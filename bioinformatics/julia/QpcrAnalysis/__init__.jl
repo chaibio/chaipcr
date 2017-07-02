@@ -3,7 +3,7 @@ function __init__()
 
     # println("calling function __init__") # raised error when starting Julia REPL with "$sysimg_path.dll": "calling function __init__fatal: error thrown and no exception handler available."
 
-    # MySQL.MySQLHandle objects involve raw Ptr objects and need to be defined in `__init__`, since memory layout does not remain the same across process restarts.
+    # MySQL.MySQLHandle objects involve raw Ptr objects and need to be defined in `__init__` (runtime instead of compile time), since memory layout does not remain the same across process restarts (e.g. between compile time and runtime).
     global const DB_CONN_DICT = OrderedDict(map([
         ("default", DB_INFO["database"]),
         ("t1", "test_1ch"),

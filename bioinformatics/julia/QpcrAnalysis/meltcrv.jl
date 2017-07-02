@@ -9,6 +9,34 @@ const EMPTY_mc_tm_pw_out = OrderedDict(
 )
 
 
+type MeltCurveTF # temperature and fluorescence
+    t_da_vec::Vector{DataArray{AbstractFloat,1}}
+    fluo_da::DataArray{AbstractFloat,2}
+end
+
+type MeltCurveTa # Tm and area
+    mc::Array{AbstractFloat,2}
+    Ta_fltd::Array{AbstractFloat,2}
+    Ta_raw::Array{AbstractFloat,2}
+    Ta_reported::String
+end
+
+type MeltCurveOutput
+    mc_bychwl::Matrix{MeltCurveTa} # dim1 is well and dim2 is channel
+    channels::Vector{Int}
+    fluo_well_nums::Vector{Int}
+    fr_ary3::Array{AbstractFloat,3}
+    mw_ary3::Array{AbstractFloat,3}
+    k4dcv::K4Deconv
+    fdcvd_ary3::Array{AbstractFloat,3}
+    wva_data::OrderedDict{String,OrderedDict{Int,Vector{AbstractFloat}}}
+    wva_well_nums::Vector{Int}
+    faw_ary3::Array{AbstractFloat,3}
+    tf_bychwl::OrderedDict{Int,Vector{OrderedDict{String,Vector{AbstractFloat}}}}
+end
+
+
+
 # Top-level function: get melting curve data and Tm for a melt curve experiment
 function process_mc(
     db_conn::MySQL.MySQLHandle,
@@ -20,10 +48,10 @@ function process_mc(
     span_smooth_default::Real=0.015,
     span_smooth_factor::Real=7.2,
     # end: arguments that might be passed by upstream code
-    dye_in::AbstractString="FAM", dyes_2bfild::AbstractVector=[],
+    dye_in::String="FAM", dyes_2bfild::AbstractVector=[],
     dcv::Bool=true, # logical, whether to perform multi-channel deconvolution
 	max_tmprtr::Real=1000, # maximum temperature to analyze
-    out_format::AbstractString="json", # "full", "pre_json", "json"
+    out_format::String="json", # "full", "pre_json", "json"
     verbose::Bool=false,
     kwdict_mc_tm_pw::OrderedDict=OrderedDict() # keyword arguments passed onto `mc_tm_pw`
     )
@@ -64,25 +92,19 @@ function process_mc(
     num_channels = 1
     dcv = false
 
-    channel_dict = OrderedDict(map(channels) do channel
-        channel => channel
-    end)
+    mc_data_bych = map(channels) do channel
+        get_mc_data(
+            channel,
+            db_conn,
+            exp_id, stage_id,
+            well_nums,
+        	max_tmprtr
+        )
+    end
 
-    mc_data_mtch = process_mtch(
-        channel_dict,
-        true, # arydims2to3
-        get_mc_data, # func
-        db_conn,
-        exp_id, stage_id,
-        well_nums,
-        max_tmprtr
-    )
+    fr_ary3 = cat(3, map(mc_data -> mc_data.fluo_da, mc_data_bych)...) # fr = fluo_raw
 
-    mc_data_mtch_bych = mc_data_mtch["pre_consoli"]
-
-    fr_ary3 = mc_data_mtch["post_consoli"]["fluo_da"] # fr = fluo_raw
-
-    mw_ary3, k_dict, fdcvd_ary3, wva_data, wva_well_nums, faw_ary3 = dcv_aw(
+    mw_ary3, k4dcv, fdcvd_ary3, wva_data, wva_well_nums, faw_ary3 = dcv_aw(
         fr_ary3, dcv, channels,
         db_conn, calib_info, fluo_well_nums, well_nums, dye_in, dyes_2bfild;
         aw_out_format="array"
@@ -94,18 +116,20 @@ function process_mc(
 
     tf_bychwl = OrderedDict( # bychwl = by channel then by well
         map(1:num_channels) do channel_i
-            channel = channels[channel_i]
             tf = map(wva_well_nums) do wva_well_num
                 if wva_well_num in fluo_well_nums
                     i = indexin([wva_well_num], fluo_well_nums)[1]
-                    tmprtrs_wNaN = mc_data_mtch_bych[channel]["t_da_vec"][i]
-                    fluos_wNaN = faw_ary3[:,i,channel]
+                    tmprtrs_wNaN = mc_data_bych[channel_i].t_da_vec[i]
+                    fluos_wNaN = faw_ary3[:,i,channel_i]
                     idc_not_NaN = find(tmprtrs_wNaN) do tmprtr
                         !isnan(tmprtr)
                     end
+                    tmprtrs = tmprtrs_wNaN[idc_not_NaN]
+                    fluos_raw = fluos_wNaN[idc_not_NaN]
+                    fluos = fluos_raw - minimum(fluos_raw) # where "normalized" came from
                     OrderedDict(
-                        "tmprtrs" => tmprtrs_wNaN[idc_not_NaN],
-                        "fluos" => fluos_wNaN[idc_not_NaN]
+                        "tmprtrs" => tmprtrs,
+                        "fluos" => fluos
                     ) # note: selecting one column of a 2-D array results in a vector (1-D array), but selecting one row of it results in a 1-row 2-D array.
                 else
                     nothing
@@ -128,10 +152,10 @@ function process_mc(
     end...)
 
     if out_format[end-3:end] == "json"
-        old_keys = ["mc", "Ta_fltd"]
-        new_keys = ["melt_curve_data", "melt_curve_analysis"]
-        mc_out = OrderedDict(map(1:length(new_keys)) do key_i
-            new_keys[key_i] => [mc_bychwl[well_i, channel_i][old_keys[key_i]]
+        fns = [:mc, :Ta_fltd]
+        keys = ["melt_curve_data", "melt_curve_analysis"]
+        mc_out = OrderedDict(map(1:length(keys)) do fk_i
+            keys[fk_i] => [getfield(mc_bychwl[well_i, channel_i], fns[fk_i])
                 for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
             ]
         end) # do key_i
@@ -139,18 +163,20 @@ function process_mc(
             mc_out = json(mc_out)
         end
     elseif out_format == "full"
-        mc_out = OrderedDict( # each element is an OrderedDict whose each element represents a channel
-            "mc_bychwl"=>mc_bychwl, # a matrix where dim1 is well and dim2 is channel
-            "channels"=>channels,
-            "fluo_well_nums"=>fluo_well_nums,
-            "fr_ary3"=>fr_ary3,
-            "mw_ary3"=>mw_ary3,
-            "k_dict"=>k_dict, "fdcvd_ary3"=>fdcvd_ary3,
-            "wva_data"=>wva_data, "wva_well_nums"=>wva_well_nums,
-            "faw_ary3"=>faw_ary3,
-            "tf_bychwl"=>tf_bychwl
+        mc_out = MeltCurveOutput(
+            mc_bychwl,
+            channels,
+            fluo_well_nums,
+            fr_ary3,
+            mw_ary3,
+            k4dcv,
+            fdcvd_ary3,
+            wva_data,
+            wva_well_nums,
+            faw_ary3,
+            tf_bychwl
         )
-    end
+    end # out_format
 
     return mc_out
 
@@ -203,15 +229,10 @@ function get_mc_data(
     # temperature DataArray vector, with rows as temperature points and columns as wells
     t_da_vec = map(tf_df -> tf_df[:temperature], tf_dv_adj)
 
-    # optical calibration
+    # fluorescence DataArray
     fluo_da = hcat(map(tf_df -> tf_df[:fluorescence_value], tf_dv_adj)...)
 
-    mc_data = OrderedDict(
-        "t_da_vec" => t_da_vec,
-        "fluo_da" => fluo_da
-    )
-
-    return mc_data
+    return MeltCurveTF(t_da_vec, fluo_da)
 
 end # get_mc_data
 
@@ -247,6 +268,7 @@ function mc_tm_pw(
     # filter Tm peaks
     qt_prob_flTm::Real=0.64, # quantile probability point for normalized -df/dT (range 0-1)
     max_normd_qtv::Real=0.601, # maximum normalized -df/dt values (range 0-1) at the quantile probablity point
+    top1_from_max_ub::Real=1, # upper bound of temperature difference between top-1 Tm peak and maximum -df/dt
     top_N::Integer=4, # top number of Tm peaks to report
     min_frac_report::Real=0.1, # minimum area fraction of the Tm peak to be reported in regards to the largest real Tm peak
 
@@ -264,6 +286,7 @@ function mc_tm_pw(
     fluos = tf_dict["fluos"][no_nti]
 
     len_raw = length(tmprtrs)
+    area_i = 2
 
     if len_raw <= 3
         ndrv_cfd = -finite_diff(
@@ -379,7 +402,7 @@ function mc_tm_pw(
 
 
         # find summit indices of Tm peaks in `ndrv`
-        span_peaks_dp = Int(round(span_peaks_tmprtr / (max_tp - min_tp) * length(tp_denser), 0)) # dp = data points
+        span_peaks_dp = Int(round(span_peaks_tmprtr / (max_tp - min_tp) * length(tp_denser), 0)) # dp = data point
         min_ns_vec = fill(minimum(ndrv_smu), span_peaks_dp) # ns = ndrv_smu
         ns_wms = [min_ns_vec; ndrv_smu; min_ns_vec] # wms = with min values
         summit_idc = find(1:len_denser) do i
@@ -403,14 +426,19 @@ function mc_tm_pw(
             area = spl(tp_denser_bes[1]) - spl(tp_denser_bes[2])    - sum(ndrv_bes) * (tp_denser_bes[2] - tp_denser_bes[1]) / 2
             #      integrated -df/dT peak area elevated from x-axis - trapezium-shaped baseline area elevlated from x-axis == peak area elevated from baseline (pa)
             # pa_vec[i] = OrderedDict("Tm"=>Tm, "pa"=>pa)
-            return round([Tm area], json_digits)
+            return round.([Tm area], json_digits)
         end...) # do Tm
 
-        # filter for real Tm peaks and against those due to random fluctuation. fltd = filtered
+
+        # filter in real Tm peaks and out those due to random fluctuation. fltd = filtered
+
         Ta_fltd = EMPTY_Ta # 0x2 Array. On another note, 2x0 Array `Ta_raw[:, 1:0]` raised error upon `json`.
-        Ta_reported_keywords = ["No", ">"]
+        Ta_reported = "No"
+
         if len_Tms > 0
-            area_i = 2
+
+            # larger_normd_qtv_of_two_sides
+            # area_i = 2
             areas_raw = Ta_raw[:, area_i]
             ndrv_normd = (ndrv - minimum(ndrv)) / (maximum(ndrv) - minimum(ndrv))
             top1_Tm_idx = summit_idc[indmax(areas_raw)]
@@ -419,26 +447,44 @@ function mc_tm_pw(
                     quantile(ndrv_normd[idc], qt_prob_flTm)
                 end
             )
-            if larger_normd_qtv_of_two_sides <= max_normd_qtv
-                Ta_reported_keywords = ["Yes", "<="]
-                idc_sb_area = sortperm(areas_raw, rev=true) # idc_sb = indice sorted by
-                idc_topN = idc_sb_area[1:min(top_N,len_Tms)]
-                fltd_idc = find(idc_topN) do idx_topN
-                    areas_raw[idx_topN] >= areas_raw[idc_topN[1]] * min_frac_report
-                end # do idx_topN
-                Ta_fltd = Ta_raw[idc_topN[fltd_idc], :]
-            end # if larger...
+
+            # top1_from_max
+            tmprtr_max_ndrv = tp_denser[findmax(ndrv_smu)[2]]
+            top1_from_max = abs(tp_denser[top1_Tm_idx] - tmprtr_max_ndrv)
+
+            # mc_slope
+            mc_slope = linreg(tmprtrs, fluos)[2]
+
+            idc_sb_area = sortperm(areas_raw, rev=true) # idc_sb = indice sorted by
+            idc_topNp1 = idc_sb_area[1 : min(top_N+1, len_Tms)]
+            min_area_report = areas_raw[idc_topNp1[1]] * min_frac_report
+
+            # reporting
+            if (
+                larger_normd_qtv_of_two_sides <= max_normd_qtv &&
+                top1_from_max <= top1_from_max_ub &&
+                mc_slope < 0
+                )
+                fltd_idc = find(idc_topNp1) do idx
+                    areas_raw[idx] >= min_area_report
+                end # do idx
+                if length(fltd_idc) <= top_N # When all the Tm peaks are noises, no peak is expected to have a substantially larger area than the other peaks. This can be observed as top-(N+1) peak has an area >= `min_area_report`, and thus `length(fltd_idc) > top_N`
+                    Ta_fltd = Ta_raw[idc_topNp1[fltd_idc], :]
+                    Ta_reported = "Yes"
+                end # if length
+            end # if (
+
         end # if len_Tms > 0
 
     end # if shorter_length_raw <= 3 ... else
 
-    mc = round(mc_raw, json_digits)
+    mc = round.(mc_raw, json_digits)
 
-    return OrderedDict(
-        "mc"=>mc,
-        "Ta_fltd"=>Ta_fltd,
-        "Ta_raw"=>Ta_raw,
-        "Ta_reported" => "$(Ta_reported_keywords[1]). The larger normalized quantile value of the left and right sides of the summit on the negative derivative curve $larger_normd_qtv_of_two_sides $(Ta_reported_keywords[2]) `max_normd_qtv` $max_normd_qtv."
+    return MeltCurveTa(
+        mc,
+        Ta_fltd,
+        Ta_raw,
+        "$Ta_reported. All of the following statements must be true for Tm to be reported. (1) The larger normalized quantile value of the left and right sides of the summit on the negative derivative curve $larger_normd_qtv_of_two_sides <= `max_normd_qtv` $max_normd_qtv. (2) The top-1 Tm peak is $(top1_from_max)C (need to be <= top1_from_max_ub $(top1_from_max_ub)C) away from maximum -df/dT temperature $tmprtr_max_ndrv. (3) Has $(size(Ta_raw)[1]) no more than $top_N (top_N) raw_tm peaks, or the top-$(top_N+1) (top_N+1) peak has an area $(areas_raw[idc_topNp1[end]]) <= $min_area_report ($min_frac_report of the top-1 peak). (4) The slope of the straight line fit to the melt curve $mc_slope < 0."
     )
 
 end # mc_tm_pw

@@ -50,9 +50,10 @@ end: items to be tested"""
 
 
 # constants
-immutable TestDBInfo
-    db_name::AbstractString
-    db_name_src::AbstractString
+
+immutable TestDBInfo # need to load each sqldump file named "$db_name_src.sql" as an MySQL database named "db_name"
+    db_name::String
+    db_name_src::String
     exp_ids::OrderedDict
 end
 
@@ -97,7 +98,7 @@ function test(;
 
     OrderedDict(map(keys(TD_INFO_DICT)) do td_key
 
-        tr_cs = OrderedDict{AbstractString,Any}() # test_results_channel_setup
+        tr_cs = OrderedDict{String,Any}() # test_results_channel_setup
 
         channel_setup = CHANNEL_SETUP_DICT[td_key]
         print_v(println, verbose, "$channel_setup tests:")
@@ -130,7 +131,7 @@ function test(;
 
             if debug
                 if action == "amplification"
-                    amp_debug = process_amp(db_conn, exp_id, [], calib_info)
+                    amp_debug = process_amp(db_conn, exp_id, Vector{AmpStepRampProperties}(), calib_info)
                 elseif action == "meltcurve"
                     mc_debug = process_mc(db_conn, exp_id, stage_id, calib_info)
                 end # if action
@@ -166,7 +167,7 @@ function test(;
             end : calib_info
 
             if debug
-                anlz_debug = ANALYZE_DICT[guid](db_conn, exp_id, calib_info_anlz)
+                anlz_debug = analyze_func(Analyze_DICT[guid](), db_conn, exp_id, calib_info_anlz)
             end
 
             reqb = args2reqb(

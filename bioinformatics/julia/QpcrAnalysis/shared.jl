@@ -7,7 +7,7 @@ const JSON_DIGITS = 3 # number of decimal points for floats in JSON output
 
 const JULIA_ENV = ENV["JULIA_ENV"]
 
-const DB_INFO = JSON.parsefile("$MODULE_DIR/database.json", dicttype=OrderedDict)[JULIA_ENV]
+const DB_INFO = JSON.parsefile("$LOAD_FROM_DIR/database.json", dicttype=OrderedDict)[JULIA_ENV]
 
 # ABSENT_IN_REQ values
 const calib_info_AIR = 0 # calib_info == ABSENT_IN_REQ. To conform with `calib_info::Union{Integer,OrderedDict}``
@@ -78,7 +78,7 @@ end # ensure_ci
 function finite_diff(
     X::AbstractVector, Y::AbstractVector; # X and Y must be of same length
     nu::Integer=1, # order of derivative
-    method::AbstractString="central"
+    method::String="central"
     )
 
     dlen = length(X)
@@ -134,7 +134,7 @@ end
 
 function get_mysql_data_well(
     well_nums::AbstractVector, # must be sorted in ascending order
-    qry_2b::AbstractString, # must select "well_num" column
+    qry_2b::String, # must select "well_num" column
     db_conn::MySQL.MySQLHandle,
     verbose::Bool,
     )
@@ -219,7 +219,7 @@ end
 
 
 # parse AbstractFloat on BBB
-function parse_af{T<:AbstractFloat}(::Type{T}, strval::AbstractString)
+function parse_af{T<:AbstractFloat}(::Type{T}, strval::String)
     str_parts = split(strval, '.')
     float_parts = map(str_part -> parse(Int32, str_part), str_parts)
     return float_parts[1] + float_parts[2] / 10^length(str_parts[2])

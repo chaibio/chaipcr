@@ -21,7 +21,7 @@ const DYE2CHST = OrderedDict( # mapping from dye to channel and step_id.
 
 immutable Ccsc # channels_check_subset_composite
     set::Vector # channels
-    description::AbstractString
+    description::String
 end
 
 
@@ -87,7 +87,7 @@ function get_wva_data(
     calib_id_s::Union{Integer,OrderedDict},
     step_id_s::Union{Integer,OrderedDict},
     db_conn::MySQL.MySQLHandle,
-    calib_id_key_isa::AbstractString, # "channel" or "dye"
+    calib_id_key_isa::String, # "channel" or "dye"
     well_nums::AbstractVector
     )
 
@@ -130,7 +130,7 @@ function get_wva_data(
         wva_vecs_byky = Array{Array{AbstractFloat,1},1}()
         well_nums_dupd = Vector{Vector}()
         for calib_id_key in calib_id_key_vec
-            if calib_id_key_isa == "channel" # AbstractString
+            if calib_id_key_isa == "channel" # String
                 channel = calib_id_key
             elseif calib_id_key_isa == "dye" #
                 channel = DYE2CHST[calib_id_key]["channel"]
@@ -180,7 +180,7 @@ function prep_adj_w2wvaf(
     db_conn::MySQL.MySQLHandle,
     calib_info::Union{Integer,OrderedDict}, # can be an interger or a OrderedDict in chai format: OrderedDict("water"=OrderedDict(calibration_id=>..., step_id=>...), "channel_1"=OrderedDict(calibration_id=..., step_id=...), "channel_2"=OrderedDict(calibration_id=...", step_id=...).
     well_nums::AbstractVector,
-    dye_in::AbstractString="FAM",
+    dye_in::String="FAM",
     dyes_2bfild::AbstractVector=[]
     )
 
@@ -229,7 +229,7 @@ function prep_adj_w2wvaf(
     end
 
     # check whether signal fluo > water fluo
-    stop_msgs = Vector{AbstractString}()
+    stop_msgs = Vector{String}()
     for channel_in_signal in channels_in_signal
         wva_invalid_idc = find(
             signal_minus_water -> signal_minus_water <= 0, signal_data_dict[channel_in_signal] .- water_data_dict[channel_in_signal]

@@ -13,9 +13,20 @@ qt_prob_flTm = 0.1
 max_normd_qtv = 0.9
 
 
+type TmCheck1w
+    Tm::Tuple{AbstractFloat,Bool}
+    area::AbstractFloat
+end
 
-ANALYZE_DICT["thermal_consistency"] = function thermal_consistency(
+type ThermalConsistencyOutput
+    tm_check::Vector{TmCheck1w}
+    delta_Tm::Tuple{AbstractFloat,Bool}
+end
+
+
+function analyze_func(
     # copy over the whole signature of `meltcrv`, comment out `stage_id`
+    ::ThermalConsistency,
     db_conn::MySQL.MySQLHandle,
     exp_id::Integer, # stage_id::Integer,
     calib_info::Union{Integer,OrderedDict};
@@ -25,10 +36,10 @@ ANALYZE_DICT["thermal_consistency"] = function thermal_consistency(
     span_smooth_default::Real=0.015,
     span_smooth_factor::Real=7.2,
     # end: arguments that might be passed by upstream code
-    dye_in::AbstractString="FAM", dyes_2bfild::AbstractVector=[],
+    dye_in::String="FAM", dyes_2bfild::AbstractVector=[],
     dcv::Bool=true, # logical, whether to perform multi-channel deconvolution
 	max_tmprtr::Real=1000, # maximum temperature to analyze
-    # out_format::AbstractString="json", # "full", "pre_json", "json"
+    # out_format::String="json", # "full", "pre_json", "json"
     verbose::Bool=false,
     kwdict_mc_tm_pw::OrderedDict=OrderedDict() # keyword arguments passed onto `mc_tm_pw`
     )
@@ -54,13 +65,13 @@ ANALYZE_DICT["thermal_consistency"] = function thermal_consistency(
 
     # process the data from only one channel
     channel_proc = 1
-    channel_proc_i = find(mc_w72c["channels"]) do channel
+    channel_proc_i = find(mc_w72c.channels) do channel
         channel == channel_proc
     end[1] # do channel
 
     mc_tm = map(
-        mc_bywl -> mc_bywl["Ta_fltd"],
-        mc_w72c["mc_bychwl"][:, channel_proc_i]
+        mc_bywl -> mc_bywl.Ta_fltd,
+        mc_w72c.mc_bychwl[:, channel_proc_i]
     )
 
     tm_check_vec = []
@@ -69,7 +80,7 @@ ANALYZE_DICT["thermal_consistency"] = function thermal_consistency(
 
     for Ta in mc_tm
         if size(Ta)[1] == 0
-            tm_check_1w = OrderedDict("Tm" => (NaN, false), "area" => NaN)
+            tm_check_1w = TmCheck1w((NaN, false), NaN)
         else
             top1_Tm = Ta[1,1]
             if top1_Tm < min_Tm
@@ -78,20 +89,19 @@ ANALYZE_DICT["thermal_consistency"] = function thermal_consistency(
             if top1_Tm > max_Tm
                 max_Tm = top1_Tm
             end
-            tm_check_1w = OrderedDict(
-                "Tm" => (
-                    top1_Tm,
-                    MIN_TM_VAL <= top1_Tm <= MAX_TM_VAL),
-                "area" => Ta[1,2] )
+            tm_check_1w = TmCheck1w(
+                (top1_Tm, MIN_TM_VAL <= top1_Tm <= MAX_TM_VAL),
+                Ta[1,2]
+            )
         end # if size
         push!(tm_check_vec, tm_check_1w)
     end # for
 
-    delta_Tm = max_Tm - min_Tm
+    delta_Tm_val = max_Tm - min_Tm
 
-    mc_w72c_out = OrderedDict(
-        "tm_check" => tm_check_vec,
-        "delta_Tm" => (round(delta_Tm, JSON_DIGITS), delta_Tm <= MAX_DELTA_TM_VAL)
+    mc_w72c_out = ThermalConsistencyOutput(
+        tm_check_vec,
+        (round(delta_Tm_val, JSON_DIGITS), delta_Tm_val <= MAX_DELTA_TM_VAL)
     )
 
     return json(mc_w72c_out)

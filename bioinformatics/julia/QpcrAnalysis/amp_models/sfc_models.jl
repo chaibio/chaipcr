@@ -1,4 +1,3 @@
-#
 
 # models with same formula for each cycle (Sfc models)
 
@@ -7,7 +6,7 @@ type sfc_model_def # non-linear model, one feature (`x`)
 
 # included in SFC_MODEL_BASE
 
-    name::AbstractString
+    name::String
     linear::Bool
 
     _x_strs::AbstractVector
@@ -24,7 +23,7 @@ type sfc_model_def # non-linear model, one feature (`x`)
     func_pred_strs::OrderedDict
     funcs_pred::OrderedDict
 
-    func_fit_str::AbstractString
+    func_fit_str::String
     func_fit::Function
 
 end
@@ -39,7 +38,7 @@ const MD_func_keys = ["f", "inv", "bl", "d1", "d2"] # when `num_fts > 1`, "d*" a
 # `EMPTY_fp` for `func_pred_strs` and `funcs_pred`
 const EMPTY_fp = map(("", empty_func)) do empty_val
     # OrderedDict(map(MD_func_keys) do func_key # v0.4, `supertype` not defined, `typeof(some_function) == Function`
-    OrderedDict{AbstractString,supertype(typeof(empty_val))}(map(MD_func_keys) do func_key # v0.5, `super` becomes `supertype`, `typeof(some_function) == #some_function AND supertype(typeof(some_function)) == Function`
+    OrderedDict{String,supertype(typeof(empty_val))}(map(MD_func_keys) do func_key # v0.5, `super` becomes `supertype`, `typeof(some_function) == #some_function AND supertype(typeof(some_function)) == Function`
         func_key => empty_val
     end) # do func_key
 end # do empty_val
@@ -49,9 +48,6 @@ const MD_EMPTY_vals = (
     "", # func_fit_str
     empty_func # func_fit
 )
-
-# empty output in place of `func_fit` output
-const EMPTY_fitted = OrderedDict("coefs"=>zeros(0), "status"=>:NotFitted, "obj_val"=>0, "jmp_model"=>Model(), "init_coefs"=>zeros(0))
 
 
 const SFC_MODEL_BASES = [ # vector of tuples
@@ -116,7 +112,7 @@ const SFC_MODEL_BASES = [ # vector of tuples
         d_ = maximum(Y) + epsilon
         idc_4be = Y_min_idx:length(Y)
         Y_4be = Y[idc_4be]
-        Y_logit = log((d_ - Y_4be) ./ (Y_4be - c_))
+        Y_logit = log.((d_ - Y_4be) ./ (Y_4be - c_))
         lin1_coefs = linreg(X[idc_4be], Y_logit)
         b_ = lin1_coefs[2]
         e_ = -lin1_coefs[1] / b_
@@ -150,8 +146,8 @@ const SFC_MODEL_BASES = [ # vector of tuples
         d_ = maximum(Y) + epsilon
         idc_4be = Y_min_idx:length(Y)
         Y_4be = Y[idc_4be]
-        Y_logit = log((d_ - Y_4be) ./ (Y_4be - c_))
-        lin1_coefs = linreg(log(X[idc_4be]), Y_logit)
+        Y_logit = log.((d_ - Y_4be) ./ (Y_4be - c_))
+        lin1_coefs = linreg(log.(X[idc_4be]), Y_logit)
         b_ = lin1_coefs[2]
         e_ = exp(-lin1_coefs[1] / b_)
         return OrderedDict("b_"=>b_, "c_"=>c_, "d_"=>d_, "e_"=>e_)
@@ -183,8 +179,8 @@ const SFC_MODEL_BASES = [ # vector of tuples
         d_ = maximum(Y) + epsilon
         idc_4be = Y_min_idx:length(Y)
         Y_4be = Y[idc_4be]
-        Y_logit = log((d_ - Y_4be) ./ (Y_4be - c_))
-        lin1_coefs = linreg(log(X[idc_4be]), Y_logit)
+        Y_logit = log.((d_ - Y_4be) ./ (Y_4be - c_))
+        lin1_coefs = linreg(log.(X[idc_4be]), Y_logit)
         b_ = lin1_coefs[2]
         e_ = exp(-lin1_coefs[1] / b_)
         bl_k = 0
@@ -223,8 +219,8 @@ const SFC_MODEL_BASES = [ # vector of tuples
         d_ = maximum(Y) + epsilon
         idc_4be = Y_min_idx:length(Y)
         Y_4be = Y[idc_4be]
-        Y_logit = log((d_ - Y_4be) ./ (Y_4be - c_))
-        lin1_coefs = linreg(log(X[idc_4be]), Y_logit)
+        Y_logit = log.((d_ - Y_4be) ./ (Y_4be - c_))
+        lin1_coefs = linreg(log.(X[idc_4be]), Y_logit)
         b_ = lin1_coefs[2]
         e_ = exp(-lin1_coefs[1] / b_)
         k1 = 0
@@ -262,8 +258,8 @@ const SFC_MODEL_BASES = [ # vector of tuples
         d_ = maximum(Y) + epsilon
         idc_4be = Y_min_idx:length(Y)
         Y_4be = Y[idc_4be]
-        Y_logit = log((d_ - Y_4be) ./ (Y_4be - c_))
-        lin1_coefs = linreg(log(X[idc_4be]), Y_logit)
+        Y_logit = log.((d_ - Y_4be) ./ (Y_4be - c_))
+        lin1_coefs = linreg(log.(X[idc_4be]), Y_logit)
         b_ = lin1_coefs[2]
         e_ = exp(-lin1_coefs[1] / b_)
         k1 = 0
@@ -302,8 +298,8 @@ const SFC_MODEL_BASES = [ # vector of tuples
         d_ = maximum(Y) + epsilon
         idc_4be = Y_min_idx:length(Y)
         Y_4be = Y[idc_4be]
-        Y_logit = log((d_ - Y_4be) ./ (Y_4be - c_))
-        lin1_coefs = linreg(log(X[idc_4be]), Y_logit)
+        Y_logit = log.((d_ - Y_4be) ./ (Y_4be - c_))
+        lin1_coefs = linreg(log.(X[idc_4be]), Y_logit)
         b_ = lin1_coefs[2]
         e_ = -lin1_coefs[1] / b_
         return OrderedDict("b_"=>b_, "c_"=>c_, "d_"=>d_, "e_"=>e_)
@@ -335,8 +331,8 @@ const SFC_MODEL_BASES = [ # vector of tuples
         d_ = maximum(Y) + epsilon
         idc_4be = Y_min_idx:length(Y)
         Y_4be = Y[idc_4be]
-        Y_logit = log((d_ - Y_4be) ./ (Y_4be - c_))
-        lin1_coefs = linreg(log(X[idc_4be]), Y_logit)
+        Y_logit = log.((d_ - Y_4be) ./ (Y_4be - c_))
+        lin1_coefs = linreg(log.(X[idc_4be]), Y_logit)
         b_ = lin1_coefs[2]
         e_ = exp(-lin1_coefs[1] / b_)
         bl_k = 0
@@ -375,8 +371,8 @@ const SFC_MODEL_BASES = [ # vector of tuples
         d_ = maximum(Y) + epsilon
         idc_4be = Y_min_idx:length(Y)
         Y_4be = Y[idc_4be]
-        Y_logit = log((d_ - Y_4be) ./ (Y_4be - c_))
-        lin1_coefs = linreg(log(X[idc_4be]), Y_logit)
+        Y_logit = log.((d_ - Y_4be) ./ (Y_4be - c_))
+        lin1_coefs = linreg(log.(X[idc_4be]), Y_logit)
         b_ = lin1_coefs[2]
         e_ = exp(-lin1_coefs[1] / b_)
         k1 = 0
@@ -414,8 +410,8 @@ const SFC_MODEL_BASES = [ # vector of tuples
         d_ = maximum(Y) + epsilon
         idc_4be = Y_min_idx:length(Y)
         Y_4be = Y[idc_4be]
-        Y_logit = log((d_ - Y_4be) ./ (Y_4be - c_))
-        lin1_coefs = linreg(log(X[idc_4be]), Y_logit)
+        Y_logit = log.((d_ - Y_4be) ./ (Y_4be - c_))
+        lin1_coefs = linreg(log.(X[idc_4be]), Y_logit)
         b_ = lin1_coefs[2]
         e_ = exp(-lin1_coefs[1] / b_)
         k1 = 0
@@ -469,9 +465,9 @@ end
 
 function add_func_fit!( # vco = variable constraints objective
     md::sfc_model_def;
-    Y_str::AbstractString="Y",
-    obj_algrt::AbstractString="RSS",
-    sense::AbstractString="Min", # "Min", "Max"
+    Y_str::String="Y",
+    obj_algrt::String="RSS",
+    sense::String="Min", # "Min", "Max"
     )
 
     # X_strs
@@ -542,7 +538,7 @@ function add_func_fit!( # vco = variable constraints objective
         "coef_strs = [\"$(join(md.coef_strs, "\", \""))\"]",
         "coefs = map(getvalue, [$(join(md.coef_strs, ", "))])",
         "obj_val = getobjectivevalue(jmp_model)",
-        "return OrderedDict(\"coef_strs\"=>coef_strs, \"coefs\"=>coefs, \"status\"=>status, \"obj_val\"=>obj_val, \"jmp_model\"=>jmp_model, \"init_coefs\"=>init_coefs); end"
+        "return SfcFitted(coef_strs, coefs, status, obj_val, jmp_model, init_coefs); end"
     ], "; ")
 
 

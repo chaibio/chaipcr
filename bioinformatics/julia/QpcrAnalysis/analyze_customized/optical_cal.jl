@@ -3,13 +3,13 @@
 
 # check JSON output in UI: http://:ip_address/experiments/:exp_id/analyze
 
-
-ANALYZE_DICT["optical_cal"] = function analyze_optical_cal(
+function analyze_func(
+    ::OpticalCal,
     db_conn::MySQL.MySQLHandle,
     exp_id::Integer, # not used for computation
     calib_info::Union{Integer,OrderedDict}; # really used
     well_nums::AbstractVector=[],
-    dye_in::AbstractString="FAM", dyes_2bfild::Vector=[],
+    dye_in::String="FAM", dyes_2bfild::Vector=[],
     out_json=true,
     verbose=false
     )
@@ -23,7 +23,7 @@ ANALYZE_DICT["optical_cal"] = function analyze_optical_cal(
     )
 
     result = OrderedDict("valid"=>true)
-    err_msg_vec = Vector{AbstractString}()
+    err_msg_vec = Vector{String}()
 
 
     # get_k
@@ -40,7 +40,7 @@ ANALYZE_DICT["optical_cal"] = function analyze_optical_cal(
             err_msg = isa(result_k, ErrorException) ? result_k.msg : "$(string(result_k)). "
             push!(err_msg_vec, "K matrix: $err_msg")
         else
-            inv_note = result_k["inv_note"]
+            inv_note = result_k.inv_note
             if length(inv_note) > 0
                 push!(err_msg_vec, inv_note)
             end # if length

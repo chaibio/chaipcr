@@ -19,9 +19,9 @@ function dcv_aw(
     calib_info::Union{Integer,OrderedDict},
     well_nums_found_in_fr::AbstractVector,
     well_nums_in_req=[]::AbstractVector,
-    dye_in::AbstractString="FAM",
+    dye_in::String="FAM",
     dyes_2bfild::AbstractVector=[];
-    aw_out_format::AbstractString="both" # "array", "dict", "both"
+    aw_out_format::String="both" # "array", "dict", "both"
     )
 
     calib_info = ensure_ci(db_conn, calib_info)
@@ -47,9 +47,9 @@ function dcv_aw(
 
     if dcv
         # k_inv_vec = fill(reshape(DataArray([1, 0, 1, 0]), 2, 2), 16) # addition with flexible ratio instead of deconvolution
-        k_dict, dcvd_ary3 = deconv(1. * mw_ary3, channels, wva_well_idc_wfluo, db_conn, calib_info, well_nums_in_req; out_format="array")
+        k4dcv, dcvd_ary3 = deconv(1. * mw_ary3, channels, wva_well_idc_wfluo, db_conn, calib_info, well_nums_in_req; out_format="array")
     else
-        k_dict = OrderedDict()
+        k4dcv = K4DCV_EMPTY
         dcvd_ary3 = mw_ary3
     end
 
@@ -62,7 +62,7 @@ function dcv_aw(
         )
     end
 
-    dcvd_aw_ary3 = Array{typeof(0.)}(cat(3, dcvd_aw_vec...))
+    dcvd_aw_ary3 = Array{AbstractFloat}(cat(3, dcvd_aw_vec...))
     dcvd_aw_dict = OrderedDict(map(1:num_channels) do channel_i
         channels[channel_i] => dcvd_aw_vec[channel_i]
     end) # do channel_i
@@ -77,7 +77,7 @@ function dcv_aw(
         error("`out_format` must be \"array\", \"dict\" or \"both\". ")
     end
 
-    return (mw_ary3, k_dict, dcvd_ary3, wva_data, wva_well_nums, dcvd_aw...)
+    return (mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, dcvd_aw...)
 
 end # dcv_aw
 
@@ -131,6 +131,16 @@ end # get_full_calib_data
 
 
 # perform deconvolution and adjustment of well-to-well variation on calibration experiment 1 using the k matrix `wva_data` made from calibration expeirment 2
+
+type CalibCalibOutput
+    ary2dcv_1::Array{AbstractFloat,3}
+    mw_ary3_1::Array{AbstractFloat,3}
+    k4dcv_2::K4Deconv
+    dcvd_ary3_1::Array{AbstractFloat,3}
+    wva_data_2::OrderedDict{String,OrderedDict{Int,AbstractVector}}
+    dcv_aw_ary3_1::Array{AbstractFloat,3}
+end
+
 function calib_calib(
     db_conn_1::MySQL.MySQLHandle,
     db_conn_2::MySQL.MySQLHandle,
@@ -138,7 +148,7 @@ function calib_calib(
     calib_info_2::OrderedDict,
     well_nums_1::AbstractVector=[],
     well_nums_2::AbstractVector=[];
-    dye_in::AbstractString="FAM", dyes_2bfild::AbstractVector=[]
+    dye_in::String="FAM", dyes_2bfild::AbstractVector=[]
     )
 
     # This function is expected to handle situations where `calib_info_1` and `calib_info_2` have different combinations of wells, but the number of wells should be the same.
@@ -161,19 +171,19 @@ function calib_calib(
         reshape(transpose(fluo_data), 1, num_wells, num_channels)
     end...) # do value_1
 
-    mw_ary3_1, k_dict_2, dcvd_ary3_1, wva_data_2, wva_well_nums_2, dcv_aw_ary3_1 = dcv_aw(
+    mw_ary3_1, k4dcv_2, dcvd_ary3_1, wva_data_2, wva_well_nums_2, dcv_aw_ary3_1 = dcv_aw(
         ary2dcv_1, true, channels_1,
         db_conn_2, calib_info_2, well_nums_2, well_nums_2, dye_in, dyes_2bfild;
         aw_out_format="array"
     )
 
-    return OrderedDict(
-        "ary2dcv_1"=>ary2dcv_1,
-        "mw_ary3_1"=>mw_ary3_1,
-        "k_dict_2"=>k_dict_2,
-        "dcvd_ary3_1"=>dcvd_ary3_1,
-        "wva_data_2"=>wva_data_2,
-        "dcv_aw_ary3_1"=>dcv_aw_ary3_1
+    return CalibCalibOutput(
+        ary2dcv_1,
+        mw_ary3_1,
+        k4dcv_2,
+        dcvd_ary3_1,
+        wva_data_2,
+        dcv_aw_ary3_1
     )
 
 end # calib_calib

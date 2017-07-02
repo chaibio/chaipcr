@@ -1,5 +1,14 @@
 # color compensation / multi-channel deconvolution
 
+type K4Deconv
+    k_s::AbstractArray
+    k_inv_vec::AbstractArray
+    inv_note::String
+end
+
+const ARRAY_EMPTY = Array{Any}()
+const K4DCV_EMPTY = K4Deconv(ARRAY_EMPTY, ARRAY_EMPTY, "")
+
 
 # multi-channel deconvolution
 function deconv(
@@ -12,7 +21,7 @@ function deconv(
     calib_info::Union{Integer,OrderedDict}=calib_info_AIR,
     well_nums::AbstractVector=[];
 
-    out_format::AbstractString="both" # "array", "dict", "both"
+    out_format::String="both" # "array", "dict", "both"
     )
 
     a2d_dim1, a2d_dim_well, a2d_dim_channel = size(ary2dcv)
@@ -23,13 +32,13 @@ function deconv(
 
     dcvd_ary3 = similar(ary2dcv)
 
-    k_dict = (isa(calib_info, Integer) || begin
+    k4dcv = (isa(calib_info, Integer) || begin
         step_ids = map(ci_value -> ci_value["step_id"], values(calib_info))
         length_step_ids = length(step_ids)
         length_step_ids <= 2 || length(unique(step_ids)) < length_step_ids
-    end) ? K_DICT : get_k(db_conn, calib_info, well_nums) # use default `well_proc` value
+    end) ? K4DCV : get_k(db_conn, calib_info, well_nums) # use default `well_proc` value
 
-    k_inv_vec = k_dict["k_inv_vec"]
+    k_inv_vec = k4dcv.k_inv_vec
 
     for i1 in 1:a2d_dim1, i_well in 1:a2d_dim_well
         dcvd_ary3[i1, i_well, :] = *(
@@ -53,7 +62,7 @@ function deconv(
         end # if out_format == "dict"
     end # if out_format == "array"
 
-    return (k_dict, dcvd...)
+    return (k4dcv, dcvd...)
 
 end # deconv
 
@@ -63,9 +72,9 @@ function get_k(
     db_conn::MySQL.MySQLHandle, # MySQL database connection
     dcv_exp_info::OrderedDict, # OrderedDict("water"=OrderedDict(calibration_id=..., step_id=...), "channel_1"=OrderedDict(calibration_id=..., step_id=...),  "channel_2"=OrderedDict(calibration_id=...", step_id=...). # info on experiment(s) used to calculate matrix k
     well_nums::AbstractVector=[];
-    well_proc::AbstractString="vec", # options: "mean", "vec".
+    well_proc::String="vec", # options: "mean", "vec".
     Float_T::DataType=Float32, # ensure compatibility with other OSs
-    save_to::AbstractString="" # used: "k.jld"
+    save_to::String="" # used: "k.jld"
     )
 
     dcv_exp_info = ensure_ci(db_conn, dcv_exp_info)
@@ -78,7 +87,7 @@ function get_k(
     water_data, water_well_nums = dcv_data_dict["water"]
     num_wells = length(water_well_nums)
 
-    k_dict_bydy = OrderedDict(map(cd_key_vec) do cd_key
+    k4dcv_bydy = OrderedDict(map(cd_key_vec) do cd_key
         k_data_1dye, dcv_well_nums = dcv_data_dict[cd_key]
         return cd_key => k_data_1dye .- water_data
     end) # `dcv_well_nums` is not passed on because expected to be the same as `water_well_nums`, otherwise error will be raised by `get_full_calib_data`
@@ -86,14 +95,14 @@ function get_k(
 
     # assuming `cd_key` (in the format of "channel_1", "channel_2", etc.) is the target channel of the dye, check whether the water-subtracted signal in target channel is greater than that in non-target channel for each well and each dye.
 
-    stop_msgs = Vector{AbstractString}()
+    stop_msgs = Vector{String}()
 
     channels = map(cd_key_vec) do cd_key
         parse(Int, split(cd_key, "_")[2])
     end
 
     for target_channel_i in 1:length(channels)
-        signals = k_dict_bydy[cd_key_vec[target_channel_i]]
+        signals = k4dcv_bydy[cd_key_vec[target_channel_i]]
         target_signals = signals[target_channel_i, :]
         for non_target_channel_i in setdiff(channels, target_channel_i)
             non_target_signals = signals[non_target_channel_i, :]
@@ -120,7 +129,7 @@ function get_k(
     if well_proc == "mean"
         k_s = hcat(
             map(cd_key_vec) do cd_key
-                k_mean_vec_1dye = mean(k_dict_bydy[cd_key], 2)
+                k_mean_vec_1dye = mean(k4dcv_bydy[cd_key], 2)
                 k_1dye = k_mean_vec_1dye / sum(k_mean_vec_1dye)
                 return Array{Float_T}(k_1dye)
             end...) # do cd_key
@@ -139,7 +148,7 @@ function get_k(
         k_inv_vec = similar(k_s)
         for i in 1:num_wells
             k_mtx = hcat(map(cd_key_vec) do cd_key
-                k_vec_1dye = k_dict_bydy[cd_key][:,i]
+                k_vec_1dye = k4dcv_bydy[cd_key][:,i]
                 k_1dye = k_vec_1dye / sum(k_vec_1dye)
                 return Array{Float_T}(k_1dye)
             end...) # do cd_key
@@ -163,18 +172,12 @@ function get_k(
 
     inv_note = length(inv_note_pt1) > 0 ? "$inv_note_pt1: $inv_note_pt2" : ""
 
+    k4dcv = K4Deconv(k_s, k_inv_vec, inv_note)
+
     if length(save_to) > 0
-        save(save_to,
-            "k_s", k_s,
-            "k_inv_vec", k_inv_vec,
-            "inv_note", inv_note
-        )
+        save(save_to, "k4dcv", k4dcv)
     end
 
-    return OrderedDict(
-        "k_s"=>k_s,
-        "k_inv_vec"=>k_inv_vec,
-        "inv_note"=>inv_note
-    )
+    return k4dcv
 
 end # get_k

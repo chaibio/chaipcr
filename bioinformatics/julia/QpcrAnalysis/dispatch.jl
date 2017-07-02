@@ -1,6 +1,6 @@
 #
 
-function dispatch(action::AbstractString, request_body::AbstractString)
+function dispatch(action::String, request_body::String)
 
     req_dict = JSON.parse(request_body; dicttype=OrderedDict) # Julia 0.4.6, DataStructures 0.4.4. DefautlDict and DefaultOrderedDict constructors sometimes don't work on OrderedDict (https://github.com/JuliaLang/DataStructures.jl/issues/205)
     keys_req_dict = keys(req_dict)
@@ -17,16 +17,16 @@ function dispatch(action::AbstractString, request_body::AbstractString)
         if action == "amplification"
             exp_id = req_dict["experiment_id"]
             if "step_id" in keys_req_dict
-                sr_vec = [("step", req_dict["step_id"])]
+                asrp_vec = [AmpStepRampProperties("step", req_dict["step_id"], DEFAULT_cyc_nums)]
             elseif "ramp_id" in keys_req_dict
-                sr_vec = [("ramp", req_dict["ramp_id"])]
+                asrp_vec = [AmpStepRampProperties("ramp", req_dict["ramp_id"], DEFAULT_cyc_nums)]
             else
-                sr_vec = []
+                asrp_vec = Vector{AmpStepRampProperties}()
             end
             baseline_cyc_bounds = "baseline_cyc_bounds" in keys_req_dict ? reshape_lv(req_dict["baseline_cyc_bounds"], 1) : []
             cq_method = "cq_method" in keys_req_dict ? req_dict["cq_method"] : "Cy0"
             process_amp( # can't use `return` to return within `try`
-                db_conn, exp_id, sr_vec, calib_info;
+                db_conn, exp_id, asrp_vec, calib_info;
                 min_reliable_cyc=req_dict["min_ct"],
                 baseline_cyc_bounds=baseline_cyc_bounds,
                 cq_method=cq_method,
@@ -43,8 +43,8 @@ function dispatch(action::AbstractString, request_body::AbstractString)
             exp_info = req_dict["experiment_info"]
             exp_id = exp_info["id"]
             guid = exp_info["guid"]
-            ANALYZE_DICT[guid](
-                db_conn, exp_id, calib_info;
+            analyze_func(
+                Analyze_DICT[guid](), db_conn, exp_id, calib_info;
             )
         else
             error("action $action is not found")
@@ -78,7 +78,7 @@ end
 
 # testing function: construct `request_body` from separate arguments
 function args2reqb(
-    action::AbstractString,
+    action::String,
     exp_id::Integer,
     calib_info::Union{Integer,OrderedDict};
     stage_id::Integer=0,
@@ -86,14 +86,14 @@ function args2reqb(
     ramp_id::Integer=0,
     min_reliable_cyc::Real=5,
     baseline_cyc_bounds::AbstractVector=[],
-    guid::AbstractString="",
+    guid::String="",
     extra_args::OrderedDict=OrderedDict(),
-    wdb::AbstractString="dflt", # "handle", "dflt", "connect"
-    db_key::AbstractString="default", # "default", "t1", "t2"
-    db_host::AbstractString="localhost",
-    db_usr::AbstractString="root",
-    db_pswd::AbstractString="",
-    db_name::AbstractString="chaipcr",
+    wdb::String="dflt", # "handle", "dflt", "connect"
+    db_key::String="default", # "default", "t1", "t2"
+    db_host::String="localhost",
+    db_usr::String="root",
+    db_pswd::String="",
+    db_name::String="chaipcr",
     )
 
     reqb = OrderedDict{typeof(""),Any}("calibration_info"=>calib_info)

@@ -8,7 +8,8 @@ const MIN_EXCITATION_FLUORESCENCE_MULTIPLE = 3
 const MAX_EXCITATION = 384000
 
 
-ANALYZE_DICT["optical_test_single_channel"] = function analyze_optical_test_single_channel(
+function analyze_func(
+    ::OpticalTestSingleChannel,
     db_conn::MySQL.MySQLHandle,
     exp_id::Integer,
     calib_info::Union{Integer,OrderedDict}=calib_info_AIR; # not used for computation

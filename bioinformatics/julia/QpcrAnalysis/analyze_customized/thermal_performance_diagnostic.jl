@@ -13,7 +13,8 @@ const MIN_HEATING_RATE = 1 # C/s
 const MAX_TIME_TO_HEAT = 90e3 # ms
 
 
-ANALYZE_DICT["thermal_performance_diagnostic"] = function analyze_thermal_performance_diagnostic(
+function analyze_func(
+    ::ThermalPerformanceDiagnostic,
     db_conn::MySQL.MySQLHandle,
     exp_id::Integer, # really used
     calib_info::Union{Integer,OrderedDict} # not used for computation
@@ -43,12 +44,12 @@ ANALYZE_DICT["thermal_performance_diagnostic"] = function analyze_thermal_perfor
 
     hbzt_lower = hbzt_avg .< LOW_TEMP_pDELTA
     apprxRampDownEndTime = try
-        minimum(elapsed_times[hbzt_lower & (elapsed_times .> apprxRampDownStartTime)])
+        minimum(elapsed_times[hbzt_lower .& (elapsed_times .> apprxRampDownStartTime)])
     catch
         Inf
     end # try minimum
     apprxRampUpStartTime = try
-        maximum(elapsed_times[hbzt_lower & (elapsed_times .< apprxRampUpEndTime)])
+        maximum(elapsed_times[hbzt_lower .& (elapsed_times .< apprxRampUpEndTime)])
     catch
         -Inf
     end # try maximum

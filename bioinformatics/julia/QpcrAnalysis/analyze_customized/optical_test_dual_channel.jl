@@ -26,7 +26,8 @@ end) # do i
 
 
 # analyze function
-ANALYZE_DICT["optical_test_dual_channel"] = function analyze_optical_test_dual_channel(
+function analyze_func(
+    ::OpticalTestDualChannel,
     db_conn::MySQL.MySQLHandle,
     exp_id::Integer,
     calib_info::Union{Integer,OrderedDict}; # keys: "baseline", "water", "channel_1", "channel_2". Each value's "calibration_id" value is the same as `exp_id`
@@ -51,7 +52,7 @@ ANALYZE_DICT["optical_test_dual_channel"] = function analyze_optical_test_dual_c
     fluo_dict = OrderedDict(map(old_calib_labels) do calib_label
         calib_label => hcat(map(CHANNELS) do channel
             fluo_data[
-                (fluo_data[:step_id] .== calib_info[calib_label]["step_id"]) & (fluo_data[:channel] .== channel),
+                (fluo_data[:step_id] .== calib_info[calib_label]["step_id"]) .& (fluo_data[:channel] .== channel),
                 :fluorescence_value
             ]
         end...) # do channel

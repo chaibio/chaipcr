@@ -1,36 +1,103 @@
-
+#
 __precompile__()
 module QpcrAnalysis
 
-include("Essentials/Essentials.jl") # does the same thing as `using Basics` except not exportng any names
-
-const ANALYZE_DICT = Essentials.ANALYZE_DICT
-
-analyze_dir = joinpath(Essentials.LOAD_FROM_DIR, "analyze_modules")
-analyze_fns = readdir(analyze_dir)
-analyze_fns_to_include = map(analyze_fns) do analyze_fn
-    joinpath(analyze_dir, analyze_fn)
-end
-# guids = map(analyze_fns) do analyze_fn
-#     splitext(analyze_fn)[1]
-# end
-
-for fn in analyze_fns_to_include
-    include(fn)
-end # Assumption: all the items are includeable .jl files
-
-defined_symbs = names(current_module(), true)
-for symb in defined_symbs
-    var = @eval $symb
-    if isa(var, Module) && isdefined(var, :analyze)
-        guid = string(symb)
-        if guid in keys(ANALYZE_DICT)
-            error("GUID \"$guid\" has been used by an `analyze` function defined in the standard module `Basics`. Please rename your `analyze` module to something else.")
-        else
-            ANALYZE_DICT[guid] = var.analyze
-        end # if guid
-    end # if isa
-end # for
+using Clustering, DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NLopt # In addition, "HttpServer" for "juliaserver.jl"
 
 
-end # QpcrAnalysis
+# Assumptions
+# (1) Integers: channel
+
+
+# possible errors
+# (1) in Julia 0.4.6, `maximum`, `minimum` and `extrema` raises `ArgumentError` over empty collection, while R returns `-Inf` for `max` and `Inf` for `min` over empty collection.
+
+
+# to change from "ct" to "cq": `min_ct` in "dispatch.jl".
+
+
+const MODULE_NAME = "QpcrAnalysis"
+# Other functions than `include` read files from `pwd()` only instead of also `LOAD_PATH`. `pwd()` shows the present working directory in module `Main`, instead of the directory where "QpcrAnalysis.jl" is located. Therefore `LOAD_FROM_DIR` needs to be defined for those functions to find files in the directory where "QpcrAnalysis.jl" is located.
+const LOAD_FROM_DIR = LOAD_PATH[find(LOAD_PATH) do path_
+    isfile("$path_/$MODULE_NAME.jl")
+end][1] # slice by boolean vector returned a one-element vector. Assumption: LOAD_PATH is global
+
+
+# include each script, generally in the order of workflow
+
+include("shared.jl")
+
+# calibration
+include("deconv.jl") # `type K4Deconv`
+# const K4DCV = load("$LOAD_FROM_DIR/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv"]
+include("adj_w2wvaf.jl")
+include("calib.jl") # `type CalibCalibOutput` currently not in production
+
+# amplification
+include("amp_models/types_for_amp_models.jl")
+include("amp_models/sfc_models.jl")
+include("amp_models/MAKx.jl")
+include("amp_models/MAKERGAUL.jl")
+include("amp.jl")
+include("allelic_discrimination.jl")
+
+# melt curve
+include("multi_channel.jl")
+include("supsmu.jl")
+include("meltcrv.jl")
+
+# analyze_customized
+include("analyze_customized/analyze_types.jl")
+include("analyze_customized/thermal_performance_diagnostic.jl")
+include("analyze_customized/optical_test_single_channel.jl")
+include("analyze_customized/optical_test_dual_channel.jl")
+include("analyze_customized/optical_cal.jl")
+include("analyze_customized/thermal_consistency.jl")
+
+# wrap up
+include("dispatch.jl")
+include("test.jl")
+include("__init__.jl")
+
+# # no longer needed
+# include("pnmsmu.jl")
+
+
+
+
+
+# include files
+
+# const MODULE_NAME = "Essentials"
+#
+# const ANALYZE_DICT = OrderedDict{String,Function}()
+#
+# const LOAD_FROM_DIR = LOAD_PATH[find(LOAD_PATH) do path_
+#     isfile("$path_/$MODULE_NAME/$MODULE_NAME.jl")
+# end][1] # slice by boolean vector returned a one-element vector. Assumption: LOAD_PATH is global
+#
+# const MODULE_DIR = joinpath(LOAD_FROM_DIR, MODULE_NAME)
+#
+# for (root, dirs, fns) in walkdir(MODULE_DIR)
+#
+#     fn_jls_to_include = fns[find(fns) do fn
+#         fn != "$MODULE_NAME.jl" && endswith(fn, ".jl")
+#     end]
+#
+#     for fn_jl in fn_jls_to_include
+#         include(joinpath(MODULE_DIR, root, fn_jl))
+#     end
+#
+#     fn_k_dict_vec = fns[
+#         find(fns) do fn
+#             startswith(fn, "k_dict_")
+#         end
+#     ]
+#     if length(fn_k_dict_vec) > 0
+#         const K4DCV = load(joinpath(MODULE_DIR, root, fn_k_dict_vec[1]))["k4dcv"]
+#     end
+#
+# end # for (root ...
+
+
+end # module QpcrAnalysis
