@@ -167,7 +167,7 @@ function test(;
             end : calib_info
 
             if debug
-                anlz_debug = analyze_func(Analyze_DICT[guid](), db_conn, exp_id, calib_info_anlz)
+                anlz_debug = analyze_func(GUID2Analyze_DICT[guid](), db_conn, exp_id, calib_info_anlz)
             end
 
             reqb = args2reqb(

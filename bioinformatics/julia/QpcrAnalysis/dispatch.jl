@@ -44,7 +44,7 @@ function dispatch(action::String, request_body::String)
             exp_id = exp_info["id"]
             guid = exp_info["guid"]
             analyze_func(
-                Analyze_DICT[guid](), db_conn, exp_id, calib_info;
+                GUID2Analyze_DICT[guid](), db_conn, exp_id, calib_info;
             )
         else
             error("action $action is not found")
