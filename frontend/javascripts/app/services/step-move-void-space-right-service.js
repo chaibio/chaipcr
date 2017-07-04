@@ -24,19 +24,19 @@ window.ChaiBioTech.ngApp.service('StepMoveVoidSpaceRightService', [
        this.verticalLineForVoidRight = function(sI, index) {
            
             if(sI.kanvas.allStageViews[index - 1]) {
-            var length = sI.kanvas.allStageViews[index - 1].childSteps.length;
-            var tStep = sI.kanvas.allStageViews[index - 1].childSteps[length - 1];
-            var place = sI.kanvas.allStageViews[index - 1].left + 
-                        sI.kanvas.allStageViews[index - 1].myWidth - 5;
+                var length = sI.kanvas.allStageViews[index - 1].childSteps.length;
+                var tStep = sI.kanvas.allStageViews[index - 1].childSteps[length - 1];
+                var place = sI.kanvas.allStageViews[index - 1].left + 
+                            sI.kanvas.allStageViews[index - 1].myWidth - 5;
             
             if(tStep.nextIsMoving) {
                 place = sI.kanvas.moveDots.left + 7;
             }
 
-            sI.currentDrop = sI.kanvas.allStageViews[index - 1].childSteps[length - 1];
-            sI.currentDropStage = sI.kanvas.allStageViews[index - 1]; // We need to insert the step as the last.
-            sI.verticalLine.setLeft(place);
-            sI.verticalLine.setCoords();
+                sI.currentDrop = sI.kanvas.allStageViews[index - 1].childSteps[length - 1];
+                sI.currentDropStage = sI.kanvas.allStageViews[index - 1]; // We need to insert the step as the last.
+                sI.verticalLine.setLeft(place);
+                sI.verticalLine.setCoords();
             }
             
         };
