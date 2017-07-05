@@ -46,7 +46,7 @@ type AmpStepRampOutput
     blsub_fluos::Array{AbstractFloat,3}
     fitted_postbl::Array{AbstractAmpFitted,2}
     postbl_status::Array{Symbol,2}
-    coefs::Array{Array{AbstractFloat,1},2}
+    coefs::Array{AbstractFloat,3}
     blsub_fitted::Array{AbstractFloat,3}
     max_d1::Array{AbstractFloat,2}
     max_d2::Array{AbstractFloat,2}
@@ -512,15 +512,15 @@ function report_cq!(
 
     num_cycs = size(full_amp_out.fr_ary3)[1]
 
-    postbl_status,   coefs,  cq_raw,  max_d1,  max_d2 = map([
-    :postbl_status, :coefs, :cq_raw, :max_d1, :max_d2
+    postbl_status,   cq_raw,  max_d1,  max_d2 = map([
+    :postbl_status, :cq_raw, :max_d1, :max_d2
     ]) do fn
         getindex(getfield(full_amp_out, fn), well_i, channel_i)
     end # do fn
 
     max_bsf = maximum(full_amp_out.blsub_fluos[:, well_i, channel_i])
 
-    b_ = coefs[1]
+    b_ = full_amp_out.coefs[1, well_i, channel_i]
 
     n_max_d1, n_max_d2, n_max_bsf = [max_d1, max_d2, max_bsf] / full_amp_out.max_qt_fluo
     why_NaN = ""
@@ -637,7 +637,7 @@ function process_amp_1sr(
         blsub_fluos,
         fitted_postbl,
         fill(:not_fitted, num_fluo_wells, num_channels), # postbl_status
-        fill(Vector{AbstractFloat}(), num_fluo_wells, num_channels), # coefs
+        fill(NaN, 1, num_fluo_wells, num_channels), # coefs # size = 1 for 1st dimension may not be correct for the chosen model
         blsub_fitted,
         NaN_ary2, # max_d1
         NaN_ary2, # max_d2
@@ -724,10 +724,10 @@ function process_amp_1sr(
                 getfield(mbq_ary2[well_i, channel_i], fn_mbq)
                 for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
             ]
-            if fn_mbq in [:blsub_fluos, :blsub_fitted]
+            if fn_mbq in [:blsub_fluos, :coefs, :blsub_fitted]
                 fv = reshape(
-                    cat(2, fv...), # 2-dim array of size (`num_cycs`, `num_wells * num_channels`)
-                    size(fr_ary3)...
+                    cat(2, fv...), # 2-dim array of size (`num_cycs` or number of coefs, `num_wells * num_channels`)
+                    length(fv[1,1]), size(fv)...
                 )
             end # if fn_mbq in
             setfield!(full_amp_out, fn_mbq, convert(typeof(getfield(full_amp_out, fn_mbq)), fv)) # `setfield!` doesn't call `convert` on its own
