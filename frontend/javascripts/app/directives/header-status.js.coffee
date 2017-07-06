@@ -65,6 +65,7 @@ window.App.directive 'headerStatus', [
       $scope.is_holding = false
       $scope.enterState = false
       $scope.done = false
+      $scope.state = 'idle' #by default
 
       checkStatus = () ->
         getExperiment (exp) ->
