@@ -175,9 +175,13 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         focus('editExpNameMode')
 
       $scope.updateSampleNameEnter = (well_num, name) ->
+        console.log(event.shiftKey)
         Experiment.updateWell($stateParams.id, well_num + 1, {'well_type':'sample','sample_name':name})
         $scope.editExpNameMode[well_num] = false
-        $scope.focusExpName(well_num + 1)
+        if event.shiftKey
+          $scope.focusExpName(well_num - 1)
+        else
+          $scope.focusExpName(well_num + 1)
 
       $scope.updateSampleName = (well_num, name) ->
         Experiment.updateWell($stateParams.id, well_num + 1, {'well_type':'sample','sample_name':name})
