@@ -29,9 +29,9 @@ window.ChaiBioTech.ngApp.service('StepMoveVoidSpaceRightService', [
                 var place = sI.kanvas.allStageViews[index - 1].left + 
                             sI.kanvas.allStageViews[index - 1].myWidth - 5;
             
-            if(tStep.nextIsMoving) {
-                place = sI.kanvas.moveDots.left + 7;
-            }
+                if(tStep.nextIsMoving) {
+                    place = sI.kanvas.moveDots.left + 7;
+                }
 
                 sI.currentDrop = sI.kanvas.allStageViews[index - 1].childSteps[length - 1];
                 sI.currentDropStage = sI.kanvas.allStageViews[index - 1]; // We need to insert the step as the last.
@@ -44,7 +44,7 @@ window.ChaiBioTech.ngApp.service('StepMoveVoidSpaceRightService', [
         var that = this;
 
         return {
-
+            outerScope: that, // This is for testing verticalLineForVoidRight method which is private for StepMoveVoidSpaceRightService
             checkVoidSpaceRight: function(sI) {
                 StagePositionService.allVoidSpaces.some(this.voidSpaceCallbackRight, sI);
             },
