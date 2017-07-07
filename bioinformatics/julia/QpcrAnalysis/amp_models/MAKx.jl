@@ -66,7 +66,8 @@ function fit(
     @variable(jmp_model, k >= 1e-10, start=k_START)
     # @variable(jmp_model, bl_k, start=0)
     @variable(jmp_model, f[cycs2fit])
-    @variable(jmp_model, d[cycs2fit])
+    @variable(jmp_model, d[cycs2fit]) # change_a1
+    # @variable(jmp_model, d[cycs2fit] >= 0) # change_a2 # didn't work as well as "change_a1", see "20170312_0302_ip137_exp187_ch1_mak2_ylims_obs_*.png"
 
     @constraint(jmp_model, f_constr[cyc in cycs2fit], f[cyc] == fb + d[cyc])
     @NLconstraint(jmp_model, d_constr_01, d[1] == d0 + k * log(1 + d0 / k))

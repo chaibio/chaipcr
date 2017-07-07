@@ -94,15 +94,18 @@ function fit(
         eu0 >= 0,
         start=eu0_START
     )
-    @variable(jmp_model, d0_LB <= d0 <= d0_UB, start=MAKERGAUL_d0_START)
+    # @variable(jmp_model, d0_LB <= d0 <= d0_UB, start=MAKERGAUL_d0_START) # change_a1
+    @variable(jmp_model, d0 >= 0, start=MAKERGAUL_d0_START) # change_a2
     @variable(jmp_model, # inh
         # eu0_inh_LB <= inh <= inh_UB_MULTIPLE * of_diff,
         inh >= 0,
         start=inh_START
     )
     @variable(jmp_model, f[cycs2fit])
-    @variable(jmp_model, eu[cycs2fit])
-    @variable(jmp_model, d[cycs2fit])
+    # @variable(jmp_model, eu[cycs2fit]) # change_b1
+    @variable(jmp_model, eu[cycs2fit] >= 0) # change_b2
+    # @variable(jmp_model, d[cycs2fit]) # change_c1
+    @variable(jmp_model, d[cycs2fit] >= 0) # change_c2
 
     @constraint(jmp_model, f_constr[cyc in cycs2fit], f[cyc] == fb + d[cyc])
     @NLconstraint(jmp_model, eu_constr_01, eu[1] == eu0 / (1 + inh * d0))
@@ -188,15 +191,18 @@ function fit(
         eu0 >= 0,
         start=eu0_START
     )
-    @variable(jmp_model, d0_LB <= d0 <= d0_UB, start=MAKERGAUL_d0_START)
+    # @variable(jmp_model, d0_LB <= d0 <= d0_UB, start=MAKERGAUL_d0_START) # change_a1
+    @variable(jmp_model, d0 >= 0, start=MAKERGAUL_d0_START) # change_a2
     @variable(jmp_model, # inh
         # eu0_inh_LB <= inh <= inh_UB_MULTIPLE * of_diff,
         inh >= 0,
         start=inh_START
     )
     @variable(jmp_model, f[cycs2fit])
-    @variable(jmp_model, eu[cycs2fit])
-    @variable(jmp_model, d[cycs2fit])
+    # @variable(jmp_model, eu[cycs2fit]) # change_b1
+    @variable(jmp_model, eu[cycs2fit] >= 0) # change_b2
+    # @variable(jmp_model, d[cycs2fit]) # change_c1
+    @variable(jmp_model, d[cycs2fit] >= 0) # change_c2
 
     @constraint(jmp_model,
         f_constr[cyc in cycs2fit],
