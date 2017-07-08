@@ -45,7 +45,8 @@ function adj_w2wvaf(
     fluo2btp::AbstractArray,
     wva_data::OrderedDict, wva_well_idc_wfluo::AbstractVector,
     channel::Integer;
-    minus_water::Bool=false
+    minus_water::Bool=false,
+    scaling_factor_adj_w2wvaf::Real=SCALING_FACTOR_adj_w2wvaf
     )
 
     fluo = transpose(fluo2btp)
@@ -58,11 +59,11 @@ function adj_w2wvaf(
         wva_water = 0
     end # if
 
-    signal_water_diff = wva_signal - wva_water
-    swd_normd = signal_water_diff / mean(signal_water_diff)
+    signal_water_diff = wva_signal .- wva_water
+    swd_normd = signal_water_diff ./ mean(signal_water_diff)
 
     fluo_aw_vec = map(1:size(fluo)[2]) do i
-        SCALING_FACTOR_adj_w2wvaf * (fluo[:,i] .- wva_water) ./ swd_normd
+        scaling_factor_adj_w2wvaf .* (fluo[:,i] .- wva_water) ./ swd_normd
     end # do i
 
     return transpose(hcat(fluo_aw_vec...))

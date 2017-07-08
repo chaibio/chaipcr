@@ -279,7 +279,7 @@ function mc_tm_pw(
 
     # parse input data
     tmprtrs_ori = tf_dict["tmprtrs"]
-    tmprtr_intvls = vcat(tmprtrs_ori[2:end], Inf - tmprtrs_ori[end]) .- tmprtrs_ori
+    tmprtr_intvls = vcat(tmprtrs_ori[2:end], Inf .- tmprtrs_ori[end]) .- tmprtrs_ori
     nti = nti_frac * median(tmprtr_intvls) # nti = narrow temperature interval
     no_nti = find(tmprtr_intvl -> tmprtr_intvl > nti, tmprtr_intvls)
     tmprtrs = mutate_dups(tmprtrs_ori[no_nti]) # duplication may cause spline interpolation failure by Dierckx

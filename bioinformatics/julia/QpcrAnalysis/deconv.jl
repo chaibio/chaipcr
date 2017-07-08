@@ -21,14 +21,11 @@ function deconv(
     calib_info::Union{Integer,OrderedDict}=calib_info_AIR,
     well_nums::AbstractVector=[];
 
+    scaling_factor_dcv_vec::AbstractVector=SCALING_FACTOR_deconv_vec,
     out_format::String="both" # "array", "dict", "both"
     )
 
     a2d_dim1, a2d_dim_well, a2d_dim_channel = size(ary2dcv)
-
-    scaling_factor_dcv_vec = map(channels) do channel
-        SCALING_FACTORS_deconv[channel]
-    end
 
     dcvd_ary3 = similar(ary2dcv)
 
@@ -40,10 +37,11 @@ function deconv(
 
     k_inv_vec = k4dcv.k_inv_vec
 
+    # 0.013213 seconds (31.36 k allocations: 1.416 MiB)
     for i1 in 1:a2d_dim1, i_well in 1:a2d_dim_well
-        dcvd_ary3[i1, i_well, :] = *(
+        dcvd_ary3[i1, i_well, :] = *( # .= resulted in incorrect values
             k_inv_vec[dcv_well_idc_wfluo[i_well]],
-            reshape(ary2dcv[i1, i_well, :], a2d_dim_channel)
+            ary2dcv[i1, i_well, :] # automatically reshaped from (1,1,2) to (2,)
         ) .* scaling_factor_dcv_vec
     end
 
