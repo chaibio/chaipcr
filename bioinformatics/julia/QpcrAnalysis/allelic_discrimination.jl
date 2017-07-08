@@ -59,17 +59,16 @@ function assign_genotypes(
     eg_labels::Vector{String}=DEFAULT_eg_LABELS # Julia v0.6.0 on 2017-06-25: `eg_labels::Vector{AbstractString}=DEFAULT_eg_LABELS` resulted in "ERROR: MethodError: no method matching #assign_genotypes#301(::Array{AbstractString,1}, ::QpcrAnalysis.#assign_genotypes, ::Array{Float64,2}, ::Array{Float64,2}, ::Float64)"
     )
 
-    data_vec = map(i -> data[:, i], 1:size(data)[2])
-    num_dp = length(data_vec)
+    num_channels, num_wells = size(data)
 
-    if length(unique(data_vec)) == 1 # all the data points are the same
+    if any(map(i -> length(unique(data[i, :])) == 1, 1:num_channels)) # for any channel, all the data points are the same (would result in "AssertionError: !(isempty(grp))" for `kmedoids`)
         cluster_result = kmeans_result_EMPTY
-        assignments_adj_labels = fill(eg_labels[end], num_dp) # all unclassified
+        assignments_adj_labels = fill(eg_labels[end], num_wells) # all unclassified
     else
         # vector whose length is number of channels
         channel_extrema = hcat(minimum(data, 2), maximum(data, 2))
 
-        num_channels, num_genotypes = size(expected_genotypes)
+        num_genotypes = size(expected_genotypes)[2]
         init_centers = [
             channel_extrema[
                 channel_i,
@@ -84,13 +83,13 @@ function assign_genotypes(
         elseif cluster_method == "k-medoids"
             num_centers = size(init_centers)[2]
             data_winit = hcat(data, init_centers)
-            num_dp_winit = num_dp + num_centers
-            cost_mtx_winit = [norm(data_winit[:, i] .- data_winit[:, j], 2) for i in 1:num_dp_winit, j in 1:num_dp_winit]
-            cluster_result = kmedoids!(cost_mtx_winit, Vector{Int}((1:num_centers) + num_dp))
+            num_wells_winit = num_wells + num_centers
+            cost_mtx_winit = [norm(data_winit[:, i] .- data_winit[:, j], 2) for i in 1:num_wells_winit, j in 1:num_wells_winit]
+            cluster_result = kmedoids!(cost_mtx_winit, Vector{Int}((1:num_centers) + num_wells))
             centers = data_winit[:, cluster_result.medoids]
         end # if cluster_method
 
-        assignments_raw = cluster_result.assignments[1:num_dp] # when `cluster_method == "k-medoids"`
+        assignments_raw = cluster_result.assignments[1:num_wells] # when `cluster_method == "k-medoids"`
 
         dist2centers_vec = map(1:size(data)[2]) do i_well
             dist_coords = data[:, i_well] .- centers # type KmedoidsResult has no field centers

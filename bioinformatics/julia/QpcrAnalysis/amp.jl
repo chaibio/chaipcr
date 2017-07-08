@@ -102,7 +102,7 @@ function process_amp(
     kwdict_mbq::Associative=OrderedDict(), # keyword arguments passed onto `mod_bl_q`
     kwdict_rc::Associative=OrderedDict(), # keyword arguments passed onto `report_cq`,
     ad_cycs::Union{Integer,AbstractVector}=0, # allelic discrimination: cycles of fluorescence to be used, 0 means the last cycle
-    ad_cluster_method::String="k-means", # allelic discrimination: "k-means", "k-medoids"
+    ad_cluster_method::String="k-medoids", # allelic discrimination: "k-means", "k-medoids"
     out_sr_dict::Bool=true, # output an OrderedDict keyed by `sr_str`s
     out_format::String="json", # "full", "pre_json", "json"
     json_digits::Integer=JSON_DIGITS,
