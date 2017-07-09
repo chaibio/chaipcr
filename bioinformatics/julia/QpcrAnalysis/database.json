@@ -18,6 +18,8 @@
 		"database": "pc_test"
 	},
 	"bbb_test_1": {
+		"username": "root",
+		"password": "",
 		"host": "127.0.0.1",
 		"database": "chaipcr"
 	}
