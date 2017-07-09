@@ -1,6 +1,6 @@
 {
 	"development": {
-  		"username": "root",
+		"username": "root",
 		"password": "",
 		"host": "localhost",
 		"database": "chaipcr"
@@ -12,9 +12,13 @@
 		"database": "chaipcr"
 	},
 	"pc_test": {
-  		"username": "root1",
+		"username": "root1",
 		"password": "pswd1",
 		"host": "localhost",
 		"database": "pc_test"
+	},
+	"bbb_test_1": {
+		"host": "127.0.0.1",
+		"database": "chaipcr"
 	}
 }
