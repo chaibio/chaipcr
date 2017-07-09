@@ -12,7 +12,7 @@
         <hudson.model.StringParameterDefinition>
           <name>build_machine</name>
           <description>IP address of the remote beaglebone.</description>
-          <defaultValue>10.0.2.240</defaultValue>
+          <defaultValue>10.0.100.240</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>download_prefix</name>

@@ -9,7 +9,7 @@
         <hudson.model.StringParameterDefinition>
           <name>build_machine</name>
           <description>IP address of the building beaglebone.</description>
-          <defaultValue>10.0.2.240</defaultValue>
+          <defaultValue>10.0.100.240</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>bypass_julia</name>

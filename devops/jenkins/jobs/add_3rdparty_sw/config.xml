@@ -4,7 +4,7 @@
   <description>Build Chaibio shoftware</description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.24.0">
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.27.0">
       <projectUrl>https://github.com/chaibio/chaipcr.git/</projectUrl>
       <displayName></displayName>
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
@@ -16,7 +16,7 @@
         <hudson.model.StringParameterDefinition>
           <name>build_machine</name>
           <description>Building machine</description>
-          <defaultValue>10.0.2.240</defaultValue>
+          <defaultValue>10.0.100.240</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>bypass_julia</name>
@@ -905,15 +905,27 @@ echo precompiling mandatory packages.
 cat &lt;&lt;EOF &gt;&gt; chaibio_packages.jl
 
 println(&quot;Setting up Julia: Adding packages&quot;)
+
+println(&quot;Adding package: Dierckx&quot;)
 Pkg.add(&quot;Dierckx&quot;)
+println(&quot;Adding package: JSON&quot;)
 Pkg.add(&quot;JSON&quot;)
+println(&quot;Adding package: MySQL&quot;)
 Pkg.add(&quot;MySQL&quot;)
+println(&quot;Adding package: JLD&quot;)
 Pkg.add(&quot;JLD&quot;)
+println(&quot;Adding package: DataFrames&quot;)
 Pkg.add(&quot;DataFrames&quot;)
+println(&quot;Adding package: Ipopt&quot;)
 Pkg.add(&quot;Ipopt&quot;)
+println(&quot;Adding package: JuMP&quot;)
 Pkg.add(&quot;JuMP&quot;)
+println(&quot;Adding package: NLopt&quot;)
 Pkg.add(&quot;NLopt&quot;)
+println(&quot;Adding package: HttpServer&quot;)
 Pkg.add(&quot;HttpServer&quot;)
+
+
 
 println(&quot;Setting up Julia: Building packages&quot;)
 Pkg.resolve()
@@ -922,15 +934,26 @@ println(&quot;Setting up Julia: Precompiling packages&quot;)
 using DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NLopt, HttpServer
 
 println(&quot;Setting up Julia: Testing packages&quot;)
-Pkg.test(&quot;Dierckx&quot;)
-Pkg.test(&quot;JSON&quot;)
-Pkg.test(&quot;MySQL&quot;)
-Pkg.test(&quot;JLD&quot;)
-Pkg.test(&quot;DataFrames&quot;)
-Pkg.test(&quot;Ipopt&quot;)
-Pkg.test(&quot;JuMP&quot;)
-Pkg.test(&quot;NLopt&quot;)
-Pkg.test(&quot;HttpServer&quot;)
+
+println(&quot;Adding package: Dierckx&quot;)
+Pkg.add(&quot;Dierckx&quot;)
+println(&quot;Adding package: JSON&quot;)
+Pkg.add(&quot;JSON&quot;)
+println(&quot;Adding package: MySQL&quot;)
+Pkg.add(&quot;MySQL&quot;)
+println(&quot;Adding package: JLD&quot;)
+Pkg.add(&quot;JLD&quot;)
+println(&quot;Adding package: DataFrames&quot;)
+Pkg.add(&quot;DataFrames&quot;)
+println(&quot;Adding package: Ipopt&quot;)
+Pkg.add(&quot;Ipopt&quot;)
+println(&quot;Adding package: JuMP&quot;)
+Pkg.add(&quot;JuMP&quot;)
+println(&quot;Adding package: NLopt&quot;)
+Pkg.add(&quot;NLopt&quot;)
+println(&quot;Adding package: HttpServer&quot;)
+Pkg.add(&quot;HttpServer&quot;)
+
 
 println(&quot;Setting up Julia: done testing.. quitting..&quot;)
 quit()
@@ -1117,6 +1140,6 @@ exit 0</command>
   </builders>
   <publishers/>
   <buildWrappers>
-    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.7"/>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.8"/>
   </buildWrappers>
 </project>

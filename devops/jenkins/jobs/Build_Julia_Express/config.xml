@@ -12,7 +12,7 @@
         <hudson.model.StringParameterDefinition>
           <name>build_machine</name>
           <description>Remote build beaglebone.</description>
-          <defaultValue>10.0.2.240</defaultValue>
+          <defaultValue>10.0.100.240</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>download_prefex</name>
@@ -41,6 +41,11 @@
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>install_packages</name>
+          <description>Installs default packages</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -481,24 +486,41 @@ cat &lt;&lt;EOF &gt;&gt; chaibio_packages.jl
 Pkg.init()
 Pkg.update()
 
+println(&quot;Adding package: Dierckx&quot;)
 Pkg.add(&quot;Dierckx&quot;)
+println(&quot;Adding package: JSON&quot;)
 Pkg.add(&quot;JSON&quot;)
+println(&quot;Adding package: MySQL&quot;)
 Pkg.add(&quot;MySQL&quot;)
+println(&quot;Adding package: JLD&quot;)
 Pkg.add(&quot;JLD&quot;)
+println(&quot;Adding package: DataFrames&quot;)
 Pkg.add(&quot;DataFrames&quot;)
+println(&quot;Adding package: Ipopt&quot;)
 Pkg.add(&quot;Ipopt&quot;)
+println(&quot;Adding package: JuMP&quot;)
 Pkg.add(&quot;JuMP&quot;)
+println(&quot;Adding package: NLopt&quot;)
 Pkg.add(&quot;NLopt&quot;)
+println(&quot;Adding package: HttpServer&quot;)
 Pkg.add(&quot;HttpServer&quot;)
 
+println(&quot;Done adding packages&quot;)
+
 using DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NLopt, HttpServer
+println(&quot;Done using package&quot;)
+
 quit()
 EOF
 
 # test with no prebuilding
-#julia chaibio_packages.jl
-echo done testing! removing test script.
+if $install_packages
+then
+        echo precompiling default packages
+        julia chaibio_packages.jl
+fi
 
+echo done testing! removing test script.
 rm chaibio_packages.jl
 
 echo test finished. cleaning..
@@ -506,8 +528,18 @@ swapoff /sdcard/upgrade/swapfile
 rm /sdcard/upgrade/swapfile
 
 cd ..
-tar fcz julia05-44-$build_machine-$BUILD_NUMBER.tgz julia /root/.julia
-tar fcz julia05-44-slim-$build_machine-$BUILD_NUMBER.tgz julia/usr /root/.julia
+
+echo archiving..
+
+echo Arch filename julia-$building_version-$build_machine-$BUILD_NUMBER.tgz
+echo Slim arch filename julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz 
+arch_filename=&quot;julia-$building_version-$build_machine-$BUILD_NUMBER.tgz&quot;
+slim_arch_filename=&quot;filename julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz&quot;
+
+echo Slim arch filename $slim_arch_filename
+
+tar fcz julia-$building_version-$build_machine-$BUILD_NUMBER.tgz julia /root/.julia
+tar fcz julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz julia/usr /root/.julia
 
 sync
 </command>
@@ -515,16 +547,16 @@ sync
     <hudson.tasks.Shell>
       <command>echo uploading julia file to server
                                                                                                                                  
-scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/julia-compile/julia05-44-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/
-chmod 777 $local_download_folder/julia05-44-$build_machine-$BUILD_NUMBER.tgz
-ln -sf $local_download_folder/julia05-44-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia05-44-default.tgz
+scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/julia-compile/julia-$building_version-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/
+chmod 777 $local_download_folder/julia-$building_version-$build_machine-$BUILD_NUMBER.tgz
+ln -sf $local_download_folder/julia-$building_version-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia-$building_version-default.tgz
 
-scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/julia-compile/julia05-44-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/
-chmod 777 $local_download_folder/julia05-44-slim-$build_machine-$BUILD_NUMBER.tgz
-ln -sf $local_download_folder/julia05-44-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia05-44-slim-default.tgz
+scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/julia-compile/julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/
+chmod 777 $local_download_folder/julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz
+ln -sf $local_download_folder/julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia-$building_version-slim-default.tgz
 
-ls -ahl $local_download_folder/julia05-44-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia05-44-default.tgz
-ls -ahl $local_download_folder/julia05-44-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia05-44-slim-default.tgz
+ls -ahl $local_download_folder/julia-$building_version-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia-$building_default.tgz
+ls -ahl $local_download_folder/julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia-$building_version-slim-default.tgz
 
 exit 0</command>
     </hudson.tasks.Shell>
@@ -533,8 +565,8 @@ exit 0</command>
       <command>echo cleaning up
 cd /sdcard/upgrade/julia-compile/
 
-rm julia05-44-$build_machine-$BUILD_NUMBER.tgz
-rm julia05-44-slim-$build_machine-$BUILD_NUMBER.tgz
+rm julia-$building_version-$build_machine-$BUILD_NUMBER.tgz
+rm julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz
 ls -ahl
 
 cd ..
