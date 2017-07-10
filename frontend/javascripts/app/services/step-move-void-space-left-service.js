@@ -39,7 +39,7 @@ window.ChaiBioTech.ngApp.service('StepMoveVoidSpaceLeftService', [
         var that = this;
 
         return {
-
+            outerScope: that,
             checkVoidSpaceLeft: function(sI) {
                 StagePositionService.allVoidSpaces.some(this.voidSpaceCallbackLeft, sI);
             },

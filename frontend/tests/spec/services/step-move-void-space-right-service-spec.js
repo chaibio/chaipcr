@@ -139,4 +139,84 @@ describe("Testing StepMoveVoidSpaceRightService", function() {
         expect(sI.verticalLine.setCoords).not.toHaveBeenCalled();
 
     });
+
+    it("It should test verticalLineForVoidRight method, nextIsMoving is true ", function() {
+
+        var sI = {
+            verticalLine: {
+                setLeft: function() {},
+                setCoords: function() {},
+            },
+            kanvas: {
+                moveDots: {
+                    left: 100
+                },
+                allStageViews: [
+                    {
+                        left: 100,
+                        myWidth: 50,
+                        childSteps: [
+                            {
+                                stepNo: 1,
+                                nextIsMoving: true,
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        spyOn(sI.verticalLine, "setLeft");
+        spyOn(sI.verticalLine, "setCoords");
+
+        _StepMoveVoidSpaceRightService.outerScope.verticalLineForVoidRight(sI, 1);
+
+        expect(sI.verticalLine.setLeft).toHaveBeenCalledWith(107);
+        expect(sI.verticalLine.setCoords).toHaveBeenCalled();
+
+    });
+
+    it("It should test verticalLineForVoidRight method, check currentDrop and currentDropStage", function() {
+
+        var sI = {
+            
+            verticalLine: {
+                setLeft: function() {},
+                setCoords: function() {},
+            },
+            
+            kanvas: {
+                moveDots: {
+                    left: 100
+                },
+                allStageViews: [
+                    {
+                        testParent: "Yes",
+                        left: 100,
+                        myWidth: 50,
+                        childSteps: [
+                            {
+                                testMember: "Yes",
+                                stepNo: 1,
+                                nextIsMoving: true,
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        spyOn(sI.verticalLine, "setLeft");
+        spyOn(sI.verticalLine, "setCoords");
+
+        _StepMoveVoidSpaceRightService.outerScope.verticalLineForVoidRight(sI, 1);
+
+        expect(sI.currentDrop).toEqual(jasmine.objectContaining({
+            testMember: "Yes",
+        }));
+        
+        expect(sI.currentDropStage).toEqual(jasmine.objectContaining({
+            testParent: "Yes",
+        }));
+    });
 });
