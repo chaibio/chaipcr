@@ -14,7 +14,7 @@ const inh_UB_MULTIPLE = 10
 
 # start
 const eu0_START = 7e3 # used: eu0_inh_LB, 0.01, 1, 50
-const MAKERGAUL_d0_START = 50 # used: 0, 1e-14, 0.01, 1, 50
+const MAKERGAUL_d0_START = 1 # used: 0, 1e-14 (change_d3), 0.01, 1 (change_d2), 50 (change_d1)
 const inh_START = 4e-6 # used: eu0_inh_LB (Infeasible for flat line), 0, 0.05, 1, (Invalid_Number_Detected for flat line), 10 (Infeasible for flat line), 50
 # `:Optimal` when `max_of_idx == 1`, "Invalid_Number_Detected" for the rest: eu0_START = 0.01, inh_START = 0; eu0_START = 50, inh_START = 0.05; eu0_START = 50, inh_START = 1; eu0_START = 50, inh_START = 50;
 
