@@ -27,7 +27,7 @@ window.ChaiBioTech.ngApp.service('StepMoveVoidSpaceLeftService', [
             var place = sI.kanvas.allStageViews[index].left - 5;
             
             if(tStep.previousIsMoving) {
-            place = sI.kanvas.moveDots.left + 7;
+                place = sI.kanvas.moveDots.left + 7;
             }
             
             sI.currentDrop = null;
@@ -47,12 +47,11 @@ window.ChaiBioTech.ngApp.service('StepMoveVoidSpaceLeftService', [
             voidSpaceCallbackLeft: function(point, index) {
                 
                 var abPlace = this.movement.left + this.rightOffset;
-                if(point[1] - point[0] && abPlace > (point[0] + 25) && abPlace < point[1]) {
+                if(point[1] - point[0] > 25 && abPlace > (point[0] + 25) && abPlace < point[1]) {
                     that.verticalLineForVoidLeft(this, index);
                     return true;
                 }
             }
-
 
         };
     }
