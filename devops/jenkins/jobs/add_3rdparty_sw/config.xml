@@ -33,6 +33,16 @@
           <description>Set cpu to lowest performance.</description>
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>building_version</name>
+          <description>Julia version</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>release-0.5</string>
+              <string>release-0.6</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -838,12 +848,16 @@ fi
 
 mkdir -p ~/julia-compile
 cd ~/julia-compile
-wget $download_prefex/julia05-44-slim-default.tgz
+
+
+default_slim_arch_filename=&quot;julia-$building_version-slim-default.tgz&quot;
+echo Slim arch filename $default_slim_arch_filename
+wget $download_prefex/$default_slim_arch_filename
 
 sync
 
 echo installing julia
-if tar xf julia05-44-slim-default.tgz -C / julia/usr --strip-components=1 
+if tar xf $default_slim_arch_filename -C / julia/usr --strip-components=1 
 then
     echo &quot;extracted julia usr files&quot;
 else
@@ -853,39 +867,24 @@ fi
 
 sync
 
-#if tar xf julia05-44-slim-default.tgz -C ~ .julia
-#then
-#    echo &quot;extracted .julia folder&quot;
-#    echo updating .cache link
-#    cd ~/.julia/v0.5
-#    rm .cache
-#    ln -s ~/.julia/.cache .cache
-#    cd sdcard/upgrade/julia-compile
-#else
-#    echo &quot;Error extracting julia&quot;
-#    exit 1
-#fi
-
-#tar xf julia05-44-slim-default.tgz -C / julia/usr/etc --strip-components=2
-
 echo &quot;export JULIA_PKGDIR=/root/.julia&quot;&gt;&gt;~/.profile
 source ~/.profile
 sync
 sleep 60
+
 if [ -e /usr/share/julia/bin/julia ] &amp;&amp; [ ! -e /usr/bin/julia ]
 then
 	ln -sf /usr/share/julia/bin/julia /usr/bin/julia
 fi
 
-
-
-
 #============== test
 echo test finished. cleaning..
 sync
+
 cd
 rm -r ~/julia-compile
 sync
+
 sync
 fsck /dev/mmcblk1p1 -y -f
 fsck /dev/mmcblk0p1 -y -f

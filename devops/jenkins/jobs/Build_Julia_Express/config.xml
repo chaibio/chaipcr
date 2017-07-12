@@ -555,7 +555,7 @@ scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/julia-comp
 chmod 777 $local_download_folder/julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz
 ln -sf $local_download_folder/julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia-$building_version-slim-default.tgz
 
-ls -ahl $local_download_folder/julia-$building_version-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia-$building_default.tgz
+ls -ahl $local_download_folder/julia-$building_version-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia-$building_version-default.tgz
 ls -ahl $local_download_folder/julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia-$building_version-slim-default.tgz
 
 exit 0</command>
