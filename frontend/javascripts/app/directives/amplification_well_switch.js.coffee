@@ -60,9 +60,7 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
         cts = []
         for i in [0..15] by 1
           cts.push ngModel.$modelValue["well_#{i}"].ct
-
         return cts
-
       , (cts) ->
         for ct, i in cts by 1
           $scope.buttons["well_#{i}"].ct = ct if $scope.buttons["well_#{i}"]
@@ -71,9 +69,7 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
         actives = []
         for i in [0..15] by 1
           actives.push(ngModel.$modelValue["well_#{i}"].active)
-
         return actives
-
       , (actives) ->
         for i in [0..15] by 1
           if ($scope.buttons["well_#{i}"])
