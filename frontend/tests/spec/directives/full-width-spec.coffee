@@ -39,3 +39,9 @@ describe 'Full Width Directive', ->
     @scope.$digest()
     expect(@directive.css('width')).toBe('1000px')
 
+  it 'should have minimum width', ->
+    spyOn(@WindowWrapper, 'width').and.callFake -> return 1234
+    @directive = @compile(angular.element('<div full-width offset="234" min="2000"></div>'))(@scope)
+    @scope.$digest()
+    expect(@directive.css('width')).toBe('2000px')
+
