@@ -10,7 +10,7 @@ else
 fi
 
 tar zfvc /var/lib/jenkins/backup/update_from_repo_$(date  +"%Y_%m_%d_%I_%M").tgz /var/lib/jenkins/jobs
-rm -r /var/lib/jenkins/jobs
+#rm -r /var/lib/jenkins/jobs
 cp -r . /var/lib/jenkins/
 chmod 777 /var/lib/jenkins/jobs
 chmod 777 /var/lib/jenkins/jobs/*
