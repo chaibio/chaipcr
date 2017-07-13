@@ -125,6 +125,10 @@
       showMouseIndicators();
       mouseMoveCb();
 
+      if (Globals.onSelectLine) {
+        Globals.onSelectLine(Globals.activePathConfig);
+      }
+
     }
 
     function unsetActivePath() {
@@ -849,6 +853,10 @@
     this.onZoomAndPan = function(fn) {
       // fn will receive (transform, width, height)
       Globals.onZoomAndPan = fn;
+    };
+
+    this.onSelectLine = function (fn) {
+      Globals.onSelectLine = fn;
     };
 
     this.getDimensions = function() {

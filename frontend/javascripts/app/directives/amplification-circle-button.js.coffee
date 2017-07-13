@@ -38,6 +38,7 @@ window.ChaiBioTech.ngApp
       $scope.updateUI = (state)->
         ngModel.$setViewValue state
         $scope.selected = ngModel.$modelValue.selected
+        $scope.active = ngModel.$modelValue.active
         $scope.color = ngModel.$modelValue.color || 'gray'
         $scope.ct = ngModel.$modelValue.ct
         $scope.abc =
@@ -53,6 +54,7 @@ window.ChaiBioTech.ngApp
       $scope.toggleState = ->
         state =
           selected: !ngModel.$modelValue.selected || false
+          active: !ngModel.$modelValue.active || false
           color: ngModel.$modelValue.color || 'gray'
           ct: $scope.ct
 

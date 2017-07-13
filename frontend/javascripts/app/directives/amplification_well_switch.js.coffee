@@ -42,6 +42,7 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
 
       for i in [0..15] by 1
         $scope.buttons["well_#{i}"] =
+          active: false
           selected : true
           color: if ($scope.colorBy is 'well') then COLORS[i] else '#75278E'
 
@@ -65,6 +66,18 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
       , (cts) ->
         for ct, i in cts by 1
           $scope.buttons["well_#{i}"].ct = ct if $scope.buttons["well_#{i}"]
+
+      $scope.$watchCollection ->
+        actives = []
+        for i in [0..15] by 1
+          actives.push(ngModel.$modelValue["well_#{i}"].active)
+
+        return actives
+
+      , (actives) ->
+        for i in [0..15] by 1
+          if ($scope.buttons["well_#{i}"])
+            $scope.buttons["well_#{i}"].active = actives[i]
 
       initSelectable = (className) =>
 
@@ -198,9 +211,6 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
         Now we differentiate these directive by className in the template. Check <ol></ol> in the template.
         We do this so that we can selectively change and manipulate #box in them.
       '''
-
-      $scope.showTriangle = ->
-        elem.find('.circle.selected').length < 16
 
       $timeout(() ->
           target = $('.selectable-container').find(".#{className}")
