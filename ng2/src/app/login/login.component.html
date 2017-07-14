@@ -1,4 +1,4 @@
-<div class="login-container">
+<div class="login-container"> {{deviceInfo}}
   <form class="login-wrapper">
     <div class="login-box">
       <div class="login-inner-container">
@@ -8,11 +8,11 @@
         </div>
         <div class="input-section">
           <span class="login-input-label">Username</span>
-          <input type="text" id="user" class="login-input-field" placeholder="Email Address" autofocus="" ng-model="user.email">
+          <input type="text" class="login-input-field" placeholder="Email Address" autofocus required>
         </div>
         <div class="input-section password">
           <span class="login-input-label">Password</span>
-          <input type="password" id="pass" placeholder="Enter Password" class="login-input-field" ng-model="user.password">
+          <input type="password" placeholder="Enter Password" class="login-input-field">
         </div>
         <div class="message-section text-center">
           <span class="text-danger">The email and password entered do not match</span>

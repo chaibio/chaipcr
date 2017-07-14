@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { BrowserModule, Title }  from '@angular/platform-browser';
 
 import { AuthHttp } from './providers/auth_http.provider';
 
@@ -7,8 +8,11 @@ import { AuthHttp } from './providers/auth_http.provider';
   ],
   imports: [
   ],
+  exports: [
+  ],
   providers: [
-    AuthHttp
+    AuthHttp,
+    Title
   ]
 })
 export class SharedModule { }
