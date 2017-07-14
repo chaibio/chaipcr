@@ -65,6 +65,7 @@ window.App.directive 'headerStatus', [
       $scope.is_holding = false
       $scope.enterState = false
       $scope.done = false
+      $scope.state = 'idle' #by default
 
       checkStatus = () ->
         getExperiment (exp) ->
@@ -86,7 +87,7 @@ window.App.directive 'headerStatus', [
         $scope.isCurrentExp = parseInt(data.experiment_controller.experiment?.id) is parseInt(experiment_id)
         if $scope.isCurrentExp is true
           $scope.enterState = $scope.isCurrentExp
-        console.log $scope.enterState
+        #console.log $scope.enterState
 
         if ((($scope.oldState isnt $scope.state or !$scope.experiment))) and experiment_id
           getExperiment (exp) ->

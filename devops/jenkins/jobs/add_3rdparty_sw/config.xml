@@ -4,7 +4,7 @@
   <description>Build Chaibio shoftware</description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.24.0">
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.27.0">
       <projectUrl>https://github.com/chaibio/chaipcr.git/</projectUrl>
       <displayName></displayName>
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
@@ -16,7 +16,7 @@
         <hudson.model.StringParameterDefinition>
           <name>build_machine</name>
           <description>Building machine</description>
-          <defaultValue>10.0.2.240</defaultValue>
+          <defaultValue>10.0.100.240</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>bypass_julia</name>
@@ -33,6 +33,16 @@
           <description>Set cpu to lowest performance.</description>
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>building_version</name>
+          <description>Julia version</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>release-0.5</string>
+              <string>release-0.6</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -838,12 +848,16 @@ fi
 
 mkdir -p ~/julia-compile
 cd ~/julia-compile
-wget $download_prefex/julia05-44-slim-default.tgz
+
+
+default_slim_arch_filename=&quot;julia-$building_version-slim-default.tgz&quot;
+echo Slim arch filename $default_slim_arch_filename
+wget $download_prefex/$default_slim_arch_filename
 
 sync
 
 echo installing julia
-if tar xf julia05-44-slim-default.tgz -C / julia/usr --strip-components=1 
+if tar xf $default_slim_arch_filename -C / julia/usr --strip-components=1 
 then
     echo &quot;extracted julia usr files&quot;
 else
@@ -853,39 +867,24 @@ fi
 
 sync
 
-#if tar xf julia05-44-slim-default.tgz -C ~ .julia
-#then
-#    echo &quot;extracted .julia folder&quot;
-#    echo updating .cache link
-#    cd ~/.julia/v0.5
-#    rm .cache
-#    ln -s ~/.julia/.cache .cache
-#    cd sdcard/upgrade/julia-compile
-#else
-#    echo &quot;Error extracting julia&quot;
-#    exit 1
-#fi
-
-#tar xf julia05-44-slim-default.tgz -C / julia/usr/etc --strip-components=2
-
 echo &quot;export JULIA_PKGDIR=/root/.julia&quot;&gt;&gt;~/.profile
 source ~/.profile
 sync
 sleep 60
+
 if [ -e /usr/share/julia/bin/julia ] &amp;&amp; [ ! -e /usr/bin/julia ]
 then
 	ln -sf /usr/share/julia/bin/julia /usr/bin/julia
 fi
 
-
-
-
 #============== test
 echo test finished. cleaning..
 sync
+
 cd
 rm -r ~/julia-compile
 sync
+
 sync
 fsck /dev/mmcblk1p1 -y -f
 fsck /dev/mmcblk0p1 -y -f
@@ -905,15 +904,27 @@ echo precompiling mandatory packages.
 cat &lt;&lt;EOF &gt;&gt; chaibio_packages.jl
 
 println(&quot;Setting up Julia: Adding packages&quot;)
+
+println(&quot;Adding package: Dierckx&quot;)
 Pkg.add(&quot;Dierckx&quot;)
+println(&quot;Adding package: JSON&quot;)
 Pkg.add(&quot;JSON&quot;)
+println(&quot;Adding package: MySQL&quot;)
 Pkg.add(&quot;MySQL&quot;)
+println(&quot;Adding package: JLD&quot;)
 Pkg.add(&quot;JLD&quot;)
+println(&quot;Adding package: DataFrames&quot;)
 Pkg.add(&quot;DataFrames&quot;)
+println(&quot;Adding package: Ipopt&quot;)
 Pkg.add(&quot;Ipopt&quot;)
+println(&quot;Adding package: JuMP&quot;)
 Pkg.add(&quot;JuMP&quot;)
+println(&quot;Adding package: NLopt&quot;)
 Pkg.add(&quot;NLopt&quot;)
+println(&quot;Adding package: HttpServer&quot;)
 Pkg.add(&quot;HttpServer&quot;)
+
+
 
 println(&quot;Setting up Julia: Building packages&quot;)
 Pkg.resolve()
@@ -922,15 +933,26 @@ println(&quot;Setting up Julia: Precompiling packages&quot;)
 using DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NLopt, HttpServer
 
 println(&quot;Setting up Julia: Testing packages&quot;)
-Pkg.test(&quot;Dierckx&quot;)
-Pkg.test(&quot;JSON&quot;)
-Pkg.test(&quot;MySQL&quot;)
-Pkg.test(&quot;JLD&quot;)
-Pkg.test(&quot;DataFrames&quot;)
-Pkg.test(&quot;Ipopt&quot;)
-Pkg.test(&quot;JuMP&quot;)
-Pkg.test(&quot;NLopt&quot;)
-Pkg.test(&quot;HttpServer&quot;)
+
+println(&quot;Adding package: Dierckx&quot;)
+Pkg.add(&quot;Dierckx&quot;)
+println(&quot;Adding package: JSON&quot;)
+Pkg.add(&quot;JSON&quot;)
+println(&quot;Adding package: MySQL&quot;)
+Pkg.add(&quot;MySQL&quot;)
+println(&quot;Adding package: JLD&quot;)
+Pkg.add(&quot;JLD&quot;)
+println(&quot;Adding package: DataFrames&quot;)
+Pkg.add(&quot;DataFrames&quot;)
+println(&quot;Adding package: Ipopt&quot;)
+Pkg.add(&quot;Ipopt&quot;)
+println(&quot;Adding package: JuMP&quot;)
+Pkg.add(&quot;JuMP&quot;)
+println(&quot;Adding package: NLopt&quot;)
+Pkg.add(&quot;NLopt&quot;)
+println(&quot;Adding package: HttpServer&quot;)
+Pkg.add(&quot;HttpServer&quot;)
+
 
 println(&quot;Setting up Julia: done testing.. quitting..&quot;)
 quit()
@@ -1117,6 +1139,6 @@ exit 0</command>
   </builders>
   <publishers/>
   <buildWrappers>
-    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.7"/>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.8"/>
   </buildWrappers>
 </project>

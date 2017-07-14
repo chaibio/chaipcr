@@ -23,7 +23,7 @@ angular.module('canvasApp').factory('stepGroup', [
     return function(step) {
 
       var groupMembers = [step.stepRect, step.numberingTextCurrent, step.numberingTextTotal, step.stepName, step.deltaSymbol,
-        step.deltaGroup, step.borderRight];
+        step.deltaGroup, step.borderRight, step.borderLeft];
 
       var properties = {
             left: step.left || 33,  top: 28,  selectable: false,  hasControls: false,

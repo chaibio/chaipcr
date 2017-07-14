@@ -124,6 +124,10 @@
 
     })
 
+    afterEach(function () {
+      angular.element(this.$window).off()
+    })
+
   })
 
 })();

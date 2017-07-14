@@ -12,7 +12,7 @@
         <hudson.model.StringParameterDefinition>
           <name>build_machine</name>
           <description>Building machine</description>
-          <defaultValue>10.0.2.240</defaultValue>
+          <defaultValue>10.0.100.240</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>check_badblocks</name>
@@ -230,7 +230,10 @@ uname -a
 ls -ahl
 lsblk
 df -h
-dpkg --configure -a
+
+rm /var/lib/dpkg/lock
+echo -e &quot;\n&quot; | dpkg --configure -a
+#dpkg --configure -a
 swapoff -a
 
 umount /dev/mmcblk0p*

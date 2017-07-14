@@ -239,12 +239,7 @@ angular.module("canvasApp").factory('moveStageRect', [
 
           this.indicator.processMovement = function(stage, circleManager) {
 
-            if(this.verticalLine.getVisible() === false) {
-              this.backToOriginal(stage);
-            } else {
-              this.applyMovement(stage, circleManager);
-            }
-
+            this.applyMovement(stage, circleManager);
             console.log("Landed .... !: Dragged stage->", this.draggedStage.index);
 
             var pre_id = (this.currentDrop) ? this.currentDrop.model.id : null;
@@ -253,25 +248,17 @@ angular.module("canvasApp").factory('moveStageRect', [
               console.log(err);
             });
 
+            this.hideElements();
+            
+        };
+
+        this.indicator.hideElements = function() {
+
             this.setVisible(false);
             this.direction = null;
             this.verticalLine.setVisible(false);
         };
-
-        this.indicator.backToOriginal = function(stageToBeReplaced) {
-          
-          var data = {
-            stage: stageToBeReplaced.model
-          };
-          
-          if(stageToBeReplaced.previousStage !== null) {
-            this.kanvas.addNewStage(data, stageToBeReplaced.previousStage, "move_stage_back_to_original"); // Remember we used this method to insert a new stage [It cant be used to insert at the very beginning]
-          } else if(stageToBeReplaced.previousStage === null) {
-            this.kanvas.addNewStageAtBeginning(stageToBeReplaced, data);
-          }
-          this.kanvas.canvas.renderAll();
-        };
-
+        
         this.indicator.applyMovement = function(stage_, circleManager) {
 
           var stage = this.draggedStage;
@@ -307,7 +294,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           stageView.stageHeader();
           this.kanvas.$scope.applyValues(stageView.childSteps[0].circle);
           stageView.childSteps[0].circle.manageClick(true);
-
+          
         };
 
         return this.indicator;
