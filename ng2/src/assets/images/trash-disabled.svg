@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="40px" height="48px" viewBox="0 0 40 48" enable-background="new 0 0 40 48" xml:space="preserve">
+<symbol  id="Trash" viewBox="-659.5 -783.5 1319 1567">
+	<path fill="#EF9193" d="M611.367,578.5H308.5v157.459c0,26.527-21.742,47.541-48.237,47.541h-521.056
+		c-26.528,0-47.706-21.014-47.706-47.541V578.5h-303.366c-26.528,0-47.634-21.133-47.634-47.661v-205.12
+		c0-26.526,21.105-48.219,47.634-48.219h42.366V-735.209c0-26.496,21.666-48.291,48.193-48.291H520.806
+		c26.496,0,47.693,21.795,47.693,48.291V277.5h42.867c26.496,0,48.133,21.691,48.133,48.219v205.12
+		C659.5,557.335,637.863,578.5,611.367,578.5z M-212.5,687.5h425v-109h-425V687.5z M-563.5,482.5h1127v-109h-1127V482.5z
+		 M472.806-687.5H-473.5v965h165v-644.901c0-26.495,21.472-48,48-48s48,21.505,48,48V277.5h164v-644.901c0-26.495,21.473-48,48-48
+		c26.496,0,48,21.505,48,48V277.5h165v-644.901c0-26.495,21.504-48,48-48s48,21.505,48,48V277.5h164v-965H472.806z"/>
+</symbol>
+<g id="Select_Wells_Border" display="none">
+</g>
+<g id="Dual_Channel_Graph">
+</g>
+<g id="Single_Channel" display="none">
+</g>
+<g id="L_Sidebar">
+</g>
+<g id="Right_Table">
+</g>
+<g id="Wells-Dual">
+</g>
+<g id="Wells-Single" display="none">
+</g>
+<g id="Hover_Crosshairs">
+</g>
+<g id="Footer" display="none">
+</g>
+<g id="Header">
+</g>
+<g id="Sin._Thres">
+</g>
+<g id="Zoom_Controls">
+</g>
+<g id="Logo">
+	<g id="OQPCR">
+	</g>
+</g>
+<g id="Coord_Hover">
+</g>
+<g id="Grid" display="none">
+</g>
+<g id="Baseline" display="none">
+</g>
+<g id="Isolation_Mode">
+</g>
+<g id="Layer_1_1_">
+</g>
+<g id="New_Symbol_2">
+	
+		<use xlink:href="#Trash"  width="1319" height="1567" id="XMLID_1_" x="-659.5" y="-783.5" transform="matrix(0.0303 0 0 -0.0306 20.001 24)" overflow="visible"/>
+</g>
+</svg>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="40.001px" height="48px" viewBox="0 0 40.001 48" enable-background="new 0 0 40.001 48" xml:space="preserve">
+<symbol  id="Trash" viewBox="-659.25 -783.875 1319 1567">
+	<path fill="#FFFFFF" d="M611.616,578.125H308.75v157.459c0,26.528-21.742,47.541-48.238,47.541h-521.056
+		c-26.528,0-47.706-21.013-47.706-47.541V578.125h-303.366c-26.528,0-47.634-21.133-47.634-47.661v-205.12
+		c0-26.527,21.105-48.219,47.634-48.219h42.366V-735.584c0-26.496,21.666-48.291,48.194-48.291H521.057
+		c26.496,0,47.693,21.795,47.693,48.291V277.125h42.866c26.496,0,48.134,21.691,48.134,48.219v205.12
+		C659.75,556.96,638.112,578.125,611.616,578.125z M-212.25,687.125h425v-109h-425V687.125z M-563.25,482.125h1127v-109h-1127
+		V482.125z M473.056-687.875H-473.25v965h165v-644.901c0-26.495,21.472-48,48-48s48,21.505,48,48v644.901h164v-644.901
+		c0-26.495,21.473-48,48-48c26.496,0,48,21.505,48,48v644.901h165v-644.901c0-26.495,21.504-48,48-48s48,21.505,48,48v644.901h164
+		v-965H473.056z"/>
+</symbol>
+<g id="Select_Wells_Border" display="none">
+</g>
+<g id="Dual_Channel_Graph">
+</g>
+<g id="Single_Channel" display="none">
+</g>
+<g id="L_Sidebar">
+</g>
+<g id="Right_Table">
+</g>
+<g id="Wells-Dual">
+</g>
+<g id="Wells-Single" display="none">
+</g>
+<g id="Hover_Crosshairs">
+</g>
+<g id="Footer" display="none">
+</g>
+<g id="Header">
+</g>
+<g id="Sin._Thres">
+</g>
+<g id="Zoom_Controls">
+</g>
+<g id="Logo">
+	<g id="OQPCR">
+	</g>
+</g>
+<g id="Coord_Hover">
+</g>
+<g id="Grid" display="none">
+</g>
+<g id="Baseline" display="none">
+</g>
+<g id="Isolation_Mode">
+</g>
+<g id="Layer_1">
+</g>
+<g id="New_Symbol_2">
+
+		<use xlink:href="#Trash"  width="1319" height="1567" id="XMLID_1_" x="-659.25" y="-783.875" transform="matrix(0.0303 0 0 -0.0306 19.9932 23.9883)" overflow="visible"/>
+</g>
+</svg>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" [
+	<!ENTITY ns_extend "http://ns.adobe.com/Extensibility/1.0/">
+	<!ENTITY ns_ai "http://ns.adobe.com/AdobeIllustrator/10.0/">
+	<!ENTITY ns_graphs "http://ns.adobe.com/Graphs/1.0/">
+	<!ENTITY ns_vars "http://ns.adobe.com/Variables/1.0/">
+	<!ENTITY ns_imrep "http://ns.adobe.com/ImageReplacement/1.0/">
+	<!ENTITY ns_sfw "http://ns.adobe.com/SaveForWeb/1.0/">
+	<!ENTITY ns_custom "http://ns.adobe.com/GenericCustomNamespace/1.0/">
+	<!ENTITY ns_adobe_xpath "http://ns.adobe.com/XPath/1.0/">
+]>
+<svg version="1.1" xmlns:x="&ns_extend;" xmlns:i="&ns_ai;" xmlns:graph="&ns_graphs;"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 30 30"
+	 style="enable-background:new 0 0 30 30;" xml:space="preserve">
+<style type="text/css">
+	.st0{display:none;}
+	.st1{display:inline;}
+	.st2{fill:#555555;}
+	.st3{fill:#333333;}
+	.st4{fill:none;stroke:#333333;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st5{display:none;fill:none;}
+	.st6{fill:#E02127;}
+	.st7{fill:none;stroke:#E02127;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st8{fill:#939598;}
+	.st9{fill:none;stroke:#939598;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st10{fill:none;stroke:#FA3C00;stroke-width:4;stroke-linecap:round;}
+	.st11{fill:none;stroke:#04A0D9;stroke-width:4;stroke-linecap:round;}
+	.st12{fill:none;stroke:#1578BE;stroke-width:4;stroke-linecap:round;}
+	.st13{fill:none;stroke:#FA1485;stroke-width:4;stroke-linecap:round;}
+	.st14{fill:none;stroke:#FFFFFF;stroke-width:4;stroke-linecap:round;}
+	.st15{fill:none;stroke:#68BD43;stroke-width:4;stroke-linecap:round;}
+	.st16{fill:none;stroke:#2455A8;stroke-width:4;stroke-linecap:round;}
+	.st17{fill:none;stroke:#B7D436;stroke-width:4;stroke-linecap:round;}
+	.st18{fill:none;stroke:#EA244E;stroke-width:4;stroke-linecap:round;}
+	.st19{fill:none;stroke:#75278E;stroke-width:4;stroke-linecap:round;}
+	.st20{fill:none;stroke:#FFFFFF;stroke-width:17;stroke-linecap:round;}
+	.st21{fill:none;stroke:#04A0D9;stroke-width:7;stroke-linecap:round;}
+	.st22{fill:#FFFFFF;stroke:#999999;stroke-width:4;stroke-linecap:round;stroke-miterlimit:10;}
+	.st23{fill:#FFFFFF;}
+	.st24{fill:#999999;}
+	.st25{fill:#D1D1D1;}
+	.st26{fill:#04A0D9;}
+	.st27{fill:#FFFFFF;stroke:#333333;stroke-width:4;stroke-linecap:round;stroke-miterlimit:10;}
+	.st28{display:inline;fill:#231F20;}
+	.st29{display:inline;fill:#F1F2F2;}
+	.st30{fill:#D1D3D4;}
+	.st31{display:inline;fill:#555555;stroke:#555555;stroke-width:20;stroke-miterlimit:10;}
+	.st32{display:inline;fill:#FFFFFF;}
+	.st33{fill:none;stroke:#231F20;stroke-width:2;stroke-miterlimit:10;}
+	.st34{fill:#F1F2F2;}
+	.st35{display:inline;opacity:0.5;}
+	.st36{fill:#AAAAAA;}
+	.st37{fill:none;stroke:#333333;stroke-width:10;stroke-linecap:round;stroke-miterlimit:10;}
+	.st38{fill:none;stroke:#555555;stroke-miterlimit:10;}
+	.st39{fill:none;stroke:#555555;stroke-linecap:round;stroke-miterlimit:10;stroke-dasharray:3,2;}
+	.st40{display:inline;fill:none;stroke:#DDDDDD;stroke-linecap:round;stroke-miterlimit:10;}
+	.st41{fill:none;stroke:#333333;stroke-miterlimit:10;}
+	.st42{fill:#2CAADA;opacity:0.5}
+	.st43{fill:none;stroke:#555555;stroke-width:2;stroke-linecap:round;stroke-miterlimit:10;}
+	.st44{fill:none;stroke:#231F20;stroke-miterlimit:10;}
+	.st45{fill:none;stroke:#DDDDDD;stroke-width:10;stroke-linecap:round;stroke-miterlimit:10;}
+	.st46{fill:none;stroke:#555555;stroke-width:10;stroke-linecap:round;stroke-miterlimit:10;}
+	.st47{fill:#FFFFFF;stroke:#333333;stroke-miterlimit:10;}
+	.st48{display:inline;fill:none;stroke:#555555;stroke-miterlimit:10;}
+	.st49{fill:none;stroke:#555555;stroke-width:2;stroke-miterlimit:10;}
+	.st50{display:inline;fill:none;stroke:#BCBEC0;stroke-width:6;stroke-linecap:round;stroke-miterlimit:10;}
+	.st51{display:inline;fill:none;stroke:#555555;stroke-width:6;stroke-linecap:round;stroke-miterlimit:10;}
+	.st52{fill:none;stroke:#DDDDDD;stroke-miterlimit:10;}
+	.st53{fill:#FBFBFB;}
+	.st54{fill:#EBEBEB;}
+	.st55{display:none;fill:#04A0D9;}
+	.st56{fill:#8DC63F;}
+	.st57{fill:#FFC132;}
+	.st58{fill:#444444;}
+	.st59{fill:#FF6F02;}
+	.st60{fill:#00AEEF;}
+	.st61{fill:#EEEEEE;}
+	.st62{fill:none;stroke:#AAAAAA;stroke-width:2;stroke-miterlimit:10;}
+	.st63{fill:#E6F5FB;}
+	.st64{fill:#81CFEC;}
+	.st65{fill:none;stroke:#81CFEC;stroke-width:2;stroke-miterlimit:10;}
+	.st66{fill:#1578BE;}
+	.st67{fill:#FA1485;}
+	.st68{fill:#FA3C00;}
+	.st69{fill:none;stroke:#BCBEC0;stroke-width:6;stroke-linecap:round;stroke-miterlimit:10;}
+	.st70{fill:none;stroke:#000000;stroke-width:6;stroke-linecap:round;stroke-miterlimit:10;}
+	.st71{fill:#ED1C24;}
+	.st72{fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-miterlimit:10;}
+	.st73{fill:none;stroke:#DDDDDD;stroke-width:2;stroke-linecap:round;stroke-miterlimit:10;}
+	.st74{opacity:0.75;fill:#FFFFFF;}
+	.st75{fill:#F5F5F5;}
+</style>
+<switch>
+	<foreignObject requiredExtensions="&ns_ai;" x="0" y="0" width="1" height="1">
+		<i:pgfRef  xlink:href="#adobe_illustrator_pgf">
+		</i:pgfRef>
+	</foreignObject>
+	<g i:extraneous="self">
+		<g id="Layer_1" class="st0">
+			<g id="Fail" class="st1">
+			</g>
+		</g>
+		<g id="BG">
+		</g>
+		<g id="VD">
+			<g id="New_Symbol">
+			</g>
+			<path class="st42" d="M15,0C6.7,0,0,6.7,0,15s6.7,15,15,15s15-6.7,15-15S23.3,0,15,0z M14.6,21.6c-2,0-3.7-0.3-5.1-1.8l1.6-1.6
+				c1,1,2.3,1.3,3.5,1.3c1.5,0,2.7-0.5,2.7-1.7c0-0.8-0.5-1.3-1.6-1.4l-1.9-0.2c-2.3-0.2-3.6-1.2-3.6-3.4c0-2.4,2-3.7,4.6-3.7
+				c1.8,0,3.4,0.4,4.5,1.4l-1.5,1.6c-0.8-0.6-1.8-0.9-3-0.9c-1.5,0-2.2,0.6-2.2,1.6c0,0.7,0.4,1.3,1.7,1.4l1.9,0.2
+				c2.3,0.2,3.6,1.3,3.6,3.4C19.7,20.3,17.5,21.6,14.6,21.6z"/>
+		</g>
+	</g>
+</switch>
+</svg>
