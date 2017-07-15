@@ -33,6 +33,9 @@ const dashRoutes: Routes = [
   ],
   exports: [
     RouterModule
+  ],
+  providers: [
+    DashboardAuthGuard
   ]
 })
 export class DashboardRoutingModule {}

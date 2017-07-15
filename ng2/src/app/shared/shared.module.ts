@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { CommonModule } from '@angular/common';
 
-import { AuthHttp } from './providers/auth_http.provider';
+import { AuthHttp } from './services/auth_http.service';
+import { SessionService } from './services/session.service';
 
 @NgModule({
   declarations: [
@@ -20,8 +21,9 @@ import { AuthHttp } from './providers/auth_http.provider';
     CommonModule,
   ],
   providers: [
+    Title,
     AuthHttp,
-    Title
+    SessionService
   ]
 })
 export class SharedModule { }

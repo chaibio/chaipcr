@@ -1,9 +1,12 @@
+
+// Redirects users to home if authenticated
+
 import {Injectable} from '@angular/core';
-import {Router, CanActivate, CanActivateChild, ActivatedRouteSnapshot, RouterStateSnapshot} from '@angular/router';
+import {Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs/Rx';
 
 @Injectable()
-export class DashboardAuthGuard implements CanActivate, CanActivateChild {
+export class LoginRouteGuard implements CanActivate {
 
   constructor (private router: Router) {}
 
@@ -13,18 +16,11 @@ export class DashboardAuthGuard implements CanActivate, CanActivateChild {
   ): Observable<boolean>|boolean {
     console.log(this.loggedIn())
     if (this.loggedIn()) {
-      return true;
-    } else {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/']);
       return false;
+    } else {
+      return true;
     }
-  }
-
-  canActivateChild(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): Observable<boolean>|boolean {
-    return this.canActivate(route, state)
   }
 
   private loggedIn (): boolean {

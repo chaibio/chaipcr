@@ -15,7 +15,7 @@
           <input type="password" placeholder="Enter Password" class="login-input-field" [(ngModel)]="credentials.password" name="password">
         </div>
         <div class="message-section text-center">
-          <span class="text-danger" *ngIf="loginError">The email and password entered do not match</span>
+          <span class="text-danger" *ngIf="loginError">{{loginError}}</span>
         </div>
         <div class="submit-section text-center">
           <button type="submit" class="login-button" [disabled]="!loginForm.form.valid">Sign In</button>
