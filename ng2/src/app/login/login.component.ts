@@ -9,30 +9,42 @@ import { Title }  from '@angular/platform-browser';
 
 export class LoginComponent implements OnInit {
 
-  deviceInfo: {
-    serial_number: ''
-    software: {
-      version: ''
-    }
-  };
+  deviceInfo: any;
   deviceInfoError: any;
   loginError: any;
+  credentials: any;
 
   constructor (private http: Http, private titleService: Title) {
     titleService.setTitle('ChaiPCR | Login');
   }
 
   ngOnInit() {
+
+    this.deviceInfo = {
+      serial_number: null,
+      software: {
+        version: null
+      }
+    };
+
+    this.credentials = {
+      email: null,
+      password: null
+    }
+
     this.http.get('/device').subscribe((res) => {
       this.deviceInfo = res.json();
-      console.log(this.deviceInfo);
     }, (res) => {
       this.deviceInfoError = res.json();
     })
   }
 
-  login () {
-    console.log('Login..!!!')
+  doSubmit () {
+    this.http.post('/login', this.credentials).subscribe((res) => {
+      console.log(res.json());
+    }, (res) => {
+      this.loginError = true;
+    })
   }
 
 }

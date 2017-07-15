@@ -1,6 +1,4 @@
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { SharedModule } from '../shared/shared.module';
 import { DashboardRoutingModule } from './dashboard.routing.module';
@@ -10,7 +8,6 @@ import { HomeComponent } from './home/home.component';
 
 @NgModule({
   imports: [
-    CommonModule,
     DashboardRoutingModule,
     SharedModule,
   ],
@@ -18,10 +15,6 @@ import { HomeComponent } from './home/home.component';
     DashboardComponent,
     HomeComponent,
   ],
-  // exports: [
-  //   DashboardComponent,
-  //   HomeComponent,
-  // ],
   providers: [
     DashboardAuthGuard,
   ]

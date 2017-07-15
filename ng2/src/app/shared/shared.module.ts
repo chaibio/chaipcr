@@ -1,5 +1,8 @@
 import { NgModule } from '@angular/core';
-import { BrowserModule, Title }  from '@angular/platform-browser';
+import { Title } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
+import { HttpModule } from '@angular/http';
+import { CommonModule } from '@angular/common';
 
 import { AuthHttp } from './providers/auth_http.provider';
 
@@ -7,8 +10,14 @@ import { AuthHttp } from './providers/auth_http.provider';
   declarations: [
   ],
   imports: [
+    FormsModule,
+    HttpModule,
+    CommonModule,
   ],
   exports: [
+    FormsModule,
+    HttpModule,
+    CommonModule,
   ],
   providers: [
     AuthHttp,

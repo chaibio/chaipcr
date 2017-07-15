@@ -1,24 +1,24 @@
 <div class="login-container">
-  <form class="login-wrapper">
+  <form class="login-wrapper" #loginForm="ngForm" (ngSubmit)="doSubmit()">
     <div class="login-box">
       <div class="login-inner-container">
         <div class="logo-version-section">
           <img class="logo" src="assets/images/login_logo.png">
-          <span class="version-data">Version 1.0.9.6</span>
+          <span class="version-data">Version {{deviceInfo.software.version}}</span>
         </div>
         <div class="input-section">
           <span class="login-input-label">Username</span>
-          <input type="text" class="login-input-field" placeholder="Email Address" autofocus required>
+          <input type="email" class="login-input-field" placeholder="Email Address" autofocus required [(ngModel)]="credentials.email" name="email">
         </div>
         <div class="input-section password">
           <span class="login-input-label">Password</span>
-          <input type="password" placeholder="Enter Password" class="login-input-field">
+          <input type="password" placeholder="Enter Password" class="login-input-field" [(ngModel)]="credentials.password" name="password">
         </div>
         <div class="message-section text-center">
-          <span class="text-danger">The email and password entered do not match</span>
+          <span class="text-danger" *ngIf="loginError">The email and password entered do not match</span>
         </div>
         <div class="submit-section text-center">
-          <button type="submit" class="login-button">Sign In</button>
+          <button type="submit" class="login-button" [disabled]="!loginForm.form.valid">Sign In</button>
         </div>
       </div>
     </div>

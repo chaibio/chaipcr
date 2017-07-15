@@ -20,7 +20,7 @@ require 'rserve'
 
 class MainController < ApplicationController
 
-  # before_filter :ensure_authenticated_user, :only => :index
+  before_filter :ensure_authenticated_user, :only => :index
 
   api :GET, "/", "Home page"
   def index

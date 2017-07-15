@@ -1,12 +1,9 @@
-import { BrowserModule, Title } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
+import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule, Routes } from '@angular/router';
 
-import { AppRoutesModule } from './app.routing.module';
-
 import { SharedModule } from './shared/shared.module';
+import { AppRoutesModule } from './app.routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 
@@ -17,13 +14,8 @@ import { LoginComponent } from './login/login.component';
   ],
   imports: [
     BrowserModule,
-    FormsModule,
-    HttpModule,
     SharedModule,
     AppRoutesModule,
-  ],
-  providers: [
-    Title
   ],
   bootstrap: [AppComponent]
 })
