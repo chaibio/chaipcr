@@ -9,7 +9,12 @@ import { Title }  from '@angular/platform-browser';
 
 export class LoginComponent implements OnInit {
 
-  deviceInfo: any;
+  deviceInfo: {
+    serial_number: ''
+    software: {
+      version: ''
+    }
+  };
   deviceInfoError: any;
   loginError: any;
 
@@ -20,6 +25,7 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
     this.http.get('/device').subscribe((res) => {
       this.deviceInfo = res.json();
+      console.log(this.deviceInfo);
     }, (res) => {
       this.deviceInfoError = res.json();
     })

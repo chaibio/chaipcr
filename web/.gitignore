@@ -25,3 +25,15 @@
 
 # Ignore precompiled assets
 /public/assets
+
+# Ignore angular 2 assets
+/public/*.ttf
+/public/*.eot
+/public/*.woff
+/public/*.woff2
+/public/*.svg
+/public/*.otf
+/public/*.map
+/public/*.js
+/public/index.html
+/public/3rdpartylicenses.txt

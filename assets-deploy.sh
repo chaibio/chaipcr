@@ -19,8 +19,4 @@ then
 fi
 
 rm -rf ./web/log
-rsync --delete --rsh="sshpass -p $remote_password ssh -oStrictHostKeyChecking=no -l root" -a ./web/public/javascripts "$1:/root/chaipcr/web/public"
-rsync --delete --rsh="sshpass -p $remote_password ssh -oStrictHostKeyChecking=no -l root" -a ./web/public/stylesheets "$1:/root/chaipcr/web/public"
-rsync --delete --rsh="sshpass -p $remote_password ssh -oStrictHostKeyChecking=no -l root" -a ./web/public/fonts "$1:/root/chaipcr/web/public"
-rsync --delete --rsh="sshpass -p $remote_password ssh -oStrictHostKeyChecking=no -l root" -a ./web/public/images "$1:/root/chaipcr/web/public"
-rsync --delete --rsh="sshpass -p $remote_password ssh -oStrictHostKeyChecking=no -l root" -a ./web/app/views "$1:/root/chaipcr/web/app"
+rsync --delete --rsh="sshpass -p $remote_password ssh -oStrictHostKeyChecking=no -l root" -a ./web/public "$1:/root/chaipcr/web"
