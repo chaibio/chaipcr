@@ -608,6 +608,7 @@ class ExperimentsController < ApplicationController
     begin
       body = {calibration_info: calibrate_hash(calibration_id), experiment_id: experiment.id, min_ct: 5}
       body = body.merge(experiment.experiment_definition.amplification_option.to_hash) if !experiment.experiment_definition.amplification_option.nil?
+      logger.info("body=#{body}")
       response = HTTParty.post("http://127.0.0.1:8000/experiments/#{experiment.id}/amplification", body: body.to_json)
       if response.code != 200
         logger.error("Julia response code: #{response.code}")
@@ -701,24 +702,47 @@ class ExperimentsController < ApplicationController
   #  sleep(10)
   #  return [CachedMeltCurveDatum.new({:experiment_id=>experiment_id, :stage_id=>stage_id, :channel=>1, :well_num=>1, :temperature=>[121,122], :fluorescence_data=>[1001, 1002], :derivative=>[3,4], :tm=>[1,2,3], :area=>[1,2,5]})]
     
-    config   = Rails.configuration.database_configuration
-    connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
+    #config   = Rails.configuration.database_configuration
+    #connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
     begin
-      results = connection.eval("tryCatchError(process_mc, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment.id}, #{stage_id}, #{calibrate_info(calibration_id)} #{", qt_prob=0.1, max_normd_qtv=0.9" if experiment.experiment_definition.guid == "thermal_consistency"})")
+      body = {calibration_info: calibrate_hash(calibration_id), experiment_id: experiment.id, stage_id: stage_id}
+      body = body.merge({qt_prob: 0.1, max_normd_qtv:0.9}) if experiment.experiment_definition.guid == "thermal_consistency"
+      #logger.info("body=#{body}")
+      response = HTTParty.post("http://127.0.0.1:8000/experiments/#{experiment.id}/meltcurve", body: body.to_json)
+      if response.code != 200
+        logger.error("Julia response code: #{response.code}")
+        raise response.body
+      else
+        results = JSON.parse(response.body)
+      end
+      #results = connection.eval("tryCatchError(process_mc, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment.id}, #{stage_id}, #{calibrate_info(calibration_id)} #{", qt_prob=0.1, max_normd_qtv=0.9" if experiment.experiment_definition.guid == "thermal_consistency"})")
     rescue  => e
-      logger.error("Rserve error: #{e}")
-      kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
+      logger.error("Julia error: #{e}")
+      #kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
       raise e
     ensure
-      connection.close
+      #connection.close
     end
     logger.info("R code time #{Time.now-start_time}")
+    #logger.info("results=#{results}")
     start_time = Time.now
-    results = results.to_ruby
+    #results = results.to_ruby
     ramp = Ramp.collect_data(stage_id).first
     melt_curve_data = []
     if !results.blank?
+      melt_curve_results = results["melt_curve_data"]
+      melt_curve_analysis_results = results["melt_curve_analysis"]
+      (0...melt_curve_results.length).each do |channel|
+        melt_curve_results[channel].each_index do |i|
+          melt_curve_results_per_well = melt_curve_results[channel][i]
+          melt_curve_analysis_per_well = melt_curve_analysis_results[channel][i]
+          hash = CachedMeltCurveDatum.new({:experiment_id=>experiment.id, :stage_id=>stage_id, :ramp_id=>(ramp)? ramp.id : nil, :channel=>channel+1, :well_num=>i+1, :temperature=>melt_curve_results_per_well[0], :normalized_data=>melt_curve_results_per_well[1], :derivative_data=>melt_curve_results_per_well[2], :tm=>melt_curve_analysis_per_well[0], :area=>melt_curve_analysis_per_well[1]})
+          melt_curve_data << hash
+        end
+      end
+=begin
+      old rserve code
       raise results["message"] if !results["message"].blank? #catched error
       (0...results.length).each do |channel|
         results[channel].each_index do |i|
@@ -727,6 +751,7 @@ class ExperimentsController < ApplicationController
           melt_curve_data << hash
         end
       end
+=end
     end 
     logger.info("Rails code time #{Time.now-start_time}")
     return melt_curve_data
@@ -734,25 +759,35 @@ class ExperimentsController < ApplicationController
 
   def background_analyze_data(experiment)
     background("analyze", experiment.id) do
-      config   = Rails.configuration.database_configuration
-      connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
+      #config   = Rails.configuration.database_configuration
+      #connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
       begin
-        connection.eval("source(\"#{Rails.configuration.dynamic_file_path}/#{experiment.experiment_definition.guid}/analyze.R\")")
-        response = connection.eval("tryCatchError(analyze, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment.id}, #{calibrate_info(experiment.calibration_id)})").to_ruby
-        new_data = CachedAnalyzeDatum.new(:experiment_id=>experiment.id, :analyze_result=>response.to_s)
+        body = {calibration_info: calibrate_hash(experiment.calibration_id), experiment_info: experiment.as_json}
+        #logger.info("body=#{body}")
+        response = HTTParty.post("http://127.0.0.1:8000/experiments/#{experiment.id}/analyze", body: body.to_json)
+        if response.code != 200
+          logger.error("Julia response code: #{response.code}")
+          raise response.body
+        else
+          new_data = CachedAnalyzeDatum.new(:experiment_id=>experiment.id, :analyze_result=>response.body)
+          #update analyze status
+          if experiment.diagnostic?
+            analysis_results = JSON.parse(response.body)
+            experiment.update_attributes(:analyze_status=>(analysis_results["valid"] != true)? "failed" : "success")
+          end
+        end
+        #connection.eval("source(\"#{Rails.configuration.dynamic_file_path}/#{experiment.experiment_definition.guid}/analyze.R\")")
+        #response = connection.eval("tryCatchError(analyze, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment.id}, #{calibrate_info(experiment.calibration_id)})").to_ruby
+        
       rescue  => e
-        logger.error("Rserve error: #{e}")
-        kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
+        logger.error("Julia error: #{e}")
+        #kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
         raise e
       ensure
-        connection.close
+        #connection.close
       end
-      raise response["message"] if response && response.is_a?(Array) && !response["message"].blank? #catched error
+      #raise response["message"] if response && response.is_a?(Array) && !response["message"].blank? #catched error
 
-      #update analyze status
-      if experiment.diagnostic?
-        experiment.update_attributes(:analyze_status=>(response.include?("false"))? "failed" : "success")
-      end
       #update cache
       CachedAnalyzeDatum.import [new_data], :on_duplicate_key_update => [:analyze_result]
     end
@@ -791,7 +826,7 @@ class ExperimentsController < ApplicationController
     if protocol && protocol.stages[0]
       water_index = protocol.stages[0].steps.find_index{|item| item.name == "Water"}
       step_water = (!water_index.nil?)? protocol.stages[0].steps[water_index].id : nil
-      if 1 #Device.dual_channel?
+      if Device.dual_channel?
         if calibration_id == 1
           channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "Signal"}
           channel_2_index = channel_1_index
