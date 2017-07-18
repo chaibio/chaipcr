@@ -1,6 +1,10 @@
-import {Injectable} from '@angular/core';
-import {Http, Response} from '@angular/http';
-import {Observable} from 'rxjs';
+import { Injectable } from '@angular/core';
+import { Http, Response } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/observable/throw';
+
+import { LoginFormData } from '../models/login-form-data.model';
 
 @Injectable()
 export class SessionService {
@@ -8,7 +12,7 @@ export class SessionService {
   constructor(private http: Http) {}
 
 
-  login (credentials) {
+  login (credentials: LoginFormData) {
     return this.http.post('/login', credentials)
     .map(this.extractData)
     .catch(this.handleErrorObservable)
@@ -21,8 +25,14 @@ export class SessionService {
   }
 
   private handleErrorObservable (error: Response | any) {
-      let body = error.json();
-      return Observable.throw(body.errors || body);
+    let body: string;
+    try {
+      let json = error.json();
+      body = json.errors
+    } catch (e) {
+      body = 'Problem logging in'
+    }
+    return Observable.throw(body)
   }
 
 }

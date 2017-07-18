@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { Http } from '@angular/http';
-import { Title }  from '@angular/platform-browser';
-import { Router } from '@angular/router';
-import { SessionService } from '../shared/services/session.service';
+import {Component, OnInit} from '@angular/core';
+import {Http} from '@angular/http';
+import {Title}  from '@angular/platform-browser';
+import {Router} from '@angular/router';
+
+import {SessionService} from '../shared/services/session.service';
+import {LoginFormData} from '../shared/models/login-form-data.model';
 
 @Component({
   templateUrl: './login.component.html',
@@ -14,7 +16,7 @@ export class LoginComponent implements OnInit {
   deviceInfo: any;
   deviceInfoError: any;
   loginError: any;
-  credentials: any;
+  credentials: LoginFormData;
 
   constructor (
     private http: Http,

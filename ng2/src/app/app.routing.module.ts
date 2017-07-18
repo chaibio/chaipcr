@@ -1,13 +1,10 @@
-// import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
 import { RouterModule, Routes } from '@angular/router';
 
+import { SharedModule } from './shared/shared.module';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { LoginComponent } from './login/login.component';
 import { LoginRouteGuard } from './login/login.route.guard';
-
 
 const appRoutes: Routes = [
   {
@@ -23,10 +20,15 @@ const appRoutes: Routes = [
 
 
 @NgModule({
+  declarations: [
+    LoginComponent
+  ],
   imports: [
+    SharedModule,
     RouterModule.forRoot(appRoutes),
   ],
   exports: [
+    SharedModule,
     RouterModule,
   ],
   providers: [

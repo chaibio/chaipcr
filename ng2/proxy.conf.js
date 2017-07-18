@@ -1,7 +1,6 @@
 const PROXY_CONFIG = [{
   context: [
     "/device",
-    "/login",
     "/logout",
     "/experiments",
     "/capabilities",
@@ -15,6 +14,16 @@ const PROXY_CONFIG = [{
   ],
   target: "http://10.0.100.200",
   secure: false
-}]
+}, {
+  context: [
+    "/login",
+    "/welcome",
+  ],
+  target: "http://10.0.100.200",
+  secure: false,
+  bypass: function(req, res, proxyOptions) {
+    if (req.method === 'GET') return '/index.html';
+  }
+}];
 
 module.exports = PROXY_CONFIG;
