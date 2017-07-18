@@ -1,8 +1,6 @@
 import { TestBed, inject } from '@angular/core/testing';
-import { Http, XHRBackend, BaseRequestOptions, RequestOptions, ResponseOptions, Response } from '@angular/http';
+import { HttpModule, XHRBackend, BaseRequestOptions, RequestOptions, ResponseOptions, Response } from '@angular/http';
 import { MockBackend, MockConnection } from '@angular/http/testing';
-
-import { SharedModule } from '../shared.module';
 import { SessionService } from './session.service';
 
 
@@ -10,9 +8,10 @@ describe('Service: SessionService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [SharedModule],
+      imports: [HttpModule],
       providers: [
-        { provide: XHRBackend, useClass: MockBackend }
+        { provide: XHRBackend, useClass: MockBackend },
+        { provide: SessionService, useClass: SessionService }
       ]
     })
   })
