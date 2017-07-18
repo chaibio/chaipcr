@@ -18,6 +18,12 @@ export class SessionService {
     .catch(this.handleErrorObservable)
   }
 
+  logout() {
+    return this.http.post('/', {}).map((res) => {
+      localStorage.removeItem('token');
+    });
+  }
+
   private extractData(res: Response) {
       let body = res.json();
       localStorage.setItem('token', body.authentication_token);

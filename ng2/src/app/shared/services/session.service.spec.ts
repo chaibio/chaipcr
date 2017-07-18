@@ -104,4 +104,29 @@ describe('Service: SessionService', () => {
 
   })
 
+  describe('post /logout', () => {
+
+    it('should delete token from local storage', inject(
+      [SessionService, XHRBackend],
+      (sessionService: SessionService, backend: MockBackend) => {
+
+        const deleteTokenSpy = spyOn(localStorage, 'removeItem').and.callThrough()
+
+        const mockResponse = {
+          status: 200,
+          body: {}
+        }
+
+        backend.connections.subscribe((connection: MockConnection) => {
+          connection.mockRespond(new Response(new ResponseOptions(mockResponse)))
+        })
+
+        sessionService.logout().subscribe((res) => {
+          expect(deleteTokenSpy).toHaveBeenCalledWith('token')
+        })
+
+      }))
+
+  })
+
 });
