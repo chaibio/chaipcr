@@ -22,7 +22,7 @@ require "httparty"
 class ExperimentsController < ApplicationController
   include ParamsHelper
   
-  #before_filter :ensure_authenticated_user
+  before_filter :ensure_authenticated_user
   before_filter :get_experiment, :except => [:index, :create, :copy]
   
   respond_to :json
@@ -823,7 +823,7 @@ class ExperimentsController < ApplicationController
     if protocol && protocol.stages[0]
       water_index = protocol.stages[0].steps.find_index{|item| item.name == "Water"}
       step_water = (!water_index.nil?)? protocol.stages[0].steps[water_index].id : nil
-      if 1 #Device.dual_channel?
+      if Device.dual_channel?
         if calibration_id == 1
           channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "Signal"}
           channel_2_index = channel_1_index
