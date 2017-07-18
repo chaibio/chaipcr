@@ -1,10 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {Http} from '@angular/http';
-import {Title}  from '@angular/platform-browser';
-import {Router} from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Http } from '@angular/http';
+import { Title } from '@angular/platform-browser';
+import { Router } from '@angular/router';
 
-import {SessionService} from '../shared/services/session.service';
-import {LoginFormData} from '../shared/models/login-form-data.model';
+import { SessionService } from '../shared/services/session.service';
+import { LoginFormData } from '../shared/models/login-form-data.model';
 
 @Component({
   templateUrl: './login.component.html',
@@ -18,11 +18,12 @@ export class LoginComponent implements OnInit {
   loginError: any;
   credentials: LoginFormData;
 
-  constructor (
+  constructor(
     private http: Http,
     private titleService: Title,
     private sessionService: SessionService,
-    private router: Router) {
+    private router: Router
+  ) {
     titleService.setTitle('ChaiPCR | Login');
   }
 
@@ -47,7 +48,7 @@ export class LoginComponent implements OnInit {
     })
   }
 
-  doSubmit () {
+  doSubmit() {
     this.sessionService.login(this.credentials).subscribe((res) => {
       this.router.navigate(['/'])
     }, (error: any) => {
