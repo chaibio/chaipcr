@@ -22,7 +22,7 @@ require "httparty"
 class ExperimentsController < ApplicationController
   include ParamsHelper
   
-  before_filter :ensure_authenticated_user
+  #before_filter :ensure_authenticated_user
   before_filter :get_experiment, :except => [:index, :create, :copy]
   
   respond_to :json
@@ -611,8 +611,7 @@ class ExperimentsController < ApplicationController
       logger.info("body=#{body}")
       response = HTTParty.post("http://127.0.0.1:8000/experiments/#{experiment.id}/amplification", body: body.to_json)
       if response.code != 200
-        logger.error("Julia response code: #{response.code}")
-        raise response.body
+        raise_julia_error(response)
       else
         results = JSON.parse(response.body)
       end
@@ -711,8 +710,7 @@ class ExperimentsController < ApplicationController
       #logger.info("body=#{body}")
       response = HTTParty.post("http://127.0.0.1:8000/experiments/#{experiment.id}/meltcurve", body: body.to_json)
       if response.code != 200
-        logger.error("Julia response code: #{response.code}")
-        raise response.body
+        raise_julia_error(response)
       else
         results = JSON.parse(response.body)
       end
@@ -766,8 +764,7 @@ class ExperimentsController < ApplicationController
         #logger.info("body=#{body}")
         response = HTTParty.post("http://127.0.0.1:8000/experiments/#{experiment.id}/analyze", body: body.to_json)
         if response.code != 200
-          logger.error("Julia response code: #{response.code}")
-          raise response.body
+          raise_julia_error(response)
         else
           new_data = CachedAnalyzeDatum.new(:experiment_id=>experiment.id, :analyze_result=>response.body)
           #update analyze status
@@ -826,7 +823,7 @@ class ExperimentsController < ApplicationController
     if protocol && protocol.stages[0]
       water_index = protocol.stages[0].steps.find_index{|item| item.name == "Water"}
       step_water = (!water_index.nil?)? protocol.stages[0].steps[water_index].id : nil
-      if Device.dual_channel?
+      if 1 #Device.dual_channel?
         if calibration_id == 1
           channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "Signal"}
           channel_2_index = channel_1_index
@@ -909,5 +906,14 @@ class ExperimentsController < ApplicationController
     end
     
     return group
+  end
+  
+  def raise_julia_error(response)
+    logger.error("Julia error response code: #{response.code}, #{response.body}")
+    if response.code == 500 && !response.body.blank?
+      raise JSON.parse(response.body)["error"].to_s
+    else
+      raise "Julia error (code=#{response.code}): #{response.inspect}"
+    end
   end
 end
