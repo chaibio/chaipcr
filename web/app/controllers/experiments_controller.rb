@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 require 'zip'
-require 'rserve'
+require "httparty"
 
 class ExperimentsController < ApplicationController
   include ParamsHelper
@@ -587,6 +587,7 @@ class ExperimentsController < ApplicationController
   def calculate_amplification_data(experiment, stage_id, calibration_id)
    # sleep(10)
   #  return  [AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :channel=>1, :well_num=>1, :cycle_num=>1, :background_subtracted_value=>1001, :baseline_subtracted_value=>102)], [AmplificationCurve.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :channel=>1, :well_num=>1, :ct=>10)]
+    
     step = Step.collect_data(stage_id).first
     if step
       sub_id = step.id
@@ -601,24 +602,54 @@ class ExperimentsController < ApplicationController
       end
     end
       
-    config   = Rails.configuration.database_configuration
-    connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
+    #config   = Rails.configuration.database_configuration
+    #connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
     begin
-      results = connection.eval("tryCatchError(get_amplification_data, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment.id}, list(#{sub_type}_id=#{sub_id}), #{calibrate_info(calibration_id)} #{","+experiment.experiment_definition.amplification_option.to_rserve_params if !experiment.experiment_definition.amplification_option.nil?})")
+      body = {calibration_info: calibrate_hash(calibration_id), experiment_id: experiment.id, min_ct: 5}
+      body = body.merge(experiment.experiment_definition.amplification_option.to_hash) if !experiment.experiment_definition.amplification_option.nil?
+      response = HTTParty.post("http://127.0.0.1:8000/experiments/#{experiment.id}/amplification", body: body.to_json)
+      if response.code != 200
+        logger.error("Julia response code: #{response.code}")
+        raise response.body
+      else
+        results = JSON.parse(response.body)
+      end
+      #results = connection.eval("tryCatchError(get_amplification_data, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment.id}, list(#{sub_type}_id=#{sub_id}), #{calibrate_info(calibration_id)} #{","+experiment.experiment_definition.amplification_option.to_rserve_params if !experiment.experiment_definition.amplification_option.nil?})")
     rescue  => e
-      logger.error("Rserve error: #{e}")
-      kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
+      logger.error("Julia error: #{e}")
+      #kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
       raise e
     ensure
-      connection.close
+      #connection.close
     end
     logger.info("R code time #{Time.now-start_time}")
+    #logger.info("results=#{results}")
     start_time = Time.now
-    results = results.to_ruby
+    #results = results.to_ruby
     amplification_data = []
     cts = []
     if !results.blank?
+      background_subtracted_results = results["rbbs_ary3"]
+      baseline_subtracted_results = results["blsub_fluos"]
+      cq_results = results["cq"]
+      (0...background_subtracted_results.length).each do |channel|
+        num_wells = background_subtracted_results[channel].length
+        (0...num_wells).each do |well_num|
+          num_cycles = background_subtracted_results[channel][well_num].length
+          (0...num_cycles).each do |cycle_num|
+            background_subtracted_value = background_subtracted_results[channel][well_num][cycle_num]
+            baseline_subtracted_value = baseline_subtracted_results[channel][well_num][cycle_num]
+            amplification_data << AmplificationDatum.new(:experiment_id=>experiment.id, :stage_id=>stage_id, :sub_type=>sub_type, :sub_id=>sub_id, :channel=>channel+1, :well_num=>well_num+1, :cycle_num=>cycle_num+1, :background_subtracted_value=>background_subtracted_value, :baseline_subtracted_value=>baseline_subtracted_value)
+          end
+        end
+        (0...cq_results[channel].length).each do |well_num|
+          cts << AmplificationCurve.new(:experiment_id=>experiment.id, :stage_id=>stage_id, :channel=>channel+1, :well_num=>well_num+1, :ct=>cq_results[channel][well_num])
+        end
+      end
+      
+=begin
+      old rserve code
       raise results["message"] if !results["message"].blank? #catched error
       (0...results[0].length).each do |channel|
          background_subtracted_results = results[0][channel]
@@ -643,6 +674,7 @@ class ExperimentsController < ApplicationController
          end
       end
       #amplification_data.sort_by!{|x| [x.channel,x.well_num,x.cycle_num]}
+=end
     end
     logger.info("Rails code time #{Time.now-start_time}")
     return amplification_data, cts
@@ -750,6 +782,34 @@ class ExperimentsController < ApplicationController
       result = "list(water=list(calibration_id=#{calibration_id},step_id=#{step_water}), channel_1=list(calibration_id=#{calibration_id},step_id=#{step_channel_1}) \
               #{(step_channel_2)? ", channel_2=list(calibration_id="+calibration_id.to_s+",step_id="+step_channel_2.to_s+")" : ""} \
               #{(step_baseline)? ", baseline=list(calibration_id="+calibration_id.to_s+",step_id="+step_baseline.to_s+")" : ""})"
+    end
+    result
+  end
+  
+  def calibrate_hash(calibration_id)
+    protocol = Protocol.includes(:stages).where("protocols.experiment_definition_id=(SELECT experiment_definition_id from experiments where experiments.id=#{calibration_id} LIMIT 1)").references(:stages).first
+    if protocol && protocol.stages[0]
+      water_index = protocol.stages[0].steps.find_index{|item| item.name == "Water"}
+      step_water = (!water_index.nil?)? protocol.stages[0].steps[water_index].id : nil
+      if 1 #Device.dual_channel?
+        if calibration_id == 1
+          channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "Signal"}
+          channel_2_index = channel_1_index
+        else
+          channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "FAM"}
+          channel_2_index = protocol.stages[0].steps.find_index{|item| item.name == "HEX"}
+          baseline_index = protocol.stages[0].steps.find_index{|item| item.name == "Baseline"}
+        end
+      else
+        channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "Signal"}
+        channel_2_index = nil
+      end
+      step_channel_1 = (!channel_1_index.nil?)? protocol.stages[0].steps[channel_1_index].id : nil
+      step_channel_2 = (!channel_2_index.nil?)? protocol.stages[0].steps[channel_2_index].id : nil
+      step_baseline = (!baseline_index.nil?)? protocol.stages[0].steps[baseline_index].id : nil
+      result = {:water=>{:calibration_id=>calibration_id, :step_id=>step_water}, :channel_1=>{:calibration_id=>calibration_id, :step_id=>step_channel_1}}
+      result.merge!(:channel_2=>{:calibration_id=>calibration_id, :step_id=>step_channel_2}) if step_channel_2
+      result.merge!(:baseline=>{:calibration_id=>calibration_id, :step_id=>step_baseline}) if step_baseline
     end
     result
   end

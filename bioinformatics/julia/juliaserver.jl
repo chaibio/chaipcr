@@ -12,13 +12,7 @@ http = HttpHandler() do req::Request, res::Response
 		nodes = split(req.resource,'/');
 		experiment_id = parse(Int,nodes[3])
 		action = nodes[4]
-		request_body = string(req.data)
-		# func = parse(action)
-		code = 0
-		# if isdefined(func)
-		# 	success, response_body = eval(func)(experiment_id, request_body)
-		# 	code = (success)? 200 : 500
-		# end
+		request_body = String(req.data)
 		success, response_body = QpcrAnalysis.Essentials.dispatch(action, request_body)
 		code = (success)? 200 : 500
 	end
