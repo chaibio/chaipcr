@@ -11,9 +11,9 @@ http = HttpHandler() do req::Request, res::Response
 	if ismatch(r"^/experiments/",req.resource)
 		nodes = split(req.resource,'/');
 		experiment_id = parse(Int,nodes[3])
-		action = nodes[4]
+		action = String(nodes[4])
 		request_body = String(req.data)
-		success, response_body = QpcrAnalysis.Essentials.dispatch(action, request_body)
+		success, response_body = QpcrAnalysis.dispatch(action, request_body)
 		code = (success)? 200 : 500
 	end
 
