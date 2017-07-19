@@ -29,6 +29,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
 
+
     this.deviceInfo = {
       serial_number: null,
       software: {
@@ -46,6 +47,7 @@ export class LoginComponent implements OnInit {
     }, (res) => {
       this.deviceInfoError = res.json();
     })
+
   }
 
   doSubmit() {

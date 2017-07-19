@@ -4,7 +4,7 @@ import { MockBackend, MockConnection } from '@angular/http/testing';
 import { SessionService } from './session.service';
 
 
-describe('Service: SessionService', () => {
+describe('SessionService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({

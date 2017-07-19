@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 
 import { LoginRouteGuard } from './login.route.guard';
 
-describe('RouteGuard: Login Route Guard', () => {
+describe('Login Route Guard', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
