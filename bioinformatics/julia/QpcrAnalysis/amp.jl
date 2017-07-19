@@ -98,9 +98,10 @@ function process_amp(
     dcv::Bool=true, # logical, whether to perform multi-channel deconvolution
     dye_in::String="FAM", dyes_2bfild::AbstractVector=[],
     qt_prob_rc::Real=0.9, # quantile probablity for fluo values per well
-    af_key::String="MAK2",
+    af_key::String="sfc",
     kwdict_mbq::Associative=OrderedDict(), # keyword arguments passed onto `mod_bl_q`
-    kwdict_rc::Associative=OrderedDict(), # keyword arguments passed onto `report_cq`,
+    ipopt_print2file_prefix::String="", # file prefix for Ipopt print for `mod_bl_q`
+    kwdict_rc::Associative=OrderedDict(), # keyword arguments passed onto `report_cq!`,
     ad_cycs::Union{Integer,AbstractVector}=0, # allelic discrimination: cycles of fluorescence to be used, 0 means the last cycle
     ad_cluster_method::String="k-medoids", # allelic discrimination: "k-means", "k-medoids"
     out_sr_dict::Bool=true, # output an OrderedDict keyed by `sr_str`s
@@ -213,7 +214,7 @@ function process_amp(
             fluo_well_nums, well_nums, channels,
             dcv,
             dye_in, dyes_2bfild,
-            min_reliable_cyc, baseline_cyc_bounds, cq_method, ct_fluos, af_key, kwdict_mbq,
+            min_reliable_cyc, baseline_cyc_bounds, cq_method, ct_fluos, af_key, kwdict_mbq, ipopt_print2file_prefix,
             qt_prob_rc, kwdict_rc,
             ad_cycs, ad_cluster_method,
             out_format_1sr, json_digits, verbose
@@ -270,7 +271,7 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
     baseline_cyc_bounds::AbstractVector=[],
     bl_fallback_func::Function=median,
 
-    af_key::String="MAK2", # a string representation of amplification curve model, used for finding the right model `DataType` in `dfc_DICT` and the right empty model instance in `AF_EMPTY_DICT`
+    af_key::String="sfc", # a string representation of amplification curve model, used for finding the right model `DataType` in `dfc_DICT` and the right empty model instance in `AF_EMPTY_DICT`
 
     m_prebl::String="l4_enl",
     m_postbl::String="l4_enl",
@@ -285,7 +286,8 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
     kwargs_jmp_model::OrderedDict=OrderedDict(
         :solver=>IpoptSolver(print_level=0, max_iter=35) # `ReadOnlyMemoryError()` for v0.5.1
         # :solver=>NLoptSolver(algorithm=:LN_COBYLA)
-    )
+    ),
+    ipopt_print2file::String="",
     )
 
     num_cycs = length(fluos)
@@ -302,14 +304,19 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
     baseline = bl_fallback_func(fluos)
     bl_notes = ["last_cyc_wt0 <= 1 || num_cycs < min_reliable_cyc, fallback"]
 
-    if af_key != "sfc"
+    solver = kwargs_jmp_model[:solver]
+    if isa(solver, IpoptSolver)
+        push!(solver.options, (:output_file, ipopt_print2file))
+    end
+
+    if af_key != "sfc" # no fallback for baseline, because: (1) curve may fit well though :Error or :UserLimit (search step becomes very small but has not converge); (2) the guessed basedline (`start` of `fb`) is usually quite close to a sensible baseline.
 
         dfc_inst = dfc_DICT[af_key]()
 
         fitted_prebl = fit(dfc_inst, cycs, fluos, wts; kwargs_jmp_model...)
         baseline = fitted_prebl.coefs[1] # "fb"
         if af_key in ["MAK3", "MAKERGAUL4"]
-            baseline += fitted_prebl.coefs[2] .* cycs
+            baseline += fitted_prebl.coefs[2] .* cycs # `.+=` caused "ERROR: MethodError: no method matching broadcast!(::QpcrAnalysis.##278#283, ::Float64, ::Float64, ::Float64, ::StepRangeLen{Float64,Base.TwicePrecision{Float64},Base.TwicePrecision{Float64}})"
         end # if af_key
 
         fitted_postbl = fitted_prebl
@@ -498,16 +505,16 @@ function report_cq!(
     well_i::Integer,
     channel_i::Integer;
     before_128x::Bool=false,
-    min_max_d1=472,
-    min_max_d2=41,
-    min_max_bsf=4356,
-    min_n_max_d1=0.0089, # look like real amplification, n_max_d1 0.00894855, ip223, exp. 75, well A7, channel 2.
-    min_n_max_d2=0.000689,
-    min_n_max_bsf=0.086
+    max_d1_lb=472,
+    max_d2_lb=41,
+    max_bsf_lb=4356,
+    n_max_d1_lb=0.0089, # look like real amplification, n_max_d1 0.00894855, ip223, exp. 75, well A7, channel 2.
+    n_max_d2_lb=0.000689,
+    n_max_bsf_lb=0.086
     )
 
     if before_128x
-        min_max_d1, min_max_d2, min_max_bsf = [min_max_d1, min_max_d2, min_max_bsf] / 128
+        max_d1_lb, max_d2_lb, max_bsf_lb = [max_d1_lb, max_d2_lb, max_bsf_lb] / 128
     end
 
     num_cycs = size(full_amp_out.fr_ary3)[1]
@@ -533,18 +540,18 @@ function report_cq!(
         why_NaN = "DomainError when calculating Ct"
     elseif cq_raw <= 0.1 || cq_raw >= num_cycs
         why_NaN = "cq_raw <= 0.1 || cq_raw >= num_cycs"
-    elseif max_d1 < min_max_d1
-        why_NaN = "max_d1 $max_d1 < min_max_d1 $min_max_d1"
-    elseif max_d2 < min_max_d2
-        why_NaN = "max_d2 $max_d2 < min_max_d2 $min_max_d2"
-    elseif max_bsf < min_max_bsf
-        why_NaN = "max_bsf $max_bsf < min_max_bsf $min_max_bsf"
-    elseif n_max_d1 < min_n_max_d1
-        why_NaN = "n_max_d1 $n_max_d1 < min_n_max_d1 $min_n_max_d1"
-    elseif n_max_d2 < min_n_max_d2
-        why_NaN = "n_max_d2 $n_max_d2 < min_n_max_d2 $min_n_max_d2"
-    elseif n_max_bsf < min_n_max_bsf
-        why_NaN = "n_max_bsf $n_max_bsf < min_n_max_bsf $min_n_max_bsf"
+    elseif max_d1 < max_d1_lb
+        why_NaN = "max_d1 $max_d1 < max_d1_lb $max_d1_lb"
+    elseif max_d2 < max_d2_lb
+        why_NaN = "max_d2 $max_d2 < max_d2_lb $max_d2_lb"
+    elseif max_bsf < max_bsf_lb
+        why_NaN = "max_bsf $max_bsf < max_bsf_lb $max_bsf_lb"
+    elseif n_max_d1 < n_max_d1_lb
+        why_NaN = "n_max_d1 $n_max_d1 < n_max_d1_lb $n_max_d1_lb"
+    elseif n_max_d2 < n_max_d2_lb
+        why_NaN = "n_max_d2 $n_max_d2 < n_max_d2_lb $n_max_d2_lb"
+    elseif n_max_bsf < n_max_bsf_lb
+        why_NaN = "n_max_bsf $n_max_bsf < n_max_bsf_lb $n_max_bsf_lb"
     end
 
     if why_NaN != ""
@@ -583,6 +590,7 @@ function process_amp_1sr(
     ct_fluos::AbstractVector,
     af_key::String,
     kwdict_mbq::Associative, # keyword arguments passed onto `mod_bl_q`
+    ipopt_print2file_prefix::String,
     qt_prob_rc::Real, # quantile probablity for fluo values per well
     kwdict_rc::Associative, # keyword arguments passed onto `report_cq`
     ad_cycs::Union{Integer,AbstractVector},
@@ -705,16 +713,20 @@ function process_amp_1sr(
         full_amp_out.ct_fluos = ct_fluos
 
         mbq_ary2 = [
-            mod_bl_q(
-                rbbs_ary3[:, well_i, channel_i];
-                min_reliable_cyc=min_reliable_cyc,
-                baseline_cyc_bounds=baseline_cyc_bounds[well_i, channel_i],
-                cq_method=cq_method,
-                ct_fluo=ct_fluos[channel_i],
-                af_key=af_key,
-                kwdict_mbq...,
-                verbose=verbose
-            )
+            begin
+                ipopt_print2file = length(ipopt_print2file_prefix) == 0 ? "" : "$(join([ipopt_print2file_prefix, channel_i, well_i], '_')).txt"
+                mod_bl_q(
+                    rbbs_ary3[:, well_i, channel_i];
+                    min_reliable_cyc=min_reliable_cyc,
+                    baseline_cyc_bounds=baseline_cyc_bounds[well_i, channel_i],
+                    cq_method=cq_method,
+                    ct_fluo=ct_fluos[channel_i],
+                    af_key=af_key,
+                    kwdict_mbq...,
+                    ipopt_print2file=ipopt_print2file,
+                    verbose=verbose
+                )
+            end
             for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
         ]
 
