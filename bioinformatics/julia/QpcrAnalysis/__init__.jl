@@ -12,11 +12,13 @@ function __init__()
         db_tuple[1] => mysql_connect(DB_INFO["host"], DB_INFO["username"], DB_INFO["password"], db_tuple[2])
     end) # do db_name
 
-    global const TEST_RESULTS = test(;
+    println("start of test")
+    @time global const TEST_RESULTS = test(;
         comprehensive=false,
         debug=true,
         verbose=true # `false` on PC, true on BBB to debug
     )
+    println("end of test")
 
     return nothing
 end
