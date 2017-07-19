@@ -3,8 +3,24 @@
 
 const gulp = require('gulp')
 const { exec } = require('child_process')
+const del = require('del')
 
-gulp.task('ng:build:debug', (done) => {
+gulp.task('clean', () => {
+  return del([
+    './web/public/*.ttf',
+    './web/public/*.eot',
+    './web/public/*.woff',
+    './web/public/*.woff2',
+    './web/public/*.svg',
+    './web/public/*.otf',
+    './web/public/*.map',
+    './web/public/*.js',
+    './web/public/index.html',
+    './web/public/3rdpartylicenses.txt',
+  ]);
+})
+
+gulp.task('ng:build:debug', ['clean'], (done) => {
   process.chdir('./ng2')
   exec('ng build', (err, stdout, stderr) => {
     console.log(err)
@@ -15,7 +31,7 @@ gulp.task('ng:build:debug', (done) => {
   })
 })
 
-gulp.task('ng:build:deploy', (done) => {
+gulp.task('ng:build:deploy', ['clean'], (done) => {
   process.chdir('./ng2')
   exec('ng build --target=production', (err, stdout, stderr) => {
     console.log(err)
