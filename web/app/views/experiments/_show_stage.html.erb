@@ -1,9 +1,0 @@
-<div class="protocol stage" id="stage_<%=stage.id%>">
-	<div class="title"><span class='stage-name'><%=stage.name%></span><span class='stage-num-cycles'>cycles <%=stage.num_cycles%> times</span><%=link_to "", stage_path(stage.id), :method => :delete, :remote => true, :class =>"icon-del", data: { confirm: stage_delete_confirm_msg } %></div>
-	<ul>
-		<% stage.steps.each do |step| %>
-			<li class="draggable droppable" id="step_<%=step.id%>"><span class="step-name"><%=step.name%></span><span class="step-temperature"><%=step.temperature%></span><span class="step-hold-time"><%=step.hold_time%></span><%=link_to "", step_path(step.id), :method => :delete, :remote => true, :class =>"icon-del", data: { confirm: step_delete_confirm_msg } %></li>
-		<% end %>
-	</ul>
-</div>
-
