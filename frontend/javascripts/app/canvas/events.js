@@ -133,9 +133,10 @@ angular.module("canvasApp").factory('events', [
           C.moveLimit = stage.previousStage.left + stage.previousStage.myWidth;
           return;
         }
+
         if(lastStep.circle.holdTime.text === "∞") {
           if(moveElement === "step") {
-            C.moveLimit = ((lastStep.left + 3) - 120);
+            C.stepMoveLimit = ((lastStep.left + 3) - 120);
             return;
           } else if(moveElement === "stage") {
             C.moveLimit = ((lastStage.left) - 40);
@@ -144,6 +145,7 @@ angular.module("canvasApp").factory('events', [
         }
 
          C.moveLimit = lastStep.left + 120;
+         C.stepMoveLimit = lastStep.left;
       };
 
       this.footerMouseOver = function(indicate, me, moveElement) {

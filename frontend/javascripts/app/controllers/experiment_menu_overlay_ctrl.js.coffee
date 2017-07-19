@@ -37,8 +37,9 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
     $scope.exporting = false
 
     $scope.deleteExperiment = ->
-      exp = new Experiment id: $stateParams.id
-      exp.$delete id: $stateParams.id, ->
+      #exp = new Experiment id: $stateParams.id
+      Experiment.delete($stateParams.id)
+      .then ->
         $state.go 'home'
 
     callAtTimeout = ->

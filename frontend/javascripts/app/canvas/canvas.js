@@ -36,9 +36,11 @@ angular.module("canvasApp").factory('canvas', [
   'stageHitBlock',
   'stageGraphics',
   'StagePositionService',
+  'StepPositionService',
+  'Line',
   function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents,
     moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory, stageHitBlock, stageGraphics, 
-    StagePositionService) {
+    StagePositionService, StepPositionService, Line) {
 
     this.init = function(model) {
       
@@ -51,6 +53,7 @@ angular.module("canvasApp").factory('canvas', [
       this.drawCirclesArray = [];
       this.findAllCirclesArray = [];
       this.moveLimit = 0; // We set the limit for the movement of the step image to move steps
+      this.stepMoveLimit = 0; // Limit when we move a step
       this.editStageStatus = false;
       this.dotCordiantes = {};
 
@@ -125,6 +128,7 @@ angular.module("canvasApp").factory('canvas', [
         return stageView;
       }, this);
       StagePositionService.init(this.allStageViews);
+      StepPositionService.init(this.allStepViews);
       console.log("Stages added ... !");
       return this;
 
@@ -146,17 +150,16 @@ angular.module("canvasApp").factory('canvas', [
         this.stepIndicator = moveStepRect.getMoveStepRect(this);
         this.stageIndicator = moveStageRect.getMoveStageRect(this);
         this.stageVerticalLine = this.stageIndicator.verticalLine;
-        this.stepBeacon = this.stepIndicator.beacon;
-        this.stepBrick = this.stepIndicator.brick;
-        this.hitBlock = stageHitBlock.getStageHitBlock(this);
+        this.stepVerticalLine = this.stepIndicator.verticalLine;
+        
+        //this.hitBlock = stageHitBlock.getStageHitBlock(this);
 
         this.canvas.add(this.stepIndicator);
         this.canvas.add(this.stageIndicator);
         this.canvas.add(this.stageVerticalLine);
-
-        this.canvas.add(this.stepBeacon);
-        this.canvas.add(this.stepBrick);
-        this.canvas.add(this.hitBlock);
+        this.canvas.add(this.stepVerticalLine);
+        
+        //this.canvas.add(this.hitBlock);
         this.addMoveDots(); // This is for movestep
     };
 
@@ -166,8 +169,17 @@ angular.module("canvasApp").factory('canvas', [
       this.imageobjects["move-step-on.png"].setTop(328);
       this.imageobjects["move-step-on.png"].setLeft(-2);
       arr.push(this.imageobjects["move-step-on.png"]);
+      
+      var properties = {
+                    stroke: 'black', strokeWidth: 2, selectable: false,
+                    originX: 'left', originY: 'top'
+                    };
+
+      var cordinates = [24, 32, 24, 353];
+      var lin = Line.create(cordinates, properties);
+      arr.push(lin);
       this.moveDots = new fabric.Group(arr, {
-        width: 13, left: 16, top: 35, backgroundColor: "white", visible: false
+        width: 40, left: 16, top: 35, backgroundColor: "white", visible: false
       });
       this.canvas.add(this.moveDots);
     };
@@ -385,6 +397,7 @@ angular.module("canvasApp").factory('canvas', [
       this.allStepViews = [];
       this.allStageViews.forEach(function(stage, index) {
         stage.stageMovedDirection = null;
+        //stage.sourceStage = false;
         stage.index = index;
         stage.stageCaption.setText("STAGE " + (index + 1) + ": " );
 
@@ -398,6 +411,10 @@ angular.module("canvasApp").factory('canvas', [
 
           tempCircle = step.circle;
           step.index = index;
+          // A quick fix, will be removed later
+          step.borderLeft.setVisible(false);
+          step.stepMovedDirection = null;
+          step.nextIsMoving = step.previousIsMoving = null;
           step.ordealStatus = oStatus;
           that.allStepViews.push(step);
           oStatus = oStatus + 1;

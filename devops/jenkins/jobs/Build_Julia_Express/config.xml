@@ -12,7 +12,7 @@
         <hudson.model.StringParameterDefinition>
           <name>build_machine</name>
           <description>Remote build beaglebone.</description>
-          <defaultValue>10.0.2.240</defaultValue>
+          <defaultValue>10.0.100.240</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>download_prefex</name>
@@ -29,6 +29,21 @@
           <name>low_performance</name>
           <description>Reduce cpu performance for a better stability.
 </description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>building_version</name>
+          <description></description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>release-0.5</string>
+              <string>release-0.6</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>install_packages</name>
+          <description>Installs default packages</description>
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
@@ -386,7 +401,9 @@ mkdir -p /sdcard/upgrade/julia-compile
 cd /sdcard/upgrade/julia-compile
 git clone git://github.com/JuliaLang/julia.git 
 cd julia
-git checkout release-0.5
+
+git checkout $building_version
+
 echo &quot;export JULIA_PKGDIR=/root/.julia&quot;&gt;&gt;~/.bashrc
 source ~/.bashrc
 ntpdate -b -s -u pool.ntp.org
@@ -403,6 +420,11 @@ override USE_SYSTEM_FFTW=1
 override USE_SYSTEM_GMP=1
 override USE_SYSTEM_MPFR=1
 override USE_SYSTEM_ARPACK=1
+
+override LLVM_ASSERTIONS=1
+LLVM_FLAGS+=&quot;--with-cpu=cortex-a8 --disable-compiler-version-checks --with-float=hard --with-abi=aapcs-vfp --with-fpu=neon --enable-targets=arm --enable-optimized --enable-assertions&quot;
+
+
 EOF
 
 make
@@ -415,6 +437,47 @@ make
       <command>echo installing julia
 cd /sdcard/upgrade/julia-compile/julia
 
+cat &lt;&lt;EOF &gt;&gt; fp.jl
+
+__precompile__(true)
+println(&quot;starting FP test&quot;)
+
+x = 1.25f0
+
+sin(x)+log(x)
+
+start_time = now()
+time1 = @elapsed for i in 0:1:1000000
+        x = nextfloat(x)
+end
+loop_time = now()
+time2 = @elapsed for i in 0:1:1000000
+        y = sin(x)
+        y = log(y)
+        x = nextfloat(x)
+end
+loop_plus_FP_time = now()
+
+println( &quot;1M operations done!&quot;)
+
+println(&quot;test finished in: &quot;, time2 )
+println(&quot;looping time: &quot;, time1 )
+fp_time = time2-time1
+fp_time2 = loop_plus_FP_time - loop_time + start_time - loop_time
+
+println(&quot;FP Time1: &quot;, fp_time )
+println(&quot;FP Time2: &quot;, fp_time2 )
+
+@printf(&quot;FP Index: %.1f\n\n&quot;, 5.01/fp_time )
+
+
+EOF
+
+./julia fp.jl --compile=yes
+
+
+
+
 make install 
 ln -s /usr/share/julia/bin/julia /usr/bin/julia
 
@@ -423,24 +486,41 @@ cat &lt;&lt;EOF &gt;&gt; chaibio_packages.jl
 Pkg.init()
 Pkg.update()
 
+println(&quot;Adding package: Dierckx&quot;)
 Pkg.add(&quot;Dierckx&quot;)
+println(&quot;Adding package: JSON&quot;)
 Pkg.add(&quot;JSON&quot;)
+println(&quot;Adding package: MySQL&quot;)
 Pkg.add(&quot;MySQL&quot;)
+println(&quot;Adding package: JLD&quot;)
 Pkg.add(&quot;JLD&quot;)
+println(&quot;Adding package: DataFrames&quot;)
 Pkg.add(&quot;DataFrames&quot;)
+println(&quot;Adding package: Ipopt&quot;)
 Pkg.add(&quot;Ipopt&quot;)
+println(&quot;Adding package: JuMP&quot;)
 Pkg.add(&quot;JuMP&quot;)
+println(&quot;Adding package: NLopt&quot;)
 Pkg.add(&quot;NLopt&quot;)
+println(&quot;Adding package: HttpServer&quot;)
 Pkg.add(&quot;HttpServer&quot;)
 
+println(&quot;Done adding packages&quot;)
+
 using DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NLopt, HttpServer
+println(&quot;Done using package&quot;)
+
 quit()
 EOF
 
 # test with no prebuilding
-#julia chaibio_packages.jl
-echo done testing! removing test script.
+if $install_packages
+then
+        echo precompiling default packages
+        julia chaibio_packages.jl
+fi
 
+echo done testing! removing test script.
 rm chaibio_packages.jl
 
 echo test finished. cleaning..
@@ -448,8 +528,18 @@ swapoff /sdcard/upgrade/swapfile
 rm /sdcard/upgrade/swapfile
 
 cd ..
-tar fcz julia05-44-$build_machine-$BUILD_NUMBER.tgz julia /root/.julia
-tar fcz julia05-44-slim-$build_machine-$BUILD_NUMBER.tgz julia/usr /root/.julia
+
+echo archiving..
+
+echo Arch filename julia-$building_version-$build_machine-$BUILD_NUMBER.tgz
+echo Slim arch filename julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz 
+arch_filename=&quot;julia-$building_version-$build_machine-$BUILD_NUMBER.tgz&quot;
+slim_arch_filename=&quot;filename julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz&quot;
+
+echo Slim arch filename $slim_arch_filename
+
+tar fcz julia-$building_version-$build_machine-$BUILD_NUMBER.tgz julia /root/.julia
+tar fcz julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz julia/usr /root/.julia
 
 sync
 </command>
@@ -457,16 +547,16 @@ sync
     <hudson.tasks.Shell>
       <command>echo uploading julia file to server
                                                                                                                                  
-scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/julia-compile/julia05-44-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/
-chmod 777 $local_download_folder/julia05-44-$build_machine-$BUILD_NUMBER.tgz
-ln -sf $local_download_folder/julia05-44-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia05-44-default.tgz
+scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/julia-compile/julia-$building_version-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/
+chmod 777 $local_download_folder/julia-$building_version-$build_machine-$BUILD_NUMBER.tgz
+ln -sf $local_download_folder/julia-$building_version-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia-$building_version-default.tgz
 
-scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/julia-compile/julia05-44-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/
-chmod 777 $local_download_folder/julia05-44-slim-$build_machine-$BUILD_NUMBER.tgz
-ln -sf $local_download_folder/julia05-44-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia05-44-slim-default.tgz
+scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/julia-compile/julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/
+chmod 777 $local_download_folder/julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz
+ln -sf $local_download_folder/julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia-$building_version-slim-default.tgz
 
-ls -ahl $local_download_folder/julia05-44-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia05-44-default.tgz
-ls -ahl $local_download_folder/julia05-44-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia05-44-slim-default.tgz
+ls -ahl $local_download_folder/julia-$building_version-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia-$building_version-default.tgz
+ls -ahl $local_download_folder/julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia-$building_version-slim-default.tgz
 
 exit 0</command>
     </hudson.tasks.Shell>
@@ -475,8 +565,8 @@ exit 0</command>
       <command>echo cleaning up
 cd /sdcard/upgrade/julia-compile/
 
-rm julia05-44-$build_machine-$BUILD_NUMBER.tgz
-rm julia05-44-slim-$build_machine-$BUILD_NUMBER.tgz
+rm julia-$building_version-$build_machine-$BUILD_NUMBER.tgz
+rm julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz
 ls -ahl
 
 cd ..
@@ -490,6 +580,46 @@ cpufreq-info
 cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 
 echo all done
+
+cat &lt;&lt;EOF &gt;&gt; fp.jl
+
+__precompile__(true)
+println(&quot;starting FP test&quot;)
+
+x = 1.25f0
+
+sin(x)+log(x)
+
+start_time = now()
+time1 = @elapsed for i in 0:1:1000000
+        x = nextfloat(x)
+end
+loop_time = now()
+time2 = @elapsed for i in 0:1:1000000
+        y = sin(x)
+        y = log(y)
+        x = nextfloat(x)
+end
+loop_plus_FP_time = now()
+
+println( &quot;1M operations done!&quot;)
+
+println(&quot;test finished in: &quot;, time2 )
+println(&quot;looping time: &quot;, time1 )
+fp_time = time2-time1
+fp_time2 = loop_plus_FP_time - loop_time + start_time - loop_time
+
+println(&quot;FP Time1: &quot;, fp_time )
+println(&quot;FP Time2: &quot;, fp_time2 )
+
+@printf(&quot;FP Index: %.1f\n\n&quot;, 5.01/fp_time )
+
+
+EOF
+julia fp.jl --compile=yes
+
+
+
 exit 0
 </command>
     </org.jvnet.hudson.plugins.SSHBuilder>

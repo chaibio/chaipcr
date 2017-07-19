@@ -31,12 +31,12 @@ angular.module("canvasApp").service('stepGraphics', [
   'deltaGroup',
   'numberingText',
   'borderRight',
+  'borderLeft',
   'rampSpeedGroup',
-  'hitPoint',
   'stepRect',
   'stepGroup',
   function(dots, Line, Group, Circle, Text, Rectangle, stepName, stepFooter, closeGroup, deltaSymbol,
-    deltaGroup, numberingText, borderRight, rampSpeedGroup, hitPoint, stepRect, stepGroup) {
+    deltaGroup, numberingText, borderRight, borderLeft, rampSpeedGroup, stepRect, stepGroup) {
 
     this.addName = function() {
 
@@ -107,6 +107,12 @@ angular.module("canvasApp").service('stepGraphics', [
       this.borderRight = new borderRight(this);
       return this;
     };
+    
+    this.addBorderLeft = function() {
+
+      this.borderLeft = new borderLeft();
+      return this;
+    };
 
     this.rampSpeed = function() {
 
@@ -116,7 +122,6 @@ angular.module("canvasApp").service('stepGraphics', [
 
     this.stepComponents = function() {
 
-      this.hitPoint = new hitPoint(this);
       this.stepRect = new stepRect(this);
       this.stepGroup = new stepGroup(this);
       return this;

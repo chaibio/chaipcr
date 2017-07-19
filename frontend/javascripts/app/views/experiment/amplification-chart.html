@@ -137,7 +137,7 @@ limitations under the License.
                 <span class="sample-span" ng-click="focusExpName($index)" ng-show="!editExpNameMode[$index]">
                   {{samples[$index] | truncate:20}}
                 </span>
-                <input type="text" class="sample-input" ng-show="editExpNameMode[$index]" focus-on="editExpNameMode" ng-blur="updateSampleName($index,samples[$index])" on-key-enter="updateSampleName($index,samples[$index])" ng-model="samples[$index]">
+                <input type="text" class="sample-input" ng-show="editExpNameMode[$index]" focus-on="editExpNameMode" ng-blur="updateSampleName($index,samples[$index])"  on-shift-enter="updateSampleNameEnter($index,samples[$index])"  ng-model="samples[$index]">
               </td>
               <td class="B1">
                 <span ng-show="wellButtons['well_'+i].ct[0] > 0">

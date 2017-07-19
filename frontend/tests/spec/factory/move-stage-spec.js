@@ -4,6 +4,7 @@ describe("Testing move-stage", function() {
     beforeEach(module('canvasApp'));
     
     var _moveStageRect, indicator, stage = {}, C, movement = {}, _StagePositionService, _ExperimentLoader;
+
     C = {
         canvas: {
             bringToFront: function() {},
@@ -126,6 +127,8 @@ describe("Testing move-stage", function() {
     it("It should check getDirection method, when we move left", function() {
         indicator.init(stage, C, movement);
         movement.left = 90;
+        indicator.currentLeft = 100;
+        indicator.direction = "right";
         indicator.getDirection();
         expect(indicator.direction).toEqual("left");
 
@@ -500,38 +503,21 @@ describe("Testing move-stage", function() {
         expect(indicator.verticalLine.setLeft).toHaveBeenCalledWith(125);
     });
 
-    it("It should test processMovement method getVisible() === false", function() {
+
+    it("It should test processMovement method", function() {
 
         indicator.init(stage, C, movement);
-        spyOn(indicator.verticalLine, "getVisible").and.returnValue(false);
-        spyOn(indicator, "backToOriginal");
-        spyOn(_ExperimentLoader, "moveStage").and.returnValue({
-            then: function() {
-
-            },
-        });
-        spyOn(indicator, "setVisible");
-        spyOn(indicator.verticalLine, "setVisible");
         
-        indicator.currentDrop = {
-            model: {
-                id: 10
+        spyOn(_ExperimentLoader, "moveStage").and.returnValue({
+            then: function(successCallback, errorCallback) {
+                successCallback();
+                errorCallback();
             }
-        };
-        indicator.processMovement(stage, "circleManager");
-        expect(indicator.backToOriginal).toHaveBeenCalled();
-        expect(_ExperimentLoader.moveStage).toHaveBeenCalled();
-        expect(indicator.setVisible).toHaveBeenCalledWith(false);
-        expect(indicator.direction).toEqual(null);
-        expect(indicator.verticalLine.setVisible).toHaveBeenCalledWith(false);
-    });
-
-    it("It should test processMovement method with getVisible() === true", function() {
-
-        indicator.init(stage, C, movement);
+        });
         spyOn(indicator.verticalLine, "getVisible").and.returnValue(true);
         spyOn(indicator, "applyMovement");
-
+        spyOn(indicator, "hideElements");
+        
         indicator.currentDrop = {
             model: {
                 id: 10
@@ -539,57 +525,23 @@ describe("Testing move-stage", function() {
         };
 
         indicator.processMovement(stage, "circleManager");
+
         expect(indicator.applyMovement).toHaveBeenCalled();
+        expect(indicator.hideElements).toHaveBeenCalled();
+        expect(_ExperimentLoader.moveStage).toHaveBeenCalled();
     });
 
-    it("It should test backToOriginal method", function() {
-        
+    it("It should check hideElements method", function() {
+
         indicator.init(stage, C, movement);
-        indicator.kanvas = {
-            addNewStage: function() {},
-            addNewStageAtBeginning: function() {},
-            canvas: {
-                renderAll: function() {}
-            }
-        };
+        spyOn(indicator, "setVisible");
+        spyOn(indicator.verticalLine, "setVisible");
 
-        spyOn(indicator.kanvas, "addNewStage");
-        spyOn(indicator.kanvas, "addNewStageAtBeginning");
-        spyOn(indicator.kanvas.canvas, "renderAll");
+        indicator.hideElements();
 
-        indicator.backToOriginal({
-            model: {},
-            previousStage: "yes"
-        });
-        
-        expect(indicator.kanvas.addNewStage).toHaveBeenCalled();
-        expect(indicator.kanvas.addNewStageAtBeginning).not.toHaveBeenCalled();
-        expect(indicator.kanvas.canvas.renderAll).toHaveBeenCalled();
-    });
-
-    it("It should test backToOriginal method with previousStage === null", function() {
-        
-        indicator.init(stage, C, movement);
-        indicator.kanvas = {
-            addNewStage: function() {},
-            addNewStageAtBeginning: function() {},
-            canvas: {
-                renderAll: function() {}
-            }
-        };
-
-        spyOn(indicator.kanvas, "addNewStage");
-        spyOn(indicator.kanvas, "addNewStageAtBeginning");
-        
-
-        indicator.backToOriginal({
-            model: {},
-            previousStage: null
-        });
-        
-        expect(indicator.kanvas.addNewStage).not.toHaveBeenCalled();
-        expect(indicator.kanvas.addNewStageAtBeginning).toHaveBeenCalled();
-        
+        expect(indicator.setVisible).toHaveBeenCalled();
+        expect(indicator.direction).toEqual(null);
+        expect(indicator.verticalLine.setVisible).toHaveBeenCalled();
     });
 
     it("It should check applyMovement method", function() {

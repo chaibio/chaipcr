@@ -199,6 +199,9 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
         We do this so that we can selectively change and manipulate #box in them.
       '''
 
+      $scope.showTriangle = ->
+        elem.find('.circle.selected').length < 16
+
       $timeout(() ->
           target = $('.selectable-container').find(".#{className}")
           for id of $scope.borders

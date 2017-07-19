@@ -23,7 +23,8 @@ angular.module("canvasApp").factory('mouseUp', [
   'previouslyHoverd',
   'scrollService',
   'circleManager',
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, circleManager) {
+  'movingStepGraphics',
+  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, circleManager, movingStepGraphics) {
 
     this.init = function(C, $scope, that) {
 
@@ -39,29 +40,19 @@ angular.module("canvasApp").factory('mouseUp', [
         }
 
         if(that.moveStepActive) {
-          if(that.mouseDownPos === evt.e.clientX) {
-            console.log("its just a click ", evt.target);
-          }
-          evt.target.parent.parentStage.shrinkedStage = false;
+          var indicate = evt.target;
+          step = indicate.parent;
           C.moveDots.setVisible(false);
-          C.moveDots.currentIndex = null;
           C.stepIndicator.setVisible(false);
           that.moveStepActive = false;
+          step.parentStage.updateWidth();
+          C.stepIndicator.processMovement(step, C);
           C.canvas.renderAll();
         }
 
         if(that.moveStageActive) {
           var stage = evt.target.parent;
-          var pos = C.stageIndicator.left;
-          console.log(that.stageIndicatorPosition, pos);
-          if(that.stageIndicatorPosition === pos) {
-            console.log("its just a click we conclude it as we want to switch places", stage);
-            C.stageIndicator.backToOriginal(stage);
-          } else {
-            console.log("We changed places .. !", stage);
-            C.stageIndicator.processMovement(stage, circleManager);
-          }
-          C.stageIndicator.setVisible(false);
+          C.stageIndicator.processMovement(stage, circleManager);
           that.moveStageActive = false;
           C.canvas.renderAll();
         }

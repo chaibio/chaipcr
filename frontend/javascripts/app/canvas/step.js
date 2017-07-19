@@ -29,12 +29,15 @@ angular.module("canvasApp").factory('step', [
 
     return function(model, parentStage, index, $scope) {
 
+      this.stepMovedDirection = null;
       this.model = model;
       this.parentStage = parentStage;
       this.index = index;
       this.canvas = parentStage.canvas;
       this.myWidth = constants.stepWidth;
       this.$scope = $scope;
+      this.nextIsMoving = null;
+      this.previousIsMoving = null;
       this.nextStep = null;
       this.previousStep = null;
       this.gatherDataDuringStep = this.model.collect_data;
@@ -56,8 +59,6 @@ angular.module("canvasApp").factory('step', [
         this.stepRect.setWidth(45).setCoords();
         this.borderRight.setLeft(-20).setCoords();
         //leftVal = {left: this.left + (this.myWidth / 2)};
-        //this.hitPoint.set(leftVal).setCoords();
-        this.hitPoint.setVisible(false); // This is important. If we dont hide hitPoint it couses unwanted step to be selected.
         this.moveOtherStepsInStage();
         this.parentStage.shrinkStage();
         //this.parentStage.addHitBlock(); // We need this to add stage , by moving a step to empty place between stages.
@@ -98,7 +99,6 @@ angular.module("canvasApp").factory('step', [
         this.stepGroup.set(leftVal).setCoords();
 
         leftVal = {left: this.left + (this.myWidth / 2)};
-        this.hitPoint.set(leftVal).setCoords();
 
         leftVal = {left: this.left + 108};
         this.closeImage.set(leftVal).setCoords();
@@ -113,6 +113,32 @@ angular.module("canvasApp").factory('step', [
         this.circle.getUniqueId();
 
       };
+      
+      this.moveToSide = function(direction) {
+        if(direction === "left" && this.stepMovedDirection !== "left") {
+          this.left = this.left - 10;
+          this.moveStep(0, false);
+          this.circle.moveCircleWithStep();
+         
+         
+          //if(this.nextStep) {
+         //   this.nextStep.borderLeft.setVisible(true);
+          //} 
+          
+          //this.borderLeft.setVisible(false);
+         
+          this.stepMovedDirection = "left";
+        } else if(direction === "right" && this.stepMovedDirection !== "right") {
+          this.left = this.left + 10;
+          this.moveStep(0, false);
+          this.circle.moveCircleWithStep();
+          //if(this.nextStep) {
+            //this.nextStep.borderLeft.setVisible(false);
+          //}
+          //this.borderLeft.setVisible(true);
+          this.stepMovedDirection = "right";
+        }
+      };
 
       this.specialMoveStep = function() {
 
@@ -123,16 +149,6 @@ angular.module("canvasApp").factory('step', [
         }
 
         this.moveStep(1, true);
-        /*if(this.shrinked === true) {
-          return;
-        }
-
-        if(this.previousStep && this.previousStep.shrinked === true) {
-          this.left = this.previousStep.left + 138;
-          //return;
-        }*/
-
-
       };
 
       this.configureStepName = function(thisStep) {
@@ -231,9 +247,9 @@ angular.module("canvasApp").factory('step', [
 
       this.numberingValue = function() {
 
-        var thisIndex = (this.index < 9) ? "0" + (this.index + 1) : (this.index + 1),
+        var thisIndex = (this.index < 9) ? "0" + (this.index + 1) : (this.index + 1).toString(),
         noofSteps = this.parentStage.model.steps.length;
-        thisLength = (noofSteps < 10) ? "0" + noofSteps : noofSteps;
+        thisLength = (noofSteps < 10) ? "0" + noofSteps : noofSteps.toString();
         text = thisIndex + "/" + thisLength;
 
         this.numberingTextCurrent.setText(thisIndex);
@@ -254,6 +270,7 @@ angular.module("canvasApp").factory('step', [
         this.setLeft();
         this.addName();
         stepGraphics.addBorderRight.call(this);
+        stepGraphics.addBorderLeft.call(this);
         this.getUniqueName();
         this.rampSpeedGraphics();
         stepGraphics.initNumberText.call(this);
@@ -268,14 +285,12 @@ angular.module("canvasApp").factory('step', [
         this.visualComponents = {
           'stepGroup': this.stepGroup,
           'rampSpeedGroup': this.rampSpeedGroup,
-          'hitPoint': this.hitPoint,
           'closeImage': this.closeImage,
           'dots': this.dots
         };
 
         this.canvas.add(this.stepGroup);
         this.canvas.add(this.rampSpeedGroup);
-        this.canvas.add(this.hitPoint);
         this.canvas.add(this.closeImage);
         this.canvas.add(this.dots);
 

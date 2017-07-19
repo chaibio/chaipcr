@@ -12,7 +12,7 @@
         <hudson.model.StringParameterDefinition>
           <name>build_machine</name>
           <description>Building machine</description>
-          <defaultValue>10.0.2.240</defaultValue>
+          <defaultValue>10.0.100.240</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>check_badblocks</name>
@@ -230,7 +230,10 @@ uname -a
 ls -ahl
 lsblk
 df -h
-dpkg --configure -a
+
+rm /var/lib/dpkg/lock
+echo -e &quot;\n&quot; | dpkg --configure -a
+#dpkg --configure -a
 swapoff -a
 
 umount /dev/mmcblk0p*
@@ -356,8 +359,8 @@ umount /mnt || true
 
 echo disabling eMMC boot
 mount -o remount,rw /boot/uboot || true
-mv /boot /boot_disabled  --backup=numbered -f
 rm -r /boot || true
+mv /boot /boot_disabled  --backup=numbered -f
 
 rm ~/$image_filename || true
 
@@ -456,7 +459,7 @@ dpkg --configure -a
 df -h
 ntpdate -b -s -u pool.ntp.org
 
-update-initramfs -u
+#update-initramfs -u
 
 	cd /opt/scripts/tools/
         rm eMMC/init-eMMC-flasher-v3.sh
@@ -619,6 +622,6 @@ exit 1</command>
   </builders>
   <publishers/>
   <buildWrappers>
-    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.7"/>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.8"/>
   </buildWrappers>
 </project>

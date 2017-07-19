@@ -42,6 +42,14 @@ App.controller 'MeltCurveChartCtrl', [
       $scope.editExpNameMode[index] = true
       focus('editExpNameMode')
 
+    $scope.updateSampleNameEnter = (well_num, name) ->
+      Experiment.updateWell($stateParams.id, well_num + 1, {'well_type':'sample','sample_name':name})
+      $scope.editExpNameMode[well_num] = false
+      if event.shiftKey
+        $scope.focusExpName(well_num - 1)
+      else
+        $scope.focusExpName(well_num + 1)
+
     $scope.updateSampleName = (well_num, name) ->
       Experiment.updateWell($stateParams.id, well_num + 1, {'well_type':'sample','sample_name':name})
       $scope.editExpNameMode[well_num] = false

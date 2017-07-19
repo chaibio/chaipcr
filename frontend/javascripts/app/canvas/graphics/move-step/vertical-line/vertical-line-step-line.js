@@ -17,17 +17,13 @@
  * limitations under the License.
  */
 
-angular.module('canvasApp').factory('hitPoint', [
-  'Rectangle',
-  function(Rectangle) {
-    return function(step) {
-
-      var properties = {
-        width: 10, height: 30, fill: '', left: step.left + 60, top: 335, selectable: false, name: "hitPoint",
-        originX: 'left', originY: 'top',
-      };
-
-      return Rectangle.create(properties);
-    };
-  }
+angular.module("canvasApp").factory('verticalLineStepLine', [
+    'Line',
+    function(Line) {
+        return function() {
+            return Line.create([0, 0, 0, 269],{
+                stroke: 'black', strokeWidth: 2, originX: 'left', originY: 'top'
+            });
+        };
+    }
 ]);

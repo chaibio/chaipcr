@@ -25,7 +25,9 @@ angular.module("canvasApp").factory('mouseDown', [
   'circleManager',
   'editMode',
   '$timeout',
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, circleManager, editMode, $timeout) {
+  'movingStepGraphics',
+  function(ExperimentLoader, previouslySelected, previouslyHoverd,
+   scrollService, circleManager, editMode, $timeout, movingStepGraphics) {
 
     /**************************************
         what happens when click is happening in canvas.
@@ -37,7 +39,7 @@ angular.module("canvasApp").factory('mouseDown', [
       // that originally points to event. Refer event.js
       var me;
       this.canvas.on("mouse:down", function(evt) {
-
+        
         if(! evt.target) {
           that.setSummaryMode();
           return false;
@@ -95,25 +97,22 @@ angular.module("canvasApp").factory('mouseDown', [
           case "moveStep":
             // Remember what we click and what we move is two different objects, once we click, rest of the graphics come by, So original reference point to ,
             // the very thing we click. Not to the one we move. This applies to moveStage too.
-            that.mouseDownPos = evt.e.clientX;
-            console.log("step = " , evt.target.parent );
-            C.stepIndicator.init(evt.target.parent);
-
-            evt.target.parent.toggleComponents(false);
-            //evt.target.parent.parentStage.shrinkedStage = true;
+            var step = evt.target.parent;
+            var backupStageModel = angular.copy(step.parentStage.model);
+            movingStepGraphics.initiateMoveStepGraphics(step, C);
+            that.selectStep(step.circle);
+            that.calculateMoveLimit("step", evt.target);
+            
             that.moveStepActive = true;
             that.canvas.moveCursor = "move";
-            C.stepIndicator.changePlacing(evt.target);
-            C.stepIndicator.changeText(evt.target.parent);
-            that.calculateMoveLimit("step", evt.target.parent);
             circleManager.togglePaths(false); //put it back later
-            C.moveDots.setLeft(evt.target.parent.left + 16);
-            evt.target.parent.shrinkStep();
             evt.target.setVisible(false);
-            C.moveDots.setVisible(true);
-            C.moveDots.currentIndex = evt.target.parent.parentStage.index;
+            C.moveDots.setLeft(step.left + 52).setCoords().setVisible(true);
             C.canvas.bringToFront(C.moveDots);
             C.canvas.bringToFront(C.stepIndicator);
+            
+            step.parentStage.squeezeStage(step);
+            C.stepIndicator.init(step, evt.target, C, backupStageModel);
             C.canvas.renderAll();
 
           break;
@@ -130,14 +129,12 @@ angular.module("canvasApp").factory('mouseDown', [
             that.calculateMoveLimit("stage", stage);
             stage.wireStageNextAndPrevious();
             stage.removeFromStagesArray();
+            C.correctNumbering();
             circleManager.togglePaths(false); //put it back later
 
             C.stageIndicator.init(evt.target.parent, C, evt.target);
             that.stageIndicatorPosition = C.stageIndicator.left;
             C.stageIndicator.changeText(evt.target.parent);
-            
-            //C.canvas.bringToFront(C.stageIndicator);
-            
             C.canvas.renderAll();
           break;
 

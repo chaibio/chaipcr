@@ -52,21 +52,3 @@ def _format(_string, format_s='{}', style = None):
     else:
         return format_s.format(_string)
 
-
-from functools import wraps
-import inspect
-
-def initializer(init):
-    """Automatic member initialization for class __init__."""
-    names, varargs, keywords, defaults = inspect.getargspec(init)
-    @wraps(init)
-    def wrapper(self, *args, **kargs):
-        for name, arg in zip(names[1:], args) + kargs.items():
-            setattr(self, name, arg)
-        for i in range(len(defaults)):
-            index = -(i + 1)
-            if not hasattr(self, names[index]):
-                setattr(self, names[index], defaults[index])
-        init(self, *args, **kargs)
-    return wrapper
-

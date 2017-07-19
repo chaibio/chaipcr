@@ -117,9 +117,8 @@ class ChaiTest(object):
 
 class ChaiNoiseTest(ChaiTest):
     """Noise Test."""
-    @util.initializer
     def __init__(
-            self, 
+            self,
             wells = range(16),
             temperatures_C = [10, 60, 80],
             loops = 300,
@@ -127,6 +126,14 @@ class ChaiNoiseTest(ChaiTest):
             leds_on = True,
             lid_temp_C = None
             ):
+
+        self.wells = wells
+        self.temperatures_C = temperatures_C
+        self.loops = loops
+        self.settle_s = settle_s
+        self.leds_on = leds_on
+        self.lid_temp_C = lid_temp_C
+        
 
         super(ChaiNoiseTest, self).__init__()
         
@@ -191,7 +198,7 @@ class ChaiNoiseTest(ChaiTest):
 
                 time.sleep(self.settle_s)
 
-                for i in xrange(self.loops):
+                for i in range(self.loops):
                     if self.verbosity > 1:
                         sys.stdout.write('.')
                         sys.stdout.flush()
@@ -236,7 +243,7 @@ class ChaiNoiseTest(ChaiTest):
 
     def analyze_data(self):
 
-        temperatures_C = self.logger_data.keys()
+        temperatures_C = list(self.logger_data)
 
         channel_labels = {1:'optics_1', 2:'optics_2'}
         raw_data = self.logger_data[temperatures_C[0]]
@@ -306,7 +313,7 @@ class ChaiNoiseTest(ChaiTest):
 
         output = ''
         output += '----------------------------\n'        
-        header = self.results.index.names[:-1] + self.meas_values.keys() + ['status']
+        header = self.results.index.names[:-1] + list(self.meas_values) + ['status']
         header = ['%8s'%i for i in header]
         output += ' '.join(header)
         output += '\n'
@@ -341,7 +348,6 @@ class ChaiNoiseTest(ChaiTest):
 
 class ChaiThermalControlTest(ChaiTest):
     """Thermal Control Test."""
-    #@util.initializer
     def __init__(
             self, 
             ):
@@ -350,65 +356,65 @@ class ChaiThermalControlTest(ChaiTest):
         
         self.logger_data = {}
         self.results = None
-	self.template = {
-		u'experiment': {u'name': u'Thermal Consistency',
-		    u'protocol': {u'lid_temperature': u'110.0',
-			u'stages': [{u'stage': {u'auto_delta': False,
-			    u'auto_delta_start_cycle': 1,
-			    u'name': u'Holding Stage',
-			    u'num_cycles': 1,
-			    u'order_number': 0,
-			    u'stage_type': u'holding',
-			    u'steps': [{u'step': {u'collect_data': False,
-				u'delta_duration_s': 0,
-				u'delta_temperature': u'0.0',
-				u'hold_time': 30,
-				u'name': u'Denature',
-				u'order_number': 0,
-				u'pause': False,
-				u'ramp': {u'collect_data': False,
-				    u'id': 8,
-				    u'rate': u'0.0'},
-				u'temperature': u'95.0'}},
-				{u'step': {u'collect_data': False,
-				    u'delta_duration_s': 0,
-				    u'delta_temperature': u'0.0',
-				    u'hold_time': 60,
-				    u'name': u'Anneal',
-				    u'order_number': 1,
-				    u'pause': False,
-				    u'ramp': {u'collect_data': False,
-					u'id': 9,
-					u'rate': u'3.0'},
-				    u'temperature': u'60.0'}}]}},
-				{u'stage': {u'auto_delta': False,
-				    u'auto_delta_start_cycle': 1,
-				    u'name': u'Melt Curve Stage',
-				    u'num_cycles': 1,
-				    u'order_number': 1,
-				    u'stage_type': u'meltcurve',
-				    u'steps': [{u'step': {u'collect_data': False,
-					u'delta_duration_s': 0,
-					u'delta_temperature': u'0.0',
-					u'hold_time': 15,
-					u'name': u'Prepare melt',
-					u'order_number': 0,
-					u'pause': False,
-					u'ramp': {u'collect_data': False,
-					    u'id': 10,
-					    u'rate': u'1.0'},
-					u'temperature': u'72.0'}},
-					{u'step': {u'collect_data': False,
-					    u'delta_duration_s': 0,
-					    u'delta_temperature': u'0.0',
-					    u'hold_time': 1,
-					    u'name': u'Melt',
-					    u'order_number': 1,
-					    u'pause': False,
-					    u'ramp': {u'collect_data': True,
-						u'id': 11,
-						u'rate': u'0.1'},
-					    u'temperature': u'85.0'}}]}}]}}}
+        self.template = {
+                u'experiment': {u'name': u'Thermal Consistency',
+                    u'protocol': {u'lid_temperature': u'110.0',
+                        u'stages': [{u'stage': {u'auto_delta': False,
+                            u'auto_delta_start_cycle': 1,
+                            u'name': u'Holding Stage',
+                            u'num_cycles': 1,
+                            u'order_number': 0,
+                            u'stage_type': u'holding',
+                            u'steps': [{u'step': {u'collect_data': False,
+                                u'delta_duration_s': 0,
+                                u'delta_temperature': u'0.0',
+                                u'hold_time': 30,
+                                u'name': u'Denature',
+                                u'order_number': 0,
+                                u'pause': False,
+                                u'ramp': {u'collect_data': False,
+                                    u'id': 8,
+                                    u'rate': u'0.0'},
+                                u'temperature': u'95.0'}},
+                                {u'step': {u'collect_data': False,
+                                    u'delta_duration_s': 0,
+                                    u'delta_temperature': u'0.0',
+                                    u'hold_time': 60,
+                                    u'name': u'Anneal',
+                                    u'order_number': 1,
+                                    u'pause': False,
+                                    u'ramp': {u'collect_data': False,
+                                        u'id': 9,
+                                        u'rate': u'3.0'},
+                                    u'temperature': u'60.0'}}]}},
+                                {u'stage': {u'auto_delta': False,
+                                    u'auto_delta_start_cycle': 1,
+                                    u'name': u'Melt Curve Stage',
+                                    u'num_cycles': 1,
+                                    u'order_number': 1,
+                                    u'stage_type': u'meltcurve',
+                                    u'steps': [{u'step': {u'collect_data': False,
+                                        u'delta_duration_s': 0,
+                                        u'delta_temperature': u'0.0',
+                                        u'hold_time': 15,
+                                        u'name': u'Prepare melt',
+                                        u'order_number': 0,
+                                        u'pause': False,
+                                        u'ramp': {u'collect_data': False,
+                                            u'id': 10,
+                                            u'rate': u'1.0'},
+                                        u'temperature': u'72.0'}},
+                                        {u'step': {u'collect_data': False,
+                                            u'delta_duration_s': 0,
+                                            u'delta_temperature': u'0.0',
+                                            u'hold_time': 1,
+                                            u'name': u'Melt',
+                                            u'order_number': 1,
+                                            u'pause': False,
+                                            u'ramp': {u'collect_data': True,
+                                                u'id': 11,
+                                                u'rate': u'0.1'},
+                                            u'temperature': u'85.0'}}]}}]}}}
 
 
     def run(self):

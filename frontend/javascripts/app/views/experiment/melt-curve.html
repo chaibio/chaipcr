@@ -85,7 +85,7 @@ limitations under the License.
           <tbody>
             <tr>
               <th class="B1">Well</th>
-              <th class="B1">Type</th>
+              <th class="B1">Sample Name</th>
               <th class="B1">Tm</th>
             </tr>
             <tr ng-repeat="i in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" ng-class="{selected: (wellButtons['well_'+i].selected)}">
@@ -104,7 +104,7 @@ limitations under the License.
                 <span class="sample-span" ng-click="focusExpName($index)" ng-show="!editExpNameMode[$index]">
             {{samples[$index] | truncate:20}}
           </span>
-                <input type="text" class="sample-input" ng-show="editExpNameMode[$index]" focus-on="editExpNameMode" ng-blur="updateSampleName($index,samples[$index])" on-key-enter="updateSampleName($index,samples[$index])" ng-model="samples[$index]">
+                <input type="text" class="sample-input" ng-show="editExpNameMode[$index]" focus-on="editExpNameMode" ng-blur="updateSampleName($index,samples[$index])" on-shift-enter="updateSampleNameEnter($index,samples[$index])" ng-model="samples[$index]">
               </td>
               <td class="B1">
                 <span ng-show="wellButtons['well_'+i].ct[0] !== null && wellButtons['well_'+i].ct[0] ">

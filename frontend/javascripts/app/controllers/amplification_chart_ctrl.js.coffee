@@ -174,13 +174,23 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.editExpNameMode[index] = true
         focus('editExpNameMode')
 
+      $scope.updateSampleNameEnter = (well_num, name) ->
+        console.log(event.shiftKey)
+        Experiment.updateWell($stateParams.id, well_num + 1, {'well_type':'sample','sample_name':name})
+        $scope.editExpNameMode[well_num] = false
+        if event.shiftKey
+          $scope.focusExpName(well_num - 1)
+        else
+          $scope.focusExpName(well_num + 1)
+
       $scope.updateSampleName = (well_num, name) ->
         Experiment.updateWell($stateParams.id, well_num + 1, {'well_type':'sample','sample_name':name})
         $scope.editExpNameMode[well_num] = false
 
+
       Experiment.getWells($stateParams.id).then (resp) ->
         for i in [0...16]
-          $scope.samples[resp.data[i].well.well_num - 1] = resp.data[i].well.sample_name
+          $scope.samples[resp.data[i].well.well_num - 1] = resp.data[i].well.sample_name if resp.data[i]
 
       Experiment.get(id: $stateParams.id).then (data) ->
         maxCycle = helper.getMaxExperimentCycle(data.experiment)

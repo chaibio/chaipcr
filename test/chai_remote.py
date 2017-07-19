@@ -55,7 +55,7 @@ class ChaiDevice(object):
             if locals()[par]:
                 self._config[par] = locals()[par]
 
-            if not self._config.has_key(par):
+            if not par in self._config:
                 raise Exception('Missing "%s" parameter'%par)
 
         self._rest_prefix = 'http://' + self._config['host'] 
@@ -136,7 +136,7 @@ class ChaiDevice(object):
 
         ret = self._rest_session.delete(self._rest_prefix + '/experiments/%d'%experiment_id)
 
-        if ret.json().has_key('experiment') and not ret.json()['experiment']:
+        if 'experiment' in ret.json() and not ret.json()['experiment']:
             return True
         else:
             raise Exception('Failed to delete experiment id %d'%experiment_id)
@@ -222,7 +222,7 @@ class ChaiDevice(object):
 
         data={}
 
-        for loop in xrange(1, loop_cnt+1):
+        for loop in range(1, loop_cnt+1):
 
             new_id = self.experiment_copy(experiment_id, name = exp_info['experiment']['name'] + '_loop_%d'%loop)
             print("Starting loop %d with experiment id %d"%(loop, new_id))
@@ -243,7 +243,7 @@ class ChaiDevice(object):
             if data_log:
                 data[new_id] = self.data_logger_trigger(timeout_s = 60)
                 self.data_logger_stop()
-                pickle.dump(data, open('data_%s'%self._config['host'], 'w'))
+                pickle.dump(data, open('data_%s'%self._config['host'], 'wb'))
             
             if stop_on_error and self.experiment_info(new_id)['experiment']['completion_status'] != 'success':
                 raise Exception('Loop %d for experiment id %d failed'%(loop, new_id))
@@ -461,11 +461,11 @@ class ChaiDevice(object):
 
         ret = []
         if mode == 'status':
-            for i in xrange(cnt):
+            for i in range(cnt):
                 ret.append([int(i) for i in self.status()['optics']['photodiode_value']])
             
             ret = pd.DataFrame(ret)
-            ret.columns = ['optics_%d'%(i+1) for i in xrange(ret.columns.size)]
+            ret.columns = ['optics_%d'%(i+1) for i in range(ret.columns.size)]
 
             self.test_control("disable_leds",'')
 
