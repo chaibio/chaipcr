@@ -14,8 +14,12 @@ function dispatch(action::String, request_body::String)
     # println("non-default db_name: ", db_name)
 
     result = try
+
         if action == "amplification"
+
             exp_id = req_dict["experiment_id"]
+
+            # asrp_vec
             if "step_id" in keys_req_dict
                 asrp_vec = [AmpStepRampProperties("step", req_dict["step_id"], DEFAULT_cyc_nums)]
             elseif "ramp_id" in keys_req_dict
@@ -23,15 +27,35 @@ function dispatch(action::String, request_body::String)
             else
                 asrp_vec = Vector{AmpStepRampProperties}()
             end
-            baseline_cyc_bounds = "baseline_cyc_bounds" in keys_req_dict ? reshape_lv(req_dict["baseline_cyc_bounds"], 1) : []
-            cq_method = "cq_method" in keys_req_dict ? req_dict["cq_method"] : "Cy0"
+
+            # `report_cq!` arguments
+            kwdict_rc = OrderedDict{Symbol,Any}()
+            if "min_fluomax" in keys_req_dict
+                kwdict_rc[:max_bsf_lb] = req_dict["min_fluomax"]
+            end
+            if "min_D1max" in keys_req_dict
+                kwdict_rc[:max_d1_lb] = req_dict["min_D1max"]
+            end
+            if "min_D2max" in keys_req_dict
+                kwdict_rc[:max_d2_lb] = req_dict["min_D2max"]
+            end
+
+            # `process_amp_1sr` arguments
+            kwdict_pa1 = OrderedDict{Symbol,Any}()
+            for key in ["min_reliable_cyc", "baseline_cyc_bounds", "cq_method"]
+                if key in keys_req_dict
+                    kwdict_pa1[parse(key)] = req_dict[key]
+                end
+            end
+
+            # call
             process_amp( # can't use `return` to return within `try`
                 db_conn, exp_id, asrp_vec, calib_info;
-                min_reliable_cyc=req_dict["min_ct"],
-                baseline_cyc_bounds=baseline_cyc_bounds,
-                cq_method=cq_method,
-                out_sr_dict=false
+                kwdict_rc=kwdict_rc,
+                out_sr_dict=false,
+                kwdict_pa1...
             )
+
         elseif action == "meltcurve" # may need to change to process only 1-channel before deployed on bbb
             exp_id = req_dict["experiment_id"]
             stage_id = req_dict["stage_id"]
@@ -39,6 +63,7 @@ function dispatch(action::String, request_body::String)
                 db_conn, exp_id, stage_id,
                 calib_info;
             )
+
         elseif action == "analyze"
             exp_info = req_dict["experiment_info"]
             exp_id = exp_info["id"]
@@ -46,9 +71,11 @@ function dispatch(action::String, request_body::String)
             analyze_func(
                 GUID2Analyze_DICT[guid](), db_conn, exp_id, calib_info;
             )
+
         else
             error("action $action is not found")
         end # if
+
     catch err
         err
     end # try
@@ -100,7 +127,7 @@ function args2reqb(
 
     if action == "amplification"
         reqb["experiment_id"] = exp_id
-        reqb["min_ct"] = min_reliable_cyc
+        reqb["min_reliable_cyc"] = min_reliable_cyc
         reqb["baseline_cyc_bounds"] = baseline_cyc_bounds
         if step_id != 0
             reqb["step_id"] = step_id

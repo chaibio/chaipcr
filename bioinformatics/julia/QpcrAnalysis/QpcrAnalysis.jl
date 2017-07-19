@@ -1,5 +1,8 @@
 #
-__precompile__()
+
+# using Base
+
+@time __precompile__()
 module QpcrAnalysis
 
 using Clustering, DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NLopt # In addition, "HttpServer" for "juliaserver.jl"
