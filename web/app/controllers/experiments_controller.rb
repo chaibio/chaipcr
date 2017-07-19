@@ -169,7 +169,7 @@ class ExperimentsController < ApplicationController
             begin
               task_submitted = background_calculate_amplification_data(@experiment, @first_stage_collect_data.id)
             rescue => e
-              render :json=>{:errors=>e.to_s}, :status => 500
+              render :json=>e.to_s, :status => 500
               return
             end
             
@@ -301,7 +301,7 @@ class ExperimentsController < ApplicationController
             begin
               task_submitted = background_calculate_melt_curve_data(@experiment, @first_stage_meltcurve_data.id)
             rescue => e
-              render :json=>{:errors=>e.to_s}, :status => 500
+              render :json=>e.to_s, :status => 500
               return
             end
             
@@ -546,7 +546,7 @@ class ExperimentsController < ApplicationController
             task_submitted = background_analyze_data(@experiment)
             render :nothing => true, :status => (task_submitted)? 202 : 503
           rescue  => e
-            render :json=>{:errors=>e.to_s}, :status => 500
+            render :json=>e.to_s, :status => 500
           end
         else
           render :json=>cached_data.analyze_result
@@ -606,7 +606,7 @@ class ExperimentsController < ApplicationController
     #connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
     begin
-      body = {calibration_info: calibrate_hash(calibration_id), experiment_id: experiment.id, min_ct: 5}
+      body = {calibration_info: calibrate_hash(calibration_id), experiment_id: experiment.id}
       body = body.merge(experiment.experiment_definition.amplification_option.to_hash) if !experiment.experiment_definition.amplification_option.nil?
       logger.info("body=#{body}")
       response = HTTParty.post("http://127.0.0.1:8080/experiments/#{experiment.id}/amplification", body: body.to_json)
@@ -624,7 +624,7 @@ class ExperimentsController < ApplicationController
       #connection.close
     end
     logger.info("R code time #{Time.now-start_time}")
-    #logger.info("results=#{results}")
+    logger.info("results=#{results}")
     start_time = Time.now
     #results = results.to_ruby
     amplification_data = []
@@ -911,7 +911,9 @@ class ExperimentsController < ApplicationController
   def raise_julia_error(response)
     logger.error("Julia error response code: #{response.code}, #{response.body}")
     if response.code == 500 && !response.body.blank?
-      raise JSON.parse(response.body)["error"].to_s
+      error = JSON.parse(response.body)["error"]
+      error = error["msg"] if error.is_a?(Hash) && !error["msg"].blank?
+      raise ({errors: error}.to_json)
     else
       raise "Julia error (code=#{response.code}): #{response.inspect}"
     end
