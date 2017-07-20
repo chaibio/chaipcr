@@ -7,10 +7,7 @@ export class DashboardAuthGuard implements CanActivate, CanActivateChild {
 
   constructor (private router: Router) {}
 
-  canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): Observable<boolean>|boolean {
+  canActivate(): boolean {
     if (this.loggedIn()) {
       return true;
     } else {
@@ -22,8 +19,8 @@ export class DashboardAuthGuard implements CanActivate, CanActivateChild {
   canActivateChild(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ): Observable<boolean>|boolean {
-    return this.canActivate(route, state)
+  ): boolean {
+    return this.canActivate()
   }
 
   private loggedIn (): boolean {
