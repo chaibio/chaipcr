@@ -11,7 +11,6 @@ export class DashboardAuthGuard implements CanActivate, CanActivateChild {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean>|boolean {
-    console.log(this.loggedIn())
     if (this.loggedIn()) {
       return true;
     } else {
