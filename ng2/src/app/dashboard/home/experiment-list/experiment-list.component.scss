@@ -1,0 +1,37 @@
+.experiments-list {
+
+  .experiments-heading {
+    height: 64px;
+    background-color: #333;
+
+    .experiments-heading-text {
+      width: 60%;
+      height: 100%;
+      float: left;
+      text-transform: uppercase;
+      color: #fff;
+      line-height: 3;
+    }
+    .experiments-heading-button {
+      width: 40%;
+      float: right;
+      .button {
+        display: inline-block;
+        width: 80px;
+        height: 30px;
+        color: #fff;
+        text-transform: uppercase;
+        background-color: #000;
+        border: 2px solid grey;
+        margin: 16px 32px 0 0;
+        text-align: center;
+        line-height: 26px;
+
+        &:hover {
+          cursor: pointer;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+}
