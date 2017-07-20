@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { CommonModule, APP_BASE_HREF } from '@angular/common';
 
-import { AuthHttp } from './services/auth_http.service';
-import { SessionService } from './services/session.service';
+import { AuthHttp } from './services/auth_http/auth_http.service';
+import { SessionService } from './services/session/session.service';
 import { LogoutComponent } from './components/logout/logout.component'
 
 @NgModule({

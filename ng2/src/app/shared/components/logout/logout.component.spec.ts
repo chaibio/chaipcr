@@ -1,7 +1,7 @@
 import { TestBed, inject, async } from '@angular/core/testing'
 import { RouterTestingModule } from '@angular/router/testing'
 import { Router } from '@angular/router'
-import { SessionService } from '../../services/session.service'
+import { SessionService } from '../../services/session/session.service'
 import { LogoutComponent } from './logout.component'
 
 class SessionServiceMock {

@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/throw';
 
-import { LoginFormData } from '../models/login-form-data.model';
+import { LoginFormData } from '../../models/login-form-data.model';
 
 @Injectable()
 export class SessionService {
