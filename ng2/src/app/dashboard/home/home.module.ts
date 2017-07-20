@@ -3,12 +3,15 @@ import { NgModule } from '@angular/core'
 import { HomeComponent } from './home.component'
 import { ExperimentListComponent } from './experiment-list/experiment-list.component'
 
+import { SharedModule } from '../../shared'
+
 const components = [
   HomeComponent,
-  ExperimentListComponent
+  ExperimentListComponent,
 ]
 
 @NgModule({
+  imports: [ SharedModule ],
   declarations: components,
   exports: components
 })

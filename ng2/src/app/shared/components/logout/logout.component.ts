@@ -20,7 +20,7 @@ export class LogoutComponent implements OnInit {
     private renderer: Renderer,
     private sessionService: SessionService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit() {
     // Listen to click events in the component
