@@ -1,6 +1,19 @@
 import { TestBed, inject } from '@angular/core/testing';
-import { HttpModule, XHRBackend, BaseRequestOptions, RequestOptions, ResponseOptions, Response } from '@angular/http';
-import { MockBackend, MockConnection } from '@angular/http/testing';
+import {
+  Http,
+  HttpModule,
+  XHRBackend,
+  BaseRequestOptions,
+  RequestOptions,
+  ResponseOptions,
+  Response
+} from '@angular/http';
+
+import {
+  MockBackend,
+  MockConnection
+} from '@angular/http/testing';
+
 import { SessionService } from './session.service';
 
 
@@ -106,9 +119,9 @@ describe('SessionService', () => {
 
   describe('post /logout', () => {
 
-    it('should delete token from local storage', inject(
-      [SessionService, XHRBackend],
-      (sessionService: SessionService, backend: MockBackend) => {
+    it('should call POST /logout and delete token from local storage', inject(
+      [SessionService, XHRBackend, Http],
+      (sessionService: SessionService, backend: MockBackend, http: Http) => {
 
         const deleteTokenSpy = spyOn(localStorage, 'removeItem').and.callThrough()
 
@@ -121,7 +134,10 @@ describe('SessionService', () => {
           connection.mockRespond(new Response(new ResponseOptions(mockResponse)))
         })
 
+        spyOn(http, 'post').and.callThrough()
+
         sessionService.logout().subscribe((res) => {
+          expect(http.post).toHaveBeenCalledWith('/logout', {})
           expect(deleteTokenSpy).toHaveBeenCalledWith('token')
         })
 

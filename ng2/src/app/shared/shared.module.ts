@@ -6,9 +6,11 @@ import { CommonModule, APP_BASE_HREF } from '@angular/common';
 
 import { AuthHttp } from './services/auth_http.service';
 import { SessionService } from './services/session.service';
+import { LogoutComponent } from './components/logout/logout.component'
 
 @NgModule({
   declarations: [
+    LogoutComponent
   ],
   imports: [
     FormsModule,
@@ -19,6 +21,7 @@ import { SessionService } from './services/session.service';
     FormsModule,
     HttpModule,
     CommonModule,
+    LogoutComponent,
   ],
   providers: [
     Title,

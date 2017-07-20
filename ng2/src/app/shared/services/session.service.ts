@@ -19,7 +19,7 @@ export class SessionService {
   }
 
   logout() {
-    return this.http.post('/', {}).map((res) => {
+    return this.http.post('/logout', {}).map((res) => {
       localStorage.removeItem('token');
     });
   }
