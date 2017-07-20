@@ -1,14 +1,14 @@
-import { TestBed, async, inject } from '@angular/core/testing'
+// import { TestBed, async, inject } from '@angular/core/testing'
 
-import { ExperimentListComponent } from './experiment-list.component'
-import {  }
+// import { ExperimentListComponent } from './experiment-list.component'
+// import {  }
 
-describe('ExperimentListComponent', () => {
+// describe('ExperimentListComponent', () => {
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
+//   beforeEach(() => {
+//     TestBed.configureTestingModule({
 
-    })
-  })
+//     })
+//   })
 
-})
+// })
