@@ -8,7 +8,9 @@ import {
   HttpModule,
   Http,
   XHRBackend,
-  RequestOptions
+  RequestOptions,
+  Response,
+  ResponseOptions
 } from '@angular/http'
 
 import {
@@ -16,7 +18,14 @@ import {
   MockConnection
 } from '@angular/http/testing'
 
+import { Router } from '@angular/router'
+
 import { AuthHttp } from './auth_http.service'
+
+
+const mockRouter = {
+  navigate: () => { }
+}
 
 describe('AuthHttp', () => {
 
@@ -28,7 +37,8 @@ describe('AuthHttp', () => {
       ],
       providers: [
         { provide: XHRBackend, useClass: MockBackend },
-        AuthHttp
+        { provide: Router, useValue: mockRouter },
+        AuthHttp,
       ]
     })
 
@@ -83,6 +93,62 @@ describe('AuthHttp', () => {
         })
 
         auth_http.get(url).subscribe()
+
+      }))
+
+  })
+
+  describe('When request is unauthenticated', () => {
+
+    it('should redirect to login page when response is 401', inject(
+      [AuthHttp, XHRBackend, Router],
+      (auth_http: AuthHttp, backend: MockBackend, router: Router) => {
+
+        const url = 'http://10.0.100.200:8000/status?x=1'
+
+        spyOn(router, 'navigate').and.callThrough()
+
+        class MockError extends Response implements Error {
+          name: any
+          message: any
+        }
+
+        backend.connections.subscribe((connection: MockConnection) => {
+          connection.mockError(new MockError(new ResponseOptions({
+            status: 401,
+            body: {}
+          })))
+        })
+
+        auth_http.get(url).subscribe(null, res => {
+          expect(router.navigate).toHaveBeenCalledWith(['/login'])
+        })
+
+      }))
+
+    it('should redirect to login page when response is 403', inject(
+      [AuthHttp, XHRBackend, Router],
+      (auth_http: AuthHttp, backend: MockBackend, router: Router) => {
+
+        const url = 'http://10.0.100.200:8000/status?x=1'
+
+        spyOn(router, 'navigate').and.callThrough()
+
+        class MockError extends Response implements Error {
+          name: any
+          message: any
+        }
+
+        backend.connections.subscribe((connection: MockConnection) => {
+          connection.mockError(new MockError(new ResponseOptions({
+            status: 403,
+            body: {}
+          })))
+        })
+
+        auth_http.get(url).subscribe(null, res => {
+          expect(router.navigate).toHaveBeenCalledWith(['/login'])
+        })
 
       }))
 

@@ -1,15 +1,27 @@
 import { Injectable } from '@angular/core';
-import { Http, XHRBackend, RequestOptions, Request, RequestOptionsArgs, Response, Headers } from '@angular/http';
+import {
+  Http,
+  XHRBackend,
+  RequestOptions,
+  Request,
+  RequestOptionsArgs,
+  Response,
+  Headers
+} from '@angular/http';
+
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import 'rxjs/add/observable/throw';
+
+import { Router } from '@angular/router'
 
 @Injectable()
 export class AuthHttp extends Http {
 
   token_name = 'token';
 
-  constructor(backend: XHRBackend, options: RequestOptions) {
+  constructor(backend: XHRBackend, options: RequestOptions, private router: Router) {
     super(backend, options);
   }
 
@@ -28,7 +40,7 @@ export class AuthHttp extends Http {
       url.headers.set('Authorization', `Bearer ${token}`);
     }
 
-    return super.request(url, options).catch(this.catchAuthError);
+    return super.request(url, options).catch(this.catchAuthError(this));
   }
 
   private appendTokenToUrl(url: string): string {
@@ -40,12 +52,12 @@ export class AuthHttp extends Http {
     return url
   }
 
-  private catchAuthError(res: Response) {
-    console.log(res);
-    if (res.status === 401 || res.status === 403) {
-      // if not authenticated
-      console.log(res);
+  private catchAuthError(self: AuthHttp) {
+    return (res: Response) => {
+      if (res.status === 401 || res.status === 403) {
+        self.router.navigate(['/login'])
+      }
+      return Observable.throw(res);
     }
-    return Observable.throw(res);
   }
 }
