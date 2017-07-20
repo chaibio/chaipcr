@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 
 import { DashboardAuthGuard } from './dashboard.auth-guard';
 
-describe('Dashboard Route Guard', () => {
+describe('DashboardAuthGuard', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
