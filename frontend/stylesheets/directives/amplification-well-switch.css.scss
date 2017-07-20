@@ -1,12 +1,12 @@
 @import './colors.css.scss';
 .selectable-container {
-  .selected-wheel-triangle {
-    opacity: 0;
-    margin-top: 7px;
-    width: 30px;
-  }
-  &.show-triangle {
-    .circle.selected {
+  .circle {
+    .selected-wheel-triangle {
+      opacity: 0;
+      margin-top: -7px;
+      width: 30px;
+    }
+    &.active {
       .selected-wheel-triangle {
         opacity: 1;
       }

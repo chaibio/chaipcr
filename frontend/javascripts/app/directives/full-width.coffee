@@ -7,12 +7,14 @@ App.directive 'fullWidth', [
       useMin: '=?'
       useMax: '=?'
       offset: '=?'
+      min: '=?'
     link: ($scope, elem) ->
 
       $scope.offset = ($scope.offset || 0) * 1
 
       set = ->
         width = WindowWrapper.width() - $scope.offset
+        width = if $scope.min then (if width > $scope.min then width else $scope.min) else width
         if $scope.useMin is true
           elem.css('min-width': width)
         if $scope.useMax is true
