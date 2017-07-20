@@ -4,7 +4,7 @@
   <description>Build Chaibio shoftware</description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.24.0">
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.27.0">
       <projectUrl>https://github.com/chaibio/chaipcr.git/</projectUrl>
       <displayName></displayName>
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
@@ -38,10 +38,21 @@
           <description>Will not install PRU work</description>
           <defaultValue>true</defaultValue>
         </hudson.model.BooleanParameterDefinition>
+        <hudson.scm.listtagsparameter.ListSubversionTagsParameterDefinition plugin="subversion@2.9">
+          <name>build_branch</name>
+          <description>Select a Subversion entry</description>
+          <tagsDir>https://github.com/chaibio/chaipcr</tagsDir>
+          <credentialsId></credentialsId>
+          <tagsFilter></tagsFilter>
+          <reverseByDate>true</reverseByDate>
+          <reverseByName>false</reverseByName>
+          <defaultValue></defaultValue>
+          <maxTags></maxTags>
+        </hudson.scm.listtagsparameter.ListSubversionTagsParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.0.1">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.3.2">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
@@ -159,7 +170,7 @@ done
 echo done connection check.
 </command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo &quot;Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}&quot;
 echo &quot;Slave Beaglebone at ${build_machine}&quot;
@@ -182,11 +193,12 @@ then
   exit 1
 fi
 dpkg --configure -a</command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
-# waiting 20min for the bulding device to flash
-echo &quot;Waiting for the build device ($build_machine) to flash and become ready!&quot;
+# waiting 20min for the bulding device to become connectable
+echo &quot;Waiting for the build device ($build_machine) to become ready!&quot;
 #sleep 1500
 
 for i in {0..1200..60}
@@ -233,7 +245,7 @@ done
 echo timeout waiting for the device to become ready!
 exit 1</command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo realtime compile
 
@@ -286,10 +298,20 @@ free -m
 
 sync
 
-
 mkdir -p /sdcard/upgrade/realtime-compile
 cd /sdcard/upgrade/realtime-compile
-git clone https://github.com/chaibio/chaipcr.git
+
+branch_param=
+
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+then
+   echo No build branch chosen
+else
+     branch_param=&quot;-b $(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
+     echo Cloning branch $branch_param
+fi
+
+git clone $branch_param https://github.com/chaibio/chaipcr.git
 cd /sdcard/upgrade/realtime-compile/chaipcr/realtime
 
 qmake
@@ -313,8 +335,9 @@ exit 0
 
 
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo checking deployed web files
 
@@ -355,8 +378,9 @@ sed -i &apos;s/#retry 60/retry 20/&apos; /etc/dhcp/dhclient.conf
 sed -i &apos;s/#reboot/reboot/&apos; /etc/dhcp/dhclient.conf
 
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Configure Logrotate
 cp ~/chaipcr/deploy/device/logrotate/logrotate.conf /etc
@@ -394,8 +418,9 @@ cp pasm /usr/bin/
 cd
 rm master.zip || true
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Build/install LCD drivers
 cd ~/chaipcr/modules/LCDtouch_V3
@@ -447,16 +472,18 @@ echo seed_fu
 echo &quot;\n&quot; | RAILS_ENV=production bundle exec rake db:seed_fu 
 
 echo done rserev</command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo &quot;Install device tree overlay and PRU binary(do this every time it changes):&quot;
 cd ~/chaipcr/deploy/overlay
 bash ./build.sh
 sync
 cd</command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo setting up website pn ngixn
 if [ -e /etc/nginx/sites-available ]
@@ -482,8 +509,9 @@ EOF
 
 update-rc.d -f nginx defaults
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Unicorn
 
@@ -497,8 +525,9 @@ chmod +x /etc/init.d/unicorn
 mkdir /etc/unicorn
 cp ~/chaipcr/web/config/etc/unicorn/chaipcr.conf /etc/unicorn/
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo zeroing 2
 
@@ -526,8 +555,9 @@ then
 fi
 
 echo basic beaglebone setup done!</command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo changing root password to chaipcr
 echo &quot;root:chaipcr&quot; | chpasswd
@@ -535,6 +565,7 @@ sync
 echo rebooting
 shutdown -r 1
 echo a reboot is scheduled after a minute</command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -556,7 +587,7 @@ echo timeout waiting for the device to become ready!
 exit 1
 </command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo device is still connectable!
 
@@ -589,8 +620,9 @@ sync
 mount /dev/mmcblk0p1 /sdcard/upgrade/
 
 exit 0</command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Maintenance
 
@@ -598,6 +630,7 @@ cd /root/chaipcr/web
 bundle exec rake db:migrate # migrates database as needed
 
 exit 0</command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#build( &quot;create_factory_settings_sdcard&quot;, build_machine:&quot;$build_machine&quot;, output_sdcard:&quot;/dev/sdb&quot;)
@@ -608,6 +641,6 @@ exit 0</command>
   </builders>
   <publishers/>
   <buildWrappers>
-    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.7"/>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.8"/>
   </buildWrappers>
 </project>
