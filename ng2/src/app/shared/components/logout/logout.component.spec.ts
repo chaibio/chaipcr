@@ -1,17 +1,12 @@
 import { TestBed, inject, async } from '@angular/core/testing'
 import { RouterTestingModule } from '@angular/router/testing'
 import { Router } from '@angular/router'
-import { SessionService } from '../../services/session/session.service'
+import { SessionService } from '../../'
 import { LogoutComponent } from './logout.component'
 
-class SessionServiceMock {
-
-  logout() {
-
-  }
-
+const sessionServiceMock = {
+  logout: () => {}
 }
-
 describe('LogoutComponent', () => {
 
   beforeEach(async(() => {
@@ -25,7 +20,7 @@ describe('LogoutComponent', () => {
       ],
       providers: [
         {
-          provide: SessionService, useClass: SessionServiceMock
+          provide: SessionService, useValue: sessionServiceMock
         }
       ]
     }).compileComponents()
@@ -51,7 +46,7 @@ describe('LogoutComponent', () => {
 
   it('should call sessionService.logout() and navigate to /login', inject(
     [SessionService, Router],
-    (sessionService: SessionServiceMock, router: Router) => {
+    (sessionService, router: Router) => {
       let fixture = TestBed.createComponent(LogoutComponent)
       let component = fixture.componentInstance
 

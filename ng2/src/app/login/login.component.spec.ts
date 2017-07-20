@@ -7,8 +7,11 @@ import { HttpModule, Http, XHRBackend, Response, ResponseOptions } from '@angula
 import { MockBackend, MockConnection } from '@angular/http/testing'
 import { Title } from '@angular/platform-browser'
 
-import { SharedModule } from '../shared/shared.module'
-import { SessionService } from '../shared/services/session/session.service'
+import {
+  SharedModule,
+  SessionService
+} from '../shared'
+
 import { LoginComponent } from './login.component'
 
 describe('LoginComponent', () => {
@@ -80,26 +83,26 @@ describe('LoginComponent', () => {
     [SessionService, Router],
     (sessionService: SessionService, router: Router) => {
 
-    const err = 'Error login'
+      const err = 'Error login'
 
-    spyOn(sessionService, 'login').and.callFake(() => {
-      return {
-        subscribe: (successCb, errCb) => {
-          successCb()
+      spyOn(sessionService, 'login').and.callFake(() => {
+        return {
+          subscribe: (successCb, errCb) => {
+            successCb()
+          }
         }
-      }
-    })
+      })
 
-    spyOn(router, 'navigate').and.callThrough()
+      spyOn(router, 'navigate').and.callThrough()
 
-    const fixture = TestBed.createComponent(LoginComponent)
-    const instance = fixture.componentInstance
+      const fixture = TestBed.createComponent(LoginComponent)
+      const instance = fixture.componentInstance
 
-    instance.doSubmit()
+      instance.doSubmit()
 
-    expect(router.navigate).toHaveBeenCalledWith(['/'])
+      expect(router.navigate).toHaveBeenCalledWith(['/'])
 
-  }))
+    }))
 
 })
 

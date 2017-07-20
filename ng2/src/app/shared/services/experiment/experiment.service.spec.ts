@@ -19,9 +19,12 @@ import {
 
 import { RouterTestingModule } from '@angular/router/testing'
 
-import { AuthHttp } from '../../services/auth_http/auth_http.service'
+import {
+  AuthHttp,
+  ExperimentListItem
+} from '../../'
+
 import { ExperimentService } from './experiment.service'
-import { ExperimentListItem } from '../../models/experiment-list-item.model'
 
 describe('ExperimentService', () => {
 
