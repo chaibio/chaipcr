@@ -57,11 +57,24 @@ function dispatch(action::String, request_body::String)
             )
 
         elseif action == "meltcurve" # may need to change to process only 1-channel before deployed on bbb
+
             exp_id = req_dict["experiment_id"]
             stage_id = req_dict["stage_id"]
+
+            kwdict_mc_tm_pw = OrderedDict{Symbol,Any}()
+            if "qt_prob" in keys_req_dict
+                kwdict_mc_tm_pw[:qt_prob_flTm] = req_dict["qt_prob"]
+            end
+            for key in ["max_normd_qtv"]
+                if key in keys_req_dict
+                    kwdict_mc_tm_pw[parse(key)] = req_dict[key]
+                end
+            end
+
             process_mc(
                 db_conn, exp_id, stage_id,
                 calib_info;
+                kwdict_mc_tm_pw=kwdict_mc_tm_pw
             )
 
         elseif action == "analyze"
