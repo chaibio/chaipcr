@@ -6,6 +6,7 @@ import { CommonModule, APP_BASE_HREF } from '@angular/common';
 
 import { AuthHttp } from './services/auth_http/auth_http.service';
 import { SessionService } from './services/session/session.service';
+import { ExperimentService } from './services/experiment/experiment.service'
 import { LogoutComponent } from './components/logout/logout.component'
 
 @NgModule({
@@ -27,6 +28,7 @@ import { LogoutComponent } from './components/logout/logout.component'
     Title,
     AuthHttp,
     SessionService,
+    ExperimentService,
     {provide: APP_BASE_HREF, useValue: '/'}
   ]
 })
