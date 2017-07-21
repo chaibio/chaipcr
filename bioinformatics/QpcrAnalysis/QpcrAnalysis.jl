@@ -56,6 +56,7 @@ include("analyze_customized/optical_test_single_channel.jl")
 include("analyze_customized/optical_test_dual_channel.jl")
 include("analyze_customized/optical_cal.jl")
 include("analyze_customized/thermal_consistency.jl")
+# include("analyze_customized/your_own_analyze_functionality.jl")
 
 # wrap up
 include("dispatch.jl")
