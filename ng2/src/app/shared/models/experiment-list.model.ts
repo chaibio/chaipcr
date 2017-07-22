@@ -1,5 +1,5 @@
 
-export interface ExperimentListItem {
+export interface ExperimentList {
   id: number
   name: string
   type: string

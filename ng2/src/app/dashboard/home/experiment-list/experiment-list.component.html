@@ -6,8 +6,8 @@
     </div>
   </div>
   <ul>
-    <li *ngFor="let item of experiments" class="exp-list-item">
-      {{item.name}}
+    <li *ngFor="let item of experiments" class="exp-list-item" [ngClass]="{'open': item.open}">
+      <a (click)="editList(item)">{{item.model.name}}</a>
     </li>
   </ul>
 </div>

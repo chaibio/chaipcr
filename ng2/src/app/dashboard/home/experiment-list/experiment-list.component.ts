@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core'
 
 import {
   ExperimentService,
-  ExperimentListItem
+  ExperimentList
 } from '../../../shared'
 
 @Component({
@@ -17,9 +17,23 @@ export class ExperimentListComponent implements OnInit {
   constructor (private expService: ExperimentService) {}
 
   ngOnInit() {
-    this.expService.getExperiments().subscribe((experiments: ExperimentListItem[]) => {
-      this.experiments = experiments
+    this.expService.getExperiments().subscribe((experiments: ExperimentList[]) => {
+      this.experiments = experiments.map(exp => {
+        return {
+          model: exp,
+          open: false
+        }
+      })
     })
   }
 
+  editList(exp: ExperimentListItem) {
+    exp.open = true;
+  }
+
+}
+
+export interface ExperimentListItem {
+  model: ExperimentList,
+  open: boolean
 }

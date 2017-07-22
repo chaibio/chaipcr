@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 
 import { AuthHttp } from '../auth_http/auth_http.service'
-import { ExperimentListItem } from '../../models/experiment-list-item.model'
+import { ExperimentList } from '../../models/experiment-list.model'
 import { Observable } from 'rxjs/Observable'
 import 'rxjs/add/operator/map'
 import 'rxjs/add/operator/catch'
@@ -14,7 +14,7 @@ export class ExperimentService {
 
   constructor(private http: AuthHttp) { }
 
-  getExperiments(): Observable<ExperimentListItem[]> {
+  getExperiments(): Observable<ExperimentList[]> {
     return this.http.get('/experiments').map(res => {
       let json = res.json()
       return json.map(exp => {

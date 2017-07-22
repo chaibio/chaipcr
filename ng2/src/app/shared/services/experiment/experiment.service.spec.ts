@@ -22,7 +22,7 @@ import { RouterTestingModule } from '@angular/router/testing'
 import {
   WindowRef,
   AuthHttp,
-  ExperimentListItem
+  ExperimentList
 } from '../../'
 
 import { ExperimentService } from './experiment.service'
@@ -86,7 +86,7 @@ describe('ExperimentService', () => {
         })))
       })
 
-      experimentService.getExperiments().subscribe((experiments: ExperimentListItem[]) => {
+      experimentService.getExperiments().subscribe((experiments: ExperimentList[]) => {
         expect(experiments[0]).toEqual(mockExperiments[0].experiment)
       })
 
