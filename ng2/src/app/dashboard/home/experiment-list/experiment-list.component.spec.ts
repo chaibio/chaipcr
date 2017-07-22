@@ -192,4 +192,21 @@ describe('ExperimentListComponent', () => {
 
   })
 
+  describe('When clicking ok button', () => {
+
+    beforeEach(() => {
+      fixture.componentInstance.editing = true
+
+      fixture.componentInstance.experiments.forEach((exp: ExperimentListItem) => {
+        exp.confirmDelete = true
+      })
+
+      fixture.detectChanges()
+
+    })
+
+    xit('should delete the experiment')
+
+  })
+
 })
