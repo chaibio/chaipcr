@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, HostListener } from '@angular/core'
 
 import {
   ExperimentService,
   ExperimentList
 } from '../../../shared'
+
+const ESCAPE_KEYCODE = 27;
 
 @Component({
   selector: 'experiment-list',
@@ -15,7 +17,14 @@ export class ExperimentListComponent implements OnInit {
   experiments: ExperimentListItem[]
   editing: boolean
 
-  constructor (private expService: ExperimentService) {}
+  constructor(private expService: ExperimentService) { }
+
+  @HostListener('document:keydown', ['$event']) onKeydownHandler(event: KeyboardEvent) {
+    let code = +event.code || event.keyCode
+    if (code === ESCAPE_KEYCODE) {
+      this.editing = false
+    }
+  }
 
   ngOnInit() {
     this.expService.getExperiments().subscribe((experiments: ExperimentList[]) => {

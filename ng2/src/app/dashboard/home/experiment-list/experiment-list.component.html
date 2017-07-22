@@ -2,7 +2,7 @@
   <div class="experiments-heading clearfix">
     <div class="experiments-heading-text H2 text-center">experiments</div>
     <div class="experiments-heading-button text-right">
-      <a id="edit-button" (click)="toggleEditing()" class="button BL" [ngClass]="{editing: editing}">edit</a>
+      <a id="edit-button" (click)="toggleEditing()" (focusout)="toggleEditing()" class="button BL" [ngClass]="{editing: editing}">edit</a>
     </div>
   </div>
   <div class="experiment-list-container" [ngClass]="{editing: editing}">

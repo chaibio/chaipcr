@@ -102,12 +102,11 @@ describe('ExperimentListComponent', () => {
 
   describe('When edit button is clicked', () => {
 
-    it(`should show editing mode`, async(() => {
+    it(`should toggle editing mode`, async(() => {
       let el = fixture.debugElement.nativeElement
       let button = <HTMLButtonElement>el.querySelector('#edit-button')
 
       button.click()
-
       fixture.detectChanges()
 
       expect(button.classList.contains('editing')).toBe(true)
@@ -115,20 +114,32 @@ describe('ExperimentListComponent', () => {
       let container = el.querySelector('.experiment-list-container')
       expect(container.classList.contains('editing')).toBe(true)
 
+      button.click()
+      fixture.detectChanges()
+
+      expect(button.classList.contains('editing')).toBe(false)
+      expect(container.classList.contains('editing')).toBe(false)
+
 
     }))
 
-    it(`should revert to non-editing mode`, async(() => {
-      let el = fixture.debugElement.nativeElement
-      let button = <HTMLButtonElement>el.querySelector('#edit-button')
+    it(`should revert to non-editing mode when [ESC] key is pressed`, async(() => {
+
       fixture.componentInstance.editing = true
       fixture.detectChanges()
-      button.click()
-      fixture.detectChanges()
-      expect(button.classList.contains('editing')).toBe(false)
-      let container = el.querySelector('.experiment-list-container')
-      expect(container.classList.contains('editing')).toBe(false)
 
+      let ev = new KeyboardEvent("keydown", {
+        code: '27'
+      })
+
+      document.dispatchEvent(ev)
+      fixture.detectChanges()
+
+      let el = fixture.debugElement.nativeElement
+      let button = <HTMLButtonElement>el.querySelector('#edit-button')
+      let container = el.querySelector('.experiment-list-container')
+      expect(button.classList.contains('editing')).toBe(false)
+      expect(container.classList.contains('editing')).toBe(false)
 
     }))
 
