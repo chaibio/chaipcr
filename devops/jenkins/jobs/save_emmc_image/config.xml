@@ -31,7 +31,7 @@ or /tmp/sdcard_image.img to export a factory settings sdcard image.</description
         <hudson.model.StringParameterDefinition>
           <name>local_download_folder</name>
           <description>The folder where to host download file. 
-Apache server: /usr/share/nginx/html/download 
+Apache server: /var/www/html/download
 or 
 Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
 </description>
@@ -61,7 +61,7 @@ Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.0.1">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.3.2">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
@@ -184,7 +184,7 @@ done
 echo done connection check.
 </command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo &quot;Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}&quot;
 echo &quot;Slave Beaglebone at ${build_machine}&quot;
@@ -256,6 +256,7 @@ else
 fi
 
 lsblk</command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>ls
@@ -263,7 +264,7 @@ sshpass -p chaipcr scp -r devops/grabimage_sdcard/* root@$build_machine:/tmp/gre
 sshpass -p chaipcr scp -r devops/grabimage_sdcard/uEnv.sdcard.txt root@$build_machine:/tmp/grep_sdcard/uEnv.txt
 </command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo patching grep sdcard to boot only once
 sed &quot;s/reboot/rm \/mnt\/uEnv.txt ; reboot/&quot; -i /tmp/grep_sdcard/autorun.sh
@@ -279,6 +280,7 @@ umount /tmp/grep_sdcard
 echo scheduling a restart in a min
 shutdown -r 1
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -299,7 +301,7 @@ done
 echo timeout waiting for the device to become ready!
 exit 1</command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo mounting result grep sdcard
 
@@ -309,6 +311,7 @@ umount /sdcard/*
 mkdir -p /tmp/grep_sdcard
 mount /dev/mmcblk0p1 /tmp/grep_sdcard
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>echo fetching eMMC image.
@@ -325,7 +328,7 @@ sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;umou
 
 ls -ahl &quot;${grep_sdcard_dir}&quot;
 
-emmc_image_latest_compressed=emmc_latest_$build_machine.img.tgz
+emmc_image_latest_compressed=${image_prefix}_emmc.img.tgz
 emmc_image_latest_compressed_full_local_path=${local_download_folder}/${emmc_image_latest_compressed}
 
 tar zfvc $emmc_image_latest_compressed_full_local_path ${grep_sdcard_dir}/eMMC_part*.img
@@ -335,7 +338,35 @@ if $no_factorysettings_sdcard
 then
 	echo latest eMMC for this build machine is downloadable from $emmc_image_latest_url
 	rm -r $grep_sdcard_dir || true
-	exit 0
+	
+    
+    
+    
+build_report_filename=build_report.xml
+#_$BUILD_NUMBER.xml
+echo Report filename is $build_report_filename
+cat &lt;&lt; EOF &gt; $build_report_filename
+&lt;section name=&quot;&quot; fontcolor=&quot;&quot;&gt;
+    // To display a field
+     &lt;field name=&quot;eMMC&quot; titlecolor=&quot;&quot; value=&quot;&quot; detailcolor=&quot;&quot; href=&quot;&quot;&gt; 
+      &lt;![CDATA[ 
+eMMC image ($emmc_image_latest_compressed) &lt;a href=&quot;$emmc_image_latest_url&quot;&gt;Download&lt;/a&gt;
+    ]]&gt; &lt;/field&gt;
+&lt;/section&gt;
+EOF
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    exit 0
+    
 fi
 
 ls
@@ -368,7 +399,6 @@ then
 	fullpath_sdcard_image=${local_download_folder}/$sdcard_filename
 	echo backup eMMC image to $full_emmc_image
     tar zfvc $full_emmc_image /tmp/image_creator/eMMC.img
-    full_emmc_url=${download_prefix}/emmc_$BUILD_NUMBER.img.tgz
     sdcard_url=${download_prefix}/$sdcard_filename
 
 #	cp $full_emmc_image $emmc_image_latest_compressed_full_local_path
@@ -388,7 +418,7 @@ then
 	   	echo raw image processing failed.
    		exit 1
 	fi
-    echo eMMC image should be downloadable from $full_emmc_url
+    echo eMMC image should be downloadable from $emmc_image_latest_url
 
     echo latest eMMC for this build machine is downloadable from $emmc_image_latest_url
 else
@@ -399,11 +429,48 @@ fi
 rm -r $grep_sdcard_dir || true
 rm -r $tmp_sdcard_dir || true
 
+
+cd ..
+
+build_report_filename=build_report.xml
+#_$BUILD_NUMBER.xml
+echo Report filename is $build_report_filename
+cat &lt;&lt; EOF &gt; $build_report_filename
+&lt;section name=&quot;&quot; fontcolor=&quot;&quot;&gt;
+    // To display a field
+    &lt;field name=&quot;Upgrade Image&quot; titlecolor=&quot;&quot; value=&quot;&quot; detailcolor=&quot;&quot; href=&quot;&quot;&gt; 
+    &lt;![CDATA[ 
+Upgrade image (${image_prefix}_upgrade.img.tgz) &lt;a href=&quot;$upgrade_image_url&quot;&gt;Download&lt;/a&gt;
+    ]]&gt; &lt;/field&gt;
+     &lt;field name=&quot;eMMC&quot; titlecolor=&quot;&quot; value=&quot;&quot; detailcolor=&quot;&quot; href=&quot;&quot;&gt; 
+      &lt;![CDATA[ 
+eMMC image ($emmc_image_latest_compressed) &lt;a href=&quot;$emmc_image_latest_url&quot;&gt;Download&lt;/a&gt;
+    ]]&gt; &lt;/field&gt;
+    &lt;field name=&quot;SDCard&quot; titlecolor=&quot;&quot; value=&quot;&quot; detailcolor=&quot;&quot; href=&quot;&quot;&gt; 
+      &lt;![CDATA[ 
+SDCard image ($sdcard_filename) &lt;a href=&quot;$sdcard_url&quot;&gt;Download&lt;/a&gt;
+    ]]&gt; &lt;/field&gt;
+&lt;/section&gt;
+EOF
+
 echo All Done!
 
 exit 0</command>
     </hudson.tasks.Shell>
   </builders>
-  <publishers/>
+  <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>*.xml</artifacts>
+      <allowEmptyArchive>false</allowEmptyArchive>
+      <onlyIfSuccessful>false</onlyIfSuccessful>
+      <fingerprint>false</fingerprint>
+      <defaultExcludes>true</defaultExcludes>
+      <caseSensitive>true</caseSensitive>
+    </hudson.tasks.ArtifactArchiver>
+    <hudson.plugins.summary__report.ACIPluginPublisher plugin="summary_report@1.15">
+      <name>*.xml</name>
+      <shownOnProjectPage>false</shownOnProjectPage>
+    </hudson.plugins.summary__report.ACIPluginPublisher>
+  </publishers>
   <buildWrappers/>
 </project>
