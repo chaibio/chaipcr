@@ -20,6 +20,7 @@ import {
 import { RouterTestingModule } from '@angular/router/testing'
 
 import {
+  WindowRef,
   AuthHttp,
   ExperimentListItem
 } from '../../'
@@ -38,7 +39,8 @@ describe('ExperimentService', () => {
       providers: [
         { provide: XHRBackend, useClass: MockBackend },
         AuthHttp,
-        ExperimentService
+        ExperimentService,
+        WindowRef,
       ]
     })
 

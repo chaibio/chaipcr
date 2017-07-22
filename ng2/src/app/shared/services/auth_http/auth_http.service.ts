@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import {
   Http,
   XHRBackend,
@@ -10,18 +10,22 @@ import {
 } from '@angular/http';
 
 import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject'
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
+import 'rxjs/add/observable/empty';
 
-import { Router } from '@angular/router'
+import { WindowRef } from '../windowref/windowref.service';
 
 @Injectable()
 export class AuthHttp extends Http {
 
   token_name = 'token';
 
-  constructor(backend: XHRBackend, options: RequestOptions, private router: Router) {
+  authState: BehaviorSubject<boolean> = new BehaviorSubject(true);
+
+  constructor(backend: XHRBackend, options: RequestOptions, private windowRef: WindowRef) {
     super(backend, options);
   }
 
@@ -40,7 +44,9 @@ export class AuthHttp extends Http {
       url.headers.set('Authorization', `Bearer ${token}`);
     }
 
-    return super.request(url, options).catch(this.catchAuthError(this));
+    return super.request(url, options).catch(res => {
+      return this.catchAuthError(res)
+    });
   }
 
   private appendTokenToUrl(url: string): string {
@@ -52,12 +58,16 @@ export class AuthHttp extends Http {
     return url
   }
 
-  private catchAuthError(self: AuthHttp) {
-    return (res: Response) => {
-      if (res.status === 401 || res.status === 403) {
-        self.router.navigate(['/login'])
-      }
-      return Observable.throw(res);
+  private catchAuthError(res: Response) {
+
+    if (res.status === 401 || res.status === 403) {
+      localStorage.removeItem(this.token_name)
+      this.windowRef.nativeWindow.location.assign('/login')
+      return Observable.empty()
     }
+
+    return Observable.throw(res);
+
   }
+
 }

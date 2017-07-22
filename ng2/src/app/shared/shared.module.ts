@@ -2,11 +2,15 @@ import { NgModule } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-import { CommonModule, APP_BASE_HREF } from '@angular/common';
+import {
+  CommonModule,
+  APP_BASE_HREF
+} from '@angular/common';
 
 import { AuthHttp } from './services/auth_http/auth_http.service';
 import { SessionService } from './services/session/session.service';
 import { ExperimentService } from './services/experiment/experiment.service'
+import { WindowRef } from './services/windowref/windowref.service'
 import { LogoutComponent } from './components/logout/logout.component'
 
 @NgModule({
@@ -29,7 +33,8 @@ import { LogoutComponent } from './components/logout/logout.component'
     AuthHttp,
     SessionService,
     ExperimentService,
-    {provide: APP_BASE_HREF, useValue: '/'}
+    WindowRef,
+    { provide: APP_BASE_HREF, useValue: '/' },
   ]
 })
 export class SharedModule { }

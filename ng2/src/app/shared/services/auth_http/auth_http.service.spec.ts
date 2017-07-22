@@ -4,6 +4,8 @@ import {
   inject
 } from '@angular/core/testing'
 
+import { Inject } from '@angular/core'
+
 import {
   HttpModule,
   Http,
@@ -18,13 +20,15 @@ import {
   MockConnection
 } from '@angular/http/testing'
 
-import { Router } from '@angular/router'
-
 import { AuthHttp } from './auth_http.service'
+import { WindowRef } from '../windowref/windowref.service'
 
-
-const mockRouter = {
-  navigate: () => { }
+const windowRefMock = {
+  nativeWindow: {
+    location: {
+      assign: () => { }
+    }
+  }
 }
 
 describe('AuthHttp', () => {
@@ -37,7 +41,7 @@ describe('AuthHttp', () => {
       ],
       providers: [
         { provide: XHRBackend, useClass: MockBackend },
-        { provide: Router, useValue: mockRouter },
+        { provide: WindowRef, useValue: windowRefMock },
         AuthHttp,
       ]
     })
@@ -101,12 +105,12 @@ describe('AuthHttp', () => {
   describe('When request is unauthenticated', () => {
 
     it('should redirect to login page when response is 401', inject(
-      [AuthHttp, XHRBackend, Router],
-      (auth_http: AuthHttp, backend: MockBackend, router: Router) => {
+      [AuthHttp, XHRBackend, WindowRef],
+      (auth_http: AuthHttp, backend: MockBackend, window: WindowRef) => {
 
-        const url = 'http://10.0.100.200:8000/status?x=1'
-
-        spyOn(router, 'navigate').and.callThrough()
+        const url = 'http://10.0.100.200:8000/status?x=1';
+        spyOn(window.nativeWindow.location, 'assign')
+        spyOn(localStorage, 'removeItem')
 
         class MockError extends Response implements Error {
           name: any
@@ -120,35 +124,10 @@ describe('AuthHttp', () => {
           })))
         })
 
-        auth_http.get(url).subscribe(null, res => {
-          expect(router.navigate).toHaveBeenCalledWith(['/login'])
-        })
+        auth_http.get(url).subscribe()
 
-      }))
-
-    it('should redirect to login page when response is 403', inject(
-      [AuthHttp, XHRBackend, Router],
-      (auth_http: AuthHttp, backend: MockBackend, router: Router) => {
-
-        const url = 'http://10.0.100.200:8000/status?x=1'
-
-        spyOn(router, 'navigate').and.callThrough()
-
-        class MockError extends Response implements Error {
-          name: any
-          message: any
-        }
-
-        backend.connections.subscribe((connection: MockConnection) => {
-          connection.mockError(new MockError(new ResponseOptions({
-            status: 403,
-            body: {}
-          })))
-        })
-
-        auth_http.get(url).subscribe(null, res => {
-          expect(router.navigate).toHaveBeenCalledWith(['/login'])
-        })
+        expect(window.nativeWindow.location.assign).toHaveBeenCalledWith('/login')
+        expect(localStorage.removeItem).toHaveBeenCalledWith(auth_http.token_name)
 
       }))
 

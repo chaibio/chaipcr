@@ -5,4 +5,9 @@
       <a class="button BL">edit</a>
     </div>
   </div>
+  <ul>
+    <li *ngFor="let item of experiments" class="exp-list-item">
+      {{item.name}}
+    </li>
+  </ul>
 </div>

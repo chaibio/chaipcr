@@ -17,7 +17,7 @@ export class ExperimentListComponent implements OnInit {
   constructor (private expService: ExperimentService) {}
 
   ngOnInit() {
-    this.expService.getExperiments().subscribe(experiments => {
+    this.expService.getExperiments().subscribe((experiments: ExperimentListItem[]) => {
       this.experiments = experiments
     })
   }
