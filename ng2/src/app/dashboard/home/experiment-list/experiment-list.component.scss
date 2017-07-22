@@ -58,6 +58,7 @@
         position: relative;
         left: 0;
         overflow: hidden;
+        cursor: pointer;
 
         .exp-texts-container {
           width: 100%;
@@ -122,6 +123,7 @@
     &.editing {
       ul {
         li {
+          cursor: auto;
 
           .exp-options-container {
             left: calc(100% - 70px);
