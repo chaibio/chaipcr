@@ -23,6 +23,9 @@ export class ExperimentListComponent implements OnInit {
     let code = +event.code || event.keyCode
     if (code === ESCAPE_KEYCODE) {
       this.editing = false
+      this.experiments.forEach(exp => {
+        exp.confirmDelete = false
+      })
     }
   }
 
@@ -31,7 +34,7 @@ export class ExperimentListComponent implements OnInit {
       this.experiments = experiments.map(exp => {
         return {
           model: exp,
-          open: false
+          confirmDelete: false
         }
       })
     })
@@ -41,13 +44,13 @@ export class ExperimentListComponent implements OnInit {
     this.editing = !this.editing
   }
 
-  editList(exp: ExperimentListItem) {
-    exp.open = true;
+  confirmDelete(exp: ExperimentListItem) {
+    exp.confirmDelete = true;
   }
 
 }
 
 export interface ExperimentListItem {
   model: ExperimentList,
-  open: boolean
+  confirmDelete: boolean
 }

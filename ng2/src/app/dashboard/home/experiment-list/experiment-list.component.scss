@@ -37,7 +37,108 @@
           border-color: #fff;
           background-color: #fff;
         }
+      }
+    }
+  }
 
+  .experiment-list-container {
+
+    border-left: 1px solid #e6e6e6;
+    height: 100%;
+
+    ul {
+      padding: 0;
+      margin: 0;
+      li {
+        padding: 0;
+        margin: 0;
+        display: block;
+        background-color: #fbfbfb;
+        border-bottom: 1px solid #e6e6e6;
+        position: relative;
+        left: 0;
+        overflow: hidden;
+
+        .exp-texts-container {
+          width: 100%;
+          height: 100%;
+          padding-top: 10px;
+          padding-bottom: 10px;
+          padding-left: 15px;
+        }
+
+        .exp-options-container {
+          top: 0;
+          position: absolute;
+          width: 72px * 2;
+          height: 100%; // margin-left: -72px;
+          background-color: red;
+          left: 100%;
+          transition: left 0.5s;
+
+          .delete-icon {
+            width: 72px;
+            height: 100%;
+            background-color: #df2227;
+            cursor: pointer;
+            color: #df2227;
+            background-image: url(/assets/images/trash.svg);
+            background-position: center;
+            background-size: 24px 26px;
+            background-repeat: no-repeat;
+            float: left;
+            text-align: center;
+            &::before {
+              content: '\200B';
+              display: inline-block;
+              height: 100%;
+              vertical-align: middle;
+            }
+            span {
+              color: white;
+              padding-left: 40px;
+              -webkit-user-select: none;
+              user-select: none;
+              display: none;
+              vertical-align: middle;
+            }
+          }
+
+          .confirm-delete-button {
+            width: 72px;
+            height: 100%;
+            cursor: pointer;
+            background-color: #c30506;
+            background-position: center;
+            background-image: url(/assets/images/ok.svg);
+            background-size: 26px 28px;
+            background-repeat: no-repeat;
+            float: left;
+          }
+        }
+      }
+    }
+
+    &.editing {
+      ul {
+        li {
+
+          .exp-options-container {
+            left: calc(100% - 70px);
+          }
+
+          &.confirm-delete {
+            .exp-options-container {
+              left: calc(100% - 144px);
+
+              .delete-icon {
+                span {
+                  display: inline-block;
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

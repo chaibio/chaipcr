@@ -79,7 +79,7 @@ describe('ExperimentListComponent', () => {
         const expectedList: ExperimentListItem[] = mockExperiments.map(exp => {
           return {
             model: exp,
-            open: false
+            confirmDelete: false
           }
         })
         expect(component.experiments).toEqual(expectedList)
@@ -140,6 +140,53 @@ describe('ExperimentListComponent', () => {
       let container = el.querySelector('.experiment-list-container')
       expect(button.classList.contains('editing')).toBe(false)
       expect(container.classList.contains('editing')).toBe(false)
+
+    }))
+
+  })
+
+  describe('When editing mode and trash icon is clicked', () => {
+
+    beforeEach(() => {
+      fixture.componentInstance.editing = true
+      fixture.detectChanges()
+    })
+
+    it(`should add "confirm-delete" class to experiment list item`, async(() => {
+
+      let el = fixture.debugElement.nativeElement
+      let listItem = <HTMLLIElement>el.querySelector('li.exp-list-item')
+      let button = <HTMLDivElement>listItem.querySelector('.delete-icon')
+
+      button.click()
+      fixture.detectChanges()
+
+      expect(listItem.classList.contains('confirm-delete')).toBe(true)
+
+    }))
+
+    it(`should remove "confirm-delete" class when [ESC] key is pressed`, async(() => {
+
+      fixture.componentInstance.editing = true
+
+      fixture.componentInstance.experiments.forEach((exp: ExperimentListItem) => {
+        exp.confirmDelete = true
+      })
+
+      fixture.detectChanges()
+
+      let ev = new KeyboardEvent("keydown", {
+        code: '27'
+      })
+
+      document.dispatchEvent(ev)
+      fixture.detectChanges()
+
+      let listItems: HTMLLIElement[] = fixture.nativeElement.querySelectorAll('li.exp-list-item')
+
+      listItems.forEach(li => {
+        expect(li.classList.contains('confirm-delete')).toBe(false)
+      })
 
     }))
 
