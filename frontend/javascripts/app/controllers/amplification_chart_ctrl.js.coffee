@@ -301,6 +301,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         }
         $scope.ampli_zoom = (transform.k - 1)/ (scale_extent-1)
 
+      $scope.onSelectLine = (config) ->
+        for i in [0..15] by 1
+          $scope.wellButtons["well_#{i}"].active = (i == config.config.well)
 
       $scope.$watch 'baseline_subtraction', (val) ->
         updateSeries()
