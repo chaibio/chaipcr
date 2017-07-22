@@ -13,6 +13,7 @@ import {
 export class ExperimentListComponent implements OnInit {
 
   experiments: ExperimentListItem[]
+  editing: boolean
 
   constructor (private expService: ExperimentService) {}
 
@@ -25,6 +26,10 @@ export class ExperimentListComponent implements OnInit {
         }
       })
     })
+  }
+
+  toggleEditing() {
+    this.editing = !this.editing
   }
 
   editList(exp: ExperimentListItem) {

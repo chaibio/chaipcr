@@ -2,12 +2,14 @@
   <div class="experiments-heading clearfix">
     <div class="experiments-heading-text H2 text-center">experiments</div>
     <div class="experiments-heading-button text-right">
-      <a class="button BL">edit</a>
+      <a id="edit-button" (click)="toggleEditing()" class="button BL" [ngClass]="{editing: editing}">edit</a>
     </div>
   </div>
-  <ul>
+  <div class="experiment-list-container" [ngClass]="{editing: editing}">
+    <ul>
     <li *ngFor="let item of experiments" class="exp-list-item" [ngClass]="{'open': item.open}">
       <a (click)="editList(item)">{{item.model.name}}</a>
     </li>
   </ul>
+  </div>
 </div>

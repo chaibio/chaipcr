@@ -102,24 +102,33 @@ describe('ExperimentListComponent', () => {
 
   describe('When edit button is clicked', () => {
 
-    it('should open the delete icon of each experiment in the list', async(() => {
-      
-    }))
-
-  })
-
-  describe('When list item is clicked', () => {
-
-    it(`should add "open" class to experiment list item`, async(() => {
+    it(`should show editing mode`, async(() => {
       let el = fixture.debugElement.nativeElement
-      let anchor = <HTMLAnchorElement>el.querySelector('.exp-list-item > a')
+      let button = <HTMLButtonElement>el.querySelector('#edit-button')
 
-      anchor.click()
+      button.click()
 
       fixture.detectChanges()
 
-      let item = el.querySelector('.exp-list-item')
-      expect(item.classList.contains('open')).toBe(true)
+      expect(button.classList.contains('editing')).toBe(true)
+
+      let container = el.querySelector('.experiment-list-container')
+      expect(container.classList.contains('editing')).toBe(true)
+
+
+    }))
+
+    it(`should revert to non-editing mode`, async(() => {
+      let el = fixture.debugElement.nativeElement
+      let button = <HTMLButtonElement>el.querySelector('#edit-button')
+      fixture.componentInstance.editing = true
+      fixture.detectChanges()
+      button.click()
+      fixture.detectChanges()
+      expect(button.classList.contains('editing')).toBe(false)
+      let container = el.querySelector('.experiment-list-container')
+      expect(container.classList.contains('editing')).toBe(false)
+
 
     }))
 

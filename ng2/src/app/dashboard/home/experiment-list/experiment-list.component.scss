@@ -31,6 +31,13 @@
           cursor: pointer;
           text-decoration: none;
         }
+
+        &.editing {
+          color: #000;
+          border-color: #fff;
+          background-color: #fff;
+        }
+
       }
     }
   }
