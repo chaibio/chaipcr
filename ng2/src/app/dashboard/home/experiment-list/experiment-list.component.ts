@@ -1,4 +1,9 @@
-import { Component, OnInit, HostListener } from '@angular/core'
+import {
+  Component,
+  OnInit,
+  HostListener,
+  ElementRef
+} from '@angular/core'
 
 import {
   ExperimentService,
@@ -17,7 +22,9 @@ export class ExperimentListComponent implements OnInit {
   experiments: ExperimentListItem[]
   editing: boolean
 
-  constructor(private expService: ExperimentService) { }
+  constructor(private expService: ExperimentService, private el: ElementRef) {
+
+  }
 
   @HostListener('document:keydown', ['$event']) onKeydownHandler(event: KeyboardEvent) {
     let code = +event.code || event.keyCode
@@ -44,8 +51,15 @@ export class ExperimentListComponent implements OnInit {
     this.editing = !this.editing
   }
 
-  confirmDelete(exp: ExperimentListItem) {
+  confirmDelete(exp: ExperimentListItem, index: number) {
     exp.confirmDelete = true;
+    let li: HTMLLIElement = this.el.nativeElement.querySelectorAll('li.exp-list-item')[index]
+    let input: HTMLInputElement = li.querySelector('input')
+    input.focus()
+  }
+
+  focusOut(exp: ExperimentListItem) {
+    exp.confirmDelete = false
   }
 
 }

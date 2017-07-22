@@ -7,18 +7,19 @@
   </div>
   <div class="experiment-list-container" [ngClass]="{editing: editing}">
     <ul>
-      <li *ngFor="let item of experiments" class="exp-list-item" [ngClass]="{'confirm-delete': item.confirmDelete}">
+      <li *ngFor="let item of experiments; let i = index" class="exp-list-item" [ngClass]="{'confirm-delete': item.confirmDelete}">
         <div class="exp-texts-container">
           <span class="exp-name B1B">{{item.model.name}}</span>
           <br>
           <span class="exp-info B2">Created Today at 12:22 AM, #3</span>
         </div>
         <div class="exp-options-container">
-          <div class="delete-icon" (click)="confirmDelete(item)">
+          <div class="delete-icon" (click)="confirmDelete(item, i)">
             <span ng-show="deleteClicked" class="H2" [hidden]="!item.confirmDelete">?</span>
           </div>
           <div class="confirm-delete-button"></div>
         </div>
+        <input type="text" (blur)="focusOut(item)">
       </li>
     </ul>
   </div>

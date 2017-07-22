@@ -165,6 +165,25 @@ describe('ExperimentListComponent', () => {
 
     }))
 
+    it(`should remove "confirm-delete" class to experiment list item when out of focus`, async(() => {
+
+      let el = fixture.debugElement.nativeElement
+      let listItem = <HTMLLIElement>el.querySelector('li.exp-list-item')
+      let button = <HTMLDivElement>listItem.querySelector('.delete-icon')
+
+      button.click()
+      fixture.detectChanges()
+
+      expect(listItem.classList.contains('confirm-delete')).toBe(true)
+
+      listItem.querySelector('input').blur()
+
+      fixture.detectChanges()
+
+      expect(listItem.classList.contains('confirm-delete')).toBe(false)
+
+    }))
+
     it(`should remove "confirm-delete" class when [ESC] key is pressed`, async(() => {
 
       fixture.componentInstance.editing = true

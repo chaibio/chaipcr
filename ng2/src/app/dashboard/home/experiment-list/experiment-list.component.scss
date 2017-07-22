@@ -59,6 +59,12 @@
         left: 0;
         overflow: hidden;
         cursor: pointer;
+        input {
+          display: block;
+          width: 0;
+          height: 0;
+          opacity: 0;
+        }
 
         .exp-texts-container {
           width: 100%;
