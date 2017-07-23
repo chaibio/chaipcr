@@ -50,7 +50,8 @@ const mockExperimentService = {
         successCb(mockExperiments)
       }
     }
-  }
+  },
+  deleteExperiment: () => {}
 }
 
 describe('ExperimentListComponent', () => {
@@ -79,7 +80,8 @@ describe('ExperimentListComponent', () => {
         const expectedList: ExperimentListItem[] = mockExperiments.map(exp => {
           return {
             model: exp,
-            confirmDelete: false
+            confirmDelete: false,
+            deleting: false,
           }
         })
         expect(component.experiments).toEqual(expectedList)
@@ -224,8 +226,30 @@ describe('ExperimentListComponent', () => {
 
     })
 
-    it('should delete the experiment', async(() => {
-      
+    it('should delete the experiment', inject([ExperimentService], (expService: ExperimentService) => {
+
+      let callback: any;
+      spyOn(expService, 'deleteExperiment').and.callFake(() => {
+        return {
+          subscribe: (successCb) => {
+            callback = successCb
+          }
+        }
+      })
+
+      let li: HTMLLIElement = fixture.nativeElement.querySelector('li.exp-list-item')
+      let okButton: HTMLButtonElement = fixture.nativeElement.querySelector('.delete-button')
+      okButton.click()
+      fixture.detectChanges()
+
+      expect(expService.deleteExperiment).toHaveBeenCalledWith(mockExperiments[0].id)
+      expect(li.classList.contains('deleting')).toBe(true)
+      callback()
+
+      fixture.detectChanges()
+
+      expect(fixture.componentInstance.experiments.length).toBe(mockExperiments.length - 1)
+
     }))
 
   })

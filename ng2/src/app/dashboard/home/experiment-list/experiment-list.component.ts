@@ -41,7 +41,8 @@ export class ExperimentListComponent implements OnInit {
       this.experiments = experiments.map(exp => {
         return {
           model: exp,
-          confirmDelete: false
+          confirmDelete: false,
+          deleting: false,
         }
       })
     })
@@ -62,9 +63,23 @@ export class ExperimentListComponent implements OnInit {
     exp.confirmDelete = false
   }
 
+  deleteExperiment(exp: ExperimentListItem) {
+    exp.deleting = true
+    this.expService.deleteExperiment(exp.model.id).subscribe((res) => {
+      let newExpList: ExperimentListItem[] = []
+      this.experiments.forEach(experiment => {
+        if (exp.model.id !== experiment.model.id) {
+          newExpList.push(experiment)
+        }
+      })
+      this.experiments = newExpList
+    })
+  }
+
 }
 
 export interface ExperimentListItem {
   model: ExperimentList,
-  confirmDelete: boolean
+  confirmDelete: boolean,
+  deleting: boolean
 }
