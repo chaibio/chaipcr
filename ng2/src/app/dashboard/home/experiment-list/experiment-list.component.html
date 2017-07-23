@@ -5,7 +5,7 @@
       <a id="edit-button" (click)="toggleEditing()" (focusout)="toggleEditing()" class="button BL" [ngClass]="{editing: editing}">edit</a>
     </div>
   </div>
-  <div class="experiment-list-container" [ngClass]="{editing: editing}">
+  <div class="experiment-list-container" [ngClass]="{editing: editing}" *ngIf="experiments&& experiments.length > 0">
     <ul>
       <li *ngFor="let item of experiments; let i = index" class="exp-list-item" [ngClass]="{'confirm-delete': item.confirmDelete, 'deleting': item.deleting}">
         <div class="exp-texts-container">
@@ -24,5 +24,11 @@
         <input type="text" (blur)="focusOut(item)">
       </li>
     </ul>
+  </div>
+  <div class="exp-list-loading-container" *ngIf="!experiments">
+    <p class="B1B">Loading experiments...</p>
+  </div>
+  <div class="exp-list-empty-container" *ngIf="experiments? experiments.length === 0 : false">
+    <p class="B1B">No experiments yet.</p>
   </div>
 </div>

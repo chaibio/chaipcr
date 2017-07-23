@@ -51,7 +51,7 @@ const mockExperimentService = {
       }
     }
   },
-  deleteExperiment: () => {}
+  deleteExperiment: () => { }
 }
 
 describe('ExperimentListComponent', () => {
@@ -72,6 +72,36 @@ describe('ExperimentListComponent', () => {
   }))
 
   describe('When fetching experiments', () => {
+
+    it('should show loading text and no experiments text', inject(
+      [ExperimentService],
+      (expService: ExperimentService) => {
+
+        fixture.componentInstance.experiments = undefined
+
+        fixture.detectChanges()
+
+        let listContainer: HTMLDivElement = fixture.nativeElement.querySelector('.exp-list-container')
+        let loadingContainer: HTMLDivElement = fixture.nativeElement.querySelector('.exp-list-loading-container')
+        let emptyContainer: HTMLDivElement = fixture.nativeElement.querySelector('.exp-list-empty-container')
+
+        expect(listContainer).toBeNull()
+        expect(emptyContainer).toBeNull()
+        expect(loadingContainer.querySelector('p').textContent).toContain('Loading experiments')
+
+        fixture.componentInstance.experiments = []
+        fixture.detectChanges()
+
+        listContainer = fixture.nativeElement.querySelector('.exp-list-container')
+        loadingContainer = fixture.nativeElement.querySelector('.exp-list-loading-container')
+        emptyContainer = fixture.nativeElement.querySelector('.exp-list-empty-container')
+
+        expect(listContainer).toBeNull()
+        expect(loadingContainer).toBeNull()
+        expect(emptyContainer.querySelector('p').textContent).toContain('No experiments yet')
+
+      }
+    ))
 
     it('should fetch experiments', inject(
       [ExperimentService],
