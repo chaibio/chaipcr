@@ -224,7 +224,9 @@ describe('ExperimentListComponent', () => {
 
     })
 
-    xit('should delete the experiment')
+    it('should delete the experiment', async(() => {
+      
+    }))
 
   })
 

@@ -14,7 +14,8 @@ import {
   HttpModule,
   XHRBackend,
   Response,
-  ResponseOptions
+  ResponseOptions,
+  RequestMethod
 } from '@angular/http'
 
 import { RouterTestingModule } from '@angular/router/testing'
@@ -91,5 +92,32 @@ describe('ExperimentService', () => {
       })
 
     }))
+
+  it('should delete experiment', inject(
+    [ExperimentService, XHRBackend],
+    (expService: ExperimentService, backend: MockBackend) => {
+
+      const expId = 1
+
+      const backendSpy = jasmine.createSpy('backendSpy')
+
+      backend.connections.subscribe((connection: MockConnection) => {
+        expect(connection.request.method).toBe(RequestMethod.Delete)
+        expect(connection.request.url).toBe(`/experiments/${expId}`)
+        connection.mockRespond(new Response(new ResponseOptions({
+          status: 200,
+          body: {
+            status: true
+          }
+        })))
+        backendSpy()
+      })
+
+      expService.deleteExperiment(expId).subscribe(resp => {
+        expect(backendSpy).toHaveBeenCalled()
+      })
+
+    }
+  ))
 
 })

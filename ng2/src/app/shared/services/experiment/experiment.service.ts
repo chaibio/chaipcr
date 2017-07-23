@@ -23,4 +23,8 @@ export class ExperimentService {
     })
   }
 
+  deleteExperiment(id: number) {
+    return this.http.delete(`/experiments/${id}`)
+  }
+
 }
