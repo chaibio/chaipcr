@@ -73,9 +73,7 @@ describe('ExperimentListComponent', () => {
 
   describe('When fetching experiments', () => {
 
-    it('should show loading text and no experiments text', inject(
-      [ExperimentService],
-      (expService: ExperimentService) => {
+    it('should show loading text and no experiments text', async(() => {
 
         fixture.componentInstance.experiments = undefined
 
