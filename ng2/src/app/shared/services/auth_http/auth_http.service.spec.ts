@@ -133,4 +133,35 @@ describe('AuthHttp', () => {
 
   })
 
+  describe('When request is unauthenticated', () => {
+
+    it('should redirect to login page when response is 403', inject(
+      [AuthHttp, XHRBackend, WindowRef],
+      (auth_http: AuthHttp, backend: MockBackend, window: WindowRef) => {
+
+        const url = 'http://10.0.100.200:8000/status?x=1';
+        spyOn(window.nativeWindow.location, 'assign')
+        spyOn(localStorage, 'removeItem')
+
+        class MockError extends Response implements Error {
+          name: any
+          message: any
+        }
+
+        backend.connections.subscribe((connection: MockConnection) => {
+          connection.mockError(new MockError(new ResponseOptions({
+            status: 403,
+            body: {}
+          })))
+        })
+
+        auth_http.get(url).subscribe()
+
+        expect(window.nativeWindow.location.assign).toHaveBeenCalledWith('/login')
+        expect(localStorage.removeItem).toHaveBeenCalledWith(auth_http.token_name)
+
+      }))
+
+  })
+
 })
