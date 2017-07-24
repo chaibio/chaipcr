@@ -239,18 +239,21 @@ sshpass -p chaipcr scp -r devops/grabimage_sdcard/uEnv.sdcard.txt root@$build_ma
 
 emmc_image_latest_compressed=${image_prefix}_emmc.img.tgz
 emmc_image_latest_url=$download_prefix/${emmc_image_latest_compressed}
-emmc_image_latest_tmp_compressed=/tmp/${emmc_image_latest_compressed}
+emmc_image_latest_tmp_compressed=/tmp/${BUILD_NUMBER}/${emmc_image_latest_compressed}
 
-emmc_image_latest_tmp_uncompressed_part1=/tmp/eMMC_part1.img
-emmc_image_latest_tmp_uncompressed_part2=/tmp/eMMC_part2.img
+emmc_image_latest_tmp_uncompressed_part1=/tmp/${BUILD_NUMBER}/eMMC_part1.img
+emmc_image_latest_tmp_uncompressed_part2=/tmp/${BUILD_NUMBER}/eMMC_part2.img
+
+mkdir -p /tmp/${BUILD_NUMBER}
+echo downloading and restoring $emmc_image_latest_compressed
 
 wget $emmc_image_latest_url -O $emmc_image_latest_tmp_compressed
-tar xfvz $emmc_image_latest_tmp_compressed --strip=2 -C /tmp
+tar xfvz $emmc_image_latest_tmp_compressed --strip=3 -C /tmp/${BUILD_NUMBER}
 
 echo latest image downloaded
-ls -ahl /tmp/eMMC_part*
+ls -ahl /tmp/${BUILD_NUMBER}/eMMC_part*
 
-sshpass -p chaipcr scp -r /tmp/eMMC_part*.img root@$build_machine:/tmp/grep_sdcard/
+sshpass -p chaipcr scp -r /tmp/${BUILD_NUMBER}/eMMC_part*.img root@$build_machine:/tmp/grep_sdcard/
 rm $emmc_image_latest_tmp_uncompressed_part1  || true
 rm $emmc_image_latest_tmp_uncompressed_part2  || true
 rm $emmc_image_latest_tmp_compressed || true
@@ -284,6 +287,9 @@ shutdown -r 1
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
+
+rm -r /tmp/${BUILD_NUMBER} || true
+
 echo waiting for a restart
 sleep 120
 for i in {0..1200..60}

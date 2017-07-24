@@ -26,7 +26,7 @@
           <description>the block device of the created factory settings sdcard: You can say:
 /dev/sdb to write directly to a physical sdcard.
 or /tmp/sdcard_image.img to export a factory settings sdcard image.</description>
-          <defaultValue>/tmp/sdcard_${BUILD_NUMBER}.img</defaultValue>
+          <defaultValue>/tmp/${BUILD_NUMBER}/sdcard_${BUILD_NUMBER}.img</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>local_download_folder</name>
@@ -316,8 +316,8 @@ mount /dev/mmcblk0p1 /tmp/grep_sdcard
     <hudson.tasks.Shell>
       <command>echo fetching eMMC image.
 stamp=$(date &apos;+%Y%M%d%H%m%S&apos;)
-grep_sdcard_dir=&quot;/tmp/emmc_inbox_${stamp}&quot;
-tmp_sdcard_dir=&quot;/tmp/sdcard_${stamp}&quot;
+grep_sdcard_dir=&quot;/tmp/${BUILD_NUMBER}/emmc_inbox_${stamp}&quot;
+tmp_sdcard_dir=&quot;/tmp/${BUILD_NUMBER}/sdcard_${stamp}&quot;
 
 echo grep sdcard folder [input]: $grep_sdcard_dir
 mkdir -p &quot;${grep_sdcard_dir}&quot;
@@ -355,16 +355,6 @@ eMMC image ($emmc_image_latest_compressed) &lt;a href=&quot;$emmc_image_latest_u
 &lt;/section&gt;
 EOF
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     exit 0
     
 fi
@@ -469,7 +459,7 @@ exit 0</command>
     </hudson.tasks.ArtifactArchiver>
     <hudson.plugins.summary__report.ACIPluginPublisher plugin="summary_report@1.15">
       <name>*.xml</name>
-      <shownOnProjectPage>false</shownOnProjectPage>
+      <shownOnProjectPage>true</shownOnProjectPage>
     </hudson.plugins.summary__report.ACIPluginPublisher>
   </publishers>
   <buildWrappers/>
