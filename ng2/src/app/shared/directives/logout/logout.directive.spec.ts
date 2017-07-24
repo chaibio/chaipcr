@@ -2,12 +2,20 @@ import { TestBed, inject, async } from '@angular/core/testing'
 import { RouterTestingModule } from '@angular/router/testing'
 import { Router } from '@angular/router'
 import { SessionService } from '../../'
-import { LogoutComponent } from './logout.component'
+import { LogoutDirective } from './logout.directive'
+
+import { Component } from '@angular/core'
 
 const sessionServiceMock = {
   logout: () => {}
 }
-describe('LogoutComponent', () => {
+
+@Component({
+  template: `<div logout></div>`
+})
+class TestingComponent {}
+
+describe('LogoutDirective', () => {
 
   beforeEach(async(() => {
 
@@ -16,7 +24,8 @@ describe('LogoutComponent', () => {
         RouterTestingModule
       ],
       declarations: [
-        LogoutComponent
+        TestingComponent,
+        LogoutDirective
       ],
       providers: [
         {
@@ -27,27 +36,27 @@ describe('LogoutComponent', () => {
 
   }))
 
-  it('should call logout when clicked', async(() => {
-    let fixture = TestBed.createComponent(LogoutComponent)
-    let component = fixture.componentInstance
+  // it('should call logout when clicked', async(() => {
+  //   let fixture = TestBed.createComponent(TestingComponent)
+  //   let component = fixture.componentInstance
 
-    spyOn(component, 'logout')
+  //   spyOn(component, 'logout')
 
-    fixture.detectChanges();
+  //   fixture.detectChanges();
 
-    fixture.debugElement.nativeElement.click()
+  //   fixture.debugElement.nativeElement.click()
 
-    fixture.whenStable().then(() => {
+  //   fixture.whenStable().then(() => {
 
-      expect(component.logout).toHaveBeenCalled()
-    })
+  //     expect(component.logout).toHaveBeenCalled()
+  //   })
 
-  }))
+  // }))
 
-  it('should call sessionService.logout() and navigate to /login', inject(
+  it('should logout and navigate to /login', inject(
     [SessionService, Router],
     (sessionService, router: Router) => {
-      let fixture = TestBed.createComponent(LogoutComponent)
+      let fixture = TestBed.createComponent(TestingComponent)
       let component = fixture.componentInstance
 
       spyOn(sessionService, 'logout').and.callFake(() => {
@@ -60,7 +69,9 @@ describe('LogoutComponent', () => {
 
       spyOn(router, 'navigate').and.returnValue(true)
 
-      component.logout()
+      fixture.nativeElement.querySelector('[logout]').click()
+
+      // component.logout()
 
       expect(sessionService.logout).toHaveBeenCalled()
       expect(router.navigate).toHaveBeenCalledWith(['/login'])

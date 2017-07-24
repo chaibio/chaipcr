@@ -1,35 +1,25 @@
 import {
-  Component,
+  Directive,
   ElementRef,
-  Renderer,
-  OnInit
+  HostListener,
 } from '@angular/core';
 
 import { Router } from '@angular/router'
 
 import { SessionService } from '../../services/session/session.service'
 
-@Component({
+@Directive({
   selector: '[logout]',
-  template: `<ng-content></ng-content>`
 })
-export class LogoutComponent implements OnInit {
+export class LogoutDirective {
 
   constructor(
     private elementRef: ElementRef,
-    private renderer: Renderer,
     private sessionService: SessionService,
     private router: Router
   ) { }
 
-  ngOnInit() {
-    // Listen to click events in the component
-    this.renderer.listen(this.elementRef.nativeElement, 'click', (event) => {
-      this.logout()
-    })
-  }
-
-  logout() {
+  @HostListener('click') doLogout() {
     this.sessionService.logout().subscribe((res) => {
       this.router.navigate(['/login'])
     })

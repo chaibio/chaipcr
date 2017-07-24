@@ -11,11 +11,11 @@ import { AuthHttp } from './services/auth_http/auth_http.service';
 import { SessionService } from './services/session/session.service';
 import { ExperimentService } from './services/experiment/experiment.service'
 import { WindowRef } from './services/windowref/windowref.service'
-import { LogoutComponent } from './components/logout/logout.component'
+import { LogoutDirective } from './directives/logout/logout.directive'
 
 @NgModule({
   declarations: [
-    LogoutComponent
+    LogoutDirective
   ],
   imports: [
     FormsModule,
@@ -26,7 +26,7 @@ import { LogoutComponent } from './components/logout/logout.component'
     FormsModule,
     HttpModule,
     CommonModule,
-    LogoutComponent,
+    LogoutDirective,
   ],
   providers: [
     Title,

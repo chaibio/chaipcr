@@ -1,4 +1,4 @@
-export * from './components/logout/logout.component'
+export * from './directives/logout/logout.directive'
 
 export * from './models/login-form-data.model'
 export * from './models/experiment-list.model'
