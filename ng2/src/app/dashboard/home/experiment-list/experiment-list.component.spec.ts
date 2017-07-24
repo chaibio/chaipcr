@@ -75,30 +75,30 @@ describe('ExperimentListComponent', () => {
 
     it('should show loading text and no experiments text', async(() => {
 
-        fixture.componentInstance.experiments = undefined
+      fixture.componentInstance.experiments = undefined
 
-        fixture.detectChanges()
+      fixture.detectChanges()
 
-        let listContainer: HTMLDivElement = fixture.nativeElement.querySelector('.exp-list-container')
-        let loadingContainer: HTMLDivElement = fixture.nativeElement.querySelector('.exp-list-loading-container')
-        let emptyContainer: HTMLDivElement = fixture.nativeElement.querySelector('.exp-list-empty-container')
+      let listContainer: HTMLDivElement = fixture.nativeElement.querySelector('.exp-list-container')
+      let loadingContainer: HTMLDivElement = fixture.nativeElement.querySelector('.exp-list-loading-container')
+      let emptyContainer: HTMLDivElement = fixture.nativeElement.querySelector('.exp-list-empty-container')
 
-        expect(listContainer).toBeNull()
-        expect(emptyContainer).toBeNull()
-        expect(loadingContainer.querySelector('p').textContent).toContain('Loading experiments')
+      expect(listContainer).toBeNull()
+      expect(emptyContainer).toBeNull()
+      expect(loadingContainer.querySelector('p').textContent).toContain('Loading experiments')
 
-        fixture.componentInstance.experiments = []
-        fixture.detectChanges()
+      fixture.componentInstance.experiments = []
+      fixture.detectChanges()
 
-        listContainer = fixture.nativeElement.querySelector('.exp-list-container')
-        loadingContainer = fixture.nativeElement.querySelector('.exp-list-loading-container')
-        emptyContainer = fixture.nativeElement.querySelector('.exp-list-empty-container')
+      listContainer = fixture.nativeElement.querySelector('.exp-list-container')
+      loadingContainer = fixture.nativeElement.querySelector('.exp-list-loading-container')
+      emptyContainer = fixture.nativeElement.querySelector('.exp-list-empty-container')
 
-        expect(listContainer).toBeNull()
-        expect(loadingContainer).toBeNull()
-        expect(emptyContainer.querySelector('p').textContent).toContain('No experiments yet')
+      expect(listContainer).toBeNull()
+      expect(loadingContainer).toBeNull()
+      expect(emptyContainer.querySelector('p').textContent).toContain('No experiments yet')
 
-      }
+    }
     ))
 
     it('should fetch experiments', inject(
@@ -175,7 +175,7 @@ describe('ExperimentListComponent', () => {
 
   })
 
-  describe('When editing mode and trash icon is clicked', () => {
+  describe('When on editing mode and trash icon is clicked', () => {
 
     beforeEach(() => {
       fixture.componentInstance.editing = true
@@ -203,11 +203,9 @@ describe('ExperimentListComponent', () => {
 
       button.click()
       fixture.detectChanges()
-
       expect(listItem.classList.contains('confirm-delete')).toBe(true)
 
-      listItem.querySelector('input').blur()
-
+      listItem.querySelector('button').blur()
       fixture.detectChanges()
 
       expect(listItem.classList.contains('confirm-delete')).toBe(false)

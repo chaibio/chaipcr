@@ -55,8 +55,8 @@ export class ExperimentListComponent implements OnInit {
   confirmDelete(exp: ExperimentListItem, index: number) {
     exp.confirmDelete = true;
     let li: HTMLLIElement = this.el.nativeElement.querySelectorAll('li.exp-list-item')[index]
-    let input: HTMLInputElement = li.querySelector('input')
-    input.focus()
+    let button: HTMLButtonElement = li.querySelector('button')
+    button.focus()
   }
 
   focusOut(exp: ExperimentListItem) {

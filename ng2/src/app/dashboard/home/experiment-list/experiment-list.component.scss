@@ -75,6 +75,9 @@
         }
 
         .exp-options-container {
+          // display: inline-block;
+          border: 0;
+          padding: 0;
           top: 0;
           position: absolute;
           width: 72px * 2;

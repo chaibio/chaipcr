@@ -13,15 +13,14 @@
           <br>
           <span class="exp-info B2">Created Today at 12:22 AM, #3</span>
         </div>
-        <div class="exp-options-container">
+        <button (blur)="focusOut(item)" class="exp-options-container">
           <div class="delete-icon" (click)="confirmDelete(item, i)">
             <span class="H2" [hidden]="!item.confirmDelete">?</span>
           </div>
           <div class="delete-button" (click)="deleteExperiment(item)">
             <div class="loader"></div>
           </div>
-        </div>
-        <input type="text" (blur)="focusOut(item)">
+        </button>
       </li>
     </ul>
   </div>
