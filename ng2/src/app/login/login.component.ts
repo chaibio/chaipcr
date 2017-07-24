@@ -3,10 +3,8 @@ import { Http } from '@angular/http';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 
-import {
-  SessionService,
-  LoginFormData
-} from '../shared';
+import { SessionService } from '../shared/services/session/session.service';
+import { LoginFormData } from '../shared/models/login-form-data.model'
 
 @Component({
   templateUrl: './login.component.html',

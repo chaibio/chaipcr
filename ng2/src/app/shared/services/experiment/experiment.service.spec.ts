@@ -20,12 +20,9 @@ import {
 
 import { RouterTestingModule } from '@angular/router/testing'
 
-import {
-  WindowRef,
-  AuthHttp,
-  ExperimentList
-} from '../../'
-
+import { WindowRef } from '../../services/windowref/windowref.service'
+import { ExperimentList } from '../../models/experiment-list.model'
+import { AuthHttp } from '../../services/auth_http/auth_http.service'
 import { ExperimentService } from './experiment.service'
 
 describe('ExperimentService', () => {

@@ -7,7 +7,7 @@ import {
 
 import { Component } from '@angular/core'
 
-import { WindowRef } from '../..'
+import { WindowRef } from '../../services/windowref/windowref.service'
 import { FullHeightDirective } from './full-height.directive'
 
 describe('FullHeightDirective', () => {
