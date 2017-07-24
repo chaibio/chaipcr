@@ -16,10 +16,7 @@ export class DashboardAuthGuard implements CanActivate, CanActivateChild {
     }
   }
 
-  canActivateChild(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): boolean {
+  canActivateChild(): boolean {
     return this.canActivate()
   }
 

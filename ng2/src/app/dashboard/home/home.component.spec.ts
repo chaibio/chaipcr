@@ -4,6 +4,7 @@ import { Title } from '@angular/platform-browser'
 import { RouterTestingModule } from '@angular/router/testing'
 import { HomeComponent } from './home.component'
 import { ExperimentListComponent } from './experiment-list/experiment-list.component'
+import { SharedModule } from '../../shared/shared.module'
 
 describe('HomeComponent', () => {
 
@@ -11,20 +12,18 @@ describe('HomeComponent', () => {
 
     TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule
+        RouterTestingModule,
+        SharedModule
       ],
       declarations: [
         HomeComponent,
         ExperimentListComponent,
-      ],
-      providers: [
-        Title
       ]
     }).compileComponents()
 
   }))
 
-  it('should set title to ChaiPCR | Home', async(() => {
+  it('should set title to ChaiPCR | Home',
     inject(
       [Title],
       (title: Title) => {
@@ -36,7 +35,6 @@ describe('HomeComponent', () => {
         expect(title.setTitle).toHaveBeenCalledWith('ChaiPCR | Home')
 
       }
-    )
-  }))
+    ))
 
 })
