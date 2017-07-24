@@ -23,11 +23,15 @@ import {
 import { AuthHttp } from './auth_http.service'
 import { WindowRef } from '../windowref/windowref.service'
 
+const mockNativeWindow = {
+  location: {
+    assign: () => {}
+  }
+}
+
 const windowRefMock = {
-  nativeWindow: {
-    location: {
-      assign: () => { }
-    }
+  nativeWindow: () => {
+    return mockNativeWindow
   }
 }
 
@@ -43,6 +47,7 @@ describe('AuthHttp', () => {
         { provide: XHRBackend, useClass: MockBackend },
         { provide: WindowRef, useValue: windowRefMock },
         AuthHttp,
+        Window
       ]
     })
 
@@ -109,7 +114,7 @@ describe('AuthHttp', () => {
       (auth_http: AuthHttp, backend: MockBackend, window: WindowRef) => {
 
         const url = 'http://10.0.100.200:8000/status?x=1';
-        spyOn(window.nativeWindow.location, 'assign')
+        spyOn(mockNativeWindow.location, 'assign')
         spyOn(localStorage, 'removeItem')
 
         class MockError extends Response implements Error {
@@ -126,7 +131,7 @@ describe('AuthHttp', () => {
 
         auth_http.get(url).subscribe()
 
-        expect(window.nativeWindow.location.assign).toHaveBeenCalledWith('/login')
+        expect(window.nativeWindow().location.assign).toHaveBeenCalledWith('/login')
         expect(localStorage.removeItem).toHaveBeenCalledWith(auth_http.token_name)
 
       }))
@@ -140,7 +145,7 @@ describe('AuthHttp', () => {
       (auth_http: AuthHttp, backend: MockBackend, window: WindowRef) => {
 
         const url = 'http://10.0.100.200:8000/status?x=1';
-        spyOn(window.nativeWindow.location, 'assign')
+        spyOn(mockNativeWindow.location, 'assign')
         spyOn(localStorage, 'removeItem')
 
         class MockError extends Response implements Error {
@@ -157,7 +162,7 @@ describe('AuthHttp', () => {
 
         auth_http.get(url).subscribe()
 
-        expect(window.nativeWindow.location.assign).toHaveBeenCalledWith('/login')
+        expect(window.nativeWindow().location.assign).toHaveBeenCalledWith('/login')
         expect(localStorage.removeItem).toHaveBeenCalledWith(auth_http.token_name)
 
       }))

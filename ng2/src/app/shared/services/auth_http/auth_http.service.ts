@@ -62,7 +62,7 @@ export class AuthHttp extends Http {
 
     if (res.status === 401 || res.status === 403) {
       localStorage.removeItem(this.token_name)
-      this.windowRef.nativeWindow.location.assign('/login')
+      this.windowRef.nativeWindow().location.assign('/login')
       return Observable.empty()
     }
 

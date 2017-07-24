@@ -5,40 +5,158 @@ import {
   ComponentFixture
 } from '@angular/core/testing'
 
+import { Component } from '@angular/core'
+
 import { WindowRef } from '../..'
 import { FullHeightDirective } from './full-height.directive'
 
-const mockWindowRef = {
-  nativeWindow: {
-    innerHeight: 500
-  }
-}
-
 describe('FullHeightDirective', () => {
 
-  let fixture: ComponentFixture<FullHeightDirective>;
+  let fixture: ComponentFixture<any>;
 
-  beforeEach(async(() => {
+  it('should set element height to window height', async(() => {
+    @Component({
+      template: `<div chai-full-height></div>`
+    })
+    class TestingComponent { }
 
     TestBed.configureTestingModule({
       providers: [
-        { provide: WindowRef, useValue: mockWindowRef }
+        WindowRef
       ],
       declarations: [
+        TestingComponent,
         FullHeightDirective
       ]
+    }).compileComponents().then(
+      inject([WindowRef], (windowRef: WindowRef) => {
+
+        let expectedHeight = 1000
+        spyOn(windowRef, 'getJQuery').and.callFake(() => {
+          return () => {
+            return {
+              height: () => {
+                return expectedHeight
+              }
+            }
+          }
+        })
+
+        fixture = TestBed.createComponent(TestingComponent)
+        fixture.detectChanges()
+        let el: HTMLDivElement = fixture.nativeElement.querySelector('[chai-full-height]')
+        expect(el.style.height).toBe(`${expectedHeight}px`)
+      }))
+  }))
+
+  it('should have height offset', async(() => {
+    @Component({
+      template: `<div chai-full-height offset="100"></div>`
     })
+    class TestingComponent { }
 
+    TestBed.configureTestingModule({
+      providers: [
+        WindowRef
+      ],
+      declarations: [
+        TestingComponent,
+        FullHeightDirective
+      ]
+    }).compileComponents().then(
+      inject([WindowRef], (windowRef: WindowRef) => {
+
+        let mockHeight = 1000
+        spyOn(windowRef, 'getJQuery').and.callFake(() => {
+          return () => {
+            return {
+              height: () => {
+                return mockHeight
+              }
+            }
+          }
+        })
+
+        fixture = TestBed.createComponent(TestingComponent)
+        fixture.detectChanges()
+        let el: HTMLDivElement = fixture.nativeElement.querySelector('[chai-full-height]')
+        expect(el.style.height).toBe(`${mockHeight - 100}px`)
+      }))
   }))
 
-  it('should set element height to window height', async(() => {
+  describe('When use-min option is true', () => {
 
-    const template = `<div full-height></div>`
 
-    TestBed.overrideTemplate(FullHeightDirective, template)
+    it('should set element height to window height', async(() => {
+      @Component({
+        template: `<div chai-full-height use-min="true"></div>`
+      })
+      class TestingComponent { }
 
-    TestBed
+      TestBed.configureTestingModule({
+        providers: [
+          WindowRef
+        ],
+        declarations: [
+          TestingComponent,
+          FullHeightDirective
+        ]
+      }).compileComponents().then(
+        inject([WindowRef], (windowRef: WindowRef) => {
 
-  }))
+          let expectedHeight = 1000
+          spyOn(windowRef, 'getJQuery').and.callFake(() => {
+            return () => {
+              return {
+                height: () => {
+                  return expectedHeight
+                }
+              }
+            }
+          })
+
+          fixture = TestBed.createComponent(TestingComponent)
+          fixture.detectChanges()
+          let el: HTMLDivElement = fixture.nativeElement.querySelector('[chai-full-height]')
+          expect(el.style.minHeight).toBe(`${expectedHeight}px`)
+        }))
+    }))
+
+    it('should have height offset', async(() => {
+      @Component({
+        template: `<div chai-full-height offset="100" use-min="true"></div>`
+      })
+      class TestingComponent { }
+
+      TestBed.configureTestingModule({
+        providers: [
+          WindowRef
+        ],
+        declarations: [
+          TestingComponent,
+          FullHeightDirective
+        ]
+      }).compileComponents().then(
+        inject([WindowRef], (windowRef: WindowRef) => {
+
+          let mockHeight = 1000
+          spyOn(windowRef, 'getJQuery').and.callFake(() => {
+            return () => {
+              return {
+                height: () => {
+                  return mockHeight
+                }
+              }
+            }
+          })
+
+          fixture = TestBed.createComponent(TestingComponent)
+          fixture.detectChanges()
+          let el: HTMLDivElement = fixture.nativeElement.querySelector('[chai-full-height]')
+          expect(el.style.minHeight).toBe(`${mockHeight - 100}px`)
+        }))
+    }))
+
+  })
 
 })
