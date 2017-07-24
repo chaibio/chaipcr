@@ -21,7 +21,7 @@ angular.module("canvasApp").service('movingStepGraphics', [
     'Line',
     'constants',
     function(Line, constants) {
-        this.offset = 41;
+        this.offset = 0;
         
         this.initiateMoveStepGraphics = function(currentStep, C) {
             
@@ -32,7 +32,8 @@ angular.module("canvasApp").service('movingStepGraphics', [
 
         this.setWidthOfStage = function(baseStage) {
             
-            baseStage.myWidth = baseStage.myWidth - (this.offset * 2);
+            //this.offset = 10;
+            baseStage.myWidth = baseStage.myWidth - 75;
             
             baseStage.stageRect.setWidth(baseStage.myWidth);
             baseStage.stageRect.setCoords();
@@ -56,7 +57,7 @@ angular.module("canvasApp").service('movingStepGraphics', [
             var startingStep = step.previousStep;
             
             while(startingStep) {
-                this.moveLittleRight(startingStep);
+                //this.moveLittleRight(startingStep); // may be remove this part and method.
                 startingStep = startingStep.previousStep;
             }
            
@@ -76,7 +77,7 @@ angular.module("canvasApp").service('movingStepGraphics', [
 
         this.moveLittleLeft = function(step) {
             
-            step.left = step.left - this.offset;
+            step.left = step.left - 82;
             step.moveStep(0, false);
             step.circle.moveCircleWithStep();
         };
