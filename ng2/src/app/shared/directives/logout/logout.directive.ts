@@ -9,7 +9,7 @@ import { Router } from '@angular/router'
 import { SessionService } from '../../services/session/session.service'
 
 @Directive({
-  selector: '[logout]',
+  selector: '[chai-logout]',
 })
 export class LogoutDirective {
 

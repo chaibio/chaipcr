@@ -11,7 +11,7 @@ const sessionServiceMock = {
 }
 
 @Component({
-  template: `<div logout></div>`
+  template: `<div chai-logout></div>`
 })
 class TestingComponent {}
 
@@ -52,7 +52,7 @@ describe('LogoutDirective', () => {
 
       spyOn(router, 'navigate').and.returnValue(true)
 
-      fixture.nativeElement.querySelector('[logout]').click()
+      fixture.nativeElement.querySelector('[chai-logout]').click()
 
       expect(sessionService.logout).toHaveBeenCalled()
       expect(router.navigate).toHaveBeenCalledWith(['/login'])
