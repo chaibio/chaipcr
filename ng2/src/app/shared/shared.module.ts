@@ -12,10 +12,12 @@ import { SessionService } from './services/session/session.service';
 import { ExperimentService } from './services/experiment/experiment.service'
 import { WindowRef } from './services/windowref/windowref.service'
 import { LogoutDirective } from './directives/logout/logout.directive'
+import { FullHeightDirective } from './directives/full-height/full-height.directive'
 
 @NgModule({
   declarations: [
-    LogoutDirective
+    LogoutDirective,
+    FullHeightDirective
   ],
   imports: [
     FormsModule,
@@ -27,6 +29,7 @@ import { LogoutDirective } from './directives/logout/logout.directive'
     HttpModule,
     CommonModule,
     LogoutDirective,
+    FullHeightDirective,
   ],
   providers: [
     Title,
