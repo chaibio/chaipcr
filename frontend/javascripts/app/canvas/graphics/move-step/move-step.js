@@ -130,7 +130,6 @@ angular.module("canvasApp").factory('moveStepRect', [
         if(direction === 'right') {
           this.manageMovingRight();
         } else if(direction === 'left') {
-          console.log("Lefting");
           this.manageMovingLeft();
         } 
       };

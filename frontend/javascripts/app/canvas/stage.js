@@ -284,6 +284,7 @@ angular.module("canvasApp").factory('stage', [
       };
 
       this.moveIndividualStageAndContents = function(stage, del) {
+
         if(!stage.nextStage) {
           return false;
         }
@@ -372,11 +373,29 @@ angular.module("canvasApp").factory('stage', [
         this.stageGroup.set({left: this.left + moveCount }).setCoords();
         this.dots.set({left: (this.left + moveCount ) + 3}).setCoords();
         this.left = this.left + moveCount;
-
+        var previousMovingFound = false;
+        
         this.childSteps.forEach(function(step, index) {
           step.moveStep(1, true);
           step.circle.moveCircleWithStep();
         });
+        
+        if(this.sourceStage === true) {
+          this.childSteps.some(function(step, index) {
+            if(step.previousIsMoving) {
+              var tempStep = step;
+              while(tempStep) {
+                tempStep.left = tempStep.left + 40;
+                tempStep.moveStep(0, false);
+                tempStep.circle.moveCircleWithStep();
+                tempStep = tempStep.nextStep;
+              }
+              return true;
+            }
+          }, this);
+
+          this.parent.moveDots.setLeft(this.parent.moveDots.left + moveCount).setCoords();  
+        }
       };
 
       this.validMove = function(direction, draggedStage) {
