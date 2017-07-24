@@ -350,7 +350,7 @@ angular.module("canvasApp").factory('stage', [
       
       this.moveToSide = function(direction, draggedStage) {
 
-        if(this.validMove(direction, draggedStage) && this.sourceStage === false) {
+        if(this.validMove(direction, draggedStage)) {
 
           var moveCount;
           if(direction === "left") {
@@ -400,6 +400,11 @@ angular.module("canvasApp").factory('stage', [
           } else if(direction === "right") {
 
             if(this.nextStage === null) {
+              
+              if(this.sourceStage === true) {
+                //If we clicked on move-step, stage is sourceStage
+                return true;
+              }
 
               if(draggedStage.index === this.parent.allStageViews.length) {
                 // For the very first time, we need to move only if we dragged the very last stage.
