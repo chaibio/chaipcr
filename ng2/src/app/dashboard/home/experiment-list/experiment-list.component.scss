@@ -75,13 +75,10 @@
         }
 
         .exp-options-container {
-          // display: inline-block;
-          border: 0;
-          padding: 0;
           top: 0;
           position: absolute;
           width: 72px * 2;
-          height: 100%; // margin-left: -72px;
+          height: 100%;
           background-color: red;
           left: 100%;
           transition: left 0.5s;
@@ -115,6 +112,8 @@
           }
 
           .delete-button {
+            border: 0;
+            padding: 0;
             width: 72px;
             height: 100%;
             cursor: pointer;
@@ -123,6 +122,7 @@
             background-image: url(/assets/images/ok.svg);
             background-size: 26px 28px;
             background-repeat: no-repeat;
+            display: block;
             float: left;
 
             .loader {

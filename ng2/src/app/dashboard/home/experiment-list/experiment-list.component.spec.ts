@@ -203,12 +203,13 @@ describe('ExperimentListComponent', () => {
 
       button.click()
       fixture.detectChanges()
-      expect(listItem.classList.contains('confirm-delete')).toBe(true)
 
-      listItem.querySelector('button').blur()
-      fixture.detectChanges()
-
-      expect(listItem.classList.contains('confirm-delete')).toBe(false)
+      setTimeout(() => {
+        expect(listItem.classList.contains('confirm-delete')).toBe(true)
+        listItem.querySelector('button').blur()
+        fixture.detectChanges()
+        expect(listItem.classList.contains('confirm-delete')).toBe(false)
+      }, 501)
 
     }))
 
