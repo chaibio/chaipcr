@@ -36,23 +36,6 @@ describe('LogoutDirective', () => {
 
   }))
 
-  // it('should call logout when clicked', async(() => {
-  //   let fixture = TestBed.createComponent(TestingComponent)
-  //   let component = fixture.componentInstance
-
-  //   spyOn(component, 'logout')
-
-  //   fixture.detectChanges();
-
-  //   fixture.debugElement.nativeElement.click()
-
-  //   fixture.whenStable().then(() => {
-
-  //     expect(component.logout).toHaveBeenCalled()
-  //   })
-
-  // }))
-
   it('should logout and navigate to /login', inject(
     [SessionService, Router],
     (sessionService, router: Router) => {
@@ -70,8 +53,6 @@ describe('LogoutDirective', () => {
       spyOn(router, 'navigate').and.returnValue(true)
 
       fixture.nativeElement.querySelector('[logout]').click()
-
-      // component.logout()
 
       expect(sessionService.logout).toHaveBeenCalled()
       expect(router.navigate).toHaveBeenCalledWith(['/login'])
