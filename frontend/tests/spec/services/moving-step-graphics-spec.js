@@ -69,7 +69,7 @@ describe("Testing movingStepGraphics service", function() {
 
         _movingStepGraphics.setWidthOfStage(currentStep.parentStage);
 
-        expect(currentStep.parentStage.myWidth).toEqual(preWidth - (_movingStepGraphics.offset * 2));
+        expect(currentStep.parentStage.myWidth).toEqual(preWidth - 75);
 
         expect(currentStep.parentStage.stageRect.setWidth).toHaveBeenCalled();
         expect(currentStep.parentStage.stageRect.setCoords).toHaveBeenCalled();
@@ -125,7 +125,7 @@ describe("Testing movingStepGraphics service", function() {
 
         _movingStepGraphics.moveLittleLeft(step);
 
-        expect(step.left).toEqual(59);
+        expect(step.left).toEqual(18);
         expect(step.moveStep).toHaveBeenCalled();
         expect(step.circle.moveCircleWithStep).toHaveBeenCalled();
 

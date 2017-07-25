@@ -54,14 +54,14 @@ angular.module("canvasApp").service('movingStepGraphics', [
 
         this.arrangeStepsOfStage = function(step) {
             
-            var startingStep = step.previousStep;
+            //var startingStep = step.previousStep;
             
-            while(startingStep) {
+            //while(startingStep) {
                 //this.moveLittleRight(startingStep); // may be remove this part and method.
-                startingStep = startingStep.previousStep;
-            }
+                //startingStep = startingStep.previousStep;
+            //}
            
-            startingStep = step.nextStep;
+            var startingStep = step.nextStep;
             while(startingStep) {
                 this.moveLittleLeft(startingStep);
                 startingStep = startingStep.nextStep;

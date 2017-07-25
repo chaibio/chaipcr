@@ -60,6 +60,9 @@ describe("Testing moveStepRect", function() {
         C = {
            canvas: {
                bringToFront: function() {}
+           },
+           moveDots: {
+               left: 20
            }
         };
 
