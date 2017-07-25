@@ -65,7 +65,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.currentDropStage = step.parentStage;
         this.currentDrop = (step.previousStep) ? step.previousStep : "NOTHING";
         
-        this.verticalLine.setLeft(footer.left + 41).setVisible(true).setCoords();
+        this.verticalLine.setLeft(C.moveDots.left + 7).setVisible(true).setCoords();
         C.canvas.bringToFront(this.verticalLine);
         this.setLeft(footer.left).setVisible(true);
         this.changeText(step);
