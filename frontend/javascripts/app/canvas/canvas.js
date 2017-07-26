@@ -39,9 +39,10 @@ angular.module("canvasApp").factory('canvas', [
   'StepPositionService',
   'Line',
   'correctNumberingService',
+  'editModeService',
   function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents,
     moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory, stageHitBlock, stageGraphics, 
-    StagePositionService, StepPositionService, Line, correctNumberingService) {
+    StagePositionService, StepPositionService, Line, correctNumberingService, editModeService) {
 
     this.init = function(model) {
       
@@ -80,6 +81,7 @@ angular.module("canvasApp").factory('canvas', [
 
       circleManager.init(this);
       correctNumberingService.init(this);
+      editModeService.init(this);
       new events(this, this.$scope); // Fire the events;
       this.loadImages();
     };
@@ -213,6 +215,8 @@ angular.module("canvasApp").factory('canvas', [
     };
 
     this.editStageMode = function(status) {
+      editModeService.editStageMode(status);
+      /*
       //StagePositionService.getPositionObject(this.allStageViews);
       //console.log(StagePositionService.allPositions);
       var add = (status) ? 25 : -25;
@@ -232,26 +236,10 @@ angular.module("canvasApp").factory('canvas', [
       this.allStageViews.forEach(function(stage, index) {
         this.editStageModeStage(stage, add, status, count, index);
       }, this);
-      this.canvas.renderAll();
+      this.canvas.renderAll();*/
     };
 
-    this.editStageModeStage = function(stage, add, status, count, stageIndex) {
-
-      if(stageIndex === count) {
-
-        var lastStep = stage.childSteps[stage.childSteps.length - 1];
-        if(parseInt(lastStep.circle.model.hold_time) !== 0) {
-          this.editModeStageChanges(stage, add, status);
-        }
-      } else {
-        this.editModeStageChanges(stage, add, status);
-      }
-
-      stage.childSteps.forEach(function(step, index) {
-        this.editStageModeStep(step, status);
-      }, this);
-    };
-
+    
     this.editModeStageChanges = function(stage, add, status) {
 
       var leftVal = {};
