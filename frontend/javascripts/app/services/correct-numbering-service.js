@@ -1,7 +1,10 @@
 window.ChaiBioTech.ngApp.service('correctNumberingService', [
     function() {
-        this.canvasObj = null;
         
+        this.canvasObj = null;
+        this.oStatus = 0;
+        this.tempCircle = null;
+
         this.init = function(obj) {
             this.canvasObj = obj;
         };
@@ -41,7 +44,6 @@ window.ChaiBioTech.ngApp.service('correctNumberingService', [
             step.ordealStatus = this.oStatus;
             this.canvasObj.allStepViews.push(step);
             this.oStatus = this.oStatus + 1;
-
         };
 
     }
