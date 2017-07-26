@@ -24,7 +24,8 @@ angular.module("canvasApp").factory('moveStageRect', [
   'StagePositionService',
   'verticalLine',
   'moveStageIndicator',
-  function(ExperimentLoader, stageDude, stageGraphics, StagePositionService, verticalLine, moveStageIndicator) {
+  'correctNumberingService',
+  function(ExperimentLoader, stageDude, stageGraphics, StagePositionService, verticalLine, moveStageIndicator, correctNumberingService) {
 
     return {
       
@@ -287,7 +288,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           stageView.updateStageData(1);
           stageView.render();
           this.kanvas.configureStepsofNewStage(stageView, 0);
-          this.kanvas.correctNumbering();
+          correctNumberingService.correctNumbering();
           this.kanvas.allStageViews[0].moveAllStepsAndStagesSpecial();
           circleManager.addRampLines();
           this.kanvas.allStepViews[this.kanvas.allStepViews.length - 1].circle.doThingsForLast(null, null);

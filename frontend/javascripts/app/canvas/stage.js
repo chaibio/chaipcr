@@ -26,8 +26,8 @@ angular.module("canvasApp").factory('stage', [
   'stepGraphics',
   'constants',
   'circleManager',
-
-  function(ExperimentLoader, $rootScope, step, previouslySelected, stageGraphics, stepGraphics, constants, circleManager) {
+  'correctNumberingService',
+  function(ExperimentLoader, $rootScope, step, previouslySelected, stageGraphics, stepGraphics, constants, circleManager, correctNumberingService) {
 
     return function(model, stage, allSteps, index, fabricStage, $scope, insert) {
 
@@ -119,7 +119,7 @@ angular.module("canvasApp").factory('stage', [
         this.configureStep(newStep, start);
         this.parent.allStepViews.splice(currentStep.ordealStatus, 0, newStep);
 
-        this.parent.correctNumbering();
+        correctNumberingService.correctNumbering();
         newStep.circle.moveCircle();
         newStep.circle.getCircle();
 
@@ -187,7 +187,7 @@ angular.module("canvasApp").factory('stage', [
         // true imply call is from delete section;
         this.moveAllStepsAndStages(true);
 
-        this.parent.correctNumbering();
+        correctNumberingService.correctNumbering();
         //circleManager.addRampLines();
         circleManager.init(fabricStage);
         circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
@@ -257,7 +257,7 @@ angular.module("canvasApp").factory('stage', [
         this.model.steps.splice(index, 1);
         this.parent.allStepViews.splice(ordealStatus - 1, 1);
         
-        this.parent.correctNumbering();
+        correctNumberingService.correctNumbering();
         console.log("From step", this.childSteps.length);
       };
 

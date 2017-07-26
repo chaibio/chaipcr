@@ -38,9 +38,10 @@ angular.module("canvasApp").factory('canvas', [
   'StagePositionService',
   'StepPositionService',
   'Line',
+  'correctNumberingService',
   function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents,
     moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory, stageHitBlock, stageGraphics, 
-    StagePositionService, StepPositionService, Line) {
+    StagePositionService, StepPositionService, Line, correctNumberingService) {
 
     this.init = function(model) {
       
@@ -71,11 +72,14 @@ angular.module("canvasApp").factory('canvas', [
       this.imageobjects = {};
       angular.element('.canvas-loading').hide();
       if(this.canvas) this.canvas.clear();
+
       this.canvas = new fabric.Canvas('canvas', {
         backgroundColor: '#FFB300', selection: false, stateful: true,
         perPixelTargetFind: true, renderOnAddRemove: false, skipTargetFind: false,
       });
+
       circleManager.init(this);
+      correctNumberingService.init(this);
       new events(this, this.$scope); // Fire the events;
       this.loadImages();
     };
@@ -361,14 +365,7 @@ angular.module("canvasApp").factory('canvas', [
       stageView.updateStageData(1);
       stageView.render();
       this.insertStageGraphics(stageView, 0, "add_stage_at_beginning");
-      /*this.configureStepsofNewStage(stageView, 0);
-      this.correctNumbering();
-      stageView.moveAllStepsAndStages();
-      circleManager.addRampLines();
-      this.allStepViews[this.allStepViews.length - 1].circle.doThingsForLast(null, null);
-      stageGraphics.stageHeader.call(stageView);
-      this.$scope.applyValues(stageView.childSteps[0].circle);
-      stageView.childSteps[0].circle.manageClick(true);*/
+      
     };
 
     this.insertStageGraphics = function(stageView, ordealStatus, mode) {
@@ -389,38 +386,6 @@ angular.module("canvasApp").factory('canvas', [
       this.$scope.applyValues(stageView.childSteps[0].circle);
       stageView.childSteps[0].circle.manageClick(true);
       this.setDefaultWidthHeight();
-    };
-
-    this.correctNumbering = function() {
-
-      var oStatus = 1, that = this, tempCircle = null;
-      this.allStepViews = [];
-      this.allStageViews.forEach(function(stage, index) {
-        stage.stageMovedDirection = null;
-        //stage.sourceStage = false;
-        stage.index = index;
-        stage.stageCaption.setText("STAGE " + (index + 1) + ": " );
-
-        stage.childSteps.forEach(function(step, index) {
-          if(tempCircle) {
-            tempCircle.next = step.circle;
-            step.circle.previous = tempCircle;
-          } else {
-            step.circle.previous = null;
-          }
-
-          tempCircle = step.circle;
-          step.index = index;
-          // A quick fix, will be removed later
-          step.borderLeft.setVisible(false);
-          step.stepMovedDirection = null;
-          step.nextIsMoving = step.previousIsMoving = null;
-          step.ordealStatus = oStatus;
-          that.allStepViews.push(step);
-          oStatus = oStatus + 1;
-        });
-      });
-      tempCircle.next = null;
     };
 
     return this;

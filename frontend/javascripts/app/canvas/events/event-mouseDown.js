@@ -26,8 +26,9 @@ angular.module("canvasApp").factory('mouseDown', [
   'editMode',
   '$timeout',
   'movingStepGraphics',
+  'correctNumberingService',
   function(ExperimentLoader, previouslySelected, previouslyHoverd,
-   scrollService, circleManager, editMode, $timeout, movingStepGraphics) {
+   scrollService, circleManager, editMode, $timeout, movingStepGraphics, correctNumberingService) {
 
     /**************************************
         what happens when click is happening in canvas.
@@ -129,7 +130,7 @@ angular.module("canvasApp").factory('mouseDown', [
             that.calculateMoveLimit("stage", stage);
             stage.wireStageNextAndPrevious();
             stage.removeFromStagesArray();
-            C.correctNumbering();
+            correctNumberingService.correctNumbering();
             circleManager.togglePaths(false); //put it back later
 
             C.stageIndicator.init(evt.target.parent, C, evt.target);
