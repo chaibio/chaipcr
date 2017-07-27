@@ -11,7 +11,6 @@ window.ChaiBioTech.ngApp.service('editModeService', [
 
         this.editStageMode = function(status) {
             
-            var add = (status) ? 25 : -25;
             this.status = status;
 
             if(status === true) {
@@ -29,27 +28,68 @@ window.ChaiBioTech.ngApp.service('editModeService', [
             var count = this.canvasObj.allStageViews.length - 1;
             
             this.canvasObj.allStageViews.forEach(function(stage, index) {
-                this.editStageModeStage(stage, add, count, index);
+                this.editStageModeStage(stage, count, index);
             }, this);
 
             this.canvasObj.canvas.renderAll();
         };
 
-        this.editStageModeStage = function(stage, add, count, stageIndex) {
+        this.editStageModeStage = function(stage, count, stageIndex) {
 
             if(stageIndex === count) {
 
                 var lastStep = stage.childSteps[stage.childSteps.length - 1];
                 if(parseInt(lastStep.circle.model.hold_time) !== 0) {
-                    this.canvasObj.editModeStageChanges(stage, add, this.status);
+                    this.editModeStageChanges(stage);
                 }
             } else {
-                this.canvasObj.editModeStageChanges(stage, add, this.status);
+                this.editModeStageChanges(stage);
             }
 
             stage.childSteps.forEach(function(step, index) {
-                this.canvasObj.editStageModeStep(step, this.status);
+                this.editStageModeStep(step);
             }, this);
+        };
+
+        this.editModeStageChanges = function(stage) {
+
+            var leftVal = {};
+            stage.dots.setVisible(this.status);
+            stage.dots.setCoords();
+            this.canvasObj.canvas.bringToFront(stage.dots);
+            
+            if(this.status === true) {
+
+                if(stage.stageNameGroup.moved !== "right") {
+                    leftVal = {left: stage.stageNameGroup.left + 26};
+                    stage.stageNameGroup.set(leftVal).setCoords();
+                    stage.stageNameGroup.moved = "right";
+                }
+                if(stage.childSteps.length === 1) {
+                    stage.shortenStageName();
+                }
+            } else if(this.status === false) {
+                if(stage.stageNameGroup.moved === "right") {
+                    leftVal = {left: stage.stageNameGroup.left - 26};
+                    stage.stageNameGroup.set(leftVal).setCoords();
+                    stage.stageNameGroup.moved = false;
+                }
+                stage.stageHeader();
+            }
+        };
+
+        this.editStageModeStep = function(step) {
+
+            step.closeImage.setOpacity(this.status);
+            step.dots.setVisible(this.status).setCoords();
+
+
+            if( step.parentStage.model.auto_delta ) {
+                if( step.index === 0 ) {
+                    step.deltaSymbol.setVisible(!this.status);
+                }
+                step.deltaGroup.setVisible(!this.status);
+            }
         };
     }
 ]);

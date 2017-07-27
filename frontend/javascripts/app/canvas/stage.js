@@ -27,7 +27,9 @@ angular.module("canvasApp").factory('stage', [
   'constants',
   'circleManager',
   'correctNumberingService',
-  function(ExperimentLoader, $rootScope, step, previouslySelected, stageGraphics, stepGraphics, constants, circleManager, correctNumberingService) {
+  'editModeService',
+  function(ExperimentLoader, $rootScope, step, previouslySelected, stageGraphics, stepGraphics, constants, 
+  circleManager, correctNumberingService, editModeService) {
 
     return function(model, stage, allSteps, index, fabricStage, $scope, insert) {
 
@@ -148,7 +150,7 @@ angular.module("canvasApp").factory('stage', [
         this.configureStep(newStep, start);
         this.parent.allStepViews.splice(firstStepOrdealStatus, 0, newStep);
 
-        this.parent.correctNumbering();
+        correctNumberingService.correctNumbering();
         
         newStep.circle.moveCircle();
         newStep.circle.getCircle();
@@ -196,7 +198,7 @@ angular.module("canvasApp").factory('stage', [
         selected.circle.manageClick();
 
         if(this.parent.allStepViews.length === 1) {
-          this.parent.editStageMode(this.parent.editStageStatus);
+          editModeService.editStageMode(this.parent.editStageStatus);
         }
 
         this.parent.setDefaultWidthHeight();

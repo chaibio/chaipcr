@@ -214,72 +214,6 @@ angular.module("canvasApp").factory('canvas', [
       loadImageRecursion(0);
     };
 
-    this.editStageMode = function(status) {
-      editModeService.editStageMode(status);
-      /*
-      //StagePositionService.getPositionObject(this.allStageViews);
-      //console.log(StagePositionService.allPositions);
-      var add = (status) ? 25 : -25;
-
-      if(status === true) {
-        this.editStageStatus = status;
-        previouslySelected.circle.parent.manageFooter("black");
-        previouslySelected.circle.parent.parentStage.changeFillsAndStrokes("black", 4);
-      } else {
-        previouslySelected.circle.parent.manageFooter("white");
-        previouslySelected.circle.parent.parentStage.changeFillsAndStrokes("white", 2);
-        this.editStageStatus = status; //This order editStageStatus is changed is important, because changeFillsAndStrokes()
-      }
-
-      // Rewrite part for one stage one step Scenario.
-      var count = this.allStageViews.length - 1;
-      this.allStageViews.forEach(function(stage, index) {
-        this.editStageModeStage(stage, add, status, count, index);
-      }, this);
-      this.canvas.renderAll();*/
-    };
-
-    
-    this.editModeStageChanges = function(stage, add, status) {
-
-      var leftVal = {};
-      stage.dots.setVisible(status);
-      stage.dots.setCoords();
-      this.canvas.bringToFront(stage.dots);
-      if(status === true) {
-
-        if(stage.stageNameGroup.moved !== "right") {
-          leftVal = {left: stage.stageNameGroup.left + 26};
-          stage.stageNameGroup.set(leftVal).setCoords();
-          stage.stageNameGroup.moved = "right";
-        }
-        if(stage.childSteps.length === 1) {
-          stage.shortenStageName();
-        }
-      } else if(status === false) {
-        if(stage.stageNameGroup.moved === "right") {
-          leftVal = {left: stage.stageNameGroup.left - 26};
-          stage.stageNameGroup.set(leftVal).setCoords();
-          stage.stageNameGroup.moved = false;
-        }
-        stage.stageHeader();
-      }
-    };
-
-    this.editStageModeStep = function(step, status) {
-
-      step.closeImage.setOpacity(status);
-      step.dots.setVisible(status).setCoords();
-
-
-      if( step.parentStage.model.auto_delta ) {
-        if( step.index === 0 ) {
-          step.deltaSymbol.setVisible(!status);
-        }
-        step.deltaGroup.setVisible(!status);
-      }
-    };
-
     this.makeSpaceForNewStage = function(data, currentStage, add) {
 
       data.stage.steps.forEach(function(step) {
@@ -359,7 +293,7 @@ angular.module("canvasApp").factory('canvas', [
     this.insertStageGraphics = function(stageView, ordealStatus, mode) {
 
       this.configureStepsofNewStage(stageView, ordealStatus);
-      this.correctNumbering();
+      correctNumberingService.correctNumbering();
 
       if(mode === "move_stage_back_to_original") {
         console.log("YES ", mode);
