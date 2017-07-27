@@ -11,6 +11,8 @@ import { AuthHttp } from './services/auth_http/auth_http.service';
 import { SessionService } from './services/session/session.service';
 import { ExperimentService } from './services/experiment/experiment.service'
 import { WindowRef } from './services/windowref/windowref.service'
+import { StatusService } from './services/status/status.service'
+
 import { LogoutDirective } from './directives/logout/logout.directive'
 import { FullHeightDirective } from './directives/full-height/full-height.directive'
 
@@ -33,10 +35,11 @@ import { FullHeightDirective } from './directives/full-height/full-height.direct
   ],
   providers: [
     Title,
-    AuthHttp,
     SessionService,
     ExperimentService,
+    StatusService,
     WindowRef,
+    AuthHttp,
     { provide: APP_BASE_HREF, useValue: '/' },
   ]
 })

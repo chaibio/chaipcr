@@ -35,5 +35,6 @@
 /public/*.otf
 /public/*.map
 /public/*.js
+/public/*.css
 /public/index.html
 /public/3rdpartylicenses.txt
