@@ -81,7 +81,8 @@ window.ChaiBioTech.ngApp.service('editModeService', [
         this.editStageModeStep = function(step) {
 
             step.closeImage.setOpacity(this.status);
-            step.dots.setVisible(this.status).setCoords();
+            step.dots.setVisible(this.status);
+            step.dots.setCoords();
 
 
             if( step.parentStage.model.auto_delta ) {
