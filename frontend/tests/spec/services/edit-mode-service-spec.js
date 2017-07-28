@@ -190,4 +190,83 @@ describe("Testing editModeService", function() {
         expect(step.deltaSymbol.setVisible).not.toHaveBeenCalled();
         expect(step.deltaGroup.setVisible).toHaveBeenCalled();
     });
+
+    it("It should test editStageModeStep method", function() {
+        
+        step = {
+            deltaGroup: {
+                setVisible: function() {}
+            },
+            deltaSymbol: {
+                setVisible: function() {}
+            },
+            closeImage: {
+                setOpacity: function() {}
+            },
+            dots: {
+                setVisible: function() {},
+                setCoords: function() {}
+            },
+            index: 0,
+            parentStage: {
+                model: {
+                    auto_delta: 1
+                }
+            }
+        };
+
+        spyOn(step.closeImage, "setOpacity");
+        spyOn(step.dots, "setVisible");
+        spyOn(step.dots, "setCoords");
+        spyOn(step.deltaSymbol, "setVisible");
+        spyOn(step.deltaGroup, "setVisible");
+
+        _editModeService.editStageModeStep(step);
+
+        expect(step.closeImage.setOpacity).toHaveBeenCalled();
+        expect(step.dots.setVisible).toHaveBeenCalled();
+        expect(step.dots.setCoords).toHaveBeenCalled();
+        expect(step.deltaSymbol.setVisible).toHaveBeenCalled();
+        expect(step.deltaGroup.setVisible).toHaveBeenCalled();
+    });
+
+
+    it("It should test editStageModeStep method when auto_delta == 0", function() {
+        
+        step = {
+            deltaGroup: {
+                setVisible: function() {}
+            },
+            deltaSymbol: {
+                setVisible: function() {}
+            },
+            closeImage: {
+                setOpacity: function() {}
+            },
+            dots: {
+                setVisible: function() {},
+                setCoords: function() {}
+            },
+            index: 1,
+            parentStage: {
+                model: {
+                    auto_delta: 0
+                }
+            }
+        };
+
+        spyOn(step.closeImage, "setOpacity");
+        spyOn(step.dots, "setVisible");
+        spyOn(step.dots, "setCoords");
+        spyOn(step.deltaSymbol, "setVisible");
+        spyOn(step.deltaGroup, "setVisible");
+
+        _editModeService.editStageModeStep(step);
+
+        expect(step.closeImage.setOpacity).toHaveBeenCalled();
+        expect(step.dots.setVisible).toHaveBeenCalled();
+        expect(step.dots.setCoords).toHaveBeenCalled();
+        expect(step.deltaSymbol.setVisible).not.toHaveBeenCalled();
+        expect(step.deltaGroup.setVisible).not.toHaveBeenCalled();
+    });
 });
