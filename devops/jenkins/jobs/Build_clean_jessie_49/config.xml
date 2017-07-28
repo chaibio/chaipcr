@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<com.tikal.jenkins.plugins.multijob.MultiJobProject plugin="jenkins-multijob-plugin@1.25">
+<com.tikal.jenkins.plugins.multijob.MultiJobProject plugin="jenkins-multijob-plugin@1.26">
   <actions/>
   <description>Flash the BB with a Jessie 49 and add 3rd party software.</description>
   <keepDependencies>false</keepDependencies>
@@ -34,6 +34,11 @@
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>output_image_prefix</name>
+          <description></description>
+          <defaultValue>Jessie49Clean</defaultValue>
+        </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -60,7 +65,7 @@
           <abortAllJob>true</abortAllJob>
           <condition></condition>
           <configs>
-            <hudson.plugins.parameterizedtrigger.CurrentBuildParameters plugin="parameterized-trigger@2.34"/>
+            <hudson.plugins.parameterizedtrigger.CurrentBuildParameters plugin="parameterized-trigger@2.35.1"/>
           </configs>
           <killPhaseOnJobResultCondition>FAILURE</killPhaseOnJobResultCondition>
           <buildOnlyIfSCMChanges>false</buildOnlyIfSCMChanges>

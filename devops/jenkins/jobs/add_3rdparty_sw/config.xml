@@ -112,15 +112,14 @@ then
 	echo sshd_config on $build_machine was patched already
 else
 	echo patching sshd_config
-	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
-KexAlgorithms diffie-hellman-group1-sha1
-KexAlgorithms ecdh-sha2-nistp256
-KexAlgorithms ecdh-sha2-nistp384
-KexAlgorithms ecdh-sha2-nistp521
-KexAlgorithms diffie-hellman-group-exchange-sha256
-KexAlgorithms diffie-hellman-group14-sha1
-#Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+    
+    cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
+KexAlgorithms diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+
 EOF
+	ssh-keygen -A || true
+
 	sudo service sshd restart
     sudo service ssh restart
     /etc/init.d/ssh restart
@@ -149,7 +148,7 @@ done
 echo done connection check.
 </command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo &quot;Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}&quot;
 echo &quot;Slave Beaglebone at ${build_machine}&quot;
@@ -172,18 +171,21 @@ then
   exit 1
 fi
 dpkg --configure -a</command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>exit 0
 
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>exit 0
 
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -231,7 +233,7 @@ done
 echo timeout waiting for the device to become ready!
 exit 1</command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>exit 0
 echo Updating kernel on $build_machine
@@ -270,8 +272,9 @@ shutdown -r 1
 echo restart scheduled after a min
 sleep 30
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>#	echo update sources# if not updated?
 echo kernel is updated	
@@ -315,6 +318,7 @@ sync
 shutdown -r 1
 echo a reboot is scheduled after a minute.
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -335,7 +339,7 @@ done
 echo timeout waiting for the device to become ready!
 exit 1</command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>#!/bin/bash
 apt-get update
@@ -413,8 +417,9 @@ echo Installing mysql client package
 sudo -E apt-get install -y -q --allow-unauthenticated libmysqlclient-dev
 echo done installing mysql
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Update Software
 apt-key update
@@ -487,6 +492,7 @@ exit 0
 #libpoco-dev can apt-get poco; but guess an old version 1.3?
 
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -508,7 +514,7 @@ echo timeout waiting for the device to become ready!
 exit 1
 </command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo arranging to build julia and different libs
 cpufreq-info
@@ -542,8 +548,9 @@ sync
  fsck /dev/mmcblk1p1 -y -f
 
 exit 0</command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Setup MySQL
 systemctl stop mysql.service
@@ -578,14 +585,16 @@ sync
 fsck /dev/mmcblk1p1 -y -f
 
 exit 0</command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>
 exit 0
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo cleanup without envs
 
@@ -780,8 +789,9 @@ rm jsonlite_0.9.19.tar.gz
 
 
 exit 0</command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo downloading and installing Julia
 cpufreq-info
@@ -979,8 +989,9 @@ fsck /dev/mmcblk0p1 -y -f
 
 exit 0
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>if $bypass_julia
 then
@@ -998,8 +1009,9 @@ exit 0
 
 
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>#echo cleaning julia build
 #cd /sdcard/upgrade
@@ -1029,8 +1041,9 @@ fsck /dev/mmcblk1p1 -y -f
 fsck /dev/mmcblk0p1 -y -f
 
 exit 0</command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Install Ruby Packages
 
@@ -1047,8 +1060,9 @@ gem install bundle
 #apt-get -q -y install nodejs 
 #gem install nodejs
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Build gems with native extensions
 bundle config build.atomic --use-system-libraries
@@ -1056,8 +1070,9 @@ bundle config build.json --use-system-libraries
 bundle config build.sqlite3 --use-system-libraries
 bundle config build.nokogiri --use-system-libraries
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Remote Support Access
 sync
@@ -1086,22 +1101,25 @@ wget $download_prefex/ngrok_2.0.19_linux_arm.zip  --no-check-certificate
 unzip -o ngrok_2.0.19_linux_arm.zip
 rm ngrok_2.0.19_linux_arm.zip
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo removing service user password
 #Edit /etc/shadow, remove password for service by setting pw to *
 passwd service -d
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo installing boost
 sync
 apt-get -q -y install libboost-all-dev
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo zeroing
 
@@ -1129,6 +1147,7 @@ then
 fi
 
 echo basic beaglebone setup done!</command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#build( &quot;create_factory_settings_sdcard&quot;, build_machine:&quot;$build_machine&quot;, output_sdcard:&quot;/dev/sdb&quot;)
