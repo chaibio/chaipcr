@@ -269,4 +269,183 @@ describe("Testing editModeService", function() {
         expect(step.deltaSymbol.setVisible).not.toHaveBeenCalled();
         expect(step.deltaGroup.setVisible).not.toHaveBeenCalled();
     });
+
+    it("It should test editModeStageChanges method when status is true", function() {
+
+        var stage = {
+            childSteps: [
+                { index: 1 },
+            ],
+            shortenStageName: function() {},
+            dots: {
+                setCoords: function() {},
+                setVisible: function() {}
+            },
+            stageHeader: function() {},
+            stageNameGroup: {
+                moved: "left",
+                left: 100,
+                set: function() {},
+                setCoords: function() {}
+            }
+        };
+
+        _editModeService.status = true;
+
+        _editModeService.canvasObj = {
+            canvas: {
+                bringToFront: function() {}
+            }
+        };
+
+        spyOn(stage, "shortenStageName");
+        spyOn(stage.dots, "setCoords");
+        spyOn(stage.dots, "setVisible");
+        spyOn(stage, "stageHeader");
+        spyOn(stage.stageNameGroup, "set");
+        spyOn(stage.stageNameGroup, "setCoords");
+
+        _editModeService.editModeStageChanges(stage);
+
+        expect(stage.dots.setCoords).toHaveBeenCalled();
+        expect(stage.dots.setVisible).toHaveBeenCalled();
+        expect(stage.stageNameGroup.moved).toEqual("right");
+        expect(stage.shortenStageName).toHaveBeenCalled();
+        expect(stage.stageHeader).not.toHaveBeenCalled();
+    });
+
+    it("It should test editModeStageChanges method when status is true looking at else paths", function() {
+
+        var stage = {
+            childSteps: [
+                { index: 1 },
+                { index: 2 },
+                { index: 3 },
+            ],
+            shortenStageName: function() {},
+            dots: {
+                setCoords: function() {},
+                setVisible: function() {}
+            },
+            stageHeader: function() {},
+            stageNameGroup: {
+                moved: "right",
+                left: 100,
+                set: function() {},
+                setCoords: function() {}
+            }
+        };
+
+        _editModeService.status = true;
+
+        _editModeService.canvasObj = {
+            canvas: {
+                bringToFront: function() {}
+            }
+        };
+
+        spyOn(stage, "shortenStageName");
+        spyOn(stage.dots, "setCoords");
+        spyOn(stage.dots, "setVisible");
+        spyOn(stage, "stageHeader");
+        spyOn(stage.stageNameGroup, "set");
+        spyOn(stage.stageNameGroup, "setCoords");
+
+        _editModeService.editModeStageChanges(stage);
+
+        expect(stage.stageNameGroup.set).not.toHaveBeenCalled();
+        expect(stage.stageNameGroup.setCoords).not.toHaveBeenCalled();
+        expect(stage.shortenStageName).not.toHaveBeenCalled();
+        expect(stage.stageHeader).not.toHaveBeenCalled();
+    });
+
+    it("It should test editModeStageChanges method when status is false", function() {
+
+        var stage = {
+            childSteps: [
+                { index: 1 },
+                { index: 2 },
+                { index: 3 },
+            ],
+            shortenStageName: function() {},
+            dots: {
+                setCoords: function() {},
+                setVisible: function() {}
+            },
+            stageHeader: function() {},
+            stageNameGroup: {
+                moved: "right",
+                left: 100,
+                set: function() {},
+                setCoords: function() {}
+            }
+        };
+
+        _editModeService.status = false;
+
+        _editModeService.canvasObj = {
+            canvas: {
+                bringToFront: function() {}
+            }
+        };
+
+        spyOn(stage, "shortenStageName");
+        spyOn(stage.dots, "setCoords");
+        spyOn(stage.dots, "setVisible");
+        spyOn(stage, "stageHeader");
+        spyOn(stage.stageNameGroup, "set");
+        spyOn(stage.stageNameGroup, "setCoords");
+
+        _editModeService.editModeStageChanges(stage);
+
+        expect(stage.stageNameGroup.set).toHaveBeenCalled();
+        expect(stage.stageNameGroup.setCoords).toHaveBeenCalled();
+        expect(stage.stageNameGroup.moved).toEqual(false);
+        expect(stage.stageHeader).toHaveBeenCalled();
+    });
+
+    it("It should test editModeStageChanges method when status is false and moved !== right", function() {
+
+        var stage = {
+            childSteps: [
+                { index: 1 },
+                { index: 2 },
+                { index: 3 },
+            ],
+            shortenStageName: function() {},
+            dots: {
+                setCoords: function() {},
+                setVisible: function() {}
+            },
+            stageHeader: function() {},
+            stageNameGroup: {
+                moved: "left",
+                left: 100,
+                set: function() {},
+                setCoords: function() {}
+            }
+        };
+
+        _editModeService.status = false;
+
+        _editModeService.canvasObj = {
+            canvas: {
+                bringToFront: function() {}
+            }
+        };
+
+        spyOn(stage, "shortenStageName");
+        spyOn(stage.dots, "setCoords");
+        spyOn(stage.dots, "setVisible");
+        spyOn(stage, "stageHeader");
+        spyOn(stage.stageNameGroup, "set");
+        spyOn(stage.stageNameGroup, "setCoords");
+
+        _editModeService.editModeStageChanges(stage);
+
+        expect(stage.stageNameGroup.set).not.toHaveBeenCalled();
+        expect(stage.stageNameGroup.setCoords).not.toHaveBeenCalled();
+        
+        expect(stage.stageHeader).toHaveBeenCalled();
+    });
 });

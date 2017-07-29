@@ -62,7 +62,8 @@ window.ChaiBioTech.ngApp.service('editModeService', [
 
                 if(stage.stageNameGroup.moved !== "right") {
                     leftVal = {left: stage.stageNameGroup.left + 26};
-                    stage.stageNameGroup.set(leftVal).setCoords();
+                    stage.stageNameGroup.set(leftVal);
+                    stage.stageNameGroup.setCoords();
                     stage.stageNameGroup.moved = "right";
                 }
                 if(stage.childSteps.length === 1) {
@@ -71,7 +72,8 @@ window.ChaiBioTech.ngApp.service('editModeService', [
             } else if(this.status === false) {
                 if(stage.stageNameGroup.moved === "right") {
                     leftVal = {left: stage.stageNameGroup.left - 26};
-                    stage.stageNameGroup.set(leftVal).setCoords();
+                    stage.stageNameGroup.set(leftVal);
+                    stage.stageNameGroup.setCoords();
                     stage.stageNameGroup.moved = false;
                 }
                 stage.stageHeader();
