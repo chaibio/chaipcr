@@ -40,9 +40,10 @@ angular.module("canvasApp").factory('canvas', [
   'Line',
   'correctNumberingService',
   'editModeService',
+  'addStageService',
   function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents,
     moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory, stageHitBlock, stageGraphics, 
-    StagePositionService, StepPositionService, Line, correctNumberingService, editModeService) {
+    StagePositionService, StepPositionService, Line, correctNumberingService, editModeService, addStageService) {
 
     this.init = function(model) {
       
@@ -82,6 +83,7 @@ angular.module("canvasApp").factory('canvas', [
       circleManager.init(this);
       correctNumberingService.init(this);
       editModeService.init(this);
+      addStageService.init(this);
       new events(this, this.$scope); // Fire the events;
       this.loadImages();
     };
@@ -157,20 +159,17 @@ angular.module("canvasApp").factory('canvas', [
         this.stageIndicator = moveStageRect.getMoveStageRect(this);
         this.stageVerticalLine = this.stageIndicator.verticalLine;
         this.stepVerticalLine = this.stepIndicator.verticalLine;
-        
-        //this.hitBlock = stageHitBlock.getStageHitBlock(this);
 
         this.canvas.add(this.stepIndicator);
         this.canvas.add(this.stageIndicator);
         this.canvas.add(this.stageVerticalLine);
         this.canvas.add(this.stepVerticalLine);
         
-        //this.canvas.add(this.hitBlock);
         this.addMoveDots(); // This is for movestep
     };
 
     this.addMoveDots = function() {
-
+      // Move-dots are the dots showing up at the place of a step [top to bottom], when we click on move-step
       var arr = dots.stepStageMoveDots();
       this.imageobjects["move-step-on.png"].setTop(328);
       this.imageobjects["move-step-on.png"].setLeft(-2);
@@ -212,102 +211,6 @@ angular.module("canvasApp").factory('canvas', [
       };
 
       loadImageRecursion(0);
-    };
-
-    this.makeSpaceForNewStage = function(data, currentStage, add) {
-
-      data.stage.steps.forEach(function(step) {
-        currentStage.myWidth = currentStage.myWidth + add;
-        currentStage.moveAllStepsAndStages(false);
-      });
-      return currentStage;
-    };
-
-    this.addNextandPrevious = function(currentStage, stageView) {
-
-      if(currentStage) {
-        if(currentStage.nextStage) {
-          stageView.nextStage = currentStage.nextStage;
-          stageView.nextStage.previousStage = stageView;
-        }
-        currentStage.nextStage = stageView;
-        stageView.previousStage = currentStage;
-      } else if (! currentStage) { // if currentStage is null, It means we are inserting at very first
-        stageView.nextStage = this.allStageViews[0];
-        this.allStageViews[0].previousStage = stageView;
-      }
-
-    };
-
-    this.configureStepsofNewStage = function(stageView, ordealStatus) {
-
-      stageView.childSteps.forEach(function(step) {
-
-        step.ordealStatus = ordealStatus + 1;
-        step.render();
-        //Important
-        step.circle.moveCircle();
-        step.circle.getCircle();
-        //
-        this.allStepViews.splice(ordealStatus, 0, step);
-        ordealStatus = ordealStatus + 1;
-      }, this);
-    };
-
-    this.addNewStage = function(data, currentStage, mode) {
-      //move the stages, make space.
-      var ordealStatus = currentStage.childSteps[currentStage.childSteps.length - 1].ordealStatus;
-      var originalWidth = currentStage.myWidth;
-      var add = (data.stage.steps.length > 0) ? 128 + Math.floor(constants.newStageOffset / data.stage.steps.length) : 128;
-
-      currentStage = this.makeSpaceForNewStage(data, currentStage, add);
-      // okay we puhed stages in front by inflating the current stage and put the old value back.
-      currentStage.myWidth = originalWidth;
-
-      // now create a stage;
-      var stageIndex = currentStage.index + 1;
-      var stageView = new stage(data.stage, this.canvas, this.allStepViews, stageIndex, this, this.$scope, true);
-
-      this.addNextandPrevious(currentStage, stageView);
-      stageView.updateStageData(1);
-      this.allStageViews.splice(stageIndex, 0, stageView);
-      stageView.render();
-      // configure steps;
-      this.insertStageGraphics(stageView, ordealStatus, mode);
-    };
-
-    this.addNewStageAtBeginning = function(stageToBeReplaced, data) {
-
-      var add = (data.stage.steps.length > 0) ? 128 + Math.floor(constants.newStageOffset / data.stage.steps.length) : 128;
-      var stageIndex = 0;
-      var stageView = new stage(data.stage, this.canvas, this.allStepViews, stageIndex, this, this.$scope, true);
-      this.addNextandPrevious(null, stageView);
-      this.allStageViews.splice(stageIndex, 0, stageView);
-
-      stageView.updateStageData(1);
-      stageView.render();
-      this.insertStageGraphics(stageView, 0, "add_stage_at_beginning");
-      
-    };
-
-    this.insertStageGraphics = function(stageView, ordealStatus, mode) {
-
-      this.configureStepsofNewStage(stageView, ordealStatus);
-      correctNumberingService.correctNumbering();
-
-      if(mode === "move_stage_back_to_original") {
-        console.log("YES ", mode);
-        this.allStageViews[0].getLeft();
-        this.allStageViews[0].moveAllStepsAndStagesSpecial(false);
-      } else {
-        this.allStageViews[0].moveAllStepsAndStages(false);
-        //stageView.moveAllStepsAndStages(false);
-      }
-      circleManager.addRampLines();
-      stageView.stageHeader();
-      this.$scope.applyValues(stageView.childSteps[0].circle);
-      stageView.childSteps[0].circle.manageClick(true);
-      this.setDefaultWidthHeight();
     };
 
     return this;

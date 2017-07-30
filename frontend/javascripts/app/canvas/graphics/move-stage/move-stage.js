@@ -25,7 +25,9 @@ angular.module("canvasApp").factory('moveStageRect', [
   'verticalLine',
   'moveStageIndicator',
   'correctNumberingService',
-  function(ExperimentLoader, stageDude, stageGraphics, StagePositionService, verticalLine, moveStageIndicator, correctNumberingService) {
+  'addStageService',
+  function(ExperimentLoader, stageDude, stageGraphics, StagePositionService, verticalLine, 
+  moveStageIndicator, correctNumberingService, addStageService) {
 
     return {
       
@@ -267,7 +269,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           var stageIndex = (this.currentDrop) ? this.currentDrop.index : 0;
           var model = this.draggedStage.model;
           var stageView = this.getNewStage(model, stageIndex);
-          this.kanvas.addNextandPrevious(this.currentDrop, stageView);
+          addStageService.addNextandPrevious(this.currentDrop, stageView);
 
           if(stageIndex === 0 && !this.currentDrop) { //if we insert into the very first place.
             this.kanvas.allStageViews.splice(stageIndex, 0, stageView);
@@ -287,7 +289,7 @@ angular.module("canvasApp").factory('moveStageRect', [
 
           stageView.updateStageData(1);
           stageView.render();
-          this.kanvas.configureStepsofNewStage(stageView, 0);
+          addStageService.configureStepsofNewStage(stageView, 0);
           correctNumberingService.correctNumbering();
           this.kanvas.allStageViews[0].moveAllStepsAndStagesSpecial();
           circleManager.addRampLines();

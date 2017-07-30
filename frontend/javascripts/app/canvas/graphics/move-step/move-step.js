@@ -32,9 +32,10 @@ angular.module("canvasApp").factory('moveStepRect', [
   'StageMovementLeftService',
   'StepMoveVoidSpaceRightService',
   'StepMoveVoidSpaceLeftService',
+  'addStageService',
   function(ExperimentLoader, previouslySelected, circleManager, StepPositionService, moveStepIndicator, verticalLineStepGroup, StagePositionService,
   movingStepGraphics, StepMovementRightService, StepMovementLeftService, StageMovementRightService, StageMovementLeftService,
-  StepMoveVoidSpaceRightService, StepMoveVoidSpaceLeftService) {
+  StepMoveVoidSpaceRightService, StepMoveVoidSpaceLeftService, addStageService) {
 
     return {
 
@@ -185,9 +186,9 @@ angular.module("canvasApp").factory('moveStepRect', [
             };
             
             if(step.parentStage.previousStage) {
-              this.kanvas.addNewStage(data, step.parentStage.previousStage, "move_stage_back_to_original");
+              addStageService.addNewStage(data, step.parentStage.previousStage, "move_stage_back_to_original");
             } else {
-              this.kanvas.addNewStageAtBeginning({}, data);
+              addStageService.addNewStageAtBeginning({}, data);
             }
             return true;
           }
