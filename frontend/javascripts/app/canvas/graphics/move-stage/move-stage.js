@@ -282,7 +282,7 @@ angular.module("canvasApp").factory('moveStageRect', [
         };
 
         this.indicator.getNewStage = function(model, stageIndex) {
-          return new stageDude(model, this.kanvas.canvas, this.kanvas.allStepViews, stageIndex, this.kanvas, this.kanvas.$scope, true);
+          return new stageDude(model, this.kanvas, stageIndex, true, this.kanvas.$scope);
         };
 
         this.indicator.moveStageGraphics = function(stageView, circleManager) {

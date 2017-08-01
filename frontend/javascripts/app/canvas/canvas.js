@@ -135,7 +135,7 @@ angular.module("canvasApp").factory('canvas', [
 
     this.addStagesMapCallback = function(stageData, index) {
       
-      stageView = new stage(stageData, this, index, false, this.$scope);
+      stageView = new stage(stageData.stage, this, index, false, this.$scope);
       // We connect the stages like a linked list so that we can go up and down.
       if(this.tempPreviousStage) {
         this.tempPreviousStage.nextStage = stageView;

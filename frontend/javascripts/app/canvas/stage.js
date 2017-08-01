@@ -31,9 +31,9 @@ angular.module("canvasApp").factory('stage', [
   function(ExperimentLoader, $rootScope, step, previouslySelected, stageGraphics, stepGraphics, constants, 
   circleManager, correctNumberingService, editModeService) {
 
-    return function(stageData, kanvas, index, insert, $scope) {
+    return function(model, kanvas, index, insert, $scope) {
 
-      this.model = stageData.stage;
+      this.model = model;
       this.index = index;
       this.canvas = kanvas.canvas;
       this.myWidth = (this.model.steps.length * (constants.stepWidth)) + constants.additionalWidth;
@@ -66,18 +66,6 @@ angular.module("canvasApp").factory('stage', [
         this.stageRect.setWidth(this.myWidth);
         this.stageRect.setCoords();
         this.roof.setWidth(this.myWidth);
-      };
-
-      this.shrinkStage = function() {
-        
-        this.shrinked = true;
-        this.myWidth = this.myWidth - 64;
-        this.roof.setWidth(this.myWidth).setCoords();
-        this.stageRect.setWidth(this.myWidth).setCoords();
-        // Befor actually move the step in process movement stage values.
-        // Find next stageDots
-        // Move all the steps in it to left.
-        // Move stage to left ...!!
       };
 
       this.collapseStage = function() {
