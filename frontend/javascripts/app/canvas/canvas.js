@@ -135,7 +135,7 @@ angular.module("canvasApp").factory('canvas', [
 
     this.addStagesMapCallback = function(stageData, index) {
       
-      stageView = new stage(stageData.stage, this.canvas, this.allStepViews, index, this, this.$scope, false);
+      stageView = new stage(stageData, this, index, false, this.$scope);
       // We connect the stages like a linked list so that we can go up and down.
       if(this.tempPreviousStage) {
         this.tempPreviousStage.nextStage = stageView;
@@ -205,7 +205,6 @@ angular.module("canvasApp").factory('canvas', [
       return new fabric.Group(arr, {
         width: 40, left: 16, top: 35, backgroundColor: "white", visible: false
       });
-      
     };
     
     this.loadImages = function() {

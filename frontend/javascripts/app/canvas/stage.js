@@ -31,13 +31,13 @@ angular.module("canvasApp").factory('stage', [
   function(ExperimentLoader, $rootScope, step, previouslySelected, stageGraphics, stepGraphics, constants, 
   circleManager, correctNumberingService, editModeService) {
 
-    return function(model, stage, allSteps, index, fabricStage, $scope, insert) {
+    return function(stageData, kanvas, index, insert, $scope) {
 
-      this.model = model;
+      this.model = stageData.stage;
       this.index = index;
-      this.canvas = stage;
+      this.canvas = kanvas.canvas;
       this.myWidth = (this.model.steps.length * (constants.stepWidth)) + constants.additionalWidth;
-      this.parent = fabricStage;
+      this.parent = kanvas;
       this.childSteps = [];
       this.previousStage = this.nextStage = this.noOfCycles = null;
       this.insertMode = insert;
@@ -580,8 +580,8 @@ angular.module("canvasApp").factory('stage', [
           that.childSteps.push(stepView);
 
           if(! that.insertMode) {
-            allSteps.push(stepView);
-            stepView.ordealStatus = allSteps.length;
+            that.parent.allStepViews.push(stepView);
+            stepView.ordealStatus = that.parent.allStepViews.length;
             stepView.render();
           }
 
