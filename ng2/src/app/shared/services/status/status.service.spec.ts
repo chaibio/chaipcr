@@ -1,0 +1,123 @@
+import {
+  TestBed,
+  async,
+  inject,
+  tick,
+  fakeAsync,
+  discardPeriodicTasks
+} from '@angular/core/testing'
+
+import {
+  MockBackend,
+  MockConnection
+} from '@angular/http/testing'
+
+import {
+  Response,
+  ResponseOptions,
+  XHRBackend,
+  HttpModule
+} from '@angular/http'
+
+import { AuthHttp } from '../auth_http/auth_http.service'
+import { StatusService } from './status.service'
+import { WindowRef } from '../windowref/windowref.service'
+import { StatusData } from '../../models/status.model'
+import { mockStatusReponse } from './mock-status-response'
+import { initialStatusData } from './initial-status-data'
+
+describe('StatusService', () => {
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpModule],
+      providers: [
+        { provide: XHRBackend, useClass: MockBackend },
+        WindowRef,
+        AuthHttp,
+        StatusService,
+      ]
+    })
+  }))
+
+  it('should fetch /status and emit the response', inject(
+    [AuthHttp, XHRBackend, WindowRef, StatusService],
+    (http: AuthHttp, backend: MockBackend, w: WindowRef, srv: StatusService) => {
+
+      const expectedData: StatusData = {
+        experiment_controller: {
+          machine: {
+            state: 'idle',
+            thermal_state: 'idle'
+          }
+        },
+        heat_block: {
+          zone1: {
+            temperature: 24.6760006,
+            target_temperature: 0,
+            drive: -0
+          },
+          zone2: {
+            temperature: 26.0189991,
+            target_temperature: 0,
+            drive: -0
+          },
+          temperature: 25.3470001
+        },
+        lid: {
+          temperature: 27.0949993,
+          target_temperature: 0,
+          drive: 0
+        },
+        optics: {
+          intensity: 60,
+          collect_data: false,
+          lid_open: false,
+          well_number: 0,
+          photodiode_value: [
+            2538
+          ]
+        },
+        heat_sink: {
+          temperature: 26.4319992,
+          fan_drive: 0
+        },
+        device: {
+          update_available: 'unavailable'
+        }
+      }
+
+      backend.connections.subscribe((con: MockConnection) => {
+        con.mockRespond(new Response(new ResponseOptions({
+          body: mockStatusReponse
+        })))
+      })
+
+      spyOn(http, 'get').and.callThrough()
+
+      const dataUpdateSpy = jasmine.createSpy('status:data:updated')
+
+      srv.$data.subscribe(dataUpdateSpy)
+      expect(dataUpdateSpy).toHaveBeenCalledWith(initialStatusData)
+      srv.fetchData().subscribe(() => {
+        expect(http.get).toHaveBeenCalledWith(`http://${w.nativeWindow().location.hostname}:8000/status`)
+        expect(dataUpdateSpy).toHaveBeenCalledWith(expectedData)
+      })
+
+    }
+  ))
+
+  it('should call status.fetchData every second', inject(
+    [WindowRef, StatusService],
+    (wref: WindowRef, statusService: StatusService) => {
+      fakeAsync(() => {
+        spyOn(statusService, 'fetchData')
+        statusService.startSync()
+        tick(5000)
+        expect(statusService.fetchData).toHaveBeenCalledTimes(5)
+        discardPeriodicTasks()
+      })()
+    }
+  ))
+
+})
