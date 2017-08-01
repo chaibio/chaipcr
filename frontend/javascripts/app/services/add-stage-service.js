@@ -46,8 +46,8 @@ window.ChaiBioTech.ngApp.service('addStageService', [
 
             if(currentStage) {
                 if(currentStage.nextStage) {
-                stageView.nextStage = currentStage.nextStage;
-                stageView.nextStage.previousStage = stageView;
+                    stageView.nextStage = currentStage.nextStage;
+                    stageView.nextStage.previousStage = stageView;
                 }
                 currentStage.nextStage = stageView;
                 stageView.previousStage = currentStage;

@@ -41,9 +41,10 @@ angular.module("canvasApp").factory('canvas', [
   'correctNumberingService',
   'editModeService',
   'addStageService',
+  'loadImageService',
   function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents,
     moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory, stageHitBlock, stageGraphics, 
-    StagePositionService, StepPositionService, Line, correctNumberingService, editModeService, addStageService) {
+    StagePositionService, StepPositionService, Line, correctNumberingService, editModeService, addStageService, loadImageService) {
 
     this.init = function(model) {
       
@@ -188,29 +189,14 @@ angular.module("canvasApp").factory('canvas', [
       });
       this.canvas.add(this.moveDots);
     };
-    /*******************************************************/
-      /* This method adds those footer images on the step. Its a tricky one beacuse images
-         are taking longer time to load. So we load it once and clone it to all the steps.
-         It uses recursive function to do the job. See the inner function mainWrapper()
-      */
-    /*******************************************************/
-
+    
     this.loadImages = function() {
-
-      var noOfImages = this.images.length - 1;
       var that = this;
-      loadImageRecursion = function(index) {
-        fabric.Image.fromURL(that.imageLocation + that.images[index], function(img) {
-          that.imageobjects[that.images[index]] = img;
-          if(index < noOfImages) {
-            loadImageRecursion(++index);
-          } else {
-            that.canvas.fire("imagesLoaded");
-          }
-        });
-      };
-
-      loadImageRecursion(0);
+      loadImageService.getImages(this.images).then(function(iData) {
+        that.imageobjects = iData;
+        that.canvas.fire("imagesLoaded");
+      });
+      
     };
 
     return this;
