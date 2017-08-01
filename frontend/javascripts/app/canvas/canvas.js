@@ -121,26 +121,30 @@ angular.module("canvasApp").factory('canvas', [
         // Tests take this data; need to plug data before this, [update when writing tests for canvas];
         allStages = [{"stage":{"id":405,"stage_type":"holding","name":"Holding Stage","num_cycles":1,"auto_delta":false,"auto_delta_start_cycle":1,"order_number":2,"steps":[{"step":{"id":699,"name":null,"temperature":"100.0","hold_time":4,"pause":false,"collect_data":false,"delta_temperature":"0.0","delta_duration_s":0,"order_number":0,"ramp":{"id":699,"rate":"0.0","collect_data":false}}},{"step":{"id":726,"name":null,"temperature":"76.7","hold_time":4,"pause":false,"collect_data":false,"delta_temperature":"0.0","delta_duration_s":0,"order_number":1,"ramp":{"id":726,"rate":"0.0","collect_data":false}}}]}},{"stage":{"id":411,"stage_type":"cycling","name":"Cycling Stage","num_cycles":40,"auto_delta":true,"auto_delta_start_cycle":1,"order_number":3,"steps":[{"step":{"id":700,"name":null,"temperature":"56.2","hold_time":5,"pause":false,"collect_data":false,"delta_temperature":"0.0","delta_duration_s":0,"order_number":0,"ramp":{"id":700,"rate":"5.0","collect_data":false}}},{"step":{"id":710,"name":null,"temperature":"0.0","hold_time":3,"pause":true,"collect_data":false,"delta_temperature":"0.0","delta_duration_s":0,"order_number":1,"ramp":{"id":710,"rate":"5.0","collect_data":false}}}]}},{"stage":{"id":413,"stage_type":"cycling","name":"Cycling Stage","num_cycles":40,"auto_delta":false,"auto_delta_start_cycle":1,"order_number":5,"steps":[{"step":{"id":714,"name":null,"temperature":"52.0","hold_time":1,"pause":false,"collect_data":false,"delta_temperature":"0.0","delta_duration_s":0,"order_number":0,"ramp":{"id":714,"rate":"0.0","collect_data":false}}},{"step":{"id":715,"name":null,"temperature":"70.9","hold_time":12,"pause":false,"collect_data":true,"delta_temperature":"0.0","delta_duration_s":0,"order_number":1,"ramp":{"id":715,"rate":"0.0","collect_data":true}}},{"step":{"id":702,"name":null,"temperature":"100.0","hold_time":180,"pause":true,"collect_data":false,"delta_temperature":"0.0","delta_duration_s":0,"order_number":2,"ramp":{"id":702,"rate":"0.0","collect_data":false}}}]}}];
       }
-      var previousStage = null, noOfStages = allStages.length, stageView;
 
-      this.allStageViews = allStages.map(function(stageData, index) {
+      this.tempPreviousStage = null;
 
-        stageView = new stage(stageData.stage, this.canvas, this.allStepViews, index, this, this.$scope, false);
-        // We connect the stages like a linked list so that we can go up and down.
-        if(previousStage) {
-          previousStage.nextStage = stageView;
-          stageView.previousStage = previousStage;
-        }
+      this.allStageViews = allStages.map(this.addStagesMapCallback, this);
 
-        previousStage = stageView;
-        stageView.render();
-        return stageView;
-      }, this);
       StagePositionService.init(this.allStageViews);
       StepPositionService.init(this.allStepViews);
+
       console.log("Stages added ... !");
       return this;
+    };
 
+    this.addStagesMapCallback = function(stageData, index) {
+      
+      stageView = new stage(stageData.stage, this.canvas, this.allStepViews, index, this, this.$scope, false);
+      // We connect the stages like a linked list so that we can go up and down.
+      if(this.tempPreviousStage) {
+        this.tempPreviousStage.nextStage = stageView;
+        stageView.previousStage = this.tempPreviousStage;
+      }
+
+      this.tempPreviousStage = stageView;
+      stageView.render();
+      return stageView;
     };
 
     /*******************************************************/
@@ -152,24 +156,37 @@ angular.module("canvasApp").factory('canvas', [
 
         this.allStepViews[0].circle.manageClick(true);
         this.$scope.fabricStep = this.allStepViews[0];
-        // here we initiate stage/step events service.. So now we can listen for changes from the bottom.
-        stageEvents.init(this.$scope, this.canvas, this);
-        stepEvents.init(this.$scope, this.canvas, this);
-
-        this.stepIndicator = moveStepRect.getMoveStepRect(this);
-        this.stageIndicator = moveStageRect.getMoveStageRect(this);
-        this.stageVerticalLine = this.stageIndicator.verticalLine;
-        this.stepVerticalLine = this.stepIndicator.verticalLine;
-
-        this.canvas.add(this.stepIndicator);
-        this.canvas.add(this.stageIndicator);
-        this.canvas.add(this.stageVerticalLine);
-        this.canvas.add(this.stepVerticalLine);
-        
-        this.addMoveDots(); // This is for movestep
+        return this;
     };
 
-    this.addMoveDots = function() {
+    this.initEvents = function() {
+      // here we initiate stage/step events service.. So now we can listen for changes from the bottom.
+      stageEvents.init(this.$scope, this.canvas, this);
+      stepEvents.init(this.$scope, this.canvas, this);
+      return this;
+    };
+
+    this.getComponents = function() {
+
+      this.stepIndicator = moveStepRect.getMoveStepRect(this);
+      this.stageIndicator = moveStageRect.getMoveStageRect(this);
+      this.stageVerticalLine = this.stageIndicator.verticalLine;
+      this.stepVerticalLine = this.stepIndicator.verticalLine;
+      this.moveDots = this.getMoveDots();
+      return this;
+    };
+
+    this.addComponentsToStage = function() {
+
+      this.canvas.add(this.stepIndicator);
+      this.canvas.add(this.stageIndicator);
+      this.canvas.add(this.stageVerticalLine);
+      this.canvas.add(this.stepVerticalLine);
+      this.canvas.add(this.moveDots);
+      return this;
+    };
+
+    this.getMoveDots = function() {
       // Move-dots are the dots showing up at the place of a step [top to bottom], when we click on move-step
       var arr = dots.stepStageMoveDots();
       this.imageobjects["move-step-on.png"].setTop(328);
@@ -177,17 +194,18 @@ angular.module("canvasApp").factory('canvas', [
       arr.push(this.imageobjects["move-step-on.png"]);
       
       var properties = {
-                    stroke: 'black', strokeWidth: 2, selectable: false,
-                    originX: 'left', originY: 'top'
+                      stroke: 'black', strokeWidth: 2, selectable: false,
+                      originX: 'left', originY: 'top'
                     };
 
       var cordinates = [24, 32, 24, 353];
       var lin = Line.create(cordinates, properties);
       arr.push(lin);
-      this.moveDots = new fabric.Group(arr, {
+
+      return new fabric.Group(arr, {
         width: 40, left: 16, top: 35, backgroundColor: "white", visible: false
       });
-      this.canvas.add(this.moveDots);
+      
     };
     
     this.loadImages = function() {
