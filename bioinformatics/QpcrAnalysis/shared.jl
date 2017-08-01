@@ -3,7 +3,7 @@
 
 # constants
 
-const JSON_DIGITS = 3 # number of decimal points for floats in JSON output
+const JSON_DIGITS = 6 # number of decimal points for floats in JSON output
 
 const JULIA_ENV = ENV["JULIA_ENV"]
 
