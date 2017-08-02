@@ -92,10 +92,6 @@ angular.module("canvasApp").factory('stage', [
         }
       };
 
-      this.expand = function() {
-        this.myWidth = this.myWidth + 64;
-      };
-
       this.addNewStep = function(data, currentStep) {
         
         this.setNewWidth(constants.stepWidth);
@@ -280,7 +276,7 @@ angular.module("canvasApp").factory('stage', [
       };
 
       this.makeSurePreviousMovedLeft = function(draggedStage) {
-        
+
         var stage = this.previousStage;
         while(stage) {
           if(stage.stageMovedDirection !== "left") {
