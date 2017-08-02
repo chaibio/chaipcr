@@ -31,6 +31,14 @@ angular.module("canvasApp").factory('stage', [
   function(ExperimentLoader, $rootScope, step, previouslySelected, stageGraphics, stepGraphics, constants, 
   circleManager, correctNumberingService, editModeService) {
 
+    /*
+      @model has all the data points related to stage
+      @kanvas , this object is canvas factory, which is returned from canvas.js
+      @index index of the stage
+      @insert, true if we are inserting the stage, whe we move/add a stage. false when we load the stages for the first time
+      @scope, actual angular $scope object. Which we passed to use within fabric.
+    */
+
     return function(model, kanvas, index, insert, $scope) {
 
       this.model = model;
@@ -69,21 +77,15 @@ angular.module("canvasApp").factory('stage', [
       };
 
       this.collapseStage = function() {
-        // Remove all content in the stage first
+        
         console.log("okay Shrinking");
-        this.childSteps.forEach(function(step, index) {
-          this.deleteAllStepContents(step);
-          //this.parent.allStepViews.splice(step.ordealStatus - 1, 1);
-          //this.deleteFromStage(step.index, step.ordealStatus);
-
-        }, this);
-
+        this.childSteps.forEach(this.deleteAllStepContents, this);
         this.deleteStageContents();
         // Bring other stages closer
         if(this.nextStage) {
           var width = this.myWidth;
           // This is a trick, when we moveAllStepsAndStages we calculate the placing with myWidth, please refer getLeft() method
-          this.myWidth = 23;
+          this.myWidth = constants.moveStageInitialSpace; // 23
           this.moveAllStepsAndStages(true);
           this.myWidth = width;
         }
@@ -299,9 +301,8 @@ angular.module("canvasApp").factory('stage', [
 
         stage.stageGroup.set({left: stage.left }).setCoords();
         stage.dots.set({left: stage.left + 3}).setCoords();
-        stage.myWidth = (stage.model.steps.length * (constants.stepWidth)) + constants.additionalWidth;
-        //stage.moveStageRightPointerDetector.set({left: (stage.left + stage.myWidth) +  50}).setCoords();
-
+        //stage.myWidth = (stage.model.steps.length * (constants.stepWidth)) + constants.additionalWidth;
+        
         stage.childSteps.forEach(function(childStep, index) {
 
           if (del === true) {
