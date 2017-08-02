@@ -212,7 +212,7 @@ angular.module("canvasApp").factory('moveStepRect', [
           step: modelClone
         };
 
-        this.kanvas.allStageViews[0].moveAllStepsAndStagesSpecial();
+        this.kanvas.allStageViews[0].moveAllStepsAndStages();
         
         if(targetStep && targetStep.left) {
           targetStage.addNewStep(data, targetStep);

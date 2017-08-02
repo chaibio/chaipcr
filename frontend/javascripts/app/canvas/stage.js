@@ -56,6 +56,7 @@ angular.module("canvasApp").factory('stage', [
       this.shortStageName = false;
       this.shrinkedStage = false;
       this.sourceStage = false; // Says if we had clicked to move a step from this stage
+      this.moveStepAction = null; // This holds the value of del, which is the first parameter to moveStep(Action, callSetLeft)
 
       this.setNewWidth = function(add) {
 
@@ -261,62 +262,25 @@ angular.module("canvasApp").factory('stage', [
         currentStep.circle.removeContents();
       };
 
-      this.moveStageForMoveStep = function() {
-
-        this.stageGroup.set({left: this.left }).setCoords();
-        this.dots.set({left: this.left + 3}).setCoords();
-        //stage.nextStage.moveStageRightPointerDetector.set({left: (stage.nextStage.left + stage.nextStage.myWidth) +  50}).setCoords();
-
-        this.childSteps.forEach(function(childStep, index) {
-          childStep.moveStep(0, true);
-          childStep.circle.moveCircleWithStep();
-        });
-      };
-
       this.moveIndividualStageAndContents = function(stage, del) {
 
-        if(!stage) {
-          return false;
-        }
         stage.getLeft();
-        stage.stageGroup.set({left: stage.left }).setCoords();
-        stage.dots.set({left: stage.left + 3}).setCoords();
-        //stage.nextStage.moveStageRightPointerDetector.set({left: (stage.nextStage.left + stage.nextStage.myWidth) +  50}).setCoords();
-
-        stage.childSteps.forEach(function(childStep, index) {
-
-          if (del === true) {
-            childStep.moveStep(-1, true);
-          } else {
-            childStep.moveStep(1, true);
-          }
-          childStep.circle.moveCircleWithStep();
-        });
-
-      };
-
-      this.moveIndividualStageAndContentsSpecial = function(stage, del) {
-
-        stage.getLeft();
-
-        stage.stageGroup.set({left: stage.left }).setCoords();
-        stage.dots.set({left: stage.left + 3}).setCoords();
+        stage.stageGroup.setLeft(stage.left).setCoords();
+        stage.dots.setLeft(stage.left + 3).setCoords();
         //stage.myWidth = (stage.model.steps.length * (constants.stepWidth)) + constants.additionalWidth;
-        
-        stage.childSteps.forEach(function(childStep, index) {
-
-          if (del === true) {
-            childStep.moveStep(-1, true);
-          } else {
-            childStep.moveStep(1, true);
-          }
-          childStep.circle.moveCircleWithStep();
-        });
+        this.moveStepAction = (del === true) ? -1 : 1; 
+        stage.childSteps.forEach(this.manageMovingChildsteps, this);
 
       };
 
-      //
+      this.manageMovingChildsteps = function(childStep) {
+
+        childStep.moveStep(this.moveStepAction, true);
+        childStep.circle.moveCircleWithStep();
+      };
+
       this.makeSurePreviousMovedLeft = function(draggedStage) {
+        
         var stage = this.previousStage;
         while(stage) {
           if(stage.stageMovedDirection !== "left") {
@@ -451,18 +415,6 @@ angular.module("canvasApp").factory('stage', [
         while(currentStage) {
 
           this.moveIndividualStageAndContents(currentStage, del);
-
-          currentStage = currentStage.nextStage;
-        }
-      };
-
-      this.moveAllStepsAndStagesSpecial = function(del) {
-
-        var currentStage = this;
-
-        while(currentStage) {
-
-          this.moveIndividualStageAndContentsSpecial(currentStage, del);
 
           currentStage = currentStage.nextStage;
         }

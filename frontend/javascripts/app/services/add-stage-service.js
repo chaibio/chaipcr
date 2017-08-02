@@ -65,7 +65,7 @@ window.ChaiBioTech.ngApp.service('addStageService', [
             if(mode === "move_stage_back_to_original") {
                 console.log("YES ", mode);
                 this.canvasObj.allStageViews[0].getLeft();
-                this.canvasObj.allStageViews[0].moveAllStepsAndStagesSpecial(false);
+                this.canvasObj.allStageViews[0].moveAllStepsAndStages(false);
             } else {
                 this.canvasObj.allStageViews[0].moveAllStepsAndStages(false);
             }

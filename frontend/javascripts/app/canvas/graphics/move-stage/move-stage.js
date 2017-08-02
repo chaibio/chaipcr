@@ -291,7 +291,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           stageView.render();
           addStageService.configureStepsofNewStage(stageView, 0);
           correctNumberingService.correctNumbering();
-          this.kanvas.allStageViews[0].moveAllStepsAndStagesSpecial();
+          this.kanvas.allStageViews[0].moveAllStepsAndStages();
           circleManager.addRampLines();
           this.kanvas.allStepViews[this.kanvas.allStepViews.length - 1].circle.doThingsForLast(null, null);
           stageView.stageHeader();
