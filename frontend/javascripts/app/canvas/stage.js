@@ -181,7 +181,7 @@ angular.module("canvasApp").factory('stage', [
 
         correctNumberingService.correctNumbering();
         //circleManager.addRampLines();
-        circleManager.init(fabricStage);
+        circleManager.init(kanvas);
         circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
         this.stageHeader();
         $scope.applyValues(selected.circle);
@@ -275,15 +275,15 @@ angular.module("canvasApp").factory('stage', [
 
       this.moveIndividualStageAndContents = function(stage, del) {
 
-        if(!stage.nextStage) {
+        if(!stage) {
           return false;
         }
-        stage.nextStage.getLeft();
-        stage.nextStage.stageGroup.set({left: stage.nextStage.left }).setCoords();
-        stage.nextStage.dots.set({left: stage.nextStage.left + 3}).setCoords();
+        stage.getLeft();
+        stage.stageGroup.set({left: stage.left }).setCoords();
+        stage.dots.set({left: stage.left + 3}).setCoords();
         //stage.nextStage.moveStageRightPointerDetector.set({left: (stage.nextStage.left + stage.nextStage.myWidth) +  50}).setCoords();
 
-        stage.nextStage.childSteps.forEach(function(childStep, index) {
+        stage.childSteps.forEach(function(childStep, index) {
 
           if (del === true) {
             childStep.moveStep(-1, true);
@@ -446,7 +446,7 @@ angular.module("canvasApp").factory('stage', [
 
       this.moveAllStepsAndStages = function(del) {
 
-        var currentStage = this;
+        var currentStage = this.nextStage;
 
         while(currentStage) {
 

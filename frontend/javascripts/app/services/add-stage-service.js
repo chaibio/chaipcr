@@ -23,7 +23,7 @@ window.ChaiBioTech.ngApp.service('addStageService', [
 
             // now create a stage;
             var stageIndex = currentStage.index + 1;
-            var stageView = new stage(data.stage, this.canvasObj.canvas, this.canvasObj.allStepViews, stageIndex, this.canvasObj, this.canvasObj.$scope, true);
+            var stageView = new stage(data.stage, this.canvasObj, stageIndex, true, this.canvasObj.$scope);
 
             this.addNextandPrevious(currentStage, stageView);
             stageView.updateStageData(1);
