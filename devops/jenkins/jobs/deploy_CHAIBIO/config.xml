@@ -23,11 +23,6 @@
           <description>Check if there are any bad blocks on eMMC. Takes more than an hour.</description>
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>download_prefex</name>
-          <description>Download folder URL</description>
-          <defaultValue>http://10.0.1.20/download</defaultValue>
-        </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>low_performance</name>
           <description>Set cpu to lowest performance.</description>
@@ -264,7 +259,7 @@ umount /sdcard/*
 umount /dev/mmcblk0p*
 
 LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
-,,0xe,*
+,,0x83,*
 __EOF__
 
 partprobe /dev/mmcblk0
@@ -279,7 +274,7 @@ else
 fi
 
 # creating a temporary swap file on sdcard
-if fallocate -l 1G /sdcard/upgrade/swapfile #or dd if=/dev/zero of=/sdcard/upgrade/swapfile bs=10M count=300
+if fallocate -l 2G /sdcard/upgrade/swapfile #or dd if=/dev/zero of=/sdcard/upgrade/swapfile bs=10M count=300
 then
     echo &quot;swap file created successfully&quot;
 else
@@ -294,6 +289,26 @@ sudo swapon /sdcard/upgrade/swapfile
 sudo swapon -s
 
 free -m
+
+
+echo browser compile
+cd /sdcard/upgrade/
+mkdir compile-browser
+cd compile-browser/
+git clone https://github.com/chaibio/chaipcr.git
+cd /sdcard/upgrade/compile-browser/chaipcr/browser/
+
+/opt/QtEmbedded/bin/qmake
+sed -i &quot;s/arm-unknown-linux-gnueabi-//&quot; Makefile
+make
+make install
+#cp realtime ~/tmp
+#cp libraries/lib/* /usr/lib/
+cd /sdcard/upgrade/
+rm -r compile-browser
+cd
+echo done compiling browser
+
 
 sync
 
@@ -313,11 +328,16 @@ fi
 git clone $branch_param https://github.com/chaibio/chaipcr.git
 cd /sdcard/upgrade/realtime-compile/chaipcr/realtime
 
-qmake
+cp util/instance.h control/
+rm libraries/lib/libPoco*
+
+#qmake
+/opt/QtEmbedded/bin/qmake
+
 sed -i &quot;s/arm-unknown-linux-gnueabi-//&quot; Makefile
 make
 make install
-cp realtime ~/tmp
+#cp realtime ~/tmp
 cp libraries/lib/* /usr/lib/
 cd
 rm -r /sdcard/upgrade/realtime-compile
@@ -388,7 +408,7 @@ mv /etc/cron.daily/logrotate /etc/cron.hourly/
 
 echo Build/update wifi drivers- ignored now.. lets see if the latest is making any issues
 
-echo Install browser
+echo copy browser resources
 # Deploy browser to ~/tmp
 cp -r ~/chaipcr/browser/resources ~/tmp/
 cp ~/chaipcr/browser/qpcrbrowser.service /lib/systemd/system/
@@ -439,8 +459,6 @@ sync
  fsck /dev/mmcblk0p1 -y -f
 
 systemctl enable r.service
-
-
 echo Setup Rails app
 
 mkdir -p ~/chaipcr/web/config/

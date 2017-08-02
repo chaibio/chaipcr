@@ -24,7 +24,7 @@
           <defaultValue>true</defaultValue>
         </hudson.model.BooleanParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>download_prefex</name>
+          <name>download_prefix</name>
           <description>Download folder URL</description>
           <defaultValue>http://10.0.1.20/download</defaultValue>
         </hudson.model.StringParameterDefinition>
@@ -370,34 +370,6 @@ ln -s /usr/bin/gcc-4.7 /usr/bin/gcc
 ln -s /usr/bin/g++-4.7 /usr/bin/g++
 fi
 
-
-echo installing QT
-dpkg --configure -a
-if apt-get install -y -q qt5-default cmake
-then
-   echo QT 5 found and installed
-else
-   wget https://cmake.org/files/v3.6/cmake-3.6.1.tar.gz
-   tar xfv cmake-3.6.1.tar.gz
-   cd cmake-3.6.1
-   ./bootstrap
-   make
-   make install
-   cd ..
-   rm -r cmake-3.6.1*
- 
-  cd
-  wget &quot;https://chaibio.box.com/shared/static/t39tu2duoszaut0rfq0dj33k77j91w0r.zip&quot;
-  unzip -o t39tu2duoszaut0rfq0dj33k77j91w0r.zip
-
-  cp ./QtEmbedded/lib/* /usr/lib/
-  mkdir -p /opt/QtEmbedded/lib/fonts
-  cp QtEmbedded/lib/fonts/* /opt/QtEmbedded/lib/fonts
-  rm -rf ./QtEmbedded
-  rm t39tu2duoszaut0rfq0dj33k77j91w0r.zip
-  apt-get -q -y install qt4-qmake
-fi
-
 df -h
 
 echo Installing mysql
@@ -528,6 +500,7 @@ fi
 sync
 
 df -h
+apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential || true
 ntpdate -b -s -u pool.ntp.org
 
 sudo apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gcc-4.8 g++-4.8 gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev cpufrequtils libc-bin
@@ -577,6 +550,10 @@ tar xpvzf poco-1.6.1.tar.gz
 cd poco-1.6.1
 ./configure
 make
+
+rm /usr/lib/libPoco* || true
+rm /usr/local/lib/libPoco* || true
+
 make install
 cd ..
 rm -rf poco-1.6.1* poco-1.6.1.tar.gz
@@ -584,7 +561,8 @@ rm -rf poco-1.6.1* poco-1.6.1.tar.gz
 sync
 fsck /dev/mmcblk1p1 -y -f
 
-exit 0</command>
+exit 0
+</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
@@ -598,6 +576,7 @@ exit 0
       <siteName>root@$build_machine:22</siteName>
       <command>echo cleanup without envs
 
+apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential || true
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get install -q -y gfortran ntpdate
 ntpdate -b -s -u pool.ntp.org
 
@@ -642,7 +621,6 @@ cat &gt;&gt; /usr/include/linux/input.h &lt;&lt; __EOF__
 #define ABS_MAX                 0x3f
 #define ABS_CNT                 (ABS_MAX+1)
 __EOF__
-
 
 echo autoget tslib
 ./autogen.sh
@@ -698,94 +676,9 @@ apt-key update
 apt-get update
 apt-get -y -q upgrade
 
+apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential || true
+
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get install -q -y gfortran ntpdate
-
-if false
-then
-
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get install -q -y r-cran-rserve r-cran-rmysql r-cran-dbi r-cran-stringr r-cran-robustbase
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get install -q -y r-cran-deoptimr
-
-if apt-get install -q -y r-cran-rserve r-cran-rmysql r-cran-dbi r-cran-stringr r-cran-robustbase
-then
-   echo R installed successfully
-else
-   echo R was not able to install.
-   exit 1
-fi
-
-ln -s /usr/bin/R /usr/local/bin/R
-else
-wget --no-check-certificate https://cran.r-project.org/src/base/R-3/R-3.2.3.tar.gz
-tar xpvzf R-3.2.3.tar.gz
-cd R-3.2.3
-./configure --with-readline=no --with-x=no --enable-R-shlib --disable-java
-if make
-then 
-  echo R compiled successfully.
-else
-  echo Error compiling R language.
-  exit 1
-fi
-
-make install
-cd ..
-rm -rf R-3.2.3 R-3.2.3.tar.gz
-
-wget --no-check-certificate https://rforge.net/Rserve/snapshot/Rserve_1.8-4.tar.gz
-R CMD INSTALL Rserve_1.8-4.tar.gz
-rm Rserve_1.8-4.tar.gz
-
-wget --no-check-certificate https://cran.r-project.org/src/contrib/00Archive/DBI/DBI_0.3.1.tar.gz
-R CMD INSTALL DBI_0.3.1.tar.gz 
-rm DBI_0.3.1.tar.gz 
-
-wget --no-check-certificate https://cran.r-project.org/src/contrib/00Archive/RMySQL/RMySQL_0.10.7.tar.gz
-R CMD INSTALL RMySQL_0.10.7.tar.gz
-rm RMySQL_0.10.7.tar.gz
-
-fi
-
-wget --no-check-certificate https://cran.r-project.org/src/contrib/00Archive/DEoptimR/DEoptimR_1.0-6.tar.gz
-R CMD INSTALL DEoptimR_1.0-6.tar.gz
-rm DEoptimR_1.0-6.tar.gz
-
-wget --no-check-certificate https://cran.r-project.org/src/contrib/00Archive/Rcpp/Rcpp_0.12.2.tar.gz
-R CMD INSTALL Rcpp_0.12.2.tar.gz
-rm Rcpp_0.12.2.tar.gz
-
-wget --no-check-certificate https://cran.r-project.org/src/contrib/00Archive/plyr/plyr_1.8.3.tar.gz
-R CMD INSTALL plyr_1.8.3.tar.gz
-rm plyr_1.8.3.tar.gz
-
-wget https://cran.r-project.org/src/contrib/00Archive/stringi/stringi_1.0-1.tar.gz --no-check-certificate
-R CMD INSTALL stringi_1.0-1.tar.gz
-rm stringi_1.0-1.tar.gz
-
-if ! wget https://cran.fhcrc.org/src/contrib/magrittr_1.5.tar.gz --no-check-certificate
-then
-	wget https://cran.fhcrc.org/src/contrib/00Archive/magrittr/magrittr_1.5.tar.gz --no-check-certificate
-fi
-R CMD INSTALL magrittr_1.5.tar.gz
-rm magrittr_1.5.tar.gz
-
-#if ! wget https://cran.r-project.org/src/contrib/reshape2_1.4.1.tar.gz --no-check-certificate
-#then
-	wget https://cran.r-project.org/src/contrib/00Archive/reshape2/reshape2_1.4.1.tar.gz --no-check-certificate
-#fi
-R CMD INSTALL reshape2_1.4.1.tar.gz
-rm reshape2_1.4.1.tar.gz
-
-#if ! wget https://cran.r-project.org/src/contrib/minpack.lm_1.2-0.tar.gz --no-check-certificate
-#then
-	wget https://cran.r-project.org/src/contrib/00Archive/minpack.lm/minpack.lm_1.2-0.tar.gz --no-check-certificate
-#fi
-R CMD INSTALL minpack.lm_1.2-0.tar.gz
-rm minpack.lm_1.2-0.tar.gz
-
-wget https://cran.r-project.org/src/contrib/00Archive/jsonlite/jsonlite_0.9.19.tar.gz --no-check-certificate
-R CMD INSTALL jsonlite_0.9.19.tar.gz
-rm jsonlite_0.9.19.tar.gz
 
 
 exit 0</command>
@@ -816,7 +709,7 @@ umount /sdcard/*
 umount /dev/mmcblk0p*
 
 LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
-,,0xe,*
+,,0x83,*
 __EOF__
 
 partprobe /dev/mmcblk0
@@ -831,13 +724,14 @@ else
 fi
 
 # creating a temporary swap file on sdcard
-if fallocate -l 1G /sdcard/upgrade/swapfile #or dd if=/dev/zero of=/sdcard/upgrade/swapfile bs=10M count=300
+if fallocate -l 2G /sdcard/upgrade/swapfile #or dd if=/dev/zero of=/sdcard/upgrade/swapfile bs=10M count=300
 then
     echo &quot;swap file created successfully&quot;
 else
    echo &quot;failed creating swap file&quot;
    exit 1
 fi
+
 sudo chmod 600 /sdcard/upgrade/swapfile
 sudo mkswap /sdcard/upgrade/swapfile
 sudo swapon /sdcard/upgrade/swapfile
@@ -846,9 +740,33 @@ sudo swapon /sdcard/upgrade/swapfile
 sudo swapon -s
 
 free -m
+echo installing QT
+dpkg --configure -a
+apt-get install -y -q cmake
+apt-get update
+apt-get install -y -q libqt4-webkit libfontconfig1-dev libfreetype6-dev libx11-dev libxcursor-dev libxext-dev libxfixes-dev libxft-dev libxi-dev libxrandr-dev libxrender-dev
+
+echo downloading compiled QT v4.8.6
+
+echo downloading QT binaries
+cd /sdcard/upgrade/
+wget $download_prefix/qt-everywhere-compiled-4.8.6.tgz
+tar xfv qt-everywhere-compiled-4.8.6.tgz
+cd qt-everywhere-opensource-src-4.8.6/
+
+make install
+
+cd /sdcard/upgrade/
+rm -r qt-everywhere-opensource-src-4.8.6
+rm qt-everywhere-compiled-4.8.6.tgz
+cd
+cp /opt/QtEmbedded/bin /usr/lib/arm-linux-gnueabihf/qt4/ -r || true
+
+echo done installing QT to /opt/
 
 sync
-apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3
+
+apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3
 
 if $bypass_julia
 then
@@ -856,13 +774,15 @@ then
        exit 0
 fi
 
+apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3
+
 mkdir -p ~/julia-compile
 cd ~/julia-compile
 
 
 default_slim_arch_filename=&quot;julia-$building_version-slim-default.tgz&quot;
 echo Slim arch filename $default_slim_arch_filename
-wget $download_prefex/$default_slim_arch_filename
+wget $download_prefix/$default_slim_arch_filename
 
 sync
 
@@ -1097,7 +1017,7 @@ fi
 sync
 
 #wget https://dl.ngrok.com/ngrok_2.0.19_linux_arm.zip --no-check-certificate
-wget $download_prefex/ngrok_2.0.19_linux_arm.zip  --no-check-certificate
+wget $download_prefix/ngrok_2.0.19_linux_arm.zip  --no-check-certificate
 unzip -o ngrok_2.0.19_linux_arm.zip
 rm ngrok_2.0.19_linux_arm.zip
 </command>

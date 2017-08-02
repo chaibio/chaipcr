@@ -20,7 +20,7 @@
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>download_prefex</name>
+          <name>download_prefix</name>
           <description>Download folder URL</description>
           <defaultValue>http://10.0.1.20/download</defaultValue>
         </hudson.model.StringParameterDefinition>
@@ -263,7 +263,7 @@ image_filename=bone-debian-8.8-console-armhf-2017-05-07-1gb.img.xz
 #bone-debian-7.11-console-armhf-2016-06-15-2gb.img.xz
 
 rm $image_filename || true
-wget $download_prefex/$image_filename
+wget $download_prefix/$image_filename
 
 #Verify Image with:
 if sha256sum $image_filename | grep 09783052e6da931c6e05a230c221fa88889af3036723fb22d85404fb057d1d2f
@@ -328,7 +328,7 @@ then
    echo sdcard got patched before
 else
 
-wget $download_prefex/functions.patch
+wget $download_prefix/functions.patch
 patch -i functions.patch
 rm functions.patch
 if $check_badblocks
