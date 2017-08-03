@@ -115,10 +115,10 @@ angular.module("canvasApp").factory('mouseDown', [
             step.parentStage.squeezeStage(step);
 
             if(step.parentStage.nextStage) {
-              var width = step.parentStage.myWidth;
+              //var width = step.parentStage.myWidth;
               // This is a trick, when we moveAllStepsAndStages we calculate the placing with myWidth, please refer getLeft() method
               step.parentStage.myWidth = step.parentStage.myWidth + 23;
-              step.parentStage.moveAllStepsAndStages(true);
+              step.parentStage.nextStage.moveAllStepsAndStages(true);
               step.parentStage.myWidth = step.parentStage.myWidth - 23;
             }
             C.stepIndicator.init(step, evt.target, C, backupStageModel);

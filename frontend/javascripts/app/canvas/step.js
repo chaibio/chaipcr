@@ -53,7 +53,7 @@ angular.module("canvasApp").factory('step', [
       };
 
       this.shrinkStep = function() {
-
+        console.log("sdcsfdsfsdfdsfsdf");
         this.shrinked = true;
         this.myWidth = 45;
         this.stepRect.setWidth(45).setCoords();

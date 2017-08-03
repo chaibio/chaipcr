@@ -406,7 +406,7 @@ angular.module("canvasApp").factory('stage', [
 
       this.moveAllStepsAndStages = function(del) {
 
-        var currentStage = this.nextStage;
+        var currentStage = this;
 
         while(currentStage) {
 
