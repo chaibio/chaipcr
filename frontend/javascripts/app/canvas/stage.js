@@ -28,8 +28,9 @@ angular.module("canvasApp").factory('stage', [
   'circleManager',
   'correctNumberingService',
   'editModeService',
+  'addStepService',
   function(ExperimentLoader, $rootScope, step, previouslySelected, stageGraphics, stepGraphics, constants, 
-  circleManager, correctNumberingService, editModeService) {
+  circleManager, correctNumberingService, editModeService, addStepService) {
 
     /*
       @model has all the data points related to stage
@@ -94,59 +95,9 @@ angular.module("canvasApp").factory('stage', [
 
       this.addNewStep = function(data, currentStep) {
         
-        this.setNewWidth(constants.stepWidth);
-        this.moveAllStepsAndStages();
-        // Now insert new step;
-        var start = currentStep.index;
-        var newStep = new step(data.step, this, start, $scope);
-        newStep.name = "I am created";
-        newStep.render();
-        newStep.ordealStatus = currentStep.ordealStatus;
-
-        this.childSteps.splice(start + 1, 0, newStep);
-        this.model.steps.splice(start + 1, 0, data);
-        this.configureStep(newStep, start);
-        this.parent.allStepViews.splice(currentStep.ordealStatus, 0, newStep);
-
-        correctNumberingService.correctNumbering();
-        newStep.circle.moveCircle();
-        newStep.circle.getCircle();
-
-        circleManager.addRampLines();
-        //circleManager.init(fabricStage);
-        //circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
-        this.stageHeader();
-        $scope.applyValues(newStep.circle);
-        newStep.circle.manageClick(true);
-        this.parent.setDefaultWidthHeight();
-      };
-
-      this.addNewStepAtTheBeginning = function(data) {
+        addStepService.addNewStep(this, data, currentStep, $scope);
+        return 0;
         
-        this.setNewWidth(constants.stepWidth);
-        this.moveAllStepsAndStages();
-        var firstStepOrdealStatus = this.childSteps[0].ordealStatus;
-        var start = 0;
-        var newStep = new step(data.step, this, start, $scope);
-        newStep.name = "I am created";
-        newStep.render();
-        newStep.ordealStatus = firstStepOrdealStatus;
-
-        this.childSteps.splice(start, 0, newStep);
-        this.model.steps.splice(start, 0, data);
-        this.configureStep(newStep, start);
-        this.parent.allStepViews.splice(firstStepOrdealStatus, 0, newStep);
-
-        correctNumberingService.correctNumbering();
-        
-        newStep.circle.moveCircle();
-        newStep.circle.getCircle();
-
-        circleManager.addRampLines();
-        this.stageHeader();
-        $scope.applyValues(newStep.circle);
-        newStep.circle.manageClick(true);
-        this.parent.setDefaultWidthHeight();
       };
 
       this.deleteStep = function(data, currentStep) {
@@ -474,14 +425,14 @@ angular.module("canvasApp").factory('stage', [
 
       this.squeezeStage = function(step) {
           
-          this.deleteFromStage(step.index, step.ordealStatus);
-          if(this.childSteps.length === 0) {
-            this.wireStageNextAndPrevious();
-            selected = (this.previousStage) ? this.previousStage.childSteps[this.previousStage.childSteps.length - 1] : step.parentStage.nextStage.childSteps[0];
-            this.parent.allStageViews.splice(step.parentStage.index, 1);
-            selected.parentStage.updateStageData(-1);
-          }    
-        };
+        this.deleteFromStage(step.index, step.ordealStatus);
+        if(this.childSteps.length === 0) {
+          this.wireStageNextAndPrevious();
+          selected = (this.previousStage) ? this.previousStage.childSteps[this.previousStage.childSteps.length - 1] : step.parentStage.nextStage.childSteps[0];
+          this.parent.allStageViews.splice(step.parentStage.index, 1);
+          selected.parentStage.updateStageData(-1);
+        }    
+      };
       
       this.shortenStageName = function() {
         var text = this.stageName.text.substr(0, 8);
@@ -505,6 +456,7 @@ angular.module("canvasApp").factory('stage', [
         this.childSteps = [];
 
         // We use reduce here so that Linking is easy here, because reduce retain the previous value which we return.
+
         this.model.steps.reduce(function(tempStep, STEP, stepIndex) {
           
           stepView = new step(STEP.step, that, stepIndex, $scope);

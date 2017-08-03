@@ -213,13 +213,9 @@ angular.module("canvasApp").factory('moveStepRect', [
         };
 
         this.kanvas.allStageViews[0].moveAllStepsAndStages();
-        
-        if(targetStep && targetStep.left) {
-          targetStage.addNewStep(data, targetStep);
-        } else  { 
-          targetStage.addNewStepAtTheBeginning(data);
-        }
 
+        targetStage.addNewStep(data, targetStep);
+        
         ExperimentLoader.moveStep(step.model.id, targetStep.model.id, targetStage.model.id)
           .then(function(data) {
             console.log("Moved", data);

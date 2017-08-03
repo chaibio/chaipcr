@@ -28,7 +28,7 @@ angular.module("canvasApp").factory('step', [
   function(ExperimentLoader, $rootScope, circle, previouslySelected, stepGraphics, constants) {
 
     return function(model, parentStage, index, $scope) {
-
+      console.log("modelled", model);
       this.stepMovedDirection = null;
       this.model = model;
       this.parentStage = parentStage;

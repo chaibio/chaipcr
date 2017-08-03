@@ -99,8 +99,10 @@ angular.module("canvasApp").factory('mouseDown', [
             // Remember what we click and what we move is two different objects, once we click, rest of the graphics come by, So original reference point to ,
             // the very thing we click. Not to the one we move. This applies to moveStage too.
             var step = evt.target.parent;
-            var backupStageModel = angular.copy(step.parentStage.model);
+            var backupStageModel = angular.copy.apply(angular, step.parentStage.model);
+            
             movingStepGraphics.initiateMoveStepGraphics(step, C);
+            
             that.selectStep(step.circle);
             that.calculateMoveLimit("step", evt.target);
             

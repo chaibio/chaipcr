@@ -13,19 +13,29 @@ window.ChaiBioTech.ngApp.service('addStepService', [
         */
         this.addNewStep = function(stage, stepData, currentStep, $scope) {
 
-            stage.setNewWidth(constants.stepWidth);
-            stage.moveAllStepsAndStages();
+            
+            stage.setNewWidth(constants.stepWidth); // Increase the width of the stage
+            stage.moveAllStepsAndStages(false); // Move other stages away
+            
+            var index = 0;
+            var start = (currentStep) ? currentStep.index : 0;
+            var newStep = new step(stepData.step, stage, start, $scope); // Creates a new step
 
-            var start = currentStep.index || 0;
-            var newStep = new step(stepData.step, stage, start, $scope);
             newStep.name = "I am created";
             newStep.render();
-            newStep.ordealStatus = currentStep.ordealStatus || stage.childSteps[0].ordealStatus;
+            newStep.ordealStatus = (currentStep) ? currentStep.ordealStatus : stage.childSteps[0].ordealStatus;
+            
+            if(currentStep) {
+                index = currentStep.index + 1;
+            } else {
+                index = 0;
+            }
 
-            stage.childSteps.splice(newStep.index, 0, newStep);
-            stage.model.steps.splice(newStep.index, 0, data);
+            stage.childSteps.splice(index, 0, newStep);
+            stage.model.steps.splice(index, 0, stepData);
+            
             stage.configureStep(newStep, start);
-            stage.parent.allStepViews.splice(currentStep.ordealStatus, 0, newStep);
+            stage.parent.allStepViews.splice(newStep.ordealStatus, 0, newStep);
 
             correctNumberingService.correctNumbering();
             newStep.circle.moveCircle();
