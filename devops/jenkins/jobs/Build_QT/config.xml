@@ -357,9 +357,11 @@ exit 0
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo compiling TSLib
+
 # TSLib
 mount /dev/mmcblk0p1 /sdcard/upgrade/ || true
-cd /sdcard/upgrade/
+
+cd /sdcard/upgrade
 mkdir tslib-compile
 cd tslib-compile/
 
@@ -370,7 +372,7 @@ cd tslib
 make
 make install
 cd ../
-#rm -r tslib
+
 ln -s /usr/local/lib/libts.so.0.5.0 /lib/libts-1.0.so.0
 cp -P /usr/local/lib/libts* /lib/arm-linux-gnueabihf/
 
@@ -383,6 +385,8 @@ apt-get install -y -q libqt4-webkit libfontconfig1-dev libfreetype6-dev libx11-d
 wget http://download.qt.io/archive/qt/4.8/4.8.6/qt-everywhere-opensource-src-4.8.6.tar.gz
 tar xfv qt-everywhere-opensource-src-4.8.6.tar.gz
 cd qt-everywhere-opensource-src-4.8.6
+
+cd /sdcard/upgrade/qt-everywhere-opensource-src-4.8.6
 
 cat &gt; mkspecs/qws/linux-arm-gnueabi-g++/qmake.conf &lt;&lt; EOF
 #Rewrite mkspecs/qws/linux-arm-gnueabi-g++/qmake.conf file with following content:
@@ -438,8 +442,8 @@ slim_arch_filename=&quot;qt-everywhere-slim-4.8.6.tgz&quot;
 echo Slim arch filename $slim_arch_filename
 echo Arch $arch_filename
 
-tar fcz $arch_filename qt-everywhere-opensource-src-4.8.6
-tar fcz $slim_arch_filename /opt/QtEmbedded
+tar fcz $arch_filename qt-everywhere-opensource-src-4.8.6  tslib-compile
+tar fcz $slim_arch_filename /opt/QtEmbedded  tslib-compile
 
 ls -ahl fcz $arch_filename $slim_arch_filename 
 
@@ -457,11 +461,11 @@ echo Slim arch filename $slim_arch_filename
 echo Arch $arch_filename
                                                                                                                                  
 scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/$arch_filename $local_download_folder/
-chmod 777 $local_download_folder/$arch_filename
+sudo chmod 777 $local_download_folder/$arch_filename
 #ln -sf $local_download_folder/arch_filename $local_download_folder/qt486-default.tgz
 
 scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/$slim_arch_filename $local_download_folder/
-chmod 777 $local_download_folder/$slim_arch_filename
+sudo chmod 777 $local_download_folder/$slim_arch_filename
 #ln -sf $local_download_folder/slim_arch_filename $local_download_folder/qt486-default.tgz
 
 
@@ -482,7 +486,7 @@ rm $slim_arch_filename
 ls -ahl
 
 rm -r  qt-everywhere-opensource-src-4.8.6* -r
-rm -r tslib-compile
+#rm -r tslib-compile
 
 sync
 ls -ah
