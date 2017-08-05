@@ -29,8 +29,9 @@ angular.module("canvasApp").factory('stage', [
   'correctNumberingService',
   'editModeService',
   'addStepService',
+  'deleteStepService',
   function(ExperimentLoader, $rootScope, step, previouslySelected, stageGraphics, stepGraphics, constants, 
-  circleManager, correctNumberingService, editModeService, addStepService) {
+  circleManager, correctNumberingService, editModeService, addStepService, deleteStepService) {
 
     /*
       @model has all the data points related to stage
@@ -101,6 +102,9 @@ angular.module("canvasApp").factory('stage', [
       };
 
       this.deleteStep = function(data, currentStep) {
+        
+        deleteStepService.deleteStep(this, data, currentStep, $scope);
+        return;
         // This methode says what happens in the canvas when a step is deleted
         var selected;
         this.setNewWidth(constants.stepWidth * -1);

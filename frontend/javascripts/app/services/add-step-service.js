@@ -37,15 +37,7 @@ window.ChaiBioTech.ngApp.service('addStepService', [
             this.configureStep(stage, newStep, start || 0);
             stage.parent.allStepViews.splice(newStep.ordealStatus, 0, newStep);
 
-            correctNumberingService.correctNumbering();
-            newStep.circle.moveCircle();
-            newStep.circle.getCircle();
-
-            circleManager.addRampLines();
-            stage.stageHeader();
-            $scope.applyValues(newStep.circle);
-            newStep.circle.manageClick(true);
-            stage.parent.setDefaultWidthHeight();
+            this.postAddStep(stage, newStep, $scope);
 
         };
 
@@ -72,6 +64,18 @@ window.ChaiBioTech.ngApp.service('addStepService', [
                 newStep.previousStep = stage.childSteps[newStep.index - 1];
                 newStep.previousStep.nextStep = newStep;
             }
+        };
+
+        this.postAddStep = function(stage, newStep, $scope) {
+
+            correctNumberingService.correctNumbering();
+            newStep.circle.moveCircle();
+            newStep.circle.getCircle();
+            circleManager.addRampLines();
+            stage.stageHeader();
+            $scope.applyValues(newStep.circle);
+            newStep.circle.manageClick(true);
+            stage.parent.setDefaultWidthHeight();
         };
     }
 ]);
