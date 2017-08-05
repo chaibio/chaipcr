@@ -18,7 +18,7 @@ window.ChaiBioTech.ngApp.service('addStepService', [
             stage.moveAllStepsAndStages(false); // Move other stages away
             
             var index = 0;
-            var start = (currentStep) ? currentStep.index : 0;
+            var start = (currentStep.index) ? currentStep.index : 0;
             var newStep = new step(stepData.step, stage, start, $scope); // Creates a new step
 
             newStep.name = "I am created";
@@ -34,7 +34,7 @@ window.ChaiBioTech.ngApp.service('addStepService', [
             stage.childSteps.splice(index, 0, newStep);
             stage.model.steps.splice(index, 0, stepData);
             
-            stage.configureStep(newStep, start);
+            this.configureStep(stage, newStep, start || 0);
             stage.parent.allStepViews.splice(newStep.ordealStatus, 0, newStep);
 
             correctNumberingService.correctNumbering();
@@ -47,6 +47,31 @@ window.ChaiBioTech.ngApp.service('addStepService', [
             newStep.circle.manageClick(true);
             stage.parent.setDefaultWidthHeight();
 
+        };
+
+        this.configureStep = function(stage, newStep, start) {
+        // insert it to all steps, add next and previous , re-render circles;
+            for(var j = 0; j < stage.childSteps.length; j++) {
+            
+                var thisStep = stage.childSteps[j];
+                if(j >= start + 1) {
+                    thisStep.index = thisStep.index + 1;
+                    thisStep.configureStepName();
+                    thisStep.moveStep(1, true);
+                } else {
+                    thisStep.numberingValue();
+                }
+            }
+
+            if(stage.childSteps[newStep.index + 1]) {
+                newStep.nextStep = stage.childSteps[newStep.index + 1];
+                newStep.nextStep.previousStep = newStep;
+            }
+
+            if(stage.childSteps[newStep.index - 1]) {
+                newStep.previousStep = stage.childSteps[newStep.index - 1];
+                newStep.previousStep.nextStep = newStep;
+            }
         };
     }
 ]);

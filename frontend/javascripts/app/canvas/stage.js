@@ -398,31 +398,6 @@ angular.module("canvasApp").factory('stage', [
         }, this);
       };
 
-      this.configureStep = function(newStep, start) {
-        // insert it to all steps, add next and previous , re-render circles;
-        for(var j = 0; j < this.childSteps.length; j++) {
-
-          var thisStep = this.childSteps[j];
-          if(j >= start + 1) {
-            thisStep.index = thisStep.index + 1;
-            thisStep.configureStepName();
-            thisStep.moveStep(1, true);
-          } else {
-            thisStep.numberingValue();
-          }
-        }
-
-        if(this.childSteps[newStep.index + 1]) {
-          newStep.nextStep = this.childSteps[newStep.index + 1];
-          newStep.nextStep.previousStep = newStep;
-        }
-
-        if(this.childSteps[newStep.index - 1]) {
-          newStep.previousStep = this.childSteps[newStep.index - 1];
-          newStep.previousStep.nextStep = newStep;
-        }
-      };
-
       this.squeezeStage = function(step) {
           
         this.deleteFromStage(step.index, step.ordealStatus);
