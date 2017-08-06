@@ -20,7 +20,7 @@ window.ChaiBioTech.ngApp.service('deleteStepService', [
             if(stage.childSteps.length > 0) {
                 this.configureStepForDelete(stage, currentStep, start);
             } else { // if all the steps in the stages are deleted, We delete the stage itself.
-                this.removeWholeStage();
+                this.removeWholeStage(stage);
                 
             }
             // true imply call is from delete section;
