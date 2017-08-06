@@ -2,7 +2,8 @@ window.ChaiBioTech.ngApp.service('deleteStepService', [
     'constants',
     'correctNumberingService',
     'circleManager',
-    function(constants, correctNumberingService, circleManager) {
+    'editModeService',
+    function(constants, correctNumberingService, circleManager, editModeService) {
         
         this.deleteStep = function(stage, data, currentStep, $scope) {
 
@@ -21,7 +22,6 @@ window.ChaiBioTech.ngApp.service('deleteStepService', [
                 this.configureStepForDelete(stage, currentStep, start);
             } else { // if all the steps in the stages are deleted, We delete the stage itself.
                 this.removeWholeStage(stage);
-                
             }
             // true imply call is from delete section;
             stage.moveAllStepsAndStages(true);
@@ -63,20 +63,37 @@ window.ChaiBioTech.ngApp.service('deleteStepService', [
 
 
         this.postDelete = function(stage, $scope, selected) {
-
+            
             correctNumberingService.correctNumbering();
             //circleManager.addRampLines();
             circleManager.init(stage.parent);
             circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
             stage.stageHeader();
-            $scope.applyValues(selected.circle);
-            selected.circle.manageClick();
+            
+            if(selected) {
+                $scope.applyValues(selected.circle);
+                selected.circle.manageClick();
+            } else {
+                selected = this.getAnotherSelection(stage);
+                $scope.applyValues(selected.circle);
+                selected.circle.manageClick();
+            }
             
             if(stage.parent.allStepViews.length === 1) {
-                editModeService.editStageMode(stage.parent.editStageStatus);
+                editModeService.editStageMode(false);
             }
 
             stage.parent.setDefaultWidthHeight();
+        };
+
+        this.getAnotherSelection = function(stage) {
+            
+            if(stage.previousStage) {
+                return stage.previousStage.childSteps[stage.previousStage.childSteps.length - 1];
+            }
+
+            return stage.nextStage.childSteps[0]; 
+
         };
     }
 ]);
