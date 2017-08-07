@@ -20,7 +20,8 @@
 window.ChaiBioTech.ngApp.service('StageMovementRightService', [
     'StepPositionService',
     'StagePositionService',
-    function(StepPositionService, StagePositionService) {
+    'moveStageToSides',
+    function(StepPositionService, StagePositionService, moveStageToSides) {
         return {
 
             shouldStageMoveRight: function(sI) {
@@ -36,7 +37,7 @@ window.ChaiBioTech.ngApp.service('StageMovementRightService', [
                     if(index !== this.movedRightStageIndex) {
                         
                         this.movedStageIndex = this.movedRightStageIndex = index;
-                        this.kanvas.allStageViews[index].moveToSide("right", this.currentDropStage);
+                        moveStageToSides.moveToSide("right", this.currentDropStage, this.kanvas.allStageViews[index]);
                         StagePositionService.getPositionObject();
                         StagePositionService.getAllVoidSpaces();
                         StepPositionService.getPositionObject(this.kanvas.allStepViews);
