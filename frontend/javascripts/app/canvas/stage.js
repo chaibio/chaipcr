@@ -82,7 +82,6 @@ angular.module("canvasApp").factory('stage', [
 
       this.collapseStage = function() {
         
-        console.log("okay Shrinking");
         this.childSteps.forEach(this.deleteAllStepContents, this);
         this.deleteStageContents();
         // Bring other stages closer
@@ -98,7 +97,7 @@ angular.module("canvasApp").factory('stage', [
       this.addNewStep = function(data, currentStep) {
         
         addStepService.addNewStep(this, data, currentStep, $scope);
-        return 0;
+        return ;
         
       };
 
@@ -123,20 +122,6 @@ angular.module("canvasApp").factory('stage', [
         }
       };
 
-      this.wireNextAndPreviousStep = function(currentStep, selected) {
-
-        if(currentStep.previousStep) {
-          currentStep.previousStep.nextStep = (currentStep.nextStep) ? currentStep.nextStep : null;
-          selected = currentStep.previousStep;
-        }
-
-        if(currentStep.nextStep) {
-          currentStep.nextStep.previousStep = (currentStep.previousStep) ? currentStep.previousStep: null;
-          selected = currentStep.nextStep;
-        }
-        return selected;
-      };
-
       this.deleteStageContents = function() {
 
         for(var component in this.visualComponents) {
@@ -156,9 +141,8 @@ angular.module("canvasApp").factory('stage', [
 
       this.deleteFromStage = function(index, ordealStatus) {
         
-        console.log("From step", this.childSteps.length, this.childSteps[index]);
         this.deleteAllStepContents(this.childSteps[index]);
-        this.wireNextAndPreviousStep(this.childSteps[index]);
+        this.childSteps[index].wireNextAndPreviousStep(this.childSteps[index]);
         this.childSteps.splice(index, 1);
         this.model.steps.splice(index, 1);
         this.parent.allStepViews.splice(ordealStatus - 1, 1);
@@ -168,11 +152,7 @@ angular.module("canvasApp").factory('stage', [
       };
 
       this.deleteAllStepContents = function(currentStep) {
-
-        for(var component in currentStep.visualComponents) {
-          this.canvas.remove(currentStep.visualComponents[component]);
-        }
-        currentStep.circle.removeContents();
+        currentStep.deleteAllStepContents();
       };
 
       this.moveIndividualStageAndContents = function(stage, del) {
@@ -192,15 +172,11 @@ angular.module("canvasApp").factory('stage', [
         childStep.circle.moveCircleWithStep();
       };
 
-      
       this.moveAllStepsAndStages = function(del) {
 
         var currentStage = this;
-
         while(currentStage) {
-
           this.moveIndividualStageAndContents(currentStage, del);
-
           currentStage = currentStage.nextStage;
         }
       };
@@ -208,7 +184,8 @@ angular.module("canvasApp").factory('stage', [
       this.updateStageData = function(action) {
 
           if(! this.previousStage && action === -1 && this.index === 1) {
-            // This is a special case when very first stage is being deleted and the second stage is selected right away..!
+            // This is a special case when very first stage is being deleted and the 
+            // second stage is selected right away..!
             this.index = this.index + action;
             this.stageHeader();
           }
@@ -251,9 +228,8 @@ angular.module("canvasApp").factory('stage', [
 
       this.addSteps = function() {
 
-        var stepView, that = this;
+        var that = this;
         this.childSteps = [];
-
         // We use reduce here so that Linking is easy here, 
         // because reduce retain the previous value which we return.
         this.model.steps.reduce(function(tempStep, STEP, stepIndex) {
@@ -263,7 +239,7 @@ angular.module("canvasApp").factory('stage', [
 
       this.configureStepOnCreate  = function(tempStep, STEP, stepIndex) {
 
-        stepView = new step(STEP.step, this, stepIndex, $scope);
+        var stepView = new step(STEP.step, this, stepIndex, $scope);
 
           if(tempStep) {
             tempStep.nextStep = stepView;
@@ -277,7 +253,6 @@ angular.module("canvasApp").factory('stage', [
             stepView.ordealStatus = this.parent.allStepViews.length;
             stepView.render();
           }
-
           return stepView;
       };
 
@@ -312,8 +287,6 @@ angular.module("canvasApp").factory('stage', [
         this.dots.setVisible(false);
         this.stageCaption.setLeft(this.stageCaption.left - 24).setCoords();
         this.canvas.sendToBack(this.stageGroup);
-        //this.canvas.sendToBack(this.dots);
-        //this.canvas.sendToBack(this.borderRight);
       };
 
       this.render = function() {
@@ -337,7 +310,6 @@ angular.module("canvasApp").factory('stage', [
           this.canvas.add(this.dots);
 
           this.setShadows();
-
           this.addSteps();
       };
 
@@ -394,14 +366,11 @@ angular.module("canvasApp").factory('stage', [
         for( i = this.index;  i < length; i++) {
           this.parent.allStageViews[i].index = i;
         }
-        console.log(this.index, this.parent.allStageViews);
-        //debugger;
       };
 
       this.unSelectStage = function() {
 
         var previousSelectedStage = previouslySelected.circle.parent.parentStage;
-
         previousSelectedStage.changeFillsAndStrokes("white", 2);
         previousSelectedStage.manageBordersOnSelection("#ff9f00");
       };

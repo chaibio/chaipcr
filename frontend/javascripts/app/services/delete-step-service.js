@@ -11,7 +11,7 @@ window.ChaiBioTech.ngApp.service('deleteStepService', [
             var selected;
             stage.setNewWidth(constants.stepWidth * -1);
             stage.deleteAllStepContents(currentStep);
-            selected = stage.wireNextAndPreviousStep(currentStep, selected);
+            selected = currentStep.wireNextAndPreviousStep(currentStep, selected);
 
             var start = currentStep.index;
             var ordealStatus = currentStep.ordealStatus;

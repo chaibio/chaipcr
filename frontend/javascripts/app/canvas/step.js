@@ -140,6 +140,28 @@ angular.module("canvasApp").factory('step', [
         }
       };
 
+      this.deleteAllStepContents = function() {
+
+        for(var component in this.visualComponents) {
+          this.canvas.remove(this.visualComponents[component]);
+        }
+        this.circle.removeContents();
+      };
+
+      this.wireNextAndPreviousStep = function(currentStep, selected) {
+
+        if(this.previousStep) {
+          this.previousStep.nextStep = (this.nextStep) ? this.nextStep : null;
+          selected = this.previousStep;
+        }
+
+        if(this.nextStep) {
+          this.nextStep.previousStep = (this.previousStep) ? this.previousStep: null;
+          selected = this.nextStep;
+        }
+        return selected;
+      };
+
       this.specialMoveStep = function() {
 
         if(this.previousStep) {
