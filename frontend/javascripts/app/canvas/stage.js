@@ -30,8 +30,9 @@ angular.module("canvasApp").factory('stage', [
   'editModeService',
   'addStepService',
   'deleteStepService',
+  'moveStageToSides',
   function(ExperimentLoader, $rootScope, step, previouslySelected, stageGraphics, stepGraphics, constants, 
-  circleManager, correctNumberingService, editModeService, addStepService, deleteStepService) {
+  circleManager, correctNumberingService, editModeService, addStepService, deleteStepService, moveStageToSides) {
 
     /*
       @model has all the data points related to stage
@@ -105,45 +106,6 @@ angular.module("canvasApp").factory('stage', [
         
         deleteStepService.deleteStep(this, data, currentStep, $scope);
         return;
-        // This methode says what happens in the canvas when a step is deleted
-        var selected;
-        this.setNewWidth(constants.stepWidth * -1);
-        this.deleteAllStepContents(currentStep);
-        selected = this.wireNextAndPreviousStep(currentStep, selected);
-
-        var start = currentStep.index;
-        var ordealStatus = currentStep.ordealStatus;
-        // Delete data from arrays
-        this.childSteps.splice(start, 1);
-        this.model.steps.splice(start, 1);
-        this.parent.allStepViews.splice(ordealStatus - 1, 1);
-        //this.parent.correctNumbering();
-        if(this.childSteps.length > 0) {
-          this.configureStepForDelete(currentStep, start);
-        } else { // if all the steps in the stages are deleted, We delete the stage itself.
-          this.deleteStageContents();
-          this.wireStageNextAndPrevious();
-
-          selected = (this.previousStage) ? this.previousStage.childSteps[this.previousStage.childSteps.length - 1] : this.nextStage.childSteps[0];
-          this.parent.allStageViews.splice(this.index, 1);
-          selected.parentStage.updateStageData(-1);
-        }
-        // true imply call is from delete section;
-        this.moveAllStepsAndStages(true);
-
-        correctNumberingService.correctNumbering();
-        //circleManager.addRampLines();
-        circleManager.init(kanvas);
-        circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
-        this.stageHeader();
-        $scope.applyValues(selected.circle);
-        selected.circle.manageClick();
-
-        if(this.parent.allStepViews.length === 1) {
-          editModeService.editStageMode(this.parent.editStageStatus);
-        }
-
-        this.parent.setDefaultWidthHeight();
       };
 
       this.wireStageNextAndPrevious = function() {
@@ -230,135 +192,7 @@ angular.module("canvasApp").factory('stage', [
         childStep.circle.moveCircleWithStep();
       };
 
-      this.makeSurePreviousMovedLeft = function(draggedStage) {
-
-        var stage = this.previousStage;
-        while(stage) {
-          if(stage.stageMovedDirection !== "left") {
-            console.log("Looking");
-            stage.moveToSide("left", draggedStage);
-          }
-          stage = stage.previousStage;
-        }
-      };
-      //
-      this.makeSureNextMovedRight = function(draggedStage) {
-        var stage = this.nextStage;
-        while(stage) {
-          if(stage.stageMovedDirection !== "right") {
-            stage.moveToSide("right", draggedStage);
-          }
-          stage = stage.nextStage;
-        }
-      };
-
       
-      this.moveToSide = function(direction, draggedStage) {
-
-        if(this.validMove(direction, draggedStage)) {
-
-          var moveCount;
-          if(direction === "left") {
-            moveCount = -30;
-            this.makeSurePreviousMovedLeft(draggedStage);
-          } else if("right") {
-            moveCount = 30;
-            this.makeSureNextMovedRight(draggedStage);
-          }
-          this.moveToSideStageComponents(moveCount);
-          this.stageMovedDirection = direction; // !important
-          return "Valid Move";
-        }
-        return null;
-      };
-
-      this.moveToSideStageComponents = function(moveCount) {
-
-        this.stageGroup.set({left: this.left + moveCount }).setCoords();
-        this.dots.set({left: (this.left + moveCount ) + 3}).setCoords();
-        this.left = this.left + moveCount;
-        var previousMovingFound = false;
-        
-        this.childSteps.forEach(function(step, index) {
-          step.moveStep(1, true);
-          step.circle.moveCircleWithStep();
-        });
-        
-        if(this.sourceStage === true) {
-            this.manageSourceStageStepMovement(moveCount);
-        }
-      };
-
-      this.manageSourceStageStepMovement = function(moveCount) {
-
-        this.childSteps.some(function(step, index) {
-            if(step.previousIsMoving) {
-              var tempStep = step;
-              while(tempStep) {
-                tempStep.left = tempStep.left + 40;
-                tempStep.moveStep(0, false);
-                tempStep.circle.moveCircleWithStep();
-                tempStep = tempStep.nextStep;
-              }
-              return true;
-            }
-          }, this);
-
-          this.parent.moveDots.setLeft(this.parent.moveDots.left + moveCount).setCoords();
-      };
-
-      this.validMove = function(direction, draggedStage) {
-
-        if(this.stageMovedDirection === null) {
-
-          if(direction === "left") {
-            // For very first stage, It can't move further left.
-            if(this.previousStage === null) {
-              //return false;
-              if(draggedStage.index !== 0) {
-                return false;
-              }
-            }
-            // look if we have space at left;
-            if(this.previousStage && this.left - (this.previousStage.left + this.previousStage.myWidth) < 10) {
-              return false;
-            }
-            this.stageMovedDirection = "left";
-
-          } else if(direction === "right") {
-
-            if(this.nextStage === null) {
-              
-              if(this.sourceStage === true) {
-                //If we clicked on move-step, stage is sourceStage
-                return true;
-              }
-
-              if(draggedStage.index === this.parent.allStageViews.length) {
-                // For the very first time, we need to move only if we dragged the very last stage.
-                this.stageMovedDirection = "right";
-                return true;
-              }
-              return false;
-            }
-            // We move only if we have space in the right side.
-            if(this.nextStage && (this.nextStage.left) - (this.left + this.myWidth) < 10) {
-              return false;
-            }
-            this.stageMovedDirection = "right";
-          }
-        } else if(this.stageMovedDirection){ // if it has left or right value
-          if(this.stageMovedDirection === "left" && direction === "left") {
-            return false;
-          }
-          if(this.stageMovedDirection === "right" && direction === "right") {
-            return false;
-          }
-        }
-
-        return true;
-      };
-
       this.moveAllStepsAndStages = function(del) {
 
         var currentStage = this;
@@ -386,20 +220,6 @@ angular.module("canvasApp").factory('stage', [
             currentStage = currentStage.nextStage;
           }
 
-      };
-
-      this.configureStepForDelete = function(newStep, start) {
-
-        this.childSteps.slice(0, start).forEach(function(thisStep) {
-          thisStep.configureStepName();
-        }, this);
-
-        this.childSteps.slice(start, this.childSteps.length).forEach(function(thisStep) {
-
-          thisStep.index = thisStep.index - 1;
-          thisStep.configureStepName();
-          thisStep.moveStep(-1, true);
-        }, this);
       };
 
       this.squeezeStage = function(step) {
