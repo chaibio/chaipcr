@@ -434,27 +434,31 @@ angular.module("canvasApp").factory('stage', [
         var stepView, that = this;
         this.childSteps = [];
 
-        // We use reduce here so that Linking is easy here, because reduce retain the previous value which we return.
-
+        // We use reduce here so that Linking is easy here, 
+        // because reduce retain the previous value which we return.
         this.model.steps.reduce(function(tempStep, STEP, stepIndex) {
-          
-          stepView = new step(STEP.step, that, stepIndex, $scope);
+          return that.configureStepOnCreate(tempStep, STEP, stepIndex);
+        }, null);
+      };
+
+      this.configureStepOnCreate  = function(tempStep, STEP, stepIndex) {
+
+        stepView = new step(STEP.step, this, stepIndex, $scope);
 
           if(tempStep) {
             tempStep.nextStep = stepView;
             stepView.previousStep = tempStep;
           }
 
-          that.childSteps.push(stepView);
+          this.childSteps.push(stepView);
 
-          if(! that.insertMode) {
-            that.parent.allStepViews.push(stepView);
-            stepView.ordealStatus = that.parent.allStepViews.length;
+          if(! this.insertMode) {
+            this.parent.allStepViews.push(stepView);
+            stepView.ordealStatus = this.parent.allStepViews.length;
             stepView.render();
           }
 
           return stepView;
-        }, null);
       };
 
       this.stageHeader = function() {
