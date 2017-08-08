@@ -33,7 +33,6 @@ angular.module("canvasApp").factory('canvas', [
   'circleManager',
   'dots',
   'interceptorFactory',
-  'stageHitBlock',
   'stageGraphics',
   'StagePositionService',
   'StepPositionService',
@@ -43,7 +42,7 @@ angular.module("canvasApp").factory('canvas', [
   'addStageService',
   'loadImageService',
   function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents,
-    moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory, stageHitBlock, stageGraphics, 
+    moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory, stageGraphics, 
     StagePositionService, StepPositionService, Line, correctNumberingService, editModeService, addStageService, loadImageService) {
 
     this.init = function(model) {
