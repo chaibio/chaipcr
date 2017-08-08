@@ -90,21 +90,6 @@ angular.module("canvasApp").factory('step', [
 
       };
       
-      this.moveToSide = function(direction) {
-
-        if(direction === "left" && this.stepMovedDirection !== "left") {
-          this.left = this.left - 10;
-          this.moveStep(0, false);
-          this.circle.moveCircleWithStep();
-          this.stepMovedDirection = "left";
-        } else if(direction === "right" && this.stepMovedDirection !== "right") {
-          this.left = this.left + 10;
-          this.moveStep(0, false);
-          this.circle.moveCircleWithStep();
-          this.stepMovedDirection = "right";
-        }
-      };
-
       this.deleteAllStepContents = function() {
 
         for(var component in this.visualComponents) {
