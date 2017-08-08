@@ -28,7 +28,7 @@ angular.module("canvasApp").factory('step', [
   function(ExperimentLoader, $rootScope, circle, previouslySelected, stepGraphics, constants) {
 
     return function(model, parentStage, index, $scope) {
-      console.log("modelled", model);
+      
       this.stepMovedDirection = null;
       this.model = model;
       this.parentStage = parentStage;
@@ -50,30 +50,6 @@ angular.module("canvasApp").factory('step', [
 
         this.left = this.parentStage.left + 3 + (parseInt(this.index) * this.myWidth);
         return this;
-      };
-
-      this.shrinkStep = function() {
-        console.log("sdcsfdsfsdfdsfsdf");
-        this.shrinked = true;
-        this.myWidth = 45;
-        this.stepRect.setWidth(45).setCoords();
-        this.borderRight.setLeft(-20).setCoords();
-        //leftVal = {left: this.left + (this.myWidth / 2)};
-        this.moveOtherStepsInStage();
-        this.parentStage.shrinkStage();
-        //this.parentStage.addHitBlock(); // We need this to add stage , by moving a step to empty place between stages.
-      };
-
-      this.moveOtherStepsInStage = function() {
-
-        var nxt = this.nextStep;
-        while(nxt) {
-          nxt.left = nxt.left - 80;
-          nxt.moveStep(0, false);
-          nxt.circle.moveCircleWithStep();
-          nxt = nxt.nextStep;
-        }
-        this.canvas.renderAll();
       };
 
       this.toggleComponents = function(state) {
@@ -115,27 +91,16 @@ angular.module("canvasApp").factory('step', [
       };
       
       this.moveToSide = function(direction) {
+
         if(direction === "left" && this.stepMovedDirection !== "left") {
           this.left = this.left - 10;
           this.moveStep(0, false);
           this.circle.moveCircleWithStep();
-         
-         
-          //if(this.nextStep) {
-         //   this.nextStep.borderLeft.setVisible(true);
-          //} 
-          
-          //this.borderLeft.setVisible(false);
-         
           this.stepMovedDirection = "left";
         } else if(direction === "right" && this.stepMovedDirection !== "right") {
           this.left = this.left + 10;
           this.moveStep(0, false);
           this.circle.moveCircleWithStep();
-          //if(this.nextStep) {
-            //this.nextStep.borderLeft.setVisible(false);
-          //}
-          //this.borderLeft.setVisible(true);
           this.stepMovedDirection = "right";
         }
       };
@@ -160,17 +125,6 @@ angular.module("canvasApp").factory('step', [
           selected = this.nextStep;
         }
         return selected;
-      };
-
-      this.specialMoveStep = function() {
-
-        if(this.previousStep) {
-          this.left = this.previousStep.left + this.previousStep.myWidth;
-          this.moveStep(1, false);
-          return;
-        }
-
-        this.moveStep(1, true);
       };
 
       this.configureStepName = function(thisStep) {
