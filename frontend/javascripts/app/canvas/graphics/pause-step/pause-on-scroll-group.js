@@ -23,8 +23,6 @@ angular.module("canvasApp").factory('pauseStepOnScrollGroup', [
       return new fabric.Group(objs, {
         left: 20,
         top: -18,
-        //width: 32,
-        //height: 32,
         me: this,
         selectable: false,
         name: "pauseStepOnScrollGroup",
