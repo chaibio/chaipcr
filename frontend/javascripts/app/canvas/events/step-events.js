@@ -21,7 +21,8 @@ angular.module("canvasApp").service('stepEvents',[
   'stageGraphics',
   'stepGraphics',
   'TimeService',
-  function(stageGraphics, stepGraphics, TimeService) {
+  'pauseStepService',
+  function(stageGraphics, stepGraphics, TimeService, pauseStepService) {
 
     var that = this;
     this.changeDeltaText = function($scope) {
@@ -103,7 +104,7 @@ angular.module("canvasApp").service('stepEvents',[
       $scope.$watch('step.pause', function(newVal, oldVal) {
 
         var circle = $scope.fabricStep.circle;
-        circle.controlPause(newVal);
+        pauseStepService.controlPause(circle);
         canvas.renderAll();
       });
 

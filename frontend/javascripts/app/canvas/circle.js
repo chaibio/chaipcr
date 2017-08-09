@@ -37,10 +37,11 @@ angular.module("canvasApp").factory('circle', [
   'previouslySelected',
   'pauseStepOnScrollGroup',
   'pauseStepCircleOnScroll',
+  'pauseStepService',
   function(ExperimentLoader, $rootScope, Constants, circleGroup, outerMostCircle, outerCircle,
     centerCircle, littleCircleGroup, circleMaker, stepDataGroup, stepTemperature, stepHoldTime,
     gatherDataGroupOnScroll, gatherDataCircleOnScroll, gatherDataGroup, gatherDataCircle, previouslySelected,
-    pauseStepOnScrollGroup, pauseStepCircleOnScroll) {
+    pauseStepOnScrollGroup, pauseStepCircleOnScroll, pauseStepService) {
     
     return function(model, parentStep, $scope) {
 
@@ -191,7 +192,7 @@ angular.module("canvasApp").factory('circle', [
         this.canvas.add(this.gatherDataDuringRampGroup);
 
         this.showHideGatherData(this.parent.gatherDataDuringStep);
-        this.controlPause(this.model.pause);
+        pauseStepService.controlPause(this);
 
         if(this.previous) {
           this.gatherDataDuringRampGroup.setVisible(this.parent.gatherDataDuringRamp);
@@ -315,19 +316,8 @@ angular.module("canvasApp").factory('circle', [
         }
 
         if(this.model.pause) {
-          this.applyPauseChanges();
+          pauseStepService.applyPauseChanges(this);
         }
-      };
-
-      this.applyPauseChanges = function() {
-
-        this.circle.setFill("#ffb400");
-        this.circle.setStroke("#ffde00");
-        this.circle.strokeWidth = 4;
-        this.circle.radius = 13;
-        this.pauseImageMiddle.setVisible(true);
-        this.gatherDataImageMiddle.setVisible(false);
-        this.pauseStepOnScrollGroup.setVisible(false);
       };
 
       this.showHideGatherData = function(state) {
@@ -339,20 +329,6 @@ angular.module("canvasApp").factory('circle', [
         } else {
           this.circle.setFill("#ffb400");
           this.gatherDataOnScroll.setVisible(state);
-        }
-      };
-
-      this.controlPause = function(state) {
-
-        if(state && this.big) {
-          this.pauseStepOnScrollGroup.setVisible(true);
-          this.holdTime.setVisible(false);
-        } else if(state) {
-          this.holdTime.setVisible(false);
-          this.applyPauseChanges();
-        } else {
-          this.pauseStepOnScrollGroup.setVisible(false);
-          this.holdTime.setVisible(true);
         }
       };
 
