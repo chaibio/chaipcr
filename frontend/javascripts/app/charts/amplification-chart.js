@@ -1,6 +1,6 @@
 (function() {
 
-  "use strict";
+  // "use strict";
 
   function AmplificationChart(elem, data, config) {
 
@@ -636,6 +636,18 @@
       if (Globals.zoomTransform.rescaleY) {
         Globals.gY.call(Globals.yAxis.scale(Globals.zoomTransform.rescaleY(Globals.yScale)));
       }
+
+      // text label for the y axis
+      svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - Globals.config.margin.left)
+        .attr("x", 0 - (Globals.height / 2))
+        .attr("dy", "1em")
+        .attr("font-family", "dinot-bold")
+        .attr("font-size", "12px")
+        .attr("fill", "#333")
+        .style("text-anchor", "middle")
+        .text("RELATIVE FLUORESCENCE UNITS");
     }
 
     function setXAxis() {
@@ -667,6 +679,19 @@
       if (Globals.zoomTransform.rescaleX) {
         Globals.gX.call(Globals.xAxis.scale(Globals.zoomTransform.rescaleX(Globals.xScale)));
       }
+
+      // text label for the x axis
+      svg.append("text")
+        .attr("transform",
+          "translate(" + (Globals.width / 2) + " ," +
+          (Globals.height + Globals.config.margin.top + Globals.config.margin.bottom - 20) + ")")
+        .style("text-anchor", "middle")
+        .attr("font-family", "dinot-bold")
+        .attr("font-size", "12px")
+        .attr("fill", "#333")
+        .text("CYCLE NUMBER");
+
+      console.log(Globals.config.margin);
     }
 
     function updateZoomScaleExtent() {
@@ -687,6 +712,26 @@
 
       var width = Globals.width = elem.parentElement.offsetWidth - config.margin.left - config.margin.right;
       var height = Globals.height = elem.parentElement.offsetHeight - config.margin.top - config.margin.bottom;
+      // var h = height;
+      // var max_width = h + h * 0.50;
+      // width = width >  max_width ? max_width : width;
+      // Globals.width = width;
+
+      // if (width > 773) {
+      //   width = 773;
+      //   height = 260;
+      //   Globals.width = width;
+      //   Globals.height = height;
+      // }
+
+      var maxWidth = 400;
+      var maxHeight = 260;
+      var ratio = maxWidth / maxHeight;
+
+      if (width / height > ratio) {
+        width = ratio * height;
+        Globals.width = width;
+      }
 
       var chartSVG = Globals.chartSVG = d3.select(elem).append("svg")
         .attr("width", width + config.margin.left + config.margin.right)
@@ -855,7 +900,7 @@
       Globals.onZoomAndPan = fn;
     };
 
-    this.onSelectLine = function (fn) {
+    this.onSelectLine = function(fn) {
       Globals.onSelectLine = fn;
     };
 
