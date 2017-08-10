@@ -65,9 +65,8 @@ window.ChaiBioTech.ngApp.service('deleteStepService', [
         this.postDelete = function(stage, $scope, selected) {
             
             correctNumberingService.correctNumbering();
-            //circleManager.addRampLines();
-            circleManager.init(stage.parent);
-            circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
+            this.makeSureLastStepHasNoCurve(stage);
+            circleManager.addRampLines();
             stage.stageHeader();
             
             if(selected) {
@@ -84,6 +83,19 @@ window.ChaiBioTech.ngApp.service('deleteStepService', [
             }
 
             stage.parent.setDefaultWidthHeight();
+        };
+
+        this.makeSureLastStepHasNoCurve = function(stage) {
+
+            var len = stage.parent.allStepViews.length;
+            var lStep = stage.parent.allStepViews[len - 1];
+
+            if(lStep.circle.curve) {
+                stage.parent.canvas.remove(lStep.circle.curve);
+                delete lStep.circle.curve;   
+                lStep.circle.next = null;
+            }
+            
         };
 
         this.getAnotherSelection = function(stage) {

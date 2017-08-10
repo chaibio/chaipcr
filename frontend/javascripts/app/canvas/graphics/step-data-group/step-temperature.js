@@ -20,7 +20,8 @@
 angular.module("canvasApp").factory('stepTemperature', [
   'editMode',
   'ExperimentLoader',
-  function(editMode, ExperimentLoader) {
+  'moveRampLineService',
+  function(editMode, ExperimentLoader, moveRampLineService) {
     return function(model, parent, $scope) {
 
       this.model = model;
@@ -90,7 +91,7 @@ angular.module("canvasApp").factory('stepTemperature', [
         parent.model.temperature = $scope.step.temperature;
         parent.circleGroup.top = parent.getTop().top;
         parent.createNewStepDataGroup();
-        parent.manageDrag(parent.circleGroup);
+        moveRampLineService.manageDrag(parent.circleGroup);
         parent.circleGroup.setCoords();
         parent.canvas.renderAll();
       };
