@@ -19,7 +19,8 @@
 
 angular.module("canvasApp").factory('circleManager', [
   'path',
-  function(path) {
+  'moveRampLineService',
+  function(path, moveRampLineService) {
 
     this.init = function(kanvas) {
 
@@ -83,7 +84,7 @@ angular.module("canvasApp").factory('circleManager', [
           }
         }
         step.circle.moveCircleWithStep();
-        step.circle.manageDrag(step.circle.circleGroup);
+        moveRampLineService.manageDrag(step.circle.circleGroup);
         this.canvas.bringToFront(step.circle.circleGroup);
 
         if(step.model.ramp.collect_data) {

@@ -332,53 +332,6 @@ angular.module("canvasApp").factory('circle', [
         }
       };
 
-      this.manageDrag = function(targetCircleGroup) {
-
-        var top = targetCircleGroup.top;
-        var left = targetCircleGroup.left;
-
-        if(top < this.scrollTop) {
-          targetCircleGroup.setTop(this.scrollTop);
-          this.manageRampLineMovement(left, this.scrollTop, targetCircleGroup);
-        } else if(top > this.scrollLength) {
-          targetCircleGroup.setTop(this.scrollLength);
-          this.manageRampLineMovement(left, this.scrollLength, targetCircleGroup);
-        } else {
-          this.stepDataGroup.setTop(top + 48).setCoords();
-          this.manageRampLineMovement(left, top, targetCircleGroup);
-        }
-      };
-
-      this.manageRampLineMovement = function(left, top, targetCircleGroup) {
-
-        var midPointY;
-
-        if(this.next) {
-
-          midPointY = this.curve.nextOne(left, top);
-          // We move the gather data Circle along with it [its next object's]
-          this.next.gatherDataDuringRampGroup.setTop(midPointY);
-
-          if(this.next.model.ramp.collect_data) {
-            this.runAlongEdge();
-          }
-        }
-
-        if(this.previous) {
-
-          midPointY = this.previous.curve.previousOne(left, top);
-
-          this.gatherDataDuringRampGroup.setTop(midPointY);
-
-          if(this.model.ramp.collect_data) {
-            this.runAlongCircle();
-          }
-        }
-
-        this.temperatureDisplay(targetCircleGroup);
-        this.parent.adjustRampSpeedPlacing();
-      };
-
       this.temperatureDisplay = function(targetCircleGroup) {
 
         var dynamicTemp;
