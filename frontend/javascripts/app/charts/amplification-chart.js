@@ -597,6 +597,7 @@
     function setYAxis() {
 
       Globals.chartSVG.selectAll('g.axis.y-axis').remove();
+      Globals.chartSVG.selectAll('.g-y-axis-text').remove();
 
       var svg = Globals.chartSVG.select('.chart-g');
 
@@ -639,6 +640,7 @@
 
       // text label for the y axis
       svg.append("text")
+        .attr("class", "g-y-axis-text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - Globals.config.margin.left)
         .attr("x", 0 - (Globals.height / 2))
@@ -653,6 +655,7 @@
     function setXAxis() {
 
       Globals.chartSVG.selectAll('g.axis.x-axis').remove();
+      Globals.chartSVG.selectAll('.g-x-axis-text').remove();
 
       var svg = Globals.chartSVG.select('.chart-g');
 
@@ -682,6 +685,7 @@
 
       // text label for the x axis
       svg.append("text")
+        .attr('class', 'g-x-axis-text')
         .attr("transform",
           "translate(" + (Globals.width / 2) + " ," +
           (Globals.height + Globals.config.margin.top + Globals.config.margin.bottom - 20) + ")")
@@ -691,7 +695,6 @@
         .attr("fill", "#333")
         .text("CYCLE NUMBER");
 
-      console.log(Globals.config.margin);
     }
 
     function updateZoomScaleExtent() {
@@ -712,17 +715,6 @@
 
       var width = Globals.width = elem.parentElement.offsetWidth - config.margin.left - config.margin.right;
       var height = Globals.height = elem.parentElement.offsetHeight - config.margin.top - config.margin.bottom;
-      // var h = height;
-      // var max_width = h + h * 0.50;
-      // width = width >  max_width ? max_width : width;
-      // Globals.width = width;
-
-      // if (width > 773) {
-      //   width = 773;
-      //   height = 260;
-      //   Globals.width = width;
-      //   Globals.height = height;
-      // }
 
       var maxWidth = 400;
       var maxHeight = 260;
