@@ -1,11 +1,13 @@
-// var requireDir = require('require-dir');
-// var tasks = requireDir('./frontend/tasks');
+var requireDir = require('require-dir');
+var tasks = requireDir('./frontend/tasks');
+
+// start angular 2 tasks
 
 const gulp = require('gulp')
 const { exec } = require('child_process')
 const del = require('del')
 
-gulp.task('clean', () => {
+gulp.task('ng2:clean', () => {
   return del([
     './web/public/*.ttf',
     './web/public/*.eot',
@@ -20,7 +22,7 @@ gulp.task('clean', () => {
   ]);
 })
 
-gulp.task('ng:build:debug', ['clean'], (done) => {
+gulp.task('ng2:build:debug', ['ng2:clean'], (done) => {
   process.chdir('./ng2')
   exec('ng build', (err, stdout, stderr) => {
     console.log(err)
@@ -31,7 +33,7 @@ gulp.task('ng:build:debug', ['clean'], (done) => {
   })
 })
 
-gulp.task('ng:build:deploy', ['clean'], (done) => {
+gulp.task('ng2:build:deploy', ['ng2:clean'], (done) => {
   process.chdir('./ng2')
   exec('ng build --target=production', (err, stdout, stderr) => {
     console.log(err)
@@ -42,14 +44,12 @@ gulp.task('ng:build:deploy', ['clean'], (done) => {
   })
 })
 
-gulp.task('debug', ['ng:build:debug'], () => {
+gulp.task('ng2:debug', ['ng2:build:debug'], () => {
   return gulp.src('./ng2/dist/**/*')
     .pipe(gulp.dest('./web/public'))
 })
 
-gulp.task('deploy', ['ng:build:deploy'], () => {
+gulp.task('ng2:deploy', ['ng2:build:deploy'], () => {
   return gulp.src('./ng2/dist/**/*')
     .pipe(gulp.dest('./web/public'))
 })
-
-gulp.task('default', ['debug'])

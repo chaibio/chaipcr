@@ -16,5 +16,5 @@ You can read more about [Angular CLI Proxy](https://github.com/angular/angular-c
 ### Deployment
 
  - cd to project's root directory `chaipcr`
- - run `gulp deploy`
+ - run `gulp ng2:deploy`
  - run the deploy script `./deploy.sh <remote_IP>`
