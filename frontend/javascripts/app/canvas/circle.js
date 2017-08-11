@@ -38,10 +38,11 @@ angular.module("canvasApp").factory('circle', [
   'pauseStepOnScrollGroup',
   'pauseStepCircleOnScroll',
   'pauseStepService',
+  'editModeService',
   function(ExperimentLoader, $rootScope, Constants, circleGroup, outerMostCircle, outerCircle,
     centerCircle, littleCircleGroup, circleMaker, stepDataGroup, stepTemperature, stepHoldTime,
     gatherDataGroupOnScroll, gatherDataCircleOnScroll, gatherDataGroup, gatherDataCircle, previouslySelected,
-    pauseStepOnScrollGroup, pauseStepCircleOnScroll, pauseStepService) {
+    pauseStepOnScrollGroup, pauseStepCircleOnScroll, pauseStepService, editModeService) {
     
     return function(model, parentStep, $scope) {
 
@@ -218,12 +219,12 @@ angular.module("canvasApp").factory('circle', [
             var lastStage = this.parent.parentStage;
             lastStage.dots.setVisible(false);
             this.canvas.bringToFront(lastStage.dots);
-            this.parent.parentStage.parent.editModeStageChanges(this.parent.parentStage, -25, false);
+            editModeService.editModeStageChanges(this.parent.parentStage, -25, false);
             this.canvas.renderAll();
           }
         } else {
           if(oldHold !== null && parseInt(oldHold) === 0 && this.parent.parentStage.parent.editStageStatus === true) {
-            this.parent.parentStage.parent.editModeStageChanges(this.parent.parentStage, 25, true);
+            editModeService.editModeStageChanges(this.parent.parentStage, 25, true);
           }
         }
       };
