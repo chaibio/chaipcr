@@ -22,7 +22,7 @@ angular.module("canvasApp").factory('moveStepRectangle', [
     function(Rectangle) {
         return function() {
             return Rectangle.create({
-                fill: 'white', width: 96, left: 0, height: 72, selectable: false, name: "moveStepRectangle", rx: 1,
+                fill: 'white', width: 128, left: 0, height: 72, selectable: false, name: "moveStepRectangle", rx: 1,
             });
         };
     }

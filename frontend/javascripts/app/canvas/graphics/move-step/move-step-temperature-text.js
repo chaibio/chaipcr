@@ -23,7 +23,7 @@ angular.module("canvasApp").factory('moveStepTemperatureText', [
         return function() {
             return Text.create("20º", {
                 fill: 'black',  fontSize: 20, selectable: false, originX: 'left', originY: 'top',
-                top: 9, left: 1, fontFamily: "dinot-bold"
+                top: 9, left: 10, fontFamily: "dinot-bold"
             });
         };
     }

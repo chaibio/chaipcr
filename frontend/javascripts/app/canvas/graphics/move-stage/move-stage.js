@@ -24,7 +24,11 @@ angular.module("canvasApp").factory('moveStageRect', [
   'StagePositionService',
   'verticalLine',
   'moveStageIndicator',
-  function(ExperimentLoader, stageDude, stageGraphics, StagePositionService, verticalLine, moveStageIndicator) {
+  'correctNumberingService',
+  'addStageService',
+  'moveStageToSides',
+  function(ExperimentLoader, stageDude, stageGraphics, StagePositionService, verticalLine, 
+  moveStageIndicator, correctNumberingService, addStageService, moveStageToSides) {
 
     return {
       
@@ -104,7 +108,7 @@ angular.module("canvasApp").factory('moveStageRect', [
             if(this.kanvas.allStageViews[index].childSteps.length === 1) {
               if((this.movement.left + this.leftOffset) > point[1] && (this.movement.left + this.leftOffset) < point[2]) {
                 if(index !== this.currentMoveRight) {
-                  this.kanvas.allStageViews[index].moveToSide("left", this.draggedStage);
+                  moveStageToSides.moveToSide("left", this.draggedStage, this.kanvas.allStageViews[index]);
                   this.currentMoveRight = this.movedStageIndex = index;
                   StagePositionService.getPositionObject();
                 }
@@ -126,7 +130,7 @@ angular.module("canvasApp").factory('moveStageRect', [
               if((this.movement.left + this.rightOffset) > point[0] && (this.movement.left + this.rightOffset) < point[1]) {
                 
                 if(index !== this.currentMoveLeft) {
-                  this.kanvas.allStageViews[index].moveToSide("right", this.draggedStage);
+                  moveStageToSides.moveToSide("right", this.draggedStage, this.kanvas.allStageViews[index]);
                   this.currentMoveLeft = this.movedStageIndex = index;
                   StagePositionService.getPositionObject();
                 }
@@ -145,7 +149,7 @@ angular.module("canvasApp").factory('moveStageRect', [
             if((this.movement.left + this.rightOffset) > points[1] && (this.movement.left + this.rightOffset) < points[2]) {
               
               if(index !== this.currentMoveRight) {
-                this.kanvas.allStageViews[index].moveToSide("left", this.draggedStage);
+                moveStageToSides.moveToSide("left", this.draggedStage, this.kanvas.allStageViews[index]);
                 this.currentMoveRight = this.movedStageIndex = index;
                 StagePositionService.getPositionObject();
               }
@@ -163,7 +167,7 @@ angular.module("canvasApp").factory('moveStageRect', [
             if((this.movement.left + this.leftOffset) > points[0] && (this.movement.left + this.leftOffset) < points[1]) {
               
               if(this.currentMoveLeft !== index) {
-                this.kanvas.allStageViews[index].moveToSide("right", this.draggedStage);
+                moveStageToSides.moveToSide("right", this.draggedStage, this.kanvas.allStageViews[index]);
                 this.currentMoveLeft = this.movedStageIndex = index;
                 StagePositionService.getPositionObject();
               }
@@ -266,7 +270,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           var stageIndex = (this.currentDrop) ? this.currentDrop.index : 0;
           var model = this.draggedStage.model;
           var stageView = this.getNewStage(model, stageIndex);
-          this.kanvas.addNextandPrevious(this.currentDrop, stageView);
+          addStageService.addNextandPrevious(this.currentDrop, stageView);
 
           if(stageIndex === 0 && !this.currentDrop) { //if we insert into the very first place.
             this.kanvas.allStageViews.splice(stageIndex, 0, stageView);
@@ -279,16 +283,16 @@ angular.module("canvasApp").factory('moveStageRect', [
         };
 
         this.indicator.getNewStage = function(model, stageIndex) {
-          return new stageDude(model, this.kanvas.canvas, this.kanvas.allStepViews, stageIndex, this.kanvas, this.kanvas.$scope, true);
+          return new stageDude(model, this.kanvas, stageIndex, true, this.kanvas.$scope);
         };
 
         this.indicator.moveStageGraphics = function(stageView, circleManager) {
 
           stageView.updateStageData(1);
           stageView.render();
-          this.kanvas.configureStepsofNewStage(stageView, 0);
-          this.kanvas.correctNumbering();
-          this.kanvas.allStageViews[0].moveAllStepsAndStagesSpecial();
+          addStageService.configureStepsofNewStage(stageView, 0);
+          correctNumberingService.correctNumbering();
+          this.kanvas.allStageViews[0].moveAllStepsAndStages();
           circleManager.addRampLines();
           this.kanvas.allStepViews[this.kanvas.allStepViews.length - 1].circle.doThingsForLast(null, null);
           stageView.stageHeader();

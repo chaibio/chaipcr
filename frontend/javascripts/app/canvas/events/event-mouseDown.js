@@ -26,8 +26,9 @@ angular.module("canvasApp").factory('mouseDown', [
   'editMode',
   '$timeout',
   'movingStepGraphics',
+  'correctNumberingService',
   function(ExperimentLoader, previouslySelected, previouslyHoverd,
-   scrollService, circleManager, editMode, $timeout, movingStepGraphics) {
+   scrollService, circleManager, editMode, $timeout, movingStepGraphics, correctNumberingService) {
 
     /**************************************
         what happens when click is happening in canvas.
@@ -98,8 +99,10 @@ angular.module("canvasApp").factory('mouseDown', [
             // Remember what we click and what we move is two different objects, once we click, rest of the graphics come by, So original reference point to ,
             // the very thing we click. Not to the one we move. This applies to moveStage too.
             var step = evt.target.parent;
-            var backupStageModel = angular.copy(step.parentStage.model);
+            var backupStageModel = angular.copy.apply(angular, step.parentStage.model);
+            
             movingStepGraphics.initiateMoveStepGraphics(step, C);
+            
             that.selectStep(step.circle);
             that.calculateMoveLimit("step", evt.target);
             
@@ -107,11 +110,19 @@ angular.module("canvasApp").factory('mouseDown', [
             that.canvas.moveCursor = "move";
             circleManager.togglePaths(false); //put it back later
             evt.target.setVisible(false);
-            C.moveDots.setLeft(step.left + 52).setCoords().setVisible(true);
+            C.moveDots.setLeft(step.left + 6).setCoords().setVisible(true);
             C.canvas.bringToFront(C.moveDots);
             C.canvas.bringToFront(C.stepIndicator);
             
             step.parentStage.squeezeStage(step);
+
+            if(step.parentStage.nextStage) {
+              //var width = step.parentStage.myWidth;
+              // This is a trick, when we moveAllStepsAndStages we calculate the placing with myWidth, please refer getLeft() method
+              step.parentStage.myWidth = step.parentStage.myWidth + 23;
+              step.parentStage.nextStage.moveAllStepsAndStages(true);
+              step.parentStage.myWidth = step.parentStage.myWidth - 23;
+            }
             C.stepIndicator.init(step, evt.target, C, backupStageModel);
             C.canvas.renderAll();
 
@@ -129,7 +140,7 @@ angular.module("canvasApp").factory('mouseDown', [
             that.calculateMoveLimit("stage", stage);
             stage.wireStageNextAndPrevious();
             stage.removeFromStagesArray();
-            C.correctNumbering();
+            correctNumberingService.correctNumbering();
             circleManager.togglePaths(false); //put it back later
 
             C.stageIndicator.init(evt.target.parent, C, evt.target);

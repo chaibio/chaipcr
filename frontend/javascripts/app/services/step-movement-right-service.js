@@ -19,7 +19,8 @@
 
 window.ChaiBioTech.ngApp.service('StepMovementRightService', [
     'StepPositionService',
-    function(StepPositionService) {
+    'moveStepToSides',
+    function(StepPositionService, moveStepToSides) {
         return {
 
             ifOverRightSide: function(stepIndicator) {
@@ -34,7 +35,7 @@ window.ChaiBioTech.ngApp.service('StepMovementRightService', [
                 if((this.movement.left + this.rightOffset) > points[1] && (this.movement.left + this.rightOffset) < points[2]) {
                     
                     if(index !== this.currentMoveRight) {
-                        this.kanvas.allStepViews[index].moveToSide("left", this.currentDropStage);
+                        moveStepToSides.moveToSide(this.kanvas.allStepViews[index], "left");
                         this.currentMoveRight = this.movedStepIndex = index;
                         StepPositionService.getPositionObject(this.kanvas.allStepViews);
                     }

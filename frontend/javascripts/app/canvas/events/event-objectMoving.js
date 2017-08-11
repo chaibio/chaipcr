@@ -22,7 +22,8 @@ angular.module("canvasApp").factory('objectMoving', [
   'previouslySelected',
   'previouslyHoverd',
   'scrollService',
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService) {
+  'moveRampLineService',
+  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, moveRampLineService) {
 
     /**************************************
         Here we write what happens when we drag over the canvas.
@@ -38,7 +39,7 @@ angular.module("canvasApp").factory('objectMoving', [
 
           case "controlCircleGroup":
             me = evt.target.me;
-            me.manageDrag(evt.target);
+            moveRampLineService.manageDrag(evt.target);
             $scope.$apply(function() {
               $scope.step.temperature = me.model.temperature;
             });

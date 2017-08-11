@@ -23,7 +23,7 @@ angular.module("canvasApp").factory('moveStepPlaceText', [
         return function() {
             return Text.create("01/01", {
                 fill: 'black',  fontSize: 16, selectable: false, originX: 'left', originY: 'top',
-                top: 30, left: 42, fontFamily: "dinot"
+                top: 30, left: 72, fontFamily: "dinot"
             });
         };
     }

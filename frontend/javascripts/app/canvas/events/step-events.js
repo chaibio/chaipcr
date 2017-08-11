@@ -21,7 +21,9 @@ angular.module("canvasApp").service('stepEvents',[
   'stageGraphics',
   'stepGraphics',
   'TimeService',
-  function(stageGraphics, stepGraphics, TimeService) {
+  'pauseStepService',
+  'moveRampLineService',
+  function(stageGraphics, stepGraphics, TimeService, pauseStepService, moveRampLineService) {
 
     var that = this;
     this.changeDeltaText = function($scope) {
@@ -40,7 +42,7 @@ angular.module("canvasApp").service('stepEvents',[
 
         var circle = $scope.fabricStep.circle;
         circle.circleGroup.top = circle.getTop().top;
-        circle.manageDrag(circle.circleGroup);
+        moveRampLineService.manageDrag(circle.circleGroup);
         circle.circleGroup.setCoords();
         canvas.renderAll();
       });
@@ -103,7 +105,7 @@ angular.module("canvasApp").service('stepEvents',[
       $scope.$watch('step.pause', function(newVal, oldVal) {
 
         var circle = $scope.fabricStep.circle;
-        circle.controlPause(newVal);
+        pauseStepService.controlPause(circle);
         canvas.renderAll();
       });
 

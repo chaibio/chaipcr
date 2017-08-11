@@ -41,7 +41,7 @@ describe("Testing moveStepIndicatorGroup", function() {
     });
 
     it("It should check the width property", function() {
-        expect(_moveStepIndicatorGroup.width).toEqual(96);
+        expect(_moveStepIndicatorGroup.width).toEqual(128);
     });
 
     it("It should check the height property", function() {
