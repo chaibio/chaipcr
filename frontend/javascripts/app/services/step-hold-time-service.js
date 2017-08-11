@@ -10,9 +10,11 @@ angular.module("canvasApp").service('stepHoldTimeService', [
         };
 
         this.ifLastStep = function(step) {
+            console.log("Lox", step)
             return step.parentStage.nextStage === null && step.nextStep === null;
         };
 
+        // Defrag this method.. 
         this.postEdit = function($scope, parent, textObject) {
             // There is some issues for, saving new hold_time for infinite hold, make sure uts corrected when new design comes.
             editMode.holdActive = false;
