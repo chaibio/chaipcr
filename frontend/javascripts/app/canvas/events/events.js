@@ -176,7 +176,10 @@ angular.module("canvasApp").factory('events', [
            or wait for images to complete
       ***************************************/
       this.canvas.on("imagesLoaded", function() {
-        C.addStages().setDefaultWidthHeight();
+
+        C.addStages();
+        C.setDefaultWidthHeight();
+
         circleManager.addRampLinesAndCircles();
         
         if(!C.$scope.protocol.id && !C.$scope.fabricStep) {
@@ -185,7 +188,11 @@ angular.module("canvasApp").factory('events', [
             return true;
           };
         }
+
         C.selectStep();
+        C.initEvents();
+        C.getComponents();
+        C.addComponentsToStage();
         C.canvas.renderAll();
       });
     };

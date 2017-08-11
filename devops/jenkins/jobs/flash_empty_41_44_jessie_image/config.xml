@@ -4,6 +4,9 @@
   <description>Build basic debian image with kernel version 4.4</description>
   <keepDependencies>false</keepDependencies>
   <properties>
+    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.17.2">
+      <optOut>false</optOut>
+    </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
@@ -17,7 +20,7 @@
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>download_prefex</name>
+          <name>download_prefix</name>
           <description>Download folder URL</description>
           <defaultValue>http://10.0.1.20/download</defaultValue>
         </hudson.model.StringParameterDefinition>
@@ -184,7 +187,7 @@ done
 echo done connection check.
 sleep 20</command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo &quot;Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}&quot;
 echo &quot;Slave Beaglebone at ${build_machine}&quot;
@@ -207,8 +210,9 @@ then
   exit 1
 fi
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command># download flasher image
 #wget https://rcn-ee.com/rootfs/bb.org/testing/2016-10-09/console/BBB-blank-debian-8.6-console-armhf-2016-10-09-2gb.img.xz
@@ -221,7 +225,7 @@ image_filename=bone-debian-8.8-console-armhf-2017-05-07-1gb.img.xz
 #bone-debian-7.11-console-armhf-2016-06-15-2gb.img.xz
 
 rm $image_filename || true
-wget $download_prefex/$image_filename
+wget $download_prefix/$image_filename
 
 #Verify Image with:
 if sha256sum $image_filename | grep 09783052e6da931c6e05a230c221fa88889af3036723fb22d85404fb057d1d2f
@@ -286,7 +290,7 @@ then
    echo sdcard got patched before
 else
 
-wget $download_prefex/functions.patch
+wget $download_prefix/functions.patch
 patch -i functions.patch
 rm functions.patch
 if $check_badblocks
@@ -335,6 +339,7 @@ echo &quot;Restart scheduled after a min&quot;
 #exit 0
 
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -382,7 +387,7 @@ done
 echo &quot;timeout waiting for the device to become ready!&quot;
 exit 1</command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Updating kernel on $build_machine
 #
@@ -445,6 +450,7 @@ echo restart scheduled after a min-2
 
 #exit 0
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -487,7 +493,7 @@ done
 echo timeout waiting for the device to become ready!
 exit 1</command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo device is restarted.. 
 
@@ -516,8 +522,9 @@ df -h
 echo image creation done.
 
 exit 0</command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo zeroing
 echo 1500 &gt; /proc/sys/kernel/hung_task_timeout_secs
@@ -559,6 +566,7 @@ echo basic image zeroing done! restarting!
 shutdown -r 1
 
 exit 0</command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash

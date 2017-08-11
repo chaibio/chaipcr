@@ -37,7 +37,7 @@ describe("Testing moveStepHoldTimeText", function() {
     });
 
     it("It should check left property", function() {
-        expect(_moveStepHoldTimeText.left).toEqual(52);
+        expect(_moveStepHoldTimeText.left).toEqual(72);
     });
 
     it("It should check fontFamily property", function() {

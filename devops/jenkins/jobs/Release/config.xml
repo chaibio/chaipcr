@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<com.tikal.jenkins.plugins.multijob.MultiJobProject plugin="jenkins-multijob-plugin@1.25">
+<com.tikal.jenkins.plugins.multijob.MultiJobProject plugin="jenkins-multijob-plugin@1.26">
   <actions/>
   <description>Flash the BB with the latest fresh kernel image. And deploy our software and create a factory settings sdcard.</description>
   <keepDependencies>false</keepDependencies>
@@ -18,6 +18,27 @@
           <name>download_prefix</name>
           <description></description>
           <defaultValue>http://10.0.1.20/download</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.scm.listtagsparameter.ListSubversionTagsParameterDefinition plugin="subversion@2.9">
+          <name>build_branch</name>
+          <description>Select a Subversion entry</description>
+          <tagsDir>https://github.com/chaibio/chaipcr.git</tagsDir>
+          <credentialsId></credentialsId>
+          <tagsFilter></tagsFilter>
+          <reverseByDate>true</reverseByDate>
+          <reverseByName>false</reverseByName>
+          <defaultValue></defaultValue>
+          <maxTags></maxTags>
+        </hudson.scm.listtagsparameter.ListSubversionTagsParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>input_image_prefix</name>
+          <description>Image prefix to start with.</description>
+          <defaultValue>Jessie49</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>output_image_prefix</name>
+          <description>eMMC image released</description>
+          <defaultValue>Jessie49Release</defaultValue>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
@@ -80,7 +101,7 @@
       <phaseName>Factory Settings SDCard creation</phaseName>
       <phaseJobs>
         <com.tikal.jenkins.plugins.multijob.PhaseJobsConfig>
-          <jobName>create_factory_settings_sdcard</jobName>
+          <jobName>save_emmc_image</jobName>
           <currParams>true</currParams>
           <exposedSCM>false</exposedSCM>
           <disableJob>false</disableJob>
@@ -90,14 +111,23 @@
           <enableCondition>false</enableCondition>
           <abortAllJob>true</abortAllJob>
           <condition></condition>
-          <configs class="empty-list"/>
+          <configs>
+            <hudson.plugins.parameterizedtrigger.BooleanParameters plugin="parameterized-trigger@2.35.1">
+              <configs>
+                <hudson.plugins.parameterizedtrigger.BooleanParameterConfig>
+                  <name>no_factorysettings_sdcard</name>
+                  <value>false</value>
+                </hudson.plugins.parameterizedtrigger.BooleanParameterConfig>
+              </configs>
+            </hudson.plugins.parameterizedtrigger.BooleanParameters>
+          </configs>
           <killPhaseOnJobResultCondition>FAILURE</killPhaseOnJobResultCondition>
           <buildOnlyIfSCMChanges>false</buildOnlyIfSCMChanges>
           <applyConditionOnlyIfNoSCMChanges>false</applyConditionOnlyIfNoSCMChanges>
         </com.tikal.jenkins.plugins.multijob.PhaseJobsConfig>
       </phaseJobs>
       <continuationCondition>SUCCESSFUL</continuationCondition>
-      <executionType>PARALLEL</executionType>
+      <executionType>SEQUENTIALLY</executionType>
     </com.tikal.jenkins.plugins.multijob.MultiJobBuilder>
   </builders>
   <publishers/>

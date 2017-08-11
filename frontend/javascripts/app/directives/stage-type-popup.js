@@ -22,8 +22,8 @@ window.ChaiBioTech.ngApp.directive('stageTypePopup', [
   '$timeout',
   'canvas',
   'popupStatus',
-
-  function(ExperimentLoader, $timeout, canvas, popupStatus) {
+  'addStageService',
+  function(ExperimentLoader, $timeout, canvas, popupStatus, addStageService) {
     return {
       restric: 'EA',
       replace: true,
@@ -39,7 +39,7 @@ window.ChaiBioTech.ngApp.directive('stageTypePopup', [
               .then(function(data) {
                 console.log("added", data);
                 scope.actionPopup = false;
-                scope.fabricStep.parentStage.parent.addNewStage(data, scope.fabricStep.parentStage);
+                addStageService.addNewStage(data, scope.fabricStep.parentStage);
               });
           }
         };

@@ -37,10 +37,12 @@ angular.module("canvasApp").factory('circle', [
   'previouslySelected',
   'pauseStepOnScrollGroup',
   'pauseStepCircleOnScroll',
+  'pauseStepService',
   function(ExperimentLoader, $rootScope, Constants, circleGroup, outerMostCircle, outerCircle,
     centerCircle, littleCircleGroup, circleMaker, stepDataGroup, stepTemperature, stepHoldTime,
     gatherDataGroupOnScroll, gatherDataCircleOnScroll, gatherDataGroup, gatherDataCircle, previouslySelected,
-    pauseStepOnScrollGroup, pauseStepCircleOnScroll) {
+    pauseStepOnScrollGroup, pauseStepCircleOnScroll, pauseStepService) {
+    
     return function(model, parentStep, $scope) {
 
       this.model = model;
@@ -131,10 +133,12 @@ angular.module("canvasApp").factory('circle', [
         This method shows circles and gather data. Please note
         this method is invoked from canvas.js once all the stage/step are loaded.
       ********************************************/
-      this.getCircle = function() {
-
+      this.addStepDataGroup = function() {
         this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
         this.canvas.add(this.stepDataGroup);
+      };
+
+      this.manageGatheDataScroll = function() {
 
         this.gatherDataCircleOnScroll = new gatherDataCircleOnScroll();
         this.gatherDataOnScroll = new gatherDataGroupOnScroll(
@@ -142,22 +146,18 @@ angular.module("canvasApp").factory('circle', [
             this.gatherDataCircleOnScroll,
             this.gatherDataImageOnMoving,
           ], this);
+      };
 
-          this.pauseStepCircleOnScroll = new pauseStepCircleOnScroll();
-          this.pauseStepOnScrollGroup = new pauseStepOnScrollGroup(
-            [
-              this.pauseStepCircleOnScroll,
-              this.pauseImage,
-            ], this);
+      this.managePause = function() {
+        this.pauseStepCircleOnScroll = new pauseStepCircleOnScroll();
+        this.pauseStepOnScrollGroup = new pauseStepOnScrollGroup(
+          [
+            this.pauseStepCircleOnScroll,
+            this.pauseImage,
+          ], this);
+      };
 
-        // enable this when image is added on creating new circle ..
-        this.circleGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
-
-        this.circleGroup.add(this.gatherDataImageMiddle);
-        this.circleGroup.add(this.pauseImageMiddle);
-        this.circleGroup.add(this.gatherDataOnScroll);
-        this.circleGroup.add(this.pauseStepOnScrollGroup);
-        this.canvas.add(this.circleGroup);
+      this.manageGatherDataDuringRamp = function() {
 
         this.gatherDataDuringRampGroup = new gatherDataGroup(
           [
@@ -165,12 +165,35 @@ angular.module("canvasApp").factory('circle', [
             this.gatherDataImage
           ], this);
 
+          var left = (this.previous) ? (this.left + (this.previous.left + 128)) / 2 : this.left;
+          this.gatherDataDuringRampGroup.set({"left": left}).setCoords();
 
-        var left = (this.previous) ? (this.left + (this.previous.left + 128)) / 2 : this.left;
-        this.gatherDataDuringRampGroup.set({"left": left}).setCoords();
+      };
+
+      this.addComponentsToCircleGroup = function() {
+
+        this.circleGroup.add(this.gatherDataImageMiddle);
+        this.circleGroup.add(this.pauseImageMiddle);
+        this.circleGroup.add(this.gatherDataOnScroll);
+        this.circleGroup.add(this.pauseStepOnScrollGroup);
+      };
+
+      this.getCircle = function() {
+      
+        this.addStepDataGroup();
+        this.manageGatheDataScroll();
+        this.managePause();
+          
+        this.circleGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
+        this.addComponentsToCircleGroup();
+        this.canvas.add(this.circleGroup);
+
+        this.manageGatherDataDuringRamp();
         this.canvas.add(this.gatherDataDuringRampGroup);
+
         this.showHideGatherData(this.parent.gatherDataDuringStep);
-        this.controlPause(this.model.pause);
+        pauseStepService.controlPause(this);
+
         if(this.previous) {
           this.gatherDataDuringRampGroup.setVisible(this.parent.gatherDataDuringRamp);
         }
@@ -206,14 +229,6 @@ angular.module("canvasApp").factory('circle', [
       };
 
       this.changeHoldTime = function(new_hold) {
-
-        /*var duration = Number(this.model.hold_time);
-        var holdTimeHour = Math.floor(duration / 60);
-        var holdTimeMinute = (duration % 60);
-
-        if(holdTimeMinute < 10) {
-          holdTimeMinute = "0" + holdTimeMinute;
-        }*/
 
         this.holdTime.text = new_hold;
       };
@@ -301,20 +316,8 @@ angular.module("canvasApp").factory('circle', [
         }
 
         if(this.model.pause) {
-          this.applyPauseChanges();
+          pauseStepService.applyPauseChanges(this);
         }
-
-      };
-
-      this.applyPauseChanges = function() {
-
-        this.circle.setFill("#ffb400");
-        this.circle.setStroke("#ffde00");
-        this.circle.strokeWidth = 4;
-        this.circle.radius = 13;
-        this.pauseImageMiddle.setVisible(true);
-        this.gatherDataImageMiddle.setVisible(false);
-        this.pauseStepOnScrollGroup.setVisible(false);
       };
 
       this.showHideGatherData = function(state) {
@@ -327,67 +330,6 @@ angular.module("canvasApp").factory('circle', [
           this.circle.setFill("#ffb400");
           this.gatherDataOnScroll.setVisible(state);
         }
-      };
-
-      this.controlPause = function(state) {
-
-        if(state && this.big) {
-          this.pauseStepOnScrollGroup.setVisible(true);
-          this.holdTime.setVisible(false);
-        } else if(state) {
-          this.holdTime.setVisible(false);
-          this.applyPauseChanges();
-        } else {
-          this.pauseStepOnScrollGroup.setVisible(false);
-          this.holdTime.setVisible(true);
-        }
-      };
-
-      this.manageDrag = function(targetCircleGroup) {
-
-        var top = targetCircleGroup.top;
-        var left = targetCircleGroup.left;
-
-        if(top < this.scrollTop) {
-          targetCircleGroup.setTop(this.scrollTop);
-          this.manageRampLineMovement(left, this.scrollTop, targetCircleGroup);
-        } else if(top > this.scrollLength) {
-          targetCircleGroup.setTop(this.scrollLength);
-          this.manageRampLineMovement(left, this.scrollLength, targetCircleGroup);
-        } else {
-          this.stepDataGroup.setTop(top + 48).setCoords();
-          this.manageRampLineMovement(left, top, targetCircleGroup);
-        }
-      };
-
-      this.manageRampLineMovement = function(left, top, targetCircleGroup) {
-
-        var midPointY;
-
-        if(this.next) {
-
-          midPointY = this.curve.nextOne(left, top);
-          // We move the gather data Circle along with it [its next object's]
-          this.next.gatherDataDuringRampGroup.setTop(midPointY);
-
-          if(this.next.model.ramp.collect_data) {
-            this.runAlongEdge();
-          }
-        }
-
-        if(this.previous) {
-
-          midPointY = this.previous.curve.previousOne(left, top);
-
-          this.gatherDataDuringRampGroup.setTop(midPointY);
-
-          if(this.model.ramp.collect_data) {
-            this.runAlongCircle();
-          }
-        }
-
-        this.temperatureDisplay(targetCircleGroup);
-        this.parent.adjustRampSpeedPlacing();
       };
 
       this.temperatureDisplay = function(targetCircleGroup) {

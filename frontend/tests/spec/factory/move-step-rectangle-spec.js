@@ -14,7 +14,7 @@ describe("Testing moveStepRectangle", function() {
     });
 
     it("It should test width property", function() {
-        expect(_moveStepRectangle.width).toEqual(96);
+        expect(_moveStepRectangle.width).toEqual(128);
     });
 
     it("It should test selectable property", function() {

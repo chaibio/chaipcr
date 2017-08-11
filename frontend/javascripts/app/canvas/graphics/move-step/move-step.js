@@ -32,9 +32,10 @@ angular.module("canvasApp").factory('moveStepRect', [
   'StageMovementLeftService',
   'StepMoveVoidSpaceRightService',
   'StepMoveVoidSpaceLeftService',
+  'addStageService',
   function(ExperimentLoader, previouslySelected, circleManager, StepPositionService, moveStepIndicator, verticalLineStepGroup, StagePositionService,
   movingStepGraphics, StepMovementRightService, StepMovementLeftService, StageMovementRightService, StageMovementLeftService,
-  StepMoveVoidSpaceRightService, StepMoveVoidSpaceLeftService) {
+  StepMoveVoidSpaceRightService, StepMoveVoidSpaceLeftService, addStageService) {
 
     return {
 
@@ -65,7 +66,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.currentDropStage = step.parentStage;
         this.currentDrop = (step.previousStep) ? step.previousStep : "NOTHING";
         
-        this.verticalLine.setLeft(footer.left + 41).setVisible(true).setCoords();
+        this.verticalLine.setLeft(C.moveDots.left + 7).setVisible(true).setCoords();
         C.canvas.bringToFront(this.verticalLine);
         this.setLeft(footer.left).setVisible(true);
         this.changeText(step);
@@ -185,9 +186,9 @@ angular.module("canvasApp").factory('moveStepRect', [
             };
             
             if(step.parentStage.previousStage) {
-              this.kanvas.addNewStage(data, step.parentStage.previousStage, "move_stage_back_to_original");
+              addStageService.addNewStage(data, step.parentStage.previousStage, "move_stage_back_to_original");
             } else {
-              this.kanvas.addNewStageAtBeginning({}, data);
+              addStageService.addNewStageAtBeginning({}, data);
             }
             return true;
           }
@@ -211,14 +212,10 @@ angular.module("canvasApp").factory('moveStepRect', [
           step: modelClone
         };
 
-        this.kanvas.allStageViews[0].moveAllStepsAndStagesSpecial();
-        
-        if(targetStep && targetStep.left) {
-          targetStage.addNewStep(data, targetStep);
-        } else  { 
-          targetStage.addNewStepAtTheBeginning(data);
-        }
+        this.kanvas.allStageViews[0].moveAllStepsAndStages();
 
+        targetStage.addNewStep(data, targetStep);
+        
         ExperimentLoader.moveStep(step.model.id, targetStep.model.id, targetStage.model.id)
           .then(function(data) {
             console.log("Moved", data);

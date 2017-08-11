@@ -32,7 +32,8 @@ angular.module("canvasApp").factory('constants', [
       "controlDistance": 50,
       "canvasSpacingFrontAndRear": 33,
       "newStageOffset": 8,
-      "additionalWidth": 2
+      "additionalWidth": 2,
+      "moveStageInitialSpace": 23
     };
   }
 ]);
