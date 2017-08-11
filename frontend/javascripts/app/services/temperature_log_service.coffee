@@ -44,7 +44,7 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
       },
       margin: {
         top: 20
-        left: 50
+        left: 80
         right: 30
         bottom: 20
       },
