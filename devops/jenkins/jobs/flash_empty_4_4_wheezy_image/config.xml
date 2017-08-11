@@ -20,7 +20,7 @@
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>download_prefex</name>
+          <name>download_prefix</name>
           <description>Download folder URL</description>
           <defaultValue>http://10.0.1.20/download</defaultValue>
         </hudson.model.StringParameterDefinition>
@@ -151,7 +151,7 @@ done
 echo done connection check.
 </command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo &quot;Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}&quot;
 echo &quot;Slave Beaglebone at ${build_machine}&quot;
@@ -174,8 +174,9 @@ then
   exit 1
 fi
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command># download flasher image
 #wget https://rcn-ee.com/rootfs/bb.org/testing/2016-10-09/console/BBB-blank-debian-8.6-console-armhf-2016-10-09-2gb.img.xz
@@ -185,7 +186,7 @@ mount -o remount,rw /
 image_filename=bone-debian-7.11-console-armhf-2016-06-15-2gb.img.xz
 
 rm $image_filename || true
-wget $download_prefex/$image_filename
+wget $download_prefix/$image_filename
 
 #Verify Image with:
 if sha256sum $image_filename | grep cfceb64083cf63ed49ad75c3b5f5665cef65eaa67c86420a2c4d27bddc22d1ee
@@ -235,7 +236,7 @@ KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,e
 Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 EOF
 
-wget $download_prefex/3partitions_flasher_38.patch
+wget $download_prefix/3partitions_flasher_38.patch
 patch -i 3partitions_flasher_38.patch
 rm 3partitions_flasher_38.patch
 if $check_badblocks
@@ -272,6 +273,7 @@ echo &quot;Restart scheduled after a min -1&quot;
 #exit 0
 
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -319,7 +321,7 @@ done
 echo &quot;timeout waiting for the device to become ready!&quot;
 exit 1</command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Updating kernel on $build_machine
 #
@@ -375,6 +377,7 @@ echo restart scheduled after a min-2
 
 #exit 0
 </command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -394,7 +397,7 @@ done
 echo timeout waiting for the device to become ready!
 exit 1</command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo device is restarted.. 
 
@@ -423,8 +426,9 @@ df -h
 echo image creation done.
 
 exit 0</command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo zeroing
 echo 1500 &gt; /proc/sys/kernel/hung_task_timeout_secs
@@ -466,6 +470,7 @@ echo basic image zeroing done! restarting!
 shutdown -r 1
 
 exit 0</command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -490,6 +495,6 @@ exit 1</command>
   </builders>
   <publishers/>
   <buildWrappers>
-    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.7"/>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.8"/>
   </buildWrappers>
 </project>

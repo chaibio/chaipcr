@@ -22,8 +22,8 @@ angular.module("canvasApp").directive('actions', [
   '$timeout',
   'canvas',
   'popupStatus',
-
-  function(ExperimentLoader, $timeout, canvas, popupStatus) {
+  'editModeService',
+  function(ExperimentLoader, $timeout, canvas, popupStatus, editModeService) {
     return {
       restric: 'EA',
       replace: true,
@@ -112,7 +112,7 @@ angular.module("canvasApp").directive('actions', [
 
           scope.editStageMode = ! scope.editStageMode;
           scope.editStageText = (scope.editStageMode) ? "DONE" : "EDIT STAGES";
-          canvas.editStageMode(scope.editStageMode);
+          editModeService.editStageMode(scope.editStageMode);
 
         };
 

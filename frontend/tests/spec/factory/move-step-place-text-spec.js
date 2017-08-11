@@ -38,7 +38,7 @@ describe("Testing moveStepPlaceText", function() {
     });
 
     it("It should test left property", function() {
-        expect(_moveStepPlaceText.left).toEqual(42);
+        expect(_moveStepPlaceText.left).toEqual(72);
     });
 
     it("It should test fontFamily property", function() {

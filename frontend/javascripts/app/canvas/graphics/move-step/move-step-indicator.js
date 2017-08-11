@@ -25,14 +25,27 @@ angular.module("canvasApp").factory('moveStepIndicator', [
     'moveStepRectangle',
     'moveStepIndicatorRectangleGroup',
     'moveStepIndicatorGroup',
+    'dots',
+    'Group',
     function(moveStepTemperatureText, moveStepHoldTimeText, moveStepIndexText, moveStepPlaceText, moveStepRectangle,
-        moveStepIndicatorRectangleGroup, moveStepIndicatorGroup) {
+        moveStepIndicatorRectangleGroup, moveStepIndicatorGroup, dots, Group) {
         return function(me) {
             
-            me.imageobjects["drag-footer-image.png"].originX = "left";
-            me.imageobjects["drag-footer-image.png"].originY = "top";
-            me.imageobjects["drag-footer-image.png"].top = 52;
-            me.imageobjects["drag-footer-image.png"].left = 9;
+            //me.imageobjects["drag-footer-image.png"].originX = "left";
+            //me.imageobjects["drag-footer-image.png"].originY = "top";
+            //me.imageobjects["drag-footer-image.png"].top = 52;
+            //me.imageobjects["drag-footer-image.png"].left = 20;
+
+            var components = dots.stepDots();
+            
+            components.forEach(function(obj) {
+                obj.setFill("black");
+            }, this);
+
+            var properties =  {
+                originX: "left", originY: "top", left: 16, top: 52, visible: true, lockMovementY: true,
+                hasBorders: false, hasControls: false, name: "", parent: null
+            };
 
             var componentsFirstSet = [
                 new moveStepRectangle(), 
@@ -40,7 +53,7 @@ angular.module("canvasApp").factory('moveStepIndicator', [
                 new moveStepHoldTimeText(), 
                 new moveStepIndexText(), 
                 new moveStepPlaceText(),
-                me.imageobjects["drag-footer-image.png"],
+                Group.create(components, properties)
             ];
             
             var componentsSecondSet = [

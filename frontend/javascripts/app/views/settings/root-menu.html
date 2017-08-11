@@ -19,7 +19,7 @@
 <div class="settings" ng-controller="SettingsCtrl">
   <div class="header">
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-xs-6">
         <div class="stripes-and-name">
           <div class="name-container">SETTINGS</div>
         </div>
@@ -33,38 +33,41 @@
   </div>
   <div class="content" full-height offset="45 + 37">
     <!--<div class="row content-row"> -->
-    <div class="col-md-4 col-xs-4 left-menu-container">
-      <h2 class="underlined">
+    <div class="left-menu-container col-xs-4">
+      <!-- <div class="menu-list" full-height min="723 - 60 - 60" offset="45 + 37 + 60"> -->
+      <div class="menu-list">
+        <h2 class="underlined">
           ACTIVE USER
         </h2>
-      <div class="user-container">
-        <h2>{{user.name}}</h2>
-        <h3 ng-show="user.role === 'admin'">Admin</h3>
-        <div class="buttons-container">
-          <button class="button" logout>LOG OUT</button>
-          <button ui-sref="settings.current-user" class="button">EDIT</button>
+        <div class="user-container">
+          <h2>{{user.name}}</h2>
+          <h3 ng-show="user.role === 'admin'">Admin</h3>
+          <div class="buttons-container">
+            <button class="button" logout>LOG OUT</button>
+            <button ui-sref="settings.current-user" class="button">EDIT</button>
+          </div>
         </div>
+        <ul>
+          <li>
+            <a ui-sref="settings.usermanagement" ui-sref-active="active">MANAGE USERS</a>
+          </li>
+          <li ng-if="isBeta">
+            <a ui-sref-active="active" ui-sref="settings.networkmanagement">NETWORK SETTINGS</a>
+          </li>
+          <li>
+            <a ui-sref-active="active" ui-sref="settings.diagnostics">DIAGNOSTICS</a>
+          </li>
+          <li>
+            <a ui-sref-active="active" ui-sref="settings.calibration">CALIBRATION</a>
+          </li>
+          <li>
+            <a ui-sref="settings.system" ui-sref-active="active">SYSTEM</a>
+          </li>
+        </ul>
       </div>
-      <ul>
-        <li>
-          <a ui-sref="settings.usermanagement" ui-sref-active="active">MANAGE USERS</a>
-        </li>
-        <li ng-if="isBeta">
-          <a ui-sref-active="active" ui-sref="settings.networkmanagement">NETWORK SETTINGS</a>
-        </li>
-        <li>
-          <a ui-sref-active="active" ui-sref="settings.diagnostics">DIAGNOSTICS</a>
-        </li>
-        <li>
-          <a ui-sref-active="active" ui-sref="settings.calibration">CALIBRATION</a>
-        </li>
-        <li>
-          <a ui-sref="settings.system" ui-sref-active="active">SYSTEM</a>
-        </li>
-      </ul>
-      <return-home></return-home>
+      <div class="return-home col-md-12" ui-sref="home"> RETURN TO HOME SCREEN</div>
     </div>
-    <div class="col-md-8 col-xs-8 device-info-container" full-height offset="45 + 37">
+    <div class="device-info-container col-xs-8" full-height offset="45 + 37">
       <div ui-view></div>
     </div>
     <!--</div> -->

@@ -26,10 +26,10 @@
           <defaultValue>http://10.0.1.20/download</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>image_prefix</name>
+          <name>input_image_prefix</name>
           <description>eMMC name prefix.
 </description>
-          <defaultValue>fresh</defaultValue>
+          <defaultValue>Jessie49Clean</defaultValue>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
@@ -120,15 +120,13 @@ then
 	echo sshd_config on $build_machine was patched already
 else
 	echo patching sshd_config
+    
 	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
-KexAlgorithms diffie-hellman-group1-sha1
-KexAlgorithms ecdh-sha2-nistp256
-KexAlgorithms ecdh-sha2-nistp384
-KexAlgorithms ecdh-sha2-nistp521
-KexAlgorithms diffie-hellman-group-exchange-sha256
-KexAlgorithms diffie-hellman-group14-sha1
-#Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
-EOF
+		KexAlgorithms diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+		Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+	EOF
+	ssh-keygen -A || true
+
 	sudo service sshd restart
     sudo service ssh restart
     /etc/init.d/ssh restart
@@ -237,20 +235,23 @@ echo copying grep sdcard contents
 sshpass -p chaipcr scp -r devops/grabimage_sdcard/* root@$build_machine:/tmp/grep_sdcard/
 sshpass -p chaipcr scp -r devops/grabimage_sdcard/uEnv.sdcard.txt root@$build_machine:/tmp/grep_sdcard/uEnv.txt
 
-emmc_image_latest_compressed=${image_prefix}_emmc.img.tgz
+emmc_image_latest_compressed=${input_image_prefix}_emmc.img.tgz
 emmc_image_latest_url=$download_prefix/${emmc_image_latest_compressed}
-emmc_image_latest_tmp_compressed=/tmp/${emmc_image_latest_compressed}
+emmc_image_latest_tmp_compressed=/tmp/${BUILD_NUMBER}/${emmc_image_latest_compressed}
 
-emmc_image_latest_tmp_uncompressed_part1=/tmp/eMMC_part1.img
-emmc_image_latest_tmp_uncompressed_part2=/tmp/eMMC_part2.img
+emmc_image_latest_tmp_uncompressed_part1=/tmp/${BUILD_NUMBER}/eMMC_part1.img
+emmc_image_latest_tmp_uncompressed_part2=/tmp/${BUILD_NUMBER}/eMMC_part2.img
+
+mkdir -p /tmp/${BUILD_NUMBER}
+echo downloading and restoring $emmc_image_latest_compressed
 
 wget $emmc_image_latest_url -O $emmc_image_latest_tmp_compressed
-tar xfvz $emmc_image_latest_tmp_compressed --strip=2 -C /tmp
+tar xfvz $emmc_image_latest_tmp_compressed --strip=3 -C /tmp/${BUILD_NUMBER}
 
 echo latest image downloaded
-ls -ahl /tmp/eMMC_part*
+ls -ahl /tmp/${BUILD_NUMBER}/eMMC_part*
 
-sshpass -p chaipcr scp -r /tmp/eMMC_part*.img root@$build_machine:/tmp/grep_sdcard/
+sshpass -p chaipcr scp -r /tmp/${BUILD_NUMBER}/eMMC_part*.img root@$build_machine:/tmp/grep_sdcard/
 rm $emmc_image_latest_tmp_uncompressed_part1  || true
 rm $emmc_image_latest_tmp_uncompressed_part2  || true
 rm $emmc_image_latest_tmp_compressed || true
@@ -284,6 +285,9 @@ shutdown -r 1
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
+
+rm -r /tmp/${BUILD_NUMBER} || true
+
 echo waiting for a restart
 sleep 120
 for i in {0..1200..60}

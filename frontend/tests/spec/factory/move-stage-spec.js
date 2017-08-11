@@ -3,7 +3,7 @@ describe("Testing move-stage", function() {
     beforeEach(module('ChaiBioTech'));
     beforeEach(module('canvasApp'));
     
-    var _moveStageRect, indicator, stage = {}, C, movement = {}, _StagePositionService, _ExperimentLoader;
+    var _moveStageRect, indicator, stage = {}, C, movement = {}, _StagePositionService, _ExperimentLoader, _correctNumberingService;
 
     C = {
         canvas: {
@@ -32,11 +32,12 @@ describe("Testing move-stage", function() {
         left: 100
     };
 
-    beforeEach(inject(function(moveStageRect, StagePositionService, ExperimentLoader) {
+    beforeEach(inject(function(moveStageRect, StagePositionService, ExperimentLoader, correctNumberingService) {
         var me = {};
         indicator = moveStageRect.getMoveStageRect(me);
         _StagePositionService = StagePositionService;
         _ExperimentLoader = ExperimentLoader;
+        _correctNumberingService = correctNumberingService;
     }));
 
     it("It should check if indicator exists", function() {
@@ -691,7 +692,7 @@ describe("Testing move-stage", function() {
        spyOn(stageView, "render").and.returnValue(true);
        spyOn(stageView, "stageHeader").and.returnValue(true);
        spyOn(indicator.kanvas, "configureStepsofNewStage").and.returnValue(true);
-       spyOn(indicator.kanvas, "correctNumbering").and.returnValue(true);
+       spyOn(_correctNumberingService, "correctNumbering").and.returnValue(true);
        spyOn(circleManager, "addRampLines").and.returnValue(null);
 
        indicator.moveStageGraphics(stageView, circleManager);
@@ -701,7 +702,7 @@ describe("Testing move-stage", function() {
        expect(stageView.stageHeader).toHaveBeenCalled();
        
        expect(indicator.kanvas.configureStepsofNewStage).toHaveBeenCalled();
-       expect(indicator.kanvas.correctNumbering).toHaveBeenCalled();
+       expect(_correctNumberingService.correctNumbering).toHaveBeenCalled();
        expect(circleManager.addRampLines).toHaveBeenCalled();
     });
 

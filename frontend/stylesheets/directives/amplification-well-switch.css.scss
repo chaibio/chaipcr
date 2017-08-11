@@ -1,9 +1,18 @@
 @import './colors.css.scss';
 .selectable-container {
   .circle {
+    position: relative;
+    text-align: center;
+    .triangle-icon-container {
+      width: 100%;
+      position: absolute;
+      bottom: 0px;
+      margin-left: -20px;
+      margin-right: -20px;
+      margin-bottom: -2px;
+    }
     .selected-wheel-triangle {
       opacity: 0;
-      margin-top: -7px;
       width: 30px;
     }
     &.active {
@@ -36,24 +45,19 @@
     $size: 90px;
     $padding_top: 10px;
     $border_width: 3px;
-    border-width: $border_width;
-    //border-radius: 100px;
+    border-width: $border_width; //border-radius: 100px;
     //border-style: solid;
     //cursor: pointer;
     font-size: 10px;
-    line-height: 1.5;
-    //margin: 5px;
+    line-height: 1.5; //margin: 5px;
     padding-top: $padding_top;
-    height: 80px;
-    //width: $size;
-    opacity: 0.5;
-    //border: 1px solid grey;
+    height: 80px; //width: $size;
+    opacity: 0.5; //border: 1px solid grey;
     &.selected {
       //border-width: $border_width + 2px;
       //padding-top: $padding_top - 2px;
       opacity: 1;
-      color: #000;
-      //border-top: 1px solid;
+      color: #000; //border-top: 1px solid;
     }
     .ct {
       position: relative;
@@ -103,11 +107,9 @@
     ;
   }
   #selectableol li {
-    margin: 0px;
-    //padding: 1px;
+    margin: 0px; //padding: 1px;
     float: left;
-    width: 12.5%;
-    //height: 80px;
+    width: 12.5%; //height: 80px;
     font-size: 4em;
     text-align: center;
   }

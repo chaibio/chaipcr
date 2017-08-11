@@ -26,7 +26,7 @@
           <description>the block device of the created factory settings sdcard: You can say:
 /dev/sdb to write directly to a physical sdcard.
 or /tmp/sdcard_image.img to export a factory settings sdcard image.</description>
-          <defaultValue>/tmp/sdcard_${BUILD_NUMBER}.img</defaultValue>
+          <defaultValue>/tmp/${BUILD_NUMBER}/sdcard_${BUILD_NUMBER}.img</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>local_download_folder</name>
@@ -48,7 +48,7 @@ Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>image_prefix</name>
+          <name>output_image_prefix</name>
           <description>Class of the upgrade image generated during this process. Could be empty, kernel44, kernel49, kernel 41, kernel 38, allthirdparty, or release.
 </description>
           <defaultValue>fresh</defaultValue>
@@ -147,15 +147,13 @@ then
 	echo sshd_config on $build_machine was patched already
 else
 	echo patching sshd_config
+    
 	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
-KexAlgorithms diffie-hellman-group1-sha1
-KexAlgorithms ecdh-sha2-nistp256
-KexAlgorithms ecdh-sha2-nistp384
-KexAlgorithms ecdh-sha2-nistp521
-KexAlgorithms diffie-hellman-group-exchange-sha256
-KexAlgorithms diffie-hellman-group14-sha1
-#Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
-EOF
+		KexAlgorithms diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+		Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+	EOF
+	ssh-keygen -A || true
+
 	sudo service sshd restart
     sudo service ssh restart
     /etc/init.d/ssh restart
@@ -316,8 +314,8 @@ mount /dev/mmcblk0p1 /tmp/grep_sdcard
     <hudson.tasks.Shell>
       <command>echo fetching eMMC image.
 stamp=$(date &apos;+%Y%M%d%H%m%S&apos;)
-grep_sdcard_dir=&quot;/tmp/emmc_inbox_${stamp}&quot;
-tmp_sdcard_dir=&quot;/tmp/sdcard_${stamp}&quot;
+grep_sdcard_dir=&quot;/tmp/${BUILD_NUMBER}/emmc_inbox_${stamp}&quot;
+tmp_sdcard_dir=&quot;/tmp/${BUILD_NUMBER}/sdcard_${stamp}&quot;
 
 echo grep sdcard folder [input]: $grep_sdcard_dir
 mkdir -p &quot;${grep_sdcard_dir}&quot;
@@ -328,20 +326,17 @@ sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;umou
 
 ls -ahl &quot;${grep_sdcard_dir}&quot;
 
-emmc_image_latest_compressed=${image_prefix}_emmc.img.tgz
+emmc_image_latest_compressed=${output_image_prefix}_emmc.img.tgz
 emmc_image_latest_compressed_full_local_path=${local_download_folder}/${emmc_image_latest_compressed}
 
 tar zfvc $emmc_image_latest_compressed_full_local_path ${grep_sdcard_dir}/eMMC_part*.img
-emmc_image_latest_url=${download_prefix}/${emmc_image_latest_compressed}
+full_emmc_url=${download_prefix}/${emmc_image_latest_compressed}
 
 if $no_factorysettings_sdcard
 then
-	echo latest eMMC for this build machine is downloadable from $emmc_image_latest_url
+	echo latest eMMC for this build machine is downloadable from $full_emmc_url
 	rm -r $grep_sdcard_dir || true
-	
-    
-    
-    
+ 
 build_report_filename=build_report.xml
 #_$BUILD_NUMBER.xml
 echo Report filename is $build_report_filename
@@ -350,23 +345,11 @@ cat &lt;&lt; EOF &gt; $build_report_filename
     // To display a field
      &lt;field name=&quot;eMMC&quot; titlecolor=&quot;&quot; value=&quot;&quot; detailcolor=&quot;&quot; href=&quot;&quot;&gt; 
       &lt;![CDATA[ 
-eMMC image ($emmc_image_latest_compressed) &lt;a href=&quot;$emmc_image_latest_url&quot;&gt;Download&lt;/a&gt;
+eMMC image ($emmc_image_latest_compressed) &lt;a href=&quot;$full_emmc_url&quot; download=&quot;eMMC.img.tgz&quot;&gt;Download&lt;/a&gt;
     ]]&gt; &lt;/field&gt;
 &lt;/section&gt;
 EOF
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    exit 0
-    
+    exit 0  
 fi
 
 ls
@@ -384,13 +367,13 @@ if [ -e &quot;${tmp_sdcard_dir}&quot; ]
 then
     if [ -z $sdcard_filename ]
     then
-	    sdcard_filename=sdcard_$BUILD_NUMBER.img.tgz
+	    sdcard_filename=sdcard_$BUILD_NUMBER.img
     fi
     echo sdcard filename is $sdcard_filename
     
     upgrade_image_filename=$tmp_sdcard_dir/p2/upgrade.img.tar
-    upgrade_image_url_local_filename=${local_download_folder}/${image_prefix}_upgrade.img.tgz
-    upgrade_image_url=${download_prefix}/${image_prefix}_upgrade.img.tgz
+    upgrade_image_url_local_filename=${local_download_folder}/${output_image_prefix}_upgrade.img.tgz
+    upgrade_image_url=${download_prefix}/${output_image_prefix}_upgrade.img.tgz
     echo upgrade image path $upgrade_image_filename, copying to $upgrade_image_url_local_filename
     cp $upgrade_image_filename $upgrade_image_url_local_filename
     echo Upgrade image URL is $upgrade_image_url
@@ -414,22 +397,21 @@ then
         cp ${output_sdcard}.tgz ${fullpath_sdcard_image}.tgz
         echo sdcard image should be downloadable from $sdcard_url
         echo compressed sdcard image should be downloadable from ${sdcard_url}.tgz
+        sudo rm -r /tmp/image_creator/ || :
 	else
 	   	echo raw image processing failed.
    		exit 1
 	fi
-    echo eMMC image should be downloadable from $emmc_image_latest_url
+    echo eMMC image should be downloadable from $full_emmc_url
 
-    echo latest eMMC for this build machine is downloadable from $emmc_image_latest_url
+    echo latest eMMC for this build machine is downloadable from $full_emmc_url
+    rm -r $tmp_sdcard_dir || true
 else
    echo raw image processing failed.
    exit 1
 fi
 
 rm -r $grep_sdcard_dir || true
-rm -r $tmp_sdcard_dir || true
-
-
 cd ..
 
 build_report_filename=build_report.xml
@@ -440,15 +422,15 @@ cat &lt;&lt; EOF &gt; $build_report_filename
     // To display a field
     &lt;field name=&quot;Upgrade Image&quot; titlecolor=&quot;&quot; value=&quot;&quot; detailcolor=&quot;&quot; href=&quot;&quot;&gt; 
     &lt;![CDATA[ 
-Upgrade image (${image_prefix}_upgrade.img.tgz) &lt;a href=&quot;$upgrade_image_url&quot;&gt;Download&lt;/a&gt;
+Upgrade image (${output_image_prefix}_upgrade.img.tgz) &lt;a href=&quot;$upgrade_image_url&quot; download=&quot;upgrade.img.tgz&quot;&gt;Download&lt;/a&gt;
     ]]&gt; &lt;/field&gt;
      &lt;field name=&quot;eMMC&quot; titlecolor=&quot;&quot; value=&quot;&quot; detailcolor=&quot;&quot; href=&quot;&quot;&gt; 
       &lt;![CDATA[ 
-eMMC image ($emmc_image_latest_compressed) &lt;a href=&quot;$emmc_image_latest_url&quot;&gt;Download&lt;/a&gt;
+eMMC image ($emmc_image_latest_compressed) &lt;a href=&quot;$full_emmc_url&quot; download=&quot;eMMC.img.tgz&quot;&gt;Download&lt;/a&gt;
     ]]&gt; &lt;/field&gt;
     &lt;field name=&quot;SDCard&quot; titlecolor=&quot;&quot; value=&quot;&quot; detailcolor=&quot;&quot; href=&quot;&quot;&gt; 
       &lt;![CDATA[ 
-SDCard image ($sdcard_filename) &lt;a href=&quot;$sdcard_url&quot;&gt;Download&lt;/a&gt;
+SDCard image ($sdcard_filename) &lt;a href=&quot;$sdcard_url&quot; download=&quot;sdcard.img&quot;&gt;Download&lt;/a&gt;
     ]]&gt; &lt;/field&gt;
 &lt;/section&gt;
 EOF
@@ -469,7 +451,7 @@ exit 0</command>
     </hudson.tasks.ArtifactArchiver>
     <hudson.plugins.summary__report.ACIPluginPublisher plugin="summary_report@1.15">
       <name>*.xml</name>
-      <shownOnProjectPage>false</shownOnProjectPage>
+      <shownOnProjectPage>true</shownOnProjectPage>
     </hudson.plugins.summary__report.ACIPluginPublisher>
   </publishers>
   <buildWrappers/>
