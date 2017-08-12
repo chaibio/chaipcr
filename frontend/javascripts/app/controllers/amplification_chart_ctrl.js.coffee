@@ -151,7 +151,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       $scope.getAmplificationOptions = ->
         Experiment.getAmplificationOptions($stateParams.id).then (resp) ->
-          console.log(resp.data)
           $scope.method.name = resp.data.amplification_option.cq_method
           $scope.minFl.value = resp.data.amplification_option.min_fluorescence
           $scope.minCq.value = resp.data.amplification_option.min_reliable_cycle
@@ -304,6 +303,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.onSelectLine = (config) ->
         for i in [0..15] by 1
           $scope.wellButtons["well_#{i}"].active = (i == config.config.well)
+
+      $scope.onUnselectLine = ->
+        for i in [0..15] by 1
+          $scope.wellButtons["well_#{i}"].active = false
 
       $scope.$watch 'baseline_subtraction', (val) ->
         updateSeries()

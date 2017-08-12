@@ -143,6 +143,9 @@
       if (Globals.box) {
         Globals.box.container.remove();
       }
+      if (Globals.onUnselectLine) {
+        Globals.onUnselectLine();
+      }
     }
 
     function drawBox(line_config) {
@@ -857,6 +860,10 @@
 
     this.onSelectLine = function (fn) {
       Globals.onSelectLine = fn;
+    };
+
+    this.onUnselectLine = function (fn) {
+      Globals.onUnselectLine = fn;
     };
 
     this.getDimensions = function() {

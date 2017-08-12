@@ -14,6 +14,7 @@ window.App.directive 'amplificationChart', [
         zoom: '='
         onZoom: '&'
         onSelectLine: '&'
+        onUnselectLine: '&'
         show: '='
       link: ($scope, elem, attrs) ->
 
@@ -34,6 +35,7 @@ window.App.directive 'amplificationChart', [
           chart = new $window.ChaiBioCharts.AmplificationChart(elem[0], $scope.data, $scope.config)
           chart.onZoomAndPan($scope.onZoom())
           chart.onSelectLine($scope.onSelectLine())
+          chart.onUnselectLine($scope.onUnselectLine())
           d = chart.getDimensions()
           $scope.onZoom()(chart.getTransform(), d.width, d.height, chart.getScaleExtent())
 
