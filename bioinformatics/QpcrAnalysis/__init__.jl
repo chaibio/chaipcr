@@ -12,6 +12,7 @@ function __init__()
         db_tuple[1] => mysql_connect(DB_INFO["host"], DB_INFO["username"], DB_INFO["password"], db_tuple[2])
     end) # do db_name
 
+    # comment this section when `--compile-all`
     println("start of test")
     @time global const TEST_RESULTS = test(;
         comprehensive=false,
@@ -19,14 +20,6 @@ function __init__()
         verbose=true # `false` on PC, true on BBB to debug
     )
     println("end of test")
-
-    return nothing
-end
-
-
-# trigger compilation of most functions in the package, to reduce running time for subsequent function calls.
-
-function trigger_compilation()
 
     return nothing
 end

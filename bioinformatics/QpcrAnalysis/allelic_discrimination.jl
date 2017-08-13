@@ -1,8 +1,16 @@
 # allelic discrimination (ad)
 
+# 4 groups
 const DEFAULT_egr = [0 1 0 1; 0 0 1 1] # NTC, homo ch1, homo ch2, hetero
+const DEFAULT_init_FACTORS = [1, 1, 1, 1] # sometimes "hetero" may not have very high end-point fluo
 const DEFAULT_eg_LABELS = ["ntc", "homo_a", "homo_b", "hetero", "unclassified"]
-const AD_DATA_CATEGS = ["fluo", "d0", "cq"]
+
+# # 3 groups without NTC
+# const DEFAULT_egr = [1 0 1; 0 1 1] # homo ch1, homo ch2, hetero
+# const DEFAULT_init_FACTORS = [1, 1, 1] # sometimes "hetero" may not have very high end-point fluo
+# const DEFAULT_eg_LABELS = ["homo_a", "homo_b", "hetero", "unclassified"]
+
+const AD_DATA_CATEGS = ["rbbs_ary3", "blsub_fluos", "d0", "cq"]
 
 const kmeans_result_EMPTY = kmeans(1. * [1 2 3; 4 5 6], 2)
 
@@ -24,17 +32,17 @@ function prep_input_4ad(
     data_categ::String="fluo",
     cycs::Union{Integer,AbstractVector}=1 # relevant if `data_categ == "fluo"`, last available cycle
     )
-    blsub_fluos = full_amp_out.blsub_fluos
-    num_cycs, num_wells, num_channels = size(blsub_fluos)
+    num_cycs, num_wells, num_channels = size(full_amp_out.fr_ary3)
     expected_genotypes = expected_genotypes_raw
-    if data_categ == "fluo"
+    if data_categ in ["rbbs_ary3", "blsub_fluos"]
+        fluos = getfield(full_amp_out, parse(data_categ))
         if cycs == 0
-            cycs = size(full_amp_out.fr_ary3)[1]
+            cycs = num_cycs
         end # if cycs == 0
         if isa(cycs, Integer)
             cycs = (cycs:cycs) # `blsub_fluos[an_integer, :, :]` results in size `(num_wells, num_channels)` instead of `(1, num_wells, num_channels)`
         end # if isa(cycs, Integer)
-        data_t = reshape(mean(blsub_fluos[cycs, :, :], 1), num_wells, num_channels)
+        data_t = reshape(mean(fluos[cycs, :, :], 1), num_wells, num_channels)
     elseif data_categ == "d0"
         d0_i_vec = find(full_amp_out.fitted_prebl[1, 1].coef_strs) do coef_str
             coef_str == data_categ
@@ -55,8 +63,10 @@ function assign_genotypes(
     data::AbstractMatrix,
     expected_genotypes::AbstractMatrix, # each column is a vector of binary genotype whose length is number of channels (0 => channel min, 1 => channel max)
     cluster_method::String,
+    # below not specified by `process_ad` as of right now
+    init_factors::AbstractVector=DEFAULT_init_FACTORS, # for `init_centers`
     rdcd_lower::Real=0.1; # lower limit of `relative_diff_closest_dist`
-    eg_labels::Vector{String}=DEFAULT_eg_LABELS # Julia v0.6.0 on 2017-06-25: `eg_labels::Vector{AbstractString}=DEFAULT_eg_LABELS` resulted in "ERROR: MethodError: no method matching #assign_genotypes#301(::Array{AbstractString,1}, ::QpcrAnalysis.#assign_genotypes, ::Array{Float64,2}, ::Array{Float64,2}, ::Float64)"
+    eg_labels::AbstractVector=DEFAULT_eg_LABELS # Julia v0.6.0 on 2017-06-25: `eg_labels::Vector{AbstractString}=DEFAULT_eg_LABELS` resulted in "ERROR: MethodError: no method matching #assign_genotypes#301(::Array{AbstractString,1}, ::QpcrAnalysis.#assign_genotypes, ::Array{Float64,2}, ::Array{Float64,2}, ::Float64)"
     )
 
     num_channels, num_wells = size(data)
@@ -65,7 +75,6 @@ function assign_genotypes(
         cluster_result = kmeans_result_EMPTY
         assignments_adj_labels = fill(eg_labels[end], num_wells) # all unclassified
     else
-        # vector whose length is number of channels
         channel_extrema = hcat(minimum(data, 2), maximum(data, 2))
 
         num_genotypes = size(expected_genotypes)[2]
@@ -75,12 +84,14 @@ function assign_genotypes(
                 expected_genotypes[channel_i, genotype_i] + 1 # allele == 0 => channel_extrema[,1], allele == 1 => channel_extrema[,2]
             ]
             for channel_i in 1:num_channels, genotype_i in 1:num_genotypes
-        ]
+        ] .* transpose(init_factors)
 
-        if cluster_method == "k-means"
-            cluster_result = kmeans!(data, copy(init_centers)) # ideally the element with the same index between `init_centers` and `cluster_result.centers` should be for the same genotype
-            centers = cluster_result.centers
-        elseif cluster_method == "k-medoids"
+        # run k-means whether finally using k-means or k-medoids
+        cluster_result = kmeans!(data, copy(init_centers)) # ideally the element with the same index between `init_centers` and `cluster_result.centers` should be for the same genotype
+        centers = cluster_result.centers
+
+        if cluster_method == "k-medoids"
+            init_centers = centers # using centers found by k-means
             num_centers = size(init_centers)[2]
             data_winit = hcat(data, init_centers)
             num_wells_winit = num_wells + num_centers
@@ -117,24 +128,23 @@ function assign_genotypes(
 end # assign_genotypes
 
 
-# "fluo", "cq"
 function process_ad(
     full_amp_out::AmpStepRampOutput,
     cycs::Union{Integer,AbstractVector}, # relevant if `data_categ == "fluo"`, last available cycle
     cluster_method::String, # for `assign_genotypes`
-    expected_genotypes_raw::AbstractMatrix=DEFAULT_egr # each column is a vector of binary genotype whose length is number of channels (0 => no signal, 1 => yes signal),
+    expected_genotypes_raw::AbstractMatrix=DEFAULT_egr, # each column is a vector of binary genotype whose length is number of channels (0 => no signal, 1 => yes signal)
+    data_categs::AbstractVector=AD_DATA_CATEGS
     )
 
     # output
     # OrderedDict(
-    #     "fluo" => Clustering.ClusteringResult,
-    #     "cq" => Clustering.ClusteringResult
+    #     data_categ => Clustering.ClusteringResult,
     # )
 
     cluster_result_dict = OrderedDict{String,ClusteringResult}()
     assignments_adj_labels_dict = OrderedDict{String,Vector{String}}()
 
-    for data_categ in AD_DATA_CATEGS
+    for data_categ in data_categs
         cluster_result_dict[data_categ], assignments_adj_labels_dict[data_categ] = assign_genotypes(prep_input_4ad(
             full_amp_out,
             expected_genotypes_raw,

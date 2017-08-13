@@ -755,12 +755,13 @@ function process_amp_1sr(
             report_cq!(full_amp_out, well_i, channel_i; kwdict_rc...)
         end
 
-        # allelic discrimination
-        if dcv
-            full_amp_out.cluster_result_dict, full_amp_out.assignments_adj_labels_dict = process_ad(full_amp_out, ad_cycs, ad_cluster_method)
-        end # if dcv
-
     end # if num_cycs <= 2 ... else
+
+
+    # allelic discrimination
+    if dcv
+        full_amp_out.cluster_result_dict, full_amp_out.assignments_adj_labels_dict = process_ad(full_amp_out, ad_cycs, ad_cluster_method)
+    end # if dcv
 
 
     if endswith(out_format, "json")
