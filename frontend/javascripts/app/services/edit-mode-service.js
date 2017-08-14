@@ -80,13 +80,20 @@ window.ChaiBioTech.ngApp.service('editModeService', [
             }
         };
 
+        this.temporaryChangeForStatus = function(tempStat, stage) {
+
+            var keepStat = this.status;
+            this.status = tempStat;
+            this.editModeStageChanges(stage);
+            this.status = keepStat;
+            console.log("Keep state", this.status);
+        };
         this.editStageModeStep = function(step) {
 
             step.closeImage.setOpacity(this.status);
             step.dots.setVisible(this.status);
             step.dots.setCoords();
-
-
+            
             if( step.parentStage.model.auto_delta ) {
                 if( step.index === 0 ) {
                     step.deltaSymbol.setVisible(!this.status);
