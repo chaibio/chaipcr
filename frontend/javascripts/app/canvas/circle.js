@@ -27,9 +27,6 @@ angular.module("canvasApp").factory('circle', [
   'centerCircle',
   'littleCircleGroup',
   'circleMaker',
-  'stepDataGroup',
-  'stepTemperature',
-  'stepHoldTime',
   'gatherDataGroupOnScroll',
   'gatherDataCircleOnScroll',
   'gatherDataGroup',
@@ -39,10 +36,10 @@ angular.module("canvasApp").factory('circle', [
   'pauseStepCircleOnScroll',
   'pauseStepService',
   'editModeService',
+  'stepDataGroupService',
   function(ExperimentLoader, $rootScope, Constants, circleGroup, outerMostCircle, outerCircle,
-    centerCircle, littleCircleGroup, circleMaker, stepDataGroup, stepTemperature, stepHoldTime,
-    gatherDataGroupOnScroll, gatherDataCircleOnScroll, gatherDataGroup, gatherDataCircle, previouslySelected,
-    pauseStepOnScrollGroup, pauseStepCircleOnScroll, pauseStepService, editModeService) {
+    centerCircle, littleCircleGroup, circleMaker, gatherDataGroupOnScroll, gatherDataCircleOnScroll, gatherDataGroup, gatherDataCircle, previouslySelected,
+    pauseStepOnScrollGroup, pauseStepCircleOnScroll, pauseStepService, editModeService, stepDataGroupService) {
     
     return function(model, parentStep, $scope) {
 
@@ -216,17 +213,14 @@ angular.module("canvasApp").factory('circle', [
         if(parseInt(holdTimeText) === 0) {
           this.holdTime.text = "∞";
           if(this.parent.parentStage.parent.editStageStatus === true && oldHold !== null){
-            console.log("Inside this part 00");
             var lastStage = this.parent.parentStage;
             //lastStage.dots.setVisible(false);
             //this.canvas.bringToFront(lastStage.dots);
-            console.log(this.parent);
             editModeService.temporaryChangeForStatus(false, this.parent.parentStage);
             this.canvas.renderAll();
           }
         } else {
           if(oldHold !== null && parseInt(oldHold) === 0 && this.parent.parentStage.parent.editStageStatus === true) {
-            console.log("Inside this part");
             editModeService.editModeStageChanges(this.parent.parentStage);
           }
         }
@@ -252,28 +246,12 @@ angular.module("canvasApp").factory('circle', [
             )
           ], this, $scope);
 
-        this.stepDataGroup = new stepDataGroup([
-            this.temperature = new stepTemperature(this.model, this, $scope),
-            this.holdTime = new stepHoldTime(this.model, this, $scope)
-          ], this, $scope);
+        stepDataGroupService.newStepDataGroup(this, $scope);
 
       };
 
       this.createNewStepDataGroup = function() {
-
-        this.canvas.remove(this.temperature);
-        this.canvas.remove(this.holdTime);
-
-        delete(this.temperature);
-        delete(this.holdTime);
-
-        this.stepDataGroup = new stepDataGroup([
-          this.temperature = new stepTemperature(this.model, this, $scope),
-          this.holdTime = new stepHoldTime(this.model, this, $scope)
-        ], this, $scope);
-
-        this.canvas.add(this.stepDataGroup);
-        this.canvas.renderAll();
+        stepDataGroupService.reCreateNewStepDataGroup(this, $scope);
       };
 
       this.makeItBig = function() {
