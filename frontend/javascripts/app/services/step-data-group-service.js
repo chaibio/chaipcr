@@ -10,6 +10,7 @@ window.ChaiBioTech.ngApp.service('stepDataGroupService', [
                 circle.temperature = new stepTemperature(circle.model, circle, $scope),
                 circle.holdTime = new stepHoldTime(circle.model, circle, $scope)
             ], circle, $scope);
+            
         };
 
         this.reCreateNewStepDataGroup = function(circle, $scope) {

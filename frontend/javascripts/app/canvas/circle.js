@@ -132,6 +132,7 @@ angular.module("canvasApp").factory('circle', [
         this method is invoked from canvas.js once all the stage/step are loaded.
       ********************************************/
       this.addStepDataGroup = function() {
+
         this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
         this.canvas.add(this.stepDataGroup);
       };
@@ -147,6 +148,7 @@ angular.module("canvasApp").factory('circle', [
       };
 
       this.managePause = function() {
+
         this.pauseStepCircleOnScroll = new pauseStepCircleOnScroll();
         this.pauseStepOnScrollGroup = new pauseStepOnScrollGroup(
           [
@@ -251,6 +253,7 @@ angular.module("canvasApp").factory('circle', [
       };
 
       this.createNewStepDataGroup = function() {
+        
         stepDataGroupService.reCreateNewStepDataGroup(this, $scope);
       };
 

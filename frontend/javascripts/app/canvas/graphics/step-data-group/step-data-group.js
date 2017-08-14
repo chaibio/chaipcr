@@ -46,7 +46,6 @@ angular.module("canvasApp").factory('stepDataGroup', [
         name: "stepDataGroup",
         evented: ! $scope.exp_completed,
         parentCircle: parent,
-        //backgroundColor: 'green'
       });
     };
   }
