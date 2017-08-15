@@ -1,6 +1,6 @@
 (function() {
 
-  "use strict";
+  // "use strict";
 
   function AmplificationChart(elem, data, config) {
 
@@ -535,7 +535,7 @@
       Globals.gX.call(Globals.xAxis.scale(Globals.lastXScale));
       Globals.zoomTransform = transform;
       drawLines();
-      updateAxesExtremeValues();
+      updateXAxisExtremeValues();
 
       if (Globals.onZoomAndPan) {
         Globals.onZoomAndPan(Globals.zoomTransform, Globals.width, Globals.height, getScaleExtent());
@@ -685,67 +685,189 @@
     }
 
     function drawAxesExtremeValues() {
-
-    }
-
-    function updateAxesExtremeValues() {
       Globals.chartSVG.selectAll('.axes-extreme-value').remove();
-      updateXAxisRightExtremeValue();
-      updateXAxisLeftExtremeValue();
+      drawXAxisRightExtremeValue();
+      drawXAxisLeftExtremeValue();
+      updateXAxisExtremeValues();
     }
 
-    function updateXAxisRightExtremeValue() {
+    // function drawXAxisRightExtremeValue() {
 
-      var textG = Globals.chartSVG.append('g')
-        .attr('class', 'axes-extreme-value tick');
+    //   var textG = Globals.chartSVG.append('g')
+    //     .attr('class', 'axes-extreme-value tick');
 
-      var conWidth = 30;
-      var offsetTop = 8.5;
-      var offsetRight = 5;
-      var xScale = Globals.lastXScale || Globals.xScale;
+    //   var conWidth = 30;
+    //   var offsetTop = 8.5;
+    //   var offsetRight = 5;
+    //   var xScale = Globals.lastXScale || Globals.xScale;
 
-      textG.append('rect')
-        .attr('fill', '#ffffff')
-        .attr('width', conWidth)
-        .attr('height', 10)
-        .attr('y', Globals.height + Globals.config.margin.top + offsetTop)
-        .attr('x', Globals.width + Globals.config.margin.left - conWidth + offsetRight);
+    //   textG.append('rect')
+    //     .attr('fill', '#ffffff')
+    //     .attr('width', conWidth)
+    //     .attr('height', 10)
+    //     .attr('y', Globals.height + Globals.config.margin.top + offsetTop)
+    //     .attr('x', Globals.width + Globals.config.margin.left - conWidth + offsetRight);
 
-      var text = textG.append('text')
-        .attr('fill', '#000')
-        .attr('y', Globals.height + Globals.config.margin.top + offsetTop)
-        .attr('dy', '0.71em')
-        .attr('font-size', '10px')
-        .text(Math.round(xScale.invert(Globals.width) * 10) / 10);
+    //   var text = textG.append('text')
+    //     .attr('fill', '#000')
+    //     .attr('y', Globals.height + Globals.config.margin.top + offsetTop)
+    //     .attr('dy', '0.71em')
+    //     .attr('font-size', '10px')
+    //     .text(Math.round(xScale.invert(Globals.width) * 10) / 10);
 
-      var textWidth = text.node().getBBox().width;
-      text.attr('x', Globals.width + Globals.config.margin.left - textWidth + offsetRight);
-    }
+    //   var textWidth = text.node().getBBox().width;
+    //   text.attr('x', Globals.width + Globals.config.margin.left - textWidth + offsetRight);
 
-    function updateXAxisLeftExtremeValue() {
+    //   Globals.xAxisRightExtremeValueText = text;
+    // }
+
+    function drawXAxisLeftExtremeValue() {
 
       var textContainer = Globals.chartSVG.append('g')
         .attr('class', 'axes-extreme-value tick');
 
-      var conWidth = 30;
-      var offsetTop = 8.5;
-      var offsetRight = 5;
-      var xScale = Globals.lastXScale || Globals.xScale;
+      Globals.xAxisLeftExtremeValueContainer = textContainer;
 
-      textContainer.append('rect')
-        .attr('fill', '#ffffff')
+      var conWidth = 30;
+      var conHeight = 14;
+      var offsetTop = 8.5;
+      var underlineStroke = 2;
+      var lineWidth = 15;
+
+      var rect = textContainer.append('rect')
+        .attr('fill', '#fff')
         .attr('width', conWidth)
-        .attr('height', 10)
+        .attr('height', conHeight)
         .attr('y', Globals.height + Globals.config.margin.top + offsetTop)
-        .attr('x', Globals.config.margin.left);
+        .attr('x', Globals.config.margin.left - (conWidth / 2))
+        .on('mousemove', function() {
+          if (Globals.xAxisLeftExtremeValueTextUnderline) {
+            Globals.xAxisLeftExtremeValueTextUnderline.attr('opacity', 1);
+          }
+        })
+        .on('mouseout', function() {
+          if (Globals.xAxisLeftExtremeValueTextUnderline) {
+            Globals.xAxisLeftExtremeValueTextUnderline.attr('opacity', 0);
+          }
+        });
+
+      var line = textContainer.append('line')
+        .attr('stroke', '#000')
+        .attr('stroke-width', underlineStroke)
+        .attr('x1', Globals.config.margin.left - (lineWidth / 2))
+        .attr('y1', Globals.height + Globals.config.margin.top + offsetTop + conHeight - underlineStroke)
+        .attr('x2', Globals.config.margin.left - (lineWidth / 2) + lineWidth)
+        .attr('y2', Globals.height + Globals.config.margin.top + offsetTop + conHeight - underlineStroke)
+        .attr('opacity', 0);
 
       var text = textContainer.append('text')
         .attr('fill', '#000')
         .attr('y', Globals.height + Globals.config.margin.top + offsetTop)
-        .attr('x', Globals.config.margin.left)
         .attr('dy', '0.71em')
         .attr('font-size', '10px')
-        .text(Math.round(xScale.invert(0) * 10) / 10);
+        .on('mousemove', function() {
+          if (Globals.xAxisLeftExtremeValueTextUnderline) {
+            Globals.xAxisLeftExtremeValueTextUnderline.attr('opacity', 1);
+          }
+        })
+        .on('mouseout', function() {
+          if (Globals.xAxisLeftExtremeValueTextUnderline) {
+            Globals.xAxisLeftExtremeValueTextUnderline.attr('opacity', 0);
+          }
+        });
+
+      Globals.xAxisLeftExtremeValueText = text;
+      Globals.xAxisLeftExtremeValueTextUnderline = line;
+    }
+
+    function drawXAxisRightExtremeValue() {
+
+      var textContainer = Globals.chartSVG.append('g')
+        .attr('class', 'axes-extreme-value tick');
+
+      Globals.xAxisLeftExtremeValueContainer = textContainer;
+
+      var conWidth = 30;
+      var conHeight = 14;
+      var offsetTop = 8.5;
+      var underlineStroke = 2;
+      var lineWidth = 20;
+
+      var rect = textContainer.append('rect')
+        .attr('fill', '#fff')
+        .attr('width', conWidth)
+        .attr('height', conHeight)
+        .attr('y', Globals.height + Globals.config.margin.top + offsetTop)
+        .attr('x', Globals.config.margin.left + Globals.width - (conWidth / 2))
+        .on('mousemove', function() {
+          if (Globals.xAxisRightExtremeValueTextUnderline) {
+            Globals.xAxisRightExtremeValueTextUnderline.attr('opacity', 1);
+          }
+        })
+        .on('mouseout', function() {
+          if (Globals.xAxisRightExtremeValueTextUnderline) {
+            Globals.xAxisRightExtremeValueTextUnderline.attr('opacity', 0);
+          }
+        });
+
+      var line = textContainer.append('line')
+        .attr('stroke', '#000')
+        .attr('stroke-width', underlineStroke)
+        .attr('x1', Globals.config.margin.left + Globals.width - (lineWidth / 2))
+        .attr('y1', Globals.height + Globals.config.margin.top + offsetTop + conHeight - underlineStroke)
+        .attr('x2', Globals.config.margin.left + Globals.width - (lineWidth / 2) + lineWidth)
+        .attr('y2', Globals.height + Globals.config.margin.top + offsetTop + conHeight - underlineStroke)
+        .attr('opacity', 0);
+
+      var text = textContainer.append('text')
+        .attr('fill', '#000')
+        .attr('y', Globals.height + Globals.config.margin.top + offsetTop)
+        .attr('dy', '0.71em')
+        .attr('font-size', '10px')
+        .on('mousemove', function() {
+          if (Globals.xAxisRightExtremeValueTextUnderline) {
+            Globals.xAxisRightExtremeValueTextUnderline.attr('opacity', 1);
+          }
+        })
+        .on('mouseout', function() {
+          if (Globals.xAxisRightExtremeValueTextUnderline) {
+            Globals.xAxisRightExtremeValueTextUnderline.attr('opacity', 0);
+          }
+        });
+
+      Globals.xAxisRightExtremeValueText = text;
+      Globals.xAxisRightExtremeValueTextUnderline = line;
+    }
+
+    function updateXAxisExtremeValues() {
+      var xScale = Globals.lastXScale || Globals.xScale;
+      var lineWidth, textWidth;
+      var minWidth = 10;
+      if (Globals.xAxisLeftExtremeValueText) {
+        var text = Globals.xAxisLeftExtremeValueText;
+        textWidth = text.node().getBBox().width;
+        text.text(Math.round(xScale.invert(0) * 10) / 10)
+          .attr('x', Globals.config.margin.left - (textWidth / 2));
+      }
+      if (Globals.xAxisLeftExtremeValueTextUnderline) {
+        lineWidth = textWidth;
+        lineWidth = lineWidth > minWidth ? lineWidth : minWidth;
+        Globals.xAxisLeftExtremeValueTextUnderline
+          .attr('x1', Globals.config.margin.left - (lineWidth / 2))
+          .attr('x2', Globals.config.margin.left - (lineWidth / 2) + lineWidth);
+      }
+      if (Globals.xAxisRightExtremeValueText) {
+        Globals.xAxisRightExtremeValueText.text(Math.round(xScale.invert(Globals.width) * 10) / 10);
+        textWidth = Globals.xAxisRightExtremeValueText.node().getBBox().width;
+        Globals.xAxisRightExtremeValueText.attr('x', Globals.width + Globals.config.margin.left - (textWidth / 2));
+      }
+      if (Globals.xAxisRightExtremeValueTextUnderline) {
+        lineWidth = textWidth;
+        lineWidth = lineWidth > minWidth ? lineWidth : minWidth;
+        Globals.xAxisRightExtremeValueTextUnderline
+          .attr('x1', Globals.width + Globals.config.margin.left - (lineWidth / 2))
+          .attr('x2', Globals.width + Globals.config.margin.left - (lineWidth / 2) + lineWidth);
+      }
     }
 
     function initChart(elem, data, config) {
@@ -798,8 +920,8 @@
       setXAxis();
       drawLines(config.series);
       makeCircle();
-      updateAxesExtremeValues();
       updateZoomScaleExtent();
+      drawAxesExtremeValues();
 
     }
 
@@ -965,13 +1087,13 @@
 
     this.updateSeries = function(series) {
       Globals.config.series = series;
-      updateAxesExtremeValues();
+      updateXAxisExtremeValues();
     };
 
     this.updateData = function(data) {
       Globals.data = data;
       updateZoomScaleExtent();
-      updateAxesExtremeValues();
+      updateXAxisExtremeValues();
     };
 
     this.updateConfig = function(config) {

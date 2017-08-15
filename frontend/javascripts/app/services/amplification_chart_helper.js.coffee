@@ -34,7 +34,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
       margin:
         top: 10
         left: 80
-        right: 5
+        right: 15
         bottom: 50
 
       series: []
