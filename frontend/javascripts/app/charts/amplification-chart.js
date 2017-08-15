@@ -691,36 +691,6 @@
       updateXAxisExtremeValues();
     }
 
-    // function drawXAxisRightExtremeValue() {
-
-    //   var textG = Globals.chartSVG.append('g')
-    //     .attr('class', 'axes-extreme-value tick');
-
-    //   var conWidth = 30;
-    //   var offsetTop = 8.5;
-    //   var offsetRight = 5;
-    //   var xScale = Globals.lastXScale || Globals.xScale;
-
-    //   textG.append('rect')
-    //     .attr('fill', '#ffffff')
-    //     .attr('width', conWidth)
-    //     .attr('height', 10)
-    //     .attr('y', Globals.height + Globals.config.margin.top + offsetTop)
-    //     .attr('x', Globals.width + Globals.config.margin.left - conWidth + offsetRight);
-
-    //   var text = textG.append('text')
-    //     .attr('fill', '#000')
-    //     .attr('y', Globals.height + Globals.config.margin.top + offsetTop)
-    //     .attr('dy', '0.71em')
-    //     .attr('font-size', '10px')
-    //     .text(Math.round(xScale.invert(Globals.width) * 10) / 10);
-
-    //   var textWidth = text.node().getBBox().width;
-    //   text.attr('x', Globals.width + Globals.config.margin.left - textWidth + offsetRight);
-
-    //   Globals.xAxisRightExtremeValueText = text;
-    // }
-
     function drawXAxisLeftExtremeValue() {
 
       var textContainer = Globals.chartSVG.append('g')
@@ -733,23 +703,14 @@
       var offsetTop = 8.5;
       var underlineStroke = 2;
       var lineWidth = 15;
+      var xScale = Globals.lastXScale || Globals.xScale;
 
       var rect = textContainer.append('rect')
         .attr('fill', '#fff')
         .attr('width', conWidth)
         .attr('height', conHeight)
         .attr('y', Globals.height + Globals.config.margin.top + offsetTop)
-        .attr('x', Globals.config.margin.left - (conWidth / 2))
-        .on('mousemove', function() {
-          if (Globals.xAxisLeftExtremeValueTextUnderline) {
-            Globals.xAxisLeftExtremeValueTextUnderline.attr('opacity', 1);
-          }
-        })
-        .on('mouseout', function() {
-          if (Globals.xAxisLeftExtremeValueTextUnderline) {
-            Globals.xAxisLeftExtremeValueTextUnderline.attr('opacity', 0);
-          }
-        });
+        .attr('x', Globals.config.margin.left - (conWidth / 2));
 
       var line = textContainer.append('line')
         .attr('stroke', '#000')
@@ -764,7 +725,26 @@
         .attr('fill', '#000')
         .attr('y', Globals.height + Globals.config.margin.top + offsetTop)
         .attr('dy', '0.71em')
-        .attr('font-size', '10px')
+        .attr('font-size', '10px');
+
+      var inputContainer = textContainer.append('foreignObject')
+        .attr('width', conWidth)
+        .attr('height', conHeight)
+        .attr('y', Globals.height + Globals.config.margin.top + offsetTop)
+        .attr('x', Globals.config.margin.left - (conWidth / 2));
+
+      var form = inputContainer.append('xhtml:form');
+
+      var input = form.append('xhtml:input').attr('type', 'text')
+        .style('display', 'block')
+        .style('opacity', '0')
+        .style('width', conWidth + 'px')
+        .style('height', conHeight + 'px')
+        .style('padding', '0px')
+        .style('margin', '0px')
+        .style('margin-top', '-4px')
+        .style('text-align', 'center')
+        .attr('type', 'text')
         .on('mousemove', function() {
           if (Globals.xAxisLeftExtremeValueTextUnderline) {
             Globals.xAxisLeftExtremeValueTextUnderline.attr('opacity', 1);
@@ -774,6 +754,12 @@
           if (Globals.xAxisLeftExtremeValueTextUnderline) {
             Globals.xAxisLeftExtremeValueTextUnderline.attr('opacity', 0);
           }
+        })
+        .on('click', function() {
+          input.style('opacity', 1).attr('value', Math.round(xScale.invert(0) * 10) / 10);
+        })
+        .on('focusout', function() {
+          input.style('opacity', 0);
         });
 
       Globals.xAxisLeftExtremeValueText = text;
