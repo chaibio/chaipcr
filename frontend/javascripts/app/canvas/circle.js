@@ -218,14 +218,16 @@ angular.module("canvasApp").factory('circle', [
             var lastStage = this.parent.parentStage;
             //lastStage.dots.setVisible(false);
             //this.canvas.bringToFront(lastStage.dots);
+            this.parent.swapMoveStepStatus(false);
             editModeService.temporaryChangeForStatus(false, this.parent.parentStage);
-            this.canvas.renderAll();
           }
         } else {
           if(oldHold !== null && parseInt(oldHold) === 0 && this.parent.parentStage.parent.editStageStatus === true) {
             editModeService.editModeStageChanges(this.parent.parentStage);
+            this.parent.swapMoveStepStatus(true);
           }
         }
+        this.canvas.renderAll();
       };
 
       this.changeHoldTime = function(new_hold) {
