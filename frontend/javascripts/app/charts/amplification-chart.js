@@ -527,14 +527,20 @@
         transform.y = -(Globals.height * transform.k - Globals.height);
       }
 
+      if (transform.k < 1) {
+        transform.k = 1;
+      }
+
       Globals.lastXScale = transform.rescaleX(Globals.xScale);
       Globals.gX.call(Globals.xAxis.scale(Globals.lastXScale));
       Globals.zoomTransform = transform;
       drawLines();
+      updateAxesExtremeValues();
 
       if (Globals.onZoomAndPan) {
         Globals.onZoomAndPan(Globals.zoomTransform, Globals.width, Globals.height, getScaleExtent());
       }
+
     }
 
     function getMinX() {
@@ -640,7 +646,6 @@
         .call(Globals.yAxis)
         .on('mouseenter', hideMouseIndicators);
 
-      // if (Globals.zoomTransform.rescaleY) {
       if (Globals.zoomTransform.rescaleY) {
         Globals.gY.call(Globals.yAxis.scale(Globals.zoomTransform.rescaleY(Globals.yScale)));
       }
@@ -660,12 +665,7 @@
       Globals.xScale.domain([min, max]);
 
       Globals.xAxis = d3.axisBottom(Globals.xScale);
-      if (Globals.config.axes.x.ticks) {
-        Globals.xAxis.tickValues = Globals.config.axes.x.ticks;
-      }
-      if (Globals.config.axes.x.tickFormat) {
-        Globals.xAxis.tickFormat(Globals.config.axes.x.tickFormat);
-      }
+
       Globals.gX = svg.append("g")
         .attr("class", "axis x-axis")
         .attr('fill', 'none')
@@ -684,9 +684,72 @@
       Globals.zooomBehavior.scaleExtent([1, getScaleExtent()]);
     }
 
+    function drawAxesExtremeValues() {
+
+    }
+
+    function updateAxesExtremeValues() {
+      Globals.chartSVG.selectAll('.axes-extreme-value').remove();
+      updateXAxisRightExtremeValue();
+      updateXAxisLeftExtremeValue();
+    }
+
+    function updateXAxisRightExtremeValue() {
+
+      var textG = Globals.chartSVG.append('g')
+        .attr('class', 'axes-extreme-value tick');
+
+      var conWidth = 30;
+      var offsetTop = 8.5;
+      var offsetRight = 5;
+      var xScale = Globals.lastXScale || Globals.xScale;
+
+      textG.append('rect')
+        .attr('fill', '#ffffff')
+        .attr('width', conWidth)
+        .attr('height', 10)
+        .attr('y', Globals.height + Globals.config.margin.top + offsetTop)
+        .attr('x', Globals.width + Globals.config.margin.left - conWidth + offsetRight);
+
+      var text = textG.append('text')
+        .attr('fill', '#000')
+        .attr('y', Globals.height + Globals.config.margin.top + offsetTop)
+        .attr('dy', '0.71em')
+        .attr('font-size', '10px')
+        .text(Math.round(xScale.invert(Globals.width) * 10) / 10);
+
+      var textWidth = text.node().getBBox().width;
+      text.attr('x', Globals.width + Globals.config.margin.left - textWidth + offsetRight);
+    }
+
+    function updateXAxisLeftExtremeValue() {
+
+      var textContainer = Globals.chartSVG.append('g')
+        .attr('class', 'axes-extreme-value tick');
+
+      var conWidth = 30;
+      var offsetTop = 8.5;
+      var offsetRight = 5;
+      var xScale = Globals.lastXScale || Globals.xScale;
+
+      textContainer.append('rect')
+        .attr('fill', '#ffffff')
+        .attr('width', conWidth)
+        .attr('height', 10)
+        .attr('y', Globals.height + Globals.config.margin.top + offsetTop)
+        .attr('x', Globals.config.margin.left);
+
+      var text = textContainer.append('text')
+        .attr('fill', '#000')
+        .attr('y', Globals.height + Globals.config.margin.top + offsetTop)
+        .attr('x', Globals.config.margin.left)
+        .attr('dy', '0.71em')
+        .attr('font-size', '10px')
+        .text(Math.round(xScale.invert(0) * 10) / 10);
+    }
+
     function initChart(elem, data, config) {
 
-      // initGlobalVars();
       Globals.data = data;
       Globals.config = config;
       Globals.zooomBehavior = d3.zoom().on("zoom", zoomed);
@@ -735,7 +798,7 @@
       setXAxis();
       drawLines(config.series);
       makeCircle();
-      // Globals.activePath = null;
+      updateAxesExtremeValues();
       updateZoomScaleExtent();
 
     }
@@ -902,11 +965,13 @@
 
     this.updateSeries = function(series) {
       Globals.config.series = series;
+      updateAxesExtremeValues();
     };
 
     this.updateData = function(data) {
       Globals.data = data;
       updateZoomScaleExtent();
+      updateAxesExtremeValues();
     };
 
     this.updateConfig = function(config) {
