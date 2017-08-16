@@ -48,7 +48,7 @@ class Protocol < ActiveRecord::Base
           if stage.auto_delta && i > stage.auto_delta_start_cycle
             temperature += step.delta_temperature*(i-stage.auto_delta_start_cycle)
           end
-          ramp_rate = (step.ramp.rate <= 0 || step.ramp.rate > step.ramp.max_rate)? step.ramp.max_rate : step.ramp.rate
+          ramp_rate = (step.ramp.rate <= 0 || step.ramp.rate > Ramp::MAX_RATE)? Ramp::MAX_RATE : step.ramp.rate
           duration += (temperature-prev_target_temp).abs / ramp_rate
           prev_target_temp = temperature
           if !step.pause && !step.infinite_hold?

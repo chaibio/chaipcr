@@ -70,6 +70,7 @@ class Experiment < ActiveRecord::Base
     AmplificationCurve.delete_all(:experiment_id => experiment.id)
     AmplificationDatum.delete_all(:experiment_id => experiment.id)
     CachedMeltCurveDatum.delete_all(:experiment_id => experiment.id)
+    Wells.delete_all(:experiment_id => experiment.id)
   end
   
   def protocol

@@ -363,6 +363,7 @@ class DevicesController < ApplicationController
   
   def erase_data
     start_time = Time.now
+=begin
     User.delete_all
     UserToken.delete_all
     logger.info "erase_data User.delete_all: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
@@ -374,6 +375,16 @@ class DevicesController < ApplicationController
     start_time = Time.now
     Setting.update_all("calibration_id=1")
     logger.info "erase_data settings update: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
+=end
+    ActiveRecord::Base.connection.tables.each do |table|
+        ActiveRecord::Base.connection.execute("TRUNCATE TABLE #{table};")
+    end
+    logger.info "erase_data truncate table: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
+    
+    start_time = Time.now
+    system("rake db:seed_fu")
+    logger.info "erase_data seedfu: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
+    
     start_time = Time.now
     system("sync")
     logger.info "erase_data sync: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
