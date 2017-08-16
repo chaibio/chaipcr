@@ -1,10 +1,8 @@
 (function() {
 
-  // "use strict";
-
   function AmplificationChart(elem, data, config) {
 
-    // Global vars
+    var that = this;
     var Globals = null;
     var bisectX = function(line_config) {
       return d3.bisector(function(d) {
@@ -686,8 +684,8 @@
 
     function drawAxesExtremeValues() {
       Globals.chartSVG.selectAll('.axes-extreme-value').remove();
-      drawXAxisRightExtremeValue();
       drawXAxisLeftExtremeValue();
+      drawXAxisRightExtremeValue();
       updateXAxisExtremeValues();
     }
 
@@ -703,7 +701,6 @@
       var offsetTop = 8.5;
       var underlineStroke = 2;
       var lineWidth = 15;
-      var xScale = Globals.lastXScale || Globals.xScale;
 
       var rect = textContainer.append('rect')
         .attr('fill', '#fff')
@@ -744,6 +741,7 @@
         .style('margin', '0px')
         .style('margin-top', '-4px')
         .style('text-align', 'center')
+        .style('font-size', '10px')
         .attr('type', 'text')
         .on('mousemove', function() {
           if (Globals.xAxisLeftExtremeValueTextUnderline) {
@@ -756,7 +754,9 @@
           }
         })
         .on('click', function() {
-          input.style('opacity', 1).attr('value', Math.round(xScale.invert(0) * 10) / 10);
+          var xScale = Globals.lastXScale || Globals.xScale;
+          var val = Math.round(xScale.invert(0) * 10) / 10;
+          input.style('opacity', 1).attr('value', val);
         })
         .on('focusout', function() {
           input.style('opacity', 0);
@@ -784,17 +784,7 @@
         .attr('width', conWidth)
         .attr('height', conHeight)
         .attr('y', Globals.height + Globals.config.margin.top + offsetTop)
-        .attr('x', Globals.config.margin.left + Globals.width - (conWidth / 2))
-        .on('mousemove', function() {
-          if (Globals.xAxisRightExtremeValueTextUnderline) {
-            Globals.xAxisRightExtremeValueTextUnderline.attr('opacity', 1);
-          }
-        })
-        .on('mouseout', function() {
-          if (Globals.xAxisRightExtremeValueTextUnderline) {
-            Globals.xAxisRightExtremeValueTextUnderline.attr('opacity', 0);
-          }
-        });
+        .attr('x', Globals.config.margin.left + Globals.width - (conWidth / 2));
 
       var line = textContainer.append('line')
         .attr('stroke', '#000')
@@ -809,7 +799,27 @@
         .attr('fill', '#000')
         .attr('y', Globals.height + Globals.config.margin.top + offsetTop)
         .attr('dy', '0.71em')
-        .attr('font-size', '10px')
+        .attr('font-size', '10px');
+
+      var inputContainer = textContainer.append('foreignObject')
+        .attr('width', conWidth)
+        .attr('height', conHeight)
+        .attr('y', Globals.height + Globals.config.margin.top + offsetTop)
+        .attr('x', Globals.config.margin.left + Globals.width - (conWidth / 2));
+
+      var form = inputContainer.append('xhtml:form');
+
+      var input = form.append('xhtml:input').attr('type', 'text')
+        .style('display', 'block')
+        .style('opacity', '0')
+        .style('width', conWidth + 'px')
+        .style('height', conHeight + 'px')
+        .style('padding', '0px')
+        .style('margin', '0px')
+        .style('margin-top', '-4px')
+        .style('text-align', 'center')
+        .style('font-size', '10px')
+        .attr('type', 'text')
         .on('mousemove', function() {
           if (Globals.xAxisRightExtremeValueTextUnderline) {
             Globals.xAxisRightExtremeValueTextUnderline.attr('opacity', 1);
@@ -819,6 +829,13 @@
           if (Globals.xAxisRightExtremeValueTextUnderline) {
             Globals.xAxisRightExtremeValueTextUnderline.attr('opacity', 0);
           }
+        })
+        .on('click', function() {
+          var xScale = Globals.lastXScale || Globals.xScale;
+          input.style('opacity', 1).attr('value', Math.round(xScale.invert(Globals.width) * 10) / 10);
+        })
+        .on('focusout', function() {
+          input.style('opacity', 0);
         });
 
       Globals.xAxisRightExtremeValueText = text;
@@ -831,9 +848,9 @@
       var minWidth = 10;
       if (Globals.xAxisLeftExtremeValueText) {
         var text = Globals.xAxisLeftExtremeValueText;
+        text.text(Math.round(xScale.invert(0) * 10) / 10);
         textWidth = text.node().getBBox().width;
-        text.text(Math.round(xScale.invert(0) * 10) / 10)
-          .attr('x', Globals.config.margin.left - (textWidth / 2));
+        text.attr('x', Globals.config.margin.left - (textWidth / 2));
       }
       if (Globals.xAxisLeftExtremeValueTextUnderline) {
         lineWidth = textWidth;
