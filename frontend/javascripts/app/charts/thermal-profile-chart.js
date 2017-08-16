@@ -254,6 +254,7 @@
       }
 
       var svg = Globals.chartSVG.select('.chart-g');
+      Globals.chartSVG.selectAll('.g-y-axis-text').remove();
 
       // add allowance for interpolation curves
       var max = getMaxY();
@@ -278,6 +279,19 @@
         .attr("class", "axis y-axis")
         .attr('fill', 'none')
         .call(Globals.yAxis);
+
+      // text label for the y axis
+      svg.append("text")
+        .attr("class", "g-y-axis-text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - Globals.config.margin.left)
+        .attr("x", 0 - (Globals.height / 2))
+        .attr("dy", "1em")
+        .attr("font-family", "dinot-bold")
+        .attr("font-size", "16px")
+        .attr("fill", "#333")
+        .style("text-anchor", "middle")
+        .text("Temperature (°C)");
     }
 
     function setXAxis() {

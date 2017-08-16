@@ -48,7 +48,7 @@ App.service 'MeltCurveService', [
         y:
           ticks: 10
       margin:
-        left: 50
+        left: 75
         right: 10
         top: 10
         bottom: 20

@@ -3,15 +3,14 @@
   .curve-header {
     border-bottom: 3px solid $gray;
     padding-bottom: 3px;
-		margin-left: 20px;
-		margin-right: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
     .row {
       margin-top: 0;
       margin-bottom: 0;
     }
     .curve-title {
-      display: inline-block;
-      //width: 70%;
+      display: inline-block; //width: 70%;
       cursor: pointer;
       img {
         display: inline-block;
@@ -102,8 +101,7 @@
   .vertical-text {
     transform: rotate(-90deg);
     transform-origin: 20% 40%;
-    float: left;
-    // font-size: 10px;
+    float: left; // font-size: 10px;
     // font-weight: bold;
     margin-left: -35px;
     margin-top: $marginTop;
@@ -114,8 +112,9 @@
     margin-bottom: 100px;
   }
   .chart-container {
-    margin-left: 15px;
-    margin-bottom: -35px;
+    // margin-left: 15px; // margin-bottom: -35px;
+    //   margin-left: 0;
+    text-align: center;
   }
   .line-series {
     path {
@@ -141,7 +140,7 @@
     margin-top: 60px;
   }
   .zoom-scroll-container {
-    margin-top: 50px;
+    margin-top: 20px;
     padding-left: 50px;
     padding-right: 50px;
     .zoom-container {

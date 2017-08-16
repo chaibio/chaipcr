@@ -583,6 +583,7 @@
     function setYAxis() {
 
       Globals.chartSVG.selectAll('g.axis.y-axis').remove();
+      Globals.chartSVG.selectAll('.g-y-axis-text').remove();
 
       var svg = Globals.chartSVG.select('.chart-g');
 
@@ -622,6 +623,23 @@
       if (Globals.zoomTransform.rescaleY) {
         Globals.gY.call(Globals.yAxis.scale(Globals.zoomTransform.rescaleY(Globals.yScale)));
       }
+      // text label for the y axis
+      Globals.reporterText = svg.append("text")
+        .attr("class", "g-y-axis-text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - Globals.config.margin.left)
+        .attr("x", 0 - (Globals.height / 2))
+        .attr("dy", "1em")
+        .attr("font-family", "dinot-bold")
+        .attr("font-size", "12px")
+        .attr("fill", "#333")
+        .style("text-anchor", "middle");
+
+      if (Globals.config.curve_type === 'normalized') {
+        Globals.reporterText.text("NORMALIZED REPORTER");
+      } else {
+        Globals.reporterText.text("DERIVATIVE REPORTER");
+      }
     }
 
     function setXAxis() {
@@ -653,6 +671,7 @@
       if (Globals.zoomTransform.rescaleX) {
         Globals.gX.call(Globals.xAxis.scale(Globals.zoomTransform.rescaleX(Globals.xScale)));
       }
+
     }
 
     function updateZoomScaleExtent() {
@@ -663,9 +682,6 @@
     }
 
     function initChart(elem, data, config) {
-
-      console.log(data);
-      console.log(config);
 
       initGlobalVars();
       Globals.data = data;
@@ -881,6 +897,12 @@
 
     this.updateSeries = function(series) {
       Globals.config.series = series;
+
+      if (Globals.config.curve_type === 'normalized') {
+        Globals.reporterText.text("NORMALIZED REPORTER");
+      } else {
+        Globals.reporterText.text("DERIVATIVE REPORTER");
+      }
     };
 
     this.updateData = function(data) {

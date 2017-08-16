@@ -609,6 +609,7 @@
     function setYAxis() {
 
       Globals.chartSVG.selectAll('g.axis.y-axis').remove();
+      Globals.chartSVG.selectAll('.g-y-axis-text').remove();
 
       var svg = Globals.chartSVG.select('.chart-g');
 
@@ -647,11 +648,25 @@
       if (Globals.zoomTransform.rescaleY) {
         Globals.gY.call(Globals.yAxis.scale(Globals.zoomTransform.rescaleY(Globals.yScale)));
       }
+
+      // text label for the y axis
+      svg.append("text")
+        .attr("class", "g-y-axis-text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - Globals.config.margin.left)
+        .attr("x", 0 - (Globals.height / 2))
+        .attr("dy", "1em")
+        .attr("font-family", "dinot-bold")
+        .attr("font-size", "12px")
+        .attr("fill", "#333")
+        .style("text-anchor", "middle")
+        .text("RELATIVE FLUORESCENCE UNITS");
     }
 
     function setXAxis() {
 
       Globals.chartSVG.selectAll('g.axis.x-axis').remove();
+      Globals.chartSVG.selectAll('.g-x-axis-text').remove();
 
       var svg = Globals.chartSVG.select('.chart-g');
 
@@ -673,6 +688,19 @@
       if (Globals.zoomTransform.rescaleX) {
         Globals.gX.call(Globals.xAxis.scale(Globals.zoomTransform.rescaleX(Globals.xScale)));
       }
+
+      // text label for the x axis
+      svg.append("text")
+        .attr('class', 'g-x-axis-text')
+        .attr("transform",
+          "translate(" + (Globals.width / 2) + " ," +
+          (Globals.height + Globals.config.margin.top + Globals.config.margin.bottom - 20) + ")")
+        .style("text-anchor", "middle")
+        .attr("font-family", "dinot-bold")
+        .attr("font-size", "12px")
+        .attr("fill", "#333")
+        .text("CYCLE NUMBER");
+
     }
 
     function updateZoomScaleExtent() {
@@ -1101,6 +1129,7 @@
 
     this.updateConfig = function(config) {
       Globals.config = config;
+      updateXAxisExtremeValues();
     };
 
     this.updateInterpolation = function(i) {
