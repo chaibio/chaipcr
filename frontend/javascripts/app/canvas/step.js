@@ -226,6 +226,11 @@ angular.module("canvasApp").factory('step', [
         }
       };
 
+      this.swapMoveStepStatus = function(status) {
+
+        this.dots.setVisible(status);
+      };
+
       this.render = function() {
 
         this.setLeft();

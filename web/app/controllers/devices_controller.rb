@@ -364,6 +364,7 @@ class DevicesController < ApplicationController
   def erase_data
     start_time = Time.now
     User.delete_all
+    UserToken.delete_all
     logger.info "erase_data User.delete_all: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
     start_time = Time.now
     Experiment.joins(:experiment_definition).where("experiment_type != ? and experiments.id != 1", ExperimentDefinition::TYPE_DIAGNOSTIC).select('experiments.*').each do |e|
