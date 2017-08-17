@@ -362,6 +362,8 @@ class DevicesController < ApplicationController
   private
   
   def erase_data
+    system("cp /etc/network/interfaces.orig /etc/network/interfaces")
+    
     start_time = Time.now
 =begin
     User.delete_all
