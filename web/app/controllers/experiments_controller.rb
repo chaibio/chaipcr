@@ -452,10 +452,10 @@ class ExperimentsController < ApplicationController
       
         if amplification_data
           out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/amplification.csv")
-          columns = ["channel", "well_num", "cycle_num"]
+          columns = ["baseline_subtracted_value", "background_subtracted_value", "fluorescence_value", "channel", "well_num", "well_name", "cycle_num"]
           fluorescence_index = 0
           csv_string = CSV.generate do |csv|
-            csv << ["baseline_subtracted_value", "background_subtracted_value", "fluorescence_value"]+columns
+            csv << columns
             amplification_data.each do |data|
               while (fluorescence_index < fluorescence_data.length && 
                     !(fluorescence_data[fluorescence_index].channel == data.channel && 
@@ -464,7 +464,10 @@ class ExperimentsController < ApplicationController
                     fluorescence_index += 1
               end
               fluorescence_value = (fluorescence_index < fluorescence_data.length)? fluorescence_data[fluorescence_index].fluorescence_value : nil
-              csv << [data.baseline_subtracted_value, data.background_subtracted_value, fluorescence_value]+data.attributes.values_at(*columns)
+              attributes = data.attributes
+              attributes["fluorescence_value"] = fluorescence_value
+              attributes["well_name"] = well_name(data.well_num)
+              csv << attributes.values_at(*columns)
               fluorescence_index += 1
             end
           end
@@ -474,9 +477,9 @@ class ExperimentsController < ApplicationController
         if cts
           out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/cq.csv")
           csv_string = CSV.generate do |csv|
-            csv << ["channel", "well_num", "cq"];
+            csv << ["channel", "well_num", "well_name", "cq"];
             cts.each do |ct|
-              csv << [ct.channel, ct.well_num, ct.ct]
+              csv << [ct.channel, ct.well_num, well_name(ct.well_num), ct.ct]
             end
           end
           out.write csv_string
@@ -507,16 +510,16 @@ class ExperimentsController < ApplicationController
 
         if melt_curve_data
           out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_data.csv")
-          columns = ["channel", "well_num", "temperature", "normalized_data", "derivative_data"]
+          columns = ["channel", "well_num", "well_name", "temperature", "normalized_data", "derivative_data"]
           out.write columns.to_csv
           melt_curve_data.each do |data|
             data.temperature.each_index do |index|
-              out.write "#{data.channel}, #{data.well_num}, #{data.temperature[index]}, #{data.normalized_data[index]}, #{data.derivative_data[index]}\r\n"
+              out.write "#{data.channel}, #{data.well_num}, #{well_name(data.well_num)}, #{data.temperature[index]}, #{data.normalized_data[index]}, #{data.derivative_data[index]}\r\n"
             end
           end
 
           out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_analysis.csv")
-          columns = ["channel", "well_num", "Tm1", "Tm2", "Tm3", "Tm4", "area1", "area2", "area3", "area4"]
+          columns = ["channel", "well_num", "well_name", "Tm1", "Tm2", "Tm3", "Tm4", "area1", "area2", "area3", "area4"]
           csv_string = CSV.generate do |csv|
             csv << columns
             melt_curve_data.each do |data|
@@ -524,7 +527,7 @@ class ExperimentsController < ApplicationController
               data.tm.each_index{|i| tm_arr[i] = data.tm[i]}
               area_arr = Array.new(4)
               data.area.each_index{|i| area_arr[i] = data.area[i]}
-              csv << [data.channel, data.well_num]+tm_arr+area_arr
+              csv << [data.channel, data.well_num, well_name(data.well_num)]+tm_arr+area_arr
             end
           end
         
@@ -564,6 +567,11 @@ class ExperimentsController < ApplicationController
   end
   
   protected
+  
+  def well_name(well_num)
+    @wells ||= Well.wells(@experiment.id) if @experiment
+    (@wells && @wells[well_num])? @wells[well_num].sample_name : ""
+  end
   
   def get_experiment
     @experiment = Experiment.find_by_id(params[:id]) if @experiment.nil?
