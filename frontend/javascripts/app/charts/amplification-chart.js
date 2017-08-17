@@ -2,7 +2,7 @@
 
   function AmplificationChart(elem, data, config) {
 
-    var that = this;
+    var instance = this;
     var Globals = null;
     var bisectX = function(line_config) {
       return d3.bisector(function(d) {
@@ -710,6 +710,23 @@
       Globals.zooomBehavior.scaleExtent([1, getScaleExtent()]);
     }
 
+    function ensureNumeric() {
+      var charCode = d3.event.keyCode;
+      if (charCode > 36 && charCode < 41) {
+        //arrow keys
+        return true;
+      }
+      if (charCode >= 96 && charCode <= 105) {
+        //numpad number keys
+        return true;
+      }
+      if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+        d3.event.preventDefault();
+        return false;
+      }
+      return true;
+    }
+
     function drawAxesExtremeValues() {
       Globals.chartSVG.selectAll('.axes-extreme-value').remove();
       drawXAxisLeftExtremeValue();
@@ -788,6 +805,26 @@
         })
         .on('focusout', function() {
           input.style('opacity', 0);
+        })
+        .on('keydown', function() {
+          if (d3.event.keyCode === 13) {
+            // enter
+            d3.event.preventDefault();
+            var extent = getScaleExtent() - 1;
+            var x = Globals.xScale;
+            var minX = this.value * 1;
+            var maxX = x.invert(Globals.width);
+            if (minX >= maxX || minX <= 1) {
+              return false;
+            }
+            var k = Globals.width / (x(maxX) - x(minX));
+            var width_percent = 1 / k;
+            var w = extent - (width_percent * extent);
+            Globals.chartSVG.call(Globals.zooomBehavior.scaleTo, k);
+            instance.scroll((minX - 1) / w);
+          } else {
+            ensureNumeric();
+          }
         });
 
       Globals.xAxisLeftExtremeValueText = text;
@@ -864,6 +901,26 @@
         })
         .on('focusout', function() {
           input.style('opacity', 0);
+        })
+        .on('keydown', function() {
+          if (d3.event.keyCode === 13) {
+            // enter
+            d3.event.preventDefault();
+            var extent = getScaleExtent() - 1;
+            var x = Globals.xScale;
+            var minX = x.invert(0);
+            var maxX = this.value * 1;
+            if (minX >= maxX || maxX > x.invert(Globals.width)) {
+              return false;
+            }
+            var k = Globals.width / (x(maxX) - x(minX));
+            var width_percent = 1 / k;
+            var w = extent - (width_percent * extent);
+            Globals.chartSVG.call(Globals.zooomBehavior.scaleTo, k);
+            instance.scroll((minX - 1) / w);
+          } else {
+            ensureNumeric();
+          }
         });
 
       Globals.xAxisRightExtremeValueText = text;
