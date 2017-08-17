@@ -16,8 +16,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-require 'rserve'
-
 class MainController < ApplicationController
 
   before_filter :ensure_authenticated_user, :only => :index
