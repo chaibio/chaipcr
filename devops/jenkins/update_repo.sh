@@ -11,6 +11,7 @@ find . -name *.xml -type f -exec sed -i "s/192.168.1.44/10.0.100.240/g"  {} \;
 find . -name *.xml -type f -exec sed -i "s/192.168.1.55/10.0.100.240/g"  {} \;
 find . -name *.xml -type f -exec sed -i "s/192.168.1.112/10.0.100.240/g"  {} \;
 find . -name *.xml -type f -exec sed -i "s/192.168.1.88/10.0.100.240/g"  {} \;
+find . -name *.xml -type f -exec sed -i "s/192.168.1.99/10.0.100.240/g"  {} \;
 
 sync
 
