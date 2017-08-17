@@ -801,7 +801,8 @@
         .on('click', function() {
           var xScale = Globals.lastXScale || Globals.xScale;
           var val = Math.round(xScale.invert(0) * 10) / 10;
-          input.style('opacity', 1).attr('value', val);
+          input.style('opacity', 1);
+          input.node().value = val;
         })
         .on('focusout', function() {
           input.style('opacity', 0);
@@ -812,9 +813,10 @@
             d3.event.preventDefault();
             var extent = getScaleExtent() - 1;
             var x = Globals.xScale;
+            var lastXScale = Globals.lastXScale || x;
             var minX = this.value * 1;
-            var maxX = x.invert(Globals.width);
-            if (minX >= maxX || minX <= 1) {
+            var maxX = lastXScale.invert(Globals.width);
+            if (minX >= maxX || minX < 1) {
               return false;
             }
             var k = Globals.width / (x(maxX) - x(minX));
@@ -897,7 +899,8 @@
         })
         .on('click', function() {
           var xScale = Globals.lastXScale || Globals.xScale;
-          input.style('opacity', 1).attr('value', Math.round(xScale.invert(Globals.width) * 10) / 10);
+          input.style('opacity', 1);
+          input.node().value = Math.round(xScale.invert(Globals.width) * 10) / 10;
         })
         .on('focusout', function() {
           input.style('opacity', 0);
@@ -908,9 +911,10 @@
             d3.event.preventDefault();
             var extent = getScaleExtent() - 1;
             var x = Globals.xScale;
-            var minX = x.invert(0);
+            var lastXScale = Globals.lastXScale || x;
+            var minX = lastXScale.invert(0);
             var maxX = this.value * 1;
-            if (minX >= maxX || maxX > x.invert(Globals.width)) {
+            if (minX >= maxX || maxX > getScaleExtent()) {
               return false;
             }
             var k = Globals.width / (x(maxX) - x(minX));
@@ -933,7 +937,8 @@
       var minWidth = 10;
       if (Globals.xAxisLeftExtremeValueText) {
         var text = Globals.xAxisLeftExtremeValueText;
-        text.text(Math.round(xScale.invert(0) * 10) / 10);
+        var minX = Math.round(xScale.invert(0) * 10) / 10;
+        text.text(minX);
         textWidth = text.node().getBBox().width;
         text.attr('x', Globals.config.margin.left - (textWidth / 2));
       }
@@ -945,7 +950,8 @@
           .attr('x2', Globals.config.margin.left - (lineWidth / 2) + lineWidth);
       }
       if (Globals.xAxisRightExtremeValueText) {
-        Globals.xAxisRightExtremeValueText.text(Math.round(xScale.invert(Globals.width) * 10) / 10);
+        var maxX = Math.round(xScale.invert(Globals.width) * 10) / 10;
+        Globals.xAxisRightExtremeValueText.text(maxX);
         textWidth = Globals.xAxisRightExtremeValueText.node().getBBox().width;
         Globals.xAxisRightExtremeValueText.attr('x', Globals.width + Globals.config.margin.left - (textWidth / 2));
       }
