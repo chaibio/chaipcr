@@ -86,7 +86,7 @@ const double kHeatBlockZonesMaxTargetTemp = 105;
 const double kHeatBlockLowTempShutdownThreshold = -5;
 const double kHeatBlockHighTempShutdownThreshold = 120;
 
-const double kMaxHeatBlockRampSpeed = 6.0;
+const double kMaxHeatBlockRampSpeed = 5.0;
 const double kDurationCalcHeatBlockRampSpeed = kMaxHeatBlockRampSpeed;
 
 //LED constants

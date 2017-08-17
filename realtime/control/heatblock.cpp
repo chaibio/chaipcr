@@ -89,8 +89,14 @@ void HeatBlock::setTargetTemperature(double targetTemperature, double rampRate) 
 
         throw std::out_of_range(string.str());
     }
+    else if (rampRate <= 0)
+    {
+        std::stringstream string;
+        string << "Requested heat block ramp rate is equal or below 0";
 
-    if (rampRate <= 0 || rampRate > _maxRampSpeed)
+        throw std::out_of_range(string.str());
+    }
+    else if (rampRate > _maxRampSpeed)
         rampRate = _maxRampSpeed;
 
     std::lock_guard<std::mutex> lock(_stepProcessingMutex);
