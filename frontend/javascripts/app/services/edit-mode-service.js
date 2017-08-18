@@ -87,6 +87,7 @@ window.ChaiBioTech.ngApp.service('editModeService', [
             this.editModeStageChanges(stage);
             this.status = keepStat;
         };
+        
         this.editStageModeStep = function(step) {
 
             step.closeImage.setOpacity(this.status);
@@ -96,6 +97,7 @@ window.ChaiBioTech.ngApp.service('editModeService', [
             } else {
                 step.dots.setVisible(this.status);
             }
+            
             step.dots.setCoords();
 
             if( step.parentStage.model.auto_delta ) {

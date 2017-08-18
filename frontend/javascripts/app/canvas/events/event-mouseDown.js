@@ -114,6 +114,10 @@ angular.module("canvasApp").factory('mouseDown', [
               circleManager.togglePaths(false); //put it back later
               evt.target.setVisible(false);
               C.moveDots.setLeft(step.left + 6).setCoords().setVisible(true);
+              C.moveDots.baseStep = null;
+              if(step.previousStep) {
+                C.moveDots.baseStep = step.previousStep;
+              }
               C.canvas.bringToFront(C.moveDots);
               C.canvas.bringToFront(C.stepIndicator);
               

@@ -29,7 +29,7 @@
           <name>input_image_prefix</name>
           <description>eMMC name prefix.
 </description>
-          <defaultValue>Jessie49Clean</defaultValue>
+          <defaultValue>Jessie49Release</defaultValue>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>

@@ -404,9 +404,13 @@ sudo apt-get -y -q remove --purge mysql-server mysql-client mysql-common
 sudo apt-get -y -q autoremove
 sudo apt-get -y -q autoclean
 
-wget $download_prefix/mariadb-10.0.16.tar.gz -O mariadb-10.0.16.tar.gz
-tar xfv mariadb-10.0.16.tar.gz
-cd mariadb-10.0.16
+mariadb_version=10.0
+git clone -b $mariadb_version https://github.com/MariaDB/server.git
+cd server
+
+#wget $download_prefix/mariadb-10.0.16.tar.gz -O mariadb-10.0.16.tar.gz
+#tar xfv mariadb-10.0.16.tar.gz
+#cd mariadb-10.0.16
 
 mkdir -p /data/mysql  || :
 

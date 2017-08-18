@@ -12,11 +12,14 @@
         <hudson.model.StringParameterDefinition>
           <name>build_machine</name>
           <description>Remote build beaglebone.</description>
-          <defaultValue>192.168.1.99</defaultValue>
+          <defaultValue>10.0.100.240</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>local_download_folder</name>
-          <description>The folder where to host download file. Could be /usr/share/nginx/html/download or /usr/share/nginx/html/download
+          <description>The folder where to host download file. 
+Apache server: /var/www/html/download
+or 
+Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
 </description>
           <defaultValue>/usr/share/nginx/html/download</defaultValue>
         </hudson.model.StringParameterDefinition>
@@ -478,6 +481,9 @@ exit 0</command>
       <command>echo cleaning up
 cd /sdcard/upgrade/
 
+arch_filename=&quot;qt-everywhere-compiled-4.8.6.tgz&quot;
+slim_arch_filename=&quot;qt-everywhere-slim-4.8.6.tgz&quot;
+
 echo deleting $arch_filename
 
 rm $arch_filename
@@ -486,10 +492,12 @@ rm $slim_arch_filename
 ls -ahl
 
 rm -r  qt-everywhere-opensource-src-4.8.6* -r
-#rm -r tslib-compile
+rm -r tslib-compile
 
 sync
 ls -ah
+
+echo all done
 
 exit 0
 </command>
