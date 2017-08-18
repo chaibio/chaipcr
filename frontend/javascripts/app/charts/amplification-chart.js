@@ -731,6 +731,7 @@
       Globals.chartSVG.selectAll('.axes-extreme-value').remove();
       drawXAxisLeftExtremeValue();
       drawXAxisRightExtremeValue();
+      drawYAxisUpperExtremeValue();
       updateXAxisExtremeValues();
     }
 
@@ -931,12 +932,130 @@
       Globals.xAxisRightExtremeValueTextUnderline = line;
     }
 
+    function drawYAxisUpperExtremeValue() {
+
+      var textContainer = Globals.chartSVG.append('g')
+        .attr('class', 'axes-extreme-value tick');
+
+      Globals.yAxisUpperExtremeValueContainer = textContainer;
+
+      var conWidth = 30;
+      var conHeight = 14;
+      var offsetRight = 9;
+      var offsetTop = 0;
+      var underlineStroke = 2;
+      var lineWidth = 15;
+
+      var rect = textContainer.append('rect')
+        .attr('fill', '#fff')
+        .attr('width', conWidth)
+        .attr('height', conHeight)
+        .attr('y', Globals.config.margin.top - (conHeight / 2))
+        .attr('x', Globals.config.margin.left - (conWidth + offsetRight));
+
+      var line = textContainer.append('line')
+        .attr('opacity', 0)
+        .attr('stroke', '#000')
+        .attr('stroke-width', underlineStroke)
+        .attr('x1', Globals.config.margin.left - (conWidth + offsetRight))
+        .attr('y1', Globals.config.margin.top + (conHeight / 2) - (underlineStroke / 2))
+        .attr('x2', Globals.config.margin.left - (conWidth + offsetRight) + conWidth)
+        .attr('y2', Globals.config.margin.top + (conHeight / 2) - (underlineStroke / 2));
+      // .attr('opacity', 0);
+
+      var text = textContainer.append('text')
+        .attr('fill', '#000')
+        .attr('x', Globals.config.margin.left - (offsetRight + conWidth))
+        .attr('y', Globals.config.margin.top - underlineStroke * 2)
+        .attr('dy', '0.71em')
+        .attr('font-size', '10px')
+        .text(Math.round(Globals.yScale.invert(0) * 10) / 10);
+
+      text.attr('x', Globals.config.margin.left - (offsetRight + text.node().getBBox().width));
+
+      var inputContainer = textContainer.append('foreignObject')
+        .attr('width', conWidth)
+        .attr('height', conHeight - offsetTop)
+        .attr('y', Globals.config.margin.top - (conHeight / 2))
+        .attr('x', Globals.config.margin.left - (conWidth + offsetRight));
+
+      var form = inputContainer.append('xhtml:form');
+
+      var input = form.append('xhtml:input').attr('type', 'text')
+        .style('display', 'block')
+        .style('opacity', 0)
+        .style('width', conWidth + 'px')
+        .style('height', conHeight + 'px')
+        .style('padding', '0px')
+        .style('margin', '0px')
+        .style('margin-top', '-1px')
+        .style('text-align', 'center')
+        .style('font-size', '10px')
+        .attr('type', 'text')
+        .on('mousemove', function() {
+          var textWidth = text.node().getBBox().width;
+          line.attr('x1', Globals.config.margin.left - (textWidth + offsetRight))
+            .attr('y1', Globals.config.margin.top + (conHeight / 2) - (underlineStroke / 2))
+            .attr('x2', Globals.config.margin.left - (textWidth + offsetRight) + textWidth)
+            .attr('y2', Globals.config.margin.top + (conHeight / 2) - (underlineStroke / 2))
+            .attr('opacity', 1);
+
+          var inputContainerOffset = 5;
+
+          inputContainer
+            .attr('width', textWidth + inputContainerOffset)
+            .attr('x', Globals.config.margin.left - (textWidth + offsetRight) - (inputContainerOffset / 2));
+          input.style('width', (textWidth + inputContainerOffset) + 'px');
+
+          rect
+            .attr('width', textWidth)
+            .attr('x', Globals.config.margin.left - (textWidth + offsetRight));
+        })
+        .on('mouseout', function() {
+          line.attr('opacity', 0);
+        })
+        .on('click', function() {
+          var val = Math.round(Globals.yScale.invert(0) * 10) / 10;
+          input.style('opacity', 1);
+          input.node().value = val;
+        })
+        .on('focusout', function() {
+          input.style('opacity', 0);
+        })
+        .on('keydown', function() {
+          if (d3.event.keyCode === 13) {
+            // enter
+            d3.event.preventDefault();
+            var extent = getMaxY();
+            var y = Globals.yScale;
+            var lastYscale = Globals.lastYscale || y;
+            var minY = lastYscale.invert(Globals.height);
+            var maxY = this.value * 1;
+            if (minY >= maxY || minY < 1) {
+              return false;
+            }
+            var k = Globals.height / (y(maxY) - y(minY));
+            console.log('k: ', k);
+            // var width_percent = 1 / k;
+            // var w = extent - (width_percent * extent);
+            // Globals.chartSVG.call(Globals.zooomBehavior.scaleTo, k);
+            // instance.scroll((minY - 1) / w);
+          } else {
+            ensureNumeric();
+          }
+        });
+
+      Globals.yAxisUpperExtremeValueText = text;
+      Globals.yAxisUpperExtremeValueTextUnderline = line;
+    }
+
     function updateXAxisExtremeValues() {
       var xScale = Globals.lastXScale || Globals.xScale;
-      var lineWidth, textWidth;
+      var yScale = Globals.lastYscale || Globals.yScale;
+      var lineWidth, textWidth, text;
       var minWidth = 10;
       if (Globals.xAxisLeftExtremeValueText) {
-        var text = Globals.xAxisLeftExtremeValueText;
+        text = Globals.xAxisLeftExtremeValueText;
         var minX = Math.round(xScale.invert(0) * 10) / 10;
         text.text(minX);
         textWidth = text.node().getBBox().width;
@@ -961,6 +1080,14 @@
         Globals.xAxisRightExtremeValueTextUnderline
           .attr('x1', Globals.width + Globals.config.margin.left - (lineWidth / 2))
           .attr('x2', Globals.width + Globals.config.margin.left - (lineWidth / 2) + lineWidth);
+      }
+      if (Globals.yAxisUpperExtremeValueText) {
+        var offsetRight = 9;
+        text = Globals.yAxisUpperExtremeValueText;
+        var maxY = Math.round(yScale.invert(0) * 10) / 10;
+        text.text(maxY);
+        textWidth = text.node().getBBox().width;
+        text.attr('x', Globals.config.margin.left - (offsetRight + text.node().getBBox().width));
       }
     }
 
