@@ -30,6 +30,8 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           ticks: 8
         y:
           ticks: 10
+          tickFormat: (y) ->
+            "#{Math.round(( y / 1000) * 10) / 10}k"
 
       margin:
         top: 10

@@ -110,9 +110,8 @@
       Globals.activePathConfig = getPathConfig(path);
       var activePathConfig = Globals.activePathConfig.config;
       var activePathIndex = Globals.activePathConfig.index;
-      var xScale = Globals.zoomTransform.k > 1 ? Globals.lastXScale : Globals.xScale;
-      makeWhiteBorderLine(xScale, activePathConfig);
-      var newLine = makeColoredLine(xScale, activePathConfig).attr('stroke-width', Globals.activePathStrokeWidth);
+      makeWhiteBorderLine(activePathConfig);
+      var newLine = makeColoredLine(activePathConfig).attr('stroke-width', Globals.activePathStrokeWidth);
       Globals.lines[activePathIndex] = newLine;
       Globals.activePath = newLine;
       makeCircle();
@@ -293,7 +292,26 @@
       }
     }
 
-    function makeGuidingLine(xScale, line_config) {
+    function getDrawLineXScale() {
+      var xScale = Globals.zoomTransform.k > 1 && !Globals.editYAxis ? Globals.lastXScale : Globals.xScale;
+      xScale = xScale || Globals.xScale;
+      return xScale;
+    }
+
+    function getDrawLineYScale() {
+      var yScale = Globals.lastYScale || Globals.yScale;
+      if (Globals.editYAxis) {
+        return yScale;
+      }
+      if (yScale.invert(0) < getMaxY() || yScale.invert(Globals.height) > getMinY()) {
+        return yScale;
+      }
+      return Globals.yScale;
+    }
+
+    function makeGuidingLine(line_config) {
+      var xScale = getDrawLineXScale();
+      var yScale = getDrawLineYScale();
       var line = d3.line();
       if (Globals.config.axes.y.scale === 'log') {
         line.curve(d3.curveMonotoneX);
@@ -304,7 +322,7 @@
           return xScale(d[line_config.x]);
         })
         .y(function(d) {
-          return Globals.yScale(d[line_config.y]);
+          return yScale(d[line_config.y]);
         });
       var trans;
       var _path = Globals.viewSVG.append("path")
@@ -320,7 +338,9 @@
       return _path;
     }
 
-    function makeColoredLine(xScale, line_config) {
+    function makeColoredLine(line_config) {
+      var xScale = getDrawLineXScale();
+      var yScale = getDrawLineYScale();
       var line = d3.line();
       if (Globals.config.axes.y.scale === 'log') {
         line.curve(d3.curveMonotoneX);
@@ -331,7 +351,7 @@
           return xScale(d[line_config.x]);
         })
         .y(function(d) {
-          return Globals.yScale(d[line_config.y]);
+          return yScale(d[line_config.y]);
         });
 
       if (Globals.config.axes.y.scale === 'log') {
@@ -370,7 +390,9 @@
       return _path;
     }
 
-    function makeWhiteBorderLine(xScale, line_config) {
+    function makeWhiteBorderLine(line_config) {
+      var xScale = getDrawLineXScale();
+      var yScale = getDrawLineYScale();
       if (Globals.whiteBorderLine) {
         Globals.whiteBorderLine.remove();
       }
@@ -384,7 +406,7 @@
           return xScale(d[line_config.x]);
         })
         .y(function(d) {
-          return Globals.yScale(d[line_config.y]);
+          return yScale(d[line_config.y]);
         });
       if (Globals.config.axes.y.scale === 'log') {
         line.defined(function(d) {
@@ -424,16 +446,15 @@
       });
       Globals.lines = [];
       Globals.activePath = null;
-      var xScale = Globals.zoomTransform.k > 1 ? Globals.lastXScale : Globals.xScale;
 
       for (i = 0; i < series.length; i++) {
         s = series[i];
-        Globals.guidingLines.push(makeGuidingLine(xScale, s));
+        Globals.guidingLines.push(makeGuidingLine(s));
       }
 
       for (i = 0; i < series.length; i++) {
         s = series[i];
-        Globals.lines.push(makeColoredLine(xScale, s));
+        Globals.lines.push(makeColoredLine(s));
       }
 
 
@@ -455,6 +476,8 @@
           showMouseIndicators();
         }
       }
+
+      drawAxesExtremeValues();
 
     }
 
@@ -504,6 +527,7 @@
     }
 
     function zoomed() {
+      console.log('zoomed callback');
       var transform = d3.event.transform;
       transform.x = transform.x || 0;
       transform.y = transform.y || 0;
@@ -529,15 +553,22 @@
         transform.k = 1;
       }
 
-      Globals.lastXScale = transform.rescaleX(Globals.xScale);
-      Globals.gX.call(Globals.xAxis.scale(Globals.lastXScale));
+      if (Globals.editYAxis) {
+        Globals.lastYScale = transform.rescaleY(Globals.yScale);
+        Globals.gY.call(Globals.yAxis.scale(Globals.lastYScale));
+      } else {
+        Globals.lastXScale = transform.rescaleX(Globals.xScale);
+        Globals.gX.call(Globals.xAxis.scale(Globals.lastXScale));
+      }
+
       Globals.zoomTransform = transform;
-      drawLines();
       updateXAxisExtremeValues();
 
-      if (Globals.onZoomAndPan) {
+      if (Globals.onZoomAndPan && !Globals.editYAxis) {
         Globals.onZoomAndPan(Globals.zoomTransform, Globals.width, Globals.height, getScaleExtent());
       }
+
+      drawLines();
 
     }
 
@@ -716,6 +747,10 @@
         //arrow keys
         return true;
       }
+      if (charCode === 189 || charCode === 187 || charCode === 109 || charCode === 107) {
+        //+/- key
+        return true;
+      }
       if (charCode >= 96 && charCode <= 105) {
         //numpad number keys
         return true;
@@ -732,6 +767,7 @@
       drawXAxisLeftExtremeValue();
       drawXAxisRightExtremeValue();
       drawYAxisUpperExtremeValue();
+      drawYAxisLowerExtremeValue();
       updateXAxisExtremeValues();
     }
 
@@ -867,7 +903,8 @@
         .attr('fill', '#000')
         .attr('y', Globals.height + Globals.config.margin.top + offsetTop)
         .attr('dy', '0.71em')
-        .attr('font-size', '10px');
+        .attr('font-size', '10px')
+        .text(getMaxX());
 
       var inputContainer = textContainer.append('foreignObject')
         .attr('width', conWidth)
@@ -942,7 +979,7 @@
       var conWidth = 30;
       var conHeight = 14;
       var offsetRight = 9;
-      var offsetTop = 0;
+      var offsetTop = 2;
       var underlineStroke = 2;
       var lineWidth = 15;
 
@@ -950,7 +987,7 @@
         .attr('fill', '#fff')
         .attr('width', conWidth)
         .attr('height', conHeight)
-        .attr('y', Globals.config.margin.top - (conHeight / 2))
+        .attr('y', Globals.config.margin.top - (conHeight / 2) + offsetTop)
         .attr('x', Globals.config.margin.left - (conWidth + offsetRight));
 
       var line = textContainer.append('line')
@@ -969,7 +1006,7 @@
         .attr('y', Globals.config.margin.top - underlineStroke * 2)
         .attr('dy', '0.71em')
         .attr('font-size', '10px')
-        .text(Math.round(Globals.yScale.invert(0) * 10) / 10);
+        .text(getMaxY());
 
       text.attr('x', Globals.config.margin.left - (offsetRight + text.node().getBBox().width));
 
@@ -993,6 +1030,9 @@
         .style('font-size', '10px')
         .attr('type', 'text')
         .on('mousemove', function() {
+
+          input.node().value = Math.round(getDrawLineYScale().invert(0) * 10) / 10;
+
           var textWidth = text.node().getBBox().width;
           line.attr('x1', Globals.config.margin.left - (textWidth + offsetRight))
             .attr('y1', Globals.config.margin.top + (conHeight / 2) - (underlineStroke / 2))
@@ -1001,15 +1041,16 @@
             .attr('opacity', 1);
 
           var inputContainerOffset = 5;
+          var inputWidth = 40;
 
           inputContainer
-            .attr('width', textWidth + inputContainerOffset)
-            .attr('x', Globals.config.margin.left - (textWidth + offsetRight) - (inputContainerOffset / 2));
-          input.style('width', (textWidth + inputContainerOffset) + 'px');
+            .attr('width', inputWidth + inputContainerOffset)
+            .attr('x', Globals.config.margin.left - (inputWidth + offsetRight) - (inputContainerOffset / 2));
+          input.style('width', (inputWidth + inputContainerOffset) + 'px');
 
           rect
-            .attr('width', textWidth)
-            .attr('x', Globals.config.margin.left - (textWidth + offsetRight));
+            .attr('width', inputWidth)
+            .attr('x', Globals.config.margin.left - (inputWidth + offsetRight));
         })
         .on('mouseout', function() {
           line.attr('opacity', 0);
@@ -1023,23 +1064,34 @@
           input.style('opacity', 0);
         })
         .on('keydown', function() {
+          console.log('here');
           if (d3.event.keyCode === 13) {
             // enter
             d3.event.preventDefault();
             var extent = getMaxY();
             var y = Globals.yScale;
-            var lastYscale = Globals.lastYscale || y;
-            var minY = lastYscale.invert(Globals.height);
+            var lastYScale = Globals.lastYScale || y;
+            var minY = lastYScale.invert(Globals.height);
             var maxY = this.value * 1;
-            if (minY >= maxY || minY < 1) {
+            if (minY >= maxY) {
               return false;
             }
-            var k = Globals.height / (y(maxY) - y(minY));
-            console.log('k: ', k);
-            // var width_percent = 1 / k;
-            // var w = extent - (width_percent * extent);
-            // Globals.chartSVG.call(Globals.zooomBehavior.scaleTo, k);
-            // instance.scroll((minY - 1) / w);
+
+            var max = getMaxY();
+            var min = getMinY();
+            var diff = max - min;
+            var allowance = diff * (Globals.config.axes.y.scale === 'log' ? 0.2 : 0.05);
+            max += allowance;
+
+            if (maxY > max) {
+              maxY = max;
+            }
+
+            var k = Globals.height / (y(minY) - y(maxY));
+
+            Globals.editYAxis = true;
+            Globals.chartSVG.call(Globals.zooomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)));
+            Globals.editYAxis = false;
           } else {
             ensureNumeric();
           }
@@ -1049,14 +1101,150 @@
       Globals.yAxisUpperExtremeValueTextUnderline = line;
     }
 
+    function drawYAxisLowerExtremeValue() {
+
+      var textContainer = Globals.chartSVG.append('g')
+        .attr('class', 'axes-extreme-value tick');
+
+      Globals.yAxisLowerExtremeValueContainer = textContainer;
+
+      var conWidth = 30;
+      var conHeight = 14;
+      var offsetRight = 9;
+      var offsetTop = 2;
+      var underlineStroke = 2;
+      var lineWidth = 15;
+
+      var rect = textContainer.append('rect')
+        .attr('fill', '#fff')
+        .attr('width', conWidth)
+        .attr('height', conHeight)
+        .attr('y', Globals.height + Globals.config.margin.top - (conHeight / 2) + offsetTop)
+        .attr('x', Globals.config.margin.left - (conWidth + offsetRight));
+
+      var line = textContainer.append('line')
+        .attr('opacity', 0)
+        .attr('stroke', '#000')
+        .attr('stroke-width', underlineStroke)
+        .attr('x1', Globals.config.margin.left - (conWidth + offsetRight))
+        .attr('y1', Globals.height + Globals.config.margin.top + (conHeight / 2) - (underlineStroke / 2))
+        .attr('x2', Globals.config.margin.left - (conWidth + offsetRight) + conWidth)
+        .attr('y2', Globals.height + Globals.config.margin.top + (conHeight / 2) - (underlineStroke / 2));
+      // .attr('opacity', 0);
+
+      var text = textContainer.append('text')
+        .attr('fill', '#000')
+        .attr('x', Globals.config.margin.left - (offsetRight + conWidth))
+        .attr('y', Globals.height + Globals.config.margin.top - underlineStroke * 2)
+        .attr('dy', '0.71em')
+        .attr('font-size', '10px')
+        .text(getMaxY());
+
+      text.attr('x', Globals.config.margin.left - (offsetRight + text.node().getBBox().width));
+
+      var inputContainer = textContainer.append('foreignObject')
+        .attr('width', conWidth)
+        .attr('height', conHeight - offsetTop)
+        .attr('y', Globals.height + Globals.config.margin.top - (conHeight / 2))
+        .attr('x', Globals.config.margin.left - (conWidth + offsetRight));
+
+      var form = inputContainer.append('xhtml:form');
+
+      var input = form.append('xhtml:input').attr('type', 'text')
+        .style('display', 'block')
+        .style('opacity', 0)
+        .style('width', conWidth + 'px')
+        .style('height', conHeight + 'px')
+        .style('padding', '0px')
+        .style('margin', '0px')
+        .style('margin-top', '-1px')
+        .style('text-align', 'center')
+        .style('font-size', '10px')
+        .attr('type', 'text')
+        .on('mousemove', function() {
+
+          input.node().value = Math.round(getDrawLineYScale().invert(Globals.height) * 10) / 10;
+
+          var textWidth = text.node().getBBox().width;
+          line.attr('x1', Globals.config.margin.left - (textWidth + offsetRight))
+            .attr('y1', Globals.height + Globals.config.margin.top + (conHeight / 2) - (underlineStroke / 2))
+            .attr('x2', Globals.config.margin.left - (textWidth + offsetRight) + textWidth)
+            .attr('y2', Globals.height + Globals.config.margin.top + (conHeight / 2) - (underlineStroke / 2))
+            .attr('opacity', 1);
+
+          var inputContainerOffset = 5;
+          var inputWidth = 40;
+
+          inputContainer
+            .attr('width', inputWidth + inputContainerOffset)
+            .attr('x', Globals.config.margin.left - (inputWidth + offsetRight) - (inputContainerOffset / 2));
+          input.style('width', (inputWidth + inputContainerOffset) + 'px');
+
+          rect
+            .attr('width', inputWidth)
+            .attr('x', Globals.config.margin.left - (inputWidth + offsetRight));
+        })
+        .on('mouseout', function() {
+          line.attr('opacity', 0);
+        })
+        .on('click', function() {
+          var val = Math.round(Globals.yScale.invert(Globals.height) * 10) / 10;
+          console.log(val);
+          input.style('opacity', 1);
+          input.node().value = val;
+        })
+        .on('focusout', function() {
+          input.style('opacity', 0);
+        })
+        .on('keydown', function() {
+          console.log('here');
+          if (d3.event.keyCode === 13) {
+            // enter
+            d3.event.preventDefault();
+            var extent = getMaxY();
+            var y = Globals.yScale;
+            var lastYScale = Globals.lastYScale || y;
+            var minY = this.value * 1;
+            var maxY = lastYScale.invert(0);
+            if (minY >= maxY) {
+              return false;
+            }
+
+            var max = getMaxY();
+            var min = getMinY();
+            var diff = max - min;
+            var allowance = diff * (Globals.config.axes.y.scale === 'log' ? 0.2 : 0.05);
+            min = Globals.config.axes.y.scale === 'log' ? 5 : min - allowance;
+
+            if (minY < min) {
+              minY = min;
+            }
+
+            var k = Globals.height / (y(minY) - y(maxY));
+
+            Globals.editYAxis = true;
+            Globals.chartSVG.call(Globals.zooomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)));
+            Globals.editYAxis = false;
+          } else {
+            ensureNumeric();
+          }
+        });
+
+      Globals.yAxisLowerExtremeValueText = text;
+      Globals.yAxisLowerExtremeValueTextUnderline = line;
+    }
+
     function updateXAxisExtremeValues() {
-      var xScale = Globals.lastXScale || Globals.xScale;
-      var yScale = Globals.lastYscale || Globals.yScale;
-      var lineWidth, textWidth, text;
+      var xScale = getDrawLineXScale();
+      var yScale = getDrawLineYScale();
+      var lineWidth, textWidth, text, minX;
       var minWidth = 10;
       if (Globals.xAxisLeftExtremeValueText) {
         text = Globals.xAxisLeftExtremeValueText;
-        var minX = Math.round(xScale.invert(0) * 10) / 10;
+        minX = Math.round(xScale.invert(0) * 10) / 10;
+        if (Globals.config.axes.x.tickFormat) {
+          minX = Globals.config.axes.x.tickFormat(minX);
+        }
         text.text(minX);
         textWidth = text.node().getBBox().width;
         text.attr('x', Globals.config.margin.left - (textWidth / 2));
@@ -1070,6 +1258,9 @@
       }
       if (Globals.xAxisRightExtremeValueText) {
         var maxX = Math.round(xScale.invert(Globals.width) * 10) / 10;
+        if (Globals.config.axes.x.tickFormat) {
+          minX = Globals.config.axes.x.tickFormat(minX);
+        }
         Globals.xAxisRightExtremeValueText.text(maxX);
         textWidth = Globals.xAxisRightExtremeValueText.node().getBBox().width;
         Globals.xAxisRightExtremeValueText.attr('x', Globals.width + Globals.config.margin.left - (textWidth / 2));
@@ -1081,11 +1272,24 @@
           .attr('x1', Globals.width + Globals.config.margin.left - (lineWidth / 2))
           .attr('x2', Globals.width + Globals.config.margin.left - (lineWidth / 2) + lineWidth);
       }
+      var offsetRight = 9;
       if (Globals.yAxisUpperExtremeValueText) {
-        var offsetRight = 9;
         text = Globals.yAxisUpperExtremeValueText;
         var maxY = Math.round(yScale.invert(0) * 10) / 10;
+        if (Globals.config.axes.y.tickFormat) {
+          maxY = Globals.config.axes.y.tickFormat(maxY);
+        }
         text.text(maxY);
+        textWidth = text.node().getBBox().width;
+        text.attr('x', Globals.config.margin.left - (offsetRight + text.node().getBBox().width));
+      }
+      if (Globals.yAxisLowerExtremeValueText) {
+        text = Globals.yAxisLowerExtremeValueText;
+        var minY = Math.round(yScale.invert(Globals.height) * 10) / 10;
+        if (Globals.config.axes.y.tickFormat) {
+          minY = Globals.config.axes.y.tickFormat(minY);
+        }
+        text.text(minY);
         textWidth = text.node().getBBox().width;
         text.attr('x', Globals.config.margin.left - (offsetRight + text.node().getBBox().width));
       }
@@ -1142,7 +1346,6 @@
       drawLines(config.series);
       makeCircle();
       updateZoomScaleExtent();
-      drawAxesExtremeValues();
 
     }
 
