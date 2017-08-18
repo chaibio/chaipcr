@@ -293,14 +293,14 @@
     }
 
     function getDrawLineXScale() {
-      var xScale = Globals.zoomTransform.k > 1 && !Globals.editYAxis ? Globals.lastXScale : Globals.xScale;
+      var xScale = Globals.zoomTransform.k > 1 && !Globals.editingYAxis ? Globals.lastXScale : Globals.xScale;
       xScale = xScale || Globals.xScale;
       return xScale;
     }
 
     function getDrawLineYScale() {
       var yScale = Globals.lastYScale || Globals.yScale;
-      if (Globals.editYAxis) {
+      if (Globals.editingYAxis) {
         return yScale;
       }
       if (yScale.invert(0) < getMaxY() || yScale.invert(Globals.height) > getMinY()) {
@@ -527,7 +527,6 @@
     }
 
     function zoomed() {
-      console.log('zoomed callback');
       var transform = d3.event.transform;
       transform.x = transform.x || 0;
       transform.y = transform.y || 0;
@@ -553,7 +552,7 @@
         transform.k = 1;
       }
 
-      if (Globals.editYAxis) {
+      if (Globals.editingYAxis) {
         Globals.lastYScale = transform.rescaleY(Globals.yScale);
         Globals.gY.call(Globals.yAxis.scale(Globals.lastYScale));
       } else {
@@ -562,9 +561,10 @@
       }
 
       Globals.zoomTransform = transform;
+
       updateXAxisExtremeValues();
 
-      if (Globals.onZoomAndPan && !Globals.editYAxis) {
+      if (Globals.onZoomAndPan && !Globals.editingYAxis) {
         Globals.onZoomAndPan(Globals.zoomTransform, Globals.width, Globals.height, getScaleExtent());
       }
 
@@ -1089,9 +1089,9 @@
 
             var k = Globals.height / (y(minY) - y(maxY));
 
-            Globals.editYAxis = true;
+            Globals.editingYAxis = true;
             Globals.chartSVG.call(Globals.zooomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)));
-            Globals.editYAxis = false;
+            Globals.editingYAxis = false;
           } else {
             ensureNumeric();
           }
@@ -1222,9 +1222,9 @@
 
             var k = Globals.height / (y(minY) - y(maxY));
 
-            Globals.editYAxis = true;
+            Globals.editingYAxis = true;
             Globals.chartSVG.call(Globals.zooomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)));
-            Globals.editYAxis = false;
+            Globals.editingYAxis = false;
           } else {
             ensureNumeric();
           }
