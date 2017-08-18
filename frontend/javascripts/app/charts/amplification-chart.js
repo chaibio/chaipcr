@@ -853,8 +853,11 @@
             var lastXScale = Globals.lastXScale || x;
             var minX = this.value * 1;
             var maxX = lastXScale.invert(Globals.width);
-            if (minX >= maxX || minX < 1) {
+            if (minX >= maxX) {
               return false;
+            }
+            if (minX < 1) {
+              minX = 1;
             }
             var k = Globals.width / (x(maxX) - x(minX));
             var width_percent = 1 / k;
@@ -952,8 +955,11 @@
             var lastXScale = Globals.lastXScale || x;
             var minX = lastXScale.invert(0);
             var maxX = this.value * 1;
-            if (minX >= maxX || maxX > getScaleExtent()) {
+            if (minX >= maxX) {
               return false;
+            }
+            if (maxX > getScaleExtent()) {
+              maxX = getScaleExtent();
             }
             var k = Globals.width / (x(maxX) - x(minX));
             var width_percent = 1 / k;
