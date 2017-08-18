@@ -1090,8 +1090,10 @@
             var k = Globals.height / (y(minY) - y(maxY));
 
             Globals.editingYAxis = true;
+            var lastK = instance.getTransform().k;
             Globals.chartSVG.call(Globals.zooomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)));
             Globals.editingYAxis = false;
+            Globals.chartSVG.call(Globals.zooomBehavior.transform, d3.zoomIdentity.scale(lastK));
           } else {
             ensureNumeric();
           }
@@ -1221,10 +1223,11 @@
             }
 
             var k = Globals.height / (y(minY) - y(maxY));
-
+            var lastK = instance.getTransform().k;
             Globals.editingYAxis = true;
             Globals.chartSVG.call(Globals.zooomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)));
             Globals.editingYAxis = false;
+            Globals.chartSVG.call(Globals.zooomBehavior.transform, d3.zoomIdentity.scale(lastK));
           } else {
             ensureNumeric();
           }
