@@ -80,5 +80,5 @@ void QPCRPage::loaded(bool isSuccess)
 
 void QPCRPage::javaScriptConsoleMessage(const QString &message, int lineNumber, const QString &sourceId)
 {
-    qDebug() << "Line:" << lineNumber << "SourceId:" << sourceId << "Message:" << message;
+    qWarning() << "QPCRPage::javaScriptConsoleMessage - Line:" << lineNumber << "SourceId:" << sourceId << "Message:" << message;
 }

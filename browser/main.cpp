@@ -23,12 +23,13 @@
 #include <cstdio>
 
 #include "qpcrbrowser.h"
+#include "logger.h"
 
 QPCRBrowser *browser = 0;
 
 void messageHandler(QtMsgType type, const char *msg)
 {
-    fprintf(stderr, "%s\n", msg);
+    APP_LOGGER << msg << std::endl;
 
     switch (type) {
     case QtWarningMsg:
@@ -47,6 +48,9 @@ void messageHandler(QtMsgType type, const char *msg)
 
 int main(int argc, char **argv)
 {
+    Logger::setup("QPCRBrowser", "/var/log/browser.log");
+    APP_LOGGER << "--------------------------qPCR Browser Started--------------------------" << std::endl;
+
     qInstallMsgHandler(messageHandler);
 
     QApplication app(argc, argv);
