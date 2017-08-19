@@ -143,7 +143,7 @@ describe "DataAnalysis API" do
     create_fluorescence_data(@experiment, 10)
     error = "test error"
     expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |experiment, stage_id, calibration_id|
-      raise error
+      raise ({errors: error}.to_json)
     end
     
     #request submitted
