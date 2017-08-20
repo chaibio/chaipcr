@@ -5,7 +5,7 @@
 @time __precompile__()
 module QpcrAnalysis
 
-using Clustering, DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NLopt # In addition, "HttpServer" for "juliaserver.jl"
+using Clustering, DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL #, NLopt # on BBB but not on PC ("ERROR: LoadError: Declaring __precompile__(false) is not allowed in files that are being precompiled". "ERROR: Failed to precompile NLopt to /root/.julia/lib/v0.6/NLopt.ji") # In addition, "HttpServer" for "juliaserver.jl"
 
 
 # Assumptions
@@ -32,7 +32,7 @@ include("shared.jl")
 
 # calibration
 include("deconv.jl") # `type K4Deconv`
-# const K4DCV = load("$LOAD_FROM_DIR/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv"]
+const K4DCV = load("$LOAD_FROM_DIR/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv"] # sometimes crash REPL
 include("adj_w2wvaf.jl")
 include("calib.jl") # `type CalibCalibOutput` currently not in production
 
