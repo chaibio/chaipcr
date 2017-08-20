@@ -13,14 +13,16 @@ const K4DCV_EMPTY = K4Deconv(ARRAY_EMPTY, ARRAY_EMPTY, "")
 # multi-channel deconvolution
 function deconv(
     ary2dcv::AbstractArray, # dim1 is unit, which can be cycle (amplification), temperature point (melting curve), or step type (like "water", "channel_1", "channel_2" for calibration experiment); dim2 must be well, dim3 must be channel
-    channels::AbstractVector, # must be the same length as 3rd dimension of `array2dcv`
+    channel_nums::AbstractVector, # must be the same length as 3rd dimension of `array2dcv`
     dcv_well_idc_wfluo::AbstractVector,
 
-    # arguments needed k matrix needs to be computed
+    # arguments needed if k matrix needs to be computed
     db_conn::MySQL.MySQLHandle=db_conn_default, # `db_conn_default` is defined in "__init__.jl"
     calib_info::Union{Integer,OrderedDict}=calib_info_AIR,
     well_nums::AbstractVector=[];
 
+    # keyword arguments
+    k4dcv_backup::K4Deconv=K4DCV,
     scaling_factor_dcv_vec::AbstractVector=SCALING_FACTOR_deconv_vec,
     out_format::String="both" # "array", "dict", "both"
     )
@@ -33,7 +35,7 @@ function deconv(
         step_ids = map(ci_value -> ci_value["step_id"], values(calib_info))
         length_step_ids = length(step_ids)
         length_step_ids <= 2 || length(unique(step_ids)) < length_step_ids
-    end) ? K4DCV : get_k(db_conn, calib_info, well_nums) # use default `well_proc` value
+    end) ? k4dcv_backup : get_k(db_conn, calib_info, well_nums) # use default `well_proc` value
 
     k_inv_vec = k4dcv.k_inv_vec
 
@@ -49,8 +51,8 @@ function deconv(
         dcvd = (dcvd_ary3,)
     else
         dcvd_dict = OrderedDict(map(1:a2d_dim_channel) do channel_i
-            channels[channel_i] => dcvd_ary3[:,:,channel_i]
-        end) # do channel
+            channel_nums[channel_i] => dcvd_ary3[:,:,channel_i]
+        end) # do channel_i
         if out_format == "dict"
             dcvd = (dcvd_dict,)
         elseif out_format == "both"
@@ -95,14 +97,14 @@ function get_k(
 
     stop_msgs = Vector{String}()
 
-    channels = map(cd_key_vec) do cd_key
+    channel_nums = map(cd_key_vec) do cd_key
         parse(Int, split(cd_key, "_")[2])
     end
 
-    for target_channel_i in 1:length(channels)
+    for target_channel_i in 1:length(channel_nums)
         signals = k4dcv_bydy[cd_key_vec[target_channel_i]]
         target_signals = signals[target_channel_i, :]
-        for non_target_channel_i in setdiff(channels, target_channel_i)
+        for non_target_channel_i in setdiff(channel_nums, target_channel_i)
             non_target_signals = signals[non_target_channel_i, :]
             failed_idc = find(
                 target_minus_non_target -> target_minus_non_target <= 0, target_signals .- non_target_signals
