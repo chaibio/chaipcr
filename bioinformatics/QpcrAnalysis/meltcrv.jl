@@ -23,7 +23,7 @@ end
 
 type MeltCurveOutput
     mc_bychwl::Matrix{MeltCurveTa} # dim1 is well and dim2 is channel
-    channels::Vector{Int}
+    channel_nums::Vector{Int}
     fluo_well_nums::Vector{Int}
     fr_ary3::Array{AbstractFloat,3}
     mw_ary3::Array{AbstractFloat,3}
@@ -44,6 +44,7 @@ function process_mc(
     calib_info::Union{Integer,OrderedDict};
     # start: arguments that might be passed by upstream code
     well_nums::AbstractVector=[],
+    channel_nums::AbstractVector=[1],
     auto_span_smooth::Bool=false,
     span_smooth_default::Real=0.015,
     span_smooth_factor::Real=7.2,
@@ -80,21 +81,21 @@ function process_mc(
     )
     num_fluo_wells = length(fluo_well_nums)
 
-    # # pre-deconvolution, process all available channels
-    # channels = sort(unique(mcd_df[:channel]))
-    # num_channels = length(channels)
-    # if num_channels == 1
-    #     dcv = false
-    # end
+    # pre-deconvolution, can process multiple channels
+    # channel_nums = sort(unique(mcd_df[:channel])) # process all available channels in the database
+    num_channels = length(channel_nums)
+    if num_channels == 1
+        dcv = false
+    end
 
-    # pre-deconvolution, process only channel 1
-    channels = [1]
-    num_channels = 1
-    dcv = false
+    # # pre-deconvolution, process only channel 1
+    # channel_nums = [1]
+    # num_channels = 1
+    # dcv = false
 
-    mc_data_bych = map(channels) do channel
+    mc_data_bych = map(channel_nums) do channel_num
         get_mc_data(
-            channel,
+            channel_num,
             db_conn,
             exp_id, stage_id,
             well_nums,
@@ -105,7 +106,7 @@ function process_mc(
     fr_ary3 = cat(3, map(mc_data -> mc_data.fluo_da, mc_data_bych)...) # fr = fluo_raw
 
     mw_ary3, k4dcv, fdcvd_ary3, wva_data, wva_well_nums, faw_ary3 = dcv_aw(
-        fr_ary3, dcv, channels,
+        fr_ary3, dcv, channel_nums,
         db_conn, calib_info, fluo_well_nums, well_nums, dye_in, dyes_2bfild;
         aw_out_format="array"
     )
@@ -135,7 +136,7 @@ function process_mc(
                     nothing
                 end # if
             end # do oc_well_num
-            return channels[channel_i] => tf
+            return channel_nums[channel_i] => tf
         end) # do channel_i
 
     mc_bychwl = hcat(map(collect(values(tf_bychwl))) do tf_bywl
@@ -165,7 +166,7 @@ function process_mc(
     elseif out_format == "full"
         mc_out = MeltCurveOutput(
             mc_bychwl,
-            channels,
+            channel_nums,
             fluo_well_nums,
             fr_ary3,
             mw_ary3,
@@ -187,7 +188,7 @@ end # process_mc
 
 # function: get raw melt curve data and perform optical calibration
 function get_mc_data(
-    channel::Integer,
+    channel_num::Integer,
     db_conn::MySQL.MySQLHandle,
     exp_id::Integer, stage_id::Integer,
     well_nums::AbstractVector,
@@ -201,7 +202,7 @@ function get_mc_data(
             WHERE
                 experiment_id = $exp_id AND
                 stage_id = $stage_id AND
-                channel = $channel AND
+                channel = $channel_num AND
 				temperature <= $max_tmprtr
                 well_constraint
             ORDER BY well_num, temperature
@@ -262,12 +263,12 @@ function mc_tm_pw(
     smooth_fluo_spl::Bool=false,
 
     # identify Tm peaks and calculate peak area
-    span_peaks_tmprtr::Real=0.5, # Within the smoothed -df/dt sequence spanning the temperature range of approximately `span_peaks_tmprtr * 2`, if the maximum -df/dt value equals that at the middle point of the sequence, identify this middle point as a peak summit.
-    peak_shoulder::Real=1, # 1/2 width of peak in temperature when calculating peak area
+    peak_span_tmprtr::Real=5, # Within the smoothed -df/dt sequence spanning the temperature range of approximately `peak_span_tmprtr`, if the maximum -df/dt value equals that at the middle point of the sequence, identify this middle point as a peak summit. Similar to `span.peaks` in qpcR code. Combined with `peak_shoulder` (similar to `Tm.border` in qpcR code).
+    # peak_shoulder::Real=1, # 1/2 width of peak in temperature when calculating peak area  # consider changing from 1 to 2, or automatically determined (max and min d2)?
 
     # filter Tm peaks
     qt_prob_flTm::Real=0.64, # quantile probability point for normalized -df/dT (range 0-1)
-    max_normd_qtv::Real=0.601, # maximum normalized -df/dt values (range 0-1) at the quantile probablity point
+    max_normd_qtv::Real=0.8, # maximum normalized -df/dt values (range 0-1) at the quantile probablity point
     top1_from_max_ub::Real=1, # upper bound of temperature difference between top-1 Tm peak and maximum -df/dt
     top_N::Integer=4, # top number of Tm peaks to report
     min_frac_report::Real=0.1, # minimum area fraction of the Tm peak to be reported in regards to the largest real Tm peak
@@ -400,9 +401,10 @@ function mc_tm_pw(
 
         # end: fit cubic spline ...
 
+        half_peak_span_tmprtr = peak_span_tmprtr / 2
 
         # find summit indices of Tm peaks in `ndrv`
-        span_peaks_dp = Int(round(span_peaks_tmprtr / (max_tp - min_tp) * length(tp_denser), 0)) # dp = data point
+        span_peaks_dp = Int(round(half_peak_span_tmprtr / (max_tp - min_tp) * length(tp_denser), 0)) # dp = data point
         min_ns_vec = fill(minimum(ndrv_smu), span_peaks_dp) # ns = ndrv_smu
         ns_wms = [min_ns_vec; ndrv_smu; min_ns_vec] # wms = with min values
         summit_idc = find(1:len_denser) do i
@@ -415,7 +417,7 @@ function mc_tm_pw(
         len_Tms = length(Tms)
         Ta_raw = vcat(map(Tms) do Tm # Ta = Tm_area
             a_idc_bool = map(tp_denser) do tp
-                Tm - peak_shoulder < tp < Tm + peak_shoulder
+                Tm - half_peak_span_tmprtr < tp < Tm + half_peak_span_tmprtr
             end
             a_idc_int = (1:len_denser)[a_idc_bool]
             base_end_idc = [a_idc_int[1], a_idc_int[end]]
@@ -440,6 +442,7 @@ function mc_tm_pw(
             # larger_normd_qtv_of_two_sides
             # area_i = 2
             areas_raw = Ta_raw[:, area_i]
+            abs_areas_raw = abs(areas_raw)
             ndrv_normd = (ndrv - minimum(ndrv)) / (maximum(ndrv) - minimum(ndrv))
             top1_Tm_idx = summit_idc[indmax(areas_raw)]
             larger_normd_qtv_of_two_sides = maximum(
@@ -455,23 +458,35 @@ function mc_tm_pw(
             # mc_slope
             mc_slope = linreg(tmprtrs, fluos)[2]
 
+            seq_topNp1 = 1 : min(top_N+1, len_Tms)
+
+            # idc_topNp1, min_area_report
             idc_sb_area = sortperm(areas_raw, rev=true) # idc_sb = indice sorted by
-            idc_topNp1 = idc_sb_area[1 : min(top_N+1, len_Tms)]
+            idc_topNp1 = idc_sb_area[seq_topNp1]
             min_area_report = areas_raw[idc_topNp1[1]] * min_frac_report
+
+            # absolute areas
+            idc_sb_abs_area = sortperm(abs_areas_raw, rev=true)
+            idc_abs_topNp1 = idc_sb_abs_area[seq_topNp1]
+            smallest_abs_area_within_topNp1 = top_N+1 <= len_Tms ? abs_areas_raw[idc_abs_topNp1[end]] : 0
 
             # reporting
             if (
                 larger_normd_qtv_of_two_sides <= max_normd_qtv &&
-                top1_from_max <= top1_from_max_ub &&
+                # top1_from_max <= top1_from_max_ub && # disabled because it caused false suppression of Tm peak reporting for `db_name_ = "20160309_chaipcr"; exp_id_ = 7`, well A2.
                 mc_slope < 0
                 )
+
                 fltd_idc = find(idc_topNp1) do idx
                     areas_raw[idx] >= min_area_report
                 end # do idx
-                if length(fltd_idc) <= top_N # When all the Tm peaks are noises, no peak is expected to have a substantially larger area than the other peaks. This can be observed as top-(N+1) peak has an area >= `min_area_report`, and thus `length(fltd_idc) > top_N`
+
+                # if length(fltd_idc) <= top_N && # When all the Tm peaks are noises, no peak is expected to have a substantially larger area than the other peaks. This can be observed as top-(N+1) peak has an area >= `min_area_report`, and thus `length(fltd_idc) > top_N`
+                if smallest_abs_area_within_topNp1 < min_area_report # When all the Tm peaks are noises, no peak is expected to have a substantially larger area than the other peaks; and absolute values of negative peak areas should not be much smaller than top-1 peak area.
                     Ta_fltd = Ta_raw[idc_topNp1[fltd_idc], :]
                     Ta_reported = "Yes"
                 end # if length
+
             end # if (
 
         end # if len_Tms > 0
@@ -484,7 +499,7 @@ function mc_tm_pw(
         mc,
         Ta_fltd,
         Ta_raw,
-        "$Ta_reported. All of the following statements must be true for Tm to be reported. (1) The larger normalized quantile value of the left and right sides of the summit on the negative derivative curve $larger_normd_qtv_of_two_sides <= `max_normd_qtv` $max_normd_qtv. (2) The top-1 Tm peak is $(top1_from_max)C (need to be <= top1_from_max_ub $(top1_from_max_ub)C) away from maximum -df/dT temperature $tmprtr_max_ndrv. (3) Has $(size(Ta_raw)[1]) no more than $top_N (top_N) raw_tm peaks, or the top-$(top_N+1) (top_N+1) peak has an area $(areas_raw[idc_topNp1[end]]) <= $min_area_report ($min_frac_report of the top-1 peak). (4) The slope of the straight line fit to the melt curve $mc_slope < 0."
+        "$Ta_reported. All of the following statements must be true for Tm to be reported. \n(1) The larger normalized quantile value of the left and right sides of the summit on the negative derivative curve $larger_normd_qtv_of_two_sides <= `max_normd_qtv` $max_normd_qtv. \n(2, disabled for now) The top-1 Tm peak is $(top1_from_max)C (need to be <= top1_from_max_ub $(top1_from_max_ub)C) away from maximum -df/dT temperature $tmprtr_max_ndrv. \n(3) Has $(size(Ta_raw)[1]) no more than $top_N (top_N) raw_tm peaks, or the peak with smallest absolute area within top-$(top_N+1) (top_N+1) has an absolute area $smallest_abs_area_within_topNp1 < $min_area_report ($min_frac_report of the top-1 peak). \n(4) The slope of the straight line fit to the melt curve $mc_slope < 0."
     )
 
 end # mc_tm_pw
