@@ -20,12 +20,45 @@
 #include <QApplication>
 #include <QWSServer>
 #include <QtGlobal>
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+
 #include <cstdio>
+#include <csignal>
 
 #include "qpcrbrowser.h"
 #include "logger.h"
 
 QPCRBrowser *browser = 0;
+
+void messageHandler(QtMsgType type, const char *msg);
+
+void setupSignals();
+void signalHandler(int signal);
+
+void readConfig();
+
+int main(int argc, char **argv)
+{
+    Logger::setup("QPCRBrowser", "/var/log/browser.log");
+    APP_LOGGER << "--------------------------qPCR Browser Started--------------------------" << std::endl;
+
+    qInstallMsgHandler(messageHandler);
+
+    QApplication app(argc, argv);
+#ifdef Q_WS_QWS
+    QWSServer::setCursorVisible( false );
+#endif
+
+    browser = new QPCRBrowser;
+    browser->showFullScreen();
+
+    setupSignals();
+    readConfig();
+
+    return app.exec();
+}
 
 void messageHandler(QtMsgType type, const char *msg)
 {
@@ -46,20 +79,33 @@ void messageHandler(QtMsgType type, const char *msg)
     }
 }
 
-int main(int argc, char **argv)
+void setupSignals()
 {
-    Logger::setup("QPCRBrowser", "/var/log/browser.log");
-    APP_LOGGER << "--------------------------qPCR Browser Started--------------------------" << std::endl;
+    struct sigaction action;
+    sigemptyset(&action.sa_mask);
+    action.sa_flags = 0;
+    action.sa_handler = signalHandler;
 
-    qInstallMsgHandler(messageHandler);
+    sigaction(SIGUSR1, &action, nullptr);
+}
 
-    QApplication app(argc, argv);
-#ifdef Q_WS_QWS
-    QWSServer::setCursorVisible( false );
-#endif
+void signalHandler(int signal)
+{
+    if (signal == SIGUSR1)
+        readConfig();
+}
 
-    browser = new QPCRBrowser;
-    browser->showFullScreen();
+void readConfig()
+{
+    try
+    {
+        boost::property_tree::ptree ptree;
+        boost::property_tree::json_parser::read_json("/etc/chai/browser.conf", ptree);
 
-    return app.exec();
+        browser->toggleRequestLogger(ptree.get<bool>("requests_logger"));
+    }
+    catch (const std::exception &ex)
+    {
+        APP_LOGGER << "readConfig - unable to read the config file: " << ex.what() << std::endl;
+    }
 }

@@ -29,6 +29,9 @@ public:
     QPCRPage(QPCRBrowser *browser);
     ~QPCRPage();
 
+public slots:
+    void toggleRequestLogger(bool state);
+
 protected:
     void javaScriptConsoleMessage(const QString &message, int lineNumber, const QString &sourceId);
 

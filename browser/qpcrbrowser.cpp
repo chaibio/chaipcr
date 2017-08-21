@@ -45,6 +45,11 @@ void QPCRBrowser::loadRoot()
     load(QPCR_ROOT_URL);
 }
 
+void QPCRBrowser::toggleRequestLogger(bool state)
+{
+    static_cast<QPCRPage*>(page())->toggleRequestLogger(state);
+}
+
 void QPCRBrowser::closeEvent(QCloseEvent *event)
 {
     event->ignore();
