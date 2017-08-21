@@ -31,6 +31,8 @@ public slots:
     void loadSplashScreen();
     void loadRoot();
 
+    void toggleRequestLogger(bool state);
+
 protected:
     void closeEvent(QCloseEvent *event);
     void contextMenuEvent(QContextMenuEvent *event);

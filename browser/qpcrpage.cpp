@@ -19,6 +19,7 @@
 
 #include "qpcrpage.h"
 #include "qpcrbrowser.h"
+#include "qpcrnam.h"
 
 #include <QtCore>
 #include <QtWebKit>
@@ -29,6 +30,8 @@ QPCRPage::QPCRPage(QPCRBrowser *browser)
     this->browser = browser;
     repeatState = true;
 
+    setNetworkAccessManager(new QPCRNam(this));
+
     connect(networkAccessManager(), SIGNAL(finished(QNetworkReply*)), SLOT(reply(QNetworkReply*)));
     connect(this, SIGNAL(loadFinished(bool)), SLOT(loaded(bool)));
 }
@@ -36,6 +39,16 @@ QPCRPage::QPCRPage(QPCRBrowser *browser)
 QPCRPage::~QPCRPage()
 {
 
+}
+
+void QPCRPage::toggleRequestLogger(bool state)
+{
+    static_cast<QPCRNam*>(networkAccessManager())->toggleRequestLogger(state);
+}
+
+void QPCRPage::javaScriptConsoleMessage(const QString &message, int lineNumber, const QString &sourceId)
+{
+    qWarning() << "QPCRPage::javaScriptConsoleMessage - Line:" << lineNumber << "SourceId:" << sourceId << "Message:" << message;
 }
 
 void QPCRPage::reply(QNetworkReply *reply)
@@ -76,9 +89,4 @@ void QPCRPage::loaded(bool isSuccess)
 {
     if (isSuccess)
         repeatState = true;
-}
-
-void QPCRPage::javaScriptConsoleMessage(const QString &message, int lineNumber, const QString &sourceId)
-{
-    qDebug() << "Line:" << lineNumber << "SourceId:" << sourceId << "Message:" << message;
 }

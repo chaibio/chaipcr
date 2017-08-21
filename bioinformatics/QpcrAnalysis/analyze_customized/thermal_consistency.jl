@@ -65,9 +65,9 @@ function analyze_func(
 
     # process the data from only one channel
     channel_proc = 1
-    channel_proc_i = find(mc_w72c.channels) do channel
-        channel == channel_proc
-    end[1] # do channel
+    channel_proc_i = find(mc_w72c.channel_nums) do channel_num
+        channel_num == channel_proc
+    end[1] # do channel_num
 
     mc_tm = map(
         mc_bywl -> mc_bywl.Ta_fltd,

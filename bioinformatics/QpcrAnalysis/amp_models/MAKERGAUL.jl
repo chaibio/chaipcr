@@ -108,11 +108,19 @@ function fit(
     @variable(jmp_model, d[cycs2fit] >= 0) # change_c2
 
     @constraint(jmp_model, f_constr[cyc in cycs2fit], f[cyc] == fb + d[cyc])
+    # change_e1: with division
     @NLconstraint(jmp_model, eu_constr_01, eu[1] == eu0 / (1 + inh * d0))
     @NLconstraint(jmp_model, d_constr_01, d[1] == d0 + d0 * eu[1] / (eu[1] + d0))
     @NLconstraint(jmp_model, eu_constr_2p[cyc in cycs2fit[2:end]], eu[cyc] == eu[cyc-1] / (1 + inh * d[cyc-1]))
     # @NLconstraint(jmp_model, d_constr_2p[cyc in cycs2fit[2:end]], d[cyc] == d[cyc-1] + d[cyc-1] * eu[cyc] / (eu[cyc] + d[cyc-1])) # "Invalid_Number_Detected"
     @NLconstraint(jmp_model, d_constr_2p[cyc in cycs2fit[2:end]], d[cyc] == d[cyc-1] + 1 / (1 / d[cyc-1] + 1 / eu[cyc]))
+    # # # #
+    # # change_e2: get rid of division by multiplying both sides by denominator
+    # @NLconstraint(jmp_model, eu_constr_01, eu[1] * (1 + inh * d0) == eu0)
+    # @NLconstraint(jmp_model, d_constr_01, d[1] * (eu[1] + d0) == d0 * (d0 + 2 * eu[1]))
+    # @NLconstraint(jmp_model, eu_constr_2p[cyc in cycs2fit[2:end]], eu[cyc] * (1 + inh * d[cyc-1]) == eu[cyc-1])
+    # # @NLconstraint(jmp_model, d_constr_2p[cyc in cycs2fit[2:end]], d[cyc] == d[cyc-1] + d[cyc-1] * eu[cyc] / (eu[cyc] + d[cyc-1])) # "Invalid_Number_Detected"
+    # @NLconstraint(jmp_model, d_constr_2p[cyc in cycs2fit[2:end]], d[cyc] * (eu[cyc] + d[cyc-1]) == d[cyc-1] * (d[cyc-1] + 2 * eu[cyc]))
 
     # # ssre by mean of predicted
     # len_cycs = length(cycs)
@@ -208,11 +216,19 @@ function fit(
         f_constr[cyc in cycs2fit],
         f[cyc] == fb + bl_k * cyc + d[cyc]
     )
+    # change_e1: with division
     @NLconstraint(jmp_model, eu_constr_01, eu[1] == eu0 / (1 + inh * d0))
     @NLconstraint(jmp_model, d_constr_01, d[1] == d0 + d0 * eu[1] / (eu[1] + d0))
     @NLconstraint(jmp_model, eu_constr_2p[cyc in cycs2fit[2:end]], eu[cyc] == eu[cyc-1] / (1 + inh * d[cyc-1]))
     # @NLconstraint(jmp_model, d_constr_2p[cyc in cycs2fit[2:end]], d[cyc] == d[cyc-1] + d[cyc-1] * eu[cyc] / (eu[cyc] + d[cyc-1])) # "Invalid_Number_Detected"
     @NLconstraint(jmp_model, d_constr_2p[cyc in cycs2fit[2:end]], d[cyc] == d[cyc-1] + 1 / (1 / d[cyc-1] + 1 / eu[cyc]))
+    # # # #
+    # # change_e2: get rid of division by multiplying both sides by denominator
+    # @NLconstraint(jmp_model, eu_constr_01, eu[1] * (1 + inh * d0) == eu0)
+    # @NLconstraint(jmp_model, d_constr_01, d[1] * (eu[1] + d0) == d0 * (d0 + 2 * eu[1]))
+    # @NLconstraint(jmp_model, eu_constr_2p[cyc in cycs2fit[2:end]], eu[cyc] * (1 + inh * d[cyc-1]) == eu[cyc-1])
+    # # @NLconstraint(jmp_model, d_constr_2p[cyc in cycs2fit[2:end]], d[cyc] == d[cyc-1] + d[cyc-1] * eu[cyc] / (eu[cyc] + d[cyc-1])) # "Invalid_Number_Detected"
+    # @NLconstraint(jmp_model, d_constr_2p[cyc in cycs2fit[2:end]], d[cyc] * (eu[cyc] + d[cyc-1]) == d[cyc-1] * (d[cyc-1] + 2 * eu[cyc]))
 
     # # ssre by mean of predicted
     # len_cycs = length(cycs)

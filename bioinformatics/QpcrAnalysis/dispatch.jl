@@ -60,12 +60,19 @@ function dispatch(action::String, request_body::String)
 
             exp_id = req_dict["experiment_id"]
             stage_id = req_dict["stage_id"]
+            kwdict_pmc = OrderedDict{Symbol,Any}()
+
+            for key in ["channel_nums"]
+                if key in keys_req_dict
+                    kwdict_pmc[parse(key)] = req_dict[key]
+                end
+            end
 
             kwdict_mc_tm_pw = OrderedDict{Symbol,Any}()
             if "qt_prob" in keys_req_dict
                 kwdict_mc_tm_pw[:qt_prob_flTm] = req_dict["qt_prob"]
             end
-            for key in ["max_normd_qtv"]
+            for key in ["max_normd_qtv", "top_N"]
                 if key in keys_req_dict
                     kwdict_mc_tm_pw[parse(key)] = req_dict[key]
                 end
@@ -74,6 +81,7 @@ function dispatch(action::String, request_body::String)
             process_mc(
                 db_conn, exp_id, stage_id,
                 calib_info;
+                kwdict_pmc...,
                 kwdict_mc_tm_pw=kwdict_mc_tm_pw
             )
 

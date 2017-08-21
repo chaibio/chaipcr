@@ -44,10 +44,13 @@ function prep_input_4ad(
         end # if isa(cycs, Integer)
         data_t = reshape(mean(fluos[cycs, :, :], 1), num_wells, num_channels)
     elseif data_categ == "d0"
-        d0_i_vec = find(full_amp_out.fitted_prebl[1, 1].coef_strs) do coef_str
-            coef_str == data_categ
+        # d0_i_vec = find(full_amp_out.fitted_prebl[1, 1].coef_strs) do coef_str
+        #     coef_str == data_categ
+        # end
+        # data_t = length(d0_i_vec) == 0 ? zeros(num_wells, num_channels) : full_amp_out.coefs[d0_i_vec[1], :, :] * 1. # without `* 1.`, MethodError: no method matching kmeans!(::Array{AbstractFloat,2}, ::Array{Float64,2}); Closest candidates are: kmeans!(::Array{T<:AbstractFloat,2}, ::Array{T<:AbstractFloat,2}; weights, maxiter, tol, display) where T<:AbstractFloat at E:\for_programs\julia_pkgs\v0.6\Clustering\src\kmeans.jl:27
+        data_t = map(full_amp_out.d0) do d0
+            isnan(d0) ? 0 : d0
         end
-        data_t = length(d0_i_vec) == 0 ? zeros(num_wells, num_channels) : full_amp_out.coefs[d0_i_vec[1], :, :] * 1. # without `* 1.`, MethodError: no method matching kmeans!(::Array{AbstractFloat,2}, ::Array{Float64,2}); Closest candidates are: kmeans!(::Array{T<:AbstractFloat,2}, ::Array{T<:AbstractFloat,2}; weights, maxiter, tol, display) where T<:AbstractFloat at E:\for_programs\julia_pkgs\v0.6\Clustering\src\kmeans.jl:27
     elseif data_categ == "cq"
         data_t = map(full_amp_out.cq) do cq_val
             isnan(cq_val) ? AbstractFloat(num_cycs) : cq_val # `Interger` resulted in `InexactError()`
@@ -86,12 +89,16 @@ function assign_genotypes(
             for channel_i in 1:num_channels, genotype_i in 1:num_genotypes
         ] .* transpose(init_factors)
 
-        # run k-means whether finally using k-means or k-medoids
-        cluster_result = kmeans!(data, copy(init_centers)) # ideally the element with the same index between `init_centers` and `cluster_result.centers` should be for the same genotype
-        centers = cluster_result.centers
-
-        if cluster_method == "k-medoids"
-            init_centers = centers # using centers found by k-means
+        if cluster_method in ["k-means", "k-means-medoids"]
+            # run k-means whether finally using k-means or k-medoids
+            cluster_result = kmeans!(data, copy(init_centers)) # ideally the element with the same index between `init_centers` and `cluster_result.centers` should be for the same genotype
+            if cluster_method == "k-means"
+                centers = cluster_result.centers
+            elseif cluster_method == "k-means-medoids"
+                init_centers = cluster_result.centers # using centers found by k-means
+            end
+        end
+        if cluster_method in ["k-means-medoids", "k-medoids"]
             num_centers = size(init_centers)[2]
             data_winit = hcat(data, init_centers)
             num_wells_winit = num_wells + num_centers

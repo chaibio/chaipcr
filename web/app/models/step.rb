@@ -131,7 +131,7 @@ class Step < ActiveRecord::Base
       end
     end
     
-    if hold_time < 0
+    if !hold_time.nil? && hold_time < 0
       errors.add(:hold_time, "Cannot be negative")
     end
     

@@ -17,6 +17,7 @@ type MbqOutput
     fitted_postbl::AbstractAmpFitted
     postbl_status::Symbol
     coefs::Vector{AbstractFloat}
+    d0::AbstractFloat
     blsub_fitted::Vector{AbstractFloat}
     max_d1::AbstractFloat
     max_d2::AbstractFloat
@@ -38,7 +39,7 @@ type AmpStepRampOutput
     wva_data::OrderedDict{String,OrderedDict{Int,Vector{AbstractFloat}}}
     rbbs_ary3::Array{AbstractFloat,3}
     fluo_well_nums::Vector{Int}
-    channels::Vector{Int}
+    channel_nums::Vector{Int}
     cq_method::String
     # computed by `mod_bl_q` as part of `MbqOutput` and arranged in arrays in `process_amp_1sr`
     fitted_prebl::Array{AbstractAmpFitted,2}
@@ -47,6 +48,7 @@ type AmpStepRampOutput
     fitted_postbl::Array{AbstractAmpFitted,2}
     postbl_status::Array{Symbol,2}
     coefs::Array{AbstractFloat,3}
+    d0::Array{AbstractFloat,2}
     blsub_fitted::Array{AbstractFloat,3}
     max_d1::Array{AbstractFloat,2}
     max_d2::Array{AbstractFloat,2}
@@ -73,11 +75,12 @@ type AmpStepRampOutput
 end # type AmpStepRampOutput
 
 type AmpStepRampOutput2Bjson
-    rbbs_ary3::Array{AbstractFloat,3}
-    blsub_fluos::Array{AbstractFloat,3}
-    cq::Array{AbstractFloat,2}
-    ct_fluos::Vector{AbstractFloat}
-    assignments_adj_labels_dict::OrderedDict{String,Vector{String}}
+    rbbs_ary3::Array{AbstractFloat,3} # fluorescence after deconvolution and adjusting well-to-well variation
+    blsub_fluos::Array{AbstractFloat,3} # fluorescence after baseline subtraction
+    cq::Array{AbstractFloat,2} # cq values, applicable to sigmoid models but not to MAK models
+    d0::Array{AbstractFloat,2} # starting quantity from absolute quanitification
+    ct_fluos::Vector{AbstractFloat} # fluorescence thresholds (one value per channel) for Ct method
+    assignments_adj_labels_dict::OrderedDict{String,Vector{String}} # assigned genotypes from allelic discrimination, keyed by type of data (see `AD_DATA_CATEG` in "allelic_discrimination.jl")
 end
 
 
@@ -184,7 +187,7 @@ function process_amp(
         asrp.cyc_nums = unique(fd_df[:cycle_num])
      end # for asrp
 
-     # find `fluo_well_nums` and `channels`. literal i.e. non-pointer variables created in a Julia for-loop is local, i.e. not accessible outside of the for-loop.
+     # find `fluo_well_nums` and `channel_nums`. literal i.e. non-pointer variables created in a Julia for-loop is local, i.e. not accessible outside of the for-loop.
      asrp_1 = asrp_vec[1]
      fd_qry_2b = "
          SELECT well_num, channel
@@ -199,10 +202,10 @@ function process_amp(
      fd_df, fluo_well_nums = get_mysql_data_well(
          well_nums, fd_qry_2b, db_conn, verbose
      )
-    channels = unique(fd_df[:channel])
+    channel_nums = unique(fd_df[:channel])
 
-    # pre-deconvolution, process all available channels
-    if length(channels) == 1
+    # pre-deconvolution, process all available channel_nums
+    if length(channel_nums) == 1
         dcv = false
     end
 
@@ -211,7 +214,7 @@ function process_amp(
     sr_dict = OrderedDict(map(asrp_vec) do asrp
         process_amp_1sr(
             db_conn, exp_id, asrp, calib_info,
-            fluo_well_nums, well_nums, channels,
+            fluo_well_nums, well_nums, channel_nums,
             dcv,
             dye_in, dyes_2bfild,
             min_reliable_cyc, baseline_cyc_bounds, cq_method, ct_fluos, af_key, kwdict_mbq, ipopt_print2file_prefix,
@@ -234,7 +237,7 @@ function get_amp_data(
     exp_id::Integer,
     asrp::AmpStepRampProperties,
     fluo_well_nums::AbstractVector, # not `[]`, all elements are expected to be found
-    channels::AbstractVector,
+    channel_nums::AbstractVector,
     )
 
     cyc_nums = asrp.cyc_nums
@@ -247,7 +250,7 @@ function get_amp_data(
             $(asrp.step_or_ramp)_id = $(asrp.id) AND
             cycle_num in ($(join(cyc_nums, ","))) AND
             well_num in ($(join(fluo_well_nums, ","))) AND
-            channel in ($(join(channels, ","))) AND
+            channel in ($(join(channel_nums, ","))) AND
             step_id is not NULL
         ORDER BY channel, well_num, cycle_num
     "
@@ -255,7 +258,7 @@ function get_amp_data(
 
     fluo_raw = reshape(
         fluo_sel[parse(col_name)],
-        map(length, (cyc_nums, fluo_well_nums, channels))...
+        map(length, (cyc_nums, fluo_well_nums, channel_nums))...
     )
 
     return fluo_raw
@@ -321,6 +324,11 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
 
         fitted_postbl = fitted_prebl
         coefs_pob = fitted_postbl.coefs
+
+        d0_i_vec = find(fitted_postbl.coef_strs) do coef_str
+            coef_str == "d0"
+        end
+        d0 = coefs_pob[d0_i_vec[1]] # * 1. # without `* 1.`, MethodError: no method matching kmeans!(::Array{AbstractFloat,2}, ::Array{Float64,2}); Closest candidates are: kmeans!(::Array{T<:AbstractFloat,2}, ::Array{T<:AbstractFloat,2}; weights, maxiter, tol, display) where T<:AbstractFloat at E:\for_programs\julia_pkgs\v0.6\Clustering\src\kmeans.jl:27
 
         # for `Sfc`-style output
         bl_notes = [af_key]
@@ -423,6 +431,8 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
 
         coefs_pob = fitted_postbl.coefs
 
+        d0 = NaN
+
         func_pred_f = MDs[m_postbl].funcs_pred["f"]
         blsub_fitted = func_pred_f(cycs, coefs_pob...)
 
@@ -485,6 +495,7 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
         fitted_postbl,
         fitted_postbl.status,
         coefs_pob,
+        d0,
         blsub_fitted,
         max_d1,
         max_d2,
@@ -581,7 +592,7 @@ function process_amp_1sr(
     asrp::AmpStepRampProperties,
     calib_info::Union{Integer,OrderedDict},
     fluo_well_nums::AbstractVector, well_nums::AbstractVector,
-    channels::AbstractVector,
+    channel_nums::AbstractVector,
     dcv::Bool, # logical, whether to perform multi-channel deconvolution
     dye_in::String, dyes_2bfild::AbstractVector,
     min_reliable_cyc::Real,
@@ -604,13 +615,13 @@ function process_amp_1sr(
         db_conn,
         "fluorescence_value", # "fluorescence_value" or "baseline_value"
         exp_id, asrp,
-        fluo_well_nums, channels
+        fluo_well_nums, channel_nums
     )
 
     num_cycs, num_fluo_wells, num_channels = size(fr_ary3)
 
     mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, rbbs_ary3 = dcv_aw(
-        fr_ary3, dcv, channels,
+        fr_ary3, dcv, channel_nums,
         db_conn, calib_info, fluo_well_nums, well_nums, dye_in, dyes_2bfild;
         aw_out_format="array"
     )
@@ -638,7 +649,7 @@ function process_amp_1sr(
         wva_data,
         rbbs_ary3,
         fluo_well_nums,
-        channels,
+        channel_nums,
         cq_method,
         fitted_prebl,
         fill(Vector{String}(), num_fluo_wells, num_channels), # bl_notes
@@ -646,6 +657,7 @@ function process_amp_1sr(
         fitted_postbl,
         fill(:not_fitted, num_fluo_wells, num_channels), # postbl_status
         fill(NaN, 1, num_fluo_wells, num_channels), # coefs # size = 1 for 1st dimension may not be correct for the chosen model
+        NaN_ary2, # d0s
         blsub_fitted,
         NaN_ary2, # max_d1
         NaN_ary2, # max_d2
