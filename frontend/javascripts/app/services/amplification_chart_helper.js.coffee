@@ -28,11 +28,17 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           min: 0
           key: 'cycle_num'
           ticks: 8
+          label: 'CYCLE NUMBER'
         y:
           label: 'RELATIVE FLUORESCENCE UNITS'
           ticks: 10
           tickFormat: (y) ->
             "#{Math.round(( y / 1000) * 10) / 10}k"
+
+      box:
+        label:
+          x: 'Cycle'
+          y: 'RFU'
 
       margin:
         top: 10
