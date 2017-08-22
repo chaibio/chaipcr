@@ -114,11 +114,11 @@ angular.module("canvasApp").factory('mouseDown', [
               
               evt.target.setVisible(false);
               C.moveDots.baseStep = null;
+              
               if(step.previousStep) {
                 C.moveDots.baseStep = step.previousStep;
               }
               
-              C.canvas.bringToFront(C.stepIndicator);
               
               if(step.nextStep === null && step.previousStep === null) {
                 // If this stage has only one step;
@@ -134,18 +134,21 @@ angular.module("canvasApp").factory('mouseDown', [
                 return null;
               }
 
+              step.parentStage.squeezeStage(step);
+              
               if(step.parentStage.nextStage) {
                 console.log("Inside multi step zone");
-                step.parentStage.squeezeStage(step);
                 // var width = step.parentStage.myWidth;
                 // This is a trick, when we moveAllStepsAndStages we calculate the placing with myWidth, please refer getLeft() method
                 step.parentStage.myWidth = step.parentStage.myWidth + 23;
                 step.parentStage.nextStage.moveAllStepsAndStages(true);
                 step.parentStage.myWidth = step.parentStage.myWidth - 23;
-                C.moveDots.setLeft(step.left + 6).setCoords().setVisible(true);
-                C.canvas.bringToFront(C.moveDots);
-                circleManager.togglePaths(false); //put it back later
+                
               }
+
+              C.moveDots.setLeft(step.left + 6).setCoords().setVisible(true);
+              C.canvas.bringToFront(C.moveDots);
+              circleManager.togglePaths(false); //put it back later
               console.log(" control is here");
               C.canvas.bringToFront(C.stepIndicator);
               C.stepIndicator.init(step, evt.target, C, backupStageModel);
