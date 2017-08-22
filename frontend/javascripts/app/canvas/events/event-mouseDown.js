@@ -121,9 +121,10 @@ angular.module("canvasApp").factory('mouseDown', [
               C.canvas.bringToFront(C.moveDots);
               C.canvas.bringToFront(C.stepIndicator);
               
-              step.parentStage.squeezeStage(step);
+              
 
               if(step.parentStage.nextStage) {
+                step.parentStage.squeezeStage(step);
                 //var width = step.parentStage.myWidth;
                 // This is a trick, when we moveAllStepsAndStages we calculate the placing with myWidth, please refer getLeft() method
                 step.parentStage.myWidth = step.parentStage.myWidth + 23;
