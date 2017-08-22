@@ -106,7 +106,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
 					{'well_num':15,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit2.name,'']},
 					{'well_num':16,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit2.name,'']}
 				];
-				Testkit.create({guid:'pika_4e_kit',name:$scope.kit1.name + '&' + $scope.kit2.name }).then(function (resp){
+				Testkit.create({guid:'pika_4e_kit',name:$scope.kit1.name + ' & ' + $scope.kit2.name }).then(function (resp){
 					Testkit.createWells(resp.data.experiment.id,$scope.wells).then(function(response){
 						$state.go('pika_test.setWellsA', {id: resp.data.experiment.id});
 						$scope.$close();
