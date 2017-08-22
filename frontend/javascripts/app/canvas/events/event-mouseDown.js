@@ -128,6 +128,7 @@ angular.module("canvasApp").factory('mouseDown', [
                 circleManager.togglePaths(false); //put it back later
                 console.log(C.allStageViews);
                 C.canvas.bringToFront(C.stepIndicator);
+                // May be write a seperate init method for one step stage.
                 C.stepIndicator.init(step, evt.target, C, backupStageModel);
                 C.canvas.renderAll();
                 return null;
@@ -146,6 +147,7 @@ angular.module("canvasApp").factory('mouseDown', [
                 circleManager.togglePaths(false); //put it back later
               }
               console.log(" control is here");
+              C.canvas.bringToFront(C.stepIndicator);
               C.stepIndicator.init(step, evt.target, C, backupStageModel);
               C.canvas.renderAll();
             }

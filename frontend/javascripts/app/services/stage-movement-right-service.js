@@ -35,7 +35,7 @@ window.ChaiBioTech.ngApp.service('StageMovementRightService', [
                 if((this.movement.left) > point[0] - 150 && (this.movement.left) < point[0]) {
                     
                     if(index !== this.movedRightStageIndex) {
-                        
+                        console.log("Should move");
                         this.movedStageIndex = this.movedRightStageIndex = index;
                         moveStageToSides.moveToSide("right", this.currentDropStage, this.kanvas.allStageViews[index]);
                         StagePositionService.getPositionObject();
