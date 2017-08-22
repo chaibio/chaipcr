@@ -51,7 +51,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         step.parentStage.stageHeader();
         
         if(step.parentStage.childSteps.length === 0) {
-          step.parentStage.adjustHeader();
+          //step.parentStage.adjustHeader();
         }
 
         this.movement = this.movedStepIndex = this.currentMoveRight = this.currentMoveLeft =
