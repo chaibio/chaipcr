@@ -466,7 +466,7 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
     if @zoomTransform.rescaleY
       @gY.call(@yAxis.scale(@zoomTransform.rescaleY(@yScale)))
     #text label for the y axis
-    svg.append("text")
+    label = svg.append("text")
       .attr("class", "g-y-axis-text")
       .attr("transform", "rotate(-90)")
       .attr("y", 0 - @config.margin.left)
@@ -476,7 +476,9 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
       .attr("font-size", "12px")
       .attr("fill", "#333")
       .style("text-anchor", "middle")
-      .text("RELATIVE FLUORESCENCE UNITS")
+
+    if @config.axes.y.label
+      label.text(@config.axes.y.label)
 
   setXAxis: ->
     @chartSVG.selectAll('g.axis.x-axis').remove()
