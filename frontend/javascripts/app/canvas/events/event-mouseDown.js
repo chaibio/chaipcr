@@ -121,15 +121,13 @@ angular.module("canvasApp").factory('mouseDown', [
               
               
               if(step.nextStep === null && step.previousStep === null) {
-                // If this stage has only one step;
-                console.log("Alone");
-                console.log(C.allStageViews);
+                
                 step.parentStage.deleteStep({}, step);
                 circleManager.togglePaths(false); //put it back later
-                console.log(C.allStageViews);
+
                 C.canvas.bringToFront(C.stepIndicator);
                 // May be write a seperate init method for one step stage.
-                C.stepIndicator.init(step, evt.target, C, backupStageModel);
+                C.stepIndicator.initForOneStepStage(step, evt.target, C, backupStageModel);
                 C.canvas.renderAll();
                 return null;
               }
@@ -137,19 +135,15 @@ angular.module("canvasApp").factory('mouseDown', [
               step.parentStage.squeezeStage(step);
               
               if(step.parentStage.nextStage) {
-                console.log("Inside multi step zone");
-                // var width = step.parentStage.myWidth;
-                // This is a trick, when we moveAllStepsAndStages we calculate the placing with myWidth, please refer getLeft() method
-                step.parentStage.myWidth = step.parentStage.myWidth - 2;
-                step.parentStage.nextStage.moveAllStepsAndStages(true);
-               // step.parentStage.myWidth = step.parentStage.myWidth - 23;
                 
+                step.parentStage.myWidth = step.parentStage.myWidth - 2;
+                step.parentStage.nextStage.moveAllStepsAndStages(true); 
               }
 
               C.moveDots.setLeft(step.left + 6).setCoords().setVisible(true);
               C.canvas.bringToFront(C.moveDots);
               circleManager.togglePaths(false); //put it back later
-              console.log(" control is here");
+              
               C.canvas.bringToFront(C.stepIndicator);
               C.stepIndicator.init(step, evt.target, C, backupStageModel);
               C.canvas.renderAll();

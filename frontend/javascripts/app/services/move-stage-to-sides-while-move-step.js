@@ -2,7 +2,7 @@ window.ChaiBioTech.ngApp.service('moveStageToSidesWhileMoveStep', [
     'moveStageToSides',
     function(moveStageToSides) {
         
-        this.moveToSideForStep = function(direction, source, targetStage) {
+        this.moveToSideForStep = function(direction, targetStage) {
 
             if(direction === "left") {
                 this.moveStageToLeft(targetStage);
