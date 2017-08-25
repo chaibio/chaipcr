@@ -94,7 +94,7 @@ window.ChaiBioTech.ngApp.service('moveStageToSides', [
       };
 
       this.moveToSideStageComponents = function(moveCount, targetStage) {
-
+        console.log("Being here", moveCount, targetStage.index);
         targetStage.stageGroup.set({left: targetStage.left + moveCount }).setCoords();
         targetStage.dots.set({left: (targetStage.left + moveCount ) + 3}).setCoords();
         targetStage.left = targetStage.left + moveCount;
@@ -138,7 +138,7 @@ window.ChaiBioTech.ngApp.service('moveStageToSides', [
 
         if(direction === "left") {
             moveCount = -30;
-            
+            this.moveStageToLeft(targetStage);
             //this.makeSurePreviousMovedLeft(draggedStage, targetStage);
         } else if(direction === "right") {
             moveCount = 30;
@@ -159,6 +159,26 @@ window.ChaiBioTech.ngApp.service('moveStageToSides', [
           break;
         }
         stage = stage.nextStage;
+      }
+    };
+
+    this.moveStageToLeft = function(stage) {
+      console.log("starting point", stage.index);
+      var Cstage = stage;
+      while(Cstage) {
+        if(Cstage.stageMovedDirection === null && Cstage.nextStage) {
+          console.log("Visiting here");
+          this.moveStageToRight(Cstage.nextStage);
+          break;
+        } else if(Cstage.stageMovedDirection === "left") {
+          break;
+        } else if(Cstage.stageMovedDirection !== "left") {
+          console.log("Place", Cstage.stageMovedDirection);
+          this.moveToSideStageComponents(-30, Cstage);
+          Cstage.stageMovedDirection = "left";
+          break;
+        } 
+        Cstage = Cstage.previousStage;
       }
     };
       

@@ -140,9 +140,9 @@ angular.module("canvasApp").factory('mouseDown', [
                 console.log("Inside multi step zone");
                 // var width = step.parentStage.myWidth;
                 // This is a trick, when we moveAllStepsAndStages we calculate the placing with myWidth, please refer getLeft() method
-                step.parentStage.myWidth = step.parentStage.myWidth + 23;
+                step.parentStage.myWidth = step.parentStage.myWidth - 2;
                 step.parentStage.nextStage.moveAllStepsAndStages(true);
-                step.parentStage.myWidth = step.parentStage.myWidth - 23;
+               // step.parentStage.myWidth = step.parentStage.myWidth - 23;
                 
               }
 
