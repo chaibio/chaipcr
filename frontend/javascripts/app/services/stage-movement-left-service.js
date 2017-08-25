@@ -21,7 +21,8 @@ window.ChaiBioTech.ngApp.service('StageMovementLeftService', [
     'StepPositionService',
     'StagePositionService',
     'moveStageToSides',
-    function(StepPositionService, StagePositionService, moveStageToSides) {
+    'moveStageToSidesWhileMoveStep',
+    function(StepPositionService, StagePositionService, moveStageToSides, moveStageToSidesWhileMoveStep) {
         return {
 
             shouldStageMoveLeft: function(sI) {
@@ -37,7 +38,7 @@ window.ChaiBioTech.ngApp.service('StageMovementLeftService', [
                     if(index !== this.movedLeftStageIndex) {
                         console.log("shoul move to left side");
                         this.movedStageIndex = this.movedLeftStageIndex = index;
-                        moveStageToSides.moveToSideForStep("left", {index: 10}, this.kanvas.allStageViews[index]); 
+                        moveStageToSidesWhileMoveStep.moveToSideForStep("left", {index: 10}, this.kanvas.allStageViews[index]); 
                         // {index: 10} is sent so that the very first stage doesnt move, refer stage.validMove()
                         // It dosnt have to be 10, can be any non zero value
                         StagePositionService.getPositionObject();
