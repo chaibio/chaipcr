@@ -610,8 +610,13 @@ class BaseChart
       .style('text-align', 'center')
       .style('font-size', '10px')
       .attr('type', 'text')
-      .on('mousemove', ->
+      .on('mousemove', =>
+        lineWidth = text.node().getBBox().width
         line.attr('opacity', 1)
+          .attr('x1', @config.margin.left - (lineWidth / 2))
+          .attr('y1', @height + @config.margin.top + offsetTop + conHeight - underlineStroke)
+          .attr('x2', @config.margin.left - (lineWidth / 2) + lineWidth)
+          .attr('y2', @height + @config.margin.top + offsetTop + conHeight - underlineStroke)
       )
       .on('mouseout', ->
         line.attr('opacity', 0)
@@ -626,28 +631,32 @@ class BaseChart
         input.style('opacity', 0)
       )
       .on('keydown', =>
-        if d3.event.keyCode is 13
-          # enter
-          d3.event.preventDefault()
-          extent = @getScaleExtent() - @getMinX()
-          x = @xScale
-          lastXScale = @lastXScale || x
-          minX = input.node().value * 1
-          maxX = lastXScale.invert(@width)
-          if (minX >= maxX)
-            return false
-          if (minX < 1)
-            minX = 1
-          k = @width / (x(maxX) - x(minX))
-          width_percent = 1 / k
-          w = extent - (width_percent * extent)
-          @chartSVG.call(@zooomBehavior.scaleTo, k)
-          @scroll((minX - @getMinX()) / w)
-        else
-          @ensureNumeric()
+        @onInputLeftXAxis(input)
       )
 
     @xAxisLeftExtremeValueText = text
+
+  onInputLeftXAxis: (input) ->
+    if d3.event.keyCode is 13
+      # enter
+      d3.event.preventDefault()
+      extent = @getScaleExtent() - @getMinX()
+      x = @xScale
+      lastXScale = @lastXScale || x
+      minX = input.node().value * 1
+      maxX = lastXScale.invert(@width)
+      if (minX >= maxX)
+        return false
+      if (minX < 1)
+        minX = 1
+      k = @width / (x(maxX) - x(minX))
+      width_percent = 1 / k
+      w = extent - (width_percent * extent)
+      @chartSVG.call(@zooomBehavior.scaleTo, k)
+      @scroll((minX - @getMinX()) / w)
+    else
+      @ensureNumeric()
+
 
   drawXAxisRightExtremeValue: ->
     textContainer = @chartSVG.append('g')
@@ -704,10 +713,15 @@ class BaseChart
       .style('font-size', '10px')
       .attr('type', 'text')
       .on('mousemove', =>
-        line.attr 'opacity', 1
+        lineWidth = text.node().getBBox().width
+        line.attr('opacity', 1)
+          .attr('x1', @config.margin.left + @width - (lineWidth / 2))
+          .attr('y1', @height + @config.margin.top + offsetTop + conHeight - underlineStroke)
+          .attr('x2', @config.margin.left + @width - (lineWidth / 2) + lineWidth)
+          .attr('y2', @height + @config.margin.top + offsetTop + conHeight - underlineStroke)
       )
-      .on('mouseout', ->
-        line.attr 'opacity', 0
+      .on('mouseout', =>
+        line.attr('opacity', 0)
       )
       .on('click', =>
         xScale = @lastXScale || @xScale
@@ -718,28 +732,31 @@ class BaseChart
         input.style('opacity', 0)
       )
       .on('keydown', =>
-        if d3.event.keyCode is 13
-          # enter
-          d3.event.preventDefault()
-          extent = @getScaleExtent() - @getMinX()
-          x = @xScale
-          lastXScale = @lastXScale || x
-          minX = lastXScale.invert(0)
-          maxX = input.node().value * 1
-          if (minX >= maxX)
-            return false
-          if (maxX > @getScaleExtent())
-            maxX = @getScaleExtent()
-          k = @width / (x(maxX) - x(minX))
-          width_percent = 1 / k
-          w = extent - (width_percent * extent)
-          @chartSVG.call(@zooomBehavior.scaleTo, k)
-          @scroll((minX - @getMinX()) / w)
-        else
-          @ensureNumeric()
+        @onInputRightXAxis(input)
       )
 
     @xAxisRightExtremeValueText = text
+
+  onInputRightXAxis: (input) =>
+    if d3.event.keyCode is 13
+      # enter
+      d3.event.preventDefault()
+      extent = @getScaleExtent() - @getMinX()
+      x = @xScale
+      lastXScale = @lastXScale || x
+      minX = lastXScale.invert(0)
+      maxX = input.node().value * 1
+      if (minX >= maxX)
+        return false
+      if (maxX > @getScaleExtent())
+        maxX = @getScaleExtent()
+      k = @width / (x(maxX) - x(minX))
+      width_percent = 1 / k
+      w = extent - (width_percent * extent)
+      @chartSVG.call(@zooomBehavior.scaleTo, k)
+      @scroll((minX - @getMinX()) / w)
+    else
+      @ensureNumeric()
 
   drawYAxisUpperExtremeValue: ->
       textContainer = @chartSVG.append('g')
