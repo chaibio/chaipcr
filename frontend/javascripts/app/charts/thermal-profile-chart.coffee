@@ -76,6 +76,7 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
     @circles = []
     for config in @config.series by 1
       @circles.push(@makeCircleForLine(config))
+    return
 
   makeCircleForLine: (line_config) ->
     @viewSVG.append('circle')
