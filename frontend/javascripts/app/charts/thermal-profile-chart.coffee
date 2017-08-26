@@ -78,7 +78,6 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
       @circles.push(@makeCircleForLine(config))
 
   makeCircleForLine: (line_config) ->
-    console.log line_config
     @viewSVG.append('circle')
       .attr('opacity', 0)
       .attr('r', @CIRCLE_RADIUS)
@@ -116,8 +115,6 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
     return if @isZooming or !@hasData()
     @toggleCirclesVisibility(true)
     x = d3.mouse(@mouseOverlay.node())[0]
-
-    console.log @lines
 
     @lines.forEach (path, i) =>
       pathEl = path.node();
