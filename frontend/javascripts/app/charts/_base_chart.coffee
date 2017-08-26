@@ -1283,7 +1283,7 @@ class BaseChart
 
   empty: -> d3.select(@elem).selectAll('*').remove()
 
-  resize: (@elem, @data, @config) -> @initChart()
+  resize: -> @initChart()
 
 
 window.ChaiBioCharts = window.ChaiBioCharts || {}
