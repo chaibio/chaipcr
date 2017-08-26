@@ -622,7 +622,7 @@ class BaseChart
         line.attr('opacity', 0)
       )
       .on('click', =>
-        @onClickLeftXAxisInput()
+        @onClickLeftXAxisInput(input)
         input.style('opacity', 1)
       )
       .on('focusout', ->
