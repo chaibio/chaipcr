@@ -632,6 +632,7 @@ class BaseChart
       )
 
     rect.on 'click', => @onClickLeftXAxisInput(input)
+    text.on 'click', => @onClickLeftXAxisInput(input)
 
     @xAxisLeftExtremeValueText = text
 
@@ -739,6 +740,7 @@ class BaseChart
       )
 
     rect.on 'click', => @onClickRightXAxisInput(input)
+    text.on 'click', => @onClickRightXAxisInput(input)
 
     @xAxisRightExtremeValueText = text
 
@@ -863,6 +865,7 @@ class BaseChart
         )
 
       rect.on 'click', => @onClickUpperYAxisInput(input)
+      text.on 'click', => @onClickUpperYAxisInput(input)
 
       @yAxisUpperExtremeValueText = text
 
@@ -998,6 +1001,7 @@ class BaseChart
       )
 
     rect.on 'click', => @onClickLowerYAxisInput(input)
+    text.on 'click', => @onClickLowerYAxisInput(input)
 
     @yAxisLowerExtremeValueText = text
 
