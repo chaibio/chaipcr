@@ -623,7 +623,6 @@ class BaseChart
       )
       .on('click', =>
         @onClickLeftXAxisInput(input)
-        input.style('opacity', 1)
       )
       .on('focusout', ->
         input.style('opacity', 0)
@@ -635,6 +634,7 @@ class BaseChart
     @xAxisLeftExtremeValueText = text
 
   onClickLeftXAxisInput: (input) ->
+    input.style('opacity', 1)
     xScale = @lastXScale || @xScale
     val = Math.round(xScale.invert(0) * 10) / 10
     input.node().value = val
@@ -728,7 +728,6 @@ class BaseChart
       )
       .on('click', =>
         @onClickRightXAxisInput(input)
-        input.style('opacity', 1)
       )
       .on('focusout', ->
         input.style('opacity', 0)
@@ -742,6 +741,7 @@ class BaseChart
   onClickRightXAxisInput: (input) ->
     xScale = @lastXScale || @xScale
     input.node().value = Math.round(xScale.invert(@width) * 10) / 10
+    input.style('opacity', 1)
 
   onInputRightXAxis: (input) =>
     if d3.event.keyCode is 13
@@ -850,7 +850,6 @@ class BaseChart
         )
         .on('click', =>
           @onClickUpperYAxisInput(input)
-          input.style('opacity', 1)
         )
         .on('focusout', ->
           input.style('opacity', 0)
@@ -864,6 +863,7 @@ class BaseChart
   onClickUpperYAxisInput: (input) ->
     val = Math.round(@yScale.invert(0) * 10) / 10
     input.node().value = val
+    input.style('opacity', 1)
 
   onInputUpperYAxis: (input) =>
     if d3.event.keyCode is 13
@@ -982,7 +982,7 @@ class BaseChart
         line.attr('opacity', 0)
       )
       .on('click', =>
-        input.style('opacity', 1)
+        @onClickLowerYAxisInput(input)
       )
       .on('focusout', ->
         input.style('opacity', 0)
@@ -996,6 +996,7 @@ class BaseChart
   onClickLowerYAxisInput: (input) ->
     val = Math.round(@yScale.invert(@height) * 10) / 10
     input.node().value = val
+    input.style('opacity', 1)
 
   onInputLowerYAxis: (input) ->
     if d3.event.keyCode is 13
