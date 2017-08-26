@@ -2,7 +2,7 @@
 
   // "use strict";
 
-  function ThermalProfileChart($scope, elem, data, config) {
+  function xThermalProfileChart($scope, elem, data, config) {
 
     // Global vars
     var Globals = null;
@@ -585,6 +585,6 @@
   }
 
   window.ChaiBioCharts = window.ChaiBioCharts || {};
-  window.ChaiBioCharts.ThermalProfileChart = ThermalProfileChart;
+  window.ChaiBioCharts.xThermalProfileChart = xThermalProfileChart;
 
 }).call(window);

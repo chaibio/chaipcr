@@ -1,18 +1,22 @@
 class BaseChart
 
+  NORMAL_PATH_STROKE_WIDTH: 2
+  HOVERED_PATH_STROKE_WIDTH: 3
+  ACTIVE_PATH_STROKE_WIDTH: 5
+  CIRCLE_STROKE_WIDTH: 2
+  CIRCLE_RADIUS: 7
+  AXIS_LABEL_FONT_SIZE: 10
+  zoomTransform: {x: 0, y: 0, k: 1}
+  isZooming: false
+
   constructor: (@elem, @data, @config) ->
-
-    @NORMAL_PATH_STROKE_WIDTH = 2
-    @HOVERED_PATH_STROKE_WIDTH = 3
-    @ACTIVE_PATH_STROKE_WIDTH = 5
-    @CIRCLE_STROKE_WIDTH = 2
-    @CIRCLE_RADIUS = 7
-
-    @zoomTransform =
-      x:0
-      y: 0
-      k: 1
     @initChart()
+
+  hasData: ->
+    return false if !@data
+    return false if !@data.dataset
+    return false if @data.dataset.length is 0
+    return true
 
   formatPower: (d) ->
     superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹"
@@ -79,7 +83,7 @@ class BaseChart
     else
       @hideMouseIndicators
 
-    if (@onSelectLine)
+    if typeof @onSelectLine is 'function'
       @onSelectLine(@activePathConfig)
 
     @prevMousePosition = mouse
@@ -472,18 +476,23 @@ class BaseChart
     if @zoomTransform.rescaleY
       @gY.call(@yAxis.scale(@zoomTransform.rescaleY(@yScale)))
     #text label for the y axis
-    if @config.axes.y.label
-      label = svg.append("text")
-        .attr("class", "g-y-axis-text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 0 - @config.margin.left)
-        .attr("x", 0 - (@height / 2))
-        .attr("dy", "1em")
-        .attr("font-family", "dinot-bold")
-        .attr("font-size", "12px")
-        .attr("fill", "#333")
-        .style("text-anchor", "middle")
-        .text(@config.axes.y.label)
+    @setYAxisLabel()
+
+  setYAxisLabel: ->
+    return if not @config.axes.y.label
+    svg = @chartSVG.select('.chart-g')
+    @yAxisLabel = svg.append("text")
+      .attr("class", "g-y-axis-text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - @config.margin.left)
+      .attr("x", 0 - (@height / 2))
+      .attr("dy", "1em")
+      .attr("font-family", "dinot-bold")
+      .attr("font-size", "#{@AXIS_LABEL_FONT_SIZE}px")
+      .attr("fill", "#333")
+      .style("text-anchor", "middle")
+      .text(@config.axes.y.label)
+
 
   setXAxis: ->
     @chartSVG.selectAll('g.axis.x-axis').remove()
@@ -506,17 +515,21 @@ class BaseChart
       @gX.call(@xAxis.scale(@zoomTransform.rescaleX(@xScale)))
 
     # text label for the x axis
-    if (@config.axes.x.label)
-      svg.append("text")
-        .attr('class', 'g-x-axis-text')
-        .attr("transform",
-          "translate(" + (@width / 2) + " ," +
-          (@height + @config.margin.top + @config.margin.bottom - 20) + ")")
-        .style("text-anchor", "middle")
-        .attr("font-family", "dinot-bold")
-        .attr("font-size", "12px")
-        .attr("fill", "#333")
-        .text(@config.axes.x.label)
+    @setXAxisLabel()
+
+  setXAxisLabel: ->
+    return if not (@config.axes.x.label)
+    svg = @chartSVG.select('.chart-g')
+    @xAxisLabel = svg.append("text")
+      .attr('class', 'g-x-axis-text')
+      .attr("transform",
+        "translate(" + (@width / 2) + " ," +
+        (@height + @config.margin.top + @config.margin.bottom - 20) + ")")
+      .style("text-anchor", "middle")
+      .attr("font-family", "dinot-bold")
+      .attr("font-size", "#{@AXIS_LABEL_FONT_SIZE}px")
+      .attr("fill", "#333")
+      .text(@config.axes.x.label)
 
   updateZoomScaleExtent: ->
     return if !@zooomBehavior
@@ -1036,7 +1049,10 @@ class BaseChart
     @width = @elem.parentElement.offsetWidth - @config.margin.left - @config.margin.right
     @height = @elem.parentElement.offsetHeight - @config.margin.top - @config.margin.bottom
 
-    @zooomBehavior = d3.zoom().on 'zoom', => @zoomed.call(@)
+    @zooomBehavior = d3.zoom()
+      .on 'start', => @isZooming = true
+      .on 'end', => @isZooming = false
+      .on 'zoom', => @zoomed.call(@)
 
     @chartSVG = d3.select(@elem).append("svg")
         .attr("width", @width + @config.margin.left + @config.margin.right)
@@ -1055,6 +1071,15 @@ class BaseChart
         .attr('height', @height)
         .attr('class', 'viewSVG')
 
+    @setMouseOverlay()
+    @setYAxis()
+    @setXAxis()
+    @drawLines(@config.series)
+    @makeCircle()
+    @updateZoomScaleExtent()
+    @drawAxesExtremeValues()
+
+  setMouseOverlay: ->
     @mouseOverlay = @viewSVG.append('rect')
         .attr('width', @width)
         .attr('height', @height)
@@ -1067,13 +1092,6 @@ class BaseChart
           if @hoveredLine
             mouse = @getMousePosition(@mouseOverlay.node())
             @setActivePath(@hoveredLine, mouse)
-
-    @setYAxis()
-    @setXAxis()
-    @drawLines(@config.series)
-    @makeCircle()
-    @updateZoomScaleExtent()
-    @drawAxesExtremeValues()
 
   getPathPositionByX: (path, x) ->
     return if not path

@@ -76,7 +76,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         value: Math.abs(transform.x/(w*transform.k - w))
         width: w/(w*transform.k)
       }
-      $scope.zoomState = (transform.k - 1)/ (scale_extent-1)
+      $scope.zoomState = (transform.k - 1)/ (scale_extent)
 
     $scope.$watch ->
       $scope.$parent.chart
