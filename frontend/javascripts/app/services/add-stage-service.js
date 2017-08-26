@@ -12,6 +12,7 @@ window.ChaiBioTech.ngApp.service('addStageService', [
         };
 
         this.addNewStage = function(data, currentStage, mode) {
+            console.log(data);
             //move the stages, make space.
             var ordealStatus = currentStage.childSteps[currentStage.childSteps.length - 1].ordealStatus;
             var originalWidth = currentStage.myWidth;
@@ -80,9 +81,10 @@ window.ChaiBioTech.ngApp.service('addStageService', [
 
             var add = (data.stage.steps.length > 0) ? 128 + Math.floor(constants.newStageOffset / data.stage.steps.length) : 128;
             var stageIndex = 0;
-            var stageView = new stage(data.stage, this.canvas, this.allStepViews, stageIndex, this, this.$scope, true);
+            var stageView = new stage(data.stage, this.canvasObj, stageIndex, true, this.canvasObj.$scope);
+
             this.addNextandPrevious(null, stageView);
-            this.allStageViews.splice(stageIndex, 0, stageView);
+            this.canvasObj.allStageViews.splice(stageIndex, 0, stageView);
 
             stageView.updateStageData(1);
             stageView.render();
