@@ -631,6 +631,8 @@ class BaseChart
         @onLeftXAxisInput(input)
       )
 
+    rect.on 'click', => @onClickLeftXAxisInput(input)
+
     @xAxisLeftExtremeValueText = text
 
   onClickLeftXAxisInput: (input) ->
@@ -735,6 +737,8 @@ class BaseChart
       .on('keydown', =>
         @onInputRightXAxis(input)
       )
+
+    rect.on 'click', => @onClickRightXAxisInput(input)
 
     @xAxisRightExtremeValueText = text
 
@@ -857,6 +861,8 @@ class BaseChart
         .on('keydown', =>
           @onInputUpperYAxis(input)
         )
+
+      rect.on 'click', => @onClickUpperYAxisInput(input)
 
       @yAxisUpperExtremeValueText = text
 
@@ -990,6 +996,8 @@ class BaseChart
       .on('keydown', =>
         @onInputLowerYAxis(input)
       )
+
+    rect.on 'click', => @onClickLowerYAxisInput(input)
 
     @yAxisLowerExtremeValueText = text
 
@@ -1260,10 +1268,15 @@ class BaseChart
   updateData: (data) ->
     @data = data
     @updateZoomScaleExtent()
+    setTimeout =>
+      @updateXAxisExtremeValues()
+    , 500
 
   updateConfig: (config) ->
     @config = config
-    @updateXAxisExtremeValues()
+    setTimeout =>
+      @updateXAxisExtremeValues()
+    , 500
 
   updateInterpolation: (i) ->
     @config.axes.y.scale = i
