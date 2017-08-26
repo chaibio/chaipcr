@@ -30,7 +30,7 @@ window.App.directive 'meltCurveChart', [
           $scope.onZoom()(chart.getTransform(), d.width, d.height, chart.getScaleExtent())
 
         $scope.$on 'window:resize', ->
-          initChart()
+          chart.resize(elem[0], $scope.data, $scope.config) if chart and $scope.show
 
         $scope.$watchCollection ($scope) ->
           return {

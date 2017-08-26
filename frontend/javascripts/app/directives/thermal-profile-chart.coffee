@@ -70,7 +70,7 @@ window.App.directive 'thermalProfileChart', [
               chart.drawLines()
 
         $scope.$on 'window:resize', ->
-          initChart()
+          chart.resize(elem[0], $scope.data, $scope.config) if chart and $scope.show
 
     }
 ]
