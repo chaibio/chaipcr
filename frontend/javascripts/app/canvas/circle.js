@@ -48,10 +48,14 @@ angular.module("canvasApp").factory('circle', [
       this.canvas = parentStep.canvas;
       this.scrollTop = 80;
       this.scrollLength = 317;
-      this.halfway = (this.scrollLength - this.scrollTop) / 2;
       //this.scrollRatio = (this.scrollLength - this.scrollTop) / 100;
       this.scrollRatio1 = ((this.scrollLength - this.scrollTop) * 0.25) / 50; // 1.2;//(this.scrollLength - this.scrollTop) / 200;
       this.scrollRatio2 = ((this.scrollLength - this.scrollTop) * 0.75) / 50;//3.54;//(this.scrollLength - this.scrollTop) / 50;
+      // Now we have our lowest temperature as 4 instead of 0, So we introduce lowestScrollCoordinate;
+      // lowestScrollCoordinate = this.scrollLength - (4 * scrollRatio1);
+      this.lowestTemperature = 4;
+      this.lowestScrollCoordinate = this.scrollLength - (this.lowestTemperature * this.scrollRatio1);
+      
       this.middlePoint = this.scrollLength - ((this.scrollLength - this.scrollTop) * 0.25); // This is the point where it reads 50
 
       this.gatherDataImage = this.next = this.previous = null;
@@ -69,6 +73,7 @@ angular.module("canvasApp").factory('circle', [
 
         if(temperature <= 50) {
           this.top = this.scrollLength - (temperature * this.scrollRatio1);
+          console.log("Reaching here", this.top);
           return this;
         }
 
