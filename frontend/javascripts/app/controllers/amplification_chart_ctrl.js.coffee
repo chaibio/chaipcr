@@ -298,7 +298,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           value: Math.abs(transform.x/(w*transform.k - w))
           width: w/(w*transform.k)
         }
-        $scope.ampli_zoom = (transform.k - 1)/ (scale_extent-1)
+        $scope.ampli_zoom = (transform.k - 1)/ (scale_extent)
 
       $scope.onSelectLine = (config) ->
         for i in [0..15] by 1

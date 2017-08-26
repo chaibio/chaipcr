@@ -23,7 +23,8 @@ window.App.directive 'thermalProfileChart', [
 
         initChart = ->
           return if !$scope.data or !$scope.config or !$scope.show
-          chart = new $window.ChaiBioCharts.ThermalProfileChart($scope, elem[0], $scope.data, $scope.config)
+          # chart = new $window.ChaiBioCharts.ThermalProfileChart($scope, elem[0], $scope.data, $scope.config)
+          chart = new $window.ChaiBioCharts.ThermalProfileChart(elem[0], $scope.data, $scope.config)
           chart.onZoomAndPan($scope.onZoom())
           chart.setMouseMoveListener($scope.onMouseMove())
           d = chart.getDimensions()

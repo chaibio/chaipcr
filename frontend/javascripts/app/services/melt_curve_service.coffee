@@ -48,10 +48,14 @@ App.service 'MeltCurveService', [
         y:
           ticks: 10
       margin:
-        left: 50
+        left: 75
         right: 10
         top: 10
         bottom: 20
+      box:
+        label:
+          x: 'Temp'
+          y: 'RFU'
     # end chartConfig
 
     self.parseData = (data, cb) ->
