@@ -12,7 +12,7 @@ window.ChaiBioTech.ngApp.service('addStageService', [
         };
 
         this.addNewStage = function(data, currentStage, mode) {
-            console.log(data);
+
             //move the stages, make space.
             var ordealStatus = currentStage.childSteps[currentStage.childSteps.length - 1].ordealStatus;
             var originalWidth = currentStage.myWidth;
