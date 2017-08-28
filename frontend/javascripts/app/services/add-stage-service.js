@@ -66,10 +66,9 @@ window.ChaiBioTech.ngApp.service('addStageService', [
             if(mode === "move_stage_back_to_original") {
                 console.log("YES ", mode);
                 this.canvasObj.allStageViews[0].getLeft();
-                this.canvasObj.allStageViews[0].moveAllStepsAndStages(false);
-            } else {
-                this.canvasObj.allStageViews[0].moveAllStepsAndStages(false);
             }
+            
+            this.canvasObj.allStageViews[0].moveAllStepsAndStages(false);
             circleManager.addRampLines();
             stageView.stageHeader();
             this.canvasObj.$scope.applyValues(stageView.childSteps[0].circle);
@@ -77,7 +76,7 @@ window.ChaiBioTech.ngApp.service('addStageService', [
             this.canvasObj.setDefaultWidthHeight();
         };
 
-        this.addNewStageAtBeginning = function(stageToBeReplaced, data) {
+        this.addNewStageAtBeginning = function(data) {
 
             var add = (data.stage.steps.length > 0) ? 128 + Math.floor(constants.newStageOffset / data.stage.steps.length) : 128;
             var stageIndex = 0;

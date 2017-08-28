@@ -269,7 +269,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           var stageIndex = (this.currentDrop) ? this.currentDrop.index : 0;
 
           if(stageIndex === 0 && !this.currentDrop) { //if we insert into the very first place.
-            addStageService.addNewStageAtBeginning({}, {stage: model});
+            addStageService.addNewStageAtBeginning({stage: model});
           } else {
             addStageService.addNewStage({stage: model}, this.currentDrop, "move_stage_back_to_original");
           }

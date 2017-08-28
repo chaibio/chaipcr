@@ -213,7 +213,7 @@ angular.module("canvasApp").factory('moveStepRect', [
             if(step.parentStage.previousStage) {
               addStageService.addNewStage(data, step.parentStage.previousStage, "move_stage_back_to_original");
             } else {
-              addStageService.addNewStageAtBeginning({}, data);
+              addStageService.addNewStageAtBeginning(data);
             }
             return true;
           }
