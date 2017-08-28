@@ -77,8 +77,7 @@ window.ChaiBioTech.ngApp.directive('allowAdminToggle', [
           } else {
             scope.data = "admin";
           }
-          //scope.data = !scope.data;
-          //scope.$parent['update']();
+          
         };
 
         scope.dragElem = angular.element(elem).find(".outer-circle").draggable({
