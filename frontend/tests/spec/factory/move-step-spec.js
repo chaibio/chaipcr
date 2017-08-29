@@ -9,7 +9,7 @@ describe("Testing moveStepRect", function() {
     
     beforeEach(inject(function(moveStepRect, Image, StepPositionService, StagePositionService, StepMovementRightService, 
     StageMovementLeftService, StepMoveVoidSpaceLeftService, StepMovementLeftService, StageMovementRightService,
-    StepMoveVoidSpaceRightService, ExperimentLoader) {
+    StepMoveVoidSpaceRightService, ExperimentLoader, addStageService) {
         
         _StepPositionService = StepPositionService;
         _StagePositionService = StagePositionService;
@@ -20,6 +20,7 @@ describe("Testing moveStepRect", function() {
         _StageMovementRightService = StageMovementRightService;
         _StepMoveVoidSpaceRightService = StepMoveVoidSpaceRightService;
         _ExperimentLoader = ExperimentLoader;
+        _addStageService = addStageService;
         var obj = {
             imageobjects: {
                 "drag-footer-image.png": Image.create()
@@ -86,14 +87,13 @@ describe("Testing moveStepRect", function() {
         spyOn(indicator, "changeText").and.callFake(function() {
             return true;
         });
-        spyOn(step.parentStage, "adjustHeader");
+        
         indicator.init(step, footer, C, backupStageModel);
 
         expect(_StagePositionService.getPositionObject).toHaveBeenCalled();
         expect(_StagePositionService.getAllVoidSpaces).toHaveBeenCalled();
         expect(_StepPositionService.getPositionObject).toHaveBeenCalled();
         expect(indicator.changeText).toHaveBeenCalled();
-        expect(step.parentStage.adjustHeader).toHaveBeenCalled();
     });
 
     it("It should test init method [all setters]", function() {
@@ -416,10 +416,11 @@ describe("Testing moveStepRect", function() {
                 }
             };
         });
+
         indicator.kanvas = {
             allStageViews: [
                 {
-                    moveAllStepsAndStagesSpecial: function() {}
+                    moveAllStepsAndStages: function() {}
                 }
             ]
         };
@@ -469,7 +470,7 @@ describe("Testing moveStepRect", function() {
         indicator.kanvas = {
             allStageViews: [
                 {
-                    moveAllStepsAndStagesSpecial: function() {}
+                    moveAllStepsAndStages: function() {}
                 }
             ]
         };
@@ -505,26 +506,23 @@ describe("Testing moveStepRect", function() {
         var step = {
             parentStage: {
                 deleteStageContents: function() {},
-                childSteps: [
-                    
-                ],
+                childSteps: {
+                    length: 0
+                },
                 previousStage: {
 
                 }
             }
         };
-        indicator.kanvas = {
-            addNewStage: function() {},
-            addNewStageAtBeginning: function() {}
-        };
+        
         indicator.currentDrop = "NOTHING";
-        spyOn(indicator.kanvas, "addNewStage").and.returnValue(true);
+        spyOn(_addStageService, "addNewStage").and.returnValue(true);
         spyOn(step.parentStage, "deleteStageContents");
 
         indicator.manageSingleStepStage(step);
 
         expect(step.parentStage.deleteStageContents).toHaveBeenCalled();
-        expect(indicator.kanvas.addNewStage).toHaveBeenCalled();
+        expect(_addStageService.addNewStage).toHaveBeenCalled();
 
     });
 
@@ -533,24 +531,21 @@ describe("Testing moveStepRect", function() {
         var step = {
             parentStage: {
                 deleteStageContents: function() {},
-                childSteps: [
-                    
-                ],
+                childSteps: {
+                    length: 0
+                },
                 
             }
         };
-        indicator.kanvas = {
-            addNewStage: function() {},
-            addNewStageAtBeginning: function() {}
-        };
+        
         indicator.currentDrop = "NOTHING";
-        spyOn(indicator.kanvas, "addNewStageAtBeginning").and.returnValue(true);
+        spyOn(_addStageService, "addNewStageAtBeginning").and.returnValue(true);
         spyOn(step.parentStage, "deleteStageContents");
 
         indicator.manageSingleStepStage(step);
 
         expect(step.parentStage.deleteStageContents).toHaveBeenCalled();
-        expect(indicator.kanvas.addNewStageAtBeginning).toHaveBeenCalled();
+        expect(_addStageService.addNewStageAtBeginning).toHaveBeenCalled();
 
     });
 });
