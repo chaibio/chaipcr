@@ -143,7 +143,7 @@ angular.module("canvasApp").factory('step', [
 
         this.rampSpeedText.text = String(this.model.ramp.rate + "º C/s");
         var rampRate = Number(this.model.ramp.rate);
-        if(!rampRate || rampRate == 5) {
+        if(!rampRate || rampRate >= 5 || rampRate <=0) {
           this.rampSpeedGroup.setVisible(false);
         } else {
           this.rampSpeedGroup.setVisible(true);
@@ -221,7 +221,7 @@ angular.module("canvasApp").factory('step', [
 
       this.rampSpeedGraphics = function() {
         stepGraphics.rampSpeed.call(this);
-        if(this.rampSpeedNumber <= 0) {
+        if(this.rampSpeedNumber >= 5) {
           this.rampSpeedGroup.setVisible(false);
         }
       };

@@ -101,7 +101,7 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
             alerts.showMessage(warningMessageLimitExceeded, scope);
             return;
 
-          } else if(! isNaN(scope.shown) && Number(scope.shown) < 7 && Number(scope.shown) >= 0) {
+          } else if(! isNaN(scope.shown) && Number(scope.shown) < 6 && Number(scope.shown) >= 0) {
 
             if(editValue != Number(scope.shown)) {
 
