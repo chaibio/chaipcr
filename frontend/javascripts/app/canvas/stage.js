@@ -43,7 +43,7 @@ angular.module("canvasApp").factory('stage', [
     */
 
     return function(model, kanvas, index, insert, $scope) {
-
+      
       this.model = model;
       this.index = index;
       this.canvas = kanvas.canvas;
