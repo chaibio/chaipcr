@@ -118,6 +118,19 @@ describe("Testing moveStepRect", function() {
         
     });
 
+    it("It should test initForOneStepStage method, which is specifically handle one step stage", function() {
+
+        spyOn(indicator, "changeText").and.callFake(function() {
+            return true;
+        });
+        spyOn(indicator, "tagSteps").and.returnValue(true);
+
+        indicator.initForOneStepStage(step, footer, C, backupStageModel);
+        
+        expect(indicator.changeText).not.toHaveBeenCalled();
+        expect(indicator.tagSteps).not.toHaveBeenCalled();
+
+    });
     it("It should test tagSteps method", function() {
         
         indicator.tagSteps(step);
