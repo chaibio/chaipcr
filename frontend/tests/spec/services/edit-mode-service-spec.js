@@ -168,6 +168,9 @@ describe("Testing editModeService", function() {
                 setVisible: function() {},
                 setCoords: function() {}
             },
+            model: {
+                hold_time: 0
+            },
             index: 1,
             parentStage: {
                 model: {
@@ -206,6 +209,9 @@ describe("Testing editModeService", function() {
             dots: {
                 setVisible: function() {},
                 setCoords: function() {}
+            },
+            model: {
+                hold_time: 2
             },
             index: 0,
             parentStage: {
@@ -246,6 +252,9 @@ describe("Testing editModeService", function() {
             dots: {
                 setVisible: function() {},
                 setCoords: function() {}
+            },
+            model: {
+                hold_time: 2
             },
             index: 1,
             parentStage: {
@@ -447,5 +456,15 @@ describe("Testing editModeService", function() {
         expect(stage.stageNameGroup.setCoords).not.toHaveBeenCalled();
         
         expect(stage.stageHeader).toHaveBeenCalled();
+    });
+
+    it("It should test temporaryChangeForStatus", function() {
+
+        var stage = {}, tempStat = false;
+        _editModeService.status = true;
+        spyOn(_editModeService, "editModeStageChanges").and.returnValue(true);
+        _editModeService.temporaryChangeForStatus(tempStat, stage);
+        expect(_editModeService.editModeStageChanges).toHaveBeenCalled();
+        expect(_editModeService.status).toEqual(true);
     });
 });
