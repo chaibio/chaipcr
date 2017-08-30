@@ -23,12 +23,6 @@ Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
 </description>
           <defaultValue>/usr/share/nginx/html/download</defaultValue>
         </hudson.model.StringParameterDefinition>
-        <hudson.model.BooleanParameterDefinition>
-          <name>low_performance</name>
-          <description>Reduce cpu performance for a better stability.
-</description>
-          <defaultValue>false</defaultValue>
-        </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -172,7 +166,7 @@ apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D284E608A4C46402
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CF979FFA3D3D3ACC
 
 apt-get update
-apt-get install xz-utils parted cpufrequtils git -y -q
+apt-get install xz-utils parted git -y -q
 
 #no reformating
 exit 0

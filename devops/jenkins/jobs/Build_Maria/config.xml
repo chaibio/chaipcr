@@ -25,12 +25,6 @@
 </description>
           <defaultValue>/usr/share/nginx/html/download</defaultValue>
         </hudson.model.StringParameterDefinition>
-        <hudson.model.BooleanParameterDefinition>
-          <name>low_performance</name>
-          <description>Reduce cpu performance for a better stability.
-</description>
-          <defaultValue>false</defaultValue>
-        </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -144,16 +138,21 @@ lsblk
 df -h
 dpkg --configure -a
 swapoff -a
-umount /dev/mmcblk0p*
-
+umount /dev/mmcblk0p* || true
 lsblk
+</command>
+      <execEachLine>true</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>
 if mount | grep mmcblk0
 then
   echo &quot;Error: can&apos;t unmount sdcard!&quot;
   exit 1
 fi
 
-</command>
+exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
@@ -180,14 +179,7 @@ apt-get install xz-utils parted cpufrequtils git -y -q
 exit 0
 
 </command>
-      <execEachLine>false</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
-      <command>exit 0
-
-</command>
-      <execEachLine>false</execEachLine>
+      <execEachLine>true</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -245,12 +237,8 @@ apt-get -y -q upgrade
 apt-get -f -y -q install
 
 exit 0</command>
-      <execEachLine>false</execEachLine>
+      <execEachLine>true</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <hudson.tasks.Shell>
-      <command>exit 0
-</command>
-    </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo arranging to build mariadb
@@ -258,12 +246,15 @@ df -h
 
 apt-get -q -y install gcc g++
 
-if g++ --version | grep &quot;4.9&quot;
+</command>
+      <execEachLine>true</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>if g++ --version | grep &quot;4.9&quot;
 then
-echo new g++ version is installed
-
+     echo new g++ version is installed
 else
-
 if ! apt-get -q -y install gcc g++
 then
     echo error downloading gcc 4.8.. trying 4.7
@@ -308,7 +299,12 @@ then
    exit 1
 fi
 
-echo arranging the sdcard
+</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo arranging the sdcard
 
 swapoff -a || :
 umount /sdcard/*  || :
@@ -317,24 +313,14 @@ umount /dev/mmcblk0p*  || :
 ln -sf /usr/bin/ld /usr/bin/ld.gold
 echo 1500 &gt; /proc/sys/kernel/hung_task_timeout_secs
 
-LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
+</command>
+      <execEachLine>true</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
 ,,0xe,*
 __EOF__
-
-partprobe /dev/mmcblk0
-mkfs.ext4 /dev/mmcblk0p1 -F
-mkdir -p /sdcard/upgrade  || :
-mount /dev/mmcblk0p1 /sdcard/upgrade/ 
-
-# creating a temporary swap file on sdcard
-sudo fallocate -l 3G /sdcard/upgrade/swapfile #or dd if=/dev/zero of=/sdcard/upgrade/swapfile bs=10M count=300
-sudo chmod 600 /sdcard/upgrade/swapfile
-sudo mkswap /sdcard/upgrade/swapfile
-sudo swapon /sdcard/upgrade/swapfile
-#verifying swap file is successfully added
-sudo swapon -s
-
-free -m
 
 cmake_version=$(cmake --version | sed -n &apos;s/^cmake version \([0-9]*\.[0-9]*\)\..*$/\1/p&apos;)
 echo CMake version is $cmake_version
@@ -356,6 +342,26 @@ then
    rm -r cmake-3.6.1*
 fi 
 
+</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>partprobe /dev/mmcblk0
+mkfs.ext4 /dev/mmcblk0p1 -F
+mkdir -p /sdcard/upgrade  || :
+mount /dev/mmcblk0p1 /sdcard/upgrade/ 
+
+# creating a temporary swap file on sdcard
+sudo fallocate -l 3G /sdcard/upgrade/swapfile #or dd if=/dev/zero of=/sdcard/upgrade/swapfile bs=10M count=300
+sudo chmod 600 /sdcard/upgrade/swapfile
+sudo mkswap /sdcard/upgrade/swapfile
+sudo swapon /sdcard/upgrade/swapfile
+#verifying swap file is successfully added
+sudo swapon -s
+
+free -m
+
 apt-get -y -q install lsb-release clang
 apt-get install bison -y
 apt-get install libcurl4-openssl-dev -y
@@ -371,18 +377,8 @@ apt-get -q -y install parted git build-essential curl python pkg-config libssl-d
 
 apt-get -f -y -q install
 
-cpufreq-info
-cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-
-if $low_performance
-then
-   echo GOVERNOR=\&quot;conservative\&quot; &gt;&gt; /etc/default/cpufrequtils
-   cpufreq-set -f 300MHz -g conservative
-   cpufreq-set -g conservative --max 300MHz
-fi
-
 exit 0</command>
-      <execEachLine>false</execEachLine>
+      <execEachLine>true</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
@@ -404,19 +400,18 @@ sudo apt-get -y -q remove --purge mysql-server mysql-client mysql-common
 sudo apt-get -y -q autoremove
 sudo apt-get -y -q autoclean
 
-mariadb_version=10.0
-git clone -b $mariadb_version https://github.com/MariaDB/server.git
-cd server
-
-#wget $download_prefix/mariadb-10.0.16.tar.gz -O mariadb-10.0.16.tar.gz
-#tar xfv mariadb-10.0.16.tar.gz
-#cd mariadb-10.0.16
-
 mkdir -p /data/mysql  || :
 
-groupadd -g 40 mysql
-useradd -c &quot;MySQL Server&quot; -d /data/mysql -g mysql -s /bin/false -u 40 mysql
+groupadd -g 40 mysql  || :
+useradd -c &quot;MySQL Server&quot; -d /data/mysql -g mysql -s /bin/false -u 40 mysql  || :</command>
+      <execEachLine>true</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>cd /sdcard/upgrade/maria/
+git clone -b 10.0 https://github.com/MariaDB/server.git
 
+cd /sdcard/upgrade/maria/server
 cmake -DCMAKE_BUILD_TYPE=Release                       \
       -DCMAKE_INSTALL_PREFIX=/usr                      \
       -DINSTALL_MANDIR=share/man                       \
@@ -436,21 +431,21 @@ cmake -DCMAKE_BUILD_TYPE=Release                       \
       -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
       .
     
-make
+
 
 </command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>cd /sdcard/upgrade/maria/mariadb-10.0.16
-make install
+      <command>cd /sdcard/upgrade/maria/server &amp;&amp; make
+cd /sdcard/upgrade/maria/server &amp;&amp; make install
 </command>
-      <execEachLine>false</execEachLine>
+      <execEachLine>true</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>cd /sdcard/upgrade/maria/mariadb-10.0.16
+      <command>cd /sdcard/upgrade/maria/server
 
 install -v -dm 755 /etc/mysql
 cat &gt; /etc/mysql/my.cnf &lt;&lt; &quot;EOF&quot;
@@ -530,27 +525,29 @@ innodb_defragment_n_pages = 32
 
 # End /etc/mysql/my.cnf
 EOF
-
+</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>
 mysql_install_db --basedir=/usr --datadir=/data/mysql --user=mysql
 chown -R mysql:mysql /data/mysql
 
 install -v -m755 -o mysql -g mysql -d /run/mysqld
 mysqld_safe --user=mysql 2&gt;&amp;1 &gt;/dev/null &amp;
 
-cd /sdcard/upgrade/maria/
-tar fcz mariadb-10.0.16-build.tar.gz mariadb-10.0.16
+cd /sdcard/upgrade/maria/ &amp;&amp; tar fcz mariadb-10.0.16-build.tar.gz server
 
 cd
-sync</command>
-      <execEachLine>false</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
-      <command>echo test finished. cleaning..
+sync
+echo archiving finished. cleaning..
 swapoff /sdcard/upgrade/swapfile
+sync
 rm /sdcard/upgrade/swapfile
-</command>
-      <execEachLine>false</execEachLine>
+
+exit 0</command>
+      <execEachLine>true</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>echo uploading mariadb file to server
@@ -564,23 +561,18 @@ chmod 777 $local_download_folder/mariadb-10.0.16-build.tar.gz
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo cleaning up
-cd /sdcard/upgrade/maria/
+cd /sdcard/upgrade/maria/ 
 
-ls -ahl
-
+ls -ahl  /sdcard/upgrade/maria/
 cd ..
 
-rm -r maria
+rm -r  /sdcard/upgrade/maria
 sync
-ls -ahl
-
-cpufreq-info
-cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+ls -ahl /sdcard/upgrade/maria/
 
 echo all done
-exit 0
 </command>
-      <execEachLine>false</execEachLine>
+      <execEachLine>true</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
   </builders>
   <publishers/>

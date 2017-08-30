@@ -15,11 +15,6 @@
           <defaultValue>10.0.100.240</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
-          <name>low_performance</name>
-          <description>Set cpu to lowest performance.</description>
-          <defaultValue>false</defaultValue>
-        </hudson.model.BooleanParameterDefinition>
-        <hudson.model.BooleanParameterDefinition>
           <name>bypass_pru</name>
           <description>Will not install PRU work</description>
           <defaultValue>true</defaultValue>
@@ -38,7 +33,7 @@
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.3.2">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.5.1">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
@@ -234,8 +229,8 @@ ENDSSH
 		rm -r tmp || true
 	 	mkdir tmp || true
         cd tmp
-		git clone $branch_param https://github.com/chaibio/chaipcr.git
-        cd chaipcr
+		git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
+        cd chaipcr || exit 1
         cat deploy.sh
         echo | ./deploy.sh $build_machine
 
@@ -249,6 +244,9 @@ exit 1</command>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Setup MySQL
+
+mkdir /data /perm || true
+
 systemctl stop mysql.service
 mount /dev/mmcblk1p2 /data || true
 mount /dev/mmcblk1p3 /perm || true
@@ -258,31 +256,18 @@ sed -i &quot;s,datadir.*=.*,datadir=/data/mysql,g&quot; /etc/mysql/my.cnf # Edit
 systemctl start mysql.service
 
 sync
-
-echo realtime compile
-
-cpufreq-info
-cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-if $low_performance
-then
-    cpufreq-set -f 300MHz 
-    cpufreq-set -g conservative --max 300MHz
-fi
-
-sync
-
 cd
 echo unmounting any sdcard folders
 umount /sdcard/*
 umount /dev/mmcblk0p*
 
-LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
+LC_ALL=C /sbin/sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
 ,,0x83,*
 __EOF__
 
-partprobe /dev/mmcblk0
-mkfs.ext4 /dev/mmcblk0p1 -F
-mkdir -p /sdcard/upgrade
+/sbin/partprobe /dev/mmcblk0
+/sbin/mkfs.ext4 /dev/mmcblk0p1 -F
+mkdir -p /sdcard/upgrade || true
 if mount /dev/mmcblk0p1 /sdcard/upgrade/
 then
     echo &quot;temp sdcard folder mounted&quot;
@@ -299,6 +284,7 @@ else
    echo &quot;failed creating swap file&quot;
    exit 1
 fi
+
 sudo chmod 600 /sdcard/upgrade/swapfile
 sudo mkswap /sdcard/upgrade/swapfile
 sudo swapon /sdcard/upgrade/swapfile
@@ -307,19 +293,20 @@ sudo swapon /sdcard/upgrade/swapfile
 sudo swapon -s
 
 free -m
-
-
 echo browser compile
 cd /sdcard/upgrade/
+rm -r compile-browser || true
 mkdir compile-browser
 cd compile-browser/
-git clone https://github.com/chaibio/chaipcr.git
-cd /sdcard/upgrade/compile-browser/chaipcr/browser/
+git clone https://github.com/chaibio/chaipcr.git || exit 1
+cd /sdcard/upgrade/compile-browser/chaipcr/browser/ || exit 1
 
-/opt/QtEmbedded/bin/qmake
+rm /sdcard/upgrade/compile-browser/chaipcr/realtime/libraries/lib/libPoco*
+
+/opt/QtEmbedded/bin/qmake || exit 1
 sed -i &quot;s/arm-unknown-linux-gnueabi-//&quot; Makefile
-make
-make install
+make || exit 1
+make install || exit 1
 #cp realtime ~/tmp
 #cp libraries/lib/* /usr/lib/
 cd /sdcard/upgrade/
@@ -330,6 +317,7 @@ echo done compiling browser
 free -m
 sync
 
+rm -r /sdcard/upgrade/realtime-compile || true
 mkdir -p /sdcard/upgrade/realtime-compile
 cd /sdcard/upgrade/realtime-compile
 
@@ -343,18 +331,18 @@ else
      echo Cloning branch $branch_param
 fi
 
-git clone $branch_param https://github.com/chaibio/chaipcr.git
-cd /sdcard/upgrade/realtime-compile/chaipcr/realtime
+git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
+cd /sdcard/upgrade/realtime-compile/chaipcr/realtime || exit 1
 
 cp util/instance.h control/
 rm libraries/lib/libPoco*
 
 #qmake
-/opt/QtEmbedded/bin/qmake
+/opt/QtEmbedded/bin/qmake || exit 1
 
 sed -i &quot;s/arm-unknown-linux-gnueabi-//&quot; Makefile
-make
-make install
+make || exit 1
+make install || exit 1
 #cp realtime ~/tmp
 cp libraries/lib/* /usr/lib/
 cd
@@ -762,15 +750,6 @@ exit 1
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo device is still connectable!
-
-cpufreq-info
-cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-if $low_performance
-then
-    cpufreq-set -f 300MHz 
-    cpufreq-set -g conservative --max 300MHz
-fi
-
 cd
 echo unmounting any sdcard folders
 umount /sdcard/*

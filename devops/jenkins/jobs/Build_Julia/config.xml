@@ -23,12 +23,6 @@ Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
 </description>
           <defaultValue>/usr/share/nginx/html/download</defaultValue>
         </hudson.model.StringParameterDefinition>
-        <hudson.model.BooleanParameterDefinition>
-          <name>low_performance</name>
-          <description>Reduce cpu performance for a better stability.
-</description>
-          <defaultValue>false</defaultValue>
-        </hudson.model.BooleanParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>building_version</name>
           <description></description>
@@ -171,9 +165,7 @@ fi
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command># download flasher image
-#wget https://rcn-ee.com/rootfs/bb.org/testing/2016-10-09/console/BBB-blank-debian-8.6-console-armhf-2016-10-09-2gb.img.xz
-
+      <command>
 swapoff -a
 mount -o remount,rw /
 
@@ -187,7 +179,7 @@ apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D284E608A4C46402
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CF979FFA3D3D3ACC
 
 apt-get update
-apt-get install xz-utils parted cpufrequtils git -y -q
+apt-get install xz-utils parted git -y -q
 
 #no reformating
 exit 0
@@ -251,20 +243,9 @@ exit 1</command>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>exit 0
-</command>
-      <execEachLine>false</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <hudson.tasks.Shell>
-      <command>exit 0
-</command>
-    </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
       <command>echo Starting building Julia on $build_machine
 apt-get update
 apt-get -y -q upgrade
-
 apt-get -f -y -q install
 
 exit 0
@@ -280,19 +261,17 @@ if ! apt-get -q -y install gcc-4.8 g++-4.8
 then
     echo error downloading gcc 4.8.. trying 4.7
     apt-get -q -y install g++-4.7
-if apt-get -q -y install gcc-4.7
-then
-  apt-get clean
-  apt-get autoclean
-  dpkg --configure -a
-  rm /usr/bin/gcc
-  rm /usr/bin/g++
-  ln -s /usr/bin/gcc-4.7 /usr/bin/gcc
-  ln -s /usr/bin/g++-4.7 /usr/bin/g++
+    if apt-get -q -y install gcc-4.7
+    then
+      apt-get clean
+      apt-get autoclean
+      dpkg --configure -a
+      rm /usr/bin/gcc
+      rm /usr/bin/g++
+      ln -s /usr/bin/gcc-4.7 /usr/bin/gcc
+      ln -s /usr/bin/g++-4.7 /usr/bin/g++
+    fi
 fi
-
-fi
-
 
 apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential
 dpkg --configure -a
@@ -354,8 +333,8 @@ echo Building CMake
    tar xfv cmake-3.6.1.tar.gz
    cd cmake-3.6.1
    ./bootstrap
-   make
-   make install
+   make || exit 1
+   make install || exit 1
    cd ..
    rm -r cmake-3.6.1*
 
@@ -370,7 +349,7 @@ apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-d
 
 apt-get -f -y -q install
 
-apt-get install -q -y libarpack2 libblas3 libgfortran3 liblapack3 ntpdate cpufrequtils
+apt-get install -q -y libarpack2 libblas3 libgfortran3 liblapack3 ntpdate
 apt-get -f -y -q install
 
 apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3 
@@ -378,17 +357,6 @@ apt-get -y -q install libblas3 libatlas3-base
 apt-get -y -q install libblas-common libfftw3-double3 libfftw3-single3 libllvm3.8 libmetis5 libopenblas-base libunwind8 
 
 apt-get -f -y -q install
-
-cpufreq-info
-cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-
-if $low_performance
-then
-   echo GOVERNOR=\&quot;conservative\&quot; &gt;&gt; /etc/default/cpufrequtils
-   cpufreq-set -f 300MHz -g conservative
-   cpufreq-set -g conservative --max 300MHz
-fi
-
 exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
@@ -483,7 +451,7 @@ EOF
 
 
 
-make install 
+make install  || exit 1
 ln -s /usr/share/julia/bin/julia /usr/bin/julia
 
 echo precompiling mandatory packages.
@@ -581,9 +549,6 @@ rm -r julia-compile
 rm -r /root/.julia
 sync
 ls -ahl
-
-cpufreq-info
-cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 
 echo all done
 
