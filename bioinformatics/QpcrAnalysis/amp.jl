@@ -90,23 +90,31 @@ function process_amp(
     exp_id::Integer,
     asrp_vec::AbstractVector,
     calib_info::Union{Integer,OrderedDict};
-    # start: arguments that might be passed by upstream code
+
+    # arguments that might be passed by upstream code
     well_nums::AbstractVector=[],
     min_reliable_cyc::Real=5,
     baseline_cyc_bounds::AbstractArray=[],
     cq_method::String="Cy0",
     ct_fluos::AbstractVector=[],
-    # end: arguments that might be passed by upstream code
+
     max_cycle::Integer=1000, # maximum temperature to analyze
     dcv::Bool=true, # logical, whether to perform multi-channel deconvolution
     dye_in::String="FAM", dyes_2bfild::AbstractVector=[],
     qt_prob_rc::Real=0.9, # quantile probablity for fluo values per well
     af_key::String="sfc",
+
     kwdict_mbq::Associative=OrderedDict(), # keyword arguments passed onto `mod_bl_q`
     ipopt_print2file_prefix::String="", # file prefix for Ipopt print for `mod_bl_q`
+
     kwdict_rc::Associative=OrderedDict(), # keyword arguments passed onto `report_cq!`,
+
+    # allelic discrimination
     ad_cycs::Union{Integer,AbstractVector}=0, # allelic discrimination: cycles of fluorescence to be used, 0 means the last cycle
-    ad_cluster_method::String="k-medoids", # allelic discrimination: "k-means", "k-medoids"
+    cluster_method::String="k-medoids", # allelic discrimination: "k-means", "k-medoids"
+    expected_genotypes_raw::AbstractMatrix=DEFAULT_egr, # each column is a vector of binary genotype whose length is number of channels (0 => no signal, 1 => yes signal)
+    categ_well_vec::AbstractVector=CATEG_WELL_VEC,
+
     out_sr_dict::Bool=true, # output an OrderedDict keyed by `sr_str`s
     out_format::String="json", # "full", "pre_json", "json"
     json_digits::Integer=JSON_DIGITS,
@@ -219,7 +227,7 @@ function process_amp(
             dye_in, dyes_2bfild,
             min_reliable_cyc, baseline_cyc_bounds, cq_method, ct_fluos, af_key, kwdict_mbq, ipopt_print2file_prefix,
             qt_prob_rc, kwdict_rc,
-            ad_cycs, ad_cluster_method,
+            ad_cycs, cluster_method, expected_genotypes_raw, categ_well_vec,
             out_format_1sr, json_digits, verbose
         )
     end) # do sr_ele
@@ -605,7 +613,9 @@ function process_amp_1sr(
     qt_prob_rc::Real, # quantile probablity for fluo values per well
     kwdict_rc::Associative, # keyword arguments passed onto `report_cq`
     ad_cycs::Union{Integer,AbstractVector},
-    ad_cluster_method::String,
+    cluster_method::String,
+    expected_genotypes_raw::AbstractMatrix,
+    categ_well_vec::AbstractVector,
     out_format::String, # "full", "pre_json", "json"
     json_digits::Integer,
     verbose::Bool
@@ -772,7 +782,7 @@ function process_amp_1sr(
 
     # allelic discrimination
     if dcv
-        full_amp_out.cluster_result_dict, full_amp_out.assignments_adj_labels_dict = process_ad(full_amp_out, ad_cycs, ad_cluster_method)
+        full_amp_out.cluster_result_dict, full_amp_out.assignments_adj_labels_dict = process_ad(full_amp_out, ad_cycs, cluster_method, expected_genotypes_raw, categ_well_vec)
     end # if dcv
 
 
