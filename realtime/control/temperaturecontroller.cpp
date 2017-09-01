@@ -70,6 +70,8 @@ void TemperatureController::setEnableMode(bool enableMode, bool enablePid)
             _pidState = false;
         }
 
+        _targetTemperature = _minTargetTemp;
+
         resetOutput();
     }
 }
