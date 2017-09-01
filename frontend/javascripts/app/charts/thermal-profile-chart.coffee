@@ -95,26 +95,27 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
       .attr('height', @height)
       .attr('fill', 'transparent')
       .on('mouseenter', =>
-        @toggleCirclesVisibility(true)
+        @toggleMouseIndicatorsVisibility(true)
       )
       .on('mouseout', =>
-        @toggleCirclesVisibility(false)
+        @toggleMouseIndicatorsVisibility(false)
       )
       .on('mousemove', => 
         @followTheMouse()
       )
 
-  toggleCirclesVisibility: (show) ->
+  toggleMouseIndicatorsVisibility: (show) ->
     opacity = if show then 1 else 0
     @dashedLine.attr('opacity', opacity) if @dashedLine
+    @xAxisCircle.attr('opacity', opacity) if @xAxisCircle
     @circles.forEach (circle) ->
       circle.attr('opacity', opacity)
-    @xAxisCircle.attr('opacity', opacity) if @xAxisCircle
 
 
   followTheMouse: ->
     return if @isZooming or !@hasData()
-    @toggleCirclesVisibility(true)
+    opacity = if @isZooming then 0 else 1
+    @toggleMouseIndicatorsVisibility(!@isZooming)
     x = d3.mouse(@mouseOverlay.node())[0]
 
     @lines.forEach (path, i) =>
@@ -145,13 +146,14 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
 
     if @dashedLine
       @dashedLine
-        .attr("opacity", 1)
+        .attr("opacity", opacity)
         .attr('x1', x)
         .attr('x2', x)
 
     if @xAxisCircle
       x = d3.mouse(@chartSVG.node())[0];
       @xAxisCircle
+        .attr("opacity", opacity)
         .attr("cx", x)
         .attr("cy", @height + @config.margin.top)
 

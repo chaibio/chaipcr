@@ -33,6 +33,7 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
         },
         y: {
           label: 'Temperature (°C)'
+          ticks: 8
           min: 0
           max: 120
           tickFormat: (t) ->

@@ -41,18 +41,18 @@ class BaseChart
     return mouse
 
   getPathConfig: (path) ->
-      activePathConfig = null
-      activePathIndex = null
+    activePathConfig = null
+    activePathIndex = null
 
-      for line, i in @lines by 1
-        if line is path
-          activePathConfig = @config.series[i]
-          activePathIndex = i
-          break
-      return {
-        config: activePathConfig,
-        index: activePathIndex,
-      }
+    for line, i in @lines by 1
+      if line is path
+        activePathConfig = @config.series[i]
+        activePathIndex = i
+        break
+    return {
+      config: activePathConfig,
+      index: activePathIndex,
+    }
 
   hideMouseIndicators: ->
     @circle.attr('opacity', 0) if @circle
@@ -406,14 +406,16 @@ class BaseChart
     @drawLines()
 
   getMinX: ->
+    return @config.axes.x.min if @config.axes.x.min
     min = d3.min @config.series, (s) =>
       d3.min @data[s.dataset], (d) => d[s.x]
     return min || 0
 
   getMaxX: ->
-      max = d3.max @config.series, (s) =>
-        d3.max @data[s.dataset], (d) => d[s.x]
-      return max || 1
+    return @config.axes.x.max if @config.axes.x.max
+    max = d3.max @config.series, (s) =>
+      d3.max @data[s.dataset], (d) => d[s.x]
+    return max || 1
 
   getMinY: ->
     return @config.axes.y.min if @config.axes.y.min
@@ -1088,6 +1090,46 @@ class BaseChart
       text.text(minY)
       textWidth = text.node().getBBox().width
       text.attr('x', @config.margin.left - (offsetRight + text.node().getBBox().width))
+    
+    @updateLastAxesTicks()
+
+  updateLastAxesTicks: ->
+    spacingX = 5
+    spacingY = 1
+    xAxisLeftExtremeValueText = @xAxisLeftExtremeValueText
+    xAxisRightExtremeValueText = @xAxisRightExtremeValueText
+    yAxisLowerExtremeValueText = @yAxisLowerExtremeValueText
+    yAxisUpperExtremeValueText = @yAxisUpperExtremeValueText
+    # x ticks
+    ticks = @chartSVG.selectAll('g.axis.x-axis > g.tick')
+    width = @width
+    num_ticks = ticks.size()
+    ticks.each (d, i) ->
+      if (i is 0)
+        textWidth = xAxisLeftExtremeValueText.node().getBBox().width
+        x = this.transform.baseVal[0].matrix.e
+        if x < textWidth + spacingX
+          d3.select(this).attr('opacity', 0)
+      if (i is num_ticks - 1)
+        textWidth = xAxisRightExtremeValueText.node().getBBox().width
+        x = this.transform.baseVal[0].matrix.e
+        if x >  width - (textWidth + spacingX)
+          d3.select(this).attr('opacity', 0)
+    # y ticks
+    ticks = @chartSVG.selectAll('g.axis.y-axis > g.tick')
+    num_ticks = ticks.size()
+    height = @height
+    ticks.each (d, i) ->
+      if (i is 0)
+        textHeight = yAxisLowerExtremeValueText.node().getBBox().height
+        y = this.transform.baseVal[0].matrix.f
+        if y >  height - (textHeight + spacingY)
+          d3.select(this).attr('opacity', 0)
+      if (i is num_ticks - 1)
+        textHeight = yAxisUpperExtremeValueText.node().getBBox().height
+        y = this.transform.baseVal[0].matrix.f
+        if y < textHeight + spacingY
+          d3.select(this).attr('opacity', 0)
 
   initChart: ->
     d3.select(@elem).selectAll("*").remove()
@@ -1098,7 +1140,7 @@ class BaseChart
     @zooomBehavior = d3.zoom()
       .on 'start', => @isZooming = true
       .on 'end', => @isZooming = false
-      .on 'zoom', => @zoomed.call(@)
+      .on 'zoom', => @zoomed()
 
     @chartSVG = d3.select(@elem).append("svg")
         .attr("width", @width + @config.margin.left + @config.margin.right)
@@ -1195,7 +1237,7 @@ class BaseChart
     mouseY = mouse[1]
     closestLineIndex
     distances = []
-    lineIndex
+    lineIndex = null
     maxDistance = 20 * @zoomTransform.k
 
     for l, lineIndex in @lines by 1
@@ -1260,9 +1302,6 @@ class BaseChart
     zoom_percent = zoom_percent || 0
     zoom_percent = if zoom_percent < 0 then 0 else ( if zoom_percent > 1 then 1 else zoom_percent)
     k = ((@getScaleExtent() - @getMinX()) * zoom_percent) + 1
-    console.log('getScaleExtent', @getScaleExtent())
-    console.log('getMinX', @getMinX())
-    console.log('k', k)
     @chartSVG.call(@zooomBehavior.scaleTo, k)
 
   updateSeries: (series) ->
