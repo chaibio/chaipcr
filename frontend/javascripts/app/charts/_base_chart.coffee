@@ -572,13 +572,6 @@ class BaseChart
     underlineStroke = 2
     lineWidth = 15
 
-    rect = textContainer.append('rect')
-        .attr('fill', '#fff')
-        .attr('width', conWidth)
-        .attr('height', conHeight)
-        .attr('y', @height + @config.margin.top + offsetTop)
-        .attr('x', @config.margin.left - (conWidth / 2))
-
     line = textContainer.append('line')
         .attr('stroke', '#000')
         .attr('stroke-width', underlineStroke)
@@ -633,7 +626,6 @@ class BaseChart
         @onLeftXAxisInput(input)
       )
 
-    rect.on 'click', => @onClickLeftXAxisInput(input)
     text.on 'click', => @onClickLeftXAxisInput(input)
 
     @xAxisLeftExtremeValueText = text
@@ -677,13 +669,6 @@ class BaseChart
     offsetTop = 8.5
     underlineStroke = 2
     lineWidth = 20
-
-    rect = textContainer.append('rect')
-        .attr('fill', '#fff')
-        .attr('width', conWidth)
-        .attr('height', conHeight)
-        .attr('y', @height + @config.margin.top + offsetTop)
-        .attr('x', @config.margin.left + @width - (conWidth / 2))
 
     line = textContainer.append('line')
         .attr('stroke', '#000')
@@ -741,7 +726,6 @@ class BaseChart
         @onInputRightXAxis(input)
       )
 
-    rect.on 'click', => @onClickRightXAxisInput(input)
     text.on 'click', => @onClickRightXAxisInput(input)
 
     @xAxisRightExtremeValueText = text
@@ -784,13 +768,6 @@ class BaseChart
       offsetTop = 2
       underlineStroke = 2
       lineWidth = 15
-
-      rect = textContainer.append('rect')
-        .attr('fill', '#fff')
-        .attr('width', conWidth)
-        .attr('height', conHeight)
-        .attr('y', @config.margin.top - (conHeight / 2) + offsetTop)
-        .attr('x', @config.margin.left - (conWidth + offsetRight))
 
       line = textContainer.append('line')
         .attr('opacity', 0)
@@ -848,10 +825,6 @@ class BaseChart
             .attr('width', inputWidth + inputContainerOffset)
             .attr('x', @config.margin.left - (inputWidth + offsetRight) - (inputContainerOffset / 2))
           input.style('width', (inputWidth + inputContainerOffset) + 'px')
-
-          rect
-            .attr('width', inputWidth)
-            .attr('x', @config.margin.left - (inputWidth + offsetRight))
         )
         .on('mouseout', ->
           line.attr('opacity', 0)
@@ -866,7 +839,6 @@ class BaseChart
           @onInputUpperYAxis(input)
         )
 
-      rect.on 'click', => @onClickUpperYAxisInput(input)
       text.on 'click', => @onClickUpperYAxisInput(input)
 
       @yAxisUpperExtremeValueText = text
@@ -920,13 +892,6 @@ class BaseChart
     offsetTop = 2
     underlineStroke = 2
     lineWidth = 15
-
-    rect = textContainer.append('rect')
-      .attr('fill', '#fff')
-      .attr('width', conWidth)
-      .attr('height', conHeight)
-      .attr('y', @height + @config.margin.top - (conHeight / 2) + offsetTop)
-      .attr('x', @config.margin.left - (conWidth + offsetRight))
 
     line = textContainer.append('line')
       .attr('opacity', 0)
@@ -984,10 +949,6 @@ class BaseChart
           .attr('width', inputWidth + inputContainerOffset)
           .attr('x', @config.margin.left - (inputWidth + offsetRight) - (inputContainerOffset / 2))
         input.style('width', (inputWidth + inputContainerOffset) + 'px')
-
-        rect
-          .attr('width', inputWidth)
-          .attr('x', @config.margin.left - (inputWidth + offsetRight))
       )
       .on('mouseout', ->
         line.attr('opacity', 0)
@@ -1002,7 +963,6 @@ class BaseChart
         @onInputLowerYAxis(input)
       )
 
-    rect.on 'click', => @onClickLowerYAxisInput(input)
     text.on 'click', => @onClickLowerYAxisInput(input)
 
     @yAxisLowerExtremeValueText = text
@@ -1090,7 +1050,7 @@ class BaseChart
       text.text(minY)
       textWidth = text.node().getBBox().width
       text.attr('x', @config.margin.left - (offsetRight + text.node().getBBox().width))
-    
+
     @updateLastAxesTicks()
 
   updateLastAxesTicks: ->
