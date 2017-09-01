@@ -47,6 +47,15 @@ function dispatch(action::String, request_body::String)
                     kwdict_pa1[parse(key)] = req_dict[key]
                 end
             end
+            if "categ_well_vec" in keys_req_dict
+                categ_well_vec = req_dict["categ_well_vec"]
+                for i in 1:length(categ_well_vec)
+                    if length(categ_well_vec[i][2]) == 0
+                        categ_well_vec[i][2] = Colon()
+                    end
+                end
+                kwdict_pa1[:categ_well_vec] = categ_well_vec
+            end
 
             # call
             process_amp( # can't use `return` to return within `try`

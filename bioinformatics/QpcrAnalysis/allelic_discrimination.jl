@@ -11,10 +11,10 @@ const DEFAULT_eg_LABELS = ["ntc", "homo_a", "homo_b", "hetero", "unclassified"]
 # const DEFAULT_eg_LABELS = ["homo_a", "homo_b", "hetero", "unclassified"]
 
 const CATEG_WELL_VEC = [
-    ("rbbs_ary3", []),
-    ("blsub_fluos", []),
-    ("d0", []),
-    ("cq", [])
+    ("rbbs_ary3", Colon()),
+    ("blsub_fluos", Colon()),
+    ("d0", Colon()),
+    ("cq", Colon())
 ]
 
 const kmeans_result_EMPTY = kmeans(1. * [1 2 3; 4 5 6], 2)
@@ -35,7 +35,7 @@ function prep_input_4ad(
     full_amp_out::AmpStepRampOutput, # one step/ramp of amplification output
     expected_genotypes_raw::AbstractMatrix, # each column is a vector of binary genotype whose length is number of channels (0 => no signal, 1 => yes signal)
     categ::String="fluo",
-    well_idc::AbstractVector=[],
+    well_idc::Union{AbstractVector,Colon}=Colon(),
     cycs::Union{Integer,AbstractVector}=1 # relevant if `categ == "fluo"`, last available cycle
     )
 
@@ -68,10 +68,6 @@ function prep_input_4ad(
         end # do cq_val
         expected_genotypes = 1 - expected_genotypes_raw
     end # if categ
-
-    if length(well_idc) == 0 # to support JSON format as an empty vector, because can't pass `Colon()` by JSON
-        well_idc = Colon()
-    end
 
     data = transpose(data_t[well_idc, :])
 
