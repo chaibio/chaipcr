@@ -29,6 +29,7 @@ HeatBlock::HeatBlock(HeatBlockZoneController* zone1, HeatBlockZoneController* zo
     _beginStepTemperatureThreshold = beginStepTemperatureThreshold;
     _maxRampSpeed = maxRampSpeed;
     _stepProcessingState = false;
+    _targetTempDirtyState = false;
 }
 
 HeatBlock::~HeatBlock() {
@@ -57,10 +58,15 @@ void HeatBlock::process() {
 }
 
 void HeatBlock::setEnableMode(bool enableMode) {
-    if (!enableMode) {
-        _stepProcessingMutex.lock();
+    if (enableMode) {
+        std::lock_guard<std::mutex> lock(_stepProcessingMutex);
+        _targetTempDirtyState = true;
+    }
+    else {
+        std::lock_guard<std::mutex> lock(_stepProcessingMutex);
         _stepProcessingState = false;
-        _stepProcessingMutex.unlock();
+        _targetTempDirtyState = false;
+        _ramp.clear();
     }
 
     _zones.first->setEnableMode(enableMode);
@@ -115,7 +121,15 @@ void HeatBlock::calculateTemperature() {
         std::lock_guard<std::mutex> lock(_stepProcessingMutex);
 
         if (!_ramp.isEmpty()) {
-            double temp = _ramp.computeTemperature(_zones.first->targetTemperature());
+            double temp = 0;
+
+            if (!_targetTempDirtyState) {
+                temp = _ramp.computeTemperature(_zones.first->targetTemperature());
+            }
+            else {
+                temp = _ramp.computeTemperature(_zones.first->currentTemperature());
+                _targetTempDirtyState = false;
+            }
 
             _zones.first->setTargetTemperature(temp);
             _zones.second->setTargetTemperature(temp);

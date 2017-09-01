@@ -24,18 +24,6 @@
           <description>Download folder URL</description>
           <defaultValue>http://10.0.1.20/download</defaultValue>
         </hudson.model.StringParameterDefinition>
-        <hudson.model.BooleanParameterDefinition>
-          <name>low_performance</name>
-          <description>Set cpu frequency to minimum for more stability.
-</description>
-          <defaultValue>false</defaultValue>
-        </hudson.model.BooleanParameterDefinition>
-        <hudson.model.BooleanParameterDefinition>
-          <name>kernel_49</name>
-          <description>Update to kernel TI LTS_4.9
-</description>
-          <defaultValue>true</defaultValue>
-        </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -253,7 +241,6 @@ fi
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command># download flasher image
-#wget https://rcn-ee.com/rootfs/bb.org/testing/2016-10-09/console/BBB-blank-debian-8.6-console-armhf-2016-10-09-2gb.img.xz
 
 swapoff -a
 mount -o remount,rw /
@@ -263,7 +250,7 @@ image_filename=bone-debian-8.8-console-armhf-2017-05-07-1gb.img.xz
 #bone-debian-7.11-console-armhf-2016-06-15-2gb.img.xz
 
 rm $image_filename || true
-wget $download_prefix/$image_filename
+wget $download_prefix/$image_filename || exit 1
 
 #Verify Image with:
 if sha256sum $image_filename | grep 09783052e6da931c6e05a230c221fa88889af3036723fb22d85404fb057d1d2f
@@ -283,10 +270,10 @@ apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1655A0AB68576280
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D284E608A4C46402
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CF979FFA3D3D3ACC
 
-apt-get update
+apt-get update || exit 1
 apt-get install -f -y -q
 
-apt-get install xz-utils parted  -y -q
+apt-get install xz-utils parted  -y -q  || exit 1
 apt-get install -f -y -q
 
 echo wrting to sdcard
@@ -314,7 +301,7 @@ echo done flashing sdcard
 sync
 partprobe /dev/mmcblk0
 echo patching sdcard
-mount /dev/mmcblk0p1 /mnt
+mount /dev/mmcblk0p1 /mnt  || exit 1
 cd /mnt/opt/scripts/tools/eMMC/
 
 echo first patching sshd_config
@@ -451,10 +438,10 @@ apt-get update
 apt-get autoremove
 apt-get install -y -q -f
 
-apt-get install -y -q git ntpdate 
+apt-get install -y -q git ntpdate  || exit 1
 apt-get install -y -q -f
 
-apt-get install -y -q unzip parted
+apt-get install -y -q unzip parted  || exit 1
 apt-get install -y -q -f
 
 apt-get install -y -q autoremove
@@ -474,10 +461,7 @@ ntpdate -b -s -u pool.ntp.org
 #        ./update_kernel.sh --kernel 4.4.24-ti-rt-r58
 #./update_kernel.sh --ti-rt-channel --lts-4_1
 
-if $kernel_49
-then
      ./update_kernel.sh --ti-channel --lts-4_9
-fi
 
 touch /forcefsck
 sync 
@@ -537,22 +521,12 @@ exit 1</command>
 
 apt-key update
 apt-get update
-apt-get -q -y install cpufrequtils
+
 apt-get -q -y upgrade
 apt-get -q -y dist-upgrade
 
 update-initramfs -u
 touch /forcefsck
-
-cpufreq-info
-cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-echo &quot;FSCKFIX=yes&quot; &gt;&gt; /etc/default/rcS
-#echo GOVERNOR=\&quot;conservative\&quot; &gt;&gt; /etc/default/cpufrequtils
-if $low_performance
-then
-    cpufreq-set -f 300MHz 
-    cpufreq-set -g conservative --max 300MHz
-fi
 
 lsblk
 df -h

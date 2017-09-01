@@ -27,7 +27,7 @@ window.ChaiBioTech.ngApp.directive('chaiScroll', [
       compile: function(elem, tAttr) {
         return {
           post: function($scope, elem, tAttr) {
-            console.log("this is post:", tAttr);
+            
             $scope.expName = tAttr.chaiScroll;
             $scope.normalScroll = 8;
             $scope.animationText = 'marquee '+ $scope.normalScroll +'s linear infinite';

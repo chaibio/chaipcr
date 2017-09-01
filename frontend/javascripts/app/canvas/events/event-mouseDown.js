@@ -102,7 +102,6 @@ angular.module("canvasApp").factory('mouseDown', [
             if(step.model.hold_time !== 0) {
             
               var backupStageModel = angular.copy(step.parentStage.model);
-              console.log("Lx", backupStageModel);
               movingStepGraphics.initiateMoveStepGraphics(step, C);
               // only if its not an infinite hold step we move the step
             

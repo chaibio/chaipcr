@@ -32,12 +32,15 @@ describe("Testing move-stage", function() {
         left: 100
     };
 
-    beforeEach(inject(function(moveStageRect, StagePositionService, ExperimentLoader, correctNumberingService) {
+    beforeEach(inject(function(moveStageRect, StagePositionService, ExperimentLoader, correctNumberingService, moveStageToSides ,
+    addStageService) {
         var me = {};
         indicator = moveStageRect.getMoveStageRect(me);
         _StagePositionService = StagePositionService;
         _ExperimentLoader = ExperimentLoader;
         _correctNumberingService = correctNumberingService;
+        _moveStageToSides = moveStageToSides;
+        _addStageService = addStageService;
     }));
 
     it("It should check if indicator exists", function() {
@@ -180,11 +183,11 @@ describe("Testing move-stage", function() {
                 },
             ];
 
-        spyOn(indicator.kanvas.allStageViews[0], "moveToSide");
+        spyOn(_moveStageToSides, "moveToSide");
         indicator.ifOverRightSideForOneStepStageCallback([33, 162, 291], 0);
 
         expect(_StagePositionService.getPositionObject).toHaveBeenCalled();
-        expect(indicator.kanvas.allStageViews[0].moveToSide).toHaveBeenCalled();
+        expect(_moveStageToSides.moveToSide).toHaveBeenCalled();
         expect(indicator.currentMoveRight).toEqual(0);
     });
 
@@ -237,11 +240,11 @@ describe("Testing move-stage", function() {
                 },
             ];
 
-        spyOn(indicator.kanvas.allStageViews[0], "moveToSide");
+        spyOn(_moveStageToSides, "moveToSide");
         indicator.ifOverLeftSideForOneStepStageCallback([33, 200, 291], 0);
 
         expect(_StagePositionService.getPositionObject).toHaveBeenCalled();
-        expect(indicator.kanvas.allStageViews[0].moveToSide).toHaveBeenCalled();
+        expect(_moveStageToSides.moveToSide).toHaveBeenCalled();
         expect(indicator.movedStageIndex).toEqual(0);
     });
     
@@ -292,11 +295,11 @@ describe("Testing move-stage", function() {
                 },
             ];
 
-        spyOn(indicator.kanvas.allStageViews[0], "moveToSide");
+        spyOn(_moveStageToSides, "moveToSide");
         indicator.ifOverRightSideCallback([33, 100, 291], 0);
 
         expect(_StagePositionService.getPositionObject).toHaveBeenCalled();
-        expect(indicator.kanvas.allStageViews[0].moveToSide).toHaveBeenCalled();
+        expect(_moveStageToSides.moveToSide).toHaveBeenCalled();
         expect(indicator.currentMoveRight).toEqual(0);
 
     });
@@ -348,11 +351,11 @@ describe("Testing move-stage", function() {
                 },
             ];
 
-        spyOn(indicator.kanvas.allStageViews[0], "moveToSide");
+        spyOn(_moveStageToSides, "moveToSide");
         indicator.ifOverLeftSideCallback([33, 200, 291], 0);
 
         expect(_StagePositionService.getPositionObject).toHaveBeenCalled();
-        expect(indicator.kanvas.allStageViews[0].moveToSide).toHaveBeenCalled();
+        expect(_moveStageToSides.moveToSide).toHaveBeenCalled();
         expect(indicator.currentMoveLeft).toEqual(0);
 
     });
@@ -545,7 +548,7 @@ describe("Testing move-stage", function() {
         expect(indicator.verticalLine.setVisible).toHaveBeenCalled();
     });
 
-    it("It should check applyMovement method", function() {
+    it("It should check applyMovement method when, method has currentDrop value", function() {
 
         indicator.init(stage, C, movement);
 
@@ -576,25 +579,13 @@ describe("Testing move-stage", function() {
         var _stage = {
             dots: []
         };
-        spyOn(indicator.kanvas, "addNextandPrevious");
-        spyOn(indicator, "getNewStage").and.returnValue({
 
-        });
-        spyOn(indicator, "moveStageGraphics").and.callFake(function() {
-            return true;
-        });
-
-        spyOn(indicator.kanvas.canvas, "remove");
-        spyOn(indicator.kanvas.allStageViews, "splice");
+        spyOn(_addStageService, "addNewStage").and.returnValue(true);
         indicator.applyMovement(_stage, {});
-        
-        expect(indicator.kanvas.allStageViews.splice).toHaveBeenCalled();
-        expect(indicator.kanvas.addNextandPrevious).toHaveBeenCalled();
-        expect(indicator.kanvas.canvas.remove).toHaveBeenCalled();
-
+        expect(_addStageService.addNewStage).toHaveBeenCalled();
     });
 
-    it("It should check applyMovement method, with currentdrop === null", function() {
+    it("It should check applyMovement method, when method has no currentDrop value", function() {
 
         indicator.init(stage, C, movement);
 
@@ -623,100 +614,10 @@ describe("Testing move-stage", function() {
         var _stage = {
             dots: []
         };
-        spyOn(indicator.kanvas, "addNextandPrevious");
-        spyOn(indicator, "getNewStage").and.returnValue({
 
-        });
-        spyOn(indicator, "moveStageGraphics").and.callFake(function() {
-            return true;
-        });
-
-        spyOn(indicator.kanvas.canvas, "remove");
-        spyOn(indicator.kanvas.allStageViews, "splice");
+        spyOn(_addStageService, "addNewStageAtBeginning").and.returnValue(true);
         indicator.applyMovement(_stage, {});
-        
-        expect(indicator.kanvas.allStageViews.splice).toHaveBeenCalled();
-
-    });
-
-
-    it("It should test moveStageGraphics", function() {
-        indicator.init(stage, C, movement);
-        var stageView = {
-            updateStageData: function() {
-
-            },
-            render: function() {
-
-            },
-            stageHeader: function() {},
-            childSteps: [
-                {
-                    circle: {
-                        manageClick: function() {}
-                    }
-                }
-            ]
-        };
-
-        var circleManager = {
-           addRampLines: function() {}
-       };
-
-        indicator.kanvas = {
-            configureStepsofNewStage: function() {},
-            correctNumbering: function() {},
-            allStageViews: [
-                {
-                    moveAllStepsAndStagesSpecial: function() {},
-                    circle: {
-                        doThingsForLast: function() {}
-                    }
-                }
-            ],
-            allStepViews: [
-                {
-                    circle: {
-                        doThingsForLast: function() {}
-                    }
-                }
-            ],
-            $scope: {
-                applyValues: function() {}
-            }
-        };
-
-       
-
-       spyOn(stageView, "updateStageData").and.returnValue(true);
-       spyOn(stageView, "render").and.returnValue(true);
-       spyOn(stageView, "stageHeader").and.returnValue(true);
-       spyOn(indicator.kanvas, "configureStepsofNewStage").and.returnValue(true);
-       spyOn(_correctNumberingService, "correctNumbering").and.returnValue(true);
-       spyOn(circleManager, "addRampLines").and.returnValue(null);
-
-       indicator.moveStageGraphics(stageView, circleManager);
-
-       expect(stageView.updateStageData).toHaveBeenCalled();
-       expect(stageView.render).toHaveBeenCalled();
-       expect(stageView.stageHeader).toHaveBeenCalled();
-       
-       expect(indicator.kanvas.configureStepsofNewStage).toHaveBeenCalled();
-       expect(_correctNumberingService.correctNumbering).toHaveBeenCalled();
-       expect(circleManager.addRampLines).toHaveBeenCalled();
-    });
-
-    it("It should test getNewStage method", function() {
-        
-        indicator.init(stage, C, movement);
-        model = {
-            steps: [
-                
-            ]
-        };
-
-        var st = indicator.getNewStage(model, 100);
-        expect(st.index).toEqual(100);
+        expect(_addStageService.addNewStageAtBeginning).toHaveBeenCalled();
     });
 
 });

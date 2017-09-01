@@ -7,22 +7,24 @@ describe("Testing canvas.js", function() {
   var Canvas;
 
   // Here 'Canvas' refer to the applications canvas area and 'canvas' refers actuall fabricjs canvas.
-  beforeEach(inject(function(_canvas_) {
+  beforeEach(inject(function(canvas) {
     //console.log(_canvas_, "bimmmmmmm");
-    Canvas = _canvas_;
-  }));
-
-  it("canvas.init should initiate values", function() {
-
+    //console.log(canvas.init);
     var model = {
       "protocol": {
 
       }
     };
-
+    
+    Canvas = canvas;
     spyOn(Canvas, "loadImages");
     Canvas.init(model);
 
+
+  }));
+
+  it("canvas.init should initiate values", function() {
+    
     expect(Canvas.editStageStatus).toBeFalsy();
     expect(Canvas.allCircles).toBeNull();
 
@@ -45,13 +47,8 @@ describe("Testing canvas.js", function() {
 
   it("setDefaultWidthHeight method should set the width of the canvas", function() {
 
-    //spyOn(Canvas.canvas, "setHeight");
-    var model = {
-      "protocol": {
+    console.log(Canvas.setDefaultWidthHeight);
 
-      }
-    };
-    Canvas.init(model);
     spyOn(Canvas.canvas, "setHeight");
     spyOn(Canvas.canvas, "renderAll");
     spyOn(Canvas.canvas, "setWidth");

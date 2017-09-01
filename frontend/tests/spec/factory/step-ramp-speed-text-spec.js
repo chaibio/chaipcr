@@ -19,7 +19,7 @@ describe("Testing rampSpeedText", function() {
   });
 
   it("It should check the text property", function() {
-    expect(_rampSpeedText.text).toEqual(step.rampSpeedNumber + "º C/s");
+    expect(_rampSpeedText.text).toEqual(step.rampSpeedNumber + " ºC/s");
   });
 
   it("It should check the fill property", function() {

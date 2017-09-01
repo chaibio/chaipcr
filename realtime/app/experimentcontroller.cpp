@@ -159,6 +159,8 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
 
     startLogging();
 
+    APP_LOGGER << "ExperimentController::start - experiment started " << experimentId << std::endl;
+
     return Started;
 }
 
@@ -310,6 +312,8 @@ void ExperimentController::stop()
         _meltCurveTimer->stop();
         _fluorescenceTimer->stop();
     }
+
+    APP_LOGGER << "ExperimentController::stop - experiment stopped" << std::endl;
 }
 
 void ExperimentController::stop(const std::string &errorMessage)
@@ -338,6 +342,8 @@ void ExperimentController::stop(const std::string &errorMessage)
     _holdStepTimer->stop();
     _meltCurveTimer->stop();
     _fluorescenceTimer->stop();
+
+    APP_LOGGER << "ExperimentController::stop - experiment stopped with an error \'" << errorMessage << "\'" << std::endl;
 }
 
 bool ExperimentController::shutdown(MachineState checkState)

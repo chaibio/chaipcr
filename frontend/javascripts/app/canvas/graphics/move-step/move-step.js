@@ -76,7 +76,7 @@ angular.module("canvasApp").factory('moveStepRect', [
       };
 
       this.indicator.initForOneStepStage = function(step, footer, C, backupStageModel) {
-        console.log("sdfsdf", backupStageModel);
+        
         step.parentStage.stageHeader();
         
         this.movement = this.movedStepIndex = this.currentMoveRight = this.currentMoveLeft =
@@ -213,8 +213,7 @@ angular.module("canvasApp").factory('moveStepRect', [
             if(step.parentStage.previousStage) {
               addStageService.addNewStage(data, step.parentStage.previousStage, "move_stage_back_to_original");
             } else {
-              console.log("Beggddd");
-              addStageService.addNewStageAtBeginning({}, data);
+              addStageService.addNewStageAtBeginning(data);
             }
             return true;
           }

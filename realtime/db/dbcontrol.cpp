@@ -25,11 +25,60 @@
 
 #include <Poco/Timer.h>
 
+#include <errmsg.h>
+
 #define DATABASE_ADDRESS "host=localhost db=chaipcr user=root"
 #define DATABASE_LOCKED_TRY_COUNT 3
 #define ROUND(x) ((int)(x * 100.0 + 0.5) / 100.0)
 
-#define PING_TIMER_INTERVAL 5 * 1000
+#define PING_TIMER_INTERVAL 2 * 1000
+
+#define BEGIN_DB_READ() \
+    bool __TRY_AGAIN = false; \
+    do \
+    { \
+        try \
+        {
+
+#define END_DB_READ() \
+        } \
+        catch (const soci::mysql_soci_error &ex) \
+        { \
+            if (ex.err_num_ == CR_SERVER_LOST || ex.err_num_ == CR_SERVER_GONE_ERROR || \
+                    ex.err_num_ == CR_CONNECTION_ERROR || ex.err_num_ ==  CR_CONN_HOST_ERROR) \
+            { \
+                if (!__TRY_AGAIN) \
+                { \
+                    try \
+                    { \
+                        _readSession->reconnect(); \
+                        \
+                        { \
+                            std::lock_guard<std::mutex> lock(_writeMutex); \
+                            _writeSession->reconnect(); \
+                        } \
+                        \
+                        __TRY_AGAIN = true; \
+                    } \
+                    catch (...) \
+                    { \
+                        qpcrApp.setException(std::current_exception()); \
+                        \
+                        throw std::runtime_error("DBControl::END_DB_READ - unable to reconnect to the MySQL server"); \
+                    } \
+                } \
+                else \
+                { \
+                    qpcrApp.setException(std::current_exception()); \
+                    \
+                    throw std::runtime_error("DBControl::END_DB_READ - unable to reconnect to the MySQL server"); \
+                } \
+            } \
+            else \
+                throw; \
+        } \
+    } \
+    while (__TRY_AGAIN)
 
 DBControl::DBControl()
 {
@@ -130,7 +179,10 @@ Experiment DBControl::getExperiment(int id)
 
     std::unique_lock<std::mutex> lock(_readMutex);
     {
+        BEGIN_DB_READ()
         *_readSession << "SELECT * FROM experiments WHERE id = " << id, soci::into(result);
+        END_DB_READ();
+
         gotData = _readSession->got_data();
     }
     lock.unlock();
@@ -162,7 +214,10 @@ bool DBControl::getExperimentDefination(Experiment &experiment)
 
         std::unique_lock<std::mutex> lock(_readMutex);
         {
+            BEGIN_DB_READ()
             *_readSession << "SELECT * FROM experiment_definitions WHERE id = " << experiment.definationId(), soci::into(result);
+            END_DB_READ();
+
             gotData = _readSession->got_data();
         }
         lock.unlock();
@@ -192,7 +247,10 @@ Protocol* DBControl::getProtocol(int experimentId)
 
     std::unique_lock<std::mutex> lock(_readMutex);
     {
+        BEGIN_DB_READ()
         *_readSession << "SELECT * FROM protocols WHERE experiment_definition_id = " << experimentId, soci::into(result);
+        END_DB_READ();
+
         gotData = _readSession->got_data();
     }
     lock.unlock();
@@ -219,6 +277,8 @@ std::vector<Stage> DBControl::getStages(int protocolId)
 {
     std::vector<Stage> stages;
     std::unique_lock<std::mutex> lock(_readMutex);
+
+    BEGIN_DB_READ()
 
     soci::rowset<soci::row> result((_readSession->prepare << "SELECT * FROM stages WHERE protocol_id = " << protocolId << " ORDER BY order_number"));
 
@@ -259,6 +319,8 @@ std::vector<Stage> DBControl::getStages(int protocolId)
         stages.push_back(std::move(stage));
     }
 
+    END_DB_READ();
+
     return stages;
 }
 
@@ -283,6 +345,8 @@ std::vector<Step> DBControl::getSteps(int stageId)
 {
     std::vector<Step> steps;    
     std::unique_lock<std::mutex> lock(_readMutex);
+
+    BEGIN_DB_READ()
 
     soci::rowset<soci::row> result((_readSession->prepare << "SELECT * FROM steps WHERE stage_id = " << stageId << " ORDER BY order_number"));
 
@@ -345,6 +409,8 @@ std::vector<Step> DBControl::getSteps(int stageId)
         steps.push_back(std::move(step));
     }
 
+    END_DB_READ();
+
     return steps;
 }
 
@@ -355,7 +421,10 @@ Ramp* DBControl::getRamp(int stepId)
 
     std::unique_lock<std::mutex> lock(_readMutex);
     {
+        BEGIN_DB_READ()
         *_readSession << "SELECT * FROM ramps WHERE next_step_id = " << stepId, soci::into(result);
+        END_DB_READ();
+
         gotData = _readSession->got_data();
     }
     lock.unlock();
@@ -607,7 +676,9 @@ Settings DBControl::getSettings()
     soci::row result;
     std::unique_lock<std::mutex> lock(_readMutex);
 
+    BEGIN_DB_READ()
     *_readSession << "SELECT * FROM settings", soci::into(result);
+    END_DB_READ();
 
     lock.unlock();
 
@@ -714,7 +785,9 @@ void DBControl::updateUpgrade(const Upgrade &upgrade,  bool &isCurrent, bool &do
         int tmpDownloaded = 0;
         std::lock_guard<std::mutex> lock(_readMutex);
 
+        BEGIN_DB_READ()
         *_readSession << "SELECT downloaded FROM upgrades WHERE version = \'" << upgrade.version() << '\'', soci::into(tmpDownloaded);
+        END_DB_READ();
 
         if (_readSession->got_data())
         {
@@ -756,7 +829,9 @@ int DBControl::getUserId(const std::string &token)
 
     std::lock_guard<std::mutex> lock(_readMutex);
 
+    BEGIN_DB_READ()
     *_readSession << "SELECT user_id FROM user_tokens WHERE access_token = \'" << token << '\'', soci::into(id);
+    END_DB_READ();
 
     return id;
 }
@@ -790,11 +865,55 @@ void DBControl::write(std::vector<soci::statement> &statements)
 {
     if (!statements.empty())
     {
-        soci::transaction transaction(*_writeSession);
+        bool tryAgain = false;
 
-        for (soci::statement &statement: statements)
-            statement.execute(true);
+        do
+        {
+            try
+            {
+                soci::transaction transaction(*_writeSession);
 
-        transaction.commit();
+                for (soci::statement &statement: statements)
+                    statement.execute(true);
+
+                transaction.commit();
+            }
+            catch (const soci::mysql_soci_error &ex)
+            {
+                if (ex.err_num_ == CR_SERVER_LOST || ex.err_num_ == CR_SERVER_GONE_ERROR ||
+                        ex.err_num_ == CR_CONNECTION_ERROR || ex.err_num_ ==  CR_CONN_HOST_ERROR)
+                {
+                    if (!tryAgain)
+                    {
+                        try
+                        {
+                            {
+                                std::lock_guard<std::mutex> lock(_readMutex);
+                                _readSession->reconnect();
+                            }
+
+                            _writeSession->reconnect();
+
+                            tryAgain = true;
+                        }
+                        catch (...)
+                        {
+                            qpcrApp.setException(std::current_exception());
+
+                            throw std::runtime_error("DBControl::END_DB_READ - unable to reconnect to the MySQL server");
+                        }
+                    }
+                    else
+                    {
+                        qpcrApp.setException(std::current_exception());
+
+                        throw std::runtime_error("DBControl::END_DB_READ - unable to reconnect to the MySQL server");
+                    }
+                }
+                else
+                    throw;
+            }
+        }
+        while (tryAgain);
     }
 }
