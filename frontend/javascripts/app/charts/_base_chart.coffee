@@ -586,6 +586,7 @@ class BaseChart
         .attr('y', @height + @config.margin.top + offsetTop)
         .attr('dy', '0.71em')
         .attr('font-size', '10px')
+        .attr('font-family', 'dinot-regular')
 
     inputContainer = textContainer.append('foreignObject')
         .attr('width', conWidth)
@@ -684,6 +685,7 @@ class BaseChart
         .attr('y', @height + @config.margin.top + offsetTop)
         .attr('dy', '0.71em')
         .attr('font-size', '10px')
+        .attr('font-family', 'dinot-regular')
         .text(@getMaxX())
 
     inputContainer = textContainer.append('foreignObject')
@@ -757,91 +759,92 @@ class BaseChart
       @validateAxisInput()
 
   drawYAxisUpperExtremeValue: ->
-      textContainer = @chartSVG.append('g')
-        .attr('class', 'axes-extreme-value tick')
+    textContainer = @chartSVG.append('g')
+      .attr('class', 'axes-extreme-value tick')
 
-      @yAxisUpperExtremeValueContainer = textContainer
+    @yAxisUpperExtremeValueContainer = textContainer
 
-      conWidth = 30
-      conHeight = 14
-      offsetRight = 9
-      offsetTop = 2
-      underlineStroke = 2
-      lineWidth = 15
+    conWidth = 30
+    conHeight = 14
+    offsetRight = 9
+    offsetTop = 2
+    underlineStroke = 2
+    lineWidth = 15
 
-      line = textContainer.append('line')
-        .attr('opacity', 0)
-        .attr('stroke', '#000')
-        .attr('stroke-width', underlineStroke)
-        .attr('x1', @config.margin.left - (conWidth + offsetRight))
-        .attr('y1', @config.margin.top + (conHeight / 2) - (underlineStroke / 2))
-        .attr('x2', @config.margin.left - (conWidth + offsetRight) + conWidth)
-        .attr('y2', @config.margin.top + (conHeight / 2) - (underlineStroke / 2))
+    line = textContainer.append('line')
+      .attr('opacity', 0)
+      .attr('stroke', '#000')
+      .attr('stroke-width', underlineStroke)
+      .attr('x1', @config.margin.left - (conWidth + offsetRight))
+      .attr('y1', @config.margin.top + (conHeight / 2) - (underlineStroke / 2))
+      .attr('x2', @config.margin.left - (conWidth + offsetRight) + conWidth)
+      .attr('y2', @config.margin.top + (conHeight / 2) - (underlineStroke / 2))
 
-      text = textContainer.append('text')
-        .attr('fill', '#000')
-        .attr('x', @config.margin.left - (offsetRight + conWidth))
-        .attr('y', @config.margin.top - underlineStroke * 2)
-        .attr('dy', '0.71em')
-        .attr('font-size', '10px')
-        .text(@getMaxY())
+    text = textContainer.append('text')
+      .attr('fill', '#000')
+      .attr('x', @config.margin.left - (offsetRight + conWidth))
+      .attr('y', @config.margin.top - underlineStroke * 2)
+      .attr('dy', '0.71em')
+      .attr('font-size', '10px')
+      .attr('font-family', 'dinot-regular')
+      .text(@getMaxY())
 
-      text.attr('x', @config.margin.left - (offsetRight + text.node().getBBox().width))
+    text.attr('x', @config.margin.left - (offsetRight + text.node().getBBox().width))
 
-      inputContainer = textContainer.append('foreignObject')
-        .attr('width', conWidth)
-        .attr('height', conHeight - offsetTop)
-        .attr('y', @config.margin.top - (conHeight / 2))
-        .attr('x', @config.margin.left - (conWidth + offsetRight))
+    inputContainer = textContainer.append('foreignObject')
+      .attr('width', conWidth)
+      .attr('height', conHeight - offsetTop)
+      .attr('y', @config.margin.top - (conHeight / 2))
+      .attr('x', @config.margin.left - (conWidth + offsetRight))
 
-      form = inputContainer.append('xhtml:form')
+    form = inputContainer.append('xhtml:form')
 
-      input = form.append('xhtml:input').attr('type', 'text')
-        .style('display', 'block')
-        .style('opacity', 0)
-        .style('width', conWidth + 'px')
-        .style('height', conHeight + 'px')
-        .style('padding', '0px')
-        .style('margin', '0px')
-        .style('margin-top', '-1px')
-        .style('text-align', 'center')
-        .style('font-size', '10px')
-        .attr('type', 'text')
-        .on('mousemove', =>
+    input = form.append('xhtml:input').attr('type', 'text')
+      .style('display', 'block')
+      .style('opacity', 0)
+      .style('width', conWidth + 'px')
+      .style('height', conHeight + 'px')
+      .style('padding', '0px')
+      .style('margin', '0px')
+      .style('margin-top', '-1px')
+      .style('text-align', 'center')
+      .style('font-size', '10px')
+      .attr('type', 'text')
+      .on('mousemove', =>
 
-          input.node().value = Math.round(@getDrawLineYScale().invert(0) * 10) / 10
+        input.node().value = Math.round(@getDrawLineYScale().invert(0) * 10) / 10
 
-          textWidth = text.node().getBBox().width
-          line.attr('x1', @config.margin.left - (textWidth + offsetRight))
-            .attr('y1', @config.margin.top + (conHeight / 2) - (underlineStroke / 2))
-            .attr('x2', @config.margin.left - (textWidth + offsetRight) + textWidth)
-            .attr('y2', @config.margin.top + (conHeight / 2) - (underlineStroke / 2))
-            .attr('opacity', 1)
+        textWidth = text.node().getBBox().width
+        line.attr('x1', @config.margin.left - (textWidth + offsetRight))
+          .attr('y1', @config.margin.top + (conHeight / 2) - (underlineStroke / 2))
+          .attr('x2', @config.margin.left - (textWidth + offsetRight) + textWidth)
+          .attr('y2', @config.margin.top + (conHeight / 2) - (underlineStroke / 2))
+          .attr('opacity', 1)
 
-          inputContainerOffset = 5
-          inputWidth = 40
+        inputContainerOffset = 5
+        inputWidth = 40
 
-          inputContainer
-            .attr('width', inputWidth + inputContainerOffset)
-            .attr('x', @config.margin.left - (inputWidth + offsetRight) - (inputContainerOffset / 2))
-          input.style('width', (inputWidth + inputContainerOffset) + 'px')
-        )
-        .on('mouseout', ->
-          line.attr('opacity', 0)
-        )
-        .on('click', =>
-          @onClickUpperYAxisInput(input)
-        )
-        .on('focusout', ->
-          input.style('opacity', 0)
-        )
-        .on('keydown', =>
-          @onInputUpperYAxis(input)
-        )
+        inputContainer
+          .attr('width', inputWidth + inputContainerOffset)
+          .attr('x', @config.margin.left - (inputWidth + offsetRight) - (inputContainerOffset / 2))
+        input.style('width', (inputWidth + inputContainerOffset) + 'px')
+      )
+      .on('mouseout', ->
+        line.attr('opacity', 0)
+      )
+      .on('click', =>
+        @onClickUpperYAxisInput(input)
+      )
+      .on('focusout', ->
+        input.style('opacity', 0)
+      )
+      .on('keydown', =>
+        @onInputUpperYAxis(input)
+      )
 
-      text.on 'click', => @onClickUpperYAxisInput(input)
+    text.on 'click', => @onClickUpperYAxisInput(input)
 
-      @yAxisUpperExtremeValueText = text
+    @yAxisUpperExtremeValueText = text
 
   onClickUpperYAxisInput: (input) ->
     val = Math.round(@yScale.invert(0) * 10) / 10
@@ -908,6 +911,7 @@ class BaseChart
       .attr('y', @height + @config.margin.top - underlineStroke * 2)
       .attr('dy', '0.71em')
       .attr('font-size', '10px')
+      .attr('font-family', 'dinot-regular')
       .text(@getMaxY())
 
     text.attr('x', @config.margin.left - (offsetRight + text.node().getBBox().width))
