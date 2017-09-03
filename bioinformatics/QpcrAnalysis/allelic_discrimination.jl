@@ -10,7 +10,12 @@ const DEFAULT_eg_LABELS = ["ntc", "homo_a", "homo_b", "hetero", "unclassified"]
 # const DEFAULT_init_FACTORS = [1, 1, 1] # sometimes "hetero" may not have very high end-point fluo
 # const DEFAULT_eg_LABELS = ["homo_a", "homo_b", "hetero", "unclassified"]
 
-const AD_DATA_CATEGS = ["rbbs_ary3", "blsub_fluos", "d0", "cq"]
+const CATEG_WELL_VEC = [
+    ("rbbs_ary3", Colon()),
+    ("blsub_fluos", Colon()),
+    ("d0", Colon()),
+    ("cq", Colon())
+]
 
 const kmeans_result_EMPTY = kmeans(1. * [1 2 3; 4 5 6], 2)
 
@@ -29,13 +34,17 @@ const kmeans_result_EMPTY = kmeans(1. * [1 2 3; 4 5 6], 2)
 function prep_input_4ad(
     full_amp_out::AmpStepRampOutput, # one step/ramp of amplification output
     expected_genotypes_raw::AbstractMatrix, # each column is a vector of binary genotype whose length is number of channels (0 => no signal, 1 => yes signal)
-    data_categ::String="fluo",
-    cycs::Union{Integer,AbstractVector}=1 # relevant if `data_categ == "fluo"`, last available cycle
+    categ::String="fluo",
+    well_idc::Union{AbstractVector,Colon}=Colon(),
+    cycs::Union{Integer,AbstractVector}=1 # relevant if `categ == "fluo"`, last available cycle
     )
+
     num_cycs, num_wells, num_channels = size(full_amp_out.fr_ary3)
+
     expected_genotypes = expected_genotypes_raw
-    if data_categ in ["rbbs_ary3", "blsub_fluos"]
-        fluos = getfield(full_amp_out, parse(data_categ))
+
+    if categ in ["rbbs_ary3", "blsub_fluos"]
+        fluos = getfield(full_amp_out, parse(categ))
         if cycs == 0
             cycs = num_cycs
         end # if cycs == 0
@@ -43,22 +52,27 @@ function prep_input_4ad(
             cycs = (cycs:cycs) # `blsub_fluos[an_integer, :, :]` results in size `(num_wells, num_channels)` instead of `(1, num_wells, num_channels)`
         end # if isa(cycs, Integer)
         data_t = reshape(mean(fluos[cycs, :, :], 1), num_wells, num_channels)
-    elseif data_categ == "d0"
+
+    elseif categ == "d0"
         # d0_i_vec = find(full_amp_out.fitted_prebl[1, 1].coef_strs) do coef_str
-        #     coef_str == data_categ
+        #     coef_str == categ
         # end
         # data_t = length(d0_i_vec) == 0 ? zeros(num_wells, num_channels) : full_amp_out.coefs[d0_i_vec[1], :, :] * 1. # without `* 1.`, MethodError: no method matching kmeans!(::Array{AbstractFloat,2}, ::Array{Float64,2}); Closest candidates are: kmeans!(::Array{T<:AbstractFloat,2}, ::Array{T<:AbstractFloat,2}; weights, maxiter, tol, display) where T<:AbstractFloat at E:\for_programs\julia_pkgs\v0.6\Clustering\src\kmeans.jl:27
         data_t = map(full_amp_out.d0) do d0
             isnan(d0) ? 0 : d0
         end
-    elseif data_categ == "cq"
+
+    elseif categ == "cq"
         data_t = map(full_amp_out.cq) do cq_val
             isnan(cq_val) ? AbstractFloat(num_cycs) : cq_val # `Interger` resulted in `InexactError()`
         end # do cq_val
         expected_genotypes = 1 - expected_genotypes_raw
-    end # if data_categ
-    data = transpose(data_t)
+    end # if categ
+
+    data = transpose(data_t[well_idc, :])
+
     return (data, expected_genotypes)
+
 end # prep_data_4ad
 
 
@@ -137,25 +151,27 @@ end # assign_genotypes
 
 function process_ad(
     full_amp_out::AmpStepRampOutput,
-    cycs::Union{Integer,AbstractVector}, # relevant if `data_categ == "fluo"`, last available cycle
+    cycs::Union{Integer,AbstractVector}, # relevant if `categ == "fluo"`, last available cycle
     cluster_method::String, # for `assign_genotypes`
     expected_genotypes_raw::AbstractMatrix=DEFAULT_egr, # each column is a vector of binary genotype whose length is number of channels (0 => no signal, 1 => yes signal)
-    data_categs::AbstractVector=AD_DATA_CATEGS
+    categ_well_vec::AbstractVector=CATEG_WELL_VEC,
     )
 
     # output
     # OrderedDict(
-    #     data_categ => Clustering.ClusteringResult,
+    #     categ => Clustering.ClusteringResult,
     # )
 
     cluster_result_dict = OrderedDict{String,ClusteringResult}()
     assignments_adj_labels_dict = OrderedDict{String,Vector{String}}()
 
-    for data_categ in data_categs
-        cluster_result_dict[data_categ], assignments_adj_labels_dict[data_categ] = assign_genotypes(prep_input_4ad(
+    for categ_well_tuple in categ_well_vec
+        categ, well_idc = categ_well_tuple
+        cluster_result_dict[categ], assignments_adj_labels_dict[categ] = assign_genotypes(prep_input_4ad(
             full_amp_out,
             expected_genotypes_raw,
-            data_categ,
+            categ,
+            well_idc,
             cycs
         )..., cluster_method)
     end # for
