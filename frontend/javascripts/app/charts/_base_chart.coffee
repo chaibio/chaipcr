@@ -19,6 +19,12 @@ class BaseChart
     return false if @data.dataset.length is 0
     return true
 
+  roundExtremeValue: (val) ->
+    if Math.abs(val) >= 10
+      Math.ceil(val/5)*5
+    else
+      Math.ceil(val)
+
   formatPower: (d) ->
     superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹"
     (d + "").split("").map((c) -> superscript[c]).join("")
@@ -455,12 +461,13 @@ class BaseChart
     svg = @chartSVG.select('.chart-g')
 
     # add allowance for interpolation curves
-    max = @getMaxY()
-    min = @getMinY()
-    diff = max - min
-    allowance = diff * (if @config.axes.y.scale is 'log' then 0.2 else 0.05)
-    max += allowance
-    min = if @config.axes.y.scale is 'log' then 5 else min - allowance
+    max = @roundExtremeValue(@getMaxY())
+    min = @roundExtremeValue(@getMinY())
+    # diff = max - min
+    # allowance = diff * (if @config.axes.y.scale is 'log' then 0.2 else 0.05)
+    # max += allowance
+    # max = @roundExtremeValue(max)
+    # min = if @config.axes.y.scale is 'log' then 5 else min - allowance
     @yScale = if @config.axes.y.scale is 'log' then d3.scaleLog() else d3.scaleLinear()
     @yScale.range([@height, 0]).domain([min, max])
     @yAxis = d3.axisLeft(@yScale)
@@ -883,7 +890,7 @@ class BaseChart
         inputContainerOffset: inputContainerOffset
 
   onClickUpperYAxisInput: ->
-    val = Math.round(@yScale.invert(0) * 10) / 10
+    val = Math.round(@getYScale().invert(0) * 10) / 10
     if @config.axes.y.tickFormat
       val = @config.axes.y.tickFormat(val)
     @yAxisUpperExtremeValue.input.node().value = val
@@ -909,11 +916,12 @@ class BaseChart
       if minY >= maxY
         return false
 
-      max = @getMaxY()
-      min = @getMinY()
-      diff = max - min
-      allowance = diff * (if @config.axes.y.scale is 'log' then 0.2 else 0.05)
-      max += allowance
+      max = @roundExtremeValue(@getMaxY())
+      # min = @roundExtremeValue(@getMinY())
+      # diff = max - min
+      # allowance = diff * (if @config.axes.y.scale is 'log' then 0.2 else 0.05)
+      # max += allowance
+      # max = @roundExtremeValue(max)
 
       if maxY > max
         maxY = max
@@ -1017,7 +1025,7 @@ class BaseChart
 
   onClickLowerYAxisInput: ->
     conWidth = @yAxisUpperExtremeValue.text.node().getBBox().width
-    val = Math.round(@yScale.invert(@height) * 10) / 10
+    val = Math.round(@getYScale().invert(@height) * 10) / 10
     if @config.axes.y.tickFormat
       val = @config.axes.y.tickFormat(val)
     @yAxisLowerExtremeValue.input.node().value = val
@@ -1042,10 +1050,10 @@ class BaseChart
         return false
 
       max = extent
-      min = @getMinY()
-      diff = max - min
-      allowance = diff * (if @config.axes.y.scale is 'log' then 0.2 else 0.05)
-      min = if @config.axes.y.scale is 'log' then 5 else min - allowance
+      min = @roundExtremeValue(@getMinY())
+      # diff = max - min
+      # allowance = diff * (if @config.axes.y.scale is 'log' then 0.2 else 0.05)
+      # min = if @config.axes.y.scale is 'log' then 5 else min - allowance
 
       if (minY < min)
         minY = min
