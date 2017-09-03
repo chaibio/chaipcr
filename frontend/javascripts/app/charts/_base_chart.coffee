@@ -846,6 +846,7 @@ class BaseChart
       .style('margin-top', '-1px')
       .style('text-align', 'center')
       .style('font-size', '10px')
+      .style('font-family', 'dinot-regular')
       .attr('type', 'text')
       .on('mouseenter', =>
         textWidth = text.node().getBBox().width
@@ -978,6 +979,7 @@ class BaseChart
       .style('margin-top', '-1px')
       .style('text-align', 'center')
       .style('font-size', '10px')
+      .style('font-family', 'dinot-regular')
       .attr('type', 'text')
       .on('mouseenter', =>
 
