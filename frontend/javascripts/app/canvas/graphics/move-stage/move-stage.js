@@ -264,41 +264,16 @@ angular.module("canvasApp").factory('moveStageRect', [
         };
         
         this.indicator.applyMovement = function(stage_, circleManager) {
-
-          var stage = this.draggedStage;
-
-          var stageIndex = (this.currentDrop) ? this.currentDrop.index : 0;
+          // May be reuse the code in addStageService
           var model = this.draggedStage.model;
-          var stageView = this.getNewStage(model, stageIndex);
-          addStageService.addNextandPrevious(this.currentDrop, stageView);
+          var stageIndex = (this.currentDrop) ? this.currentDrop.index : 0;
 
           if(stageIndex === 0 && !this.currentDrop) { //if we insert into the very first place.
-            this.kanvas.allStageViews.splice(stageIndex, 0, stageView);
+            addStageService.addNewStageAtBeginning({stage: model});
           } else {
-            this.kanvas.allStageViews.splice(stageIndex + 1, 0, stageView);
+            addStageService.addNewStage({stage: model}, this.currentDrop, "move_stage_back_to_original");
           }
 
-          this.moveStageGraphics(stageView, circleManager);
-          this.kanvas.canvas.remove(stage_.dots);
-        };
-
-        this.indicator.getNewStage = function(model, stageIndex) {
-          return new stageDude(model, this.kanvas, stageIndex, true, this.kanvas.$scope);
-        };
-
-        this.indicator.moveStageGraphics = function(stageView, circleManager) {
-
-          stageView.updateStageData(1);
-          stageView.render();
-          addStageService.configureStepsofNewStage(stageView, 0);
-          correctNumberingService.correctNumbering();
-          this.kanvas.allStageViews[0].moveAllStepsAndStages();
-          circleManager.addRampLines();
-          this.kanvas.allStepViews[this.kanvas.allStepViews.length - 1].circle.doThingsForLast(null, null);
-          stageView.stageHeader();
-          this.kanvas.$scope.applyValues(stageView.childSteps[0].circle);
-          stageView.childSteps[0].circle.manageClick(true);
-          
         };
 
         return this.indicator;

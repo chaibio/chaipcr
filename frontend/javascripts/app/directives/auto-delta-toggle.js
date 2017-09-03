@@ -48,13 +48,7 @@ window.ChaiBioTech.ngApp.directive('autoDeltaToggle', [
           scope.configureSwitch(!scope.data);
           scope.sendData();
         };
-        /*$(elem).click(function(evt) {
-          //if($(evt.target).is(".gather-data-toggle") && scope.type === "cycling") {
-            scope.configureSwitch(!scope.data);
-            scope.sendData();
-          //}
-        });*/
-
+        
         scope.configureSwitch = function(val) {
 
           if(val) {

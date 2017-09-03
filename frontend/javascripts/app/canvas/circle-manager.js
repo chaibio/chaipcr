@@ -114,7 +114,9 @@ angular.module("canvasApp").factory('circleManager', [
       return this.findAllCirclesArray;
     };
 
-    this.reDrawCircles = function() {
+    // reDrawCircles method is no more used, because it takes up a lot of resources
+    
+    /*this.reDrawCircles = function() {
       console.log("redraw circle starts here");
       var tempCirc = null;
       this.drawCirclesArray.length = 0;
@@ -135,7 +137,7 @@ angular.module("canvasApp").factory('circleManager', [
       }, this);
       console.log("reDrawCircles ends here");
       return this.drawCirclesArray;
-    };
+    }; */
 
     return this;
   }

@@ -127,6 +127,14 @@ start_unicorn () {
 	/usr/local/bin/bundle exec /usr/local/bin/unicorn -c /root/chaipcr/web/config/unicorn.rb -E production -D || true
 }
 
+start_julia () {
+	if [ -e /root/chaipcr/bioinformatics/juliaserver.jl ] && [ -e /usr/bin/julia ]
+	then
+		echo starting julia
+		/usr/bin/julia /root/chaipcr/bioinformatics/juliaserver.jl || true
+	fi
+}
+
 run_clean_user_tokens () {
 	wait_for_migrate
 
@@ -166,6 +174,14 @@ run_clean_user_tokens () {
 	fi
 
 	run_cleanup_user_tokens_every4hours &
+
+	if  ps aux | grep julia | grep -v grep
+        then
+		echo julia is running
+	else
+		echo starting julia
+		start_julia &
+	fi
 }
 
 mysql_watchdog () {

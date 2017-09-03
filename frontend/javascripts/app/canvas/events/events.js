@@ -160,7 +160,7 @@ angular.module("canvasApp").factory('events', [
         C.canvas.renderAll();
 
       };
-
+      
       /**************************************
           A tricky one, fired from the DOM perspective. When we have long
           canvas and when we scroll canvas recalculate the offset.

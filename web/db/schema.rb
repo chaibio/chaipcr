@@ -11,13 +11,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170322051101) do
+ActiveRecord::Schema.define(version: 20170816215759) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"
     t.integer "stage_id"
     t.integer "well_num"
-    t.decimal "ct",                      precision: 5, scale: 2
+    t.decimal "ct",                      precision: 9, scale: 6
     t.integer "channel",       limit: 1,                         default: 1, null: false
   end
 

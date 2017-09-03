@@ -19,18 +19,15 @@
 
 angular.module("canvasApp").factory('stepTemperature', [
   'editMode',
-  'ExperimentLoader',
-  function(editMode, ExperimentLoader) {
+  'stepTemperatureService',
+  function(editMode, stepTemperatureService) {
+
     return function(model, parent, $scope) {
 
-      this.model = model;
-      this.parent = parent;
-      this.canvas = parent.canvas;
-      this.stepData = this.model;
       var that = this;
 
       this.render = function() {
-        var temp = parseFloat(this.stepData.temperature);
+        var temp = parseFloat(model.temperature);
         temp = (temp < 100) ? temp.toFixed(1) : temp;
 
         this.text = new fabric.IText(temp +"º", {
@@ -57,7 +54,7 @@ angular.module("canvasApp").factory('stepTemperature', [
         // This condition is a tricky one. When we hit enter text:editing:exited and editing:exited are called and
         // we dont need to execute twice. So in the first call, whichever it is editMode.tempActive is made false.
         if(editMode.tempActive) {
-          that.postEdit();
+          stepTemperatureService.postEdit($scope, parent, that.text);
         }
 
       });
@@ -65,35 +62,10 @@ angular.module("canvasApp").factory('stepTemperature', [
       this.text.on('editing:exited', function() {
         // This block works when we click somewhere else after enabling inline edit.
         if(editMode.tempActive) {
-          that.postEdit();
+          stepTemperatureService.postEdit($scope, parent, that.text);
         }
       });
 
-      this.postEdit = function() {
-
-        editMode.tempActive = false;
-        editMode.currentActiveTemp = null;
-        var tempFloat, tempNo = parseFloat(this.text.text.replace("º", ""));
-
-
-        if(tempNo === 0) {
-          tempFloat = 0;
-        } else {
-          tempFloat = Math.abs(parseFloat(this.text.text.replace("º", ""))) || $scope.step.temperature;
-        }
-
-        $scope.step.temperature = (tempFloat > 100) ? 100.0 :  tempFloat;
-
-        ExperimentLoader.changeTemperature($scope).then(function(data) {
-          console.log("saved", data);
-        });
-        parent.model.temperature = $scope.step.temperature;
-        parent.circleGroup.top = parent.getTop().top;
-        parent.createNewStepDataGroup();
-        parent.manageDrag(parent.circleGroup);
-        parent.circleGroup.setCoords();
-        parent.canvas.renderAll();
-      };
       return this.text;
     };
   }

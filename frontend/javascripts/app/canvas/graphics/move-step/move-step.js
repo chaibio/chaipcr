@@ -51,7 +51,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         step.parentStage.stageHeader();
         
         if(step.parentStage.childSteps.length === 0) {
-          step.parentStage.adjustHeader();
+          //step.parentStage.adjustHeader();
         }
 
         this.movement = this.movedStepIndex = this.currentMoveRight = this.currentMoveLeft =
@@ -70,6 +70,31 @@ angular.module("canvasApp").factory('moveStepRect', [
         C.canvas.bringToFront(this.verticalLine);
         this.setLeft(footer.left).setVisible(true);
         this.changeText(step);
+        StepPositionService.getPositionObject(this.kanvas.allStepViews);
+        StagePositionService.getPositionObject();
+        StagePositionService.getAllVoidSpaces();
+      };
+
+      this.indicator.initForOneStepStage = function(step, footer, C, backupStageModel) {
+        
+        step.parentStage.stageHeader();
+        
+        this.movement = this.movedStepIndex = this.currentMoveRight = this.currentMoveLeft =
+        this.movedStageIndex = this.movedRightStageIndex = this.movedLeftStageIndex = null;
+
+        this.currentLeft = footer.left;
+
+        this.backupStageModel = backupStageModel;        
+        this.rightOffset = 96;
+        this.leftOffset = 0;
+        this.kanvas = C;
+        this.currentDropStage = step.parentStage;
+        this.currentDrop = (step.previousStep) ? step.previousStep : "NOTHING";
+        
+        this.verticalLine.setLeft(footer.left).setVisible(true).setCoords();
+        C.canvas.bringToFront(this.verticalLine);
+        this.setLeft(footer.left).setVisible(true);
+        
         StepPositionService.getPositionObject(this.kanvas.allStepViews);
         StagePositionService.getPositionObject();
         StagePositionService.getAllVoidSpaces();
@@ -188,7 +213,7 @@ angular.module("canvasApp").factory('moveStepRect', [
             if(step.parentStage.previousStage) {
               addStageService.addNewStage(data, step.parentStage.previousStage, "move_stage_back_to_original");
             } else {
-              addStageService.addNewStageAtBeginning({}, data);
+              addStageService.addNewStageAtBeginning(data);
             }
             return true;
           }

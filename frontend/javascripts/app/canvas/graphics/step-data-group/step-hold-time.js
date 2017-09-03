@@ -19,32 +19,18 @@
 
 angular.module("canvasApp").factory('stepHoldTime', [
   'editMode',
-  'ExperimentLoader',
-  'TimeService',
-  'alerts',
-  function(editMode, ExperimentLoader, TimeService, alerts) {
+  'stepHoldTimeService',
+  function(editMode, stepHoldTimeService) {
     return function(model, parent, $scope) {
 
       this.model = model;
-      this.parent = parent;
-      this.canvas = parent.canvas;
       var that = this;
-
-      this.formatHoldTime = function() {
-
-        /*var holdTimeHour = Math.floor(this.holdTime / 60);
-        var holdTimeMinute = (this.holdTime % 60);
-
-        holdTimeMinute = (holdTimeMinute < 10) ? "0" + holdTimeMinute : holdTimeMinute;*/
-
-        return TimeService.newTimeFormatting(this.model.hold_time);
-      };
 
       this.render = function() {
 
         this.holdTime = this.model.hold_time;
 
-        this.text = new fabric.IText(this.formatHoldTime(), {
+        this.text = new fabric.IText(stepHoldTimeService.formatHoldTime(this.model.hold_time), {
           fill: 'black',
           fontSize: 20,
           top : 0,
@@ -69,7 +55,7 @@ angular.module("canvasApp").factory('stepHoldTime', [
         // This condition is a tricky one. When we hit enter text:editing:exited and editing:exited are called and
         // we dont need to execute twice. So in the first call, whichever it is editMode.tempActive is made false.
         if(editMode.holdActive) {
-          that.postEdit();
+          stepHoldTimeService.postEdit($scope, parent, that.text);
         }
 
       });
@@ -77,56 +63,9 @@ angular.module("canvasApp").factory('stepHoldTime', [
       this.text.on('editing:exited', function() {
         // This block works when we click somewhere else after enabling inline edit.
         if(editMode.holdActive) {
-          that.postEdit();
+          stepHoldTimeService.postEdit($scope, parent, that.text);
         }
       });
-
-      this.ifLastStep = function(step) {
-        return step.parentStage.nextStage === null && step.nextStep === null;
-      };
-
-      this.postEdit = function() {
-        // There is some issues for, saving new hold_time for infinite hold, make sure uts corrected when new design comes.
-        editMode.holdActive = false;
-        editMode.currentActiveHold = null;
-        var previousHoldTime = Number($scope.step.hold_time);
-        var newHoldTime = Number(TimeService.convertToSeconds(this.text.text));
-
-
-        if(! isNaN(newHoldTime) && (newHoldTime !== previousHoldTime)) { //Should unify this with step-hold-time-directives
-          if(newHoldTime < 0) {
-            alerts.showMessage(alerts.noNegativeHold, $scope);
-          } else if(newHoldTime === 0) {
-            if(this.ifLastStep(parent.parent) && ! $scope.step.collect_data) {
-              $scope.step.hold_time = newHoldTime;
-              ExperimentLoader.changeHoldDuration($scope).then(function(data) {
-                console.log("saved", data);
-              });
-            } else {
-              alerts.showMessage(alerts.holdDurationZeroWarning, $scope);
-            }
-          } else {
-            $scope.step.hold_time = newHoldTime;
-            ExperimentLoader.changeHoldDuration($scope).then(function(data) {
-              console.log("saved", data);
-            });
-          }
-        }
-
-        /*if($scope.step.hold_time !== 0) { // If its zero server returns error , but make an exception for last step
-          ExperimentLoader.changeHoldDuration($scope).then(function(data) {
-            console.log("saved", data);
-          });
-        }*/
-
-        parent.model.hold_time = $scope.step.hold_time;
-        parent.createNewStepDataGroup();
-        if(this.ifLastStep(parent.parent)) {
-          parent.doThingsForLast(newHoldTime, previousHoldTime);
-        }
-        parent.canvas.renderAll();
-
-      };
 
       return this.text;
     };

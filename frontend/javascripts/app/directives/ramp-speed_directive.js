@@ -65,11 +65,11 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
         scope.configureData = function() {
 
           if(Number(scope.reading) <= 0) {
-            scope.shown = "AUTO";
-            scope.unit = false;
+            scope.shown = Number(5.0);
+            scope.unit = " ºC/s";
           } else {
             scope.shown = scope.reading;
-            scope.unit = "ºC/s";
+            scope.unit = " ºC/s";
           }
           editValue = scope.shown;
         };
@@ -78,9 +78,9 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
         scope.editAndFocus = function(className) {
 
           scope.edit = true;
-          if(scope.shown === "AUTO") {
-            scope.shown = editValue = Number(0);
-            scope.unit = "ºC/s";
+          if(scope.shown === 5) {
+            scope.shown = editValue = Number(5);
+            scope.unit = " ºC/s";
           } else {
             scope.shown = editValue = Number(scope.shown);
           }
@@ -101,11 +101,14 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
             alerts.showMessage(warningMessageLimitExceeded, scope);
             return;
 
-          } else if(! isNaN(scope.shown) && Number(scope.shown) < 7 && Number(scope.shown) >= 0) {
+          } else if(! isNaN(scope.shown) && Number(scope.shown) < 6 && Number(scope.shown) >= 0) {
 
             if(editValue != Number(scope.shown)) {
 
               scope.shown = scope.reading = (Number(scope.shown));
+							if(scope.shown == 0){
+								scope.shown = scope.reading = 5;
+							}
 
               $timeout(function() {
                 ExperimentLoader.changeRampSpeed(scope.$parent).then(function(data) {

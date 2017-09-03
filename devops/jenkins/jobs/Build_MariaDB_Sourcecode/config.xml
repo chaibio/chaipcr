@@ -16,7 +16,10 @@
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>local_download_folder</name>
-          <description>The folder where to host download file. Could be /usr/share/nginx/html/download or /usr/share/nginx/html/download
+          <description>The folder where to host download file. 
+Apache server: /var/www/html/download
+or 
+Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
 </description>
           <defaultValue>/usr/share/nginx/html/download</defaultValue>
         </hudson.model.StringParameterDefinition>

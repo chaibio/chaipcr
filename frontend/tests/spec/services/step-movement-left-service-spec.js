@@ -2,11 +2,12 @@ describe("Testing StepMovementLeftService", function() {
 
     beforeEach(module('ChaiBioTech'));
     
-    var _StepMovementLeftService, _StepPositionService;
+    var _StepMovementLeftService, _StepPositionService, _moveStepToSides;
 
-    beforeEach(inject(function(StepMovementLeftService, StepPositionService) {
+    beforeEach(inject(function(StepMovementLeftService, StepPositionService, moveStepToSides) {
         _StepPositionService = StepPositionService;
         _StepMovementLeftService = StepMovementLeftService;
+        _moveStepToSides = moveStepToSides;
     }));
 
     it("It should test ifOverLeftSide method checking movedStepIndex", function() {
@@ -96,12 +97,12 @@ describe("Testing StepMovementLeftService", function() {
 
         var args = [[50, 100, 150], 0];
 
-        spyOn(sI.kanvas.allStepViews[0], "moveToSide").and.returnValue(true);
+        spyOn(_moveStepToSides, "moveToSide").and.returnValue(true);
         spyOn(_StepPositionService, "getPositionObject");
 
         _StepMovementLeftService.ifOverLeftSideCallback.apply(sI, args);
 
-        expect(sI.kanvas.allStepViews[0].moveToSide).toHaveBeenCalledWith("right");
+        expect(_moveStepToSides.moveToSide).toHaveBeenCalled();
         expect(_StepPositionService.getPositionObject).toHaveBeenCalled();
         expect(sI.currentMoveLeft).toEqual(0);
     });

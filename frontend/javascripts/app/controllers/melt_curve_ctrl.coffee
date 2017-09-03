@@ -55,8 +55,8 @@ App.controller 'MeltCurveChartCtrl', [
       $scope.editExpNameMode[well_num] = false
 
     Experiment.getWells($stateParams.id).then (resp) ->
-      for i in [0...16]
-        $scope.samples[resp.data[i].well.well_num - 1] = resp.data[i].well.sample_name
+      for i in [0...16] by 1
+        $scope.samples[resp.data[i].well.well_num - 1] = resp.data[i].well.sample_name if resp.data[i]
 
     $scope.$on 'status:data:updated', (e, data, oldData) ->
       return if !data
@@ -124,7 +124,8 @@ App.controller 'MeltCurveChartCtrl', [
       buttons = $scope.wellButtons || {}
 
       $scope.config.series = []
-      $scope.config.curve_type = $scope.curve_type
+      $scope.config.axes.y.label = $scope.curve_type.toUpperCase()
+      $scope.config.box.label.y = if $scope.curve_type is 'derivative' then '-dF/dT' else 'RFU'
 
       for i in [0..15] by 1
         $scope.config.series.push
@@ -156,6 +157,9 @@ App.controller 'MeltCurveChartCtrl', [
           $scope.enterState = false
           $scope.data = MeltCurveService.defaultData()
           $scope.has_data = false
+          Experiment.getWells($stateParams.id).then (resp) ->
+            for i in [0...16]
+              $scope.samples[resp.data[i].well.well_num - 1] = resp.data[i].well.sample_name if resp.data[i]
 
         $timeout ->
           $scope.showMeltCurveChart = true
@@ -175,7 +179,15 @@ App.controller 'MeltCurveChartCtrl', [
         value: Math.abs(transform.x/(w*transform.k - w))
         width: w/(w*transform.k)
       }
-      $scope.mc_zoom = (transform.k - 1)/ (scale_extent-1)
+      $scope.mc_zoom = (transform.k - 1)/ (scale_extent)
+
+    $scope.onSelectLine = (config) ->
+      for i in [0..15] by 1
+        $scope.wellButtons["well_#{i}"].active = (i == config.config.well)
+
+    $scope.onUnselectLine = ->
+      for i in [0..15] by 1
+        $scope.wellButtons["well_#{i}"].active = false
 
     $scope.$watchCollection 'wellButtons', (buttons) ->
       return if !buttons

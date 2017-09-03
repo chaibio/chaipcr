@@ -94,7 +94,7 @@ window.ChaiBioTech.ngApp.service('moveStageToSides', [
       };
 
       this.moveToSideStageComponents = function(moveCount, targetStage) {
-
+        
         targetStage.stageGroup.set({left: targetStage.left + moveCount }).setCoords();
         targetStage.dots.set({left: (targetStage.left + moveCount ) + 3}).setCoords();
         targetStage.left = targetStage.left + moveCount;
@@ -125,8 +125,14 @@ window.ChaiBioTech.ngApp.service('moveStageToSides', [
             }
           }, targetStage);
 
-          targetStage.parent.moveDots.setLeft(targetStage.parent.moveDots.left + moveCount).setCoords();
+          if(targetStage.parent.moveDots.baseStep) {
+            var baseStep = targetStage.parent.moveDots.baseStep;
+            targetStage.parent.moveDots.setLeft(baseStep.left + baseStep.myWidth + 6).setCoords();
+            return true;
+          } else {
+            targetStage.parent.moveDots.setLeft(targetStage.left + 6).setCoords();
+          }         
       };
-      
+
     }
 ]);

@@ -70,6 +70,7 @@ class Experiment < ActiveRecord::Base
     AmplificationCurve.delete_all(:experiment_id => experiment.id)
     AmplificationDatum.delete_all(:experiment_id => experiment.id)
     CachedMeltCurveDatum.delete_all(:experiment_id => experiment.id)
+    Well.delete_all(:experiment_id => experiment.id)
   end
   
   def protocol
@@ -107,4 +108,19 @@ class Experiment < ActiveRecord::Base
     end
   end
   
+  def as_json(options={})
+      {:id=>id,
+       :guid=>experiment_definition.guid,
+       :stages=>experiment_definition.protocol.stages.map {|stage|
+        { :id=>stage.id,
+          :name=>stage.name,
+          :stage_type=>stage.stage_type,
+          :num_cycles=>stage.num_cycles,
+          :steps=>stage.steps.map { |step|
+            {:id=>step.id, :name=>step.name, :hold_time=>step.hold_time, :ramp_id=>(step.ramp)? step.ramp.id : nil}
+          }
+        }
+       }
+      }
+  end
 end

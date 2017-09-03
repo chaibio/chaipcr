@@ -4,10 +4,6 @@
   <description>Build Chaibio shoftware</description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.27.0">
-      <projectUrl>https://github.com/chaibio/chaipcr.git/</projectUrl>
-      <displayName></displayName>
-    </com.coravy.hudson.plugins.github.GithubProjectProperty>
     <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.17.2">
       <optOut>false</optOut>
     </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
@@ -18,16 +14,6 @@
           <description>Building machine</description>
           <defaultValue>10.0.100.240</defaultValue>
         </hudson.model.StringParameterDefinition>
-        <hudson.model.BooleanParameterDefinition>
-          <name>check_badblocks</name>
-          <description>Check if there are any bad blocks on eMMC. Takes more than an hour.</description>
-          <defaultValue>false</defaultValue>
-        </hudson.model.BooleanParameterDefinition>
-        <hudson.model.BooleanParameterDefinition>
-          <name>low_performance</name>
-          <description>Set cpu to lowest performance.</description>
-          <defaultValue>false</defaultValue>
-        </hudson.model.BooleanParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>bypass_pru</name>
           <description>Will not install PRU work</description>
@@ -47,7 +33,7 @@
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.3.2">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.5.1">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
@@ -229,6 +215,22 @@ ENDSSH
 		echo ssh is connectable.
         sleep 10
 
+
+		branch_param=
+
+		if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+		then
+   			echo No build branch chosen
+		else
+     		branch_param=&quot;-b $(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
+		    echo Cloning branch $branch_param
+		fi
+
+		rm -r tmp || true
+	 	mkdir tmp || true
+        cd tmp
+		git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
+        cd chaipcr || exit 1
         cat deploy.sh
         echo | ./deploy.sh $build_machine
 
@@ -241,30 +243,31 @@ exit 1</command>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo realtime compile
+      <command>echo Setup MySQL
 
-cpufreq-info
-cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-if $low_performance
-then
-    cpufreq-set -f 300MHz 
-    cpufreq-set -g conservative --max 300MHz
-fi
+mkdir /data /perm || true
+
+systemctl stop mysql.service
+mount /dev/mmcblk1p2 /data || true
+mount /dev/mmcblk1p3 /perm || true
+
+mv /var/lib/mysql /data/
+sed -i &quot;s,datadir.*=.*,datadir=/data/mysql,g&quot; /etc/mysql/my.cnf # Edit /etc/mysql/my.cnf and change datadir to /data/mysql
+systemctl start mysql.service
 
 sync
-
 cd
 echo unmounting any sdcard folders
 umount /sdcard/*
 umount /dev/mmcblk0p*
 
-LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
+LC_ALL=C /sbin/sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
 ,,0x83,*
 __EOF__
 
-partprobe /dev/mmcblk0
-mkfs.ext4 /dev/mmcblk0p1 -F
-mkdir -p /sdcard/upgrade
+/sbin/partprobe /dev/mmcblk0
+/sbin/mkfs.ext4 /dev/mmcblk0p1 -F
+mkdir -p /sdcard/upgrade || true
 if mount /dev/mmcblk0p1 /sdcard/upgrade/
 then
     echo &quot;temp sdcard folder mounted&quot;
@@ -281,6 +284,7 @@ else
    echo &quot;failed creating swap file&quot;
    exit 1
 fi
+
 sudo chmod 600 /sdcard/upgrade/swapfile
 sudo mkswap /sdcard/upgrade/swapfile
 sudo swapon /sdcard/upgrade/swapfile
@@ -289,19 +293,20 @@ sudo swapon /sdcard/upgrade/swapfile
 sudo swapon -s
 
 free -m
-
-
 echo browser compile
 cd /sdcard/upgrade/
+rm -r compile-browser || true
 mkdir compile-browser
 cd compile-browser/
-git clone https://github.com/chaibio/chaipcr.git
-cd /sdcard/upgrade/compile-browser/chaipcr/browser/
+git clone https://github.com/chaibio/chaipcr.git || exit 1
+cd /sdcard/upgrade/compile-browser/chaipcr/browser/ || exit 1
 
-/opt/QtEmbedded/bin/qmake
+rm /sdcard/upgrade/compile-browser/chaipcr/realtime/libraries/lib/libPoco*
+
+/opt/QtEmbedded/bin/qmake || exit 1
 sed -i &quot;s/arm-unknown-linux-gnueabi-//&quot; Makefile
-make
-make install
+make || exit 1
+make install || exit 1
 #cp realtime ~/tmp
 #cp libraries/lib/* /usr/lib/
 cd /sdcard/upgrade/
@@ -309,9 +314,10 @@ rm -r compile-browser
 cd
 echo done compiling browser
 
-
+free -m
 sync
 
+rm -r /sdcard/upgrade/realtime-compile || true
 mkdir -p /sdcard/upgrade/realtime-compile
 cd /sdcard/upgrade/realtime-compile
 
@@ -325,34 +331,171 @@ else
      echo Cloning branch $branch_param
 fi
 
-git clone $branch_param https://github.com/chaibio/chaipcr.git
-cd /sdcard/upgrade/realtime-compile/chaipcr/realtime
+git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
+cd /sdcard/upgrade/realtime-compile/chaipcr/realtime || exit 1
 
 cp util/instance.h control/
 rm libraries/lib/libPoco*
 
 #qmake
-/opt/QtEmbedded/bin/qmake
+/opt/QtEmbedded/bin/qmake || exit 1
 
 sed -i &quot;s/arm-unknown-linux-gnueabi-//&quot; Makefile
-make
-make install
+make || exit 1
+make install || exit 1
 #cp realtime ~/tmp
 cp libraries/lib/* /usr/lib/
 cd
 rm -r /sdcard/upgrade/realtime-compile
 
-swapoff /sdcard/upgrade/swapfile
-rm /sdcard/upgrade/swapfile
-
 echo  Deploy realtime to ~/tmp
 cp ~/chaipcr/deploy/device/realtime.service /lib/systemd/system/
 systemctl enable realtime.service
+
+
+sync
+
+     echo precompile julia packages if needed
+if [ -e /root/chaipcr/bioinformatics/juliaserver.jl ]
+then
+     free -m
+
+     echo $(date) Performing precompilling julia packages
+     cd /root/chaipcr/bioinformatics/
+
+      #julia --print &quot;Pkg.init()&quot;
+      julia --print &quot;Pkg.update()&quot;
+      julia --print &quot;Pkg.add(\&quot;Clustering\&quot;)&quot;
+      julia --print &quot;Pkg.add(\&quot;JuMP\&quot;)&quot;
+      julia --print &quot;Pkg.add(\&quot;HttpServer\&quot;)&quot;
+      julia --print &quot;Pkg.add(\&quot;Ipopt\&quot;)&quot;
+      julia --print &quot;Pkg.add(\&quot;JSON\&quot;)&quot;
+      julia --print &quot;Pkg.add(\&quot;MySQL\&quot;)&quot;
+      julia --print &quot;Pkg.add(\&quot;ProfileView\&quot;)&quot;
+
+      julia --print &quot;Pkg.build(\&quot;ProfileView\&quot;)&quot;
+
+      julia --print &quot;Pkg.build(\&quot;MySQL\&quot;)&quot;
+  
+      julia --print &quot;Pkg.build(\&quot;HttpServer\&quot;)&quot;
+      julia --print &quot;Pkg.build(\&quot;Ipopt\&quot;)&quot;
+      julia --print &quot;Pkg.build(\&quot;JSON\&quot;)&quot;
+      julia --print &quot;Pkg.build(\&quot;JuMP\&quot;)&quot;
+
+      julia --print &quot;using JuMP, JSON, MySQL, Clustering, HttpServer, Ipopt&quot;
+
+#      julia --print &quot;include(\&quot;/root/chaipcr/bioinformatics/QpcrAnalysis/QpcrAnalysis.jl\&quot;)&quot; --compile=all count not be called this way... must have some arrangment before it 
+
+      echo calling qa_startup_bbb.jl
+	cat &lt;&lt;EOF &gt; /root/chaipcr/bioinformatics/qa_startup_bbb.jl
+
+# start-up code for &quot;QpcrAnalysis&quot; package testing
+# load_from_dir_ = &quot;E:/freelance/applications/010_qpcr/Julia/QpcrAnalysis&quot; # PC
+# load_from_dir_ = &quot;/sdcard/upgrade/Julia/QpcrAnalysis&quot; # bbb
+# load_from_dir_ = &quot;/root/xqrm/QpcrAnalysis&quot; # bbb
+load_from_dir_ = &quot;/root/chaipcr/bioinformatics/QpcrAnalysis&quot; # bbb production
+ENV[&quot;JULIA_ENV&quot;] = &quot;bbb_test_1&quot; # bbb when &quot;localhost&quot; resulted in error &quot;&quot;
+push!(LOAD_PATH, load_from_dir_)
+using DataStructures, Ipopt, JSON, MySQL#, NLopt (&quot;ERROR: LoadError: Declaring __precompile__(false) is not allowed in files that are being precompiled&quot;. &quot;ERROR: Failed to precompile NLopt to /root/.julia/lib/v0.6/NLopt.ji&quot;) #, ProfileView # comment `ProfileView` for building .dll, otherwise something like &quot;incremental compilation error&quot;
+
+include(&quot;$load_from_dir_/QpcrAnalysis.jl&quot;)
+using QpcrAnalysis
+
+function mysql_session(
+    func::Function,
+    db_hup::AbstractVector, # exactly 3 elements for db_host, db_usr, db_pswd
+    db_name::AbstractString
+    )
+    db_conn = mysql_connect(db_hup..., db_name)
+    try
+        func(db_conn)
+    finally
+        mysql_disconnect(db_conn)
+        # println(&quot;`db_conn` closed&quot;) # cause &quot;julia-client&quot; not to show debug info
+    end # try
+end # mysql_session
+wdb_ = &quot;connect&quot;
+db_key_ = &quot;default&quot;
+# beaglebone
+db_host_ = &quot;localhost&quot;
+db_host_ = &quot;127.0.0.1&quot;
+db_usr_ = &quot;root&quot;
+db_pswd_ = &quot;&quot;
+# PC
+#db_host_ = &quot;localhost&quot;
+#db_usr_ = &quot;root1&quot;
+#db_pswd_ = &quot;pswd1&quot;
+db_name_ = &quot;test_2ch&quot;
+db_hup_ = [db_host_, db_usr_, db_pswd_]
+out_format_ = &quot;full&quot; # used: &quot;full&quot;, &quot;pre_json&quot;, &quot;json&quot;
+# amp
+asrp_vec_ = []
+step_id_ = 0
+ramp_id_ = 0
+well_nums_ = []
+min_reliable_cyc_ = 5
+baseline_cyc_bounds_ = []
+cq_method_ = &quot;Cy0&quot;
+ct_fluos_ = []
+max_cycle_ = 1000
+ad_cycs_ = 0
+ad_cluster_method_ = &quot;k-medoids&quot;
+out_format_ = &quot;full&quot;
+out_sr_dict_ = true
+verbose_ = false
+# for `mod_bl_q`
+m_prebl_ = &quot;l4_enl&quot;
+# m_prebl_ = &quot;l4_enl_hbl&quot; # not working well
+m_postbl_ = &quot;l4_enl&quot;
+ms = OrderedDict(&quot;pre&quot;=&gt;m_prebl_, &quot;post&quot;=&gt;m_postbl_)
+solver_ = IpoptSolver(print_level=0, max_iter=35)
+kwdict_jmp_model_ = OrderedDict(:solver=&gt;solver_)
+kwdict_mbq_ = OrderedDict(
+    :m_prebl=&gt;m_prebl_,
+    :m_postbl=&gt;m_postbl_,
+    :kwargs_jmp_model=&gt;kwdict_jmp_model_
+)
+ipopt_print2file_prefix_ = &quot;&quot;
+before_128x_ = false
+kwdict_rc_ = OrderedDict(
+    :before_128x=&gt;before_128x_
+)
+ad_cycs_ = 0
+ad_cluster_method_ = &quot;k-means&quot;
+# mc
+well_nums_ = []
+auto_span_smooth_ = false
+span_smooth_default_ = 0.015
+span_smooth_factor_ = 7.2
+max_tmprtr_ = 1000
+out_format_ = &quot;full&quot;
+verbose_ = false
+# analyze functions
+# analyze_optical_calibration
+well_nums_ = []
+verbose = false
+# using QpcrAnalysis
+# reload(&quot;QpcrAnalysis&quot;) # can update non-exported content properly, but cant export, like import and include
+ include(&quot;$load_from_dir_/QpcrAnalysis.jl&quot;)
+&quot;success&quot;
+#
+EOF
+
+	echo $(date) calling startup script
+       	julia qa_startup_bbb.jl --compile=All
+	echo done with startup script
+       	echo $(date) starting julia server, and running for 30 min
+       	julia juliaserver.jl --compile=All &amp;
+
+       	sleep 1800
+       	echo $(date) server wait time due
+
+fi
+
+sync
+swapoff /sdcard/upgrade/swapfile
+rm /sdcard/upgrade/swapfile
 exit 0
-
-
-
-
 </command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
@@ -607,15 +750,6 @@ exit 1
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo device is still connectable!
-
-cpufreq-info
-cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-if $low_performance
-then
-    cpufreq-set -f 300MHz 
-    cpufreq-set -g conservative --max 300MHz
-fi
-
 cd
 echo unmounting any sdcard folders
 umount /sdcard/*
@@ -645,6 +779,7 @@ exit 0</command>
 
 cd /root/chaipcr/web
 bundle exec rake db:migrate # migrates database as needed
+
 
 exit 0</command>
       <execEachLine>false</execEachLine>

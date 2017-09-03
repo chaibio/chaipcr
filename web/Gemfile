@@ -56,7 +56,9 @@ gem 'bcrypt-ruby', '~> 3.1.2'
 
 gem 'seed-fu'
 
-gem 'rserve-client', :git=>"https://github.com/rapofran/Rserve-Ruby-client.git", :branch => 'sockets-with-timeouts'
+#gem 'rserve-client', :git=>"https://github.com/rapofran/Rserve-Ruby-client.git", :branch => 'sockets-with-timeouts'
+
+gem 'httparty'
 
 gem 'activerecord-import'
 

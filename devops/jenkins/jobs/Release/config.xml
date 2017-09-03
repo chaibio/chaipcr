@@ -33,7 +33,7 @@
         <hudson.model.StringParameterDefinition>
           <name>input_image_prefix</name>
           <description>Image prefix to start with.</description>
-          <defaultValue>Jessie49</defaultValue>
+          <defaultValue>Jessie49Clean</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>output_image_prefix</name>

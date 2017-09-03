@@ -89,6 +89,7 @@ private:
     double _maxRampSpeed;
 
     bool _stepProcessingState;
+    bool _targetTempDirtyState;
     mutable std::mutex _stepProcessingMutex;
 
     HeatBlock::Ramp _ramp;

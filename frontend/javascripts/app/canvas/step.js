@@ -28,7 +28,7 @@ angular.module("canvasApp").factory('step', [
   function(ExperimentLoader, $rootScope, circle, previouslySelected, stepGraphics, constants) {
 
     return function(model, parentStage, index, $scope) {
-      
+
       this.stepMovedDirection = null;
       this.model = model;
       this.parentStage = parentStage;
@@ -89,7 +89,7 @@ angular.module("canvasApp").factory('step', [
         this.circle.getUniqueId();
 
       };
-      
+
       this.deleteAllStepContents = function() {
 
         for(var component in this.visualComponents) {
@@ -143,7 +143,7 @@ angular.module("canvasApp").factory('step', [
 
         this.rampSpeedText.text = String(this.model.ramp.rate + "º C/s");
         var rampRate = Number(this.model.ramp.rate);
-        if(rampRate <= 0 || ! rampRate) {
+        if(!rampRate || rampRate >= 5 || rampRate <=0) {
           this.rampSpeedGroup.setVisible(false);
         } else {
           this.rampSpeedGroup.setVisible(true);
@@ -221,9 +221,14 @@ angular.module("canvasApp").factory('step', [
 
       this.rampSpeedGraphics = function() {
         stepGraphics.rampSpeed.call(this);
-        if(this.rampSpeedNumber <= 0) {
+        if(this.rampSpeedNumber >= 5) {
           this.rampSpeedGroup.setVisible(false);
         }
+      };
+
+      this.swapMoveStepStatus = function(status) {
+
+        this.dots.setVisible(status);
       };
 
       this.render = function() {

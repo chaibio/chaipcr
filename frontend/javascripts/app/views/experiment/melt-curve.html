@@ -40,12 +40,12 @@ limitations under the License.
           </div>
         </div>
         <div style="padding-top:70px;">
-          <div full-height offset="210 + 50 + 37 + 20 + 122">
-            <div class="vertical-text SH">
+          <div>
+            <!-- <div class="vertical-text SH">
               <span ng-show="curve_type === 'derivative'">DERIVATIVE REPORTER</span>
               <span ng-show="curve_type === 'normalized'">NORMALIZED REPORTER</span>
-            </div>
-            <div class="chart-container" full-height offset="530" min="255">
+            </div> -->
+            <div class="chart-container" full-height offset="530" min="300">
               <div class="chart-error B1" ng-show="error">
                 <strong class="text-black">Unable to load chart data</strong>
                 <p ng-bind="error"></p>
@@ -57,7 +57,7 @@ limitations under the License.
                 <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
                 <p class="B2">May take a minute</p>
               </div>
-              <melt-curve-chart data="data" config="config" zoom="mc_zoom" on-zoom="onZoom" scroll="mc_scroll.value" show="showMeltCurveChart"></melt-curve-chart>
+              <melt-curve-chart data="data" config="config" zoom="mc_zoom" on-zoom="onZoom" on-select-line="onSelectLine" on-unselect-line="onUnselectLine" scroll="mc_scroll.value" show="showMeltCurveChart"></melt-curve-chart>
             </div>
             <div class="ampli-zoom-scroll-container">
               <div class="row">

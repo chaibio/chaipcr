@@ -31,6 +31,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <system_error>
+#include <map>
 
 #include <unistd.h>
 #include <ifaddrs.h>
@@ -251,7 +252,7 @@ void WirelessManager::scan(const std::string &interface)
 
     Util::watchProcess("iwlist " + interface + " scan", [&stream](const char *buffer, std::size_t size){ stream.write(buffer, size); });
 
-    std::vector<ScanResult> resultList;
+    std::map<std::string, ScanResult> resultMap;
     ScanResult result;
 
     while (stream.good())
@@ -262,7 +263,17 @@ void WirelessManager::scan(const std::string &interface)
         if (line.find("Cell ") != std::string::npos)
         {
             if (!result.ssid.empty())
-                resultList.emplace_back(result);
+            {
+                auto it = resultMap.find(result.ssid);
+
+                if (it != resultMap.end())
+                {
+                    if (it->second.quality < result.quality)
+                        it->second = result;
+                }
+                else
+                    resultMap.emplace(std::make_pair(result.ssid, result));
+            }
 
             result = ScanResult();
         }
@@ -297,11 +308,25 @@ void WirelessManager::scan(const std::string &interface)
     }
 
     if (!result.ssid.empty())
-        resultList.emplace_back(result);
+    {
+        auto it = resultMap.find(result.ssid);
+
+        if (it != resultMap.end())
+        {
+            if (it->second.quality < result.quality)
+                it->second = result;
+        }
+        else
+            resultMap.emplace(std::make_pair(result.ssid, result));
+    }
 
     {
         Poco::RWLock::ScopedWriteLock lock(_scanResultMutex);
-        _scanResult = std::move(resultList);
+        _scanResult.clear();
+
+        for (auto it = resultMap.begin(); it != resultMap.end(); ++it)
+            _scanResult.emplace_back(it->second);
+
         _scanTime = std::time(nullptr);
         _scanScheduleState = false;
     }

@@ -20,7 +20,7 @@ limitations under the License.
   <div class="page-layout" ng-controller="AmplificationChartCtrl" ng-show="experiment">
     <div class="content row">
       <div class="chart-section col-xs-6">
-        <div full-height offset="210 + 50 + 37 + 20">
+        <div>
           <div class="curve-header">
             <div class="row">
               <div class="col-lg-5 col-md-6 col-sm-6 col-xs-6 curve-name">
@@ -71,9 +71,9 @@ limitations under the License.
               <label class="amplification-options" ng-click="openOptionsModal()">AMPLIFICATION SETTINGS</label>
             </div>
           </div>
-          <div style="margin-left:20px;">
-            <div class="vertical-text SH">RELATIVE FLUORESCENCE UNITS</div>
-            <div class="chart-container" full-height offset="37 + 50 + 170 + 70 + 50 + 42 + 53" min="320">
+          <div style="padding-left:20px; padding-right: 20px;">
+            <!-- <div class="vertical-text SH">RELATIVE FLUORESCENCE UNITS</div> -->
+            <div class="chart-container" full-height offset="37 + 50 + 170 + 70 + 50 + 42 + 53" min="353">
               <div class="chart-error B1" ng-show="retrying && !fetching && error">
                 <strong class="text-black">Unable to load chart data</strong>
                 <p ng-bind="error"></p>
@@ -85,10 +85,10 @@ limitations under the License.
                 <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
                 <p class="B2">May take a minute</p>
               </div>
-              <amplification-chart data="amplification_data" config="chartConfig" zoom="ampli_zoom" on-zoom="onZoom" on-select-line="onSelectLine" scroll="ampli_scroll.value" show="showAmpliChart"></amplification-chart>
+              <amplification-chart data="amplification_data" config="chartConfig" zoom="ampli_zoom" on-zoom="onZoom" on-select-line="onSelectLine" on-unselect-line="onUnselectLine" scroll="ampli_scroll.value" show="showAmpliChart"></amplification-chart>
             </div>
           </div>
-          <div class="text-center num-cycle-text SH">CYCLE NUMBER</div>
+          <!-- <div class="text-center num-cycle-text SH">CYCLE NUMBER</div> -->
           <div class="ampli-zoom-scroll-container">
             <div class="row">
               <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">

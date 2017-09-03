@@ -25,18 +25,20 @@ class Ramp < ActiveRecord::Base
   
   ACCESSIBLE_ATTRS = [:rate, :collect_data]
   
-  MAX_RATE   = 0
+  MAX_RATE   = 5
   
-  def max?
-    rate == 0
-  end
-  
-  def max_rate
-    3.0
-  end
+  validate :validate
   
   def copy
     copy_helper
+  end
+  
+  protected
+
+  def validate
+    if rate <= 0 || rate > MAX_RATE
+      errors.add(:rate, "range is from 0 to #{MAX_RATE}")
+    end
   end
   
 end

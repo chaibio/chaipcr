@@ -3,13 +3,14 @@ describe("Testing StageMovementRightService", function() {
     beforeEach(module('ChaiBioTech'));
     beforeEach(module('canvasApp'));
 
-    var _StageMovementRightService, _StagePositionService, _StepPositionService;
+    var _StageMovementRightService, _StagePositionService, _StepPositionService, _moveStageToSidesWhileMoveStep;
 
-    beforeEach(inject(function(StageMovementRightService, StagePositionService, StepPositionService) {
+    beforeEach(inject(function(StageMovementRightService, StagePositionService, StepPositionService, moveStageToSidesWhileMoveStep) {
 
         _StageMovementRightService = StageMovementRightService;
         _StagePositionService = StagePositionService;
         _StepPositionService = StepPositionService;
+        _moveStageToSidesWhileMoveStep = moveStageToSidesWhileMoveStep;
     }));
 
     it("It should test shouldStageMoveRight method", function() {
@@ -104,12 +105,14 @@ describe("Testing StageMovementRightService", function() {
         spyOn(_StagePositionService, "getPositionObject").and.returnValue(true);
         spyOn(_StagePositionService, "getAllVoidSpaces").and.returnValue(true);
         spyOn(_StepPositionService, "getPositionObject").and.returnValue(true);
+        spyOn(_moveStageToSidesWhileMoveStep, "moveToSideForStep").and.returnValue();
 
         _StageMovementRightService.shouldStageMoveRightCallback.apply(sI, args);
 
         expect(_StagePositionService.getPositionObject).toHaveBeenCalled();
         expect(_StagePositionService.getAllVoidSpaces).toHaveBeenCalled();
         expect(_StepPositionService.getPositionObject).toHaveBeenCalled();
+        expect(_moveStageToSidesWhileMoveStep.moveToSideForStep).toHaveBeenCalled();
     });
 
     it("It should test shouldStageMoveRightCallback method, when movement.left not within the space", function() {

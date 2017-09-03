@@ -99,32 +99,54 @@ angular.module("canvasApp").factory('mouseDown', [
             // Remember what we click and what we move is two different objects, once we click, rest of the graphics come by, So original reference point to ,
             // the very thing we click. Not to the one we move. This applies to moveStage too.
             var step = evt.target.parent;
-            var backupStageModel = angular.copy.apply(angular, step.parentStage.model);
+            if(step.model.hold_time !== 0) {
             
-            movingStepGraphics.initiateMoveStepGraphics(step, C);
+              var backupStageModel = angular.copy(step.parentStage.model);
+              movingStepGraphics.initiateMoveStepGraphics(step, C);
+              // only if its not an infinite hold step we move the step
             
-            that.selectStep(step.circle);
-            that.calculateMoveLimit("step", evt.target);
-            
-            that.moveStepActive = true;
-            that.canvas.moveCursor = "move";
-            circleManager.togglePaths(false); //put it back later
-            evt.target.setVisible(false);
-            C.moveDots.setLeft(step.left + 6).setCoords().setVisible(true);
-            C.canvas.bringToFront(C.moveDots);
-            C.canvas.bringToFront(C.stepIndicator);
-            
-            step.parentStage.squeezeStage(step);
+              that.selectStep(step.circle);
+              that.calculateMoveLimit("step", evt.target);
+              
+              that.moveStepActive = true;
+              that.canvas.moveCursor = "move";
+              
+              evt.target.setVisible(false);
+              C.moveDots.baseStep = null;
+              
+              if(step.previousStep) {
+                C.moveDots.baseStep = step.previousStep;
+              }
+              
+              
+              if(step.nextStep === null && step.previousStep === null) {
+                
+                step.parentStage.deleteStep({}, step);
+                circleManager.togglePaths(false); //put it back later
 
-            if(step.parentStage.nextStage) {
-              //var width = step.parentStage.myWidth;
-              // This is a trick, when we moveAllStepsAndStages we calculate the placing with myWidth, please refer getLeft() method
-              step.parentStage.myWidth = step.parentStage.myWidth + 23;
-              step.parentStage.nextStage.moveAllStepsAndStages(true);
-              step.parentStage.myWidth = step.parentStage.myWidth - 23;
+                C.canvas.bringToFront(C.stepIndicator);
+                // May be write a seperate init method for one step stage.
+                C.stepIndicator.initForOneStepStage(step, evt.target, C, backupStageModel);
+                C.canvas.renderAll();
+                return null;
+              }
+
+              step.parentStage.squeezeStage(step);
+              
+              if(step.parentStage.nextStage) {
+                
+                step.parentStage.myWidth = step.parentStage.myWidth - 2;
+                step.parentStage.nextStage.moveAllStepsAndStages(true); 
+              }
+
+              C.moveDots.setLeft(step.left + 6).setCoords().setVisible(true);
+              C.canvas.bringToFront(C.moveDots);
+              circleManager.togglePaths(false); //put it back later
+              
+              C.canvas.bringToFront(C.stepIndicator);
+              C.stepIndicator.init(step, evt.target, C, backupStageModel);
+              C.canvas.renderAll();
             }
-            C.stepIndicator.init(step, evt.target, C, backupStageModel);
-            C.canvas.renderAll();
 
           break;
 

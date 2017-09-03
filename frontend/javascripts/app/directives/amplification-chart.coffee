@@ -14,6 +14,7 @@ window.App.directive 'amplificationChart', [
         zoom: '='
         onZoom: '&'
         onSelectLine: '&'
+        onUnselectLine: '&'
         show: '='
       link: ($scope, elem, attrs) ->
 
@@ -34,11 +35,12 @@ window.App.directive 'amplificationChart', [
           chart = new $window.ChaiBioCharts.AmplificationChart(elem[0], $scope.data, $scope.config)
           chart.onZoomAndPan($scope.onZoom())
           chart.onSelectLine($scope.onSelectLine())
+          chart.onUnselectLine($scope.onUnselectLine())
           d = chart.getDimensions()
           $scope.onZoom()(chart.getTransform(), d.width, d.height, chart.getScaleExtent())
 
         $scope.$on 'window:resize', ->
-          initChart()
+          chart.resize(elem[0], $scope.data, $scope.config) if chart
 
         $scope.$watchCollection ($scope) ->
           return {
@@ -57,6 +59,7 @@ window.App.directive 'amplificationChart', [
               chart.setYAxis()
               chart.setXAxis()
               chart.drawLines()
+              chart.updateXAxisExtremeValues()
               if isInterpolationChanged(val, oldState) or isBaseBackroundChanged(val, oldState)
                 chart.zoomTo(0)
 
@@ -75,7 +78,6 @@ window.App.directive 'amplificationChart', [
           if !$scope.data or !$scope.config or !$scope.show
             return $timeout(reinitChart, 500)
           dims = chart.getDimensions()
-          #console.log dims
           if dims.width <= 0 or dims.height <= 0 or !dims.width or !dims.height
             $timeout(reinitChart, 500)
 
@@ -87,6 +89,7 @@ window.App.directive 'amplificationChart', [
               chart.setYAxis()
               chart.setXAxis()
               chart.drawLines()
+              chart.updateXAxisExtremeValues()
 
     }
 ]

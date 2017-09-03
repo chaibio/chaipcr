@@ -16,7 +16,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-#require 'rserve'
 
 class MainController < ApplicationController
   api :GET, "/welcome", "Show this page when there is no user in the database"

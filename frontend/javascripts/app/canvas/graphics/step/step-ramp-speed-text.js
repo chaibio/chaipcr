@@ -27,7 +27,7 @@
            fill: 'black',  fontSize: 12, fontFamily: "dinot",  originX: 'left',  originY: 'top'
          };
 
-       var dataString = String(step.rampSpeedNumber) + "º C/s";
+       var dataString = String(step.rampSpeedNumber) + " ºC/s";
 
        return Text.create(dataString, properties);
 

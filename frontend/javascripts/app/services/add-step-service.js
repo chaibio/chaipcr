@@ -13,7 +13,6 @@ window.ChaiBioTech.ngApp.service('addStepService', [
         */
         this.addNewStep = function(stage, stepData, currentStep, $scope) {
 
-            
             stage.setNewWidth(constants.stepWidth); // Increase the width of the stage
             stage.moveAllStepsAndStages(false); // Move other stages away
             

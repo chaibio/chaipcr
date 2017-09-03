@@ -80,6 +80,10 @@ class AmplificationOption < ActiveRecord::Base
     "cp='#{cq_method}',min_fluomax=#{min_fluorescence},min_D1max=#{min_d1},min_D2max=#{min_d2},min_reliable_cyc=#{min_reliable_cycle}#{",baseline_cyc_bounds=c("+baseline_cycle_min.to_s+","+baseline_cycle_max.to_s+")" if !baseline_cycle_min.nil?}"
   end
   
+  def to_hash
+    {:cq_method=>cq_method, :min_fluomax=>min_fluorescence, :min_D1max=>min_d1, :min_D2max=>min_d2, :min_reliable_cyc=>min_reliable_cycle, :baseline_cyc_bounds=>(baseline_cycle_min.nil?)? [] : [baseline_cycle_min, baseline_cycle_max]}
+  end
+  
   def changed?
     super || @save_changed
   end

@@ -130,6 +130,15 @@ class Step < ActiveRecord::Base
           end
       end
     end
+    
+    if !temperature.nil? && (temperature < 4 || temperature > 100)
+      errors.add(:temperature, "between 4 to 100")
+    end
+    
+    if !hold_time.nil? && hold_time < 0
+      errors.add(:hold_time, "Cannot be negative")
+    end
+    
     if collect_data && (infinite_hold? || pause)
       errors.add(:collect_data, "Cannot collect data on #{(infinite_hold?)? "infinite hold" : "pause"} step")
     end

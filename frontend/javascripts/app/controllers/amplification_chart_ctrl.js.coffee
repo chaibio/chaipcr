@@ -151,7 +151,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       $scope.getAmplificationOptions = ->
         Experiment.getAmplificationOptions($stateParams.id).then (resp) ->
-          console.log(resp.data)
           $scope.method.name = resp.data.amplification_option.cq_method
           $scope.minFl.value = resp.data.amplification_option.min_fluorescence
           $scope.minCq.value = resp.data.amplification_option.min_reliable_cycle
@@ -299,11 +298,15 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           value: Math.abs(transform.x/(w*transform.k - w))
           width: w/(w*transform.k)
         }
-        $scope.ampli_zoom = (transform.k - 1)/ (scale_extent-1)
+        $scope.ampli_zoom = (transform.k - 1)/ (scale_extent)
 
       $scope.onSelectLine = (config) ->
         for i in [0..15] by 1
           $scope.wellButtons["well_#{i}"].active = (i == config.config.well)
+
+      $scope.onUnselectLine = ->
+        for i in [0..15] by 1
+          $scope.wellButtons["well_#{i}"].active = false
 
       $scope.$watch 'baseline_subtraction', (val) ->
         updateSeries()
@@ -326,6 +329,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       , (chart) ->
         if chart is 'amplification'
           fetchFluorescenceData()
+          Experiment.getWells($stateParams.id).then (resp) ->
+            for i in [0...16]
+              $scope.samples[resp.data[i].well.well_num - 1] = resp.data[i].well.sample_name if resp.data[i]
 
           $timeout ->
             $scope.showAmpliChart = true

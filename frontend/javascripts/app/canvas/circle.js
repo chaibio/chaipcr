@@ -27,9 +27,6 @@ angular.module("canvasApp").factory('circle', [
   'centerCircle',
   'littleCircleGroup',
   'circleMaker',
-  'stepDataGroup',
-  'stepTemperature',
-  'stepHoldTime',
   'gatherDataGroupOnScroll',
   'gatherDataCircleOnScroll',
   'gatherDataGroup',
@@ -38,10 +35,11 @@ angular.module("canvasApp").factory('circle', [
   'pauseStepOnScrollGroup',
   'pauseStepCircleOnScroll',
   'pauseStepService',
+  'editModeService',
+  'stepDataGroupService',
   function(ExperimentLoader, $rootScope, Constants, circleGroup, outerMostCircle, outerCircle,
-    centerCircle, littleCircleGroup, circleMaker, stepDataGroup, stepTemperature, stepHoldTime,
-    gatherDataGroupOnScroll, gatherDataCircleOnScroll, gatherDataGroup, gatherDataCircle, previouslySelected,
-    pauseStepOnScrollGroup, pauseStepCircleOnScroll, pauseStepService) {
+    centerCircle, littleCircleGroup, circleMaker, gatherDataGroupOnScroll, gatherDataCircleOnScroll, gatherDataGroup, gatherDataCircle, previouslySelected,
+    pauseStepOnScrollGroup, pauseStepCircleOnScroll, pauseStepService, editModeService, stepDataGroupService) {
     
     return function(model, parentStep, $scope) {
 
@@ -50,10 +48,14 @@ angular.module("canvasApp").factory('circle', [
       this.canvas = parentStep.canvas;
       this.scrollTop = 80;
       this.scrollLength = 317;
-      this.halfway = (this.scrollLength - this.scrollTop) / 2;
       //this.scrollRatio = (this.scrollLength - this.scrollTop) / 100;
       this.scrollRatio1 = ((this.scrollLength - this.scrollTop) * 0.25) / 50; // 1.2;//(this.scrollLength - this.scrollTop) / 200;
       this.scrollRatio2 = ((this.scrollLength - this.scrollTop) * 0.75) / 50;//3.54;//(this.scrollLength - this.scrollTop) / 50;
+      // Now we have our lowest temperature as 4 instead of 0, So we introduce lowestScrollCoordinate;
+      // lowestScrollCoordinate = this.scrollLength - (4 * scrollRatio1);
+      this.lowestTemperature = 4;
+      this.lowestScrollCoordinate = this.scrollLength - (this.lowestTemperature * this.scrollRatio1);
+
       this.middlePoint = this.scrollLength - ((this.scrollLength - this.scrollTop) * 0.25); // This is the point where it reads 50
 
       this.gatherDataImage = this.next = this.previous = null;
@@ -134,6 +136,7 @@ angular.module("canvasApp").factory('circle', [
         this method is invoked from canvas.js once all the stage/step are loaded.
       ********************************************/
       this.addStepDataGroup = function() {
+
         this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
         this.canvas.add(this.stepDataGroup);
       };
@@ -149,6 +152,7 @@ angular.module("canvasApp").factory('circle', [
       };
 
       this.managePause = function() {
+
         this.pauseStepCircleOnScroll = new pauseStepCircleOnScroll();
         this.pauseStepOnScrollGroup = new pauseStepOnScrollGroup(
           [
@@ -216,16 +220,18 @@ angular.module("canvasApp").factory('circle', [
           this.holdTime.text = "∞";
           if(this.parent.parentStage.parent.editStageStatus === true && oldHold !== null){
             var lastStage = this.parent.parentStage;
-            lastStage.dots.setVisible(false);
-            this.canvas.bringToFront(lastStage.dots);
-            this.parent.parentStage.parent.editModeStageChanges(this.parent.parentStage, -25, false);
-            this.canvas.renderAll();
+            //lastStage.dots.setVisible(false);
+            //this.canvas.bringToFront(lastStage.dots);
+            this.parent.swapMoveStepStatus(false);
+            editModeService.temporaryChangeForStatus(false, this.parent.parentStage);
           }
         } else {
           if(oldHold !== null && parseInt(oldHold) === 0 && this.parent.parentStage.parent.editStageStatus === true) {
-            this.parent.parentStage.parent.editModeStageChanges(this.parent.parentStage, 25, true);
+            editModeService.editModeStageChanges(this.parent.parentStage);
+            this.parent.swapMoveStepStatus(true);
           }
         }
+        this.canvas.renderAll();
       };
 
       this.changeHoldTime = function(new_hold) {
@@ -248,28 +254,13 @@ angular.module("canvasApp").factory('circle', [
             )
           ], this, $scope);
 
-        this.stepDataGroup = new stepDataGroup([
-            this.temperature = new stepTemperature(this.model, this, $scope),
-            this.holdTime = new stepHoldTime(this.model, this, $scope)
-          ], this, $scope);
+        stepDataGroupService.newStepDataGroup(this, $scope);
 
       };
 
       this.createNewStepDataGroup = function() {
-
-        this.canvas.remove(this.temperature);
-        this.canvas.remove(this.holdTime);
-
-        delete(this.temperature);
-        delete(this.holdTime);
-
-        this.stepDataGroup = new stepDataGroup([
-          this.temperature = new stepTemperature(this.model, this, $scope),
-          this.holdTime = new stepHoldTime(this.model, this, $scope)
-        ], this, $scope);
-
-        this.canvas.add(this.stepDataGroup);
-        this.canvas.renderAll();
+        
+        stepDataGroupService.reCreateNewStepDataGroup(this, $scope);
       };
 
       this.makeItBig = function() {

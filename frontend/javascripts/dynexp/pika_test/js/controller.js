@@ -353,7 +353,7 @@
                 }
               }else if (($scope.hexCq[i] >= 0 && $scope.hexCq[i] < 20) ) {
                 $scope.result[i] = "Invalid";
-              }else if (($scope.famCq[i] > 38 || !$scope.famCq[i]) && ($scope.hexCq[i] > 36 || !$scope.hexCq[i])) {
+              }else if (($scope.famCq[i] > 38 || !$scope.famCq[i]) && ($scope.hexCq[i] > 36 || !$scope.hexCq[i] || $scope.hexCq[i] < 10)) {
                 $scope.result[i] = "Inhibited";
               }else if (($scope.famCq[i] >= 0 && $scope.famCq[i] < 10) && (!$scope.hexCq[i] || $scope.hexCq[i] >= 20)) {
                 $scope.result[i] = "Unknown";
@@ -376,7 +376,7 @@
                   }
                 }else if (($scope.hexCq[i] >= 0 && $scope.hexCq[i] < 20) ) {
                   $scope.result[i] = "Invalid";
-                }else if (($scope.famCq[i] > 38 || !$scope.famCq[i]) && ($scope.hexCq[i] > 36 || !$scope.hexCq[i])) {
+                }else if (($scope.famCq[i] > 38 || !$scope.famCq[i]) && ($scope.hexCq[i] > 36 || !$scope.hexCq[i] || $scope.hexCq[i] < 10)) {
                   $scope.result[i] = "Inhibited";
                 }else if (($scope.famCq[i] >= 0 && $scope.famCq[i] < 10) && (!$scope.hexCq[i] || $scope.hexCq[i] >= 20)) {
                   $scope.result[i] = "Unknown";
@@ -411,7 +411,7 @@
                   }
                 }else if (!$scope.famCq[i] && ($scope.hexCq[i] >= 0 && $scope.hexCq[i] < 20) ) {
                   $scope.result[i] = "Invalid";
-                }else if (($scope.famCq[i] > 38 || !$scope.famCq[i]) && ($scope.hexCq[i] > 36 || !$scope.hexCq[i])) {
+                }else if (($scope.famCq[i] > 38 || !$scope.famCq[i]) && ($scope.hexCq[i] > 36 || !$scope.hexCq[i] || $scope.hexCq[i] < 10)) {
                   $scope.result[i] = "Inhibited";
                 }else if (($scope.famCq[i] >= 0 && $scope.famCq[i] < 10) && (!$scope.hexCq[i] || $scope.hexCq[i] >= 20)) {
                   $scope.result[i] = "Unknown";

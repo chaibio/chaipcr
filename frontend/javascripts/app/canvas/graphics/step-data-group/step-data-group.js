@@ -20,6 +20,7 @@
 angular.module("canvasApp").factory('stepDataGroup', [
   'constants',
   function(constants) {
+    
     return function(dataArray, parent, $scope) {
       var rec = new fabric.Rect({
         width: 105,
@@ -45,7 +46,6 @@ angular.module("canvasApp").factory('stepDataGroup', [
         name: "stepDataGroup",
         evented: ! $scope.exp_completed,
         parentCircle: parent,
-        //backgroundColor: 'green'
       });
     };
   }

@@ -24,6 +24,7 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
     @chartConfig =
       axes: {
         x: {
+          label: 'Time'
           key: 'elapsed_time'
           ticks: 10
           min: 0
@@ -31,6 +32,7 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
             SecondsDisplay.display2 t
         },
         y: {
+          label: 'Temperature (°C)'
           min: 0
           max: 120
           tickFormat: (t) ->
@@ -44,9 +46,9 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
       },
       margin: {
         top: 20
-        left: 50
+        left: 80
         right: 30
-        bottom: 20
+        bottom: 50
       },
       grid:
         x: false

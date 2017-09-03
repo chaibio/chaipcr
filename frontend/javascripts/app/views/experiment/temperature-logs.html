@@ -44,7 +44,7 @@
       </div>
       <div class="temperature-log-chart">
         <div>
-          <div class="vertical-text B1B">Temperature (&deg;C)</div>
+          <!-- <div class="vertical-text B1B">Temperature (&deg;C)</div> -->
           <div class="chart-container" full-width offset="40">
             <div full-height offset="37 + 50 + 210" min="300">
               <div class="loading-blue-container" ng-show="!experiment || !hasData">
@@ -52,11 +52,11 @@
                 <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
                 <p class="B2">May take a minute</p>
               </div>
-              <thermal-profile-chart data="data" config="options" on-zoom="tempOnZoom" zoom="zoomState" scroll="scrollState.value" on-mouse-move="mouseMove" show="showChart"></thermal-profile-chart>
+              <thermal-profile-chart data="data" config="options" on-zoom="tempOnZoom" zoom="zoomState" scroll="scrollState.value" on-mouse-move="mouseMove"show="showChart"></thermal-profile-chart>
             </div>
           </div>
         </div>
-        <div class="text-center abscissa-text B1B">Time</div>
+        <!-- <div class="text-center abscissa-text B1B">Time</div> -->
         <div class="indicators-group B1B">
           <div class="row">
             <div class="item-indicator">

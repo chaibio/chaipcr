@@ -40,14 +40,17 @@ angular.module("canvasApp").factory('mouseUp', [
         }
 
         if(that.moveStepActive) {
+          console.log("Loxxxxxxx");
           var indicate = evt.target;
           step = indicate.parent;
+
           C.moveDots.setVisible(false);
           C.stepIndicator.setVisible(false);
           that.moveStepActive = false;
           step.parentStage.updateWidth();
           C.stepIndicator.processMovement(step, C);
           C.canvas.renderAll();
+
         }
 
         if(that.moveStageActive) {

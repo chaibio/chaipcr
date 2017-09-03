@@ -34,4 +34,12 @@ class Well < ActiveRecord::Base
       self.create(params)
     end
   end
+  
+  def self.wells(experiment_id)
+    wells = []
+    self.where("experiment_id=?", experiment_id).each do |well|
+      wells[well.well_num] = well
+    end
+    wells
+  end
 end

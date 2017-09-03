@@ -4,7 +4,7 @@
   <description>Build Chaibio shoftware</description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.27.0">
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.28.0">
       <projectUrl>https://github.com/chaibio/chaipcr.git/</projectUrl>
       <displayName></displayName>
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
@@ -28,11 +28,6 @@
           <description>Download folder URL</description>
           <defaultValue>http://10.0.1.20/download</defaultValue>
         </hudson.model.StringParameterDefinition>
-        <hudson.model.BooleanParameterDefinition>
-          <name>low_performance</name>
-          <description>Set cpu to lowest performance.</description>
-          <defaultValue>false</defaultValue>
-        </hudson.model.BooleanParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>building_version</name>
           <description>Julia version</description>
@@ -51,7 +46,6 @@
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <authToken>123</authToken>
   <triggers/>
   <concurrentBuild>true</concurrentBuild>
   <builders>
@@ -173,20 +167,6 @@ fi
 dpkg --configure -a</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
-      <command>exit 0
-
-</command>
-      <execEachLine>false</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
-      <command>exit 0
-
-</command>
-      <execEachLine>false</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
 # waiting 20min for the bulding device to flash
@@ -235,47 +215,6 @@ exit 1</command>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>exit 0
-echo Updating kernel on $build_machine
-#
-#cat &lt;&lt;EOF &gt;&gt; /etc/apt/sources.list
-#deb [arch=armhf] http://repos.rcn-ee.com/debian/ jessie main
-#deb-src [arch=armhf] http://repos.rcn-ee.com/debian/ jessie main
-#EOF
-
-cd
-wget http://repos.rcn-ee.net/ubuntu/conf/repos.rcn-ee.net.gpg.key --no-check-certificate
-apt-key add repos.rcn-ee.net.gpg.key
-rm repos.rcn-ee.net.gpg.key
-
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 9D6D8F6BC857C906
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7638D0442B90D010
-
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1655A0AB68576280
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D284E608A4C46402
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CF979FFA3D3D3ACC
-
-apt-get update 
-dpkg --configure -a
-apt-get install -y -q git
-
-cd /opt/scripts/tools/
-rm eMMC/init-eMMC-flasher-v3.sh
-git pull
-
-#	./update_kernel.sh --ti-rt-channel --lts-4_4
-#       ./update_kernel.sh --kernel 4.4.24-ti-rt-r58
-./update_kernel.sh --kernel 4.4.36-ti-rt-r72
-
-sync 
-shutdown -r 1
-echo restart scheduled after a min
-sleep 30
-</command>
-      <execEachLine>false</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
       <command>#	echo update sources# if not updated?
 echo kernel is updated	
 lsb_release -a
@@ -299,7 +238,6 @@ apt-get -y autoclean
 dpkg --configure -a
 
 apt-get upgrade -y -q
-#sudo apt-get install -y -q linux-image-armmp
 dpkg --configure -a
 df -h
 
@@ -308,7 +246,7 @@ echo packages installation done
 apt-key update
 apt-get update 
 dpkg --configure -a
-apt-get install -y -q git
+apt-get install -y -q git || exit 1
 dpkg --configure -a
 update-initramfs -u
 touch /forcefsck
@@ -343,13 +281,12 @@ exit 1</command>
       <siteName>root@$build_machine:22</siteName>
       <command>#!/bin/bash
 apt-get update
-apt-get -q -y install cpufrequtils
-apt-get -q -y install unzip parted
+apt-get -q -y install unzip parted || exit 1
 
 sync
 
 echo installing basic packages.
-apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential
+apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential || exit 1
 dpkg --configure -a
 sync
 sleep 30
@@ -386,8 +323,25 @@ export DEBIAN_FRONTEND=noninteractive
 sudo -E apt-get install -y -q --allow-unauthenticated mysql-server
 
 echo Installing mysql client package
-sudo -E apt-get install -y -q --allow-unauthenticated libmysqlclient-dev
+sudo -E apt-get install -y -q --allow-unauthenticated libmysqlclient-dev  || exit 1
 echo done installing mysql
+
+# resetting mysql password
+
+    service mysql stop
+    mysqld_safe --skip-grant-tables &amp;
+    sleep 10
+cat &gt;&gt; mysql_password_flush.sql &lt;&lt; EOF
+    UPDATE user SET password=PASSWORD(&apos;&apos;) WHERE user=&apos;root&apos;;
+    FLUSH PRIVILEGES;
+    exit
+EOF
+
+    mysql -u root mysql &lt; mysql_password_flush.sql
+    service mysql restart
+
+    rm mysql_password_flush.sql
+
 </command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
@@ -403,42 +357,34 @@ sleep 30
 
 dpkg --configure -a
 sync
-apt-get -q -y install cpufrequtils
-apt-get -q -y install unzip
+
+apt-get -q -y update
+apt-get -q -y install -f
+
+apt-get -q -y install unzip || exit 1
 
 dpkg --configure -a
 
 echo &quot;FSCKFIX=yes&quot; &gt;&gt; /etc/default/rcS
-cpufreq-info
-cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-if $low_performance
-then
-    cpufreq-set -f 300MHz 
-    cpufreq-set -g conservative --max 300MHz
-fi
 
-apt-get -y -q install nodejs ruby ruby-dev 
+apt-get -y -q install nodejs ruby ruby-dev  || exit 1
 sync
 sleep 30
 dpkg --configure -a
 
-apt-get -y -q install libxslt-dev libxml2-dev 
+apt-get -y -q install libxslt-dev libxml2-dev  || exit 1
 sync
 sleep 30
 dpkg --configure -a
 
-apt-get -y -q install libtool
+apt-get -y -q install libtool || exit 1
 dpkg --configure -a
-sync
-sleep 30
-
-DEBIAN_FRONTEND=noninteractive apt-get -y -q install nginx-full 
-DEBIAN_FRONTEND=noninteractive dpkg --configure -a
 sync
 sleep 30
 
 echo installing headers...
-apt-get -y -q install linux-headers-`uname -r`
+apt-get -y -q install linux-headers-`uname -r` || exit 1
+apt-get install -y -q cmake || exit 1
 sync
 sleep 30
 dpkg --configure -a
@@ -447,21 +393,19 @@ echo &quot;Build SOCI (or get its libs from repo)&quot;
 cd ~
 
 #http://downloads.sourceforge.net/project/soci/soci/soci-3.2.2/soci-3.2.2.tar.gz?r=&amp;ts=1481630635&amp;use_mirror=netix
-wget &quot;http://downloads.sourceforge.net/project/soci/soci/soci-3.2.2/soci-3.2.2.tar.gz&quot;
+#wget &quot;http://downloads.sourceforge.net/project/soci/soci/soci-3.2.2/soci-3.2.2.tar.gz&quot;
+wget &quot;http://netix.dl.sourceforge.net/project/soci/soci/soci-3.2.2/soci-3.2.2.tar.gz&quot;
 tar xpvzf soci-3.2.2.tar.gz
 dpkg --configure -a
 cd soci-3.2.2
-cmake -DCMAKE_BUILD_TYPE=Release -DSOCI_STATIC=OFF -DSOCI_TESTS=OFF -DWITH_SQLITE3=OFF -DSOCI_EMPTY=OFF -DWITH_MYSQL=ON -G &quot;Unix Makefiles&quot;
-make
-make install
+cmake -DCMAKE_BUILD_TYPE=Release -DSOCI_STATIC=OFF -DSOCI_TESTS=OFF -DWITH_SQLITE3=OFF -DSOCI_EMPTY=OFF -DWITH_MYSQL=ON -G &quot;Unix Makefiles&quot; || exit 1
+make || exit 1
+make install || exit 1
 cd ..
 rm -rf soci-3.2.2*
 dpkg --configure -a
-
-
-
 exit 0
-#libpoco-dev can apt-get poco; but guess an old version 1.3?
+
 
 </command>
       <execEachLine>false</execEachLine>
@@ -489,31 +433,23 @@ exit 1
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo arranging to build julia and different libs
-cpufreq-info
-cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-if $low_performance
-then
-    cpufreq-set -f 300MHz 
-    cpufreq-set -g conservative --max 300MHz
-fi
-
 sync
 
 df -h
 apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential || true
 ntpdate -b -s -u pool.ntp.org
 
-sudo apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gcc-4.8 g++-4.8 gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev cpufrequtils libc-bin
+sudo apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gcc-4.8 g++-4.8 gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libc-bin  || exit 1
 apt-get -f -y -q install
 
-apt-get install -q -y libarpack2 libblas-common libblas3 libfftw3-double3 libfftw3-single3 libgfortran3 liblapack3 libllvm3.8 libmetis5 libopenblas-base libunwind8
+apt-get install -q -y libarpack2 libblas-common libblas3 libfftw3-double3 libfftw3-single3 libgfortran3 liblapack3 libllvm3.8 libmetis5 libopenblas-base libunwind8  || exit 1
 apt-get -f -y -q install
 
-sudo apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gcc-4.8 g++-4.8 gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas-common libblas3 libfftw3-double3 libfftw3-single3 libgfortran3 liblapack3 libllvm3.8 libmetis5 libopenblas-base libunwind8 liblapack-dev liblapack3 libopenblas-base libopenblas-dev
+sudo apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gcc-4.8 g++-4.8 gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas-common libblas3 libfftw3-double3 libfftw3-single3 libgfortran3 liblapack3 libllvm3.8 libmetis5 libopenblas-base libunwind8 liblapack-dev liblapack3 libopenblas-base libopenblas-dev || exit 1
 apt-get -f -y -q install
 
-apt-get -y -q install i2c-tools evtest git automake libtool 
-apt-get -y -q install device-tree-compiler
+apt-get -y -q install i2c-tools evtest git automake libtool || exit 1 
+apt-get -y -q install device-tree-compiler || exit 1
 apt-get -f -y -q install
 
 sync
@@ -525,13 +461,14 @@ exit 0</command>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo Setup MySQL
-systemctl stop mysql.service
-mv /var/lib/mysql /data/
-sed -i &quot;s,datadir.*=.*,datadir=/data/mysql,g&quot; /etc/mysql/my.cnf # Edit /etc/mysql/my.cnf and change datadir to /data/mysql
-systemctl start mysql.service
+      <command>#echo Setup MySQL
+#systemctl stop mysql.service
+#mount /dev/mmcblk1p2 /data
+#mv /var/lib/mysql /data/
+#sed -i &quot;s,datadir.*=.*,datadir=/data/mysql,g&quot; /etc/mysql/my.cnf # Edit /etc/mysql/my.cnf and change datadir to /data/mysql
+#systemctl start mysql.service
 
-sync
+#sync
 
 # the latest version sofar.. however, lets stay as we are for now.
 #echo build latest stable poco 1.7.6
@@ -545,16 +482,16 @@ sync
 #cd
 #rm -rf poco-1.7.6* poco-1.7.6.tar.gz
 
-wget &quot;http://pocoproject.org/releases/poco-1.6.1/poco-1.6.1.tar.gz&quot;
-tar xpvzf poco-1.6.1.tar.gz
+wget &quot;http://pocoproject.org/releases/poco-1.6.1/poco-1.6.1.tar.gz&quot;  || exit 1
+tar xpvzf poco-1.6.1.tar.gz  || exit 1
 cd poco-1.6.1
-./configure
-make
+./configure || exit 1
+make || exit 1
 
 rm /usr/lib/libPoco* || true
 rm /usr/local/lib/libPoco* || true
 
-make install
+make install || exit 1
 cd ..
 rm -rf poco-1.6.1* poco-1.6.1.tar.gz
 
@@ -562,14 +499,7 @@ sync
 fsck /dev/mmcblk1p1 -y -f
 
 exit 0
-</command>
-      <execEachLine>false</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
-      <command>
-exit 0
-</command>
+ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc                                                                                c                      c cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc                                                                                                                                                                                                                                                                                              cccccccccccccccccccccccccccccccccccccccccccccccccccccc                                                                                                                                                                                                                                                                                                                                                                                                        ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc c         ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc ccccccccccccccc                                                                                                                                        cccccccccccccccccccccccccccccccccccccccccccccccccccccc  c                                                                                                           ccccccccccccccccccccccc                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc ccccccccccccccccccccccc                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       ccccccccccccccccccc c ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                c                                                                                                                                                                                                       cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      </command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
@@ -577,23 +507,14 @@ exit 0
       <command>echo cleanup without envs
 
 apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential || true
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get install -q -y gfortran ntpdate
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get install -q -y gfortran ntpdate || exit 1
 ntpdate -b -s -u pool.ntp.org
-
-cpufreq-info
-cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-if $low_performance
-then
-    cpufreq-set -f 300MHz 
-    cpufreq-set -g conservative --max 300MHz
-fi
-
 sync
 
-apt-get autoremove -q -y --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data libx11* libxcb*
+apt-get autoremove -q -y --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data libx11* libxcb* || exit 1
 
 echo cleanup with envs
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get autoremove -q -y --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data libx11* libxcb*
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get autoremove -q -y --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data libx11* libxcb* || exit 1
 
 
 apt-get clean
@@ -607,9 +528,9 @@ echo building tslib
 cd
 
 echo installing with envs..
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get -y -q install i2c-tools evtest git automake libtool
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get -y -q install i2c-tools evtest git automake libtool  || exit 1
 echo with no envs
-apt-get -y -q install i2c-tools evtest git automake libtool
+apt-get -y -q install i2c-tools evtest git automake libtool  || exit 1
 
 git clone git://github.com/kergoth/tslib.git
 cd tslib
@@ -627,8 +548,8 @@ echo autoget tslib
 echo configure tslib
 ./configure
 echo making tslib
-make
-make install
+make || exit 1
+make install || exit 1
 cd
 rm -r tslib
 
@@ -678,7 +599,7 @@ apt-get -y -q upgrade
 
 apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential || true
 
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get install -q -y gfortran ntpdate
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get install -q -y gfortran ntpdate || exit 1
 
 
 exit 0</command>
@@ -687,13 +608,8 @@ exit 0</command>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo downloading and installing Julia
-cpufreq-info
-cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-if $low_performance
-then
-    cpufreq-set -f 300MHz 
-    cpufreq-set -g conservative --max 300MHz
-fi
+
+
 
 sync
 
@@ -742,7 +658,7 @@ sudo swapon -s
 free -m
 echo installing QT
 dpkg --configure -a
-apt-get install -y -q cmake
+
 apt-get update
 apt-get install -y -q libqt4-webkit libfontconfig1-dev libfreetype6-dev libx11-dev libxcursor-dev libxext-dev libxfixes-dev libxft-dev libxi-dev libxrandr-dev libxrender-dev
 
@@ -752,15 +668,14 @@ wget $download_prefix/qt-everywhere-compiled-4.8.6.tgz
 tar xfv qt-everywhere-compiled-4.8.6.tgz
 
 echo installing tslib first
-
 cd tslib-compile/tslib/
-make install
+make install  || exit 1
 cd ../..
 
 echo downloading QT binaries
 cd qt-everywhere-opensource-src-4.8.6/
 
-make install
+make install || exit 1
 
 cd /sdcard/upgrade/
 rm -r qt-everywhere-opensource-src-4.8.6
@@ -782,7 +697,7 @@ then
        exit 0
 fi
 
-apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3
+apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3  || exit 1
 
 mkdir -p ~/julia-compile
 cd ~/julia-compile
@@ -790,7 +705,7 @@ cd ~/julia-compile
 
 default_slim_arch_filename=&quot;julia-$building_version-slim-default.tgz&quot;
 echo Slim arch filename $default_slim_arch_filename
-wget $download_prefix/$default_slim_arch_filename
+wget $download_prefix/$default_slim_arch_filename || exit 1
 
 sync
 
@@ -830,10 +745,16 @@ fsck /dev/mmcblk0p1 -y -f
 sync
 
 sleep 60
+
 echo &quot;Setting up Julia: Initializing rep&quot;
 julia --print &quot;Pkg.init()&quot;
 sync
 sleep 60
+
+
+
+
+
 echo &quot;Setting up Julia: Updating rep&quot;
 julia --print &quot;Pkg.update()&quot;
 sync
@@ -845,30 +766,49 @@ println(&quot;Setting up Julia: Adding packages&quot;)
 
 println(&quot;Adding package: Dierckx&quot;)
 Pkg.add(&quot;Dierckx&quot;)
+using Dierckx
+
 println(&quot;Adding package: JSON&quot;)
 Pkg.add(&quot;JSON&quot;)
+using JSON
+
 println(&quot;Adding package: MySQL&quot;)
 Pkg.add(&quot;MySQL&quot;)
+using MySQL
+
 println(&quot;Adding package: JLD&quot;)
 Pkg.add(&quot;JLD&quot;)
+using JLD
+
 println(&quot;Adding package: DataFrames&quot;)
 Pkg.add(&quot;DataFrames&quot;)
+using DataFrames
+
 println(&quot;Adding package: Ipopt&quot;)
 Pkg.add(&quot;Ipopt&quot;)
+using Ipopt
+
 println(&quot;Adding package: JuMP&quot;)
 Pkg.add(&quot;JuMP&quot;)
+using JuMP
+
 println(&quot;Adding package: NLopt&quot;)
 Pkg.add(&quot;NLopt&quot;)
+using NLopt
+
 println(&quot;Adding package: HttpServer&quot;)
 Pkg.add(&quot;HttpServer&quot;)
+using HttpServer
 
-
+println(&quot;Adding package: Clustering&quot;)
+Pkg.add(&quot;Clustering&quot;)
+using Clustering
 
 println(&quot;Setting up Julia: Building packages&quot;)
 Pkg.resolve()
 
-println(&quot;Setting up Julia: Precompiling packages&quot;)
-using DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NLopt, HttpServer
+println(&quot;Setting up Julia: Checking precompiled packages&quot;)
+using DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NLopt, HttpServer, Clustering
 
 println(&quot;Setting up Julia: Testing packages&quot;)
 
@@ -890,7 +830,8 @@ println(&quot;Adding package: NLopt&quot;)
 Pkg.add(&quot;NLopt&quot;)
 println(&quot;Adding package: HttpServer&quot;)
 Pkg.add(&quot;HttpServer&quot;)
-
+println(&quot;Adding package: Clustering&quot;)
+Pkg.add(&quot;Clustering&quot;)
 
 println(&quot;Setting up Julia: done testing.. quitting..&quot;)
 quit()
@@ -900,6 +841,7 @@ sleep 60
 
 # leave julia staff to be able to test why it crashes the system
 julia chaibio_packages.jl
+
 rm chaibio_packages.jl
 julia --print &apos;Pkg.build(&quot;HDF5&quot;)&apos;
 julia --print &apos;Pkg.build(&quot;HDF5&quot;)&apos;
@@ -964,6 +906,12 @@ apt-get autoclean
 
 apt-get -q -y autoremove
 sync
+
+DEBIAN_FRONTEND=noninteractive apt-get -y -q install nginx-full  || exit 1
+DEBIAN_FRONTEND=noninteractive dpkg --configure -a
+sync
+sleep 30
+
 sync
 fsck /dev/mmcblk1p1 -y -f
 fsck /dev/mmcblk0p1 -y -f
@@ -974,16 +922,6 @@ exit 0</command>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Install Ruby Packages
-
-cpufreq-info
-cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-if $low_performance
-then
-    cpufreq-set -f 300MHz 
-    cpufreq-set -g conservative --max 300MHz
-fi
-
-#apt-get install -y -q ruby ruby-dev libxslt-dev libxml2-dev #Needed for Nokogiri
 gem install bundle
 #apt-get -q -y install nodejs 
 #gem install nodejs
@@ -993,10 +931,10 @@ gem install bundle
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Build gems with native extensions
-bundle config build.atomic --use-system-libraries
-bundle config build.json --use-system-libraries
-bundle config build.sqlite3 --use-system-libraries
-bundle config build.nokogiri --use-system-libraries
+bundle config build.atomic --use-system-libraries || exit 1
+bundle config build.json --use-system-libraries || exit 1
+bundle config build.sqlite3 --use-system-libraries || exit 1
+bundle config build.nokogiri --use-system-libraries || exit 1
 </command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
@@ -1014,21 +952,15 @@ chown service /home/service/.ssh
 chgrp service /home/service/.ssh
 cd
 
-cpufreq-info
-cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-if $low_performance
-then
-    cpufreq-set -f 300MHz 
-    cpufreq-set -g conservative --max 300MHz
-fi
-
 sync
 
 #wget https://dl.ngrok.com/ngrok_2.0.19_linux_arm.zip --no-check-certificate
 wget $download_prefix/ngrok_2.0.19_linux_arm.zip  --no-check-certificate
 unzip -o ngrok_2.0.19_linux_arm.zip
 rm ngrok_2.0.19_linux_arm.zip
-</command>
+rm ngrok
+
+exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">

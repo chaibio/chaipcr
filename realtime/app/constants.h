@@ -80,13 +80,13 @@ const unsigned long kHeatBlockZone2PWMPeriodNs = 50000;
 const double kHeatBlockZonesPIDMin = -1;
 const double kHeatBlockZonesPIDMax = 1;
 
-const double kHeatBlockZonesMinTargetTemp = 0;
-const double kHeatBlockZonesMaxTargetTemp = 105;
+const double kHeatBlockZonesMinTargetTemp = 4;
+const double kHeatBlockZonesMaxTargetTemp = 100;
 
 const double kHeatBlockLowTempShutdownThreshold = -5;
 const double kHeatBlockHighTempShutdownThreshold = 120;
 
-const double kMaxHeatBlockRampSpeed = 6.0;
+const double kMaxHeatBlockRampSpeed = 5.0;
 const double kDurationCalcHeatBlockRampSpeed = kMaxHeatBlockRampSpeed;
 
 //LED constants

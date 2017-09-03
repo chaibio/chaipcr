@@ -38,6 +38,8 @@
 #include <arpa/inet.h>
 #include <net/if.h>
 
+#include <iostream>
+
 std::string getMacAddress(const std::string &interface);
 std::string getInterfaceGateway(const std::string &interface);
 std::vector<std::string> readDnsServers();
@@ -304,7 +306,7 @@ std::string findWifiInterface()
 
         std::string str = output.str();
 
-        if (str.find("no wireless extensions") == std::string::npos)
+        if (!str.empty() && str.find("no wireless extensions") == std::string::npos)
             return interface;
     }
 
