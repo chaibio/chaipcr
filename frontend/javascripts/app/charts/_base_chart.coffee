@@ -19,11 +19,17 @@ class BaseChart
     return false if @data.dataset.length is 0
     return true
 
-  roundExtremeValue: (val) ->
+  roundUpExtremeValue: (val) ->
     if Math.abs(val) >= 10
       Math.ceil(val/5)*5
     else
       Math.ceil(val)
+
+  roundDownExtremeValue: (val) ->
+    if Math.abs(val) >= 10
+      Math.floor(val/5)*5
+    else
+      Math.floor(val)
 
   formatPower: (d) ->
     superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹"
@@ -461,12 +467,12 @@ class BaseChart
     svg = @chartSVG.select('.chart-g')
 
     # add allowance for interpolation curves
-    max = @roundExtremeValue(@getMaxY())
-    min = @roundExtremeValue(@getMinY())
+    max = @roundUpExtremeValue(@getMaxY())
+    min = @roundDownExtremeValue(@getMinY())
     # diff = max - min
     # allowance = diff * (if @config.axes.y.scale is 'log' then 0.2 else 0.05)
     # max += allowance
-    # max = @roundExtremeValue(max)
+    # max = @roundUpExtremeValue(max)
     # min = if @config.axes.y.scale is 'log' then 5 else min - allowance
     @yScale = if @config.axes.y.scale is 'log' then d3.scaleLog() else d3.scaleLinear()
     @yScale.range([@height, 0]).domain([min, max])
@@ -916,12 +922,12 @@ class BaseChart
       if minY >= maxY
         return false
 
-      max = @roundExtremeValue(@getMaxY())
-      # min = @roundExtremeValue(@getMinY())
+      max = @roundUpExtremeValue(@getMaxY())
+      # min = @roundDownExtremeValue(@getMinY())
       # diff = max - min
       # allowance = diff * (if @config.axes.y.scale is 'log' then 0.2 else 0.05)
       # max += allowance
-      # max = @roundExtremeValue(max)
+      # max = @roundUpExtremeValue(max)
 
       if maxY > max
         maxY = max
@@ -1050,7 +1056,7 @@ class BaseChart
         return false
 
       max = extent
-      min = @roundExtremeValue(@getMinY())
+      min = @roundDownExtremeValue(@getMinY())
       # diff = max - min
       # allowance = diff * (if @config.axes.y.scale is 'log' then 0.2 else 0.05)
       # min = if @config.axes.y.scale is 'log' then 5 else min - allowance
