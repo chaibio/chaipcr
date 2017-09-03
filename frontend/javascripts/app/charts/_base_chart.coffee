@@ -411,7 +411,7 @@ class BaseChart
 
     @zoomTransform = transform
 
-    @updateXAxisExtremeValues()
+    @updateAxesExtremeValues()
 
     if (@onZoomAndPan and !@editingYAxis)
       @onZoomAndPan(@zoomTransform, @width, @height, @getScaleExtent() - @getMinX() )
@@ -573,7 +573,7 @@ class BaseChart
     @drawXAxisRightExtremeValue()
     @drawYAxisUpperExtremeValue()
     @drawYAxisLowerExtremeValue()
-    @updateXAxisExtremeValues()
+    @updateAxesExtremeValues()
 
   drawXAxisLeftExtremeValue: ->
     textContainer = @chartSVG.append('g')
@@ -1078,13 +1078,13 @@ class BaseChart
     else
       @validateAxisInput()
 
-  updateXAxisExtremeValues: ->
+  updateAxesExtremeValues: ->
     xScale = @getXScale()
     yScale = @getYScale()
     minWidth = 10
     if @xAxisLeftExtremeValue.text
       text = @xAxisLeftExtremeValue.text
-      minX = Math.round(xScale.invert(0) * 10) / 10
+      minX = if @hasData() then Math.round(xScale.invert(0) * 10) / 10 else @getMinX()
       if @config.axes.x.tickFormat
         minX = @config.axes.x.tickFormat(minX)
       text.text(minX)
@@ -1097,7 +1097,7 @@ class BaseChart
         .attr('x1', @config.margin.left - (lineWidth / 2))
         .attr('x2', @config.margin.left - (lineWidth / 2) + lineWidth)
     if @xAxisRightExtremeValue.text
-      maxX = Math.round(xScale.invert(@width) * 10) / 10
+      maxX = if @hasData() then Math.round(xScale.invert(@width) * 10) / 10 else @getMaxX()
       if @config.axes.x.tickFormat
         maxX = @config.axes.x.tickFormat(maxX)
       @xAxisRightExtremeValue.text.text(maxX)
@@ -1109,23 +1109,22 @@ class BaseChart
       @xAxisRightExtremeValue.line
         .attr('x1', @width + @config.margin.left - (lineWidth / 2))
         .attr('x2', @width + @config.margin.left - (lineWidth / 2) + lineWidth)
-    offsetRight = 9
     if @yAxisUpperExtremeValue.text
       text = @yAxisUpperExtremeValue.text
-      maxY = Math.round(yScale.invert(0) * 10) / 10
+      maxY = if @hasData() then Math.round(yScale.invert(0) * 10) / 10 else @roundUpExtremeValue(@getMaxY())
       if @config.axes.y.tickFormat
         maxY = @config.axes.y.tickFormat(maxY)
       text.text(maxY)
       textWidth = text.node().getBBox().width
-      text.attr('x', @config.margin.left - (offsetRight + text.node().getBBox().width))
+      text.attr('x', @config.margin.left - (@yAxisUpperExtremeValue.config.offsetRight + text.node().getBBox().width))
     if @yAxisLowerExtremeValue.text
       text = @yAxisLowerExtremeValue.text
-      minY = Math.round(yScale.invert(@height) * 10) / 10
+      minY = if @hasData() then Math.round(yScale.invert(@height) * 10) / 10 else @roundDownExtremeValue(@getMinY())
       if @config.axes.y.tickFormat
         minY = @config.axes.y.tickFormat(minY)
       text.text(minY)
       textWidth = text.node().getBBox().width
-      text.attr('x', @config.margin.left - (offsetRight + text.node().getBBox().width))
+      text.attr('x', @config.margin.left - (@yAxisLowerExtremeValue.config.offsetRight + text.node().getBBox().width))
 
     @updateLastAxesTicks()
 
@@ -1342,19 +1341,19 @@ class BaseChart
 
   updateSeries: (series) ->
     @config.series = series
-    @updateXAxisExtremeValues()
+    @updateAxesExtremeValues()
 
   updateData: (data) ->
     @data = data
     @updateZoomScaleExtent()
     setTimeout =>
-      @updateXAxisExtremeValues()
+      @updateAxesExtremeValues()
     , 500
 
   updateConfig: (config) ->
     @config = config
     setTimeout =>
-      @updateXAxisExtremeValues()
+      @updateAxesExtremeValues()
     , 500
 
   updateInterpolation: (i) ->
