@@ -49,8 +49,8 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
       .attr("fill", "none")
 
   makeLine: (line_config) ->
-    xScale = @getDrawLineXScale()
-    yScale = @getDrawLineYScale()
+    xScale = @getXScale()
+    yScale = @getYScale()
     line = d3.line()
       .curve(d3.curveCardinal)
       .x((d) ->
