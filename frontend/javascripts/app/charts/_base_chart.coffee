@@ -639,7 +639,7 @@ class BaseChart
         input.style('opacity', 0)
       )
       .on('keydown', =>
-        @onLeftXAxisInput()
+        @onInputLeftXAxis()
       )
 
     @xAxisLeftExtremeValue =
@@ -667,7 +667,7 @@ class BaseChart
       val = @config.axes.x.tickFormat(val)
     @xAxisLeftExtremeValue.input.node().value = val
 
-  onLeftXAxisInput: ->
+  onInputLeftXAxis: ->
     if d3.event.keyCode is 13
       # enter
       d3.event.preventDefault()
@@ -678,8 +678,8 @@ class BaseChart
       maxX = lastXScale.invert(@width)
       if (minX >= maxX)
         return false
-      if (minX < 1)
-        minX = 1
+      if (@xAxisLeftExtremeValue.input.node().value is '' || minX < @getMinX())
+        minX = @getMinX()
       k = @width / (x(maxX) - x(minX))
       width_percent = 1 / k
       w = extent - (width_percent * extent)
@@ -797,6 +797,8 @@ class BaseChart
       maxX = @xAxisRightExtremeValue.input.node().value * 1
       if (minX >= maxX)
         return false
+      if @xAxisRightExtremeValue.input.node().value is ''
+        maxX = @roundUpExtremeValue(@getMaxX())
       if (maxX > @getScaleExtent())
         maxX = @getScaleExtent()
       k = @width / (x(maxX) - x(minX))
@@ -928,6 +930,9 @@ class BaseChart
       # allowance = diff * (if @config.axes.y.scale is 'log' then 0.2 else 0.05)
       # max += allowance
       # max = @roundUpExtremeValue(max)
+
+      if @yAxisUpperExtremeValue.input.node().value is ''
+        maxY = @roundUpExtremeValue(@getMaxY())
 
       if maxY > max
         maxY = max
@@ -1061,7 +1066,7 @@ class BaseChart
       # allowance = diff * (if @config.axes.y.scale is 'log' then 0.2 else 0.05)
       # min = if @config.axes.y.scale is 'log' then 5 else min - allowance
 
-      if (minY < min)
+      if (@yAxisLowerExtremeValue.input.node().value is '' || minY < min)
         minY = min
 
       k = @height / (y(minY) - y(maxY))
