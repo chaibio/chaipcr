@@ -103,7 +103,12 @@ window.ChaiBioTech.ngApp
           def.resolve resp.data
       promise.catch (err) ->
         for def in tempLogsQues by 1
-          def.reject err
+          if err.toString().indexOf('SyntaxError') > -1
+            def.reject
+              status: 500
+              statusText: err
+          else
+            def.reject(err)
       promise.finally ->
         fetchingTempLogs = false
         tempLogsQues = []
@@ -111,11 +116,32 @@ window.ChaiBioTech.ngApp
       return deferred.promise
 
     self.getAmplificationData = (expId) ->
-      $http.get("/experiments/#{expId}/amplification_data")
+      deferred = $q.defer()
+      $http.get("/experiments/#{expId}/amplification_data").then (resp) ->
+        deferred.resolve(resp)
+      , (resp) ->
+        if resp.toString().indexOf('SyntaxError') > -1
+          deferred.reject
+            status: 500
+            statusText: resp
+        else
+          deferred.reject(resp)
+
+      return deferred.promise
 
     self.getMeltCurveData = (expId) ->
-      $http.get("/experiments/#{expId}/melt_curve_data")
-      # $http.get("/test_melt_curve_data.json")
+      deferred = $q.defer()
+      $http.get("/experiments/#{expId}/melt_curve_data").then (resp) ->
+        deferred.resolve(resp)
+      , (resp) ->
+        if resp.toString().indexOf('SyntaxError') > -1
+          deferred.reject
+            status: 500
+            statusText: resp
+        else
+          deferred.reject(resp)
+
+      return deferred.promise
 
     self.duplicate = (expId, data) ->
       $http.post "/experiments/#{expId}/copy", data
