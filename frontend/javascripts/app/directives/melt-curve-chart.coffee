@@ -49,6 +49,7 @@ window.App.directive 'meltCurveChart', [
               chart.setYAxis()
               chart.setXAxis()
               chart.drawLines()
+              chart.updateAxesExtremeValues()
 
         $scope.$watch 'scroll', (scroll) ->
           return if !scroll or !chart or !$scope.show
@@ -74,7 +75,7 @@ window.App.directive 'meltCurveChart', [
               chart.setYAxis()
               chart.setXAxis()
               chart.drawLines()
-              chart.updateXAxisExtremeValues()
+              chart.updateAxesExtremeValues()
 
 
     }

@@ -59,6 +59,7 @@ window.App.directive 'amplificationChart', [
               chart.setYAxis()
               chart.setXAxis()
               chart.drawLines()
+              chart.updateAxesExtremeValues()
               if isInterpolationChanged(val, oldState) or isBaseBackroundChanged(val, oldState)
                 chart.zoomTo(0)
 
@@ -88,7 +89,7 @@ window.App.directive 'amplificationChart', [
               chart.setYAxis()
               chart.setXAxis()
               chart.drawLines()
-              chart.updateXAxisExtremeValues()
+              chart.updateAxesExtremeValues()
 
     }
 ]

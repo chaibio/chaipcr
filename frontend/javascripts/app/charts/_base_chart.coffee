@@ -382,6 +382,16 @@ class BaseChart
 
   zoomed: ->
     return if not d3.event
+    if d3.event.sourceEvent?.srcElement
+      if d3.event.sourceEvent.srcElement is @xAxisLeftExtremeValue.input.node()
+        return @onClickLeftXAxisInput()
+      if d3.event.sourceEvent.srcElement is @xAxisRightExtremeValue.input.node()
+        return @onClickRightXAxisInput()
+      if d3.event.sourceEvent.srcElement is @yAxisUpperExtremeValue.input.node()
+        return @onClickUpperYAxisInput()
+      if d3.event.sourceEvent.srcElement is @yAxisLowerExtremeValue.input.node()
+        return @onClickLowerYAxisInput()
+
     transform = d3.event.transform
     transform.x = transform.x || 0
     transform.y = transform.y || 0
@@ -586,6 +596,14 @@ class BaseChart
     underlineStroke = 2
     lineWidth = 15
 
+    rect = textContainer.append('rect')
+      .attr('fill', '#fff')
+      .attr('width', conWidth)
+      .attr('height', conHeight)
+      .attr('y', @height + @config.margin.top + offsetTop)
+      .attr('x', @config.margin.left - (conWidth / 2))
+      .on 'click', => @onClickLeftXAxisInput()
+
     line = textContainer.append('line')
         .attr('stroke', '#000')
         .attr('stroke-width', underlineStroke)
@@ -643,6 +661,7 @@ class BaseChart
       )
 
     @xAxisLeftExtremeValue =
+      rect: rect
       text: text
       line: line
       inputContainer: inputContainer
@@ -700,6 +719,14 @@ class BaseChart
     offsetTop = 8.5
     underlineStroke = 2
     lineWidth = 20
+
+    rect = textContainer.append('rect')
+        .attr('fill', '#fff')
+        .attr('width', conWidth)
+        .attr('height', conHeight)
+        .attr('y', @height + @config.margin.top + offsetTop)
+        .attr('x', @config.margin.left + @width - (conWidth / 2))
+        .on 'click', => @onClickRightXAxisInput()
 
     line = textContainer.append('line')
         .attr('stroke', '#000')
@@ -760,6 +787,7 @@ class BaseChart
       )
 
     @xAxisRightExtremeValue =
+      rect: rect
       text: text
       line: line
       inputContainer: inputContainer
@@ -823,6 +851,14 @@ class BaseChart
     lineWidth = 15
     inputContainerOffset = 5
 
+    rect = textContainer.append('rect')
+      .attr('fill', '#fff')
+      .attr('width', conWidth)
+      .attr('height', conHeight - offsetTop)
+      .attr('y', @config.margin.top - (conHeight / 2))
+      .attr('x', @config.margin.left - (conWidth + offsetRight))
+      .on 'click', => @onClickUpperYAxisInput()
+
     line = textContainer.append('line')
       .attr('opacity', 0)
       .attr('stroke', '#000')
@@ -885,6 +921,7 @@ class BaseChart
       )
 
     @yAxisUpperExtremeValue =
+      rect: rect
       text: text
       line: line
       inputContainer: inputContainer
@@ -961,6 +998,14 @@ class BaseChart
     underlineStroke = 2
     lineWidth = 15
 
+    rect = textContainer.append('rect')
+      .attr('fill', '#fff')
+      .attr('width', conWidth)
+      .attr('height', conHeight - offsetTop)
+      .attr('y', @height + @config.margin.top - (conHeight / 2))
+      .attr('x', @config.margin.left - (conWidth + offsetRight))
+      .on 'click', => @onClickLowerYAxisInput()
+
     line = textContainer.append('line')
       .attr('opacity', 0)
       .attr('stroke', '#000')
@@ -1001,7 +1046,6 @@ class BaseChart
       .style('font-family', 'dinot-regular')
       .attr('type', 'text')
       .on('mouseenter', =>
-
         textWidth = text.node().getBBox().width
         line.attr('x1', @config.margin.left - (textWidth + offsetRight))
           .attr('y1', @height + @config.margin.top + (conHeight / 2) - (underlineStroke / 2))
@@ -1023,6 +1067,7 @@ class BaseChart
       )
 
     @yAxisLowerExtremeValue = 
+      rect: rect
       text: text
       line: line
       inputContainer: inputContainer
@@ -1084,18 +1129,21 @@ class BaseChart
     minWidth = 10
     if @xAxisLeftExtremeValue.text
       text = @xAxisLeftExtremeValue.text
+      rect = @xAxisLeftExtremeValue.rect
       minX = if @hasData() then Math.round(xScale.invert(0) * 10) / 10 else @getMinX()
       if @config.axes.x.tickFormat
         minX = @config.axes.x.tickFormat(minX)
       text.text(minX)
       textWidth = text.node().getBBox().width
       text.attr('x', @config.margin.left - (textWidth / 2))
-    if @xAxisLeftExtremeValue.line
-      lineWidth = textWidth
-      lineWidth = if lineWidth > minWidth then lineWidth else minWidth
-      @xAxisLeftExtremeValue.line
-        .attr('x1', @config.margin.left - (lineWidth / 2))
-        .attr('x2', @config.margin.left - (lineWidth / 2) + lineWidth)
+      rect.attr('x', @config.margin.left - (textWidth / 2))
+        .attr('width', textWidth)
+    # if @xAxisLeftExtremeValue.line
+    #   lineWidth = textWidth
+    #   lineWidth = if lineWidth > minWidth then lineWidth else minWidth
+    #   @xAxisLeftExtremeValue.line
+    #     .attr('x1', @config.margin.left - (lineWidth / 2))
+    #     .attr('x2', @config.margin.left - (lineWidth / 2) + lineWidth)
     if @xAxisRightExtremeValue.text
       maxX = if @hasData() then Math.round(xScale.invert(@width) * 10) / 10 else @getMaxX()
       if @config.axes.x.tickFormat
@@ -1103,28 +1151,36 @@ class BaseChart
       @xAxisRightExtremeValue.text.text(maxX)
       textWidth = @xAxisRightExtremeValue.text.node().getBBox().width
       @xAxisRightExtremeValue.text.attr('x', @width + @config.margin.left - (textWidth / 2))
-    if @xAxisRightExtremeValue.line
-      lineWidth = textWidth
-      lineWidth = if lineWidth > minWidth then lineWidth else minWidth
-      @xAxisRightExtremeValue.line
-        .attr('x1', @width + @config.margin.left - (lineWidth / 2))
-        .attr('x2', @width + @config.margin.left - (lineWidth / 2) + lineWidth)
+      @xAxisRightExtremeValue.rect.attr('x', @width + @config.margin.left - (textWidth / 2))
+        .attr('width', textWidth)
+    # if @xAxisRightExtremeValue.line
+    #   lineWidth = textWidth
+    #   lineWidth = if lineWidth > minWidth then lineWidth else minWidth
+    #   @xAxisRightExtremeValue.line
+    #     .attr('x1', @width + @config.margin.left - (lineWidth / 2))
+    #     .attr('x2', @width + @config.margin.left - (lineWidth / 2) + lineWidth)
     if @yAxisUpperExtremeValue.text
       text = @yAxisUpperExtremeValue.text
+      rect = @yAxisUpperExtremeValue.rect
       maxY = if @hasData() then Math.round(yScale.invert(0) * 10) / 10 else @roundUpExtremeValue(@getMaxY())
       if @config.axes.y.tickFormat
         maxY = @config.axes.y.tickFormat(maxY)
       text.text(maxY)
       textWidth = text.node().getBBox().width
-      text.attr('x', @config.margin.left - (@yAxisUpperExtremeValue.config.offsetRight + text.node().getBBox().width))
+      text.attr('x', @config.margin.left - (@yAxisUpperExtremeValue.config.offsetRight + textWidth))
+      rect.attr('x', @config.margin.left - (@yAxisUpperExtremeValue.config.offsetRight + textWidth))
+        .attr('width', textWidth)
     if @yAxisLowerExtremeValue.text
+      rect = @yAxisLowerExtremeValue.rect
       text = @yAxisLowerExtremeValue.text
       minY = if @hasData() then Math.round(yScale.invert(@height) * 10) / 10 else @roundDownExtremeValue(@getMinY())
       if @config.axes.y.tickFormat
         minY = @config.axes.y.tickFormat(minY)
       text.text(minY)
       textWidth = text.node().getBBox().width
-      text.attr('x', @config.margin.left - (@yAxisLowerExtremeValue.config.offsetRight + text.node().getBBox().width))
+      text.attr('x', @config.margin.left - (@yAxisLowerExtremeValue.config.offsetRight + textWidth))
+      rect.attr('x', @config.margin.left - (@yAxisLowerExtremeValue.config.offsetRight + textWidth))
+        .attr('width', textWidth)
 
     @updateLastAxesTicks()
 
