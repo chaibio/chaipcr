@@ -2,12 +2,23 @@
   min-width: 1205px;
   .chart-screens-container {
     min-height: 400px;
+    .chart-error {
+      position: absolute;
+      left: 0;
+      top: 27%;
+      width: 100%;
+      padding-top: 40px;
+      padding-left: 150px;
+      padding-right: 50px;
+      text-align: center;
+    }
     .loading-blue-container {
       position: absolute;
       left: 0;
-      top: 0;
+      top: 32%;
       text-align: center;
       z-index: 99;
+      margin-left: 45%;
       h2 {
         font-weight: bold;
       }
