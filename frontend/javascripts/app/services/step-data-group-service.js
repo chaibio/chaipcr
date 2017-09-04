@@ -21,7 +21,7 @@ window.ChaiBioTech.ngApp.service('stepDataGroupService', [
                 delete(circle.temperature);
                 delete(circle.holdTime);
 
-                this.newStepDataGroup(circle, $scope)
+                this.newStepDataGroup(circle, $scope);
                 
                 circle.canvas.add(circle.stepDataGroup);
                 circle.canvas.renderAll();
