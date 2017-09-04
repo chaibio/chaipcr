@@ -24,7 +24,7 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
       .attr('class', 'mouse-indicator-circle')
 
   setMouseMoveListener: (fn) ->
-  	@onMouseMove = fn
+    @onMouseMove = fn
 
   drawLines: ->
     series = @config.series
@@ -100,7 +100,8 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
       .attr('height', @height)
       .attr('fill', 'transparent')
       .on('mouseenter', =>
-        @toggleMouseIndicatorsVisibility(true)
+        if @hasData() and !@isZooming
+          @toggleMouseIndicatorsVisibility(true)
       )
       .on('mouseout', =>
         @toggleMouseIndicatorsVisibility(false)
@@ -119,7 +120,6 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
 
   followTheMouse: ->
     return if @isZooming or !@hasData()
-    opacity = if @isZooming then 0 else 1
     @toggleMouseIndicatorsVisibility(!@isZooming)
     x = d3.mouse(@mouseOverlay.node())[0]
 
@@ -148,6 +148,8 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
         @circles[i]
           .attr("cx", x)
           .attr("cy", pos.y)
+
+    opacity = if (@isZooming or !@hasData()) then 0 else 1
 
     if @dashedLine
       @dashedLine
