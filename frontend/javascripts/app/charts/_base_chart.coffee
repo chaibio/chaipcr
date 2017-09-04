@@ -7,6 +7,10 @@ class BaseChart
   CIRCLE_RADIUS: 7
   AXIS_LABEL_FONT_SIZE: 10
   AXES_TICKS_FONT_SIZE: 10
+  DEFAULT_MAX_Y: 1
+  DEFAULT_MAX_X: 1
+  DEFAULT_MIN_Y: 0
+  DEFAULT_MIN_X: 0
   zoomTransform: {x: 0, y: 0, k: 1}
   isZooming: false
   inputPadding: 5
@@ -439,7 +443,7 @@ class BaseChart
     return @config.axes.x.max if @config.axes.x.max
     max = d3.max @config.series, (s) =>
       d3.max @data[s.dataset], (d) => d[s.x]
-    return max || 1
+    return max || 0
 
   getMinY: ->
     return @config.axes.y.min if @config.axes.y.min
@@ -451,7 +455,7 @@ class BaseChart
     return @config.axes.y.max if @config.axes.y.max
     max_y = d3.max @config.series, (s) =>
         d3.max @data[s.dataset], (d) => d[s.y]
-    return max_y || 1
+    return max_y || 0
 
   getScaleExtent: ->
     return @config.axes.x.max || @getMaxX()
@@ -478,8 +482,9 @@ class BaseChart
     svg = @chartSVG.select('.chart-g')
 
     # add allowance for interpolation curves
-    max = @roundUpExtremeValue(@getMaxY())
-    min = @roundDownExtremeValue(@getMinY())
+    max = if angular.isNumber(@config.axes.y.max) then @config.axes.y.max else if @hasData() then @roundUpExtremeValue(@getMaxY()) else @DEFAULT_MAX_Y
+    max = if max is 0 then @DEFAULT_MAX_Y else max
+    min = if angular.isNumber(@config.axes.y.min) then @config.axes.y.min else if @hasData() then @roundUpExtremeValue(@getMinY()) else @DEFAULT_MIN_Y
     # diff = max - min
     # allowance = diff * (if @config.axes.y.scale is 'log' then 0.2 else 0.05)
     # max += allowance
@@ -488,7 +493,7 @@ class BaseChart
     @yScale = if @config.axes.y.scale is 'log' then d3.scaleLog() else d3.scaleLinear()
     @yScale.range([@height, 0]).domain([min, max])
     @yAxis = d3.axisLeft(@yScale)
-    @yAxis.tickFormat(@config.axes.y.tickFormat) if @config.axes.y.tickFormat
+    @yAxis.tickFormat(@config.axes.y.tickFormat) if typeof @config.axes.y.tickFormat is 'function'
     if @config.axes.y.scale is 'log'
       @yAxis
         .tickValues(@getYLogticks())
@@ -527,17 +532,19 @@ class BaseChart
     svg = @chartSVG.select('.chart-g')
     @xScale = d3.scaleLinear().range([0, @width])
 
-    min = @config.axes.x.min || @getMinX() || 0
-    max = @config.axes.x.max || @getMaxX() || 1
+    min = if angular.isNumber(@config.axes.x.min) then @config.axes.x.min else if @hasData() then @roundDownExtremeValue(@getMinX()) else @DEFAULT_MIN_X
+    max = if angular.isNumber(@config.axes.x.max) then @config.axes.x.max else if @hasData() then @roundUpExtremeValue(@getMaxX()) else @DEFAULT_MAX_X   
+    
     @xScale.domain([min, max])
 
     @xAxis = d3.axisBottom(@xScale)
-    @xAxis.tickFormat(@config.axes.x.tickFormat) if @config.axes.x.tickFormat
+    @xAxis.tickFormat(@config.axes.x.tickFormat) if typeof @config.axes.x.tickFormat is 'function'
     @gX = svg.append("g")
         .attr("class", "axis x-axis")
         .attr('fill', 'none')
-        .attr("transform", "translate(0," + (@height) + ")")
+        .attr("transform", "translate(0," + @height + ")")
         .call(@xAxis)
+        .on('mouseenter', => @hideMouseIndicators())
     if @zoomTransform.rescaleX
       @gX.call(@xAxis.scale(@zoomTransform.rescaleX(@xScale)))
 
@@ -1131,7 +1138,7 @@ class BaseChart
     if @xAxisLeftExtremeValue.text
       text = @xAxisLeftExtremeValue.text
       rect = @xAxisLeftExtremeValue.rect
-      minX = if @hasData() then Math.round(xScale.invert(0) * 10) / 10 else @getMinX()
+      minX = if @hasData() then Math.round(xScale.invert(0) * 10) / 10 else @DEFAULT_MIN_X
       if @config.axes.x.tickFormat
         minX = @config.axes.x.tickFormat(minX)
       text.text(minX)
@@ -1139,14 +1146,8 @@ class BaseChart
       text.attr('x', @config.margin.left - (textWidth / 2))
       rect.attr('x', @config.margin.left - (textWidth / 2))
         .attr('width', textWidth)
-    # if @xAxisLeftExtremeValue.line
-    #   lineWidth = textWidth
-    #   lineWidth = if lineWidth > minWidth then lineWidth else minWidth
-    #   @xAxisLeftExtremeValue.line
-    #     .attr('x1', @config.margin.left - (lineWidth / 2))
-    #     .attr('x2', @config.margin.left - (lineWidth / 2) + lineWidth)
     if @xAxisRightExtremeValue.text
-      maxX = if @hasData() then Math.round(xScale.invert(@width) * 10) / 10 else @getMaxX()
+      maxX = if @hasData() then Math.round(xScale.invert(@width) * 10) / 10 else @DEFAULT_MAX_X
       if @config.axes.x.tickFormat
         maxX = @config.axes.x.tickFormat(maxX)
       @xAxisRightExtremeValue.text.text(maxX)
@@ -1154,16 +1155,10 @@ class BaseChart
       @xAxisRightExtremeValue.text.attr('x', @width + @config.margin.left - (textWidth / 2))
       @xAxisRightExtremeValue.rect.attr('x', @width + @config.margin.left - (textWidth / 2))
         .attr('width', textWidth)
-    # if @xAxisRightExtremeValue.line
-    #   lineWidth = textWidth
-    #   lineWidth = if lineWidth > minWidth then lineWidth else minWidth
-    #   @xAxisRightExtremeValue.line
-    #     .attr('x1', @width + @config.margin.left - (lineWidth / 2))
-    #     .attr('x2', @width + @config.margin.left - (lineWidth / 2) + lineWidth)
     if @yAxisUpperExtremeValue.text
       text = @yAxisUpperExtremeValue.text
       rect = @yAxisUpperExtremeValue.rect
-      maxY = if @hasData() then Math.round(yScale.invert(0) * 10) / 10 else @roundUpExtremeValue(@getMaxY())
+      maxY = if @hasData() then Math.round(yScale.invert(0) * 10) / 10 else @DEFAULT_MAX_Y
       if @config.axes.y.tickFormat
         maxY = @config.axes.y.tickFormat(maxY)
       text.text(maxY)
@@ -1174,7 +1169,7 @@ class BaseChart
     if @yAxisLowerExtremeValue.text
       rect = @yAxisLowerExtremeValue.rect
       text = @yAxisLowerExtremeValue.text
-      minY = if @hasData() then Math.round(yScale.invert(@height) * 10) / 10 else @roundDownExtremeValue(@getMinY())
+      minY = if @hasData() then Math.round(yScale.invert(@height) * 10) / 10 else @DEFAULT_MIN_Y
       if @config.axes.y.tickFormat
         minY = @config.axes.y.tickFormat(minY)
       text.text(minY)

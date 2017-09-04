@@ -3,6 +3,11 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
 
   AXIS_LABEL_FONT_SIZE: 17
   DASHED_LINE_STROKE_WIDTH: 2
+  
+  DEFAULT_MAX_Y: 120
+  DEFAULT_MIN_Y: 0
+  DEFAULT_MAX_X: 60
+  DEFAULT_MIN_X: 0
 
   setXAxis: ->
     super
