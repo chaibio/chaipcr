@@ -6,6 +6,7 @@ class BaseChart
   CIRCLE_STROKE_WIDTH: 2
   CIRCLE_RADIUS: 7
   AXIS_LABEL_FONT_SIZE: 10
+  AXES_TICKS_FONT_SIZE: 10
   zoomTransform: {x: 0, y: 0, k: 1}
   isZooming: false
   inputPadding: 5
@@ -614,7 +615,7 @@ class BaseChart
         .attr('fill', '#000')
         .attr('y', @height + @config.margin.top + offsetTop)
         .attr('dy', '0.71em')
-        .attr('font-size', '10px')
+        .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
         .attr('font-family', 'dinot-regular')
         .on 'click', => @onClickLeftXAxisInput()
 
@@ -636,7 +637,7 @@ class BaseChart
       .style('margin', '0px')
       .style('margin-top', '-4px')
       .style('text-align', 'center')
-      .style('font-size', '10px')
+      .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .style('font-family', 'dinot-regular')
       .attr('type', 'text')
       .on('mouseenter', =>
@@ -738,7 +739,7 @@ class BaseChart
         .attr('fill', '#000')
         .attr('y', @height + @config.margin.top + offsetTop)
         .attr('dy', '0.71em')
-        .attr('font-size', '10px')
+        .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
         .attr('font-family', 'dinot-regular')
         .text(@getMaxX())
         .on 'click', => @onClickRightXAxisInput()
@@ -762,7 +763,7 @@ class BaseChart
       .style('margin', '0px')
       .style('margin-top', '-4px')
       .style('text-align', 'center')
-      .style('font-size', '10px')
+      .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .style('font-family', 'dinot-regular')
       .attr('type', 'text')
       .on('mouseenter', =>
@@ -854,8 +855,8 @@ class BaseChart
     rect = textContainer.append('rect')
       .attr('fill', '#fff')
       .attr('width', conWidth)
-      .attr('height', conHeight - offsetTop)
-      .attr('y', @config.margin.top - (conHeight / 2))
+      .attr('height', @AXES_TICKS_FONT_SIZE)
+      .attr('y', @config.margin.top - ((conHeight) / 2))
       .attr('x', @config.margin.left - (conWidth + offsetRight))
       .on 'click', => @onClickUpperYAxisInput()
 
@@ -870,7 +871,7 @@ class BaseChart
       .attr('x', @config.margin.left - (offsetRight + conWidth))
       .attr('y', @config.margin.top - underlineStroke * 2)
       .attr('dy', '0.71em')
-      .attr('font-size', '10px')
+      .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .attr('font-family', 'dinot-regular')
       .text(@getMaxY())
       .on 'click', => @onClickUpperYAxisInput()
@@ -896,7 +897,7 @@ class BaseChart
       .style('margin', '0px')
       .style('margin-top', '-1px')
       .style('text-align', 'center')
-      .style('font-size', '10px')
+      .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .style('font-family', 'dinot-regular')
       .attr('type', 'text')
       .on('mouseenter', =>
@@ -1001,7 +1002,7 @@ class BaseChart
     rect = textContainer.append('rect')
       .attr('fill', '#fff')
       .attr('width', conWidth)
-      .attr('height', conHeight - offsetTop)
+      .attr('height', @AXES_TICKS_FONT_SIZE)
       .attr('y', @height + @config.margin.top - (conHeight / 2))
       .attr('x', @config.margin.left - (conWidth + offsetRight))
       .on 'click', => @onClickLowerYAxisInput()
@@ -1017,7 +1018,7 @@ class BaseChart
       .attr('x', @config.margin.left - (offsetRight + conWidth))
       .attr('y', @height + @config.margin.top - underlineStroke * 2)
       .attr('dy', '0.71em')
-      .attr('font-size', '10px')
+      .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .attr('font-family', 'dinot-regular')
       .text(@getMaxY())
       .on 'click', => @onClickLowerYAxisInput()
@@ -1042,7 +1043,7 @@ class BaseChart
       .style('margin', '0px')
       .style('margin-top', '-1px')
       .style('text-align', 'center')
-      .style('font-size', '10px')
+      .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .style('font-family', 'dinot-regular')
       .attr('type', 'text')
       .on('mouseenter', =>
