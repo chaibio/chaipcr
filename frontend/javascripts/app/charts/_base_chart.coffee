@@ -716,10 +716,10 @@ class BaseChart
       .style('opacity', 1)
       .style('width', "#{conWidth}px")
     xScale = @getXScale()
-    val = @xAxisTickFormat(Math.round(xScale.invert(0) * 10) / 10)
+    val = @xAxisTickFormat(Math.round(xScale.invert(0) * 10) / 10).toString()
     @xAxisLeftExtremeValue.input.node().value = val
     
-    val = val.toString().replace(@config.axes.x.unit, '') if @config.axes.x.unit
+    val = val.replace(@config.axes.x.unit, '') if @config.axes.x.unit
     val = val.trim()
     @setCaretPosition(@xAxisLeftExtremeValue.input.node(), val.length)
 
@@ -843,13 +843,13 @@ class BaseChart
       .attr('width', conWidth)
       .attr('x', @config.margin.left + @width - (conWidth / 2))
 
-    val = @xAxisTickFormat(Math.round(xScale.invert(@width) * 10) / 10)
+    val = @xAxisTickFormat(Math.round(xScale.invert(@width) * 10) / 10).toString()
     @xAxisRightExtremeValue.input.node().value = val
     @xAxisRightExtremeValue.input
       .style('opacity', 1)
       .style('width', "#{conWidth}px")
 
-    val = val.toString().replace(@config.axes.x.unit, '') if @config.axes.x.unit
+    val = val.replace(@config.axes.x.unit, '') if @config.axes.x.unit
     val = val.trim()
     @setCaretPosition(@xAxisRightExtremeValue.input.node(), val.length)
 
@@ -974,9 +974,9 @@ class BaseChart
         inputContainerOffset: inputContainerOffset
 
   onClickUpperYAxisInput: ->
-    val = @yAxisTickFormat(Math.round(@getYScale().invert(0) * 10) / 10)
+    val = @yAxisTickFormat(Math.round(@getYScale().invert(0) * 10) / 10).toString()
     @yAxisUpperExtremeValue.input.node().value = val
-    val = val.toString().replace(@config.axes.y.unit, '') if @config.axes.y.unit
+    val = val.replace(@config.axes.y.unit, '') if @config.axes.y.unit
     val = val.trim()
     @setCaretPosition(@yAxisUpperExtremeValue.input.node(), val.length)
 
@@ -1121,10 +1121,10 @@ class BaseChart
 
   onClickLowerYAxisInput: ->
     conWidth = @yAxisUpperExtremeValue.text.node().getBBox().width
-    val = @yAxisTickFormat(Math.round(@getYScale().invert(@height) * 10) / 10)
+    val = @yAxisTickFormat(Math.round(@getYScale().invert(@height) * 10) / 10).toString()
     @yAxisLowerExtremeValue.input.node().value = val
 
-    val = val.toString().replace(@config.axes.y.unit, '') if @config.axes.y.unit
+    val = val.replace(@config.axes.y.unit, '') if @config.axes.y.unit
     val = val.trim()
     @setCaretPosition(@yAxisLowerExtremeValue.input.node(), val.length)
 
