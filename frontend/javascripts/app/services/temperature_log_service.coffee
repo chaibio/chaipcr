@@ -32,6 +32,7 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
             SecondsDisplay.display2 t
         },
         y: {
+          unit: '°C'
           label: 'Temperature (°C)'
           ticks: 8
           min: 0
@@ -41,7 +42,7 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
             t_string = t.toString().split('.')
             if (t_string[1])
               t = t.toFixed(2)
-            return "#{t} °C"
+            return t
 
         }
       },

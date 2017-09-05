@@ -39,12 +39,13 @@ App.service 'MeltCurveService', [
       series: series
       axes:
         x:
+          unit: '°C'
           key: 'temperature'
           ticks: 8
           tickFormat: (x) ->
             x = x || 0
             x = Math.round(x * 100) / 100
-            return "#{x}°C"
+            return x
         y:
           ticks: 10
       margin:

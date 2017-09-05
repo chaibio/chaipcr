@@ -13,7 +13,7 @@ class BaseChart
   DEFAULT_MIN_X: 0
   zoomTransform: {x: 0, y: 0, k: 1}
   isZooming: false
-  inputPadding: 5
+  INPUT_PADDING: 5
 
   constructor: (@elem, @data, @config) ->
     @initChart()
@@ -36,9 +36,19 @@ class BaseChart
     else
       Math.floor(val)
 
-  formatPower: (d) ->
-    superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹"
-    (d + "").split("").map((c) -> superscript[c]).join("")
+  xAxisTickFormat: (x) ->
+    if @config.axes.x.tickFormat
+      x = @config.axes.x.tickFormat(x)
+    if @config.axes.x.unit
+      x = "#{x}#{@config.axes.x.unit}"
+    return x
+
+  yAxisTickFormat: (y) ->
+    if @config.axes.y.tickFormat
+      y = @config.axes.y.tickFormat(y)
+    if @config.axes.y.unit
+      y = "#{y}#{@config.axes.y.unit}"
+    return y
 
   bisectX: (line_config) ->
     return d3.bisector((d) ->
@@ -57,6 +67,24 @@ class BaseChart
         mouse = [0, 0]
 
     return mouse
+
+  setCaretPosition: (input, caretPos) ->
+    if input.createTextRange
+      console.log 'createTextRange'
+      range = ctrl.createTextRange()
+      range.collapse(true)
+      range.moveEnd('character', caretPos)
+      range.moveStart('character', caretPos)
+      range.select()
+    else
+      if input.selectionStart
+        console.log 'selectionStart'
+        input.focus()
+        input.setSelectionRange(caretPos, caretPos)
+      else
+        console.log 'not selectionStart'
+        input.focus()
+        input.setSelectionRange(caretPos, caretPos)
 
   getPathConfig: (path) ->
     activePathConfig = null
@@ -493,11 +521,9 @@ class BaseChart
     @yScale = if @config.axes.y.scale is 'log' then d3.scaleLog() else d3.scaleLinear()
     @yScale.range([@height, 0]).domain([min, max])
     @yAxis = d3.axisLeft(@yScale)
-    @yAxis.tickFormat(@config.axes.y.tickFormat) if typeof @config.axes.y.tickFormat is 'function'
+    @yAxis.tickFormat (y) => @yAxisTickFormat(y)
     if @config.axes.y.scale is 'log'
-      @yAxis
-        .tickValues(@getYLogticks())
-        .tickFormat (d) => '10' + @formatPower(Math.round(Math.log(d) / Math.LN10))
+      @yAxis.tickValues(@getYLogticks())
 
     @gY = svg.append("g")
         .attr("class", "axis y-axis")
@@ -538,7 +564,8 @@ class BaseChart
     @xScale.domain([min, max])
 
     @xAxis = d3.axisBottom(@xScale)
-    @xAxis.tickFormat(@config.axes.x.tickFormat) if typeof @config.axes.x.tickFormat is 'function'
+    if typeof @config.axes.x.tickFormat is 'function'
+      @xAxis.tickFormat (x) => @xAxisTickFormat(x)
     @gX = svg.append("g")
         .attr("class", "axis x-axis")
         .attr('fill', 'none')
@@ -681,7 +708,7 @@ class BaseChart
         conHeight: conHeight
 
   onClickLeftXAxisInput: ->
-    conWidth = @xAxisLeftExtremeValue.text.node().getBBox().width + @inputPadding
+    conWidth = @xAxisLeftExtremeValue.text.node().getBBox().width + @INPUT_PADDING
     @xAxisLeftExtremeValue.inputContainer
       .attr('width', conWidth)
       .attr('x', @config.margin.left - (conWidth / 2))
@@ -689,10 +716,12 @@ class BaseChart
       .style('opacity', 1)
       .style('width', "#{conWidth}px")
     xScale = @getXScale()
-    val = Math.round(xScale.invert(0) * 10) / 10
-    if @config.axes.x.tickFormat
-      val = @config.axes.x.tickFormat(val)
+    val = @xAxisTickFormat(Math.round(xScale.invert(0) * 10) / 10)
     @xAxisLeftExtremeValue.input.node().value = val
+    
+    val = val.toString().replace(@config.axes.x.unit, '') if @config.axes.x.unit
+    val = val.trim()
+    @setCaretPosition(@xAxisLeftExtremeValue.input.node(), val.length)
 
   onInputLeftXAxis: ->
     if d3.event.keyCode is 13
@@ -808,19 +837,21 @@ class BaseChart
 
   onClickRightXAxisInput: ->
     xScale = @getXScale()
-    conWidth = @xAxisRightExtremeValue.text.node().getBBox().width + @inputPadding
+    conWidth = @xAxisRightExtremeValue.text.node().getBBox().width + @INPUT_PADDING
 
     @xAxisRightExtremeValue.inputContainer
       .attr('width', conWidth)
       .attr('x', @config.margin.left + @width - (conWidth / 2))
 
-    val = Math.round(xScale.invert(@width) * 10) / 10
-    if @config.axes.x.tickFormat
-      val = @config.axes.x.tickFormat(val)
+    val = @xAxisTickFormat(Math.round(xScale.invert(@width) * 10) / 10)
     @xAxisRightExtremeValue.input.node().value = val
     @xAxisRightExtremeValue.input
       .style('opacity', 1)
       .style('width', "#{conWidth}px")
+
+    val = val.toString().replace(@config.axes.x.unit, '') if @config.axes.x.unit
+    val = val.trim()
+    @setCaretPosition(@xAxisRightExtremeValue.input.node(), val.length)
 
   onInputRightXAxis: =>
     if d3.event.keyCode is 13
@@ -871,7 +902,7 @@ class BaseChart
       .attr('opacity', 0)
       .attr('stroke', '#000')
       .attr('stroke-width', underlineStroke)
-      .on 'click', => @onClickUpperYAxisInput()
+      # .on 'click', => @onClickUpperYAxisInput()
 
     text = textContainer.append('text')
       .attr('fill', '#000')
@@ -890,10 +921,10 @@ class BaseChart
       .attr('height', conHeight - offsetTop)
       .attr('y', @config.margin.top - (conHeight / 2))
       .attr('x', @config.margin.left - (conWidth + offsetRight))
-      .on 'click', => @onClickUpperYAxisInput()
+      # .on 'click', => @onClickUpperYAxisInput()
 
     form = inputContainer.append('xhtml:form')
-      .on 'click', => @onClickUpperYAxisInput()
+      # .on 'click', => @onClickUpperYAxisInput()
 
     input = form.append('xhtml:input').attr('type', 'text')
       .style('display', 'block')
@@ -943,18 +974,19 @@ class BaseChart
         inputContainerOffset: inputContainerOffset
 
   onClickUpperYAxisInput: ->
-    val = Math.round(@getYScale().invert(0) * 10) / 10
-    if @config.axes.y.tickFormat
-      val = @config.axes.y.tickFormat(val)
+    val = @yAxisTickFormat(Math.round(@getYScale().invert(0) * 10) / 10)
     @yAxisUpperExtremeValue.input.node().value = val
+    val = val.toString().replace(@config.axes.y.unit, '') if @config.axes.y.unit
+    val = val.trim()
+    @setCaretPosition(@yAxisUpperExtremeValue.input.node(), val.length)
 
     inputWidth = @yAxisUpperExtremeValue.text.node().getBBox().width
 
     @yAxisUpperExtremeValue.inputContainer
-      .attr('width', inputWidth + @inputPadding )
-      .attr('x', @config.margin.left - (inputWidth + @yAxisUpperExtremeValue.config.offsetRight) - (@inputPadding / 2))
+      .attr('width', inputWidth + @INPUT_PADDING )
+      .attr('x', @config.margin.left - (inputWidth + @yAxisUpperExtremeValue.config.offsetRight) - (@INPUT_PADDING / 2))
     @yAxisUpperExtremeValue.input
-      .style('width', "#{inputWidth + @inputPadding}px")
+      .style('width', "#{inputWidth + @INPUT_PADDING}px")
       .style('opacity', 1)
 
   onInputUpperYAxis: =>
@@ -1089,17 +1121,20 @@ class BaseChart
 
   onClickLowerYAxisInput: ->
     conWidth = @yAxisUpperExtremeValue.text.node().getBBox().width
-    val = Math.round(@getYScale().invert(@height) * 10) / 10
-    if @config.axes.y.tickFormat
-      val = @config.axes.y.tickFormat(val)
+    val = @yAxisTickFormat(Math.round(@getYScale().invert(@height) * 10) / 10)
     @yAxisLowerExtremeValue.input.node().value = val
+
+    val = val.toString().replace(@config.axes.y.unit, '') if @config.axes.y.unit
+    val = val.trim()
+    @setCaretPosition(@yAxisLowerExtremeValue.input.node(), val.length)
+
     @yAxisLowerExtremeValue.inputContainer
       .attr('width', conWidth)
       .attr('y', @height + @config.margin.top - (@yAxisLowerExtremeValue.config.conHeight / 2))
       .attr('x', @config.margin.left - (conWidth + @yAxisLowerExtremeValue.config.offsetRight))
     @yAxisLowerExtremeValue.input
       .style('opacity', 1)
-      .style('width', "#{conWidth + @inputPadding}px")
+      .style('width', "#{conWidth + @INPUT_PADDING}px")
 
   onInputLowerYAxis: ->
     if d3.event.keyCode is 13
@@ -1139,18 +1174,14 @@ class BaseChart
       text = @xAxisLeftExtremeValue.text
       rect = @xAxisLeftExtremeValue.rect
       minX = if @hasData() then Math.round(xScale.invert(0) * 10) / 10 else @DEFAULT_MIN_X
-      if @config.axes.x.tickFormat
-        minX = @config.axes.x.tickFormat(minX)
-      text.text(minX)
+      text.text(@xAxisTickFormat(minX))
       textWidth = text.node().getBBox().width
       text.attr('x', @config.margin.left - (textWidth / 2))
       rect.attr('x', @config.margin.left - (textWidth / 2))
         .attr('width', textWidth)
     if @xAxisRightExtremeValue.text
       maxX = if @hasData() then Math.round(xScale.invert(@width) * 10) / 10 else @DEFAULT_MAX_X
-      if @config.axes.x.tickFormat
-        maxX = @config.axes.x.tickFormat(maxX)
-      @xAxisRightExtremeValue.text.text(maxX)
+      @xAxisRightExtremeValue.text.text(@xAxisTickFormat(maxX))
       textWidth = @xAxisRightExtremeValue.text.node().getBBox().width
       @xAxisRightExtremeValue.text.attr('x', @width + @config.margin.left - (textWidth / 2))
       @xAxisRightExtremeValue.rect.attr('x', @width + @config.margin.left - (textWidth / 2))
@@ -1159,9 +1190,7 @@ class BaseChart
       text = @yAxisUpperExtremeValue.text
       rect = @yAxisUpperExtremeValue.rect
       maxY = if @hasData() then Math.round(yScale.invert(0) * 10) / 10 else @DEFAULT_MAX_Y
-      if @config.axes.y.tickFormat
-        maxY = @config.axes.y.tickFormat(maxY)
-      text.text(maxY)
+      text.text(@yAxisTickFormat(maxY))
       textWidth = text.node().getBBox().width
       text.attr('x', @config.margin.left - (@yAxisUpperExtremeValue.config.offsetRight + textWidth))
       rect.attr('x', @config.margin.left - (@yAxisUpperExtremeValue.config.offsetRight + textWidth))
@@ -1170,17 +1199,15 @@ class BaseChart
       rect = @yAxisLowerExtremeValue.rect
       text = @yAxisLowerExtremeValue.text
       minY = if @hasData() then Math.round(yScale.invert(@height) * 10) / 10 else @DEFAULT_MIN_Y
-      if @config.axes.y.tickFormat
-        minY = @config.axes.y.tickFormat(minY)
-      text.text(minY)
+      text.text(@yAxisTickFormat(minY))
       textWidth = text.node().getBBox().width
       text.attr('x', @config.margin.left - (@yAxisLowerExtremeValue.config.offsetRight + textWidth))
       rect.attr('x', @config.margin.left - (@yAxisLowerExtremeValue.config.offsetRight + textWidth))
         .attr('width', textWidth)
 
-    @updateLastAxesTicks()
+    @hideLastAxesTicks()
 
-  updateLastAxesTicks: ->
+  hideLastAxesTicks: ->
     spacingX = 20
     spacingY = 1
     xAxisLeftExtremeValueText = @xAxisLeftExtremeValue.text

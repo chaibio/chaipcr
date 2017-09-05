@@ -3,7 +3,7 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
 
   AXIS_LABEL_FONT_SIZE: 17
   DASHED_LINE_STROKE_WIDTH: 2
-  
+
   DEFAULT_MAX_Y: 120
   DEFAULT_MIN_Y: 0
   DEFAULT_MAX_X: 60
@@ -158,18 +158,15 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
         .attr('x2', x)
 
     if @xAxisCircle
-      x = d3.mouse(@chartSVG.node())[0];
+      xx = d3.mouse(@chartSVG.node())[0];
       @xAxisCircle
         .attr("opacity", opacity)
-        .attr("cx", x)
+        .attr("cx", xx)
         .attr("cy", @height + @config.margin.top)
 
     if (typeof @onMouseMove is 'function')
-      # get data point at point x
-      x = @getMousePosition(@mouseOverlay.node())[0]
-
       line_config = @config.series[0]
-      x0 = if @zoomTransform.k > 1 then @zoomTransform.rescaleX(@xScale).invert(x) else @xScale.invert(x)
+      x0 = @getXScale().invert(x)
       i = @bisectX(line_config)(@data[line_config.dataset], x0, 1)
       d0 = @data[line_config.dataset][i - 1]
 
