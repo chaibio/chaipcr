@@ -106,7 +106,7 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
             if(editValue != Number(scope.shown)) {
 
               scope.shown = scope.reading = (Number(scope.shown));
-							if(scope.shown == 0){
+							if(scope.shown === 0){
 								scope.shown = scope.reading = 5;
 							}
 
