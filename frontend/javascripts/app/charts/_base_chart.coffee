@@ -18,23 +18,27 @@ class BaseChart
   constructor: (@elem, @data, @config) ->
     @initChart()
 
+  getLineCurve: ->
+    d3.curveLinear
+
   hasData: ->
     return false if !@data
-    return false if !@data.dataset
-    return false if @data.dataset.length is 0
-    return true
+    if @data and @config
+      if @config.series?.length > 0
+        if (@data[@config.series[0].dataset]?.length > 1)
+          true
+        else
+          false
+      else
+        false
+    else
+      false
 
   roundUpExtremeValue: (val) ->
-    if Math.abs(val) >= 10
-      Math.ceil(val/5)*5
-    else
-      Math.ceil(val)
+    Math.ceil(val)
 
   roundDownExtremeValue: (val) ->
-    if Math.abs(val) >= 10
-      Math.floor(val/5)*5
-    else
-      Math.floor(val)
+    Math.floor(val)
 
   xAxisTickFormat: (x) ->
     if @config.axes.x.tickFormat
@@ -70,21 +74,14 @@ class BaseChart
 
   setCaretPosition: (input, caretPos) ->
     if input.createTextRange
-      console.log 'createTextRange'
       range = ctrl.createTextRange()
       range.collapse(true)
       range.moveEnd('character', caretPos)
       range.moveStart('character', caretPos)
       range.select()
     else
-      if input.selectionStart
-        console.log 'selectionStart'
-        input.focus()
-        input.setSelectionRange(caretPos, caretPos)
-      else
-        console.log 'not selectionStart'
-        input.focus()
-        input.setSelectionRange(caretPos, caretPos)
+      input.focus()
+      input.setSelectionRange(caretPos, caretPos)
 
   getPathConfig: (path) ->
     activePathConfig = null
@@ -279,10 +276,7 @@ class BaseChart
     xScale = @getXScale()
     yScale = @getYScale()
     line = d3.line()
-    if @config.axes.y.scale is 'log'
-      line.curve(d3.curveMonotoneX)
-    else
-      line.curve(d3.curveBasis)
+    line.curve(@getLineCurve())
     line.x (d) -> xScale(d[line_config.x])
     line.y (d) -> yScale(d[line_config.y])
 
@@ -300,10 +294,7 @@ class BaseChart
     xScale = @getXScale()
     yScale = @getYScale()
     line = d3.line()
-    if @config.axes.y.scale is 'log'
-      line.curve(d3.curveMonotoneX)
-    else
-      line.curve(d3.curveBasis)
+    line.curve(@getLineCurve())
     line.x (d) -> xScale(d[line_config.x])
     line.y (d) -> yScale(d[line_config.y])
     if (@config.axes.y.scale is 'log') then line.defined (d) -> d[line_config.y] > 10
@@ -337,10 +328,7 @@ class BaseChart
     yScale = @getYScale()
     line = d3.line()
     if @whiteBorderLine then @whiteBorderLine.remove()
-    if @config.axes.y.scale is 'log'
-      line.curve(d3.curveMonotoneX)
-    else
-      line.curve(d3.curveBasis)
+    line.curve(@getLineCurve())
     line.x (d) -> xScale(d[line_config.x])
     line.y (d) -> yScale(d[line_config.y])
     if (@config.axes.y.scale is 'log') then line.defined (d) -> d[line_config.y] > 10
@@ -490,7 +478,7 @@ class BaseChart
 
   getYLogticks: ->
     num = @getMaxY()
-    num = num + num * 0.2
+    num = @roundUpExtremeValue(num)
     num_length = num.toString().length
     roundup = '1'
     for i in [0...num_length] by 1
@@ -510,9 +498,10 @@ class BaseChart
     svg = @chartSVG.select('.chart-g')
 
     # add allowance for interpolation curves
-    max = if angular.isNumber(@config.axes.y.max) then @config.axes.y.max else if @hasData() then @roundUpExtremeValue(@getMaxY()) else @DEFAULT_MAX_Y
-    max = if max is 0 then @DEFAULT_MAX_Y else max
-    min = if angular.isNumber(@config.axes.y.min) then @config.axes.y.min else if @hasData() then @roundUpExtremeValue(@getMinY()) else @DEFAULT_MIN_Y
+    max = if angular.isNumber(@config.axes.y.max) then @config.axes.y.max else if @hasData() then @getMaxY() else @DEFAULT_MAX_Y
+    min = if angular.isNumber(@config.axes.y.min) then @config.axes.y.min else if @hasData() then @getMinY() else @DEFAULT_MIN_Y
+    max = @roundUpExtremeValue(max)
+    min = @roundDownExtremeValue(min)
     # diff = max - min
     # allowance = diff * (if @config.axes.y.scale is 'log' then 0.2 else 0.05)
     # max += allowance
@@ -558,8 +547,8 @@ class BaseChart
     svg = @chartSVG.select('.chart-g')
     @xScale = d3.scaleLinear().range([0, @width])
 
-    min = if angular.isNumber(@config.axes.x.min) then @config.axes.x.min else if @hasData() then @roundDownExtremeValue(@getMinX()) else @DEFAULT_MIN_X
-    max = if angular.isNumber(@config.axes.x.max) then @config.axes.x.max else if @hasData() then @roundUpExtremeValue(@getMaxX()) else @DEFAULT_MAX_X   
+    min = if angular.isNumber(@config.axes.x.min) then @config.axes.x.min else if @hasData() then @getMinX() else @DEFAULT_MIN_X
+    max = if angular.isNumber(@config.axes.x.max) then @config.axes.x.max else if @hasData() then @getMaxX() else @DEFAULT_MAX_X   
     
     @xScale.domain([min, max])
 
@@ -596,21 +585,35 @@ class BaseChart
     return if !@zooomBehavior
     @zooomBehavior.scaleExtent([1, @getScaleExtent()])
 
-  validateAxisInput: ->
+  onAxisInputBaseFunc: (loc, input, val) ->
     charCode = d3.event.keyCode
     if charCode > 36 and charCode < 41
       # arrow keys
       return true
-    if charCode is 189 || charCode is 187 || charCode is 109 || charCode is 107
-      # +/- key
-      return true
-    if charCode >= 96 and charCode <= 105
-      # numpad number keys
-      return true
-    if charCode > 31 and (charCode < 48 || charCode > 57)
-      d3.event.preventDefault()
-      return false
-    return true
+    else
+      # remove units before passing value to @onAxisInput()
+      if (loc is 'x:min' or loc is 'x:max')
+        val = val.toString().replace(@config.axes.x.unit, '') if @config.axes.x.unit
+        @onAxisInput(loc, input, val) if typeof @onAxisInput is 'function'
+      if (loc is 'y:min' or loc is 'y:max')
+        val = val.toString().replace(@config.axes.y.unit, '') if @config.axes.y.unit
+        @onAxisInput(loc, input, val) if typeof @onAxisInput is 'function'
+
+  # validateAxisInput: ->
+  #   charCode = d3.event.keyCode
+  #   if charCode > 36 and charCode < 41
+  #     # arrow keys
+  #     return true
+  #   if charCode is 189 || charCode is 187 || charCode is 109 || charCode is 107
+  #     # +/- key
+  #     return true
+  #   if charCode >= 96 and charCode <= 105
+  #     # numpad number keys
+  #     return true
+  #   if charCode > 31 and (charCode < 48 || charCode > 57)
+  #     d3.event.preventDefault()
+  #     return false
+  #   return true
 
   drawAxesExtremeValues: ->
     @chartSVG.selectAll('.axes-extreme-value').remove()
@@ -688,11 +691,18 @@ class BaseChart
       .on('click', =>
         @onClickLeftXAxisInput()
       )
-      .on('focusout', ->
+      .on('focusout', =>
         input.style('opacity', 0)
+        @xAxisLeftExtremeValue.focused = false
       )
       .on('keydown', =>
-        @onInputLeftXAxis()
+        if d3.event.keyCode is 13 and typeof @onEnterAxisInput is 'function'
+          @onEnterAxisInput('x:min', input.node(), input.node().value.trim())
+          d3.event.preventDefault()
+      )
+      .on('keyup', =>
+        if d3.event.keyCode isnt 13 and typeof @onAxisInputBaseFunc is 'function'
+          @onAxisInputBaseFunc('x:min', input.node(), input.node().value.trim())
       )
 
     @xAxisLeftExtremeValue =
@@ -708,6 +718,9 @@ class BaseChart
         conHeight: conHeight
 
   onClickLeftXAxisInput: ->
+    return if @xAxisLeftExtremeValue.focused
+    @xAxisLeftExtremeValue.focused = true
+
     conWidth = @xAxisLeftExtremeValue.text.node().getBBox().width + @INPUT_PADDING
     @xAxisLeftExtremeValue.inputContainer
       .attr('width', conWidth)
@@ -716,14 +729,14 @@ class BaseChart
       .style('opacity', 1)
       .style('width', "#{conWidth}px")
     xScale = @getXScale()
-    val = @xAxisTickFormat(Math.round(xScale.invert(0) * 10) / 10).toString()
+    val = @xAxisLeftExtremeValue.text.text()
     @xAxisLeftExtremeValue.input.node().value = val
     
     val = val.replace(@config.axes.x.unit, '') if @config.axes.x.unit
     val = val.trim()
     @setCaretPosition(@xAxisLeftExtremeValue.input.node(), val.length)
 
-  onInputLeftXAxis: ->
+  # onInputLeftXAxis: ->
     # if d3.event.keyCode is 13
     #   # enter
     #   d3.event.preventDefault()
@@ -816,11 +829,18 @@ class BaseChart
       .on('click', =>
         @onClickRightXAxisInput()
       )
-      .on('focusout', ->
+      .on('focusout', =>
         input.style('opacity', 0)
+        @xAxisRightExtremeValue.focused = false
       )
       .on('keydown', =>
-        @onInputRightXAxis()
+        if d3.event.keyCode is 13 and typeof @onEnterAxisInput is 'function'
+          @onEnterAxisInput('x:max', input.node(), input.node().value.trim())
+          d3.event.preventDefault()
+      )
+      .on('keyup', =>
+        if d3.event.keyCode isnt 13 and typeof @onAxisInputBaseFunc is 'function'
+          @onAxisInputBaseFunc('x:max', input.node(), input.node().value.trim())
       )
 
     @xAxisRightExtremeValue =
@@ -836,6 +856,8 @@ class BaseChart
         conHeight: conHeight
 
   onClickRightXAxisInput: ->
+    return if @xAxisRightExtremeValue.focused
+    @xAxisRightExtremeValue.focused = true
     xScale = @getXScale()
     conWidth = @xAxisRightExtremeValue.text.node().getBBox().width + @INPUT_PADDING
 
@@ -843,7 +865,7 @@ class BaseChart
       .attr('width', conWidth)
       .attr('x', @config.margin.left + @width - (conWidth / 2))
 
-    val = @xAxisTickFormat(Math.round(xScale.invert(@width) * 10) / 10).toString()
+    val = @xAxisRightExtremeValue.text.text()
     @xAxisRightExtremeValue.input.node().value = val
     @xAxisRightExtremeValue.input
       .style('opacity', 1)
@@ -853,7 +875,7 @@ class BaseChart
     val = val.trim()
     @setCaretPosition(@xAxisRightExtremeValue.input.node(), val.length)
 
-  onInputRightXAxis: =>
+  # onInputRightXAxis: =>
     # if d3.event.keyCode is 13
     #   # enter
     #   d3.event.preventDefault()
@@ -952,11 +974,18 @@ class BaseChart
       .on('click', =>
         @onClickUpperYAxisInput()
       )
-      .on('focusout', ->
+      .on('focusout', =>
         input.style('opacity', 0)
+        @yAxisUpperExtremeValue.focused = false
+      )
+      .on('keyup', =>
+        if d3.event.keyCode isnt 13 and typeof @onAxisInputBaseFunc is 'function'
+          @onAxisInputBaseFunc('y:max', input.node(), input.node().value.trim())
       )
       .on('keydown', =>
-        @onInputUpperYAxis()
+        if d3.event.keyCode is 13 and typeof @onEnterAxisInput is 'function'
+          @onEnterAxisInput('y:max', input.node(), input.node().value.trim())
+          d3.event.preventDefault()
       )
 
     @yAxisUpperExtremeValue =
@@ -974,7 +1003,11 @@ class BaseChart
         inputContainerOffset: inputContainerOffset
 
   onClickUpperYAxisInput: ->
-    val = @yAxisTickFormat(Math.round(@getYScale().invert(0) * 10) / 10).toString()
+    return if @yAxisUpperExtremeValue.focused
+    @yAxisUpperExtremeValue.focused = true
+
+    # val = @yAxisTickFormat(Math.round(@getYScale().invert(0) * 10) / 10).toString()
+    val = @yAxisUpperExtremeValue.text.text()
     @yAxisUpperExtremeValue.input.node().value = val
     val = val.replace(@config.axes.y.unit, '') if @config.axes.y.unit
     val = val.trim()
@@ -989,7 +1022,7 @@ class BaseChart
       .style('width', "#{inputWidth + @INPUT_PADDING}px")
       .style('opacity', 1)
 
-  onInputUpperYAxis: =>
+  # onInputUpperYAxis: =>
     # if d3.event.keyCode is 13
     #   # // enter
     #   d3.event.preventDefault()
@@ -1094,11 +1127,18 @@ class BaseChart
       .on('click', =>
         @onClickLowerYAxisInput()
       )
-      .on('focusout', ->
+      .on('focusout', =>
         input.style('opacity', 0)
+        @yAxisLowerExtremeValue.focused = false
+      )
+      .on('keyup', =>
+        if d3.event.keyCode isnt 13 and typeof @onAxisInputBaseFunc is 'function'
+          @onAxisInputBaseFunc('y:min', input.node(), input.node().value.trim())
       )
       .on('keydown', =>
-        @onInputLowerYAxis()
+        if d3.event.keyCode is 13 and typeof @onEnterAxisInput is 'function'
+          @onEnterAxisInput('y:min', input.node(), input.node().value.trim())
+          d3.event.preventDefault()
       )
 
     @yAxisLowerExtremeValue = 
@@ -1115,8 +1155,10 @@ class BaseChart
         conHeight: conHeight
 
   onClickLowerYAxisInput: ->
+    return if @yAxisLowerExtremeValue.focused
+    @yAxisLowerExtremeValue.focused = true
     conWidth = @yAxisUpperExtremeValue.text.node().getBBox().width
-    val = @yAxisTickFormat(Math.round(@getYScale().invert(@height) * 10) / 10).toString()
+    val = @yAxisLowerExtremeValue.text.text()
     @yAxisLowerExtremeValue.input.node().value = val
 
     val = val.replace(@config.axes.y.unit, '') if @config.axes.y.unit
@@ -1131,7 +1173,7 @@ class BaseChart
       .style('opacity', 1)
       .style('width', "#{conWidth + @INPUT_PADDING}px")
 
-  onInputLowerYAxis: ->
+  # onInputLowerYAxis: ->
     # if d3.event.keyCode is 13
     #   # enter
     #   d3.event.preventDefault()
@@ -1206,11 +1248,20 @@ class BaseChart
     xAxisRightExtremeValueText = @xAxisRightExtremeValue.text
     yAxisLowerExtremeValueText = @yAxisLowerExtremeValue.text
     yAxisUpperExtremeValueText = @yAxisUpperExtremeValue.text
+
+    config = @config
+
     # x ticks
     ticks = @chartSVG.selectAll('g.axis.x-axis > g.tick')
+
+
     width = @width
     num_ticks = ticks.size()
     ticks.each (d, i) ->
+
+      if config.axes.y.scale is 'log'
+        return "xtick_#{i}"
+
       if (i is 0)
         textWidth = xAxisLeftExtremeValueText.node().getBBox().width
         x = this.transform.baseVal[0].matrix.e
@@ -1226,6 +1277,10 @@ class BaseChart
     num_ticks = ticks.size()
     height = @height
     ticks.each (d, i) ->
+
+      if config.axes.y.scale is 'log'
+        return "ytick_#{i}"
+
       if (i is 0)
         textHeight = yAxisLowerExtremeValueText.node().getBBox().height
         y = this.transform.baseVal[0].matrix.f
