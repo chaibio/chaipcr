@@ -103,7 +103,7 @@ angular.module("canvasApp").factory('stage', [
 
       this.deleteStep = function(data, currentStep) {
         
-        deleteStepService.deleteStep(this, data, currentStep, $scope);
+        deleteStepService.deleteStep(this, currentStep, $scope);
         return;
       };
 

@@ -5,7 +5,7 @@ window.ChaiBioTech.ngApp.service('deleteStepService', [
     'editModeService',
     function(constants, correctNumberingService, circleManager, editModeService) {
         
-        this.deleteStep = function(stage, data, currentStep, $scope) {
+        this.deleteStep = function(stage, currentStep, $scope) {
 
             // This methode says what happens in the canvas when a step is deleted
             var selected;
@@ -19,7 +19,7 @@ window.ChaiBioTech.ngApp.service('deleteStepService', [
             this.deleteFromArrays(stage, start, ordealStatus);
             
             if(stage.childSteps.length > 0) {
-                this.configureStepForDelete(stage, currentStep, start);
+                this.configureStepForDelete(stage, start);
             } else { // if all the steps in the stages are deleted, We delete the stage itself.
                 this.removeWholeStage(stage);
             }
@@ -37,17 +37,16 @@ window.ChaiBioTech.ngApp.service('deleteStepService', [
             stage.parent.allStepViews.splice(ordealStatus - 1, 1);
         };
 
-        this.configureStepForDelete = function(stage, newStep, start) {
+        this.configureStepForDelete = function(stage, start) {
 
             stage.childSteps.slice(0, start).forEach(function(thisStep) {
-            thisStep.configureStepName();
+                thisStep.configureStepName();
             }, this);
 
             stage.childSteps.slice(start, stage.childSteps.length).forEach(function(thisStep) {
-
-            thisStep.index = thisStep.index - 1;
-            thisStep.configureStepName();
-            thisStep.moveStep(-1, true);
+                thisStep.index = thisStep.index - 1;
+                thisStep.configureStepName();
+                thisStep.moveStep(-1, true);
             }, this);
         };
 
@@ -89,7 +88,7 @@ window.ChaiBioTech.ngApp.service('deleteStepService', [
 
             var len = stage.parent.allStepViews.length;
             var lStep = stage.parent.allStepViews[len - 1];
-
+            
             if(lStep.circle.curve) {
                 stage.parent.canvas.remove(lStep.circle.curve);
                 delete lStep.circle.curve;   
