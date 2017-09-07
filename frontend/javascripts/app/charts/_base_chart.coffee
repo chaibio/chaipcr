@@ -48,9 +48,10 @@ class BaseChart
     return x
 
   yAxisTickFormat: (y) ->
-    if @config.axes.y.tickFormat
+    if @config.axes.y.tickFormat and angular.isNumber(y)
       y = @config.axes.y.tickFormat(y)
     if @config.axes.y.unit
+      y = if !angular.isNumber(y) then '' else y
       y = "#{y}#{@config.axes.y.unit}"
     return y
 
@@ -405,13 +406,13 @@ class BaseChart
     return if not d3.event
     if d3.event.sourceEvent?.srcElement
       if d3.event.sourceEvent.srcElement is @xAxisLeftExtremeValue.input.node()
-        return @onClickLeftXAxisInput()
+        @onClickLeftXAxisInput()
       if d3.event.sourceEvent.srcElement is @xAxisRightExtremeValue.input.node()
-        return @onClickRightXAxisInput()
+        @onClickRightXAxisInput()
       if d3.event.sourceEvent.srcElement is @yAxisUpperExtremeValue.input.node()
-        return @onClickUpperYAxisInput()
+        @onClickUpperYAxisInput()
       if d3.event.sourceEvent.srcElement is @yAxisLowerExtremeValue.input.node()
-        return @onClickLowerYAxisInput()
+        @onClickLowerYAxisInput()
 
     transform = d3.event.transform
     transform.x = transform.x || 0
@@ -592,12 +593,53 @@ class BaseChart
       return true
     else
       # remove units before passing value to @onAxisInput()
-      if (loc is 'x:min' or loc is 'x:max')
-        val = val.toString().replace(@config.axes.x.unit, '') if @config.axes.x.unit
-        @onAxisInput(loc, input, val) if typeof @onAxisInput is 'function'
-      if (loc is 'y:min' or loc is 'y:max')
-        val = val.toString().replace(@config.axes.y.unit, '') if @config.axes.y.unit
-        @onAxisInput(loc, input, val) if typeof @onAxisInput is 'function'
+      axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
+      val = val.toString().replace(@config.axes[axis].unit, '') if @config.axes[axis].unit
+      @onAxisInput(loc, input, val) if typeof @onAxisInput is 'function'
+
+      # update the input width after value is updated
+      extremeValue = null
+      if loc is 'x:min'
+        extremeValue = @xAxisLeftExtremeValue
+      if loc is 'x:max'
+        extremeValue = @xAxisRightExtremeValue
+      if loc is 'y:min'
+        extremeValue = @yAxisLowerExtremeValue
+      if loc is 'y:max'
+        extremeValue = @yAxisUpperExtremeValue
+
+      extremeValue.text.text(extremeValue.input.node().value)
+      textWidth = extremeValue.text.node().getBBox().width
+
+      if loc is 'x:min'
+        conWidth = textWidth + @INPUT_PADDING
+        extremeValue.inputContainer
+          .attr('width', conWidth)
+          .attr('x', @config.margin.left - (conWidth / 2))
+        extremeValue.text
+          .attr('x', @config.margin.left - (textWidth / 2))
+        extremeValue.input
+          .style('width', "#{conWidth}px")
+
+      if loc is 'x:max'
+        conWidth = textWidth + @INPUT_PADDING
+        extremeValue.inputContainer
+          .attr('width', conWidth)
+          .attr('x', @config.margin.left + @width - (conWidth / 2))
+        extremeValue.text
+          .attr('x', @config.margin.left + @width - (textWidth / 2))
+        extremeValue.input
+          .style('width', "#{conWidth}px")
+
+      if (loc is 'y:min') or (loc is 'y:max')
+        conWidth = textWidth
+        extremeValue.inputContainer
+          .attr('width', conWidth + @INPUT_PADDING)
+          .attr('x', @config.margin.left - (conWidth + extremeValue.config.offsetRight))
+        extremeValue.input
+          .style('width', "#{conWidth + @INPUT_PADDING}px")
+        extremeValue.text.attr('x', @config.margin.left - (extremeValue.config.offsetRight + conWidth))
+
 
   # validateAxisInput: ->
   #   charCode = d3.event.keyCode
@@ -694,6 +736,7 @@ class BaseChart
       .on('focusout', =>
         input.style('opacity', 0)
         @xAxisLeftExtremeValue.focused = false
+        @updateAxesExtremeValues()
       )
       .on('keydown', =>
         if d3.event.keyCode is 13 and typeof @onEnterAxisInput is 'function'
@@ -721,20 +764,8 @@ class BaseChart
     return if @xAxisLeftExtremeValue.focused
     @xAxisLeftExtremeValue.focused = true
 
-    conWidth = @xAxisLeftExtremeValue.text.node().getBBox().width + @INPUT_PADDING
-    @xAxisLeftExtremeValue.inputContainer
-      .attr('width', conWidth)
-      .attr('x', @config.margin.left - (conWidth / 2))
-    @xAxisLeftExtremeValue.input
-      .style('opacity', 1)
-      .style('width', "#{conWidth}px")
-    xScale = @getXScale()
-    val = @xAxisLeftExtremeValue.text.text()
-    @xAxisLeftExtremeValue.input.node().value = val
-    
-    val = val.replace(@config.axes.x.unit, '') if @config.axes.x.unit
-    val = val.trim()
-    @setCaretPosition(@xAxisLeftExtremeValue.input.node(), val.length)
+    if typeof @onClickAxisInput is 'function'
+      @onClickAxisInput('x:min', @xAxisLeftExtremeValue)
 
   # onInputLeftXAxis: ->
     # if d3.event.keyCode is 13
@@ -832,6 +863,7 @@ class BaseChart
       .on('focusout', =>
         input.style('opacity', 0)
         @xAxisRightExtremeValue.focused = false
+        @updateAxesExtremeValues()
       )
       .on('keydown', =>
         if d3.event.keyCode is 13 and typeof @onEnterAxisInput is 'function'
@@ -858,22 +890,9 @@ class BaseChart
   onClickRightXAxisInput: ->
     return if @xAxisRightExtremeValue.focused
     @xAxisRightExtremeValue.focused = true
-    xScale = @getXScale()
-    conWidth = @xAxisRightExtremeValue.text.node().getBBox().width + @INPUT_PADDING
-
-    @xAxisRightExtremeValue.inputContainer
-      .attr('width', conWidth)
-      .attr('x', @config.margin.left + @width - (conWidth / 2))
-
-    val = @xAxisRightExtremeValue.text.text()
-    @xAxisRightExtremeValue.input.node().value = val
-    @xAxisRightExtremeValue.input
-      .style('opacity', 1)
-      .style('width', "#{conWidth}px")
-
-    val = val.replace(@config.axes.x.unit, '') if @config.axes.x.unit
-    val = val.trim()
-    @setCaretPosition(@xAxisRightExtremeValue.input.node(), val.length)
+    
+    if typeof @onClickAxisInput is 'function'
+      @onClickAxisInput('x:max', @xAxisRightExtremeValue)
 
   # onInputRightXAxis: =>
     # if d3.event.keyCode is 13
@@ -977,6 +996,7 @@ class BaseChart
       .on('focusout', =>
         input.style('opacity', 0)
         @yAxisUpperExtremeValue.focused = false
+        @updateAxesExtremeValues()
       )
       .on('keyup', =>
         if d3.event.keyCode isnt 13 and typeof @onAxisInputBaseFunc is 'function'
@@ -1006,21 +1026,8 @@ class BaseChart
     return if @yAxisUpperExtremeValue.focused
     @yAxisUpperExtremeValue.focused = true
 
-    # val = @yAxisTickFormat(Math.round(@getYScale().invert(0) * 10) / 10).toString()
-    val = @yAxisUpperExtremeValue.text.text()
-    @yAxisUpperExtremeValue.input.node().value = val
-    val = val.replace(@config.axes.y.unit, '') if @config.axes.y.unit
-    val = val.trim()
-    @setCaretPosition(@yAxisUpperExtremeValue.input.node(), val.length)
-
-    inputWidth = @yAxisUpperExtremeValue.text.node().getBBox().width
-
-    @yAxisUpperExtremeValue.inputContainer
-      .attr('width', inputWidth + @INPUT_PADDING )
-      .attr('x', @config.margin.left - (inputWidth + @yAxisUpperExtremeValue.config.offsetRight) - (@INPUT_PADDING / 2))
-    @yAxisUpperExtremeValue.input
-      .style('width', "#{inputWidth + @INPUT_PADDING}px")
-      .style('opacity', 1)
+    if typeof @onClickAxisInput is 'function'
+      @onClickAxisInput 'y:max', @yAxisUpperExtremeValue
 
   # onInputUpperYAxis: =>
     # if d3.event.keyCode is 13
@@ -1094,9 +1101,9 @@ class BaseChart
 
     inputContainer = textContainer.append('foreignObject')
       .attr('width', conWidth)
+      .attr('x', @config.margin.left - (conWidth + offsetRight))
       .attr('height', conHeight - offsetTop)
       .attr('y', @height + @config.margin.top - (conHeight / 2))
-      .attr('x', @config.margin.left - (conWidth + offsetRight))
       .on 'click', => @onClickLowerYAxisInput()
 
     form = inputContainer.append('xhtml:form')
@@ -1130,6 +1137,7 @@ class BaseChart
       .on('focusout', =>
         input.style('opacity', 0)
         @yAxisLowerExtremeValue.focused = false
+        @updateAxesExtremeValues()
       )
       .on('keyup', =>
         if d3.event.keyCode isnt 13 and typeof @onAxisInputBaseFunc is 'function'
@@ -1157,21 +1165,9 @@ class BaseChart
   onClickLowerYAxisInput: ->
     return if @yAxisLowerExtremeValue.focused
     @yAxisLowerExtremeValue.focused = true
-    conWidth = @yAxisUpperExtremeValue.text.node().getBBox().width
-    val = @yAxisLowerExtremeValue.text.text()
-    @yAxisLowerExtremeValue.input.node().value = val
 
-    val = val.replace(@config.axes.y.unit, '') if @config.axes.y.unit
-    val = val.trim()
-    @setCaretPosition(@yAxisLowerExtremeValue.input.node(), val.length)
-
-    @yAxisLowerExtremeValue.inputContainer
-      .attr('width', conWidth)
-      .attr('y', @height + @config.margin.top - (@yAxisLowerExtremeValue.config.conHeight / 2))
-      .attr('x', @config.margin.left - (conWidth + @yAxisLowerExtremeValue.config.offsetRight))
-    @yAxisLowerExtremeValue.input
-      .style('opacity', 1)
-      .style('width', "#{conWidth + @INPUT_PADDING}px")
+    if typeof @onClickAxisInput is 'function'
+      @onClickAxisInput 'y:max', @yAxisLowerExtremeValue
 
   # onInputLowerYAxis: ->
     # if d3.event.keyCode is 13
@@ -1415,8 +1411,11 @@ class BaseChart
         @hoveredLine = null
       if @prevClosestLineIndex isnt closestLineIndex
         if @prevClosestLineIndex isnt undefined and @lines[@prevClosestLineIndex]
-          if (@lines[@prevClosestLineIndex] isnt @activePath) and (@lines[@prevClosestLineIndex] isnt @hoveredLine) and !@hovering
-            @lines[@prevClosestLineIndex].attr('stroke-width', @NORMAL_PATH_STROKE_WIDTH)
+          # if (@lines[@prevClosestLineIndex] isnt @activePath) and (@lines[@prevClosestLineIndex] isnt @hoveredLine) and !@hovering
+            # @lines[@prevClosestLineIndex].attr('stroke-width', @NORMAL_PATH_STROKE_WIDTH)
+          @lines.forEach (line) =>
+            if line isnt @activePath and line isnt @hoveredLine and !@hovering
+              line.attr('stroke-width', @NORMAL_PATH_STROKE_WIDTH)
           if !@hovering and @hoveredLine
             @hoveredLine.attr('stroke-width', @NORMAL_PATH_STROKE_WIDTH)
             @hoveredLine = null

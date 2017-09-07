@@ -34,7 +34,8 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           label: 'RELATIVE FLUORESCENCE UNITS'
           ticks: 10
           tickFormat: (y) ->
-            if y >= 1000 then Math.round(( y / 1000) * 10) / 10 else Math.round(y * 10) / 10
+            # if y >= 1000 then Math.round(( y / 1000) * 10) / 10 else Math.round(y * 10) / 10
+            Math.round(( y / 1000) * 10) / 10
 
       box:
         label:
