@@ -1,7 +1,9 @@
 {
 	"software": {
 		"version": "1.0.0",
-		"platform": "S0100"	
+		"platform": "S0100",
+		"data_partition_free_soft_limit": 40,	
+		"data_partition_free_hard_limit": 30
 	},
 	"thermal": {
 		"lid": {
