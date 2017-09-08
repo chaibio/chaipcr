@@ -44,7 +44,7 @@ App.service 'MeltCurveService', [
           ticks: 8
           tickFormat: (x) ->
             x = x || 0
-            x = Math.round(x * 100) / 100
+            x = Math.round(x * 10) / 10
             return x
         y:
           ticks: 10

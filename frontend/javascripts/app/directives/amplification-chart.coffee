@@ -56,12 +56,13 @@ window.App.directive 'amplificationChart', [
             chart.updateData($scope.data)
             chart.updateConfig($scope.config)
             if $scope.show
-              chart.setYAxis()
-              chart.setXAxis()
-              chart.drawLines()
-              chart.updateAxesExtremeValues()
               if isInterpolationChanged(val, oldState) or isBaseBackroundChanged(val, oldState)
-                chart.zoomTo(0)
+                initChart()
+              else
+                chart.setYAxis()
+                chart.setXAxis()
+                chart.drawLines()
+                chart.updateAxesExtremeValues()
 
           oldState = angular.copy(val)
 
