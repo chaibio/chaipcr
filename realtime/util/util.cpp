@@ -35,6 +35,7 @@
 #include <sys/wait.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#include <sys/statvfs.h>
 
 #define WATCH_PROCESS_BUFFER_SIZE 4096
 
@@ -434,6 +435,16 @@ bool getFileChecksum(const std::string &filePath, int eventFd, std::string &chec
     }
     else
         return true;
+}
+
+unsigned long getPartitionAvailableSpace(const std::string &path)
+{
+    struct statvfs stat;
+    std::memset(&stat, 0, sizeof(stat));
+
+    statvfs(path.c_str(), &stat);
+
+    return stat.f_bfree * 4;
 }
 
 }

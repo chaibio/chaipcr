@@ -271,25 +271,55 @@ void QPCRApplication::readConfigurationFile()
 {
     Poco::Logger &logger = Poco::Logger::get(kAppLogName);
     Poco::LogStream stream(logger);
-    std::ifstream deviceFile(kConfigurationFilePath);
+    std::ifstream configurationFile(kConfigurationFilePath);
 
-    if (deviceFile.is_open())
+    if (configurationFile.is_open())
     {
         boost::property_tree::ptree ptree;
-        boost::property_tree::read_json(deviceFile, ptree);
-        boost::property_tree::ptree::const_assoc_iterator softwareIt = ptree.find("software");
+        boost::property_tree::read_json(configurationFile, ptree);
+        boost::property_tree::ptree::const_assoc_iterator it = ptree.find("software");
 
-        if (softwareIt != ptree.not_found())
+        if (it != ptree.not_found())
         {
-            boost::property_tree::ptree::const_assoc_iterator it = softwareIt->second.find("version");
+            boost::property_tree::ptree::const_assoc_iterator valueIt = it->second.find("version");
 
-            if (it != softwareIt->second.not_found())
-                _settings.configuration.version = it->second.get_value<std::string>();
+            if (valueIt != it->second.not_found())
+                _settings.configuration.version = valueIt->second.get_value<std::string>();
 
-            it = softwareIt->second.find("platform");
+            valueIt = it->second.find("platform");
 
-            if (it != softwareIt->second.not_found())
-                _settings.configuration.platform = it->second.get_value<std::string>();
+            if (valueIt != it->second.not_found())
+                _settings.configuration.platform = valueIt->second.get_value<std::string>();
+
+            valueIt = it->second.find("data_partition_free_soft_limit");
+
+            if (valueIt != it->second.not_found())
+                _settings.configuration.dataSpaceSoftLimit = valueIt->second.get_value<unsigned long>() * 1024 * 1024;
+
+            valueIt = it->second.find("data_partition_free_hard_limit");
+
+            if (valueIt != it->second.not_found())
+                _settings.configuration.dataSpaceHardLimit = valueIt->second.get_value<unsigned long>() * 1024 * 1024;
+        }
+
+        it = ptree.find("thermal");
+
+        if (it != ptree.not_found())
+        {
+            it = ptree.find("block");
+
+            if (it != ptree.not_found())
+            {
+                boost::property_tree::ptree::const_assoc_iterator valueIt = it->second.find("min_temp_c");
+
+                if (valueIt != it->second.not_found())
+                    _settings.configuration.heatBlockMinTemp = valueIt->second.get_value<float>();
+
+                valueIt = it->second.find("max_temp_c");
+
+                if (valueIt != it->second.not_found())
+                    _settings.configuration.heatBlockMaxTemp = valueIt->second.get_value<float>();
+            }
         }
     }
     else

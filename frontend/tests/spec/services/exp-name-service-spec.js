@@ -15,20 +15,21 @@ describe("Testing expName method", function() {
 
         
         inject(function($injector) {
-            _rootScope = $injector.get('$rootScope');
+            _$rootScope = $injector.get('$rootScope');
             _expName = $injector.get('expName');
            
         });
 
     });
+    
     it("It should test updateName method", function() {
 
         var name = "ChaiBio";
-        console.log(_$rootScope, _expName);
-        //spyOn(_$rootScope, "$broadcast");
+        spyOn(_$rootScope, "$broadcast");
 
         _expName.updateName(name);
 
         expect(_expName.name).toEqual(name);
+        expect(_$rootScope.$broadcast).toHaveBeenCalled();
     });
 });

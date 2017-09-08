@@ -60,8 +60,17 @@ public:
         class Configuration
         {
         public:
+            Configuration(): heatBlockMinTemp(0), heatBlockMaxTemp(0), dataSpaceSoftLimit(0), dataSpaceHardLimit(0) {}
+
+        public:
             std::string version;
             std::string platform;
+
+            float heatBlockMinTemp;
+            float heatBlockMaxTemp;
+
+            unsigned long dataSpaceSoftLimit;
+            unsigned long dataSpaceHardLimit;
         }configuration;
     };
 
