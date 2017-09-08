@@ -215,7 +215,7 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
   onClickAxisInput: (loc, extremeValue) ->
     # val = extremeValue.text.text()
     if loc is 'x:min'
-      val = @getXScale().invert(0)
+      val = @getXScale().invert(0).toString()
       conWidth = extremeValue.text.node().getBBox().width + @INPUT_PADDING
       extremeValue.inputContainer
         .attr('width', conWidth)
@@ -231,8 +231,7 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
       val = val.trim()
       @setCaretPosition(extremeValue.input.node(), val.length)
     if loc is 'x:max'
-      xScale = @getXScale()
-      val = xScale.invert(@width)
+      val = @getXScale().invert(@width).toString()
       conWidth = extremeValue.text.node().getBBox().width + @INPUT_PADDING
 
       extremeValue.inputContainer
