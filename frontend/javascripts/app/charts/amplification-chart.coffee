@@ -139,7 +139,6 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
 
     if @config.axes.y.scale is 'log'
       ticks = @getYLogTicks(min, max)
-      console.log ticks
       @yScale.range([@height, 0]).domain([ticks[0], ticks[ticks.length - 1]])
       @yAxis = d3.axisLeft(@yScale)
       @yAxis.tickValues(ticks)
