@@ -60,8 +60,14 @@ public:
         class Configuration
         {
         public:
+            Configuration(): heatBlockMinTemp(0), heatBlockMaxTemp(0) {}
+
+        public:
             std::string version;
             std::string platform;
+
+            float heatBlockMinTemp;
+            float heatBlockMaxTemp;
         }configuration;
     };
 
