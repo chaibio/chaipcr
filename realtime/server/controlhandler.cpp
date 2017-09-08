@@ -58,6 +58,11 @@ void ControlHandler::processData(const boost::property_tree::ptree &requestPt, b
             setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
             break;
 
+        case ExperimentController::OutOfStorageSpace:
+            setErrorString("Storage limit reached - please delete some experiments");
+            setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+            break;
+
         default:
             setErrorString("Unknown error");
             setStatus(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
