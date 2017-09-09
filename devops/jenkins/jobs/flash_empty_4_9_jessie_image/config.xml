@@ -4,9 +4,6 @@
   <description>Build basic debian image with kernel version 4.9</description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.17.2">
-      <optOut>false</optOut>
-    </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
@@ -220,7 +217,9 @@ uname -a
 ls -ahl
 lsblk
 df -h
-
+rm -r .julia
+ 
+df -h
 rm /var/lib/dpkg/lock
 echo -e &quot;\n&quot; | dpkg --configure -a
 #dpkg --configure -a
@@ -250,8 +249,7 @@ image_filename=bone-debian-8.8-console-armhf-2017-05-07-1gb.img.xz
 #bone-debian-7.11-console-armhf-2016-06-15-2gb.img.xz
 
 rm $image_filename || true
-rm -r .julia
-rm -r /tmp
+
 wget $download_prefix/$image_filename || exit 1
 
 #Verify Image with:
