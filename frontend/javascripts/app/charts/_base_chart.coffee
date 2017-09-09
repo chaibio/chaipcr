@@ -298,7 +298,6 @@ class BaseChart
     line.curve(@getLineCurve())
     line.x (d) -> xScale(d[line_config.x])
     line.y (d) -> yScale(d[line_config.y])
-    # if (@config.axes.y.scale is 'log') then line.defined (d) -> d[line_config.y] > 10
     _path = @viewSVG.append("path")
         .datum(@data[line_config.dataset])
         .attr("class", "colored-line")
@@ -488,20 +487,7 @@ class BaseChart
     max = if @config.axes.y.scale is 'linear' then @roundUpExtremeValue(max) else max
     min = if @config.axes.y.scale is 'linear' then @roundDownExtremeValue(min) else min
 
-    # diff = max - min
-    # allowance = diff * (if @config.axes.y.scale is 'log' then 0.2 else 0.05)
-    # max += allowance
-    # max = @roundUpExtremeValue(max)
-    # min = if @config.axes.y.scale is 'log' then 5 else min - allowance
     @yScale = d3.scaleLinear()
-    # @yScale.range([@height, 0]).domain([min, max])
-    # @yAxis = d3.axisLeft(@yScale)
-    # @yAxis.tickFormat (y) => @yAxisTickFormat(y)
-    # if @config.axes.y.scale is 'log'
-    #   ticks = @getYLogTicks(min, max)
-    #   @yScale.range([@height, 0]).domain([ticks[0], ticks[ticks.length - 1]])
-    #   @yAxis.tickValues(ticks)
-    # else
     @yScale.range([@height, 0]).domain([min, max])
     @yAxis = d3.axisLeft(@yScale)
     
@@ -651,25 +637,7 @@ class BaseChart
       val = val.replace(@config.axes.x.unit, '') if @config.axes.x.unit
       val = val.trim()
       @setCaretPosition(extremeValue.input.node(), val.length)
-    #if loc is 'x:max'
-    #  val = @getXScale().invert(@width)
-    #  val = @xAxisTickFormat(val)
-    #  conWidth = extremeValue.text.node().getBBox().width + @INPUT_PADDING
-
-    #  extremeValue.inputContainer
-    #    .attr('width', conWidth)
-    #    .attr('x', @config.margin.left + @width - (conWidth / 2))
-
-    #  extremeValue.input.node().value = val
-    #  extremeValue.input
-    #    .style('opacity', 1)
-    #    .style('width', "#{conWidth}px")
-
-    #  val = val.replace(@config.axes.x.unit, '') if @config.axes.x.unit
-    #  val = val.trim()
-    #  @setCaretPosition(extremeValue.input.node(), val.length)
-
-    
+        
     else
       val= if loc is 'y:max' then @getYScale().invert(0) else @getYScale().invert(@height)
       val = @yAxisTickFormat(val)
@@ -689,27 +657,6 @@ class BaseChart
         .style('width', "#{inputWidth + @INPUT_PADDING}px")
         .style('opacity', 1)
 
-    #if loc is 'y:min'
-    #  val = @getYScale().invert(@height)
-    #  val = @yAxisTickFormat(val)
-    #  val = val.toString()
-    #  extremeValue.input.node().value = val
-    #  extremeValue.text.text(val)
-
-    #  conWidth = extremeValue.text.node().getBBox().width
-
-    #  val = val.replace(@config.axes.y.unit, '') if @config.axes.y.unit
-    #  val = val.trim()
-    #  @setCaretPosition(extremeValue.input.node(), val.length)
-
-    #  extremeValue.inputContainer
-    #    .attr('width', conWidth)
-    #    .attr('y', @height + @config.margin.top - (extremeValue.config.conHeight / 2))
-    #    .attr('x', @config.margin.left - (conWidth + extremeValue.config.offsetRight) - (@INPUT_PADDING / 2))
-    #  extremeValue.input
-    #    .style('opacity', 1)
-    #    .style('width', "#{conWidth + @INPUT_PADDING}px")
-
   onAxisInput: (loc, input, val) ->
     val = val.replace(/[^0-9\.\-]/g, '')
     axis = if loc is 'y:max' or loc is 'y:min' then 'y' else 'x'
@@ -717,22 +664,6 @@ class BaseChart
     input.value = val + unit
     @setCaretPosition(input, val.length)
     
-  # validateAxisInput: ->
-  #   charCode = d3.event.keyCode
-  #   if charCode > 36 and charCode < 41
-  #     # arrow keys
-  #     return true
-  #   if charCode is 189 || charCode is 187 || charCode is 109 || charCode is 107
-  #     # +/- key
-  #     return true
-  #   if charCode >= 96 and charCode <= 105
-  #     # numpad number keys
-  #     return true
-  #   if charCode > 31 and (charCode < 48 || charCode > 57)
-  #     d3.event.preventDefault()
-  #     return false
-  #   return true
-
   drawAxesExtremeValues: ->
     @chartSVG.selectAll('.axes-extreme-value').remove()
     @drawXAxisLeftExtremeValue()
@@ -845,29 +776,8 @@ class BaseChart
     if typeof @onClickAxisInput is 'function'
       @onClickAxisInput('x:min', @xAxisLeftExtremeValue)
 
-  # onInputLeftXAxis: ->
-    # if d3.event.keyCode is 13
-    #   # enter
-    #   d3.event.preventDefault()
-    #   extent = @getScaleExtent() - @getMinX()
-    #   x = @xScale
-    #   lastXScale = @lastXScale || x
-    #   minX = @xAxisLeftExtremeValue.input.node().value * 1
-    #   maxX = lastXScale.invert(@width)
-    #   if (minX >= maxX)
-    #     return false
-    #   if (@xAxisLeftExtremeValue.input.node().value is '' || minX < @getMinX())
-    #     minX = @getMinX()
-    #   k = @width / (x(maxX) - x(minX))
-    #   width_percent = 1 / k
-    #   w = extent - (width_percent * extent)
-    #   @chartSVG.call(@zooomBehavior.scaleTo, k)
-    #   @scroll((minX - @getMinX()) / w)
-    # else
-    #   @validateAxisInput()
-
   onEnterAxisInput: (loc, input, val) ->
-    axis = if loc.indexOf('y:') > -1 then 'y' else 'x'
+    axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
     val = val.replace(/[^0-9\.\-]/g, '')
     val = val.replace(@config.axes[axis].unit, '') * 1
     if loc is 'y:max'
@@ -1062,29 +972,6 @@ class BaseChart
     if typeof @onClickAxisInput is 'function'
       @onClickAxisInput('x:max', @xAxisRightExtremeValue)
 
-  # onInputRightXAxis: =>
-    # if d3.event.keyCode is 13
-    #   # enter
-    #   d3.event.preventDefault()
-    #   extent = @getScaleExtent() - @getMinX()
-    #   x = @xScale
-    #   lastXScale = @lastXScale || x
-    #   minX = lastXScale.invert(0)
-    #   maxX = @xAxisRightExtremeValue.input.node().value * 1
-    #   if (minX >= maxX)
-    #     return false
-    #   if @xAxisRightExtremeValue.input.node().value is ''
-    #     maxX = @roundUpExtremeValue(@getMaxX())
-    #   if (maxX > @getScaleExtent())
-    #     maxX = @getScaleExtent()
-    #   k = @width / (x(maxX) - x(minX))
-    #   width_percent = 1 / k
-    #   w = extent - (width_percent * extent)
-    #   @chartSVG.call(@zooomBehavior.scaleTo, k)
-    #   @scroll((minX - @getMinX()) / w)
-    # else
-    #   @validateAxisInput()
-
   drawYAxisUpperExtremeValue: ->
     textContainer = @chartSVG.append('g')
       .attr('class', 'axes-extreme-value tick')
@@ -1111,7 +998,7 @@ class BaseChart
       .attr('opacity', 0)
       .attr('stroke', '#000')
       .attr('stroke-width', underlineStroke)
-      # .on 'click', => @onClickUpperYAxisInput()
+      .on 'click', => @onClickUpperYAxisInput()
 
     text = textContainer.append('text')
       .attr('fill', '#000')
@@ -1130,10 +1017,10 @@ class BaseChart
       .attr('height', conHeight - offsetTop)
       .attr('y', @config.margin.top - (conHeight / 2))
       .attr('x', @config.margin.left - (conWidth + offsetRight))
-      # .on 'click', => @onClickUpperYAxisInput()
+      .on 'click', => @onClickUpperYAxisInput()
 
     form = inputContainer.append('xhtml:form')
-      # .on 'click', => @onClickUpperYAxisInput()
+      .on 'click', => @onClickUpperYAxisInput()
 
     input = form.append('xhtml:input').attr('type', 'text')
       .style('display', 'block')
@@ -1199,36 +1086,7 @@ class BaseChart
     if typeof @onClickAxisInput is 'function'
       @onClickAxisInput 'y:max', @yAxisUpperExtremeValue
 
-  # onInputUpperYAxis: =>
-    # if d3.event.keyCode is 13
-    #   # // enter
-    #   d3.event.preventDefault()
-    #   extent = @getMaxY()
-    #   y = @yScale
-    #   lastYScale = @lastYScale || y
-    #   minY = lastYScale.invert(@height)
-    #   maxY = @yAxisUpperExtremeValue.input.node().value * 1
-    #   if minY >= maxY
-    #     return false
-
-    #   max = @roundUpExtremeValue(@getMaxY())
-
-    #   if @yAxisUpperExtremeValue.input.node().value is ''
-    #     maxY = @roundUpExtremeValue(@getMaxY())
-
-    #   if maxY > max
-    #     maxY = max
-
-    #   k = @height / (y(minY) - y(maxY))
-
-    #   @editingYAxis = true
-    #   lastK = @getTransform().k
-    #   @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)))
-    #   @editingYAxis = false
-    #   @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(lastK))
-    # else
-    #   @validateAxisInput()
-
+  
   drawYAxisLowerExtremeValue: ->
 
     textContainer = @chartSVG.append('g')
@@ -1341,33 +1199,6 @@ class BaseChart
     if typeof @onClickAxisInput is 'function'
       @onClickAxisInput 'y:min', @yAxisLowerExtremeValue
 
-  # onInputLowerYAxis: ->
-    # if d3.event.keyCode is 13
-    #   # enter
-    #   d3.event.preventDefault()
-    #   extent = @getMaxY()
-    #   y = @yScale
-    #   lastYScale = @lastYScale || y
-    #   minY = @yAxisLowerExtremeValue.input.node().value * 1
-    #   maxY = lastYScale.invert(0)
-    #   if (minY >= maxY)
-    #     return false
-
-    #   max = extent
-    #   min = @roundDownExtremeValue(@getMinY())
-
-    #   if (@yAxisLowerExtremeValue.input.node().value is '' || minY < min)
-    #     minY = min
-
-    #   k = @height / (y(minY) - y(maxY))
-    #   lastK = @getTransform().k
-    #   @editingYAxis = true
-    #   @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)))
-    #   @editingYAxis = false
-    #   @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(lastK))
-    # else
-    #   @validateAxisInput()
-
   updateAxesExtremeValues: ->
     xScale = @getXScale()
     yScale = @getYScale()
@@ -1445,9 +1276,6 @@ class BaseChart
     num_ticks = ticks.size()
     height = @height
     ticks.each (d, i) ->
-
-      # if config.axes.y.scale is 'log'
-      #   return "ytick_#{i}"
 
       if (i is 0)
         textHeight = yAxisLowerExtremeValueText.node().getBBox().height
@@ -1583,8 +1411,6 @@ class BaseChart
         @hoveredLine = null
       if @prevClosestLineIndex isnt closestLineIndex
         if @prevClosestLineIndex isnt undefined and @lines[@prevClosestLineIndex]
-          # if (@lines[@prevClosestLineIndex] isnt @activePath) and (@lines[@prevClosestLineIndex] isnt @hoveredLine) and !@hovering
-            # @lines[@prevClosestLineIndex].attr('stroke-width', @NORMAL_PATH_STROKE_WIDTH)
           @lines.forEach (line) =>
             if line isnt @activePath and line isnt @hoveredLine and !@hovering
               line.attr('stroke-width', @NORMAL_PATH_STROKE_WIDTH)
