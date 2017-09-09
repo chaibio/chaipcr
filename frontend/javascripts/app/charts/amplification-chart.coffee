@@ -78,7 +78,7 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
       else
         Math.floor(val) * 1000
     else
-      if val % 10 > 0      
+      if val % 10 > 0
         num_length = val.toString().length
         rounddown = '1'
         for i in [0...num_length - 1] by 1
@@ -100,7 +100,7 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
 
     max = '1'
     for i in [0...max_num_length] by 1
-      max = "#{max}0"      
+      max = "#{max}0"
     max = max * 1
 
     calibs = []
@@ -212,46 +212,14 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
           d3.select(this).attr('opacity', 0)
 
   onClickAxisInput: (loc, extremeValue) ->
-    # val = extremeValue.text.text()
-    if loc is 'x:min'
-      val = @getXScale().invert(0).toString()
-      conWidth = extremeValue.text.node().getBBox().width + @INPUT_PADDING
-      extremeValue.inputContainer
-        .attr('width', conWidth)
-        .attr('x', @config.margin.left - (conWidth / 2))
-      extremeValue.input
-        .style('opacity', 1)
-        .style('width', "#{conWidth}px")
-      xScale = @getXScale()
-      val = extremeValue.text.text()
-      extremeValue.input.node().value = val
-      
-      val = val.replace(@config.axes.x.unit, '') if @config.axes.x.unit
-      val = val.trim()
-      @setCaretPosition(extremeValue.input.node(), val.length)
-    if loc is 'x:max'
-      val = @getXScale().invert(@width).toString()
-      conWidth = extremeValue.text.node().getBBox().width + @INPUT_PADDING
-
-      extremeValue.inputContainer
-        .attr('width', conWidth)
-        .attr('x', @config.margin.left + @width - (conWidth / 2))
-
-      extremeValue.input.node().value = val
-      extremeValue.input
-        .style('opacity', 1)
-        .style('width', "#{conWidth}px")
-
-      val = val.replace(@config.axes.x.unit, '') if @config.axes.x.unit
-      val = val.trim()
-      @setCaretPosition(extremeValue.input.node(), val.length)
-
-    if loc is 'y:max'
-      val = @getYScale().invert(0)
-      if @config.axes.y.scale is 'log'
-        val = @yAxisLogInputFormat(val)
-      else
-        val = @yAxisTickFormat(val)
+    axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
+    if axis is 'x'
+      super
+    else
+      if @config.axes.y.scale is 'linear'
+        return super
+      val = if loc is 'y:max' then @getYScale().invert(0) else @getYScale().invert(@height)
+      val = @yAxisLogInputFormat(val)
       val = val.toString()
       extremeValue.input.node().value = val
       extremeValue.text.text(val)
@@ -268,128 +236,110 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
         .style('width', "#{inputWidth + @INPUT_PADDING}px")
         .style('opacity', 1)
 
-    if loc is 'y:min'
-      val = @getYScale().invert(@height)
-      if @config.axes.y.scale is 'log'
-        val = @yAxisLogInputFormat(val)
-      else
-        val = @yAxisTickFormat(val)
-      val = val.toString()
-      extremeValue.input.node().value = val
-      extremeValue.text.text(val)
 
-      conWidth = extremeValue.text.node().getBBox().width
+    #if loc is 'x:min'
+    #  val = @getXScale().invert(0).toString()
+    #  conWidth = extremeValue.text.node().getBBox().width + @INPUT_PADDING
+    #  extremeValue.inputContainer
+    #    .attr('width', conWidth)
+    #    .attr('x', @config.margin.left - (conWidth / 2))
+    #  extremeValue.input
+    #    .style('opacity', 1)
+    #    .style('width', "#{conWidth}px")
+    #  xScale = @getXScale()
+    #  val = extremeValue.text.text()
+    #  extremeValue.input.node().value = val
+    #  
+    #  val = val.replace(@config.axes.x.unit, '') if @config.axes.x.unit
+    #  val = val.trim()
+    #  @setCaretPosition(extremeValue.input.node(), val.length)
+    #if loc is 'x:max'
+    #  val = @getXScale().invert(@width).toString()
+    #  conWidth = extremeValue.text.node().getBBox().width + @INPUT_PADDING
 
-      val = val.replace(@config.axes.y.unit, '') if @config.axes.y.unit and @config.axes.y.scale isnt 'log'
-      val = val.trim()
-      @setCaretPosition(extremeValue.input.node(), val.length)
+    #  extremeValue.inputContainer
+    #    .attr('width', conWidth)
+    #    .attr('x', @config.margin.left + @width - (conWidth / 2))
 
-      extremeValue.inputContainer
-        .attr('width', conWidth)
-        .attr('y', @height + @config.margin.top - (extremeValue.config.conHeight / 2))
-        .attr('x', @config.margin.left - (conWidth + extremeValue.config.offsetRight) - (@INPUT_PADDING / 2))
-      extremeValue.input
-        .style('opacity', 1)
-        .style('width', "#{conWidth + @INPUT_PADDING}px")
+    #  extremeValue.input.node().value = val
+    #  extremeValue.input
+    #    .style('opacity', 1)
+    #    .style('width', "#{conWidth}px")
+
+    #  val = val.replace(@config.axes.x.unit, '') if @config.axes.x.unit
+    #  val = val.trim()
+    #  @setCaretPosition(extremeValue.input.node(), val.length)
+
+    #if loc is 'y:max'
+    #  val = @getYScale().invert(0)
+    #  if @config.axes.y.scale is 'log'
+    #    val = @yAxisLogInputFormat(val)
+    #    val = val.toString()
+    #    extremeValue.input.node().value = val
+    #    extremeValue.text.text(val)
+    #    val = val.replace(@config.axes.y.unit, '') if @config.axes.y.unit and @config.axes.y.scale isnt 'log'
+    #    val = val.trim()
+    #    @setCaretPosition(extremeValue.input.node(), val.length)
+
+    #    inputWidth = extremeValue.text.node().getBBox().width
+
+    #    extremeValue.inputContainer
+    #      .attr('width', inputWidth + @INPUT_PADDING )
+    #      .attr('x', @config.margin.left - (inputWidth + extremeValue.config.offsetRight) - (@INPUT_PADDING / 2))
+    #    extremeValue.input
+    #      .style('width', "#{inputWidth + @INPUT_PADDING}px")
+    #      .style('opacity', 1)
+    #  else
+    #    super
+
+    #if loc is 'y:min'
+    #  val = @getYScale().invert(@height)
+    #  if @config.axes.y.scale is 'log'
+    #    val = @yAxisLogInputFormat(val)
+    #  else
+    #    val = @yAxisTickFormat(val)
+    #  val = val.toString()
+    #  extremeValue.input.node().value = val
+    #  extremeValue.text.text(val)
+
+    #  conWidth = extremeValue.text.node().getBBox().width
+
+    #  val = val.replace(@config.axes.y.unit, '') if @config.axes.y.unit and @config.axes.y.scale isnt 'log'
+    #  val = val.trim()
+    #  @setCaretPosition(extremeValue.input.node(), val.length)
+
+    #  extremeValue.inputContainer
+    #    .attr('width', conWidth)
+    #    .attr('y', @height + @config.margin.top - (extremeValue.config.conHeight / 2))
+    #    .attr('x', @config.margin.left - (conWidth + extremeValue.config.offsetRight) - (@INPUT_PADDING / 2))
+    #  extremeValue.input
+    #    .style('opacity', 1)
+    #    .style('width', "#{conWidth + @INPUT_PADDING}px")
 
   onAxisInput: (loc, input, val) ->
-    val = val.replace(/[^0-9\.\-]/g, '')
-    if (loc is 'y:max' or loc is 'y:min')
-      if @config.axes.y.scale is 'linear'
-        unit = if @config.axes.y.unit then @config.axes.y.unit else ''
-        input.value = val + unit
-        @setCaretPosition(input, input.value.length - unit.length)
-      else
-        input.value = @yAxisLogInputFormat(val)
-        @setCaretPosition(input, input.value.length)
+    if @config.axes.y.scale is 'log' and loc.indexOf('y:') > -1
+      val = val.replace(/[^0-9\.\-]/g, '')
+      input.value = @yAxisLogInputFormat(val)
+      @setCaretPosition(input, input.value.length)
     else
-      input.value = val
-      @setCaretPosition(input, val.length)
-
+      super
 
   onEnterAxisInput: (loc, input, val) ->
-    if loc is 'y:max'
+    axis = if loc.indexOf('y:') > -1 then 'y' else 'x'
+    unit = @config.axes[axis].unit || ''
+    if axis is 'y'
       val = if @config.axes.y.scale is 'linear'
-              val.replace(@config.axes.y.unit, '') * 1000
+              val.replace(/[^0-9\.\-]/g, '') * 1000
             else
-              newval = val.replace(/\D/g, '') * 1
-              @roundUpExtremeValue(newval)
-
-      maxY = if angular.isNumber(val) and !window.isNaN(val) then val else @roundUpExtremeValue(@getMaxY())
-      y = @yScale
-      lastYScale = @lastYScale || y
-      minY = lastYScale.invert(@height)
-
-      if minY >= maxY
-        return false
-
-      max = @roundUpExtremeValue(@getMaxY())
-      maxY = if maxY > max then max else maxY
-      k = @height / (y(minY) - y(maxY))
-
-      @editingYAxis = true
-      lastK = @getTransform().k
-      @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)))
-      @editingYAxis = false
-      @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(lastK))
-
-    if loc is 'y:min'
-      val = if @config.axes.y.scale is 'linear'
-              val.replace(@config.axes.y.unit, '') * 1000
-            else
-              newval = val.replace(/\D/g, '') * 1
-              @roundDownExtremeValue(newval)
-      y = @yScale
-      lastYScale = @lastYScale || y
-      minY = if angular.isNumber(val) and !window.isNaN(val) then val else @roundDownExtremeValue(@getMinY())
-      maxY = lastYScale.invert(0)
-      if (minY >= maxY)
-        return false
-
-      min = @roundDownExtremeValue(@getMinY())
-      minY = if minY < min then min else minY
-
-      k = @height / (y(minY) - y(maxY))
-      lastK = @getTransform().k
-      @editingYAxis = true
-      @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)))
-      @editingYAxis = false
-      @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(lastK))
-
-    if loc is 'x:min'
-      extent = @getScaleExtent() - @getMinX()
-      x = @xScale
-      lastXScale = @lastXScale || x
-      minX = val * 1
-      maxX = lastXScale.invert(@width)
-      if (minX >= maxX)
-        return false
-      if (val is '' || minX < @getMinX())
-        minX = @getMinX()
-      k = @width / (x(maxX) - x(minX))
-      width_percent = 1 / k
-      w = extent - (width_percent * extent)
-      @chartSVG.call(@zooomBehavior.scaleTo, k)
-      @scroll((minX - @getMinX()) / w)
-
-    if loc is 'x:max'
-      extent = @getScaleExtent() - @getMinX()
-      x = @xScale
-      lastXScale = @lastXScale || x
-      minX = lastXScale.invert(0)
-      maxX = val * 1
-      if (minX >= maxX)
-        return false
-      if val is ''
-        maxX = @roundUpExtremeValue(@getMaxX())
-      if (maxX > @getScaleExtent())
-        maxX = @getScaleExtent()
-      k = @width / (x(maxX) - x(minX))
-      width_percent = 1 / k
-      w = extent - (width_percent * extent)
-      @chartSVG.call(@zooomBehavior.scaleTo, k)
-      @scroll((minX - @getMinX()) / w)
-
+              newval = val.replace(/[^0-9\.\-]/g, '') * 1
+              newval = if loc is 'y:max' then @roundUpExtremeValue(newval) else @roundDownExtremeValue(newval)
+              newval
+      val = val + unit
+      super
+    
+    else
+      super
+    
     # update input state
     extremeValue =  if loc is 'x:min'
                       @xAxisLeftExtremeValue

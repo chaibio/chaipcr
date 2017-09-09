@@ -19,7 +19,7 @@ class BaseChart
     @initChart()
 
   getLineCurve: ->
-    d3.curveLinear
+    d3.curveCardinal
 
   hasData: ->
     return false if !@data
@@ -499,7 +499,6 @@ class BaseChart
     # @yAxis.tickFormat (y) => @yAxisTickFormat(y)
     # if @config.axes.y.scale is 'log'
     #   ticks = @getYLogTicks(min, max)
-    #   console.log ticks
     #   @yScale.range([@height, 0]).domain([ticks[0], ticks[ticks.length - 1]])
     #   @yAxis.tickValues(ticks)
     # else
@@ -634,7 +633,90 @@ class BaseChart
           .style('width', "#{conWidth + @INPUT_PADDING}px")
         extremeValue.text.attr('x', @config.margin.left - (extremeValue.config.offsetRight + conWidth))
 
+  onClickAxisInput: (loc, extremeValue) ->
+    axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
+    if axis is 'x'
+      val = if loc is 'x:min' then @getXScale().invert(0) else @getXScale().invert(@width)
+      val = @xAxisTickFormat(val)
+      conWidth = extremeValue.text.node().getBBox().width + @INPUT_PADDING
+      extremeValue.inputContainer
+        .attr('width', conWidth)
+        .attr('x', @config.margin.left + (if loc is 'x:min' then 0 else @width) - (conWidth / 2))
+      extremeValue.input
+        .style('opacity', 1)
+        .style('width', "#{conWidth}px")
+      val = extremeValue.text.text()
+      extremeValue.input.node().value = val
+      
+      val = val.replace(@config.axes.x.unit, '') if @config.axes.x.unit
+      val = val.trim()
+      @setCaretPosition(extremeValue.input.node(), val.length)
+    #if loc is 'x:max'
+    #  val = @getXScale().invert(@width)
+    #  val = @xAxisTickFormat(val)
+    #  conWidth = extremeValue.text.node().getBBox().width + @INPUT_PADDING
 
+    #  extremeValue.inputContainer
+    #    .attr('width', conWidth)
+    #    .attr('x', @config.margin.left + @width - (conWidth / 2))
+
+    #  extremeValue.input.node().value = val
+    #  extremeValue.input
+    #    .style('opacity', 1)
+    #    .style('width', "#{conWidth}px")
+
+    #  val = val.replace(@config.axes.x.unit, '') if @config.axes.x.unit
+    #  val = val.trim()
+    #  @setCaretPosition(extremeValue.input.node(), val.length)
+
+    
+    else
+      val= if loc is 'y:max' then @getYScale().invert(0) else @getYScale().invert(@height)
+      val = @yAxisTickFormat(val)
+      val = val.toString()
+      extremeValue.input.node().value = val
+      extremeValue.text.text(val)
+      val = val.replace(@config.axes.y.unit, '') if @config.axes.y.unit
+      val = val.trim()
+      @setCaretPosition(extremeValue.input.node(), val.length)
+
+      inputWidth = extremeValue.text.node().getBBox().width
+
+      extremeValue.inputContainer
+        .attr('width', inputWidth + @INPUT_PADDING )
+        .attr('x', @config.margin.left - (inputWidth + extremeValue.config.offsetRight) - (@INPUT_PADDING / 2))
+      extremeValue.input
+        .style('width', "#{inputWidth + @INPUT_PADDING}px")
+        .style('opacity', 1)
+
+    #if loc is 'y:min'
+    #  val = @getYScale().invert(@height)
+    #  val = @yAxisTickFormat(val)
+    #  val = val.toString()
+    #  extremeValue.input.node().value = val
+    #  extremeValue.text.text(val)
+
+    #  conWidth = extremeValue.text.node().getBBox().width
+
+    #  val = val.replace(@config.axes.y.unit, '') if @config.axes.y.unit
+    #  val = val.trim()
+    #  @setCaretPosition(extremeValue.input.node(), val.length)
+
+    #  extremeValue.inputContainer
+    #    .attr('width', conWidth)
+    #    .attr('y', @height + @config.margin.top - (extremeValue.config.conHeight / 2))
+    #    .attr('x', @config.margin.left - (conWidth + extremeValue.config.offsetRight) - (@INPUT_PADDING / 2))
+    #  extremeValue.input
+    #    .style('opacity', 1)
+    #    .style('width', "#{conWidth + @INPUT_PADDING}px")
+
+  onAxisInput: (loc, input, val) ->
+    val = val.replace(/[^0-9\.\-]/g, '')
+    axis = if loc is 'y:max' or loc is 'y:min' then 'y' else 'x'
+    unit = @config.axes[axis].unit || ''
+    input.value = val + unit
+    @setCaretPosition(input, val.length)
+    
   # validateAxisInput: ->
   #   charCode = d3.event.keyCode
   #   if charCode > 36 and charCode < 41
@@ -783,6 +865,94 @@ class BaseChart
     #   @scroll((minX - @getMinX()) / w)
     # else
     #   @validateAxisInput()
+
+  onEnterAxisInput: (loc, input, val) ->
+    axis = if loc.indexOf('y:') > -1 then 'y' else 'x'
+    val = val.replace(/[^0-9\.\-]/g, '')
+    val = val.replace(@config.axes[axis].unit, '') * 1
+    if loc is 'y:max'
+      maxY = if angular.isNumber(val) and !window.isNaN(val) then val else @roundUpExtremeValue(@getMaxY())
+      y = @yScale
+      lastYScale = @lastYScale || y
+      minY = lastYScale.invert(@height)
+
+      if minY >= maxY
+        return false
+
+      max = @roundUpExtremeValue(@getMaxY())
+      maxY = if maxY > max then max else maxY
+      k = @height / (y(minY) - y(maxY))
+
+      @editingYAxis = true
+      lastK = @getTransform().k
+      @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)))
+      @editingYAxis = false
+      @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(lastK))
+
+    if loc is 'y:min'
+      y = @yScale
+      lastYScale = @lastYScale || y
+      minY = if angular.isNumber(val) and !window.isNaN(val) then val else @roundDownExtremeValue(@getMinY())
+      maxY = lastYScale.invert(0)
+      if (minY >= maxY)
+        return false
+
+      min = @roundDownExtremeValue(@getMinY())
+      minY = if minY < min then min else minY
+
+      k = @height / (y(minY) - y(maxY))
+      lastK = @getTransform().k
+      @editingYAxis = true
+      @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)))
+      @editingYAxis = false
+      @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(lastK))
+
+    if loc is 'x:min'
+      extent = @getScaleExtent() - @getMinX()
+      x = @xScale
+      lastXScale = @lastXScale || x
+      minX = val * 1
+      maxX = lastXScale.invert(@width)
+      if (minX >= maxX)
+        return false
+      if (val is '' || minX < @getMinX())
+        minX = @getMinX()
+      k = @width / (x(maxX) - x(minX))
+      width_percent = 1 / k
+      w = extent - (width_percent * extent)
+      @chartSVG.call(@zooomBehavior.scaleTo, k)
+      @scroll((minX - @getMinX()) / w)
+
+    if loc is 'x:max'
+      extent = @getScaleExtent() - @getMinX()
+      x = @xScale
+      lastXScale = @lastXScale || x
+      minX = lastXScale.invert(0)
+      maxX = val * 1
+      if (minX >= maxX)
+        return false
+      if val is ''
+        maxX = @roundUpExtremeValue(@getMaxX())
+      if (maxX > @getScaleExtent())
+        maxX = @getScaleExtent()
+      k = @width / (x(maxX) - x(minX))
+      width_percent = 1 / k
+      w = extent - (width_percent * extent)
+      @chartSVG.call(@zooomBehavior.scaleTo, k)
+      @scroll((minX - @getMinX()) / w)
+
+    # update input state
+    extremeValue =  if loc is 'x:min'
+                      @xAxisLeftExtremeValue
+                    else if loc is 'x:max'
+                      @xAxisRightExtremeValue
+                    else if loc is 'y:min'
+                      @yAxisLowerExtremeValue
+                    else
+                      @yAxisUpperExtremeValue
+
+    @onClickAxisInput(loc, extremeValue)
+
 
 
   drawXAxisRightExtremeValue: ->

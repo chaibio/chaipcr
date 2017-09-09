@@ -75,7 +75,7 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
 
   drawCircleTooltips: ->
     return if not @config.series
-    @circles = @circles || [];
+    @circles = @circles || []
     @circles.forEach (circle) ->
       circle.remove()
     @circles = []
@@ -106,7 +106,7 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
       .on('mouseout', =>
         @toggleMouseIndicatorsVisibility(false)
       )
-      .on('mousemove', => 
+      .on('mousemove', =>
         @followTheMouse()
       )
 
@@ -124,8 +124,8 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
     x = d3.mouse(@mouseOverlay.node())[0]
 
     @lines.forEach (path, i) =>
-      pathEl = path.node();
-      pathLength = pathEl.getTotalLength();
+      pathEl = path.node()
+      pathLength = pathEl.getTotalLength()
       beginning = x
       end = pathLength
       target = null
@@ -158,7 +158,7 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
         .attr('x2', x)
 
     if @xAxisCircle
-      xx = d3.mouse(@chartSVG.node())[0];
+      xx = d3.mouse(@chartSVG.node())[0]
       @xAxisCircle
         .attr("opacity", opacity)
         .attr("cx", xx)
