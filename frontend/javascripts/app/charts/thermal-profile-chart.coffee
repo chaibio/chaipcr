@@ -177,5 +177,43 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
 
       @onMouseMove(d)
 
+
+  onEnterAxisInput: (loc, input, val) ->
+    axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
+    if axis is 'y'
+      super
+    else
+      #console.log val
+      #console.log @getXScale().invert(@width)
+      val = @parseXAxisInput(val).toString()
+      super
+
+  onAxisInput: (loc, input, val) ->
+    axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
+    if axis is 'x'
+      reg = /[^((d{2}):?){n}]/g
+      console.log(reg.test val)
+      #val = @parseXAxisInput(val)
+      #caret = input.selectionStart - 1
+      #input.value =  @xAxisTickFormat(val)
+      #@setCaretPosition(input, caret)
+    else
+      super
+  
+  parseXAxisInput: (val) ->
+    valArr = val.split(':')
+    return 0 if val.length is 0
+
+    valArr = valArr.reverse()
+
+    secs = valArr[0] * 1
+    mins = valArr[1] * 1
+    hours = if valArr[2] then valArr[2] * 1 else 0
+    days = if valArr[3] then valArr[3] * 1 else 0
+
+    total = secs + mins * 60 + hours * 60 * 60
+    return total
+    
+
 window.ChaiBioCharts = window.ChaiBioCharts || {}
 window.ChaiBioCharts.ThermalProfileChart = ThermalProfileChart
