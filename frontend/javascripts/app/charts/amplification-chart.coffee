@@ -65,7 +65,7 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
         roundup = '1'
         for i in [0...num_length] by 1
           roundup = roundup + "0"
-        roundup = roundup * 1
+        roundup * 1
       else
         val
 
