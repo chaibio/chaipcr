@@ -202,7 +202,12 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
   
   parseXAxisInput: (val) ->
     valArr = val.split(':')
-    return 0 if val.length is 0
+
+    if valArr.length is 0
+     if loc is 'x:min'
+       return @getMinX()
+     else
+       return @getMaxX()
 
     valArr = valArr.reverse()
 

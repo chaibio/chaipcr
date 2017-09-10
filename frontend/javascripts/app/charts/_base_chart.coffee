@@ -528,7 +528,7 @@ class BaseChart
     @xScale = d3.scaleLinear().range([0, @width])
 
     min = if angular.isNumber(@config.axes.x.min) then @config.axes.x.min else if @hasData() then @getMinX() else @DEFAULT_MIN_X
-    max = if angular.isNumber(@config.axes.x.max) then @config.axes.x.max else if @hasData() then @getMaxX() else @DEFAULT_MAX_X   
+    max = if angular.isNumber(@config.axes.x.max) then @config.axes.x.max else if @hasData() then @getMaxX() else @DEFAULT_MAX_X
     
     @xScale.domain([min, max])
 
@@ -714,6 +714,7 @@ class BaseChart
 
     form = inputContainer.append('xhtml:form')
         .on 'click', => @onClickLeftXAxisInput()
+
     input = form.append('xhtml:input').attr('type', 'text')
       .style('display', 'block')
       .style('opacity', '0')
