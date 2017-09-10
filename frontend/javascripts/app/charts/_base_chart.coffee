@@ -661,7 +661,7 @@ class BaseChart
     val = val.replace(/[^0-9\.\-]/g, '')
     axis = if loc is 'y:max' or loc is 'y:min' then 'y' else 'x'
     unit = @config.axes[axis].unit || ''
-    input.value = if axis is 'y' then @yAxisTickFormat(val) else @xAxisTickFormat(val)
+    input.value = val + unit
     @setCaretPosition(input, input.value.length - unit.length)
     
   drawAxesExtremeValues: ->
