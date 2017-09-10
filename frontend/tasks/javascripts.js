@@ -96,9 +96,9 @@ gulp.task('set-js-deploy', function(done) {
 
 gulp.task('clean-js', function(done) {
   del([
-    '/tmp/chaipcr/js/**/*',
+    '.tmp/js/**/*',
     'web/public/javascripts/**/*'
-  ], {force: true}).then(function() {
+  ]).then(function() {
     done();
   });
 });
@@ -112,7 +112,7 @@ gulp.task('coffee', ['clean-js'], function() {
     .pipe(insert.transform(function(contents, file) {
       return '// start of file: ' + file.history[0] + '\n' + contents + '\n// end of file: ' + file.history[0] + '\n';
     }))
-    .pipe(gulp.dest('/tmp/chaipcr/js'))
+    .pipe(gulp.dest('.tmp/js'))
     .on('error', gutil.log);
 });
 
@@ -124,7 +124,7 @@ gulp.task('es6', ['clean-js'], function() {
     }))
     .on('error', swallowError)
     .pipe(rename(_renameJS))
-    .pipe(gulp.dest('/tmp/chaipcr/js'))
+    .pipe(gulp.dest('.tmp/js'))
     .on('error', gutil.log);
 });
 
@@ -141,7 +141,7 @@ gulp.task('templates', function() {
       standalone: true
     }))
     // .on('error', swallowError)
-    .pipe(gulp.dest('/tmp/chaipcr/js'));
+    .pipe(gulp.dest('.tmp/js'));
 });
 
 gulp.task('copy-js-to-tmp', ['clean-js', 'templates'], function() {
@@ -151,7 +151,7 @@ gulp.task('copy-js-to-tmp', ['clean-js', 'templates'], function() {
     .pipe(insert.transform(function(contents, file) {
       return '// start of file: ' + file.history[0] + '\n' + contents + '\n// end of file: ' + file.history[0] + '\n';
     }))
-    .pipe(gulp.dest('/tmp/chaipcr/js'));
+    .pipe(gulp.dest('.tmp/js'));
 });
 
 // gulp.task('jslint', ['clean-js', 'coffee', 'es6', 'copy-js-to-tmp', 'templates'], function() {
@@ -169,30 +169,30 @@ gulp.task('concat-js', ['jslint', 'clean-js', 'es6', 'coffee', 'copy-js-to-tmp',
   var files = vendorFiles.concat(appFiles);
 
   for (var i = files.length - 1; i >= 0; i--) {
-    files[i] = '/tmp/chaipcr/js/' + files[i];
+    files[i] = '.tmp/js/' + files[i];
   };
 
   return gulp.src(files)
     .pipe(concat(applicationTmpJS + '.js'))
-    .pipe(gulp.dest('/tmp/chaipcr/js'));
+    .pipe(gulp.dest('.tmp/js'));
 
 });
 
 gulp.task('hash-js', ['concat-js'], function() {
   var hash = process.env.jshash || _makeHash();
 
-  return gulp.src('/tmp/chaipcr/js/' + applicationTmpJS + '.js')
+  return gulp.src('.tmp/js/' + applicationTmpJS + '.js')
     .pipe(rename(function(path) {
       path.basename = debug ? applicationDebugJS : 'application-' + hash;
       applicationJS = path.basename;
     }))
-    .pipe(gulp.dest('/tmp/chaipcr/js'));
+    .pipe(gulp.dest('.tmp/js'));
 
 });
 
 gulp.task('uglify', ['concat-js', 'hash-js'], function() {
   var isDebug = process.env.debug === 'true';
-  var stream = gulp.src('/tmp/chaipcr/js/' + applicationJS + '.js');
+  var stream = gulp.src('.tmp/js/' + applicationJS + '.js');
 
   if (!isDebug) {
     stream.pipe(uglify({
@@ -205,7 +205,7 @@ gulp.task('uglify', ['concat-js', 'hash-js'], function() {
       .on('error', swallowError);
   }
 
-  stream.pipe(gulp.dest('/tmp/chaipcr/js'));
+  stream.pipe(gulp.dest('.tmp/js'));
 
   return stream;
 
@@ -221,12 +221,12 @@ gulp.task('markup-js-link', ['hash-js'], function() {
 });
 
 gulp.task('js:debug', ['set-js-debug', 'concat-js', 'markup-js-link'], function() {
-  return gulp.src('/tmp/chaipcr/js/' + applicationJS + '.js')
+  return gulp.src('.tmp/js/' + applicationJS + '.js')
     .pipe(gulp.dest('./web/public/javascripts'));
 });
 
 gulp.task('js:deploy', ['set-js-deploy', 'uglify', 'markup-js-link'], function() {
-  return gulp.src('/tmp/chaipcr/js/' + applicationJS + '.js')
+  return gulp.src('.tmp/js/' + applicationJS + '.js')
     .pipe(gulp.dest('./web/public/javascripts'));
 });
 
@@ -242,7 +242,7 @@ gulp.task('js:upload', ['uglify'], function(done) {
   var host = process.env.host || '10.0.2.175';
   var user = process.env.user || 'root';
   var password = process.env.password || 'chaipcr';
-  var file = '/tmp/chaipcr/js/' + applicationJS + '.js';
+  var file = '.tmp/js/' + applicationJS + '.js';
   var _hash_ = process.env.jshash || '19a06cc94d11d2e154e5d3e4494a80';
   var remote_file = '/root/chaipcr/web/public/javascripts/application-' + _hash_ + '.js';
   var command = 'sshpass -p \'' + password + '\' scp ' + file + ' ' + user + '@' + host + ':' + remote_file;

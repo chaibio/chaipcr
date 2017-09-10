@@ -28,7 +28,6 @@ cache
 *.obj
 *.log
 *.tlog
-*.swp
 Debug
 /.idea/
 .editorconfig
