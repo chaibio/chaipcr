@@ -42,7 +42,7 @@ function dispatch(action::String, request_body::String)
 
             # `process_amp_1sr` arguments
             kwdict_pa1 = OrderedDict{Symbol,Any}()
-            for key in ["min_reliable_cyc", "baseline_cyc_bounds", "cq_method"]
+            for key in ["min_reliable_cyc", "baseline_cyc_bounds", "cq_method", "ctrl_well_vec"]
                 if key in keys_req_dict
                     kwdict_pa1[parse(key)] = req_dict[key]
                 end

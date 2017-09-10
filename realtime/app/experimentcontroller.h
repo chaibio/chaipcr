@@ -88,7 +88,8 @@ public:
         ExperimentNotFound,
         ExperimentUsed,
         LidIsOpen,
-        MachineRunning
+        MachineRunning,
+        OutOfStorageSpace
     };
 
     enum ThermalState
@@ -135,6 +136,10 @@ private:
     void stopLogging();
     void addLogCallback(Poco::Timer &timer);
 
+    void startDataSpaceCheck();
+    void stopDataSpaceCheck();
+    void checkDataSpace(Poco::Timer &timer);
+
     void calculateEstimatedDuration();
 
 private:
@@ -150,6 +155,7 @@ private:
     Poco::Timer *_meltCurveTimer;
     Poco::Timer *_holdStepTimer;
     Poco::Timer *_logTimer;
+    Poco::Timer *_dataSpaceTimer;
 
     std::vector<TemperatureLog> _logs;
 };

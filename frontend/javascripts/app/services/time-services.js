@@ -92,7 +92,7 @@ window.ChaiBioTech.ngApp.service('TimeService', [
 
       var hour = Math.floor(reading / 3600);
       hour = (hour < 10) ? hour : hour;
-			hour = (hour == 0) ? "0" + hour : hour ;
+			hour = (hour === 0) ? "0" + hour : hour ;
 
       var noMin = reading % 3600;
 

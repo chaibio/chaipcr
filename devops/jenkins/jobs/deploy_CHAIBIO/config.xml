@@ -68,7 +68,7 @@ df -h
 echo user: $(whoami)
 
 echo Checking for nessasery packages:
-sudo apt-get -y -q install sshpass parted mdadm
+sudo apt-get -y -q install sshpass parted mdadm npm inetutils-traceroute ruby nodejs ruby-dev libxslt-dev libxml2-dev
 
 if grep $build_machine /var/lib/jenkins/.ssh/config
 then
@@ -231,6 +231,14 @@ ENDSSH
         cd tmp
 		git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
         cd chaipcr || exit 1
+        cd web
+        gem sources --add http://rubygems.org/
+  		gem install bundle
+        bundle install
+        gem install nodejs
+        npm install
+        cd ..
+        
         cat deploy.sh
         echo | ./deploy.sh $build_machine
 
@@ -398,7 +406,7 @@ ENV[&quot;JULIA_ENV&quot;] = &quot;bbb_test_1&quot; # bbb when &quot;localhost&q
 push!(LOAD_PATH, load_from_dir_)
 using DataStructures, Ipopt, JSON, MySQL#, NLopt (&quot;ERROR: LoadError: Declaring __precompile__(false) is not allowed in files that are being precompiled&quot;. &quot;ERROR: Failed to precompile NLopt to /root/.julia/lib/v0.6/NLopt.ji&quot;) #, ProfileView # comment `ProfileView` for building .dll, otherwise something like &quot;incremental compilation error&quot;
 
-include(&quot;$load_from_dir_/QpcrAnalysis.jl&quot;)
+include(&quot;/root/chaipcr/bioinformatics/QpcrAnalysis/QpcrAnalysis.jl&quot;)
 using QpcrAnalysis
 
 function mysql_session(
@@ -476,13 +484,14 @@ well_nums_ = []
 verbose = false
 # using QpcrAnalysis
 # reload(&quot;QpcrAnalysis&quot;) # can update non-exported content properly, but cant export, like import and include
- include(&quot;$load_from_dir_/QpcrAnalysis.jl&quot;)
+include(&quot;/root/chaipcr/bioinformatics/QpcrAnalysis/QpcrAnalysis.jl&quot;)
 &quot;success&quot;
 #
 EOF
 
 	echo $(date) calling startup script
-       	julia qa_startup_bbb.jl --compile=All
+       	julia qa_startup_bbb.jl --compile=All || exit 1
+
 	echo done with startup script
        	echo $(date) starting julia server, and running for 30 min
        	julia juliaserver.jl --compile=All &amp;
@@ -659,7 +668,7 @@ cd /etc/nginx/sites-enabled
 sudo ln -s ../sites-available/chaipcr
 rm default 
 
-cat &lt;&lt;EOF &gt;&gt; /etc/nginx/nginx.conf 
+cat &lt;&lt;EOF &gt;&gt; /etc/nginx/conf.d/chaipcr_unicorn.conf
 #Add the following to /etc/nginx/nginx.conf under the http section:
     # Unicorn
      upstream unicorn {

@@ -21,6 +21,7 @@
 #include "utilincludes.h"
 #include "controlincludes.h"
 #include "qpcrfactory.h"
+#include "qpcrapplication.h"
 
 using namespace std;
 
@@ -63,8 +64,8 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(ADCController::ConsumersLis
 
     TemperatureController::Settings settings;
 
-    settings.minTargetTemp = kHeatBlockZonesMinTargetTemp;
-    settings.maxTargetTemp = kHeatBlockZonesMaxTargetTemp;
+    settings.minTargetTemp = qpcrApp.settings().configuration.heatBlockMinTemp;
+    settings.maxTargetTemp = qpcrApp.settings().configuration.heatBlockMaxTemp;
     settings.minTempThreshold = kHeatBlockLowTempShutdownThreshold;
     settings.maxTempThreshold = kHeatBlockHighTempShutdownThreshold;
 

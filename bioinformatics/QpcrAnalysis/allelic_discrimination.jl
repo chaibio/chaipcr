@@ -17,6 +17,8 @@ const CATEG_WELL_VEC = [
     ("cq", Colon())
 ]
 
+const CTRL_WELL_VEC = fill(Vector{Int}(), length(DEFAULT_init_FACTORS)) # All empty. NTC, homo ch1, homo ch2, hetero
+
 const kmeans_result_EMPTY = kmeans(1. * [1 2 3; 4 5 6], 2)
 
 
@@ -79,10 +81,11 @@ end # prep_data_4ad
 function assign_genotypes(
     data::AbstractMatrix,
     expected_genotypes::AbstractMatrix, # each column is a vector of binary genotype whose length is number of channels (0 => channel min, 1 => channel max)
-    cluster_method::String,
+    ctrl_well_vec::AbstractVector=CTRL_WELL_VEC,
+    cluster_method::String="k-means",
     # below not specified by `process_ad` as of right now
     init_factors::AbstractVector=DEFAULT_init_FACTORS, # for `init_centers`
-    rdcd_lower::Real=0.1; # lower limit of `relative_diff_closest_dist`
+    rdcd_lb::Real=0.1; # lower limit of `relative_diff_closest_dist`
     eg_labels::AbstractVector=DEFAULT_eg_LABELS # Julia v0.6.0 on 2017-06-25: `eg_labels::Vector{AbstractString}=DEFAULT_eg_LABELS` resulted in "ERROR: MethodError: no method matching #assign_genotypes#301(::Array{AbstractString,1}, ::QpcrAnalysis.#assign_genotypes, ::Array{Float64,2}, ::Array{Float64,2}, ::Float64)"
     )
 
@@ -95,6 +98,8 @@ function assign_genotypes(
         channel_extrema = hcat(minimum(data, 2), maximum(data, 2))
 
         num_genotypes = size(expected_genotypes)[2]
+
+        # determine initial centers based on extrema for each channel
         init_centers = [
             channel_extrema[
                 channel_i,
@@ -103,6 +108,16 @@ function assign_genotypes(
             for channel_i in 1:num_channels, genotype_i in 1:num_genotypes
         ] .* transpose(init_factors)
 
+        # update initial centers according to controls with known gentoypes if present
+        for i in length(ctrl_well_vec)
+            ctrl_well_nums = ctrl_well_vec[i]
+            if length(ctrl_well_nums) > 0
+                ctrl_well_data = data[:, ctrl_well_nums]
+                init_centers[:, i] = mean(ctrl_well_data, 2)
+            end # if
+        end # for
+
+        # clustering
         if cluster_method in ["k-means", "k-means-medoids"]
             # run k-means whether finally using k-means or k-medoids
             cluster_result = kmeans!(data, copy(init_centers)) # ideally the element with the same index between `init_centers` and `cluster_result.centers` should be for the same genotype
@@ -123,6 +138,21 @@ function assign_genotypes(
 
         assignments_raw = cluster_result.assignments[1:num_wells] # when `cluster_method == "k-medoids"`
 
+        unclassfied_assignment = length(eg_labels)
+
+        # check whether the controls are assigned with the correct genotypes, if not, assign as unclassified
+        for i in length(ctrl_well_vec)
+            ctrl_well_nums = ctrl_well_vec[i]
+            if length(ctrl_well_nums) > 0
+                for ctrl_well_num in ctrl_well_nums
+                    if assignments_raw[ctrl_well_num] != i
+                        assignments_raw[ctrl_well_num] = unclassfied_assignment
+                    end # if assignments_raw
+                end # for ctrl_well_num
+            end # if length
+        end # for i
+
+        # compute distances of data points to centers
         dist2centers_vec = map(1:size(data)[2]) do i_well
             dist_coords = data[:, i_well] .- centers # type KmedoidsResult has no field centers
             map(1:num_genotypes) do i_genotype
@@ -130,16 +160,17 @@ function assign_genotypes(
             end # do i_genotype
         end # do i_well
 
+        # compute relative difference between the distances of each data point to the two centers it is closest to
         relative_diff_closest_dists = map(dist2centers_vec) do dist2centers
             sorted_d2c = sort(dist2centers)
             d2c_min1, d2c_min2 = sorted_d2c[1:2]
             (d2c_min2 - d2c_min1) / d2c_min1
         end # do dist2centers
 
-        unclassfied_assignment = length(eg_labels)
+        # assign as unclassified the wells where `relative_diff_closest_dist` is below the lower bound `rdcd_lb`, i.e. unclear which genotype should be assigned
         assignments_adj = map(1:length(assignments_raw)) do i
-            relative_diff_closest_dists[i] > rdcd_lower ? assignments_raw[i] : unclassfied_assignment
-        end # do i # previously `assignments_raw .* (relative_diff_closest_dists .> rdcd_lower)`
+            relative_diff_closest_dists[i] > rdcd_lb ? assignments_raw[i] : unclassfied_assignment
+        end # do i # previously `assignments_raw .* (relative_diff_closest_dists .> rdcd_lb)`
         assignments_adj_labels = map(a -> eg_labels[a], assignments_adj)
 
     end # if length(unique
@@ -152,9 +183,11 @@ end # assign_genotypes
 function process_ad(
     full_amp_out::AmpStepRampOutput,
     cycs::Union{Integer,AbstractVector}, # relevant if `categ == "fluo"`, last available cycle
+    ctrl_well_vec::AbstractVector,
     cluster_method::String, # for `assign_genotypes`
     expected_genotypes_raw::AbstractMatrix=DEFAULT_egr, # each column is a vector of binary genotype whose length is number of channels (0 => no signal, 1 => yes signal)
     categ_well_vec::AbstractVector=CATEG_WELL_VEC,
+
     )
 
     # output
@@ -173,7 +206,7 @@ function process_ad(
             categ,
             well_idc,
             cycs
-        )..., cluster_method)
+        )..., ctrl_well_vec, cluster_method)
     end # for
 
     return (cluster_result_dict, assignments_adj_labels_dict)
