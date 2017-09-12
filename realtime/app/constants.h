@@ -121,7 +121,7 @@ const double kPCRBeginStepTemperatureThreshold = 0.5;
 const long kTemperatureLoggerInterval = 1000;
 const long kTemperatureLoggerFlushInterval = 1000; //ms
 
-const long kDataSpaceCheckInterval = 1000;
+const long kDataSpaceCheckInterval = 60 * 1000;
 
 //Heat Sink
 const double kHeatSinkTargetTemperature = 40; //C

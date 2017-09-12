@@ -139,8 +139,20 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
         return ExperimentNotFound;
     else if (experiment.startedAt() != boost::posix_time::not_a_date_time)
         return ExperimentUsed;
-    else if (qpcrApp.settings().configuration.dataSpaceSoftLimit >= Util::getPartitionAvailableSpace(kDataPartitionpath))
+
+    unsigned long dataSpace = 0;
+
+    if (Util::getPartitionAvailableSpace(kDataPartitionpath, dataSpace))
+    {
+        if (qpcrApp.settings().configuration.dataSpaceSoftLimit >= dataSapce)
+            return OutOfStorageSpace;
+    }
+    else
+    {
+        APP_LOGGER << "ExperimentController::start - unable to get the available space of the data partition" << std::endl;
+
         return OutOfStorageSpace;
+    }
 
     experiment.setStartedAt(boost::posix_time::microsec_clock::local_time());
 
@@ -657,8 +669,19 @@ void ExperimentController::stopDataSpaceCheck()
 
 void ExperimentController::checkDataSpace(Poco::Timer &/*timer*/)
 {
-    if (qpcrApp.settings().configuration.dataSpaceHardLimit >= Util::getPartitionAvailableSpace(kDataPartitionpath))
+    unsigned long dataSpace = 0;
+
+    if (Util::getPartitionAvailableSpace(kDataPartitionpath, dataSpace))
+    {
+        if (qpcrApp.settings().configuration.dataSpaceSoftLimit >= dataSapce)
+            stop("Out of storage space");
+    }
+    else
+    {
+        APP_LOGGER << "ExperimentController::checkDataSpace - unable to get the available space of the data partition" << std::endl;
+
         stop("Out of storage space");
+    }
 }
 
 void ExperimentController::calculateEstimatedDuration()
