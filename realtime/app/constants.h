@@ -43,7 +43,6 @@ const double kLidThermistorT0Resistance = 10000;    //ohms
 const double kLidThermistorT0 = 298.15;             //kelvins
 
 const double kLidMinTargetTemp = 0;
-const double kLidMaxTargetTemp = 130;
 
 const double kLidLowTempShutdownThreshold = -2;
 const double kLidHighTempShutdownThreshold = 140;

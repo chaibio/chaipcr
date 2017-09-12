@@ -306,6 +306,16 @@ void QPCRApplication::readConfigurationFile()
 
         if (it != ptree.not_found())
         {
+            it = ptree.find("lid");
+
+            if (it != ptree.not_found())
+            {
+                boost::property_tree::ptree::const_assoc_iterator valueIt = it->second.find("max_temp_c");
+
+                if (valueIt != it->second.not_found())
+                    _settings.configuration.lidMaxTemp = valueIt->second.get_value<float>();
+            }
+
             it = ptree.find("block");
 
             if (it != ptree.not_found())
