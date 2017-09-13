@@ -214,6 +214,17 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
         if y < textHeight + spacingY
           d3.select(this).attr('opacity', 0)
 
+  validateBackSpace: (loc, input) ->
+    axis = if loc is 'y:min' or loc is 'y:max' then 'y' else 'x'
+    value = input.value
+    selection = input.selectionStart
+    unit = @config.axes[axis].unit || ''
+    if @config.axes.y.scale is 'linear' and (selection > value.length - unit.length)
+      d3.event.preventDefault()
+      return true
+    else
+      return false
+
   onClickAxisInput: (loc, extremeValue) ->
     axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
     if axis is 'x'
