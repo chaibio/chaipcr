@@ -437,14 +437,17 @@ bool getFileChecksum(const std::string &filePath, int eventFd, std::string &chec
         return true;
 }
 
-unsigned long getPartitionAvailableSpace(const std::string &path)
+bool getPartitionAvailableSpace(const std::string &path, unsigned long &space)
 {
     struct statvfs stat;
     std::memset(&stat, 0, sizeof(stat));
 
-    statvfs(path.c_str(), &stat);
+    if (statvfs(path.c_str(), &stat) != 0)
+        return false;
 
-    return stat.f_bfree * 4;
+    space = stat.f_bfree * 4;
+
+    return true;
 }
 
 }
