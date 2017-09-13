@@ -639,7 +639,9 @@ class BaseChart
       @setCaretPosition(extremeValue.input.node(), val.length)
         
     else
-      val= if loc is 'y:max' then @getYScale().invert(0) else @getYScale().invert(@height)
+      yScale = @lastYScale or @yScale
+      val= if loc is 'y:max' then yScale.invert(0) else yScale.invert(@height)
+      console.log val
       val = @yAxisTickFormat(val)
       val = val.toString()
       extremeValue.input.node().value = val
@@ -780,7 +782,18 @@ class BaseChart
   onEnterAxisInput: (loc, input, val) ->
     axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
     val = val.replace(/[^0-9\.\-]/g, '')
-    val = val.replace(@config.axes[axis].unit, '') * 1
+    val = val.replace(@config.axes[axis].unit, '')
+    if val is ''
+      if loc is 'x:min'
+        val = @getMinX()
+      if loc is 'x:max'
+        val = @getMaxX()
+      if loc is 'y:min'
+        val = @roundDownExtremeValue(@getMinY())
+      if loc is 'y:max'
+        val = @roundDownExtremeValue(@getMaxY())
+    console.log val
+    val = val * 1
     if loc is 'y:max'
       maxY = if angular.isNumber(val) and !window.isNaN(val) then val else @roundUpExtremeValue(@getMaxY())
       y = @yScale
@@ -853,18 +866,18 @@ class BaseChart
       @scroll((minX - @getMinX()) / w)
 
     # update input state
-    extremeValue =  if loc is 'x:min'
-                      @xAxisLeftExtremeValue
-                    else if loc is 'x:max'
-                      @xAxisRightExtremeValue
-                    else if loc is 'y:min'
-                      @yAxisLowerExtremeValue
-                    else
-                      @yAxisUpperExtremeValue
+    extremeValue = null
+    
+    if loc is 'x:min'
+      extremeValue =  @xAxisLeftExtremeValue
+    else if loc is 'x:max'
+      extremeValue =  @xAxisRightExtremeValue
+    else if loc is 'y:min'
+      extremeValue = @yAxisLowerExtremeValue
+    else
+      extremeValue = @yAxisUpperExtremeValue
 
     @onClickAxisInput(loc, extremeValue)
-
-
 
   drawXAxisRightExtremeValue: ->
     textContainer = @chartSVG.append('g')
@@ -1202,7 +1215,7 @@ class BaseChart
 
   updateAxesExtremeValues: ->
     xScale = @getXScale()
-    yScale = @getYScale()
+    yScale = @lastYScale or @yScale
     minWidth = 10
     if @xAxisLeftExtremeValue.text
       text = @xAxisLeftExtremeValue.text

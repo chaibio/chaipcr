@@ -39,9 +39,10 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
           max: 120
           tickFormat: (t) ->
             t = t or 0
-            t_string = t.toString().split('.')
-            if (t_string[1])
-              t = t.toFixed(2)
+            #t_string = t.toString().split('.')
+            #if (t_string[1])
+            #  t = t.toFixed(2)
+            t = Math.round(t * 100) / 100
             return t
 
         }

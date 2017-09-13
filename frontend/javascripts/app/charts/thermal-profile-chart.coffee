@@ -9,6 +9,12 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
   DEFAULT_MAX_X: 60
   DEFAULT_MIN_X: 0
 
+  getMinY: -> @DEFAULT_MIN_Y
+
+  roundDownExtremeValue: (v) -> v
+
+  roundUpExtremeValue: (v) -> v
+
   setXAxis: ->
     super
     @setXAxisCircle()

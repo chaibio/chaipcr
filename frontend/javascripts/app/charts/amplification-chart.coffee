@@ -78,8 +78,11 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
       else
         Math.floor(val) * 1000
     else
+      if val < 10
+        return 10
       if val % 10 > 0
         num_length = val.toString().length
+        num_length = if val < 10 then 2 else num_length
         rounddown = '1'
         for i in [0...num_length - 1] by 1
           rounddown = rounddown + "0"
@@ -218,7 +221,8 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
     else
       if @config.axes.y.scale is 'linear'
         return super
-      val = if loc is 'y:max' then @getYScale().invert(0) else @getYScale().invert(@height)
+      yScale = @lastYScale or @yScale
+      val = if loc is 'y:max' then yScale.invert(0) else yScale.invert(@height)
       val = @yAxisLogInputFormat(val)
       val = val.toString()
       extremeValue.input.node().value = val
@@ -240,7 +244,7 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
   onAxisInput: (loc, input, val) ->
     if @config.axes.y.scale is 'log' and (loc is 'y:min' or loc is 'y:max')
       val = val.replace(/[^0-9\.\-]/g, '')
-      input.value = @yAxisLogInputFormat(val)
+      input.value = if val is '' then val else @yAxisLogInputFormat(val)
       @setCaretPosition(input, input.value.length)
     else
       super
@@ -249,11 +253,11 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
     axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
     unit = @config.axes[axis].unit || ''
     val = val.toString().replace(unit, '')
+    console.log val
     if axis is 'y'
       if val is ''
         val = if loc is 'y:max' then @roundUpExtremeValue(@getMaxY()) else @roundDownExtremeValue(@getMinY())
         val = val.toString()
-        console.log val
       val = if @config.axes.y.scale is 'linear'
               val.replace(/[^0-9\.\-]/g, '') * 1000
             else
@@ -264,20 +268,19 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
       super
     
     else
-      if val is ''
-        val = if loc is 'x:min' then @getMinX() else @getMaxX()
-        val = val.toString()
       super
     
     # update input state
-    extremeValue =  if loc is 'x:min'
-                      @xAxisLeftExtremeValue
-                    else if loc is 'x:max'
-                      @xAxisRightExtremeValue
-                    else if loc is 'y:min'
-                      @yAxisLowerExtremeValue
-                    else
-                      @yAxisUpperExtremeValue
+    extremeValue = null
+    
+    if loc is 'x:min'
+      extremeValue =  @xAxisLeftExtremeValue
+    else if loc is 'x:max'
+      extremeValue =  @xAxisRightExtremeValue
+    else if loc is 'y:min'
+      extremeValue = @yAxisLowerExtremeValue
+    else
+      extremeValue = @yAxisUpperExtremeValue
 
     @onClickAxisInput(loc, extremeValue)
 
