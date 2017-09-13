@@ -119,4 +119,5 @@ describe("Testing moveStageToSidesWhileMoveStep method", function() {
         expect(_moveStageToSides.moveToSideStageComponents).toHaveBeenCalled();
         expect(stage.stageMovedDirection).toEqual("left");
     });
+
 });
