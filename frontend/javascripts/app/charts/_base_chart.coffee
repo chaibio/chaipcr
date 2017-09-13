@@ -614,10 +614,10 @@ class BaseChart
         conWidth = textWidth
         extremeValue.inputContainer
           .attr('width', conWidth + @INPUT_PADDING)
-          .attr('x', @config.margin.left - (conWidth + extremeValue.config.offsetRight))
+          .attr('x', @config.margin.left - (conWidth + extremeValue.config.offsetRight + @INPUT_PADDING / 2))
         extremeValue.input
           .style('width', "#{conWidth + @INPUT_PADDING}px")
-        extremeValue.text.attr('x', @config.margin.left - (extremeValue.config.offsetRight + conWidth))
+        extremeValue.text.attr('x', @config.margin.left - (extremeValue.config.offsetRight + conWidth + @INPUT_PADDING / 2))
 
   onClickAxisInput: (loc, extremeValue) ->
     axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
@@ -753,6 +753,8 @@ class BaseChart
         if d3.event.keyCode is 13 and typeof @onEnterAxisInput is 'function'
           @onEnterAxisInput('x:min', input.node(), input.node().value.trim())
           d3.event.preventDefault()
+        if d3.event.keyCode is 8
+          @validateBackSpace('x:min', input.node())
       )
       .on('keyup', =>
         if d3.event.keyCode isnt 13 and typeof @onAxisInputBaseFunc is 'function'
@@ -778,6 +780,17 @@ class BaseChart
 
     if typeof @onClickAxisInput is 'function'
       @onClickAxisInput('x:min', @xAxisLeftExtremeValue)
+
+  validateBackSpace: (loc, input) ->
+    axis = if loc is 'y:min' or loc is 'y:max' then 'y' else 'x'
+    value = input.value
+    selection = input.selectionStart
+    unit = @config.axes[axis].unit || ''
+    if selection > value.length - unit.length
+      d3.event.preventDefault()
+      return true
+    else
+      return false
 
   onEnterAxisInput: (loc, input, val) ->
     axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
@@ -960,6 +973,8 @@ class BaseChart
         if d3.event.keyCode is 13 and typeof @onEnterAxisInput is 'function'
           @onEnterAxisInput('x:max', input.node(), input.node().value.trim())
           d3.event.preventDefault()
+        if d3.event.keyCode is 8
+          @validateBackSpace('x:max', input.node())
       )
       .on('keyup', =>
         if d3.event.keyCode isnt 13 and typeof @onAxisInputBaseFunc is 'function'
@@ -1076,6 +1091,8 @@ class BaseChart
         if d3.event.keyCode is 13 and typeof @onEnterAxisInput is 'function'
           @onEnterAxisInput('y:max', input.node(), input.node().value.trim())
           d3.event.preventDefault()
+        if d3.event.keyCode is 8
+          @validateBackSpace('y:max', input.node())
       )
 
     @yAxisUpperExtremeValue =
@@ -1190,6 +1207,8 @@ class BaseChart
         if d3.event.keyCode is 13 and typeof @onEnterAxisInput is 'function'
           @onEnterAxisInput('y:min', input.node(), input.node().value.trim())
           d3.event.preventDefault()
+        if d3.event.keyCode is 8
+          @validateBackSpace('y:min', input.node())
       )
 
     @yAxisLowerExtremeValue = 
