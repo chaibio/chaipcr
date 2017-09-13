@@ -248,7 +248,12 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
   onEnterAxisInput: (loc, input, val) ->
     axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
     unit = @config.axes[axis].unit || ''
+    val = val.toString().replace(unit, '')
     if axis is 'y'
+      if val is ''
+        val = if loc is 'y:max' then @roundUpExtremeValue(@getMaxY()) else @roundDownExtremeValue(@getMinY())
+        val = val.toString()
+        console.log val
       val = if @config.axes.y.scale is 'linear'
               val.replace(/[^0-9\.\-]/g, '') * 1000
             else
@@ -259,6 +264,9 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
       super
     
     else
+      if val is ''
+        val = if loc is 'x:min' then @getMinX() else @getMaxX()
+        val = val.toString()
       super
     
     # update input state
