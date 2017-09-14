@@ -76,7 +76,7 @@ window.ChaiBioTech.ngApp.service('moveStageToSides', [
         var stage = targetStage.previousStage;
         while(stage) {
           if(stage.stageMovedDirection !== "left") {
-            console.log("Looking");
+            //console.log("Looking");
             this.moveToSide("left", draggedStage, stage);
           }
           stage = stage.previousStage;
@@ -84,9 +84,11 @@ window.ChaiBioTech.ngApp.service('moveStageToSides', [
       };
 
       this.makeSureNextMovedRight = function(draggedStage, targetStage) {
-        var stage = this.nextStage;
+        var stage = targetStage.nextStage;
         while(stage) {
+
           if(stage.stageMovedDirection !== "right") {
+            //console.log("Lookingggggggg");
             this.moveToSide("right", draggedStage, stage);
           }
           stage = stage.nextStage;
