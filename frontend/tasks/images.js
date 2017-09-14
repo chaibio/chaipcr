@@ -8,6 +8,6 @@ gulp.task('clean-images', function (done) {
 });
 
 gulp.task('copy-images', ['clean-images'], function () {
-  return gulp.src('./frontend/images/*/*')
+  return gulp.src('./frontend/images/**/*')
          .pipe(gulp.dest('./web/public/images'));
 });
