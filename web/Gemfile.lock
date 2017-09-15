@@ -1,10 +1,3 @@
-GIT
-  remote: https://github.com/rapofran/Rserve-Ruby-client.git
-  revision: 98d36d4da593912856a6f9ac1d0caf3df7856533
-  branch: sockets-with-timeouts
-  specs:
-    rserve-client (0.3.1)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -62,6 +55,8 @@ GEM
       factory_girl (~> 4.4.0)
       railties (>= 3.0.0)
     hike (1.2.3)
+    httparty (0.15.6)
+      multi_xml (>= 0.5.2)
     i18n (0.6.9)
     jbuilder (1.5.3)
       activesupport (>= 3.0.0)
@@ -80,6 +75,7 @@ GEM
     mini_portile (0.6.0)
     minitest (4.7.5)
     multi_json (1.10.0)
+    multi_xml (0.6.0)
     mysql2 (0.3.17)
     nokogiri (1.6.2.1)
       mini_portile (= 0.6.0)
@@ -162,13 +158,13 @@ DEPENDENCIES
   bcrypt-ruby (~> 3.1.2)
   capybara
   factory_girl_rails
+  httparty
   jbuilder (~> 1.2)
   migration_comments
   mysql2 (= 0.3.17)
   rabl
   rails (= 4.0.1)
   rails-backbone
-  rserve-client!
   rspec-rails
   rubyzip
   sdoc
