@@ -99,4 +99,124 @@ describe("Testing moveStageToSides service", function() {
 
         expect(_moveStageToSides.moveToSide).toHaveBeenCalled();
     });
+
+    it("It should test moveToSideStageComponents method", function() {
+
+        var moveCount = 30;
+        var targetStage = {
+            stageGroup: {
+                setCoords: function() {},
+                set: function() {},
+            },
+            dots: {
+                set: function() {},
+                setCoords: function() {}
+            },
+            left: 50,
+            childSteps: [
+                {
+                    moveStep: function() {},
+                    circle: {
+                        moveCircleWithStep: function() {}
+                    }
+                }
+            ],
+            sourceStage: true,
+        };
+
+        spyOn(_moveStageToSides, "manageSourceStageStepMovement").and.returnValue(true);
+
+        spyOn(targetStage.stageGroup, "set");
+        spyOn(targetStage.dots, "set");
+        
+        spyOn(targetStage.childSteps[0], "moveStep");
+        spyOn(targetStage.childSteps[0].circle, "moveCircleWithStep");
+        
+        _moveStageToSides.moveToSideStageComponents(moveCount, targetStage);
+        
+        expect(targetStage.stageGroup.set).toHaveBeenCalled();
+        expect(targetStage.dots.set).toHaveBeenCalled();
+        expect(targetStage.left).toEqual(50 + moveCount);
+        expect(targetStage.childSteps[0].moveStep).toHaveBeenCalled();
+        expect(targetStage.childSteps[0].circle.moveCircleWithStep).toHaveBeenCalled();
+        expect(_moveStageToSides.manageSourceStageStepMovement).toHaveBeenCalled();
+    });
+
+    it("It should test manageSourceStageStepMovement method", function() {
+
+        var targetStage = {
+            childSteps: [
+                {
+                    previousIsMoving: true,
+                    left: 10,
+                    moveStep: function() {},
+                    circle: {
+                        moveCircleWithStep: function() {}
+                    },
+
+                }
+            ],
+            
+                parent: {
+                    moveDots: {
+                        setLeft: function() {},
+                        setCoords: function() {},
+                    }
+                }
+           
+        };
+
+        spyOn(targetStage.childSteps[0], "moveStep");
+        spyOn(targetStage.childSteps[0].circle, "moveCircleWithStep");
+        spyOn(targetStage.parent.moveDots, "setLeft");
+
+        _moveStageToSides.manageSourceStageStepMovement(targetStage);
+
+        expect(targetStage.childSteps[0].moveStep).toHaveBeenCalled();
+        expect(targetStage.childSteps[0].circle.moveCircleWithStep).toHaveBeenCalled();
+        expect(targetStage.parent.moveDots.setLeft).toHaveBeenCalledWith(targetStage.left + 6);
+        expect(targetStage.childSteps[0].left).toEqual(50);
+    });
+
+    it("It should test manageSourceStageStepMovement method when moveDots has baseStage", function() {
+        var targetStage = {
+            childSteps: [
+                {
+                    previousIsMoving: true,
+                    left: 10,
+                    moveStep: function() {},
+                    circle: {
+                        moveCircleWithStep: function() {}
+                    },
+
+                }
+            ],
+            
+                parent: {
+                    moveDots: {
+                        baseStep: {
+                            left: 100,
+                            myWidth: 128,
+                        },
+                        setLeft: function() {},
+                        setCoords: function() {},
+                    }
+                }
+           
+        };
+
+        var baseStep = targetStage.parent.moveDots.baseStep;
+
+        spyOn(targetStage.childSteps[0], "moveStep");
+        spyOn(targetStage.childSteps[0].circle, "moveCircleWithStep");
+        spyOn(targetStage.parent.moveDots, "setLeft");
+
+        _moveStageToSides.manageSourceStageStepMovement(targetStage);
+
+        expect(targetStage.childSteps[0].moveStep).toHaveBeenCalled();
+        expect(targetStage.childSteps[0].circle.moveCircleWithStep).toHaveBeenCalled();
+        expect(targetStage.parent.moveDots.setLeft).toHaveBeenCalledWith(baseStep.left + baseStep.myWidth + 6);
+        expect(targetStage.childSteps[0].left).toEqual(50);
+    });
+    
 });
