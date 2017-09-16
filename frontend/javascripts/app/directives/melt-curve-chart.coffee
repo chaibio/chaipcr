@@ -32,6 +32,13 @@ window.App.directive 'meltCurveChart', [
         $scope.$on 'window:resize', ->
           chart.resize() if chart and $scope.show
 
+        $scope.$watch ->
+          series = $scope.config?.series || []
+          series[0]?.y
+        , (val, oldVal) ->
+          if val and (val isnt oldVal)
+            initChart()
+
         $scope.$watchCollection ($scope) ->
           return {
             data: $scope.data,
