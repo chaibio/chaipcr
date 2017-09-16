@@ -60,8 +60,9 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
       else
         Math.ceil(val) * 1000
     else
+      console.log val
       if val % 10 > 0
-        num_length = val.toString().length
+        num_length = if val >= @getMaxY() then val.toString().length else val.toString().length - 1
         roundup = '1'
         for i in [0...num_length] by 1
           roundup = roundup + "0"
@@ -264,7 +265,6 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
     axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
     unit = @config.axes[axis].unit || ''
     val = val.toString().replace(unit, '')
-    console.log val
     if axis is 'y'
       if val is ''
         val = if loc is 'y:max' then @roundUpExtremeValue(@getMaxY()) else @roundDownExtremeValue(@getMinY())
@@ -275,7 +275,9 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
               newval = val.replace(/[^0-9\.\-]/g, '') * 1
               newval = if loc is 'y:max' then @roundUpExtremeValue(newval) else @roundDownExtremeValue(newval)
               newval
-      val = val + unit
+      val = val + unit if @config.axes.y.scale is 'linear'
+      val = val.toString()
+      console.log val
       super
     
     else

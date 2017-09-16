@@ -891,7 +891,8 @@ class BaseChart
       extremeValue = @yAxisUpperExtremeValue
 
     @onClickAxisInput(loc, extremeValue)
-
+    input.blur()
+    
   drawXAxisRightExtremeValue: ->
     textContainer = @chartSVG.append('g')
         .attr('class', 'axes-extreme-value tick')

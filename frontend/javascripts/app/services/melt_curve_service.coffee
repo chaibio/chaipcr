@@ -39,7 +39,7 @@ App.service 'MeltCurveService', [
       series: series
       axes:
         x:
-          unit: '°C'
+          unit: ' °C'
           key: 'temperature'
           ticks: 8
           tickFormat: (x) ->
