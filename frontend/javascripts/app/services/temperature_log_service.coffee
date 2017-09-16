@@ -32,7 +32,7 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
             SecondsDisplay.display2 t
         },
         y: {
-          unit: '°C'
+          unit: ' °C'
           label: 'Temperature (°C)'
           ticks: 8
           min: 0
