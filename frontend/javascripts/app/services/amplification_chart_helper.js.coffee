@@ -42,12 +42,6 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           x: 'Cycle'
           y: 'RFU'
 
-      margin:
-        top: 10
-        left: 80
-        right: 15
-        bottom: 50
-
       series: []
 
     # end chartConfig

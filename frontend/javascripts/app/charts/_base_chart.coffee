@@ -14,6 +14,11 @@ class BaseChart
   zoomTransform: {x: 0, y: 0, k: 1}
   isZooming: false
   INPUT_PADDING: 5
+  MARGIN:
+    left: 0
+    top: 0
+    right: 0
+    bottom: 0
 
   constructor: (@elem, @data, @config) ->
     @initChart()
@@ -160,7 +165,7 @@ class BaseChart
     @box = {}
     @box.container = @chartSVG.append('g')
         .attr('stroke-width', 0)
-        .attr('transform', 'translate(' + (boxMargin.left + @config.margin.left) + ',' + (boxMargin.top + @config.margin.top) + ')')
+        .attr('transform', 'translate(' + (boxMargin.left + @MARGIN.left) + ',' + (boxMargin.top + @MARGIN.top) + ')')
         .attr('fill', '#fff')
         .on 'mousemove', => @mouseMoveCb()
 
@@ -216,7 +221,7 @@ class BaseChart
         .attr('fill', "#000")
         .attr('x', 10 + boxBorderWidth)
         .attr('y', headerHeight + ctTextDims.height + 20 + boxBorderWidth)
-        .text('RFU')
+        .text(@config.box?.label?.y || 'RFU')
 
     rfyLabelDims = @box.RFYTextLabel.node().getBBox()
 
@@ -232,7 +237,7 @@ class BaseChart
         .attr('fill', "#000")
         .attr('x', 70 + boxBorderWidth)
         .attr('y', headerHeight + ctTextDims.height + 20 + boxBorderWidth)
-        .text('Cycle')
+        .text(@config.box?.label?.x || 'Cycle')
 
     cycleLabelDims = @box.cycleTextLabel.node().getBBox()
 
@@ -511,7 +516,7 @@ class BaseChart
     @yAxisLabel = svg.append("text")
       .attr("class", "g-y-axis-text")
       .attr("transform", "rotate(-90)")
-      .attr("y", 0 - @config.margin.left)
+      .attr("y", 0 - @MARGIN.left)
       .attr("x", 0 - (@height / 2))
       .attr("dy", "1em")
       .attr("font-family", "dinot-bold")
@@ -554,7 +559,7 @@ class BaseChart
       .attr('class', 'g-x-axis-text')
       .attr("transform",
         "translate(" + (@width / 2) + " ," +
-        (@height + @config.margin.top + @config.margin.bottom - 20) + ")")
+        (@height + @MARGIN.top + @MARGIN.bottom - 20) + ")")
       .style("text-anchor", "middle")
       .attr("font-family", "dinot-bold")
       .attr("font-size", "#{@AXIS_LABEL_FONT_SIZE}px")
@@ -594,9 +599,9 @@ class BaseChart
         conWidth = textWidth + @INPUT_PADDING
         extremeValue.inputContainer
           .attr('width', conWidth)
-          .attr('x', @config.margin.left - (conWidth / 2))
+          .attr('x', @MARGIN.left - (conWidth / 2))
         extremeValue.text
-          .attr('x', @config.margin.left - (textWidth / 2))
+          .attr('x', @MARGIN.left - (textWidth / 2))
         extremeValue.input
           .style('width', "#{conWidth}px")
 
@@ -604,9 +609,9 @@ class BaseChart
         conWidth = textWidth + @INPUT_PADDING
         extremeValue.inputContainer
           .attr('width', conWidth)
-          .attr('x', @config.margin.left + @width - (conWidth / 2))
+          .attr('x', @MARGIN.left + @width - (conWidth / 2))
         extremeValue.text
-          .attr('x', @config.margin.left + @width - (textWidth / 2))
+          .attr('x', @MARGIN.left + @width - (textWidth / 2))
         extremeValue.input
           .style('width', "#{conWidth}px")
 
@@ -614,10 +619,10 @@ class BaseChart
         conWidth = textWidth
         extremeValue.inputContainer
           .attr('width', conWidth + @INPUT_PADDING)
-          .attr('x', @config.margin.left - (conWidth + extremeValue.config.offsetRight + @INPUT_PADDING / 2))
+          .attr('x', @MARGIN.left - (conWidth + extremeValue.config.offsetRight + @INPUT_PADDING / 2))
         extremeValue.input
           .style('width', "#{conWidth + @INPUT_PADDING}px")
-        extremeValue.text.attr('x', @config.margin.left - (extremeValue.config.offsetRight + conWidth + @INPUT_PADDING / 2))
+        extremeValue.text.attr('x', @MARGIN.left - (extremeValue.config.offsetRight + conWidth + @INPUT_PADDING / 2))
 
   onClickAxisInput: (loc, extremeValue) ->
     axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
@@ -627,7 +632,7 @@ class BaseChart
       conWidth = extremeValue.text.node().getBBox().width + @INPUT_PADDING
       extremeValue.inputContainer
         .attr('width', conWidth)
-        .attr('x', @config.margin.left + (if loc is 'x:min' then 0 else @width) - (conWidth / 2))
+        .attr('x', @MARGIN.left + (if loc is 'x:min' then 0 else @width) - (conWidth / 2))
       extremeValue.input
         .style('opacity', 1)
         .style('width', "#{conWidth}px")
@@ -654,7 +659,7 @@ class BaseChart
 
       extremeValue.inputContainer
         .attr('width', inputWidth + @INPUT_PADDING )
-        .attr('x', @config.margin.left - (inputWidth + extremeValue.config.offsetRight) - (@INPUT_PADDING / 2))
+        .attr('x', @MARGIN.left - (inputWidth + extremeValue.config.offsetRight) - (@INPUT_PADDING / 2))
       extremeValue.input
         .style('width', "#{inputWidth + @INPUT_PADDING}px")
         .style('opacity', 1)
@@ -689,8 +694,8 @@ class BaseChart
       .attr('fill', '#fff')
       .attr('width', conWidth)
       .attr('height', conHeight)
-      .attr('y', @height + @config.margin.top + offsetTop)
-      .attr('x', @config.margin.left - (conWidth / 2))
+      .attr('y', @height + @MARGIN.top + offsetTop)
+      .attr('x', @MARGIN.left - (conWidth / 2))
       .on 'click', => @onClickLeftXAxisInput()
 
     line = textContainer.append('line')
@@ -701,7 +706,7 @@ class BaseChart
 
     text = textContainer.append('text')
         .attr('fill', '#000')
-        .attr('y', @height + @config.margin.top + offsetTop)
+        .attr('y', @height + @MARGIN.top + offsetTop)
         .attr('dy', '0.71em')
         .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
         .attr('font-family', 'dinot-regular')
@@ -710,8 +715,8 @@ class BaseChart
     inputContainer = textContainer.append('foreignObject')
         .attr('width', conWidth)
         .attr('height', conHeight)
-        .attr('y', @height + @config.margin.top + offsetTop)
-        .attr('x', @config.margin.left - (conWidth / 2))
+        .attr('y', @height + @MARGIN.top + offsetTop)
+        .attr('x', @MARGIN.left - (conWidth / 2))
         .on 'click', => @onClickLeftXAxisInput()
 
     form = inputContainer.append('xhtml:form')
@@ -732,10 +737,10 @@ class BaseChart
       .on('mouseenter', =>
         lineWidth = text.node().getBBox().width
         line.attr('opacity', 1)
-          .attr('x1', @config.margin.left - (lineWidth / 2))
-          .attr('y1', @height + @config.margin.top + offsetTop + conHeight - underlineStroke)
-          .attr('x2', @config.margin.left - (lineWidth / 2) + lineWidth)
-          .attr('y2', @height + @config.margin.top + offsetTop + conHeight - underlineStroke)
+          .attr('x1', @MARGIN.left - (lineWidth / 2))
+          .attr('y1', @height + @MARGIN.top + offsetTop + conHeight - underlineStroke)
+          .attr('x2', @MARGIN.left - (lineWidth / 2) + lineWidth)
+          .attr('y2', @height + @MARGIN.top + offsetTop + conHeight - underlineStroke)
       )
       .on('mouseout', ->
         line.attr('opacity', 0)
@@ -909,8 +914,8 @@ class BaseChart
         .attr('fill', '#fff')
         .attr('width', conWidth)
         .attr('height', conHeight)
-        .attr('y', @height + @config.margin.top + offsetTop)
-        .attr('x', @config.margin.left + @width - (conWidth / 2))
+        .attr('y', @height + @MARGIN.top + offsetTop)
+        .attr('x', @MARGIN.left + @width - (conWidth / 2))
         .on 'click', => @onClickRightXAxisInput()
 
     line = textContainer.append('line')
@@ -921,7 +926,7 @@ class BaseChart
 
     text = textContainer.append('text')
         .attr('fill', '#000')
-        .attr('y', @height + @config.margin.top + offsetTop)
+        .attr('y', @height + @MARGIN.top + offsetTop)
         .attr('dy', '0.71em')
         .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
         .attr('font-family', 'dinot-regular')
@@ -931,8 +936,8 @@ class BaseChart
     inputContainer = textContainer.append('foreignObject')
         .attr('width', conWidth)
         .attr('height', conHeight)
-        .attr('y', @height + @config.margin.top + offsetTop)
-        .attr('x', @config.margin.left + @width - (conWidth / 2))
+        .attr('y', @height + @MARGIN.top + offsetTop)
+        .attr('x', @MARGIN.left + @width - (conWidth / 2))
         .on 'click', => @onClickRightXAxisInput()
 
     form = inputContainer.append('xhtml:form')
@@ -953,10 +958,10 @@ class BaseChart
       .on('mouseenter', =>
         lineWidth = text.node().getBBox().width
         line.attr('opacity', 1)
-          .attr('x1', @config.margin.left + @width - (lineWidth / 2))
-          .attr('y1', @height + @config.margin.top + offsetTop + conHeight - underlineStroke)
-          .attr('x2', @config.margin.left + @width - (lineWidth / 2) + lineWidth)
-          .attr('y2', @height + @config.margin.top + offsetTop + conHeight - underlineStroke)
+          .attr('x1', @MARGIN.left + @width - (lineWidth / 2))
+          .attr('y1', @height + @MARGIN.top + offsetTop + conHeight - underlineStroke)
+          .attr('x2', @MARGIN.left + @width - (lineWidth / 2) + lineWidth)
+          .attr('y2', @height + @MARGIN.top + offsetTop + conHeight - underlineStroke)
       )
       .on('mouseout', =>
         line.attr('opacity', 0)
@@ -1020,8 +1025,8 @@ class BaseChart
       .attr('fill', '#fff')
       .attr('width', conWidth)
       .attr('height', @AXES_TICKS_FONT_SIZE + offsetTop)
-      .attr('y', @config.margin.top - ((conHeight) / 2))
-      .attr('x', @config.margin.left - (conWidth + offsetRight))
+      .attr('y', @MARGIN.top - ((conHeight) / 2))
+      .attr('x', @MARGIN.left - (conWidth + offsetRight))
       .on 'click', => @onClickUpperYAxisInput()
 
     line = textContainer.append('line')
@@ -1032,21 +1037,21 @@ class BaseChart
 
     text = textContainer.append('text')
       .attr('fill', '#000')
-      .attr('x', @config.margin.left - (offsetRight + conWidth))
-      .attr('y', @config.margin.top - underlineStroke * 2)
+      .attr('x', @MARGIN.left - (offsetRight + conWidth))
+      .attr('y', @MARGIN.top - underlineStroke * 2)
       .attr('dy', '0.71em')
       .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .attr('font-family', 'dinot-regular')
       .text(@getMaxY())
       .on 'click', => @onClickUpperYAxisInput()
 
-    text.attr('x', @config.margin.left - (offsetRight + text.node().getBBox().width))
+    text.attr('x', @MARGIN.left - (offsetRight + text.node().getBBox().width))
 
     inputContainer = textContainer.append('foreignObject')
       .attr('width', conWidth)
       .attr('height', conHeight - offsetTop)
-      .attr('y', @config.margin.top - (conHeight / 2))
-      .attr('x', @config.margin.left - (conWidth + offsetRight))
+      .attr('y', @MARGIN.top - (conHeight / 2))
+      .attr('x', @MARGIN.left - (conWidth + offsetRight))
       .on 'click', => @onClickUpperYAxisInput()
 
     form = inputContainer.append('xhtml:form')
@@ -1066,10 +1071,10 @@ class BaseChart
       .attr('type', 'text')
       .on('mouseenter', =>
         textWidth = text.node().getBBox().width
-        line.attr('x1', @config.margin.left - (textWidth + offsetRight))
-          .attr('y1', @config.margin.top + (conHeight / 2) - (underlineStroke / 2))
-          .attr('x2', @config.margin.left - (textWidth + offsetRight) + textWidth)
-          .attr('y2', @config.margin.top + (conHeight / 2) - (underlineStroke / 2))
+        line.attr('x1', @MARGIN.left - (textWidth + offsetRight))
+          .attr('y1', @MARGIN.top + (conHeight / 2) - (underlineStroke / 2))
+          .attr('x2', @MARGIN.left - (textWidth + offsetRight) + textWidth)
+          .attr('y2', @MARGIN.top + (conHeight / 2) - (underlineStroke / 2))
           .attr('opacity', 1)
       )
       .on('mouseout', ->
@@ -1137,8 +1142,8 @@ class BaseChart
       .attr('fill', '#fff')
       .attr('width', conWidth)
       .attr('height', @AXES_TICKS_FONT_SIZE + offsetTop)
-      .attr('y', @height + @config.margin.top - (conHeight / 2))
-      .attr('x', @config.margin.left - (conWidth + offsetRight))
+      .attr('y', @height + @MARGIN.top - (conHeight / 2))
+      .attr('x', @MARGIN.left - (conWidth + offsetRight))
       .on 'click', => @onClickLowerYAxisInput()
 
     line = textContainer.append('line')
@@ -1149,21 +1154,21 @@ class BaseChart
 
     text = textContainer.append('text')
       .attr('fill', '#000')
-      .attr('x', @config.margin.left - (offsetRight + conWidth))
-      .attr('y', @height + @config.margin.top - underlineStroke * 2)
+      .attr('x', @MARGIN.left - (offsetRight + conWidth))
+      .attr('y', @height + @MARGIN.top - underlineStroke * 2)
       .attr('dy', '0.71em')
       .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .attr('font-family', 'dinot-regular')
       .text(@getMaxY())
       .on 'click', => @onClickLowerYAxisInput()
 
-    text.attr('x', @config.margin.left - (offsetRight + text.node().getBBox().width))
+    text.attr('x', @MARGIN.left - (offsetRight + text.node().getBBox().width))
 
     inputContainer = textContainer.append('foreignObject')
       .attr('width', conWidth)
-      .attr('x', @config.margin.left - (conWidth + offsetRight))
+      .attr('x', @MARGIN.left - (conWidth + offsetRight))
       .attr('height', conHeight - offsetTop)
-      .attr('y', @height + @config.margin.top - (conHeight / 2))
+      .attr('y', @height + @MARGIN.top - (conHeight / 2))
       .on 'click', => @onClickLowerYAxisInput()
 
     form = inputContainer.append('xhtml:form')
@@ -1182,10 +1187,10 @@ class BaseChart
       .attr('type', 'text')
       .on('mouseenter', =>
         textWidth = text.node().getBBox().width
-        line.attr('x1', @config.margin.left - (textWidth + offsetRight))
-          .attr('y1', @height + @config.margin.top + (conHeight / 2) - (underlineStroke / 2))
-          .attr('x2', @config.margin.left - (textWidth + offsetRight) + textWidth)
-          .attr('y2', @height + @config.margin.top + (conHeight / 2) - (underlineStroke / 2))
+        line.attr('x1', @MARGIN.left - (textWidth + offsetRight))
+          .attr('y1', @height + @MARGIN.top + (conHeight / 2) - (underlineStroke / 2))
+          .attr('x2', @MARGIN.left - (textWidth + offsetRight) + textWidth)
+          .attr('y2', @height + @MARGIN.top + (conHeight / 2) - (underlineStroke / 2))
           .attr('opacity', 1)
       )
       .on('mouseout', ->
@@ -1243,15 +1248,15 @@ class BaseChart
       minX = if @hasData() then Math.round(xScale.invert(0) * 10) / 10 else @DEFAULT_MIN_X
       text.text(@xAxisTickFormat(minX))
       textWidth = text.node().getBBox().width
-      text.attr('x', @config.margin.left - (textWidth / 2))
-      rect.attr('x', @config.margin.left - (textWidth / 2))
+      text.attr('x', @MARGIN.left - (textWidth / 2))
+      rect.attr('x', @MARGIN.left - (textWidth / 2))
         .attr('width', textWidth)
     if @xAxisRightExtremeValue.text
       maxX = if @hasData() then Math.round(xScale.invert(@width) * 10) / 10 else @DEFAULT_MAX_X
       @xAxisRightExtremeValue.text.text(@xAxisTickFormat(maxX))
       textWidth = @xAxisRightExtremeValue.text.node().getBBox().width
-      @xAxisRightExtremeValue.text.attr('x', @width + @config.margin.left - (textWidth / 2))
-      @xAxisRightExtremeValue.rect.attr('x', @width + @config.margin.left - (textWidth / 2))
+      @xAxisRightExtremeValue.text.attr('x', @width + @MARGIN.left - (textWidth / 2))
+      @xAxisRightExtremeValue.rect.attr('x', @width + @MARGIN.left - (textWidth / 2))
         .attr('width', textWidth)
     if @yAxisUpperExtremeValue.text
       text = @yAxisUpperExtremeValue.text
@@ -1259,8 +1264,8 @@ class BaseChart
       maxY = if @hasData() then Math.round(yScale.invert(0) * 10) / 10 else @DEFAULT_MAX_Y
       text.text(@yAxisTickFormat(maxY))
       textWidth = text.node().getBBox().width
-      text.attr('x', @config.margin.left - (@yAxisUpperExtremeValue.config.offsetRight + textWidth))
-      rect.attr('x', @config.margin.left - (@yAxisUpperExtremeValue.config.offsetRight + textWidth))
+      text.attr('x', @MARGIN.left - (@yAxisUpperExtremeValue.config.offsetRight + textWidth))
+      rect.attr('x', @MARGIN.left - (@yAxisUpperExtremeValue.config.offsetRight + textWidth))
         .attr('width', textWidth)
     if @yAxisLowerExtremeValue.text
       rect = @yAxisLowerExtremeValue.rect
@@ -1268,8 +1273,8 @@ class BaseChart
       minY = if @hasData() then Math.round(yScale.invert(@height) * 10) / 10 else @DEFAULT_MIN_Y
       text.text(@yAxisTickFormat(minY))
       textWidth = text.node().getBBox().width
-      text.attr('x', @config.margin.left - (@yAxisLowerExtremeValue.config.offsetRight + textWidth))
-      rect.attr('x', @config.margin.left - (@yAxisLowerExtremeValue.config.offsetRight + textWidth))
+      text.attr('x', @MARGIN.left - (@yAxisLowerExtremeValue.config.offsetRight + textWidth))
+      rect.attr('x', @MARGIN.left - (@yAxisLowerExtremeValue.config.offsetRight + textWidth))
         .attr('width', textWidth)
 
     @hideLastAxesTicks()
@@ -1325,8 +1330,8 @@ class BaseChart
   initChart: ->
     d3.select(@elem).selectAll("*").remove()
 
-    @width = @elem.parentElement.offsetWidth - @config.margin.left - @config.margin.right
-    @height = @elem.parentElement.offsetHeight - @config.margin.top - @config.margin.bottom
+    @width = @elem.parentElement.offsetWidth - @MARGIN.left - @MARGIN.right
+    @height = @elem.parentElement.offsetHeight - @MARGIN.top - @MARGIN.bottom
 
     @zooomBehavior = d3.zoom()
       .on 'start', => @isZooming = true
@@ -1334,12 +1339,12 @@ class BaseChart
       .on 'zoom', => @zoomed()
 
     @chartSVG = d3.select(@elem).append("svg")
-        .attr("width", @width + @config.margin.left + @config.margin.right)
-        .attr("height", @height + @config.margin.top + @config.margin.bottom)
+        .attr("width", @width + @MARGIN.left + @MARGIN.right)
+        .attr("height", @height + @MARGIN.top + @MARGIN.bottom)
         .call(@zooomBehavior)
 
     svg = @chartSVG.append("g")
-        .attr("transform", "translate(" + @config.margin.left + "," + @config.margin.top + ")")
+        .attr("transform", "translate(" + @MARGIN.left + "," + @MARGIN.top + ")")
         .attr('class', 'chart-g')
 
     @viewSVG = svg.append('svg')

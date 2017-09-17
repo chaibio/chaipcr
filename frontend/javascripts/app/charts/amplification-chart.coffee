@@ -4,6 +4,12 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
   DEFAULT_MAX_Y: 10000
   DEFAULT_MIN_X: 1
   DEFAULT_MAX_X: 40
+  MARGIN:
+    top: 10
+    left: 80
+    right: 15
+    bottom: 50
+
 
   formatPower: (d) ->
     superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹"
@@ -247,7 +253,7 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
 
       extremeValue.inputContainer
         .attr('width', inputWidth + @INPUT_PADDING )
-        .attr('x', @config.margin.left - (inputWidth + extremeValue.config.offsetRight) - (@INPUT_PADDING / 2))
+        .attr('x', @MARGIN.left - (inputWidth + extremeValue.config.offsetRight) - (@INPUT_PADDING / 2))
       extremeValue.input
         .style('width', "#{inputWidth + @INPUT_PADDING}px")
         .style('opacity', 1)

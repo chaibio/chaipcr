@@ -47,15 +47,6 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
 
         }
       },
-      margin: {
-        top: 20
-        left: 80
-        right: 30
-        bottom: 50
-      },
-      grid:
-        x: false
-        y: false
       series: [
         {x: 'elapsed_time', dataset: 'dataset', y: 'heat_block_zone_temp', color: '#00AEEF'},
         {x: 'elapsed_time', dataset: 'dataset', y: 'lid_temp', color: '#C5C5C5'}

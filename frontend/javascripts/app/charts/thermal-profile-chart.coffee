@@ -8,6 +8,12 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
   DEFAULT_MIN_Y: 0
   DEFAULT_MAX_X: 60
   DEFAULT_MIN_X: 0
+  MARGIN:
+    top: 20
+    left: 80
+    right: 30
+    bottom: 50
+
 
   getMinY: -> @DEFAULT_MIN_Y
 
@@ -168,7 +174,7 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
       @xAxisCircle
         .attr("opacity", opacity)
         .attr("cx", xx)
-        .attr("cy", @height + @config.margin.top)
+        .attr("cy", @height + @MARGIN.top)
 
     if (typeof @onMouseMove is 'function')
       line_config = @config.series[0]
