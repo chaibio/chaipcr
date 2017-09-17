@@ -66,15 +66,11 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
       else
         Math.ceil(val) * 1000
     else
-      console.log val
-      if val % 10 > 0
-        num_length = if val >= @getMaxY() then val.toString().length else val.toString().length - 1
-        roundup = '1'
-        for i in [0...num_length] by 1
-          roundup = roundup + "0"
-        roundup * 1
-      else
-        val
+      num_length = if val >= @getMaxY() then val.toString().length else val.toString().length - 1
+      roundup = '1'
+      for i in [0...num_length] by 1
+        roundup = roundup + "0"
+      roundup * 1
 
   roundDownExtremeValue: (val) ->
     if @config.axes.y.scale is 'linear'
@@ -286,25 +282,11 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
               newval
       val = val + unit if @config.axes.y.scale is 'linear'
       val = val.toString()
-      console.log val
+      console.log 'roundedupY', val
       super
     
     else
       super
     
-    # update input state
-    ###extremeValue = null###
-    
-    #if loc is 'x:min'
-      #extremeValue =  @xAxisLeftExtremeValue
-    #else if loc is 'x:max'
-      #extremeValue =  @xAxisRightExtremeValue
-    #else if loc is 'y:min'
-      #extremeValue = @yAxisLowerExtremeValue
-    #else
-      #extremeValue = @yAxisUpperExtremeValue
-
-    ###@onClickAxisInput(loc, extremeValue)###
-
 window.ChaiBioCharts = window.ChaiBioCharts || {}
 window.ChaiBioCharts.AmplificationChart = AmplificationChart
