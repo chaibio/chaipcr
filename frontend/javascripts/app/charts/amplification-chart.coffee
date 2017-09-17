@@ -83,16 +83,12 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
     else
       if val < 10
         return 10
-      if val % 10 > 0
-        num_length = val.toString().length
-        num_length = if val < 10 then 2 else num_length
-        rounddown = '1'
-        for i in [0...num_length - 1] by 1
-          rounddown = rounddown + "0"
-        rounddown = rounddown * 1
-        rounddown
-      else
-        val
+      num_length = val.toString().length
+      num_length = if val < 10 then 2 else num_length
+      rounddown = '1'
+      for i in [0...num_length - 1] by 1
+        rounddown = rounddown + "0"
+      rounddown * 1
 
   getYLogTicks: (min, max) ->
     min = if min < 10 then 10 else min
