@@ -126,7 +126,10 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
       y = '10' + @formatPower(Math.round(Math.log(y) / Math.LN10))
       return y
     else
-      super
+      if (@getMaxY() - @getMinY()) > 20000
+        return (Math.round(y / 1000)) + @config.axes.y.unit
+      else
+        return y
 
   yAxisLogInputFormat: (val) ->
     val = Math.round(val)
@@ -290,18 +293,18 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
       super
     
     # update input state
-    extremeValue = null
+    ###extremeValue = null###
     
-    if loc is 'x:min'
-      extremeValue =  @xAxisLeftExtremeValue
-    else if loc is 'x:max'
-      extremeValue =  @xAxisRightExtremeValue
-    else if loc is 'y:min'
-      extremeValue = @yAxisLowerExtremeValue
-    else
-      extremeValue = @yAxisUpperExtremeValue
+    #if loc is 'x:min'
+      #extremeValue =  @xAxisLeftExtremeValue
+    #else if loc is 'x:max'
+      #extremeValue =  @xAxisRightExtremeValue
+    #else if loc is 'y:min'
+      #extremeValue = @yAxisLowerExtremeValue
+    #else
+      #extremeValue = @yAxisUpperExtremeValue
 
-    @onClickAxisInput(loc, extremeValue)
+    ###@onClickAxisInput(loc, extremeValue)###
 
 window.ChaiBioCharts = window.ChaiBioCharts || {}
 window.ChaiBioCharts.AmplificationChart = AmplificationChart
