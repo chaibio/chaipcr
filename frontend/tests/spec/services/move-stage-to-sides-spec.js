@@ -99,4 +99,380 @@ describe("Testing moveStageToSides service", function() {
 
         expect(_moveStageToSides.moveToSide).toHaveBeenCalled();
     });
+
+    it("It should test moveToSideStageComponents method", function() {
+
+        var moveCount = 30;
+        var targetStage = {
+            stageGroup: {
+                setCoords: function() {},
+                set: function() {},
+            },
+            dots: {
+                set: function() {},
+                setCoords: function() {}
+            },
+            left: 50,
+            childSteps: [
+                {
+                    moveStep: function() {},
+                    circle: {
+                        moveCircleWithStep: function() {}
+                    }
+                }
+            ],
+            sourceStage: true,
+        };
+
+        spyOn(_moveStageToSides, "manageSourceStageStepMovement").and.returnValue(true);
+
+        spyOn(targetStage.stageGroup, "set");
+        spyOn(targetStage.dots, "set");
+        
+        spyOn(targetStage.childSteps[0], "moveStep");
+        spyOn(targetStage.childSteps[0].circle, "moveCircleWithStep");
+        
+        _moveStageToSides.moveToSideStageComponents(moveCount, targetStage);
+        
+        expect(targetStage.stageGroup.set).toHaveBeenCalled();
+        expect(targetStage.dots.set).toHaveBeenCalled();
+        expect(targetStage.left).toEqual(50 + moveCount);
+        expect(targetStage.childSteps[0].moveStep).toHaveBeenCalled();
+        expect(targetStage.childSteps[0].circle.moveCircleWithStep).toHaveBeenCalled();
+        expect(_moveStageToSides.manageSourceStageStepMovement).toHaveBeenCalled();
+    });
+
+    it("It should test manageSourceStageStepMovement method", function() {
+
+        var targetStage = {
+            childSteps: [
+                {
+                    previousIsMoving: true,
+                    left: 10,
+                    moveStep: function() {},
+                    circle: {
+                        moveCircleWithStep: function() {}
+                    },
+
+                }
+            ],
+            
+                parent: {
+                    moveDots: {
+                        setLeft: function() {},
+                        setCoords: function() {},
+                    }
+                }
+           
+        };
+
+        spyOn(targetStage.childSteps[0], "moveStep");
+        spyOn(targetStage.childSteps[0].circle, "moveCircleWithStep");
+        spyOn(targetStage.parent.moveDots, "setLeft");
+
+        _moveStageToSides.manageSourceStageStepMovement(targetStage);
+
+        expect(targetStage.childSteps[0].moveStep).toHaveBeenCalled();
+        expect(targetStage.childSteps[0].circle.moveCircleWithStep).toHaveBeenCalled();
+        expect(targetStage.parent.moveDots.setLeft).toHaveBeenCalledWith(targetStage.left + 6);
+        expect(targetStage.childSteps[0].left).toEqual(50);
+    });
+
+    it("It should test manageSourceStageStepMovement method when moveDots has baseStage", function() {
+        var targetStage = {
+            childSteps: [
+                {
+                    previousIsMoving: true,
+                    left: 10,
+                    moveStep: function() {},
+                    circle: {
+                        moveCircleWithStep: function() {}
+                    },
+
+                }
+            ],
+            
+            parent: {
+                moveDots: {
+                    baseStep: {
+                        left: 100,
+                        myWidth: 128,
+                    },
+                    setLeft: function() {},
+                    setCoords: function() {},
+                }
+            }
+        };
+
+        var baseStep = targetStage.parent.moveDots.baseStep;
+
+        spyOn(targetStage.childSteps[0], "moveStep");
+        spyOn(targetStage.childSteps[0].circle, "moveCircleWithStep");
+        spyOn(targetStage.parent.moveDots, "setLeft");
+
+        _moveStageToSides.manageSourceStageStepMovement(targetStage);
+
+        expect(targetStage.childSteps[0].moveStep).toHaveBeenCalled();
+        expect(targetStage.childSteps[0].circle.moveCircleWithStep).toHaveBeenCalled();
+        expect(targetStage.parent.moveDots.setLeft).toHaveBeenCalledWith(baseStep.left + baseStep.myWidth + 6);
+        expect(targetStage.childSteps[0].left).toEqual(50);
+    });
+    
+    it("It should test validMove method, when all the values passed are null ", function() {
+
+        rVal = _moveStageToSides.validMove(null, {}, {});
+        expect(rVal).not.toBeDefined();
+    });
+
+    it("It should test validMove method, when stageMovedDirection === null and direction === left", function() {
+
+        var direction = "left";
+        var draggedStage = {
+            index: 1,
+        };
+        var targetStage = {
+            stageMovedDirection: null,
+            previousStage: null,
+        };
+
+        var rVal = _moveStageToSides.validMove(direction, draggedStage, targetStage);
+
+        expect(rVal).toEqual(false);
+    });
+
+    it("It should test validMove method when targetStage has previousStage", function() {
+
+        var direction = "left";
+        var draggedStage = {
+            index: 1,
+        };
+        var targetStage = {
+            left: 225,
+            stageMovedDirection: null,
+            previousStage: {
+                left: 100,
+                myWidth: 128
+            },
+        };
+
+        var rVal = _moveStageToSides.validMove(direction, draggedStage, targetStage);
+
+        expect(rVal).toEqual(false);
+    });
+
+    it("It should test validMove method when targetStage has no previousStage", function() {
+
+        var direction = "left";
+        var draggedStage = {
+            index: 0,
+        };
+        var targetStage = {
+            left: 225,
+            stageMovedDirection: null,
+            previousStage: null,
+        };
+
+            var rVal = _moveStageToSides.validMove(direction, draggedStage, targetStage);
+
+        expect(rVal).not.toBeDefined();
+        expect(targetStage.stageMovedDirection).toEqual("left");
+    });
+
+    it("It should test validMove method when direction === right and has no next stage", function() {
+
+        var direction = "right";
+        var draggedStage = {
+            index: 0,
+        };
+        var targetStage = {
+            sourceStage: true,
+            left: 225,
+            stageMovedDirection: null,
+            nextStage: null,
+        };
+
+        var rVal = _moveStageToSides.validMove(direction, draggedStage, targetStage);
+
+        expect(rVal).toEqual(true);
+    });
+
+    it("It should test validMove method when direction === right and has no next stage, agin its not a sourceStage", function() {
+
+        var direction = "right";
+        var draggedStage = {
+            index: 0,
+        };
+        var targetStage = {
+            sourceStage: false,
+            left: 225,
+            stageMovedDirection: null,
+            nextStage: null,
+            parent: {
+                allStageViews: {
+                    length: 1
+                }
+            }
+        };
+
+        var rVal = _moveStageToSides.validMove(direction, draggedStage, targetStage);
+
+        expect(rVal).toEqual(false);
+    });
+    
+    it("It should test validMove method when draggedStage.index === targetStage.parent.allStageViews.length", function() {
+
+        var direction = "right";
+        var draggedStage = {
+            index: 1,
+        };
+        var targetStage = {
+            sourceStage: false,
+            left: 225,
+            stageMovedDirection: null,
+            nextStage: null,
+            parent: {
+                allStageViews: {
+                    length: 1
+                }
+            }
+        };
+
+        var rVal = _moveStageToSides.validMove(direction, draggedStage, targetStage);
+        expect(rVal).toEqual(true);
+        expect(targetStage.stageMovedDirection).toEqual('right');
+    });
+
+    it("It should test validMove method when targetStage has nextStage and '(targetStage.nextStage.left) - (targetStage.left + targetStage.myWidth) < 10'", function() {
+
+        var direction = "right";
+        var draggedStage = {
+            index: 1,
+        };
+        
+        var targetStage = {
+            sourceStage: false,
+            left: 225,
+            myWidth: 50,
+            stageMovedDirection: null,
+            nextStage: {
+                left: 260
+            },
+            parent: {
+                allStageViews: {
+                    length: 1
+                }
+            }
+        };
+
+        var rVal = _moveStageToSides.validMove(direction, draggedStage, targetStage);
+        expect(rVal).toEqual(false);
+    });
+
+    it("It should test validMove method when targetStage and its next stage has > 10 difference", function() {
+
+        var direction = "right";
+        var draggedStage = {
+            index: 1,
+        };
+        
+        var targetStage = {
+            sourceStage: false,
+            left: 225,
+            myWidth: 50,
+            stageMovedDirection: null,
+            nextStage: {
+                left: 400
+            },
+            parent: {
+                allStageViews: {
+                    length: 1
+                }
+            }
+        };
+
+        var rVal = _moveStageToSides.validMove(direction, draggedStage, targetStage);
+        expect(targetStage.stageMovedDirection).toEqual('right');
+    });
+
+    it("It should test validMove method when it has stageMovedDirection and directions are right", function() {
+
+        var direction = "right";
+        var draggedStage = {
+            index: 1,
+        };
+        
+        var targetStage = {
+            sourceStage: false,
+            left: 225,
+            myWidth: 50,
+            stageMovedDirection: 'right',
+            nextStage: {
+                left: 400
+            },
+            parent: {
+                allStageViews: {
+                    length: 1
+                }
+            }
+        };
+
+        var rVal = _moveStageToSides.validMove(direction, draggedStage, targetStage);
+        expect(rVal).toEqual(false);
+
+    });
+
+    it("It should test validMove method when it has stageMovedDirection and directions are left", function() {
+
+        var direction = "left";
+        var draggedStage = {
+            index: 1,
+        };
+        
+        var targetStage = {
+            sourceStage: false,
+            left: 225,
+            myWidth: 50,
+            stageMovedDirection: 'left',
+            nextStage: {
+                left: 400
+            },
+            parent: {
+                allStageViews: {
+                    length: 1
+                }
+            }
+        };
+
+        var rVal = _moveStageToSides.validMove(direction, draggedStage, targetStage);
+        expect(rVal).toEqual(false);
+
+    });
+
+    it("It should test validMove method when it has stageMovedDirection and directions are different", function() {
+
+        var direction = "left";
+        var draggedStage = {
+            index: 1,
+        };
+        
+        var targetStage = {
+            sourceStage: false,
+            left: 225,
+            myWidth: 50,
+            stageMovedDirection: 'right',
+            nextStage: {
+                left: 400
+            },
+            parent: {
+                allStageViews: {
+                    length: 1
+                }
+            }
+        };
+
+        var rVal = _moveStageToSides.validMove(direction, draggedStage, targetStage);
+        expect(rVal).toEqual(true);
+
+    });
+
 });

@@ -95,11 +95,14 @@ $(document).ready(function() {
 	var getDevice = function() {
 		$.get("http://localhost:80/device")
 			.done(function(data) {
-				if (data.software.version) {
-					$(".version-text").text("V.   ").show();
-					$(".version-value").text(data.software.version).show();
+				//if(typeof (data.software.version) != 'undefined' ){
+					if (data && data.software && data.software.version) {
+						$(".version-text").text("V.   ").show();
+						$(".version-value").text(data.software.version).show();
 					//clearInterval(insure); // Now we keep looking if we have connection.
-				}
+					}
+
+				//}
 				if (data.serial_number) {
 					$(".serial-value").text(data.serial_number).show();
 					$(".serial-text").text("SERIAL:").show();
