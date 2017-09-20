@@ -509,6 +509,7 @@ class BaseChart
       @gY.call(@yAxis.scale(@zoomTransform.rescaleY(@yScale)))
     #text label for the y axis
     @setYAxisLabel()
+    @lastYScale = @yScale
 
   setYAxisLabel: ->
     return if not @config.axes.y.label
@@ -1242,7 +1243,7 @@ class BaseChart
 
   updateAxesExtremeValues: ->
     xScale = @getXScale()
-    yScale = @lastYScale or @yScale
+    yScale = @getYScale()
     minWidth = 10
     if @xAxisLeftExtremeValue.text
       text = @xAxisLeftExtremeValue.text
@@ -1360,7 +1361,7 @@ class BaseChart
     @setMouseOverlay()
     @setYAxis()
     @setXAxis()
-    @drawLines(@config.series)
+    @drawLines()
     @makeCircle()
     @updateZoomScaleExtent()
     @drawAxesExtremeValues()

@@ -67,7 +67,8 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
         Math.ceil(val) * 1000
     else
       num_length = if val >= @getMaxY() then val.toString().length else val.toString().length - 1
-      roundup = '1'
+      roundup = val.toString().charAt 0
+      console.log 'roundup', roundup
       for i in [0...num_length] by 1
         roundup = roundup + "0"
       roundup * 1
@@ -90,26 +91,39 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
         rounddown = rounddown + "0"
       rounddown * 1
 
+  base10: (num) ->
+    b = '1'
+    num_length = num.toString().length
+    while b.length < num_length
+      b += '0'
+
+    return b * 1
+
   getYLogTicks: (min, max) ->
     min = if min < 10 then 10 else min
     min_num_length = min.toString().length
     max_num_length = max.toString().length
 
-    min = '1'
+    min = if min > @getMinY() then min.toString().charAt(0) else '1'
     for i in [0...min_num_length - 1] by 1
       min = "#{min}0"
     min = min * 1
 
-    max = '1'
+    max = if max < @getMaxY() then min.toString().charAt(0) else '1'
     for i in [0...max_num_length] by 1
       max = "#{max}0"
     max = max * 1
 
     calibs = []
     calib = min
-    while calib <= max
-      calibs.push(calib)
+    calibs.push(min)
+    calib = @base10(calib)
+    while calib < max
       calib = calib * 10
+      calibs.push(calib)
+
+    calibs.push max
+    console.log calibs
 
     return calibs
 
@@ -164,6 +178,7 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
       @gY.call(@yAxis.scale(@zoomTransform.rescaleY(@yScale)))
     #text label for the y axis
     @setYAxisLabel()
+    @lastYScale = @yScale
 
   hideLastAxesTicks: ->
     spacingX = 20
@@ -257,6 +272,8 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
   onAxisInput: (loc, input, val) ->
     if @config.axes.y.scale is 'log' and (loc is 'y:min' or loc is 'y:max')
       val = val.replace(/[^0-9\.\-]/g, '')
+      if val.match(/0/g)?.length is val.length
+        return val
       input.value = if val is '' then val else @yAxisLogInputFormat(val)
       @setCaretPosition(input, input.value.length)
     else
