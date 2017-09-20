@@ -123,6 +123,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
 
       $http.get(host + ':8000/network/wlan')
       .then(function(result) {
+        console.log(result.data, "bing");
         if(! result.data.state) {
           return null;
         }
@@ -139,7 +140,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       $http.get(host + ':8000/network/eth0')
       .then(function(ethernet) {
         that.connectedEthernet = ethernet.data;
-        if(ethernet.data.state.address){
+        if(ethernet.data.state.address) {
           $rootScope.$broadcast("ethernet_detected");
         }
       });
