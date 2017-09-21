@@ -58,6 +58,16 @@ describe("Testing NetworkSettingsService", function() {
         expect(_$http.get).toHaveBeenCalled();
     });
 
+    it("It should test getWifiNetworks method, when connection rejected", function() {
+
+        spyOn(_$http, "get").and.callThrough();
+        $httpBackend.expectGET( _host + ':8000/network/wlan/scan').respond(502);
+        _NetworkSettingsService.getWifiNetworks();
+        $httpBackend.flush();
+        expect(_$http.get).toHaveBeenCalled();
+        // delay.reject() to be executed
+    });
+
     it("It should test getSettings method", function() {
 
         spyOn(_NetworkSettingsService, "accessLanLookup").and.returnValue(true);
@@ -85,8 +95,9 @@ describe("Testing NetworkSettingsService", function() {
 
     it("It should test lanLookup method when request fails", function() {
 
+        $httpBackend.expectGET(_host + ':8000/network/wlan').respond(502);
         spyOn(_NetworkSettingsService, "processOnError").and.returnValue(true);
-        $httpBackend.expectGET(_host + ':8000/network/wlan').respond(503, '');
+
         _NetworkSettingsService.lanLookup();
         $httpBackend.flush();
         expect(_NetworkSettingsService.processOnError).toHaveBeenCalled();
@@ -314,6 +325,24 @@ describe("Testing NetworkSettingsService", function() {
             restart: "okay"
         });
 
-        
+        _NetworkSettingsService.restart();
+        $httpBackend.flush();
+        expect(_NetworkSettingsService.userSettings.wifiSwitchOn).toEqual(true);
+        expect(_NetworkSettingsService.wirelessError).toEqual(false);
     });
+
+    it("It should test restart method, when connection refused", function() {
+        
+        $httpBackend.expectPOST(_host + ':8000/network/wlan/connect').respond(502);
+        _NetworkSettingsService.restart();
+        $httpBackend.flush();
+        // This should execute delay.reject()
+    });
+
+    it("It should test stopInterval method", function() {
+
+        _NetworkSettingsService.stopInterval();
+        expect(_NetworkSettingsService.intervalKey).toEqual(null);
+    });
+
 });
