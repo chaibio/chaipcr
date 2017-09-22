@@ -68,7 +68,6 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
     else
       num_length = if val >= @getMaxY() then val.toString().length else val.toString().length - 1
       roundup = val.toString().charAt 0
-      console.log 'roundup', roundup
       for i in [0...num_length] by 1
         roundup = roundup + "0"
       roundup * 1
@@ -123,7 +122,6 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
       calibs.push(calib)
 
     calibs.push max
-    console.log calibs
 
     return calibs
 
