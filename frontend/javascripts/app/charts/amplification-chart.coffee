@@ -148,9 +148,9 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
     svg = @chartSVG.select('.chart-g')
 
     max = if angular.isNumber(@config.axes.y.max) then @config.axes.y.max else if @hasData() then @getMaxY() else @DEFAULT_MAX_Y
-    min = if angular.isNumber(@config.axes.y.min) then @config.axes.y.min else if @hasData() then @getMinY() else @DEFAULT_MIN_Y
-    # add allowance for interpolation curves
     max = if @config.axes.y.scale is 'linear' then @roundUpExtremeValue(max) else max
+
+    min = if angular.isNumber(@config.axes.y.min) then @config.axes.y.min else if @hasData() then @getMinY() else @DEFAULT_MIN_Y
     min = if @config.axes.y.scale is 'linear' then @roundDownExtremeValue(min) else min
 
     @yScale = if @config.axes.y.scale is 'log' then d3.scaleLog() else d3.scaleLinear()
@@ -234,38 +234,17 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
     val = val.toString().replace(unit, '')
     if axis is 'y'
       if val is ''
-        val = if loc is 'y:max' then @roundUpExtremeValue(@getMaxY()) else @roundDownExtremeValue(@getMinY())
+        val = if loc is 'y:max' then @getMaxY() else @getMinY()
         val = val.toString()
       val = if @config.axes.y.scale is 'linear'
               val.replace(/[^0-9\.\-]/g, '') * 1000
             else
               newval = val.replace(/[^0-9\.\-]/g, '') * 1
-              newval = if loc is 'y:max' then @roundUpExtremeValue(newval) else @roundDownExtremeValue(newval)
+              newval = if loc is 'y:max' then newval else newval
               newval
       val = val + unit if @config.axes.y.scale is 'linear'
       val = val.toString()
       super
-
-      #if @config.axes.y.scale is 'log'
-        #yScale = @getYScale()
-        #min = Math.round yScale.invert(@height)
-        #max = Math.round yScale.invert(0)
-        #ticks = @getYLogTicks(min, max)
-        #console.log 'min', min
-        #console.log 'max', max
-        #console.log 'ticks', ticks
-        #@yAxis = d3.axisLeft(@getYScale()).tickValues(ticks)
-        #@yAxis.tickFormat (y) =>
-          #@yAxisTickFormat(y)
-        
-        #svg = @chartSVG.select('.chart-g')
-
-        #@gY.remove()
-        #@gY = svg.append("g")
-          #.attr("class", "axis y-axis")
-          #.attr('fill', 'none')
-          #.call(@yAxis)
-          #.on('mouseenter', => @hideMouseIndicators())
 
     else
       super

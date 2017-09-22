@@ -646,7 +646,6 @@ class BaseChart
     else
       yScale = @lastYScale or @yScale
       val= if loc is 'y:max' then yScale.invert(0) else yScale.invert(@height)
-      console.log val
       val = @yAxisTickFormat(val)
       val = val.toString()
       extremeValue.input.node().value = val
@@ -810,8 +809,8 @@ class BaseChart
         val = @roundDownExtremeValue(@getMinY())
       if loc is 'y:max'
         val = @roundDownExtremeValue(@getMaxY())
-    console.log val
     val = val * 1
+
     if loc is 'y:max'
       maxY = if angular.isNumber(val) and !window.isNaN(val) then val else @roundUpExtremeValue(@getMaxY())
       y = @yScale
