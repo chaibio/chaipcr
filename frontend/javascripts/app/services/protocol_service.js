@@ -32,8 +32,11 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
 
       var delay, that = this;
       delay = $q.defer();
-      Experiment.get({'id': $stateParams.id})
-      .then(function(data) {
+      
+      var del = Experiment.get({'id': $stateParams.id});
+      
+      del.then(function(data) {
+        
         that.protocol = data.experiment;
         //$rootScope.$broadcast("dataLoaded");
         delay.resolve(data);
