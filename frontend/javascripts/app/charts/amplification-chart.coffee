@@ -86,7 +86,7 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
         return 10
       num_length = val.toString().length
       num_length = if val < 10 then 2 else num_length
-      rounddown = '1'
+      rounddown = val.toString().charAt(0)
       for i in [0...num_length - 1] by 1
         rounddown = rounddown + "0"
       rounddown * 1
@@ -104,12 +104,12 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
     min_num_length = min.toString().length
     max_num_length = max.toString().length
 
-    min = if min > @getMinY() then min.toString().charAt(0) else '1'
+    min = '1'
     for i in [0...min_num_length - 1] by 1
       min = "#{min}0"
     min = min * 1
 
-    max = if max < @getMaxY() then min.toString().charAt(0) else '1'
+    max = '1'
     for i in [0...max_num_length] by 1
       max = "#{max}0"
     max = max * 1
@@ -129,7 +129,8 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
 
   yAxisTickFormat: (y) ->
     if @config.axes.y.scale is 'log'
-      y = '10' + @formatPower(Math.round(Math.log(y) / Math.LN10))
+      y0 = y.toString().charAt(0)
+      y = (if y0 is '1' then '10' else y0 + ' x 10') + @formatPower(Math.round(Math.log(y) / Math.LN10))
       return y
     else
       if (@getMaxY() - @getMinY()) > 20000
@@ -169,67 +170,17 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
       @yAxisTickFormat(y)
 
     @gY = svg.append("g")
-        .attr("class", "axis y-axis")
-        .attr('fill', 'none')
-        .call(@yAxis)
-        .on('mouseenter', => @hideMouseIndicators())
+          .attr("class", "axis y-axis")
+          .attr('fill', 'none')
+          .call(@yAxis)
+          .on('mouseenter', => @hideMouseIndicators())
 
+    
     if @zoomTransform.rescaleY
       @gY.call(@yAxis.scale(@zoomTransform.rescaleY(@yScale)))
     #text label for the y axis
     @setYAxisLabel()
     @lastYScale = @yScale
-
-  hideLastAxesTicks: ->
-    spacingX = 20
-    spacingY = 1
-    xAxisLeftExtremeValueText = @xAxisLeftExtremeValue.text
-    xAxisRightExtremeValueText = @xAxisRightExtremeValue.text
-    yAxisLowerExtremeValueText = @yAxisLowerExtremeValue.text
-    yAxisUpperExtremeValueText = @yAxisUpperExtremeValue.text
-
-    config = @config
-
-    # x ticks
-    ticks = @chartSVG.selectAll('g.axis.x-axis > g.tick')
-
-
-    width = @width
-    num_ticks = ticks.size()
-    ticks.each (d, i) ->
-
-      if config.axes.y.scale is 'log'
-        return "xtick_#{i}"
-
-      if (i is 0)
-        textWidth = xAxisLeftExtremeValueText.node().getBBox().width
-        x = this.transform.baseVal[0].matrix.e
-        if x < textWidth + spacingX
-          d3.select(this).attr('opacity', 0)
-      if (i is num_ticks - 1)
-        textWidth = xAxisRightExtremeValueText.node().getBBox().width
-        x = this.transform.baseVal[0].matrix.e
-        if x >  width - (textWidth + spacingX)
-          d3.select(this).attr('opacity', 0)
-    # y ticks
-    ticks = @chartSVG.selectAll('g.axis.y-axis > g.tick')
-    num_ticks = ticks.size()
-    height = @height
-    ticks.each (d, i) ->
-
-      if config.axes.y.scale is 'log'
-        return "ytick_#{i}"
-
-      if (i is 0)
-        textHeight = yAxisLowerExtremeValueText.node().getBBox().height
-        y = this.transform.baseVal[0].matrix.f
-        if y >  height - (textHeight + spacingY)
-          d3.select(this).attr('opacity', 0)
-      if (i is num_ticks - 1)
-        textHeight = yAxisUpperExtremeValueText.node().getBBox().height
-        y = this.transform.baseVal[0].matrix.f
-        if y < textHeight + spacingY
-          d3.select(this).attr('opacity', 0)
 
   validateBackSpace: (loc, input) ->
     axis = if loc is 'y:min' or loc is 'y:max' then 'y' else 'x'
@@ -295,9 +246,29 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
               newval
       val = val + unit if @config.axes.y.scale is 'linear'
       val = val.toString()
-      console.log 'roundedupY', val
       super
-    
+
+      #if @config.axes.y.scale is 'log'
+        #yScale = @getYScale()
+        #min = Math.round yScale.invert(@height)
+        #max = Math.round yScale.invert(0)
+        #ticks = @getYLogTicks(min, max)
+        #console.log 'min', min
+        #console.log 'max', max
+        #console.log 'ticks', ticks
+        #@yAxis = d3.axisLeft(@getYScale()).tickValues(ticks)
+        #@yAxis.tickFormat (y) =>
+          #@yAxisTickFormat(y)
+        
+        #svg = @chartSVG.select('.chart-g')
+
+        #@gY.remove()
+        #@gY = svg.append("g")
+          #.attr("class", "axis y-axis")
+          #.attr('fill', 'none')
+          #.call(@yAxis)
+          #.on('mouseenter', => @hideMouseIndicators())
+
     else
       super
     

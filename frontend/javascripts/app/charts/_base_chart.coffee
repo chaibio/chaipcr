@@ -446,7 +446,6 @@ class BaseChart
       @gX.call(@xAxis.scale(@lastXScale))
 
     @zoomTransform = transform
-
     @updateAxesExtremeValues()
 
     if (@onZoomAndPan and !@editingYAxis)
@@ -1294,7 +1293,6 @@ class BaseChart
 
     # x ticks
     ticks = @chartSVG.selectAll('g.axis.x-axis > g.tick')
-
 
     width = @width
     num_ticks = ticks.size()
