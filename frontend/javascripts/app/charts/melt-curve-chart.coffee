@@ -10,7 +10,6 @@ class MeltCurveChart extends window.ChaiBioCharts.AmplificationChart
     top: 10
     bottom: 20
 
-
   getScaleExtent: ->
     return @getMaxX()
 

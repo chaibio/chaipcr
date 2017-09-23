@@ -147,7 +147,7 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
       y = (if y0 is '1' then '10' else y0 + ' x 10') + @formatPower(Math.round(Math.log(y) / Math.LN10))
       return y
     else
-      if (@getMaxY() - @getMinY()) > 20000
+      if (@getMaxY() - @getMinY()) > 10000
         return (Math.round(y / 1000)) + @config.axes.y.unit
       else
         return y
