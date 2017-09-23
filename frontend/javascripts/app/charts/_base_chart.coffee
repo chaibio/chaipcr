@@ -757,6 +757,8 @@ class BaseChart
         @updateAxesExtremeValues()
       )
       .on('keydown', =>
+        if d3.event.keyCode is 39
+          @validateArrowInput('x:min', input.node(), input.node().value.trim())
         if d3.event.keyCode is 13 and typeof @onEnterAxisInput is 'function'
           @onEnterAxisInput('x:min', input.node(), input.node().value.trim())
           d3.event.preventDefault()
@@ -798,6 +800,13 @@ class BaseChart
       return true
     else
       return false
+
+  validateArrowInput: (loc, input, val) ->
+    axis = if loc is 'y:min' or loc is 'y:max' then 'y' else 'x'
+    unit = @config.axes[axis].unit or ''
+    caret = input.selectionStart + 1
+    if val.length - unit.length < caret
+      d3.event.preventDefault()
 
   onEnterAxisInput: (loc, input, val) ->
     axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
@@ -981,6 +990,8 @@ class BaseChart
         @updateAxesExtremeValues()
       )
       .on('keydown', =>
+        if d3.event.keyCode is 39
+          @validateArrowInput('x:max', input.node(), input.node().value)
         if d3.event.keyCode is 13 and typeof @onEnterAxisInput is 'function'
           @onEnterAxisInput('x:max', input.node(), input.node().value.trim())
           d3.event.preventDefault()
@@ -1099,6 +1110,8 @@ class BaseChart
           @onAxisInputBaseFunc('y:max', input.node(), input.node().value.trim())
       )
       .on('keydown', =>
+        if d3.event.keyCode is 39
+          @validateArrowInput('y:max', input.node(), input.node(). value)
         if d3.event.keyCode is 13 and typeof @onEnterAxisInput is 'function'
           @onEnterAxisInput('y:max', input.node(), input.node().value.trim())
           d3.event.preventDefault()
@@ -1215,6 +1228,8 @@ class BaseChart
           @onAxisInputBaseFunc('y:min', input.node(), input.node().value.trim())
       )
       .on('keydown', =>
+        if d3.event.keyCode is 39
+          @validateArrowInput('y:min', input.node(), input.node().value)
         if d3.event.keyCode is 13 and typeof @onEnterAxisInput is 'function'
           @onEnterAxisInput('y:min', input.node(), input.node().value.trim())
           d3.event.preventDefault()
