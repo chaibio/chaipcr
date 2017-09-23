@@ -10,6 +10,10 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
     right: 15
     bottom: 50
 
+  inK: ->
+    @getMaxY() - @getMinY() > 20000
+
+  getYUnit: -> if @inK() then 'k' else ''
 
   formatPower: (d) ->
     superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹"
@@ -60,7 +64,8 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
   computedMaxY: ->
     max = if angular.isNumber(@config.axes.y.max) then @config.axes.y.max else if @hasData() then @getMaxY() else @DEFAULT_MAX_Y
     if @config.axes.y.scale is 'linear'
-      return @roundUpExtremeValue( max + @getYExtremeValuesAllowance())
+      m = @roundUpExtremeValue( max + @getYExtremeValuesAllowance())
+      return m
     else
       ticks = @getYLogTicks(@getMinY(), @getMaxY())
       return ticks[ticks.length - 1]
@@ -75,12 +80,11 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
 
   roundUpExtremeValue: (val) ->
     if @config.axes.y.scale is 'linear'
-      #val += @getYExtremeValuesAllowance()
-      val = val / 1000
-      if Math.abs(val) >= 10
+      val = if @inK() then val / 1000 else val
+      if @inK()
         Math.ceil(val / 5) * 5 * 1000
       else
-        Math.ceil(val) * 1000
+        Math.ceil(val) * 1
     else
       num_length = val.toString().length - 1
       roundup = val.toString().charAt 0
@@ -90,12 +94,11 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
 
   roundDownExtremeValue: (val) ->
     if @config.axes.y.scale is 'linear'
-      #val = val - @getYExtremeValuesAllowance()
-      val = val / 1000
-      if Math.abs(val) >= 10
+      val = if @inK() then val / 1000 else val
+      if @inK()
         Math.floor(val / 5) * 5 * 1000
       else
-        Math.floor(val) * 1000
+        Math.floor(val) * 1
     else
       if val < 10
         return 10
@@ -147,10 +150,10 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
       y = (if y0 is '1' then '10' else y0 + ' x 10') + @formatPower(Math.round(Math.log(y) / Math.LN10))
       return y
     else
-      if (@getMaxY() - @getMinY()) > 10000
-        return (Math.round(y / 1000)) + @config.axes.y.unit
+      if @inK()
+        return (Math.round(y / 1000)) + @getYUnit()
       else
-        return y
+        return Math.round(y * 10) / 10
 
   yAxisLogInputFormat: (val) ->
     val = Math.round(val)
@@ -176,6 +179,7 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
     else
       @yScale.range([@height, 0]).domain([min, max])
       @yAxis = d3.axisLeft(@yScale)
+      @yAxis.ticks(8)
     
     @yAxis.tickFormat (y) =>
       @yAxisTickFormat(y)
@@ -197,7 +201,7 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
     axis = if loc is 'y:min' or loc is 'y:max' then 'y' else 'x'
     value = input.value
     selection = input.selectionStart
-    unit = @config.axes[axis].unit || ''
+    unit = if axis is 'y' then @getYUnit() else @config.axes[axis].unit or ''
     if @config.axes.y.scale is 'linear' and (selection > value.length - unit.length)
       d3.event.preventDefault()
       return true
@@ -211,13 +215,13 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
     else
       if @config.axes.y.scale is 'linear'
         return super
+      # log
       yScale = @lastYScale or @yScale
       val = if loc is 'y:max' then yScale.invert(0) else yScale.invert(@height)
       val = @yAxisLogInputFormat(val)
       val = val.toString()
       extremeValue.input.node().value = val
       extremeValue.text.text(val)
-      val = val.replace(@config.axes.y.unit, '') if @config.axes.y.unit and @config.axes.y.scale isnt 'log'
       val = val.trim()
       @setCaretPosition(extremeValue.input.node(), val.length)
 
@@ -239,17 +243,21 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
       input.value = if val is '' then val else @yAxisLogInputFormat(val)
       @setCaretPosition(input, input.value.length)
     else
-      super
+      val = val.replace(/[^0-9\.\-]/g, '')
+      axis = if loc is 'y:max' or loc is 'y:min' then 'y' else 'x'
+      unit = if axis is 'y' then @getYUnit() else @config.axes[axis].unit or ''
+      input.value = val + unit
+      @setCaretPosition(input, input.value.length - unit.length)
 
   onEnterAxisInput: (loc, input, val) ->
     axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
-    unit = @config.axes[axis].unit || ''
+    unit = if axis is 'y' then @getYUnit() else @config.axes[axis].unit or ''
     val = val.toString().replace(unit, '')
 
     return super if val is ''
 
     if axis is 'y'
-      val = if @config.axes.y.scale is 'linear'
+      val = if @config.axes.y.scale is 'linear' and @inK()
               val.replace(/[^0-9\.\-]/g, '') * 1000
             else
               val.replace(/[^0-9\.\-]/g, '') * 1
