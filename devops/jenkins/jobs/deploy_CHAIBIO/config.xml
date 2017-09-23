@@ -233,10 +233,22 @@ ENDSSH
         cd chaipcr || exit 1
         cd web
         gem sources --add http://rubygems.org/
-  		gem install bundle
-        bundle install
-        gem install nodejs
+  		
+        sudo apt-get -y -q install ca-certificates software-properties-common 
+
+        sudo apt-add-repository -y ppa:rael-gc/rvm
+        sudo apt-get update
+        sudo apt-get -y -q install rvm nodejs nodejs-legacy
+		rvm install ruby-2.1.5
+
+        source /etc/profile.d/rvm.sh
+        rvm install ruby-2.1.5
+
+        npm install --global gulp
+        npm install --global gulp-cli
         npm install
+        
+        gulp deploy
         cd ..
         
         cat deploy.sh
@@ -306,7 +318,19 @@ cd /sdcard/upgrade/
 rm -r compile-browser || true
 mkdir compile-browser
 cd compile-browser/
-git clone https://github.com/chaibio/chaipcr.git || exit 1
+
+branch_param=
+
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+then
+   echo No build branch chosen
+else
+     branch_param=&quot;-b $(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
+     echo Cloning branch $branch_param
+fi
+
+git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
+
 cd /sdcard/upgrade/compile-browser/chaipcr/browser/ || exit 1
 
 rm /sdcard/upgrade/compile-browser/chaipcr/realtime/libraries/lib/libPoco*
@@ -328,16 +352,6 @@ sync
 rm -r /sdcard/upgrade/realtime-compile || true
 mkdir -p /sdcard/upgrade/realtime-compile
 cd /sdcard/upgrade/realtime-compile
-
-branch_param=
-
-if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
-then
-   echo No build branch chosen
-else
-     branch_param=&quot;-b $(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
-     echo Cloning branch $branch_param
-fi
 
 git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
 cd /sdcard/upgrade/realtime-compile/chaipcr/realtime || exit 1
@@ -596,20 +610,18 @@ rm master.zip || true
       <siteName>root@$build_machine:22</siteName>
       <command>echo Build/install LCD drivers
 cd ~/chaipcr/modules/LCDtouch_V3
-chmod 775 install_debian.sh
+chmod 775 install_debian49.sh
 mkdir -p /boot/uboot/dtbs/
-./install_debian.sh
-rm -rf /usr/src/linux*
+mkdir -p /boot/dts/
+mkdir -p /lib/firmware/
+./install_debian49.sh
+#rm -rf /usr/src/linux* why?
 sync
 
-echo Setting up Rserve
-cp ~/chaipcr/deploy/device/Rserve/Rserv.conf /etc
-cp ~/chaipcr/deploy/device/Rserve/r.service /lib/systemd/system/
-
 sync
 sync
- fsck /dev/mmcblk1p1 -y -f
- fsck /dev/mmcblk0p1 -y -f
+fsck /dev/mmcblk1p1 -y -f
+fsck /dev/mmcblk0p1 -y -f
 
 systemctl enable r.service
 echo Setup Rails app
@@ -629,8 +641,8 @@ echo database.yml created
 cd /root/chaipcr/web
 chmod 755 /root
 
-echo rserve 
-echo \n | gem install rserve-client #otherwise bundle fails, don&apos;t know why
+#echo rserve 
+#echo \n | gem install rserve-client #otherwise bundle fails, don&apos;t know why
 
 echo bundle
 echo &quot;\n&quot; | bundle
@@ -649,8 +661,10 @@ echo done rserev</command>
       <command>echo &quot;Install device tree overlay and PRU binary(do this every time it changes):&quot;
 cd ~/chaipcr/deploy/overlay
 bash ./build.sh
-sync
-cd</command>
+echo chai-pcr &gt; $SLOTS
+cat $SLOTS
+
+sync</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
