@@ -57,16 +57,32 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
     diff = max - min
     diff * 0.05
 
+  computedMaxY: ->
+    max = if angular.isNumber(@config.axes.y.max) then @config.axes.y.max else if @hasData() then @getMaxY() else @DEFAULT_MAX_Y
+    if @config.axes.y.scale is 'linear'
+      return @roundUpExtremeValue( max + @getYExtremeValuesAllowance())
+    else
+      ticks = @getYLogTicks(@getMinY(), @getMaxY())
+      return ticks[ticks.length - 1]
+
+  computedMinY: ->
+    min = if angular.isNumber(@config.axes.y.min) then @config.axes.y.min else if @hasData() then @getMinY() else @DEFAULT_MIN_Y
+    if @config.axes.y.scale is 'linear'
+      return @roundDownExtremeValue(min - @getYExtremeValuesAllowance())
+    else
+      ticks = @getYLogTicks(@getMinY(), @getMaxY())
+      return ticks[0]
+
   roundUpExtremeValue: (val) ->
     if @config.axes.y.scale is 'linear'
-      val += @getYExtremeValuesAllowance()
+      #val += @getYExtremeValuesAllowance()
       val = val / 1000
       if Math.abs(val) >= 10
         Math.ceil(val / 5) * 5 * 1000
       else
         Math.ceil(val) * 1000
     else
-      num_length = if val >= @getMaxY() then val.toString().length else val.toString().length - 1
+      num_length = val.toString().length - 1
       roundup = val.toString().charAt 0
       for i in [0...num_length] by 1
         roundup = roundup + "0"
@@ -74,7 +90,7 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
 
   roundDownExtremeValue: (val) ->
     if @config.axes.y.scale is 'linear'
-      val = val - @getYExtremeValuesAllowance()
+      #val = val - @getYExtremeValuesAllowance()
       val = val / 1000
       if Math.abs(val) >= 10
         Math.floor(val / 5) * 5 * 1000
@@ -147,16 +163,13 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
     @chartSVG.selectAll('.g-y-axis-text').remove()
     svg = @chartSVG.select('.chart-g')
 
-    max = if angular.isNumber(@config.axes.y.max) then @config.axes.y.max else if @hasData() then @getMaxY() else @DEFAULT_MAX_Y
-    max = if @config.axes.y.scale is 'linear' then @roundUpExtremeValue(max) else max
-
-    min = if angular.isNumber(@config.axes.y.min) then @config.axes.y.min else if @hasData() then @getMinY() else @DEFAULT_MIN_Y
-    min = if @config.axes.y.scale is 'linear' then @roundDownExtremeValue(min) else min
+    min = @computedMinY()
+    max = @computedMaxY()
 
     @yScale = if @config.axes.y.scale is 'log' then d3.scaleLog() else d3.scaleLinear()
 
     if @config.axes.y.scale is 'log'
-      ticks = @getYLogTicks(min, max)
+      ticks = @getYLogTicks(@getMinY(), @getMaxY())
       @yScale.range([@height, 0]).domain([ticks[0], ticks[ticks.length - 1]])
       @yAxis = d3.axisLeft(@yScale)
       @yAxis.tickValues(ticks)
@@ -232,22 +245,20 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
     axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
     unit = @config.axes[axis].unit || ''
     val = val.toString().replace(unit, '')
+
+    return super if val is ''
+
     if axis is 'y'
-      if val is ''
-        val = if loc is 'y:max' then @getMaxY() else @getMinY()
-        val = val.toString()
       val = if @config.axes.y.scale is 'linear'
               val.replace(/[^0-9\.\-]/g, '') * 1000
             else
-              newval = val.replace(/[^0-9\.\-]/g, '') * 1
-              newval = if loc is 'y:max' then newval else newval
-              newval
+              val.replace(/[^0-9\.\-]/g, '') * 1
+
+      val = if loc is 'y:min' then @roundDownExtremeValue(val) else @roundUpExtremeValue(val)
       val = val + unit if @config.axes.y.scale is 'linear'
       val = val.toString()
-      super
-
-    else
-      super
+      
+    super
     
 window.ChaiBioCharts = window.ChaiBioCharts || {}
 window.ChaiBioCharts.AmplificationChart = AmplificationChart

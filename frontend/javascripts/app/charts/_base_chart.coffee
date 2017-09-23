@@ -39,6 +39,12 @@ class BaseChart
     else
       false
 
+  computedMaxY: ->
+    if angular.isNumber(@config.axes.y.max) then @config.axes.y.max else if @hasData() then @getMaxY() else @DEFAULT_MAX_Y
+
+  computedMinY: ->
+    min = if angular.isNumber(@config.axes.y.min) then @config.axes.y.min else if @hasData() then @getMinY() else @DEFAULT_MIN_Y
+
   roundUpExtremeValue: (val) ->
     Math.ceil(val)
 
@@ -485,11 +491,8 @@ class BaseChart
     @chartSVG.selectAll('.g-y-axis-text').remove()
     svg = @chartSVG.select('.chart-g')
 
-    max = if angular.isNumber(@config.axes.y.max) then @config.axes.y.max else if @hasData() then @getMaxY() else @DEFAULT_MAX_Y
-    min = if angular.isNumber(@config.axes.y.min) then @config.axes.y.min else if @hasData() then @getMinY() else @DEFAULT_MIN_Y
-    # add allowance for interpolation curves
-    max = if @config.axes.y.scale is 'linear' then @roundUpExtremeValue(max) else max
-    min = if @config.axes.y.scale is 'linear' then @roundDownExtremeValue(min) else min
+    max = @computedMaxY()
+    min = @computedMinY()
 
     @yScale = d3.scaleLinear()
     @yScale.range([@height, 0]).domain([min, max])
@@ -750,7 +753,7 @@ class BaseChart
       .on('focusout', =>
         input.style('opacity', 0)
         text.attr('opacity', 1)
-        @xAxisLeftExtremeValue.focused = false
+        #@xAxisLeftExtremeValue.focused = false
         @updateAxesExtremeValues()
       )
       .on('keydown', =>
@@ -778,8 +781,8 @@ class BaseChart
         conHeight: conHeight
 
   onClickLeftXAxisInput: ->
-    return if @xAxisLeftExtremeValue.focused
-    @xAxisLeftExtremeValue.focused = true
+    #return if @xAxisLeftExtremeValue.focused
+    #@xAxisLeftExtremeValue.focused = true
     @xAxisLeftExtremeValue.text.attr('opacity', 0)
 
     if typeof @onClickAxisInput is 'function'
@@ -806,13 +809,14 @@ class BaseChart
       if loc is 'x:max'
         val = @getMaxX()
       if loc is 'y:min'
-        val = @roundDownExtremeValue(@getMinY())
+        val = @computedMinY()
       if loc is 'y:max'
-        val = @roundDownExtremeValue(@getMaxY())
+        val = @computedMaxY()
     val = val * 1
 
     if loc is 'y:max'
-      maxY = if angular.isNumber(val) and !window.isNaN(val) then val else @roundUpExtremeValue(@getMaxY())
+      max = @computedMaxY()
+      maxY = if angular.isNumber(val) and !window.isNaN(val) then val else max
       y = @yScale
       lastYScale = @lastYScale || y
       minY = lastYScale.invert(@height)
@@ -820,7 +824,6 @@ class BaseChart
       if minY >= maxY
         return false
 
-      max = @roundUpExtremeValue(@getMaxY())
       maxY = if maxY > max then max else maxY
       k = @height / (y(minY) - y(maxY))
 
@@ -833,12 +836,13 @@ class BaseChart
     if loc is 'y:min'
       y = @yScale
       lastYScale = @lastYScale || y
-      minY = if angular.isNumber(val) and !window.isNaN(val) then val else @roundDownExtremeValue(@getMinY())
+      min = @computedMinY()
+
+      minY = if angular.isNumber(val) and !window.isNaN(val) then val else min
       maxY = lastYScale.invert(0)
       if (minY >= maxY)
         return false
 
-      min = @roundDownExtremeValue(@getMinY())
       minY = if minY < min then min else minY
 
       k = @height / (y(minY) - y(maxY))
@@ -873,7 +877,7 @@ class BaseChart
       if (minX >= maxX)
         return false
       if val is ''
-        maxX = @roundUpExtremeValue(@getMaxX())
+        maxX = @getMaxX()
       if (maxX > @getScaleExtent())
         maxX = @getScaleExtent()
       k = @width / (x(maxX) - x(minX))
@@ -973,7 +977,7 @@ class BaseChart
       .on('focusout', =>
         input.style('opacity', 0)
         text.attr('opacity', 1)
-        @xAxisRightExtremeValue.focused = false
+        #@xAxisRightExtremeValue.focused = false
         @updateAxesExtremeValues()
       )
       .on('keydown', =>
@@ -1001,8 +1005,8 @@ class BaseChart
         conHeight: conHeight
 
   onClickRightXAxisInput: ->
-    return if @xAxisRightExtremeValue.focused
-    @xAxisRightExtremeValue.focused = true
+    #return if @xAxisRightExtremeValue.focused
+    #@xAxisRightExtremeValue.focused = true
     @xAxisRightExtremeValue.text.attr 'opacity', 0
     
     if typeof @onClickAxisInput is 'function'
@@ -1087,7 +1091,7 @@ class BaseChart
       .on('focusout', =>
         input.style('opacity', 0)
         text.attr('opacity', 1)
-        @yAxisUpperExtremeValue.focused = false
+        #@yAxisUpperExtremeValue.focused = false
         @updateAxesExtremeValues()
       )
       .on('keyup', =>
@@ -1117,8 +1121,8 @@ class BaseChart
         inputContainerOffset: inputContainerOffset
 
   onClickUpperYAxisInput: ->
-    return if @yAxisUpperExtremeValue.focused
-    @yAxisUpperExtremeValue.focused = true
+    #return if @yAxisUpperExtremeValue.focused
+    #@yAxisUpperExtremeValue.focused = true
     @yAxisUpperExtremeValue.text.attr('opacity', 0)
 
     if typeof @onClickAxisInput is 'function'
@@ -1203,7 +1207,7 @@ class BaseChart
       .on('focusout', =>
         input.style('opacity', 0)
         text.attr('opacity', 1)
-        @yAxisLowerExtremeValue.focused = false
+        #@yAxisLowerExtremeValue.focused = false
         @updateAxesExtremeValues()
       )
       .on('keyup', =>
@@ -1232,8 +1236,8 @@ class BaseChart
         conHeight: conHeight
 
   onClickLowerYAxisInput: ->
-    return if @yAxisLowerExtremeValue.focused
-    @yAxisLowerExtremeValue.focused = true
+    #return if @yAxisLowerExtremeValue.focused
+    #@yAxisLowerExtremeValue.focused = true
     @yAxisLowerExtremeValue.text.attr('opacity', 0)
 
     if typeof @onClickAxisInput is 'function'
