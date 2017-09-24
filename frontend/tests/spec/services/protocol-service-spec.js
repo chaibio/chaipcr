@@ -66,4 +66,194 @@ describe("Testing ExperimentLoader service", function() {
         expect(_ExperimentLoader.protocol.id).toEqual(10);
 
    });
+
+   it("It should test getExperiment method, when server reject the request", function() {
+       _$stateParams.id = 10;
+        
+        $httpBackend.expectGET('/experiments/10').respond(502, '');
+        _ExperimentLoader.getExperiment();
+
+        $httpBackend.flush();
+        expect(_ExperimentLoader.protocol.id).not.toBeDefined();
+
+   });
+
+   it("It should test loadFirstStages method", function() {
+        _ExperimentLoader.protocol = {
+            
+                protocol: {
+                    stages: [
+                        {
+                            stage: {
+                                name: "stage1"
+                            }
+                        }
+                    ]
+                }
+        };
+
+        var rv = _ExperimentLoader.loadFirstStages();
+        expect(rv.name).toEqual("stage1");
+   });
+
+   it("It should test loadFirstStep method", function() {
+
+         _ExperimentLoader.protocol = {
+            
+                protocol: {
+                    stages: [
+                        {
+                            stage: {
+                                steps: [
+                                    { step: "step1"},
+                                    { step: "step2"}
+                                ] 
+                            }
+                        }
+                    ]
+                }
+        };  
+        
+        var rv = _ExperimentLoader.loadFirstStep();
+        expect(rv).toEqual("step1");
+   });
+
+   it("It should test getNew mwthod", function() {
+
+        _ExperimentLoader.protocol = {
+            
+                protocol: {
+                    stages: [
+                        {
+                            stage: {
+                                steps: [
+                                    { step: "step1"},
+                                    { step: "step2"}
+                                ] 
+                            }
+                        },
+                        {
+                            stage: "target"
+                        }
+                    ]
+                }
+        };  
+        
+        var rv = _ExperimentLoader.getNew();
+        expect(rv).toEqual("target");
+   });
+
+   it("It should test update method", function() {
+
+        var dataToBeSend = {
+            name: "Stage"
+        };
+
+        var url = "http://localhost:8000/experiments/10";
+
+        $httpBackend.expectPUT(url).respond({
+            status: "okay"
+        });
+
+        _ExperimentLoader.update(url, dataToBeSend, _$q.defer());
+
+        $httpBackend.flush();
+   });
+
+   it("It should test update method, when server returns error", function() {
+
+        var dataToBeSend = {
+            name: "Stage"
+        };
+
+        var url = "http://localhost:8000/experiments/10";
+
+        $httpBackend.expectPUT(url).respond(502, '');
+
+        _ExperimentLoader.update(url, dataToBeSend, _$q.defer());
+
+        $httpBackend.flush();
+   });
+
+   it("It should test addStage method", function() {
+
+        var $scope = {
+            stage: {
+                id: 100,
+            },
+            protocol: {
+                protocol: {
+                    id: 10
+                }
+            }
+        };
+
+        var type = "Cycling";
+
+        var url = "/protocols/" + $scope.protocol.protocol.id + "/stages";
+
+        $httpBackend.expectPOST(url).respond(200);
+        _ExperimentLoader.addStage($scope, type);
+        $httpBackend.flush();
+   });
+
+   it("It should test addStage method, when request fail", function() {
+
+        var $scope = {
+            stage: {
+                id: 100,
+            },
+            protocol: {
+                protocol: {
+                    id: 10
+                }
+            }
+        };
+
+        var type = "Cycling";
+
+        var url = "/protocols/" + $scope.protocol.protocol.id + "/stages";
+
+        $httpBackend.expectPOST(url).respond(502);
+        _ExperimentLoader.addStage($scope, type);
+        $httpBackend.flush();
+   });
+
+   it("It should test moveStage method", function() {
+
+        var id = 10, prev_id = 9;
+        var url = "/stages/" + id + "/move";
+
+        $httpBackend.expectPOST(url).respond(200);
+
+        _ExperimentLoader.moveStage(id, prev_id);
+        $httpBackend.flush();
+   });
+
+   it("It should test moveStage method, when request fail", function() {
+
+        var id = 10, prev_id = 9;
+        var url = "/stages/" + id + "/move";
+
+        $httpBackend.expectPOST(url).respond(500);
+
+        _ExperimentLoader.moveStage(id, prev_id);
+        $httpBackend.flush();
+   });
+
+   it("It should test saveCycle method", function() {
+
+        var $scope = {
+            stage: {
+                num_cycles: 10,
+                id: 132
+            }
+        };
+
+        var url = "/stages/"+ $scope.stage.id;
+
+        $httpBackend.expectPUT(url).respond(200);
+        _ExperimentLoader.saveCycle($scope);
+        $httpBackend.flush();
+   });
 });
