@@ -26,19 +26,19 @@ window.ChaiBioTech.ngApp.service('moveStageToSidesWhileMoveStep', [
 
         this.moveStageToLeft = function(stage) {
     
-            while(stage) {
-                if(stage.stageMovedDirection === null && stage.nextStage) {
-                    this.moveStageToRight(stage.nextStage);
-                    break;
-                } else if(stage.stageMovedDirection === "left") {
-                    break;
-                } else if(stage.stageMovedDirection !== "left") {
-                    moveStageToSides.moveToSideStageComponents(-30, stage);
-                    stage.stageMovedDirection = "left";
-                    break;
-                } 
-                stage = stage.previousStage;
-            }
+            //while(stage) {
+            if(stage.stageMovedDirection === null && stage.nextStage) {
+                this.moveStageToRight(stage.nextStage);
+                //break;
+            } else if(stage.stageMovedDirection === "left") {
+                //break;
+            } else if(stage.stageMovedDirection !== "left") {
+                moveStageToSides.moveToSideStageComponents(-30, stage);
+                stage.stageMovedDirection = "left";
+                //break;
+            } 
+                //stage = stage.previousStage;
+            //}
         };
     }
 ]);

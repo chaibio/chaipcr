@@ -96,7 +96,7 @@ shared_ptr<IControl> QPCRFactory::constructLid(ADCController::ConsumersList &con
     settings.name = "lid";
     settings.thermistor.reset(new BetaThermistor(kLidThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits, kLidThermistorBetaCoefficient, kLidThermistorT0Resistance, kLidThermistorT0));
     settings.minTargetTemp = kLidMinTargetTemp;
-    settings.maxTargetTemp = kLidMaxTargetTemp;
+    settings.maxTargetTemp = qpcrApp.settings().configuration.lidMaxTemp;
     settings.minTempThreshold = kLidLowTempShutdownThreshold;
     settings.maxTempThreshold = kLidHighTempShutdownThreshold;
     settings.pidController = new PIDController({{150, 0.35, 100, 0}}, kLidPIDMin, kLidPIDMax, SinglePoleRecursiveFilter(0.01));//was 150, 0.2, 100, 0 ///0.3 works for gain
