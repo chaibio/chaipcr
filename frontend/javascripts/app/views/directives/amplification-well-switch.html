@@ -1,62 +1,46 @@
 <!--
-    Chai PCR - Software platform for Open qPCR and Chai's Real-Time PCR instruments.
-    For more information visit http://www.chaibio.com
+  Chai PCR - Software platform for Open qPCR and Chai's Real-Time PCR instruments.
+  For more information visit http://www.chaibio.com
 
-    Copyright 2016 Chai Biotechnologies Inc. <info@chaibio.com>
+  Copyright 2016 Chai Biotechnologies Inc. <info@chaibio.com>
 
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+  http://www.apache.org/licenses/LICENSE-2.0
 
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 -->
 <div class="amplification-well-switch">
-  <table class="on-off-buttons">
-    <tr style="border-bottom:2px solid black">
-      <td></td>
-      <td style="width: 12.5%" ng-repeat="i in loop" class="number B2" ng-bind="i+1"></td>
-    </tr>
-    <tr>
-      <td class="number B2">A</td>
-      <!--<td ng-repeat="i in loop">
-        <amplification-circle-button ng-model="buttons['well_'+$index]"></amplification-circle-button>
-      </td> -->
-      <td colspan="8" rowspan="2" class="selectable-on-off-buttons">
-        <div class="selectable-container">
-          <ol id="selectableol" ng-class="{amplification: chartType === 'amplification', melt_curve: chartType === 'melt-curve'}">
-            <li id="box{{$index + 1}}" ng-repeat="i in loop" class="topEight" ng-class="{special_left: $index == 0, special_right: $index == 7}">
-              <amplification-circle-button ng-model="buttons['well_'+$index]"></amplification-circle-button>
-            </li>
-            <li id="box{{$index + 9}}" ng-repeat="i in loop" class="bottomEight" ng-class="{special_left: $index == 0, special_right: $index == 7}">
-              <amplification-circle-button ng-model="buttons['well_'+($index+8)]"></amplification-circle-button>
-            </li>
-          </ol>
-        </div>
-        <!--<table >
-          <tr>
-            <td class="ui-widget-content" ng-repeat="i in loop">
-              <amplification-circle-button ng-model="buttons['well_'+$index]"></amplification-circle-button>
-            </td>
-          </tr>
-          <td class="ui-widget-content" ng-repeat="i in loop">
-            <amplification-circle-button ng-model="buttons['well_'+($index+8)]"></amplification-circle-button>
-          </td>
-          <tr>
-          </tr>
-        </table> !-->
-      </td>
-    </tr>
-    <tr>
-      <td class="number B2">B</td>
-      <!--<td ng-repeat="i in loop">
-        <amplification-circle-button ng-model="buttons['well_'+($index+8)]"></amplification-circle-button>
-      </td> -->
-    </tr>
+  <table>
+    <tbody>
+      <tr>
+        <th ng-style="{width: row_header_width + 'px'}" class="col-header"></th>
+        <th ng-repeat="col in columns" ng-style="{width: getCellWidth() + 'px'}" class="col-header">
+          {{col + 1}}
+        </th>
+      </tr>
+      <tr ng-repeat="row in rows">
+        <td class="row-header">
+          {{ row + 1 }}
+        </td>
+        <td ng-repeat="col in columns" class="well-switch">
+          <div class="well-switch-container" ng-init="i = (row + 1) * (col + 1) - 1; button = buttons['well_' + i];" >
+            <div class="well-switch-bar" ng-style="getStyleForWellBar(row, col, button, i)">
+            </div>
+            <div class="ct-cq-container">
+              {{ button.selected }}
+              <div> Cq <strong class="value">{{ button.ct[0] }}</strong> </div>
+              <div> Cq <strong class="value">{{ button.ct[1] }}</strong> </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
   </table>
 </div>

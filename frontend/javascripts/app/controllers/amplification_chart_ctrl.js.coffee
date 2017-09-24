@@ -174,7 +174,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         focus('editExpNameMode')
 
       $scope.updateSampleNameEnter = (well_num, name) ->
-        console.log(event.shiftKey)
         Experiment.updateWell($stateParams.id, well_num + 1, {'well_type':'sample','sample_name':name})
         $scope.editExpNameMode[well_num] = false
         if event.shiftKey
@@ -193,7 +192,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       Experiment.get(id: $stateParams.id).then (data) ->
         maxCycle = helper.getMaxExperimentCycle(data.experiment)
-        console.log "max cycle: #{maxCycle}"
         $scope.chartConfig.axes.x.max = maxCycle
         $scope.experiment = data.experiment
 
@@ -233,7 +231,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           Experiment
           .getAmplificationData($stateParams.id)
           .then (resp) ->
-            console.log resp
             $scope.fetching = false
             $scope.error = null
             if (resp.status is 200 and resp.data?.partial and $scope.enterState) or (resp.status is 200 and !resp.data.partial)
@@ -258,7 +255,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               retry()
 
           .catch (resp) ->
-            console.log resp
             if resp.status is 500
               $scope.error = resp.statusText || 'Unknown error'
             $scope.fetching = false
@@ -268,7 +264,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           retry()
 
       updateButtonCts = ->
-        console.log $scope.wellButtons
         for well_i in [0..15] by 1
           cts = _.filter AMPLI_DATA_CACHE.cq, (ct) ->
             ct[1] is well_i+1

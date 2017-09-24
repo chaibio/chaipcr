@@ -1,205 +1,42 @@
 @import './colors.css.scss';
-.selectable-container {
-  .circle {
-    position: relative;
-    text-align: center;
-    .triangle-icon-container {
-      width: 100%;
-      position: absolute;
-      bottom: 0px;
-      margin-left: -20px;
-      margin-right: -20px;
-      margin-bottom: -2px;
-    }
-    .selected-wheel-triangle {
-      opacity: 0;
-      width: 30px;
-    }
-    &.active {
-      .selected-wheel-triangle {
-        opacity: 1;
-      }
-    }
-  }
-}
 
-.choose-chart {
-  //margin-top: 5px;
-  //margin-bottom: 10px;
-  width: 100%;
-  .choose-chart-heading {
-    border-bottom: 2px solid black;
-  }
-  .chart-type-option {
-    cursor: pointer;
-    font-weight: bold;
-    margin-top: 10px;
-  }
-  .number {
-    text-align: center;
-    vertical-align: middle;
-    padding: 10px;
-    color: gray;
-  }
-  .circle {
-    $size: 90px;
-    $padding_top: 10px;
-    $border_width: 3px;
-    border-width: $border_width; //border-radius: 100px;
-    //border-style: solid;
-    //cursor: pointer;
-    font-size: 10px;
-    line-height: 1.5; //margin: 5px;
-    padding-top: $padding_top;
-    height: 80px; //width: $size;
-    opacity: 0.5; //border: 1px solid grey;
-    &.selected {
-      //border-width: $border_width + 2px;
-      //padding-top: $padding_top - 2px;
-      opacity: 1;
-      color: #000; //border-top: 1px solid;
-    }
-    .ct {
-      position: relative;
-      font-size: 11px;
-      .dot {
-        $size: 5px;
-        display: inline-block;
-        border-radius: 90px;
-        width: $size;
-        height: $size;
-      }
-      &.ct-1 {
-        .dot {
-          //background-color: $lightgray;
-          background-color: rgb(4, 160, 217);
-        }
-      }
-      &.ct-2 {
-        .dot {
-          //background-color: gray;
-          background-color: rgb(103, 188, 66);
-        }
-      }
-      .text {
-        display: inline-block;
-        vertical-align: middle;
-        color: black;
-      }
-    }
-    &.single-channel {
-      .ct {
-        margin-top: 8px;
-      }
-    }
-  }
-}
+.amplification-well-switch {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
-.selectable-container {
-  width: 100%;
-  height: 170px;
-  margin-left: 1px;
-  #selectableol {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    ;
+  table {
+    border-top: 2px solid #ccc;
   }
-  #selectableol li {
-    margin: 0px; //padding: 1px;
-    float: left;
-    width: 12.5%; //height: 80px;
-    font-size: 4em;
+
+  th, td {
+    border-left: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    border-top: 1px solid #eee;
+  }
+
+  .col-header {
+    font-family: 'dinot-regular';
+    font-size: 12px;
     text-align: center;
   }
-  hr {
-    border-top: 3px solid #eee;
+  .row-header {
+    text-align: center;
   }
-}
+  .well-switch {
+    height: 60px;
+    vertical-align: top;
 
-#selectableol .ui-selecting {
-  background: #FECA40;
-}
-
-#selectableol .ui-selected {
-  color: white;
-  border: solid 1px #000
-}
-
-#selectableol .ui-selecting {
-  border: solid 1px #000
-}
-
-#selectable {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  width: 850px;
-}
-
-#selectableol li {
-  padding: 1px;
-  float: left;
-  border: 1px solid #c5c5c5;
-  &.topEight {
-    border-top: 2px solid #c5c5c5;
+    .well-switch-bar {
+      margin: 5px 10px;
+      height: 5px;
+    }
+    .ct-cq-container {
+      border-top: 1px solid #eee;
+    }
+    .ct-cq-container {
+      padding: 0px 20px;
+    }
   }
-  &.bottomEight {
-    border-bottom: 2px solid #c5c5c5;
-  }
-  &.special_left {
-    border-left: 2px solid #c5c5c5;
-  }
-  &.special_right {
-    border-right: 2px solid #c5c5c5;
-  }
-}
-
-.noBorderRight {
-  border-right-color: #c5c5c5 !important;
-}
-
-.noBorderLeft {
-  //border-left-color: #c5c5c5 !important;
-}
-
-.noBorderBottom {
-  //border-bottom-color: #c5c5c5 !important;
-}
-
-.noBorderTop {
-  border-top-color: #c5c5c5 !important;
-}
-
-.specialBorderLeft {
-  border-left: solid 1px !important;
-}
-
-.specialBorderRight {
-  border-right: solid 1px !important;
-}
-
-.specialBorderTop {
-  border-top: solid 1px !important;
-}
-
-.specialBorderBottom {
-  border-bottom: solid 1px !important;
-}
-
-.lastBorderRight {
-  border-right: solid 2px #000 !important;
-}
-
-.firstBorderLeft {
-  border-left: solid 2px #000 !important;
-}
-
-.firstBorderBottom {
-  border-bottom: solid 2px #000 !important;
-}
-
-.firstBorderTop {
-  border-top: solid 2px #000 !important;
 }
