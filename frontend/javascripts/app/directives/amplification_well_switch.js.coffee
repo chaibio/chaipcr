@@ -71,7 +71,7 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
         'background-color': config.color
         'opacity': if config.selected then 1 else 0.25
 
-      $scope.dragStart = (type, index) ->
+      $scope.dragStart = (evt, type, index) ->
         # type can be 'column', 'row', 'well' or 'corner'
         # index is index of the type
         $scope.dragging = true
@@ -79,9 +79,9 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
           type: type
           index: index
 
-        $scope.dragged(type, index)
+        $scope.dragged(evt, type, index)
 
-      $scope.dragged = (type, index) ->
+      $scope.dragged = (evt, type, index) ->
         return if !$scope.dragging
         if $scope.dragStartingPoint.type is 'column'
           if type is 'well'
@@ -92,7 +92,9 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
           $scope.columns.forEach (col) ->
             col.selected = col.index >= min and col.index <= max
             $scope.rows.forEach (row) ->
-              $scope.wells["well_#{row.index * $scope.columns.length + col.index}"].selected = col.selected
+              well = $scope.wells["well_#{row.index * $scope.columns.length + col.index}"]
+              if not (evt.ctrlKey and well.selected)
+                well.selected = col.selected
 
         if $scope.dragStartingPoint.type is 'row'
           if type is 'well'
@@ -102,10 +104,29 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
           $scope.rows.forEach (row) ->
             row.selected = row.index >= min and row.index <= max
             $scope.columns.forEach (col) ->
-              $scope.wells["well_#{row.index * $scope.columns.length + col.index}"].selected = row.selected
+              well = $scope.wells["well_#{row.index * $scope.columns.length + col.index}"]
+              if not (evt.ctrlKey and well.selected)
+                well.selected = row.selected
+
+        if $scope.dragStartingPoint.type is 'well'
+          if type is 'well'
+            row1 = Math.floor($scope.dragStartingPoint.index / $scope.columns.length)
+            col1 = $scope.dragStartingPoint.index - row1 * $scope.columns.length
+            row2 = Math.floor(index / $scope.columns.length)
+            col2 = index - row2 * $scope.columns.length
+            max_row = Math.max.apply(Math, [row1, row2])
+            min_row = if max_row is row1 then row2 else row1
+            max_col = Math.max.apply(Math, [col1, col2])
+            min_col = if max_col is col1 then col2 else col1
+            $scope.rows.forEach (row) ->
+              $scope.columns.forEach (col) ->
+                selected = (row.index >= min_row and row.index <= max_row) and (col.index >= min_col and col.index <= max_col)
+                well = $scope.wells["well_#{row.index * $scope.columns.length + col.index}"]
+                if not (evt.ctrlKey and well.selected)
+                  well.selected = selected
 
 
-      $scope.dragStop = ->
+      $scope.dragStop = (evt) ->
         $scope.dragging = false
 
         # remove selected from columns and row headers
@@ -115,5 +136,8 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
           row.selected = false
 
         ngModel.$setViewValue(angular.copy($scope.wells))
+
+      $scope.selectWell = (evt, row, col, well, i) ->
+        #well.selected = !well.selected
 
 ]
