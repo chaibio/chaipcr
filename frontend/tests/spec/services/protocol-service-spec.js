@@ -256,4 +256,269 @@ describe("Testing ExperimentLoader service", function() {
         _ExperimentLoader.saveCycle($scope);
         $httpBackend.flush();
    });
+
+   it("It should test changeStartOnCycle method", function() {
+
+        var $scope = {
+            stage: {
+                id: 100,
+                auto_delta_start_cycle: 10
+            }
+        };
+
+        var url = "/stages/"+ $scope.stage.id;
+        $httpBackend.expectPUT(url).respond(200);
+        _ExperimentLoader.changeStartOnCycle($scope);
+        $httpBackend.flush();
+   });
+
+   it("It should test updateAutoDelata method", function() {
+
+        var $scope = {
+            stage: {
+                id: 100,
+                auto_delta: 10
+            }
+        };
+
+        var url = "/stages/"+ $scope.stage.id;
+        $httpBackend.expectPUT(url).respond(200);
+        _ExperimentLoader.updateAutoDelata($scope);
+        $httpBackend.flush();
+
+   });
+
+   it("It should test moveStep method", function() {
+
+        var id = 100;
+        var prev_id = 10;
+        var stage_id = 20;
+        var url = "/steps/" + id + "/move";
+
+        $httpBackend.expectPOST(url).respond(200);
+        _ExperimentLoader.moveStep(id, prev_id, stage_id);
+        $httpBackend.flush();
+   });
+
+   it("It should test moveStep method, when  request fail", function() {
+
+        var id = 100;
+        var prev_id = 10;
+        var stage_id = 20;
+        var url = "/steps/" + id + "/move";
+
+        $httpBackend.expectPOST(url).respond(500);
+        _ExperimentLoader.moveStep(id, prev_id, stage_id);
+        $httpBackend.flush();
+   });
+
+   it("It should test changeTemperature method", function() {
+
+        var $scope = {
+            step: {
+                id: 10,
+                temperature: 45
+            }
+        };
+
+        var url = "/steps/" + $scope.step.id;
+        $httpBackend.expectPUT(url).respond(200);
+        _ExperimentLoader.changeTemperature($scope);
+        $httpBackend.flush();
+   });
+
+   it("It should test addStep method", function() {
+
+        var $scope = {
+            stage: {
+                id: 10
+            },
+            step: {
+                id: 12
+            }
+        };
+        var stageId = $scope.stage.id;
+        var url = "/stages/"+ stageId +"/steps";
+        $httpBackend.expectPOST(url).respond(200);
+        _ExperimentLoader.addStep($scope);
+        $httpBackend.flush();
+
+   });
+
+   it("It should test addStep method, when request fails", function() {
+
+        var $scope = {
+            stage: {
+                id: 10
+            },
+            step: {
+                id: 12
+            }
+        };
+        var stageId = $scope.stage.id;
+        var url = "/stages/"+ stageId +"/steps";
+        $httpBackend.expectPOST(url).respond(500);
+        _ExperimentLoader.addStep($scope);
+        $httpBackend.flush();
+
+   });
+
+   it("It should test deleteStep method", function() {
+
+        var $scope = {
+            step: {
+                id: 10
+            }
+        };
+
+        var url = "/steps/" + $scope.step.id;
+        $httpBackend.expectDELETE(url).respond(200);
+        _ExperimentLoader.deleteStep($scope);
+        $httpBackend.flush();
+
+   });
+
+   it("It should test deleteStep method, when request fails", function() {
+
+        var $scope = {
+            step: {
+                id: 10
+            }
+        };
+
+        var url = "/steps/" + $scope.step.id;
+        $httpBackend.expectDELETE(url).respond(500);
+        _ExperimentLoader.deleteStep($scope);
+        $httpBackend.flush();
+
+   });
+
+   it("It should test gatherDuringStep method", function() {
+
+        var $scope = {
+            step: {
+                id: 10,
+                collect_data: true
+            }
+        };
+
+        var url =  "/steps/" + $scope.step.id;
+
+        $httpBackend.expectPUT(url).respond(200);
+        _ExperimentLoader.gatherDuringStep($scope);
+        $httpBackend.flush();
+   });
+
+   it("It should test gatherDataDuringRamp method", function() {
+
+        var $scope = {
+            step: {
+                id: 10,
+                ramp: {
+                    collect_data: true
+                }
+            }
+        };
+
+        var url = "/ramps/" + $scope.step.id;
+        $httpBackend.expectPUT(url).respond(200);
+        _ExperimentLoader.gatherDataDuringRamp($scope);
+        $httpBackend.flush();
+
+   });
+
+   it("It should changeRampSpeed method", function() {
+
+        var $scope = {
+            step: {
+                id: 10,
+                ramp: {
+                    rate: 10,
+                    collect_data: true
+                }
+            }
+        };
+
+        var url = "/ramps/" + $scope.step.id;
+        $httpBackend.expectPUT(url).respond(200);
+        _ExperimentLoader.changeRampSpeed($scope);
+        $httpBackend.flush();
+   });
+
+   it("It should test changeHoldDuration method", function() {
+
+        var $scope = {
+            step: {
+                id: 10,
+                hold_time: 400,
+            }
+        };
+
+        var url = "/steps/" + $scope.step.id;
+        $httpBackend.expectPUT(url).respond(200);
+        _ExperimentLoader.changeHoldDuration($scope);
+        $httpBackend.flush();
+
+   });
+
+   it("It should test saveName mathod", function() {
+
+        var $scope = {
+            step: {
+                id: 10,
+                name: "Step1"
+            }
+        };
+
+        var url = "/steps/" + $scope.step.id;
+        $httpBackend.expectPUT(url).respond(200);
+        _ExperimentLoader.saveName($scope);
+        $httpBackend.flush();
+   });
+
+   it("It should test changeDeltaTemperature method", function() {
+
+        var $scope = {
+            step: {
+                id: 10,
+                delta_temperature: 25
+            }
+        };
+
+        var url = "/steps/" + $scope.step.id;
+        $httpBackend.expectPUT(url).respond(200);
+        _ExperimentLoader.changeDeltaTemperature($scope);
+        $httpBackend.flush();
+   });
+
+   it("It should test changeDeltaTime method", function() {
+
+        var $scope = {
+            step: {
+                id: 10,
+                delta_duration_s: 25
+            }
+        };
+
+        var url = "/steps/" + $scope.step.id;
+        $httpBackend.expectPUT(url).respond(200);
+        _ExperimentLoader.changeDeltaTime($scope);
+        $httpBackend.flush();
+   });
+
+   it("It should test changePause method", function() {
+
+        var $scope = {
+            step: {
+                id: 10,
+                pause: true
+            }
+        };
+
+        var url = "/steps/" + $scope.step.id;
+
+        $httpBackend.expectPUT(url).respond(200);
+        _ExperimentLoader.changePause($scope);
+        $httpBackend.flush();
+   });
 });
