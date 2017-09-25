@@ -21,7 +21,7 @@
     <tbody>
       <tr>
         <th ng-style="{width: row_header_width + 'px'}" class="col-header"></th>
-        <th ng-repeat="col in columns" ng-style="{width: getCellWidth() + 'px'}" class="col-header">
+        <th ng-mousedown="dragStart()" ng-mouseup="dragStop()" ng-repeat="col in columns" ng-style="{width: getCellWidth() + 'px'}" class="col-header">
           {{col + 1}}
         </th>
       </tr>
@@ -30,11 +30,10 @@
           {{ row + 1 }}
         </td>
         <td ng-repeat="col in columns" class="well-switch">
-          <div class="well-switch-container" ng-init="i = (row + 1) * (col + 1) - 1; button = buttons['well_' + i];" >
+          <div class="well-switch-container" ng-init="i = (row * columns.length) + col; button = buttons['well_' + i];" >
             <div class="well-switch-bar" ng-style="getStyleForWellBar(row, col, button, i)">
             </div>
             <div class="ct-cq-container">
-              {{ button.selected }}
               <div> Cq <strong class="value">{{ button.ct[0] }}</strong> </div>
               <div> Cq <strong class="value">{{ button.ct[1] }}</strong> </div>
             </div>

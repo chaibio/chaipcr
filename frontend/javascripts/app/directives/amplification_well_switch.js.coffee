@@ -35,10 +35,11 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
 
       COLORS = AmplificationChartHelper.COLORS
       buttons = {}
+      $scope.dragging = false
 
       for b in [0...16] by 1
         buttons["well_#{b}"] =
-          selected: b > 6
+          selected: b > 12
           active: false
           color: COLORS[b]
 
@@ -66,8 +67,12 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
 
       $scope.getStyleForWellBar = (row, col, config, i) ->
         'background-color': config.color
-        'opacity': if config.selected then 1 else 0.5
+        'opacity': if config.selected then 1 else 0.25
 
+      $scope.dragStart = ->
+        $scope.dragging = true
 
+      $scope.dragStop = ->
+        $scope.dragging = false
 
 ]
