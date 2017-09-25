@@ -21,17 +21,19 @@
     <tbody>
       <tr>
         <th ng-mousedown="dragStart($event, 'corner', 0)" ng-style="{width: row_header_width + 'px'}" class="col-header"></th>
-        <th ng-mousedown="dragStart($event, 'column', col.index)" ng-mouseup="dragStop($event)" ng-mousemove="dragged($event, 'column', col.index)" ng-repeat="col in columns" ng-style="{width: getCellWidth() + 'px'}" class="col-header" ng-class="col.selected ? 'dragged' : '' ">
+        <th ng-mousedown="dragStart($event, 'column', col.index)" ng-mouseup="dragStop($event)" ng-mousemove="dragged($event, 'column', col.index)" ng-repeat="col in columns" ng-style="{width: getCellWidth() + 'px'}" class="col-header" ng-class="{dragged: col.selected}">
           {{col.index + 1}}
         </th>
       </tr>
       <tr ng-repeat="row in rows">
-        <td class="row-header" ng-mousedown="dragStart($event, 'row', row.index)" ng-mousemove="dragged($event, 'row', row.index)" ng-mouseup="dragStop($event)" ng-class="row.selected ? 'dragged' : '' ">
+        <td class="row-header" ng-mousedown="dragStart($event, 'row', row.index)" ng-mousemove="dragged($event, 'row', row.index)" ng-mouseup="dragStop($event)" ng-class="{dragged: row.selected}">
           {{ row.index + 1 }}
         </td>
-        <td ng-repeat="col in columns" class="well-switch" ng-init="i = (row.index * columns.length) + col.index; well = wells['well_' + i];" ng-mousedown="dragStart($event, 'well', i)" ng-mousemove="dragged($event, 'well', i)" ng-mouseup="dragStop($event)" ng-click="selectWell($event,  row, col, well, i)">
+        <td ng-repeat="col in columns" class="well-switch" ng-init="i = (row.index * columns.length) + col.index; well = wells['well_' + i];" ng-mousedown="dragStart($event, 'well', i)" ng-mousemove="dragged($event, 'well', i)" ng-mouseup="dragStop($event)" ng-class="{selected: well.selected}" ng-style="getWellStyle(row, col, well, i)">
           <div class="well-switch-container">
-            <div class="well-switch-bar" ng-style="getStyleForWellBar(row, col, well, i)">
+            <div class="well-switch-bar-container">
+              <div class="well-switch-bar" ng-style="getStyleForWellBar(row, col, well, i)">
+              </div>
             </div>
             <div class="ct-cq-container">
               <div> Cq <strong class="value">{{ well.ct[0] }}</strong> </div>

@@ -137,7 +137,29 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
 
         ngModel.$setViewValue(angular.copy($scope.wells))
 
-      $scope.selectWell = (evt, row, col, well, i) ->
-        #well.selected = !well.selected
+      $scope.getWellStyle = (row, col, well, index) ->
+        well_left_index = if (col.index + 1) % $scope.columns.length is 1 then null else index - 1
+        well_right_index = if (col.index + 1) % $scope.columns.length is 0 then null else index + 1
+        well_top_index = if (row.index + 1) % $scope.rows.length is 1 then null else index - $scope.columns.length
+        well_bottom_index = if (row.index + 1) % $scope.rows.length is 0 then null else index + $scope.columns.length
 
+        well_left = $scope.wells["well_#{well_left_index}"]
+        well_right = $scope.wells["well_#{well_right_index}"]
+        well_top = $scope.wells["well_#{well_top_index}"]
+        well_bottom = $scope.wells["well_#{well_bottom_index}"]
+
+        style = {}
+        border = '2px solid #000'
+
+        if well.selected
+          if !(well_left?.selected)
+            style['border-left'] = border
+          if !(well_right?.selected)
+            style['border-right'] = border
+          if !(well_top?.selected)
+            style['border-top'] = border
+          if !(well_bottom?.selected)
+            style['border-bottom'] = border
+
+        return style
 ]

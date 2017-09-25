@@ -11,9 +11,9 @@
   }
 
   th, td {
-    border-left: 1px solid #eee;
-    border-bottom: 1px solid #eee;
-    border-top: 1px solid #eee;
+    border-left: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    border-top: 1px solid #ccc;
   }
 
   .col-header {
@@ -22,28 +22,35 @@
     text-align: center;
 
     &.dragged {
-      background: lightblue;
+      background: #7DC2E6;
     }
   }
   .row-header {
     text-align: center;
     &.dragged {
-      background: lightblue;
+      background: #7DC2E6;
     }
   }
   .well-switch {
     height: 60px;
     vertical-align: top;
 
+    &.selected {
+      background-color: #e4f4fa;
+    }
+
+    .well-switch-bar-container {
+      background-color: #fff;
+      padding: 5px 10px;
+    }
+
     .well-switch-bar {
-      margin: 5px 10px;
       height: 5px;
     }
     .ct-cq-container {
-      border-top: 1px solid #eee;
-    }
-    .ct-cq-container {
+      border-top: 1px solid #ccc;
       padding: 0px 20px;
     }
+
   }
 }
