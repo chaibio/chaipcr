@@ -39,7 +39,7 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
 
       for b in [0...16] by 1
         wells["well_#{b}"] =
-          selected: b > 12
+          selected: true
           active: false
           color: COLORS[b]
 
@@ -79,7 +79,7 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
           type: type
           index: index
 
-        $scope.selected(type, index)
+        $scope.dragged(type, index)
 
       $scope.dragged = (type, index) ->
         return if !$scope.dragging
