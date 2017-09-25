@@ -20,9 +20,16 @@
     font-family: 'dinot-regular';
     font-size: 12px;
     text-align: center;
+
+    &.dragged {
+      background: lightblue;
+    }
   }
   .row-header {
     text-align: center;
+    &.dragged {
+      background: lightblue;
+    }
   }
   .well-switch {
     height: 60px;

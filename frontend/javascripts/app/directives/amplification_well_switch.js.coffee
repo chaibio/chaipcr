@@ -34,21 +34,25 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
     link: ($scope, elem, attrs, ngModel) ->
 
       COLORS = AmplificationChartHelper.COLORS
-      buttons = {}
+      wells = {}
       $scope.dragging = false
 
       for b in [0...16] by 1
-        buttons["well_#{b}"] =
+        wells["well_#{b}"] =
           selected: b > 12
           active: false
           color: COLORS[b]
 
-      ngModel.$setViewValue buttons
-      $scope.buttons = buttons
+      ngModel.$setViewValue wells
+      $scope.wells = wells
 
       $scope.row_header_width = 30
-      $scope.columns = [0...8]
-      $scope.rows = [0...2]
+      $scope.columns = []
+      $scope.rows = []
+      for i in [0...8]
+        $scope.columns.push index: i, dragged: false
+      for i in [0...2]
+        $scope.rows.push index: i, dragged: false
 
       $scope.getWidth = -> elem[0].parentElement.offsetWidth
       $scope.getCellWidth = ->
@@ -61,18 +65,55 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
         return cts
       , (cts) ->
         for ct, i in cts by 1
-          $scope.buttons["well_#{i}"].ct = ct if $scope.buttons["well_#{i}"]
-
-        console.log $scope.buttons
+          $scope.wells["well_#{i}"].ct = ct if $scope.wells["well_#{i}"]
 
       $scope.getStyleForWellBar = (row, col, config, i) ->
         'background-color': config.color
         'opacity': if config.selected then 1 else 0.25
 
-      $scope.dragStart = ->
+      $scope.dragStart = (type, index) ->
+        # type can be 'column', 'row', 'well' or 'corner'
+        # index is index of the type
         $scope.dragging = true
+        $scope.dragStartingPoint =
+          type: type
+          index: index
+
+        $scope.dragged(type, index)
+
+      $scope.dragged = (type, index) ->
+        return if !$scope.dragging
+        if $scope.dragStartingPoint.type is 'column'
+          if type is 'well'
+            index = if index >= $scope.columns.length then index - $scope.columns.length else index
+
+          max = Math.max.apply(Math, [index, $scope.dragStartingPoint.index])
+          min = if max is index then $scope.dragStartingPoint.index else index
+          $scope.columns.forEach (col) ->
+            col.dragged = col.index >= min and col.index <= max
+            $scope.rows.forEach (row) ->
+              $scope.wells["well_#{row.index * $scope.columns.length + col.index}"].selected = col.dragged
+
+        if $scope.dragStartingPoint.type is 'row'
+          if type is 'well'
+            index = if index >= 8 then 1 else 0
+          max = Math.max.apply(Math, [index, $scope.dragStartingPoint.index])
+          min = if max is index then $scope.dragStartingPoint.index else index
+          $scope.rows.forEach (row) ->
+            row.dragged = row.index >= min and row.index <= max
+            $scope.columns.forEach (col) ->
+              $scope.wells["well_#{row.index * $scope.columns.length + col.index}"].selected = row.dragged
+
 
       $scope.dragStop = ->
         $scope.dragging = false
+
+        # remove dragged from columns and row headers
+        $scope.columns.forEach (col) ->
+          col.dragged = false
+        $scope.rows.forEach (row) ->
+          row.dragged = false
+
+        ngModel.$setViewValue(angular.copy($scope.wells))
 
 ]
