@@ -50,9 +50,9 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
       $scope.columns = []
       $scope.rows = []
       for i in [0...8]
-        $scope.columns.push index: i, dragged: false
+        $scope.columns.push index: i, selected: false
       for i in [0...2]
-        $scope.rows.push index: i, dragged: false
+        $scope.rows.push index: i, selected: false
 
       $scope.getWidth = -> elem[0].parentElement.offsetWidth
       $scope.getCellWidth = ->
@@ -79,7 +79,7 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
           type: type
           index: index
 
-        $scope.dragged(type, index)
+        $scope.selected(type, index)
 
       $scope.dragged = (type, index) ->
         return if !$scope.dragging
@@ -90,9 +90,9 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
           max = Math.max.apply(Math, [index, $scope.dragStartingPoint.index])
           min = if max is index then $scope.dragStartingPoint.index else index
           $scope.columns.forEach (col) ->
-            col.dragged = col.index >= min and col.index <= max
+            col.selected = col.index >= min and col.index <= max
             $scope.rows.forEach (row) ->
-              $scope.wells["well_#{row.index * $scope.columns.length + col.index}"].selected = col.dragged
+              $scope.wells["well_#{row.index * $scope.columns.length + col.index}"].selected = col.selected
 
         if $scope.dragStartingPoint.type is 'row'
           if type is 'well'
@@ -100,19 +100,19 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
           max = Math.max.apply(Math, [index, $scope.dragStartingPoint.index])
           min = if max is index then $scope.dragStartingPoint.index else index
           $scope.rows.forEach (row) ->
-            row.dragged = row.index >= min and row.index <= max
+            row.selected = row.index >= min and row.index <= max
             $scope.columns.forEach (col) ->
-              $scope.wells["well_#{row.index * $scope.columns.length + col.index}"].selected = row.dragged
+              $scope.wells["well_#{row.index * $scope.columns.length + col.index}"].selected = row.selected
 
 
       $scope.dragStop = ->
         $scope.dragging = false
 
-        # remove dragged from columns and row headers
+        # remove selected from columns and row headers
         $scope.columns.forEach (col) ->
-          col.dragged = false
+          col.selected = false
         $scope.rows.forEach (row) ->
-          row.dragged = false
+          row.selected = false
 
         ngModel.$setViewValue(angular.copy($scope.wells))
 
