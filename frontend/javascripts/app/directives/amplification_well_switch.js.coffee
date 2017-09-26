@@ -42,7 +42,7 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
         wells["well_#{b}"] =
           selected: true
           active: false
-          color: COLORS[b]
+          color: if ($scope.colorBy is 'well') then COLORS[b] else '#75278E'
 
       ngModel.$setViewValue wells
       $scope.wells = wells
@@ -76,6 +76,11 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
       , (actives) ->
         for a, i in actives by 1
           $scope.wells["well_#{i}"].active = a if $scope.wells["well_#{i}"]
+
+      $scope.$watch 'colorBy', (color_by) ->
+        for i in [0..15] by 1
+          #$scope.buttons["well_#{i}"] = angular.copy $scope.buttons["well_#{i}"]
+          $scope.wells["well_#{i}"].color = if (color_by is 'well') then COLORS[i] else '#75278E'
 
       $scope.getStyleForWellBar = (row, col, config, i) ->
         'background-color': config.color
@@ -182,4 +187,11 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
           style.width = "#{@getCellWidth() + ACTIVE_BORDER_WIDTH * 4}px"
 
         return style
-]
+
+      $scope.displayCt = (ct) ->
+        if angular.isNumber(ct)
+          Math.round(ct * 10) / 10
+        else
+          ''
+
+  ]
