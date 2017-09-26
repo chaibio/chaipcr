@@ -4,9 +4,7 @@ describe("Testing ExperimentLoader service", function() {
 
    beforeEach(function() {
         
-        var meth = {
-            
-        };
+        
         module('ChaiBioTech', function($provide) {
             //$provide.value('Experiment',  meth);
         });
