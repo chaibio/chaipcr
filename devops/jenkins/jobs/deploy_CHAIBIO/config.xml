@@ -609,14 +609,13 @@ rm master.zip || true
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Build/install LCD drivers
-cd ~/chaipcr/modules/LCDtouch_V3
-chmod 775 install_debian49.sh
-mkdir -p /boot/uboot/dtbs/
+cd ~/chaipcr/modules/LCDtouch_V3/49
+chmod 775 install_debian.sh
+
 mkdir -p /boot/dts/
 mkdir -p /lib/firmware/
-./install_debian49.sh
-#rm -rf /usr/src/linux* why?
-sync
+
+./install_debian.sh
 
 sync
 sync
