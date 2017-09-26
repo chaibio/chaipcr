@@ -7,13 +7,14 @@
   user-select: none;
 
   table {
-    border-top: 2px solid #ccc;
+    border-top: 2px solid #c5c5c5;
+    border-right: 1px solid #c5c5c5;
   }
 
   th, td {
-    border-left: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
-    border-top: 1px solid #ccc;
+    border-left: 1px solid #c5c5c5;
+    border-bottom: 1px solid #c5c5c5;
+    border-top: 1px solid #c5c5c5;
   }
 
   .col-header {
@@ -70,7 +71,7 @@
       height: 5px;
     }
     .ct-cq-container {
-      border-top: 1px solid #ccc;
+      border-top: 1px solid #c5c5c5;
       padding: 2px 20px;
       min-height: 45px;
     }
