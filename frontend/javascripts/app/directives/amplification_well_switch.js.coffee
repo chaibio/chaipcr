@@ -189,8 +189,8 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
         return style
 
       $scope.displayCt = (ct) ->
-        if angular.isNumber(ct)
-          Math.round(ct * 10) / 10
+        if ct and angular.isNumber(ct * 1) and !window.isNaN(ct * 1)
+          parseFloat(ct).toFixed(2)
         else
           ''
 
