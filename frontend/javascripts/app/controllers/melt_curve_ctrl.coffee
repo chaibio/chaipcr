@@ -128,15 +128,16 @@ App.controller 'MeltCurveChartCtrl', [
       $scope.config.box.label.y = if $scope.curve_type is 'derivative' then '-dF/dT' else 'RFU'
 
       for i in [0..15] by 1
-        $scope.config.series.push
-          selected: buttons["well_#{i}"]?.selected
-          channel: 1
-          y: $scope.curve_type
-          x: 'temperature'
-          dataset: "well_#{i}"
-          color: buttons["well_#{i}"]?.color
-          ct: buttons["well_#{i}"]?.ct
-          well: i
+        if buttons["well_#{i}"]?.selected
+          $scope.config.series.push
+            selected: buttons["well_#{i}"]?.selected
+            channel: 1
+            y: $scope.curve_type
+            x: 'temperature'
+            dataset: "well_#{i}"
+            color: buttons["well_#{i}"]?.color
+            ct: buttons["well_#{i}"]?.ct
+            well: i
 
     getMeltCurveDataCallBack = (data) ->
       updateButtonTms(data)
