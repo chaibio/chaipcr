@@ -79,8 +79,8 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
 
       $scope.$watch 'colorBy', (color_by) ->
         for i in [0..15] by 1
-          #$scope.buttons["well_#{i}"] = angular.copy $scope.buttons["well_#{i}"]
           $scope.wells["well_#{i}"].color = if (color_by is 'well') then COLORS[i] else '#75278E'
+        ngModel.$setViewValue angular.copy($scope.wells)
 
       $scope.getStyleForWellBar = (row, col, config, i) ->
         'background-color': config.color
