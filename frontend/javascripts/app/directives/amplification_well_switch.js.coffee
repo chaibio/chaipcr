@@ -34,6 +34,7 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
     link: ($scope, elem, attrs, ngModel) ->
 
       COLORS = AmplificationChartHelper.COLORS
+      ACTIVE_BORDER_WIDTH = 2
       wells = {}
       $scope.dragging = false
 
@@ -66,6 +67,15 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
       , (cts) ->
         for ct, i in cts by 1
           $scope.wells["well_#{i}"].ct = ct if $scope.wells["well_#{i}"]
+
+      $scope.$watchCollection ->
+        actives = []
+        for i in [0..15] by 1
+          actives.push ngModel.$modelValue["well_#{i}"].active
+        return actives
+      , (actives) ->
+        for a, i in actives by 1
+          $scope.wells["well_#{i}"].active = a if $scope.wells["well_#{i}"]
 
       $scope.getStyleForWellBar = (row, col, config, i) ->
         'background-color': config.color
@@ -138,6 +148,8 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
         ngModel.$setViewValue(angular.copy($scope.wells))
 
       $scope.getWellStyle = (row, col, well, index) ->
+        return {} if well.active
+
         well_left_index = if (col.index + 1) % $scope.columns.length is 1 then null else index - 1
         well_right_index = if (col.index + 1) % $scope.columns.length is 0 then null else index + 1
         well_top_index = if (row.index + 1) % $scope.rows.length is 1 then null else index - $scope.columns.length
@@ -160,6 +172,14 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
             style['border-top'] = border
           if !(well_bottom?.selected)
             style['border-bottom'] = border
+
+        return style
+
+      $scope.getWellContainerStyle = (row, col, well, i) ->
+        style = {}
+
+        if well.active
+          style.width = "#{@getCellWidth() + ACTIVE_BORDER_WIDTH * 4}px"
 
         return style
 ]

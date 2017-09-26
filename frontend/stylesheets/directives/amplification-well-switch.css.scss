@@ -32,11 +32,33 @@
     }
   }
   .well-switch {
-    height: 60px;
+    min-height: 60px;
     vertical-align: top;
 
     &.selected {
-      background-color: #e4f4fa;
+      .ct-cq-container {
+        background-color: #e4f4fa;
+      }
+    }
+
+    &.selected.active {
+      position: relative;
+
+      .well-switch-container {
+        margin: -4px;
+        height: 68px;
+        border: 2px solid #000;
+        z-index: 999999;
+        position: absolute;
+        top: 0;
+        left: 0;
+        box-shadow: 0px 0px 5px #000;
+      }
+      .ct-cq-container {
+        height: 49px;
+        padding: 4px 22px;
+      }
+
     }
 
     .well-switch-bar-container {
@@ -49,7 +71,8 @@
     }
     .ct-cq-container {
       border-top: 1px solid #ccc;
-      padding: 0px 20px;
+      padding: 2px 20px;
+      min-height: 45px;
     }
 
   }
