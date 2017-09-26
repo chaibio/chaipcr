@@ -32,8 +32,11 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
 
       var delay, that = this;
       delay = $q.defer();
-      Experiment.get({'id': $stateParams.id})
-      .then(function(data) {
+      
+      var del = Experiment.get({'id': $stateParams.id});
+      
+      del.then(function(data) {
+        
         that.protocol = data.experiment;
         //$rootScope.$broadcast("dataLoaded");
         delay.resolve(data);
@@ -51,6 +54,7 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
     };
 
     this.loadFirstStep = function() {
+      
       return this.protocol.protocol.stages[0].stage.steps[0].step;
     };
 
