@@ -123,6 +123,4 @@ Qpcrctl::Application.routes.draw do
 
   get ':controller(/:action(/:id))'
 
-  get '*path' => 'main#index'
-
 end
