@@ -17,11 +17,6 @@
 # limitations under the License.
 #
 class ApplicationController < ActionController::Base
-  unless Rails.application.config.consider_all_requests_local
-      rescue_from Exception, :with => :render_not_found 
-      rescue_from ActionController::RoutingError, :with => :render_not_found
-  end 
-    
   helper_method :authentication_token, :current_user
  
   # Prevent CSRF attacks by raising an exception.
@@ -30,20 +25,8 @@ class ApplicationController < ActionController::Base
 
   CLOUD_SERVER = "http://cloudops.chaibio.com"
  
-  def raise_not_found!
-    raise ActionController::RoutingError.new("No route matches #{params[:unmatched_route]}")
-  end
-  
   protected
 
-  def render_public_index_html
-    render file: Rails.public_path.join("index.html"), layout: false
-  end
-  
-  def render_not_found(e)
-    render_public_index_html
-  end
-   
   def kill_process(process_name)
     processes = `ps -ef | grep #{process_name}`
     logger.info(processes)

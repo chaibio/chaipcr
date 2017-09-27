@@ -122,7 +122,7 @@ Qpcrctl::Application.routes.draw do
   end
 
   get ':controller(/:action(/:id))'
-  
-  match '*unmatched_route', :to => 'application#raise_not_found!', :via => :all
+
+  get '*path' => 'main#index'
 
 end

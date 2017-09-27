@@ -18,10 +18,18 @@
 #
 
 class MainController < ApplicationController
+
+  before_filter :ensure_authenticated_user, :only => :index
+
+  api :GET, "/", "Home page"
+  def index
+    render file: Rails.public_path.join("index.html"), layout: false
+  end
+
   api :GET, "/welcome", "Show this page when there is no user in the database"
   def welcome
     if User.empty?
-      render_public_index_html
+      render file: Rails.public_path.join("index.html"), layout: false
     else
       redirect_to login_path
     end
@@ -33,7 +41,7 @@ class MainController < ApplicationController
       cookies.permanent[:authentication_token] = params[:token]
       redirect_to root_path
     elsif !User.empty?
-      render_public_index_html
+      render file: Rails.public_path.join("index.html"), layout: false
     else
       redirect_to welcome_path
     end
