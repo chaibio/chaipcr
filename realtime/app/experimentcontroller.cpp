@@ -144,7 +144,7 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
 
     if (Util::getPartitionAvailableSpace(kDataPartitionpath, dataSpace))
     {
-        if (qpcrApp.settings().configuration.dataSpaceSoftLimit >= dataSapce)
+        if (qpcrApp.settings().configuration.dataSpaceSoftLimit >= dataSpace)
             return OutOfStorageSpace;
     }
     else
