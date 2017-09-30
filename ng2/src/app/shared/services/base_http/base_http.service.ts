@@ -32,25 +32,24 @@ export class BaseHttp extends Http {
   request(url: string | Request, options?: RequestOptionsArgs): Observable<Response> {
     if (typeof url === 'string') {
       // meaning we have to add the token to the options, not in url
-      url = this.preprocessUrl(url)
+      url = this.appendApiPortToUrl(url)
     } else {
       // we have to add the token to the url object
-      url.url = this.preprocessUrl(url.url)
+      url.url = this.appendApiPortToUrl(url.url)
     }
 
     return super.request(url, options);
   }
 
-  protected preprocessUrl(url: string): string {
-    return this.appendApiPortToUrl(url);
-  }
-
   protected appendApiPortToUrl(url: string): string {
+    const w = this.windowRef.nativeWindow();
+
     if (url.indexOf(':8000') === -1) {
-      return this.windowRef.nativeWindow().location.hostname + ':' + this.api_port + url;
+      return w.location.protocol + '//' + this.windowRef.nativeWindow().location.hostname + ':' + this.api_port + url;
     } else {
       return url;
     }
+
   }
 
 }

@@ -28,7 +28,8 @@ const mockNativeWindow = {
   location: {
     assign: () => {},
     hostname: window.location.hostname,
-    port: window.location.port
+    port: window.location.port,
+    protocol: 'http:'
   }
 }
 
@@ -62,11 +63,12 @@ describe('BaseHttp', () => {
 
       const PORT = environment.api_port;
       const url = '/test'
+      const w = windowRef.nativeWindow()
 
       expect(base_http.api_port).toBe(PORT)
 
       backend.connections.subscribe((con: MockConnection) => {
-        expect(con.request.url).toBe(windowRef.nativeWindow().location.hostname + ':' + PORT + url)
+        expect(con.request.url).toBe(w.location.protocol + '//' +w.location.hostname + ':' + PORT + url)
       })
 
       base_http.get(url).subscribe()
