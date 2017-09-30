@@ -45,8 +45,8 @@ describe('ExperimentService', () => {
   }))
 
   it('should get all experiments', inject(
-    [ExperimentService, XHRBackend],
-    (experimentService: ExperimentService, backend: MockBackend) => {
+    [ExperimentService, XHRBackend, AuthHttp],
+    (experimentService: ExperimentService, backend: MockBackend, auth_http: AuthHttp) => {
 
       const mockExperiments = [
         {
@@ -77,8 +77,9 @@ describe('ExperimentService', () => {
         },
       ]
 
+      spyOn(auth_http, 'get').and.callThrough()
+
       backend.connections.subscribe((connection: MockConnection) => {
-        expect(connection.request.url).toBe('/experiments')
         connection.mockRespond(new Response(new ResponseOptions({
           body: mockExperiments
         })))
@@ -88,11 +89,13 @@ describe('ExperimentService', () => {
         expect(experiments[0]).toEqual(mockExperiments[0].experiment)
       })
 
+      expect(auth_http.get).toHaveBeenCalledWith('/experiments')
+
     }))
 
   it('should delete experiment', inject(
-    [ExperimentService, XHRBackend],
-    (expService: ExperimentService, backend: MockBackend) => {
+    [ExperimentService, XHRBackend, AuthHttp],
+    (expService: ExperimentService, backend: MockBackend, auth_http: AuthHttp) => {
 
       const expId = 1
 
@@ -100,7 +103,7 @@ describe('ExperimentService', () => {
 
       backend.connections.subscribe((connection: MockConnection) => {
         expect(connection.request.method).toBe(RequestMethod.Delete)
-        expect(connection.request.url).toBe(`/experiments/${expId}`)
+        //expect(connection.request.url).toBe(`/experiments/${expId}`)
         connection.mockRespond(new Response(new ResponseOptions({
           status: 200,
           body: {
@@ -110,9 +113,13 @@ describe('ExperimentService', () => {
         backendSpy()
       })
 
+      spyOn(auth_http, 'delete').and.callThrough()
+
       expService.deleteExperiment(expId).subscribe(resp => {
         expect(backendSpy).toHaveBeenCalled()
       })
+
+      expect(auth_http.delete).toHaveBeenCalledWith(`/experiments/${expId}`)
 
     }
   ))

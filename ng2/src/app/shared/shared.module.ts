@@ -7,6 +7,7 @@ import {
   APP_BASE_HREF
 } from '@angular/common';
 
+import { BaseHttp } from './services/base_http/base_http.service';
 import { AuthHttp } from './services/auth_http/auth_http.service';
 import { SessionService } from './services/session/session.service';
 import { ExperimentService } from './services/experiment/experiment.service'
@@ -40,7 +41,9 @@ import { FullHeightDirective } from './directives/full-height/full-height.direct
     StatusService,
     WindowRef,
     AuthHttp,
+    BaseHttp,
     { provide: APP_BASE_HREF, useValue: '/' },
   ]
 })
+
 export class SharedModule { }

@@ -3,6 +3,7 @@ import { Http } from '@angular/http';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 
+import { BaseHttp } from '../shared/services/base_http/base_http.service';
 import { SessionService } from '../shared/services/session/session.service';
 import { LoginFormData } from '../shared/models/login-form-data.model'
 
@@ -19,7 +20,7 @@ export class LoginComponent implements OnInit {
   credentials: LoginFormData;
 
   constructor(
-    private http: Http,
+    private http: BaseHttp,
     private titleService: Title,
     private sessionService: SessionService,
     private router: Router
@@ -28,7 +29,6 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
-
 
     this.deviceInfo = {
       serial_number: null,

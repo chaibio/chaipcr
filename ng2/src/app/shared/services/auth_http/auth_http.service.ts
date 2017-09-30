@@ -9,6 +9,7 @@ import {
   Headers
 } from '@angular/http';
 
+import { environment } from '../../../../environments/environment';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject'
 import 'rxjs/add/operator/map';
@@ -16,17 +17,17 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/observable/empty';
 
+import { BaseHttp } from '../base_http/base_http.service';
 import { WindowRef } from '../windowref/windowref.service';
 
 @Injectable()
-export class AuthHttp extends Http {
+export class AuthHttp extends BaseHttp {
 
   token_name = 'token';
-
   authState: BehaviorSubject<boolean> = new BehaviorSubject(true);
 
-  constructor(backend: XHRBackend, options: RequestOptions, private windowRef: WindowRef) {
-    super(backend, options);
+  constructor(backend: XHRBackend, options: RequestOptions, windowRef: WindowRef) {
+    super(backend, options, windowRef);
   }
 
   request(url: string | Request, options?: RequestOptionsArgs): Observable<Response> {
@@ -47,9 +48,10 @@ export class AuthHttp extends Http {
     return super.request(url, options).catch(res => {
       return this.catchAuthError(res)
     });
+
   }
 
-  private appendTokenToUrl(url: string): string {
+  protected appendTokenToUrl(url: string): string {
     let token = localStorage.getItem(this.token_name);
     if (url.indexOf('8000') >= 0) {
       let separator = url.indexOf('?') >= 0 ? '&' : '?'
@@ -58,7 +60,7 @@ export class AuthHttp extends Http {
     return url
   }
 
-  private catchAuthError(res: Response) {
+  protected catchAuthError(res: Response) {
 
     if (res.status === 401 || res.status === 403) {
       localStorage.removeItem(this.token_name)

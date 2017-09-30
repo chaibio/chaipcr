@@ -53,6 +53,7 @@ describe('AuthHttp', () => {
 
   }))
 
+
   it('should attach the authentication token to the  header', inject(
     [AuthHttp, XHRBackend],
     (auth_http: AuthHttp, backend: MockBackend) => {

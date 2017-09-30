@@ -15,7 +15,9 @@ import {
 } from '@angular/http/testing';
 
 import { SessionService } from './session.service';
-
+import { AuthHttp } from '../auth_http/auth_http.service';
+import { BaseHttp } from '../base_http/base_http.service';
+import { WindowRef } from '../windowref/windowref.service';
 
 describe('SessionService', () => {
 
@@ -23,8 +25,11 @@ describe('SessionService', () => {
     TestBed.configureTestingModule({
       imports: [HttpModule],
       providers: [
+        AuthHttp,
+        BaseHttp,
+        WindowRef,
         { provide: XHRBackend, useClass: MockBackend },
-        { provide: SessionService, useClass: SessionService }
+        SessionService
       ]
     })
   })
@@ -120,8 +125,8 @@ describe('SessionService', () => {
   describe('post /logout', () => {
 
     it('should call POST /logout and delete token from local storage', inject(
-      [SessionService, XHRBackend, Http],
-      (sessionService: SessionService, backend: MockBackend, http: Http) => {
+      [SessionService, XHRBackend, BaseHttp],
+      (sessionService: SessionService, backend: MockBackend, http: BaseHttp) => {
 
         const deleteTokenSpy = spyOn(localStorage, 'removeItem').and.callThrough()
 
