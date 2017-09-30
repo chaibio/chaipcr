@@ -44,7 +44,7 @@ export class LoginComponent implements OnInit {
 
     this.http.get('/device').subscribe((res) => {
       let info = res.json();
-      if(info.software_release_variant) {
+      if(info.software_release_variant && !info.software) {
         this.deviceInfo.software.version = info.software_release_variant;
       } else {
         this.deviceInfo = info;

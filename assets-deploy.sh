@@ -20,3 +20,4 @@ fi
 
 rm -rf ./web/log
 rsync --delete --rsh="sshpass -p $remote_password ssh -oStrictHostKeyChecking=no -l root" -a ./web/public "$1:/root/chaipcr/web"
+rsync --delete --rsh="sshpass -p $remote_password ssh -oStrictHostKeyChecking=no -l root" -a ./ng2/dist "$1:/root/chaipcr/ng2"
