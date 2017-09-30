@@ -23,8 +23,6 @@ import { WindowRef } from '../windowref/windowref.service';
 @Injectable()
 export class BaseHttp extends Http {
 
-  api_port = environment.api_port;
-
   constructor(backend: XHRBackend, options: RequestOptions, protected windowRef: WindowRef) {
     super(backend, options);
   }
@@ -45,7 +43,7 @@ export class BaseHttp extends Http {
     const w = this.windowRef.nativeWindow();
 
     if (url.indexOf(':8000') === -1) {
-      return w.location.protocol + '//' + this.windowRef.nativeWindow().location.hostname + ':' + this.api_port + url;
+      return w.location.protocol + '//' + this.windowRef.nativeWindow().location.hostname + ':' + environment.api_port + url;
     } else {
       return url;
     }

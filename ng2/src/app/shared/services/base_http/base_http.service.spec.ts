@@ -65,8 +65,6 @@ describe('BaseHttp', () => {
       const url = '/test'
       const w = windowRef.nativeWindow()
 
-      expect(base_http.api_port).toBe(PORT)
-
       backend.connections.subscribe((con: MockConnection) => {
         expect(con.request.url).toBe(w.location.protocol + '//' +w.location.hostname + ':' + PORT + url)
       })
