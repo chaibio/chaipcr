@@ -44,4 +44,26 @@ describe("Testing TimeService", function() {
         var rVal = _TimeService.convertToSeconds(timeString);
         expect(rVal).toEqual(false);
     });
+
+    it("It should test convertToSeconds method, when time is invalid", function() {
+
+        var timeString = "::";
+        var rVal = _TimeService.convertToSeconds(timeString);
+        expect(rVal).toEqual(false);
+    });
+
+    it("It should test convertToSeconds method, when only seconds provided", function() {
+
+        var timeString = "100";
+        var rVal = _TimeService.convertToSeconds(timeString);
+        expect(rVal).toEqual("100");
+    });
+
+    it("It should test convertToSeconds method, when non-digit is provided", function() {
+
+        var timeString = "1xx";
+        spyOn(_$rootScope, "$broadcast");
+        var rVal = _TimeService.convertToSeconds(timeString);
+        expect(_$rootScope.$broadcast).toHaveBeenCalled();
+    });
 });
