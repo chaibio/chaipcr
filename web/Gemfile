@@ -42,7 +42,6 @@ group :test do
   gem "factory_girl_rails"
   gem "capybara"
 end
-gem "rails-backbone"
 
 group :assets do
     # gem 'compass-rails'
@@ -77,6 +76,8 @@ gem 'activerecord-import'
 #gem 'angular-rails-templates'
 
 gem 'unicorn'
+
+gem 'rack-cors', :require => 'rack/cors'
 
 # group :test, :development do
 #   gem 'jasmine-rails'
