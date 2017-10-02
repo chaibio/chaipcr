@@ -221,7 +221,7 @@ describe("Testing moveStageToSides service", function() {
     it("It should test validMove method, when all the values passed are null ", function() {
 
         rVal = _moveStageToSides.validMove(null, {}, {});
-        expect(rVal).not.toBeDefined();
+        expect(rVal).toEqual(true);
     });
 
     it("It should test validMove method, when stageMovedDirection === null and direction === left", function() {
@@ -274,7 +274,7 @@ describe("Testing moveStageToSides service", function() {
 
             var rVal = _moveStageToSides.validMove(direction, draggedStage, targetStage);
 
-        expect(rVal).not.toBeDefined();
+        expect(rVal).toEqual(true);
         expect(targetStage.stageMovedDirection).toEqual("left");
     });
 
