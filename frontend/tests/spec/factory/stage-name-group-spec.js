@@ -1,6 +1,9 @@
 describe("Testing stage name group, which contains all the components like stageCaption and stageName", function() {
 
-  beforeEach(module('ChaiBioTech'));
+  beforeEach(module('ChaiBioTech', function ($provide) {
+    mockCommonServices($provide);
+  }));
+
   beforeEach(module('canvasApp'));
 
   var _stageNameGroup, stage, originalStageNameGroup;

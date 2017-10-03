@@ -14,6 +14,7 @@
       module('ChaiBioTech', function($provide) {
         mockCommonServices($provide)
       })
+
       inject(function($injector) {
         this.$timeout = $injector.get('$timeout')
         this.$rootScope = $injector.get('$rootScope')

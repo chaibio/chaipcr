@@ -1,6 +1,8 @@
 describe("Checking the behaviour of menu overlay controller", function() {
 
-  beforeEach(module('ChaiBioTech'));
+  beforeEach(module('ChaiBioTech', function($provide) {
+    $provide.value('IsTouchScreen', function () {});
+  }));
 
   var $controller, $rootScope, httpMock, stateParams, $scope, ExperimentMenuOverlayCtrl, deferred, data;
 

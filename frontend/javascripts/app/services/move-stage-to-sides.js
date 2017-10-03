@@ -28,7 +28,7 @@ window.ChaiBioTech.ngApp.service('moveStageToSides', [
             // For very first stage, It can't move further left.
             if(targetStage.previousStage === null) {
               if(draggedStage.index !== 0) {
-                return false;    
+                return false;
               }
             }
             // look if we have space at left;
@@ -66,10 +66,9 @@ window.ChaiBioTech.ngApp.service('moveStageToSides', [
           if(targetStage.stageMovedDirection === "right" && direction === "right") {
             return false;
           }
-          return true;
         }
 
-        //return true;
+        return true;
       };
 
       this.makeSurePreviousMovedLeft = function(draggedStage, targetStage) {

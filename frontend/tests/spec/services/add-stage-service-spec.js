@@ -1,317 +1,320 @@
+
 describe("Testing addStageService", function() {
 
-    var _addStageService, _constants, _correctNumberingService, _stage, _circleManager;
-    
-    beforeEach(function() {
-        module('ChaiBioTech', function($provide) {
+  var _addStageService, _constants, _correctNumberingService, _stage, _circleManager;
 
-            $provide.value('stage', function() {
-                return {
-                    updateStageData: function() {},
-                    render: function() {}
-                };
-            });
-        });
+  beforeEach(function() {
+    module('ChaiBioTech', function($provide) {
+      
+      mockCommonServices($provide);
 
-        
-        inject(function($injector) {
-            _addStageService = $injector.get('addStageService');
-            _circleManager = $injector.get('circleManager');
-            _constants = $injector.get('constants');
-            _correctNumberingService = $injector.get('correctNumberingService');
-            _stage = $injector.get('stage');
-        });
-
-    });
-    
-
-    it("It should test init method", function() {
-
-        _addStageService.init("init");
-        expect(_addStageService.canvasObj).toEqual("init");
+      $provide.value('stage', function() {
+        return {
+          updateStageData: function() {},
+          render: function() {}
+        };
+      });
     });
 
-    it("It should test addNewStage method", function() {
 
-        _addStageService.canvasObj = {
-            $scope: {
-
-            },
-            allStageViews: {
-                splice: function() {}
-            }
-
-        };
-
-        var currentStage = {
-            myWidth: 128,
-            childSteps: [
-                {
-                    ordealStatus: 10
-                }
-            ]
-        };
-
-        var data = {
-            stage: {
-                steps: {
-                    length: 2
-                }
-            }
-        };
-
-        spyOn(_addStageService, "makeSpaceForNewStage").and.returnValue({
-            index: 1
-        });
-
-        spyOn(_addStageService, "addNextandPrevious").and.returnValue(true);
-        spyOn(_addStageService, "insertStageGraphics").and.returnValue(true);
-        
-        _addStageService.addNewStage(data, currentStage, "yes");
-
-        expect(_addStageService.makeSpaceForNewStage).toHaveBeenCalled();
-        expect(_addStageService.insertStageGraphics).toHaveBeenCalled();
-        expect(_addStageService.addNextandPrevious).toHaveBeenCalled();
-
+    inject(function($injector) {
+      _addStageService = $injector.get('addStageService');
+      _circleManager = $injector.get('circleManager');
+      _constants = $injector.get('constants');
+      _correctNumberingService = $injector.get('correctNumberingService');
+      _stage = $injector.get('stage');
     });
 
-    it("It should test makeSpaceForNewStage method", function() {
+  });
 
-        var data = {
-            stage: {
-                steps: [
-                    {
-                        step: 1
-                    },
-                    {
-                        step: 2
-                    }
-                ]
-            }
-        };
-         
-         var currentStage = {
-             myWidth: 0,
-             moveAllStepsAndStages: function() {}
-         };
 
-         var add = 128;
+  it("It should test init method", function() {
 
-         spyOn(currentStage, "moveAllStepsAndStages");
+    _addStageService.init("init");
+    expect(_addStageService.canvasObj).toEqual("init");
+  });
 
-         _addStageService.makeSpaceForNewStage(data, currentStage, add);
+  it("It should test addNewStage method", function() {
 
-         expect(currentStage.moveAllStepsAndStages).toHaveBeenCalled();
-         expect(currentStage.myWidth).toEqual(256);
+    _addStageService.canvasObj = {
+      $scope: {
+
+      },
+      allStageViews: {
+        splice: function() {}
+      }
+
+    };
+
+    var currentStage = {
+      myWidth: 128,
+      childSteps: [
+        {
+          ordealStatus: 10
+        }
+      ]
+    };
+
+    var data = {
+      stage: {
+        steps: {
+          length: 2
+        }
+      }
+    };
+
+    spyOn(_addStageService, "makeSpaceForNewStage").and.returnValue({
+      index: 1
     });
 
-    it("It should test addNextandPrevious", function() {
+    spyOn(_addStageService, "addNextandPrevious").and.returnValue(true);
+    spyOn(_addStageService, "insertStageGraphics").and.returnValue(true);
 
-        var currentStage = {
-            name: "currentStage",
-            nextStage: {
-                previousStage: {
-                    content: "Bin"
-                }
-            },
-            previousStage: "yes"
-        };
+    _addStageService.addNewStage(data, currentStage, "yes");
 
-        var stageView = {
-            name: "stageView"
-        };
+    expect(_addStageService.makeSpaceForNewStage).toHaveBeenCalled();
+    expect(_addStageService.insertStageGraphics).toHaveBeenCalled();
+    expect(_addStageService.addNextandPrevious).toHaveBeenCalled();
 
-        _addStageService.addNextandPrevious(currentStage, stageView);
-        expect(currentStage.nextStage.name).toEqual("stageView");
-        expect(stageView.previousStage.name).toEqual("currentStage");
-    });
+  });
 
-    it("It should test addNextandPrevious, when currentStage is null", function() {
+  it("It should test makeSpaceForNewStage method", function() {
 
-        var currentStage = null;
+    var data = {
+      stage: {
+        steps: [
+          {
+            step: 1
+          },
+          {
+            step: 2
+          }
+        ]
+      }
+    };
 
-        var stageView = {
-            name: "stageView"
-        };
+    var currentStage = {
+      myWidth: 0,
+      moveAllStepsAndStages: function() {}
+    };
 
-        _addStageService.canvasObj = {
-            allStageViews: [
-                {
-                    previousStage: null,
-                    name: "wasFirstStage"
-                }
-            ]
-        };
+    var add = 128;
 
-         _addStageService.addNextandPrevious(currentStage, stageView);
+    spyOn(currentStage, "moveAllStepsAndStages");
 
-         expect(stageView.nextStage.name).toEqual("wasFirstStage");
-         expect(_addStageService.canvasObj.allStageViews[0].previousStage.name).toEqual("stageView");
-    });
+    _addStageService.makeSpaceForNewStage(data, currentStage, add);
 
-    it("It should test insertStageGraphics method", function() {
+    expect(currentStage.moveAllStepsAndStages).toHaveBeenCalled();
+    expect(currentStage.myWidth).toEqual(256);
+  });
 
-        _addStageService.canvasObj = {
-            setDefaultWidthHeight: function() {},
-            allStageViews: [
-                {
-                    previousStage: null,
-                    name: "wasFirstStage",
-                    moveAllStepsAndStages: function() {},
-                }
-            ],
-            $scope: {
-                applyValues: function() {},
-            }
-        };
+  it("It should test addNextandPrevious", function() {
 
-        var stageView = {
-            stageHeader: function() {},
-            childSteps: [
-                {
-                    circle: {
-                        manageClick: function() {},
-                    }
-                }
-            ]
-        };
+    var currentStage = {
+      name: "currentStage",
+      nextStage: {
+        previousStage: {
+          content: "Bin"
+        }
+      },
+      previousStage: "yes"
+    };
 
-        var ordealStatus = 1, mode = "insert";
-        spyOn(_addStageService, "configureStepsofNewStage").and.returnValue(null);
-        spyOn(_correctNumberingService, "correctNumbering").and.returnValue(true);
-        spyOn(_circleManager, "addRampLines").and.returnValue(true);
-        spyOn(_addStageService.canvasObj.allStageViews[0], "moveAllStepsAndStages");
-        spyOn(stageView, "stageHeader");
-        spyOn(_addStageService.canvasObj.$scope, "applyValues");
-        spyOn(stageView.childSteps[0].circle, "manageClick");
-        spyOn(_addStageService.canvasObj, "setDefaultWidthHeight");
+    var stageView = {
+      name: "stageView"
+    };
 
-        _addStageService.insertStageGraphics(stageView, ordealStatus, mode);
+    _addStageService.addNextandPrevious(currentStage, stageView);
+    expect(currentStage.nextStage.name).toEqual("stageView");
+    expect(stageView.previousStage.name).toEqual("currentStage");
+  });
 
-        expect(_addStageService.configureStepsofNewStage).toHaveBeenCalled();
-        expect(_correctNumberingService.correctNumbering).toHaveBeenCalled();
-        expect(_circleManager.addRampLines).toHaveBeenCalled();
-        expect(_addStageService.canvasObj.allStageViews[0].moveAllStepsAndStages).toHaveBeenCalled();
-        expect(stageView.stageHeader).toHaveBeenCalled();
-        expect(_addStageService.canvasObj.$scope.applyValues).toHaveBeenCalled();
-        expect(stageView.childSteps[0].circle.manageClick).toHaveBeenCalled();
-        expect(_addStageService.canvasObj.setDefaultWidthHeight).toHaveBeenCalled();
-    });
+  it("It should test addNextandPrevious, when currentStage is null", function() {
 
-    it("It should test insertStageGraphics method, when mode is 'move_stage_back_to_original' ", function() {
-        
-        _addStageService.canvasObj = {
-            setDefaultWidthHeight: function() {},
-            allStageViews: [
-                {
-                    previousStage: null,
-                    name: "wasFirstStage",
-                    moveAllStepsAndStages: function() {},
-                    getLeft: function() {},
-                }
-            ],
-            $scope: {
-                applyValues: function() {},
-            }
-        };
+    var currentStage = null;
 
-        var stageView = {
-            stageHeader: function() {},
-            childSteps: [
-                {
-                    circle: {
-                        manageClick: function() {},
-                    }
-                }
-            ]
-        };
+    var stageView = {
+      name: "stageView"
+    };
 
-        var ordealStatus = 1, mode = "move_stage_back_to_original";
+    _addStageService.canvasObj = {
+      allStageViews: [
+        {
+          previousStage: null,
+          name: "wasFirstStage"
+        }
+      ]
+    };
 
-        spyOn(_addStageService, "configureStepsofNewStage").and.returnValue(null);
-        spyOn(_correctNumberingService, "correctNumbering").and.returnValue(true);
-        spyOn(_circleManager, "addRampLines").and.returnValue(true);
-        spyOn(_addStageService.canvasObj.allStageViews[0], "moveAllStepsAndStages");
-        spyOn(_addStageService.canvasObj.allStageViews[0], "getLeft");
-        spyOn(stageView, "stageHeader");
-        spyOn(_addStageService.canvasObj.$scope, "applyValues");
-        spyOn(stageView.childSteps[0].circle, "manageClick");
-        spyOn(_addStageService.canvasObj, "setDefaultWidthHeight");
+    _addStageService.addNextandPrevious(currentStage, stageView);
 
-        _addStageService.insertStageGraphics(stageView, ordealStatus, mode);
-        expect(_addStageService.canvasObj.allStageViews[0].getLeft).toHaveBeenCalled();        
-    });
+    expect(stageView.nextStage.name).toEqual("wasFirstStage");
+    expect(_addStageService.canvasObj.allStageViews[0].previousStage.name).toEqual("stageView");
+  });
 
-    it("It should test addNewStageAtBeginning", function() {
+  it("It should test insertStageGraphics method", function() {
 
-        var data = {
-            stage: {
-                steps: [
-                    {}, {}
-                ]
-            }
-        };
+    _addStageService.canvasObj = {
+      setDefaultWidthHeight: function() {},
+      allStageViews: [
+        {
+          previousStage: null,
+          name: "wasFirstStage",
+          moveAllStepsAndStages: function() {},
+        }
+      ],
+      $scope: {
+        applyValues: function() {},
+      }
+    };
 
-        _addStageService.canvasObj = {
-            setDefaultWidthHeight: function() {},
-            allStageViews: {
-                splice: function() {},
-            },
-            $scope: {
-                applyValues: function() {},
-            }
-        };
+    var stageView = {
+      stageHeader: function() {},
+      childSteps: [
+        {
+          circle: {
+            manageClick: function() {},
+          }
+        }
+      ]
+    };
 
-        spyOn(_addStageService, "addNextandPrevious").and.returnValue(true);
-        spyOn(_addStageService, "insertStageGraphics").and.returnValue(true);
-        spyOn(_addStageService.canvasObj.allStageViews, "splice");
-        
-        _addStageService.addNewStageAtBeginning(data);
+    var ordealStatus = 1, mode = "insert";
+    spyOn(_addStageService, "configureStepsofNewStage").and.returnValue(null);
+    spyOn(_correctNumberingService, "correctNumbering").and.returnValue(true);
+    spyOn(_circleManager, "addRampLines").and.returnValue(true);
+    spyOn(_addStageService.canvasObj.allStageViews[0], "moveAllStepsAndStages");
+    spyOn(stageView, "stageHeader");
+    spyOn(_addStageService.canvasObj.$scope, "applyValues");
+    spyOn(stageView.childSteps[0].circle, "manageClick");
+    spyOn(_addStageService.canvasObj, "setDefaultWidthHeight");
 
-        expect(_addStageService.addNextandPrevious).toHaveBeenCalled();
-        expect(_addStageService.insertStageGraphics).toHaveBeenCalled();
-        expect(_addStageService.canvasObj.allStageViews.splice).toHaveBeenCalled();
+    _addStageService.insertStageGraphics(stageView, ordealStatus, mode);
 
-    });
+    expect(_addStageService.configureStepsofNewStage).toHaveBeenCalled();
+    expect(_correctNumberingService.correctNumbering).toHaveBeenCalled();
+    expect(_circleManager.addRampLines).toHaveBeenCalled();
+    expect(_addStageService.canvasObj.allStageViews[0].moveAllStepsAndStages).toHaveBeenCalled();
+    expect(stageView.stageHeader).toHaveBeenCalled();
+    expect(_addStageService.canvasObj.$scope.applyValues).toHaveBeenCalled();
+    expect(stageView.childSteps[0].circle.manageClick).toHaveBeenCalled();
+    expect(_addStageService.canvasObj.setDefaultWidthHeight).toHaveBeenCalled();
+  });
 
-    it("It should test configureStepsofNewStage", function() {
+  it("It should test insertStageGraphics method, when mode is 'move_stage_back_to_original' ", function() {
 
-        var stageView = {
-            childSteps: [
-                {
-                    ordealStatus: 10,
-                    render: function() {},
-                    circle: {
-                        moveCircle: function() {},
-                        getCircle: function() {},
-                    }
-                }
-            ]
-        };
+    _addStageService.canvasObj = {
+      setDefaultWidthHeight: function() {},
+      allStageViews: [
+        {
+          previousStage: null,
+          name: "wasFirstStage",
+          moveAllStepsAndStages: function() {},
+          getLeft: function() {},
+        }
+      ],
+      $scope: {
+        applyValues: function() {},
+      }
+    };
 
-        _addStageService.canvasObj = {
-            setDefaultWidthHeight: function() {},
-            allStepViews: {
-                splice: function() {},
-            },
-            $scope: {
-                applyValues: function() {},
-            }
-        };
+    var stageView = {
+      stageHeader: function() {},
+      childSteps: [
+        {
+          circle: {
+            manageClick: function() {},
+          }
+        }
+      ]
+    };
 
-        var ordealStatus =10;
-        
-        spyOn(stageView.childSteps[0], "render");
-        spyOn(stageView.childSteps[0].circle, "moveCircle");
-        spyOn(stageView.childSteps[0].circle, "getCircle");
-        spyOn(_addStageService.canvasObj.allStepViews, "splice");
+    var ordealStatus = 1, mode = "move_stage_back_to_original";
 
-        _addStageService.configureStepsofNewStage(stageView, ordealStatus);
+    spyOn(_addStageService, "configureStepsofNewStage").and.returnValue(null);
+    spyOn(_correctNumberingService, "correctNumbering").and.returnValue(true);
+    spyOn(_circleManager, "addRampLines").and.returnValue(true);
+    spyOn(_addStageService.canvasObj.allStageViews[0], "moveAllStepsAndStages");
+    spyOn(_addStageService.canvasObj.allStageViews[0], "getLeft");
+    spyOn(stageView, "stageHeader");
+    spyOn(_addStageService.canvasObj.$scope, "applyValues");
+    spyOn(stageView.childSteps[0].circle, "manageClick");
+    spyOn(_addStageService.canvasObj, "setDefaultWidthHeight");
 
-        expect(stageView.childSteps[0].ordealStatus).toEqual(11);
-        expect(stageView.childSteps[0].render).toHaveBeenCalled();
-        expect(stageView.childSteps[0].circle.moveCircle).toHaveBeenCalled();
-        expect(stageView.childSteps[0].circle.getCircle).toHaveBeenCalled();
-        expect(_addStageService.canvasObj.allStepViews.splice).toHaveBeenCalled();
-    });
+    _addStageService.insertStageGraphics(stageView, ordealStatus, mode);
+    expect(_addStageService.canvasObj.allStageViews[0].getLeft).toHaveBeenCalled();
+  });
+
+  it("It should test addNewStageAtBeginning", function() {
+
+    var data = {
+      stage: {
+        steps: [
+          {}, {}
+        ]
+      }
+    };
+
+    _addStageService.canvasObj = {
+      setDefaultWidthHeight: function() {},
+      allStageViews: {
+        splice: function() {},
+      },
+      $scope: {
+        applyValues: function() {},
+      }
+    };
+
+    spyOn(_addStageService, "addNextandPrevious").and.returnValue(true);
+    spyOn(_addStageService, "insertStageGraphics").and.returnValue(true);
+    spyOn(_addStageService.canvasObj.allStageViews, "splice");
+
+    _addStageService.addNewStageAtBeginning(data);
+
+    expect(_addStageService.addNextandPrevious).toHaveBeenCalled();
+    expect(_addStageService.insertStageGraphics).toHaveBeenCalled();
+    expect(_addStageService.canvasObj.allStageViews.splice).toHaveBeenCalled();
+
+  });
+
+  it("It should test configureStepsofNewStage", function() {
+
+    var stageView = {
+      childSteps: [
+        {
+          ordealStatus: 10,
+          render: function() {},
+          circle: {
+            moveCircle: function() {},
+            getCircle: function() {},
+          }
+        }
+      ]
+    };
+
+    _addStageService.canvasObj = {
+      setDefaultWidthHeight: function() {},
+      allStepViews: {
+        splice: function() {},
+      },
+      $scope: {
+        applyValues: function() {},
+      }
+    };
+
+    var ordealStatus =10;
+
+    spyOn(stageView.childSteps[0], "render");
+    spyOn(stageView.childSteps[0].circle, "moveCircle");
+    spyOn(stageView.childSteps[0].circle, "getCircle");
+    spyOn(_addStageService.canvasObj.allStepViews, "splice");
+
+    _addStageService.configureStepsofNewStage(stageView, ordealStatus);
+
+    expect(stageView.childSteps[0].ordealStatus).toEqual(11);
+    expect(stageView.childSteps[0].render).toHaveBeenCalled();
+    expect(stageView.childSteps[0].circle.moveCircle).toHaveBeenCalled();
+    expect(stageView.childSteps[0].circle.getCircle).toHaveBeenCalled();
+    expect(_addStageService.canvasObj.allStepViews.splice).toHaveBeenCalled();
+  });
 });

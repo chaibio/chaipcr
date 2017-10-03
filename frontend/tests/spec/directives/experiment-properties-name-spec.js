@@ -1,6 +1,9 @@
 describe("Specs for edit Exp name in the left menu", function() {
 
-  beforeEach(module("ChaiBioTech"));
+  beforeEach(module("ChaiBioTech", function ($provide) {
+    $provide.value('IsTouchScreen', function() {});
+  }));
+
   var scope, compile, httpMock, elem, compiled;
 
   beforeEach(inject(function($rootScope, $compile, $httpBackend) {
@@ -10,6 +13,7 @@ describe("Specs for edit Exp name in the left menu", function() {
     httpMock.whenGET("http://localhost:8000/status").respond("NOTHING");
     httpMock.whenGET("http://localhost:8000/network/wlan").respond("NOTHING");
     httpMock.whenGET("/experiments/").respond("NOTHING");
+    httpMock.whenGET("/experiments/undefined").respond("NOTHING");
     elem = angular.element('<edit-exp-name status="NOT_STARTED"></edit-exp-name>');
     compiled = compile(elem)(scope);
   }));

@@ -5,7 +5,9 @@ describe 'AmplificationChartCtrl', ->
   _$controller = null
 
   beforeEach ->
-    module('ChaiBioTech')
+    module 'ChaiBioTech', ($provide) ->
+      mockCommonServices($provide)
+
 
     inject ($injector) ->
       _$httpBackend = $injector.get '$httpBackend'
@@ -14,5 +16,5 @@ describe 'AmplificationChartCtrl', ->
 
 
   it 'should have AmplificationChartCtrl controller', ->
-    expect(ChaiBioTech.AmplificationChartCtrl).not.toEqual(null);
+    expect(ChaiBioTech.AmplificationChartCtrl).not.toEqual(null)
 

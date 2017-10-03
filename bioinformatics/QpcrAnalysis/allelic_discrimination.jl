@@ -1,7 +1,8 @@
 # allelic discrimination (ad)
 
 # 4 groups
-const DEFAULT_encgr = [0 1 0 1; 0 0 1 1] # NTC, homo ch1, homo ch2, hetero
+const DEFAULT_encgr = Array{Int,2}()
+# const DEFAULT_encgr = [0 1 0 1; 0 0 1 1] # NTC, homo ch1, homo ch2, hetero
 const DEFAULT_init_FACTORS = [1, 1, 1, 1] # sometimes "hetero" may not have very high end-point fluo
 const DEFAULT_apg_LABELS = ["ntc", "homo_a", "homo_b", "hetero", "unclassified"]
 
@@ -160,7 +161,7 @@ function assign_genos(
 
         cluster_result = car.cluster_result
         best_i = 1
-        expected_genos_vec = Vector{Vector{Int}}()
+        expected_genos_vec = Vector{Array{Int,2}}()
         car_vec = [car]
 
         assignments_adj_labels = fill(apg_labels[end], num_wells)
@@ -222,7 +223,7 @@ function assign_genos(
             car = do_cluster_analysis(data, init_centers, cluster_method)
 
             best_i = 1
-            expected_genos_vec = [expected_genos_all[geno_idc]]
+            expected_genos_vec = [expected_genos_all[:, geno_idc]]
             car_vec = [car]
 
         else # no expected genotypes specified for non-control wells, perform cluster analysis on all possible combinations of genotypes
@@ -232,17 +233,17 @@ function assign_genos(
             # num_non_ctrl_genos = length(non_ctrl_geno_idc)
 
             # initial conditions for `while` loop
-            expected_genos_vec = Vector{Vector{Int}}()
+            expected_genos_vec = Vector{Array{Int,2}}()
             car_vec = Vector{ClusterAnalysisResult}()
             num_genos = max_num_genos
 
             while num_genos >= 2 # `p_` = possible
-                for num_expected_ncg in (num_genos - num_ctrl_genos):-1:0
+                for num_expected_ncg in (num_genos - num_ctrl_genos) : -1 : max(2 - num_ctrl_genos, 0)
                     possible_ncg_idc_vec = combinations(non_ctrl_geno_idc, num_expected_ncg)
                     for possible_ncg_idc in possible_ncg_idc_vec
                         geno_idc = vcat(ctrl_geno_idc, possible_ncg_idc)
-                        push!(expected_genos_vec, expected_genos_all[geno_idc])
-                        init_centers = init_centers_all[geno_idc]
+                        push!(expected_genos_vec, expected_genos_all[:, geno_idc])
+                        init_centers = init_centers_all[:, geno_idc]
                         push!(car_vec, do_cluster_analysis(data, init_centers, cluster_method))
                     end # for possible_ncg_idc
                 end # for num_expected_ncg
