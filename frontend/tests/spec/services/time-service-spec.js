@@ -5,7 +5,7 @@ describe("Testing TimeService", function() {
   beforeEach(function() {
 
     module('ChaiBioTech', function($provide) {
-      mockCommonServices($provide)
+      mockCommonServices($provide);
     });
 
     inject(function($injector) {
