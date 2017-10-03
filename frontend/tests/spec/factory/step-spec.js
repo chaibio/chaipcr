@@ -1,16 +1,20 @@
 describe("Testing functionalities of step", function() {
 
-    beforeEach(module('ChaiBioTech'));
-    beforeEach(module('canvasApp'));
+  beforeEach(module('ChaiBioTech', function ($provide) {
+    mockCommonServices($provide);
+  }));
 
-    var _step;
+  beforeEach(module('canvasApp'));
 
-    beforeEach(inject(function(step) {
-        _step = step;
-    }));
+  var _step;
+
+  beforeEach(inject(function(step) {
+    _step = step;
+  }));
 
 
-    it("should test step", function() {
-        expect("a").toEqual("a");
-    });
+  it("should test step", function() {
+    expect("a").toEqual("a");
+  });
+
 });

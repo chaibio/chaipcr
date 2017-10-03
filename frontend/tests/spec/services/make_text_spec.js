@@ -1,6 +1,8 @@
 describe("Testing Text service", function() {
 
-  beforeEach(module('ChaiBioTech'));
+  beforeEach(module('ChaiBioTech', function ($provide) {
+    mockCommonServices($provide);
+  }));
 
   var text, properties, displayText;
 

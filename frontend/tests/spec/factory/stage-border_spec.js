@@ -1,6 +1,9 @@
 describe("Testing stageBorderLeft", function() {
 
-  beforeEach(module('ChaiBioTech'));
+  beforeEach(module('ChaiBioTech', function ($provide) {
+    mockCommonServices($provide);
+  }));
+
   beforeEach(module('canvasApp'));
 
   var _stageBorderLeft;
@@ -39,5 +42,5 @@ describe("Testing stageBorderLeft", function() {
   it("It should be a fabric Line object with y2", function() {
     expect(_stageBorderLeft.y2).toEqual(390);
   });
-  
+
 });

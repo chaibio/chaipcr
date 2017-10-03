@@ -1,10 +1,13 @@
 describe("Testing step closeLine", function() {
 
-  beforeEach(module('ChaiBioTech'));
+  beforeEach(module('ChaiBioTech', function ($provide) {
+    mockCommonServices($provide);
+  }));
+
   beforeEach(module('canvasApp'));
 
   var _closeLine,
-  shadowCloseLine;
+    shadowCloseLine;
   beforeEach(inject(function(closeLine) {
     _closeLine = new closeLine();
     shadowCloseLine = closeLine;
@@ -16,15 +19,15 @@ describe("Testing step closeLine", function() {
 
   it("It should check the angle of closeLine if provided", function() {
     var prop = {
-        stroke: 'rgb(166, 122, 40)',
-        angle: 90,
-        originX: 'center',
-        originY: 'center',
-      };
+      stroke: 'rgb(166, 122, 40)',
+      angle: 90,
+      originX: 'center',
+      originY: 'center',
+    };
 
-      _closeLine = new shadowCloseLine(prop);
+    _closeLine = new shadowCloseLine(prop);
 
-      expect(_closeLine.angle).toEqual(90);
+    expect(_closeLine.angle).toEqual(90);
   });
 
 

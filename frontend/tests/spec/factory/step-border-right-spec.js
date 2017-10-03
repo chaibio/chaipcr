@@ -1,12 +1,15 @@
 describe("Testing steps's borderRight factory", function() {
 
-  beforeEach(module('ChaiBioTech'));
+  beforeEach(module('ChaiBioTech', function ($provide) {
+    mockCommonServices($provide);
+  }));
+
   beforeEach(module('canvasApp'));
 
   var _borderRight,
-  step = {
-    myWidth: 128
-  };
+    step = {
+      myWidth: 128
+    };
 
   beforeEach(inject(function(borderRight) {
     _borderRight = new borderRight(step);

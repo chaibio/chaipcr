@@ -1,6 +1,8 @@
 describe("Testing canvas.js", function() {
 
-  beforeEach(module("ChaiBioTech"));
+  beforeEach(module("ChaiBioTech", function ($provide) {
+    $provide.value('IsTouchScreen', function () {});
+  }));
 
   beforeEach(module("canvasApp"));
 

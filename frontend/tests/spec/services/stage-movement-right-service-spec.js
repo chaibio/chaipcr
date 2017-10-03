@@ -1,186 +1,189 @@
 describe("Testing StageMovementRightService", function() {
 
-    beforeEach(module('ChaiBioTech'));
-    beforeEach(module('canvasApp'));
+  beforeEach(module('ChaiBioTech', function ($provide) {
+    mockCommonServices($provide)
+  }));
 
-    var _StageMovementRightService, _StagePositionService, _StepPositionService, _moveStageToSidesWhileMoveStep;
+  beforeEach(module('canvasApp'));
 
-    beforeEach(inject(function(StageMovementRightService, StagePositionService, StepPositionService, moveStageToSidesWhileMoveStep) {
+  var _StageMovementRightService, _StagePositionService, _StepPositionService, _moveStageToSidesWhileMoveStep;
 
-        _StageMovementRightService = StageMovementRightService;
-        _StagePositionService = StagePositionService;
-        _StepPositionService = StepPositionService;
-        _moveStageToSidesWhileMoveStep = moveStageToSidesWhileMoveStep;
-    }));
+  beforeEach(inject(function(StageMovementRightService, StagePositionService, StepPositionService, moveStageToSidesWhileMoveStep) {
 
-    it("It should test shouldStageMoveRight method", function() {
+    _StageMovementRightService = StageMovementRightService;
+    _StagePositionService = StagePositionService;
+    _StepPositionService = StepPositionService;
+    _moveStageToSidesWhileMoveStep = moveStageToSidesWhileMoveStep;
+  }));
 
-        sI = {
-            movedStageIndex: null
-        };
+  it("It should test shouldStageMoveRight method", function() {
 
-        spyOn(_StageMovementRightService, "shouldStageMoveRightCallback").and.callFake(function(thisObjs) {
-            thisObjs.movedStageIndex = 5;
-            return true;
-        });
+    sI = {
+      movedStageIndex: null
+    };
 
-        _StagePositionService.allPositions = {
-            
-            some: function(callback, thisObjs) {
-                callback(thisObjs);
-            }
-        };
-
-        var rVal = _StageMovementRightService.shouldStageMoveRight(sI);
-        expect(rVal).toEqual(5);
+    spyOn(_StageMovementRightService, "shouldStageMoveRightCallback").and.callFake(function(thisObjs) {
+      thisObjs.movedStageIndex = 5;
+      return true;
     });
 
-    it("It should test shouldStageMoveLeft method, test shouldStageMoveRightCallback call from this method", function() {
+    _StagePositionService.allPositions = {
 
-        sI = {
-            movedStageIndex: null
-        };
+      some: function(callback, thisObjs) {
+        callback(thisObjs);
+      }
+    };
 
-        spyOn(_StageMovementRightService, "shouldStageMoveRightCallback").and.callFake(function(thisObjs) {
-            thisObjs.movedStageIndex = 5;
-            return true;
-        });
+    var rVal = _StageMovementRightService.shouldStageMoveRight(sI);
+    expect(rVal).toEqual(5);
+  });
 
-        _StagePositionService.allPositions = {
-            
-            some: function(callback, thisObjs) {
-                callback(thisObjs);
-            }
-        };
+  it("It should test shouldStageMoveLeft method, test shouldStageMoveRightCallback call from this method", function() {
 
-        _StageMovementRightService.shouldStageMoveRight(sI);
-         expect(_StageMovementRightService.shouldStageMoveRightCallback).toHaveBeenCalled();
+    sI = {
+      movedStageIndex: null
+    };
+
+    spyOn(_StageMovementRightService, "shouldStageMoveRightCallback").and.callFake(function(thisObjs) {
+      thisObjs.movedStageIndex = 5;
+      return true;
     });
 
-    it("It should test shouldStageMoveLeft method, make sure 'some' method has been called", function() {
+    _StagePositionService.allPositions = {
 
-        sI = {
-            movedStageIndex: null
-        };
+      some: function(callback, thisObjs) {
+        callback(thisObjs);
+      }
+    };
 
-        spyOn(_StageMovementRightService, "shouldStageMoveRightCallback").and.callFake(function(thisObjs) {
-            thisObjs.movedStageIndex = 5;
-            return true;
-        });
+    _StageMovementRightService.shouldStageMoveRight(sI);
+    expect(_StageMovementRightService.shouldStageMoveRightCallback).toHaveBeenCalled();
+  });
 
-        _StagePositionService.allPositions = {
-            
-            some: function(callback, thisObjs) {
-                callback(thisObjs);
-            }
-        };
+  it("It should test shouldStageMoveLeft method, make sure 'some' method has been called", function() {
 
-        spyOn(_StagePositionService.allPositions, "some");
-        _StageMovementRightService.shouldStageMoveRight(sI);
-        expect(_StagePositionService.allPositions.some).toHaveBeenCalled();
+    sI = {
+      movedStageIndex: null
+    };
+
+    spyOn(_StageMovementRightService, "shouldStageMoveRightCallback").and.callFake(function(thisObjs) {
+      thisObjs.movedStageIndex = 5;
+      return true;
     });
 
-    it("It should test shouldStageMoveRightCallback method, when both conditions are true", function() {
+    _StagePositionService.allPositions = {
 
-        var sI = {
-            movement: {
-                left: 100
-            },
-            rightOffset: 20,
-            movedRightStageIndex: 1,
-            kanvas: {
-                allStageViews: [
-                    {
-                        moveToSide: function() {}
-                    }
-                ],
-                allStepViews: [
+      some: function(callback, thisObjs) {
+        callback(thisObjs);
+      }
+    };
 
-                ]
-            }
-        };
+    spyOn(_StagePositionService.allPositions, "some");
+    _StageMovementRightService.shouldStageMoveRight(sI);
+    expect(_StagePositionService.allPositions.some).toHaveBeenCalled();
+  });
 
-        var args = [[200, 210, 230], 0];
+  it("It should test shouldStageMoveRightCallback method, when both conditions are true", function() {
 
-        spyOn(_StagePositionService, "getPositionObject").and.returnValue(true);
-        spyOn(_StagePositionService, "getAllVoidSpaces").and.returnValue(true);
-        spyOn(_StepPositionService, "getPositionObject").and.returnValue(true);
-        spyOn(_moveStageToSidesWhileMoveStep, "moveToSideForStep").and.returnValue();
+    var sI = {
+      movement: {
+        left: 100
+      },
+      rightOffset: 20,
+      movedRightStageIndex: 1,
+      kanvas: {
+        allStageViews: [
+          {
+            moveToSide: function() {}
+          }
+        ],
+        allStepViews: [
 
-        _StageMovementRightService.shouldStageMoveRightCallback.apply(sI, args);
+        ]
+      }
+    };
 
-        expect(_StagePositionService.getPositionObject).toHaveBeenCalled();
-        expect(_StagePositionService.getAllVoidSpaces).toHaveBeenCalled();
-        expect(_StepPositionService.getPositionObject).toHaveBeenCalled();
-        expect(_moveStageToSidesWhileMoveStep.moveToSideForStep).toHaveBeenCalled();
-    });
+    var args = [[200, 210, 230], 0];
 
-    it("It should test shouldStageMoveRightCallback method, when movement.left not within the space", function() {
+    spyOn(_StagePositionService, "getPositionObject").and.returnValue(true);
+    spyOn(_StagePositionService, "getAllVoidSpaces").and.returnValue(true);
+    spyOn(_StepPositionService, "getPositionObject").and.returnValue(true);
+    spyOn(_moveStageToSidesWhileMoveStep, "moveToSideForStep").and.returnValue();
 
-        var sI = {
-            movement: {
-                left: 1000
-            },
-            rightOffset: 20,
-            movedRightStageIndex: 1,
-            kanvas: {
-                allStageViews: [
-                    {
-                        moveToSide: function() {}
-                    }
-                ],
-                allStepViews: [
+    _StageMovementRightService.shouldStageMoveRightCallback.apply(sI, args);
 
-                ]
-            }
-        };
+    expect(_StagePositionService.getPositionObject).toHaveBeenCalled();
+    expect(_StagePositionService.getAllVoidSpaces).toHaveBeenCalled();
+    expect(_StepPositionService.getPositionObject).toHaveBeenCalled();
+    expect(_moveStageToSidesWhileMoveStep.moveToSideForStep).toHaveBeenCalled();
+  });
 
-        var args = [[200, 210, 230], 0];
+  it("It should test shouldStageMoveRightCallback method, when movement.left not within the space", function() {
 
-        spyOn(_StagePositionService, "getPositionObject").and.returnValue(true);
-        spyOn(_StagePositionService, "getAllVoidSpaces").and.returnValue(true);
-        spyOn(_StepPositionService, "getPositionObject").and.returnValue(true);
+    var sI = {
+      movement: {
+        left: 1000
+      },
+      rightOffset: 20,
+      movedRightStageIndex: 1,
+      kanvas: {
+        allStageViews: [
+          {
+            moveToSide: function() {}
+          }
+        ],
+        allStepViews: [
 
-        _StageMovementRightService.shouldStageMoveRightCallback.apply(sI, args);
+        ]
+      }
+    };
 
-        expect(_StagePositionService.getPositionObject).not.toHaveBeenCalled();
-        expect(_StagePositionService.getAllVoidSpaces).not.toHaveBeenCalled();
-        expect(_StepPositionService.getPositionObject).not.toHaveBeenCalled();
-    });
+    var args = [[200, 210, 230], 0];
 
-    it("It should test shouldStageMoveRightCallback method, when movement.left within the space but index is already selected", function() {
+    spyOn(_StagePositionService, "getPositionObject").and.returnValue(true);
+    spyOn(_StagePositionService, "getAllVoidSpaces").and.returnValue(true);
+    spyOn(_StepPositionService, "getPositionObject").and.returnValue(true);
 
-        var sI = {
-            movement: {
-                left: 100
-            },
-            rightOffset: 20,
-            movedRightStageIndex: 1,
-            kanvas: {
-                allStageViews: [
-                    {
-                        moveToSide: function() {}
-                    },
-                    {
-                        moveToSide: function() {}
-                    }
-                ],
-                allStepViews: [
+    _StageMovementRightService.shouldStageMoveRightCallback.apply(sI, args);
 
-                ]
-            }
-        };
+    expect(_StagePositionService.getPositionObject).not.toHaveBeenCalled();
+    expect(_StagePositionService.getAllVoidSpaces).not.toHaveBeenCalled();
+    expect(_StepPositionService.getPositionObject).not.toHaveBeenCalled();
+  });
 
-        var args = [[200, 210, 230], 1];
+  it("It should test shouldStageMoveRightCallback method, when movement.left within the space but index is already selected", function() {
 
-        spyOn(_StagePositionService, "getPositionObject").and.returnValue(true);
-        spyOn(_StagePositionService, "getAllVoidSpaces").and.returnValue(true);
-        spyOn(_StepPositionService, "getPositionObject").and.returnValue(true);
+    var sI = {
+      movement: {
+        left: 100
+      },
+      rightOffset: 20,
+      movedRightStageIndex: 1,
+      kanvas: {
+        allStageViews: [
+          {
+            moveToSide: function() {}
+          },
+          {
+            moveToSide: function() {}
+          }
+        ],
+        allStepViews: [
 
-        _StageMovementRightService.shouldStageMoveRightCallback.apply(sI, args);
+        ]
+      }
+    };
 
-        expect(_StagePositionService.getPositionObject).not.toHaveBeenCalled();
-        expect(_StagePositionService.getAllVoidSpaces).not.toHaveBeenCalled();
-        expect(_StepPositionService.getPositionObject).not.toHaveBeenCalled();
-    });
-}); 
+    var args = [[200, 210, 230], 1];
+
+    spyOn(_StagePositionService, "getPositionObject").and.returnValue(true);
+    spyOn(_StagePositionService, "getAllVoidSpaces").and.returnValue(true);
+    spyOn(_StepPositionService, "getPositionObject").and.returnValue(true);
+
+    _StageMovementRightService.shouldStageMoveRightCallback.apply(sI, args);
+
+    expect(_StagePositionService.getPositionObject).not.toHaveBeenCalled();
+    expect(_StagePositionService.getAllVoidSpaces).not.toHaveBeenCalled();
+    expect(_StepPositionService.getPositionObject).not.toHaveBeenCalled();
+  });
+});
