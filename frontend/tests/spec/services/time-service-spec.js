@@ -66,4 +66,53 @@ describe("Testing TimeService", function() {
         var rVal = _TimeService.convertToSeconds(timeString);
         expect(_$rootScope.$broadcast).toHaveBeenCalled();
     });
+
+    it("It should test timeFormating method", function() {
+
+        var reading = 100;
+        var retVal = _TimeService.timeFormating(reading);
+        expect(retVal).toEqual("01:40");
+    });
+
+    it("It should test timeFormating method, when a negative value is sent", function() {
+
+        var reading = -100;
+        var retVal = _TimeService.timeFormating(reading);
+        expect(retVal).toEqual("-01:40");
+    });
+
+    it("It should test timeFormating method, when method return minute value that is less than 10", function() {
+
+        var reading = -66;
+        var retVal = _TimeService.timeFormating(reading);
+        expect(retVal).toEqual("-01:06");
+    });
+
+    it("It should test newTimeFormatting method", function() {
+
+        var reading = 100;
+        var retVal = _TimeService.newTimeFormatting(reading);
+        expect(retVal).toEqual("01:40");
+    });
+
+    it("It should test newTimeFormatting, when 3600 is passed", function() {
+
+        var reading = 3600;
+        var retVal = _TimeService.newTimeFormatting(reading);
+        expect(retVal).toEqual("1:00:00");
+    });
+
+    it("It should test newTimeFormatting, when 3600 is passed", function() {
+
+        var reading = 4000;
+        var retVal = _TimeService.newTimeFormatting(reading);
+        expect(retVal).toEqual("1:06:40");
+    });
+
+    it("It should test newTimeFormatting, when a negative value is passed", function() {
+
+        var reading = -4000;
+        var retVal = _TimeService.newTimeFormatting(reading);
+        expect(retVal).toEqual("-1:06:40");
+    });
 });
