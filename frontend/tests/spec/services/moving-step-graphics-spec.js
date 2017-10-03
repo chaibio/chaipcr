@@ -1,159 +1,161 @@
 describe("Testing movingStepGraphics service", function() {
-    
-    beforeEach(module('ChaiBioTech'));
-    beforeEach(module('canvasApp'));
 
-    var _movingStepGraphics, currentStep;
-    beforeEach(inject(function(movingStepGraphics) {
-       
-        _movingStepGraphics = movingStepGraphics;
-         _movingStepGraphics.offset = 41;
-         
-         currentStep = {
-            previousStep: {
+  beforeEach(module('ChaiBioTech', function ($provide) {
+    mockCommonServices($provide)
+  }));
+  beforeEach(module('canvasApp'));
 
-            },
-            parentStage: {
-                myWidth: 128,
-                left: 100,
-                stageRect: {
-                    setWidth: function() {},
-                    setCoords: function() {}
-                },
-                roof: {
-                    setWidth: function() {},
-                    setCoords: function() {}
-                },
-                stageGroup: {
-                    left: 100,
-                    setLeft: function() {},
-                    setCoords: function() {}
-                },
-                dots: {
-                    left: 110,
-                    setLeft: function() {},
-                    setCoords: function() {}
-                }
-            }
-         };
-    }));
+  var _movingStepGraphics, currentStep;
+  beforeEach(inject(function(movingStepGraphics) {
 
-    it("It should test initiateMoveStepGraphics method", function() {
+    _movingStepGraphics = movingStepGraphics;
+    _movingStepGraphics.offset = 41;
 
-        spyOn(_movingStepGraphics, "arrangeStepsOfStage");
-        spyOn(_movingStepGraphics, "setWidthOfStage");
-        spyOn(_movingStepGraphics, "setLeftOfStage");
+    currentStep = {
+      previousStep: {
 
-        _movingStepGraphics.initiateMoveStepGraphics(currentStep);
+      },
+      parentStage: {
+        myWidth: 128,
+        left: 100,
+        stageRect: {
+          setWidth: function() {},
+          setCoords: function() {}
+        },
+        roof: {
+          setWidth: function() {},
+          setCoords: function() {}
+        },
+        stageGroup: {
+          left: 100,
+          setLeft: function() {},
+          setCoords: function() {}
+        },
+        dots: {
+          left: 110,
+          setLeft: function() {},
+          setCoords: function() {}
+        }
+      }
+    };
+  }));
 
-        expect(_movingStepGraphics.arrangeStepsOfStage).toHaveBeenCalled();
-        expect(_movingStepGraphics.setWidthOfStage).toHaveBeenCalled();
-        expect(_movingStepGraphics.setLeftOfStage).toHaveBeenCalled();
-    });
+  it("It should test initiateMoveStepGraphics method", function() {
 
-    it("It should test setWidthOfStage method", function() {
+    spyOn(_movingStepGraphics, "arrangeStepsOfStage");
+    spyOn(_movingStepGraphics, "setWidthOfStage");
+    spyOn(_movingStepGraphics, "setLeftOfStage");
 
-        var preWidth = currentStep.parentStage.myWidth;
-        
-        spyOn(currentStep.parentStage.stageRect, "setWidth");
-        spyOn(currentStep.parentStage.stageRect, "setCoords");
+    _movingStepGraphics.initiateMoveStepGraphics(currentStep);
 
-        spyOn(currentStep.parentStage.roof, "setWidth");
-        spyOn(currentStep.parentStage.roof, "setCoords");
+    expect(_movingStepGraphics.arrangeStepsOfStage).toHaveBeenCalled();
+    expect(_movingStepGraphics.setWidthOfStage).toHaveBeenCalled();
+    expect(_movingStepGraphics.setLeftOfStage).toHaveBeenCalled();
+  });
 
-        spyOn(currentStep.parentStage.stageGroup, "setLeft");
-        spyOn(currentStep.parentStage.stageGroup, "setCoords");
+  it("It should test setWidthOfStage method", function() {
 
-        spyOn(currentStep.parentStage.dots, "setLeft");
-        spyOn(currentStep.parentStage.dots, "setCoords");
+    var preWidth = currentStep.parentStage.myWidth;
 
-        _movingStepGraphics.setWidthOfStage(currentStep.parentStage);
+    spyOn(currentStep.parentStage.stageRect, "setWidth");
+    spyOn(currentStep.parentStage.stageRect, "setCoords");
 
-        expect(currentStep.parentStage.myWidth).toEqual(preWidth - 75);
+    spyOn(currentStep.parentStage.roof, "setWidth");
+    spyOn(currentStep.parentStage.roof, "setCoords");
 
-        expect(currentStep.parentStage.stageRect.setWidth).toHaveBeenCalled();
-        expect(currentStep.parentStage.stageRect.setCoords).toHaveBeenCalled();
+    spyOn(currentStep.parentStage.stageGroup, "setLeft");
+    spyOn(currentStep.parentStage.stageGroup, "setCoords");
 
-        expect(currentStep.parentStage.roof.setWidth).toHaveBeenCalled();
-        expect(currentStep.parentStage.roof.setCoords).toHaveBeenCalled();
+    spyOn(currentStep.parentStage.dots, "setLeft");
+    spyOn(currentStep.parentStage.dots, "setCoords");
 
-        expect(currentStep.parentStage.stageGroup.setLeft).toHaveBeenCalled();
-        expect(currentStep.parentStage.stageGroup.setCoords).toHaveBeenCalled();
+    _movingStepGraphics.setWidthOfStage(currentStep.parentStage);
 
-        expect(currentStep.parentStage.dots.setLeft).toHaveBeenCalled();
-        expect(currentStep.parentStage.dots.setCoords).toHaveBeenCalled();
-    });
+    expect(currentStep.parentStage.myWidth).toEqual(preWidth - 75);
 
-    it("It should test setLeftOfStage method", function() {
+    expect(currentStep.parentStage.stageRect.setWidth).toHaveBeenCalled();
+    expect(currentStep.parentStage.stageRect.setCoords).toHaveBeenCalled();
 
-        var preLeft = currentStep.parentStage.left;
-        _movingStepGraphics.setLeftOfStage(currentStep.parentStage);
-        expect(currentStep.parentStage.left).toEqual(preLeft + _movingStepGraphics.offset);
-    });
+    expect(currentStep.parentStage.roof.setWidth).toHaveBeenCalled();
+    expect(currentStep.parentStage.roof.setCoords).toHaveBeenCalled();
 
-    it("It should test moveLittleRight method", function() {
-        var step = {
-            left: 100,
-            moveStep: function() {},
-            circle: {
-                moveCircleWithStep: function() {},
-            }
-        };
+    expect(currentStep.parentStage.stageGroup.setLeft).toHaveBeenCalled();
+    expect(currentStep.parentStage.stageGroup.setCoords).toHaveBeenCalled();
 
-        spyOn(step, "moveStep");
-        spyOn(step.circle, "moveCircleWithStep");
+    expect(currentStep.parentStage.dots.setLeft).toHaveBeenCalled();
+    expect(currentStep.parentStage.dots.setCoords).toHaveBeenCalled();
+  });
 
-        _movingStepGraphics.moveLittleRight(step);
+  it("It should test setLeftOfStage method", function() {
 
-        expect(step.left).toEqual(141);
-        expect(step.moveStep).toHaveBeenCalled();
-        expect(step.circle.moveCircleWithStep).toHaveBeenCalled();
-    });
+    var preLeft = currentStep.parentStage.left;
+    _movingStepGraphics.setLeftOfStage(currentStep.parentStage);
+    expect(currentStep.parentStage.left).toEqual(preLeft + _movingStepGraphics.offset);
+  });
 
-    it("It should test moveLittleLeft method", function() {
+  it("It should test moveLittleRight method", function() {
+    var step = {
+      left: 100,
+      moveStep: function() {},
+      circle: {
+        moveCircleWithStep: function() {},
+      }
+    };
 
-        var step = {
-            left: 100,
-            moveStep: function() {},
-            circle: {
-                moveCircleWithStep: function() {},
-            }
-        };
+    spyOn(step, "moveStep");
+    spyOn(step.circle, "moveCircleWithStep");
 
-        spyOn(step, "moveStep");
-        spyOn(step.circle, "moveCircleWithStep");
+    _movingStepGraphics.moveLittleRight(step);
 
-        _movingStepGraphics.moveLittleLeft(step);
+    expect(step.left).toEqual(141);
+    expect(step.moveStep).toHaveBeenCalled();
+    expect(step.circle.moveCircleWithStep).toHaveBeenCalled();
+  });
 
-        expect(step.left).toEqual(18);
-        expect(step.moveStep).toHaveBeenCalled();
-        expect(step.circle.moveCircleWithStep).toHaveBeenCalled();
+  it("It should test moveLittleLeft method", function() {
 
-    });
+    var step = {
+      left: 100,
+      moveStep: function() {},
+      circle: {
+        moveCircleWithStep: function() {},
+      }
+    };
+
+    spyOn(step, "moveStep");
+    spyOn(step.circle, "moveCircleWithStep");
+
+    _movingStepGraphics.moveLittleLeft(step);
+
+    expect(step.left).toEqual(18);
+    expect(step.moveStep).toHaveBeenCalled();
+    expect(step.circle.moveCircleWithStep).toHaveBeenCalled();
+
+  });
 
 
-    it("It should test arrangeStepsOfStage method", function() {
+  it("It should test arrangeStepsOfStage method", function() {
 
-        var step = {
-                previousStep: {
+    var step = {
+      previousStep: {
 
-                },
-                nextStep: {
+      },
+      nextStep: {
 
-                },
-                left: 100,
-                moveStep: function() {},
-                circle: {
-                    moveCircleWithStep: function() {},
-                }
-            };
-        
-        spyOn(_movingStepGraphics, "moveLittleLeft");
-        spyOn(_movingStepGraphics, "moveLittleRight");
-        
-        _movingStepGraphics.arrangeStepsOfStage(step);
+      },
+      left: 100,
+      moveStep: function() {},
+      circle: {
+        moveCircleWithStep: function() {},
+      }
+    };
 
-        expect(_movingStepGraphics.moveLittleLeft).toHaveBeenCalled();
-        //expect(_movingStepGraphics.moveLittleRight).toHaveBeenCalled();
-    });
+    spyOn(_movingStepGraphics, "moveLittleLeft");
+    spyOn(_movingStepGraphics, "moveLittleRight");
+
+    _movingStepGraphics.arrangeStepsOfStage(step);
+
+    expect(_movingStepGraphics.moveLittleLeft).toHaveBeenCalled();
+    //expect(_movingStepGraphics.moveLittleRight).toHaveBeenCalled();
+  });
 });

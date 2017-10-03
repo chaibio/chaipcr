@@ -1,6 +1,9 @@
 describe("Testing stage graphics, Which creates all the graphics for the stage", function() {
 
-  beforeEach(module('ChaiBioTech'));
+  beforeEach(module('ChaiBioTech', function ($provide) {
+    mockCommonServices($provide);
+  }));
+
   beforeEach(module('canvasApp'));
 
   var _stageGraphics;

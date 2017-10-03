@@ -1,6 +1,9 @@
 describe("Testing autoDeltaTempTime", function() {
 
-  beforeEach(module('ChaiBioTech'));
+  beforeEach(module('ChaiBioTech', function ($provide) {
+    mockCommonServices($provide);
+  }));
+
   beforeEach(module('canvasApp'));
 
   var _autoDeltaTempTime;

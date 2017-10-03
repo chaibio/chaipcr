@@ -1,46 +1,45 @@
 describe("Testing move-stage-name", function() {
 
-    beforeEach(module('ChaiBioTech'));
-    beforeEach(module('canvasApp'));
-    
-    var _moveStageName;
+  beforeEach(module('ChaiBioTech', function ($provide) {
+    mockCommonServices($provide)
+  }));
 
-    beforeEach(inject(function(moveStageName) {
+  beforeEach(module('canvasApp'));
 
-        _moveStageName = new moveStageName();
-    }));
+  var _moveStageName;
 
-    it("It should check text property", function() {
-       expect(_moveStageName.text).toEqual("STAGE 2"); 
-    });
+  beforeEach(inject(function(moveStageName) {
 
-    it("It should check fill property", function() {
-       expect(_moveStageName.fill).toEqual("black"); 
-    });
+    _moveStageName = new moveStageName();
+  }));
 
-    it("It should check fontSize property", function() {
-       expect(_moveStageName.fontSize).toEqual(12); 
-    });
+  it("It should check text property", function() {
+    expect(_moveStageName.text).toEqual("STAGE 2");
+  });
 
-    it("It should check selectable property", function() {
-       expect(_moveStageName.selectable).toEqual(false); 
-    });
+  it("It should check fill property", function() {
+    expect(_moveStageName.fill).toEqual("black");
+  });
 
-    it("It should check top property", function() {
-       expect(_moveStageName.top).toEqual(15); 
-    });
+  it("It should check fontSize property", function() {
+    expect(_moveStageName.fontSize).toEqual(12);
+  });
 
-    it("It should check left property", function() {
-       expect(_moveStageName.left).toEqual(35); 
-    });
+  it("It should check selectable property", function() {
+    expect(_moveStageName.selectable).toEqual(false);
+  });
 
-    
-    it("It should check fontFamily property", function() {
-       expect(_moveStageName.fontFamily).toEqual('dinot-bold'); 
-    });
+  it("It should check top property", function() {
+    expect(_moveStageName.top).toEqual(15);
+  });
 
-    
+  it("It should check left property", function() {
+    expect(_moveStageName.left).toEqual(35);
+  });
 
 
-    
+  it("It should check fontFamily property", function() {
+    expect(_moveStageName.fontFamily).toEqual('dinot-bold');
+  });
+
 });

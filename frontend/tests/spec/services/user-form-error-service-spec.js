@@ -1,69 +1,69 @@
 describe("Testing userFormErrors", function() {
 
-    var _userFormErrors;
+  var _userFormErrors;
 
-    beforeEach(function() {
-        module('ChaiBioTech', function($provide) {
-
-        });
-
-        inject(function($injector) {
-            _userFormErrors = $injector.get('userFormErrors');
-        });
+  beforeEach(function() {
+    module('ChaiBioTech', function($provide) {
+      mockCommonServices($provide)
     });
 
-    it("It should test handleError method", function() {
+    inject(function($injector) {
+      _userFormErrors = $injector.get('userFormErrors');
+    });
+  });
 
-        $scope = {
+  it("It should test handleError method", function() {
 
-        };
+    $scope = {
 
-        var problem = {
-            errors: {
-                email: [
-                    'is invalid'
-                ]
-            }
-        };
+    };
 
-        var form = {
-            emailField: {
-                $setValidity: function() {
-                    
-                }
-            }
-        };
+    var problem = {
+      errors: {
+        email: [
+          'is invalid'
+        ]
+      }
+    };
 
-        spyOn(form.emailField, "$setValidity");
-        _userFormErrors.handleError($scope, problem, form);
-        expect(form.emailField.$setValidity).toHaveBeenCalledWith("emailInvalid", false);
-    }); 
+    var form = {
+      emailField: {
+        $setValidity: function() {
 
-    it("It should test handleError method when email is already taken", function() {
+        }
+      }
+    };
 
-        $scope = {
+    spyOn(form.emailField, "$setValidity");
+    _userFormErrors.handleError($scope, problem, form);
+    expect(form.emailField.$setValidity).toHaveBeenCalledWith("emailInvalid", false);
+  });
 
-        };
+  it("It should test handleError method when email is already taken", function() {
 
-        var problem = {
-            errors: {
-                email: [
-                    'is already taken'
-                ]
-            }
-        };
+    $scope = {
 
-        var form = {
-            emailField: {
-                $setValidity: function() {
-                    
-                }
-            }
-        };
+    };
 
-        spyOn(form.emailField, "$setValidity");
-        _userFormErrors.handleError($scope, problem, form);
-        expect(form.emailField.$setValidity).toHaveBeenCalledWith("emailAlreadtTaken", false);
-    }); 
+    var problem = {
+      errors: {
+        email: [
+          'is already taken'
+        ]
+      }
+    };
+
+    var form = {
+      emailField: {
+        $setValidity: function() {
+
+        }
+      }
+    };
+
+    spyOn(form.emailField, "$setValidity");
+    _userFormErrors.handleError($scope, problem, form);
+    expect(form.emailField.$setValidity).toHaveBeenCalledWith("emailAlreadtTaken", false);
+  });
 
 });

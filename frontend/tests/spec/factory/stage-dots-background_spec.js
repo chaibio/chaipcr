@@ -1,6 +1,9 @@
 describe("Testing the background of dots in the top of the stage, which is used to drag the stage", function() {
 
-  beforeEach(module('ChaiBioTech'));
+  beforeEach(module('ChaiBioTech', function ($provide) {
+    mockCommonServices($provide);
+  }));
+
   beforeEach(module('canvasApp'));
 
   var _stageDotsBackground;

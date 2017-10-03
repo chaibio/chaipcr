@@ -1,9 +1,27 @@
 describe("Testing step group", function() {
 
-  beforeEach(module('ChaiBioTech'));
+  beforeEach(module('ChaiBioTech', function ($provide) {
+    mockCommonServices($provide);
+  }));
+
   beforeEach(module('canvasApp'));
 
   var _stepGroup, step = {
+    left: 500,
+    stepRect: {},
+    numberingTextCurrent: {},
+    numberingTextTotal: {},
+    stepName: {},
+    deltaSymbol: {},
+    deltaGroup: {},
+    borderRight: {},
+    borderLeft: {}
+  }, shadowStepGroup;
+
+  beforeEach(inject(function(stepGroup, stepRect, numberingText, deltaSymbol, deltaGroup, stepName, borderRight, borderLeft) {
+
+    shadowStepGroup = stepGroup;
+    step = {
       left: 500,
       stepRect: {},
       numberingTextCurrent: {},
@@ -13,22 +31,7 @@ describe("Testing step group", function() {
       deltaGroup: {},
       borderRight: {},
       borderLeft: {}
-    }, shadowStepGroup;
-
-  beforeEach(inject(function(stepGroup, stepRect, numberingText, deltaSymbol, deltaGroup, stepName, borderRight, borderLeft) {
-
-    shadowStepGroup = stepGroup;
-    step = {
-        left: 500,
-        stepRect: {},
-        numberingTextCurrent: {},
-        numberingTextTotal: {},
-        stepName: {},
-        deltaSymbol: {},
-        deltaGroup: {},
-        borderRight: {},
-        borderLeft: {}
-      };
+    };
 
     step.stepRect = new stepRect(step);
     step.numberingTextCurrent = new numberingText('current');
@@ -41,8 +44,8 @@ describe("Testing step group", function() {
 
     _stepGroup = new stepGroup(step);
   }));
-   //var groupMembers = [step.stepRect, step.numberingTextCurrent, step.numberingTextTotal, step.stepName, step.deltaSymbol,
-    // step.deltaGroup, step.borderRight, step.borderLeft];
+  //var groupMembers = [step.stepRect, step.numberingTextCurrent, step.numberingTextTotal, step.stepName, step.deltaSymbol,
+  // step.deltaGroup, step.borderRight, step.borderLeft];
   it("It should check the left property", function() {
     expect(_stepGroup.left).toEqual(step.left);
   });

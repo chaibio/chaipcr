@@ -1,6 +1,9 @@
 describe("Specs for edit LID TEMP in the left menu", function() {
 
-  beforeEach(module("ChaiBioTech"));
+  beforeEach(module("ChaiBioTech", function ($provide) {
+    $provide.value('IsTouchScreen', function () {})
+  }))
+
   var scope, compile, httpMock;
 
   beforeEach(inject(function($rootScope, $compile, $httpBackend) {
@@ -9,6 +12,7 @@ describe("Specs for edit LID TEMP in the left menu", function() {
     httpMock = $httpBackend;
     httpMock.whenGET("http://localhost:8000/status").respond("NOTHING");
     httpMock.whenGET("/experiments/").respond("NOTHING");
+    httpMock.whenGET("/experiments/undefined").respond("NOTHING");
     httpMock.whenGET("http://localhost:8000/network/wlan").respond("NOTHING");
 
   }));
@@ -33,11 +37,11 @@ describe("Specs for edit LID TEMP in the left menu", function() {
     scope.$digest();
     expect(scope.focusLidTemp).toHaveBeenCalled();
 
-    /*spyOn(scope, "updateProtocol");
+/*spyOn(scope, "updateProtocol");
     compiled.find(":text").blur();
     scope.$digest();
     expect(scope.updateProtocol).toHaveBeenCalled();*/
 
-  });
+});
 
 });
