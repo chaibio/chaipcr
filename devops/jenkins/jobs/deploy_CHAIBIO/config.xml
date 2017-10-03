@@ -248,7 +248,7 @@ ENDSSH
         npm install --global gulp-cli
         npm install
         
-        gulp deploy
+        gulp deploy || exit 1
         cd ..
         
         cat deploy.sh
@@ -263,7 +263,10 @@ exit 1</command>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo Setup MySQL
+      <command>echo cleanup some space
+rm /usr/lib/julia/sys-debug.*
+
+echo Setup MySQL
 
 mkdir /data /perm || true
 
@@ -357,6 +360,7 @@ git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
 cd /sdcard/upgrade/realtime-compile/chaipcr/realtime || exit 1
 
 cp util/instance.h control/
+sed -i &quot;s/dataSapce/dataSpace/&quot; app/experimentcontroller.cpp
 rm libraries/lib/libPoco*
 
 #qmake
@@ -374,145 +378,84 @@ echo  Deploy realtime to ~/tmp
 cp ~/chaipcr/deploy/device/realtime.service /lib/systemd/system/
 systemctl enable realtime.service
 
-
 sync
-exit 0 # stopping julia precompile 
- 
+
 echo precompile julia packages if needed
 if [ -e /root/chaipcr/bioinformatics/juliaserver.jl ]
 then
-     free -m
 
-     echo $(date) Performing precompilling julia packages
-     cd /root/chaipcr/bioinformatics/
+echo Build time- adding pre-requesits
+free -m
+apt-get -q -y install libgtk-3-0 gettext
 
-      #julia --print &quot;Pkg.init()&quot;
-      julia --print &quot;Pkg.update()&quot;
-      julia --print &quot;Pkg.add(\&quot;Clustering\&quot;)&quot;
-      julia --print &quot;Pkg.add(\&quot;JuMP\&quot;)&quot;
-      julia --print &quot;Pkg.add(\&quot;HttpServer\&quot;)&quot;
-      julia --print &quot;Pkg.add(\&quot;Ipopt\&quot;)&quot;
-      julia --print &quot;Pkg.add(\&quot;JSON\&quot;)&quot;
-      julia --print &quot;Pkg.add(\&quot;MySQL\&quot;)&quot;
-      julia --print &quot;Pkg.add(\&quot;ProfileView\&quot;)&quot;
+echo $(date) Performing precompilling julia packages
+cd /root/chaipcr/bioinformatics/QpcrAnalysis
+cp __init__.jl __init__.jl.org
+#sed -i &apos;1ireturn nothing&apos; __init__.jl
+sed -i &apos;s/# MySQL./return nothing \n# MySQL./&apos; __init__.jl
 
-      julia --print &quot;Pkg.build(\&quot;ProfileView\&quot;)&quot;
+cat &gt; testQpcrAnalysis.jl &lt;&lt; EOF
+	println(&quot;Build time:  .. Updating packages ..&quot;)
+      	@time Pkg.update()
 
-      julia --print &quot;Pkg.build(\&quot;MySQL\&quot;)&quot;
-  
-      julia --print &quot;Pkg.build(\&quot;HttpServer\&quot;)&quot;
-      julia --print &quot;Pkg.build(\&quot;Ipopt\&quot;)&quot;
-      julia --print &quot;Pkg.build(\&quot;JSON\&quot;)&quot;
-      julia --print &quot;Pkg.build(\&quot;JuMP\&quot;)&quot;
+	println(&quot;Build time:  .. Adding packages ..&quot;)
+	println(&quot; .. clustering ..&quot;)
+      	@time Pkg.add(&quot;Clustering&quot;)
+	println(&quot; .. jump ..&quot;)
+      	@time Pkg.add(&quot;JuMP&quot;)
+	println(&quot; .. httpserver ..&quot;)
+      	@time Pkg.add(&quot;HttpServer&quot;)
+	println(&quot; .. ipopt ..&quot;)
+      	@time Pkg.add(&quot;Ipopt&quot;)
+	println(&quot; .. json ..&quot;)
+      	@time Pkg.add(&quot;JSON&quot;)
+	println(&quot; .. mysql ..&quot;)
+      	@time Pkg.add(&quot;MySQL&quot;)
+	println(&quot; .. profileview ..&quot;)
+      	@time Pkg.add(&quot;ProfileView&quot;)
+	println(&quot; .. JLD ..&quot;)
+      	@time Pkg.add(&quot;JLD&quot;)
+	println(&quot; .. NLopt ..&quot;)
+      	@time Pkg.add(&quot;NLopt&quot;)
+	println(&quot; .. DirectX ..&quot;)
+      	@time Pkg.add(&quot;Dierckx&quot;)
+	println(&quot; .. DataFrames ..&quot;)
+      	@time Pkg.add(&quot;DataFrames&quot;)
+	println(&quot; .. DataStructures ..&quot;)
+      	@time Pkg.add(&quot;DataStructures&quot;)
 
-      julia --print &quot;using JuMP, JSON, MySQL, Clustering, HttpServer, Ipopt&quot;
+	println(&quot;Build time:  ... building ...&quot;)
+	@time Pkg.build(&quot;ProfileView&quot;, &quot;MySQL&quot;, &quot;HttpServer&quot;, &quot;Ipopt&quot;, &quot;JSON&quot;, &quot;JuMP&quot;, &quot;JLD&quot;, &quot;NLopt&quot;, &quot;Dierckx&quot;, &quot;DataFrames&quot;, &quot;DataStructures&quot;)
 
-#      julia --print &quot;include(\&quot;/root/chaipcr/bioinformatics/QpcrAnalysis/QpcrAnalysis.jl\&quot;)&quot; --compile=all count not be called this way... must have some arrangment before it 
-
-      echo calling qa_startup_bbb.jl
-	cat &lt;&lt;EOF &gt; /root/chaipcr/bioinformatics/qa_startup_bbb.jl
-
-# start-up code for &quot;QpcrAnalysis&quot; package testing
-# load_from_dir_ = &quot;E:/freelance/applications/010_qpcr/Julia/QpcrAnalysis&quot; # PC
-# load_from_dir_ = &quot;/sdcard/upgrade/Julia/QpcrAnalysis&quot; # bbb
-# load_from_dir_ = &quot;/root/xqrm/QpcrAnalysis&quot; # bbb
-load_from_dir_ = &quot;/root/chaipcr/bioinformatics/QpcrAnalysis&quot; # bbb production
-ENV[&quot;JULIA_ENV&quot;] = &quot;bbb_test_1&quot; # bbb when &quot;localhost&quot; resulted in error &quot;&quot;
-push!(LOAD_PATH, load_from_dir_)
-using DataStructures, Ipopt, JSON, MySQL#, NLopt (&quot;ERROR: LoadError: Declaring __precompile__(false) is not allowed in files that are being precompiled&quot;. &quot;ERROR: Failed to precompile NLopt to /root/.julia/lib/v0.6/NLopt.ji&quot;) #, ProfileView # comment `ProfileView` for building .dll, otherwise something like &quot;incremental compilation error&quot;
-
-include(&quot;/root/chaipcr/bioinformatics/QpcrAnalysis/QpcrAnalysis.jl&quot;)
-using QpcrAnalysis
-
-function mysql_session(
-    func::Function,
-    db_hup::AbstractVector, # exactly 3 elements for db_host, db_usr, db_pswd
-    db_name::AbstractString
-    )
-    db_conn = mysql_connect(db_hup..., db_name)
-    try
-        func(db_conn)
-    finally
-        mysql_disconnect(db_conn)
-        # println(&quot;`db_conn` closed&quot;) # cause &quot;julia-client&quot; not to show debug info
-    end # try
-end # mysql_session
-wdb_ = &quot;connect&quot;
-db_key_ = &quot;default&quot;
-# beaglebone
-db_host_ = &quot;localhost&quot;
-db_host_ = &quot;127.0.0.1&quot;
-db_usr_ = &quot;root&quot;
-db_pswd_ = &quot;&quot;
-# PC
-#db_host_ = &quot;localhost&quot;
-#db_usr_ = &quot;root1&quot;
-#db_pswd_ = &quot;pswd1&quot;
-db_name_ = &quot;test_2ch&quot;
-db_hup_ = [db_host_, db_usr_, db_pswd_]
-out_format_ = &quot;full&quot; # used: &quot;full&quot;, &quot;pre_json&quot;, &quot;json&quot;
-# amp
-asrp_vec_ = []
-step_id_ = 0
-ramp_id_ = 0
-well_nums_ = []
-min_reliable_cyc_ = 5
-baseline_cyc_bounds_ = []
-cq_method_ = &quot;Cy0&quot;
-ct_fluos_ = []
-max_cycle_ = 1000
-ad_cycs_ = 0
-ad_cluster_method_ = &quot;k-medoids&quot;
-out_format_ = &quot;full&quot;
-out_sr_dict_ = true
-verbose_ = false
-# for `mod_bl_q`
-m_prebl_ = &quot;l4_enl&quot;
-# m_prebl_ = &quot;l4_enl_hbl&quot; # not working well
-m_postbl_ = &quot;l4_enl&quot;
-ms = OrderedDict(&quot;pre&quot;=&gt;m_prebl_, &quot;post&quot;=&gt;m_postbl_)
-solver_ = IpoptSolver(print_level=0, max_iter=35)
-kwdict_jmp_model_ = OrderedDict(:solver=&gt;solver_)
-kwdict_mbq_ = OrderedDict(
-    :m_prebl=&gt;m_prebl_,
-    :m_postbl=&gt;m_postbl_,
-    :kwargs_jmp_model=&gt;kwdict_jmp_model_
-)
-ipopt_print2file_prefix_ = &quot;&quot;
-before_128x_ = false
-kwdict_rc_ = OrderedDict(
-    :before_128x=&gt;before_128x_
-)
-ad_cycs_ = 0
-ad_cluster_method_ = &quot;k-means&quot;
-# mc
-well_nums_ = []
-auto_span_smooth_ = false
-span_smooth_default_ = 0.015
-span_smooth_factor_ = 7.2
-max_tmprtr_ = 1000
-out_format_ = &quot;full&quot;
-verbose_ = false
-# analyze functions
-# analyze_optical_calibration
-well_nums_ = []
-verbose = false
-# using QpcrAnalysis
-# reload(&quot;QpcrAnalysis&quot;) # can update non-exported content properly, but cant export, like import and include
-include(&quot;/root/chaipcr/bioinformatics/QpcrAnalysis/QpcrAnalysis.jl&quot;)
-&quot;success&quot;
-#
 EOF
 
-	echo $(date) calling startup script
-       	julia qa_startup_bbb.jl --compile=All || exit 1
+JULIA_ENV=bbb_test_1 julia testQpcrAnalysis.jl --compile=all
 
-	echo done with startup script
-       	echo $(date) starting julia server, and running for 30 min
-       	julia juliaserver.jl --compile=All &amp;
+cat &gt; testQpcrAnalysis.jl &lt;&lt; __EOF__
 
-       	sleep 1800
-       	echo $(date) server wait time due
+	println(&quot;Build time: .. all packages built ..&quot;)
+	load_from_dir_ = &quot;/root/chaipcr/bioinformatics/QpcrAnalysis&quot; # bbb production
+
+	println(&quot;Build time: settings&quot;)
+	push!(LOAD_PATH, load_from_dir_)
+
+	println(&quot;Build time: using dependencies&quot;)
+	@time using Clustering, DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NLopt
+
+	println(&quot;Build time: Using qpcrAnalysis&quot;)
+	@time using QpcrAnalysis
+	println(&quot;Build time: end of QpcrAnalysis build&quot;)
+__EOF__
+
+echo First QpcrAnalysis package installation run
+JULIA_ENV=bbb_test_1 julia testQpcrAnalysis.jl --compile=all
+
+echo Second run
+JULIA_ENV=bbb_test_1 julia testQpcrAnalysis.jl --compile=all
+
+echo end of test result: $?
+cp __init__.jl.org __init__.jl
+rm testQpcrAnalysis.jl
 
 fi
 
@@ -660,15 +603,16 @@ echo done rserev</command>
       <command>echo &quot;Install device tree overlay and PRU binary(do this every time it changes):&quot;
 cd ~/chaipcr/deploy/overlay
 bash ./build.sh
-echo chai-pcr &gt; $SLOTS
-cat $SLOTS
+echo chai-pcr &gt; /sys/devices/platform/bone_capemgr/slots
+cat /sys/devices/platform/bone_capemgr/slots
 
-sync</command>
+exit 0
+</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo setting up website pn ngixn
+      <command>echo setting up website on ngixn
 if [ -e /etc/nginx/sites-available ]
 then
     echo Nginx is installed

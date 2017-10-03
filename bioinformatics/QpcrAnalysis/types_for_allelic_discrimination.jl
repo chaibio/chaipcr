@@ -14,7 +14,7 @@ end # type
 type AssignGenosResult
     cluster_result::ClusteringResult
     best_i::Int
-    expected_genos_vec::Vector{Vector{Int}}
+    expected_genos_vec::Vector{Array{Int,2}}
     car_vec::Vector{ClusterAnalysisResult}
 end # type
 

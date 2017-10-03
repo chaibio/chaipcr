@@ -43,7 +43,7 @@ window.ChaiBioTech.ngApp.service('TimeService', [
             durationArray[len - 2] = "0";
         }
 
-        if(durationArray[len - 2]) {
+        if(Number(durationArray[len - 2])) {
           MM = Number(durationArray[len - 2]);
         } else {
           console.log("Plz verify Minutes");
