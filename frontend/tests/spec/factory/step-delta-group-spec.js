@@ -1,6 +1,9 @@
 describe("Testing the delta group", function() {
 
-  beforeEach(module('ChaiBioTech'));
+  beforeEach(module('ChaiBioTech', function ($provide) {
+    mockCommonServices($provide);
+  }));
+
   beforeEach(module('canvasApp'));
 
   var _deltaGroup, step = {};
@@ -20,4 +23,5 @@ describe("Testing the delta group", function() {
   it("It should check visible property", function() {
     expect(_deltaGroup.visible).toBeFalsy();
   });
+
 });

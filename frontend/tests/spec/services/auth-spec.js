@@ -6,8 +6,7 @@
     beforeEach(function() {
 
       module('ChaiBioTech', function($provide) {
-        $provide.value('Status', StatusServiceMock)
-        $provide.value('NetworkSettingsService', NetworkSettingsServiceMock)
+        mockCommonServices($provide)
       })
 
       inject(function($injector) {

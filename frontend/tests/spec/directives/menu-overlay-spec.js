@@ -1,6 +1,8 @@
 describe("Testing menu overlay [Shows up when we enable side menu]", function() {
 
-  beforeEach(module('ChaiBioTech'));
+  beforeEach(module('ChaiBioTech', function ($provide) {
+    $provide.value('IsTouchScreen', function () {});
+  }));
 
   var compile, rootScope, scope, httpMock;
 

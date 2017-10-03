@@ -1,6 +1,8 @@
 describe("Test protocol item directive, which shows in left menu", function() {
 
-  beforeEach(module('ChaiBioTech'));
+  beforeEach(module('ChaiBioTech', function ($provide) {
+    mockCommonServices($provide);
+  }));
 
   var scope, controllerService, httpMock, compile, templateCache;
 
@@ -9,8 +11,6 @@ describe("Test protocol item directive, which shows in left menu", function() {
     httpMock = $httpBackend;
     compile = $compile;
     templateCache = $templateCache;
-    httpMock.expectGET("http://localhost:8000/status").respond("NOTHING");
-    httpMock.whenGET("http://localhost:8000/network/wlan").respond("NOTHING");
   }));
 
   it("Passing NOT_STARTED should set the message to EDIT PROTOCOL ", function () {

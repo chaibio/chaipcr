@@ -1,6 +1,9 @@
 describe("Testing Group service", function() {
 
-  beforeEach(module('ChaiBioTech'));
+  beforeEach(module('ChaiBioTech', function ($provide) {
+    mockCommonServices($provide);
+  }));
+
   var group, properties, circle, line;
 
   beforeEach(inject(function(Group, Circle, Line) {

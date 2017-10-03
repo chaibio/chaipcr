@@ -1,123 +1,124 @@
 describe("Testing moveStageToSidesWhileMoveStep method", function() {
 
-    var _moveStageToSidesWhileMoveStep, _moveStageToSides;
+  var _moveStageToSidesWhileMoveStep, _moveStageToSides;
 
-    beforeEach(function() {
-        module("ChaiBioTech", function($provide) {
+  beforeEach(function() {
 
-        });
-
-        inject(function($injector) {
-            _moveStageToSides = $injector.get("moveStageToSides");
-            _moveStageToSidesWhileMoveStep = $injector.get("moveStageToSidesWhileMoveStep");
-        });
-
+    module("ChaiBioTech", function($provide) {
+      mockCommonServices($provide);
     });
 
-    it("It should test moveToSideForStep method when direction === left", function() {
-
-        var direction = "left";
-        var targetStage = {};
-
-        spyOn(_moveStageToSidesWhileMoveStep, "moveStageToLeft").and.returnValue(true);
-        spyOn(_moveStageToSidesWhileMoveStep, "moveStageToRight").and.returnValue(true);
-
-        _moveStageToSidesWhileMoveStep.moveToSideForStep(direction, targetStage);
-
-        expect(_moveStageToSidesWhileMoveStep.moveStageToLeft).toHaveBeenCalled();
-        expect(_moveStageToSidesWhileMoveStep.moveStageToRight).not.toHaveBeenCalled();
+    inject(function($injector) {
+      _moveStageToSides = $injector.get("moveStageToSides");
+      _moveStageToSidesWhileMoveStep = $injector.get("moveStageToSidesWhileMoveStep");
     });
 
-    it("It should test moveToSideForStep method when direction === right", function() {
+  });
 
-        var direction = "right";
-        var targetStage = {};
+  it("It should test moveToSideForStep method when direction === left", function() {
 
-        spyOn(_moveStageToSidesWhileMoveStep, "moveStageToLeft").and.returnValue(true);
-        spyOn(_moveStageToSidesWhileMoveStep, "moveStageToRight").and.returnValue(true);
+    var direction = "left";
+    var targetStage = {};
 
-        _moveStageToSidesWhileMoveStep.moveToSideForStep(direction, targetStage);
+    spyOn(_moveStageToSidesWhileMoveStep, "moveStageToLeft").and.returnValue(true);
+    spyOn(_moveStageToSidesWhileMoveStep, "moveStageToRight").and.returnValue(true);
 
-        expect(_moveStageToSidesWhileMoveStep.moveStageToLeft).not.toHaveBeenCalled();
-        expect(_moveStageToSidesWhileMoveStep.moveStageToRight).toHaveBeenCalled();
-    });
+    _moveStageToSidesWhileMoveStep.moveToSideForStep(direction, targetStage);
 
-    it("It should test moveStageToRight method when direction != right", function() {
+    expect(_moveStageToSidesWhileMoveStep.moveStageToLeft).toHaveBeenCalled();
+    expect(_moveStageToSidesWhileMoveStep.moveStageToRight).not.toHaveBeenCalled();
+  });
 
-        var stage = {
-            stageMovedDirection: "left",
-            nextStage: null,
-        };
+  it("It should test moveToSideForStep method when direction === right", function() {
 
-        spyOn(_moveStageToSides, "moveToSideStageComponents").and.returnValue(true);
-        
-        _moveStageToSidesWhileMoveStep.moveStageToRight(stage);
+    var direction = "right";
+    var targetStage = {};
 
-        expect(_moveStageToSides.moveToSideStageComponents).toHaveBeenCalled();
-        expect(stage.stageMovedDirection).toEqual("right");
+    spyOn(_moveStageToSidesWhileMoveStep, "moveStageToLeft").and.returnValue(true);
+    spyOn(_moveStageToSidesWhileMoveStep, "moveStageToRight").and.returnValue(true);
 
-    });
+    _moveStageToSidesWhileMoveStep.moveToSideForStep(direction, targetStage);
 
-    it("It should test moveStageToRight method when direction === right", function() {
+    expect(_moveStageToSidesWhileMoveStep.moveStageToLeft).not.toHaveBeenCalled();
+    expect(_moveStageToSidesWhileMoveStep.moveStageToRight).toHaveBeenCalled();
+  });
 
-        var stage = {
-            stageMovedDirection: "right",
-            nextStage: null,
-        };
+  it("It should test moveStageToRight method when direction != right", function() {
 
-        spyOn(_moveStageToSides, "moveToSideStageComponents").and.returnValue(true);
-        
-        _moveStageToSidesWhileMoveStep.moveStageToRight(stage);
+    var stage = {
+      stageMovedDirection: "left",
+      nextStage: null,
+    };
 
-        expect(_moveStageToSides.moveToSideStageComponents).not.toHaveBeenCalled();
+    spyOn(_moveStageToSides, "moveToSideStageComponents").and.returnValue(true);
 
-    });
+    _moveStageToSidesWhileMoveStep.moveStageToRight(stage);
 
-    it("It should test moveStageToLeft method when stageMovedDirection === null", function() {
+    expect(_moveStageToSides.moveToSideStageComponents).toHaveBeenCalled();
+    expect(stage.stageMovedDirection).toEqual("right");
 
-        var stage = {
-            stageMovedDirection: null,
-            nextStage: {
-                stageMovedDirection: null,
-            },
-        };
+  });
 
-        spyOn(_moveStageToSidesWhileMoveStep, "moveStageToRight").and.returnValue(true);
+  it("It should test moveStageToRight method when direction === right", function() {
 
-        _moveStageToSidesWhileMoveStep.moveStageToLeft(stage);
+    var stage = {
+      stageMovedDirection: "right",
+      nextStage: null,
+    };
 
-        expect(_moveStageToSidesWhileMoveStep.moveStageToRight).toHaveBeenCalled();
-    });
+    spyOn(_moveStageToSides, "moveToSideStageComponents").and.returnValue(true);
 
-    it("It should test moveStageToLeft method when stageMovedDirection === left", function() {
+    _moveStageToSidesWhileMoveStep.moveStageToRight(stage);
 
-        var stage = {
-            stageMovedDirection: "left",
-            nextStage: null
-        };
+    expect(_moveStageToSides.moveToSideStageComponents).not.toHaveBeenCalled();
 
-        spyOn(_moveStageToSidesWhileMoveStep, "moveStageToRight").and.returnValue(true);
+  });
 
-        _moveStageToSidesWhileMoveStep.moveStageToLeft(stage);
+  it("It should test moveStageToLeft method when stageMovedDirection === null", function() {
 
-        expect(_moveStageToSidesWhileMoveStep.moveStageToRight).not.toHaveBeenCalled();
-    });
+    var stage = {
+      stageMovedDirection: null,
+      nextStage: {
+        stageMovedDirection: null,
+      },
+    };
 
-    it("It should test moveStageToLeft method when stageMovedDirection !== left", function() {
+    spyOn(_moveStageToSidesWhileMoveStep, "moveStageToRight").and.returnValue(true);
 
-        var stage = {
-            stageMovedDirection: "null",
-            previousStage: {
-                stageMovedDirection: "right"
-            }
-        };
+    _moveStageToSidesWhileMoveStep.moveStageToLeft(stage);
 
-        spyOn(_moveStageToSides, "moveToSideStageComponents").and.returnValue(true);
+    expect(_moveStageToSidesWhileMoveStep.moveStageToRight).toHaveBeenCalled();
+  });
 
-        _moveStageToSidesWhileMoveStep.moveStageToLeft(stage);
+  it("It should test moveStageToLeft method when stageMovedDirection === left", function() {
 
-        expect(_moveStageToSides.moveToSideStageComponents).toHaveBeenCalled();
-        expect(stage.stageMovedDirection).toEqual("left");
-    });
+    var stage = {
+      stageMovedDirection: "left",
+      nextStage: null
+    };
+
+    spyOn(_moveStageToSidesWhileMoveStep, "moveStageToRight").and.returnValue(true);
+
+    _moveStageToSidesWhileMoveStep.moveStageToLeft(stage);
+
+    expect(_moveStageToSidesWhileMoveStep.moveStageToRight).not.toHaveBeenCalled();
+  });
+
+  it("It should test moveStageToLeft method when stageMovedDirection !== left", function() {
+
+    var stage = {
+      stageMovedDirection: "null",
+      previousStage: {
+        stageMovedDirection: "right"
+      }
+    };
+
+    spyOn(_moveStageToSides, "moveToSideStageComponents").and.returnValue(true);
+
+    _moveStageToSidesWhileMoveStep.moveStageToLeft(stage);
+
+    expect(_moveStageToSides.moveToSideStageComponents).toHaveBeenCalled();
+    expect(stage.stageMovedDirection).toEqual("left");
+  });
 
 });

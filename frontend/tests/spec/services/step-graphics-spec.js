@@ -1,6 +1,9 @@
 describe("Testing stepGraphics", function() {
 
-  beforeEach(module('ChaiBioTech'));
+  beforeEach(module('ChaiBioTech', function ($provide) {
+    mockCommonServices($provide);
+  }));
+
   beforeEach(module('canvasApp'));
 
   var _stepGraphics;
@@ -28,8 +31,8 @@ describe("Testing stepGraphics", function() {
         }
       }
     };
-      var sg = _stepGraphics.stepFooter.call(step);
-      expect(sg.dots).toEqual(jasmine.any(Object));
+    var sg = _stepGraphics.stepFooter.call(step);
+    expect(sg.dots).toEqual(jasmine.any(Object));
   });
 
   it("It should check the deleteButton method, calling this method should give closeImage group object", function() {
@@ -533,7 +536,7 @@ describe("Testing stepGraphics", function() {
       stepRect: {
 
       },
-      
+
       autoDeltaTempTime: {
         setText: function() {
 
@@ -575,7 +578,7 @@ describe("Testing stepGraphics", function() {
         exp_completed: true
       }
     };
-   // _stepGraphics.stepComponents.call(step);
+    // _stepGraphics.stepComponents.call(step);
     //expect(sg.hitPoint).toEqual(jasmine.any(Object));
     //expect(sg.stepRect).toEqual(jasmine.any(Object));
     //expect(sg.stepGroup).toEqual(jasmine.any(Object));
