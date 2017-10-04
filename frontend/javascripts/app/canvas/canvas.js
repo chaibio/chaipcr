@@ -18,22 +18,15 @@
  */
 
 angular.module("canvasApp").factory('canvas', [
-  'ExperimentLoader',
-  '$rootScope',
-  'stage',
-  '$timeout',
   'events',
-  'path',
+  'stage',
   'stageEvents',
   'stepEvents',
   'moveStepRect',
   'moveStageRect',
-  'previouslySelected',
   'constants',
   'circleManager',
   'dots',
-  'interceptorFactory',
-  'stageGraphics',
   'StagePositionService',
   'StepPositionService',
   'Line',
@@ -41,9 +34,8 @@ angular.module("canvasApp").factory('canvas', [
   'editModeService',
   'addStageService',
   'loadImageService',
-  function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents,
-    moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory, stageGraphics, 
-    StagePositionService, StepPositionService, Line, correctNumberingService, editModeService, addStageService, loadImageService) {
+  function(events, stage, stageEvents, stepEvents, moveStepRect, moveStageRect, constants, circleManager, dots, StagePositionService, 
+  StepPositionService, Line, correctNumberingService, editModeService, addStageService, loadImageService) {
 
     this.init = function(model) {
       
@@ -118,7 +110,7 @@ angular.module("canvasApp").factory('canvas', [
         allStages = this.model.protocol.stages;
       } else {
         // Tests take this data; need to plug data before this, [update when writing tests for canvas];
-        allStages = [{"stage":{"id":405,"stage_type":"holding","name":"Holding Stage","num_cycles":1,"auto_delta":false,"auto_delta_start_cycle":1,"order_number":2,"steps":[{"step":{"id":699,"name":null,"temperature":"100.0","hold_time":4,"pause":false,"collect_data":false,"delta_temperature":"0.0","delta_duration_s":0,"order_number":0,"ramp":{"id":699,"rate":"0.0","collect_data":false}}},{"step":{"id":726,"name":null,"temperature":"76.7","hold_time":4,"pause":false,"collect_data":false,"delta_temperature":"0.0","delta_duration_s":0,"order_number":1,"ramp":{"id":726,"rate":"0.0","collect_data":false}}}]}},{"stage":{"id":411,"stage_type":"cycling","name":"Cycling Stage","num_cycles":40,"auto_delta":true,"auto_delta_start_cycle":1,"order_number":3,"steps":[{"step":{"id":700,"name":null,"temperature":"56.2","hold_time":5,"pause":false,"collect_data":false,"delta_temperature":"0.0","delta_duration_s":0,"order_number":0,"ramp":{"id":700,"rate":"5.0","collect_data":false}}},{"step":{"id":710,"name":null,"temperature":"0.0","hold_time":3,"pause":true,"collect_data":false,"delta_temperature":"0.0","delta_duration_s":0,"order_number":1,"ramp":{"id":710,"rate":"5.0","collect_data":false}}}]}},{"stage":{"id":413,"stage_type":"cycling","name":"Cycling Stage","num_cycles":40,"auto_delta":false,"auto_delta_start_cycle":1,"order_number":5,"steps":[{"step":{"id":714,"name":null,"temperature":"52.0","hold_time":1,"pause":false,"collect_data":false,"delta_temperature":"0.0","delta_duration_s":0,"order_number":0,"ramp":{"id":714,"rate":"0.0","collect_data":false}}},{"step":{"id":715,"name":null,"temperature":"70.9","hold_time":12,"pause":false,"collect_data":true,"delta_temperature":"0.0","delta_duration_s":0,"order_number":1,"ramp":{"id":715,"rate":"0.0","collect_data":true}}},{"step":{"id":702,"name":null,"temperature":"100.0","hold_time":180,"pause":true,"collect_data":false,"delta_temperature":"0.0","delta_duration_s":0,"order_number":2,"ramp":{"id":702,"rate":"0.0","collect_data":false}}}]}}];
+        //allStages = [{"stage":{"id":405,"stage_type":"holding","name":"Holding Stage","num_cycles":1,"auto_delta":false,"auto_delta_start_cycle":1,"order_number":2,"steps":[{"step":{"id":699,"name":null,"temperature":"100.0","hold_time":4,"pause":false,"collect_data":false,"delta_temperature":"0.0","delta_duration_s":0,"order_number":0,"ramp":{"id":699,"rate":"0.0","collect_data":false}}},{"step":{"id":726,"name":null,"temperature":"76.7","hold_time":4,"pause":false,"collect_data":false,"delta_temperature":"0.0","delta_duration_s":0,"order_number":1,"ramp":{"id":726,"rate":"0.0","collect_data":false}}}]}},{"stage":{"id":411,"stage_type":"cycling","name":"Cycling Stage","num_cycles":40,"auto_delta":true,"auto_delta_start_cycle":1,"order_number":3,"steps":[{"step":{"id":700,"name":null,"temperature":"56.2","hold_time":5,"pause":false,"collect_data":false,"delta_temperature":"0.0","delta_duration_s":0,"order_number":0,"ramp":{"id":700,"rate":"5.0","collect_data":false}}},{"step":{"id":710,"name":null,"temperature":"0.0","hold_time":3,"pause":true,"collect_data":false,"delta_temperature":"0.0","delta_duration_s":0,"order_number":1,"ramp":{"id":710,"rate":"5.0","collect_data":false}}}]}},{"stage":{"id":413,"stage_type":"cycling","name":"Cycling Stage","num_cycles":40,"auto_delta":false,"auto_delta_start_cycle":1,"order_number":5,"steps":[{"step":{"id":714,"name":null,"temperature":"52.0","hold_time":1,"pause":false,"collect_data":false,"delta_temperature":"0.0","delta_duration_s":0,"order_number":0,"ramp":{"id":714,"rate":"0.0","collect_data":false}}},{"step":{"id":715,"name":null,"temperature":"70.9","hold_time":12,"pause":false,"collect_data":true,"delta_temperature":"0.0","delta_duration_s":0,"order_number":1,"ramp":{"id":715,"rate":"0.0","collect_data":true}}},{"step":{"id":702,"name":null,"temperature":"100.0","hold_time":180,"pause":true,"collect_data":false,"delta_temperature":"0.0","delta_duration_s":0,"order_number":2,"ramp":{"id":702,"rate":"0.0","collect_data":false}}}]}}];
       }
 
       this.tempPreviousStage = null;
