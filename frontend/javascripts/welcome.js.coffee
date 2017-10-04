@@ -8,6 +8,7 @@ App.config ['$httpProvider', ($httpProvider) ->
 ]
 
 App.run ['IsTouchScreen', (IsTouchScreen) ->
+  console.log IsTouchScreen
   IsTouchScreen()
 ]
 
