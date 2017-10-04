@@ -1,8 +1,14 @@
-App = angular.module 'WelcomeApp', []
+App = angular.module 'WelcomeApp', [
+  'ChaiBioTech.Common'
+]
 
 App.config ['$httpProvider', ($httpProvider) ->
   $httpProvider.defaults.headers.post['X-CSRF-Token'] = angular.element('meta[name="csrf-token"]').attr 'content'
   $httpProvider.defaults.headers.post['X-Requested-With'] = 'XMLHttpRequest'
+]
+
+App.run ['IsTouchScreen', (IsTouchScreen) ->
+  IsTouchScreen()
 ]
 
 App.controller 'WelcomeCtrl', [

@@ -42,6 +42,7 @@ JS_VENDOR_FILES = _file_path_prepend([
 ]);
 
 JS_APP_FILES = _file_path_prepend([
+  'javascripts/common.module.coffee',
   'javascripts/login.js.coffee',
   'javascripts/welcome.js.coffee',
   'javascripts/app/app.js.coffee',

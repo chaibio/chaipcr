@@ -52,6 +52,7 @@ var vendorFiles = [
   'libs/ng-webworker.js',
 ];
 var appFiles = [
+  'common.module.js',
   'welcome.js',
   'login.js',
   'app/charts/**/*.js',

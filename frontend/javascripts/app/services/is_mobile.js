@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  App.service('IsMobile', ['$window', function isMobile($window) {
+  angular.module('ChaiBioTech.Common').service('IsMobile', ['$window', function isMobile($window) {
 
     return function() {
       // http://stackoverflow.com/questions/3514784/what-is-the-best-way-to-detect-a-mobile-device-in-jquery

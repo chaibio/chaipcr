@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  App.service('WindowWrapper', [
+  angular.module('ChaiBioTech.Common').service('WindowWrapper', [
     '$window',
     '$rootScope',
     'IsMobile',

@@ -19,6 +19,7 @@ limitations under the License.
 window.ChaiBioTech = window.ChaiBioTech || {};
 
 window.App = window.ChaiBioTech.ngApp = angular.module 'ChaiBioTech', [
+  'ChaiBioTech.Common'
   'templates'
   'perfect_scrollbar'
   'ui.slider'

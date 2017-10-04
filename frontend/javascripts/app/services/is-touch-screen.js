@@ -1,7 +1,8 @@
 (function () {
   'use strict';
 
-  App.service('IsTouchScreen', [
+  angular.module('ChaiBioTech.Common')
+  .service('IsTouchScreen', [
     'WindowWrapper',
     '$window',
     function (WindowWrapper, $window) {
