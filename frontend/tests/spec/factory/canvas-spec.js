@@ -14,6 +14,13 @@ describe("Testing canvas.js", function() {
           render: function() {}
         };
       });
+      $provide.value('Group', {
+        create: function() {
+          return {
+            alright: "yes"
+          };
+        }
+      });
     });
 
     inject(function($injector) {
@@ -32,6 +39,7 @@ describe("Testing canvas.js", function() {
       _StagePositionService = $injector.get('StagePositionService');
       _StepPositionService = $injector.get('StepPositionService');
       _Line = $injector.get('Line');
+      _Group = $injector.get('Group');
       _correctNumberingService = $injector.get('correctNumberingService');
       _editModeService = $injector.get('editModeService');
       _addStageService = $injector.get('addStageService');
@@ -137,9 +145,127 @@ describe("Testing canvas.js", function() {
     };
     
     var retVal = Canvas.addStagesMapCallback(stageData, index);
-    console.log(Canvas.tempPreviousStage);
-    expect(Canvas.tempPreviousStage.nextStage.created).toEqual("yes");
+    expect(Canvas.tempPreviousStage.created).toEqual("yes");
+    expect(retVal.created).toEqual("yes");
 
+  });
 
+  it("It should test addStagesMapCallback method, when tempPreviousStage is not defined", function() {
+
+    var stageData = {
+      stage: {
+        model: {
+          id: 10
+        }
+      }
+    };
+
+    var index = 3;
+    
+    Canvas.$scope = {
+
+    };
+    
+    var retVal = Canvas.addStagesMapCallback(stageData, index);
+    expect(Canvas.tempPreviousStage.created).toEqual("yes");
+    expect(retVal.created).toEqual("yes");
+
+  });
+
+  it("It should test selectStep method", function() {
+
+    Canvas.allStepViews = [
+      { 
+        ready: "yes",
+        circle: {
+          manageClick: function() {}
+        }
+      }
+    ];
+
+    Canvas.$scope = {};
+    spyOn(Canvas.allStepViews[0].circle, "manageClick");
+    Canvas.selectStep();
+    expect(Canvas.allStepViews[0].circle.manageClick).toHaveBeenCalled();
+    expect(Canvas.$scope.fabricStep.ready).toEqual("yes");
+  });
+
+  it("It should test initEvents method", function() {
+
+    spyOn(_stageEvents, "init").and.returnValue(true);
+    spyOn(_stepEvents, "init").and.returnValue(true);
+
+    Canvas.initEvents();
+    expect(_stageEvents.init).toHaveBeenCalled();
+    expect(_stepEvents.init).toHaveBeenCalled();
+  });
+
+  it("It should test getComponents method", function() {
+
+    Canvas.stageIndicator = { verticalLine: "stage verticalLine" };
+    Canvas.stepIndicator = { verticalLine: "step verticalLine" };
+
+    spyOn(Canvas, "getMoveDots").and.returnValue("dots");
+    spyOn(_moveStageRect, "getMoveStageRect").and.returnValue(true);
+    spyOn(_moveStepRect, "getMoveStepRect").and.returnValue(true);
+
+    Canvas.getComponents();
+    
+    expect(Canvas.getMoveDots).toHaveBeenCalled();
+    expect(_moveStepRect.getMoveStepRect).toHaveBeenCalled();
+    expect(_moveStageRect.getMoveStageRect).toHaveBeenCalled();
+    expect(Canvas.moveDots).toEqual("dots");
+  });
+
+  it("It should test addComponentsToStage", function() {
+
+    Canvas.canvas = {
+      add: function() {
+
+      }
+    };
+
+    spyOn(Canvas.canvas, "add");
+
+    Canvas.addComponentsToStage();
+    expect(Canvas.canvas.add).toHaveBeenCalledTimes(5);
+  });
+
+  it("It should test getMoveDots method", function() {
+
+    spyOn(_dots, "stepStageMoveDots").and.returnValue([]);
+    Canvas.imageobjects = ["move-step-on.png"];
+    
+    Canvas.imageobjects["move-step-on.png"] = {
+      setTop: function() {},
+      setLeft: function() {},
+    };
+
+    var retVal = Canvas.getMoveDots();
+    
+    expect(_dots.stepStageMoveDots).toHaveBeenCalled();
+    expect(retVal.alright).toEqual("yes");
+    
+  });
+
+  it("It should test loadImages method", function() {
+
+    Canvas.canvas = {
+      fire: function() {}
+    };
+    spyOn(Canvas.canvas, "fire");
+    spyOn(_loadImageService, "getImages").and.returnValue({
+      then: function(callBack) {
+        var iData = {
+          imageLoaded: true
+        };
+        callBack(iData);
+      }
+    });
+
+    
+    Canvas.loadImages();
+    expect(Canvas.canvas.fire).toHaveBeenCalled();
+    expect(Canvas.imageobjects.imageLoaded).toEqual(true);
   });
 });
