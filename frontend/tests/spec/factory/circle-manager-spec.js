@@ -189,4 +189,26 @@ describe("Testing circleManager", function() {
         expect(_circleManager.canvas.renderAll).toHaveBeenCalled();
         expect(_circleManager.originalCanvas.allStepViews[1].circle.gatherDataDuringRampGroup.setVisible).toHaveBeenCalled();
     });
+
+    it("It should test findAllCircles method", function() {
+
+        _circleManager.findAllCirclesArray = [];
+        _circleManager.allStepViews = [
+            {
+                circle: {
+                    index: 1
+                }
+            },
+            {
+                circle: {
+                    index: 2
+                }
+            }
+        ];
+
+        var retVal = _circleManager.findAllCircles();
+
+        expect(retVal.length).toEqual(2);
+
+    });
 });
