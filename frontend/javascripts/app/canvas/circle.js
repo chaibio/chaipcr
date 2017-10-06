@@ -18,11 +18,8 @@
  */
 
 angular.module("canvasApp").factory('circle', [
-  'ExperimentLoader',
-  '$rootScope',
   'constants',
   'circleGroup',
-  'outerMostCircle',
   'outerCircle',
   'centerCircle',
   'littleCircleGroup',
@@ -37,7 +34,7 @@ angular.module("canvasApp").factory('circle', [
   'pauseStepService',
   'editModeService',
   'stepDataGroupService',
-  function(ExperimentLoader, $rootScope, Constants, circleGroup, outerMostCircle, outerCircle,
+  function(Constants, circleGroup, outerCircle,
     centerCircle, littleCircleGroup, circleMaker, gatherDataGroupOnScroll, gatherDataCircleOnScroll, gatherDataGroup, gatherDataCircle, previouslySelected,
     pauseStepOnScrollGroup, pauseStepCircleOnScroll, pauseStepService, editModeService, stepDataGroupService) {
     
@@ -63,6 +60,7 @@ angular.module("canvasApp").factory('circle', [
       this.controlDistance = Constants.controlDistance;
 
       this.getLeft = function() {
+        
         this.left = this.parent.left;
         return this;
       };
