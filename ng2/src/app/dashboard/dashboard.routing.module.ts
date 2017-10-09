@@ -15,6 +15,10 @@ const dashRoutes: Routes = [
         path: '',
         component: HomeComponent,
       },
+      {
+        path: 'charts',
+        loadChildren: './charts/charts.module#ChartsModule'
+      }
       // {
       //   path: 'welcome',
       //   component: WelcomeComponent,

@@ -9,7 +9,7 @@ import { LoginRouteGuard } from './login/login.route.guard';
 const appRoutes: Routes = [
   {
     path: '',
-    loadChildren: 'app/dashboard/dashboard.module#DashboardModule'
+    loadChildren: './dashboard/dashboard.module#DashboardModule'
   },
   {
     path: 'login',

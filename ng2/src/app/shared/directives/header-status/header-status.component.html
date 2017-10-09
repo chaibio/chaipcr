@@ -1,0 +1,22 @@
+<div class="header-status">
+  <div class="exp-name">
+    {{ experiment? experiment.name : 'Loading...' }}
+  </div>
+  <!--experiment completed successfully-->
+  <div class="status-indicator" *ngIf="experiment && experiment.completed_at && !(state !== 'idle' && isCurrentExperiment())">
+    <div class="message">
+      COMPLETED
+    </div>
+  </div>
+  <div class="status-indicator" *ngIf="experiment && (experiment.started_at && !experiment.completed_at && !(state !== 'idle' && isCurrentExperiment()))">
+    <div class="message">
+      <span class="failed">FAILED</span>
+      <span class="message-text" *ngIf="experiment.completion_status === 'aborted'">
+        USER CANCELLED
+      </span>
+      <span class="message-text" *ngIf="experiment.completion_status !== 'aborted'">
+        AN ERROR OCCURED
+      </span>
+    </div>
+  </div>
+</div>

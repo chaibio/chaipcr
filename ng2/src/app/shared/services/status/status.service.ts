@@ -13,16 +13,19 @@ import { initialStatusData } from './initial-status-data'
 export class StatusService {
 
   $data: BehaviorSubject<StatusData> = new BehaviorSubject(initialStatusData)
+  private data: StatusData;
 
   constructor(private http: AuthHttp, private wref: WindowRef) {}
 
   fetchData(): Observable<StatusData> {
-    return this.http.get(`http://${this.wref.nativeWindow().location.hostname}:8000/status`)
-      .map((res: Response) => {
-        let data: StatusData = this.extractData(res)
-        this.$data.next(data)
-        return data
-      })
+    let loc = this.wref.nativeWindow().location
+    return this.http.get(`${loc.protocol}//${loc.hostname}:8000/status`)
+    .map((res: Response) => {
+      let data: StatusData = this.extractData(res)
+      this.$data.next(data)
+      this.data = data
+      return data
+    })
   }
 
   startSync() {
@@ -31,8 +34,41 @@ export class StatusService {
     }, 1000)
   }
 
+  timePercentage(): number {
+    if (!this.data) return 0
+    else {
+      let exp = this.data.experiment_controller.experiment
+      return exp.run_duration/(exp.estimated_duration + exp.paused_duration)
+    }
+  }
+
+  timeRemaining(): number {
+    if (!this.data) return 0
+    else {
+      let exp = this.data.experiment_controller.experiment
+      return (exp.run_duration + exp.paused_duration) - exp.run_duration
+    }
+  }
+
   private extractData(res: Response): StatusData {
     let data = res.json()
+    // extract experiment
+    if (!data.experiment_controller.experiment) {
+      data.experiment_controller.experiment = {
+        id: -1,
+        name: '',
+        estimated_duration: 0,
+        paused_duration: 0,
+        run_duration: 0
+      }
+    } else {
+      let exp = data.experiment_controller.experiment
+      exp.id = +exp.id
+      exp.estimated_duration = +exp.estimated_duration
+      exp.paused_duration = +exp.paused_duration
+      exp.run_duration = +exp.run_duration
+      data.experiment_controller.experiment = exp
+    }
     // zone1
     data.heat_block.zone1.temperature = +data.heat_block.zone1.temperature
     data.heat_block.zone1.target_temperature = +data.heat_block.zone1.target_temperature
@@ -48,8 +84,8 @@ export class StatusService {
     data.lid.drive = +data.lid.drive
     // optics
     data.optics.intensity = +data.optics.intensity
-    data.optics.collect_data = data.optics.collect_data === 'true' ? true : false
-    data.optics.lid_open = data.optics.lid_open === 'true' ? true : false
+    data.optics.collect_data = data.optics.collect_data === 'true'
+    data.optics.lid_open = data.optics.lid_open === 'true'
     data.optics.well_number = +data.optics.well_number
     data.optics.photodiode_value = data.optics.photodiode_value.map(v => +v)
     // heat sink

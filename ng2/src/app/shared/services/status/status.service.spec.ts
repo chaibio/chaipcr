@@ -46,6 +46,13 @@ describe('StatusService', () => {
 
       const expectedData: StatusData = {
         experiment_controller: {
+          experiment: {
+            id: -1,
+            name: '',
+            estimated_duration: 0,
+            paused_duration: 0,
+            run_duration: 0
+          },
           machine: {
             state: 'idle',
             thermal_state: 'idle'
@@ -119,5 +126,33 @@ describe('StatusService', () => {
       })()
     }
   ))
+
+  it('should compute the remaining time of running experiment',
+    inject(
+      [StatusService, XHRBackend],
+      (statusService: StatusService, backend: MockBackend) => {
+
+        let resp: any = mockStatusReponse
+        resp.experiment_controller.machine.state = "running"        
+        resp.experiment_controller.experiment.estimated_duration = 350
+        resp.experiment_controller.experiment.paused_duration = 10
+        resp.experiment_controller.experiment.run_duration = 50
+
+        backend.connections.subscribe((con: MockConnection) => {
+          con.mockRespond(new Response(new ResponseOptions({
+            body: resp
+          })))
+        })
+
+        expect(statusService.timeRemaining()).toBe(0)
+        expect(statusService.timePercentage()).toBe(0)
+        
+        statusService.fetchData().subscribe( res => {
+          let exp = res.experiment_controller.experiment
+          expect(statusService.timePercentage()).toBe(exp.run_duration/(exp.estimated_duration + exp.paused_duration ))
+          expect(statusService.timeRemaining()).toBe((exp.run_duration + exp.paused_duration) - exp.run_duration)
+        })
+
+      }))
 
 })

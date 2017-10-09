@@ -10,17 +10,19 @@ import {
 import { BaseHttp } from './services/base_http/base_http.service';
 import { AuthHttp } from './services/auth_http/auth_http.service';
 import { SessionService } from './services/session/session.service';
-import { ExperimentService } from './services/experiment/experiment.service'
-import { WindowRef } from './services/windowref/windowref.service'
-import { StatusService } from './services/status/status.service'
+import { ExperimentService } from './services/experiment/experiment.service';
+import { WindowRef } from './services/windowref/windowref.service';
+import { StatusService } from './services/status/status.service';
 
-import { LogoutDirective } from './directives/logout/logout.directive'
-import { FullHeightDirective } from './directives/full-height/full-height.directive'
+import { LogoutDirective } from './directives/logout/logout.directive';
+import { FullHeightDirective } from './directives/full-height/full-height.directive';
+import { HeaderStatusComponent } from './directives/header-status/header-status.component';
 
 @NgModule({
   declarations: [
     LogoutDirective,
-    FullHeightDirective
+    FullHeightDirective,
+    HeaderStatusComponent
   ],
   imports: [
     FormsModule,
@@ -33,6 +35,7 @@ import { FullHeightDirective } from './directives/full-height/full-height.direct
     CommonModule,
     LogoutDirective,
     FullHeightDirective,
+    HeaderStatusComponent
   ],
   providers: [
     Title,

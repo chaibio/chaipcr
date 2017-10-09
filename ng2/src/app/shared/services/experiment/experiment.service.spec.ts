@@ -25,6 +25,9 @@ import { ExperimentList } from '../../models/experiment-list.model'
 import { AuthHttp } from '../../services/auth_http/auth_http.service'
 import { ExperimentService } from './experiment.service'
 
+import { Experiment } from '../../models/experiment.model';
+import { mockExperimentResponse } from './mock-experiment.response'
+
 describe('ExperimentService', () => {
 
   beforeEach(async(() => {
@@ -86,12 +89,80 @@ describe('ExperimentService', () => {
       })
 
       experimentService.getExperiments().subscribe((experiments: ExperimentList[]) => {
-        expect(experiments[0]).toEqual(mockExperiments[0].experiment)
+        for (let i = 0; i < experiments.length; i ++) {
+          expect(experiments[i]).toEqual(mockExperiments[i].experiment)
+        }
       })
 
       expect(auth_http.get).toHaveBeenCalledWith('/experiments')
 
     }))
+
+  it('should get single experiment', inject(
+    [ExperimentService, XHRBackend, AuthHttp],
+    (expService: ExperimentService, backend: MockBackend, auth_http: AuthHttp) => {
+
+      let exp = mockExperimentResponse.experiment;
+
+      let result: Experiment = {
+        id: exp.id,
+        name: exp.name,
+        type: exp.type,
+        time_valid: exp.time_valid,
+        started_at: exp.started_at,
+        created_at: exp.started_at,
+        completed_at: exp.completed_at,
+        completion_status: exp.completion_status,
+        completion_message: exp.completion_message,
+        protocol: {
+          id: exp.protocol.id,
+          estimate_duration: exp.protocol.estimate_duration,
+          lid_temperature: +exp.protocol.lid_temperature,
+          stages: []
+        }
+      };
+
+      exp.protocol.stages.forEach((s) => {
+        let stage: any = {
+          id: s.stage.id,
+          name: s.stage.name,
+          num_cycles: s.stage.num_cycles,
+          order_number: s.stage.order_number,
+          stage_type: s.stage.stage_type,
+          auto_delta: s.stage.auto_delta,
+          auto_delta_start_cycle: s.stage.auto_delta_start_cycle,
+          steps: []
+        };
+        s.stage.steps.forEach((step) => {
+          let nstep:any = step.step
+          nstep.temperature = +step.step.temperature;
+          nstep.delta_temperature = +step.step.delta_temperature;
+          nstep.ramp.rate = +nstep.ramp.rate;
+
+          stage.steps.push(nstep);
+
+        })
+        result.protocol.stages.push(stage);
+      })
+
+      let exptedResult: Experiment = result;
+
+      backend.connections.subscribe((con: MockConnection) => {
+        con.mockRespond(new Response(new ResponseOptions({
+          body: mockExperimentResponse
+        })))
+      })
+
+      spyOn(auth_http, 'get').and.callThrough();
+
+      expService.getExperiment(1).subscribe((res: Experiment) => {
+        expect(res).toEqual(result)
+      })
+
+      expect(auth_http.get).toHaveBeenCalledWith(`/experiments/1`)
+
+    }
+  ))
 
   it('should delete experiment', inject(
     [ExperimentService, XHRBackend, AuthHttp],

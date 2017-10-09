@@ -1,5 +1,12 @@
 export interface StatusData {
   experiment_controller: {
+    experiment: {
+      id: number,
+      name: string,
+      estimated_duration: number,
+      paused_duration: number,
+      run_duration: number
+    },
     machine: {
       state: string,
       thermal_state: string
@@ -28,9 +35,7 @@ export interface StatusData {
     collect_data: boolean,
     lid_open: boolean,
     well_number: number,
-    photodiode_value: [
-      number
-    ]
+    photodiode_value: Array<number>
   },
   heat_sink: {
     temperature: number,
