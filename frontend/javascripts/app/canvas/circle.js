@@ -87,9 +87,12 @@ angular.module("canvasApp").factory('circle', [
       this.moveCircleWithStep = function() {
 
         this.getLeft();
-        this.circleGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
-        this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
-        this.gatherDataDuringRampGroup.set({"left": this.left}).setCoords();
+        this.circleGroup.set({"left": this.left + (Constants.stepWidth / 2)});
+        this.circleGroup.setCoords();
+        this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)});
+        this.stepDataGroup.setCoords();
+        this.gatherDataDuringRampGroup.set({"left": this.left});
+        this.gatherDataDuringRampGroup.setCoords();
       };
 
       this.setCenter = function(imgObj) {
@@ -135,7 +138,8 @@ angular.module("canvasApp").factory('circle', [
       ********************************************/
       this.addStepDataGroup = function() {
 
-        this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
+        this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)});
+        this.stepDataGroup.setCoords();
         this.canvas.add(this.stepDataGroup);
       };
 
