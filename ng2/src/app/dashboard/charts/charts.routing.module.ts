@@ -6,11 +6,11 @@ import { AmplificationComponent } from './amplification/amplification.component'
 
 const routes: Routes = [
   {
-    path: '',
+    path: 'exp/:id',
     component: ChartsComponent,
     children: [
       {
-        path: '',
+        path: 'amplification',
         component: AmplificationComponent,
       },
       // {

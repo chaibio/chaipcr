@@ -35,7 +35,7 @@ const ExperimentServiceMock = {
 }
 
 @Component({
-  template: `<div chai-header-status experiment-id="{{id}}"></div>`
+  template: `<div chai-header-status [experiment-id]="id"></div>`
 })
 class TestingComponent {
   public id: number
