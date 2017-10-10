@@ -172,8 +172,8 @@ angular.module("canvasApp").factory('circle', [
           ], this);
 
           var left = (this.previous) ? (this.left + (this.previous.left + 128)) / 2 : this.left;
-          this.gatherDataDuringRampGroup.set({"left": left}).setCoords();
-
+          this.gatherDataDuringRampGroup.set({"left": left});
+          this.gatherDataDuringRampGroup.setCoords();
       };
 
       this.addComponentsToCircleGroup = function() {
@@ -190,7 +190,8 @@ angular.module("canvasApp").factory('circle', [
         this.manageGatheDataScroll();
         this.managePause();
           
-        this.circleGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
+        this.circleGroup.set({"left": this.left + (Constants.stepWidth / 2)});
+        this.circleGroup.setCoords();
         this.addComponentsToCircleGroup();
         this.canvas.add(this.circleGroup);
 
