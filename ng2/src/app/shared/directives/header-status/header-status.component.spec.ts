@@ -34,16 +34,18 @@ const ExperimentServiceMock = {
   }
 }
 
+@Component({
+  template: `<div chai-header-status experiment-id="{{id}}"></div>`
+})
+class TestingComponent {
+  public id: number
+}
+
 describe('HeaderStatusComponent Directive', () => {
 
   beforeEach(async(() => {
     spyOn(ExperimentServiceMock, 'getExperiment').and.callThrough()
-    @Component({
-      template: `<div chai-header-status experiment-id="1"></div>`
-    })
-    class TestingComponent {}
 
-    this.TestingComponent = TestingComponent;
 
     TestBed.configureTestingModule({
       imports: [
@@ -71,11 +73,14 @@ describe('HeaderStatusComponent Directive', () => {
     [ExperimentService],
     (expService: ExperimentService) => {
 
-      let fixture = TestBed.createComponent(this.TestingComponent);
+      let fixture = TestBed.createComponent(TestingComponent);
       let component = fixture.componentInstance;
       fixture.detectChanges();
-      expect(ExperimentServiceMock.getExperiment).toHaveBeenCalledWith(1);
+      expect(ExperimentServiceMock.getExperiment).not.toHaveBeenCalled();
       expect(fixture.debugElement.nativeElement.querySelector('.exp-name').innerHTML.trim()).toBe('Loading...')
+      component.id = ExperimentMockInstance.id;
+      fixture.detectChanges();
+      expect(ExperimentServiceMock.getExperiment).toHaveBeenCalledWith(component.id);
       getExperimentCB(ExperimentMockInstance);
       fixture.detectChanges();
       expect(fixture.debugElement.nativeElement.querySelector('.exp-name').innerHTML.trim()).toBe(ExperimentMockInstance.name)
@@ -86,21 +91,22 @@ describe('HeaderStatusComponent Directive', () => {
 
     let statusData: any;
 
-    beforeEach(() => {
+    beforeEach(async(() => {
 
       statusData = mockStatusReponse;
       statusData.experiment_controller.machine.state = "idle"
 
-    })
+    }))
 
     describe('When experiment is complete', () => {
 
       beforeEach(() => {
+        ExperimentMockInstance.id = 1;
         expect(ExperimentMockInstance.started_at).toBeTruthy();
         expect(ExperimentMockInstance.completed_at).toBeTruthy();
-        expect(ExperimentMockInstance.id).toBeTruthy(1);
 
-        this.fixture = TestBed.createComponent(this.TestingComponent);
+        this.fixture = TestBed.createComponent(TestingComponent);
+        this.fixture.componentInstance.id = ExperimentMockInstance.id;
         this.fixture.detectChanges();
         getExperimentCB(ExperimentMockInstance);
         this.fixture.detectChanges();
@@ -126,9 +132,9 @@ describe('HeaderStatusComponent Directive', () => {
         ExperimentMockInstance.completed_at = null;
         expect(ExperimentMockInstance.started_at).toBeTruthy();
 
-        this.fixture = TestBed.createComponent(this.TestingComponent);
+        this.fixture = TestBed.createComponent(TestingComponent);
+        this.fixture.componentInstance.id = ExperimentMockInstance.id;
         this.fixture.detectChanges();
-
 
       })
 
@@ -145,8 +151,9 @@ describe('HeaderStatusComponent Directive', () => {
           this.fixture.detectChanges();
           let el = this.fixture.debugElement.nativeElement.querySelector('.status-indicator .message-text');
           let failedEl = this.fixture.debugElement.nativeElement.querySelector('.status-indicator .failed');
-          expect(failedEl.innerHTML.trim()).toBe('FAILED')
-          expect(el.innerHTML.trim()).toContain('USER CANCELLED')
+
+          expect(failedEl.innerHTML.trim()).toBe('FAILED');
+          expect(el.innerHTML.trim()).toContain('USER CANCELLED');
         }
       ))
 
@@ -163,11 +170,10 @@ describe('HeaderStatusComponent Directive', () => {
           this.fixture.detectChanges();
           let el = this.fixture.debugElement.nativeElement.querySelector('.status-indicator .message-text');
           let failedEl = this.fixture.debugElement.nativeElement.querySelector('.status-indicator .failed');
-          expect(failedEl.innerHTML.trim()).toBe('FAILED')
-          expect(el.innerHTML.trim()).toContain('AN ERROR OCCURED')
+          expect(failedEl.innerHTML.trim()).toBe('FAILED');
+          expect(el.innerHTML.trim()).toContain('AN ERROR OCCURED');
         }
       ))
-
 
     })
 

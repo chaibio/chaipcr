@@ -1,7 +1,7 @@
 import {
-  Component, 
+  Component,
   ElementRef,
-  OnInit,
+  OnChanges,
   Input,
 } from '@angular/core';
 
@@ -16,7 +16,7 @@ import { StatusData } from '../../models/status.model';
   styleUrls: ['./header-status.component.scss']
 })
 
-export class HeaderStatusComponent implements OnInit {
+export class HeaderStatusComponent implements OnChanges {
 
   public experiment: Experiment;
   public state: string;
@@ -30,10 +30,12 @@ export class HeaderStatusComponent implements OnInit {
 
   @Input('experiment-id') expId: number;
 
-  ngOnInit() {
-    this.expService.getExperiment(+this.expId).subscribe((exp: Experiment) => {
-      this.experiment = exp; 
-    })
+  ngOnChanges() {
+    if (this.expId) {
+      this.expService.getExperiment(+this.expId).subscribe((exp: Experiment) => {
+        this.experiment = exp;
+      })
+    }
   }
 
   public isCurrentExperiment(): boolean {
@@ -41,7 +43,7 @@ export class HeaderStatusComponent implements OnInit {
       return this.statusData.experiment_controller.experiment.id === this.experiment.id;
     } else {
       return false;
-    } 
+    }
   }
 
   private extraceStatusData (d: StatusData) {
