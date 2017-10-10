@@ -149,6 +149,17 @@ function assign_genos(
 
     max_num_genos = 2 ^ num_channels # 2 comes from the binary possible values, i.e. presence/absence of signal for each channel
 
+    expected_genos_all = nrn(vcat([
+        hcat(fill(
+            hcat(map([0, 1]) do geno
+                fill(geno, 1, 2 ^ (i-1))
+            end...),
+            2 ^ (num_channels - i)
+        )...)
+        for i in 1:num_channels
+    ]...)) # each column is a vector of binary geno whose length is number of channels (0 => channel min, 1 => channel max)
+    geno_idc_all = 1:size(expected_genos_all)[2]
+
     unclassfied_assignment = max_num_genos + 1
     if length(apg_labels) != unclassfied_assignment
         error("The number of labels does not equal the number of all possible genotypes.")
@@ -161,25 +172,14 @@ function assign_genos(
 
         cluster_result = car.cluster_result
         best_i = 1
-        expected_genos_vec = Vector{Array{Int,2}}()
-        car_vec = [car]
+        best_geno_combins = Vector{Matrix{Int}}()
+        ucc_dict = OrderedDict{Set{Vector{AbstractFloat}},UniqCombinCenters}()
 
         assignments_adj_labels = fill(apg_labels[end], num_wells)
 
     else
 
         channel_extrema = hcat(minimum(data, 2), maximum(data, 2))
-
-        expected_genos_all = nrn(vcat([
-            hcat(fill(
-                hcat(map([0, 1]) do geno
-                    fill(geno, 1, 2 ^ (i-1))
-                end...),
-                2 ^ (num_channels - i)
-            )...)
-            for i in 1:num_channels
-        ]...)) # each column is a vector of binary geno whose length is number of channels (0 => channel min, 1 => channel max)
-        geno_idc_all = 1:size(expected_genos_all)[2]
 
         # determine initial centers based on extrema for each channel, defined here instead of in the for-loop for possible non-control genotypes to avoid repetitively computing the same inital centers
         init_centers_all = [
@@ -223,7 +223,6 @@ function assign_genos(
             car = do_cluster_analysis(data, init_centers, cluster_method)
 
             best_i = 1
-            expected_genos_vec = [expected_genos_all[:, geno_idc]]
             car_vec = [car]
 
         else # no expected genotypes specified for non-control wells, perform cluster analysis on all possible combinations of genotypes
@@ -233,27 +232,51 @@ function assign_genos(
             # num_non_ctrl_genos = length(non_ctrl_geno_idc)
 
             # initial conditions for `while` loop
-            expected_genos_vec = Vector{Array{Int,2}}()
-            car_vec = Vector{ClusterAnalysisResult}()
             num_genos = max_num_genos
+            ucc_dict = OrderedDict{Set{Vector{AbstractFloat}},UniqCombinCenters}()
 
             while num_genos >= 2 # `p_` = possible
+
                 for num_expected_ncg in (num_genos - num_ctrl_genos) : -1 : max(2 - num_ctrl_genos, 0)
+
                     possible_ncg_idc_vec = combinations(non_ctrl_geno_idc, num_expected_ncg)
+
                     for possible_ncg_idc in possible_ncg_idc_vec
+
                         geno_idc = vcat(ctrl_geno_idc, possible_ncg_idc)
-                        push!(expected_genos_vec, expected_genos_all[:, geno_idc])
+                        geno_combin = expected_genos_all[:, geno_idc]
+
                         init_centers = init_centers_all[:, geno_idc]
-                        push!(car_vec, do_cluster_analysis(data, init_centers, cluster_method))
+                        car = do_cluster_analysis(data, init_centers, cluster_method)
+
+                        centers = car.centers
+                        center_set = Set(map(1:size(centers)[2]) do i
+                            centers[:, i]
+                        end) # do i
+                        if !(center_set in keys(ucc_dict))
+                            ucc_dict[center_set] = UniqCombinCenters(
+                                center_set,
+                                car,
+                                car.slht_mean,
+                                [geno_combin]
+                            )
+                        else
+                            push!(ucc_dict[center_set].geno_combins, geno_combin)
+                        end # if !
+
                     end # for possible_ncg_idc
+
                 end # for num_expected_ncg
                 num_genos -= 1
+
             end # while
 
             # find the best model (possible combination of genotypes resulting in largest silhouette mean)
-            best_i = findmax(map(car -> car.slht_mean, car_vec))[2]
-            expected_genos = expected_genos_vec[best_i]
-            car = car_vec[best_i]
+            ucc_vec = collect(values(ucc_dict))
+            best_i = findmax(map(ucc -> ucc.slht_mean, ucc_vec))[2]
+            # expected_genos = expected_genos_vec[best_i]
+            best_geno_combins = ucc_vec[best_i].geno_combins
+            car = ucc_vec[best_i].car
 
         end # if length
 
@@ -306,10 +329,13 @@ function assign_genos(
     end # if any
 
     return (assignments_adj_labels, AssignGenosResult(
+        # best
         cluster_result,
         best_i,
-        expected_genos_vec,
-        car_vec
+        best_geno_combins,
+        # all
+        expected_genos_all,
+        ucc_dict
     ))
 
 end # assign_genos

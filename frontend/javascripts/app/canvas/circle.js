@@ -18,11 +18,8 @@
  */
 
 angular.module("canvasApp").factory('circle', [
-  'ExperimentLoader',
-  '$rootScope',
   'constants',
   'circleGroup',
-  'outerMostCircle',
   'outerCircle',
   'centerCircle',
   'littleCircleGroup',
@@ -37,7 +34,7 @@ angular.module("canvasApp").factory('circle', [
   'pauseStepService',
   'editModeService',
   'stepDataGroupService',
-  function(ExperimentLoader, $rootScope, Constants, circleGroup, outerMostCircle, outerCircle,
+  function(Constants, circleGroup, outerCircle,
     centerCircle, littleCircleGroup, circleMaker, gatherDataGroupOnScroll, gatherDataCircleOnScroll, gatherDataGroup, gatherDataCircle, previouslySelected,
     pauseStepOnScrollGroup, pauseStepCircleOnScroll, pauseStepService, editModeService, stepDataGroupService) {
     
@@ -63,6 +60,7 @@ angular.module("canvasApp").factory('circle', [
       this.controlDistance = Constants.controlDistance;
 
       this.getLeft = function() {
+        
         this.left = this.parent.left;
         return this;
       };
@@ -89,9 +87,12 @@ angular.module("canvasApp").factory('circle', [
       this.moveCircleWithStep = function() {
 
         this.getLeft();
-        this.circleGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
-        this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
-        this.gatherDataDuringRampGroup.set({"left": this.left}).setCoords();
+        this.circleGroup.set({"left": this.left + (Constants.stepWidth / 2)});
+        this.circleGroup.setCoords();
+        this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)});
+        this.stepDataGroup.setCoords();
+        this.gatherDataDuringRampGroup.set({"left": this.left});
+        this.gatherDataDuringRampGroup.setCoords();
       };
 
       this.setCenter = function(imgObj) {
@@ -137,7 +138,8 @@ angular.module("canvasApp").factory('circle', [
       ********************************************/
       this.addStepDataGroup = function() {
 
-        this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
+        this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)});
+        this.stepDataGroup.setCoords();
         this.canvas.add(this.stepDataGroup);
       };
 
