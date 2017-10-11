@@ -2,6 +2,7 @@ import {
   Component,
   ElementRef,
   OnChanges,
+  OnDestroy,
   Input,
 } from '@angular/core';
 
@@ -10,22 +11,28 @@ import { ExperimentService } from '../../services/experiment/experiment.service'
 import { StatusService } from '../../services/status/status.service';
 import { StatusData } from '../../models/status.model';
 
+import 'rxjs/add/operator/takeUntil';
+import { Subject } from 'rxjs/Subject';
+
 @Component({
   selector: '[chai-header-status]',
   templateUrl: './header-status.component.html',
   styleUrls: ['./header-status.component.scss']
 })
 
-export class HeaderStatusComponent implements OnChanges {
+export class HeaderStatusComponent implements OnChanges, OnDestroy {
 
   public experiment: Experiment;
   public state: string;
   public statusData: StatusData;
+  private ngUnsubscribe: Subject<void> = new Subject<void>(); // = new Subject(); in Typescript 2.2-2.4
 
   constructor(private el: ElementRef, private expService: ExperimentService, private statusService: StatusService) {
-    statusService.$data.subscribe((statusData: StatusData) => {
-      this.extraceStatusData(statusData);
-    })
+    statusService.$data
+      .takeUntil(this.ngUnsubscribe)
+      .subscribe((statusData: StatusData) => {
+        this.extraceStatusData(statusData);
+      })
   }
 
   @Input('experiment-id') expId: number;
@@ -36,6 +43,11 @@ export class HeaderStatusComponent implements OnChanges {
         this.experiment = exp;
       })
     }
+  }
+//https://stackoverflow.com/questions/38008334/angular-rxjs-when-should-i-unsubscribe-from-subscription
+  ngOnDestroy() {
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
 
   public isCurrentExperiment(): boolean {
