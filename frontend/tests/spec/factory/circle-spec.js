@@ -46,6 +46,36 @@ describe("Testing circle", function() {
                 };
             });
 
+            $provide.value('circleGroup', function(data) {
+                return data;
+            });
+
+            $provide.value('outerCircle', function() {
+                return {
+                    created: 'yes'
+                };
+            });
+
+            $provide.value('centerCircle', function() {
+
+                return {
+                    created: 'yes'
+                };
+            });
+
+            $provide.value('littleCircleGroup', function(data) {
+
+                return {
+                    created: 'yes',
+                    allData: data
+                };
+            });
+
+            $provide.value('circleMaker', function() {
+                return {
+                    created: 'yes'
+                };
+            });
         });
 
         inject(function($injector) {
@@ -77,11 +107,16 @@ describe("Testing circle", function() {
         var parentStep = {
             left: 100,
             adjustRampSpeedPlacing: function() {},
+            swapMoveStepStatus: function() {},
             canvas: {
-                add: function() {}
+                add: function() {},
+                renderAll: function() {},
             },
             parentStage: {
-                index: 201
+                index: 201,
+                parent: {
+                    editStageStatus: true,
+                }
             }
         };
 
@@ -364,5 +399,129 @@ describe("Testing circle", function() {
         expect(retVal.uniqueName).toEqual('302circle');
     });
 
-    
+    it("It should test doThingsForLast method, when hold time is zero", function() {
+
+        circle.model.hold_time = 0;
+        circle.holdTime = {
+            text: 'Chai'
+        };
+
+        var newHold = 0;
+        var oldHold = 12;
+        spyOn(circle.parent, "swapMoveStepStatus").and.returnValue(true);
+        spyOn(_editModeService, "temporaryChangeForStatus").and.returnValue(true);
+        spyOn(circle.canvas, "renderAll");
+
+        circle.doThingsForLast(newHold, oldHold);
+
+        expect(circle.parent.swapMoveStepStatus).toHaveBeenCalled();
+        expect(circle.canvas.renderAll).toHaveBeenCalled();
+        expect(_editModeService.temporaryChangeForStatus).toHaveBeenCalled();
+        expect(circle.holdTime.text).toEqual('∞');
+
+    });
+
+    it("It should test doThingsForLast method, when hold time is not zero", function() {
+
+        circle.model.hold_time = 12;
+        circle.holdTime = {
+            text: 'Chai'
+        };
+
+        var newHold = 12;
+        var oldHold = 0;
+        spyOn(circle.parent, "swapMoveStepStatus").and.returnValue(true);
+        spyOn(_editModeService, "editModeStageChanges").and.returnValue(true);
+        spyOn(circle.canvas, "renderAll");
+
+        circle.doThingsForLast(newHold, oldHold);
+
+        expect(circle.parent.swapMoveStepStatus).toHaveBeenCalled();
+        expect(circle.canvas.renderAll).toHaveBeenCalled();
+        expect(_editModeService.editModeStageChanges).toHaveBeenCalled();
+    });
+
+    it("It should test changeHoldTime method", function() {
+
+        circle.holdTime = {
+            text: 1
+        };
+
+        var newHold = 14;
+        circle.changeHoldTime(newHold);
+        expect(circle.holdTime.text).toEqual(newHold);
+    });
+
+    it("It should test render method", function() {
+
+        spyOn(_stepDataGroupService, "newStepDataGroup").and.returnValue(true);
+
+        circle.render();
+
+        expect(_stepDataGroupService.newStepDataGroup).toHaveBeenCalled();
+        expect(circle.circleGroup.length).toEqual(3);
+        expect(circle.outerCircle.created).toEqual('yes');
+        expect(circle.circle.created).toEqual('yes');
+        expect(circle.littleCircleGroup.allData.length).toEqual(3);
+    });
+
+    it("It should test createNewStepDataGroup method", function() {
+
+        spyOn(_stepDataGroupService, "reCreateNewStepDataGroup").and.returnValue(true);
+        
+        circle.createNewStepDataGroup();
+
+        expect(_stepDataGroupService.reCreateNewStepDataGroup).toHaveBeenCalled();
+    });
+
+    it("It should test makeItBig method, when collect_data is on", function() {
+
+        circle.big = false;
+
+        circle.circle = {
+
+            setFill: function(color) {},
+            setStroke: function() {},
+
+        };
+
+        circle.gatherDataImageMiddle = {
+            setVisible: function() {},
+        };
+
+        circle.gatherDataOnScroll = {
+            setVisible: function() {}
+        };
+
+        circle.outerCircle = {
+            setStroke: function() {},
+            strokeWidth: 0
+        };
+        
+        circle.littleCircleGroup = {
+            visible: false
+        };
+
+        circle.model = {
+            collect_data: true,
+            pause: false
+        };
+
+        spyOn(circle.circle, "setFill");
+        spyOn(circle.gatherDataImageMiddle, "setVisible");
+        spyOn(circle.gatherDataOnScroll, "setVisible");
+        spyOn(circle.circle, "setStroke");
+        spyOn(circle.outerCircle, "setStroke");
+
+        circle.makeItBig();
+
+        expect(circle.circle.setFill).toHaveBeenCalled();
+        expect(circle.gatherDataImageMiddle.setVisible).toHaveBeenCalled();
+        expect(circle.gatherDataOnScroll.setVisible).toHaveBeenCalled();
+        expect(circle.circle.setStroke).toHaveBeenCalled();
+        expect(circle.outerCircle.setStroke).toHaveBeenCalled();
+        expect(circle.outerCircle.strokeWidth).toEqual(5);
+        expect(circle.littleCircleGroup.visible).toEqual(true);
+        expect(circle.big).toEqual(true);
+    });
 });
