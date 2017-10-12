@@ -76,6 +76,16 @@ describe("Testing circle", function() {
                     created: 'yes'
                 };
             });
+
+            $provide.value('previouslySelected',  {
+                        circle: {
+                            makeItSmall: function() {},
+                            model: {
+                                id: 134
+                            }
+                        }
+                    }
+                );
         });
 
         inject(function($injector) {
@@ -106,6 +116,7 @@ describe("Testing circle", function() {
 
         var parentStep = {
             left: 100,
+            selectStep: function() {},
             adjustRampSpeedPlacing: function() {},
             swapMoveStepStatus: function() {},
             canvas: {
@@ -114,6 +125,7 @@ describe("Testing circle", function() {
             },
             parentStage: {
                 index: 201,
+                selectStage: function() {},
                 parent: {
                     editStageStatus: true,
                 }
@@ -706,6 +718,216 @@ describe("Testing circle", function() {
 
         expect(circle.gatherDataImageMiddle.setVisible).toHaveBeenCalledWith(true);
         expect(circle.gatherDataOnScroll.setVisible).toHaveBeenCalledWith(false);
+    });
+
+    it("It should test showHideGatherData method, when staus is true and circle is small", function() {
+
+        var status = true;
+        circle.big = false;
+        circle.circle = {
+            setFill: function() {}
+        };
+
+        circle.gatherDataImageMiddle = {
+            setVisible: function() {}
+        };
+
+        spyOn(circle.circle, "setFill");
+        spyOn(circle.gatherDataImageMiddle, "setVisible");
+
+        circle.showHideGatherData(status);
+
+        expect(circle.circle.setFill).toHaveBeenCalledWith("white");
+        expect(circle.gatherDataImageMiddle.setVisible).toHaveBeenCalledWith(status);
+    });
+
+    it("It should test showHideGatherData method, when staus is false", function() {
+
+        var status = false;
+        circle.big = true;
+        circle.circle = {
+            setFill: function() {}
+        };
+
+        circle.gatherDataImageMiddle = {
+            setVisible: function() {}
+        };
+
+        circle.gatherDataOnScroll = {
+            setVisible: function() {}
+        };
+
+        spyOn(circle.circle, "setFill");
+        spyOn(circle.gatherDataOnScroll, "setVisible");
+
+        circle.showHideGatherData(status);
+
+        expect(circle.circle.setFill).toHaveBeenCalledWith("#ffb400");
+        expect(circle.gatherDataOnScroll.setVisible).toHaveBeenCalled();
+    });
+
+    it("It should test temperatureDisplay method, temperature less than 50", function() {
+
+        circle.temperature = {
+            text: "10"
+        };
+        var targetCircleGroup = {
+            top: 300
+        };
+        
+        circle.temperatureDisplay(targetCircleGroup);
+        
+        expect(circle.model.temperature).toEqual('14.3');
+        expect(circle.temperature.text).toEqual('14.3º');
+    });
+
+    it("It should test temperatureDisplay method, temperature greater than 50", function() {
+
+        circle.temperature = {
+            text: "10"
+        };
+        var targetCircleGroup = {
+            top: 100
+        };
+        
+        circle.temperatureDisplay(targetCircleGroup);
+        
+        expect(circle.model.temperature).toEqual('94.4');
+        expect(circle.temperature.text).toEqual('94.4º');
+    });
+
+    it("It should test temperatureDisplay method, temperature greater than 100", function() {
+
+        circle.temperature = {
+            text: "10"
+        };
+        var targetCircleGroup = {
+            top: 10
+        };
+        
+        circle.temperatureDisplay(targetCircleGroup);
+        
+        expect(circle.model.temperature).toEqual('100');
+        expect(circle.temperature.text).toEqual('100º');
+    });
+
+    it("It should test manageClick method", function() {
+
+        circle.big = false;
+        spyOn(circle.canvas, "renderAll");
+        spyOn(circle, "makeItBig").and.returnValue(true);
+        spyOn(circle.parent, "selectStep");
+        spyOn(circle.parent.parentStage, "selectStage");
+
+
+        circle.manageClick();
+
+        expect(circle.canvas.renderAll).toHaveBeenCalled();
+        expect(circle.makeItBig).toHaveBeenCalled();
+        expect(circle.parent.selectStep);
+        expect(circle.parent.parentStage.selectStage).toHaveBeenCalled();
+    });
+
+    it("It should test manageClick method, when the circle has a previous circle", function() {
+
+        circle.big = false;
+        circle.model.id = 100;
+
+        spyOn(circle.canvas, "renderAll");
+        spyOn(circle, "makeItBig").and.returnValue(true);
+        spyOn(circle.parent, "selectStep");
+        spyOn(circle.parent.parentStage, "selectStage");
+        spyOn(_previouslySelected.circle, "makeItSmall");
+
+        circle.manageClick();
+
+        expect(circle.canvas.renderAll).toHaveBeenCalled();
+        expect(circle.makeItBig).toHaveBeenCalled();
+        expect(circle.parent.selectStep);
+        expect(circle.parent.parentStage.selectStage).toHaveBeenCalled();
+        expect(_previouslySelected.circle.model.id).toEqual(100);
+    });
+
+    it("It should test runAlongEdge method", function() {
+
+        circle.next = {
+            parent: {
+                left: 20,
+                rampSpeedGroup: {
+                    height: 47,
+                    setCoords: function() {},
+                    top: 20,
+                    left: 30
+                },
+
+            },
+            gatherDataDuringRampGroup: {
+                setCoords: function() {},
+                top: 100
+            },
+
+        };
+
+        spyOn(circle.next.gatherDataDuringRampGroup, "setCoords");
+        spyOn(circle.next.parent.rampSpeedGroup, "setCoords");
+
+        circle.runAlongEdge();
+
+        expect(circle.next.gatherDataDuringRampGroup.setCoords).toHaveBeenCalled();
+        expect(circle.next.parent.rampSpeedGroup.setCoords).toHaveBeenCalled();
+        expect(circle.next.parent.rampSpeedGroup.left).toEqual(25);
+    });
+
+    it("It should test runAlongEdge method, when ((rampEdge > this.next.gatherDataDuringRampGroup.top - 14) && this.next.parent.rampSpeedGroup.top < this.next.gatherDataDuringRampGroup.top + 16)", function() {
+
+        circle.next = {
+            parent: {
+                left: 20,
+                rampSpeedGroup: {
+                    height: 110,
+                    setCoords: function() {},
+                    top: 20,
+                    left: 30
+                },
+
+            },
+            gatherDataDuringRampGroup: {
+                setCoords: function() {},
+                top: 100
+            },
+
+        };
+
+        spyOn(circle.next.gatherDataDuringRampGroup, "setCoords");
+        spyOn(circle.next.parent.rampSpeedGroup, "setCoords");
+
+        circle.runAlongEdge();
+
+        expect(circle.next.gatherDataDuringRampGroup.setCoords).toHaveBeenCalled();
+        expect(circle.next.parent.rampSpeedGroup.setCoords).toHaveBeenCalled();
+        expect(circle.next.parent.rampSpeedGroup.left).toEqual(36);
+    });
+
+    it("It should test runAlongCircle method, when (rampEdge > this.gatherDataDuringRampGroup.top - 14)", function() {
+
+        circle.gatherDataDuringRampGroup = {
+            top: 100,
+            setCoords: function() { },
+        };
+
+        circle.parent = {
+            left:50,
+            rampSpeedGroup: {
+                top: 70,
+                height: 15,
+                left: 0,
+                setCoords: function() {},
+            }
+        };
+
+        circle.runAlongCircle();
+
+        expect(circle.parent.rampSpeedGroup.left).toEqual(circle.parent.left + 5);
     });
 
 });
