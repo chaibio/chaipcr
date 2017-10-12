@@ -524,4 +524,188 @@ describe("Testing circle", function() {
         expect(circle.littleCircleGroup.visible).toEqual(true);
         expect(circle.big).toEqual(true);
     });
+
+    it("It should test makeItBig method, when collect_data is onand pause is set on", function() {
+
+        circle.big = false;
+
+        circle.circle = {
+
+            setFill: function(color) {},
+            setStroke: function() {},
+
+        };
+
+        circle.gatherDataImageMiddle = {
+            setVisible: function() {},
+        };
+
+        circle.gatherDataOnScroll = {
+            setVisible: function() {}
+        };
+
+        circle.outerCircle = {
+            setStroke: function() {},
+            strokeWidth: 0
+        };
+        
+        circle.littleCircleGroup = {
+            visible: false
+        };
+
+        circle.pauseImageMiddle = {
+            setVisible: function() {}
+        };
+
+        circle.pauseStepOnScrollGroup = {
+            setVisible: function() {}
+        };
+
+        circle.model = {
+            collect_data: true,
+            pause: true,
+        };
+
+        spyOn(circle.circle, "setFill");
+        spyOn(circle.gatherDataImageMiddle, "setVisible");
+        spyOn(circle.gatherDataOnScroll, "setVisible");
+        spyOn(circle.circle, "setStroke");
+        spyOn(circle.outerCircle, "setStroke");
+        spyOn(circle.pauseImageMiddle, "setVisible");
+        spyOn(circle.pauseStepOnScrollGroup, "setVisible");
+
+        circle.makeItBig();
+
+        expect(circle.circle.setFill).toHaveBeenCalled();
+        expect(circle.gatherDataImageMiddle.setVisible).toHaveBeenCalled();
+        expect(circle.gatherDataOnScroll.setVisible).toHaveBeenCalled();
+        expect(circle.circle.setStroke).toHaveBeenCalled();
+        expect(circle.outerCircle.setStroke).toHaveBeenCalled();
+        expect(circle.pauseImageMiddle.setVisible).toHaveBeenCalled();
+        expect(circle.pauseStepOnScrollGroup.setVisible).toHaveBeenCalled();
+        expect(circle.outerCircle.strokeWidth).toEqual(5);
+        expect(circle.littleCircleGroup.visible).toEqual(true);
+        expect(circle.big).toEqual(true);
+    });
+
+    it("It should test makeItSmall method", function() {
+
+         circle.circle = {
+            setFill: function(color) {},
+            setStroke: function() {},
+            setRadius: function() {},
+            setStrokeWidth: function() {},
+        };
+        
+        circle.outerCircle = {
+            setStroke: function() {}
+        };
+
+        circle.stepDataGroup = {
+            setVisible: function() {},
+        };
+
+        circle.littleCircleGroup = {
+            visible:  true
+        };
+
+        circle.model = {
+            collect_data: false,
+            pause: true,
+        };
+
+        circle.gatherDataImageMiddle = {
+            setVisible: function() {}
+        };
+
+        circle.gatherDataOnScroll = {
+            setVisible: function() {}
+        };
+
+        spyOn(_pauseStepService, "applyPauseChanges").and.returnValue(true);
+        spyOn(circle.circle, "setFill");
+        spyOn(circle.circle, "setStroke");
+        spyOn(circle.circle, "setRadius");
+        spyOn(circle.circle, "setStrokeWidth");
+        spyOn(circle.outerCircle, "setStroke");
+        spyOn(circle.stepDataGroup, "setVisible");
+        spyOn(circle.gatherDataImageMiddle, "setVisible");
+        spyOn(circle.gatherDataOnScroll, "setVisible");
+
+        circle.makeItSmall();
+
+        expect(circle.big).toEqual(false);
+        expect(circle.circle.setFill).toHaveBeenCalledWith("#ffb400");
+        expect(circle.circle.setStroke).toHaveBeenCalledWith("white");
+        expect(circle.circle.setRadius).toHaveBeenCalledWith(11);
+        expect(circle.circle.setStrokeWidth).toHaveBeenCalledWith(8);
+
+        expect(circle.outerCircle.setStroke).toHaveBeenCalledWith(null);
+        expect(circle.stepDataGroup.setVisible).toHaveBeenCalledWith(true);
+        expect(circle.littleCircleGroup.visible).toEqual(false);
+        expect(_pauseStepService.applyPauseChanges).toHaveBeenCalled();
+
+    });
+
+    it("It should test makeItSmall method, when collect_data turned on", function() {
+
+         circle.circle = {
+            setFill: function(color) {},
+            setStroke: function() {},
+            setRadius: function() {},
+            setStrokeWidth: function() {},
+        };
+        
+        circle.outerCircle = {
+            setStroke: function() {}
+        };
+
+        circle.stepDataGroup = {
+            setVisible: function() {},
+        };
+
+        circle.littleCircleGroup = {
+            visible:  true
+        };
+
+        circle.model = {
+            collect_data: true,
+            pause: true,
+        };
+
+        circle.gatherDataImageMiddle = {
+            setVisible: function() {}
+        };
+
+        circle.gatherDataOnScroll = {
+            setVisible: function() {}
+        };
+
+        spyOn(_pauseStepService, "applyPauseChanges").and.returnValue(true);
+        spyOn(circle.circle, "setFill");
+        spyOn(circle.circle, "setStroke");
+        spyOn(circle.circle, "setRadius");
+        spyOn(circle.circle, "setStrokeWidth");
+        spyOn(circle.outerCircle, "setStroke");
+        spyOn(circle.stepDataGroup, "setVisible");
+        spyOn(circle.gatherDataImageMiddle, "setVisible");
+        spyOn(circle.gatherDataOnScroll, "setVisible");
+
+        circle.makeItSmall();
+
+        expect(circle.big).toEqual(false);
+        expect(circle.circle.setFill).toHaveBeenCalledWith("white");
+        expect(circle.circle.setStroke).toHaveBeenCalledWith("white");
+        expect(circle.circle.setRadius).toHaveBeenCalledWith(11);
+        expect(circle.circle.setStrokeWidth).toHaveBeenCalledWith(8);
+
+        expect(circle.outerCircle.setStroke).toHaveBeenCalledWith(null);
+        expect(circle.stepDataGroup.setVisible).toHaveBeenCalledWith(true);
+        expect(circle.littleCircleGroup.visible).toEqual(false);
+        expect(_pauseStepService.applyPauseChanges).toHaveBeenCalled();
+
+        expect(circle.gatherDataImageMiddle.setVisible).toHaveBeenCalledWith(true);
+        expect(circle.gatherDataOnScroll.setVisible).toHaveBeenCalledWith(false);
+    });
+
 });
