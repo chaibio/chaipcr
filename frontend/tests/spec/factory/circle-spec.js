@@ -908,7 +908,7 @@ describe("Testing circle", function() {
         expect(circle.next.parent.rampSpeedGroup.left).toEqual(36);
     });
 
-    it("It should test runAlongCircle method, when (rampEdge > this.gatherDataDuringRampGroup.top - 14)", function() {
+    it("It should test runAlongCircle method, when (rampEdge < this.gatherDataDuringRampGroup.top - 14)", function() {
 
         circle.gatherDataDuringRampGroup = {
             top: 100,
@@ -929,5 +929,50 @@ describe("Testing circle", function() {
 
         expect(circle.parent.rampSpeedGroup.left).toEqual(circle.parent.left + 5);
     });
+
+    it("It should test runAlongCircle method, when ((rampEdge > this.gatherDataDuringRampGroup.top - 14) && this.parent.rampSpeedGroup.top < this.gatherDataDuringRampGroup.top + 16)", function() {
+
+        circle.gatherDataDuringRampGroup = {
+            top: 60,
+            setCoords: function() { },
+        };
+
+        circle.parent = {
+            left:50,
+            rampSpeedGroup: {
+                top: 70,
+                height: 15,
+                left: 0,
+                setCoords: function() {},
+            }
+        };
+        circle.runAlongCircle();
+
+        expect(circle.parent.rampSpeedGroup.left).toEqual(62.48999599679679);
+        
+    });
+
+    it("It should test runAlongCircle method, when ((rampEdge > this.gatherDataDuringRampGroup.top - 14) && this.parent.rampSpeedGroup.top < this.gatherDataDuringRampGroup.top + 16)", function() {
+
+        circle.gatherDataDuringRampGroup = {
+            top: 90,
+            setCoords: function() { },
+        };
+
+        circle.parent = {
+            left:50,
+            rampSpeedGroup: {
+                top: 70,
+                height: 15,
+                left: 0,
+                setCoords: function() {},
+            }
+        };
+        circle.runAlongCircle();
+
+        expect(circle.parent.rampSpeedGroup.left).toEqual(65.19868415357067);
+        
+    });
+
 
 });
