@@ -18,21 +18,15 @@
  */
 
 angular.module("canvasApp").factory('stage', [
-  'ExperimentLoader',
-  '$rootScope',
   'step',
   'previouslySelected',
   'stageGraphics',
-  'stepGraphics',
   'constants',
-  'circleManager',
   'correctNumberingService',
-  'editModeService',
   'addStepService',
   'deleteStepService',
   'moveStageToSides',
-  function(ExperimentLoader, $rootScope, step, previouslySelected, stageGraphics, stepGraphics, constants, 
-  circleManager, correctNumberingService, editModeService, addStepService, deleteStepService, moveStageToSides) {
+  function(step, previouslySelected, stageGraphics, constants, correctNumberingService, addStepService, deleteStepService, moveStageToSides) {
 
     /*
       @model has all the data points related to stage

@@ -45,7 +45,7 @@ angular.module("canvasApp").factory('circle', [
       this.canvas = parentStep.canvas;
       this.scrollTop = 80;
       this.scrollLength = 317;
-      //this.scrollRatio = (this.scrollLength - this.scrollTop) / 100;
+      
       this.scrollRatio1 = ((this.scrollLength - this.scrollTop) * 0.25) / 50; // 1.2;//(this.scrollLength - this.scrollTop) / 200;
       this.scrollRatio2 = ((this.scrollLength - this.scrollTop) * 0.75) / 50;//3.54;//(this.scrollLength - this.scrollTop) / 50;
       // Now we have our lowest temperature as 4 instead of 0, So we introduce lowestScrollCoordinate;
