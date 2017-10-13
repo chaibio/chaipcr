@@ -341,7 +341,7 @@ angular.module("canvasApp").factory('circle', [
       };
 
       this.manageClick = function() {
-        //debugger;
+        
         if(! this.big) {
           this.makeItBig();
           this.parent.parentStage.selectStage();
