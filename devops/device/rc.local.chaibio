@@ -11,6 +11,45 @@
 #
 # By default this script does nothing.
 
+pwm_setup_kernel49 ()
+{
+	if [ -e /sys/class/pwm/pwmchip0/export ] && [ ! -d /sys/class/pwm/pwmchip0/pwm0 ] 
+	then
+		echo setting up PWM
+		if [ ! -d /sys/class/pwm/pwmchip0/pwm0 ]
+		then
+			echo turning on chip 0- pwm0
+			echo 0 > /sys/class/pwm/pwmchip0/export
+		fi
+
+		# EHRPWM1B
+		if [ ! -d /sys/class/pwm/pwmchip0/pwm1 ]
+		then
+		        echo turning on chip 0- pwm1
+        		echo 1 > /sys/class/pwm/pwmchip0/export
+		fi
+
+		if [ ! -d /sys/class/pwm/pwmchip2/pwm0 ]
+		then
+			echo turning on chip 2- pwm0
+			echo 0 > /sys/class/pwm/pwmchip2/export
+		fi
+
+		if [ ! -d /sys/class/pwm/pwmchip3/pwm0 ]
+		then
+			echo turning on chip 3- pwm0
+			echo 0 > /sys/class/pwm/pwmchip3/export
+		fi
+
+		if [ ! -d /sys/class/pwm/pwmchip3/pwm1 ]
+		then
+			echo turning on chip 3- pwm1
+			echo 1 > /sys/class/pwm/pwmchip3/export
+		fi
+	else
+		echo PWM dose not need to be set.
+	fi
+}
 
 wait_for_migrate () {
         echo "Checking for migrate script completation"
@@ -393,6 +432,8 @@ then
 		fi
 	fi
 fi
+
+pwm_setup_kernel49 >> $log_file 2>&1 || true
 check_upgrade_autorun >> $log_file 2>&1 || true &
 network_watchdog >> /dev/null 2>&1 || true
 check_corruption >> $log_file 2>&1 || true

@@ -1,8 +1,8 @@
 #!/bin/sh
 
 echo "Compiling the LCD overlay from .dts to .dtbo"
-dtc -O dtb -o CHAI-LCDtouch5-00A0.dtbo -b 0 -@ CHAI-LCDtouch5-00A0.dts
-if [ -e CHAI-LCDtouch5-00A0.dtbo ]
+dtc -O dtb -o ../CHAI-LCDtouch5-00A0.dtbo -b 0 -@ ../CHAI-LCDtouch5-00A0.dts
+if [ -e ../CHAI-LCDtouch5-00A0.dtbo ]
 then
 	echo Tree overlay compiled ok.
 else
@@ -10,13 +10,25 @@ else
 	exit 1
 fi
 
-echo "Compiling the main device tree from .dts to .dtb"
-dtc -O dtb -o am335x-boneblack.dtb -b 0 -@ am335x-boneblack.dts.49
 
-find /boot/dtbs/* -maxdepth 1 -type d -exec mv {}/am335x-boneblack.dtb {}/am335x-boneblack.dtb.org \;
-# until fixing dts find /boot/dtbs/* -maxdepth 1 -type d -exec cp am335x-boneblack.dtb {}/am335x-boneblack.dtb \;
+#echo "Compiling the main device tree from .dts to .dtb"
+#wget https://github.com/RobertCNelson/dtb-rebuilder/archive/4.9-ti.zip
+#unzip 4.9-ti.zip
+#cd dtb-rebuilder-4.9-ti/
+#cp ../am335x-bone-common.dtsi src/arm/am335x-bone-common.dtsi
+#cpp -Wp,-MD,src/arm/.am335x-boneblack.dtb.d.pre.tmp -nostdinc -Iinclude -Isrc/arm -Itestcase-data -undef -D__DTS__ -x assembler-with-cpp -o src/arm/.am335x-boneblack.dtb.dts.tmp src/arm/am335x-boneblack.dts ; 
+#dtc -O dtb -o src/arm/am335x-boneblack.dtb -b 0 -i src/arm  -d src/arm/.am335x-boneblack.dtb.d.dtc.tmp src/arm/.am335x-boneblack.dtb.dts.tmp ;
+#cat src/arm/.am335x-boneblack.dtb.d.pre.tmp src/arm/.am335x-boneblack.dtb.d.dtc.tmp > src/arm/.am335x-boneblack.dtb.d
+
+#find /boot/dtbs/* -maxdepth 1 -type d -exec mv {}/am335x-boneblack.dtb {}/am335x-boneblack.dtb.org \;
+#find /boot/dtbs/* -maxdepth 1 -type d -exec cp src/arm/am335x-boneblack.dtb {}/am335x-boneblack.dtb \;
+#cd ..
+cd ..
 
 cp CHAI-LCDtouch5-00A0.dtbo /lib/firmware/CHAI-LCDtouch5-00A0.dtbo
+
+#rm 49/4.9-ti.zip
+#rm -r 49/dtb-rebuilder-4.9-ti/
 
 cp capemgr /etc/default/
 
@@ -40,6 +52,7 @@ else
 	exit 1
 fi
 
+echo "cape_enable=bone_capemgr.enable_partno=chai-pcr,CHAI-LCDtouch5" >> /boot/uEnv.txt
 sync
 
 echo CHAI-LCDtouch5 > $SLOTS

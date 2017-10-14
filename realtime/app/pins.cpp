@@ -27,18 +27,44 @@ using namespace std;
 const string kSPI0DevicePath {"/dev/spidev1.0"};
 const string kSPI1DevicePath {"/dev/spidev2.0"};
 
-//Heat Sink
-const string kHeatSinkFanControlPWMPath {"/sys/devices/ocp.3/fan_pwm.17"};
+#ifdef KERNEL_49
+/*
+	PWM Name 		File System Location 							Header Pin
+	EHRPWM2B (pwm1) 	/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchipX	P8.13 (23), P8.46
+	EHRPWM2A (pwm0) 	/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchipX	P8.19 (22), P8.45
+	EHRPWM1A (pwm0) 	/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchipX 	P8.36, P9.14
+	EHRPWM1B (pwm1) 	/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchipX 	P8.34, P9.16
+	EHRPWM0A (pwm0) 	/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchipX 	P9.22, P9.31
+	EHRPWM0B ) (pwm1) 	/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchipX 	P9.21, P9.29
+	ECAPPWM0 	/sys/devices/platform/ocp/48300000.epwmss/48300100.ecap/pwm/pwmchipX (?) 	P9.42
+	ECAPPWM2 	/sys/devices/platform/ocp/48304000.epwmss/48304100.ecap/pwm/pwmchipX (?) 	P9.28
+*/
+	//Heat Sink: P9.14 ehrpwm1a: 
+	const string kHeatSinkFanControlPWMPath {"/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip0/pwm0"};
 
-//LED control
-const std::string kLEDBlankPWMPath {"/sys/devices/ocp.3/lia_ref_pwm.18"};
+	//LED control: P9.28 eCAP2_PWM2
+	const std::string kLEDBlankPWMPath {"/sys/devices/platform/ocp/48304000.epwmss/48304100.ecap/pwm/pwmchip2/pwm0"};
 
-//Lid
-const std::string kLidControlPWMPath {"/sys/devices/ocp.3/lid_heater_pwm.16"};
+	//Lid: P9.16 ehrpwm1b
+	const std::string kLidControlPWMPath {"/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip0/pwm1"};
 
-//Head Block
-const std::string kHeatBlockZone1PWMPath {"/sys/devices/ocp.3/peltier1_pwm.14"};
-const std::string kHeatBlockZone2PWMPath {"/sys/devices/ocp.3/peltier2_pwm.15"};
+	//Head Block: P8.13 ehrpwm2b, P8.19 ehrpwm2a
+	const std::string kHeatBlockZone1PWMPath {"/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip3/pwm1"};
+	const std::string kHeatBlockZone2PWMPath {"/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip3/pwm0"};
+#else
+	//Heat Sink
+	const string kHeatSinkFanControlPWMPath {"/sys/devices/ocp.3/fan_pwm.17"};
+
+	//LED control
+	const std::string kLEDBlankPWMPath {"/sys/devices/ocp.3/lia_ref_pwm.18"};
+
+	//Lid
+	const std::string kLidControlPWMPath {"/sys/devices/ocp.3/lid_heater_pwm.16"};
+
+	//Head Block
+	const std::string kHeatBlockZone1PWMPath {"/sys/devices/ocp.3/peltier1_pwm.14"};
+	const std::string kHeatBlockZone2PWMPath {"/sys/devices/ocp.3/peltier2_pwm.15"};
+#endif
 
 //ADC
 const std::string kADCPinPath {"/sys/bus/iio/devices/iio:device0"};
