@@ -53,9 +53,12 @@ else
 fi
 
 echo "cape_enable=bone_capemgr.enable_partno=chai-pcr,CHAI-LCDtouch5" >> /boot/uEnv.txt
+echo "cape_disable=bone_capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN,BB-SPIDEV0,BB-SPIDEV1,BB-BONE-EMMC-2G" >> /boot/uEnv.txt
+echo "dtb=am335x-boneblack-emmc-overlay.dtb" >> /boot/uEnv.txt
+
 sync
 
-echo CHAI-LCDtouch5 > $SLOTS
-cat $SLOTS
+#echo CHAI-LCDtouch5 > $SLOTS
+#cat $SLOTS
 
 exit 0
