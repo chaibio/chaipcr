@@ -55,6 +55,8 @@ fi
 echo "cape_enable=bone_capemgr.enable_partno=chai-pcr,CHAI-LCDtouch5" >> /boot/uEnv.txt
 echo "cape_disable=bone_capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN,BB-SPIDEV0,BB-SPIDEV1,BB-BONE-EMMC-2G" >> /boot/uEnv.txt
 echo "dtb=am335x-boneblack-emmc-overlay.dtb" >> /boot/uEnv.txt
+sed -i -e 's:enable_uboot_cape_universal=1::g' /boot/uEnv.txt
+sed -i -e 's:cape_universal=enable:cape_universal=disable:g' /boot/uEnv.txt
 
 sync
 

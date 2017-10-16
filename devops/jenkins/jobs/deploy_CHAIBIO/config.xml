@@ -340,6 +340,8 @@ rm /sdcard/upgrade/compile-browser/chaipcr/realtime/libraries/lib/libPoco*
 
 /opt/QtEmbedded/bin/qmake || exit 1
 sed -i &quot;s/arm-unknown-linux-gnueabi-//&quot; Makefile
+sed -i &apos;/^DEFINES[[:space:]]\+=/ s/$/ -DKERNEL_49/&apos; Makefile
+
 make || exit 1
 make install || exit 1
 #cp realtime ~/tmp
@@ -386,7 +388,8 @@ then
 
 echo Build time- adding pre-requesits
 free -m
-apt-get -q -y install libgtk-3-0 gettext
+DEBIAN_FRONTEND=noninteractive apt-get -q -y install gettext
+DEBIAN_FRONTEND=noninteractive apt-get -q -y install libgtk-3-0
 
 echo $(date) Performing precompilling julia packages
 cd /root/chaipcr/bioinformatics/QpcrAnalysis
@@ -460,7 +463,7 @@ rm testQpcrAnalysis.jl
 fi
 
 sync
-swapoff /sdcard/upgrade/swapfile
+swapoff -a
 rm /sdcard/upgrade/swapfile
 exit 0
 </command>
@@ -551,6 +554,18 @@ rm master.zip || true
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
+      <command>echo &quot;Install device tree overlay and PRU binary(do this every time it changes):&quot;
+cd ~/chaipcr/deploy/overlay
+bash ./build.sh
+echo chai-pcr &gt; /sys/devices/platform/bone_capemgr/slots
+cat /sys/devices/platform/bone_capemgr/slots
+
+exit 0
+</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
       <command>echo Build/install LCD drivers
 cd ~/chaipcr/modules/LCDtouch_V3/49
 chmod 775 install_debian.sh
@@ -559,6 +574,7 @@ mkdir -p /boot/dts/
 mkdir -p /lib/firmware/
 
 ./install_debian.sh
+echo done installing LCD driver.
 
 sync
 sync
@@ -596,18 +612,6 @@ echo seed_fu
 echo &quot;\n&quot; | RAILS_ENV=production bundle exec rake db:seed_fu 
 
 echo done rserev</command>
-      <execEachLine>false</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
-      <command>echo &quot;Install device tree overlay and PRU binary(do this every time it changes):&quot;
-cd ~/chaipcr/deploy/overlay
-bash ./build.sh
-echo chai-pcr &gt; /sys/devices/platform/bone_capemgr/slots
-cat /sys/devices/platform/bone_capemgr/slots
-
-exit 0
-</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
