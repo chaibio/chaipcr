@@ -119,8 +119,9 @@ angular.module("canvasApp").factory('stage', [
       this.deleteStageContents = function() {
 
         for(var component in this.visualComponents) {
+          
           if(component === "dots") {
-            var items = this.dots._objects;
+            //var items = this.dots._objects;
             this.canvas.remove(this.dots);
             this.dots.forEachObject(function(O) {
               this.canvas.remove(O);
