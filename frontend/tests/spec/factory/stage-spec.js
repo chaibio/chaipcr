@@ -8,6 +8,11 @@ describe("Testing stage factory", function() {
         module('ChaiBioTech', function($provide) {
             $provide.value('IsTouchScreen', function () {});
 
+            $provide.value('step', function() {
+                return {
+                    stepStatus: "newly created"
+                };
+            });
         });
 
         inject(function($injector) {
@@ -466,5 +471,258 @@ describe("Testing stage factory", function() {
         expect(childStep.moveStep).toHaveBeenCalled();
         expect(childStep.circle.moveCircleWithStep).toHaveBeenCalled();
     });
+
+    it("It should test moveAllStepsAndStages method", function() {
+
+        var del = true;
+        spyOn(stage, "moveIndividualStageAndContents");
+
+        stage.moveAllStepsAndStages(del);
+
+        expect(stage.moveIndividualStageAndContents).toHaveBeenCalled();
+    });
+
+    it("It should test updateStageData method", function() {
+
+        var action = -1;
+        stage.index = 1;
+
+        spyOn(stage, "stageHeader").and.returnValue(true);
+
+        stage.updateStageData(action);
+
+        expect(stage.stageHeader).toHaveBeenCalled();
+        expect(stage.index).toEqual(0);
+    });
+
+    it("It should test updateStageData method, and should go into while loop", function() {
+
+        var action = 1;
+        stage.index = 1;
+
+        stage.nextStage = {
+
+            index: 2,
+            stageHeader: function() {},
+        };
+        spyOn(stage.nextStage, "stageHeader").and.returnValue(true);
+
+        stage.updateStageData(action);
+
+        expect(stage.nextStage.stageHeader).toHaveBeenCalled();
+        expect(stage.nextStage.index).toEqual(3);
+    });
+
+    it("It should test squeezeStage method", function() {
+
+        var step = {
+            index: 0,
+            ordealStatus: 1
+        };
+
+        stage.childSteps = [
+            {}
+        ];
+
+        spyOn(stage, "deleteFromStage").and.returnValue(true);
+
+        stage.squeezeStage(step);
+
+        expect(stage.deleteFromStage).toHaveBeenCalled();
+    });
+
+    it("It should test squeezeStage method, when stage has no child steps", function() {
+
+        var step = {
+            index: 0,
+            ordealStatus: 1,
+            parentStage: {
+                index: 2
+            }
+        };
+
+        stage.childSteps = [
+            
+        ];
+
+        stage.parent = {
+            allStageViews: {
+                splice: function() {}
+            }
+        };
+        stage.previousStage = {
+
+            childSteps: [
+                {
+                    parentStage: {
+                        updateStageData: function() {}
+                    }
+                }
+            ]
+        };
+
+        spyOn(stage, "deleteFromStage").and.returnValue(true);
+        spyOn(stage, "wireStageNextAndPrevious").and.returnValue(true);
+        spyOn(stage.parent.allStageViews, "splice");
+        spyOn(stage.previousStage.childSteps[0].parentStage, "updateStageData");
+
+        stage.squeezeStage(step);
+
+        expect(stage.deleteFromStage).toHaveBeenCalled();
+        expect(stage.wireStageNextAndPrevious).toHaveBeenCalled();
+        expect(stage.parent.allStageViews.splice).toHaveBeenCalled();
+        expect(stage.previousStage.childSteps[0].parentStage.updateStageData).toHaveBeenCalled();
+    });
+
+    it("It should test squeezeStage method, when stage has no child steps and no previousStage", function() {
+
+        var step = {
+            index: 0,
+            ordealStatus: 1,
+            parentStage: {
+                nextStage: {
+                    childSteps: [
+                        {
+                            parentStage: {
+                                updateStageData: function() {}
+                            }
+                        }
+                    ]
+                },
+                index: 2
+            }
+        };
+
+        stage.childSteps = [
+            
+        ];
+
+        stage.parent = {
+            allStageViews: {
+                splice: function() {}
+            }
+        };
+        stage.nextStage = {
+
+            childSteps: [
+                {
+                    parentStage: {
+                        updateStageData: function() {}
+                    }
+                }
+            ]
+        };
+
+        spyOn(stage, "deleteFromStage").and.returnValue(true);
+        spyOn(stage, "wireStageNextAndPrevious").and.returnValue(true);
+        spyOn(stage.parent.allStageViews, "splice");
+        spyOn(step.parentStage.nextStage.childSteps[0].parentStage, "updateStageData");
+
+        stage.squeezeStage(step);
+
+        expect(stage.deleteFromStage).toHaveBeenCalled();
+        expect(stage.wireStageNextAndPrevious).toHaveBeenCalled();
+        expect(stage.parent.allStageViews.splice).toHaveBeenCalled();
+        expect(step.parentStage.nextStage.childSteps[0].parentStage.updateStageData).toHaveBeenCalled();
+    });
+
+    it("It should test shortenStageName method", function() {
+
+        stage.stageName = {
+            setText: function() {
+
+            },
+            text: "0123456789"
+        };
+
+        spyOn(stage.stageName, "setText");
+
+        stage.shortenStageName();
+
+        expect(stage.shortStageName).toEqual(true);
+        expect(stage.stageName.setText).toHaveBeenCalledWith('01234567');
+    });
+
+    describe("Test getLeft method in different scenarios", function() {
+
+        it("It should test getLeft method when stage has no previous stage", function() {
+
+            stage.parentStage = null;
+
+            stage.getLeft();
+
+            expect(stage.left).toEqual(33);
+        });
+
+        it("It should test getLeft method when stage has a previous stage", function() {
+
+            stage.previousStage = {
+                left: 100,
+                myWidth: 200,
+            };
+
+            stage.getLeft();
+            expect(stage.left).toEqual(308);
+        });        
+    });
+
+    it("It should test addSteps method", function() {
+
+                stage.model = {
+            steps: {
+                reduce: function(callback) {
+                    var a, b, c;
+                    callback.call(stage, a, b, c);
+                }
+            }
+        };
+        
+        spyOn(stage, "configureStepOnCreate").and.returnValue(true);
+        spyOn(stage.model.steps, "reduce").and.callThrough();
+
+        stage.addSteps();
+
+        expect(stage.model.steps.reduce).toHaveBeenCalled();
+        expect(stage.configureStepOnCreate).toHaveBeenCalled();
+    });
+    
+    describe("Testing scenarios in configureStepOnCreate", function() {
+        
+        it("It should test configureStepOnCreate method, when its not insertMode", function() {
+        
+            stage.insertMode = true;
+
+            var tempStep = {
+                name: "I am temporary",
+                nextStep: null
+            };
+
+            stage.childSteps = [];
+
+            var STEP = {
+                step: {
+
+                }
+            };
+
+            var stepIndex = 1;
+
+            var retVal = stage.configureStepOnCreate(tempStep, STEP, stepIndex);
+
+            expect(retVal.previousStep.name).toEqual("I am temporary");
+            expect(retVal.stepStatus).toEqual("newly created");
+            expect(tempStep.nextStep.stepStatus).toEqual("newly created");
+            expect(stage.childSteps.length).toEqual(1);
+        });
+
+        it("It should test configureStepOnCreate method, when insertMode is false", function() {
+
+
+        });
+
+    });
+
+
+    
 
 }); 
