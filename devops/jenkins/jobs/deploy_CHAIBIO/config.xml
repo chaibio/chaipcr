@@ -369,6 +369,8 @@ rm libraries/lib/libPoco*
 /opt/QtEmbedded/bin/qmake || exit 1
 
 sed -i &quot;s/arm-unknown-linux-gnueabi-//&quot; Makefile
+sed -i &apos;/^DEFINES[[:space:]]\+=/ s/$/ -DKERNEL_49/&apos; Makefile
+
 make || exit 1
 make install || exit 1
 #cp realtime ~/tmp
