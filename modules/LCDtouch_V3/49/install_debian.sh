@@ -52,15 +52,22 @@ else
 	exit 1
 fi
 
-echo "cape_enable=bone_capemgr.enable_partno=chai-pcr,CHAI-LCDtouch5" >> /boot/uEnv.txt
-echo "cape_disable=bone_capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN,BB-SPIDEV0,BB-SPIDEV1,BB-BONE-EMMC-2G" >> /boot/uEnv.txt
-echo "dtb=am335x-boneblack-emmc-overlay.dtb" >> /boot/uEnv.txt
-sed -i -e 's:enable_uboot_cape_universal=1::g' /boot/uEnv.txt
-sed -i -e 's:cape_universal=enable:cape_universal=disable:g' /boot/uEnv.txt
+process_uEnv () {
+	if [ -e $1 ]
+	then
+		ech processing $1
+		echo "cape_enable=bone_capemgr.enable_partno=chai-pcr,CHAI-LCDtouch5" >> $1
+		echo "cape_disable=bone_capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN,BB-SPIDEV0,BB-SPIDEV1,BB-BONE-EMMC-2G" >> $1
+		echo "dtb=am335x-boneblack-emmc-overlay.dtb" >> $1
+		sed -i -e 's:enable_uboot_cape_universal=1::g' $1
+		sed -i -e 's:cape_universal=enable:cape_universal=disable:g' $1
+	fi
+}
+
+process_uEnv /boot/uEnv.txt
+process_uEnv /boot/uEnv.sdcard.txt
+process_uEnv /boot/uEnv.72check.txt
 
 sync
-
-#echo CHAI-LCDtouch5 > $SLOTS
-#cat $SLOTS
 
 exit 0
