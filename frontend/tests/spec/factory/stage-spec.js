@@ -360,4 +360,111 @@ describe("Testing stage factory", function() {
 
         expect(currentStep.deleteAllStepContents).toHaveBeenCalled();
     });
+
+    it("it should moveIndividualStageAndContents method, when del = true", function() {
+
+        stage.stageGroup = {
+            setLeft: function() {},
+            setCoords: function() {}
+        };
+
+        stage.dots = {
+            setLeft: function() {},
+            setCoords: function() {}
+        };
+
+        stage.childSteps = [
+            { id: 1 },
+            { id: 2 }
+        ];
+
+        stage.left = 100;
+        
+        spyOn(stage, "getLeft");
+
+        spyOn(stage.stageGroup, "setLeft");
+        spyOn(stage.stageGroup, "setCoords");
+
+        spyOn(stage.dots, "setLeft");
+        spyOn(stage.dots, "setCoords");
+
+        spyOn(stage, "manageMovingChildsteps").and.returnValue();
+
+        var _stage = stage;
+        var del = true;
+
+        stage.moveIndividualStageAndContents(_stage, del);
+
+        expect(stage.getLeft).toHaveBeenCalled();
+        expect(stage.stageGroup.setLeft).toHaveBeenCalledWith(100);
+        expect(stage.stageGroup.setCoords).toHaveBeenCalled();
+
+        expect(stage.dots.setLeft).toHaveBeenCalled();
+        expect(stage.dots.setCoords).toHaveBeenCalled();
+        expect(stage.moveStepAction).toEqual(-1);
+        expect(stage.manageMovingChildsteps).toHaveBeenCalledTimes(2);
+    });
+
+    it("it should moveIndividualStageAndContents method, when del = false", function() {
+
+        stage.stageGroup = {
+            setLeft: function() {},
+            setCoords: function() {}
+        };
+
+        stage.dots = {
+            setLeft: function() {},
+            setCoords: function() {}
+        };
+
+        stage.childSteps = [
+            { id: 1 },
+            { id: 2 }
+        ];
+
+        stage.left = 100;
+        
+        spyOn(stage, "getLeft");
+
+        spyOn(stage.stageGroup, "setLeft");
+        spyOn(stage.stageGroup, "setCoords");
+
+        spyOn(stage.dots, "setLeft");
+        spyOn(stage.dots, "setCoords");
+
+        spyOn(stage, "manageMovingChildsteps").and.returnValue();
+
+        var _stage = stage;
+        var del = false;
+
+        stage.moveIndividualStageAndContents(_stage, del);
+
+        expect(stage.getLeft).toHaveBeenCalled();
+        expect(stage.stageGroup.setLeft).toHaveBeenCalledWith(100);
+        expect(stage.stageGroup.setCoords).toHaveBeenCalled();
+
+        expect(stage.dots.setLeft).toHaveBeenCalled();
+        expect(stage.dots.setCoords).toHaveBeenCalled();
+        expect(stage.moveStepAction).toEqual(1);
+        expect(stage.manageMovingChildsteps).toHaveBeenCalledTimes(2);
+    });
+
+    it("It should test manageMovingChildsteps method", function() {
+
+        var childStep = {
+            moveStep: function() {},
+            circle: {
+                moveCircleWithStep: function() {}
+            }
+        };
+
+        spyOn(childStep, "moveStep");
+        spyOn(childStep.circle, "moveCircleWithStep");
+
+        stage.manageMovingChildsteps(childStep);
+
+        expect(childStep.moveStep).toHaveBeenCalled();
+        expect(childStep.circle.moveCircleWithStep).toHaveBeenCalled();
+    });
+
 }); 

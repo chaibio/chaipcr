@@ -153,8 +153,10 @@ angular.module("canvasApp").factory('stage', [
       this.moveIndividualStageAndContents = function(stage, del) {
 
         stage.getLeft();
-        stage.stageGroup.setLeft(stage.left).setCoords();
-        stage.dots.setLeft(stage.left + 3).setCoords();
+        stage.stageGroup.setLeft(stage.left);
+        stage.stageGroup.setCoords();
+        stage.dots.setLeft(stage.left + 3);
+        stage.dots.setCoords();
         //stage.myWidth = (stage.model.steps.length * (constants.stepWidth)) + constants.additionalWidth;
         this.moveStepAction = (del === true) ? -1 : 1; 
         stage.childSteps.forEach(this.manageMovingChildsteps, this);
