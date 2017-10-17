@@ -40,17 +40,17 @@ const string kSPI1DevicePath {"/dev/spidev2.0"};
 	ECAPPWM2 	/sys/devices/platform/ocp/48304000.epwmss/48304100.ecap/pwm/pwmchipX (?) 	P9.28
 */
 	//Heat Sink: P9.14 ehrpwm1a: 
-	const string kHeatSinkFanControlPWMPath {"/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip0/pwm0"};
+	const string kHeatSinkFanControlPWMPath {"/run/chaipcr/realtime/kHeatSinkFanControl.pwm"};
 
 	//LED control: P9.28 eCAP2_PWM2
-	const std::string kLEDBlankPWMPath {"/sys/devices/platform/ocp/48304000.epwmss/48304100.ecap/pwm/pwmchip2/pwm0"};
+	const std::string kLEDBlankPWMPath {"/run/chaipcr/realtime/kLEDBlank.pwm"};
 
 	//Lid: P9.16 ehrpwm1b
-	const std::string kLidControlPWMPath {"/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip0/pwm1"};
+	const std::string kLidControlPWMPath {"/run/chaipcr/realtime/kLidControl.pwm"};
 
 	//Head Block: P8.13 ehrpwm2b, P8.19 ehrpwm2a
-	const std::string kHeatBlockZone1PWMPath {"/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip3/pwm1"};
-	const std::string kHeatBlockZone2PWMPath {"/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip3/pwm0"};
+	const std::string kHeatBlockZone1PWMPath {"/run/chaipcr/realtime/kHeatBlockZone1.pwm"};
+	const std::string kHeatBlockZone2PWMPath {"/run/chaipcr/realtime/kHeatBlockZone2.pwm"};
 #else
 	//Heat Sink
 	const string kHeatSinkFanControlPWMPath {"/sys/devices/ocp.3/fan_pwm.17"};
