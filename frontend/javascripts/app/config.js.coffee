@@ -25,9 +25,11 @@ window.ChaiBioTech.ngApp
   'PeriodicUpdate'
   'NetworkSettingsService'
   'IsTouchScreen'
-  ($rootScope, $state, $window, Status, PeriodicUpdate, NetworkSettingsService, IsTouchScreen) ->
+  'WindowWrapper'
+  ($rootScope, $state, $window, Status, PeriodicUpdate, NetworkSettingsService, IsTouchScreen, WindowWrapper) ->
 
     IsTouchScreen()
+    WindowWrapper.initEventHandlers()
 
     $rootScope.title = "ChaiBioTech"
 

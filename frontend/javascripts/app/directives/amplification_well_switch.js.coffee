@@ -36,7 +36,18 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
       COLORS = AmplificationChartHelper.COLORS
       ACTIVE_BORDER_WIDTH = 2
       wells = {}
+      is_cmd_key_held = false
       $scope.dragging = false
+      
+      $scope.$on 'keypressed:command', ->
+        is_cmd_key_held = true
+
+      $scope.$on 'keyreleased:command', ->
+        is_cmd_key_held = false
+        console.log 'cmd held!!!'
+
+      isCtrlKeyHeld = (evt) ->
+        return evt.ctrlKey or is_cmd_key_held
 
       for b in [0...16] by 1
         wells["well_#{b}"] =
@@ -108,7 +119,7 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
             col.selected = col.index >= min and col.index <= max
             $scope.rows.forEach (row) ->
               well = $scope.wells["well_#{row.index * $scope.columns.length + col.index}"]
-              if not (evt.ctrlKey and well.selected)
+              if not (isCtrlKeyHeld(evt) and well.selected)
                 well.selected = col.selected
 
         if $scope.dragStartingPoint.type is 'row'
@@ -120,7 +131,8 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
             row.selected = row.index >= min and row.index <= max
             $scope.columns.forEach (col) ->
               well = $scope.wells["well_#{row.index * $scope.columns.length + col.index}"]
-              if not (evt.ctrlKey and well.selected)
+              # ctrl or command key held
+              if not (isCtrlKeyHeld(evt) and well.selected)
                 well.selected = row.selected
 
         if $scope.dragStartingPoint.type is 'well'
@@ -137,7 +149,7 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
               $scope.columns.forEach (col) ->
                 selected = (row.index >= min_row and row.index <= max_row) and (col.index >= min_col and col.index <= max_col)
                 well = $scope.wells["well_#{row.index * $scope.columns.length + col.index}"]
-                if not (evt.ctrlKey and well.selected)
+                if not (isCtrlKeyHeld(evt) and well.selected)
                   well.selected = selected
 
 

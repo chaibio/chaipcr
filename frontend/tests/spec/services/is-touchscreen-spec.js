@@ -10,6 +10,7 @@
     }
 
     var mockWindowWrapperService = {
+      initEventHandlers: function () {},
       width: function () {
         return touchScreenSize.width
       },
