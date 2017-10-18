@@ -35,16 +35,15 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
 
       COLORS = AmplificationChartHelper.COLORS
       ACTIVE_BORDER_WIDTH = 2
-      wells = {}
       is_cmd_key_held = false
+      wells = {}
       $scope.dragging = false
-      
+
       $scope.$on 'keypressed:command', ->
         is_cmd_key_held = true
 
       $scope.$on 'keyreleased:command', ->
         is_cmd_key_held = false
-        console.log 'cmd held!!!'
 
       isCtrlKeyHeld = (evt) ->
         return evt.ctrlKey or is_cmd_key_held
@@ -105,10 +104,12 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
           type: type
           index: index
 
-        $scope.dragged(evt, type, index)
+        #$scope.dragged(evt, type, index)
 
       $scope.dragged = (evt, type, index) ->
         return if !$scope.dragging
+        return if type is $scope.dragStartingPoint.type and index is $scope.dragStartingPoint.index
+
         if $scope.dragStartingPoint.type is 'column'
           if type is 'well'
             index = if index >= $scope.columns.length then index - $scope.columns.length else index
@@ -153,7 +154,8 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
                   well.selected = selected
 
 
-      $scope.dragStop = (evt) ->
+      $scope.dragStop = (evt, type, index) ->
+
         $scope.dragging = false
 
         # remove selected from columns and row headers
@@ -161,6 +163,17 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
           col.selected = false
         $scope.rows.forEach (row) ->
           row.selected = false
+
+        if type is 'well' and index is $scope.dragStartingPoint.index
+          # deselect all other wells if ctrl/cmd key is not held
+          if !isCtrlKeyHeld(evt)
+            $scope.rows.forEach (r) ->
+              $scope.columns.forEach (c) ->
+                $scope.wells["well_#{r.index * $scope.columns.length + c.index}"].selected = false
+
+          # toggle selected state
+          well = $scope.wells["well_#{index}"]
+          well.selected = if isCtrlKeyHeld(evt) then !well.selected else true
 
         ngModel.$setViewValue(angular.copy($scope.wells))
 
