@@ -4,6 +4,9 @@
   <description>freeup eMMC</description>
   <keepDependencies>false</keepDependencies>
   <properties>
+    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.17.2">
+      <optOut>false</optOut>
+    </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
@@ -251,14 +254,21 @@ apt-get  -y -q --purge autoremove gcc
 apt-get  -y -q -f install
 
 apt-get  -y -q --purge autoremove gfortran* git hdf5-tools i2c-tools 
-apt-get  -y -q --purge autoremove icu-devtools ifupdown 
+apt-get  -y -q --purge autoremove icu-devtools
 apt-get  -y -q --purge autoremove initramfs-tools libboost*
-apt-get -y -q remove qt4-default qt5-default
+apt-get -y -q remove qt4-default qt5-default gettext
+DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge libgtk-3-0
+DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge gcc-4.9 cmake perl5 perl 
+DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge ruby python2*
+
 apt-get  -y -q -f install
 
 rm /var/lib/gems/ -r
-# rm -r /lib/modules/*
+rm /usr/lib/libjulia* /usr/lib/libmysql* /usr/lib/libLLVM*  /usr/lib/libsql* 
 rm /var/log/*gz
+rm /var/log/*1
+rm /var/log/mysql* -r
+rm /var/log/nginx/ -r
 find / -name julia -exec rm -r {} \;
 find / -name doc -exec rm -r {} \;
 rm -r /usr/local/lib/R
@@ -325,6 +335,7 @@ rm /zeros.bigfile
 sleep 60
 sync
 echo done freeing up
+df -h
 
 mkdir -p /tmp/zeroer
 if mount /dev/mmcblk1p2 /tmp/zeroer
@@ -350,6 +361,8 @@ then
 fi
 
 echo basic image zeroing done! restarting!
+
+df -h
 
 shutdown -r 1
 

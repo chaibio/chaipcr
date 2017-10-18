@@ -1,8 +1,8 @@
 #!/bin/sh
 
 echo "Compiling the LCD overlay from .dts to .dtbo"
-dtc -O dtb -o CHAI-LCDtouch5-00A0.dtbo -b 0 -@ CHAI-LCDtouch5-00A0.dts
-if [ -e CHAI-LCDtouch5-00A0.dtbo ]
+dtc -O dtb -o ../CHAI-LCDtouch5-00A0.dtbo -b 0 -@ ../CHAI-LCDtouch5-00A0.dts
+if [ -e ../CHAI-LCDtouch5-00A0.dtbo ]
 then
 	echo Tree overlay compiled ok.
 else
@@ -10,13 +10,25 @@ else
 	exit 1
 fi
 
-echo "Compiling the main device tree from .dts to .dtb"
-dtc -O dtb -o am335x-boneblack.dtb -b 0 -@ am335x-boneblack.dts.49
 
-find /boot/dtbs/* -maxdepth 1 -type d -exec mv {}/am335x-boneblack.dtb {}/am335x-boneblack.dtb.org \;
-# until fixing dts find /boot/dtbs/* -maxdepth 1 -type d -exec cp am335x-boneblack.dtb {}/am335x-boneblack.dtb \;
+#echo "Compiling the main device tree from .dts to .dtb"
+#wget https://github.com/RobertCNelson/dtb-rebuilder/archive/4.9-ti.zip
+#unzip 4.9-ti.zip
+#cd dtb-rebuilder-4.9-ti/
+#cp ../am335x-bone-common.dtsi src/arm/am335x-bone-common.dtsi
+#cpp -Wp,-MD,src/arm/.am335x-boneblack.dtb.d.pre.tmp -nostdinc -Iinclude -Isrc/arm -Itestcase-data -undef -D__DTS__ -x assembler-with-cpp -o src/arm/.am335x-boneblack.dtb.dts.tmp src/arm/am335x-boneblack.dts ; 
+#dtc -O dtb -o src/arm/am335x-boneblack.dtb -b 0 -i src/arm  -d src/arm/.am335x-boneblack.dtb.d.dtc.tmp src/arm/.am335x-boneblack.dtb.dts.tmp ;
+#cat src/arm/.am335x-boneblack.dtb.d.pre.tmp src/arm/.am335x-boneblack.dtb.d.dtc.tmp > src/arm/.am335x-boneblack.dtb.d
+
+#find /boot/dtbs/* -maxdepth 1 -type d -exec mv {}/am335x-boneblack.dtb {}/am335x-boneblack.dtb.org \;
+#find /boot/dtbs/* -maxdepth 1 -type d -exec cp src/arm/am335x-boneblack.dtb {}/am335x-boneblack.dtb \;
+#cd ..
+cd ..
 
 cp CHAI-LCDtouch5-00A0.dtbo /lib/firmware/CHAI-LCDtouch5-00A0.dtbo
+
+#rm 49/4.9-ti.zip
+#rm -r 49/dtb-rebuilder-4.9-ti/
 
 cp capemgr /etc/default/
 
@@ -40,9 +52,22 @@ else
 	exit 1
 fi
 
-sync
+process_uEnv () {
+	if [ -e $1 ]
+	then
+		ech processing $1
+		echo "cape_enable=bone_capemgr.enable_partno=chai-pcr,CHAI-LCDtouch5" >> $1
+		echo "cape_disable=bone_capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN,BB-SPIDEV0,BB-SPIDEV1,BB-BONE-EMMC-2G" >> $1
+		echo "dtb=am335x-boneblack-emmc-overlay.dtb" >> $1
+		sed -i -e 's:enable_uboot_cape_universal=1::g' $1
+		sed -i -e 's:cape_universal=enable:cape_universal=disable:g' $1
+	fi
+}
 
-echo CHAI-LCDtouch5 > $SLOTS
-cat $SLOTS
+process_uEnv /boot/uEnv.txt
+process_uEnv /boot/uEnv.sdcard.txt
+process_uEnv /boot/uEnv.72check.txt
+
+sync
 
 exit 0

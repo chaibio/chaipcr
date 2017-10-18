@@ -18,21 +18,15 @@
  */
 
 angular.module("canvasApp").factory('stage', [
-  'ExperimentLoader',
-  '$rootScope',
   'step',
   'previouslySelected',
   'stageGraphics',
-  'stepGraphics',
   'constants',
-  'circleManager',
   'correctNumberingService',
-  'editModeService',
   'addStepService',
   'deleteStepService',
   'moveStageToSides',
-  function(ExperimentLoader, $rootScope, step, previouslySelected, stageGraphics, stepGraphics, constants, 
-  circleManager, correctNumberingService, editModeService, addStepService, deleteStepService, moveStageToSides) {
+  function(step, previouslySelected, stageGraphics, constants, correctNumberingService, addStepService, deleteStepService, moveStageToSides) {
 
     /*
       @model has all the data points related to stage
@@ -125,8 +119,9 @@ angular.module("canvasApp").factory('stage', [
       this.deleteStageContents = function() {
 
         for(var component in this.visualComponents) {
+          
           if(component === "dots") {
-            var items = this.dots._objects;
+            //var items = this.dots._objects;
             this.canvas.remove(this.dots);
             this.dots.forEachObject(function(O) {
               this.canvas.remove(O);
@@ -158,8 +153,10 @@ angular.module("canvasApp").factory('stage', [
       this.moveIndividualStageAndContents = function(stage, del) {
 
         stage.getLeft();
-        stage.stageGroup.setLeft(stage.left).setCoords();
-        stage.dots.setLeft(stage.left + 3).setCoords();
+        stage.stageGroup.setLeft(stage.left);
+        stage.stageGroup.setCoords();
+        stage.dots.setLeft(stage.left + 3);
+        stage.dots.setCoords();
         //stage.myWidth = (stage.model.steps.length * (constants.stepWidth)) + constants.additionalWidth;
         this.moveStepAction = (del === true) ? -1 : 1; 
         stage.childSteps.forEach(this.manageMovingChildsteps, this);
@@ -285,7 +282,8 @@ angular.module("canvasApp").factory('stage', [
         
         this.stageName.setVisible(false);
         this.dots.setVisible(false);
-        this.stageCaption.setLeft(this.stageCaption.left - 24).setCoords();
+        this.stageCaption.setLeft(this.stageCaption.left - 24);
+        this.stageCaption.setCoords();
         this.canvas.sendToBack(this.stageGroup);
       };
 
