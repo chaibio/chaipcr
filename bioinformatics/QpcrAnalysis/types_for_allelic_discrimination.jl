@@ -2,7 +2,7 @@
 
 # clustering analysis result from a possible combination of expected genotypes
 type ClusterAnalysisResult
-    init_centers::Array{AbstractFloat,2}
+    init_centers::Array{AbstractFloat,2} # no longer necessary because it represents one combination of genotypes, but different combinations of genotypes with the same number of genotypes may result in the same clustering results
     cost_mtx_winit::Array{AbstractFloat,2}
     cluster_result::ClusteringResult
     centers::Array{AbstractFloat,2}
@@ -10,12 +10,19 @@ type ClusterAnalysisResult
     slht_mean::AbstractFloat
 end # type
 
-# assign genotypes
+type UniqCombinCenters
+    uniq_combin_centers::Set{Vector{AbstractFloat}}
+    car::ClusterAnalysisResult
+    slht_mean::AbstractFloat
+    geno_combins::Vector{Matrix{AbstractFloat}}
+end # type
+
 type AssignGenosResult
     cluster_result::ClusteringResult
     best_i::Int
-    expected_genos_vec::Vector{Array{Int,2}}
-    car_vec::Vector{ClusterAnalysisResult}
+    best_genos_combins::Vector{Matrix{Int}}
+    expected_genos_all::Matrix{Int}
+    ucc_dict::OrderedDict{Set{Vector{AbstractFloat}},UniqCombinCenters}
 end # type
 
 

@@ -31,10 +31,18 @@ PWMPin::PWMPin(const string& pwmDevicePath) {
     polarityFile.exceptions(ofstream::failbit | ofstream::badbit);
 
     try {
+#ifdef KERNEL_49
+        dutyFile.open(pwmDevicePath + "/duty_cycle", ofstream::out);
+#else
         dutyFile.open(pwmDevicePath + "/duty", ofstream::out);
+#endif
     }
     catch (const exception&) {
+#ifdef KERNEL_49
+        throw system_error(errno, generic_category(), "Unexpected PWM error: unable to open pin (" + pwmDevicePath + "/duty_cycle) -");
+#else
         throw system_error(errno, generic_category(), "Unexpected PWM error: unable to open pin (" + pwmDevicePath + "/duty) -");
+#endif
     }
 
     try {

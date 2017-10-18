@@ -18,11 +18,8 @@
  */
 
 angular.module("canvasApp").factory('circle', [
-  'ExperimentLoader',
-  '$rootScope',
   'constants',
   'circleGroup',
-  'outerMostCircle',
   'outerCircle',
   'centerCircle',
   'littleCircleGroup',
@@ -37,7 +34,7 @@ angular.module("canvasApp").factory('circle', [
   'pauseStepService',
   'editModeService',
   'stepDataGroupService',
-  function(ExperimentLoader, $rootScope, Constants, circleGroup, outerMostCircle, outerCircle,
+  function(Constants, circleGroup, outerCircle,
     centerCircle, littleCircleGroup, circleMaker, gatherDataGroupOnScroll, gatherDataCircleOnScroll, gatherDataGroup, gatherDataCircle, previouslySelected,
     pauseStepOnScrollGroup, pauseStepCircleOnScroll, pauseStepService, editModeService, stepDataGroupService) {
     
@@ -48,7 +45,7 @@ angular.module("canvasApp").factory('circle', [
       this.canvas = parentStep.canvas;
       this.scrollTop = 80;
       this.scrollLength = 317;
-      //this.scrollRatio = (this.scrollLength - this.scrollTop) / 100;
+      
       this.scrollRatio1 = ((this.scrollLength - this.scrollTop) * 0.25) / 50; // 1.2;//(this.scrollLength - this.scrollTop) / 200;
       this.scrollRatio2 = ((this.scrollLength - this.scrollTop) * 0.75) / 50;//3.54;//(this.scrollLength - this.scrollTop) / 50;
       // Now we have our lowest temperature as 4 instead of 0, So we introduce lowestScrollCoordinate;
@@ -63,6 +60,7 @@ angular.module("canvasApp").factory('circle', [
       this.controlDistance = Constants.controlDistance;
 
       this.getLeft = function() {
+        
         this.left = this.parent.left;
         return this;
       };
@@ -89,9 +87,12 @@ angular.module("canvasApp").factory('circle', [
       this.moveCircleWithStep = function() {
 
         this.getLeft();
-        this.circleGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
-        this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
-        this.gatherDataDuringRampGroup.set({"left": this.left}).setCoords();
+        this.circleGroup.set({"left": this.left + (Constants.stepWidth / 2)});
+        this.circleGroup.setCoords();
+        this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)});
+        this.stepDataGroup.setCoords();
+        this.gatherDataDuringRampGroup.set({"left": this.left});
+        this.gatherDataDuringRampGroup.setCoords();
       };
 
       this.setCenter = function(imgObj) {
@@ -137,7 +138,8 @@ angular.module("canvasApp").factory('circle', [
       ********************************************/
       this.addStepDataGroup = function() {
 
-        this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
+        this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)});
+        this.stepDataGroup.setCoords();
         this.canvas.add(this.stepDataGroup);
       };
 
@@ -170,8 +172,8 @@ angular.module("canvasApp").factory('circle', [
           ], this);
 
           var left = (this.previous) ? (this.left + (this.previous.left + 128)) / 2 : this.left;
-          this.gatherDataDuringRampGroup.set({"left": left}).setCoords();
-
+          this.gatherDataDuringRampGroup.set({"left": left});
+          this.gatherDataDuringRampGroup.setCoords();
       };
 
       this.addComponentsToCircleGroup = function() {
@@ -188,7 +190,8 @@ angular.module("canvasApp").factory('circle', [
         this.manageGatheDataScroll();
         this.managePause();
           
-        this.circleGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
+        this.circleGroup.set({"left": this.left + (Constants.stepWidth / 2)});
+        this.circleGroup.setCoords();
         this.addComponentsToCircleGroup();
         this.canvas.add(this.circleGroup);
 
@@ -338,7 +341,7 @@ angular.module("canvasApp").factory('circle', [
       };
 
       this.manageClick = function() {
-        //debugger;
+        
         if(! this.big) {
           this.makeItBig();
           this.parent.parentStage.selectStage();
