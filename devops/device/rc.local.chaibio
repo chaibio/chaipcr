@@ -17,9 +17,9 @@ export_pwm ()
 	for chip in $1/pwmchip?
 	do
 		echo exporting $chip
-		echo $2>$chip/export
-		echo $chip>>/run/chaipcr/realtime/pwms.inf
-		ln -s $chip /run/chaipcr/realtime/$3
+		echo $2>$chip/export || continue
+		echo $chip/pwm$2>>/run/chaipcr/realtime/pwms.inf
+		ln -s $chip/pwm$2 /run/chaipcr/realtime/$3
 	done
 }
 
