@@ -282,7 +282,8 @@ angular.module("canvasApp").factory('stage', [
         
         this.stageName.setVisible(false);
         this.dots.setVisible(false);
-        this.stageCaption.setLeft(this.stageCaption.left - 24).setCoords();
+        this.stageCaption.setLeft(this.stageCaption.left - 24);
+        this.stageCaption.setCoords();
         this.canvas.sendToBack(this.stageGroup);
       };
 

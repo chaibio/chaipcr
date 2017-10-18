@@ -10,7 +10,8 @@ describe("Testing stage factory", function() {
 
             $provide.value('step', function() {
                 return {
-                    stepStatus: "newly created"
+                    stepStatus: "newly created",
+                    render: function() {},
                 };
             });
         });
@@ -44,7 +45,9 @@ describe("Testing stage factory", function() {
             canvas: {
                 renderAll: function() {},
                 remove: function() {},
-                discardActiveGroup: function() {}
+                discardActiveGroup: function() {},
+                sendToBack: function() {},
+                add: function() {},
             }
         };
 
@@ -717,12 +720,312 @@ describe("Testing stage factory", function() {
 
         it("It should test configureStepOnCreate method, when insertMode is false", function() {
 
+            stage.parent = {
+                allStepViews: [
 
+                ]
+            };
+
+            stage.insertMode = false;
+
+            var tempStep = {
+                name: "I am temporary",
+                nextStep: null
+            };
+
+            stage.childSteps = [];
+
+            var STEP = {
+                step: {
+
+                }
+            };
+
+            var stepIndex = 1;
+
+            var retVal = stage.configureStepOnCreate(tempStep, STEP, stepIndex);
+
+            expect(retVal.previousStep.name).toEqual("I am temporary");
+            expect(retVal.stepStatus).toEqual("newly created");
+            expect(tempStep.nextStep.stepStatus).toEqual("newly created");
+            expect(stage.childSteps.length).toEqual(1);
+            expect(retVal.ordealStatus).toEqual(1);
         });
 
     });
 
+    describe("Testing different scenarios in stageHeader method", function() {
 
+        it("It should test stageHeader method", function() {
+
+            stage.stageName = {
+                setText: function() {},
+                setLeft: function() {}
+            };
+
+            stage.index = 2;
+
+            stage.model = {
+                name: "Cycling STAGE"
+            };
+
+            stage.stageCaption = {
+                setText: function() {},
+                left: 100,
+                width: 50,
+            };
+
+            spyOn(stage.stageName, "setText");
+            spyOn(stage.stageName, "setLeft");
+
+            stage.stageHeader();
+
+            expect(stage.shortStageName).toEqual(false);
+
+            expect(stage.stageName.setText).toHaveBeenCalledWith("CYCLING");
+            expect(stage.stageName.setLeft).toHaveBeenCalledWith(150);
+        });
+
+        it("It should test stageHeader method, when stage type is cycling", function() {
+
+            stage.stageName = {
+                setText: function() {},
+                setLeft: function() {}
+            };
+
+            stage.index = 2;
+
+            stage.model = {
+                name: "Cycling STAGE",
+                stage_type: "cycling",
+                num_cycles: 10
+            };
+
+            stage.stageCaption = {
+                setText: function() {},
+                left: 100,
+                width: 50,
+            };
+
+            spyOn(stage.stageName, "setText");
+            spyOn(stage.stageName, "setLeft");
+
+            stage.stageHeader();
+
+            expect(stage.shortStageName).toEqual(false);
+
+            expect(stage.stageName.setText).toHaveBeenCalledWith("CYCLING, 10x");
+            expect(stage.stageName.setLeft).toHaveBeenCalledWith(150);
+
+        });
+
+        it("It should test stageHeader method, when stage type is cycling and editStageStatus is true", function() {
+
+            stage.stageName = {
+                setText: function() {},
+                setLeft: function() {}
+            };
+
+            stage.index = 2;
+            stage.parent.editStageStatus = true;
+            
+            stage.childSteps = [
+                { index: 0 },
+            ];
+
+            stage.model = {
+                name: "Cycling STAGE",
+                stage_type: "cycling",
+                num_cycles: 10
+            };
+
+            stage.stageCaption = {
+                setText: function() {},
+                left: 100,
+                width: 50,
+            };
+
+            spyOn(stage.stageName, "setText");
+            spyOn(stage.stageName, "setLeft");
+            spyOn(stage, "shortenStageName");
+
+            stage.stageHeader();
+
+            expect(stage.shortStageName).toEqual(false);
+
+            expect(stage.stageName.setText).toHaveBeenCalledWith("CYCLING, 10x");
+            expect(stage.stageName.setLeft).toHaveBeenCalledWith(150);
+            expect(stage.shortenStageName).toHaveBeenCalled();
+        });
+    });
+
+    it("It should test adjustHeader method", function() {
+
+        stage.stageName = {
+            setVisible: function() {},
+        };
+        stage.dots = {
+            setVisible: function() {}
+        };
+
+        stage.stageCaption = {
+            setVisible: function() {},
+            left: 50,
+            setLeft: function() {},
+            setCoords: function() {},
+        };
+
+        spyOn(stage.stageName, "setVisible");
+        spyOn(stage.dots, "setVisible");
+
+        spyOn(stage.stageCaption, "setLeft");
+        spyOn(stage.stageCaption, "setCoords");
+        spyOn(stage.canvas, "sendToBack");
+
+        stage.adjustHeader();
+
+        expect(stage.stageName.setVisible).toHaveBeenCalled();
+        expect(stage.dots.setVisible).toHaveBeenCalled();
+        expect(stage.stageCaption.setLeft).toHaveBeenCalledWith(26);
+        expect(stage.stageCaption.setCoords).toHaveBeenCalled();
+        expect(stage.canvas.sendToBack).toHaveBeenCalled();
+    });
+
+    it("It shoud test render method", function() {
+
+        stage.stageGroup = {
+            name: "stageGroup"
+        };
+
+        stage.dots = {
+            name: "dots"
+        };
+
+        stage.borderRight = {
+            name: "borderRight"
+        };
+
+        spyOn(stage, "getLeft");
+        spyOn(stage, "setShadows");
+        spyOn(stage, "addSteps");
+        spyOn(stage, "stageHeader");
+
+        spyOn(stage.canvas, "add");
+
+        spyOn(_stageGraphics, "addRoof").and.returnValue(true);
+        spyOn(_stageGraphics, "borderLeft").and.returnValue(true);
+        spyOn(_stageGraphics, "writeMyName").and.returnValue(true);
+        spyOn(_stageGraphics, "createStageRect").and.returnValue(true);
+        spyOn(_stageGraphics, "dotsOnStage").and.returnValue(true);
+        spyOn(_stageGraphics, "createStageGroup").and.returnValue(true);
+        
+        stage.render();
+
+        expect(stage.getLeft).toHaveBeenCalled();
+        expect(stage.setShadows).toHaveBeenCalled();
+        expect(stage.addSteps).toHaveBeenCalled();
+        expect(stage.stageHeader).toHaveBeenCalled();
+
+        expect(stage.canvas.add).toHaveBeenCalled();
+
+        expect(_stageGraphics.addRoof).toHaveBeenCalled();
+        expect(_stageGraphics.borderLeft).toHaveBeenCalled();
+        expect(_stageGraphics.writeMyName).toHaveBeenCalled();
+        expect(_stageGraphics.createStageRect).toHaveBeenCalled();
+        expect(_stageGraphics.dotsOnStage).toHaveBeenCalled();
+        expect(_stageGraphics.createStageGroup).toHaveBeenCalled();
+
+        expect(stage.visualComponents.stageGroup.name).toEqual("stageGroup");
+        expect(stage.visualComponents.dots.name).toEqual("dots");
+        expect(stage.visualComponents.borderRight.name).toEqual("borderRight");
+    });
+
+    it("It should test setShodows method", function() {
+
+        stage.shadowText = "This is shadow text";
+
+        stage.stageName = {
+            setShadow: function() {},
+        };
+
+        stage.stageCaption = {
+            setShadow: function() {},
+        };
+
+        spyOn(stage.stageName, "setShadow");
+        spyOn(stage.stageCaption, "setShadow");
+
+        stage.setShadows();
+
+        expect(stage.stageName.setShadow).toHaveBeenCalledWith(stage.shadowText);
+        expect(stage.stageCaption.setShadow).toHaveBeenCalledWith(stage.shadowText);
+    });
+
+    it("It should test manageBordersOnSelection method", function() {
+
+        stage.border = {
+            setStroke: function() {},
+        };
+
+        stage.childSteps = [
+            {
+                borderRight: {
+                    setStroke: function() {},
+                    setStrokeWidth: function() {}
+                }
+            }
+        ];
+
+        var color = "white";
+        spyOn(stage.border, "setStroke");
+        spyOn(stage.childSteps[0].borderRight, "setStroke");
+        spyOn(stage.childSteps[0].borderRight, "setStrokeWidth");
+
+        stage.manageBordersOnSelection(color);
+
+        expect(stage.border.setStroke).toHaveBeenCalledWith(color);
+        expect(stage.childSteps[0].borderRight.setStroke).toHaveBeenCalledWith(color);
+        expect(stage.childSteps[0].borderRight.setStrokeWidth).toHaveBeenCalledWith(2);
+
+    });
+
+    it("It should test changeFillsAndStrokes method when editStageStatus = false", function() {
+
+        stage.roof = {
+            setStroke: function() {},
+            setStrokeWidth: function() {}
+        };
+
+        stage.stageName = {
+            setFill: function() {}
+        };
+
+        stage.stageCaption = {
+            setFill: function() {}
+        };
+
+        stage.parent.editStageStatus = false;
+
+        var color = "black";
+        var strokeWidth = 2;
+
+        spyOn(stage.roof, "setStroke");
+        spyOn(stage.roof, "setStrokeWidth");
+
+        spyOn(stage.stageName, "setFill");
+        spyOn(stage.stageCaption, "setFill");
+
+        stage.changeFillsAndStrokes(color, strokeWidth);
+
+        expect(stage.roof.setStroke).toHaveBeenCalledWith(color);
+        expect(stage.roof.setStrokeWidth).toHaveBeenCalledWith(strokeWidth);
+
+        expect(stage.stageName.setFill).toHaveBeenCalledWith(color);
+        expect(stage.stageCaption.setFill).toHaveBeenCalledWith(color);
+    });
+
+    it("It should test changeFillsAndStrokes method when editStageStatus = true", function() {
+        
+    });
     
-
 }); 
