@@ -43,9 +43,12 @@ class TestingComponent {
 
 describe('HeaderStatusComponent Directive', () => {
 
-  beforeEach(async(() => {
-    spyOn(ExperimentServiceMock, 'getExperiment').and.callThrough()
+  let exp: any;
 
+  beforeEach(async(() => {
+
+    spyOn(ExperimentServiceMock, 'getExperiment').and.callThrough()
+    exp = JSON.parse(JSON.stringify(ExperimentMockInstance));
 
     TestBed.configureTestingModule({
       imports: [
@@ -129,8 +132,8 @@ describe('HeaderStatusComponent Directive', () => {
 
       beforeEach(() => {
 
-        ExperimentMockInstance.completed_at = null;
-        expect(ExperimentMockInstance.started_at).toBeTruthy();
+        exp.completed_at = null;
+        expect(exp.started_at).toBeTruthy();
 
         this.fixture = TestBed.createComponent(TestingComponent);
         this.fixture.componentInstance.id = ExperimentMockInstance.id;
@@ -144,7 +147,7 @@ describe('HeaderStatusComponent Directive', () => {
 
           ExperimentMockInstance.completion_status = 'aborted';
 
-          getExperimentCB(ExperimentMockInstance);
+          getExperimentCB(exp);
           this.fixture.detectChanges();
 
           statusService.$data.next(statusData);
@@ -161,9 +164,9 @@ describe('HeaderStatusComponent Directive', () => {
         [StatusService],
         (statusService: StatusService) => {
 
-          ExperimentMockInstance.completion_status = 'some error';
+          exp.completion_status = 'some error';
 
-          getExperimentCB(ExperimentMockInstance);
+          getExperimentCB(exp);
           this.fixture.detectChanges();
 
           statusService.$data.next(statusData);
@@ -172,6 +175,37 @@ describe('HeaderStatusComponent Directive', () => {
           let failedEl = this.fixture.debugElement.nativeElement.querySelector('.status-indicator .failed');
           expect(failedEl.innerHTML.trim()).toBe('FAILED');
           expect(el.innerHTML.trim()).toContain('AN ERROR OCCURED');
+        }
+      ))
+
+    })
+
+  })
+
+  describe('When experiment is running', () => {
+
+    let exp: any
+    let statusResp: any = null;
+
+    beforeEach(async(() => {
+
+      exp = JSON.parse(JSON.stringify(ExperimentMockInstance));
+      statusResp = JSON.parse(JSON.stringify(mockStatusReponse));
+      statusResp.experiment_controller.machine.state = "running";
+
+    }))
+
+    describe('When experiment is complete and in holding state', () => {
+
+      beforeEach(async(() => {
+        exp.started_at = "2017-08-30T16:30:13.000Z";
+        exp.completed_at = "2017-08-30T16:30:13.000Z";
+      }))
+
+      it('should display analyzing', inject(
+        [StatusService],
+        (statusService: StatusService) => {
+          console.log('Penging test');
         }
       ))
 
