@@ -9,7 +9,7 @@
       return function IsTouchScreen() {
         var w = 800;
         var h = 600;
-        var api_port = 4444;
+        var api_port = 4200;
 
         if(WindowWrapper.width() <= w && WindowWrapper.height() <= h) {
           var loc = $window.location;

@@ -37,7 +37,7 @@
 
     it('should redirect to touchscreen app base on window size', function () {
       var w = this.$window
-      var api_port = 4444
+      var api_port = 4200
 
       this.IsTouchScreen()
       expect(w.location.assign).toHaveBeenCalledWith(w.location.protocol + '//' + w.location.hostname + ':' + api_port)
