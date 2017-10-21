@@ -808,7 +808,7 @@ class BaseChart
     if val.length - unit.length < caret
       d3.event.preventDefault()
 
-  onEnterAxisInput: (loc, input, val) ->
+  cleanAxisInput: (loc, input, val) ->
     axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
     val = val.replace(/[^0-9\.\-]/g, '')
     val = val.replace(@config.axes[axis].unit, '')
@@ -821,8 +821,12 @@ class BaseChart
         val = @computedMinY()
       if loc is 'y:max'
         val = @computedMaxY()
-    val = val * 1
+    return +val
 
+  onEnterAxisInput: (loc, input, val) ->
+    #axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
+    val = @cleanAxisInput(loc, input, val)
+    
     if loc is 'y:max'
       max = @computedMaxY()
       maxY = if angular.isNumber(val) and !window.isNaN(val) then val else max
@@ -1321,12 +1325,12 @@ class BaseChart
 
       if (i is 0)
         textWidth = xAxisLeftExtremeValueText.node().getBBox().width
-        x = this.transform.baseVal[0].matrix.e
+        x = this.transform.baseVal.consolidate().matrix.e
         if x < textWidth + spacingX
           d3.select(this).attr('opacity', 0)
       if (i is num_ticks - 1)
         textWidth = xAxisRightExtremeValueText.node().getBBox().width
-        x = this.transform.baseVal[0].matrix.e
+        x = this.transform.baseVal.consolidate().matrix.e
         if x >  width - (textWidth + spacingX)
           d3.select(this).attr('opacity', 0)
     # y ticks
@@ -1337,12 +1341,12 @@ class BaseChart
 
       if (i is 0)
         textHeight = yAxisLowerExtremeValueText.node().getBBox().height
-        y = this.transform.baseVal[0].matrix.f
+        y = this.transform.baseVal.consolidate().matrix.f
         if y >  height - (textHeight + spacingY)
           d3.select(this).attr('opacity', 0)
       if (i is num_ticks - 1)
         textHeight = yAxisUpperExtremeValueText.node().getBBox().height
-        y = this.transform.baseVal[0].matrix.f
+        y = this.transform.baseVal.consolidate().matrix.f
         if y < textHeight + spacingY
           d3.select(this).attr('opacity', 0)
 
