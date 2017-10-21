@@ -146,6 +146,8 @@ function assign_genos(
 
     num_channels, num_wells = size(data)
 
+    ntc_geno = fill(0, num_channels)
+
     well_idc = 1:num_wells
 
     max_num_genos = 2 ^ num_channels # 2 comes from the binary possible values, i.e. presence/absence of signal for each channel
@@ -254,7 +256,7 @@ function assign_genos(
                         center_set = Set(map(1:size(centers)[2]) do i
                             centers[:, i]
                         end) # do i
-                        if !(center_set in keys(ucc_dict)) || (length(center_set) == max_num_genos - 1 && fill(0, num_channels) in center_set)
+                        if !(center_set in keys(ucc_dict))
                             ucc_dict[center_set] = UniqCombinCenters(
                                 center_set,
                                 car,
@@ -262,7 +264,10 @@ function assign_genos(
                                 [geno_combin]
                             )
                         else
-                            push!(ucc_dict[center_set].geno_combins, geno_combin)
+                            push!(ucc_dict[center_set].geno_combins, geno_combin) # assuming that for any two clustering results with the same set of final centers, cr_1 and cr_2, the same data point is assigned to the same center point in both cr_1 and cr_2
+                            if num_genos == max_num_genos -1 && !(ntc_geno in map(i -> geno_combin[:, i], 1:num_genos) # `geno_combin` includes all genotypes except NTC
+                                ucc_dict[center_set].car = car
+                            end # if num_genos
                         end # if !
 
                     end # for possible_ncg_idc
@@ -288,10 +293,12 @@ function assign_genos(
 
         assignments_raw = cluster_result.assignments[well_idc] # when `cluster_method == "k-medoids"`
 
-        # if any well has NaN as Cq for all the channels, label all the wells as unclassified (Requirement: If less than 3 non-NTC clusters are present, and there are not user-labeled controls in the clusters, the software shall not attempt to identify the clusters.), otherwise proceed...
-        if best_num_genos == max_num_genos - 1 && any(ntc_bool_vec) # one less cluster
+        num_missing_genos = max_num_genos - best_num_genos
+        if num_missing_genos >= 2 || (num_missing_genos == 1 && any(ntc_bool_vec)) # `any(ntc_bool_vec)` is interpreted as at least one NTC sample is present and that the cluster this well belongs to should be NTC
             assignments_raw = fill(unclassfied_assignment, length(assignments_raw))
-        end # if best_num_genos
+        end # if num_missing_genos
+
+        # if control(s) specified, identify non-control genotypes using control info? - a lot to consider
 
         # (!!!! needs update) check whether the controls are assigned with the correct genos, if not, assign as unclassified
         for ctrl_geno in keys(ctrl_well_dict)

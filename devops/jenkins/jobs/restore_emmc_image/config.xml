@@ -34,7 +34,7 @@
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.3.2">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.5.1">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
@@ -113,7 +113,7 @@ ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
 #sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;passwd -d -u root&quot;
 
 ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
-sshpass -p chaipcr ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
+sshpass -p chaipcr ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt; ENDSSH
 
 if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
 then
@@ -165,8 +165,12 @@ uname -a
 ls -ahl
 lsblk
 df -h
-dpkg --configure -a
+echo processing incomplete installations
+dpkg --configure -a --force-confdef
+
+echo disable swapping
 swapoff -a
+
 umount /dev/mmcblk0p*
 
 lsblk
@@ -178,6 +182,7 @@ fi
 
 echo installing missing packages.
 apt-get update
+echo installing parted.
 apt-get install parted -y -q
 partprobe /dev/mmcblk0
 

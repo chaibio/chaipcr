@@ -45,7 +45,7 @@ angular.module("canvasApp").factory('circle', [
       this.canvas = parentStep.canvas;
       this.scrollTop = 80;
       this.scrollLength = 317;
-      //this.scrollRatio = (this.scrollLength - this.scrollTop) / 100;
+      
       this.scrollRatio1 = ((this.scrollLength - this.scrollTop) * 0.25) / 50; // 1.2;//(this.scrollLength - this.scrollTop) / 200;
       this.scrollRatio2 = ((this.scrollLength - this.scrollTop) * 0.75) / 50;//3.54;//(this.scrollLength - this.scrollTop) / 50;
       // Now we have our lowest temperature as 4 instead of 0, So we introduce lowestScrollCoordinate;
@@ -172,8 +172,8 @@ angular.module("canvasApp").factory('circle', [
           ], this);
 
           var left = (this.previous) ? (this.left + (this.previous.left + 128)) / 2 : this.left;
-          this.gatherDataDuringRampGroup.set({"left": left}).setCoords();
-
+          this.gatherDataDuringRampGroup.set({"left": left});
+          this.gatherDataDuringRampGroup.setCoords();
       };
 
       this.addComponentsToCircleGroup = function() {
@@ -190,7 +190,8 @@ angular.module("canvasApp").factory('circle', [
         this.manageGatheDataScroll();
         this.managePause();
           
-        this.circleGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
+        this.circleGroup.set({"left": this.left + (Constants.stepWidth / 2)});
+        this.circleGroup.setCoords();
         this.addComponentsToCircleGroup();
         this.canvas.add(this.circleGroup);
 
@@ -340,7 +341,7 @@ angular.module("canvasApp").factory('circle', [
       };
 
       this.manageClick = function() {
-        //debugger;
+        
         if(! this.big) {
           this.makeItBig();
           this.parent.parentStage.selectStage();
