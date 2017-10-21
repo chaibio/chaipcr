@@ -43,7 +43,7 @@ class BaseChart
     if angular.isNumber(@config.axes.y.max) then @config.axes.y.max else if @hasData() then @getMaxY() else @DEFAULT_MAX_Y
 
   computedMinY: ->
-    min = if angular.isNumber(@config.axes.y.min) then @config.axes.y.min else if @hasData() then @getMinY() else @DEFAULT_MIN_Y
+    if angular.isNumber(@config.axes.y.min) then @config.axes.y.min else if @hasData() then @getMinY() else @DEFAULT_MIN_Y
 
   roundUpExtremeValue: (val) ->
     Math.ceil(val)
@@ -485,6 +485,18 @@ class BaseChart
 
   getScaleExtent: ->
     return @config.axes.x.max || @getMaxX()
+
+  getYLinearTicks: ->
+    max = @getMaxY()
+    min = @getMinY()
+    min = Math.floor(min / 5000) * 5000 # ROUND(A2/5,0)*5
+    max = Math.ceil(max / 5000) * 5000
+    
+    ticks = []
+    for y in [min..max] by 5000
+      ticks.push(y)
+
+    return ticks
 
   setYAxis: ->
     @chartSVG.selectAll('g.axis.y-axis').remove()

@@ -180,6 +180,8 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
       @yScale.range([@height, 0]).domain([min, max])
       @yAxis = d3.axisLeft(@yScale)
       @yAxis.ticks(8)
+      if @inK()
+        @yAxis.tickValues(@getYLinearTicks())
     
     @yAxis.tickFormat (y) =>
       @yAxisTickFormat(y)
