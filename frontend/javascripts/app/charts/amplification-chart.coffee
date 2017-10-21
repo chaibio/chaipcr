@@ -125,12 +125,12 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
     min = '1'
     for i in [0...min_num_length - 1] by 1
       min = "#{min}0"
-    min = min * 1
+    min = +min
 
     max = '1'
     for i in [0...max_num_length] by 1
       max = "#{max}0"
-    max = max * 1
+    max = +max
 
     calibs = []
     calib = min

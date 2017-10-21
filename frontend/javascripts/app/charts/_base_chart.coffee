@@ -1319,18 +1319,13 @@ class BaseChart
     width = @width
     num_ticks = ticks.size()
     ticks.each (d, i) ->
-
-      # if config.axes.y.scale is 'log'
-      #   return "xtick_#{i}"
-
+      x = this.transform.baseVal.consolidate().matrix.e
       if (i is 0)
         textWidth = xAxisLeftExtremeValueText.node().getBBox().width
-        x = this.transform.baseVal.consolidate().matrix.e
         if x < textWidth + spacingX
           d3.select(this).attr('opacity', 0)
       if (i is num_ticks - 1)
         textWidth = xAxisRightExtremeValueText.node().getBBox().width
-        x = this.transform.baseVal.consolidate().matrix.e
         if x >  width - (textWidth + spacingX)
           d3.select(this).attr('opacity', 0)
     # y ticks
@@ -1338,15 +1333,13 @@ class BaseChart
     num_ticks = ticks.size()
     height = @height
     ticks.each (d, i) ->
-
+      y = this.transform.baseVal.consolidate().matrix.f
       if (i is 0)
         textHeight = yAxisLowerExtremeValueText.node().getBBox().height
-        y = this.transform.baseVal.consolidate().matrix.f
         if y >  height - (textHeight + spacingY)
           d3.select(this).attr('opacity', 0)
       if (i is num_ticks - 1)
         textHeight = yAxisUpperExtremeValueText.node().getBBox().height
-        y = this.transform.baseVal.consolidate().matrix.f
         if y < textHeight + spacingY
           d3.select(this).attr('opacity', 0)
 
