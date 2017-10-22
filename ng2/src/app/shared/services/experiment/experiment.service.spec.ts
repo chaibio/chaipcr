@@ -2,12 +2,12 @@ import {
   TestBed,
   async,
   inject
-} from '@angular/core/testing'
+} from '@angular/core/testing';
 
 import {
   MockBackend,
   MockConnection
-} from '@angular/http/testing'
+} from '@angular/http/testing';
 
 import {
   Http,
@@ -16,17 +16,20 @@ import {
   Response,
   ResponseOptions,
   RequestMethod
-} from '@angular/http'
+} from '@angular/http';
 
-import { RouterTestingModule } from '@angular/router/testing'
+import { RouterTestingModule } from '@angular/router/testing';
 
-import { WindowRef } from '../../services/windowref/windowref.service'
-import { ExperimentList } from '../../models/experiment-list.model'
-import { AuthHttp } from '../../services/auth_http/auth_http.service'
-import { ExperimentService } from './experiment.service'
+import { WindowRef } from '../../services/windowref/windowref.service';
+import { ExperimentList } from '../../models/experiment-list.model';
+import { AmplificationData } from '../../models/amplification-data.model';
+import { AuthHttp } from '../../services/auth_http/auth_http.service';
+import { ExperimentService } from './experiment.service';
+import { } from '../../models/amplification-data.model';
 
 import { Experiment } from '../../models/experiment.model';
-import { mockExperimentResponse } from './mock-experiment.response'
+import { mockExperimentResponse } from './mock-experiment.response';
+import { MockAmplificationDataResponse } from './mock-amplification-data.response';
 
 describe('ExperimentService', () => {
 
@@ -191,6 +194,39 @@ describe('ExperimentService', () => {
       })
 
       expect(auth_http.delete).toHaveBeenCalledWith(`/experiments/${expId}`)
+
+    }
+  ))
+
+  it('should fetch amplification data', inject(
+    [ExperimentService, XHRBackend, AuthHttp],
+    (expService: ExperimentService, backend: MockBackend, http: AuthHttp) => {
+
+      const expId = 1;
+      const backendSpy = jasmine.createSpy('backendSpy');
+      const resp:any = Object.assign({}, MockAmplificationDataResponse)
+
+      backend.connections.subscribe((con: MockConnection) => {
+        expect(con.request.method).toBe(RequestMethod.Get);
+        con.mockRespond(new Response(new ResponseOptions({
+          body: resp
+        })));
+        backendSpy();
+      })
+
+      spyOn(http, 'get').and.callThrough();
+
+      expService.getAmplificationData(expId).subscribe((data: AmplificationData) => {
+        //console.log(data.channel_1[1]);
+        // assert background subtracted value
+        expect(data.channel_1[1].well_0_background).toBe(resp.steps[0].amplification_data[3])
+        // assert cycle number
+        expect(data.channel_1[1].cycle_num).toEqual(resp.steps[0].amplification_data[2])
+      })
+
+      expect(http.get).toHaveBeenCalledWith(`/experiments/${expId}/amplification_data`);
+
+      expect(backendSpy).toHaveBeenCalled();
 
     }
   ))

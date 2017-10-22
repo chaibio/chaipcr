@@ -102,6 +102,8 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
           return pt
 
+      console.log(channel_datasets)
+
       return channel_datasets
 
     @paddData = (cycle_num = 1) ->
