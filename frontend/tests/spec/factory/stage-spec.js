@@ -48,6 +48,8 @@ describe("Testing stage factory", function() {
                 discardActiveGroup: function() {},
                 sendToBack: function() {},
                 add: function() {},
+                bringToFront: function() {},
+
             }
         };
 
@@ -1026,6 +1028,92 @@ describe("Testing stage factory", function() {
 
     it("It should test changeFillsAndStrokes method when editStageStatus = true", function() {
         
+        stage.roof = {
+            setStroke: function() {},
+            setStrokeWidth: function() {}
+        };
+
+        stage.stageName = {
+            setFill: function() {}
+        };
+
+        stage.stageCaption = {
+            setFill: function() {}
+        };
+
+        stage.parent.editStageStatus = true;
+
+        var color = "black";
+        var strokeWidth = 2;
+
+        var obj = {
+            name: "stageDot",
+            setFill: function() {
+                
+            }
+        };
+
+        stage.dots = {
+            forEachObject: function(func) {
+                func(obj);
+            },
+            setCoords: function() {}
+        };
+
+        spyOn(stage.dots, "forEachObject").and.callThrough();
+        spyOn(obj, "setFill");
+        spyOn(stage.canvas, "bringToFront");
+        spyOn(stage.dots, "setCoords");
+
+        spyOn(stage.roof, "setStroke");
+        spyOn(stage.roof, "setStrokeWidth");
+
+        spyOn(stage.stageName, "setFill");
+        spyOn(stage.stageCaption, "setFill");
+
+        stage.changeFillsAndStrokes(color, strokeWidth);
+
+        expect(stage.roof.setStroke).toHaveBeenCalledWith(color);
+        expect(stage.roof.setStrokeWidth).toHaveBeenCalledWith(strokeWidth);
+
+        expect(stage.stageName.setFill).toHaveBeenCalledWith(color);
+        expect(stage.stageCaption.setFill).toHaveBeenCalledWith(color);
+        expect(stage.dots.forEachObject).toHaveBeenCalled();
+        expect(stage.canvas.bringToFront).toHaveBeenCalled();
+        expect(stage.dots.setCoords).toHaveBeenCalled();
+        expect(obj.setFill).toHaveBeenCalledWith(color);
+    });
+
+    it("It should test selectStage method", function() {
+
+        spyOn(stage, "changeFillsAndStrokes");
+        spyOn(stage, "manageBordersOnSelection");
+
+        spyOn(stage, "unSelectStage");
+
+        stage.selectStage();
+
+        expect(stage.changeFillsAndStrokes).toHaveBeenCalled();
+        expect(stage.manageBordersOnSelection).toHaveBeenCalled();
+        expect(stage.unSelectStage).not.toHaveBeenCalled(); 
+    });
+
+    it("It should test selectStage method, When previouslySelected object has circle", function() {
+
+        _previouslySelected.circle = {
+            circle: true,
+        };
+
+        spyOn(stage, "changeFillsAndStrokes");
+        spyOn(stage, "manageBordersOnSelection");
+
+        spyOn(stage, "unSelectStage");
+
+        stage.selectStage();
+
+        expect(stage.changeFillsAndStrokes).toHaveBeenCalled();
+        expect(stage.manageBordersOnSelection).toHaveBeenCalled();
+        expect(stage.unSelectStage).toHaveBeenCalled(); 
     });
     
 }); 
