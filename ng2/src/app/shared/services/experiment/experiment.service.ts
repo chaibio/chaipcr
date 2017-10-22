@@ -129,9 +129,9 @@ export class ExperimentService {
           };
           for(let i=0; i < d.length; i++) {
             datum[`well_${i}_background`] = d[i][3];
-            datum[`well_${i}_background_log`] = d[i][3] > 0? d[i][3] : 10;
+            datum[`well_${i}_background_log`] = d[i][3] > 10? d[i][3] : 10;
             datum[`well_${i}_baseline`] = d[i][4];
-            datum[`well_${i}_baseline_log`] = d[i][4] > 0? d[i][4] : 10;
+            datum[`well_${i}_baseline_log`] = d[i][4] > 10? d[i][4] : 10;
           }
           return datum;
         });

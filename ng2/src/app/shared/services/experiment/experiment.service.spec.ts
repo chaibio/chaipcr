@@ -20,16 +20,17 @@ import {
 
 import { RouterTestingModule } from '@angular/router/testing';
 
-import { WindowRef } from '../../services/windowref/windowref.service';
 import { ExperimentList } from '../../models/experiment-list.model';
 import { AmplificationData } from '../../models/amplification-data.model';
+
+import { WindowRef } from '../../services/windowref/windowref.service';
 import { AuthHttp } from '../../services/auth_http/auth_http.service';
 import { ExperimentService } from './experiment.service';
-import { } from '../../models/amplification-data.model';
 
 import { Experiment } from '../../models/experiment.model';
 import { mockExperimentResponse } from './mock-experiment.response';
 import { MockAmplificationDataResponse } from './mock-amplification-data.response';
+import * as _ from 'underscore';
 
 describe('ExperimentService', () => {
 
@@ -217,11 +218,21 @@ describe('ExperimentService', () => {
       spyOn(http, 'get').and.callThrough();
 
       expService.getAmplificationData(expId).subscribe((data: AmplificationData) => {
-        //console.log(data.channel_1[1]);
-        // assert background subtracted value
-        expect(data.channel_1[1].well_0_background).toBe(resp.steps[0].amplification_data[3])
+        let ch1_well0_cycle1= _.filter(resp.steps[0].amplification_data, (d) => { return d[0] === 1 && d[1] === 0 && d[2] === 1; });
         // assert cycle number
-        expect(data.channel_1[1].cycle_num).toEqual(resp.steps[0].amplification_data[2])
+        expect(data.channel_1[0].cycle_num).toEqual(ch1_well0_cycle1[0][2])
+        // assert sample data is less than 10
+        expect(data.channel_1[0].well_0_background).toBeLessThan(10)
+        expect(data.channel_1[0].well_0_baseline).toBeLessThan(10)
+        // assert background subtracted value
+        expect(data.channel_1[0].well_0_background).toBe(ch1_well0_cycle1[0][3])
+        // assert baseline subtraction value
+        expect(data.channel_1[0].well_0_baseline).toEqual(ch1_well0_cycle1[0][4])
+        // assert background log value
+        expect(data.channel_1[0].well_0_background_log).toEqual(10)
+        // assert baseline log value
+        expect(data.channel_1[0].well_0_baseline_log).toEqual(10)
+
       })
 
       expect(http.get).toHaveBeenCalledWith(`/experiments/${expId}/amplification_data`);
