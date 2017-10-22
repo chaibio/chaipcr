@@ -242,4 +242,25 @@ describe('ExperimentService', () => {
     }
   ))
 
+  it('should emit experiment:completed event', inject(
+    [ExperimentService, XHRBackend],
+    (expService: ExperimentService, backend: MockBackend) => {
+      let res: any = Object.assign({}, MockAmplificationDataResponse);
+      res.partial = false;
+      let expCompletedSpy = jasmine.createSpy('expCompletedSpy');
+
+      backend.connections.subscribe((con: MockConnection) => {
+        con.mockRespond(new Response(new ResponseOptions({
+          body: res
+        })));
+      });
+
+      expService.$updates.subscribe(expCompletedSpy);
+
+      expService.getAmplificationData(1).subscribe(() => {
+        expect(expCompletedSpy).toHaveBeenCalledWith('experiment:completed');
+      })
+    }
+  ))
+
 })

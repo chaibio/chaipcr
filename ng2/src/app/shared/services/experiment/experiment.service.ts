@@ -1,20 +1,22 @@
 import { Injectable } from '@angular/core'
-
 import { AuthHttp } from '../auth_http/auth_http.service'
 import { ExperimentList } from '../../models/experiment-list.model'
 import { AmplificationData } from '../../models/amplification-data.model'
 import { AmplificationDatum } from '../../models/amplification-datum.model'
 import { Experiment } from '../../models/experiment.model'
-import * as _ from 'underscore'
 import { Observable } from 'rxjs/Observable'
+import { Subject } from 'rxjs/Subject'
 import 'rxjs/add/operator/map'
 import 'rxjs/add/operator/catch'
 import 'rxjs/add/observable/throw'
+import * as _ from 'underscore'
 
 
 @Injectable()
 
 export class ExperimentService {
+
+  public $updates: Subject<any> = new Subject();
 
   constructor(private http: AuthHttp) { }
 
@@ -40,7 +42,10 @@ export class ExperimentService {
 
   getAmplificationData(id: number) {
     return this.http.get(`/experiments/${id}/amplification_data`)
-      .map(res => { return this.extractAmplificationData(res); });
+      .map(res => {
+        this.checkExperimentCompleted(res);
+        return this.extractAmplificationData(res);
+      });
   }
 
   private extractExperiment(res): Experiment {
@@ -87,6 +92,12 @@ export class ExperimentService {
     })
 
     return result;
+  }
+
+  private checkExperimentCompleted(res):void {
+    if(!res.json().partial) {
+      this.$updates.next('experiment:completed');
+    }
   }
 
   private extractAmplificationData(res): AmplificationData {
