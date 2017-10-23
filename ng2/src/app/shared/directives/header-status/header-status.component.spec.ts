@@ -24,7 +24,13 @@ import { mockStatusReponse } from '../../services/status/mock-status-response';
 import { WindowRef } from '../../services/windowref/windowref.service';
 
 let getExperimentCB: any = null;
+let expUpdatesCB: any = null;
 const ExperimentServiceMock = {
+  $updates: {
+    subscribe: (cb) => {
+      expUpdatesCB = cb;
+    }
+  },
   getExperiment: () => {
     return {
       subscribe: (cb) => {
@@ -185,31 +191,140 @@ describe('HeaderStatusComponent Directive', () => {
   describe('When experiment is running', () => {
 
     let exp: any
-    let statusResp: any = null;
+    let statusData: any;
 
     beforeEach(async(() => {
 
       exp = JSON.parse(JSON.stringify(ExperimentMockInstance));
-      statusResp = JSON.parse(JSON.stringify(mockStatusReponse));
-      statusResp.experiment_controller.machine.state = "running";
+      statusData = JSON.parse(JSON.stringify(StatusDataMockInstance));
+      statusData.experiment_controller.machine.state = "running";
 
     }))
 
-    describe('When experiment is complete and in holding state', () => {
+    it('should subscribe to experiment service updates', inject(
+      [ExperimentService, StatusService],
+      (expService:ExperimentService, statusService:StatusService) => {
+
+        spyOn(expService.$updates, 'subscribe').and.callThrough();
+
+        statusData.experiment_controller.experiment.id = exp.id;
+
+        this.fixture = TestBed.createComponent(TestingComponent);
+        // it should not subscribe when expid is null
+        statusService.$data.next(statusData);
+        this.fixture.detectChanges();
+        expect(expService.$updates.subscribe).not.toHaveBeenCalled()
+
+        // it shoud subscribe when exp id is present and current is current experient running
+        this.fixture.componentInstance.id = exp.id;
+        this.fixture.detectChanges();
+        statusService.$data.next(statusData);
+        this.fixture.detectChanges();
+        expect(expService.$updates.subscribe).toHaveBeenCalled();
+      }
+    ))
+
+    it('should NOT subscribe to experiment service updates if not current experiment', inject(
+      [ExperimentService, StatusService],
+      (expService:ExperimentService, statusService:StatusService) => {
+
+        spyOn(expService.$updates, 'subscribe').and.callThrough();
+
+        statusData.experiment_controller.experiment.id = 9876;
+
+        this.fixture = TestBed.createComponent(TestingComponent);
+        // it should not subscribe when expid is null
+        statusService.$data.next(statusData);
+        this.fixture.detectChanges();
+        expect(expService.$updates.subscribe).not.toHaveBeenCalled()
+
+        // it shoud subscribe when exp id is present and current is current experient running
+        this.fixture.componentInstance.id = exp.id;
+        this.fixture.detectChanges();
+        statusService.$data.next(statusData);
+        this.fixture.detectChanges();
+        expect(expService.$updates.subscribe).not.toHaveBeenCalled();
+      }
+    ))
+
+    describe('When experiment is in holding state', () => {
 
       beforeEach(async(() => {
         exp.started_at = "2017-08-30T16:30:13.000Z";
         exp.completed_at = "2017-08-30T16:30:13.000Z";
+
+        this.fixture = TestBed.createComponent(TestingComponent);
+        this.fixture.componentInstance.id = exp.id;
+        this.fixture.detectChanges();
       }))
 
       it('should display analyzing', inject(
         [StatusService],
         (statusService: StatusService) => {
-          console.log('Penging test');
+          getExperimentCB(exp);
+          this.fixture.detectChanges();
+          statusService.$data.next(statusData);
+          this.fixture.detectChanges();
+          let el = this.fixture.debugElement.nativeElement;
+          expect(el.querySelector('.status-indicator .message-text').innerHTML.trim()).toBe(`Analyzing... Holding Temperature of ${statusData.heat_block.temperature.toFixed(1)}`);
+        }
+      ))
+
+      it('should display experiment complete, holding temperature', inject(
+        [StatusService],
+        (statusService: StatusService) => {
+          getExperimentCB(exp);
+          this.fixture.detectChanges();
+          statusService.$data.next(statusData);
+          this.fixture.detectChanges();
+          expUpdatesCB('experiment:completed');
+          this.fixture.detectChanges();
+          let el = this.fixture.debugElement.nativeElement;
+          expect(el.querySelector('.status-indicator .message-text').innerHTML.trim()).toBe(`Experiment Complete, Holding Temperature of ${statusData.heat_block.temperature.toFixed(1)}`);
         }
       ))
 
     })
+
+    describe('When another experiment is running', () => {
+
+      let exp: any;
+      let statusData: any;
+
+      beforeEach(async(() => {
+        exp = JSON.parse(JSON.stringify(ExperimentMockInstance));
+        statusData = JSON.parse(JSON.stringify(StatusDataMockInstance));
+        exp.id = 1;
+        statusData.experiment_controller.experiment.id = 1233423423;
+      }))
+
+      describe('When experiment has not been started', () => {
+
+        beforeEach(() => {
+          exp.started_at = null;
+          exp.completed_at = null;
+        })
+
+        it('should display another experiment is running', inject(
+          [ExperimentService, StatusService],
+          (expService: ExperimentService, statusService: StatusService) => {
+            this.fixture = TestBed.createComponent(TestingComponent);
+            this.fixture.componentInstance.id = exp.id;
+            this.fixture.detectChanges();
+            getExperimentCB(exp);
+            this.fixture.detectChanges();
+            statusService.$data.next(statusData);
+            this.fixture.detectChanges();
+            let el = this.fixture.debugElement.nativeElement;
+            expect(el.querySelector('.message-text').innerHTML.trim()).toBe('ANOTHER EXPERIMENT IS RUNNING');
+            expect(el.querySelector('.message .button').innerHTML.trim()).toBe('VIEW NOW');
+          }
+        ));
+
+
+      });
+
+    });
 
   })
 

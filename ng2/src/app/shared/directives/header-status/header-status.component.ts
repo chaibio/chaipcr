@@ -25,6 +25,7 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
   public experiment: Experiment;
   public state: string;
   public statusData: StatusData;
+  public analyzed = false;
   private ngUnsubscribe: Subject<void> = new Subject<void>(); // = new Subject(); in Typescript 2.2-2.4
 
   constructor(private el: ElementRef, private expService: ExperimentService, private statusService: StatusService) {
@@ -51,8 +52,8 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
   }
 
   public isCurrentExperiment(): boolean {
-    if (this.statusData && this.experiment) {
-      return this.statusData.experiment_controller.experiment.id === this.experiment.id;
+    if (this.statusData && this.expId) {
+      return this.statusData.experiment_controller.experiment.id === +this.expId;
     } else {
       return false;
     }
@@ -61,6 +62,13 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
   private extraceStatusData (d: StatusData) {
     this.statusData = d;
     this.state = d.experiment_controller.machine.state;
+    if(this.state === 'running' && this.isCurrentExperiment()) {
+      this.expService.$updates.subscribe((evt) => {
+        if(evt === 'experiment:completed') {
+          this.analyzed = true;
+        }
+      });
+    }
   }
 
 }

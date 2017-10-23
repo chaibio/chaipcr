@@ -8,6 +8,7 @@
       COMPLETED
     </div>
   </div>
+  <!--experiment failed-->
   <div class="status-indicator" *ngIf="experiment && (experiment.started_at && !experiment.completed_at && !(state !== 'idle' && isCurrentExperiment()))">
     <div class="message">
       <span class="failed">FAILED</span>
@@ -17,6 +18,27 @@
       <span class="message-text" *ngIf="experiment.completion_status !== 'aborted'">
         AN ERROR OCCURED
       </span>
+    </div>
+  </div>
+  <!--holding stage-->
+  <div class="status-indicator" *ngIf="experiment && (experiment.started_at && experiment.completed_at && state !== 'idle' && isCurrentExperiment())">
+    <div class="message">
+      <span class="message-text" *ngIf="!analyzed">
+        Analyzing... Holding Temperature of {{ statusData.heat_block.temperature.toFixed(1)  }}
+      </span>
+      <span class="message-text" *ngIf="analyzed">
+        Experiment Complete, Holding Temperature of {{ statusData.heat_block.temperature.toFixed(1)  }}
+      </span>
+    </div>
+  </div>
+  <div class="status-indicator" *ngIf="experiment && (!experiment.started_at && !experiment.completed_at && state !== 'idle' && !isCurrentExperiment())">
+    <div class="message">
+      <span class="message-text" *ngIf="!analyzed">
+        ANOTHER EXPERIMENT IS RUNNING
+      </span>
+      <a class="button">
+        VIEW NOW
+      </a>
     </div>
   </div>
 </div>
