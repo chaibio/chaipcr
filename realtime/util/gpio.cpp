@@ -44,7 +44,12 @@ GPIO::GPIO(unsigned int pinNumber, Direction direction, Type type)
     _savedValue = kLow;
 
     exportPin();
+#ifdef KERNEL_49
+    if(direction==kInput)
+  	changeEdge();
+#else  	
     changeEdge();
+#endif
     setDirection(direction);
 
     if (type == kDirect)
