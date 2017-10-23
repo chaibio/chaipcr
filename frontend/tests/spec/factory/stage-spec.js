@@ -758,6 +758,16 @@ describe("Testing stage factory", function() {
 
     describe("Testing different scenarios in stageHeader method", function() {
 
+        it("It should test stageHeader method when there is no stageName", function() {
+            
+            stage.stageName = null;
+            spyOn(stage, "shortenStageName");
+
+            stage.stageHeader();
+
+            expect(stage.shortenStageName).not.toHaveBeenCalled(); 
+        });
+
         it("It should test stageHeader method", function() {
 
             stage.stageName = {
@@ -1116,4 +1126,52 @@ describe("Testing stage factory", function() {
         expect(stage.unSelectStage).toHaveBeenCalled(); 
     });
     
+    it("It should test removeFromStagesArray method", function() {
+
+        stage.parent = {
+            allStageViews: [
+                { 
+                    name: "stage1",
+                    index: 0
+                },
+                {
+                    name: "stage2",
+                    index: 1
+                },
+                {
+                    name: "stage3",
+                    index: 2
+                }
+            ]
+        };
+
+        stage.index = 1;
+
+        stage.removeFromStagesArray();
+        var length = stage.parent.allStageViews.length;
+
+        expect(length).toEqual(2);
+        expect(stage.parent.allStageViews[length - 1].name).toEqual("stage3");
+    });
+
+    it("It should test unSelectStage method", function() {
+
+        _previouslySelected.circle = {
+            parent: {
+                parentStage: {
+                    changeFillsAndStrokes: function() {},
+                    manageBordersOnSelection: function() {},
+                }
+            }
+        };
+
+        spyOn(_previouslySelected.circle.parent.parentStage, "changeFillsAndStrokes");
+        spyOn(_previouslySelected.circle.parent.parentStage, "manageBordersOnSelection");
+
+        stage.unSelectStage();
+
+        expect(_previouslySelected.circle.parent.parentStage.changeFillsAndStrokes).toHaveBeenCalled();
+        expect(_previouslySelected.circle.parent.parentStage.manageBordersOnSelection).toHaveBeenCalled();
+
+    });
 }); 
