@@ -18,14 +18,12 @@
  */
 
 angular.module("canvasApp").factory('step', [
-  'ExperimentLoader',
-  '$rootScope',
   'circle',
   'previouslySelected',
   'stepGraphics',
   'constants',
 
-  function(ExperimentLoader, $rootScope, circle, previouslySelected, stepGraphics, constants) {
+  function(circle, previouslySelected, stepGraphics, constants) {
 
     return function(model, parentStage, index, $scope) {
 
@@ -71,19 +69,28 @@ angular.module("canvasApp").factory('step', [
         }
 
         this.getUniqueName();
+
         var leftVal = {left: this.left};
-        this.stepGroup.set(leftVal).setCoords();
+
+        this.stepGroup.set(leftVal);
+        this.stepGroup.setCoords();
 
         leftVal = {left: this.left + (this.myWidth / 2)};
 
         leftVal = {left: this.left + 108};
-        this.closeImage.set(leftVal).setCoords();
+
+        this.closeImage.set(leftVal);
+        this.closeImage.setCoords();
 
         leftVal = {left: this.left + 16};
-        this.dots.set(leftVal).setCoords();
+
+        this.dots.set(leftVal);
+        this.dots.setCoords();
 
         leftVal = {left: this.left + 5};
-        this.rampSpeedGroup.set(leftVal).setCoords();
+        
+        this.rampSpeedGroup.set(leftVal);
+        this.rampSpeedGroup.setCoords();
 
         this.ordealStatus = this.ordealStatus + action;
         this.circle.getUniqueId();
