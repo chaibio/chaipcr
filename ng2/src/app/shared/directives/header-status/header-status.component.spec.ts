@@ -49,12 +49,14 @@ class TestingComponent {
 
 describe('HeaderStatusComponent Directive', () => {
 
+  let statusData: any;
   let exp: any;
 
   beforeEach(async(() => {
 
     spyOn(ExperimentServiceMock, 'getExperiment').and.callThrough()
     exp = JSON.parse(JSON.stringify(ExperimentMockInstance));
+    statusData = JSON.parse(JSON.stringify(StatusDataMockInstance))
 
     TestBed.configureTestingModule({
       imports: [
@@ -87,37 +89,59 @@ describe('HeaderStatusComponent Directive', () => {
       fixture.detectChanges();
       expect(ExperimentServiceMock.getExperiment).not.toHaveBeenCalled();
       expect(fixture.debugElement.nativeElement.querySelector('.exp-name').innerHTML.trim()).toBe('Loading...')
-      component.id = ExperimentMockInstance.id;
+      component.id = exp.id;
       fixture.detectChanges();
       expect(ExperimentServiceMock.getExperiment).toHaveBeenCalledWith(component.id);
-      getExperimentCB(ExperimentMockInstance);
+      getExperimentCB(exp);
       fixture.detectChanges();
-      expect(fixture.debugElement.nativeElement.querySelector('.exp-name').innerHTML.trim()).toBe(ExperimentMockInstance.name)
+      expect(fixture.debugElement.nativeElement.querySelector('.exp-name').innerHTML.trim()).toBe(exp.name)
 
     }))
 
   describe('When status is idle', () => {
 
-    let statusData: any;
-
     beforeEach(async(() => {
-
-      statusData = mockStatusReponse;
+      statusData = JSON.parse(JSON.stringify(StatusDataMockInstance))
       statusData.experiment_controller.machine.state = "idle"
-
     }))
+
+    describe('When experiment has not been started', () => {
+
+      beforeEach(async(() => {
+        exp = JSON.parse(JSON.stringify(ExperimentMockInstance))
+        exp.started_at = null;
+        exp.completed_at = null;
+      }))
+
+      it('should not start when lid is open', inject(
+        [StatusService],
+        (statusService: StatusService) => {
+          statusData.optics.lid_open = true
+          this.fixture = TestBed.createComponent(TestingComponent)
+          this.fixture.componentInstance.id = exp.id
+          this.fixture.detectChanges()
+          getExperimentCB(exp)
+          this.fixture.detectChanges()
+          statusService.$data.next(statusData)
+          this.fixture.detectChanges()
+          let el = this.fixture.debugElement.nativeElement
+          expect(el.querySelector('.message-text').innerHTML.trim()).toBe('LID IS OPEN')
+          expect(el.querySelector('.button').classList.contains('disabled')).toBe(true)
+        }))
+
+    })
 
     describe('When experiment is complete', () => {
 
       beforeEach(() => {
-        ExperimentMockInstance.id = 1;
-        expect(ExperimentMockInstance.started_at).toBeTruthy();
-        expect(ExperimentMockInstance.completed_at).toBeTruthy();
+        exp.id = 1;
+        expect(exp.started_at).toBeTruthy();
+        expect(exp.completed_at).toBeTruthy();
 
         this.fixture = TestBed.createComponent(TestingComponent);
-        this.fixture.componentInstance.id = ExperimentMockInstance.id;
+        this.fixture.componentInstance.id = exp.id;
         this.fixture.detectChanges();
-        getExperimentCB(ExperimentMockInstance);
+        getExperimentCB(exp);
         this.fixture.detectChanges();
       })
 
@@ -190,15 +214,8 @@ describe('HeaderStatusComponent Directive', () => {
 
   describe('When experiment is running', () => {
 
-    let exp: any
-    let statusData: any;
-
     beforeEach(async(() => {
-
-      exp = JSON.parse(JSON.stringify(ExperimentMockInstance));
-      statusData = JSON.parse(JSON.stringify(StatusDataMockInstance));
       statusData.experiment_controller.machine.state = "running";
-
     }))
 
     it('should subscribe to experiment service updates', inject(
@@ -250,6 +267,7 @@ describe('HeaderStatusComponent Directive', () => {
     describe('When experiment is in holding state', () => {
 
       beforeEach(async(() => {
+        statusData.experiment_controller.experiment.id = exp.id
         exp.started_at = "2017-08-30T16:30:13.000Z";
         exp.completed_at = "2017-08-30T16:30:13.000Z";
 

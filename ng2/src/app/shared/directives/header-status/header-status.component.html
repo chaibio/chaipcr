@@ -2,6 +2,13 @@
   <div class="exp-name">
     {{ experiment? experiment.name : 'Loading...' }}
   </div>
+  <!--experiment invalid, lid is open-->
+  <div class="status-indicator" *ngIf="experiment && !experiment.started_at && !experiment.completed_at && state==='idle' && statusData.optics.lid_open">
+    <div class="message">
+      <span class="message-text">LID IS OPEN</span>
+    </div>
+    <a class="button disabled">BEGIN EXPERIMENT</a>
+  </div>
   <!--experiment completed successfully-->
   <div class="status-indicator" *ngIf="experiment && experiment.completed_at && !(state !== 'idle' && isCurrentExperiment())">
     <div class="message">
