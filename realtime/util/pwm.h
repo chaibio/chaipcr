@@ -35,11 +35,17 @@ public:
 
 private:
     void writePWMFile(std::ostream &stream, unsigned long value);
+#ifdef KERNEL_49
+    void writePWMFile(std::ostream &stream, const std::string value);
+#endif
 
 private:
     std::ofstream dutyFile;
     std::ofstream periodFile;
     std::ofstream polarityFile;
+#ifdef KERNEL_49
+    std::ofstream enableFile;
+#endif
 };
 
 class PWMControl {
