@@ -505,4 +505,300 @@ describe("Testing functionalities of step", function() {
     
     expect(step.circle.runAlongCircle).toHaveBeenCalled();
   });
+
+  it("It should test manageBorder method, when step has no previousStep", function() {
+
+    var color = "white";
+
+    step.borderRight = {
+      setStroke: function() {},
+      setStrokeWidth: function() {}
+    };
+
+    step.parentStage = {
+      border: {
+        setStroke: function() {}
+      }
+    };
+
+    spyOn(step.borderRight, "setStroke");
+    spyOn(step.borderRight, "setStrokeWidth");
+    spyOn(step.parentStage.border, "setStroke");
+
+    step.manageBorder(color);
+
+    expect(step.borderRight.setStroke).toHaveBeenCalledWith(color);
+    expect(step.borderRight.setStrokeWidth).toHaveBeenCalledWith(2);
+    expect(step.parentStage.border.setStroke).toHaveBeenCalledWith(color);
+
+  });
+
+  it("It should test manageBorder method, when step has previous step", function() {
+
+    var color = "white";
+
+
+    step.borderRight = {
+      setStroke: function() {},
+      setStrokeWidth: function() {}
+    };
+
+    step.previousStep = {
+      borderRight: {
+        setStroke: function() {},
+        setStrokeWidth: function() {}
+      }
+    };
+
+    step.parentStage = {
+      border: {
+        setStroke: function() {}
+      }
+    };
+
+    spyOn(step.borderRight, "setStroke");
+    spyOn(step.borderRight, "setStrokeWidth");
+    spyOn(step.parentStage.border, "setStroke");
+
+    spyOn(step.previousStep.borderRight, "setStroke");
+    spyOn(step.previousStep.borderRight, "setStrokeWidth");
+
+    step.manageBorder(color);
+
+    expect(step.previousStep.borderRight.setStroke).toHaveBeenCalledWith(color);
+    expect(step.previousStep.borderRight.setStrokeWidth).toHaveBeenCalledWith(2);
+    expect(step.borderRight.setStroke).toHaveBeenCalledWith(color);
+    expect(step.borderRight.setStrokeWidth).toHaveBeenCalledWith(2);
+    expect(step.parentStage.border.setStroke).not.toHaveBeenCalledWith(color);
+
+  });
+
+  describe("Testing manageBorderPrevious method over different conditions", function() {
+
+    it("It should test manageBorderPrevious method, when the selected step is the laste in the stage", function() {
+
+      var color = "white";
+      var currentStep = {
+        parentStage: {
+          index: 1
+        }
+      };
+
+      step.index = 1;
+      
+      step.parentStage = {
+        index: 1,
+        childSteps: [
+          { index: 1},
+          { index: 2},
+        ]
+      };
+
+      step.borderRight = {
+
+        setStroke: function() {},
+        setStrokeWidth: function() {},
+      };
+
+      spyOn(step.borderRight, "setStroke");
+      spyOn(step.borderRight, "setStrokeWidth");
+
+      step.manageBorderPrevious(color, currentStep);
+
+      expect(step.borderRight.setStroke).toHaveBeenCalledWith('#cc6c00');
+      expect(step.borderRight.setStrokeWidth).toHaveBeenCalledWith(2);
+    });
+
+    it("It should test manageBorderPrevious method, when selected step is not the last in the stage", function() {
+
+      var color = "white";
+      var currentStep = {
+        parentStage: {
+          index: 1
+        }
+      };
+
+      step.index = 1;
+      
+      step.parentStage = {
+        index: 1,
+        childSteps: [
+          { index: 1},
+          { index: 2},
+          { index: 3}
+        ]
+      };
+
+      step.borderRight = {
+        setStroke: function() {},
+        setStrokeWidth: function() {},
+      };
+
+      spyOn(step.borderRight, "setStroke");
+      spyOn(step.borderRight, "setStrokeWidth");
+
+      step.manageBorderPrevious(color, currentStep);
+
+      expect(step.borderRight.setStroke).toHaveBeenCalledWith(color);
+      expect(step.borderRight.setStrokeWidth).toHaveBeenCalledWith(1);
+
+    });
+
+    it("It should test manageBorderPrevious method, when selected step has previous step", function() {
+
+      var color = "white";
+      var currentStep = {
+        parentStage: {
+          index: 1
+        }
+      };
+
+      step.index = 1;
+      
+      step.parentStage = {
+        index: 1,
+        childSteps: [
+          { index: 1},
+          { index: 2},
+          { index: 3}
+        ]
+      };
+
+      step.previousStep = {
+        borderRight: {
+          setStroke: function() {},
+          setStrokeWidth: function() {},
+        }
+      };
+
+      step.borderRight = {
+        setStroke: function() {},
+        setStrokeWidth: function() {},
+      };
+
+      spyOn(step.borderRight, "setStroke");
+      spyOn(step.borderRight, "setStrokeWidth");
+
+      spyOn(step.previousStep.borderRight, "setStroke");
+      spyOn(step.previousStep.borderRight, "setStrokeWidth");
+
+      step.manageBorderPrevious(color, currentStep);
+
+      expect(step.borderRight.setStroke).toHaveBeenCalledWith(color);
+      expect(step.borderRight.setStrokeWidth).toHaveBeenCalledWith(1);
+
+      expect(step.previousStep.borderRight.setStroke).toHaveBeenCalledWith(color);
+      expect(step.previousStep.borderRight.setStrokeWidth).toHaveBeenCalledWith(1);
+    });
+
+  });
+
+  it("It should test addName method", function() {
+
+    step.index = 10;
+
+    spyOn(_stepGraphics, "addName");
+
+    step.addName();
+
+    expect(step.stepNameText).toEqual('Step 11');
+    expect(_stepGraphics.addName).toHaveBeenCalled();
+  });
+  
+  it("It should test addName method when step has model", function() {
+
+    step.model = {
+      name: "lazarus"
+    };
+
+    spyOn(_stepGraphics, "addName");
+
+    step.addName();
+
+    expect(step.stepNameText).toEqual("Lazarus");
+    expect(_stepGraphics.addName).toHaveBeenCalled();
+  });
+
+  it("It should test numberingValue method", function() {
+
+    step.numberingTextCurrent = {
+      left: 100,
+      width: 100,
+      setText: function() {},
+    };
+
+    step.numberingTextTotal = {
+      setText: function() {},
+      setLeft: function() {},
+    };
+
+    step.index = 5;
+
+    step.parentStage = {
+      model: {
+        steps: [
+          { index: 1 },
+          { index: 2 } 
+        ]
+      }
+    };
+
+    spyOn(step.numberingTextCurrent, "setText");
+    spyOn(step.numberingTextTotal, "setText");
+    spyOn(step.numberingTextTotal, "setLeft");
+
+    step.numberingValue();
+
+    expect(step.numberingTextCurrent.setText).toHaveBeenCalledWith("06");
+    expect(step.numberingTextTotal.setText).toHaveBeenCalledWith("/02");
+    expect(step.numberingTextTotal.setLeft).toHaveBeenCalledWith(200);
+
+  });
+
+  it("It should test numberingValue method, when index is larger than 9", function() {
+
+    step.numberingTextCurrent = {
+      left: 100,
+      width: 100,
+      setText: function() {},
+    };
+
+    step.numberingTextTotal = {
+      setText: function() {},
+      setLeft: function() {},
+    };
+
+    step.index = 10;
+
+    step.parentStage = {
+      model: {
+        steps: [
+          { index: 1 },
+          { index: 2 },
+          { index: 3 },
+          { index: 4 },
+          { index: 5 },
+          { index: 6 },
+          { index: 7 },
+          { index: 8 },
+          { index: 9 },
+          { index: 10 },
+          { index: 11 },
+          { index: 12 }
+        ]
+      }
+    };
+
+    spyOn(step.numberingTextCurrent, "setText");
+    spyOn(step.numberingTextTotal, "setText");
+    spyOn(step.numberingTextTotal, "setLeft");
+
+    step.numberingValue();
+
+    expect(step.numberingTextCurrent.setText).toHaveBeenCalledWith("11");
+    expect(step.numberingTextTotal.setText).toHaveBeenCalledWith("/12");
+    expect(step.numberingTextTotal.setLeft).toHaveBeenCalledWith(200);
+
+  });
+
 });
