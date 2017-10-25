@@ -798,7 +798,22 @@ describe("Testing functionalities of step", function() {
     expect(step.numberingTextCurrent.setText).toHaveBeenCalledWith("11");
     expect(step.numberingTextTotal.setText).toHaveBeenCalledWith("/12");
     expect(step.numberingTextTotal.setLeft).toHaveBeenCalledWith(200);
-
   });
 
+  it("It should test rampSpeedGraphics method", function() {
+
+    step.rampSpeedNumber = 6;
+    step.rampSpeedGroup = {
+      setVisible: function() {}
+    };
+
+    spyOn(_stepGraphics, "rampSpeed");
+    spyOn(step.rampSpeedGroup, "setVisible");
+
+    step.rampSpeedGraphics();
+
+    expect(_stepGraphics.rampSpeed).toHaveBeenCalled();
+    expect(step.rampSpeedGroup.setVisible).toHaveBeenCalled();
+    
+  });
 });
