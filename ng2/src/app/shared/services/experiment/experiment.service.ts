@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core'
+import { WindowRef } from '../windowref/windowref.service'
 import { AuthHttp } from '../auth_http/auth_http.service'
 import { ExperimentList } from '../../models/experiment-list.model'
 import { AmplificationData } from '../../models/amplification-data.model'
@@ -18,7 +19,7 @@ export class ExperimentService {
 
   public $updates: Subject<any> = new Subject();
 
-  constructor(private http: AuthHttp) { }
+  constructor(private http: AuthHttp, private wref: WindowRef) { }
 
   getExperiments(): Observable<ExperimentList[]> {
     return this.http.get('/experiments').map(res => {
@@ -46,6 +47,11 @@ export class ExperimentService {
         this.checkExperimentCompleted(res);
         return this.extractAmplificationData(res);
       });
+  }
+
+  startExperiment(id: number) {
+    let loc = this.wref.nativeWindow().location;
+    return this.http.post(`${loc.protocol}//${loc.hostname}:8000/control/start`, {experiment_id: id})
   }
 
   private extractExperiment(res): Experiment {

@@ -263,4 +263,18 @@ describe('ExperimentService', () => {
     }
   ))
 
+  it('should start experiment', inject(
+    [ExperimentService, AuthHttp, WindowRef],
+    (expService: ExperimentService, http: AuthHttp, wref: WindowRef) => {
+      spyOn(http, 'post').and.callFake((url, id) => {
+        return {
+          subscribe: () => {}
+        }
+      })
+      expService.startExperiment(1).subscribe()
+      let loc = wref.nativeWindow().location
+      expect(http.post).toHaveBeenCalledWith(`${loc.protocol}//${loc.hostname}:8000/control/start`, {experiment_id: 1})
+    }
+  ))
+
 })
