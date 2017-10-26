@@ -118,10 +118,16 @@ describe('StatusService', () => {
     [WindowRef, StatusService],
     (wref: WindowRef, statusService: StatusService) => {
       fakeAsync(() => {
-        spyOn(statusService, 'fetchData')
+        let subscribeSpy = jasmine.createSpy('subscribeSpy')
+        spyOn(statusService, 'fetchData').and.callFake(() => {
+          return {
+            subscribe: subscribeSpy
+          }
+        })
         statusService.startSync()
         tick(5000)
         expect(statusService.fetchData).toHaveBeenCalledTimes(5)
+        expect(subscribeSpy).toHaveBeenCalledTimes(5)
         discardPeriodicTasks()
       })()
     }

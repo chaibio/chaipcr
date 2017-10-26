@@ -30,7 +30,7 @@ export class StatusService {
 
   startSync() {
     this.wref.nativeWindow().setInterval(() => {
-      this.fetchData()
+      this.fetchData().subscribe()
     }, 1000)
   }
 
