@@ -1,44 +1,43 @@
 {
-    "device": {
-        "update_available": "unavailable"
-    },
-    "heatblock":
-    {
-        "zone1":
-        {
-            "temperature": "95",
-            "drive": "0.212"
-        },
-        "zone2":
-        {
-            "temperature": "95",
-            "drive": "0.222"
-        },
-        "temperature": "95.0001"
-    },
-    "lid":
-    {
-        "temperature": "110.094",
-        "drive": "0.279"
-    },
-    "optics":
-    {
-        "intensity": "60",
-        "collectData": "false",
-        "lid_open": "false",
-        "photodiodeValue": "1"
-    },
-    "heatSink":
-    {
-        "temperature": "31.599",
-        "fanDrive": "0"
-    },
-    "experiment_controller":
-    {
-        "machine":
-        {
+    "experiment_controller": {
+        "machine": {
             "state": "idle",
             "thermal_state": "idle"
         }
+    },
+    "heat_block": {
+        "zone1": {
+            "temperature": "25.1070004",
+            "target_temperature": "0",
+            "drive": "-0"
+        },
+        "zone2": {
+            "temperature": "26.4069996",
+            "target_temperature": "0",
+            "drive": "-0"
+        },
+        "temperature": "25.757"
+    },
+    "lid": {
+        "temperature": "27.7259998",
+        "target_temperature": "0",
+        "drive": "0"
+    },
+    "optics": {
+        "intensity": "60",
+        "collect_data": "false",
+        "lid_open": "false",
+        "well_number": "0",
+        "photodiode_value": [
+            "2060"
+        ]
+    },
+    "heat_sink": {
+        "temperature": "27.4449997",
+        "fan_drive": "0"
+    },
+    "device": {
+        "update_available": "unavailable"
     }
 }
+
