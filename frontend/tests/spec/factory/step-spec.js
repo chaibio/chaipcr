@@ -24,7 +24,16 @@ describe("Testing functionalities of step", function() {
     module('ChaiBioTech', function($provide) {
 
       $provide.value('IsTouchScreen', function () {});
-
+      $provide.value('circle', function() {
+        return {
+          name: "circle",
+          getLeft: function() {},
+          getTop: function() {},
+          getUniqueId: function() {},
+          addImages: function() {},
+          render: function() {}
+        };
+      });
     });
 
     inject(function($injector) {
@@ -45,7 +54,9 @@ describe("Testing functionalities of step", function() {
     parentStage = {
       name: "stage",
       canvas: {
-        name: "canvas"
+        name: "canvas",
+        remove: function() {},
+        renderAll: function() {}
       }
     };
 
@@ -280,5 +291,529 @@ describe("Testing functionalities of step", function() {
     expect(step.circle.getUniqueId).toHaveBeenCalled();
   });
 
+  it("It should test deleteAllStepContents method", function() {
 
+    step.visualComponents = {
+      circle: {
+
+      },
+      dots: {
+
+      }
+    };
+
+    step.circle = {
+      removeContents: function() {}
+    };
+
+    spyOn(step.canvas, "remove");
+    spyOn(step.circle, "removeContents");
+
+    step.deleteAllStepContents();
+
+    expect(step.canvas.remove).toHaveBeenCalled();
+    expect(step.circle.removeContents).toHaveBeenCalled();
+
+  });
+
+  describe("Testing wireNextAndPreviousStep method in different scenarios", function() {
+
+    it("It should test wireNextAndPreviousStep method when step has nextStep or when the step is very first one", function() {
+
+      step.nextStep  = {
+        name: "nextStep"
+      };
+
+      var selected = step.wireNextAndPreviousStep({}, {});
+
+      expect(selected.name).toEqual("nextStep");
+      expect(step.nextStep.previousStep).toEqual(null);
+    });
+
+    it("it should test wireNextAndPreviousStep method, when the step is the last one", function() {
+
+      step.previousStep = {
+        name: "previousStep"
+      };
+
+      var selected = step.wireNextAndPreviousStep({}, {});
+
+      expect(selected.name).toEqual("previousStep");
+      expect(step.previousStep.nextStep).toEqual(null);
+    });
+
+    it("It should test wireNextAndPreviousStep method, when step has next and previous", function() {
+
+      step.previousStep = {
+        name: "previousStep"
+      };
+
+      step.nextStep = {
+        name: "nextStep"
+      };
+
+      var selected = step.wireNextAndPreviousStep({}, {});
+
+      expect(selected.name).toEqual("nextStep");
+      expect(step.previousStep.nextStep.name).toEqual("nextStep");
+      expect(step.nextStep.previousStep.name).toEqual("previousStep");
+    });
+  });
+
+  it("It should test configureStepName method", function() {
+
+    step.stepName = {};
+    
+    step.model = {
+      name: "step1"
+    };
+
+    spyOn(step, "numberingValue").and.returnValue();
+
+    step.configureStepName();
+
+    expect(step.stepName.text).toEqual("step1");
+    expect(step.numberingValue).toHaveBeenCalled();
+  });
+
+  it("It should test configureStepName method, when model.name = null", function() {
+
+    step.stepName = {};
+    
+    step.model = {
+      name: null,
+      index: 2,
+    };
+
+    spyOn(step, "numberingValue").and.returnValue();
+
+    step.configureStepName();
+
+    expect(step.numberingValue).toHaveBeenCalled();
+    expect(step.stepNameText).toEqual('Step ' + (step.index + 1));
+    expect(step.stepName.text).toEqual('Step ' + (step.index + 1));
+  });
+
+  it("It should test addCircle method", function() {
+
+    step.addCircle();
+
+    expect(step.circle.name).toEqual("circle");
+  });
+
+  it("It should test getUniqueName method", function() {
+
+    step.model = {
+      id: 1000
+    };
+
+    step.parentStage = {
+      index: 100
+    };
+
+    step.getUniqueName();
+
+    expect(step.uniqueName).toEqual(step.model.id + step.parentStage.index + "step");
+  });
+
+  it("It should test showHideRamp method", function() {
+
+    step.model = {
+      ramp: {
+        rate: "2"
+      }
+    };
+
+    step.rampSpeedGroup = {
+      setVisible: function() {},
+
+    };
+    step.rampSpeedText = {
+      width: 100,
+    };
+
+    step.underLine = {
+      setWidth: function() {}
+    };
+
+    spyOn(step.canvas, "renderAll");
+    spyOn(step.rampSpeedGroup, "setVisible");
+    spyOn(step.underLine, "setWidth");
+
+    step.showHideRamp();
+
+    expect(step.rampSpeedText.text).toEqual("2º C/s");
+    expect(step.rampSpeedGroup.setVisible).toHaveBeenCalledWith(true);
+    expect(step.underLine.setWidth).toHaveBeenCalled();
+  });
+
+  it("It should test showHideRamp method when ramp text to be hide", function() {
+
+    step.model = {
+      ramp: {
+        rate: "10"
+      }
+    };
+
+    step.rampSpeedGroup = {
+      setVisible: function() {},
+
+    };
+    step.rampSpeedText = {
+      width: 100,
+    };
+
+    step.underLine = {
+      setWidth: function() {}
+    };
+
+    spyOn(step.canvas, "renderAll");
+    spyOn(step.rampSpeedGroup, "setVisible");
+    spyOn(step.underLine, "setWidth");
+
+    step.showHideRamp();
+
+    expect(step.rampSpeedText.text).toEqual("10º C/s");
+    expect(step.rampSpeedGroup.setVisible).toHaveBeenCalledWith(false);
+    expect(step.underLine.setWidth).not.toHaveBeenCalled();
+  });
+
+  it("It should test adjustRampSpeedPlacing method", function() {
+
+    step.circle = {
+      top: 12
+    };
+
+    step.rampSpeedGroup = {
+      setTop: function() {},
+    };
+
+    spyOn(step.rampSpeedGroup, "setTop");
+    step.adjustRampSpeedPlacing();
+    expect(step.rampSpeedGroup.setTop).toHaveBeenCalledWith(step.circle.top + 20);
+  });
+
+  it("It should test adjustRampSpeedLeft method", function() {
+
+    step.circle = {
+      runAlongCircle: function() {}
+    };
+
+    spyOn(step.circle, "runAlongCircle");
+
+    step.adjustRampSpeedLeft();
+    
+    expect(step.circle.runAlongCircle).toHaveBeenCalled();
+  });
+
+  it("It should test manageBorder method, when step has no previousStep", function() {
+
+    var color = "white";
+
+    step.borderRight = {
+      setStroke: function() {},
+      setStrokeWidth: function() {}
+    };
+
+    step.parentStage = {
+      border: {
+        setStroke: function() {}
+      }
+    };
+
+    spyOn(step.borderRight, "setStroke");
+    spyOn(step.borderRight, "setStrokeWidth");
+    spyOn(step.parentStage.border, "setStroke");
+
+    step.manageBorder(color);
+
+    expect(step.borderRight.setStroke).toHaveBeenCalledWith(color);
+    expect(step.borderRight.setStrokeWidth).toHaveBeenCalledWith(2);
+    expect(step.parentStage.border.setStroke).toHaveBeenCalledWith(color);
+
+  });
+
+  it("It should test manageBorder method, when step has previous step", function() {
+
+    var color = "white";
+
+
+    step.borderRight = {
+      setStroke: function() {},
+      setStrokeWidth: function() {}
+    };
+
+    step.previousStep = {
+      borderRight: {
+        setStroke: function() {},
+        setStrokeWidth: function() {}
+      }
+    };
+
+    step.parentStage = {
+      border: {
+        setStroke: function() {}
+      }
+    };
+
+    spyOn(step.borderRight, "setStroke");
+    spyOn(step.borderRight, "setStrokeWidth");
+    spyOn(step.parentStage.border, "setStroke");
+
+    spyOn(step.previousStep.borderRight, "setStroke");
+    spyOn(step.previousStep.borderRight, "setStrokeWidth");
+
+    step.manageBorder(color);
+
+    expect(step.previousStep.borderRight.setStroke).toHaveBeenCalledWith(color);
+    expect(step.previousStep.borderRight.setStrokeWidth).toHaveBeenCalledWith(2);
+    expect(step.borderRight.setStroke).toHaveBeenCalledWith(color);
+    expect(step.borderRight.setStrokeWidth).toHaveBeenCalledWith(2);
+    expect(step.parentStage.border.setStroke).not.toHaveBeenCalledWith(color);
+
+  });
+
+  describe("Testing manageBorderPrevious method over different conditions", function() {
+
+    it("It should test manageBorderPrevious method, when the selected step is the laste in the stage", function() {
+
+      var color = "white";
+      var currentStep = {
+        parentStage: {
+          index: 1
+        }
+      };
+
+      step.index = 1;
+      
+      step.parentStage = {
+        index: 1,
+        childSteps: [
+          { index: 1},
+          { index: 2},
+        ]
+      };
+
+      step.borderRight = {
+
+        setStroke: function() {},
+        setStrokeWidth: function() {},
+      };
+
+      spyOn(step.borderRight, "setStroke");
+      spyOn(step.borderRight, "setStrokeWidth");
+
+      step.manageBorderPrevious(color, currentStep);
+
+      expect(step.borderRight.setStroke).toHaveBeenCalledWith('#cc6c00');
+      expect(step.borderRight.setStrokeWidth).toHaveBeenCalledWith(2);
+    });
+
+    it("It should test manageBorderPrevious method, when selected step is not the last in the stage", function() {
+
+      var color = "white";
+      var currentStep = {
+        parentStage: {
+          index: 1
+        }
+      };
+
+      step.index = 1;
+      
+      step.parentStage = {
+        index: 1,
+        childSteps: [
+          { index: 1},
+          { index: 2},
+          { index: 3}
+        ]
+      };
+
+      step.borderRight = {
+        setStroke: function() {},
+        setStrokeWidth: function() {},
+      };
+
+      spyOn(step.borderRight, "setStroke");
+      spyOn(step.borderRight, "setStrokeWidth");
+
+      step.manageBorderPrevious(color, currentStep);
+
+      expect(step.borderRight.setStroke).toHaveBeenCalledWith(color);
+      expect(step.borderRight.setStrokeWidth).toHaveBeenCalledWith(1);
+
+    });
+
+    it("It should test manageBorderPrevious method, when selected step has previous step", function() {
+
+      var color = "white";
+      var currentStep = {
+        parentStage: {
+          index: 1
+        }
+      };
+
+      step.index = 1;
+      
+      step.parentStage = {
+        index: 1,
+        childSteps: [
+          { index: 1},
+          { index: 2},
+          { index: 3}
+        ]
+      };
+
+      step.previousStep = {
+        borderRight: {
+          setStroke: function() {},
+          setStrokeWidth: function() {},
+        }
+      };
+
+      step.borderRight = {
+        setStroke: function() {},
+        setStrokeWidth: function() {},
+      };
+
+      spyOn(step.borderRight, "setStroke");
+      spyOn(step.borderRight, "setStrokeWidth");
+
+      spyOn(step.previousStep.borderRight, "setStroke");
+      spyOn(step.previousStep.borderRight, "setStrokeWidth");
+
+      step.manageBorderPrevious(color, currentStep);
+
+      expect(step.borderRight.setStroke).toHaveBeenCalledWith(color);
+      expect(step.borderRight.setStrokeWidth).toHaveBeenCalledWith(1);
+
+      expect(step.previousStep.borderRight.setStroke).toHaveBeenCalledWith(color);
+      expect(step.previousStep.borderRight.setStrokeWidth).toHaveBeenCalledWith(1);
+    });
+
+  });
+
+  it("It should test addName method", function() {
+
+    step.index = 10;
+
+    spyOn(_stepGraphics, "addName");
+
+    step.addName();
+
+    expect(step.stepNameText).toEqual('Step 11');
+    expect(_stepGraphics.addName).toHaveBeenCalled();
+  });
+  
+  it("It should test addName method when step has model", function() {
+
+    step.model = {
+      name: "lazarus"
+    };
+
+    spyOn(_stepGraphics, "addName");
+
+    step.addName();
+
+    expect(step.stepNameText).toEqual("Lazarus");
+    expect(_stepGraphics.addName).toHaveBeenCalled();
+  });
+
+  it("It should test numberingValue method", function() {
+
+    step.numberingTextCurrent = {
+      left: 100,
+      width: 100,
+      setText: function() {},
+    };
+
+    step.numberingTextTotal = {
+      setText: function() {},
+      setLeft: function() {},
+    };
+
+    step.index = 5;
+
+    step.parentStage = {
+      model: {
+        steps: [
+          { index: 1 },
+          { index: 2 } 
+        ]
+      }
+    };
+
+    spyOn(step.numberingTextCurrent, "setText");
+    spyOn(step.numberingTextTotal, "setText");
+    spyOn(step.numberingTextTotal, "setLeft");
+
+    step.numberingValue();
+
+    expect(step.numberingTextCurrent.setText).toHaveBeenCalledWith("06");
+    expect(step.numberingTextTotal.setText).toHaveBeenCalledWith("/02");
+    expect(step.numberingTextTotal.setLeft).toHaveBeenCalledWith(200);
+
+  });
+
+  it("It should test numberingValue method, when index is larger than 9", function() {
+
+    step.numberingTextCurrent = {
+      left: 100,
+      width: 100,
+      setText: function() {},
+    };
+
+    step.numberingTextTotal = {
+      setText: function() {},
+      setLeft: function() {},
+    };
+
+    step.index = 10;
+
+    step.parentStage = {
+      model: {
+        steps: [
+          { index: 1 },
+          { index: 2 },
+          { index: 3 },
+          { index: 4 },
+          { index: 5 },
+          { index: 6 },
+          { index: 7 },
+          { index: 8 },
+          { index: 9 },
+          { index: 10 },
+          { index: 11 },
+          { index: 12 }
+        ]
+      }
+    };
+
+    spyOn(step.numberingTextCurrent, "setText");
+    spyOn(step.numberingTextTotal, "setText");
+    spyOn(step.numberingTextTotal, "setLeft");
+
+    step.numberingValue();
+
+    expect(step.numberingTextCurrent.setText).toHaveBeenCalledWith("11");
+    expect(step.numberingTextTotal.setText).toHaveBeenCalledWith("/12");
+    expect(step.numberingTextTotal.setLeft).toHaveBeenCalledWith(200);
+  });
+
+  it("It should test rampSpeedGraphics method", function() {
+
+    step.rampSpeedNumber = 6;
+    step.rampSpeedGroup = {
+      setVisible: function() {}
+    };
+
+    spyOn(_stepGraphics, "rampSpeed");
+    spyOn(step.rampSpeedGroup, "setVisible");
+
+    step.rampSpeedGraphics();
+
+    expect(_stepGraphics.rampSpeed).toHaveBeenCalled();
+    expect(step.rampSpeedGroup.setVisible).toHaveBeenCalled();
+    
+  });
 });

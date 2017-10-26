@@ -106,7 +106,7 @@ angular.module("canvasApp").factory('step', [
       };
 
       this.wireNextAndPreviousStep = function(currentStep, selected) {
-
+        
         if(this.previousStep) {
           this.previousStep.nextStep = (this.nextStep) ? this.nextStep : null;
           selected = this.previousStep;
@@ -119,7 +119,7 @@ angular.module("canvasApp").factory('step', [
         return selected;
       };
 
-      this.configureStepName = function(thisStep) {
+      this.configureStepName = function() {
 
         if(this.model.name === null) {
           this.stepNameText = "Step " + (this.index + 1);
@@ -133,11 +133,11 @@ angular.module("canvasApp").factory('step', [
       this.addCircle = function() {
 
         this.circle = new circle(this.model, this, $scope);
-        this.circle.getLeft()
-          .getTop()
-          .getUniqueId()
-          .addImages()
-          .render();
+        this.circle.getLeft();
+        this.circle.getTop();
+        this.circle.getUniqueId();
+        this.circle.addImages();
+        this.circle.render();
       };
 
       this.getUniqueName = function() {
@@ -204,7 +204,7 @@ angular.module("canvasApp").factory('step', [
 
       this.addName = function() {
 
-        var stepName = "Step " +(this.index + 1);
+        var stepName = "Step " + (this.index + 1);
         if(this.model.name) {
           stepName = (this.model.name).charAt(0).toUpperCase() + (this.model.name).slice(1).toLowerCase();
         }
