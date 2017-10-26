@@ -13,6 +13,7 @@ import {
   MockConnection,
   MockBackend
 } from '@angular/http/testing';
+import { Router } from '@angular/router';
 
 import { AuthHttp } from '../../services/auth_http/auth_http.service';
 import { StatusService } from '../../services/status/status.service';
@@ -37,7 +38,11 @@ const ExperimentServiceMock = {
         getExperimentCB = cb;
       }
     }
-  }
+  },
+  startExperiment: () => {}
+}
+const mockRouter = {
+  navigate: () => {}
 }
 
 @Component({
@@ -70,6 +75,9 @@ describe('HeaderStatusComponent Directive', () => {
       providers: [
         {
           provide: ExperimentService, useValue: ExperimentServiceMock
+        },
+        {
+          provide: Router, useValue: mockRouter
         },
         WindowRef,
         StatusService,
@@ -144,9 +152,9 @@ describe('HeaderStatusComponent Directive', () => {
           }))
 
         it('should start experiment when lid is closed', async(() => {
-            let el = this.fixture.debugElement.nativeElement
-            expect(el.querySelector('.button').innerHTML.trim()).toBe('START EXPERIMENT')
-          }
+          let el = this.fixture.debugElement.nativeElement
+          expect(el.querySelector('.button').innerHTML.trim()).toBe('START EXPERIMENT')
+        }
         ))
 
         it('should show confirm start experiment', async(() => {
@@ -155,6 +163,33 @@ describe('HeaderStatusComponent Directive', () => {
           this.fixture.detectChanges()
           expect(el.querySelector('.button').innerHTML.trim()).toBe('CONFIRM START')
         }))
+
+        it('should start experiment upon confirmation', inject(
+          [ExperimentService, Router],
+          (expService: ExperimentService, router) => {
+
+            spyOn(router, 'navigate').and.callThrough()
+
+            spyOn(expService, 'startExperiment').and.callFake(() => {
+              return {
+                subscribe: (cb) => {
+                  if(cb) cb()
+                }
+              }
+            })
+
+            let el = this.fixture.debugElement.nativeElement
+            //click start button
+            el.querySelector('.button').click()
+            this.fixture.detectChanges()
+            // click confirm button
+            el.querySelector('.button').click()
+            this.fixture.detectChanges()
+            expect(expService.startExperiment).toHaveBeenCalledWith(exp.id)
+            expect(router.navigate).toHaveBeenCalledWith(['/charts', 'exp', exp.id, 'amplification'])
+
+          }
+        ))
 
       })
 

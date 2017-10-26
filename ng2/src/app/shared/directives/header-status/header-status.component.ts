@@ -5,6 +5,7 @@ import {
   OnDestroy,
   Input,
 } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { Experiment } from '../../models/experiment.model';
 import { ExperimentService } from '../../services/experiment/experiment.service';
@@ -28,7 +29,7 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
   public analyzed = false;
   private ngUnsubscribe: Subject<void> = new Subject<void>(); // = new Subject(); in Typescript 2.2-2.4
 
-  constructor(private el: ElementRef, private expService: ExperimentService, private statusService: StatusService) {
+  constructor(private el: ElementRef, private expService: ExperimentService, private statusService: StatusService, private router: Router) {
     statusService.$data
       .takeUntil(this.ngUnsubscribe)
       .subscribe((statusData: StatusData) => {
@@ -49,6 +50,12 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
   ngOnDestroy() {
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
+  }
+
+  public startExperiment() {
+    this.expService.startExperiment(+this.expId).subscribe(() => {
+      this.router.navigate(['/charts', 'exp', +this.expId, 'amplification'])
+    })
   }
 
   public isCurrentExperiment(): boolean {
