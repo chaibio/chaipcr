@@ -69,8 +69,7 @@ describe('HeaderStatusComponent Directive', () => {
       ],
       providers: [
         {
-          provide: ExperimentService,
-          useValue: ExperimentServiceMock
+          provide: ExperimentService, useValue: ExperimentServiceMock
         },
         WindowRef,
         StatusService,
@@ -113,7 +112,7 @@ describe('HeaderStatusComponent Directive', () => {
         exp.completed_at = null;
       }))
 
-      it('should not start when lid is open', inject(
+      it('should not start experiment when lid is open', inject(
         [StatusService],
         (statusService: StatusService) => {
           statusData.optics.lid_open = true
@@ -128,6 +127,36 @@ describe('HeaderStatusComponent Directive', () => {
           expect(el.querySelector('.message-text').innerHTML.trim()).toBe('LID IS OPEN')
           expect(el.querySelector('.button').classList.contains('disabled')).toBe(true)
         }))
+
+      describe('When experiment is valid', () => {
+
+        beforeEach(inject(
+          [StatusService],
+          (statusService: StatusService) => {
+            statusData.optics.lid_open = false
+            this.fixture = TestBed.createComponent(TestingComponent)
+            this.fixture.componentInstance.id = exp.id
+            this.fixture.detectChanges()
+            getExperimentCB(exp)
+            this.fixture.detectChanges()
+            statusService.$data.next(statusData)
+            this.fixture.detectChanges()
+          }))
+
+        it('should start experiment when lid is closed', async(() => {
+            let el = this.fixture.debugElement.nativeElement
+            expect(el.querySelector('.button').innerHTML.trim()).toBe('START EXPERIMENT')
+          }
+        ))
+
+        it('should show confirm start experiment', async(() => {
+          let el = this.fixture.debugElement.nativeElement
+          el.querySelector('.button').click()
+          this.fixture.detectChanges()
+          expect(el.querySelector('.button').innerHTML.trim()).toBe('CONFIRM START')
+        }))
+
+      })
 
     })
 
