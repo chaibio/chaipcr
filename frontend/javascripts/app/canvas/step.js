@@ -308,6 +308,7 @@ angular.module("canvasApp").factory('step', [
       };
 
       this.unSelectStep = function() {
+        
         var previouslySelectedStep = previouslySelected.circle.parent;
 
         if(this.parentStage.parent.editStageStatus) {
