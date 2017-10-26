@@ -47,11 +47,11 @@ describe('StatusService', () => {
       const expectedData: StatusData = {
         experiment_controller: {
           experiment: {
-            id: -1,
-            name: '',
-            estimated_duration: 0,
-            paused_duration: 0,
-            run_duration: 0
+            id: null,
+            name: null,
+            estimated_duration: null,
+            paused_duration: null,
+            run_duration: null
           },
           machine: {
             state: 'idle',
@@ -139,7 +139,7 @@ describe('StatusService', () => {
       (statusService: StatusService, backend: MockBackend) => {
 
         let resp: any = mockStatusReponse
-        resp.experiment_controller.machine.state = "running"        
+        resp.experiment_controller.machine.state = "running"
         resp.experiment_controller.experiment.estimated_duration = 350
         resp.experiment_controller.experiment.paused_duration = 10
         resp.experiment_controller.experiment.run_duration = 50
@@ -152,7 +152,7 @@ describe('StatusService', () => {
 
         expect(statusService.timeRemaining()).toBe(0)
         expect(statusService.timePercentage()).toBe(0)
-        
+
         statusService.fetchData().subscribe( res => {
           let exp = res.experiment_controller.experiment
           expect(statusService.timePercentage()).toBe(exp.run_duration/(exp.estimated_duration + exp.paused_duration ))

@@ -1,11 +1,11 @@
 export interface StatusData {
   experiment_controller: {
     experiment: {
-      id: number,
-      name: string,
-      estimated_duration: number,
-      paused_duration: number,
-      run_duration: number
+      id: number|null,
+      name: string|null,
+      estimated_duration: number|null,
+      paused_duration: number|null,
+      run_duration: number|null
     },
     machine: {
       state: string,
