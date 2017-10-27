@@ -18,23 +18,17 @@
  */
 
 angular.module("canvasApp").factory('htmlEvents', [
-  'ExperimentLoader',
-  'previouslySelected',
   'previouslyHoverd',
-  'scrollService',
   'popupStatus',
   'editMode',
 
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, popupStatus, editMode) {
+  function(previouslyHoverd, popupStatus, editMode) {
 
-    this.init = function(C, $scope, that) {
+    var me = this, reference;
+    this.init = function(C, that) {
+      reference = that;
 
-      angular.element('body').click(function(evt) {
-
-        if (popupStatus.popupStatusAddStage && evt.target.id != "add-stage") {
-            angular.element('#add-stage').click();
-        }
-      });
+      angular.element('body').click(me.manageClcikOnBody);
 
       angular.element('.canvas-container, .canvasClass').mouseleave(function() {
 
@@ -55,14 +49,23 @@ angular.module("canvasApp").factory('htmlEvents', [
 
       });
 
-      angular.element('.canvas-containing').click(function(evt) {
-
-        if (evt.target == evt.currentTarget) {
-          that.setSummaryMode();
-        }
-      });
+      angular.element('.canvas-containing').click(me.manageClickOnCanvasContaining);
 
     };
+
+    this.manageClcikOnBody = function(evt) {
+
+      if (popupStatus.popupStatusAddStage && evt.target.id != "add-stage") {
+          angular.element('#add-stage').click();
+      }
+    };
+
+    this.manageClickOnCanvasContaining = function(evt) {
+      if (evt.target == evt.currentTarget) {
+          reference.setSummaryMode();
+        }
+    };
+
     return this;
   }
 ]);
