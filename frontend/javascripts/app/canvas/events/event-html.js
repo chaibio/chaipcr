@@ -24,30 +24,15 @@ angular.module("canvasApp").factory('htmlEvents', [
 
   function(previouslyHoverd, popupStatus, editMode) {
 
-    var me = this, reference;
+    var me = this, reference, kanvas;
+   
     this.init = function(C, that) {
       reference = that;
+      kanvas = C;
 
       angular.element('body').click(me.manageClcikOnBody);
 
-      angular.element('.canvas-container, .canvasClass').mouseleave(function() {
-
-        if (C.editStageStatus === false) {
-            if (previouslyHoverd.step) {
-              previouslyHoverd.step.closeImage.setOpacity(false);
-            }
-            C.canvas.renderAll();
-        }
-
-        if (editMode.tempActive === true) {
-          editMode.currentActiveTemp.fire('text:editing:exited');
-        }
-
-        if (editMode.holdActive === true) {
-          editMode.currentActiveHold.fire('text:editing:exited');
-        }
-
-      });
+      angular.element('.canvas-container, .canvasClass').mouseleave(me.mouseLeaveEventHandler);
 
       angular.element('.canvas-containing').click(me.manageClickOnCanvasContaining);
 
@@ -61,8 +46,27 @@ angular.module("canvasApp").factory('htmlEvents', [
     };
 
     this.manageClickOnCanvasContaining = function(evt) {
+
       if (evt.target == evt.currentTarget) {
-          reference.setSummaryMode();
+        reference.setSummaryMode();
+      }
+    };
+
+    this.mouseLeaveEventHandler = function() {
+        console.log(kanvas);
+        if (kanvas.editStageStatus === false) {
+            if (previouslyHoverd.step) {
+              previouslyHoverd.step.closeImage.setOpacity(false);
+            }
+            kanvas.canvas.renderAll();
+        }
+
+        if (editMode.tempActive === true) {
+          editMode.currentActiveTemp.fire('text:editing:exited');
+        }
+
+        if (editMode.holdActive === true) {
+          editMode.currentActiveHold.fire('text:editing:exited');
         }
     };
 
