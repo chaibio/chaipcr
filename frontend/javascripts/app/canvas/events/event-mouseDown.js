@@ -55,6 +55,7 @@ angular.module("canvasApp").factory('mouseDown', [
         for(var i = 0; i < items.length; i++) {
           ParentKanvas.canvas.add(items[i]);
         }
+        
         ParentKanvas.canvas.renderAll();
       };
 
