@@ -19,10 +19,10 @@ import {
   HttpModule
 } from '@angular/http'
 
-import { AuthHttp } from '../auth_http/auth_http.service'
+import { AuthHttp } from '../../shared/services/auth_http/auth_http.service'
 import { StatusService } from './status.service'
-import { WindowRef } from '../windowref/windowref.service'
-import { StatusData } from '../../models/status.model'
+import { WindowRef } from '../../shared/services/windowref/windowref.service'
+import { StatusData } from '../../shared/models/status.model'
 import { mockStatusReponse } from './mock-status-response'
 import { initialStatusData } from './initial-status-data'
 

@@ -2,15 +2,37 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import { SharedModule } from './shared/shared.module';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { LoginComponent } from './login/login.component';
-import { LoginRouteGuard } from './login/login.route.guard';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { DashboardAuthGuard } from './components/dashboard/dashboard.auth-guard';
+import { HomeComponent } from './components/dashboard/home/home.component';
+import { LoginComponent } from './components/login/login.component';
+import { LoginRouteGuard } from './components/login/login.route.guard';
+import { ChartsComponent } from './components/dashboard/charts/charts.component';
+import { AmplificationComponent } from './components/dashboard/charts/amplification/amplification.component';
 
 const appRoutes: Routes = [
-  //{
-  //  path: '',
-  //  loadChildren: './dashboard/dashboard.module#DashboardModule'
-  //},
+  {
+    path: '',
+    component: DashboardComponent,
+    canActivate: [DashboardAuthGuard],
+    canActivateChild: [DashboardAuthGuard],
+    children: [
+      {
+        path: '',
+        component: HomeComponent,
+      },
+      {
+        path: 'charts/exp/:id',
+        component: ChartsComponent,
+        children: [
+          {
+            path: 'amplification',
+            component: AmplificationComponent
+          }
+        ]
+      }
+    ]
+  },
   {
     path: 'login',
     component: LoginComponent,
@@ -28,11 +50,8 @@ const appRoutes: Routes = [
     RouterModule.forRoot(appRoutes),
   ],
   exports: [
-    SharedModule,
     RouterModule,
-  ],
-  providers: [
-    LoginRouteGuard
   ]
+  
 })
 export class AppRoutesModule { }

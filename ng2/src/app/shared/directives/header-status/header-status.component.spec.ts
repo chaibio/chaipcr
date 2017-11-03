@@ -16,12 +16,12 @@ import {
 import { Router } from '@angular/router';
 
 import { AuthHttp } from '../../services/auth_http/auth_http.service';
-import { StatusService } from '../../services/status/status.service';
+import { StatusService } from '../../../services/status/status.service';
 import { ExperimentService } from '../../services/experiment/experiment.service';
 import { HeaderStatusComponent } from './header-status.component';
 import { ExperimentMockInstance } from '../../models/experiment.model.mock';
 import { StatusDataMockInstance } from '../../models/status.model.mock';
-import { mockStatusReponse } from '../../services/status/mock-status-response';
+import { mockStatusReponse } from '../../../services/status/mock-status-response';
 import { WindowRef } from '../../services/windowref/windowref.service';
 
 let getExperimentCB: any = null;

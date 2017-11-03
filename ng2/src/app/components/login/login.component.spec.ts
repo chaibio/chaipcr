@@ -7,8 +7,8 @@ import { HttpModule, Http, XHRBackend, Response, ResponseOptions } from '@angula
 import { MockBackend, MockConnection } from '@angular/http/testing'
 import { Title } from '@angular/platform-browser'
 
-import { SharedModule } from '../shared/shared.module'
-import { SessionService } from '../shared/services/session/session.service'
+import { SharedModule } from '../../shared/shared.module'
+import { SessionService } from '../../shared/services/session/session.service'
 import { LoginComponent } from './login.component'
 
 describe('LoginComponent', () => {

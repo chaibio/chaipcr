@@ -1,4 +1,4 @@
-import { StatusData } from '../../models/status.model'
+import { StatusData } from '../../shared/models/status.model'
 
 export const initialStatusData: StatusData = {
   experiment_controller: {

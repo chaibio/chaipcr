@@ -4,7 +4,9 @@ import { BrowserModule } from '@angular/platform-browser';
 import { SharedModule } from './shared/shared.module';
 import { AppRoutesModule } from './app.routing.module';
 import { AppComponent } from './app.component';
-import { DashboardModule } from './dashboard/dashboard.module';
+import { DashboardModule } from './components/dashboard/dashboard.module';
+
+import { StatusService } from './services/status/status.service';
 
 @NgModule({
   declarations: [
@@ -15,6 +17,13 @@ import { DashboardModule } from './dashboard/dashboard.module';
     SharedModule,
     AppRoutesModule,
     DashboardModule,
+  ],
+  providers: [
+    // declare global singletone services here
+    StatusService
+  ],
+  exports: [
+    DashboardModule
   ],
   bootstrap: [AppComponent]
 })

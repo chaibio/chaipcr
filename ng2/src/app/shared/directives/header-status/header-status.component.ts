@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 
 import { Experiment } from '../../models/experiment.model';
 import { ExperimentService } from '../../services/experiment/experiment.service';
-import { StatusService } from '../../services/status/status.service';
+import { StatusService } from '../../../services/status/status.service';
 import { StatusData } from '../../models/status.model';
 
 import 'rxjs/add/operator/takeUntil';

@@ -3,9 +3,9 @@ import { Http } from '@angular/http';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 
-import { BaseHttp } from '../shared/services/base_http/base_http.service';
-import { SessionService } from '../shared/services/session/session.service';
-import { LoginFormData } from '../shared/models/login-form-data.model'
+import { BaseHttp } from '../../shared/services/base_http/base_http.service';
+import { SessionService } from '../../shared/services/session/session.service';
+import { LoginFormData } from '../../shared/models/login-form-data.model'
 
 @Component({
   templateUrl: './login.component.html',

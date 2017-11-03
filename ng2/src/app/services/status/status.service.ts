@@ -4,9 +4,9 @@ import { Observable } from 'rxjs/Observable'
 import { BehaviorSubject } from 'rxjs/BehaviorSubject'
 import 'rxjs/operator/map'
 
-import { AuthHttp } from '../auth_http/auth_http.service'
-import { WindowRef } from '../windowref/windowref.service'
-import { StatusData } from '../../models/status.model'
+import { AuthHttp } from '../../shared/services/auth_http/auth_http.service'
+import { WindowRef } from '../../shared/services/windowref/windowref.service'
+import { StatusData } from '../../shared/models/status.model'
 import { initialStatusData } from './initial-status-data'
 
 @Injectable()

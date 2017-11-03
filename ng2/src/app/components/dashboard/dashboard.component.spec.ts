@@ -1,13 +1,12 @@
 import { TestBed, async, inject } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 
-import { SharedModule } from '../shared/shared.module';
-import { DashboardRoutingModule } from './dashboard.routing.module';
+import { SharedModule } from '../../shared/shared.module';
 import { DashboardComponent } from './dashboard.component';
 import { HomeModule } from './home/home.module';
 
-import { StatusService } from '../shared/services/status/status.service'
-import { ExperimentService } from '../shared/services/experiment/experiment.service'
+import { StatusService } from '../../services/status/status.service'
+import { ExperimentService } from '../../shared/services/experiment/experiment.service'
 
 const mockExperimentService = {
   getExperiments: () => {
@@ -26,9 +25,9 @@ describe('DashboardComponent', () => {
       imports: [
         RouterTestingModule,
         SharedModule,
-        DashboardRoutingModule,
         HomeModule,
       ],
+      providers: [StatusService],
       declarations: [
         DashboardComponent
       ]
