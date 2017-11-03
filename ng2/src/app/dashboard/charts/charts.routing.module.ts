@@ -6,7 +6,7 @@ import { AmplificationComponent } from './amplification/amplification.component'
 
 const routes: Routes = [
   {
-    path: 'exp/:id',
+    path: 'charts/exp/:id',
     component: ChartsComponent,
     children: [
       {

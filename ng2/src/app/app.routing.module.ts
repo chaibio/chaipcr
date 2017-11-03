@@ -7,10 +7,10 @@ import { LoginComponent } from './login/login.component';
 import { LoginRouteGuard } from './login/login.route.guard';
 
 const appRoutes: Routes = [
-  {
-    path: '',
-    loadChildren: './dashboard/dashboard.module#DashboardModule'
-  },
+  //{
+  //  path: '',
+  //  loadChildren: './dashboard/dashboard.module#DashboardModule'
+  //},
   {
     path: 'login',
     component: LoginComponent,
