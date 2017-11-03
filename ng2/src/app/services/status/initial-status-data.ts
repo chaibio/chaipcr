@@ -3,11 +3,11 @@ import { StatusData } from '../../shared/models/status.model'
 export const initialStatusData: StatusData = {
   experiment_controller: {
     experiment: {
-      id: -1,
-      name: '',
-      estimated_duration: 0,
-      paused_duration: 0,
-      run_duration: 0
+      id: null,
+      name: null,
+      estimated_duration: null,
+      paused_duration: null,
+      run_duration: null 
     },
     machine: {
       state: '',

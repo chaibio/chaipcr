@@ -26,7 +26,7 @@ const appRoutes: Routes = [
         component: ChartsComponent,
         children: [
           {
-            path: 'amplification',
+            path: '',
             component: AmplificationComponent
           }
         ]

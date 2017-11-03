@@ -3,7 +3,7 @@
     {{ experiment? experiment.name : 'Loading...' }}
   </div>
 <!--experiment valid, lid is close-->
-  <div class="status-indicator" *ngIf="experiment && !experiment.started_at && !experiment.completed_at && state==='idle' && !statusData.optics.lid_open">
+  <div class="status-indicator" *ngIf="!!state && experiment && !experiment.started_at && !experiment.completed_at && state==='idle' && !statusData.optics.lid_open">
     <div class="message">
       <span class="message-text"></span>
     </div>
@@ -12,20 +12,20 @@
   </div>
 
   <!--experiment invalid, lid is open-->
-  <div class="status-indicator" *ngIf="experiment && !experiment.started_at && !experiment.completed_at && state==='idle' && statusData.optics.lid_open">
+  <div class="status-indicator" *ngIf="!!state && experiment && !experiment.started_at && !experiment.completed_at && state==='idle' && statusData.optics.lid_open">
     <div class="message">
       <span class="message-text">LID IS OPEN</span>
     </div>
     <a class="button disabled">BEGIN EXPERIMENT</a>
   </div>
   <!--experiment completed successfully-->
-  <div class="status-indicator" *ngIf="experiment && experiment.completed_at && !(state !== 'idle' && isCurrentExperiment())">
+  <div class="status-indicator" *ngIf="!!state && experiment && experiment.completed_at && !(state !== 'idle' && isCurrentExperiment())">
     <div class="message">
       COMPLETED
     </div>
   </div>
   <!--experiment failed-->
-  <div class="status-indicator" *ngIf="experiment && (experiment.started_at && !experiment.completed_at && !(state !== 'idle' && isCurrentExperiment()))">
+  <div class="status-indicator" *ngIf="!!state && experiment && (experiment.started_at && !experiment.completed_at && !(state !== 'idle' && isCurrentExperiment()))">
     <div class="message">
       <span class="failed">FAILED</span>
       <span class="message-text" *ngIf="experiment.completion_status === 'aborted'">
@@ -37,7 +37,7 @@
     </div>
   </div>
   <!--holding stage-->
-  <div class="status-indicator" *ngIf="experiment && (experiment.started_at && experiment.completed_at && state !== 'idle' && isCurrentExperiment())">
+  <div class="status-indicator" *ngIf="!!state && experiment && (experiment.started_at && experiment.completed_at && state !== 'idle' && isCurrentExperiment())">
     <div class="message">
       <span class="message-text" *ngIf="!analyzed">
         Analyzing... Holding Temperature of {{ statusData.heat_block.temperature.toFixed(1)  }}
@@ -47,7 +47,7 @@
       </span>
     </div>
   </div>
-  <div class="status-indicator" *ngIf="experiment && (!experiment.started_at && !experiment.completed_at && state !== 'idle' && !isCurrentExperiment())">
+  <div class="status-indicator" *ngIf="!!state && experiment && (!experiment.started_at && !experiment.completed_at && state !== 'idle' && !isCurrentExperiment())">
     <div class="message">
       <span class="message-text" *ngIf="!analyzed">
         ANOTHER EXPERIMENT IS RUNNING

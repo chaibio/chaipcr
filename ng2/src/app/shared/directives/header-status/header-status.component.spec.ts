@@ -23,6 +23,7 @@ import { ExperimentMockInstance } from '../../models/experiment.model.mock';
 import { StatusDataMockInstance } from '../../models/status.model.mock';
 import { mockStatusReponse } from '../../../services/status/mock-status-response';
 import { WindowRef } from '../../services/windowref/windowref.service';
+import { initialStatusData } from '../../../services/status/initial-status-data';
 
 let getExperimentCB: any = null;
 let expUpdatesCB: any = null;
@@ -104,6 +105,21 @@ describe('HeaderStatusComponent Directive', () => {
       expect(fixture.debugElement.nativeElement.querySelector('.exp-name').innerHTML.trim()).toBe(exp.name)
 
     }))
+
+  it('should not show messages when status data is null', inject(
+    [StatusService],
+    (statusService: StatusService) => {
+      let fixture = TestBed.createComponent(TestingComponent)
+      fixture.componentInstance.id = exp.id
+      fixture.detectChanges()
+      getExperimentCB(exp)
+      statusService.$data.next(initialStatusData)
+      fixture.detectChanges()
+      let el = fixture.debugElement.nativeElement
+      expect(el.querySelector('.message')).toBeFalsy()
+
+    }
+  ))
 
   describe('When status is idle', () => {
 
