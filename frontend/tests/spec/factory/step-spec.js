@@ -56,7 +56,8 @@ describe("Testing functionalities of step", function() {
       canvas: {
         name: "canvas",
         remove: function() {},
-        renderAll: function() {}
+        renderAll: function() {},
+        add: function() {},
       }
     };
 
@@ -813,7 +814,373 @@ describe("Testing functionalities of step", function() {
     step.rampSpeedGraphics();
 
     expect(_stepGraphics.rampSpeed).toHaveBeenCalled();
-    expect(step.rampSpeedGroup.setVisible).toHaveBeenCalled();
+    expect(step.rampSpeedGroup.setVisible).toHaveBeenCalledWith(false);
+
+  });
+
+  it("It should test rampSpeedGraphics method, when rampSpeed is less than 5", function() {
+
+    step.rampSpeedNumber = 3;
+    step.rampSpeedGroup = {
+      setVisible: function() {}
+    };
+
+    spyOn(_stepGraphics, "rampSpeed");
+    spyOn(step.rampSpeedGroup, "setVisible");
+
+    step.rampSpeedGraphics();
+
+    expect(_stepGraphics.rampSpeed).toHaveBeenCalled();
+    expect(step.rampSpeedGroup.setVisible).not.toHaveBeenCalled();
     
   });
+
+  it("It should test swapMoveStepStatus method", function() {
+
+    var status  = true;
+    step.dots = {
+      setVisible: function() {}
+    };
+
+    spyOn(step.dots, "setVisible");
+
+    step.swapMoveStepStatus(status);
+
+    expect(step.dots.setVisible).toHaveBeenCalledWith(status);
+  });
+
+  it("It should test render method", function() {
+
+    spyOn(step, "setLeft").and.returnValue(true);
+    spyOn(step, "addName").and.returnValue(true);
+
+    spyOn(_stepGraphics, "addBorderRight").and.returnValue(true);
+    spyOn(_stepGraphics, "addBorderLeft").and.returnValue(true);
+    
+    spyOn(step, "getUniqueName").and.returnValue(true);
+    spyOn(step, "rampSpeedGraphics").and.returnValue(true);
+
+    spyOn(_stepGraphics, "initNumberText").and.returnValue(true);
+    spyOn(_stepGraphics, "initAutoDelta").and.returnValue(true);
+    spyOn(_stepGraphics, "autoDeltaDetails").and.returnValue(true);
+    
+    spyOn(step, "numberingValue").and.returnValue(true);
+
+    spyOn(_stepGraphics, "deleteButton").and.returnValue(true);
+    spyOn(_stepGraphics, "stepFooter").and.returnValue(true);
+    spyOn(_stepGraphics, "stepComponents").and.returnValue(true);
+
+    step.stepGroup = {};
+    step.rampSpeedGroup = {};
+    step.closeImage = {};
+    step.dots = {};
+
+    spyOn(step.canvas, "add");
+    spyOn(step, "setShadows").and.returnValue(true);
+    spyOn(step, "addCircle").and.returnValue(true);
+
+    step.render();
+
+    expect(step.setLeft).toHaveBeenCalled();
+    expect(step.addName).toHaveBeenCalled();
+    expect(_stepGraphics.addBorderRight).toHaveBeenCalled();
+    expect(_stepGraphics.addBorderLeft).toHaveBeenCalled();
+    expect(step.getUniqueName).toHaveBeenCalled();
+    expect(step.rampSpeedGraphics).toHaveBeenCalled();
+    expect(_stepGraphics.initNumberText).toHaveBeenCalled();
+    expect(_stepGraphics.initAutoDelta).toHaveBeenCalled();
+    expect(_stepGraphics.autoDeltaDetails).toHaveBeenCalled();
+    expect(step.numberingValue).toHaveBeenCalled();
+    expect(_stepGraphics.deleteButton).toHaveBeenCalled();
+    expect(_stepGraphics.stepFooter).toHaveBeenCalled();
+    expect(_stepGraphics.stepComponents).toHaveBeenCalled();
+
+    expect(step.canvas.add).toHaveBeenCalledTimes(4);
+
+    expect(step.setShadows).toHaveBeenCalled();
+    expect(step.addCircle).toHaveBeenCalled();
+
+    expect(step.visualComponents.stepGroup).toEqual(jasmine.any(Object));
+  });
+
+  it("It should test setShadows method", function() {
+
+    step.stepName = {
+      setShadow: function() {}
+    };
+    step.deltaSymbol = {
+      setShadow: function() {}
+    };
+    step.autoDeltaTempTime = {
+      setShadow: function() {}
+    };
+    step.autoDeltaStartCycle = {
+      setShadow: function() {}
+    };
+    step.numberingTextCurrent = {
+      setShadow: function() {}
+    };
+    step.numberingTextTotal = {
+      setShadow: function() {}
+    };
+
+    step.shadowText = "Shadows";
+    
+    spyOn(step.stepName, "setShadow");
+    spyOn(step.deltaSymbol, "setShadow");
+    spyOn(step.autoDeltaTempTime, "setShadow");
+    spyOn(step.autoDeltaStartCycle, "setShadow");
+    spyOn(step.numberingTextCurrent, "setShadow");
+    spyOn(step.numberingTextTotal, "setShadow");
+
+    step.setShadows();
+
+    expect(step.stepName.setShadow).toHaveBeenCalled();
+    expect(step.deltaSymbol.setShadow).toHaveBeenCalled();
+    expect(step.autoDeltaTempTime.setShadow).toHaveBeenCalled();
+    expect(step.autoDeltaStartCycle.setShadow).toHaveBeenCalled();
+    expect(step.numberingTextCurrent.setShadow).toHaveBeenCalled();
+    expect(step.numberingTextTotal.setShadow).toHaveBeenCalled();
+
+  });
+
+  it("It should test manageFooter method", function() {
+
+    var color = "red";
+    var obj = {
+      name: "ChaiBio",
+      setFill: function() {}
+    };
+
+    step.dots = {
+      forEachObject: function(func) {
+        func(obj);
+      }
+    };
+
+    spyOn(obj, "setFill");
+
+    step.manageFooter(color);
+
+    expect(obj.setFill).toHaveBeenCalled();
+  });
+
+  it("It should test manageFooter method when name !== backgroundRect ", function() {
+
+    var color = "red";
+    var obj = {
+      name: "backgroundRect",
+      setFill: function() {}
+    };
+
+    step.dots = {
+      forEachObject: function(func) {
+        func(obj);
+      }
+    };
+
+    spyOn(obj, "setFill");
+
+    step.manageFooter(color);
+
+    expect(obj.setFill).not.toHaveBeenCalled();
+  });
+
+  describe("Testing different scenarios in selectStep method", function() {
+    
+    it("It should test selectStep method, when no condition is satisfied", function() {
+
+      step.parentStage = {
+        parent: {
+          editStageStatus: false
+        }
+      };
+
+      step.stepName = {
+        setFill: function() {}
+      };
+
+      step.numberingTextCurrent = {
+        setFill: function() {}
+      };
+
+      step.numberingTextTotal = {
+        setFill: function() {}
+      };
+
+      spyOn(step, "manageBorder").and.returnValue(true);
+      spyOn(step.stepName, "setFill").and.returnValue(true);
+      spyOn(step.numberingTextCurrent, "setFill").and.returnValue(true);
+      spyOn(step.numberingTextTotal, "setFill").and.returnValue(true);
+
+      step.selectStep();
+
+      expect(step.manageBorder).toHaveBeenCalledWith('black');
+      expect(step.stepName.setFill).toHaveBeenCalledWith('black');
+      expect(step.numberingTextCurrent.setFill).toHaveBeenCalledWith('black');
+      expect(step.numberingTextTotal.setFill).toHaveBeenCalledWith('black');
+
+    });
+
+    it("It should test selectStep method when editStageStatus is true", function() {
+
+      step.parentStage = {
+        parent: {
+          editStageStatus: true
+        }
+      };
+
+      step.stepName = {
+        setFill: function() {}
+      };
+
+      step.numberingTextCurrent = {
+        setFill: function() {}
+      };
+
+      step.numberingTextTotal = {
+        setFill: function() {}
+      };
+
+      spyOn(step, "manageBorder").and.returnValue(true);
+      spyOn(step.stepName, "setFill").and.returnValue(true);
+      spyOn(step.numberingTextCurrent, "setFill").and.returnValue(true);
+      spyOn(step.numberingTextTotal, "setFill").and.returnValue(true);
+      spyOn(step, "manageFooter").and.returnValue(true);
+
+      step.selectStep();
+
+      expect(step.manageBorder).toHaveBeenCalledWith('black');
+      expect(step.stepName.setFill).toHaveBeenCalledWith('black');
+      expect(step.numberingTextCurrent.setFill).toHaveBeenCalledWith('black');
+      expect(step.numberingTextTotal.setFill).toHaveBeenCalledWith('black');
+      expect(step.manageFooter).toHaveBeenCalledWith('black');
+
+    });
+
+    it("It should test selectStep method when editStageStatus is true and has previouslySelected", function() {
+      
+      _previouslySelected.circle = {
+
+      };
+
+      step.parentStage = {
+        parent: {
+          editStageStatus: true
+        }
+      };
+
+      step.stepName = {
+        setFill: function() {}
+      };
+
+      step.numberingTextCurrent = {
+        setFill: function() {}
+      };
+
+      step.numberingTextTotal = {
+        setFill: function() {}
+      };
+
+      spyOn(step, "unSelectStep").and.returnValue(true);
+      spyOn(step, "manageBorder").and.returnValue(true);
+      spyOn(step.stepName, "setFill").and.returnValue(true);
+      spyOn(step.numberingTextCurrent, "setFill").and.returnValue(true);
+      spyOn(step.numberingTextTotal, "setFill").and.returnValue(true);
+      spyOn(step, "manageFooter").and.returnValue(true);
+
+      step.selectStep();
+
+      expect(step.unSelectStep).toHaveBeenCalled();
+      expect(step.manageBorder).toHaveBeenCalledWith('black');
+      expect(step.stepName.setFill).toHaveBeenCalledWith('black');
+      expect(step.numberingTextCurrent.setFill).toHaveBeenCalledWith('black');
+      expect(step.numberingTextTotal.setFill).toHaveBeenCalledWith('black');
+      expect(step.manageFooter).toHaveBeenCalledWith('black');
+
+    });
+
+  });
+
+  it("It should test unSelectedStep method", function() {
+
+    step.parentStage = {
+      parent: {
+        editStageStatus: false
+      }
+    };
+
+    _previouslySelected.circle = {
+      parent: {
+        manageBorderPrevious: function() {},
+        stepName: {
+          setFill: function() {}
+        },
+        numberingTextCurrent: {
+          setFill: function() {}
+        },
+        numberingTextTotal: {
+          setFill: function() {}
+        }
+
+      }
+    };   
+
+    var prevStep = _previouslySelected.circle.parent;
+
+    spyOn(prevStep, "manageBorderPrevious");
+    spyOn(prevStep.stepName, "setFill");
+    spyOn(prevStep.numberingTextCurrent, "setFill");
+    spyOn(prevStep.numberingTextTotal, "setFill");
+
+    step.unSelectStep();
+
+    expect(prevStep.manageBorderPrevious).toHaveBeenCalled();
+    expect(prevStep.stepName.setFill).toHaveBeenCalled();
+    expect(prevStep.numberingTextCurrent.setFill).toHaveBeenCalled();
+    expect(prevStep.numberingTextTotal.setFill).toHaveBeenCalled();
+
+  });
+
+  it("It should test unSelectedStep method when editStageStatus is true", function() {
+
+    step.parentStage = {
+      parent: {
+        editStageStatus: true
+      }
+    };
+
+    _previouslySelected.circle = {
+      parent: {
+        manageBorderPrevious: function() {},
+        stepName: {
+          setFill: function() {}
+        },
+        numberingTextCurrent: {
+          setFill: function() {}
+        },
+        numberingTextTotal: {
+          setFill: function() {}
+        },
+        manageFooter: function() {}
+      }
+    };   
+
+    var prevStep = _previouslySelected.circle.parent;
+
+    spyOn(prevStep, "manageBorderPrevious");
+    spyOn(prevStep.stepName, "setFill");
+    spyOn(prevStep.numberingTextCurrent, "setFill");
+    spyOn(prevStep.numberingTextTotal, "setFill");
+    spyOn(prevStep, "manageFooter");
+
+    step.unSelectStep();
+
+    expect(prevStep.manageBorderPrevious).toHaveBeenCalled();
+    expect(prevStep.stepName.setFill).toHaveBeenCalled();
+    expect(prevStep.numberingTextCurrent.setFill).toHaveBeenCalled();
+    expect(prevStep.numberingTextTotal.setFill).toHaveBeenCalled();
+    expect(prevStep.manageFooter).toHaveBeenCalled();
+  });
+
 });
