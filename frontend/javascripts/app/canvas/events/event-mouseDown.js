@@ -55,7 +55,7 @@ angular.module("canvasApp").factory('mouseDown', [
         for(var i = 0; i < items.length; i++) {
           ParentKanvas.canvas.add(items[i]);
         }
-        
+
         ParentKanvas.canvas.renderAll();
       };
 
@@ -220,7 +220,9 @@ angular.module("canvasApp").factory('mouseDown', [
             step.parentStage.nextStage.moveAllStepsAndStages(true); 
           }
 
-          ParentKanvas.moveDots.setLeft(step.left + 6).setCoords().setVisible(true);
+          ParentKanvas.moveDots.setLeft(step.left + 6);
+          ParentKanvas.moveDots.setCoords();
+          ParentKanvas.moveDots.setVisible(true);
           ParentKanvas.canvas.bringToFront(ParentKanvas.moveDots);
           circleManager.togglePaths(false); //put it back later
           
