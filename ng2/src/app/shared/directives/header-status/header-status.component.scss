@@ -20,10 +20,13 @@
 
   .header-right-container {
     float: left;
+    line-height: 50px;
 
     .exp-name {
       float: left;
       width: 50%;
+      padding-left: 15px;
+      font-size: 16px;
     }
 
     .status-indicator {
