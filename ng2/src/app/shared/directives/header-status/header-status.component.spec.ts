@@ -14,6 +14,7 @@ import {
   MockBackend
 } from '@angular/http/testing';
 import { Router } from '@angular/router';
+import ngStyles from 'ng-style';
 
 import { AuthHttp } from '../../services/auth_http/auth_http.service';
 import { StatusService } from '../../../services/status/status.service';
@@ -437,9 +438,11 @@ describe('HeaderStatusComponent Directive', () => {
       it('should display actual remaining time', inject(
         [StatusService],
         (statusService: StatusService) => {
+          let p = 0.5
+          let r = 5
 
-          spyOn(statusService, 'timePercentage').and.returnValue(0.5);
-          spyOn(statusService, 'timeRemaining').and.returnValue(5);
+          spyOn(statusService, 'timePercentage').and.returnValue(p);
+          spyOn(statusService, 'timeRemaining').and.returnValue(r);
 
           getExperimentCB(exp)
           this.fixture.detectChanges()
@@ -448,11 +451,15 @@ describe('HeaderStatusComponent Directive', () => {
           let el = this.fixture.debugElement.nativeElement
 
           expect(el.querySelector('.message-text > span').innerHTML.trim()).toBe('IN PROGRESS...')
-          expect(el.querySelector('.message-text > strong').innerHTML.trim()).toBe(this.timePipe.transform(5))
-          let headerCon = el.querySelector('.header-right-container')
-          console.log(el)
+          expect(el.querySelector('.message-text > strong').innerHTML.trim()).toBe(this.timePipe.transform(r))
+          let bg = el.querySelector('.bg-placeholder')
+          let s = {
+            background: `linear-gradient(left,  #64b027 0%,#c6e35f ${p * 100 || 0}%,#5d8329 ${p*100 || 0}%,#5d8329 100%)`
+          }
 
-          expect(el.style.background).toBe(`-webkit-linear-gradient(left,  #64b027 0%,#c6e35f #{50}%,#5d8329 #{50}%,#5d8329 100%)`)
+          let style  = ngStyles(s)
+
+          expect(bg.getAttribute('style')).toBe(style)
 
         }
       ))

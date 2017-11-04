@@ -39,8 +39,8 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
         this.extraceStatusData(statusData);
       })
 
-    let p = 50
-    this.background = `linear-gradient(left,  #64b027 0%,#c6e35f ${p || 0}%,#5d8329 ${p || 0}%,#5d8329 100%)`
+    //let p = 50
+    //this.background = `linear-gradient(left,  #64b027 0%,#c6e35f ${p || 0}%,#5d8329 ${p || 0}%,#5d8329 100%)`
   }
 
   @Input('experiment-id') expId: number;
@@ -78,7 +78,7 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
     this.remainingTime = this.statusService.timeRemaining();
     if(this.state === 'running' && this.isCurrentExperiment()) {
       let p = this.statusService.timePercentage() * 100
-      //this.background = `-webkit-linear-gradient(left,  #64b027 0%,#c6e35f #{p || 0}%,#5d8329 #{p || 0}%,#5d8329 100%)`
+      this.background = `linear-gradient(left,  #64b027 0%,#c6e35f ${p || 0}%,#5d8329 ${p || 0}%,#5d8329 100%)`
       this.expService.$updates.subscribe((evt) => {
         if(evt === 'experiment:completed') {
           this.analyzed = true;
@@ -87,16 +87,12 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
     }
   }
 
-  public stringify (obj) {return JSON.stringify(obj) }
-
   public getStyles () {
+    if (!this.background) return this.sanitizer.bypassSecurityTrustStyle('')
     let s = {
-      background: this.background,
-      color: 'red'
+      background: this.background
     }
     let p = ngStyles(s)
-    console.log(p)
-    //console.log(p)
     return this.sanitizer.bypassSecurityTrustStyle(p)
 
   }
