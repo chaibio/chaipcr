@@ -78,7 +78,7 @@ angular.module("canvasApp").factory('mouseDown', [
         parentEventReference.setSummaryMode();
         return false;
       }
-
+      parentEventReference.mouseDown = true;
       switch(evt.target.name)  {      
         case "stepDataGroup":
           reference.stepDataGroupHandler(evt);
