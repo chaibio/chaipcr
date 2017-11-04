@@ -108,7 +108,7 @@ describe('HeaderStatusComponent Directive', () => {
 
     }))
 
-  it('should not show messages when status data is null', inject(
+  it('should not show messages when status data has not arrived yet', inject(
     [StatusService],
     (statusService: StatusService) => {
       let fixture = TestBed.createComponent(TestingComponent)
