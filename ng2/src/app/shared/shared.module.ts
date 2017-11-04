@@ -16,6 +16,7 @@ import { WindowRef } from './services/windowref/windowref.service';
 
 import { LogoutDirective } from './directives/logout/logout.directive';
 import { FullHeightDirective } from './directives/full-height/full-height.directive';
+import { FullWidthDirective } from './directives/full-width/full-width.directive';
 import { HeaderStatusComponent } from './directives/header-status/header-status.component';
 import { HrMinSecPipe } from './pipes/hr-min-secs/hr-min-secs.pipe';
 
@@ -23,6 +24,7 @@ import { HrMinSecPipe } from './pipes/hr-min-secs/hr-min-secs.pipe';
   declarations: [
     LogoutDirective,
     FullHeightDirective,
+    FullWidthDirective,
     HeaderStatusComponent,
     HrMinSecPipe
   ],
@@ -38,6 +40,7 @@ import { HrMinSecPipe } from './pipes/hr-min-secs/hr-min-secs.pipe';
     CommonModule,
     LogoutDirective,
     FullHeightDirective,
+    FullWidthDirective,
     HeaderStatusComponent,
     HrMinSecPipe
   ],

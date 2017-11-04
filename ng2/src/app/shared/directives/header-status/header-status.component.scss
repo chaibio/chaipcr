@@ -1,0 +1,35 @@
+.header-status {
+
+  box-shadow: 0px 3px 2px #999;
+
+  .menu-dropdown {
+    float: left;
+    background: #ddd;
+    width: 50px;
+    height: 50px;
+    padding: 10px;
+
+    .menu-bar {
+      width: 30px;
+      height: 3px;
+      background: grey;
+      margin-top: 5px;
+      border-radius: 3px;
+    }
+  }
+
+  .header-right-container {
+    float: left;
+
+    .exp-name {
+      float: left;
+      width: 50%;
+    }
+
+    .status-indicator {
+      float: left;
+      width: 50%;
+    }
+  }
+
+}
