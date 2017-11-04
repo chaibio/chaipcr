@@ -38,7 +38,7 @@ export class StatusService {
     if (!this.data) return 0
     else {
       let exp = this.data.experiment_controller.experiment
-      return exp.run_duration/(exp.estimated_duration + exp.paused_duration)
+      return exp.run_duration / (exp.estimated_duration + exp.paused_duration)
     }
   }
 

@@ -418,6 +418,7 @@ describe('HeaderStatusComponent Directive', () => {
     })
 
     describe('When experiment is in running state', () => {
+
       beforeEach(async(() => {
         statusData.experiment_controller.machine.state = "running"
         statusData.experiment_controller.machine.thermal_state = "running"
@@ -437,6 +438,9 @@ describe('HeaderStatusComponent Directive', () => {
         [StatusService],
         (statusService: StatusService) => {
 
+          spyOn(statusService, 'timePercentage').and.returnValue(0.5);
+          spyOn(statusService, 'timeRemaining').and.returnValue(5);
+
           getExperimentCB(exp)
           this.fixture.detectChanges()
           statusService.$data.next(statusData)
@@ -444,8 +448,11 @@ describe('HeaderStatusComponent Directive', () => {
           let el = this.fixture.debugElement.nativeElement
 
           expect(el.querySelector('.message-text > span').innerHTML.trim()).toBe('IN PROGRESS...')
-          let t = statusService.timeRemaining()
-          expect(el.querySelector('.message-text > strong').innerHTML.trim()).toBe(this.timePipe.transform(t))
+          expect(el.querySelector('.message-text > strong').innerHTML.trim()).toBe(this.timePipe.transform(5))
+          let headerCon = el.querySelector('.header-right-container')
+          console.log(el)
+
+          expect(el.style.background).toBe(`-webkit-linear-gradient(left,  #64b027 0%,#c6e35f #{50}%,#5d8329 #{50}%,#5d8329 100%)`)
 
         }
       ))
