@@ -26,7 +26,7 @@
         "intensity": "60",
         "collectData": "false",
         "lid_open": "false",
-        "photodiodeValue": "1"
+        "photodiodeValue": ["1"]
     },
     "heatSink":
     {

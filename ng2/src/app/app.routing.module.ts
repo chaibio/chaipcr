@@ -22,7 +22,7 @@ const appRoutes: Routes = [
         component: HomeComponent,
       },
       {
-        path: 'charts/exp/:id',
+        path: 'charts/exp/:id/amplification',
         component: ChartsComponent,
         children: [
           {
