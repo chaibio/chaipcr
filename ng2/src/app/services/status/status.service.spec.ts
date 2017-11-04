@@ -156,7 +156,7 @@ describe('StatusService', () => {
         statusService.fetchData().subscribe( res => {
           let exp = res.experiment_controller.experiment
           expect(statusService.timePercentage()).toBe(exp.run_duration/(exp.estimated_duration + exp.paused_duration ))
-          expect(statusService.timeRemaining()).toBe((exp.run_duration + exp.paused_duration) - exp.run_duration)
+          expect(statusService.timeRemaining()).toBe(350 + 10 - 50)
         })
 
       }))

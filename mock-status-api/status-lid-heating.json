@@ -26,9 +26,9 @@
         "intensity": "60",
         "collectData": "false",
         "lid_open": "false",
-        "photodiodeValue": ["1"]
+        "photodiode_value": ["1"]
     },
-    "heatSink":
+    "heat_sink":
     {
         "temperature": "31.599",
         "fanDrive": "0"

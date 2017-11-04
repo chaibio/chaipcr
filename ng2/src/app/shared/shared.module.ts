@@ -17,12 +17,14 @@ import { WindowRef } from './services/windowref/windowref.service';
 import { LogoutDirective } from './directives/logout/logout.directive';
 import { FullHeightDirective } from './directives/full-height/full-height.directive';
 import { HeaderStatusComponent } from './directives/header-status/header-status.component';
+import { HrMinSecPipe } from './pipes/hr-min-secs/hr-min-secs.pipe';
 
 @NgModule({
   declarations: [
     LogoutDirective,
     FullHeightDirective,
-    HeaderStatusComponent
+    HeaderStatusComponent,
+    HrMinSecPipe
   ],
   imports: [
     FormsModule,
@@ -36,7 +38,8 @@ import { HeaderStatusComponent } from './directives/header-status/header-status.
     CommonModule,
     LogoutDirective,
     FullHeightDirective,
-    HeaderStatusComponent
+    HeaderStatusComponent,
+    HrMinSecPipe
   ],
   providers: [
     Title,

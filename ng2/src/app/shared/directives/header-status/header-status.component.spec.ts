@@ -24,6 +24,7 @@ import { StatusDataMockInstance } from '../../models/status.model.mock';
 import { mockStatusReponse } from '../../../services/status/mock-status-response';
 import { WindowRef } from '../../services/windowref/windowref.service';
 import { initialStatusData } from '../../../services/status/initial-status-data';
+import { HrMinSecPipe } from '../../pipes/hr-min-secs/hr-min-secs.pipe';
 
 let getExperimentCB: any = null;
 let expUpdatesCB: any = null;
@@ -71,7 +72,8 @@ describe('HeaderStatusComponent Directive', () => {
       ],
       declarations: [
         TestingComponent,
-        HeaderStatusComponent
+        HeaderStatusComponent,
+        HrMinSecPipe
       ],
       providers: [
         {
@@ -88,7 +90,7 @@ describe('HeaderStatusComponent Directive', () => {
 
   }))
 
-  it('should show loading text initially', inject(
+  it('should show loading initially', inject(
     [ExperimentService],
     (expService: ExperimentService) => {
 
@@ -225,9 +227,24 @@ describe('HeaderStatusComponent Directive', () => {
         this.fixture.detectChanges();
       })
 
+      it('should NOT show completed experiment', inject(
+        [ExperimentService, StatusService],
+        (expService: ExperimentService, statusService: StatusService) => {
+
+          exp.completion_status = "aborted"
+
+          statusService.$data.next(statusData)
+          this.fixture.detectChanges();
+          let el = this.fixture.debugElement.nativeElement.querySelector('.status-indicator > .message');
+          expect(el.innerHTML.trim()).not.toBe('COMPLETED')
+
+        }))
+
       it('should show completed experiment', inject(
         [ExperimentService, StatusService],
         (expService: ExperimentService, statusService: StatusService) => {
+
+          exp.completion_status = 'success';
 
           statusService.$data.next(statusData)
           this.fixture.detectChanges();
@@ -236,13 +253,13 @@ describe('HeaderStatusComponent Directive', () => {
 
         }))
 
+
     })
 
     describe('When experiment failed', () => {
 
       beforeEach(() => {
 
-        exp.completed_at = null;
         expect(exp.started_at).toBeTruthy();
 
         this.fixture = TestBed.createComponent(TestingComponent);
@@ -255,7 +272,8 @@ describe('HeaderStatusComponent Directive', () => {
         [StatusService],
         (statusService: StatusService) => {
 
-          ExperimentMockInstance.completion_status = 'aborted';
+          exp.completion_status = 'aborted';
+          exp.completed_at = new Date()
 
           getExperimentCB(exp);
           this.fixture.detectChanges();
@@ -270,10 +288,32 @@ describe('HeaderStatusComponent Directive', () => {
         }
       ))
 
+
+      it('should NOT show an error occured', inject(
+        [StatusService],
+        (statusService: StatusService) => {
+
+          exp.completed_at = new Date()
+          exp.completion_message = "";
+          exp.completion_status = 'success';
+
+          getExperimentCB(exp);
+          this.fixture.detectChanges();
+
+          statusService.$data.next(statusData);
+          this.fixture.detectChanges();
+          let failedEl = this.fixture.debugElement.nativeElement.querySelector('.status-indicator .failed');
+          expect(failedEl).toBeFalsy();
+        }
+      ))
+
+
       it('should show an error occured', inject(
         [StatusService],
         (statusService: StatusService) => {
 
+          exp.completed_at = new Date()
+          exp.completion_message = "";
           exp.completion_status = 'some error';
 
           getExperimentCB(exp);
@@ -344,6 +384,75 @@ describe('HeaderStatusComponent Directive', () => {
       }
     ))
 
+    describe('When experiment is in lead heating state', () => {
+      beforeEach(async(() => {
+        statusData.experiment_controller.machine.state = "lid_heating"
+        statusData.experiment_controller.machine.thermal_state = "idle"
+        statusData.experiment_controller.experiment.id = exp.id
+
+        exp.started_at = "2017-08-30T16:30:13.000Z";
+        exp.completed_at = null;
+
+        this.fixture = TestBed.createComponent(TestingComponent);
+        this.fixture.componentInstance.id = exp.id;
+        this.fixture.detectChanges();
+
+      }))
+
+      it('should display estimating remaining time', inject(
+        [StatusService],
+        (statusService: StatusService) => {
+
+          getExperimentCB(exp)
+          this.fixture.detectChanges()
+          statusService.$data.next(statusData)
+          this.fixture.detectChanges()
+          let el = this.fixture.debugElement.nativeElement
+
+          expect(el.querySelector('.message-text > span').innerHTML.trim()).toBe('IN PROGRESS...')
+          expect(el.querySelector('.message-text > strong').innerHTML.trim()).toBe('ESTIMATING TIME REMAINING')
+
+        }
+      ))
+
+    })
+
+    describe('When experiment is in running state', () => {
+      beforeEach(async(() => {
+        statusData.experiment_controller.machine.state = "running"
+        statusData.experiment_controller.machine.thermal_state = "running"
+        statusData.experiment_controller.experiment.id = exp.id
+
+        exp.started_at = "2017-08-30T16:30:13.000Z";
+        exp.completed_at = null;
+
+        this.fixture = TestBed.createComponent(TestingComponent);
+        this.fixture.componentInstance.id = exp.id;
+        this.fixture.detectChanges();
+        this.timePipe = new HrMinSecPipe()
+
+      }))
+
+      it('should display actual remaining time', inject(
+        [StatusService],
+        (statusService: StatusService) => {
+
+          getExperimentCB(exp)
+          this.fixture.detectChanges()
+          statusService.$data.next(statusData)
+          this.fixture.detectChanges()
+          let el = this.fixture.debugElement.nativeElement
+
+          expect(el.querySelector('.message-text > span').innerHTML.trim()).toBe('IN PROGRESS...')
+          let t = statusService.timeRemaining()
+          expect(el.querySelector('.message-text > strong').innerHTML.trim()).toBe(this.timePipe.transform(t))
+
+        }
+      ))
+
+    })
+
+
     describe('When experiment is in holding state', () => {
 
       beforeEach(async(() => {
@@ -354,6 +463,7 @@ describe('HeaderStatusComponent Directive', () => {
         this.fixture = TestBed.createComponent(TestingComponent);
         this.fixture.componentInstance.id = exp.id;
         this.fixture.detectChanges();
+
       }))
 
       it('should display analyzing', inject(
