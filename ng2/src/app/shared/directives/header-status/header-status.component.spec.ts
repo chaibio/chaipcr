@@ -464,6 +464,28 @@ describe('HeaderStatusComponent Directive', () => {
         }
       ))
 
+      it('should fetch experiment when state changes to idle', inject(
+        [StatusService, ExperimentService],
+        (statusService: StatusService, expService: ExperimentService) => {
+
+          getExperimentCB(exp)
+          this.fixture.detectChanges()
+          statusService.$data.next(statusData)
+          this.fixture.detectChanges()
+
+          //spyOn(expService, 'getExperiment').and.callThrough()
+          statusData.experiment_controller.machine.state = 'idle'
+          statusService.$data.next(statusData)
+          this.fixture.detectChanges()
+          expect(expService.getExperiment).toHaveBeenCalledTimes(2)
+          exp.name = 'xxx'
+          getExperimentCB(exp)
+          this.fixture.detectChanges()
+          expect(this.fixture.debugElement.nativeElement.querySelector('.exp-name').innerHTML.trim()).toBe('xxx')
+
+        }
+      ))
+
     })
 
 

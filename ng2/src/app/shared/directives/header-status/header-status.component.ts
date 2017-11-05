@@ -33,6 +33,7 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
   private background: string;
   private ngUnsubscribe: Subject<void> = new Subject<void>(); // = new Subject(); in Typescript 2.2-2.4
   private expCompleteSub: Subscription;
+  private oldState: string;
 
   constructor(private el: ElementRef, private expService: ExperimentService, private statusService: StatusService, private router: Router, private sanitizer: DomSanitizer) {
     statusService.$data
@@ -45,11 +46,7 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
   @Input('experiment-id') expId: number;
 
   ngOnChanges() {
-    if (this.expId) {
-      this.expService.getExperiment(+this.expId).subscribe((exp: Experiment) => {
-        this.experiment = exp;
-      })
-    }
+    this.fetchExperiment()
   }
   //https://stackoverflow.com/questions/38008334/angular-rxjs-when-should-i-unsubscribe-from-subscription
   ngOnDestroy() {
@@ -71,6 +68,14 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
     }
   }
 
+  private fetchExperiment() {
+    if (this.expId) {
+      this.expService.getExperiment(+this.expId).subscribe((exp: Experiment) => {
+        this.experiment = exp;
+      })
+    }
+  }
+
   private extraceStatusData (d: StatusData) {
     this.statusData = d;
     this.state = d.experiment_controller.machine.state;
@@ -83,6 +88,10 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
         }
       });
     }
+    if (this.oldState && this.oldState !== 'idle' && this.state === 'idle') {
+      this.fetchExperiment()
+    }
+    this.oldState = this.state
   }
 
   public getStyles () {
