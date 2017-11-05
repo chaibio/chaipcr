@@ -454,7 +454,7 @@ describe('HeaderStatusComponent Directive', () => {
           expect(el.querySelector('.message-text > strong').innerHTML.trim()).toBe(this.timePipe.transform(r))
           let bg = el.querySelector('.bg-placeholder')
           let s = {
-            background: `linear-gradient(left,  #64b027 0%,#c6e35f ${p * 100 || 0}%,#5d8329 ${p*100 || 0}%,#5d8329 100%)`
+            background: `linear-gradient(left,  #64b027 0%,#c6e35f ${p*100}%,#5d8329 ${p*100}%,#5d8329 100%)`
           }
 
           let style  = ngStyles(s)
@@ -489,6 +489,13 @@ describe('HeaderStatusComponent Directive', () => {
           this.fixture.detectChanges();
           let el = this.fixture.debugElement.nativeElement;
           expect(el.querySelector('.status-indicator .message-text').innerHTML.trim()).toBe(`Analyzing... Holding Temperature of ${statusData.heat_block.temperature.toFixed(1)}`);
+          let bgCon = el.querySelector('.bg-placeholder')
+          let p = 1
+          let s = {
+            background: `linear-gradient(left,  #64b027 0%,#c6e35f ${p * 100}%,#5d8329 ${p*100}%,#5d8329 100%)`
+          }
+          let style = ngStyles(s)
+          expect(bgCon.getAttribute('style')).toBe(style)
         }
       ))
 
@@ -503,6 +510,14 @@ describe('HeaderStatusComponent Directive', () => {
           this.fixture.detectChanges();
           let el = this.fixture.debugElement.nativeElement;
           expect(el.querySelector('.status-indicator .message-text').innerHTML.trim()).toBe(`Experiment Complete, Holding Temperature of ${statusData.heat_block.temperature.toFixed(1)}`);
+          let bgCon = el.querySelector('.bg-placeholder')
+          let p = 1
+          let s = {
+            background: `linear-gradient(left,  #64b027 0%,#c6e35f ${p * 100}%,#5d8329 ${p*100}%,#5d8329 100%)`
+          }
+          let style = ngStyles(s)
+          expect(bgCon.getAttribute('style')).toBe(style)
+
         }
       ))
 

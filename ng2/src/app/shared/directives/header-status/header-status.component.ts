@@ -15,6 +15,7 @@ import { StatusData } from '../../models/status.model';
 
 import 'rxjs/add/operator/takeUntil';
 import { Subject } from 'rxjs/Subject';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   selector: '[chai-header-status]',
@@ -29,8 +30,9 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
   public statusData: StatusData;
   public analyzed = false;
   public remainingTime: number;
-  public background: string;
+  private background: string;
   private ngUnsubscribe: Subject<void> = new Subject<void>(); // = new Subject(); in Typescript 2.2-2.4
+  private expCompleteSub: Subscription;
 
   constructor(private el: ElementRef, private expService: ExperimentService, private statusService: StatusService, private router: Router, private sanitizer: DomSanitizer) {
     statusService.$data
@@ -38,9 +40,6 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
       .subscribe((statusData: StatusData) => {
         this.extraceStatusData(statusData);
       })
-
-    //let p = 50
-    //this.background = `linear-gradient(left,  #64b027 0%,#c6e35f ${p || 0}%,#5d8329 ${p || 0}%,#5d8329 100%)`
   }
 
   @Input('experiment-id') expId: number;
@@ -77,9 +76,8 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
     this.state = d.experiment_controller.machine.state;
     this.remainingTime = this.statusService.timeRemaining();
     if(this.state === 'running' && this.isCurrentExperiment()) {
-      let p = this.statusService.timePercentage() * 100
-      this.background = `linear-gradient(left,  #64b027 0%,#c6e35f ${p || 0}%,#5d8329 ${p || 0}%,#5d8329 100%)`
-      this.expService.$updates.subscribe((evt) => {
+      if (this.expCompleteSub) return;
+      this.expCompleteSub = this.expService.$updates.subscribe((evt) => {
         if(evt === 'experiment:completed') {
           this.analyzed = true;
         }
@@ -88,12 +86,21 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
   }
 
   public getStyles () {
-    if (!this.background) return this.sanitizer.bypassSecurityTrustStyle('')
+    if (!this.state || !this.experiment) return this.sanitizer.bypassSecurityTrustStyle('')
+    let bg = '';
+    let p = this.statusService.timePercentage() * 100
+    if (this.state !== 'idle' && this.isCurrentExperiment())
+      bg = `linear-gradient(left,  #64b027 0%,#c6e35f ${p || 0}%,#5d8329 ${p || 0}%,#5d8329 100%)`
+    if (this.isCurrentExperiment() && !this.analyzed && this.experiment.completed_at)
+      bg = `linear-gradient(left,  #64b027 0%,#c6e35f ${100}%,#5d8329 ${100}%,#5d8329 100%)`
+    if (this.isCurrentExperiment() && this.analyzed && this.experiment.completed_at && this.state !== 'idle')
+      bg = `linear-gradient(left,  #64b027 0%,#c6e35f ${100}%,#5d8329 ${100}%,#5d8329 100%)`
+
     let s = {
-      background: this.background
+      background: bg
     }
-    let p = ngStyles(s)
-    return this.sanitizer.bypassSecurityTrustStyle(p)
+    let style = ngStyles(s)
+    return this.sanitizer.bypassSecurityTrustStyle(style)
 
   }
 
