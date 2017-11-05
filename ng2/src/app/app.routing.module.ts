@@ -49,6 +49,9 @@ const appRoutes: Routes = [
     SharedModule,
     RouterModule.forRoot(appRoutes),
   ],
+  providers: [
+    LoginRouteGuard
+  ],
   exports: [
     RouterModule,
   ]
