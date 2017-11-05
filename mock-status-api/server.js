@@ -257,9 +257,11 @@ app.post('/control/start', function (req, res, next) {
 
 function stop () {
   completeExperiment(experiment_id, function () {
-    data = status_idle;
     lastLog = null;
     clearTimeout(intrvl);
+    setTimeout(function () {
+      data = status_idle;
+    }, 5000)
   });
 }
 

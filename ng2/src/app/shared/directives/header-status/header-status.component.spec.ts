@@ -465,7 +465,7 @@ describe('HeaderStatusComponent Directive', () => {
           expect(el.querySelector('.message-text > strong').innerHTML.trim()).toBe(this.timePipe.transform(r))
           let bg = el.querySelector('.bg-placeholder')
           let s = {
-            background: `linear-gradient(left,  #64b027 0%,#c6e35f ${p*100}%,#5d8329 ${p*100}%,#5d8329 100%)`
+            background: `linear-gradient(left,  #64b027 0%,#c6e35f ${p*100}%,#0c2c03 ${p*100}%,#0c2c03 100%)`
           }
 
           let style  = ngStyles(s)
@@ -524,7 +524,7 @@ describe('HeaderStatusComponent Directive', () => {
           let bgCon = el.querySelector('.bg-placeholder')
           let p = 1
           let s = {
-            background: `linear-gradient(left,  #64b027 0%,#c6e35f ${p * 100}%,#5d8329 ${p*100}%,#5d8329 100%)`
+            background: `linear-gradient(left,  #64b027 0%,#c6e35f ${p * 100}%,#0c2c03 ${p*100}%,#0c2c03 100%)`
           }
           let style = ngStyles(s)
           expect(bgCon.getAttribute('style')).toBe(style)
@@ -545,7 +545,7 @@ describe('HeaderStatusComponent Directive', () => {
           let bgCon = el.querySelector('.bg-placeholder')
           let p = 1
           let s = {
-            background: `linear-gradient(left,  #64b027 0%,#c6e35f ${p * 100}%,#5d8329 ${p*100}%,#5d8329 100%)`
+            background: `linear-gradient(left,  #64b027 0%,#c6e35f ${p * 100}%,#0c2c03 ${p*100}%,#0c2c03 100%)`
           }
           let style = ngStyles(s)
           expect(bgCon.getAttribute('style')).toBe(style)

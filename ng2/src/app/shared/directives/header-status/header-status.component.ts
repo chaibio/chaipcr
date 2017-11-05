@@ -99,11 +99,11 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
     let bg = ''
     let p = this.statusService.timePercentage() * 100
     if (this.state !== 'idle' && this.isCurrentExperiment())
-      bg = `linear-gradient(left,  #64b027 0%,#c6e35f ${p || 0}%,#5d8329 ${p || 0}%,#5d8329 100%)`
+      bg = `linear-gradient(left,  #64b027 0%,#c6e35f ${p || 0}%,#0c2c03 ${p || 0}%,#0c2c03 100%)`
     if (this.isCurrentExperiment() && !this.analyzed && this.experiment.completed_at)
-      bg = `linear-gradient(left,  #64b027 0%,#c6e35f ${100}%,#5d8329 ${100}%,#5d8329 100%)`
+      bg = `linear-gradient(left,  #64b027 0%,#c6e35f ${100}%,#0c2c03 ${100}%,#0c2c03 100%)`
     if (this.isCurrentExperiment() && this.analyzed && this.experiment.completed_at && this.state !== 'idle')
-      bg = `linear-gradient(left,  #64b027 0%,#c6e35f ${100}%,#5d8329 ${100}%,#5d8329 100%)`
+      bg = `linear-gradient(left,  #64b027 0%,#c6e35f ${100}%,#0c2c03 ${100}%,#0c2c03 100%)`
 
     let s = bg === '' ? bg : {
       background: bg

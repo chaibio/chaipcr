@@ -4,7 +4,7 @@
     <div class="menu-bar"></div>
     <div class="menu-bar"></div>
   </div>
-  <div class="header-right-container clearfix" chai-full-width offset="50">
+  <div class="header-right-container clearfix" chai-full-width offset="70">
     <div class="bg-placeholder clearfix" [attr.style]="getBackgroundStyle()" [ngClass]="{completed: experiment && ((!(status !=='idle' && isCurrentExperiment()) && experiment.completed_at) || experiment.started_at && state === 'idle')}">
       <div class="exp-name x">
         {{ experiment? experiment.name : 'Loading...' }}
