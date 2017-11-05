@@ -94,7 +94,7 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
     this.oldState = this.state
   }
 
-  public getStyles () {
+  public getBackgroundStyle () {
     if (!this.state || !this.experiment) return this.sanitizer.bypassSecurityTrustStyle('')
     let bg = '';
     let p = this.statusService.timePercentage() * 100
@@ -105,7 +105,7 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
     if (this.isCurrentExperiment() && this.analyzed && this.experiment.completed_at && this.state !== 'idle')
       bg = `linear-gradient(left,  #64b027 0%,#c6e35f ${100}%,#5d8329 ${100}%,#5d8329 100%)`
 
-    let s = {
+    let s = bg == '' ? bg : {
       background: bg
     }
     let style = ngStyles(s)

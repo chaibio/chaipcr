@@ -21,9 +21,16 @@
   .header-right-container {
     float: left;
     line-height: 50px;
+    color: #fff;
+    background: #333;
 
     .bg-placeholder {
       width: 100%;
+
+      &.completed {
+        background-image: url('/assets/images/header-complete.png');
+        background-size: auto 100%;
+      }
     }
 
     .exp-name {

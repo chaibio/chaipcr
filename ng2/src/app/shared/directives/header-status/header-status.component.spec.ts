@@ -127,7 +127,7 @@ describe('HeaderStatusComponent Directive', () => {
   describe('When status is idle', () => {
 
     beforeEach(async(() => {
-      statusData = JSON.parse(JSON.stringify(StatusDataMockInstance))
+      //statusData = JSON.parse(JSON.stringify(StatusDataMockInstance))
       statusData.experiment_controller.machine.state = "idle"
     }))
 
@@ -137,6 +137,7 @@ describe('HeaderStatusComponent Directive', () => {
         exp = JSON.parse(JSON.stringify(ExperimentMockInstance))
         exp.started_at = null;
         exp.completed_at = null;
+        statusData.experiment_controller.experiment.id = null
       }))
 
       it('should not start experiment when lid is open', inject(
@@ -210,6 +211,12 @@ describe('HeaderStatusComponent Directive', () => {
           }
         ))
 
+        afterEach(() => {
+          let bgCon = this.fixture.debugElement.nativeElement.querySelector('.bg-placeholder')
+          expect(bgCon.getAttribute('style')).toBe('')
+          expect(bgCon.classList.contains('completed')).toBe(false)
+        })
+
       })
 
     })
@@ -253,6 +260,10 @@ describe('HeaderStatusComponent Directive', () => {
           expect(el.innerHTML.trim()).toBe('COMPLETED')
 
         }))
+
+      afterEach(() => {
+        expect(this.fixture.debugElement.nativeElement.querySelector('.bg-placeholder').classList.contains('completed')).toBe(true)
+      })
 
 
     })
