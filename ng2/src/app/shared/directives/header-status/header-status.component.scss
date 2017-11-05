@@ -43,6 +43,11 @@
     .status-indicator {
       float: left;
       width: 50%;
+
+      .failed {
+        background-color: #e02127;
+        padding: 2px 5px;
+      }
     }
   }
 

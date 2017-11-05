@@ -35,7 +35,7 @@
       <!--experiment failed-->
       <div class="status-indicator" *ngIf="!!state && experiment && (experiment.started_at && experiment.completion_status !=='success' && !(state !== 'idle' && isCurrentExperiment()))">
         <div class="message">
-          <span class="failed">FAILED</span>
+          <span class="failed SHR">FAILED</span>
           <span class="message-text" *ngIf="experiment.completion_status === 'aborted'">
             USER CANCELLED
           </span>
