@@ -37,12 +37,16 @@ export class AuthHttp extends BaseHttp {
         // let's make option object
         options = { headers: new Headers() };
       }
-      url = this.appendTokenToUrl(url)
-      options.headers.set('Authorization', `Bearer ${token}`);
+      if (url.indexOf('8000') >= 0)
+        url = this.appendTokenToUrl(url)
+      else
+        options.headers.set('Authorization', `Bearer ${token}`);
     } else {
       // we have to add the token to the url object
-      url.url = this.appendTokenToUrl(url.url)
-      url.headers.set('Authorization', `Bearer ${token}`);
+      if (url.url.indexOf('8000') >= 0)
+        url.url = this.appendTokenToUrl(url.url)
+      else
+        url.headers.set('Authorization', `Bearer ${token}`);
     }
 
     return super.request(url, options).catch(res => {

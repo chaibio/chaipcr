@@ -532,13 +532,14 @@ describe('HeaderStatusComponent Directive', () => {
       ))
 
       it('should display experiment complete, holding temperature', inject(
-        [StatusService],
-        (statusService: StatusService) => {
+        [StatusService, ExperimentService],
+        (statusService: StatusService, expService: ExperimentService) => {
           getExperimentCB(exp);
           this.fixture.detectChanges();
           statusService.$data.next(statusData);
           this.fixture.detectChanges();
           expUpdatesCB('experiment:completed');
+          expect(expService.getExperiment).toHaveBeenCalledTimes(2)
           this.fixture.detectChanges();
           let el = this.fixture.debugElement.nativeElement;
           expect(el.querySelector('.status-indicator .message-text').innerHTML.trim()).toBe(`Experiment Complete, Holding Temperature of ${statusData.heat_block.temperature.toFixed(1)}`);

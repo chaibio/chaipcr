@@ -85,6 +85,7 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
       this.expCompleteSub = this.expService.$updates.subscribe((evt) => {
         if(evt === 'experiment:completed') {
           this.analyzed = true;
+          this.fetchExperiment()
         }
       });
     }

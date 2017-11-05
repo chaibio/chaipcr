@@ -82,6 +82,7 @@ describe('AuthHttp', () => {
         spyOn(localStorage, 'getItem').and.returnValue(token)
 
         backend.connections.subscribe((connection: MockConnection) => {
+          expect(connection.request.headers.get('Authorization')).toBeFalsy()
           expect(connection.request.url).toBe(`${url}?access_token=${token}`)
         })
 
