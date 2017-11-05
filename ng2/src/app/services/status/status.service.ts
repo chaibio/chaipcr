@@ -14,6 +14,7 @@ export class StatusService {
 
   $data: BehaviorSubject<StatusData> = new BehaviorSubject(initialStatusData)
   private data: StatusData;
+  private fetchInterval: any;
 
   constructor(private http: AuthHttp, private wref: WindowRef) {}
 
@@ -29,9 +30,13 @@ export class StatusService {
   }
 
   startSync() {
-    this.wref.nativeWindow().setInterval(() => {
+    this.fetchInterval = this.wref.nativeWindow().setInterval(() => {
       this.fetchData().subscribe()
     }, 1000)
+  }
+
+  stopSync() {
+    this.wref.nativeWindow().clearInterval(this.fetchInterval)
   }
 
   timePercentage(): number {

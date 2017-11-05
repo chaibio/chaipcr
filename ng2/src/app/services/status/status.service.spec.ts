@@ -128,6 +128,9 @@ describe('StatusService', () => {
         tick(5000)
         expect(statusService.fetchData).toHaveBeenCalledTimes(5)
         expect(subscribeSpy).toHaveBeenCalledTimes(5)
+        statusService.stopSync()
+        tick(2000)
+        expect(subscribeSpy).toHaveBeenCalledTimes(5)
         discardPeriodicTasks()
       })()
     }

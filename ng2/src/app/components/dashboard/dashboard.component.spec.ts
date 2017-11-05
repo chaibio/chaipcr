@@ -52,4 +52,15 @@ describe('DashboardComponent', () => {
     }
   ))
 
+  it('should call statusService.stopSync() on destroy event', inject(
+    [StatusService],
+    (statusService: StatusService) => {
+      spyOn(statusService, 'stopSync')
+      const fixture = TestBed.createComponent(DashboardComponent)
+      fixture.componentInstance.ngOnDestroy()
+      expect(statusService.stopSync).toHaveBeenCalled()
+    }
+  ))
+
+
 });
