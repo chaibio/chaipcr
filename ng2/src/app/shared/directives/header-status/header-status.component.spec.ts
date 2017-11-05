@@ -418,7 +418,7 @@ describe('HeaderStatusComponent Directive', () => {
 
     })
 
-    describe('When experiment is in running state', () => {
+    describe('When experiment is done loading and heating', () => {
 
       beforeEach(async(() => {
         statusData.experiment_controller.machine.state = "running"
@@ -473,7 +473,6 @@ describe('HeaderStatusComponent Directive', () => {
           statusService.$data.next(statusData)
           this.fixture.detectChanges()
 
-          //spyOn(expService, 'getExperiment').and.callThrough()
           statusData.experiment_controller.machine.state = 'idle'
           statusService.$data.next(statusData)
           this.fixture.detectChanges()
