@@ -463,7 +463,7 @@ describe('HeaderStatusComponent Directive', () => {
           let el = this.fixture.debugElement.nativeElement
 
           expect(el.querySelector('.message-text > span').innerHTML.trim()).toBe('IN PROGRESS...')
-          expect(el.querySelector('.message-text > strong').innerHTML.trim()).toBe(this.timePipe.transform(r))
+          expect(el.querySelector('.message-text > strong').innerHTML.trim()).toBe(this.timePipe.transform(r) + ' Remaining')
           let bg = el.querySelector('.bg-placeholder')
           let s = {
             background: `linear-gradient(left,  #64b027 0%,#c6e35f ${p*100}%,#0c2c03 ${p*100}%,#0c2c03 100%)`
