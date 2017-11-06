@@ -206,6 +206,7 @@ describe('HeaderStatusComponent Directive', () => {
             el.querySelector('.button').click()
             this.fixture.detectChanges()
             expect(expService.startExperiment).toHaveBeenCalledWith(exp.id)
+            expect(expService.getExperiment).toHaveBeenCalledTimes(2)
             expect(router.navigate).toHaveBeenCalledWith(['/charts', 'exp', exp.id, 'amplification'])
 
           }

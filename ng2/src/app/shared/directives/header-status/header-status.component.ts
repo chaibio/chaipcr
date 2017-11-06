@@ -56,6 +56,7 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
 
   public startExperiment() {
     this.expService.startExperiment(+this.expId).subscribe(() => {
+      this.fetchExperiment()
       this.router.navigate(['/charts', 'exp', +this.expId, 'amplification'])
     })
   }
