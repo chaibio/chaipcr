@@ -18,50 +18,43 @@
  */
 
 angular.module("canvasApp").factory('mouseOut', [
-  'ExperimentLoader',
-  'previouslySelected',
-  'previouslyHoverd',
-  'scrollService',
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService) {
+  function() {
+    var reference = this, parentEventReference = null, ParentKanvas = null, 
+    originalScope, left, startPos;
 
     this.init = function(C, $scope, that) {
 
-      var me;
-      this.canvas.on("mouse:out", function(evt) {
-        if(! evt.target) return false;
+      parentEventReference = that;
+      ParentKanvas = C;
+      originalScope = $scope;
+
+      this.canvas.on("mouse:out", reference.mouseOutHandler);
+    };
+
+    this.mouseOutHandler = function(evt) {
+
+      if(! evt.target) return false;
 
         switch(evt.target.name) {
 
-          case "stepGroup":
-            // May be we need something in here
-          break;
           case "controlCircleGroup":
-            that.canvas.hoverCursor = "move";
+            parentEventReference.canvas.hoverCursor = "move";
           break;
 
           case "moveStep":
-            that.canvas.hoverCursor = "move";
+            parentEventReference.canvas.hoverCursor = "move";
           break;
 
           case "moveStage":
-            that.canvas.hoverCursor = "move";
+            parentEventReference.canvas.hoverCursor = "move";
           break;
 
           case "deleteStepButton":
-            that.canvas.hoverCursor = "move";
+            parentEventReference.canvas.hoverCursor = "move";
           break;
-
-          case "temperatureDisplayText":
-            //evt.target.trigger('editing:exited');
-          break;
-
-          case "holdTimeDisplayText":
-            //evt.target.trigger('editing:exited');
-          break;
-
         }
-      });
     };
+
     return this;
   }
 ]);
