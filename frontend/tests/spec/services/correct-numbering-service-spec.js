@@ -1,6 +1,9 @@
 describe("Testing correctNumberingService", function() {
 
-    beforeEach(module('ChaiBioTech'));
+    beforeEach(module('ChaiBioTech', function ($provide) {
+      mockCommonServices($provide);
+    }));
+
     var _correctNumberingService;
     
     beforeEach(inject(function(correctNumberingService) {

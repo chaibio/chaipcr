@@ -65,7 +65,7 @@ angular.module("canvasApp").factory('events', [
 
       textChanged.init.call(this, C, $scope, that);
 
-      htmlEvents.init.call(this, C, $scope, that);
+      htmlEvents.init.call(this, C, that);
 
       // Methods
       this.setSummaryMode = function() {

@@ -1,6 +1,9 @@
 describe("Testing stageGroup which is the container of the whole stage.", function() {
 
-  beforeEach(module('ChaiBioTech'));
+  beforeEach(module('ChaiBioTech', function ($provide) {
+    mockCommonServices($provide);
+  }));
+
   beforeEach(module('canvasApp'));
 
   var _stageGroup, _stageContents = [], left = 40;

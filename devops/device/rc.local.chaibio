@@ -11,6 +11,48 @@
 #
 # By default this script does nothing.
 
+export_pwm ()
+{
+	echo PWM: Exporting $1
+	for chip in $1/pwmchip?
+	do
+		echo exporting $chip
+		echo $2>$chip/export || continue
+		echo $chip/pwm$2>>/run/chaipcr/realtime/pwms.inf
+		ln -s $chip/pwm$2 /run/chaipcr/realtime/$3
+	done
+}
+
+pwm_setup_kernel49 ()
+{
+	ls /sys/class/pwm/pwmchip?/export >/dev/null
+	if [ $? -eq 0 ]
+	then
+		echo PWM Export: New kernel detected
+		if [ -e /run/chaipcr/realtime/
+		then
+			rm /run/chaipcr/realtime/ -r || true
+		fi
+		mkdir -p /run/chaipcr/realtime/ || true
+		
+		#Heat Sink: P9.14 ehrpwm1a:
+		export_pwm /sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm 0 kHeatSinkFanControl.pwm
+
+		#LED control: P9.28 eCAP2_PWM2
+		export_pwm /sys/devices/platform/ocp/48304000.epwmss/48304100.ecap/pwm 0 kLEDBlank.pwm
+
+		#Lid: P9.16 ehrpwm1b
+		export_pwm /sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm 1 kLidControl.pwm
+
+		#Head Block: P8.13 ehrpwm2b, P8.19 ehrpwm2a
+		export_pwm /sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm 1 kHeatBlockZone1.pwm
+		export_pwm /sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm 0 kHeatBlockZone2.pwm
+	
+		#LCD Backlight: P9.42
+		export_pwm /sys/devices/platform/ocp/48304000.epwmss/48304100.ecap/pwm 0 kLCDBacklight.pwm
+		ls -ahl /run/chaipcr/realtime/ || true
+	fi
+}
 
 wait_for_migrate () {
         echo "Checking for migrate script completation"
@@ -393,6 +435,8 @@ then
 		fi
 	fi
 fi
+
+pwm_setup_kernel49 >> $log_file 2>&1 || true
 check_upgrade_autorun >> $log_file 2>&1 || true &
 network_watchdog >> /dev/null 2>&1 || true
 check_corruption >> $log_file 2>&1 || true

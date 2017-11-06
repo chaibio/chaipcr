@@ -70,8 +70,8 @@ type AmpStepRampOutput
     # for ct method
     ct_fluos::Vector{AbstractFloat}
     # allelic discrimination
-    cluster_result_dict::OrderedDict{String,ClusteringResult}
     assignments_adj_labels_dict::OrderedDict{String,Vector{String}}
+    agr_dict::OrderedDict{String,AssignGenosResult}
 end # type AmpStepRampOutput
 
 type AmpStepRampOutput2Bjson
@@ -111,8 +111,9 @@ function process_amp(
 
     # allelic discrimination
     ad_cycs::Union{Integer,AbstractVector}=0, # allelic discrimination: cycles of fluorescence to be used, 0 means the last cycle
-    cluster_method::String="k-medoids", # allelic discrimination: "k-means", "k-medoids"
-    expected_genotypes_raw::AbstractMatrix=DEFAULT_egr, # each column is a vector of binary genotype whose length is number of channels (0 => no signal, 1 => yes signal)
+    ctrl_well_dict::OrderedDict=CTRL_WELL_DICT,
+    cluster_method::String="k-means", # allelic discrimination: "k-means", "k-medoids"
+    expected_ncg_raw::AbstractMatrix=DEFAULT_encgr, # each column is a vector of binary genotype whose length is number of channels (0 => no signal, 1 => yes signal)
     categ_well_vec::AbstractVector=CATEG_WELL_VEC,
 
     out_sr_dict::Bool=true, # output an OrderedDict keyed by `sr_str`s
@@ -227,7 +228,7 @@ function process_amp(
             dye_in, dyes_2bfild,
             min_reliable_cyc, baseline_cyc_bounds, cq_method, ct_fluos, af_key, kwdict_mbq, ipopt_print2file_prefix,
             qt_prob_rc, kwdict_rc,
-            ad_cycs, cluster_method, expected_genotypes_raw, categ_well_vec,
+            ad_cycs, ctrl_well_dict, cluster_method, expected_ncg_raw, categ_well_vec,
             out_format_1sr, json_digits, verbose
         )
     end) # do sr_ele
@@ -613,8 +614,9 @@ function process_amp_1sr(
     qt_prob_rc::Real, # quantile probablity for fluo values per well
     kwdict_rc::Associative, # keyword arguments passed onto `report_cq`
     ad_cycs::Union{Integer,AbstractVector},
+    ctrl_well_dict::OrderedDict,
     cluster_method::String,
-    expected_genotypes_raw::AbstractMatrix,
+    expected_ncg_raw::AbstractMatrix,
     categ_well_vec::AbstractVector,
     out_format::String, # "full", "pre_json", "json"
     json_digits::Integer,
@@ -685,8 +687,8 @@ function process_amp_1sr(
         NaN_ary2, # n_max_d2
         fill("", num_fluo_wells, num_channels), # why_NaN
         ct_fluos,
-        OrderedDict{String,ClusteringResult}(), # cluster_result_dict
-        OrderedDict{String,Vector{String}}() # assignments_adj_labels_dict
+        OrderedDict{String,Vector{String}}(), # assignments_adj_labels_dict
+        OrderedDict{String,AssignGenosResult}() # agr_dict
     )
 
     if num_cycs <= 2
@@ -782,7 +784,14 @@ function process_amp_1sr(
 
     # allelic discrimination
     if dcv
-        full_amp_out.cluster_result_dict, full_amp_out.assignments_adj_labels_dict = process_ad(full_amp_out, ad_cycs, cluster_method, expected_genotypes_raw, categ_well_vec)
+        full_amp_out.assignments_adj_labels_dict, full_amp_out.agr_dict = process_ad(
+            full_amp_out,
+            ad_cycs,
+            ctrl_well_dict,
+            cluster_method,
+            expected_ncg_raw,
+            categ_well_vec
+        )
     end # if dcv
 
 

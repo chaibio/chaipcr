@@ -1,0 +1,397 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>freeup eMMC</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.17.2">
+      <optOut>false</optOut>
+    </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>build_machine</name>
+          <description>Building machine</description>
+          <defaultValue>192.168.1.66</defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>true</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+echo checking Jenkins server
+echo &quot;Bash version ${BASH_VERSION}...&quot;
+uname -a
+ls -ahl
+lsblk
+df -h
+echo user: $(whoami)
+
+echo Checking for nessasery packages:
+sudo apt-get -y -q install sshpass parted mdadm
+
+sudo chmod 777      /var/lib/jenkins/.ssh/known_hosts
+ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
+#ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
+
+sshpass -p temppwd ssh -t -oStrictHostKeyChecking=no debian@$build_machine &lt;&lt;&apos;ENDSSH&apos;
+echo enable root access with no password
+
+echo temppwd | sudo -S sed -i -e &apos;s:PermitEmptyPasswords no:PermitEmptyPasswords yes:g&apos; /etc/ssh/sshd_config
+sudo sed -i -e &apos;s:UsePAM yes:UsePAM no:g&apos; /etc/ssh/sshd_config
+sudo sed -i -e &apos;s:PermitRootLogin without-password:PermitRootLogin yes:g&apos; /etc/ssh/sshd_config
+sudo passwd -d -u root
+sudo su
+
+echo patching sshd_config
+    
+#sudo cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
+#KexAlgorithms diffie-hellman-group1-sha1
+#KexAlgorithms ecdh-sha2-nistp256
+#KexAlgorithms ecdh-sha2-nistp384
+#KexAlgorithms ecdh-sha2-nistp521
+#KexAlgorithms diffie-hellman-group-exchange-sha256
+#KexAlgorithms diffie-hellman-group14-sha1
+#Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+#EOF
+sudo cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
+KexAlgorithms diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+EOF
+
+ssh-keygen -A || true
+sudo /etc/init.d/ssh restart
+service ssh restart
+
+echo ssh daemon is restarted
+
+
+ENDSSH
+
+echo root access patching returned
+
+
+if grep $build_machine /var/lib/jenkins/.ssh/config
+then
+	echo /var/lib/jenkins/.ssh/config was patched already
+else
+	echo patching /var/lib/jenkins/.ssh/config
+	cat &lt;&lt;EOF &gt;&gt; /var/lib/jenkins/.ssh/config
+Host $build_machine
+		KexAlgorithms +diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+		Ciphers +3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+#		KexAlgorithms +diffie-hellman-group1-sha1
+#        KexAlgorithms +curve25519-sha256@libssh.org
+#        KexAlgorithms +ecdh-sha2-nistp256
+#        KexAlgorithms +ecdh-sha2-nistp384
+#        KexAlgorithms +ecdh-sha2-nistp521
+#        KexAlgorithms +diffie-hellman-group-exchange-sha256
+#        KexAlgorithms +diffie-hellman-group14-sha1
+EOF
+fi
+
+#if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
+#then
+#	echo sshd_config was patched already
+#else
+#	echo patching sshd_config
+#	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
+#KexAlgorithms diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+#Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+#EOF
+#	sudo service sshd restart
+#fi
+
+
+echo deleting root password in case of chaipcr
+sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;passwd -d -u root&quot;
+#echo done deleting root password
+
+
+if ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
+
+if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
+then
+	echo sshd_config was patched already
+else
+	echo patching sshd_config
+    
+	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
+		KexAlgorithms diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+		Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+	EOF
+	ssh-keygen -A || true
+
+	sudo service sshd restart
+    sudo service ssh restart
+    /etc/init.d/ssh restart
+	echo device is patched
+    ifconfig
+fi
+
+exit 0
+ENDSSH
+then
+   echo &quot;-t worked&quot;
+else
+echo &quot; trying -tt&quot;
+ssh -tt -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
+
+if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
+then
+	echo sshd_config was patched already
+else
+	echo patching sshd_config
+    
+	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
+KexAlgorithms diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+
+EOF
+	ssh-keygen -A || true
+
+	
+	sudo service sshd restart
+    sudo service ssh restart
+    /etc/init.d/ssh restart
+	echo device is patched
+    ifconfig
+fi
+
+exit 0
+ENDSSH
+
+fi
+
+echo Returned to host. connection check:
+ssh -oStrictHostKeyChecking=no -t root@$build_machine &apos;exit 0&apos;
+
+if ssh -oStrictHostKeyChecking=no -tt root@$build_machine &apos;exit 0&apos;
+then
+    echo key is added ok
+else
+    echo error adding key to known hosts.. retrying..
+    chmod 777 /var/lib/jenkins/.ssh/known_hosts
+	ssh -oStrictHostKeyChecking=no -t root@$build_machine &apos;exit 0&apos;
+fi
+
+counter=0
+until ssh -tt root@$build_machine &apos;exit 0&apos;
+do
+	counter=$(( $counter + 1 ))
+    if [ $counter -gt 10 ]
+    then
+    	echo Beaglebone is not available.
+    	exit 1
+    fi
+    
+	echo waiting for beaglebone to become connectable.
+	sleep 20
+done
+
+echo done connection check.
+sleep 20</command>
+    </hudson.tasks.Shell>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo &quot;Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}&quot;
+echo &quot;Slave Beaglebone at ${build_machine}&quot;
+echo checking build device 
+echo &quot;Bash version ${BASH_VERSION}...&quot;
+uname -a
+ls -ahl
+lsblk
+df -h
+</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo removing packages from the device at $build_machine
+
+wget http://repos.rcn-ee.net/ubuntu/conf/repos.rcn-ee.net.gpg.key
+apt-key add repos.rcn-ee.net.gpg.key
+rm repos.rcn-ee.net.gpg.key
+
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 9D6D8F6BC857C906
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7638D0442B90D010
+
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1655A0AB68576280
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D284E608A4C46402
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CF979FFA3D3D3ACC
+
+rm -r .julia
+rm -r tmp shared chaipcr
+
+apt-key update
+apt-get update 
+apt-get -q -y autoremove
+apt-get install -y -q -f
+
+sync
+
+apt-get  -y -q --purge autoremove libblas* autoconf automake autotools-dev 
+apt-get  -y -q -f install
+apt-get  -y -q --purge autoremove device-tree-compiler g++ gcc
+apt-get  -y -q -f install
+apt-get  -y -q --purge autoremove parted g++-4.7 g++-4.8 ntp ntpdate git unzip automake sshpass build-essential mysql-server lsb-release  nodejs ruby ruby-dev libmysqlclient-dev libxslt-dev libxml2-dev libtool linux-headers-`uname -r` cmake g++ ntp ntpdate git unzip automake sshpass build-essential libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev lib blas-dev liblapack-dev gcc-4.8 g++-4.8 gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas-common libblas3 libfftw3-double3 libfftw3-single3 libgfortran3 liblapack3 libllvm3.8 libmetis5 libopenblas-base libunwind8 libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gcc-4.8 g++-4.8 gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas-common libblas3 libfftw3-double3 libfftw3-single3 libgfortran3 liblapack3 libllvm3.8 libmetis5 libopenblas-base libunwind8 liblapack-dev liblapack3 libopenblas-base libopenblas-dev i2c-tools evtest git automake libtool device-tree-compiler libqt4-webkit libfontconfig1-dev libfreetype6-dev libx11-dev libxcursor-dev libxext-dev libxfixes-dev libxft-dev libxi-dev libxrandr-dev libxrender-dev libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3 libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools perl
+
+apt-get -f  -y -q install
+
+apt-get  -y -q --purge autoremove fakeroot 
+apt-get -f  -y -q install
+
+apt-get --purge  -y -q autoremove g++
+apt-get  -y -q --purge autoremove gcc 
+apt-get  -y -q -f install
+
+apt-get  -y -q --purge autoremove gfortran* git hdf5-tools i2c-tools 
+apt-get  -y -q --purge autoremove icu-devtools
+apt-get  -y -q --purge autoremove initramfs-tools libboost*
+apt-get -y -q remove qt4-default qt5-default gettext
+DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge libgtk-3-0
+DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge gcc-4.9 cmake perl5 perl 
+DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge ruby python2*
+
+apt-get  -y -q -f install
+
+rm /var/lib/gems/ -r
+rm /usr/lib/libjulia* /usr/lib/libmysql* /usr/lib/libLLVM*  /usr/lib/libsql* 
+rm /var/log/*gz
+rm /var/log/*1
+rm /var/log/mysql* -r
+rm /var/log/nginx/ -r
+find / -name julia -exec rm -r {} \;
+find / -name doc -exec rm -r {} \;
+rm -r /usr/local/lib/R
+rm -r /opt/QtEmbedded
+rm -r .gem
+
+
+exit 0
+
+</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+echo &quot;waitting for a restart&quot;
+for i in {0..300..60}
+do
+	echo &quot;Waiting for the build device to become ready! $i&quot;
+	sleep 60
+    if ping $build_machine -c 1
+    then
+    	echo device is finally up
+        sleep 120
+    	
+        
+        counter=0
+		until ssh -tt root@$build_machine &apos;exit 0&apos;
+		do
+			counter=$(( $counter + 1 ))
+    		if [ $counter -gt 10 ]
+    		then
+    			echo Beaglebone is not available.
+    			exit 1
+    		fi
+			echo waiting for beaglebone to become connectable $counter .
+			sleep 20
+	   
+		done
+
+
+        echo Moving to next task
+        
+        
+        
+        
+        
+        exit 0
+    fi
+done
+
+echo timeout waiting for the device to become ready!
+exit 1</command>
+    </hudson.tasks.Shell>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo zeroing
+echo 1500 &gt; /proc/sys/kernel/hung_task_timeout_secs
+
+dd if=/dev/zero of=/zeros.bigfile bs=16M
+sleep 60
+sync
+echo done writing
+rm /zeros.bigfile
+sleep 60
+sync
+echo done freeing up
+df -h
+
+mkdir -p /tmp/zeroer
+if mount /dev/mmcblk1p2 /tmp/zeroer
+then
+    dd if=/dev/zero of=/tmp/zeroer/zeros.bigfile bs=16M
+    sleep 60
+    sync
+    rm /tmp/zeroer/zeros.bigfile
+    sleep 60
+    sync
+    umount /tmp/zeroer
+fi
+
+if mount /dev/mmcblk1p3 /tmp/zeroer
+then
+    dd if=/dev/zero of=/tmp/zeroer/zeros.bigfile bs=16M
+    sleep 60
+    sync
+    rm /tmp/zeroer/zeros.bigfile
+    sleep 60
+    sync
+    umount /tmp/zeroer
+fi
+
+echo basic image zeroing done! restarting!
+
+df -h
+
+shutdown -r 1
+
+exit 0</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+echo &quot;waitting for a restart&quot;
+sleep 90
+
+for i in {0..1500..60}
+do
+	echo &quot;Waiting for the build device to become ready! $i&quot;
+	sleep 60
+    if ping $build_machine -c 1
+    then
+    	echo device is up and ready!
+        sleep 30
+        exit 0
+    fi
+done
+
+echo timeout waiting for the device to become ready!
+exit 1</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.8"/>
+  </buildWrappers>
+</project>

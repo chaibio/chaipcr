@@ -57,6 +57,8 @@ bool watchProcess(const std::string &command, int eventFd, WatchProcessCallback 
 
 bool getFileChecksum(const std::string &filePath, int eventFd, std::string &checksum);
 
+bool getPartitionAvailableSpace(const std::string &path, unsigned long &space);
+
 struct NullMutex
 {
      void lock() {}

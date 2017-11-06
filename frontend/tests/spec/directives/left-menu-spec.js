@@ -1,7 +1,11 @@
 describe("Specs for left menu directive", function() {
 
-  beforeEach(module("ChaiBioTech"));
+  beforeEach(module("ChaiBioTech", function ($provide) {
+    $provide.value('IsTouchScreen', function () {}); 
+  }));
+  
   var scope, compile, httpMock, paramId = 10;
+
   beforeEach(inject(function($rootScope, $compile,$httpBackend, $stateParams) {
     scope = $rootScope.$new();
     compile = $compile;

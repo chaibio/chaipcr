@@ -1,6 +1,10 @@
 describe("Test RUN/VIEW item directive, which shows up in left menu", function() {
 
-  beforeEach(module('ChaiBioTech'));
+  beforeEach(function () {
+    module('ChaiBioTech', function ($provide) {
+      $provide.value('IsTouchScreen', function () {})
+    });
+  });
 
   var scope, controllerService, httpMock, compile, templateCache, state, rootScope, Experiment;
 

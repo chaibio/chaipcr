@@ -43,7 +43,7 @@ window.ChaiBioTech.ngApp.service('TimeService', [
             durationArray[len - 2] = "0";
         }
 
-        if(durationArray[len - 2]) {
+        if(Number(durationArray[len - 2])) {
           MM = Number(durationArray[len - 2]);
         } else {
           console.log("Plz verify Minutes");
@@ -92,7 +92,7 @@ window.ChaiBioTech.ngApp.service('TimeService', [
 
       var hour = Math.floor(reading / 3600);
       hour = (hour < 10) ? hour : hour;
-			hour = (hour == 0) ? "0" + hour : hour ;
+			hour = (hour === 0) ? "0" + hour : hour ;
 
       var noMin = reading % 3600;
 

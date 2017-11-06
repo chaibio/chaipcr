@@ -1,34 +1,29 @@
 describe("Testing expName method", function() {
 
-    var _$rootScope, _expName;
+  var _$rootScope, _expName;
 
-    beforeEach(function() {
-        module('ChaiBioTech', function($provide) {
+  beforeEach(function() {
 
-            /*$provide.value('$rootScope', function() {
-                return {
-                    updateStageData: function() {},
-                    render: function() {}
-                };
-            });*/
-        });
+    module('ChaiBioTech', function($provide) {
+      mockCommonServices($provide)
+    });
 
-        
-        inject(function($injector) {
-            _rootScope = $injector.get('$rootScope');
-            _expName = $injector.get('expName');
-           
-        });
+    inject(function($injector) {
+      _$rootScope = $injector.get('$rootScope');
+      _expName = $injector.get('expName');
 
     });
-    it("It should test updateName method", function() {
 
-        var name = "ChaiBio";
-        console.log(_$rootScope, _expName);
-        //spyOn(_$rootScope, "$broadcast");
+  });
 
-        _expName.updateName(name);
+  it("It should test updateName method", function() {
 
-        expect(_expName.name).toEqual(name);
-    });
+    var name = "ChaiBio";
+    spyOn(_$rootScope, "$broadcast");
+
+    _expName.updateName(name);
+
+    expect(_expName.name).toEqual(name);
+    expect(_$rootScope.$broadcast).toHaveBeenCalled();
+  });
 });

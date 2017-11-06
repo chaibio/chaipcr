@@ -1,6 +1,9 @@
 describe("Testing stageDots, we click and drag stageDots to move stage", function() {
 
-  beforeEach(module('ChaiBioTech'));
+  beforeEach(module('ChaiBioTech', function ($provide) {
+    mockCommonServices($provide);
+  }));
+
   beforeEach(module('canvasApp'));
 
   var _stageDots, _this;

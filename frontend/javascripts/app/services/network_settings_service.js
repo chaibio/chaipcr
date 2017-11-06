@@ -38,6 +38,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     this.wifiShutDownInProgress = false;
     this.wifiRestartingInProgress = false;
     this.macAddress = null;
+    
     this.getWifiNetworks = function() {
 
       var delay = $q.defer();
@@ -53,19 +54,21 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     };
 
     this.getSettings = function() {
+
       this.userSettings = $.jStorage.get('userNetworkSettings');
-      if(that.userSettings.wifiSwitchOn /*&& that.wirelessError === false*/) {
+      this.accessLanLookup();
+
+      this.intervalKey = $interval(that.accessLanLookup, 2000);
+    };
+
+    this.accessLanLookup = function() {
+      if(this.userSettings.wifiSwitchOn /*&& that.wirelessError === false*/) {
         this.lanLookup();
       }
-
-      this.intervalKey = $interval(function() {
-        if(that.userSettings.wifiSwitchOn /*&& that.wirelessError === false*/) {
-          that.lanLookup();
-        }
-      }, 2000);
     };
 
     this.lanLookup = function() {
+
       $http.get(host + ':8000/network/wlan')
       .then(function(result) {
         that.processData(result);
@@ -75,6 +78,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     };
 
     this.processData = function(wlanOutput) {
+
       console.log("processing");
       if(this.wirelessError && wlanOutput.data.settings) {
         console.log("No more error");
@@ -119,6 +123,10 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
 
       $http.get(host + ':8000/network/wlan')
       .then(function(result) {
+        console.log(result.data, "bing");
+        if(! result.data.state) {
+          return null;
+        }
         if(result.data.state.status) {
           that.macAddress = result.data.state.macAddress;
         }
@@ -132,7 +140,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       $http.get(host + ':8000/network/eth0')
       .then(function(ethernet) {
         that.connectedEthernet = ethernet.data;
-        if(ethernet.data.state.address){
+        if(ethernet.data.state.address) {
           $rootScope.$broadcast("ethernet_detected");
         }
       });
@@ -172,7 +180,8 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       return delay.promise;
     };
 
-    this.changeToAutomatic = function(ethernet){
+    this.changeToAutomatic = function(ethernet) {
+
       ethernet.type = "dhcp";
       var delay = $q.defer();
       $http.put(host + ':8000/network/eth0', ethernet)

@@ -312,11 +312,11 @@ df -h
 echo Installing mysql
 dpkg --configure -a
 
-sudo debconf-set-selections &lt;&lt;&lt; &quot;mysql-server-5.5 mysql-server/root_password password &apos;&apos;&quot;
-sudo debconf-set-selections &lt;&lt;&lt; &quot;mysql-server-5.5 mysql-server/root_password_again password &apos;&apos;&quot;
+sudo debconf-set-selections &lt;&lt;&lt; &quot;mysql-server-5.5 mysql-server/root_password password chaipcr&quot;
+sudo debconf-set-selections &lt;&lt;&lt; &quot;mysql-server-5.5 mysql-server/root_password_again password chaipcr&quot;
 
-sudo debconf-set-selections &lt;&lt;&lt; &quot;mysql-server mysql-server/root_password password &apos;&apos;&quot;
-sudo debconf-set-selections &lt;&lt;&lt; &quot;mysql-server mysql-server/root_password_again password &apos;&apos;&quot;
+sudo debconf-set-selections &lt;&lt;&lt; &quot;mysql-server mysql-server/root_password password chaipcr&quot;
+sudo debconf-set-selections &lt;&lt;&lt; &quot;mysql-server mysql-server/root_password_again password chaipcr&quot;
 
 echo Installing mysql server package
 export DEBIAN_FRONTEND=noninteractive
@@ -324,24 +324,21 @@ sudo -E apt-get install -y -q --allow-unauthenticated mysql-server
 
 echo Installing mysql client package
 sudo -E apt-get install -y -q --allow-unauthenticated libmysqlclient-dev  || exit 1
+
 echo done installing mysql
 
-# resetting mysql password
+echo resetting mysql password
 
-    service mysql stop
-    mysqld_safe --skip-grant-tables &amp;
-    sleep 10
 cat &gt;&gt; mysql_password_flush.sql &lt;&lt; EOF
     UPDATE user SET password=PASSWORD(&apos;&apos;) WHERE user=&apos;root&apos;;
     FLUSH PRIVILEGES;
     exit
 EOF
 
-    mysql -u root mysql &lt; mysql_password_flush.sql
-    service mysql restart
+mysql -u root --password=chaipcr mysql &lt; mysql_password_flush.sql
 
-    rm mysql_password_flush.sql
-
+rm mysql_password_flush.sql
+echo done resetting mysql password
 </command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
@@ -557,7 +554,7 @@ sync
 
 echo Set environment variables 
 cat &gt; ~/.profile &lt;&lt; EOL
-    export SLOTS=/sys/devices/bone_capemgr.9/slots
+    export SLOTS=/sys/devices/platform/bone_capemgr/slots
     export PINS=/sys/kernel/debug/pinctrl/44e10800.pinmux/pins
     export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
     export TSLIB_TSEVENTTYPE=INPUT
@@ -660,12 +657,13 @@ echo installing QT
 dpkg --configure -a
 
 apt-get update
-apt-get install -y -q libqt4-webkit libfontconfig1-dev libfreetype6-dev libx11-dev libxcursor-dev libxext-dev libxfixes-dev libxft-dev libxi-dev libxrandr-dev libxrender-dev
+apt-get install -y -q libfontconfig1-dev libfreetype6-dev
 
 echo downloading compiled QT v4.8.6
 cd /sdcard/upgrade/
-wget $download_prefix/qt-everywhere-compiled-4.8.6.tgz
-tar xfv qt-everywhere-compiled-4.8.6.tgz
+#wget $download_prefix/qt-everywhere-compiled-4.8.6.tgz
+wget $download_prefix/qt-everywhere-slim-4.8.6.tgz
+tar xfv qt-everywhere-slim-4.8.6.tgz
 
 echo installing tslib first
 cd tslib-compile/tslib/
@@ -673,15 +671,17 @@ make install  || exit 1
 cd ../..
 
 echo downloading QT binaries
-cd qt-everywhere-opensource-src-4.8.6/
-
-make install || exit 1
+#cd qt-everywhere-opensource-src-4.8.6/
+#make install || exit 1
+mv opt/QtEmbedded /opt
+rm -r /opt/QtEmbedded/examples/
 
 cd /sdcard/upgrade/
 rm -r qt-everywhere-opensource-src-4.8.6
 rm qt-everywhere-compiled-4.8.6.tgz
+rm qt-everywhere-slim-4.8.6.tgz
 rm -r tslib-compile
-
+rm -r opt
 cd
 cp /opt/QtEmbedded/bin /usr/lib/arm-linux-gnueabihf/qt4/ -r || true
 

@@ -1,6 +1,9 @@
 describe("Testing the stage roof properties", function() {
 
-  beforeEach(module('ChaiBioTech'));
+  beforeEach(module('ChaiBioTech', function ($provide) {
+    mockCommonServices($provide);
+  }));
+
   beforeEach(module('canvasApp'));
 
   var _stageRoof;
@@ -49,7 +52,5 @@ describe("Testing the stage roof properties", function() {
   it("Should check the x1", function() {
     expect(_stageRoof.y2).toEqual(24);
   });
-
-
 
 });

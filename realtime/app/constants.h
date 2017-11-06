@@ -43,7 +43,6 @@ const double kLidThermistorT0Resistance = 10000;    //ohms
 const double kLidThermistorT0 = 298.15;             //kelvins
 
 const double kLidMinTargetTemp = 0;
-const double kLidMaxTargetTemp = 130;
 
 const double kLidLowTempShutdownThreshold = -2;
 const double kLidHighTempShutdownThreshold = 140;
@@ -79,9 +78,6 @@ const unsigned long kHeatBlockZone2PWMPeriodNs = 50000;
 
 const double kHeatBlockZonesPIDMin = -1;
 const double kHeatBlockZonesPIDMax = 1;
-
-const double kHeatBlockZonesMinTargetTemp = 4;
-const double kHeatBlockZonesMaxTargetTemp = 100;
 
 const double kHeatBlockLowTempShutdownThreshold = -5;
 const double kHeatBlockHighTempShutdownThreshold = 120;
@@ -125,6 +121,8 @@ const double kPCRBeginStepTemperatureThreshold = 0.5;
 const long kTemperatureLoggerInterval = 1000;
 const long kTemperatureLoggerFlushInterval = 1000; //ms
 
+const long kDataSpaceCheckInterval = 60 * 1000;
+
 //Heat Sink
 const double kHeatSinkTargetTemperature = 40; //C
 const unsigned int kHeatSinkThermistorVoltageDividerResistanceOhms = 6800;
@@ -147,6 +145,8 @@ const std::string kAppLogName = "QPCRApplication";
 
 const std::string kDeviceFilePath = "/perm/device.json";
 const std::string kConfigurationFilePath = "/root/configuration.json";
+
+const std::string kDataPartitionpath = "/data";
 
 const long kAppSignalInterval = 50 * 1000 * 1000; //Nanosec
 

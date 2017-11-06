@@ -1,7 +1,11 @@
 describe("Testing Rectangle service", function() {
 
-  beforeEach(module('ChaiBioTech'));
+  beforeEach(module('ChaiBioTech', function ($provide) {
+    mockCommonServices($provide);
+  }));
+  
   var rectangle, properties;
+
   beforeEach(inject(function(Rectangle) {
     rectangle = Rectangle;
     properties = {

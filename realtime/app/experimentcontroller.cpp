@@ -32,6 +32,7 @@
 #include "qpcrapplication.h"
 #include "timercallback.h"
 #include "logger.h"
+#include "util.h"
 
 #define STORE_MELT_CURVE_DATA_INTERVAL 10 * 1000
 
@@ -92,6 +93,7 @@ ExperimentController::ExperimentController(std::shared_ptr<DBControl> dbControl)
     _meltCurveTimer = new Poco::Timer();
     _holdStepTimer = new Poco::Timer();
     _logTimer = new Poco::Timer();
+    _dataSpaceTimer = new Poco::Timer();
     
     _settings.debugMode = _dbControl->getSettings().debugMode();
 
@@ -112,6 +114,7 @@ ExperimentController::~ExperimentController()
     delete _meltCurveTimer;
     delete _holdStepTimer;
     delete _machineMutex;
+    delete _dataSpaceTimer;
 }
 
 Experiment ExperimentController::experiment() const
@@ -137,6 +140,20 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
     else if (experiment.startedAt() != boost::posix_time::not_a_date_time)
         return ExperimentUsed;
 
+    unsigned long dataSpace = 0;
+
+    if (Util::getPartitionAvailableSpace(kDataPartitionpath, dataSpace))
+    {
+        if (qpcrApp.settings().configuration.dataSpaceSoftLimit >= dataSpace)
+            return OutOfStorageSpace;
+    }
+    else
+    {
+        APP_LOGGER << "ExperimentController::start - unable to get the available space of the data partition" << std::endl;
+
+        return OutOfStorageSpace;
+    }
+
     experiment.setStartedAt(boost::posix_time::microsec_clock::local_time());
 
     if (machineState() != IdleMachineState)
@@ -158,6 +175,7 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
     }
 
     startLogging();
+    startDataSpaceCheck();
 
     APP_LOGGER << "ExperimentController::start - experiment started " << experimentId << std::endl;
 
@@ -305,6 +323,7 @@ void ExperimentController::stop()
     }
 
     stopLogging();
+    stopDataSpaceCheck();
 
     if (state != CompleteMachineState)
     {
@@ -338,6 +357,7 @@ void ExperimentController::stop(const std::string &errorMessage)
     }
 
     stopLogging();
+    stopDataSpaceCheck();
 
     _holdStepTimer->stop();
     _meltCurveTimer->stop();
@@ -633,6 +653,34 @@ void ExperimentController::addLogCallback(Poco::Timer &)
     {
         _dbControl->addTemperatureLog(_logs);
         _logs.clear();
+    }
+}
+
+void ExperimentController::startDataSpaceCheck()
+{
+    _dataSpaceTimer->setPeriodicInterval(kDataSpaceCheckInterval);
+    _dataSpaceTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::checkDataSpace));
+}
+
+void ExperimentController::stopDataSpaceCheck()
+{
+    _dataSpaceTimer->restart(0); //Restart is used here because the timer can be stopped within its callback
+}
+
+void ExperimentController::checkDataSpace(Poco::Timer &/*timer*/)
+{
+    unsigned long dataSpace = 0;
+
+    if (Util::getPartitionAvailableSpace(kDataPartitionpath, dataSpace))
+    {
+        if (qpcrApp.settings().configuration.dataSpaceSoftLimit >= dataSpace)
+            stop("Out of storage space");
+    }
+    else
+    {
+        APP_LOGGER << "ExperimentController::checkDataSpace - unable to get the available space of the data partition" << std::endl;
+
+        stop("Out of storage space");
     }
 }
 

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>Build basic debian image with kernel version 4.4</description>
+  <description>Build basic debian image with kernel version 4.9</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.17.2">
@@ -53,13 +53,23 @@ ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
 #ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
 
 sshpass -p temppwd ssh -t -oStrictHostKeyChecking=no debian@$build_machine &lt;&lt;&apos;ENDSSH&apos;
-echo enable root access with no password
+	echo enable root access with no password
 
-echo temppwd | sudo -S sed -i -e &apos;s:PermitEmptyPasswords no:PermitEmptyPasswords yes:g&apos; /etc/ssh/sshd_config
-sudo sed -i -e &apos;s:UsePAM yes:UsePAM no:g&apos; /etc/ssh/sshd_config
-sudo sed -i -e &apos;s:PermitRootLogin without-password:PermitRootLogin yes:g&apos; /etc/ssh/sshd_config
-sudo passwd -d -u root
-sudo su
+	echo temppwd | sudo -S sed -i -e &apos;s:PermitEmptyPasswords no:PermitEmptyPasswords yes:g&apos; /etc/ssh/sshd_config
+	sudo sed -i -e &apos;s:UsePAM yes:UsePAM no:g&apos; /etc/ssh/sshd_config
+	sudo sed -i -e &apos;s:PermitRootLogin without-password:PermitRootLogin yes:g&apos; /etc/ssh/sshd_config
+	
+    sudo sed -i -e &apos;s:#PermitEmptyPasswords:PermitEmptyPasswords:g&apos; /etc/ssh/sshd_config
+	sudo sed -i -e &apos;s:#UsePAM:UsePAM:g&apos; /etc/ssh/sshd_config
+	sudo sed -i -e &apos;s:#PermitRootLogin:PermitRootLogin:g&apos; /etc/ssh/sshd_config
+
+	sudo sed -i -e &apos;s:PermitRootLogin prohibit-password:PermitRootLogin yes:g&apos; /etc/ssh/sshd_config
+	sudo sed -i -e &apos;s:PermitEmptyPasswords:PermitEmptyPasswords:g&apos; /etc/ssh/sshd_config
+
+
+
+	sudo passwd -d -u root
+	sudo su
 
 echo patching sshd_config
     
@@ -77,17 +87,35 @@ KexAlgorithms diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-
 Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 EOF
 
-ssh-keygen -A || true
-sudo /etc/init.d/ssh restart
-service ssh restart
+	if grep &quot;PermitEmptyPasswords yes&quot; /etc/ssh/sshd_config
+	then
+		echo PermitEmptyPasswords set
+	else
+		echo &quot;PermitEmptyPasswords yes&quot;&gt;&gt; /etc/ssh/sshd_config
+	fi
 
-echo ssh daemon is restarted
+	if grep &quot;UsePAM no&quot; /etc/ssh/sshd_config
+	then
+		echo UsePAM set
+	else
+		echo &quot;UsePAM no&quot;&gt;&gt; /etc/ssh/sshd_config
+	fi
 
+	if grep &quot;PermitRootLogin yes&quot; /etc/ssh/sshd_config
+	then
+		echo PermitRootLogin set
+	else
+		echo &quot;PermitRootLogin yes&quot;&gt;&gt; /etc/ssh/sshd_config
+	fi
 
+	ssh-keygen -A || true
+	sudo /etc/init.d/ssh restart
+	service ssh restart
+
+	echo ssh daemon is restarted
 ENDSSH
 
 echo root access patching returned
-
 
 if grep $build_machine /var/lib/jenkins/.ssh/config
 then
@@ -250,6 +278,8 @@ image_filename=bone-debian-8.8-console-armhf-2017-05-07-1gb.img.xz
 #bone-debian-7.11-console-armhf-2016-06-15-2gb.img.xz
 
 rm $image_filename || true
+rm -r .julia
+
 wget $download_prefix/$image_filename || exit 1
 
 #Verify Image with:
