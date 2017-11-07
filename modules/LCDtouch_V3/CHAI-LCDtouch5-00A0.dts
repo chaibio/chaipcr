@@ -179,7 +179,7 @@ pinmux_LCDtouch5_lcd_pins {
 	};
     
         fragment@4 {
-               target = <&i2c1>;
+               target = <&i2c2>;
                __overlay__ {
 
 		       /* needed to avoid gripping by DTC */
