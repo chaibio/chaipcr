@@ -36,6 +36,7 @@ angular.module("canvasApp").factory('mouseOver', [
           hoverCursor: "anything"
         }
       };
+
       this.canvas.on("mouse:over", reference.mouseOverHandler);
     };
 
@@ -71,23 +72,21 @@ angular.module("canvasApp").factory('mouseOver', [
     this.stepGroupHoverHandler = function(evt) {
        
         me = evt.target.me;
+
         if(ParentKanvas.editStageStatus === false) {
+
           me.closeImage.animate('opacity', 1, {
             duration: 400,
             onChange: ParentKanvas.canvas.renderAll.bind(ParentKanvas.canvas),
-            onComplete: function() {
-              //console.log('done');
-            }
+            
           });
+
           //me.closeImage.setVisible(true);
           if(previouslyHoverd.step && (me.model.id !== previouslyHoverd.step.model.id)) {
             //previouslyHoverd.step.closeImage.setVisible(false);
             previouslyHoverd.step.closeImage.animate('opacity', 0, {
               duration: 400,
               onChange: ParentKanvas.canvas.renderAll.bind(ParentKanvas.canvas),
-              onComplete: function() {
-                //console.log('done');
-              }
             });
           }
           previouslyHoverd.step = me;

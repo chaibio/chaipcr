@@ -29,7 +29,7 @@ angular.module("canvasApp").factory('mouseMove', [
       ParentKanvas = C;
       originalScope = $scope;
 
-      this.canvasContaining = $('.canvas-containing');
+      reference.canvasContaining = $('.canvas-containing');
 
       this.canvas.on("mouse:move", reference.handleMouseMove);
     };
@@ -41,7 +41,7 @@ angular.module("canvasApp").factory('mouseMove', [
           if(parentEventReference.startDrag === 0) {
             parentEventReference.canvas.defaultCursor = "ew-resize";
             parentEventReference.startDrag = evt.e.clientX;
-            startPos = this.canvasContaining.scrollLeft();
+            startPos = reference.canvasContaining.scrollLeft();
           }
 
           left = startPos - (evt.e.clientX - parentEventReference.startDrag); // Add startPos to reverse the moving direction.
@@ -52,7 +52,7 @@ angular.module("canvasApp").factory('mouseMove', [
               originalScope.scrollLeft = left;
             });
 
-            this.canvasContaining.scrollLeft(left);
+            reference.canvasContaining.scrollLeft(left);
           }
         }
     };
