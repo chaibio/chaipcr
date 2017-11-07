@@ -55,7 +55,7 @@ fi
 process_uEnv () {
 	if [ -e $1 ]
 	then
-		ech processing $1
+		echo processing $1
 		echo "cape_enable=bone_capemgr.enable_partno=chai-pcr,CHAI-LCDtouch5" >> $1
 		echo "cape_disable=bone_capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN,BB-SPIDEV0,BB-SPIDEV1,BB-BONE-EMMC-2G" >> $1
 		echo "dtb=am335x-boneblack-emmc-overlay.dtb" >> $1
