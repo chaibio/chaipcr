@@ -39,23 +39,26 @@ App.service 'MeltCurveService', [
       series: series
       axes:
         x:
+          unit: ' °C'
           key: 'temperature'
           ticks: 8
           tickFormat: (x) ->
             x = x || 0
-            x = Math.round(x * 100) / 100
-            return "#{x}°C"
+            x = Math.round(x * 10) / 10
+            return x
         y:
+          scale: 'linear'
+          unit: 'k'
           ticks: 10
-      margin:
-        left: 75
-        right: 10
-        top: 10
-        bottom: 20
+          tickFormat: (y) -># Math.round( y * 10 ) / 10
+            Math.round(( y / 1000) * 10) / 10
+
+      
       box:
         label:
           x: 'Temp'
           y: 'RFU'
+
     # end chartConfig
 
     self.parseData = (data, cb) ->

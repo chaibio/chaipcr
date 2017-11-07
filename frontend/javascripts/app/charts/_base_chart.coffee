@@ -6,21 +6,65 @@ class BaseChart
   CIRCLE_STROKE_WIDTH: 2
   CIRCLE_RADIUS: 7
   AXIS_LABEL_FONT_SIZE: 10
+  AXES_TICKS_FONT_SIZE: 10
+  DEFAULT_MAX_Y: 1
+  DEFAULT_MAX_X: 1
+  DEFAULT_MIN_Y: 0
+  DEFAULT_MIN_X: 0
   zoomTransform: {x: 0, y: 0, k: 1}
   isZooming: false
+  INPUT_PADDING: 5
+  MARGIN:
+    left: 0
+    top: 0
+    right: 0
+    bottom: 0
 
   constructor: (@elem, @data, @config) ->
     @initChart()
 
+  getLineCurve: ->
+    d3.curveCardinal
+
   hasData: ->
     return false if !@data
-    return false if !@data.dataset
-    return false if @data.dataset.length is 0
-    return true
+    if @data and @config
+      if @config.series?.length > 0
+        if (@data[@config.series[0].dataset]?.length > 1)
+          true
+        else
+          false
+      else
+        false
+    else
+      false
 
-  formatPower: (d) ->
-    superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹"
-    (d + "").split("").map((c) -> superscript[c]).join("")
+  computedMaxY: ->
+    if angular.isNumber(@config.axes.y.max) then @config.axes.y.max else if @hasData() then @getMaxY() else @DEFAULT_MAX_Y
+
+  computedMinY: ->
+    if angular.isNumber(@config.axes.y.min) then @config.axes.y.min else if @hasData() then @getMinY() else @DEFAULT_MIN_Y
+
+  roundUpExtremeValue: (val) ->
+    Math.ceil(val)
+
+  roundDownExtremeValue: (val) ->
+    Math.floor(val)
+
+  xAxisTickFormat: (x) ->
+    if @config.axes.x.tickFormat
+      x = @config.axes.x.tickFormat(x)
+    if @config.axes.x.unit
+      x = "#{x}#{@config.axes.x.unit}"
+    return x
+
+  yAxisTickFormat: (y) ->
+    if @config.axes.y.tickFormat and angular.isNumber(y)
+      y = @config.axes.y.tickFormat(y)
+    if @config.axes.y.unit
+      y = if !angular.isNumber(y) then '' else y
+      y = "#{y}#{@config.axes.y.unit}"
+    return y
 
   bisectX: (line_config) ->
     return d3.bisector((d) ->
@@ -40,19 +84,30 @@ class BaseChart
 
     return mouse
 
-  getPathConfig: (path) ->
-      activePathConfig = null
-      activePathIndex = null
+  setCaretPosition: (input, caretPos) ->
+    if input.createTextRange
+      range = ctrl.createTextRange()
+      range.collapse(true)
+      range.moveEnd('character', caretPos)
+      range.moveStart('character', caretPos)
+      range.select()
+    else
+      input.focus()
+      input.setSelectionRange(caretPos, caretPos)
 
-      for line, i in @lines by 1
-        if line is path
-          activePathConfig = @config.series[i]
-          activePathIndex = i
-          break
-      return {
-        config: activePathConfig,
-        index: activePathIndex,
-      }
+  getPathConfig: (path) ->
+    activePathConfig = null
+    activePathIndex = null
+
+    for line, i in @lines by 1
+      if line is path
+        activePathConfig = @config.series[i]
+        activePathIndex = i
+        break
+    return {
+      config: activePathConfig,
+      index: activePathIndex,
+    }
 
   hideMouseIndicators: ->
     @circle.attr('opacity', 0) if @circle
@@ -116,7 +171,7 @@ class BaseChart
     @box = {}
     @box.container = @chartSVG.append('g')
         .attr('stroke-width', 0)
-        .attr('transform', 'translate(' + (boxMargin.left + @config.margin.left) + ',' + (boxMargin.top + @config.margin.top) + ')')
+        .attr('transform', 'translate(' + (boxMargin.left + @MARGIN.left) + ',' + (boxMargin.top + @MARGIN.top) + ')')
         .attr('fill', '#fff')
         .on 'mousemove', => @mouseMoveCb()
 
@@ -172,7 +227,7 @@ class BaseChart
         .attr('fill', "#000")
         .attr('x', 10 + boxBorderWidth)
         .attr('y', headerHeight + ctTextDims.height + 20 + boxBorderWidth)
-        .text('RFU')
+        .text(@config.box?.label?.y || 'RFU')
 
     rfyLabelDims = @box.RFYTextLabel.node().getBBox()
 
@@ -188,7 +243,7 @@ class BaseChart
         .attr('fill', "#000")
         .attr('x', 70 + boxBorderWidth)
         .attr('y', headerHeight + ctTextDims.height + 20 + boxBorderWidth)
-        .text('Cycle')
+        .text(@config.box?.label?.x || 'Cycle')
 
     cycleLabelDims = @box.cycleTextLabel.node().getBBox()
 
@@ -217,11 +272,11 @@ class BaseChart
         cqText = 'Cq: ' + (conf.cq[conf.channel - 1] || '')
         @box.CqText.text(cqText)
 
-  getDrawLineXScale: ->
+  getXScale: ->
       xScale = if @zoomTransform.k > 1 and !@editingYAxis then @lastXScale else @xScale
       return xScale || @xScale
 
-  getDrawLineYScale: ->
+  getYScale: ->
       yScale = @lastYScale || @yScale
       if (@editingYAxis)
         return yScale
@@ -230,13 +285,10 @@ class BaseChart
       return @yScale
 
   makeGuidingLine: (line_config) ->
-    xScale = @getDrawLineXScale()
-    yScale = @getDrawLineYScale()
+    xScale = @getXScale()
+    yScale = @getYScale()
     line = d3.line()
-    if @config.axes.y.scale is 'log'
-      line.curve(d3.curveMonotoneX)
-    else
-      line.curve(d3.curveBasis)
+    line.curve(@getLineCurve())
     line.x (d) -> xScale(d[line_config.x])
     line.y (d) -> yScale(d[line_config.y])
 
@@ -251,16 +303,12 @@ class BaseChart
         .on 'click', => @unsetActivePath()
 
   makeColoredLine: (line_config) ->
-    xScale = @getDrawLineXScale()
-    yScale = @getDrawLineYScale()
+    xScale = @getXScale()
+    yScale = @getYScale()
     line = d3.line()
-    if @config.axes.y.scale is 'log'
-      line.curve(d3.curveMonotoneX)
-    else
-      line.curve(d3.curveBasis)
+    line.curve(@getLineCurve())
     line.x (d) -> xScale(d[line_config.x])
     line.y (d) -> yScale(d[line_config.y])
-    if (@config.axes.y.scale is 'log') then line.defined (d) -> d[line_config.y] > 10
     _path = @viewSVG.append("path")
         .datum(@data[line_config.dataset])
         .attr("class", "colored-line")
@@ -287,14 +335,11 @@ class BaseChart
         )
 
   makeWhiteBorderLine: (line_config) ->
-    xScale = @getDrawLineXScale()
-    yScale = @getDrawLineYScale()
+    xScale = @getXScale()
+    yScale = @getYScale()
     line = d3.line()
     if @whiteBorderLine then @whiteBorderLine.remove()
-    if @config.axes.y.scale is 'log'
-      line.curve(d3.curveMonotoneX)
-    else
-      line.curve(d3.curveBasis)
+    line.curve(@getLineCurve())
     line.x (d) -> xScale(d[line_config.x])
     line.y (d) -> yScale(d[line_config.y])
     if (@config.axes.y.scale is 'log') then line.defined (d) -> d[line_config.y] > 10
@@ -369,6 +414,16 @@ class BaseChart
 
   zoomed: ->
     return if not d3.event
+    if d3.event.sourceEvent?.srcElement
+      if d3.event.sourceEvent.srcElement is @xAxisLeftExtremeValue.input.node()
+        @onClickLeftXAxisInput()
+      if d3.event.sourceEvent.srcElement is @xAxisRightExtremeValue.input.node()
+        @onClickRightXAxisInput()
+      if d3.event.sourceEvent.srcElement is @yAxisUpperExtremeValue.input.node()
+        @onClickUpperYAxisInput()
+      if d3.event.sourceEvent.srcElement is @yAxisLowerExtremeValue.input.node()
+        @onClickLowerYAxisInput()
+
     transform = d3.event.transform
     transform.x = transform.x || 0
     transform.y = transform.y || 0
@@ -397,8 +452,7 @@ class BaseChart
       @gX.call(@xAxis.scale(@lastXScale))
 
     @zoomTransform = transform
-
-    @updateXAxisExtremeValues()
+    @updateAxesExtremeValues()
 
     if (@onZoomAndPan and !@editingYAxis)
       @onZoomAndPan(@zoomTransform, @width, @height, @getScaleExtent() - @getMinX() )
@@ -406,14 +460,16 @@ class BaseChart
     @drawLines()
 
   getMinX: ->
+    return @config.axes.x.min if @config.axes.x.min
     min = d3.min @config.series, (s) =>
       d3.min @data[s.dataset], (d) => d[s.x]
     return min || 0
 
   getMaxX: ->
-      max = d3.max @config.series, (s) =>
-        d3.max @data[s.dataset], (d) => d[s.x]
-      return max || 1
+    return @config.axes.x.max if @config.axes.x.max
+    max = d3.max @config.series, (s) =>
+      d3.max @data[s.dataset], (d) => d[s.x]
+    return max || 0
 
   getMinY: ->
     return @config.axes.y.min if @config.axes.y.min
@@ -425,47 +481,37 @@ class BaseChart
     return @config.axes.y.max if @config.axes.y.max
     max_y = d3.max @config.series, (s) =>
         d3.max @data[s.dataset], (d) => d[s.y]
-    return max_y || 1
+    return max_y || 0
 
   getScaleExtent: ->
     return @config.axes.x.max || @getMaxX()
 
-  getYLogticks: ->
-    num = @getMaxY()
-    num = num + num * 0.2
-    num_length = num.toString().length
-    roundup = '1'
-    for i in [0...num_length] by 1
-      roundup = roundup + "0"
-    roundup = roundup * 1
-    calibs = []
-    calib = 10
-    while calib <= roundup
-      calibs.push(calib)
-      calib = calib * 10
+  getYLinearTicks: ->
+    max = @getMaxY()
+    min = @getMinY()
+    min = Math.floor(min / 5000) * 5000 # ROUND(A2/5,0)*5
+    max = Math.ceil(max / 5000) * 5000
+    
+    ticks = []
+    for y in [min..max] by 5000
+      ticks.push(y)
 
-    return calibs
+    return ticks
 
   setYAxis: ->
     @chartSVG.selectAll('g.axis.y-axis').remove()
     @chartSVG.selectAll('.g-y-axis-text').remove()
     svg = @chartSVG.select('.chart-g')
 
-    # add allowance for interpolation curves
-    max = @getMaxY()
-    min = @getMinY()
-    diff = max - min
-    allowance = diff * (if @config.axes.y.scale is 'log' then 0.2 else 0.05)
-    max += allowance
-    min = if @config.axes.y.scale is 'log' then 5 else min - allowance
-    @yScale = if @config.axes.y.scale is 'log' then d3.scaleLog() else d3.scaleLinear()
+    max = @computedMaxY()
+    min = @computedMinY()
+
+    @yScale = d3.scaleLinear()
     @yScale.range([@height, 0]).domain([min, max])
     @yAxis = d3.axisLeft(@yScale)
-    @yAxis.tickFormat(@config.axes.y.tickFormat) if @config.axes.y.tickFormat
-    if @config.axes.y.scale is 'log'
-      @yAxis
-        .tickValues(@getYLogticks())
-        .tickFormat (d) => '10' + @formatPower(Math.round(Math.log(d) / Math.LN10))
+    
+    @yAxis.tickFormat (y) =>
+      @yAxisTickFormat(y)
 
     @gY = svg.append("g")
         .attr("class", "axis y-axis")
@@ -477,6 +523,7 @@ class BaseChart
       @gY.call(@yAxis.scale(@zoomTransform.rescaleY(@yScale)))
     #text label for the y axis
     @setYAxisLabel()
+    @lastYScale = @yScale
 
   setYAxisLabel: ->
     return if not @config.axes.y.label
@@ -484,7 +531,7 @@ class BaseChart
     @yAxisLabel = svg.append("text")
       .attr("class", "g-y-axis-text")
       .attr("transform", "rotate(-90)")
-      .attr("y", 0 - @config.margin.left)
+      .attr("y", 0 - @MARGIN.left)
       .attr("x", 0 - (@height / 2))
       .attr("dy", "1em")
       .attr("font-family", "dinot-bold")
@@ -500,17 +547,20 @@ class BaseChart
     svg = @chartSVG.select('.chart-g')
     @xScale = d3.scaleLinear().range([0, @width])
 
-    min = @config.axes.x.min || @getMinX() || 0
-    max = @config.axes.x.max || @getMaxX() || 1
+    min = if angular.isNumber(@config.axes.x.min) then @config.axes.x.min else if @hasData() then @getMinX() else @DEFAULT_MIN_X
+    max = if angular.isNumber(@config.axes.x.max) then @config.axes.x.max else if @hasData() then @getMaxX() else @DEFAULT_MAX_X
+    
     @xScale.domain([min, max])
 
     @xAxis = d3.axisBottom(@xScale)
-    @xAxis.tickFormat(@config.axes.x.tickFormat) if @config.axes.x.tickFormat
+    if typeof @config.axes.x.tickFormat is 'function'
+      @xAxis.tickFormat (x) => @xAxisTickFormat(x)
     @gX = svg.append("g")
         .attr("class", "axis x-axis")
         .attr('fill', 'none')
-        .attr("transform", "translate(0," + (@height) + ")")
+        .attr("transform", "translate(0," + @height + ")")
         .call(@xAxis)
+        .on('mouseenter', => @hideMouseIndicators())
     if @zoomTransform.rescaleX
       @gX.call(@xAxis.scale(@zoomTransform.rescaleX(@xScale)))
 
@@ -524,7 +574,7 @@ class BaseChart
       .attr('class', 'g-x-axis-text')
       .attr("transform",
         "translate(" + (@width / 2) + " ," +
-        (@height + @config.margin.top + @config.margin.bottom - 20) + ")")
+        (@height + @MARGIN.top + @MARGIN.bottom - 20) + ")")
       .style("text-anchor", "middle")
       .attr("font-family", "dinot-bold")
       .attr("font-size", "#{@AXIS_LABEL_FONT_SIZE}px")
@@ -535,29 +585,113 @@ class BaseChart
     return if !@zooomBehavior
     @zooomBehavior.scaleExtent([1, @getScaleExtent()])
 
-  ensureNumeric: ->
+  onAxisInputBaseFunc: (loc, input, val) ->
     charCode = d3.event.keyCode
     if charCode > 36 and charCode < 41
       # arrow keys
       return true
-    if charCode is 189 || charCode is 187 || charCode is 109 || charCode is 107
-      # +/- key
-      return true
-    if charCode >= 96 and charCode <= 105
-      # numpad number keys
-      return true
-    if charCode > 31 and (charCode < 48 || charCode > 57)
-      d3.event.preventDefault()
-      return false
-    return true
+    else
+      # remove units before passing value to @onAxisInput()
+      axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
+      val = val.toString().replace(@config.axes[axis].unit, '') if @config.axes[axis].unit
+      @onAxisInput(loc, input, val) if typeof @onAxisInput is 'function'
 
+      # update the input width after value is updated
+      extremeValue = null
+      if loc is 'x:min'
+        extremeValue = @xAxisLeftExtremeValue
+      if loc is 'x:max'
+        extremeValue = @xAxisRightExtremeValue
+      if loc is 'y:min'
+        extremeValue = @yAxisLowerExtremeValue
+      if loc is 'y:max'
+        extremeValue = @yAxisUpperExtremeValue
+
+      extremeValue.text.text(extremeValue.input.node().value)
+      textWidth = extremeValue.text.node().getBBox().width
+
+      if loc is 'x:min'
+        conWidth = textWidth + @INPUT_PADDING
+        extremeValue.inputContainer
+          .attr('width', conWidth)
+          .attr('x', @MARGIN.left - (conWidth / 2))
+        extremeValue.text
+          .attr('x', @MARGIN.left - (textWidth / 2))
+        extremeValue.input
+          .style('width', "#{conWidth}px")
+
+      if loc is 'x:max'
+        conWidth = textWidth + @INPUT_PADDING
+        extremeValue.inputContainer
+          .attr('width', conWidth)
+          .attr('x', @MARGIN.left + @width - (conWidth / 2))
+        extremeValue.text
+          .attr('x', @MARGIN.left + @width - (textWidth / 2))
+        extremeValue.input
+          .style('width', "#{conWidth}px")
+
+      if (loc is 'y:min') or (loc is 'y:max')
+        conWidth = textWidth
+        extremeValue.inputContainer
+          .attr('width', conWidth + @INPUT_PADDING)
+          .attr('x', @MARGIN.left - (conWidth + extremeValue.config.offsetRight + @INPUT_PADDING / 2))
+        extremeValue.input
+          .style('width', "#{conWidth + @INPUT_PADDING}px")
+        extremeValue.text.attr('x', @MARGIN.left - (extremeValue.config.offsetRight + conWidth + @INPUT_PADDING / 2))
+
+  onClickAxisInput: (loc, extremeValue) ->
+    axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
+    if axis is 'x'
+      val = if loc is 'x:min' then @getXScale().invert(0) else @getXScale().invert(@width)
+      val = @xAxisTickFormat(val)
+      conWidth = extremeValue.text.node().getBBox().width + @INPUT_PADDING
+      extremeValue.inputContainer
+        .attr('width', conWidth)
+        .attr('x', @MARGIN.left + (if loc is 'x:min' then 0 else @width) - (conWidth / 2))
+      extremeValue.input
+        .style('opacity', 1)
+        .style('width', "#{conWidth}px")
+      val = extremeValue.text.text()
+      extremeValue.input.node().value = val
+      
+      val = val.replace(@config.axes.x.unit, '') if @config.axes.x.unit
+      val = val.trim()
+      @setCaretPosition(extremeValue.input.node(), val.length)
+        
+    else
+      yScale = @lastYScale or @yScale
+      val= if loc is 'y:max' then yScale.invert(0) else yScale.invert(@height)
+      val = @yAxisTickFormat(val)
+      val = val.toString()
+      extremeValue.input.node().value = val
+      extremeValue.text.text(val)
+      val = val.replace(@config.axes.y.unit, '') if @config.axes.y.unit
+      val = val.trim()
+      @setCaretPosition(extremeValue.input.node(), val.length)
+
+      inputWidth = extremeValue.text.node().getBBox().width
+
+      extremeValue.inputContainer
+        .attr('width', inputWidth + @INPUT_PADDING )
+        .attr('x', @MARGIN.left - (inputWidth + extremeValue.config.offsetRight) - (@INPUT_PADDING / 2))
+      extremeValue.input
+        .style('width', "#{inputWidth + @INPUT_PADDING}px")
+        .style('opacity', 1)
+
+  onAxisInput: (loc, input, val) ->
+    val = val.replace(/[^0-9\.\-]/g, '')
+    axis = if loc is 'y:max' or loc is 'y:min' then 'y' else 'x'
+    unit = @config.axes[axis].unit || ''
+    input.value = val + unit
+    @setCaretPosition(input, input.value.length - unit.length)
+    
   drawAxesExtremeValues: ->
     @chartSVG.selectAll('.axes-extreme-value').remove()
     @drawXAxisLeftExtremeValue()
     @drawXAxisRightExtremeValue()
     @drawYAxisUpperExtremeValue()
     @drawYAxisLowerExtremeValue()
-    @updateXAxisExtremeValues()
+    @updateAxesExtremeValues()
 
   drawXAxisLeftExtremeValue: ->
     textContainer = @chartSVG.append('g')
@@ -571,84 +705,230 @@ class BaseChart
     lineWidth = 15
 
     rect = textContainer.append('rect')
-        .attr('fill', '#fff')
-        .attr('width', conWidth)
-        .attr('height', conHeight)
-        .attr('y', @height + @config.margin.top + offsetTop)
-        .attr('x', @config.margin.left - (conWidth / 2))
+      .attr('fill', '#fff')
+      .attr('width', conWidth)
+      .attr('height', conHeight)
+      .attr('y', @height + @MARGIN.top + offsetTop)
+      .attr('x', @MARGIN.left - (conWidth / 2))
+      .on 'click', => @onClickLeftXAxisInput()
 
     line = textContainer.append('line')
         .attr('stroke', '#000')
         .attr('stroke-width', underlineStroke)
-        .attr('x1', @config.margin.left - (lineWidth / 2))
-        .attr('y1', @height + @config.margin.top + offsetTop + conHeight - underlineStroke)
-        .attr('x2', @config.margin.left - (lineWidth / 2) + lineWidth)
-        .attr('y2', @height + @config.margin.top + offsetTop + conHeight - underlineStroke)
         .attr('opacity', 0)
+        .on 'click', => @onClickLeftXAxisInput()
 
     text = textContainer.append('text')
         .attr('fill', '#000')
-        .attr('y', @height + @config.margin.top + offsetTop)
+        .attr('y', @height + @MARGIN.top + offsetTop)
         .attr('dy', '0.71em')
-        .attr('font-size', '10px')
+        .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
+        .attr('font-family', 'dinot-regular')
+        .on 'click', => @onClickLeftXAxisInput()
 
     inputContainer = textContainer.append('foreignObject')
         .attr('width', conWidth)
         .attr('height', conHeight)
-        .attr('y', @height + @config.margin.top + offsetTop)
-        .attr('x', @config.margin.left - (conWidth / 2))
+        .attr('y', @height + @MARGIN.top + offsetTop - 4)
+        .attr('x', @MARGIN.left - (conWidth / 2))
+        .on 'click', => @onClickLeftXAxisInput()
 
     form = inputContainer.append('xhtml:form')
+        .style('margin', 0)
+        .style('padding', 0)
+        .on 'click', => @onClickLeftXAxisInput()
+
     input = form.append('xhtml:input').attr('type', 'text')
       .style('display', 'block')
-      .style('opacity', '0')
+      .style('opacity', 0)
       .style('width', conWidth + 'px')
       .style('height', conHeight + 'px')
-      .style('padding', '0px')
-      .style('margin', '0px')
-      .style('margin-top', '-4px')
+      .style('padding', 0)
+      .style('margin', 0)
       .style('text-align', 'center')
-      .style('font-size', '10px')
+      .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
+      .style('font-family', 'dinot-regular')
       .attr('type', 'text')
-      .on('mousemove', ->
+      .on('mouseenter', =>
+        lineWidth = text.node().getBBox().width
         line.attr('opacity', 1)
+          .attr('x1', @MARGIN.left - (lineWidth / 2))
+          .attr('y1', @height + @MARGIN.top + offsetTop + conHeight - underlineStroke)
+          .attr('x2', @MARGIN.left - (lineWidth / 2) + lineWidth)
+          .attr('y2', @height + @MARGIN.top + offsetTop + conHeight - underlineStroke)
       )
       .on('mouseout', ->
         line.attr('opacity', 0)
       )
       .on('click', =>
-        xScale = @lastXScale || @xScale
-        val = Math.round(xScale.invert(0) * 10) / 10
-        input.style('opacity', 1)
-        input.node().value = val
+        @onClickLeftXAxisInput()
       )
-      .on('focusout', ->
+      .on('focusout', =>
         input.style('opacity', 0)
+        text.attr('opacity', 1)
+        #@xAxisLeftExtremeValue.focused = false
+        @updateAxesExtremeValues()
       )
       .on('keydown', =>
-        if d3.event.keyCode is 13
-          # enter
+        if d3.event.keyCode is 39
+          @validateArrowInput('x:min', input.node(), input.node().value.trim())
+        if d3.event.keyCode is 13 and typeof @onEnterAxisInput is 'function'
+          @onEnterAxisInput('x:min', input.node(), input.node().value.trim())
           d3.event.preventDefault()
-          extent = @getScaleExtent() - @getMinX()
-          x = @xScale
-          lastXScale = @lastXScale || x
-          minX = input.node().value * 1
-          maxX = lastXScale.invert(@width)
-          if (minX >= maxX)
-            return false
-          if (minX < 1)
-            minX = 1
-          k = @width / (x(maxX) - x(minX))
-          width_percent = 1 / k
-          w = extent - (width_percent * extent)
-          @chartSVG.call(@zooomBehavior.scaleTo, k)
-          @scroll((minX - @getMinX()) / w)
-        else
-          @ensureNumeric()
+        if d3.event.keyCode is 8
+          @validateBackSpace('x:min', input.node())
+      )
+      .on('keyup', =>
+        if d3.event.keyCode isnt 13 and typeof @onAxisInputBaseFunc is 'function'
+          @onAxisInputBaseFunc('x:min', input.node(), input.node().value.trim())
       )
 
-    @xAxisLeftExtremeValueText = text
+    @xAxisLeftExtremeValue =
+      rect: rect
+      text: text
+      line: line
+      inputContainer: inputContainer
+      form: form
+      input: input
+      config:
+        offsetTop: offsetTop
+        underlineStroke: underlineStroke
+        conHeight: conHeight
 
+  onClickLeftXAxisInput: ->
+    #return if @xAxisLeftExtremeValue.focused
+    #@xAxisLeftExtremeValue.focused = true
+    @xAxisLeftExtremeValue.text.attr('opacity', 0)
+
+    if typeof @onClickAxisInput is 'function'
+      @onClickAxisInput('x:min', @xAxisLeftExtremeValue)
+
+  validateBackSpace: (loc, input) ->
+    axis = if loc is 'y:min' or loc is 'y:max' then 'y' else 'x'
+    value = input.value
+    selection = input.selectionStart
+    unit = @config.axes[axis].unit || ''
+    if selection > value.length - unit.length
+      d3.event.preventDefault()
+      return true
+    else
+      return false
+
+  validateArrowInput: (loc, input, val) ->
+    axis = if loc is 'y:min' or loc is 'y:max' then 'y' else 'x'
+    unit = @config.axes[axis].unit or ''
+    caret = input.selectionStart + 1
+    if val.length - unit.length < caret
+      d3.event.preventDefault()
+
+  cleanAxisInput: (loc, input, val) ->
+    axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
+    val = val.replace(/[^0-9\.\-]/g, '')
+    val = val.replace(@config.axes[axis].unit, '')
+    if val is ''
+      if loc is 'x:min'
+        val = @getMinX()
+      if loc is 'x:max'
+        val = @getMaxX()
+      if loc is 'y:min'
+        val = @computedMinY()
+      if loc is 'y:max'
+        val = @computedMaxY()
+    return +val
+
+  onEnterAxisInput: (loc, input, val) ->
+    #axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
+    val = @cleanAxisInput(loc, input, val)
+    
+    if loc is 'y:max'
+      max = @computedMaxY()
+      maxY = if angular.isNumber(val) and !window.isNaN(val) then val else max
+      y = @yScale
+      lastYScale = @lastYScale || y
+      minY = lastYScale.invert(@height)
+
+      if minY >= maxY
+        return false
+
+      maxY = if maxY > max then max else maxY
+      k = @height / (y(minY) - y(maxY))
+
+      @editingYAxis = true
+      lastK = @getTransform().k
+      @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)))
+      @editingYAxis = false
+      @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(lastK))
+
+    if loc is 'y:min'
+      y = @yScale
+      lastYScale = @lastYScale || y
+      min = @computedMinY()
+
+      minY = if angular.isNumber(val) and !window.isNaN(val) then val else min
+      maxY = lastYScale.invert(0)
+      if (minY >= maxY)
+        return false
+
+      minY = if minY < min then min else minY
+
+      k = @height / (y(minY) - y(maxY))
+      lastK = @getTransform().k
+      @editingYAxis = true
+      @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)))
+      @editingYAxis = false
+      @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(lastK))
+
+    if loc is 'x:min'
+      extent = @getScaleExtent() - @getMinX()
+      x = @xScale
+      lastXScale = @lastXScale || x
+      minX = val * 1
+      maxX = lastXScale.invert(@width)
+      if (minX >= maxX)
+        return false
+      if (val is '' || minX < @getMinX())
+        minX = @getMinX()
+      k = @width / (x(maxX) - x(minX))
+      width_percent = 1 / k
+      w = extent - (width_percent * extent)
+      @chartSVG.call(@zooomBehavior.scaleTo, k)
+      @scroll((minX - @getMinX()) / w)
+
+    if loc is 'x:max'
+      extent = @getScaleExtent() - @getMinX()
+      x = @xScale
+      lastXScale = @lastXScale || x
+      minX = lastXScale.invert(0)
+      maxX = val * 1
+      if (minX >= maxX)
+        return false
+      if val is ''
+        maxX = @getMaxX()
+      if (maxX > @getScaleExtent())
+        maxX = @getScaleExtent()
+      k = @width / (x(maxX) - x(minX))
+      width_percent = 1 / k
+      w = extent - (width_percent * extent)
+      @chartSVG.call(@zooomBehavior.scaleTo, k)
+      @scroll((minX - @getMinX()) / w)
+
+    # update input state
+    extremeValue = null
+    
+    if loc is 'x:min'
+      extremeValue =  @xAxisLeftExtremeValue
+    else if loc is 'x:max'
+      extremeValue =  @xAxisRightExtremeValue
+    else if loc is 'y:min'
+      extremeValue = @yAxisLowerExtremeValue
+    else
+      extremeValue = @yAxisUpperExtremeValue
+
+    @onClickAxisInput(loc, extremeValue)
+    setTimeout =>
+      input.blur()
+    , 100
+    
   drawXAxisRightExtremeValue: ->
     textContainer = @chartSVG.append('g')
         .attr('class', 'axes-extreme-value tick')
@@ -665,32 +945,34 @@ class BaseChart
         .attr('fill', '#fff')
         .attr('width', conWidth)
         .attr('height', conHeight)
-        .attr('y', @height + @config.margin.top + offsetTop)
-        .attr('x', @config.margin.left + @width - (conWidth / 2))
+        .attr('y', @height + @MARGIN.top + offsetTop)
+        .attr('x', @MARGIN.left + @width - (conWidth / 2))
+        .on 'click', => @onClickRightXAxisInput()
 
     line = textContainer.append('line')
         .attr('stroke', '#000')
         .attr('stroke-width', underlineStroke)
-        .attr('x1', @config.margin.left + @width - (lineWidth / 2))
-        .attr('y1', @height + @config.margin.top + offsetTop + conHeight - underlineStroke)
-        .attr('x2', @config.margin.left + @width - (lineWidth / 2) + lineWidth)
-        .attr('y2', @height + @config.margin.top + offsetTop + conHeight - underlineStroke)
         .attr('opacity', 0)
+        .on 'click', => @onClickRightXAxisInput()
 
     text = textContainer.append('text')
         .attr('fill', '#000')
-        .attr('y', @height + @config.margin.top + offsetTop)
+        .attr('y', @height + @MARGIN.top + offsetTop)
         .attr('dy', '0.71em')
-        .attr('font-size', '10px')
+        .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
+        .attr('font-family', 'dinot-regular')
         .text(@getMaxX())
+        .on 'click', => @onClickRightXAxisInput()
 
     inputContainer = textContainer.append('foreignObject')
         .attr('width', conWidth)
         .attr('height', conHeight)
-        .attr('y', @height + @config.margin.top + offsetTop)
-        .attr('x', @config.margin.left + @width - (conWidth / 2))
+        .attr('y', @height + @MARGIN.top + offsetTop - 4)
+        .attr('x', @MARGIN.left + @width - (conWidth / 2))
+        .on 'click', => @onClickRightXAxisInput()
 
     form = inputContainer.append('xhtml:form')
+        .on 'click', => @onClickRightXAxisInput()
 
     input = form.append('xhtml:input').attr('type', 'text')
       .style('display', 'block')
@@ -699,368 +981,400 @@ class BaseChart
       .style('height', conHeight + 'px')
       .style('padding', '0px')
       .style('margin', '0px')
-      .style('margin-top', '-4px')
       .style('text-align', 'center')
-      .style('font-size', '10px')
+      .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
+      .style('font-family', 'dinot-regular')
       .attr('type', 'text')
-      .on('mousemove', =>
-        line.attr 'opacity', 1
+      .on('mouseenter', =>
+        lineWidth = text.node().getBBox().width
+        line.attr('opacity', 1)
+          .attr('x1', @MARGIN.left + @width - (lineWidth / 2))
+          .attr('y1', @height + @MARGIN.top + offsetTop + conHeight - underlineStroke)
+          .attr('x2', @MARGIN.left + @width - (lineWidth / 2) + lineWidth)
+          .attr('y2', @height + @MARGIN.top + offsetTop + conHeight - underlineStroke)
       )
-      .on('mouseout', ->
-        line.attr 'opacity', 0
+      .on('mouseout', =>
+        line.attr('opacity', 0)
       )
       .on('click', =>
-        xScale = @lastXScale || @xScale
-        input.style('opacity', 1)
-        input.node().value = Math.round(xScale.invert(@width) * 10) / 10
+        @onClickRightXAxisInput()
       )
-      .on('focusout', ->
+      .on('focusout', =>
         input.style('opacity', 0)
+        text.attr('opacity', 1)
+        #@xAxisRightExtremeValue.focused = false
+        @updateAxesExtremeValues()
       )
       .on('keydown', =>
-        if d3.event.keyCode is 13
-          # enter
+        if d3.event.keyCode is 39
+          @validateArrowInput('x:max', input.node(), input.node().value)
+        if d3.event.keyCode is 13 and typeof @onEnterAxisInput is 'function'
+          @onEnterAxisInput('x:max', input.node(), input.node().value.trim())
           d3.event.preventDefault()
-          extent = @getScaleExtent() - @getMinX()
-          x = @xScale
-          lastXScale = @lastXScale || x
-          minX = lastXScale.invert(0)
-          maxX = input.node().value * 1
-          if (minX >= maxX)
-            return false
-          if (maxX > @getScaleExtent())
-            maxX = @getScaleExtent()
-          k = @width / (x(maxX) - x(minX))
-          width_percent = 1 / k
-          w = extent - (width_percent * extent)
-          @chartSVG.call(@zooomBehavior.scaleTo, k)
-          @scroll((minX - @getMinX()) / w)
-        else
-          @ensureNumeric()
+        if d3.event.keyCode is 8
+          @validateBackSpace('x:max', input.node())
+      )
+      .on('keyup', =>
+        if d3.event.keyCode isnt 13 and typeof @onAxisInputBaseFunc is 'function'
+          @onAxisInputBaseFunc('x:max', input.node(), input.node().value.trim())
       )
 
-    @xAxisRightExtremeValueText = text
+    @xAxisRightExtremeValue =
+      rect: rect
+      text: text
+      line: line
+      inputContainer: inputContainer
+      form: form
+      input: input
+      config:
+        offsetTop: offsetTop
+        underlineStroke: underlineStroke
+        conHeight: conHeight
+
+  onClickRightXAxisInput: ->
+    #return if @xAxisRightExtremeValue.focused
+    #@xAxisRightExtremeValue.focused = true
+    @xAxisRightExtremeValue.text.attr 'opacity', 0
+    
+    if typeof @onClickAxisInput is 'function'
+      @onClickAxisInput('x:max', @xAxisRightExtremeValue)
 
   drawYAxisUpperExtremeValue: ->
-      textContainer = @chartSVG.append('g')
-        .attr('class', 'axes-extreme-value tick')
+    textContainer = @chartSVG.append('g')
+      .attr('class', 'axes-extreme-value tick')
 
-      @yAxisUpperExtremeValueContainer = textContainer
+    @yAxisUpperExtremeValueContainer = textContainer
 
-      conWidth = 30
-      conHeight = 14
-      offsetRight = 9
-      offsetTop = 2
-      underlineStroke = 2
-      lineWidth = 15
+    conWidth = 30
+    conHeight = 14
+    offsetRight = 9
+    offsetTop = 2
+    underlineStroke = 2
+    lineWidth = 15
+    inputContainerOffset = 5
 
-      rect = textContainer.append('rect')
-        .attr('fill', '#fff')
-        .attr('width', conWidth)
-        .attr('height', conHeight)
-        .attr('y', @config.margin.top - (conHeight / 2) + offsetTop)
-        .attr('x', @config.margin.left - (conWidth + offsetRight))
+    rect = textContainer.append('rect')
+      .attr('fill', '#fff')
+      .attr('width', conWidth)
+      .attr('height', @AXES_TICKS_FONT_SIZE + offsetTop)
+      .attr('y', @MARGIN.top - ((conHeight) / 2))
+      .attr('x', @MARGIN.left - (conWidth + offsetRight))
+      .on 'click', => @onClickUpperYAxisInput()
 
-      line = textContainer.append('line')
-        .attr('opacity', 0)
-        .attr('stroke', '#000')
-        .attr('stroke-width', underlineStroke)
-        .attr('x1', @config.margin.left - (conWidth + offsetRight))
-        .attr('y1', @config.margin.top + (conHeight / 2) - (underlineStroke / 2))
-        .attr('x2', @config.margin.left - (conWidth + offsetRight) + conWidth)
-        .attr('y2', @config.margin.top + (conHeight / 2) - (underlineStroke / 2))
+    line = textContainer.append('line')
+      .attr('opacity', 0)
+      .attr('stroke', '#000')
+      .attr('stroke-width', underlineStroke)
+      .on 'click', => @onClickUpperYAxisInput()
 
-      text = textContainer.append('text')
-        .attr('fill', '#000')
-        .attr('x', @config.margin.left - (offsetRight + conWidth))
-        .attr('y', @config.margin.top - underlineStroke * 2)
-        .attr('dy', '0.71em')
-        .attr('font-size', '10px')
-        .text(@getMaxY())
+    text = textContainer.append('text')
+      .attr('fill', '#000')
+      .attr('x', @MARGIN.left - (offsetRight + conWidth))
+      .attr('y', @MARGIN.top - underlineStroke * 2)
+      .attr('dy', '0.71em')
+      .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
+      .attr('font-family', 'dinot-regular')
+      .text(@getMaxY())
+      .on 'click', => @onClickUpperYAxisInput()
 
-      text.attr('x', @config.margin.left - (offsetRight + text.node().getBBox().width))
+    text.attr('x', @MARGIN.left - (offsetRight + text.node().getBBox().width))
 
-      inputContainer = textContainer.append('foreignObject')
-        .attr('width', conWidth)
-        .attr('height', conHeight - offsetTop)
-        .attr('y', @config.margin.top - (conHeight / 2))
-        .attr('x', @config.margin.left - (conWidth + offsetRight))
+    inputContainer = textContainer.append('foreignObject')
+      .attr('width', conWidth)
+      .attr('height', conHeight - offsetTop)
+      .attr('y', @MARGIN.top - (conHeight / 2))
+      .attr('x', @MARGIN.left - (conWidth + offsetRight))
+      .on 'click', => @onClickUpperYAxisInput()
 
-      form = inputContainer.append('xhtml:form')
+    form = inputContainer.append('xhtml:form')
+      .on 'click', => @onClickUpperYAxisInput()
 
-      input = form.append('xhtml:input').attr('type', 'text')
-        .style('display', 'block')
-        .style('opacity', 0)
-        .style('width', conWidth + 'px')
-        .style('height', conHeight + 'px')
-        .style('padding', '0px')
-        .style('margin', '0px')
-        .style('margin-top', '-1px')
-        .style('text-align', 'center')
-        .style('font-size', '10px')
-        .attr('type', 'text')
-        .on('mousemove', =>
+    input = form.append('xhtml:input').attr('type', 'text')
+      .style('display', 'block')
+      .style('opacity', 0)
+      .style('width', conWidth + 'px')
+      .style('height', conHeight + 'px')
+      .style('padding', '0px')
+      .style('margin', '0px')
+      .style('margin-top', '-1px')
+      .style('text-align', 'center')
+      .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
+      .style('font-family', 'dinot-regular')
+      .attr('type', 'text')
+      .on('mouseenter', =>
+        textWidth = text.node().getBBox().width
+        line.attr('x1', @MARGIN.left - (textWidth + offsetRight))
+          .attr('y1', @MARGIN.top + (conHeight / 2) - (underlineStroke / 2))
+          .attr('x2', @MARGIN.left - (textWidth + offsetRight) + textWidth)
+          .attr('y2', @MARGIN.top + (conHeight / 2) - (underlineStroke / 2))
+          .attr('opacity', 1)
+      )
+      .on('mouseout', ->
+        line.attr('opacity', 0)
+      )
+      .on('click', =>
+        @onClickUpperYAxisInput()
+      )
+      .on('focusout', =>
+        input.style('opacity', 0)
+        text.attr('opacity', 1)
+        #@yAxisUpperExtremeValue.focused = false
+        @updateAxesExtremeValues()
+      )
+      .on('keyup', =>
+        if d3.event.keyCode isnt 13 and typeof @onAxisInputBaseFunc is 'function'
+          @onAxisInputBaseFunc('y:max', input.node(), input.node().value.trim())
+      )
+      .on('keydown', =>
+        if d3.event.keyCode is 39
+          @validateArrowInput('y:max', input.node(), input.node(). value)
+        if d3.event.keyCode is 13 and typeof @onEnterAxisInput is 'function'
+          @onEnterAxisInput('y:max', input.node(), input.node().value.trim())
+          d3.event.preventDefault()
+        if d3.event.keyCode is 8
+          @validateBackSpace('y:max', input.node())
+      )
 
-          input.node().value = Math.round(@getDrawLineYScale().invert(0) * 10) / 10
+    @yAxisUpperExtremeValue =
+      rect: rect
+      text: text
+      line: line
+      inputContainer: inputContainer
+      form: form
+      input: input
+      config:
+        offsetTop: offsetTop
+        offsetRight: offsetRight
+        underlineStroke: underlineStroke
+        conHeight: conHeight
+        inputContainerOffset: inputContainerOffset
 
-          textWidth = text.node().getBBox().width
-          line.attr('x1', @config.margin.left - (textWidth + offsetRight))
-            .attr('y1', @config.margin.top + (conHeight / 2) - (underlineStroke / 2))
-            .attr('x2', @config.margin.left - (textWidth + offsetRight) + textWidth)
-            .attr('y2', @config.margin.top + (conHeight / 2) - (underlineStroke / 2))
-            .attr('opacity', 1)
+  onClickUpperYAxisInput: ->
+    #return if @yAxisUpperExtremeValue.focused
+    #@yAxisUpperExtremeValue.focused = true
+    @yAxisUpperExtremeValue.text.attr('opacity', 0)
 
-          inputContainerOffset = 5
-          inputWidth = 40
+    if typeof @onClickAxisInput is 'function'
+      @onClickAxisInput 'y:max', @yAxisUpperExtremeValue
 
-          inputContainer
-            .attr('width', inputWidth + inputContainerOffset)
-            .attr('x', @config.margin.left - (inputWidth + offsetRight) - (inputContainerOffset / 2))
-          input.style('width', (inputWidth + inputContainerOffset) + 'px')
-
-          rect
-            .attr('width', inputWidth)
-            .attr('x', @config.margin.left - (inputWidth + offsetRight))
-        )
-        .on('mouseout', ->
-          line.attr('opacity', 0)
-        )
-        .on('click', =>
-          val = Math.round(@yScale.invert(0) * 10) / 10
-          input.style('opacity', 1)
-          input.node().value = val
-        )
-        .on('focusout', ->
-          input.style('opacity', 0)
-        )
-        .on('keydown', =>
-          if d3.event.keyCode is 13
-            # // enter
-            d3.event.preventDefault()
-            extent = @getMaxY()
-            y = @yScale
-            lastYScale = @lastYScale || y
-            minY = lastYScale.invert(@height)
-            maxY = input.node().value * 1
-            if minY >= maxY
-              return false
-
-            max = @getMaxY()
-            min = @getMinY()
-            diff = max - min
-            allowance = diff * (if @config.axes.y.scale is 'log' then 0.2 else 0.05)
-            max += allowance
-
-            if maxY > max
-              maxY = max
-
-            k = @height / (y(minY) - y(maxY))
-
-            @editingYAxis = true
-            lastK = @getTransform().k
-            @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)))
-            @editingYAxis = false
-            @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(lastK))
-          else
-            @ensureNumeric()
-        )
-
-      @yAxisUpperExtremeValueText = text
-
+  
   drawYAxisLowerExtremeValue: ->
 
-      textContainer = @chartSVG.append('g')
-        .attr('class', 'axes-extreme-value tick')
+    textContainer = @chartSVG.append('g')
+      .attr('class', 'axes-extreme-value tick')
 
-      @yAxisLowerExtremeValueContainer = textContainer
+    @yAxisLowerExtremeValueContainer = textContainer
 
-      conWidth = 30
-      conHeight = 14
-      offsetRight = 9
-      offsetTop = 2
-      underlineStroke = 2
-      lineWidth = 15
+    conWidth = 30
+    conHeight = 14
+    offsetRight = 9
+    offsetTop = 2
+    underlineStroke = 2
+    lineWidth = 15
 
-      rect = textContainer.append('rect')
-        .attr('fill', '#fff')
-        .attr('width', conWidth)
-        .attr('height', conHeight)
-        .attr('y', @height + @config.margin.top - (conHeight / 2) + offsetTop)
-        .attr('x', @config.margin.left - (conWidth + offsetRight))
+    rect = textContainer.append('rect')
+      .attr('fill', '#fff')
+      .attr('width', conWidth)
+      .attr('height', @AXES_TICKS_FONT_SIZE + offsetTop)
+      .attr('y', @height + @MARGIN.top - (conHeight / 2))
+      .attr('x', @MARGIN.left - (conWidth + offsetRight))
+      .on 'click', => @onClickLowerYAxisInput()
 
-      line = textContainer.append('line')
-        .attr('opacity', 0)
-        .attr('stroke', '#000')
-        .attr('stroke-width', underlineStroke)
-        .attr('x1', @config.margin.left - (conWidth + offsetRight))
-        .attr('y1', @height + @config.margin.top + (conHeight / 2) - (underlineStroke / 2))
-        .attr('x2', @config.margin.left - (conWidth + offsetRight) + conWidth)
-        .attr('y2', @height + @config.margin.top + (conHeight / 2) - (underlineStroke / 2))
+    line = textContainer.append('line')
+      .attr('opacity', 0)
+      .attr('stroke', '#000')
+      .attr('stroke-width', underlineStroke)
+      .on 'click', => @onClickLowerYAxisInput()
 
-      text = textContainer.append('text')
-        .attr('fill', '#000')
-        .attr('x', @config.margin.left - (offsetRight + conWidth))
-        .attr('y', @height + @config.margin.top - underlineStroke * 2)
-        .attr('dy', '0.71em')
-        .attr('font-size', '10px')
-        .text(@getMaxY())
+    text = textContainer.append('text')
+      .attr('fill', '#000')
+      .attr('x', @MARGIN.left - (offsetRight + conWidth))
+      .attr('y', @height + @MARGIN.top - underlineStroke * 2)
+      .attr('dy', '0.71em')
+      .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
+      .attr('font-family', 'dinot-regular')
+      .text(@getMaxY())
+      .on 'click', => @onClickLowerYAxisInput()
 
-      text.attr('x', @config.margin.left - (offsetRight + text.node().getBBox().width))
+    text.attr('x', @MARGIN.left - (offsetRight + text.node().getBBox().width))
 
-      inputContainer = textContainer.append('foreignObject')
-        .attr('width', conWidth)
-        .attr('height', conHeight - offsetTop)
-        .attr('y', @height + @config.margin.top - (conHeight / 2))
-        .attr('x', @config.margin.left - (conWidth + offsetRight))
+    inputContainer = textContainer.append('foreignObject')
+      .attr('width', conWidth)
+      .attr('x', @MARGIN.left - (conWidth + offsetRight))
+      .attr('height', conHeight - offsetTop)
+      .attr('y', @height + @MARGIN.top - (conHeight / 2))
+      .on 'click', => @onClickLowerYAxisInput()
 
-      form = inputContainer.append('xhtml:form')
+    form = inputContainer.append('xhtml:form')
+      .style('margin', 0)
+      .style('padding', 0)
 
-      input = form.append('xhtml:input').attr('type', 'text')
-        .style('display', 'block')
-        .style('opacity', 0)
-        .style('width', conWidth + 'px')
-        .style('height', conHeight + 'px')
-        .style('padding', '0px')
-        .style('margin', '0px')
-        .style('margin-top', '-1px')
-        .style('text-align', 'center')
-        .style('font-size', '10px')
-        .attr('type', 'text')
-        .on('mousemove', =>
-
-          input.node().value = Math.round(@getDrawLineYScale().invert(@height) * 10) / 10
-
-          textWidth = text.node().getBBox().width
-          line.attr('x1', @config.margin.left - (textWidth + offsetRight))
-            .attr('y1', @height + @config.margin.top + (conHeight / 2) - (underlineStroke / 2))
-            .attr('x2', @config.margin.left - (textWidth + offsetRight) + textWidth)
-            .attr('y2', @height + @config.margin.top + (conHeight / 2) - (underlineStroke / 2))
-            .attr('opacity', 1)
-
-          inputContainerOffset = 5
-          inputWidth = 40
-
-          inputContainer
-            .attr('width', inputWidth + inputContainerOffset)
-            .attr('x', @config.margin.left - (inputWidth + offsetRight) - (inputContainerOffset / 2))
-          input.style('width', (inputWidth + inputContainerOffset) + 'px')
-
-          rect
-            .attr('width', inputWidth)
-            .attr('x', @config.margin.left - (inputWidth + offsetRight))
-        )
-        .on('mouseout', ->
-          line.attr('opacity', 0)
-        )
-        .on('click', =>
-          val = Math.round(@yScale.invert(@height) * 10) / 10
-          input.style('opacity', 1)
-          input.node().value = val
-        )
-        .on('focusout', ->
-          input.style('opacity', 0)
-        )
-        .on('keydown', =>
-          if d3.event.keyCode is 13
-            # enter
-            d3.event.preventDefault()
-            extent = @getMaxY()
-            y = @yScale
-            lastYScale = @lastYScale || y
-            minY = input.node().value * 1
-            maxY = lastYScale.invert(0)
-            if (minY >= maxY)
-              return false
-
-            max = @getMaxY()
-            min = @getMinY()
-            diff = max - min
-            allowance = diff * (if @config.axes.y.scale is 'log' then 0.2 else 0.05)
-            min = if @config.axes.y.scale is 'log' then 5 else min - allowance
-
-            if (minY < min)
-              minY = min
-
-            k = @height / (y(minY) - y(maxY))
-            lastK = @getTransform().k
-            @editingYAxis = true
-            @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)))
-            @editingYAxis = false
-            @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(lastK))
-          else
-            @ensureNumeric()
-        )
-
-      @yAxisLowerExtremeValueText = text
-      @yAxisLowerExtremeValueText = text
-
-    updateXAxisExtremeValues: ->
-      xScale = @getDrawLineXScale()
-      yScale = @getDrawLineYScale()
-      minWidth = 10
-      if @xAxisLeftExtremeValueText
-        text = @xAxisLeftExtremeValueText
-        minX = Math.round(xScale.invert(0) * 10) / 10
-        if @config.axes.x.tickFormat
-          minX = @config.axes.x.tickFormat(minX)
-        text.text(minX)
+    input = form.append('xhtml:input').attr('type', 'text')
+      .style('display', 'block')
+      .style('opacity', 0)
+      .style('width', conWidth + 'px')
+      .style('height', conHeight + 'px')
+      .style('padding', 0)
+      .style('margin', 0)
+      .style('margin-top', '-1px')
+      .style('text-align', 'center')
+      .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
+      .style('font-family', 'dinot-regular')
+      .attr('type', 'text')
+      .on('mouseenter', =>
         textWidth = text.node().getBBox().width
-        text.attr('x', @config.margin.left - (textWidth / 2))
-      if @xAxisLeftExtremeValueTextUnderline
-        lineWidth = textWidth
-        lineWidth = if lineWidth > minWidth then lineWidth else minWidth
-        @xAxisLeftExtremeValueTextUnderline
-          .attr('x1', @config.margin.left - (lineWidth / 2))
-          .attr('x2', @config.margin.left - (lineWidth / 2) + lineWidth)
-      if @xAxisRightExtremeValueText
-        maxX = Math.round(xScale.invert(@width) * 10) / 10
-        if @config.axes.x.tickFormat
-          maxX = @config.axes.x.tickFormat(maxX)
-        @xAxisRightExtremeValueText.text(maxX)
-        textWidth = @xAxisRightExtremeValueText.node().getBBox().width
-        @xAxisRightExtremeValueText.attr('x', @width + @config.margin.left - (textWidth / 2))
-      if @xAxisRightExtremeValueTextUnderline
-        lineWidth = textWidth
-        lineWidth = if lineWidth > minWidth then lineWidth else minWidth
-        @xAxisRightExtremeValueTextUnderline
-          .attr('x1', @width + @config.margin.left - (lineWidth / 2))
-          .attr('x2', @width + @config.margin.left - (lineWidth / 2) + lineWidth)
-      offsetRight = 9
-      if @yAxisUpperExtremeValueText
-        text = @yAxisUpperExtremeValueText
-        maxY = Math.round(yScale.invert(0) * 10) / 10
-        if @config.axes.y.tickFormat
-          maxY = @config.axes.y.tickFormat(maxY)
-        text.text(maxY)
-        textWidth = text.node().getBBox().width
-        text.attr('x', @config.margin.left - (offsetRight + text.node().getBBox().width))
-      if @yAxisLowerExtremeValueText
-        text = @yAxisLowerExtremeValueText
-        minY = Math.round(yScale.invert(@height) * 10) / 10
-        if @config.axes.y.tickFormat
-          minY = @config.axes.y.tickFormat(minY)
-        text.text(minY)
-        textWidth = text.node().getBBox().width
-        text.attr('x', @config.margin.left - (offsetRight + text.node().getBBox().width))
+        line.attr('x1', @MARGIN.left - (textWidth + offsetRight))
+          .attr('y1', @height + @MARGIN.top + (conHeight / 2) - (underlineStroke / 2))
+          .attr('x2', @MARGIN.left - (textWidth + offsetRight) + textWidth)
+          .attr('y2', @height + @MARGIN.top + (conHeight / 2) - (underlineStroke / 2))
+          .attr('opacity', 1)
+      )
+      .on('mouseout', ->
+        line.attr('opacity', 0)
+      )
+      .on('click', =>
+        @onClickLowerYAxisInput()
+      )
+      .on('focusout', =>
+        input.style('opacity', 0)
+        text.attr('opacity', 1)
+        #@yAxisLowerExtremeValue.focused = false
+        @updateAxesExtremeValues()
+      )
+      .on('keyup', =>
+        if d3.event.keyCode isnt 13 and typeof @onAxisInputBaseFunc is 'function'
+          @onAxisInputBaseFunc('y:min', input.node(), input.node().value.trim())
+      )
+      .on('keydown', =>
+        if d3.event.keyCode is 39
+          @validateArrowInput('y:min', input.node(), input.node().value)
+        if d3.event.keyCode is 13 and typeof @onEnterAxisInput is 'function'
+          @onEnterAxisInput('y:min', input.node(), input.node().value.trim())
+          d3.event.preventDefault()
+        if d3.event.keyCode is 8
+          @validateBackSpace('y:min', input.node())
+      )
+
+    @yAxisLowerExtremeValue = 
+      rect: rect
+      text: text
+      line: line
+      inputContainer: inputContainer
+      form: form
+      input: input
+      config:
+        offsetTop: offsetTop
+        offsetRight: offsetRight
+        underlineStroke: underlineStroke
+        conHeight: conHeight
+
+  onClickLowerYAxisInput: ->
+    #return if @yAxisLowerExtremeValue.focused
+    #@yAxisLowerExtremeValue.focused = true
+    @yAxisLowerExtremeValue.text.attr('opacity', 0)
+
+    if typeof @onClickAxisInput is 'function'
+      @onClickAxisInput 'y:min', @yAxisLowerExtremeValue
+
+  updateAxesExtremeValues: ->
+    xScale = @getXScale()
+    yScale = @getYScale()
+    minWidth = 10
+    if @xAxisLeftExtremeValue.text
+      text = @xAxisLeftExtremeValue.text
+      rect = @xAxisLeftExtremeValue.rect
+      minX = if @hasData() then Math.round(xScale.invert(0) * 10) / 10 else @DEFAULT_MIN_X
+      text.text(@xAxisTickFormat(minX))
+      textWidth = text.node().getBBox().width
+      text.attr('x', @MARGIN.left - (textWidth / 2))
+      rect.attr('x', @MARGIN.left - (textWidth / 2))
+        .attr('width', textWidth)
+    if @xAxisRightExtremeValue.text
+      maxX = if @hasData() then Math.round(xScale.invert(@width) * 10) / 10 else @DEFAULT_MAX_X
+      @xAxisRightExtremeValue.text.text(@xAxisTickFormat(maxX))
+      textWidth = @xAxisRightExtremeValue.text.node().getBBox().width
+      @xAxisRightExtremeValue.text.attr('x', @width + @MARGIN.left - (textWidth / 2))
+      @xAxisRightExtremeValue.rect.attr('x', @width + @MARGIN.left - (textWidth / 2))
+        .attr('width', textWidth)
+    if @yAxisUpperExtremeValue.text
+      text = @yAxisUpperExtremeValue.text
+      rect = @yAxisUpperExtremeValue.rect
+      maxY = if @hasData() then Math.round(yScale.invert(0) * 10) / 10 else @DEFAULT_MAX_Y
+      text.text(@yAxisTickFormat(maxY))
+      textWidth = text.node().getBBox().width
+      text.attr('x', @MARGIN.left - (@yAxisUpperExtremeValue.config.offsetRight + textWidth))
+      rect.attr('x', @MARGIN.left - (@yAxisUpperExtremeValue.config.offsetRight + textWidth))
+        .attr('width', textWidth)
+    if @yAxisLowerExtremeValue.text
+      rect = @yAxisLowerExtremeValue.rect
+      text = @yAxisLowerExtremeValue.text
+      minY = if @hasData() then Math.round(yScale.invert(@height) * 10) / 10 else @DEFAULT_MIN_Y
+      text.text(@yAxisTickFormat(minY))
+      textWidth = text.node().getBBox().width
+      text.attr('x', @MARGIN.left - (@yAxisLowerExtremeValue.config.offsetRight + textWidth))
+      rect.attr('x', @MARGIN.left - (@yAxisLowerExtremeValue.config.offsetRight + textWidth))
+        .attr('width', textWidth)
+
+    @hideLastAxesTicks()
+
+  hideLastAxesTicks: ->
+    spacingX = 20
+    spacingY = 1
+    xAxisLeftExtremeValueText = @xAxisLeftExtremeValue.text
+    xAxisRightExtremeValueText = @xAxisRightExtremeValue.text
+    yAxisLowerExtremeValueText = @yAxisLowerExtremeValue.text
+    yAxisUpperExtremeValueText = @yAxisUpperExtremeValue.text
+
+    config = @config
+
+    # x ticks
+    ticks = @chartSVG.selectAll('g.axis.x-axis > g.tick')
+
+    width = @width
+    num_ticks = ticks.size()
+    ticks.each (d, i) ->
+      x = this.transform.baseVal.consolidate().matrix.e
+      if (i is 0)
+        textWidth = xAxisLeftExtremeValueText.node().getBBox().width
+        if x < textWidth + spacingX
+          d3.select(this).attr('opacity', 0)
+      if (i is num_ticks - 1)
+        textWidth = xAxisRightExtremeValueText.node().getBBox().width
+        if x >  width - (textWidth + spacingX)
+          d3.select(this).attr('opacity', 0)
+    # y ticks
+    ticks = @chartSVG.selectAll('g.axis.y-axis > g.tick')
+    num_ticks = ticks.size()
+    height = @height
+    ticks.each (d, i) ->
+      y = this.transform.baseVal.consolidate().matrix.f
+      if (i is 0)
+        textHeight = yAxisLowerExtremeValueText.node().getBBox().height
+        if y >  height - (textHeight + spacingY)
+          d3.select(this).attr('opacity', 0)
+      if (i is num_ticks - 1)
+        textHeight = yAxisUpperExtremeValueText.node().getBBox().height
+        if y < textHeight + spacingY
+          d3.select(this).attr('opacity', 0)
 
   initChart: ->
     d3.select(@elem).selectAll("*").remove()
 
-    @width = @elem.parentElement.offsetWidth - @config.margin.left - @config.margin.right
-    @height = @elem.parentElement.offsetHeight - @config.margin.top - @config.margin.bottom
+    @width = @elem.parentElement.offsetWidth - @MARGIN.left - @MARGIN.right
+    @height = @elem.parentElement.offsetHeight - @MARGIN.top - @MARGIN.bottom
 
     @zooomBehavior = d3.zoom()
       .on 'start', => @isZooming = true
       .on 'end', => @isZooming = false
-      .on 'zoom', => @zoomed.call(@)
+      .on 'zoom', => @zoomed()
 
     @chartSVG = d3.select(@elem).append("svg")
-        .attr("width", @width + @config.margin.left + @config.margin.right)
-        .attr("height", @height + @config.margin.top + @config.margin.bottom)
+        .attr("width", @width + @MARGIN.left + @MARGIN.right)
+        .attr("height", @height + @MARGIN.top + @MARGIN.bottom)
         .call(@zooomBehavior)
 
     svg = @chartSVG.append("g")
-        .attr("transform", "translate(" + @config.margin.left + "," + @config.margin.top + ")")
+        .attr("transform", "translate(" + @MARGIN.left + "," + @MARGIN.top + ")")
         .attr('class', 'chart-g')
 
     @viewSVG = svg.append('svg')
@@ -1074,7 +1388,7 @@ class BaseChart
     @setMouseOverlay()
     @setYAxis()
     @setXAxis()
-    @drawLines(@config.series)
+    @drawLines()
     @makeCircle()
     @updateZoomScaleExtent()
     @drawAxesExtremeValues()
@@ -1149,7 +1463,7 @@ class BaseChart
     mouseY = mouse[1]
     closestLineIndex
     distances = []
-    lineIndex
+    lineIndex = null
     maxDistance = 20 * @zoomTransform.k
 
     for l, lineIndex in @lines by 1
@@ -1166,8 +1480,9 @@ class BaseChart
         @hoveredLine = null
       if @prevClosestLineIndex isnt closestLineIndex
         if @prevClosestLineIndex isnt undefined and @lines[@prevClosestLineIndex]
-          if (@lines[@prevClosestLineIndex] isnt @activePath) and (@lines[@prevClosestLineIndex] isnt @hoveredLine) and !@hovering
-            @lines[@prevClosestLineIndex].attr('stroke-width', @NORMAL_PATH_STROKE_WIDTH)
+          @lines.forEach (line) =>
+            if line isnt @activePath and line isnt @hoveredLine and !@hovering
+              line.attr('stroke-width', @NORMAL_PATH_STROKE_WIDTH)
           if !@hovering and @hoveredLine
             @hoveredLine.attr('stroke-width', @NORMAL_PATH_STROKE_WIDTH)
             @hoveredLine = null
@@ -1214,29 +1529,28 @@ class BaseChart
     zoom_percent = zoom_percent || 0
     zoom_percent = if zoom_percent < 0 then 0 else ( if zoom_percent > 1 then 1 else zoom_percent)
     k = ((@getScaleExtent() - @getMinX()) * zoom_percent) + 1
-    console.log('getScaleExtent', @getScaleExtent())
-    console.log('getMinX', @getMinX())
-    console.log('k', k)
     @chartSVG.call(@zooomBehavior.scaleTo, k)
 
   updateSeries: (series) ->
     @config.series = series
-    @updateXAxisExtremeValues()
+    @updateAxesExtremeValues()
 
   updateData: (data) ->
     @data = data
     @updateZoomScaleExtent()
+    setTimeout =>
+      @updateAxesExtremeValues()
+    , 500
 
   updateConfig: (config) ->
     @config = config
-    @updateXAxisExtremeValues()
-
-  updateInterpolation: (i) ->
-    @config.axes.y.scale = i
+    setTimeout =>
+      @updateAxesExtremeValues()
+    , 500
 
   empty: -> d3.select(@elem).selectAll('*').remove()
 
-  resize: (@elem, @data, @config) -> @initChart()
+  resize: -> @initChart()
 
 
 window.ChaiBioCharts = window.ChaiBioCharts || {}

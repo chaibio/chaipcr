@@ -30,7 +30,14 @@ window.App.directive 'meltCurveChart', [
           $scope.onZoom()(chart.getTransform(), d.width, d.height, chart.getScaleExtent())
 
         $scope.$on 'window:resize', ->
-          initChart()
+          chart.resize() if chart and $scope.show
+
+        $scope.$watch ->
+          series = $scope.config?.series || []
+          series[0]?.y
+        , (val, oldVal) ->
+          if val and (val isnt oldVal)
+            initChart()
 
         $scope.$watchCollection ($scope) ->
           return {
@@ -49,7 +56,7 @@ window.App.directive 'meltCurveChart', [
               chart.setYAxis()
               chart.setXAxis()
               chart.drawLines()
-              chart.updateXAxisExtremeValues()
+              chart.updateAxesExtremeValues()
 
         $scope.$watch 'scroll', (scroll) ->
           return if !scroll or !chart or !$scope.show
@@ -75,7 +82,7 @@ window.App.directive 'meltCurveChart', [
               chart.setYAxis()
               chart.setXAxis()
               chart.drawLines()
-              chart.updateXAxisExtremeValues()
+              chart.updateAxesExtremeValues()
 
 
     }

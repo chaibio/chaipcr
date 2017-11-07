@@ -4,6 +4,23 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
   AXIS_LABEL_FONT_SIZE: 17
   DASHED_LINE_STROKE_WIDTH: 2
 
+  DEFAULT_MAX_Y: 120
+  DEFAULT_MIN_Y: 0
+  DEFAULT_MAX_X: 60
+  DEFAULT_MIN_X: 0
+  MARGIN:
+    top: 20
+    left: 80
+    right: 30
+    bottom: 50
+
+
+  getMinY: -> @DEFAULT_MIN_Y
+
+  roundDownExtremeValue: (v) -> v
+
+  roundUpExtremeValue: (v) -> v
+
   setXAxis: ->
     super
     @setXAxisCircle()
@@ -19,7 +36,7 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
       .attr('class', 'mouse-indicator-circle')
 
   setMouseMoveListener: (fn) ->
-  	@onMouseMove = fn
+    @onMouseMove = fn
 
   drawLines: ->
     series = @config.series
@@ -49,8 +66,8 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
       .attr("fill", "none")
 
   makeLine: (line_config) ->
-    xScale = @getDrawLineXScale()
-    yScale = @getDrawLineYScale()
+    xScale = @getXScale()
+    yScale = @getYScale()
     line = d3.line()
       .curve(d3.curveCardinal)
       .x((d) ->
@@ -70,15 +87,15 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
 
   drawCircleTooltips: ->
     return if not @config.series
-    @circles = @circles || [];
+    @circles = @circles || []
     @circles.forEach (circle) ->
       circle.remove()
     @circles = []
     for config in @config.series by 1
       @circles.push(@makeCircleForLine(config))
+    return
 
   makeCircleForLine: (line_config) ->
-    console.log line_config
     @viewSVG.append('circle')
       .attr('opacity', 0)
       .attr('r', @CIRCLE_RADIUS)
@@ -95,33 +112,32 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
       .attr('height', @height)
       .attr('fill', 'transparent')
       .on('mouseenter', =>
-        @toggleCirclesVisibility(true)
+        if @hasData() and !@isZooming
+          @toggleMouseIndicatorsVisibility(true)
       )
       .on('mouseout', =>
-        @toggleCirclesVisibility(false)
+        @toggleMouseIndicatorsVisibility(false)
       )
-      .on('mousemove', => 
+      .on('mousemove', =>
         @followTheMouse()
       )
 
-  toggleCirclesVisibility: (show) ->
+  toggleMouseIndicatorsVisibility: (show) ->
     opacity = if show then 1 else 0
     @dashedLine.attr('opacity', opacity) if @dashedLine
+    @xAxisCircle.attr('opacity', opacity) if @xAxisCircle
     @circles.forEach (circle) ->
       circle.attr('opacity', opacity)
-    @xAxisCircle.attr('opacity', opacity) if @xAxisCircle
 
 
   followTheMouse: ->
     return if @isZooming or !@hasData()
-    @toggleCirclesVisibility(true)
+    @toggleMouseIndicatorsVisibility(!@isZooming)
     x = d3.mouse(@mouseOverlay.node())[0]
 
-    console.log @lines
-
     @lines.forEach (path, i) =>
-      pathEl = path.node();
-      pathLength = pathEl.getTotalLength();
+      pathEl = path.node()
+      pathLength = pathEl.getTotalLength()
       beginning = x
       end = pathLength
       target = null
@@ -145,24 +161,24 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
           .attr("cx", x)
           .attr("cy", pos.y)
 
+    opacity = if (@isZooming or !@hasData()) then 0 else 1
+
     if @dashedLine
       @dashedLine
-        .attr("opacity", 1)
+        .attr("opacity", opacity)
         .attr('x1', x)
         .attr('x2', x)
 
     if @xAxisCircle
-      x = d3.mouse(@chartSVG.node())[0];
+      xx = d3.mouse(@chartSVG.node())[0]
       @xAxisCircle
-        .attr("cx", x)
-        .attr("cy", @height + @config.margin.top)
+        .attr("opacity", opacity)
+        .attr("cx", xx)
+        .attr("cy", @height + @MARGIN.top)
 
     if (typeof @onMouseMove is 'function')
-      # get data point at point x
-      x = @getMousePosition(@mouseOverlay.node())[0]
-
       line_config = @config.series[0]
-      x0 = if @zoomTransform.k > 1 then @zoomTransform.rescaleX(@xScale).invert(x) else @xScale.invert(x)
+      x0 = @getXScale().invert(x)
       i = @bisectX(line_config)(@data[line_config.dataset], x0, 1)
       d0 = @data[line_config.dataset][i - 1]
 
@@ -172,6 +188,45 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
       d = if x0 - d0[line_config.x] > d1[line_config.x] - x0 then d1 else d0
 
       @onMouseMove(d)
+
+
+  onEnterAxisInput: (loc, input, val) ->
+    axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
+    if axis is 'y'
+      super
+    else
+      val = @parseXAxisInput(val).toString()
+      super
+
+  onAxisInput: (loc, input, val) ->
+    axis = if loc is 'x:min' or loc is 'x:max' then 'x' else 'y'
+    if axis isnt 'x'
+      super
+  
+  parseXAxisInput: (val) ->
+    valArr = val.split(':')
+
+    if valArr.length is 0
+     if loc is 'x:min'
+       return @getMinX()
+     else
+       return @getMaxX()
+
+    valArr = valArr.reverse()
+
+    if val.length is 2 and valArr.length is 1
+      secs = 0
+      mins = valArr[0] * 1
+    else
+      secs = valArr[0] * 1
+      mins = valArr[1] * 1
+
+    hours = if valArr[2] then valArr[2] * 1 else 0
+    days = if valArr[3] then valArr[3] * 1 else 0
+
+    total = secs + mins * 60 + hours * 60 * 60
+    return total
+    
 
 window.ChaiBioCharts = window.ChaiBioCharts || {}
 window.ChaiBioCharts.ThermalProfileChart = ThermalProfileChart

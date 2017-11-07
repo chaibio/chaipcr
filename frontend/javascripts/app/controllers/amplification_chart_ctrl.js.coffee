@@ -233,7 +233,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           Experiment
           .getAmplificationData($stateParams.id)
           .then (resp) ->
-            console.log resp
             $scope.fetching = false
             $scope.error = null
             if (resp.status is 200 and resp.data?.partial and $scope.enterState) or (resp.status is 200 and !resp.data.partial)
@@ -258,7 +257,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               retry()
 
           .catch (resp) ->
-            console.log resp
             if resp.status is 500
               $scope.error = resp.statusText || 'Unknown error'
             $scope.fetching = false
