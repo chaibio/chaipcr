@@ -291,7 +291,7 @@ do
     if ping $build_machine -c 3
     then
     	echo device is finally up !!
-        sleep 30
+        sleep 230
         exit 0
     fi
 done

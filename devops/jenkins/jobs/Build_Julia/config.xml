@@ -33,11 +33,6 @@ Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
-        <hudson.model.BooleanParameterDefinition>
-          <name>install_packages</name>
-          <description>Installs default packages</description>
-          <defaultValue>false</defaultValue>
-        </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -448,50 +443,8 @@ EOF
 
 ./julia fp.jl --compile=yes
 
-
-
-
 make install  || exit 1
 ln -s /usr/share/julia/bin/julia /usr/bin/julia
-
-echo precompiling mandatory packages.
-cat &lt;&lt;EOF &gt;&gt; chaibio_packages.jl
-Pkg.init()
-Pkg.update()
-
-println(&quot;Adding package: Dierckx&quot;)
-Pkg.add(&quot;Dierckx&quot;)
-println(&quot;Adding package: JSON&quot;)
-Pkg.add(&quot;JSON&quot;)
-println(&quot;Adding package: MySQL&quot;)
-Pkg.add(&quot;MySQL&quot;)
-println(&quot;Adding package: JLD&quot;)
-Pkg.add(&quot;JLD&quot;)
-println(&quot;Adding package: DataFrames&quot;)
-Pkg.add(&quot;DataFrames&quot;)
-println(&quot;Adding package: Ipopt&quot;)
-Pkg.add(&quot;Ipopt&quot;)
-println(&quot;Adding package: JuMP&quot;)
-Pkg.add(&quot;JuMP&quot;)
-println(&quot;Adding package: NLopt&quot;)
-Pkg.add(&quot;NLopt&quot;)
-println(&quot;Adding package: HttpServer&quot;)
-Pkg.add(&quot;HttpServer&quot;)
-
-println(&quot;Done adding packages&quot;)
-
-using DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NLopt, HttpServer
-println(&quot;Done using package&quot;)
-
-quit()
-EOF
-
-# test with no prebuilding
-if $install_packages
-then
-        echo precompiling default packages
-        julia chaibio_packages.jl
-fi
 
 echo done testing! removing test script.
 rm chaibio_packages.jl
