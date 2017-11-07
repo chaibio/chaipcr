@@ -5,7 +5,7 @@
     '$window',
     '$rootScope',
     'IsMobile',
-    function windowCommon($window, $rootScope, IsMobile) {
+    function WindowWrapper($window, $rootScope, IsMobile) {
 
       this.width = function() {
         if (IsMobile()) {
@@ -30,29 +30,46 @@
         return height;
       };
 
-      angular.element($window).resize(function() {
-        $rootScope.$apply(function () {
-          $rootScope.$broadcast('window:resize');
-        });
-      });
+      this.initEventHandlers = function () {
 
-      angular.element($window).on('mousedown', function(e) {
-        $rootScope.$apply(function () {
-          $rootScope.$broadcast('window:mousedown', e);
-        });
-      });
+        angular.element(document).on('keydown keyup', function (e) {
+          var charCodes = [224, 17, 91, 93];
 
-      angular.element($window).on('mouseup', function(e) {
-        $rootScope.$apply(function () {
-          $rootScope.$broadcast('window:mouseup', e);
-        });
-      });
+          var keyCode = e.which || e.keyCode;
 
-      angular.element($window).on('mousemove', function(e) {
-        $rootScope.$apply(function () {
-          $rootScope.$broadcast('window:mousemove', e);
+          if (charCodes.indexOf(keyCode) > -1) {
+            $rootScope.$apply(function () {
+              var et = e.type === 'keydown'? 'keypressed:command' : 'keyreleased:command';
+              $rootScope.$broadcast(et);
+            });
+          }
+
         });
-      });
+
+        angular.element($window).resize(function() {
+          $rootScope.$apply(function () {
+            $rootScope.$broadcast('window:resize');
+          });
+        });
+
+        angular.element($window).on('mousedown', function(e) {
+          $rootScope.$apply(function () {
+            $rootScope.$broadcast('window:mousedown', e);
+          });
+        });
+
+        angular.element($window).on('mouseup', function(e) {
+          $rootScope.$apply(function () {
+            $rootScope.$broadcast('window:mouseup', e);
+          });
+        });
+
+        angular.element($window).on('mousemove', function(e) {
+          $rootScope.$apply(function () {
+            $rootScope.$broadcast('window:mousemove', e);
+          });
+        });
+      };
 
     }
   ]);

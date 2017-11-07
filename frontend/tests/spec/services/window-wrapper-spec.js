@@ -8,8 +8,8 @@
       var windowMock = {
         navigator: {
           userAgent: 'Mozilla/5.0 (iPad; CPU OS 8_0_2 like Mac OS X)\
-                      AppleWebKit/60.1.4 (KHTML, like Gecko) Version/8.0\
-                      Mobile/12A405 Safari/600.1.4'
+          AppleWebKit/60.1.4 (KHTML, like Gecko) Version/8.0\
+          Mobile/12A405 Safari/600.1.4'
         },
         innerWidth: 200
       }
@@ -56,6 +56,48 @@
       it('should return document height', function() {
         angular.element('body').css({ margin: 0, padding: 0 }).append('<div style="height: 1234px"></div>')
         expect(this.WindowWrapper.documentHeight()).toBe(1234)
+      })
+
+      it('should broadcast keypressed:command event', function () {
+        var charCodes = [224, 17, 91, 93] // https://stackoverflow.com/questions/3902635/how-does-one-capture-a-macs-command-key-via-javascript
+
+        spyOn(this.$rootScope, '$apply').and.callFake(function(fn) {
+          fn()
+        })
+
+        spyOn(this.$rootScope, '$broadcast')
+
+        for (var i=0; i < charCodes.length; i++) {
+          var code = charCodes[i]
+
+          var e = jQuery.Event("keydown")
+          e.which = code
+          $(window.document.body).trigger(e)
+          expect(this.$rootScope.$broadcast).toHaveBeenCalledWith('keypressed:command')
+
+        }
+
+      })
+
+      it('should broadcast keyreleased:command event', function () {
+        var charCodes = [224, 17, 91, 93] // https://stackoverflow.com/questions/3902635/how-does-one-capture-a-macs-command-key-via-javascript
+
+        spyOn(this.$rootScope, '$apply').and.callFake(function(fn) {
+          fn()
+        })
+
+        spyOn(this.$rootScope, '$broadcast')
+
+        for (var i=0; i < charCodes.length; i++) {
+          var code = charCodes[i]
+
+          var e = jQuery.Event("keyup")
+          e.which = code
+          $(window.document.body).trigger(e)
+          expect(this.$rootScope.$broadcast).toHaveBeenCalledWith('keyreleased:command')
+
+        }
+
       })
 
       it('should broadcast window:resize event', function() {
@@ -126,6 +168,7 @@
 
     afterEach(function () {
       angular.element(this.$window).off()
+      angular.element(document).off()
     })
 
   })
