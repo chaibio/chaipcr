@@ -18,31 +18,47 @@
  */
 
 angular.module("canvasApp").factory('htmlEvents', [
-  'ExperimentLoader',
-  'previouslySelected',
   'previouslyHoverd',
-  'scrollService',
   'popupStatus',
   'editMode',
 
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, popupStatus, editMode) {
+  function(previouslyHoverd, popupStatus, editMode) {
 
-    this.init = function(C, $scope, that) {
+    var me = this, reference, kanvas;
+   
+    this.init = function(C, that) {
+      reference = that;
+      kanvas = C;
 
-      angular.element('body').click(function(evt) {
+      angular.element('body').click(me.manageClcikOnBody);
 
-        if (popupStatus.popupStatusAddStage && evt.target.id != "add-stage") {
-            angular.element('#add-stage').click();
-        }
-      });
+      angular.element('.canvas-container, .canvasClass').mouseleave(me.mouseLeaveEventHandler);
 
-      angular.element('.canvas-container, .canvasClass').mouseleave(function() {
+      angular.element('.canvas-containing').click(me.manageClickOnCanvasContaining);
 
-        if (C.editStageStatus === false) {
+    };
+
+    this.manageClcikOnBody = function(evt) {
+
+      if (popupStatus.popupStatusAddStage && evt.target.id != "add-stage") {
+          angular.element('#add-stage').click();
+      }
+    };
+
+    this.manageClickOnCanvasContaining = function(evt) {
+
+      if (evt.target == evt.currentTarget) {
+        reference.setSummaryMode();
+      }
+    };
+
+    this.mouseLeaveEventHandler = function() {
+        console.log(kanvas);
+        if (kanvas.editStageStatus === false) {
             if (previouslyHoverd.step) {
               previouslyHoverd.step.closeImage.setOpacity(false);
             }
-            C.canvas.renderAll();
+            kanvas.canvas.renderAll();
         }
 
         if (editMode.tempActive === true) {
@@ -52,17 +68,8 @@ angular.module("canvasApp").factory('htmlEvents', [
         if (editMode.holdActive === true) {
           editMode.currentActiveHold.fire('text:editing:exited');
         }
-
-      });
-
-      angular.element('.canvas-containing').click(function(evt) {
-
-        if (evt.target == evt.currentTarget) {
-          that.setSummaryMode();
-        }
-      });
-
     };
+
     return this;
   }
 ]);

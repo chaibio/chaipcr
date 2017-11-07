@@ -48,6 +48,8 @@ describe("Testing stage factory", function() {
                 discardActiveGroup: function() {},
                 sendToBack: function() {},
                 add: function() {},
+                bringToFront: function() {},
+
             }
         };
 
@@ -756,6 +758,16 @@ describe("Testing stage factory", function() {
 
     describe("Testing different scenarios in stageHeader method", function() {
 
+        it("It should test stageHeader method when there is no stageName", function() {
+            
+            stage.stageName = null;
+            spyOn(stage, "shortenStageName");
+
+            stage.stageHeader();
+
+            expect(stage.shortenStageName).not.toHaveBeenCalled(); 
+        });
+
         it("It should test stageHeader method", function() {
 
             stage.stageName = {
@@ -1026,6 +1038,140 @@ describe("Testing stage factory", function() {
 
     it("It should test changeFillsAndStrokes method when editStageStatus = true", function() {
         
+        stage.roof = {
+            setStroke: function() {},
+            setStrokeWidth: function() {}
+        };
+
+        stage.stageName = {
+            setFill: function() {}
+        };
+
+        stage.stageCaption = {
+            setFill: function() {}
+        };
+
+        stage.parent.editStageStatus = true;
+
+        var color = "black";
+        var strokeWidth = 2;
+
+        var obj = {
+            name: "stageDot",
+            setFill: function() {
+                
+            }
+        };
+
+        stage.dots = {
+            forEachObject: function(func) {
+                func(obj);
+            },
+            setCoords: function() {}
+        };
+
+        spyOn(stage.dots, "forEachObject").and.callThrough();
+        spyOn(obj, "setFill");
+        spyOn(stage.canvas, "bringToFront");
+        spyOn(stage.dots, "setCoords");
+
+        spyOn(stage.roof, "setStroke");
+        spyOn(stage.roof, "setStrokeWidth");
+
+        spyOn(stage.stageName, "setFill");
+        spyOn(stage.stageCaption, "setFill");
+
+        stage.changeFillsAndStrokes(color, strokeWidth);
+
+        expect(stage.roof.setStroke).toHaveBeenCalledWith(color);
+        expect(stage.roof.setStrokeWidth).toHaveBeenCalledWith(strokeWidth);
+
+        expect(stage.stageName.setFill).toHaveBeenCalledWith(color);
+        expect(stage.stageCaption.setFill).toHaveBeenCalledWith(color);
+        expect(stage.dots.forEachObject).toHaveBeenCalled();
+        expect(stage.canvas.bringToFront).toHaveBeenCalled();
+        expect(stage.dots.setCoords).toHaveBeenCalled();
+        expect(obj.setFill).toHaveBeenCalledWith(color);
+    });
+
+    it("It should test selectStage method", function() {
+
+        spyOn(stage, "changeFillsAndStrokes");
+        spyOn(stage, "manageBordersOnSelection");
+
+        spyOn(stage, "unSelectStage");
+
+        stage.selectStage();
+
+        expect(stage.changeFillsAndStrokes).toHaveBeenCalled();
+        expect(stage.manageBordersOnSelection).toHaveBeenCalled();
+        expect(stage.unSelectStage).not.toHaveBeenCalled(); 
+    });
+
+    it("It should test selectStage method, When previouslySelected object has circle", function() {
+
+        _previouslySelected.circle = {
+            circle: true,
+        };
+
+        spyOn(stage, "changeFillsAndStrokes");
+        spyOn(stage, "manageBordersOnSelection");
+
+        spyOn(stage, "unSelectStage");
+
+        stage.selectStage();
+
+        expect(stage.changeFillsAndStrokes).toHaveBeenCalled();
+        expect(stage.manageBordersOnSelection).toHaveBeenCalled();
+        expect(stage.unSelectStage).toHaveBeenCalled(); 
     });
     
+    it("It should test removeFromStagesArray method", function() {
+
+        stage.parent = {
+            allStageViews: [
+                { 
+                    name: "stage1",
+                    index: 0
+                },
+                {
+                    name: "stage2",
+                    index: 1
+                },
+                {
+                    name: "stage3",
+                    index: 2
+                }
+            ]
+        };
+
+        stage.index = 1;
+
+        stage.removeFromStagesArray();
+        var length = stage.parent.allStageViews.length;
+
+        expect(length).toEqual(2);
+        expect(stage.parent.allStageViews[length - 1].name).toEqual("stage3");
+    });
+
+    it("It should test unSelectStage method", function() {
+
+        _previouslySelected.circle = {
+            parent: {
+                parentStage: {
+                    changeFillsAndStrokes: function() {},
+                    manageBordersOnSelection: function() {},
+                }
+            }
+        };
+
+        spyOn(_previouslySelected.circle.parent.parentStage, "changeFillsAndStrokes");
+        spyOn(_previouslySelected.circle.parent.parentStage, "manageBordersOnSelection");
+
+        stage.unSelectStage();
+
+        expect(_previouslySelected.circle.parent.parentStage.changeFillsAndStrokes).toHaveBeenCalled();
+        expect(_previouslySelected.circle.parent.parentStage.manageBordersOnSelection).toHaveBeenCalled();
+
+    });
 }); 

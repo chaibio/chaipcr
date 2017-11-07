@@ -18,14 +18,12 @@
  */
 
 angular.module("canvasApp").factory('step', [
-  'ExperimentLoader',
-  '$rootScope',
   'circle',
   'previouslySelected',
   'stepGraphics',
   'constants',
 
-  function(ExperimentLoader, $rootScope, circle, previouslySelected, stepGraphics, constants) {
+  function(circle, previouslySelected, stepGraphics, constants) {
 
     return function(model, parentStage, index, $scope) {
 
@@ -71,19 +69,28 @@ angular.module("canvasApp").factory('step', [
         }
 
         this.getUniqueName();
+
         var leftVal = {left: this.left};
-        this.stepGroup.set(leftVal).setCoords();
+
+        this.stepGroup.set(leftVal);
+        this.stepGroup.setCoords();
 
         leftVal = {left: this.left + (this.myWidth / 2)};
 
         leftVal = {left: this.left + 108};
-        this.closeImage.set(leftVal).setCoords();
+
+        this.closeImage.set(leftVal);
+        this.closeImage.setCoords();
 
         leftVal = {left: this.left + 16};
-        this.dots.set(leftVal).setCoords();
+
+        this.dots.set(leftVal);
+        this.dots.setCoords();
 
         leftVal = {left: this.left + 5};
-        this.rampSpeedGroup.set(leftVal).setCoords();
+        
+        this.rampSpeedGroup.set(leftVal);
+        this.rampSpeedGroup.setCoords();
 
         this.ordealStatus = this.ordealStatus + action;
         this.circle.getUniqueId();
@@ -99,7 +106,7 @@ angular.module("canvasApp").factory('step', [
       };
 
       this.wireNextAndPreviousStep = function(currentStep, selected) {
-
+        
         if(this.previousStep) {
           this.previousStep.nextStep = (this.nextStep) ? this.nextStep : null;
           selected = this.previousStep;
@@ -112,7 +119,7 @@ angular.module("canvasApp").factory('step', [
         return selected;
       };
 
-      this.configureStepName = function(thisStep) {
+      this.configureStepName = function() {
 
         if(this.model.name === null) {
           this.stepNameText = "Step " + (this.index + 1);
@@ -126,11 +133,11 @@ angular.module("canvasApp").factory('step', [
       this.addCircle = function() {
 
         this.circle = new circle(this.model, this, $scope);
-        this.circle.getLeft()
-          .getTop()
-          .getUniqueId()
-          .addImages()
-          .render();
+        this.circle.getLeft();
+        this.circle.getTop();
+        this.circle.getUniqueId();
+        this.circle.addImages();
+        this.circle.render();
       };
 
       this.getUniqueName = function() {
@@ -197,7 +204,7 @@ angular.module("canvasApp").factory('step', [
 
       this.addName = function() {
 
-        var stepName = "Step " +(this.index + 1);
+        var stepName = "Step " + (this.index + 1);
         if(this.model.name) {
           stepName = (this.model.name).charAt(0).toUpperCase() + (this.model.name).slice(1).toLowerCase();
         }
@@ -301,6 +308,7 @@ angular.module("canvasApp").factory('step', [
       };
 
       this.unSelectStep = function() {
+        
         var previouslySelectedStep = previouslySelected.circle.parent;
 
         if(this.parentStage.parent.editStageStatus) {

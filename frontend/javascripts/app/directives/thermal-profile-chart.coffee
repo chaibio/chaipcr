@@ -47,6 +47,10 @@ window.App.directive 'thermalProfileChart', [
               chart.setYAxis()
               chart.setXAxis()
               chart.drawLines()
+              chart.updateAxesExtremeValues()
+
+        $scope.$on 'window:resize', ->
+          chart.resize() if chart and $scope.show
 
         $scope.$watch 'scroll', (scroll) ->
           return if !scroll or !chart or !$scope.show
@@ -68,9 +72,7 @@ window.App.directive 'thermalProfileChart', [
               chart.setYAxis()
               chart.setXAxis()
               chart.drawLines()
-
-        $scope.$on 'window:resize', ->
-          initChart()
+              chart.updateAxesExtremeValues()
 
     }
 ]

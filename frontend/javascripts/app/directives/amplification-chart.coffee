@@ -40,7 +40,7 @@ window.App.directive 'amplificationChart', [
           $scope.onZoom()(chart.getTransform(), d.width, d.height, chart.getScaleExtent())
 
         $scope.$on 'window:resize', ->
-          chart.resize(elem[0], $scope.data, $scope.config) if chart
+          chart.resize() if chart and $scope.show
 
         $scope.$watchCollection ($scope) ->
           return {
@@ -56,12 +56,13 @@ window.App.directive 'amplificationChart', [
             chart.updateData($scope.data)
             chart.updateConfig($scope.config)
             if $scope.show
-              chart.setYAxis()
-              chart.setXAxis()
-              chart.drawLines()
-              chart.updateXAxisExtremeValues()
               if isInterpolationChanged(val, oldState) or isBaseBackroundChanged(val, oldState)
-                chart.zoomTo(0)
+                initChart()
+              else
+                chart.setYAxis()
+                chart.setXAxis()
+                chart.drawLines()
+                chart.updateAxesExtremeValues()
 
           oldState = angular.copy(val)
 
@@ -89,7 +90,7 @@ window.App.directive 'amplificationChart', [
               chart.setYAxis()
               chart.setXAxis()
               chart.drawLines()
-              chart.updateXAxisExtremeValues()
+              chart.updateAxesExtremeValues()
 
     }
 ]

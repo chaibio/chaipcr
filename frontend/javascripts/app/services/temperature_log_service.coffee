@@ -32,27 +32,21 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
             SecondsDisplay.display2 t
         },
         y: {
+          unit: ' °C'
           label: 'Temperature (°C)'
+          ticks: 8
           min: 0
           max: 120
           tickFormat: (t) ->
             t = t or 0
-            t_string = t.toString().split('.')
-            if (t_string[1])
-              t = t.toFixed(2)
-            return "#{t} °C"
+            #t_string = t.toString().split('.')
+            #if (t_string[1])
+            #  t = t.toFixed(2)
+            t = Math.round(t * 100) / 100
+            return t
 
         }
       },
-      margin: {
-        top: 20
-        left: 80
-        right: 30
-        bottom: 50
-      },
-      grid:
-        x: false
-        y: false
       series: [
         {x: 'elapsed_time', dataset: 'dataset', y: 'heat_block_zone_temp', color: '#00AEEF'},
         {x: 'elapsed_time', dataset: 'dataset', y: 'lid_temp', color: '#C5C5C5'}
