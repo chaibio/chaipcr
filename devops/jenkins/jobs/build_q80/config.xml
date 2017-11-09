@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>Building mariadb and upload it to download server</description>
+  <description>Building QT and upload it to download server without reformatting</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.17.2">
@@ -15,13 +15,11 @@
           <defaultValue>10.0.100.240</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>download_prefix</name>
-          <description>Download server url</description>
-          <defaultValue>http://10.0.1.20/download</defaultValue>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
           <name>local_download_folder</name>
-          <description>The folder where to host download file. Could be /usr/share/nginx/html/download or /usr/share/nginx/html/download
+          <description>The folder where to host download file. 
+Apache server: /var/www/html/download
+or 
+Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
 </description>
           <defaultValue>/usr/share/nginx/html/download</defaultValue>
         </hudson.model.StringParameterDefinition>
@@ -138,21 +136,16 @@ lsblk
 df -h
 dpkg --configure -a
 swapoff -a
-umount /dev/mmcblk0p* || true
+umount /dev/mmcblk0p*
+
 lsblk
-</command>
-      <execEachLine>true</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
-      <command>
 if mount | grep mmcblk0
 then
   echo &quot;Error: can&apos;t unmount sdcard!&quot;
   exit 1
 fi
 
-exit 0</command>
+</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
@@ -173,13 +166,20 @@ apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D284E608A4C46402
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CF979FFA3D3D3ACC
 
 apt-get update
-apt-get install xz-utils parted cpufrequtils git -y -q
+apt-get install xz-utils parted git autogen autoconf libtool -y -q
 
 #no reformating
 exit 0
 
 </command>
-      <execEachLine>true</execEachLine>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>exit 0
+
+</command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -230,32 +230,32 @@ exit 1</command>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo Starting building Maria on $build_machine
+      <command>exit 0
+</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <hudson.tasks.Shell>
+      <command>exit 0
+</command>
+    </hudson.tasks.Shell>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo Starting building Julia on $build_machine
 apt-get update
-apt-get -y -q upgrade
 
+apt-get -y -q upgrade
 apt-get -f -y -q install
 
-exit 0</command>
-      <execEachLine>true</execEachLine>
+exit 0
+</command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo arranging to build mariadb
+      <command>echo arranging to build julia
 df -h
 
-apt-get -q -y install gcc g++
-
-</command>
-      <execEachLine>true</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
-      <command>if g++ --version | grep &quot;4.9&quot;
-then
-     echo new g++ version is installed
-else
-if ! apt-get -q -y install gcc g++
+if ! apt-get -q -y install gcc-4.8 g++-4.8 
 then
     echo error downloading gcc 4.8.. trying 4.7
     apt-get -q -y install g++-4.7
@@ -271,7 +271,7 @@ then
 fi
 
 fi
-fi
+
 
 apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential
 dpkg --configure -a
@@ -299,61 +299,26 @@ then
    exit 1
 fi
 
-</command>
-      <execEachLine>false</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
-      <command>echo arranging the sdcard
+echo arranging the sdcard
 
-swapoff -a || :
-umount /sdcard/*  || :
-umount /dev/mmcblk0p*  || :
+swapoff -a
+umount /sdcard/*
+umount /dev/mmcblk0p*
 
 ln -sf /usr/bin/ld /usr/bin/ld.gold
 echo 1500 &gt; /proc/sys/kernel/hung_task_timeout_secs
 
-</command>
-      <execEachLine>true</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
-      <command>LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
-,,0xe,*
+LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
+,,0x83,*
 __EOF__
 
-cmake_version=$(cmake --version | sed -n &apos;s/^cmake version \([0-9]*\.[0-9]*\)\..*$/\1/p&apos;)
-echo CMake version is $cmake_version
-check=$(echo &quot;3.1&gt;$cmake_version&quot; | bc -l)
-echo version check result $check
-
-if [ $check -eq 1 ]
-then
-   echo old cmake found and installing 3.6 now..
-   echo Building CMake
-   cd /sdcard/upgrade
-   wget https://cmake.org/files/v3.6/cmake-3.6.1.tar.gz
-   tar xfv cmake-3.6.1.tar.gz
-   cd cmake-3.6.1
-   ./bootstrap
-   make
-   make install
-   cd ..
-   rm -r cmake-3.6.1*
-fi 
-
-</command>
-      <execEachLine>false</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
-      <command>partprobe /dev/mmcblk0
+partprobe /dev/mmcblk0
 mkfs.ext4 /dev/mmcblk0p1 -F
-mkdir -p /sdcard/upgrade  || :
-mount /dev/mmcblk0p1 /sdcard/upgrade/ 
+mkdir -p /sdcard/upgrade
+mount /dev/mmcblk0p1 /sdcard/upgrade/
 
 # creating a temporary swap file on sdcard
-sudo fallocate -l 3G /sdcard/upgrade/swapfile #or dd if=/dev/zero of=/sdcard/upgrade/swapfile bs=10M count=300
+sudo fallocate -l 2G /sdcard/upgrade/swapfile #or dd if=/dev/zero of=/sdcard/upgrade/swapfile bs=10M count=300
 sudo chmod 600 /sdcard/upgrade/swapfile
 sudo mkswap /sdcard/upgrade/swapfile
 sudo swapon /sdcard/upgrade/swapfile
@@ -362,217 +327,174 @@ sudo swapon -s
 
 free -m
 
-apt-get -y -q install lsb-release clang
-apt-get install bison -y
-apt-get install libcurl4-openssl-dev -y
-apt-get install libncurses5-dev -y
 
-sync
-sleep 30
+#echo Building CMake
+#   cd /sdcard/upgrade
+#   wget https://cmake.org/files/v3.6/cmake-3.6.1.tar.gz
+#   tar xfv cmake-3.6.1.tar.gz
+#   cd cmake-3.6.1
+#   ./bootstrap
+#   make
+#   make install
+#   cd ..
+#   rm -r cmake-3.6.1*
+
+#apt-get -y -q install lsb-release
+#sync
+#sleep 30
 dpkg --configure -a
 
 apt-get autoremove -y -q
-
-apt-get -q -y install parted git build-essential curl python pkg-config libssl-dev ntp ntpdate git unzip automake sshpass linux-headers-`uname -r`
-
 apt-get -f -y -q install
 
-exit 0</command>
-      <execEachLine>true</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
-      <command>echo building mariadb
-
-# add gfortran link to search path. 
-
-# compiling madiadb 10
-
-rm -r /sdcard/upgrade/maria || :
-
-mkdir -p /sdcard/upgrade/maria
-cd /sdcard/upgrade/maria
-
-apt-get install libncurses5-dev clang -q -y
-
-# remove mysql
-sudo apt-get -y -q remove --purge mysql-server mysql-client mysql-common
-sudo apt-get -y -q autoremove
-sudo apt-get -y -q autoclean
-
-mkdir -p /data/mysql  || :
-
-groupadd -g 40 mysql  || :
-useradd -c &quot;MySQL Server&quot; -d /data/mysql -g mysql -s /bin/false -u 40 mysql  || :</command>
-      <execEachLine>true</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
-      <command>cd /sdcard/upgrade/maria/
-git clone -b 10.0 https://github.com/MariaDB/server.git
-
-cd /sdcard/upgrade/maria/server
-cmake -DCMAKE_BUILD_TYPE=Release                       \
-      -DCMAKE_INSTALL_PREFIX=/usr                      \
-      -DINSTALL_MANDIR=share/man                       \
-      -DINSTALL_MYSQLSHAREDIR=share/mysql              \
-      -DINSTALL_MYSQLTESTDIR=share/mysql/test          \
-      -DINSTALL_PLUGINDIR=lib/mysql/plugin             \
-      -DINSTALL_SBINDIR=sbin                           \
-      -DINSTALL_SCRIPTDIR=bin                          \
-      -DINSTALL_SQLBENCHDIR=share/mysql/bench          \
-      -DINSTALL_SUPPORTFILESDIR=share/mysql            \
-      -DMYSQL_DATADIR=/data/mysql                      \
-      -DMYSQL_UNIX_ADDR=/run/mysqld/mysqld.sock        \
-      -DWITH_EXTRA_CHARSETS=complex                    \
-      -DWITH_EMBEDDED_SERVER=ON                        \
-      -DWITHOUT_MROONGA_STORAGE_ENGINE=1               \
-      -DTOKUDB_OK=0                                   \
-      -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
-      .
-    
-
-
+exit 0
 </command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>cd /sdcard/upgrade/maria/server &amp;&amp; make
-cd /sdcard/upgrade/maria/server &amp;&amp; make install
-</command>
-      <execEachLine>true</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
-      <command>cd /sdcard/upgrade/maria/server
+      <command>echo compiling TSLib
 
-install -v -dm 755 /etc/mysql
-cat &gt; /etc/mysql/my.cnf &lt;&lt; &quot;EOF&quot;
-# Begin /etc/mysql/my.cnf
+# TSLib
+mount /dev/mmcblk0p1 /sdcard/upgrade/ || true
 
-# The following options will be passed to all MySQL clients
-[client]
-#password       = your_password
-port            = 3306
-socket          = /run/mysqld/mysqld.sock
+cd /sdcard/upgrade
+mkdir tslib-compile
+cd tslib-compile/
 
-# The MySQL server
-[mysqld]
-port            = 3306
-socket          = /run/mysqld/mysqld.sock
-datadir         = /data/mysql
-skip-external-locking
-key_buffer_size = 16M
-max_allowed_packet = 1M
-sort_buffer_size = 512K
-net_buffer_length = 16K
-myisam_sort_buffer_size = 8M
+git clone git://github.com/kergoth/tslib.git
+cd tslib
+./autogen.sh || exit 1
+./configure  --prefix=/usr --disable-tools || exit 1
+make || exit 1
+make install || exit 1
+cd ../
 
-# Don&apos;t listen on a TCP/IP port at all.
-skip-networking
+ln -s /usr/lib/libts.so /lib/libts-1.0.so.0
+cp -P /usr/lib/libts* /lib/arm-linux-gnueabihf/
 
-# required unique id between 1 and 2^32 - 1
-server-id       = 1
+echo building QT
 
-# Uncomment the following if you are using BDB tables
-#bdb_cache_size = 4M
-#bdb_max_lock = 10000
+cd /sdcard/upgrade
+apt-get update
+apt-get install -y -q libqt4-webkit libfontconfig1-dev libfreetype6-dev libx11-dev libxcursor-dev libxext-dev libxfixes-dev libxft-dev libxi-dev libxrandr-dev libxrender-dev
 
-# InnoDB tables are now used by default
-innodb_data_home_dir = /data/mysql
-innodb_data_file_path = ibdata1:10M:autoextend
-innodb_log_group_home_dir = /data/mysql
-# You can set .._buffer_pool_size up to 50 - 80 %
-# of RAM but beware of setting memory usage too high
-innodb_buffer_pool_size = 16M
-innodb_additional_mem_pool_size = 2M
-# Set .._log_file_size to 25 % of buffer pool size
-innodb_log_file_size = 5M
-innodb_log_buffer_size = 8M
-innodb_flush_log_at_trx_commit = 1
-innodb_lock_wait_timeout = 50
+wget http://download.qt.io/archive/qt/4.8/4.8.6/qt-everywhere-opensource-src-4.8.6.tar.gz
+tar xfv qt-everywhere-opensource-src-4.8.6.tar.gz
 
-[mysqldump]
-quick
-max_allowed_packet = 16M
+cd /sdcard/upgrade/qt-everywhere-opensource-src-4.8.6
 
-[mysql]
-no-auto-rehash
-# Remove the next comment character if you are not familiar with SQL
-#safe-updates
+cat &gt; mkspecs/qws/linux-arm-gnueabi-g++/qmake.conf &lt;&lt; EOF
+#Rewrite mkspecs/qws/linux-arm-gnueabi-g++/qmake.conf file with following content:
 
-[isamchk]
-key_buffer = 20M
-sort_buffer_size = 20M
-read_buffer = 2M
-write_buffer = 2M
+include(../../common/linux.conf)
+include(../../common/gcc-base-unix.conf)
+include(../../common/g++-unix.conf)
+include(../../common/qws.conf)
 
-[myisamchk]
-key_buffer_size = 20M
-sort_buffer_size = 20M
-read_buffer = 2M
-write_buffer = 2M
+# modifications to g++.conf
+QMAKE_CC                = gcc
+QMAKE_CXX               = g++
+QMAKE_LINK              = g++
+QMAKE_LINK_SHLIB        = g++
 
-[mysqlhotcopy]
-interactive-timeout
+# modifications to linux.conf
+QMAKE_AR                = ar cqs
+QMAKE_OBJCOPY           = objcopy
+QMAKE_STRIP             = strip
 
-# defragmentation flags
-default-storage-engine = innodb
-innodb_defragment = 1
-innodb_defragment_fill_factor = 0.95
-innodb_defragment_n_pages = 32
+# tslib
+QMAKE_CFLAGS += -I/usr/include
+QMAKE_LFLAGS += -L/usr/lib -lts
 
-# End /etc/mysql/my.cnf
+QMAKE_INCDIR += /usr/include
+QMAKE_LIBDIR += /usr/lib
+
+load(qt_config)
+
 EOF
+
+./configure -prefix /opt/QtEmbedded -opensource -confirm-license -no-qt3support -qt-zlib -no-libtiff -qt-libpng -no-libmng -qt-libjpeg -embedded arm -xplatform qws/linux-arm-gnueabi-g++ -little-endian -qt-freetype -no-opengl -qt-gfx-vnc -qt-gfx-linuxfb -depths 8,16,18,32 -qt-kbd-tty -qt-kbd-linuxinput -qt-mouse-linuxinput -host-little-endian -no-pch -qt-mouse-tslib -nomake demos -nomake examples
+
+make || exit 1
+make install || exit 1
+
 </command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>
-mysql_install_db --basedir=/usr --datadir=/data/mysql --user=mysql
-chown -R mysql:mysql /data/mysql
-
-install -v -m755 -o mysql -g mysql -d /run/mysqld
-mysqld_safe --user=mysql 2&gt;&amp;1 &gt;/dev/null &amp;
-
-cd /sdcard/upgrade/maria/ &amp;&amp; tar fcz mariadb-10.0.16-build.tar.gz server
-
-cd
-sync
-echo archiving finished. cleaning..
+      <command>echo test finished. cleaning..
 swapoff /sdcard/upgrade/swapfile
-sync
 rm /sdcard/upgrade/swapfile
 
-exit 0</command>
-      <execEachLine>true</execEachLine>
+cd /sdcard/upgrade/
+
+echo archiving..
+
+arch_filename=&quot;qt-everywhere-compiled-4.8.6.tgz&quot;
+slim_arch_filename=&quot;qt-everywhere-slim-4.8.6.tgz&quot;
+
+echo Slim arch filename $slim_arch_filename
+echo Arch $arch_filename
+
+tar fcz $arch_filename qt-everywhere-opensource-src-4.8.6  tslib-compile
+tar fcz $slim_arch_filename /opt/QtEmbedded  tslib-compile
+
+ls -ahl fcz $arch_filename $slim_arch_filename 
+
+sync</command>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
-      <command>echo uploading mariadb file to server
+      <command>echo uploading QT Archive file to server
 
-sudo rm $local_download_folder/mariadb-10.0.16-build.tar.gz
-scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/maria/mariadb-10.0.16-build.tar.gz $local_download_folder/
-chmod 777 $local_download_folder/mariadb-10.0.16-build.tar.gz
 
-</command>
+arch_filename=&quot;qt-everywhere-compiled-4.8.6.tgz&quot;
+slim_arch_filename=&quot;qt-everywhere-slim-4.8.6.tgz&quot;
+
+echo Slim arch filename $slim_arch_filename
+echo Arch $arch_filename
+                                                                                                                                 
+scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/$arch_filename $local_download_folder/
+sudo chmod 777 $local_download_folder/$arch_filename
+#ln -sf $local_download_folder/arch_filename $local_download_folder/qt486-default.tgz
+
+scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/$slim_arch_filename $local_download_folder/
+sudo chmod 777 $local_download_folder/$slim_arch_filename
+#ln -sf $local_download_folder/slim_arch_filename $local_download_folder/qt486-default.tgz
+
+
+ls -ahl $local_download_folder/$arch_filename $local_download_folder/$slim_arch_filename
+
+exit 0</command>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo cleaning up
-cd /sdcard/upgrade/maria/ 
+cd /sdcard/upgrade/
 
-ls -ahl  /sdcard/upgrade/maria/
-cd ..
+arch_filename=&quot;qt-everywhere-compiled-4.8.6.tgz&quot;
+slim_arch_filename=&quot;qt-everywhere-slim-4.8.6.tgz&quot;
 
-rm -r  /sdcard/upgrade/maria
+echo deleting $arch_filename
+
+rm $arch_filename
+rm $slim_arch_filename
+
+ls -ahl
+
+rm -r  qt-everywhere-opensource-src-4.8.6* -r
+rm -r tslib-compile
+
 sync
-ls -ahl /sdcard/upgrade/maria/
+ls -ah
 
 echo all done
+
+exit 0
 </command>
-      <execEachLine>true</execEachLine>
+      <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
   </builders>
   <publishers/>
