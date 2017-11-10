@@ -24,7 +24,7 @@ class BaseChart
     @initChart()
 
   getLineCurve: ->
-    d3.curveCardinal
+    d3.curveBasis
 
   hasData: ->
     return false if !@data

@@ -20,7 +20,7 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
     (d + "").split("").map((c) -> superscript[c]).join("")
 
   getLineCurve: ->
-    if @config.axes.y.scale is 'log' then d3.curveMonotoneX else d3.curveCardinal
+    if @config.axes.y.scale is 'log' then d3.curveMonotoneX else d3.curveBasis
 
   makeColoredLine: (line_config) ->
     xScale = @getXScale()
