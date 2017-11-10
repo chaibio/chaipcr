@@ -287,7 +287,6 @@ function mc_tm_pw(
     fluos = tf_dict["fluos"][no_nti]
 
     len_raw = length(tmprtrs)
-    area_i = 2
 
     if len_raw <= 3
         ndrv_cfd = -finite_diff(
@@ -405,34 +404,105 @@ function mc_tm_pw(
 
         # find summit indices of Tm peaks in `ndrv`
         span_peaks_dp = Int(round(half_peak_span_tmprtr / (max_tp - min_tp) * length(tp_denser), 0)) # dp = data point
-        min_ns_vec = fill(minimum(ndrv_smu), span_peaks_dp) # ns = ndrv_smu
-        ns_wms = [min_ns_vec; ndrv_smu; min_ns_vec] # wms = with min values
-        summit_idc = find(1:len_denser) do i
-            ndrv_iw = ns_wms[i : i + span_peaks_dp * 2] # iw = in window
-            return maximum(ndrv_iw) == ndrv_iw[span_peaks_dp + 1]
-        end # do i
+        # min_ns_vec = fill(minimum(ndrv_smu), span_peaks_dp) # ns = ndrv_smu
+        # ns_wms = [min_ns_vec; ndrv_smu; min_ns_vec] # wms = with min values
+        # summit_idc = find_mid_sumr_bysw(ns_wms, span_peaks_dp, maximum)
+        # summit_idc = find(1:len_denser) do i
+        #     ndrv_iw = ns_wms[i : i + span_peaks_dp * 2] # iw = in window
+        #     return maximum(ndrv_iw) == ndrv_iw[span_peaks_dp + 1]
+        # end # do i
 
-        # calculate peak area
-        Tms = tp_denser[summit_idc]
-        len_Tms = length(Tms)
-        Ta_raw = vcat(map(Tms) do Tm # Ta = Tm_area
-            a_idc_bool = map(tp_denser) do tp
-                Tm - half_peak_span_tmprtr < tp < Tm + half_peak_span_tmprtr
-            end
-            a_idc_int = (1:len_denser)[a_idc_bool]
-            base_end_idc = [a_idc_int[1], a_idc_int[end]]
-            tp_denser_bes = tp_denser[base_end_idc] # be = base_end
-            ndrv_bes = ndrv[base_end_idc]
-            # baseline_coefs = *(inv([ones(2) tp_denser_bes]), ndrv_bes) # coefficients (solved by linear algebra) for baseline (the line connecting the two ends of curve -df/dT against temperature)
-            # baseline = *([ones(length(a_idc_int)) tp_denser[a_idc_int]], baseline_coefs)
-            area = spl(tp_denser_bes[1]) - spl(tp_denser_bes[2])    - sum(ndrv_bes) * (tp_denser_bes[2] - tp_denser_bes[1]) / 2
+        # # calculate peak area
+        # Tms = tp_denser[summit_idc]
+        # len_Tms = length(Tms)
+        # Ta_raw = vcat(map(Tms) do Tm # Ta = Tm_area
+        #     a_idc_bool = map(tp_denser) do tp
+        #         Tm - half_peak_span_tmprtr < tp < Tm + half_peak_span_tmprtr
+        #     end
+        #     a_idc_int = (1:len_denser)[a_idc_bool]
+        #     base_end_idc = [a_idc_int[1], a_idc_int[end]]
+        #     tp_denser_bes = tp_denser[base_end_idc] # be = base_end
+        #     ndrv_bes = ndrv[base_end_idc]
+        #     # baseline_coefs = *(inv([ones(2) tp_denser_bes]), ndrv_bes) # coefficients (solved by linear algebra) for baseline (the line connecting the two ends of curve -df/dT against temperature)
+        #     # baseline = *([ones(length(a_idc_int)) tp_denser[a_idc_int]], baseline_coefs)
+        #     area = spl(tp_denser_bes[1]) - spl(tp_denser_bes[2])    - sum(ndrv_bes) * (tp_denser_bes[2] - tp_denser_bes[1]) / 2
+        #     #      integrated -df/dT peak area elevated from x-axis - trapezium-shaped baseline area elevlated from x-axis == peak area elevated from baseline (pa)
+        #     # pa_vec[i] = OrderedDict("Tm"=>Tm, "pa"=>pa)
+        #     return round.([Tm area], json_digits)
+        # end...) # do Tm
+
+        summit_idc_pre, nadir_idc = map([maximum, minimum]) do sumr_func
+            find_mid_sumr_bysw(ndrv_smu, span_peaks_dp, sumr_func)
+        end
+        summit_idc = summit_idc_pre[map(summit_idc_pre) do summit_idc_pre
+            summit_idc_pre > minimum(nadir_idc) && summit_idc_pre < maximum(nadir_idc)
+        end]
+
+
+        Ta_raw_wdup = vcat(map(summit_idc) do summit_idx
+
+            Tm = tp_denser[summit_idx]
+
+            left_nadir_idx = maximum(nadir_idc[nadir_idc .< summit_idx])
+            right_nadir_idx = minimum(nadir_idc[nadir_idc .> summit_idx])
+            nadir_vec = [left_nadir_idx, right_nadir_idx]
+            low_nadir_idx, high_nadir_idx = map(func -> nadir_vec[func(ndrv_smu[nadir_vec])[2]], [findmin, findmax])
+            hn_ns = ndrv_smu[high_nadir_idx]
+
+            # find the nearest location to `summit_idx` where line `ndrv = ndrv_smu[high_nadir_idx]`` is crossed by `ndrv_smu` curve
+            idx_lb, idx_ub = map(func -> func([summit_idx, low_nadir_idx]), [minimum, maximum])
+            idx_step = -1 + 2 * (summit_idx < low_nadir_idx)
+            about2cross_idx = low_nadir_idx - idx_step # peak slightly narrower than using actual crossing point
+            for idx in colon(summit_idx, idx_step, low_nadir_idx - 2 * idx_step)
+                if ndrv_smu[idx] >= hn_ns && ndrv_smu[idx + idx_step] <= hn_ns
+                    about2cross_idx = idx
+                    break
+                end # if
+            end # for
+            peak_bound_idc = [high_nadir_idx, about2cross_idx]
+
+            # calculate peak area
+            tp_low_end, tp_high_end = map(func -> func(tp_denser[peak_bound_idc]), [minimum, maximum])
+            area = -(spl(tp_high_end) - spl(tp_low_end))            - sum(ndrv_smu[peak_bound_idc]) * (tp_high_end - tp_low_end) / 2
             #      integrated -df/dT peak area elevated from x-axis - trapezium-shaped baseline area elevlated from x-axis == peak area elevated from baseline (pa)
+
             # pa_vec[i] = OrderedDict("Tm"=>Tm, "pa"=>pa)
             return round.([Tm area], json_digits)
-        end...) # do Tm
+
+        end...) # do summit_idx
+
+
+        summit_ii_grps = map(1:length(nadir_idc)-1) do nadir_ii
+            find(summit_idc) do summit_idx
+                summit_idx > nadir_idc[nadir_ii] && summit_idx < nadir_idc[nadir_ii + 1]
+            end # do summit_idx
+        end # do nadir_ii
+
+        Ta_raw = vcat(map(summit_ii_grps) do summit_ii_grp
+            if length(summit_ii_grp) == 0
+                real_summit_ii_range = 1:0
+            else
+                real_summit_ii = summit_ii_grp[findmax(ndrv_smu[summit_idc[summit_ii_grp]])[2]]
+                real_summit_ii_range = real_summit_ii:real_summit_ii
+            end # if
+            return Ta_raw_wdup[real_summit_ii_range, :]
+        end...) # do summit_ii_grp
+
+        len_Tms = size(Ta_raw)[1]
+
+        if len_Tms == 0
+            Ta_raw = EMPTY_Ta # otherwise `Ta_raw` will be an `Array{Any,1}`
+        end
 
 
         # filter in real Tm peaks and out those due to random fluctuation. fltd = filtered
+
+        larger_normd_qtv_of_two_sides = NaN
+        top1_from_max = NaN
+        tmprtr_max_ndrv = tp_denser[findmax(ndrv_smu)[2]]
+        min_area_report = NaN
+        smallest_abs_area_within_topNp1 = NaN
+        mc_slope = linreg(tmprtrs, fluos)[2]
 
         Ta_fltd = EMPTY_Ta # 0x2 Array. On another note, 2x0 Array `Ta_raw[:, 1:0]` raised error upon `json`.
         Ta_reported = "No"
@@ -440,8 +510,7 @@ function mc_tm_pw(
         if len_Tms > 0
 
             # larger_normd_qtv_of_two_sides
-            # area_i = 2
-            areas_raw = Ta_raw[:, area_i]
+            areas_raw = Ta_raw[:, end]
             abs_areas_raw = abs(areas_raw)
             ndrv_normd = (ndrv - minimum(ndrv)) / (maximum(ndrv) - minimum(ndrv))
             top1_Tm_idx = summit_idc[indmax(areas_raw)]
@@ -452,11 +521,7 @@ function mc_tm_pw(
             )
 
             # top1_from_max
-            tmprtr_max_ndrv = tp_denser[findmax(ndrv_smu)[2]]
             top1_from_max = abs(tp_denser[top1_Tm_idx] - tmprtr_max_ndrv)
-
-            # mc_slope
-            mc_slope = linreg(tmprtrs, fluos)[2]
 
             seq_topNp1 = 1 : min(top_N+1, len_Tms)
 
@@ -473,7 +538,7 @@ function mc_tm_pw(
             # reporting
             if (
                 larger_normd_qtv_of_two_sides <= max_normd_qtv &&
-                # top1_from_max <= top1_from_max_ub && # disabled because it caused false suppression of Tm peak reporting for `db_name_ = "20160309_chaipcr"; exp_id_ = 7`, well A2.
+                # top1_from_max <= top1_from_max_ub && # disabled because it caused false suppression of Tm peak reporting for `db_name_ = "20160309_chaipcr"; exp_id_ = 7`, well A2. Needs to be enabled because it is the only criterion that suppress false reporting of not-real peaks in `db_name_ = "20161103_chaipcr_ip152"; exp_id_ = 45`, well A1
                 mc_slope < 0
                 )
 
@@ -499,7 +564,7 @@ function mc_tm_pw(
         mc,
         Ta_fltd,
         Ta_raw,
-        "$Ta_reported. All of the following statements must be true for Tm to be reported. \n(1) The larger normalized quantile value of the left and right sides of the summit on the negative derivative curve $larger_normd_qtv_of_two_sides <= `max_normd_qtv` $max_normd_qtv. \n(2, disabled for now) The top-1 Tm peak is $(top1_from_max)C (need to be <= top1_from_max_ub $(top1_from_max_ub)C) away from maximum -df/dT temperature $tmprtr_max_ndrv. \n(3) Has $(size(Ta_raw)[1]) no more than $top_N (top_N) raw_tm peaks, or the peak with smallest absolute area within top-$(top_N+1) (top_N+1) has an absolute area $smallest_abs_area_within_topNp1 < $min_area_report ($min_frac_report of the top-1 peak). \n(4) The slope of the straight line fit to the melt curve $mc_slope < 0."
+        "$Ta_reported. All of the following statements must be true for Tm to be reported. \n(1) The larger normalized quantile value of the left and right sides of the summit on the negative derivative curve $larger_normd_qtv_of_two_sides <= `max_normd_qtv` $max_normd_qtv. \n(2, disabled for now) The top-1 Tm peak is $(top1_from_max)C (need to be <= top1_from_max_ub $(top1_from_max_ub)C) away from maximum -df/dT temperature $tmprtr_max_ndrv. \n(3) Has $len_Tms no more than $top_N (top_N) raw_tm peaks, or the peak with smallest absolute area within top-$(top_N+1) (top_N+1) has an absolute area $smallest_abs_area_within_topNp1 < $min_area_report ($min_frac_report of the top-1 peak). \n(4) The slope of the straight line fit to the melt curve $mc_slope < 0."
     )
 
 end # mc_tm_pw
