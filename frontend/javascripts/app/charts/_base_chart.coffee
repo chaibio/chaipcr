@@ -1,5 +1,6 @@
 class BaseChart
 
+  Y_AXIS_NUM_TICKS: 10
   NORMAL_PATH_STROKE_WIDTH: 2
   HOVERED_PATH_STROKE_WIDTH: 3
   ACTIVE_PATH_STROKE_WIDTH: 5
@@ -489,13 +490,19 @@ class BaseChart
   getYLinearTicks: ->
     max = @getMaxY()
     min = @getMinY()
-    min = Math.floor(min / 5000) * 5000 # ROUND(A2/5,0)*5
-    max = Math.ceil(max / 5000) * 5000
+    #max = 455543
+    #min = - 35890
+    intv = (max - min) / @Y_AXIS_NUM_TICKS
+    intv = Math.ceil(intv / 5000) * 5000
+    #console.log('interval', intv)
+    min = Math.floor(min / intv) * intv # ROUND(A2/5,0)*5
+    max = Math.ceil(max / intv) * intv
     
     ticks = []
-    for y in [min..max] by 5000
+    for y in [min..max] by intv
       ticks.push(y)
 
+    #console.log ticks
     return ticks
 
   setYAxis: ->
