@@ -57,6 +57,8 @@ bool watchProcess(const std::string &command, int eventFd, WatchProcessCallback 
 
 bool getFileChecksum(const std::string &filePath, int eventFd, std::string &checksum);
 
+int isVersionGreater(const std::string &currentVersion, const std::string &newVersion);
+
 struct NullMutex
 {
      void lock() {}

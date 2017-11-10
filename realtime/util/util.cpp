@@ -435,4 +435,71 @@ bool getFileChecksum(const std::string &filePath, int eventFd, std::string &chec
         return true;
 }
 
+int isVersionGreater(const std::string &currentVersion, const std::string &newVersion)
+{
+    std::vector<unsigned> currentDigits, newDigits;
+    std::stringstream stream;
+
+    stream.exceptions(std::stringstream::badbit | std::stringstream::failbit);
+
+    stream << currentVersion;
+
+    while (stream.good())
+    {
+        unsigned digit = 0;
+        stream >> digit;
+
+        if (!stream.eof())
+            stream.get();
+
+        currentDigits.emplace_back(digit);
+    }
+
+    stream.seekp(0);
+    stream.seekg(0);
+    stream.clear();
+    stream.str("");
+
+    try
+    {
+        stream << newVersion;
+
+        while (stream.good())
+        {
+            unsigned digit = 0;
+            stream >> digit;
+
+            if (!stream.eof())
+                stream.get();
+
+            newDigits.emplace_back(digit);
+        }
+    }
+    catch (...)
+    {
+        throw std::runtime_error("Unable to parse the new version");
+    }
+
+    if (currentDigits.size() < newDigits.size())
+    {
+        for (std::size_t i = currentDigits.size(); i < newDigits.size(); ++i)
+            currentDigits.emplace_back(0);
+    }
+    else if (currentDigits.size() > newDigits.size())
+    {
+        for (std::size_t i = newDigits.size(); i < currentDigits.size(); ++i)
+            newDigits.emplace_back(0);
+    }
+
+    for (std::vector<unsigned>::iterator it = currentDigits.begin(), it2 = newDigits.begin(); it != currentDigits.end(); ++it, ++it2)
+    {
+        if (*it < *it2)
+            return 1;
+        else if (*it > *it2)
+            return -1;
+    }
+
+    return 0;
+}
+
 }
