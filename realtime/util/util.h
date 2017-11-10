@@ -59,6 +59,8 @@ bool getFileChecksum(const std::string &filePath, int eventFd, std::string &chec
 
 bool getPartitionAvailableSpace(const std::string &path, unsigned long &space);
 
+int isVersionGreater(const std::string &currentVersion, const std::string &newVersion);
+
 struct NullMutex
 {
      void lock() {}
