@@ -10,7 +10,7 @@ const MAX_DELTA_TM_VAL = 2
 stage_id = 4
 # passed onto `mc_tm_pw`, different than default
 qt_prob_flTm = 0.1
-max_normd_qtv = 0.9
+normd_qtv_ub = 0.9
 
 
 type TmCheck1w
@@ -41,7 +41,10 @@ function analyze_func(
 	max_tmprtr::Real=1000, # maximum temperature to analyze
     # out_format::String="json", # "full", "pre_json", "json"
     verbose::Bool=false,
-    kwdict_mc_tm_pw::OrderedDict=OrderedDict() # keyword arguments passed onto `mc_tm_pw`
+    kwdict_mc_tm_pw::OrderedDict=OrderedDict(
+        :qt_prob_flTm=>qt_prob_flTm,
+        :normd_qtv_ub=>normd_qtv_ub
+    ) # keyword arguments passed onto `mc_tm_pw`
     )
 
     mc_w72c = process_mc(
@@ -57,10 +60,7 @@ function analyze_func(
         max_tmprtr=max_tmprtr,
         out_format="full",
         verbose=verbose,
-        kwdict_mc_tm_pw=OrderedDict(
-            :qt_prob_flTm=>qt_prob_flTm,
-            :max_normd_qtv=>max_normd_qtv
-        )
+        kwdict_mc_tm_pw=kwdict_mc_tm_pw
     )
 
     # process the data from only one channel
