@@ -266,12 +266,13 @@ function mc_tm_pw(
     smooth_fluo_spl::Bool=false,
 
     # identify Tm peaks and calculate peak area
-    peak_span_tmprtr::Real=0.5, # Within the smoothed -df/dt sequence spanning the temperature range of approximately `peak_span_tmprtr`, if the maximum -df/dt value equals that at the middle point of the sequence, identify this middle point as a peak summit. Similar to `span.peaks` in qpcR code. Combined with `peak_shoulder` (similar to `Tm.border` in qpcR code).
+    peak_span_tmprtr::Real=2, # Within the smoothed -df/dt sequence spanning the temperature range of approximately `peak_span_tmprtr`, if the maximum -df/dt value equals that at the middle point of the sequence, identify this middle point as a peak summit. Similar to `span.peaks` in qpcR code. Combined with `peak_shoulder` (similar to `Tm.border` in qpcR code).
     # peak_shoulder::Real=1, # 1/2 width of peak in temperature when calculating peak area  # consider changing from 1 to 2, or automatically determined (max and min d2)?
 
     # filter Tm peaks
+    qt_prob_range_lb::AbstractFloat=0.2, # quantile probability point for the lower bound of the range considered for number of crossing points
     ncp_ub::Real=10, # upper bound of number of data points crossing the mid range value (line parallel to x-axis) of smoothed -df/dt (`ndrv_smu`)
-    qt_prob_flTm::Real=0.64, # quantile probability point for normalized -df/dT (range 0-1)
+    qt_prob_flTm::AbstractFloat=0.64, # quantile probability point for normalized -df/dT (range 0-1)
     normd_qtv_ub::Real=0.8, # upper bound of normalized -df/dt values (range 0-1) at the quantile probablity point
     top1_from_max_ub::Real=1, # upper bound of temperature difference between top-1 Tm peak and maximum -df/dt
     top_N::Integer=4, # top number of Tm peaks to report
@@ -398,11 +399,6 @@ function mc_tm_pw(
         ndrv = -derivative(spl, tp_denser) #  derivative(splin::Dierckx.Spline1D, x::Array{Float61, 1})
         ndrv_smu = supsmu(tp_denser, ndrv, span_smooth) # using default for the rest of `supsmu` parameters
 
-        ns_range_mid = mean(extrema(ndrv_smu))
-        num_cross_points = sum(map(1:(len_denser-1)) do i
-            (ndrv_smu[i] - ns_range_mid) * (ndrv_smu[i+1] - ns_range_mid) <= 0
-        end) # do i
-
         mc_denser = hcat(tp_denser, fluo_spl_blsub, ndrv_smu)
         mc_raw = mc_denser[1:denser_factor:len_denser, :]
 
@@ -510,6 +506,11 @@ function mc_tm_pw(
 
         # filter in real Tm peaks and out those due to random fluctuation. fltd = filtered
 
+        ns_range_mid = mean([quantile(ndrv_smu, qt_prob_range_lb), maximum(ndrv_smu)])
+        num_cross_points = sum(map(1:(len_denser-1)) do i
+            (ndrv_smu[i] - ns_range_mid) * (ndrv_smu[i+1] - ns_range_mid) <= 0
+        end) # do i
+
         larger_normd_qtv_of_two_sides = NaN
         top1_from_max = NaN
         tmprtr_max_ndrv = tp_denser[findmax(ndrv_smu)[2]]
@@ -585,7 +586,7 @@ function mc_tm_pw(
         Ta_raw[idc_sb_area, :],
         join([
             "$Ta_reported. All of the following statements must be true for Tm to be reported",
-            "The number of data points crossing the middle point of the range of -df/dt $num_cross_points is less than or equal to ncp_ub $ncp_ub",
+            "The number of data points $num_cross_points crossing the middle point of the range of -df/dt ($ns_range_mid) is less than or equal to ncp_ub $ncp_ub",
             "The larger normalized quantile value of the left and right sides of the summit on the negative derivative curve $larger_normd_qtv_of_two_sides <= `normd_qtv_ub` $normd_qtv_ub",
             # "The top-1 Tm peak is $(top1_from_max)C (need to be <= top1_from_max_ub $(top1_from_max_ub)C) away from maximum -df/dt temperature $tmprtr_max_ndrv",
             "Has $len_Tms no more than $top_N (top_N) raw_tm peaks, or the top-$(top_N+1) (top_N+1) peak has an area $area_topNp1 < $area_report_lb ($frac_report_lb of the top-1 peak)", # ", or the peak with smallest absolute area within top-$(top_N+1) (top_N+1) has an absolute area $smallest_abs_area_within_topNp1 < $area_report_lb ($frac_report_lb of the top-1 peak)",
