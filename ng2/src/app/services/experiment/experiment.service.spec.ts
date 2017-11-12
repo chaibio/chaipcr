@@ -20,14 +20,14 @@ import {
 
 import { RouterTestingModule } from '@angular/router/testing';
 
-import { ExperimentList } from '../../models/experiment-list.model';
-import { AmplificationData } from '../../models/amplification-data.model';
+import { ExperimentList } from '../../shared/models/experiment-list.model';
+import { AmplificationData } from '../../shared/models/amplification-data.model';
 
-import { WindowRef } from '../../services/windowref/windowref.service';
-import { AuthHttp } from '../../services/auth_http/auth_http.service';
+import { WindowRef } from '../../shared/services/windowref/windowref.service';
+import { AuthHttp } from '../../shared/services/auth_http/auth_http.service';
 import { ExperimentService } from './experiment.service';
 
-import { Experiment } from '../../models/experiment.model';
+import { Experiment } from '../../shared/models/experiment.model';
 import { mockExperimentResponse } from './mock-experiment.response';
 import { MockAmplificationDataResponse } from './mock-amplification-data.response';
 import * as _ from 'underscore';
@@ -242,7 +242,41 @@ describe('ExperimentService', () => {
     }
   ))
 
-  it('should emit experiment:completed event', inject(
+  it('should handle empty amplification data', inject(
+    [ExperimentService, XHRBackend, AuthHttp],
+    (expService: ExperimentService, backend: MockBackend, http: AuthHttp) => {
+
+      const expId = 1;
+      const backendSpy = jasmine.createSpy('backendSpy');
+      const resp:any = Object.assign({}, MockAmplificationDataResponse)
+
+      backend.connections.subscribe((con: MockConnection) => {
+        expect(con.request.method).toBe(RequestMethod.Get);
+        con.mockRespond(new Response(new ResponseOptions({
+          body: {
+            partial: true,
+            total_cycles: 40
+          }
+        })));
+        backendSpy();
+      })
+
+      spyOn(http, 'get').and.callThrough();
+
+      expService.getAmplificationData(expId).subscribe((data: AmplificationData) => {
+        expect(data).toEqual({channel_1: [], channel_2: []})
+      })
+
+      expect(http.get).toHaveBeenCalledWith(`/experiments/${expId}/amplification_data`);
+
+      expect(backendSpy).toHaveBeenCalled();
+
+    }
+  ))
+
+
+
+  it('should emit experiment completed event', inject(
     [ExperimentService, XHRBackend],
     (expService: ExperimentService, backend: MockBackend) => {
       let res: any = Object.assign({}, MockAmplificationDataResponse);
@@ -258,7 +292,7 @@ describe('ExperimentService', () => {
       expService.$updates.subscribe(expCompletedSpy);
 
       expService.getAmplificationData(1).subscribe(() => {
-        expect(expCompletedSpy).toHaveBeenCalledWith('experiment:completed');
+        expect(expCompletedSpy).toHaveBeenCalledWith('experiment:completed:' + 1);
       })
     }
   ))

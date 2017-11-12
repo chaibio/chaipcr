@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core'
-import { WindowRef } from '../windowref/windowref.service'
-import { AuthHttp } from '../auth_http/auth_http.service'
-import { ExperimentList } from '../../models/experiment-list.model'
-import { AmplificationData } from '../../models/amplification-data.model'
-import { AmplificationDatum } from '../../models/amplification-datum.model'
-import { Experiment } from '../../models/experiment.model'
+import { WindowRef } from '../../shared/services/windowref/windowref.service'
+import { AuthHttp } from '../../shared/services/auth_http/auth_http.service'
+import { ExperimentList } from '../../shared/models/experiment-list.model'
+import { AmplificationData } from '../../shared/models/amplification-data.model'
+import { AmplificationDatum } from '../../shared/models/amplification-datum.model'
+import { Experiment } from '../../shared/models/experiment.model'
 import { Observable } from 'rxjs/Observable'
 import { Subject } from 'rxjs/Subject'
 import 'rxjs/add/operator/map'
@@ -44,7 +44,7 @@ export class ExperimentService {
   getAmplificationData(id: number) {
     return this.http.get(`/experiments/${id}/amplification_data`)
       .map(res => {
-        this.checkExperimentCompleted(res);
+        this.checkExperimentCompleted(res, id);
         return this.extractAmplificationData(res);
       });
   }
@@ -100,9 +100,9 @@ export class ExperimentService {
     return result;
   }
 
-  private checkExperimentCompleted(res):void {
+  private checkExperimentCompleted(res, id: number):void {
     if(!res.json().partial) {
-      this.$updates.next('experiment:completed');
+      this.$updates.next(`experiment:completed:${id}`);
     }
   }
 
@@ -112,6 +112,9 @@ export class ExperimentService {
       channel_1: [],
       channel_2: []
     };
+    if (!data.steps) {
+      return datasets;
+    }
     let channel_count = 2;
 
     // get max cycle

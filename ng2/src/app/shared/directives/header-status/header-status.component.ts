@@ -9,7 +9,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import ngStyles from 'ng-style'
 import { Router } from '@angular/router';
 import { Experiment } from '../../models/experiment.model';
-import { ExperimentService } from '../../services/experiment/experiment.service';
+import { ExperimentService } from '../../../services/experiment/experiment.service';
 import { StatusService } from '../../../services/status/status.service';
 import { StatusData } from '../../models/status.model';
 
@@ -41,6 +41,14 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
       .subscribe((statusData: StatusData) => {
         this.extraceStatusData(statusData);
       })
+
+    this.expCompleteSub = this.expService.$updates.subscribe((evt) => {
+      if(evt === `experiment:completed:${this.expId}`) {
+        this.analyzed = true;
+        this.fetchExperiment()
+      }
+    });
+
   }
 
   @Input('experiment-id') expId: number;
@@ -73,6 +81,9 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
     if (this.expId) {
       this.expService.getExperiment(+this.expId).subscribe((exp: Experiment) => {
         this.experiment = exp;
+        if (exp.started_at && !this.analyzed) {
+          this.expService.getAmplificationData(exp.id).subscribe()
+        }
       })
     }
   }
@@ -81,15 +92,9 @@ export class HeaderStatusComponent implements OnChanges, OnDestroy {
     this.statusData = d;
     this.state = d.experiment_controller.machine.state;
     this.remainingTime = this.statusService.timeRemaining();
-    if(this.state === 'running' && this.isCurrentExperiment()) {
-      if (this.expCompleteSub) return;
-      this.expCompleteSub = this.expService.$updates.subscribe((evt) => {
-        if(evt === 'experiment:completed') {
-          this.analyzed = true;
-          this.fetchExperiment()
-        }
-      });
-    }
+    //if(this.state === 'running' && this.isCurrentExperiment()) {
+
+    //}
     if (this.oldState && this.oldState !== 'idle' && this.state === 'idle') {
       this.fetchExperiment()
     }

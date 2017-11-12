@@ -6,7 +6,7 @@ import { DashboardComponent } from './dashboard.component';
 import { HomeModule } from './home/home.module';
 
 import { StatusService } from '../../services/status/status.service'
-import { ExperimentService } from '../../shared/services/experiment/experiment.service'
+import { ExperimentService } from '../../services/experiment/experiment.service'
 
 const mockExperimentService = {
   getExperiments: () => {

@@ -10,7 +10,7 @@ import {
   ExperimentListItem,
 } from './experiment-list.component'
 
-import { ExperimentService } from '../../../../shared/services/experiment/experiment.service'
+import { ExperimentService } from '../../../../services/experiment/experiment.service'
 import { ExperimentList } from '../../../../shared/models/experiment-list.model'
 
 const mockExperiments: ExperimentList[] = [

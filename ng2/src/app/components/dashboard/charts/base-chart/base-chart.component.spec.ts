@@ -15,7 +15,7 @@ class TestingComponent {
   public config: any;
 }
 
-fdescribe('BaseChart Component', () => {
+xdescribe('BaseChart Component', () => {
 
   beforeEach(async(() => {
 
@@ -27,7 +27,7 @@ fdescribe('BaseChart Component', () => {
 
   }))
 
-  it('should NOT initalize chart when data/config isnt initialized', () => {
+  it('should NOT initalize chart when data or config isnt initialized', () => {
   
     let fixture = TestBed.createComponent(TestingComponent)
     fixture.detectChanges()

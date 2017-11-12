@@ -1,9 +1,10 @@
 import {
-  Component,
-  ElementRef
+  Directive,
+  ElementRef,
+  Input
 } from '@angular/core';
 
-@Component({
+@Directive({
   selector: '[chai-base-chart]'
 })
 export class BaseChart {
@@ -11,5 +12,8 @@ export class BaseChart {
   constructor(private el: ElementRef) {
     
   }
+
+  @Input('data') data: any;
+  @Input('config') config: any;
 
 }

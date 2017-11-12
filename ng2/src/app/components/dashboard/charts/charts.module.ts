@@ -2,11 +2,13 @@ import { NgModule } from '@angular/core';
 
 import { SharedModule } from '../../../shared/shared.module';
 import { ChartsComponent } from './charts.component';
+import { BaseChart } from './base-chart/base-chart.component';
 import { AmplificationComponent } from './amplification/amplification.component';
 
 const components = [ 
   ChartsComponent,
-  AmplificationComponent
+  AmplificationComponent,
+  BaseChart
 ];
 
 @NgModule({

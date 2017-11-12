@@ -5,7 +5,7 @@ import {
   ElementRef
 } from '@angular/core'
 
-import { ExperimentService } from '../../../../shared/services/experiment/experiment.service'
+import { ExperimentService } from '../../../../services/experiment/experiment.service'
 import { ExperimentList } from '../../../../shared/models/experiment-list.model'
 
 const ESCAPE_KEYCODE = 27;

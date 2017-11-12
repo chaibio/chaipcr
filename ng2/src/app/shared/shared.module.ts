@@ -11,7 +11,6 @@ import {
 import { BaseHttp } from './services/base_http/base_http.service';
 import { AuthHttp } from './services/auth_http/auth_http.service';
 import { SessionService } from './services/session/session.service';
-import { ExperimentService } from './services/experiment/experiment.service';
 import { WindowRef } from './services/windowref/windowref.service';
 
 import { LogoutDirective } from './directives/logout/logout.directive';
@@ -47,7 +46,6 @@ import { HrMinSecPipe } from './pipes/hr-min-secs/hr-min-secs.pipe';
   providers: [
     Title,
     SessionService,
-    ExperimentService,
     WindowRef,
     AuthHttp,
     BaseHttp,

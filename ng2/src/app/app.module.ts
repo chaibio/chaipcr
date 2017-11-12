@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 import { DashboardModule } from './components/dashboard/dashboard.module';
 
 import { StatusService } from './services/status/status.service';
+import { ExperimentService } from './services/experiment/experiment.service';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { StatusService } from './services/status/status.service';
   ],
   providers: [
     // declare global singletone services here
-    StatusService
+    StatusService,
+    ExperimentService
   ],
   exports: [
     DashboardModule
