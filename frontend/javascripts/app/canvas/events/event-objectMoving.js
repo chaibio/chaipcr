@@ -18,12 +18,8 @@
  */
 
 angular.module("canvasApp").factory('objectMoving', [
-  'ExperimentLoader',
-  'previouslySelected',
-  'previouslyHoverd',
-  'scrollService',
   'moveRampLineService',
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, moveRampLineService) {
+  function(moveRampLineService) {
 
     /**************************************
         Here we write what happens when we drag over the canvas.
@@ -33,6 +29,7 @@ angular.module("canvasApp").factory('objectMoving', [
 
       var me;
       this.canvas.on('object:moving', function(evt) {
+        
         if(! evt.target) return false;
 
         switch(evt.target.name) {

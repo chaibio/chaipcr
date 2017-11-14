@@ -19,11 +19,7 @@
 
 angular.module("canvasApp").factory('objectModified', [
   'ExperimentLoader',
-  'previouslySelected',
-  'previouslyHoverd',
-  'scrollService',
-  'circleManager',
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, circleManager) {
+  function(ExperimentLoader) {
 
     this.init = function(C, $scope, that) {
 
@@ -43,14 +39,14 @@ angular.module("canvasApp").factory('objectModified', [
             });
           break;
 
-          case "moveStep":
+          /*case "moveStep":
 
             //var indicate = evt.target;
             //step = indicate.parent;
            // C.stepIndicator.endPosition = indicate.left;
             //C.stepIndicator.processMovement(step, C);
             //C.canvas.renderAll();
-          break;
+          break;*/
 
           case "moveStage":
 
