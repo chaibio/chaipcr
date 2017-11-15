@@ -29,7 +29,7 @@ angular.module("canvasApp").factory('objectMoving', [
 
       var me;
       this.canvas.on('object:moving', function(evt) {
-        
+
         if(! evt.target) return false;
 
         switch(evt.target.name) {
@@ -54,13 +54,13 @@ angular.module("canvasApp").factory('objectMoving', [
 
           case "moveStage":
 
-          if(evt.target.left < 35) {
-            evt.target.setLeft(35);
-          } else if(evt.target.left > C.moveLimit) {
-            evt.target.setLeft(C.moveLimit);
-          } else {
-            C.stageIndicator.onTheMove(evt.target);
-          }
+            if(evt.target.left < 35) {
+              evt.target.setLeft(35);
+            } else if(evt.target.left > C.moveLimit) {
+              evt.target.setLeft(C.moveLimit);
+            } else {
+              C.stageIndicator.onTheMove(evt.target);
+            }
           break;
         }
       });

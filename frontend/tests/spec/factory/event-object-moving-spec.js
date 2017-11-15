@@ -147,6 +147,86 @@ describe("Testing object moving events", function() {
                 expect(C.stepIndicator.onTheMove).toHaveBeenCalled();
             });
 
+            it("It should test moveStage test case, when left < 35", function() {
+
+                var evt = {
+                    target: {
+                        name: "moveStage",
+                        left: 20,
+                        setLeft: function() {}
+                    }
+                };
+
+                objectMoving.canvas = {
+                    on: function(arg1, callBack) {
+                        callBack(evt);
+                    }
+                };
+
+                spyOn(evt.target, "setLeft");
+
+                objectMoving.init(C, $scope, that);
+
+                expect(evt.target.setLeft).toHaveBeenCalled();
+
+            });
+
+            it("It should test moveStage test case, when left > C.moveLimit", function() {
+
+                var evt = {
+                    target: {
+                        name: "moveStage",
+                        left: 200,
+                        setLeft: function() {}
+                    }
+                };
+
+                C.moveLimit = 100;
+
+                objectMoving.canvas = {
+                    on: function(arg1, callBack) {
+                        callBack(evt);
+                    }
+                };
+
+                spyOn(evt.target, "setLeft");
+
+                objectMoving.init(C, $scope, that);
+
+                expect(evt.target.setLeft).toHaveBeenCalledWith(C.moveLimit);
+                
+            });
+
+            it("It should test moveStage test case, when else path is taken", function() {
+
+                C.stageIndicator = {
+                    onTheMove: function() {}
+                };
+
+                var evt = {
+                    target: {
+                        name: "moveStage",
+                        left: 200,
+                        setLeft: function() {}
+                    }
+                };
+
+                C.moveLimit = 300;
+
+                objectMoving.canvas = {
+                    on: function(arg1, callBack) {
+                        callBack(evt);
+                    }
+                };
+
+                spyOn(C.stageIndicator, "onTheMove");
+
+                objectMoving.init(C, $scope, that);
+
+                expect(C.stageIndicator.onTheMove).toHaveBeenCalledWith(evt.target);
+                
+            });
+
         });
     
 });
