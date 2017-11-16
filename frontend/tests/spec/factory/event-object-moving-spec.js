@@ -226,6 +226,7 @@ describe("Testing object moving events", function() {
                 expect(C.stageIndicator.onTheMove).toHaveBeenCalledWith(evt.target);
                 
             });
+            
 
         });
     
