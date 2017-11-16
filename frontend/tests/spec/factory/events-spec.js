@@ -87,7 +87,8 @@ describe("Testing events factory", function() {
             C = {
                 allStageViews: [
                     {
-                        index: 1
+                        index: 1,
+                        left: 200
                     }
                 ],
                 allStepViews: [
@@ -104,6 +105,7 @@ describe("Testing events factory", function() {
                     on: function() {
 
                     },
+                    bringToFront: function() {},
                     renderAll: function() {}
                 }
             };
@@ -299,16 +301,79 @@ describe("Testing events factory", function() {
             expect(C.moveLimit).toEqual(stage.previousStage.myWidth + stage.previousStage.left);
         });
 
-        it("It should test calculateMoveLimit method when holdTime.text === ∞", function() {
+        describe("Testing calculateMoveLimit method when holdTime.text === ∞ and when moveElement = step/stage", function() {
+            
+            it("It should test calculateMoveLimit method when holdTime.text === ∞", function() {
 
-            var moveElement = "step";
+                var moveElement = "step";
+
+                C.allStepViews = [
+                    {   
+                        left: 180,
+                        circle: {
+                            holdTime: {
+                                text: "∞"
+                            }
+                        }
+                    }
+                ];
+
+                var stage = {
+                    index: 10,
+                    previousStage: {
+                        index: 3,
+                        myWidth: 100,
+                        left: 110
+                    }
+                };
+
+                eventSystem.calculateMoveLimit(moveElement, stage);
+
+                expect(C.stepMoveLimit).toEqual(63);
+            });
+
+            it("it should test calculateMoveLimit method when holdTime.text === ∞ and moveElement === stage", function() {
+
+                    var moveElement = "stage";
+
+                    C.allStepViews = [
+                        {   
+                            left: 180,
+                            circle: {
+                                holdTime: {
+                                    text: "∞"
+                                }
+                            }
+                        }
+                    ];
+
+                    var stage = {
+                        index: 10,
+                        previousStage: {
+                            index: 3,
+                            myWidth: 100,
+                            left: 110
+                        }
+                    };
+
+                    eventSystem.calculateMoveLimit(moveElement, stage);
+
+                    expect(C.moveLimit).toEqual(160);
+                });
+            });
+        
+    });
+
+    it("It should test calculateMoveLimit when holdTime.text !== ∞", function() {
+
+        var moveElement = "stage";
 
             C.allStepViews = [
                 {   
                     left: 180,
                     circle: {
                         holdTime: {
-                            text: "∞"
+                            text: "1"
                         }
                     }
                 }
@@ -325,7 +390,48 @@ describe("Testing events factory", function() {
 
             eventSystem.calculateMoveLimit(moveElement, stage);
 
-            expect(C.stepMoveLimit).toEqual(63);
-        });
+            expect(C.moveLimit).toEqual(300);
+            expect(C.stepMoveLimit).toEqual(180);
+
+    });
+
+    it("It should test footerMouseOver method", function() {
+
+        var indicate = {
+            changeText: function() {},
+            currentStep: null,
+            setLeft: function() {},
+            setCoords: function() {},
+            setVisible: function() {},
+        };
+
+        me = {
+            parentStage: {
+                index: 10
+            },
+            index: 10
+        };
+
+        var moveElement = "step";
+
+        spyOn(indicate, "changeText");
+        spyOn(indicate, "setLeft");
+        spyOn(indicate, "setCoords");
+        spyOn(indicate, "setVisible");
+
+        spyOn(eventSystem, "calculateMoveLimit").and.returnValue(100);
+        spyOn(C.canvas, "renderAll");
+        spyOn(C.canvas, "bringToFront");
+
+        eventSystem.footerMouseOver(indicate, me, moveElement);
+
+        expect(indicate.changeText).toHaveBeenCalled();
+        expect(indicate.setLeft).toHaveBeenCalled();
+        expect(indicate.setCoords).toHaveBeenCalled();
+        expect(indicate.setVisible).toHaveBeenCalled();
+        expect(eventSystem.calculateMoveLimit).toHaveBeenCalled();
+        expect(C.canvas.bringToFront).toHaveBeenCalled();
+        expect(C.canvas.renderAll).toHaveBeenCalled();
+        expect(C.moveLimit).toEqual(100);
     });
 });
