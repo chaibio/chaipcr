@@ -107,7 +107,22 @@ describe("Testing events factory", function() {
                     },
                     bringToFront: function() {},
                     renderAll: function() {}
-                }
+                },
+                addStages: function() {},
+                setDefaultWidthHeight: function() {},
+                
+                $scope: {
+                    $watch: function() {},
+                    protocol: {
+                        id: null
+                    },
+                    fabricStep: null
+                },
+
+                selectStep: function() {},
+                initEvents: function() {},
+                getComponents: function() {},
+                addComponentsToStage: function() {},
             };
 
             $scope = {
@@ -434,4 +449,35 @@ describe("Testing events factory", function() {
         expect(C.canvas.renderAll).toHaveBeenCalled();
         expect(C.moveLimit).toEqual(100);
     });
+
+    it("It should test canvas.on (afterImagesLoaded) method", function() {
+
+        _circleManager.addRampLinesAndCircles = function() {};
+
+        spyOn(C, "addStages");
+        spyOn(C, "setDefaultWidthHeight");
+        spyOn(C, "selectStep");
+        spyOn(C, "initEvents");
+        spyOn(C, "getComponents");
+        spyOn(C, "addComponentsToStage");
+        spyOn(C.canvas, "renderAll");
+
+        eventSystem.afterImagesLoaded();
+
+        expect(C.addStages).toHaveBeenCalled();
+        expect(C.setDefaultWidthHeight).toHaveBeenCalled();
+        expect(C.selectStep).toHaveBeenCalled();
+        expect(C.initEvents).toHaveBeenCalled();
+        expect(C.getComponents).toHaveBeenCalled();
+        expect(C.addComponentsToStage).toHaveBeenCalled();
+        expect(C.canvas.renderAll).toHaveBeenCalled();
+    });
+
+    it("It should test scroll", function() {
+
+
+        $('.canvas-containing').trigger('scroll');
+        //expect(1).toEqual(2);
+    });
+
 });

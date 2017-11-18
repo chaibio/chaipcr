@@ -169,8 +169,8 @@ angular.module("canvasApp").factory('events', [
            Note that it takes some more time to load images, better avaoid images
            or wait for images to complete
       ***************************************/
-      this.canvas.on("imagesLoaded", function() {
-
+      this.afterImagesLoaded = function() {
+        
         C.addStages();
         C.setDefaultWidthHeight();
 
@@ -188,7 +188,12 @@ angular.module("canvasApp").factory('events', [
         C.getComponents();
         C.addComponentsToStage();
         C.canvas.renderAll();
-      });
+
+      };
+
+      this.canvas.on("imagesLoaded", that.afterImagesLoaded);
+
+      
 
       return this;
     };
