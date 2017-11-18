@@ -271,7 +271,8 @@ function mc_tm_pw(
 
     # filter Tm peaks
     qt_prob_range_lb::AbstractFloat=0.2, # quantile probability point for the lower bound of the range considered for number of crossing points
-    ncp_ub::Real=10, # upper bound of number of data points crossing the mid range value (line parallel to x-axis) of smoothed -df/dt (`ndrv_smu`)
+    ncp_ub::Integer=10, # upper bound of number of data points crossing the mid range value (line parallel to x-axis) of smoothed -df/dt (`ndrv_smu`)
+    noisy_factor::AbstractFloat=0.2, # `num_cross_points` must also <= `noisy_factor * len_raw`
     qt_prob_flTm::AbstractFloat=0.64, # quantile probability point for normalized -df/dT (range 0-1)
     normd_qtv_ub::Real=0.8, # upper bound of normalized -df/dt values (range 0-1) at the quantile probablity point
     top1_from_max_ub::Real=1, # upper bound of temperature difference between top-1 Tm peak and maximum -df/dt
@@ -506,6 +507,7 @@ function mc_tm_pw(
 
         # filter in real Tm peaks and out those due to random fluctuation. fltd = filtered
 
+
         ns_range_mid = mean([quantile(ndrv_smu, qt_prob_range_lb), maximum(ndrv_smu)])
         num_cross_points = sum(map(1:(len_denser-1)) do i
             (ndrv_smu[i] - ns_range_mid) * (ndrv_smu[i+1] - ns_range_mid) <= 0
@@ -553,7 +555,7 @@ function mc_tm_pw(
 
             # reporting
             if (
-                num_cross_points <= ncp_ub &&
+                num_cross_points <= min(ncp_ub, len_raw * noisy_factor) &&
                 larger_normd_qtv_of_two_sides <= normd_qtv_ub &&
                 # top1_from_max <= top1_from_max_ub && # disabled because it caused false suppression of Tm peak reporting for `db_name_ = "20160309_chaipcr"; exp_id_ = 7`, well A2. Needs to be enabled because it is the only criterion that suppress false reporting of not-real peaks in `db_name_ = "20161103_chaipcr_ip152"; exp_id_ = 45`, well A1
                 mc_slope < 0
@@ -586,7 +588,7 @@ function mc_tm_pw(
         Ta_raw[idc_sb_area, :],
         join([
             "$Ta_reported. All of the following statements must be true for Tm to be reported",
-            "The number of data points $num_cross_points crossing the middle point of the range of -df/dt ($ns_range_mid) is less than or equal to ncp_ub $ncp_ub",
+            "The number of data points $num_cross_points crossing the middle point of the range of -df/dt ($ns_range_mid) is less than or equal to ncp_ub $ncp_ub and noisy_factor $noisy_factor multiplied by len_raw $len_raw",
             "The larger normalized quantile value of the left and right sides of the summit on the negative derivative curve $larger_normd_qtv_of_two_sides <= `normd_qtv_ub` $normd_qtv_ub",
             # "The top-1 Tm peak is $(top1_from_max)C (need to be <= top1_from_max_ub $(top1_from_max_ub)C) away from maximum -df/dt temperature $tmprtr_max_ndrv",
             "Has $len_Tms no more than $top_N (top_N) raw_tm peaks, or the top-$(top_N+1) (top_N+1) peak has an area $area_topNp1 < $area_report_lb ($frac_report_lb of the top-1 peak)", # ", or the peak with smallest absolute area within top-$(top_N+1) (top_N+1) has an absolute area $smallest_abs_area_within_topNp1 < $area_report_lb ($frac_report_lb of the top-1 peak)",
