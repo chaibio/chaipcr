@@ -270,7 +270,7 @@ function mc_tm_pw(
     # peak_shoulder::Real=1, # 1/2 width of peak in temperature when calculating peak area  # consider changing from 1 to 2, or automatically determined (max and min d2)?
 
     # filter Tm peaks
-    qt_prob_range_lb::AbstractFloat=0.2, # quantile probability point for the lower bound of the range considered for number of crossing points
+    qt_prob_range_lb::AbstractFloat=0.21, # quantile probability point for the lower bound of the range considered for number of crossing points
     ncp_ub::Integer=10, # upper bound of number of data points crossing the mid range value (line parallel to x-axis) of smoothed -df/dt (`ndrv_smu`)
     noisy_factor::AbstractFloat=0.2, # `num_cross_points` must also <= `noisy_factor * len_raw`
     qt_prob_flTm::AbstractFloat=0.64, # quantile probability point for normalized -df/dT (range 0-1)
