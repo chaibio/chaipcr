@@ -19,10 +19,11 @@
 
 angular.module("canvasApp").service('stageEvents',[
   'stepGraphics',
-  'stageGraphics',
-  function(stepGraphics, stageGraphics) {
+  function(stepGraphics) {
 
     var that = this;
+    var _$scope, _canvas, _C;
+
     this.changeDeltaText = function($scope, C) {
 
       var stage = $scope.fabricStep.parentStage;
@@ -35,26 +36,36 @@ angular.module("canvasApp").service('stageEvents',[
 
     this.init = function($scope, canvas, C) {
 
-      $scope.$watch('stage.num_cycles', function(newVal, oldVal) {
+      _$scope = $scope;
+      _canvas = canvas;
+      _C = C;
 
-        var stage = $scope.fabricStep.parentStage;
-        stage.stageHeader();
-        canvas.renderAll();
-      });
+      $scope.$watch('stage.num_cycles', that.numCyclesChange);
 
-      $scope.$watch('stage.auto_delta', function(newVal, oldVal) {
+      $scope.$watch('stage.auto_delta', that.autoDeltaChange);
 
-        that.changeDeltaText($scope);
-        canvas.renderAll();
-      });
-
-      $scope.$watch('stage.auto_delta_start_cycle', function(newVal, oldVal) {
-
-        that.changeDeltaText($scope, C);
-        canvas.renderAll();
-      });
-
+      $scope.$watch('stage.auto_delta_start_cycle', that.autoDeltaStartCyclesChange);
 
     };
+
+    this.numCyclesChange = function(newVal, oldVal) {
+      
+        var stage = _$scope.fabricStep.parentStage;
+        stage.stageHeader();
+        _canvas.renderAll();
+    };
+
+    this.autoDeltaChange = function(newVal, oldVal) {
+      
+      that.changeDeltaText(_$scope);
+      _canvas.renderAll();
+    };
+
+    this.autoDeltaStartCyclesChange = function(newVal, oldVal) {
+      
+      that.changeDeltaText(_$scope, _C);
+      _canvas.renderAll();
+    };
+
   }
 ]);
