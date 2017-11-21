@@ -34,11 +34,11 @@ window.App.directive 'versionInfo', [
         status = data?.device?.update_available || 'unknown'
         if status isnt 'unknown'
           $scope.update_available = status
-        if data.device.update_available is 'unknown' && data.device.update_error
-          if $scope.checkedUpdate
-            $scope.openUpdateModal()
-          $scope.update_available = 'unavailable'
-          $scope.checkedUpdate = false
+        #if data.device.update_available is 'unknown' && data.device.update_error
+          #if $scope.checkedUpdate
+            #$scope.openUpdateModal()
+          #$scope.update_available = 'unavailable'
+          #$scope.checkedUpdate = false
 
       Device.getVersion(true).then (resp) ->
         $scope.data = resp
