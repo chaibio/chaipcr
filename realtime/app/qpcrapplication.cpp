@@ -306,28 +306,28 @@ void QPCRApplication::readConfigurationFile()
 
         if (it != ptree.not_found())
         {
-            it = ptree.find("lid");
+            boost::property_tree::ptree::const_assoc_iterator it2 = it->second.find("lid");
 
-            if (it != ptree.not_found())
+            if (it2 != it->second.not_found())
             {
-                boost::property_tree::ptree::const_assoc_iterator valueIt = it->second.find("max_temp_c");
+                boost::property_tree::ptree::const_assoc_iterator valueIt = it2->second.find("max_temp_c");
 
-                if (valueIt != it->second.not_found())
+                if (valueIt != it2->second.not_found())
                     _settings.configuration.lidMaxTemp = valueIt->second.get_value<float>();
             }
 
-            it = ptree.find("block");
+            it2 = it->second.find("block");
 
             if (it != ptree.not_found())
             {
-                boost::property_tree::ptree::const_assoc_iterator valueIt = it->second.find("min_temp_c");
+                boost::property_tree::ptree::const_assoc_iterator valueIt = it2->second.find("min_temp_c");
 
-                if (valueIt != it->second.not_found())
+                if (valueIt != it2->second.not_found())
                     _settings.configuration.heatBlockMinTemp = valueIt->second.get_value<float>();
 
-                valueIt = it->second.find("max_temp_c");
+                valueIt = it2->second.find("max_temp_c");
 
-                if (valueIt != it->second.not_found())
+                if (valueIt != it2->second.not_found())
                     _settings.configuration.heatBlockMaxTemp = valueIt->second.get_value<float>();
             }
         }
