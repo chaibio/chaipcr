@@ -175,11 +175,20 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
           console.log("connectedWifiNetwork yet to load");
         }
 
-        if($scope.selectedWifiNow.encryption === 'wpa2') {
-          $scope.wifiNetworkType = 'wpa2';
+        if($scope.selectedWifiNow.encryption === 'wpa2 psk') {
+          $scope.wifiNetworkType = 'wpa2 psk';
           $scope.credentials = {
             'wpa-ssid': $scope.name,
             'wpa-psk': "",
+            'type': "dhcp"
+          };
+          $scope.updateConnectedWifi('wpa-ssid');
+        }else if($scope.selectedWifiNow.encryption === 'wpa2 802.1x') {
+          $scope.wifiNetworkType = 'wpa2 802.1x';
+          $scope.credentials = {
+            'wpa-ssid': $scope.name,
+						'wpa-identity': "",
+            'wpa-password': "",
             'type': "dhcp"
           };
           $scope.updateConnectedWifi('wpa-ssid');
