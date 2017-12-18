@@ -189,7 +189,7 @@ describe("Testing moveStepRect", function() {
     indicator.updateLocationOnMoveRight();
 
     expect(indicator.movement.left).toEqual(holdVal - 40);
-    expect(indicator.manageMovingRight).toHaveBeenCalled();
+    //expect(indicator.manageMovingRight).toHaveBeenCalled();
   });
 
   it("It should test updateLocationOnMoveLeft method", function() {
@@ -203,7 +203,7 @@ describe("Testing moveStepRect", function() {
     indicator.updateLocationOnMoveLeft();
 
     expect(indicator.movement.left).toEqual(holdVal + 40);
-    expect(indicator.manageMovingLeft).toHaveBeenCalled();
+    //expect(indicator.manageMovingLeft).toHaveBeenCalled();
   });
 
   it("It should test manageMovingRight method", function() {
@@ -309,6 +309,10 @@ describe("Testing moveStepRect", function() {
     spyOn(indicator, "getDirection").and.returnValue("right");
     spyOn(indicator, "manageMovingRight");
     spyOn(indicator, "manageMovingLeft");
+    indicator.currentDropStage = {
+      index: 10
+    };
+    
     var movement = {
       left: 20
     };
@@ -319,6 +323,7 @@ describe("Testing moveStepRect", function() {
     expect(indicator.getDirection).toHaveBeenCalled();
     expect(indicator.manageMovingRight).toHaveBeenCalled();
     expect(indicator.manageMovingLeft).not.toHaveBeenCalled();
+    expect(indicator.movedLeftStageIndex).toEqual(indicator.currentDropStage.index - 1);
   });
 
   it("It should test onTheMove method when moving LEFT", function() {
@@ -327,6 +332,10 @@ describe("Testing moveStepRect", function() {
     spyOn(indicator, "getDirection").and.returnValue("left");
     spyOn(indicator, "manageMovingRight");
     spyOn(indicator, "manageMovingLeft");
+    indicator.currentDropStage = {
+      index: 10
+    };
+
     var movement = {
       left: 20
     };
@@ -337,7 +346,7 @@ describe("Testing moveStepRect", function() {
     expect(indicator.getDirection).toHaveBeenCalled();
     expect(indicator.manageMovingRight).not.toHaveBeenCalled();
     expect(indicator.manageMovingLeft).toHaveBeenCalled();
-
+    expect(indicator.movedRightStageIndex).toEqual(indicator.currentDropStage.index + 1);
   });
 
   it("It should test hideFirstStepBorderLeft method", function() {
