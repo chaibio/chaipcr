@@ -56,6 +56,12 @@ class Experiment < ActiveRecord::Base
       key :type, :object
       key :'$ref', :Protocol
     end
+    property :errors do
+      key :type, :array
+      items do
+        key :type, :string
+      end
+    end
   end
   
   swagger_schema :ExperimentInput do

@@ -70,12 +70,6 @@ class ExperimentsController < ApplicationController
           end
         end
       end
-      response :default do
-        key :description, 'unexpected error'
-        schema do
-          key :'$ref', :ErrorModel
-        end
-      end
     end
     
     operation :post do
@@ -98,10 +92,10 @@ class ExperimentsController < ApplicationController
           key :'$ref', :Experiment
         end
       end
-      response :default do
-        key :description, 'unexpected error'
+      response 422 do
+        key :description, 'experiment create error'
         schema do
-          key :'$ref', :ErrorModel
+          key :'$ref', :Experiment
         end
       end
     end
