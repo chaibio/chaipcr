@@ -29,8 +29,10 @@ class Ramp < ActiveRecord::Base
     property :rate do
       key :type, :number
       key :format, :float
-      key :description, 'Rate of the ramp, in degrees C/s, between 0 and 5, precision to 8 decimal point'
+      key :description, 'Rate of the ramp, in degrees C/s, precision to 8 decimal point'
       key :default, 0
+      key :minimum, 0
+      key :maximum, 5
     end
     property :collect_data do
       key :type, :boolean
