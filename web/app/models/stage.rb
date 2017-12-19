@@ -20,6 +20,38 @@ class Stage < ActiveRecord::Base
   include ProtocolHelper
   include ProtocolOrderHelper
   
+  include Swagger::Blocks
+   
+  swagger_schema :Stage do
+    property :id do
+      key :type, :integer
+      key :format, :int64
+    end
+    property :stage_type do
+      key :type, :string
+    end
+    property :name do
+      key :type, :string
+    end
+    property :num_cycles do
+      key :type, :integer
+      key :format, :int32
+    end
+    property :auto_delta do
+      key :type, :boolean
+      key :default, false
+    end
+    property :auto_delta_start_cycle do
+      key :type, :integer
+    end
+    property :steps do
+      key :type, :array
+      items do
+        key :'$ref', :Step
+      end
+    end
+  end
+    
   belongs_to :protocol
   has_many :steps, -> {order("order_number")}
   has_many :ramps, :through => :steps

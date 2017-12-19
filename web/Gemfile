@@ -35,6 +35,7 @@ end
 gem 'migration_comments'
 gem "rabl"
 gem 'apipie-rails'
+gem 'swagger-blocks'
 #gem 'bcrypt'
 
 gem 'rspec-rails', :group => [:test, :development]

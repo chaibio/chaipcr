@@ -17,6 +17,61 @@
 # limitations under the License.
 #
 class Experiment < ActiveRecord::Base
+  include Swagger::Blocks
+   
+  swagger_schema :Experiment do
+    key :required, [:id, :name]
+    property :id do
+      key :type, :integer
+      key :format, :int64
+    end
+    property :name do
+      key :type, :string
+    end
+    property :type do
+      key :type, :string
+    end
+    property :time_valid do
+      key :type, :boolean
+    end
+    property :created_at do
+      key :type, :string
+      key :format, :date
+    end 
+    property :started_at do
+      key :type, :string
+      key :format, :date
+    end 
+    property :completed_at do
+      key :type, :string
+      key :format, :date
+    end
+    property :completion_status do
+      key :type, :string
+    end 
+    property :completion_message do
+      key :type, :string
+    end
+    property :protocol do
+      key :type, :object
+      key :'$ref', :Protocol
+    end
+  end
+  
+  swagger_schema :ExperimentInput do
+    allOf do
+      schema do
+        key :required, [:name]
+        property :name do
+          key :type, :string
+        end
+        property :guid do
+          key :type, :string
+        end
+      end
+    end
+  end
+  
   validates :name, presence: true
   
   belongs_to :experiment_definition

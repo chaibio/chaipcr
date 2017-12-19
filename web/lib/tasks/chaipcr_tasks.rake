@@ -11,4 +11,10 @@ task :cleanup => :environment do
   UserToken.delete_all(["expired_at < ?", Date.today])
 end
 
+desc "swagger json file"
+task :swagger => :environment do
+  swagger_data = Swagger::Blocks.build_root_json(ApidocsController::SWAGGERED_CLASSES)
+  File.open('public/swagger.json', 'w') { |file| file.write(swagger_data.to_json) }
+end
+
 end
