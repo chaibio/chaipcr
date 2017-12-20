@@ -15,7 +15,13 @@ window.ChaiBioTech.ngApp.service('moveStageToSidesWhileMoveStep', [
             
             while(stage) {
                 if(stage.stageMovedDirection !== 'right') {
-                    moveStageToSides.moveToSideStageComponents(30, stage);
+
+                    if(stage.partialMove) {
+                        moveStageToSides.moveToSideStageComponents(24, stage);
+                        stage.partialMove = false;
+                    } else {
+                        moveStageToSides.moveToSideStageComponents(30, stage);
+                    }
                     stage.stageMovedDirection = "right";
                 } else if(stage.stageMovedDirection === "right") {
                     break;
@@ -25,7 +31,7 @@ window.ChaiBioTech.ngApp.service('moveStageToSidesWhileMoveStep', [
         };
 
         this.moveStageToLeft = function(stage) {
-            console.log("dvdf");
+            
             //while(stage) {
             if(stage.stageMovedDirection === null && stage.nextStage) {
                 this.moveStageToRight(stage.nextStage);
@@ -46,8 +52,9 @@ window.ChaiBioTech.ngApp.service('moveStageToSidesWhileMoveStep', [
 
             while(stage) {
                 if(stage.stageMovedDirection === "right") {
-                    moveStageToSides.moveToSideStageComponents(-30, stage);
+                    moveStageToSides.moveToSideStageComponents(-24, stage);
                     stage.stageMovedDirection = "left";
+                    stage.partialMove = true;
                 }
                 stage = stage.nextStage;
             }
