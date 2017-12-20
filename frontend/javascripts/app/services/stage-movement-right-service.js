@@ -34,6 +34,7 @@ window.ChaiBioTech.ngApp.service('StageMovementRightService', [
                 
                 if((this.movement.left) > point[0] - 150 && (this.movement.left) < point[0]) {
                     
+                    
                     if(index !== this.movedRightStageIndex) {
                         
                         this.movedStageIndex = this.movedRightStageIndex = index;
@@ -42,8 +43,16 @@ window.ChaiBioTech.ngApp.service('StageMovementRightService', [
                         StagePositionService.getAllVoidSpaces();
                         StepPositionService.getPositionObject(this.kanvas.allStepViews);
                         return true;
+                    } else if((this.movement.left) > point[0] - 140 && (this.movement.left) < point[0] - 100) {
+                       //this.movedStageIndex = this.movedLeftStageIndex = index;
+                        moveStageToSidesWhileMoveStep.moveStageToLeftSpecialCase(this.kanvas.allStageViews[index]); 
+                        StagePositionService.getPositionObject();
+                        StagePositionService.getAllVoidSpaces();
+                        StepPositionService.getPositionObject(this.kanvas.allStepViews);
+                        return true;
                     }
                 }
+                
             }
         };
     }
