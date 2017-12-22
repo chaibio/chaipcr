@@ -18,17 +18,14 @@
  */
 
 angular.module("canvasApp").service('stepEvents',[
-  'stageGraphics',
   'stepGraphics',
   'TimeService',
   'pauseStepService',
   'moveRampLineService',
-  function(stageGraphics, stepGraphics, TimeService, pauseStepService, moveRampLineService) {
+  function(stepGraphics, TimeService, pauseStepService, moveRampLineService) {
 
     var that = this;
     var _$scope, _canvas, _C;
-
-    
 
     this.init = function($scope, canvas, C) {
 
