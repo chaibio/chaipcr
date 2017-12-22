@@ -26,6 +26,10 @@
 
 #include <boost/date_time/posix_time/ptime.hpp>
 
+#ifdef KERNEL_49
+	#include <numeric>
+#endif
+
 namespace Util
 {
 
