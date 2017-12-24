@@ -101,4 +101,151 @@ describe("Testing stepEvents service", function() {
             expect(canvas.renderAll).toHaveBeenCalled();
             
         });
+
+        it("It should test manageStepNameChange method", function() {
+
+            $scope.fabricStep = {
+                index: 14,
+                model: {
+                    name: "chaibio",
+                },
+                stepName: {}
+            };
+
+            spyOn(canvas, "renderAll");
+
+            stepEvents.init($scope, canvas, C);
+            stepEvents.manageStepNameChange();
+
+            expect(canvas.renderAll).toHaveBeenCalled();
+            expect($scope.fabricStep.stepName.text).toEqual("Chaibio");
+        });
+
+        it("It should test manageStepNameChange method when model has no name", function() {
+
+            $scope.fabricStep = {
+                index: 14,
+                model: {
+                   // name: "chaibio",
+                },
+                stepName: {}
+            };
+
+            spyOn(canvas, "renderAll");
+
+            stepEvents.init($scope, canvas, C);
+            stepEvents.manageStepNameChange();
+
+            expect(canvas.renderAll).toHaveBeenCalled();
+            expect($scope.fabricStep.stepName.text).toEqual("Step " + ($scope.fabricStep.index + 1));
+        });
+
+        it("It should test manageStepHoldTimeChange method", function() {
+
+            C.allStepViews = [
+                {
+                    index: 1,
+                    name: "Step",
+                    circle: {
+                        doThingsForLast: function() {}
+                    }
+                }
+            ];
+
+            $scope.fabricStep = {
+                index: 1,
+                showHideRamp: function() {},
+                circle: {
+                    changeHoldTime: function() {},
+
+                    circleGroup: {
+                        setCoords: function() {}
+                    },
+                    getTop: function() {
+                        return {
+                            top: 100,
+                            left: 150
+                        };
+                    }
+                }
+            };
+
+            _TimeService.newTimeFormatting = function() {};
+
+            spyOn(_TimeService, "newTimeFormatting");
+            spyOn($scope.fabricStep.circle, "changeHoldTime");
+            spyOn(C.allStepViews[0].circle, "doThingsForLast");
+            spyOn(canvas, "renderAll");
+
+            stepEvents.init($scope, canvas, C);
+            stepEvents.manageStepHoldTimeChange();
+
+            expect(_TimeService.newTimeFormatting).toHaveBeenCalled();
+            expect($scope.fabricStep.circle.changeHoldTime).toHaveBeenCalled();
+            expect(C.allStepViews[0].circle.doThingsForLast).toHaveBeenCalled();
+            expect(canvas.renderAll).toHaveBeenCalled();
+        });
+
+        it("It should test manageStepCollectDataChange method", function() {
+
+            $scope.fabricStep = {
+                index: 1,
+                showHideRamp: function() {},
+                circle: {
+                    parent: {
+                        gatherDataDuringStep: {}
+                    },
+                    showHideGatherData: function() {},
+                    changeHoldTime: function() {},
+
+                    circleGroup: {
+                        setCoords: function() {}
+                    },
+                    getTop: function() {
+                        return {
+                            top: 100,
+                            left: 150
+                        };
+                    }
+                }
+            };
+
+            spyOn($scope.fabricStep.circle, "showHideGatherData");
+            spyOn(canvas, "renderAll");
+
+            stepEvents.init($scope, canvas, C);
+            stepEvents.manageStepCollectDataChange("I am new", "I am old");
+
+            expect($scope.fabricStep.circle.showHideGatherData).toHaveBeenCalled();
+            expect(canvas.renderAll).toHaveBeenCalled();
+            expect($scope.fabricStep.circle.parent.gatherDataDuringStep).toEqual("I am new");
+        });
+
+        it("It should test manageStepRampCollectData method", function() {
+
+            $scope.fabricStep = {
+                index: 1,
+                showHideRamp: function() {},
+                circle: {
+                    parent: {
+                        gatherDataDuringStep: {}
+                    },
+                    showHideGatherData: function() {},
+                    changeHoldTime: function() {},
+
+                    circleGroup: {
+                        setCoords: function() {}
+                    },
+                    getTop: function() {
+                        return {
+                            top: 100,
+                            left: 150
+                        };
+                    }
+                }
+            };
+            
+
+        });
+        
 });
