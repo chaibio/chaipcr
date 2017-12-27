@@ -226,9 +226,16 @@ describe("Testing stepEvents service", function() {
             $scope.fabricStep = {
                 index: 1,
                 showHideRamp: function() {},
+                parentStage: {
+                    index: 1
+                },
                 circle: {
+                    gatherDataDuringRampGroup: {
+                        setVisible: function() {}
+                    },
                     parent: {
-                        gatherDataDuringStep: {}
+                        gatherDataDuringStep: {},
+                        gatherDataDuringRamp: {}
                     },
                     showHideGatherData: function() {},
                     changeHoldTime: function() {},
@@ -245,7 +252,230 @@ describe("Testing stepEvents service", function() {
                 }
             };
             
+            spyOn($scope.fabricStep.circle.gatherDataDuringRampGroup, "setVisible");
+            spyOn(canvas, "renderAll");
 
+            stepEvents.init($scope, canvas, C);
+            stepEvents.manageStepRampCollectData("I am new", "I am old");
+
+            expect($scope.fabricStep.circle.gatherDataDuringRampGroup.setVisible).toHaveBeenCalled();
+            expect(canvas.renderAll).toHaveBeenCalled();
+            expect($scope.fabricStep.circle.parent.gatherDataDuringRamp).toEqual("I am new");
+        });
+
+        it("It should test manageStepRampCollectData method, when index === 0", function() {
+
+            $scope.fabricStep = {
+                index: 0,
+                showHideRamp: function() {},
+                parentStage: {
+                    index: 0
+                },
+                circle: {
+                    gatherDataDuringRampGroup: {
+                        setVisible: function() {}
+                    },
+                    parent: {
+                        gatherDataDuringStep: {},
+                        gatherDataDuringRamp: {}
+                    },
+                    showHideGatherData: function() {},
+                    changeHoldTime: function() {},
+
+                    circleGroup: {
+                        setCoords: function() {}
+                    },
+                    getTop: function() {
+                        return {
+                            top: 100,
+                            left: 150
+                        };
+                    }
+                }
+            };
+            
+            spyOn($scope.fabricStep.circle.gatherDataDuringRampGroup, "setVisible");
+            spyOn(canvas, "renderAll");
+
+            stepEvents.init($scope, canvas, C);
+            stepEvents.manageStepRampCollectData("I am new", "I am old");
+
+            expect($scope.fabricStep.circle.gatherDataDuringRampGroup.setVisible).not.toHaveBeenCalled();
+            expect(canvas.renderAll).not.toHaveBeenCalled();
         });
         
+        it("It should test manageStepPause method", function() {
+
+            $scope.fabricStep = {
+                index: 0,
+                showHideRamp: function() {},
+                parentStage: {
+                    index: 0
+                },
+                circle: {
+                    gatherDataDuringRampGroup: {
+                        setVisible: function() {}
+                    },
+                    parent: {
+                        gatherDataDuringStep: {},
+                        gatherDataDuringRamp: {}
+                    },
+                    showHideGatherData: function() {},
+                    changeHoldTime: function() {},
+
+                    circleGroup: {
+                        setCoords: function() {}
+                    },
+                    getTop: function() {
+                        return {
+                            top: 100,
+                            left: 150
+                        };
+                    }
+                }
+            };
+
+            _pauseStepService.controlPause = function() {};
+
+            spyOn(_pauseStepService, "controlPause");
+            spyOn(canvas, "renderAll");
+
+            stepEvents.init($scope, canvas, C);
+            stepEvents.manageStepPause();
+
+            expect(_pauseStepService.controlPause).toHaveBeenCalled();
+            expect(canvas.renderAll).toHaveBeenCalled();
+
+        });
+
+        it("It should test manageStepDeltaDurationS method", function() {
+
+            spyOn(stepEvents, "changeDeltaText");
+            spyOn(canvas, "renderAll");
+
+            stepEvents.init($scope, canvas, C);
+            stepEvents.manageStepDeltaDurationS();
+
+            expect(stepEvents.changeDeltaText).toHaveBeenCalled();
+            expect(canvas.renderAll).toHaveBeenCalled();
+
+        });
+
+        it("It should test manageStepDeltaTemperature method", function() {
+
+            spyOn(stepEvents, "changeDeltaText");
+            spyOn(canvas, "renderAll");
+
+            stepEvents.init($scope, canvas, C);
+            stepEvents.manageStepDeltaTemperature();
+
+            expect(stepEvents.changeDeltaText).toHaveBeenCalled();
+            expect(canvas.renderAll).toHaveBeenCalled();
+
+        });
+
+        it("It should test changeDeltaText method", function() {
+
+            $scope.fabricStep = {
+                index: 0,
+                showHideRamp: function() {},
+                parentStage: {
+                    index: 0,
+                    model: {
+                        stage_type: "cycling"
+                    },
+                    childSteps: [
+                        {
+                            index: 0
+                        },
+                        {
+                            index: 1
+                        }
+                    ]
+                },
+                circle: {
+                    gatherDataDuringRampGroup: {
+                        setVisible: function() {}
+                    },
+                    parent: {
+                        gatherDataDuringStep: {},
+                        gatherDataDuringRamp: {}
+                    },
+                    showHideGatherData: function() {},
+                    changeHoldTime: function() {},
+
+                    circleGroup: {
+                        setCoords: function() {}
+                    },
+                    getTop: function() {
+                        return {
+                            top: 100,
+                            left: 150
+                        };
+                    }
+                }
+            };
+
+            _stepGraphics.autoDeltaDetails = function() {};
+
+            spyOn(_stepGraphics, "autoDeltaDetails");
+
+            stepEvents.init($scope, canvas, C);
+            stepEvents.changeDeltaText($scope);
+
+            expect(_stepGraphics.autoDeltaDetails).toHaveBeenCalledTimes(2);
+        });
+
+        it("It should test changeDeltaText method when stage is not cycling", function() {
+
+            $scope.fabricStep = {
+                index: 0,
+                showHideRamp: function() {},
+                parentStage: {
+                    index: 0,
+                    model: {
+                        stage_type: "holding"
+                    },
+                    childSteps: [
+                        {
+                            index: 0
+                        },
+                        {
+                            index: 1
+                        }
+                    ]
+                },
+                circle: {
+                    gatherDataDuringRampGroup: {
+                        setVisible: function() {}
+                    },
+                    parent: {
+                        gatherDataDuringStep: {},
+                        gatherDataDuringRamp: {}
+                    },
+                    showHideGatherData: function() {},
+                    changeHoldTime: function() {},
+
+                    circleGroup: {
+                        setCoords: function() {}
+                    },
+                    getTop: function() {
+                        return {
+                            top: 100,
+                            left: 150
+                        };
+                    }
+                }
+            };
+
+            _stepGraphics.autoDeltaDetails = function() {};
+
+            spyOn(_stepGraphics, "autoDeltaDetails");
+
+            stepEvents.init($scope, canvas, C);
+            stepEvents.changeDeltaText($scope);
+
+            expect(_stepGraphics.autoDeltaDetails).not.toHaveBeenCalledTimes(2);
+        });
+
 });
