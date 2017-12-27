@@ -339,15 +339,16 @@ sleep 30
 dpkg --configure -a
 
 apt-get autoremove -y -q
+apt-get -q -y install libopenblas-dev libblas-dev liblapack-dev
+apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git build-essential hdf5-tools curl python pkg-config libssl-dev ntp ntpdate git unzip automake sshpass linux-headers-`uname -r` libpoco-dev
 
-apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git build-essential hdf5-tools curl python pkg-config libssl-dev ntp ntpdate git unzip automake sshpass linux-headers-`uname -r` libpoco-dev
-
+apt-get -q -y install liblapack3gf libblas3gf 
 apt-get -f -y -q install
 
 apt-get install -q -y libarpack2 libblas3 libgfortran3 liblapack3 ntpdate
 apt-get -f -y -q install
 
-apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3 
+apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3 
 apt-get -y -q install libblas3 libatlas3-base
 apt-get -y -q install libblas-common libfftw3-double3 libfftw3-single3 libllvm3.8 libmetis5 libopenblas-base libunwind8 
 
