@@ -26,6 +26,7 @@ rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking
 rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./browser "$1:/root/chaipcr/"
 rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./bioinformatics "$1:/root/chaipcr/"
 rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./device/configuration.json "$1:/root/chaipcr/deploy/"
+rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./device/configuration.json "$1:/root/"
 rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./devops/factory_settings_sdcard/scripts/replace_uEnv.txt.sh "$1:/root/chaipcr/deploy/"
 rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./devops/device "$1:/root/chaipcr/deploy/"
 rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./modules "$1:/root/chaipcr/"
