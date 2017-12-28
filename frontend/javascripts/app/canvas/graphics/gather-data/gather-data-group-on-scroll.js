@@ -19,7 +19,7 @@
 
 angular.module("canvasApp").factory('gatherDataGroupOnScroll', [
   function() {
-    return function(objs, parent) {
+    return function(objs) {
       return new fabric.Group(objs, {
         left: 20,
         top: -18,
