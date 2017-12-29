@@ -46,7 +46,6 @@ describe("Testing gatherDataGroup ", function() {
         };
 
         var prop = new gatherDataGroup(objs, parent);
-
         expect(prop.top).toEqual(230);
     });
 });

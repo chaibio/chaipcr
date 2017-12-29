@@ -41,7 +41,10 @@ angular.module("canvasApp").factory('path', [
       this.curve.nextOne = function(left, top) {
 
         var endPointX, endPointY, midPointX, midPointY;
-
+        /*
+          Remember there is a path array in curve [fabric.path], This file is returning a path object, and that
+          contains path array.
+        */
         this.path[0][1] = left;
         this.path[0][2] = top;
         // Calculating the mid point of the line at the right side of the circle
@@ -87,10 +90,6 @@ angular.module("canvasApp").factory('path', [
         this.path[1][2] = endPointY;
 
         return midPointY;
-      };
-
-      this.curve.reconfigure = function() {
-        console.log('Re- configuring');
       };
       /*************************************************************************/
       return this.curve;
