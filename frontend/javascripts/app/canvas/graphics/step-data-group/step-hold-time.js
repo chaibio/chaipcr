@@ -49,23 +49,20 @@ angular.module("canvasApp").factory('stepHoldTime', [
 
       this.render();
 
-      this.text.on('text:editing:exited', function() {
+      this.text.editingExited = function() {
 
-        // This block is executed when we hit enter.
-        // This condition is a tricky one. When we hit enter text:editing:exited and editing:exited are called and
-        // we dont need to execute twice. So in the first call, whichever it is editMode.tempActive is made false.
         if(editMode.holdActive) {
           stepHoldTimeService.postEdit($scope, parent, that.text);
         }
+      };
 
-      });
+      // This block is executed when we hit enter.
+      // This condition is a tricky one. When we hit enter text:editing:exited and editing:exited are called and
+      // we dont need to execute twice. So in the first call, whichever it is editMode.tempActive is made false.
+      this.text.on('text:editing:exited', this.text.editingExited);
 
-      this.text.on('editing:exited', function() {
-        // This block works when we click somewhere else after enabling inline edit.
-        if(editMode.holdActive) {
-          stepHoldTimeService.postEdit($scope, parent, that.text);
-        }
-      });
+      // This block works when we click somewhere else after enabling inline edit.
+      this.text.on('editing:exited', this.text.editingExited);
 
       return this.text;
     };

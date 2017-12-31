@@ -36,7 +36,6 @@ describe("Testing stepHoldTime", function() {
 
    it("It should test stepHoldTime return value", function() {
 
-        console.log(ht);
         expect(ht.text).toEqual('00:10');
         expect(ht.fill).toEqual('black');
         expect(ht.top).toEqual(0);
@@ -52,5 +51,35 @@ describe("Testing stepHoldTime", function() {
         expect(ht.name).toEqual('holdTimeDisplayText');
         expect(ht.visible).toEqual(true);
         
+   });
+
+   it("It should test editingExited method", function() {
+
+        _editMode.holdActive = true;
+
+        _stepHoldTimeService.postEdit = function() {
+
+        };
+
+        spyOn(_stepHoldTimeService, "postEdit");
+
+        ht.editingExited();
+
+        expect(_stepHoldTimeService.postEdit).toHaveBeenCalled();
+   });
+
+   it("It should test editingExited method when holdActive is false", function() {
+
+        _editMode.holdActive = false;
+
+        _stepHoldTimeService.postEdit = function() {
+
+        };
+
+        spyOn(_stepHoldTimeService, "postEdit");
+
+        ht.editingExited();
+
+        expect(_stepHoldTimeService.postEdit).not.toHaveBeenCalled();
    });
 });
