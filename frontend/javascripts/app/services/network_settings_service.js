@@ -38,7 +38,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     this.wifiShutDownInProgress = false;
     this.wifiRestartingInProgress = false;
     this.macAddress = null;
-    
+
     this.getWifiNetworks = function() {
 
       var delay = $q.defer();
@@ -62,8 +62,8 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     };
 
     this.accessLanLookup = function() {
-      if(this.userSettings.wifiSwitchOn /*&& that.wirelessError === false*/) {
-        this.lanLookup();
+      if(that.userSettings.wifiSwitchOn /*&& that.wirelessError === false*/) {
+        that.lanLookup();
       }
     };
 

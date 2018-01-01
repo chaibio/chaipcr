@@ -18,13 +18,7 @@
  */
 
 angular.module("canvasApp").factory('textChanged', [
-  'ExperimentLoader',
-  'previouslySelected',
-  'previouslyHoverd',
-  'scrollService',
-  'circleManager',
-  'editMode',
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, circleManager, editMode) {
+  function() {
 
     /**************************************
       What happens when text:changed event occurs.

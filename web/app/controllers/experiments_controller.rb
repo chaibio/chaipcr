@@ -18,10 +18,11 @@
 #
 require 'zip'
 require "httparty"
-require "rserve"
+#require "rserve"
 
 class ExperimentsController < ApplicationController
   include ParamsHelper
+  include Swagger::Blocks
   
   before_filter :ensure_authenticated_user
   before_filter :get_experiment, :except => [:index, :create, :copy]
@@ -53,8 +54,55 @@ class ExperimentsController < ApplicationController
     end
   end
   
-  api :GET, "/experiments", "List all the experiments"
-  example "[{'experiment':{'id':1,'name':'test1','type':'user','started_at':null,'completed_at':null,'completed_status':null}},{'experiment':{'id':2,'name':'test2','type':'user','started_at':null,'completed_at':null,'completed_status':null}}]"
+  swagger_path '/experiments' do
+    operation :get do
+      key :summary, 'All experiments'
+      key :description, 'Returns all experiments from the system sorted by the time it is created'
+      key :produces, [
+        'application/json',
+      ]
+      response 200 do
+        key :description, 'experiments response'
+        schema do
+          key :type, :array
+          items do
+            key :'$ref', :Experiment
+          end
+        end
+      end
+    end
+    
+    operation :post do
+      key :description, 'Creates a new experiment, default protocol will be created'
+      key :produces, [
+        'application/json'
+      ]
+      parameter do
+        key :name, :experiment
+        key :in, :body
+        key :description, 'experiment to create'
+        key :required, true
+        schema do
+           key :'$ref', :ExperimentInput
+         end
+      end
+      response 200 do
+        key :description, 'experiment response'
+        schema do
+          key :'$ref', :Experiment
+        end
+      end
+      response 422 do
+        key :description, 'experiment create error'
+        schema do
+          key :'$ref', :Experiment
+        end
+      end
+    end
+  end
+       
+  #api :GET, "/experiments", "List all the experiments"
+  #example "[{'experiment':{'id':1,'name':'test1','type':'user','started_at':null,'completed_at':null,'completed_status':null}},{'experiment':{'id':2,'name':'test2','type':'user','started_at':null,'completed_at':null,'completed_status':null}}]"
   def index
     @experiments = Experiment.includes(:experiment_definition).where("experiment_definitions.experiment_type"=>[ExperimentDefinition::TYPE_USER_DEFINED, ExperimentDefinition::TYPE_TESTKIT]).load
     respond_to do |format|

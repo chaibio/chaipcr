@@ -25,6 +25,7 @@
 
 # Ignore precompiled assets
 /public/assets
+/public/swagger.json
 
 # Ignore angular 2 assets
 /public/*.ttf

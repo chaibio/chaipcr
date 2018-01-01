@@ -29,13 +29,27 @@
       <div class="ssid-text">SSID</div>
       <div class="ssid-val">{{name}}</div>
 
+			<div ng-if="wifiNetworkType == 'wpa2 802.1x'" class="password-label">Username</div>
+			<div ng-if="wifiNetworkType=='wpa2 802.1x'"class="password-input-container">
+				<input type="text" autofocus="" name="wpa_identity" class="text-class" required placeholder="{{name}} username" ng-model="credentials['wpa-identity']">
+				<div ng-show="connectWifiNetwork.wpa_identity.$touched">
+					<span ng-show="connectWifiNetwork.wpa_identity.$error.required" class="connection-error-text">Cannot left blank ..</span>
+				</div>
+			</div>
+
       <div ng-if="wifiNetworkType != 'none'" class="password-label">Password</div>
-      <div ng-if="wifiNetworkType=='wpa2'"class="password-input-container">
+      <div ng-if="wifiNetworkType=='wpa2 psk'"class="password-input-container">
         <input type="password" autofocus="" name="wpa_key" class="text-class" required placeholder="{{name}} password" ng-model="credentials['wpa-psk']">
         <div ng-show="connectWifiNetwork.wpa_key.$touched">
           <span ng-show="connectWifiNetwork.wpa_key.$error.required" class="connection-error-text">Cannot left blank ..</span>
         </div>
       </div>
+			<div ng-if="wifiNetworkType=='wpa2 802.1x'"class="password-input-container">
+				<input type="password" autofocus="" name="wpa_password" class="text-class" required placeholder="{{name}} password" ng-model="credentials['wpa-password']">
+				<div ng-show="connectWifiNetwork.wpa_password.$touched">
+					<span ng-show="connectWifiNetwork.wpa_password.$error.required" class="connection-error-text">Cannot left blank ..</span>
+				</div>
+			</div>
       <div ng-if="wifiNetworkType=='wep'"class="password-input-container">
         <input type="password" autofocus="" name="wireless_key" class="text-class" required placeholder="{{name}} password" ng-model="credentials['wireless_key']">
         <div ng-show="connectWifiNetwork.wireless_key.$touched">

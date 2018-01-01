@@ -18,44 +18,58 @@
  */
 
 angular.module("canvasApp").service('stepEvents',[
-  'stageGraphics',
   'stepGraphics',
   'TimeService',
   'pauseStepService',
   'moveRampLineService',
-  function(stageGraphics, stepGraphics, TimeService, pauseStepService, moveRampLineService) {
+  function(stepGraphics, TimeService, pauseStepService, moveRampLineService) {
 
     var that = this;
-    this.changeDeltaText = function($scope) {
-
-      var stage = $scope.fabricStep.parentStage;
-      if(stage.model.stage_type === "cycling") {
-        stage.childSteps.forEach(function(step, index) {
-          stepGraphics.autoDeltaDetails.call(step);
-        });
-      }
-    };
+    var _$scope, _canvas, _C;
 
     this.init = function($scope, canvas, C) {
 
-      $scope.$watch('step.temperature', function(newVal, oldVal) {
+      _$scope = $scope;
+      _canvas = canvas;
+      _C = C;
+      
+      $scope.$watch('step.temperature', that.manageTemperatureChange);
 
-        var circle = $scope.fabricStep.circle;
+      $scope.$watch('step.ramp.rate', that.manageRampRateChange);
+
+      $scope.$watch('step.name', that.manageStepNameChange);
+
+      $scope.$watch('step.hold_time', that.manageStepHoldTimeChange);
+
+      $scope.$watch('step.collect_data', that.manageStepCollectDataChange);
+
+      $scope.$watch('step.ramp.collect_data', that.manageStepRampCollectData);
+
+      $scope.$watch('step.pause', that.manageStepPause);
+
+      $scope.$watch('step.delta_duration_s', that.manageStepDeltaDurationS);
+
+      $scope.$watch('step.delta_temperature', that.manageStepDeltaTemperature);
+    };
+
+    this.manageTemperatureChange = function(newVal, oldVal) {
+        
+        var circle = _$scope.fabricStep.circle;
         circle.circleGroup.top = circle.getTop().top;
         moveRampLineService.manageDrag(circle.circleGroup);
         circle.circleGroup.setCoords();
-        canvas.renderAll();
-      });
+        _canvas.renderAll();
+    };
 
-      $scope.$watch('step.ramp.rate', function(newVal, oldVal) {
+    this.manageRampRateChange = function(newVal, oldVal) {
 
-        $scope.fabricStep.showHideRamp();
-        canvas.renderAll();
-      });
+      _$scope.fabricStep.showHideRamp();
+      _canvas.renderAll();
+    };
 
-      $scope.$watch('step.name', function(newVal, oldVal) {
+    this.manageStepNameChange = function(newVal, oldVal) {
 
-        var step = $scope.fabricStep;
+        var step = _$scope.fabricStep;
 
         if(step.model.name) {
           step.stepName.text = (step.model.name).charAt(0).toUpperCase() + (step.model.name).slice(1).toLowerCase();
@@ -64,60 +78,72 @@ angular.module("canvasApp").service('stepEvents',[
           step.stepNameText =  "Step " + (step.index + 1);
         }
 
-        canvas.renderAll();
-      });
+        _canvas.renderAll();
+    };
 
-      $scope.$watch('step.hold_time', function(newVal, oldVal) {
+    this.manageStepHoldTimeChange = function(newVal, oldVal) {
 
-        var circle = $scope.fabricStep.circle;
+        var circle = _$scope.fabricStep.circle;
 
         var val = TimeService.newTimeFormatting(newVal);
         circle.changeHoldTime(val);
         //Check the last step. See if the last step has zero and put infinity in that case.
         //C.allCircles[C.allCircles.length - 1].doThingsForLast();
-        if($scope.fabricStep.index === C.allStepViews[C.allStepViews.length - 1].index) {
-          C.allStepViews[C.allStepViews.length - 1].circle.doThingsForLast(newVal, oldVal);
+        if(_$scope.fabricStep.index === _C.allStepViews[_C.allStepViews.length - 1].index) {
+          _C.allStepViews[_C.allStepViews.length - 1].circle.doThingsForLast(newVal, oldVal);
         }
 
-        canvas.renderAll();
-      });
+        _canvas.renderAll();
+    };
 
-      $scope.$watch('step.collect_data', function(newVal, oldVal) {
+    this.manageStepCollectDataChange = function(newVal, oldVal) {
 
-        // things to happen wen step.collect_data changes;
-        var circle = $scope.fabricStep.circle;
+      // things to happen wen step.collect_data changes;
+        var circle = _$scope.fabricStep.circle;
         circle.showHideGatherData(newVal);
         circle.parent.gatherDataDuringStep = newVal;
-        canvas.renderAll();
-      });
+        _canvas.renderAll();
+    };
 
-      $scope.$watch('step.ramp.collect_data', function(newVal, oldVal) {
+    this.manageStepRampCollectData = function(newVal, oldVal) {
 
-        if($scope.fabricStep.index !== 0 || $scope.fabricStep.parentStage.index !== 0) {
+        if(_$scope.fabricStep.index !== 0 || _$scope.fabricStep.parentStage.index !== 0) {
           //if its not the very first step
-          var circle = $scope.fabricStep.circle;
+          var circle = _$scope.fabricStep.circle;
           circle.gatherDataDuringRampGroup.setVisible(newVal);
           circle.parent.gatherDataDuringRamp = newVal;
-          canvas.renderAll();
+          _canvas.renderAll();
         }
-      });
-
-      $scope.$watch('step.pause', function(newVal, oldVal) {
-
-        var circle = $scope.fabricStep.circle;
-        pauseStepService.controlPause(circle);
-        canvas.renderAll();
-      });
-
-      $scope.$watch('step.delta_duration_s', function(newVal, oldVal) {
-        that.changeDeltaText($scope);
-        canvas.renderAll();
-      });
-
-      $scope.$watch('step.delta_temperature', function(newVal, oldVal) {
-        that.changeDeltaText($scope);
-        canvas.renderAll();
-      });
     };
+
+    this.manageStepPause = function(newVal, oldVal) {
+
+      var circle = _$scope.fabricStep.circle;
+      pauseStepService.controlPause(circle);
+      _canvas.renderAll();
+    };
+
+    that.manageStepDeltaDurationS = function(newVal, oldVal) {
+      
+      that.changeDeltaText(_$scope);
+      _canvas.renderAll();
+    };
+
+    that.manageStepDeltaTemperature = function(newVal, oldVal) {
+
+      that.changeDeltaText(_$scope);
+      _canvas.renderAll();
+    };
+
+    this.changeDeltaText = function($scope) {
+
+      var stage = _$scope.fabricStep.parentStage;
+      if(stage.model.stage_type === "cycling") {
+        stage.childSteps.forEach(function(step, index) {
+          stepGraphics.autoDeltaDetails.call(step);
+        });
+      }
+    };
+
   }
 ]);

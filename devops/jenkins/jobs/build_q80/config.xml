@@ -51,7 +51,7 @@ else
 	echo patching ~/.ssh/config
 	cat &lt;&lt;EOF &gt;&gt; ~/.ssh/config
 Host $build_machine
-		KexAlgorithms +diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+		KexAlgorithms +diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
 		Ciphers +3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 #		KexAlgorithms +diffie-hellman-group1-sha1
 #        KexAlgorithms +curve25519-sha256@libssh.org
@@ -69,7 +69,7 @@ fi
 #else
 #	echo patching sshd_config
 #	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
-#KexAlgorithms diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+#KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
 #Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 #EOF
 #	sudo service sshd restart
@@ -254,49 +254,91 @@ exit 0
       <siteName>root@$build_machine:22</siteName>
       <command>echo arranging to build julia
 df -h
-
-if ! apt-get -q -y install gcc-4.8 g++-4.8 
-then
-    echo error downloading gcc 4.8.. trying 4.7
-    apt-get -q -y install g++-4.7
-if apt-get -q -y install gcc-4.7
-then
-  apt-get clean
-  apt-get autoclean
-  dpkg --configure -a
-  rm /usr/bin/gcc
-  rm /usr/bin/g++
-  ln -s /usr/bin/gcc-4.7 /usr/bin/gcc
-  ln -s /usr/bin/g++-4.7 /usr/bin/g++
-fi
-
-fi
-
+#!/bin/bash
 
 apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential
 dpkg --configure -a
 sync
 sleep 5
 
-if  g++ --version | grep 4.6
-then
-  apt-get update
-  apt-get -y upgrade
-  dpkg --configure -a
-  apt-get -y install g++-4.7
-  apt-get clean
-  apt-get autoclean
-  dpkg --configure -a
-  rm /usr/bin/gcc
-  rm /usr/bin/g++
-  ln -s /usr/bin/gcc-4.7 /usr/bin/gcc
-  ln -s /usr/bin/g++-4.7 /usr/bin/g++
-fi
+currentver=&quot;$(gcc -dumpversion)&quot;
+requiredver=&quot;6.0.0&quot;
+if [ &quot;$(printf &quot;$requiredver\n$currentver&quot; | sort -V | head -n1)&quot; == &quot;$currentver&quot; ] &amp;&amp; [ &quot;$currentver&quot; != &quot;$requiredver&quot; ]; then 
+        echo &quot;GCC Version is less than 6.0.0&quot;
+	if ! apt-get -q -y install gcc-4.8 g++-4.8 
+	then
+	    echo error downloading gcc 4.8.. trying 4.7
+	    apt-get -q -y install g++-4.7
+	    if apt-get -q -y install gcc-4.7
+	    then
+	      apt-get clean
+	      apt-get autoclean
+	      dpkg --configure -a
+	  
+	      if [ -e /usr/bin/gcc-4.7 ]
+	      then
+	        echo gcc 4.7 is installed.
+	        rm /usr/bin/gcc
+	        rm /usr/bin/g++
+	        ln -s /usr/bin/gcc-4.7 /usr/bin/gcc
+	        ln -s /usr/bin/g++-4.7 /usr/bin/g++
+	      else
+	        echo Warning: gcc 4.7 could not be installed!
+	      fi
+	    fi
+	fi
+	if  g++ --version | grep 4.6
+	then
+	  echo gcc 4.6 is installed.. upgrading it to 4.7..
+	  apt-get update
+	  apt-get -y upgrade
+	  dpkg --configure -a
+	  apt-get -y install g++-4.7
+	  apt-get clean
+	  apt-get autoclean
+	  dpkg --configure -a
+	  if [ -e /usr/bin/gcc-4.7 ]
+	  then
+	    echo gcc 4.7 is installed.
+	    rm /usr/bin/gcc
+	    rm /usr/bin/g++
+	    ln -s /usr/bin/gcc-4.7 /usr/bin/gcc
+	    ln -s /usr/bin/g++-4.7 /usr/bin/g++
+	  else
+	    echo Warning: gcc 4.7 could not be installed!
+	  fi
+	fi
 
-if  g++ --version | grep 4.6
-then
-   echo &quot;Can&apos;t update g++&quot;
-   exit 1
+	if  g++ --version | grep 4.6
+	then
+	   echo &quot;Can&apos;t update g++&quot;
+	   exit 1
+	fi
+else
+        echo &quot;GCC version is greater than 6.0.0&quot;
+   	echo &quot;g++ 6 found. Downgrading to 4.9&quot;
+	apt-get remove g++ gcc --purge -y -q
+	rm -r /usr/lib/gcc
+	apt-get autoremove -y -q
+	cp /etc/apt/sources.list /etc/apt/sources.list.org
+	echo &quot;deb http://ftp.us.debian.org/debian/ jessie main contrib non-free&quot; &gt;&gt; /etc/apt/sources.list 
+	echo &quot;deb-src http://ftp.us.debian.org/debian/ jessie main contrib non-free&quot; &gt;&gt; /etc/apt/sources.list 
+	
+   	apt-get update 
+   	apt-get install g++-4.9 gcc-4.9 -y -q
+
+   	cp /etc/apt/sources.list.org /etc/apt/sources.list
+   	apt-get update 
+   	if [ -e /usr/bin/gcc-4.9 ]
+   	then
+      		rm /usr/bin/gcc
+      		rm /usr/bin/g++
+      		ln -s /usr/bin/gcc-4.9 /usr/bin/gcc
+      		ln -s /usr/bin/g++-4.9 /usr/bin/g++
+      		echo &quot;installed g++ version 4.9 successfully&quot;
+   	else
+      		echo &quot;Failed to downgrade g++&quot;
+   	fi
 fi
 
 echo arranging the sdcard
@@ -326,7 +368,6 @@ sudo swapon /sdcard/upgrade/swapfile
 sudo swapon -s
 
 free -m
-
 
 #echo Building CMake
 #   cd /sdcard/upgrade

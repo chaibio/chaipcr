@@ -297,6 +297,7 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
 
     kwargs_jmp_model::OrderedDict=OrderedDict(
         :solver=>IpoptSolver(print_level=0, max_iter=35) # `ReadOnlyMemoryError()` for v0.5.1
+        # :solver=>IpoptSolver(print_level=0, max_iter=100) # increase allowed number of iterations for MAK-based methods, due to possible numerical difficulties during search for fitting directions (step size becomes too small to be precisely represented by the precision allowed by the system's capacity)
         # :solver=>NLoptSolver(algorithm=:LN_COBYLA)
     ),
     ipopt_print2file::String="",

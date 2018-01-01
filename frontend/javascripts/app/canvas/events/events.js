@@ -24,11 +24,7 @@
     all the events are send from canvas and we check if the event has particular target.
   ***************************************/
 angular.module("canvasApp").factory('events', [
-  'ExperimentLoader',
   'previouslySelected',
-  'popupStatus',
-  'previouslyHoverd',
-  'scrollService',
   'mouseOver',
   'mouseOut',
   'mouseDown',
@@ -39,7 +35,7 @@ angular.module("canvasApp").factory('events', [
   'htmlEvents',
   'circleManager',
   'textChanged',
-  function(ExperimentLoader, previouslySelected, popupStatus, previouslyHoverd, scrollService,
+  function(previouslySelected,
     mouseOver, mouseOut, mouseDown, objectMoving, objectModified, mouseMove, mouseUp, htmlEvents,
     circleManager, textChanged) {
     return function(C, $scope) {
@@ -77,8 +73,6 @@ angular.module("canvasApp").factory('events', [
         $scope.$apply(function() {
           $scope.summaryMode = true;
         });
-
-
 
         var circle = previouslySelected.circle;
         circle.parent.unSelectStep();
@@ -175,8 +169,8 @@ angular.module("canvasApp").factory('events', [
            Note that it takes some more time to load images, better avaoid images
            or wait for images to complete
       ***************************************/
-      this.canvas.on("imagesLoaded", function() {
-
+      this.afterImagesLoaded = function() {
+        
         C.addStages();
         C.setDefaultWidthHeight();
 
@@ -194,7 +188,14 @@ angular.module("canvasApp").factory('events', [
         C.getComponents();
         C.addComponentsToStage();
         C.canvas.renderAll();
-      });
+
+      };
+
+      this.canvas.on("imagesLoaded", that.afterImagesLoaded);
+
+      
+
+      return this;
     };
   }
 ]);

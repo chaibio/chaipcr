@@ -18,7 +18,6 @@ const db_name_AIR = "" # db_name == ABSENT_IN_REQ
 
 # functions
 
-
 # function: check whether a value different from `calib_info_AIR` is passed onto `calib_info`; if not, use `exp_id` to find calibration "experiment_id" in MySQL database and assumes water "step_id"=2, signal "step_id"=4, using FAM to calibrate all the channels.
 function ensure_ci(
     db_conn::MySQL.MySQLHandle,
@@ -72,6 +71,17 @@ function ensure_ci(
     return calib_info
 
 end # ensure_ci
+
+
+# find by sliding window the indices in a vector where the value at the index equals the summary value of the window centering at the index ( window width = number of data points in the whole window). can be used to find peak summits and nadirs
+function find_mid_sumr_bysw(vals::AbstractVector, half_width::Integer, sumr_func::Function=maximum)
+    padding = fill(-sumr_func(-vals), half_width)
+    vals_padded = [padding; vals; padding]
+    find(1:length(vals)) do i
+        vals_iw = vals_padded[i : i + half_width * 2] # iw = in window
+        return sumr_func(vals_iw) == vals_iw[half_width + 1]
+    end # do i
+end
 
 
 # finite differencing

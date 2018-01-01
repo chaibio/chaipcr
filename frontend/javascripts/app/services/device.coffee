@@ -66,9 +66,9 @@ window.App.service 'Device', [
         @getCapabilities().then (resp) ->
           deferred.resolve resp.data.capabilities?.optics?.emission_channels?.length is 2
         return deferred.promise
-		
+
       exportDatabase: ->
-        $http.get("/device/export_database", responseType: 'arraybuffer')		  		
+        $http.get("/device/export_database", responseType: 'arraybuffer')
 
       channelCount: ->
         deferred = $q.defer()
@@ -85,10 +85,32 @@ window.App.service 'Device', [
             deviceCheckPromise = @getVersion()
             deviceCheckPromise.then (device) ->
               is_offline = true
-              if cloudInfo.software_version isnt device.software?.version
-                deferred.resolve 'available'
-              else
-                deferred.resolve 'unavailable'
+              if cloudInfo.software_version == device.software?.version
+                return deferred.resolve 'unavailable'
+              a_components = cloudInfo.software_version.split('.')
+              b_components = device.software?.version.split('.')
+              len = Math.min(a_components.length, b_components.length)
+              i = 0
+              while i < len
+                # A bigger than B
+                if parseInt(a_components[i]) > parseInt(b_components[i])
+                  return deferred.resolve 'available'
+                # B bigger than A
+                if parseInt(a_components[i]) < parseInt(b_components[i])
+                  return deferred.resolve 'unavailable'
+                i++
+              # If one's a prefix of the other, the longer one is greater.
+              if a_components.length > b_components.length
+                return deferred.resolve 'available'
+              if a_components.length < b_components.length
+                return deferred.resolve 'unavailable'
+              return deferred.resolve 'unavailable'
+
+
+              #if cloudInfo.software_version isnt device.software?.version
+                #deferred.resolve 'available'
+              #else
+                #deferred.resolve 'unavailable'
 
             deviceCheckPromise.catch ->
               deferred.reject()

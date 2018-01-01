@@ -26,6 +26,10 @@
 
 #include <boost/date_time/posix_time/ptime.hpp>
 
+#ifdef KERNEL_49
+	#include <numeric>
+#endif
+
 namespace Util
 {
 
@@ -58,6 +62,8 @@ bool watchProcess(const std::string &command, int eventFd, WatchProcessCallback 
 bool getFileChecksum(const std::string &filePath, int eventFd, std::string &checksum);
 
 bool getPartitionAvailableSpace(const std::string &path, unsigned long &space);
+
+int isVersionGreater(const std::string &currentVersion, const std::string &newVersion);
 
 struct NullMutex
 {

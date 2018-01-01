@@ -776,41 +776,33 @@ void DBControl::updateSettings(const Settings &settings)
     write(statements);
 }
 
-void DBControl::updateUpgrade(const Upgrade &upgrade,  bool &isCurrent, bool &downloaded)
+void DBControl::getCurrentUpgrade(std::string &version, bool &downloaded)
 {
-    isCurrent = false;
-    downloaded = false;
+    int tmpDownloaded = 0;
 
     {
-        int tmpDownloaded = 0;
         std::lock_guard<std::mutex> lock(_readMutex);
 
         BEGIN_DB_READ()
-        *_readSession << "SELECT downloaded FROM upgrades WHERE version = \'" << upgrade.version() << '\'', soci::into(tmpDownloaded);
+        *_readSession << "SELECT COUNT(1) version, downloaded FROM upgrades", soci::into(version), soci::into(tmpDownloaded);
         END_DB_READ();
-
-        if (_readSession->got_data())
-        {
-            isCurrent = true;
-            downloaded = tmpDownloaded;
-
-            if (downloaded)
-                return;
-        }
     }
 
-    {
-        std::vector<soci::statement> statements;
-        std::lock_guard<std::mutex> lock(_writeMutex);
+    downloaded = tmpDownloaded;
+}
 
-        statements.emplace_back((_writeSession->prepare << "INSERT INTO upgrades(id, version, checksum, release_date, brief_description, full_description, password, downloaded) VALUES("
-                                 "1, :version, :checksum, :release_date, :brief_description, :full_description, :password, 0) ON DUPLICATE KEY UPDATE "
-                                 "version = :version, checksum = :checksum, release_date = :release_date, brief_description = :brief_description, full_description = :full_description, password = :password, downloaded = 0",
-                                 soci::use(upgrade.version()), soci::use(upgrade.checksum()), soci::use(upgrade.releaseDate()), soci::use(upgrade.briefDescription()), soci::use(upgrade.fullDescription()), soci::use(upgrade.password()),
-                                 soci::use(upgrade.version()), soci::use(upgrade.checksum()), soci::use(upgrade.releaseDate()), soci::use(upgrade.briefDescription()), soci::use(upgrade.fullDescription()), soci::use(upgrade.password())));
+void DBControl::updateUpgrade(const Upgrade &upgrade)
+{
+    std::vector<soci::statement> statements;
+    std::lock_guard<std::mutex> lock(_writeMutex);
 
-        write(statements);
-    }
+    statements.emplace_back((_writeSession->prepare << "INSERT INTO upgrades(id, version, checksum, release_date, brief_description, full_description, password, downloaded) VALUES("
+                             "1, :version, :checksum, :release_date, :brief_description, :full_description, :password, 0) ON DUPLICATE KEY UPDATE "
+                             "version = :version, checksum = :checksum, release_date = :release_date, brief_description = :brief_description, full_description = :full_description, password = :password, downloaded = 0",
+                             soci::use(upgrade.version()), soci::use(upgrade.checksum()), soci::use(upgrade.releaseDate()), soci::use(upgrade.briefDescription()), soci::use(upgrade.fullDescription()), soci::use(upgrade.password()),
+                             soci::use(upgrade.version()), soci::use(upgrade.checksum()), soci::use(upgrade.releaseDate()), soci::use(upgrade.briefDescription()), soci::use(upgrade.fullDescription()), soci::use(upgrade.password())));
+
+    write(statements);
 }
 
 void DBControl::setUpgradeDownloaded(bool state)

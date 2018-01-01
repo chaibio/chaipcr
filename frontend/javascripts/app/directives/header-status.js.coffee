@@ -26,7 +26,8 @@ window.App.directive 'headerStatus', [
   'ModalError'
   '$location'
   '$timeout'
-  (Experiment, $state, Status, TestInProgressHelper, $rootScope, expName, ModalError, $location, $timeout) ->
+  'alerts'
+  (Experiment, $state, Status, TestInProgressHelper, $rootScope, expName, ModalError, $location, $timeout, alerts) ->
 
     restrict: 'EA'
     replace: true
@@ -134,6 +135,9 @@ window.App.directive 'headerStatus', [
             if $state.is('edit-protocol')
               max_cycle = Experiment.getMaxExperimentCycle($scope.experiment)
               $state.go('run-experiment', {'id': experiment_id, 'chart': 'amplification', 'max_cycle': max_cycle})
+        .catch (resp) ->
+          console.log('error')
+          alerts.showMessage(resp.data.status.error, $scope);
 
       $scope.startConfirm = ->
         $scope.start_confirm_show = true

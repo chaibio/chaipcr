@@ -26,8 +26,8 @@
     <div class="wizard">
       <h3>Optical</h3>
       <p>Compensates for well-to-well variations in optical performance. Run whenever lid height is adjusted, or tube type is changed</p>
-      <a ui-sref="optical_cal.intro" class="button" ng-class="{ 'disabled-button': anotherExperimentInProgress}" ng-show="!is_dual_channel">RUN NOW</a>
-      <a ui-sref="2_channel_optical_cal.intro" class="button" ng-class="{ 'disabled-button': anotherExperimentInProgress}" ng-show="is_dual_channel">RUN NOW</a>
+      <a ui-sref="optical_cal.intro" class="button" ng-class="{ 'disabled-button': anotherExperimentInProgress || !checked}" ng-show="!is_dual_channel">RUN NOW</a>
+      <a ui-sref="2_channel_optical_cal.intro" class="button" ng-class="{ 'disabled-button': anotherExperimentInProgress || !checked}" ng-show="is_dual_channel">RUN NOW</a>
     </div>
 
   </div>

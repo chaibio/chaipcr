@@ -36,9 +36,26 @@ $(document).ready(function() {
         $('#splash').center({transition:0});
     });*/
 
+    var dots = 0;
+    var testInterval = setInterval (type, 350);
+
 	var interval = setInterval(function() {
 		checkConnection();
 	}, 10000);
+
+	function type()
+{
+    if(dots < 3)
+    {
+        $('.version-value').append('.');
+        dots++;
+    }
+    else
+    {
+        $('.version-value').html('');
+        dots = 0;
+    }
+}
 
 
 
@@ -97,6 +114,7 @@ $(document).ready(function() {
 			.done(function(data) {
 				//if(typeof (data.software.version) != 'undefined' ){
 					if (data && data.software && data.software.version) {
+						clearInterval(testInterval);
 						$(".version-text").text("V.   ").show();
 						$(".version-value").text(data.software.version).show();
 					//clearInterval(insure); // Now we keep looking if we have connection.

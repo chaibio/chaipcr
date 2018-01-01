@@ -292,7 +292,12 @@ void WirelessManager::scan(const std::string &interface)
             if (line.find("WPA Version 1") != std::string::npos)
                 result.encryption = ScanResult::Wpa1Ecryption;
             else if (line.find("WPA2") != std::string::npos)
-                result.encryption = ScanResult::Wpa2Ecryption;
+                result.encryption = ScanResult::Wpa2PSKEcryption;
+        }
+        else if (line.find("Authentication Suites ") != std::string::npos)
+        {
+            if (line.find("802.1x") != std::string::npos)
+                result.encryption = ScanResult::Wpa28021xEcryption;
         }
         else if (line.find("Quality=") != std::string::npos)
         {
