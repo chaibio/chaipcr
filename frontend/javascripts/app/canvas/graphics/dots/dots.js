@@ -41,6 +41,7 @@ angular.module("canvasApp").factory('dots', [
         dotCordiantes["middle" + i] = [6, (11 * i) + 6];
         dotCordiantes["right" + i] = [11, (11 * i) + 1];
       }
+      
       delete dotCordiantes["middle" + (i - 1)];
 
       for(var dot in dotCordiantes) {
