@@ -20,13 +20,12 @@
 window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
   '$scope',
   '$rootScope',
-  '$stateParams',
   'User',
   '$state',
   'NetworkSettingsService',
   '$interval',
   '$timeout',
-  function($scope, $rootScope, $stateParams, User, $state, NetworkSettingsService, $interval, $timeout) {
+  function($scope, $rootScope, User, $state, NetworkSettingsService, $interval, $timeout) {
 
     $scope.wifiNetworks = {}; // All available wifi networks
     $scope.currentWifiSettings = {}; // Current active wifi network [connected to]

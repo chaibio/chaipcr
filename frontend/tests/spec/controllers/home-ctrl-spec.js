@@ -7,7 +7,7 @@
 
       module('ChaiBioTech', function($provide) {
         mockCommonServices($provide)
-      })
+      });
 
       inject(function($injector) {
         this.window = $injector.get('$window')
@@ -20,10 +20,10 @@
         this.scope = this.rootScope.$new()
         this.HomeCtrl = this.controller('HomeCtrl', {
           $scope: this.scope
-        })
-      })
+        });
+      });
 
-    })
+    });
 
     it('should add modal-form class to body', function() {
       expect($('body').hasClass('modal-form')).toBe(true)
