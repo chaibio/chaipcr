@@ -69,12 +69,29 @@ describe("Testing NetworkSettingController", function() {
 
     });
 
-
     it("It should test new_wifi_result event on scope", function() {
 
         _NetworkSettingsService.connectedWifiNetwork = "Chai";
-
         _$scope.$broadcast('new_wifi_result');
         expect(_$scope.currentWifiSettings).toEqual(_NetworkSettingsService.connectedWifiNetwork);
+        expect(_$scope.wirelessError).toEqual(false);
+    });
+
+    it("It should test ethernet_detected event on scope", function() {
+
+        _NetworkSettingsService.connectedEthernet = "ChaiEther";
+
+        _$scope.$broadcast('ethernet_detected');
+
+        expect(_$scope.ethernetSettings).toEqual(_NetworkSettingsService.connectedEthernet);
+    });
+
+    it("It should test wifi_adapter_error event", function() {
+
+        spyOn(_$scope, "whenNoWifiAdapter").and.returnValue({});
+
+        _$rootScope.$broadcast('wifi_adapter_error');
+
+        expect(_$scope.whenNoWifiAdapter).toHaveBeenCalled();
     });
 });
