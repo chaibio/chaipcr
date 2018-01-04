@@ -15,13 +15,18 @@ describe("Testing NetworkSettingController", function() {
             _NetworkSettingsService = $injector.get('NetworkSettingsService');
             _$interval = $injector.get('$interval');
             _$scope = _$rootScope.$new();
-            _$controller = $injector.get('$controller')
-            
+            _$controller = $injector.get('$controller');;
+            httpMock = $injector.get('$httpBackend');
+
+            httpMock.expectGET("http://localhost:8000/status").respond("NOTHING");
+            httpMock.expectGET("http://localhost:8000/network/wlan").respond("NOTHING");
+            httpMock.expectGET("http://localhost:8000/network/eth0").respond("NOTHING");
             NetworkSettingController = _$controller('NetworkSettingController', {
                 $scope: _$scope
             });
 
         });
+        
     });
 
     it("It should test initial $scope values", function() {
@@ -94,4 +99,81 @@ describe("Testing NetworkSettingController", function() {
 
         expect(_$scope.whenNoWifiAdapter).toHaveBeenCalled();
     });
+
+    it("It should test wifiNetworkStatus change to true", function() {
+
+        _$scope.userSettings = {
+            wifiSwitchOn: true
+        };
+
+        spyOn(_$scope, "turnOnWifi");
+        _$scope.wirelessError = false;
+        _$scope.wifiNetworkStatus = false;
+        
+        
+
+        _NetworkSettingsService.stopInterval = function() {
+
+        };
+
+        spyOn(_$scope, "turnOffWifi").and.returnValue({});
+        spyOn(_NetworkSettingsService, "stopInterval");
+
+        _$scope.$digest();
+    
+        expect(_$scope.turnOffWifi).toHaveBeenCalled();
+        expect(_NetworkSettingsService.stopInterval).toHaveBeenCalled();
+    });
+
+    it("It should test wifiNetworkStatus change to false", function() {
+
+        _$scope.userSettings = {
+            wifiSwitchOn: false
+        };
+
+        spyOn(_$scope, "turnOnWifi");
+        _$scope.wirelessError = false;
+        _$scope.wifiNetworkStatus = true;
+        
+        spyOn(_$scope, "turnOffWifi").and.returnValue({});
+        
+        _$scope.$digest();
+    
+        expect(_$scope.turnOnWifi).toHaveBeenCalled();
+    });
+
+    it("It should test wifiNetworkStatus change when wirelessError is true", function() {
+
+        _$scope.userSettings = {
+            wifiSwitchOn: false
+        };
+
+        spyOn(_$scope, "turnOnWifi");
+        _$scope.wirelessError = true;
+        _$scope.wifiNetworkStatus = true;
+        
+        spyOn(_$scope, "turnOffWifi").and.returnValue({});
+        
+        _$scope.$digest();
+    
+        expect(_$scope.turnOnWifi).not.toHaveBeenCalled();
+    });
+
+    it("It should test wifiNetworkStatus change to false, when wifiSwitchOn is already true [its unlikely]", function() {
+
+        _$scope.userSettings = {
+            wifiSwitchOn: true
+        };
+
+        spyOn(_$scope, "turnOnWifi");
+        _$scope.wirelessError = false;
+        _$scope.wifiNetworkStatus = true;
+        
+        spyOn(_$scope, "turnOffWifi").and.returnValue({});
+        
+        _$scope.$digest();
+    
+        expect(_$scope.turnOffWifi).not.toHaveBeenCalled();
+    });
+
 });
