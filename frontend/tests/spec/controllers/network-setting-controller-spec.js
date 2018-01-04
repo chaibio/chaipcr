@@ -15,7 +15,8 @@ describe("Testing NetworkSettingController", function() {
             _NetworkSettingsService = $injector.get('NetworkSettingsService');
             _$interval = $injector.get('$interval');
             _$scope = _$rootScope.$new();
-            _$controller = $injector.get('$controller');;
+            _$controller = $injector.get('$controller');
+            _$state = $injector.get('$state');
             httpMock = $injector.get('$httpBackend');
 
             httpMock.expectGET("http://localhost:8000/status").respond("NOTHING");
@@ -176,4 +177,80 @@ describe("Testing NetworkSettingController", function() {
         expect(_$scope.turnOffWifi).not.toHaveBeenCalled();
     });
 
+    it("It should test wifi_adapter_reconnected event", function() {
+
+        var evt = {};
+        var wifiData = {
+            state: {
+                macAddress: "100:1w:dd:dd:300"
+            }
+        };
+
+        spyOn(_$scope, "init").and.returnValue({});
+
+        _$scope.$broadcast("wifi_adapter_reconnected", wifiData);
+
+        expect(_$scope.wifiNetworkStatus).toEqual(true);
+        expect(_$scope.wirelessError).toEqual(false);
+        expect(_$scope.macAddress).toEqual(wifiData.state.macAddress);
+        expect(_$scope.init).toHaveBeenCalled();
+    });
+
+    it("It should test wifi_stopped event", function() {
+
+        _$scope.$broadcast("wifi_stopped");
+        expect(_$scope.wifiNetworks.ssid).toEqual(undefined);
+    });
+
+    it("It should test whenNoWifiAdapter method", function() {
+
+        _NetworkSettingsService.wirelessErrorData = "no_wifi_adapter";
+        _$scope.whenNoWifiAdapter();
+
+        expect(_$scope.wirelessError).toEqual(true);
+        expect(_$scope.wifiNetworkStatus).toEqual(false);
+        expect(_$scope.wirelessErrorData).toEqual("no_wifi_adapter");
+        expect(_$scope.wifiNetworks.ssid).toEqual(undefined);
+    });
+
+    it("It should test turnOffWifi method", function() {
+
+        _NetworkSettingsService.stop = function() {
+            var result;
+            return {
+                then: function(callback) {
+                    callback(result);
+                }
+            };
+        };
+
+        spyOn(_NetworkSettingsService, "stop").and.callThrough();
+        spyOn(_$state, "go").and.returnValue(true);
+
+        _$scope.turnOffWifi();
+
+        expect(_NetworkSettingsService.stop).toHaveBeenCalled();
+        expect(_$state.go).toHaveBeenCalled();
+    });
+
+    it("It should test turnOffWifi error callback", function() {
+
+        _NetworkSettingsService.stop = function() {
+            var result = {}, successCallback = null;
+            return {
+                then: function( successCallback ,errorCallback) {
+                    errorCallback(result);
+                }
+            };
+        };
+
+        spyOn(_NetworkSettingsService, "stop").and.callThrough();
+        spyOn(_$state, "go").and.returnValue(true);
+
+        _$scope.turnOffWifi();
+
+        expect(_NetworkSettingsService.stop).toHaveBeenCalled();
+        expect(_$state.go).not.toHaveBeenCalled(); 
+
+    });
 });
