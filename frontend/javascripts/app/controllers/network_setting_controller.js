@@ -156,7 +156,7 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
       This part of the code look at the wifi networks around at every 10 second, There could be changes in the network.
       Like change in signal stregth, some new networks or some networks may not be there.
     */
-    var stop = $interval(function() {
+    /*var stop = $interval(function() {
 
       if($state.is('settings.networkmanagement')) {
         $scope.findWifiNetworks();
@@ -164,7 +164,7 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
         $interval.cancel(stop);
         stop = null;
       }
-    }, 5000);
+    }, 5000); */
 
     /**
       Initiate the primary things like ethernet status, wifiNetworkStatus and all the wifi networks around the room.
