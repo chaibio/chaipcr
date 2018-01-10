@@ -104,7 +104,7 @@ class ExperimentsController < ApplicationController
   #api :GET, "/experiments", "List all the experiments"
   #example "[{'experiment':{'id':1,'name':'test1','type':'user','started_at':null,'completed_at':null,'completed_status':null}},{'experiment':{'id':2,'name':'test2','type':'user','started_at':null,'completed_at':null,'completed_status':null}}]"
   def index
-    @experiments = Experiment.includes(:experiment_definition).where("experiment_definitions.experiment_type"=>[ExperimentDefinition::TYPE_USER_DEFINED, ExperimentDefinition::TYPE_TESTKIT]).load
+    @experiments = Experiment.includes(:experiment_definition).where("experiment_definitions.experiment_type"=>[ExperimentDefinition::TYPE_USER_DEFINED, ExperimentDefinition::TYPE_TESTKIT]).order("id").load
     respond_to do |format|
       format.json { render "index", :status => :ok }
     end
