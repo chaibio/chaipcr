@@ -11,9 +11,9 @@
 
 ~~Edit: `proxy.conf.js` has been added to `.gitignore` list. Use `proxy.conf.js.example` as reference to setup your proxy.~~
 
-Edit: In development, all calls to api are sent to local rails web server (`localhost:3000`).
+~~You can read more about [Angular CLI Proxy](https://github.com/angular/angular-cli/blob/master/docs/documentation/stories/proxy.md)~~
 
-You can read more about [Angular CLI Proxy](https://github.com/angular/angular-cli/blob/master/docs/documentation/stories/proxy.md)
+Edit: In development, all calls to api are sent to local rails web server (`http://localhost:3000`).
 
 ### Deployment
 
