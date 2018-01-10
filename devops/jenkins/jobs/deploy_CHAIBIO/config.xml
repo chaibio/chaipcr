@@ -53,7 +53,6 @@
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <authToken>123</authToken>
   <triggers/>
   <concurrentBuild>true</concurrentBuild>
   <builders>
@@ -68,7 +67,15 @@ df -h
 echo user: $(whoami)
 
 echo Checking for nessasery packages:
-sudo apt-get -y -q install sshpass parted mdadm npm inetutils-traceroute ruby nodejs ruby-dev libxslt-dev libxml2-dev
+sudo apt-get -y -q update
+sudo apt-get -y -q install sshpass parted
+sudo apt-get -y -q install ruby
+sudo apt-get -y -q install inetutils-traceroute
+sudo apt-get -y -q install install mdadm npm 
+sudo apt-get -y -q install nodejs ruby-dev 
+sudo apt-get -y -q install libxslt-dev 
+sudo apt-get -y -q install libxml2-dev
+sudo apt-get -q -y install npm
 
 if grep $build_machine /var/lib/jenkins/.ssh/config
 then
@@ -77,7 +84,7 @@ else
 	echo patching /var/lib/jenkins/.ssh/config
 	cat &lt;&lt;EOF &gt;&gt; /var/lib/jenkins/.ssh/config
 Host $build_machine
-		KexAlgorithms +diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+		KexAlgorithms +diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
 		Ciphers +3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 #		KexAlgorithms +diffie-hellman-group1-sha1
 #        KexAlgorithms +curve25519-sha256@libssh.org
@@ -95,7 +102,7 @@ fi
 #else
 #	echo patching sshd_config
 #	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
-#KexAlgorithms diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+#KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
 #Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 #EOF
 #	sudo service sshd restart
@@ -116,7 +123,7 @@ else
 	echo patching sshd_config
 
 cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
-KexAlgorithms diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
 Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 
 EOF
@@ -215,7 +222,7 @@ ENDSSH
 		echo ssh is connectable.
         sleep 10
 
-
+		echo now at $(pwd)
 		branch_param=
 
 		if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
@@ -226,29 +233,45 @@ ENDSSH
 		    echo Cloning branch $branch_param
 		fi
 
-		rm -r tmp || true
+		sudo rm -r tmp || true
 	 	mkdir tmp || true
         cd tmp
 		git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
         cd chaipcr || exit 1
         cd web
-        gem sources --add http://rubygems.org/
+        echo now at $(pwd)
+        
+        gem env
+        if gem env | grep rubygems.org
+        then
+        	echo &quot;ruby source already added&quot;
+        else
+        	# this step is not important as we haverubygems.org/ under remote sources
+        	gem sources --add https://rubygems.org/
+            gem sources --add http://rubygems.org/
+        fi
   		
         sudo apt-get -y -q install ca-certificates software-properties-common 
 
         sudo apt-add-repository -y ppa:rael-gc/rvm
         sudo apt-get update
         sudo apt-get -y -q install rvm nodejs nodejs-legacy
-		rvm install ruby-2.1.5
+        sudo chmod 0777 /usr/share/rvm/tmp
+        sudo chmod 0777 /usr/share/rvm/tmp/*
+        sudo chmod 0777 /usr/share/rvm/*
+
+		sudo rvm install ruby-2.1.5
+        sudo /usr/share/rvm/bin/rvm install ruby-2.1.5
 
         source /etc/profile.d/rvm.sh
-        rvm install ruby-2.1.5
+        sudo rvm install ruby-2.1.5
+        sudo /usr/share/rvm/bin/rvm install ruby-2.1.5
 
-        npm install --global gulp
-        npm install --global gulp-cli
-        npm install
+        sudo npm install --global gulp
+        sudo npm install --global gulp-cli
+        sudo npm install
         
-        gulp deploy || exit 1
+        sudo gulp deploy || exit 1
         cd ..
         
         cat deploy.sh
@@ -259,7 +282,9 @@ ENDSSH
 done
 
 echo timeout waiting for the device to become ready!
-exit 1</command>
+exit 1
+
+</command>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
@@ -337,6 +362,8 @@ git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
 cd /sdcard/upgrade/compile-browser/chaipcr/browser/ || exit 1
 
 rm /sdcard/upgrade/compile-browser/chaipcr/realtime/libraries/lib/libPoco*
+rm /sdcard/upgrade/compile-browser/chaipcr/realtime/libraries/lib/libboost*
+rm /sdcard/upgrade/compile-browser/chaipcr/realtime/libraries/lib/libsoci*
 
 /opt/QtEmbedded/bin/qmake || exit 1
 sed -i &quot;s/arm-unknown-linux-gnueabi-//&quot; Makefile
@@ -364,6 +391,8 @@ cd /sdcard/upgrade/realtime-compile/chaipcr/realtime || exit 1
 cp util/instance.h control/
 sed -i &quot;s/dataSapce/dataSpace/&quot; app/experimentcontroller.cpp
 rm libraries/lib/libPoco*
+rm libraries/lib/libboost*
+rm libraries/lib/libsoci*
 
 #qmake
 /opt/QtEmbedded/bin/qmake || exit 1
@@ -692,7 +721,8 @@ echo basic beaglebone setup done!</command>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo changing root password to chaipcr
+      <command>echo changing root password to chaipcr and disabling login prompt on console
+sudo systemctl disable getty@tty1.service
 echo &quot;root:chaipcr&quot; | chpasswd
 sync
 echo rebooting

@@ -1,0 +1,288 @@
+--- am33xx.dtsi	2018-01-03 17:13:03.000000000 +0000
++++ ../../../am33xx.dtsi	2018-01-09 19:22:04.000000000 +0000
+@@ -321,39 +321,6 @@
+ 			#interrupt-cells = <2>;
+ 			reg = <0x44e07000 0x1000>;
+ 			interrupts = <96>;
+-			gpio-line-names =
+-				"MDIO_DATA",	// 0
+-				"MDIO_CLK",	// 1
+-				"SPI0_SCLK",	// 2
+-				"SPI0_D0",	// 3
+-				"SPI0_D1",	// 4
+-				"SPI0_CS0",	// 5
+-				"SPI0_CS1",	// 6
+-				"ECAP0_IN_PWM0_OUT",	// 7
+-				"LCD_DATA12",	// 8
+-				"LCD_DATA13",	// 9
+-				"LCD_DATA14",	// 10
+-				"LCD_DATA15",	// 11
+-				"UART1_CTSN",	// 12
+-				"UART1_RTSN",	// 13
+-				"UART1_RXD",	// 14
+-				"UART1_TXD",	// 15
+-				"GMII1_TXD3",	// 16
+-				"GMII1_TXD2",	// 17
+-				"USB0_DRVVBUS",	// 18
+-				"XDMA_EVENT_INTR0",	// 19
+-				"XDMA_EVENT_INTR1",	// 20
+-				"GMII1_TXD1",	// 21
+-				"GPMC_AD8",	// 22
+-				"GPMC_AD9",	// 23
+-				"NC",	// 24
+-				"NC",	// 25
+-				"GPMC_AD10",	// 26
+-				"GPMC_AD11",	// 27
+-				"GMII1_TXD0",	// 28
+-				"RMII1_REFCLK",	// 29
+-				"GPMC_WAIT0",	// 30
+-				"GPMC_WPN";	// 31
+ 		};
+ 
+ 		gpio1: gpio@4804c000 {
+@@ -365,39 +332,6 @@
+ 			#interrupt-cells = <2>;
+ 			reg = <0x4804c000 0x1000>;
+ 			interrupts = <98>;
+-			gpio-line-names =
+-				"GPMC_AD0",	// 0
+-				"GPMC_AD1",	// 1
+-				"GPMC_AD2",	// 2
+-				"GPMC_AD3",	// 3
+-				"GPMC_AD4",	// 4
+-				"GPMC_AD5",	// 5
+-				"GPMC_AD6",	// 6
+-				"GPMC_AD7",	// 7
+-				"UART0_CTSN",	// 8
+-				"UART0_RTSN",	// 9
+-				"UART0_RXD",	// 10
+-				"UART0_TXD",	// 11
+-				"GPMC_AD12",	// 12
+-				"GPMC_AD13",	// 13
+-				"GPMC_AD14",	// 14
+-				"GPMC_AD15",	// 15
+-				"GPMC_A0",	// 16
+-				"GPMC_A1",	// 17
+-				"GPMC_A2",	// 18
+-				"GPMC_A3",	// 19
+-				"GPMC_A4",	// 20
+-				"GPMC_A5",	// 21
+-				"GPMC_A6",	// 22
+-				"GPMC_A7",	// 23
+-				"GPMC_A8",	// 24
+-				"GPMC_A9",	// 25
+-				"GPMC_A10",	// 26
+-				"GPMC_A11",	// 27
+-				"GPMC_BE1N",	// 28
+-				"GPMC_CSN0",	// 29
+-				"GPMC_CSN1",	// 30
+-				"GPMC_CSN2";	// 31
+ 		};
+ 
+ 		gpio2: gpio@481ac000 {
+@@ -409,39 +343,6 @@
+ 			#interrupt-cells = <2>;
+ 			reg = <0x481ac000 0x1000>;
+ 			interrupts = <32>;
+-			gpio-line-names =
+-				"GPMC_CSN3",	// 0
+-				"GPMC_CLK",	// 1
+-				"GPMC_ADVN_ALE",	// 2
+-				"GPMC_OEN_REN",	// 3
+-				"GPMC_WEN",	// 4
+-				"GPMC_BE0N_CLE",	// 5
+-				"LCD_DATA0",	// 6
+-				"LCD_DATA1",	// 7
+-				"LCD_DATA2",	// 8
+-				"LCD_DATA3",	// 9
+-				"LCD_DATA4",	// 10
+-				"LCD_DATA5",	// 11
+-				"LCD_DATA6",	// 12
+-				"LCD_DATA7",	// 13
+-				"LCD_DATA8",	// 14
+-				"LCD_DATA9",	// 15
+-				"LCD_DATA10",	// 16
+-				"LCD_DATA11",	// 17
+-				"GMII1_RXD3",	// 18
+-				"GMII1_RXD2",	// 19
+-				"GMII1_RXD1",	// 20
+-				"GMII1_RXD0",	// 21
+-				"LCD_VSYNC",	// 22
+-				"LCD_HSYNC",	// 23
+-				"LCD_PCLK",	// 24
+-				"LCD_AC_BIAS_EN",	// 25
+-				"MMC0_DAT3",	// 26
+-				"MMC0_DAT2",	// 27
+-				"MMC0_DAT1",	// 28
+-				"MMC0_DAT0",	// 29
+-				"MMC0_CLK",	// 30
+-				"MMC0_CMD";	// 31
+ 		};
+ 
+ 		gpio3: gpio@481ae000 {
+@@ -453,39 +354,6 @@
+ 			#interrupt-cells = <2>;
+ 			reg = <0x481ae000 0x1000>;
+ 			interrupts = <62>;
+-			gpio-line-names =
+-				"GMII1_COL",	// 0
+-				"GMII1_CRS",	// 1
+-				"GMII1_RXER",	// 2
+-				"GMII1_TXEN",	// 3
+-				"GMII1_RXDV",	// 4
+-				"I2C0_SDA",	// 5
+-				"I2C0_SCL",	// 6
+-				"EMU0",	// 7
+-				"EMU1",	// 8
+-				"GMII1_TXCLK",	// 9
+-				"GMII1_RXCLK",	// 10
+-				"NC",	// 11
+-				"NC",	// 12
+-				"USB1_DRVVBUS",	// 13
+-				"MCASP0_ACLKX",	// 14
+-				"MCASP0_FSX",	// 15
+-				"MCASP0_AXR0",	// 16
+-				"MCASP0_AHCLKR",	// 17
+-				"MCASP0_ACLKR",	// 18
+-				"MCASP0_FSR",	// 19
+-				"MCASP0_AXR1",	// 20
+-				"MCASP0_AHCLKX",	// 21
+-				"NC",	// 22
+-				"NC",	// 23
+-				"NC",	// 24
+-				"NC",	// 25
+-				"NC",	// 26
+-				"NC",	// 27
+-				"NC",	// 28
+-				"NC",	// 29
+-				"NC",	// 30
+-				"NC";	// 31
+ 		};
+ 
+ 		uart0: serial@44e09000 {
+@@ -907,7 +775,7 @@
+ 			ti,hwmods = "epwmss0";
+ 			#address-cells = <1>;
+ 			#size-cells = <1>;
+-			status = "disabled";
++			status = "okay";
+ 			ranges = <0x48300100 0x48300100 0x80   /* ECAP */
+ 				  0x48300180 0x48300180 0x80   /* EQEP */
+ 				  0x48300200 0x48300200 0x80>; /* EHRPWM */
+@@ -921,7 +789,9 @@
+ 				clock-names = "fck";
+ 				interrupts = <31>;
+ 				interrupt-names = "ecap0";
+-				status = "disabled";
++				status = "okay";
++                            	pinctrl-names = "default";
++                                pinctrl-0 = <&pwm_chaibio_p9_42_pin>;
+ 			};
+ 
+ 			eqep0: eqep@0x48300180 {
+@@ -951,7 +821,7 @@
+ 			ti,hwmods = "epwmss1";
+ 			#address-cells = <1>;
+ 			#size-cells = <1>;
+-			status = "disabled";
++			status = "okay";
+ 			ranges = <0x48302100 0x48302100 0x80   /* ECAP */
+ 				  0x48302180 0x48302180 0x80   /* EQEP */
+ 				  0x48302200 0x48302200 0x80>; /* EHRPWM */
+@@ -986,7 +856,10 @@
+ 				reg = <0x48302200 0x80>;
+ 				clocks = <&ehrpwm1_tbclk>, <&l4ls_gclk>;
+ 				clock-names = "tbclk", "fck";
+-				status = "disabled";
++				status = "okay";
++                            	pinctrl-names = "default", "default";
++                                pinctrl-0 = <&pwm_chaibio_p9_14_pin>;
++                                pinctrl-1 = <&pwm_chaibio_p9_16_pin>;
+ 			};
+ 		};
+ 
+@@ -996,7 +869,7 @@
+ 			ti,hwmods = "epwmss2";
+ 			#address-cells = <1>;
+ 			#size-cells = <1>;
+-			status = "disabled";
++			status = "okay";
+ 			ranges = <0x48304100 0x48304100 0x80   /* ECAP */
+ 				  0x48304180 0x48304180 0x80   /* EQEP */
+ 				  0x48304200 0x48304200 0x80>; /* EHRPWM */
+@@ -1010,7 +883,9 @@
+ 				clock-names = "fck";
+ 				interrupts = <61>;
+ 				interrupt-names = "ecap2";
+-				status = "disabled";
++				status = "okay";
++                            	pinctrl-names = "default";
++                                pinctrl-0 = <&pwm_chaibio_p9_28_pin>;
+ 			};
+ 
+ 			eqep2: eqep@0x48304180 {
+@@ -1030,7 +905,10 @@
+ 				reg = <0x48304200 0x80>;
+ 				clocks = <&ehrpwm2_tbclk>, <&l4ls_gclk>;
+ 				clock-names = "tbclk", "fck";
+-				status = "disabled";
++				status = "okay";
++                            	pinctrl-names = "default", "default";
++                                pinctrl-0 = <&pwm_chaibio_p8_13_pin>;
++                                pinctrl-1 = <&pwm_chaibio_p8_19_pin>;
+ 			};
+ 		};
+ 
+@@ -1313,4 +1191,52 @@
+ 	};
+ };
+ 
++&am33xx_pinmux {
++	pwm_chaibio_p9_28_pin: pwm_chaibio_p9_28_pin {
++		pinctrl-single,pins = <
++			AM33XX_IOPAD(0x99c, PIN_OUTPUT_PULLDOWN | MUX_MODE4)	// LED control: P9.28 eCAP2_PWM2
++		>;
++	};
++};
++
++&am33xx_pinmux {
++	pwm_chaibio_p8_13_pin: pwm_chaibio_p8_13_pin {
++		pinctrl-single,pins = <
++			AM33XX_IOPAD(0x824, PIN_OUTPUT_PULLDOWN | MUX_MODE4)	// Head Block: P8.13 ehrpwm2b
++		>;
++	};
++};
++
++&am33xx_pinmux {//
++	pwm_chaibio_p8_19_pin: pwm_chaibio_p8_19_pin {
++		pinctrl-single,pins = <
++			AM33XX_IOPAD(0x820, PIN_OUTPUT_PULLDOWN | MUX_MODE4)	// Head Block: P8.19 ehrpwm2a
++		>;
++	};
++};
++
++&am33xx_pinmux {
++	pwm_chaibio_p9_42_pin: pwm_chaibio_p9_42_pin {
++		pinctrl-single,pins = <
++			AM33XX_IOPAD(0x964, PIN_OUTPUT_PULLDOWN | MUX_MODE0)	// LCD Backlight: P9.42
++		>;
++	};
++};
++
++&am33xx_pinmux {
++	pwm_chaibio_p9_14_pin: pwm_chaibio_p9_14_pin {
++		pinctrl-single,pins = <
++			AM33XX_IOPAD(0x848, PIN_OUTPUT_PULLDOWN | MUX_MODE6)	// Heat Sink: P9.14 ehrpwm1a
++		>;
++	};
++};
++
++&am33xx_pinmux {//
++	pwm_chaibio_p9_16_pin: pwm_chaibio_p9_16_pin {
++		pinctrl-single,pins = <
++			AM33XX_IOPAD(0x84c, PIN_OUTPUT_PULLDOWN | MUX_MODE6)	// Lid: P9.16 ehrpwm1b
++		>;
++	};
++};
++
+ /include/ "am33xx-clocks.dtsi"

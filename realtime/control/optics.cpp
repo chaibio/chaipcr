@@ -24,6 +24,10 @@
 #include <limits>
 #include <sstream>
 
+#ifdef KERNEL_49
+	#include <numeric>
+#endif // KERNEL_49
+
 #include "pcrincludes.h"
 #include "pid.h"
 #include "ledcontroller.h"

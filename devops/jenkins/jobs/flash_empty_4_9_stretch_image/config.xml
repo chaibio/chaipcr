@@ -54,10 +54,15 @@ ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
 
 sshpass -p temppwd ssh -t -oStrictHostKeyChecking=no debian@$build_machine &lt;&lt;&apos;ENDSSH&apos;
 echo enable root access with no password
-
+echo temppwd | sudo -S su
 echo temppwd | sudo -S sed -i -e &apos;s:PermitEmptyPasswords no:PermitEmptyPasswords yes:g&apos; /etc/ssh/sshd_config
+sudo sed -i -e &apos;s:#PermitEmptyPasswords:PermitEmptyPasswords:g&apos; /etc/ssh/sshd_config
 sudo sed -i -e &apos;s:UsePAM yes:UsePAM no:g&apos; /etc/ssh/sshd_config
 sudo sed -i -e &apos;s:PermitRootLogin without-password:PermitRootLogin yes:g&apos; /etc/ssh/sshd_config
+sudo sed -i -e &apos;s:PermitRootLogin prohibit-password:PermitRootLogin yes:g&apos; /etc/ssh/sshd_config
+sudo sed -i -e &apos;s:#PermitRootLogin:PermitRootLogin:g&apos; /etc/ssh/sshd_config
+
+
 sudo passwd -d -u root
 sudo su
 
@@ -73,7 +78,7 @@ echo patching sshd_config
 #Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 #EOF
 sudo cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
-KexAlgorithms diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
 Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 EOF
 
@@ -96,7 +101,7 @@ else
 	echo patching /var/lib/jenkins/.ssh/config
 	cat &lt;&lt;EOF &gt;&gt; /var/lib/jenkins/.ssh/config
 Host $build_machine
-		KexAlgorithms +diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+		KexAlgorithms +diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
 		Ciphers +3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 #		KexAlgorithms +diffie-hellman-group1-sha1
 #        KexAlgorithms +curve25519-sha256@libssh.org
@@ -114,7 +119,7 @@ fi
 #else
 #	echo patching sshd_config
 #	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
-#KexAlgorithms diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+#KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
 #Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 #EOF
 #	sudo service sshd restart
@@ -134,10 +139,10 @@ then
 else
 	echo patching sshd_config
     
-	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
-		KexAlgorithms diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+	cat &lt;&lt;EOF&gt;&gt; /etc/ssh/sshd_config
+		KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
 		Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
-	EOF
+EOF
 	ssh-keygen -A || true
 
 	sudo service sshd restart
@@ -162,7 +167,7 @@ else
 	echo patching sshd_config
     
 	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
-KexAlgorithms diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
 Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 
 EOF
@@ -246,7 +251,7 @@ swapoff -a
 mount -o remount,rw /
 echo 0 &gt; /proc/sys/kernel/hung_task_timeout_secs
 
-image_filename=bone-debian-9.1-console-armhf-2017-10-01-1gb.img.xz
+image_filename=bone-debian-9.3-console-armhf-2017-12-10-1gb.img.xz
 
 rm $image_filename || true
 rm -r .julia
@@ -254,7 +259,7 @@ rm -r .julia
 wget $download_prefix/$image_filename || exit 1
 
 #Verify Image with:
-if sha256sum $image_filename | grep 368f9820913a9087ec53983abb22db3bd774136f0f4ca855eb7e841dbbc161ad
+if sha256sum $image_filename | grep 551478c0aabd85c25ff68b73de691616009287de47bd8803e6c5adb3fe791e99
 then
 	echo Checksum OK..
 else
@@ -271,7 +276,7 @@ apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1655A0AB68576280
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D284E608A4C46402
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CF979FFA3D3D3ACC
 
-apt-get update || exit 1
+apt-get update
 apt-get install -f -y -q
 
 apt-get install xz-utils parted  -y -q  || exit 1
@@ -286,10 +291,16 @@ if [ -e /dev/mmcblk0 ] &amp;&amp; [ -e /dev/mmcblk1 ]
 then
    echo &quot;eMMC and SDCard found&quot;
 else
-   echo &quot;SDCard is not mounted&quot;
+   echo &quot;SDCard is not found&quot;
    exit 1
 fi
 
+if mount | grep /dev/mmcblk0
+then
+      echo &quot;SDCard is still mounted, or it was inserted after booting. Please reboot&quot;
+      exit 1
+fi
+echo Burning $image_filename to /dev/mmcblk0
 if xzcat $image_filename | dd of=/dev/mmcblk0
 then
     echo SDCard flashed successfully
@@ -300,6 +311,9 @@ fi
 
 echo done flashing sdcard
 sync
+
+#apt-get install -y -q parted
+blockdev --flushbufs /dev/mmcblk0
 partprobe /dev/mmcblk0
 echo patching sdcard
 mount /dev/mmcblk0p1 /mnt  || exit 1
@@ -311,14 +325,15 @@ KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,e
 Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 EOF
 
-if [ -e functions.patch ]
+if [ -e functions-201712.sh.patch ]
 then
    echo sdcard got patched before
 else
 
-wget $download_prefix/functions.patch
-patch -i functions.patch
-rm functions.patch
+wget $download_prefix/functions-201712.sh.patch
+patch -i functions-201712.sh.patch
+rm functions-201712.sh.patch
+
 if $check_badblocks
 then
   echo badblocks check is active
@@ -335,6 +350,14 @@ echo patching sshd_config
 sed -i -e &apos;s:PermitEmptyPasswords no:PermitEmptyPasswords yes:g&apos; /mnt/etc/ssh/sshd_config
 sed -i -e &apos;s:UsePAM yes:UsePAM no:g&apos; /mnt/etc/ssh/sshd_config
 sed -i -e &apos;s:PermitRootLogin without-password:PermitRootLogin yes:g&apos; /mnt/etc/ssh/sshd_config
+
+sed -i -e &apos;s:PermitEmptyPasswords no:PermitEmptyPasswords yes:g&apos; /mnt/etc/ssh/sshd_config
+sudo sed -i -e &apos;s:#PermitEmptyPasswords:PermitEmptyPasswords:g&apos; /mnt/etc/ssh/sshd_config
+sudo sed -i -e &apos;s:UsePAM yes:UsePAM no:g&apos; /etc/ssh/sshd_config
+sudo sed -i -e &apos;s:PermitRootLogin without-password:PermitRootLogin yes:g&apos; /mnt/etc/ssh/sshd_config
+sudo sed -i -e &apos;s:PermitRootLogin prohibit-password:PermitRootLogin yes:g&apos; /mnt/etc/ssh/sshd_config
+sudo sed -i -e &apos;s:#PermitRootLogin:PermitRootLogin:g&apos; /mnt/etc/ssh/sshd_config
+
 echo done patching sshd_config
 
 echo patching uEnv.txt

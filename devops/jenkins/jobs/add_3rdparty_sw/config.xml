@@ -69,7 +69,7 @@ else
 	echo patching /var/lib/jenkins/.ssh/config
 	cat &lt;&lt;EOF &gt;&gt; /var/lib/jenkins/.ssh/config
 Host $build_machine
-		KexAlgorithms +diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+		KexAlgorithms +diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
 		Ciphers +3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 #		KexAlgorithms +diffie-hellman-group1-sha1
 #        KexAlgorithms +curve25519-sha256@libssh.org
@@ -87,7 +87,7 @@ fi
 #else
 #	echo patching sshd_config
 #	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
-#KexAlgorithms diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+#KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
 #Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 #EOF
 #	sudo service sshd restart
@@ -108,7 +108,7 @@ else
 	echo patching sshd_config
     
     cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
-KexAlgorithms diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
 Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 
 EOF
@@ -219,6 +219,7 @@ exit 1</command>
 echo kernel is updated	
 lsb_release -a
 uname -a
+df -h
 
 apt-get update
 dpkg --configure -a
@@ -253,6 +254,7 @@ touch /forcefsck
 
 echo rebooting for changes to take effect.
 sync
+df -h
 shutdown -r 1
 echo a reboot is scheduled after a minute.
 </command>
@@ -323,7 +325,19 @@ export DEBIAN_FRONTEND=noninteractive
 sudo -E apt-get install -y -q --allow-unauthenticated mysql-server
 
 echo Installing mysql client package
-sudo -E apt-get install -y -q --allow-unauthenticated libmysqlclient-dev  || exit 1
+if sudo -E apt-get install -y -q --allow-unauthenticated libmysqlclient-dev 
+then
+     echo mysql client is installed
+else
+     if sudo -E apt-get install -y -q --allow-unauthenticated default-libmysqlclient-dev  
+     then
+            echo default mysql client is installed
+      else
+            echo error installing default mysql client
+            exit 1
+      fi
+fi
+
 
 echo done installing mysql
 
@@ -338,6 +352,7 @@ EOF
 mysql -u root --password=chaipcr mysql &lt; mysql_password_flush.sql
 
 rm mysql_password_flush.sql
+df -h
 echo done resetting mysql password
 </command>
       <execEachLine>false</execEachLine>
@@ -363,13 +378,15 @@ apt-get -q -y install unzip || exit 1
 dpkg --configure -a
 
 echo &quot;FSCKFIX=yes&quot; &gt;&gt; /etc/default/rcS
+apt-key list  | grep &quot;expired: &quot; | sed -ne &apos;s|pub .*/\([^ ]*\) .*|\1|gp&apos; | xargs -n1 sudo apt-key adv --keyserver keys.gnupg.net --recv-keys 
+apt-get -q -y update
 
-apt-get -y -q install nodejs ruby ruby-dev  || exit 1
+apt-get --force-yes -y -q install nodejs ruby ruby-dev  || exit 1
 sync
 sleep 30
 dpkg --configure -a
 
-apt-get -y -q install libxslt-dev libxml2-dev  || exit 1
+apt-get --force-yes -y -q install libxslt-dev libxml2-dev  || exit 1
 sync
 sleep 30
 dpkg --configure -a
@@ -401,6 +418,7 @@ make install || exit 1
 cd ..
 rm -rf soci-3.2.2*
 dpkg --configure -a
+df -h
 exit 0
 
 
@@ -436,13 +454,16 @@ df -h
 apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential || true
 ntpdate -b -s -u pool.ntp.org
 
-sudo apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gcc-4.8 g++-4.8 gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libc-bin  || exit 1
+sudo apt-get -q -y install gcc-4.8 g++-4.8 
+sudo apt-get -q -y install libgfortran-6-dev liblapack3
+sudo apt-get -q -y install libblas3gf liblapack3gf 
+sudo apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libc-bin  || exit 1
 apt-get -f -y -q install
 
 apt-get install -q -y libarpack2 libblas-common libblas3 libfftw3-double3 libfftw3-single3 libgfortran3 liblapack3 libllvm3.8 libmetis5 libopenblas-base libunwind8  || exit 1
 apt-get -f -y -q install
 
-sudo apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gcc-4.8 g++-4.8 gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas-common libblas3 libfftw3-double3 libfftw3-single3 libgfortran3 liblapack3 libllvm3.8 libmetis5 libopenblas-base libunwind8 liblapack-dev liblapack3 libopenblas-base libopenblas-dev || exit 1
+sudo apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas-common libblas3 libfftw3-double3 libfftw3-single3 libgfortran3 liblapack3 libllvm3.8 libmetis5 libopenblas-base libunwind8 liblapack-dev liblapack3 libopenblas-base libopenblas-dev || exit 1
 apt-get -f -y -q install
 
 apt-get -y -q install i2c-tools evtest git automake libtool || exit 1 
@@ -451,8 +472,8 @@ apt-get -f -y -q install
 
 sync
 sync
- fsck /dev/mmcblk1p1 -y -f
-
+fsck /dev/mmcblk1p1 -y -f
+df -h
 exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
@@ -494,9 +515,10 @@ rm -rf poco-1.6.1* poco-1.6.1.tar.gz
 
 sync
 fsck /dev/mmcblk1p1 -y -f
+df -h
 
 exit 0
- cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc                                                                                c                      c cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc                                                                                                                                                                                                                                                                                              cccccccccccccccccccccccccccccccccccccccccccccccccccccc                                                                                                                                                                                                                                                                                                                                                                                                        ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc c         ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc ccccccccccccccc                                                                                                                                        cccccccccccccccccccccccccccccccccccccccccccccccccccccc  c                                                                                                           ccccccccccccccccccccccc                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc ccccccccccccccccccccccc                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       ccccccccccccccccccc c ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                c                                                                                                                                                                                                       cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      </command>
+</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
@@ -598,7 +620,7 @@ apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential
 
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get install -q -y gfortran ntpdate || exit 1
 
-
+df -h
 exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
@@ -689,7 +711,7 @@ echo done installing QT to /opt/
 
 sync
 
-apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3
+apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3
 
 if $bypass_julia
 then
@@ -697,7 +719,7 @@ then
        exit 0
 fi
 
-apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3  || exit 1
+apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3  || exit 1
 
 mkdir -p ~/julia-compile
 cd ~/julia-compile
@@ -852,6 +874,7 @@ echo test finished. cleaning..
 sync
 cd
 rm -r ~/julia-compile
+df -h
 sync
 sync
 fsck /dev/mmcblk1p1 -y -f
@@ -915,7 +938,7 @@ sleep 30
 sync
 fsck /dev/mmcblk1p1 -y -f
 fsck /dev/mmcblk0p1 -y -f
-
+df -h
 exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
@@ -935,7 +958,8 @@ bundle config build.atomic --use-system-libraries || exit 1
 bundle config build.json --use-system-libraries || exit 1
 bundle config build.sqlite3 --use-system-libraries || exit 1
 bundle config build.nokogiri --use-system-libraries || exit 1
-</command>
+
+df -h</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
@@ -959,7 +983,7 @@ wget $download_prefix/ngrok_2.0.19_linux_arm.zip  --no-check-certificate
 unzip -o ngrok_2.0.19_linux_arm.zip
 rm ngrok_2.0.19_linux_arm.zip
 rm ngrok
-
+df -h
 exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
@@ -975,7 +999,9 @@ passwd service -d
       <siteName>root@$build_machine:22</siteName>
       <command>echo installing boost
 sync
-apt-get -q -y install libboost-all-dev
+apt-get -q -y install libboost-all-dev || exit 1
+
+df -h
 </command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
@@ -1005,7 +1031,7 @@ then
     sync
     umount /tmp/zeroer
 fi
-
+df -h
 echo basic beaglebone setup done!</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>

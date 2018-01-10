@@ -121,6 +121,8 @@ Qpcrctl::Application.routes.draw do
     end
   end
 
+  resources :apidocs, only: [:index]
+  
   get ':controller(/:action(/:id))'
 
 end

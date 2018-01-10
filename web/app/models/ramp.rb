@@ -19,6 +19,28 @@
 class Ramp < ActiveRecord::Base
   include ProtocolHelper
   
+  include Swagger::Blocks
+   
+  swagger_schema :Ramp do
+    property :id do
+      key :type, :integer
+      key :format, :int64
+    end
+    property :rate do
+      key :type, :number
+      key :format, :float
+      key :description, 'Rate of the ramp, in degrees C/s, precision to 8 decimal point'
+      key :default, 0
+      key :minimum, 0
+      key :maximum, 5
+    end
+    property :collect_data do
+      key :type, :boolean
+      key :description, 'Collect data'
+      key :default, false
+    end
+  end
+  
   belongs_to :step, foreign_key: "next_step_id"
   
   scope :collect_data, lambda {|stage_id| joins(:step).where(["steps.stage_id=? AND ramps.collect_data=?", stage_id, true]).order("steps.order_number")}

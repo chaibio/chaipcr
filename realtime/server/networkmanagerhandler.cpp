@@ -193,8 +193,12 @@ void NetworkManagerHandler::wifiScan(boost::property_tree::ptree &responsePt)
             ptree.put("encryption", "wpa1");
             break;
 
-        case WirelessManager::ScanResult::Wpa2Ecryption:
-            ptree.put("encryption", "wpa2");
+        case WirelessManager::ScanResult::Wpa2PSKEcryption:
+            ptree.put("encryption", "wpa2 psk");
+            break;
+
+        case WirelessManager::ScanResult::Wpa28021xEcryption:
+            ptree.put("encryption", "wpa2 802.1x");
             break;
 
         default:

@@ -415,12 +415,28 @@ void UpdateManager::checkUpdateCallback(bool checkHash)
         upgrade.setPassword(ptree.get<std::string>("password"));
         upgrade.setImageUrl(ptree.get<std::string>("image_rsync_url"));
 
-        bool isCurrent = false;
+        std::string currentVersion;
         bool downloaded = false;
 
-        _dbControl->updateUpgrade(upgrade, isCurrent, downloaded);
+        _dbControl->getCurrentUpgrade(currentVersion, downloaded);
+        _dbControl->updateUpgrade(upgrade);
 
-        if (isCurrent)
+        if (Util::isVersionGreater(qpcrApp.settings().configuration.version, upgrade.version()) <= 0)
+        {
+            if (state == Downloading)
+            {
+                APP_LOGGER << "UpdateManager::checkUpdateCallback - the server has returned a lower version number (" << upgrade.version() << ") while another version ("
+                           << currentVersion << ") is being downloaded. Canceling the download" << std::endl;
+
+                stopDownload();
+            }
+
+            _updateState.compare_exchange_strong(state, Unavailable);
+
+            return;
+        }
+
+        if (Util::isVersionGreater(currentVersion, upgrade.version()) == 0)
         {
             if (downloaded)
             {
@@ -428,11 +444,7 @@ void UpdateManager::checkUpdateCallback(bool checkHash)
 
                 if (!checkHash || (Util::getFileChecksum(kUpdateFilePath, _downloadEventFd, sum) && sum == upgrade.checksum()))
                 {
-                    if (qpcrApp.settings().configuration.version != upgrade.version())
-                        _updateState.compare_exchange_strong(state, Available);
-                    else
-                        _updateState.compare_exchange_strong(state, Unavailable);
-
+                    _updateState.compare_exchange_strong(state, Available);
                     return;
                 }
                 else if (_updateState.compare_exchange_strong(state, Unknown))
@@ -460,19 +472,14 @@ void UpdateManager::checkUpdateCallback(bool checkHash)
 
     std::lock_guard<std::recursive_mutex> lock(_downloadMutex);
 
+    stopDownload();
+
     state = _updateState;
     if (state == ManualDownloading || state == Updating)
         return;
 
-    if (qpcrApp.settings().configuration.version != upgrade.version())
-    {
-        stopDownload();
-
-        if (_updateState.compare_exchange_strong(state, Downloading))
-            _downloadThread = std::thread(static_cast<void(UpdateManager::*)(Upgrade)>(&UpdateManager::downlaod), this, upgrade);
-    }
-    else
-        _updateState.compare_exchange_strong(state, Unavailable);
+    if (_updateState.compare_exchange_strong(state, Downloading))
+        _downloadThread = std::thread(static_cast<void(UpdateManager::*)(Upgrade)>(&UpdateManager::downlaod), this, upgrade);
 }
 
 void UpdateManager::downlaod(Upgrade upgrade)

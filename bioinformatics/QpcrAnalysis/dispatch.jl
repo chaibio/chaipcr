@@ -81,7 +81,10 @@ function dispatch(action::String, request_body::String)
             if "qt_prob" in keys_req_dict
                 kwdict_mc_tm_pw[:qt_prob_flTm] = req_dict["qt_prob"]
             end
-            for key in ["max_normd_qtv", "top_N"]
+            if "max_normd_qtv" in keys_req_dict
+                kwdict_mc_tm_pw[:normd_qtv_ub] = req_dict["max_normd_qtv"]
+            end
+            for key in ["top_N"]
                 if key in keys_req_dict
                     kwdict_mc_tm_pw[parse(key)] = req_dict[key]
                 end
