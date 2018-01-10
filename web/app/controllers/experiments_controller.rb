@@ -23,37 +23,37 @@ require "httparty"
 class ExperimentsController < ApplicationController
   include ParamsHelper
   include Swagger::Blocks
-  
+
   before_filter :ensure_authenticated_user
   before_filter :get_experiment, :except => [:index, :create, :copy]
-  
+
   respond_to :json
 
-  resource_description { 
+  resource_description {
     formats ['json']
   }
-  
+
   RSERVE_TIMEOUT  = 240
-  
+
   BackgroundTask = Struct.new(:action, :experiment_id, :complete_result) do
     def completed?
       complete_result != nil
     end
-    
+
     def match?(action, experiment_id)
       return self.action == action && self.experiment_id == experiment_id
     end
   end
   @@background_task = nil
   @@background_last_task = nil
-  
+
   def_param_group :experiment do
     param :experiment, Hash, :desc => "Experiment Info", :required => true do
       param :name, String, :desc => "Name of the experiment", :required => false
       param :guid, String, :desc => "GUID used for diagnostic or calibration", :required => false
     end
   end
-  
+
   swagger_path '/experiments' do
     operation :get do
       key :summary, 'All experiments'
@@ -71,7 +71,7 @@ class ExperimentsController < ApplicationController
         end
       end
     end
-    
+
     operation :post do
       key :description, 'Creates a new experiment, default protocol will be created'
       key :produces, [
@@ -100,16 +100,16 @@ class ExperimentsController < ApplicationController
       end
     end
   end
-       
+
   #api :GET, "/experiments", "List all the experiments"
   #example "[{'experiment':{'id':1,'name':'test1','type':'user','started_at':null,'completed_at':null,'completed_status':null}},{'experiment':{'id':2,'name':'test2','type':'user','started_at':null,'completed_at':null,'completed_status':null}}]"
   def index
-    @experiments = Experiment.includes(:experiment_definition).where("experiment_definitions.experiment_type"=>[ExperimentDefinition::TYPE_USER_DEFINED, ExperimentDefinition::TYPE_TESTKIT]).order("id").load
+    @experiments = Experiment.includes(:experiment_definition).where("experiment_definitions.experiment_type"=>[ExperimentDefinition::TYPE_USER_DEFINED, ExperimentDefinition::TYPE_TESTKIT]).order("experiments.id DESC").load
     respond_to do |format|
       format.json { render "index", :status => :ok }
     end
   end
-  
+
   api :POST, "/experiments", "Create an experiment"
   param_group :experiment
   description "when experiment is created, default protocol will be created"
@@ -128,7 +128,7 @@ class ExperimentsController < ApplicationController
       format.json { render "fullshow", :status => (ret)? :ok : :unprocessable_entity}
     end
   end
-  
+
   api :PUT, "/experiments/:id", "Update an experiment"
   param_group :experiment
   example "{'experiment':{'id':1,'name':'test','type':'user','started_at':null,'completed_at':null,'completed_status':null}}"
@@ -142,7 +142,7 @@ class ExperimentsController < ApplicationController
       format.json { render "show", :status => (ret)? :ok :  :unprocessable_entity}
     end
   end
-  
+
   api :POST, "/experiments/:id/copy", "Copy an experiment"
   see "experiments#create", "json response"
   def copy
@@ -155,7 +155,7 @@ class ExperimentsController < ApplicationController
       format.json { render "fullshow", :status => (ret)? :ok :  :unprocessable_entity}
     end
   end
-  
+
   api :GET, "/experiments/:id", "Show an experiment"
   see "experiments#create", "json response"
   def show
@@ -164,7 +164,7 @@ class ExperimentsController < ApplicationController
       format.json { render "fullshow", :status => (@experiment)? :ok :  :unprocessable_entity}
     end
   end
-  
+
   api :DELETE, "/experiments/:id", "Destroy an experiment"
   def destroy
     ret = @experiment.destroy
@@ -172,7 +172,7 @@ class ExperimentsController < ApplicationController
       format.json { render "destroy", :status => (ret)? :ok :  :unprocessable_entity}
     end
   end
-  
+
   api :GET, "/experiments/:id/temperature_data?starttime=xx&endtime=xx&resolution=xx", "Retrieve temperature data"
   param :starttime, Integer, :desc => "0 means start of the experiment, in ms", :required => true
   param :endtime, Integer, :desc => "if not specified, it returns everything to the end of the experiment, in ms"
@@ -193,7 +193,7 @@ class ExperimentsController < ApplicationController
     params[:background] = params[:background].to_bool if !params[:background].nil?
     params[:baseline] = params[:baseline].to_bool if !params[:baseline].nil?
     params[:cq] = params[:cq].to_bool if !params[:cq].nil?
-    
+
     if params[:step_id].nil? && params[:ramp_id].nil?
       #first step that collects data will be returned, if none of the steps can be found, first ramp that collect data will be returned
       params[:raw] = false if params[:raw].nil?
@@ -206,7 +206,7 @@ class ExperimentsController < ApplicationController
       params[:baseline] = false
       params[:cq] = false
     end
-    
+
     if @experiment
       if @experiment.ran?
         @first_stage_collect_data = Stage.collect_data(@experiment.experiment_definition_id).first
@@ -221,11 +221,11 @@ class ExperimentsController < ApplicationController
               render :json=>e.to_s, :status => 500
               return
             end
-            
+
             if @partial == false
               @partial = FluorescenceDatum.new_data_generated?(@experiment.id, @first_stage_collect_data.id)
             end
-            
+
             if !stale?(etag: generate_etag(@partial, AmplificationDatum.maxid(@experiment.id, @first_stage_collect_data.id)))
               #render 304 Not Modified
               return
@@ -243,13 +243,13 @@ class ExperimentsController < ApplicationController
               fresh_when(:etag => generate_etag(@partial, @amplification_data.last.id))
             end
           end
- 
+
           if params[:raw] == true
             if !analyze_required && !stale?(etag: generate_etag(@partial, last_cycle))
               #render 304 Not Modified
               return
             end
-            
+
             #construct OR clause
             conditions = String.new
             wheres = Array.new
@@ -273,15 +273,15 @@ class ExperimentsController < ApplicationController
             else
               fluorescence_data = FluorescenceDatum.for_stage(@first_stage_collect_data.id).for_experiment(@experiment.id)
             end
-            
+
             if !analyze_required && !fluorescence_data.blank?
               #set etag
               fresh_when(:etag => generate_etag(@partial, fluorescence_data.last.cycle_num))
             end
           end
         end
-        
-        if !@amplification_data.blank? 
+
+        if !@amplification_data.blank?
           if !fluorescence_data.blank?
             #amplification_data only have one step
             fluorescence_offset = 0
@@ -299,7 +299,7 @@ class ExperimentsController < ApplicationController
         elsif !fluorescence_data.blank?
           @amplification_data = fluorescence_data
         end
-        
+
         attributes = []
         attributes << "background_subtracted_value" if params[:background] == true
         attributes << "baseline_subtracted_value" if params[:baseline] == true
@@ -316,7 +316,7 @@ class ExperimentsController < ApplicationController
       render :json=>{:errors=>"experiment not found"}, :status => :not_found
     end
   end
-  
+
   api :GET, "/experiments/:id/melt_curve_data?raw=false&normalized=true&derivative=true&tm=true&ramp_id[]=43&ramp_id[]=44", "Retrieve melt curve data"
   example "{'partial':false, 'ramps':['ramp_id':22,
             'melt_curve_data':[{'well_num':1, 'temperature':[0,1,2,3,4,5], 'normalized_data':[0,1,2,3,4,5], 'derivative_data':[0,1,2,3,4,5], 'tm':[1,2,3], 'area':[2,4,5]},
@@ -326,7 +326,7 @@ class ExperimentsController < ApplicationController
     params[:normalized] = params[:normalized].to_bool if !params[:normalized].nil?
     params[:derivative] = params[:derivative].to_bool if !params[:derivative].nil?
     params[:tm] = params[:tm].to_bool if !params[:tm].nil?
-    
+
     if params[:ramp_id].nil?
       #first step that collects data will be returned, if none of the steps can be found, first ramp that collect data will be returned
       params[:raw] = false if params[:raw].nil?
@@ -339,7 +339,7 @@ class ExperimentsController < ApplicationController
       params[:derivative] = false
       params[:tm] = false
     end
-    
+
     if @experiment
       if @experiment.ran?
         @first_stage_meltcurve_data = Stage.melt_curve(@experiment.experiment_definition_id).first
@@ -353,11 +353,11 @@ class ExperimentsController < ApplicationController
               render :json=>e.to_s, :status => 500
               return
             end
-            
+
             if @partial == false
               @partial = MeltCurveDatum.new_data_generated?(@experiment, @first_stage_meltcurve_data.id) != nil
             end
-          
+
             if !@experiment.cached_temperature.nil? && !stale?(etag: generate_etag(@partial, @experiment.cached_temperature))
               #render 304 Not Modified
               return
@@ -374,13 +374,13 @@ class ExperimentsController < ApplicationController
               fresh_when(:etag => generate_etag(@partial, @experiment.cached_temperature))
             end
           end
- 
+
           if params[:raw] == true
             if !analyze_required && !stale?(etag: generate_etag(@partial, MeltCurveDatum.maxid(@experiment.id, @first_stage_meltcurve_data.id)))
               #render 304 Not Modified
               return
             end
-            
+
             #construct OR clause
             conditions = String.new
             wheres = Array.new
@@ -396,14 +396,14 @@ class ExperimentsController < ApplicationController
             end
             wheres.insert(0, conditions) if !conditions.blank?
             #logger.info ("**********#{wheres.join(",")}")
-            
+
             #query to database
             if !wheres.blank?
               raw_data = MeltCurveDatum.for_experiment(@experiment.id).where(wheres).group_by_well.all
             else
               raw_data = MeltCurveDatum.for_stage(@first_stage_meltcurve_data.id).for_experiment(@experiment.id).group_by_well.all
             end
-            
+
             if !analyze_required && !raw_data.blank?
               #set etag
               max_id = raw_data.max_by(&:id).id
@@ -412,8 +412,8 @@ class ExperimentsController < ApplicationController
             end
           end
         end
-        
-        if !@melt_curve_data.blank? 
+
+        if !@melt_curve_data.blank?
           if !raw_data.blank?
             #melt_curve_data only have one ramp
             ramp_id = @melt_curve_data[0].ramp_id
@@ -428,7 +428,7 @@ class ExperimentsController < ApplicationController
         elsif !raw_data.blank?
           @melt_curve_data = raw_data
         end
-        
+
         if !@melt_curve_data.blank?
           @melt_curve_data_group = []
           melt_curve_data_hash = @melt_curve_data.group_by { |obj| obj.ramp_id }
@@ -451,7 +451,7 @@ class ExperimentsController < ApplicationController
             @melt_curve_data_group << OpenStruct.new(:ramp_id=>ramp_id, :melt_curve_data=>data_array)
           end
         end
-        
+
         respond_to do |format|
           format.json { render "melt_curve_data", :status => :ok}
         end
@@ -472,15 +472,15 @@ class ExperimentsController < ApplicationController
           out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/temperature_log.csv")
           out.write TemperatureLog.as_csv(params[:id])
         end
-      
+
         first_stage_collect_data = Stage.collect_data(@experiment.experiment_definition_id).first
         if first_stage_collect_data
           begin
             task_submitted = background_calculate_amplification_data(@experiment, first_stage_collect_data.id)
             amplification_data = AmplificationDatum.retrieve(@experiment, first_stage_collect_data.id)
-            
+
             if !task_submitted.nil? && (!@experiment.running? || amplification_data.blank?)
-              #background task is submitted 
+              #background task is submitted
               #if experiment is finished, wait for the task to complete
               #if amplification_data is empty, wait for the task to complete
               t.close
@@ -490,7 +490,7 @@ class ExperimentsController < ApplicationController
           rescue => e
             logger.error("export amplification data failed: #{e}")
           end
-          
+
           if request.method == "HEAD"
             amplification_data = nil
           else
@@ -498,7 +498,7 @@ class ExperimentsController < ApplicationController
             fluorescence_data = FluorescenceDatum.for_stage(first_stage_collect_data.id).for_experiment(@experiment.id)
           end
         end
-      
+
         if amplification_data
           out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/amplification.csv")
           columns = ["baseline_subtracted_value", "background_subtracted_value", "fluorescence_value", "channel", "well_num", "well_name", "cycle_num"]
@@ -506,8 +506,8 @@ class ExperimentsController < ApplicationController
           csv_string = CSV.generate do |csv|
             csv << columns
             amplification_data.each do |data|
-              while (fluorescence_index < fluorescence_data.length && 
-                    !(fluorescence_data[fluorescence_index].channel == data.channel && 
+              while (fluorescence_index < fluorescence_data.length &&
+                    !(fluorescence_data[fluorescence_index].channel == data.channel &&
                       fluorescence_data[fluorescence_index].well_num == data.well_num &&
                       fluorescence_data[fluorescence_index].cycle_num == data.cycle_num)) do
                     fluorescence_index += 1
@@ -539,7 +539,7 @@ class ExperimentsController < ApplicationController
           begin
             task_submitted = background_calculate_melt_curve_data(@experiment, first_stage_meltcurve_data.id)
             melt_curve_data = CachedMeltCurveDatum.retrieve(@experiment.id, first_stage_meltcurve_data.id)
-            
+
             if !task_submitted.nil? && (!@experiment.running? || melt_curve_data.blank?)
               #background task is submitted
               #if experiment is finished, wait for the task to complete
@@ -551,7 +551,7 @@ class ExperimentsController < ApplicationController
           rescue => e
             logger.error("export melt curve data failed: #{e}")
           end
-          
+
           if request.method == "HEAD"
             melt_curve_data = nil
           end
@@ -579,7 +579,7 @@ class ExperimentsController < ApplicationController
               csv << [data.channel, data.well_num, well_name(data.well_num)]+tm_arr+area_arr
             end
           end
-        
+
           out.write csv_string
         end
       end
@@ -588,7 +588,7 @@ class ExperimentsController < ApplicationController
       t.close
     end
   end
-  
+
   def analyze
     if @experiment && !@experiment.experiment_definition.guid.blank?
       if @experiment.completion_status == "success"
@@ -614,22 +614,22 @@ class ExperimentsController < ApplicationController
       render :json=>{:errors=>"experiment not found"}, :status => :not_found
     end
   end
-  
+
   protected
-  
+
   def well_name(well_num)
     @wells ||= Well.wells(@experiment.id) if @experiment
     (@wells && @wells[well_num])? @wells[well_num].sample_name : ""
   end
-  
+
   def get_experiment
     @experiment = Experiment.find_by_id(params[:id]) if @experiment.nil?
   end
-  
+
   def generate_etag(partial, tag)
     return "partial:#{partial} tag:#{tag}"
   end
- 
+
   def background_calculate_amplification_data(experiment, stage_id)
     return nil if !FluorescenceDatum.new_data_generated?(experiment.id, stage_id)
     experiment.experiment_definition #load experiment_definition before go to background thread
@@ -640,11 +640,11 @@ class ExperimentsController < ApplicationController
       AmplificationCurve.import cts, :on_duplicate_key_update => [:ct]
     end
   end
-  
+
   def calculate_amplification_data(experiment, stage_id, calibration_id)
    # sleep(10)
   #  return  [AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :channel=>1, :well_num=>1, :cycle_num=>1, :background_subtracted_value=>1001, :baseline_subtracted_value=>102)], [AmplificationCurve.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :channel=>1, :well_num=>1, :ct=>10)]
-    
+
     step = Step.collect_data(stage_id).first
     if step
       sub_id = step.id
@@ -658,7 +658,7 @@ class ExperimentsController < ApplicationController
         return nil, nil
       end
     end
-      
+
     config   = Rails.configuration.database_configuration
     connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
@@ -754,11 +754,11 @@ class ExperimentsController < ApplicationController
       end
     end
   end
-  
+
   def calculate_melt_curve_data(experiment, stage_id, calibration_id)
   #  sleep(10)
   #  return [CachedMeltCurveDatum.new({:experiment_id=>experiment_id, :stage_id=>stage_id, :channel=>1, :well_num=>1, :temperature=>[121,122], :fluorescence_data=>[1001, 1002], :derivative=>[3,4], :tm=>[1,2,3], :area=>[1,2,5]})]
-    
+
     config   = Rails.configuration.database_configuration
     connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
@@ -809,7 +809,7 @@ class ExperimentsController < ApplicationController
           melt_curve_data << hash
         end
       end
-    end 
+    end
     logger.info("Rails code time #{Time.now-start_time}")
     return melt_curve_data
   end
@@ -849,7 +849,7 @@ class ExperimentsController < ApplicationController
       CachedAnalyzeDatum.import [new_data], :on_duplicate_key_update => [:analyze_result]
     end
   end
-  
+
   def calibrate_info(calibration_id)
     protocol = Protocol.includes(:stages).where("protocols.experiment_definition_id=(SELECT experiment_definition_id from experiments where experiments.id=#{calibration_id} LIMIT 1)").first
     if protocol && protocol.stages[0]
@@ -877,7 +877,7 @@ class ExperimentsController < ApplicationController
     end
     result
   end
-  
+
   def calibrate_hash(calibration_id)
     protocol = Protocol.includes(:stages).where("protocols.experiment_definition_id=(SELECT experiment_definition_id from experiments where experiments.id=#{calibration_id} LIMIT 1)").references(:stages).first
     if protocol && protocol.stages[0]
@@ -932,16 +932,16 @@ class ExperimentsController < ApplicationController
       return false #there is already another background process, return resource unavailable
     end
   end
-  
+
   def group_by_keynames(data, data_attributes, cqs)
     return nil if data.nil?
-    
+
     keyname = nil
     key = nil
     data_array = nil
     group = Array.new
     column_names = ["channel","well_num","cycle_num"]+data_attributes
-    
+
     data.each do |node|
       Constants::KEY_NAMES.each do |newkeyname|
         newkeyname = newkeyname.to_sym
@@ -960,14 +960,14 @@ class ExperimentsController < ApplicationController
     if key != nil
       elem = OpenStruct.new(keyname=>key, :amplification_data=>data_array)
       if !cqs.blank?
-        elem.cq = [["channel","well_num","cq"]]+cqs.map {|cq| [cq.channel,cq.well_num,cq.ct]} 
+        elem.cq = [["channel","well_num","cq"]]+cqs.map {|cq| [cq.channel,cq.well_num,cq.ct]}
       end
       group << elem
     end
-    
+
     return group
   end
-  
+
   def raise_julia_error(response)
     logger.error("Julia error response code: #{response.code}, #{response.body}")
     if response.code == 500 && !response.body.blank?

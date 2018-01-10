@@ -59,7 +59,7 @@
       <p class="home-page-exp-messages B1B" ng-show="experiments !== null && experiments.length === 0">No experiments yet.</p>
       <div class="home-page-exp-container" ng-if="experiments !== null && experiments.length !== 0">
         <div class="exp-list-container" full-height force="true" doc="true" offset="(64 + 37)">
-          <div ng-repeat="exp in experiments | orderBy:'experiment.created_at':true" class="ovtrunc home-page-exp-tile">
+          <div ng-repeat="exp in experiments " class="ovtrunc home-page-exp-tile">
             <div ng-mouseenter="mouseOver = true" class="home-page-tile-text ovtrunc" ng-mouseleave="mouseOver = false" ng-class="{'home-page-tile-text': true, 'home-page-tile-text-hover': mouseOver && !deleteMode}" ng-click="HomeCtrl.openExperiment(exp.experiment)">
               <!--<a ng-if="!exp.experiment.started_at" href="/#/experiments/{{exp.experiment.id}}/run-experiment?chart=amplification">-->
               <a class="experiment-links" ng-if="!exp.experiment.started_at && exp.experiment.type !== 'test_kit'" href="/#/edit-protocol/{{exp.experiment.id}}">
