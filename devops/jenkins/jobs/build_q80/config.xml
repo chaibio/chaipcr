@@ -254,7 +254,6 @@ exit 0
       <siteName>root@$build_machine:22</siteName>
       <command>echo arranging to build julia
 df -h
-#!/bin/bash
 
 apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential
 dpkg --configure -a
@@ -454,7 +453,7 @@ QMAKE_LIBDIR += /usr/lib
 load(qt_config)
 
 EOF
-
+#--enable-shared
 ./configure -prefix /opt/QtEmbedded -opensource -confirm-license -no-qt3support -qt-zlib -no-libtiff -qt-libpng -no-libmng -qt-libjpeg -embedded arm -xplatform qws/linux-arm-gnueabi-g++ -little-endian -qt-freetype -no-opengl -qt-gfx-vnc -qt-gfx-linuxfb -depths 8,16,18,32 -qt-kbd-tty -qt-kbd-linuxinput -qt-mouse-linuxinput -host-little-endian -no-pch -qt-mouse-tslib -nomake demos -nomake examples
 
 make || exit 1

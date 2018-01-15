@@ -301,6 +301,7 @@ mount /dev/mmcblk1p3 /perm || true
 
 mv /var/lib/mysql /data/
 sed -i &quot;s,datadir.*=.*,datadir=/data/mysql,g&quot; /etc/mysql/my.cnf # Edit /etc/mysql/my.cnf and change datadir to /data/mysql
+sed -i &quot;s,datadir.*=.*,datadir=/data/mysql,g&quot; /etc/mysql/mariadb.conf.d/50-server.cnf # Edit /etc/mysql/my.cnf and change datadir to /data/mysql
 systemctl start mysql.service
 
 sync
@@ -521,6 +522,29 @@ cd ~/chaipcr/deploy/
 #sed -i &quot;s/errors=remount-ro/errors=continue/&quot; /etc/fstab
 
 echo patching rc.local
+if [ ! -e rc.local ]
+then
+    echo &quot;Cann&apos;t find rc.local. Creating it.&quot;
+    cat &gt;&gt; rc.local &lt;&lt; EOF
+#!/bin/sh -e
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will &quot;exit 0&quot; on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+
+exit 0
+
+EOF
+chmod +x rc.local
+fi
+
 cd /etc        
 patch -i ~/chaipcr/deploy/device/rc.local.patch
 cd
@@ -642,6 +666,10 @@ echo &quot;\n&quot; | RAILS_ENV=production bundle exec rake db:setup
 echo seed_fu
 echo &quot;\n&quot; | RAILS_ENV=production bundle exec rake db:seed_fu 
 
+echo Rails init
+cd ~/chaipcr/web
+bundle install
+
 echo done rserev</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
@@ -676,7 +704,6 @@ update-rc.d -f nginx defaults
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Unicorn
-
 mkdir ~/shared
 mkdir ~/shared/pids
 mkdir ~/shared/log

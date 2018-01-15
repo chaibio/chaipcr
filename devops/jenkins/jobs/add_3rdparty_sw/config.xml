@@ -349,7 +349,7 @@ cat &gt;&gt; mysql_password_flush.sql &lt;&lt; EOF
     exit
 EOF
 
-mysql -u root --password=chaipcr mysql &lt; mysql_password_flush.sql
+mysql -u root --password=chaipcr mysql &lt; mysql_password_flush.sql || exit 1
 
 rm mysql_password_flush.sql
 df -h
@@ -484,6 +484,8 @@ exit 0</command>
 #mount /dev/mmcblk1p2 /data
 #mv /var/lib/mysql /data/
 #sed -i &quot;s,datadir.*=.*,datadir=/data/mysql,g&quot; /etc/mysql/my.cnf # Edit /etc/mysql/my.cnf and change datadir to /data/mysql
+#sed -i &quot;s,datadir.*=.*,datadir=/data/mysql,g&quot; /etc/mysql/mariadb.conf.d/50-server.cnf # Edit /etc/mysql/my.cnf and change datadir to /data/mysql
+
 #systemctl start mysql.service
 
 #sync
