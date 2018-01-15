@@ -18,66 +18,80 @@
  */
 
 angular.module("canvasApp").factory('mouseOver', [
-  'ExperimentLoader',
-  'previouslySelected',
   'previouslyHoverd',
-  'scrollService',
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService) {
+  function(previouslyHoverd) {
+
+    var reference = this, parentEventReference = null, ParentKanvas = null, 
+    originalScope;
 
     this.init = function(C, $scope, that) {
 
-      var me;
-      this.canvas.on("mouse:over", function(evt) {
+      parentEventReference = that;
+      ParentKanvas = C;
+      originalScope = $scope;
 
-        if(! evt.target) return false;
+      var me;
+      that = {
+        canvas: {
+          hoverCursor: "anything"
+        }
+      };
+
+      this.canvas.on("mouse:over", reference.mouseOverHandler);
+    };
+
+    this.mouseOverHandler = function(evt) {
+
+      if(! evt.target) return false;
 
         switch(evt.target.name) {
 
           case "stepGroup":
-          //console.log("hovered");
-            me = evt.target.me;
-            if(C.editStageStatus === false) {
-              me.closeImage.animate('opacity', 1, {
-                duration: 400,
-                onChange: C.canvas.renderAll.bind(C.canvas),
-                onComplete: function() {
-                  //console.log('done');
-                }
-              });
-              //me.closeImage.setVisible(true);
-              if(previouslyHoverd.step && (me.model.id !== previouslyHoverd.step.model.id)) {
-                //previouslyHoverd.step.closeImage.setVisible(false);
-                previouslyHoverd.step.closeImage.animate('opacity', 0, {
-                  duration: 400,
-                  onChange: C.canvas.renderAll.bind(C.canvas),
-                  onComplete: function() {
-                    //console.log('done');
-                  }
-                });
-              }
-              previouslyHoverd.step = me;
-              C.canvas.renderAll();
-            }
+            reference.stepGroupHoverHandler(evt);
           break;
 
           case "controlCircleGroup":
-            that.canvas.hoverCursor = "pointer";
+            parentEventReference.canvas.hoverCursor = "pointer";
           break;
 
           case "moveStep":
-            that.canvas.hoverCursor = "pointer";
+            parentEventReference.canvas.hoverCursor = "pointer";
           break;
 
           case "moveStage":
-            that.canvas.hoverCursor = "pointer";
+            parentEventReference.canvas.hoverCursor = "pointer";
           break;
 
           case "deleteStepButton":
-            that.canvas.hoverCursor = "pointer";
+            parentEventReference.canvas.hoverCursor = "pointer";
           break;
 
         }
-      });
+    };
+
+    this.stepGroupHoverHandler = function(evt) {
+       
+        me = evt.target.me;
+
+        if(ParentKanvas.editStageStatus === false) {
+
+          me.closeImage.animate('opacity', 1, {
+            duration: 400,
+            onChange: ParentKanvas.canvas.renderAll.bind(ParentKanvas.canvas),
+            
+          });
+
+          //me.closeImage.setVisible(true);
+          if(previouslyHoverd.step && (me.model.id !== previouslyHoverd.step.model.id)) {
+            //previouslyHoverd.step.closeImage.setVisible(false);
+            previouslyHoverd.step.closeImage.animate('opacity', 0, {
+              duration: 400,
+              onChange: ParentKanvas.canvas.renderAll.bind(ParentKanvas.canvas),
+            });
+          }
+          previouslyHoverd.step = me;
+          ParentKanvas.canvas.renderAll();
+        }
     };
     return this;
   }

@@ -24,6 +24,7 @@ window.App.controller 'SettingsCtrl', [
 
     $scope.isBeta = true
     $scope.anotherExperimentInProgress = false
+    $scope.checked = false
 
     $scope.$on 'status:data:updated', (e, data, oldData) ->
       return if !data
@@ -47,6 +48,7 @@ window.App.controller 'SettingsCtrl', [
 
     Device.isDualChannel()
     .then (resp) ->
+      $scope.checked = true
       $scope.is_dual_channel = resp
 
     backdrop = $('.maintainance-backdrop')

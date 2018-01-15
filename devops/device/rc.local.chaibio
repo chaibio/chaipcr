@@ -13,7 +13,7 @@
 
 export_pwm ()
 {
-	echo PWM: Exporting $1
+	echo PWM: Creating $3 endpoint. Exporting $1
 	for chip in $1/pwmchip?
 	do
 		echo exporting $chip
@@ -21,6 +21,14 @@ export_pwm ()
 		echo $chip/pwm$2>>/run/chaipcr/realtime/pwms.inf
 		ln -s $chip/pwm$2 /run/chaipcr/realtime/$3
 	done
+	if [ -e /run/chaipcr/realtime/$3 ]
+	then
+		echo Intilizing $3 end point
+		echo $4 > $chip/pwm$2/period
+		echo 0 >  $chip/pwm$2/enable
+	else
+		echo Error creating $3 end point
+	fi
 }
 
 pwm_setup_kernel49 ()
@@ -29,27 +37,30 @@ pwm_setup_kernel49 ()
 	if [ $? -eq 0 ]
 	then
 		echo PWM Export: New kernel detected
-		if [ -e /run/chaipcr/realtime/
+		if [ -e /run/chaipcr/realtime/ ]
 		then
-			rm /run/chaipcr/realtime/ -r || true
+			echo pwm endpoints folder created before
+#			rm /run/chaipcr/realtime/ -r || true
+			return
 		fi
+
 		mkdir -p /run/chaipcr/realtime/ || true
-		
+
 		#Heat Sink: P9.14 ehrpwm1a:
-		export_pwm /sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm 0 kHeatSinkFanControl.pwm
+		export_pwm /sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm 0 kHeatSinkFanControl.pwm 500000
 
 		#LED control: P9.28 eCAP2_PWM2
-		export_pwm /sys/devices/platform/ocp/48304000.epwmss/48304100.ecap/pwm 0 kLEDBlank.pwm
+		export_pwm /sys/devices/platform/ocp/48304000.epwmss/48304100.ecap/pwm 0 kLEDBlank.pwm 50000
 
 		#Lid: P9.16 ehrpwm1b
-		export_pwm /sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm 1 kLidControl.pwm
+		export_pwm /sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm 1 kLidControl.pwm 500000
 
 		#Head Block: P8.13 ehrpwm2b, P8.19 ehrpwm2a
-		export_pwm /sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm 1 kHeatBlockZone1.pwm
-		export_pwm /sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm 0 kHeatBlockZone2.pwm
-	
+		export_pwm /sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm 1 kHeatBlockZone1.pwm 50000
+		export_pwm /sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm 0 kHeatBlockZone2.pwm 50000
+
 		#LCD Backlight: P9.42
-		export_pwm /sys/devices/platform/ocp/48304000.epwmss/48304100.ecap/pwm 0 kLCDBacklight.pwm
+		export_pwm /sys/devices/platform/ocp/48300000.epwmss/48300100.ecap/pwm 0 kLCDBacklight.pwm 50000
 		ls -ahl /run/chaipcr/realtime/ || true
 	fi
 }

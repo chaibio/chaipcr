@@ -18,48 +18,51 @@
  */
 
 angular.module("canvasApp").factory('mouseUp', [
-  'ExperimentLoader',
-  'previouslySelected',
-  'previouslyHoverd',
-  'scrollService',
   'circleManager',
-  'movingStepGraphics',
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, circleManager, movingStepGraphics) {
+  function(circleManager) {
+
+    var reference = this, parentEventReference = null, ParentKanvas = null, 
+    originalScope;
 
     this.init = function(C, $scope, that) {
 
-      this.canvas.on("mouse:up", function(evt) {
+      parentEventReference = that;
+      ParentKanvas = C;
+      originalScope = $scope;
 
-        if(that.mouseDown) {
-          that.canvas.defaultCursor = "default";
-          that.startDrag = 0;
-          that.mouseDown = false;
-          that.canvas.renderAll();
+      this.canvas.on("mouse:up", reference.mouseUpHandler);
+    };
+
+    this.mouseUpHandler = function(evt) {
+
+      if(parentEventReference.mouseDown) {
+          parentEventReference.canvas.defaultCursor = "default";
+          parentEventReference.startDrag = 0;
+          parentEventReference.mouseDown = false;
+          parentEventReference.canvas.renderAll();
         } else {
-          that.canvas.moveCursor = "move";
+          parentEventReference.canvas.moveCursor = "move";
         }
 
-        if(that.moveStepActive) {
-          console.log("Loxxxxxxx");
+        if(parentEventReference.moveStepActive) {
           var indicate = evt.target;
           step = indicate.parent;
 
-          C.moveDots.setVisible(false);
-          C.stepIndicator.setVisible(false);
-          that.moveStepActive = false;
+          ParentKanvas.moveDots.setVisible(false);
+          ParentKanvas.stepIndicator.setVisible(false);
+          parentEventReference.moveStepActive = false;
           step.parentStage.updateWidth();
-          C.stepIndicator.processMovement(step, C);
-          C.canvas.renderAll();
+          ParentKanvas.stepIndicator.processMovement(step, ParentKanvas);
+          ParentKanvas.canvas.renderAll();
 
         }
 
-        if(that.moveStageActive) {
+        if(parentEventReference.moveStageActive) {
           var stage = evt.target.parent;
-          C.stageIndicator.processMovement(stage, circleManager);
-          that.moveStageActive = false;
-          C.canvas.renderAll();
+          ParentKanvas.stageIndicator.processMovement(stage, circleManager);
+          parentEventReference.moveStageActive = false;
+          ParentKanvas.canvas.renderAll();
         }
-      });
     };
     return this;
   }

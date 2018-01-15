@@ -54,10 +54,10 @@ window.ChaiBioTech.ngApp.controller('systemController', [
 				$scope.update_available = status;
 			if (data.device.update_available == 'unknown' && data.device.update_error) {
 				if ($scope.checkedUpdate){
-					$scope.openUpdateModal();
+					//$scope.openUpdateModal();
 				}
-				$scope.update_available = 'unavailable';
-				$scope.checkedUpdate = false;
+				//$scope.update_available = 'unavailable';
+				//$scope.checkedUpdate = false;
 				//$scope.openUpdateModal();
 			}
 		});

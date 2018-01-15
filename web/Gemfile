@@ -35,6 +35,7 @@ end
 gem 'migration_comments'
 gem "rabl"
 gem 'apipie-rails'
+gem 'swagger-blocks'
 #gem 'bcrypt'
 
 gem 'rspec-rails', :group => [:test, :development]
@@ -55,9 +56,6 @@ gem 'rubyzip'
 gem 'bcrypt-ruby', '~> 3.1.2'
 
 gem 'seed-fu'
-
-#gem 'rserve-client', :git=>"https://github.com/rapofran/Rserve-Ruby-client.git", :branch => 'sockets-with-timeouts'
-gem 'rserve-client'
 
 gem 'httparty'
 

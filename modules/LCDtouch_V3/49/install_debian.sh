@@ -10,19 +10,20 @@ else
 	exit 1
 fi
 
+echo "Compiling the main device tree from .dts to .dtb"
+wget https://github.com/RobertCNelson/dtb-rebuilder/archive/4.9-ti.zip
+unzip 4.9-ti.zip
+cd dtb-rebuilder-4.9-ti/src/arm/
+patch < ../../../am33xx.dtsi.patch
+cd ../..
+make
+make install
+cp src/arm/am335x-boneblack-emmc-overlay.dtb /lib/firmware/
+cp src/arm/am335x-boneblack-emmc-overlay.dtb /boot/dtbs/*/
 
-#echo "Compiling the main device tree from .dts to .dtb"
-#wget https://github.com/RobertCNelson/dtb-rebuilder/archive/4.9-ti.zip
-#unzip 4.9-ti.zip
-#cd dtb-rebuilder-4.9-ti/
-#cp ../am335x-bone-common.dtsi src/arm/am335x-bone-common.dtsi
-#cpp -Wp,-MD,src/arm/.am335x-boneblack.dtb.d.pre.tmp -nostdinc -Iinclude -Isrc/arm -Itestcase-data -undef -D__DTS__ -x assembler-with-cpp -o src/arm/.am335x-boneblack.dtb.dts.tmp src/arm/am335x-boneblack.dts ; 
-#dtc -O dtb -o src/arm/am335x-boneblack.dtb -b 0 -i src/arm  -d src/arm/.am335x-boneblack.dtb.d.dtc.tmp src/arm/.am335x-boneblack.dtb.dts.tmp ;
-#cat src/arm/.am335x-boneblack.dtb.d.pre.tmp src/arm/.am335x-boneblack.dtb.d.dtc.tmp > src/arm/.am335x-boneblack.dtb.d
-
-#find /boot/dtbs/* -maxdepth 1 -type d -exec mv {}/am335x-boneblack.dtb {}/am335x-boneblack.dtb.org \;
-#find /boot/dtbs/* -maxdepth 1 -type d -exec cp src/arm/am335x-boneblack.dtb {}/am335x-boneblack.dtb \;
-#cd ..
+cd ..
+rm -r dtb-rebuilder-4.9-ti
+rm 4.9-ti.zip 
 cd ..
 
 cp CHAI-LCDtouch5-00A0.dtbo /lib/firmware/CHAI-LCDtouch5-00A0.dtbo
@@ -55,7 +56,7 @@ fi
 process_uEnv () {
 	if [ -e $1 ]
 	then
-		ech processing $1
+		echo processing $1
 		echo "cape_enable=bone_capemgr.enable_partno=chai-pcr,CHAI-LCDtouch5" >> $1
 		echo "cape_disable=bone_capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN,BB-SPIDEV0,BB-SPIDEV1,BB-BONE-EMMC-2G" >> $1
 		echo "dtb=am335x-boneblack-emmc-overlay.dtb" >> $1

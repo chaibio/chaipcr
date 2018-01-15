@@ -18,39 +18,45 @@
  */
 
 angular.module("canvasApp").factory('mouseMove', [
-  'ExperimentLoader',
-  'previouslySelected',
-  'previouslyHoverd',
-  'scrollService',
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService) {
+  function() {
+
+    var reference = this, parentEventReference = null, ParentKanvas = null, 
+    originalScope, left, startPos;
 
     this.init = function(C, $scope, that) {
+      
+      parentEventReference = that;
+      ParentKanvas = C;
+      originalScope = $scope;
 
-      var me, left, canvasContaining = $('.canvas-containing'), startPos;
+      reference.canvasContaining = $('.canvas-containing');
 
-      this.canvas.on("mouse:move", function(evt) {
+      this.canvas.on("mouse:move", reference.handleMouseMove);
+    };
 
-        if(that.mouseDown && evt.target) {
+    this.handleMouseMove = function(evt) {
+      
+      if(parentEventReference.mouseDown && evt.target) {
 
-          if(that.startDrag === 0) {
-            that.canvas.defaultCursor = "ew-resize";
-            that.startDrag = evt.e.clientX;
-            startPos = canvasContaining.scrollLeft();
+          if(parentEventReference.startDrag === 0) {
+            parentEventReference.canvas.defaultCursor = "ew-resize";
+            parentEventReference.startDrag = evt.e.clientX;
+            startPos = reference.canvasContaining.scrollLeft();
           }
 
-          left = startPos - (evt.e.clientX - that.startDrag); // Add startPos to reverse the moving direction.
+          left = startPos - (evt.e.clientX - parentEventReference.startDrag); // Add startPos to reverse the moving direction.
 
-          if((left >= 0) && (left <= $scope.scrollWidth - 1024)) {
+          if((left >= 0) && (left <= originalScope.scrollWidth - 1024)) {
 
-            $scope.$apply(function() {
-              $scope.scrollLeft = left;
+            originalScope.$apply(function() {
+              originalScope.scrollLeft = left;
             });
 
-            canvasContaining.scrollLeft(left);
+            reference.canvasContaining.scrollLeft(left);
           }
         }
-      });
     };
+
     return this;
   }
 ]);

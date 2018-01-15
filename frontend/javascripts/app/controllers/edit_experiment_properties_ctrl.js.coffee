@@ -111,6 +111,10 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
         $scope.experiment.protocol.lid_temperature = $scope.experimentOrig.protocol.lid_temperature
         return
 
+      if data.lid_temperature > 120
+        $scope.experiment.protocol.lid_temperature = 120
+        data.lid_temperature = 120
+
       promise = Protocol.update data
 
       promise.success ->

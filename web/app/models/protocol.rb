@@ -17,6 +17,30 @@
 # limitations under the License.
 #
 class Protocol < ActiveRecord::Base
+  include Swagger::Blocks
+   
+  swagger_schema :Protocol do
+    property :id do
+      key :type, :integer
+      key :format, :int64
+    end
+    property :lid_temperature do
+      key :type, :number
+      key :format, :double
+      key :description, 'lid temperature, in degree C, default is 110, with precision to one decimal point'
+    end
+    property :estimate_duration do
+      key :type, :integer
+      key :format, :int32
+    end
+    property :stages do
+      key :type, :array
+      items do
+        key :'$ref', :Stage
+      end
+    end
+  end
+  
   belongs_to :experiment_definition
   has_many :stages, -> {order("order_number").includes(:steps, :ramps)}
   

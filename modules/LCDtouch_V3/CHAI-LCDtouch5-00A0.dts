@@ -36,7 +36,7 @@
 		"P8.30",	/* lcd: lcd_ac_bias_en */
 		"P9.27",	/* lcd: gpio3_19 */
 		"P9.42",	/* pwm: eCAP0 */
-                "P9.23",	/* lcd: gpio1_17 */
+                "P9.23",	/* touch: gpio1_17 */
 		/* the hardware IP uses */
                 "gpio1_17",
 		"gpio3_19",
@@ -132,10 +132,9 @@ pinmux_LCDtouch5_lcd_pins {
 
 			/* Settings for TF-SPEC50002C-V0 / chai-pcr lcd: */
 			panel {
-				compatible = "tilcdc,panel";
+				compatible = "ti,tilcdc,panel";
 				pinctrl-names = "default";
-				pinctrl-0 = 
-<&LCDtouch5_lcd_pins>;
+				pinctrl-0 = <&LCDtouch5_lcd_pins>;
 				panel-info {
 					ac-bias           = <255>;
 					ac-bias-intrpt    = <0>;
@@ -194,6 +193,7 @@ pinmux_LCDtouch5_lcd_pins {
 				interrupts = <17 0x0>;
 				irq-gpio = <&gpio2 17 0>;
 			};
+
                };
        };
 };

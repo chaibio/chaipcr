@@ -42,7 +42,8 @@ public:
             NoEncryption,
             WepEncryption,
             Wpa1Ecryption,
-            Wpa2Ecryption
+            Wpa2PSKEcryption,
+            Wpa28021xEcryption
         };
 
         ScanResult(): encryption(NoEncryption), quality(0), siganlLevel(0) {}

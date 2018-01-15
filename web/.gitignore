@@ -25,3 +25,4 @@
 
 # Ignore precompiled assets
 /public/assets
+/public/swagger.json

@@ -134,7 +134,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         //this.movedStepIndex = this.currentMoveLeft;
         //StepMovementRightService.movedRightAction(this);
         this.movement.left = this.movement.left - 40;
-        this.manageMovingRight();
+        //this.manageMovingRight();
 
       };
 
@@ -142,7 +142,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         //this.movedStepIndex = this.currentMoveRight;
         //StepMovementLeftService.movedLeftAction(this);
         this.movement.left = this.movement.left + 40;
-        this.manageMovingLeft();
+        //this.manageMovingLeft();
       };
       
       this.indicator.onTheMove = function(movement) {
@@ -154,8 +154,10 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.currentLeft = movement.left;
         
         if(direction === 'right') {
+          this.movedLeftStageIndex = this.currentDropStage.index - 1;
           this.manageMovingRight();
         } else if(direction === 'left') {
+          this.movedRightStageIndex = this.currentDropStage.index + 1;
           this.manageMovingLeft();
         } 
       };
