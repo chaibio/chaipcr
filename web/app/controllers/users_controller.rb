@@ -17,6 +17,7 @@
 # limitations under the License.
 #
 class UsersController < ApplicationController
+  include Swagger::Blocks
   before_filter :ensure_authenticated_user, :except => :create
 
   respond_to :json
@@ -36,12 +37,50 @@ class UsersController < ApplicationController
      end
   end
 
+  swagger_path '/users' do
+    operation :get do
+      key :summary, 'User information'
+      key :description, 'List all the users'
+      key :produces, [
+        'application/json',
+      ]
+      response 200 do
+        key :description, 'User response'
+        schema do
+          key :type, :array
+          items do
+            key :'$ref', :User
+          end
+        end
+      end
+    end
+  end
+
   api :GET, "/users", "List all the users"
   example "[{'user':{'id':1,'name':'admin','email':'admin@admin.com','role':'admin'}}]"
   def index
     @users = User.all
     respond_to do |format|
       format.json { render "index", :status => :ok }
+    end
+  end
+
+  swagger_path '/users/current' do
+    operation :get do
+      key :summary, 'User information'
+      key :description, 'List the current user'
+      key :produces, [
+        'application/json',
+      ]
+      response 200 do
+        key :description, 'Current user response'
+        schema do
+          key :type, :array
+          items do
+            key :'$ref', :UserCurrent
+          end
+        end
+      end
     end
   end
 
@@ -58,6 +97,33 @@ class UsersController < ApplicationController
     end
   end
 
+  swagger_path '/users' do
+    operation :post do
+      key :description, 'Create an user'
+      key :produces, [
+        'application/json',
+      ]
+      parameter do
+        key :name, :user
+        key :in, :body
+        key :description, 'user to create'
+        key :required, true
+        schema do
+           key :'$ref', :UserInput
+         end
+      end
+      response 200 do
+        key :description, 'User response'
+        schema do
+          key :type, :array
+          items do
+            key :'$ref', :User
+          end
+        end
+      end
+    end
+  end
+
   api :POST, "/users", "Create an user"
   param_group :user
   example "[{'user':{'id':1,'name':'test','email':'test@test.com','role':'user'}}]"
@@ -71,6 +137,33 @@ class UsersController < ApplicationController
     end
   end
 
+  swagger_path '/users/:id' do
+    operation :put do
+      key :description, 'Update an user'
+      key :produces, [
+        'application/json',
+      ]
+      parameter do
+        key :name, :user
+        key :in, :body
+        key :description, 'user to update'
+        key :required, true
+        schema do
+           key :'$ref', :UserInput
+         end
+      end
+      response 200 do
+        key :description, 'User response'
+        schema do
+          key :type, :array
+          items do
+            key :'$ref', :User
+          end
+        end
+      end
+    end
+  end
+
   api :PUT, "/users/:id", "Update an user"
   param_group :user
   example "[{'user':{'id':1,'name':'test','email':'test@test.com','role':'user'}}]"
@@ -79,6 +172,27 @@ class UsersController < ApplicationController
     ret  = @user.update_attributes(user_params)
     respond_to do |format|
       format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
+    end
+  end
+
+  swagger_path '/users/:id' do
+    operation :delete do
+      key :description, 'Delete a user'
+      key :produces, [
+        'application/json',
+      ]
+      parameter do
+        key :name, :user
+        key :in, :body
+        key :description, 'user to delete'
+        key :required, true
+        schema do
+           key :'$ref', :UserInput
+         end
+      end
+      response 200 do
+        key :description, 'User Deleted'
+      end
     end
   end
 
