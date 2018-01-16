@@ -17,10 +17,28 @@
 # limitations under the License.
 #
 class Setting < ActiveRecord::Base
+  include Swagger::Blocks
+
+  #to verify the type of the property
+
+  swagger_schema :Settings do
+    #key :required, [:id, :name]
+    property :time_zone do
+      key :type, :string
+    end
+    property :debug do
+      key :type, :boolean
+    end
+    property :time_zone_offset do
+      key :type, :integer
+    end
+  end
+
+
   def self.instance
     self.first
   end
-  
+
   def self.debug
     instance.debug
   end
@@ -32,13 +50,13 @@ class Setting < ActiveRecord::Base
   def self.software_release_variant
     instance.software_release_variant
   end
-      
+
   def self.time_valid
     instance.time_valid
   end
-  
+
   def time_zone_offset
     (time_zone.nil?)? nil : ActiveSupport::TimeZone.new(time_zone).utc_offset
   end
-  
+
 end
