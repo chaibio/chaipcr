@@ -144,13 +144,10 @@ class UsersController < ApplicationController
         'application/json',
       ]
       parameter do
-        key :name, :user
-        key :in, :body
+        key :name, :id
+        key :in, :path
         key :description, 'user to update'
         key :required, true
-        schema do
-           key :'$ref', :UserInput
-         end
       end
       response 200 do
         key :description, 'User response'
@@ -182,13 +179,10 @@ class UsersController < ApplicationController
         'application/json',
       ]
       parameter do
-        key :name, :user
-        key :in, :body
+        key :name, :id
+        key :in, :path
         key :description, 'user to delete'
         key :required, true
-        schema do
-           key :'$ref', :UserInput
-         end
       end
       response 200 do
         key :description, 'User Deleted'
