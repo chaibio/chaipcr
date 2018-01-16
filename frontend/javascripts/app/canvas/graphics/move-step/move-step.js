@@ -33,9 +33,10 @@ angular.module("canvasApp").factory('moveStepRect', [
   'StepMoveVoidSpaceRightService',
   'StepMoveVoidSpaceLeftService',
   'addStageService',
+  'stageHeaderLineExtender',
   function(ExperimentLoader, previouslySelected, circleManager, StepPositionService, moveStepIndicator, verticalLineStepGroup, StagePositionService,
   movingStepGraphics, StepMovementRightService, StepMovementLeftService, StageMovementRightService, StageMovementLeftService,
-  StepMoveVoidSpaceRightService, StepMoveVoidSpaceLeftService, addStageService) {
+  StepMoveVoidSpaceRightService, StepMoveVoidSpaceLeftService, addStageService, stageHeaderLineExtender) {
 
     return {
 
@@ -43,7 +44,7 @@ angular.module("canvasApp").factory('moveStepRect', [
        
       this.indicator = new moveStepIndicator(me);
       this.indicator.verticalLine = new verticalLineStepGroup();
-      
+      this.indicator.headerExtender = new stageHeaderLineExtender(20);
       this.indicator.init = function(step, footer, C, backupStageModel) {
 
         this.tagSteps(step);
@@ -194,28 +195,11 @@ angular.module("canvasApp").factory('moveStepRect', [
 
       this.indicator.increaseHeaderLengthLeft = function(index) {
 
-        if(this.kanvas.allStageViews[index + 1] && ! this.kanvas.allStageViews[index + 1].rooftExtended) {
-
-          var roof = this.kanvas.allStageViews[index + 1].roof;
-          console.log(roof.left);
-          roof.setWidth(roof.width + 25);
-          roof.setLeft(roof.left - 25);
-          
-
-          this.kanvas.canvas.bringToFront(roof);
-          this.kanvas.allStageViews[index + 1].rooftExtended = true;
-
-          if(this.roofChanged) {
-            // How to update placing of Line , check fabric documentaion.
-            this.roofChanged.updateWidth();
-            this.roofChanged.roof.setLeft(roof.left + 25);
-            this.roofChanged.rooftExtended = false;
-          }
-          this.roofChanged = this.kanvas.allStageViews[index + 1];
-          //this.roofChanged.
-        }
-        
-        //console.log(roof);
+        // Create a small line which can fill the small length between stages.
+        // Hide it at first.
+        // When stages spread away, add the small line at the right place,
+        // As stages change keep moving the small line.
+        // When a stage is in selected state make sure, we make the line black.
         
       };
 

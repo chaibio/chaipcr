@@ -170,6 +170,7 @@ angular.module("canvasApp").factory('canvas', [
     this.addComponentsToStage = function() {
 
       this.canvas.add(this.stepIndicator);
+      this.canvas.add(this.stepIndicator.headerExtender);
       this.canvas.add(this.stageIndicator);
       this.canvas.add(this.stageVerticalLine);
       this.canvas.add(this.stepVerticalLine);
