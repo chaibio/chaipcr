@@ -25,7 +25,7 @@ window.ChaiBioTech.ngApp.service('StageMovementLeftService', [
         return {
 
             shouldStageMoveLeft: function(sI) {
-
+                
                 sI.movedStageIndex = null;
                 StagePositionService.allPositions.some(this.shouldStageMoveLeftCallback, sI);
                 return sI.movedStageIndex;

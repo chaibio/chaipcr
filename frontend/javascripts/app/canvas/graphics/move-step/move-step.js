@@ -49,7 +49,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.tagSteps(step);
         step.parentStage.sourceStage = true;
         step.parentStage.stageHeader();
-        
+        this.roofChanged = null;
         if(step.parentStage.childSteps.length === 0) {
           //step.parentStage.adjustHeader();
         }
@@ -170,7 +170,8 @@ angular.module("canvasApp").factory('moveStepRect', [
         }
 
         if(StageMovementLeftService.shouldStageMoveLeft(this) !== null) {
-          
+          console.log("Move left", this.movedLeftStageIndex);
+          this.increaseHeaderLengthLeft(this.movedLeftStageIndex);
           this.movedRightStageIndex = null; // Resetting
           this.hideFirstStepBorderLeft();
         }
@@ -189,6 +190,33 @@ angular.module("canvasApp").factory('moveStepRect', [
           this.hideFirstStepBorderLeft();
         }
         StepMoveVoidSpaceRightService.checkVoidSpaceRight(this);
+      };
+
+      this.indicator.increaseHeaderLengthLeft = function(index) {
+
+        if(this.kanvas.allStageViews[index + 1] && ! this.kanvas.allStageViews[index + 1].rooftExtended) {
+
+          var roof = this.kanvas.allStageViews[index + 1].roof;
+          console.log(roof.left);
+          roof.setWidth(roof.width + 25);
+          roof.setLeft(roof.left - 25);
+          
+
+          this.kanvas.canvas.bringToFront(roof);
+          this.kanvas.allStageViews[index + 1].rooftExtended = true;
+
+          if(this.roofChanged) {
+            // How to update placing of Line , check fabric documentaion.
+            this.roofChanged.updateWidth();
+            this.roofChanged.roof.setLeft(roof.left + 25);
+            this.roofChanged.rooftExtended = false;
+          }
+          this.roofChanged = this.kanvas.allStageViews[index + 1];
+          //this.roofChanged.
+        }
+        
+        //console.log(roof);
+        
       };
 
       this.indicator.hideFirstStepBorderLeft = function() {

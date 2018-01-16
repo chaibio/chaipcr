@@ -72,6 +72,7 @@ angular.module("canvasApp").factory('stage', [
         this.stageRect.setWidth(this.myWidth);
         this.stageRect.setCoords();
         this.roof.setWidth(this.myWidth);
+        //this.roof.setLeft(0);
       };
 
       this.collapseStage = function() {
