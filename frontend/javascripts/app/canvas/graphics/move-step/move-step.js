@@ -196,19 +196,11 @@ angular.module("canvasApp").factory('moveStepRect', [
       };
 
       this.indicator.increaseHeaderLengthLeft = function(index) {
-
         
         if(this.kanvas.allStageViews[index + 1]) {
           var stage = this.kanvas.allStageViews[index + 1];
-          var stroke = stage.roof.get('stroke');
-          var strokeWidth = stage.roof.get('strokeWidth');
-
-          var left = this.kanvas.allStageViews[index + 1].left;
-          left = left - 27;
-          this.headerExtender.setLeft(left);
-          this.headerExtender.setVisible(true);
-          this.headerExtender.setStroke(stroke);
-          this.headerExtender.setStrokeWidth(strokeWidth);
+          var left = stage.left - 27;
+          stage.extendHeader(left, this.headerExtender);
         }
         
       };
@@ -218,20 +210,13 @@ angular.module("canvasApp").factory('moveStepRect', [
         if(this.kanvas.allStageViews[index - 1]) {
           
           var stage = this.kanvas.allStageViews[index - 1];
-          var stroke = stage.roof.get('stroke');
-          var strokeWidth = stage.roof.get('strokeWidth');
-
           var left = (stage.left + stage.myWidth) - 1;
-          
-          this.headerExtender.setLeft(left);
-          this.headerExtender.setStroke(stroke);
-          this.headerExtender.setStrokeWidth(strokeWidth);
-          this.headerExtender.setVisible(true);
-          //this.kanvas.canvas.bringToFront(this.headerExtender);
+          stage.extendHeader(left, this.headerExtender);
         } else {
           this.increaseHeaderLengthLeft(-1);
         }
       };
+
       this.indicator.hideFirstStepBorderLeft = function() {
 
         if(this.kanvas.allStageViews[this.movedStageIndex].childSteps[0]) {

@@ -373,6 +373,23 @@ angular.module("canvasApp").factory('stage', [
         previousSelectedStage.changeFillsAndStrokes("white", 2);
         previousSelectedStage.manageBordersOnSelection("#ff9f00");
       };
+
+      this.extendHeader = function(left, headerExtender) {
+
+          var stroke = this.roof.get('stroke');
+          var strokeWidth = this.roof.get('strokeWidth');
+          //headerExtender.setLeft(left);
+          //headerExtender.setVisible(true);
+          //headerExtender.setStroke(stroke);
+          //headerExtender.setStrokeWidth(strokeWidth);
+          headerExtender.set({
+            'visible': true,
+            'stroke': stroke,
+            'strokeWidth': strokeWidth,
+            'left': left
+          });
+      };
+
     };
 
   }
