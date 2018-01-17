@@ -210,7 +210,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         if(this.kanvas.allStageViews[index - 1]) {
           
           var stage = this.kanvas.allStageViews[index - 1];
-          var left = (stage.left + stage.myWidth) - 1;
+          var left = (stage.left + stage.myWidth) - 2;
           stage.extendHeader(left, this.headerExtender);
         } else {
           this.increaseHeaderLengthLeft(-1);
