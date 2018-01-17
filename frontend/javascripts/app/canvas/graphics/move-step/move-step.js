@@ -171,7 +171,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         }
 
         if(StageMovementLeftService.shouldStageMoveLeft(this) !== null) {
-          console.log("Move left", this.movedLeftStageIndex);
+          
           this.increaseHeaderLengthLeft(this.movedLeftStageIndex);
           this.movedRightStageIndex = null; // Resetting
           this.hideFirstStepBorderLeft();
@@ -187,22 +187,51 @@ angular.module("canvasApp").factory('moveStepRect', [
         }
 
         if(StageMovementRightService.shouldStageMoveRight(this) !== null) {
+          this.increaseHeaderLengthRight(this.movedRightStageIndex);
           this.movedLeftStageIndex = null; // Resetting
           this.hideFirstStepBorderLeft();
+          
         }
         StepMoveVoidSpaceRightService.checkVoidSpaceRight(this);
       };
 
       this.indicator.increaseHeaderLengthLeft = function(index) {
 
-        // Create a small line which can fill the small length between stages.
-        // Hide it at first.
-        // When stages spread away, add the small line at the right place,
-        // As stages change keep moving the small line.
-        // When a stage is in selected state make sure, we make the line black.
+        
+        if(this.kanvas.allStageViews[index + 1]) {
+          var stage = this.kanvas.allStageViews[index + 1];
+          var stroke = stage.roof.get('stroke');
+          var strokeWidth = stage.roof.get('strokeWidth');
+
+          var left = this.kanvas.allStageViews[index + 1].left;
+          left = left - 27;
+          this.headerExtender.setLeft(left);
+          this.headerExtender.setVisible(true);
+          this.headerExtender.setStroke(stroke);
+          this.headerExtender.setStrokeWidth(strokeWidth);
+        }
         
       };
 
+      this.indicator.increaseHeaderLengthRight = function(index) {
+
+        if(this.kanvas.allStageViews[index - 1]) {
+          
+          var stage = this.kanvas.allStageViews[index - 1];
+          var stroke = stage.roof.get('stroke');
+          var strokeWidth = stage.roof.get('strokeWidth');
+
+          var left = (stage.left + stage.myWidth) - 1;
+          
+          this.headerExtender.setLeft(left);
+          this.headerExtender.setStroke(stroke);
+          this.headerExtender.setStrokeWidth(strokeWidth);
+          this.headerExtender.setVisible(true);
+          //this.kanvas.canvas.bringToFront(this.headerExtender);
+        } else {
+          this.increaseHeaderLengthLeft(-1);
+        }
+      };
       this.indicator.hideFirstStepBorderLeft = function() {
 
         if(this.kanvas.allStageViews[this.movedStageIndex].childSteps[0]) {
@@ -238,6 +267,7 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.processMovement = function(step, C) {
         
         this.verticalLine.setVisible(false);
+        this.headerExtender.setVisible(false);
         if(this.manageSingleStepStage(step) === true) {
           return true;
         }

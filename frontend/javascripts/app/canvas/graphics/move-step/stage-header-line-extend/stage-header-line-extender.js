@@ -7,7 +7,7 @@ angular.module('canvasApp').factory('stageHeaderLineExtender', [
           stroke: 'white', strokeWidth: 2, selectable: false, left: 0, top: 24, width: width,
           visible: false
         };
-      var cordinates = [0, 24, width, 24];
+      var cordinates = [0, 24, 27, 24];
 
       return Line.create(cordinates, properties);
     };
