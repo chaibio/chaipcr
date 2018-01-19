@@ -45,12 +45,14 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator = new moveStepIndicator(me);
       this.indicator.verticalLine = new verticalLineStepGroup();
       this.indicator.headerExtender = new stageHeaderLineExtender(20);
+
       this.indicator.init = function(step, footer, C, backupStageModel) {
 
         this.tagSteps(step);
         step.parentStage.sourceStage = true;
         step.parentStage.stageHeader();
         this.roofChanged = null;
+        this.lastStepInStage = false;
         if(step.parentStage.childSteps.length === 0) {
           //step.parentStage.adjustHeader();
         }
@@ -69,7 +71,16 @@ angular.module("canvasApp").factory('moveStepRect', [
         
         this.verticalLine.setLeft(C.moveDots.left + 7).setVisible(true).setCoords();
         C.canvas.bringToFront(this.verticalLine);
-        this.setLeft(footer.left).setVisible(true);
+
+        if(step.nextStep) {
+          this.setLeft(footer.left).setVisible(true);
+        } else {
+          this.lastStepInStage = true;
+          this.rightOffset = 56;
+          this.leftOffset = -40;
+          this.setLeft(footer.left - 60).setVisible(true);
+        }
+        
         this.changeText(step);
         StepPositionService.getPositionObject(this.kanvas.allStepViews);
         StagePositionService.getPositionObject();
@@ -134,7 +145,13 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.updateLocationOnMoveRight = function() {
         //this.movedStepIndex = this.currentMoveLeft;
         //StepMovementRightService.movedRightAction(this);
+        if(this.lastStepInStage) {
+          //this.movement.left = this.movement.left - 120;
+          //return;
+        }
+
         this.movement.left = this.movement.left - 40;
+        
         //this.manageMovingRight();
 
       };
@@ -142,6 +159,10 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.updateLocationOnMoveLeft = function() {
         //this.movedStepIndex = this.currentMoveRight;
         //StepMovementLeftService.movedLeftAction(this);
+        if(this.lastStepInStage) {
+          this.movement.left = this.movement.left;
+          return;
+        }
         this.movement.left = this.movement.left + 40;
         //this.manageMovingLeft();
       };
