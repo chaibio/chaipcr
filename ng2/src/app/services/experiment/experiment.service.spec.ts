@@ -305,6 +305,7 @@ describe('ExperimentService', () => {
           subscribe: () => {}
         }
       })
+      spyOn(wref.nativeWindow(), 'setInterval').and.returnValue(true);
       expService.startExperiment(1).subscribe()
       let loc = wref.nativeWindow().location
       expect(http.post).toHaveBeenCalledWith(`${loc.protocol}//${loc.hostname}:8000/control/start`, {experiment_id: 1})

@@ -18,12 +18,14 @@ import { FullHeightDirective } from './directives/full-height/full-height.direct
 import { FullWidthDirective } from './directives/full-width/full-width.directive';
 import { HeaderStatusComponent } from './directives/header-status/header-status.component';
 import { HrMinSecPipe } from './pipes/hr-min-secs/hr-min-secs.pipe';
+import { BaseChartDirective } from './directives/charts/base-chart/base-chart.component'
 
 @NgModule({
   declarations: [
     LogoutDirective,
     FullHeightDirective,
     FullWidthDirective,
+    BaseChartDirective,
     HeaderStatusComponent,
     HrMinSecPipe
   ],
