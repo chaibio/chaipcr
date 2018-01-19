@@ -53,7 +53,7 @@ window.ChaiBioTech.ngApp.service('StepMovementRightService', [
             },
 
             manageVerticalLineRight: function(si) {
-
+                
                 var index = si.movedStepIndex;
                 var place = (si.kanvas.allStepViews[index].left + si.kanvas.allStepViews[index].myWidth - 2);
                 

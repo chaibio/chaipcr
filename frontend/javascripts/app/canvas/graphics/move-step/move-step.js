@@ -77,8 +77,8 @@ angular.module("canvasApp").factory('moveStepRect', [
         } else {
           this.lastStepInStage = true;
           this.rightOffset = 56;
-          this.leftOffset = -40;
-          this.setLeft(footer.left - 60).setVisible(true);
+          //this.leftOffset = -40;
+          this.setLeft(footer.left).setVisible(true);
         }
         
         this.changeText(step);
@@ -145,11 +145,6 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.updateLocationOnMoveRight = function() {
         //this.movedStepIndex = this.currentMoveLeft;
         //StepMovementRightService.movedRightAction(this);
-        if(this.lastStepInStage) {
-          //this.movement.left = this.movement.left - 120;
-          //return;
-        }
-
         this.movement.left = this.movement.left - 40;
         
         //this.manageMovingRight();
@@ -159,10 +154,6 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.updateLocationOnMoveLeft = function() {
         //this.movedStepIndex = this.currentMoveRight;
         //StepMovementLeftService.movedLeftAction(this);
-        if(this.lastStepInStage) {
-          this.movement.left = this.movement.left;
-          return;
-        }
         this.movement.left = this.movement.left + 40;
         //this.manageMovingLeft();
       };
@@ -189,10 +180,10 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         if(StepMovementRightService.ifOverRightSide(this) !== null) {
           StepMovementRightService.movedRightAction(this);
+          console.log("LX");
         }
 
         if(StageMovementLeftService.shouldStageMoveLeft(this) !== null) {
-          
           this.increaseHeaderLengthLeft(this.movedLeftStageIndex);
           this.movedRightStageIndex = null; // Resetting
           this.hideFirstStepBorderLeft();
@@ -208,6 +199,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         }
 
         if(StageMovementRightService.shouldStageMoveRight(this) !== null) {
+          
           this.increaseHeaderLengthRight(this.movedRightStageIndex);
           this.movedLeftStageIndex = null; // Resetting
           this.hideFirstStepBorderLeft();
