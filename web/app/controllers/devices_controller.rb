@@ -23,21 +23,41 @@ require 'zip'
 
 class DevicesController < ApplicationController
   include ParamsHelper
-  
+	include Swagger::Blocks
+
   skip_before_action :verify_authenticity_token, :except=>[:root_password]
   before_filter :allow_cors, :except=>[:root_password]
   before_filter :ensure_authenticated_user, :except=>[:show, :serial_start, :update, :clean, :unserialize, :login, :software_update, :empty]
-  
+
   respond_to :json
-  
-  resource_description { 
+
+  resource_description {
     formats ['json']
   }
-  
+
   def empty
      render :nothing => true
   end
-  
+
+  swagger_path '/device' do
+    operation :get do
+      key :summary, 'Device information'
+      key :description, 'Returns device specific information'
+      key :produces, [
+        'application/json',
+      ]
+      response 200 do
+        key :description, 'device response'
+        schema do
+          key :type, :object
+          items do
+            key :'$ref', :Device
+          end
+        end
+      end
+    end
+  end
+
   api :GET, "/device", "return device specific information"
   example "{'serial_number':'1234789127894212','model_number':'M2342JA','processor_architecture':'armv7l','software':{'version':'1.0.0','platform':'S0100'}}"
   description <<-EOS
@@ -45,7 +65,7 @@ class DevicesController < ApplicationController
     ===serial_number
     serial number of the device
     ===model_number
-    hardware model number of the device 
+    hardware model number of the device
     ===processor_architecture
     device processor architecture
     ===software version
@@ -65,10 +85,29 @@ class DevicesController < ApplicationController
       result_hash["software"] = DeviceConfiguration.software
     end
     result_hash["software_release_variant"] = Setting.software_release_variant
-    
+
     render json: result_hash.to_json, status: :ok
   end
-  
+
+  swagger_path '/capabilities' do
+    operation :get do
+      key :summary, 'Device capabilities information'
+      key :description, 'Returns device capabilities'
+      key :produces, [
+        'application/json',
+      ]
+      response 200 do
+        key :description, 'capabilities response'
+        schema do
+          key :type, :object
+          items do
+            key :'$ref', :Configuration
+          end
+        end
+      end
+    end
+  end
+
   api :GET, "/capabilities", "return device capabilities"
   example "{'capabilities':{'plate':{'rows':2,'columns':8,'min_volume_ul':5,'max_volume_ul':100},'optics':{'excitation_channels':[{'begin_wavelength':462,'end_wavelength':490}],'emission_channels':[{'begin_wavelength':510,'end_wavelength':700}]},'storage':{'microsd_size_gb':8,'emmc_size_gb':4}},'thermal':{'lid':{'max_temp_c':120},'block':{'min_temp_c':4,'max_temp_c':100}}}"
   def capabilities
@@ -81,7 +120,26 @@ class DevicesController < ApplicationController
     end
     render json: result_hash.to_json, status: :ok
   end
-  
+
+  swagger_path '/device/status' do
+    operation :get do
+      key :summary, 'Device status'
+      key :description, 'Returns the current status of the device'
+      key :produces, [
+        'application/json',
+      ]
+      response 200 do
+        key :description, 'Device status response'
+        schema do
+          key :type, :object
+          items do
+            key :'$ref', :Status
+          end
+        end
+      end
+    end
+  end
+
   api :GET, "/device/status", "status of the machine"
   def status
     url = URI.parse("http://localhost:8000/status?access_token=#{authentication_token}")
@@ -92,14 +150,14 @@ class DevicesController < ApplicationController
       render json: {errors: "reatime server port 8000 cannot be reached: #{e}"}, status: 500
     end
   end
-  
+
   api :PUT, "/device/root_password", "Set root password"
   param :password, String, :desc => "password to set", :required=>true
   def root_password
     system("printf '#{params[:password]}\n#{params[:password]}\n' | passwd")
     render json: {response: "Root password is set properly"}, status: :ok
   end
-   
+
   def serial_start
     if Device.exists?
       if Device.serial_number.blank?
@@ -141,7 +199,7 @@ class DevicesController < ApplicationController
       render json: {errors: "Device is not configured"}, status: 405
     end
   end
-  
+
   def update
     if Device.exists?
       if !Device.serial_number.blank?
@@ -151,7 +209,7 @@ class DevicesController < ApplicationController
     end
 
     erase_data
-    
+
     start_time = Time.now
     error = Device.write(request.body.read)
     if !error.blank?
@@ -159,20 +217,20 @@ class DevicesController < ApplicationController
       return
     end
     logger.info "device write: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
-    
+
     start_time = Time.now
     change_root_password
     logger.info "change root password: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
-    
+
     start_time = Time.now
     system("sync")
     logger.info "second sync: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
-    
+
     kill_process("realtime")
-    
+
     render json: {response: "Device is programmed successfully"}, status: :ok
   end
-  
+
   def clean
     if !Device.valid?
       render json: {errors: "Device file is not found or corrupted"}, status: 500
@@ -185,7 +243,7 @@ class DevicesController < ApplicationController
       render json: {errors: "Device cannot be cleaned because device signature doesn't match"}, status: 400
     end
   end
-  
+
   def unserialize
     if !Device.valid?
       render json: {errors: "Device file is not found or corrupted"}, status: 500
@@ -210,7 +268,27 @@ class DevicesController < ApplicationController
       render json: {errors: "Device cannot be login because device signature doesn't match"}, status: 400
     end
   end
-  
+
+
+  swagger_path '/device/software_update' do
+    operation :get do
+      key :summary, 'Query the software update meta data'
+      key :description, 'Returns if there is a software update available '
+      key :produces, [
+        'application/json',
+      ]
+      response 200 do
+        key :description, 'Software update response'
+        schema do
+          key :type, :object
+          items do
+            key :'$ref', :SoftwareUpdate
+          end
+        end
+      end
+    end
+  end
+
   api :GET, "/device/software_update", "query the software update meta data"
   example "{'upgrade':{'version':'1.0.1','release_date':null,'brief_description':'this is the brief description','full_description':'this is the full description'}}"
   def software_update
@@ -223,7 +301,7 @@ class DevicesController < ApplicationController
       format.json { render "software_update", :status => :ok}
     end
   end
-  
+
   api :POST, "/device/enable_support_access", "enable remote support access"
   def enable_support_access
     query_hash = Hash.new
@@ -233,7 +311,7 @@ class DevicesController < ApplicationController
     query_hash[:software_platform] = DeviceConfiguration.software["platform"]
     query_hash[:serial_number] = Device.serial_number
     #query_hash[:device_signature]
-    
+
     #query cloud server for auth_token and ssh keys
     url = URI.parse("#{CLOUD_SERVER}/device/provision_support_access?#{query_hash.to_query}")
     begin
@@ -242,15 +320,15 @@ class DevicesController < ApplicationController
       render json: {errors: "chai cloud server #{CLOUD_SERVER} cannot be reached: #{e}"}, status: 500
       return
     end
-    
-    if response.code.to_i != 200 
+
+    if response.code.to_i != 200
       render json: {errors: "chai cloud server #{CLOUD_SERVER} provision_support_access fails (#{response.code}): #{response.body}"}, status: 500
       return
     end
-    
+
     #setup ngrok
     json_response = JSON.parse(response.body)
-    
+
     begin
       logger.info("replace /root/.ngrok2/ngrok.yml")
       File.open("/root/.ngrok2/ngrok.yml", 'w') {|f| f.write("authtoken: #{json_response["tunnel_authtoken"]}") }
@@ -258,7 +336,7 @@ class DevicesController < ApplicationController
       render json: {errors: "open ngrok.yml fails: #{e}"}, status: 500
       return
     end
-    
+
     begin
       logger.info("replace /home/service/.ssh/authorized_keys")
       File.open("/home/service/.ssh/authorized_keys", 'w') {|f| f.write(json_response["ssh_access_key"]) }
@@ -266,13 +344,13 @@ class DevicesController < ApplicationController
       render json: {errors: "open .ssh/authorized_keys fails: #{e}"}, status: 500
       return
     end
-        
+
     #kill ngrok
     kill_process("ngrok")
-    
+
     #run ngrok
     system("/root/ngrok tcp -log=stdout 22 > /dev/null &")
-    
+
     response = nil
     tunnel_url = nil
     sleep_until(10) {
@@ -288,12 +366,12 @@ class DevicesController < ApplicationController
           end
         else
           false
-        end 
+        end
       rescue  => e
         false
       end
     }
-  
+
     if response == nil
       render json: {errors: "ngrok is not running: #{e}"}, status: 500
       return
@@ -301,7 +379,7 @@ class DevicesController < ApplicationController
       render json: {errors: "ngrok api/tunnels returns error ()#{response.code}): #{response.body}"}, status: 500
       return
     end
-    
+
     #post to cloud server
     begin
       uri = URI.parse("#{CLOUD_SERVER}/device/establish_support_tunnel")
@@ -310,15 +388,34 @@ class DevicesController < ApplicationController
       render json: {errors: "chai cloud server #{CLOUD_SERVER} cannot be reached: #{e}"}, status: 500
       return
     end
-    
-    if response.code.to_i != 200 
+
+    if response.code.to_i != 200
       render json: {errors: "publish tunnel url #{tunnel_url} failed (#{response.code}): #{response.body}"}, status: 500
       return
     end
-    
+
     render :nothing=>true, :status=>:ok
   end
-    
+
+  swagger_path '/device/export_database' do
+    operation :get do
+      key :summary, 'Export database'
+      key :description, 'Downloads the current database on the machine to exportdb.zip'
+      key :produces, [
+        'application/json',
+      ]
+      response 200 do
+        key :description, 'Downloaded database'
+        schema do
+          key :type, :object
+          items do
+            key :'$ref', :Database
+          end
+        end
+      end
+    end
+  end
+
   api :GET, "/device/export_database", "export to exportdb.zip"
   def export_database
     config   = Rails.configuration.database_configuration
@@ -358,12 +455,12 @@ class DevicesController < ApplicationController
       t.close
     end
   end
-    
+
   private
-  
+
   def erase_data
     system("cp /etc/network/interfaces.orig /etc/network/interfaces")
-    
+
     start_time = Time.now
 =begin
     User.delete_all
@@ -382,42 +479,42 @@ class DevicesController < ApplicationController
         ActiveRecord::Base.connection.execute("TRUNCATE TABLE #{table};")
     end
     logger.info "erase_data truncate table: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
-    
+
     start_time = Time.now
     system("rake db:seed_fu")
     logger.info "erase_data seedfu: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
-    
+
     start_time = Time.now
     system("sync")
     logger.info "erase_data sync: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
   end
-  
+
   def change_root_password
     if !Device.serial_number.blank?
       serialmd5 = Digest::MD5.hexdigest(Device.serial_number)
       system("printf '#{serialmd5}\n#{serialmd5}\n' | passwd")
     end
   end
-  
+
   def retrieve_mac
     str = `ifconfig eth0 | grep HWaddr`
   #  str = "eth0      Link encap:Ethernet  HWaddr 54:4a:16:c0:7e:38 "
     re = %r/([A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2}/
     return re.match(str).to_s.strip
   end
-  
+
   def allow_cors
     headers["Access-Control-Allow-Origin"] = "*"
     headers["Access-Control-Allow-Methods"] = "GET,PUT,POST,OPTIONS"
     headers["Access-Control-Allow-Headers"] = "*"
     headers["Access-Control-Max-Age"] = "1728000"
   end
-  
+
   def sleep_until(time)
     time.times do
       break if block_given? && yield
       sleep(1)
     end
   end
-  
+
 end

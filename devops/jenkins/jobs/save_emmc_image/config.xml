@@ -321,6 +321,8 @@ echo grep sdcard folder [input]: $grep_sdcard_dir
 mkdir -p &quot;${grep_sdcard_dir}&quot;
 
 echo fetching image files from beaglebone.
+
+#sshpass -p chaipcr scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r root@$build_machine:/tmp/grep_sdcard/* &quot;${grep_sdcard_dir}&quot;
 sshpass -p chaipcr scp -oStrictHostKeyChecking=no -r root@$build_machine:/tmp/grep_sdcard/* &quot;${grep_sdcard_dir}&quot;
 sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;umount /tmp/grep_sdcard &amp;&amp; exit 0&quot;
 

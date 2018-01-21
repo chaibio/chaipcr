@@ -31,6 +31,8 @@ class ApidocsController < ActionController::Base
     Stage,
     Step,
     Ramp,
+    Device,
+    DevicesController,
     ErrorModel,
     self,
   ].freeze

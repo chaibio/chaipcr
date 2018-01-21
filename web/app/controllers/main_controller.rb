@@ -18,11 +18,38 @@
 #
 
 class MainController < ApplicationController
+  include Swagger::Blocks
 
   before_filter :ensure_authenticated_user, :only => :index
 
+  swagger_path '/' do
+    operation :get do
+      key :summary, 'Home Page'
+      key :description, 'Returns to the Home page'
+      key :produces, [
+        'application/html',
+      ]
+      response 200 do
+        key :description, 'Home Page'
+      end
+    end
+  end
+
   api :GET, "/", "Home page"
   def index
+  end
+
+  swagger_path '/welcome' do
+    operation :get do
+      key :summary, 'Signup page'
+      key :description, 'Show this page when there is no user in the database'
+      key :produces, [
+        'application/html',
+      ]
+      response 200 do
+        key :description, 'Signup Page'
+      end
+    end
   end
 
   api :GET, "/welcome", "Show this page when there is no user in the database"
@@ -31,6 +58,19 @@ class MainController < ApplicationController
       render :welcome
     else
       redirect_to login_path
+    end
+  end
+
+  swagger_path '/login' do
+    operation :get do
+      key :summary, 'Login page'
+      key :description, 'Show this page when there are users in the database and user is not logged in'
+      key :produces, [
+        'application/html',
+      ]
+      response 200 do
+        key :description, 'Login Page'
+      end
     end
   end
 
@@ -45,5 +85,6 @@ class MainController < ApplicationController
       redirect_to welcome_path
     end
   end
-  
+
 end
+
