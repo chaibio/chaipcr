@@ -9,7 +9,7 @@ const del = require('del')
 
 gulp.task('ng2:debug', (done) => {
   process.chdir('./ng2')
-  exec('ng build', (err, stdout, stderr) => {
+  exec('./node_modules/.bin/ng build --no-progress', (err, stdout, stderr) => {
     console.log(err)
     console.log(stdout)
     console.log(stderr)
@@ -20,7 +20,7 @@ gulp.task('ng2:debug', (done) => {
 
 gulp.task('ng2:deploy', (done) => {
   process.chdir('./ng2')
-  exec('ng build --target=production', (err, stdout, stderr) => {
+  exec('./node_modules/.bin/ng build --target=production --no-progress', (err, stdout, stderr) => {
     console.log(err)
     console.log(stdout)
     console.log(stderr)

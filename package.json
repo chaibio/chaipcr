@@ -7,7 +7,9 @@
     "doc": "doc",
     "test": "test"
   },
-  "dependencies": {},
+  "dependencies": {
+    "shelljs": "^0.8.1"
+  },
   "devDependencies": {
     "babel-preset-es2015": "^6.3.13",
     "del": "^2.0.2",
@@ -41,8 +43,7 @@
     "karma-ng-html2js-preprocessor": "^0.2.1",
     "karma-phantomjs-launcher": "^1.0.4",
     "karma-spec-reporter": "0.0.24",
-    "require-dir": "^0.3.0",
-    "shelljs": "^0.5.3"
+    "require-dir": "^0.3.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

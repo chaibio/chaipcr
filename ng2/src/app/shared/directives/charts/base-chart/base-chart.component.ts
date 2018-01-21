@@ -1,16 +1,18 @@
 import {
   Directive,
   ElementRef,
-  Input
+  Input,
+  OnInit,
+  OnChanges
 } from '@angular/core';
 
 import * as d3 from 'd3';
 import { WindowRef } from '../../../services/windowref/windowref.service';
 
-this.Directive({
+@Directive({
   selector: '[chai-base-chart]'
 })
-export class BaseChartDirective {
+export class BaseChartDirective implements OnChanges {
 
   protected NORMAL_PATH_STROKE_WIDTH = 2;
   protected HOVERED_PATH_STROKE_WIDTH = 3;
@@ -31,7 +33,8 @@ export class BaseChartDirective {
     bottom: 0
   };
 
-  protected elem: any;
+  protected initialized = false;
+  protected elem: HTMLDivElement;
   protected zoomTransform: any = {x: 0, y: 0, k: 1};
   protected isZooming = false;
 
@@ -75,12 +78,16 @@ export class BaseChartDirective {
   protected xAxis: any;
   protected zoomBehavior: any;
 
-  constructor(protected el: ElementRef, private wref: WindowRef) {
-    this.initChart();
+  constructor(protected el: ElementRef, protected wref: WindowRef) {
+    this.elem = el.nativeElement;
   }
 
   @Input('data') data: any;
   @Input('config') config: any;
+
+  ngOnInit() {
+    this.initChart();
+  }
 
   protected getLineCurve() {
     return d3.curveBasis;
@@ -147,7 +154,7 @@ export class BaseChartDirective {
       y = this.config.axes.y.tickFormat(y)
     if(this.config.axes.y.unit)
       y = isNaN(y) ? '' : y
-    y = "#{y}#{this.config.axes.y.unit}"
+    y = `${y}${this.config.axes.y.unit}`
     return y
   }
 
@@ -169,6 +176,7 @@ export class BaseChartDirective {
         mouse = [0,0]
       }
     }
+    return mouse;
   }
 
   protected setCaretPosition (input, caretPos) {
@@ -331,7 +339,7 @@ export class BaseChartDirective {
       .attr('y', headerHeight + 20 + boxBorderWidth)
       .text('Cq');
 
-    let ctTextDims = this.box.CqText.ndoe().getBBox();
+    let ctTextDims = this.box.CqText.node().getBBox();
 
     this.box.RFYTextLabel = this.box.container.append('text')
       .attr('font-weight', 700)
@@ -341,7 +349,7 @@ export class BaseChartDirective {
       .attr('y', headerHeight + ctTextDims.height + 20 + boxBorderWidth)
       .text(() => {
         let defaultText = 'RFU';
-        return this.config.box ? (this.config.box.label? (this.config.label.y || defaultText) : defaultText) : defaultText
+        return this.config.box ? (this.config.box.label? (this.config.box.label.y || defaultText) : defaultText) : defaultText
       })
 
     let rfyLabelDims = this.box.RFYTextLabel.node().getBBox();
@@ -360,7 +368,7 @@ export class BaseChartDirective {
       .attr('y', headerHeight + ctTextDims.height + 20 + boxBorderWidth)
       .text(() => {
         let defaultText = 'Cycle';
-        return this.config.box ? (this.config.box.label? (this.config.label.y || defaultText) : defaultText) : defaultText
+        return this.config.box ? (this.config.box.label? (this.config.box.label.y || defaultText) : defaultText) : defaultText
       })
 
     let cycleLabelDims = this.box.cycleTextLabel.node().getBBox();
@@ -1676,6 +1684,9 @@ export class BaseChartDirective {
   }
 
   protected initChart () {
+    if(!this.data || !this.config) return;
+
+    this.initialized = true;
     d3.select(this.elem).selectAll("*").remove()
 
     this.width = this.elem.parentElement.offsetWidth - this.MARGIN.left - this.MARGIN.right
@@ -1720,7 +1731,8 @@ export class BaseChartDirective {
   }
 
   protected setMouseOverlay () {
-    this.mouseOverlay = this.viewSVG.append('rect')
+    this.mouseOverlay = this.viewSVG.append('rect');
+    this.mouseOverlay
       .attr('width', this.width)
       .attr('height', this.height)
       .attr('fill', 'transparent')
@@ -1739,7 +1751,7 @@ export class BaseChartDirective {
           let mouse = this.getMousePosition(this.mouseOverlay.node())
           this.setActivePath(this.hoveredLine, mouse)
         }
-      })
+      });
   }
 
   protected getPathPositionByX(path, x) {
@@ -1810,6 +1822,7 @@ export class BaseChartDirective {
     for (let lineIndex = 0; lineIndex < this.lines.length; lineIndex++) {
       let l = this.lines[lineIndex]
       let pos = this.getPathPositionByX(this.lines[lineIndex], mouseX)
+      console.log(pos)
       let distance = Math.abs(pos.y - mouseY)
       distances.push(distance)
 
@@ -1917,6 +1930,18 @@ export class BaseChartDirective {
 
   protected resize() {
     this.initChart()
+  }
+
+  ngOnChanges(change: any) {
+    if(change.data) {
+      this.data = change.data.currentValue;
+    }
+    if(change.config) {
+      this.config = change.config.currentValue;
+    }
+    if(!this.initialized) {
+      this.initChart();
+    }
   }
 
 }

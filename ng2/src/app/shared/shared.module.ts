@@ -12,6 +12,7 @@ import { BaseHttp } from './services/base_http/base_http.service';
 import { AuthHttp } from './services/auth_http/auth_http.service';
 import { SessionService } from './services/session/session.service';
 import { WindowRef } from './services/windowref/windowref.service';
+import { AmplificationConfigService } from './services/chart-config/amplification-chart-config.service';
 
 import { LogoutDirective } from './directives/logout/logout.directive';
 import { FullHeightDirective } from './directives/full-height/full-height.directive';
@@ -19,6 +20,7 @@ import { FullWidthDirective } from './directives/full-width/full-width.directive
 import { HeaderStatusComponent } from './directives/header-status/header-status.component';
 import { HrMinSecPipe } from './pipes/hr-min-secs/hr-min-secs.pipe';
 import { BaseChartDirective } from './directives/charts/base-chart/base-chart.component'
+import { AmplificationChartDirective } from './directives/charts/amplification-chart/amplification-chart.directive'
 
 @NgModule({
   declarations: [
@@ -26,6 +28,7 @@ import { BaseChartDirective } from './directives/charts/base-chart/base-chart.co
     FullHeightDirective,
     FullWidthDirective,
     BaseChartDirective,
+    AmplificationChartDirective,
     HeaderStatusComponent,
     HrMinSecPipe
   ],
@@ -43,6 +46,8 @@ import { BaseChartDirective } from './directives/charts/base-chart/base-chart.co
     FullHeightDirective,
     FullWidthDirective,
     HeaderStatusComponent,
+    BaseChartDirective,
+    AmplificationChartDirective,
     HrMinSecPipe
   ],
   providers: [
@@ -51,6 +56,7 @@ import { BaseChartDirective } from './directives/charts/base-chart/base-chart.co
     WindowRef,
     AuthHttp,
     BaseHttp,
+    AmplificationConfigService,
     { provide: APP_BASE_HREF, useValue: '/' },
   ]
 })

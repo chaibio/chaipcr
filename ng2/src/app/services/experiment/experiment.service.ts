@@ -143,18 +143,23 @@ export class ExperimentService {
           datasets[dataset_name].push(data_by_cycle);
         }
 
-        datasets[dataset_name] = _.map(datasets[dataset_name], (d: Array<any>) => {
-          let datum = {
-            cycle_num: d[0][2]
-          };
-          for(let i=0; i < d.length; i++) {
-            datum[`well_${i}_background`] = d[i][3];
-            datum[`well_${i}_background_log`] = d[i][3] > 10? d[i][3] : 10;
-            datum[`well_${i}_baseline`] = d[i][4];
-            datum[`well_${i}_baseline_log`] = d[i][4] > 10? d[i][4] : 10;
-          }
-          return datum;
-        });
+        datasets[dataset_name] = _.chain(datasets[dataset_name])
+          .filter((d: Array<any>) => {
+            return d.length > 0;
+          })
+          .map((d: Array<any>) => {
+            let datum = {
+              cycle_num: d[0][2]
+            };
+            for(let i=0; i < d.length; i++) {
+              datum[`well_${i}_background`] = d[i][3];
+              datum[`well_${i}_background_log`] = d[i][3] > 10? d[i][3] : 10;
+              datum[`well_${i}_baseline`] = d[i][4];
+              datum[`well_${i}_baseline_log`] = d[i][4] > 10? d[i][4] : 10;
+            }
+            return datum;
+          })
+          .value();
       }
     });
     return datasets;

@@ -31,3 +31,5 @@ rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking
 rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./devops/device "$1:/root/chaipcr/deploy/"
 rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./modules "$1:/root/chaipcr/"
 rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./realtime/overlay "$1:/root/chaipcr/deploy/"
+rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./ng2/lcdapp.nginx.conf "$1:/etc/nginx/sites-enabled/"
+rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./ng2/dist "$1:/root/chaipcr/ng2"
