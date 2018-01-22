@@ -176,6 +176,7 @@ export class BaseChartDirective implements OnChanges {
         mouse = [0,0]
       }
     }
+
     return mouse;
   }
 
@@ -264,14 +265,14 @@ export class BaseChartDirective implements OnChanges {
       this.activePath = null;
       if(this.box)
         this.box.container.remove();
-      if(this.onUnselectLinceCb())
+      if(typeof this.onUnselectLinceCb === 'function')
         this.onUnselectLinceCb()
     }
   }
 
   protected drawBox(line_config) {
     if(this.box)
-      this.box.remove()
+      this.box.container.remove()
 
     let headerHeight = 25;
     let headerTextSize = 15;
@@ -385,7 +386,7 @@ export class BaseChartDirective implements OnChanges {
     let i = this.bisectX(line_config)(this.data[line_config.dataset], x0, 1)
     let d0 = this.data[line_config.dataset][i - 1]
     if(!d0) return
-    let d1 = this.data[line_config][i]
+    let d1 = this.data[line_config.dataset][i]
     if(!d1) return
     let d =  x0 - d0[line_config.x] > d1[line_config.x] - x0 ? d1 : d0
 
@@ -429,7 +430,7 @@ export class BaseChartDirective implements OnChanges {
       return yScale(d[line_config.y])
     })
 
-    this.viewSVG.append("path")
+    return this.viewSVG.append("path")
       .datum(this.data[line_config.dataset])
       .attr("class", "guiding-line")
       .attr("stroke", 'transparent')
@@ -487,14 +488,18 @@ export class BaseChartDirective implements OnChanges {
     let xScale = this.getXScale()
     let yScale = this.getYScale()
     let line = d3.line()
+
     if(this.whiteBorderLine)
       this.whiteBorderLine.remove()
+
     line.curve(this.getLineCurve())
     line.x(d => { return xScale(d[line_config.x]) } )
     line.y(d => { return yScale(d[line_config.y]) })
+
     if(this.config.axes.y.scale === 'log')
       line.defined(d => { return d[line_config.y] > 10 })
-    this.whiteBorderLine = this.viewSVG.append("path")
+
+    return this.whiteBorderLine = this.viewSVG.append("path")
       .datum(this.data[line_config.dataset])
       .attr("class", "white-border-line")
       .attr("stroke", "#fff")
@@ -1777,9 +1782,9 @@ export class BaseChartDirective implements OnChanges {
       else
         break // position found
 
-      return { x: x, y: pos.y }
     }
-
+    pos = { x: x, y: pos.y }
+    return pos;
   }
 
   protected mouseMoveCb () {
@@ -1790,7 +1795,9 @@ export class BaseChartDirective implements OnChanges {
     }
     let x = this.getMousePosition(this.mouseOverlay.node())[0]
     let pos = this.getPathPositionByX(this.guidingLines[this.activePathConfig.index], x)
-    let max_x = ((this.getMaxX() - this.getMinX()) / (this.config.axes.x.max - this.getMinX())) * this.width
+    let min_x = this.getMinX()
+    let max_x = this.config.axes.x.max || this.getMaxX()
+    max_x = ((this.getMaxX() - min_x) / (max_x - min_x)) * this.width
 
     if(x > max_x)
       this.hideMouseIndicators()
@@ -1822,7 +1829,6 @@ export class BaseChartDirective implements OnChanges {
     for (let lineIndex = 0; lineIndex < this.lines.length; lineIndex++) {
       let l = this.lines[lineIndex]
       let pos = this.getPathPositionByX(this.lines[lineIndex], mouseX)
-      console.log(pos)
       let distance = Math.abs(pos.y - mouseY)
       distances.push(distance)
 
