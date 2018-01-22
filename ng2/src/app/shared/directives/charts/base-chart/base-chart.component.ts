@@ -322,7 +322,7 @@ export class BaseChartDirective implements OnChanges {
 
     this.box.headerText.attr('y', () => {
       let textDims = this.box.headerText.node().getBBox()
-      return (headerHeight / 2 + (headerHeight - textDims.height) / 2) + boxWidth;
+      return (headerHeight / 2 + (headerHeight - textDims.height) / 2) + boxBorderWidth;
     });
 
     this.box.body = this.box.container.append('rect')
