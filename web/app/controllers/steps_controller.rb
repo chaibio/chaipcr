@@ -18,14 +18,15 @@
 #
 class StepsController < ApplicationController
   include ParamsHelper
+  include Swagger::Blocks
   before_filter :experiment_definition_editable_check
-  
+
   respond_to :json
-  
-  resource_description { 
+
+  resource_description {
     formats ['json']
   }
-  
+
   def_param_group :step do
     param :step, Hash, :desc => "Step Info", :required => true do
       param :temperature, Float, :desc => "Temperature of the step, in degree C, with precision to one decimal point", :required => false
@@ -37,7 +38,45 @@ class StepsController < ApplicationController
       param :delta_duration_s, Integer, :desc => "Delta duration, in second", :required => false
     end
   end
-  
+
+  swagger_path '/stages/{stage_id}/steps' do
+    operation :post do
+      key :summary, 'Create Step'
+      key :description, 'Create a new step in the stage'
+      key :produces, [
+        'application/json',
+      ]
+      key :tags, [
+        'Steps'
+      ]
+      parameter do
+        key :name, :stage_id
+        key :in, :path
+        key :description, 'id of the stage'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      parameter do
+        key :name, :prev_id
+        key :in, :body
+        key :required, false
+        schema do
+          key :'$ref', :CreateStepInput
+        end
+      end
+      response 200 do
+        key :description, 'Created step is returned'
+        schema do
+          key :type, :array
+          items do
+            key :'$ref', :Step
+          end
+        end
+      end
+    end
+  end
+
   api :POST, "/stages/:stage_id/steps", "Create a step"
   param_group :step
   param :prev_id, Integer, :desc => "prev step id or null if it is the first node", :required=>false
@@ -53,7 +92,46 @@ class StepsController < ApplicationController
       format.json { render "fullshow", :status => (ret)? :ok :  :unprocessable_entity}
     end
   end
-  
+
+  swagger_path '/steps/{step_id}' do
+    operation :put do
+      key :summary, 'Update Step'
+      key :description, 'Update properties of a step'
+      key :produces, [
+        'application/json',
+      ]
+      key :tags, [
+        'Steps'
+      ]
+      parameter do
+        key :name, :step_id
+        key :in, :path
+        key :description, 'id of the step'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      parameter do
+        key :name, :step
+        key :in, :body
+        key :description, 'Step to update'
+        key :required, true
+        schema do
+          key :'$ref', :StepInput
+        end
+      end
+      response 200 do
+        key :description, 'Updated step is returned'
+        schema do
+          key :type, :array
+          items do
+            key :'$ref', :Step
+          end
+        end
+      end
+    end
+  end
+
   api :PUT, "/steps/:id", "Update a step"
   param_group :step
   example "{'step':{'id':1,'name':'Step 1','temperature':'95.0','hold_time':180,'pause':false}}"
@@ -63,7 +141,46 @@ class StepsController < ApplicationController
       format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
     end
   end
-  
+
+  swagger_path '/steps/{step_id}/move' do
+    operation :post do
+      key :summary, 'Move Step'
+      key :description, 'Move a step'
+      key :produces, [
+        'application/json',
+      ]
+      key :tags, [
+        'Steps'
+      ]
+      parameter do
+        key :name, :step_id
+        key :in, :path
+        key :description, 'id of the step'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      parameter do
+        key :name, :step
+        key :in, :body
+        key :description, 'Step to move ??'
+        key :required, true
+        schema do
+           key :'$ref', :StepMoveInput
+         end
+      end
+      response 200 do
+        key :description, 'Updated step is returned'
+        schema do
+          key :type, :array
+          items do
+            key :'$ref', :Step
+          end
+        end
+      end
+    end
+  end
+
   api :POST, "/steps/:id/move", "Move a step"
   param :prev_id, Integer, :desc => "prev step id or null if it is the first node", :required=>true
   param :stage_id, Integer, :desc => "stage id or null if it is the same stage", :required=>false
@@ -83,7 +200,31 @@ class StepsController < ApplicationController
       format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
     end
   end
-  
+
+  swagger_path '/steps/{step_id}' do
+    operation :delete do
+      key :summary, 'Delete Step'
+      key :description, 'if last step in the asoociated stage is destroyed, the stage will be destroyed too if it is not the last stage in the protocol. '
+      key :produces, [
+        'application/json',
+      ]
+      key :tags, [
+        'Steps'
+      ]
+      parameter do
+        key :name, :step_id
+        key :in, :path
+        key :description, 'id of the step'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      response 200 do
+        key :description, 'Step is Deleted'
+      end
+    end
+  end
+
   api :DELETE, "/steps/:id", "Destroy a step"
   description "if last step in the asoociated stage is destroyed, the stage will be destroyed too if it is not the last stage in the protocol."
   example "{'step':{'destroyed_stage_id':1}}"
@@ -93,9 +234,9 @@ class StepsController < ApplicationController
       format.json { render "destroy", :status => (ret)? :ok : :unprocessable_entity}
     end
   end
-  
+
   protected
-  
+
   def get_experiment
     if params[:action] == "create"
       @step = Step.new((!params[:step].blank?)? step_params : {})
@@ -105,5 +246,5 @@ class StepsController < ApplicationController
     end
     @experiment = Experiment.where("experiment_definition_id=?", @step.stage.protocol.experiment_definition_id).first if !@step.nil?
   end
-  
+
 end

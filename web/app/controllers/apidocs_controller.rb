@@ -37,6 +37,9 @@ class ApidocsController < ActionController::Base
 		AmplificationDatum,
 		MeltCurveDatum,
 		TemperatureLog,
+		WellsController,
+		Well,
+		StepsController,
     self,
   ].freeze
 
