@@ -34,6 +34,9 @@ class ApidocsController < ActionController::Base
     Device,
     DevicesController,
     ErrorModel,
+		AmplificationDatum,
+		MeltCurveDatum,
+		TemperatureLog,
     self,
   ].freeze
 

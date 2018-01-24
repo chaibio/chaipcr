@@ -49,7 +49,7 @@ class DevicesController < ApplicationController
       response 200 do
         key :description, 'device response'
         schema do
-          key :type, :object
+          key :type, :array
           items do
             key :'$ref', :Device
           end
