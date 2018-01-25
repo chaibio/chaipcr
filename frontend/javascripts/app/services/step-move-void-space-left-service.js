@@ -22,6 +22,7 @@ window.ChaiBioTech.ngApp.service('StepMoveVoidSpaceLeftService', [
     function(StagePositionService) {
 
         this.verticalLineForVoidLeft = function(sI, index) {
+            console.log("Bingo");
 
             var tStep = sI.kanvas.allStageViews[index].childSteps[0];
             var place = sI.kanvas.allStageViews[index].left - 5;

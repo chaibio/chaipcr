@@ -34,7 +34,7 @@ window.ChaiBioTech.ngApp.service('StepMovementRightService', [
                 // Note , this method works in the context of stepIndicator, dont confuse with this keyword.
                 var edge = this.movement.left + this.rightOffset;
                 if(edge > points[1] && edge < points[2]) {
-                    
+                    console.log("Alright");
                     if(index !== this.currentMoveRight) {
                         moveStepToSides.moveToSide(this.kanvas.allStepViews[index], "left");
                         this.currentMoveRight = this.movedStepIndex = index;
@@ -62,6 +62,7 @@ window.ChaiBioTech.ngApp.service('StepMovementRightService', [
                     place = si.kanvas.moveDots.left + 7;
                 }
                 si.verticalLine.setLeft(place);
+                console.log("done");
                 si.verticalLine.setCoords();
             },
 
