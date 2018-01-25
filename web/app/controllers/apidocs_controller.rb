@@ -40,6 +40,7 @@ class ApidocsController < ActionController::Base
 		WellsController,
 		Well,
 		StepsController,
+		StagesController,
     self,
   ].freeze
 
