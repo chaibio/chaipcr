@@ -18,11 +18,58 @@
 #
 class MeltCurveDatum < ActiveRecord::Base
   belongs_to :experiment
+	include Swagger::Blocks
+
+	swagger_schema :MeltData do
+		property :partial do
+			key :type, :boolean
+			key :description, '?'
+		end
+		property :ramps do
+			key :description, '?'
+			key :type, :array
+			items do
+				property :ramp_id do
+					key :type, :integer
+				end
+				property :melt_curve_data do
+					key :type, :array
+					items do
+						key :type, :object
+						property :well_num do
+							key :type, :integer
+							key :description, '?'
+						end
+						property :temperature do
+							key :type, :array
+							key :description, '?'
+						end
+						property :normalized_data do
+							key :type, :array
+							key :description, '?'
+						end
+						property :derivative_data do
+							key :type, :array
+							key :description, '?'
+						end
+						property :tm do
+							key :type, :array
+							key :description, '?'
+						end
+						property :area do
+							key :type, :array
+							key :description, '?'
+						end
+					end
+				end
+			end
+		end
+	end
 
   scope :for_experiment, lambda {|experiment_id| where(["experiment_id=?", experiment_id])}
   scope :for_stage, lambda {|stage_id| where(["stage_id=?", stage_id])}
   scope :group_by_well, -> { select("experiment_id,ramp_id,channel,well_num,MAX(id) AS id,GROUP_CONCAT(temperature SEPARATOR ',') AS temperature,GROUP_CONCAT(fluorescence_value SEPARATOR ',') AS fluorescence_data").group("well_num").order("ramp_id, channel, well_num") }
-  
+
   def self.new_data_generated?(experiment, stage_id)
     lastrow = self.for_experiment(experiment.id).for_stage(stage_id).order("id DESC").select("temperature").first
     if lastrow
@@ -37,9 +84,9 @@ class MeltCurveDatum < ActiveRecord::Base
       end
     else
       return nil
-    end 
+    end
   end
-  
+
   def self.maxid(experiment_id, stage_id)
     self.for_experiment(experiment_id).for_stage(stage_id).maximum(:id)
   end

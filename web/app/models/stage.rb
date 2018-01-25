@@ -19,9 +19,9 @@
 class Stage < ActiveRecord::Base
   include ProtocolHelper
   include ProtocolOrderHelper
-  
+
   include Swagger::Blocks
-   
+
   swagger_schema :Stage do
     property :id do
       key :type, :integer
@@ -51,22 +51,92 @@ class Stage < ActiveRecord::Base
       end
     end
   end
-    
+
+	swagger_schema :CreateStageInput do
+		property :prev_id do
+			key :type, :integer
+			key :format, :int64
+			key :required, true
+			key :description, 'prev stage id or null if it is the first node'
+		end
+	end
+
+	swagger_schema :StageMoveInput do
+		key :required, [:prev_id]
+		property :prev_id do
+			key :type, :integer
+			key :format, :int64
+			key :required, true
+			key :description, 'prev stage id or null if it is the first node'
+		end
+	end
+
+	swagger_schema :StageInput do
+		key :required, [:stage]
+		property :stage do
+			key :description, 'Give a description of all the parameters'
+			property :stage_type do
+				key :type, :string
+			end
+			property :name do
+				key :type, :string
+			end
+			property :num_cycles do
+				key :type, :integer
+				key :format, :int32
+			end
+			property :auto_delta do
+				key :type, :boolean
+				key :default, false
+			end
+			property :auto_delta_start_cycle do
+				key :type, :integer
+			end
+		end
+	end
+
+	swagger_schema :StageValue do
+		property :stage do
+			key :description, 'Give a description of all the parameters'
+			property :id do
+				key :type, :integer
+				key :format, :int64
+			end
+			property :stage_type do
+				key :type, :string
+			end
+			property :name do
+				key :type, :string
+			end
+			property :num_cycles do
+				key :type, :integer
+				key :format, :int32
+			end
+			property :auto_delta do
+				key :type, :boolean
+				key :default, false
+			end
+			property :auto_delta_start_cycle do
+				key :type, :integer
+			end
+		end
+	end
+
   belongs_to :protocol
   has_many :steps, -> {order("order_number")}
   has_many :ramps, :through => :steps
-  
+
   scope :collect_data, lambda {|experiment_definition_id| joins(:steps, :protocol).joins("LEFT OUTER JOIN ramps ON ramps.next_step_id = steps.id").where(["experiment_definition_id=? AND stage_type=? AND (steps.collect_data=true OR ramps.collect_data=true)", experiment_definition_id, TYPE_CYCLE]).order("stages.order_number")}
   scope :melt_curve, lambda {|experiment_definition_id| joins(:protocol).where(["experiment_definition_id=? and stage_type=?", experiment_definition_id, TYPE_MELTCURVE])}
-  
+
   validate :validate
-  
+
   TYPE_HOLD   = "holding"
   TYPE_CYCLE  = "cycling"
   TYPE_MELTCURVE = "meltcurve"
-  
+
   ACCESSIBLE_ATTRS = [:name, :num_cycles, :stage_type, :auto_delta, :auto_delta_start_cycle]
-  
+
   before_create do |stage|
     if num_cycles.nil? && cycle_stage?
       self.num_cycles = 40
@@ -74,7 +144,7 @@ class Stage < ActiveRecord::Base
       self.num_cycles = 1
     end
   end
-  
+
   after_create do |stage|
     if steps.count == 0
       if hold_stage?
@@ -104,7 +174,7 @@ class Stage < ActiveRecord::Base
       end
     end
   end
-  
+
   before_destroy do |stage|
     if stage.destroyed?
       return false
@@ -113,14 +183,14 @@ class Stage < ActiveRecord::Base
       return false
     end
   end
-  
+
   #delete steps after stage destroy, so that step.stage will be nil
   after_destroy do |stage|
     for step in stage.steps
       step.destroy
     end
   end
-  
+
   def name
     name_attr = read_attribute(:name)
     if name_attr.nil?
@@ -135,15 +205,15 @@ class Stage < ActiveRecord::Base
       return name_attr
     end
   end
-  
+
   def hold_stage?
     stage_type == TYPE_HOLD
   end
-  
+
   def cycle_stage?
     stage_type == TYPE_CYCLE
   end
-  
+
   def meltcurve_stage?
     stage_type == TYPE_MELTCURVE
   end
@@ -155,11 +225,11 @@ class Stage < ActiveRecord::Base
     end
     new_stage
   end
-  
+
   def new_sibling?
     new_record?
   end
-  
+
   def siblings
     if protocol.nil?
       nil
@@ -169,11 +239,11 @@ class Stage < ActiveRecord::Base
       protocol.stages
     end
   end
-  
+
   def last_stage?
     !self.class.where("protocol_id = ? and order_number > ?", protocol_id, order_number).exists?
   end
-  
+
   protected
 
   def validate
@@ -184,7 +254,7 @@ class Stage < ActiveRecord::Base
         errors.add(:auto_delta_start_cycle, "Cannot be greater than the total number of cycles")
       end
     end
-    
+
     if new_record?
       if !prev_id.nil?
         step = Step.where(:stage_id=>prev_id).order(order_number: :desc).first

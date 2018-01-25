@@ -18,22 +18,61 @@
 #
 class RampsController < ApplicationController
   include ParamsHelper
+	include Swagger::Blocks
   before_filter :ensure_authenticated_user
   before_filter :experiment_definition_editable_check
-    
+
   respond_to :json
-  
-  resource_description { 
+
+  resource_description {
     formats ['json']
   }
-  
+
   def_param_group :ramp do
     param :ramp, Hash, :desc => "Ramp Info", :required => true do
       param :rate, Float, :desc => "Rate of the ramp, in degrees C/s, set to 100 for max, precision to 8 decimal point", :required => true
       param :collect_data, :bool, :desc => "Collect data, if not provided, default is false", :required => false
     end
   end
-  
+
+	swagger_path '/ramps/{id}' do
+		operation :put do
+			key :summary, 'Update Ramp'
+			key :description, 'Updates the passed ramp data for the experiment'
+			key :produces, [
+				'application/json',
+			]
+			key :tags, [
+				'experiment'
+			]
+			parameter do
+				key :name, :id
+				key :in, :path
+				key :description, 'ramp id'
+				key :required, true
+				key :type, :integer
+				key :format, :int64
+			end
+			parameter do
+				key :name, :ramp_params
+				key :in, :body
+				key :description, 'Ramp properties to update'
+				key :required, true
+				schema do
+					key :'$ref', :ramp_params
+				end
+			end
+			response 200 do
+				key :description, 'Returns an object ramp which has the list of ramp properties'
+				schema do
+					key :name, :Ramp
+					key :type, :object
+					key :'$ref', :Ramp
+				end
+			end
+		end
+	end
+
   api :PUT, "/ramps/:id", "Update a ramp"
   param_group :ramp
   example "{'ramp':{'id':1,'rate':'100.0','max':true}}"
@@ -43,12 +82,12 @@ class RampsController < ApplicationController
       format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
     end
   end
-  
+
   protected
-  
+
   def get_experiment
     @ramp = Ramp.find_by_id(params[:id])
     @experiment = Experiment.where("experiment_definition_id=?", @ramp.step.stage.protocol.experiment_definition_id).first if !@ramp.nil?
   end
-  
+
 end
