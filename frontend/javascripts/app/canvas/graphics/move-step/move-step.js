@@ -137,9 +137,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         //this.movedStepIndex = this.currentMoveLeft;
         //StepMovementRightService.movedRightAction(this);
         this.movement.left = this.movement.left - 64;
-        
         //this.manageMovingRight();
-
       };
 
       this.indicator.updateLocationOnMoveLeft = function() {
@@ -148,7 +146,11 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.movement.left = this.movement.left + 64;
         //this.manageMovingLeft();
       };
-      
+      // Simplify move step, Stop moving steps 
+      // Now make the vertical line intelligent.
+      // implement 1 px borders for vertical line, remove additional line from steps.
+      // As white box at the place change the placing of vertical line, dont move steps at all.
+
       this.indicator.onTheMove = function(movement) {
 
         this.setLeft(movement.left);

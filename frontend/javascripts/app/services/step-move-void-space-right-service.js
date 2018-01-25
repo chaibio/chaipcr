@@ -24,10 +24,12 @@ window.ChaiBioTech.ngApp.service('StepMoveVoidSpaceRightService', [
        this.verticalLineForVoidRight = function(sI, index) {
            
             if(sI.kanvas.allStageViews[index - 1]) {
+               
                 var length = sI.kanvas.allStageViews[index - 1].childSteps.length;
                 var tStep = sI.kanvas.allStageViews[index - 1].childSteps[length - 1];
-                var place = sI.kanvas.allStageViews[index - 1].left + 
-                            sI.kanvas.allStageViews[index - 1].myWidth - 5;
+                var place = tStep.left + tStep.myWidth;
+                /*sI.kanvas.allStageViews[index - 1].left + 
+                            sI.kanvas.allStageViews[index - 1].myWidth - 5;*/
             
                 if(tStep.nextIsMoving) {
                     place = sI.kanvas.moveDots.left + 7;
