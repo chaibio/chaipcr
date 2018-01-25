@@ -35,10 +35,10 @@ window.ChaiBioTech.ngApp.service('StepMoveVoidSpaceLeftService', [
             sI.verticalLine.setLeft(place);
             sI.verticalLine.setCoords();
             
-            if(sI.rightOffset !== 96) {
+            /*if(sI.rightOffset !== 96) {
                 sI.rightOffset = 96; // When we click on the last step of a stage, we change rightOffset so that,
                 // the condition in the voidSpaceCallbackLeft works, then we change it back.
-            }
+            }*/
         };
         
         var that = this;

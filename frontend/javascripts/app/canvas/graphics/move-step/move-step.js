@@ -63,7 +63,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.currentLeft = footer.left;
 
         this.backupStageModel = backupStageModel;        
-        this.rightOffset = 96;
+        this.rightOffset = 128;
         this.leftOffset = 0;
         this.kanvas = C;
         this.currentDropStage = step.parentStage;
@@ -71,16 +71,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         
         this.verticalLine.setLeft(C.moveDots.left + 7).setVisible(true).setCoords();
         C.canvas.bringToFront(this.verticalLine);
-
-        if(step.nextStep) {
-          this.setLeft(footer.left).setVisible(true);
-        } else {
-          this.lastStepInStage = true;
-          this.rightOffset = 56;
-          //this.leftOffset = -40;
-          this.setLeft(footer.left).setVisible(true);
-        }
-        
+        this.setLeft(footer.left).setVisible(true);
         this.changeText(step);
         StepPositionService.getPositionObject(this.kanvas.allStepViews);
         StagePositionService.getPositionObject();
@@ -97,7 +88,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.currentLeft = footer.left;
 
         this.backupStageModel = backupStageModel;        
-        this.rightOffset = 96;
+        this.rightOffset = 128;
         this.leftOffset = 0;
         this.kanvas = C;
         this.currentDropStage = step.parentStage;
@@ -145,7 +136,7 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.updateLocationOnMoveRight = function() {
         //this.movedStepIndex = this.currentMoveLeft;
         //StepMovementRightService.movedRightAction(this);
-        this.movement.left = this.movement.left - 40;
+        //this.movement.left = this.movement.left - 40;
         
         //this.manageMovingRight();
 
@@ -154,7 +145,7 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.updateLocationOnMoveLeft = function() {
         //this.movedStepIndex = this.currentMoveRight;
         //StepMovementLeftService.movedLeftAction(this);
-        this.movement.left = this.movement.left + 40;
+        //this.movement.left = this.movement.left + 40;
         //this.manageMovingLeft();
       };
       
@@ -180,7 +171,6 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         if(StepMovementRightService.ifOverRightSide(this) !== null) {
           StepMovementRightService.movedRightAction(this);
-          console.log("LX");
         }
 
         if(StageMovementLeftService.shouldStageMoveLeft(this) !== null) {
