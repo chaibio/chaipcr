@@ -41,6 +41,9 @@ class ApidocsController < ActionController::Base
 		Well,
 		StepsController,
 		StagesController,
+		AmplificationOptionsController,
+		AmplificationOption,
+		RampsController,
     self,
   ].freeze
 
