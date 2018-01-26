@@ -28,6 +28,8 @@ window.ChaiBioTech.ngApp.service('StepMoveVoidSpaceRightService', [
                 var length = sI.kanvas.allStageViews[index - 1].childSteps.length;
                 var tStep = sI.kanvas.allStageViews[index - 1].childSteps[length - 1];
                 var place = tStep.left + tStep.myWidth;
+
+                //console.log("fsd");
                 /*sI.kanvas.allStageViews[index - 1].left + 
                             sI.kanvas.allStageViews[index - 1].myWidth - 5;*/
             
@@ -39,6 +41,9 @@ window.ChaiBioTech.ngApp.service('StepMoveVoidSpaceRightService', [
                 sI.currentDropStage = sI.kanvas.allStageViews[index - 1]; // We need to insert the step as the last.
                 sI.verticalLine.setLeft(place);
                 sI.verticalLine.setCoords();
+
+                sI.verticalLine.borderS.setLeft(place + 14);
+                sI.verticalLine.borderS.setCoords();
             }
             
         };

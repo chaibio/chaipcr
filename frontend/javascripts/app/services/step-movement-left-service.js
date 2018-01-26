@@ -56,20 +56,27 @@ window.ChaiBioTech.ngApp.service('StepMovementLeftService', [
                 }
                 
                 this.manageVerticalLineLeft(sI);
-                this.manageBorderLeftForLeft(sI);
+                //this.manageBorderLeftForLeft(sI);
                 sI.currentMoveRight = null; // Resetting
             },
 
             manageVerticalLineLeft: function(sI) {
                 
                 var index = sI.movedStepIndex;
-                var place = (sI.kanvas.allStepViews[index].left - 12);
+                var place;
+                place = (sI.kanvas.allStepViews[index].left - 14);
                 
                 if(sI.kanvas.allStepViews[index].previousIsMoving === true) {
+                    
                     place = sI.kanvas.moveDots.left + 7;
                 }        
+                
                 sI.verticalLine.setLeft(place);
                 sI.verticalLine.setCoords();
+
+                sI.verticalLine.borderS.setLeft(place);
+                sI.verticalLine.borderS.setCoords();
+                //si.kanvas.canvas.bringToFront(sI.verticalLine.border);
             },
 
             manageBorderLeftForLeft: function(sI) {

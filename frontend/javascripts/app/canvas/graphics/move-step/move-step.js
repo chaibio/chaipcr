@@ -34,9 +34,10 @@ angular.module("canvasApp").factory('moveStepRect', [
   'StepMoveVoidSpaceLeftService',
   'addStageService',
   'stageHeaderLineExtender',
+  'verticalLineBorder',
   function(ExperimentLoader, previouslySelected, circleManager, StepPositionService, moveStepIndicator, verticalLineStepGroup, StagePositionService,
   movingStepGraphics, StepMovementRightService, StepMovementLeftService, StageMovementRightService, StageMovementLeftService,
-  StepMoveVoidSpaceRightService, StepMoveVoidSpaceLeftService, addStageService, stageHeaderLineExtender) {
+  StepMoveVoidSpaceRightService, StepMoveVoidSpaceLeftService, addStageService, stageHeaderLineExtender, verticalLineBorder) {
 
     return {
 
@@ -44,6 +45,7 @@ angular.module("canvasApp").factory('moveStepRect', [
        
       this.indicator = new moveStepIndicator(me);
       this.indicator.verticalLine = new verticalLineStepGroup();
+      this.indicator.verticalLine.borderS = new verticalLineBorder();
       this.indicator.headerExtender = new stageHeaderLineExtender(20);
 
       this.indicator.init = function(step, footer, C, backupStageModel) {
@@ -63,13 +65,17 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.currentLeft = footer.left;
 
         this.backupStageModel = backupStageModel;        
-        this.rightOffset = 128;
+        this.rightOffset = (step.nextStep) ? 128 : 64;
         this.leftOffset = 0;
         this.kanvas = C;
         this.currentDropStage = step.parentStage;
         this.currentDrop = (step.previousStep) ? step.previousStep : "NOTHING";
         
         this.verticalLine.setLeft(C.moveDots.left + 7).setVisible(true).setCoords();
+        this.verticalLine.borderS.setLeft(C.moveDots.left + 7).setVisible(true).setCoords();
+       
+        C.canvas.bringToFront(this.verticalLine.borderS);
+        C.canvas.bringToFront(this);
         C.canvas.bringToFront(this.verticalLine);
         this.setLeft(footer.left).setVisible(true);
         this.changeText(step);
@@ -79,6 +85,9 @@ angular.module("canvasApp").factory('moveStepRect', [
       };
 
       this.indicator.initForOneStepStage = function(step, footer, C, backupStageModel) {
+        // Update this part so that, new implementation works for one step stage scenarion.
+        // Remember, now borderS is not visible, enable it.
+        // change rightOffset part.
         
         step.parentStage.stageHeader();
         
@@ -146,11 +155,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.movement.left = this.movement.left + 64;
         //this.manageMovingLeft();
       };
-      // Simplify move step, Stop moving steps 
-      // Now make the vertical line intelligent.
-      // implement 1 px borders for vertical line, remove additional line from steps.
-      // As white box at the place change the placing of vertical line, dont move steps at all.
-
+      
       this.indicator.onTheMove = function(movement) {
 
         this.setLeft(movement.left);
@@ -171,18 +176,18 @@ angular.module("canvasApp").factory('moveStepRect', [
       // Manage the movement of the indicator right side.
       this.indicator.manageMovingRight = function() {
 
+        StepMoveVoidSpaceLeftService.checkVoidSpaceLeft(this);
         if(StageMovementLeftService.shouldStageMoveLeft(this) !== null) {
+          
           this.increaseHeaderLengthLeft(this.movedLeftStageIndex);
           this.movedRightStageIndex = null; // Resetting
-          this.hideFirstStepBorderLeft();
+          //this.hideFirstStepBorderLeft();
         }
 
         if(StepMovementRightService.ifOverRightSide(this) !== null) {
           StepMovementRightService.movedRightAction(this);
         }
-
-        
-        StepMoveVoidSpaceLeftService.checkVoidSpaceLeft(this);
+       
       };
 
       // Manage the movement of the indicator left side.
@@ -196,8 +201,7 @@ angular.module("canvasApp").factory('moveStepRect', [
           
           this.increaseHeaderLengthRight(this.movedRightStageIndex);
           this.movedLeftStageIndex = null; // Resetting
-          this.hideFirstStepBorderLeft();
-          
+          //this.hideFirstStepBorderLeft();
         }
         StepMoveVoidSpaceRightService.checkVoidSpaceRight(this);
       };
@@ -259,6 +263,7 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.processMovement = function(step, C) {
         
         this.verticalLine.setVisible(false);
+        this.verticalLine.borderS.setVisible(false);
         this.headerExtender.setVisible(false);
         if(this.manageSingleStepStage(step) === true) {
           return true;

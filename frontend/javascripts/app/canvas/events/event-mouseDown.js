@@ -226,7 +226,7 @@ angular.module("canvasApp").factory('mouseDown', [
           ParentKanvas.canvas.bringToFront(ParentKanvas.moveDots);
           circleManager.togglePaths(false); //put it back later
           
-          ParentKanvas.canvas.bringToFront(ParentKanvas.stepIndicator);
+          //ParentKanvas.canvas.bringToFront(ParentKanvas.stepIndicator);
           ParentKanvas.stepIndicator.init(step, evt.target, ParentKanvas, backupStageModel);
           ParentKanvas.canvas.renderAll();
         }

@@ -12,16 +12,15 @@ window.ChaiBioTech.ngApp.service('moveStageToSidesWhileMoveStep', [
         };
 
         this.moveStageToRight = function(stage) {
-            
+        
             while(stage) {
                 if(stage.stageMovedDirection !== 'right') {
-
-                    if(stage.partialMove) {
-                        moveStageToSides.moveToSideStageComponents(24, stage);
-                        stage.partialMove = false;
-                    } else {
-                        moveStageToSides.moveToSideStageComponents(30, stage);
-                    }
+                //if(stage.partialMove) {
+                    //  moveStageToSides.moveToSideStageComponents(24, stage);
+                    // stage.partialMove = false;
+                //} else {
+                    moveStageToSides.moveToSideStageComponents(30, stage);
+                //}
                     stage.stageMovedDirection = "right";
                 } else if(stage.stageMovedDirection === "right") {
                     break;
@@ -51,11 +50,14 @@ window.ChaiBioTech.ngApp.service('moveStageToSidesWhileMoveStep', [
         this.moveStageToLeftSpecialCase = function(stage) {
 
             while(stage) {
-                if(stage.stageMovedDirection === "right") {
-                    moveStageToSides.moveToSideStageComponents(-24, stage);
-                    stage.stageMovedDirection = "left";
-                    stage.partialMove = true;
+                if(stage.previousStage && stage.previousStage.stageMovedDirection === "left") {
+                    if(stage.stageMovedDirection === "right") {
+                        moveStageToSides.moveToSideStageComponents(-30, stage);
+                        stage.stageMovedDirection = "left";
+                        //stage.partialMove = true;
+                    }
                 }
+                
                 stage = stage.nextStage;
             }
         };

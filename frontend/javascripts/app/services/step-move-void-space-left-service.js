@@ -24,7 +24,7 @@ window.ChaiBioTech.ngApp.service('StepMoveVoidSpaceLeftService', [
         this.verticalLineForVoidLeft = function(sI, index) {
             
             var tStep = sI.kanvas.allStageViews[index].childSteps[0];
-            var place = sI.kanvas.allStageViews[index].left - 5;
+            var place = sI.kanvas.allStageViews[index].left - 14;
             
             if(tStep.previousIsMoving) {
                 place = sI.kanvas.moveDots.left + 7;
@@ -34,6 +34,13 @@ window.ChaiBioTech.ngApp.service('StepMoveVoidSpaceLeftService', [
             sI.currentDropStage = sI.kanvas.allStageViews[index]; // We need to insert the step as the first.
             sI.verticalLine.setLeft(place);
             sI.verticalLine.setCoords();
+
+            sI.verticalLine.borderS.setLeft(place);
+            sI.verticalLine.borderS.setCoords();
+
+            if(sI.rightOffset === 64) {
+                sI.rightOffset = 128;
+            }
             
         };
         
