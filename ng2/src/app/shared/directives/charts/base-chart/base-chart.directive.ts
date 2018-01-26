@@ -521,7 +521,7 @@ export class BaseChartDirective implements OnChanges {
 
     this.lines = this.lines || []
     for (let i = 0; i < this.lines.length; i ++) {
-      let l = this.guidingLines[i];
+      let l = this.lines[i];
       l.remove();
     }
     this.lines = []
@@ -599,13 +599,12 @@ export class BaseChartDirective implements OnChanges {
 
   protected zoomed() {
 
-    if(d3.event) return
+    if(!d3.event) return
     if(!d3.event.sourceEvent)
       d3.event.sourceEvent = {};
 
     if(d3.event.sourceEvent.srcElement === this.xAxisLeftExtremeValue.input.node())
       this.onClickLeftXAxisInput()
-
     if(d3.event.sourceEvent.srcElement === this.xAxisRightExtremeValue.input.node())
       this.onClickRightXAxisInput()
     if(d3.event.sourceEvent.srcElement === this.yAxisUpperExtremeValue.input.node())
@@ -715,7 +714,7 @@ export class BaseChartDirective implements OnChanges {
     return ticks
   }
 
-  setYAxis() {
+  protected setYAxis() {
     this.chartSVG.selectAll('g.axis.y-axis').remove()
     this.chartSVG.selectAll('.g-y-axis-text').remove()
     let svg = this.chartSVG.select('.chart-g')
@@ -756,7 +755,7 @@ export class BaseChartDirective implements OnChanges {
       .attr("x", 0 - (this.height / 2))
       .attr("dy", "1em")
       .attr("font-family", "dinot-bold")
-      .attr("font-size", "#{this.AXIS_LABEL_FONT_SIZE}px")
+      .attr("font-size", `${this.AXIS_LABEL_FONT_SIZE}px`)
       .attr("fill", "#333")
       .style("text-anchor", "middle")
       .text(this.config.axes.y.label)
@@ -810,7 +809,7 @@ export class BaseChartDirective implements OnChanges {
         (this.height + this.MARGIN.top + this.MARGIN.bottom - 20) + ")")
       .style("text-anchor", "middle")
       .attr("font-family", "dinot-bold")
-      .attr("font-size", "#{this.AXIS_LABEL_FONT_SIZE}px")
+      .attr("font-size", `${this.AXIS_LABEL_FONT_SIZE}px`)
       .attr("fill", "#333")
       .text(this.config.axes.x.label)
   }
@@ -980,7 +979,7 @@ export class BaseChartDirective implements OnChanges {
       .attr('fill', '#000')
       .attr('y', this.height + this.MARGIN.top + offsetTop)
       .attr('dy', '0.71em')
-      .attr('font-size', "#{this.AXES_TICKS_FONT_SIZE}px")
+      .attr('font-size', `${this.AXES_TICKS_FONT_SIZE}px`)
       .attr('font-family', 'dinot-regular')
       .on('click', () => {
         this.onClickLeftXAxisInput()
@@ -1010,7 +1009,7 @@ export class BaseChartDirective implements OnChanges {
       .style('padding', 0)
       .style('margin', 0)
       .style('text-align', 'center')
-      .style('font-size', "#{this.AXES_TICKS_FONT_SIZE}px")
+      .style('font-size', `${this.AXES_TICKS_FONT_SIZE}px`)
       .style('font-family', 'dinot-regular')
       .attr('type', 'text')
       .on('mouseenter', () => {
@@ -1249,7 +1248,7 @@ export class BaseChartDirective implements OnChanges {
       .attr('fill', '#000')
       .attr('y', this.height + this.MARGIN.top + offsetTop)
       .attr('dy', '0.71em')
-      .attr('font-size', "#{this.AXES_TICKS_FONT_SIZE}px")
+      .attr('font-size', `${this.AXES_TICKS_FONT_SIZE}px`)
       .attr('font-family', 'dinot-regular')
       .text(this.getMaxX())
       .on('click', () => {
@@ -1278,7 +1277,7 @@ export class BaseChartDirective implements OnChanges {
       .style('padding', '0px')
       .style('margin', '0px')
       .style('text-align', 'center')
-      .style('font-size', "#{this.AXES_TICKS_FONT_SIZE}px")
+      .style('font-size', `${this.AXES_TICKS_FONT_SIZE}px`)
       .style('font-family', 'dinot-regular')
       .attr('type', 'text')
       .on('mouseenter', () => {
@@ -1373,7 +1372,7 @@ export class BaseChartDirective implements OnChanges {
       .attr('x', this.MARGIN.left - (offsetRight + conWidth))
       .attr('y', this.MARGIN.top - underlineStroke * 2)
       .attr('dy', '0.71em')
-      .attr('font-size', "#{this.AXES_TICKS_FONT_SIZE}px")
+      .attr('font-size', `${this.AXES_TICKS_FONT_SIZE}px`)
       .attr('font-family', 'dinot-regular')
       .text(this.getMaxY())
       .on('click', () => {
@@ -1405,7 +1404,7 @@ export class BaseChartDirective implements OnChanges {
       .style('margin', '0px')
       .style('margin-top', '-1px')
       .style('text-align', 'center')
-      .style('font-size', "#{this.AXES_TICKS_FONT_SIZE}px")
+      .style('font-size', `${this.AXES_TICKS_FONT_SIZE}px`)
       .style('font-family', 'dinot-regular')
       .attr('type', 'text')
       .on('mouseenter', () => {
@@ -1503,7 +1502,7 @@ export class BaseChartDirective implements OnChanges {
       .attr('x', this.MARGIN.left - (offsetRight + conWidth))
       .attr('y', this.height + this.MARGIN.top - underlineStroke * 2)
       .attr('dy', '0.71em')
-      .attr('font-size', "#{this.AXES_TICKS_FONT_SIZE}px")
+      .attr('font-size', `${this.AXES_TICKS_FONT_SIZE}px`)
       .attr('font-family', 'dinot-regular')
       .text(this.getMaxY())
       .on('click', () => {
@@ -1534,7 +1533,7 @@ export class BaseChartDirective implements OnChanges {
       .style('margin', 0)
       .style('margin-top', '-1px')
       .style('text-align', 'center')
-      .style('font-size', "#{this.AXES_TICKS_FONT_SIZE}px")
+      .style('font-size', `${this.AXES_TICKS_FONT_SIZE}px`)
       .style('font-family', 'dinot-regular')
       .attr('type', 'text')
       .on('mouseenter', () => {
