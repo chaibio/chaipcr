@@ -26,7 +26,7 @@ angular.module("canvasApp").factory('verticalLineBorder', [
            originX: 'left', originY: 'top', visible: false
          };
 
-       var cordinates = [5, 70, 5, 388];
+       var cordinates = [5, 68, 5, 390];
        
        return Line.create(cordinates, properties);
      };
