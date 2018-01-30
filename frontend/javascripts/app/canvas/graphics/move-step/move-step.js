@@ -88,7 +88,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         // Update this part so that, new implementation works for one step stage scenarion.
         // Remember, now borderS is not visible, enable it.
         // change rightOffset part.
-        
+
         step.parentStage.stageHeader();
         
         this.movement = this.movedStepIndex = this.currentMoveRight = this.currentMoveLeft =
@@ -103,8 +103,13 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.currentDropStage = step.parentStage;
         this.currentDrop = (step.previousStep) ? step.previousStep : "NOTHING";
         
-        this.verticalLine.setLeft(footer.left).setVisible(true).setCoords();
+        this.verticalLine.setLeft(footer.left - 20).setVisible(true).setCoords();
+        this.verticalLine.borderS.setLeft(footer.left - 7).setVisible(true).setCoords();
+
+        C.canvas.bringToFront(this.verticalLine.borderS);
+        C.canvas.bringToFront(this);
         C.canvas.bringToFront(this.verticalLine);
+        
         this.setLeft(footer.left).setVisible(true);
         
         StepPositionService.getPositionObject(this.kanvas.allStepViews);
