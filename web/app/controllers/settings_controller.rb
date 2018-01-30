@@ -43,9 +43,7 @@ class SettingsController < ApplicationController
         key :description, 'settings response'
         schema do
           key :type, :object
-          items do
-            key :'$ref', :Settings
-          end
+          key :'$ref', :Settings
         end
       end
     end

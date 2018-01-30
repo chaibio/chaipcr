@@ -117,7 +117,7 @@ class StepsController < ApplicationController
         key :description, 'Step to update'
         key :required, true
         schema do
-          key :'$ref', :StepInput
+          key :'$ref', :StepProperties
         end
       end
       response 200 do
@@ -125,7 +125,7 @@ class StepsController < ApplicationController
         schema do
           key :type, :array
           items do
-            key :'$ref', :Step
+            key :'$ref', :StepProperties
           end
         end
       end

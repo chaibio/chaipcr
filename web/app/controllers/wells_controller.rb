@@ -36,13 +36,13 @@ class WellsController < ApplicationController
 
 	swagger_path '/experiments/{id}/wells' do
 		operation :get do
-			key :summary, 'List of Wells'
+			key :summary, 'List all Wells'
 			key :description, 'Returns all wells of the experiment'
 			key :produces, [
 				'application/json',
 			]
 			key :tags, [
-				'Wells'
+				'Experiment'
 			]
 			parameter do
 				key :name, :id
@@ -75,13 +75,13 @@ class WellsController < ApplicationController
 
 	swagger_path '/experiments/{id}/wells' do
 		operation :put do
-			key :summary, 'Update Wells'
+			key :summary, 'Update Multiple Wells'
 			key :description, 'Update multiple wells at the same time for the specified experiment '
 			key :produces, [
 				'application/json',
 			]
 			key :tags, [
-				'Wells'
+				'Experiment'
 			]
 			parameter do
 				key :name, :id
@@ -95,10 +95,10 @@ class WellsController < ApplicationController
 				key :name, :wells
 				key :in, :body
 				key :type, :array
-				key :description, 'wells to update'
+				key :description, 'Array of wells to update'
 				key :required, true
 				schema do
-					 key :'$ref', :WellsInput
+					 key :'$ref', :Well
 				 end
 			end
 			response 200 do
@@ -136,7 +136,7 @@ class WellsController < ApplicationController
 				'application/json',
 			]
 			key :tags, [
-				'Wells'
+				'Experiment'
 			]
 			parameter do
 				key :name, :id
@@ -160,7 +160,7 @@ class WellsController < ApplicationController
 				key :description, 'well to update'
 				key :required, true
 				schema do
-					 key :'$ref', :Well_Input
+					 key :'$ref', :Well
 				 end
 			end
 			response 200 do
@@ -190,7 +190,7 @@ class WellsController < ApplicationController
 				'application/json',
 			]
 			key :tags, [
-				'Wells'
+				'Experiment'
 			]
 			parameter do
 				key :name, :id

@@ -59,6 +59,9 @@ class Stage < ActiveRecord::Base
 			key :required, true
 			key :description, 'prev stage id or null if it is the first node'
 		end
+		property :stage do
+			key :'$ref', :Stage
+		end
 	end
 
 	swagger_schema :StageMoveInput do
@@ -70,7 +73,7 @@ class Stage < ActiveRecord::Base
 			key :description, 'prev stage id or null if it is the first node'
 		end
 	end
-
+=begin
 	swagger_schema :StageInput do
 		key :required, [:stage]
 		property :stage do
@@ -94,6 +97,7 @@ class Stage < ActiveRecord::Base
 			end
 		end
 	end
+=end
 
 	swagger_schema :StageValue do
 		property :stage do

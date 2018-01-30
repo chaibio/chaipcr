@@ -21,28 +21,30 @@ class Well < ActiveRecord::Base
   belongs_to :experiment
 
 	swagger_schema :Well do
-		property :well_num do
-			key :type, :integer
-			key :format, :int64
-		end
-		property :well_type do
-			key :type, :string
-		end
-		property :sample_name do
-			key :type, :string
-		end
-		property :notes do
-			key :type, :string
-		end
-		property :targets do
-			key :type, :array
-			items do
+		property :well do
+			property :well_num do
+				key :type, :integer
+				key :format, :int64
+			end
+			property :well_type do
 				key :type, :string
+			end
+			property :sample_name do
 				key :type, :string
+			end
+			property :notes do
+				key :type, :string
+			end
+			property :targets do
+				key :type, :array
+				items do
+					key :type, :string
+					key :type, :string
+				end
 			end
 		end
 	end
-
+=begin
 	swagger_schema :WellsInput do
 		allOf do
 			schema do
@@ -69,7 +71,7 @@ class Well < ActiveRecord::Base
 			end
 		end
 	end
-
+=end
 
 
   scope :well, lambda {|experiment_id, well_num| where("experiment_id=? and well_num=?", experiment_id, well_num)}

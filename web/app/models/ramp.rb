@@ -41,7 +41,7 @@ class Ramp < ActiveRecord::Base
     end
   end
 
-	swagger_schema :ramp_params do
+	swagger_schema :Ramp_params do
 		key :required, [:ramp]
 		property :ramp do
 			key :description, 'Give a description of all the parameters'

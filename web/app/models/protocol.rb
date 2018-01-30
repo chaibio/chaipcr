@@ -18,7 +18,7 @@
 #
 class Protocol < ActiveRecord::Base
   include Swagger::Blocks
-   
+
   swagger_schema :Protocol do
     property :id do
       key :type, :integer
@@ -40,19 +40,32 @@ class Protocol < ActiveRecord::Base
       end
     end
   end
-  
+
+	swagger_schema :Protocol_params do
+		key :required, [:protocol]
+		property :protocol do
+			key :description, 'Give a description of all the parameters'
+			property :lid_temperature do
+				key :type, :number
+				key :format, :float
+				key :description, 'lid temperature, in degree C, default is 110, with precision to one decimal point'
+				key :default, 110
+			end
+		end
+	end
+
   belongs_to :experiment_definition
   has_many :stages, -> {order("order_number").includes(:steps, :ramps)}
-  
+
   ACCESSIBLE_ATTRS = [:lid_temperature]
-  
+
   #delete stages after protocol destroy, so that stage.protocol will be nil
   after_destroy do |protocol|
     for stage in protocol.stages
       stage.destroy
     end
   end
-  
+
   def copy
     new_protocol = Protocol.new(:lid_temperature=>lid_temperature)
     stages.each do |stage|
@@ -60,13 +73,13 @@ class Protocol < ActiveRecord::Base
     end
     new_protocol
   end
-  
+
   def estimate_duration
     stage = stages.first
     duration = 0
     prev_target_temp = 20
     stages.each do |stage|
-      for i in 1..stage.num_cycles 
+      for i in 1..stage.num_cycles
         stage.steps.each do |step|
           temperature = step.temperature
           if stage.auto_delta && i > stage.auto_delta_start_cycle

@@ -60,6 +60,7 @@ class StagesController < ApplicationController
 				key :name, :prev_id
 				key :in, :body
 				key :required, false
+				key :description, 'properties of the stage'
 				schema do
 					key :'$ref', :CreateStageInput
 				end
@@ -67,10 +68,7 @@ class StagesController < ApplicationController
 			response 200 do
 				key :description, 'Created stage is returned'
 				schema do
-					key :type, :array
-					items do
-						key :'$ref', :Stage
-					end
+					key :'$ref', :Stage
 				end
 			end
 		end
@@ -112,16 +110,13 @@ class StagesController < ApplicationController
 				key :description, 'Stage to update'
 				key :required, true
 				schema do
-					key :'$ref', :StageInput
+					key :'$ref', :StageValue
 				end
 			end
 			response 200 do
 				key :description, 'Updated stage is returned'
 				schema do
-					key :type, :array
-					items do
-						key :'$ref', :StageValue
-					end
+					key :'$ref', :StageValue
 				end
 			end
 		end
@@ -156,9 +151,9 @@ class StagesController < ApplicationController
 				key :format, :int64
 			end
 			parameter do
-				key :name, :step
+				key :name, :prev_id
 				key :in, :body
-				key :description, 'Stage to move ??'
+				key :description, 'Previous stage id'
 				key :required, true
 				schema do
 					 key :'$ref', :StageMoveInput

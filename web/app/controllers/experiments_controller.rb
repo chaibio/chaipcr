@@ -56,20 +56,20 @@ class ExperimentsController < ApplicationController
 
   swagger_path '/experiments' do
     operation :get do
-      key :summary, 'List of experiments'
-      key :description, 'Returns all experiments from the system sorted by the time it is created'
+      key :summary, 'List all Experiments'
+      key :description, 'Returns all experiments from the system sorted by the id'
       key :produces, [
         'application/json',
       ]
 			key :tags, [
-				'experiment'
+				'Experiment'
 			]
       response 200 do
         key :description, 'experiments response'
         schema do
           key :type, :array
           items do
-            key :'$ref', :Experiment
+            key :'$ref', :Experiments
           end
         end
       end
@@ -82,7 +82,7 @@ class ExperimentsController < ApplicationController
         'application/json'
       ]
 			key :tags, [
-				'experiment'
+				'Experiment'
 			]
       parameter do
         key :name, :experiment
@@ -101,9 +101,6 @@ class ExperimentsController < ApplicationController
       end
       response 422 do
         key :description, 'experiment create error'
-        schema do
-          key :'$ref', :Experiment
-        end
       end
     end
   end
@@ -138,13 +135,13 @@ class ExperimentsController < ApplicationController
 
 	swagger_path '/experiments/{id}' do
 		operation :put do
-			key :summary, 'Update'
-			key :description, 'Updates an experiment'
+			key :summary, 'Update Experiment'
+			key :description, 'Updates experiment'
 			key :produces, [
 				'application/json'
 			]
 			key :tags, [
-				'experiment'
+				'Experiment'
 			]
 			parameter do
 				key :name, :id
@@ -200,7 +197,7 @@ class ExperimentsController < ApplicationController
 				'application/json'
 			]
 			key :tags, [
-				'experiment'
+				'Experiment'
 			]
 			parameter do
 				key :name, :id
@@ -240,13 +237,13 @@ class ExperimentsController < ApplicationController
 
 	swagger_path '/experiments/{id}' do
 		operation :get do
-			key :summary, 'Show an experiment by id'
+			key :summary, 'Show Experiment'
 			key :description, 'Returns a single experiment based on the id'
 			key :produces, [
 				'application/json',
 			]
 			key :tags, [
-				'experiment'
+				'Experiment'
 			]
 			parameter do
 				key :name, :id
@@ -282,13 +279,13 @@ class ExperimentsController < ApplicationController
 
 	swagger_path '/experiments/{id}' do
 		operation :delete do
-			key :summary, 'Delete an experiment by id'
+			key :summary, 'Delete Experiment'
 			key :description, 'Deletes the experiment from the database based on id'
 			key :produces, [
 				'application/json',
 			]
 			key :tags, [
-				'experiment'
+				'Experiment'
 			]
 			parameter do
 				key :name, :id
@@ -326,7 +323,7 @@ class ExperimentsController < ApplicationController
 				'application/json',
 			]
 			key :tags, [
-				'experiment'
+				'Experiment'
 			]
 			parameter do
 				key :name, :id
@@ -397,7 +394,7 @@ class ExperimentsController < ApplicationController
 				'application/json',
 			]
 			key :tags, [
-				'experiment'
+				'Experiment'
 			]
 			parameter do
 				key :name, :id
@@ -610,7 +607,7 @@ class ExperimentsController < ApplicationController
 				'application/json',
 			]
 			key :tags, [
-				'experiment'
+				'Experiment'
 			]
 			parameter do
 				key :name, :id
@@ -828,15 +825,15 @@ class ExperimentsController < ApplicationController
     end
   end
 
-	swagger_path '/experiments/:id/export' do
+	swagger_path '/experiments/{id}/export' do
 		operation :get do
-			key :summary, 'zip temperature, amplification and meltcurv csv files'
+			key :summary, 'Export Experiment'
 			key :description, 'Downloads a zip file which has csv files for temperature, amplification and meltcurve data'
 			key :produces, [
 				'application/zip',
 			]
 			key :tags, [
-				'experiment'
+				'Experiment'
 			]
 			parameter do
 				key :name, :id
