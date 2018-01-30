@@ -44,6 +44,9 @@ class UsersController < ApplicationController
       key :produces, [
         'application/json',
       ]
+			key :tags, [
+				'User'
+			]
       response 200 do
         key :description, 'User response'
         schema do
@@ -72,6 +75,9 @@ class UsersController < ApplicationController
       key :produces, [
         'application/json',
       ]
+			key :tags, [
+				'User'
+			]
       response 200 do
         key :description, 'Current user response'
         schema do
@@ -103,6 +109,9 @@ class UsersController < ApplicationController
       key :produces, [
         'application/json',
       ]
+			key :tags, [
+				'User'
+			]
       parameter do
         key :name, :user
         key :in, :body
@@ -143,6 +152,9 @@ class UsersController < ApplicationController
       key :produces, [
         'application/json',
       ]
+			key :tags, [
+				'User'
+			]
       parameter do
         key :name, :id
         key :in, :path
@@ -178,6 +190,9 @@ class UsersController < ApplicationController
       key :produces, [
         'application/json',
       ]
+			key :tags, [
+				'User'
+			]
       parameter do
         key :name, :id
         key :in, :path

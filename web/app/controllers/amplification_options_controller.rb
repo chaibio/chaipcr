@@ -51,7 +51,7 @@ class AmplificationOptionsController < ApplicationController
 				'application/json',
 			]
 			key :tags, [
-				'experiment'
+				'Experiment'
 			]
 			parameter do
 				key :name, :id
@@ -66,7 +66,7 @@ class AmplificationOptionsController < ApplicationController
 				schema do
 					key :name, :amplification_option
 					key :type, :object
-					key :'$ref', :amplification_option
+					key :'$ref', :Amplification_option
 				end
 			end
 		end
@@ -90,7 +90,7 @@ class AmplificationOptionsController < ApplicationController
 				'application/json',
 			]
 			key :tags, [
-				'experiment'
+				'Experiment'
 			]
 			parameter do
 				key :name, :id
@@ -106,7 +106,7 @@ class AmplificationOptionsController < ApplicationController
 				key :description, 'Amplification options to update'
 				key :required, true
 				schema do
-					key :'$ref', :amplification_option_params
+					key :'$ref', :Amplification_option
 				end
 			end
 			response 200 do
@@ -114,7 +114,7 @@ class AmplificationOptionsController < ApplicationController
 				schema do
 					key :name, :amplification_option
 					key :type, :object
-					key :'$ref', :amplification_option
+					key :'$ref', :Amplification_option
 				end
 			end
 		end

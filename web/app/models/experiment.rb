@@ -18,7 +18,43 @@
 #
 class Experiment < ActiveRecord::Base
   include Swagger::Blocks
-   
+
+	swagger_schema :Experiments do
+		property :experiment do
+			property :id do
+	      key :type, :integer
+	      key :format, :int64
+	    end
+	    property :name do
+	      key :type, :string
+	    end
+	    property :type do
+	      key :type, :string
+	    end
+	    property :time_valid do
+	      key :type, :boolean
+	    end
+	    property :created_at do
+	      key :type, :string
+	      key :format, :date
+	    end
+	    property :started_at do
+	      key :type, :string
+	      key :format, :date
+	    end
+	    property :completed_at do
+	      key :type, :string
+	      key :format, :date
+	    end
+	    property :completion_status do
+	      key :type, :string
+	    end
+	    property :completion_message do
+	      key :type, :string
+	    end
+		end
+	end
+
   swagger_schema :Experiment do
     key :required, [:id, :name]
     property :id do
@@ -37,18 +73,18 @@ class Experiment < ActiveRecord::Base
     property :created_at do
       key :type, :string
       key :format, :date
-    end 
+    end
     property :started_at do
       key :type, :string
       key :format, :date
-    end 
+    end
     property :completed_at do
       key :type, :string
       key :format, :date
     end
     property :completion_status do
       key :type, :string
-    end 
+    end
     property :completion_message do
       key :type, :string
     end
@@ -63,7 +99,7 @@ class Experiment < ActiveRecord::Base
       end
     end
   end
-  
+
   swagger_schema :ExperimentInput do
     allOf do
       schema do
@@ -77,11 +113,11 @@ class Experiment < ActiveRecord::Base
       end
     end
   end
-  
+
   validates :name, presence: true
-  
+
   belongs_to :experiment_definition
-  
+
   has_many :fluorescence_data
   has_many :temperature_logs, -> {order("elapsed_time")} do
     def with_range(starttime, endtime, resolution)
@@ -104,25 +140,25 @@ class Experiment < ActiveRecord::Base
       outputs
     end
   end
-  
+
 #  validates :time_valid, inclusion: {in: [true, false]}
-  
+
   before_create do |experiment|
     experiment.time_valid = (Setting.time_valid)? 1 : 0
   end
-  
+
   before_destroy do |experiment|
     if experiment.running?
       errors.add(:base, "cannot delete experiment in the middle of running")
       return false;
     end
   end
-  
+
   after_destroy do |experiment|
     if experiment_definition.experiment_type ==  ExperimentDefinition::TYPE_USER_DEFINED
       experiment_definition.destroy
     end
-    
+
     TemperatureLog.delete_all(:experiment_id => experiment.id)
     TemperatureDebugLog.delete_all(:experiment_id => experiment.id)
     FluorescenceDatum.delete_all(:experiment_id => experiment.id)
@@ -133,11 +169,11 @@ class Experiment < ActiveRecord::Base
     CachedMeltCurveDatum.delete_all(:experiment_id => experiment.id)
     Well.delete_all(:experiment_id => experiment.id)
   end
-  
+
   def protocol
     experiment_definition.protocol
   end
-  
+
   def editable?
     return started_at.nil? && experiment_definition.editable?
   end
@@ -145,30 +181,30 @@ class Experiment < ActiveRecord::Base
   def ran?
     return !started_at.nil?
   end
-  
+
   def running?
     return !started_at.nil? && completed_at.nil?
   end
-  
+
   def diagnostic?
     experiment_definition.experiment_type == ExperimentDefinition::TYPE_DIAGNOSTIC
   end
-  
+
   def diagnostic_passed?
     diagnostic? && completion_status == "success" && analyze_status == "success"
   end
-  
+
   def calibration_id
     if experiment_definition.guid == "thermal_consistency"
       return 1
     elsif experiment_definition.guid == "optical_cal" || experiment_definition.guid == "dual_channel_optical_cal_v2" ||
           experiment_definition.guid == "optical_test_dual_channel"
-      return self.id 
+      return self.id
     else
       return read_attribute(:calibration_id)
     end
   end
-  
+
   def as_json(options={})
       {:id=>id,
        :guid=>experiment_definition.guid,

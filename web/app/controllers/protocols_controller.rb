@@ -18,21 +18,60 @@
 #
 class ProtocolsController < ApplicationController
   include ParamsHelper
+	include Swagger::Blocks
   before_filter :ensure_authenticated_user, :except => :create
   before_filter :experiment_definition_editable_check
-    
+
   respond_to :json
-  
-  resource_description { 
+
+  resource_description {
     formats ['json']
   }
-  
+
   def_param_group :protocol do
     param :protocol, Hash, :desc => "Protocol Info", :required => true do
       param :lid_temperature, Float, :desc => "lid temperature, in degree C, default is 110, with precision to one decimal point", :required => true
     end
   end
-  
+
+	swagger_path '/protocols/{id}' do
+		operation :put do
+			key :summary, 'Update Protocol'
+			key :description, 'Updates the passed protocol data for the experiment'
+			key :produces, [
+				'application/json',
+			]
+			key :tags, [
+				'Protocol'
+			]
+			parameter do
+				key :name, :id
+				key :in, :path
+				key :description, 'protocol id'
+				key :required, true
+				key :type, :integer
+				key :format, :int64
+			end
+			parameter do
+				key :name, :protocol_params
+				key :in, :body
+				key :description, 'Protocol properties to update'
+				key :required, true
+				schema do
+					key :'$ref', :Protocol_params
+				end
+			end
+			response 200 do
+				key :description, 'Returns an object protocol which has the list of protocol properties'
+				schema do
+					key :name, :Protocol
+					key :type, :object
+					key :'$ref', :Protocol
+				end
+			end
+		end
+	end
+
   api :PUT, "/protocols/:id", "Update a protocol"
   param_group :protocol
   def update
@@ -41,12 +80,12 @@ class ProtocolsController < ApplicationController
       format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
     end
   end
-  
+
   protected
-  
+
   def get_experiment
     @protocol = Protocol.find_by_id(params[:id])
     @experiment = Experiment.where("experiment_definition_id=?", @protocol.experiment_definition_id).first if !@protocol.nil?
   end
-  
+
 end

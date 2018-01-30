@@ -43,7 +43,7 @@ class RampsController < ApplicationController
 				'application/json',
 			]
 			key :tags, [
-				'experiment'
+				'Ramp'
 			]
 			parameter do
 				key :name, :id
@@ -59,7 +59,7 @@ class RampsController < ApplicationController
 				key :description, 'Ramp properties to update'
 				key :required, true
 				schema do
-					key :'$ref', :ramp_params
+					key :'$ref', :Ramp_params
 				end
 			end
 			response 200 do

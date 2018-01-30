@@ -66,44 +66,43 @@ class Step < ActiveRecord::Base
     end
   end
 
-	swagger_schema :StepInput do
-		property :temperature do
-      key :type, :number
-      key :format, :float
-      key :description, 'Temperature of the step, in degree C, with precision to one decimal point'
-    end
-    property :hold_time do
-      key :type, :integer
-      key :description, 'Hold time of the step, in seconds, 0 means infinite'
-    end
-    property :name do
-      key :type, :string
-      key :description, 'Name of the step'
-      key :default, 'Step <order_number>'
-    end
-    property :pause do
-      key :type, :boolean
-      key :description, 'machine will be paused when the step is reached'
-      key :default, false
-    end
-    property :collect_data do
-      key :type, :boolean
-      key :description, 'Collect data'
-      key :default, false
-    end
-    property :delta_temperature do
-      key :type, :number
-      key :format, :float
-      key :description, 'Delta temperature, in degree C, with precision to two decimal points'
-    end
-    property :delta_duration_s do
-      key :type, :integer
-      key :description, 'Delta duration, in second'
-    end
-    property :ramp do
-      key :type, :object
-      key :'$ref', :Ramp
-    end
+	swagger_schema :StepProperties do
+		key :required, [:step]
+		property :step do
+			property :temperature do
+				key :type, :number
+				key :format, :float
+				key :description, 'Temperature of the step, in degree C, with precision to one decimal point'
+			end
+			property :hold_time do
+				key :type, :integer
+				key :description, 'Hold time of the step, in seconds, 0 means infinite'
+			end
+			property :name do
+				key :type, :string
+				key :description, 'Name of the step'
+				key :default, 'Step <order_number>'
+			end
+			property :pause do
+				key :type, :boolean
+				key :description, 'machine will be paused when the step is reached'
+				key :default, false
+			end
+			property :collect_data do
+				key :type, :boolean
+				key :description, 'Collect data'
+				key :default, false
+			end
+			property :delta_temperature do
+				key :type, :number
+				key :format, :float
+				key :description, 'Delta temperature, in degree C, with precision to two decimal points'
+			end
+			property :delta_duration_s do
+				key :type, :integer
+				key :description, 'Delta duration, in second'
+			end
+		end
 	end
 
 	swagger_schema :StepMoveInput do

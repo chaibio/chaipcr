@@ -18,10 +18,51 @@
 #
 class SessionsController < ApplicationController
   respond_to :json
+	include Swagger::Blocks
 
   resource_description {
     formats ['json']
   }
+
+	swagger_path '/login' do
+		operation :post do
+			key :summary, 'Login'
+			key :description, 'Logs in the user'
+			key :produces, [
+				'application/json',
+			]
+			key :tags, [
+				'Sessions'
+			]
+			parameter do
+				key :name, :login_params
+				key :in, :body
+				key :description, 'Login detals'
+				key :required, true
+				schema do
+					key :'$ref', :login_params
+				end
+			end
+			response 201 do
+				key :description, 'User is logged in to the application'
+			end
+		end
+		operation :get do
+			key :summary, 'Login page'
+			key :description, 'Show this page when there are users in the database and user is not logged in'
+			key :produces, [
+				'application/html',
+			]
+			key :tags, [
+				'Main'
+			]
+			response 200 do
+				key :description, 'Login Page is returned'
+			end
+		end
+	end
+
+
 
   api :POST, "/login", "Login"
   param :email, String, :desc => "Email", :required => true
@@ -38,6 +79,22 @@ class SessionsController < ApplicationController
       render json: {errors: "The email and password entered do not match"}, status: 401
     end
   end
+
+	swagger_path '/logout' do
+		operation :post do
+			key :summary, 'Logout'
+			key :description, 'Logout of the application and redirected to the login page'
+			key :produces, [
+				'application/json',
+			]
+			key :tags, [
+				'Sessions'
+			]
+			response 200 do
+				key :description, 'User is logged out'
+			end
+		end
+	end
 
   api :POST, "/logout", "Logout"
   def destroy

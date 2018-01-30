@@ -20,7 +20,7 @@ class AmplificationOption < ActiveRecord::Base
   belongs_to :experiment_definition
 	include Swagger::Blocks
 
-	swagger_schema :amplification_option do
+	swagger_schema :Amplification_option_properties do
 		property :cq_method do
 			key :type, :integer
 			key :format, :int64
@@ -44,11 +44,11 @@ class AmplificationOption < ActiveRecord::Base
 		end
 	end
 
-	swagger_schema :amplification_option_params do
+	swagger_schema :Amplification_option do
 		key :required, [:amplification_option]
 		property :amplification_option do
 			key :description, 'Give a description of all the parameters'
-			key :'$ref', :amplification_option
+			key :'$ref', :Amplification_option_properties
 		end
 	end
 
