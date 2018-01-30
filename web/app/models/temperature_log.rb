@@ -22,24 +22,27 @@ class TemperatureLog < ActiveRecord::Base
   belongs_to :experiment
 	include Swagger::Blocks
 
-	swagger_schema :TemperatureLog do
+	swagger_schema :TemperatureData do
 		property :temperature_log do
 			property :elapsed_time do
 				key :type, :integer
 				key :format, :int64
-				key :description, '?'
+				key :description, 'in milliseconds'
 			end
 			property :lid_temp do
-				key :type, :string
-				key :description, '?'
+        key :type, :number
+        key :format, :float
+        key :description, 'temperature, in degree C, with precision to two decimal points'
 			end
 			property :heat_block_zone_1_temp do
-				key :type, :string
-				key :description, '?'
+        key :type, :number
+        key :format, :float
+        key :description, 'temperature, in degree C, with precision to two decimal points'
 			end
 			property :heat_block_zone_2_temp do
-				key :type, :boolean
-				key :description, '?'
+        key :type, :number
+        key :format, :float
+        key :description, 'temperature, in degree C, with precision to two decimal points'
 			end
 		end
 	end

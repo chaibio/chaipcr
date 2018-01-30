@@ -121,7 +121,7 @@ class Step < ActiveRecord::Base
 		end
 	end
 
-	swagger_schema :CreateStepInput do
+	swagger_schema :StepInput do
 		property :prev_id do
 			key :type, :integer
 			key :format, :int64

@@ -62,7 +62,7 @@ class StagesController < ApplicationController
 				key :required, false
 				key :description, 'properties of the stage'
 				schema do
-					key :'$ref', :CreateStageInput
+					key :'$ref', :StageInput
 				end
 			end
 			response 200 do

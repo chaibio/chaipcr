@@ -62,7 +62,7 @@ class StepsController < ApplicationController
         key :in, :body
         key :required, false
         schema do
-          key :'$ref', :CreateStepInput
+          key :'$ref', :StepInput
         end
       end
       response 200 do

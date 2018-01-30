@@ -101,6 +101,9 @@ class ExperimentsController < ApplicationController
       end
       response 422 do
         key :description, 'experiment create error'
+				schema do
+					key :'$ref', :Experiment
+				end
       end
     end
   end
@@ -362,7 +365,7 @@ class ExperimentsController < ApplicationController
 				schema do
 					key :type, :array
 					items do
-						key :'$ref', :TemperatureLog
+						key :'$ref', :TemperatureData
 					end
 				end
 			end
@@ -435,19 +438,15 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :step_id
 				key :in, :query
-				key :description, '?'
-				key :required, false
-				key :type, :integer
-				key :format, :int64
+        key :description, '?'
+        key :required, false
+			  key :type, :array
+			  items do
+				  key :type, :integer
+          key :format, :int64
+        end
 			end
-			parameter do
-				key :name, :step_id
-				key :in, :query
-				key :description, '?'
-				key :required, false
-				key :type, :integer
-				key :format, :int64
-			end
+      
 			response 200 do
 				key :description, 'amplification data'
 				schema do
