@@ -105,22 +105,6 @@ class Step < ActiveRecord::Base
 		end
 	end
 
-	swagger_schema :StepMoveInput do
-		key :required, [:prev_id]
-		property :prev_id do
-			key :type, :integer
-			key :format, :int64
-			key :required, true
-			key :description, 'prev step id or null if it is the first node'
-		end
-		property :stage_id do
-			key :type, :integer
-			key :format, :int64
-			key :required, false
-			key :description, 'stage id or null if it is the same stage'
-		end
-	end
-
 	swagger_schema :StepInput do
 		property :prev_id do
 			key :type, :integer

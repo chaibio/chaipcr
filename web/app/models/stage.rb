@@ -80,21 +80,8 @@ class Stage < ActiveRecord::Base
 			end
 		end
 	end
-  
-	swagger_schema :StageInput do
-		property :prev_id do
-			key :type, :integer
-			key :format, :int64
-			key :required, true
-			key :description, 'prev stage id or null if it is the first node'
-		end
-		property :stage do
-			key :'$ref', :Stage
-		end
-	end
 
-	swagger_schema :StageMoveInput do
-		key :required, [:prev_id]
+	swagger_schema :StageInput do
 		property :prev_id do
 			key :type, :integer
 			key :format, :int64

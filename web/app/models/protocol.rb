@@ -41,7 +41,7 @@ class Protocol < ActiveRecord::Base
     end
   end
 
-	swagger_schema :Protocol_params do
+	swagger_schema :ProtocolInput do
 		key :required, [:protocol]
 		property :protocol do
 			key :description, 'Give a description of all the parameters'
