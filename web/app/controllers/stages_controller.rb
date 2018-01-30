@@ -156,7 +156,7 @@ class StagesController < ApplicationController
 				key :description, 'Previous stage id'
 				key :required, true
 				schema do
-					 key :'$ref', :StageMoveInput
+					 key :'$ref', :StageInput
 				 end
 			end
 			response 200 do

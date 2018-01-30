@@ -68,10 +68,7 @@ class StepsController < ApplicationController
       response 200 do
         key :description, 'Created step is returned'
         schema do
-          key :type, :array
-          items do
-            key :'$ref', :Step
-          end
+          key :'$ref', :Step
         end
       end
     end
@@ -123,10 +120,7 @@ class StepsController < ApplicationController
       response 200 do
         key :description, 'Updated step is returned'
         schema do
-          key :type, :array
-          items do
-            key :'$ref', :StepProperties
-          end
+          key :'$ref', :StepProperties
         end
       end
     end
@@ -166,16 +160,13 @@ class StepsController < ApplicationController
         key :description, 'Step to move ??'
         key :required, true
         schema do
-           key :'$ref', :StepMoveInput
+           key :'$ref', :StepInput
          end
       end
       response 200 do
         key :description, 'Updated step is returned'
         schema do
-          key :type, :array
-          items do
-            key :'$ref', :Step
-          end
+          key :'$ref', :StepProperties
         end
       end
     end
