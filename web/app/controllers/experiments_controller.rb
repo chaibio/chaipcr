@@ -262,7 +262,7 @@ class ExperimentsController < ApplicationController
 					key :'$ref', :Experiment
 				end
 			end
-			response :default do
+			response 422 do
 				key :description, 'unexpected error'
 				schema do
 					key :'$ref', :ErrorModel
@@ -301,10 +301,10 @@ class ExperimentsController < ApplicationController
 			response 200 do
 				key :description, 'experiment deleted'
 			end
-			response :default do
+			response 422 do
 				key :description, 'unexpected error'
 				schema do
-					key :'$ref', :ErrorModel
+					key :'$ref', :Experiment
 				end
 			end
 		end
@@ -411,32 +411,47 @@ class ExperimentsController < ApplicationController
 				key :name, :raw
 				key :in, :query
 				key :description, '?'
-				key :required, false
 				key :type, :boolean
+				key :required, false
+        key :default, false
 			end
 			parameter do
 				key :name, :background
 				key :in, :query
 				key :description, '?'
-				key :required, false
 				key :type, :boolean
+				key :required, false
+        key :default, true
 			end
 			parameter do
 				key :name, :baseline
 				key :in, :query
 				key :description, '?'
-				key :required, false
 				key :type, :boolean
+				key :required, false
+        key :default, true
 			end
 			parameter do
 				key :name, :cq
 				key :in, :query
 				key :description, '?'
-				key :required, false
 				key :type, :boolean
+				key :required, false
+        key :default, true
 			end
 			parameter do
 				key :name, :step_id
+				key :in, :query
+        key :description, '?'
+        key :required, false
+			  key :type, :array
+			  items do
+				  key :type, :integer
+          key :format, :int64
+        end
+			end
+			parameter do
+				key :name, :ramp_id
 				key :in, :query
         key :description, '?'
         key :required, false
@@ -456,6 +471,15 @@ class ExperimentsController < ApplicationController
 					end
 				end
 			end
+      
+			response 202 do
+				key :description, 'Job accepted'
+			end
+			
+      response 304 do
+				key :description, 'Amplification data is not modified if etag is the same'
+			end
+      
 			response :default do
 				key :description, 'unexpected error'
 				schema do
@@ -619,49 +643,49 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :raw
 				key :in, :query
-				key :description, '?'
-				key :required, false
+				key :description, 'melt curve raw data'
 				key :type, :boolean
+				key :required, false
+        key :default, false
 			end
 			parameter do
 				key :name, :normalized
 				key :in, :query
 				key :description, '?'
-				key :required, false
 				key :type, :boolean
+  			key :required, false
+        key :default, true
 			end
 			parameter do
 				key :name, :derivative
 				key :in, :query
 				key :description, '?'
-				key :required, false
 				key :type, :boolean
+        key :required, false
+        key :default, true
 			end
 			parameter do
 				key :name, :tm
 				key :in, :query
 				key :description, '?'
-				key :required, false
 				key :type, :boolean
+				key :required, false
+        key :default, true
 			end
 			parameter do
 				key :name, :ramp_id
 				key :in, :query
-				key :description, '?'
-				key :required, false
-				key :type, :integer
-				key :format, :int64
+        key :description, '?'
+        key :required, false
+			  key :type, :array
+			  items do
+				  key :type, :integer
+          key :format, :int64
+        end
 			end
-			parameter do
-				key :name, :ramp_id
-				key :in, :query
-				key :description, '?'
-				key :required, false
-				key :type, :integer
-				key :format, :int64
-			end
+    
 			response 200 do
-				key :description, 'melt curve data'
+				key :description, 'melt curve data along with etag header'
 				schema do
 					key :type, :array
 					items do
@@ -669,6 +693,15 @@ class ExperimentsController < ApplicationController
 					end
 				end
 			end
+      
+			response 202 do
+				key :description, 'Job accepted'
+			end
+			
+      response 304 do
+				key :description, 'Melt curve data is not modified if etag is the same'
+			end
+      
 			response :default do
 				key :description, 'unexpected error'
 				schema do
@@ -842,9 +875,19 @@ class ExperimentsController < ApplicationController
 				key :type, :integer
 				key :format, :int64
 			end
+      
 			response 200 do
 				key :description, 'zipped data'
+				schema do
+          key :type, :string
+          key :format, :binary
+				end
 			end
+      
+			response 202 do
+				key :description, 'Job accepted'
+			end
+      
 			response :default do
 				key :description, 'unexpected error'
 				schema do
@@ -1004,6 +1047,14 @@ class ExperimentsController < ApplicationController
     else
       render :json=>{:errors=>"experiment not found"}, :status => :not_found
     end
+  end
+  
+  def start
+    if @experiment
+    end
+  end
+  
+  def stop
   end
 
   protected

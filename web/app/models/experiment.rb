@@ -66,6 +66,7 @@ class Experiment < ActiveRecord::Base
     end
     property :type do
       key :type, :string
+      key :enum, ['user', 'diagnostic', 'calibration']
     end
     property :time_valid do
       key :type, :boolean
@@ -101,16 +102,12 @@ class Experiment < ActiveRecord::Base
   end
 
   swagger_schema :ExperimentInput do
-    allOf do
-      schema do
-        key :required, [:name]
-        property :name do
-          key :type, :string
-        end
-        property :guid do
-          key :type, :string
-        end
-      end
+    key :required, [:name]
+    property :name do
+      key :type, :string
+    end
+    property :guid do
+      key :type, :string
     end
   end
 
