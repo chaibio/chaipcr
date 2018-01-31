@@ -37,20 +37,11 @@ class User < ActiveRecord::Base
   end
 
   swagger_schema :UserInput do
-    allOf do
-      schema do
-        key :'$ref', :User
-      end
-      schema do
-        key :required, [:name]
-        property :name do
-          key :type, :string
-        end
-        property :guid do
-          key :type, :string
-        end
-      end
-    end
+		key :required, [:user]
+		property :user do
+			key :'$ref', :User
+			key :description, 'User id is only required for the get request not for creating a user'
+		end
   end
 
 

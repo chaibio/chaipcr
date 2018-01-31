@@ -81,10 +81,7 @@ class UsersController < ApplicationController
       response 200 do
         key :description, 'Current user response'
         schema do
-          key :type, :array
-          items do
-            key :'$ref', :UserCurrent
-          end
+          key :'$ref', :User
         end
       end
     end
@@ -124,10 +121,7 @@ class UsersController < ApplicationController
       response 200 do
         key :description, 'User response'
         schema do
-          key :type, :array
-          items do
-            key :'$ref', :User
-          end
+          key :'$ref', :User
         end
       end
     end
@@ -146,7 +140,7 @@ class UsersController < ApplicationController
     end
   end
 
-  swagger_path '/users/:id' do
+  swagger_path '/users/{id}' do
     operation :put do
       key :description, 'Update an user'
       key :produces, [
@@ -161,13 +155,19 @@ class UsersController < ApplicationController
         key :description, 'user to update'
         key :required, true
       end
+			parameter do
+				key :name, :user
+				key :in, :body
+				key :description, 'user to update'
+				key :required, true
+				schema do
+					 key :'$ref', :UserInput
+				 end
+			end
       response 200 do
         key :description, 'User response'
         schema do
-          key :type, :array
-          items do
-            key :'$ref', :User
-          end
+          key :'$ref', :User
         end
       end
     end
@@ -184,7 +184,7 @@ class UsersController < ApplicationController
     end
   end
 
-  swagger_path '/users/:id' do
+  swagger_path '/users/{id}' do
     operation :delete do
       key :description, 'Delete a user'
       key :produces, [
@@ -196,7 +196,7 @@ class UsersController < ApplicationController
       parameter do
         key :name, :id
         key :in, :path
-        key :description, 'user to delete'
+        key :description, 'id of the user to delete'
         key :required, true
       end
       response 200 do

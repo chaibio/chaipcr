@@ -52,6 +52,7 @@ class ApidocsController < ActionController::Base
     Step,
 		TemperatureLog,
 		Well,
+		User,
     ErrorModel,
     self,
   ].freeze

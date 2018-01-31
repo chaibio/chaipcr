@@ -47,6 +47,58 @@ class Device
     end
   end
 
+	swagger_schema :Capabilities do
+		property :capabilities do
+			property :plate do
+				key :'$ref', :CapabilitiesPlate
+			end
+			property :storage do
+				key :'$ref', :CapabilitiesStorage
+			end
+		end
+	end
+
+	swagger_schema :CapabilitiesPlate do
+		property :rows do
+			key :type, :integer
+			key :description, 'Serial number of the device'
+		end
+		property :columns do
+			key :type, :integer
+			key :description, 'Hardware model number of the device'
+		end
+		property :min_volume_ul do
+			key :type, :integer
+			key :description, 'Device processor architecture'
+		end
+		property :max_volume_ul do
+			key :type, :integer
+			key :description, 'Device processor architecture'
+		end
+	end
+
+	swagger_schema :CapabilitiesStorage do
+		property :microsd_size_gb do
+			key :type, :integer
+			key :description, 'Storage capacity of the micro sd card in gb'
+		end
+		property :emmc_size_gb do
+			key :type, :integer
+			key :description, 'emmc size in gb'
+		end
+	end
+
+	swagger_schema :CapabilitiesWavelength do
+		property :begin_wavelength do
+			key :type, :integer
+			key :description, 'Starting wavelength '
+		end
+		property :end_wavelength do
+			key :type, :integer
+			key :description, 'Ending wavelength'
+		end
+	end
+
   @@device_hash = nil
 
   def self.exists?

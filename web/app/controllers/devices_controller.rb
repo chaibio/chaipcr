@@ -103,7 +103,7 @@ class DevicesController < ApplicationController
         key :description, 'capabilities response'
         schema do
           key :type, :object
-          key :'$ref', :Configuration
+          key :'$ref', :Capabilities
         end
       end
     end
