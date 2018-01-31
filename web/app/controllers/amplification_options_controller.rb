@@ -63,6 +63,7 @@ class AmplificationOptionsController < ApplicationController
 			end
 			response 200 do
 				key :description, 'Returns an object amplification_option which has the list of options'
+				key :name, 'fdfdf'
 				schema do
 					key :name, :amplification_option
 					key :type, :object

@@ -47,19 +47,6 @@ class SessionsController < ApplicationController
 				key :description, 'User is logged in to the application'
 			end
 		end
-		operation :get do
-			key :summary, 'Login page'
-			key :description, 'Show this page when there are users in the database and user is not logged in'
-			key :produces, [
-				'application/html',
-			]
-			key :tags, [
-				'Main'
-			]
-			response 200 do
-				key :description, 'Login Page is returned'
-			end
-		end
 	end
 
 
