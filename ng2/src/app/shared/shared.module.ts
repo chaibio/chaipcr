@@ -21,6 +21,7 @@ import { HeaderStatusComponent } from './directives/header-status/header-status.
 import { HrMinSecPipe } from './pipes/hr-min-secs/hr-min-secs.pipe';
 import { BaseChartDirective } from './directives/charts/base-chart/base-chart.directive'
 import { AmplificationChartDirective } from './directives/charts/amplification-chart/amplification-chart.directive'
+import { WellButtonsDirective } from './directives/well-buttons/well-buttons.directive';
 
 @NgModule({
   declarations: [

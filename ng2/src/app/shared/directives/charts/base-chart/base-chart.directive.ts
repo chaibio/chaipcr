@@ -1112,29 +1112,15 @@ export class BaseChartDirective implements OnChanges {
   }
 
   protected onEnterAxisInput (loc, input, val) {
-    let max: any,
-      min:any,
-      maxY: any,
-      maxX: any,
-      minY: any,
-      minX: any,
-      y: any,
-      x: any,
-      lastYScale: any,
-      lastXScale: any,
-      k: any,
-      lastK: any,
-      extent: any,
-      width_percent: any
 
     val = this.cleanAxisInput(loc, input, val)
 
     if(loc === 'y:max') {
-      max = this.computedMaxY()
-      maxY = this.isNumber(val) && !this.isNumber(val) ? val : max;
-      y = this.yScale
-      lastYScale = this.lastYScale || y
-      minY = lastYScale.invert(this.height)
+      let max = this.computedMaxY()
+      let maxY = this.isNumber(val)? val : max;
+      let y = this.yScale
+      let lastYScale = this.lastYScale || y
+      let minY = lastYScale.invert(this.height)
 
       if(minY >= maxY)
         return false
@@ -1143,60 +1129,60 @@ export class BaseChartDirective implements OnChanges {
       let k = this.height / (y(minY) - y(maxY))
 
       this.editingYAxis = true
-      lastK = this.getTransform().k
+      let lastK = this.getTransform().k
       this.chartSVG.call(this.zoomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)))
       this.editingYAxis = false
       this.chartSVG.call(this.zoomBehavior.transform, d3.zoomIdentity.scale(lastK))
     }
     if(loc === 'y:min') {
-      y = this.yScale
-      lastYScale = this.lastYScale || y
-      min = this.computedMinY()
+      let y = this.yScale
+      let lastYScale = this.lastYScale || y
+      let min = this.computedMinY()
 
-      minY = this.isNumber(val) && !this.isNumber(val) ? val : min;
-      maxY = lastYScale.invert(0)
+      let minY = this.isNumber(val)? val : min;
+      let maxY = lastYScale.invert(0)
       if (minY >= maxY)
         return false
 
       minY = minY < min ? min : minY;
 
-      k = this.height / (y(minY) - y(maxY))
-      lastK = this.getTransform().k
+      let k = this.height / (y(minY) - y(maxY))
+      let lastK = this.getTransform().k
       this.editingYAxis = true
       this.chartSVG.call(this.zoomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)))
       this.editingYAxis = false
       this.chartSVG.call(this.zoomBehavior.transform, d3.zoomIdentity.scale(lastK))
     }
     if(loc === 'x:min') {
-      extent = this.getScaleExtent() - this.getMinX()
-      x = this.xScale
-      lastXScale = this.lastXScale || x
-      minX = val * 1
-      maxX = lastXScale.invert(this.width)
+      let extent = this.getScaleExtent() - this.getMinX()
+      let x = this.xScale
+      let lastXScale = this.lastXScale || x
+      let minX = val * 1
+      let maxX = lastXScale.invert(this.width)
       if(minX >= maxX)
         return false
       if(val === '' || minX < this.getMinX())
         minX = this.getMinX()
-      k = this.width / (x(maxX) - x(minX))
-      width_percent = 1 / k
+      let k = this.width / (x(maxX) - x(minX))
+      let width_percent = 1 / k
       let w = extent - (width_percent * extent)
       this.chartSVG.call(this.zoomBehavior.scaleTo, k)
       this.scroll((minX - this.getMinX()) / w)
     }
     if(loc === 'x:max') {
-      extent = this.getScaleExtent() - this.getMinX()
-      x = this.xScale
-      lastXScale = this.lastXScale || x
-      minX = lastXScale.invert(0)
-      maxX = val * 1
+      let extent = this.getScaleExtent() - this.getMinX()
+      let x = this.xScale
+      let lastXScale = this.lastXScale || x
+      let minX = lastXScale.invert(0)
+      let maxX = val * 1
       if(minX >= maxX)
         return false
       if(val === '')
         maxX = this.getMaxX()
       if(maxX > this.getScaleExtent())
         maxX = this.getScaleExtent()
-      k = this.width / (x(maxX) - x(minX))
-      width_percent = 1 / k
+      let k = this.width / (x(maxX) - x(minX))
+      let width_percent = 1 / k
       let w = extent - (width_percent * extent)
       this.chartSVG.call(this.zoomBehavior.scaleTo, k)
       this.scroll((minX - this.getMinX()) / w)

@@ -327,8 +327,8 @@ export class AmplificationChartDirective extends BaseChartDirective {
   }
 
   protected onEnterAxisInput(loc, input, val) {
-    let axis = loc === 'x:min' || loc === 'x:max' ? 'x' : 'y'
-    let unit = axis === 'y' ? this.getYUnit() : this.config.axes[axis].unit || ''
+    let axis = (loc === 'x:min' || loc === 'x:max') ? 'x' : 'y'
+    let unit = (axis === 'y') ? this.getYUnit() : this.config.axes[axis].unit || ''
     val = val.toString().replace(unit, '')
 
     if(val === '')
@@ -339,7 +339,7 @@ export class AmplificationChartDirective extends BaseChartDirective {
         ? val.replace(/[^0-9\.\-]/g, '') * 1000
         : val.replace(/[^0-9\.\-]/g, '') * 1
 
-      val = loc === 'y:min' ? this.roundDownExtremeValue(val) : this.roundUpExtremeValue(val)
+      val = (loc === 'y:min') ? this.roundDownExtremeValue(val) : this.roundUpExtremeValue(val)
       if(this.config.axes.y.scale === 'linear')
         val = val + unit
       val = val.toString()
