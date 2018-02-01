@@ -20,7 +20,30 @@ require "csv"
 
 class TemperatureLog < ActiveRecord::Base
   belongs_to :experiment
-  
+	include Swagger::Blocks
+
+	swagger_schema :TemperatureLog do
+		property :temperature_log do
+			property :elapsed_time do
+				key :type, :integer
+				key :format, :int64
+				key :description, '?'
+			end
+			property :lid_temp do
+				key :type, :string
+				key :description, '?'
+			end
+			property :heat_block_zone_1_temp do
+				key :type, :string
+				key :description, '?'
+			end
+			property :heat_block_zone_2_temp do
+				key :type, :boolean
+				key :description, '?'
+			end
+		end
+	end
+
   def self.as_csv(experiment_id)
     temperatures = TemperatureLog.order("temperature_logs.elapsed_time").where("temperature_logs.experiment_id=?", experiment_id)
     columns = ["temperature_logs.experiment_id", "temperature_logs.elapsed_time"] + column_names-["experiment_id", "elapsed_time"]
@@ -35,5 +58,5 @@ class TemperatureLog < ActiveRecord::Base
       end
     end
   end
-  
+
 end

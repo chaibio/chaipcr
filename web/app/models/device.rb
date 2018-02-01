@@ -24,19 +24,24 @@ class Device
 
   swagger_schema :Device do
     property :serial_number do
+      key :type, :string
       key :description, 'Serial number of the device'
     end
     property :model_number do
+      key :type, :string
       key :description, 'Hardware model number of the device'
     end
     property :processor_architecture do
+      key :type, :string
       key :description, 'Device processor architecture'
     end
     property :software do
       property :version do
+        key :type, :string
         key :description, 'Current software version'
       end
       property :platform do
+        key :type, :string
         key :description, 'Current software platform'
       end
     end

@@ -56,27 +56,34 @@ class ExperimentsController < ApplicationController
 
   swagger_path '/experiments' do
     operation :get do
-      key :summary, 'All experiments'
-      key :description, 'Returns all experiments from the system sorted by the time it is created'
+      key :summary, 'List all Experiments'
+      key :description, 'Returns all experiments from the system sorted by the id'
       key :produces, [
         'application/json',
       ]
+			key :tags, [
+				'Experiment'
+			]
       response 200 do
         key :description, 'experiments response'
         schema do
           key :type, :array
           items do
-            key :'$ref', :Experiment
+            key :'$ref', :Experiments
           end
         end
       end
     end
 
     operation :post do
+			key :summary, 'Create Experiment'
       key :description, 'Creates a new experiment, default protocol will be created'
       key :produces, [
         'application/json'
       ]
+			key :tags, [
+				'Experiment'
+			]
       parameter do
         key :name, :experiment
         key :in, :body
@@ -94,9 +101,6 @@ class ExperimentsController < ApplicationController
       end
       response 422 do
         key :description, 'experiment create error'
-        schema do
-          key :'$ref', :Experiment
-        end
       end
     end
   end
@@ -129,6 +133,48 @@ class ExperimentsController < ApplicationController
     end
   end
 
+	swagger_path '/experiments/{id}' do
+		operation :put do
+			key :summary, 'Update Experiment'
+			key :description, 'Updates experiment'
+			key :produces, [
+				'application/json'
+			]
+			key :tags, [
+				'Experiment'
+			]
+			parameter do
+				key :name, :id
+				key :in, :path
+				key :description, 'id of the experiment to update'
+				key :required, true
+				key :type, :integer
+				key :format, :int64
+			end
+			parameter do
+				key :name, :experiment
+				key :in, :body
+				key :description, 'experiment to update'
+				key :required, true
+				schema do
+					 key :'$ref', :ExperimentInput
+				 end
+			end
+			response 200 do
+				key :description, 'experiment response'
+				schema do
+					key :'$ref', :Experiment
+				end
+			end
+			response 422 do
+				key :description, 'experiment update error'
+				schema do
+					key :'$ref', :Experiment
+				end
+			end
+		end
+	end
+
   api :PUT, "/experiments/:id", "Update an experiment"
   param_group :experiment
   example "{'experiment':{'id':1,'name':'test','type':'user','started_at':null,'completed_at':null,'completed_status':null}}"
@@ -143,6 +189,39 @@ class ExperimentsController < ApplicationController
     end
   end
 
+	swagger_path '/experiments/{id}/copy' do
+		operation :post do
+			key :summary, 'Copy Experiment'
+			key :description, 'Creates a new copy of the experiment'
+			key :produces, [
+				'application/json'
+			]
+			key :tags, [
+				'Experiment'
+			]
+			parameter do
+				key :name, :id
+				key :in, :path
+				key :description, 'id of the experiment to copy'
+				key :required, true
+				key :type, :integer
+				key :format, :int64
+			end
+			response 200 do
+				key :description, 'experiment response'
+				schema do
+					key :'$ref', :Experiment
+				end
+			end
+			response 422 do
+				key :description, 'experiment copy error'
+				schema do
+					key :'$ref', :Experiment
+				end
+			end
+		end
+	end
+
   api :POST, "/experiments/:id/copy", "Copy an experiment"
   see "experiments#create", "json response"
   def copy
@@ -156,6 +235,39 @@ class ExperimentsController < ApplicationController
     end
   end
 
+	swagger_path '/experiments/{id}' do
+		operation :get do
+			key :summary, 'Show Experiment'
+			key :description, 'Returns a single experiment based on the id'
+			key :produces, [
+				'application/json',
+			]
+			key :tags, [
+				'Experiment'
+			]
+			parameter do
+				key :name, :id
+				key :in, :path
+				key :description, 'id of the experiment to fetch'
+				key :required, true
+				key :type, :integer
+				key :format, :int64
+			end
+			response 200 do
+				key :description, 'experiment response'
+				schema do
+					key :'$ref', :Experiment
+				end
+			end
+			response :default do
+				key :description, 'unexpected error'
+				schema do
+					key :'$ref', :ErrorModel
+				end
+			end
+		end
+	end
+
   api :GET, "/experiments/:id", "Show an experiment"
   see "experiments#create", "json response"
   def show
@@ -165,6 +277,36 @@ class ExperimentsController < ApplicationController
     end
   end
 
+	swagger_path '/experiments/{id}' do
+		operation :delete do
+			key :summary, 'Delete Experiment'
+			key :description, 'Deletes the experiment from the database based on id'
+			key :produces, [
+				'application/json',
+			]
+			key :tags, [
+				'Experiment'
+			]
+			parameter do
+				key :name, :id
+				key :in, :path
+				key :description, 'id of the experiment to delete'
+				key :required, true
+				key :type, :integer
+				key :format, :int64
+			end
+			response 200 do
+				key :description, 'experiment deleted'
+			end
+			response :default do
+				key :description, 'unexpected error'
+				schema do
+					key :'$ref', :ErrorModel
+				end
+			end
+		end
+	end
+
   api :DELETE, "/experiments/:id", "Destroy an experiment"
   def destroy
     ret = @experiment.destroy
@@ -172,6 +314,66 @@ class ExperimentsController < ApplicationController
       format.json { render "destroy", :status => (ret)? :ok :  :unprocessable_entity}
     end
   end
+
+	swagger_path '/experiments/{id}/temperature_data' do
+		operation :get do
+			key :summary, 'Retrieve temperature data'
+			key :description, 'Returns the temperature data of an experiment based on the parameters specified'
+			key :produces, [
+				'application/json',
+			]
+			key :tags, [
+				'Experiment'
+			]
+			parameter do
+				key :name, :id
+				key :in, :path
+				key :description, 'id of the experiment for which we need temperature data'
+				key :required, true
+				key :type, :integer
+				key :format, :int64
+			end
+			parameter do
+				key :name, :starttime
+				key :in, :query
+				key :description, 'Starting time in ms for temperature data'
+				key :required, true
+				key :type, :integer
+				key :format, :int64
+			end
+			parameter do
+				key :name, :endtime
+				key :in, :query
+				key :description, 'if not specified, it returns everything to the end of the experiment, in ms'
+				key :required, false
+				key :type, :integer
+				key :format, :int64
+			end
+			parameter do
+				key :name, :resolution
+				key :in, :query
+				key :description, 'Include data points for every x milliseconds. Must be a multiple of 1000 ms'
+				key :required, false
+				key :type, :integer
+				key :format, :int64
+			end
+			response 200 do
+				key :description, 'temperature data'
+				schema do
+					key :type, :array
+					items do
+						key :'$ref', :TemperatureLog
+					end
+				end
+			end
+			response :default do
+				key :description, 'unexpected error'
+				schema do
+					key :'$ref', :ErrorModel
+				end
+			end
+		end
+	end
 
   api :GET, "/experiments/:id/temperature_data?starttime=xx&endtime=xx&resolution=xx", "Retrieve temperature data"
   param :starttime, Integer, :desc => "0 means start of the experiment, in ms", :required => true
@@ -183,6 +385,86 @@ class ExperimentsController < ApplicationController
       format.json { render "temperature_data", :status => :ok}
     end
   end
+
+	swagger_path '/experiments/{id}/amplification_data' do
+		operation :get do
+			key :summary, 'Retrieve amplification data'
+			key :description, 'Returns the amplification data of an experiment based on the parameters specified'
+			key :produces, [
+				'application/json',
+			]
+			key :tags, [
+				'Experiment'
+			]
+			parameter do
+				key :name, :id
+				key :in, :path
+				key :description, 'id of the experiment for which we need amplification data'
+				key :required, true
+				key :type, :integer
+				key :format, :int64
+			end
+			parameter do
+				key :name, :raw
+				key :in, :query
+				key :description, '?'
+				key :required, false
+				key :type, :boolean
+			end
+			parameter do
+				key :name, :background
+				key :in, :query
+				key :description, '?'
+				key :required, false
+				key :type, :boolean
+			end
+			parameter do
+				key :name, :baseline
+				key :in, :query
+				key :description, '?'
+				key :required, false
+				key :type, :boolean
+			end
+			parameter do
+				key :name, :cq
+				key :in, :query
+				key :description, '?'
+				key :required, false
+				key :type, :boolean
+			end
+			parameter do
+				key :name, :step_id
+				key :in, :query
+				key :description, '?'
+				key :required, false
+				key :type, :integer
+				key :format, :int64
+			end
+			parameter do
+				key :name, :step_id
+				key :in, :query
+				key :description, '?'
+				key :required, false
+				key :type, :integer
+				key :format, :int64
+			end
+			response 200 do
+				key :description, 'amplification data'
+				schema do
+					key :type, :array
+					items do
+						key :'$ref', :AmplificationData
+					end
+				end
+			end
+			response :default do
+				key :description, 'unexpected error'
+				schema do
+					key :'$ref', :ErrorModel
+				end
+			end
+		end
+	end
 
   api :GET, "/experiments/:id/amplification_data?raw=false&background=true&baseline=true&cq=true&step_id[]=43&step_id[]=44", "Retrieve amplification data"
   example "{'partial':false, 'total_cycles':40, 'steps':['step_id':2,
@@ -316,6 +598,86 @@ class ExperimentsController < ApplicationController
       render :json=>{:errors=>"experiment not found"}, :status => :not_found
     end
   end
+
+	swagger_path '/experiments/{id}/melt_curve_data' do
+		operation :get do
+			key :summary, 'Retrieve melt curve data'
+			key :description, 'Returns the melt curve data of an experiment based on the parameters specified'
+			key :produces, [
+				'application/json',
+			]
+			key :tags, [
+				'Experiment'
+			]
+			parameter do
+				key :name, :id
+				key :in, :path
+				key :description, 'id of the experiment for which we need melt curve data'
+				key :required, true
+				key :type, :integer
+				key :format, :int64
+			end
+			parameter do
+				key :name, :raw
+				key :in, :query
+				key :description, '?'
+				key :required, false
+				key :type, :boolean
+			end
+			parameter do
+				key :name, :normalized
+				key :in, :query
+				key :description, '?'
+				key :required, false
+				key :type, :boolean
+			end
+			parameter do
+				key :name, :derivative
+				key :in, :query
+				key :description, '?'
+				key :required, false
+				key :type, :boolean
+			end
+			parameter do
+				key :name, :tm
+				key :in, :query
+				key :description, '?'
+				key :required, false
+				key :type, :boolean
+			end
+			parameter do
+				key :name, :ramp_id
+				key :in, :query
+				key :description, '?'
+				key :required, false
+				key :type, :integer
+				key :format, :int64
+			end
+			parameter do
+				key :name, :ramp_id
+				key :in, :query
+				key :description, '?'
+				key :required, false
+				key :type, :integer
+				key :format, :int64
+			end
+			response 200 do
+				key :description, 'melt curve data'
+				schema do
+					key :type, :array
+					items do
+						key :'$ref', :MeltData
+					end
+				end
+			end
+			response :default do
+				key :description, 'unexpected error'
+				schema do
+					key :'$ref', :ErrorModel
+				end
+			end
+		end
+	end
 
   api :GET, "/experiments/:id/melt_curve_data?raw=false&normalized=true&derivative=true&tm=true&ramp_id[]=43&ramp_id[]=44", "Retrieve melt curve data"
   example "{'partial':false, 'ramps':['ramp_id':22,
@@ -462,6 +824,36 @@ class ExperimentsController < ApplicationController
       render :json=>{:errors=>"experiment not found"}, :status => :not_found
     end
   end
+
+	swagger_path '/experiments/{id}/export' do
+		operation :get do
+			key :summary, 'Export Experiment'
+			key :description, 'Downloads a zip file which has csv files for temperature, amplification and meltcurve data'
+			key :produces, [
+				'application/zip',
+			]
+			key :tags, [
+				'Experiment'
+			]
+			parameter do
+				key :name, :id
+				key :in, :path
+				key :description, 'id of the experiment for which we need melt curve data'
+				key :required, true
+				key :type, :integer
+				key :format, :int64
+			end
+			response 200 do
+				key :description, 'zipped data'
+			end
+			response :default do
+				key :description, 'unexpected error'
+				schema do
+					key :'$ref', :ErrorModel
+				end
+			end
+		end
+	end
 
   api :GET, "/experiments/:id/export", "zip temperature, amplification and meltcurv csv files"
   def export

@@ -19,9 +19,9 @@
 class Step < ActiveRecord::Base
   include ProtocolHelper
   include ProtocolOrderHelper
-   
+
   include Swagger::Blocks
-   
+
   swagger_schema :Step do
     property :id do
       key :type, :integer
@@ -39,7 +39,7 @@ class Step < ActiveRecord::Base
     property :name do
       key :type, :string
       key :description, 'Name of the step'
-      key :default, 'Step <order_number>' 
+      key :default, 'Step <order_number>'
     end
     property :pause do
       key :type, :boolean
@@ -65,18 +65,82 @@ class Step < ActiveRecord::Base
       key :'$ref', :Ramp
     end
   end
-  
+
+	swagger_schema :StepProperties do
+		key :required, [:step]
+		property :step do
+			property :temperature do
+				key :type, :number
+				key :format, :float
+				key :description, 'Temperature of the step, in degree C, with precision to one decimal point'
+			end
+			property :hold_time do
+				key :type, :integer
+				key :description, 'Hold time of the step, in seconds, 0 means infinite'
+			end
+			property :name do
+				key :type, :string
+				key :description, 'Name of the step'
+				key :default, 'Step <order_number>'
+			end
+			property :pause do
+				key :type, :boolean
+				key :description, 'machine will be paused when the step is reached'
+				key :default, false
+			end
+			property :collect_data do
+				key :type, :boolean
+				key :description, 'Collect data'
+				key :default, false
+			end
+			property :delta_temperature do
+				key :type, :number
+				key :format, :float
+				key :description, 'Delta temperature, in degree C, with precision to two decimal points'
+			end
+			property :delta_duration_s do
+				key :type, :integer
+				key :description, 'Delta duration, in second'
+			end
+		end
+	end
+
+	swagger_schema :StepMoveInput do
+		key :required, [:prev_id]
+		property :prev_id do
+			key :type, :integer
+			key :format, :int64
+			key :required, true
+			key :description, 'prev step id or null if it is the first node'
+		end
+		property :stage_id do
+			key :type, :integer
+			key :format, :int64
+			key :required, false
+			key :description, 'stage id or null if it is the same stage'
+		end
+	end
+
+	swagger_schema :CreateStepInput do
+		property :prev_id do
+			key :type, :integer
+			key :format, :int64
+			key :required, true
+			key :description, 'prev step id or null if it is the first node'
+		end
+	end
+
   belongs_to :stage
   has_one :ramp, foreign_key: "next_step_id", dependent: :destroy
-  
+
   scope :collect_data, lambda {|stage_id| where(:stage_id=>stage_id, :collect_data=>true).order("steps.order_number")}
-     
+
   ACCESSIBLE_ATTRS = [:name, :temperature, :hold_time, :collect_data, :pause, :delta_temperature, :delta_duration_s, :excitation_intensity]
-  
+
   attr_accessor :destroyed_stage_id
-  
+
   validate :validate
-  
+
   before_create do |step|
     if step.temperature.nil? || step.hold_time.nil?
       if !prev_id.nil?
@@ -93,7 +157,7 @@ class Step < ActiveRecord::Base
       step.ramp = Ramp.new(:rate=>Ramp::MAX_RATE)
     end
   end
-  
+
   after_save do |step|
     if step.stage_id_changed? && !step.stage_id_was.nil?
       children_count = Step.where("stage_id=?", step.stage_id_was).count
@@ -104,7 +168,7 @@ class Step < ActiveRecord::Base
       end
     end
   end
-  
+
   after_destroy do |step|
     if step.siblings && step.siblings.length == 0
       if step.stage.destroy
@@ -115,7 +179,7 @@ class Step < ActiveRecord::Base
       end
     end
   end
-  
+
 #  def name
 #    name_attr = read_attribute(:name)
 #    if name_attr.nil?
@@ -130,21 +194,21 @@ class Step < ActiveRecord::Base
     val = nil if val.blank?
     write_attribute(:name, val)
   end
-  
+
   def infinite_hold?
     hold_time == 0
   end
-  
+
   def copy
     new_step = copy_helper
     new_step.ramp = ramp.copy
     new_step
   end
-  
+
   def new_sibling?
     new_record? || stage_id_changed?
   end
-  
+
   def siblings
     if stage.nil?
       nil
@@ -154,11 +218,11 @@ class Step < ActiveRecord::Base
       stage.steps
     end
   end
-  
+
   def last_step?
     !self.class.where("stage_id = ? and order_number > ?", stage_id, order_number).exists?
   end
-  
+
   protected
 
   def validate
@@ -176,15 +240,15 @@ class Step < ActiveRecord::Base
           end
       end
     end
-    
+
     if !temperature.nil? && (temperature < 4 || temperature > 100)
       errors.add(:temperature, "between 4 to 100")
     end
-    
+
     if !hold_time.nil? && hold_time < 0
       errors.add(:hold_time, "Cannot be negative")
     end
-    
+
     if collect_data && (infinite_hold? || pause)
       errors.add(:collect_data, "Cannot collect data on #{(infinite_hold?)? "infinite hold" : "pause"} step")
     end

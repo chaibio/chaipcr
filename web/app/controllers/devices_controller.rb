@@ -46,13 +46,13 @@ class DevicesController < ApplicationController
       key :produces, [
         'application/json',
       ]
+			key :tags, [
+				'Device'
+			]
       response 200 do
         key :description, 'device response'
         schema do
-          key :type, :object
-          items do
             key :'$ref', :Device
-          end
         end
       end
     end
@@ -96,13 +96,14 @@ class DevicesController < ApplicationController
       key :produces, [
         'application/json',
       ]
+			key :tags, [
+				'Device'
+			]
       response 200 do
         key :description, 'capabilities response'
         schema do
           key :type, :object
-          items do
-            key :'$ref', :Configuration
-          end
+          key :'$ref', :Configuration
         end
       end
     end
@@ -128,13 +129,14 @@ class DevicesController < ApplicationController
       key :produces, [
         'application/json',
       ]
+			key :tags, [
+				'Device'
+			]
       response 200 do
         key :description, 'Device status response'
         schema do
           key :type, :object
-          items do
-            key :'$ref', :Status
-          end
+          key :'$ref', :Status
         end
       end
     end
@@ -150,6 +152,33 @@ class DevicesController < ApplicationController
       render json: {errors: "reatime server port 8000 cannot be reached: #{e}"}, status: 500
     end
   end
+
+=begin
+	swagger_path '/device/root_password' do
+		operation :put do
+			key :summary, 'Set root password'
+			key :description, 'Root password is set based on the sent parameter'
+			key :produces, [
+				'application/json',
+			]
+			parameter do
+				key :name, :root_password
+				key :in, :body
+				key :description, 'password to set'
+				key :required, true
+				schema do
+					key :required, [:password]
+					property :password do
+						key :description, 'password to set'
+					end
+				end
+			end
+			response 200 do
+				key :description, 'Root password is set properly'
+			end
+		end
+	end
+=end
 
   api :PUT, "/device/root_password", "Set root password"
   param :password, String, :desc => "password to set", :required=>true
@@ -277,13 +306,14 @@ class DevicesController < ApplicationController
       key :produces, [
         'application/json',
       ]
+			key :tags, [
+				'Device'
+			]
       response 200 do
         key :description, 'Software update response'
         schema do
           key :type, :object
-          items do
-            key :'$ref', :SoftwareUpdate
-          end
+          key :'$ref', :SoftwareUpdate
         end
       end
     end
@@ -404,14 +434,11 @@ class DevicesController < ApplicationController
       key :produces, [
         'application/json',
       ]
+			key :tags, [
+				'Device'
+			]
       response 200 do
         key :description, 'Downloaded database'
-        schema do
-          key :type, :object
-          items do
-            key :'$ref', :Database
-          end
-        end
       end
     end
   end

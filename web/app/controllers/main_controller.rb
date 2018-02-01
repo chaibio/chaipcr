@@ -29,8 +29,11 @@ class MainController < ApplicationController
       key :produces, [
         'application/html',
       ]
+			key :tags, [
+				'Main'
+			]
       response 200 do
-        key :description, 'Home Page'
+        key :description, 'Home Page is returned'
       end
     end
   end
@@ -46,8 +49,11 @@ class MainController < ApplicationController
       key :produces, [
         'application/html',
       ]
+			key :tags, [
+				'Main'
+			]
       response 200 do
-        key :description, 'Signup Page'
+        key :description, 'Signup Page is returned'
       end
     end
   end
@@ -60,7 +66,7 @@ class MainController < ApplicationController
       redirect_to login_path
     end
   end
-
+=begin
   swagger_path '/login' do
     operation :get do
       key :summary, 'Login page'
@@ -68,12 +74,15 @@ class MainController < ApplicationController
       key :produces, [
         'application/html',
       ]
+			key :tags, [
+				'Main'
+			]
       response 200 do
-        key :description, 'Login Page'
+        key :description, 'Login Page is returned'
       end
     end
   end
-
+=end
   api :GET, "/login", "Show this page when there are users in the database and user is not logged in"
   def login
     if !params[:token].blank?

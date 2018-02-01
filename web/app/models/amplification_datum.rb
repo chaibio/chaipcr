@@ -18,19 +18,82 @@
 #
 class AmplificationDatum < ActiveRecord::Base
   belongs_to :experiment
-   
+	include Swagger::Blocks
+
+	swagger_schema :AmplificationData do
+		property :partial do
+			key :type, :boolean
+			key :description, '?'
+		end
+		property :total_cycles do
+			key :type, :integer
+			key :description, '?'
+		end
+		property :steps do
+			key :description, '?'
+			key :type, :array
+			items do
+				property :step_id do
+					key :type, :integer
+				end
+				property :amplification_data do
+					key :type, :array
+					items do
+						property :channel do
+							key :type, :integer
+							key :description, '?'
+						end
+						property :well_num do
+							key :type, :integer
+							key :description, '?'
+						end
+						property :cycle_num do
+							key :type, :integer
+							key :description, '?'
+						end
+						property :background_subtracted_value do
+							key :type, :integer
+							key :description, '?'
+						end
+						property :baseline_subtracted_value do
+							key :type, :integer
+							key :description, '?'
+						end
+					end
+				end
+				property :cq do
+					key :type, :array
+					items do
+						property :channel do
+							key :type, :integer
+							key :description, '?'
+						end
+						property :well_num do
+							key :type, :integer
+							key :description, '?'
+						end
+						property :cq do
+							key :type, :integer
+							key :description, '?'
+						end
+					end
+				end
+			end
+		end
+	end
+
   Constants::KEY_NAMES.each do |variable|
     define_method("#{variable}") do
       (!sub_type.nil? && "#{sub_type}_id" == variable)? sub_id : nil
     end
   end
-  
+
   attr_accessor :fluorescence_value
-  
+
   def self.retrieve(experiment_id, stage_id)
     self.where(:experiment_id=>experiment_id, :stage_id=>stage_id).order(:channel, :well_num, :cycle_num)
   end
-  
+
   def self.maxid(experiment_id, stage_id)
     self.where(:experiment_id=>experiment_id, :stage_id=>stage_id).maximum(:id)
   end
