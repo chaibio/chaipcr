@@ -14,6 +14,7 @@ import { WindowRef } from '../../../services/windowref/windowref.service';
 })
 export class BaseChartDirective implements OnChanges {
 
+  protected Y_AXIS_NUM_TICKS = 10
   protected NORMAL_PATH_STROKE_WIDTH = 2;
   protected HOVERED_PATH_STROKE_WIDTH = 3;
   protected ACTIVE_PATH_STROKE_WIDTH = 5;
@@ -703,11 +704,16 @@ export class BaseChartDirective implements OnChanges {
   getYLinearTicks() {
     let max = this.getMaxY()
     let min = this.getMinY()
-    min = Math.floor(min / 5000) * 5000 // ROUND(A2/5,0)*5
-    max = Math.ceil(max / 5000) * 5000
+    //min = Math.floor(min / 5000) * 5000 // ROUND(A2/5,0)*5
+    //max = Math.ceil(max / 5000) * 5000
+    let intv = (max - min) / this.Y_AXIS_NUM_TICKS
+    intv = Math.ceil(intv / 5000) * 5000
+
+    min = Math.floor(min / intv) * intv
+    max = Math.ceil(max / intv) * intv
 
     let ticks = []
-    for (let i=min; i <= max; i+=5000 ) {
+    for (let i=min; i <= max; i+=intv ) {
       ticks.push(i)
     }
 

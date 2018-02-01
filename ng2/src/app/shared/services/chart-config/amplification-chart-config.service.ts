@@ -39,7 +39,8 @@ export class AmplificationConfigService {
           ticks: 10,
           tickFormat: (y) => {
             return Math.round((y / 1000) * 10) / 10;
-          }
+          },
+          scale: 'linear'
         }
       },
       box: {
