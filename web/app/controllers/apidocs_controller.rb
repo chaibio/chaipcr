@@ -44,7 +44,9 @@ class ApidocsController < ActionController::Base
 		AmplificationDatum,
 		AmplificationOption,
     Device,
+		ErrorModel,
     Experiment,
+		LoginModel,
 		MeltCurveDatum,
     Protocol,
     Ramp,
@@ -53,7 +55,6 @@ class ApidocsController < ActionController::Base
 		TemperatureLog,
 		Well,
 		User,
-    ErrorModel,
     self,
   ].freeze
 

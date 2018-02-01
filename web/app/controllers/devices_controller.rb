@@ -298,7 +298,7 @@ class DevicesController < ApplicationController
     end
   end
 
-
+=begin
   swagger_path '/device/software_update' do
     operation :get do
       key :summary, 'Query the software update meta data'
@@ -318,6 +318,7 @@ class DevicesController < ApplicationController
       end
     end
   end
+=end
 
   api :GET, "/device/software_update", "query the software update meta data"
   example "{'upgrade':{'version':'1.0.1','release_date':null,'brief_description':'this is the brief description','full_description':'this is the full description'}}"

@@ -23,14 +23,14 @@ class AmplificationDatum < ActiveRecord::Base
 	swagger_schema :AmplificationData do
 		property :partial do
 			key :type, :boolean
-			key :description, '?'
+			key :description, 'Indicates if the returned data is complete or partial'
 		end
 		property :total_cycles do
 			key :type, :integer
-			key :description, '?'
+			key :description, 'No of cycles for the experiment'
 		end
 		property :steps do
-			key :description, '?'
+			key :description, 'Contains the step id and and a 2d array amplification_data - every array object contains the channel, the well number, the cycle number and the background and baseline subtracted values for them.'
 			key :type, :array
 			items do
 				property :step_id do

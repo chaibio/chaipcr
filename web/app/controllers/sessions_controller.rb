@@ -40,11 +40,14 @@ class SessionsController < ApplicationController
 				key :description, 'Login detals'
 				key :required, true
 				schema do
-					key :'$ref', :login_params
+					key :'$ref', :LoginInput
 				end
 			end
 			response 201 do
-				key :description, 'User is logged in to the application'
+				key :description, 'User is logged in to the application. Cookie will be set with the authentication token, the token will expire in a day'
+				schema do
+					key :'$ref', :Login
+				end
 			end
 		end
 	end

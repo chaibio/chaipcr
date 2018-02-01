@@ -410,7 +410,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :raw
 				key :in, :query
-				key :description, '?'
+				key :description, 'if raw data should be returned, by default it is not returned'
 				key :type, :boolean
 				key :required, false
         key :default, false
@@ -418,7 +418,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :background
 				key :in, :query
-				key :description, '?'
+				key :description, 'if background subtracted data should be returned, by default it is retuned'
 				key :type, :boolean
 				key :required, false
         key :default, true
@@ -426,7 +426,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :baseline
 				key :in, :query
-				key :description, '?'
+				key :description, 'if baseline subtracted data should be returned, by default it is retuned'
 				key :type, :boolean
 				key :required, false
         key :default, true
@@ -434,7 +434,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :cq
 				key :in, :query
-				key :description, '?'
+				key :description, 'if cq values should be returned, by default it is retuned'
 				key :type, :boolean
 				key :required, false
         key :default, true
@@ -461,7 +461,7 @@ class ExperimentsController < ApplicationController
           key :format, :int64
         end
 			end
-      
+
 			response 200 do
 				key :description, 'amplification data'
 				schema do
@@ -471,15 +471,15 @@ class ExperimentsController < ApplicationController
 					end
 				end
 			end
-      
+
 			response 202 do
 				key :description, 'Job accepted'
 			end
-			
+
       response 304 do
 				key :description, 'Amplification data is not modified if etag is the same'
 			end
-      
+
 			response :default do
 				key :description, 'unexpected error'
 				schema do
@@ -643,7 +643,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :raw
 				key :in, :query
-				key :description, 'melt curve raw data'
+				key :description, 'if raw data should be returned, by default it is not returned'
 				key :type, :boolean
 				key :required, false
         key :default, false
@@ -651,7 +651,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :normalized
 				key :in, :query
-				key :description, '?'
+				key :description, 'if normalized data should be returned, by default it is returned'
 				key :type, :boolean
   			key :required, false
         key :default, true
@@ -659,7 +659,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :derivative
 				key :in, :query
-				key :description, '?'
+				key :description, 'if derivative data should be returned, by default it is returned'
 				key :type, :boolean
         key :required, false
         key :default, true
@@ -667,7 +667,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :tm
 				key :in, :query
-				key :description, '?'
+				key :description, 'if tm values should be returned, by default it is returned'
 				key :type, :boolean
 				key :required, false
         key :default, true
@@ -683,7 +683,7 @@ class ExperimentsController < ApplicationController
           key :format, :int64
         end
 			end
-    
+
 			response 200 do
 				key :description, 'melt curve data along with etag header'
 				schema do
@@ -693,15 +693,15 @@ class ExperimentsController < ApplicationController
 					end
 				end
 			end
-      
+
 			response 202 do
 				key :description, 'Job accepted'
 			end
-			
+
       response 304 do
 				key :description, 'Melt curve data is not modified if etag is the same'
 			end
-      
+
 			response :default do
 				key :description, 'unexpected error'
 				schema do
@@ -875,7 +875,7 @@ class ExperimentsController < ApplicationController
 				key :type, :integer
 				key :format, :int64
 			end
-      
+
 			response 200 do
 				key :description, 'zipped data'
 				schema do
@@ -883,11 +883,11 @@ class ExperimentsController < ApplicationController
           key :format, :binary
 				end
 			end
-      
+
 			response 202 do
 				key :description, 'Job accepted'
 			end
-      
+
 			response :default do
 				key :description, 'unexpected error'
 				schema do
@@ -1048,12 +1048,12 @@ class ExperimentsController < ApplicationController
       render :json=>{:errors=>"experiment not found"}, :status => :not_found
     end
   end
-  
+
   def start
     if @experiment
     end
   end
-  
+
   def stop
   end
 
