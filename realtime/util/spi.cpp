@@ -17,6 +17,7 @@
 // limitations under the License.
 //
 
+#include <cstring>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
@@ -87,16 +88,17 @@ void SPIPort::setMode(uint8_t mode) {
 void SPIPort::readBytes(char* rxbuffer, char* txbuffer, unsigned int length, unsigned int speedHz) {
     //create transfer descriptor
 	struct spi_ioc_transfer spiTransfer;
-	spiTransfer.tx_buf = (unsigned long)txbuffer;
-	spiTransfer.rx_buf = (unsigned long)rxbuffer;
+    memset(&spiTransfer, 0, sizeof(spiTransfer));
+    spiTransfer.tx_buf = reinterpret_cast<__u64>(txbuffer);
+    spiTransfer.rx_buf = reinterpret_cast<__u64>(rxbuffer);
 	spiTransfer.len = length;
-	spiTransfer.delay_usecs = 0;
+    spiTransfer.delay_usecs = 0;
 	spiTransfer.speed_hz = speedHz;
     spiTransfer.bits_per_word = 0;
     spiTransfer.cs_change = 0;
     spiTransfer.pad = 0;
 
 	//execute transfer
-	if (ioctl(deviceFile_, SPI_IOC_MESSAGE(1), &spiTransfer) < 0)
+    if (ioctl(deviceFile_, SPI_IOC_MESSAGE(1), &spiTransfer) < 0)
         throw SPIError("SPI read bytes failed", errno);
 }
