@@ -861,7 +861,7 @@ export class BaseChartDirective implements OnChanges {
       extremeValue.text
         .attr('x', this.MARGIN.left - (textWidth / 2))
       extremeValue.input
-        .style('width', "#{conWidth}px")
+        .style('width', `${conWidth}px`)
     }
     if(loc === 'x:max') {
       let conWidth = textWidth + this.INPUT_PADDING
@@ -871,7 +871,7 @@ export class BaseChartDirective implements OnChanges {
       extremeValue.text
         .attr('x', this.MARGIN.left + this.width - (textWidth / 2))
       extremeValue.input
-        .style('width', "#{conWidth}px")
+        .style('width', `${conWidth}px`)
     }
 
     if(loc === 'y:min' || loc === 'y:max') {
@@ -880,7 +880,7 @@ export class BaseChartDirective implements OnChanges {
         .attr('width', conWidth + this.INPUT_PADDING)
         .attr('x', this.MARGIN.left - (conWidth + extremeValue.config.offsetRight + this.INPUT_PADDING / 2))
       extremeValue.input
-        .style('width', "#{conWidth + this.INPUT_PADDING}px")
+        .style('width', `${conWidth + this.INPUT_PADDING}px`)
       extremeValue.text.attr('x', this.MARGIN.left - (extremeValue.config.offsetRight + conWidth + this.INPUT_PADDING / 2))
     }
 
@@ -901,7 +901,7 @@ export class BaseChartDirective implements OnChanges {
         .attr('x', this.MARGIN.left + (loc === 'x:min' ? 0 : this.width) - (conWidth / 2))
       extremeValue.input
         .style('opacity', 1)
-        .style('width', "#{conWidth}px")
+        .style('width', `${conWidth}px`)
       val = extremeValue.text.text()
       extremeValue.input.node().value = val
 
@@ -930,7 +930,7 @@ export class BaseChartDirective implements OnChanges {
         .attr('width', inputWidth + this.INPUT_PADDING )
         .attr('x', this.MARGIN.left - (inputWidth + extremeValue.config.offsetRight) - (this.INPUT_PADDING / 2))
       extremeValue.input
-        .style('width', "#{inputWidth + this.INPUT_PADDING}px")
+        .style('width', `${inputWidth + this.INPUT_PADDING}px`)
         .style('opacity', 1)
     }
   }
