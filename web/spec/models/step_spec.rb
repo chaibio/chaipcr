@@ -5,6 +5,15 @@ describe Step do
       @stage = hold_stage(Protocol.create).reload
     end
 
+    describe "#validate" do
+      it "temperature" do
+        step = @stage.steps.first
+        step.temperature = 110
+        step.save.should be_falsey
+        expect(step.errors.size).to eq(1)
+      end
+    end
+    
     describe "#create" do
       it "step with default params match to previous step" do
         last_step = @stage.steps.last

@@ -225,8 +225,16 @@ class Step < ActiveRecord::Base
       end
     end
 
-    if !temperature.nil? && (temperature < 4 || temperature > 100)
-      errors.add(:temperature, "between 4 to 100")
+    if !temperature.nil?
+      if DeviceConfiguration.valid?
+        temperature_min = DeviceConfiguration.thermal["block"]["min_temp_c"]
+        temperature_max = DeviceConfiguration.thermal["block"]["max_temp_c"]
+      end
+      temperature_min = 4 if temperature_min.nil?
+      temperature_max = 100 if temperature_max.nil?
+      if (temperature < temperature_min || temperature > temperature_max)
+        errors.add(:temperature, "between #{temperature_min} to #{temperature_max}")
+      end
     end
 
     if !hold_time.nil? && hold_time < 0
