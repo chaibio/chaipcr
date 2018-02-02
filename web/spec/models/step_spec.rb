@@ -29,8 +29,8 @@ describe Step do
         last_step.save
         step = Step.new(:stage_id=>@stage.id)
         step.prev_id = last_step.id
-        step.save.should be_false
-        step.errors.should have(1).item
+        step.save.should be_falsey
+        expect(step.errors.size).to eq(1)
       end
     end
 
@@ -39,37 +39,37 @@ describe Step do
         @stage.steps << Step.new(:temperature=>95, :hold_time=>30, :order_number=>1)
         step = @stage.steps.first
         step.hold_time = 0
-        step.save.should be_false
-        step.errors.should have(1).item
+        step.save.should be_falsey
+        expect(step.errors.size).to eq(1)
       end
       
       it "not allowed to update to infinite hold if it is not the last stage" do
         new_stage = hold_stage(@stage.protocol).reload
         step = new_stage.steps.last
         step.hold_time = 0
-        step.save.should be_false
-        step.errors.should have(1).item
+        step.save.should be_falsey
+        expect(step.errors.size).to eq(1)
       end
       
       it "allowed to update to infinite hold if it is the last step in the last stage" do
         new_stage = hold_stage(@stage.protocol).reload
         step = @stage.steps.last
         step.hold_time = 0
-        step.save.should be_true
+        step.save.should be_truthy
       end
       
       it "not allow to collect data on infinite hold step" do
         step = Step.new(:stage_id=>@stage.id)
         step.hold_time = 0
         step.collect_data = true
-        step.save.should be_false
+        step.save.should be_falsey
       end
       
       it "not allow to collect data on pause step" do
         step = Step.new(:stage_id=>@stage.id)
         step.pause = true
         step.collect_data = true
-        step.save.should be_false
+        step.save.should be_falsey
       end
     end
     

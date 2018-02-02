@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Experiments API" do
+describe "Experiments API", type: :request do
   before(:each) do
     admin_user = create_admin_user
     post '/login', { email: admin_user.email, password: admin_user.password }
@@ -15,7 +15,7 @@ describe "Experiments API" do
     json = JSON.parse(response.body)
     json["experiment"]["name"].should == "test"
     json["experiment"]["type"].should == "user"
-    json["experiment"]["protocol"]["stages"].should have(2).items
+    expect(json["experiment"]["protocol"]["stages"].size).to eq(2)
     json["experiment"]["run_at"].should be_nil
   end
   
@@ -26,7 +26,7 @@ describe "Experiments API" do
     json = JSON.parse(response.body)
     json["experiment"]["name"].should == "Thermal Performance Diagnostic"
     json["experiment"]["type"].should == "diagnostic"
-    json["experiment"]["protocol"]["stages"].should have(1).item
+    expect(json["experiment"]["protocol"]["stages"].size).to eq(1)
     json["experiment"]["run_at"].should be_nil
   end
   
@@ -41,7 +41,7 @@ describe "Experiments API" do
     json = JSON.parse(response.body)
     json["experiment"]["name"].should == "test"
     json["experiment"]["type"].should == "user"
-    json["experiment"]["protocol"]["stages"].should have(4).items
+    expect(json["experiment"]["protocol"]["stages"].size).to eq(4)
     json["experiment"]["run_at"].should be_nil
   end
   

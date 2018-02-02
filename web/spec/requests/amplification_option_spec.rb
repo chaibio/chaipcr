@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Amplification Option API" do
+describe "Amplification Option API", type: :request do
   before(:each) do
     admin_user = create_admin_user
     post '/login', { email: admin_user.email, password: admin_user.password }

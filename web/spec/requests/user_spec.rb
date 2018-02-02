@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "User" do
+describe "User", type: :request do
   describe "#login" do
     it "as admin" do
       admin_user = create_admin_user

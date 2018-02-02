@@ -147,7 +147,7 @@ class Experiment < ActiveRecord::Base
   before_destroy do |experiment|
     if experiment.running?
       errors.add(:base, "cannot delete experiment in the middle of running")
-      return false;
+      false
     end
   end
 

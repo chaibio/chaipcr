@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Device API" do
+describe "Device API", type: :request do
   it 'show status' do
     admin_user = create_admin_user
     post '/login', { email: admin_user.email, password: admin_user.password }

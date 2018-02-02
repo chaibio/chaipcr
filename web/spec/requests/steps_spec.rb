@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Steps API" do
+describe "Steps API", type: :request do
   before(:each) do
     admin_user = create_admin_user
     post '/login', { email: admin_user.email, password: admin_user.password }
@@ -60,7 +60,7 @@ describe "Steps API" do
   describe "#update" do
     it "step name" do
       params = { step: {name: "test"} }
-      put "steps/#{@stage.steps.first.id}", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      put "/steps/#{@stage.steps.first.id}", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       expect(response).to be_success
       json = JSON.parse(response.body)
       json["step"]["name"].should eq("test")
@@ -68,7 +68,7 @@ describe "Steps API" do
     
     it "step name null" do
       params = { step: {name: ""} }
-      put "steps/#{@stage.steps.first.id}", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      put "/steps/#{@stage.steps.first.id}", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       expect(response).to be_success
       json = JSON.parse(response.body)
       json["step"]["name"].should be_nil

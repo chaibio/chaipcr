@@ -145,10 +145,10 @@ class Stage < ActiveRecord::Base
 
   before_destroy do |stage|
     if stage.destroyed?
-      return false
+      false
     elsif stage.protocol && stage.protocol.stages.count <= 1
       errors.add(:base, "At least one stage is required")
-      return false
+      false
     end
   end
 

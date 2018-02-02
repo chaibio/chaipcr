@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "DataAnalysis API" do
+describe "DataAnalysis API", type: :request do
   before(:each) do
     admin_user = create_admin_user
     post '/login', { email: admin_user.email, password: admin_user.password }
@@ -38,10 +38,10 @@ describe "DataAnalysis API" do
   
   it "amplification data with async calls" do
     create_fluorescence_data(@experiment, 10)
-    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |experiment, stage_id, calibration_id|
+    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |obj, experiment, stage_id, calibration_id|
       experiment.id.should == @experiment.id
       calibration_id.should == @experiment.calibration_id
-      sleep(1)
+      sleep(2)
       [[], []]
     end
     
@@ -49,6 +49,7 @@ describe "DataAnalysis API" do
     get "/experiments/#{@experiment.id}/amplification_data", { :format => 'json' }
     response.response_code.should == 202
     get "/experiments/#{@experiment.id}/amplification_data", { :format => 'json' }
+    print response.body
     response.response_code.should == 202
     sleep(2)
 
@@ -74,7 +75,7 @@ describe "DataAnalysis API" do
   it "amplification data with more data" do
     create_fluorescence_data(@experiment, 10)
     
-    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |experiment, stage_id, calibration_id|
+    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |obj, experiment, stage_id, calibration_id|
       experiment.id.should == @experiment.id
       calibration_id.should == @experiment.calibration_id
       sleep(1)
@@ -142,7 +143,7 @@ describe "DataAnalysis API" do
   it "amplification data for error" do
     create_fluorescence_data(@experiment, 10)
     error = "test error"
-    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |experiment, stage_id, calibration_id|
+    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |obj, experiment, stage_id, calibration_id|
       raise ({errors: error}.to_json)
     end
     
@@ -176,7 +177,7 @@ describe "DataAnalysis API" do
   
   it "amplification data for two experiments" do
     create_fluorescence_data(@experiment, 10)
-    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |experiment, stage_id, calibration_id|
+    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |obj, experiment, stage_id, calibration_id|
       experiment.id.should == @experiment.id
       calibration_id.should == @experiment.calibration_id
       sleep(2)

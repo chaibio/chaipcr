@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Wells API" do
+describe "Wells API", type: :request do
   before(:each) do
     admin_user = create_admin_user
     post '/login', { email: admin_user.email, password: admin_user.password }
