@@ -51,6 +51,7 @@ class ApidocsController < ActionController::Base
     Protocol,
     Ramp,
     Stage,
+		StatusModel,
     Step,
 		TemperatureLog,
 		Well,

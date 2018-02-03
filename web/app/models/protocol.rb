@@ -27,10 +27,11 @@ class Protocol < ActiveRecord::Base
     property :lid_temperature do
       key :type, :number
       key :format, :double
-      key :description, 'lid temperature, in degree C, default is 110, with precision to one decimal point'
+      key :description, 'Lid temperature, in degree C, default is 110, with precision to one decimal point'
     end
     property :estimate_duration do
       key :type, :integer
+			key :description, 'Estimated duration in seconds'
       key :format, :int32
     end
     property :stages do
@@ -44,7 +45,7 @@ class Protocol < ActiveRecord::Base
 	swagger_schema :ProtocolInput do
 		key :required, [:protocol]
 		property :protocol do
-			key :description, 'Give a description of all the parameters'
+			key :description, 'Contains properties to update'
 			property :lid_temperature do
 				key :type, :number
 				key :format, :float

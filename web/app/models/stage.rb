@@ -32,18 +32,22 @@ class Stage < ActiveRecord::Base
       key :enum, ['holding', 'cycling', 'meltcurve']
     end
     property :name do
+			key :description, "Name of the stage, if not provided, default name is '<stage type> Stage'"
       key :type, :string
     end
     property :num_cycles do
+			key :description, "Number of cycles in a stage, must be >= 1, default to 1"
       key :type, :integer
       key :format, :int32
       key :minimum, 1
     end
     property :auto_delta do
+			key :description, "Auto Delta, default is false"
       key :type, :boolean
       key :default, false
     end
     property :auto_delta_start_cycle do
+			key :description, "Cycle to start delta temperature"
       key :type, :integer
     end
     property :steps do

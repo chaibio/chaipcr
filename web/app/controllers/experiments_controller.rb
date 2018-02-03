@@ -65,7 +65,7 @@ class ExperimentsController < ApplicationController
 				'Experiment'
 			]
       response 200 do
-        key :description, 'experiments response'
+        key :description, 'Object containing list of all the experiments'
         schema do
           key :type, :array
           items do
@@ -87,20 +87,20 @@ class ExperimentsController < ApplicationController
       parameter do
         key :name, :experiment
         key :in, :body
-        key :description, 'experiment to create'
+        key :description, 'Experiment to create'
         key :required, true
         schema do
            key :'$ref', :ExperimentInput
          end
       end
       response 200 do
-        key :description, 'experiment response'
+        key :description, 'Created experiment is returned'
         schema do
           key :'$ref', :Experiment
         end
       end
       response 422 do
-        key :description, 'experiment create error'
+        key :description, 'Experiment create error'
 				schema do
 					key :'$ref', :Experiment
 				end
@@ -149,7 +149,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :id
 				key :in, :path
-				key :description, 'id of the experiment to update'
+				key :description, 'Id of the experiment to update'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
@@ -157,20 +157,20 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :experiment
 				key :in, :body
-				key :description, 'experiment to update'
+				key :description, 'Experiment to update'
 				key :required, true
 				schema do
 					 key :'$ref', :ExperimentInput
 				 end
 			end
 			response 200 do
-				key :description, 'experiment response'
+				key :description, 'Updated experiment is returned'
 				schema do
 					key :'$ref', :Experiment
 				end
 			end
 			response 422 do
-				key :description, 'experiment update error'
+				key :description, 'Experiment update error'
 				schema do
 					key :'$ref', :Experiment
 				end
@@ -205,19 +205,19 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :id
 				key :in, :path
-				key :description, 'id of the experiment to copy'
+				key :description, 'Id of the experiment to copy'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
 			end
 			response 200 do
-				key :description, 'experiment response'
+				key :description, 'Copied experiment is retuned'
 				schema do
 					key :'$ref', :Experiment
 				end
 			end
 			response 422 do
-				key :description, 'experiment copy error'
+				key :description, 'Experiment copy error'
 				schema do
 					key :'$ref', :Experiment
 				end
@@ -251,19 +251,19 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :id
 				key :in, :path
-				key :description, 'id of the experiment to fetch'
+				key :description, 'Id of the experiment to fetch'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
 			end
 			response 200 do
-				key :description, 'experiment response'
+				key :description, 'Fetched experiment is retuned'
 				schema do
 					key :'$ref', :Experiment
 				end
 			end
 			response 422 do
-				key :description, 'unexpected error'
+				key :description, 'Unexpected error'
 				schema do
 					key :'$ref', :ErrorModel
 				end
@@ -293,16 +293,16 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :id
 				key :in, :path
-				key :description, 'id of the experiment to delete'
+				key :description, 'Id of the experiment to delete'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
 			end
 			response 200 do
-				key :description, 'experiment deleted'
+				key :description, 'Experiment deleted'
 			end
 			response 422 do
-				key :description, 'unexpected error'
+				key :description, 'Unexpected error'
 				schema do
 					key :'$ref', :Experiment
 				end
@@ -331,7 +331,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :id
 				key :in, :path
-				key :description, 'id of the experiment for which we need temperature data'
+				key :description, 'Id of the experiment for which we need temperature data'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
@@ -347,7 +347,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :endtime
 				key :in, :query
-				key :description, 'if not specified, it returns everything to the end of the experiment, in ms'
+				key :description, 'If not specified, it returns everything to the end of the experiment, in ms'
 				key :required, false
 				key :type, :integer
 				key :format, :int64
@@ -361,7 +361,7 @@ class ExperimentsController < ApplicationController
 				key :format, :int64
 			end
 			response 200 do
-				key :description, 'temperature data'
+				key :description, 'Temperature data'
 				schema do
 					key :type, :array
 					items do
@@ -370,7 +370,7 @@ class ExperimentsController < ApplicationController
 				end
 			end
 			response :default do
-				key :description, 'unexpected error'
+				key :description, 'Unexpected error'
 				schema do
 					key :'$ref', :ErrorModel
 				end
@@ -402,7 +402,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :id
 				key :in, :path
-				key :description, 'id of the experiment for which we need amplification data'
+				key :description, 'Id of the experiment for which we need amplification data'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
@@ -410,7 +410,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :raw
 				key :in, :query
-				key :description, 'if raw data should be returned, by default it is not returned'
+				key :description, 'If raw data should be returned, by default it is not returned'
 				key :type, :boolean
 				key :required, false
         key :default, false
@@ -418,7 +418,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :background
 				key :in, :query
-				key :description, 'if background subtracted data should be returned, by default it is retuned'
+				key :description, 'If background subtracted data should be returned, by default it is retuned'
 				key :type, :boolean
 				key :required, false
         key :default, true
@@ -426,7 +426,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :baseline
 				key :in, :query
-				key :description, 'if baseline subtracted data should be returned, by default it is retuned'
+				key :description, 'If baseline subtracted data should be returned, by default it is retuned'
 				key :type, :boolean
 				key :required, false
         key :default, true
@@ -434,7 +434,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :cq
 				key :in, :query
-				key :description, 'if cq values should be returned, by default it is retuned'
+				key :description, 'If cq values should be returned, by default it is retuned'
 				key :type, :boolean
 				key :required, false
         key :default, true
@@ -463,7 +463,7 @@ class ExperimentsController < ApplicationController
 			end
 
 			response 200 do
-				key :description, 'amplification data'
+				key :description, 'Amplification data'
 				schema do
 					key :type, :array
 					items do
@@ -481,7 +481,7 @@ class ExperimentsController < ApplicationController
 			end
 
 			response :default do
-				key :description, 'unexpected error'
+				key :description, 'Unexpected error'
 				schema do
 					key :'$ref', :ErrorModel
 				end
@@ -635,7 +635,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :id
 				key :in, :path
-				key :description, 'id of the experiment for which we need melt curve data'
+				key :description, 'Id of the experiment for which we need melt curve data'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
@@ -643,7 +643,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :raw
 				key :in, :query
-				key :description, 'if raw data should be returned, by default it is not returned'
+				key :description, 'If raw data should be returned, by default it is not returned'
 				key :type, :boolean
 				key :required, false
         key :default, false
@@ -651,7 +651,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :normalized
 				key :in, :query
-				key :description, 'if normalized data should be returned, by default it is returned'
+				key :description, 'If normalized data should be returned, by default it is returned'
 				key :type, :boolean
   			key :required, false
         key :default, true
@@ -659,7 +659,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :derivative
 				key :in, :query
-				key :description, 'if derivative data should be returned, by default it is returned'
+				key :description, 'If derivative data should be returned, by default it is returned'
 				key :type, :boolean
         key :required, false
         key :default, true
@@ -667,7 +667,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :tm
 				key :in, :query
-				key :description, 'if tm values should be returned, by default it is returned'
+				key :description, 'If tm values should be returned, by default it is returned'
 				key :type, :boolean
 				key :required, false
         key :default, true
@@ -685,7 +685,7 @@ class ExperimentsController < ApplicationController
 			end
 
 			response 200 do
-				key :description, 'melt curve data along with etag header'
+				key :description, 'Melt curve data along with etag header'
 				schema do
 					key :type, :array
 					items do
@@ -703,7 +703,7 @@ class ExperimentsController < ApplicationController
 			end
 
 			response :default do
-				key :description, 'unexpected error'
+				key :description, 'Unexpected error'
 				schema do
 					key :'$ref', :ErrorModel
 				end
@@ -870,14 +870,14 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :id
 				key :in, :path
-				key :description, 'id of the experiment for which we need melt curve data'
+				key :description, 'Id of the experiment for which we need melt curve data'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
 			end
 
 			response 200 do
-				key :description, 'zipped data'
+				key :description, 'Zipped data'
 				schema do
           key :type, :string
           key :format, :binary
@@ -889,7 +889,7 @@ class ExperimentsController < ApplicationController
 			end
 
 			response :default do
-				key :description, 'unexpected error'
+				key :description, 'Unexpected error'
 				schema do
 					key :'$ref', :ErrorModel
 				end

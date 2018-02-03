@@ -23,10 +23,10 @@ class MeltCurveDatum < ActiveRecord::Base
 	swagger_schema :MeltData do
 		property :partial do
 			key :type, :boolean
-			key :description, '?'
+			key :description, 'Indicates if the returned data is complete or partial'
 		end
 		property :ramps do
-			key :description, '?'
+			key :description, 'Describe temperature, normalized_data, derivative_data, tm and area arrays'
 			key :type, :array
 			items do
 				property :ramp_id do

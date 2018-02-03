@@ -26,30 +26,38 @@ class Experiment < ActiveRecord::Base
 	      key :format, :int64
 	    end
 	    property :name do
+				key :description, 'Name of the experiment'
 	      key :type, :string
 	    end
 	    property :type do
+				key :description, 'Josh to describe'
 	      key :type, :string
+				key :enum, ['user', 'diagnostic', 'calibration']
 	    end
 	    property :time_valid do
 	      key :type, :boolean
 	    end
 	    property :created_at do
+				key :description, 'Date at which the experiment was created'
 	      key :type, :string
 	      key :format, :date
 	    end
 	    property :started_at do
+				key :description, 'Date at which the experiment was started'
 	      key :type, :string
 	      key :format, :date
 	    end
 	    property :completed_at do
+				key :description, 'Date at which the experiment was completed'
 	      key :type, :string
 	      key :format, :date
 	    end
 	    property :completion_status do
+				key :description, 'If the experiment was completed successfully or aborted'
 	      key :type, :string
 	    end
 	    property :completion_message do
+				key :description, '?'
 	      key :type, :string
 	    end
 		end

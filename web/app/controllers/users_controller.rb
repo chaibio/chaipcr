@@ -39,8 +39,8 @@ class UsersController < ApplicationController
 
   swagger_path '/users' do
     operation :get do
-      key :summary, 'User information'
-      key :description, 'List all the users'
+      key :summary, 'List all Users'
+      key :description, 'Gives a list of all the users'
       key :produces, [
         'application/json',
       ]
@@ -70,7 +70,7 @@ class UsersController < ApplicationController
 
   swagger_path '/users/current' do
     operation :get do
-      key :summary, 'User information'
+      key :summary, 'Show User'
       key :description, 'List the current user'
       key :produces, [
         'application/json',
@@ -102,7 +102,8 @@ class UsersController < ApplicationController
 
   swagger_path '/users' do
     operation :post do
-      key :description, 'Create an user'
+			key :summary, 'Create User'
+      key :description, 'Create an user. Authentication token is not required.'
       key :produces, [
         'application/json',
       ]
@@ -112,7 +113,7 @@ class UsersController < ApplicationController
       parameter do
         key :name, :user
         key :in, :body
-        key :description, 'user to create'
+        key :description, 'User to create'
         key :required, true
         schema do
            key :'$ref', :UserInput
@@ -142,6 +143,7 @@ class UsersController < ApplicationController
 
   swagger_path '/users/{id}' do
     operation :put do
+			key :summary, 'Update User'
       key :description, 'Update an user'
       key :produces, [
         'application/json',
@@ -152,13 +154,13 @@ class UsersController < ApplicationController
       parameter do
         key :name, :id
         key :in, :path
-        key :description, 'user to update'
+        key :description, 'User id'
         key :required, true
       end
 			parameter do
 				key :name, :user
 				key :in, :body
-				key :description, 'user to update'
+				key :description, 'User to update'
 				key :required, true
 				schema do
 					 key :'$ref', :UserInput
@@ -186,6 +188,7 @@ class UsersController < ApplicationController
 
   swagger_path '/users/{id}' do
     operation :delete do
+			key :summary, 'Delete User'
       key :description, 'Delete a user'
       key :produces, [
         'application/json',
@@ -196,7 +199,7 @@ class UsersController < ApplicationController
       parameter do
         key :name, :id
         key :in, :path
-        key :description, 'id of the user to delete'
+        key :description, 'Id of the user to delete'
         key :required, true
       end
       response 200 do

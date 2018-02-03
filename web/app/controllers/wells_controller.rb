@@ -56,7 +56,6 @@ class WellsController < ApplicationController
 				key :description, 'List of all the wells is returned in an array'
 				schema do
 					key :name, :well
-					key :type, :array
 					items do
 						key :'$ref', :Well
 					end

@@ -48,7 +48,7 @@ class RampsController < ApplicationController
 			parameter do
 				key :name, :id
 				key :in, :path
-				key :description, 'ramp id'
+				key :description, 'Ramp id'
 				key :required, true
 				key :type, :integer
 				key :format, :int64

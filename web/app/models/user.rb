@@ -20,27 +20,35 @@ class User < ActiveRecord::Base
   include Swagger::Blocks
 
   swagger_schema :User do
-    key :required, [:id, :name]
-    property :id do
-      key :type, :integer
-      key :format, :int64
-    end
-    property :name do
-      key :type, :string
-    end
-    property :email do
-      key :type, :string
-    end
-    property :role do
-      key :type, :string
-    end
+		property :user do
+			property :id do
+				key :type, :integer
+				key :format, :int64
+			end
+			property :name do
+	      key :type, :string
+	    end
+	    property :email do
+	      key :type, :string
+	    end
+	    property :role do
+	      key :type, :string
+	    end
+		end
   end
 
   swagger_schema :UserInput do
 		key :required, [:user]
 		property :user do
-			key :'$ref', :User
-			key :description, 'User id is only required for the get request not for creating a user'
+			property :name do
+	      key :type, :string
+	    end
+	    property :email do
+	      key :type, :string
+	    end
+	    property :role do
+	      key :type, :string
+	    end
 		end
   end
 

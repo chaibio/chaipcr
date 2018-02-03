@@ -41,7 +41,7 @@ class DevicesController < ApplicationController
 
   swagger_path '/device' do
     operation :get do
-      key :summary, 'Device information'
+      key :summary, 'Device information. Authentication Token is not required.'
       key :description, 'Returns device specific information'
       key :produces, [
         'application/json',
@@ -50,7 +50,7 @@ class DevicesController < ApplicationController
 				'Device'
 			]
       response 200 do
-        key :description, 'device response'
+        key :description, 'Object containing device information'
         schema do
             key :'$ref', :Device
         end
@@ -100,9 +100,8 @@ class DevicesController < ApplicationController
 				'Device'
 			]
       response 200 do
-        key :description, 'capabilities response'
+        key :description, 'Object containing device capabilities information'
         schema do
-          key :type, :object
           key :'$ref', :Capabilities
         end
       end
@@ -133,7 +132,7 @@ class DevicesController < ApplicationController
 				'Device'
 			]
       response 200 do
-        key :description, 'Device status response'
+        key :description, 'Object containing device status information'
         schema do
           key :type, :object
           key :'$ref', :Status

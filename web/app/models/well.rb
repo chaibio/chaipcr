@@ -22,20 +22,24 @@ class Well < ActiveRecord::Base
 
 	swagger_schema :Well do
 		property :well_num do
+			key :description, '1-16'
 			key :type, :integer
 		end
 		property :well_type do
+			key :description, 'positive_control, no_template_control, standard, sample'
 			key :type, :string
 		end
 		property :sample_name do
+			key :description, 'sample name'
 			key :type, :string
 		end
 		property :notes do
+			key :description, 'notes'
 			key :type, :string
 		end
 		property :targets do
 			key :type, :array
-      key :description, 'Array of one or two depending on the channels'
+      key :description, "Array of one or two depending on the channels eg.['channel1 target', 'channel2 target']"
 			items do
 				key :type, :string
 				end
