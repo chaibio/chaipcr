@@ -314,6 +314,15 @@ df -h
 echo Installing mysql
 dpkg --configure -a
 
+if mount | grep /data
+then
+    echo data partition is mounted
+else
+    echo mounting data partition
+    mount /dev/mmcblk1p2 /data || true
+    service mysql start
+fi
+
 sudo debconf-set-selections &lt;&lt;&lt; &quot;mysql-server-5.5 mysql-server/root_password password chaipcr&quot;
 sudo debconf-set-selections &lt;&lt;&lt; &quot;mysql-server-5.5 mysql-server/root_password_again password chaipcr&quot;
 
@@ -337,19 +346,24 @@ else
             exit 1
       fi
 fi
-
-
 echo done installing mysql
 
 echo resetting mysql password
-
 cat &gt;&gt; mysql_password_flush.sql &lt;&lt; EOF
     UPDATE user SET password=PASSWORD(&apos;&apos;) WHERE user=&apos;root&apos;;
     FLUSH PRIVILEGES;
     exit
 EOF
 
-mysql -u root --password=chaipcr mysql &lt; mysql_password_flush.sql || exit 1
+echo calling mysql command line
+if mysql -u root --password=chaipcr mysql &lt; mysql_password_flush.sql 
+then
+      echo Done resetting mysql password.
+else
+     echo Checking if already MySQL password is empty.
+     mysql -u root mysql &lt; mysql_password_flush.sql || exit 1
+     echo MySQL password found empty.
+fi
 
 rm mysql_password_flush.sql
 df -h
@@ -1044,7 +1058,19 @@ echo all 3rd party software done for $build_machine, you can call call deploy_ch
 exit 0</command>
     </hudson.tasks.Shell>
   </builders>
-  <publishers/>
+  <publishers>
+    <com.chikli.hudson.plugin.naginator.NaginatorPublisher plugin="naginator@1.17.2">
+      <regexpForRerun></regexpForRerun>
+      <rerunIfUnstable>false</rerunIfUnstable>
+      <rerunMatrixPart>false</rerunMatrixPart>
+      <checkRegexp>false</checkRegexp>
+      <regexpForMatrixStrategy>TestParent</regexpForMatrixStrategy>
+      <delay class="com.chikli.hudson.plugin.naginator.FixedDelay">
+        <delay>2000</delay>
+      </delay>
+      <maxSchedule>5</maxSchedule>
+    </com.chikli.hudson.plugin.naginator.NaginatorPublisher>
+  </publishers>
   <buildWrappers>
     <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.8"/>
   </buildWrappers>
