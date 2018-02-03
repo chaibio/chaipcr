@@ -25,14 +25,37 @@ Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
         </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>building_version</name>
-          <description></description>
+          <description>Julia version to build</description>
           <choices class="java.util.Arrays$ArrayList">
             <a class="string-array">
-              <string>release-0.5</string>
               <string>release-0.6</string>
+              <string>v0.6.2</string>
+              <string>v0.6.1</string>
+              <string>v0.6.0</string>
+              <string>release-0.5</string>
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>upgrade_gcc</name>
+          <description>upgrade GCC</description>
+          <defaultValue>true</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>build_cmake</name>
+          <description>Build cmake 3.6</description>
+          <defaultValue>true</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>upload_to_server</name>
+          <description>Upload generated binaries to server</description>
+          <defaultValue>true</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>debug</name>
+          <description>Build a debug version of julia. Needs a 16G+ sdcard.</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -251,6 +274,8 @@ exit 0
       <siteName>root@$build_machine:22</siteName>
       <command>echo arranging to build julia
 df -h
+if $upgrade_gcc
+then
 
 if ! apt-get -q -y install gcc-4.8 g++-4.8 
 then
@@ -293,7 +318,7 @@ then
    echo &quot;Can&apos;t update g++&quot;
    exit 1
 fi
-
+fi
 echo arranging the sdcard
 
 swapoff -a
@@ -321,7 +346,8 @@ sudo swapon /sdcard/upgrade/swapfile
 sudo swapon -s
 
 free -m
-
+if $build_cmake
+then
 echo Building CMake
    cd /sdcard/upgrade
    wget https://cmake.org/files/v3.6/cmake-3.6.1.tar.gz
@@ -332,6 +358,12 @@ echo Building CMake
    make install || exit 1
    cd ..
    rm -r cmake-3.6.1*
+else
+   apt-get install -y -q cmake
+fi
+
+apt-get update
+apt-get upgrade
 
 apt-get -y -q install lsb-release
 sync
@@ -352,6 +384,10 @@ apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack
 apt-get -y -q install libblas3 libatlas3-base
 apt-get -y -q install libblas-common libfftw3-double3 libfftw3-single3 libllvm3.8 libmetis5 libopenblas-base libunwind8 
 
+DEBIAN_FRONTEND=noninteractive apt-get -q -y install gettext
+DEBIAN_FRONTEND=noninteractive apt-get -q -y install libgtk-3-0
+apt-get -y -q install libpango1.0-0 libglib2.0-0 libcairo2
+
 apt-get -f -y -q install
 exit 0</command>
       <execEachLine>false</execEachLine>
@@ -364,7 +400,6 @@ exit 0</command>
 ln -s /usr/lib/gcc/arm-linux-gnueabihf/4.9/libgfortran.so /usr/lib/libgfortran.so
 
 # compiling julia
-# compiling julia 0.5
 mkdir -p /sdcard/upgrade/julia-compile
 cd /sdcard/upgrade/julia-compile
 git clone git://github.com/JuliaLang/julia.git 
@@ -377,10 +412,10 @@ source ~/.bashrc
 ntpdate -b -s -u pool.ntp.org
 
 cat &lt;&lt;EOF &gt;&gt; Make.user
-prefix=/usr/share/julia
+#prefix=/usr/share/julia
 MARCH=armv7-a
 JULIA_CPU_TARGET=cortex-a8
-
+JULIA_BUILD_MODE=release
 override USE_SYSTEM_BLAS=1
 override USE_SYSTEM_LAPACK=1
 override USE_SYSTEM_LIBM=1
@@ -391,12 +426,29 @@ override USE_SYSTEM_ARPACK=1
 
 override LLVM_ASSERTIONS=1
 LLVM_FLAGS+=&quot;--with-cpu=cortex-a8 --disable-compiler-version-checks --with-float=hard --with-abi=aapcs-vfp --with-fpu=neon --enable-targets=arm --enable-optimized --enable-assertions&quot;
-
-
 EOF
 
-make
+if $debug
+then
+cat &lt;&lt;EOF &gt;&gt; Make.user
+JULIA_BUILD_MODE=debug
+LLVM_DEBUG=1
+VERBOSE=1
+EOF
+fi
 
+#sed -i &quot;s/-gtk-update-icon-cache/-gtk-update-icon-cache --ignore-theme-index/&quot; Makefile
+echo making
+sed -i &quot;s/-gtk-update-icon-cache/-gtk-update-icon-cache --ignore-theme-index/&quot; Makefile
+#   make release || exit 1
+if $debug
+then
+   make debug
+fi
+
+make binary-dist || exit 1
+
+echo done making
 
 </command>
       <execEachLine>false</execEachLine>
@@ -472,29 +524,148 @@ sync
 </command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>#experimental code creating deb file
+cd /sdcard/upgrade/julia-compile/julia
+hashcode=$(git rev-parse --short HEAD)
+rm -fr julia-$building_version julia_* 
+    tar zxf julia-$hashcode-Linux-arm.tar.gz 
+    cd julia-$hashcode
+
+    mv LICENSE.md share/doc/julia/LICENSE.md 
+    rm -f lib/julia/libpcre2-posix.so* 
+    rm -f lib/julia/libstdc++.so* 
+    rm -f bin/*-debug* lib/*-debug* lib/julia/*-debug* 
+    rm -fr libexec 
+    rm -f lib/julia/libccalltest* 
+    mkdir usr 
+    mv bin include lib share usr 
+    tar  cvf ../julia-$building_version.tar * 
+    cd .. 
+    rm -fr julia-$hashcode 
+apt-get install alien build-essential fakeroot alien devscripts -y -q
+    fakeroot alien -d --generate julia-$building_version.tar 
+    cd julia-$building_version/ || cd julia-$building_version-?/
+    rm debian/control 
+
+    cat &lt;&lt; EOF &gt; debian/control 
+Source: julia-release
+Section: science
+Priority: extra
+Homepage: http://julialang.org
+Maintainer: Julia Computing Inc &lt;juliapro@juliacomputing.com&gt;
+
+Package: julia-release
+Architecture: any
+Depends: libllvm3.9, libpcre2-dev, libdsfmt-dev, libopenblas-dev, libfftw3-dev, libgmp-dev
+Description: high-performance programming language for numerical computing
+ Julia is a high-level, high-performance dynamic programming language for
+ numerical computing. It provides a sophisticated compiler, distributed
+ parallel execution, numerical accuracy, and an extensive mathematical function
+ library. The library, mostly written in Julia itself, also integrates mature,
+ best-of-breed C and Fortran libraries for linear algebra, random number
+ generation, FFTs, and string processing. The Julia community has contributed
+ over 1,000 packages covering a number of capabilities.
+ .
+ This package contains the Julia compiler, standard library, package manage
+ and documentation.
+EOF
+
+debuild --no-lintian
+echo done creating deb file
+ls -ahl . ..
+
+echo try 2
+    rm debian/control 
+
+    cat &lt;&lt; EOF &gt; debian/control 
+Source: julia-$building_version
+Section: science
+Priority: extra
+Homepage: http://julialang.org
+Maintainer: Julia Computing Inc &lt;juliapro@juliacomputing.com&gt;
+
+Package: julia-$building_version
+Architecture: any
+Depends: libllvm3.9, libpcre2-dev, libdsfmt-dev, libopenblas-dev, libfftw3-dev, libgmp-dev
+Description: high-performance programming language for numerical computing
+ Julia is a high-level, high-performance dynamic programming language for
+ numerical computing. It provides a sophisticated compiler, distributed
+ parallel execution, numerical accuracy, and an extensive mathematical function
+ library. The library, mostly written in Julia itself, also integrates mature,
+ best-of-breed C and Fortran libraries for linear algebra, random number
+ generation, FFTs, and string processing. The Julia community has contributed
+ over 1,000 packages covering a number of capabilities.
+ .
+ This package contains the Julia compiler, standard library, package manage
+ and documentation.
+EOF
+
+debuild --no-lintian
+echo done creating deb file
+ls -ahl . ..
+
+
+
+apt-get -q -y autoremove build-essential fakeroot devscripts alien
+apt-get -q -y remove at bash-completion dctrl-tools debian-keyring devscripts diffstat dirmngr dput equivs exim4-base  exim4-config exim4-daemon-light guile-2.0-libs iso-codes libapt-pkg-perl libauthen-sasl-perl  libb-hooks-endofscope-perl libclass-accessor-perl libclass-inspector-perl  libclass-method-modifiers-perl libclass-xsaccessor-perl libclone-perl libconvert-binhex-perl  libdata-optlist-perl libdevel-globaldestruction-perl libdigest-hmac-perl libdistro-info-perl  libemail-valid-perl libexporter-tiny-perl libfile-basedir-perl libfile-chdir-perl  libfile-homedir-perl libfile-listing-perl libfile-which-perl libfont-afm-perl libfribidi0  libgc1c2 libgetopt-long-descriptive-perl libgit-wrapper-perl libgpgme11 libgsasl7  libhtml-form-perl libhtml-format-perl libhtml-tree-perl libhttp-cookies-perl libhttp-daemon-perl  libhttp-negotiate-perl libimport-into-perl libio-pty-perl libio-sessiondata-perl  libio-socket-inet6-perl libio-socket-ssl-perl libio-string-perl libio-stringy-perl  libipc-run-perl libipc-system-simple-perl libkyotocabinet16v5 liblist-compare-perl  liblist-moreutils-perl liblwp-protocol-https-perl libmailtools-perl libmailutils5  libmime-tools-perl libmodule-implementation-perl libmodule-runtime-perl libmoo-perl  libnamespace-clean-perl libnet-dns-perl libnet-domain-tld-perl libnet-http-perl libnet-ip-perl  libnet-smtp-ssl-perl libnet-ssleay-perl libntlm0 libnumber-compare-perl libnumber-range-perl  libossp-uuid-perl libossp-uuid16 libpackage-stash-perl libpackage-stash-xs-perl  libparams-classify-perl libparams-util-perl libparams-validate-perl  libparse-debianchangelog-perl libpath-iterator-rule-perl libpath-tiny-perl libperlio-gzip-perl  libpod-constants-perl librole-tiny-perl libscalar-list-utils-perl libsoap-lite-perl  libsocket6-perl libsort-key-perl libsort-versions-perl libstrictures-perl  libstring-copyright-perl libstring-escape-perl libsub-exporter-perl  libsub-exporter-progressive-perl libsub-identify-perl libsub-install-perl libsub-name-perl  libtask-weaken-perl libtext-glob-perl libtext-levenshtein-perl libtry-tiny-perl  libunicode-utf8-perl libvariable-magic-perl libwww-perl libwww-robotrules-perl  libxml-parser-perl libxmlrpc-lite-perl libyaml-libyaml-perl licensecheck lintian mailutils  mailutils-common patchutils perl-openssl-defaults python-apt python-apt-common python-debian  python-gpg python-six python3-apt python3-chardet python3-debian python3-magic  python3-pkg-resources python3-six t1utils wdiff
+
+#end of experimental code creating deb file
+exit 0
+</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
-      <command>echo uploading julia file to server
-                                                                                                                                 
-scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/julia-compile/julia-$building_version-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/
-chmod 777 $local_download_folder/julia-$building_version-$build_machine-$BUILD_NUMBER.tgz
-ln -sf $local_download_folder/julia-$building_version-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia-$building_version-default.tgz
+      <command>if ! $upload_to_server
+then
+	exit 0
+fi
+if $debug
+then
+	prefix=$building_version-debug
+else
+    prefix=$building_version
+fi
 
-scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/julia-compile/julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/
-chmod 777 $local_download_folder/julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz
-ln -sf $local_download_folder/julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia-$building_version-slim-default.tgz
+echo uploading julia file to server
+scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/julia-compile/julia-$prefix-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/
+chmod 777 $local_download_folder/julia-$prefix-$build_machine-$BUILD_NUMBER.tgz
+ln -sf $local_download_folder/julia-$prefix-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia-$prefix-default.tgz
 
-ls -ahl $local_download_folder/julia-$building_version-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia-$building_version-default.tgz
-ls -ahl $local_download_folder/julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia-$building_version-slim-default.tgz
+scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/julia-compile/julia-$prefix-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/
+chmod 777 $local_download_folder/julia-$prefix-slim-$build_machine-$BUILD_NUMBER.tgz
+ln -sf $local_download_folder/julia-$prefix-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia-$prefix-slim-default.tgz
 
-exit 0</command>
+ls -ahl $local_download_folder/julia-$prefix-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia-$prefix-default.tgz
+ls -ahl $local_download_folder/julia-$prefix-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia-$prefix-slim-default.tgz
+
+#experimental deb file upload: julia-release_0.6-2_armhf.deb
+scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/julia-compile/julia/julia-release_0.6*.deb $local_download_folder/julia-$prefix.deb || true
+chmod 777 $local_download_folder/julia-$prefix.deb || true
+
+exit 0
+</command>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo cleaning up
+      <command>if ! $upload_to_server
+then
+       echo build ended without upload to server
+       exit 0
+fi
+if $debug
+then
+	exit 0
+fi
+
+echo cleaning up
 cd /sdcard/upgrade/julia-compile/
 
 rm julia-$building_version-$build_machine-$BUILD_NUMBER.tgz
 rm julia-$building_version-slim-$build_machine-$BUILD_NUMBER.tgz
+rm julia-$building_version-debug-$build_machine-$BUILD_NUMBER.tgz
+rm julia-$building_version-debug-slim-$build_machine-$BUILD_NUMBER.tgz
 ls -ahl
 
 cd ..

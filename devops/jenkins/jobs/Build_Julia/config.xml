@@ -30,10 +30,30 @@
           <choices class="java.util.Arrays$ArrayList">
             <a class="string-array">
               <string>release-0.6</string>
+              <string>v0.6.2</string>
+              <string>v0.6.1</string>
+              <string>v0.6.0</string>
+              <string>v0.5.2</string>
+              <string>v0.5.0</string>
               <string>release-0.5</string>
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>upgrade_gcc</name>
+          <description>Upgrade GCC to 4.9</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>build_cmake</name>
+          <description>Compile cmake</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>upload_to_server</name>
+          <description>Upload generated binaries to server and then cleanup</description>
+          <defaultValue>true</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -49,7 +69,7 @@
       <phaseName>Flashing OS</phaseName>
       <phaseJobs>
         <com.tikal.jenkins.plugins.multijob.PhaseJobsConfig>
-          <jobName>flash_empty_4_9_jessie_image</jobName>
+          <jobName>flash_empty_4_9_stretch_image</jobName>
           <currParams>true</currParams>
           <exposedSCM>false</exposedSCM>
           <disableJob>false</disableJob>
