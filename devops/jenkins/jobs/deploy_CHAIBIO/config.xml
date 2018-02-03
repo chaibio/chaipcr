@@ -420,77 +420,117 @@ then
 
 echo Build time- adding pre-requesits
 free -m
+apt-get update
+
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get -q -y install gettext libgtk-3-0 libpango1.0-0 libglib2.0-0 libcairo2
+
 DEBIAN_FRONTEND=noninteractive apt-get -q -y install gettext
 DEBIAN_FRONTEND=noninteractive apt-get -q -y install libgtk-3-0
+apt-get -y -q install libpango1.0-0 libglib2.0-0 libcairo2
 
 echo $(date) Performing precompilling julia packages
 cd /root/chaipcr/bioinformatics/QpcrAnalysis
 cp __init__.jl __init__.jl.org
 #sed -i &apos;1ireturn nothing&apos; __init__.jl
 sed -i &apos;s/# MySQL./return nothing \n# MySQL./&apos; __init__.jl
+rm -r ~/.julia
+
+git config --global user.email &apos;info@chaibio.org&apos;
+git config --global user.name &apos;Chaibio qPCR&apos;
+git config --global github.user &quot;Chaibio&quot;
 
 cat &gt; testQpcrAnalysis.jl &lt;&lt; EOF
-	println(&quot;Build time:  .. Updating packages ..&quot;)
-      	@time Pkg.update()
+function pin()
+	println(&quot;ADDING: BinDeps&quot;)
+	Pkg.add(&quot;BinDeps&quot;,v&quot;0.8.0&quot;,v&quot;0.8.1-&quot;)
+	println(&quot;ADDING: JLD&quot;)
+	Pkg.add(&quot;JLD&quot;,v&quot;0.8.3&quot;,v&quot;0.8.4-&quot;) # to fulfil requirments of Ipopt, JuMP, and NLopt
+	println(&quot;ADDING: MathProgBase&quot;)
+	Pkg.add(&quot;MathProgBase&quot;,v&quot;0.6.0&quot;,v&quot;0.6.1-&quot;)
+	println(&quot;ADDING: DataStructures&quot;)
+	Pkg.add(&quot;DataStructures&quot;, v&quot;0.7.4&quot;, v&quot;0.7.5-&quot;)
+	println(&quot;ADDING: SpecialFunctions&quot;)
+	Pkg.add(&quot;SpecialFunctions&quot;,v&quot;0.3.6&quot;,v&quot;0.3.7-&quot;)
+	println(&quot;ADDING: DataFrames&quot;)
+	Pkg.add(&quot;DataFrames&quot;, v&quot;0.11.2&quot;, v&quot;0.11.3-&quot;)
+	println(&quot;ADDING: HDF5&quot;)
+	Pkg.add(&quot;HDF5&quot;,v&quot;0.8.8&quot;, v&quot;0.8.9-&quot;)
+	println(&quot;ADDING: Clustering&quot;)
+	Pkg.add(&quot;Clustering&quot;,v&quot;0.9.1&quot;, v&quot;0.9.2-&quot;)
+	println(&quot;ADDING: Nullables&quot;)
+	Pkg.add(&quot;Nullables&quot;,v&quot;0.0.3&quot;, v&quot;0.0.4-&quot;)
+	println(&quot;ADDING: JSON&quot;)
+	Pkg.add(&quot;JSON&quot;,v&quot;0.16.4&quot;, v&quot;0.16.5-&quot;)
+	println(&quot;ADDING: Ipopt&quot;)
+	Pkg.add(&quot;Ipopt&quot;,v&quot;0.2.4&quot;, v&quot;0.2.9-&quot;)
+	println(&quot;ADDING: NLopt&quot;)
+	Pkg.add(&quot;NLopt&quot;,v&quot;0.3.6&quot;, v&quot;0.3.7-&quot;)
+	println(&quot;ADDING: JuMP&quot;)
+	Pkg.add(&quot;JuMP&quot;,v&quot;0.17.1&quot;, v&quot;0.17.2-&quot;)
+	println(&quot;ADDING: HttpServer&quot;)
+	Pkg.add(&quot;HttpServer&quot;,v&quot;0.2.0&quot;, v&quot;0.2.1-&quot;)
+	println(&quot;ADDING: ProfileView&quot;)
+	Pkg.add(&quot;ProfileView&quot;,v&quot;0.3.0&quot;, v&quot;0.3.1-&quot;)
+	println(&quot;ADDING: Dierckx&quot;)
+	Pkg.add(&quot;Dierckx&quot;,v&quot;0.3.0&quot;, v&quot;0.3.1-&quot;)
+	println(&quot;ADDING: MySQL&quot;)
+	Pkg.add(&quot;MySQL&quot;,v&quot;0.3.0&quot;, v&quot;0.3.1-&quot;)
+	println(&quot;ADDING: Done&quot;)
 
-	println(&quot;Build time:  .. Adding packages ..&quot;)
-	println(&quot; .. clustering ..&quot;)
-      	@time Pkg.add(&quot;Clustering&quot;)
-	println(&quot; .. jump ..&quot;)
-      	@time Pkg.add(&quot;JuMP&quot;)
-	println(&quot; .. httpserver ..&quot;)
-      	@time Pkg.add(&quot;HttpServer&quot;)
-	println(&quot; .. ipopt ..&quot;)
-      	@time Pkg.add(&quot;Ipopt&quot;)
-	println(&quot; .. json ..&quot;)
-      	@time Pkg.add(&quot;JSON&quot;)
-	println(&quot; .. mysql ..&quot;)
-      	@time Pkg.add(&quot;MySQL&quot;)
-	println(&quot; .. profileview ..&quot;)
-      	@time Pkg.add(&quot;ProfileView&quot;)
-	println(&quot; .. JLD ..&quot;)
-      	@time Pkg.add(&quot;JLD&quot;)
-	println(&quot; .. NLopt ..&quot;)
-      	@time Pkg.add(&quot;NLopt&quot;)
-	println(&quot; .. DirectX ..&quot;)
-      	@time Pkg.add(&quot;Dierckx&quot;)
-	println(&quot; .. DataFrames ..&quot;)
-      	@time Pkg.add(&quot;DataFrames&quot;)
-	println(&quot; .. DataStructures ..&quot;)
-      	@time Pkg.add(&quot;DataStructures&quot;)
+	Pkg.build(&quot;DataStructures&quot;, &quot;SpecialFunctions&quot;, &quot;MathProgBase&quot;, &quot;HDF5&quot;, &quot;Clustering&quot;, &quot;Nullables&quot;,&quot;JSON&quot;, &quot;JLD&quot;, &quot;NLopt&quot;, &quot;JuMP&quot;, &quot;HttpServer&quot;, &quot;ProfileView&quot;, &quot;Dierckx&quot;, &quot;Ipopt&quot;, &quot;MySQL&quot;, &quot;DataFrames&quot;)
 
-	println(&quot;Build time:  ... building ...&quot;)
-	@time Pkg.build(&quot;ProfileView&quot;, &quot;MySQL&quot;, &quot;HttpServer&quot;, &quot;Ipopt&quot;, &quot;JSON&quot;, &quot;JuMP&quot;, &quot;JLD&quot;, &quot;NLopt&quot;, &quot;Dierckx&quot;, &quot;DataFrames&quot;, &quot;DataStructures&quot;)
+	println(&quot;Done building&quot;)
 
-EOF
+	println(&quot;Done using&quot;)
 
-JULIA_ENV=bbb_test_1 julia testQpcrAnalysis.jl --compile=all
+	Pkg.add(&quot;PkgDev&quot;)
+	return true
+end
 
-cat &gt; testQpcrAnalysis.jl &lt;&lt; __EOF__
+Pkg.init()
 
-	println(&quot;Build time: .. all packages built ..&quot;)
-	load_from_dir_ = &quot;/root/chaipcr/bioinformatics/QpcrAnalysis&quot; # bbb production
+for i in 1:10
+    print(&quot;  ###################    Try# &quot;)
+    println(string(i,&quot;    ######################################&quot;))
+    try
+	if pin()
+		println(&quot;Pinning all done&quot;)
+		using PkgDev
+		using DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering
+		using Nullables, JSON, JLD, NLopt, JuMP, HttpServer, ProfileView
+		using Dierckx, Ipopt, MySQL, DataFrames
+		PkgDev.generate(&quot;QpcrAnalysis&quot;, &quot;MIT&quot;)
+		println(&quot;QpcrAnalysis structure generated&quot;)
+		Pkg.status()
+		println(string(&quot; done at trail: &quot;, i))
+		exit()
+	end
+    catch e
+          println(&quot;caught an error $e&quot;)
+          println(&quot;waiting 100 seconds before continue with execution&quot;)
+	  sleep(100)
+    end
+end
 
-	println(&quot;Build time: settings&quot;)
-	push!(LOAD_PATH, load_from_dir_)
+print(&quot;Tried to pin packages 10 times and failed.&quot;)
+exit()
 
-	println(&quot;Build time: using dependencies&quot;)
-	@time using Clustering, DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NLopt
-
-	println(&quot;Build time: Using qpcrAnalysis&quot;)
-	@time using QpcrAnalysis
-	println(&quot;Build time: end of QpcrAnalysis build&quot;)
 __EOF__
 
 echo First QpcrAnalysis package installation run
 JULIA_ENV=bbb_test_1 julia testQpcrAnalysis.jl --compile=all
 
-echo Second run
-JULIA_ENV=bbb_test_1 julia testQpcrAnalysis.jl --compile=all
+#echo Second run
+#JULIA_ENV=bbb_test_1 julia testQpcrAnalysis.jl --compile=all
 
 echo end of test result: $?
 cp __init__.jl.org __init__.jl
+cp -r * ~/.julia/v0.6/QpcrAnalysis/
+
 rm testQpcrAnalysis.jl
+echo about to start using QpcrAnalysis
+JULIA_ENV=bbb_test_1 julia -e &quot;using QpcrAnalysis&quot; --compile=all
+echo tested using QpcrAnalysis
 
 fi
 
@@ -522,6 +562,7 @@ cd ~/chaipcr/deploy/
 #sed -i &quot;s/errors=remount-ro/errors=continue/&quot; /etc/fstab
 
 echo patching rc.local
+cd /etc
 if [ ! -e rc.local ]
 then
     echo &quot;Cann&apos;t find rc.local. Creating it.&quot;
