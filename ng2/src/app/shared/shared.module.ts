@@ -21,7 +21,7 @@ import { HeaderStatusComponent } from './directives/header-status/header-status.
 import { HrMinSecPipe } from './pipes/hr-min-secs/hr-min-secs.pipe';
 import { BaseChartDirective } from './directives/charts/base-chart/base-chart.directive'
 import { AmplificationChartDirective } from './directives/charts/amplification-chart/amplification-chart.directive'
-import { WellButtonsDirective } from './directives/well-buttons/well-buttons.directive';
+import { WellButtonsComponent } from './components/well-buttons/well-buttons.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +30,7 @@ import { WellButtonsDirective } from './directives/well-buttons/well-buttons.dir
     FullWidthDirective,
     BaseChartDirective,
     AmplificationChartDirective,
+    WellButtonsComponent,
     HeaderStatusComponent,
     HrMinSecPipe
   ],
@@ -49,6 +50,7 @@ import { WellButtonsDirective } from './directives/well-buttons/well-buttons.dir
     HeaderStatusComponent,
     BaseChartDirective,
     AmplificationChartDirective,
+    WellButtonsComponent,
     HrMinSecPipe
   ],
   providers: [

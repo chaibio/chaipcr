@@ -142,7 +142,7 @@ export class BaseChartDirective implements OnChanges {
   }
 
   protected xAxisTickFormat (x: number): string {
-    let result: string;
+    let result = x.toString();
     if(this.config.axes.x.tickFormat)
       result = this.config.axes.x.tickFormat(x);
     if(this.config.axes.x.unit)
@@ -1074,143 +1074,11 @@ export class BaseChartDirective implements OnChanges {
       this.onClickAxisInput('x:min', this.xAxisLeftExtremeValue)
   }
 
-  protected validateBackSpace(loc, input) {
-    let axis = (loc === 'y:min' || loc === 'y:max') ? 'y' : 'x';
-    let value = input.value
-    let selection = input.selectionStart
-    let unit = this.config.axes[axis].unit || ''
-    if(selection > value.length - unit.length) {
-      d3.event.preventDefault()
-      return true
-    } else
-      return false
-  }
-
-  protected validateArrowInput(loc, input, val) {
-    let axis = (loc === 'y:min' || loc === 'y:max') ? 'y' : 'x';
-    let unit = this.config.axes[axis].unit || ''
-    let caret = input.selectionStart + 1
-    if(val.length - unit.length < caret)
-      d3.event.preventDefault()
-  }
-
-  protected cleanAxisInput (loc, input, val) {
-    let axis = (loc === 'x:min' || loc === 'x:max') ? 'x' : 'y';
-    val = val.replace(/[^0-9\.\-]/g, '')
-    val = val.replace(this.config.axes[axis].unit, '')
-    if(val === '') {
-      if(loc === 'x:min')
-        val = this.getMinX()
-      if(loc === 'x:max')
-        val = this.getMaxX()
-      if(loc === 'y:min')
-        val = this.computedMinY()
-      if(loc === 'y:max')
-        val = this.computedMaxY()
-    }
-    return +val
-  }
-
-  protected onEnterAxisInput (loc, input, val) {
-
-    val = this.cleanAxisInput(loc, input, val)
-
-    if(loc === 'y:max') {
-      let max = this.computedMaxY()
-      let maxY = this.isNumber(val)? val : max;
-      let y = this.yScale
-      let lastYScale = this.lastYScale || y
-      let minY = lastYScale.invert(this.height)
-
-      if(minY >= maxY)
-        return false
-
-      maxY = (maxY > max) ? max : maxY;
-      let k = this.height / (y(minY) - y(maxY))
-
-      this.editingYAxis = true
-      let lastK = this.getTransform().k
-      this.chartSVG.call(this.zoomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)))
-      this.editingYAxis = false
-      this.chartSVG.call(this.zoomBehavior.transform, d3.zoomIdentity.scale(lastK))
-    }
-    if(loc === 'y:min') {
-      let y = this.yScale
-      let lastYScale = this.lastYScale || y
-      let min = this.computedMinY()
-
-      let minY = this.isNumber(val)? val : min;
-      let maxY = lastYScale.invert(0)
-      if (minY >= maxY)
-        return false
-
-      minY = minY < min ? min : minY;
-
-      let k = this.height / (y(minY) - y(maxY))
-      let lastK = this.getTransform().k
-      this.editingYAxis = true
-      this.chartSVG.call(this.zoomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)))
-      this.editingYAxis = false
-      this.chartSVG.call(this.zoomBehavior.transform, d3.zoomIdentity.scale(lastK))
-    }
-    if(loc === 'x:min') {
-      let extent = this.getScaleExtent() - this.getMinX()
-      let x = this.xScale
-      let lastXScale = this.lastXScale || x
-      let minX = val * 1
-      let maxX = lastXScale.invert(this.width)
-      if(minX >= maxX)
-        return false
-      if(val === '' || minX < this.getMinX())
-        minX = this.getMinX()
-      let k = this.width / (x(maxX) - x(minX))
-      let width_percent = 1 / k
-      let w = extent - (width_percent * extent)
-      this.chartSVG.call(this.zoomBehavior.scaleTo, k)
-      this.scroll((minX - this.getMinX()) / w)
-    }
-    if(loc === 'x:max') {
-      let extent = this.getScaleExtent() - this.getMinX()
-      let x = this.xScale
-      let lastXScale = this.lastXScale || x
-      let minX = lastXScale.invert(0)
-      let maxX = val * 1
-      if(minX >= maxX)
-        return false
-      if(val === '')
-        maxX = this.getMaxX()
-      if(maxX > this.getScaleExtent())
-        maxX = this.getScaleExtent()
-      let k = this.width / (x(maxX) - x(minX))
-      let width_percent = 1 / k
-      let w = extent - (width_percent * extent)
-      this.chartSVG.call(this.zoomBehavior.scaleTo, k)
-      this.scroll((minX - this.getMinX()) / w)
-    }
-
-    // update input state
-    let extremeValue = null
-
-    if(loc === 'x:min')
-      extremeValue =  this.xAxisLeftExtremeValue
-    else if(loc === 'x:max')
-      extremeValue =  this.xAxisRightExtremeValue
-    else if(loc === 'y:min')
-      extremeValue = this.yAxisLowerExtremeValue
-    else
-      extremeValue = this.yAxisUpperExtremeValue
-
-    this.onClickAxisInput(loc, extremeValue)
-    setTimeout(() => {
-      input.blur()
-    }, 100)
-  }
-
   protected drawXAxisRightExtremeValue() {
     let textContainer = this.chartSVG.append('g')
       .attr('class', 'axes-extreme-value tick')
 
-    this.xAxisLeftExtremeValueContainer = textContainer
+    this.xAxisRightExtremeValueContainer = textContainer
 
     let conWidth = 30
     let conHeight = 14
@@ -1585,14 +1453,148 @@ export class BaseChartDirective implements OnChanges {
       this.onClickAxisInput('y:min', this.yAxisLowerExtremeValue)
   }
 
+  protected validateBackSpace(loc, input) {
+    let axis = (loc === 'y:min' || loc === 'y:max') ? 'y' : 'x';
+    let value = input.value
+    let selection = input.selectionStart
+    let unit = this.config.axes[axis].unit || ''
+    if(selection > value.length - unit.length) {
+      d3.event.preventDefault()
+      return true
+    } else
+      return false
+  }
+
+  protected validateArrowInput(loc, input, val) {
+    let axis = (loc === 'y:min' || loc === 'y:max') ? 'y' : 'x';
+    let unit = this.config.axes[axis].unit || ''
+    let caret = input.selectionStart + 1
+    if(val.length - unit.length < caret)
+      d3.event.preventDefault()
+  }
+
+  protected cleanAxisInput (loc, input, val) {
+    let axis = (loc === 'x:min' || loc === 'x:max') ? 'x' : 'y';
+    val = val.replace(/[^0-9\.\-]/g, '')
+    val = val.replace(this.config.axes[axis].unit, '')
+    if(val === '') {
+      if(loc === 'x:min')
+        val = this.getMinX()
+      if(loc === 'x:max')
+        val = this.getMaxX()
+      if(loc === 'y:min')
+        val = this.computedMinY()
+      if(loc === 'y:max')
+        val = this.computedMaxY()
+    }
+    return +val
+  }
+
+  protected onEnterAxisInput (loc, input, val) {
+
+    val = this.cleanAxisInput(loc, input, val)
+
+    if(loc === 'y:max') {
+      let max = this.computedMaxY()
+      let maxY = this.isNumber(val)? val : max;
+      let y = this.yScale
+      let lastYScale = this.lastYScale || y
+      let minY = lastYScale.invert(this.height)
+
+      if(minY >= maxY)
+        return false
+
+      maxY = (maxY > max) ? max : maxY;
+      let k = this.height / (y(minY) - y(maxY))
+
+      this.editingYAxis = true
+      let lastK = this.getTransform().k
+      this.chartSVG.call(this.zoomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)))
+      this.editingYAxis = false
+      this.chartSVG.call(this.zoomBehavior.transform, d3.zoomIdentity.scale(lastK))
+    }
+    if(loc === 'y:min') {
+      let y = this.yScale
+      let lastYScale = this.lastYScale || y
+      let min = this.computedMinY()
+
+      let minY = this.isNumber(val)? val : min;
+      let maxY = lastYScale.invert(0)
+      if (minY >= maxY)
+        return false
+
+      minY = minY < min ? min : minY;
+
+      let k = this.height / (y(minY) - y(maxY))
+      let lastK = this.getTransform().k
+      this.editingYAxis = true
+      this.chartSVG.call(this.zoomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)))
+      this.editingYAxis = false
+      this.chartSVG.call(this.zoomBehavior.transform, d3.zoomIdentity.scale(lastK))
+    }
+    if(loc === 'x:min') {
+      let extent = this.getScaleExtent() - this.getMinX()
+      let x = this.xScale
+      let lastXScale = this.lastXScale || x
+      let minX = val * 1
+      let maxX = lastXScale.invert(this.width)
+      if(minX >= maxX)
+        return false
+      if(val === '' || minX < this.getMinX())
+        minX = this.getMinX()
+      let k = this.width / (x(maxX) - x(minX))
+      let width_percent = 1 / k
+      let w = extent - (width_percent * extent)
+      this.chartSVG.call(this.zoomBehavior.scaleTo, k)
+      this.scroll((minX - this.getMinX()) / w)
+    }
+    if(loc === 'x:max') {
+      let extent = this.getScaleExtent() - this.getMinX()
+      let x = this.xScale
+      let lastXScale = this.lastXScale || x
+      let minX = lastXScale.invert(0)
+      let maxX = val * 1
+      if(minX >= maxX)
+        return false
+      if(val === '')
+        maxX = this.getMaxX()
+      if(maxX > this.getScaleExtent())
+        maxX = this.getScaleExtent()
+      let k = this.width / (x(maxX) - x(minX))
+      let width_percent = 1 / k
+      let w = extent - (width_percent * extent)
+      this.chartSVG.call(this.zoomBehavior.scaleTo, k)
+      this.scroll((minX - this.getMinX()) / w)
+    }
+
+    // update input state
+    let extremeValue = null
+
+    if(loc === 'x:min')
+      extremeValue =  this.xAxisLeftExtremeValue
+    else if(loc === 'x:max')
+      extremeValue =  this.xAxisRightExtremeValue
+    else if(loc === 'y:min')
+      extremeValue = this.yAxisLowerExtremeValue
+    else
+      extremeValue = this.yAxisUpperExtremeValue
+
+    this.onClickAxisInput(loc, extremeValue)
+    setTimeout(() => {
+      input.blur()
+    }, 100)
+  }
+
   protected updateAxesExtremeValues () {
     let xScale = this.getXScale()
     let yScale = this.getYScale()
     let minWidth = 10
+
     if(this.xAxisLeftExtremeValue.text) {
       let text = this.xAxisLeftExtremeValue.text
       let rect = this.xAxisLeftExtremeValue.rect
       let minX = this.hasData() ? Math.round(xScale.invert(0) * 10) / 10 : this.DEFAULT_MIN_X;
+      console.log(this.xAxisTickFormat(minX))
       text.text(this.xAxisTickFormat(minX))
       let textWidth = text.node().getBBox().width
       text.attr('x', this.MARGIN.left - (textWidth / 2))

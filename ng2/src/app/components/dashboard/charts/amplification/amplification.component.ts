@@ -21,6 +21,7 @@ import { AmplificationConfigService } from '../../../../shared/services/chart-co
 
 export class AmplificationComponent implements OnInit, OnDestroy{
 
+  colorBy: 'well'
   config: any;
   retryInterval: any;
   retrying = false;
@@ -100,6 +101,11 @@ export class AmplificationComponent implements OnInit, OnDestroy{
       }
     }
 
+  }
+
+  onWellsSelected(e, data) {
+    console.log(e) 
+    console.log(data)
   }
 
   ngOnDestroy() {
