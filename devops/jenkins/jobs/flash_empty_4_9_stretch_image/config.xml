@@ -275,6 +275,7 @@ apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7638D0442B90D010
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1655A0AB68576280
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D284E608A4C46402
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CF979FFA3D3D3ACC
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 06F90DE5381BA480
 
 apt-get update
 apt-get install -f -y -q
