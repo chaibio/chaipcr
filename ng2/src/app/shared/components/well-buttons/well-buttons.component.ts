@@ -5,11 +5,12 @@ import {
   EventEmitter,
   OnChanges,
   SimpleChanges,
-  OnInit
+  OnInit,
+  ElementRef
 } from '@angular/core';
 
 import { WellButtonI } from '../../models/well-button.model';
-import { AmplificationConfigService } from '../../services/chart-config/amplification-chart-config.service';
+import { ChartConfigService } from '../../services/chart-config/base-chart-config.service';
 
 @Component({
   selector: '[chai-well-buttons]',
@@ -20,6 +21,7 @@ export class WellButtonsComponent implements OnChanges, OnInit {
   private _wells: Array<WellButtonI>;
   private rows: Array<any>;
   private cols: Array<any>;
+  private row_header_width = 100;
 
   @Input() wells: any;
   @Input() colorby: string;
@@ -32,7 +34,10 @@ export class WellButtonsComponent implements OnChanges, OnInit {
   //  }
   //}
 
-  constructor(private config: AmplificationConfigService) {
+  constructor(
+    private config: ChartConfigService,
+    private el: ElementRef
+  ) {
     this._wells = [];
     this.cols = [];
     this.rows = [];
@@ -50,8 +55,12 @@ export class WellButtonsComponent implements OnChanges, OnInit {
     }
   }
 
+  getWidth():number {
+    return this.el.nativeElement.parentElement.offsetWidth
+  }
+
   getCellWidth() {
-    return 50;
+    return (this.getWidth() - this.row_header_width) / this.cols.length
   }
 
   ngOnInit() {

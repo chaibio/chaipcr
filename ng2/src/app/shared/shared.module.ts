@@ -12,6 +12,7 @@ import { BaseHttp } from './services/base_http/base_http.service';
 import { AuthHttp } from './services/auth_http/auth_http.service';
 import { SessionService } from './services/session/session.service';
 import { WindowRef } from './services/windowref/windowref.service';
+import { ChartConfigService } from './services/chart-config/base-chart-config.service';
 import { AmplificationConfigService } from './services/chart-config/amplification-chart-config.service';
 
 import { LogoutDirective } from './directives/logout/logout.directive';
@@ -60,6 +61,7 @@ import { WellButtonsComponent } from './components/well-buttons/well-buttons.com
     AuthHttp,
     BaseHttp,
     AmplificationConfigService,
+    ChartConfigService,
     { provide: APP_BASE_HREF, useValue: '/' },
   ]
 })
