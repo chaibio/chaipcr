@@ -18,7 +18,7 @@ import 'rxjs/add/observable/throw';
 import 'rxjs/add/observable/empty';
 
 import { BaseHttp } from '../base_http/base_http.service';
-import { WindowRef } from '../windowref/windowref.service';
+import { WindowRef } from '../../../services/windowref/windowref.service';
 
 @Injectable()
 export class AuthHttp extends BaseHttp {

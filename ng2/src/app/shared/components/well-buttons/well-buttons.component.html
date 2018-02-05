@@ -2,26 +2,29 @@
   <table>
     <tbody>
       <tr>
-        <th (mousedown)="dragStart($event, 'corner', 0)" [ngStyle]="{width: row_header_width + 'px'}" class="col-header"></th>
+        <th (mousedown)="dragStart($event, 'corner', 0)" [ngStyle]="{width: ROW_HEADER_WIDTH + 'px'}" class="col-header"></th>
         <th (mousedown)="dragStart($event, 'column', col.index)" (mouseup)="dragStop($event, 'column', col.index)" (mousemove)="dragged($event, 'column', col.index)" *ngFor="let col of cols" [ngStyle]="{width: getCellWidth() + 'px'}" class="col-header" [ngClass]="{dragged: col.selected}">
           {{col.index + 1}}
         </th>
       </tr>
       <tr *ngFor="let row of rows">
-        <td class="row-header" ng-mousedown="dragStart($event, 'row', row.index)" ng-mousemove="dragged($event, 'row', row.index)" ng-mouseup="dragStop($event, 'row', row.index)" ng-class="{dragged: row.selected}">
+        <td class="row-header" (mousedown)="dragStart($event, 'row', row.index)" (mousemove)="dragged($event, 'row', row.index)" (mouseup)="dragStop($event, 'row', row.index)" [ngClass]="{dragged: row.selected}">
           {{ row.index + 1 }}
         </td>
-        <td *ngFor="let col of cols" class="well-switch" ng-init="i = (row.index * columns.length) + col.index; well = wells['well_' + i];" (mousedown)="dragStart($event, 'well', i)" (mousemove)="dragged($event, 'well', i)" (mouseup)="dragStop($event, 'well', i)" (ngClass)="{selected: well.selected, active: well.active}" ng-style="getWellStyle(row, col, well, i)">
-          <div class="well-switch-container" ng-style="getWellContainerStyle(row, col, well, i)">
+        <!--<td *ngFor="let col of cols" class="well-switch" ng-init="i = (row.index * columns.length) + col.index; well = wells['well_' + i];" (mousedown)="dragStart($event, 'well', i)" (mousemove)="dragged($event, 'well', i)" (mouseup)="dragStop($event, 'well', i)" (ngClass)="{selected: well.selected, active: well.active}" ng-style="getWellStyle(row, col, well, i)">-->
+        <td *ngFor="let col of cols" class="well-switch" (mousedown)="dragStart($event, 'well', getWellIndex(row, col))" (mousemove)="dragged($event, 'well', getWellIndex(row, col))" (mouseup)="dragStop($event, 'well', getWellIndex(row, col))" (ngClass)="{selected: well.selected, active: well.active}" ng-style="getWellStyle(row, col, well, i)">
+
+          <div class="well-switch-container" [ngStyle]="getWellContainerStyle(row, col, getWell(row, col), getWellIndex(row, col))">
             <div class="well-switch-bar-container">
-              <div class="well-switch-bar" ng-style="getStyleForWellBar(row, col, well, i)">
+              <div class="well-switch-bar" [ngStyle]="getStyleForWellBar(row, col, getWell(row, col), getWellIndex(row, col))">
               </div>
             </div>
-            <div class="ct-cq-container">
-              <div> Cq <strong class="value">{{ displayCt(well.ct[0]) }}</strong> </div>
-              <div> Cq <strong class="value">{{ displayCt(well.ct[1]) }}</strong> </div>
+            <div class="ct-cq-container" *ngIf="getWell(row, col)">
+              <div> Cq <strong class="value">{{ getWell(row, col).cts[0] }}</strong> </div>
+              <div> Cq <strong class="value">{{ getWell(row, col).cts[1] }}</strong> </div>
             </div>
           </div>
+
         </td>
       </tr>
     </tbody>

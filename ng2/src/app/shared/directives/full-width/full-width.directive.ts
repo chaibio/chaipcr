@@ -3,47 +3,38 @@ import {
   ElementRef,
   Input,
   OnInit,
-  OnDestroy
+  OnDestroy,
+  HostListener
 } from '@angular/core';
 
-import { WindowRef } from '../../services/windowref/windowref.service';
+import { WindowRef } from '../../../services/windowref/windowref.service';
 import 'rxjs/add/operator/takeUntil'
 import { Subject } from 'rxjs/Subject';
 
 @Directive({
   selector: '[chai-full-width]'
 })
-export class FullWidthDirective implements OnInit, OnDestroy {
-
-  private jQuery: any;
-  private ngUnsubscribe: Subject<void> = new Subject<void>()
-
-  constructor(private el: ElementRef, private wref: WindowRef) {
-    this.jQuery = wref.getJQuery()
-    wref.$events.resize
-      .takeUntil(this.ngUnsubscribe)
-      .subscribe(() => {
-        this.setWidth()
-      })
-  }
+export class FullWidthDirective implements OnInit {
 
   @Input() offset: number;
-
-  ngOnInit() {
-    this.setWidth()
-  }
-
-  ngOnDestroy() {
-    this.ngUnsubscribe.next()
-    this.ngUnsubscribe.complete()
-  }
-
-  private setWidth () {
+  @HostListener('window:resize', ['$event'])
+  setWidth () {
     let width = this.jQuery(document).width()
     if (this.offset) {
       width = width - this.offset
     }
     this.el.nativeElement.style.width = `${width}px`
   }
+
+  private jQuery: any;
+
+  constructor(private el: ElementRef, private wref: WindowRef) {
+    this.jQuery = wref.getJQuery()
+  }
+
+  ngOnInit() {
+    this.setWidth()
+  }
+
 
 }

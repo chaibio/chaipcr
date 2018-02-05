@@ -5,7 +5,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject'
 import 'rxjs/operator/map'
 
 import { AuthHttp } from '../../shared/services/auth_http/auth_http.service'
-import { WindowRef } from '../../shared/services/windowref/windowref.service'
+import { WindowRef } from '../../services/windowref/windowref.service'
 import { StatusData } from '../../shared/models/status.model'
 import { initialStatusData } from './initial-status-data'
 

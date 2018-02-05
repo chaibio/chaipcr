@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 
 import * as d3 from 'd3';
-import { WindowRef } from '../../../services/windowref/windowref.service';
+import { WindowRef } from '../../../../services/windowref/windowref.service';
 
 @Directive({
   selector: '[chai-base-chart]'

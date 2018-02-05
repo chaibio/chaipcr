@@ -18,7 +18,7 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/observable/empty';
 
-import { WindowRef } from '../windowref/windowref.service';
+import { WindowRef } from '../../../services/windowref/windowref.service';
 
 @Injectable()
 export class BaseHttp extends Http {

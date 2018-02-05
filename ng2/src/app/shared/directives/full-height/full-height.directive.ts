@@ -5,7 +5,7 @@ import {
   OnInit
 } from '@angular/core'
 
-import { WindowRef } from '../../services/windowref/windowref.service'
+import { WindowRef } from '../../../services/windowref/windowref.service'
 
 @Directive({
   selector: '[chai-full-height]',

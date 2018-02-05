@@ -8,7 +8,7 @@ import {
   ActivatedRoute
 } from '@angular/router';
 
-import { WindowRef } from '../../../../shared/services/windowref/windowref.service';
+import { WindowRef } from '../../../../services/windowref/windowref.service';
 import { ExperimentService } from '../../../../services/experiment/experiment.service';
 import { AmplificationConfigService } from '../../../../shared/services/chart-config/amplification-chart-config.service';
 
@@ -21,7 +21,7 @@ import { AmplificationConfigService } from '../../../../shared/services/chart-co
 
 export class AmplificationComponent implements OnInit, OnDestroy{
 
-  colorBy: 'well'
+  colorBy: string; 
   config: any;
   retryInterval: any;
   retrying = false;
@@ -39,6 +39,7 @@ export class AmplificationComponent implements OnInit, OnDestroy{
     private configService: AmplificationConfigService
   ) {
     this.config = configService.getConfig();
+    this.colorBy = 'well';
   }
 
   ngOnInit() {

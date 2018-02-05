@@ -9,6 +9,7 @@ import { AppComponent } from './app.component';
 
 import { StatusService } from './services/status/status.service';
 import { ExperimentService } from './services/experiment/experiment.service';
+import { WindowRef } from './services/windowref/windowref.service';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { ExperimentService } from './services/experiment/experiment.service';
   providers: [
     // declare global singletone services here
     StatusService,
-    ExperimentService
+    ExperimentService,
+    WindowRef
   ],
   exports: [
     DashboardModule
