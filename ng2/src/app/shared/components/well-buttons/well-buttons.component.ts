@@ -90,8 +90,11 @@ export class WellButtonsComponent implements OnChanges, OnInit {
     return well
   }
 
-  getWellContainerStyle(row, col, config, i) {
-    return {};
+  getWellContainerStyle(row, col, well, i) {
+    let style: any = {};
+    if (well.active)
+      style.width = `${this.getCellWidth() + this.ACTIVE_BORDER_WIDTH * 4}px`;
+    return style;
   }
 
   getStyleForWellBar(row, col, config, i) {
@@ -171,7 +174,7 @@ export class WellButtonsComponent implements OnChanges, OnInit {
   dragStop(e, t, i) {
     this.isDragging = false;
     this.cols.forEach((col) => {
-      col.selected = false 
+      col.selected = false
     })
     this.rows.forEach((row) => {
       row.selected = false
@@ -183,7 +186,7 @@ export class WellButtonsComponent implements OnChanges, OnInit {
             this._wells[`well_${r.index * this.cols.length + c.index}`].selected = false
           })
         })
-      } 
+      }
       let well = this._wells[`well_${i}`]
       well.selected = this.isCtrlKeyHeld(e) ? !well.selected : true
     }
