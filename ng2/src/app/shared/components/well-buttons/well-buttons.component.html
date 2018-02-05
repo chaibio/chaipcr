@@ -13,8 +13,7 @@
             {{ row.index + 1 }}
           </div>
         </td>
-        <!--<td *ngFor="let col of cols" class="well-switch" ng-init="i = (row.index * columns.length) + col.index; well = wells['well_' + i];" (mousedown)="dragStart($event, 'well', i)" (mousemove)="dragged($event, 'well', i)" (mouseup)="dragStop($event, 'well', i)" (ngClass)="{selected: well.selected, active: well.active}" ng-style="getWellStyle(row, col, well, i)">-->
-        <td *ngFor="let col of cols" class="well-switch" (mousedown)="dragStart($event, 'well', getWellIndex(row, col))" (mousemove)="dragged($event, 'well', getWellIndex(row, col))" (mouseup)="dragStop($event, 'well', getWellIndex(row, col))" (ngClass)="{selected: well.selected, active: well.active}" ng-style="getWellStyle(row, col, well, i)">
+        <td *ngFor="let col of cols" class="well-switch" (mousedown)="dragStart($event, 'well', getWellIndex(row, col))" (mousemove)="dragged($event, 'well', getWellIndex(row, col))" (mouseup)="dragStop($event, 'well', getWellIndex(row, col))" (ngClass)="{selected: well.selected, active: well.active}" [ngStyle]="getWellStyle(row, col, getWell(row, col), getWellIndex(row, col))">
 
           <div class="well-switch-container" [ngStyle]="getWellContainerStyle(row, col, getWell(row, col), getWellIndex(row, col))">
             <div class="well-switch-bar-container">
