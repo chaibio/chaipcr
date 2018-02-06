@@ -6,7 +6,7 @@ import {
 
 import { Router } from '@angular/router'
 
-import { SessionService } from '../../services/session/session.service'
+import { SessionService } from '../../../services/session/session.service'
 
 @Directive({
   selector: '[chai-logout]',

@@ -5,7 +5,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/throw';
 
 import { BaseHttp } from '../base_http/base_http.service';
-import { LoginFormData } from '../../models/login-form-data.model';
+import { LoginFormData } from '../../shared/models/login-form-data.model';
 
 @Injectable()
 export class SessionService {

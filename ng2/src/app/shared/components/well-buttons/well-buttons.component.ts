@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 
 import { WellButtonI } from '../../models/well-button.model';
-import { ChartConfigService } from '../../services/chart-config/base-chart-config.service';
+import { ChartConfigService } from '../../../services/chart-config/base-chart-config.service';
 import { WindowRef } from '../../../services/windowref/windowref.service';
 
 @Component({

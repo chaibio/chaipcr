@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { WindowRef } from '../../services/windowref/windowref.service'
-import { AuthHttp } from '../../shared/services/auth_http/auth_http.service'
+import { AuthHttp } from '../auth_http/auth_http.service'
 import { ExperimentList } from '../../shared/models/experiment-list.model'
 import { AmplificationData } from '../../shared/models/amplification-data.model'
 import { AmplificationDatum } from '../../shared/models/amplification-datum.model'

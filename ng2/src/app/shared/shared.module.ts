@@ -8,12 +8,6 @@ import {
   APP_BASE_HREF
 } from '@angular/common';
 
-import { BaseHttp } from './services/base_http/base_http.service';
-import { AuthHttp } from './services/auth_http/auth_http.service';
-import { SessionService } from './services/session/session.service';
-import { ChartConfigService } from './services/chart-config/base-chart-config.service';
-import { AmplificationConfigService } from './services/chart-config/amplification-chart-config.service';
-
 import { LogoutDirective } from './directives/logout/logout.directive';
 import { FullHeightDirective } from './directives/full-height/full-height.directive';
 import { FullWidthDirective } from './directives/full-width/full-width.directive';
@@ -55,11 +49,6 @@ import { WellButtonsComponent } from './components/well-buttons/well-buttons.com
   ],
   providers: [
     Title,
-    SessionService,
-    AuthHttp,
-    BaseHttp,
-    AmplificationConfigService,
-    ChartConfigService,
     { provide: APP_BASE_HREF, useValue: '/' },
   ]
 })

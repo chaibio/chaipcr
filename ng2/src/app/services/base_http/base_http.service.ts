@@ -10,7 +10,7 @@ import {
   Headers
 } from '@angular/http';
 
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject'
 import 'rxjs/add/operator/map';
@@ -18,7 +18,7 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/observable/empty';
 
-import { WindowRef } from '../../../services/windowref/windowref.service';
+import { WindowRef } from '../windowref/windowref.service';
 
 @Injectable()
 export class BaseHttp extends Http {

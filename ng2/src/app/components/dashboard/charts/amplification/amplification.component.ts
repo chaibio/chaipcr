@@ -10,7 +10,7 @@ import {
 
 import { WindowRef } from '../../../../services/windowref/windowref.service';
 import { ExperimentService } from '../../../../services/experiment/experiment.service';
-import { AmplificationConfigService } from '../../../../shared/services/chart-config/amplification-chart-config.service';
+import { AmplificationConfigService } from '../../../../services/chart-config/amplification-chart-config.service';
 
 //import 'rxjs/operator/add/takeUntil';
 

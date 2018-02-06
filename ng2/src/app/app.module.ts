@@ -7,6 +7,11 @@ import { DashboardModule } from './components/dashboard/dashboard.module';
 
 import { AppComponent } from './app.component';
 
+import { BaseHttp } from './services/base_http/base_http.service';
+import { AuthHttp } from './services/auth_http/auth_http.service';
+import { SessionService } from './services/session/session.service';
+import { ChartConfigService } from './services/chart-config/base-chart-config.service';
+import { AmplificationConfigService } from './services/chart-config/amplification-chart-config.service';
 import { StatusService } from './services/status/status.service';
 import { ExperimentService } from './services/experiment/experiment.service';
 import { WindowRef } from './services/windowref/windowref.service';
@@ -25,7 +30,12 @@ import { WindowRef } from './services/windowref/windowref.service';
     // declare global singletone services here
     StatusService,
     ExperimentService,
-    WindowRef
+    WindowRef,
+    BaseHttp,
+    AuthHttp,
+    SessionService,
+    ChartConfigService,
+    AmplificationConfigService
   ],
   exports: [
     DashboardModule
