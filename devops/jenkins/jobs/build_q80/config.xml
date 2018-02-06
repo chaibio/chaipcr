@@ -401,6 +401,7 @@ mount /dev/mmcblk0p1 /sdcard/upgrade/ || true
 cd /sdcard/upgrade
 mkdir tslib-compile
 cd tslib-compile/
+apt-get -y -q install autoconf automake pkg-config libgtk-3-dev
 
 git clone git://github.com/kergoth/tslib.git
 cd tslib

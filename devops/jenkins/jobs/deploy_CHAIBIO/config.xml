@@ -289,7 +289,7 @@ exit 1
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo cleanup some space
-rm /usr/lib/julia/sys-debug.*
+#rm /usr/lib/julia/sys-debug.*
 
 echo Setup MySQL
 
@@ -374,6 +374,7 @@ make || exit 1
 make install || exit 1
 #cp realtime ~/tmp
 #cp libraries/lib/* /usr/lib/
+
 cd /sdcard/upgrade/
 rm -r compile-browser
 cd
@@ -418,11 +419,19 @@ echo precompile julia packages if needed
 if [ -e /root/chaipcr/bioinformatics/juliaserver.jl ]
 then
 
+time julia-debug -v
+
 echo Build time- adding pre-requesits
 free -m
 apt-get update
+apt-get -q -y --fix-broken install
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get -q -y install libgtk-3-0
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get -q -y install libpango1.0-0 
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get -q -y install libglib2.0-0
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get -q -y install libcairo2
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get -q -y install gettext
 
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get -q -y install gettext libgtk-3-0 libpango1.0-0 libglib2.0-0 libcairo2
+apt-get -q -y --fix-broken install
 
 DEBIAN_FRONTEND=noninteractive apt-get -q -y install gettext
 DEBIAN_FRONTEND=noninteractive apt-get -q -y install libgtk-3-0
@@ -480,9 +489,6 @@ function pin()
 	Pkg.build(&quot;DataStructures&quot;, &quot;SpecialFunctions&quot;, &quot;MathProgBase&quot;, &quot;HDF5&quot;, &quot;Clustering&quot;, &quot;Nullables&quot;,&quot;JSON&quot;, &quot;JLD&quot;, &quot;NLopt&quot;, &quot;JuMP&quot;, &quot;HttpServer&quot;, &quot;ProfileView&quot;, &quot;Dierckx&quot;, &quot;Ipopt&quot;, &quot;MySQL&quot;, &quot;DataFrames&quot;)
 
 	println(&quot;Done building&quot;)
-
-	println(&quot;Done using&quot;)
-
 	Pkg.add(&quot;PkgDev&quot;)
 	return true
 end
@@ -499,6 +505,8 @@ for i in 1:10
 		using DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering
 		using Nullables, JSON, JLD, NLopt, JuMP, HttpServer, ProfileView
 		using Dierckx, Ipopt, MySQL, DataFrames
+	        println(&quot;Done using&quot;)
+
 		PkgDev.generate(&quot;QpcrAnalysis&quot;, &quot;MIT&quot;)
 		println(&quot;QpcrAnalysis structure generated&quot;)
 		Pkg.status()
@@ -515,13 +523,28 @@ end
 print(&quot;Tried to pin packages 10 times and failed.&quot;)
 exit()
 
-__EOF__
+EOF
 
 echo First QpcrAnalysis package installation run
-JULIA_ENV=bbb_test_1 julia testQpcrAnalysis.jl --compile=all
+for retryloop in 1 2 3 4 5
+do
+    JULIA_ENV=bbb_test_1 julia-debug testQpcrAnalysis.jl --compile=all
+    if [ -e ~/.julia/v0.6/QpcrAnalysis/ ]
+    then
+         echo packages pinned successfully
+         break
+    else
+        echo Error pinning and installing  QpcrAnalysis package.. retrying 5 times.
+    fi
+done
 
-#echo Second run
-#JULIA_ENV=bbb_test_1 julia testQpcrAnalysis.jl --compile=all
+if [ -e ~/.julia/v0.6/QpcrAnalysis/ ]
+then
+      echo QpcrAnalysis package generated.
+else
+     echo Error pinning and installing  QpcrAnalysis package
+     exit 1
+fi
 
 echo end of test result: $?
 cp __init__.jl.org __init__.jl
@@ -529,11 +552,12 @@ cp -r * ~/.julia/v0.6/QpcrAnalysis/
 
 rm testQpcrAnalysis.jl
 echo about to start using QpcrAnalysis
-JULIA_ENV=bbb_test_1 julia -e &quot;using QpcrAnalysis&quot; --compile=all
+JULIA_ENV=bbb_test_1 julia-debug -e &quot;using QpcrAnalysis&quot; --compile=all
 echo tested using QpcrAnalysis
 
 fi
 
+apt-get -q -y --fix-broken install
 sync
 swapoff -a
 rm /sdcard/upgrade/swapfile
