@@ -294,12 +294,12 @@ void QPCRApplication::readConfigurationFile()
             valueIt = it->second.find("data_partition_free_soft_limit");
 
             if (valueIt != it->second.not_found())
-                _settings.configuration.dataSpaceSoftLimit = valueIt->second.get_value<unsigned long>() * 1024 * 1024;
+                _settings.configuration.dataSpaceSoftLimit = valueIt->second.get_value<unsigned long>() * 1024;
 
             valueIt = it->second.find("data_partition_free_hard_limit");
 
             if (valueIt != it->second.not_found())
-                _settings.configuration.dataSpaceHardLimit = valueIt->second.get_value<unsigned long>() * 1024 * 1024;
+                _settings.configuration.dataSpaceHardLimit = valueIt->second.get_value<unsigned long>() * 1024;
         }
 
         it = ptree.find("thermal");
