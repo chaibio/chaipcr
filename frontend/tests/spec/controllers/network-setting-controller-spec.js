@@ -442,6 +442,43 @@ describe("Testing NetworkSettingController", function() {
         expect(_$scope.findWifiNetworks).toHaveBeenCalled();
     });
 
+    it("It should test init method, when wifi switch is on", function() {
 
+        _NetworkSettingsService.getEthernetStatus = function() {};
+
+        spyOn(_NetworkSettingsService, "getEthernetStatus");
+
+        _NetworkSettingsService.wirelessError = false;
+
+        _NetworkSettingsService.intervalKey = null;
+
+        spyOn(_$scope, "whenNoWifiAdapter");
+
+        spyOn(_$scope, "findWifiNetworks");
+
+        _NetworkSettingsService.getSettings = function() {
+            _NetworkSettingsService.wirelessError = true;
+        };
+
+        spyOn(_NetworkSettingsService, "getSettings").and.callThrough();
+
+        _$scope.userSettings = {
+            wifiSwitchOn: true
+        };
+
+        _$interval = function(callback, interval) {
+
+            callback();
+        };
+        
+        _$scope.macAddress = null;
+
+        _$scope.init();
+
+        expect(_NetworkSettingsService.getEthernetStatus).toHaveBeenCalled();
+        expect(_NetworkSettingsService.getSettings).toHaveBeenCalled();
+        expect(_$scope.whenNoWifiAdapter).not.toHaveBeenCalled();
+        expect(_$scope.findWifiNetworks).toHaveBeenCalled();
+    });
 
 });
