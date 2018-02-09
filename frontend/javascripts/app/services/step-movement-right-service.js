@@ -24,6 +24,7 @@ window.ChaiBioTech.ngApp.service('StepMovementRightService', [
         return {
 
             ifOverRightSide: function(stepIndicator) {
+                console.log("white box Moving ... right");
                 stepIndicator.movedStepIndex = null;
 
                 StepPositionService.allPositions.some(this.ifOverRightSideCallback, stepIndicator);
@@ -36,11 +37,23 @@ window.ChaiBioTech.ngApp.service('StepMovementRightService', [
                 if(edge > points[1] && edge < points[2]) {
                     
                     if(index !== this.currentMoveRight) {
-                        moveStepToSides.moveToSide(this.kanvas.allStepViews[index], "left");
+
+                        this.currentMouseOver.exitDirection = "right";
+                        //this.currentMouseOver.index = index;
+                        moveStepToSides.moveToSide(this.kanvas.allStepViews[index], "left", this.currentMouseOver);
                         this.currentMoveRight = this.movedStepIndex = index;
                         StepPositionService.getPositionObject(this.kanvas.allStepViews);
                     }
                     return true;
+                } else if(edge > points[0] && edge < points[1]) {
+                    if(index !== this.currentMouseOver.index) {
+                        this.currentMouseOver = {
+                            index: index,
+                            enterDirection: "left",
+                            exitDirection: null,
+                        };
+                    }
+                    
                 }
             },
 
@@ -56,16 +69,16 @@ window.ChaiBioTech.ngApp.service('StepMovementRightService', [
             manageVerticalLineRight: function(si) {
                 
                 var index = si.movedStepIndex;
-                var place = (si.kanvas.allStepViews[index].left + si.kanvas.allStepViews[index].myWidth - 2);
+                var place = (si.kanvas.allStepViews[index].left + si.kanvas.allStepViews[index].myWidth);
                 
                 if(si.kanvas.allStepViews[index].nextIsMoving === true) {
                     place = si.kanvas.moveDots.left + 7;
                 }
-                si.verticalLine.setLeft(place);
+                si.verticalLine.setLeft(place + 5);
                 
                 si.verticalLine.setCoords();
 
-                si.verticalLine.borderS.setLeft(place + 12);
+                si.verticalLine.borderS.setLeft(place + 25);
                 si.verticalLine.borderS.setCoords();
 
             },

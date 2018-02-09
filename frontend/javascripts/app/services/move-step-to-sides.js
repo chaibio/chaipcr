@@ -1,21 +1,101 @@
 window.ChaiBioTech.ngApp.service('moveStepToSides', [
     function() {
-        this.moveToSide = function(step, direction) {
+        this.moveToSide = function(step, direction, mouseOver) {
 
-            if(direction === "left" && step.stepMovedDirection !== "left") {
-                /*step.left = step.left - 10;
-                step.moveStep(0, false);
-                step.circle.moveCircleWithStep();
-                step.stepMovedDirection = "left";
-                this.adjustDotsPlacingLeft(step);*/
-            } else if(direction === "right" && step.stepMovedDirection !== "right") {
+            console.log(mouseOver);
+
+            if(direction === "left" && step.stepMovedDirection !== "left") {    
+                if(mouseOver.enterDirection === "left" && mouseOver.exitDirection === "right") {
+                    //this.makeSurePreviousStepMovedLeft(step);
+                    this.moveStepToLeft(step);
+                }
                 
-                /*step.left = step.left + 10;
-                step.moveStep(0, false);
-                step.circle.moveCircleWithStep();
-                step.stepMovedDirection = "right";
-                this.adjustDotsPlacingRight(step);*/
+            } 
+            
+            if(direction === "right" && step.stepMovedDirection !== "right") {
+                if(mouseOver.enterDirection === "right" && mouseOver.exitDirection === "left") {
+                    //this.makeSureNextStepMovedRight(step);
+                    this.moveStepToRight(step);
+                } 
+            } 
+
+
+            /*if(direction === "left" && step.stepMovedDirection !== "left") {
+                
+                if(step.previousStep && step.previousStep.stepMovedDirection === "left") {
+                    step.left = step.left - 20;
+                    step.moveStep(0, false);
+                    step.circle.moveCircleWithStep();
+                    step.stepMovedDirection = "left";
+                    this.adjustDotsPlacingLeft(step);
+
+                } else if(! step.previousStep) { // If step is the very first in the stage.
+                    step.left = step.left - 20;
+                    step.moveStep(0, false);
+                    step.circle.moveCircleWithStep();
+                    step.stepMovedDirection = "left";
+                    this.adjustDotsPlacingLeft(step);
+                }
+
+                
+            } else if(direction === "right" && step.stepMovedDirection !== "right") {
+
+                if(step.nextStep && step.nextStep.stepMovedDirection === "right") {
+
+                    step.left = step.left + 20;
+                    step.moveStep(0, false);
+                    step.circle.moveCircleWithStep();
+                    step.stepMovedDirection = "right";
+                    this.adjustDotsPlacingRight(step);
+                } else if(! step.nextStep) { // if step is the last one in the stage.
+                    step.left = step.left + 20;
+                    step.moveStep(0, false);
+                    step.circle.moveCircleWithStep();
+                    step.stepMovedDirection = "right";
+                    this.adjustDotsPlacingRight(step);
+                }                
+            }*/
+      };
+
+      this.makeSurePreviousStepMovedLeft = function(step) {
+
+        var anchor = step.previousStep;
+        while(anchor) {
+            if(anchor.stepMovedDirection !== "left") {
+                this.moveStepToLeft(anchor);
             }
+            anchor = anchor.previousStep;
+        }
+      };
+
+      this.makeSureNextStepMovedRight = function(step) {
+
+        var anchor = step.nextStep;
+
+        while(anchor) {
+            if(anchor.stepMovedDirection !== "right") {
+                this.moveStepToRight(anchor);   
+            }
+            anchor = anchor.nextStep;
+        }
+      };
+
+      this.moveStepToRight = function(step) {
+        step.left = step.left + 20;
+        step.moveStep(0, false);
+        step.circle.moveCircleWithStep();
+        step.stepMovedDirection = "right";
+        this.adjustDotsPlacingRight(step);
+
+      };
+
+      this.moveStepToLeft = function(step) {
+        
+        step.left = step.left - 20;
+        step.moveStep(0, false);
+        step.circle.moveCircleWithStep();
+        step.stepMovedDirection = "left";
+        this.adjustDotsPlacingLeft(step);
       };
 
       this.adjustDotsPlacingRight = function(step) {

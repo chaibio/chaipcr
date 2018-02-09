@@ -25,6 +25,7 @@ window.ChaiBioTech.ngApp.service('StepMovementLeftService', [
         return {
 
             ifOverLeftSide: function(stepIndicator) {
+                console.log("White box moving left");
                 stepIndicator.movedStepIndex = null;
                 StepPositionService.allPositions.some(this.ifOverLeftSideCallback, stepIndicator);
                 return stepIndicator.movedStepIndex;
@@ -35,11 +36,21 @@ window.ChaiBioTech.ngApp.service('StepMovementLeftService', [
                 if((this.movement.referencePoint) > points[0] && (this.movement.referencePoint) < points[1]) {
 
                     if(this.currentMoveLeft !== index) {
-                        moveStepToSides.moveToSide(this.kanvas.allStepViews[index], "right");
+                        this.currentMouseOver.exitDirection = "left";
+                        moveStepToSides.moveToSide(this.kanvas.allStepViews[index], "right", this.currentMouseOver);
                         this.currentMoveLeft = this.movedStepIndex = index;
                         StepPositionService.getPositionObject(this.kanvas.allStepViews);
                     }
                 return true;
+                } else if(this.movement.referencePoint > points[1] && this.movement.referencePoint < points[2]) {
+
+                    if(index !== this.currentMouseOver.index) {
+                        this.currentMouseOver = {
+                            index: index,
+                            enterDirection: "right",
+                            exitDirection: null,
+                        };
+                    }
                 }
             },
 
@@ -61,20 +72,20 @@ window.ChaiBioTech.ngApp.service('StepMovementLeftService', [
             },
 
             manageVerticalLineLeft: function(sI) {
-                
+                console.log("here .. manageVerticalLineLeft");
                 var index = sI.movedStepIndex;
                 var place;
-                place = (sI.kanvas.allStepViews[index].left - 14);
+                place = (sI.kanvas.allStepViews[index].left - 10);
                 
                 if(sI.kanvas.allStepViews[index].previousIsMoving === true) {
                     
                     place = sI.kanvas.moveDots.left + 7;
                 }        
                 
-                sI.verticalLine.setLeft(place);
+                sI.verticalLine.setLeft(place - 5);
                 sI.verticalLine.setCoords();
 
-                sI.verticalLine.borderS.setLeft(place);
+                sI.verticalLine.borderS.setLeft(place + 15);
                 sI.verticalLine.borderS.setCoords();
                 //si.kanvas.canvas.bringToFront(sI.verticalLine.border);
             },

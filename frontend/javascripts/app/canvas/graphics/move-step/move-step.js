@@ -50,6 +50,12 @@ angular.module("canvasApp").factory('moveStepRect', [
 
       this.indicator.init = function(step, footer, C, backupStageModel) {
 
+        this.currentMouseOver = {
+          index: null,
+          enterDirection: null,
+          exitDirection: null,
+        };
+        
         this.tagSteps(step);
         step.parentStage.sourceStage = true;
         step.parentStage.stageHeader();
@@ -91,6 +97,8 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         step.parentStage.stageHeader();
         
+        
+
         this.movement = this.movedStepIndex = this.currentMoveRight = this.currentMoveLeft =
         this.movedStageIndex = this.movedRightStageIndex = this.movedLeftStageIndex = null;
 
@@ -139,10 +147,12 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         if(this.movement.left > this.currentLeft && this.direction !== "right") {
           this.direction = "right";
-          this.updateLocationOnMoveRight();
+          //this.updateLocationOnMoveRight();
+          this.currentMouseOver = {};
         } else if(this.movement.left < this.currentLeft && this.direction !== "left") {
           this.direction = "left";
-          this.updateLocationOnMoveLeft();    
+          this.currentMouseOver = {};
+          //this.updateLocationOnMoveLeft();    
         }
         return this.direction;
       };
@@ -150,14 +160,14 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.updateLocationOnMoveRight = function() {
         //this.movedStepIndex = this.currentMoveLeft;
         //StepMovementRightService.movedRightAction(this);
-        this.movement.left = this.movement.left - 64;
+        //this.movement.left = this.movement.left - 64;
         //this.manageMovingRight();
       };
 
       this.indicator.updateLocationOnMoveLeft = function() {
         //this.movedStepIndex = this.currentMoveRight;
         //StepMovementLeftService.movedLeftAction(this);
-        this.movement.left = this.movement.left + 64;
+        //this.movement.left = this.movement.left + 64;
         //this.manageMovingLeft();
       };
       
