@@ -20,7 +20,7 @@ describe "Amplification Option API", type: :request do
     it 'updated option' do
       params = {amplification_option: {min_fluorescence: 123, min_reliable_cycle: 3, min_d1: 21, min_d2: 45, baseline_cycle_bounds: [1,5]}} 
     
-      put "/experiments/#{@experiment.id}/amplification_option", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      put "/experiments/#{@experiment.id}/amplification_option", params.to_json, http_headers
       expect(response).to be_success            # test for the 200 status-code
       get "/experiments/#{@experiment.id}/amplification_option"
       expect(response).to be_success 
@@ -38,7 +38,7 @@ describe "Amplification Option API", type: :request do
     it 'multiple times' do
       params = {amplification_option: {min_fluorescence: 123, baseline_cycle_bounds: [1,5]}} 
     
-      put "/experiments/#{@experiment.id}/amplification_option", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      put "/experiments/#{@experiment.id}/amplification_option", params.to_json, http_headers
       expect(response).to be_success            # test for the 200 status-code
       json = JSON.parse(response.body)
       json["amplification_option"]["cq_method"].should == AmplificationOption::CQ_METHOD_CY0
@@ -46,7 +46,7 @@ describe "Amplification Option API", type: :request do
       json["amplification_option"]["baseline_cycle_bounds"].should == [1,5]
       
       params = {amplification_option: {min_fluorescence: nil}}
-      put "/experiments/#{@experiment.id}/amplification_option", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      put "/experiments/#{@experiment.id}/amplification_option", params.to_json, http_headers
       expect(response).to be_success            # test for the 200 status-code
       json = JSON.parse(response.body)
       json["amplification_option"]["min_fluorescence"].should == AmplificationOption.new.min_fluorescence
@@ -54,7 +54,7 @@ describe "Amplification Option API", type: :request do
       
       params = {amplification_option: {baseline_cycle_bounds: nil}} 
     
-      put "/experiments/#{@experiment.id}/amplification_option", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      put "/experiments/#{@experiment.id}/amplification_option", params.to_json, http_headers
       expect(response).to be_success            # test for the 200 status-code
       json = JSON.parse(response.body)
       json["amplification_option"]["min_fluorescence"].should == AmplificationOption.new.min_fluorescence
@@ -63,7 +63,7 @@ describe "Amplification Option API", type: :request do
     
     it 'fails because of params check' do
       params = {amplification_option: {cq_method: "abc", min_fluorescence: -123}} 
-      put "/experiments/#{@experiment.id}/amplification_option", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      put "/experiments/#{@experiment.id}/amplification_option", params.to_json, http_headers
       expect(response.status).to eq(422)
       json = JSON.parse(response.body)
       json["amplification_option"]["errors"].length.should == 2      

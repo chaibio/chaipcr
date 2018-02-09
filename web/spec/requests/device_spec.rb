@@ -18,7 +18,7 @@ describe "Device API", type: :request do
       signature
     end
     params = { signature: "abc" }
-    put "/device/clean", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+    put "/device/clean", params.to_json, http_headers
     response.response_code.should == 400
   end
   
@@ -33,7 +33,7 @@ describe "Device API", type: :request do
       signature
     end
     params = { signature: signature }
-    put "/device/clean", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+    put "/device/clean", params.to_json, http_headers
     expect(response).to be_success
     get "/"
     response.should redirect_to "/login"

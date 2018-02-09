@@ -18,6 +18,7 @@
 #
 class ExperimentDefinition < ActiveRecord::Base
   has_one :protocol, dependent: :destroy
+  has_one :well_layout, ->{ where(:parent_type => ExperimentDefinition.name) }, dependent: :destroy
   has_one :amplification_option, dependent: :destroy
   
   TYPE_USER_DEFINED = "user"

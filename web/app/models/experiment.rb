@@ -122,7 +122,8 @@ class Experiment < ActiveRecord::Base
   validates :name, presence: true
 
   belongs_to :experiment_definition
-
+  
+  has_one  :well_layout, ->{ where(:parent_type => Experiment.name) }, dependent: :destroy
   has_many :fluorescence_data
   has_many :temperature_logs, -> {order("elapsed_time")} do
     def with_range(starttime, endtime, resolution)
@@ -150,6 +151,9 @@ class Experiment < ActiveRecord::Base
 
   before_create do |experiment|
     experiment.time_valid = (Setting.time_valid)? 1 : 0
+    if experiment.well_layout == nil
+      experiment.create_well_layout
+    end
   end
 
   before_destroy do |experiment|
@@ -175,6 +179,14 @@ class Experiment < ActiveRecord::Base
     Well.delete_all(:experiment_id => experiment.id)
   end
 
+  def create_well_layout
+    if experiment_definition.well_layout != nil
+      self.well_layout = experiment_definition.well_layout.copy
+    else
+      self.well_layout = WellLayout.new(:experiment_id=>id, :parent_type=>Experiment.name)
+    end
+  end
+  
   def protocol
     experiment_definition.protocol
   end

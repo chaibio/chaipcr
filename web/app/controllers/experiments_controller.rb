@@ -228,10 +228,12 @@ class ExperimentsController < ApplicationController
   api :POST, "/experiments/:id/copy", "Copy an experiment"
   see "experiments#create", "json response"
   def copy
-    old_experiment = Experiment.includes(:experiment_definition).find_by_id(params[:id])
-    experiment_definition = old_experiment.experiment_definition.copy
+    old_experiment = Experiment.includes(:experiment_definition).find_by_id(params[:id]) 
     @experiment = Experiment.new({:name=>(!params[:experiment].blank?)? params[:experiment][:name] : "Copy of #{old_experiment.name}"})
-    @experiment.experiment_definition = experiment_definition
+    @experiment.experiment_definition = old_experiment.experiment_definition.copy
+    if old_experiment.well_layout
+      @experiment.well_layout = old_experiment.well_layout.copy
+    end
     ret = @experiment.save
     respond_to do |format|
       format.json { render "fullshow", :status => (ret)? :ok :  :unprocessable_entity}
@@ -318,6 +320,15 @@ class ExperimentsController < ApplicationController
     end
   end
 
+  def well_layout
+    @well_layout = WellLayout.for_experiment(params[:id]).first
+    if @well_layout.is_a? WellLayout
+      @well_layout = @well_layout.layout
+    else
+      @well_layout = []
+    end
+  end
+  
 	swagger_path '/experiments/{id}/temperature_data' do
 		operation :get do
 			key :summary, 'Retrieve temperature data'

@@ -104,4 +104,31 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def well_layout_editable_check(create)
+    if params[:id] == nil
+      @well_layout = WellLayout.for_experiment(params[:experiment_id]).first
+      if create && (!@well_layout.is_a? WellLayout)
+        @experiment = Experiment.find_by_id(params[:experiment_id]) if @experiment.nil?
+        @well_layout = @experiment.create_well_layout
+        @well_layout = nil if !@well_layout.save
+      end
+    else
+      obj = get_object
+      if obj
+        @well_layout = obj.well_layout
+      else
+        render json: {errors: "The object doesn't exist"}, status: :unprocessable_entity
+        return false
+      end
+    end
+    if !@well_layout.is_a? WellLayout
+      render json: {errors: "The well layout doesn't exist"}, status: :unprocessable_entity
+      return false
+    elsif !@well_layout.editable?
+      render json: {errors: "The well layout is not editable"}, status: :unprocessable_entity
+      return false
+    else
+      return true
+    end
+  end
 end
