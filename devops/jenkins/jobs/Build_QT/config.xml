@@ -39,7 +39,7 @@
       <phaseName>Flashing OS</phaseName>
       <phaseJobs>
         <com.tikal.jenkins.plugins.multijob.PhaseJobsConfig>
-          <jobName>flash_empty_4_9_jessie_image</jobName>
+          <jobName>flash_empty_4_9_stretch_image</jobName>
           <currParams>true</currParams>
           <exposedSCM>false</exposedSCM>
           <disableJob>false</disableJob>
