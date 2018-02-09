@@ -29,13 +29,11 @@
           <description>Julia version to build.</description>
           <choices class="java.util.Arrays$ArrayList">
             <a class="string-array">
-              <string>release-0.6</string>
               <string>v0.6.2</string>
               <string>v0.6.1</string>
               <string>v0.6.0</string>
               <string>v0.5.2</string>
               <string>v0.5.0</string>
-              <string>release-0.5</string>
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
