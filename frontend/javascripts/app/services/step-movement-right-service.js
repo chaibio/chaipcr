@@ -32,7 +32,7 @@ window.ChaiBioTech.ngApp.service('StepMovementRightService', [
 
             ifOverRightSideCallback: function(points, index) {
                 // Note , this method works in the context of stepIndicator, dont confuse with this keyword.
-                var edge = this.movement.left + this.rightOffset;
+                var edge = this.movement.referencePoint;
                 if(edge > points[1] && edge < points[2]) {
                     
                     if(index !== this.currentMoveRight) {

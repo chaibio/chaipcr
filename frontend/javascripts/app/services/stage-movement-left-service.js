@@ -33,7 +33,7 @@ window.ChaiBioTech.ngApp.service('StageMovementLeftService', [
 
             shouldStageMoveLeftCallback: function(point, index) {
                 // Note, the context of this method is sI [stepIndicator]
-                if((this.movement.left + this.rightOffset) > point[2] && (this.movement.left + this.rightOffset) < point[2] + 150) {
+                if((this.movement.referencePoint) > point[2] && (this.movement.referencePoint) < point[2] + 60) {
                     
                     if(index !== this.movedLeftStageIndex) {
                         

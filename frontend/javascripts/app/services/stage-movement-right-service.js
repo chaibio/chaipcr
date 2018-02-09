@@ -32,26 +32,27 @@ window.ChaiBioTech.ngApp.service('StageMovementRightService', [
 
             shouldStageMoveRightCallback: function(point, index) {
                 
-                if((this.movement.left) > point[0] - 150 && (this.movement.left) < point[0]) {
+                if((this.movement.referencePoint) > point[0] - 60 && (this.movement.referencePoint) < point[0]) {
                     
                     
                     if(index !== this.movedRightStageIndex) {
+                        console.log("LX");
                         this.movedStageIndex = this.movedRightStageIndex = index;
                         moveStageToSidesWhileMoveStep.moveToSideForStep("right", this.kanvas.allStageViews[index]);
                         StagePositionService.getPositionObject();
                         StagePositionService.getAllVoidSpaces();
                         StepPositionService.getPositionObject(this.kanvas.allStepViews);
                         return true;
-                    } else if((this.movement.left) > point[0] - 140 && (this.movement.left) < point[0] - 100) {
+                    } /*else if((this.movement.referencePoint) > point[0] - 140 && (this.movement.referencePoint) < point[0] - 100) {
                        //this.movedStageIndex = this.movedLeftStageIndex = index;
-                       console.log("Hotcha");
+                        console.log("Hotcha");
                         moveStageToSidesWhileMoveStep.moveStageToLeftSpecialCase(this.kanvas.allStageViews[index]); 
                         this.kanvas.stepIndicator.headerExtender.setVisible(false);
                         StagePositionService.getPositionObject();
                         StagePositionService.getAllVoidSpaces();
                         StepPositionService.getPositionObject(this.kanvas.allStepViews);
                         return true;
-                    }
+                    }*/
                 }
                 
             }

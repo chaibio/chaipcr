@@ -54,8 +54,9 @@ window.ChaiBioTech.ngApp.service('StepMoveVoidSpaceLeftService', [
 
             voidSpaceCallbackLeft: function(point, index) {
                 
-                var abPlace = this.movement.left + this.rightOffset;
-                if(point[1] - point[0] > 25 && abPlace > (point[0] + 25) && abPlace < point[1]) {
+                var abPlace = this.movement.referencePoint;
+                if(point[1] - point[0] > 25 && abPlace > point[0] && abPlace < point[1]) {
+                    console.log("Hola");
                     that.verticalLineForVoidLeft(this, index);
                     return true;
                 }
