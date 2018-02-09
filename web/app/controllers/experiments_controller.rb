@@ -1051,13 +1051,33 @@ class ExperimentsController < ApplicationController
 
   def start
     if @experiment
+      proxy_request("http://localhost:8000/control/start", @experiment)
+    else
+      render json: {errors: "experiment not found #{params[:id]}"}, status: 404
     end
   end
 
   def stop
+    if @experiment
+      proxy_request("http://localhost:8000/control/stop", @experiment)
+    else
+      render json: {errors: "experiment not found #{params[:id]}"}, status: 404
+    end
   end
 
   protected
+
+  def proxy_request(url, experiment)
+    begin
+      body = {experiment_id: experiment.id}
+      headers = {"Authorization" => "Token #{authentication_token}", 'Content-Type' => 'application/json' }
+      response = HTTParty.post(url, body: body.to_json, headers: headers)
+      render :json=>response.body, :status=>response.code
+    rescue  => e
+      render json: {errors: "reatime server port 8000 cannot be reached: #{e}"}, status: 500
+      logger.error("real time server connection error: #{e}")
+    end
+  end
 
   def well_name(well_num)
     @wells ||= Well.wells(@experiment.id) if @experiment

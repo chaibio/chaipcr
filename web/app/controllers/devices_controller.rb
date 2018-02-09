@@ -20,6 +20,7 @@ require "net/http"
 require 'digest/md5'
 require 'json'
 require 'zip'
+require "httparty"
 
 class DevicesController < ApplicationController
   include ParamsHelper
@@ -143,12 +144,13 @@ class DevicesController < ApplicationController
 
   api :GET, "/device/status", "status of the machine"
   def status
-    url = URI.parse("http://localhost:8000/status?access_token=#{authentication_token}")
     begin
-      response = Net::HTTP.get_response(url)
+      headers = {"Authorization" => "Token #{authentication_token}"}
+      response = HTTParty.get("http://localhost:8000/status", headers: headers)
       render :json=>response.body, :status=>response.code
     rescue  => e
       render json: {errors: "reatime server port 8000 cannot be reached: #{e}"}, status: 500
+      logger.error("real time server connection error: #{e}")
     end
   end
 
