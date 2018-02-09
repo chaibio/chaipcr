@@ -561,6 +561,11 @@ apt-get -q -y --fix-broken install
 sync
 swapoff -a
 rm /sdcard/upgrade/swapfile
+echo clearing more space and removing .git julia folders
+cd
+find . -name .git -execdir rm -r {} \;
+find . -name *.o  -exec rm {} \;
+
 exit 0
 </command>
       <execEachLine>false</execEachLine>
@@ -694,6 +699,7 @@ mkdir -p /boot/dts/
 mkdir -p /lib/firmware/
 
 ./install_debian.sh
+apt-get  -y -q --purge autoremove device-tree-compiler
 echo done installing LCD driver.
 
 sync
@@ -783,6 +789,52 @@ cp ~/chaipcr/web/config/etc/unicorn/chaipcr.conf /etc/unicorn/
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
+      <command>echo cleanup to free up some space
+df -h
+
+apt-get  -y -q --purge autoremove g++-4.7 g++-4.8 gcc-4.8 g++-4.8 gcc-4.8 g++-4.8 
+apt-get  -y -q --purge autoremove libblas3gf libblas3gf
+
+
+apt-get  -y -q --purge autoremove parted ntp ntpdate git unzip automake sshpass build-essential lsb-release  nodejs libxslt-dev libxml2-dev libtool linux-headers-`uname -r` cmake g++ ntp ntpdate git unzip automake sshpass build-essential liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas-common libblas3 libfftw3-double3 libfftw3-single3 libgfortran3 libllvm3.8 libmetis5 libopenblas-base libunwind8 liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas-common libblas3 libfftw3-double3 libfftw3-single3 libgfortran3 liblapack3 libllvm3.8 libmetis5 libopenblas-base libunwind8 liblapack3 libopenblas-base libopenblas-dev i2c-tools evtest git automake libtool device-tree-compiler libqt4-webkit libfontconfig1-dev libfreetype6-dev libx11-dev libxcursor-dev libxext-dev libxfixes-dev libxft-dev libxi-dev libxrandr-dev libxrender-dev liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3 liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools perl
+
+apt-get install -y -q liblapack-dev 
+
+
+apt-get -f  -y -q install
+
+apt-get  -y -q --purge autoremove fakeroot 
+apt-get -f  -y -q install
+
+apt-get --purge  -y -q autoremove g++
+apt-get  -y -q --purge autoremove gcc 
+apt-get  -y -q -f install
+
+apt-get  -y -q --purge autoremove gfortran* git hdf5-tools i2c-tools 
+apt-get  -y -q --purge autoremove icu-devtools
+apt-get -y -q remove qt4-default qt5-default gettext
+DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge libgtk-3-0
+DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge gcc-4.9 cmake perl5 perl 
+DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge python2*
+
+apt install -q -y liblapack-dev libboost-all-dev
+
+apt-get autoremove -y --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data libx11* libxcb*
+
+
+DEBIAN_FRONTEND=noninteractive apt-get -q -y install gettext
+DEBIAN_FRONTEND=noninteractive apt-get -q -y install libgtk-3-0
+apt-get -y -q install libpango1.0-0 libglib2.0-0 libcairo2
+
+
+
+
+df -h
+exit 0</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
       <command>echo zeroing 2
 
 dd if=/dev/zero of=/zeros.bigfile bs=16M
@@ -809,6 +861,17 @@ then
 fi
 
 echo basic beaglebone setup done!</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo Maintenance
+
+cd /root/chaipcr/web
+bundle exec rake db:migrate # migrates database as needed
+
+
+exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
@@ -868,17 +931,6 @@ mount /dev/mmcblk0p1 /sdcard/upgrade/
 exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
-      <command>echo Maintenance
-
-cd /root/chaipcr/web
-bundle exec rake db:migrate # migrates database as needed
-
-
-exit 0</command>
-      <execEachLine>false</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#build( &quot;create_factory_settings_sdcard&quot;, build_machine:&quot;$build_machine&quot;, output_sdcard:&quot;/dev/sdb&quot;)
 echo all done for $build_machine, you can call create_factory_settings_sdcard job to create a factory settings image. root password is chaipcr
@@ -886,7 +938,19 @@ echo all done for $build_machine, you can call create_factory_settings_sdcard jo
 exit 0</command>
     </hudson.tasks.Shell>
   </builders>
-  <publishers/>
+  <publishers>
+    <com.chikli.hudson.plugin.naginator.NaginatorPublisher plugin="naginator@1.17.2">
+      <regexpForRerun></regexpForRerun>
+      <rerunIfUnstable>false</rerunIfUnstable>
+      <rerunMatrixPart>false</rerunMatrixPart>
+      <checkRegexp>false</checkRegexp>
+      <regexpForMatrixStrategy>TestParent</regexpForMatrixStrategy>
+      <delay class="com.chikli.hudson.plugin.naginator.FixedDelay">
+        <delay>2000</delay>
+      </delay>
+      <maxSchedule>5</maxSchedule>
+    </com.chikli.hudson.plugin.naginator.NaginatorPublisher>
+  </publishers>
   <buildWrappers>
     <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.8"/>
   </buildWrappers>
