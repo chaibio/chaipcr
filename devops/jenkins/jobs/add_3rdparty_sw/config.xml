@@ -33,6 +33,9 @@
           <description>Julia version</description>
           <choices class="java.util.Arrays$ArrayList">
             <a class="string-array">
+              <string>v0.6.2</string>
+              <string>v0.6.1</string>
+              <string>v0.6.0</string>
               <string>release-0.5</string>
               <string>release-0.6</string>
             </a>
