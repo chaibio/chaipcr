@@ -307,6 +307,7 @@ systemctl start mysql.service
 sync
 cd
 echo unmounting any sdcard folders
+swapoff -a
 umount /sdcard/*
 umount /dev/mmcblk0p*
 
@@ -796,7 +797,8 @@ apt-get  -y -q --purge autoremove g++-4.7 g++-4.8 gcc-4.8 g++-4.8 gcc-4.8 g++-4.
 apt-get  -y -q --purge autoremove libblas3gf libblas3gf
 
 
-apt-get  -y -q --purge autoremove parted ntp ntpdate git unzip automake sshpass build-essential lsb-release  nodejs libxslt-dev libxml2-dev libtool linux-headers-`uname -r` cmake g++ ntp ntpdate git unzip automake sshpass build-essential liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas-common libblas3 libfftw3-double3 libfftw3-single3 libgfortran3 libllvm3.8 libmetis5 libopenblas-base libunwind8 liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas-common libblas3 libfftw3-double3 libfftw3-single3 libgfortran3 liblapack3 libllvm3.8 libmetis5 libopenblas-base libunwind8 liblapack3 libopenblas-base libopenblas-dev i2c-tools evtest git automake libtool device-tree-compiler libqt4-webkit libfontconfig1-dev libfreetype6-dev libx11-dev libxcursor-dev libxext-dev libxfixes-dev libxft-dev libxi-dev libxrandr-dev libxrender-dev liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3 liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools perl
+apt-get  -y -q --purge autoremove parted linux-headers-`uname -r` parted automake build-essential cmake curl device-tree-compiler evtest g++ gfortran git hdf5-tools i2c-tools libarpack2 libblas-common libblas-dev libblas3 libedit-dev libfftw3-dev libfftw3-double3 libfftw3-single3 libfontconfig1-dev libfreetype6-dev libgfortran3 libgfortran3 libgmp3-dev liblapack3 liblapack3gf libllvm3.8 libmetis5 libmpfr-dev libopenblas-base libopenblas-dev libqt4-webkit libssl-dev libtool libunwind8 libx11-dev libxcursor-dev libxext-dev libxfixes-dev libxft-dev libxi-dev libxml2-dev libxrandr-dev libxrender-dev libxslt-dev lsb-release m4 nodejs ntp ntpdate parted pkg-config python sshpass unzip
+
 
 apt-get install -y -q liblapack-dev 
 
@@ -814,8 +816,7 @@ apt-get  -y -q --purge autoremove gfortran* git hdf5-tools i2c-tools
 apt-get  -y -q --purge autoremove icu-devtools
 apt-get -y -q remove qt4-default qt5-default gettext
 DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge libgtk-3-0
-DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge gcc-4.9 cmake perl5 perl 
-DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge python2*
+DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge gcc-4.9 cmake DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge python2*
 
 apt install -q -y liblapack-dev libboost-all-dev
 
