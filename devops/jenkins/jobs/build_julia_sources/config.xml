@@ -810,7 +810,7 @@ ls -ahl $local_download_folder/julia-$prefix-$build_machine-$BUILD_NUMBER.tgz $l
 ls -ahl $local_download_folder/julia-$prefix-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia-$prefix-slim-default.tgz
 
 #experimental deb file upload: julia-release_0.6-2_armhf.deb
-scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/julia-compile/julia/julia-release_0.6*.deb $local_download_folder/julia-$prefix.deb || true
+scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/julia-compile/julia/julia-*.deb $local_download_folder/julia-$prefix.deb || true
 chmod 777 $local_download_folder/julia-$prefix.deb || true
 
 
