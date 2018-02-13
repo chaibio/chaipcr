@@ -158,6 +158,8 @@ angular.module("canvasApp").factory('stage', [
         stage.stageGroup.setCoords();
         stage.dots.setLeft(stage.left + 3);
         stage.dots.setCoords();
+        stage.border.setLeft(stage.left);
+        stage.border.setCoords();
         //stage.myWidth = (stage.model.steps.length * (constants.stepWidth)) + constants.additionalWidth;
         this.moveStepAction = (del === true) ? -1 : 1; 
         stage.childSteps.forEach(this.manageMovingChildsteps, this);
@@ -302,12 +304,13 @@ angular.module("canvasApp").factory('stage', [
           this.visualComponents = {
             'stageGroup': this.stageGroup,
             'dots': this.dots,
-            'borderRight': this.borderRight
+            'borderRight': this.borderRight,
+            'borderLeft': this.border
           };
 
           this.canvas.add(this.stageGroup);
           this.canvas.add(this.dots);
-
+          this.canvas.add(this.border);
           this.setShadows();
           this.addSteps();
       };

@@ -1,9 +1,9 @@
 angular.module('canvasApp').factory('stageBorderLeft', [
   'Line',
   function(Line) {
-    return function(width) {
+    return function(stage) {
       var properties = {
-          stroke: '#ff9f00',  left: 0, strokeWidth: 2, selectable: false
+          stroke: '#ff9f00',  left: stage.left, strokeWidth: 2, selectable: false
         };
       var cordinates = [0, 70, 0, 390];
 

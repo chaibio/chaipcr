@@ -43,7 +43,7 @@ angular.module("canvasApp").service('stageGraphics', [
     };
 
     this.borderLeft = function() {
-      this.border =  new stageBorderLeft();
+      this.border =  new stageBorderLeft(this);
       return this;
     };
 
@@ -67,7 +67,7 @@ angular.module("canvasApp").service('stageGraphics', [
 
     this.createStageGroup = function() {
 
-      var stageContents = [this.stageRect, this.stageNameGroup, this.roof, this.border]; //this.dots
+      var stageContents = [this.stageRect, this.stageNameGroup, this.roof]; //this.dots
       this.stageGroup = new stageGroup(stageContents, this.left);
       return this;
     };
