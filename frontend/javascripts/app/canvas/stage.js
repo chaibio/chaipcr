@@ -161,7 +161,7 @@ angular.module("canvasApp").factory('stage', [
         stage.border.setLeft(stage.left);
         stage.border.setCoords();
         //stage.myWidth = (stage.model.steps.length * (constants.stepWidth)) + constants.additionalWidth;
-        this.moveStepAction = (del === true) ? -1 : 1; 
+        this.moveStepAction = (del === true) ? -1 : 1;
         stage.childSteps.forEach(this.manageMovingChildsteps, this);
 
       };
