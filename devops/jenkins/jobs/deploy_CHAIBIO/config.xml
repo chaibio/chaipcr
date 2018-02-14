@@ -747,7 +747,16 @@ echo done rserev</command>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo setting up website on ngixn
+      <command>echo Checking locale.
+if grep &quot;&quot; /etc/default/locale
+then
+        echo default locale is set.
+else
+        echo setting default local to en_US.UTF-8
+        echo &quot;LANG=en_US.UTF-8&quot; &gt; /etc/default/locale
+fi
+
+echo setting up website on ngixn
 if [ -e /etc/nginx/sites-available ]
 then
     echo Nginx is installed
