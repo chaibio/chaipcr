@@ -227,7 +227,7 @@ export class WellButtonsComponent implements OnChanges, OnInit {
       this._wells[`well_${i}`] = {
         active: false,
         selected: true,
-        color: this.colorby === 'wells' ? this.config.getColors()[i] : '#75278E',
+        color: this.colorby === 'well' ? this.config.getColors()[i] : '#75278E',
         cts: [1, 2]
       }
     }
@@ -239,7 +239,6 @@ export class WellButtonsComponent implements OnChanges, OnInit {
       for (let i = 0; i < this.NUM_WELLS; i ++) {
         this._wells[`well_${i}`].color = this.colorby === 'well' ? this.config.getColors()[i] : '#75278E'
       }
-      console.log('colors changed!')
     }
   }
 
