@@ -92,16 +92,16 @@ export class WellButtonsComponent implements OnChanges, OnInit {
 
   getWellContainerStyle(row, col, well, i) {
     let style: any = {};
-    if (well.active)
-      style.width = `${this.getCellWidth() + this.ACTIVE_BORDER_WIDTH * 4}px`;
-    return style;
-  }
-
-  getStyleForWellBar(row, col, config, i) {
-    return {
-      'background-color' : config.color,
-      'opacity' : config.selected ? 1 : 0.25
+    style.opacity = 0.5;
+    style.width = `${this.getCellWidth()}px`;
+    style.height = `${this.getCellWidth()}px`;
+    if (well.active) {
     }
+    if (well.selected) {
+      style.opacity = 1;
+    }
+    style.borderColor = well.color;
+    return style;
   }
 
   ngOnInit() {
@@ -192,35 +192,35 @@ export class WellButtonsComponent implements OnChanges, OnInit {
     }
   }
 
-  getWellStyle(row, col, well, index) {
-    if(well.active)
-      return {}
+  //getWellStyle(row, col, well, index) {
+  //  if(well.active)
+  //    return {}
 
-    let well_left_index = (col.index + 1) % this.cols.length === 1 ? null : index - 1
-    let well_right_index = (col.index + 1) % this.cols.length === 0 ? null : index + 1
-    let well_top_index = (row.index + 1) % this.rows.length === 1 ? null : index - this.cols.length
-    let well_bottom_index = (row.index + 1) % this.rows.length === 0 ? null : index + this.cols.length
+  //  let well_left_index = (col.index + 1) % this.cols.length === 1 ? null : index - 1
+  //  let well_right_index = (col.index + 1) % this.cols.length === 0 ? null : index + 1
+  //  let well_top_index = (row.index + 1) % this.rows.length === 1 ? null : index - this.cols.length
+  //  let well_bottom_index = (row.index + 1) % this.rows.length === 0 ? null : index + this.cols.length
 
-    let well_left = this._wells[`well_${well_left_index}`]
-    let well_right = this._wells[`well_${well_right_index}`]
-    let well_top = this._wells[`well_${well_top_index}`]
-    let well_bottom = this._wells[`well_${well_bottom_index}`]
+  //  let well_left = this._wells[`well_${well_left_index}`]
+  //  let well_right = this._wells[`well_${well_right_index}`]
+  //  let well_top = this._wells[`well_${well_top_index}`]
+  //  let well_bottom = this._wells[`well_${well_bottom_index}`]
 
-    let style: any = {}
-    let border = `2px solid #000`
+  //  let style: any = {}
+  //  let border = `2px solid #000`
 
-    if (well.selected) {
-      if(!(well_left? well_left.selected : false))
-        style[`border-left`] = border
-      if(!(well_right? well_right.selected : false))
-        style[`border-right`] = border
-      if(!(well_top? well_top.selected : false))
-        style[`border-top`] = border
-      if(!(well_bottom? well_bottom.selected : false))
-        style[`border-bottom`] = border
-    }
-    return style;
-  }
+  //  if (well.selected) {
+  //    if(!(well_left? well_left.selected : false))
+  //      style[`border-left`] = border
+  //    if(!(well_right? well_right.selected : false))
+  //      style[`border-right`] = border
+  //    if(!(well_top? well_top.selected : false))
+  //      style[`border-top`] = border
+  //    if(!(well_bottom? well_bottom.selected : false))
+  //      style[`border-bottom`] = border
+  //  }
+  //  return style;
+  //}
 
   private initWells() {
     for (let i = 0; i < this.NUM_WELLS; i ++) {
