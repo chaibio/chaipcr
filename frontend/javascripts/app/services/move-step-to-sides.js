@@ -3,10 +3,10 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
     function(moveStageToSides) {
         this.moveToSide = function(step, direction, mouseOver) {
 
-            if(step.parentStage.sourceStage) {
+            /*if(step.parentStage.sourceStage) {
                 this.moveToSideForSourceStage(step, direction, mouseOver);
                 return;
-            }
+            }*/
 
             if(direction === "left" && step.stepMovedDirection !== "left") {    
                 if(mouseOver.enterDirection === "left" && mouseOver.exitDirection === "right") {
