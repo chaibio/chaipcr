@@ -1,8 +1,12 @@
 window.ChaiBioTech.ngApp.service('moveStepToSides', [
-    function() {
+    'moveStageToSides',
+    function(moveStageToSides) {
         this.moveToSide = function(step, direction, mouseOver) {
 
-            console.log(mouseOver);
+            if(step.parentStage.sourceStage) {
+                this.moveToSideForSourceStage(step, direction, mouseOver);
+                return;
+            }
 
             if(direction === "left" && step.stepMovedDirection !== "left") {    
                 if(mouseOver.enterDirection === "left" && mouseOver.exitDirection === "right") {
@@ -57,6 +61,38 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
             }*/
       };
 
+      this.moveToSideForSourceStage = function(step, direction, mouseOver) {
+
+        if(direction === "left" && step.stepMovedDirection !== "left") {    
+            if(mouseOver.enterDirection === "left" && mouseOver.exitDirection === "right") {
+                //this.makeSurePreviousStepMovedLeft(step);
+                //this.moveStepToLeft(step);
+                if(step.previousIsMoving) {
+                    // Move next stages to sides;
+                    if(step.parentStage.nextStage) {
+                        //var stage = step.parentStage.nextStage;
+                        //while(stage) {
+                            //moveStageToSides.moveToSideStageComponents(30, step.parentStage.nextStage);
+                            //stage = stage.nextStage;
+                        //}
+                        
+                    }
+                }
+
+            }
+            
+        } 
+        
+        if(direction === "right" && step.stepMovedDirection !== "right") {
+            if(mouseOver.enterDirection === "right" && mouseOver.exitDirection === "left") {
+                
+                //this.makeSureNextStepMovedRight(step);
+                //this.moveStepToRight(step);
+            } 
+        } 
+
+      };
+
       this.makeSurePreviousStepMovedLeft = function(step) {
 
         var anchor = step.previousStep;
@@ -81,6 +117,7 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
       };
 
       this.moveStepToRight = function(step) {
+
         step.left = step.left + 20;
         step.moveStep(0, false);
         step.circle.moveCircleWithStep();

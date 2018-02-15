@@ -97,8 +97,6 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         step.parentStage.stageHeader();
         
-        
-
         this.movement = this.movedStepIndex = this.currentMoveRight = this.currentMoveLeft =
         this.movedStageIndex = this.movedRightStageIndex = this.movedLeftStageIndex = null;
 
@@ -174,8 +172,15 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.onTheMove = function(movement) {
 
         var displacement = this.getDisplacement(movement.left);
-        console.log(displacement);
+        
         if(displacement > 30) {
+          this.currentLeft = movement.left;
+          return false;
+        }
+
+        if(((this.left - 40) < movement.left) && (movement.left < this.left + 90)) {
+
+        } else {
           this.currentLeft = movement.left;
           return false;
         }
@@ -188,7 +193,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.currentLeft = movement.left;
         //this.currentTime = new Date();
 
-        this.movement.referencePoint = movement.left + 64;
+        this.movement.referencePoint = this.left + 64;
 
         if(direction === 'right') {
           this.movedLeftStageIndex = this.currentDropStage.index - 1;
@@ -204,7 +209,6 @@ angular.module("canvasApp").factory('moveStepRect', [
         return Math.abs(left - this.currentLeft);
         //var duration = new Date() - this.currentTime;
         //console.log(distance, duration);
-
       }; 
       // Manage the movement of the indicator right side.
       this.indicator.manageMovingRight = function() {
