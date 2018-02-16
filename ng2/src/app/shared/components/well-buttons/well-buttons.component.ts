@@ -22,8 +22,9 @@ import { WindowRef } from '../../../services/windowref/windowref.service';
 export class WellButtonsComponent implements OnChanges, OnInit {
 
   readonly ROW_HEADER_WIDTH = 30;
-  readonly ACTIVE_BORDER_WIDTH = 2;
+  readonly BORDER_WIDTH = 5;
   readonly NUM_WELLS = 16;
+  readonly MARGIN = 15;
 
   private _wells: any;
   private rows: Array<any>;
@@ -93,8 +94,11 @@ export class WellButtonsComponent implements OnChanges, OnInit {
   getWellContainerStyle(row, col, well, i) {
     let style: any = {};
     style.opacity = 0.5;
-    style.width = `${this.getCellWidth()}px`;
-    style.height = `${this.getCellWidth()}px`;
+    style.width = `${this.getCellWidth() - this.MARGIN * 2}px`;
+    style.height = `${this.getCellWidth() - this.MARGIN * 2}px`;
+    style.margin = `${this.MARGIN}px`;
+    style.borderWidth = `${this.BORDER_WIDTH}px`;
+    style.lineHeight = `${this.getCellWidth() - this.MARGIN * 2}px`;
     if (well.active) {
     }
     if (well.selected) {
@@ -192,6 +196,10 @@ export class WellButtonsComponent implements OnChanges, OnInit {
     }
   }
 
+  getWellName(row, col) {
+    let rows = ['A', 'B']
+    return `${rows[row.index]}${col.index + 1}`;
+  }
   //getWellStyle(row, col, well, index) {
   //  if(well.active)
   //    return {}

@@ -12,37 +12,14 @@
     border: none;
   }
 
-  .well-switch-container {
-    border: 2px solid red;
-    border-radius: 100%;
+  .well-switch {
+    text-align: center;
+    vertical-align: middle;
+    line-height: 90px;
   }
 
-  .well-switch {
-    vertical-align: top;
-
-    &.selected {
-      .ct-cq-container {
-        background-color: #e4f4fa;
-      }
-    }
-
-    &.selected.active {
-      position: relative;
-
-      .well-switch-container {
-      }
-      .ct-cq-container {
-        height: 49px;
-        padding: 4px 22px;
-      }
-
-    }
-
-   .ct-cq-container {
-      //border-top: 1px solid #c5c5c5;
-      padding: 2px 20px;
-      min-height: 45px;
-    }
-
+  .well-switch-container {
+    border: 2px solid #fff;
+    border-radius: 100%;
   }
 }

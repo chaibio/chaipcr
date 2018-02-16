@@ -6,10 +6,7 @@
 
           <div class="well-switch-container" [ngStyle]="getWellContainerStyle(row, col, getWell(row, col), getWellIndex(row, col))">
 
-            <div class="ct-cq-container" *ngIf="getWell(row, col)">
-              <div> Cq <strong class="value">{{ getWell(row, col).cts[0] }}</strong> </div>
-              <div> Cq <strong class="value">{{ getWell(row, col).cts[1] }}</strong> </div>
-            </div>
+            {{getWellName(row, col)}}
 
           </div>
 
