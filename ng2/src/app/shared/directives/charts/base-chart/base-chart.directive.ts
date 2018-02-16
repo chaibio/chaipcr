@@ -1931,12 +1931,13 @@ export class BaseChartDirective implements OnChanges {
     this.initChart()
   }
 
-  ngOnChanges(change: any) {
-    if(change.data) {
-      this.data = change.data.currentValue;
+  ngOnChanges(changes: any) {
+    console.log('change', changes);
+    if(changes.data) {
+      this.data = changes.data.currentValue;
     }
-    if(change.config) {
-      this.config = change.config.currentValue;
+    if(changes.config) {
+      this.config = changes.config.currentValue;
     }
     if(!this.initialized) {
       this.initChart();

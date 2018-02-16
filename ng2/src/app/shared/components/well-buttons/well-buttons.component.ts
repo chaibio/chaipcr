@@ -194,6 +194,7 @@ export class WellButtonsComponent implements OnChanges, OnInit {
       let well = this._wells[`well_${i}`]
       well.selected = this.isCtrlKeyHeld(e) ? !well.selected : true
     }
+    this.onSelectWells.emit(this._wells);
   }
 
   getWellName(row, col) {

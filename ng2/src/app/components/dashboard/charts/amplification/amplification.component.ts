@@ -21,7 +21,7 @@ import { AmplificationConfigService } from '../../../../services/chart-config/am
 
 export class AmplificationComponent implements OnInit, OnDestroy{
 
-  colorBy: string; 
+  colorBy: string;
   config: any;
   retryInterval: any;
   retrying = false;
@@ -69,7 +69,6 @@ export class AmplificationComponent implements OnInit, OnDestroy{
       this.expService.getAmplificationData(this.experimentId)
         .subscribe(data => {
           this.fetchingAmpliData = false;
-          this.updateSeries(null);
           this.ampliData = data;
           this.refetch();
         }, error => {
@@ -81,6 +80,7 @@ export class AmplificationComponent implements OnInit, OnDestroy{
   }
 
   updateSeries(buttons) {
+    //console.log(buttons)
     buttons = buttons || {}
     const subtraction_type = 'baseline';
     this.config.series = []
@@ -89,24 +89,28 @@ export class AmplificationComponent implements OnInit, OnDestroy{
     let channel_start = 1
     for (let ch_i = channel_start; ch_i <= channel_end; ch_i++) {
       for(let i = 0; i <= 15; i ++) {
-        //if buttons["well_#{i}"]?.selected
-        this.config.series.push({
-          dataset: `channel_${ch_i}`,
-          x: 'cycle_num',
-          y: `well_${i}_${subtraction_type}`,
-          color: 'red',
-          //cq: $scope.wellButtons["well_#{i}"]?.ct,
-          well: i,
-          channel: ch_i
-        })
+        //console.log(buttons[`well_${i}`])
+        if (buttons[`well_${i}`]) {
+          if(buttons[`well_${i}`].selected) {
+            this.config.series.push({
+              dataset: `channel_${ch_i}`,
+              x: 'cycle_num',
+              y: `well_${i}_${subtraction_type}`,
+              color: buttons[`well_${i}`].color,
+              well: i,
+              channel: ch_i
+            })
+          }
+        }
       }
     }
 
+    console.log('series', this.config.series);
+
   }
 
-  onWellsSelected(e, data) {
-    console.log(e) 
-    console.log(data)
+  onWellsSelected(data) {
+    this.updateSeries(data);
   }
 
   ngOnDestroy() {
