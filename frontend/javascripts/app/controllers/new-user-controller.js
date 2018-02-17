@@ -72,6 +72,7 @@ window.ChaiBioTech.ngApp.controller('newUserController', [
     };
 
     $scope.currentLogin = function() {
+      
       userService.findUSer("current").
         then(function(data) {
           if(data.user.role === "admin") {
