@@ -3,6 +3,7 @@ describe("Testing newUserController", function() {
     var _$scope, _$stateParams, _User, _$state, _$uibModal, _userFormErrors, newUserController, controlle, _$rootScope;
 
     beforeEach(function() {
+
         module("ChaiBioTech", function($provide) {
             $provide.value('IsTouchScreen', function () {});
             $provide.value('$stateParams', {
@@ -26,6 +27,7 @@ describe("Testing newUserController", function() {
 
             //_$stateParams.id = 100;
         });
+        
     });
 
     it("It should test initial values", function() {
