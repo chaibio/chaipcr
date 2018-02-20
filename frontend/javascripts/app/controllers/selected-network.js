@@ -147,9 +147,10 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
       $window.location.href = url;
     };
 
-    $scope.changeToAutomatic = function (){
+    $scope.changeToAutomatic = function () {
       var ethernet ={};
       ethernet.type = "dhcp";
+      
       NetworkSettingsService.changeToAutomatic(ethernet).then(function(result) {
         console.log(result);
         NetworkSettingsService.getEthernetStatus(); // Get the new ip details as soon as we connect to new ethernet.
@@ -183,7 +184,7 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
             'type': "dhcp"
           };
           $scope.updateConnectedWifi('wpa-ssid');
-        }else if($scope.selectedWifiNow.encryption === 'wpa2 802.1x') {
+        } else if($scope.selectedWifiNow.encryption === 'wpa2 802.1x') {
           $scope.wifiNetworkType = 'wpa2 802.1x';
           $scope.credentials = {
             'wpa-ssid': $scope.name,
