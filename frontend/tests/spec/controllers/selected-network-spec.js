@@ -150,7 +150,7 @@ describe("Testing selectedNetwork", function() {
         expect(_$scope.configureAsStatus).toHaveBeenCalled();
     });
 
-    it("It should test updateConnectedWifi method, when fifi has connection status", function() {
+    it("It should test updateConnectedWifi method, when fifi has connecting status", function() {
 
          _NetworkSettingsService.connectedWifiNetwork = {
 
@@ -173,4 +173,270 @@ describe("Testing selectedNetwork", function() {
 
         expect(_$scope.buttonValue).toEqual("CONNECTING");
     });
+
+    it("It should test updateConnectedWifi method, when fifi has connected status", function() {
+
+         _NetworkSettingsService.connectedWifiNetwork = {
+
+            state: {
+                status: "connected"
+            },
+            settings: {
+                'dns-nameservers': "chai net",
+                'wpa-ssid': 'ChaiBio',
+                'wireless_essid': 'Bio',
+            }
+        };
+
+        _$state.params = {
+            name: "ChaiBio"
+        };
+
+        _$scope.updateConnectedWifi("wpa-ssid");
+
+        expect(_$scope.IamConnected).toEqual(true);
+        expect(_$scope.editEthernetData.dns_nameservers).toEqual('chai');
+    });
+
+    it("It should test connectWifi method", function() {
+
+        _NetworkSettingsService.connectWifi = function() {
+            return {
+                then: function(callback) {
+                    callback();
+                }
+            };
+        };
+
+        spyOn(_NetworkSettingsService, "connectWifi").and.callThrough();
+
+        _$scope.connectWifi();
+        
+        expect(_$scope.statusMessage).toEqual("");
+        expect(_$scope.buttonValue).toEqual("CONNECTING");
+        expect(_NetworkSettingsService.connectWifi).toHaveBeenCalled();
+    });
+
+    it("It should test connectWifi metgod when there is error connecting", function() {
+
+        _NetworkSettingsService.connectWifi = function() {
+            return {
+                then: function(callback, errorCallback) {
+                    errorCallback();
+                }
+            };
+        };
+
+        spyOn(_NetworkSettingsService, "connectWifi").and.callThrough();
+
+        _$scope.connectWifi();
+        
+        expect(_NetworkSettingsService.connectWifi).toHaveBeenCalled();
+    });
+
+    it("It should test configureAsStatus method, when not_connected", function() {
+
+        var status = "not_connected";
+        _$scope.configureAsStatus(status);
+
+        expect(_$scope.buttonValue).toEqual("CONNECT");
+        expect(_$scope.statusMessage).toEqual("");
+    });
+
+    it("It should test configureAsStatus method, when connecting", function() {
+
+        var status = "connecting";
+        _$scope.configureAsStatus(status);
+
+        expect(_$scope.buttonValue).toEqual("CONNECTING");
+        expect(_$scope.statusMessage).toEqual("");
+    });
+
+    it("It should test configureAsStatus method, when connection_error", function() {
+
+        var status = "connection_error";
+        _$scope.configureAsStatus(status);
+
+        expect(_$scope.buttonValue).toEqual("CONNECT");
+        expect(_$scope.statusMessage).toEqual("Unable to connect");
+    });
+
+    it("It should test configureAsStatus method, when authentication_error", function() {
+
+        var status = "authentication_error";
+        _$scope.configureAsStatus(status);
+
+        expect(_$scope.buttonValue).toEqual("CONNECT");
+        expect(_$scope.statusMessage).toEqual("Authentication error");
+    });
+
+    it("It should test connectEthernet method", function() {
+
+        _NetworkSettingsService.connectToEthernet = function() {
+            return {
+                then: function(callback) {
+                    callback();
+                }
+            };
+        };
+
+        spyOn(_NetworkSettingsService, "getEthernetStatus");
+        spyOn(_NetworkSettingsService, "connectToEthernet").and.callThrough();
+
+        _$scope.connectEthernet();
+
+        expect(_$scope.statusMessage).toEqual("");
+        expect(_$scope.buttonValue).toEqual("CONNECTING");
+        expect(_NetworkSettingsService.getEthernetStatus).toHaveBeenCalled();
+
+    });
+
+    it("It should test connectEthernet method, when connectEthernet returns error", function() {
+
+        _NetworkSettingsService.connectToEthernet = function() {
+            return {
+                then: function(callback, errorCallback) {
+                    errorCallback();
+                }
+            };
+        };
+
+        spyOn(_NetworkSettingsService, "getEthernetStatus");
+        spyOn(_NetworkSettingsService, "connectToEthernet").and.callThrough();
+
+        _$scope.connectEthernet();
+
+        expect(_$scope.statusMessage).toEqual("");
+        expect(_$scope.buttonValue).toEqual("CONNECTING");
+        expect(_NetworkSettingsService.getEthernetStatus).not.toHaveBeenCalled();
+
+    });
+
+    it("It should test goToNewIp method", function() {
+
+        _$scope.editEthernetData = {
+            address: "post office"
+        };
+
+        _$scope.currentNetwork = {
+            settings: {
+                type: "dhcp"
+            }
+        }
+        _$scope.$digest();
+        
+        _$scope.goToNewIp();
+        //expect(_$window.location.href).toEqual('http://' + _$scope.editEthernetData.address);
+    });
+
+    it("It should test changeToAutomatic method", function() {
+
+        _NetworkSettingsService.changeToAutomatic = function() {
+            return {
+                then: function(callback) {
+                    callback();
+                }
+            };
+        };
+
+        spyOn(_NetworkSettingsService, "changeToAutomatic").and.callThrough();
+        spyOn(_NetworkSettingsService, "getEthernetStatus");
+
+        _$scope.changeToAutomatic();
+
+        expect(_NetworkSettingsService.changeToAutomatic).toHaveBeenCalled();
+        expect(_NetworkSettingsService.getEthernetStatus).toHaveBeenCalled();
+        expect(_$scope.autoSetting).toEqual("auto");
+    });
+
+    it("It should test changeToAutomatic method when _NetworkSettingsService.changeToAutomatic returns error", function() {
+
+        _NetworkSettingsService.changeToAutomatic = function() {
+            return {
+                then: function(callback, errorCallback) {
+                    errorCallback();
+                }
+            };
+        };
+
+        spyOn(_NetworkSettingsService, "changeToAutomatic").and.callThrough();
+        spyOn(_NetworkSettingsService, "getEthernetStatus");
+
+        _$scope.changeToAutomatic();
+
+        expect(_NetworkSettingsService.changeToAutomatic).toHaveBeenCalled();
+        expect(_NetworkSettingsService.getEthernetStatus).not.toHaveBeenCalled();
+    });
+
+    it("It should test init method", function() {
+
+        _$scope.selectedWifiNow = {
+            encryption: ""
+        };
+
+        _$state.params = {
+            name: "Chai"
+        };
+        
+        _NetworkSettingsService.connectedWifiNetwork = {
+            state: {
+                status: "connecting"
+            },
+            settings: {
+                'wpa-ssid': "Chai" 
+            }
+        };
+
+        _$scope.init();
+
+        expect(_$scope.buttonValue).toEqual("CONNECTING");
+
+    });
+
+    it("It should test init method, when connectedNetwork in null", function() {
+
+        /*_$scope.selectedWifiNow = {
+            encryption: ""
+        };
+
+        _$state.params = {
+            name: "Chai"
+        };
+        
+        _NetworkSettingsService = {};
+
+        _$scope.init();
+
+        expect(_$scope.init).toThrowError();*/
+
+    });
+
+
+    it("It should test init method, when encryption is wpa2 psk", function() {
+
+        _$scope.selectedWifiNow = {
+            encryption: "wpa2 psk"
+        };
+
+        _$state.params = {
+            name: "Chai"
+        };
+        
+        _NetworkSettingsService.connectedWifiNetwork = {
+            state: {
+                status: "connecting"
+            },
+            settings: {
+                'wpa-ssid': "Chai" 
+            }
+        };
+
+        spyOn(_$scope, "updateConnectedWifi");
+
+        _$scope.init();
+
+        expect(_$scope.updateConnectedWifi).toHaveBeenCalledWith("wpa-ssid");
+        expect(_$scope.wifiNetworkType).toEqual("wpa2 psk");
+    });
+
 });
