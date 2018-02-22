@@ -439,4 +439,148 @@ describe("Testing selectedNetwork", function() {
         expect(_$scope.wifiNetworkType).toEqual("wpa2 psk");
     });
 
+    it("It should test init method, when encryption is wpa2 802.1x", function() {
+
+        _$scope.selectedWifiNow = {
+            encryption: "wpa2 802.1x"
+        };
+
+        _$state.params = {
+            name: "Chai"
+        };
+        
+        _NetworkSettingsService.connectedWifiNetwork = {
+            state: {
+                status: "connecting"
+            },
+            settings: {
+                'wpa-ssid': "Chai" 
+            }
+        };
+
+        spyOn(_$scope, "updateConnectedWifi");
+
+        _$scope.init();
+
+        expect(_$scope.updateConnectedWifi).toHaveBeenCalledWith("wpa-ssid");
+        expect(_$scope.wifiNetworkType).toEqual("wpa2 802.1x");
+    });
+
+    it("It should test init method, when encryption is wep", function() {
+
+        _$scope.selectedWifiNow = {
+            encryption: "wep"
+        };
+
+        _$state.params = {
+            name: "Chai"
+        };
+        
+        _NetworkSettingsService.connectedWifiNetwork = {
+            state: {
+                status: "connecting"
+            },
+            settings: {
+                'wpa-ssid': "Chai" 
+            }
+        };
+
+        spyOn(_$scope, "updateConnectedWifi");
+
+        _$scope.init();
+
+        expect(_$scope.updateConnectedWifi).toHaveBeenCalledWith("wireless_essid");
+        expect(_$scope.wifiNetworkType).toEqual("wep");
+    });
+
+    it("It should test init method, when encryption is none", function() {
+
+        _$scope.selectedWifiNow = {
+            encryption: "none"
+        };
+
+        _$state.params = {
+            name: "Chai"
+        };
+        
+        _NetworkSettingsService.connectedWifiNetwork = {
+            state: {
+                status: "connecting"
+            },
+            settings: {
+                'wpa-ssid': "Chai" 
+            }
+        };
+
+        spyOn(_$scope, "updateConnectedWifi");
+
+        _$scope.init();
+
+        expect(_$scope.updateConnectedWifi).toHaveBeenCalledWith("wireless_essid");
+        expect(_$scope.wifiNetworkType).toEqual("none");
+    });
+
+    it("It should test ethernet connection", function() {
+
+        _$scope.selectedWifiNow = null;
+        
+        _NetworkSettingsService.connectedEthernet = {
+            interface: 'eth0',
+            state: {
+                status: "connected",
+            },
+            settings: {
+                type: "static",
+                gateway: '1:2:3:4',
+                'dns-nameservers': "Chai Bio"
+            }
+        };
+
+        _$scope.editEthernetData = {};
+
+        _$state.params = {
+            name: "ethernet"
+        };
+
+        _$scope.init();
+
+        expect(_$scope.IamConnected).toEqual(true);
+        expect(_$scope.autoSetting).toEqual("manual");
+        expect(_$scope.editEthernetData.gateway).toEqual('1:2:3:4');
+        expect(_$scope.editEthernetData['dns-nameservers']).toEqual("Chai");
+
+    });
+
+    it("It should test ethernet connection, ehrn settings have different values", function() {
+
+        _$scope.selectedWifiNow = null;
+        
+        _NetworkSettingsService.connectedEthernet = {
+            interface: 'eth0',
+            state: {
+                status: "connected",
+            },
+            settings: {
+                type: "dynamic",
+                gateway: null,
+                'dns-nameservers': null
+            }
+        };
+
+        _$scope.editEthernetData = {};
+
+        _$state.params = {
+            name: "ethernet"
+        };
+
+        _$scope.init();
+
+        expect(_$scope.IamConnected).toEqual(true);
+        expect(_$scope.autoSetting).toEqual("auto");
+        expect(_$scope.editEthernetData.gateway).toEqual('0.0.0.0');
+        expect(_$scope.editEthernetData['dns-nameservers']).toEqual("0.0.0.0");
+
+    });
+
+
 });
