@@ -582,5 +582,31 @@ describe("Testing selectedNetwork", function() {
 
     });
 
+    it("It should test scenario, when ethernet or wifi not detected", function() {
+
+         _$scope.selectedWifiNow = null;
+        
+        _NetworkSettingsService.connectedEthernet = {
+            interface: null,
+            state: {
+                status: "connected",
+            },
+            settings: {
+                type: "dynamic",
+                gateway: null,
+                'dns-nameservers': null
+            }
+        };
+
+        _$timeout = function(callback, wait) {
+            callback();
+        };
+
+        _$scope.init();
+
+        //_$timeout.flush();
+        expect(_$scope.selectedWifiNow).toEqual(null);
+    }); 
+
 
 });
