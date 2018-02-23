@@ -202,4 +202,32 @@ describe("Testing StageStepCtrl", function() {
         expect(_$scope.stage.name).toEqual("Stage1");
         expect(_$scope.fabricStep.name).toEqual("fabricStep");
     });
+
+    it("It should test applyValues method", function() {
+        
+        var circle = {
+
+            parent: {
+                name: "fabricStep",
+                model: {
+                    name: "Step10"
+                },
+                parentStage: {
+                    model: {
+                        name: "Stage1"
+                    }
+                },
+
+            }
+        };
+
+        _$scope.applyValues(circle);
+
+        expect(_$scope.step.name).toEqual("Step10");
+        expect(_$scope.stage.name).toEqual("Stage1");
+        expect(_$scope.fabricStep.name).toEqual("fabricStep");
+    });
+
+    
+
 });
