@@ -228,6 +228,19 @@ run_clean_user_tokens () {
 
 	run_cleanup_user_tokens_every4hours &
 
+	if [ -e /tmp/mysql.sock ]
+	then
+		echo "MySQL sockets cloned file found"
+	else
+		if [ -e /run/mysqld/mysqld.sock ]
+		then
+			echo "Clonning MySQL sockets file"
+			ln -s /run/mysqld/mysqld.sock /tmp/mysql.sock
+		else
+			echo "ERROR: MySQL sockets file not found (/run/mysqld/mysqld.sock)" 
+		fi
+	fi
+
 	if  ps aux | grep julia | grep -v grep
         then
 		echo julia is running
