@@ -31,6 +31,8 @@ Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
               <string>v0.6.2</string>
               <string>v0.6.1</string>
               <string>v0.6.0</string>
+              <string>v0.5.2</string>
+              <string>v0.5.0</string>
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
@@ -611,7 +613,7 @@ fi
 
 echo end of test result: $?
 cp __init__.jl.org __init__.jl
-cp -r * ~/.julia/v0.6/QpcrAnalysis/
+cp -r * ~/.julia/v0.6/QpcrAnalysis/src/
 
 rm testQpcrAnalysis.jl
 echo about to start using QpcrAnalysis
@@ -892,5 +894,7 @@ exit 0
     </org.jvnet.hudson.plugins.SSHBuilder>
   </builders>
   <publishers/>
-  <buildWrappers/>
+  <buildWrappers>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.8"/>
+  </buildWrappers>
 </project>
