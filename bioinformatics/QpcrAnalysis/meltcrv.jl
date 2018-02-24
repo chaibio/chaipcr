@@ -1,5 +1,6 @@
 # melt curve analysis
 
+using DataArrays
 const EMPTY_mc = zeros(1,3)[1:0,:]
 const EMPTY_Ta = zeros(1,2)[1:0,:]
 const EMPTY_mc_tm_pw_out = OrderedDict(
@@ -10,7 +11,7 @@ const EMPTY_mc_tm_pw_out = OrderedDict(
 
 
 type MeltCurveTF # temperature and fluorescence
-    t_da_vec::Vector{DataArray{AbstractFloat,1}}
+    t_da_vec::Vector{DataArrays.DataArray{AbstractFloat,1}}
     fluo_da::DataArray{AbstractFloat,2}
 end
 
