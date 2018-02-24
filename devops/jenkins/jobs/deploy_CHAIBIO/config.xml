@@ -419,13 +419,14 @@ sync
 echo precompile julia packages if needed
 if [ -e /root/chaipcr/bioinformatics/juliaserver.jl ]
 then
+      time julia-debug -v
+      sed -i &apos;1i using DataArrays&apos; /root/chaipcr/bioinformatics/juliaserver.jl
+      sed -i &apos;1i push!(LOAD_PATH, &quot;/root/.julia/v0.6/QpcrAnalysis/src/&quot;)&apos; /root/chaipcr/bioinformatics/juliaserver.jl
 
-time julia-debug -v
-
-echo Build time- adding pre-requesits
-free -m
-apt-get update
-apt-get -q -y --fix-broken install
+      echo Build time- adding pre-requesits
+      free -m
+      apt-get update
+      apt-get -q -y --fix-broken install
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get -q -y install libgtk-3-0
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get -q -y install libpango1.0-0 
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get -q -y install libglib2.0-0
@@ -439,8 +440,22 @@ DEBIAN_FRONTEND=noninteractive apt-get -q -y install libgtk-3-0
 apt-get -y -q install libpango1.0-0 libglib2.0-0 libcairo2
 
 echo $(date) Performing precompilling julia packages
+if [ -e /tmp/mysql.sock ]
+then
+	echo &quot;MySQL sockets file found&quot;
+else
+	if [ -e /run/mysqld/mysqld.sock ]
+	then
+		echo &quot;Clonning MySQL sockets file&quot;
+		ln -s /run/mysqld/mysqld.sock /tmp/mysql.sock
+	else
+		echo &quot;MySQL sockets file not found.&quot; 
+		exit 1
+	fi
+fi
+
 cd /root/chaipcr/bioinformatics/QpcrAnalysis
-cp __init__.jl __init__.jl.org
+#cp __init__.jl __init__.jl.org
 #sed -i &apos;1ireturn nothing&apos; __init__.jl
 sed -i &apos;s/# MySQL./return nothing \n# MySQL./&apos; __init__.jl
 rm -r ~/.julia
@@ -485,9 +500,11 @@ function pin()
 	Pkg.add(&quot;Dierckx&quot;,v&quot;0.3.0&quot;, v&quot;0.3.1-&quot;)
 	println(&quot;ADDING: MySQL&quot;)
 	Pkg.add(&quot;MySQL&quot;,v&quot;0.3.0&quot;, v&quot;0.3.1-&quot;)
+	println(&quot;ADDING: DataArrays&quot;)
+	Pkg.add(&quot;DataArrays&quot;,v&quot;0.7.0&quot;, v&quot;0.7.1-&quot;)
 	println(&quot;ADDING: Done&quot;)
 
-	Pkg.build(&quot;DataStructures&quot;, &quot;SpecialFunctions&quot;, &quot;MathProgBase&quot;, &quot;HDF5&quot;, &quot;Clustering&quot;, &quot;Nullables&quot;,&quot;JSON&quot;, &quot;JLD&quot;, &quot;NLopt&quot;, &quot;JuMP&quot;, &quot;HttpServer&quot;, &quot;ProfileView&quot;, &quot;Dierckx&quot;, &quot;Ipopt&quot;, &quot;MySQL&quot;, &quot;DataFrames&quot;)
+	Pkg.build(&quot;DataArrays&quot;,&quot;DataStructures&quot;, &quot;SpecialFunctions&quot;, &quot;MathProgBase&quot;, &quot;HDF5&quot;, &quot;Clustering&quot;, &quot;Nullables&quot;,&quot;JSON&quot;, &quot;JLD&quot;, &quot;NLopt&quot;, &quot;JuMP&quot;, &quot;HttpServer&quot;, &quot;ProfileView&quot;, &quot;Dierckx&quot;, &quot;Ipopt&quot;, &quot;MySQL&quot;, &quot;DataFrames&quot;)
 
 	println(&quot;Done building&quot;)
 	Pkg.add(&quot;PkgDev&quot;)
@@ -504,7 +521,7 @@ for i in 1:10
 		println(&quot;Pinning all done&quot;)
 		using PkgDev
 		using DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering
-		using Nullables, JSON, JLD, NLopt, JuMP, HttpServer, ProfileView
+		using Nullables, JSON, JLD, NLopt, JuMP, HttpServer, ProfileView, DataArrays
 		using Dierckx, Ipopt, MySQL, DataFrames
 	        println(&quot;Done using&quot;)
 
@@ -527,9 +544,16 @@ exit()
 EOF
 
 echo First QpcrAnalysis package installation run
-for retryloop in 1 2 3 4 5
+for retryloop in 1 2 3 4 5 6
 do
-    JULIA_ENV=bbb_test_1 julia-debug testQpcrAnalysis.jl --compile=all
+      if [ $retryloop -eq 3 ]  || [ $retryloop -eq 5 ]
+      then
+           echo cleaning .julia folder
+           rm -r ~/.julia
+      fi
+
+     JULIA_ENV=production julia-debug testQpcrAnalysis.jl --compile=all
+    echo precompiling result is $?
     if [ -e ~/.julia/v0.6/QpcrAnalysis/ ]
     then
          echo packages pinned successfully
@@ -549,7 +573,7 @@ fi
 
 echo end of test result: $?
 cp __init__.jl.org __init__.jl
-cp -r * ~/.julia/v0.6/QpcrAnalysis/
+cp -r * ~/.julia/v0.6/QpcrAnalysis/src/
 
 rm testQpcrAnalysis.jl
 echo about to start using QpcrAnalysis
@@ -561,6 +585,8 @@ fi
 apt-get -q -y --fix-broken install
 sync
 swapoff -a
+/sbin/swapoff  -a
+
 rm /sdcard/upgrade/swapfile
 echo clearing more space and removing .git julia folders
 cd
@@ -683,7 +709,9 @@ rm master.zip || true
       <command>echo &quot;Install device tree overlay and PRU binary(do this every time it changes):&quot;
 cd ~/chaipcr/deploy/overlay
 bash ./build.sh
-echo chai-pcr &gt; /sys/devices/platform/bone_capemgr/slots
+echo chai-pcr &gt; /sys/devices/platform/bone_capemgr/slots &amp;
+sleep 60
+
 cat /sys/devices/platform/bone_capemgr/slots
 
 exit 0
