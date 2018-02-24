@@ -37,6 +37,7 @@ include("adj_w2wvaf.jl")
 include("calib.jl") # `type CalibCalibOutput` currently not in production
 
 # amplification
+include("types_for_allelic_discrimination.jl")
 include("amp_models/types_for_amp_models.jl")
 include("amp_models/sfc_models.jl")
 include("amp_models/MAKx.jl")
