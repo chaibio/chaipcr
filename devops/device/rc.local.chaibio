@@ -184,7 +184,8 @@ start_julia () {
 	if [ -e /root/chaipcr/bioinformatics/juliaserver.jl ] && [ -e /usr/bin/julia ]
 	then
 		echo starting julia
-		/usr/bin/julia /root/chaipcr/bioinformatics/juliaserver.jl || true
+		JULIA_ENV=production /usr/bin/julia /root/chaipcr/bioinformatics/juliaserver.jl || true
+		echo julia exit
 	fi
 }
 
