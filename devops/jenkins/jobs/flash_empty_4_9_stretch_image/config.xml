@@ -44,7 +44,7 @@ ls -ahl
 lsblk
 df -h
 echo user: $(whoami)
-
+ping google.com -c 10
 echo Checking for nessasery packages:
 sudo apt-get -y -q install sshpass parted mdadm
 
@@ -277,6 +277,7 @@ apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D284E608A4C46402
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CF979FFA3D3D3ACC
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 06F90DE5381BA480
 
+ping google.com -c 10
 apt-get update
 apt-get install -f -y -q
 
@@ -459,6 +460,7 @@ apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D284E608A4C46402
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CF979FFA3D3D3ACC
 
 apt-key update
+ping google.com -c 10
 apt-get update 
 apt-get autoremove
 apt-get install -y -q -f
@@ -543,7 +545,7 @@ exit 1</command>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo device is restarted.. 
-
+ping google.com -c 10
 apt-key update
 apt-get update
 
