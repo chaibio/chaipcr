@@ -33,12 +33,12 @@
         <hudson.model.StringParameterDefinition>
           <name>input_image_prefix</name>
           <description>Image prefix to start with.</description>
-          <defaultValue>Jessie49Clean</defaultValue>
+          <defaultValue>Stretch49Clean</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>output_image_prefix</name>
           <description>eMMC image released</description>
-          <defaultValue>Jessie49Release</defaultValue>
+          <defaultValue>Stretch49Release</defaultValue>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
