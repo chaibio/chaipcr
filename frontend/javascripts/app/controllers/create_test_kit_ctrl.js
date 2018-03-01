@@ -123,6 +123,10 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
 
 		// Close the dropdown if the user clicks outside of it
 		window.onclick = function(event) {
+
+			if(! event.target || ! event.target.matches) {
+				return false;
+			}
 			if (!event.target.matches('.dropbtn') && !event.target.matches('.test') && !event.target.matches('.arrow-down') ) {
 				var dropdowns = document.getElementsByClassName("dropdown-content");
 				var i;
