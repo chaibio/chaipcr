@@ -36,7 +36,7 @@ describe("Testing EditExperimentPropertiesCtrl", function() {
         });        
     });
 
-    it("It should test ", function() {
+    it("It should test init value", function() {
 
         _Experiment.get = function(obj,callback) {
             var data = {
@@ -75,7 +75,41 @@ describe("Testing EditExperimentPropertiesCtrl", function() {
 
         expect(_Experiment.get).toHaveBeenCalled();
         expect(_Experiment.setCurrentExperiment).toHaveBeenCalled();
+        expect(_$scope.editExpNameMode).toEqual(false);
 
     });
 
+    it("It should test getData method when started_at && completed_at are null", function() {
+
+       /* _Experiment.get = function() {
+
+            return {
+                then: function(callback) {
+                    var data = {
+                        experiment: {
+                            started_at: null,
+                            completed_at: null
+                        }
+                    };
+                    callback();
+                }
+            };
+        };
+
+        _$scope.getData();
+
+        expect(_$scope.status).toEqual('NOT_STARTED');
+        expect(_$scope.runStatus).toEqual('Not run yet.'); 
+        */
+       // This method is not attached to $scope.
+    });
+
+    it("It should test removeMessages", function() {
+
+        _$scope.removeMessages();
+
+        expect(_$scope.successLid).toEqual(null);
+        expect(_$scope.successName).toEqual(null);
+        expect(_$scope.errors).toEqual(null);
+    });
 });
