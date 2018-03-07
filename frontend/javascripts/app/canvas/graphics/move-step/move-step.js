@@ -65,8 +65,13 @@ angular.module("canvasApp").factory('moveStepRect', [
           //step.parentStage.adjustHeader();
         }
 
-        this.movement = this.movedStepIndex = this.currentMoveRight = this.currentMoveLeft =
-        this.movedStageIndex = this.movedRightStageIndex = this.movedLeftStageIndex = null;
+        this.movement = null;
+        this.movedStepIndex = null;
+        this.currentMoveRight = null;
+        this.currentMoveLeft = null;
+        this.movedStageIndex = null;
+        this.movedRightStageIndex = null; 
+        this.movedLeftStageIndex = null;
 
         this.currentLeft = footer.left;
 
@@ -97,8 +102,13 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         step.parentStage.stageHeader();
         
-        this.movement = this.movedStepIndex = this.currentMoveRight = this.currentMoveLeft =
-        this.movedStageIndex = this.movedRightStageIndex = this.movedLeftStageIndex = null;
+        this.movement = null;
+        this.movedStepIndex = null;
+        this.currentMoveRight = null;
+        this.currentMoveLeft = null;
+        this.movedStageIndex = null;
+        this.movedRightStageIndex = null; 
+        this.movedLeftStageIndex = null;
 
         this.currentLeft = footer.left;
 
@@ -196,10 +206,10 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.movement.referencePoint = this.left + 64;
 
         if(direction === 'right') {
-          this.movedLeftStageIndex = this.currentDropStage.index - 1;
+          //this.movedLeftStageIndexHeader = this.currentDropStage.index - 1;
           this.manageMovingRight();
         } else if(direction === 'left') {
-          this.movedRightStageIndex = this.currentDropStage.index + 1;
+          //this.movedRightStageIndexHeader = this.currentDropStage.index + 1;
           this.manageMovingLeft();
         } 
       };
