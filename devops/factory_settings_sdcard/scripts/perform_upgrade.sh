@@ -32,19 +32,40 @@ if ! id | grep -q root; then
 	exit_with_message "must be run as root" 5 $1
 fi
 
-if [ -e /dev/mmcblk1p4 ] ; then
+if [ -e /dev/mmcblk1p3 ] ; then
 	sdcard_dev="/dev/mmcblk0"
 	eMMC="/dev/mmcblk1"
 fi
 
-if [ -e /dev/mmcblk0p4 ] ; then
+if [ -e /dev/mmcblk0p3 ] ; then
 	sdcard_dev="/dev/mmcblk1"
 	eMMC="/dev/mmcblk0"
 fi
 
-if [ ! -e "${eMMC}p4" ]
+if [ ! -e "${eMMC}p3" ]
 then
         exit_with_message "Proper eMMC partitionining not found!" 1 $1
+fi
+
+eMMC_boot=${eMMC}p1
+eMMC_root=${eMMC}p2
+eMMC_data=${eMMC}p3
+eMMC_perm=${eMMC}p4
+uEnvPath=/tmp/uEnvPath
+
+if [ -e $eMMC_perm ]
+then
+	echo four partitions system
+else
+	eMMC_boot=
+	eMMC_root=${eMMC}p1
+	eMMC_data=${eMMC}p2
+	eMMC_perm=${eMMC}p3
+fi
+
+if [ ! -e $emmc_boot_files ]
+then
+	mkdir -p $emmc_boot_files
 fi
 
 verify_checksum () {
@@ -122,18 +143,22 @@ reset_sdcard_uEnv () {
 	sync
 }
 
-uEnvPath=/tmp/uEnvPath
 
 if [ ! -e "$uEnvPath" ]
 then
 	mkdir -p ${uEnvPath} > /dev/null
 fi
 
-#umount ${uEnvPath} > /dev/null
-mount ${eMMC}p1 ${uEnvPath} -t vfat
-set_sdcard_uEnv
-sync
-umount ${uEnvPath}> /dev/null
+if [ -z $eMMC_boot ]
+then
+ 	echo none fat boot
+else
+	#umount ${uEnvPath} > /dev/null
+	mount ${eMMC_boot} ${uEnvPath} -t vfat
+	set_sdcard_uEnv
+	sync
+	umount ${uEnvPath}> /dev/null
+fi
 
 mount ${sdcard_dev}p1 ${uEnvPath} -t vfat
 set_sdcard_uEnv

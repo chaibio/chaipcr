@@ -68,6 +68,8 @@ fi
 
 mkfsext4tooldir=$(which mkfs.ext4)
 echo mkfs.ext4 : $mkfsext4tooldir
+mkfsext4tooldir=$(which mkfs.ext4)
+echo mkfs.ext4 : $mkfsext4tooldir
 
 if [ ! -z "$mkfsext4tooldir" ]
 then
@@ -482,7 +484,7 @@ fi
 
 if [ ! -e $data_partition ]
 then
-        error_exit "Data file system partition not found: $data_partition, backuped eMMC was not 4 partitions."
+        error_exit "Data file system partition not found: $data_partition, backuped eMMC was not 3 nor 4 partitions."
 fi
 
 if mount $rootfs_partition /tmp/emmc -t ext4
@@ -576,8 +578,14 @@ if $fat_boot
 then
 	dd if=$boot_partition bs=16777216 | gzip -c > $image_filename_boot
 else
-	dd count=1 if=$boot_partition bs=16777216 | gzip -c > $image_filename_boot
+	dd count=7 if=$eMMC bs=16777216 | gzip -c > $image_filename_boot # could be dropped
 fi
+
+echo image_filename_boot : $image_filename_boot
+echo image_filename_pt : $image_filename_pt 
+echo eMMC : $eMMC
+
+
 
 if [ $? -eq 0 ]
 then
@@ -621,6 +629,8 @@ sync
 umount /tmp/emmc > /dev/null || true
 
 echo "Packing data partition to: $image_filename_data"
+fsck $data_partition
+
 if dd  if=$data_partition bs=16777216 | gzip -c > $image_filename_data
 then
 	echo data image extracted.

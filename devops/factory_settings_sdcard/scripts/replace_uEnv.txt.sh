@@ -227,6 +227,7 @@ uenvcmdsdcard_s2pressed=echo "*** Boot button pressed..!!"; setenv s2pressed 1; 
 #echo  "UEnvCMD is \$uenvcmd"
 
 # Updated: $NOW
+
 _EOF_
 fi
 
@@ -239,7 +240,7 @@ echo "#" >> $uEnvSDCard
 
 echo "SDCard version of uEnv.txt done updating"
 
-if [ -z $UUID_p1 ]
+if $fat_boot && [ -z $UUID_p1 ]
 then
 	echo "Can't find UUID for /boot/uboot partition!"
 	exit 0

@@ -546,6 +546,7 @@ exit 1</command>
       <siteName>root@$build_machine:22</siteName>
       <command>echo device is restarted.. 
 ping google.com -c 10
+
 apt-key update
 apt-get update
 
@@ -600,11 +601,18 @@ then
     umount /tmp/zeroer
 fi
 
-echo basic image zeroing done! restarting!
+echo basic image zeroing done! 
+sync
+mkdir /data /perm || true
+echo reformatting /data partition
+mkfs.ext4 -F /dev/mmcblk1p2 -L data
+sync
+echo restarting!
 
 shutdown -r 1
 
-exit 0</command>
+exit 0
+</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>

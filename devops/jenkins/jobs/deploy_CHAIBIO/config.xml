@@ -520,10 +520,13 @@ for i in 1:10
 	if pin()
 		println(&quot;Pinning all done&quot;)
 		using PkgDev
+                println(&quot;Used PkgDev&quot;)
 		using DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering
+                println(&quot;Used DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering&quot;)
 		using Nullables, JSON, JLD, NLopt, JuMP, HttpServer, ProfileView, DataArrays
+                println(&quot;Used Nullables, JSON, JLD, NLopt, JuMP, HttpServer, ProfileView, DataArrays&quot;)
 		using Dierckx, Ipopt, MySQL, DataFrames
-	        println(&quot;Done using&quot;)
+	        println(&quot;All packages used&quot;)
 
 		PkgDev.generate(&quot;QpcrAnalysis&quot;, &quot;MIT&quot;)
 		println(&quot;QpcrAnalysis structure generated&quot;)
@@ -577,7 +580,7 @@ cp -r * ~/.julia/v0.6/QpcrAnalysis/src/
 
 rm testQpcrAnalysis.jl
 echo about to start using QpcrAnalysis
-JULIA_ENV=bbb_test_1 julia-debug -e &quot;using QpcrAnalysis&quot; --compile=all
+JULIA_ENV=production julia-debug -e &apos;using QpcrAnalysis;Pkg.build(&quot;QpcrAnalysis&quot;)&apos; --compile=all
 echo tested using QpcrAnalysis
 
 fi
@@ -830,6 +833,11 @@ cp ~/chaipcr/web/config/etc/unicorn/chaipcr.conf /etc/unicorn/
       <command>echo cleanup to free up some space
 df -h
 
+for retryloop in 1 2 3
+do
+
+
+
 apt-get  -y -q --purge autoremove g++-4.7 g++-4.8 gcc-4.8 g++-4.8 gcc-4.8 g++-4.8 
 apt-get  -y -q --purge autoremove libblas3gf libblas3gf
 
@@ -868,6 +876,10 @@ apt-get -y -q install libpango1.0-0 libglib2.0-0 libcairo2
 
 
 df -h
+
+
+done
+
 exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>

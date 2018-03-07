@@ -18,6 +18,8 @@
 # limitations under the License.
 #
 
+exit 0
+
 debug=1
 BASEDIR=$(dirname $0)
 
@@ -40,7 +42,7 @@ then
 		mount ${sdcard_dev}p2 /tmp/upgrade
 		log_file=/tmp/upgrade/booting.log
 	else
-       		echo "4 partitions eMMC not found!"
+       		echo "3 or 4 partitions eMMC not found!"
 	fi
 
 	echo "Logging boot to: $log_file.. timestamp: $NOW"

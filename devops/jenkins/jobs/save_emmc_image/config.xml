@@ -22,13 +22,6 @@
           <defaultValue>10.0.100.240</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>output_sdcard</name>
-          <description>the block device of the created factory settings sdcard: You can say:
-/dev/sdb to write directly to a physical sdcard.
-or /tmp/sdcard_image.img to export a factory settings sdcard image.</description>
-          <defaultValue>/tmp/${BUILD_NUMBER}/sdcard_${BUILD_NUMBER}.img</defaultValue>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
           <name>local_download_folder</name>
           <description>The folder where to host download file. 
 Apache server: /var/www/html/download
@@ -58,6 +51,13 @@ Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
           <description>No factory settings sdcard image created if this paramter is checked.</description>
           <defaultValue>true</defaultValue>
         </hudson.model.BooleanParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>output_sdcard</name>
+          <description>the block device of the created factory settings sdcard: You can say:
+/dev/sdb to write directly to a physical sdcard.
+or /tmp/sdcard_image.img to export a factory settings sdcard image.</description>
+          <defaultValue>/tmp/${BUILD_NUMBER}/sdcard_${BUILD_NUMBER}.img</defaultValue>
+        </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -337,7 +337,7 @@ full_emmc_url=${download_prefix}/${emmc_image_latest_compressed}
 if $no_factorysettings_sdcard
 then
 	echo latest eMMC for this build machine is downloadable from $full_emmc_url
-	rm -r $grep_sdcard_dir || true
+	sudo rm -r $grep_sdcard_dir || true
  
 build_report_filename=build_report.xml
 #_$BUILD_NUMBER.xml
@@ -356,6 +356,7 @@ fi
 
 ls
 cd devops
+echo &apos;performing ./process_raw_image.sh &quot;${grep_sdcard_dir}&quot; &quot;${tmp_sdcard_dir}&quot;&apos;
 
 if sudo ./process_raw_image.sh &quot;${grep_sdcard_dir}&quot; &quot;${tmp_sdcard_dir}&quot;
 then
@@ -407,13 +408,13 @@ then
     echo eMMC image should be downloadable from $full_emmc_url
 
     echo latest eMMC for this build machine is downloadable from $full_emmc_url
-    rm -r $tmp_sdcard_dir || true
+    sudo rm -r $tmp_sdcard_dir || true
 else
    echo raw image processing failed.
    exit 1
 fi
 
-rm -r $grep_sdcard_dir || true
+sudo rm -r $grep_sdcard_dir || true
 cd ..
 
 build_report_filename=build_report.xml
