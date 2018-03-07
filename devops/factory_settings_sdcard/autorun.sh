@@ -18,7 +18,7 @@
 # limitations under the License.
 #
 
-exit 0
+#exit 0
 
 debug=1
 BASEDIR=$(dirname $0)
