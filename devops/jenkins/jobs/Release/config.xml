@@ -40,6 +40,12 @@
           <description>eMMC image released</description>
           <defaultValue>Stretch49Release</defaultValue>
         </hudson.model.StringParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>no_factorysettings_sdcard</name>
+          <description>Bypass Factory Settings sdcard creation.
+</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
