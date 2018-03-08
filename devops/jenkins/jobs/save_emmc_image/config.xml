@@ -58,30 +58,19 @@ Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
 or /tmp/sdcard_image.img to export a factory settings sdcard image.</description>
           <defaultValue>/tmp/${BUILD_NUMBER}/sdcard_${BUILD_NUMBER}.img</defaultValue>
         </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>build_branch</name>
+          <description>branch contains building scripts</description>
+          <defaultValue>branches/julia</defaultValue>
+        </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.5.1">
-    <configVersion>2</configVersion>
-    <userRemoteConfigs>
-      <hudson.plugins.git.UserRemoteConfig>
-        <url>https://github.com/chaibio/chaipcr.git</url>
-      </hudson.plugins.git.UserRemoteConfig>
-    </userRemoteConfigs>
-    <branches>
-      <hudson.plugins.git.BranchSpec>
-        <name>*/master</name>
-      </hudson.plugins.git.BranchSpec>
-    </branches>
-    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
-    <submoduleCfg class="list"/>
-    <extensions/>
-  </scm>
+  <scm class="hudson.scm.NullSCM"/>
   <canRoam>true</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <authToken>123</authToken>
   <triggers/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
@@ -180,6 +169,29 @@ do
 done
 
 echo done connection check.
+
+
+ls
+echo now at $(pwd)
+branch_param=
+rm -r tmp || true
+echo build_branch is $build_branc
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+then
+ 	echo No build branch chosen
+else
+   	branch_param=&quot;-b $(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
+    echo Cloning branch $branch_param
+fi
+
+sudo rm -r tmp || true
+mkdir tmp || true
+cd tmp
+git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
+cd chaipcr || exit 1
+echo now at $(pwd)
+ls
+
 </command>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
@@ -257,7 +269,11 @@ lsblk</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
-      <command>ls
+      <command>echo now at $(pwd)
+cd tmp/chaipcr
+echo now at $(pwd)
+ls
+
 sshpass -p chaipcr scp -r devops/grabimage_sdcard/* root@$build_machine:/tmp/grep_sdcard/
 sshpass -p chaipcr scp -r devops/grabimage_sdcard/uEnv.sdcard.txt root@$build_machine:/tmp/grep_sdcard/uEnv.txt
 </command>
@@ -354,8 +370,8 @@ EOF
     exit 0  
 fi
 
-ls
-cd devops
+cd tmp/chaipcr
+cd devop
 echo &apos;performing ./process_raw_image.sh &quot;${grep_sdcard_dir}&quot; &quot;${tmp_sdcard_dir}&quot;&apos;
 
 if sudo ./process_raw_image.sh &quot;${grep_sdcard_dir}&quot; &quot;${tmp_sdcard_dir}&quot;
