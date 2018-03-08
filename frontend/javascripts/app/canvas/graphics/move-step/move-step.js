@@ -55,7 +55,7 @@ angular.module("canvasApp").factory('moveStepRect', [
           enterDirection: null,
           exitDirection: null,
         };
-        this.currentTime = new Date();
+        
         this.tagSteps(step);
         step.parentStage.sourceStage = true;
         step.parentStage.stageHeader();
@@ -201,8 +201,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         
         var direction = this.getDirection();
         this.currentLeft = movement.left;
-        //this.currentTime = new Date();
-
+        
         this.movement.referencePoint = this.left + 64;
 
         if(direction === 'right') {
