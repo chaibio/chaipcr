@@ -33,7 +33,7 @@ angular.module("canvasApp").service('movingStepGraphics', [
         this.setWidthOfStage = function(baseStage) {
             
             //this.offset = 10;
-            baseStage.myWidth = baseStage.myWidth - 75;
+            baseStage.myWidth = baseStage.myWidth - 60;
             
             baseStage.stageRect.setWidth(baseStage.myWidth);
             baseStage.stageRect.setCoords();

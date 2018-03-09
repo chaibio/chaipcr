@@ -37,7 +37,7 @@ window.ChaiBioTech.ngApp.service('StepMovementLeftService', [
 
                     if(this.currentMoveLeft !== index) {
                         this.currentMouseOver.exitDirection = "left";
-                        moveStepToSides.moveToSide(this.kanvas.allStepViews[index], "right", this.currentMouseOver);
+                        moveStepToSides.moveToSide(this.kanvas.allStepViews[index], "right", this.currentMouseOver, this);
                         this.currentMoveLeft = this.movedStepIndex = index;
                         StepPositionService.getPositionObject(this.kanvas.allStepViews);
                     }

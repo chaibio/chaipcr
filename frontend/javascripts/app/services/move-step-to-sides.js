@@ -1,17 +1,34 @@
 window.ChaiBioTech.ngApp.service('moveStepToSides', [
     'moveStageToSides',
     function(moveStageToSides) {
-        this.moveToSide = function(step, direction, mouseOver) {
+
+        this.moveToSide = function(step, direction, mouseOver, moveStepObj) {
 
             /*if(step.parentStage.sourceStage) {
                 this.moveToSideForSourceStage(step, direction, mouseOver);
                 return;
             }*/
 
+            if(step.previousIsMoving) {
+                this.managePrevisousIsMoving(step, direction, mouseOver, moveStepObj);
+                return;
+            }
+
+            if(step.nextIsMoving) {
+                this.manageNextIsMoving(step, direction, mouseOver, moveStepObj);
+                return;
+            }
+
             if(direction === "left" && step.stepMovedDirection !== "left") {    
                 if(mouseOver.enterDirection === "left" && mouseOver.exitDirection === "right") {
                     //this.makeSurePreviousStepMovedLeft(step);
                     this.moveStepToLeft(step);
+                    moveStepObj.emptySpaceTracker = {
+                        stageIndex: step.parentStage.index,
+                        left: step.index,
+                        right: (step.nextStep) ? step.nextStep.index : null
+                    };
+                    return;
                 }
                 
             } 
@@ -20,6 +37,12 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
                 if(mouseOver.enterDirection === "right" && mouseOver.exitDirection === "left") {
                     //this.makeSureNextStepMovedRight(step);
                     this.moveStepToRight(step);
+                    moveStepObj.emptySpaceTracker = {
+                        stageIndex: step.parentStage.index,
+                        left: (step.previousStep) ? step.previousStep.index : null,
+                        right: step.index
+                    };
+                    return;
                 } 
             } 
 
@@ -59,6 +82,86 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
                     this.adjustDotsPlacingRight(step);
                 }                
             }*/
+      };
+
+      this.manageNextIsMoving = function(step, direction, mouseOver, moveStepObj) {
+
+        if(direction === "right" && step.stepMovedDirection !== "right") {
+            if(mouseOver.enterDirection === "right" && mouseOver.exitDirection === "left") {
+                
+                if(moveStepObj.emptySpaceTracker.stageIndex === null) {
+                    
+                    var s = step;
+                    
+                    while(s) {
+                        if(s.stepMovedDirection === "right")
+                            break;
+                        
+                        this.moveStepToRight(s);
+                        s = s.nextStep; 
+                    }
+
+                    moveStepObj.emptySpaceTracker = {
+                        stageIndex: step.parentStage.index,
+                        left: (step.previousStep) ? step.previousStep.index : null,
+                        right: step.index
+                    };
+                } else if(moveStepObj.emptySpaceTracker.stageIndex) {
+                    if(step.nextStep && moveStepObj.emptySpaceTracker.right !== step.index) {
+                        if(step.stepMovedDirection !== "right")
+                            this.moveStepToRight(step);
+                        if(step.nextStep.stepMovedDirection !== "right")
+                            this.moveStepToRight(step.nextStep);
+                        
+                        moveStepObj.emptySpaceTracker = {
+                            stageIndex: step.parentStage.index,
+                            left: (step.previousStep) ? step.previousStep.index : null,
+                            right: step.index
+                        };
+                    }
+                }
+            }
+        }
+      };
+
+      this.managePrevisousIsMoving = function(step, direction, mouseOver, moveStepObj) {
+
+        if(direction === "left" && step.stepMovedDirection !== "left") {
+            if(mouseOver.enterDirection === "left" && mouseOver.exitDirection === "right") {
+                
+                if(moveStepObj.emptySpaceTracker.stageIndex === null) {
+
+                    var s = step.nextStep;
+                    while(s) {
+                        if(s.stepMovedDirection === "right")
+                            break;
+                        this.moveStepToRight(s);
+                        s = s.nextStep; 
+                    }
+                    moveStepObj.emptySpaceTracker = {
+                        stageIndex: step.parentStage.index,
+                        left: step.index,
+                        right: (step.nextStep) ? step.nextStep.index : null
+                    };
+                } else if(moveStepObj.emptySpaceTracker.stageIndex){
+                    console.log(moveStepObj.emptySpaceTracker);
+                    if(step.previousStep && moveStepObj.emptySpaceTracker.left !== step.index) {
+                        if(step.stepMovedDirection !== "left")
+                            this.moveStepToLeft(step);
+                        if(step.previousStep.stepMovedDirection !== "left")
+                            this.moveStepToLeft(step.previousStep);
+
+                        moveStepObj.emptySpaceTracker = {
+                            stageIndex: step.parentStage.index,
+                            left: step.index,
+                            right: (step.nextStep) ? step.nextStep.index : null
+                        };
+                            
+                    }
+
+                }
+            }
+        }
       };
 
       this.moveToSideForSourceStage = function(step, direction, mouseOver) {

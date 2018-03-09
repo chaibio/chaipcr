@@ -72,7 +72,13 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.movedStageIndex = null;
         this.movedRightStageIndex = null; 
         this.movedLeftStageIndex = null;
-
+        this.sourceStageFirstStepMove = false;
+        this.moveStepMovedOutOfSourceStage = false;
+        this.emptySpaceTracker = {
+          stageIndex: null,
+          left: null,
+          right: null
+        };
         this.currentLeft = footer.left;
 
         this.backupStageModel = backupStageModel;        
@@ -225,7 +231,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         StepMoveVoidSpaceLeftService.checkVoidSpaceLeft(this);
         
         if(StageMovementLeftService.shouldStageMoveLeft(this) !== null) {
-          
+          this.moveStepMovedOutOfSourceStage = true;
           this.increaseHeaderLengthLeft(this.movedLeftStageIndex);
           //this.movedRightStageIndex = null; // Resetting
           //this.hideFirstStepBorderLeft();
@@ -245,7 +251,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         }
 
         if(StageMovementRightService.shouldStageMoveRight(this) !== null) {
-          
+          this.moveStepMovedOutOfSourceStage = true;
           this.increaseHeaderLengthRight(this.movedRightStageIndex);
           //this.movedLeftStageIndex = null; // Resetting
           //this.hideFirstStepBorderLeft();
