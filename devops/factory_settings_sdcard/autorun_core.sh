@@ -343,7 +343,7 @@ update_uenv () {
         fi
 
 	echo resetting to boot switch dependant uEnv                       
-        cp /sdcard/p1/uEnv.txt $emmc_boot_files || true                            
+#        cp /sdcard/p1/uEnv.txt $emmc_boot_files || true                            
         cp /mnt/uEnv.72check.txt /mnt/uEnv.txt || true                
         cp /sdcard/p1/uEnv.72check.txt /sdcard/p1/uEnv.txt || true                
         cp $emmc_boot_files/uEnv.72check.txt $emmc_boot_files/uEnv.txt || true                            
