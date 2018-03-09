@@ -1,7 +1,24 @@
-#Docs: http://elinux.org/Beagleboard:U-boot_partitioning_layout_2.0
+name_r=4.9.67-ti-r82
+  
+loadaddr=0x82000000
+fdtaddr=0x88000000
+rdaddr=0x88080000
+  
+initrd_high=0xffffffff
+fdt_high=0xffffffff
+  
+#for single partitions:
+mmcroot=/dev/mmcblk1p1
+  
+loadximage=load mmc 1:1 ${loadaddr} /boot/vmlinuz-${uname_r}
+loadxfdt=load mmc 1:1 ${fdtaddr} /boot/dtbs/${uname_r}/${fdtfile}
+loadxrd=load mmc 1:1 ${rdaddr} /boot/initrd.img-${uname_r}; setenv rdsize ${filesize}
+loaduEnvtxt=load mmc 1:1 ${loadaddr} /boot/uEnv.txt ; env import -t ${loadaddr} ${filesize};
+loadall=run loaduEnvtxt; run loadximage; run loadxfdt;
+  
+mmcargs=setenv bootargs console=tty0 console=${console} ${optargs} ${cape_disable} ${cape_enable} root=${mmcroot} rootfstype=${mmcrootfstype} ${cmdline}
 
-uname_r=4.9.67-ti-r82
-
+uenvcmdemmcfromsdcard=run loadall; run mmcargs; bootz ${loadaddr} - ${fdtaddr};
 cmdline=coherent_pool=1M quiet cape_universal=disable
 #uuid=
 
@@ -12,9 +29,8 @@ uenvcmdoverlay3=dtb=am335x-boneblack-emmc-overlay.dtb
 uenvcmdoverlay=echo "*** Overlays Configuration ***";run uenvcmdoverlay1;run uenvcmdoverlay2;run uenvcmdoverlay3
 
 shutdown_usb_power=i2c dev 0;i2c mw 0x24 1 0xec
-uenvcmdmmc=echo "*** Boot button Unpressed..!!";run uenvcmdoverlay
+uenvcmdmmc=echo "*** Boot button Unpressed..!!";run uenvcmdoverlay;run uenvcmdemmcfromsdcard
 uenvcmdsdcard=bootpart=0:1;bootdir=;fdtaddr=0x81FF0000;optargs=quiet capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN;load mmc 0 \${loadaddr} uImage;run loadfdt;setenv bootargs console=\${console} \${optargs} s2pressed=\${s2pressed};bootm \${loadaddr} - \${fdtaddr}
-uenvcmdsdcard_s2pressed=echo "*** Boot button pressed..!!"; setenv s2pressed 1; run uenvcmdsdcard
+uenvcmdsdcard_s2pressed=echo "*** Boot button pressed..!!";setenv s2pressed 1;run uenvcmdsdcard
 
 uenvcmd=run shutdown_usb_power;if gpio input 72; then run uenvcmdsdcard_s2pressed; else run uenvcmdmmc; fi
-

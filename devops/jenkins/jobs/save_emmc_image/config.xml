@@ -216,8 +216,10 @@ then
 fi
 
 echo installing missing packages.
+dpkg --configure -a --force-confdef --force-confnew
 apt-get update
-apt-get install parted -y -q
+apt-get install -y -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confnew parted -y -q
+
 partprobe /dev/mmcblk0
 
 if LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
@@ -371,7 +373,7 @@ EOF
 fi
 
 cd tmp/chaipcr
-cd devop
+cd devops
 echo &apos;performing ./process_raw_image.sh &quot;${grep_sdcard_dir}&quot; &quot;${tmp_sdcard_dir}&quot;&apos;
 
 if sudo ./process_raw_image.sh &quot;${grep_sdcard_dir}&quot; &quot;${tmp_sdcard_dir}&quot;
