@@ -4,11 +4,6 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
 
         this.moveToSide = function(step, direction, mouseOver, moveStepObj) {
 
-            /*if(step.parentStage.sourceStage) {
-                this.moveToSideForSourceStage(step, direction, mouseOver);
-                return;
-            }*/
-
             if(step.previousIsMoving) {
                 this.managePrevisousIsMoving(step, direction, mouseOver, moveStepObj);
                 return;
@@ -31,7 +26,7 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
                     return;
                 }
                 
-            } 
+            }
             
             if(direction === "right" && step.stepMovedDirection !== "right") {
                 if(mouseOver.enterDirection === "right" && mouseOver.exitDirection === "left") {
@@ -162,38 +157,6 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
                 }
             }
         }
-      };
-
-      this.moveToSideForSourceStage = function(step, direction, mouseOver) {
-
-        if(direction === "left" && step.stepMovedDirection !== "left") {    
-            if(mouseOver.enterDirection === "left" && mouseOver.exitDirection === "right") {
-                //this.makeSurePreviousStepMovedLeft(step);
-                //this.moveStepToLeft(step);
-                if(step.previousIsMoving) {
-                    // Move next stages to sides;
-                    if(step.parentStage.nextStage) {
-                        //var stage = step.parentStage.nextStage;
-                        //while(stage) {
-                            //moveStageToSides.moveToSideStageComponents(30, step.parentStage.nextStage);
-                            //stage = stage.nextStage;
-                        //}
-                        
-                    }
-                }
-
-            }
-            
-        } 
-        
-        if(direction === "right" && step.stepMovedDirection !== "right") {
-            if(mouseOver.enterDirection === "right" && mouseOver.exitDirection === "left") {
-                
-                //this.makeSureNextStepMovedRight(step);
-                //this.moveStepToRight(step);
-            } 
-        } 
-
       };
 
       this.makeSurePreviousStepMovedLeft = function(step) {
