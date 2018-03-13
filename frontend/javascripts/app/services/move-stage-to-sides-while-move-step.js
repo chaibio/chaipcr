@@ -5,7 +5,6 @@ window.ChaiBioTech.ngApp.service('moveStageToSidesWhileMoveStep', [
         this.moveToSideForStep = function(direction, targetStage) {
 
             if(direction === "left") {
-                console.log("Alright in left");
                 this.moveStageToLeft(targetStage);
             } else if(direction === "right") {
                 this.moveStageToRight(targetStage);
@@ -13,7 +12,12 @@ window.ChaiBioTech.ngApp.service('moveStageToSidesWhileMoveStep', [
         };
 
         this.moveStageToRight = function(stage) {
-        
+            
+            if(stage.previousStage === null) {
+                return null;
+            }
+                
+
             while(stage) {
                 if(stage.stageMovedDirection !== 'right') {
                 //if(stage.partialMove) {

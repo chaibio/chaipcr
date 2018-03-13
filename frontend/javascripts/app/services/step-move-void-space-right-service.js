@@ -28,7 +28,7 @@ window.ChaiBioTech.ngApp.service('StepMoveVoidSpaceRightService', [
                 var length = sI.kanvas.allStageViews[index - 1].childSteps.length;
                 var tStep = sI.kanvas.allStageViews[index - 1].childSteps[length - 1];
                 var place = tStep.left + tStep.myWidth;
-
+                sI.increaseHeaderLengthRight(tStep.parentStage.index);
                 //console.log("fsd");
                 /*sI.kanvas.allStageViews[index - 1].left + 
                             sI.kanvas.allStageViews[index - 1].myWidth - 5;*/

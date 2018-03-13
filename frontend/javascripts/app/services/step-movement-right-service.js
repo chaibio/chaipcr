@@ -24,7 +24,7 @@ window.ChaiBioTech.ngApp.service('StepMovementRightService', [
         return {
 
             ifOverRightSide: function(stepIndicator) {
-                console.log("white box Moving ... right");
+                
                 stepIndicator.movedStepIndex = null;
 
                 StepPositionService.allPositions.some(this.ifOverRightSideCallback, stepIndicator);

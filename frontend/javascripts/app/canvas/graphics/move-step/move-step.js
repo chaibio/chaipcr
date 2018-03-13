@@ -161,17 +161,15 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         if(this.movement.left > this.currentLeft && this.direction !== "right") {
           this.direction = "right";
-          //this.updateLocationOnMoveRight();
           this.currentMouseOver = {};
         } else if(this.movement.left < this.currentLeft && this.direction !== "left") {
           this.direction = "left";
           this.currentMouseOver = {};
-          //this.updateLocationOnMoveLeft();    
         }
         return this.direction;
       };
 
-      this.indicator.updateLocationOnMoveRight = function() {
+      /*this.indicator.updateLocationOnMoveRight = function() {
         //this.movedStepIndex = this.currentMoveLeft;
         //StepMovementRightService.movedRightAction(this);
         //this.movement.left = this.movement.left - 64;
@@ -183,7 +181,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         //StepMovementLeftService.movedLeftAction(this);
         //this.movement.left = this.movement.left + 64;
         //this.manageMovingLeft();
-      };
+      };*/
       
       this.indicator.onTheMove = function(movement) {
 
@@ -222,8 +220,6 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.getDisplacement = function(left) {
 
         return Math.abs(left - this.currentLeft);
-        //var duration = new Date() - this.currentTime;
-        //console.log(distance, duration);
       }; 
       // Manage the movement of the indicator right side.
       this.indicator.manageMovingRight = function() {
@@ -232,9 +228,6 @@ angular.module("canvasApp").factory('moveStepRect', [
         
         if(StageMovementLeftService.shouldStageMoveLeft(this) !== null) {
           this.moveStepMovedOutOfSourceStage = true;
-          this.increaseHeaderLengthLeft(this.movedLeftStageIndex);
-          //this.movedRightStageIndex = null; // Resetting
-          //this.hideFirstStepBorderLeft();
         }
 
         if(StepMovementRightService.ifOverRightSide(this) !== null) {
@@ -252,33 +245,30 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         if(StageMovementRightService.shouldStageMoveRight(this) !== null) {
           this.moveStepMovedOutOfSourceStage = true;
-          this.increaseHeaderLengthRight(this.movedRightStageIndex);
-          //this.movedLeftStageIndex = null; // Resetting
-          //this.hideFirstStepBorderLeft();
         }
         StepMoveVoidSpaceRightService.checkVoidSpaceRight(this);
       };
 
       this.indicator.increaseHeaderLengthLeft = function(index) {
         
-        if(this.kanvas.allStageViews[index + 1]) {
-          var stage = this.kanvas.allStageViews[index + 1];
+        //if(this.kanvas.allStageViews[index + 1]) {
+          var stage = this.kanvas.allStageViews[index];
           var left = stage.left - 27;
           stage.extendHeader(left, this.headerExtender);
-        }
+        //}
         
       };
 
       this.indicator.increaseHeaderLengthRight = function(index) {
 
-        if(this.kanvas.allStageViews[index - 1]) {
+        //if(this.kanvas.allStageViews[index - 1]) {
           
-          var stage = this.kanvas.allStageViews[index - 1];
+          var stage = this.kanvas.allStageViews[index];
           var left = (stage.left + stage.myWidth) - 2;
           stage.extendHeader(left, this.headerExtender);
-        } else {
-          this.increaseHeaderLengthLeft(-1);
-        }
+        //} else {
+          //this.increaseHeaderLengthLeft(-1);
+        //}
       };
 
       this.indicator.hideFirstStepBorderLeft = function() {
