@@ -23,6 +23,11 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
                         left: step.index,
                         right: (step.nextStep) ? step.nextStep.index : null
                     };
+
+                    if(step.previousStep === null) {
+                        console.log("Okay I entered here ......");
+                        moveStepObj.increaseHeaderLengthLeft(step.parentStage.index);
+                    }
                     return;
                 }
                 
@@ -37,6 +42,10 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
                         left: (step.previousStep) ? step.previousStep.index : null,
                         right: step.index
                     };
+
+                    if(step.nextStep === null) {
+                        moveStepObj.increaseHeaderLengthRight(step.parentStage.index);
+                    }
                     return;
                 } 
             } 
@@ -125,6 +134,7 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
                             right: step.index
                         };
 
+                        moveStepObj.increaseHeaderLengthRight(step.parentStage.index);
                     }
                 }
             }
@@ -137,6 +147,7 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
                         left: (step.previousStep) ? step.previousStep.index : null,
                         right: step.index
                     };
+                    moveStepObj.increaseHeaderLengthRight(step.parentStage.index); // incase header  is not extended due to fast movement.                    
                 }
 
             }
@@ -185,7 +196,7 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
                             left: step.index,
                             right: (step.nextStep) ? step.nextStep.index : null
                         };
-                    } else if(! step.previousStep) {
+                    } else if(step.previousStep === null) {
                         console.log("This segment", step);
                         //if(step.stepMovedDirection === "right") {
                             this.moveStepToLeft(step);
@@ -194,6 +205,7 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
                                 left: step.index,
                                 right: (step.nextStep) ? step.nextStep.index : null
                             };
+                            moveStepObj.increaseHeaderLengthLeft(step.parentStage.index);
                         //}
                     }
 
@@ -209,6 +221,7 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
                         left: step.index,
                         right: (step.nextStep) ? step.nextStep.index : null
                     };
+                    moveStepObj.increaseHeaderLengthLeft(step.parentStage.index);
                 }
             }
         }
