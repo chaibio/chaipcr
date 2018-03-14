@@ -57,33 +57,40 @@ $(document).ready(function() {
     }
 }
 
+	var ethernetConnected = 0;
+
 
 
 	var checkConnection = function() {
 		$.get("http://localhost:8000/network/eth0")
 			.done(function(data) {
 				if (data.state.address) {
+					ethernetConnected = 1;
 					//$("#ip-address").text("IP ADDRESS: " + data.state.address);
 					assignIp(data);
-				} else {
-					$.get("http://localhost:8000/network/wlan")
-						.done(function(data) {
-							if (data.state.address) {
-								assignIp(data);
-							} else {
-								noConnection();
-							}
-						})
-						.fail(function() {
-							noConnection();
-						});
 				}
-			})
-			.fail(function() {
+				else{
+				ethernetConnected = 0;
 				$.get("http://localhost:8000/network/wlan")
 					.done(function(data) {
 						if (data.state.address) {
-							assignIp(data);
+							assignIpNoEth(data);
+						} else {
+							noConnection();
+						}
+					})
+					.fail(function() {
+						noConnection();
+					});
+				} 
+
+			})
+			.fail(function() {
+				ethernetConnected = 0;
+				$.get("http://localhost:8000/network/wlan")
+					.done(function(data) {
+						if (data.state.address) {
+							assignIpNoEth(data);
 						} else {
 							noConnection();
 						}
@@ -92,19 +99,59 @@ $(document).ready(function() {
 						noConnection();
 					});
 			});
+
+		$.get("http://localhost:8000/network/wlan")
+			.done(function(data) {
+				if (data.state.address && ethernetConnected) {
+					//$("#ip-address").text("IP ADDRESS: " + data.state.address);
+					assignIpWifi(data);
+				} 
+
+				else{
+
+					noWifi();
+
+				}
+
+			})
+			.fail(function() {
+
+				noWifi();
+
+			});
+
 	}
 
 	checkConnection();
 
 	var assignIp = function(data) {
 		$(".span-message").hide();
-		$(".ip-text").show().text("IP ADDRESS: ");
+		$(".ip-text").show().text("ETHERNET IP: ");
 		$(".ip-value").show().text(data.state.address);
+	}
+
+	var assignIpNoEth = function(data) {
+		$(".span-message").hide();
+		$(".ip-text").show().text("WIFI IP: ");
+		$(".ip-value").show().text(data.state.address);
+	}
+
+	var assignIpWifi = function(data) {
+		$(".span-message").hide();
+		$(".ip-wifi-text").show().text("WIFI IP: ");
+		$(".ip-wifi-value").show().text(data.state.address);
+	}
+
+	var noWifi = function(data){
+		$(".ip-wifi-text").hide();
+		$(".ip-wifi-value").hide();
 	}
 
 	var noConnection = function() {
 		$(".ip-text").hide();
 		$(".ip-value").hide();
+		$(".ip-wifi-text").hide();
+		$(".ip-wifi-value").hide();
 		$(".span-message").show().text("No network connection");
 	}
 
