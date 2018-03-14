@@ -81,11 +81,13 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
 
       this.manageNextIsMoving = function(step, direction, mouseOver, moveStepObj) {
 
+        console.log("In manageNextIsMoving", step);
+
         if(direction === "right" && step.stepMovedDirection !== "right") {
             if(mouseOver.enterDirection === "right" && mouseOver.exitDirection === "left") {
                 
                 if(moveStepObj.emptySpaceTracker.stageIndex === null) {
-                    
+                    console.log("stageIndex null -> right");
                     var s = step;
                     
                     while(s) {
@@ -102,6 +104,7 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
                         right: step.index
                     };
                 } else if(moveStepObj.emptySpaceTracker.stageIndex !== null) {
+                    console.log("stageIndex -> right");
                     if(step.nextStep && moveStepObj.emptySpaceTracker.right !== step.index) {
                         if(step.stepMovedDirection !== "right")
                             this.moveStepToRight(step);
@@ -113,8 +116,29 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
                             left: (step.previousStep) ? step.previousStep.index : null,
                             right: step.index
                         };
+                    } else if(! step.nextStep && step.nextIsMoving === true) {
+                        
+                        this.moveStepToRight(step);
+                        moveStepObj.emptySpaceTracker = {
+                            stageIndex: step.parentStage.index,
+                            left: (step.previousStep) ? step.previousStep.index : null,
+                            right: step.index
+                        };
+
                     }
                 }
+            }
+        } else if(direction === "right" && step.stepMovedDirection === "right") {
+            if(mouseOver.enterDirection === "right" && mouseOver.exitDirection === "left") {
+                if(step.nextStep === null && moveStepObj.emptySpaceTracker.right != step.index) { // for the last step in the stage
+                    this.moveStepToRight(step);
+                    moveStepObj.emptySpaceTracker = {
+                        stageIndex: step.parentStage.index,
+                        left: (step.previousStep) ? step.previousStep.index : null,
+                        right: step.index
+                    };
+                }
+
             }
         }
       };
@@ -175,10 +199,10 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
 
                 }
             }
-        } else if(direction === "left" && step.stepMovedDirection === "left") {
+        } else if(direction === "left" && step.stepMovedDirection === "left") { // This is specifically done for for the first step of the stage.
             if(mouseOver.enterDirection === "left" && mouseOver.exitDirection === "right") {
-                if(step.previousStep === null) { // When its the first step
-                    console.log("Holy");
+                if(step.previousStep === null && moveStepObj.emptySpaceTracker.left !== step.index) { // When its the first step
+                    
                     this.moveStepToLeft(step);
                     moveStepObj.emptySpaceTracker = {
                         stageIndex: step.parentStage.index,
