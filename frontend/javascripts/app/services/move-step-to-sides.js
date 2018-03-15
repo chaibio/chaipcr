@@ -140,7 +140,7 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
             }
         } else if(direction === "right" && step.stepMovedDirection === "right") {
             if(mouseOver.enterDirection === "right" && mouseOver.exitDirection === "left") {
-                if(step.nextStep === null && moveStepObj.emptySpaceTracker.right != step.index) { // for the last step in the stage
+                if(step.nextStep === null && moveStepObj.emptySpaceTracker.right != step.index && moveStepObj.emptySpaceTracker.stageIndex === step.parentStage.index) { // for the last step in the stage
                     this.moveStepToRight(step);
                     moveStepObj.emptySpaceTracker = {
                         stageIndex: step.parentStage.index,
@@ -155,7 +155,7 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
       };
 
       this.managePrevisousIsMoving = function(step, direction, mouseOver, moveStepObj) {
-
+        console.log("In previousIsMoving", direction, step.stepMovedDirection);
         if(direction === "left" && step.stepMovedDirection !== "left") {
             if(mouseOver.enterDirection === "left" && mouseOver.exitDirection === "right") {
                 console.log(moveStepObj.emptySpaceTracker, "This is ");
@@ -173,7 +173,7 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
                         left: step.index,
                         right: (step.nextStep) ? step.nextStep.index : null
                     };
-                } else if(moveStepObj.emptySpaceTracker.stageIndex !== null){
+                } else if(moveStepObj.emptySpaceTracker.stageIndex !== null) {
                     console.log("stageIndex");
                     if(step.previousStep && moveStepObj.emptySpaceTracker.left !== step.index) {
                         if(step.stepMovedDirection !== "left")
@@ -187,7 +187,7 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
                             right: (step.nextStep) ? step.nextStep.index : null
                         };
                             
-                    } else if(! step.previousStep && step.previousIsMoving === true) {
+                    } else if(step.previousStep === null && step.previousIsMoving === true) {
 
                         console.log("Wow ###############################");
                         this.moveStepToLeft(step);
@@ -199,22 +199,24 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
                     } else if(step.previousStep === null) {
                         console.log("This segment", step);
                         //if(step.stepMovedDirection === "right") {
-                            this.moveStepToLeft(step);
-                            moveStepObj.emptySpaceTracker = {
-                                stageIndex: step.parentStage.index,
-                                left: step.index,
-                                right: (step.nextStep) ? step.nextStep.index : null
-                            };
-                            moveStepObj.increaseHeaderLengthLeft(step.parentStage.index);
+                        this.moveStepToLeft(step);
+                        moveStepObj.emptySpaceTracker = {
+                            stageIndex: step.parentStage.index,
+                            left: step.index,
+                            right: (step.nextStep) ? step.nextStep.index : null
+                        };
+                        moveStepObj.increaseHeaderLengthLeft(step.parentStage.index);
                         //}
                     }
 
                 }
             }
         } else if(direction === "left" && step.stepMovedDirection === "left") { // This is specifically done for for the first step of the stage.
+            console.log(mouseOver.enterDirection, mouseOver.exitDirection);
             if(mouseOver.enterDirection === "left" && mouseOver.exitDirection === "right") {
-                if(step.previousStep === null && moveStepObj.emptySpaceTracker.left !== step.index) { // When its the first step
-                    
+                console.log(moveStepObj.emptySpaceTracker.left, step.index, moveStepObj.emptySpaceTracker.stageIndex, step.parentStage.index);
+                if(step.previousStep === null && moveStepObj.emptySpaceTracker.left !== step.index && moveStepObj.emptySpaceTracker.stageIndex === step.parentStage.index) { // When its the first step
+                    console.log("This is a interesting place");
                     this.moveStepToLeft(step);
                     moveStepObj.emptySpaceTracker = {
                         stageIndex: step.parentStage.index,
