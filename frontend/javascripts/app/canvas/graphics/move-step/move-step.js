@@ -55,7 +55,7 @@ angular.module("canvasApp").factory('moveStepRect', [
           enterDirection: null,
           exitDirection: null,
         };
-        
+        console.log(step.ordealStatus);
         this.tagSteps(step);
         step.parentStage.sourceStage = true;
         step.parentStage.stageHeader();
