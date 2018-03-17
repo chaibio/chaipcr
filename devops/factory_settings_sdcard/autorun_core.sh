@@ -1,3 +1,4 @@
+
 #!/bin/sh
 #
 # Chai PCR - Software platform for Open qPCR and Chai's Real-Time PCR instruments.
@@ -24,7 +25,7 @@ is_root=$?
 if [ ! $is_root ]
 then
 	echo "must be run as root"
-	exit
+	exit 0
 fi
 
 if [ -e /dev/mmcblk0p3 ]
@@ -56,7 +57,17 @@ eMMC_root=${eMMC}p2
 eMMC_data=${eMMC}p3
 eMMC_perm=${eMMC}p4
 emmc_boot_files=/tmp/emmcboot
-three_partitions=false
+three_partitions_emmc=false
+three_partitions_image=false
+
+set3PartitionsEMMC ()
+{	eMMC_boot=
+	eMMC_root=${eMMC}p1
+	eMMC_data=${eMMC}p2
+	eMMC_perm=${eMMC}p3
+	emmc_boot_files=/tmp/rootfs/boot/
+	three_partitions_emmc=true
+}
 
 if [ -e $eMMC_perm ]
 then
@@ -65,12 +76,25 @@ then
 		mkdir -p $emmc_boot_files
 	fi
 else
-	eMMC_boot=
-	eMMC_root=${eMMC}p1
-	eMMC_data=${eMMC}p2
-	eMMC_perm=${eMMC}p3
-	emmc_boot_files=/tmp/rootfs/boot/
-	three_partitions=true
+	set3PartitionsEMMC
+fi
+
+migration_needed=false
+factory_settings_script_version=0
+version_file=/mnt/fs_Version.inf
+if [ -e ${version_file} ]
+then
+	factory_settings_script_version=$(cat ${version_file})
+fi
+if [ $factory_settings_script_version -ge 120 ]
+then
+	echo three partitions image on SDCard
+	three_partitions_image=true
+	if ! $three_partitions_emmc
+	then
+		echo four partitions image on eMMC.. migration needed.
+		migration_needed=true
+	fi
 fi
 
 mount_sdcard_partitions () {
@@ -222,6 +246,7 @@ write_pt_image () {
 	image_filename_rootfs="$image_filename_prfx-rootfs.img.gz"
 	image_filename_data="$image_filename_prfx-data.img.gz"
 	image_filename_pt="$image_filename_prfx-pt.img.gz"
+	image_filename_boot="$image_filename_prfx-boot.img.gz"
 
 	image_filename_upgrade="${sdcard_p1}/factory_settings.img.tar"
 	if isUpgrade
@@ -232,6 +257,13 @@ write_pt_image () {
 	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
         tar xOf $image_filename_upgrade $image_filename_pt | gunzip -c | dd of=${eMMC} bs=16M
 	flush_cache_mounted
+
+	if $three_partitions_image
+	then
+		echo writing hidden boot binaries.
+	        tar xOf $image_filename_upgrade $image_filename_boot | gunzip -c | dd of=${eMMC} bs=16M
+	fi
+
 	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
 	echo "Done writing partition table image!"
 }
@@ -246,6 +278,11 @@ repartition_drive () {
 	flush_cache
 	flush_cache_mounted
 
+	if [ $factory_settings_script_version -ge 120 ]
+	then
+		echo Partitioned to 3 partitions eMMC
+		set3PartitionsEMMC
+	fi
 	echo "Partitioned!"
 }
 
@@ -292,16 +329,13 @@ write_data_fs_image () {
 	flush_cache_mounted
         echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
         echo "Done writing data partition image!"
-
-#3exit 0
-
 }
-
+	
 partition_drive () {
 	flush_cache
 
 	echo "Unmounting!"
-        if [ -e ${eMMC_boot} ]
+        if [ -e ${eMMC_boot} ] && ! $three_partitions_emmc
 	then
 		umount ${eMMC_boot} > /dev/null 2>&1 || true
 	fi
@@ -321,6 +355,10 @@ update_uenv () {
               mkdir -p /tmp/emmcboot                                             
         fi
 
+	echo resetting to boot switch dependant uEnv                       
+        cp /mnt/uEnv.72check.txt /mnt/uEnv.txt || true                
+        cp /sdcard/p1/uEnv.72check.txt /sdcard/p1/uEnv.txt || true                
+
 	# first param =2 in case of upgrade.. =1 for factory settings.                               
         if $three_partitions
         then
@@ -334,47 +372,49 @@ update_uenv () {
 		then
 			echo ${eMMC_root} is mounted already
 		else
-			mount ${eMMC_root} /tmp/rootfs || true
+			if mount ${eMMC_root} /tmp/rootfs
+			then
+				echo Error in mounting rootfs. Failed to switch boot uEnv.
+				return 1
+			fi
 		fi
+		echo running factory settings version of replace_uEnv.txt.sh
+#       	        sh /sdcard/p1/scripts/replace_uEnv.txt.sh $emmc_boot_files || true        
+		echo resetting to boot switch dependant uEnv                       
+	        cp $emmc_boot_files/uEnv.72check.txt $emmc_boot_files/uEnv.txt || true                            
+        	sync                                                                                     
+	        sleep 5 	                                                                                 
+        	umount /tmp/rootfs || true
 	else
 		echo Dealing with four partitions system.
 	        echo copying coupling uEng.txt                                                           
 	        mount ${eMMC_boot} $emmc_boot_files -t vfat || true                            
-        fi
 
-	echo resetting to boot switch dependant uEnv                       
-#        cp /sdcard/p1/uEnv.txt $emmc_boot_files || true                            
-        cp /mnt/uEnv.72check.txt /mnt/uEnv.txt || true                
-        cp /sdcard/p1/uEnv.72check.txt /sdcard/p1/uEnv.txt || true                
-        cp $emmc_boot_files/uEnv.72check.txt $emmc_boot_files/uEnv.txt || true                            
-
-        if [ $1 -eq 2 ]                                             
-        then                                                                                     
-                if [ -e /sdcard/p2/scripts/replace_uEnv.txt.sh ]
-                then
-			echo running upgrade version of replace_uEnv.txt.sh
-                        sh /sdcard/p2/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
-                else
-			echo running factory settings version of replace_uEnv.txt.sh while performing upgrade.
-                        sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
-                fi                                                                     
-        else                                                                           
-		echo running factory settings version of replace_uEnv.txt.sh
-                sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true        
-        fi                                                                             
-
-        sync                                                                                     
-        sleep 5                                                                                  
-        if $three_partitions
-        then
-		umount /tmp/rootfs || true
-	else
+        	if [ $1 -eq 2 ]                                             
+	        then                                                                                     
+        	        if [ -e /sdcard/p2/scripts/replace_uEnv.txt.sh ]
+	                then
+				echo running upgrade version of replace_uEnv.txt.sh
+        	                sh /sdcard/p2/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+	                else
+				echo running factory settings version of replace_uEnv.txt.sh while performing upgrade.
+                	        sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+        	        fi                                                                     
+	        else                                                                           
+			echo running factory settings version of replace_uEnv.txt.sh
+        	        sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true        
+	        fi                                                                             
+	        sync                                                                                     
+        	sleep 5                                                                                  
 		if mount | grep $emmc_boot_files
 		then
 	        	umount $emmc_boot_files || true
 			rm -r $emmc_boot_files || true
 		fi
         fi
+
+        sync                                                                                     
+        sleep 5                                                                                  
 }
 
 reset_uenv () {
@@ -386,7 +426,7 @@ reset_uenv () {
 		        mkdir -p $emmc_boot_files
 		fi
 
-		if mount | grep $emmc_boot_files
+		if mount | grep $emmc_boot_files || $three_partitions_emmc
 		then
 			echo $emmc_boot_files already mounted!
 		else
@@ -401,7 +441,7 @@ reset_uenv () {
 	sync
 	sleep 5
 
-        if $three_partitions
+        if $three_partitions_emmc
         then
 		umount /tmp/rootfs || true
 	else
@@ -456,7 +496,7 @@ reset_update_uenv_with_verification () {
         fi
 	sync
 
-	if mount | grep $emmc_boot_files
+	if mount | grep $emmc_boot_files || $three_partitions_emmc
 	then
 		echo $emmc_boot_files already mounted!
 	else
@@ -777,7 +817,7 @@ isValidDataPartition
 isValidDataResult=$?
 
 echo "Validity test for /perm and /data partitions: $isValidPermResult and $isValidDataResul"
-if [ $isValidPermResult -eq 1 ] || [ $isValidDataResult -eq 1 ]
+if [ $isValidPermResult -eq 1 ] || [ $isValidDataResult -eq 1 ] || $migration_needed
 then
 	backup_perm
 	if isUpgrade
@@ -831,7 +871,7 @@ then
 		echo "Done partitioning $eMMC!"
 		perform_data_restore
 	else
-		echo "Cannot update partition table at  $eMMC! restarting!"
+		echo "Cannot update partition table at  $eMMC_perm! restarting!"
 		echo "Write Perm Partition 2" > ${sdcard_p2}/write_perm_partition.flag
 
 		sync
@@ -848,18 +888,24 @@ then
 		echo "Done partitioning $eMMC!"
 		perform_data_restore
 	else
-		echo "Cannot update data partition table at  $eMMC! restarting!"
-		echo "Write Data Partition 2" > ${sdcard_p2}/write_data_partition.flag
-		if isUpgrade
+		if $three_partitions_image
 		then
-			echo data partition formatting needed.
+			echo Bypassing data partition check for 3 partitions image.
 		else
+			echo "Cannot update data partition table at  $eMMC_data !!"
+			echo "Write Data Partition 2" > ${sdcard_p2}/write_data_partition.flag
+			if isUpgrade
+			then
+				echo data partition formatting needed.
+			else
+				write_data_fs_image
+			fi
 
-			write_data_fs_image
+			sync
+			echo Restarting
+			rebootx
+			exit 0
 		fi
-		sync
-		rebootx
-		exit 0
 	fi
 else
 	echo "Device is partitioned"
@@ -916,3 +962,4 @@ alldone
 rebootx
 
 exit 0
+

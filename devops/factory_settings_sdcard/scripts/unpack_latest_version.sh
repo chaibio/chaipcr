@@ -99,11 +99,6 @@ write_data_image () {
 }
 
 write_boot_image () {
-	if $three_partitions
-	then
-		echo No boot partition for three partitions system
-		return
-	fi
 	echo "Writing boot partition image!"
 	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
 	tar xOf $image_filename_upgrade $image_filename_boot | gunzip -c | dd of=${eMMC_boot} bs=16M

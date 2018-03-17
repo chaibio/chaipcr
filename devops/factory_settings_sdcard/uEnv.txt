@@ -1,3 +1,4 @@
+#Docs: http://elinux.org/Beagleboard:U-boot_partitioning_layout_2.0
 name_r=4.9.67-ti-r82
   
 loadaddr=0x82000000
@@ -33,4 +34,5 @@ uenvcmdmmc=echo "*** Boot button Unpressed..!!";run uenvcmdoverlay;run uenvcmdem
 uenvcmdsdcard=bootpart=0:1;bootdir=;fdtaddr=0x81FF0000;optargs=quiet capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN;load mmc 0 \${loadaddr} uImage;run loadfdt;setenv bootargs console=\${console} \${optargs} s2pressed=\${s2pressed};bootm \${loadaddr} - \${fdtaddr}
 uenvcmdsdcard_s2pressed=echo "*** Boot button pressed..!!";setenv s2pressed 1;run uenvcmdsdcard
 
-uenvcmd=run shutdown_usb_power;if gpio input 72; then run uenvcmdsdcard_s2pressed; else run uenvcmdmmc; fi
+#uenvcmd=run shutdown_usb_power;if gpio input 72; then run uenvcmdsdcard_s2pressed; else run uenvcmdmmc; fi
+uenvcmd=run shutdown_usb_power; run uenvcmdsdcard_s2pressed;
