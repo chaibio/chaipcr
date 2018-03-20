@@ -112,10 +112,17 @@ describe "Targets API", type: :request do
       post "/targets/#{@target1.id}/links", {wells:[{well_num: 2, well_type: "positive_control"}]}.to_json, http_headers
       expect(response).to be_success
       post "/targets/#{@target1.id}/links", {wells:[{well_num: 2, well_type: "sample"}]}.to_json, http_headers
-      expect(response).to be_success
+      expect(response).to be_success #update the row
       json = JSON.parse(response.body)
       expect(json["target"]["targets_wells"].length).to eq(1)
       expect(json["target"]["targets_wells"][0]["well_type"]).to eq("sample")
+    end
+    
+    it 'multiple wells' do
+      post "/targets/#{@target1.id}/links", {wells:[{well_num: 2, well_type: "positive_control"}, {well_num: 3, well_type: "sample"}]}.to_json, http_headers
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json["target"]["targets_wells"].length).to eq(2)
     end
   end
   
