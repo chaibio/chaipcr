@@ -20,9 +20,9 @@ describe "Targets API", type: :request do
   
   describe "#all" do
     it 'targets' do
-      post "/targets/#{@target1.id}/link/1", {well_type: "sample"}.to_json, http_headers
+      post "/targets/#{@target1.id}/links", {wells:[{well_num: 1, well_type: "sample"}]}.to_json, http_headers
       expect(response).to be_success
-      post "/targets/#{@target2.id}/link/1", {well_type: "sample"}.to_json, http_headers
+      post "/targets/#{@target2.id}/links", {wells:[{well_num: 1, well_type: "sample"}]}.to_json, http_headers
       expect(response).to be_success
       get "/experiments/#{@experiment.id}/targets", http_headers
       expect(response).to be_success
@@ -83,35 +83,35 @@ describe "Targets API", type: :request do
   
   describe "#link" do  
     it 'standard well requires concentration' do
-      post "/targets/#{@target1.id}/link/2", {well_type: "standard"}.to_json, http_headers
+      post "/targets/#{@target1.id}/links", {wells:[{well_num: 2, well_type: "standard"}]}.to_json, http_headers
       expect(response.response_code).to eq(422)
       json = JSON.parse(response.body)
       expect(json["target"]["errors"]).not_to be_nil
     end
     
     it 'well type not exist' do
-      post "/targets/#{@target1.id}/link/2", {well_type: "abc"}.to_json, http_headers
+      post "/targets/#{@target1.id}/links", {wells:[{well_num: 2, well_type: "abc"}]}.to_json, http_headers
       expect(response.response_code).to eq(422)
       json = JSON.parse(response.body)
       expect(json["target"]["errors"]).not_to be_nil
     end
     
     it 'add another target with the same channel in the well' do
-      post "/targets/#{@target2.id}/link/2", {well_type: "sample"}.to_json, http_headers
+      post "/targets/#{@target2.id}/links", {wells:[{well_num: 2, well_type: "sample"}]}.to_json, http_headers
       expect(response).to be_success
       post "/experiments/#{@experiment.id}/targets", {name: "target3", channel: 2}.to_json, http_headers
       expect(response).to be_success
       json = JSON.parse(response.body)
-      post "/targets/#{json["target"]["id"]}/link/2", {well_type: "sample"}.to_json, http_headers
+      post "/targets/#{json["target"]["id"]}/links", {wells:[{well_num: 2, well_type: "sample"}]}.to_json, http_headers
       expect(response.response_code).to eq(422)
       json = JSON.parse(response.body)
       expect(json["target"]["errors"]).not_to be_nil
     end
       
     it 'one well twice' do
-      post "/targets/#{@target1.id}/link/2", {well_type: "positive_control"}.to_json, http_headers
+      post "/targets/#{@target1.id}/links", {wells:[{well_num: 2, well_type: "positive_control"}]}.to_json, http_headers
       expect(response).to be_success
-      post "/targets/#{@target1.id}/link/2", {well_type: "sample"}.to_json, http_headers
+      post "/targets/#{@target1.id}/links", {wells:[{well_num: 2, well_type: "sample"}]}.to_json, http_headers
       expect(response).to be_success
       json = JSON.parse(response.body)
       expect(json["target"]["targets_wells"].length).to eq(1)
@@ -121,9 +121,9 @@ describe "Targets API", type: :request do
   
   describe "#unlink" do
     it 'existed well' do
-      post "/targets/#{@target1.id}/link/1", {well_type: "positive_control"}.to_json, http_headers
+      post "/targets/#{@target1.id}/links", {wells:[{well_num: 1, well_type: "sample"}]}.to_json, http_headers
       expect(response).to be_success  
-      post "/targets/#{@target1.id}/unlink/1", http_headers
+      post "/targets/#{@target1.id}/unlinks", {wells: [1]}.to_json, http_headers
       expect(response).to be_success  
       json = JSON.parse(response.body)
       expect(json["target"]["targets_wells"].length).to eq(0)

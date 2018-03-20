@@ -159,22 +159,22 @@ describe "Experiments API", type: :request do
       post "/experiments/#{@experiment.id}/samples", {name: "sample1"}.to_json, http_headers
       expect(response).to be_success
       json = JSON.parse(response.body)
-      post "/samples/#{json["sample"]["id"]}/link/1", http_headers
+      post "/samples/#{json["sample"]["id"]}/links", {wells: [1]}.to_json, http_headers
       expect(response).to be_success
       post "/experiments/#{@experiment.id}/samples", {name: "sample2"}.to_json, http_headers
       expect(response).to be_success
       json = JSON.parse(response.body)
-      post "/samples/#{json["sample"]["id"]}/link/2", http_headers
+      post "/samples/#{json["sample"]["id"]}/links", {wells: [2]}.to_json, http_headers
       expect(response).to be_success
       post "/experiments/#{@experiment.id}/targets", {name: "target1", channel: 1}.to_json, http_headers
       expect(response).to be_success  
       json = JSON.parse(response.body)
-      post "/targets/#{json["target"]["id"]}/link/1", {well_type: "sample"}.to_json, http_headers
+      post "/targets/#{json["target"]["id"]}/links", {wells:[{well_num: 1, well_type: "sample"}]}.to_json, http_headers
       expect(response).to be_success
       post "/experiments/#{@experiment.id}/targets", {name: "target2", channel: 2}.to_json, http_headers
       expect(response).to be_success  
       json = JSON.parse(response.body)
-      post "/targets/#{json["target"]["id"]}/link/3", {well_type: "positive_control"}.to_json, http_headers
+      post "/targets/#{json["target"]["id"]}/links", {wells:[{well_num: 3, well_type: "positive_control"}]}.to_json, http_headers
       expect(response).to be_success
       get "/experiments/#{@experiment.id}/well_layout", http_headers
       expect(response).to be_success

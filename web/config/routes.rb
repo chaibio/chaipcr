@@ -105,13 +105,17 @@ Qpcrctl::Application.routes.draw do
     end
 
     resources :samples, shallow: true, only: [:index, :create, :update, :destroy] do
-      post 'link/:well_num', to: 'samples#link', on: :member
-      post 'unlink/:well_num', to: 'samples#unlink', on: :member
+      member do
+        post 'links', to: 'samples#links'
+        post 'unlinks', to: 'samples#unlinks'
+      end
     end
        
     resources :targets, shallow: true, only: [:index, :create, :update, :destroy] do
-      post 'link/:well_num', to: 'targets#link', on: :member
-      post 'unlink/:well_num', to: 'targets#unlink', on: :member
+      member do
+        post 'links', to: 'targets#links'
+        post 'unlinks', to: 'targets#unlinks'
+      end
     end
      
     resource :amplification_option, only: [:show, :update]

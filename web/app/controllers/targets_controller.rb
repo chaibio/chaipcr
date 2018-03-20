@@ -52,10 +52,30 @@ class TargetsController < ApplicationController
     end
   end
 
-  def link
-    target_well = TargetsWell.where(:target_id=>@target.id, :well_num=>params[:well_num]).first
-    target_well = TargetsWell.new(:target_id=>@target.id, :well_num=>params[:well_num]) if target_well.nil?
-    target_well.update_attributes(:well_type=>params[:well_type], :concentration=>params[:concentration])
+  def links
+    params[:wells].each do |well|
+      link_well(well[:well_num], well[:well_type], well[:concentration])
+    end
+    respond_to do |format|
+      format.json { render "show", :status => (@target.errors.empty?)? :ok : :unprocessable_entity}
+    end
+  end
+  
+  def unlinks
+    params[:wells].each do |well_num|
+      unlink_well(well_num)
+    end
+    respond_to do |format|
+      format.json { render "show", :status => (@target.errors.empty?)? :ok : :unprocessable_entity}
+    end
+  end
+  
+  protected
+  
+  def link_well(well_num, well_type, concentration)
+    target_well = TargetsWell.where(:target_id=>@target.id, :well_num=>well_num).first
+    target_well = TargetsWell.new(:target_id=>@target.id, :well_num=>well_num) if target_well.nil?
+    target_well.update_attributes(:well_type=>well_type, :concentration=>concentration)
     target_well.target = @target
     ret = target_well.save
     if !ret
@@ -63,13 +83,10 @@ class TargetsController < ApplicationController
         @target.errors.add(:targets_wells, message)
       end
     end
-    respond_to do |format|
-      format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
-    end
   end
   
-  def unlink
-    target_well = TargetsWell.where(:target_id=>@target.id, :well_num=>params[:well_num]).first
+  def unlink_well(well_num)
+    target_well = TargetsWell.where(:target_id=>@target.id, :well_num=>well_num).first
     if target_well
       ret = target_well.destroy
       if !ret
@@ -78,14 +95,9 @@ class TargetsController < ApplicationController
         end
       end
     else
-      @target.errors.add(:targets_wells, "well num #{params[:well_num]} is not associated with this target")
-    end
-    respond_to do |format|
-      format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
+      @target.errors.add(:targets_wells, "well num #{well_num} is not associated with this target")
     end
   end
-  
-  protected
   
   def get_object
     @target = Target.find_by_id(params[:id])

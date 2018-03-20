@@ -52,21 +52,38 @@ class SamplesController < ApplicationController
     end
   end
 
-  def link
-    sample_well = SamplesWell.new(:sample_id=>@sample.id, :well_num=>params[:well_num])
+  def links
+    params[:wells].each do |well_num|
+      link_well(well_num)
+    end
+    respond_to do |format|
+      format.json { render "show", :status => (@sample.errors.empty?)? :ok : :unprocessable_entity}
+    end
+  end
+  
+  def unlinks
+    params[:wells].each do |well_num|
+      unlink_well(well_num)
+    end
+    respond_to do |format|
+      format.json { render "show", :status => (@sample.errors.empty?)? :ok : :unprocessable_entity}
+    end
+  end
+  
+  protected
+  
+  def link_well(well_num)
+    sample_well = SamplesWell.new(:sample_id=>@sample.id, :well_num=>well_num)
     ret = sample_well.save
     if !ret
       sample_well.errors.full_messages.each do |message|
         @sample.errors.add(:samples_wells, message)
       end
     end
-    respond_to do |format|
-      format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
-    end
   end
   
-  def unlink
-    sample_well = SamplesWell.where(:sample_id=>@sample.id, :well_num=>params[:well_num]).first
+  def unlink_well(well_num)
+    sample_well = SamplesWell.where(:sample_id=>@sample.id, :well_num=>well_num).first
     if sample_well
       ret = sample_well.destroy
       if !ret
@@ -75,14 +92,9 @@ class SamplesController < ApplicationController
         end
       end
     else
-      @sample.errors.add(:samples_wells, "well num #{params[:well_num]} is not associated with this sample")
-    end
-    respond_to do |format|
-      format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
+      @sample.errors.add(:samples_wells, "well num #{well_num} is not associated with this sample")
     end
   end
-  
-  protected
   
   def get_object
     @sample = Sample.find_by_id(params[:id])
