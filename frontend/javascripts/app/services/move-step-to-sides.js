@@ -42,57 +42,9 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
                         moveStepObj.increaseHeaderLengthRight(step.parentStage.index);
                     }
 
-                    /*if(step.nextStep === null) {
-                        if(step.parentStage.nextStage) {
-                            var tStep = step.parentStage.nextStage.childSteps[0];
-                            if(tStep.previousIsMoving && tStep.stepMovedDirection === "left") {
-                                console.log("OyO");
-                                this.moveStepToRight(tStep);
-                            }
-                            
-                        }
-                    }*/
-
                     return;
                 } 
             } 
-
-
-            /*if(direction === "left" && step.stepMovedDirection !== "left") {
-                
-                if(step.previousStep && step.previousStep.stepMovedDirection === "left") {
-                    step.left = step.left - 20;
-                    step.moveStep(0, false);
-                    step.circle.moveCircleWithStep();
-                    step.stepMovedDirection = "left";
-                    this.adjustDotsPlacingLeft(step);
-
-                } else if(! step.previousStep) { // If step is the very first in the stage.
-                    step.left = step.left - 20;
-                    step.moveStep(0, false);
-                    step.circle.moveCircleWithStep();
-                    step.stepMovedDirection = "left";
-                    this.adjustDotsPlacingLeft(step);
-                }
-
-                
-            } else if(direction === "right" && step.stepMovedDirection !== "right") {
-
-                if(step.nextStep && step.nextStep.stepMovedDirection === "right") {
-
-                    step.left = step.left + 20;
-                    step.moveStep(0, false);
-                    step.circle.moveCircleWithStep();
-                    step.stepMovedDirection = "right";
-                    this.adjustDotsPlacingRight(step);
-                } else if(! step.nextStep) { // if step is the last one in the stage.
-                    step.left = step.left + 20;
-                    step.moveStep(0, false);
-                    step.circle.moveCircleWithStep();
-                    step.stepMovedDirection = "right";
-                    this.adjustDotsPlacingRight(step);
-                }                
-            }*/
       };
 
       this.emptySpaceTrackerRight = function(step, moveStepObj) {
@@ -163,6 +115,7 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
                     if((step.left - (step.previousStep.left + step.previousStep.myWidth)) < 20) {
                         this.moveStepToRight(step);
                         this.emptySpaceTrackerRight(step, moveStepObj);
+                        moveStepObj.increaseHeaderLengthRight(step.parentStage.index);
                     }
                 }
             } 
@@ -216,23 +169,22 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
             if(mouseOver.enterDirection === "left" && mouseOver.exitDirection === "right") {
                 
                 if(step.previousStep === null && moveStepObj.emptySpaceTracker.left !== step.index && step.parentStage.index === moveStepObj.emptySpaceTracker.stageIndex) { // When its the first step
-                    console.log(moveStepObj.emptySpaceTracker.left, step.index, step.parentStage.index);
                     console.log("This is a interesting place", step.stepMovedDirection);
-                    
                     this.moveStepToLeft(step);
                     this.emptySpaceTrackerLeft(step, moveStepObj);
                     moveStepObj.increaseHeaderLengthLeft(step.parentStage.index);
                 } else {
-                    //console.log("Exceptional case", moveStepObj.emptySpaceTracker.left, step.index, step.parentStage.index, moveStepObj.emptySpaceTracker.stageIndex);
-                    //console.log(step.stepMovedDirection);
-                    if(step.nextStep.left - (step.left + step.myWidth) < 20) {
-                        this.moveStepToLeft(step);
-                        this.emptySpaceTrackerLeft(step, moveStepObj);
-                        moveStepObj.increaseHeaderLengthLeft(step.parentStage.index);
-                    }          
-                    //this.moveStepToLeft(step);
-                    //this.emptySpaceTrackerLeft(step, moveStepObj);
-                    //moveStepObj.increaseHeaderLengthLeft(step.parentStage.index);
+                    console.log("Exceptional case for first step");
+                    if(step.previousStep === null) {
+                        if(step.nextStep.left - (step.left + step.myWidth) < 20) {
+                            this.moveStepToLeft(step);
+                            this.emptySpaceTrackerLeft(step, moveStepObj);
+                            moveStepObj.increaseHeaderLengthLeft(step.parentStage.index);
+                        }   
+                    } else {
+                        console.log("Thats another case");
+                    }
+                           
                 }
             }
         }
