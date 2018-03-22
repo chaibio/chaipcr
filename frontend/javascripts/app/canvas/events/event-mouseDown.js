@@ -187,7 +187,6 @@ angular.module("canvasApp").factory('mouseDown', [
           // only if its not an infinite hold step we move the step
         
           parentEventReference.selectStep(step.circle);
-          parentEventReference.calculateMoveLimit("step", evt.target);
           
           parentEventReference.moveStepActive = true;
           parentEventReference.canvas.moveCursor = "move";
@@ -227,6 +226,7 @@ angular.module("canvasApp").factory('mouseDown', [
           circleManager.togglePaths(false); //put it back later
           
           //ParentKanvas.canvas.bringToFront(ParentKanvas.stepIndicator);
+          parentEventReference.calculateMoveLimitForStep("step", evt.target.parent);
           ParentKanvas.stepIndicator.init(step, evt.target, ParentKanvas, backupStageModel);
           ParentKanvas.canvas.renderAll();
         }
