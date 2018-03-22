@@ -78,8 +78,11 @@ window.ChaiBioTech.ngApp.service('StepMovementLeftService', [
                 place = (sI.kanvas.allStepViews[index].left - 10);
                 
                 if(sI.kanvas.allStepViews[index].previousIsMoving === true) {
-                    
+                    console.log("previousIsMoving");
                     place = sI.kanvas.moveDots.left + 7;
+                    sI.verticalLine.setLeft(place);
+                    sI.verticalLine.setCoords();
+                    return;
                 }        
                 
                 var step = sI.kanvas.allStepViews[index];
