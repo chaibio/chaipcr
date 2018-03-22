@@ -112,11 +112,16 @@ window.ChaiBioTech.ngApp.service('moveStepToSides', [
                     moveStepObj.increaseHeaderLengthRight(step.parentStage.index); // incase header  is not extended due to fast movement.                    
                 } else {
                     console.log("Exceptional case for last step");
-                    if((step.left - (step.previousStep.left + step.previousStep.myWidth)) < 20) {
-                        this.moveStepToRight(step);
-                        this.emptySpaceTrackerRight(step, moveStepObj);
-                        moveStepObj.increaseHeaderLengthRight(step.parentStage.index);
+                    if(step.nextStep === null) {
+                        if((step.left - (step.previousStep.left + step.previousStep.myWidth)) < 20) {
+                            this.moveStepToRight(step);
+                            this.emptySpaceTrackerRight(step, moveStepObj);
+                            moveStepObj.increaseHeaderLengthRight(step.parentStage.index);
+                        }
+                    } else {
+                        console.log("Thats another case for last step");
                     }
+                    
                 }
             } 
         }
