@@ -23,7 +23,7 @@ class SamplesController < ApplicationController
   before_filter -> { well_layout_editable_check params[:action] == "create" }, :except => [:index]
   
   def index
-    @samples = Sample.joins("inner join well_layouts on well_layouts.id = samples.well_layout_id").where(["experiment_id=? and parent_type=?", params[:experiment_id], Experiment.name]).order("samples.id")
+    @samples = Sample.includes(:samples_wells).joins("inner join well_layouts on well_layouts.id = samples.well_layout_id").where(["experiment_id=? and parent_type=?", params[:experiment_id], Experiment.name]).order("samples.name")
     respond_to do |format|
       format.json { render "index", :status => :ok}
     end
@@ -53,27 +53,40 @@ class SamplesController < ApplicationController
   end
 
   def links
-    params[:wells].each do |well_num|
-      link_well(well_num)
-    end
-    respond_to do |format|
-      format.json { render "show", :status => (@sample.errors.empty?)? :ok : :unprocessable_entity}
+    if @experiment && @sample
+      if @sample.belongs_to_experiment?(@experiment)
+        params[:wells].each do |well_num|
+          link_well(well_num)
+        end
+      else
+        @sample.errors.add(:base, "sample doesn't belong to this experiment")
+      end
+      
+      respond_to do |format|
+        format.json { render "show", :status => (@sample.errors.empty?)? :ok : :unprocessable_entity}
+      end
+    else
+      render json: {errors: "The #{(@experiment == nil)? "experiment" : "sample"} is not found"}, status: :not_found
     end
   end
   
   def unlinks
-    params[:wells].each do |well_num|
-      unlink_well(well_num)
-    end
-    respond_to do |format|
-      format.json { render "show", :status => (@sample.errors.empty?)? :ok : :unprocessable_entity}
+    if @experiment && @sample
+      params[:wells].each do |well_num|
+        unlink_well(well_num)
+      end
+      respond_to do |format|
+        format.json { render "show", :status => (@sample.errors.empty?)? :ok : :unprocessable_entity}
+      end
+    else
+      render json: {errors: "The #{(@experiment == nil)? "experiment" : "sample"} is not found"}, status: :not_found
     end
   end
   
   protected
   
   def link_well(well_num)
-    sample_well = SamplesWell.new(:sample_id=>@sample.id, :well_num=>well_num)
+    sample_well = SamplesWell.find_or_create(@sample, @experiment.well_layout.id, well_num)
     ret = sample_well.save
     if !ret
       sample_well.errors.full_messages.each do |message|
@@ -83,7 +96,7 @@ class SamplesController < ApplicationController
   end
   
   def unlink_well(well_num)
-    sample_well = SamplesWell.where(:sample_id=>@sample.id, :well_num=>well_num).first
+    sample_well = SamplesWell.where(:sample_id=>@sample.id, :well_layout_id=>@experiment.well_layout.id, :well_num=>well_num).first
     if sample_well
       ret = sample_well.destroy
       if !ret
@@ -97,7 +110,12 @@ class SamplesController < ApplicationController
   end
   
   def get_object
+    get_experiment
     @sample = Sample.find_by_id(params[:id])
+  end
+  
+  def get_experiment
+    @experiment = Experiment.includes(:well_layout).find_by_id(params[:experiment_id]) if params[:experiment_id]
   end
   
 end

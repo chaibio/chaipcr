@@ -19,30 +19,38 @@
 class TargetsWell < ActiveRecord::Base
   include ProtocolLayoutHelper
   
+  belongs_to :well_layout
   belongs_to :target
   
-  validates_presence_of :well_type, :well_num, :target_id
-  ACCESSIBLE_ATTRS = [:well_type, :well_num, :concentration]
+  attr_accessor :validate_targets_in_well
   
+  validates_presence_of :well_num, :target_id
   validates :well_num, :inclusion => {:in=>1..16, :message => "%{value} is not between 1 and 16"}
-  validates :well_type, inclusion: { in: ["positive_control", "no_template_control", "standard", "sample"],
+  validates :well_type, inclusion: { in: ["positive_control", "negative_control", "standard", "unknown", nil],
      message: "'%{value}' is not a valid type" }
 
   validate :validate
   
+  def self.find_or_create(target, well_layout_id, well_num)
+     target_well = joins(:target).where(["targets_wells.well_layout_id=? and targets_wells.well_num=? and targets.channel=?", well_layout_id, well_num, target.channel]).first
+     if target_well
+       target_well.target = target
+     else
+       target_well = self.new(:well_layout_id=>well_layout_id, :target=>target, :well_num=>well_num)
+       target_well.validate_targets_in_well = false
+     end
+     target_well
+  end
+  
   protected
 
   def validate
-    if well_type == "standard" && concentration.nil?
-      errors.add(:concentration, "cannot be blank if well_type is #{well_type}")
+    if target.imported && well_type == "standard"
+      errors.add(:well_type, "standard cannot be supported for imported target")
     end
-      
-    if new_record?
-      Target.joins("inner join targets_wells ON targets_wells.target_id = targets.id")
-            .where("well_layout_id=? AND well_num=?", target.well_layout_id, well_num).each do |existing_target|
-        if  existing_target.channel == target.channel
-          errors.add(:target_id, "channel #{target.channel} is already occupied in well #{well_num}")
-        end 
+    if new_record? && validate_targets_in_well != false
+      if joins(:target).where(:well_layout_id=>well_layout_id, :well_num=>well_num, :channel=>target.channel).exists?
+        errors.add(:target_id, "#{target.channel} is already occupied in well #{well_num}")
       end
     end
   end

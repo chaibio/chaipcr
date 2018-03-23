@@ -25,6 +25,10 @@ class Sample < ActiveRecord::Base
   validates_presence_of :well_layout_id, :name
   ACCESSIBLE_ATTRS = [:well_layout_id, :name]
   
+  def belongs_to_experiment?(experiment)
+    well_layout_id == experiment.well_layout.id
+  end
+  
   def copy
     new_sample = copy_helper
     samples_wells.each do ||

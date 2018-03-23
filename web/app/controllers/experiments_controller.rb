@@ -230,6 +230,7 @@ class ExperimentsController < ApplicationController
   def copy
     old_experiment = Experiment.includes(:experiment_definition).find_by_id(params[:id]) 
     @experiment = Experiment.new({:name=>(!params[:experiment].blank?)? params[:experiment][:name] : "Copy of #{old_experiment.name}"})
+    @experiment.targets_well_layout_id = old_experiment.targets_well_layout_id
     @experiment.experiment_definition = old_experiment.experiment_definition.copy
     if old_experiment.well_layout
       @experiment.well_layout = old_experiment.well_layout.copy

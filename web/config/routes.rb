@@ -104,20 +104,22 @@ Qpcrctl::Application.routes.draw do
       end
     end
 
-    resources :samples, shallow: true, only: [:index, :create, :update, :destroy] do
+    resources :samples, shallow: true, only: [:index, :create, :update, :destroy]
+    resources :samples, only: [] do
       member do
         post 'links', to: 'samples#links'
         post 'unlinks', to: 'samples#unlinks'
       end
     end
-       
-    resources :targets, shallow: true, only: [:index, :create, :update, :destroy] do
+    
+    resources :targets, shallow: true, only: [:index, :create, :update, :destroy]
+    resources :targets, only: [] do
       member do
         post 'links', to: 'targets#links'
         post 'unlinks', to: 'targets#unlinks'
       end
     end
-     
+    
     resource :amplification_option, only: [:show, :update]
     
   end

@@ -23,7 +23,29 @@ class TargetsController < ApplicationController
   before_filter -> { well_layout_editable_check params[:action] == "create" }, :except => [:index]
   
   def index
-    @targets = Target.joins("inner join well_layouts on well_layouts.id = targets.well_layout_id").where(["experiment_id=? and parent_type=?", params[:experiment_id], Experiment.name]).order("targets.id")
+    get_experiment
+    @targets = Target.includes(:targets_wells).where(["targets.well_layout_id=? or targets.well_layout_id=?", @experiment.well_layout.id, @experiment.targets_well_layout_id]).order("targets.well_layout_id, targets.name")
+    if params[:channel]
+      @targets.where(["channel=?", params[:channel]])
+    end    
+    targets_ids = @targets.map {|target| target.id}
+    @targets_wells = TargetsWell.where(["well_layout_id=? AND target_id IN (?)", @experiment.well_layout.id, targets_ids]).order("FIELD(target_id,#{targets_ids.join(',')})")
+    target_well_index = 0
+    @targets.each do |target|
+      #set imported
+      if target.well_layout_id != @experiment.well_layout.id
+        target.imported = true
+      else
+        target.imported = false
+      end
+      #set targets_wells
+      targets_wells = []
+      while target_well_index < @targets_wells.length && @targets_wells[target_well_index].target_id == target.id
+        targets_wells << @targets_wells[target_well_index]
+        target_well_index += 1
+      end
+      target.targets_wells = targets_wells
+    end
     respond_to do |format|
       format.json { render "index", :status => :ok}
     end
@@ -53,30 +75,46 @@ class TargetsController < ApplicationController
   end
 
   def links
-    params[:wells].each do |well|
-      link_well(well[:well_num], well[:well_type], well[:concentration])
-    end
-    respond_to do |format|
-      format.json { render "show", :status => (@target.errors.empty?)? :ok : :unprocessable_entity}
+    if @experiment && @target
+      if @target.belongs_to_experiment?(@experiment)
+        params[:wells].each do |well|
+          if well.is_a? Integer
+            link_well(well, nil, nil)
+          else
+            link_well(well[:well_num], well[:well_type], well[:concentration])
+          end
+        end
+      else
+        @target.errors.add(:base, "target doesn't belong to this experiment")
+      end
+      
+      respond_to do |format|
+        format.json { render "show", :status => (@target.errors.empty?)? :ok : :unprocessable_entity}
+      end
+    else
+      render json: {errors: "The #{(@experiment == nil)? "experiment" : "target"} is not found"}, status: :not_found
     end
   end
   
   def unlinks
-    params[:wells].each do |well_num|
-      unlink_well(well_num)
-    end
-    respond_to do |format|
-      format.json { render "show", :status => (@target.errors.empty?)? :ok : :unprocessable_entity}
+    if @experiment && @target
+      params[:wells].each do |well_num|
+        unlink_well(well_num)
+      end
+      respond_to do |format|
+        format.json { render "show", :status => (@target.errors.empty?)? :ok : :unprocessable_entity}
+      end
+    else
+      render json: {errors: "The #{(@experiment == nil)? "experiment" : "target"} is not found"}, status: :not_found
     end
   end
   
   protected
   
   def link_well(well_num, well_type, concentration)
-    target_well = TargetsWell.where(:target_id=>@target.id, :well_num=>well_num).first
-    target_well = TargetsWell.new(:target_id=>@target.id, :well_num=>well_num) if target_well.nil?
-    target_well.update_attributes(:well_type=>well_type, :concentration=>concentration)
-    target_well.target = @target
+    target_well = TargetsWell.find_or_create(@target, @experiment.well_layout.id, well_num)
+    target_well.well_type = well_type if !well_type.nil?
+    target_well.concentration = concentration if !concentration.nil?
     ret = target_well.save
     if !ret
       target_well.errors.full_messages.each do |message|
@@ -86,7 +124,7 @@ class TargetsController < ApplicationController
   end
   
   def unlink_well(well_num)
-    target_well = TargetsWell.where(:target_id=>@target.id, :well_num=>well_num).first
+    target_well = TargetsWell.where(:target_id=>@target.id, :well_layout_id=>@experiment.well_layout.id, :well_num=>well_num).first
     if target_well
       ret = target_well.destroy
       if !ret
@@ -100,7 +138,12 @@ class TargetsController < ApplicationController
   end
   
   def get_object
+    get_experiment
     @target = Target.find_by_id(params[:id])
+  end
+  
+  def get_experiment
+    @experiment = Experiment.includes(:well_layout).find_by_id(params[:experiment_id]) if params[:experiment_id]
   end
   
 end

@@ -32,8 +32,8 @@ class WellLayout < ActiveRecord::Base
   end
   
   def layout
-    wellsamples = samples.joins(:samples_wells).order("well_num").select("samples.*, well_num")
-    welltargets = targets.joins(:targets_wells).order("well_num").select("targets.*, well_num, well_type, concentration")
+    wellsamples = Sample.joins(:samples_wells).where(["samples_wells.well_layout_id=?", id]).order("well_num").select("samples.*, well_num")
+    welltargets = Target.joins(:targets_wells).where(["targets_wells.well_layout_id=?", id]).order("well_num, channel").select("targets.*, well_num, well_type, concentration")
     wells = (wellsamples.length > 0 || welltargets.length > 0)? Array.new(16) : []
     index = 0
     while index < wellsamples.length || index < welltargets.length do
@@ -44,6 +44,7 @@ class WellLayout < ActiveRecord::Base
         wells[well_index].samples << wellsamples[index]
       end
       if index < welltargets.length
+        welltargets[index].imported = (welltargets[index].well_layout_id == id)? false : true
         well_index = welltargets[index].well_num-1
         wells[well_index] = WellNode.new if wells[well_index].nil?
         wells[well_index].targets ||= Array.new

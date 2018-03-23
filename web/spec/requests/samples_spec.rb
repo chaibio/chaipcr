@@ -31,12 +31,13 @@ describe "Samples API", type: :request do
     end
     
     it 'samples' do
-      post "/samples/#{@sample.id}/links", {wells: [1]}.to_json, http_headers
+      post "/experiments/#{@experiment.id}/samples/#{@sample.id}/links", {wells: [1]}.to_json, http_headers
       expect(response).to be_success
       post "/experiments/#{@experiment.id}/samples", {name: "test1"}.to_json, http_headers
       expect(response).to be_success
       json = JSON.parse(response.body)
-      post "/samples/#{json["sample"]["id"]}/links", {wells: [1]}.to_json, http_headers
+      #replace well 1 with test1 sample
+      post "/experiments/#{@experiment.id}/samples/#{json["sample"]["id"]}/links", {wells: [2]}.to_json, http_headers
       expect(response).to be_success
       get "/experiments/#{@experiment.id}/samples", http_headers
       expect(response).to be_success
@@ -105,50 +106,84 @@ describe "Samples API", type: :request do
   
   describe "#link" do    
     it 'one well' do
-      post "/samples/#{@sample.id}/links", {wells: [1]}.to_json, http_headers
+      post "/experiments/#{@experiment.id}/samples/#{@sample.id}/links", {wells: [1]}.to_json, http_headers
       expect(response).to be_success
       json = JSON.parse(response.body)
       expect(json["sample"]["samples_wells"][0]["well_num"]).to eq(1)
     end
     
     it 'two wells' do
-      post "/samples/#{@sample.id}/links", {wells: [1, 2]}.to_json, http_headers
+      post "/experiments/#{@experiment.id}/samples/#{@sample.id}/links", {wells: [1, 2]}.to_json, http_headers
       expect(response).to be_success  
       json = JSON.parse(response.body)
       expect(json["sample"]["samples_wells"].length).to eq(2)
     end
     
     it 'two wells with same well num' do
-      post "/samples/#{@sample.id}/links", {wells: [1, 1]}.to_json, http_headers
-      expect(response.response_code).to eq(422)
+      post "/experiments/#{@experiment.id}/samples/#{@sample.id}/links", {wells: [1, 1]}.to_json, http_headers
+      expect(response).to be_success
       json = JSON.parse(response.body)
       expect(json["sample"]["samples_wells"].length).to eq(1)
-      expect(json["sample"]["errors"]["samples_wells"].length).to eq(1)
+    end
+    
+    it 'two wells with two calls' do
+      post "/experiments/#{@experiment.id}/samples/#{@sample.id}/links", {wells: [1]}.to_json, http_headers
+      expect(response).to be_success  
+      post "/experiments/#{@experiment.id}/samples/#{@sample.id}/links", {wells: [2]}.to_json, http_headers
+      expect(response).to be_success  
+      json = JSON.parse(response.body)
+      expect(json["sample"]["samples_wells"].length).to eq(2)
+    end
+    
+    it 'another sample in the well' do
+      post "/experiments/#{@experiment.id}/samples/#{@sample.id}/links", {wells: [1]}.to_json, http_headers
+      expect(response).to be_success
+      post "/experiments/#{@experiment.id}/samples", {name: "test1"}.to_json, http_headers
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      #replace well 1 with test1 sample
+      post "/experiments/#{@experiment.id}/samples/#{json["sample"]["id"]}/links", {wells: [1]}.to_json, http_headers
+      expect(response).to be_success
+      get "/experiments/#{@experiment.id}/samples", http_headers
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json.length).to eq(2)
+      expect(json[0]["sample"]["samples_wells"].length).to eq(0)
+      expect(json[1]["sample"]["samples_wells"].length).to eq(1)
+      expect(json[1]["sample"]["samples_wells"][0]["well_num"]).to eq(1)
     end
     
     it 'well num is invalid' do
-      post "/samples/#{@sample.id}/links", {wells: [17]}.to_json, http_headers
+      post "/experiments/#{@experiment.id}/samples/#{@sample.id}/links", {wells: [17]}.to_json, http_headers
       expect(response.response_code).to eq(422)
       json = JSON.parse(response.body)
       expect(json["sample"]["samples_wells"].length).to eq(0)
       expect(json["sample"]["errors"]["samples_wells"].length).to eq(1)
     end
+    
+    it 'sample doesnot belong disallowed' do
+      @experiment = create_experiment_with_one_stage("test1")
+      post "/experiments/#{@experiment.id}/samples/#{@sample.id}/links", {wells:[1]}.to_json, http_headers
+      expect(response.response_code).to eq(422)
+      json = JSON.parse(response.body)
+      expect(json["sample"]["errors"]).not_to be_nil
+    end
   end
   
   describe "#unlink" do
     it 'existed well' do
-      post "/samples/#{@sample.id}/links", {wells: [1]}.to_json, http_headers
+      post "/experiments/#{@experiment.id}/samples/#{@sample.id}/links", {wells: [1]}.to_json, http_headers
       expect(response).to be_success  
-      post "/samples/#{@sample.id}/unlinks", {wells: [1]}.to_json, http_headers
+      post "/experiments/#{@experiment.id}/samples/#{@sample.id}/unlinks", {wells: [1]}.to_json, http_headers
       expect(response).to be_success  
       json = JSON.parse(response.body)
       expect(json["sample"]["samples_wells"].length).to eq(0)
     end
     
     it 'notexisted well' do
-      post "/samples/#{@sample.id}/links", {wells: [1]}.to_json, http_headers
+      post "/experiments/#{@experiment.id}/samples/#{@sample.id}/links", {wells: [1]}.to_json, http_headers
       expect(response).to be_success  
-      post "/samples/#{@sample.id}/unlinks", {wells: [3]}.to_json, http_headers
+      post "/experiments/#{@experiment.id}/samples/#{@sample.id}/unlinks", {wells: [3]}.to_json, http_headers
       expect(response.response_code).to eq(422)
       json = JSON.parse(response.body)
       expect(json["sample"]["samples_wells"].length).to eq(1)

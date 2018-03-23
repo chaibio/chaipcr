@@ -1,5 +1,5 @@
 object @target
-attribute :id, :name, :channel
+attribute :id, :name, :channel, :imported
 
 child :targets_wells, :object_root => false do
 	attribute :well_num, :well_type, :concentration

@@ -20,7 +20,30 @@ class Target < ActiveRecord::Base
   belongs_to :well_layout
   has_many :targets_wells, dependent: :destroy
   
+  attr_accessor :imported
+  
   validates_presence_of :well_layout_id, :name, :channel
   validates :channel, :inclusion => {:in=>1..2, :message => "%{value} is not 1 and 2"}
   ACCESSIBLE_ATTRS = [:well_layout_id, :name, :channel]
+  
+  validate :validate
+  
+  def belongs_to_experiment?(experiment)
+    if well_layout_id == experiment.well_layout.id
+      self.imported = false
+    elsif well_layout_id == experiment.targets_well_layout_id
+      self.imported = true
+    end
+    !imported.nil?
+  end
+  
+  protected
+  
+  def validate
+    if channel_changed?
+      if TargetsWell.exists?(:target_id=>id)
+        errors.add(:channel, "cannot be changed because it is linked to a well")
+      end
+    end
+  end
 end
