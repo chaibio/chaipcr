@@ -46,7 +46,7 @@ class Sample < ActiveRecord::Base
   end
   
   def destroy
-    if samples_wells.count > 0
+    if samples_wells.exists?
       errors.add(:base, "sample is linked to well")
       false
     else

@@ -56,7 +56,7 @@ class Target < ActiveRecord::Base
   end
   
   def destroy
-    if targets_wells.count > 0
+    if linked?
       errors.add(:base, "target is linked to well")
       false
     else
@@ -68,9 +68,13 @@ class Target < ActiveRecord::Base
   
   def validate
     if channel_changed?
-      if TargetsWell.exists?(:target_id=>id)
+      if linked?
         errors.add(:channel, "cannot be changed because it is linked to a well")
       end
     end
+  end
+  
+  def linked?
+    targets_wells.exists?
   end
 end
