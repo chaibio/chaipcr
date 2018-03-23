@@ -19,6 +19,14 @@ describe "Targets API", type: :request do
   end
   
   describe "#all" do
+    it "empty targets with no well layout" do
+      @experiment.well_layout.destroy
+      get "/experiments/#{@experiment.id}/targets", http_headers
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json.length).to eq(0)
+    end
+    
     it 'targets' do
       post "/experiments/#{@experiment.id}/targets/#{@target1.id}/links", {wells:[{well_num: 1}]}.to_json, http_headers
       expect(response).to be_success
@@ -44,7 +52,7 @@ describe "Targets API", type: :request do
   
   describe "#update" do
     it 'target name' do
-      put "/targets/#{@target1.id}", {name: "target3", channel: 2}.to_json, http_headers
+      put "/experiments/#{@experiment.id}/targets/#{@target1.id}", {name: "target3", channel: 2}.to_json, http_headers
       expect(response).to be_success
       json = JSON.parse(response.body)
       expect(json["target"]["name"]).to eq("target3")
@@ -52,14 +60,14 @@ describe "Targets API", type: :request do
     end
     
     it 'target invalid channel' do
-      put "/targets/#{@target1.id}", {channel: 3}.to_json, http_headers
+      put "/experiments/#{@experiment.id}/targets/#{@target1.id}", {channel: 3}.to_json, http_headers
       expect(response.response_code).to eq(422)
       json = JSON.parse(response.body)
       expect(json["target"]["errors"]).not_to be_nil
     end
     
     it 'invalid target id' do
-      put "/targets/#{@target2.id+1}", {name: "target3"}.to_json, http_headers
+      put "/experiments/#{@experiment.id}/targets/#{@target2.id+1}", {name: "target3"}.to_json, http_headers
       expect(response.response_code).to eq(422)
       json = JSON.parse(response.body)
       expect(json["errors"]).not_to be_nil
@@ -68,7 +76,7 @@ describe "Targets API", type: :request do
     it 'target channel disallowed if it links to a well' do
       post "/experiments/#{@experiment.id}/targets/#{@target1.id}/links", {wells:[{well_num: 2}]}.to_json, http_headers
       expect(response).to be_success
-      put "/targets/#{@target1.id}", {channel: 2}.to_json, http_headers
+      put "/experiments/#{@experiment.id}/targets/#{@target1.id}", {channel: 2}.to_json, http_headers
       expect(response.response_code).to eq(422)
       json = JSON.parse(response.body)
       expect(json["target"]["errors"]).not_to be_nil
@@ -77,14 +85,14 @@ describe "Targets API", type: :request do
   
   describe "#destroy" do
     it 'target' do
-      delete "/targets/#{@target1.id}", { :format => 'json' }
+      delete "/experiments/#{@experiment.id}/targets/#{@target1.id}", { :format => 'json' }
       expect(response).to be_success
     end
     
     it 'invalid target id' do
-      delete "/targets/#{@target1.id}", { :format => 'json' }
+      delete "/experiments/#{@experiment.id}/targets/#{@target1.id}", { :format => 'json' }
       expect(response).to be_success
-      delete "/targets/#{@target1.id}", { :format => 'json' }
+      delete "/experiments/#{@experiment.id}/targets/#{@target1.id}", { :format => 'json' }
       expect(response.response_code).to eq(422)
       json = JSON.parse(response.body)
       expect(json["errors"]).not_to be_nil
@@ -243,6 +251,13 @@ describe "Targets API", type: :request do
     
     it 'link imported targets with well_type standard disallowed' do
       post "/experiments/#{@experiment.id}/targets/#{@target1.id}/links", {wells:[{well_num: 2, well_type: "standard"}]}.to_json, http_headers
+      expect(response.response_code).to eq(422)
+      json = JSON.parse(response.body)
+      expect(json["target"]["errors"]).not_to be_nil
+    end
+    
+    it 'target update disallowed' do
+      put "/experiments/#{@experiment.id}/targets/#{@target1.id}", {name: "target3", channel: 2}.to_json, http_headers
       expect(response.response_code).to eq(422)
       json = JSON.parse(response.body)
       expect(json["target"]["errors"]).not_to be_nil

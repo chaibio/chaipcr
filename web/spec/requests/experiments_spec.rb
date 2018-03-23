@@ -150,7 +150,6 @@ describe "Experiments API", type: :request do
       get "/experiments/#{json["experiment"]["id"]}/well_layout", http_headers
       expect(response).to be_success
       json = JSON.parse(response.body)
-      puts response.body
       expect(json[0]["samples"]).not_to be_nil
       expect(json[0]["targets"]).to be_nil
       expect(json[1]["samples"]).to be_nil
@@ -224,7 +223,6 @@ describe "Experiments API", type: :request do
       @new_experiment_standard = create_experiment_with_one_stage("test1")
       put "/experiments/#{@experiment.id}", {experiment: {standard_experiment_id: @new_experiment_standard.id}}.to_json, http_headers
       expect(response.response_code).to eq(422)
-      print response.body
     end
     
   end

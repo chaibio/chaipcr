@@ -20,7 +20,8 @@ class SamplesController < ApplicationController
   include ParamsHelper
   
   before_filter :ensure_authenticated_user
-  before_filter -> { well_layout_editable_check params[:action] == "create" }, :except => [:index]
+  before_filter -> { well_layout_editable_check }
+  before_filter :get_object, :except => [:index, :create]
   
   def index
     @samples = Sample.includes(:samples_wells).joins("inner join well_layouts on well_layouts.id = samples.well_layout_id").where(["experiment_id=? and parent_type=?", params[:experiment_id], Experiment.name]).order("samples.name")
@@ -31,7 +32,7 @@ class SamplesController < ApplicationController
 
   def create
     @sample = Sample.new(sample_params)
-    @sample.well_layout_id = @well_layout.id
+    @sample.well_layout_id = @experiment.well_layout.id
     ret = @sample.save
     respond_to do |format|
       format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
@@ -110,12 +111,13 @@ class SamplesController < ApplicationController
   end
   
   def get_object
-    get_experiment
     @sample = Sample.find_by_id(params[:id])
-  end
-  
-  def get_experiment
-    @experiment = Experiment.includes(:well_layout).find_by_id(params[:experiment_id]) if params[:experiment_id]
+    if @sample == nil
+      render json: {errors: "The object doesn't exist"}, status: :unprocessable_entity
+      return false
+    else
+      return true
+    end
   end
   
 end

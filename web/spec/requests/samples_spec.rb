@@ -74,14 +74,14 @@ describe "Samples API", type: :request do
   
   describe "#update" do
     it 'sample name' do
-      put "/samples/#{@sample.id}", {name: "test2"}.to_json, http_headers
+      put "/experiments/#{@experiment.id}/samples/#{@sample.id}", {name: "test2"}.to_json, http_headers
       expect(response).to be_success
       json = JSON.parse(response.body)
       expect(json["sample"]["name"]).to eq("test2")
     end
     
     it 'invalid sample id' do
-      put "/samples/#{@sample.id+1}", {name: "test2"}.to_json, http_headers
+      put "/experiments/#{@experiment.id}/samples/#{@sample.id+1}", {name: "test2"}.to_json, http_headers
       expect(response.response_code).to eq(422)
       json = JSON.parse(response.body)
       expect(json["errors"]).not_to be_nil
@@ -90,14 +90,14 @@ describe "Samples API", type: :request do
   
   describe "#destroy" do
     it 'sample' do
-      delete "/samples/#{@sample.id}", { :format => 'json' }
+      delete "/experiments/#{@experiment.id}/samples/#{@sample.id}", { :format => 'json' }
       expect(response).to be_success
     end
     
     it 'invalid sample id' do
-      delete "/samples/#{@sample.id}", { :format => 'json' }
+      delete "/experiments/#{@experiment.id}/samples/#{@sample.id}", { :format => 'json' }
       expect(response).to be_success
-      delete "/samples/#{@sample.id}", { :format => 'json' }
+      delete "/experiments/#{@experiment.id}/samples/#{@sample.id}", { :format => 'json' }
       expect(response.response_code).to eq(422)
       json = JSON.parse(response.body)
       expect(json["errors"]).not_to be_nil

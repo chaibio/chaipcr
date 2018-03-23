@@ -20,10 +20,10 @@ class TargetsController < ApplicationController
   include ParamsHelper
   
   before_filter :ensure_authenticated_user
-  before_filter -> { well_layout_editable_check params[:action] == "create" }, :except => [:index]
+  before_filter -> { well_layout_editable_check }
+  before_filter :get_object, :except => [:index, :create]
   
   def index
-    get_experiment
     @targets = Target.includes(:targets_wells).where(["targets.well_layout_id=? or targets.well_layout_id=?", @experiment.well_layout.id, @experiment.targets_well_layout_id]).order("targets.well_layout_id, targets.name")
     if params[:channel]
       @targets.where(["channel=?", params[:channel]])
@@ -53,7 +53,7 @@ class TargetsController < ApplicationController
 
   def create
     @target = Target.new(target_params)
-    @target.well_layout_id = @well_layout.id
+    @target.well_layout_id = @experiment.well_layout.id
     ret = @target.save
     respond_to do |format|
       format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
@@ -61,51 +61,51 @@ class TargetsController < ApplicationController
   end
   
   def update
-    ret  = @target.update_attributes(target_params)
+    if @target.well_layout_id == @experiment.well_layout.id
+      ret  = @target.update_attributes(target_params)
+    else
+      @target.errors.add(:base, "target cannot be updated because it is imported")
+    end
     respond_to do |format|
       format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
     end
   end
 
   def destroy
-    ret = @target.destroy
+    if @target.well_layout_id == @experiment.well_layout.id
+      ret = @target.destroy
+    else
+      @target.errors.add(:base, "target cannot be destroyed because it is imported")
+    end
     respond_to do |format|
       format.json { render "destroy", :status => (ret)? :ok : :unprocessable_entity}
     end
   end
 
   def links
-    if @experiment && @target
-      if @target.belongs_to_experiment?(@experiment)
-        params[:wells].each do |well|
-          if well.is_a? Integer
-            link_well(well, nil)
-          else
-            link_well(well[:well_num], well)
-          end
+    if @target.belongs_to_experiment?(@experiment)
+      params[:wells].each do |well|
+        if well.is_a? Integer
+          link_well(well, nil)
+        else
+          link_well(well[:well_num], well)
         end
-      else
-        @target.errors.add(:base, "target doesn't belong to this experiment")
-      end
-      
-      respond_to do |format|
-        format.json { render "show", :status => (@target.errors.empty?)? :ok : :unprocessable_entity}
       end
     else
-      render json: {errors: "The #{(@experiment == nil)? "experiment" : "target"} is not found"}, status: :not_found
+      @target.errors.add(:base, "target doesn't belong to this experiment")
+    end
+      
+    respond_to do |format|
+      format.json { render "show", :status => (@target.errors.empty?)? :ok : :unprocessable_entity}
     end
   end
   
   def unlinks
-    if @experiment && @target
-      params[:wells].each do |well_num|
-        unlink_well(well_num)
-      end
-      respond_to do |format|
-        format.json { render "show", :status => (@target.errors.empty?)? :ok : :unprocessable_entity}
-      end
-    else
-      render json: {errors: "The #{(@experiment == nil)? "experiment" : "target"} is not found"}, status: :not_found
+    params[:wells].each do |well_num|
+      unlink_well(well_num)
+    end
+    respond_to do |format|
+      format.json { render "show", :status => (@target.errors.empty?)? :ok : :unprocessable_entity}
     end
   end
   
@@ -141,12 +141,13 @@ class TargetsController < ApplicationController
   end
   
   def get_object
-    get_experiment
     @target = Target.find_by_id(params[:id])
-  end
-  
-  def get_experiment
-    @experiment = Experiment.includes(:well_layout).find_by_id(params[:experiment_id]) if params[:experiment_id]
+    if @target == nil
+      render json: {errors: "The object doesn't exist"}, status: :unprocessable_entity
+      return false
+    else
+      return true
+    end
   end
   
 end
