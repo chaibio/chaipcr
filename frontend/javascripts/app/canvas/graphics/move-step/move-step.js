@@ -74,6 +74,12 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.movedLeftStageIndex = null;
         this.sourceStageFirstStepMove = false;
         this.moveStepMovedOutOfSourceStage = false;
+        
+        this.emptySpaceTrackerForStage = {
+          left: null,
+          right: null
+        };
+
         this.emptySpaceTracker = {
           stageIndex: null,
           left: null,
@@ -127,6 +133,17 @@ angular.module("canvasApp").factory('moveStepRect', [
         
         this.verticalLine.setLeft(footer.left - 20).setVisible(true).setCoords();
         this.verticalLine.borderS.setLeft(footer.left - 7).setVisible(true).setCoords();
+
+        this.emptySpaceTrackerForStage = {
+          left: null,
+          right: null
+        };
+
+        this.emptySpaceTracker = {
+          stageIndex: null,
+          left: null,
+          right: null
+        };
 
         C.canvas.bringToFront(this.verticalLine.borderS);
         C.canvas.bringToFront(this);
@@ -253,19 +270,25 @@ angular.module("canvasApp").factory('moveStepRect', [
         
         //if(this.kanvas.allStageViews[index + 1]) {
           var stage = this.kanvas.allStageViews[index];
-          var left = stage.left - 27;
-          stage.extendHeader(left, this.headerExtender);
+          if(stage.previousStage && this.emptySpaceTrackerForStage.right === stage.index) {
+            var left = stage.left - 27;
+            stage.extendHeader(left, this.headerExtender);
+          }
+          
         //}
         
       };
 
       this.indicator.increaseHeaderLengthRight = function(index) {
-
+        //console.log("Viola");
         //if(this.kanvas.allStageViews[index - 1]) {
           
           var stage = this.kanvas.allStageViews[index];
-          var left = (stage.left + stage.myWidth) - 2;
-          stage.extendHeader(left, this.headerExtender);
+          if(stage.nextStage && this.emptySpaceTrackerForStage.left === stage.index) {
+            var left = (stage.left + stage.myWidth) - 4;
+            stage.extendHeader(left, this.headerExtender);
+          }
+          
         //} else {
           //this.increaseHeaderLengthLeft(-1);
         //}
