@@ -27,7 +27,7 @@ class Sample < ActiveRecord::Base
   
   before_create do |sample|
     sample.samples_wells.each do |sample_well|
-      sample_well.well_layout_id = sample.well_layout_id
+      sample_well.well_layout_id = sample.well_layout_id if sample_well.well_layout_id.nil?
     end
   end
 
@@ -43,5 +43,14 @@ class Sample < ActiveRecord::Base
       new_sample.samples_wells << new_sample_well
     end
     new_sample
+  end
+  
+  def destroy
+    if samples_wells.count > 0
+      errors.add(:base, "sample is linked to well")
+      false
+    else
+      super
+    end
   end
 end

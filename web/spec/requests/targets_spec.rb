@@ -97,6 +97,15 @@ describe "Targets API", type: :request do
       json = JSON.parse(response.body)
       expect(json["errors"]).not_to be_nil
     end
+    
+    it 'target disallowed if it is linked' do
+      post "/experiments/#{@experiment.id}/targets/#{@target1.id}/links", {wells:[{well_num: 2}]}.to_json, http_headers
+      expect(response).to be_success
+      delete "/experiments/#{@experiment.id}/targets/#{@target1.id}", { :format => 'json' }
+      expect(response.response_code).to eq(422)
+      json = JSON.parse(response.body)
+      expect(json["target"]["errors"]).not_to be_nil
+    end
   end
   
   describe "#link" do  

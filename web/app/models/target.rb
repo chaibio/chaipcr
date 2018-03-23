@@ -32,7 +32,7 @@ class Target < ActiveRecord::Base
   
   before_create do |target|
     target.targets_wells.each do |target_well|
-      target_well.well_layout_id = target.well_layout_id
+      target_well.well_layout_id = target.well_layout_id if target_well.well_layout_id.nil?
     end
   end
   
@@ -53,6 +53,15 @@ class Target < ActiveRecord::Base
       new_target.targets_wells << new_target_well
     end
     new_target
+  end
+  
+  def destroy
+    if targets_wells.count > 0
+      errors.add(:base, "target is linked to well")
+      false
+    else
+      super
+    end
   end
   
   protected

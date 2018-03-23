@@ -54,33 +54,25 @@ class SamplesController < ApplicationController
   end
 
   def links
-    if @experiment && @sample
-      if @sample.belongs_to_experiment?(@experiment)
-        params[:wells].each do |well_num|
-          link_well(well_num)
-        end
-      else
-        @sample.errors.add(:base, "sample doesn't belong to this experiment")
-      end
-      
-      respond_to do |format|
-        format.json { render "show", :status => (@sample.errors.empty?)? :ok : :unprocessable_entity}
+    if @sample.belongs_to_experiment?(@experiment)
+      params[:wells].each do |well_num|
+        link_well(well_num)
       end
     else
-      render json: {errors: "The #{(@experiment == nil)? "experiment" : "sample"} is not found"}, status: :not_found
+      @sample.errors.add(:base, "sample doesn't belong to this experiment")
+    end
+    
+    respond_to do |format|
+      format.json { render "show", :status => (@sample.errors.empty?)? :ok : :unprocessable_entity}
     end
   end
   
   def unlinks
-    if @experiment && @sample
-      params[:wells].each do |well_num|
-        unlink_well(well_num)
-      end
-      respond_to do |format|
-        format.json { render "show", :status => (@sample.errors.empty?)? :ok : :unprocessable_entity}
-      end
-    else
-      render json: {errors: "The #{(@experiment == nil)? "experiment" : "sample"} is not found"}, status: :not_found
+    params[:wells].each do |well_num|
+      unlink_well(well_num)
+    end
+    respond_to do |format|
+      format.json { render "show", :status => (@sample.errors.empty?)? :ok : :unprocessable_entity}
     end
   end
   
