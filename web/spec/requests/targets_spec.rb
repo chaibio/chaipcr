@@ -176,10 +176,9 @@ describe "Targets API", type: :request do
     before(:each) do
       post "/experiments/#{@experiment.id}/targets/#{@target1.id}/links", {wells:[{well_num: 16}]}.to_json, http_headers
       post "/experiments/#{@experiment.id}/targets/#{@target2.id}/links", {wells:[{well_num: 16}]}.to_json, http_headers
-      @experiment_import = @experiment
+      @experiment_standard = @experiment
       @experiment = create_experiment_with_one_stage("test1")
-      @experiment.targets_well_layout_id = @experiment_import.well_layout.id
-      @experiment.save
+      put "/experiments/#{@experiment.id}", {experiment: {standard_experiment_id: @experiment_standard.id}}.to_json, http_headers
     end
     
     it 'targets' do

@@ -79,9 +79,9 @@ class TargetsController < ApplicationController
       if @target.belongs_to_experiment?(@experiment)
         params[:wells].each do |well|
           if well.is_a? Integer
-            link_well(well, nil, nil)
+            link_well(well, nil)
           else
-            link_well(well[:well_num], well[:well_type], well[:concentration])
+            link_well(well[:well_num], well)
           end
         end
       else
@@ -111,10 +111,13 @@ class TargetsController < ApplicationController
   
   protected
   
-  def link_well(well_num, well_type, concentration)
+  def link_well(well_num, target_well_params)
     target_well = TargetsWell.find_or_create(@target, @experiment.well_layout.id, well_num)
-    target_well.well_type = well_type if !well_type.nil?
-    target_well.concentration = concentration if !concentration.nil?
+    if target_well_params
+      target_well.well_type = target_well_params[:well_type] if !target_well_params[:well_type].nil?
+      target_well.concentration = target_well_params[:concentration] if !target_well_params[:concentration].nil?
+      target_well.omit = target_well_params[:omit] if !target_well_params[:omit].nil?
+    end
     ret = target_well.save
     if !ret
       target_well.errors.full_messages.each do |message|

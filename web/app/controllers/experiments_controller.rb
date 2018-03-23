@@ -186,12 +186,14 @@ class ExperimentsController < ApplicationController
       render json: {errors: "The experiment is not found"}, status: :not_found
       return
     end
+    @experiment.targets_well_layout_id = WellLayout.for_experiment(params[:experiment][:standard_experiment_id]).pluck(:id).first if params[:experiment][:standard_experiment_id]
     ret = @experiment.update_attributes(experiment_params)
     respond_to do |format|
       format.json { render "show", :status => (ret)? :ok :  :unprocessable_entity}
     end
   end
 
+  
 	swagger_path '/experiments/{id}/copy' do
 		operation :post do
 			key :summary, 'Copy Experiment'

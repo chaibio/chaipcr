@@ -17,16 +17,24 @@
 # limitations under the License.
 #
 class Target < ActiveRecord::Base
+  include ProtocolLayoutHelper
+  
   belongs_to :well_layout
   has_many :targets_wells, dependent: :destroy
   
   attr_accessor :imported
   
-  validates_presence_of :well_layout_id, :name, :channel
+  validates_presence_of :name, :channel
   validates :channel, :inclusion => {:in=>1..2, :message => "%{value} is not 1 and 2"}
   ACCESSIBLE_ATTRS = [:well_layout_id, :name, :channel]
   
   validate :validate
+  
+  before_create do |target|
+    target.targets_wells.each do |target_well|
+      target_well.well_layout_id = target.well_layout_id
+    end
+  end
   
   def belongs_to_experiment?(experiment)
     if well_layout_id == experiment.well_layout.id
@@ -35,6 +43,16 @@ class Target < ActiveRecord::Base
       self.imported = true
     end
     !imported.nil?
+  end
+  
+  def copy
+    new_target = copy_helper
+    targets_wells.each do |target_well|
+      new_target_well = target_well.copy_helper
+      new_target_well.validate_targets_in_well = false
+      new_target.targets_wells << new_target_well
+    end
+    new_target
   end
   
   protected

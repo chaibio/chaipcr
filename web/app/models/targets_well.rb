@@ -24,7 +24,7 @@ class TargetsWell < ActiveRecord::Base
   
   attr_accessor :validate_targets_in_well
   
-  validates_presence_of :well_num, :target_id
+  validates_presence_of :well_num
   validates :well_num, :inclusion => {:in=>1..16, :message => "%{value} is not between 1 and 16"}
   validates :well_type, inclusion: { in: ["positive_control", "negative_control", "standard", "unknown", nil],
      message: "'%{value}' is not a valid type" }
@@ -49,7 +49,7 @@ class TargetsWell < ActiveRecord::Base
       errors.add(:well_type, "standard cannot be supported for imported target")
     end
     if new_record? && validate_targets_in_well != false
-      if joins(:target).where(:well_layout_id=>well_layout_id, :well_num=>well_num, :channel=>target.channel).exists?
+      if joins(:target).where(["targets_wells.well_layout_id=? and targets_wells.well_num=? and targets.channel=?", well_layout_id, well_num, target.channel]).exists?
         errors.add(:target_id, "#{target.channel} is already occupied in well #{well_num}")
       end
     end

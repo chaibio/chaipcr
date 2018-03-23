@@ -24,7 +24,7 @@ class SamplesWell < ActiveRecord::Base
     
   attr_accessor :validate_samples_in_well
   
-  validates_presence_of :well_layout_id, :well_num, :sample_id
+  validates_presence_of :well_num
   validates :well_num, :inclusion => {:in=>1..16, :message => "%{value} is not between 1 and 16"}
   validate :validate
   

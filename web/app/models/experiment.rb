@@ -120,6 +120,7 @@ class Experiment < ActiveRecord::Base
   end
 
   validates :name, presence: true
+  validate :validate
 
   belongs_to :experiment_definition
   
@@ -236,5 +237,15 @@ class Experiment < ActiveRecord::Base
         }
        }
       }
+  end
+  
+  protected
+  
+  def validate
+    if targets_well_layout_id_changed? && !targets_well_layout_id_was.blank?
+      if Target.joins("inner join targets_wells on targets_wells.target_id = targets.id").where(["targets.well_layout_id=? and targets_wells.well_layout_id=?", targets_well_layout_id_was, well_layout.id]).exists?
+        errors.add(:targets_well_layout_id, "cannot be changed because targets are already linked")
+      end
+    end
   end
 end

@@ -22,17 +22,25 @@ class Sample < ActiveRecord::Base
   belongs_to :well_layout
   has_many :samples_wells, dependent: :destroy
   
-  validates_presence_of :well_layout_id, :name
+  validates_presence_of :name
   ACCESSIBLE_ATTRS = [:well_layout_id, :name]
   
+  before_create do |sample|
+    sample.samples_wells.each do |sample_well|
+      sample_well.well_layout_id = sample.well_layout_id
+    end
+  end
+
   def belongs_to_experiment?(experiment)
     well_layout_id == experiment.well_layout.id
   end
   
   def copy
     new_sample = copy_helper
-    samples_wells.each do ||
-      new_sample.samples_wells << samples_wells.copy_helper
+    samples_wells.each do |sample_well|
+      new_sample_well = sample_well.copy_helper
+      new_sample_well.validate_samples_in_well = false
+      new_sample.samples_wells << new_sample_well
     end
     new_sample
   end
