@@ -181,11 +181,18 @@ start_unicorn () {
 }
 
 start_julia () {
+	echo starting
 	if [ -e /root/chaipcr/bioinformatics/juliaserver.jl ] && [ -e /usr/bin/julia ]
 	then
-		echo starting julia
-		JULIA_ENV=production /usr/bin/julia /root/chaipcr/bioinformatics/juliaserver.jl || true
-		echo julia exit
+		while true
+		do
+			echo starting julia
+			JULIA_ENV=production julia -e 'push!(LOAD_PATH, "/root/.julia/v0.6/QpcrAnalysis/src/"); include("/root/chaipcr/bioinformatics/juliaserver.jl")' || true
+			echo julia exit
+			sleep 10
+		done
+	else
+		echo julia server script not exectuting.
 	fi
 }
 
@@ -238,7 +245,7 @@ run_clean_user_tokens () {
 			echo "Clonning MySQL sockets file"
 			ln -s /run/mysqld/mysqld.sock /tmp/mysql.sock
 		else
-			echo "ERROR: MySQL sockets file not found (/run/mysqld/mysqld.sock)" 
+			echo "MySQL sockets file not found." 
 		fi
 	fi
 
@@ -247,7 +254,7 @@ run_clean_user_tokens () {
 		echo julia is running
 	else
 		echo starting julia
-		start_julia &
+		start_julia>> $log_file 2>&1 &
 	fi
 }
 
