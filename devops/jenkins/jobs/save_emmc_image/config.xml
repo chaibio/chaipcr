@@ -173,6 +173,7 @@ echo done connection check.
 
 ls
 echo now at $(pwd)
+rm build_report.xml
 branch_param=
 rm -r tmp || true
 echo build_branch is $build_branc
@@ -375,6 +376,7 @@ fi
 cd tmp/chaipcr
 cd devops
 echo &apos;performing ./process_raw_image.sh &quot;${grep_sdcard_dir}&quot; &quot;${tmp_sdcard_dir}&quot;&apos;
+echo fs version $(cat factory_settings_sdcard/fs_version.inf)
 
 if sudo ./process_raw_image.sh &quot;${grep_sdcard_dir}&quot; &quot;${tmp_sdcard_dir}&quot;
 then
@@ -433,7 +435,7 @@ else
 fi
 
 sudo rm -r $grep_sdcard_dir || true
-cd ..
+cd ../../..
 
 build_report_filename=build_report.xml
 #_$BUILD_NUMBER.xml

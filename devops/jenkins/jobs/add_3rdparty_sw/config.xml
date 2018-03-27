@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version='1.1' encoding='UTF-8'?>
 <project>
   <actions/>
   <description>Build Chaibio shoftware</description>
@@ -17,6 +17,7 @@
           <name>build_machine</name>
           <description>Building machine</description>
           <defaultValue>10.0.100.240</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>bypass_julia</name>
@@ -27,6 +28,7 @@
           <name>download_prefix</name>
           <description>Download folder URL</description>
           <defaultValue>http://10.0.1.20/download</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>building_version</name>
@@ -36,7 +38,6 @@
               <string>v0.6.2</string>
               <string>v0.6.1</string>
               <string>v0.6.0</string>
-              <string>release-0.5</string>
               <string>release-0.6</string>
             </a>
           </choices>
@@ -735,6 +736,7 @@ apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack
 if $bypass_julia
 then
        echo Bypassing JULIA
+       touch /etc/bypassjulia.flag
        exit 0
 fi
 

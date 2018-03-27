@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version='1.1' encoding='UTF-8'?>
 <project>
   <actions/>
   <description>Build Chaibio shoftware</description>
@@ -13,6 +13,7 @@
           <name>build_machine</name>
           <description>Building machine</description>
           <defaultValue>10.0.100.240</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>bypass_pru</name>
@@ -292,9 +293,7 @@ exit 1
 #rm /usr/lib/julia/sys-debug.*
 
 echo Setup MySQL
-
 mkdir /data /perm || true
-
 systemctl stop mysql.service
 mount /dev/mmcblk1p2 /data || true
 mount /dev/mmcblk1p3 /perm || true
@@ -343,6 +342,12 @@ sudo swapon /sdcard/upgrade/swapfile
 sudo swapon -s
 
 free -m
+</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>
 echo browser compile
 cd /sdcard/upgrade/
 rm -r compile-browser || true
@@ -380,7 +385,14 @@ cd /sdcard/upgrade/
 rm -r compile-browser
 cd
 echo done compiling browser
+</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo compiling realtime
 
+cd /sdcard/upgrade/
 free -m
 sync
 
@@ -415,11 +427,43 @@ cp ~/chaipcr/deploy/device/realtime.service /lib/systemd/system/
 systemctl enable realtime.service
 
 sync
-
-echo precompile julia packages if needed
+</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo precompile julia packages if needed
+if [ -e /etc/bypassjulia.flag ]
+then
+    echo  Bypass julia build
+    return 0
+fi
 if [ -e /root/chaipcr/bioinformatics/juliaserver.jl ]
 then
-      time julia-debug -v
+      time julia -v
+      apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential || true
+      ntpdate -b -s -u pool.ntp.org
+
+      sudo apt-get -q -y install gcc-4.8 g++-4.8 
+      sudo apt-get -q -y install libgfortran-6-dev liblapack3
+      sudo apt-get -q -y install libblas3gf liblapack3gf 
+      sudo apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libc-bin  || exit 1
+apt-get -f -y -q install
+
+      apt-get install -q -y libarpack2 libblas-common libblas3 libfftw3-double3 libfftw3-single3 libgfortran3 liblapack3 libllvm3.8 libmetis5 libopenblas-base libunwind8  || exit 1
+apt-get -f -y -q install
+
+      sudo apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas-common libblas3 libfftw3-double3 libfftw3-single3 libgfortran3 liblapack3 libllvm3.8 libmetis5 libopenblas-base libunwind8 liblapack-dev liblapack3 libopenblas-base libopenblas-dev || exit 1
+apt-get -f -y -q install
+
+      apt-get -y -q install evtest git automake libtool || exit 1 
+      apt-get -f -y -q install
+
+      apt-get  -y -q install  libblas3gf libblas3gf
+      apt-get  -y -q install  parted linux-headers-`uname -r` parted automake build-essential cmake curl device-tree-compiler evtest g++ gfortran git hdf5-tools i2c-tools libarpack2 libblas-common libblas-dev libblas3 libedit-dev libfftw3-dev libfftw3-double3 libfftw3-single3 libfontconfig1-dev libfreetype6-dev libgfortran3 libgfortran3 libgmp3-dev liblapack3 liblapack3gf libllvm3.8 libmetis5 libmpfr-dev libopenblas-base libopenblas-dev libqt4-webkit libssl-dev libtool libunwind8 libxcursor-dev libxext-dev libxfixes-dev libxft-dev libxi-dev libxml2-dev libxrandr-dev libxrender-dev libxslt-dev lsb-release m4 nodejs ntp ntpdate parted pkg-config python sshpass unzip
+      apt-get install -y -q liblapack-dev
+      apt install -y -q liblapack-dev libblas-dev
+
       sed -i &apos;1i using DataArrays&apos; /root/chaipcr/bioinformatics/juliaserver.jl
       sed -i &apos;1i push!(LOAD_PATH, &quot;/root/.julia/v0.6/QpcrAnalysis/src/&quot;)&apos; /root/chaipcr/bioinformatics/juliaserver.jl
 
@@ -456,7 +500,6 @@ fi
 
 cd /root/chaipcr/bioinformatics/QpcrAnalysis
 #cp __init__.jl __init__.jl.org
-#sed -i &apos;1ireturn nothing&apos; __init__.jl
 sed -i &apos;s/# MySQL./return nothing \n# MySQL./&apos; __init__.jl
 rm -r ~/.julia
 
@@ -549,14 +592,21 @@ EOF
 echo First QpcrAnalysis package installation run
 for retryloop in 1 2 3 4 5 6
 do
+    if [ -e ~/.julia/v0.6/QpcrAnalysis/ ]
+    then
+         echo QocrAnalysis package created before.. bypassing pinning.
+         break
+    fi
+
       if [ $retryloop -eq 3 ]  || [ $retryloop -eq 5 ]
       then
            echo cleaning .julia folder
            rm -r ~/.julia
       fi
 
-     JULIA_ENV=production julia-debug testQpcrAnalysis.jl --compile=all
+     JULIA_ENV=production julia testQpcrAnalysis.jl --compile=all
     echo precompiling result is $?
+
     if [ -e ~/.julia/v0.6/QpcrAnalysis/ ]
     then
          echo packages pinned successfully
@@ -575,29 +625,45 @@ else
 fi
 
 echo end of test result: $?
-cp __init__.jl.org __init__.jl
 cp -r * ~/.julia/v0.6/QpcrAnalysis/src/
-
 rm testQpcrAnalysis.jl
+
 echo about to start using QpcrAnalysis
-JULIA_ENV=production julia-debug -e &apos;using QpcrAnalysis;Pkg.build(&quot;QpcrAnalysis&quot;)&apos; --compile=all
+JULIA_ENV=production julia -e &apos;push!(LOAD_PATH, &quot;/root/.julia/v0.6/QpcrAnalysis/src/&quot;);using QpcrAnalysis;&apos; --compile=all
 echo tested using QpcrAnalysis
+
+if [ -e /root/.julia/lib/v0.6/QpcrAnalysis.ji ]
+then
+      echo QpcrAnalysis package precompiled.
+else
+      echo Error precompiling QpcrAnalysis package
+      exit 1
+fi
+
 
 fi
 
-apt-get -q -y --fix-broken install
+exit 0
+</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo closing swap file
 sync
 swapoff -a
 /sbin/swapoff  -a
 
-rm /sdcard/upgrade/swapfile
 echo clearing more space and removing .git julia folders
+
+apt-get -q -y --fix-broken install
+
+rm /sdcard/upgrade/swapfile
 cd
 find . -name .git -execdir rm -r {} \;
 find . -name *.o  -exec rm {} \;
 
-exit 0
-</command>
+exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
@@ -987,6 +1053,11 @@ echo all done for $build_machine, you can call create_factory_settings_sdcard jo
 
 exit 0</command>
     </hudson.tasks.Shell>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command></command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
   </builders>
   <publishers>
     <com.chikli.hudson.plugin.naginator.NaginatorPublisher plugin="naginator@1.17.2">
