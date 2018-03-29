@@ -60,4 +60,43 @@ describe("Testing allowAdminToggle", function() {
         compiledScope.configureSwitch("admin");
         expect(angular.element(compiledScope.dragElem).parent().css("background-color")).toEqual("rgb(141, 198, 63)");
     });
+
+    it("It should test processMovement method", function() {
+
+        compiledScope.data = 'admin';
+        spyOn(compiledScope, "sendData").and.returnValue(true);
+        compiledScope.$digest();
+        var pos = 1;
+        var val = "user";
+        compiledScope.processMovement(pos, val);
+        expect(compiledScope.sendData).toHaveBeenCalled();
+    });
+
+    it("It should test processMovement method when pos > 6", function() {
+
+        compiledScope.data = 'admin';
+        spyOn(compiledScope, "sendData").and.returnValue(true);
+        compiledScope.$digest();
+        var pos = 8;
+        var val = "user";
+        compiledScope.processMovement(pos, val);
+        expect(compiledScope.sendData).toHaveBeenCalled();
+    });
+
+    it("It should test sendData method", function() {
+
+        compiledScope.data = 'admin';
+        compiledScope.$digest();
+        compiledScope.sendData();
+        expect(compiledScope.data).toEqual("default");
+    });
+
+    it("It should test sendData method, when data !== admin", function() {
+
+        compiledScope.data = 'smething else';
+        compiledScope.$digest();
+        compiledScope.sendData();
+        expect(compiledScope.data).toEqual("admin");
+        expect(1).toEqual(2);
+    });
 });
