@@ -97,6 +97,5 @@ describe("Testing allowAdminToggle", function() {
         compiledScope.$digest();
         compiledScope.sendData();
         expect(compiledScope.data).toEqual("admin");
-        expect(1).toEqual(2);
     });
 });
