@@ -174,4 +174,73 @@ describe("Testing arrow directive", function() {
         expect(compiledScope.applyValues).toHaveBeenCalled();
         expect(step.previousStep.circle.manageClick).toHaveBeenCalled();
     });
+
+    it("It should test managePrevious method when step has no previousStep", function() {
+
+        var step = {
+            previousStep: null,
+            parentStage: {
+                previousStage: {
+                    childSteps: [
+                        {
+                            circle: {
+                                manageClick: function() {}
+                            }
+                        }
+                    ]
+                }
+            }
+        };
+
+        compiledScope.applyValuesFromOutSide = function() {
+
+        };
+
+        spyOn(compiledScope, "applyValuesFromOutSide").and.returnValue(true);     
+        spyOn(step.parentStage.previousStage.childSteps[0].circle, "manageClick").and.returnValue(true);
+
+        compiledScope.managePrevious(step);
+
+        expect(compiledScope.applyValuesFromOutSide).toHaveBeenCalled();
+        expect(step.parentStage.previousStage.childSteps[0].circle.manageClick).toHaveBeenCalled();
+
+
+    });
+
+    it("It should test managePrevious method when step is the very first step", function() {
+
+        var step = {
+            previousStep: null,
+            parentStage: {
+                previousStage: null,
+                nextStage: {
+                    nextStage: null,
+                    childSteps: [
+                        {
+                            circle: {
+                                manageClick: function() {}
+                            }
+                        }
+                    ]
+                }
+                    
+                        
+                }
+            };
+
+        compiledScope.applyValues = function() {
+
+        };
+        
+        var targetStage = step.parentStage.nextStage.childSteps[0].circle;
+        
+        spyOn(targetStage, "manageClick").and.returnValue(true);
+        spyOn(compiledScope, "applyValues").and.returnValue(true);
+
+        compiledScope.managePrevious(step);
+
+        expect(targetStage.manageClick).toHaveBeenCalled();
+        expect(compiledScope.applyValues).toHaveBeenCalled();
+
+    });
 });
