@@ -497,29 +497,7 @@ exit 0</command>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>#echo Setup MySQL
-#systemctl stop mysql.service
-#mount /dev/mmcblk1p2 /data
-#mv /var/lib/mysql /data/
-#sed -i &quot;s,datadir.*=.*,datadir=/data/mysql,g&quot; /etc/mysql/my.cnf # Edit /etc/mysql/my.cnf and change datadir to /data/mysql
-#sed -i &quot;s,datadir.*=.*,datadir=/data/mysql,g&quot; /etc/mysql/mariadb.conf.d/50-server.cnf # Edit /etc/mysql/my.cnf and change datadir to /data/mysql
-
-#systemctl start mysql.service
-
-#sync
-
-# the latest version sofar.. however, lets stay as we are for now.
-#echo build latest stable poco 1.7.6
-#cd
-#wget --no-check-certificate &quot;https://pocoproject.org/releases/poco-1.7.6/poco-1.7.6.tar.gz&quot;
-#tar xpvzf poco-1.7.6.tar.gz
-#cd poco-1.7.6
-#./configure
-#make
-#make install
-#cd
-#rm -rf poco-1.7.6* poco-1.7.6.tar.gz
-
+      <command>echo installing POCO
 wget &quot;http://pocoproject.org/releases/poco-1.6.1/poco-1.6.1.tar.gz&quot;  || exit 1
 tar xpvzf poco-1.6.1.tar.gz  || exit 1
 cd poco-1.6.1
@@ -546,15 +524,14 @@ exit 0
       <command>echo cleanup without envs
 
 apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential || true
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get install -q -y gfortran ntpdate || exit 1
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get install -q -y gfortran ntpdate || exit 1
 ntpdate -b -s -u pool.ntp.org
 sync
 
 apt-get autoremove -q -y --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data libx11* libxcb* || exit 1
 
 echo cleanup with envs
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get autoremove -q -y --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data libx11* libxcb* || exit 1
-
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get autoremove -q -y --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data libx11* libxcb* || exit 1
 
 apt-get clean
 apt-get autoclean
@@ -567,7 +544,7 @@ echo building tslib
 cd
 
 echo installing with envs..
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get -y -q install i2c-tools evtest git automake libtool  || exit 1
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get -y -q install i2c-tools evtest git automake libtool  || exit 1
 echo with no envs
 apt-get -y -q install i2c-tools evtest git automake libtool  || exit 1
 
@@ -638,7 +615,7 @@ apt-get -y -q upgrade
 
 apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential || true
 
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get install -q -y gfortran ntpdate || exit 1
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get install -q -y gfortran ntpdate || exit 1
 
 df -h
 exit 0</command>
@@ -647,11 +624,7 @@ exit 0</command>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo downloading and installing Julia
-
-
-
 sync
-
 #pufreq-set --governor ondemand 
 echo 1500 &gt; /proc/sys/kernel/hung_task_timeout_secs
 
@@ -663,12 +636,12 @@ echo unmounting any sdcard folders
 umount /sdcard/*
 umount /dev/mmcblk0p*
 
-LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
+LC_ALL=C /sbin/sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
 ,,0x83,*
 __EOF__
 
-partprobe /dev/mmcblk0
-mkfs.ext4 /dev/mmcblk0p1 -F
+/sbin/partprobe /dev/mmcblk0
+/sbin/mkfs.ext4 /dev/mmcblk0p1 -F
 mkdir -p /sdcard/upgrade
 if mount /dev/mmcblk0p1 /sdcard/upgrade/
 then
@@ -695,7 +668,295 @@ sudo swapon /sdcard/upgrade/swapfile
 sudo swapon -s
 
 free -m
-echo installing QT
+
+apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3
+
+if $bypass_julia
+then
+       echo Bypassing JULIA
+       touch /etc/bypassjulia.flag
+       exit 0
+fi
+
+apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3  || exit 1
+
+mkdir -p ~/julia-compile
+cd ~/julia-compile
+
+
+default_slim_arch_filename=&quot;julia-$building_version-slim-default.tgz&quot;
+echo Slim arch filename $default_slim_arch_filename
+wget $download_prefix/$default_slim_arch_filename || exit 1
+
+sync
+
+echo installing julia
+
+
+
+
+if tar xf $default_slim_arch_filename -C / julia/usr --strip-components=1 
+then
+    echo &quot;extracted julia usr files&quot;
+else
+   echo &quot;Error extracting julia&quot;
+   exit 1
+fi
+
+sync
+
+echo &quot;export JULIA_PKGDIR=/root/.julia&quot;&gt;&gt;~/.profile
+source ~/.profile
+sync
+sleep 60
+
+if [ -e /usr/share/julia/bin/julia ] &amp;&amp; [ ! -e /usr/bin/julia ]
+then
+	ln -sf /usr/share/julia/bin/julia /usr/bin/julia
+fi
+
+#============== test
+echo test finished. cleaning..
+sync
+
+
+      apt-get -y -q install g++ gcc ntp ntpdate git unzip automake sshpass build-essential || true
+      ntpdate -b -s -u pool.ntp.org
+
+      sudo apt-get -q -y install libgfortran-6-dev liblapack3
+      sudo apt-get -q -y install libblas3gf liblapack3gf 
+      sudo apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libc-bin  || exit 1
+apt-get -f -y -q install
+
+      apt-get install -q -y libarpack2 libblas-common libblas3 libfftw3-double3 libfftw3-single3 libgfortran3 liblapack3 libllvm3.8 libmetis5 libopenblas-base libunwind8  || exit 1
+apt-get -f -y -q install
+
+      sudo apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas-common libblas3 libfftw3-double3 libfftw3-single3 libgfortran3 liblapack3 libllvm3.8 libmetis5 libopenblas-base libunwind8 liblapack-dev liblapack3 libopenblas-base libopenblas-dev || exit 1
+apt-get -f -y -q install
+
+      apt-get -y -q install evtest git automake libtool || exit 1 
+      apt-get -f -y -q install
+
+      apt-get  -y -q install  libblas3gf libblas3gf
+      apt-get  -y -q install  parted linux-headers-`uname -r` parted automake build-essential cmake curl device-tree-compiler evtest g++ gfortran git hdf5-tools i2c-tools libarpack2 libblas-common libblas-dev libblas3 libedit-dev libfftw3-dev libfftw3-double3 libfftw3-single3 libfontconfig1-dev libfreetype6-dev libgfortran3 libgfortran3 libgmp3-dev liblapack3 liblapack3gf libllvm3.8 libmetis5 libmpfr-dev libopenblas-base libopenblas-dev libqt4-webkit libssl-dev libtool libunwind8 libxcursor-dev libxext-dev libxfixes-dev libxft-dev libxi-dev libxml2-dev libxrandr-dev libxrender-dev libxslt-dev lsb-release m4 nodejs ntp ntpdate parted pkg-config python sshpass unzip
+      apt-get install -y -q liblapack-dev
+      apt install -y -q liblapack-dev libblas-dev
+      apt install -y -q libmysqlclient-dev
+
+      sed -i &apos;1i using DataArrays&apos; /root/chaipcr/bioinformatics/juliaserver.jl
+      sed -i &apos;1i push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;)&apos; /root/chaipcr/bioinformatics/juliaserver.jl
+
+      echo Build time- adding pre-requesits
+      free -m
+      apt-get update
+      apt-get -q -y --fix-broken install
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get -q -y install libgtk-3-0
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get -q -y install libpango1.0-0 
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get -q -y install libglib2.0-0
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get -q -y install libcairo2
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get -q -y install gettext
+
+apt-get -q -y --fix-broken install
+
+DEBIAN_FRONTEND=noninteractive apt-get -q -y install gettext
+DEBIAN_FRONTEND=noninteractive apt-get -q -y install libgtk-3-0
+apt-get -y -q install libpango1.0-0 libglib2.0-0 libcairo2
+
+echo $(date) Performing precompilling julia packages
+if [ -e /tmp/mysql.sock ]
+then
+	echo &quot;MySQL sockets file found&quot;
+else
+	if [ -e /run/mysqld/mysqld.sock ]
+	then
+		echo &quot;Clonning MySQL sockets file&quot;
+		ln -s /run/mysqld/mysqld.sock /tmp/mysql.sock
+	else
+		echo &quot;MySQL sockets file not found.&quot; 
+		exit 1
+	fi
+fi
+
+git config --global user.email &apos;info@chaibio.org&apos;
+git config --global user.name &apos;Chaibio qPCR&apos;
+git config --global github.user &quot;Chaibio&quot;
+
+
+
+
+
+
+
+
+
+
+
+cd
+rm -r ~/julia-compile
+sync
+
+sync
+fsck /dev/mmcblk1p1 -y -f
+fsck /dev/mmcblk0p1 -y -f
+
+sync
+
+sleep 60
+
+echo &quot;Setting up Julia: Initializing rep&quot;
+julia --print &quot;Pkg.init()&quot;
+sync
+sleep 60
+
+
+
+
+rm -r ~/.julia
+
+echo &quot;Setting up Julia: Updating rep&quot;
+julia --print &quot;Pkg.init()&quot;
+julia --print &quot;Pkg.update()&quot;
+sync
+sleep 60
+echo precompiling mandatory packages.
+cat &lt;&lt;EOF &gt;&gt; chaibio_packages.jl
+
+println(&quot;Setting up Julia: Adding packages&quot;)
+
+       println(&quot;installing library: Compat&quot;);Pkg.add(&quot;Compat&quot;,v&quot;0.61.0&quot;,v&quot;0.61.1-&quot;)
+       println(&quot;installing library: SHA&quot;);Pkg.add(&quot;SHA&quot;,v&quot;0.5.6&quot;,v&quot;0.5.7-&quot;)
+       println(&quot;installing library: URIParser&quot;); Pkg.add(&quot;URIParser&quot;,v&quot;0.3.1&quot;,v&quot;0.3.2-&quot;)
+       println(&quot;ADDING: BinDeps&quot;); Pkg.add(&quot;BinDeps&quot;,v&quot;0.8.0&quot;,v&quot;0.8.1-&quot;)
+       println(&quot;installing library Blosc&quot;); Pkg.add(&quot;Blosc&quot;,v&quot;0.3.0&quot;,v&quot;0.3.1-&quot;)
+       println(&quot;installing library BinaryProvider&quot;); Pkg.add(&quot;BinaryProvider&quot;,v&quot;0.2.5&quot;,v&quot;0.2.6-&quot;)
+
+
+       println(&quot;installing library: FixedPointNumbers&quot;); Pkg.add(&quot;FixedPointNumbers&quot;,v&quot;0.4.6&quot;,v&quot;0.4.7-&quot;)
+       println(&quot;installing library: ColorTypes&quot;); Pkg.add(&quot;ColorTypes&quot;,v&quot;0.6.7&quot;,v&quot;0.6.8-&quot;)
+       println(&quot;installing library: Reexport&quot;); Pkg.add(&quot;Reexport&quot;,v&quot;0.1.0&quot;,v&quot;0.1.1-&quot;)
+       println(&quot;installing library: Colors&quot;); Pkg.add(&quot;Colors&quot;,v&quot;0.8.2&quot;,v&quot;0.8.3-&quot;)
+       println(&quot;installing library: NaNMath&quot;); Pkg.add(&quot;NaNMath&quot;,v&quot;0.3.1&quot;,v&quot;0.3.2-&quot;)
+	println(&quot;ADDING: MathProgBase&quot;); Pkg.add(&quot;MathProgBase&quot;,v&quot;0.6.0&quot;,v&quot;0.6.1-&quot;)
+
+
+       println(&quot;installing library: Graphics&quot;); Pkg.add(&quot;Graphics&quot;,v&quot;0.2.0&quot;,v&quot;0.2.1-&quot;)
+       println(&quot;installing library Cairo&quot;); Pkg.add(&quot;Cairo&quot;,v&quot;0.5.1&quot;,v&quot;0.5.2-&quot;)
+       println(&quot;installing library: Gtk&quot;); Pkg.add(&quot;Gtk&quot;,v&quot;0.13.1&quot;,v&quot;0.13.2-&quot;)
+
+       println(&quot;installing library: IntervalSets&quot;); Pkg.add(&quot;IntervalSets&quot;,v&quot;0.2.0&quot;,v&quot;0.2.1-&quot;)
+       println(&quot;installing library: RoundingIntegers&quot;); Pkg.add(&quot;RoundingIntegers&quot;,v&quot;0.0.3&quot;,v&quot;0.0.4-&quot;)
+	println(&quot;ADDING: DataStructures&quot;); Pkg.add(&quot;DataStructures&quot;, v&quot;0.7.4&quot;, v&quot;0.7.5-&quot;)
+       println(&quot;installing library: Reactive&quot;); Pkg.add(&quot;Reactive&quot;,v&quot;0.6.0&quot;,v&quot;0.6.1-&quot;)
+
+       println(&quot;installing library: Missings&quot;); Pkg.add(&quot;Missings&quot;,v&quot;0.2.7&quot;,v&quot;0.2.8-&quot;)
+       println(&quot;installing library: WeakRefStrings&quot;); Pkg.add(&quot;WeakRefStrings&quot;,v&quot;0.4.3&quot;,v&quot;0.4.4-&quot;)
+       println(&quot;installing library: NamedTuples &quot;); Pkg.add(&quot;NamedTuples&quot;,v&quot;4.0.0&quot;,v&quot;4.0.1-&quot;)
+
+	println(&quot;ADDING: Nullables&quot;); Pkg.add(&quot;Nullables&quot;,v&quot;0.0.3&quot;, v&quot;0.0.4-&quot;)
+
+	println(&quot;ADDING: JSON&quot;); Pkg.add(&quot;JSON&quot;,v&quot;0.16.4&quot;, v&quot;0.16.5-&quot;)
+       println(&quot;installing library: CategoricalArrays&quot;); Pkg.add(&quot;CategoricalArrays&quot;,v&quot;0.3.6&quot;,v&quot;0.3.7-&quot;)
+
+       println(&quot;installing library: Calculus&quot;); Pkg.add(&quot;Calculus&quot;,v&quot;0.2.2&quot;,v&quot;0.2.3-&quot;)
+
+       println(&quot;installing library: TranscodingStreams&quot;); Pkg.add(&quot;TranscodingStreams&quot;,v&quot;0.5.1&quot;,v&quot;0.5.2-&quot;)
+       println(&quot;installing library: CodecZlib&quot;); Pkg.add(&quot;CodecZlib&quot;,v&quot;0.4.2&quot;,v&quot;0.4.3-&quot;)
+       println(&quot;installing library: DataStreams&quot;); Pkg.add(&quot;DataStreams&quot;,v&quot;0.3.4&quot;,v&quot;0.3.5-&quot;)
+       println(&quot;installing library: DiffBase&quot;); Pkg.add(&quot;DiffBase&quot;,v&quot;0.2.0&quot;,v&quot;0.2.1-&quot;)
+       println(&quot;installing library: Distances&quot;); Pkg.add(&quot;Distances&quot;,v&quot;0.5.0&quot;,v&quot;0.5.1-&quot;)
+       println(&quot;installing library: FileIO&quot;); Pkg.add(&quot;FileIO&quot;,v&quot;0.7.0&quot;,v&quot;0.7.1-&quot;)
+	println(&quot;ADDING: SpecialFunctions&quot;); Pkg.add(&quot;SpecialFunctions&quot;,v&quot;0.3.6&quot;,v&quot;0.3.7-&quot;)
+
+       println(&quot;installing library: ForwardDiff&quot;); Pkg.add(&quot;ForwardDiff&quot;,v&quot;0.4.2&quot;,v&quot;0.4.3-&quot;)
+
+
+       println(&quot;installing library: GtkReactive&quot;); Pkg.add(&quot;GtkReactive&quot;,v&quot;0.4.0&quot;,v&quot;0.4.1-&quot;)
+       println(&quot;installing library: HttpCommon&quot;); Pkg.add(&quot;HttpCommon&quot;,v&quot;0.4.0&quot;,v&quot;0.4.1-&quot;)
+       println(&quot;installing library: HttpParser&quot;); Pkg.add(&quot;HttpParser&quot;,v&quot;0.3.1&quot;,v&quot;0.3.2-&quot;)
+       println(&quot;installing library: LegacyStrings&quot;); Pkg.add(&quot;LegacyStrings&quot;,v&quot;0.3.0&quot;,v&quot;0.3.1-&quot;)
+       println(&quot;installing library: MbedTLS&quot;); Pkg.add(&quot;MbedTLS&quot;,v&quot;0.5.8&quot;,v&quot;0.5.9-&quot;)
+       println(&quot;installing library: StaticArrays&quot;); Pkg.add(&quot;StaticArrays&quot;,v&quot;0.7.0&quot;,v&quot;0.7.1-&quot;)
+       println(&quot;installing library: NearestNeighbors&quot;); Pkg.add(&quot;NearestNeighbors&quot;,v&quot;0.3.0&quot;,v&quot;0.3.1-&quot;)
+       println(&quot;installing library: ReverseDiffSparse&quot;); Pkg.add(&quot;ReverseDiffSparse&quot;,v&quot;0.7.3&quot;,v&quot;0.7.4-&quot;)
+       println(&quot;installing library: SortingAlgorithms&quot;); Pkg.add(&quot;SortingAlgorithms&quot;,v&quot;0.2.0&quot;,v&quot;0.2.1-&quot;)
+       println(&quot;installing library: StatsBase&quot;); Pkg.add(&quot;StatsBase&quot;,v&quot;0.20.1&quot;,v&quot;0.20.2-&quot;)
+
+	println(&quot;All additional packages&quot;)
+
+
+	println(&quot;ADDING: DataFrames&quot;)
+	Pkg.add(&quot;DataFrames&quot;, v&quot;0.11.2&quot;, v&quot;0.11.3-&quot;)
+	println(&quot;ADDING: HDF5&quot;)
+	Pkg.add(&quot;HDF5&quot;,v&quot;0.8.8&quot;, v&quot;0.8.9-&quot;)
+	println(&quot;ADDING: JLD&quot;)
+	Pkg.add(&quot;JLD&quot;,v&quot;0.8.3&quot;,v&quot;0.8.4-&quot;) # to fulfil requirments of Ipopt, JuMP, and NLopt
+	println(&quot;ADDING: Clustering&quot;)
+	Pkg.add(&quot;Clustering&quot;,v&quot;0.9.1&quot;, v&quot;0.9.2-&quot;)
+	println(&quot;ADDING: Ipopt&quot;)
+	Pkg.add(&quot;Ipopt&quot;,v&quot;0.2.4&quot;, v&quot;0.2.9-&quot;)
+	println(&quot;ADDING: NLopt&quot;)
+	Pkg.add(&quot;NLopt&quot;,v&quot;0.3.6&quot;, v&quot;0.3.7-&quot;)
+	println(&quot;ADDING: JuMP&quot;)
+	Pkg.add(&quot;JuMP&quot;,v&quot;0.17.1&quot;, v&quot;0.17.2-&quot;)
+	println(&quot;ADDING: HttpServer&quot;)
+	Pkg.add(&quot;HttpServer&quot;,v&quot;0.2.0&quot;, v&quot;0.2.1-&quot;)
+	println(&quot;ADDING: ProfileView&quot;)
+	Pkg.add(&quot;ProfileView&quot;,v&quot;0.3.0&quot;, v&quot;0.3.1-&quot;)
+	println(&quot;ADDING: Dierckx&quot;)
+	Pkg.add(&quot;Dierckx&quot;,v&quot;0.3.0&quot;, v&quot;0.3.1-&quot;)
+	println(&quot;ADDING: MySQL&quot;)
+	Pkg.add(&quot;MySQL&quot;,v&quot;0.3.0&quot;, v&quot;0.3.1-&quot;)
+	println(&quot;ADDING: DataArrays&quot;)
+	Pkg.add(&quot;DataArrays&quot;,v&quot;0.7.0&quot;, v&quot;0.7.1-&quot;)
+	println(&quot;ADDING: PkgDev&quot;)
+	Pkg.add(&quot;PkgDev&quot;,v&quot;0.1.6&quot;, v&quot;0.1.7-&quot;)
+ 
+	println(&quot;ADDING: Done&quot;)
+	Pkg.build(&quot;DataArrays&quot;,&quot;DataStructures&quot;, &quot;SpecialFunctions&quot;, &quot;MathProgBase&quot;, &quot;HDF5&quot;, &quot;Clustering&quot;, &quot;Nullables&quot;,&quot;JSON&quot;, &quot;JLD&quot;, &quot;NLopt&quot;, &quot;JuMP&quot;, &quot;HttpServer&quot;, &quot;ProfileView&quot;, &quot;Dierckx&quot;, &quot;Ipopt&quot;, &quot;MySQL&quot;, &quot;DataFrames&quot;)
+	println(&quot;Building: Done&quot;)
+
+		println(&quot;Pinning all done&quot;)
+		using PkgDev
+                println(&quot;Used PkgDev&quot;)
+		using DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering
+                println(&quot;Used DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering&quot;)
+		using Nullables, JSON, JLD, NLopt, JuMP, HttpServer, ProfileView, DataArrays
+                println(&quot;Used Nullables, JSON, JLD, NLopt, JuMP, HttpServer, ProfileView, DataArrays&quot;)
+		using Dierckx, Ipopt, MySQL, DataFrames
+	        println(&quot;All packages used&quot;)
+
+		PkgDev.generate(&quot;QpcrAnalysis&quot;, &quot;MIT&quot;)
+		println(&quot;QpcrAnalysis structure generated&quot;)
+		Pkg.status()
+	println(&quot;Using: Done&quot;)
+
+println(&quot;Setting up Julia: done testing.. quitting..&quot;)
+quit()
+EOF
+sync
+sleep 60
+
+# leave julia staff to be able to test why it crashes the system
+julia chaibio_packages.jl
+rm chaibio_packages.jl
+
+echo test finished. cleaning..
+sync
+cd
+rm -r ~/julia-compile
+df -h
+sync
+sync
+fsck /dev/mmcblk1p1 -y -f
+fsck /dev/mmcblk0p1 -y -f
+
+exit 0
+</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo installing QT
 dpkg --configure -a
 
 apt-get update
@@ -730,179 +991,12 @@ cp /opt/QtEmbedded/bin /usr/lib/arm-linux-gnueabihf/qt4/ -r || true
 echo done installing QT to /opt/
 
 sync
-
-apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3
-
-if $bypass_julia
-then
-       echo Bypassing JULIA
-       touch /etc/bypassjulia.flag
-       exit 0
-fi
-
-apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3  || exit 1
-
-mkdir -p ~/julia-compile
-cd ~/julia-compile
-
-
-default_slim_arch_filename=&quot;julia-$building_version-slim-default.tgz&quot;
-echo Slim arch filename $default_slim_arch_filename
-wget $download_prefix/$default_slim_arch_filename || exit 1
-
-sync
-
-echo installing julia
-if tar xf $default_slim_arch_filename -C / julia/usr --strip-components=1 
-then
-    echo &quot;extracted julia usr files&quot;
-else
-   echo &quot;Error extracting julia&quot;
-   exit 1
-fi
-
-sync
-
-echo &quot;export JULIA_PKGDIR=/root/.julia&quot;&gt;&gt;~/.profile
-source ~/.profile
-sync
-sleep 60
-
-if [ -e /usr/share/julia/bin/julia ] &amp;&amp; [ ! -e /usr/bin/julia ]
-then
-	ln -sf /usr/share/julia/bin/julia /usr/bin/julia
-fi
-
-#============== test
-echo test finished. cleaning..
-sync
-
-cd
-rm -r ~/julia-compile
-sync
-
-sync
-fsck /dev/mmcblk1p1 -y -f
-fsck /dev/mmcblk0p1 -y -f
-
-sync
-
-sleep 60
-
-echo &quot;Setting up Julia: Initializing rep&quot;
-julia --print &quot;Pkg.init()&quot;
-sync
-sleep 60
-
-
-
-
-
-echo &quot;Setting up Julia: Updating rep&quot;
-julia --print &quot;Pkg.update()&quot;
-sync
-sleep 60
-echo precompiling mandatory packages.
-cat &lt;&lt;EOF &gt;&gt; chaibio_packages.jl
-
-println(&quot;Setting up Julia: Adding packages&quot;)
-
-println(&quot;Adding package: Dierckx&quot;)
-Pkg.add(&quot;Dierckx&quot;)
-using Dierckx
-
-println(&quot;Adding package: JSON&quot;)
-Pkg.add(&quot;JSON&quot;)
-using JSON
-
-println(&quot;Adding package: MySQL&quot;)
-Pkg.add(&quot;MySQL&quot;)
-using MySQL
-
-println(&quot;Adding package: JLD&quot;)
-Pkg.add(&quot;JLD&quot;)
-using JLD
-
-println(&quot;Adding package: DataFrames&quot;)
-Pkg.add(&quot;DataFrames&quot;)
-using DataFrames
-
-println(&quot;Adding package: Ipopt&quot;)
-Pkg.add(&quot;Ipopt&quot;)
-using Ipopt
-
-println(&quot;Adding package: JuMP&quot;)
-Pkg.add(&quot;JuMP&quot;)
-using JuMP
-
-println(&quot;Adding package: NLopt&quot;)
-Pkg.add(&quot;NLopt&quot;)
-using NLopt
-
-println(&quot;Adding package: HttpServer&quot;)
-Pkg.add(&quot;HttpServer&quot;)
-using HttpServer
-
-println(&quot;Adding package: Clustering&quot;)
-Pkg.add(&quot;Clustering&quot;)
-using Clustering
-
-println(&quot;Setting up Julia: Building packages&quot;)
-Pkg.resolve()
-
-println(&quot;Setting up Julia: Checking precompiled packages&quot;)
-using DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NLopt, HttpServer, Clustering
-
-println(&quot;Setting up Julia: Testing packages&quot;)
-
-println(&quot;Adding package: Dierckx&quot;)
-Pkg.add(&quot;Dierckx&quot;)
-println(&quot;Adding package: JSON&quot;)
-Pkg.add(&quot;JSON&quot;)
-println(&quot;Adding package: MySQL&quot;)
-Pkg.add(&quot;MySQL&quot;)
-println(&quot;Adding package: JLD&quot;)
-Pkg.add(&quot;JLD&quot;)
-println(&quot;Adding package: DataFrames&quot;)
-Pkg.add(&quot;DataFrames&quot;)
-println(&quot;Adding package: Ipopt&quot;)
-Pkg.add(&quot;Ipopt&quot;)
-println(&quot;Adding package: JuMP&quot;)
-Pkg.add(&quot;JuMP&quot;)
-println(&quot;Adding package: NLopt&quot;)
-Pkg.add(&quot;NLopt&quot;)
-println(&quot;Adding package: HttpServer&quot;)
-Pkg.add(&quot;HttpServer&quot;)
-println(&quot;Adding package: Clustering&quot;)
-Pkg.add(&quot;Clustering&quot;)
-
-println(&quot;Setting up Julia: done testing.. quitting..&quot;)
-quit()
-EOF
-sync
-sleep 60
-
-# leave julia staff to be able to test why it crashes the system
-julia chaibio_packages.jl
-
-rm chaibio_packages.jl
-julia --print &apos;Pkg.build(&quot;HDF5&quot;)&apos;
-julia --print &apos;Pkg.build(&quot;HDF5&quot;)&apos;
-julia --print &apos;Pkg.build(&quot;HDF5&quot;)&apos;
-julia --print &apos;Pkg.build(&quot;HDF5&quot;)&apos;
-
-echo test finished. cleaning..
-sync
-cd
-rm -r ~/julia-compile
-df -h
-sync
-sync
-fsck /dev/mmcblk1p1 -y -f
-fsck /dev/mmcblk0p1 -y -f
-
-exit 0
 </command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command></command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
@@ -942,8 +1036,6 @@ rm /etc/systemd/system/sockets.target.wants/cloud9.socket
 echo ifup script fix
 echo &quot;Due to a bug (https://bugs.launchpad.net/ubuntu/+source/ntp/+bug/1206164) a script from ifup has to be fixed&quot;
 sed -i &apos;s/) \&amp;/) &lt;\/dev\/null &gt;\/dev\/null 2&gt;\&amp;1 \&amp;/g&apos; /etc/network/if-up.d/ntpdate
-
-#apt-get autoremove -q -y --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data libx11* libxcb*
 
 apt-get clean
 apt-get autoclean
@@ -1063,19 +1155,7 @@ echo all 3rd party software done for $build_machine, you can call call deploy_ch
 exit 0</command>
     </hudson.tasks.Shell>
   </builders>
-  <publishers>
-    <com.chikli.hudson.plugin.naginator.NaginatorPublisher plugin="naginator@1.17.2">
-      <regexpForRerun></regexpForRerun>
-      <rerunIfUnstable>false</rerunIfUnstable>
-      <rerunMatrixPart>false</rerunMatrixPart>
-      <checkRegexp>false</checkRegexp>
-      <regexpForMatrixStrategy>TestParent</regexpForMatrixStrategy>
-      <delay class="com.chikli.hudson.plugin.naginator.FixedDelay">
-        <delay>2000</delay>
-      </delay>
-      <maxSchedule>5</maxSchedule>
-    </com.chikli.hudson.plugin.naginator.NaginatorPublisher>
-  </publishers>
+  <publishers/>
   <buildWrappers>
     <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.8"/>
   </buildWrappers>
