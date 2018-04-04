@@ -444,7 +444,7 @@ then
       time julia -v
       echo end of test result: $?
       echo about to start using QpcrAnalysis
-      time JULIA_ENV=production ./julia -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;);reload(&quot;QpcrAnalysis&quot;);using QpcrAnalysis;&apos; --compile=all
+      JULIA_ENV=production julia -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;);reload(&quot;QpcrAnalysis&quot;);using QpcrAnalysis;&apos; --compile=all
 
       echo tested using QpcrAnalysis
       if [ -e /root/.julia/lib/v0.6/QpcrAnalysis.ji ]

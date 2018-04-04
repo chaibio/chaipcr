@@ -744,7 +744,9 @@ apt-get -f -y -q install
       apt install -y -q libmysqlclient-dev
 
       sed -i &apos;1i using DataArrays&apos; /root/chaipcr/bioinformatics/juliaserver.jl
-      sed -i &apos;1i push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;)&apos; /root/chaipcr/bioinformatics/juliaserver.jl
+      sed -i &apos;1i push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/
+
+nalysis/&quot;)&apos; /root/chaipcr/bioinformatics/juliaserver.jl
 
       echo Build time- adding pre-requesits
       free -m
@@ -908,16 +910,12 @@ println(&quot;Setting up Julia: Adding packages&quot;)
 	Pkg.add(&quot;MySQL&quot;,v&quot;0.3.0&quot;, v&quot;0.3.1-&quot;)
 	println(&quot;ADDING: DataArrays&quot;)
 	Pkg.add(&quot;DataArrays&quot;,v&quot;0.7.0&quot;, v&quot;0.7.1-&quot;)
-	println(&quot;ADDING: PkgDev&quot;)
-	Pkg.add(&quot;PkgDev&quot;,v&quot;0.1.6&quot;, v&quot;0.1.7-&quot;)
  
 	println(&quot;ADDING: Done&quot;)
 	Pkg.build(&quot;DataArrays&quot;,&quot;DataStructures&quot;, &quot;SpecialFunctions&quot;, &quot;MathProgBase&quot;, &quot;HDF5&quot;, &quot;Clustering&quot;, &quot;Nullables&quot;,&quot;JSON&quot;, &quot;JLD&quot;, &quot;NLopt&quot;, &quot;JuMP&quot;, &quot;HttpServer&quot;, &quot;ProfileView&quot;, &quot;Dierckx&quot;, &quot;Ipopt&quot;, &quot;MySQL&quot;, &quot;DataFrames&quot;)
 	println(&quot;Building: Done&quot;)
 
 		println(&quot;Pinning all done&quot;)
-		using PkgDev
-                println(&quot;Used PkgDev&quot;)
 		using DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering
                 println(&quot;Used DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering&quot;)
 		using Nullables, JSON, JLD, NLopt, JuMP, HttpServer, ProfileView, DataArrays
@@ -925,8 +923,6 @@ println(&quot;Setting up Julia: Adding packages&quot;)
 		using Dierckx, Ipopt, MySQL, DataFrames
 	        println(&quot;All packages used&quot;)
 
-		PkgDev.generate(&quot;QpcrAnalysis&quot;, &quot;MIT&quot;)
-		println(&quot;QpcrAnalysis structure generated&quot;)
 		Pkg.status()
 	println(&quot;Using: Done&quot;)
 
