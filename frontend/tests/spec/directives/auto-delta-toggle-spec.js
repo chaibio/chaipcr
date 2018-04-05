@@ -59,4 +59,50 @@ describe("Testing autoDeltaToggle", function() {
         expect(compiledScope.show).toEqual(false);
         expect(compiledScope.configureSwitch).toHaveBeenCalled();
     });
+
+    it("It should test clickHandler method", function() {
+
+        spyOn(compiledScope, "configureSwitch").and.returnValue(true);
+        spyOn(compiledScope, "sendData").and.returnValue(true);
+
+        compiledScope.clickHandler();
+
+        expect(compiledScope.configureSwitch).toHaveBeenCalled();
+        expect(compiledScope.sendData).toHaveBeenCalled();
+    });
+
+    it("It should test configureSwitch method, when we pass true", function() {
+
+        var val = true;
+
+        compiledScope.configureSwitch(val);
+
+        expect($(compiledScope.dragElem).parent().css("background-color")).toEqual('rgb(141, 198, 63)');
+    });
+
+    it("It should test configureSwitch method, when we pass false", function() {
+
+        var val = false;
+
+        compiledScope.configureSwitch(val);
+
+        expect($(compiledScope.dragElem).parent().css("background-color")).toEqual('rgb(187, 187, 187)');
+    });
+
+    it("It should test sendData method", function() {
+
+        compiledScope.$parent = [
+            function() {
+                return true;
+            },
+        ];
+
+        compiledScope.call = 0;
+
+        compiledScope.sendData();
+
+        expect(compiledScope.data).toEqual(true);
+    });
+
+    
 });
