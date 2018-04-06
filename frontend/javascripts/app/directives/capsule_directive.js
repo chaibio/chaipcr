@@ -34,7 +34,7 @@ window.ChaiBioTech.ngApp.directive('capsule', [
       },
 
       link: function(scope, elem, attr) {
-
+        
         // data is not readily available as its an inner directive
         scope.$watch("data", function(val, oldVal) {
           if(angular.isDefined(scope.data)) {
@@ -58,7 +58,11 @@ window.ChaiBioTech.ngApp.directive('capsule', [
         });
 
         $(elem).click(function(evt) {
+          scope.clickCallback();
+        });
 
+        scope.clickCallback = function() {
+          
           if(scope.delta === "true") {
 
             scope.originalValue = scope.originalValue * -1;
@@ -69,7 +73,7 @@ window.ChaiBioTech.ngApp.directive('capsule', [
             scope.configure();
             scope.sendValue();
           }
-        });
+        };
 
         scope.justInverse = function() {
 

@@ -63,6 +63,43 @@ describe("Testing capsule directive", function() {
         expect(compiledScope.disable).toHaveBeenCalled();
     });
 
+    it("It should test clickCallback method", function() {
+
+        compiledScope.$apply(function() {
+            compiledScope.delta = "true";
+        });
+
+        //compiledScope.$digest();
+        
+        spyOn(compiledScope, "configure").and.returnValue(true);
+        spyOn(compiledScope, "sendValue").and.returnValue(true);
+
+        compiledScope.clickCallback();
+
+        expect(compiledScope.configure).toHaveBeenCalled();
+        expect(compiledScope.sendValue).toHaveBeenCalled();
+    });
+
+    it("It should test clickCallback method, originalValue is 0", function() {
+
+        compiledScope.$apply(function() {
+            compiledScope.delta = "true";
+            compiledScope.originalValue = 0;
+        });
+
+        //compiledScope.$digest();
+        
+        spyOn(compiledScope, "configure").and.returnValue(true);
+        spyOn(compiledScope, "sendValue").and.returnValue(true);
+        spyOn(compiledScope, "justInverse").and.returnValue(true);
+
+        compiledScope.clickCallback();
+
+        expect(compiledScope.justInverse).toHaveBeenCalled();
+        expect(compiledScope.configure).not.toHaveBeenCalled();
+        expect(compiledScope.sendValue).not.toHaveBeenCalled();
+    });
+    
     it("It should test justInverse method", function() {
 
         spyOn(compiledScope, "positive").and.returnValue(true);
@@ -210,11 +247,37 @@ describe("Testing capsule directive", function() {
         compiledScope.$apply(function() {
             compiledScope.originalValue = -3;
         });
-        
+
         compiledScope.configure();
 
         expect(compiledScope.positive).not.toHaveBeenCalled();
         expect(compiledScope.negative).toHaveBeenCalled();
 
     });
+
+    it("It should test sendValue method", function() {
+
+        _ExperimentLoader.changeDeltaTime = function() {
+            return {
+                then: function(callback) {
+                    var data = {};
+                    callback(data);
+                }
+            };
+        };
+
+        compiledScope.$apply(function() {
+            compiledScope.fun = "changeDeltaTime";
+        });
+        
+        spyOn(compiledScope, "$apply").and.callThrough();
+
+        spyOn(_ExperimentLoader, "changeDeltaTime").and.callThrough();
+
+        compiledScope.sendValue();
+
+        expect(compiledScope.$apply).toHaveBeenCalled();
+        expect(_ExperimentLoader.changeDeltaTime).toHaveBeenCalled();
+    });
+
 });
