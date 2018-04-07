@@ -720,25 +720,7 @@ echo test finished. cleaning..
 sync
 
 
-      apt-get -y -q install g++ gcc ntp ntpdate git unzip automake sshpass build-essential || true
-      ntpdate -b -s -u pool.ntp.org
-
-      sudo apt-get -q -y install libgfortran-6-dev liblapack3
-      sudo apt-get -q -y install libblas3gf liblapack3gf 
-      sudo apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libc-bin  || exit 1
-apt-get -f -y -q install
-
-      apt-get install -q -y libarpack2 libblas-common libblas3 libfftw3-double3 libfftw3-single3 libgfortran3 liblapack3 libllvm3.8 libmetis5 libopenblas-base libunwind8  || exit 1
-apt-get -f -y -q install
-
-      sudo apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas-common libblas3 libfftw3-double3 libfftw3-single3 libgfortran3 liblapack3 libllvm3.8 libmetis5 libopenblas-base libunwind8 liblapack-dev liblapack3 libopenblas-base libopenblas-dev || exit 1
-apt-get -f -y -q install
-
-      apt-get -y -q install evtest git automake libtool || exit 1 
-      apt-get -f -y -q install
-
       apt-get  -y -q install  libblas3gf libblas3gf
-      apt-get  -y -q install  parted linux-headers-`uname -r` parted automake build-essential cmake curl device-tree-compiler evtest g++ gfortran git hdf5-tools i2c-tools libarpack2 libblas-common libblas-dev libblas3 libedit-dev libfftw3-dev libfftw3-double3 libfftw3-single3 libfontconfig1-dev libfreetype6-dev libgfortran3 libgfortran3 libgmp3-dev liblapack3 liblapack3gf libllvm3.8 libmetis5 libmpfr-dev libopenblas-base libopenblas-dev libqt4-webkit libssl-dev libtool libunwind8 libxcursor-dev libxext-dev libxfixes-dev libxft-dev libxi-dev libxml2-dev libxrandr-dev libxrender-dev libxslt-dev lsb-release m4 nodejs ntp ntpdate parted pkg-config python sshpass unzip
       apt-get install -y -q liblapack-dev
       apt install -y -q liblapack-dev libblas-dev
       apt install -y -q libmysqlclient-dev
@@ -1108,7 +1090,9 @@ passwd service -d
       <siteName>root@$build_machine:22</siteName>
       <command>echo installing boost
 sync
-apt-get -q -y install libboost-all-dev || exit 1
+# much space
+#apt-get -q -y install libboost-all-dev || exit 1
+apt-get -q -y install libboost-chrono-dev libboost-system-dev || exit 1
 
 df -h
 </command>

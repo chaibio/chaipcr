@@ -33,8 +33,6 @@ Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
               <string>v0.6.2</string>
               <string>v0.6.1</string>
               <string>v0.6.0</string>
-              <string>v0.5.2</string>
-              <string>v0.5.0</string>
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
@@ -61,7 +59,24 @@ Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
         <hudson.model.BooleanParameterDefinition>
           <name>pin_packages</name>
           <description>Pinning packages</description>
-          <defaultValue>true</defaultValue>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>cLang</name>
+          <description>compile using CLang</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>LTO</name>
+          <description>Linker optimization
+</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>gcc48</name>
+          <description>Download gcc and g++ v.4.8
+</description>
+          <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
@@ -298,6 +313,34 @@ exit 0
       <siteName>root@$build_machine:22</siteName>
       <command>echo arranging to build julia
 df -h
+if $gcc48
+then
+   echo removing latest gcc if any and installing gcc-4.8
+   gcc -v
+   apt-get -y -q remove gcc g++
+   apt-get autoremove -y -q  gcc g++
+cp /etc/apt/sources.list /etc/apt/sources.list.org
+apt-get update
+echo &quot;deb http://ftp.uk.debian.org/debian/ jessie main non-free contrib&quot; &gt;&gt; /etc/apt/sources.list
+apt-get update
+apt-get -y -q install gcc-4.8 g++-4.8
+cp /etc/apt/sources.list.org /etc/apt/sources.list
+apt-get update
+    apt-get clean
+      apt-get autoclean
+      dpkg --configure -a
+      rm /usr/bin/gcc
+      rm /usr/bin/g++
+      ln -s /usr/bin/gcc-4.8 /usr/bin/gcc
+      ln -s /usr/bin/g++-4.8 /usr/bin/g++
+
+gcc -v
+
+else
+   echo installing latest gcc and g++ 
+   apt-get -q -y install gcc g++
+fi
+
 if $upgrade_gcc
 then
 
@@ -314,10 +357,10 @@ then
       rm /usr/bin/g++
       ln -s /usr/bin/gcc-4.7 /usr/bin/gcc
       ln -s /usr/bin/g++-4.7 /usr/bin/g++
-    fi
+   fi
 fi
 
-apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential
+apt-get -y -q install ntp ntpdate git unzip automake sshpass build-essential
 dpkg --configure -a
 sync
 sleep 5
@@ -342,6 +385,9 @@ then
    echo &quot;Can&apos;t update g++&quot;
    exit 1
 fi
+
+else
+      apt-get -y -q install ntp ntpdate git unzip automake sshpass build-essential
 fi
 echo arranging the sdcard
 
@@ -353,7 +399,7 @@ ln -sf /usr/bin/ld /usr/bin/ld.gold
 echo 1500 &gt; /proc/sys/kernel/hung_task_timeout_secs
 
 LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
-,,0xe,*
+,,0x83,*
 __EOF__
 
 partprobe /dev/mmcblk0
@@ -387,7 +433,7 @@ else
 fi
 
 apt-get update
-apt-get upgrade
+apt-get upgrade -y -q
 
 apt-get -y -q install lsb-release
 sync
@@ -449,7 +495,6 @@ override USE_SYSTEM_MPFR=1
 override USE_SYSTEM_ARPACK=1
 
 override LLVM_ASSERTIONS=1
-LLVM_FLAGS+=&quot;--with-cpu=cortex-a8 --disable-compiler-version-checks --with-float=hard --with-abi=aapcs-vfp --with-fpu=neon --enable-targets=arm --enable-optimized --enable-assertions&quot;
 EOF
 
 if $debug
@@ -458,8 +503,53 @@ cat &lt;&lt;EOF &gt;&gt; Make.user
 JULIA_BUILD_MODE=debug
 LLVM_DEBUG=1
 VERBOSE=1
+override JULIA_BUILD_MODE=debug
 EOF
 fi
+
+make_cmd=make
+
+if $LTO
+then
+cat &lt;&lt;EOF &gt;&gt; Make.user
+LLVM_FLAGS+=&quot;--with-cpu=cortex-a8 --disable-compiler-version-checks --with-float=hard --with-abi=aapcs-vfp --with-fpu=neon --enable-targets=arm --enable-optimized --enable-assertions -flto &quot;
+CFLAGS+=  -flto
+CXXFLAGS+=  -flto
+LLVM_LTO=1
+LLVM_CMAKE=&apos;-DCMAKE_CXX_FLAGS=-flto -DCMAKE_C_FLAGS=-flto -DCMAKE_EXE_LINKER_FLAGS=-flto -DCMAKE_SHARED_LINKER_FLAGS=-flto &apos;
+
+make_cmd=&quot;LLVM_CMAKE=&apos;-DCMAKE_CXX_FLAGS=-flto -DCMAKE_C_FLAGS=-flto -DCMAKE_EXE_LINKER_FLAGS=-flto -DCMAKE_SHARED_LINKER_FLAGS=-flto&apos;  make LLVM_USE_CMAKE=1 LLVM_LTO=1&quot;
+
+EOF
+else
+cat &lt;&lt;EOF &gt;&gt; Make.user
+LLVM_FLAGS+=&quot;--with-cpu=cortex-a8 --disable-compiler-version-checks --with-float=hard --with-abi=aapcs-vfp --with-fpu=neon --enable-targets=arm --enable-optimized --enable-assertions&quot;
+EOF
+fi
+
+if $cLang
+then
+       apt-get -y install clang
+
+
+cat &lt;&lt;EOF &gt;&gt; Make.user
+
+# use our new toolchain
+override USECLANG=1
+USECLANG=1
+override LLVM_ASSERTIONS=1
+override USE_LLVM_SHLIB=1
+override BUILD_LLVM_CLANG=1
+
+
+# make the GC use regular malloc/frees, which are intercepted by ASAN
+override WITH_GC_DEBUG_ENV=1
+
+
+
+EOF
+fi
+
 
 #sed -i &quot;s/-gtk-update-icon-cache/-gtk-update-icon-cache --ignore-theme-index/&quot; Makefile
 echo making
@@ -467,8 +557,13 @@ sed -i &quot;s/-gtk-update-icon-cache/-gtk-update-icon-cache --ignore-theme-inde
 #   make release || exit 1
 if $debug
 then
-   make debug
+   #make debug
+   make_cmd=&quot;$make_cmd debug&quot;
 fi
+
+echo calling $make_cmd
+$(make_cmd)
+echo end of make call
 
 make binary-dist || exit 1
 
