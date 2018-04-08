@@ -29,10 +29,10 @@ function analyze_func(
                 well_constraint
             ORDER BY well_num
         "
-        ot_df, fluo_well_nums = get_mysql_data_well(
+        ot_nt, fluo_well_nums = get_mysql_data_well(
             well_nums, ot_qry_2b, db_conn, false
         )
-        step_id => ot_df[:fluorescence_value]
+        step_id => ot_nt[:fluorescence_value]
     end) # do step_id
 
     # assuming the 2 values of `ot_dict` are the same in length (number of wells)

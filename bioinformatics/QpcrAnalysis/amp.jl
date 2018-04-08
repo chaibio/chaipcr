@@ -143,10 +143,10 @@ function process_amp(
                 experiments.id = $exp_id AND
                 stages.stage_type <> \'meltcurve\'
         "
-        sr = mysql_execute(db_conn, sr_qry)
+        sr = MySQL.query(db_conn, sr_qry) # fieldnames: [1] steps.id, [2] steps.collect_data, [3] ramps.id, [4] ramps.collect_data
 
-        step_ids = unique(sr[sr[:collect_data] .== 1, :id])
-        ramp_ids = unique(sr[sr[:collect_data_1] .== 1, :id_1])
+        step_ids = unique(sr[1][sr[2] .== 1])
+        ramp_ids = unique(sr[3][sr[4] .== 1])
 
         asrp_vec = vcat(
             map(step_ids) do step_id
@@ -190,10 +190,10 @@ function process_amp(
                     well_constraint
                 ORDER BY cycle_num
         " # must "SELECT well_num" for `get_mysql_data_well`
-        fd_df, fluo_well_nums = get_mysql_data_well(
+        fd_nt, fluo_well_nums = get_mysql_data_well(
             well_nums, fd_qry_2b, db_conn, verbose
         )
-        asrp.cyc_nums = unique(fd_df[:cycle_num])
+        asrp.cyc_nums = unique(fd_nt[:cycle_num])
      end # for asrp
 
      # find `fluo_well_nums` and `channel_nums`. literal i.e. non-pointer variables created in a Julia for-loop is local, i.e. not accessible outside of the for-loop.
@@ -208,10 +208,10 @@ function process_amp(
                  well_constraint
              ORDER BY well_num
      " # must "SELECT well_num" and "ORDER BY well_num" for `get_mysql_data_well`
-     fd_df, fluo_well_nums = get_mysql_data_well(
+     fd_nt, fluo_well_nums = get_mysql_data_well(
          well_nums, fd_qry_2b, db_conn, verbose
      )
-    channel_nums = unique(fd_df[:channel])
+    channel_nums = unique(fd_nt[:channel])
 
     # pre-deconvolution, process all available channel_nums
     if length(channel_nums) == 1
@@ -263,7 +263,7 @@ function get_amp_data(
             step_id is not NULL
         ORDER BY channel, well_num, cycle_num
     "
-    fluo_sel = mysql_execute(db_conn, fluo_qry)
+    fluo_sel = MySQL.query(db_conn, fluo_qry)
 
     fluo_raw = reshape(
         fluo_sel[parse(col_name)],

@@ -9,7 +9,7 @@ function __init__()
         ("t1", "test_1ch"),
         ("t2", "test_2ch")
     ]) do db_tuple
-        db_tuple[1] => mysql_connect(DB_INFO["host"], DB_INFO["username"], DB_INFO["password"], db_tuple[2])
+        db_tuple[1] => MySQL.connect(DB_INFO["host"], DB_INFO["username"], DB_INFO["password"]; db=db_tuple[2])
     end) # do db_name
 
     # comment this section when `--compile-all`

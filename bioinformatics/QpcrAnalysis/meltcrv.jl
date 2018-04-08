@@ -79,13 +79,13 @@ function process_mc(
                     temperature <= $max_tmprtr
                     well_constraint
     "
-    mcd_df, fluo_well_nums = get_mysql_data_well(
+    mcd_nt, fluo_well_nums = get_mysql_data_well(
         well_nums, mcd_qry_2b, db_conn, verbose
     )
     num_fluo_wells = length(fluo_well_nums)
 
     # pre-deconvolution, can process multiple channels
-    # channel_nums = sort(unique(mcd_df[:channel])) # process all available channels in the database
+    # channel_nums = sort(unique(mcd_nt[:channel])) # process all available channels in the database
     num_channels = length(channel_nums)
     if num_channels == 1
         dcv = false
@@ -215,26 +215,33 @@ function get_mc_data(
     )
 
     # split temperature and fluo data by well_num
-    tf_df_vec = map(fluo_well_nums) do well_num
-        fluo_sel[
-            fluo_sel[:well_num] .== well_num,
-            [:temperature, :fluorescence_value]
-        ]
+    tf_names = [:temperature, :fluorescence_value]
+    tf_dict_vec = map(fluo_well_nums) do well_num
+        well_bool_vec = fluo_sel[:well_num] .== well_num
+        OrderedDict(
+            name => fluo_sel[name][well_bool_vec]
+            for name in tf_names
+        )
     end # do well_num
 
     # add NaN to the end if not enough data
-    max_len = maximum(map(tf_df -> size(tf_df)[1], tf_df_vec))
-    tf_dv_adj = map(tf_df_vec) do tf_df
-        nan_da = ones(max_len - size(tf_df)[1]) * NaN
-        nan_df = DataFrame(temperature=nan_da, fluorescence_value=nan_da)
-        vcat(tf_df, nan_df)
-    end # do tf_df
+    ori_len_vec = map(tf_dict -> length(tf_dict[tf_names[1]]), tf_dict_vec)
+    max_len = maximum(ori_len_vec)
+    tf_nv_adj = map(1:length(tf_dict_vec)) do i
+        tf_dict = tf_dict_vec[i]
+        ori_len = ori_len_vec[i]
+        nan_da = ones(max_len - ori_len) * NaN
+        OrderedDict(
+            name => vcat(tf_dict[name], nan_da)
+            for name in tf_names
+        )
+    end # do i
 
     # temperature DataArray vector, with rows as temperature points and columns as wells
-    t_da_vec = map(tf_df -> tf_df[:temperature], tf_dv_adj)
+    t_da_vec = map(tf_dict -> tf_dict[:temperature], tf_nv_adj)
 
     # fluorescence DataArray
-    fluo_da = hcat(map(tf_df -> tf_df[:fluorescence_value], tf_dv_adj)...)
+    fluo_da = hcat(map(tf_dict -> tf_dict[:fluorescence_value], tf_nv_adj)...)
 
     return MeltCurveTF(t_da_vec, fluo_da)
 
