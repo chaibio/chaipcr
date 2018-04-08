@@ -95,7 +95,133 @@ describe("Testing gatherDataToggle directive", function() {
         expect(compiledScope.dragElem.draggable).toHaveBeenCalledWith('enable');
     });
 
+    it("It should test clickHandler method when call === changeDuringStep", function() {
 
+        spyOn(compiledScope, "configureSwitch").and.returnValue(true);
+        spyOn(compiledScope, "sendData").and.returnValue();
+        
+        compiledScope.call = "changeDuringStep";
+        compiledScope.pause = false;
+        compiledScope.infiniteHoldStep = false;
+        
+        _$scope.$digest();
+        
+        compiledScope.clickHandler();
 
+        expect(compiledScope.configureSwitch).toHaveBeenCalled();
+        expect(compiledScope.sendData).toHaveBeenCalled();
 
+    });
+
+    it("It should test clickHandler method when call is !== changeDuringStep", function() {
+
+        spyOn(compiledScope, "configureSwitch").and.returnValue(true);
+        spyOn(compiledScope, "sendData").and.returnValue();
+        
+        compiledScope.call = "not changeDuringStep";
+        compiledScope.pause = false;
+        compiledScope.infiniteHoldStep = false;
+        
+        _$scope.$digest();
+        
+        compiledScope.clickHandler();
+
+        expect(compiledScope.configureSwitch).toHaveBeenCalled();
+        expect(compiledScope.sendData).toHaveBeenCalled();
+    });
+
+    it("It should test configureSwitch method when val === true", function() {
+
+        spyOn($.fn, "parent").and.returnValue({
+            css: function() {
+
+            }
+        });
+
+        spyOn($.fn, "children").and.returnValue({
+            css: function() {
+                
+            }
+        });
+
+        spyOn($.fn, "animate").and.returnValue(true);
+
+        compiledScope.configureSwitch(true);
+
+        expect($.fn.parent).toHaveBeenCalled();
+        expect($.fn.children).toHaveBeenCalled();
+        expect($.fn.animate).toHaveBeenCalledWith({
+            left: "11"
+          }, 100);
+    });
+
+    it("It should test configureSwitch method when val === false", function() {
+
+        spyOn($.fn, "parent").and.returnValue({
+            css: function() {
+
+            }
+        });
+
+        spyOn($.fn, "children").and.returnValue({
+            css: function() {
+                
+            }
+        });
+
+        spyOn($.fn, "animate").and.returnValue(true);
+
+        compiledScope.configureSwitch(false);
+
+        expect($.fn.parent).toHaveBeenCalled();
+        expect($.fn.children).toHaveBeenCalled();
+        expect($.fn.animate).toHaveBeenCalledWith({
+            left: "1"
+          }, 100);
+    });
+
+    it("It should test processMovement method when pos < 6", function() {
+
+        spyOn($.fn, "css").and.returnValue();
+        spyOn(compiledScope, "sendData").and.returnValue(true);
+        compiledScope.data = false;
+        compiledScope.$digest();
+
+        compiledScope.processMovement(2, true);
+        
+        expect($.fn.css).toHaveBeenCalledWith("left", "1px");
+        expect(compiledScope.sendData).toHaveBeenCalled();
+    });
+
+    it("It should test processMovement method when pos > 6", function() {
+
+        spyOn($.fn, "css").and.returnValue();
+        spyOn(compiledScope, "sendData").and.returnValue(true);
+        compiledScope.data = true;
+        compiledScope.$digest();
+
+        compiledScope.processMovement(7, false);
+        
+        expect($.fn.css).toHaveBeenCalledWith("left", "11px");
+        expect(compiledScope.sendData).not.toHaveBeenCalled();
+    });
+
+    it("It should test sendData method", function() {
+
+        compiledScope.$parent = {
+            "method": function() {
+
+            }
+        };
+
+        compiledScope.call = "method";
+        compiledScope.data = false;
+        compiledScope.$digest();
+        spyOn(compiledScope.$parent, "method").and.returnValue(true);
+
+        compiledScope.sendData();
+
+        expect(compiledScope.data).toEqual(true);
+        expect(compiledScope.$parent[compiledScope.call]).toHaveBeenCalled();
+    });
 });
