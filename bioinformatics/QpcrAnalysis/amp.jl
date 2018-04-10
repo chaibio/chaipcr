@@ -143,7 +143,7 @@ function process_amp(
                 experiments.id = $exp_id AND
                 stages.stage_type <> \'meltcurve\'
         "
-        sr = MySQL.query(db_conn, sr_qry) # fieldnames: [1] steps.id, [2] steps.collect_data, [3] ramps.id, [4] ramps.collect_data
+        sr = MySQL.mysql_execute(db_conn, sr_qry) # fieldnames: [1] steps.id, [2] steps.collect_data, [3] ramps.id, [4] ramps.collect_data
 
         step_ids = unique(sr[1][sr[2] .== 1])
         ramp_ids = unique(sr[3][sr[4] .== 1])
@@ -263,7 +263,7 @@ function get_amp_data(
             step_id is not NULL
         ORDER BY channel, well_num, cycle_num
     "
-    fluo_sel = MySQL.query(db_conn, fluo_qry)
+    fluo_sel = MySQL.mysql_execute(db_conn, fluo_qry)
 
     fluo_raw = reshape(
         fluo_sel[parse(col_name)],
