@@ -22,12 +22,12 @@ function analyze_func(
 
     #extract data from database
     queryTemperatureData = "SELECT * FROM temperature_logs WHERE experiment_id = $exp_id order by elapsed_time"
-    temperatureData = mysql_execute(db_conn, queryTemperatureData)
-    num_dp = size(temperatureData)[1] # dp = data points
+    temperatureData = MySQL.query(db_conn, queryTemperatureData)
+    num_dp = length(temperatureData[1]) # dp = data points
 
     #add a new column (not row) that is the average of the two heat block zones
     hbzt_avg = map(1:num_dp) do i
-        mean(Array(temperatureData[i, [:heat_block_zone_1_temp, :heat_block_zone_2_temp]]))
+        mean(map(name -> temperatureData[name][i], [:heat_block_zone_1_temp, :heat_block_zone_2_temp]))
     end # do i
 
     elapsed_times = temperatureData[:elapsed_time]
@@ -71,7 +71,7 @@ function analyze_func(
         elapsed_time_idc = find(elapsed_times) do elapsed_time
             time_vec[1] < elapsed_time < time_vec[2]
         end # do elapsed_time
-        maximum(abs(temperatureData[elapsed_time_idc, :heat_block_zone_1_temp] .- temperatureData[elapsed_time_idc, :heat_block_zone_2_temp]))
+        maximum(abs.(temperatureData[:heat_block_zone_1_temp][elapsed_time_idc] .- temperatureData[:heat_block_zone_2_temp][elapsed_time_idc]))
     end # do time_vec
 
     #calculate the average ramp rate of the lid heater in degrees C per second

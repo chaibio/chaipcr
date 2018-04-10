@@ -51,10 +51,10 @@ function analyze_func(
 
     fluo_dict = OrderedDict(map(old_calib_labels) do calib_label
         calib_label => hcat(map(CHANNELS) do channel
-            fluo_data[
-                (fluo_data[:step_id] .== calib_info[calib_label]["step_id"]) .& (fluo_data[:channel] .== channel),
-                :fluorescence_value
+            fluo_data[:fluorescence_value][
+                (fluo_data[:step_id] .== calib_info[calib_label]["step_id"]) .& (fluo_data[:channel] .== channel)
             ]
+
         end...) # do channel
     end) # do calib_label
 
@@ -111,7 +111,7 @@ function analyze_func(
 
     ch12_ratios = OrderedDict(map(CHANNEL_IS) do channel_i
         sc_dye = self_calib_vec[channel_i]
-        ["FAM", "HEX"][channel_i] => round(sc_dye[1] ./ sc_dye[2], JSON_DIGITS)
+        ["FAM", "HEX"][channel_i] => round.(sc_dye[1] ./ sc_dye[2], JSON_DIGITS)
     end) # do channel_i
 
 

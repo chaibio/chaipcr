@@ -5,7 +5,7 @@
 @time __precompile__()
 module QpcrAnalysis
 
-using Clustering, DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL #, NLopt # on BBB but not on PC ("ERROR: LoadError: Declaring __precompile__(false) is not allowed in files that are being precompiled". "ERROR: Failed to precompile NLopt to /root/.julia/lib/v0.6/NLopt.ji") # In addition, "HttpServer" for "juliaserver.jl"
+using Clustering, Combinatorics, DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NamedTuples #, NLopt # on BBB but not on PC ("ERROR: LoadError: Declaring __precompile__(false) is not allowed in files that are being precompiled". "ERROR: Failed to precompile NLopt to /root/.julia/lib/v0.6/NLopt.ji") # In addition, "HttpServer" for "juliaserver.jl"
 
 
 # Assumptions
@@ -37,13 +37,15 @@ include("adj_w2wvaf.jl")
 include("calib.jl") # `type CalibCalibOutput` currently not in production
 
 # amplification
-include("types_for_allelic_discrimination.jl")
 include("amp_models/types_for_amp_models.jl")
 include("amp_models/sfc_models.jl")
 include("amp_models/MAKx.jl")
 include("amp_models/MAKERGAUL.jl")
+include("types_for_allelic_discrimination.jl")
 include("amp.jl")
 include("allelic_discrimination.jl")
+
+include("standard_curve.jl")
 
 # melt curve
 include("multi_channel.jl")

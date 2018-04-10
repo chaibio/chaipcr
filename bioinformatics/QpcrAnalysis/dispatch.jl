@@ -2,16 +2,24 @@
 
 function dispatch(action::String, request_body::String)
 
-    req_dict = JSON.parse(request_body; dicttype=OrderedDict) # Julia 0.4.6, DataStructures 0.4.4. DefautlDict and DefaultOrderedDict constructors sometimes don't work on OrderedDict (https://github.com/JuliaLang/DataStructures.jl/issues/205)
-    keys_req_dict = keys(req_dict)
+    req_parsed = JSON.parse(request_body; dicttype=OrderedDict) # Julia 0.4.6, DataStructures 0.4.4. DefautlDict and DefaultOrderedDict constructors sometimes don't work on OrderedDict (https://github.com/JuliaLang/DataStructures.jl/issues/205)
 
-    calib_info = "calibration_info" in keys_req_dict ? req_dict["calibration_info"] : calib_info_AIR
+    if isa(req_parsed, Associative)
+        req_dict = req_parsed
 
-    db_name = "db_name" in keys_req_dict ? req_dict["db_name"] : db_name_AIR
-    db_conn = "db_key" in keys_req_dict ? DB_CONN_DICT[req_dict["db_key"]] : ((db_name == db_name_AIR) ? DB_CONN_DICT["default"] : mysql_connect(
-        req_dict["db_host"], req_dict["db_usr"], req_dict["db_pswd"], req_dict["db_name"]
-    ))
-    # println("non-default db_name: ", db_name)
+        keys_req_dict = keys(req_dict)
+
+        calib_info = "calibration_info" in keys_req_dict ? req_dict["calibration_info"] : calib_info_AIR
+
+        db_name = "db_name" in keys_req_dict ? req_dict["db_name"] : db_name_AIR
+        db_conn = "db_key" in keys_req_dict ? DB_CONN_DICT[req_dict["db_key"]] : ((db_name == db_name_AIR) ? DB_CONN_DICT["default"] : mysql_connect(
+            req_dict["db_host"], req_dict["db_usr"], req_dict["db_pswd"], req_dict["db_name"]
+        ))
+        # println("non-default db_name: ", db_name)
+
+    elseif isa(req_parsed, AbstractVector)
+        req_vec = req_parsed
+    end # if isa
 
     result = try
 
@@ -104,6 +112,9 @@ function dispatch(action::String, request_body::String)
             analyze_func(
                 GUID2Analyze_DICT[guid](), db_conn, exp_id, calib_info;
             )
+
+        elseif action == "standard_curve"
+            standard_curve(req_vec)
 
         else
             error("action $action is not found")

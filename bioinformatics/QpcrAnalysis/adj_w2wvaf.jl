@@ -109,13 +109,13 @@ function get_wva_data(
                     well_constraint
                 ORDER BY well_num, channel
         "
-        calib_df, complete_well_nums = get_mysql_data_well(
+        calib_nt, complete_well_nums = get_mysql_data_well(
             well_nums, calib_qry_2b, db_conn, false)
-        calib_id_key_vec = channels_in_df = unique(calib_df[:channel])
+        calib_id_key_vec = channels_in_df = unique(calib_nt[:channel])
         wva_vecs_byky = map(channels_in_df) do channel_in_df
             wva_vec = map(
                 AbstractFloat, # integer values may cause type issues for downstream computation
-                calib_df[calib_df[:channel] .== channel_in_df, :fluorescence_value]
+                calib_nt[:fluorescence_value][calib_nt[:channel] .== channel_in_df]
             )
             return wva_vec
         end # do channel_in_df
@@ -150,9 +150,9 @@ function get_wva_data(
                     well_constraint
                 ORDER BY well_num
             "
-            wva_df, found_well_nums = get_mysql_data_well(
+            wva_nt, found_well_nums = get_mysql_data_well(
                 well_nums, wva_qry_2b, db_conn, false)
-            push!(wva_vecs_byky, wva_df[:fluorescence_value])
+            push!(wva_vecs_byky, wva_nt[:fluorescence_value])
             push!(well_nums_dupd, found_well_nums)
         end
         complete_well_nums = intersect(well_nums_dupd...)
