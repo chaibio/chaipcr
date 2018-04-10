@@ -368,4 +368,6 @@ describe("Testing general directive", function() {
         expect(compiledScope.popUp).toEqual(true);
         expect(compiledScope.step.ramp.collect_data).toEqual(true);
     });
+
+    
 });
