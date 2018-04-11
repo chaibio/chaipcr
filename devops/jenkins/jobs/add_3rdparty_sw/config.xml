@@ -683,6 +683,21 @@ apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack
 mkdir -p ~/julia-compile
 cd ~/julia-compile
 
+online_julia=true
+if $online_julia
+then
+
+mkdir downloadjulia
+cd downloadjulia
+
+wget https://julialang-s3.julialang.org/bin/linux/armv7l/0.6/julia-0.6.2-linux-armv7l.tar.gz
+tar xfvz julia-0.6.2-linux-armv7l.tar.gz
+cp -r julia-*/* /usr/
+
+cd ..
+rm -r downloadjulia
+
+else
 
 default_slim_arch_filename=&quot;julia-$building_version-slim-default.tgz&quot;
 echo Slim arch filename $default_slim_arch_filename
@@ -691,16 +706,15 @@ wget $download_prefix/$default_slim_arch_filename || exit 1
 sync
 
 echo installing julia
-
-
-
-
 if tar xf $default_slim_arch_filename -C / julia/usr --strip-components=1 
 then
     echo &quot;extracted julia usr files&quot;
 else
    echo &quot;Error extracting julia&quot;
    exit 1
+fi
+
+
 fi
 
 sync
@@ -866,7 +880,7 @@ println(&quot;Setting up Julia: Adding packages&quot;)
        println(&quot;installing library: StatsBase&quot;); Pkg.add(&quot;StatsBase&quot;,v&quot;0.20.1&quot;,v&quot;0.20.2-&quot;)
 
 	println(&quot;All additional packages&quot;)
-
+	Pkg.add(&quot;DataFrames&quot;, v&quot;0.11.5&quot;, v&quot;0.11.6-&quot;)
 
 	println(&quot;ADDING: DataFrames&quot;)
 	Pkg.add(&quot;DataFrames&quot;, v&quot;0.11.2&quot;, v&quot;0.11.3-&quot;)

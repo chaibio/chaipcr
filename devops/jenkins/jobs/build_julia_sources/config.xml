@@ -313,6 +313,28 @@ exit 0
       <siteName>root@$build_machine:22</siteName>
       <command>echo arranging to build julia
 df -h
+
+apt-get -y -q install ntp ntpdate git unzip automake sshpass build-essential
+
+free -m
+if $build_cmake
+then
+echo Building CMake
+   cd /sdcard/upgrade
+   wget https://cmake.org/files/v3.6/cmake-3.6.1.tar.gz
+   tar xfv cmake-3.6.1.tar.gz
+   cd cmake-3.6.1
+   ./bootstrap
+   make || exit 1
+   make install || exit 1
+   cd ..
+   rm -r cmake-3.6.1*
+else
+# installs gcc
+   apt-get install -y -q cmake
+fi
+
+
 if $gcc48
 then
    echo removing latest gcc if any and installing gcc-4.8
@@ -360,7 +382,7 @@ then
    fi
 fi
 
-apt-get -y -q install ntp ntpdate git unzip automake sshpass build-essential
+apt-get -y -q install ntp ntpdate git unzip automake sshpass 
 dpkg --configure -a
 sync
 sleep 5
@@ -387,7 +409,7 @@ then
 fi
 
 else
-      apt-get -y -q install ntp ntpdate git unzip automake sshpass build-essential
+      apt-get -y -q install ntp ntpdate git unzip automake sshpass
 fi
 echo arranging the sdcard
 
@@ -408,29 +430,12 @@ mkdir -p /sdcard/upgrade
 mount /dev/mmcblk0p1 /sdcard/upgrade/
 
 # creating a temporary swap file on sdcard
-sudo fallocate -l 2G /sdcard/upgrade/swapfile #or dd if=/dev/zero of=/sdcard/upgrade/swapfile bs=10M count=300
+sudo fallocate -l 3G /sdcard/upgrade/swapfile #or dd if=/dev/zero of=/sdcard/upgrade/swapfile bs=10M count=300
 sudo chmod 600 /sdcard/upgrade/swapfile
 sudo mkswap /sdcard/upgrade/swapfile
 sudo swapon /sdcard/upgrade/swapfile
 #verifying swap file is successfully added
 sudo swapon -s
-
-free -m
-if $build_cmake
-then
-echo Building CMake
-   cd /sdcard/upgrade
-   wget https://cmake.org/files/v3.6/cmake-3.6.1.tar.gz
-   tar xfv cmake-3.6.1.tar.gz
-   cd cmake-3.6.1
-   ./bootstrap
-   make || exit 1
-   make install || exit 1
-   cd ..
-   rm -r cmake-3.6.1*
-else
-   apt-get install -y -q cmake
-fi
 
 apt-get update
 apt-get upgrade -y -q
@@ -442,7 +447,7 @@ dpkg --configure -a
 
 apt-get autoremove -y -q
 apt-get -q -y install libopenblas-dev libblas-dev liblapack-dev
-apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git build-essential hdf5-tools curl python pkg-config libssl-dev ntp ntpdate git unzip automake sshpass linux-headers-`uname -r` libpoco-dev
+apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git hdf5-tools curl python pkg-config libssl-dev ntp ntpdate git unzip automake sshpass linux-headers-`uname -r` libpoco-dev
 
 apt-get -q -y install liblapack3gf libblas3gf 
 apt-get -f -y -q install
@@ -450,7 +455,7 @@ apt-get -f -y -q install
 apt-get install -q -y libarpack2 libblas3 libgfortran3 liblapack3 ntpdate
 apt-get -f -y -q install
 
-apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3 
+apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3 
 apt-get -y -q install libblas3 libatlas3-base
 apt-get -y -q install libblas-common libfftw3-double3 libfftw3-single3 libllvm3.8 libmetis5 libopenblas-base libunwind8 
 
@@ -837,7 +842,7 @@ rm -fr julia-$building_version julia_*
     tar  cvf ../julia-$building_version.tar * 
     cd .. 
     rm -fr julia-$hashcode 
-apt-get install alien build-essential fakeroot alien devscripts -y -q
+apt-get install alien fakeroot alien devscripts -y -q
     fakeroot alien -d --generate julia-$building_version.tar 
     cd julia-$building_version/ || cd julia-$building_version-?/
     rm debian/control 

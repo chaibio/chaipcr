@@ -432,36 +432,6 @@ sync
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo precompile julia packages if needed
-if [ -e /etc/bypassjulia.flag ]
-then
-    echo  Bypass julia build
-    exit 0
-fi
-
-if [ -e /root/chaipcr/bioinformatics/juliaserver.jl ]
-then
-      time julia -v
-      echo end of test result: $?
-      echo about to start using QpcrAnalysis
-      JULIA_ENV=production julia -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;);reload(&quot;QpcrAnalysis&quot;);using QpcrAnalysis;&apos; --compile=all
-
-      echo tested using QpcrAnalysis
-      if [ -e /root/.julia/lib/v0.6/QpcrAnalysis.ji ]
-      then
-            echo QpcrAnalysis package precompiled.
-      else
-            echo Error precompiling QpcrAnalysis package
-            exit 1
-      fi
-fi
-
-exit 0
-</command>
-      <execEachLine>false</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
       <command>echo closing swap file
 sync
 swapoff -a
@@ -475,6 +445,7 @@ rm /sdcard/upgrade/swapfile
 cd
 find . -name .git -execdir rm -r {} \;
 find . -name *.o  -exec rm {} \;
+find / -name .git -execdir rm -r {} \;
 
 exit 0</command>
       <execEachLine>false</execEachLine>
@@ -716,7 +687,7 @@ for retryloop in 1 2 3
 do
 apt-get  -y -q --purge autoremove g++-4.7 g++-4.8 gcc-4.8 g++-4.8 gcc-4.8 g++-4.8 
 apt-get  -y -q --purge autoremove libblas3gf libblas3gf
-apt-get  -y -q --purge autoremove parted linux-headers-`uname -r` parted automake build-essential cmake curl device-tree-compiler evtest g++ gfortran git hdf5-tools i2c-tools libarpack2 libblas-common libblas-dev libblas3 libedit-dev libfftw3-dev libfftw3-double3 libfftw3-single3 libfontconfig1-dev libfreetype6-dev libgfortran3 libgfortran3 libgmp3-dev liblapack3 liblapack3gf libllvm3.8 libmetis5 libmpfr-dev libopenblas-base libopenblas-dev libqt4-webkit libssl-dev libtool libunwind8 libxcursor-dev libxext-dev libxfixes-dev libxft-dev libxi-dev libxml2-dev libxrandr-dev libxrender-dev libxslt-dev lsb-release m4 nodejs ntp ntpdate parted pkg-config python sshpass unzip
+apt-get  -y -q --purge autoremove parted linux-headers-`uname -r` parted automake build-essential cmake curl device-tree-compiler evtest g++ gfortran git i2c-tools libarpack2 libblas-common libblas-dev libblas3 libedit-dev libfftw3-dev libfftw3-double3 libfftw3-single3 libfontconfig1-dev libfreetype6-dev libgfortran3 libgfortran3 libgmp3-dev liblapack3 liblapack3gf libllvm3.8 libmetis5 libmpfr-dev libopenblas-base libopenblas-dev libqt4-webkit libssl-dev libtool libunwind8 libxcursor-dev libxext-dev libxfixes-dev libxft-dev libxi-dev libxml2-dev libxrandr-dev libxrender-dev libxslt-dev lsb-release m4 nodejs ntp ntpdate parted pkg-config python sshpass unzip
 
 apt-get install -y -q liblapack-dev 
 apt-get -f  -y -q install
@@ -728,7 +699,7 @@ apt-get --purge  -y -q autoremove g++
 apt-get  -y -q --purge autoremove gcc 
 apt-get  -y -q -f install
 
-apt-get  -y -q --purge autoremove gfortran* git hdf5-tools i2c-tools 
+apt-get  -y -q --purge autoremove gfortran* git i2c-tools 
 apt-get  -y -q --purge autoremove icu-devtools
 apt-get -y -q remove qt4-default qt5-default gettext
 DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge libgtk-3-0
@@ -792,6 +763,39 @@ exit 0</command>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
+      <command>echo precompile julia packages if needed
+if [ -e /etc/bypassjulia.flag ]
+then
+    echo  Bypass julia build
+    exit 0
+fi
+
+if [ -e /root/chaipcr/bioinformatics/juliaserver.jl ]
+then
+      time julia -v
+      echo about to start using QpcrAnalysis
+#      cp /root/chaipcr/bioinformatics/QpcrAnalysis/__init__.jl /root/chaipcr/bioinformatics/QpcrAnalysis/__init__.jl.org
+#      sed -i &quot;s/# MySQL./return nothing \n# MySQL./&quot; /root/chaipcr/bioinformatics/QpcrAnalysis/__init__.jl
+      JULIA_ENV=production julia -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;);reload(&quot;QpcrAnalysis&quot;);using QpcrAnalysis;&apos; --compile=all
+
+#      cp /root/chaipcr/bioinformatics/QpcrAnalysis/__init__.jl.org /root/chaipcr/bioinformatics/QpcrAnalysis/__init__.jl
+
+      echo tested using QpcrAnalysis
+      if [ -e /root/.julia/lib/v0.6/QpcrAnalysis.ji ]
+      then
+            echo QpcrAnalysis package precompiled.
+      else
+            echo Error precompiling QpcrAnalysis package
+            exit 1
+      fi
+fi
+
+exit 0
+</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
       <command>echo changing root password to chaipcr and disabling login prompt on console
 sudo systemctl disable getty@tty1.service
 echo &quot;root:chaipcr&quot; | chpasswd
@@ -843,6 +847,8 @@ sync
  fsck /dev/mmcblk0p1 -y -f
 
 mount /dev/mmcblk0p1 /sdcard/upgrade/
+
+df -h
 
 exit 0</command>
       <execEachLine>false</execEachLine>
