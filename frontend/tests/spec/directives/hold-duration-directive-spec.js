@@ -138,4 +138,92 @@ describe("Testing holdDuration directive", function() {
 
     });
 
+    it("It should test save method when value is zero", function() {
+
+        spyOn(_TimeService, "convertToSeconds").and.returnValue(0);
+        spyOn(_TimeService, "newTimeFormatting").and.returnValue(10);
+        spyOn(_alerts, "showMessage").and.returnValue();
+        spyOn(compiledScope, "ifLastStep").and.returnValue(true);
+
+        compiledScope.$parent = {
+            step: {
+                collect_data: false
+            }
+        };
+
+        compiledScope.reading = 24;
+
+        compiledScope.$digest();
+
+        _$timeout = function(callback) {
+            callback();
+        };
+
+        compiledScope.save();
+
+        expect(_TimeService.convertToSeconds).toHaveBeenCalled();
+        expect(_TimeService.newTimeFormatting).toHaveBeenCalled();
+        expect(compiledScope.ifLastStep).toHaveBeenCalled();
+    });
+
+    it("It should test save method when value is zero and when ifLastStep is false", function() {
+
+        spyOn(_TimeService, "convertToSeconds").and.returnValue(0);
+        spyOn(_TimeService, "newTimeFormatting").and.returnValue(10);
+        spyOn(_alerts, "showMessage").and.returnValue();
+        spyOn(compiledScope, "ifLastStep").and.returnValue(false);
+
+        //spyOn(_alerts, "showMessage").and.returnValue(true);
+
+        compiledScope.$parent = {
+            step: {
+                collect_data: false
+            }
+        };
+
+        compiledScope.reading = 24;
+
+        compiledScope.$digest();
+
+        _$timeout = function(callback) {
+            callback();
+        };
+        
+        compiledScope.save();
+
+        expect(_TimeService.convertToSeconds).toHaveBeenCalled();
+        expect(_TimeService.newTimeFormatting).toHaveBeenCalled();
+        expect(compiledScope.ifLastStep).toHaveBeenCalled();
+        expect(_alerts.showMessage).toHaveBeenCalled();
+    });
+
+    it("It should test save method when value is positive", function() {
+
+        spyOn(_TimeService, "convertToSeconds").and.returnValue(10);
+        spyOn(_TimeService, "newTimeFormatting").and.returnValue(10);
+        spyOn(_alerts, "showMessage").and.returnValue();
+        spyOn(compiledScope, "ifLastStep").and.returnValue(false);
+        
+        compiledScope.$parent = {
+            step: {
+                collect_data: false
+            }
+        };
+
+        compiledScope.reading = 24;
+
+        compiledScope.$digest();
+
+        _$timeout = function(callback) {
+            callback();
+        };
+        
+        compiledScope.save();
+
+        expect(_TimeService.convertToSeconds).toHaveBeenCalled();
+        expect(_TimeService.newTimeFormatting).toHaveBeenCalled();
+        expect(compiledScope.ifLastStep).not.toHaveBeenCalled();
+        expect(_alerts.showMessage).not.toHaveBeenCalled();
+    });
+
 });
