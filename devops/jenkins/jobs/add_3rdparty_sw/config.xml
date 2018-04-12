@@ -822,6 +822,9 @@ cat &lt;&lt;EOF &gt;&gt; chaibio_packages.jl
 println(&quot;Setting up Julia: Adding packages&quot;)
 
        println(&quot;installing library: Compat&quot;);Pkg.add(&quot;Compat&quot;,v&quot;0.61.0&quot;,v&quot;0.61.1-&quot;)
+       println(&quot;installing library: Polynomials&quot;);Pkg.add(&quot;Polynomials&quot;,v&quot;0.2.2&quot;,v&quot;0.2.3-&quot;)
+       println(&quot;installing library: IterTools&quot;);Pkg.add(&quot;IterTools&quot;,v&quot;0.2.1&quot;,v&quot;0.2.2-&quot;)
+       println(&quot;installing library: Combinatorics&quot;);Pkg.add(&quot;Combinatorics&quot;,v&quot;0.6.0&quot;,v&quot;0.6.1-&quot;)
        println(&quot;installing library: SHA&quot;);Pkg.add(&quot;SHA&quot;,v&quot;0.5.6&quot;,v&quot;0.5.7-&quot;)
        println(&quot;installing library: URIParser&quot;); Pkg.add(&quot;URIParser&quot;,v&quot;0.3.1&quot;,v&quot;0.3.2-&quot;)
        println(&quot;ADDING: BinDeps&quot;); Pkg.add(&quot;BinDeps&quot;,v&quot;0.8.0&quot;,v&quot;0.8.1-&quot;)
@@ -880,8 +883,6 @@ println(&quot;Setting up Julia: Adding packages&quot;)
        println(&quot;installing library: StatsBase&quot;); Pkg.add(&quot;StatsBase&quot;,v&quot;0.20.1&quot;,v&quot;0.20.2-&quot;)
 
 	println(&quot;All additional packages&quot;)
-	Pkg.add(&quot;DataFrames&quot;, v&quot;0.11.5&quot;, v&quot;0.11.6-&quot;)
-
 	println(&quot;ADDING: DataFrames&quot;)
 	Pkg.add(&quot;DataFrames&quot;, v&quot;0.11.2&quot;, v&quot;0.11.3-&quot;)
 	println(&quot;ADDING: HDF5&quot;)
@@ -911,15 +912,15 @@ println(&quot;Setting up Julia: Adding packages&quot;)
 	Pkg.build(&quot;DataArrays&quot;,&quot;DataStructures&quot;, &quot;SpecialFunctions&quot;, &quot;MathProgBase&quot;, &quot;HDF5&quot;, &quot;Clustering&quot;, &quot;Nullables&quot;,&quot;JSON&quot;, &quot;JLD&quot;, &quot;NLopt&quot;, &quot;JuMP&quot;, &quot;HttpServer&quot;, &quot;ProfileView&quot;, &quot;Dierckx&quot;, &quot;Ipopt&quot;, &quot;MySQL&quot;, &quot;DataFrames&quot;)
 	println(&quot;Building: Done&quot;)
 
-		println(&quot;Pinning all done&quot;)
-		using DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering
-                println(&quot;Used DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering&quot;)
-		using Nullables, JSON, JLD, NLopt, JuMP, HttpServer, ProfileView, DataArrays
-                println(&quot;Used Nullables, JSON, JLD, NLopt, JuMP, HttpServer, ProfileView, DataArrays&quot;)
-		using Dierckx, Ipopt, MySQL, DataFrames
-	        println(&quot;All packages used&quot;)
+	println(&quot;Pinning all done&quot;)
+	using DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering
+               println(&quot;Used DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering&quot;)
+	using JSON, JLD, NLopt, JuMP, HttpServer, ProfileView, DataArrays
+        println(&quot;Used JSON, JLD, NLopt, JuMP, HttpServer, ProfileView, DataArrays&quot;)
+	using Dierckx, Ipopt, MySQL, DataFrames
+	println(&quot;All packages used&quot;)
 
-		Pkg.status()
+	Pkg.status()
 	println(&quot;Using: Done&quot;)
 
 println(&quot;Setting up Julia: done testing.. quitting..&quot;)
