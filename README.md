@@ -1,7 +1,7 @@
 Welcome to Chai PCR
 ===================
 
-Chai PCR is a software platform that power's Chai's line of Real-Time PCR Thermocyclers including the [Open qPCR](https://www.chaibio.com/openqpcr) and related future devices. Chai PCR is released as open source to faciliate development of open source qPCR instruments and to welcome community contributions.
+Chai PCR is a software platform that power's Chai's line of Real-Time PCR Thermocyclers including the [Open qPCR Real-Time PCR instrument](https://www.chaibio.com/openqpcr) and related future devices. Chai PCR is released as open source to faciliate development of open source qPCR instruments and to welcome community contributions.
 
 This software release is intended for developers, is provided as-is without warranty, and is not supported by [Chai](https://www.chaibio.com). Users of Chai's devices and Open qPCR should refer to [www.chaibio.com/openqpcr](https://www.chaibio.com/openqpcr) for device information and support, or [www.chaibio.com/about](https://www.chaibio.com/about) for more information about Chai.
 
