@@ -79,4 +79,105 @@ describe("It should test rampSpeed dirctive", function() {
         compiledScope.$digest();
 
     });
+
+    it("It should test configureData method", function() {
+
+        compiledScope.reading = 0;
+        compiledScope.$digest();
+        compiledScope.configureData();
+        expect(compiledScope.shown).toEqual(5);
+        expect(compiledScope.unit).toEqual(" ºC/s");
+
+    });
+
+    it("It should test configureData method when reading is greater then 0", function() {
+
+        compiledScope.reading = 10;
+        compiledScope.$digest();
+        compiledScope.configureData();
+        expect(compiledScope.shown).toEqual(10);
+        expect(compiledScope.unit).toEqual(" ºC/s");
+
+    });
+
+    it("It should test editAndFocus method", function() {
+
+        compiledScope.shown = 5;
+        compiledScope.$digest();
+        compiledScope.editAndFocus();
+
+        expect(compiledScope.shown).toEqual(5);
+        expect(compiledScope.unit).toEqual(" ºC/s");
+
+    });
+
+    it("It should test editAndFocus method", function() {
+
+        compiledScope.shown = 10;
+        compiledScope.$digest();
+        compiledScope.editAndFocus();
+
+        expect(compiledScope.shown).toEqual(10);
+        expect(compiledScope.unit).toEqual("ºC/s");
+        expect(compiledScope.edit).toEqual(true);
+    });
+    
+    it("It should test save method when number of fractions greater than five", function() {
+
+        spyOn(compiledScope, "configureData").and.returnValue(true);
+        spyOn(_alerts, "showMessage").and.returnValue(true);
+        compiledScope.shown = 10.123456;
+        compiledScope.$digest();
+        
+        compiledScope.save();
+
+        expect(compiledScope.configureData).toHaveBeenCalled();
+        expect(_alerts.showMessage).toHaveBeenCalled();
+    });
+
+    it("It should test save method when shown is less than six", function() {
+
+        spyOn(compiledScope, "configureData").and.returnValue(true);
+        //spyOn(_alerts, "showMessage").and.returnValue(true);
+        compiledScope.shown = 3.123;
+        compiledScope.$digest();
+
+        compiledScope.configureData();
+        compiledScope.save();
+
+        expect(compiledScope.configureData).toHaveBeenCalled();
+       
+    });
+
+    it("It should test save method when shown is less than six", function() {
+
+        spyOn(compiledScope, "configureData").and.returnValue(true);
+        
+        compiledScope.shown = 0;
+        compiledScope.$digest();
+
+        compiledScope.configureData();
+        compiledScope.save();
+
+        expect(compiledScope.configureData).toHaveBeenCalled();
+        expect(compiledScope.shown).toEqual(5);
+        expect(compiledScope.reading).toEqual(5);
+        
+    });
+
+    it("It should test save method when shown is not a number", function() {
+
+        spyOn(compiledScope, "configureData").and.returnValue(true);
+        spyOn(_alerts, "showMessage").and.returnValue();
+
+        compiledScope.shown = "bingo";
+        compiledScope.$digest();
+
+        compiledScope.configureData();
+        compiledScope.save();
+
+        expect(compiledScope.configureData).toHaveBeenCalled();
+        expect(_alerts.showMessage).toHaveBeenCalled();
+
+    });
 });
