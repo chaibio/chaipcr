@@ -4,11 +4,9 @@ function standard_curve(req_vec::Vector{Any})
     target_input_dict = OrderedDict{Int,NamedTuple}()
     group_input_vec = Vector{Vector{Int}}()
 
-    for well_dict in req_vec:
-
+    for well_dict in req_vec
         target_vec = well_dict["well"]
         sample = well_dict["sample"]
-
         for target_dict in target_vec
             target = target_dict["target"]
             cq = target_dict["cq"]
