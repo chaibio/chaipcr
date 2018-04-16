@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version='1.1' encoding='UTF-8'?>
 <com.tikal.jenkins.plugins.multijob.MultiJobProject plugin="jenkins-multijob-plugin@1.27">
   <actions/>
   <description>Flash the BB with a stock Stretch image 49 and add 3rd party software.</description>
@@ -13,6 +13,7 @@
           <name>build_machine</name>
           <description>IP address of the building beaglebone.</description>
           <defaultValue>10.0.100.240</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>bypass_julia</name>
@@ -23,22 +24,13 @@
           <name>download_prefix</name>
           <description>Download folder URL</description>
           <defaultValue>http://10.0.1.20/download</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
-        <hudson.model.ChoiceParameterDefinition>
-          <name>building_version</name>
-          <description>Julia version.</description>
-          <choices class="java.util.Arrays$ArrayList">
-            <a class="string-array">
-              <string>v0.6.2</string>
-              <string>v0.6.1</string>
-              <string>v0.6.0</string>
-            </a>
-          </choices>
-        </hudson.model.ChoiceParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>output_image_prefix</name>
           <description></description>
           <defaultValue>Stretch49Clean</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>

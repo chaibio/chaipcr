@@ -31,17 +31,6 @@
           <description>Add or bypass adding julia binaries to the build.</description>
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
-        <hudson.model.ChoiceParameterDefinition>
-          <name>building_version</name>
-          <description>Julia version.</description>
-          <choices class="java.util.Arrays$ArrayList">
-            <a class="string-array">
-              <string>v0.6.2</string>
-              <string>v0.6.1</string>
-              <string>v0.6.0</string>
-            </a>
-          </choices>
-        </hudson.model.ChoiceParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>download_prefix</name>
           <description>Download folder URL</description>

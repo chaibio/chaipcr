@@ -347,12 +347,55 @@ free -m
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>
-echo browser compile
+      <command>echo precompile julia packages if needed
+if [ -e /etc/bypassjulia.flag ]
+then
+    echo  Bypass julia build
+    exit 0
+fi
+
+if [ -e /root/chaipcr/bioinformatics/juliaserver.jl ]
+then
+      julia -v
+      echo about to start using QpcrAnalysis
+free -m
+
+apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3
+
+apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3  || exit 1
+
+#      cp /root/chaipcr/bioinformatics/QpcrAnalysis/__init__.jl /root/chaipcr/bioinformatics/QpcrAnalysis/__init__.jl.org
+#      sed -i &quot;s/# MySQL./return nothing \n# MySQL./&quot; /root/chaipcr/bioinformatics/QpcrAnalysis/__init__.jl
+      JULIA_ENV=production julia -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;);reload(&quot;QpcrAnalysis&quot;);using QpcrAnalysis;&apos; --compile=all
+
+#      cp /root/chaipcr/bioinformatics/QpcrAnalysis/__init__.jl.org /root/chaipcr/bioinformatics/QpcrAnalysis/__init__.jl
+
+      echo tested using QpcrAnalysis
+      if [ -e /root/.julia/lib/v0.6/QpcrAnalysis.ji ]
+      then
+            echo QpcrAnalysis package precompiled.
+      else
+            echo Error precompiling QpcrAnalysis package
+            exit 1
+      fi
+fi
+
+find . -name .git -execdir rm -r {} \;
+find . -name *.o  -exec rm {} \;
+find / -name .git -execdir rm -r {} \;
+
+exit 0
+</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo browser compile
 cd /sdcard/upgrade/
 rm -r compile-browser || true
 mkdir compile-browser
 cd compile-browser/
+apt-get install -y git make linux-headers-`uname -r` build-essential cmake curl pkg-config python sshpass unzip
 
 branch_param=
 
@@ -428,26 +471,6 @@ systemctl enable realtime.service
 
 sync
 </command>
-      <execEachLine>false</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
-      <command>echo closing swap file
-sync
-swapoff -a
-/sbin/swapoff  -a
-
-echo clearing more space and removing .git julia folders
-
-apt-get -q -y --fix-broken install
-
-rm /sdcard/upgrade/swapfile
-cd
-find . -name .git -execdir rm -r {} \;
-find . -name *.o  -exec rm {} \;
-find / -name .git -execdir rm -r {} \;
-
-exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
@@ -680,6 +703,37 @@ cp ~/chaipcr/web/config/etc/unicorn/chaipcr.conf /etc/unicorn/
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
+      <command>echo Maintenance
+
+cd /root/chaipcr/web
+bundle exec rake db:migrate # migrates database as needed
+
+
+exit 0</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo closing swap file
+sync
+swapoff -a
+/sbin/swapoff  -a
+
+echo clearing more space and removing .git julia folders
+
+apt-get -q -y --fix-broken install
+
+rm /sdcard/upgrade/swapfile
+cd
+find . -name .git -execdir rm -r {} \;
+find . -name *.o  -exec rm {} \;
+find / -name .git -execdir rm -r {} \;
+
+exit 0</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
       <command>echo cleanup to free up some space
 df -h
 
@@ -752,50 +806,6 @@ echo basic beaglebone setup done!</command>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo Maintenance
-
-cd /root/chaipcr/web
-bundle exec rake db:migrate # migrates database as needed
-
-
-exit 0</command>
-      <execEachLine>false</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
-      <command>echo precompile julia packages if needed
-if [ -e /etc/bypassjulia.flag ]
-then
-    echo  Bypass julia build
-    exit 0
-fi
-
-if [ -e /root/chaipcr/bioinformatics/juliaserver.jl ]
-then
-      time julia -v
-      echo about to start using QpcrAnalysis
-#      cp /root/chaipcr/bioinformatics/QpcrAnalysis/__init__.jl /root/chaipcr/bioinformatics/QpcrAnalysis/__init__.jl.org
-#      sed -i &quot;s/# MySQL./return nothing \n# MySQL./&quot; /root/chaipcr/bioinformatics/QpcrAnalysis/__init__.jl
-      JULIA_ENV=production julia -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;);reload(&quot;QpcrAnalysis&quot;);using QpcrAnalysis;&apos; --compile=all
-
-#      cp /root/chaipcr/bioinformatics/QpcrAnalysis/__init__.jl.org /root/chaipcr/bioinformatics/QpcrAnalysis/__init__.jl
-
-      echo tested using QpcrAnalysis
-      if [ -e /root/.julia/lib/v0.6/QpcrAnalysis.ji ]
-      then
-            echo QpcrAnalysis package precompiled.
-      else
-            echo Error precompiling QpcrAnalysis package
-            exit 1
-      fi
-fi
-
-exit 0
-</command>
-      <execEachLine>false</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
       <command>echo changing root password to chaipcr and disabling login prompt on console
 sudo systemctl disable getty@tty1.service
 echo &quot;root:chaipcr&quot; | chpasswd
@@ -859,25 +869,8 @@ echo all done for $build_machine, you can call create_factory_settings_sdcard jo
 
 exit 0</command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
-      <command></command>
-      <execEachLine>false</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
   </builders>
-  <publishers>
-    <com.chikli.hudson.plugin.naginator.NaginatorPublisher plugin="naginator@1.17.2">
-      <regexpForRerun></regexpForRerun>
-      <rerunIfUnstable>false</rerunIfUnstable>
-      <rerunMatrixPart>false</rerunMatrixPart>
-      <checkRegexp>false</checkRegexp>
-      <regexpForMatrixStrategy>TestParent</regexpForMatrixStrategy>
-      <delay class="com.chikli.hudson.plugin.naginator.FixedDelay">
-        <delay>2000</delay>
-      </delay>
-      <maxSchedule>5</maxSchedule>
-    </com.chikli.hudson.plugin.naginator.NaginatorPublisher>
-  </publishers>
+  <publishers/>
   <buildWrappers>
     <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.8"/>
   </buildWrappers>

@@ -30,18 +30,6 @@
           <defaultValue>http://10.0.1.20/download</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
-        <hudson.model.ChoiceParameterDefinition>
-          <name>building_version</name>
-          <description>Julia version</description>
-          <choices class="java.util.Arrays$ArrayList">
-            <a class="string-array">
-              <string>v0.6.2</string>
-              <string>v0.6.1</string>
-              <string>v0.6.0</string>
-              <string>release-0.6</string>
-            </a>
-          </choices>
-        </hudson.model.ChoiceParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -668,7 +656,7 @@ sudo swapon /sdcard/upgrade/swapfile
 sudo swapon -s
 
 free -m
-
+apt-get -q -y install libnlopt0
 apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3
 
 if $bypass_julia
@@ -683,10 +671,6 @@ apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack
 mkdir -p ~/julia-compile
 cd ~/julia-compile
 
-online_julia=true
-if $online_julia
-then
-
 mkdir downloadjulia
 cd downloadjulia
 
@@ -696,26 +680,6 @@ cp -r julia-*/* /usr/
 
 cd ..
 rm -r downloadjulia
-
-else
-
-default_slim_arch_filename=&quot;julia-$building_version-slim-default.tgz&quot;
-echo Slim arch filename $default_slim_arch_filename
-wget $download_prefix/$default_slim_arch_filename || exit 1
-
-sync
-
-echo installing julia
-if tar xf $default_slim_arch_filename -C / julia/usr --strip-components=1 
-then
-    echo &quot;extracted julia usr files&quot;
-else
-   echo &quot;Error extracting julia&quot;
-   exit 1
-fi
-
-
-fi
 
 sync
 
@@ -930,8 +894,16 @@ sync
 sleep 60
 
 # leave julia staff to be able to test why it crashes the system
-julia chaibio_packages.jl
+if julia chaibio_packages.jl
+then
+    echo pinning all done
+else
+    echo Error pinning julia packages
+    exit 1
+fi
+
 rm chaibio_packages.jl
+sed -i &apos;s/is_nullable = mysql_is/is_nullable = false # mysql_is/&apos; /root/.julia/v0.6/MySQL/src/types.jl
 
 echo test finished. cleaning..
 sync
