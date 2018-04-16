@@ -5,7 +5,7 @@
 @time __precompile__()
 module QpcrAnalysis
 
-using Clustering, Combinatorics, DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NamedTuples #, NLopt # on BBB but not on PC ("ERROR: LoadError: Declaring __precompile__(false) is not allowed in files that are being precompiled". "ERROR: Failed to precompile NLopt to /root/.julia/lib/v0.6/NLopt.ji") # In addition, "HttpServer" for "juliaserver.jl"
+using DataArrays, Clustering, Combinatorics, DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NamedTuples #, NLopt # on BBB but not on PC ("ERROR: LoadError: Declaring __precompile__(false) is not allowed in files that are being precompiled". "ERROR: Failed to precompile NLopt to /root/.julia/lib/v0.6/NLopt.ji") # In addition, "HttpServer" for "juliaserver.jl"
 
 
 # Assumptions
