@@ -5,11 +5,12 @@ function __init__()
 
     # MySQL.MySQLHandle objects involve raw Ptr objects and need to be defined in `__init__` (runtime instead of compile time), since memory layout does not remain the same across process restarts (e.g. between compile time and runtime).
     global const DB_CONN_DICT = OrderedDict(map([
-        ("default", DB_INFO["database"]),
-        ("t1", "test_1ch"),
-        ("t2", "test_2ch")
+        ("default", DB_INFO["database"])
+	#,
+    #    ("t1", "test_1ch"),
+    #    ("t2", "test_2ch")
     ]) do db_tuple
-        db_tuple[1] => MySQL.connect(DB_INFO["host"], DB_INFO["username"], DB_INFO["password"]; db=db_tuple[2])
+        db_tuple[1] => mysql_connect(DB_INFO["host"], DB_INFO["username"], DB_INFO["password"], db_tuple[2])
     end) # do db_name
 
     # # comment this section when `--compile-all`
