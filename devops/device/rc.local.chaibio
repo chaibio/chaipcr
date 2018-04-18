@@ -187,7 +187,7 @@ start_julia () {
 		while true
 		do
 			echo starting julia
-			JULIA_ENV=production julia -e 'push!(LOAD_PATH, "/root/chaipcr/bioinformatics/QpcrAnalysis/"); reload("QpcrAnalysis"); include("/root/chaipcr/bioinformatics/juliaserver.jl")' || true
+			JULIA_ENV=production julia -e 'push!(LOAD_PATH, "/root/chaipcr/bioinformatics/QpcrAnalysis/"); include("/root/chaipcr/bioinformatics/juliaserver.jl")' || true
 			echo julia exit
 			sleep 10
 		done
