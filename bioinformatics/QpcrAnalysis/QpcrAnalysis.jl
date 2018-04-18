@@ -1,22 +1,33 @@
 #
 
+
+# Notes on using MySQL 0.3.0 instead of current version
+# ----
+#                   0.3.0                      0.5.2
+# connect           mysql_connect(, some_db)   connect(; db=some_db)
+# query function    mysql_execute              query
+# query return      Array(DataFrame)           NamedTuple
+# data container    DataFrame                  NamedTuple
+# data access       [1]                        (direct)
+# ----
+# `connect` examples:
+# 0.3.0 `MySQL.mysql_connect(host, username, password, some_db)`
+# 0.5.2 `MySQL.connect(host, username, password; db=some_db)`
+# `query` examples:
+# 0.3.0 `MySQL.mysql_execute(some_query)[1][:some_header]`
+# 0.5.2 `MySQL.query(some_query)[:some_header]`
+
+
+
+
 # using Base
 
 @time __precompile__()
 module QpcrAnalysis
 
-using DataArrays, Clustering, Combinatorics, DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NamedTuples #, NLopt # on BBB but not on PC ("ERROR: LoadError: Declaring __precompile__(false) is not allowed in files that are being precompiled". "ERROR: Failed to precompile NLopt to /root/.julia/lib/v0.6/NLopt.ji") # In addition, "HttpServer" for "juliaserver.jl"
-
-
-# Assumptions
-# (1) Integers: channel
-
-
-# possible errors
-# (1) in Julia 0.4.6, `maximum`, `minimum` and `extrema` raises `ArgumentError` over empty collection, while R returns `-Inf` for `max` and `Inf` for `min` over empty collection.
-
-
-# to change from "ct" to "cq": `min_ct` in "dispatch.jl".
+using Clustering, Combinatorics, DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NamedTuples, DataArrays #, NLopt
+# `, DataArrays` needed if `Pkg.add("DataFrames", v"0.11.2", v"0.11.3-")`, but not needed when using latest version as of 2018-04-10
+# `, NLopt` on BBB but not on PC ("ERROR: LoadError: Declaring __precompile__(false) is not allowed in files that are being precompiled". "ERROR: Failed to precompile NLopt to /root/.julia/lib/v0.6/NLopt.ji") # In addition, "HttpServer" for "juliaserver.jl"
 
 
 const MODULE_NAME = "QpcrAnalysis"
@@ -70,41 +81,6 @@ include("__init__.jl")
 # include("pnmsmu.jl")
 
 
-
-
-
-# include files
-
-# const MODULE_NAME = "Essentials"
-#
-# const ANALYZE_DICT = OrderedDict{String,Function}()
-#
-# const LOAD_FROM_DIR = LOAD_PATH[find(LOAD_PATH) do path_
-#     isfile("$path_/$MODULE_NAME/$MODULE_NAME.jl")
-# end][1] # slice by boolean vector returned a one-element vector. Assumption: LOAD_PATH is global
-#
-# const MODULE_DIR = joinpath(LOAD_FROM_DIR, MODULE_NAME)
-#
-# for (root, dirs, fns) in walkdir(MODULE_DIR)
-#
-#     fn_jls_to_include = fns[find(fns) do fn
-#         fn != "$MODULE_NAME.jl" && endswith(fn, ".jl")
-#     end]
-#
-#     for fn_jl in fn_jls_to_include
-#         include(joinpath(MODULE_DIR, root, fn_jl))
-#     end
-#
-#     fn_k_dict_vec = fns[
-#         find(fns) do fn
-#             startswith(fn, "k_dict_")
-#         end
-#     ]
-#     if length(fn_k_dict_vec) > 0
-#         const K4DCV = load(joinpath(MODULE_DIR, root, fn_k_dict_vec[1]))["k4dcv"]
-#     end
-#
-# end # for (root ...
 
 
 end # module QpcrAnalysis

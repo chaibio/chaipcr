@@ -114,7 +114,7 @@ function test(;
 
         # MySQL
         db_qry = "select * from experiments"
-        tr_cs["mysql"] = MySQL.mysql_execute(db_conn, db_qry)
+        tr_cs["mysql"] = MySQL.mysql_execute(db_conn, db_qry)[1]
         print_v(println, verbose, "Passed: MySQL \"select * from users\".")
 
 
@@ -127,7 +127,7 @@ function test(;
                 LEFT JOIN stages ON protocols.id = stages.protocol_id
                 WHERE experiments.id = $exp_id AND stages.stage_type <> \'holding\'
             "
-            stage_id = unique(MySQL.mysql_execute(db_conn, stage_qry)[:id])[1]
+            stage_id = unique(MySQL.mysql_execute(db_conn, stage_qry)[1][:id])[1]
 
             if debug
                 if action == "amplification"
@@ -157,7 +157,7 @@ function test(;
             calib_info_anlz = (guid == "optical_test_dual_channel") ? begin
                 step_names = ["baseline", "water", "channel_1", "channel_2"]
                 step_qry = "SELECT step_id from fluorescence_data WHERE experiment_id = $exp_id"
-                step_ids = sort(unique(MySQL.mysql_execute(db_conn, step_qry)[:step_id])) # assuming the order fits that in `step_names`
+                step_ids = sort(unique(MySQL.mysql_execute(db_conn, step_qry)[1][:step_id])) # assuming the order fits that in `step_names`
                 OrderedDict(map(1:4) do i
                     step_names[i] => OrderedDict(
                         "calibration_id" => exp_id,
