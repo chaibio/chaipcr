@@ -1128,7 +1128,7 @@ class ExperimentsController < ApplicationController
       body = {calibration_info: calibrate_hash(calibration_id), experiment_id: experiment.id}
       body = body.merge(experiment.experiment_definition.amplification_option.to_hash) if !experiment.experiment_definition.amplification_option.nil?
       logger.info("body=#{body}")
-      response = HTTParty.post("http://127.0.0.1:8080/experiments/#{experiment.id}/amplification", body: body.to_json)
+      response = HTTParty.post("http://127.0.0.1:8081/experiments/#{experiment.id}/amplification", body: body.to_json)
       if response.code != 200
         raise_julia_error(response)
       else
@@ -1227,7 +1227,7 @@ class ExperimentsController < ApplicationController
       body = {calibration_info: calibrate_hash(calibration_id), experiment_id: experiment.id, stage_id: stage_id}
       body = body.merge({qt_prob: 0.1, max_normd_qtv:0.9}) if experiment.experiment_definition.guid == "thermal_consistency"
       #logger.info("body=#{body}")
-      response = HTTParty.post("http://127.0.0.1:8080/experiments/#{experiment.id}/meltcurve", body: body.to_json)
+      response = HTTParty.post("http://127.0.0.1:8081/experiments/#{experiment.id}/meltcurve", body: body.to_json)
       if response.code != 200
         raise_julia_error(response)
       else
@@ -1281,7 +1281,7 @@ class ExperimentsController < ApplicationController
       begin
         body = {calibration_info: calibrate_hash(experiment.calibration_id), experiment_info: experiment.as_json}
         #logger.info("body=#{body}")
-        response = HTTParty.post("http://127.0.0.1:8080/experiments/#{experiment.id}/analyze", body: body.to_json)
+        response = HTTParty.post("http://127.0.0.1:8081/experiments/#{experiment.id}/analyze", body: body.to_json)
         if response.code != 200
           raise_julia_error(response)
         else
