@@ -768,6 +768,14 @@ DEBIAN_FRONTEND=noninteractive apt-get -q -y install gettext
 DEBIAN_FRONTEND=noninteractive apt-get -q -y install libgtk-3-0
 apt-get -y -q install libpango1.0-0 libglib2.0-0 libcairo2
 apt-get -q -y install libboost-chrono-dev libboost-system-dev
+if [ -e /etc/bypassjulia.flag ]
+then
+    echo Julia is not installed
+else
+    apt-get -q -y install hdf5-tools
+fi
+
+
 
 df -h
 
