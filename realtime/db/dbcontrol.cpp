@@ -779,12 +779,13 @@ void DBControl::updateSettings(const Settings &settings)
 void DBControl::getCurrentUpgrade(std::string &version, bool &downloaded)
 {
     int tmpDownloaded = 0;
+    soci::indicator indicator;
 
     {
         std::lock_guard<std::mutex> lock(_readMutex);
 
         BEGIN_DB_READ()
-        *_readSession << "SELECT COUNT(1) version, downloaded FROM upgrades", soci::into(version), soci::into(tmpDownloaded);
+        *_readSession << "SELECT COUNT(1) version, downloaded FROM upgrades", soci::into(version, indicator), soci::into(tmpDownloaded, indicator);
         END_DB_READ();
     }
 

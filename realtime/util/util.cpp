@@ -452,6 +452,9 @@ bool getPartitionAvailableSpace(const std::string &path, unsigned long &space)
 
 int isVersionGreater(const std::string &currentVersion, const std::string &newVersion)
 {
+    if (currentVersion.empty())
+        return 1;
+
     std::vector<unsigned> currentDigits, newDigits;
     std::stringstream stream;
 
