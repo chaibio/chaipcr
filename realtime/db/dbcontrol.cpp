@@ -75,7 +75,11 @@
                 } \
             } \
             else \
+            { \
+                APP_LOGGER << "DBControl::END_DB_READ - unexpected DB error: " << ex.err_num_ << std::endl; \
+                \
                 throw; \
+            } \
         } \
     } \
     while (__TRY_AGAIN)
@@ -224,7 +228,7 @@ bool DBControl::getExperimentDefination(Experiment &experiment)
 
         if (!gotData || result.get_indicator("id") == soci::i_null)
         {
-            Poco::LogStream(Logger::get()) << "DBControl::getExperimentDefination - unable to find experiment with definationId " << experiment.definationId() << std::endl;
+            APP_LOGGER << "DBControl::getExperimentDefination - unable to find experiment with definationId " << experiment.definationId() << std::endl;
 
             experiment.setDefinationId(-1);
 
@@ -779,12 +783,13 @@ void DBControl::updateSettings(const Settings &settings)
 void DBControl::getCurrentUpgrade(std::string &version, bool &downloaded)
 {
     int tmpDownloaded = 0;
+    soci::indicator indicator;
 
     {
         std::lock_guard<std::mutex> lock(_readMutex);
 
         BEGIN_DB_READ()
-        *_readSession << "SELECT COUNT(1) version, downloaded FROM upgrades", soci::into(version), soci::into(tmpDownloaded);
+        *_readSession << "SELECT COUNT(1) version, downloaded FROM upgrades", soci::into(version, indicator), soci::into(tmpDownloaded, indicator);
         END_DB_READ();
     }
 
@@ -892,18 +897,22 @@ void DBControl::write(std::vector<soci::statement> &statements)
                         {
                             qpcrApp.setException(std::current_exception());
 
-                            throw std::runtime_error("DBControl::END_DB_READ - unable to reconnect to the MySQL server");
+                            throw std::runtime_error("DBControl::write - unable to reconnect to the MySQL server");
                         }
                     }
                     else
                     {
                         qpcrApp.setException(std::current_exception());
 
-                        throw std::runtime_error("DBControl::END_DB_READ - unable to reconnect to the MySQL server");
+                        throw std::runtime_error("DBControl::write - unable to reconnect to the MySQL server");
                     }
                 }
                 else
+                {
+                    APP_LOGGER << "DBControl::write - unexpected DB error: " << ex.err_num_ << std::endl;
+
                     throw;
+                }
             }
         }
         while (tryAgain);
