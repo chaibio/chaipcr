@@ -380,6 +380,20 @@ apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack
       fi
 fi
 
+echo testing juliaserver script to make sure nothing left to precompile as we are removing the compilation tools later to free up space.
+
+test_julia_server()
+{
+      JULIA_ENV=production julia -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;); include(&quot;/root/chaipcr/bioinformatics/juliaserver.jl&quot;)&apos;
+     echo error: julia server terminated
+     exit 1 
+}
+
+test_julia_server &amp;
+echo starting julia server on a different thread
+sleep 1800
+echo julia server testing period due. Cleaning up.
+
 find . -name .git -execdir rm -r {} \;
 find . -name *.o  -exec rm {} \;
 find / -name .git -execdir rm -r {} \;
