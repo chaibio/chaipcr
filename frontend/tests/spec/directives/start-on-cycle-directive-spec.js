@@ -114,7 +114,6 @@ describe("Testing startOnCycle",function() {
         spyOn(_alerts, "showMessage").and.returnValue(true);
         compiledScope.$digest();
         compiledScope.save();
-
         expect(_alerts.showMessage).toHaveBeenCalled();
     });
     
