@@ -181,6 +181,18 @@ function test(;
         end) # do guid_pre
 
 
+        action = "standard_curve"
+
+        rj, rv = generate_req_sc(; num_channels = td_key == "t1" ? 1 : 2)
+
+        if debug
+            sd_debug = standard_curve(JSON.parse(rj))
+        end
+
+        tr_cs[action] = dispatch(action, rj)
+        print_v(println, verbose, "Passed: $action")
+
+
         return channel_setup => tr_cs
 
     end) # do td_key

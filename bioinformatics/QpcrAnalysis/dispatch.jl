@@ -4,7 +4,7 @@ function dispatch(action::String, request_body::String)
 
     req_parsed = JSON.parse(request_body; dicttype=OrderedDict) # Julia 0.4.6, DataStructures 0.4.4. DefautlDict and DefaultOrderedDict constructors sometimes don't work on OrderedDict (https://github.com/JuliaLang/DataStructures.jl/issues/205)
 
-    if isa(req_parsed, Associative)
+    if isa(req_parsed, Associative) # amplification, meltcurve, analyze
         req_dict = req_parsed
 
         keys_req_dict = keys(req_dict)
@@ -17,8 +17,9 @@ function dispatch(action::String, request_body::String)
         ))
         # println("non-default db_name: ", db_name)
 
-    elseif isa(req_parsed, AbstractVector)
+    elseif isa(req_parsed, AbstractVector) # standard_curve
         req_vec = req_parsed
+        db_name = db_name_AIR
     end # if isa
 
     result = try
