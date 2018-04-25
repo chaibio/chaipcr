@@ -2,7 +2,7 @@
 # models with same formula for each cycle (Sfc models)
 
 
-type sfc_model_def # non-linear model, one feature (`x`)
+type SFCModelDef # non-linear model, one feature (`x`)
 
 # included in SFC_MODEL_BASE
 
@@ -436,7 +436,7 @@ const SFC_MODEL_BASES = [ # vector of tuples
 
 
 function add_funcs_pred!(
-    md::sfc_model_def,
+    md::SFCModelDef,
     verbose::Bool=false
     )
 
@@ -464,7 +464,7 @@ end
 
 
 function add_func_fit!( # vco = variable constraints objective
-    md::sfc_model_def;
+    md::SFCModelDef;
     Y_str::String="Y",
     obj_algrt::String="RSS",
     sense::String="Min", # "Min", "Max"
@@ -560,7 +560,7 @@ end
 
 # generate generic md objects
 const MDs = OrderedDict(map(SFC_MODEL_BASES) do sfc_model_base
-    sfc_model_base[1] => sfc_model_def(
+    sfc_model_base[1] => SFCModelDef(
         sfc_model_base...,
         deepcopy(MD_EMPTY_vals)...
     )

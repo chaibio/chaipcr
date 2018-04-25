@@ -275,17 +275,77 @@ function get_amp_data(
 end # get_amp_data
 
 
-#
+
+
+# automatically choose baseline cycles as the flat part of the curve
+function auto_choose_bl_cycs(
+    fluos::AbstractVector,
+    last_cyc_wt0::Real, # `floor(min_reliable_cyc) - 1`
+    bl_notes::Vector{String} # will be updated by `push!` and returned
+)
+
+    num_cycs = length(fluos)
+    cycs = 1.0 * (1:num_cycs)
+
+    min_fluo, min_fluo_cyc = findmin(fluos)
+    d2_cfd = finite_diff(cycs, fluos; nu=2) # `Dierckx.Spline1D` resulted in all `NaN` in some cases
+
+    d2_cfd_left = d2_cfd[1:min_fluo_cyc]
+    d2_cfd_right = d2_cfd[min_fluo_cyc:end]
+    max_d2_left_cyc, max_d2_right_cyc = map((d2_cfd_left, d2_cfd_right)) do d2_vec
+        findmax(d2_vec)[2]
+    end # do d2_vec
+
+    if max_d2_right_cyc <= last_cyc_wt0 # fluo on fitted spline may not be close to raw fluo at `cyc_m2l` and `cyc_m2r`
+        push!(bl_notes, "max_d2_right_cyc ($max_d2_right_cyc) <= last_cyc_wt0 ($last_cyc_wt0), bl_cycs = $(last_cyc_wt0+1):$num_cycs")
+        bl_cycs = last_cyc_wt0+1:num_cycs
+    else
+        bl_cyc_start = max(last_cyc_wt0+1, max_d2_left_cyc)
+        push!(bl_notes, "max_d2_right_cyc ($max_d2_right_cyc) > last_cyc_wt0 ($last_cyc_wt0), bl_cyc_start = $bl_cyc_start (max(last_cyc_wt0+1, max_d2_left_cyc), i.e. max($(last_cyc_wt0+1), $max_d2_left_cyc))")
+
+        if max_d2_right_cyc - bl_cyc_start <= 1
+            push!(bl_notes, "max_d2_right_cyc ($max_d2_right_cyc) - bl_cyc_start ($bl_cyc_start) <= 1")
+            max_d2_right_2, max_d2_right_cyc_2_shifted = findmax(d2_cfd[max_d2_right_cyc+1:end])
+            max_d2_right_cyc_2 = max_d2_right_cyc_2_shifted + max_d2_right_cyc
+            if max_d2_right_cyc_2 - max_d2_right_cyc == 1
+                bl_cyc_end = num_cycs
+                push!(bl_notes, "max_d2_right_cyc_2 ($max_d2_right_cyc_2) - max_d2_right_cyc ($max_d2_right_cyc) == 1")
+            else
+                push!(bl_notes, "max_d2_right_cyc_2 ($max_d2_right_cyc_2) - max_d2_right_cyc ($max_d2_right_cyc) != 1")
+                bl_cyc_end = max_d2_right_cyc_2
+            end # if m2r2_idx
+        else
+            push!(bl_notes, "max_d2_right_cyc ($max_d2_right_cyc) - bl_cyc_start ($bl_cyc_start) > 1")
+            bl_cyc_end = max_d2_right_cyc
+        end # if cyc_m2r - bl_cyc_start <= 1
+        push!(bl_notes, "bl_cyc_end = $bl_cyc_end")
+
+        bl_cycs = bl_cyc_start:bl_cyc_end
+        push!(bl_notes, "bl_cycs = $bl_cyc_start:$bl_cyc_end")
+
+    end # cyc_m2r <= last_cyc_wt0
+
+    return (bl_cycs, bl_notes)
+
+end # auto_choose_bl_cycs
+
+
+
+
+# fit model, baseline subtraction, quantification
 function mod_bl_q( # for amplification data per well per channel, fit sigmoid model, extract important information for Cq, subtract baseline.
     fluos::AbstractVector;
 
     min_reliable_cyc::Real=5, # >= 1
-    baseline_cyc_bounds::AbstractVector=[],
-    bl_fallback_func::Function=median,
 
     af_key::String="sfc", # a string representation of amplification curve model, used for finding the right model `DataType` in `dfc_DICT` and the right empty model instance in `AF_EMPTY_DICT`
 
-    m_prebl::String="l4_enl",
+    sfc_model_defs::OrderedDict{String,SFCModelDef}=MDs,
+
+    bl_method::String="l4_enl",
+    baseline_cyc_bounds::AbstractVector=[],
+    bl_fallback_func::Function=median,
+
     m_postbl::String="l4_enl",
 
     denser_factor::Real=100,
@@ -309,7 +369,7 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
 
     len_bcb = length(baseline_cyc_bounds)
 
-    last_cyc_wt0 = round(min_reliable_cyc, RoundDown) - 1 # to determine weights (`wts`) for sigmoid fitting per `min_reliable_cyc`
+    last_cyc_wt0 = floor(min_reliable_cyc) - 1 # to determine weights (`wts`) for sigmoid fitting per `min_reliable_cyc`
 
     # will remain the same `if len_bcb == 0 && (last_cyc_wt0 <= 1 || num_cycs < min_reliable_cyc)`
     wts = ones(num_cycs)
@@ -322,12 +382,12 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
         push!(solver.options, (:output_file, ipopt_print2file))
     end
 
-    if af_key != "sfc" # no fallback for baseline, because: (1) curve may fit well though :Error or :UserLimit (search step becomes very small but has not converge); (2) the guessed basedline (`start` of `fb`) is usually quite close to a sensible baseline.
+    if af_key == "dfc" # no fallback for baseline, because: (1) curve may fit well though :Error or :UserLimit (search step becomes very small but has not converge); (2) the guessed basedline (`start` of `fb`) is usually quite close to a sensible baseline.
 
         dfc_inst = dfc_DICT[af_key]()
 
         fitted_prebl = fit(dfc_inst, cycs, fluos, wts; kwargs_jmp_model...)
-        baseline = fitted_prebl.coefs[1] # "fb"
+        baseline = fitted_prebl.coefs[1] # "fb" (don't remember what this means, leave it here just in case it's important)
         if af_key in ["MAK3", "MAKERGAUL4"]
             baseline += fitted_prebl.coefs[2] .* cycs # `.+=` caused "ERROR: MethodError: no method matching broadcast!(::QpcrAnalysis.##278#283, ::Float64, ::Float64, ::Float64, ::StepRangeLen{Float64,Base.TwicePrecision{Float64},Base.TwicePrecision{Float64}})"
         end # if af_key
@@ -350,91 +410,66 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
         cq_raw = NaN
         cq_fluo = NaN
 
-    else # af_key == "sfc"
+    elseif af_key == "sfc"
 
-        if len_bcb == 0 && last_cyc_wt0 > 1 && num_cycs >= min_reliable_cyc
+        if bl_method in keys(sfc_model_defs)
 
-            wts = vcat(zeros(last_cyc_wt0), ones(num_cycs - last_cyc_wt0))
+            if bl_method in ["lin_1ft", "lin_2ft"]
+                wts = zeros(num_cycs)
+                wts[colon(baseline_cyc_bounds...)] .= 1
+            else # sigmoid models so far
+                wts = vcat(zeros(last_cyc_wt0), ones(num_cycs - last_cyc_wt0))
+            end
 
-            fitted_prebl = MDs[m_prebl].func_fit(cycs, fluos, wts; kwargs_jmp_model...)
+            fitted_prebl = sfc_model_defs[bl_method].func_fit(cycs, fluos, wts; kwargs_jmp_model...)
 
             prebl_status = string(fitted_prebl.status)
             bl_notes = ["prebl_status $prebl_status"]
 
-            baseline_fitted = MDs[m_prebl].funcs_pred["bl"](cycs, fitted_prebl.coefs...)
+            baseline = sfc_model_defs[bl_method].funcs_pred["bl"](cycs, fitted_prebl.coefs...) # may be changed later
 
             if prebl_status in ["Optimal", "UserLimit"]
-                push!(bl_notes, "sig")
-                blsub_fluos_draft = fluos .- baseline_fitted
+                push!(bl_notes, "model-derived baseline") # may be changed later
+                blsub_fluos_draft = fluos .- baseline
                 min_bfd, max_bfd = extrema(blsub_fluos_draft) # bfd = blsub_fluos_draft
                 if max_bfd - min_bfd <= abs(min_bfd)
-                    bl_notes[2] = "fallback"
+                    bl_notes[2] = "fallback" # change
                     push!(bl_notes, "max_bfd ($max_bfd) - min_bfd ($min_bfd) == $(max_bfd - min_bfd) <= abs(min_bfd)")
                 end # if max_bfd
             elseif prebl_status == "Error"
                 push!(bl_notes, "fallback")
             end # if prebl_status
 
-            # different baseline subtraction methods
-            if bl_notes[2] == "sig"
-                baseline = baseline_fitted
+            if bl_notes[2] == "fallback"
+                bl_func = bl_fallback_func
+            end
 
-            elseif bl_notes[2] == "fallback"
+        else # if not fit model to find baseline
+            bl_notes = ["no prebl_status", "no fallback"]
+            if bl_method == "median"
+                bl_func = median
+            end
+        end # if bl_method
 
-                min_fluo, min_fluo_cyc = findmin(fluos)
-                d2_cfd = finite_diff(cycs, fluos; nu=2) # `Dierckx.Spline1D` resulted in all `NaN` in some cases
-
-                d2_cfd_left = d2_cfd[1:min_fluo_cyc]
-                d2_cfd_right = d2_cfd[min_fluo_cyc:end]
-                max_d2_left_cyc, max_d2_right_cyc = map((d2_cfd_left, d2_cfd_right)) do d2_vec
-                    findmax(d2_vec)[2]
-                end # do d2_vec
-
-                if max_d2_right_cyc <= last_cyc_wt0 # fluo on fitted spline may not be close to raw fluo at `cyc_m2l` and `cyc_m2r`
-                    push!(bl_notes, "max_d2_right_cyc ($max_d2_right_cyc) <= last_cyc_wt0 ($last_cyc_wt0), bl_cycs = $(last_cyc_wt0+1):$num_cycs")
-                    bl_cycs = last_cyc_wt0+1:num_cycs
-                else
-                    bl_cyc_start = max(last_cyc_wt0+1, max_d2_left_cyc)
-                    push!(bl_notes, "max_d2_right_cyc ($max_d2_right_cyc) > last_cyc_wt0 ($last_cyc_wt0), bl_cyc_start = $bl_cyc_start (max(last_cyc_wt0+1, max_d2_left_cyc), i.e. max($(last_cyc_wt0+1), $max_d2_left_cyc))")
-
-                    if max_d2_right_cyc - bl_cyc_start <= 1
-                        push!(bl_notes, "max_d2_right_cyc ($max_d2_right_cyc) - bl_cyc_start ($bl_cyc_start) <= 1")
-                        max_d2_right_2, max_d2_right_cyc_2_shifted = findmax(d2_cfd[max_d2_right_cyc+1:end])
-                        max_d2_right_cyc_2 = max_d2_right_cyc_2_shifted + max_d2_right_cyc
-                        if max_d2_right_cyc_2 - max_d2_right_cyc == 1
-                            bl_cyc_end = num_cycs
-                            push!(bl_notes, "max_d2_right_cyc_2 ($max_d2_right_cyc_2) - max_d2_right_cyc ($max_d2_right_cyc) == 1")
-                        else
-                            push!(bl_notes, "max_d2_right_cyc_2 ($max_d2_right_cyc_2) - max_d2_right_cyc ($max_d2_right_cyc) != 1")
-                            bl_cyc_end = max_d2_right_cyc_2
-                        end # if m2r2_idx
-                    else
-                        push!(bl_notes, "max_d2_right_cyc ($max_d2_right_cyc) - bl_cyc_start ($bl_cyc_start) > 1")
-                        bl_cyc_end = max_d2_right_cyc
-                    end # if cyc_m2r - bl_cyc_start <= 1
-                    push!(bl_notes, "bl_cyc_end = $bl_cyc_end")
-
-                    bl_cycs = bl_cyc_start:bl_cyc_end
-                    push!(bl_notes, "bl_cycs = $bl_cyc_start:$bl_cyc_end")
-                end # cyc_m2r <= last_cyc_wt0
-
-                baseline = bl_fallback_func(fluos[bl_cycs])
-
-            end # if bl_notes = ["sig"]
-
+        if len_bcb == 0 && last_cyc_wt0 > 1 && num_cycs >= min_reliable_cyc
+        # if last_cyc_wt0 > 1 && num_cycs >= min_reliable_cyc
+            bl_cycs, bl_notes = auto_choose_bl_cycs(fluos, last_cyc_wt0, bl_notes)
         elseif len_bcb == 2
-            baseline = bl_fallback_func(fluos[colon(baseline_cyc_bounds...)])
-            bl_notes = ["User-defined"]
-
+            bl_cycs = colon(baseline_cyc_bounds...)
+            push!(bl_notes, "User-defined")
+            # baseline = bl_fallback_func(fluos[colon(baseline_cyc_bounds...)])
+            # bl_notes = ["User-defined"]
         elseif !(len_bcb in [0, 2])
             error("Length of `baseline_cyc_bounds` must be 0 or 2.")
-
         end # if len_bcb
 
+        if bl_notes[2] != "model-derived baseline"
+            baseline = bl_func(fluos[bl_cycs]) # change or new def
+        end
 
         blsub_fluos = fluos .- baseline
 
-        fitted_postbl = MDs[m_postbl].func_fit(
+        fitted_postbl = sfc_model_defs[m_postbl].func_fit(
             cycs, blsub_fluos, wts;
             kwargs_jmp_model...
         )
@@ -443,23 +478,23 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
 
         d0 = NaN
 
-        func_pred_f = MDs[m_postbl].funcs_pred["f"]
+        func_pred_f = sfc_model_defs[m_postbl].funcs_pred["f"]
         blsub_fitted = func_pred_f(cycs, coefs_pob...)
 
         len_denser = length(cycs_denser)
 
-        d1_pred = MDs[m_postbl].funcs_pred["d1"](cycs_denser, coefs_pob...)
+        d1_pred = sfc_model_defs[m_postbl].funcs_pred["d1"](cycs_denser, coefs_pob...)
         max_d1, idx_max_d1 = findmax(d1_pred)
         cyc_max_d1 = cycs_denser[idx_max_d1]
 
-        d2_pred = MDs[m_postbl].funcs_pred["d2"](cycs_denser, coefs_pob...)
+        d2_pred = sfc_model_defs[m_postbl].funcs_pred["d2"](cycs_denser, coefs_pob...)
         max_d2, idx_max_d2 = findmax(d2_pred)
         cyc_max_d2 = cycs_denser[idx_max_d2]
 
         Cy0 = cyc_max_d1 - func_pred_f(cyc_max_d1, coefs_pob...) / max_d1
 
         ct = try
-            MDs[m_postbl].funcs_pred["inv"](ct_fluo, coefs_pob...)
+            sfc_model_defs[m_postbl].funcs_pred["inv"](ct_fluo, coefs_pob...)
         catch err
             isa(err, DomainError) ? Ct_VAL_DomainError : "unhandled error"
         end # try
@@ -494,6 +529,8 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
 
         cq_fluo = func_pred_f(cq_raw <= 0 ? NaN : cq_raw, coefs_pob...)
 
+    else
+        error("`af_key` \"$af_key\" is not recognized.")
 
     end # if af_key
 

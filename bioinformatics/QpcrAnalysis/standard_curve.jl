@@ -420,9 +420,9 @@ end # generate_req_sc
 # then as expected
 
 
-# for testing, need commented for production
-using DataStructures, DataFrames, JSON
-JSON_DIGITS = 3
+# # for testing, need commented for production
+# using DataStructures, DataFrames, JSON
+# JSON_DIGITS = 3
 
 
 

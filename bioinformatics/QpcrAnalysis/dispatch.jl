@@ -65,6 +65,18 @@ function dispatch(action::String, request_body::String)
                 end
                 kwdict_pa1[:categ_well_vec] = categ_well_vec
             end
+            if "baseline_method" in keys_req_dict
+                baseline_method = keys_req_dict["baseline_method"]
+                if baseline_method == "sigmoid"
+                    kwdict_pa1[:bl_method] = "l4_enl"
+                    kwdict_pa1[:bl_fallback_func] = median
+                elseif baseline_method == "linear"
+                    kwdict_pa1[:bl_method] = "lin_1ft"
+                    kwdict_pa1[:bl_fallback_func] = mean
+                elseif baseline_method == "median"
+                    kwdict_pa1[:bl_method] = "median"
+                end
+            end
 
             # call
             process_amp( # can't use `return` to return within `try`
@@ -157,6 +169,7 @@ function args2reqb(
     step_id::Integer=0,
     ramp_id::Integer=0,
     min_reliable_cyc::Real=5,
+    baseline_method::String="sigmoid",
     baseline_cyc_bounds::AbstractVector=[],
     guid::String="",
     extra_args::OrderedDict=OrderedDict(),
