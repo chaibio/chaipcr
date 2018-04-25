@@ -90,6 +90,7 @@ describe("Testing temp directive", function() {
         
         expect(compiledScope.edit).toEqual(false);
         expect(compiledScope.reading).toEqual(compiledScope.shown);
+        
     });
 
     it("It should test save method when show is not a number", function() {
@@ -108,6 +109,20 @@ describe("Testing temp directive", function() {
         
         expect(_alerts.showMessage).toHaveBeenCalled();
 
+    });
+
+    it("It should test save method when show is not a number", function() {
+
+        spyOn(_alerts, "showMessage").and.returnValue();
+
+        compiledScope.shown = 'wow';
+        compiledScope.reading = 15.1234;
+        compiledScope.$digest();
+
+        compiledScope.save();
+        
+        expect(_alerts.showMessage).not.toHaveBeenCalled();
+        expect(compiledScope.shown).toEqual('15.1');
     });
 
 });
