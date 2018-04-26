@@ -386,20 +386,82 @@ test_julia_server()
 {
       JULIA_ENV=production julia -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;); include(&quot;/root/chaipcr/bioinformatics/juliaserver.jl&quot;)&apos;
      echo error: julia server terminated
-     exit 1 
 }
 
 test_julia_server &amp;
 echo starting julia server on a different thread
 sleep 1800
 echo julia server testing period due. Cleaning up.
+pkill -9 julia
+pkill -9 julia
+pkill -9 julia
+pkill -9 julia
+pkill -9 julia
+sleep 100
+ps -aux | grep julia
 
+exit 0
+</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo cleaning misc. file
+rm -r /var/log/*.log
 find . -name .git -execdir rm -r {} \;
 find . -name *.o  -exec rm {} \;
 find / -name .git -execdir rm -r {} \;
 
 exit 0
 </command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo Maintenance
+
+cd /root/chaipcr/web
+bundle install
+gem install bcrypt -v &apos;3.1.11&apos;
+
+systemctl enable r.service
+echo Setup Rails app
+mkdir -p ~/chaipcr/web/config/
+cat &lt;&lt;EOF &gt;&gt; ~/chaipcr/web/config/database.yml
+    production:
+      adapter: mysql2
+      database: chaipcr
+      pool: 5
+      timeout: 5000
+      username: root
+      password:
+EOF
+echo database.yml created
+
+cd /root/chaipcr/web
+chmod 755 /root
+
+#echo rserve 
+#echo \n | gem install rserve-client #otherwise bundle fails, don&apos;t know why
+
+echo bundle
+echo &quot;\n&quot; | bundle
+
+echo rake setup
+echo &quot;\n&quot; | RAILS_ENV=production bundle exec rake db:setup
+
+echo seed_fu
+echo &quot;\n&quot; | RAILS_ENV=production bundle exec rake db:seed_fu 
+
+echo Rails init
+cd ~/chaipcr/web
+bundle install
+gem install bcrypt -v &apos;3.1.11&apos;
+echo done rserev
+
+bundle exec rake db:migrate # migrates database as needed
+
+exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
@@ -490,9 +552,7 @@ sync
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo checking deployed web files
-
 ls -ahl
-
 if [ -e ~/chaipcr/deploy ]
 then
 	echo web files deploy done successfully
@@ -567,31 +627,7 @@ echo copy browser resources
 # Deploy browser to ~/tmp
 cp -r ~/chaipcr/browser/resources ~/tmp/
 cp ~/chaipcr/browser/qpcrbrowser.service /lib/systemd/system/
-systemctl enable qpcrbrowser.service
-
-if $bypass_pru
-then
-   echo bypassing PRU stub
-   exit 0
-fi
-
-echo Install PRU libraries and Tools
-cd
-wget https://github.com/beagleboard/am335x_pru_package/archive/master.zip --no-check-certificate
-unzip -o master.zip
-mkdir /usr/include/pruss/
-cp ~/am335x_pru_package-master/pru_sw/app_loader/include/pruss* /usr/include/pruss/
-cd ~/am335x_pru_package-master/pru_sw/app_loader/interface
-CROSS_COMPILE= make  #note: there is space between = and make
-cp ~/am335x_pru_package-master/pru_sw/app_loader/lib/lib* /usr/lib/
-ldconfig
-cd ~/am335x_pru_package-master/pru_sw/utils/pasm_source
-source linuxbuild
-cd ..
-cp pasm /usr/bin/ 
-cd
-rm master.zip || true
-</command>
+systemctl enable qpcrbrowser.service</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
@@ -611,6 +647,8 @@ exit 0
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Build/install LCD drivers
+# this needs some optimization.. it takes 90MB
+apt-get  -y -q install device-tree-compiler
 cd ~/chaipcr/modules/LCDtouch_V3/49
 chmod 775 install_debian.sh
 
@@ -626,41 +664,7 @@ sync
 fsck /dev/mmcblk1p1 -y -f
 fsck /dev/mmcblk0p1 -y -f
 
-systemctl enable r.service
-echo Setup Rails app
-
-mkdir -p ~/chaipcr/web/config/
-cat &lt;&lt;EOF &gt;&gt; ~/chaipcr/web/config/database.yml
-    production:
-      adapter: mysql2
-      database: chaipcr
-      pool: 5
-      timeout: 5000
-      username: root
-      password:
-EOF
-echo database.yml created
-
-cd /root/chaipcr/web
-chmod 755 /root
-
-#echo rserve 
-#echo \n | gem install rserve-client #otherwise bundle fails, don&apos;t know why
-
-echo bundle
-echo &quot;\n&quot; | bundle
-
-echo rake setup
-echo &quot;\n&quot; | RAILS_ENV=production bundle exec rake db:setup
-
-echo seed_fu
-echo &quot;\n&quot; | RAILS_ENV=production bundle exec rake db:seed_fu 
-
-echo Rails init
-cd ~/chaipcr/web
-bundle install
-
-echo done rserev</command>
+exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
@@ -713,17 +717,6 @@ chmod +x /etc/init.d/unicorn
 mkdir /etc/unicorn
 cp ~/chaipcr/web/config/etc/unicorn/chaipcr.conf /etc/unicorn/
 </command>
-      <execEachLine>false</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
-      <command>echo Maintenance
-
-cd /root/chaipcr/web
-bundle exec rake db:migrate # migrates database as needed
-
-
-exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
