@@ -66,7 +66,47 @@ describe("Test temperature directive", function() {
 
     });
 
-    /*it("It should $watch edit", function() {
+    it("It should $watch edit when edit is true", function() {
+        spyOn($.fn, "animate").and.returnValue(true);
+        compiledScope.edit = true;
+        compiledScope.$digest();   
+        expect($.fn.animate).toHaveBeenCalled();
 
-    });*/
+    });
+
+    it("It should test editAndFocus method", function() {
+
+        compiledScope.edit = false;
+        compiledScope.$digest();
+        compiledScope.editAndFocus();
+        expect(compiledScope.edit).toEqual(true);
+    });
+
+    it("It should test save method", function() {
+
+        compiledScope.shown = 15;
+        compiledScope.$digest();
+        compiledScope.editAndFocus();
+
+        compiledScope.shown = 10;
+        compiledScope.$digest();
+
+        compiledScope.save();
+
+        expect(compiledScope.reading).toEqual('10.0');
+    });
+
+    it("It should test save method when shown is not a number", function() {
+
+        compiledScope.shown = 15;
+        compiledScope.$digest();
+        compiledScope.editAndFocus();
+
+        compiledScope.shown = "kwel";
+        compiledScope.$digest();
+
+        compiledScope.save();
+
+        expect(compiledScope.shown).toEqual('100.0');
+    });
 });
