@@ -1,4 +1,4 @@
-describe("Test temperature directive", function() {
+describe("testing time directive", function() {
 
     var _$rootScope, _$scope, _allowAdminToggle, _$compile, httpMock, compiledScope, _ExperimentLoader, _canvas, _$timeout, _$uibModal,
     _alerts, _popupStatus, _TimeService, _addStageService;
@@ -40,7 +40,7 @@ describe("Test temperature directive", function() {
                 pause: true
             };
 
-            var elem = angular.element('<temperature caption="Temperature" help-text="[4-100     ºC]" unit="ºC" reading="100" action="WOWaction(edit)"></temperature>');
+            var elem = angular.element('<time caption="Δ Time" delta="true" reading="100"><capsule func="changeDeltaTime" delta="{{stage.auto_delta}}" data="step.delta_duration_s"></capsule></time>');
             var compiled = _$compile(elem)(_$scope);
             _$scope.show = true;
             _$scope.$digest();
@@ -51,61 +51,62 @@ describe("Test temperature directive", function() {
 
     it("It should test initial values", function() {
 
-        expect(compiledScope.delta).toEqual(true);
-        expect(compiledScope.edit).toEqual(false);
-        expect(compiledScope.temp).toEqual(true);
-        expect(compiledScope.pause).toEqual(true);
+        expect(compiledScope.showCapsule).toEqual(true);
+
     });
 
-    it("It should watch reading", function() {
+    it("It should test change in reading", function() {
 
-        compiledScope.reading = 12.456;
+        spyOn(_TimeService, "newTimeFormatting").and.returnValue(10);
+        compiledScope.reading = 20;
         compiledScope.$digest();
-
-        expect(compiledScope.shown).toEqual(compiledScope.reading.toFixed(1));
-
-    });
-
-    it("It should $watch edit when edit is true", function() {
-        spyOn($.fn, "animate").and.returnValue(true);
-        compiledScope.edit = true;
-        compiledScope.$digest();   
-        expect($.fn.animate).toHaveBeenCalled();
-
+        expect(_TimeService.newTimeFormatting).toHaveBeenCalled();
     });
 
     it("It should test editAndFocus method", function() {
 
-        compiledScope.edit = false;
+        spyOn(_TimeService, "convertToSeconds").and.returnValue(true);
+        compiledScope.delta = true;
         compiledScope.$digest();
         compiledScope.editAndFocus();
-        expect(compiledScope.edit).toEqual(true);
+        expect(_TimeService.convertToSeconds).toHaveBeenCalled();
     });
 
     it("It should test save method", function() {
+        
+        _TimeService.convertToSeconds = function(val) {
+            return val;
+        };
 
-        compiledScope.shown = 15;
+        spyOn(_TimeService, "convertToSeconds").and.callThrough();
+
+        compiledScope.shown = 30;
         compiledScope.$digest();
         compiledScope.editAndFocus();
-
-        compiledScope.shown = 10;
+        compiledScope.shown = 40;
         compiledScope.$digest();
-
+        //spyOn(_TimeService, "convertToSeconds").and.returnValue(35);
         compiledScope.save();
-
-        expect(compiledScope.reading).toEqual('10.0');
+        expect(compiledScope.reading).toEqual(40);
+        expect(_TimeService.convertToSeconds).toHaveBeenCalled();
+        
     });
 
-    it("It should test save method when shown is not a number", function() {
+    it("It should test save method when first condition is not met", function() {
 
-        compiledScope.shown = 15;
+        spyOn(_alerts, "showMessage").and.returnValue(true);
+        _TimeService.convertToSeconds = function(val) {
+            return undefined;
+        };
+
+        spyOn(_TimeService, "newTimeFormatting").and.returnValue(100);
+        spyOn(_TimeService, "convertToSeconds").and.callThrough();
+
+        compiledScope.shown = 300;
         compiledScope.$digest();
-        compiledScope.editAndFocus();
-
-        compiledScope.shown = "kwel";
-        compiledScope.$digest();
-
         compiledScope.save();
-        expect(compiledScope.shown).toEqual('100.0');
+        expect(_alerts.showMessage).toHaveBeenCalled();
+        expect(_TimeService.convertToSeconds).toHaveBeenCalled();
+        expect(_TimeService.newTimeFormatting).toHaveBeenCalled();
     });
 });
