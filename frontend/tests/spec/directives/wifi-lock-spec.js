@@ -51,7 +51,28 @@ describe("Testing wifiLock directive", function() {
     });
 
     it("It should test initial values", function() {
+        _$state.is = function() {
+            return true;
+        };
+
+        spyOn(_$state, "is").and.callThrough();
+
         expect(compiledScope.encryption).toEqual("encryption");
         expect(compiledScope.ssid).toEqual("wow");
+    });
+
+    it("It should test $stateChangeStart", function() {
+
+        compiledScope.$stateChangeStart = "okay";
+        compiledScope.$digest();
+        //expect(compiledScope.selected).toEqual(false);
+    });
+
+    it("It should test change encryption", function() {
+
+        compiledScope.encryption = "hola";
+        compiledScope.$digest();
+        console.log(compiledScope);
+        //Nothing to test here , may be if we add code , we can add tests here.
     });
 });
