@@ -33,7 +33,7 @@ class WellLayout < ActiveRecord::Base
   
   def layout
     wellsamples = Sample.joins(:samples_wells).where(["samples_wells.well_layout_id=?", id]).order("well_num").select("samples.*, well_num")
-    welltargets = Target.joins(:targets_wells).where(["targets_wells.well_layout_id=?", id]).order("well_num, channel").select("targets.*, well_num, well_type, concentration")
+    welltargets = Target.joins(:targets_wells).where(["targets_wells.well_layout_id=?", id]).order("well_num, channel").select("targets.*, well_num, well_type, quantity_m, quantity_b")
     wells = (wellsamples.length > 0 || welltargets.length > 0)? Array.new(16) : []
     index = 0
     while index < wellsamples.length || index < welltargets.length do

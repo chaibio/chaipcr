@@ -198,7 +198,7 @@ describe "Experiments API", type: :request do
       post "/experiments/#{@experiment.id}/targets", {name: "target2", channel: 2}.to_json, http_headers
       expect(response).to be_success  
       json = JSON.parse(response.body)
-      post "/experiments/#{@experiment.id}/targets/#{json["target"]["id"]}/links", {wells:[{well_num: 3, well_type: "positive_control"}]}.to_json, http_headers
+      post "/experiments/#{@experiment.id}/targets/#{json["target"]["id"]}/links", {wells:[{well_num: 3, well_type: "standard", quantity:{m: 1.12345678, b:-2}}]}.to_json, http_headers
       expect(response).to be_success
       get "/experiments/#{@experiment.id}/well_layout", http_headers
       expect(response).to be_success
@@ -209,6 +209,7 @@ describe "Experiments API", type: :request do
       expect(json[1]["targets"]).to be_nil
       expect(json[2]["samples"]).to be_nil
       expect(json[2]["targets"]).not_to be_nil
+      expect(json[2]["targets"][0]["quantity"]).not_to be_nil
     end
     
     it "update standard after target is linked is disallowed" do

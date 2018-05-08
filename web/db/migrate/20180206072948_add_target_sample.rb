@@ -29,7 +29,8 @@ class AddTargetSample < ActiveRecord::Migration
       t.integer :well_num, :null=>false
       t.integer :target_id, :null=>false
       t.string  :well_type, :comment => "positive_control, negative_control, standard, unknown"
-      t.decimal :concentration, :precision=>10, :scale=>2
+      t.decimal :quantity_m, :precision=>9, :scale=>8
+      t.integer :quantity_b
       t.boolean :omit, :default=>false
     end
     

@@ -221,12 +221,13 @@ ActiveRecord::Schema.define(version: 20180322210934) do
   end
 
   create_table "targets_wells", force: :cascade do |t|
-    t.integer "well_layout_id", limit: 4,                                            null: false
-    t.integer "well_num",       limit: 4,                                            null: false
-    t.integer "target_id",      limit: 4,                                            null: false
-    t.string  "well_type",      limit: 255,                                                       comment: "positive_control, negative_control, standard, unknown"
-    t.decimal "concentration",              precision: 10, scale: 2
-    t.boolean "omit",                                                default: false
+    t.integer "well_layout_id", limit: 4,                                           null: false
+    t.integer "well_num",       limit: 4,                                           null: false
+    t.integer "target_id",      limit: 4,                                           null: false
+    t.string  "well_type",      limit: 255,                                                      comment: "positive_control, negative_control, standard, unknown"
+    t.decimal "quantity_m",                 precision: 9, scale: 8
+    t.integer "quantity_b",     limit: 4
+    t.boolean "omit",                                               default: false
   end
 
   add_index "targets_wells", ["well_layout_id", "well_num"], name: "well_layout_target", using: :btree

@@ -115,8 +115,11 @@ class TargetsController < ApplicationController
     target_well = TargetsWell.find_or_create(@target, @experiment.well_layout.id, well_num)
     if target_well_params
       target_well.well_type = target_well_params[:well_type] if !target_well_params[:well_type].nil?
-      target_well.concentration = target_well_params[:concentration] if !target_well_params[:concentration].nil?
       target_well.omit = target_well_params[:omit] if !target_well_params[:omit].nil?
+      if !target_well_params[:quantity].nil?
+        target_well.quantity_m = target_well_params[:quantity][:m]
+        target_well.quantity_b = target_well_params[:quantity][:b]
+      end
     end
     ret = target_well.save
     if !ret

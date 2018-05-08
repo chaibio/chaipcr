@@ -119,13 +119,14 @@ describe "Targets API", type: :request do
       json = JSON.parse(response.body)
       expect(json["target"]["targets_wells"][0]["well_num"]).to eq(2)
       expect(json["target"]["targets_wells"][0]["well_type"]).to eq("standard")
-      post "/experiments/#{@experiment.id}/targets/#{@target1.id}/links", {wells:[{well_num: 2, concentration: 1}]}.to_json, http_headers
+      post "/experiments/#{@experiment.id}/targets/#{@target1.id}/links", {wells:[{well_num: 2, quantity:{m: 1.12345678, b:-2}}]}.to_json, http_headers
       expect(response).to be_success
       json = JSON.parse(response.body)
       expect(json["target"]["targets_wells"].length).to eq(1)
       expect(json["target"]["targets_wells"][0]["well_num"]).to eq(2)
       expect(json["target"]["targets_wells"][0]["well_type"]).to eq("standard")
-      expect(json["target"]["targets_wells"][0]["concentration"]).not_to be_nil
+      expect(json["target"]["targets_wells"][0]["quantity"]["m"]).to eq(1.12345678)
+      expect(json["target"]["targets_wells"][0]["quantity"]["b"]).to eq(-2)
     end
           
     it 'one well replace well_type' do
