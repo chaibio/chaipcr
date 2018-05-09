@@ -25,6 +25,10 @@ describe("Testing wifiLock directive", function() {
             httpMock = $injector.get('$httpBackend');
             _TimeService = $injector.get('TimeService');
             _addStageService = $injector.get('addStageService');
+            
+            _$state.is = function() {
+                return true;
+            };
 
             httpMock.expectGET("http://localhost:8000/status").respond("NOTHING");
             httpMock.expectGET("http://localhost:8000/network/wlan").respond("NOTHING");
