@@ -94,6 +94,7 @@ Qpcrctl::Application.routes.draw do
       get 'temperature_data'
       get 'amplification_data'
       get 'melt_curve_data'
+      get 'standard_curve'
       get 'export'
       get 'analyze'
     end

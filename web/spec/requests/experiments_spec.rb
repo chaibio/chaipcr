@@ -209,7 +209,10 @@ describe "Experiments API", type: :request do
       expect(json[1]["targets"]).to be_nil
       expect(json[2]["samples"]).to be_nil
       expect(json[2]["targets"]).not_to be_nil
-      expect(json[2]["targets"][0]["quantity"]).not_to be_nil
+      expect(json[2]["targets"][1]["quantity"]).not_to be_nil
+      
+      get "/experiments/#{@experiment.id}/standard_curve", http_headers
+      expect(response).to be_success
     end
     
     it "update standard after target is linked is disallowed" do

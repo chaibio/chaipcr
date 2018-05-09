@@ -246,16 +246,17 @@ describe "Targets API", type: :request do
       get "/experiments/#{@experiment.id}/well_layout", http_headers
       expect(response).to be_success
       json = JSON.parse(response.body)
-      expect(json[0]["targets"].length).to eq(1)
       expect(json[0]["targets"][0]["name"]).to eq("target1")
       expect(json[0]["targets"][0]["imported"]).to eq(true)
-      expect(json[1]["targets"].length).to eq(2)
-      expect(json[2]["targets"].length).to eq(1)
-      expect(json[2]["targets"][0]["name"]).to eq("target2")
-      expect(json[2]["targets"][0]["imported"]).to eq(true)
-      expect(json[3]["targets"].length).to eq(1)
-      expect(json[3]["targets"][0]["name"]).to eq("target3")
-      expect(json[3]["targets"][0]["imported"]).to eq(false)
+      expect(json[0]["targets"][1]).to be_empty
+      expect(json[1]["targets"][0]).not_to be_empty
+      expect(json[1]["targets"][1]).not_to be_empty
+      expect(json[2]["targets"][0]).to be_empty
+      expect(json[2]["targets"][1]["name"]).to eq("target2")
+      expect(json[2]["targets"][1]["imported"]).to eq(true)
+      expect(json[3]["targets"][0]).to be_empty
+      expect(json[3]["targets"][1]["name"]).to eq("target3")
+      expect(json[3]["targets"][1]["imported"]).to eq(false)
       expect(json[15]["targets"]).to be_nil
     end
     

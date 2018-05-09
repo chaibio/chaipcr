@@ -332,6 +332,38 @@ class ExperimentsController < ApplicationController
     end
   end
   
+  def standard_curve
+    @well_layout = WellLayout.for_experiment(params[:id]).first
+    if @well_layout.is_a? WellLayout
+      @wells = @well_layout.standard_curve
+    else
+      @wells = []
+    end
+    
+    begin
+      body = @wells.map {|well| (well)? well.as_json_standard_curve : {}}.to_json
+      puts("body=#{body}")
+      response = HTTParty.post("http://127.0.0.1:8080/experiments/#{@experiment.id}/standard_curve", body: body.to_json)
+      if response.code != 200
+        raise_julia_error(response)
+      else
+        new_data = CachedAnalyzeDatum.new(:experiment_id=>experiment.id, :analyze_result=>response.body)
+        #update analyze status
+        if experiment.diagnostic?
+          analysis_results = JSON.parse(response.body)
+          experiment.update_attributes(:analyze_status=>(analysis_results["valid"] != true)? "failed" : "success")
+        end
+      end
+    rescue  => e
+      logger.error("Julia error: #{e}")
+      raise e
+    ensure
+    end
+
+    #update cache
+    CachedAnalyzeDatum.import [new_data], :on_duplicate_key_update => [:analyze_result]
+  end
+  
 	swagger_path '/experiments/{id}/temperature_data' do
 		operation :get do
 			key :summary, 'Retrieve temperature data'
@@ -870,7 +902,7 @@ class ExperimentsController < ApplicationController
       render :json=>{:errors=>"experiment not found"}, :status => :not_found
     end
   end
-
+  
 	swagger_path '/experiments/{id}/export' do
 		operation :get do
 			key :summary, 'Export Experiment'
