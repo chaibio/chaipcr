@@ -9,8 +9,6 @@ echo "Compiling the LCD overlay from .dts to .dtbo"
 dtc -O dtb -o CHAI-LCDtouch5-00A0.dtbo -b 0 -@ CHAI-LCDtouch5-00A0.dts
 cp CHAI-LCDtouch5-00A0.dtbo /lib/firmware/CHAI-LCDtouch5-00A0.dtbo
 
-cp capemgr /etc/default/
-
 cp dtbo /etc/initramfs-tools/hooks/
 
 cp /boot/uboot/initrd.img /boot/uboot/initrd.img.bak
