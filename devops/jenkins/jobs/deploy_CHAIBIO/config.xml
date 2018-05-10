@@ -657,6 +657,8 @@ mkdir -p /lib/firmware/
 
 ./install_debian.sh
 apt-get  -y -q --purge autoremove device-tree-compiler
+modprobe -i tilcdc
+
 echo done installing LCD driver.
 
 sync
