@@ -164,4 +164,81 @@ describe("Testing wifi-toggle", function() {
         compiledScope.clickHandler();
         expect(compiledScope.sendData).toHaveBeenCalled();
     });
+
+    it("It should test configureSwitch method when false is passed", function() {
+
+        spyOn(compiledScope, "changeState").and.returnValue(true);
+        compiledScope.configureSwitch(false);
+        expect(compiledScope.changeState).toHaveBeenCalledWith("#bbbbbb", "1");
+        expect(compiledScope.inProgress).toEqual(true);
+    });
+
+    it("It should test changeState method", function() {
+        spyOn(angular, "element").and.returnValue({
+            parent: function() {
+                return {
+                    css: function() {
+
+                    }
+                };
+            },
+            children: function() {
+                return {
+                    css: function() {
+
+                    }
+                };
+            },
+            animate: function() {
+
+            }
+        });
+
+        
+        compiledScope.changeState("#bbbbbb", 10);
+
+        expect(angular.element).toHaveBeenCalled();
+    });
+
+    it("It should test processMovement method when pos < 6", function() {
+
+        spyOn($.fn, "css").and.returnValue(true);
+
+        compiledScope.processMovement(5, false);
+
+        expect($.fn.css).toHaveBeenCalledWith("left", "1px");
+    });
+
+    it("It should test processMovement method", function() {
+
+        spyOn($.fn, "css").and.returnValue(true);
+
+        compiledScope.processMovement(7, false);
+
+        expect($.fn.css).toHaveBeenCalledWith("left", "11px");
+    });
+
+    it("It should test processMovement method", function() {
+
+        spyOn($.fn, "css").and.returnValue(true);
+        spyOn(compiledScope, "sendData").and.returnValue(true);
+        compiledScope.wirelessStatus = false;
+        compiledScope.$digest();
+        
+        compiledScope.processMovement(7, false);
+        expect($.fn.css).toHaveBeenCalledWith("left", "11px");
+        expect(compiledScope.sendData).toHaveBeenCalled();
+    });
+
+    it("It should test sendData method", function() {
+
+        spyOn(compiledScope, "configureSwitch").and.returnValue(true);
+        compiledScope.wirelessStatus = false;
+        compiledScope.$digest();
+
+        compiledScope.sendData();
+
+        expect(compiledScope.wirelessStatus).toEqual(true);
+        expect(compiledScope.configureSwitch).toHaveBeenCalledWith(compiledScope.wirelessStatus);
+    });
 });

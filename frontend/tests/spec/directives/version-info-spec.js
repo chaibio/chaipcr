@@ -1,7 +1,7 @@
-describe("Testing wifiLock directive", function() {
+describe("Testing version-info-directive", function() {
 
     var _$rootScope, _$scope, _allowAdminToggle, _$compile, httpMock, compiledScope, _ExperimentLoader, _canvas, _$timeout, _$uibModal,
-    _alerts, _popupStatus, _TimeService, _addStageService, _$state;
+    _alerts, _popupStatus, _TimeService, _addStageService, _$state, _Status, _Device;
 
     beforeEach(function() {
 
@@ -25,6 +25,8 @@ describe("Testing wifiLock directive", function() {
             httpMock = $injector.get('$httpBackend');
             _TimeService = $injector.get('TimeService');
             _addStageService = $injector.get('addStageService');
+            _Status = $injector.get('Status');
+            _Device = $injector.get('Device');
             
             _$state.is = function() {
                 return true;
@@ -58,34 +60,5 @@ describe("Testing wifiLock directive", function() {
         });
     });
 
-    it("It should test initial values", function() {
-        
-        spyOn(_$state, "is").and.callThrough();
 
-        expect(compiledScope.encryption).toEqual("encryption");
-        expect(compiledScope.ssid).toEqual("wow");
-        expect(compiledScope.selected).toEqual(true);
-    });
-
-    it("It should test $stateChangeStart", function() {
-
-        compiledScope.$broadcast('$stateChangeStart', {}, {}, {name: "wow"});
-        //compiledScope.$stateChangeStart = "okay";
-        //compiledScope.$digest();
-        expect(compiledScope.selected).toEqual(false);
-
-    });
-
-    it("It should test change encryption", function() {
-
-        spyOn(angular, "element").and.returnValue({
-            hide: function() {
-
-            }
-        });
-
-        compiledScope.encryption = "";
-        compiledScope.$digest();
-        expect(angular.element).toHaveBeenCalled();
-    });
 });
