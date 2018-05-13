@@ -80,4 +80,155 @@ describe("Testing action directive", function() {
         compiledScope.$digest();
         expect(_popupStatus.popupStatusAddStage).toEqual(compiledScope.actionPopup);
     });
+
+    it("It should test dataLoaded broadcast and change pause", function() {
+
+        compiledScope.$broadcast('dataLoaded');
+
+        compiledScope.step = {
+            pause: false
+        };
+        
+        compiledScope.$digest();
+
+        compiledScope.step = {
+            pause: true
+        };
+        compiledScope.$digest();
+
+        //expect(compiledScope.popAction).toEqual("Remove");
+    });
+
+    it("It should test dataLoaded broadcast and change in step", function() {
+
+        compiledScope.fabricStep = {
+            circle: {
+                holdTime: {
+                    text: "∞"
+                }
+            }
+
+        };
+
+        compiledScope.$broadcast('dataLoaded');
+
+        compiledScope.step = {
+            id: 10
+        };
+
+        compiledScope.$digest();
+
+        expect(compiledScope.infiniteHoldStep).toEqual(true);
+
+    });
+
+    it("It should test dataLoaded broadcast and change in step when containInfiniteStep return true", function() {
+
+        compiledScope.fabricStep = {
+            circle: {
+                holdTime: {
+                    text: "10"
+                }
+            },
+            parentStage: {
+
+            }
+        };
+
+        spyOn(compiledScope, "containInfiniteStep").and.returnValue(true);
+        compiledScope.$broadcast('dataLoaded');
+
+        compiledScope.step = {
+            id: 10
+        };
+
+        compiledScope.$digest();
+
+        expect(compiledScope.containInfiniteStep).toHaveBeenCalled();
+        expect(compiledScope.infiniteHoldStep).toEqual(false);
+        expect(compiledScope.infiniteHoldStage).toEqual(true);
+
+    });
+
+    it("It should test dataLoaded broadcast and change in step when containInfiniteStep return false", function() {
+
+        compiledScope.fabricStep = {
+            circle: {
+                holdTime: {
+                    text: "10"
+                }
+            },
+            parentStage: {
+
+            }
+        };
+
+        spyOn(compiledScope, "containInfiniteStep").and.returnValue(false);
+        compiledScope.$broadcast('dataLoaded');
+
+        compiledScope.step = {
+            id: 10
+        };
+
+        compiledScope.$digest();
+
+        expect(compiledScope.containInfiniteStep).toHaveBeenCalled();
+        expect(compiledScope.infiniteHoldStep).toEqual(false);
+        expect(compiledScope.infiniteHoldStage).toEqual(false);
+
+    });
+
+    it("It should test addStage_ method", function() {
+
+        compiledScope.summaryMode = false;
+        compiledScope.actionPopup = true;
+        compiledScope.$digest();
+        compiledScope.addStage_();
+
+        expect(compiledScope.actionPopup).toEqual(false);
+
+    });
+
+    it("It should test containInfiniteStep method when its not infiniteHold", function() {
+
+        var stage = {
+            childSteps: [
+                {
+                    id: 0,
+                    circle: {
+                        holdTime: {
+                            text: "10"
+                        }
+                    }
+                }
+            ]
+        };
+
+        var retVal = compiledScope.containInfiniteStep(stage);
+
+        expect(retVal).toEqual(false);
+    
+    });
+
+    it("It should test containInfiniteStep method when its infiniteHold", function() {
+
+        var stage = {
+            childSteps: [
+                {
+                    id: 0,
+                    circle: {
+                        holdTime: {
+                            text: "∞"
+                        }
+                    }
+                }
+            ]
+        };
+
+        var retVal = compiledScope.containInfiniteStep(stage);
+
+        expect(retVal).toEqual(true);
+    
+    });
+
 });
