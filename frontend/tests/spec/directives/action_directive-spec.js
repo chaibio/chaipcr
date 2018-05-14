@@ -231,4 +231,126 @@ describe("Testing action directive", function() {
     
     });
 
+    it("It should test addStep method", function() {
+
+        compiledScope.fabricStep = {
+            parentStage: {
+                addNewStep: function() {
+
+                }
+            }
+        };
+
+        _ExperimentLoader.addStep = function() {
+            var data = {
+
+            };
+
+            return {
+                then: function(callback) {
+                    callback(data);
+                }
+            };
+        };
+        spyOn(_ExperimentLoader, "addStep").and.callThrough();
+        spyOn(compiledScope.fabricStep.parentStage, "addNewStep").and.returnValue(true);
+        compiledScope.infiniteHoldStep = false;
+        compiledScope.summaryMode = false;
+        compiledScope.$digest();
+
+        compiledScope.addStep();
+
+        expect(_ExperimentLoader.addStep).toHaveBeenCalled();
+        expect(compiledScope.fabricStep.parentStage.addNewStep).toHaveBeenCalled();
+
+    });
+
+    it("It should test deleteStep method", function() {
+
+        _ExperimentLoader.deleteStep = function() {
+
+            var data = {};
+            return {
+                then: function(callback) {
+                    callback(data);
+                }
+            };
+        };
+
+        compiledScope.fabricStep = {
+           parentStage: {
+               deleteStep: function() {
+
+               }
+           } 
+        };
+
+        spyOn(_ExperimentLoader, "deleteStep").and.callThrough();
+        spyOn(compiledScope.fabricStep.parentStage, "deleteStep").and.returnValue(true);
+
+        compiledScope.deleteStep();
+
+        expect(_ExperimentLoader.deleteStep).toHaveBeenCalled();
+        expect(compiledScope.fabricStep.parentStage.deleteStep).toHaveBeenCalled();
+    });
+
+    it("It should test editStage method when editStageMode === false", function() {
+
+        _editModeService.editStageMode = function() {
+
+        };
+
+        spyOn(_editModeService, "editStageMode").and.callThrough();
+
+        compiledScope.editStageMode = false;
+
+        compiledScope.editStage();
+
+        expect(compiledScope.editStageText).toEqual("DONE");
+        expect(_editModeService.editStageMode).toHaveBeenCalled();
+    });
+
+    it("It should test editStage method when editStageMode === false", function() {
+
+        _editModeService.editStageMode = function() {
+
+        };
+
+        spyOn(_editModeService, "editStageMode").and.callThrough();
+
+        compiledScope.editStageMode = true;
+
+        compiledScope.editStage();
+
+        expect(compiledScope.editStageText).toEqual("EDIT STAGES");
+        expect(_editModeService.editStageMode).toHaveBeenCalled();
+    });
+
+    it("It should test addPause method", function() {
+
+        _ExperimentLoader.changePause = function() {
+            var data = {};
+            return {
+                then: function(callback) {
+                    callback(data);
+                }
+            };
+        };
+
+        spyOn(_ExperimentLoader, "changePause").and.callThrough();
+
+        compiledScope.summaryMode = false;
+        compiledScope.infiniteHoldStep = false;
+        compiledScope.step = {
+            collect_data: false,
+            pause: false
+        };
+
+        compiledScope.$digest();
+
+        compiledScope.addPause();
+
+        expect(_ExperimentLoader.changePause).toHaveBeenCalled();
+        expect(compiledScope.step.pause).toEqual(true);
+    });
 });
