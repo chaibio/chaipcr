@@ -1,7 +1,7 @@
-describe("Testing autoDeltaCaption", function() {
+describe("Testing amplificationChart", function() {
 
     var _$rootScope, _$scope, _allowAdminToggle, _$compile, httpMock, compiledScope, _ExperimentLoader, _canvas, _$timeout, _$uibModal,
-    _alerts, _popupStatus, _TimeService, _addStageService, _$state, _NetworkSettingsService, _editModeService;
+    _alerts, _popupStatus, _TimeService, _addStageService, _$state, _NetworkSettingsService, _editModeService, _$window;
 
     beforeEach(function() {
 
@@ -16,6 +16,7 @@ describe("Testing autoDeltaCaption", function() {
 
         inject(function($injector) {
 
+            _$window = $injector.get('$window');
             _$rootScope = $injector.get('$rootScope');
             _$scope = _$rootScope.$new();
             _$compile = $injector.get('$compile');
@@ -55,22 +56,37 @@ describe("Testing autoDeltaCaption", function() {
                 pause: true
             };
 
-            var elem = angular.element('<auto-delta-caption type="cycling"></auto-delta-caption>');
+            _$window.ChaiBioCharts = {
+                AmplificationChart: function() {
+                    return {
+                        onZoomAndPan: function() {},
+                        onSelectLine: function() {}
+                    };
+                }
+            };
+
+            var elem = angular.element('<amplification-chart data="amplification_data" config="chartConfig" zoom="ampli_zoom" on-zoom="onZoom" on-select-line="onSelectLine" on-unselect-line="onUnselectLine" scroll="ampli_scroll.value" show="true"></amplification-chart>');
             var compiled = _$compile(elem)(_$scope);
             _$scope.show = true;
             _$scope.$digest();
-            compiledScope = compiled.scope();
+            compiledScope = compiled.isolateScope();
             
         });
     });
 
+    it("It should test scroll", function() {
 
-    it("It should test initial valuse when type === cycling", function() {
+        compiledScope.scroll = 150;
+        compiledScope.show = true;
+        compiledScope.$digest();
 
-        _$rootScope.$broadcast('dataLoaded');
-        _$scope.type = "cycling";
+    });
 
-        _$scope.$digest();
-        expect(_$scope.show).toEqual(true);
+    it("It should test zoom", function() {
+
+        compiledScope.zoom = 150;
+        compiledScope.show = true;
+        compiledScope.$digest();
+
     });
 });
