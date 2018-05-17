@@ -138,7 +138,7 @@ function dispatch(action::String, request_body::String)
     end # try
 
     success = !isa(result, Exception)
-    response_body = success ? result : json(OrderedDict("error"=>result))
+    response_body = success ? result : json(OrderedDict("error"=>repr(result)))
 
     if db_name != db_name_AIR
         mysql_disconnect(db_conn)
