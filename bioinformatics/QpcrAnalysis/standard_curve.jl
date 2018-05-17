@@ -189,18 +189,40 @@ function reqvec2df(req_vec::AbstractVector)
 
     sample_vec = Vector{Real}()
 
+    num_channels = maximum(map(req_vec) do req_ele
+        try
+            length(req_ele["well"])
+        catch
+            0
+        end # try
+    end)
+
     for well_i in 1:length(req_vec)
         req_ele = req_vec[well_i]
-        measrmt_vec = req_ele["well"]
-        for channel_i in 1:length(measrmt_vec)
-            measrmt_dict = measrmt_vec[channel_i]
+        for channel_i in 1:num_channels
+            measrmt_dict = try
+                req_ele["well"][channel_i]
+            catch
+                Dict{String,Any}()
+            end # try
+            if length(measrmt_dict) == 0
+                target = cq = qty = NaN
+            else
+                target = nothing2NaN(measrmt_dict["target"])
+                cq = nothing2NaN(measrmt_dict["cq"])
+                qty_dict = measrmt_dict["quantity"]
+                qty = nothing2NaN(qty_dict["m"]) * 10 ^ nothing2NaN(qty_dict["b"])
+            end # if
             push!(well_vec, well_i)
             push!(channel_vec, channel_i)
-            push!(target_vec, nothing2NaN(measrmt_dict["target"]))
-            push!(cq_vec, nothing2NaN(measrmt_dict["cq"]))
-            qty_dict = measrmt_dict["quantity"]
-            push!(qty_vec, nothing2NaN(qty_dict["m"]) * 10 ^ nothing2NaN(qty_dict["b"]))
-            push!(sample_vec, nothing2NaN(req_ele["sample"]))
+            push!(target_vec, target)
+            push!(cq_vec, cq)
+            push!(qty_vec, qty)
+            push!(sample_vec, try
+                nothing2NaN(req_ele["sample"])
+            catch
+                NaN
+            end)
         end # for channel_i
     end # for well_i
 
