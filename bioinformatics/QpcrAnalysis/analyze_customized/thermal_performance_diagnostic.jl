@@ -22,7 +22,7 @@ function analyze_func(
 
     #extract data from database
     queryTemperatureData = "SELECT * FROM temperature_logs WHERE experiment_id = $exp_id order by elapsed_time"
-    temperatureData = MySQL.mysql_execute(db_conn, queryTemperatureData)
+    temperatureData = MySQL.mysql_execute(db_conn, queryTemperatureData)[1]
     num_dp = length(temperatureData[1]) # dp = data points
 
     #add a new column (not row) that is the average of the two heat block zones
