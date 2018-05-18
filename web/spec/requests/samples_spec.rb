@@ -90,6 +90,8 @@ describe "Samples API", type: :request do
   
   describe "#destroy" do
     it 'sample' do
+      post "/experiments/#{@experiment.id}/samples/#{@sample.id}/links", {wells:[2]}.to_json, http_headers
+      expect(response).to be_success
       delete "/experiments/#{@experiment.id}/samples/#{@sample.id}", { :format => 'json' }
       expect(response).to be_success
     end
@@ -101,15 +103,6 @@ describe "Samples API", type: :request do
       expect(response.response_code).to eq(422)
       json = JSON.parse(response.body)
       expect(json["errors"]).not_to be_nil
-    end
-    
-    it 'sample disallowed if it is linked' do
-      post "/experiments/#{@experiment.id}/samples/#{@sample.id}/links", {wells:[2]}.to_json, http_headers
-      expect(response).to be_success
-      delete "/experiments/#{@experiment.id}/samples/#{@sample.id}", { :format => 'json' }
-      expect(response.response_code).to eq(422)
-      json = JSON.parse(response.body)
-      expect(json["sample"]["errors"]).not_to be_nil
     end
   end
   

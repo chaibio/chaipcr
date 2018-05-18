@@ -53,20 +53,6 @@ describe "Experiments API", type: :request do
     json["experiment"]["name"].should == "test"
   end
   
-  it  'delete experiment' do
-    experiment = create_experiment("test")
-    delete "/experiments/#{experiment.id}", http_headers
-    expect(response).to be_success
-  end
-  
-  it "delete not allowed in the middle of running" do
-    experiment = create_experiment("test")
-    experiment.started_at = Time.now
-    experiment.save
-    delete "/experiments/#{experiment.id}", http_headers
-    expect(response.response_code).to eq(422)
-  end
-  
   it "list experiments with no experiment" do
     get "/experiments", { :format => 'json' }
     expect(response).to be_success            # test for the 200 status-code
@@ -160,8 +146,6 @@ describe "Experiments API", type: :request do
   describe "well layout" do
     before(:each) do
       @experiment = create_experiment("test1")
-      @experiment.started_at = Time.now
-      @experiment.save
     end
     
     it "show empty layout" do
@@ -211,8 +195,8 @@ describe "Experiments API", type: :request do
       expect(json[2]["targets"]).not_to be_nil
       expect(json[2]["targets"][1]["quantity"]).not_to be_nil
       
-      get "/experiments/#{@experiment.id}/standard_curve", http_headers
-      expect(response).to be_success
+    #  get "/experiments/#{@experiment.id}/standard_curve", http_headers
+    #  expect(response).to be_success
     end
     
     it "update standard after target is linked is disallowed" do
@@ -230,4 +214,55 @@ describe "Experiments API", type: :request do
     end
     
   end
+  
+  describe "destroy" do
+    before(:each) do
+      @experiment = create_experiment("test")
+    end
+    
+    it  'experiment' do
+      delete "/experiments/#{@experiment.id}", http_headers
+      expect(response).to be_success
+    end
+  
+    it "experiment not allowed in the middle of running" do
+      @experiment.started_at = Time.now
+      @experiment.save
+      delete "/experiments/#{@experiment.id}", http_headers
+      expect(response.response_code).to eq(422)
+    end
+    
+    it "experiment with targets" do
+      post "/experiments/#{@experiment.id}/samples", {name: "sample1"}.to_json, http_headers
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      post "/experiments/#{@experiment.id}/samples/#{json["sample"]["id"]}/links", {wells: [1]}.to_json, http_headers
+      expect(response).to be_success
+      post "/experiments/#{@experiment.id}/targets", {name: "target1", channel: 1}.to_json, http_headers
+      expect(response).to be_success  
+      json = JSON.parse(response.body)
+      post "/experiments/#{@experiment.id}/targets/#{json["target"]["id"]}/links", {wells:[{well_num: 1, well_type: "unknown"}]}.to_json, http_headers
+      expect(response).to be_success
+      
+      delete "/experiments/#{@experiment.id}", http_headers
+      expect(response).to be_success
+    end
+    
+    it "experiment with targets imported to other experiments" do
+      post "/experiments/#{@experiment.id}/targets", {name: "target1", channel: 1}.to_json, http_headers
+      expect(response).to be_success  
+      json = JSON.parse(response.body)
+      @experiment1 = create_experiment("test1")
+      put "/experiments/#{@experiment1.id}", {experiment: {standard_experiment_id: @experiment.id}}.to_json, http_headers
+      post "/experiments/#{@experiment1.id}/targets/#{json["target"]["id"]}/links", {wells:[{well_num: 1, well_type: "unknown"}]}.to_json, http_headers
+      expect(response).to be_success
+      
+      delete "/experiments/#{@experiment.id}", http_headers
+      expect(response.response_code).to eq(422)
+      json = JSON.parse(response.body)
+      expect(json['experiment']["errors"]).not_to be_nil
+    end
+    
+  end
+  
 end

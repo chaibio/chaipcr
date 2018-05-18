@@ -44,13 +44,4 @@ class Sample < ActiveRecord::Base
     end
     new_sample
   end
-  
-  def destroy
-    if samples_wells.exists?
-      errors.add(:base, "sample is linked to well")
-      false
-    else
-      super
-    end
-  end
 end

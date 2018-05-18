@@ -317,9 +317,13 @@ class ExperimentsController < ApplicationController
 
   api :DELETE, "/experiments/:id", "Destroy an experiment"
   def destroy
-    ret = @experiment.destroy
+    begin
+      ret = @experiment.destroy
+    rescue  => e
+      ret = false
+    end
     respond_to do |format|
-      format.json { render "destroy", :status => (ret)? :ok :  :unprocessable_entity}
+      format.json { render "destroy", :status => (ret)? :ok : :unprocessable_entity}
     end
   end
 
@@ -341,12 +345,16 @@ class ExperimentsController < ApplicationController
     end
     
     begin
-      body = @wells.map {|well| (well)? well.as_json_standard_curve : {}}.to_json
+      body = @wells.map {|well| (well)? well.as_json_standard_curve : {}}
       puts("body=#{body}")
-      response = HTTParty.post("http://127.0.0.1:8080/experiments/#{@experiment.id}/standard_curve", body: body.to_json)
+      response = HTTParty.post("http://127.0.0.1:8081/experiments/#{@experiment.id}/standard_curve", body: body.to_json)
       if response.code != 200
         raise_julia_error(response)
       else
+        results = JSON.parse(response.body)
+        
+        puts("result=#{response.body}")
+        #@standard_curve_data_group = 
         new_data = CachedAnalyzeDatum.new(:experiment_id=>experiment.id, :analyze_result=>response.body)
         #update analyze status
         if experiment.diagnostic?

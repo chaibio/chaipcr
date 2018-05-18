@@ -22,7 +22,7 @@ class Target < ActiveRecord::Base
   belongs_to :well_layout
   has_many :targets_wells, dependent: :destroy
   
-  attr_accessor :imported
+  attr_accessor :imported, :force_destroy
   
   validates_presence_of :name, :channel
   validates :channel, :inclusion => {:in=>1..2, :message => "%{value} is not 1 and 2"}
@@ -56,12 +56,18 @@ class Target < ActiveRecord::Base
   end
   
   def destroy
-    if linked?
-      errors.add(:base, "target is linked to well")
-      false
+    if force_destroy != true
+      if linked?
+        errors.add(:base, "target is linked to well")
+        return false
+      end
     else
-      super
+      if linked_externally?
+        errors.add(:base, "target is imported to another experiment")
+        return false
+      end
     end
+    super
   end
   
   protected
@@ -76,5 +82,9 @@ class Target < ActiveRecord::Base
   
   def linked?
     targets_wells.exists?
+  end
+  
+  def linked_externally?
+    targets_wells.where(["targets_wells.well_layout_id != ?", well_layout_id]).exists?
   end
 end

@@ -98,13 +98,31 @@ describe "Targets API", type: :request do
       expect(json["errors"]).not_to be_nil
     end
     
-    it 'target disallowed if it is linked' do
+    it 'target disallowed if it is linked and force is not specified' do
       post "/experiments/#{@experiment.id}/targets/#{@target1.id}/links", {wells:[{well_num: 2}]}.to_json, http_headers
       expect(response).to be_success
       delete "/experiments/#{@experiment.id}/targets/#{@target1.id}", { :format => 'json' }
       expect(response.response_code).to eq(422)
       json = JSON.parse(response.body)
       expect(json["target"]["errors"]).not_to be_nil
+    end
+    
+    it 'target disallowed if it is linked externally and force is set to true' do
+      @experiment1 = create_experiment_with_one_stage("test1")
+      put "/experiments/#{@experiment1.id}", {experiment: {standard_experiment_id: @experiment.id}}.to_json, http_headers
+      post "/experiments/#{@experiment1.id}/targets/#{@target1.id}/links", {wells:[{well_num: 2}]}.to_json, http_headers
+      expect(response).to be_success
+      delete "/experiments/#{@experiment.id}/targets/#{@target1.id}", { :format => 'json' }
+      expect(response.response_code).to eq(422)
+      json = JSON.parse(response.body)
+      expect(json["target"]["errors"]).not_to be_nil
+    end
+    
+    it 'target allowed if it is linked and force is set to true' do
+      post "/experiments/#{@experiment.id}/targets/#{@target1.id}/links", {wells:[{well_num: 2}]}.to_json, http_headers
+      expect(response).to be_success
+      delete "/experiments/#{@experiment.id}/targets/#{@target1.id}?force=true", { :format => 'json' }
+      expect(response).to be_success
     end
   end
   

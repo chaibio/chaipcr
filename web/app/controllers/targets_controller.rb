@@ -73,7 +73,12 @@ class TargetsController < ApplicationController
 
   def destroy
     if @target.well_layout_id == @experiment.well_layout.id
-      ret = @target.destroy
+      @target.force_destroy = (params["force"] == true || params["force"] == "true")? true : false
+      begin
+        ret = @target.destroy
+      rescue  => e
+        ret = false
+      end
     else
       @target.errors.add(:base, "target cannot be destroyed because it is imported")
     end

@@ -23,7 +23,7 @@ class WellNode #change to Well later
   def as_json_standard_curve
     {
       :well=>(!targets.blank?)? targets.map {|target|
-        (target)? {:target=>target.id, :cq=>target.ct, :quantity=>{:m=>target.quantity_m, :b=>target.quantity.b}} : {}
+        (target)? {:target=>target.id, :cq=>target.ct.to_f, :quantity=>{:m=>target.quantity_m.to_f, :b=>target.quantity_b}} : {}
         } : nil,
       :sample=>(!samples.blank?)? samples.first.id : nil
     }
@@ -31,10 +31,21 @@ class WellNode #change to Well later
 end
 
 class WellLayout < ActiveRecord::Base
-  has_many :samples, dependent: :destroy
-  has_many :targets, dependent: :destroy
+  has_many :samples
+  has_many :targets
   
   scope :for_experiment, lambda {|experiment_id| where(:experiment_id=>experiment_id, :parent_type=>Experiment.name)}
+  
+  before_destroy do |layout|
+    layout.targets.each do |target|
+      target.force_destroy = true
+      if !target.destroy
+        errors.add(:base, "target #{target.id} destroy fails: #{target.errors.full_messages.join(",")}")
+        throw :abort
+      end
+    end
+    layout.samples.destroy_all
+  end
   
   def editable?
     parent_type == Experiment.name

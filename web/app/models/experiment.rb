@@ -124,7 +124,7 @@ class Experiment < ActiveRecord::Base
 
   belongs_to :experiment_definition
   
-  has_one  :well_layout, ->{ where(:parent_type => Experiment.name) }, dependent: :destroy
+  has_one  :well_layout, ->{ where(:parent_type => Experiment.name) }
   has_many :fluorescence_data
   has_many :temperature_logs, -> {order("elapsed_time")} do
     def with_range(starttime, endtime, resolution)
@@ -160,7 +160,15 @@ class Experiment < ActiveRecord::Base
   before_destroy do |experiment|
     if experiment.running?
       errors.add(:base, "cannot delete experiment in the middle of running")
-      false
+      throw :abort
+    end
+    if experiment.well_layout
+      begin
+        experiment.well_layout.destroy
+      rescue  => e
+        errors.add(:base, *experiment.well_layout.errors.full_messages)
+        throw :abort
+      end
     end
   end
 

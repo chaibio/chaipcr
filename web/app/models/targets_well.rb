@@ -45,6 +45,9 @@ class TargetsWell < ActiveRecord::Base
   protected
 
   def validate
+    if !quantity_m.nil? && quantity_m < 0
+      errors.add(:quantity, "has to be positive number")
+    end
     if target.imported && well_type == "standard"
       errors.add(:well_type, "standard cannot be supported for imported target")
     end
