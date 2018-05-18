@@ -22,6 +22,8 @@ class Sample < ActiveRecord::Base
   belongs_to :well_layout
   has_many :samples_wells, dependent: :destroy
   
+  attr_accessor :force_destroy
+  
   validates_presence_of :name
   ACCESSIBLE_ATTRS = [:well_layout_id, :name]
   
@@ -44,4 +46,21 @@ class Sample < ActiveRecord::Base
     end
     new_sample
   end
+  
+   def destroy
+    if force_destroy != true
+      if linked?
+        errors.add(:base, "sample is linked to well")
+        return false
+      end
+    end
+    super
+  end
+  
+  protected
+  
+  def linked?
+    samples_wells.exists?
+  end
+   
 end

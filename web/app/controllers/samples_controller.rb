@@ -47,6 +47,7 @@ class SamplesController < ApplicationController
   end
 
   def destroy
+    @sample.force_destroy = (params["force"] == true || params["force"] == "true")? true : false
     ret = @sample.destroy
     respond_to do |format|
       format.json { render "destroy", :status => (ret)? :ok : :unprocessable_entity}

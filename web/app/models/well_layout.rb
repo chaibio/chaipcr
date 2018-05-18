@@ -44,7 +44,13 @@ class WellLayout < ActiveRecord::Base
         throw :abort
       end
     end
-    layout.samples.destroy_all
+    layout.samples.each do |sample|
+      sample.force_destroy = true
+      if !sample.destroy
+        errors.add(:base, "sample #{sample.id} destroy fails: #{sample.errors.full_messages.join(",")}")
+        throw :abort
+      end
+    end
   end
   
   def editable?
