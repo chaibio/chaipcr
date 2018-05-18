@@ -352,24 +352,14 @@ class ExperimentsController < ApplicationController
         raise_julia_error(response)
       else
         results = JSON.parse(response.body)
-        
         puts("result=#{response.body}")
-        #@standard_curve_data_group = 
-        new_data = CachedAnalyzeDatum.new(:experiment_id=>experiment.id, :analyze_result=>response.body)
-        #update analyze status
-        if experiment.diagnostic?
-          analysis_results = JSON.parse(response.body)
-          experiment.update_attributes(:analyze_status=>(analysis_results["valid"] != true)? "failed" : "success")
-        end
+        render :json=>response.body, :status => :ok
       end
     rescue  => e
       logger.error("Julia error: #{e}")
-      raise e
+      render :json=>e.to_s, :status => 500
     ensure
     end
-
-    #update cache
-    CachedAnalyzeDatum.import [new_data], :on_duplicate_key_update => [:analyze_result]
   end
   
 	swagger_path '/experiments/{id}/temperature_data' do
