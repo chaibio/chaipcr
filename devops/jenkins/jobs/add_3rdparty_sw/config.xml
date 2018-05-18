@@ -704,9 +704,7 @@ sync
       apt install -y -q libmysqlclient-dev
 
       sed -i &apos;1i using DataArrays&apos; /root/chaipcr/bioinformatics/juliaserver.jl
-      sed -i &apos;1i push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/
-
-nalysis/&quot;)&apos; /root/chaipcr/bioinformatics/juliaserver.jl
+      sed -i &apos;1i push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;)&apos; /root/chaipcr/bioinformatics/juliaserver.jl
 
       echo Build time- adding pre-requesits
       free -m
@@ -844,11 +842,11 @@ println(&quot;Setting up Julia: Adding packages&quot;)
        println(&quot;installing library: NearestNeighbors&quot;); Pkg.add(&quot;NearestNeighbors&quot;,v&quot;0.3.0&quot;,v&quot;0.3.1-&quot;)
        println(&quot;installing library: ReverseDiffSparse&quot;); Pkg.add(&quot;ReverseDiffSparse&quot;,v&quot;0.7.3&quot;,v&quot;0.7.4-&quot;)
        println(&quot;installing library: SortingAlgorithms&quot;); Pkg.add(&quot;SortingAlgorithms&quot;,v&quot;0.2.0&quot;,v&quot;0.2.1-&quot;)
-       println(&quot;installing library: StatsBase&quot;); Pkg.add(&quot;StatsBase&quot;,v&quot;0.20.1&quot;,v&quot;0.20.2-&quot;)
+       println(&quot;installing library: StatsBase&quot;); Pkg.add(&quot;StatsBase&quot;,v&quot;0.22.0&quot;,v&quot;0.22.1-&quot;)
 
 	println(&quot;All additional packages&quot;)
 	println(&quot;ADDING: DataFrames&quot;)
-	Pkg.add(&quot;DataFrames&quot;, v&quot;0.11.2&quot;, v&quot;0.11.3-&quot;)
+	Pkg.add(&quot;DataFrames&quot;, v&quot;0.11.0&quot;, v&quot;0.11.1-&quot;)
 	println(&quot;ADDING: HDF5&quot;)
 	Pkg.add(&quot;HDF5&quot;,v&quot;0.8.8&quot;, v&quot;0.8.9-&quot;)
 	println(&quot;ADDING: JLD&quot;)
