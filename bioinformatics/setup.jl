@@ -47,7 +47,7 @@ println("installing library: StaticArrays"); Pkg.add("StaticArrays",v"0.7.0",v"0
 println("installing library: NearestNeighbors"); Pkg.add("NearestNeighbors",v"0.3.0",v"0.3.1-")
 println("installing library: ReverseDiffSparse"); Pkg.add("ReverseDiffSparse",v"0.7.3",v"0.7.4-")
 println("installing library: SortingAlgorithms"); Pkg.add("SortingAlgorithms",v"0.2.0",v"0.2.1-")
-println("installing library: StatsBase"); Pkg.add("StatsBase",v"0.20.1",v"0.20.2-")
+println("installing library: StatsBase"); Pkg.add("StatsBase",v"0.22.0",v"0.22.1-")
 
 println("All additional packages")
 
