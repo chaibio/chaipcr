@@ -37,6 +37,12 @@ function standard_curve(
 
     req_df = reqvec2df(req_vec)
 
+    if size(req_df)[2] == 0 || any(map([:target, :cq, :qty]) do symbl
+        all(isnan.(req_df[symbl]))
+    end)
+        return json(OrderedDict("target"=>nothing, "group"=>nothing))
+    end
+
     target_result_df = by(req_df, :target) do chunk_target
         target_id = chunk_target[1, :target]
         if isnan(target_id)
@@ -179,6 +185,10 @@ end
 
 # parse req_vec into a dataframe
 function reqvec2df(req_vec::AbstractVector)
+
+    if length(req_vec) == 0
+        return DataFrame()
+    end
 
     well_vec = Vector{Int}()
     channel_vec = Vector{Int}()
