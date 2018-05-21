@@ -28,6 +28,7 @@ describe("It should test amplificationChart", function() {
 
             
             httpMock.expectGET("http://localhost:8000/status").respond("NOTHING");
+            httpMock.expectGET("/experiments/undefined/amplification_option").respond("NOTHING");
             httpMock.expectGET("http://localhost:8000/network/wlan").respond("NOTHING");
             httpMock.expectGET("http://localhost:8000/network/eth0").respond("NOTHING");
             httpMock.expectPUT("http://localhost:8000/network/eth0").respond({
@@ -85,6 +86,73 @@ describe("It should test amplificationChart", function() {
       expect(_$scope.showOptions).toEqual(true);
       expect(_$scope.isError).toEqual(false);
       expect(_$scope.method.name).toEqual('Cy0');
+      expect(_$scope.cy0.name).toEqual('Cy0');
+      expect(_$scope.cy0.desciption).toEqual('A Cq calling method based on the max first derivative of the curve (recommended).');
+      expect(_$scope.cpd2.name).toEqual('cpD2');
+      expect(_$scope.cpd2.desciption).toEqual('A Cq calling method based on the max second derivative of the curve.');
+
+      expect(_$scope.cpd2.name).toEqual('cpD2');
+      expect(_$scope.cpd2.desciption).toEqual('A Cq calling method based on the max second derivative of the curve.');
+
+      expect(_$scope.minFl.name).toEqual('Min Flouresence');
+      expect(_$scope.minFl.desciption).toEqual('The minimum fluorescence threshold for Cq calling. Cq values will not be called when the fluorescence is below this threshold.');
+      expect(_$scope.minFl.value).toEqual(null);
+
+      expect(_$scope.minCq.name).toEqual('Min Cycle');
+      expect(_$scope.minCq.desciption).toEqual('The earliest cycle to use in Cq calling & baseline subtraction. Data for earlier cycles will be ignored.');
+      expect(_$scope.minCq.value).toEqual(null);
+
+      expect(_$scope.minDf.name).toEqual('Min 1st Derivative');
+      expect(_$scope.minDf.desciption).toEqual('The threshold which the first derivative of the curve must exceed for a Cq to be called.');
+      expect(_$scope.minDf.value).toEqual(null);
+
+      expect(_$scope.minD2f.name).toEqual('Min 2nd Derivative');
+      expect(_$scope.minD2f.desciption).toEqual('The threshold which the second derivative of the curve must exceed for a Cq to be called.');
+      expect(_$scope.minD2f.value).toEqual(null);
+
+      expect(_$scope.baseline_sub).toEqual('auto');
+
+      expect(_$scope.baseline_auto.name).toEqual('Auto');
+      expect(_$scope.baseline_auto.desciption).toEqual('Automatically detect the baseline cycles.');
+
+      expect(_$scope.baseline_manual.name).toEqual('Manual');
+      expect(_$scope.baseline_manual.desciption).toEqual('Manually specify the baseline cycles.');
+
+      expect(_$scope.cyclesFrom).toEqual(null);
+      expect(_$scope.cyclesTo).toEqual(null);
+      expect(_$scope.hoverName).toEqual("Min. Flouresence");
+      expect(_$scope.hoverDescription).toEqual("This is a test description");
+      expect(_$scope.samples).toEqual(jasmine.any(Array));
+      expect(_$scope.editExpNameMode).toEqual(jasmine.any(Array));
+    });
+
+    it("It should test expName:Updated chnage", function() {
+
+      _expName.name = "chai1";
+      
+      
+      _$scope.experiment = {
+        name: "something",
+        id: 10,
+      };
+
+      //_$scope.$digest();
+      _$scope.$broadcast('expName:Updated');
+      console.log(_expName);
+      
+      expect(_$scope.experiment.name).toEqual(_expName.name);
+    });
+
+    it("It should test check method", function() {
+
+      _$scope.check();
+      expect(_$scope.errorCheck).toEqual(true);
+      expect(_$scope.hoverName).toEqual("Error");
+      //expect(_$scope.hoverDescription).toEqual('Min Flourescence cannot be left empty');
+      expect(_$scope.hoverOn).toEqual(true);
+      expect(_$scope.errorCheck).toEqual(true);
+      expect(_$scope.errorFl).toEqual(true);
+
     });
 
 });
