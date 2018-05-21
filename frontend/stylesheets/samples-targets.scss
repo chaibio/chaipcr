@@ -1,0 +1,87 @@
+@import './colors.css.scss';
+
+.ui-selectable-helper{
+  position:absolute;
+  z-index:100;
+  border:1px dotted black;
+}
+
+.samples, .targets{
+	overflow-y: scroll;
+	table{
+		width: 100%;
+	}
+	padding-left: 50px !important;
+	padding-right: 50px !important;
+	padding-top: 20px;
+	p{
+		font-family: 'dinot-bold';
+		border-bottom: 2px solid black;
+	}
+	input{
+		font-size: 13px;
+		font-family: 'dinot-bold';
+		vertical-align: middle;
+	}
+
+	.add-span{
+		font-family: 'dinot-bold';
+		cursor: pointer;
+		display: inline-block;
+		border: 2px solid black;
+		border-radius: 3px;
+		margin-top: 5px;
+		padding: 7px;
+		.add-plus{
+			width: 13px;
+			margin-top: -5px;
+		}
+	}
+
+	.delete{
+		max-width: 15px;
+		vertical-align: middle;
+		cursor: pointer;
+	}
+
+	.color{
+		vertical-align: middle;
+	}
+
+	td{
+		padding-top: 10px;
+		padding-bottom: 10px;
+	}
+	.select-style {
+		font-family: 'dinot-bold';
+	    padding: 0;
+	    margin: 0;
+	    border: none;
+	    //width: 120px;
+	    border-radius: 3px;
+	    overflow: hidden;
+	    background-color: #fff;
+			display: inline-block;
+			vertical-align: middle;
+
+	    background: #fff url("http://www.scottgood.com/jsg/blog.nsf/images/arrowdown.gif") no-repeat 90% 50%;
+	}
+
+	.select-style select {
+		font-family: 'dinot-bold';
+		cursor: pointer;
+	    padding: 0px;
+	    width: 100%;
+	    border: none;
+	    box-shadow: none;
+	    background-color: transparent;
+	    background-image: none;
+	    -webkit-appearance: none;
+	       -moz-appearance: none;
+	            appearance: none;
+	}
+
+	.select-style select:focus {
+	    outline: none;
+	}
+}
