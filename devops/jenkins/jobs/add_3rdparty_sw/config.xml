@@ -827,6 +827,9 @@ sync
 fsck /dev/mmcblk1p1 -y -f
 fsck /dev/mmcblk0p1 -y -f
 
+find . -name .git -execdir rm -r {} \;
+find . -name *.o  -exec rm {} \;
+
 exit 0
 </command>
       <execEachLine>false</execEachLine>
