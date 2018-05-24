@@ -739,20 +739,6 @@ else
 	fi
 fi
 
-git config --global user.email &apos;info@chaibio.org&apos;
-git config --global user.name &apos;Chaibio qPCR&apos;
-git config --global github.user &quot;Chaibio&quot;
-
-
-
-
-
-
-
-
-
-
-
 cd
 rm -r ~/julia-compile
 sync
