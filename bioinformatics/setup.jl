@@ -1,12 +1,5 @@
 Pkg.init()
-dir = Pkg.Dir.path()
-info("Pinning repository $dir")
-metadata_dir = joinpath(dir, "METADATA")
-if Pkg.Dir.isdir(metadata_dir)
-        info("Package directory $dir exits.")
-	run(`git -C $metadata_dir reset --hard 62c084ec638baee70c4f361c75304583bf4647da`)
-end
-
+Pkg.status()
 println("installing library: Compat");Pkg.add("Compat",v"0.61.0",v"0.61.1-")
 println("installing library: GZip"); Pkg.add("GZip",v"0.3.0",v"0.3.1-")
 println("installing library: Polynomials");Pkg.add("Polynomials",v"0.2.2",v"0.2.3-")
