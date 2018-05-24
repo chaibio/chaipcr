@@ -38,12 +38,14 @@ class Target < ActiveRecord::Base
   
   def self.unknowns_for_experiment(experiment)
     targets_hash = Hash.new
-    targets = self.joins(:targets_wells).joins("inner join amplification_curves on amplification_curves.well_num = targets_wells.well_num and amplification_curves.channel = targets.channel")
-                                        .where(["targets_wells.well_type='unknown' and targets_wells.well_layout_id=? and amplification_curves.experiment_id=? and ct is not NULL", experiment.well_layout.id, experiment.id])
-                                        .order("targets.id, targets_wells.well_num, targets.channel").select("targets.*, targets_wells.well_num, ct as cq")
-    targets.each do |target|
-      targets_hash[target.id] = Array.new if targets_hash[target.id].nil?
-      targets_hash[target.id] << target
+    if experiment && experiment.well_layout
+      targets = self.joins(:targets_wells).joins("inner join amplification_curves on amplification_curves.well_num = targets_wells.well_num and amplification_curves.channel = targets.channel")
+                                          .where(["targets_wells.well_type='unknown' and targets_wells.well_layout_id=? and amplification_curves.experiment_id=? and ct is not NULL", experiment.well_layout.id, experiment.id])
+                                          .order("targets.id, targets_wells.well_num, targets.channel").select("targets.*, targets_wells.well_num, ct as cq")
+      targets.each do |target|
+        targets_hash[target.id] = Array.new if targets_hash[target.id].nil?
+        targets_hash[target.id] << target
+      end
     end
     targets_hash
   end
