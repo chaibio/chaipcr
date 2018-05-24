@@ -354,13 +354,14 @@ class ExperimentsController < ApplicationController
         raise_julia_error(response)
       else
         julia_results = JSON.parse(response.body)
+        #puts response.body
         results = Hash.new
         unknown_targets_hash = Target.unknowns_for_experiment(@experiment)
-        julia_results["target"].each do |target_equation|
+        julia_results["targets"].each do |target_equation|
           if !target_equation["slope"].nil? && !target_equation["offset"].nil?
             results["targets"] = Array.new if results["targets"].nil?
             result_per_target = target_equation
-            unknown_targets = unknown_targets_hash[target_equation["target"]]
+            unknown_targets = unknown_targets_hash[target_equation["target_id"]]
             if unknown_targets
               result_per_target = target_equation.clone
               result_per_target["unknowns"] = Array.new
@@ -378,8 +379,8 @@ class ExperimentsController < ApplicationController
             results["targets"] << result_per_target
           end
         end
-        if !julia_results["group"].blank?
-          results["groups"] = julia_results["group"]
+        if !julia_results["groups"].blank?
+          results["groups"] = julia_results["groups"]
         end
         render :json=>results, :status => :ok
       end
