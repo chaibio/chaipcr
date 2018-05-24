@@ -4,7 +4,7 @@
 # what if isnull(cq)
 
 immutable TargetResultEle
-    target::Int
+    target_id::Int
     slope::Float64
     offset::Float64
     efficiency::Float64
@@ -101,7 +101,7 @@ function standard_curve(
         for tre in tre_vec
             if isnan(tre.slope) && isnan(tre.offset)
                 target_result = OrderedDict(
-                    "target"=>getfield(tre, :target),
+                    "target_id"=>getfield(tre, :target_id),
                     "error"=>"less 2 valid data points of cq and/or qty available for fitting standard curve"
                 )
             else
@@ -152,7 +152,7 @@ function standard_curve(
             end # if
         end # do well_combin
 
-        jp_dict = OrderedDict("target"=>target_vec, "group"=>grp_vec)
+        jp_dict = OrderedDict("targets"=>target_vec, "groups"=>grp_vec)
         return out_format == "json" ? json(jp_dict) : jp_dict
     end # if
 
