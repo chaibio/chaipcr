@@ -460,7 +460,7 @@ df -h
 apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential || true
 ntpdate -b -s -u pool.ntp.org
 
-#sudo apt-get -q -y install gcc-4.8 g++-4.8 
+sudo apt-get -q -y install gcc-4.8 g++-4.8 
 sudo apt-get -q -y install libgfortran-6-dev liblapack3
 sudo apt-get -q -y install libblas3gf liblapack3gf 
 sudo apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libc-bin  || exit 1
@@ -553,10 +553,8 @@ echo configure tslib
 ./configure
 echo making tslib
 make || exit 1
-echo installing tslib
 make install || exit 1
 cd
-echo cleaning up
 rm -r tslib
 
 sync
@@ -747,30 +745,118 @@ sync
 fsck /dev/mmcblk1p1 -y -f
 fsck /dev/mmcblk0p1 -y -f
 
-/sbin/fsck /dev/mmcblk1p1 -y -f
-/sbin/fsck /dev/mmcblk0p1 -y -f
-
 sync
 
 sleep 60
 
 echo &quot;Setting up Julia: Initializing rep&quot;
-
-cd /tmp
-wget https://github.com/chaibio/chaipcr/raw/julia/bioinformatics/setup.jl
-rm -r ~/.julia
-julia -e &apos;include(&quot;/tmp/setup.jl&quot;)&apos;
-
-apt-get -y -q install libglib2.0-0
-apt --fix-broken install -y -q
-
+julia --print &quot;Pkg.init()&quot;
 sync
+sleep 60
+
+
+
+
+rm -r ~/.julia
 
 echo &quot;Setting up Julia: Updating rep&quot;
-
+julia --print &quot;Pkg.init()&quot;
+julia --print &quot;Pkg.update()&quot;
+sync
+sleep 60
 echo precompiling mandatory packages.
 cat &lt;&lt;EOF &gt;&gt; chaibio_packages.jl
 
+println(&quot;Setting up Julia: Adding packages&quot;)
+
+       println(&quot;installing library: Compat&quot;);Pkg.add(&quot;Compat&quot;,v&quot;0.61.0&quot;,v&quot;0.61.1-&quot;)
+       println(&quot;installing library: Polynomials&quot;);Pkg.add(&quot;Polynomials&quot;,v&quot;0.2.2&quot;,v&quot;0.2.3-&quot;)
+       println(&quot;installing library: IterTools&quot;);Pkg.add(&quot;IterTools&quot;,v&quot;0.2.1&quot;,v&quot;0.2.2-&quot;)
+       println(&quot;installing library: Combinatorics&quot;);Pkg.add(&quot;Combinatorics&quot;,v&quot;0.6.0&quot;,v&quot;0.6.1-&quot;)
+       println(&quot;installing library: SHA&quot;);Pkg.add(&quot;SHA&quot;,v&quot;0.5.6&quot;,v&quot;0.5.7-&quot;)
+       println(&quot;installing library: URIParser&quot;); Pkg.add(&quot;URIParser&quot;,v&quot;0.3.1&quot;,v&quot;0.3.2-&quot;)
+       println(&quot;ADDING: BinDeps&quot;); Pkg.add(&quot;BinDeps&quot;,v&quot;0.8.0&quot;,v&quot;0.8.1-&quot;)
+       println(&quot;installing library Blosc&quot;); Pkg.add(&quot;Blosc&quot;,v&quot;0.3.0&quot;,v&quot;0.3.1-&quot;)
+       println(&quot;installing library BinaryProvider&quot;); Pkg.add(&quot;BinaryProvider&quot;,v&quot;0.2.5&quot;,v&quot;0.2.6-&quot;)
+
+
+       println(&quot;installing library: FixedPointNumbers&quot;); Pkg.add(&quot;FixedPointNumbers&quot;,v&quot;0.4.6&quot;,v&quot;0.4.7-&quot;)
+       println(&quot;installing library: ColorTypes&quot;); Pkg.add(&quot;ColorTypes&quot;,v&quot;0.6.7&quot;,v&quot;0.6.8-&quot;)
+       println(&quot;installing library: Reexport&quot;); Pkg.add(&quot;Reexport&quot;,v&quot;0.1.0&quot;,v&quot;0.1.1-&quot;)
+       println(&quot;installing library: Colors&quot;); Pkg.add(&quot;Colors&quot;,v&quot;0.8.2&quot;,v&quot;0.8.3-&quot;)
+       println(&quot;installing library: NaNMath&quot;); Pkg.add(&quot;NaNMath&quot;,v&quot;0.3.1&quot;,v&quot;0.3.2-&quot;)
+	println(&quot;ADDING: MathProgBase&quot;); Pkg.add(&quot;MathProgBase&quot;,v&quot;0.6.0&quot;,v&quot;0.6.1-&quot;)
+
+
+       println(&quot;installing library: Graphics&quot;); Pkg.add(&quot;Graphics&quot;,v&quot;0.2.0&quot;,v&quot;0.2.1-&quot;)
+       println(&quot;installing library Cairo&quot;); Pkg.add(&quot;Cairo&quot;,v&quot;0.5.1&quot;,v&quot;0.5.2-&quot;)
+       println(&quot;installing library: Gtk&quot;); Pkg.add(&quot;Gtk&quot;,v&quot;0.13.1&quot;,v&quot;0.13.2-&quot;)
+
+       println(&quot;installing library: IntervalSets&quot;); Pkg.add(&quot;IntervalSets&quot;,v&quot;0.2.0&quot;,v&quot;0.2.1-&quot;)
+       println(&quot;installing library: RoundingIntegers&quot;); Pkg.add(&quot;RoundingIntegers&quot;,v&quot;0.0.3&quot;,v&quot;0.0.4-&quot;)
+	println(&quot;ADDING: DataStructures&quot;); Pkg.add(&quot;DataStructures&quot;, v&quot;0.7.4&quot;, v&quot;0.7.5-&quot;)
+       println(&quot;installing library: Reactive&quot;); Pkg.add(&quot;Reactive&quot;,v&quot;0.6.0&quot;,v&quot;0.6.1-&quot;)
+
+       println(&quot;installing library: Missings&quot;); Pkg.add(&quot;Missings&quot;,v&quot;0.2.7&quot;,v&quot;0.2.8-&quot;)
+       println(&quot;installing library: WeakRefStrings&quot;); Pkg.add(&quot;WeakRefStrings&quot;,v&quot;0.4.3&quot;,v&quot;0.4.4-&quot;)
+       println(&quot;installing library: NamedTuples &quot;); Pkg.add(&quot;NamedTuples&quot;,v&quot;4.0.0&quot;,v&quot;4.0.1-&quot;)
+
+	println(&quot;ADDING: Nullables&quot;); Pkg.add(&quot;Nullables&quot;,v&quot;0.0.3&quot;, v&quot;0.0.4-&quot;)
+
+	println(&quot;ADDING: JSON&quot;); Pkg.add(&quot;JSON&quot;,v&quot;0.16.4&quot;, v&quot;0.16.5-&quot;)
+       println(&quot;installing library: CategoricalArrays&quot;); Pkg.add(&quot;CategoricalArrays&quot;,v&quot;0.3.6&quot;,v&quot;0.3.7-&quot;)
+
+       println(&quot;installing library: Calculus&quot;); Pkg.add(&quot;Calculus&quot;,v&quot;0.2.2&quot;,v&quot;0.2.3-&quot;)
+
+       println(&quot;installing library: TranscodingStreams&quot;); Pkg.add(&quot;TranscodingStreams&quot;,v&quot;0.5.1&quot;,v&quot;0.5.2-&quot;)
+       println(&quot;installing library: CodecZlib&quot;); Pkg.add(&quot;CodecZlib&quot;,v&quot;0.4.2&quot;,v&quot;0.4.3-&quot;)
+       println(&quot;installing library: DataStreams&quot;); Pkg.add(&quot;DataStreams&quot;,v&quot;0.3.4&quot;,v&quot;0.3.5-&quot;)
+       println(&quot;installing library: DiffBase&quot;); Pkg.add(&quot;DiffBase&quot;,v&quot;0.2.0&quot;,v&quot;0.2.1-&quot;)
+       println(&quot;installing library: Distances&quot;); Pkg.add(&quot;Distances&quot;,v&quot;0.5.0&quot;,v&quot;0.5.1-&quot;)
+       println(&quot;installing library: FileIO&quot;); Pkg.add(&quot;FileIO&quot;,v&quot;0.7.0&quot;,v&quot;0.7.1-&quot;)
+	println(&quot;ADDING: SpecialFunctions&quot;); Pkg.add(&quot;SpecialFunctions&quot;,v&quot;0.3.6&quot;,v&quot;0.3.7-&quot;)
+
+       println(&quot;installing library: ForwardDiff&quot;); Pkg.add(&quot;ForwardDiff&quot;,v&quot;0.4.2&quot;,v&quot;0.4.3-&quot;)
+
+
+       println(&quot;installing library: GtkReactive&quot;); Pkg.add(&quot;GtkReactive&quot;,v&quot;0.4.0&quot;,v&quot;0.4.1-&quot;)
+       println(&quot;installing library: HttpCommon&quot;); Pkg.add(&quot;HttpCommon&quot;,v&quot;0.4.0&quot;,v&quot;0.4.1-&quot;)
+       println(&quot;installing library: HttpParser&quot;); Pkg.add(&quot;HttpParser&quot;,v&quot;0.3.1&quot;,v&quot;0.3.2-&quot;)
+       println(&quot;installing library: LegacyStrings&quot;); Pkg.add(&quot;LegacyStrings&quot;,v&quot;0.3.0&quot;,v&quot;0.3.1-&quot;)
+       println(&quot;installing library: MbedTLS&quot;); Pkg.add(&quot;MbedTLS&quot;,v&quot;0.5.8&quot;,v&quot;0.5.9-&quot;)
+       println(&quot;installing library: StaticArrays&quot;); Pkg.add(&quot;StaticArrays&quot;,v&quot;0.7.0&quot;,v&quot;0.7.1-&quot;)
+       println(&quot;installing library: NearestNeighbors&quot;); Pkg.add(&quot;NearestNeighbors&quot;,v&quot;0.3.0&quot;,v&quot;0.3.1-&quot;)
+       println(&quot;installing library: ReverseDiffSparse&quot;); Pkg.add(&quot;ReverseDiffSparse&quot;,v&quot;0.7.3&quot;,v&quot;0.7.4-&quot;)
+       println(&quot;installing library: SortingAlgorithms&quot;); Pkg.add(&quot;SortingAlgorithms&quot;,v&quot;0.2.0&quot;,v&quot;0.2.1-&quot;)
+       println(&quot;installing library: StatsBase&quot;); Pkg.add(&quot;StatsBase&quot;,v&quot;0.22.0&quot;,v&quot;0.22.1-&quot;)
+
+	println(&quot;All additional packages&quot;)
+	println(&quot;ADDING: DataFrames&quot;)
+	Pkg.add(&quot;DataFrames&quot;, v&quot;0.11.0&quot;, v&quot;0.11.1-&quot;)
+	println(&quot;ADDING: HDF5&quot;)
+	Pkg.add(&quot;HDF5&quot;,v&quot;0.8.8&quot;, v&quot;0.8.9-&quot;)
+	println(&quot;ADDING: JLD&quot;)
+	Pkg.add(&quot;JLD&quot;,v&quot;0.8.3&quot;,v&quot;0.8.4-&quot;) # to fulfil requirments of Ipopt, JuMP, and NLopt
+	println(&quot;ADDING: Clustering&quot;)
+	Pkg.add(&quot;Clustering&quot;,v&quot;0.9.1&quot;, v&quot;0.9.2-&quot;)
+	println(&quot;ADDING: Ipopt&quot;)
+	Pkg.add(&quot;Ipopt&quot;,v&quot;0.2.4&quot;, v&quot;0.2.9-&quot;)
+	println(&quot;ADDING: NLopt&quot;)
+	Pkg.add(&quot;NLopt&quot;,v&quot;0.3.6&quot;, v&quot;0.3.7-&quot;)
+	println(&quot;ADDING: JuMP&quot;)
+	Pkg.add(&quot;JuMP&quot;,v&quot;0.17.1&quot;, v&quot;0.17.2-&quot;)
+	println(&quot;ADDING: HttpServer&quot;)
+	Pkg.add(&quot;HttpServer&quot;,v&quot;0.2.0&quot;, v&quot;0.2.1-&quot;)
+	println(&quot;ADDING: ProfileView&quot;)
+	Pkg.add(&quot;ProfileView&quot;,v&quot;0.3.0&quot;, v&quot;0.3.1-&quot;)
+	println(&quot;ADDING: Dierckx&quot;)
+	Pkg.add(&quot;Dierckx&quot;,v&quot;0.3.0&quot;, v&quot;0.3.1-&quot;)
+	println(&quot;ADDING: MySQL&quot;)
+	Pkg.add(&quot;MySQL&quot;,v&quot;0.3.0&quot;, v&quot;0.3.1-&quot;)
+	println(&quot;ADDING: DataArrays&quot;)
+	Pkg.add(&quot;DataArrays&quot;,v&quot;0.7.0&quot;, v&quot;0.7.1-&quot;)
+ 
+	println(&quot;ADDING: Done&quot;)
 	Pkg.build(&quot;DataArrays&quot;,&quot;DataStructures&quot;, &quot;SpecialFunctions&quot;, &quot;MathProgBase&quot;, &quot;HDF5&quot;, &quot;Clustering&quot;, &quot;Nullables&quot;,&quot;JSON&quot;, &quot;JLD&quot;, &quot;NLopt&quot;, &quot;JuMP&quot;, &quot;HttpServer&quot;, &quot;ProfileView&quot;, &quot;Dierckx&quot;, &quot;Ipopt&quot;, &quot;MySQL&quot;, &quot;DataFrames&quot;)
 	println(&quot;Building: Done&quot;)
 
@@ -812,9 +898,6 @@ sync
 sync
 fsck /dev/mmcblk1p1 -y -f
 fsck /dev/mmcblk0p1 -y -f
-
-find . -name .git -execdir rm -r {} \;
-find . -name *.o  -exec rm {} \;
 
 exit 0
 </command>
