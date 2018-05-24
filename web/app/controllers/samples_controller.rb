@@ -59,6 +59,7 @@ class SamplesController < ApplicationController
       params[:wells].each do |well_num|
         link_well(well_num)
       end
+      CachedStandardCurveDatum.invalidate(@experiment) if @sample.errors.empty?
     else
       @sample.errors.add(:base, "sample doesn't belong to this experiment")
     end
@@ -72,6 +73,7 @@ class SamplesController < ApplicationController
     params[:wells].each do |well_num|
       unlink_well(well_num)
     end
+    CachedStandardCurveDatum.invalidate(@experiment) if @sample.errors.empty?
     respond_to do |format|
       format.json { render "show", :status => (@sample.errors.empty?)? :ok : :unprocessable_entity}
     end

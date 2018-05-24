@@ -96,6 +96,7 @@ class TargetsController < ApplicationController
           link_well(well[:well_num], well)
         end
       end
+      CachedStandardCurveDatum.invalidate(@experiment) if @target.errors.empty?
     else
       @target.errors.add(:base, "target doesn't belong to this experiment")
     end
@@ -109,6 +110,7 @@ class TargetsController < ApplicationController
     params[:wells].each do |well_num|
       unlink_well(well_num)
     end
+    CachedStandardCurveDatum.invalidate(@experiment) if @target.errors.empty?
     respond_to do |format|
       format.json { render "show", :status => (@target.errors.empty?)? :ok : :unprocessable_entity}
     end

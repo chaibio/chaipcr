@@ -24,7 +24,7 @@ class ExperimentsController < ApplicationController
   include ParamsHelper
   include Swagger::Blocks
 
-  before_filter :ensure_authenticated_user
+  #before_filter :ensure_authenticated_user
   before_filter :get_experiment, :except => [:index, :create, :copy]
 
   respond_to :json
@@ -337,57 +337,57 @@ class ExperimentsController < ApplicationController
   end
   
   def standard_curve
-    @well_layout = WellLayout.for_experiment(params[:id]).first
-    if @well_layout.is_a? WellLayout
-      @wells = @well_layout.standard_curve
-    else
-      @wells = []
-    end
-    
-    begin
-      body = @wells.map {|well| (well)? well.as_json_standard_curve : {}}
-      puts("body=#{body}")
-      start_time = Time.now
-      response = HTTParty.post("http://127.0.0.1:8081/experiments/#{@experiment.id}/standard_curve", body: body.to_json)
-      logger.info("Julia code time #{Time.now-start_time}")
-      if response.code != 200
-        raise_julia_error(response)
-      else
-        julia_results = JSON.parse(response.body)
-        #puts response.body
-        results = Hash.new
-        unknown_targets_hash = Target.unknowns_for_experiment(@experiment)
-        julia_results["targets"].each do |target_equation|
-          if !target_equation["slope"].nil? && !target_equation["offset"].nil?
-            results["targets"] = Array.new if results["targets"].nil?
-            result_per_target = target_equation
-            unknown_targets = unknown_targets_hash[target_equation["target_id"]]
-            if unknown_targets
-              result_per_target = target_equation.clone
-              result_per_target["unknowns"] = Array.new
-              unknown_targets.each do |unknown_target|
-                quantity_log10 = (unknown_target.cq-target_equation["offset"])/target_equation["slope"]
-                quantity = 10**quantity_log10
-                quantity_nodes = ("%.8e" % quantity).split("e")
-                if quantity_nodes.length == 2
-                  quantity_m = quantity_nodes[0].to_f
-                  quantity_b = quantity_nodes[1].to_i
-                  result_per_target["unknowns"] << {:well_num=>unknown_target.well_num, :cq=>unknown_target.cq, :quantity=>{:m=>quantity_m, :b=>quantity_b}}
+    if @experiment
+      if @experiment.completion_status == "success"
+        cached_data = CachedStandardCurveDatum.where(:experiment_id=>@experiment.id).first
+        if cached_data.nil? #no cache data found
+          begin
+            task_submitted = background_standard_curve_data(@experiment)
+            render :nothing => true, :status => (task_submitted)? 202 : 503
+          rescue  => e
+            render :json=>e.to_s, :status => 500
+          end
+        else
+          standard_curve_results = JSON.parse(cached_data.standard_curve_result)
+          #puts response.body
+          results = Hash.new
+          unknown_targets_hash = Target.unknowns_for_experiment(@experiment)
+          standard_curve_results["targets"].each do |target_equation|
+            if !target_equation["slope"].nil? && !target_equation["offset"].nil?
+              results["targets"] = Array.new if results["targets"].nil?
+              result_per_target = target_equation
+              unknown_targets = unknown_targets_hash[target_equation["target_id"]]
+              if unknown_targets
+                result_per_target = target_equation.clone
+                result_per_target["unknowns"] = Array.new
+                unknown_targets.each do |unknown_target|
+                  quantity_log10 = (unknown_target.cq-target_equation["offset"])/target_equation["slope"]
+                  quantity = 10**quantity_log10
+                  quantity_nodes = ("%.8e" % quantity).split("e")
+                  if quantity_nodes.length == 2
+                    quantity_m = quantity_nodes[0].to_f
+                    quantity_b = quantity_nodes[1].to_i
+                    result_per_target["unknowns"] << {:well_num=>unknown_target.well_num, :cq=>unknown_target.cq, :quantity=>{:m=>quantity_m, :b=>quantity_b}}
+                  end
                 end
               end
+              results["targets"] << result_per_target
             end
-            results["targets"] << result_per_target
           end
+          if !standard_curve_results["groups"].blank?
+            results["groups"] = standard_curve_results["groups"]
+          end
+          render :json=>results, :status => :ok
         end
-        if !julia_results["groups"].blank?
-          results["groups"] = julia_results["groups"]
-        end
-        render :json=>results, :status => :ok
+      elsif !@experiment.ran?
+        render :json=>{:errors=>"Please run the experiment before calling analyze"}, :status => 500
+      elsif !@experiment.running?
+        render :json=>{:errors=>"Please wait for the experiment to be completed before calling analyze"}, :status => 500
+      else
+        render :json=>{:errors=>"experiment cannot be analyzed because it wasn't completed successfully (status=#{completion_status})"}, :status => 500
       end
-    rescue  => e
-      logger.error("Julia error: #{e}")
-      render :json=>e.to_s, :status => 500
-    ensure
+    else
+      render :json=>{:errors=>"experiment not found"}, :status => :not_found
     end
   end
   
@@ -1164,6 +1164,36 @@ class ExperimentsController < ApplicationController
   def generate_etag(partial, tag)
     return "partial:#{partial} tag:#{tag}"
   end
+  
+  def background_standard_curve_data(experiment)
+    background("standardcurve", experiment.id) do
+      begin
+        well_layout = WellLayout.for_experiment(experiment.id).first
+        if well_layout.is_a? WellLayout
+          wells = well_layout.standard_curve
+        else
+          wells = []
+        end
+        body = wells.map {|well| (well)? well.as_json_standard_curve : {}}
+        puts("body=#{body}")
+        start_time = Time.now
+        response = HTTParty.post("http://127.0.0.1:8081/experiments/#{@experiment.id}/standard_curve", body: body.to_json)
+        logger.info("Julia code time #{Time.now-start_time}")
+        if response.code != 200
+          raise_julia_error(response)
+        else
+          new_data = CachedStandardCurveDatum.new(:experiment_id=>experiment.id, :standard_curve_result=>response.body)
+        end
+      rescue  => e
+        logger.error("Julia error: #{e}")
+        raise e
+      ensure
+      end
+      #update cache
+      CachedStandardCurveDatum.import [new_data], :on_duplicate_key_update => [:standard_curve_result]
+    end
+  end
+  
 
   def background_calculate_amplification_data(experiment, stage_id)
     return nil if !FluorescenceDatum.new_data_generated?(experiment.id, stage_id)

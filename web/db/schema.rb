@@ -70,6 +70,13 @@ ActiveRecord::Schema.define(version: 20180322210934) do
 
   add_index "cached_melt_curve_data", ["experiment_id", "stage_id", "channel", "well_num"], name: "index_meltcurvedata_by_exp_stage_chan_well", unique: true, using: :btree
 
+  create_table "cached_standard_curve_data", force: :cascade do |t|
+    t.integer "experiment_id",         limit: 4
+    t.text    "standard_curve_result", limit: 16777215
+  end
+
+  add_index "cached_standard_curve_data", ["experiment_id"], name: "index_cached_standard_curve_data_on_experiment_id", unique: true, using: :btree
+
   create_table "experiment_definitions", force: :cascade do |t|
     t.string "guid",            limit: 255
     t.string "experiment_type", limit: 255, null: false
@@ -209,15 +216,6 @@ ActiveRecord::Schema.define(version: 20180322210934) do
     t.integer "well_layout_id", limit: 4,   null: false
     t.integer "channel",        limit: 4,   null: false
     t.string  "name",           limit: 255, null: false
-  end
-
-  create_table "targets_curves", force: :cascade do |t|
-    t.integer "well_layout_id", limit: 4,                          null: false
-    t.integer "target_id",      limit: 4,                          null: false
-    t.decimal "slope",                    precision: 10, scale: 2
-    t.decimal "offset",                   precision: 10, scale: 2
-    t.decimal "efficiency",               precision: 10, scale: 2
-    t.decimal "r2",                       precision: 10, scale: 2
   end
 
   create_table "targets_wells", force: :cascade do |t|
