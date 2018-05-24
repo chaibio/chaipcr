@@ -24,7 +24,7 @@ class ExperimentsController < ApplicationController
   include ParamsHelper
   include Swagger::Blocks
 
-  #before_filter :ensure_authenticated_user
+  before_filter :ensure_authenticated_user
   before_filter :get_experiment, :except => [:index, :create, :copy]
 
   respond_to :json
@@ -380,11 +380,11 @@ class ExperimentsController < ApplicationController
           render :json=>results, :status => :ok
         end
       elsif !@experiment.ran?
-        render :json=>{:errors=>"Please run the experiment before calling analyze"}, :status => 500
+        render :json=>{:errors=>"Please run the experiment before calling standard curve"}, :status => 500
       elsif !@experiment.running?
-        render :json=>{:errors=>"Please wait for the experiment to be completed before calling analyze"}, :status => 500
+        render :json=>{:errors=>"Please wait for the experiment to be completed before calling standard curve"}, :status => 500
       else
-        render :json=>{:errors=>"experiment cannot be analyzed because it wasn't completed successfully (status=#{completion_status})"}, :status => 500
+        render :json=>{:errors=>"experiment cannot be standard curve because it wasn't completed successfully (status=#{completion_status})"}, :status => 500
       end
     else
       render :json=>{:errors=>"experiment not found"}, :status => :not_found
