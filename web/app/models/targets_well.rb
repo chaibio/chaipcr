@@ -31,6 +31,13 @@ class TargetsWell < ActiveRecord::Base
 
   validate :validate
   
+  before_update do |target_well|
+    if target_well.well_type != "standard"
+      target_well.quantity_m = nil
+      target_well.quantity_b = nil
+    end
+  end
+  
   def self.find_or_create(target, well_layout_id, well_num)
      target_well = joins(:target).where(["targets_wells.well_layout_id=? and targets_wells.well_num=? and targets.channel=?", well_layout_id, well_num, target.channel]).first
      if target_well

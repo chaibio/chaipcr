@@ -347,13 +347,41 @@ class ExperimentsController < ApplicationController
     begin
       body = @wells.map {|well| (well)? well.as_json_standard_curve : {}}
       puts("body=#{body}")
+      start_time = Time.now
       response = HTTParty.post("http://127.0.0.1:8081/experiments/#{@experiment.id}/standard_curve", body: body.to_json)
+      logger.info("Julia code time #{Time.now-start_time}")
       if response.code != 200
         raise_julia_error(response)
       else
-        results = JSON.parse(response.body)
-        puts("result=#{response.body}")
-        render :json=>response.body, :status => :ok
+        julia_results = JSON.parse(response.body)
+        results = Hash.new
+        unknown_targets_hash = Target.unknowns_for_experiment(@experiment)
+        julia_results["target"].each do |target_equation|
+          if !target_equation["slope"].nil? && !target_equation["offset"].nil?
+            results["targets"] = Array.new if results["targets"].nil?
+            result_per_target = target_equation
+            unknown_targets = unknown_targets_hash[target_equation["target"]]
+            if unknown_targets
+              result_per_target = target_equation.clone
+              result_per_target["unknowns"] = Array.new
+              unknown_targets.each do |unknown_target|
+                quantity_log10 = (unknown_target.cq-target_equation["offset"])/target_equation["slope"]
+                quantity = 10**quantity_log10
+                quantity_nodes = ("%.8e" % quantity).split("e")
+                if quantity_nodes.length == 2
+                  quantity_m = quantity_nodes[0].to_f
+                  quantity_b = quantity_nodes[1].to_i
+                  result_per_target["unknowns"] << {:well_num=>unknown_target.well_num, :cq=>unknown_target.cq, :quantity=>{:m=>quantity_m, :b=>quantity_b}}
+                end
+              end
+            end
+            results["targets"] << result_per_target
+          end
+        end
+        if !julia_results["group"].blank?
+          results["groups"] = julia_results["group"]
+        end
+        render :json=>results, :status => :ok
       end
     rescue  => e
       logger.error("Julia error: #{e}")

@@ -18,7 +18,7 @@
 #
 class Target < ActiveRecord::Base
   include ProtocolLayoutHelper
-  
+    
   belongs_to :well_layout
   has_many :targets_wells, dependent: :destroy
   
@@ -34,6 +34,18 @@ class Target < ActiveRecord::Base
     target.targets_wells.each do |target_well|
       target_well.well_layout_id = target.well_layout_id if target_well.well_layout_id.nil?
     end
+  end
+  
+  def self.unknowns_for_experiment(experiment)
+    targets_hash = Hash.new
+    targets = self.joins(:targets_wells).joins("inner join amplification_curves on amplification_curves.well_num = targets_wells.well_num and amplification_curves.channel = targets.channel")
+                                        .where(["targets_wells.well_type='unknown' and targets_wells.well_layout_id=? and amplification_curves.experiment_id=? and ct is not NULL", experiment.well_layout.id, experiment.id])
+                                        .order("targets.id, targets_wells.well_num, targets.channel").select("targets.*, targets_wells.well_num, ct as cq")
+    targets.each do |target|
+      targets_hash[target.id] = Array.new if targets_hash[target.id].nil?
+      targets_hash[target.id] << target
+    end
+    targets_hash
   end
   
   def belongs_to_experiment?(experiment)
