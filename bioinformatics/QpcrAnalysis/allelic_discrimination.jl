@@ -4,7 +4,8 @@
 const DEFAULT_encgr = Array{Int,2}(0, 0)
 # const DEFAULT_encgr = [0 1 0 1; 0 0 1 1] # NTC, homo ch1, homo ch2, hetero
 const DEFAULT_init_FACTORS = [1, 1, 1, 1] # sometimes "hetero" may not have very high end-point fluo
-const DEFAULT_apg_LABELS = ["ntc", "homo_a", "homo_b", "hetero", "unclassified"]
+const DEFAULT_apg_LABELS = ["ntc", "homo_1", "homo_2", "hetero", "unclassified"] # [0 1 0 1; 0 0 1 1]
+# const DEFAULT_apg_LABELS = ["hetero", "homo_2", "homo_1", "ntc", "unclassified"] # [1 0 1 0; 1 1 0 0]
 
 # # 3 groups without NTC
 # const DEFAULT_egr = [1 0 1; 0 1 1] # homo ch1, homo ch2, hetero
@@ -86,22 +87,34 @@ end # prep_data_4ad
 
 
 function do_cluster_analysis(
-    data::AbstractMatrix,
+    raw_data::AbstractMatrix,
     init_centers::AbstractMatrix,
-    cluster_method::String="k-medoids"
+    cluster_method::String="k-means-medoids",
+    norm_l::Real=2
     )
 
+    num_wells = size(raw_data)[2]
+
+    # # add slope 2/1 scaled as another dimension
+    # slope_vec = raw_data[2,:] ./ raw_data[1,:]
+    # new_data = vcat(raw_data, transpose(slope_vec) .* mean(raw_data[1:2,:], 1) ./ median(slope_vec))
+    # init_centers = vcat(init_centers, ones(1, size(init_centers)[2]))
+
+    new_data = raw_data # not additional info
+
     # get pair-wise distance (cost) matrix
-    num_wells = size(data)[2]
-    data_winit = hcat(data, init_centers)
+    data_winit = hcat(new_data, init_centers)
     num_centers = size(init_centers)[2]
     num_wells_winit = num_wells + num_centers
-    cost_mtx_winit = [norm(data_winit[:, i] .- data_winit[:, j], 2) for i in 1:num_wells_winit, j in 1:num_wells_winit]
+    dist_mtx_winit = [
+        norm(data_winit[:, i] .- data_winit[:, j], norm_l)
+        for i in 1:num_wells_winit, j in 1:num_wells_winit
+    ]
 
     # clustering
     if cluster_method in ["k-means", "k-means-medoids"]
         # run k-means whether finally using k-means or k-medoids
-        cluster_result = kmeans!(data, copy(init_centers)) # ideally the element with the same index between `init_centers` and `cluster_result.centers` should be for the same genotype
+        cluster_result = kmeans!(new_data, copy(init_centers)) # ideally the element with the same index between `init_centers` and `cluster_result.centers` should be for the same genotype
         if cluster_method == "k-means"
             centers = cluster_result.centers
         elseif cluster_method == "k-means-medoids"
@@ -109,35 +122,86 @@ function do_cluster_analysis(
         end
     end
     if cluster_method in ["k-means-medoids", "k-medoids"]
-        cluster_result = kmedoids!(cost_mtx_winit, Vector{Int}((1:num_centers) + num_wells))
+        cluster_result = kmedoids!(dist_mtx_winit, Vector{Int}((1:num_centers) + num_wells))
         centers = data_winit[:, cluster_result.medoids]
     end # if cluster_method
 
     # get silhouettes
     well_idc = 1:num_wells
-    slhts = silhouettes(cluster_result, cost_mtx_winit[well_idc, well_idc])
+    assignments_woinit = cluster_result.assignments[well_idc]
+    counts_woinit = map(1:maximum(assignments_woinit)) do assignment
+        sum(assignments_woinit .== assignment)
+    end # do assignment
+    slhts = silhouettes(
+        assignments_woinit,
+        counts_woinit,
+        dist_mtx_winit[well_idc, well_idc]
+    )
     slht_mean = mean(slhts)
+
+
+    # let's designate a data point in group g1 as g1_dp1, another data point in group g1 as g1_dp2, the distance between g1_dp1 and g1_dp2 as g1_dist1to2, and the minimum among all g1_dist1to2, g1_dist1to3 ... g1_dist1toX as g1_dist1min. Then among all g1_dist1min, g1_dist2min ... g1_distXmin, find the maximum g1_dist_within_min_max.
+    # then look at g1 vs. other groups. for each other group g2, g3 ... gY, find as g1_dist_between_min as the minimum distance between a data point in g1 and a data point in other group. Record the boolean value g1_bool evaluated as `g1_dist_within_min_max < g1_dist_between_min`
+    # break if all the boolean values g1_bool, g2_bool ... gY_bool are true
+
+    dist_mtx = dist_mtx_winit[well_idc, well_idc]
+
+    check_dist_vec = map(1:num_centers) do grp_i
+
+        gi_bool_vec = (assignments_woinit .== grp_i)
+        if sum(gi_bool_vec) == 0
+            return [0 0]
+        end
+        gi_idc = well_idc[gi_bool_vec]
+
+        if sum(gi_bool_vec) == 1
+            dist_within_min_max = 0
+        else
+            dist_mtx_within = dist_mtx[gi_bool_vec, gi_bool_vec]
+            dist_within_min_vec = map(gi_idc) do gi_i
+                minimum(dist_mtx[gi_idc[gi_idc .!= gi_i], gi_i])
+            end # do gi_i
+            dist_within_min_max = maximum(dist_within_min_vec)
+        end
+
+        dist_mtx_between = dist_mtx[gi_bool_vec, .!gi_bool_vec]
+        dist_between_min = minimum(dist_mtx_between)
+
+        return [dist_within_min_max dist_between_min]
+
+    end # do grp_i
+
+    check_dist_mtx = vcat(check_dist_vec...)
+
+    check_dist_bool = maximum(check_dist_mtx[:, 1]) < minimum(check_dist_mtx[:, 2])
+
 
     # add to collection, TBD list or dict
     return ClusterAnalysisResult(
         init_centers,
-        cost_mtx_winit,
+        dist_mtx_winit,
         cluster_result,
         centers,
         slhts,
-        slht_mean
+        slht_mean,
+        check_dist_mtx,
+        check_dist_bool
     )
 
 end # do_cluster_analysis
 
 
+# steps to assign genotypes:
+# 1. check whether expected genotypes are specified, if yes use them, if not start with all possible genotypes determined by number of channels
+# 2.
 function assign_genos(
     data::AbstractMatrix,
     nrn::Function,
     ntc_bool_vec::Vector{Bool},
     expected_ncg_raw::AbstractMatrix=DEFAULT_encgr,
     ctrl_well_dict::OrderedDict=CTRL_WELL_DICT,
-    cluster_method::String="k-means",
+    cluster_method::String="k-means-medoids",
+    norm_l::Real=2,
     # below not specified by `process_ad` as of right now
     init_factors::AbstractVector=DEFAULT_init_FACTORS, # for `init_centers`
     slht_lb::Real=0; # lower limit of silhouette
@@ -163,7 +227,9 @@ function assign_genos(
     ]...)) # each column is a vector of binary geno whose length is number of channels (0 => channel min, 1 => channel max)
     geno_idc_all = 1:size(expected_genos_all)[2]
 
-    non_ntc_geno_idc = find(geno_idx -> expected_genos_all[:, geno_idx] != ntc_geno, geno_idc_all)
+    ntc_geno_idx = find(geno_idx -> all(expected_genos_all[:, geno_idx] .== ntc_geno), geno_idc_all)[1]
+
+    non_ntc_geno_idc = geno_idc_all[geno_idc_all .!= ntc_geno_idx]
     non_ntc_geno_combin = expected_genos_all[:, non_ntc_geno_idc]
 
     unclassfied_assignment = max_num_genos + 1
@@ -173,7 +239,7 @@ function assign_genos(
 
     if any(map(i -> length(unique(data[i, :])) == 1, 1:num_channels)) # for any channel, all the data points are the same (would result in "AssertionError: !(isempty(grp))" for `kmedoids`)
 
-        car = do_cluster_analysis(data .+ rand(size(data)...), rand(num_channels, 2), cluster_method)
+        car = do_cluster_analysis(data .+ rand(size(data)...), rand(num_channels, 2), cluster_method, norm_l)
         car.cluster_result.assignments = fill(unclassfied_assignment, num_wells)
 
         cluster_result = car.cluster_result
@@ -206,9 +272,9 @@ function assign_genos(
 
         # update initial centers according to controls with known genotypes if present
         for i in 1:length(ctrl_genos)
-            ctrl_well_nums = ctrl_well_dict[ctrl_genos[i]]
-            ctrl_well_data = data[:, ctrl_well_nums]
-            init_centers_all[:, ctrl_geno_idc[i]] = (ctrl_well_data, 2)
+            ctrl_well_idc = ctrl_well_dict[ctrl_genos[i]] .+ 1 # transform 0-indexed well_nums to 1-indexed well_idc
+            ctrl_well_data = data[:, ctrl_well_idc]
+            init_centers_all[:, ctrl_geno_idc[i]] = mean(ctrl_well_data, 2)
         end # for i
 
 
@@ -226,7 +292,7 @@ function assign_genos(
             end # do
             geno_idc = vcat(ctrl_geno_idc, non_ctrl_geno_idc)
             init_centers = init_centers_all[:, geno_idc]
-            car = do_cluster_analysis(data, init_centers, cluster_method)
+            car = do_cluster_analysis(data, init_centers, cluster_method, norm_l)
 
             best_i = 1
             car_vec = [car]
@@ -241,11 +307,17 @@ function assign_genos(
             num_genos = max_num_genos
             ucc_dict = OrderedDict{Set{Vector{AbstractFloat}},UniqCombinCenters}()
 
+            good_enough = false
+
             while num_genos >= 2 # `p_` = possible
+
+                good_enough_vec = Vector{Bool}()
 
                 for num_expected_ncg in (num_genos - num_ctrl_genos) : -1 : max(2 - num_ctrl_genos, 0)
 
                     possible_ncg_idc_vec = combinations(non_ctrl_geno_idc, num_expected_ncg)
+
+                    good_enough_vec = Vector{Bool}()
 
                     for possible_ncg_idc in possible_ncg_idc_vec
 
@@ -253,7 +325,7 @@ function assign_genos(
                         geno_combin = expected_genos_all[:, geno_idc]
 
                         init_centers = init_centers_all[:, geno_idc]
-                        car = do_cluster_analysis(data, init_centers, cluster_method)
+                        car = do_cluster_analysis(data, init_centers, cluster_method, norm_l)
 
                         centers = car.centers
                         center_set = Set(map(1:size(centers)[2]) do i
@@ -273,9 +345,21 @@ function assign_genos(
                             end # if num_genos
                         end # if !
 
+                        push!(good_enough_vec, car.check_dist_bool)
+
                     end # for possible_ncg_idc
 
+                    if any(good_enough_vec)
+                        good_enough = true
+                        break
+                    end
+
                 end # for num_expected_ncg
+
+                if good_enough
+                    break
+                end
+
                 num_genos -= 1
 
             end # while
@@ -286,53 +370,102 @@ function assign_genos(
             # expected_genos = expected_genos_vec[best_i]
             best_ucc = ucc_vec[best_i]
             best_num_genos = length(best_ucc.uniq_combin_centers)
+            # println("best_num_genos ", best_num_genos)
             best_geno_combins = best_ucc.geno_combins
             car = best_ucc.car
 
         end # if length
 
-        init_centers, cost_mtx_winit, cluster_result, centers, slhts, slht_mean = map(fn -> getfield(car, fn), fieldnames(car))
+        init_centers, dist_mtx_winit, cluster_result, centers, slhts, slht_mean = map(fn -> getfield(car, fn), fieldnames(car))
 
-        if expected_genos_all in best_geno_combins || non_ntc_geno_combin in best_geno_combins # can call genotypes, `best_num_genos in keys(switch_bng_dict) == true`
+        all_unclassified = true
+
+        if best_num_genos >= max_num_genos - 1 # can call genotypes
+
+            all_unclassified = false
 
             assignments_raw = cluster_result.assignments[well_idc] # when `cluster_method == "k-medoids"`
 
             if best_num_genos == max_num_genos
-                expected_genos = expected_genos_all
-                assignments_agp_idc = assignments_raw
+                ref_center_idc = 1:max_num_genos
+                # assignments_agp_idc = assignments_raw
             elseif best_num_genos == max_num_genos - 1
-                expected_genos = non_ntc_geno_combin
-                assignments_agp_idc = map(a -> non_ntc_geno_idc[a], assignments_raw)
+                ref_center_idc = non_ntc_geno_idc
+                # assignments_agp_idc = map(a -> non_ntc_geno_idc[a], assignments_raw)
             # no possible case for `else`
             end
 
-            # (!!!! needs testing) check whether the controls are assigned with the correct genos, if not, assign as unclassified
-            for ctrl_geno in keys(ctrl_well_dict)
-                for i in 1:size(expected_genos)[2]
-                    if expected_genos[:, i] == ctrl_geno
-                        expected_ctrl_assignment = i # needs to use `centers`, `assignments_agp_idc`
-                        break
-                    end # if
-                end # for i
-                for ctrl_well_num in ctrl_well_dict[ctrl_geno]
-                    if assignments_agp_idc[ctrl_well_num] != expected_ctrl_assignment
-                        assignments_agp_idc .= unclassfied_assignment # Because assignments of different clusters depend on one another, if control well(s) is/are assigned incorrectly, the other wells may be assigned incorrectly as well.
-                    end # if
-                end # for ctrl_well_num
-            end # for ctrl_geno
+            expected_genos = expected_genos_all[:, ref_center_idc]
 
-            # assign as unclassified the wells where silhouette is below the lower bound `slht_lb`, i.e. unclear which geno should be assigned
+            dist_optm_init_centers = [
+                norm(centers[:, i] .- init_centers_all[:, j], norm_l)
+                for i in 1:best_num_genos, j in 1:max_num_genos
+            ]
+
+            # println(init_centers_all)
+
+            # (work liks US medical residency match) find max for each dimension as reference point, compare centers to reference point, assign genotype based on min distance between center/medoid and reference point; if a center/medoid has min distance (among all centers/medoids) to multiple reference point, this group is unclassified
+            # (why?) don't forget to change [0, 1] to [1, 0] and default labels
+            new_center_idc = zeros(Int, best_num_genos)
+            while any(new_center_idc .== 0)
+                for i in 1:best_num_genos
+                    if new_center_idc[i] == 0
+                        min_dist_ij, closest_j = findmin(dist_optm_init_centers[i, :])
+                        if !(closest_j in new_center_idc)
+                            min_dist_ji, closest_i = findmin(dist_optm_init_centers[:, closest_j])
+                            if closest_i == i
+                                new_center_idc[i] = closest_j
+                                dist_optm_init_centers[i, :] = +Inf
+                                dist_optm_init_centers[:, closest_j] = +Inf
+                            end # if closest_i
+                        end # if !
+                    end # if new_center_idc
+                end # for i
+                # println(dist_optm_init_centers)
+                # println(new_center_idc)
+            end # while
+
+            # println("new_center_idc ", new_center_idc)
+
+            assignments_agp_idc = map(asgm_raw -> new_center_idc[asgm_raw], assignments_raw)
+
+            # # (!!!! needs testing) check whether the controls are assigned with the correct genos, if not, assign as unclassified
+            # for ctrl_geno in keys(ctrl_well_dict)
+            #     for i in 1:size(expected_genos)[2]
+            #         if expected_genos[:, i] == ctrl_geno
+            #             expected_ctrl_assignment = i # needs to use `centers`, `assignments_agp_idc`
+            #             break
+            #         end # if
+            #     end # for i
+            #     for ctrl_well_num in ctrl_well_dict[ctrl_geno]
+            #         if assignments_agp_idc[ctrl_well_num] != expected_ctrl_assignment
+            #             assignments_agp_idc .= unclassfied_assignment # Because assignments of different clusters depend on one another, if control well(s) is/are assigned incorrectly, the other wells may be assigned incorrectly as well.
+            #         end # if
+            #     end # for ctrl_well_num
+            # end # for ctrl_geno
+            # for which contrast (1, 0). Venn diagram showing overlapping among the significant for each contrast.
+            # write.table(twl_cic[apply(twl_cic[,contrast_vec], 1, function(row_) sum(row_) > 0),], sprintf()
+
+            # # is this necessary?
+            # if best_num_genos == max_num_genos - 1 && any(new_center_idc .== ntc_geno_idx)
+            #     all_unclassified = true
+            # end
+
+        end # if best_num_genos
+
+
+        if all_unclassified
+            assignments_adj = fill(unclassfied_assignment, num_wells)
+        else # assign as unclassified the wells where silhouette is below the lower bound `slht_lb`, i.e. unclear which geno should be assigned
             assignments_adj = map(1:length(assignments_agp_idc)) do i
                 slhts[i] < slht_lb ? unclassfied_assignment: assignments_agp_idc[i]
             end # do i # previously `assignments_agp_idc .* (relative_diff_closest_dists .> slht_lb)`
-
-        else
-            assignments_adj = fill(unclassfied_assignment, num_wells)
-        end
+        end # if all_unclassified
 
         assignments_adj_labels = map(a -> apg_labels[a], assignments_adj)
 
     end # if any(map
+
 
     return (assignments_adj_labels, AssignGenosResult(
         # best
@@ -352,6 +485,7 @@ function process_ad(
     cycs::Union{Integer,AbstractVector}, # relevant if `categ == "fluo"`, last available cycle
     ctrl_well_dict::OrderedDict,
     cluster_method::String, # for `assign_genos`
+    norm_l::Real, # for `assign_genos`
     expected_ncg_raw::AbstractMatrix=DEFAULT_encgr, # each column is a vector of binary geno whose length is number of channels (0 => no signal, 1 => yes signal)
     categ_well_vec::AbstractVector=CATEG_WELL_VEC,
     )
@@ -377,7 +511,7 @@ function process_ad(
             well_idc,
             cycs
         )...,
-        ntc_bool_vec, expected_ncg_raw, ctrl_well_dict, cluster_method)
+        ntc_bool_vec, expected_ncg_raw, ctrl_well_dict, cluster_method, norm_l)
     end # for
 
     return (assignments_adj_labels_dict, agr_dict)

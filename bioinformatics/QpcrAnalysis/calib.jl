@@ -115,7 +115,7 @@ function get_full_calib_data(
         calib_data_1key, calib_well_nums = get_mysql_data_well(
             well_nums, k_qry_2b, db_conn, false
         )
-        if length(well_nums) > 0 && calib_well_nums != well_nums
+        if length(well_nums) > 0 && Set(calib_well_nums) != Set(well_nums)
             error("Experiment $exp_id, step $step_id: calibration data is not found for all the wells requested. ")
         end # if
         calib_data_1key_chwl = vcat(map(channel_nums) do channel

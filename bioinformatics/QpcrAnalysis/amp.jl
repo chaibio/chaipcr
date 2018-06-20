@@ -112,7 +112,8 @@ function process_amp(
     # allelic discrimination
     ad_cycs::Union{Integer,AbstractVector}=0, # allelic discrimination: cycles of fluorescence to be used, 0 means the last cycle
     ctrl_well_dict::OrderedDict=CTRL_WELL_DICT,
-    cluster_method::String="k-means", # allelic discrimination: "k-means", "k-medoids"
+    cluster_method::String="k-means-medoids", # allelic discrimination: "k-means", "k-medoids", "k-means-medoids"
+    norm_l::Real=2, # norm level for distance matrix, e.g. norm_l = 2 means l2-norm
     expected_ncg_raw::AbstractMatrix=DEFAULT_encgr, # each column is a vector of binary genotype whose length is number of channels (0 => no signal, 1 => yes signal)
     categ_well_vec::AbstractVector=CATEG_WELL_VEC,
 
@@ -228,7 +229,7 @@ function process_amp(
             dye_in, dyes_2bfild,
             min_reliable_cyc, baseline_cyc_bounds, cq_method, ct_fluos, af_key, kwdict_mbq, ipopt_print2file_prefix,
             qt_prob_rc, kwdict_rc,
-            ad_cycs, ctrl_well_dict, cluster_method, expected_ncg_raw, categ_well_vec,
+            ad_cycs, ctrl_well_dict, cluster_method, norm_l, expected_ncg_raw, categ_well_vec,
             out_format_1sr, json_digits, verbose
         )
     end) # do sr_ele
@@ -654,6 +655,7 @@ function process_amp_1sr(
     ad_cycs::Union{Integer,AbstractVector},
     ctrl_well_dict::OrderedDict,
     cluster_method::String,
+    norm_l::Real,
     expected_ncg_raw::AbstractMatrix,
     categ_well_vec::AbstractVector,
     out_format::String, # "full", "pre_json", "json"
@@ -827,6 +829,7 @@ function process_amp_1sr(
             ad_cycs,
             ctrl_well_dict,
             cluster_method,
+            norm_l,
             expected_ncg_raw,
             categ_well_vec
         )

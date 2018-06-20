@@ -3,11 +3,13 @@
 # clustering analysis result from a possible combination of expected genotypes
 type ClusterAnalysisResult
     init_centers::Array{AbstractFloat,2} # no longer necessary because it represents one combination of genotypes, but different combinations of genotypes with the same number of genotypes may result in the same clustering results
-    cost_mtx_winit::Array{AbstractFloat,2}
+    dist_mtx_winit::Array{AbstractFloat,2}
     cluster_result::ClusteringResult
     centers::Array{AbstractFloat,2}
     slhts::Vector{AbstractFloat}
     slht_mean::AbstractFloat
+    check_dist_mtx::Array{AbstractFloat,2}
+    check_dist_bool::Bool
 end # type
 
 type UniqCombinCenters
