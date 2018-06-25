@@ -154,22 +154,40 @@ function do_cluster_analysis(
         end
         gi_idc = well_idc[gi_bool_vec]
 
-        if sum(gi_bool_vec) == 1
-            dist_within_min_max = 0
-        else
-            dist_mtx_within = dist_mtx[gi_bool_vec, gi_bool_vec]
-            dist_within_min_vec = map(gi_idc) do gi_i
-                minimum(dist_mtx[gi_idc[gi_idc .!= gi_i], gi_i])
-            end # do gi_i
-            dist_within_min_max = maximum(dist_within_min_vec)
-        end
-
         dist_mtx_between = dist_mtx[gi_bool_vec, .!gi_bool_vec]
-        dist_between_min = minimum(dist_mtx_between)
+        dist_between_min = length(dist_mtx_between) == 0 ? 0 : minimum(dist_mtx_between)
 
-        return [dist_within_min_max dist_between_min]
+        dist_within_margin_max = 0
+        update_dwmm = false
+
+        if sum(gi_bool_vec) == 2
+            dist_within_margin_max = getindex(dist_mtx, gi_idc...)
+
+        elseif sum(gi_bool_vec) > 2
+            # find the edge whose length always ranked 2nd (can tie 1st or 3rd) in any triangle that forms within grp_i and contains this edge, then assign `dist_within_margin_max` the length of this edge
+            for edge in combinations(gi_idc, 2)
+                dist_edge = getindex(dist_mtx, edge...)
+                for gi_idx_ne in gi_idc
+                    if !(gi_idx_ne in edge)
+                        gi_idx_e1, gi_idx_e2 = edge
+                        update_dwmm = true
+                        if (dist_mtx[gi_idx_ne, gi_idx_e1] - dist_edge) * (dist_mtx[gi_idx_ne, gi_idx_e2] - dist_edge) > 0 # edge not ranked 2nd
+                            update_dwmm = false
+                            break
+                        end # if
+                    end # if
+                end # for gi_idx_ne
+                if update_dwmm
+                    dist_within_margin_max = dist_edge
+                end # if
+            end # for edge
+        end # if
+
+        return [dist_within_margin_max dist_between_min]
 
     end # do grp_i
+
+    # `dist_mtx` has been modified
 
     check_dist_mtx = vcat(check_dist_vec...)
 
@@ -404,6 +422,7 @@ function assign_genos(
 
             # println(init_centers_all)
 
+            # re-assign centers based on distance to initial centers
             # (work liks US medical residency match) find max for each dimension as reference point, compare centers to reference point, assign genotype based on min distance between center/medoid and reference point; if a center/medoid has min distance (among all centers/medoids) to multiple reference point, this group is unclassified
             # (why?) don't forget to change [0, 1] to [1, 0] and default labels
             new_center_idc = zeros(Int, best_num_genos)
@@ -427,7 +446,35 @@ function assign_genos(
 
             # println("new_center_idc ", new_center_idc)
 
-            assignments_agp_idc = map(asgm_raw -> new_center_idc[asgm_raw], assignments_raw)
+            if num_channels == 2 && all(sum(expected_genos_all[:, new_center_idc], 1) .< 2) # dual channel, no hetero, only homo1, homo2, ntc
+
+                ntc_center = centers[:, new_center_idc .== ntc_geno_idx]
+
+                homo1_center = centers[:, map(new_center_idc) do nci
+                    all(expected_genos_all[:, nci] .== [1, 0])
+                end] # do i
+
+                homo2_center = centers[:, map(new_center_idc) do nci
+                    all(expected_genos_all[:, nci] .== [0, 1])
+                end] # do i
+
+                vec_n1 = homo1_center .- ntc_center
+                vec_n2 = homo2_center .- ntc_center
+
+                angle_1n2 = acos(dot(vec_n1, vec_n2) / (norm(vec_n1) * norm(vec_n2)))
+
+                if angle_1n2 > 0.5 * pi
+                    new_center_idc[new_center_idc .== ntc_geno_idx] = find(geno_idc_all) do geno_idx
+                        all(expected_genos_all[:, geno_idx] .== [1, 1])
+                    end[1] # change ntc to hetero
+                end
+
+            end # if num_channels
+
+            # # is this necessary?
+            # if best_num_genos == max_num_genos - 1 && ntc_geno_idx in new_center_idc
+            #     all_unclassified = true
+            # end
 
             # # (!!!! needs testing) check whether the controls are assigned with the correct genos, if not, assign as unclassified
             # for ctrl_geno in keys(ctrl_well_dict)
@@ -446,10 +493,10 @@ function assign_genos(
             # for which contrast (1, 0). Venn diagram showing overlapping among the significant for each contrast.
             # write.table(twl_cic[apply(twl_cic[,contrast_vec], 1, function(row_) sum(row_) > 0),], sprintf()
 
-            # # is this necessary?
-            # if best_num_genos == max_num_genos - 1 && any(new_center_idc .== ntc_geno_idx)
-            #     all_unclassified = true
-            # end
+            assignments_agp_idc = new_center_idc[assignments_raw]
+            # values of `new_center_idc` are permuted from `geno_idc_all`, which correspond to order of `expected_genos_all`.
+            # `new_center_idc` is ordered same as centers, whose order corresponds to values of `assignments_raw`.
+            # values of `assignments_raw` correspond to order of centers
 
         end # if best_num_genos
 
