@@ -38,7 +38,7 @@ then
 	sdcard_dev=/dev/mmcblk0
 else
        	echo "3 or 4 partitions eMMC not found!"
-	echo default-on > /sys/class/leds/beaglebone\:green\:usr1/trigger
+	[ -e /sys/class/leds/beaglebone\:green\:usr1/trigger ] && echo default-on > /sys/class/leds/beaglebone\:green\:usr1/trigger
 
 	eMMC=/dev/mmcblk1
         sdcard_dev=/dev/mmcblk0
@@ -205,6 +205,7 @@ flush_cache () {
 flush_cache_mounted () {
 	sync
 #	blockdev --flushbufs ${eMMC} || true
+	partprobe /dev/mmcblk1
 }
 
 alldone () {
@@ -239,6 +240,16 @@ flush_cache () {
 	sync
 }
 
+setLedTimer () {
+	[ -e /sys/class/leds/beaglebone\:green\:usr0/trigger ] && echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+
+}
+
+setLedDefault () {
+	[ -e /sys/class/leds/beaglebone\:green\:usr0/trigger ] && echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+
+}
+
 write_pt_image () {
 	echo "Writing partition table image!"
 
@@ -254,8 +265,8 @@ write_pt_image () {
 		image_filename_upgrade="${sdcard_p2}/upgrade.img.tar"
 	fi
 
-	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
-        tar xOf $image_filename_upgrade $image_filename_pt | gunzip -c | dd of=${eMMC} bs=16M
+	setLedTimer        
+	tar xOf $image_filename_upgrade $image_filename_pt | gunzip -c | dd of=${eMMC} bs=16M
 	flush_cache_mounted
 
 	if $three_partitions_image
@@ -264,7 +275,7 @@ write_pt_image () {
 	        tar xOf $image_filename_upgrade $image_filename_boot | gunzip -c | dd of=${eMMC} bs=16M
 	fi
 
-	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+	setLedDefault
 	echo "Done writing partition table image!"
 }
 
@@ -300,21 +311,21 @@ format_perm () {
 		image_filename_upgrade="${sdcard_p2}/upgrade.img.tar"
 	fi
 
-        echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+       setLedTimer
         tar xOf $image_filename_upgrade $image_filename_perm | gunzip -c | dd of=${eMMC_perm} bs=16M
 
         flush_cache_mounted
-        echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+       	setLedDefault
         echo "Done writing empty /perm partition!"
 }
 
 format_data () {
         echo "Writing data partition formatting image!"
-        echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+       setLedTimer
         
 	tar xOf $image_filename_upgrade format-data.img.gz | gunzip -c | dd of=${eMMC_data} bs=16M
         flush_cache_mounted
-        echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+       	setLedDefault
         echo "Done writing data partition formatting image!"
 }
 
@@ -324,10 +335,10 @@ write_data_fs_image () {
 	image_filename_data="$image_filename_prfx-data.img.gz"
 	image_filename_fs="${sdcard_p1}/factory_settings.img.tar"
 
-        echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+       setLedTimer
         tar xOf $image_filename_fs $image_filename_data | gunzip -c | dd of=${eMMC_data} bs=16M
 	flush_cache_mounted
-        echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+       	setLedDefault
         echo "Done writing data partition image!"
 }
 	
@@ -347,6 +358,24 @@ partition_drive () {
 	flush_cache
 	repartition_drive
 	flush_cache
+}
+
+reset_s2 () {
+	if [ $s2pressed -eq 0 ]
+	then
+        	echo "Boot button found pressed"
+	else
+        	echo "Boot button is not pressed"
+		return
+	fi
+
+	echo "Resetting s2 button!"
+	echo 72 > /sys/class/gpio/export
+	cat /sys/class/gpio/gpio72/value
+	echo out > /sys/class/gpio/gpio72/direction
+	echo 0 > /sys/class/gpio/gpio72/value
+	cat /sys/class/gpio/gpio72/value	
+	echo 72 > /sys/class/gpio/unexport
 }
 
 update_uenv () {
@@ -816,7 +845,7 @@ isValidPermResult=$?
 isValidDataPartition
 isValidDataResult=$?
 
-echo "Validity test for /perm and /data partitions: $isValidPermResult and $isValidDataResul"
+echo "Validity test for /perm and /data partitions: $isValidPermResult and $isValidDataResult"
 if [ $isValidPermResult -eq 1 ] || [ $isValidDataResult -eq 1 ] || $migration_needed
 then
 	backup_perm
@@ -953,6 +982,7 @@ reset_update_uenv_with_verification 1
 
 remove_upgrade_flags
 reset_uenv
+reset_s2
 echo "eMMC Flasher: all done!"
 sync
 

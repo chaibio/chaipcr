@@ -31,8 +31,7 @@ uenvcmdoverlay=echo "*** Overlays Configuration ***";run uenvcmdoverlay1;run uen
 
 shutdown_usb_power=i2c dev 0;i2c mw 0x24 1 0xec
 uenvcmdmmc=echo "*** Boot button Unpressed..!!";run uenvcmdoverlay;run uenvcmdemmcfromsdcard
-uenvcmdsdcard=bootpart=0:1;bootdir=;fdtaddr=0x81FF0000;optargs=quiet capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN;load mmc 0 \${loadaddr} uImage;run loadfdt;setenv bootargs console=\${console} \${optargs} s2pressed=\${s2pressed};bootm \${loadaddr} - \${fdtaddr}
+uenvcmdsdcard=bootpart=0:1;bootdir=;fdtaddr=0x81FF0000;setenv fdtfile am335x-boneblack.dtb;fatload mmc 0:1 ${fdtaddr} ${fdtfile};optargs=quiet capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN;load mmc 0 ${loadaddr} uImage;run loadfdt;setenv bootargs console=${console} ${optargs} s2pressed=${s2pressed};bootm ${loadaddr} - ${fdtaddr}
 uenvcmdsdcard_s2pressed=echo "*** Boot button pressed..!!";setenv s2pressed 1;run uenvcmdsdcard
 
-#uenvcmd=run shutdown_usb_power;if gpio input 72; then run uenvcmdsdcard_s2pressed; else run uenvcmdmmc; fi
-uenvcmd=run shutdown_usb_power; run uenvcmdsdcard_s2pressed;
+uenvcmd=run shutdown_usb_power;if gpio input 72; then run uenvcmdsdcard_s2pressed; else run uenvcmdsdcard;fi;

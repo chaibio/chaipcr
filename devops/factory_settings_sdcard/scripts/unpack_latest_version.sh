@@ -71,43 +71,51 @@ flush_cache_mounted () {
 	fi
 }
 
+setLedTimer () {
+	[ -e /sys/class/leds/beaglebone\:green\:usr0/trigger ] && echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+}
+
+setLedDefault () {
+	[ -e /sys/class/leds/beaglebone\:green\:usr0/trigger ] && echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+}
+
 write_pt_image () {
 	echo "Writing partition table image!"
-	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+	setLedTimer
         tar xOf $image_filename_upgrade $image_filename_pt | gunzip -c | dd of=${eMMC} bs=16M
 	flush_cache_mounted
-	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+	setLedDefault
 	echo "Done writing partition table image!"
 }
 
 write_rootfs_image () {
 	echo "Writing rootfs partition image!"
-	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+	setLedTimer
         tar xOf $image_filename_upgrade $image_filename_rootfs | gunzip -c | dd of=${eMMC_root} bs=16M
 	flush_cache_mounted
-	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+	setLedDefault
 	echo "Done writing rootfs partition image!"
 }
 
 write_data_image () {
         echo "Writing data partition image!"
-        echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+       	setLedTimer
         tar xOf $image_filename_upgrade $image_filename_data | gunzip -c | dd of=${eMMC_data} bs=16M
 	flush_cache_mounted
-        echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+       	setLedDefault
         echo "Done writing data partition image!"
 }
 
 write_boot_image () {
 	echo "Writing boot partition image!"
-	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+	setLedTimer
 	tar xOf $image_filename_upgrade $image_filename_boot | gunzip -c | dd of=${eMMC_boot} bs=16M
 	flush_cache_mounted
-	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+	setLedDefault
 	echo "Done writing boot partition image!"
 }
 
-echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+setLedTimer
 
 sdcard_p1="/sdcard/p1"
 sdcard_p2="/sdcard/p2"
@@ -189,8 +197,8 @@ then
 		rm ${sdcard_p2}/unpack_resume_autorun.flag || true
 	fi
 
-	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
-	echo default-on > /sys/class/leds/beaglebone\:green\:usr1/trigger
+	setLedDefault
+	[ -e /sys/class/leds/beaglebone\:green\:usr1/trigger ] && echo default-on > /sys/class/leds/beaglebone\:green\:usr1/trigger
 
 	exit 0
 fi
@@ -376,7 +384,7 @@ echo "Upgrade resume flag down!"
 
 sync
 
-echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+setLedDefault
 
 upgrade_autorun_flag_up () {
 	echo "Autorun scripts after boot.. requested on $NOW" > ${sdcard_p2}/upgrade_autorun.flag

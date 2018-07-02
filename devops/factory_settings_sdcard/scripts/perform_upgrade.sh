@@ -111,9 +111,24 @@ echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
 echo "Verifying.."
 verify_checksum
 
+reset_s2 () {
+	echo "Resetting s2 button!"
+	echo 72 > /sys/class/gpio/export
+	cat /sys/class/gpio/gpio72/value
+	echo out > /sys/class/gpio/gpio72/direction
+	echo 0 > /sys/class/gpio/gpio72/value
+	cat /sys/class/gpio/gpio72/value	
+	echo 72 > /sys/class/gpio/unexport
+}
+
 set_sdcard_uEnv () {
+	if [ -e ${uEnvPath}/uEnv.txt ]
+	then
+		echo Processing ${uEnvPath}/uEnv.txt
+	else
+		return 1
+	fi
 	cp ${uEnvPath}/uEnv.txt ${uEnvPath}/uEnv.org.txt
-#	cp ${uEnvPath}/uEnv.sdcard.txt ${uEnvPath}/uEnv.txt
 	sync
 	file1=${uEnvPath}/uEnv.sdcard.txt
 	file2=${uEnvPath}/uEnv.txt
@@ -182,6 +197,11 @@ mount -o remount,rw ${uEnvPath}
 set_sdcard_uEnv
 sync
 
+uEnvPath=/boot
+mount -o remount,rw ${uEnvPath}
+set_sdcard_uEnv
+sync
+
 uEnvPath=/sdcard/factory
 mount -o remount,rw ${uEnvPath}
 
@@ -240,6 +260,8 @@ fi
 
 cp /var/lib/dhcp/dhclient.*.leases /data/.tmp/
 sync
+
+reset_s2
 
 sh $BASEDIR/rebootx.sh
 exit_with_message Success 0 $1
