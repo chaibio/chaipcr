@@ -27,9 +27,10 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
 	'$location',
 	'$state',
 	'Experiment',
+	'$uibModal',
 	'$stateParams',
 	'AmplificationChartHelper',
-	function($scope, Status, $http, Device, $window, $timeout, $location, $state, Experiment, $stateParams, AmplificationChartHelper) {
+	function($scope, Status, $http, Device, $window, $timeout, $location, $state, Experiment, $uibModal, $stateParams, AmplificationChartHelper) {
 
 		Experiment.get({id: $stateParams.id}).then(function(response){
 			$scope.experiment = response.experiment;
@@ -49,11 +50,11 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
 
 		$scope.getSamples = function(){
 			Experiment.getSamples($stateParams.id).then(function(resp){
-				console.log(resp);
 				$scope.rows = [];
 				var i;
 				for (i = 0; i < resp.data.length; i++) {
 					$scope.rows[i] = resp.data[i].sample;
+					$scope.rows[i].confirmDelete = false;
 				}
 
 			});
@@ -61,12 +62,20 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
 
 		$scope.getTargets = function(){
 			Experiment.getTargets($stateParams.id).then(function(resp){
-				console.log(resp);
 				$scope.targets = [];
 				var i;
 				for (i = 0; i < resp.data.length; i++) {
 					$scope.targets[i] = resp.data[i].target;
+					$scope.targets[i].confirmDelete = false;
+					$scope.targets[i].selectChannel = false;
+					if(resp.data[i].target.targets_wells.length > 0){
+						$scope.targets[i].assigned = true;
+					}
+					else{
+						$scope.targets[i].assigned = false;
+					}
 				}
+				console.log($scope.targets);
 
 			});
 		};
@@ -146,7 +155,7 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
 		};
 
 		$scope.deleteTarget = function (id) {
-			Experiment.deleteTarget($stateParams.id,id).then(function(resp){
+			Experiment.deleteLinkedTarget($stateParams.id,id).then(function(resp){
 				$scope.getTargets();
 			})
 			.catch(function(response){
@@ -154,6 +163,15 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
 					console.log(response.data.target.errors.base[0]);
 				}
 			});
+		};
+
+		$scope.openImportStandards = function(){
+			return modalInstance = $uibModal.open({
+	templateUrl: 'app/views/import-standards.html',
+	controller: 'SampleTargetCtrl',
+	openedClass: 'modal-open-standards',
+	backdrop: false
+});
 		};
 
 

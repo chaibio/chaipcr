@@ -6,6 +6,13 @@
   border:1px dotted black;
 }
 
+.import-button{
+	cursor: pointer;
+	padding: 5px;
+	border: 1px solid;
+	font-family: 'dinot';
+}
+
 .samples, .targets{
 	overflow-y: scroll;
 	table{
@@ -40,6 +47,12 @@
 
 	.delete{
 		max-width: 15px;
+		vertical-align: middle;
+		cursor: pointer;
+	}
+
+	.delete-confirm{
+		max-width: 30px;
 		vertical-align: middle;
 		cursor: pointer;
 	}
@@ -83,5 +96,9 @@
 
 	.select-style select:focus {
 	    outline: none;
+	}
+
+	.select-channel-border{
+		border-bottom: 1px solid red;
 	}
 }
