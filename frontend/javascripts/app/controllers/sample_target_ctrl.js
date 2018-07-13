@@ -166,12 +166,14 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
 		};
 
 		$scope.openImportStandards = function(){
-			return modalInstance = $uibModal.open({
-	templateUrl: 'app/views/import-standards.html',
-	controller: 'SampleTargetCtrl',
-	openedClass: 'modal-open-standards',
-	backdrop: false
-});
+			modalInstance = $uibModal.open({
+				templateUrl: 'app/views/import-standards.html',
+				controller: 'SampleTargetCtrl',
+				openedClass: 'modal-open-standards',
+				backdrop: false
+			});
+
+		return modalInstance;
 		};
 
 

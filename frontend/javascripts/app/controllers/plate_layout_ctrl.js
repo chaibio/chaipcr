@@ -44,7 +44,7 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 			$scope.target1SelectedColor = "white";
 			$scope.colors = AmplificationChartHelper.COLORS ;
 			$scope.enableTarget1Type = false;
-			$scope.clearSelected = "Select a value"
+			$scope.clearSelected = "Select a value";
 			//console.log($scope.colors);
 
 			$scope.enableTarget1Qty = false;
@@ -388,7 +388,7 @@ if (re.test(string)) {
 				$scope.target1Quantity.value = null;
 			}
 
-		}
+		};
 
 		$scope.checkTarget2 = function(){
 			var notSame =0;
@@ -457,7 +457,7 @@ if (re.test(string)) {
 				$scope.target2Quantity.value = null;
 			}
 
-		}
+		};
 
 /*		$(window).load(function() {
     console.log($('.samples-div').height());
@@ -514,10 +514,12 @@ window.onclick = function(event) {
 				 wells = {};
 				 $scope.dragging = false;
 				 $scope.$on('keypressed:command', function() {
-					 return is_cmd_key_held = true;
+					 is_cmd_key_held = true;
+					 return is_cmd_key_held;
 				 });
 				 $scope.$on('keyreleased:command', function() {
-					 return is_cmd_key_held = false;
+					 is_cmd_key_held = false;
+					 return is_cmd_key_held;
 				 });
 				 isCtrlKeyHeld = function(evt) {
 					 return evt.ctrlKey || is_cmd_key_held;
@@ -547,12 +549,6 @@ window.onclick = function(event) {
 						 selected: false
 					 });
 				 }
-				/* $scope.getWidth = function() {
-					 return elem[0].parentElement.offsetWidth;
-				 };
-				 $scope.getCellWidth = function() {
-					 return ($scope.getWidth() - $scope.row_header_width) / $scope.columns.length;
-				 };*/
 
 				 $scope.getStyleForWellBar = function(row, col, config, i) {
 					 return {
@@ -562,10 +558,12 @@ window.onclick = function(event) {
 				 };
 				 $scope.dragStart = function(evt, type, index) {
 					 $scope.dragging = true;
-					 return $scope.dragStartingPoint = {
+					 $scope.dragStartingPoint = {
 						 type: type,
 						 index: index
 					 };
+
+					 return $scope.dragStartingPoint;
 				 };
 				 $scope.dragged = function(evt, type, index) {
 					 var col1, col2, max, max_col, max_row, min, min_col, min_row, row1, row2;
@@ -587,7 +585,8 @@ window.onclick = function(event) {
 								 var well;
 								 well = $scope.wells["well_" + (row.index * $scope.columns.length + col.index)];
 								 if (!(isCtrlKeyHeld(evt) && well.selected)) {
-									 return well.selected = col.selected;
+									well.selected = col.selected;
+									return well.selected;
 								 }
 							 });
 						 });
@@ -604,7 +603,8 @@ window.onclick = function(event) {
 								 var well;
 								 well = $scope.wells["well_" + (row.index * $scope.columns.length + col.index)];
 								 if (!(isCtrlKeyHeld(evt) && well.selected)) {
-									 return well.selected = row.selected;
+									 well.selected = row.selected;
+									 return well.selected;
 								 }
 							 });
 						 });
@@ -629,7 +629,8 @@ window.onclick = function(event) {
 									 selected = (row.index >= min_row && row.index <= max_row) && (col.index >= min_col && col.index <= max_col);
 									 well = $scope.wells["well_" + (row.index * $scope.columns.length + col.index)];
 									 if (!(isCtrlKeyHeld(evt) && well.selected)) {
-										 return well.selected = selected;
+										 well.selected = selected;
+										 return well.selected;
 									 }
 								 });
 							 });
@@ -640,16 +641,19 @@ window.onclick = function(event) {
 					 var well;
 					 $scope.dragging = false;
 					 $scope.columns.forEach(function(col) {
-						 return col.selected = false;
+						 col.selected = false;
+						 return col.selected;
 					 });
 					 $scope.rows.forEach(function(row) {
-						 return row.selected = false;
+						 row.selected = false;
+						 return row.selected;
 					 });
 					 if (type === 'well' && index === $scope.dragStartingPoint.index) {
 						 if (!isCtrlKeyHeld(evt)) {
 							 $scope.rows.forEach(function(r) {
 								 return $scope.columns.forEach(function(c) {
-									 return $scope.wells["well_" + (r.index * $scope.columns.length + c.index)].selected = false;
+									 $scope.wells["well_" + (r.index * $scope.columns.length + c.index)].selected = false;
+									 return $scope.wells["well_" + (r.index * $scope.columns.length + c.index)].selected;
 								 });
 							 });
 						 }
@@ -813,11 +817,10 @@ window.onclick = function(event) {
 					 $scope.clearSelected = value;
 
 					 var unLink = [];
-					 var ef;
-					 for(ef=0;ef<16;ef++){
-						 if($scope.wells["well_" + ef].selected){
-							 if($scope.wellInf[ef].target1id != 0 && (clearType == "Target1")){
-								 Experiment.unlinkTarget($stateParams.id,$scope.wellInf[ef].target1id,{wells: [ef+1]}).then(function(response) {
+					 for(var z=0; z<16; z++){
+						 if($scope.wells["well_" + z].selected){
+							 if($scope.wellInf[z].target1id != 0 && (clearType == "Target1")){
+								 Experiment.unlinkTarget($stateParams.id,$scope.wellInf[z].target1id,{wells: [z+1]}).then(function(response) {
 									 $scope.wellInf[response.config.data.wells[0]-1].target1id = 0;
 									 $scope.wellInf[response.config.data.wells[0]-1].target1 = "Not set";
 									 $scope.wellInf[response.config.data.wells[0]-1].target1type = "";
@@ -830,8 +833,8 @@ window.onclick = function(event) {
 									 $scope.selectedTarget1Type = "";
 								 });
 							 }
-							 if($scope.wellInf[ef].target2id != 0 && (clearType == "Target2")){
-								 Experiment.unlinkTarget($stateParams.id,$scope.wellInf[ef].target2id,{wells: [ef+1]}).then(function(response) {
+							 if($scope.wellInf[z].target2id != 0 && (clearType == "Target2")){
+								 Experiment.unlinkTarget($stateParams.id,$scope.wellInf[z].target2id,{wells: [z+1]}).then(function(response) {
 									 $scope.wellInf[response.config.data.wells[0]-1].target2id = 0;
 									 $scope.wellInf[response.config.data.wells[0]-1].target2 = "Not set";
 									 $scope.wellInf[response.config.data.wells[0]-1].target2type = "";
@@ -844,8 +847,8 @@ window.onclick = function(event) {
 									 $scope.selectedTarget2Type = "";
 								 });
 							 }
-							 if($scope.wellInf[ef].sampleid != 0 && (clearType == "Sample")){
-								 Experiment.unlinkSample($stateParams.id,$scope.wellInf[ef].sampleid,{wells: [ef+1]}).then(function(response) {
+							 if($scope.wellInf[z].sampleid != 0 && (clearType == "Sample")){
+								 Experiment.unlinkSample($stateParams.id,$scope.wellInf[z].sampleid,{wells: [z+1]}).then(function(response) {
 									 console.log(response);
 									$scope.wellInf[response.config.data.wells[0]-1].sampleid = 0;
 									$scope.wellInf[response.config.data.wells[0]-1].sample = "No sample";
