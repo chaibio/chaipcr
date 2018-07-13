@@ -60,6 +60,17 @@ fi
 #umount ${sdcard} >/dev/null || true
 mount ${sdcard_dev}p1 ${sdcard} || true
 
+reset_s2 () {
+	echo "Resetting s2 button!"
+	echo 72 > /sys/class/gpio/export
+	echo "S2 press state before and after restting:"
+	cat /sys/class/gpio/gpio72/value
+	echo out > /sys/class/gpio/gpio72/direction
+	echo 0 > /sys/class/gpio/gpio72/value
+	cat /sys/class/gpio/gpio72/value	
+	echo 72 > /sys/class/gpio/unexport
+}
+
 alldone () {
 	if [ -e /sys/class/leds/beaglebone\:green\:usr0/trigger ] ; then
 		echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
@@ -106,6 +117,7 @@ then
 	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
 	sleep 5
 	sync
+	reset_s2
 	alldone
 	exit 0
 else
