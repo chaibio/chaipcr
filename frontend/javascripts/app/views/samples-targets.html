@@ -82,7 +82,7 @@ limitations under the License.
 									<span style="width:45%;display:inline-block;text-align:center" ng-click="updateTargetChannel(targetContent.id,1)" ng-class="{'select-channel-border':targetContent.channel == 1}">1</span>
 									<span style="width:45%;display:inline-block;text-align:center" ng-click="updateTargetChannel(targetContent.id,2)" ng-class="{'select-channel-border':targetContent.channel == 2}">2</span>
 								</div>
-								<div ng-show="!targetContent.selectChannel"  class="">
+								<div ng-show="!targetContent.selectChannel"  class="cursor-channel">
 									<span ng-click="targetContent.selectChannel = !targetContent.selectChannel">{{targetContent.channel}}</span>
 								</div>
 							</td>
