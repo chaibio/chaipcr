@@ -339,5 +339,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.$on '$destroy', ->
         $interval.cancel(retryInterval) if retryInterval
 
+      $scope.showPlotTypeList = ->
+        document.getElementById("plotTypeList").classList.toggle("show")
 
+      $scope.showColorByList = ->
+        document.getElementById("colorByList").classList.toggle("show")
 ]

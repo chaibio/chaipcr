@@ -32,7 +32,7 @@ limitations under the License.
               </div>
               <div class="col-lg-7 col-md-6 col-sm-6 col-xs-6 ampli-toggles">
                 <div class="row">
-                  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 plot-type-buttons-col" ng-show="is_dual_channel">
+                  <!-- <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 plot-type-buttons-col" ng-show="is_dual_channel">
                     <div class="plot-type-buttons">
                       <div class="plot-type-text SHR">COLOR BY</div>
                       <div class="buttons-wrapper SH">
@@ -49,6 +49,51 @@ limitations under the License.
                         <div class="button" ng-click="curve_type='linear'" ng-class="{'selected': curve_type==='linear'}">LINEAR</div>
                       </div>
                     </div>
+                  </div> -->
+                  <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 plot-options">
+                  </div>
+                  <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 plot-options">
+                    <div class="plot-option">
+                      <p>Plot Type</p>
+                      <form role="form" class="form-horizontal" name="plotType" novalidate>
+                        <div class="form-group">
+                          <div class="col-md-12">
+                            <div class="dropdown" ng-click="showPlotTypeList()">
+                              <button class="dropbtn">
+                                <span class="test" style="float:left;">{{curve_type.charAt(0).toUpperCase() + curve_type.slice(1)}}</span>
+                                <img class="arrow-down" src="/images/arrow-down.png">
+                              </button>
+                              <div id="plotTypeList" class="dropdown-content">
+                                <a href="" ng-click="curve_type='log'" value="abc">Log</a>
+                                <a href="" ng-click="curve_type='linear'" value="abc">Linear</a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                  <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 plot-options">
+                    <div class="plot-option">
+                      <p>Color by</p>
+                      <form role="form" class="form-horizontal" name="colorBy" novalidate>
+                        <div class="form-group">
+                          <div class="col-md-12">
+                            <div class="dropdown" ng-click="showColorByList()">
+                              <button class="dropbtn">
+                                <span class="test" style="float:left;">{{color_by.charAt(0).toUpperCase() + color_by.slice(1)}}</span>
+                                <img class="arrow-down" src="/images/arrow-down.png">
+                              </button>
+                              <div id="colorByList" class="dropdown-content">
+                                <a href="" ng-click="color_by='sample'" value="abc">Sample</a>
+                                <a href="" ng-click="color_by='target'" value="abc">Target</a>
+                                <a href="" ng-click="color_by='well'" value="abc">Well</a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
                   </div>
                 </div>
               </div>
