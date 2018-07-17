@@ -443,7 +443,26 @@
 		.sample-span{
 			font-family: 'dinot-Regular';
 			font-size: 16px;
-		}
+    }
+    
+    .type-td{
+      text-align: center;
+      vertical-align: middle;
+      .type-span{
+        display: inline-block;
+        width: 23px;
+        height: 23px;
+        border: #000 1px solid;
+        border-radius: 50%;
+        font-family: 'dinot-Regular';
+        font-size: 14px;
+      }
+    }
+
+		.target-span{
+			font-family: 'dinot-Regular';
+			font-size: 16px;
+    }
 
     input {
       outline: none;
