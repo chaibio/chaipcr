@@ -13,73 +13,73 @@ const DEFAULT_cyc_nums = Vector{Int}()
 type MbqOutput
     fitted_prebl::AbstractAmpFitted
     bl_notes::Vector{String}
-    blsub_fluos::Vector{AbstractFloat}
+    blsub_fluos::Vector{Float64}
     fitted_postbl::AbstractAmpFitted
     postbl_status::Symbol
-    coefs::Vector{AbstractFloat}
+    coefs::Vector{Float64}
     d0::AbstractFloat
-    blsub_fitted::Vector{AbstractFloat}
+    blsub_fitted::Vector{Float64}
     max_d1::AbstractFloat
     max_d2::AbstractFloat
-    cyc_vals_4cq::OrderedDict{String,AbstractFloat}
-    eff_vals_4cq::OrderedDict{String,AbstractFloat}
-    cq_raw::AbstractFloat
-    cq::AbstractFloat
-    eff::AbstractFloat
-    cq_fluo::AbstractFloat
+    cyc_vals_4cq::OrderedDict{String,Float64}
+    eff_vals_4cq::OrderedDict{String,Float64}
+    cq_raw::Float64
+    cq::Float64
+    eff::Float64
+    cq_fluo::Float64
 end
 
 # amplification output format per step or ramp
 type AmpStepRampOutput
     # computed in `process_amp_1sr`
-    fr_ary3::Array{AbstractFloat,3}
-    mw_ary3::Array{AbstractFloat,3}
+    fr_ary3::Array{Float64,3}
+    mw_ary3::Array{Float64,3}
     k4dcv::K4Deconv
-    dcvd_ary3::Array{AbstractFloat,3}
-    wva_data::OrderedDict{String,OrderedDict{Int,Vector{AbstractFloat}}}
-    rbbs_ary3::Array{AbstractFloat,3}
+    dcvd_ary3::Array{Float64,3}
+    wva_data::OrderedDict{String,OrderedDict{Int,Vector{Float64}}}
+    rbbs_ary3::Array{Float64,3}
     fluo_well_nums::Vector{Int}
     channel_nums::Vector{Int}
     cq_method::String
     # computed by `mod_bl_q` as part of `MbqOutput` and arranged in arrays in `process_amp_1sr`
     fitted_prebl::Array{AbstractAmpFitted,2}
     bl_notes::Array{Array{String,1},2}
-    blsub_fluos::Array{AbstractFloat,3}
+    blsub_fluos::Array{Float64,3}
     fitted_postbl::Array{AbstractAmpFitted,2}
     postbl_status::Array{Symbol,2}
-    coefs::Array{AbstractFloat,3}
-    d0::Array{AbstractFloat,2}
-    blsub_fitted::Array{AbstractFloat,3}
-    max_d1::Array{AbstractFloat,2}
-    max_d2::Array{AbstractFloat,2}
-    cyc_vals_4cq::Array{OrderedDict{String,AbstractFloat},2}
-    eff_vals_4cq::Array{OrderedDict{String,AbstractFloat},2}
-    cq_raw::Array{AbstractFloat,2}
-    cq::Array{AbstractFloat,2}
-    eff::Array{AbstractFloat,2}
-    cq_fluo::Array{AbstractFloat,2}
+    coefs::Array{Float64,3}
+    d0::Array{Float64,2}
+    blsub_fitted::Array{Float64,3}
+    max_d1::Array{Float64,2}
+    max_d2::Array{Float64,2}
+    cyc_vals_4cq::Array{OrderedDict{String,Float64},2}
+    eff_vals_4cq::Array{OrderedDict{String,Float64},2}
+    cq_raw::Array{Float64,2}
+    cq::Array{Float64,2}
+    eff::Array{Float64,2}
+    cq_fluo::Array{Float64,2}
     # computed in `process_amp_1sr` from `MbqOutput`
-    qt_fluos::Array{AbstractFloat,2}
-    max_qt_fluo::AbstractFloat
+    qt_fluos::Array{Float64,2}
+    max_qt_fluo::Float64
     # computed by `report_cq!` and arranged in arrays in `process_amp_1sr`
-    max_bsf::Array{AbstractFloat,2}
-    n_max_bsf::Array{AbstractFloat,2}
-    n_max_d1::Array{AbstractFloat,2}
-    n_max_d2::Array{AbstractFloat,2}
+    max_bsf::Array{Float64,2}
+    n_max_bsf::Array{Float64,2}
+    n_max_d1::Array{Float64,2}
+    n_max_d2::Array{Float64,2}
     why_NaN::Array{String,2}
     # for ct method
-    ct_fluos::Vector{AbstractFloat}
+    ct_fluos::Vector{Float64}
     # allelic discrimination
     assignments_adj_labels_dict::OrderedDict{String,Vector{String}}
     agr_dict::OrderedDict{String,AssignGenosResult}
 end # type AmpStepRampOutput
 
 type AmpStepRampOutput2Bjson
-    rbbs_ary3::Array{AbstractFloat,3} # fluorescence after deconvolution and adjusting well-to-well variation
-    blsub_fluos::Array{AbstractFloat,3} # fluorescence after baseline subtraction
-    cq::Array{AbstractFloat,2} # cq values, applicable to sigmoid models but not to MAK models
-    d0::Array{AbstractFloat,2} # starting quantity from absolute quanitification
-    ct_fluos::Vector{AbstractFloat} # fluorescence thresholds (one value per channel) for Ct method
+    rbbs_ary3::Array{Float64,3} # fluorescence after deconvolution and adjusting well-to-well variation
+    blsub_fluos::Array{Float64,3} # fluorescence after baseline subtraction
+    cq::Array{Float64,2} # cq values, applicable to sigmoid models but not to MAK models
+    d0::Array{Float64,2} # starting quantity from absolute quanitification
+    ct_fluos::Vector{Float64} # fluorescence thresholds (one value per channel) for Ct method
     assignments_adj_labels_dict::OrderedDict{String,Vector{String}} # assigned genotypes from allelic discrimination, keyed by type of data (see `AD_DATA_CATEG` in "allelic_discrimination.jl")
 end
 
@@ -88,13 +88,13 @@ end
 function process_amp(
     db_conn::MySQL.MySQLHandle,
     exp_id::Integer,
-    asrp_vec::AbstractVector,
+    asrp_vec::Vector{AmpStepRampProperties},
     calib_info::Union{Integer,OrderedDict};
 
     # arguments that might be passed by upstream code
     well_nums::AbstractVector=[],
     min_reliable_cyc::Real=5,
-    baseline_cyc_bounds::AbstractArray=[],
+    baseline_cyc_bounds::AbstractVector=[],
     cq_method::String="Cy0",
     ct_fluos::AbstractVector=[],
 

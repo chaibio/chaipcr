@@ -7,11 +7,11 @@ immutable EmptyAmpFitted <: AbstractAmpFitted end
 # sfc: same formula for each cycle
 type SfcFitted <: AbstractAmpFitted
     coef_strs::Vector{String}
-    coefs::Vector{AbstractFloat}
+    coefs::Vector{Float64}
     status::Symbol
     obj_val::AbstractFloat
     jmp_model::JuMP.Model
-    init_coefs::OrderedDict{String,AbstractFloat}
+    init_coefs::OrderedDict{String,Float64}
 end
 const SfcFitted_EMPTY = SfcFitted(
     Vector{String}(), # coef_strs
@@ -19,7 +19,7 @@ const SfcFitted_EMPTY = SfcFitted(
     :not_fitted, # status
     0., # obj_val
     Model(), # jmp_model
-    OrderedDict{String,AbstractFloat}() # init_coefs
+    OrderedDict{String,Float64}() # init_coefs
 )
 
 
@@ -46,9 +46,9 @@ abstract type DfcFitted <: AbstractAmpFitted end
 type MAK2Fitted <: DfcFitted
     max_d_idx::Int
     coef_strs::Vector{String}
-    coefs::Vector{AbstractFloat}
+    coefs::Vector{Float64}
     status::Symbol
-    obj_val::AbstractFloat
+    obj_val::Float64
     jmp_model::JuMP.Model
 end
 const MAK2Fitted_EMPTY = MAK2Fitted(
@@ -62,12 +62,12 @@ const MAK2Fitted_EMPTY = MAK2Fitted(
 
 type MAK3Fitted <: DfcFitted
     max_d_idx::Int
-    fb_start::AbstractFloat
-    bl_k_start::AbstractFloat
+    fb_start::Float64
+    bl_k_start::Float64
     coef_strs::Vector{String}
-    coefs::Vector{AbstractFloat}
+    coefs::Vector{Float64}
     status::Symbol
-    obj_val::AbstractFloat
+    obj_val::Float64
     jmp_model::JuMP.Model
 end
 const MAK3Fitted_EMPTY = MAK3Fitted(
@@ -84,9 +84,9 @@ const MAK3Fitted_EMPTY = MAK3Fitted(
 type MAKERGAUL3Fitted <: DfcFitted
     max_of_idx::Int
     coef_strs::Vector{String}
-    coefs::Vector{AbstractFloat}
+    coefs::Vector{Float64}
     status::Symbol
-    obj_val::AbstractFloat
+    obj_val::Float64
     jmp_model::JuMP.Model
 end
 const MAKERGAUL3Fitted_EMPTY = MAKERGAUL3Fitted(
@@ -100,12 +100,12 @@ const MAKERGAUL3Fitted_EMPTY = MAKERGAUL3Fitted(
 
 type MAKERGAUL4Fitted <: DfcFitted
     max_of_idx::Int
-    fb_start::AbstractFloat
-    bl_k_start::AbstractFloat
+    fb_start::Float64
+    bl_k_start::Float64
     coef_strs::Vector{String}
-    coefs::Vector{AbstractFloat}
+    coefs::Vector{Float64}
     status::Symbol
-    obj_val::AbstractFloat
+    obj_val::Float64
     jmp_model::JuMP.Model
 end
 const MAKERGAUL4Fitted_EMPTY = MAKERGAUL4Fitted(
