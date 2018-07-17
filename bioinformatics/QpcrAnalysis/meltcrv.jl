@@ -9,12 +9,12 @@ const EMPTY_mc_tm_pw_out = OrderedDict(
 )
 
 
-type MeltCurveTF # temperature and fluorescence
+struct MeltCurveTF # temperature and fluorescence
     t_da_vec::Vector{DataArray{Float64,1}}
     fluo_da::DataArray{Float64,2}
 end
 
-type MeltCurveTa # Tm and area
+struct MeltCurveTa # Tm and area
     mc::Array{Float64,2}
     Ta_fltd::Array{Float64,2}
     mc_denser::Array{Float64,2}
@@ -24,7 +24,7 @@ type MeltCurveTa # Tm and area
     Ta_reported::String
 end
 
-type MeltCurveOutput
+struct MeltCurveOutput
     mc_bychwl::Matrix{MeltCurveTa} # dim1 is well and dim2 is channel
     channel_nums::Vector{Int}
     fluo_well_nums::Vector{Int}

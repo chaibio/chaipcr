@@ -2,12 +2,12 @@
 
 abstract type Analyze end
 
-immutable ThermalPerformanceDiagnostic <: Analyze end
-immutable OpticalTestSingleChannel <: Analyze end
-immutable OpticalTestDualChannel <: Analyze end
-immutable OpticalCal <: Analyze end
-immutable ThermalConsistency <: Analyze end
-# immutable YourOwnAnalyzeFunctionality <: Analyze end
+struct ThermalPerformanceDiagnostic <: Analyze end
+struct OpticalTestSingleChannel <: Analyze end
+struct OpticalTestDualChannel <: Analyze end
+struct OpticalCal <: Analyze end
+struct ThermalConsistency <: Analyze end
+# struct YourOwnAnalyzeFunctionality <: Analyze end
 
 const GUID2Analyze_DICT = OrderedDict(
     "thermal_performance_diagnostic" => ThermalPerformanceDiagnostic,

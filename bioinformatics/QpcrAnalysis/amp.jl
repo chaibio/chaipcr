@@ -2,7 +2,7 @@
 
 const Ct_VAL_DomainError = -100 # should be a value that cannot be obtained by normal calculation of Ct
 
-type AmpStepRampProperties
+mutable struct AmpStepRampProperties
     step_or_ramp::String
     id::Int
     cyc_nums::Vector{Int} # accomodating non-continuous sequences of cycles
@@ -10,7 +10,7 @@ end
 const DEFAULT_cyc_nums = Vector{Int}()
 
 # `mod_bl_q` output
-type MbqOutput
+struct MbqOutput
     fitted_prebl::AbstractAmpFitted
     bl_notes::Vector{String}
     blsub_fluos::Vector{Float64}
@@ -30,7 +30,7 @@ type MbqOutput
 end
 
 # amplification output format per step or ramp
-type AmpStepRampOutput
+mutable struct AmpStepRampOutput
     # computed in `process_amp_1sr`
     fr_ary3::Array{Float64,3}
     mw_ary3::Array{Float64,3}
@@ -74,7 +74,7 @@ type AmpStepRampOutput
     agr_dict::OrderedDict{String,AssignGenosResult}
 end # type AmpStepRampOutput
 
-type AmpStepRampOutput2Bjson
+struct AmpStepRampOutput2Bjson
     rbbs_ary3::Array{Float64,3} # fluorescence after deconvolution and adjusting well-to-well variation
     blsub_fluos::Array{Float64,3} # fluorescence after baseline subtraction
     cq::Array{Float64,2} # cq values, applicable to sigmoid models but not to MAK models

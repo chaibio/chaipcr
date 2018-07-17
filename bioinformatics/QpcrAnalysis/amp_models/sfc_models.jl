@@ -2,7 +2,7 @@
 # models with same formula for each cycle (Sfc models)
 
 
-type SFCModelDef # non-linear model, one feature (`x`)
+mutable struct SFCModelDef # non-linear model, one feature (`x`)
 
 # included in SFC_MODEL_BASE
 
