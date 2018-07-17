@@ -158,7 +158,9 @@ limitations under the License.
           <tbody>
             <tr>
               <th class="B1" style="border-left:none">Well</th>
-              <th class="B1">Sample Name</th>
+              <th class="B1">Sample</th>
+              <th class="B1">Type</th>
+              <th class="B1">Target</th>
               <th class="B1" ng-class="{'channel-1': color_by === 'channel'}">
                 <span ng-if="is_dual_channel">Cq Ch1</span>
                 <span ng-if="!is_dual_channel">Cq</span>
@@ -182,6 +184,17 @@ limitations under the License.
                   {{samples[$index] | truncate:20}}
                 </span>
                 <input type="text" class="sample-input" ng-show="editExpNameMode[$index]" focus-on="editExpNameMode" ng-blur="updateSampleName($index,samples[$index])"  on-shift-enter="updateSampleNameEnter($index,samples[$index])"  ng-model="samples[$index]">
+              </td>
+              <td class="type-td">
+                <span class="type-span" ng-show="types[$index]">
+                  {{types[$index]==='sample'?'S':'' | truncate:20}}
+                </span>
+              </td>
+              <td ng-click="focusExpTarget($index)">
+                <span class="target-span" ng-click="focusExpTarget($index)" ng-show="!editExpTargetMode[$index]">
+                  {{targets[$index] | truncate:20}}
+                </span>
+                <input type="text" ng-show="editExpTargetMode[$index]" focus-on="editExpTargetMode" ng-blur="updateTarget($index,targets[$index])"  on-shift-enter="updateTargetEnter($index,targets[$index])"  ng-model="targets[$index]">
               </td>
               <td class="B1">
                 <span ng-show="wellButtons['well_'+i].ct[0] > 0">

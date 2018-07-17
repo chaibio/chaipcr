@@ -66,7 +66,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.hoverName = 'Min. Flouresence'
       $scope.hoverDescription = 'This is a test description'
       $scope.samples = []
+      $scope.types = []
+      $scope.targets = []
       $scope.editExpNameMode = []
+      $scope.editExpTargetMode = []
 
       modal = document.getElementById('myModal')
       span = document.getElementsByClassName("close")[0]
@@ -185,10 +188,27 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         Experiment.updateWell($stateParams.id, well_num + 1, {'well_type':'sample','sample_name':name})
         $scope.editExpNameMode[well_num] = false
 
+      $scope.focusExpTarget = (index) ->
+        $scope.editExpTargetMode[index] = true
+        focus('editExpTargetMode')
+
+      $scope.updateTargetEnter = (well_num, target) ->
+        Experiment.updateWell($stateParams.id, well_num + 1, {'well_type':'sample','targets':[target]})
+        $scope.editExpTargetMode[well_num] = false
+        if event.shiftKey
+          $scope.focusExpTarget(well_num - 1)
+        else
+          $scope.focusExpTarget(well_num + 1)
+
+      $scope.updateTarget = (well_num, target) ->
+        Experiment.updateWell($stateParams.id, well_num + 1, {'well_type':'sample','targets':[target]})
+        $scope.editExpTargetMode[well_num] = false
 
       Experiment.getWells($stateParams.id).then (resp) ->
         for i in [0...16]
           $scope.samples[resp.data[i].well.well_num - 1] = resp.data[i].well.sample_name if resp.data[i]
+          $scope.types[resp.data[i].well.well_num - 1] = resp.data[i].well.well_type if resp.data[i]
+          $scope.targets[resp.data[i].well.well_num - 1] = resp.data[i].well.targets[0] if resp.data[i]
 
       Experiment.get(id: $stateParams.id).then (data) ->
         maxCycle = helper.getMaxExperimentCycle(data.experiment)
