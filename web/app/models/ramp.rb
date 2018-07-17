@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 class Ramp < ActiveRecord::Base
-  include ProtocolHelper
+  include ProtocolLayoutHelper
 
   include Swagger::Blocks
 

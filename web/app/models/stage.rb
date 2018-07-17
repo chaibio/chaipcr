@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 class Stage < ActiveRecord::Base
-  include ProtocolHelper
+  include ProtocolLayoutHelper
   include ProtocolOrderHelper
 
   include Swagger::Blocks

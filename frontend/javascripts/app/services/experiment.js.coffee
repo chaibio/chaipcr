@@ -72,6 +72,51 @@ window.ChaiBioTech.ngApp
     self.getWells = (id) ->
       $http.get("/experiments/" + id + "/wells")
 
+    self.getWellLayout = (id) ->
+      $http.get("/experiments/" + id + "/well_layout")
+
+    self.getSamples = (id) ->
+      $http.get("/experiments/" + id + "/samples")
+
+    self.getTargets = (id) ->
+      $http.get("/experiments/" + id + "/targets")
+
+    self.createSample = (expId, data) ->
+      $http.post "/experiments/#{expId}/samples", data
+
+    self.createTarget = (expId, data) ->
+      $http.post "/experiments/#{expId}/targets", data
+
+    self.updateSample = (expId, sampleId, data) ->
+      $http.put "/experiments/#{expId}/samples/" + sampleId, data
+
+    self.updateTarget = (expId, targetId, data) ->
+      $http.put "/experiments/#{expId}/targets/" + targetId, data
+
+    self.deleteSample = (expId, sampleId) ->
+      $http.delete "/experiments/#{expId}/samples/#{sampleId}"
+
+    self.deleteLinkedSample = (expId, sampleId) ->
+      $http.delete "/experiments/#{expId}/samples/#{sampleId}?force=true"
+
+    self.deleteTarget = (expId, targetId) ->
+      $http.delete "/experiments/#{expId}/targets/#{targetId}"
+
+    self.deleteLinkedTarget = (expId, targetId) ->
+      $http.delete "/experiments/#{expId}/targets/#{targetId}?force=true"
+
+    self.linkSample = (expId, sampleId, data) ->
+      $http.post "/experiments/#{expId}/samples/#{sampleId}/links", data
+
+    self.linkTarget = (expId, targetId, data) ->
+      $http.post "/experiments/#{expId}/targets/#{targetId}/links", data
+
+    self.unlinkTarget = (expId, targetId, data) ->
+      $http.post "/experiments/#{expId}/targets/#{targetId}/unlinks", data
+
+    self.unlinkSample = (expId, sampleId, data) ->
+      $http.post "/experiments/#{expId}/samples/#{sampleId}/unlinks", data
+
     self.updateWell = (id,well_num,well_data) ->
       $http.put "/experiments/" + id + "/wells/" + well_num, well : well_data
 

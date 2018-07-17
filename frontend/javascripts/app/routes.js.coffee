@@ -100,6 +100,14 @@ window.ChaiBioTech.ngApp
         url: '/edit-protocol/:id'
         templateUrl: 'app/views/edit-protocol.html'
 
+      .state 'samples-targets',
+        url: '/samples-targets/:id'
+        templateUrl: 'app/views/samples-targets.html'
+
+      .state 'plate-layout',
+        url: '/plate-layout/:id'
+        templateUrl: 'app/views/plate-layout.html'
+
       .state 'run-experiment',
         url: '/experiments/:id/run-experiment?chart?max_cycle'
         templateUrl: 'app/views/experiment/run-experiment.html'

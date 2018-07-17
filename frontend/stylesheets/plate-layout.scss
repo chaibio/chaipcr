@@ -1,0 +1,299 @@
+@import './colors.css.scss';
+
+.selection-section{
+	font-family: 'dinot-medium';
+	h4{
+		font-family: 'dinot-bold';
+		font-size: 13px;
+	}
+
+	hr{
+		border: 1px solid black;
+		margin-top: 5px;
+		margin-bottom: 10px;
+	}
+}
+
+/*::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 7px;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, .5);
+  -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+}*/
+
+.test-gradient{
+background: repeating-linear-gradient(-60deg, #F5F5F5, #F5F5F5 1px, white 4px, white 4px);
+}
+
+.disabled-clicking{
+	pointer-events: none;
+	opacity: 0.5;
+}
+
+.hiding-div{
+	visibility: hidden;
+}
+
+.no-sample-set{
+	color: #ABABAB;
+}
+
+.testing-clicking{
+	cursor: pointer;
+	margin-bottom: 0px;
+	padding: 5px;
+}
+
+.sample-target-section{
+	background-color: white;
+	border: 1px solid #f5f5f5;
+	box-shadow: 0px 1px 0px 0px #ABABAB;
+	padding-top: 10px;
+}
+
+.span-target-color{
+	width: 10px;
+	height: 10px;
+	display: inline-block;
+	margin-right: 5px;
+}
+
+.options-div{
+	position: absolute !important;
+	background-color: white;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	border-top: 0;
+	z-index: 5;
+	width: calc(100% - 30px);
+	//cursor: pointer;
+	//top: -84px;
+	//visibility: hidden;
+	ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  //display: flex;
+  //flex-direction: column;
+  //flex-wrap: wrap;
+	overflow: scroll;
+	max-height:  122px;
+  //width: 300px;
+  //height: 200px;
+}
+li {
+  //height: 12.5%;
+	padding: 5px;
+	cursor: pointer;
+}
+.ul-height{
+	height: 200px;
+}
+.li-height{
+	height: 12.5%
+}
+}
+
+
+.plate-layout-wells {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+	background-color: white;
+
+
+	.sample-name,.target-name{
+		font-family: 'dinot-bold';
+	}
+
+	.sample-underline{
+		border: 1px solid gray;
+		margin-top: 10px;
+		margin-bottom: 7px;
+
+	}
+
+  table {
+    border-top: 2px solid #c5c5c5;
+    border-right: 1px solid #c5c5c5;
+  }
+
+  th, td {
+    border-left: 1px solid #c5c5c5;
+    border-bottom: 1px solid #c5c5c5;
+    border-top: 1px solid #c5c5c5;
+  }
+
+  .col-header {
+    font-family: 'dinot-regular';
+    font-size: 12px;
+    text-align: center;
+
+    &.dragged {
+      background: #7DC2E6;
+    }
+  }
+  .row-header {
+    text-align: center;
+    &.dragged {
+      background: #7DC2E6;
+    }
+  }
+  .well-switch {
+    min-height: 60px;
+    vertical-align: top;
+		width: 12.35%;
+
+    &.selected {
+      .ct-cq-container {
+        background-color: #e4f4fa;
+      }
+    }
+
+    &.selected.active {
+      position: relative;
+
+      .well-switch-container {
+        margin: -4px;
+        height: 68px;
+        border: 2px solid #000;
+        z-index: 999999;
+        position: absolute;
+        top: 0;
+        left: 0;
+        box-shadow: 0px 0px 5px #000;
+      }
+      .ct-cq-container {
+        height: 49px;
+        padding: 4px 22px;
+      }
+
+    }
+
+    .well-switch-bar-container {
+      background-color: #fff;
+      padding: 5px 10px;
+    }
+
+    .well-switch-bar {
+      height: 5px;
+    }
+    .ct-cq-container {
+      border-top: 1px solid #c5c5c5;
+      padding: 5px 10px;
+      min-height: 45px;
+			padding-bottom: 10px;
+
+			hr{
+				margin-top: 7px;
+				margin-bottom: 7px;
+			}
+    }
+
+  }
+}
+
+.ui-selectable-helper{
+  position:absolute;
+  z-index:100;
+  border:1px dotted black;
+}
+
+.opacityLess{
+	opacity: 0.5;
+	pointer-events: none;
+}
+
+.targetRect{
+	display:inline-block;
+	width:25px;
+	height:40px;
+	text-align: center;
+	border-radius: 3px;
+	vertical-align: top;
+}
+
+.no-targetBorder{
+	border: 1px solid #C6C6C6;
+}
+
+.numberCircle {
+    width: 25px;
+    line-height: 22px;
+		height: 25px;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 12px;
+    border: 2px solid black;
+    display: inline-block;
+		cursor: pointer;
+		margin-right: 7px;
+}
+
+.target-selected{
+	background-color: black;
+	color: white;
+}
+
+.wellCircle {
+    width: 17px;
+		height: 17px;
+    line-height: 15px;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 12px;
+    border: 1px solid black;
+    display: inline-block;
+		background-color: white;
+		margin-top: 4px;
+		font-family: 'dinot-bold';
+		font-size: 10px;
+}
+
+.wellCircle-empty {
+    width: 17px;
+		height: 17px;
+    line-height: 15px;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 12px;
+    border: 1px solid #C6C6C6;
+    display: inline-block;
+		background-color: white;
+		margin-top: 4px;
+		font-family: 'dinot-bold';
+		font-size: 10px;
+}
+
+.select-style {
+	cursor: pointer;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ccc;
+    //width: 120px;
+    border-radius: 3px;
+    overflow: hidden;
+    background-color: #fff;
+
+    background: #fff url("http://www.scottgood.com/jsg/blog.nsf/images/arrowdown.gif") no-repeat 90% 50%;
+}
+
+.select-style select {
+    padding: 5px 8px;
+    width: 130%;
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    background-image: none;
+    -webkit-appearance: none;
+       -moz-appearance: none;
+            appearance: none;
+}
+
+.select-style select:focus {
+    outline: none;
+}

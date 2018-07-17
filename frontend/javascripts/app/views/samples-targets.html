@@ -1,0 +1,111 @@
+<!--
+Chai PCR - Software platform for Open qPCR and Chai's Real-Time PCR instruments.
+For more information visit http://www.chaibio.com
+
+Copyright 2016 Chai Biotechnologies Inc. <info@chaibio.com>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<div ng-controller="SampleTargetCtrl">
+  <div menu-overlay sidemenu-template="app/views/experiment/left-menu.html">
+    <div class="home-page-wrapper row" full-height offset="37">
+      <header-status experiment-id="experiment.id">
+        <div class="stripes-and-name" toggle-sidemenu>
+          <div class="stripes">
+            <div class="stripe"></div>
+            <div class="stripe"></div>
+            <div class="stripe"></div>
+          </div>
+        </div>
+      </header-status>
+
+			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 header-samples-targets">
+				<h4 style="display:inline-block">Manage Samples + Targets</h4>
+				<span ng-click="openImportStandards()" class="import-button">Import Standards</span>
+
+			</div>
+
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 samples" full-height force="true" offset="94">
+        <p>Samples</p>
+
+        <table>
+          <tbody>
+						<tr>
+							<th>Name</td>
+							<th>Color</td>
+						</tr>
+            <tr ng-repeat="rowContent in rows track by $index">
+              <td style="border-bottom:2px solid gray;">
+								<input style="border:0px;padding:0px;" type="text" ng-blur="updateSample(rowContent.id,rowContent.name,$index)" ng-focus="focusSample(rowContent.id,rowContent.name,$index)" placeholder="Enter Sample Name" class="" ng-model="rowContent.name">
+							</td>
+							<td style="border-bottom:2px solid gray;">
+                <span class="color" ng-attr-style="background-color:{{colors[$index]}};display:inline-block;width:20px;height:30px;border-radius:3px;margin-top:-5px;"></span>
+              </td>
+							<td style="padding-bottom:25px;text-align:center;width:45px;">
+								<span ng-show="!rowContent.confirmDelete" ng-click="rowContent.confirmDelete = !rowContent.confirmDelete"><img class="delete" src="/images/trash_initial.svg" alt=""></span>
+								<span ng-show="rowContent.confirmDelete" ng-click="deleteSample(rowContent.id)"><img class="delete-confirm" src="/images/confirm_trash.svg" alt=""></span>
+							</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <span class="add-span" ng-click="create()"><img class="add-plus" src="/images/Add.svg" alt=""> Add Sample</span>
+
+      </div>
+
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 targets" full-height force="true" offset="94">
+        <p>Targets</p>
+
+        <table>
+          <tbody>
+						<tr>
+							<th>Name</td>
+							<th>Ch</td>
+							<th></th>
+							<th>Color</td>
+						</tr>
+            <tr ng-repeat="targetContent in targets track by $index">
+              <td style="border-bottom:2px solid gray;"><input style="border:0px;padding:0px;width:60%" type="text" ng-blur="updateTargetName(targetContent.id,targetContent.name,$index)" ng-focus="focusTarget(targetContent.id,targetContent.name,$index)" placeholder="Enter Target Name"  class="" ng-model="targetContent.name">
+							</td>
+								<td style="border-bottom:2px solid gray;">
+								<div style="border:1px solid gray;" ng-show="targetContent.selectChannel"  class="">
+									<span style="width:45%;display:inline-block;text-align:center" ng-click="updateTargetChannel(targetContent.id,1)" ng-class="{'select-channel-border':targetContent.channel == 1}">1</span>
+									<span style="width:45%;display:inline-block;text-align:center" ng-click="updateTargetChannel(targetContent.id,2)" ng-class="{'select-channel-border':targetContent.channel == 2}">2</span>
+								</div>
+								<div ng-show="!targetContent.selectChannel"  class="cursor-channel">
+									<span ng-click="targetContent.selectChannel = !targetContent.selectChannel">{{targetContent.channel}}</span>
+								</div>
+							</td>
+							<td style="border-bottom:2px solid gray;min-width:40px;">
+								<div ng-show="!targetContent.assigned"> <img class="delete" src="/images/assigned.svg" alt=""></div>
+								<span ng-show="targetContent.imported"> <img class="delete" src="/images/lock.svg" alt=""></span>
+							</td>
+							<td style="border-bottom:2px solid gray;">
+                <span class="color" ng-attr-style="background-color:{{colors[$index]}};display:inline-block;width:20px;height:30px;border-radius:3px;margin-top:-5px;"></span>
+              </td>
+							<td style="padding-bottom:25px;text-align:center;width:45px;">
+								<span ng-show="!targetContent.confirmDelete" ng-click="targetContent.confirmDelete = !targetContent.confirmDelete"><img class="delete" src="/images/trash_initial.svg" alt=""></span>
+								<span ng-show="targetContent.confirmDelete" ng-click="deleteTarget(targetContent.id)"><img class="delete" src="/images/confirm_trash.svg" alt=""></span>
+							</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <span class="add-span" ng-click="createTarget()"><img class="add-plus" src="/images/Add.svg" alt=""> Add Target</span>
+
+      </div>
+
+    </div>
+    <status-bar experiment-id="experiment.id"></status-bar>
+  </div>
+</div>
