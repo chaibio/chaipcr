@@ -68,6 +68,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.samples = []
       $scope.types = []
       $scope.targets = []
+      $scope.targetsSet = []
       $scope.editExpNameMode = []
       $scope.editExpTargetMode = []
 
@@ -205,10 +206,13 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.editExpTargetMode[well_num] = false
 
       Experiment.getWells($stateParams.id).then (resp) ->
+        $scope.targetsSet = []
         for i in [0...16]
           $scope.samples[resp.data[i].well.well_num - 1] = resp.data[i].well.sample_name if resp.data[i]
           $scope.types[resp.data[i].well.well_num - 1] = resp.data[i].well.well_type if resp.data[i]
           $scope.targets[resp.data[i].well.well_num - 1] = resp.data[i].well.targets[0] if resp.data[i]
+          if resp.data[i] and resp.data[i].well.targets[0] and $scope.targetsSet.indexOf(resp.data[i].well.targets[0]) < 0
+            $scope.targetsSet.push(resp.data[i].well.targets[0])
 
       Experiment.get(id: $stateParams.id).then (data) ->
         maxCycle = helper.getMaxExperimentCycle(data.experiment)
@@ -316,6 +320,12 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           width: w/(w*transform.k)
         }
         $scope.ampli_zoom = (transform.k - 1)/ (scale_extent)
+      
+      $scope.zoomIn = ->
+        $scope.ampli_zoom = Math.min($scope.ampli_zoom * 2 || 0.001 * 2, 1)
+
+      $scope.zoomOut = ->
+        $scope.ampli_zoom = Math.max($scope.ampli_zoom * 0.5, 0.001)
 
       $scope.onSelectLine = (config) ->
         for i in [0..15] by 1
