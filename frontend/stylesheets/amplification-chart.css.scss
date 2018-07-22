@@ -262,6 +262,24 @@
       }
     }
   }
+  .curve-body {
+    background-color: #eee;
+    padding: 20px;
+    .curve-plot {
+      background-color: #fff;
+      padding: 10px;
+      display: inline-block;
+      width: 85%;
+    }
+    .targets-set {
+      background-color: #fff;
+      margin-left: 20px;
+      margin-bottom: -66px;
+      padding: 10px;
+      display: inline-block;
+      width: 12%;
+    }
+  }
   .content.row {
     margin-left: 0;
     margin-right: 0;
@@ -296,6 +314,7 @@
           margin-top: -2px;
           width: 31px;
           vertical-align: middle;
+          margin-left: 6px;
           small {
             width: 15px;
             height: 15px;
@@ -406,6 +425,11 @@
     .num-cycle-text {
       margin-bottom: -30px;
       margin-top: 20px;
+    }
+    .zoom-button {
+      border: none;
+      font-weight: bold;
+      background-color: #ffffff;
     }
     .ampli-zoom-scroll-container {
       // margin-top: 50px;
