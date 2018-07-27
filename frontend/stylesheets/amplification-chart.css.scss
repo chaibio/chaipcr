@@ -278,6 +278,14 @@
       padding: 10px;
       display: inline-block;
       width: 12%;
+      .targets-table {
+        width: 100%;
+        .td-tik {
+          min-width: 50px;
+          text-align: right;
+          cursor: pointer;
+        }
+      }
     }
   }
   .content.row {

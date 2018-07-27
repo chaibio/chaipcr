@@ -32,24 +32,6 @@ limitations under the License.
               </div>
               <div class="col-lg-8 col-md-7 col-sm-7 col-xs-7 ampli-toggles">
                 <div class="row">
-                  <!-- <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 plot-type-buttons-col" ng-show="is_dual_channel">
-                    <div class="plot-type-buttons">
-                      <div class="plot-type-text SHR">COLOR BY</div>
-                      <div class="buttons-wrapper SH">
-                        <div class="button" ng-click="color_by='well'" ng-class="{'selected': color_by==='well'}">WELL</div>
-                        <div class="button" ng-click="color_by='channel'" ng-class="{'selected': color_by==='channel'}">CHANNEL</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div ng-class="{'col-lg-6 col-md-6 col-sm-6 col-xs-6 plot-type-buttons-col': is_dual_channel, 'col-md-12': !is_dual_channel}">
-                    <div class="plot-type-buttons">
-                      <div class="plot-type-text SHR">PLOT TYPE</div>
-                      <div class="buttons-wrapper SH">
-                        <div class="button" ng-click="curve_type='log'" ng-class="{'selected': curve_type==='log'}">LOG</div>
-                        <div class="button" ng-click="curve_type='linear'" ng-class="{'selected': curve_type==='linear'}">LINEAR</div>
-                      </div>
-                    </div>
-                  </div> -->
                   <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 plot-options">
                     <div class="subheader-switches SH">
                       <div class="item-switch">
@@ -145,10 +127,10 @@ limitations under the License.
               </div>
             </div>
             <div class="targets-set" ng-show="targetsSet.length">
-              <table>
+              <table class="targets-table">
                 <tr ng-repeat="target in targetsSet">
                   <td>{{target}}</td>
-                  <td></td>
+                  <td class="td-tik" ng-click="targetClick($index)"><span ng-show="!targetsSetHided[$index]"><img src="/images/tik.png"></span></td>
                 </tr>
               </table>
             </div>
