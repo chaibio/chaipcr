@@ -69,6 +69,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.types = []
       $scope.targets = []
       $scope.targetsSet = []
+      $scope.targetsSetHided = []
+      $scope.samplesSet = []
       $scope.editExpNameMode = []
       $scope.editExpTargetMode = []
 
@@ -200,19 +202,26 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $scope.focusExpTarget(well_num - 1)
         else
           $scope.focusExpTarget(well_num + 1)
+        $scope.updateTargetsSet()
 
       $scope.updateTarget = (well_num, target) ->
         Experiment.updateWell($stateParams.id, well_num + 1, {'well_type':'sample','targets':[target]})
         $scope.editExpTargetMode[well_num] = false
-
+        $scope.updateTargetsSet()
+      
+      $scope.updateTargetsSet = ->
+        $scope.targetsSet = []
+        for i in [0...16]
+          if $scope.targets[i] and $scope.targetsSet.indexOf($scope.targets[i]) < 0
+            $scope.targetsSet.push($scope.targets[i])
+      
       Experiment.getWells($stateParams.id).then (resp) ->
         $scope.targetsSet = []
         for i in [0...16]
           $scope.samples[resp.data[i].well.well_num - 1] = resp.data[i].well.sample_name if resp.data[i]
           $scope.types[resp.data[i].well.well_num - 1] = resp.data[i].well.well_type if resp.data[i]
           $scope.targets[resp.data[i].well.well_num - 1] = resp.data[i].well.targets[0] if resp.data[i]
-          if resp.data[i] and resp.data[i].well.targets[0] and $scope.targetsSet.indexOf(resp.data[i].well.targets[0]) < 0
-            $scope.targetsSet.push(resp.data[i].well.targets[0])
+        $scope.updateTargetsSet()
 
       Experiment.get(id: $stateParams.id).then (data) ->
         maxCycle = helper.getMaxExperimentCycle(data.experiment)
@@ -304,12 +313,30 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         channel_start = if $scope.channel_1 && $scope.channel_2 then 1 else if $scope.channel_1 && !$scope.channel_2 then 1 else if !$scope.channel_1 && $scope.channel_2 then 2
         for ch_i in [channel_start..channel_end] by 1
           for i in [0..15] by 1
-            if buttons["well_#{i}"]?.selected
+            if buttons["well_#{i}"]?.selected and !$scope.targetsSetHided[i]
+
+              if $scope.color_by is 'well'
+                well_color = buttons["well_#{i}"].color
+              else if $scope.color_by is 'target'
+                color_number = $scope.targetsSet.indexOf($scope.targets[i])
+                if color_number < 0
+                  color_number = 15
+                well_color = buttons["well_#{color_number}"].color
+              else if $scope.color_by is 'sample'
+                color_number = $scope.samplesSet.indexOf($scope.samples[i])
+                if color_number < 0
+                  color_number = 15
+                well_color = buttons["well_#{color_number}"].color
+              else if ch_i is 1
+                well_color = '#00AEEF'
+              else
+                well_color = '#8FC742'
+
               $scope.chartConfig.series.push
                 dataset: "channel_#{ch_i}"
                 x: 'cycle_num'
                 y: "well_#{i}_#{subtraction_type}#{if $scope.curve_type is 'log' then '_log' else ''}"
-                color: if ($scope.color_by is 'well') then buttons["well_#{i}"].color else (if ch_i is 1 then '#00AEEF' else '#8FC742')
+                color: well_color
                 cq: $scope.wellButtons["well_#{i}"]?.ct
                 well: i
                 channel: ch_i
@@ -374,4 +401,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       $scope.showColorByList = ->
         document.getElementById("colorByList").classList.toggle("show")
+      
+      $scope.targetClick = (index) ->
+        $scope.targetsSetHided[index] = !$scope.targetsSetHided[index]
+        updateSeries()
+
 ]
