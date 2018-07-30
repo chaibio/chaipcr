@@ -49,10 +49,30 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
         return evt.ctrlKey or is_cmd_key_held
 
       for b in [0...16] by 1
+
+        if $scope.colorBy is 'well'
+          well_color = COLORS[b]
+        # else if $scope.colorBy is 'target'
+        #   color_number = $scope.targetsSet.indexOf($scope.targets[i])
+        #   if color_number < 0
+        #     well_color = '#000000'
+        #   else
+        #     well_color = $scope.COLORS[color_number]
+        # else if $scope.colorBy is 'sample'
+        #   color_number = $scope.samplesSet.indexOf($scope.samples[i])
+        #   if color_number < 0
+        #     well_color = '#000000'
+        #   else
+        #     well_color = $scope.COLORS[color_number]
+        # else
+        #   well_color = '#75278E'
+        else
+          well_color = '#FFFFFF'
+
         wells["well_#{b}"] =
           selected: true
           active: false
-          color: if ($scope.colorBy is 'well') then COLORS[b] else '#75278E'
+          color: well_color
 
       ngModel.$setViewValue wells
       $scope.wells = wells
@@ -89,7 +109,27 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
 
       $scope.$watch 'colorBy', (color_by) ->
         for i in [0..15] by 1
-          $scope.wells["well_#{i}"].color = if (color_by is 'well') then COLORS[i] else '#75278E'
+
+          if color_by is 'well'
+            well_color = COLORS[i]
+          # else if color_by is 'target'
+          #   color_number = $scope.targetsSet.indexOf($scope.targets[i])
+          #   if color_number < 0
+          #     well_color = '#000000'
+          #   else
+          #     well_color = $scope.COLORS[color_number]
+          # else if color_by is 'sample'
+          #   color_number = $scope.samplesSet.indexOf($scope.samples[i])
+          #   if color_number < 0
+          #     well_color = '#000000'
+          #   else
+          #     well_color = $scope.COLORS[color_number]
+          # else
+          #   well_color = '#75278E'
+          else
+            well_color = '#FFFFFF'
+
+          $scope.wells["well_#{i}"].color = well_color
         ngModel.$setViewValue angular.copy($scope.wells)
 
       $scope.getStyleForWellBar = (row, col, config, i) ->

@@ -171,6 +171,7 @@ limitations under the License.
                 </span>
               </td>
               <td ng-click="focusExpName($index)">
+                <span ng-if="color_by==='sample'" class="dot" ng-attr-style="background-color: {{samplesSet.indexOf(samples[i]) < 0 ? '#000000' : COLORS[samplesSet.indexOf(samples[i])]}}"></span>
                 <span class="sample-span" ng-click="focusExpName($index)" ng-show="!editExpNameMode[$index]">
                   {{samples[$index] | truncate:20}}
                 </span>
