@@ -186,10 +186,14 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $scope.focusExpName(well_num - 1)
         else
           $scope.focusExpName(well_num + 1)
+        $scope.updateSamplesSet()
+        updateSeries()
 
       $scope.updateSampleName = (well_num, name) ->
         Experiment.updateWell($stateParams.id, well_num + 1, {'well_type':'sample','sample_name':name})
         $scope.editExpNameMode[well_num] = false
+        $scope.updateSamplesSet()
+        updateSeries()
 
       $scope.focusExpTarget = (index) ->
         $scope.editExpTargetMode[index] = true
@@ -216,6 +220,12 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         for i in [0...16]
           if $scope.targets[i] and $scope.targetsSet.indexOf($scope.targets[i]) < 0
             $scope.targetsSet.push($scope.targets[i])
+
+      $scope.updateSamplesSet = ->
+        $scope.samplesSet = []
+        for i in [0...16]
+          if $scope.samples[i] and $scope.samplesSet.indexOf($scope.samples[i]) < 0
+            $scope.samplesSet.push($scope.samples[i])
       
       Experiment.getWells($stateParams.id).then (resp) ->
         $scope.targetsSet = []
@@ -224,6 +234,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $scope.types[resp.data[i].well.well_num - 1] = resp.data[i].well.well_type if resp.data[i]
           $scope.targets[resp.data[i].well.well_num - 1] = resp.data[i].well.targets[0] if resp.data[i]
         $scope.updateTargetsSet()
+        $scope.updateSamplesSet()
         updateSeries()
 
       Experiment.get(id: $stateParams.id).then (data) ->
@@ -324,13 +335,15 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               else if $scope.color_by is 'target'
                 color_number = $scope.targetsSet.indexOf($scope.targets[i])
                 if color_number < 0
-                  color_number = 15
-                well_color = $scope.COLORS[color_number]
+                  well_color = '#000000'
+                else
+                  well_color = $scope.COLORS[color_number]
               else if $scope.color_by is 'sample'
                 color_number = $scope.samplesSet.indexOf($scope.samples[i])
                 if color_number < 0
-                  color_number = 15
-                well_color = $scope.COLORS[color_number]
+                  well_color = '#000000'
+                else
+                  well_color = $scope.COLORS[color_number]
               else if ch_i is 1
                 well_color = '#00AEEF'
               else
