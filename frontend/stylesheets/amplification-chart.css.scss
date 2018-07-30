@@ -281,7 +281,7 @@
       .targets-table {
         width: 100%;
         .td-tik {
-          min-width: 50px;
+          min-width: 30px;
           text-align: right;
           cursor: pointer;
         }
@@ -533,14 +533,6 @@
             // border-right: 1px solid lighten($lightgray, 15%);
             border-right: none;
           }
-          .dot {
-            border-radius: 100px;
-            display: inline-block;
-            height: 10px;
-            margin-right: 10px;
-            vertical-align: middle;
-            width: 10px;
-          }
           .text {
             display: inline-block;
             vertical-align: middle;
@@ -560,4 +552,12 @@
   .amplification-well-switch {
     margin-top: 30px;
   }
+}
+.dot {
+  border-radius: 100px;
+  display: inline-block;
+  height: 10px;
+  margin-right: 10px;
+  vertical-align: middle;
+  width: 10px;
 }
