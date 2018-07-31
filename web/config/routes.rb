@@ -97,6 +97,7 @@ Qpcrctl::Application.routes.draw do
       get 'standard_curve'
       get 'export'
       get 'analyze'
+      get 'filter_by_standard'
     end
     
     resources :wells, param: :well_num, only: [:index, :update, :destroy] do
