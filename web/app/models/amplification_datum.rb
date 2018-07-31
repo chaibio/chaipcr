@@ -69,6 +69,14 @@ class AmplificationDatum < ActiveRecord::Base
 						key :type, :integer
 						key :description, '?'
 					end
+					property :first_derivative_value do
+						key :type, :integer
+						key :description, '?'
+					end
+					property :second_derivative_value do
+						key :type, :integer
+						key :description, '?'
+					end
 				end
 			end
 		end

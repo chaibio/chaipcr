@@ -134,7 +134,39 @@ class ExperimentsController < ApplicationController
     respond_to do |format|
       format.json { render "fullshow", :status => (ret)? :ok : :unprocessable_entity}
     end
-  end
+	end
+
+	swagger_path '/experiments/filter_by_standard' do
+		operation :get do
+			key :summary, 'List all Experiments with standard well type'
+			key :description, 'Returns all experiments from the system sorted by the id along with well type as standard'
+			key :produces, [
+					'application/json',
+			]
+			key :tags, [
+					'Experiment'
+			]
+			response 200 do
+				key :description, 'Object containing list of all the experiments with standard'
+				schema do
+					key :type, :array
+					items do
+						key :'$ref', :Experiments
+					end
+				end
+			end
+		end
+	end
+
+	api :GET, "/experiments/filter_by_standard", "List all the experiments with well type standard"
+	def filter_by_standard
+		#@experiments = Experiment.includes(:well_layout).where("targets_wells.well_type"=>"standard").order("experiments.id DESC").load
+		@experiments = Experiment.includes(:experiment_definition,:well_layout).where("experiment_definitions.experiment_type"=>[ExperimentDefinition::TYPE_USER_DEFINED, ExperimentDefinition::TYPE_TESTKIT]).order("experiments.id DESC").load
+		respond_to do |format|
+			format.json { render "index", :status => :ok }
+		end
+
+	end
 
 	swagger_path '/experiments/{id}' do
 		operation :put do
@@ -279,6 +311,10 @@ class ExperimentsController < ApplicationController
   api :GET, "/experiments/:id", "Show an experiment"
   see "experiments#create", "json response"
   def show
+		if params[:id] == "filter_by_standard"
+			filter_by_standard
+			return
+		end
     @experiment.experiment_definition.protocol.stages.load
     respond_to do |format|
       format.json { render "fullshow", :status => (@experiment)? :ok :  :unprocessable_entity}
@@ -507,6 +543,22 @@ class ExperimentsController < ApplicationController
         key :default, true
 			end
 			parameter do
+				key :name, :firstderiv
+				key :in, :query
+				key :description, 'If first derivative data should be returned, by default it is retuned'
+				key :type, :boolean
+				key :required, false
+				key :default, true
+			end
+			parameter do
+				key :name, :secondderiv
+				key :in, :query
+				key :description, 'If second derivative data should be returned, by default it is retuned'
+				key :type, :boolean
+				key :required, false
+				key :default, true
+			end
+			parameter do
 				key :name, :cq
 				key :in, :query
 				key :description, 'If cq values should be returned, by default it is retuned'
@@ -564,14 +616,16 @@ class ExperimentsController < ApplicationController
 		end
 	end
 
-  api :GET, "/experiments/:id/amplification_data?raw=false&background=true&baseline=true&cq=true&step_id[]=43&step_id[]=44", "Retrieve amplification data"
+  api :GET, "/experiments/:id/amplification_data?raw=false&background=true&baseline=true&firstderiv=true&secondderiv=true&cq=true&step_id[]=43&step_id[]=44", "Retrieve amplification data"
   example "{'partial':false, 'total_cycles':40, 'steps':['step_id':2,
-            'amplification_data':[['channel', 'well_num', 'cycle_num', 'background_subtracted_value', 'baseline_subtracted_value', 'fluorescence_value'], [1, 1, 1, 25488, -2003, 86], [1, 1, 2, 53984, -409, 85]],
+            'amplification_data':[['channel', 'well_num', 'cycle_num', 'background_subtracted_value', 'baseline_subtracted_value', 'first_derivative_value', 'second_derivative_value' 'fluorescence_value'], [1, 1, 1, 25488, -2003, 34543, 453344, 86], [1, 1, 2, 53984, -409, 56345, 848583, 85]],
             'cq':[['channel', 'well_num', 'cq'], [1, 1, 12.11], [1, 2, 15.77], [1, 3, null]]]}"
   def amplification_data
     params[:raw] = params[:raw].to_bool if !params[:raw].nil?
     params[:background] = params[:background].to_bool if !params[:background].nil?
-    params[:baseline] = params[:baseline].to_bool if !params[:baseline].nil?
+		params[:baseline] = params[:baseline].to_bool if !params[:baseline].nil?
+		params[:firstderiv] = params[:firstderiv].to_bool if !params[:firstderiv].nil?
+		params[:secondderiv] = params[:secondderiv].to_bool if !params[:secondderiv].nil?
     params[:cq] = params[:cq].to_bool if !params[:cq].nil?
 
     if params[:step_id].nil? && params[:ramp_id].nil?
@@ -579,11 +633,15 @@ class ExperimentsController < ApplicationController
       params[:raw] = false if params[:raw].nil?
       params[:background] = true if params[:background].nil?
       params[:baseline] = true if params[:baseline].nil?
+			params[:firstderiv] = true if params[:firstderiv].nil?
+			params[:secondderiv] = true if params[:secondderiv].nil?
       params[:cq] = true if params[:cq].nil?
     else #if step_id is specified, only raw data is returned
       params[:raw] = true
       params[:background] = false
       params[:baseline] = false
+			params[:firstderiv] = false
+			params[:secondderiv] = false
       params[:cq] = false
     end
 
@@ -593,7 +651,7 @@ class ExperimentsController < ApplicationController
         if !@first_stage_collect_data.blank?
           last_cycle = FluorescenceDatum.last_cycle(@experiment.id, @first_stage_collect_data.id)
           @partial = (@experiment.running? && last_cycle < @first_stage_collect_data.num_cycles)
-          analyze_required = params[:background] == true || params[:baseline] == true || params[:cq] == true
+          analyze_required = params[:background] == true || params[:baseline] == true || params[:firstderiv] == true || params[:secondderiv] == true || params[:cq] == true
           if analyze_required
             begin
               task_submitted = background_calculate_amplification_data(@experiment, @first_stage_collect_data.id)
@@ -683,6 +741,8 @@ class ExperimentsController < ApplicationController
         attributes = []
         attributes << "background_subtracted_value" if params[:background] == true
         attributes << "baseline_subtracted_value" if params[:baseline] == true
+				attributes << "first_derivative_value" if params[:firstderiv] == true
+				attributes << "second_derivative_value" if params[:secondderiv] == true
         attributes << "fluorescence_value" if params[:raw] == true
         @amplification_data_group = group_by_keynames(@amplification_data, attributes, (params[:cq] == true)? @cts : nil)
 
@@ -1203,7 +1263,7 @@ class ExperimentsController < ApplicationController
     return background("amplification", experiment.id) do
       amplification_data, cts = calculate_amplification_data(experiment, stage_id, experiment.calibration_id)
       #update cache
-      AmplificationDatum.import amplification_data, :on_duplicate_key_update => [:background_subtracted_value,:baseline_subtracted_value]
+      AmplificationDatum.import amplification_data, :on_duplicate_key_update => [:background_subtracted_value,:baseline_subtracted_value,:first_derivative_value,:second_derivative_value]
       AmplificationCurve.import cts, :on_duplicate_key_update => [:ct]
     end
   end
@@ -1258,6 +1318,8 @@ class ExperimentsController < ApplicationController
 #     new julia code
       background_subtracted_results = results["rbbs_ary3"]
       baseline_subtracted_results = results["blsub_fluos"]
+			first_derivative_results = results["dr1_pred"]
+			second_derivative_results = results["dr2_pred"]
       cq_results = results["cq"]
       (0...background_subtracted_results.length).each do |channel|
         num_wells = background_subtracted_results[channel].length
@@ -1266,7 +1328,10 @@ class ExperimentsController < ApplicationController
           (0...num_cycles).each do |cycle_num|
             background_subtracted_value = background_subtracted_results[channel][well_num][cycle_num]
             baseline_subtracted_value = baseline_subtracted_results[channel][well_num][cycle_num]
-            amplification_data << AmplificationDatum.new(:experiment_id=>experiment.id, :stage_id=>stage_id, :sub_type=>sub_type, :sub_id=>sub_id, :channel=>channel+1, :well_num=>well_num+1, :cycle_num=>cycle_num+1, :background_subtracted_value=>background_subtracted_value, :baseline_subtracted_value=>baseline_subtracted_value)
+						first_derivative_value = first_derivative_results[channel][well_num][cycle_num]
+						second_derivative_value = second_derivative_results[channel][well_num][cycle_num]
+            amplification_data << AmplificationDatum.new(:experiment_id=>experiment.id, :stage_id=>stage_id, :sub_type=>sub_type, :sub_id=>sub_id, :channel=>channel+1, :well_num=>well_num+1, :cycle_num=>cycle_num+1, :background_subtracted_value=>background_subtracted_value,
+																												 :baseline_subtracted_value=>baseline_subtracted_value, :first_derivative_value=>first_derivative_value, :second_derivative_value=>second_derivative_value)
           end
         end
         (0...cq_results[channel].length).each do |well_num|
