@@ -126,17 +126,54 @@ limitations under the License.
                 </table>
               </div>
             </div>
-            <div class="targets-set" ng-show="targetsSet.length">
-              <table class="targets-table">
-                <tr ng-repeat="target in targetsSet">
-                  <td>
-                    <span ng-if="color_by==='target'" class="dot" ng-attr-style="background-color: {{COLORS[$index]}}"></span>
-                  </td>
-                  <td>{{target}}</td>
-                  <td class="td-tik" ng-click="targetClick($index)"><span ng-show="!targetsSetHided[$index]"><img src="/images/tik.png"></span></td>
-                </tr>
-              </table>
+
+            <div class="additional-info">
+              <div class="parameters">
+                <div class="header">
+                  Target 01
+                </div>
+                <div>
+                  <table class="parameters-table">
+                    <tr>
+                      <td>Effic:</td>
+                      <td>99.9%</td>
+                    </tr>
+                    <tr>
+                      <td>R2:</td>
+                      <td>.998</td>
+                    </tr>
+                    <tr>
+                      <td>Slop:</td>
+                      <td>3.325%</td>
+                    </tr>
+                    <tr>
+                      <td>Y-Int:</td>
+                      <td>26.474%</td>
+                    </tr>
+                    <tr>
+                      <td>Channel:</td>
+                      <td>1</td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+              <div class="info">
+                B4, Sample A
+              </div>
+              <br><br>
+              <div class="targets-set" ng-show="targetsSet.length">
+                <table class="targets-table">
+                  <tr ng-repeat="target in targetsSet">
+                    <td>
+                      <span ng-if="color_by==='target'" class="dot" ng-attr-style="background-color: {{COLORS[$index]}}"></span>
+                    </td>
+                    <td>{{target}}</td>
+                    <td class="td-tik" ng-click="targetClick($index)"><span ng-show="!targetsSetHided[$index]"><img src="/images/tik.png"></span></td>
+                  </tr>
+                </table>
+              </div>
             </div>
+
           </div>
 
         </div>
