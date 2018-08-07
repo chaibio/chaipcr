@@ -670,9 +670,10 @@ cd ~/julia-compile
 
 mkdir downloadjulia
 cd downloadjulia
-
-wget https://julialang-s3.julialang.org/bin/linux/armv7l/0.6/julia-0.6.2-linux-armv7l.tar.gz
-tar xfvz julia-0.6.2-linux-armv7l.tar.gz
+wget https://julialang-s3.julialang.org/bin/linux/armv7l/0.6/julia-0.6.3-linux-armv7l.tar.gz
+#wget https://julialang-s3.julialang.org/bin/linux/armv7l/0.6/julia-0.6.2-linux-armv7l.tar.gz
+#tar xfvz julia-0.6.2-linux-armv7l.tar.gz
+tar xfvz julia-0.6.3-linux-armv7l.tar.gz
 cp -r julia-*/* /usr/
 
 cd ..
@@ -808,8 +809,13 @@ sync
 fsck /dev/mmcblk1p1 -y -f
 fsck /dev/mmcblk0p1 -y -f
 
-find . -name .git -execdir rm -r {} \;
-find . -name *.o  -exec rm {} \;
+#find . -name .git -execdir rm -r {} \;
+#find . -name *.o  -exec rm {} \;
+
+rm -r /var/cache/apt /var/log/ /opt/scripts /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/include /opt/QtEmbedded/tests /opt/QtEmbedded/mkspecs
+mkdir /var/log/ -p
+find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
+apt update
 
 exit 0
 </command>
