@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version='1.1' encoding='UTF-8'?>
 <project>
   <actions/>
   <description>Restore latest eMMC image to the connected BBB.&#xd;
@@ -19,17 +19,20 @@
           <name>build_machine</name>
           <description></description>
           <defaultValue>10.0.100.240</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>download_prefix</name>
           <description>Download server url. Example: http://10.0.1.20/download</description>
           <defaultValue>http://10.0.1.20/download</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>input_image_prefix</name>
           <description>eMMC name prefix.
 </description>
           <defaultValue>Jessie49Release</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
@@ -172,6 +175,7 @@ echo disable swapping
 swapoff -a
 
 umount /dev/mmcblk0p*
+umount /sdcard/*
 
 lsblk
 if mount | grep mmcblk0
@@ -302,7 +306,7 @@ do
     if ping $build_machine -c 3
     then
     	echo device is finally up !!
-        sleep 30
+        sleep 300
         exit 0
     fi
 done
@@ -312,11 +316,15 @@ exit 1</command>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo device is up now.
+      <command>echo All done.
+
+exit 0
 </command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
   </builders>
   <publishers/>
-  <buildWrappers/>
+  <buildWrappers>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.8"/>
+  </buildWrappers>
 </project>
