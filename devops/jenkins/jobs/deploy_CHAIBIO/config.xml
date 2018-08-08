@@ -416,7 +416,7 @@ apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack
 apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3  || exit 1
 
       echo freeing up some space
-      rm -r /var/cache/apt /var/log/ /opt/scripts /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/include /opt/QtEmbedded/tests /opt/QtEmbedded/mkspecs
+      rm -r /var/cache/apt /var/log/ /opt/scripts /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/tests
 mkdir /var/log/ -p
       find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
       apt update
@@ -590,7 +590,7 @@ rm -r /var/log/*.log
 find . -name .git -execdir rm -r {} \;
 find . -name *.o  -exec rm {} \;
 find / -name .git -execdir rm -r {} \;
-rm -r /var/cache/apt /var/log/ /opt/scripts /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/include /opt/QtEmbedded/tests /opt/QtEmbedded/mkspecs
+rm -r /var/cache/apt /var/log/ /opt/scripts /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/tests
 mkdir /var/log/ -p
 find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
 apt update
