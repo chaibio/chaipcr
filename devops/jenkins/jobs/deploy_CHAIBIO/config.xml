@@ -411,7 +411,24 @@ then
       echo about to start using QpcrAnalysis
       free -m
 
-apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3
+        if [ -e /tmp/mysql.sock ]
+	then
+		echo &quot;MySQL sockets cloned file found&quot;
+	else
+		if [ -e /run/mysqld/mysqld.sock ]
+		then
+			echo &quot;Clonning MySQL sockets file&quot;
+			ln -s /run/mysqld/mysqld.sock /tmp/mysql.sock
+		else
+			echo &quot;MySQL sockets file not found.&quot; 
+		fi
+	fi
+
+export PATH=$PATH:/sbin:/usr/sbin
+export TERM=linux
+echo &apos;debconf debconf/frontend select Noninteractive&apos; | debconf-set-selections
+DEBIAN_FRONTEND=noninteractive apt-get -q -y  install patchelf
+apt-get -q -y  install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3
 
 apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3  || exit 1
 
@@ -555,14 +572,18 @@ test_julia_server()
        then
              echo moving qpcranalysis.so
              date
-             cp /tmp/output/qpcranalysis  chaipcr/bioinformatics/
-             cp /tmp/output/qpcranalysis.so chaipcr/bioinformatics/
-
+             cp /tmp/output/qpcranalysis  /root/chaipcr/bioinformatics/
+             cp /tmp/output/qpcranalysis.so /root/chaipcr/bioinformatics/
              rm -r /tmp/output
 
              echo running with qpcranalysis.so
              JULIA_ENV=production julia  -J /root/chaipcr/bioinformatics/qpcranalysis.so -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;); include(&quot;/root/chaipcr/bioinformatics/juliaserver.jl&quot;)&apos;
              echo exit running with qpcranalysis.so
+             date
+       else
+             echo running without qpcranalysis.so
+             JULIA_ENV=production julia  -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;); include(&quot;/root/chaipcr/bioinformatics/juliaserver.jl&quot;)&apos;
+             echo exit running without qpcranalysis.so
              date
        fi
 }
@@ -571,6 +592,8 @@ test_julia_server &amp;
 echo starting julia server on a different thread
 sleep 1800
 echo julia server testing period due. Cleaning up.
+
+
 pkill -9 julia
 pkill -9 julia
 pkill -9 julia
@@ -579,6 +602,8 @@ pkill -9 julia
 sleep 100
 ps -aux | grep julia
 
+#echo testing building julia  exec.. 
+#exit 1
 exit 0
 </command>
       <execEachLine>false</execEachLine>
@@ -872,7 +897,7 @@ cd
 find . -name .git -execdir rm -r {} \;
 find . -name *.o  -exec rm {} \;
 find / -name .git -execdir rm -r {} \;
-rm -r /var/cache/apt /var/log/ /opt/scripts /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/include /opt/QtEmbedded/tests /opt/QtEmbedded/mkspecs
+rm -r /var/cache/apt /var/log/ /opt/scripts /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/include /opt/QtEmbedded/tests /opt/QtEmbedded/mkspecs ~/julia ~/lib
 mkdir /var/log/ -p
 find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
 apt update
