@@ -238,6 +238,14 @@ ENDSSH
 	 	mkdir tmp || true
         cd tmp
 		git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
+        
+        if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+		then
+   			echo No build branch chosen
+		else
+     		git checkout $branch_param
+		fi
+        
         cd chaipcr || exit 1
         cd web
         echo now at $(pwd)
@@ -645,6 +653,13 @@ fi
 
 git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
 
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+then
+       echo No build branch chosen
+else
+       git checkout $branch_param
+fi
+
 cd /sdcard/upgrade/compile-browser/chaipcr/browser/ || exit 1
 
 rm /sdcard/upgrade/compile-browser/chaipcr/realtime/libraries/lib/libPoco*
@@ -679,7 +694,25 @@ rm -r /sdcard/upgrade/realtime-compile || true
 mkdir -p /sdcard/upgrade/realtime-compile
 cd /sdcard/upgrade/realtime-compile
 
+branch_param=
+
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+then
+        echo No build branch chosen
+else
+         branch_param=&quot;-b $(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
+	echo Cloning branch $branch_param
+fi
+
 git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
+
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+then
+        echo No build branch chosen
+else
+       git checkout $branch_param
+fi
+
 cd /sdcard/upgrade/realtime-compile/chaipcr/realtime || exit 1
 
 cp util/instance.h control/
