@@ -160,12 +160,21 @@ class ExperimentsController < ApplicationController
 
 	api :GET, "/experiments/filter_by_standard", "List all the experiments with well type standard"
 	def filter_by_standard
-		#@experiments = Experiment.includes(:well_layout).where("targets_wells.well_type"=>"standard").order("experiments.id DESC").load
-		@experiments = Experiment.includes(:experiment_definition,:well_layout).where("experiment_definitions.experiment_type"=>[ExperimentDefinition::TYPE_USER_DEFINED, ExperimentDefinition::TYPE_TESTKIT]).order("experiments.id DESC").load
-		respond_to do |format|
-			format.json { render "index", :status => :ok }
-		end
+		@experiments = Experiment.includes(:experiment_definition).where("experiment_definitions.experiment_type"=>[ExperimentDefinition::TYPE_USER_DEFINED, ExperimentDefinition::TYPE_TESTKIT]).order("experiments.id DESC").load
+		@standard_experiments = []
+		index = 0
+		@experiments.each do |experiment|
+			well_layout = WellLayout.for_experiment(experiment.id).first
+			if well_layout.is_a? WellLayout
+				wells = well_layout.standard_well_type
 
+				if !wells.empty?
+					@standard_experiments[index] = experiment
+					index = index+1
+				end
+			end
+		end
+		render :json=>@standard_experiments, :status => :ok
 	end
 
 	swagger_path '/experiments/{id}' do
@@ -618,7 +627,7 @@ class ExperimentsController < ApplicationController
 
   api :GET, "/experiments/:id/amplification_data?raw=false&background=true&baseline=true&firstderiv=true&secondderiv=true&cq=true&step_id[]=43&step_id[]=44", "Retrieve amplification data"
   example "{'partial':false, 'total_cycles':40, 'steps':['step_id':2,
-            'amplification_data':[['channel', 'well_num', 'cycle_num', 'background_subtracted_value', 'baseline_subtracted_value', 'first_derivative_value', 'second_derivative_value' 'fluorescence_value'], [1, 1, 1, 25488, -2003, 34543, 453344, 86], [1, 1, 2, 53984, -409, 56345, 848583, 85]],
+            'amplification_data':[['channel', 'well_num', 'cycle_num', 'background_subtracted_value', 'baseline_subtracted_value', 'dr1_pred', 'dr2_pred' 'fluorescence_value'], [1, 1, 1, 25488, -2003, 34543, 453344, 86], [1, 1, 2, 53984, -409, 56345, 848583, 85]],
             'cq':[['channel', 'well_num', 'cq'], [1, 1, 12.11], [1, 2, 15.77], [1, 3, null]]]}"
   def amplification_data
     params[:raw] = params[:raw].to_bool if !params[:raw].nil?
@@ -741,8 +750,8 @@ class ExperimentsController < ApplicationController
         attributes = []
         attributes << "background_subtracted_value" if params[:background] == true
         attributes << "baseline_subtracted_value" if params[:baseline] == true
-				attributes << "first_derivative_value" if params[:firstderiv] == true
-				attributes << "second_derivative_value" if params[:secondderiv] == true
+				attributes << "dr1_pred" if params[:firstderiv] == true
+				attributes << "dr2_pred" if params[:secondderiv] == true
         attributes << "fluorescence_value" if params[:raw] == true
         @amplification_data_group = group_by_keynames(@amplification_data, attributes, (params[:cq] == true)? @cts : nil)
 
@@ -1070,7 +1079,7 @@ class ExperimentsController < ApplicationController
 
         if amplification_data
           out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/amplification.csv")
-          columns = ["baseline_subtracted_value", "background_subtracted_value", "fluorescence_value", "channel", "well_num", "well_name", "cycle_num"]
+          columns = ["baseline_subtracted_value", "background_subtracted_value", "dr1_pred", "dr2_pred", "fluorescence_value", "channel", "well_num", "well_name", "cycle_num"]
           fluorescence_index = 0
           csv_string = CSV.generate do |csv|
             csv << columns
@@ -1263,7 +1272,7 @@ class ExperimentsController < ApplicationController
     return background("amplification", experiment.id) do
       amplification_data, cts = calculate_amplification_data(experiment, stage_id, experiment.calibration_id)
       #update cache
-      AmplificationDatum.import amplification_data, :on_duplicate_key_update => [:background_subtracted_value,:baseline_subtracted_value,:first_derivative_value,:second_derivative_value]
+      AmplificationDatum.import amplification_data, :on_duplicate_key_update => [:background_subtracted_value,:baseline_subtracted_value,:dr1_pred,:dr2_pred]
       AmplificationCurve.import cts, :on_duplicate_key_update => [:ct]
     end
   end
@@ -1293,7 +1302,7 @@ class ExperimentsController < ApplicationController
       body = {calibration_info: calibrate_hash(calibration_id), experiment_id: experiment.id}
       body = body.merge(experiment.experiment_definition.amplification_option.to_hash) if !experiment.experiment_definition.amplification_option.nil?
       logger.info("body=#{body}")
-      response = HTTParty.post("http://127.0.0.1:8081/experiments/#{experiment.id}/amplification", body: body.to_json)
+      response = HTTParty.post("http://127.0.0.1:8081/experiments/#{experiment.id}/amplification", body: body.to_json, timeout: 180)
       if response.code != 200
         raise_julia_error(response)
       else
@@ -1328,10 +1337,10 @@ class ExperimentsController < ApplicationController
           (0...num_cycles).each do |cycle_num|
             background_subtracted_value = background_subtracted_results[channel][well_num][cycle_num]
             baseline_subtracted_value = baseline_subtracted_results[channel][well_num][cycle_num]
-						first_derivative_value = first_derivative_results[channel][well_num][cycle_num]
-						second_derivative_value = second_derivative_results[channel][well_num][cycle_num]
+						dr1_pred = first_derivative_results[channel][well_num][cycle_num]
+						dr2_pred = second_derivative_results[channel][well_num][cycle_num]
             amplification_data << AmplificationDatum.new(:experiment_id=>experiment.id, :stage_id=>stage_id, :sub_type=>sub_type, :sub_id=>sub_id, :channel=>channel+1, :well_num=>well_num+1, :cycle_num=>cycle_num+1, :background_subtracted_value=>background_subtracted_value,
-																												 :baseline_subtracted_value=>baseline_subtracted_value, :first_derivative_value=>first_derivative_value, :second_derivative_value=>second_derivative_value)
+																												 :baseline_subtracted_value=>baseline_subtracted_value, :dr1_pred=>dr1_pred, :dr2_pred=>dr2_pred)
           end
         end
         (0...cq_results[channel].length).each do |well_num|

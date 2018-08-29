@@ -187,7 +187,13 @@ start_julia () {
 		while true
 		do
 			echo starting julia
-			JULIA_ENV=production julia -e 'push!(LOAD_PATH, "/root/chaipcr/bioinformatics/QpcrAnalysis/"); include("/root/chaipcr/bioinformatics/juliaserver.jl")' || true
+			if [ -e  /root/chaipcr/bioinformatics/qpcranalysis.so ]
+			then
+				echo starting with precompiled QpcrAnalysis package.
+				JULIA_ENV=production julia -J /root/chaipcr/bioinformatics/qpcranalysis.so -e 'push!(LOAD_PATH, "/root/chaipcr/bioinformatics/QpcrAnalysis/"); include("/root/chaipcr/bioinformatics/juliaserver.jl")' || true
+			else
+				JULIA_ENV=production julia -e 'push!(LOAD_PATH, "/root/chaipcr/bioinformatics/QpcrAnalysis/"); include("/root/chaipcr/bioinformatics/juliaserver.jl")' || true
+			fi
 			echo julia exit
 			sleep 10
 		done

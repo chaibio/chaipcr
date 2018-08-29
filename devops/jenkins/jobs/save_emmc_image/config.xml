@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version='1.1' encoding='UTF-8'?>
 <project>
   <actions/>
   <description>Creates a factory settings image from for connected BBB.&#xd;
@@ -20,6 +20,7 @@
           <name>build_machine</name>
           <description></description>
           <defaultValue>10.0.100.240</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>local_download_folder</name>
@@ -29,22 +30,26 @@ or
 Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
 </description>
           <defaultValue>/usr/share/nginx/html/download</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>download_prefix</name>
           <description>Download server url. Example: http://10.0.1.20/download</description>
           <defaultValue>http://10.0.1.20/download</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sdcard_filename</name>
           <description>sdcard default filename</description>
           <defaultValue></defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>output_image_prefix</name>
           <description>Class of the upgrade image generated during this process. Could be empty, kernel44, kernel49, kernel 41, kernel 38, allthirdparty, or release.
 </description>
           <defaultValue>fresh</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>no_factorysettings_sdcard</name>
@@ -57,11 +62,13 @@ Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
 /dev/sdb to write directly to a physical sdcard.
 or /tmp/sdcard_image.img to export a factory settings sdcard image.</description>
           <defaultValue>/tmp/${BUILD_NUMBER}/sdcard_${BUILD_NUMBER}.img</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>build_branch</name>
           <description>branch contains building scripts</description>
           <defaultValue>branches/julia</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
@@ -302,7 +309,7 @@ shutdown -r 1
     <hudson.tasks.Shell>
       <command>#!/bin/bash
 echo waiting for a restart
-sleep 120
+sleep 620
 for i in {0..1200..60}
 do
 	echo &quot;Waiting for the build device to become ready! $i&quot;
