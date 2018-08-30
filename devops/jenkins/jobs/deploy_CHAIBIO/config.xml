@@ -31,6 +31,11 @@
           <defaultValue></defaultValue>
           <maxTags></maxTags>
         </hudson.scm.listtagsparameter.ListSubversionTagsParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>is_dev</name>
+          <description>Build a development image.</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -238,6 +243,14 @@ ENDSSH
 	 	mkdir tmp || true
         cd tmp
 		git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
+        
+        if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+		then
+   			echo No build branch chosen
+		else
+     		git checkout $branch_param
+		fi
+        
         cd chaipcr || exit 1
         cd web
         echo now at $(pwd)
@@ -305,19 +318,27 @@ systemctl start mysql.service
 
 sync
 cd
+
 echo unmounting any sdcard folders
 swapoff -a
 umount /sdcard/*
 umount /dev/mmcblk0p*
 
+if $is_dev
+then
+      echo Building a debug image
+else
+      echo Formatting disk!  
 LC_ALL=C /sbin/sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
 ,,0x83,*
 __EOF__
-
 /sbin/partprobe /dev/mmcblk0
 /sbin/mkfs.ext4 /dev/mmcblk0p1 -F
-mkdir -p /sdcard/upgrade || true
-if mount /dev/mmcblk0p1 /sdcard/upgrade/
+
+fi
+
+mkdir -p /sdcard/factory || true
+if mount /dev/mmcblk0p1 /sdcard/factory/
 then
     echo &quot;temp sdcard folder mounted&quot;
 else
@@ -325,8 +346,11 @@ else
    exit 1
 fi
 
+rm -r /sdcard/upgrade
+ln -s /sdcard/factory /sdcard/upgrade
+
 # creating a temporary swap file on sdcard
-if fallocate -l 2G /sdcard/upgrade/swapfile #or dd if=/dev/zero of=/sdcard/upgrade/swapfile bs=10M count=300
+if fallocate -l 2G /sdcard/factory/swapfile #or dd if=/dev/zero of=/sdcard/factory/swapfile bs=10M count=300
 then
     echo &quot;swap file created successfully&quot;
 else
@@ -334,15 +358,16 @@ else
    exit 1
 fi
 
-sudo chmod 600 /sdcard/upgrade/swapfile
-sudo mkswap /sdcard/upgrade/swapfile
-sudo swapon /sdcard/upgrade/swapfile
+sudo chmod 600 /sdcard/factory/swapfile
+sudo mkswap /sdcard/factory/swapfile
+sudo swapon /sdcard/factory/swapfile
 
 #verifying swap file is successfully added
 sudo swapon -s
 
 free -m
-</command>
+
+exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
@@ -411,20 +436,46 @@ then
       echo about to start using QpcrAnalysis
       free -m
 
-apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3
+        if [ -e /tmp/mysql.sock ]
+	then
+		echo &quot;MySQL sockets cloned file found&quot;
+	else
+		if [ -e /run/mysqld/mysqld.sock ]
+		then
+			echo &quot;Clonning MySQL sockets file&quot;
+			ln -s /run/mysqld/mysqld.sock /tmp/mysql.sock
+		else
+			echo &quot;MySQL sockets file not found.&quot; 
+		fi
+	fi
+
+export PATH=$PATH:/sbin:/usr/sbin
+export TERM=linux
+echo &apos;debconf debconf/frontend select Noninteractive&apos; | debconf-set-selections
+DEBIAN_FRONTEND=noninteractive apt-get -q -y  install patchelf
+apt-get -q -y  install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3
 
 apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3  || exit 1
 
+if $is_dev
+then
+      echo Building a debug image
+      julia_pkgdir=&quot;/sdcard/factory&quot;
+     export JULIA_PKGDIR=/sdcard/factory/.julia
+else
       echo freeing up some space
       rm -r /var/cache/apt /var/log/ /opt/scripts /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/tests
-mkdir /var/log/ -p
+      mkdir /var/log/ -p
       find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
       apt update
+      julia_pkgdir=&quot;/root&quot;
+      export JULIA_PKGDIR=/root/.julia
+fi
 
       JULIA_ENV=production julia -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;);reload(&quot;QpcrAnalysis&quot;);using QpcrAnalysis;&apos; --compile=all
 
       echo tested using QpcrAnalysis
-      if [ -e /root/.julia/lib/v0.6/QpcrAnalysis.ji ]
+      if [ -e ${julia_pkgdir}/.julia/lib/v0.6/QpcrAnalysis.ji ]
       then
             echo QpcrAnalysis package precompiled.
       else
@@ -434,12 +485,12 @@ mkdir /var/log/ -p
 
 julia -e &apos;Pkg.add(&quot;BuildExecutable&quot;);Pkg.checkout(&quot;BuildExecutable&quot;)&apos;
 
-cd /root/.julia/v0.6/BuildExecutable/src/
+cd ${julia_pkgdir}/.julia/v0.6/BuildExecutable/src/
 
 cat &lt;&lt; &apos;EOF&apos; &gt;  add_catch.patch
 
---- /root/.julia/v0.6/BuildExecutable/src/BuildExecutable.jl	2018-05-29 22:08:45.271522602 +0000
-+++ /root/.julia/v0.6/BuildExecutable/src/BuildExecutable.jl	2018-05-29 20:48:13.108040252 +0000
+--- src/BuildExecutable.jl	2018-05-29 22:08:45.271522602 +0000
++++ src/BuildExecutable.jl	2018-05-29 20:48:13.108040252 +0000
 @@ -143,10 +143,13 @@
      run(cmd)
      println()
@@ -555,14 +606,18 @@ test_julia_server()
        then
              echo moving qpcranalysis.so
              date
-             cp /tmp/output/qpcranalysis  chaipcr/bioinformatics/
-             cp /tmp/output/qpcranalysis.so chaipcr/bioinformatics/
-
+             cp /tmp/output/qpcranalysis  /root/chaipcr/bioinformatics/
+             cp /tmp/output/qpcranalysis.so /root/chaipcr/bioinformatics/
              rm -r /tmp/output
 
              echo running with qpcranalysis.so
              JULIA_ENV=production julia  -J /root/chaipcr/bioinformatics/qpcranalysis.so -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;); include(&quot;/root/chaipcr/bioinformatics/juliaserver.jl&quot;)&apos;
              echo exit running with qpcranalysis.so
+             date
+       else
+             echo running without qpcranalysis.so
+             JULIA_ENV=production julia  -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;); include(&quot;/root/chaipcr/bioinformatics/juliaserver.jl&quot;)&apos;
+             echo exit running without qpcranalysis.so
              date
        fi
 }
@@ -571,6 +626,8 @@ test_julia_server &amp;
 echo starting julia server on a different thread
 sleep 1800
 echo julia server testing period due. Cleaning up.
+
+
 pkill -9 julia
 pkill -9 julia
 pkill -9 julia
@@ -579,13 +636,21 @@ pkill -9 julia
 sleep 100
 ps -aux | grep julia
 
+#echo testing building julia  exec.. 
+#exit 1
 exit 0
 </command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo cleaning misc. file
+      <command>if $is_dev
+then
+      echo Building a debug image
+      exit 0
+fi
+
+echo cleaning misc. file
 rm -r /var/log/*.log
 find . -name .git -execdir rm -r {} \;
 find . -name *.o  -exec rm {} \;
@@ -602,7 +667,7 @@ exit 0
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo browser compile
-cd /sdcard/upgrade/
+cd /sdcard/factory/
 rm -r compile-browser || true
 mkdir compile-browser
 cd compile-browser/
@@ -620,11 +685,18 @@ fi
 
 git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
 
-cd /sdcard/upgrade/compile-browser/chaipcr/browser/ || exit 1
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+then
+       echo No build branch chosen
+else
+       git checkout $branch_param
+fi
 
-rm /sdcard/upgrade/compile-browser/chaipcr/realtime/libraries/lib/libPoco*
-rm /sdcard/upgrade/compile-browser/chaipcr/realtime/libraries/lib/libboost*
-rm /sdcard/upgrade/compile-browser/chaipcr/realtime/libraries/lib/libsoci*
+cd /sdcard/factory/compile-browser/chaipcr/browser/ || exit 1
+
+rm /sdcard/factory/compile-browser/chaipcr/realtime/libraries/lib/libPoco*
+rm /sdcard/factory/compile-browser/chaipcr/realtime/libraries/lib/libboost*
+rm /sdcard/factory/compile-browser/chaipcr/realtime/libraries/lib/libsoci*
 
 /opt/QtEmbedded/bin/qmake || exit 1
 sed -i &quot;s/arm-unknown-linux-gnueabi-//&quot; Makefile
@@ -635,9 +707,15 @@ make install || exit 1
 #cp realtime ~/tmp
 #cp libraries/lib/* /usr/lib/
 
-cd /sdcard/upgrade/
-rm -r compile-browser
-cd
+if $is_dev
+then
+      echo Building a debug image
+else
+      cd /sdcard/factory/
+      rm -r compile-browser
+     cd
+fi
+
 echo done compiling browser
 </command>
       <execEachLine>false</execEachLine>
@@ -646,16 +724,34 @@ echo done compiling browser
       <siteName>root@$build_machine:22</siteName>
       <command>echo compiling realtime
 
-cd /sdcard/upgrade/
+cd /sdcard/factory/
 free -m
 sync
 
-rm -r /sdcard/upgrade/realtime-compile || true
-mkdir -p /sdcard/upgrade/realtime-compile
-cd /sdcard/upgrade/realtime-compile
+rm -r /sdcard/factory/realtime-compile || true
+mkdir -p /sdcard/factory/realtime-compile
+cd /sdcard/factory/realtime-compile
+
+branch_param=
+
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+then
+        echo No build branch chosen
+else
+         branch_param=&quot;-b $(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
+	echo Cloning branch $branch_param
+fi
 
 git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
-cd /sdcard/upgrade/realtime-compile/chaipcr/realtime || exit 1
+
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+then
+        echo No build branch chosen
+else
+       git checkout $branch_param
+fi
+
+cd /sdcard/factory/realtime-compile/chaipcr/realtime || exit 1
 
 cp util/instance.h control/
 sed -i &quot;s/dataSapce/dataSpace/&quot; app/experimentcontroller.cpp
@@ -674,7 +770,13 @@ make install || exit 1
 #cp realtime ~/tmp
 cp libraries/lib/* /usr/lib/
 cd
-rm -r /sdcard/upgrade/realtime-compile
+
+if $is_dev
+then
+      echo Building a debug image
+else
+      rm -r /sdcard/factory/realtime-compile
+fi
 
 echo  Deploy realtime to ~/tmp
 cp ~/chaipcr/deploy/device/realtime.service /lib/systemd/system/
@@ -791,7 +893,12 @@ mkdir -p /boot/dts/
 mkdir -p /lib/firmware/
 
 ./install_debian.sh
-apt-get  -y -q --purge autoremove device-tree-compiler
+if $is_dev
+then
+      echo Building a debug image
+else
+      apt-get  -y -q --purge autoremove device-tree-compiler
+fi
 modprobe -i tilcdc
 
 echo done installing LCD driver.
@@ -867,12 +974,18 @@ echo clearing more space and removing .git julia folders
 
 apt-get -q -y --fix-broken install
 
-rm /sdcard/upgrade/swapfile
+rm /sdcard/factory/swapfile
 cd
+
+if $is_dev
+then
+      echo Building a debug image
+      exit 0
+fi
 find . -name .git -execdir rm -r {} \;
 find . -name *.o  -exec rm {} \;
 find / -name .git -execdir rm -r {} \;
-rm -r /var/cache/apt /var/log/ /opt/scripts /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/include /opt/QtEmbedded/tests /opt/QtEmbedded/mkspecs
+rm -r /var/cache/apt /var/log/ /opt/scripts /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/include /opt/QtEmbedded/tests /opt/QtEmbedded/mkspecs ~/julia ~/lib
 mkdir /var/log/ -p
 find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
 apt update
@@ -884,6 +997,11 @@ exit 0</command>
       <siteName>root@$build_machine:22</siteName>
       <command>echo cleanup to free up some space
 df -h
+if $is_dev
+then
+      echo Building a debug image
+      exit 0
+fi
 
 for retryloop in 1 2 3
 do
@@ -905,7 +1023,8 @@ apt-get  -y -q --purge autoremove gfortran* git i2c-tools
 apt-get  -y -q --purge autoremove icu-devtools
 apt-get -y -q remove qt4-default qt5-default gettext
 DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge libgtk-3-0
-DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge gcc-4.9 cmake DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge python2*
+DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge gcc-4.9 cmake
+DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge python2*
 
 apt-get autoremove -y --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data
 
@@ -922,8 +1041,6 @@ then
 else
     apt-get -q -y install hdf5-tools
 fi
-
-
 
 df -h
 
@@ -994,10 +1111,20 @@ exit 1
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo device is still connectable!
+
+if $is_dev
+then
+      echo Building a debug image
+      exit 0
+fi
+
 cd
 echo unmounting any sdcard folders
 umount /sdcard/*
 umount /dev/mmcblk0p*
+
+rm -r /sdcard/upgrade
+mkdir -p /sdcard/upgrade/
 
 echo cleaning up sdcard
 LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
@@ -1012,7 +1139,7 @@ sync
  fsck /dev/mmcblk1p1 -y -f
  fsck /dev/mmcblk0p1 -y -f
 
-mount /dev/mmcblk0p1 /sdcard/upgrade/
+mount /dev/mmcblk0p1 /sdcard/factory/
 
 df -h
 

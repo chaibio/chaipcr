@@ -30,6 +30,11 @@
           <defaultValue>http://10.0.1.20/download</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>is_dev</name>
+          <description>Build a development image</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -156,55 +161,11 @@ then
   echo &quot;Error: can&apos;t unmount sdcard!&quot;
   exit 1
 fi
-dpkg --configure -a</command>
+dpkg --configure -a
+
+exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <hudson.tasks.Shell>
-      <command>#!/bin/bash
-# waiting 20min for the bulding device to flash
-echo &quot;Waiting for the build device ($build_machine) to flash and become ready!&quot;
-#sleep 1500
-
-for i in {0..1200..60}
-do
-	echo &quot;Waiting for the build device ($build_machine) to become ready! $i&quot;
-	sleep 60
-
-	if ping $build_machine -c 2
-    then
-    	echo device is finally up !!
-        sleep 60
-        
-		ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
-		ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
-		echo $build_machine device is connectable.. 
-		lsblk
-		exit 0
-ENDSSH
-
-		sleep 10
-		echo returned to host. connection check:
-		counter=0
-		until ssh -t root@$build_machine &apos;exit 0&apos;
-		do
-			counter=$(( $counter + 1 ))
-    		if [ $counter -gt 20 ]
-    		then
-    			echo Beaglebone is not available.
-    			exit 1
-		    fi
-			echo waiting for ssh on beaglebone to become connectable.
-			sleep 10
-		done
-		echo ssh is connectable.
-        sleep 10
-        exit 0
-    fi
-done
-
-echo timeout waiting for the device to become ready!
-exit 1</command>
-    </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>#	echo update sources# if not updated?
@@ -365,6 +326,49 @@ echo done resetting mysql password
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
+      <command>echo unmounting any sdcard folders and creating swap file
+umount /sdcard/*
+umount /dev/mmcblk0p*
+
+LC_ALL=C /sbin/sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
+,,0x83,*
+__EOF__
+
+/sbin/partprobe /dev/mmcblk0
+/sbin/mkfs.ext4 /dev/mmcblk0p1 -F
+mkdir -p /sdcard/factory
+if mount /dev/mmcblk0p1 /sdcard/factory/
+then
+    echo &quot;temp sdcard folder mounted&quot;
+else
+   echo &quot;Error mounting temp sdcard folder&quot;
+   exit 1
+fi
+
+rm -r /sdcard/upgrade
+ln -s /sdcard/factory /sdcard/upgrade
+
+# creating a temporary swap file on sdcard
+if fallocate -l 2G /sdcard/factory/swapfile #or dd if=/dev/zero of=/sdcard/factory/swapfile bs=10M count=300
+then
+    echo &quot;swap file created successfully&quot;
+else
+   echo &quot;failed creating swap file&quot;
+   exit 1
+fi
+
+sudo chmod 600 /sdcard/factory/swapfile
+sudo mkswap /sdcard/factory/swapfile
+sudo swapon /sdcard/factory/swapfile
+
+#verifying swap file is successfully added
+sudo swapon -s
+
+free -m</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
       <command>echo Update Software
 apt-key update
 apt-get update
@@ -414,6 +418,12 @@ cd ~
 
 #http://downloads.sourceforge.net/project/soci/soci/soci-3.2.2/soci-3.2.2.tar.gz?r=&amp;ts=1481630635&amp;use_mirror=netix
 #wget &quot;http://downloads.sourceforge.net/project/soci/soci/soci-3.2.2/soci-3.2.2.tar.gz&quot;
+if $is_dev
+then
+      echo Building a debug image
+      cd /sdcard/factory/
+fi
+
 wget &quot;http://netix.dl.sourceforge.net/project/soci/soci/soci-3.2.2/soci-3.2.2.tar.gz&quot;
 tar xpvzf soci-3.2.2.tar.gz
 dpkg --configure -a
@@ -422,8 +432,16 @@ cmake -DCMAKE_BUILD_TYPE=Release -DSOCI_STATIC=OFF -DSOCI_TESTS=OFF -DWITH_SQLIT
 make || exit 1
 make install || exit 1
 cd ..
-rm -rf soci-3.2.2*
+
 dpkg --configure -a
+
+if $is_dev
+then
+      echo Building a debug image
+else
+     rm -rf soci-3.2.2*
+fi
+
 df -h
 exit 0
 
@@ -431,26 +449,6 @@ exit 0
 </command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <hudson.tasks.Shell>
-      <command>#!/bin/bash
-sleep 60
-echo waiting for a restart
-for i in {0..300..60}
-do
-	echo &quot;Waiting for the build device to become ready! $i&quot;
-	sleep 60
-    if ping $build_machine -c 1
-    then
-    	echo device is finally up !!
-        sleep 30
-        exit 0
-    fi
-done
-
-echo timeout waiting for the device to become ready!
-exit 1
-</command>
-    </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo arranging to build julia and different libs
@@ -486,6 +484,12 @@ exit 0</command>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo installing POCO
+if $is_dev
+then
+      echo Building a debug image
+      cd /sdcard/factory/
+fi
+
 wget &quot;http://pocoproject.org/releases/poco-1.6.1/poco-1.6.1.tar.gz&quot;  || exit 1
 tar xpvzf poco-1.6.1.tar.gz  || exit 1
 cd poco-1.6.1
@@ -497,7 +501,14 @@ rm /usr/local/lib/libPoco* || true
 
 make install || exit 1
 cd ..
-rm -rf poco-1.6.1* poco-1.6.1.tar.gz
+
+if $is_dev
+then
+      echo Building a debug image
+else
+      rm -rf poco-1.6.1* poco-1.6.1.tar.gz
+fi
+
 
 sync
 fsck /dev/mmcblk1p1 -y -f
@@ -616,42 +627,6 @@ echo 1500 &gt; /proc/sys/kernel/hung_task_timeout_secs
 # add gfortran link to search path. 
 ln -s /usr/lib/gcc/arm-linux-gnueabihf/4.9/libgfortran.so /usr/lib/libgfortran.so
 
-cd
-echo unmounting any sdcard folders
-umount /sdcard/*
-umount /dev/mmcblk0p*
-
-LC_ALL=C /sbin/sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
-,,0x83,*
-__EOF__
-
-/sbin/partprobe /dev/mmcblk0
-/sbin/mkfs.ext4 /dev/mmcblk0p1 -F
-mkdir -p /sdcard/upgrade
-if mount /dev/mmcblk0p1 /sdcard/upgrade/
-then
-    echo &quot;temp sdcard folder mounted&quot;
-else
-   echo &quot;Error mounting temp sdcard folder&quot;
-   exit 1
-fi
-
-# creating a temporary swap file on sdcard
-if fallocate -l 2G /sdcard/upgrade/swapfile #or dd if=/dev/zero of=/sdcard/upgrade/swapfile bs=10M count=300
-then
-    echo &quot;swap file created successfully&quot;
-else
-   echo &quot;failed creating swap file&quot;
-   exit 1
-fi
-
-sudo chmod 600 /sdcard/upgrade/swapfile
-sudo mkswap /sdcard/upgrade/swapfile
-sudo swapon /sdcard/upgrade/swapfile
-
-#verifying swap file is successfully added
-sudo swapon -s
-
 free -m
 apt-get -q -y install libnlopt0
 apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3
@@ -665,8 +640,8 @@ fi
 
 apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3  || exit 1
 
-mkdir -p ~/julia-compile
-cd ~/julia-compile
+mkdir -p /sdcard/factory/julia-compile
+cd /sdcard/factory/julia-compile
 
 mkdir downloadjulia
 cd downloadjulia
@@ -678,10 +653,19 @@ cp -r julia-*/* /usr/
 
 cd ..
 rm -r downloadjulia
-
 sync
 
-echo &quot;export JULIA_PKGDIR=/root/.julia&quot;&gt;&gt;~/.profile
+if $is_dev
+then
+      echo Building a debug image
+      echo &quot;export JULIA_PKGDIR=/sdcard/factory/.julia&quot;&gt;&gt;~/.profile
+      export JULIA_PKGDIR=/sdcard/factory/.julia
+else
+      echo Formatting disk!  
+      echo &quot;export JULIA_PKGDIR=/root/.julia&quot;&gt;&gt;~/.profile
+      export JULIA_PKGDIR=/root/.julia
+fi
+
 source ~/.profile
 sync
 sleep 60
@@ -736,7 +720,7 @@ else
 fi
 
 cd
-rm -r ~/julia-compile
+rm -r /sdcard/factory/julia-compile
 sync
 
 sync
@@ -754,7 +738,15 @@ echo &quot;Setting up Julia: Initializing rep&quot;
 
 cd /tmp
 wget https://github.com/chaibio/chaipcr/raw/julia/bioinformatics/setup.jl
-rm -r ~/.julia
+if $is_dev
+then
+      echo Building a debug image
+      rm -r /sdcard/factory/.julia
+else
+      rm -r ~/.julia
+fi
+
+
 julia -e &apos;include(&quot;/tmp/setup.jl&quot;)&apos;
 
 apt-get -y -q install libglib2.0-0
@@ -797,7 +789,16 @@ else
 fi
 
 rm chaibio_packages.jl
-sed -i &apos;s/is_nullable = mysql_is/is_nullable = false # mysql_is/&apos; /root/.julia/v0.6/MySQL/src/types.jl
+
+cd /tmp
+wget https://github.com/chaibio/chaipcr/raw/julia/bioinformatics/setup.jl
+if $is_dev
+then
+      echo Building a debug image
+      sed -i &apos;s/is_nullable = mysql_is/is_nullable = false # mysql_is/&apos; /sdcard/factory/.julia/v0.6/MySQL/src/types.jl
+else
+      sed -i &apos;s/is_nullable = mysql_is/is_nullable = false # mysql_is/&apos; /root/.julia/v0.6/MySQL/src/types.jl
+fi
 
 echo test finished. cleaning..
 sync
@@ -811,6 +812,12 @@ fsck /dev/mmcblk0p1 -y -f
 
 #find . -name .git -execdir rm -r {} \;
 #find . -name *.o  -exec rm {} \;
+
+if $is_dev
+then
+      echo Building a debug image
+      exit 0
+fi
 
 rm -r /var/cache/apt /var/log/ /opt/scripts /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/tests
 mkdir /var/log/ -p
@@ -830,7 +837,7 @@ apt-get update
 apt-get install -y -q libfontconfig1-dev libfreetype6-dev
 
 echo downloading compiled QT v4.8.6
-cd /sdcard/upgrade/
+cd /sdcard/factory/
 #wget $download_prefix/qt-everywhere-compiled-4.8.6.tgz
 wget $download_prefix/qt-everywhere-slim-4.8.6.tgz
 tar xfv qt-everywhere-slim-4.8.6.tgz
@@ -846,17 +853,22 @@ echo downloading QT binaries
 mv opt/QtEmbedded /opt
 rm -r /opt/QtEmbedded/examples/
 
-cd /sdcard/upgrade/
-rm -r qt-everywhere-opensource-src-4.8.6
-rm qt-everywhere-compiled-4.8.6.tgz
-rm qt-everywhere-slim-4.8.6.tgz
-rm -r tslib-compile
-rm -r opt
-cd
 cp /opt/QtEmbedded/bin /usr/lib/arm-linux-gnueabihf/qt4/ -r || true
 
 echo done installing QT to /opt/
 
+if $is_dev
+then
+      echo Building a debug image
+else
+    cd /sdcard/factory/
+    rm -r qt-everywhere-opensource-src-4.8.6
+    rm qt-everywhere-compiled-4.8.6.tgz
+    rm qt-everywhere-slim-4.8.6.tgz
+    rm -r tslib-compile
+    rm -r opt
+    cd
+fi
 sync
 </command>
       <execEachLine>false</execEachLine>
@@ -889,7 +901,7 @@ exit 0
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>#echo cleaning julia build
-#cd /sdcard/upgrade
+#cd /sdcard/factory
 #rm -r julia-compile
 #sync
 
