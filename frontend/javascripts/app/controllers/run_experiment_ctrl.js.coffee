@@ -33,6 +33,8 @@ window.ChaiBioTech.ngApp.controller 'RunExperimentCtrl', [
       switch chart
         when 'amplification'
           return Experiment.hasAmplificationCurve($scope.experiment)
+        when 'standard-curve'
+          return Experiment.hasStandardCurve($scope.experiment)
         when 'melt-curve'
           return Experiment.hasMeltCurve($scope.experiment)
         when 'temperature-logs'
@@ -49,6 +51,7 @@ window.ChaiBioTech.ngApp.controller 'RunExperimentCtrl', [
       if !hasChart($scope.chart)
         chart = null
         chart = 'amplification' if Experiment.hasAmplificationCurve($scope.experiment)
+        chart = 'standard-curve' if Experiment.hasStandardCurve($scope.experiment)
         chart = 'melt-curve' if Experiment.hasMeltCurve($scope.experiment) and !chart
         chart = 'temperature-logs' if !chart
         changeChart(chart)

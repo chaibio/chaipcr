@@ -209,6 +209,10 @@ window.ChaiBioTech.ngApp
       stages = exp.protocol.stages
       return stages.some((val) => val.stage.name is "Cycling Stage")
 
+    self.hasStandardCurve = (exp) ->
+      stages = exp.protocol.stages
+      return stages.some((val) => val.stage.name is "Cycling Stage")
+
     self.hasMeltCurve = (exp) ->
       stages = exp.protocol.stages
       return stages.some((val) => val.stage.name is "Melt Curve Stage")
