@@ -537,7 +537,7 @@
       border: none;
       font-family: 'dinot-Regular';
       font-size: 16px;
-      width: 140px;
+      //width: 140px;
     }
     table {
       width: 100%;
@@ -581,6 +581,11 @@
         }
       }
     }
+  }
+
+  .omit_checkbox {
+    color: red;
+    width: 50px !important;
   }
   .experiment-start-stop-buttons {
     padding: 15px;

@@ -184,7 +184,9 @@ limitations under the License.
         <table>
           <tbody>
             <tr>
-              <th class="B1" style="border-left:none">Well</th>
+              <th class="B1" style="border-left:none">Clr</th>
+              <th class="B1">Omit</th>
+              <th class="B1">Well</th>
               <th class="B1">Sample</th>
               <th class="B1">Type</th>
               <th class="B1">Target</th>
@@ -193,10 +195,18 @@ limitations under the License.
                 <span ng-if="!is_dual_channel">Cq</span>
               </th>
               <th class="B1" ng-class="{'channel-2': color_by === 'channel'}" ng-if="is_dual_channel">Cq Ch2</th>
+              <th class="B1">Qty</th>
+              <th class="B1">Qty M</th>
             </tr>
             <tr ng-repeat="i in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" ng-class="{selected: (wellButtons['well_'+i].selected)}">
               <td class="B1" ng-class="{'text-center': color_by==='channel'}">
                 <span ng-if="color_by==='well'" class="dot" ng-attr-style="background-color: {{wellButtons['well_'+i].color}}"></span>
+                </span>
+              </td>
+              <td>
+                <input type="checkbox" style="width:50px;" ng-click="toggleOmitIndex($index)" /> 
+              </td>
+              <td class="B1" ng-class="{'text-center': color_by==='channel'}">
                 <span class="text">
                   <span ng-show="i < 8">
                     A{{i+1}}
@@ -234,6 +244,8 @@ limitations under the License.
                   {{(wellButtons['well_'+i].ct[1]) | round:2}}
                 </span>
               </td>
+              <td class="B1" ></td>
+              <td class="B1" ></td>
             </tr>
           </tbody>
         </table>

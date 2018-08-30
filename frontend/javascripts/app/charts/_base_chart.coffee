@@ -364,6 +364,7 @@ class BaseChart
     @lines = []
     @activePath = null
     for s in series by 1
+    #  console.log(s)
       @guidingLines.push(@makeGuidingLine(s))
     for s in series by 1
       @lines.push(@makeColoredLine(s))

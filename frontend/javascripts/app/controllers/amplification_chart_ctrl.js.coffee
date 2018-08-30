@@ -73,9 +73,18 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.samplesSet = []
       $scope.editExpNameMode = []
       $scope.editExpTargetMode = []
+      $scope.omittedIndexes = []
 
       modal = document.getElementById('myModal')
       span = document.getElementsByClassName("close")[0]
+
+      $scope.toggleOmitIndex = (omit_index) ->
+        if $scope.omittedIndexes.indexOf(omit_index) != -1
+          $scope.omittedIndexes.splice $scope.omittedIndexes.indexOf(omit_index), 1
+        else
+          $scope.omittedIndexes.push omit_index
+        #alert $scope.omittedIndexes
+        return
 
       $scope.$on 'expName:Updated', ->
         $scope.experiment?.name = expName.name

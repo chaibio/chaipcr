@@ -94,3 +94,4 @@ window.App.directive 'amplificationChart', [
 
     }
 ]
+ 
