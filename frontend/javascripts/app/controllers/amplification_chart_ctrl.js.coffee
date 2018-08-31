@@ -416,8 +416,18 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $timeout ->
             $scope.showAmpliChart = true
           , 1000
+        else if chart is 'standard-curve'
+          fetchFluorescenceData()
+          Experiment.getWells($stateParams.id).then (resp) ->
+            for i in [0...16]
+              $scope.samples[resp.data[i].well.well_num - 1] = resp.data[i].well.sample_name if resp.data[i]
+
+          $timeout ->
+            $scope.showStandardChart = true
+          , 1000
         else
           $scope.showAmpliChart = false
+          $scope.showStandardChart = false
 
       $scope.$on '$destroy', ->
         $interval.cancel(retryInterval) if retryInterval
