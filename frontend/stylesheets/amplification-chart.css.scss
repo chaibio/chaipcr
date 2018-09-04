@@ -265,13 +265,14 @@
   .curve-body {
     background-color: #eee;
     padding: 20px;
-    height: 567px;
+    height: 610px;
     .curve-plot {
       background-color: #fff;
       padding: 10px;
       display: inline-block;
       width: 85%;
       float: left;
+      height: 100%;
     }
     .additional-info {
       position: relative;
@@ -302,11 +303,13 @@
         }
       }
       .info {
-        color: #fff;
-        background-color: #000;
+        color: #595959;
+        // background-color: #000;
         margin-top: 5px;
       }
       .targets-set {
+        position: absolute;
+        bottom: 65px;
         background-color: #fff;
         //margin-left: 20px;
         margin-bottom: -66px;
@@ -339,7 +342,7 @@
     // display: inline-block;
     //padding-right: 20px;
     //padding-left: 20px;
-    width: 65%;
+    // width: 65%;
     margin-left: 0;
     margin-right: 0;
     padding-right: 0;
@@ -505,8 +508,13 @@
     // display: inline-block;
     margin-top: -20px;
     // margin-bottom: -4px;
-    width: 35%;
+    // width: 35%;
     border-left: 2px solid black;
+    overflow: auto;
+    position: absolute;
+    top: 70px;
+    bottom: 50px;
+    right: 0px;
 
 		.sample-span{
 			font-family: 'dinot-Regular';
@@ -529,7 +537,7 @@
 
 		.target-span{
 			font-family: 'dinot-Regular';
-			font-size: 16px;
+      font-size: 16px;
     }
 
     input {
@@ -572,6 +580,12 @@
           .text {
             display: inline-block;
             vertical-align: middle;
+          }
+          .width1 {
+            padding: 10px;
+          }
+          .dummy-placeholder {
+            padding: 25px;
           }
         }
         &.selected {

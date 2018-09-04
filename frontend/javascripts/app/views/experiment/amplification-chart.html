@@ -19,7 +19,7 @@ limitations under the License.
 <div class="amplification-chart-state-active results-charts">
   <div class="page-layout" ng-controller="AmplificationChartCtrl" ng-show="experiment">
     <div class="content row">
-      <div class="chart-section col-xs-6">
+      <div class="chart-section col-lg-8 col-md-8 col-sm-6 col-xs-6">
         <div>
           <div class="curve-header">
             <div class="row">
@@ -180,7 +180,7 @@ limitations under the License.
           <amplification-well-switch ng-model="wellButtons" color-by="color_by" chart-type="amplification"></amplification-well-switch>
         </div>
       </div>
-      <div class="table-container col-xs-6" full-height offset="37+50" style="padding-right: 0; padding-left: 0;">
+      <div class="table-container col-lg-4 col-md-4 col-sm-6 col-xs-6" full-height offset="37+50" style="padding-right: 0; padding-left: 0;">
         <table>
           <tbody>
             <tr>
@@ -235,17 +235,32 @@ limitations under the License.
                 <input type="text" ng-show="editExpTargetMode[$index]" focus-on="editExpTargetMode" ng-blur="updateTarget($index,targets[$index])"  on-shift-enter="updateTargetEnter($index,targets[$index])"  ng-model="targets[$index]">
               </td>
               <td class="B1">
-                <span ng-show="wellButtons['well_'+i].ct[0] > 0">
-                  {{(wellButtons['well_'+i].ct[0]) | round:2}}
+                <span class="width1" >
+                  <span ng-show="wellButtons['well_'+i].ct[0] > 0">
+                    {{(wellButtons['well_'+i].ct[0]) | round:2}}
+                  </span>
                 </span>
               </td>
-              <td class="B1" ng-if="is_dual_channel">
-                <span ng-show="wellButtons['well_'+i].ct[1] > 0">
-                  {{(wellButtons['well_'+i].ct[1]) | round:2}}
+              <td class="B1">
+                <span class="width1" ng-if="is_dual_channel == true">
+                  <span ng-show="wellButtons['well_'+i].ct[1] > 0">
+                    {{(wellButtons['well_'+i].ct[1]) | round:2}}
+                  </span>
+                  <span ng-show="wellButtons['well_'+i].ct[1] <= 0">
+                    <span class="dummy-placeholder"></span>
+                  </span>
+                </span>
+                <span class="width1" ng-if="is_dual_channel == false">
+                  <span class="dummy-placeholder"></span>
                 </span>
               </td>
-              <td class="B1" ></td>
-              <td class="B1" ></td>
+              <td class="B1" >
+              </td>
+              <td class="B1" >
+                <span class="width1">
+                  <span class="dummy-placeholder"></span>
+                </span>
+              </td>
             </tr>
           </tbody>
         </table>

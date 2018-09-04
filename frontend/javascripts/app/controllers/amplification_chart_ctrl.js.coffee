@@ -83,8 +83,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $scope.omittedIndexes.splice $scope.omittedIndexes.indexOf(omit_index), 1
         else
           $scope.omittedIndexes.push omit_index
-        #alert $scope.omittedIndexes
-        return
+        # alert $scope.omittedIndexes
+        # return
+        updateSeries()
 
       $scope.$on 'expName:Updated', ->
         $scope.experiment?.name = expName.name
@@ -336,36 +337,37 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         channel_start = if $scope.channel_1 && $scope.channel_2 then 1 else if $scope.channel_1 && !$scope.channel_2 then 1 else if !$scope.channel_1 && $scope.channel_2 then 2
         for ch_i in [channel_start..channel_end] by 1
           for i in [0..15] by 1
+            if $scope.omittedIndexes.indexOf(i) == -1
+              # alert(i)
+              if buttons["well_#{i}"]?.selected and !$scope.targetsSetHided[$scope.targetsSet.indexOf($scope.targets[i])]
 
-            if buttons["well_#{i}"]?.selected and !$scope.targetsSetHided[$scope.targetsSet.indexOf($scope.targets[i])]
-
-              if $scope.color_by is 'well'
-                well_color = buttons["well_#{i}"].color
-              else if $scope.color_by is 'target'
-                color_number = $scope.targetsSet.indexOf($scope.targets[i])
-                if color_number < 0
-                  well_color = '#000000'
+                if $scope.color_by is 'well'
+                  well_color = buttons["well_#{i}"].color
+                else if $scope.color_by is 'target'
+                  color_number = $scope.targetsSet.indexOf($scope.targets[i])
+                  if color_number < 0
+                    well_color = '#000000'
+                  else
+                    well_color = $scope.COLORS[color_number]
+                else if $scope.color_by is 'sample'
+                  color_number = $scope.samplesSet.indexOf($scope.samples[i])
+                  if color_number < 0
+                    well_color = '#000000'
+                  else
+                    well_color = $scope.COLORS[color_number]
+                else if ch_i is 1
+                  well_color = '#00AEEF'
                 else
-                  well_color = $scope.COLORS[color_number]
-              else if $scope.color_by is 'sample'
-                color_number = $scope.samplesSet.indexOf($scope.samples[i])
-                if color_number < 0
-                  well_color = '#000000'
-                else
-                  well_color = $scope.COLORS[color_number]
-              else if ch_i is 1
-                well_color = '#00AEEF'
-              else
-                well_color = '#8FC742'
+                  well_color = '#8FC742'
 
-              $scope.chartConfig.series.push
-                dataset: "channel_#{ch_i}"
-                x: 'cycle_num'
-                y: "well_#{i}_#{subtraction_type}#{if $scope.curve_type is 'log' then '_log' else ''}"
-                color: well_color
-                cq: $scope.wellButtons["well_#{i}"]?.ct
-                well: i
-                channel: ch_i
+                $scope.chartConfig.series.push
+                  dataset: "channel_#{ch_i}"
+                  x: 'cycle_num'
+                  y: "well_#{i}_#{subtraction_type}#{if $scope.curve_type is 'log' then '_log' else ''}"
+                  color: well_color
+                  cq: $scope.wellButtons["well_#{i}"]?.ct
+                  well: i
+                  channel: ch_i
 
       $scope.onZoom = (transform, w, h, scale_extent) ->
         $scope.ampli_scroll = {
