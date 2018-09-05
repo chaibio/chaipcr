@@ -322,6 +322,12 @@
             min-width: 30px;
             text-align: right;
             cursor: pointer;
+            span {
+              img {
+                width: 10px;
+                height: 10px;
+              }
+            }
           }
         }
       }
@@ -511,10 +517,10 @@
     // width: 35%;
     border-left: 2px solid black;
     overflow: auto;
-    position: absolute;
-    top: 70px;
+    top: 0px;
     bottom: 50px;
     right: 0px;
+    height: 94%;
 
 		.sample-span{
 			font-family: 'dinot-Regular';
