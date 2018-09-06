@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version='1.1' encoding='UTF-8'?>
 <project>
   <actions/>
   <description>Creates a factory settings image from for connected BBB.&#xd;
@@ -20,6 +20,7 @@
           <name>build_machine</name>
           <description></description>
           <defaultValue>10.0.100.240</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>output_sdcard</name>
@@ -27,6 +28,7 @@
 /dev/sdb to write directly to a physical sdcard.
 or /tmp/sdcard_image.img to export a factory settings sdcard image.</description>
           <defaultValue>/tmp/sdcard_${BUILD_NUMBER}.img</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>local_download_folder</name>
@@ -36,27 +38,31 @@ or
 Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
 </description>
           <defaultValue>/usr/share/nginx/html/download</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>download_prefix</name>
           <description>Download server url. Example: http://10.0.1.20/download</description>
           <defaultValue>http://10.0.1.20/download</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sdcard_filename</name>
           <description>sdcard default filename</description>
           <defaultValue></defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>image_prefix</name>
           <description>Class of the upgrade image generated during this process. Could be empty, kernel44, kernel 41, kernel 38, allthirdparty, or release.
 </description>
           <defaultValue>empty</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.3.2">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.5.1">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
@@ -76,7 +82,6 @@ Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <authToken>123</authToken>
   <triggers/>
   <concurrentBuild>false</concurrentBuild>
   <builders>

@@ -374,11 +374,10 @@ exit 0</command>
       <siteName>root@$build_machine:22</siteName>
       <command>echo Maintenance
 df -h
-
+export RAILS_ENV=production
 cd /root/chaipcr/web
 bundle install
 gem install bcrypt -v &apos;3.1.11&apos;
-
 systemctl enable r.service
 echo Setup Rails app
 mkdir -p ~/chaipcr/web/config/
@@ -435,6 +434,7 @@ then
       julia -v
       echo about to start using QpcrAnalysis
       free -m
+      export DEBIAN_FRONTEND=noninteractive
 
         if [ -e /tmp/mysql.sock ]
 	then
@@ -453,9 +453,9 @@ export PATH=$PATH:/sbin:/usr/sbin
 export TERM=linux
 echo &apos;debconf debconf/frontend select Noninteractive&apos; | debconf-set-selections
 DEBIAN_FRONTEND=noninteractive apt-get -q -y  install patchelf
-apt-get -q -y  install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3
+DEBIAN_FRONTEND=noninteractive apt-get -q -y  install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3
 
-apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3  || exit 1
+DEBIAN_FRONTEND=noninteractive apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3  || exit 1
 
 if $is_dev
 then
@@ -464,7 +464,7 @@ then
      export JULIA_PKGDIR=/sdcard/factory/.julia
 else
       echo freeing up some space
-      rm -r /var/cache/apt /var/log/ /opt/scripts /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/tests
+      rm -r /var/cache/apt /var/log/ /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/tests
       mkdir /var/log/ -p
       find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
       apt update
@@ -518,8 +518,9 @@ cat &lt;&lt; &apos;EOF&apos; &gt;  add_catch.patch
 
 EOF
 
-patch -i add_catch.patch
+echo Patching..
 
+patch -i add_catch.patch
 echo done installation.. creating execuitable:
 
 #exit 0
@@ -626,7 +627,8 @@ test_julia_server &amp;
 echo starting julia server on a different thread
 sleep 1800
 echo julia server testing period due. Cleaning up.
-
+rm -r /root/julia/julia6RBinaries/lib/lib/root/
+rm -r /root/lib/root/
 
 pkill -9 julia
 pkill -9 julia
@@ -655,7 +657,7 @@ rm -r /var/log/*.log
 find . -name .git -execdir rm -r {} \;
 find . -name *.o  -exec rm {} \;
 find / -name .git -execdir rm -r {} \;
-rm -r /var/cache/apt /var/log/ /opt/scripts /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/tests
+rm -r /var/cache/apt /var/log/ /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/tests
 mkdir /var/log/ -p
 find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
 apt update
@@ -985,7 +987,7 @@ fi
 find . -name .git -execdir rm -r {} \;
 find . -name *.o  -exec rm {} \;
 find / -name .git -execdir rm -r {} \;
-rm -r /var/cache/apt /var/log/ /opt/scripts /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/include /opt/QtEmbedded/tests /opt/QtEmbedded/mkspecs ~/julia ~/lib
+rm -r /var/cache/apt /var/log/ /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/include /opt/QtEmbedded/tests /opt/QtEmbedded/mkspecs ~/julia ~/lib
 mkdir /var/log/ -p
 find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
 apt update
