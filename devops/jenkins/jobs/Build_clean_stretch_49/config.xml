@@ -1,7 +1,7 @@
 <?xml version='1.1' encoding='UTF-8'?>
 <com.tikal.jenkins.plugins.multijob.MultiJobProject plugin="jenkins-multijob-plugin@1.27">
   <actions/>
-  <description>Flash the BB with a stock Stretch image 49 and add 3rd party software.</description>
+  <description>Flash the BB with a stock Stretch image 4x and add 3rd party software.</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.17.2">
@@ -47,7 +47,7 @@
       <phaseName>Flashing OS</phaseName>
       <phaseJobs>
         <com.tikal.jenkins.plugins.multijob.PhaseJobsConfig>
-          <jobName>flash_empty_4_9_stretch_image</jobName>
+          <jobName>flash_empty_4_x_image</jobName>
           <currParams>true</currParams>
           <exposedSCM>false</exposedSCM>
           <disableJob>false</disableJob>

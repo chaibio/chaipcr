@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version='1.1' encoding='UTF-8'?>
 <com.tikal.jenkins.plugins.multijob.MultiJobProject plugin="jenkins-multijob-plugin@1.27">
   <actions/>
   <description>Repartitions, reformats, burns stock image, and then builds QT and uploads the release binaries and makes them available for reuse from other jobs.</description>
@@ -13,16 +13,19 @@
           <name>build_machine</name>
           <description>IP address of the building beaglebone.</description>
           <defaultValue>10.0.100.240</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>download_prefix</name>
           <description>Download folder URL</description>
           <defaultValue>http://10.0.1.20/download</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>local_download_folder</name>
           <description>Local upload path.</description>
           <defaultValue>/usr/share/nginx/html/download</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
@@ -39,7 +42,7 @@
       <phaseName>Flashing OS</phaseName>
       <phaseJobs>
         <com.tikal.jenkins.plugins.multijob.PhaseJobsConfig>
-          <jobName>flash_empty_4_9_stretch_image</jobName>
+          <jobName>flash_empty_4_x_image</jobName>
           <currParams>true</currParams>
           <exposedSCM>false</exposedSCM>
           <disableJob>false</disableJob>
