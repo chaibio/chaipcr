@@ -19,7 +19,7 @@ limitations under the License.
 <div class="amplification-chart-state-active results-charts">
   <div class="page-layout" ng-controller="AmplificationChartCtrl" ng-show="experiment">
     <div class="content row">
-      <div class="chart-section col-lg-8 col-md-8 col-sm-6 col-xs-6">
+      <div class="chart-section col-lg-8 col-md-8 col-sm-6 col-xs-6" >
         <div>
           <div class="curve-header">
             <div class="row">
@@ -99,9 +99,9 @@ limitations under the License.
             </div>
           </div>
 
-          <div class="curve-body">
+          <div class="curve-body" full-height offset="400" min="500">
             <div class="curve-plot">
-              <div class="chart-container" full-height offset="397" min="389">
+              <div class="chart-container" full-height offset="550" min="389">
                 <div class="chart-error B1" ng-show="retrying && !fetching && error">
                   <strong class="text-black">Unable to load chart data</strong>
                   <p ng-bind="error"></p>
@@ -187,7 +187,7 @@ limitations under the License.
           <amplification-well-switch ng-model="wellButtons" color-by="color_by" chart-type="amplification"></amplification-well-switch>
         </div>
       </div>
-      <div class="table-container col-lg-4 col-md-4 col-sm-6 col-xs-6" style="padding-right: 0; padding-left: 0;">
+      <div class="table-container col-lg-4 col-md-4 col-sm-6 col-xs-6" full-height offset="110" min="808" style="padding-right: 0; padding-left: 0;">
         <table>
           <tbody>
             <tr>
@@ -257,7 +257,7 @@ limitations under the License.
                     {{(wellButtons['well_'+i].ct[1]) | round:2}}
                   </span>
                   <span ng-show="wellButtons['well_'+i].ct[1] <= 0">
-                    <span class="dummy-placeholder"></span>
+                    <span class="dummy-placeholder">&nbsp;</span>
                   </span>
                 </span>
                 <span class="width1" ng-if="!is_dual_channel">
