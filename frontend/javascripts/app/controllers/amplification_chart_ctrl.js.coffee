@@ -445,6 +445,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         updateSeries()
 
       $scope.targetGridTop = ->
-        document.getElementById("curve-plot").clientHeight - 40
+        document.getElementById("curve-plot").clientHeight + 30
 
 ]
