@@ -33,7 +33,7 @@ limitations under the License.
               <div class="col-lg-8 col-md-7 col-sm-7 col-xs-7 ampli-toggles">
                 <div class="row">
                   <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 plot-options">
-                    <div class="subheader-switches SH">
+                    <!-- <div class="subheader-switches SH">
                       <div class="item-switch">
                         <label>Baseline Sub.</label>
                         <switch class="switch" ng-model="baseline_subtraction"></switch>
@@ -49,10 +49,20 @@ limitations under the License.
                         <switch ng-model="channel_2"></switch>
                         <label style="padding-right:0px;">2</label>
                       </div>
-                    </div>
+                    </div> -->
                   </div>
                   <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 plot-options">
-                    <div class="plot-option">
+                    <ul>
+                      <li>
+                        <span>Standard</span>
+                        <img src="/images/x_k.svg">
+                      </li>
+                      <li>
+                        <span>Unknown</span>
+                        <img src="/images/o_k.svg">
+                      </li>
+                    </ul>
+                    <!-- <div class="plot-option">
                       <p>Plot Type</p>
                       <form role="form" class="form-horizontal" name="plotType" novalidate>
                         <div class="form-group">
@@ -70,7 +80,7 @@ limitations under the License.
                           </div>
                         </div>
                       </form>
-                    </div>
+                    </div> -->
                   </div>
                   <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 plot-options">
                     <div class="plot-option">
@@ -99,9 +109,9 @@ limitations under the License.
             </div>
           </div>
 
-          <div class="curve-body">
-            <div class="curve-plot">
-              <div class="chart-container" full-height offset="397" min="389">
+          <div class="curve-body" full-height offset="400" min="500">
+            <div class="curve-plot" id="curve-plot">
+              <div class="chart-container" full-height offset="550" min="389">
                 <div class="chart-error B1" ng-show="retrying && !fetching && error">
                   <strong class="text-black">Unable to load chart data</strong>
                   <p ng-bind="error"></p>
@@ -150,25 +160,31 @@ limitations under the License.
                       <td>Y-Int:</td>
                       <td>26.474%</td>
                     </tr>
-                    <tr>
-                      <td>Channel:</td>
-                      <td>1</td>
-                    </tr>
                   </table>
                 </div>
               </div>
-              <div class="info">
+              <div class="parameters-last-row">
+                Channel: 1
+              </div>
+              <div class="info1">
                 B4, Sample A
               </div>
               <br><br>
-              <div class="targets-set" ng-show="targetsSet.length">
+              <div class="targets-set" ng-show="targetsSet.length" ng-style="{'top':targetGridTop}" >
                 <table class="targets-table">
                   <tr ng-repeat="target in targetsSet">
                     <td>
                       <span ng-if="color_by==='target'" class="dot" ng-attr-style="background-color: {{COLORS[$index]}}"></span>
                     </td>
                     <td>{{target}}</td>
-                    <td class="td-tik" ng-click="targetClick($index)"><span ng-show="!targetsSetHided[$index]"><img src="/images/tik.png"></span></td>
+                    <td class="td-tik" ng-click="targetClick($index)">
+                      <span ng-show="!targetsSetHided[$index]">
+                        <img src="/images/target_on.svg">
+                      </span>
+                      <span ng-show="targetsSetHided[$index]">
+                          <img src="/images/target_off.svg">
+                        </span>
+                      </td>
                   </tr>
                 </table>
               </div>
@@ -180,7 +196,7 @@ limitations under the License.
           <amplification-well-switch ng-model="wellButtons" color-by="color_by" chart-type="amplification"></amplification-well-switch>
         </div>
       </div>
-      <div class="table-container col-lg-4 col-md-4 col-sm-6 col-xs-6" full-height offset="37+50" style="padding-right: 0; padding-left: 0;">
+      <div class="table-container col-lg-4 col-md-4 col-sm-6 col-xs-6" full-height offset="110" min="808" style="padding-right: 0; padding-left: 0;">
         <table>
           <tbody>
             <tr>
@@ -194,7 +210,10 @@ limitations under the License.
                 <span ng-if="is_dual_channel">Cq Ch1</span>
                 <span ng-if="!is_dual_channel">Cq</span>
               </th>
-              <th class="B1" ng-class="{'channel-2': color_by === 'channel'}" ng-if="is_dual_channel">Cq Ch2</th>
+              <th class="B1" ng-class="{'channel-2': color_by === 'channel'}" >
+                <span ng-if="is_dual_channel" >Cq Ch2</span>
+                <span ng-if="!is_dual_channel" >Cq M</span>
+              </th>
               <th class="B1">Qty</th>
               <th class="B1">Qty M</th>
             </tr>
@@ -235,24 +254,42 @@ limitations under the License.
                 <input type="text" ng-show="editExpTargetMode[$index]" focus-on="editExpTargetMode" ng-blur="updateTarget($index,targets[$index])"  on-shift-enter="updateTargetEnter($index,targets[$index])"  ng-model="targets[$index]">
               </td>
               <td class="B1">
-                <span ng-show="wellButtons['well_'+i].ct[0] > 0">
-                  {{(wellButtons['well_'+i].ct[0]) | round:2}}
+                <span class="width1" >
+                  <span ng-show="wellButtons['well_'+i].ct[0] > 0">
+                    {{(wellButtons['well_'+i].ct[0]) | round:2}}
+                  </span>
                 </span>
               </td>
-              <td class="B1" ng-if="is_dual_channel">
-                <span ng-show="wellButtons['well_'+i].ct[1] > 0">
-                  {{(wellButtons['well_'+i].ct[1]) | round:2}}
+              <td class="B1">
+                <span class="width1" ng-if="is_dual_channel">
+                  <span ng-show="wellButtons['well_'+i].ct[1] > 0">
+                    {{(wellButtons['well_'+i].ct[1]) | round:2}}
+                  </span>
+                  <span ng-show="wellButtons['well_'+i].ct[1] <= 0">
+                    <span class="dummy-placeholder">&nbsp;</span>
+                  </span>
+                </span>
+                <span class="width1" ng-if="!is_dual_channel">
+                  <span class="dummy-placeholder"></span>
                 </span>
               </td>
-              <td class="B1" ></td>
-              <td class="B1" ></td>
+              <td class="B1" >
+                  <span class="width1">
+                      <span class="dummy-placeholder"></span>
+                    </span>
+                  </td>
+              <td class="B1" >
+                <span class="width1">
+                  <span class="dummy-placeholder"></span>
+                </span>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
     <div id="myModal" class="modal-amplification">
-      <div class="modal-content-amplification">
+      <div class="modal-content-standard-curve">
         <span class="close" ng-click="close()">×</span>
         <h4 class="text-left">ADVANCED SETTINGS</h4>
         <div class="col-md-7 col-sm-7 col-xs-7 div-style">

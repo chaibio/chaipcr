@@ -444,4 +444,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.targetsSetHided[index] = !$scope.targetsSetHided[index]
         updateSeries()
 
+      $scope.targetGridTop = ->
+        document.getElementById("curve-plot").clientHeight - 20
+
 ]

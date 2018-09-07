@@ -43,11 +43,11 @@ limitations under the License.
                       </div>
                       <div class="item-switch-channel" ng-show="is_dual_channel">
                         <label ng-show="experiment.type != 'test_kit'" class="amplification-options" ng-click="openOptionsModal()">Advanced Settings</label>
-                        <label>CHOOSE CHANNEL:</label> &nbsp;
+                        <!-- <label>CHOOSE CHANNEL:</label> &nbsp;
                         <switch ng-model="channel_1"></switch>
                         <label>1</label>
                         <switch ng-model="channel_2"></switch>
-                        <label style="padding-right:0px;">2</label>
+                        <label style="padding-right:0px;">2</label> -->
                       </div>
                     </div>
                   </div>
@@ -100,7 +100,7 @@ limitations under the License.
           </div>
 
           <div class="curve-body" full-height offset="400" min="500">
-            <div class="curve-plot">
+            <div class="curve-plot" id="curve-plot">
               <div class="chart-container" full-height offset="550" min="389">
                 <div class="chart-error B1" ng-show="retrying && !fetching && error">
                   <strong class="text-black">Unable to load chart data</strong>
@@ -150,24 +150,20 @@ limitations under the License.
                       <td>Y-Int:</td>
                       <td>26.474%</td>
                     </tr>
-                    <tr>
-                      <td>Channel:</td>
-                      <td>1</td>
-                    </tr>
                   </table>
                 </div>
               </div>
               <div class="info">
-                B4, Sample A
+                Channel:
               </div>
               <br><br>
-              <div class="targets-set" ng-show="targetsSet.length">
+              <div class="targets-set" ng-show="targetsSet.length" ng-style="{'top':targetGridTop}" >
                 <table class="targets-table">
                   <tr ng-repeat="target in targetsSet">
                     <td>
                       <span ng-if="color_by==='target'" class="dot" ng-attr-style="background-color: {{COLORS[$index]}}"></span>
                     </td>
-                    <td>{{target}}</td>
+                    <td>{{target }}</td>
                     <td class="td-tik" ng-click="targetClick($index)">
                       <span ng-show="!targetsSetHided[$index]">
                         <img src="/images/target_on.svg">

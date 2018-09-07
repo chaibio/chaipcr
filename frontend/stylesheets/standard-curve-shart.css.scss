@@ -25,7 +25,7 @@
 
 /* Modal Content */
 
-.modal-content-amplification {
+.modal-content-standard-curve {
   background-color: #fefefe;
   margin: auto;
   padding: 20px;
@@ -303,9 +303,14 @@
           }
         }
       }
-      .info {
+      .parameters-last-row {
         color: #595959;
         // background-color: #000;
+        margin-top: 5px;
+      }
+      .info1 {
+        color: #fff;
+        background-color: #595959;
         margin-top: 5px;
       }
       .targets-set {
@@ -344,6 +349,18 @@
       .plot-option {
         display: inline-block;
         text-align: left;
+      }
+      ul {
+        li {
+            span {
+                font-size: 15px;
+                padding-right: 10px;
+            }
+            img {
+                width: 15px;
+                height: 15px;
+            }
+        }
       }
     }
   }
