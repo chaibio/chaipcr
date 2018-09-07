@@ -315,16 +315,16 @@
         //margin-left: 20px;
         // margin-bottom: -66px;
         padding: 10px;
-        display: inline-block;
+        display: none;
         width: 12%;
         height: 200px;
         overflow: auto;
         .targets-table {
           width: 100%;
           td {
-            font-family: "Dinot-Regular";
-            font-size: 16px;
-            line-height: 20px;
+            font-family: "Dinot";
+            font-size: 13px;
+            // line-height: 20px;
           }
           .td-tik {
             min-width: 30px;
