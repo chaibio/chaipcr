@@ -57,14 +57,6 @@ Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
           <defaultValue>true</defaultValue>
         </hudson.model.BooleanParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>output_sdcard</name>
-          <description>the block device of the created factory settings sdcard: You can say:
-/dev/sdb to write directly to a physical sdcard.
-or /tmp/sdcard_image.img to export a factory settings sdcard image.</description>
-          <defaultValue>/tmp/${BUILD_NUMBER}/sdcard_${BUILD_NUMBER}.img</defaultValue>
-          <trim>false</trim>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
           <name>build_branch</name>
           <description>branch contains building scripts</description>
           <defaultValue>branches/julia</defaultValue>
@@ -89,10 +81,16 @@ uname -a
 ls -ahl
 lsblk
 df -h
+
+#the block device of the created factory settings sdcard: You can say:
+#/dev/sdb to write directly to a physical sdcard.
+#or /tmp/sdcard_image.img to export a factory settings sdcard image.
+tmp_output_sdcard=/tmp/${BUILD_NUMBER}/sdcard_${BUILD_NUMBER}.img
+
 echo user: $(whoami)
 
 echo Creating an sdcard image for the device at $build_machine
-echo Path to SDCard image: $output_sdcard
+echo Path to SDCard image: $tmp_output_sdcard
 echo Environmental variables:
 env
 
@@ -413,18 +411,19 @@ then
 	echo backup eMMC image to $full_emmc_image
     tar zfvc $full_emmc_image /tmp/image_creator/eMMC.img
     sdcard_url=${download_prefix}/$sdcard_filename
+	tmp_output_sdcard=/tmp/${BUILD_NUMBER}/sdcard_${BUILD_NUMBER}.img
 
 #	cp $full_emmc_image $emmc_image_latest_compressed_full_local_path
 
-	echo &quot;performing create_sdcard.sh $tmp_sdcard_dir $output_sdcard&quot;
-	if sudo ./create_sdcard.sh &quot;$tmp_sdcard_dir&quot; &quot;$output_sdcard&quot;
+	echo &quot;performing create_sdcard.sh $tmp_sdcard_dir $tmp_output_sdcard&quot;
+	if sudo ./create_sdcard.sh &quot;$tmp_sdcard_dir&quot; &quot;$tmp_output_sdcard&quot;
 	then
-   		echo SDCard image is created at &quot;$output_sdcard&quot;
+   		echo SDCard image is created at &quot;$tmp_output_sdcard&quot;
         echo please use it to flash an 8M SDCard.
-        echo &quot;ex: dd if=$output_sdcard of=/dev/sdX bs=16M&quot;
-        cp $output_sdcard $fullpath_sdcard_image
+        echo &quot;ex: dd if=$tmp_output_sdcard of=/dev/sdX bs=16M&quot;
+        cp $tmp_output_sdcard $fullpath_sdcard_image
         echo copying compressed sdcard image
-        cp ${output_sdcard}.tgz ${fullpath_sdcard_image}.tgz
+        cp ${tmp_output_sdcard}.tgz ${fullpath_sdcard_image}.tgz
         echo sdcard image should be downloadable from $sdcard_url
         echo compressed sdcard image should be downloadable from ${sdcard_url}.tgz
         sudo rm -r /tmp/image_creator/ || :

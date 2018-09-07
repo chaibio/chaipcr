@@ -15,11 +15,6 @@
           <defaultValue>10.0.100.240</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
-        <hudson.model.BooleanParameterDefinition>
-          <name>bypass_pru</name>
-          <description>Will not install PRU work</description>
-          <defaultValue>true</defaultValue>
-        </hudson.model.BooleanParameterDefinition>
         <hudson.scm.listtagsparameter.ListSubversionTagsParameterDefinition plugin="subversion@2.9">
           <name>build_branch</name>
           <description>Select a Subversion entry</description>
@@ -1149,8 +1144,7 @@ exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
-      <command>#build( &quot;create_factory_settings_sdcard&quot;, build_machine:&quot;$build_machine&quot;, output_sdcard:&quot;/dev/sdb&quot;)
-echo all done for $build_machine, you can call create_factory_settings_sdcard job to create a factory settings image. root password is chaipcr
+      <command>echo all done for $build_machine, you can call create_factory_settings_sdcard job to create a factory settings image. root password is chaipcr
 
 exit 0</command>
     </hudson.tasks.Shell>

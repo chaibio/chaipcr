@@ -71,8 +71,7 @@ lsblk
 df -h
 echo user: $(whoami)
 
-echo Creating an sdcard image for the device at $build_machine
-echo Path to SDCard image: $output_sdcard
+echo Restoring image to device at $build_machine
 echo Environmental variables:
 env
 

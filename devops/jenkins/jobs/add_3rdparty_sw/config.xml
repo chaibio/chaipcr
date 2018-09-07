@@ -1030,8 +1030,7 @@ echo basic beaglebone setup done!</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
-      <command>#build( &quot;create_factory_settings_sdcard&quot;, build_machine:&quot;$build_machine&quot;, output_sdcard:&quot;/dev/sdb&quot;)
-echo all 3rd party software done for $build_machine, you can call call deploy_chibio job to add chibio software now.
+      <command>echo all 3rd party software done for $build_machine, you can call call deploy_chibio job to add chibio software now.
 
 exit 0</command>
     </hudson.tasks.Shell>
