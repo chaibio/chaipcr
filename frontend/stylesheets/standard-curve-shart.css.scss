@@ -326,7 +326,12 @@
         overflow: auto;
         .targets-table {
           width: 100%;
-          .td-tik {
+          td {
+            font-family: "Dinot-Regular";
+            font-size: 16px;
+            line-height: 20px;
+          }
+            .td-tik {
             min-width: 30px;
             text-align: right;
             cursor: pointer;
@@ -346,12 +351,14 @@
     margin-right: 0;
     .plot-options {
       text-align: right;
+      padding-right: 30px;
       .plot-option {
         display: inline-block;
         text-align: left;
       }
       ul {
         li {
+            padding-top: 10px;
             span {
                 font-size: 15px;
                 padding-right: 10px;
