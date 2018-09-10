@@ -200,32 +200,32 @@ limitations under the License.
         <table>
           <tbody>
             <tr>
-              <th class="B1" style="border-left:none">Clr</th>
-              <th class="B1">Omit</th>
-              <th class="B1">Well</th>
-              <th class="B1">Sample</th>
-              <th class="B1">Type</th>
-              <th class="B1">Target</th>
-              <th class="B1" ng-class="{'channel-1': color_by === 'channel'}">
+              <th class="B2" style="border-left:none">Clr</th>
+              <th class="B2">Omit</th>
+              <th class="B2">Well</th>
+              <th class="B2">Sample</th>
+              <th class="B2">Type</th>
+              <th class="B2">Target</th>
+              <th class="B2" ng-class="{'channel-1': color_by === 'channel'}">
                 <span ng-if="is_dual_channel">Cq Ch1</span>
                 <span ng-if="!is_dual_channel">Cq</span>
               </th>
-              <th class="B1" ng-class="{'channel-2': color_by === 'channel'}" >
+              <th class="B2" ng-class="{'channel-2': color_by === 'channel'}" >
                 <span ng-if="is_dual_channel" >Cq Ch2</span>
                 <span ng-if="!is_dual_channel" >Cq M</span>
               </th>
-              <th class="B1">Qty</th>
-              <th class="B1">Qty M</th>
+              <th class="B2">Qty</th>
+              <th class="B2">Qty M</th>
             </tr>
             <tr ng-repeat="i in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" ng-class="{selected: (wellButtons['well_'+i].selected)}">
-              <td class="B1" ng-class="{'text-center': color_by==='channel'}">
+              <td class="B2" ng-class="{'text-center': color_by==='channel'}">
                 <span ng-if="color_by==='well'" class="dot" ng-attr-style="background-color: {{wellButtons['well_'+i].color}}"></span>
                 </span>
               </td>
               <td>
                 <input type="checkbox" style="width:50px;" ng-click="toggleOmitIndex($index)" /> 
               </td>
-              <td class="B1" ng-class="{'text-center': color_by==='channel'}">
+              <td class="B2" ng-class="{'text-center': color_by==='channel'}">
                 <span class="text">
                   <span ng-show="i < 8">
                     A{{i+1}}
@@ -243,7 +243,7 @@ limitations under the License.
                 <input type="text" class="sample-input" ng-show="editExpNameMode[$index]" focus-on="editExpNameMode" ng-blur="updateSampleName($index,samples[$index])"  on-shift-enter="updateSampleNameEnter($index,samples[$index])"  ng-model="samples[$index]">
               </td>
               <td class="type-td">
-                <span class="type-span" ng-show="types[$index]">
+                <span class="type-span" style="width: 20px; height: 20px;" ng-show="types[$index]">
                   {{types[$index]==='sample'?'S':'' | truncate:20}}
                 </span>
               </td>
@@ -253,14 +253,14 @@ limitations under the License.
                 </span>
                 <input type="text" ng-show="editExpTargetMode[$index]" focus-on="editExpTargetMode" ng-blur="updateTarget($index,targets[$index])"  on-shift-enter="updateTargetEnter($index,targets[$index])"  ng-model="targets[$index]">
               </td>
-              <td class="B1">
+              <td class="B2">
                 <span class="width1" >
                   <span ng-show="wellButtons['well_'+i].ct[0] > 0">
                     {{(wellButtons['well_'+i].ct[0]) | round:2}}
                   </span>
                 </span>
               </td>
-              <td class="B1">
+              <td class="B2">
                 <span class="width1" ng-if="is_dual_channel">
                   <span ng-show="wellButtons['well_'+i].ct[1] > 0">
                     {{(wellButtons['well_'+i].ct[1]) | round:2}}
@@ -273,12 +273,12 @@ limitations under the License.
                   <span class="dummy-placeholder"></span>
                 </span>
               </td>
-              <td class="B1" >
+              <td class="B2" >
                   <span class="width1">
                       <span class="dummy-placeholder"></span>
                     </span>
                   </td>
-              <td class="B1" >
+              <td class="B2" >
                 <span class="width1">
                   <span class="dummy-placeholder"></span>
                 </span>

@@ -28,10 +28,10 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           min: 1
           key: 'cycle_num'
           ticks: 8
-          label: 'CYCLE NUMBER'
+          label: 'Cycle Number'
         y:
           unit: 'k'
-          label: 'RELATIVE FLUORESCENCE UNITS'
+          label: 'Relative Fluorescence Units'
           ticks: 10
           tickFormat: (y) ->
             # if y >= 1000 then Math.round(( y / 1000) * 10) / 10 else Math.round(y * 10) / 10
