@@ -194,11 +194,11 @@ limitations under the License.
               <th class="B2">Type</th>
               <th class="B2">Target</th>
               <th class="B2" ng-class="{'channel-1': color_by === 'channel'}">
-                <span ng-if="is_dual_channel">Cq Ch1</span>
-                <span ng-if="!is_dual_channel">Cq</span>
+                <span ng-if="is_dual_channel">Cq</span>
+                <span ng-if="!is_dual_channel">Cq M</span>
               </th>
               <th class="B2" ng-class="{'channel-2': color_by === 'channel'}" >
-                <span ng-if="is_dual_channel" >Cq Ch2</span>
+                <span ng-if="is_dual_channel" >Cq</span>
                 <span ng-if="!is_dual_channel" >Cq M</span>
               </th>
               <th class="B2">Qty</th>
@@ -224,7 +224,7 @@ limitations under the License.
               </td>
               <td ng-click="focusExpName($index)">
                 <span ng-if="color_by==='sample'" class="dot" ng-attr-style="background-color: {{samplesSet.indexOf(samples[i]) < 0 ? '#000000' : COLORS[samplesSet.indexOf(samples[i])]}}"></span>
-                <span class="sample-span" ng-click="focusExpName($index)" ng-show="!editExpNameMode[$index]">
+                <span class="sample-span" ng-click="focusExpName($index)" ng-show="!editExpNameMode[$index]" style="font-size:12px;">
                   {{samples[$index] | truncate:20}}
                 </span>
                 <input type="text" class="sample-input" ng-show="editExpNameMode[$index]" focus-on="editExpNameMode" ng-blur="updateSampleName($index,samples[$index])"  on-shift-enter="updateSampleNameEnter($index,samples[$index])"  ng-model="samples[$index]">
