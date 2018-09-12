@@ -160,21 +160,10 @@ class ExperimentsController < ApplicationController
 
 	api :GET, "/experiments/filter_by_standard", "List all the experiments with well type standard"
 	def filter_by_standard
-		@experiments = Experiment.includes(:experiment_definition).where("experiment_definitions.experiment_type"=>[ExperimentDefinition::TYPE_USER_DEFINED, ExperimentDefinition::TYPE_TESTKIT]).order("experiments.id DESC").load
-		@standard_experiments = []
-		index = 0
-		@experiments.each do |experiment|
-			well_layout = WellLayout.for_experiment(experiment.id).first
-			if well_layout.is_a? WellLayout
-				wells = well_layout.standard_well_type
-
-				if !wells.empty?
-					@standard_experiments[index] = experiment
-					index = index+1
-				end
-			end
-		end
-		render :json=>@standard_experiments, :status => :ok
+		@experiments = Experiment.includes(:experiment_definition).joins(:well_layout).joins("inner join targets_wells on targets_wells.well_layout_id = well_layouts.id").where("experiment_definitions.experiment_type"=>[ExperimentDefinition::TYPE_USER_DEFINED, ExperimentDefinition::TYPE_TESTKIT], "targets_wells.well_type"=>TargetsWell::TYPE_STANDARD).order("experiments.id DESC").load
+    respond_to do |format|
+      format.json { render "index", :status => :ok }
+    end
 	end
 
 	swagger_path '/experiments/{id}' do
@@ -640,11 +629,11 @@ class ExperimentsController < ApplicationController
     if params[:step_id].nil? && params[:ramp_id].nil?
       #first step that collects data will be returned, if none of the steps can be found, first ramp that collect data will be returned
       params[:raw] = false if params[:raw].nil?
-      params[:background] = true if params[:background].nil?
-      params[:baseline] = true if params[:baseline].nil?
-			params[:firstderiv] = true if params[:firstderiv].nil?
-			params[:secondderiv] = true if params[:secondderiv].nil?
-      params[:cq] = true if params[:cq].nil?
+      params[:background] = true if params[:background].nil? && params[:raw] == false
+      params[:baseline] = true if params[:baseline].nil? && params[:raw] == false
+			params[:firstderiv] = true if params[:firstderiv].nil? && params[:raw] == false
+			params[:secondderiv] = true if params[:secondderiv].nil? && params[:raw] == false
+      params[:cq] = true if params[:cq].nil? && params[:raw] == false
     else #if step_id is specified, only raw data is returned
       params[:raw] = true
       params[:background] = false

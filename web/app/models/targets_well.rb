@@ -19,6 +19,8 @@
 class TargetsWell < ActiveRecord::Base
   include ProtocolLayoutHelper
   
+  TYPE_STANDARD = "standard"
+  
   belongs_to :well_layout
   belongs_to :target
   
@@ -32,7 +34,7 @@ class TargetsWell < ActiveRecord::Base
   validate :validate
   
   before_update do |target_well|
-    if target_well.well_type != "standard"
+    if target_well.well_type != TYPE_STANDARD
       target_well.quantity_m = nil
       target_well.quantity_b = nil
     end
@@ -55,7 +57,7 @@ class TargetsWell < ActiveRecord::Base
     if !quantity_m.nil? && quantity_m < 0
       errors.add(:quantity, "has to be positive number")
     end
-    if target.imported && well_type == "standard"
+    if target.imported && well_type == TYPE_STANDARD
       errors.add(:well_type, "standard cannot be supported for imported target")
     end
     if new_record? && validate_targets_in_well != false
