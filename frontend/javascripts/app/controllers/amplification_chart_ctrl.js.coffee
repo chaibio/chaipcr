@@ -280,16 +280,20 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         gofetch = false if $scope.fetching
         gofetch = false if $scope.$parent.chart isnt 'amplification'
         gofetch = false if $scope.retrying
-
+        
         if gofetch
           hasInit = true
           $scope.fetching = true
+
+          # alert('h6')
 
           Experiment
           .getAmplificationData($stateParams.id)
           .then (resp) ->
             $scope.fetching = false
             $scope.error = null
+
+            
             if (resp.status is 200 and resp.data?.partial and $scope.enterState) or (resp.status is 200 and !resp.data.partial)
               $scope.hasData = true
               $scope.amplification_data = helper.paddData()
@@ -444,7 +448,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.targetsSetHided[index] = !$scope.targetsSetHided[index]
         updateSeries()
 
+      # $scope.targetGridTop = ->
+      #   document.getElementById("curve-plot").clientHeight + 30
       $scope.targetGridTop = ->
-        document.getElementById("curve-plot").clientHeight + 30
+        Math.max(document.getElementById("curve-plot").clientHeight + 30, 412 + 30)
 
 ]
