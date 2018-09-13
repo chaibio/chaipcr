@@ -16,11 +16,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ###
-window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
+window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
   '$scope'
   '$stateParams'
   'Experiment'
-  'AmplificationChartHelper'
+  'StandardCurveChartHelper'
   'expName'
   '$interval'
   'Device'
@@ -75,28 +75,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.editExpTargetMode = []
       $scope.omittedIndexes = []
 
-      $scope.label_cycle = 0
-      $scope.label_RFU = 0
-      $scope.label_dF_dC = 0
-      $scope.label_D2_dc2 = 0
-
-      $scope.index_target = 0
-      $scope.index_channel = 0
-      $scope.label_sample = null
-      $scope.label_target = ""
-      $scope.label_well = "No Selection"
-      $scope.label_channel = 0
-      
-
-      $scope.bgcolor_target = {
-        'background-color':'#666666'
-      }
-     
       modal = document.getElementById('myModal')
       span = document.getElementsByClassName("close")[0]
 
       $scope.toggleOmitIndex = (omit_index) ->
-      
         if $scope.omittedIndexes.indexOf(omit_index) != -1
           $scope.omittedIndexes.splice $scope.omittedIndexes.indexOf(omit_index), 1
         else
@@ -176,11 +158,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               $scope.hoverOn = true
 
       $scope.hover = (model) ->
-      
         $scope.hoverName = model.name
         $scope.hoverDescription = model.desciption
         $scope.hoverOn = true
-      
+
       $scope.hoverLeave = ->
         $scope.hoverOn = false
 
@@ -191,7 +172,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $scope.minCq.value = resp.data.amplification_option.min_reliable_cycle
           $scope.minDf.value = resp.data.amplification_option.min_d1
           $scope.minD2f.value = resp.data.amplification_option.min_d2
-
           if resp.data.amplification_option.baseline_cycle_bounds is null
             $scope.baseline_sub = 'auto'
           else
@@ -212,8 +192,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.updateSampleNameEnter = (well_num, name) ->
         Experiment.updateWell($stateParams.id, well_num + 1, {'well_type':'sample','sample_name':name})
         $scope.editExpNameMode[well_num] = false
-
-
         if event.shiftKey
           $scope.focusExpName(well_num - 1)
         else
@@ -255,8 +233,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       $scope.updateSamplesSet = ->
         $scope.samplesSet = []
-
-        
         for i in [0...16]
           if $scope.samples[i] and $scope.samplesSet.indexOf($scope.samples[i]) < 0
             $scope.samplesSet.push($scope.samples[i])
@@ -269,7 +245,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $scope.targets[resp.data[i].well.well_num - 1] = resp.data[i].well.targets[0] if resp.data[i]
         $scope.updateTargetsSet()
         $scope.updateSamplesSet()
-        
         updateSeries()
 
       Experiment.get(id: $stateParams.id).then (data) ->
@@ -285,7 +260,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.thermal_state = data.experiment_controller.machine.thermal_state
         $scope.oldState = oldData?.experiment_controller?.machine?.state || 'NONE'
         $scope.isCurrentExp = parseInt(data.experiment_controller.experiment?.id) is parseInt($stateParams.id)
-        
         if $scope.isCurrentExp is true
           $scope.enterState = $scope.isCurrentExp
 
@@ -304,22 +278,19 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       fetchFluorescenceData = ->
         gofetch = true
         gofetch = false if $scope.fetching
-        gofetch = false if $scope.$parent.chart isnt 'amplification'
+        gofetch = false if $scope.$parent.chart isnt 'standard-curve'
         gofetch = false if $scope.retrying
         
         if gofetch
           hasInit = true
           $scope.fetching = true
 
-          # alert('h6')
-
           Experiment
-          .getAmplificationData($stateParams.id)
+          .getStandardCurveData($stateParams.id)
           .then (resp) ->
             $scope.fetching = false
             $scope.error = null
 
-            
             if (resp.status is 200 and resp.data?.partial and $scope.enterState) or (resp.status is 200 and !resp.data.partial)
               $scope.hasData = true
               $scope.amplification_data = helper.paddData()
@@ -365,10 +336,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         channel_count = if $scope.is_dual_channel then 2 else 1
         channel_end = if $scope.channel_1 && $scope.channel_2 then 2 else if $scope.channel_1 && !$scope.channel_2 then 1 else if !$scope.channel_1 && $scope.channel_2 then 2
         channel_start = if $scope.channel_1 && $scope.channel_2 then 1 else if $scope.channel_1 && !$scope.channel_2 then 1 else if !$scope.channel_1 && $scope.channel_2 then 2
-
         for ch_i in [channel_start..channel_end] by 1
           for i in [0..15] by 1
             if $scope.omittedIndexes.indexOf(i) == -1
+              # alert(i)
               if buttons["well_#{i}"]?.selected and !$scope.targetsSetHided[$scope.targetsSet.indexOf($scope.targets[i])]
 
                 if $scope.color_by is 'well'
@@ -399,18 +370,13 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                   well: i
                   channel: ch_i
 
-      $scope.onUpdateProperties = (cycle, rfu, dF_dC, d2_dc2) ->
-        $scope.label_cycle = cycle
-        $scope.label_RFU = rfu
-        $scope.label_dF_dC = dF_dC
-        $scope.label_D2_dc2 = d2_dc2
-
       $scope.onZoom = (transform, w, h, scale_extent) ->
         $scope.ampli_scroll = {
           value: Math.abs(transform.x/(w*transform.k - w))
           width: w/(w*transform.k)
         }
         $scope.ampli_zoom = (transform.k - 1)/ (scale_extent)
+
 
       $scope.zoomIn = ->
         $scope.ampli_zoom = Math.min($scope.ampli_zoom * 2 || 0.001 * 2, 1)
@@ -419,45 +385,12 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.ampli_zoom = Math.max($scope.ampli_zoom * 0.5, 0.001)
 
       $scope.onSelectLine = (config) ->
-
-        $scope.bgcolor_target = { 'background-color':config.config.color }
         for i in [0..15] by 1
           $scope.wellButtons["well_#{i}"].active = (i == config.config.well)
-          if(i == config.config.well)
-            $scope.index_target = i % 8
-            if (i < 8) 
-              $scope.index_channel = 0
-            else 
-              $scope.index_channel = 1
 
-            if i < $scope.targets.length
-              $scope.label_target = $scope.targets[i]
-            else 
-              $scope.label_target = ""
-
-            if i < $scope.targets.length
-              if $scope.samples[i]!=null
-                $scope.label_sample = $scope.samples[i]
-              else
-                $scope.label_sample = ""
-            else 
-              $scope.label_sample = ""
-
-            wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8']
-            $scope.label_well = wells[i]
-            
-            
-          
       $scope.onUnselectLine = ->
         for i in [0..15] by 1
           $scope.wellButtons["well_#{i}"].active = false
-
-        $scope.label_target = ""
-        $scope.label_sample = "No Selection"
-        $scope.label_well = ""
-        $scope.bgcolor_target = {
-          'background-color':'#666666'
-        }
 
       $scope.$watch 'baseline_subtraction', (val) ->
         updateSeries()
@@ -481,12 +414,20 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         if chart is 'amplification'
           fetchFluorescenceData()
           Experiment.getWells($stateParams.id).then (resp) ->
-
             for i in [0...16]
               $scope.samples[resp.data[i].well.well_num - 1] = resp.data[i].well.sample_name if resp.data[i]
 
           $timeout ->
             $scope.showAmpliChart = true
+          , 1000
+        else if chart is 'standard-curve'
+          fetchFluorescenceData()
+          Experiment.getWells($stateParams.id).then (resp) ->
+            for i in [0...16]
+              $scope.samples[resp.data[i].well.well_num - 1] = resp.data[i].well.sample_name if resp.data[i]
+
+          $timeout ->
+            $scope.showStandardChart = true
           , 1000
         else
           $scope.showAmpliChart = false

@@ -56,6 +56,4 @@ window.ChaiBioTech.ngApp.controller 'RunExperimentCtrl', [
         chart = 'temperature-logs' if !chart
         changeChart(chart)
 
-
-
 ]
