@@ -129,8 +129,9 @@ limitations under the License.
 
             <div class="additional-info">
               <div class="parameters">
-                <div class="header" ng-style="bgcolor_target">
-                  Target: {{label_target}}
+                <div class="header" ng-style="bgcolor_target" style="min-height: 38px">
+                  <!-- Target: -->
+                  {{label_target}}
                 </div>
                 <div>
                   <table class="parameters-table">
@@ -156,7 +157,7 @@ limitations under the License.
               <div class="info">
                 Channel: {{index_channel + 1}}
               </div>
-              <div class="info1">
+              <div class="info1" style="min-height: 38px">
                 {{label_well}}{{label_sample ? ", " : ""}}{{label_sample}}
               </div>
               <br><br>
@@ -198,10 +199,10 @@ limitations under the License.
               <th class="B2">Target</th>
               <th class="B2" ng-class="{'channel-1': color_by === 'channel'}">
                 <span ng-if="is_dual_channel">Cq</span>
-                <span ng-if="!is_dual_channel">Cq M</span>
+                <span ng-if="!is_dual_channel">Cq</span>
               </th>
               <th class="B2" ng-class="{'channel-2': color_by === 'channel'}" >
-                <span ng-if="is_dual_channel" >Cq</span>
+                <span ng-if="is_dual_channel" >Cq M</span>
                 <span ng-if="!is_dual_channel" >Cq M</span>
               </th>
               <th class="B2">Qty</th>

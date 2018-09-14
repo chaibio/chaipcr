@@ -83,7 +83,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.index_target = 0
       $scope.index_channel = 0
       $scope.label_sample = null
-      $scope.label_target = ""
+      $scope.label_target = "No Selection"
       $scope.label_well = "No Selection"
       $scope.label_channel = 0
       
@@ -420,7 +420,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       $scope.onSelectLine = (config) ->
 
-        $scope.bgcolor_target = { 'background-color':config.config.color }
+        $scope.bgcolor_target = { 'background-color':'black' }
+        # $scope.bgcolor_target = { 'background-color':config.config.color }
         for i in [0..15] by 1
           $scope.wellButtons["well_#{i}"].active = (i == config.config.well)
           if(i == config.config.well)
@@ -431,7 +432,11 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               $scope.index_channel = 1
 
             if i < $scope.targets.length
-              $scope.label_target = $scope.targets[i]
+              if $scope.targets[i]!=null
+                $scope.label_target = $scope.targets[i]
+              else
+                $scope.label_target = ""
+              
             else 
               $scope.label_target = ""
 
@@ -452,7 +457,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         for i in [0..15] by 1
           $scope.wellButtons["well_#{i}"].active = false
 
-        $scope.label_target = ""
+        $scope.label_target = "No Selection"
         $scope.label_sample = "No Selection"
         $scope.label_well = ""
         $scope.bgcolor_target = {

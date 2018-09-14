@@ -50,6 +50,7 @@ var vendorFiles = [
   'libs/ng-file-upload-shim.js',
   'libs/ng-file-upload.js',
   'libs/ng-webworker.js',
+  // 'libs/angular-sanitize.js',
 ];
 var appFiles = [
   'welcome.js',
