@@ -206,7 +206,7 @@ uEnvPath=/sdcard/factory
 mount -o remount,rw ${uEnvPath}
 
 echo "Checking if factory settings scripts should be upgraded..."
-version_file=/sdcard/factory/fs_Version.inf
+version_file=/sdcard/factory/fs_version.inf
 version_current=0
 if [ -e ${version_file} ]
 then
