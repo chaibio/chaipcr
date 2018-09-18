@@ -25,7 +25,7 @@ limitations under the License.
             <div class="row">
               <div class="col-lg-4 col-md-5 col-sm-5 col-xs-5 curve-name">
                 <!-- <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()"> -->
-                <chart-chooser class="curve-title H1" experiment="experiment" current-chart="$parent.chart">
+                <chart-chooser class="curve-title H1" experiment="experiment" current-chart="$parent.chart" style="font-size: 30px">
                   Amplification Curve
                   <img class="arrow-down" src="/images/arrow-down.png">
                 </chart-chooser>
@@ -58,7 +58,7 @@ limitations under the License.
                         <div class="form-group">
                           <div class="col-md-12">
                             <div class="dropdown" ng-click="showPlotTypeList()">
-                              <button class="dropbtn">
+                              <button class="dropbtn" style="font-size: 15px">
                                 <span class="test" style="float:left;">{{curve_type.charAt(0).toUpperCase() + curve_type.slice(1)}}</span>
                                 <img class="arrow-down" src="/images/arrow-down.png">
                               </button>
@@ -83,7 +83,7 @@ limitations under the License.
                                 <span class="test" style="float:left;">{{color_by.charAt(0).toUpperCase() + color_by.slice(1)}}</span>
                                 <img class="arrow-down" src="/images/arrow-down.png">
                               </button>
-                              <div id="colorByList" class="dropdown-content">
+                              <div id="colorByList" class="dropdown-content" style="font-size: 15px">
                                 <a href="" ng-click="color_by='sample'" value="abc">Sample</a>
                                 <a href="" ng-click="color_by='target'" value="abc">Target</a>
                                 <a href="" ng-click="color_by='well'" value="abc">Well</a>
@@ -116,7 +116,7 @@ limitations under the License.
                 <amplification-chart data="amplification_data" config="chartConfig" zoom="ampli_zoom" on-zoom="onZoom" on-select-line="onSelectLine" on-unselect-line="onUnselectLine" on-update-properties="onUpdateProperties" scroll="ampli_scroll.value" show="showAmpliChart"></amplification-chart>
                 <table>
                   <tr>
-                    <td><button class="button zoom-button" ng-click="zoomIn()">+</button></td>
+                    <td><button class="button zoom-button" ng-click="zoomIn()" style="height: 30px; text-align: center; vertical-align: middle; padding: 5px">+</button></td>
                     <td></td>
                   </tr>
                   <tr>
@@ -128,46 +128,47 @@ limitations under the License.
             </div>
 
             <div class="additional-info">
-              <div class="parameters">
-                <div class="header" ng-style="bgcolor_target" style="min-height: 38px">
-                  <!-- Target: -->
-                  {{label_target}}
-                </div>
-                <div>
-                  <table class="parameters-table">
-                    <tr>
-                      <td>Cycle:</td>
-                      <td>{{label_cycle}}</td>
-                    </tr>
-                    <tr>
-                      <td>RFU:</td>
-                      <td>{{label_RFU}}</td>
-                    </tr>
-                    <tr>
-                      <td>dF/dc:</td>
-                      <td>{{label_dF_dC}}</td>
-                    </tr>
-                    <tr>
-                      <td>D<sup>2</sup>/dc<sup>2</sup>:</td>
-                      <td>{{label_D2_dc2}}</td>
-                    </tr>
-                  </table>
-                </div>
+              <div style="padding: 0px; background: transparent">
+                  <div class="parameters">
+                    <div class="header" ng-style="bgcolor_target" style="min-height: 41px; font-size: 15px; color:white;">
+                      <!-- Target: -->
+                      {{label_target}}
+                    </div>
+                    <div>
+                      <table class="parameters-table">
+                        <tr>
+                          <td style="font-size: 15px; padding: 2px;">Cycle:</td>
+                          <td style="font-size: 15px; padding: 2px;">{{label_cycle}}</td>
+                        </tr>
+                        <tr>
+                          <td style="font-size: 15px; padding: 2px;">RFU:</td>
+                          <td style="font-size: 15px; padding: 2px;">{{label_RFU}}</td>
+                        </tr>
+                        <tr>
+                          <td style="font-size: 15px; padding: 2px;">dF/dc:</td>
+                          <td style="font-size: 15px; padding: 2px;">{{label_dF_dC}}</td>
+                        </tr>
+                        <tr>
+                          <td style="font-size: 15px; padding: 2px;">D<sup>2</sup>/dc<sup>2</sup>:</td>
+                          <td style="font-size: 15px; padding: 2px;">{{label_D2_dc2}}</td>
+                        </tr>
+                      </table>
+                    </div>
+                  </div>
+                  <div class="info" style="font-size: 15px; padding-top: 8px; padding-bottom: 8px;">
+                    Channel: {{index_channel + 1}}
+                  </div>
+                  <div class="info1" ng-style="bgcolor_wellSample"  style="min-height: 41px; font-size: 15px; color:white; margin-top: 5px">
+                    {{label_well}}{{label_sample ? ", " : ""}}{{label_sample}}
+                  </div>
               </div>
-              <div class="info">
-                Channel: {{index_channel + 1}}
-              </div>
-              <div class="info1" style="min-height: 38px">
-                {{label_well}}{{label_sample ? ", " : ""}}{{label_sample}}
-              </div>
-              <br><br>
-              <div class="targets-set" ng-show="targetsSet.length" ng-style="{'top':targetGridTop,'display':'inline-block'}" >
+              <div class="targets-set" ng-show="targetsSet.length" style="padding-top:5px; padding-bottom: 0px">
                 <table class="targets-table">
                   <tr ng-repeat="target in targetsSet">
                     <td>
                       <span ng-if="color_by==='target'" class="dot" ng-attr-style="background-color: {{COLORS[$index]}}"></span>
                     </td>
-                    <td>{{target }}</td>
+                    <td style="font-size: 15px; padding-top: 5px; padding-bottom: 5px;">{{target}}</td>
                     <td class="td-tik" ng-click="targetClick($index)">
                       <span ng-show="!targetsSetHided[$index]">
                         <img src="/images/target_on.svg">
@@ -239,7 +240,7 @@ limitations under the License.
                 </span>
               </td>
               <td ng-click="focusExpTarget($index)">
-                <span class="target-span" ng-click="focusExpTarget($index)" ng-show="!editExpTargetMode[$index]">
+                <span class="target-span" ng-click="focusExpTarget($index)" ng-show="!editExpTargetMode[$index]" style="font-size: 12px">
                   {{targets[$index] | truncate:20}}
                 </span>
                 <input type="text" ng-show="editExpTargetMode[$index]" focus-on="editExpTargetMode" ng-blur="updateTarget($index,targets[$index])"  on-shift-enter="updateTargetEnter($index,targets[$index])"  ng-model="targets[$index]">

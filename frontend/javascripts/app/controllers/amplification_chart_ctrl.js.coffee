@@ -90,8 +90,12 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       $scope.bgcolor_target = {
         'background-color':'#666666'
+        
       }
-     
+      $scope.bgcolor_wellSample = {
+        'background-color':'#666666'
+      }
+
       modal = document.getElementById('myModal')
       span = document.getElementsByClassName("close")[0]
 
@@ -421,6 +425,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.onSelectLine = (config) ->
 
         $scope.bgcolor_target = { 'background-color':'black' }
+        $scope.bgcolor_wellSample = { 'background-color':'black' }
         # $scope.bgcolor_target = { 'background-color':config.config.color }
         for i in [0..15] by 1
           $scope.wellButtons["well_#{i}"].active = (i == config.config.well)
@@ -444,23 +449,24 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               if $scope.samples[i]!=null
                 $scope.label_sample = $scope.samples[i]
               else
-                $scope.label_sample = ""
+                $scope.label_sample = null
             else 
-              $scope.label_sample = ""
+              $scope.label_sample = null
 
             wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8']
             $scope.label_well = wells[i]
-            
-            
           
       $scope.onUnselectLine = ->
         for i in [0..15] by 1
           $scope.wellButtons["well_#{i}"].active = false
 
         $scope.label_target = "No Selection"
-        $scope.label_sample = "No Selection"
-        $scope.label_well = ""
+        $scope.label_well = "No Selection"
+        $scope.label_sample = null
         $scope.bgcolor_target = {
+          'background-color':'#666666'
+        }
+        $scope.bgcolor_wellSample = {
           'background-color':'#666666'
         }
 
