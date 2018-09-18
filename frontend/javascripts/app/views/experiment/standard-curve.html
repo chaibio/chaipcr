@@ -123,7 +123,9 @@ limitations under the License.
                   <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
                   <p class="B2">May take a minute</p>
                 </div>
-                <amplification-chart data="amplification_data" config="chartConfig" zoom="ampli_zoom" on-zoom="onZoom" on-select-line="onSelectLine" on-unselect-line="onUnselectLine" scroll="ampli_scroll.value" show="showStandardChart"></amplification-chart>
+
+                <standardcurve-chart data="standardcurve_data" config="chartConfig" zoom="standardcurve_zoom" on-zoom="onZoom" on-select-line="onSelectLine" on-unselect-line="onUnselectLine" scroll="ampli_scroll.value" show="showStandardChart"></standardcurve-chart>
+
                 <table>
                   <tr>
                     <td><button class="button zoom-button" ng-click="zoomIn()">+</button></td>
@@ -194,7 +196,7 @@ limitations under the License.
 
         </div>
         <div class="choose-chart">
-          <amplification-well-switch ng-model="wellButtons" color-by="color_by" chart-type="amplification"></amplification-well-switch>
+          <chart-well-switch ng-model="wellButtons" color-by="color_by" chart-type="amplification"></chart-well-switch>
         </div>
       </div>
       <div class="table-container col-lg-4 col-md-4 col-sm-6 col-xs-6" full-height offset="110" min="808" style="padding-right: 0; padding-left: 0;">
@@ -289,7 +291,7 @@ limitations under the License.
         </table>
       </div>
     </div>
-    <div id="myModal" class="modal-amplification">
+    <div id="myModal" class="modal-chart">
       <div class="modal-content-standard-curve">
         <span class="close" ng-click="close()">×</span>
         <h4 class="text-left">ADVANCED SETTINGS</h4>

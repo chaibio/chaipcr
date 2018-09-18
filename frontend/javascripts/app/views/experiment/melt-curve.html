@@ -55,7 +55,7 @@ limitations under the License.
               </div>
               <melt-curve-chart data="data" config="config" zoom="mc_zoom" on-zoom="onZoom" on-select-line="onSelectLine" on-unselect-line="onUnselectLine" scroll="mc_scroll.value" show="showMeltCurveChart"></melt-curve-chart>
             </div>
-            <div class="ampli-zoom-scroll-container">
+            <div class="chart-zoom-scroll-container">
               <div class="row">
                 <div class="col-md-6">
                   <div class="zoom-container">
@@ -72,7 +72,7 @@ limitations under the License.
             </div>
           </div>
           <div class="choose-chart" style="margin-left: -20px; margin-right: -20px; margin-top: 30px;">
-            <amplification-well-switch ng-model="wellButtons" color-by="color_by" button-labels-num="1" label-unit="'Tm'" chart-type="melt-curve"></amplification-well-switch>
+            <chart-well-switch ng-model="wellButtons" color-by="color_by" button-labels-num="1" label-unit="'Tm'" chart-type="melt-curve"></chart-well-switch>
           </div>
         </div>
       </div>

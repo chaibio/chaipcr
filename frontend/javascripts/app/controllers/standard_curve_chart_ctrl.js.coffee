@@ -36,7 +36,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
       $scope.chartConfig = helper.chartConfig()
       $scope.chartConfig.channels = if is_dual_channel then 2 else 1
       $scope.chartConfig.axes.x.max = $stateParams.max_cycle || 1
-      $scope.amplification_data = helper.paddData()
+      $scope.standardcurve_data = helper.paddData()
       $scope.COLORS = helper.COLORS
       AMPLI_DATA_CACHE = null
       retryInterval = null
@@ -97,7 +97,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
 
       $scope.close = ->
         modal.style.display = "none"
-        $scope.getAmplificationOptions()
+        $scope.getStandardCurveOptions()
 
       $scope.check = ->
         $scope.errorCheck = false
@@ -165,7 +165,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
       $scope.hoverLeave = ->
         $scope.hoverOn = false
 
-      $scope.getAmplificationOptions = ->
+      $scope.getStandardcurveOptions = ->
         Experiment.getAmplificationOptions($stateParams.id).then (resp) ->
           $scope.method.name = resp.data.amplification_option.cq_method
           $scope.minFl.value = resp.data.amplification_option.min_fluorescence
@@ -183,7 +183,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
           $scope.hoverDescription = resp.data || 'Unknown error'
           $scope.hoverOn = true
 
-      $scope.getAmplificationOptions()
+      $scope.getStandardcurveOptions()
 
       $scope.focusExpName = (index) ->
         $scope.editExpNameMode[index] = true

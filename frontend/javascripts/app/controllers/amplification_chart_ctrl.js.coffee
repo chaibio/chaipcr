@@ -322,7 +322,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           .then (resp) ->
             $scope.fetching = false
             $scope.error = null
-
             
             if (resp.status is 200 and resp.data?.partial and $scope.enterState) or (resp.status is 200 and !resp.data.partial)
               $scope.hasData = true

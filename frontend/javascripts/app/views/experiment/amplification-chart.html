@@ -99,6 +99,10 @@ limitations under the License.
             </div>
           </div>
 
+
+
+
+
           <div class="curve-body" full-height offset="400" min="500">
             <div class="curve-plot" id="curve-plot">
               <div class="chart-container" full-height offset="550" min="389">
@@ -114,7 +118,11 @@ limitations under the License.
                   <p class="B2">May take a minute</p>
                 </div>
                 <amplification-chart data="amplification_data" config="chartConfig" zoom="ampli_zoom" on-zoom="onZoom" on-select-line="onSelectLine" on-unselect-line="onUnselectLine" on-update-properties="onUpdateProperties" scroll="ampli_scroll.value" show="showAmpliChart"></amplification-chart>
-                <table>
+                <div>
+                  <button class="button zoom-button" ng-click="zoomIn()" style="text-align: center; vertical-align: middle; padding-left: 10px; padding-right: 10px; font-size: 20px">+</button>
+                  <button class="button zoom-button" ng-click="zoomOut()" style="text-align: center; vertical-align: middle; padding-left: 10px; padding-right: 10px; font-size: 20px; margin-left: 30px;">-</button>
+                </div>
+                <!-- <table>
                   <tr>
                     <td><button class="button zoom-button" ng-click="zoomIn()" style="height: 30px; text-align: center; vertical-align: middle; padding: 5px">+</button></td>
                     <td></td>
@@ -123,7 +131,7 @@ limitations under the License.
                     <td></td>
                     <td><button class="button zoom-button" ng-click="zoomOut()">-</button></td>
                   </tr>
-                </table>
+                </table> -->
               </div>
             </div>
 
@@ -185,7 +193,7 @@ limitations under the License.
 
         </div>
         <div class="choose-chart">
-          <amplification-well-switch ng-model="wellButtons" color-by="color_by" chart-type="amplification"></amplification-well-switch>
+          <chart-well-switch ng-model="wellButtons" color-by="color_by" chart-type="amplification"></chart-well-switch>
         </div>
       </div>
       <div class="table-container col-lg-4 col-md-4 col-sm-6 col-xs-6" full-height offset="110" min="808" style="padding-right: 0; padding-left: 0;">
@@ -280,7 +288,7 @@ limitations under the License.
         </table>
       </div>
     </div>
-    <div id="myModal" class="modal-amplification">
+    <div id="myModal" class="modal-chart">
       <div class="modal-content-amplification">
         <span class="close" ng-click="close()">×</span>
         <h4 class="text-left">ADVANCED SETTINGS</h4>

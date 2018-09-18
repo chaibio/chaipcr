@@ -1,30 +1,6 @@
 @import './colors.css.scss';
-.modal-amplification {
-  display: none;
-  /* Hidden by default */
-  position: fixed;
-  /* Stay in place */
-  z-index: 1050;
-  /* Sit on top */
-  padding-top: 100px;
-  /* Location of the box */
-  left: 0;
-  top: 0;
-  width: 100%;
-  /* Full width */
-  height: 100%;
-  /* Full height */
-  overflow: auto;
-  /* Enable scroll if needed */
-  background-color: rgb(0, 0, 0);
-  /* Fallback color */
-  background-color: rgba(0, 0, 0, 0.4);
-  /* Black w/ opacity */
-}
-
 
 /* Modal Content */
-
 .modal-content-amplification {
   background-color: #fefefe;
   margin: auto;
@@ -149,23 +125,6 @@
     border-top: 1px solid black;
     padding-left: 0;
   }
-}
-
-
-/* The Close Button */
-
-.close {
-  color: #aaaaaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: #000;
-  text-decoration: none;
-  cursor: pointer;
 }
 
 .amplification-chart-state-active {
@@ -353,7 +312,7 @@
     margin-right: 0;
     .plot-options {
       text-align: right;
-      padding-right: 10px;
+      padding-right: 30px;
       .plot-option {
         display: inline-block;
         text-align: left;
@@ -500,7 +459,7 @@
       font-weight: bold;
       background-color: #ffffff;
     }
-    .ampli-zoom-scroll-container {
+    .chart-zoom-scroll-container {
       // margin-top: 50px;
       padding-left: 50px;
       padding-right: 50px;
@@ -624,19 +583,5 @@
     color: red;
     width: 50px !important;
   }
-  .experiment-start-stop-buttons {
-    padding: 15px;
-  }
-  .amplification-well-switch {
-    margin-top: 30px;
-  }
 }
-.dot {
-  border-radius: 100px;
-  display: inline-block;
-  height: 10px;
-  margin-right: 10px;
-  margin-left: 10px;
-  vertical-align: middle;
-  width: 10px;
-}
+

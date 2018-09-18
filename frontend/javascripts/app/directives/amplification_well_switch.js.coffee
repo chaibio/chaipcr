@@ -17,7 +17,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ###
 
-window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
+window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
   'AmplificationChartHelper',
   '$timeout',
   '$state',
@@ -30,7 +30,7 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
       labelUnit: '=?'
       chartType: '@'
 
-    templateUrl: 'app/views/directives/amplification-well-switch.html',
+    templateUrl: 'app/views/directives/chart-well-switch.html',
     link: ($scope, elem, attrs, ngModel) ->
 
       COLORS = AmplificationChartHelper.COLORS
