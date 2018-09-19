@@ -211,9 +211,11 @@
     .ampli-toggles {
       //width: 45%;
       padding-bottom: 5px;
+      padding-right: 0px;
       .col-md-6,
       .col-sm-6 {
-        padding-left: 0;
+        padding-left: 0px;
+        
         // padding-right: 0;
         // &:last-of-type {
         //   padding-right: 15px;
@@ -243,7 +245,7 @@
       flex-direction: column;
       justify-content: space-between;
 
-      width: 12%;
+      width: 16%;
       // height: 100%;
       margin-left: 20px;
       div {

@@ -22,7 +22,7 @@ limitations under the License.
       <div class="chart-section col-lg-8 col-md-8 col-sm-6 col-xs-6" >
         <div>
           <div class="curve-header">
-            <div class="row">
+            <div>
               <div class="col-lg-4 col-md-5 col-sm-5 col-xs-5 curve-name">
                 <!-- <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()"> -->
                 <chart-chooser class="curve-title H1" experiment="experiment" current-chart="$parent.chart" style="font-size: 30px">
@@ -77,7 +77,7 @@ limitations under the License.
                       <p>Color by</p>
                       <form role="form" class="form-horizontal" name="colorBy" novalidate>
                         <div class="form-group">
-                          <div class="col-md-12" style="padding-right: 0px;">
+                          <div class="col-md-12" style="padding-right: 10px;">
                             <div class="dropdown" ng-click="showColorByList()">
                               <button class="dropbtn">
                                 <span class="test" style="float:left;">{{color_by.charAt(0).toUpperCase() + color_by.slice(1)}}</span>
@@ -100,7 +100,7 @@ limitations under the License.
           </div>
 
           <div class="curve-body" full-height offset="400" min="500" style="padding-right: 0px;">
-            <div class="curve-plot" id="curve-plot" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div class="curve-plot" id="curve-plot" style="display: flex; flex-direction: column; justify-content: space-between; width: 80%">
               <div class="chart-container" full-height offset="550" min="389" style="height: 85%;">
                 <div class="chart-error B1" ng-show="retrying && !fetching && error">
                   <strong class="text-black">Unable to load chart data</strong>
@@ -131,8 +131,8 @@ limitations under the License.
               </div>
               <div style="display: flex; flex-direction: row; height: 15%;">
                 <div style="display: block; width: 5%; display: flex; flex-direction: column; height: 100%;">
-                  <button class="button zoom-button" ng-click="zoomIn()" style="text-align: center; vertical-align: middle; font-size: 20px; margin-right: 40px; padding: 0px; height: 50%; width: 30px;">+</button>
-                  <button class="button zoom-button" ng-click="zoomOut()" style="text-align: center; vertical-align: middle; font-size: 20px; margin-left: 40px; padding: 0px; height: 50%; width: 30px;">-</button>
+                  <button class="button zoom-button" ng-click="zoomIn()" style="text-align: center; vertical-align: middle; font-size: 20px; margin-right: 30px; padding: 0px; height: 50%; width: 30px;">+</button>
+                  <button class="button zoom-button" ng-click="zoomOut()" style="text-align: center; vertical-align: middle; font-size: 20px; margin-left: 30px; padding: 0px; height: 50%; width: 30px;">-</button>
                 </div>
                 <div style="display: grid; width: 95%; height: 100%; align-content: center; vertical-align: middle; text-align: center">
                     <font style="font-weight: bold;">Cycle Number</font>
