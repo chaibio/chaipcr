@@ -574,7 +574,7 @@ class BaseChart
       @gX.call(@xAxis.scale(@zoomTransform.rescaleX(@xScale)))
 
     # text label for the x axis
-    @setXAxisLabel()
+    # @setXAxisLabel()
 
   setXAxisLabel: ->
     return if not (@config.axes.x.label)

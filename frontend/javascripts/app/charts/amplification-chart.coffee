@@ -7,8 +7,8 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
   MARGIN:
     top: 10
     left: 80
-    right: 15
-    bottom: 50
+    right: 10
+    bottom: 20
 
   inK: ->
     @getMaxY() - @getMinY() > 20000
