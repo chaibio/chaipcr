@@ -1,6 +1,6 @@
 @import './colors.css.scss';
 
-.amplification-well-switch {
+.chart-well-switch {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -26,12 +26,14 @@
       background: #7DC2E6;
     }
   }
+
   .row-header {
     text-align: center;
     &.dragged {
       background: #7DC2E6;
     }
   }
+
   .well-switch {
     min-height: 60px;
     vertical-align: top;
@@ -70,6 +72,7 @@
     .well-switch-bar {
       height: 5px;
     }
+    
     .ct-cq-container {
       border-top: 1px solid #c5c5c5;
       padding: 2px 20px;

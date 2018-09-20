@@ -1,5 +1,5 @@
 
-window.App.directive 'amplificationChart', [
+window.App.directive 'standardCurveChart', [
   '$window'
   '$timeout'
   ($window, $timeout) ->

@@ -7,8 +7,8 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
   MARGIN:
     top: 10
     left: 80
-    right: 15
-    bottom: 50
+    right: 10
+    bottom: 20
 
   inK: ->
     @getMaxY() - @getMinY() > 20000
@@ -39,7 +39,7 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
         .attr('stroke-width', @NORMAL_PATH_STROKE_WIDTH)
         .on('click', (e, a, path) =>
           el = _path.node()
-          @setActivePath(_path, @getMousePosition(el))
+          # @setActivePath(_path, @getMousePosition(el))
           @mouseMoveCb()
         )
         .on('mousemove', (e, a, path) =>

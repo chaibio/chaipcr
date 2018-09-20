@@ -110,6 +110,9 @@
         &.thermal-profile {
           background-image: url("/images/thermal-profile.png");
         }
+        &.standard-curve {
+          background-image: url("/images/standard-curve.png");
+        }
       }
     }
     .chart-name-container {
@@ -143,6 +146,9 @@
           }
           &.thermal-profile {
             background-image: url("/images/thermal-profile-hover.png");
+          }
+          &.standard-curve {
+            background-image: url("/images/standard-curve-hover.png");
           }
         }
       }

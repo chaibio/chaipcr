@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ###
-window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
+window.ChaiBioTech.ngApp.service 'StandardCurveChartHelper', [
   'SecondsDisplay'
   '$filter'
   'Experiment'
@@ -28,10 +28,10 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           min: 1
           key: 'cycle_num'
           ticks: 8
-          label: 'Cycle Number'
+          label: 'Log (Quantity)'
         y:
           unit: 'k'
-          label: 'Relative Fluorescence Units'
+          label: 'Cq'
           ticks: 10
           tickFormat: (y) ->
             # if y >= 1000 then Math.round(( y / 1000) * 10) / 10 else Math.round(y * 10) / 10

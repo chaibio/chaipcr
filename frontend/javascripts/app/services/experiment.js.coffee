@@ -174,6 +174,19 @@ window.ChaiBioTech.ngApp
 
       return deferred.promise
 
+    self.getStandardCurveData = (expId) ->
+      deferred = $q.defer()
+      $http.get("/experiments/#{expId}/standard_curve").then (resp) ->
+        deferred.resolve(resp)
+      , (resp) ->
+        if resp.toString().indexOf('SyntaxError') > -1
+          deferred.reject
+            status: 500
+            statusText: resp
+        else
+          deferred.reject(resp)
+      return deferred.promise  
+
     self.getMeltCurveData = (expId) ->
       deferred = $q.defer()
       $http.get("/experiments/#{expId}/melt_curve_data").then (resp) ->
@@ -206,6 +219,10 @@ window.ChaiBioTech.ngApp
       (end.getTime() - start.getTime())/1000;
 
     self.hasAmplificationCurve = (exp) ->
+      stages = exp.protocol.stages
+      return stages.some((val) => val.stage.name is "Cycling Stage")
+
+    self.hasStandardCurve = (exp) ->
       stages = exp.protocol.stages
       return stages.some((val) => val.stage.name is "Cycling Stage")
 

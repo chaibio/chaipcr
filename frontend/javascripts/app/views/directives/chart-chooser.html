@@ -16,6 +16,16 @@
         <div class="chart-name-container">Amplification Curve</div>
       </div>
 
+      <div class="chart-box" ng-if="hasStandardCurve()" ng-click="changeChart('standard-curve')">
+        <div class="chart-image-container">
+          <div class="chart-current-container">
+            <div class="chart-current" ng-show="currentChart === 'standard-curve'">Current Selection</div>
+          </div>
+          <div class="img-placeholder standard-curve"></div>
+        </div>
+        <div class="chart-name-container">Standard Curve</div>
+      </div>
+        
       <div class="chart-box" ng-if="hasMeltCurve()" ng-click="changeChart('melt-curve')">
         <div class="chart-image-container">
           <div class="chart-current-container">
