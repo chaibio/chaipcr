@@ -22,10 +22,10 @@ limitations under the License.
       <div class="chart-section col-lg-8 col-md-8 col-sm-6 col-xs-6">
         <div>
           <div class="curve-header">
-            <div class="row">
+            <div>
               <div class="col-lg-4 col-md-5 col-sm-5 col-xs-5 curve-name">
                 <!-- <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()"> -->
-                <chart-chooser class="curve-title H1" experiment="experiment" current-chart="$parent.chart">
+                <chart-chooser class="curve-title H1" experiment="experiment" current-chart="$parent.chart" style="font-size: 30px">
                   Standard Curve
                   <img class="arrow-down" src="/images/arrow-down.png">
                 </chart-chooser>
@@ -54,7 +54,7 @@ limitations under the License.
                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 plot-options">
                     <ul>
                       <li>
-                        <span>Standard</span>
+                            <span>Standard</span>
                         <img src="/images/x_k.svg">
                       </li>
                       <li>
@@ -93,10 +93,10 @@ limitations under the License.
                                 <span class="test" style="float:left;">{{color_by.charAt(0).toUpperCase() + color_by.slice(1)}}</span>
                                 <img class="arrow-down" src="/images/arrow-down.png">
                               </button>
-                              <div id="colorByList" class="dropdown-content">
-                                <a href="" ng-click="color_by='sample'" value="abc">Target</a>
+                              <div id="colorByList_standard" class="dropdown-content" style="font-size: 15px">
+                                <a href="" ng-click="color_by='sample'" value="abc">Samle</a>
                                 <a href="" ng-click="color_by='target'" value="abc">Target</a>
-                                <a href="" ng-click="color_by='well'" value="abc">Target</a>
+                                <a href="" ng-click="color_by='well'" value="abc">Well</a>
                               </div>
                             </div>
                           </div>
@@ -109,9 +109,9 @@ limitations under the License.
             </div>
           </div>
 
-          <div class="curve-body" full-height offset="400" min="500">
-            <div class="curve-plot" id="curve-plot">
-              <div class="chart-container" full-height offset="550" min="389">
+          <div class="curve-body" full-height offset="400" min="500" style="padding-right: 0px;">
+            <div class="curve-plot" id="curve-plot" style="display: flex; flex-direction: column; justify-content: space-between; width: 80%">
+              <div class="chart-container" full-height offset="550" min="389" style="height: 85%;">
                 <div class="chart-error B1" ng-show="retrying && !fetching && error">
                   <strong class="text-black">Unable to load chart data</strong>
                   <p ng-bind="error"></p>
@@ -124,9 +124,9 @@ limitations under the License.
                   <p class="B2">May take a minute</p>
                 </div>
 
-                <standardcurve-chart data="standardcurve_data" config="chartConfig" zoom="standardcurve_zoom" on-zoom="onZoom" on-select-line="onSelectLine" on-unselect-line="onUnselectLine" scroll="ampli_scroll.value" show="showStandardChart"></standardcurve-chart>
+                <standard-curve-chart data="standardcurve_data" config="chartConfig" zoom="standardcurve_zoom" on-zoom="onZoom" on-select-line="onSelectLine" on-unselect-line="onUnselectLine" scroll="ampli_scroll.value" show="showStandardChart"></standard-curve-chart>
 
-                <table>
+                <!-- <table>
                   <tr>
                     <td><button class="button zoom-button" ng-click="zoomIn()">+</button></td>
                     <td></td>
@@ -135,51 +135,60 @@ limitations under the License.
                     <td></td>
                     <td><button class="button zoom-button" ng-click="zoomOut()">-</button></td>
                   </tr>
-                </table>
+                </table> -->
+              </div>
+              <div style="display: flex; flex-direction: row; height: 15%;">
+                <div style="display: block; width: 5%; display: flex; flex-direction: column; height: 100%;">
+                  <button class="button zoom-button" ng-click="zoomIn()" style="text-align: center; vertical-align: middle; font-size: 20px; margin-right: 30px; padding: 0px; height: 50%; width: 30px;">+</button>
+                  <button class="button zoom-button" ng-click="zoomOut()" style="text-align: center; vertical-align: middle; font-size: 20px; margin-left: 30px; padding: 0px; height: 50%; width: 30px;">-</button>
+                </div>
+                <div style="display: grid; width: 95%; height: 100%; align-content: center; vertical-align: middle; text-align: center">
+                    <font style="font-weight: bold;">Log (Quantity)</font>
+                </div>
               </div>
             </div>
-
             <div class="additional-info">
-              <div class="parameters">
-                <div class="header">
-                  Target 01
-                </div>
-                <div>
-                  <table class="parameters-table">
-                    <tr>
-                      <td>Effic:</td>
-                      <td>99.9%</td>
-                    </tr>
-                    <tr>
-                      <td>R2:</td>
-                      <td>.998</td>
-                    </tr>
-                    <tr>
-                      <td>Slop:</td>
-                      <td>3.325%</td>
-                    </tr>
-                    <tr>
-                      <td>Y-Int:</td>
-                      <td>26.474%</td>
-                    </tr>
-                  </table>
-                </div>
+              <div style="padding: 0px; background: transparent;">
+                <div class="parameters">
+                    <div class="header" ng-style="bgcolor_target" style="min-height: 41px; font-size: 15px; color: white;">
+                      Target 01
+                    </div>
+                    <div>
+                      <table class="parameters-table">
+                        <tr>
+                          <td style="font-size: 15px; padding: 2px;">Effic:</td>
+                          <td style="font-size: 15px; padding: 2px;">99.9%</td>
+                        </tr>
+                        <tr>
+                          <td style="font-size: 15px; padding: 2px;">R2:</td>
+                          <td style="font-size: 15px; padding: 2px;">.998</td>
+                        </tr>
+                        <tr>
+                          <td style="font-size: 15px; padding: 2px;">Slop:</td>
+                          <td style="font-size: 15px; padding: 2px;">3.325%</td>
+                        </tr>
+                        <tr>
+                          <td style="font-size: 15px; padding: 2px;">Y-Int:</td>
+                          <td style="font-size: 15px; padding: 2px;">26.474%</td>
+                        </tr>
+                      </table>
+                    </div>
+                  </div>
+                  <div class="info" style="font-size: 15px; padding-top: 8px; padding-bottom: 8px;">
+                    Channel: 1
+                  </div>
+                  <div class="info1" style="min-height: 41px; font-size: 15px; color:white; margin-top: 5px">
+                    B4, Sample A
+                  </div>
               </div>
-              <div class="parameters-last-row">
-                Channel: 1
-              </div>
-              <div class="info1">
-                B4, Sample A
-              </div>
-              <br><br>
-              <div class="targets-set" ng-show="targetsSet.length" ng-style="{'top':targetGridTop,'display':'inline-block'}" >
-                <!-- <div class="targets-set" ng-show="targetsSet.length" ng-style="{'top':442px,'display':'inline-block'}" > -->
+             
+              <div class="targets-set" ng-show="targetsSet.length" style="padding-top:5px; padding-bottom: 0px" >
                 <table class="targets-table">
                   <tr ng-repeat="target in targetsSet">
                     <td>
                       <span ng-if="color_by==='target'" class="dot" ng-attr-style="background-color: {{COLORS[$index]}}"></span>
                     </td>
-                    <td>{{target}}</td>
+                    <td style="font-size: 15px; padding-top: 5px; padding-bottom: 5px;">{{target}}</td>
                     <td class="td-tik" ng-click="targetClick($index)">
                       <span ng-show="!targetsSetHided[$index]">
                         <img src="/images/target_on.svg">
@@ -240,7 +249,7 @@ limitations under the License.
               </td>
               <td ng-click="focusExpName($index)">
                 <span ng-if="color_by==='sample'" class="dot" ng-attr-style="background-color: {{samplesSet.indexOf(samples[i]) < 0 ? '#000000' : COLORS[samplesSet.indexOf(samples[i])]}}"></span>
-                <span class="sample-span" ng-click="focusExpName($index)" ng-show="!editExpNameMode[$index]">
+                <span class="sample-span" ng-click="focusExpName($index)" ng-show="!editExpNameMode[$index]" style="font-size: 12px;">
                   {{samples[$index] | truncate:20}}
                 </span>
                 <input type="text" class="sample-input" ng-show="editExpNameMode[$index]" focus-on="editExpNameMode" ng-blur="updateSampleName($index,samples[$index])"  on-shift-enter="updateSampleNameEnter($index,samples[$index])"  ng-model="samples[$index]">
@@ -251,7 +260,7 @@ limitations under the License.
                 </span>
               </td>
               <td ng-click="focusExpTarget($index)">
-                <span class="target-span" ng-click="focusExpTarget($index)" ng-show="!editExpTargetMode[$index]">
+                <span class="target-span" ng-click="focusExpTarget($index)" ng-show="!editExpTargetMode[$index]" style="font-size: 12px;">
                   {{targets[$index] | truncate:20}}
                 </span>
                 <input type="text" ng-show="editExpTargetMode[$index]" focus-on="editExpTargetMode" ng-blur="updateTarget($index,targets[$index])"  on-shift-enter="updateTargetEnter($index,targets[$index])"  ng-model="targets[$index]">

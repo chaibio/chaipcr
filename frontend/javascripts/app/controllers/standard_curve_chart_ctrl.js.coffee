@@ -440,7 +440,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
         document.getElementById("plotTypeList").classList.toggle("show")
 
       $scope.showColorByList = ->
-        document.getElementById("colorByList").classList.toggle("show")
+        document.getElementById("colorByList_standard").classList.toggle("show")
       
       $scope.targetClick = (index) ->
         $scope.targetsSetHided[index] = !$scope.targetsSetHided[index]

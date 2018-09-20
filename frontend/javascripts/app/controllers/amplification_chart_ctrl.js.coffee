@@ -509,7 +509,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         document.getElementById("plotTypeList").classList.toggle("show")
 
       $scope.showColorByList = ->
-        document.getElementById("colorByList").classList.toggle("show")
+        document.getElementById("colorByList_ampli").classList.toggle("show")
       
       $scope.targetClick = (index) ->
         $scope.targetsSetHided[index] = !$scope.targetsSetHided[index]
