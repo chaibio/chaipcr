@@ -1,7 +1,7 @@
 <?xml version='1.1' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>Build basic debian image with kernel version 4.9</description>
+  <description>Build basic debian image with kernel version 4.x</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.17.2">
@@ -253,7 +253,9 @@ swapoff -a
 mount -o remount,rw /
 echo 0 &gt; /proc/sys/kernel/hung_task_timeout_secs
 
-image_filename=bone-debian-9.3-console-armhf-2017-12-10-1gb.img.xz
+#image_filename=bone-debian-9.3-console-armhf-2017-12-10-1gb.img.xz # 551478c0aabd85c25ff68b73de691616009287de47bd8803e6c5adb3fe791e99
+image_filename=bone-debian-9.3-console-armhf-2018-01-28-1gb.img.xz # 223dc801c18edbcb9060e6a369eea38f95e09ff16da57f9394c9c8b5ce2c297d
+#image_filename=bone-debian-9.4-console-armhf-2018-06-17-1gb.img.xz # 56b27f7e659e4bb8e894b2882a1d64c9b0f6ed4612754cc7316ead01ec1eac1e
 
 rm $image_filename || true
 rm -r .julia
@@ -261,7 +263,7 @@ rm -r .julia
 wget $download_prefix/$image_filename || exit 1
 
 #Verify Image with:
-if sha256sum $image_filename | grep 551478c0aabd85c25ff68b73de691616009287de47bd8803e6c5adb3fe791e99
+if sha256sum $image_filename | grep 223dc801c18edbcb9060e6a369eea38f95e09ff16da57f9394c9c8b5ce2c297d
 then
 	echo Checksum OK..
 else

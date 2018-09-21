@@ -180,6 +180,31 @@ start_unicorn () {
 	/usr/local/bin/bundle exec /usr/local/bin/unicorn -c /root/chaipcr/web/config/unicorn.rb -E production -D || true
 }
 
+start_nginx () {
+       echo starting nginx
+       nginx_logdir=/var/log/nginx
+       if [ -d "$nginx_logdir" ] && [ -x "$nginx_logdir" ]; then
+         echo "Nginx log directory already exists, Proceed to starting Nginx..."
+       else
+         echo "Nginx directory $nginx_logdir doesn't exist, Create the directory..."
+         mkdir $nginx_logdir
+       fi
+
+       echo
+       echo "Make sure Nginx log files are writable..."
+       echo
+       touch $nginx_logdir/error.log
+       touch $nginx_logdir/access.log
+       echo "Enable automatic start of nginx at the time of reboot and start nginx..."
+       echo
+       systemctl enable nginx.service
+       systemctl start nginx.service
+
+       echo "Check the status of nginx service..."
+       echo
+       systemctl status nginx.service
+}
+
 start_julia () {
 	echo starting
 	if [ -e /root/chaipcr/bioinformatics/juliaserver.jl ] && [ -e /usr/bin/julia ]
@@ -239,6 +264,14 @@ run_clean_user_tokens () {
 		echo starting unicorn
 		start_unicorn &
 	fi
+
+        if  ps aux | grep nginx | grep -v grep
+        then
+                echo nginx is running
+        else
+                echo Start nginx process
+                start_nginx &
+        fi
 
 	run_cleanup_user_tokens_every4hours &
 

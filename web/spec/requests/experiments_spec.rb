@@ -69,6 +69,13 @@ describe "Experiments API", type: :request do
     json.length.should eq(2)
   end
   
+  it "list standard experiments" do
+    get "/experiments/filter_by_standard", { :format => 'json' }
+    expect(response).to be_success            # test for the 200 status-code
+    json = JSON.parse(response.body)
+    json.length.should eq(0)
+  end
+  
   it "set time_valid to false" do
     Setting.where(:id=>1).update_all(:time_valid=>false)
     params = { experiment: {name: "test"} }
