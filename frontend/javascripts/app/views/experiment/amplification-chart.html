@@ -141,58 +141,61 @@ limitations under the License.
             </div>
 
             <div class="additional-info">
-              <div style="padding: 0px; background: transparent">
-                  <div class="parameters">
-                    <div class="header" ng-style="bgcolor_target" style="min-height: 41px; font-size: 15px; color:white;">
-                      <!-- Target: -->
-                      {{label_target}}
-                    </div>
-                    <div>
-                      <table class="parameters-table">
-                        <tr>
-                          <td style="font-size: 15px; padding: 2px;">Cycle:</td>
-                          <td style="font-size: 15px; padding: 2px;">{{label_cycle}}</td>
-                        </tr>
-                        <tr>
-                          <td style="font-size: 15px; padding: 2px;">RFU:</td>
-                          <td style="font-size: 15px; padding: 2px;">{{label_RFU}}</td>
-                        </tr>
-                        <tr>
-                          <td style="font-size: 15px; padding: 2px;">dF/dc:</td>
-                          <td style="font-size: 15px; padding: 2px;">{{label_dF_dC}}</td>
-                        </tr>
-                        <tr>
-                          <td style="font-size: 15px; padding: 2px;">D<sup>2</sup>/dc<sup>2</sup>:</td>
-                          <td style="font-size: 15px; padding: 2px;">{{label_D2_dc2}}</td>
-                        </tr>
-                      </table>
-                    </div>
+              <div style="height:100%; padding-right: 20px; margin: 0px; background: transparent; display: flex; float: left; flex-direction: column; justify-content: space-between;">
+                  <div style="padding: 0px; background: transparent">
+                      <div class="parameters">
+                        <div class="header" ng-style="bgcolor_target" style="min-height: 41px; font-size: 15px; color:white;">
+                          <!-- Target: -->
+                          {{label_target}}
+                        </div>
+                        <div>
+                          <table class="parameters-table">
+                            <tr>
+                              <td style="font-size: 15px; padding: 2px;">Cycle:</td>
+                              <td style="font-size: 15px; padding: 2px;">{{label_cycle}}</td>
+                            </tr>
+                            <tr>
+                              <td style="font-size: 15px; padding: 2px;">RFU:</td>
+                              <td style="font-size: 15px; padding: 2px;">{{label_RFU}}</td>
+                            </tr>
+                            <tr>
+                              <td style="font-size: 15px; padding: 2px;">dF/dc:</td>
+                              <td style="font-size: 15px; padding: 2px;">{{label_dF_dC}}</td>
+                            </tr>
+                            <tr>
+                              <td style="font-size: 15px; padding: 2px;">D<sup>2</sup>/dc<sup>2</sup>:</td>
+                              <td style="font-size: 15px; padding: 2px;">{{label_D2_dc2}}</td>
+                            </tr>
+                          </table>
+                        </div>
+                      </div>
+                      <div class="info" style="font-size: 15px; padding-top: 8px; padding-bottom: 8px; padding-left: 10px;">
+                        Channel: {{label_channel}}
+                      </div>
+                      <!-- <div class="info1" ng-style="bgcolor_wellSample"  style="min-height: 41px; font-size: 15px; color:white; margin-top: 5px">
+                        {{label_well}}{{label_sample ? ", " : ""}}{{label_sample}}
+                      </div> -->
                   </div>
-                  <div class="info" style="font-size: 15px; padding-top: 8px; padding-bottom: 8px;">
-                    Channel: {{index_channel + 1}}
+                  <div class="targets-set" ng-show="targetsSet.length" style="padding-top:5px; padding-bottom: 0px">
+                    <table class="targets-table">
+                      <tr ng-repeat="target in targetsSet">
+                        <td>
+                          <span ng-if="color_by==='target'" class="dot" ng-attr-style="background-color: {{COLORS[$index]}}"></span>
+                        </td>
+                        <td style="font-size: 15px; padding-top: 5px; padding-bottom: 5px;">{{target}}</td>
+                        <td class="td-tik" ng-click="targetClick($index)">
+                          <span ng-show="!targetsSetHided[$index]">
+                            <img src="/images/target_on.svg">
+                          </span>
+                          <span ng-show="targetsSetHided[$index]">
+                              <img src="/images/target_off.svg">
+                            </span>
+                          </td>
+                      </tr>
+                    </table>
                   </div>
-                  <!-- <div class="info1" ng-style="bgcolor_wellSample"  style="min-height: 41px; font-size: 15px; color:white; margin-top: 5px">
-                    {{label_well}}{{label_sample ? ", " : ""}}{{label_sample}}
-                  </div> -->
               </div>
-              <div class="targets-set" ng-show="targetsSet.length" style="padding-top:5px; padding-bottom: 0px">
-                <table class="targets-table">
-                  <tr ng-repeat="target in targetsSet">
-                    <td>
-                      <span ng-if="color_by==='target'" class="dot" ng-attr-style="background-color: {{COLORS[$index]}}"></span>
-                    </td>
-                    <td style="font-size: 15px; padding-top: 5px; padding-bottom: 5px;">{{target}}</td>
-                    <td class="td-tik" ng-click="targetClick($index)">
-                      <span ng-show="!targetsSetHided[$index]">
-                        <img src="/images/target_on.svg">
-                      </span>
-                      <span ng-show="targetsSetHided[$index]">
-                          <img src="/images/target_off.svg">
-                        </span>
-                      </td>
-                  </tr>
-                </table>
-              </div>
+              
             </div>
           </div>
 

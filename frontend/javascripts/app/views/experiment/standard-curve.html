@@ -32,7 +32,7 @@ limitations under the License.
               </div>
               <div class="col-lg-8 col-md-7 col-sm-7 col-xs-7 ampli-toggles">
                 <div class="row">
-                  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 plot-options">
+                  <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 plot-options">
                     <!-- <div class="subheader-switches SH">
                       <div class="item-switch">
                         <label>Baseline Sub.</label>
@@ -51,10 +51,10 @@ limitations under the License.
                       </div>
                     </div> -->
                   </div>
-                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 plot-options">
+                  <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 plot-options">
                     <ul>
                       <li>
-                            <span>Standard</span>
+                        <span>Standard</span>
                         <img src="/images/x_k.svg">
                       </li>
                       <li>
@@ -82,12 +82,12 @@ limitations under the License.
                       </form>
                     </div> -->
                   </div>
-                  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 plot-options">
+                  <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 plot-options">
                     <div class="plot-option">
                       <p>Color by</p>
                       <form role="form" class="form-horizontal" name="colorBy" novalidate>
                         <div class="form-group">
-                          <div class="col-md-12">
+                          <div class="col-md-12" style="padding-right: 10px;">
                             <div class="dropdown" ng-click="showColorByList()">
                               <button class="dropbtn">
                                 <span class="test" style="float:left;">{{color_by.charAt(0).toUpperCase() + color_by.slice(1)}}</span>
@@ -148,8 +148,9 @@ limitations under the License.
               </div>
             </div>
             <div class="additional-info">
-              <div style="padding: 0px; background: transparent;">
-                <div class="parameters">
+              <div style="height:100%; padding-right: 20px; margin: 0px; background: transparent; display: flex; float: left; flex-direction: column; justify-content: space-between;">
+                <div style="padding: 0px; background: transparent;">
+                  <div class="parameters">
                     <div class="header" ng-style="bgcolor_target" style="min-height: 41px; font-size: 15px; color: white;">
                       Target 01
                     </div>
@@ -174,34 +175,32 @@ limitations under the License.
                       </table>
                     </div>
                   </div>
-                  <div class="info" style="font-size: 15px; padding-top: 8px; padding-bottom: 8px;">
+                  <div class="info" style="font-size: 15px; padding-top: 8px; padding-bottom: 8px; padding-left: 10px;">
                     Channel: 1
                   </div>
-                  <div class="info1" style="min-height: 41px; font-size: 15px; color:white; margin-top: 5px">
+                  <div class="info1" style="min-height: 41px; font-size: 15px; color:white; padding-top: 8px; padding-bottom: 8px; margin-top: 5px; padding-left: 10px;">
                     B4, Sample A
                   </div>
-              </div>
-              
-              
-
-
-              <div class="targets-set" ng-show="targetsSet.length" style="padding-top:5px; padding-bottom: 0px" >
-                <table class="targets-table">
-                  <tr ng-repeat="target in targetsSet">
-                    <td>
-                      <span ng-if="color_by==='target'" class="dot" ng-attr-style="background-color: {{COLORS[$index]}}"></span>
-                    </td>
-                    <td style="font-size: 15px; padding-top: 5px; padding-bottom: 5px;">{{target}}</td>
-                    <td class="td-tik" ng-click="targetClick($index)">
-                      <span ng-show="!targetsSetHided[$index]">
-                        <img src="/images/target_on.svg">
-                      </span>
-                      <span ng-show="targetsSetHided[$index]">
-                          <img src="/images/target_off.svg">
-                        </span>
+                </div>
+  
+                <div class="targets-set" ng-show="targetsSet.length" style="padding-top:5px; padding-bottom: 0px" >
+                  <table class="targets-table">
+                    <tr ng-repeat="target in targetsSet">
+                      <td>
+                        <span ng-if="color_by==='target'" class="dot" ng-attr-style="background-color: {{COLORS[$index]}}"></span>
                       </td>
-                  </tr>
-                </table>
+                      <td style="font-size: 15px; padding-top: 5px; padding-bottom: 5px;">{{target}}</td>
+                      <td class="td-tik" ng-click="targetClick($index)">
+                        <span ng-show="!targetsSetHided[$index]">
+                          <img src="/images/target_on.svg">
+                        </span>
+                        <span ng-show="targetsSetHided[$index]">
+                            <img src="/images/target_off.svg">
+                          </span>
+                        </td>
+                    </tr>
+                  </table>
+                </div>
               </div>
             </div>
           </div>

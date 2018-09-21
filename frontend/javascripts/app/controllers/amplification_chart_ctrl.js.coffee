@@ -81,11 +81,11 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.label_D2_dc2 = 0
 
       $scope.index_target = 0
-      $scope.index_channel = 0
+      $scope.index_channel = -1
       $scope.label_sample = null
       $scope.label_target = "No Selection"
       $scope.label_well = "No Selection"
-      $scope.label_channel = 0
+      $scope.label_channel = ""
       
 
       $scope.bgcolor_target = {
@@ -431,10 +431,11 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           if(i == config.config.well)
             $scope.index_target = i % 8
             if (i < 8) 
-              $scope.index_channel = 0
-            else 
               $scope.index_channel = 1
+            else 
+              $scope.index_channel = 2
 
+            $scope.label_channel = $scope.index_channel.toString()
             if i < $scope.targets.length
               if $scope.targets[i]!=null
                 $scope.label_target = $scope.targets[i]
@@ -461,6 +462,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
         $scope.label_target = "No Selection"
         $scope.label_well = "No Selection"
+        $scope.label_channel = ""
+
         $scope.label_sample = null
         $scope.bgcolor_target = {
           'background-color':'#666666'

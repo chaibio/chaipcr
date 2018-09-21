@@ -232,24 +232,22 @@
       background-color: #fff;
       padding: 10px;
       display: inline-block;
-      width: 85%;
+      //width: 85%;
       float: left;
       // height: 100%;
     }
     .additional-info {
       // position: relative;
       //display: inline-block;
-      display: flex;
-      float: left;
-      flex-direction: column;
-      justify-content: space-between;
-      width: 16%;
+     
       // height: 100%;
+      width: 20%;
+
       margin-left: 20px;
       div {
         width: 100%;
         background-color: #fff;
-        padding: 10px;
+        padding: 0px;
       }
       .parameters {
         padding: 0px;
@@ -533,7 +531,7 @@
       outline: none;
       border: none;
       font-family: 'dinot-Regular';
-      font-size: 16px;
+      font-size: 12px;
       //width: 140px;
     }
     table {
