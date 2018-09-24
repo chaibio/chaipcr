@@ -96,6 +96,8 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
             pt["well_#{i}_background_log"] = if y_item[3] > 0 then y_item[3] else 10
             pt["well_#{i}_baseline_log"] =  if y_item[4] > 0 then y_item[4] else 10
 
+            pt["well_#{i}_dr1_pred"] =  y_item[5]
+            pt["well_#{i}_dr2_pred"] =  y_item[6]
           return pt
 
       return channel_datasets
@@ -107,7 +109,9 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         paddData["well_#{i}_background"] = 0
         paddData["well_#{i}_background_log"] = 0
         paddData["well_#{i}_baseline_log"] = 0
-
+        paddData["well_#{i}_dr1_pred"] = 0
+        paddData["well_#{i}_dr2_pred"] = 0
+  
       channel_1: [paddData]
       channel_2: [paddData]
 

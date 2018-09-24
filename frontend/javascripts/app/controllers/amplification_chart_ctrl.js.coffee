@@ -86,7 +86,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.label_target = "No Selection"
       $scope.label_well = "No Selection"
       $scope.label_channel = ""
-      
 
       $scope.bgcolor_target = {
         'background-color':'#666666'
@@ -323,6 +322,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             $scope.fetching = false
             $scope.error = null
             
+            # alert(resp)
+            # console.log(resp)
+
             if (resp.status is 200 and resp.data?.partial and $scope.enterState) or (resp.status is 200 and !resp.data.partial)
               $scope.hasData = true
               $scope.amplification_data = helper.paddData()
@@ -397,6 +399,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                   dataset: "channel_#{ch_i}"
                   x: 'cycle_num'
                   y: "well_#{i}_#{subtraction_type}#{if $scope.curve_type is 'log' then '_log' else ''}"
+                  dr1_pred: "well_#{i}_#{'dr1_pred'}"
+                  dr2_pred: "well_#{i}_#{'dr2_pred'}"
                   color: well_color
                   cq: $scope.wellButtons["well_#{i}"]?.ct
                   well: i
@@ -441,7 +445,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                 $scope.label_target = $scope.targets[i]
               else
                 $scope.label_target = ""
-              
             else 
               $scope.label_target = ""
 
@@ -453,6 +456,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             else 
               $scope.label_sample = null
 
+            # $scope.label_dF_dC = 
+            # $scope.label_D2_dc2 = 
             wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8']
             $scope.label_well = wells[i]
           

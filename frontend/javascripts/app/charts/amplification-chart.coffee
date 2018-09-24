@@ -23,13 +23,16 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
     if @config.axes.y.scale is 'log' then d3.curveMonotoneX else d3.curveBasis
 
   makeColoredLine: (line_config) ->
+
     xScale = @getXScale()
     yScale = @getYScale()
     line = d3.line()
     line.curve(@getLineCurve())
     line.x (d) -> xScale(d[line_config.x])
     line.y (d) -> yScale(d[line_config.y])
+    
     if (@config.axes.y.scale is 'log') then line.defined (d) -> d[line_config.y] > 10
+    
     _path = @viewSVG.append("path")
         .datum(@data[line_config.dataset])
         .attr("class", "colored-line")

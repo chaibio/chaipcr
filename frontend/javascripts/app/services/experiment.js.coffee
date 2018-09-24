@@ -161,6 +161,7 @@ window.ChaiBioTech.ngApp
       return deferred.promise
 
     self.getAmplificationData = (expId) ->
+      console.log('strange')
       deferred = $q.defer()
       $http.get("/experiments/#{expId}/amplification_data").then (resp) ->
         deferred.resolve(resp)

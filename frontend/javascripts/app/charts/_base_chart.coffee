@@ -268,7 +268,7 @@ class BaseChart
       conf = @activePathConfig
 
       if (@onUpdateProperties)
-        @onUpdateProperties(d[@config.series[conf.index].x], d[@config.series[conf.index].y], 40, 50)
+        @onUpdateProperties(d[@config.series[conf.index].x], d[@config.series[conf.index].y], d[@config.series[conf.index].dr1_pred], d[@config.series[conf.index].dr2_pred])
 
       # @box.RFYTextValue.text(d[@config.series[conf.index].y]) if @box.RFYTextValue
       # @box.cycleTextValue.text(d[@config.series[conf.index].x]) if @box.cycleTextValue
@@ -299,7 +299,7 @@ class BaseChart
     line.curve(@getLineCurve())
     line.x (d) -> xScale(d[line_config.x])
     line.y (d) -> yScale(d[line_config.y])
-
+   
     @viewSVG.append("path")
         .datum(@data[line_config.dataset])
         .attr("class", "guiding-line")
@@ -311,6 +311,7 @@ class BaseChart
         .on 'click', => @unsetActivePath()
 
   makeColoredLine: (line_config) ->
+    
     xScale = @getXScale()
     yScale = @getYScale()
     line = d3.line()
@@ -377,6 +378,9 @@ class BaseChart
     for s in series by 1
       @lines.push(@makeColoredLine(s))
 
+    # console.log('strange haha')
+    # console.log(@lines)
+
     if @activePathConfig
       @makeCircle()
       m = @prevMousePosition
@@ -386,7 +390,7 @@ class BaseChart
         if (s.well is @activePathConfig.config.well and s.channel is @activePathConfig.config.channel)
           p = @lines[i]
           break
-
+        
       if p
         @setActivePath(p)
         @showMouseIndicators()
