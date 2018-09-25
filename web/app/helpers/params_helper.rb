@@ -20,7 +20,7 @@ module ParamsHelper
   
 private
   def experiment_params
-     params.require(:experiment).permit(:name)
+     params.require(:experiment).permit(:name, :notes)
   end
   
   def amplification_option_params

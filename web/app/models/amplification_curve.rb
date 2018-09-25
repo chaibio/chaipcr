@@ -19,7 +19,17 @@
 class AmplificationCurve < ActiveRecord::Base
   belongs_to :experiment
   
+  attr_accessor :replic, :mean_cq
+
   def self.retrieve(experiment_id, stage_id)
-    self.where(:experiment_id=>experiment_id, :stage_id=>stage_id).order(:channel, :well_num)
+    self.where(:experiment_id=>experiment_id, :stage_id=>stage_id).order(:channel, :well_num).select("channel, well_num, ct as cq")
+  end
+
+  def quantity
+    [nil, nil]
+  end
+
+  def mean_quantity
+    [nil, nil]
   end
 end

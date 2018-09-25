@@ -24,8 +24,7 @@ class WellNode #change to Well later
     {
       :well=>(!targets.blank?)? targets.map {|target|
         (target)? {:target=>target.id, :cq=>target.ct.to_f, :quantity=>{:m=>target.quantity_m.to_f, :b=>target.quantity_b}} : {}
-        } : nil,
-      :sample=>(!samples.blank?)? samples.first.id : nil
+        } : nil
     }
   end  
 end
@@ -64,11 +63,10 @@ class WellLayout < ActiveRecord::Base
   end
   
   def standard_curve
-    wellsamples = Sample.joins(:samples_wells).where(["samples_wells.well_layout_id=?", id]).order("well_num").select("samples.*, well_num")
     welltargets = Target.joins(:targets_wells).joins("inner join amplification_curves on amplification_curves.well_num = targets_wells.well_num and amplification_curves.channel = targets.channel")
                   .where(["targets_wells.well_layout_id=? and amplification_curves.experiment_id=? and ct is not NULL and targets_wells.quantity_m is not NULL and targets_wells.quantity_b is not NULL and targets_wells.omit = false", id, experiment_id])
                   .order("well_num, channel").select("targets.id, targets.channel, targets_wells.well_num, ct, quantity_m, quantity_b")  
-    well_array(wellsamples, welltargets)
+    well_array([], welltargets)
   end
   
   def copy

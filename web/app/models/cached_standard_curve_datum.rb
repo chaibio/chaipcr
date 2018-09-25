@@ -19,7 +19,7 @@
 class CachedStandardCurveDatum < ActiveRecord::Base
   belongs_to :experiment
   
-  def self.invalidate(experiment)
-    delete_all(:experiment_id => experiment.id)
+  def self.invalidate(well_layout_id)
+    delete_all(:well_layout_id => well_layout_id)
   end
 end

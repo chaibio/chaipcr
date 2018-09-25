@@ -18,15 +18,7 @@ describe "Targets API", type: :request do
     @target2 = Target.find_by_id(json["target"]["id"])
   end
   
-  describe "#all" do
-    it "empty targets with no well layout" do
-      @experiment.well_layout.destroy
-      get "/experiments/#{@experiment.id}/targets", http_headers
-      expect(response).to be_success
-      json = JSON.parse(response.body)
-      expect(json.length).to eq(0)
-    end
-    
+  describe "#all" do    
     it 'targets' do
       post "/experiments/#{@experiment.id}/targets/#{@target1.id}/links", {wells:[{well_num: 1}]}.to_json, http_headers
       expect(response).to be_success

@@ -119,6 +119,8 @@ class Experiment < ActiveRecord::Base
     end
   end
 
+  scope :for_well_layout, lambda {|well_layout_id| joins("well_layouts on well_layouts.experiment_id = experiments.id and well_layouts.parent_type = '#{Experiment.name}'").where(["well_layouts.id=?", well_layout_id])}
+
   validates :name, presence: true
   validate :validate
 
@@ -152,9 +154,7 @@ class Experiment < ActiveRecord::Base
 
   before_create do |experiment|
     experiment.time_valid = (Setting.time_valid)? 1 : 0
-    if experiment.well_layout == nil
-      experiment.create_well_layout
-    end
+    experiment.create_well_layout!
   end
 
   before_destroy do |experiment|
@@ -185,14 +185,18 @@ class Experiment < ActiveRecord::Base
     AmplificationCurve.delete_all(:experiment_id => experiment.id)
     AmplificationDatum.delete_all(:experiment_id => experiment.id)
     CachedMeltCurveDatum.delete_all(:experiment_id => experiment.id)
-    Well.delete_all(:experiment_id => experiment.id)
   end
 
-  def create_well_layout
-    if experiment_definition.well_layout != nil
-      self.well_layout = experiment_definition.well_layout.copy
-    else
-      self.well_layout = WellLayout.new(:experiment_id=>id, :parent_type=>Experiment.name)
+  def create_well_layout!
+    if self.well_layout == nil
+      if experiment_definition.well_layout != nil
+        self.well_layout = experiment_definition.well_layout.copy
+      else
+        self.well_layout = WellLayout.new(:experiment_id=>id, :parent_type=>Experiment.name)
+      end
+      if !self.new_record?
+        self.well_layout.save
+      end
     end
   end
   

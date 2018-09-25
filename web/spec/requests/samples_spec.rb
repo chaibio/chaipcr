@@ -22,14 +22,6 @@ describe "Samples API", type: :request do
       expect(json.length).to eq(0)
     end
     
-    it "empty samples with no well layout" do
-      @experiment.well_layout.destroy
-      get "/experiments/#{@experiment.id}/samples", http_headers
-      expect(response).to be_success
-      json = JSON.parse(response.body)
-      expect(json.length).to eq(0)
-    end
-    
     it 'samples' do
       post "/experiments/#{@experiment.id}/samples/#{@sample.id}/links", {wells: [1]}.to_json, http_headers
       expect(response).to be_success
@@ -61,14 +53,6 @@ describe "Samples API", type: :request do
       expect(response.response_code).to eq(422)
       json = JSON.parse(response.body)
       expect(json["sample"]["errors"]).not_to be_nil
-    end
-    
-    it 'with no well layout' do
-      @experiment.well_layout.destroy
-      post "/experiments/#{@experiment.id}/samples", {name: "test1"}.to_json, http_headers
-      expect(response).to be_success
-      json = JSON.parse(response.body)
-      expect(json["sample"]["name"]).to eq("test1")
     end
   end
   

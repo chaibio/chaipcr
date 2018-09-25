@@ -147,10 +147,12 @@ class AmplificationDatum < ActiveRecord::Base
     end
   end
 
+  scope :filter_by_targets, lambda {|well_layout_id| unscope(:select).select("amplification_data.*, targets_wells.target_id as target_id").joins("inner join targets_wells on targets_wells.well_num = amplification_data.well_num and targets_wells.well_layout_id = #{well_layout_id} inner join targets on targets.id=targets_wells.target_id and targets.channel = amplification_data.channel")}
+
   attr_accessor :fluorescence_value
 
   def self.retrieve(experiment_id, stage_id)
-    self.where(:experiment_id=>experiment_id, :stage_id=>stage_id).order(:channel, :well_num, :cycle_num)
+    self.where(:experiment_id=>experiment_id, :stage_id=>stage_id).order(:channel, :well_num, :cycle_num).select("amplification_data.*, channel as target_id")
   end
 
   def self.maxid(experiment_id, stage_id)

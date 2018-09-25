@@ -28,7 +28,7 @@ class SamplesWell < ActiveRecord::Base
   validates :well_num, :inclusion => {:in=>1..16, :message => "%{value} is not between 1 and 16"}
   validate :validate
   
-  def self.find_or_create(sample, well_layout_id, well_num)
+  def self.find_or_create(sample, well_layout_id, well_num, notes)
      sample_well = where(:well_layout_id=>well_layout_id, :well_num=>well_num).first
      if sample_well
        sample_well.sample = sample
@@ -36,6 +36,7 @@ class SamplesWell < ActiveRecord::Base
        sample_well = self.new(:well_layout_id=>well_layout_id, :sample=>sample, :well_num=>well_num)
        sample_well.validate_samples_in_well = false
      end
+     sample_well.notes = notes if sample_well
      sample_well
   end
   

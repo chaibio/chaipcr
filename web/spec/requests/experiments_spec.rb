@@ -70,7 +70,7 @@ describe "Experiments API", type: :request do
   end
   
   it "list standard experiments" do
-    get "/experiments/filter_by_standard", { :format => 'json' }
+    get "/experiments?type=standard", { :format => 'json' }
     expect(response).to be_success            # test for the 200 status-code
     json = JSON.parse(response.body)
     json.length.should eq(0)
@@ -95,13 +95,14 @@ describe "Experiments API", type: :request do
     experiment.calibration_id.should == 1
   end
   
-  it  'edit experiment name' do
+  it  'edit experiment name and notes' do
     experiment = create_experiment("test")
-    params = {experiment: {name: "test1"}}
+    params = {experiment: {name: "test1", notes: "note"}}
     put "/experiments/#{experiment.id}", params.to_json, http_headers
     expect(response).to be_success 
     json = JSON.parse(response.body)
     json["experiment"]["name"].should == "test1"
+    json["experiment"]["notes"].should == "note"
   end
   
   describe "check editable" do

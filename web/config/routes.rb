@@ -94,16 +94,8 @@ Qpcrctl::Application.routes.draw do
       get 'temperature_data'
       get 'amplification_data'
       get 'melt_curve_data'
-      get 'standard_curve'
       get 'export'
       get 'analyze'
-      get 'filter_by_standard'
-    end
-    
-    resources :wells, param: :well_num, only: [:index, :update, :destroy] do
-      collection do
-        put '', :action => 'bulk_update'
-      end
     end
 
     resources :samples, only: [:index, :create, :update, :destroy] do

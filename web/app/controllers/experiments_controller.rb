@@ -64,6 +64,13 @@ class ExperimentsController < ApplicationController
 			key :tags, [
 				'Experiment'
 			]
+			parameter do
+				key :name, :type
+				key :in, :query
+				key :description, 'filter by type (i.e. standard)'
+				key :required, false
+        key :type, :string
+			end
       response 200 do
         key :description, 'Object containing list of all the experiments'
         schema do
@@ -111,7 +118,12 @@ class ExperimentsController < ApplicationController
   #api :GET, "/experiments", "List all the experiments"
   #example "[{'experiment':{'id':1,'name':'test1','type':'user','started_at':null,'completed_at':null,'completed_status':null}},{'experiment':{'id':2,'name':'test2','type':'user','started_at':null,'completed_at':null,'completed_status':null}}]"
   def index
-    @experiments = Experiment.includes(:experiment_definition).where("experiment_definitions.experiment_type"=>[ExperimentDefinition::TYPE_USER_DEFINED, ExperimentDefinition::TYPE_TESTKIT]).order("experiments.id DESC").load
+    @experiments = Experiment.includes(:experiment_definition).where("experiment_definitions.experiment_type"=>[ExperimentDefinition::TYPE_USER_DEFINED, ExperimentDefinition::TYPE_TESTKIT]).order("experiments.id DESC")
+    if params[:type] == "standard"
+      @experiments = @experiments.joins(:well_layout).joins("inner join targets_wells on targets_wells.well_layout_id = well_layouts.id").where("targets_wells.well_type"=>TargetsWell::TYPE_STANDARD, "completion_status"=>"success")
+    end
+    @experiments = @experiments.to_a
+ 
     respond_to do |format|
       format.json { render "index", :status => :ok }
     end
@@ -133,36 +145,6 @@ class ExperimentsController < ApplicationController
     ret = @experiment.save
     respond_to do |format|
       format.json { render "fullshow", :status => (ret)? :ok : :unprocessable_entity}
-    end
-	end
-
-	swagger_path '/experiments/filter_by_standard' do
-		operation :get do
-			key :summary, 'List all Experiments with standard well type'
-			key :description, 'Returns all experiments from the system sorted by the id along with well type as standard'
-			key :produces, [
-					'application/json',
-			]
-			key :tags, [
-					'Experiment'
-			]
-			response 200 do
-				key :description, 'Object containing list of all the experiments with standard'
-				schema do
-					key :type, :array
-					items do
-						key :'$ref', :Experiments
-					end
-				end
-			end
-		end
-	end
-
-	api :GET, "/experiments/filter_by_standard", "List all the experiments with well type standard"
-	def filter_by_standard
-		@experiments = Experiment.includes(:experiment_definition).joins(:well_layout).joins("inner join targets_wells on targets_wells.well_layout_id = well_layouts.id").where("experiment_definitions.experiment_type"=>[ExperimentDefinition::TYPE_USER_DEFINED, ExperimentDefinition::TYPE_TESTKIT], "targets_wells.well_type"=>TargetsWell::TYPE_STANDARD).order("experiments.id DESC").load
-    respond_to do |format|
-      format.json { render "index", :status => :ok }
     end
 	end
 
@@ -370,63 +352,6 @@ class ExperimentsController < ApplicationController
     end
   end
   
-  def standard_curve
-    if @experiment
-      if @experiment.completion_status == "success"
-        cached_data = CachedStandardCurveDatum.where(:experiment_id=>@experiment.id).first
-        if cached_data.nil? #no cache data found
-          begin
-            task_submitted = background_standard_curve_data(@experiment)
-            render :nothing => true, :status => (task_submitted)? 202 : 503
-          rescue  => e
-            render :json=>e.to_s, :status => 500
-          end
-        else
-          standard_curve_results = JSON.parse(cached_data.standard_curve_result)
-          #puts response.body
-          results = Hash.new
-          unknown_targets_hash = Target.unknowns_for_experiment(@experiment)
-          if !standard_curve_results["targets"].blank?
-            standard_curve_results["targets"].each do |target_equation|
-              if !target_equation["slope"].nil? && !target_equation["offset"].nil?
-                results["targets"] = Array.new if results["targets"].nil?
-                result_per_target = target_equation
-                unknown_targets = unknown_targets_hash[target_equation["target_id"]]
-                if unknown_targets
-                  result_per_target = target_equation.clone
-                  result_per_target["unknowns"] = Array.new
-                  unknown_targets.each do |unknown_target|
-                    quantity_log10 = (unknown_target.cq-target_equation["offset"])/target_equation["slope"]
-                    quantity = 10**quantity_log10
-                    quantity_nodes = ("%.8e" % quantity).split("e")
-                    if quantity_nodes.length == 2
-                      quantity_m = quantity_nodes[0].to_f
-                      quantity_b = quantity_nodes[1].to_i
-                      result_per_target["unknowns"] << {:well_num=>unknown_target.well_num, :cq=>unknown_target.cq, :quantity=>{:m=>quantity_m, :b=>quantity_b}}
-                    end
-                  end
-                end
-                results["targets"] << result_per_target
-              end
-            end
-          end
-          if !standard_curve_results["groups"].blank?
-            results["groups"] = standard_curve_results["groups"]
-          end
-          render :json=>results, :status => :ok
-        end
-      elsif !@experiment.ran?
-        render :json=>{:errors=>"Please run the experiment before calling standard curve"}, :status => 500
-      elsif !@experiment.running?
-        render :json=>{:errors=>"Please wait for the experiment to be completed before calling standard curve"}, :status => 500
-      else
-        render :json=>{:errors=>"experiment cannot be standard curve because it wasn't completed successfully (status=#{completion_status})"}, :status => 500
-      end
-    else
-      render :json=>{:errors=>"experiment not found"}, :status => :not_found
-    end
-  end
-  
 	swagger_path '/experiments/{id}/temperature_data' do
 		operation :get do
 			key :summary, 'Retrieve temperature data'
@@ -557,7 +482,7 @@ class ExperimentsController < ApplicationController
 				key :default, true
 			end
 			parameter do
-				key :name, :cq
+				key :name, :summary
 				key :in, :query
 				key :description, 'If cq values should be returned, by default it is retuned'
 				key :type, :boolean
@@ -614,17 +539,19 @@ class ExperimentsController < ApplicationController
 		end
 	end
 
-  api :GET, "/experiments/:id/amplification_data?raw=false&background=true&baseline=true&firstderiv=true&secondderiv=true&cq=true&step_id[]=43&step_id[]=44", "Retrieve amplification data"
+  api :GET, "/experiments/:id/amplification_data?raw=false&background=true&baseline=true&firstderiv=true&secondderiv=true&summary=true&step_id[]=43&step_id[]=44", "Retrieve amplification data"
   example "{'partial':false, 'total_cycles':40, 'steps':['step_id':2,
-            'amplification_data':[['channel', 'well_num', 'cycle_num', 'background_subtracted_value', 'baseline_subtracted_value', 'dr1_pred', 'dr2_pred' 'fluorescence_value'], [1, 1, 1, 25488, -2003, 34543, 453344, 86], [1, 1, 2, 53984, -409, 56345, 848583, 85]],
-            'cq':[['channel', 'well_num', 'cq'], [1, 1, 12.11], [1, 2, 15.77], [1, 3, null]]]}"
+            'amplification_data':[['target_id', 'well_num', 'cycle_num', 'background_subtracted_value', 'baseline_subtracted_value', 'dr1_pred', 'dr2_pred' 'fluorescence_value'], [1, 1, 1, 25488, -2003, 34543, 453344, 86], [1, 1, 2, 53984, -409, 56345, 848583, 85]],
+            'summary_data':[['target_id','well_num','replic_group','cq','quantity_m','quantity_b','mean_cq','mean_quantity_m','mean_quantity_b'], [1,1,null,null,null,null,null,null,null], [2,12,1,7.314787,4.0,2,6.9858934999999995,4.0,2], [2,14,1,6.657,4.0,2,6.9858934999999995,4.0,2], [2,3,null,6.2,5.7952962,14,null,null,null]],
+            'targets':[['id','name','equation'],[1,'target1',null],[2,'target2',{'slope':-0.064624,'offset':7.154049,'efficiency':2979647189313701.5,'r2':0.221279}]]
+          ]}"
   def amplification_data
     params[:raw] = params[:raw].to_bool if !params[:raw].nil?
     params[:background] = params[:background].to_bool if !params[:background].nil?
 		params[:baseline] = params[:baseline].to_bool if !params[:baseline].nil?
 		params[:firstderiv] = params[:firstderiv].to_bool if !params[:firstderiv].nil?
 		params[:secondderiv] = params[:secondderiv].to_bool if !params[:secondderiv].nil?
-    params[:cq] = params[:cq].to_bool if !params[:cq].nil?
+    params[:summary] = params[:summary].to_bool if !params[:summary].nil?
 
     if params[:step_id].nil? && params[:ramp_id].nil?
       #first step that collects data will be returned, if none of the steps can be found, first ramp that collect data will be returned
@@ -633,14 +560,14 @@ class ExperimentsController < ApplicationController
       params[:baseline] = true if params[:baseline].nil? && params[:raw] == false
 			params[:firstderiv] = true if params[:firstderiv].nil? && params[:raw] == false
 			params[:secondderiv] = true if params[:secondderiv].nil? && params[:raw] == false
-      params[:cq] = true if params[:cq].nil? && params[:raw] == false
+      params[:summary] = true if params[:summary].nil? && params[:raw] == false
     else #if step_id is specified, only raw data is returned
       params[:raw] = true
       params[:background] = false
       params[:baseline] = false
 			params[:firstderiv] = false
 			params[:secondderiv] = false
-      params[:cq] = false
+      params[:summary] = false
     end
 
     if @experiment
@@ -649,7 +576,7 @@ class ExperimentsController < ApplicationController
         if !@first_stage_collect_data.blank?
           last_cycle = FluorescenceDatum.last_cycle(@experiment.id, @first_stage_collect_data.id)
           @partial = (@experiment.running? && last_cycle < @first_stage_collect_data.num_cycles)
-          analyze_required = params[:background] == true || params[:baseline] == true || params[:firstderiv] == true || params[:secondderiv] == true || params[:cq] == true
+          analyze_required = params[:background] == true || params[:baseline] == true || params[:firstderiv] == true || params[:secondderiv] == true || params[:summary] == true
           if analyze_required
             begin
               task_submitted = background_calculate_amplification_data(@experiment, @first_stage_collect_data.id)
@@ -658,30 +585,47 @@ class ExperimentsController < ApplicationController
               return
             end
 
+            standard_curve_pending = false
+            if task_submitted.nil? && params[:summary] == true
+              begin
+                task_submitted = background_run_standard_curve(@experiment)
+              rescue => e
+                render :json=>e.to_s, :status => 500
+                return
+              end
+              standard_curve_pending = true if !task_submitted.nil?
+            end
+
             if @partial == false
               @partial = FluorescenceDatum.new_data_generated?(@experiment.id, @first_stage_collect_data.id)
             end
 
-            if !stale?(etag: generate_etag(@partial, AmplificationDatum.maxid(@experiment.id, @first_stage_collect_data.id)))
+            if !stale?(etag: generate_etag(@partial, AmplificationDatum.maxid(@experiment.id, @first_stage_collect_data.id), standard_curve_pending))
               #render 304 Not Modified
               return
             end
 
             @amplification_data = AmplificationDatum.retrieve(@experiment.id, @first_stage_collect_data.id)
-            @cts = AmplificationCurve.retrieve(@experiment.id, @first_stage_collect_data.id)
-
+            if TargetsWell.for_experiment(@experiment).exists?
+              @amplification_data = @amplification_data.filter_by_targets(@experiment.well_layout.id)
+              fake_targets = false
+            else
+              fake_targets = true
+            end
+            @amplification_data = @amplification_data.to_a
+            
             if @amplification_data.blank? && !task_submitted.nil?
               #no data but background task is submitted
               render :nothing => true, :status => (task_submitted)? 202 : 503
               return
             elsif !@amplification_data.blank?
               #set etag
-              fresh_when(:etag => generate_etag(@partial, @amplification_data.last.id))
+              fresh_when(:etag => generate_etag(@partial, AmplificationDatum.maxid(@experiment.id, @first_stage_collect_data.id), standard_curve_pending))
             end
           end
 
           if params[:raw] == true
-            if !analyze_required && !stale?(etag: generate_etag(@partial, last_cycle))
+            if !analyze_required && !stale?(etag: generate_etag(@partial, last_cycle, standard_curve_pending))
               #render 304 Not Modified
               return
             end
@@ -712,7 +656,7 @@ class ExperimentsController < ApplicationController
 
             if !analyze_required && !fluorescence_data.blank?
               #set etag
-              fresh_when(:etag => generate_etag(@partial, fluorescence_data.last.cycle_num))
+              fresh_when(:etag => generate_etag(@partial, fluorescence_data.last.cycle_num, standard_curve_pending))
             end
           end
         end
@@ -736,13 +680,30 @@ class ExperimentsController < ApplicationController
           @amplification_data = fluorescence_data
         end
 
+        #####################################################################################################
+        #format output
+        @partial = true if standard_curve_pending
         attributes = []
         attributes << "background_subtracted_value" if params[:background] == true
         attributes << "baseline_subtracted_value" if params[:baseline] == true
 				attributes << "dr1_pred" if params[:firstderiv] == true
 				attributes << "dr2_pred" if params[:secondderiv] == true
         attributes << "fluorescence_value" if params[:raw] == true
-        @amplification_data_group = group_by_keynames(@amplification_data, attributes, (params[:cq] == true)? @cts : nil)
+        
+        #summary data
+        summary_data = nil
+        if fake_targets == true
+          summary_data = AmplificationCurve.retrieve(@experiment.id, @first_stage_collect_data.id).select("channel as target_id").to_a
+          targets = TargetsWell.fake_targets
+        elsif params[:summary] == true && @first_stage_collect_data
+          summary_data = TargetsWell.with_data(@experiment, @first_stage_collect_data).to_a
+          targets = TargetsWell.process_data(summary_data)
+        else
+          targets = nil
+        end
+        
+        @amplification_data_group = group_by_keynames(@amplification_data, attributes, summary_data, targets)
+        #####################################################################################################
 
         respond_to do |format|
           format.json { render "amplification_data", :status => :ok}
@@ -1061,7 +1022,7 @@ class ExperimentsController < ApplicationController
           if request.method == "HEAD"
             amplification_data = nil
           else
-            cts = AmplificationCurve.retrieve(@experiment, first_stage_collect_data.id)
+            cqs = AmplificationCurve.retrieve(@experiment, first_stage_collect_data.id)
             fluorescence_data = FluorescenceDatum.for_stage(first_stage_collect_data.id).for_experiment(@experiment.id)
           end
         end
@@ -1090,12 +1051,12 @@ class ExperimentsController < ApplicationController
           out.write csv_string
         end
 
-        if cts
+        if cqs
           out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/cq.csv")
           csv_string = CSV.generate do |csv|
             csv << ["channel", "well_num", "well_name", "cq"];
-            cts.each do |ct|
-              csv << [ct.channel, ct.well_num, well_name(ct.well_num), ct.ct]
+            cqs.each do |cq|
+              csv << [cq.channel, cq.well_num, well_name(cq.well_num), cq.cq]
             end
           end
           out.write csv_string
@@ -1221,28 +1182,44 @@ class ExperimentsController < ApplicationController
     @experiment = Experiment.find_by_id(params[:id]) if @experiment.nil?
   end
 
-  def generate_etag(partial, tag)
-    return "partial:#{partial} tag:#{tag}"
+  def generate_etag(partial, tag1, tag2=nil)
+    return "partial:#{partial} tag:#{tag1} #{(tag2)? "tag2:"+tag2.to_s : ""}"
   end
   
   def background_standard_curve_data(experiment)
+    if experiment.completion_status != "success"
+      return nil
+    end
+    
+    well_layout = WellLayout.for_experiment(experiment.id).first
+    if well_layout.is_a? WellLayout
+      wells = well_layout.standard_curve
+    else
+      wells = []
+    end
+    body = wells.map {|well| (well)? well.as_json_standard_curve : {}}
+    logger.info("body=#{body}")
+    
+    if body.blank?
+      return nil
+    end
+ 
     background("standardcurve", experiment.id) do
       begin
-        well_layout = WellLayout.for_experiment(experiment.id).first
-        if well_layout.is_a? WellLayout
-          wells = well_layout.standard_curve
-        else
-          wells = []
-        end
-        body = wells.map {|well| (well)? well.as_json_standard_curve : {}}
-        puts("body=#{body}")
         start_time = Time.now
         response = HTTParty.post("http://127.0.0.1:8081/experiments/#{@experiment.id}/standard_curve", body: body.to_json)
         logger.info("Julia code time #{Time.now-start_time}")
         if response.code != 200
           raise_julia_error(response)
         else
-          new_data = CachedStandardCurveDatum.new(:experiment_id=>experiment.id, :standard_curve_result=>response.body)
+          jsonbody = JSON.parse(response.body)
+          if jsonbody["targets"]
+            equations = []
+            jsonbody["targets"].each do |target_body|
+              target_id = target_body.delete("target_id")
+              equations << CachedStandardCurveDatum.new(:well_layout_id=>well_layout.id, :target_id=>target_id, :equation=>target_body.to_json) if !target_id.blank?
+            end
+          end
         end
       rescue  => e
         logger.error("Julia error: #{e}")
@@ -1250,8 +1227,9 @@ class ExperimentsController < ApplicationController
       ensure
       end
       #update cache
-      CachedStandardCurveDatum.import [new_data], :on_duplicate_key_update => [:standard_curve_result]
+      CachedStandardCurveDatum.import equations, :on_duplicate_key_update => [:equation] if !equations.blank?
     end
+    
   end
   
 
@@ -1560,14 +1538,14 @@ class ExperimentsController < ApplicationController
     end
   end
 
-  def group_by_keynames(data, data_attributes, cqs)
+  def group_by_keynames(data, data_attributes, summary_data, targets)
     return nil if data.nil?
 
     keyname = nil
     key = nil
     data_array = nil
     group = Array.new
-    column_names = ["channel","well_num","cycle_num"]+data_attributes
+    column_names = ["target_id","well_num","cycle_num"]+data_attributes
 
     data.each do |node|
       Constants::KEY_NAMES.each do |newkeyname|
@@ -1586,8 +1564,12 @@ class ExperimentsController < ApplicationController
 
     if key != nil
       elem = OpenStruct.new(keyname=>key, :amplification_data=>data_array)
-      if !cqs.blank?
-        elem.cq = [["channel","well_num","cq"]]+cqs.map {|cq| [cq.channel,cq.well_num,cq.ct]}
+      if !summary_data.blank?
+        elem.summary_data = [["target_id","well_num","replic_group", "cq", "quantity_m", "quantity_b", "mean_cq", "mean_quantity_m", "mean_quantity_b"]]+summary_data.map {|data| 
+                             [data.target_id,data.well_num,data.replic,data.cq,data.quantity[0],data.quantity[1],data.mean_cq,data.mean_quantity[0],data.mean_quantity[1]]}
+      end
+      if !targets.blank?
+        elem.targets = [["id", "name", "equation"]] + targets.map {|target| [target.target_id, target.target_name, target.target_equation]}
       end
       group << elem
     end
@@ -1605,4 +1587,27 @@ class ExperimentsController < ApplicationController
       raise "Julia error (code=#{response.code}): #{response.inspect}"
     end
   end
+  
+  def background_run_standard_curve(experiment)
+    if experiment.targets_well_layout_id
+      if !CachedStandardCurveDatum.where(:well_layout_id=>experiment.targets_well_layout_id).exists?
+        parent_experiment = Experiment.for_well_layout(experiment.targets_well_layout_id)
+        first_stage_collect_data = Stage.collect_data(parent_experiment.experiment_definition_id).first
+        if first_stage_collect_data
+          task_submitted = background_calculate_amplification_data(parent_experiment, first_stage_collect_data.id)
+        end
+        if task_submitted.nil?
+          task_submitted = background_standard_curve_data(parent_experiment)
+        end
+      end
+    end
+    
+    if task_submitted.nil? && experiment.well_layout && !CachedStandardCurveDatum.where(:well_layout_id=>experiment.well_layout.id).exists?
+      logger.info("***********background run standard curve #{task_submitted}")
+      task_submitted = background_standard_curve_data(experiment)
+    end
+    
+    task_submitted
+  end
+  
 end
