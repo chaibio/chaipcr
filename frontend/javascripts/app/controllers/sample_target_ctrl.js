@@ -149,7 +149,7 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
 
 		$scope.deleteSample = function (rowContent, $event) {
 			if($event.shiftKey){
-				rowContent.confirmDelete = !rowContent.confirmDelete
+				rowContent.confirmDelete = !rowContent.confirmDelete;
 				return;
 			}
 
@@ -165,7 +165,7 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
 
 		$scope.deleteTarget = function (targetContent, $event) {
 			if($event.shiftKey){
-				targetContent.confirmDelete = !targetContent.confirmDelete
+				targetContent.confirmDelete = !targetContent.confirmDelete;
 				return;
 			}
 
