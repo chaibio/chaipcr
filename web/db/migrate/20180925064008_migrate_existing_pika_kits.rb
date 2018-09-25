@@ -19,17 +19,16 @@ class MigrateExistingPikaKits < ActiveRecord::Migration
           target_well.well_type = map_well_type(row['well_type'])
           target_well.save
         end
-        if !row['target2'].blank?
-          target = Target.new(:name=>row['target2'], :channel=>2)
-          target.well_layout_id = well_layout.id
-          target.save
-          target_well = TargetsWell.find_or_create(target, well_layout.id, row['well_num'])
-          target_well.well_type = map_well_type(row['well_type'])
-          target_well.save
-        end
+        target2_name = (row['target2'].blank?)? "IPC" : row['target2']
+        target = Target.new(:name=>target2_name, :channel=>2)
+        target.well_layout_id = well_layout.id
+        target.save
+        target_well = TargetsWell.find_or_create(target, well_layout.id, row['well_num'])
+        target_well.well_type = map_well_type(row['well_type'])
+        target_well.save
       end
     end
-    drop_table :wells
+    #drop_table :wells
   end
   
   private
