@@ -56,7 +56,9 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
 					$scope.rows[i] = resp.data[i].sample;
 					$scope.rows[i].confirmDelete = false;
 				}
-
+				if(resp.data.length == 0){
+					$scope.create();
+				}
 			});
 		};
 
@@ -76,7 +78,9 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
 					}
 				}
 				console.log($scope.targets);
-
+				if(resp.data.length == 0){
+					$scope.createTarget();
+				}				
 			});
 		};
 
@@ -143,8 +147,13 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
 			//$scope.samples[index - 3] = x;
 		};
 
-		$scope.deleteSample = function (id) {
-			Experiment.deleteSample($stateParams.id,id).then(function(resp){
+		$scope.deleteSample = function (rowContent, $event) {
+			if($event.shiftKey){
+				rowContent.confirmDelete = !rowContent.confirmDelete
+				return;
+			}
+
+			Experiment.deleteSample($stateParams.id, rowContent.id).then(function(resp){
 				$scope.getSamples();
 			})
 			.catch(function(response){
@@ -154,8 +163,13 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
 			});
 		};
 
-		$scope.deleteTarget = function (id) {
-			Experiment.deleteLinkedTarget($stateParams.id,id).then(function(resp){
+		$scope.deleteTarget = function (targetContent, $event) {
+			if($event.shiftKey){
+				targetContent.confirmDelete = !targetContent.confirmDelete
+				return;
+			}
+
+			Experiment.deleteLinkedTarget($stateParams.id,targetContent.id).then(function(resp){
 				$scope.getTargets();
 			})
 			.catch(function(response){
