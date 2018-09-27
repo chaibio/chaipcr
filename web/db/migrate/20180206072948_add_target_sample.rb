@@ -22,6 +22,7 @@ class AddTargetSample < ActiveRecord::Migration
       t.integer :well_layout_id, :null=>false
       t.integer :well_num, :null=>false
       t.integer :sample_id, :null=>false
+      t.text    :notes, limit: 16777215
     end
     
     create_table :targets_wells do |t|
@@ -35,10 +36,11 @@ class AddTargetSample < ActiveRecord::Migration
     end
     
     create_table :cached_standard_curve_data do |t| 
-      t.integer :experiment_id
-      t.text :standard_curve_result, :limit => 16777215
+      t.integer :well_layout_id, :null=>false
+      t.integer :target_id, :null=>false
+      t.text :equation, :limit => 16777215
     end
-    add_index "cached_standard_curve_data", "experiment_id", unique: true
+    add_index "cached_standard_curve_data", [:well_layout_id, :target_id], unique: true
     
     add_index :samples_wells, [:well_layout_id, :well_num], name: "well_layout_sample"
     add_index :targets_wells, [:well_layout_id, :well_num], name: "well_layout_target"

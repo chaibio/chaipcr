@@ -63,8 +63,8 @@ describe "DataAnalysis API", type: :request do
     json["total_cycles"].should eq(stage.num_cycles)
     json["steps"][0]["step_id"].should eq(step.id)
     json["steps"][0]["amplification_data"].length.should == 11 #include header
-    json["steps"][0]["amplification_data"][0].join(",").should eq("channel,well_num,cycle_num,background_subtracted_value,baseline_subtracted_value,dr1_pred,dr2_pred")
-    json["steps"][0]["cq"].should_not be_nil
+    json["steps"][0]["amplification_data"][0].join(",").should eq("target_id,well_num,cycle_num,background_subtracted_value,baseline_subtracted_value,dr1_pred,dr2_pred")
+    json["steps"][0]["summary_data"].should_not be_nil
 
     #data cached
     get "/experiments/#{@experiment.id}/amplification_data", { :format => 'json'}, { "If-None-Match" => response.etag }
@@ -132,8 +132,8 @@ describe "DataAnalysis API", type: :request do
     json["total_cycles"].should eq(stage.num_cycles)
     json["steps"][0]["step_id"].should eq(step.id)
     json["steps"][0]["amplification_data"].length.should == amplification_data_length(stage.num_cycles) 
-    json["steps"][0]["amplification_data"][0].join(",").should eq("channel,well_num,cycle_num,fluorescence_value")
-    json["steps"][0]["cq"].should be_nil
+    json["steps"][0]["amplification_data"][0].join(",").should eq("target_id,well_num,cycle_num,fluorescence_value")
+    json["steps"][0]["summary_data"].should be_nil
   
     #data cached  
     get "/experiments/#{@experiment.id}/amplification_data?raw=true", { :format => 'json'}, { "If-None-Match" => response.etag }
