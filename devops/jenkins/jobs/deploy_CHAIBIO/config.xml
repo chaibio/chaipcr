@@ -408,7 +408,7 @@ bundle install
 gem install bcrypt -v &apos;3.1.11&apos;
 echo done rserev
 
-bundle exec rake db:migrate # migrates database as needed
+bundle exec rake db:migrate --trace # migrates database as needed
 
 df -h
 
@@ -845,7 +845,35 @@ sed -i &apos;s/#timeout 60/timeout 20/&apos; /etc/dhcp/dhclient.conf
 sed -i &apos;s/#retry 60/retry 20/&apos; /etc/dhcp/dhclient.conf
 sed -i &apos;s/#reboot/reboot/&apos; /etc/dhcp/dhclient.conf
 
-</command>
+echo Disabling usb1
+ls temp.patch &amp;&amp; rm temp.patch
+cat &gt;&gt; temp.patch &lt;&lt; EOF
+--- /opt/scripts/boot/am335x_evm.sh     2018-09-27 10:44:59.465061718 +0000
++++ /opt/scripts/boot/am335x_evm.sh     2018-09-27 10:45:40.146892119 +0000
+@@ -682,6 +682,8 @@
+ compare_major=&quot;4&quot;
+ compare_minor=&quot;4&quot;
+ 
++use_old_g_multi
++/*
+ if [ &quot;\${kernel_major}&quot; -lt &quot;\${compare_major}&quot; ] ; then
+        use_old_g_multi
+ elif [ &quot;\${kernel_major}&quot; -eq &quot;\${compare_major}&quot; ] ; then
+@@ -693,7 +695,7 @@
+ else
+        use_libcomposite
+ fi
+-
++*/
+ if [ -f /var/lib/misc/dnsmasq.leases ] ; then
+        systemctl stop dnsmasq || true
+        rm -rf /var/lib/misc/dnsmasq.leases || true
+EOF
+
+patch -i temp.patch
+rm temp.patch
+
+exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
