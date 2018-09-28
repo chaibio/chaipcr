@@ -21,58 +21,30 @@ class Well < ActiveRecord::Base
   belongs_to :experiment
 
 	swagger_schema :Well do
-		property :well do
-			property :well_num do
-				key :type, :integer
-				key :format, :int64
-			end
-			property :well_type do
-				key :type, :string
-			end
-			property :sample_name do
-				key :type, :string
-			end
-			property :notes do
-				key :type, :string
-			end
-			property :targets do
-				key :type, :array
-				items do
-					key :type, :string
-					key :type, :string
-				end
-			end
+		property :well_num do
+			key :description, '1-16'
+			key :type, :integer
 		end
-	end
-=begin
-	swagger_schema :WellsInput do
-		allOf do
-			schema do
-				key :'$ref', :Well
-			end
-		end
-	end
-
-	swagger_schema :Well_Input do
 		property :well_type do
+			key :description, 'positive_control, no_template_control, standard, sample'
 			key :type, :string
 		end
 		property :sample_name do
+			key :description, 'sample name'
 			key :type, :string
 		end
 		property :notes do
+			key :description, 'notes'
 			key :type, :string
 		end
 		property :targets do
 			key :type, :array
+      key :description, "Array of one or two depending on the channels eg.['channel1 target', 'channel2 target']"
 			items do
 				key :type, :string
-				key :type, :string
-			end
+				end
 		end
 	end
-=end
-
 
   scope :well, lambda {|experiment_id, well_num| where("experiment_id=? and well_num=?", experiment_id, well_num)}
 

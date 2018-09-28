@@ -27,10 +27,11 @@ class Protocol < ActiveRecord::Base
     property :lid_temperature do
       key :type, :number
       key :format, :double
-      key :description, 'lid temperature, in degree C, default is 110, with precision to one decimal point'
+      key :description, 'Lid temperature, in degree C, default is 110, with precision to one decimal point'
     end
     property :estimate_duration do
       key :type, :integer
+			key :description, 'Estimated duration in seconds'
       key :format, :int32
     end
     property :stages do
@@ -41,10 +42,10 @@ class Protocol < ActiveRecord::Base
     end
   end
 
-	swagger_schema :Protocol_params do
+	swagger_schema :ProtocolInput do
 		key :required, [:protocol]
 		property :protocol do
-			key :description, 'Give a description of all the parameters'
+			key :description, 'Contains properties to update'
 			property :lid_temperature do
 				key :type, :number
 				key :format, :float
@@ -56,6 +57,8 @@ class Protocol < ActiveRecord::Base
 
   belongs_to :experiment_definition
   has_many :stages, -> {order("order_number").includes(:steps, :ramps)}
+
+  validate :validate
 
   ACCESSIBLE_ATTRS = [:lid_temperature]
 
@@ -99,5 +102,21 @@ class Protocol < ActiveRecord::Base
       end
     end
     duration.round
+  end
+  
+  protected
+
+  def validate
+    if !lid_temperature.nil?
+      if DeviceConfiguration.valid?
+        temperature_min = DeviceConfiguration.thermal["lid"]["min_temp_c"]
+        temperature_max = DeviceConfiguration.thermal["lid"]["max_temp_c"]
+      end
+      temperature_min = 0 if temperature_min.nil?
+      temperature_max = 120 if temperature_max.nil?
+      if (lid_temperature < temperature_min || lid_temperature > temperature_max)
+        errors.add(:lid_temperature, "between #{temperature_min} to #{temperature_max}")
+      end
+    end
   end
 end

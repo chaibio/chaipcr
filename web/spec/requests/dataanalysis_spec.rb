@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "DataAnalysis API" do
+describe "DataAnalysis API", type: :request do
   before(:each) do
     admin_user = create_admin_user
     post '/login', { email: admin_user.email, password: admin_user.password }
@@ -38,10 +38,10 @@ describe "DataAnalysis API" do
   
   it "amplification data with async calls" do
     create_fluorescence_data(@experiment, 10)
-    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |experiment, stage_id, calibration_id|
+    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |obj, experiment, stage_id, calibration_id|
       experiment.id.should == @experiment.id
       calibration_id.should == @experiment.calibration_id
-      sleep(1)
+      sleep(2)
       [[], []]
     end
     
@@ -49,6 +49,7 @@ describe "DataAnalysis API" do
     get "/experiments/#{@experiment.id}/amplification_data", { :format => 'json' }
     response.response_code.should == 202
     get "/experiments/#{@experiment.id}/amplification_data", { :format => 'json' }
+    print response.body
     response.response_code.should == 202
     sleep(2)
 
@@ -62,7 +63,7 @@ describe "DataAnalysis API" do
     json["total_cycles"].should eq(stage.num_cycles)
     json["steps"][0]["step_id"].should eq(step.id)
     json["steps"][0]["amplification_data"].length.should == 11 #include header
-    json["steps"][0]["amplification_data"][0].join(",").should eq("channel,well_num,cycle_num,background_subtracted_value,baseline_subtracted_value")
+    json["steps"][0]["amplification_data"][0].join(",").should eq("channel,well_num,cycle_num,background_subtracted_value,baseline_subtracted_value,dr1_pred,dr2_pred")
     json["steps"][0]["cq"].should_not be_nil
 
     #data cached
@@ -74,7 +75,7 @@ describe "DataAnalysis API" do
   it "amplification data with more data" do
     create_fluorescence_data(@experiment, 10)
     
-    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |experiment, stage_id, calibration_id|
+    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |obj, experiment, stage_id, calibration_id|
       experiment.id.should == @experiment.id
       calibration_id.should == @experiment.calibration_id
       sleep(1)
@@ -121,7 +122,7 @@ describe "DataAnalysis API" do
   
   it "amplification data raw" do
     create_fluorescence_data(@experiment, 0)
-    get "/experiments/#{@experiment.id}/amplification_data?raw=true&background=false&baseline=false&cq=false", { :format => 'json' }
+    get "/experiments/#{@experiment.id}/amplification_data?raw=true", { :format => 'json' }
     expect(response).to be_success
     response.etag.should_not be_nil
     stage = Stage.collect_data(@experiment.experiment_definition_id).first
@@ -135,14 +136,14 @@ describe "DataAnalysis API" do
     json["steps"][0]["cq"].should be_nil
   
     #data cached  
-    get "/experiments/#{@experiment.id}/amplification_data?raw=true&background=false&baseline=false&cq=false", { :format => 'json'}, { "If-None-Match" => response.etag }
+    get "/experiments/#{@experiment.id}/amplification_data?raw=true", { :format => 'json'}, { "If-None-Match" => response.etag }
     response.response_code.should == 304
   end
   
   it "amplification data for error" do
     create_fluorescence_data(@experiment, 10)
     error = "test error"
-    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |experiment, stage_id, calibration_id|
+    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |obj, experiment, stage_id, calibration_id|
       raise ({errors: error}.to_json)
     end
     
@@ -176,7 +177,7 @@ describe "DataAnalysis API" do
   
   it "amplification data for two experiments" do
     create_fluorescence_data(@experiment, 10)
-    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |experiment, stage_id, calibration_id|
+    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |obj, experiment, stage_id, calibration_id|
       experiment.id.should == @experiment.id
       calibration_id.should == @experiment.calibration_id
       sleep(2)

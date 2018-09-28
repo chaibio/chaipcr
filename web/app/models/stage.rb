@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 class Stage < ActiveRecord::Base
-  include ProtocolHelper
+  include ProtocolLayoutHelper
   include ProtocolOrderHelper
 
   include Swagger::Blocks
@@ -29,19 +29,25 @@ class Stage < ActiveRecord::Base
     end
     property :stage_type do
       key :type, :string
+      key :enum, ['holding', 'cycling', 'meltcurve']
     end
     property :name do
+			key :description, "Name of the stage, if not provided, default name is '<stage type> Stage'"
       key :type, :string
     end
     property :num_cycles do
+			key :description, "Number of cycles in a stage, must be >= 1, default to 1"
       key :type, :integer
       key :format, :int32
+      key :minimum, 1
     end
     property :auto_delta do
+			key :description, "Auto Delta, default is false"
       key :type, :boolean
       key :default, false
     end
     property :auto_delta_start_cycle do
+			key :description, "Cycle to start delta temperature"
       key :type, :integer
     end
     property :steps do
@@ -51,53 +57,6 @@ class Stage < ActiveRecord::Base
       end
     end
   end
-
-	swagger_schema :CreateStageInput do
-		property :prev_id do
-			key :type, :integer
-			key :format, :int64
-			key :required, true
-			key :description, 'prev stage id or null if it is the first node'
-		end
-		property :stage do
-			key :'$ref', :Stage
-		end
-	end
-
-	swagger_schema :StageMoveInput do
-		key :required, [:prev_id]
-		property :prev_id do
-			key :type, :integer
-			key :format, :int64
-			key :required, true
-			key :description, 'prev stage id or null if it is the first node'
-		end
-	end
-=begin
-	swagger_schema :StageInput do
-		key :required, [:stage]
-		property :stage do
-			key :description, 'Give a description of all the parameters'
-			property :stage_type do
-				key :type, :string
-			end
-			property :name do
-				key :type, :string
-			end
-			property :num_cycles do
-				key :type, :integer
-				key :format, :int32
-			end
-			property :auto_delta do
-				key :type, :boolean
-				key :default, false
-			end
-			property :auto_delta_start_cycle do
-				key :type, :integer
-			end
-		end
-	end
-=end
 
 	swagger_schema :StageValue do
 		property :stage do
@@ -123,6 +82,15 @@ class Stage < ActiveRecord::Base
 			property :auto_delta_start_cycle do
 				key :type, :integer
 			end
+		end
+	end
+
+	swagger_schema :StageInput do
+		property :prev_id do
+			key :type, :integer
+			key :format, :int64
+			key :required, true
+			key :description, 'prev stage id or null if it is the first node'
 		end
 	end
 
@@ -181,10 +149,10 @@ class Stage < ActiveRecord::Base
 
   before_destroy do |stage|
     if stage.destroyed?
-      return false
+      false
     elsif stage.protocol && stage.protocol.stages.count <= 1
       errors.add(:base, "At least one stage is required")
-      return false
+      false
     end
   end
 

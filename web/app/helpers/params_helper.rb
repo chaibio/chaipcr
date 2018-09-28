@@ -43,6 +43,14 @@ private
     params.require(:ramp).permit(*Ramp::ACCESSIBLE_ATTRS)
   end
   
+  def sample_params
+    params.require(:sample).permit(*Sample::ACCESSIBLE_ATTRS)
+  end
+  
+  def target_params
+    params.require(:target).permit(*Target::ACCESSIBLE_ATTRS)
+  end
+  
   def settings_params
     params.require(:settings).permit(:calibration_id, :time_zone, :debug)
   end

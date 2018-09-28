@@ -1,5 +1,5 @@
 object @experiment
 
 node(:errors, :unless => lambda { |obj| obj.errors.empty? }) do |o|
-	o.errors
+	o.errors.as_json
 end

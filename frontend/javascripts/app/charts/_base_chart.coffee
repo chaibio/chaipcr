@@ -129,7 +129,7 @@ class BaseChart
     @activePath = newLine
     @makeCircle()
     path.remove()
-    @drawBox(lineConfig)
+    # @drawBox(lineConfig)
 
     if mouse
       @showMouseIndicators()
@@ -263,14 +263,22 @@ class BaseChart
     return if not d1
     d = if x0 - d0[line_config.x] > d1[line_config.x] - x0 then d1 else d0
 
-    if @box and @activePath
+    if @activePath
+
       conf = @activePathConfig
-      @box.RFYTextValue.text(d[@config.series[conf.index].y]) if @box.RFYTextValue
-      @box.cycleTextValue.text(d[@config.series[conf.index].x]) if @box.cycleTextValue
-      if @box.CqText and @activePathConfig.config.cq
-        conf = @activePathConfig.config
-        cqText = 'Cq: ' + (conf.cq[conf.channel - 1] || '')
-        @box.CqText.text(cqText)
+
+      if (@onUpdateProperties)
+        @onUpdateProperties(d[@config.series[conf.index].x], d[@config.series[conf.index].y], 40, 50)
+
+      # @box.RFYTextValue.text(d[@config.series[conf.index].y]) if @box.RFYTextValue
+      # @box.cycleTextValue.text(d[@config.series[conf.index].x]) if @box.cycleTextValue
+      # if @box.CqText and @activePathConfig.config.cq
+      #   conf = @activePathConfig.config
+      #   cqText = 'Cq: ' + (conf.cq[conf.channel - 1] || '')
+      #   @box.CqText.text(cqText)
+
+    # alert(@onUpdateProperties)
+    
 
   getXScale: ->
       xScale = if @zoomTransform.k > 1 and !@editingYAxis then @lastXScale else @xScale
@@ -364,6 +372,7 @@ class BaseChart
     @lines = []
     @activePath = null
     for s in series by 1
+    #  console.log(s)
       @guidingLines.push(@makeGuidingLine(s))
     for s in series by 1
       @lines.push(@makeColoredLine(s))
@@ -565,7 +574,7 @@ class BaseChart
       @gX.call(@xAxis.scale(@zoomTransform.rescaleX(@xScale)))
 
     # text label for the x axis
-    @setXAxisLabel()
+    # @setXAxisLabel()
 
   setXAxisLabel: ->
     return if not (@config.axes.x.label)
@@ -1432,6 +1441,7 @@ class BaseChart
     return { x: x, y: pos.y }
 
   mouseMoveCb: ->
+
       @setHoveredLine()
       if !@activePath
         @hideMouseIndicators()
@@ -1456,6 +1466,8 @@ class BaseChart
         @showMouseIndicators()
 
       @prevMousePosition = [pos.x, pos.y]
+
+     
 
   setHoveredLine: ->
     mouse = @getMousePosition(@mouseOverlay.node())
@@ -1514,6 +1526,9 @@ class BaseChart
 
   onUnselectLine: (fn) ->
     @onUnselectLine = fn
+
+  onUpdateProperties: (fn) ->
+    @onUpdateProperties = fn
 
   getDimensions: ->
     width: @width

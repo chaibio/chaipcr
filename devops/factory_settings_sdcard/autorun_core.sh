@@ -1,3 +1,4 @@
+
 #!/bin/sh
 #
 # Chai PCR - Software platform for Open qPCR and Chai's Real-Time PCR instruments.
@@ -24,20 +25,20 @@ is_root=$?
 if [ ! $is_root ]
 then
 	echo "must be run as root"
-	exit
+	exit 0
 fi
 
-if [ -e /dev/mmcblk0p4 ]
+if [ -e /dev/mmcblk0p3 ]
 then
         eMMC=/dev/mmcblk0
 	sdcard_dev=/dev/mmcblk1
-elif [ -e /dev/mmcblk1p4 ]
+elif [ -e /dev/mmcblk1p3 ]
 then
        	eMMC=/dev/mmcblk1
 	sdcard_dev=/dev/mmcblk0
 else
-       	echo "4 partitions eMMC not found!"
-	echo default-on > /sys/class/leds/beaglebone\:green\:usr1/trigger
+       	echo "3 or 4 partitions eMMC not found!"
+	[ -e /sys/class/leds/beaglebone\:green\:usr1/trigger ] && echo default-on > /sys/class/leds/beaglebone\:green\:usr1/trigger
 
 	eMMC=/dev/mmcblk1
         sdcard_dev=/dev/mmcblk0
@@ -48,13 +49,53 @@ then
 	mkdir -p /sdcard/p1
 fi
 
-if [ ! -e /tmp/emmcboot ]
-then
-	mkdir -p /tmp/emmcboot
-fi
-
 sdcard_p1="/sdcard/p1"
 sdcard_p2="/sdcard/p2"
+
+eMMC_boot=${eMMC}p1
+eMMC_root=${eMMC}p2
+eMMC_data=${eMMC}p3
+eMMC_perm=${eMMC}p4
+emmc_boot_files=/tmp/emmcboot
+three_partitions_emmc=false
+three_partitions_image=false
+
+set3PartitionsEMMC ()
+{	eMMC_boot=
+	eMMC_root=${eMMC}p1
+	eMMC_data=${eMMC}p2
+	eMMC_perm=${eMMC}p3
+	emmc_boot_files=/tmp/rootfs/boot/
+	three_partitions_emmc=true
+}
+
+if [ -e $eMMC_perm ]
+then
+	if [ ! -e $emmc_boot_files ]
+	then
+		mkdir -p $emmc_boot_files
+	fi
+else
+	set3PartitionsEMMC
+fi
+
+migration_needed=false
+factory_settings_script_version=0
+version_file=/mnt/fs_Version.inf
+if [ -e ${version_file} ]
+then
+	factory_settings_script_version=$(cat ${version_file})
+fi
+if [ $factory_settings_script_version -ge 120 ]
+then
+	echo three partitions image on SDCard
+	three_partitions_image=true
+	if ! $three_partitions_emmc
+	then
+		echo four partitions image on eMMC.. migration needed.
+		migration_needed=true
+	fi
+fi
 
 mount_sdcard_partitions () {
 	if [ ! -e ${sdcard_p1} ]
@@ -164,6 +205,7 @@ flush_cache () {
 flush_cache_mounted () {
 	sync
 #	blockdev --flushbufs ${eMMC} || true
+	partprobe /dev/mmcblk1
 }
 
 alldone () {
@@ -198,14 +240,24 @@ flush_cache () {
 	sync
 }
 
+setLedTimer () {
+	[ -e /sys/class/leds/beaglebone\:green\:usr0/trigger ] && echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+
+}
+
+setLedDefault () {
+	[ -e /sys/class/leds/beaglebone\:green\:usr0/trigger ] && echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+
+}
+
 write_pt_image () {
 	echo "Writing partition table image!"
 
 	image_filename_prfx="upgrade"
 	image_filename_rootfs="$image_filename_prfx-rootfs.img.gz"
 	image_filename_data="$image_filename_prfx-data.img.gz"
-	image_filename_boot="$image_filename_prfx-boot.img.gz"
 	image_filename_pt="$image_filename_prfx-pt.img.gz"
+	image_filename_boot="$image_filename_prfx-boot.img.gz"
 
 	image_filename_upgrade="${sdcard_p1}/factory_settings.img.tar"
 	if isUpgrade
@@ -213,10 +265,17 @@ write_pt_image () {
 		image_filename_upgrade="${sdcard_p2}/upgrade.img.tar"
 	fi
 
-	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
-        tar xOf $image_filename_upgrade $image_filename_pt | gunzip -c | dd of=${eMMC} bs=16M
+	setLedTimer        
+	tar xOf $image_filename_upgrade $image_filename_pt | gunzip -c | dd of=${eMMC} bs=16M
 	flush_cache_mounted
-	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+
+	if $three_partitions_image
+	then
+		echo writing hidden boot binaries.
+	        tar xOf $image_filename_upgrade $image_filename_boot | gunzip -c | dd of=${eMMC} bs=16M
+	fi
+
+	setLedDefault
 	echo "Done writing partition table image!"
 }
 
@@ -230,6 +289,11 @@ repartition_drive () {
 	flush_cache
 	flush_cache_mounted
 
+	if [ $factory_settings_script_version -ge 120 ]
+	then
+		echo Partitioned to 3 partitions eMMC
+		set3PartitionsEMMC
+	fi
 	echo "Partitioned!"
 }
 
@@ -239,7 +303,6 @@ format_perm () {
         image_filename_prfx="upgrade"
         image_filename_rootfs="$image_filename_prfx-rootfs.img.gz"
         image_filename_perm="$image_filename_prfx-perm.img.gz"
-        image_filename_boot="$image_filename_prfx-boot.img.gz"
         image_filename_pt="$image_filename_prfx-pt.img.gz"
 
         image_filename_upgrade="${sdcard_p1}/factory_settings.img.tar"
@@ -248,21 +311,21 @@ format_perm () {
 		image_filename_upgrade="${sdcard_p2}/upgrade.img.tar"
 	fi
 
-        echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
-        tar xOf $image_filename_upgrade $image_filename_perm | gunzip -c | dd of=${eMMC}p4 bs=16M
+       setLedTimer
+        tar xOf $image_filename_upgrade $image_filename_perm | gunzip -c | dd of=${eMMC_perm} bs=16M
 
         flush_cache_mounted
-        echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+       	setLedDefault
         echo "Done writing empty /perm partition!"
 }
 
 format_data () {
         echo "Writing data partition formatting image!"
-        echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+       setLedTimer
         
-	tar xOf $image_filename_upgrade format-data.img.gz | gunzip -c | dd of=${eMMC}p3 bs=16M
+	tar xOf $image_filename_upgrade format-data.img.gz | gunzip -c | dd of=${eMMC_data} bs=16M
         flush_cache_mounted
-        echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+       	setLedDefault
         echo "Done writing data partition formatting image!"
 }
 
@@ -272,101 +335,151 @@ write_data_fs_image () {
 	image_filename_data="$image_filename_prfx-data.img.gz"
 	image_filename_fs="${sdcard_p1}/factory_settings.img.tar"
 
-        echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
-        tar xOf $image_filename_fs $image_filename_data | gunzip -c | dd of=${eMMC}p3 bs=16M
+       setLedTimer
+        tar xOf $image_filename_fs $image_filename_data | gunzip -c | dd of=${eMMC_data} bs=16M
 	flush_cache_mounted
-        echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+       	setLedDefault
         echo "Done writing data partition image!"
-
-#3exit 0
-
 }
-
+	
 partition_drive () {
 	flush_cache
 
 	echo "Unmounting!"
-	umount ${eMMC}p1 > /dev/null 2>&1 || true
-	umount ${eMMC}p2 > /dev/null 2>&1 || true
-	umount ${eMMC}p3 > /dev/null 2>&1 || true
-	umount ${eMMC}p4 > /dev/null 2>&1 || true
+        if [ -e ${eMMC_boot} ] && ! $three_partitions_emmc
+	then
+		umount ${eMMC_boot} > /dev/null 2>&1 || true
+	fi
+
+	umount ${eMMC_root} > /dev/null 2>&1 || true
+	umount ${eMMC_data} > /dev/null 2>&1 || true
+	umount ${eMMC_perm} > /dev/null 2>&1 || true
 
 	flush_cache
 	repartition_drive
 	flush_cache
 }
 
-update_uenv () {
-	# first param =2 in case of upgrade.. =1 for factory settings.
-        echo resetting coupling uEng.txt
-        if [ ! -e /tmp/emmcboot ]
-        then
-              mkdir -p /tmp/emmcboot
-        fi
-	sync
-	if mount | grep /tmp/emmcboot
+reset_s2 () {
+	if [ $s2pressed -eq 0 ]
 	then
-		echo /tmp/emmcboot already mounted!
+        	echo "Boot button found pressed"
 	else
-	        mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
+        	echo "Boot button is not pressed"
+		return
 	fi
 
-	echo resetting to boot switch dependant uEnv
-        cp /sdcard/p1/uEnv.txt /tmp/emmcboot/ || true
-        cp /mnt/uEnv.72check.txt /mnt/uEnv.txt || true
-        cp /sdcard/p1/uEnv.72check.txt /sdcard/p1/uEnv.txt || true
-        cp /tmp/emmcboot/uEnv.72check.txt /tmp/emmcboot/uEnv.txt || true
+	echo "Resetting s2 button!"
+	echo 72 > /sys/class/gpio/export
+	cat /sys/class/gpio/gpio72/value
+	echo out > /sys/class/gpio/gpio72/direction
+	echo 0 > /sys/class/gpio/gpio72/value
+	cat /sys/class/gpio/gpio72/value	
+	echo 72 > /sys/class/gpio/unexport
+}
 
-        if [ $1 -eq 2 ]
-        then
-                if [ -e /sdcard/p2/scripts/replace_uEnv.txt.sh ]
-                then
-			echo running upgrade version of replace_uEnv.txt.sh
-                        sh /sdcard/p2/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
-                else
-			echo running factory settings version of replace_uEnv.txt.sh while performing upgrade.
-                        sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
-                fi
-        else
-		echo running factory settings version of replace_uEnv.txt.sh
-                sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+update_uenv () {
+        if [ ! -e /tmp/emmcboot ]                                                
+        then                                                                     
+              mkdir -p /tmp/emmcboot                                             
         fi
 
-        sync
-        sleep 5
-	if mount | grep /tmp/emmcboot
-	then
-	        umount /tmp/emmcboot || true
-		rm -r /tmp/emmcboot || true
-	fi
+	echo resetting to boot switch dependant uEnv                       
+        cp /mnt/uEnv.72check.txt /mnt/uEnv.txt || true                
+        cp /sdcard/p1/uEnv.72check.txt /sdcard/p1/uEnv.txt || true                
+
+	# first param =2 in case of upgrade.. =1 for factory settings.                               
+        if $three_partitions
+        then
+		echo Dealing with uEnv.txt on three partitions system.
+		if [ ! -e /tmp/rootfs ] 
+		then
+			mkdir -p /tmp/rootfs || true
+		fi
+		mount | grep ${eMMC_root}
+		if [ $? -eq 0 ]
+		then
+			echo ${eMMC_root} is mounted already
+		else
+			if mount ${eMMC_root} /tmp/rootfs
+			then
+				echo Error in mounting rootfs. Failed to switch boot uEnv.
+				return 1
+			fi
+		fi
+		echo running factory settings version of replace_uEnv.txt.sh
+#       	        sh /sdcard/p1/scripts/replace_uEnv.txt.sh $emmc_boot_files || true        
+		echo resetting to boot switch dependant uEnv                       
+	        cp $emmc_boot_files/uEnv.72check.txt $emmc_boot_files/uEnv.txt || true                            
+        	sync                                                                                     
+	        sleep 5 	                                                                                 
+        	umount /tmp/rootfs || true
+	else
+		echo Dealing with four partitions system.
+	        echo copying coupling uEng.txt                                                           
+	        mount ${eMMC_boot} $emmc_boot_files -t vfat || true                            
+
+        	if [ $1 -eq 2 ]                                             
+	        then                                                                                     
+        	        if [ -e /sdcard/p2/scripts/replace_uEnv.txt.sh ]
+	                then
+				echo running upgrade version of replace_uEnv.txt.sh
+        	                sh /sdcard/p2/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+	                else
+				echo running factory settings version of replace_uEnv.txt.sh while performing upgrade.
+                	        sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+        	        fi                                                                     
+	        else                                                                           
+			echo running factory settings version of replace_uEnv.txt.sh
+        	        sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true        
+	        fi                                                                             
+	        sync                                                                                     
+        	sleep 5                                                                                  
+		if mount | grep $emmc_boot_files
+		then
+	        	umount $emmc_boot_files || true
+			rm -r $emmc_boot_files || true
+		fi
+        fi
+
+        sync                                                                                     
+        sleep 5                                                                                  
 }
 
 reset_uenv () {
 	echo "resetting uEnv!"
+        if [ -z $emmc_boot_files ]
+	then
+		if [ ! -e $emmc_boot_files ]
+		then
+		        mkdir -p $emmc_boot_files
+		fi
+
+		if mount | grep $emmc_boot_files || $three_partitions_emmc
+		then
+			echo $emmc_boot_files already mounted!
+		else
+		        mount ${eMMC_boot} $emmc_boot_files -t vfat || true
+		fi
+        fi
+
 	cp ${sdcard_p1}/uEnv.72check.txt ${sdcard_p1}/uEnv.txt || true
         cp /mnt/uEnv.72check.txt /mnt/uEnv.txt || true
 
-	if [ ! -e /tmp/emmcboot ]
-	then
-	        mkdir -p /tmp/emmcboot
-	fi
-
-	if mount | grep /tmp/emmcboot
-	then
-		echo /tmp/emmcboot already mounted!
-	else
-	        mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
-	fi
-
-	cp /tmp/emmcboot/uEnv.72check.txt /tmp/emmcboot/uEnv.txt || true
+	cp $emmc_boot_files/uEnv.72check.txt $emmc_boot_files/uEnv.txt || true
 	sync
 	sleep 5
 
-	if mount | grep /tmp/emmcboot
-	then
-	        umount /tmp/emmcboot || true
-		rm -r /tmp/emmcboot || true
-	fi
+        if $three_partitions_emmc
+        then
+		umount /tmp/rootfs || true
+	else
+		if mount | grep $emmc_boot_files
+		then
+	        	umount $emmc_boot_files || true
+			rm -r $emmc_boot_files || true
+		fi
+        fi
 	echo "Done returning to gpio 72 check version"
 }
 
@@ -391,6 +504,7 @@ files_verification () {
 }
 
 reset_update_uenv_with_verification () {
+
         echo updating and verifying uEnv
         update_uenv $1
 
@@ -402,28 +516,27 @@ reset_update_uenv_with_verification () {
 	file2=/sdcard/p1/uEnv.72check.txt
 	files_verification $1
 
-        file1=/tmp/emmcboot/uEnv.txt
-        file2=/tmp/emmcboot/uEnv.72check.txt
+        file1=$emmc_boot_files/uEnv.txt
+        file2=$emmc_boot_files/uEnv.72check.txt
 
-        if [ ! -e /tmp/emmcboot ]
+        if [ ! -e $emmc_boot_files ]
         then
-              mkdir -p /tmp/emmcboot
+              mkdir -p $emmc_boot_files
         fi
 	sync
 
-	if mount | grep /tmp/emmcboot
+	if mount | grep $emmc_boot_files || $three_partitions_emmc
 	then
-		echo /tmp/emmcboot already mounted!
+		echo $emmc_boot_files already mounted!
 	else
-	        mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
+	        mount ${eMMC_boot} $emmc_boot_files -t vfat || true
 	fi
 
 	files_verification $1
-
-	if mount | grep /tmp/emmcboot
+	if mount | grep $emmc_boot_files
 	then
-	        umount /tmp/emmcboot || true
-		rm -r /tmp/emmcboot || true
+	        umount $emmc_boot_files || true
+		rm -r $emmc_boot_files || true
 	fi
 }
 
@@ -442,7 +555,7 @@ perform_data_restore () {
         then
         	echo Backup found from a previous run. Restoring...
 		mkdir -p /tmp/p4 || true
-                if mount ${eMMC}p4 /tmp/p4
+                if mount ${eMMC_perm} /tmp/p4
                 then
                 	echo Restoring /perm partition contents.
                         tar xfv ${sdcard_p2}/backup_perm.gz -C /tmp/p4/
@@ -454,11 +567,12 @@ perform_data_restore () {
 	else
         	echo No /perm contents backup found.
 	fi
+
         if [ -e ${sdcard_p2}/backup_data.gz ]
         then
         	echo Backup found for /data partition. Restoring...
 		mkdir -p /tmp/p3 || true
-                if mount ${eMMC}p3 /tmp/p3
+                if mount ${eMMC_data} /tmp/p3
                 then
                 	echo Restoring /perm partition contents.
 			cd /tmp/p3
@@ -482,7 +596,7 @@ backup_data () {
                 echo Backup found from a previous run.
         else
                 mkdir -p /tmp/p3 || true
-                if mount ${eMMC}p3 /tmp/p3
+                if mount ${eMMC_data} /tmp/p3
                 then
                         echo Saving /data partition contents.
                         cd /tmp/p3
@@ -502,7 +616,7 @@ backup_perm () {
                 echo /perm backup found from a previous run.
         else
                 mkdir -p /tmp/p4 || true
-                if mount ${eMMC}p4 /tmp/p4
+                if mount ${eMMC_perm} /tmp/p4
                 then
                         echo Saving /perm partition contents.
                         cd /tmp/p4
@@ -546,15 +660,15 @@ perform_upgrade () {
 }
 
 isValidPermGeometry () {
-	echo "Testing ${eMMC}p4 validaty"
-	if [ ! -e ${eMMC}p4 ]
+	echo "Testing ${eMMC_perm} validaty"
+	if [ ! -e ${eMMC_perm} ]
 	then
 		echo Device not partitioned up to 5 partitions.
 		return 1
 	fi
 	result=1
 
-	start=$(hdparm -g ${eMMC}p4 | awk -F 'start =' '{print $2}')
+	start=$(hdparm -g ${eMMC_perm} | awk -F 'start =' '{print $2}')
 	if [ -z $start ]
 	then
 		echo No valid geometry found.
@@ -605,15 +719,15 @@ isValidPermGeometry () {
 }
 
 isValidDataGeometry () {
-	echo "Testing ${eMMC}p3 validaty"
-	if [ ! -e ${eMMC}p3 ]
+	echo "Testing ${eMMC_data} validaty"
+	if [ ! -e ${eMMC_data} ]
 	then
 		echo Device is not partitioned up to 4 partitions.
 		return 1
 	fi
 	result=1
 
-	start=$(hdparm -g ${eMMC}p3 | awk -F 'start =' '{print $2}')
+	start=$(hdparm -g ${eMMC_data} | awk -F 'start =' '{print $2}')
 	if [ -z $start ]
 	then
 		echo No valid data partition geometry found.
@@ -673,10 +787,10 @@ isValidPermPartition () {
 
 	result=1
 	mkdir /tmp/permcheck -p || true
-	mount ${eMMC}p4 /tmp/permcheck
+	mount ${eMMC_perm} /tmp/permcheck
 	if [ $? -eq 0 ]
 	then
-		echo "${eMMC}p4 mounted!"
+		echo "${eMMC_perm} mounted!"
 		echo "Test Test" >> /tmp/permcheck/write_test_perm_partition.flag
 		if [ -e /tmp/permcheck/write_test_perm_partition.flag ]
 		then
@@ -707,10 +821,11 @@ isValidDataPartition () {
 	fi	
 
 	mkdir /tmp/datacheck -p || true
-	mount ${eMMC}p3 /tmp/datacheck
+	mount ${eMMC_data} /tmp/datacheck
+	#mount /dev/mmcblk1p2 /tmp/datacheck
 	if [ $? -eq 0 ]
 	then
-		echo "${eMMC}p3 mounted!"
+		echo "${eMMC_data} mounted!"
 		echo "Test Test" >> /tmp/datacheck/write_test_data_partition.flag
 		if [ -e /tmp/datacheck/write_test_data_partition.flag ]
 		then
@@ -730,8 +845,8 @@ isValidPermResult=$?
 isValidDataPartition
 isValidDataResult=$?
 
-echo "Validity test for /perm and /data partitions: $isValidPermResult and $isValidDataResul"
-if [ $isValidPermResult -eq 1 ] || [ $isValidDataResult -eq 1 ]
+echo "Validity test for /perm and /data partitions: $isValidPermResult and $isValidDataResult"
+if [ $isValidPermResult -eq 1 ] || [ $isValidDataResult -eq 1 ] || $migration_needed
 then
 	backup_perm
 	if isUpgrade
@@ -785,7 +900,7 @@ then
 		echo "Done partitioning $eMMC!"
 		perform_data_restore
 	else
-		echo "Cannot update partition table at  $eMMC! restarting!"
+		echo "Cannot update partition table at  $eMMC_perm! restarting!"
 		echo "Write Perm Partition 2" > ${sdcard_p2}/write_perm_partition.flag
 
 		sync
@@ -802,18 +917,24 @@ then
 		echo "Done partitioning $eMMC!"
 		perform_data_restore
 	else
-		echo "Cannot update data partition table at  $eMMC! restarting!"
-		echo "Write Data Partition 2" > ${sdcard_p2}/write_data_partition.flag
-		if isUpgrade
+		if $three_partitions_image
 		then
-			echo data partition formatting needed.
+			echo Bypassing data partition check for 3 partitions image.
 		else
+			echo "Cannot update data partition table at  $eMMC_data !!"
+			echo "Write Data Partition 2" > ${sdcard_p2}/write_data_partition.flag
+			if isUpgrade
+			then
+				echo data partition formatting needed.
+			else
+				write_data_fs_image
+			fi
 
-			write_data_fs_image
+			sync
+			echo Restarting
+			rebootx
+			exit 0
 		fi
-		sync
-		rebootx
-		exit 0
 	fi
 else
 	echo "Device is partitioned"
@@ -829,7 +950,7 @@ fi
 echo "Restoring system from sdcard at $sdcard_dev to eMMC at $eMMC!"
 sh ${sdcard_p1}/scripts/unpack_latest_version.sh factorysettings $counter || true
 
-if [ -e "${eMMC}p4" ]
+if [ -e "${eMMC_perm}" ]
 then
         echo "Permanent data partition found! Bypassing repartitioning!"
 else
@@ -840,7 +961,7 @@ fi
 
 if [ -e ${sdcard_p1}/write_perm_partition.flag ] || [ -e ${sdcard_p2}/write_perm_partition.flag ]
 then
-	echo "eMMC Flasher: writing to /perm partition (to format)"
+	echo "eMMC Flasher: writing to /perm partition to format"
 	format_perm
 	rm ${sdcard_p1}/write_perm_partition.flag > /dev/null 2>&1 || true
 	rm ${sdcard_p2}/write_perm_partition.flag > /dev/null 2>&1 || true
@@ -849,7 +970,7 @@ fi
 
 if [ -e ${sdcard_p1}/write_data_partition.flag ] || [ -e ${sdcard_p2}/write_data_partition.flag ]
 then
-	echo "eMMC Flasher: writing to /data partition (to format)"
+	echo "eMMC Flasher: writing to /data partition to format"
 	format_data
 	rm ${sdcard_p1}/write_data_partition.flag > /dev/null 2>&1 || true
 	rm ${sdcard_p2}/write_data_partition.flag > /dev/null 2>&1 || true
@@ -861,6 +982,7 @@ reset_update_uenv_with_verification 1
 
 remove_upgrade_flags
 reset_uenv
+reset_s2
 echo "eMMC Flasher: all done!"
 sync
 
@@ -870,3 +992,4 @@ alldone
 rebootx
 
 exit 0
+

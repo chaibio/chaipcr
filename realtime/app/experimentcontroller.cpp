@@ -658,6 +658,7 @@ void ExperimentController::addLogCallback(Poco::Timer &)
 
 void ExperimentController::startDataSpaceCheck()
 {
+    _dataSpaceTimer->stop();
     _dataSpaceTimer->setPeriodicInterval(kDataSpaceCheckInterval);
     _dataSpaceTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::checkDataSpace));
 }

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Device API" do
+describe "Device API", type: :request do
   it 'show status' do
     admin_user = create_admin_user
     post '/login', { email: admin_user.email, password: admin_user.password }
@@ -18,7 +18,7 @@ describe "Device API" do
       signature
     end
     params = { signature: "abc" }
-    put "/device/clean", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+    put "/device/clean", params.to_json, http_headers
     response.response_code.should == 400
   end
   
@@ -33,7 +33,7 @@ describe "Device API" do
       signature
     end
     params = { signature: signature }
-    put "/device/clean", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+    put "/device/clean", params.to_json, http_headers
     expect(response).to be_success
     get "/"
     response.should redirect_to "/login"

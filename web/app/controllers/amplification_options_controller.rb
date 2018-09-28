@@ -56,7 +56,7 @@ class AmplificationOptionsController < ApplicationController
 			parameter do
 				key :name, :id
 				key :in, :path
-				key :description, 'id of the experiment'
+				key :description, 'Id of the experiment'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
@@ -65,7 +65,6 @@ class AmplificationOptionsController < ApplicationController
 				key :description, 'Returns an object amplification_option which has the list of options'
 				schema do
 					key :name, :amplification_option
-					key :type, :object
 					key :'$ref', :Amplification_option
 				end
 			end

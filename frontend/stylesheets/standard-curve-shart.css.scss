@@ -1,0 +1,335 @@
+@import './colors.css.scss';
+/* Modal Content */
+
+.modal-content-standard-curve {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 750px;
+  height: 550px;
+  text-align: center;
+  font-family: 'dinot-Regular';
+  color: black !important;
+  .h3-baseline {
+    font-family: 'dinot-Bold';
+    color: black;
+    font-size: 20px;
+  }
+  .baseline-cycles {
+    border-top: 1px solid black;
+    padding-top: 10px;
+  }
+  .hover-desc {
+    visibility: hidden;
+  }
+  .error-color {
+    color: red !important;
+  }
+  .h3-cq {
+    color: black;
+    font-size: 20px;
+    margin-top: 10px;
+    font-weight: 300;
+    font-family: 'dinot';
+  }
+  .button {
+    border: 2px solid #787878;
+    background: #fff;
+    color: #333;
+    display: inline-block;
+    border-radius: 0;
+    font-weight: bold;
+    min-width: 150px;
+    margin-right: 15px;
+    margin-top: 10px;
+    padding: 6px 0;
+    //position: absolute;
+    top: 530px;
+  }
+  .button-cancel {
+    left: 650px;
+  }
+  .button-apply {
+    left: 850px;
+  }
+  .button:hover {
+    background: #8FC742;
+    color: white;
+    border: none;
+    height: 34px;
+  }
+  input {
+    border: 0;
+    outline: 0;
+    background: transparent;
+    width: 50px;
+  }
+  input[type="radio"] {
+    width: 20px;
+  }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  label.radio-pcr {
+    content: "";
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    border-radius: 12px;
+    margin-right: 10px;
+    left: 0;
+    border: 2px solid white;
+    bottom: 1px;
+    box-shadow: 0 0 0 0.07em #000;
+  }
+  input[type='radio']:checked + label.radio-pcr {
+    background: #8FC742;
+    box-shadow: 0 0 0 0.07em #000;
+  }
+  label {
+    padding-top: 5px;
+    color: black;
+    font-size: 15px;
+  }
+  .div-style {
+    text-align: left;
+    height: 275px;
+  }
+  .ct-label {
+    border-bottom: 1px solid #ccc;
+    margin-left: 25px;
+  }
+  .params-label {
+    border-bottom: 1px solid #ccc;
+    width: 180px;
+    text-align: left;
+    span {
+      width: 125px;
+      display: inline-block;
+    }
+  }
+  .by-label {
+    border-bottom: 1px solid #ccc;
+    margin-left: 5px;
+  }
+  .col-md-6 {
+    text-align: left;
+    border-top: 1px solid black;
+    padding-left: 0;
+  }
+  .cq-method {
+    text-align: left;
+    border-top: 1px solid black;
+    padding-left: 0;
+  }
+}
+
+.standardcurve-chart-state-active {
+  font-family: 'dinot';
+  .header {
+    .name-container {
+      width: 80%;
+    }
+  }
+  .amplification-options {
+    cursor: pointer;
+    color: #00b3ed !important;
+  }
+  .curve-header {
+    .plot-type-buttons {
+      width: 140px !important;
+      .buttons-wrapper {
+        .button {
+          width: 70px !important;
+        }
+      }
+    }
+    .curve-name {
+      //width: 55%;
+    }
+
+    .form-horizontal .editable
+    { 
+      padding-top: 5px;
+      display:inline-block;
+    }
+    /* The container <div> - needed to position the dropdown content */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+      /* Dropdown Button */
+      .dropbtn {
+        background-color: white;
+        color: black;
+        padding: 6px;
+        font-size: 16px;
+        font-family: 'dinot-regular';
+        //font-weight: 300;
+        border: none;
+        cursor: pointer;
+        width: 120px;
+        border: 1px solid black;
+        .arrow-down{
+          float: right;
+          width: 15px;
+          padding-top: 5px;
+        }
+      }
+      /* Dropdown Content (Hidden by Default) */
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 120px;
+        font-family: 'dinot-regular';
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+      }
+      /* Links inside the dropdown */
+      .dropdown-content a {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        font-family: 'dinot-regular';
+      }
+
+      /* Change color of dropdown links on hover */
+      .dropdown-content a:hover {
+        background-color: #f1f1f1;
+      }
+
+      /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+      .show {
+        display:block;
+      }
+    }
+
+    .ampli-toggles {
+      //width: 45%;
+      padding-bottom: 5px;
+      .col-md-6,
+      .col-sm-6 {
+        padding-left: 0;
+        // padding-right: 0;
+        // &:last-of-type {
+        //   padding-right: 15px;
+        // }
+      }
+    }
+  }
+  .curve-body {
+    background-color: #eee;
+    padding: 20px;
+    // min-height: 600px;
+    // height: 610px;
+    .curve-plot {
+      background-color: #fff;
+      padding: 10px;
+      display: inline-block;
+      width: 85%;
+      float: left;
+      // height: 100%;
+    }
+    .additional-info {
+      // position: relative;
+      display: inline-block;
+      width: 12%;
+      // height: 100%;
+      margin-left: 20px;
+      div {
+        width: 100%;
+        background-color: #fff;
+        padding: 10px;
+      }
+      .parameters {
+        padding: 0px;
+        .header {
+          color: #fff;
+          background-color: #000;
+          padding: 10px;
+        }
+        div {
+          padding: 10px;
+          .parameters-table {
+            width: 100%;
+            color: #000;
+            background-color: #fff;
+            margin: 0px;
+          }
+        }
+      }
+      .parameters-last-row {
+        color: #595959;
+        // background-color: #000;
+        margin-top: 5px;
+      }
+      .info1 {
+        color: #fff;
+        background-color: #595959;
+        margin-top: 5px;
+      }
+      .targets-set {
+        position: absolute;
+        display: none;
+        // bottom: -55px;
+        background-color: #fff;
+        //margin-left: 20px;
+        // margin-bottom: -66px;
+        padding: 10px;
+        // display: inline-block;
+        width: 12%;
+        height: 130px;
+        overflow: auto;
+        .targets-table {
+          width: 100%;
+          td {
+            font-family: "Dinot";
+            font-size: 13px;
+            // line-height: 20px;
+          }
+            .td-tik {
+            min-width: 30px;
+            text-align: right;
+            cursor: pointer;
+            span {
+              img {
+                width: 10px;
+                height: 10px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  .content.row {
+    margin-left: 0;
+    margin-right: 0;
+    .plot-options {
+      text-align: right;
+      padding-right: 30px;
+      .plot-option {
+        display: inline-block;
+        text-align: left;
+      }
+      ul {
+        li {
+            padding-top: 10px;
+            span {
+                font-size: 15px;
+                padding-right: 10px;
+            }
+            img {
+                width: 15px;
+                height: 15px;
+            }
+        }
+      }
+    }
+  }
+  
+}

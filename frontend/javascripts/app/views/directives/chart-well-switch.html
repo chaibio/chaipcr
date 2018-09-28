@@ -1,0 +1,47 @@
+<!--
+  Chai PCR - Software platform for Open qPCR and Chai's Real-Time PCR instruments.
+  For more information visit http://www.chaibio.com
+
+  Copyright 2016 Chai Biotechnologies Inc. <info@chaibio.com>
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<div class="chart-well-switch">
+  <table>
+    <tbody>
+      <tr>
+        <th style="font-size: 9px; font-weight: normal" ng-mousedown="dragStart($event, 'corner', 0)" ng-style="{width: row_header_width + 'px'}" class="col-header"></th>
+        <th style="font-size: 9px; font-weight: normal" ng-mousedown="dragStart($event, 'column', col.index)" ng-mouseup="dragStop($event, 'column', col.index)" ng-mousemove="dragged($event, 'column', col.index)" ng-repeat="col in columns" ng-style="{width: getCellWidth() + 'px'}" class="col-header" ng-class="{dragged: col.selected}">
+          {{col.index + 1}}
+        </th>
+      </tr>
+      <tr ng-repeat="row in rows">
+        <td style="font-size: 9px; font-weight: normal" class="row-header" ng-mousedown="dragStart($event, 'row', row.index)" ng-mousemove="dragged($event, 'row', row.index)" ng-mouseup="dragStop($event, 'row', row.index)" ng-class="{dragged: row.selected}">
+          {{ row.index + 1 }}
+        </td>
+        <td ng-repeat="col in columns" class="well-switch" ng-init="i = (row.index * columns.length) + col.index; well = wells['well_' + i];" ng-mousedown="dragStart($event, 'well', i)" ng-mousemove="dragged($event, 'well', i)" ng-mouseup="dragStop($event, 'well', i)" ng-class="{selected: well.selected, active: well.active}" ng-style="getWellStyle(row, col, well, i)">
+          <div class="well-switch-container" ng-style="getWellContainerStyle(row, col, well, i)" style="font-size: 15px;">
+            <div class="well-switch-bar-container">
+              <div class="well-switch-bar" ng-style="getStyleForWellBar(row, col, well, i)">
+              </div>
+            </div>
+            <div class="ct-cq-container">
+              <div> Cq <strong class="value">{{ displayCt(well.ct[0]) }}</strong> </div>
+              <div> Cq <strong class="value">{{ displayCt(well.ct[1]) }}</strong> </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

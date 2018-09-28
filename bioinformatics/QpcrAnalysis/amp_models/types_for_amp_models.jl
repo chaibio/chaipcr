@@ -1,17 +1,17 @@
 # amp_model_types
 
 abstract type AbstractAmpFitted end
-immutable EmptyAmpFitted <: AbstractAmpFitted end
+struct EmptyAmpFitted <: AbstractAmpFitted end
 
 
 # sfc: same formula for each cycle
-type SfcFitted <: AbstractAmpFitted
+struct SfcFitted <: AbstractAmpFitted
     coef_strs::Vector{String}
-    coefs::Vector{AbstractFloat}
+    coefs::Vector{Float64}
     status::Symbol
     obj_val::AbstractFloat
     jmp_model::JuMP.Model
-    init_coefs::OrderedDict{String,AbstractFloat}
+    init_coefs::OrderedDict{String,Float64}
 end
 const SfcFitted_EMPTY = SfcFitted(
     Vector{String}(), # coef_strs
@@ -19,7 +19,7 @@ const SfcFitted_EMPTY = SfcFitted(
     :not_fitted, # status
     0., # obj_val
     Model(), # jmp_model
-    OrderedDict{String,AbstractFloat}() # init_coefs
+    OrderedDict{String,Float64}() # init_coefs
 )
 
 
@@ -29,10 +29,10 @@ const SfcFitted_EMPTY = SfcFitted(
 # https://discourse.julialang.org/t/avoid-repeating-the-same-using-line-for-enclosed-modules/2549/7
 
 abstract type AbstractDfcArg end
-immutable MAK2 <: AbstractDfcArg end
-immutable MAK3 <: AbstractDfcArg end
-immutable MAKERGAUL3 <: AbstractDfcArg end
-immutable MAKERGAUL4 <: AbstractDfcArg end
+struct MAK2 <: AbstractDfcArg end
+struct MAK3 <: AbstractDfcArg end
+struct MAKERGAUL3 <: AbstractDfcArg end
+struct MAKERGAUL4 <: AbstractDfcArg end
 
 const dfc_DICT = OrderedDict(
     "MAK2"=>MAK2,
@@ -43,12 +43,12 @@ const dfc_DICT = OrderedDict(
 
 abstract type DfcFitted <: AbstractAmpFitted end
 
-type MAK2Fitted <: DfcFitted
+struct MAK2Fitted <: DfcFitted
     max_d_idx::Int
     coef_strs::Vector{String}
-    coefs::Vector{AbstractFloat}
+    coefs::Vector{Float64}
     status::Symbol
-    obj_val::AbstractFloat
+    obj_val::Float64
     jmp_model::JuMP.Model
 end
 const MAK2Fitted_EMPTY = MAK2Fitted(
@@ -60,14 +60,14 @@ const MAK2Fitted_EMPTY = MAK2Fitted(
     Model(), # jmp_model
 )
 
-type MAK3Fitted <: DfcFitted
+struct MAK3Fitted <: DfcFitted
     max_d_idx::Int
-    fb_start::AbstractFloat
-    bl_k_start::AbstractFloat
+    fb_start::Float64
+    bl_k_start::Float64
     coef_strs::Vector{String}
-    coefs::Vector{AbstractFloat}
+    coefs::Vector{Float64}
     status::Symbol
-    obj_val::AbstractFloat
+    obj_val::Float64
     jmp_model::JuMP.Model
 end
 const MAK3Fitted_EMPTY = MAK3Fitted(
@@ -81,12 +81,12 @@ const MAK3Fitted_EMPTY = MAK3Fitted(
     Model(), # jmp_model
 )
 
-type MAKERGAUL3Fitted <: DfcFitted
+struct MAKERGAUL3Fitted <: DfcFitted
     max_of_idx::Int
     coef_strs::Vector{String}
-    coefs::Vector{AbstractFloat}
+    coefs::Vector{Float64}
     status::Symbol
-    obj_val::AbstractFloat
+    obj_val::Float64
     jmp_model::JuMP.Model
 end
 const MAKERGAUL3Fitted_EMPTY = MAKERGAUL3Fitted(
@@ -98,14 +98,14 @@ const MAKERGAUL3Fitted_EMPTY = MAKERGAUL3Fitted(
     Model(), # jmp_model
 )
 
-type MAKERGAUL4Fitted <: DfcFitted
+struct MAKERGAUL4Fitted <: DfcFitted
     max_of_idx::Int
-    fb_start::AbstractFloat
-    bl_k_start::AbstractFloat
+    fb_start::Float64
+    bl_k_start::Float64
     coef_strs::Vector{String}
-    coefs::Vector{AbstractFloat}
+    coefs::Vector{Float64}
     status::Symbol
-    obj_val::AbstractFloat
+    obj_val::Float64
     jmp_model::JuMP.Model
 end
 const MAKERGAUL4Fitted_EMPTY = MAKERGAUL4Fitted(

@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version='1.1' encoding='UTF-8'?>
 <project>
   <actions/>
   <description>Build Chaibio shoftware</description>
@@ -17,6 +17,7 @@
           <name>build_machine</name>
           <description>Building machine</description>
           <defaultValue>10.0.100.240</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>bypass_julia</name>
@@ -27,17 +28,13 @@
           <name>download_prefix</name>
           <description>Download folder URL</description>
           <defaultValue>http://10.0.1.20/download</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
-        <hudson.model.ChoiceParameterDefinition>
-          <name>building_version</name>
-          <description>Julia version</description>
-          <choices class="java.util.Arrays$ArrayList">
-            <a class="string-array">
-              <string>release-0.5</string>
-              <string>release-0.6</string>
-            </a>
-          </choices>
-        </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>is_dev</name>
+          <description>Build a development image</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -164,55 +161,11 @@ then
   echo &quot;Error: can&apos;t unmount sdcard!&quot;
   exit 1
 fi
-dpkg --configure -a</command>
+dpkg --configure -a
+
+exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <hudson.tasks.Shell>
-      <command>#!/bin/bash
-# waiting 20min for the bulding device to flash
-echo &quot;Waiting for the build device ($build_machine) to flash and become ready!&quot;
-#sleep 1500
-
-for i in {0..1200..60}
-do
-	echo &quot;Waiting for the build device ($build_machine) to become ready! $i&quot;
-	sleep 60
-
-	if ping $build_machine -c 2
-    then
-    	echo device is finally up !!
-        sleep 60
-        
-		ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
-		ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
-		echo $build_machine device is connectable.. 
-		lsblk
-		exit 0
-ENDSSH
-
-		sleep 10
-		echo returned to host. connection check:
-		counter=0
-		until ssh -t root@$build_machine &apos;exit 0&apos;
-		do
-			counter=$(( $counter + 1 ))
-    		if [ $counter -gt 20 ]
-    		then
-    			echo Beaglebone is not available.
-    			exit 1
-		    fi
-			echo waiting for ssh on beaglebone to become connectable.
-			sleep 10
-		done
-		echo ssh is connectable.
-        sleep 10
-        exit 0
-    fi
-done
-
-echo timeout waiting for the device to become ready!
-exit 1</command>
-    </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>#	echo update sources# if not updated?
@@ -314,6 +267,15 @@ df -h
 echo Installing mysql
 dpkg --configure -a
 
+if mount | grep /data
+then
+    echo data partition is mounted
+else
+    echo mounting data partition
+    mount /dev/mmcblk1p2 /data || true
+    service mysql start
+fi
+
 sudo debconf-set-selections &lt;&lt;&lt; &quot;mysql-server-5.5 mysql-server/root_password password chaipcr&quot;
 sudo debconf-set-selections &lt;&lt;&lt; &quot;mysql-server-5.5 mysql-server/root_password_again password chaipcr&quot;
 
@@ -337,24 +299,72 @@ else
             exit 1
       fi
 fi
-
-
 echo done installing mysql
 
 echo resetting mysql password
-
 cat &gt;&gt; mysql_password_flush.sql &lt;&lt; EOF
     UPDATE user SET password=PASSWORD(&apos;&apos;) WHERE user=&apos;root&apos;;
     FLUSH PRIVILEGES;
     exit
 EOF
 
-mysql -u root --password=chaipcr mysql &lt; mysql_password_flush.sql || exit 1
+echo calling mysql command line
+if mysql -u root --password=chaipcr mysql &lt; mysql_password_flush.sql 
+then
+      echo Done resetting mysql password.
+else
+     echo Checking if already MySQL password is empty.
+     mysql -u root mysql &lt; mysql_password_flush.sql || exit 1
+     echo MySQL password found empty.
+fi
 
 rm mysql_password_flush.sql
 df -h
 echo done resetting mysql password
 </command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo unmounting any sdcard folders and creating swap file
+umount /sdcard/*
+umount /dev/mmcblk0p*
+
+LC_ALL=C /sbin/sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
+,,0x83,*
+__EOF__
+
+/sbin/partprobe /dev/mmcblk0
+/sbin/mkfs.ext4 /dev/mmcblk0p1 -F
+mkdir -p /sdcard/factory
+if mount /dev/mmcblk0p1 /sdcard/factory/
+then
+    echo &quot;temp sdcard folder mounted&quot;
+else
+   echo &quot;Error mounting temp sdcard folder&quot;
+   exit 1
+fi
+
+rm -r /sdcard/upgrade
+ln -s /sdcard/factory /sdcard/upgrade
+
+# creating a temporary swap file on sdcard
+if fallocate -l 2G /sdcard/factory/swapfile #or dd if=/dev/zero of=/sdcard/factory/swapfile bs=10M count=300
+then
+    echo &quot;swap file created successfully&quot;
+else
+   echo &quot;failed creating swap file&quot;
+   exit 1
+fi
+
+sudo chmod 600 /sdcard/factory/swapfile
+sudo mkswap /sdcard/factory/swapfile
+sudo swapon /sdcard/factory/swapfile
+
+#verifying swap file is successfully added
+sudo swapon -s
+
+free -m</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
@@ -408,6 +418,12 @@ cd ~
 
 #http://downloads.sourceforge.net/project/soci/soci/soci-3.2.2/soci-3.2.2.tar.gz?r=&amp;ts=1481630635&amp;use_mirror=netix
 #wget &quot;http://downloads.sourceforge.net/project/soci/soci/soci-3.2.2/soci-3.2.2.tar.gz&quot;
+if $is_dev
+then
+      echo Building a debug image
+      cd /sdcard/factory/
+fi
+
 wget &quot;http://netix.dl.sourceforge.net/project/soci/soci/soci-3.2.2/soci-3.2.2.tar.gz&quot;
 tar xpvzf soci-3.2.2.tar.gz
 dpkg --configure -a
@@ -416,8 +432,16 @@ cmake -DCMAKE_BUILD_TYPE=Release -DSOCI_STATIC=OFF -DSOCI_TESTS=OFF -DWITH_SQLIT
 make || exit 1
 make install || exit 1
 cd ..
-rm -rf soci-3.2.2*
+
 dpkg --configure -a
+
+if $is_dev
+then
+      echo Building a debug image
+else
+     rm -rf soci-3.2.2*
+fi
+
 df -h
 exit 0
 
@@ -425,26 +449,6 @@ exit 0
 </command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <hudson.tasks.Shell>
-      <command>#!/bin/bash
-sleep 60
-echo waiting for a restart
-for i in {0..300..60}
-do
-	echo &quot;Waiting for the build device to become ready! $i&quot;
-	sleep 60
-    if ping $build_machine -c 1
-    then
-    	echo device is finally up !!
-        sleep 30
-        exit 0
-    fi
-done
-
-echo timeout waiting for the device to become ready!
-exit 1
-</command>
-    </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo arranging to build julia and different libs
@@ -454,7 +458,7 @@ df -h
 apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential || true
 ntpdate -b -s -u pool.ntp.org
 
-sudo apt-get -q -y install gcc-4.8 g++-4.8 
+#sudo apt-get -q -y install gcc-4.8 g++-4.8 
 sudo apt-get -q -y install libgfortran-6-dev liblapack3
 sudo apt-get -q -y install libblas3gf liblapack3gf 
 sudo apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libc-bin  || exit 1
@@ -479,28 +483,12 @@ exit 0</command>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>#echo Setup MySQL
-#systemctl stop mysql.service
-#mount /dev/mmcblk1p2 /data
-#mv /var/lib/mysql /data/
-#sed -i &quot;s,datadir.*=.*,datadir=/data/mysql,g&quot; /etc/mysql/my.cnf # Edit /etc/mysql/my.cnf and change datadir to /data/mysql
-#sed -i &quot;s,datadir.*=.*,datadir=/data/mysql,g&quot; /etc/mysql/mariadb.conf.d/50-server.cnf # Edit /etc/mysql/my.cnf and change datadir to /data/mysql
-
-#systemctl start mysql.service
-
-#sync
-
-# the latest version sofar.. however, lets stay as we are for now.
-#echo build latest stable poco 1.7.6
-#cd
-#wget --no-check-certificate &quot;https://pocoproject.org/releases/poco-1.7.6/poco-1.7.6.tar.gz&quot;
-#tar xpvzf poco-1.7.6.tar.gz
-#cd poco-1.7.6
-#./configure
-#make
-#make install
-#cd
-#rm -rf poco-1.7.6* poco-1.7.6.tar.gz
+      <command>echo installing POCO
+if $is_dev
+then
+      echo Building a debug image
+      cd /sdcard/factory/
+fi
 
 wget &quot;http://pocoproject.org/releases/poco-1.6.1/poco-1.6.1.tar.gz&quot;  || exit 1
 tar xpvzf poco-1.6.1.tar.gz  || exit 1
@@ -513,7 +501,14 @@ rm /usr/local/lib/libPoco* || true
 
 make install || exit 1
 cd ..
-rm -rf poco-1.6.1* poco-1.6.1.tar.gz
+
+if $is_dev
+then
+      echo Building a debug image
+else
+      rm -rf poco-1.6.1* poco-1.6.1.tar.gz
+fi
+
 
 sync
 fsck /dev/mmcblk1p1 -y -f
@@ -528,15 +523,14 @@ exit 0
       <command>echo cleanup without envs
 
 apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential || true
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get install -q -y gfortran ntpdate || exit 1
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get install -q -y gfortran ntpdate || exit 1
 ntpdate -b -s -u pool.ntp.org
 sync
 
 apt-get autoremove -q -y --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data libx11* libxcb* || exit 1
 
 echo cleanup with envs
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get autoremove -q -y --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data libx11* libxcb* || exit 1
-
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get autoremove -q -y --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data libx11* libxcb* || exit 1
 
 apt-get clean
 apt-get autoclean
@@ -549,7 +543,7 @@ echo building tslib
 cd
 
 echo installing with envs..
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get -y -q install i2c-tools evtest git automake libtool  || exit 1
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get -y -q install i2c-tools evtest git automake libtool  || exit 1
 echo with no envs
 apt-get -y -q install i2c-tools evtest git automake libtool  || exit 1
 
@@ -570,8 +564,10 @@ echo configure tslib
 ./configure
 echo making tslib
 make || exit 1
+echo installing tslib
 make install || exit 1
 cd
+echo cleaning up
 rm -r tslib
 
 sync
@@ -609,18 +605,13 @@ echo patching /etc/ld.so.conf
 echo &quot;/usr/local/lib&quot; &gt;&gt; /etc/ld.so.conf
 ldconfig
 
-echo Installing R
-
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 06F90DE5381BA480
-echo deb http://cran.cnr.berkeley.edu/bin/linux/debian jessie-cran3/ &gt;&gt; /etc/apt/sources.list
-
 apt-key update
 apt-get update
 apt-get -y -q upgrade
 
 apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential || true
 
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive apt-get install -q -y gfortran ntpdate || exit 1
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get install -q -y gfortran ntpdate || exit 1
 
 df -h
 exit 0</command>
@@ -629,62 +620,224 @@ exit 0</command>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo downloading and installing Julia
-
-
-
 sync
-
 #pufreq-set --governor ondemand 
 echo 1500 &gt; /proc/sys/kernel/hung_task_timeout_secs
 
 # add gfortran link to search path. 
 ln -s /usr/lib/gcc/arm-linux-gnueabihf/4.9/libgfortran.so /usr/lib/libgfortran.so
 
-cd
-echo unmounting any sdcard folders
-umount /sdcard/*
-umount /dev/mmcblk0p*
-
-LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
-,,0x83,*
-__EOF__
-
-partprobe /dev/mmcblk0
-mkfs.ext4 /dev/mmcblk0p1 -F
-mkdir -p /sdcard/upgrade
-if mount /dev/mmcblk0p1 /sdcard/upgrade/
-then
-    echo &quot;temp sdcard folder mounted&quot;
-else
-   echo &quot;Error mounting temp sdcard folder&quot;
-   exit 1
-fi
-
-# creating a temporary swap file on sdcard
-if fallocate -l 2G /sdcard/upgrade/swapfile #or dd if=/dev/zero of=/sdcard/upgrade/swapfile bs=10M count=300
-then
-    echo &quot;swap file created successfully&quot;
-else
-   echo &quot;failed creating swap file&quot;
-   exit 1
-fi
-
-sudo chmod 600 /sdcard/upgrade/swapfile
-sudo mkswap /sdcard/upgrade/swapfile
-sudo swapon /sdcard/upgrade/swapfile
-
-#verifying swap file is successfully added
-sudo swapon -s
-
 free -m
-echo installing QT
+apt-get -q -y install libnlopt0
+apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3
+
+if $bypass_julia
+then
+       echo Bypassing JULIA
+       touch /etc/bypassjulia.flag
+       exit 0
+fi
+
+apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3  || exit 1
+
+mkdir -p /sdcard/factory/julia-compile
+cd /sdcard/factory/julia-compile
+
+mkdir downloadjulia
+cd downloadjulia
+wget https://julialang-s3.julialang.org/bin/linux/armv7l/0.6/julia-0.6.3-linux-armv7l.tar.gz
+#wget https://julialang-s3.julialang.org/bin/linux/armv7l/0.6/julia-0.6.2-linux-armv7l.tar.gz
+#tar xfvz julia-0.6.2-linux-armv7l.tar.gz
+tar xfvz julia-0.6.3-linux-armv7l.tar.gz
+cp -r julia-*/* /usr/
+
+cd ..
+rm -r downloadjulia
+sync
+
+if $is_dev
+then
+      echo Building a debug image
+      echo &quot;export JULIA_PKGDIR=/sdcard/factory/.julia&quot;&gt;&gt;~/.profile
+      export JULIA_PKGDIR=/sdcard/factory/.julia
+else
+      echo Formatting disk!  
+      echo &quot;export JULIA_PKGDIR=/root/.julia&quot;&gt;&gt;~/.profile
+      export JULIA_PKGDIR=/root/.julia
+fi
+
+source ~/.profile
+sync
+sleep 60
+
+if [ -e /usr/share/julia/bin/julia ] &amp;&amp; [ ! -e /usr/bin/julia ]
+then
+	ln -sf /usr/share/julia/bin/julia /usr/bin/julia
+fi
+
+#============== test
+echo test finished. cleaning..
+sync
+
+
+      apt-get  -y -q install  libblas3gf libblas3gf
+      apt-get install -y -q liblapack-dev
+      apt install -y -q liblapack-dev libblas-dev
+      apt install -y -q libmysqlclient-dev
+
+      sed -i &apos;1i using DataArrays&apos; /root/chaipcr/bioinformatics/juliaserver.jl
+      sed -i &apos;1i push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;)&apos; /root/chaipcr/bioinformatics/juliaserver.jl
+
+      echo Build time- adding pre-requesits
+      free -m
+      apt-get update
+      apt-get -q -y --fix-broken install
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get -q -y install libgtk-3-0
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get -q -y install libpango1.0-0 
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get -q -y install libglib2.0-0
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get -q -y install libcairo2
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get -q -y install gettext
+
+apt-get -q -y --fix-broken install
+
+DEBIAN_FRONTEND=noninteractive apt-get -q -y install gettext
+DEBIAN_FRONTEND=noninteractive apt-get -q -y install libgtk-3-0
+apt-get -y -q install libpango1.0-0 libglib2.0-0 libcairo2
+
+echo $(date) Performing precompilling julia packages
+if [ -e /tmp/mysql.sock ]
+then
+	echo &quot;MySQL sockets file found&quot;
+else
+	if [ -e /run/mysqld/mysqld.sock ]
+	then
+		echo &quot;Clonning MySQL sockets file&quot;
+		ln -s /run/mysqld/mysqld.sock /tmp/mysql.sock
+	else
+		echo &quot;MySQL sockets file not found.&quot; 
+		exit 1
+	fi
+fi
+
+cd
+rm -r /sdcard/factory/julia-compile
+sync
+
+sync
+fsck /dev/mmcblk1p1 -y -f
+fsck /dev/mmcblk0p1 -y -f
+
+/sbin/fsck /dev/mmcblk1p1 -y -f
+/sbin/fsck /dev/mmcblk0p1 -y -f
+
+sync
+
+sleep 60
+
+echo &quot;Setting up Julia: Initializing rep&quot;
+
+cd /tmp
+wget https://github.com/chaibio/chaipcr/raw/julia/bioinformatics/setup.jl
+if $is_dev
+then
+      echo Building a debug image
+      rm -r /sdcard/factory/.julia
+else
+      rm -r ~/.julia
+fi
+
+
+julia -e &apos;include(&quot;/tmp/setup.jl&quot;)&apos;
+
+apt-get -y -q install libglib2.0-0
+apt --fix-broken install -y -q
+
+sync
+
+echo &quot;Setting up Julia: Updating rep&quot;
+
+echo precompiling mandatory packages.
+cat &lt;&lt;EOF &gt;&gt; chaibio_packages.jl
+
+	Pkg.build(&quot;DataArrays&quot;,&quot;DataStructures&quot;, &quot;SpecialFunctions&quot;, &quot;MathProgBase&quot;, &quot;HDF5&quot;, &quot;Clustering&quot;, &quot;Nullables&quot;,&quot;JSON&quot;, &quot;JLD&quot;, &quot;NLopt&quot;, &quot;JuMP&quot;, &quot;HttpServer&quot;, &quot;ProfileView&quot;, &quot;Dierckx&quot;, &quot;Ipopt&quot;, &quot;MySQL&quot;, &quot;DataFrames&quot;)
+	println(&quot;Building: Done&quot;)
+
+	println(&quot;Pinning all done&quot;)
+	using DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering
+               println(&quot;Used DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering&quot;)
+	using JSON, JLD, NLopt, JuMP, HttpServer, ProfileView, DataArrays
+        println(&quot;Used JSON, JLD, NLopt, JuMP, HttpServer, ProfileView, DataArrays&quot;)
+	using Dierckx, Ipopt, MySQL, DataFrames
+	println(&quot;All packages used&quot;)
+
+	Pkg.status()
+	println(&quot;Using: Done&quot;)
+
+println(&quot;Setting up Julia: done testing.. quitting..&quot;)
+quit()
+EOF
+sync
+sleep 60
+
+# leave julia staff to be able to test why it crashes the system
+if julia chaibio_packages.jl
+then
+    echo pinning all done
+else
+    echo Error pinning julia packages
+    exit 1
+fi
+
+rm chaibio_packages.jl
+
+cd /tmp
+wget https://github.com/chaibio/chaipcr/raw/julia/bioinformatics/setup.jl
+if $is_dev
+then
+      echo Building a debug image
+      sed -i &apos;s/is_nullable = mysql_is/is_nullable = false # mysql_is/&apos; /sdcard/factory/.julia/v0.6/MySQL/src/types.jl
+else
+      sed -i &apos;s/is_nullable = mysql_is/is_nullable = false # mysql_is/&apos; /root/.julia/v0.6/MySQL/src/types.jl
+fi
+
+echo test finished. cleaning..
+sync
+cd
+rm -r ~/julia-compile
+df -h
+sync
+sync
+fsck /dev/mmcblk1p1 -y -f
+fsck /dev/mmcblk0p1 -y -f
+
+#find . -name .git -execdir rm -r {} \;
+#find . -name *.o  -exec rm {} \;
+
+if $is_dev
+then
+      echo Building a debug image
+      exit 0
+fi
+
+rm -r /var/cache/apt /var/log/ /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/tests
+mkdir /var/log/ -p
+find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
+apt update
+
+exit 0
+</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo installing QT
 dpkg --configure -a
 
 apt-get update
 apt-get install -y -q libfontconfig1-dev libfreetype6-dev
 
 echo downloading compiled QT v4.8.6
-cd /sdcard/upgrade/
+cd /sdcard/factory/
 #wget $download_prefix/qt-everywhere-compiled-4.8.6.tgz
 wget $download_prefix/qt-everywhere-slim-4.8.6.tgz
 tar xfv qt-everywhere-slim-4.8.6.tgz
@@ -700,190 +853,29 @@ echo downloading QT binaries
 mv opt/QtEmbedded /opt
 rm -r /opt/QtEmbedded/examples/
 
-cd /sdcard/upgrade/
-rm -r qt-everywhere-opensource-src-4.8.6
-rm qt-everywhere-compiled-4.8.6.tgz
-rm qt-everywhere-slim-4.8.6.tgz
-rm -r tslib-compile
-rm -r opt
-cd
 cp /opt/QtEmbedded/bin /usr/lib/arm-linux-gnueabihf/qt4/ -r || true
 
 echo done installing QT to /opt/
 
-sync
-
-apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3
-
-if $bypass_julia
+if $is_dev
 then
-       echo Bypassing JULIA
-       exit 0
-fi
-
-apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3  || exit 1
-
-mkdir -p ~/julia-compile
-cd ~/julia-compile
-
-
-default_slim_arch_filename=&quot;julia-$building_version-slim-default.tgz&quot;
-echo Slim arch filename $default_slim_arch_filename
-wget $download_prefix/$default_slim_arch_filename || exit 1
-
-sync
-
-echo installing julia
-if tar xf $default_slim_arch_filename -C / julia/usr --strip-components=1 
-then
-    echo &quot;extracted julia usr files&quot;
+      echo Building a debug image
 else
-   echo &quot;Error extracting julia&quot;
-   exit 1
+    cd /sdcard/factory/
+    rm -r qt-everywhere-opensource-src-4.8.6
+    rm qt-everywhere-compiled-4.8.6.tgz
+    rm qt-everywhere-slim-4.8.6.tgz
+    rm -r tslib-compile
+    rm -r opt
+    cd
 fi
-
 sync
-
-echo &quot;export JULIA_PKGDIR=/root/.julia&quot;&gt;&gt;~/.profile
-source ~/.profile
-sync
-sleep 60
-
-if [ -e /usr/share/julia/bin/julia ] &amp;&amp; [ ! -e /usr/bin/julia ]
-then
-	ln -sf /usr/share/julia/bin/julia /usr/bin/julia
-fi
-
-#============== test
-echo test finished. cleaning..
-sync
-
-cd
-rm -r ~/julia-compile
-sync
-
-sync
-fsck /dev/mmcblk1p1 -y -f
-fsck /dev/mmcblk0p1 -y -f
-
-sync
-
-sleep 60
-
-echo &quot;Setting up Julia: Initializing rep&quot;
-julia --print &quot;Pkg.init()&quot;
-sync
-sleep 60
-
-
-
-
-
-echo &quot;Setting up Julia: Updating rep&quot;
-julia --print &quot;Pkg.update()&quot;
-sync
-sleep 60
-echo precompiling mandatory packages.
-cat &lt;&lt;EOF &gt;&gt; chaibio_packages.jl
-
-println(&quot;Setting up Julia: Adding packages&quot;)
-
-println(&quot;Adding package: Dierckx&quot;)
-Pkg.add(&quot;Dierckx&quot;)
-using Dierckx
-
-println(&quot;Adding package: JSON&quot;)
-Pkg.add(&quot;JSON&quot;)
-using JSON
-
-println(&quot;Adding package: MySQL&quot;)
-Pkg.add(&quot;MySQL&quot;)
-using MySQL
-
-println(&quot;Adding package: JLD&quot;)
-Pkg.add(&quot;JLD&quot;)
-using JLD
-
-println(&quot;Adding package: DataFrames&quot;)
-Pkg.add(&quot;DataFrames&quot;)
-using DataFrames
-
-println(&quot;Adding package: Ipopt&quot;)
-Pkg.add(&quot;Ipopt&quot;)
-using Ipopt
-
-println(&quot;Adding package: JuMP&quot;)
-Pkg.add(&quot;JuMP&quot;)
-using JuMP
-
-println(&quot;Adding package: NLopt&quot;)
-Pkg.add(&quot;NLopt&quot;)
-using NLopt
-
-println(&quot;Adding package: HttpServer&quot;)
-Pkg.add(&quot;HttpServer&quot;)
-using HttpServer
-
-println(&quot;Adding package: Clustering&quot;)
-Pkg.add(&quot;Clustering&quot;)
-using Clustering
-
-println(&quot;Setting up Julia: Building packages&quot;)
-Pkg.resolve()
-
-println(&quot;Setting up Julia: Checking precompiled packages&quot;)
-using DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NLopt, HttpServer, Clustering
-
-println(&quot;Setting up Julia: Testing packages&quot;)
-
-println(&quot;Adding package: Dierckx&quot;)
-Pkg.add(&quot;Dierckx&quot;)
-println(&quot;Adding package: JSON&quot;)
-Pkg.add(&quot;JSON&quot;)
-println(&quot;Adding package: MySQL&quot;)
-Pkg.add(&quot;MySQL&quot;)
-println(&quot;Adding package: JLD&quot;)
-Pkg.add(&quot;JLD&quot;)
-println(&quot;Adding package: DataFrames&quot;)
-Pkg.add(&quot;DataFrames&quot;)
-println(&quot;Adding package: Ipopt&quot;)
-Pkg.add(&quot;Ipopt&quot;)
-println(&quot;Adding package: JuMP&quot;)
-Pkg.add(&quot;JuMP&quot;)
-println(&quot;Adding package: NLopt&quot;)
-Pkg.add(&quot;NLopt&quot;)
-println(&quot;Adding package: HttpServer&quot;)
-Pkg.add(&quot;HttpServer&quot;)
-println(&quot;Adding package: Clustering&quot;)
-Pkg.add(&quot;Clustering&quot;)
-
-println(&quot;Setting up Julia: done testing.. quitting..&quot;)
-quit()
-EOF
-sync
-sleep 60
-
-# leave julia staff to be able to test why it crashes the system
-julia chaibio_packages.jl
-
-rm chaibio_packages.jl
-julia --print &apos;Pkg.build(&quot;HDF5&quot;)&apos;
-julia --print &apos;Pkg.build(&quot;HDF5&quot;)&apos;
-julia --print &apos;Pkg.build(&quot;HDF5&quot;)&apos;
-julia --print &apos;Pkg.build(&quot;HDF5&quot;)&apos;
-
-echo test finished. cleaning..
-sync
-cd
-rm -r ~/julia-compile
-df -h
-sync
-sync
-fsck /dev/mmcblk1p1 -y -f
-fsck /dev/mmcblk0p1 -y -f
-
-exit 0
 </command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command></command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
@@ -909,7 +901,7 @@ exit 0
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>#echo cleaning julia build
-#cd /sdcard/upgrade
+#cd /sdcard/factory
 #rm -r julia-compile
 #sync
 
@@ -923,8 +915,6 @@ rm /etc/systemd/system/sockets.target.wants/cloud9.socket
 echo ifup script fix
 echo &quot;Due to a bug (https://bugs.launchpad.net/ubuntu/+source/ntp/+bug/1206164) a script from ifup has to be fixed&quot;
 sed -i &apos;s/) \&amp;/) &lt;\/dev\/null &gt;\/dev\/null 2&gt;\&amp;1 \&amp;/g&apos; /etc/network/if-up.d/ntpdate
-
-#apt-get autoremove -q -y --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data libx11* libxcb*
 
 apt-get clean
 apt-get autoclean
@@ -1001,7 +991,9 @@ passwd service -d
       <siteName>root@$build_machine:22</siteName>
       <command>echo installing boost
 sync
-apt-get -q -y install libboost-all-dev || exit 1
+# much space
+#apt-get -q -y install libboost-all-dev || exit 1
+apt-get -q -y install libboost-chrono-dev libboost-system-dev || exit 1
 
 df -h
 </command>
@@ -1038,8 +1030,7 @@ echo basic beaglebone setup done!</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
-      <command>#build( &quot;create_factory_settings_sdcard&quot;, build_machine:&quot;$build_machine&quot;, output_sdcard:&quot;/dev/sdb&quot;)
-echo all 3rd party software done for $build_machine, you can call call deploy_chibio job to add chibio software now.
+      <command>echo all 3rd party software done for $build_machine, you can call call deploy_chibio job to add chibio software now.
 
 exit 0</command>
     </hudson.tasks.Shell>

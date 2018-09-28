@@ -26,30 +26,38 @@ class Experiment < ActiveRecord::Base
 	      key :format, :int64
 	    end
 	    property :name do
+				key :description, 'Name of the experiment'
 	      key :type, :string
 	    end
 	    property :type do
+				key :description, 'Josh to describe'
 	      key :type, :string
+				key :enum, ['user', 'diagnostic', 'calibration']
 	    end
 	    property :time_valid do
 	      key :type, :boolean
 	    end
 	    property :created_at do
+				key :description, 'Date at which the experiment was created'
 	      key :type, :string
 	      key :format, :date
 	    end
 	    property :started_at do
+				key :description, 'Date at which the experiment was started'
 	      key :type, :string
 	      key :format, :date
 	    end
 	    property :completed_at do
+				key :description, 'Date at which the experiment was completed'
 	      key :type, :string
 	      key :format, :date
 	    end
 	    property :completion_status do
+				key :description, 'If the experiment was completed successfully or aborted'
 	      key :type, :string
 	    end
 	    property :completion_message do
+				key :description, '?'
 	      key :type, :string
 	    end
 		end
@@ -66,6 +74,7 @@ class Experiment < ActiveRecord::Base
     end
     property :type do
       key :type, :string
+      key :enum, ['user', 'diagnostic', 'calibration']
     end
     property :time_valid do
       key :type, :boolean
@@ -101,23 +110,21 @@ class Experiment < ActiveRecord::Base
   end
 
   swagger_schema :ExperimentInput do
-    allOf do
-      schema do
-        key :required, [:name]
-        property :name do
-          key :type, :string
-        end
-        property :guid do
-          key :type, :string
-        end
-      end
+    key :required, [:name]
+    property :name do
+      key :type, :string
+    end
+    property :guid do
+      key :type, :string
     end
   end
 
   validates :name, presence: true
+  validate :validate
 
   belongs_to :experiment_definition
-
+  
+  has_one  :well_layout, ->{ where(:parent_type => Experiment.name) }
   has_many :fluorescence_data
   has_many :temperature_logs, -> {order("elapsed_time")} do
     def with_range(starttime, endtime, resolution)
@@ -145,12 +152,23 @@ class Experiment < ActiveRecord::Base
 
   before_create do |experiment|
     experiment.time_valid = (Setting.time_valid)? 1 : 0
+    if experiment.well_layout == nil
+      experiment.create_well_layout
+    end
   end
 
   before_destroy do |experiment|
     if experiment.running?
       errors.add(:base, "cannot delete experiment in the middle of running")
-      return false;
+      throw :abort
+    end
+    if experiment.well_layout
+      begin
+        experiment.well_layout.destroy
+      rescue  => e
+        errors.add(:base, *experiment.well_layout.errors.full_messages)
+        throw :abort
+      end
     end
   end
 
@@ -170,6 +188,14 @@ class Experiment < ActiveRecord::Base
     Well.delete_all(:experiment_id => experiment.id)
   end
 
+  def create_well_layout
+    if experiment_definition.well_layout != nil
+      self.well_layout = experiment_definition.well_layout.copy
+    else
+      self.well_layout = WellLayout.new(:experiment_id=>id, :parent_type=>Experiment.name)
+    end
+  end
+  
   def protocol
     experiment_definition.protocol
   end
@@ -219,5 +245,15 @@ class Experiment < ActiveRecord::Base
         }
        }
       }
+  end
+  
+  protected
+  
+  def validate
+    if targets_well_layout_id_changed? && !targets_well_layout_id_was.blank?
+      if Target.joins("inner join targets_wells on targets_wells.target_id = targets.id").where(["targets.well_layout_id=? and targets_wells.well_layout_id=?", targets_well_layout_id_was, well_layout.id]).exists?
+        errors.add(:targets_well_layout_id, "cannot be changed because targets are already linked")
+      end
+    end
   end
 end

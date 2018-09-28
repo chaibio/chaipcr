@@ -52,7 +52,7 @@ class StepsController < ApplicationController
       parameter do
         key :name, :stage_id
         key :in, :path
-        key :description, 'id of the stage'
+        key :description, 'Id of the stage'
         key :required, true
         key :type, :integer
         key :format, :int64
@@ -62,16 +62,13 @@ class StepsController < ApplicationController
         key :in, :body
         key :required, false
         schema do
-          key :'$ref', :CreateStepInput
+          key :'$ref', :StepInput
         end
       end
       response 200 do
         key :description, 'Created step is returned'
         schema do
-          key :type, :array
-          items do
-            key :'$ref', :Step
-          end
+          key :'$ref', :Step
         end
       end
     end
@@ -106,7 +103,7 @@ class StepsController < ApplicationController
       parameter do
         key :name, :step_id
         key :in, :path
-        key :description, 'id of the step'
+        key :description, 'Id of the step'
         key :required, true
         key :type, :integer
         key :format, :int64
@@ -123,10 +120,7 @@ class StepsController < ApplicationController
       response 200 do
         key :description, 'Updated step is returned'
         schema do
-          key :type, :array
-          items do
-            key :'$ref', :StepProperties
-          end
+          key :'$ref', :StepProperties
         end
       end
     end
@@ -155,7 +149,7 @@ class StepsController < ApplicationController
       parameter do
         key :name, :step_id
         key :in, :path
-        key :description, 'id of the step'
+        key :description, 'Id of the step'
         key :required, true
         key :type, :integer
         key :format, :int64
@@ -166,16 +160,13 @@ class StepsController < ApplicationController
         key :description, 'Step to move ??'
         key :required, true
         schema do
-           key :'$ref', :StepMoveInput
+           key :'$ref', :StepInput
          end
       end
       response 200 do
         key :description, 'Updated step is returned'
         schema do
-          key :type, :array
-          items do
-            key :'$ref', :Step
-          end
+          key :'$ref', :StepProperties
         end
       end
     end
@@ -204,7 +195,7 @@ class StepsController < ApplicationController
   swagger_path '/steps/{step_id}' do
     operation :delete do
       key :summary, 'Delete Step'
-      key :description, 'if last step in the asoociated stage is destroyed, the stage will be destroyed too if it is not the last stage in the protocol. '
+      key :description, 'If last step in the asoociated stage is destroyed, the stage will be destroyed too if it is not the last stage in the protocol. '
       key :produces, [
         'application/json',
       ]
@@ -214,7 +205,7 @@ class StepsController < ApplicationController
       parameter do
         key :name, :step_id
         key :in, :path
-        key :description, 'id of the step'
+        key :description, 'Id of the step'
         key :required, true
         key :type, :integer
         key :format, :int64

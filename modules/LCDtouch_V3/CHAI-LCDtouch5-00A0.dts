@@ -40,7 +40,7 @@
 		/* the hardware IP uses */
                 "gpio1_17",
 		"gpio3_19",
-		"lcd",
+		"lcdc",
 		"eCAP0_in_PWM0_out";
 
 	fragment@0 {
@@ -118,7 +118,7 @@ pinmux_LCDtouch5_lcd_pins {
 			backlight {
 				compatible      = "pwm-backlight";
  				pinctrl-names   = "default";
-				pinctrl-0       = <&pwm_bl_pins>;
+				/*pinctrl-0       = <&pwm_bl_pins>;*/
 
 				pwms = <&ecap0 0 500000 0>;
 				pwm-names = "LCDtouch5";
@@ -132,6 +132,7 @@ pinmux_LCDtouch5_lcd_pins {
 
 			/* Settings for TF-SPEC50002C-V0 / chai-pcr lcd: */
 			panel {
+				status = "okay";
 				compatible = "ti,tilcdc,panel";
 				pinctrl-names = "default";
 				pinctrl-0 = <&LCDtouch5_lcd_pins>;
@@ -157,7 +158,7 @@ pinmux_LCDtouch5_lcd_pins {
 						hback-porch     = <40>;
 						hfront-porch    = <40>;
 						hsync-len       = <48>;
-						vback-porch     = <29>;
+						vback-porch     = <2>;
 						vfront-porch    = <13>;
 						vsync-len       = <3>;
 						clock-frequency = <30000000>;
@@ -196,4 +197,10 @@ pinmux_LCDtouch5_lcd_pins {
 
                };
        };
+	fragment@5 {
+		target = <&lcdc>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
 };

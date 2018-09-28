@@ -23,65 +23,124 @@ class AmplificationDatum < ActiveRecord::Base
 	swagger_schema :AmplificationData do
 		property :partial do
 			key :type, :boolean
-			key :description, '?'
+			key :description, 'Indicates if the returned data is complete or partial'
 		end
 		property :total_cycles do
 			key :type, :integer
-			key :description, '?'
+			key :description, 'No of cycles for the experiment'
 		end
 		property :steps do
-			key :description, '?'
+			key :description, 'Contains the step id and and a 2d array amplification_data - every array object contains the channel, the well number, the cycle number and the background and baseline subtracted values for them.'
 			key :type, :array
 			items do
-				property :step_id do
-					key :type, :integer
-				end
-				property :amplification_data do
-					key :type, :array
-					items do
-						property :channel do
-							key :type, :integer
-							key :description, '?'
-						end
-						property :well_num do
-							key :type, :integer
-							key :description, '?'
-						end
-						property :cycle_num do
-							key :type, :integer
-							key :description, '?'
-						end
-						property :background_subtracted_value do
-							key :type, :integer
-							key :description, '?'
-						end
-						property :baseline_subtracted_value do
-							key :type, :integer
-							key :description, '?'
-						end
+				key :'$ref', :AmplificationDataSteps
+			end
+		end
+	end
+
+	swagger_schema :AmplificationDataSteps do
+		property :step_id do
+			key :type, :integer
+			key :description, 'Step id'
+		end
+		property :amplification_data do
+			key :description, 'Describe the properties'
+			key :type, :array
+			items do
+				key :type, :array
+				items do
+					property :channel do
+						key :type, :integer
+						key :description, '?'
+					end
+					property :well_num do
+						key :type, :integer
+						key :description, '?'
+					end
+					property :cycle_num do
+						key :type, :integer
+						key :description, '?'
+					end
+					property :background_subtracted_value do
+						key :type, :integer
+						key :description, '?'
+					end
+					property :baseline_subtracted_value do
+						key :type, :integer
+						key :description, '?'
+					end
+					property :dr1_pred do
+						key :type, :integer
+						key :description, '?'
+					end
+					property :dr2_pred do
+						key :type, :integer
+						key :description, '?'
 					end
 				end
-				property :cq do
-					key :type, :array
-					items do
-						property :channel do
-							key :type, :integer
-							key :description, '?'
-						end
-						property :well_num do
-							key :type, :integer
-							key :description, '?'
-						end
-						property :cq do
-							key :type, :integer
-							key :description, '?'
-						end
+			end
+		end
+		property :cq do
+			key :description, 'Describe the properties'
+			key :type, :array
+			items do
+				key :type, :array
+				items do
+					property :channel do
+						key :type, :integer
+						key :description, '?'
+					end
+					property :well_num do
+						key :type, :integer
+						key :description, '?'
+					end
+					property :cq do
+						key :type, :integer
+						key :description, '?'
 					end
 				end
 			end
 		end
 	end
+=begin
+	swagger_schema :AmplificationDataProp do
+		property :channel do
+			key :type, :integer
+			key :description, '?'
+		end
+		property :well_num do
+			key :type, :integer
+			key :description, '?'
+		end
+		property :cycle_num do
+			key :type, :integer
+			key :description, '?'
+		end
+		property :background_subtracted_value do
+			key :type, :integer
+			key :description, '?'
+		end
+		property :baseline_subtracted_value do
+			key :type, :integer
+			key :description, '?'
+		end
+	end
 
+	swagger_schema :AmplificationDataCq do
+		property :channel do
+			key :type, :integer
+			key :description, '?'
+		end
+		property :well_num do
+			key :type, :integer
+			key :description, '?'
+		end
+		property :cq do
+			key :type, :integer
+			key :description, '?'
+		end
+	end
+=end
   Constants::KEY_NAMES.each do |variable|
     define_method("#{variable}") do
       (!sub_type.nil? && "#{sub_type}_id" == variable)? sub_id : nil

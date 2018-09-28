@@ -17,9 +17,11 @@ class ApidocsController < ActionController::Base
         key :name, 'MIT'
       end
     end
-		tag do
-			key :name, 'Experiment'
-			key :description, 'Experiment defination'
+		security_definition :access_token do
+			key :name, 'access_token'
+			key :description, 'An authorization token is returned when you login which needs to be passed for api calls unless the api specifies that the token is not required'
+			key :type, :apiKey
+			key :in, :header
 		end
     key :host, 'chaipcr.readme.io'
     key :basePath, '/api'
@@ -29,29 +31,31 @@ class ApidocsController < ActionController::Base
 
   # A list of all classes that have swagger_* declarations.
   SWAGGERED_CLASSES = [
-    ExperimentsController,
 		DevicesController,
-    Experiment,
-    Device,
+    ExperimentsController,
 		AmplificationOptionsController,
-		AmplificationOption,
 		ProtocolsController,
-    Protocol,
-    Stage,
-    Step,
-    Ramp,
-    ErrorModel,
-		AmplificationDatum,
-		MeltCurveDatum,
-		TemperatureLog,
-		WellsController,
-		MainController,
-		Well,
-		UsersController,
-		StepsController,
-		StagesController,
 		RampsController,
 		SessionsController,
+		StagesController,
+		StepsController,
+		UsersController,
+		WellsController,
+		AmplificationDatum,
+		AmplificationOption,
+    Device,
+		ErrorModel,
+    Experiment,
+		LoginModel,
+		MeltCurveDatum,
+    Protocol,
+    Ramp,
+    Stage,
+		StatusModel,
+    Step,
+		TemperatureLog,
+		Well,
+		User,
     self,
   ].freeze
 

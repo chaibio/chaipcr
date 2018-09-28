@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 class Step < ActiveRecord::Base
-  include ProtocolHelper
+  include ProtocolLayoutHelper
   include ProtocolOrderHelper
 
   include Swagger::Blocks
@@ -105,23 +105,7 @@ class Step < ActiveRecord::Base
 		end
 	end
 
-	swagger_schema :StepMoveInput do
-		key :required, [:prev_id]
-		property :prev_id do
-			key :type, :integer
-			key :format, :int64
-			key :required, true
-			key :description, 'prev step id or null if it is the first node'
-		end
-		property :stage_id do
-			key :type, :integer
-			key :format, :int64
-			key :required, false
-			key :description, 'stage id or null if it is the same stage'
-		end
-	end
-
-	swagger_schema :CreateStepInput do
+	swagger_schema :StepInput do
 		property :prev_id do
 			key :type, :integer
 			key :format, :int64
@@ -241,8 +225,16 @@ class Step < ActiveRecord::Base
       end
     end
 
-    if !temperature.nil? && (temperature < 4 || temperature > 100)
-      errors.add(:temperature, "between 4 to 100")
+    if !temperature.nil?
+      if DeviceConfiguration.valid?
+        temperature_min = DeviceConfiguration.thermal["block"]["min_temp_c"]
+        temperature_max = DeviceConfiguration.thermal["block"]["max_temp_c"]
+      end
+      temperature_min = 4 if temperature_min.nil?
+      temperature_max = 100 if temperature_max.nil?
+      if (temperature < temperature_min || temperature > temperature_max)
+        errors.add(:temperature, "between #{temperature_min} to #{temperature_max}")
+      end
     end
 
     if !hold_time.nil? && hold_time < 0

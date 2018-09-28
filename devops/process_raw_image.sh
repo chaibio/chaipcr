@@ -68,6 +68,8 @@ fi
 
 mkfsext4tooldir=$(which mkfs.ext4)
 echo mkfs.ext4 : $mkfsext4tooldir
+mkfsext4tooldir=$(which mkfs.ext4)
+echo mkfs.ext4 : $mkfsext4tooldir
 
 if [ ! -z "$mkfsext4tooldir" ]
 then
@@ -155,19 +157,6 @@ image_filename_upgrade2="$sdcard/eMMC_part2.img"
 upgrade_scripts="scripts"
 factory_scripts="factory-scripts"
 
-echo "Packing eMMC image.."
-if [ -e  ${temp} ]
-then
-        echo "$temp: exists!"
-else
-        mkdir -p ${temp}/$upgrade_scripts
-fi
-
-if [ ! -e  ${temp}/$factory_scripts ]
-then
-        mkdir -p ${temp}/$factory_scripts
-fi
-
 unmount_all () {
 	if [ -e $eMMC ]
 	then
@@ -204,6 +193,58 @@ error_exit () {
 	fi
 	exit 1
 }
+
+construct_image() {
+
+	if [ ! -e $image_filename_upgrade1 ]
+	then
+		error_exit "First image part not found: $image_filename_upgrade1"
+	fi
+
+	if [ ! -e $image_filename_upgrade2 ]
+	then
+		error_exit "Second image part not found: $image_filename_upgrade2"
+	fi
+
+	echo "Concatinating eMMC image parts"
+	cat $image_filename_upgrade1 $image_filename_upgrade2 > $image_filename_upgrade
+
+	if [ $? -gt 0 ]
+	then
+		error_exit "Error concatinating image parts!"
+	fi
+}
+
+if [ ! -e $image_filename_upgrade1 ] || [ ! -e $image_filename_upgrade2 ]
+then
+	error_exit "Wronge input folder!"
+fi
+
+file_size_kb1=`du -b "$image_filename_upgrade1" | cut -f1`
+file_size_kb2=`du -b "$image_filename_upgrade2" | cut -f1`
+
+total_sectors=$(( ($file_size_kb2+$file_size_kb1)/512 ))
+echo Total image sectors = $total_sectors
+
+if [ $total_sectors -eq 7471104 ]
+then
+	echo Correct eMMC size.
+else
+	echo Warning: Image is taken from a BBB with a wrong eMMC size.
+fi
+
+echo "Packing eMMC image.."
+if [ -e  ${temp} ]
+then
+        echo "$temp: exists!"
+else
+        mkdir -p ${temp}/$upgrade_scripts
+fi
+
+if [ ! -e  ${temp}/$factory_scripts ]
+then
+        mkdir -p ${temp}/$factory_scripts
+fi
 
 if [ ! -e ${output_dir}/p1 ]
 then
@@ -246,27 +287,6 @@ then
 else
 	error_exit "Not able to copy factory settings script"
 fi
-
-construct_image() {
-
-	if [ ! -e $image_filename_upgrade1 ]
-	then
-		error_exit "First image part not found: $image_filename_upgrade1"
-	fi
-
-	if [ ! -e $image_filename_upgrade2 ]
-	then
-		error_exit "Second image part not found: $image_filename_upgrade2"
-	fi
-
-	echo "Concatinating eMMC image parts"
-	cat $image_filename_upgrade1 $image_filename_upgrade2 > $image_filename_upgrade
-
-	if [ $? -gt 0 ]
-	then
-		error_exit "Error concatinating image parts!"
-	fi
-}
 
 if [ -d ${sdcard} ] && [ -f ${image_filename_upgrade1} ] && [ -f ${image_filename_upgrade2} ]
 then
@@ -482,7 +502,7 @@ fi
 
 if [ ! -e $data_partition ]
 then
-        error_exit "Data file system partition not found: $data_partition, backuped eMMC was not 4 partitions."
+        error_exit "Data file system partition not found: $data_partition, backuped eMMC was not 3 nor 4 partitions."
 fi
 
 if mount $rootfs_partition /tmp/emmc -t ext4
@@ -576,8 +596,14 @@ if $fat_boot
 then
 	dd if=$boot_partition bs=16777216 | gzip -c > $image_filename_boot
 else
-	dd count=1 if=$boot_partition bs=16777216 | gzip -c > $image_filename_boot
+	dd count=7 if=$eMMC bs=16777216 | gzip -c > $image_filename_boot # could be dropped
 fi
+
+echo image_filename_boot : $image_filename_boot
+echo image_filename_pt : $image_filename_pt 
+echo eMMC : $eMMC
+
+
 
 if [ $? -eq 0 ]
 then
@@ -621,6 +647,8 @@ sync
 umount /tmp/emmc > /dev/null || true
 
 echo "Packing data partition to: $image_filename_data"
+fsck $data_partition
+
 if dd  if=$data_partition bs=16777216 | gzip -c > $image_filename_data
 then
 	echo data image extracted.

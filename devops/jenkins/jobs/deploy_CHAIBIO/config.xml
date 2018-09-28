@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version='1.1' encoding='UTF-8'?>
 <project>
   <actions/>
   <description>Build Chaibio shoftware</description>
@@ -13,12 +13,8 @@
           <name>build_machine</name>
           <description>Building machine</description>
           <defaultValue>10.0.100.240</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
-        <hudson.model.BooleanParameterDefinition>
-          <name>bypass_pru</name>
-          <description>Will not install PRU work</description>
-          <defaultValue>true</defaultValue>
-        </hudson.model.BooleanParameterDefinition>
         <hudson.scm.listtagsparameter.ListSubversionTagsParameterDefinition plugin="subversion@2.9">
           <name>build_branch</name>
           <description>Select a Subversion entry</description>
@@ -30,6 +26,11 @@
           <defaultValue></defaultValue>
           <maxTags></maxTags>
         </hudson.scm.listtagsparameter.ListSubversionTagsParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>is_dev</name>
+          <description>Build a development image.</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -237,6 +238,14 @@ ENDSSH
 	 	mkdir tmp || true
         cd tmp
 		git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
+        
+        if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+		then
+   			echo No build branch chosen
+		else
+     		git checkout $branch_param
+		fi
+        
         cd chaipcr || exit 1
         cd web
         echo now at $(pwd)
@@ -289,12 +298,10 @@ exit 1
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo cleanup some space
-rm /usr/lib/julia/sys-debug.*
+#rm /usr/lib/julia/sys-debug.*
 
 echo Setup MySQL
-
 mkdir /data /perm || true
-
 systemctl stop mysql.service
 mount /dev/mmcblk1p2 /data || true
 mount /dev/mmcblk1p3 /perm || true
@@ -306,18 +313,27 @@ systemctl start mysql.service
 
 sync
 cd
+
 echo unmounting any sdcard folders
+swapoff -a
 umount /sdcard/*
 umount /dev/mmcblk0p*
 
+if $is_dev
+then
+      echo Building a debug image
+else
+      echo Formatting disk!  
 LC_ALL=C /sbin/sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
 ,,0x83,*
 __EOF__
-
 /sbin/partprobe /dev/mmcblk0
 /sbin/mkfs.ext4 /dev/mmcblk0p1 -F
-mkdir -p /sdcard/upgrade || true
-if mount /dev/mmcblk0p1 /sdcard/upgrade/
+
+fi
+
+mkdir -p /sdcard/factory || true
+if mount /dev/mmcblk0p1 /sdcard/factory/
 then
     echo &quot;temp sdcard folder mounted&quot;
 else
@@ -325,8 +341,11 @@ else
    exit 1
 fi
 
+rm -r /sdcard/upgrade
+ln -s /sdcard/factory /sdcard/upgrade
+
 # creating a temporary swap file on sdcard
-if fallocate -l 2G /sdcard/upgrade/swapfile #or dd if=/dev/zero of=/sdcard/upgrade/swapfile bs=10M count=300
+if fallocate -l 2G /sdcard/factory/swapfile #or dd if=/dev/zero of=/sdcard/factory/swapfile bs=10M count=300
 then
     echo &quot;swap file created successfully&quot;
 else
@@ -334,19 +353,322 @@ else
    exit 1
 fi
 
-sudo chmod 600 /sdcard/upgrade/swapfile
-sudo mkswap /sdcard/upgrade/swapfile
-sudo swapon /sdcard/upgrade/swapfile
+sudo chmod 600 /sdcard/factory/swapfile
+sudo mkswap /sdcard/factory/swapfile
+sudo swapon /sdcard/factory/swapfile
 
 #verifying swap file is successfully added
 sudo swapon -s
 
 free -m
-echo browser compile
-cd /sdcard/upgrade/
+
+exit 0</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo Maintenance
+df -h
+export RAILS_ENV=production
+cd /root/chaipcr/web
+bundle install
+gem install bcrypt -v &apos;3.1.11&apos;
+systemctl enable r.service
+echo Setup Rails app
+mkdir -p ~/chaipcr/web/config/
+cat &lt;&lt;EOF &gt;&gt; ~/chaipcr/web/config/database.yml
+    production:
+      adapter: mysql2
+      database: chaipcr
+      pool: 5
+      timeout: 5000
+      username: root
+      password:
+EOF
+echo database.yml created
+
+cd /root/chaipcr/web
+chmod 755 /root
+
+#echo rserve 
+#echo \n | gem install rserve-client #otherwise bundle fails, don&apos;t know why
+
+echo bundle
+echo &quot;\n&quot; | bundle
+
+echo rake setup
+echo &quot;\n&quot; | RAILS_ENV=production bundle exec rake db:setup
+
+echo seed_fu
+echo &quot;\n&quot; | RAILS_ENV=production bundle exec rake db:seed_fu 
+
+echo Rails init
+cd ~/chaipcr/web
+bundle install
+gem install bcrypt -v &apos;3.1.11&apos;
+echo done rserev
+
+bundle exec rake db:migrate --trace # migrates database as needed
+
+df -h
+
+exit 0</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo precompile julia packages if needed
+if [ -e /etc/bypassjulia.flag ]
+then
+    echo  Bypass julia build
+    exit 0
+fi
+
+if [ -e /root/chaipcr/bioinformatics/juliaserver.jl ]
+then
+      julia -v
+      echo about to start using QpcrAnalysis
+      free -m
+      export DEBIAN_FRONTEND=noninteractive
+
+        if [ -e /tmp/mysql.sock ]
+	then
+		echo &quot;MySQL sockets cloned file found&quot;
+	else
+		if [ -e /run/mysqld/mysqld.sock ]
+		then
+			echo &quot;Clonning MySQL sockets file&quot;
+			ln -s /run/mysqld/mysqld.sock /tmp/mysql.sock
+		else
+			echo &quot;MySQL sockets file not found.&quot; 
+		fi
+	fi
+
+export PATH=$PATH:/sbin:/usr/sbin
+export TERM=linux
+echo &apos;debconf debconf/frontend select Noninteractive&apos; | debconf-set-selections
+DEBIAN_FRONTEND=noninteractive apt-get -q -y  install patchelf
+DEBIAN_FRONTEND=noninteractive apt-get -q -y  install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3
+
+DEBIAN_FRONTEND=noninteractive apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3  || exit 1
+
+if $is_dev
+then
+      echo Building a debug image
+      julia_pkgdir=&quot;/sdcard/factory&quot;
+     export JULIA_PKGDIR=/sdcard/factory/.julia
+else
+      echo freeing up some space
+      rm -r /var/cache/apt /var/log/ /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/tests
+      mkdir /var/log/ -p
+      find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
+      apt update
+      julia_pkgdir=&quot;/root&quot;
+      export JULIA_PKGDIR=/root/.julia
+fi
+
+      JULIA_ENV=production julia -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;);reload(&quot;QpcrAnalysis&quot;);using QpcrAnalysis;&apos; --compile=all
+
+      echo tested using QpcrAnalysis
+      if [ -e ${julia_pkgdir}/.julia/lib/v0.6/QpcrAnalysis.ji ]
+      then
+            echo QpcrAnalysis package precompiled.
+      else
+            echo Error precompiling QpcrAnalysis package
+            exit 1
+      fi
+
+julia -e &apos;Pkg.add(&quot;BuildExecutable&quot;);Pkg.checkout(&quot;BuildExecutable&quot;)&apos;
+
+cd ${julia_pkgdir}/.julia/v0.6/BuildExecutable/src/
+
+cat &lt;&lt; &apos;EOF&apos; &gt;  add_catch.patch
+
+--- src/BuildExecutable.jl	2018-05-29 22:08:45.271522602 +0000
++++ src/BuildExecutable.jl	2018-05-29 20:48:13.108040252 +0000
+@@ -143,10 +143,13 @@
+     run(cmd)
+     println()
+ 
++try
+     println(&quot;running: rm -rf $(tmpdir) $(sys.buildfile).o $(sys.inference).o $(sys.inference).ji $(sys.inference0).o $(sys.inference0).ji&quot;)
+     map(f-&gt; rm(f, recursive=true), [tmpdir, sys.buildfile*&quot;.o&quot;, sys.inference*&quot;.o&quot;, sys.inference*&quot;.ji&quot;, sys.inference0*&quot;.o&quot;, sys.inference0*&quot;.ji&quot;])
+     println()
++end
+ 
++try
+     if targetdir != nothing
+         # Move created files to target directory
+         for file in [exe_file.buildfile, sys.buildfile * &quot;.$(Libdl.dlext)&quot;, sys.buildfile * &quot;.ji&quot;]
+@@ -194,7 +197,7 @@
+             end
+         end
+     end
+-
++end
+     println(&quot;$(exe_file.targetfile) successfully created.&quot;)
+     return 0
+ end
+
+
+EOF
+
+echo Patching..
+
+patch -i add_catch.patch
+echo done installation.. creating execuitable:
+
+#exit 0
+
+JULIA=julia
+
+cat &gt; /tmp/precompile_QpcrAnalysis.jl &lt;&lt; EOF
+
+println(&quot;Starting precompile template !!!&quot;)
+push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;)
+
+println(&quot;Using time: &quot;)
+@time using QpcrAnalysis
+println(&quot;Done Using!&quot;)
+
+function main()
+
+	println(&quot;Main is executed!&quot;)
+	#reload(&quot;QpcrAnalysis&quot;)
+
+	println(&quot;About to dispatch. First time dispatch time:&quot;)
+	@time QpcrAnalysis.dispatch(&quot;amplification&quot;, &quot;{\&quot;calibration_info\&quot;:{\&quot;water\&quot;:{\&quot;calibration_id\&quot;:44,\&quot;step_id\&quot;:28},\&quot;channel_1\&quot;:{\&quot;calibration_id\&quot;:44,\&quot;step_id\&quot;:31},\&quot;channel_2\&quot;:{\&quot;calibration_id\&quot;:44,\&quot;step_id\&quot;:34}},\&quot;experiment_id\&quot;:68,\&quot;min_ct\&quot;:5,\&quot;baseline_cyc_bounds\&quot;:[],\&quot;cq_method\&quot;:\&quot;Cy0\&quot;}&quot;)
+
+	println(&quot;dispatch time no JIT:&quot;)
+	@time QpcrAnalysis.dispatch(&quot;amplification&quot;, &quot;{\&quot;calibration_info\&quot;:{\&quot;water\&quot;:{\&quot;calibration_id\&quot;:44,\&quot;step_id\&quot;:28},\&quot;channel_1\&quot;:{\&quot;calibration_id\&quot;:44,\&quot;step_id\&quot;:31},\&quot;channel_2\&quot;:{\&quot;calibration_id\&quot;:44,\&quot;step_id\&quot;:34}},\&quot;experiment_id\&quot;:68,\&quot;min_ct\&quot;:5,\&quot;baseline_cyc_bounds\&quot;:[],\&quot;cq_method\&quot;:\&quot;Cy0\&quot;}&quot;)
+	println(&quot;Done dispatch time test&quot;)
+	include(&quot;/root/chaipcr/bioinformatics/juliaserver.jl&quot;)
+	println(&quot;Server Exit&quot;)
+end
+
+println(&quot;Done with precompilescript!&quot;)
+
+
+EOF
+
+cat &gt; /tmp/mkexec.jl &lt;&lt; EOF
+println(&quot;Try dispatch on its own&quot;)
+@time include(&quot;/tmp/precompile_QpcrAnalysis.jl&quot;)
+println(&quot;Done checking dispatch.. now building executible..&quot;)
+
+#Pkg.add(&quot;BuildExecutable&quot;)
+#println(&quot;BE package is added&quot;)
+using BuildExecutable
+println(&quot;BE package is used&quot;)
+
+build_executable(&quot;/root/qpcranalysis&quot;, &quot;/tmp/precompile_QpcrAnalysis.jl&quot;, &quot;/tmp/output/&quot;, &quot;native&quot;)
+println(&quot;Execuable creation finished&quot;)
+
+EOF
+
+rm -r /tmp/output/
+mkdir -p /tmp/output/
+ls /root/qpcranalysis &amp;&amp; rm /root/qpcranalysis
+
+rm -r /usr/lib/lib/root/
+mkdir -p /root/julia/julia6RBinaries/lib/lib/root/
+mkdir -p /usr/lib/lib/root/
+
+rm /usr/lib/lib/root/qpcranalysis.ji
+rm /usr/lib/lib/root/qpcranalysis.so
+rm /usr/share/julia/base/userimg.jl
+#echo try script on its onwn
+#JULIA_ENV=production $JULIA /tmp/precompile_QpcrAnalysis.jl
+
+echo creating the image
+time JULIA_ENV=production $JULIA /tmp/mkexec.jl
+
+mkdir -p /root/lib/root/
+cp /usr/lib/lib/root/qpcranalysis.so /root/lib/root/qpcranalysis.so
+
+fi
+
+echo testing juliaserver script to make sure nothing left to precompile as we are removing the compilation tools later to free up space.
+
+test_julia_server2()
+{
+     JULIA_ENV=production julia -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;); include(&quot;/root/chaipcr/bioinformatics/juliaserver.jl&quot;)&apos;
+     echo error: julia server terminated
+}
+
+test_julia_server()
+{
+       if [ -e /tmp/output/qpcranalysis.so ] 
+       then
+             echo moving qpcranalysis.so
+             date
+             cp /tmp/output/qpcranalysis  /root/chaipcr/bioinformatics/
+             cp /tmp/output/qpcranalysis.so /root/chaipcr/bioinformatics/
+             rm -r /tmp/output
+
+             echo running with qpcranalysis.so
+             JULIA_ENV=production julia  -J /root/chaipcr/bioinformatics/qpcranalysis.so -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;); include(&quot;/root/chaipcr/bioinformatics/juliaserver.jl&quot;)&apos;
+             echo exit running with qpcranalysis.so
+             date
+       else
+             echo running without qpcranalysis.so
+             JULIA_ENV=production julia  -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;); include(&quot;/root/chaipcr/bioinformatics/juliaserver.jl&quot;)&apos;
+             echo exit running without qpcranalysis.so
+             date
+       fi
+}
+
+test_julia_server &amp;
+echo starting julia server on a different thread
+sleep 1800
+echo julia server testing period due. Cleaning up.
+rm -r /root/julia/julia6RBinaries/lib/lib/root/
+rm -r /root/lib/root/
+
+pkill -9 julia
+pkill -9 julia
+pkill -9 julia
+pkill -9 julia
+pkill -9 julia
+sleep 100
+ps -aux | grep julia
+
+#echo testing building julia  exec.. 
+#exit 1
+exit 0
+</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>if $is_dev
+then
+      echo Building a debug image
+      exit 0
+fi
+
+echo cleaning misc. file
+rm -r /var/log/*.log
+find . -name .git -execdir rm -r {} \;
+find . -name *.o  -exec rm {} \;
+find / -name .git -execdir rm -r {} \;
+rm -r /var/cache/apt /var/log/ /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/tests
+mkdir /var/log/ -p
+find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
+apt update
+
+exit 0
+</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo browser compile
+cd /sdcard/factory/
 rm -r compile-browser || true
 mkdir compile-browser
 cd compile-browser/
+apt-get install -y git make linux-headers-`uname -r` build-essential cmake curl pkg-config python sshpass unzip
 
 branch_param=
 
@@ -360,11 +682,18 @@ fi
 
 git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
 
-cd /sdcard/upgrade/compile-browser/chaipcr/browser/ || exit 1
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+then
+       echo No build branch chosen
+else
+       git checkout $branch_param
+fi
 
-rm /sdcard/upgrade/compile-browser/chaipcr/realtime/libraries/lib/libPoco*
-rm /sdcard/upgrade/compile-browser/chaipcr/realtime/libraries/lib/libboost*
-rm /sdcard/upgrade/compile-browser/chaipcr/realtime/libraries/lib/libsoci*
+cd /sdcard/factory/compile-browser/chaipcr/browser/ || exit 1
+
+rm /sdcard/factory/compile-browser/chaipcr/realtime/libraries/lib/libPoco*
+rm /sdcard/factory/compile-browser/chaipcr/realtime/libraries/lib/libboost*
+rm /sdcard/factory/compile-browser/chaipcr/realtime/libraries/lib/libsoci*
 
 /opt/QtEmbedded/bin/qmake || exit 1
 sed -i &quot;s/arm-unknown-linux-gnueabi-//&quot; Makefile
@@ -374,20 +703,52 @@ make || exit 1
 make install || exit 1
 #cp realtime ~/tmp
 #cp libraries/lib/* /usr/lib/
-cd /sdcard/upgrade/
-rm -r compile-browser
-cd
-echo done compiling browser
 
+if $is_dev
+then
+      echo Building a debug image
+else
+      cd /sdcard/factory/
+      rm -r compile-browser
+     cd
+fi
+
+echo done compiling browser
+</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo compiling realtime
+
+cd /sdcard/factory/
 free -m
 sync
 
-rm -r /sdcard/upgrade/realtime-compile || true
-mkdir -p /sdcard/upgrade/realtime-compile
-cd /sdcard/upgrade/realtime-compile
+rm -r /sdcard/factory/realtime-compile || true
+mkdir -p /sdcard/factory/realtime-compile
+cd /sdcard/factory/realtime-compile
+
+branch_param=
+
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+then
+        echo No build branch chosen
+else
+         branch_param=&quot;-b $(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
+	echo Cloning branch $branch_param
+fi
 
 git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
-cd /sdcard/upgrade/realtime-compile/chaipcr/realtime || exit 1
+
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+then
+        echo No build branch chosen
+else
+       git checkout $branch_param
+fi
+
+cd /sdcard/factory/realtime-compile/chaipcr/realtime || exit 1
 
 cp util/instance.h control/
 sed -i &quot;s/dataSapce/dataSpace/&quot; app/experimentcontroller.cpp
@@ -406,107 +767,26 @@ make install || exit 1
 #cp realtime ~/tmp
 cp libraries/lib/* /usr/lib/
 cd
-rm -r /sdcard/upgrade/realtime-compile
+
+if $is_dev
+then
+      echo Building a debug image
+else
+      rm -r /sdcard/factory/realtime-compile
+fi
 
 echo  Deploy realtime to ~/tmp
 cp ~/chaipcr/deploy/device/realtime.service /lib/systemd/system/
 systemctl enable realtime.service
 
 sync
-
-echo precompile julia packages if needed
-if [ -e /root/chaipcr/bioinformatics/juliaserver.jl ]
-then
-
-echo Build time- adding pre-requesits
-free -m
-DEBIAN_FRONTEND=noninteractive apt-get -q -y install gettext
-DEBIAN_FRONTEND=noninteractive apt-get -q -y install libgtk-3-0
-
-echo $(date) Performing precompilling julia packages
-cd /root/chaipcr/bioinformatics/QpcrAnalysis
-cp __init__.jl __init__.jl.org
-#sed -i &apos;1ireturn nothing&apos; __init__.jl
-sed -i &apos;s/# MySQL./return nothing \n# MySQL./&apos; __init__.jl
-
-cat &gt; testQpcrAnalysis.jl &lt;&lt; EOF
-	println(&quot;Build time:  .. Updating packages ..&quot;)
-      	@time Pkg.update()
-
-	println(&quot;Build time:  .. Adding packages ..&quot;)
-	println(&quot; .. clustering ..&quot;)
-      	@time Pkg.add(&quot;Clustering&quot;)
-	println(&quot; .. jump ..&quot;)
-      	@time Pkg.add(&quot;JuMP&quot;)
-	println(&quot; .. httpserver ..&quot;)
-      	@time Pkg.add(&quot;HttpServer&quot;)
-	println(&quot; .. ipopt ..&quot;)
-      	@time Pkg.add(&quot;Ipopt&quot;)
-	println(&quot; .. json ..&quot;)
-      	@time Pkg.add(&quot;JSON&quot;)
-	println(&quot; .. mysql ..&quot;)
-      	@time Pkg.add(&quot;MySQL&quot;)
-	println(&quot; .. profileview ..&quot;)
-      	@time Pkg.add(&quot;ProfileView&quot;)
-	println(&quot; .. JLD ..&quot;)
-      	@time Pkg.add(&quot;JLD&quot;)
-	println(&quot; .. NLopt ..&quot;)
-      	@time Pkg.add(&quot;NLopt&quot;)
-	println(&quot; .. DirectX ..&quot;)
-      	@time Pkg.add(&quot;Dierckx&quot;)
-	println(&quot; .. DataFrames ..&quot;)
-      	@time Pkg.add(&quot;DataFrames&quot;)
-	println(&quot; .. DataStructures ..&quot;)
-      	@time Pkg.add(&quot;DataStructures&quot;)
-
-	println(&quot;Build time:  ... building ...&quot;)
-	@time Pkg.build(&quot;ProfileView&quot;, &quot;MySQL&quot;, &quot;HttpServer&quot;, &quot;Ipopt&quot;, &quot;JSON&quot;, &quot;JuMP&quot;, &quot;JLD&quot;, &quot;NLopt&quot;, &quot;Dierckx&quot;, &quot;DataFrames&quot;, &quot;DataStructures&quot;)
-
-EOF
-
-JULIA_ENV=bbb_test_1 julia testQpcrAnalysis.jl --compile=all
-
-cat &gt; testQpcrAnalysis.jl &lt;&lt; __EOF__
-
-	println(&quot;Build time: .. all packages built ..&quot;)
-	load_from_dir_ = &quot;/root/chaipcr/bioinformatics/QpcrAnalysis&quot; # bbb production
-
-	println(&quot;Build time: settings&quot;)
-	push!(LOAD_PATH, load_from_dir_)
-
-	println(&quot;Build time: using dependencies&quot;)
-	@time using Clustering, DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NLopt
-
-	println(&quot;Build time: Using qpcrAnalysis&quot;)
-	@time using QpcrAnalysis
-	println(&quot;Build time: end of QpcrAnalysis build&quot;)
-__EOF__
-
-echo First QpcrAnalysis package installation run
-JULIA_ENV=bbb_test_1 julia testQpcrAnalysis.jl --compile=all
-
-echo Second run
-JULIA_ENV=bbb_test_1 julia testQpcrAnalysis.jl --compile=all
-
-echo end of test result: $?
-cp __init__.jl.org __init__.jl
-rm testQpcrAnalysis.jl
-
-fi
-
-sync
-swapoff -a
-rm /sdcard/upgrade/swapfile
-exit 0
 </command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo checking deployed web files
-
 ls -ahl
-
 if [ -e ~/chaipcr/deploy ]
 then
 	echo web files deploy done successfully
@@ -522,6 +802,7 @@ cd ~/chaipcr/deploy/
 #sed -i &quot;s/errors=remount-ro/errors=continue/&quot; /etc/fstab
 
 echo patching rc.local
+cd /etc
 if [ ! -e rc.local ]
 then
     echo &quot;Cann&apos;t find rc.local. Creating it.&quot;
@@ -564,7 +845,35 @@ sed -i &apos;s/#timeout 60/timeout 20/&apos; /etc/dhcp/dhclient.conf
 sed -i &apos;s/#retry 60/retry 20/&apos; /etc/dhcp/dhclient.conf
 sed -i &apos;s/#reboot/reboot/&apos; /etc/dhcp/dhclient.conf
 
-</command>
+echo Disabling usb1
+ls temp.patch &amp;&amp; rm temp.patch
+cat &gt;&gt; temp.patch &lt;&lt; EOF
+--- /opt/scripts/boot/am335x_evm.sh     2018-09-27 10:44:59.465061718 +0000
++++ /opt/scripts/boot/am335x_evm.sh     2018-09-27 10:45:40.146892119 +0000
+@@ -682,6 +682,8 @@
+ compare_major=&quot;4&quot;
+ compare_minor=&quot;4&quot;
+ 
++use_old_g_multi
++/*
+ if [ &quot;\${kernel_major}&quot; -lt &quot;\${compare_major}&quot; ] ; then
+        use_old_g_multi
+ elif [ &quot;\${kernel_major}&quot; -eq &quot;\${compare_major}&quot; ] ; then
+@@ -693,7 +695,7 @@
+ else
+        use_libcomposite
+ fi
+-
++*/
+ if [ -f /var/lib/misc/dnsmasq.leases ] ; then
+        systemctl stop dnsmasq || true
+        rm -rf /var/lib/misc/dnsmasq.leases || true
+EOF
+
+patch -i temp.patch
+rm temp.patch
+
+exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
@@ -580,31 +889,7 @@ echo copy browser resources
 # Deploy browser to ~/tmp
 cp -r ~/chaipcr/browser/resources ~/tmp/
 cp ~/chaipcr/browser/qpcrbrowser.service /lib/systemd/system/
-systemctl enable qpcrbrowser.service
-
-if $bypass_pru
-then
-   echo bypassing PRU stub
-   exit 0
-fi
-
-echo Install PRU libraries and Tools
-cd
-wget https://github.com/beagleboard/am335x_pru_package/archive/master.zip --no-check-certificate
-unzip -o master.zip
-mkdir /usr/include/pruss/
-cp ~/am335x_pru_package-master/pru_sw/app_loader/include/pruss* /usr/include/pruss/
-cd ~/am335x_pru_package-master/pru_sw/app_loader/interface
-CROSS_COMPILE= make  #note: there is space between = and make
-cp ~/am335x_pru_package-master/pru_sw/app_loader/lib/lib* /usr/lib/
-ldconfig
-cd ~/am335x_pru_package-master/pru_sw/utils/pasm_source
-source linuxbuild
-cd ..
-cp pasm /usr/bin/ 
-cd
-rm master.zip || true
-</command>
+systemctl enable qpcrbrowser.service</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
@@ -612,7 +897,9 @@ rm master.zip || true
       <command>echo &quot;Install device tree overlay and PRU binary(do this every time it changes):&quot;
 cd ~/chaipcr/deploy/overlay
 bash ./build.sh
-echo chai-pcr &gt; /sys/devices/platform/bone_capemgr/slots
+echo chai-pcr &gt; /sys/devices/platform/bone_capemgr/slots &amp;
+sleep 60
+
 cat /sys/devices/platform/bone_capemgr/slots
 
 exit 0
@@ -622,6 +909,8 @@ exit 0
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Build/install LCD drivers
+# this needs some optimization.. it takes 90MB
+apt-get  -y -q install device-tree-compiler
 cd ~/chaipcr/modules/LCDtouch_V3/49
 chmod 775 install_debian.sh
 
@@ -629,6 +918,14 @@ mkdir -p /boot/dts/
 mkdir -p /lib/firmware/
 
 ./install_debian.sh
+if $is_dev
+then
+      echo Building a debug image
+else
+      apt-get  -y -q --purge autoremove device-tree-compiler
+fi
+modprobe -i tilcdc
+
 echo done installing LCD driver.
 
 sync
@@ -636,46 +933,21 @@ sync
 fsck /dev/mmcblk1p1 -y -f
 fsck /dev/mmcblk0p1 -y -f
 
-systemctl enable r.service
-echo Setup Rails app
-
-mkdir -p ~/chaipcr/web/config/
-cat &lt;&lt;EOF &gt;&gt; ~/chaipcr/web/config/database.yml
-    production:
-      adapter: mysql2
-      database: chaipcr
-      pool: 5
-      timeout: 5000
-      username: root
-      password:
-EOF
-echo database.yml created
-
-cd /root/chaipcr/web
-chmod 755 /root
-
-#echo rserve 
-#echo \n | gem install rserve-client #otherwise bundle fails, don&apos;t know why
-
-echo bundle
-echo &quot;\n&quot; | bundle
-
-echo rake setup
-echo &quot;\n&quot; | RAILS_ENV=production bundle exec rake db:setup
-
-echo seed_fu
-echo &quot;\n&quot; | RAILS_ENV=production bundle exec rake db:seed_fu 
-
-echo Rails init
-cd ~/chaipcr/web
-bundle install
-
-echo done rserev</command>
+exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo setting up website on ngixn
+      <command>echo Checking locale.
+if grep &quot;&quot; /etc/default/locale
+then
+        echo default locale is set.
+else
+        echo setting default local to en_US.UTF-8
+        echo &quot;LANG=en_US.UTF-8&quot; &gt; /etc/default/locale
+fi
+
+echo setting up website on ngixn
 if [ -e /etc/nginx/sites-available ]
 then
     echo Nginx is installed
@@ -714,6 +986,90 @@ chmod +x /etc/init.d/unicorn
 mkdir /etc/unicorn
 cp ~/chaipcr/web/config/etc/unicorn/chaipcr.conf /etc/unicorn/
 </command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo closing swap file
+sync
+swapoff -a
+/sbin/swapoff  -a
+
+echo clearing more space and removing .git julia folders
+
+apt-get -q -y --fix-broken install
+
+rm /sdcard/factory/swapfile
+cd
+
+if $is_dev
+then
+      echo Building a debug image
+      exit 0
+fi
+find . -name .git -execdir rm -r {} \;
+find . -name *.o  -exec rm {} \;
+find / -name .git -execdir rm -r {} \;
+rm -r /var/cache/apt /var/log/ /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/include /opt/QtEmbedded/tests /opt/QtEmbedded/mkspecs ~/julia ~/lib
+mkdir /var/log/ -p
+find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
+apt update
+
+exit 0</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo cleanup to free up some space
+df -h
+if $is_dev
+then
+      echo Building a debug image
+      exit 0
+fi
+
+for retryloop in 1 2 3
+do
+apt-get  -y -q --purge autoremove g++-4.7 g++-4.8 gcc-4.8 g++-4.8 gcc-4.8 g++-4.8 
+apt-get  -y -q --purge autoremove libblas3gf libblas3gf
+apt-get  -y -q --purge autoremove parted linux-headers-`uname -r` parted automake build-essential cmake curl device-tree-compiler evtest g++ gfortran git i2c-tools libarpack2 libblas-common libblas-dev libblas3 libedit-dev libfftw3-dev libfftw3-double3 libfftw3-single3 libfontconfig1-dev libfreetype6-dev libgfortran3 libgfortran3 libgmp3-dev liblapack3 liblapack3gf libllvm3.8 libmetis5 libmpfr-dev libopenblas-base libopenblas-dev libqt4-webkit libssl-dev libtool libunwind8 libxcursor-dev libxext-dev libxfixes-dev libxft-dev libxi-dev libxml2-dev libxrandr-dev libxrender-dev libxslt-dev lsb-release m4 nodejs ntp ntpdate parted pkg-config python unzip
+
+apt-get install -y -q liblapack-dev 
+apt-get -f  -y -q install
+
+apt-get  -y -q --purge autoremove fakeroot 
+apt-get -f  -y -q install
+
+apt-get --purge  -y -q autoremove g++
+apt-get  -y -q --purge autoremove gcc 
+apt-get  -y -q -f install
+
+apt-get  -y -q --purge autoremove gfortran* git i2c-tools 
+apt-get  -y -q --purge autoremove icu-devtools
+apt-get -y -q remove qt4-default qt5-default gettext
+DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge libgtk-3-0
+DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge gcc-4.9 cmake
+DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge python2*
+
+apt-get autoremove -y --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data
+
+df -h
+done
+
+DEBIAN_FRONTEND=noninteractive apt-get -q -y install gettext
+DEBIAN_FRONTEND=noninteractive apt-get -q -y install libgtk-3-0
+apt-get -y -q install libpango1.0-0 libglib2.0-0 libcairo2
+apt-get -q -y install libboost-chrono-dev libboost-system-dev
+if [ -e /etc/bypassjulia.flag ]
+then
+    echo Julia is not installed
+else
+    apt-get -q -y install hdf5-tools
+fi
+
+df -h
+
+exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
@@ -780,10 +1136,20 @@ exit 1
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo device is still connectable!
+
+if $is_dev
+then
+      echo Building a debug image
+      exit 0
+fi
+
 cd
 echo unmounting any sdcard folders
 umount /sdcard/*
 umount /dev/mmcblk0p*
+
+rm -r /sdcard/upgrade
+mkdir -p /sdcard/upgrade/
 
 echo cleaning up sdcard
 LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
@@ -798,25 +1164,15 @@ sync
  fsck /dev/mmcblk1p1 -y -f
  fsck /dev/mmcblk0p1 -y -f
 
-mount /dev/mmcblk0p1 /sdcard/upgrade/
+mount /dev/mmcblk0p1 /sdcard/factory/
 
-exit 0</command>
-      <execEachLine>false</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
-      <command>echo Maintenance
-
-cd /root/chaipcr/web
-bundle exec rake db:migrate # migrates database as needed
-
+df -h
 
 exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
-      <command>#build( &quot;create_factory_settings_sdcard&quot;, build_machine:&quot;$build_machine&quot;, output_sdcard:&quot;/dev/sdb&quot;)
-echo all done for $build_machine, you can call create_factory_settings_sdcard job to create a factory settings image. root password is chaipcr
+      <command>echo all done for $build_machine, you can call create_factory_settings_sdcard job to create a factory settings image. root password is chaipcr
 
 exit 0</command>
     </hudson.tasks.Shell>

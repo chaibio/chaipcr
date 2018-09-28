@@ -30,9 +30,13 @@ window.App.directive 'chartChooser', [
         $scope.hasAmplification = ->
           return Experiment.hasAmplificationCurve($scope.experiment)
 
+        $scope.hasStandardCurve = ->
+          return Experiment.hasStandardCurve($scope.experiment)
+          
         $scope.chartCount = 1
         $scope.chartCount = $scope.chartCount + 1 if $scope.hasMeltCurve()
         $scope.chartCount = $scope.chartCount + 1 if $scope.hasAmplification()
+        $scope.chartCount = $scope.chartCount + 1 if $scope.hasStandardCurve()
 
         elem.click ->
           $scope.$apply ->

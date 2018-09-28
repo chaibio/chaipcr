@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Steps API" do
+describe "Steps API", type: :request do
   before(:each) do
     admin_user = create_admin_user
     post '/login', { email: admin_user.email, password: admin_user.password }
@@ -11,7 +11,7 @@ describe "Steps API" do
   
   describe "#create" do
     it 'first step' do
-      post "/stages/#{@stage.id}/steps", {}, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      post "/stages/#{@stage.id}/steps", {}, http_headers
       expect(response).to be_success            # test for the 200 status-code
       json = JSON.parse(response.body)
       json["step"]["name"].should be_nil
@@ -20,7 +20,7 @@ describe "Steps API" do
     
     it 'last step' do
       params = { prev_id: @stage.steps.first.id }
-      post "/stages/#{@stage.id}/steps", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      post "/stages/#{@stage.id}/steps", params.to_json, http_headers
       expect(response).to be_success            # test for the 200 status-code
       json = JSON.parse(response.body)
       json["step"]["order_number"].should == 1
@@ -60,7 +60,7 @@ describe "Steps API" do
   describe "#update" do
     it "step name" do
       params = { step: {name: "test"} }
-      put "steps/#{@stage.steps.first.id}", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      put "/steps/#{@stage.steps.first.id}", params.to_json, http_headers
       expect(response).to be_success
       json = JSON.parse(response.body)
       json["step"]["name"].should eq("test")
@@ -68,7 +68,7 @@ describe "Steps API" do
     
     it "step name null" do
       params = { step: {name: ""} }
-      put "steps/#{@stage.steps.first.id}", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      put "/steps/#{@stage.steps.first.id}", params.to_json, http_headers
       expect(response).to be_success
       json = JSON.parse(response.body)
       json["step"]["name"].should be_nil
@@ -83,7 +83,7 @@ describe "Steps API" do
       @stage.steps << Step.new(:order_number=>movestep.order_number+1) #4 steps now
       params = { prev_id: @stage.steps.first.id}
       #move step 3 after step 1
-      post "/steps/#{movestep.id}/move", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      post "/steps/#{movestep.id}/move", params.to_json, http_headers
       expect(response).to be_success
       @stage.steps.reload
       @stage.steps.should be_contiguous_order_numbers
@@ -96,7 +96,7 @@ describe "Steps API" do
       movestep = @stage.steps.first
       params = { prev_id: @stage.steps[1].id}
       #move step 1 after step 2
-      post "/steps/#{movestep.id}/move", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      post "/steps/#{movestep.id}/move", params.to_json, http_headers
       expect(response).to be_success
       @stage.steps.reload
       @stage.steps.should be_contiguous_order_numbers
@@ -107,7 +107,7 @@ describe "Steps API" do
       @stage = meltcurve_stage(@stage.protocol) #3 steps
       movestep = @stage.steps[2]
       params = { prev_id: @stage.steps[1].id}
-      post "/steps/#{movestep.id}/move", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      post "/steps/#{movestep.id}/move", params.to_json, http_headers
       expect(response).to be_success
       @stage.steps.reload
       @stage.steps.should be_contiguous_order_numbers
@@ -120,7 +120,7 @@ describe "Steps API" do
       movestep = @stage.steps[2]
       params = { prev_id: 123}
       #move step 3 after step 1
-      post "/steps/#{movestep.id}/move", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      post "/steps/#{movestep.id}/move", params.to_json, http_headers
       expect(response).to be_success
       @stage.steps.reload
       @stage.steps.should be_contiguous_order_numbers
@@ -132,7 +132,7 @@ describe "Steps API" do
       steps_count = new_stage.steps.count
       movestep = @stage.steps.first
       params = { stage_id: new_stage.id }
-      post "/steps/#{movestep.id}/move", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      post "/steps/#{movestep.id}/move", params.to_json, http_headers
       expect(response).to be_success
       @experiment.experiment_definition.protocol.stages.reload
       @experiment.experiment_definition.protocol.stages.count.should == 1 #hold stage should be deleted because the only step is moved
@@ -149,7 +149,7 @@ describe "Steps API" do
       steps_count = new_stage.steps.count
       movestep = @stage.steps[1]
       params = { stage_id: new_stage.id }
-      post "/steps/#{movestep.id}/move", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      post "/steps/#{movestep.id}/move", params.to_json, http_headers
       expect(response).to be_success
       @stage.steps.reload
       @stage.steps.count.should == 2
@@ -161,7 +161,7 @@ describe "Steps API" do
         
     it "step to non-existent stage not allowed" do
       params = { stage_id: 212 }
-      post "/steps/#{@stage.steps.first.id}/move", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      post "/steps/#{@stage.steps.first.id}/move", params.to_json, http_headers
       response.response_code.should == 422
     end
   end
@@ -170,14 +170,14 @@ describe "Steps API" do
     it "- not editable if experiment definition is not editable" do
       @experiment.experiment_definition = ExperimentDefinition.new(:experiment_type=>ExperimentDefinition::TYPE_DIAGNOSTIC)
       @experiment.save
-      post "/stages/#{@stage.id}/steps", {}, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      post "/stages/#{@stage.id}/steps", {}, http_headers
       response.response_code.should == 422
     end
     
     it "not editable if experiment is runned" do
       @experiment.update_attributes(:started_at=>Time.now)
       @experiment.save
-      post "/stages/#{@stage.id}/steps", {}, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      post "/stages/#{@stage.id}/steps", {}, http_headers
       response.response_code.should == 422
     end
   end

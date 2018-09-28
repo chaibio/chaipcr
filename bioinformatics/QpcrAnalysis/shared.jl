@@ -28,16 +28,16 @@ function ensure_ci(
     if isa(calib_info, Integer)
 
         if calib_info == calib_info_AIR
-            calib_id = MySQL.query(
+            calib_id = MySQL.mysql_execute(
                 db_conn,
                 "SELECT calibration_id FROM experiments WHERE id=$exp_id"
-            )[:calibration_id][1]
+            )[1][:calibration_id][1]
         else
             calib_id = calib_info
         end
 
         step_qry = "SELECT step_id FROM fluorescence_data WHERE experiment_id=$calib_id"
-        step_ids = sort(unique(MySQL.query(db_conn, step_qry)[:step_id]))
+        step_ids = sort(unique(MySQL.mysql_execute(db_conn, step_qry)[1][:step_id]))
 
         calib_info = OrderedDict(
             "water" => OrderedDict(
@@ -54,7 +54,7 @@ function ensure_ci(
         end # for
 
         channel_qry = "SELECT channel FROM fluorescence_data WHERE experiment_id=$calib_id"
-        channels = sort(unique(MySQL.query(db_conn, channel_qry)[:channel]))
+        channels = sort(unique(MySQL.mysql_execute(db_conn, channel_qry)[1][:channel]))
 
         for channel in channels
             channel_key = "channel_$channel"
@@ -154,7 +154,7 @@ function get_mysql_data_well(
 
     well_constraint = (well_nums_str == "") ? "" : "AND well_num in ($well_nums_str)"
     qry = replace(qry_2b, "well_constraint", well_constraint)
-    found_well_namedtuple = MySQL.query(db_conn, qry)
+    found_well_namedtuple = MySQL.mysql_execute(db_conn, qry)[1]
 
     found_well_nums = sort(unique(found_well_namedtuple[:well_num]))
 

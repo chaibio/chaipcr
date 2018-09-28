@@ -30,6 +30,10 @@ RSpec::Matchers.define :be_contiguous_order_numbers do
 end
 
 module FactoryHelper
+  def http_headers
+    {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+  end
+  
   def hold_stage(protocol)
     Stage.create(:stage_type=>Stage::TYPE_HOLD, :protocol_id=>protocol.id)
   end
@@ -64,7 +68,7 @@ module FactoryHelper
     params = { experiment: {name: name, protocol: {lid_temperature:110, stages:[
                       {stage:{stage_type:"holding",steps:[{step:{temperature:95,hold_time:180}}]}}, 
                       ]}} }
-    post "/experiments", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+    post "/experiments", params.to_json, http_headers
     expect(response).to be_success            # test for the 200 status-code
     json = JSON.parse(response.body)
     return Experiment.find_by_id(json["experiment"]["id"])
@@ -88,7 +92,7 @@ module FactoryHelper
                       {stage:{stage_type:Stage::TYPE_CYCLE,num_cycles:45,steps:[{step:{temperature:95,hold_time:15}},{step:{temperature:60,hold_time:60,collect_data:1}}]}},
                       {stage:{stage_type:Stage::TYPE_MELTCURVE}}
                       ]}} }
-    post "/experiments", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+    post "/experiments", params.to_json, http_headers
     expect(response).to be_success            # test for the 200 status-code
     json = JSON.parse(response.body)
     return Experiment.find_by_id(json["experiment"]["id"])

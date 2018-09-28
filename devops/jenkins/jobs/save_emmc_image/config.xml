@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version='1.1' encoding='UTF-8'?>
 <project>
   <actions/>
   <description>Creates a factory settings image from for connected BBB.&#xd;
@@ -20,13 +20,7 @@
           <name>build_machine</name>
           <description></description>
           <defaultValue>10.0.100.240</defaultValue>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>output_sdcard</name>
-          <description>the block device of the created factory settings sdcard: You can say:
-/dev/sdb to write directly to a physical sdcard.
-or /tmp/sdcard_image.img to export a factory settings sdcard image.</description>
-          <defaultValue>/tmp/${BUILD_NUMBER}/sdcard_${BUILD_NUMBER}.img</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>local_download_folder</name>
@@ -36,52 +30,46 @@ or
 Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
 </description>
           <defaultValue>/usr/share/nginx/html/download</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>download_prefix</name>
           <description>Download server url. Example: http://10.0.1.20/download</description>
           <defaultValue>http://10.0.1.20/download</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sdcard_filename</name>
           <description>sdcard default filename</description>
           <defaultValue></defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>output_image_prefix</name>
           <description>Class of the upgrade image generated during this process. Could be empty, kernel44, kernel49, kernel 41, kernel 38, allthirdparty, or release.
 </description>
           <defaultValue>fresh</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>no_factorysettings_sdcard</name>
           <description>No factory settings sdcard image created if this paramter is checked.</description>
           <defaultValue>true</defaultValue>
         </hudson.model.BooleanParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>build_branch</name>
+          <description>branch contains building scripts</description>
+          <defaultValue>branches/julia</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.5.1">
-    <configVersion>2</configVersion>
-    <userRemoteConfigs>
-      <hudson.plugins.git.UserRemoteConfig>
-        <url>https://github.com/chaibio/chaipcr.git</url>
-      </hudson.plugins.git.UserRemoteConfig>
-    </userRemoteConfigs>
-    <branches>
-      <hudson.plugins.git.BranchSpec>
-        <name>*/master</name>
-      </hudson.plugins.git.BranchSpec>
-    </branches>
-    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
-    <submoduleCfg class="list"/>
-    <extensions/>
-  </scm>
+  <scm class="hudson.scm.NullSCM"/>
   <canRoam>true</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <authToken>123</authToken>
   <triggers/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
@@ -93,10 +81,16 @@ uname -a
 ls -ahl
 lsblk
 df -h
+
+#the block device of the created factory settings sdcard: You can say:
+#/dev/sdb to write directly to a physical sdcard.
+#or /tmp/sdcard_image.img to export a factory settings sdcard image.
+tmp_output_sdcard=/tmp/${BUILD_NUMBER}/sdcard_${BUILD_NUMBER}.img
+
 echo user: $(whoami)
 
 echo Creating an sdcard image for the device at $build_machine
-echo Path to SDCard image: $output_sdcard
+echo Path to SDCard image: $tmp_output_sdcard
 echo Environmental variables:
 env
 
@@ -180,6 +174,30 @@ do
 done
 
 echo done connection check.
+
+
+ls
+echo now at $(pwd)
+rm build_report.xml
+branch_param=
+rm -r tmp || true
+echo build_branch is $build_branc
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+then
+ 	echo No build branch chosen
+else
+   	branch_param=&quot;-b $(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
+    echo Cloning branch $branch_param
+fi
+
+sudo rm -r tmp || true
+mkdir tmp || true
+cd tmp
+git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
+cd chaipcr || exit 1
+echo now at $(pwd)
+ls
+
 </command>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
@@ -204,8 +222,10 @@ then
 fi
 
 echo installing missing packages.
+dpkg --configure -a --force-confdef --force-confnew
 apt-get update
-apt-get install parted -y -q
+apt-get install -y -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confnew parted -y -q
+
 partprobe /dev/mmcblk0
 
 if LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
@@ -257,7 +277,11 @@ lsblk</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
-      <command>ls
+      <command>echo now at $(pwd)
+cd tmp/chaipcr
+echo now at $(pwd)
+ls
+
 sshpass -p chaipcr scp -r devops/grabimage_sdcard/* root@$build_machine:/tmp/grep_sdcard/
 sshpass -p chaipcr scp -r devops/grabimage_sdcard/uEnv.sdcard.txt root@$build_machine:/tmp/grep_sdcard/uEnv.txt
 </command>
@@ -283,7 +307,7 @@ shutdown -r 1
     <hudson.tasks.Shell>
       <command>#!/bin/bash
 echo waiting for a restart
-sleep 120
+sleep 620
 for i in {0..1200..60}
 do
 	echo &quot;Waiting for the build device to become ready! $i&quot;
@@ -337,7 +361,7 @@ full_emmc_url=${download_prefix}/${emmc_image_latest_compressed}
 if $no_factorysettings_sdcard
 then
 	echo latest eMMC for this build machine is downloadable from $full_emmc_url
-	rm -r $grep_sdcard_dir || true
+	sudo rm -r $grep_sdcard_dir || true
  
 build_report_filename=build_report.xml
 #_$BUILD_NUMBER.xml
@@ -354,8 +378,10 @@ EOF
     exit 0  
 fi
 
-ls
+cd tmp/chaipcr
 cd devops
+echo &apos;performing ./process_raw_image.sh &quot;${grep_sdcard_dir}&quot; &quot;${tmp_sdcard_dir}&quot;&apos;
+echo fs version $(cat factory_settings_sdcard/fs_version.inf)
 
 if sudo ./process_raw_image.sh &quot;${grep_sdcard_dir}&quot; &quot;${tmp_sdcard_dir}&quot;
 then
@@ -385,18 +411,19 @@ then
 	echo backup eMMC image to $full_emmc_image
     tar zfvc $full_emmc_image /tmp/image_creator/eMMC.img
     sdcard_url=${download_prefix}/$sdcard_filename
+	tmp_output_sdcard=/tmp/${BUILD_NUMBER}/sdcard_${BUILD_NUMBER}.img
 
 #	cp $full_emmc_image $emmc_image_latest_compressed_full_local_path
 
-	echo &quot;performing create_sdcard.sh $tmp_sdcard_dir $output_sdcard&quot;
-	if sudo ./create_sdcard.sh &quot;$tmp_sdcard_dir&quot; &quot;$output_sdcard&quot;
+	echo &quot;performing create_sdcard.sh $tmp_sdcard_dir $tmp_output_sdcard&quot;
+	if sudo ./create_sdcard.sh &quot;$tmp_sdcard_dir&quot; &quot;$tmp_output_sdcard&quot;
 	then
-   		echo SDCard image is created at &quot;$output_sdcard&quot;
+   		echo SDCard image is created at &quot;$tmp_output_sdcard&quot;
         echo please use it to flash an 8M SDCard.
-        echo &quot;ex: dd if=$output_sdcard of=/dev/sdX bs=16M&quot;
-        cp $output_sdcard $fullpath_sdcard_image
+        echo &quot;ex: dd if=$tmp_output_sdcard of=/dev/sdX bs=16M&quot;
+        cp $tmp_output_sdcard $fullpath_sdcard_image
         echo copying compressed sdcard image
-        cp ${output_sdcard}.tgz ${fullpath_sdcard_image}.tgz
+        cp ${tmp_output_sdcard}.tgz ${fullpath_sdcard_image}.tgz
         echo sdcard image should be downloadable from $sdcard_url
         echo compressed sdcard image should be downloadable from ${sdcard_url}.tgz
         sudo rm -r /tmp/image_creator/ || :
@@ -407,14 +434,14 @@ then
     echo eMMC image should be downloadable from $full_emmc_url
 
     echo latest eMMC for this build machine is downloadable from $full_emmc_url
-    rm -r $tmp_sdcard_dir || true
+    sudo rm -r $tmp_sdcard_dir || true
 else
    echo raw image processing failed.
    exit 1
 fi
 
-rm -r $grep_sdcard_dir || true
-cd ..
+sudo rm -r $grep_sdcard_dir || true
+cd ../../..
 
 build_report_filename=build_report.xml
 #_$BUILD_NUMBER.xml

@@ -90,15 +90,14 @@ Qpcrctl::Application.routes.draw do
       post 'start'
       post 'stop'
       post 'copy'
-      get 'protocol'
-      get 'platessetup'
-      get 'status'
+      get 'well_layout'
       get 'temperature_data'
       get 'amplification_data'
       get 'melt_curve_data'
-      get 'baseline_subtracted_ct_data'
+      get 'standard_curve'
       get 'export'
       get 'analyze'
+      get 'filter_by_standard'
     end
     
     resources :wells, param: :well_num, only: [:index, :update, :destroy] do
@@ -106,11 +105,27 @@ Qpcrctl::Application.routes.draw do
         put '', :action => 'bulk_update'
       end
     end
+
+    resources :samples, only: [:index, :create, :update, :destroy] do
+      member do
+        post 'links', to: 'samples#links'
+        post 'unlinks', to: 'samples#unlinks'
+      end
+    end
+    
+    resources :targets
+    resources :targets, only: [:index, :create, :update, :destroy] do
+      member do
+        post 'links', to: 'targets#links'
+        post 'unlinks', to: 'targets#unlinks'
+      end
+    end
     
     resource :amplification_option, only: [:show, :update]
     
   end
 
+  
   resources :protocols, shallow: true, only: [:update] do
     resources :stages, shallow: true, only: [:create, :update, :destroy] do
       resources :steps, shallow: true, only: [:create, :update, :destroy] do

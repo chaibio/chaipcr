@@ -65,7 +65,7 @@ class ExperimentsController < ApplicationController
 				'Experiment'
 			]
       response 200 do
-        key :description, 'experiments response'
+        key :description, 'Object containing list of all the experiments'
         schema do
           key :type, :array
           items do
@@ -87,20 +87,23 @@ class ExperimentsController < ApplicationController
       parameter do
         key :name, :experiment
         key :in, :body
-        key :description, 'experiment to create'
+        key :description, 'Experiment to create'
         key :required, true
         schema do
            key :'$ref', :ExperimentInput
          end
       end
       response 200 do
-        key :description, 'experiment response'
+        key :description, 'Created experiment is returned'
         schema do
           key :'$ref', :Experiment
         end
       end
       response 422 do
-        key :description, 'experiment create error'
+        key :description, 'Experiment create error'
+				schema do
+					key :'$ref', :Experiment
+				end
       end
     end
   end
@@ -131,7 +134,37 @@ class ExperimentsController < ApplicationController
     respond_to do |format|
       format.json { render "fullshow", :status => (ret)? :ok : :unprocessable_entity}
     end
-  end
+	end
+
+	swagger_path '/experiments/filter_by_standard' do
+		operation :get do
+			key :summary, 'List all Experiments with standard well type'
+			key :description, 'Returns all experiments from the system sorted by the id along with well type as standard'
+			key :produces, [
+					'application/json',
+			]
+			key :tags, [
+					'Experiment'
+			]
+			response 200 do
+				key :description, 'Object containing list of all the experiments with standard'
+				schema do
+					key :type, :array
+					items do
+						key :'$ref', :Experiments
+					end
+				end
+			end
+		end
+	end
+
+	api :GET, "/experiments/filter_by_standard", "List all the experiments with well type standard"
+	def filter_by_standard
+		@experiments = Experiment.includes(:experiment_definition).joins(:well_layout).joins("inner join targets_wells on targets_wells.well_layout_id = well_layouts.id").where("experiment_definitions.experiment_type"=>[ExperimentDefinition::TYPE_USER_DEFINED, ExperimentDefinition::TYPE_TESTKIT], "targets_wells.well_type"=>TargetsWell::TYPE_STANDARD).order("experiments.id DESC").load
+    respond_to do |format|
+      format.json { render "index", :status => :ok }
+    end
+	end
 
 	swagger_path '/experiments/{id}' do
 		operation :put do
@@ -146,7 +179,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :id
 				key :in, :path
-				key :description, 'id of the experiment to update'
+				key :description, 'Id of the experiment to update'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
@@ -154,20 +187,20 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :experiment
 				key :in, :body
-				key :description, 'experiment to update'
+				key :description, 'Experiment to update'
 				key :required, true
 				schema do
 					 key :'$ref', :ExperimentInput
 				 end
 			end
 			response 200 do
-				key :description, 'experiment response'
+				key :description, 'Updated experiment is returned'
 				schema do
 					key :'$ref', :Experiment
 				end
 			end
 			response 422 do
-				key :description, 'experiment update error'
+				key :description, 'Experiment update error'
 				schema do
 					key :'$ref', :Experiment
 				end
@@ -183,12 +216,14 @@ class ExperimentsController < ApplicationController
       render json: {errors: "The experiment is not found"}, status: :not_found
       return
     end
+    @experiment.targets_well_layout_id = WellLayout.for_experiment(params[:experiment][:standard_experiment_id]).pluck(:id).first if params[:experiment][:standard_experiment_id]
     ret = @experiment.update_attributes(experiment_params)
     respond_to do |format|
       format.json { render "show", :status => (ret)? :ok :  :unprocessable_entity}
     end
   end
 
+  
 	swagger_path '/experiments/{id}/copy' do
 		operation :post do
 			key :summary, 'Copy Experiment'
@@ -202,19 +237,19 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :id
 				key :in, :path
-				key :description, 'id of the experiment to copy'
+				key :description, 'Id of the experiment to copy'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
 			end
 			response 200 do
-				key :description, 'experiment response'
+				key :description, 'Copied experiment is retuned'
 				schema do
 					key :'$ref', :Experiment
 				end
 			end
 			response 422 do
-				key :description, 'experiment copy error'
+				key :description, 'Experiment copy error'
 				schema do
 					key :'$ref', :Experiment
 				end
@@ -225,10 +260,13 @@ class ExperimentsController < ApplicationController
   api :POST, "/experiments/:id/copy", "Copy an experiment"
   see "experiments#create", "json response"
   def copy
-    old_experiment = Experiment.includes(:experiment_definition).find_by_id(params[:id])
-    experiment_definition = old_experiment.experiment_definition.copy
+    old_experiment = Experiment.includes(:experiment_definition).find_by_id(params[:id]) 
     @experiment = Experiment.new({:name=>(!params[:experiment].blank?)? params[:experiment][:name] : "Copy of #{old_experiment.name}"})
-    @experiment.experiment_definition = experiment_definition
+    @experiment.targets_well_layout_id = old_experiment.targets_well_layout_id
+    @experiment.experiment_definition = old_experiment.experiment_definition.copy
+    if old_experiment.well_layout
+      @experiment.well_layout = old_experiment.well_layout.copy
+    end
     ret = @experiment.save
     respond_to do |format|
       format.json { render "fullshow", :status => (ret)? :ok :  :unprocessable_entity}
@@ -248,19 +286,19 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :id
 				key :in, :path
-				key :description, 'id of the experiment to fetch'
+				key :description, 'Id of the experiment to fetch'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
 			end
 			response 200 do
-				key :description, 'experiment response'
+				key :description, 'Fetched experiment is retuned'
 				schema do
 					key :'$ref', :Experiment
 				end
 			end
-			response :default do
-				key :description, 'unexpected error'
+			response 422 do
+				key :description, 'Unexpected error'
 				schema do
 					key :'$ref', :ErrorModel
 				end
@@ -271,6 +309,10 @@ class ExperimentsController < ApplicationController
   api :GET, "/experiments/:id", "Show an experiment"
   see "experiments#create", "json response"
   def show
+		if params[:id] == "filter_by_standard"
+			filter_by_standard
+			return
+		end
     @experiment.experiment_definition.protocol.stages.load
     respond_to do |format|
       format.json { render "fullshow", :status => (@experiment)? :ok :  :unprocessable_entity}
@@ -290,18 +332,18 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :id
 				key :in, :path
-				key :description, 'id of the experiment to delete'
+				key :description, 'Id of the experiment to delete'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
 			end
 			response 200 do
-				key :description, 'experiment deleted'
+				key :description, 'Experiment deleted'
 			end
-			response :default do
-				key :description, 'unexpected error'
+			response 422 do
+				key :description, 'Unexpected error'
 				schema do
-					key :'$ref', :ErrorModel
+					key :'$ref', :Experiment
 				end
 			end
 		end
@@ -309,12 +351,82 @@ class ExperimentsController < ApplicationController
 
   api :DELETE, "/experiments/:id", "Destroy an experiment"
   def destroy
-    ret = @experiment.destroy
+    begin
+      ret = @experiment.destroy
+    rescue  => e
+      ret = false
+    end
     respond_to do |format|
-      format.json { render "destroy", :status => (ret)? :ok :  :unprocessable_entity}
+      format.json { render "destroy", :status => (ret)? :ok : :unprocessable_entity}
     end
   end
 
+  def well_layout
+    @well_layout = WellLayout.for_experiment(params[:id]).first
+    if @well_layout.is_a? WellLayout
+      @well_layout = @well_layout.layout
+    else
+      @well_layout = []
+    end
+  end
+  
+  def standard_curve
+    if @experiment
+      if @experiment.completion_status == "success"
+        cached_data = CachedStandardCurveDatum.where(:experiment_id=>@experiment.id).first
+        if cached_data.nil? #no cache data found
+          begin
+            task_submitted = background_standard_curve_data(@experiment)
+            render :nothing => true, :status => (task_submitted)? 202 : 503
+          rescue  => e
+            render :json=>e.to_s, :status => 500
+          end
+        else
+          standard_curve_results = JSON.parse(cached_data.standard_curve_result)
+          #puts response.body
+          results = Hash.new
+          unknown_targets_hash = Target.unknowns_for_experiment(@experiment)
+          if !standard_curve_results["targets"].blank?
+            standard_curve_results["targets"].each do |target_equation|
+              if !target_equation["slope"].nil? && !target_equation["offset"].nil?
+                results["targets"] = Array.new if results["targets"].nil?
+                result_per_target = target_equation
+                unknown_targets = unknown_targets_hash[target_equation["target_id"]]
+                if unknown_targets
+                  result_per_target = target_equation.clone
+                  result_per_target["unknowns"] = Array.new
+                  unknown_targets.each do |unknown_target|
+                    quantity_log10 = (unknown_target.cq-target_equation["offset"])/target_equation["slope"]
+                    quantity = 10**quantity_log10
+                    quantity_nodes = ("%.8e" % quantity).split("e")
+                    if quantity_nodes.length == 2
+                      quantity_m = quantity_nodes[0].to_f
+                      quantity_b = quantity_nodes[1].to_i
+                      result_per_target["unknowns"] << {:well_num=>unknown_target.well_num, :cq=>unknown_target.cq, :quantity=>{:m=>quantity_m, :b=>quantity_b}}
+                    end
+                  end
+                end
+                results["targets"] << result_per_target
+              end
+            end
+          end
+          if !standard_curve_results["groups"].blank?
+            results["groups"] = standard_curve_results["groups"]
+          end
+          render :json=>results, :status => :ok
+        end
+      elsif !@experiment.ran?
+        render :json=>{:errors=>"Please run the experiment before calling standard curve"}, :status => 500
+      elsif !@experiment.running?
+        render :json=>{:errors=>"Please wait for the experiment to be completed before calling standard curve"}, :status => 500
+      else
+        render :json=>{:errors=>"experiment cannot be standard curve because it wasn't completed successfully (status=#{completion_status})"}, :status => 500
+      end
+    else
+      render :json=>{:errors=>"experiment not found"}, :status => :not_found
+    end
+  end
+  
 	swagger_path '/experiments/{id}/temperature_data' do
 		operation :get do
 			key :summary, 'Retrieve temperature data'
@@ -328,7 +440,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :id
 				key :in, :path
-				key :description, 'id of the experiment for which we need temperature data'
+				key :description, 'Id of the experiment for which we need temperature data'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
@@ -344,7 +456,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :endtime
 				key :in, :query
-				key :description, 'if not specified, it returns everything to the end of the experiment, in ms'
+				key :description, 'If not specified, it returns everything to the end of the experiment, in ms'
 				key :required, false
 				key :type, :integer
 				key :format, :int64
@@ -358,16 +470,16 @@ class ExperimentsController < ApplicationController
 				key :format, :int64
 			end
 			response 200 do
-				key :description, 'temperature data'
+				key :description, 'Temperature data'
 				schema do
 					key :type, :array
 					items do
-						key :'$ref', :TemperatureLog
+						key :'$ref', :TemperatureData
 					end
 				end
 			end
 			response :default do
-				key :description, 'unexpected error'
+				key :description, 'Unexpected error'
 				schema do
 					key :'$ref', :ErrorModel
 				end
@@ -399,7 +511,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :id
 				key :in, :path
-				key :description, 'id of the experiment for which we need amplification data'
+				key :description, 'Id of the experiment for which we need amplification data'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
@@ -407,49 +519,76 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :raw
 				key :in, :query
-				key :description, '?'
-				key :required, false
+				key :description, 'If raw data should be returned, by default it is not returned'
 				key :type, :boolean
+				key :required, false
+        key :default, false
 			end
 			parameter do
 				key :name, :background
 				key :in, :query
-				key :description, '?'
-				key :required, false
+				key :description, 'If background subtracted data should be returned, by default it is retuned'
 				key :type, :boolean
+				key :required, false
+        key :default, true
 			end
 			parameter do
 				key :name, :baseline
 				key :in, :query
-				key :description, '?'
-				key :required, false
+				key :description, 'If baseline subtracted data should be returned, by default it is retuned'
 				key :type, :boolean
+				key :required, false
+        key :default, true
+			end
+			parameter do
+				key :name, :firstderiv
+				key :in, :query
+				key :description, 'If first derivative data should be returned, by default it is retuned'
+				key :type, :boolean
+				key :required, false
+				key :default, true
+			end
+			parameter do
+				key :name, :secondderiv
+				key :in, :query
+				key :description, 'If second derivative data should be returned, by default it is retuned'
+				key :type, :boolean
+				key :required, false
+				key :default, true
 			end
 			parameter do
 				key :name, :cq
 				key :in, :query
-				key :description, '?'
-				key :required, false
+				key :description, 'If cq values should be returned, by default it is retuned'
 				key :type, :boolean
+				key :required, false
+        key :default, true
 			end
 			parameter do
 				key :name, :step_id
 				key :in, :query
-				key :description, '?'
-				key :required, false
-				key :type, :integer
-				key :format, :int64
+        key :description, '?'
+        key :required, false
+			  key :type, :array
+			  items do
+				  key :type, :integer
+          key :format, :int64
+        end
 			end
 			parameter do
-				key :name, :step_id
+				key :name, :ramp_id
 				key :in, :query
-				key :description, '?'
-				key :required, false
-				key :type, :integer
-				key :format, :int64
+        key :description, '?'
+        key :required, false
+			  key :type, :array
+			  items do
+				  key :type, :integer
+          key :format, :int64
+        end
 			end
+
 			response 200 do
-				key :description, 'amplification data'
+				key :description, 'Amplification data'
 				schema do
 					key :type, :array
 					items do
@@ -457,8 +596,17 @@ class ExperimentsController < ApplicationController
 					end
 				end
 			end
+
+			response 202 do
+				key :description, 'Job accepted'
+			end
+
+      response 304 do
+				key :description, 'Amplification data is not modified if etag is the same'
+			end
+
 			response :default do
-				key :description, 'unexpected error'
+				key :description, 'Unexpected error'
 				schema do
 					key :'$ref', :ErrorModel
 				end
@@ -466,26 +614,32 @@ class ExperimentsController < ApplicationController
 		end
 	end
 
-  api :GET, "/experiments/:id/amplification_data?raw=false&background=true&baseline=true&cq=true&step_id[]=43&step_id[]=44", "Retrieve amplification data"
+  api :GET, "/experiments/:id/amplification_data?raw=false&background=true&baseline=true&firstderiv=true&secondderiv=true&cq=true&step_id[]=43&step_id[]=44", "Retrieve amplification data"
   example "{'partial':false, 'total_cycles':40, 'steps':['step_id':2,
-            'amplification_data':[['channel', 'well_num', 'cycle_num', 'background_subtracted_value', 'baseline_subtracted_value', 'fluorescence_value'], [1, 1, 1, 25488, -2003, 86], [1, 1, 2, 53984, -409, 85]],
+            'amplification_data':[['channel', 'well_num', 'cycle_num', 'background_subtracted_value', 'baseline_subtracted_value', 'dr1_pred', 'dr2_pred' 'fluorescence_value'], [1, 1, 1, 25488, -2003, 34543, 453344, 86], [1, 1, 2, 53984, -409, 56345, 848583, 85]],
             'cq':[['channel', 'well_num', 'cq'], [1, 1, 12.11], [1, 2, 15.77], [1, 3, null]]]}"
   def amplification_data
     params[:raw] = params[:raw].to_bool if !params[:raw].nil?
     params[:background] = params[:background].to_bool if !params[:background].nil?
-    params[:baseline] = params[:baseline].to_bool if !params[:baseline].nil?
+		params[:baseline] = params[:baseline].to_bool if !params[:baseline].nil?
+		params[:firstderiv] = params[:firstderiv].to_bool if !params[:firstderiv].nil?
+		params[:secondderiv] = params[:secondderiv].to_bool if !params[:secondderiv].nil?
     params[:cq] = params[:cq].to_bool if !params[:cq].nil?
 
     if params[:step_id].nil? && params[:ramp_id].nil?
       #first step that collects data will be returned, if none of the steps can be found, first ramp that collect data will be returned
       params[:raw] = false if params[:raw].nil?
-      params[:background] = true if params[:background].nil?
-      params[:baseline] = true if params[:baseline].nil?
-      params[:cq] = true if params[:cq].nil?
+      params[:background] = true if params[:background].nil? && params[:raw] == false
+      params[:baseline] = true if params[:baseline].nil? && params[:raw] == false
+			params[:firstderiv] = true if params[:firstderiv].nil? && params[:raw] == false
+			params[:secondderiv] = true if params[:secondderiv].nil? && params[:raw] == false
+      params[:cq] = true if params[:cq].nil? && params[:raw] == false
     else #if step_id is specified, only raw data is returned
       params[:raw] = true
       params[:background] = false
       params[:baseline] = false
+			params[:firstderiv] = false
+			params[:secondderiv] = false
       params[:cq] = false
     end
 
@@ -495,7 +649,7 @@ class ExperimentsController < ApplicationController
         if !@first_stage_collect_data.blank?
           last_cycle = FluorescenceDatum.last_cycle(@experiment.id, @first_stage_collect_data.id)
           @partial = (@experiment.running? && last_cycle < @first_stage_collect_data.num_cycles)
-          analyze_required = params[:background] == true || params[:baseline] == true || params[:cq] == true
+          analyze_required = params[:background] == true || params[:baseline] == true || params[:firstderiv] == true || params[:secondderiv] == true || params[:cq] == true
           if analyze_required
             begin
               task_submitted = background_calculate_amplification_data(@experiment, @first_stage_collect_data.id)
@@ -585,6 +739,8 @@ class ExperimentsController < ApplicationController
         attributes = []
         attributes << "background_subtracted_value" if params[:background] == true
         attributes << "baseline_subtracted_value" if params[:baseline] == true
+				attributes << "dr1_pred" if params[:firstderiv] == true
+				attributes << "dr2_pred" if params[:secondderiv] == true
         attributes << "fluorescence_value" if params[:raw] == true
         @amplification_data_group = group_by_keynames(@amplification_data, attributes, (params[:cq] == true)? @cts : nil)
 
@@ -612,7 +768,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :id
 				key :in, :path
-				key :description, 'id of the experiment for which we need melt curve data'
+				key :description, 'Id of the experiment for which we need melt curve data'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
@@ -620,49 +776,49 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :raw
 				key :in, :query
-				key :description, '?'
-				key :required, false
+				key :description, 'If raw data should be returned, by default it is not returned'
 				key :type, :boolean
+				key :required, false
+        key :default, false
 			end
 			parameter do
 				key :name, :normalized
 				key :in, :query
-				key :description, '?'
-				key :required, false
+				key :description, 'If normalized data should be returned, by default it is returned'
 				key :type, :boolean
+  			key :required, false
+        key :default, true
 			end
 			parameter do
 				key :name, :derivative
 				key :in, :query
-				key :description, '?'
-				key :required, false
+				key :description, 'If derivative data should be returned, by default it is returned'
 				key :type, :boolean
+        key :required, false
+        key :default, true
 			end
 			parameter do
 				key :name, :tm
 				key :in, :query
-				key :description, '?'
-				key :required, false
+				key :description, 'If tm values should be returned, by default it is returned'
 				key :type, :boolean
+				key :required, false
+        key :default, true
 			end
 			parameter do
 				key :name, :ramp_id
 				key :in, :query
-				key :description, '?'
-				key :required, false
-				key :type, :integer
-				key :format, :int64
+        key :description, '?'
+        key :required, false
+			  key :type, :array
+			  items do
+				  key :type, :integer
+          key :format, :int64
+        end
 			end
-			parameter do
-				key :name, :ramp_id
-				key :in, :query
-				key :description, '?'
-				key :required, false
-				key :type, :integer
-				key :format, :int64
-			end
+
 			response 200 do
-				key :description, 'melt curve data'
+				key :description, 'Melt curve data along with etag header'
 				schema do
 					key :type, :array
 					items do
@@ -670,8 +826,17 @@ class ExperimentsController < ApplicationController
 					end
 				end
 			end
+
+			response 202 do
+				key :description, 'Job accepted'
+			end
+
+      response 304 do
+				key :description, 'Melt curve data is not modified if etag is the same'
+			end
+
 			response :default do
-				key :description, 'unexpected error'
+				key :description, 'Unexpected error'
 				schema do
 					key :'$ref', :ErrorModel
 				end
@@ -824,7 +989,7 @@ class ExperimentsController < ApplicationController
       render :json=>{:errors=>"experiment not found"}, :status => :not_found
     end
   end
-
+  
 	swagger_path '/experiments/{id}/export' do
 		operation :get do
 			key :summary, 'Export Experiment'
@@ -838,16 +1003,26 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :id
 				key :in, :path
-				key :description, 'id of the experiment for which we need melt curve data'
+				key :description, 'Id of the experiment for which we need melt curve data'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
 			end
+
 			response 200 do
-				key :description, 'zipped data'
+				key :description, 'Zipped data'
+				schema do
+          key :type, :string
+          key :format, :binary
+				end
 			end
+
+			response 202 do
+				key :description, 'Job accepted'
+			end
+
 			response :default do
-				key :description, 'unexpected error'
+				key :description, 'Unexpected error'
 				schema do
 					key :'$ref', :ErrorModel
 				end
@@ -893,7 +1068,7 @@ class ExperimentsController < ApplicationController
 
         if amplification_data
           out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/amplification.csv")
-          columns = ["baseline_subtracted_value", "background_subtracted_value", "fluorescence_value", "channel", "well_num", "well_name", "cycle_num"]
+          columns = ["baseline_subtracted_value", "background_subtracted_value", "dr1_pred", "dr2_pred", "fluorescence_value", "channel", "well_num", "well_name", "cycle_num"]
           fluorescence_index = 0
           csv_string = CSV.generate do |csv|
             csv << columns
@@ -1007,7 +1182,35 @@ class ExperimentsController < ApplicationController
     end
   end
 
+  def start
+    if @experiment
+      proxy_request("http://localhost:8000/control/start", @experiment)
+    else
+      render json: {errors: "experiment not found #{params[:id]}"}, status: 404
+    end
+  end
+
+  def stop
+    if @experiment
+      proxy_request("http://localhost:8000/control/stop", @experiment)
+    else
+      render json: {errors: "experiment not found #{params[:id]}"}, status: 404
+    end
+  end
+
   protected
+
+  def proxy_request(url, experiment)
+    begin
+      body = {experiment_id: experiment.id}
+      headers = {"Authorization" => "Token #{authentication_token}", 'Content-Type' => 'application/json' }
+      response = HTTParty.post(url, body: body.to_json, headers: headers)
+      render :json=>response.body, :status=>response.code
+    rescue  => e
+      render json: {errors: "reatime server port 8000 cannot be reached: #{e}"}, status: 500
+      logger.error("real time server connection error: #{e}")
+    end
+  end
 
   def well_name(well_num)
     @wells ||= Well.wells(@experiment.id) if @experiment
@@ -1021,6 +1224,36 @@ class ExperimentsController < ApplicationController
   def generate_etag(partial, tag)
     return "partial:#{partial} tag:#{tag}"
   end
+  
+  def background_standard_curve_data(experiment)
+    background("standardcurve", experiment.id) do
+      begin
+        well_layout = WellLayout.for_experiment(experiment.id).first
+        if well_layout.is_a? WellLayout
+          wells = well_layout.standard_curve
+        else
+          wells = []
+        end
+        body = wells.map {|well| (well)? well.as_json_standard_curve : {}}
+        puts("body=#{body}")
+        start_time = Time.now
+        response = HTTParty.post("http://127.0.0.1:8081/experiments/#{@experiment.id}/standard_curve", body: body.to_json)
+        logger.info("Julia code time #{Time.now-start_time}")
+        if response.code != 200
+          raise_julia_error(response)
+        else
+          new_data = CachedStandardCurveDatum.new(:experiment_id=>experiment.id, :standard_curve_result=>response.body)
+        end
+      rescue  => e
+        logger.error("Julia error: #{e}")
+        raise e
+      ensure
+      end
+      #update cache
+      CachedStandardCurveDatum.import [new_data], :on_duplicate_key_update => [:standard_curve_result]
+    end
+  end
+  
 
   def background_calculate_amplification_data(experiment, stage_id)
     return nil if !FluorescenceDatum.new_data_generated?(experiment.id, stage_id)
@@ -1028,7 +1261,7 @@ class ExperimentsController < ApplicationController
     return background("amplification", experiment.id) do
       amplification_data, cts = calculate_amplification_data(experiment, stage_id, experiment.calibration_id)
       #update cache
-      AmplificationDatum.import amplification_data, :on_duplicate_key_update => [:background_subtracted_value,:baseline_subtracted_value]
+      AmplificationDatum.import amplification_data, :on_duplicate_key_update => [:background_subtracted_value,:baseline_subtracted_value,:dr1_pred,:dr2_pred]
       AmplificationCurve.import cts, :on_duplicate_key_update => [:ct]
     end
   end
@@ -1051,29 +1284,28 @@ class ExperimentsController < ApplicationController
       end
     end
 
-    config   = Rails.configuration.database_configuration
-    connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
+#    config   = Rails.configuration.database_configuration
+#    connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
     begin
-=begin
       body = {calibration_info: calibrate_hash(calibration_id), experiment_id: experiment.id}
       body = body.merge(experiment.experiment_definition.amplification_option.to_hash) if !experiment.experiment_definition.amplification_option.nil?
       logger.info("body=#{body}")
-      response = HTTParty.post("http://127.0.0.1:8080/experiments/#{experiment.id}/amplification", body: body.to_json)
+      response = HTTParty.post("http://127.0.0.1:8081/experiments/#{experiment.id}/amplification", body: body.to_json, timeout: 180)
       if response.code != 200
         raise_julia_error(response)
       else
         results = JSON.parse(response.body)
       end
-=end
-      results = connection.eval("tryCatchError(get_amplification_data, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment.id}, list(#{sub_type}_id=#{sub_id}), #{calibrate_info(calibration_id)} #{","+experiment.experiment_definition.amplification_option.to_rserve_params if !experiment.experiment_definition.amplification_option.nil?})")
-      results = results.to_ruby
+
+#     results = connection.eval("tryCatchError(get_amplification_data, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment.id}, list(#{sub_type}_id=#{sub_id}), #{calibrate_info(calibration_id)} #{","+experiment.experiment_definition.amplification_option.to_rserve_params if !experiment.experiment_definition.amplification_option.nil?})")
+#      results = results.to_ruby
     rescue  => e
-      #logger.error("Julia error: #{e}")
-      kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
+      logger.error("Julia error: #{e}")
+#      kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
       raise e
     ensure
-      connection.close
+#      connection.close
     end
     logger.info("R code time #{Time.now-start_time}")
     logger.info("results=#{results}")
@@ -1081,10 +1313,11 @@ class ExperimentsController < ApplicationController
     amplification_data = []
     cts = []
     if !results.blank?
-=begin
-      new julia code
+#     new julia code
       background_subtracted_results = results["rbbs_ary3"]
       baseline_subtracted_results = results["blsub_fluos"]
+			first_derivative_results = results["dr1_pred"]
+			second_derivative_results = results["dr2_pred"]
       cq_results = results["cq"]
       (0...background_subtracted_results.length).each do |channel|
         num_wells = background_subtracted_results[channel].length
@@ -1093,14 +1326,17 @@ class ExperimentsController < ApplicationController
           (0...num_cycles).each do |cycle_num|
             background_subtracted_value = background_subtracted_results[channel][well_num][cycle_num]
             baseline_subtracted_value = baseline_subtracted_results[channel][well_num][cycle_num]
-            amplification_data << AmplificationDatum.new(:experiment_id=>experiment.id, :stage_id=>stage_id, :sub_type=>sub_type, :sub_id=>sub_id, :channel=>channel+1, :well_num=>well_num+1, :cycle_num=>cycle_num+1, :background_subtracted_value=>background_subtracted_value, :baseline_subtracted_value=>baseline_subtracted_value)
+						dr1_pred = first_derivative_results[channel][well_num][cycle_num]
+						dr2_pred = second_derivative_results[channel][well_num][cycle_num]
+            amplification_data << AmplificationDatum.new(:experiment_id=>experiment.id, :stage_id=>stage_id, :sub_type=>sub_type, :sub_id=>sub_id, :channel=>channel+1, :well_num=>well_num+1, :cycle_num=>cycle_num+1, :background_subtracted_value=>background_subtracted_value,
+																												 :baseline_subtracted_value=>baseline_subtracted_value, :dr1_pred=>dr1_pred, :dr2_pred=>dr2_pred)
           end
         end
         (0...cq_results[channel].length).each do |well_num|
           cts << AmplificationCurve.new(:experiment_id=>experiment.id, :stage_id=>stage_id, :channel=>channel+1, :well_num=>well_num+1, :ct=>cq_results[channel][well_num])
         end
       end
-=end
+=begin
       raise results["message"] if !results["message"].blank? #catched error
       (0...results[0].length).each do |channel|
          background_subtracted_results = results[0][channel]
@@ -1125,6 +1361,7 @@ class ExperimentsController < ApplicationController
          end
       end
       #amplification_data.sort_by!{|x| [x.channel,x.well_num,x.cycle_num]}
+=end
     end
     logger.info("Rails code time #{Time.now-start_time}")
     return amplification_data, cts
@@ -1151,29 +1388,28 @@ class ExperimentsController < ApplicationController
   #  sleep(10)
   #  return [CachedMeltCurveDatum.new({:experiment_id=>experiment_id, :stage_id=>stage_id, :channel=>1, :well_num=>1, :temperature=>[121,122], :fluorescence_data=>[1001, 1002], :derivative=>[3,4], :tm=>[1,2,3], :area=>[1,2,5]})]
 
-    config   = Rails.configuration.database_configuration
-    connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
+#    config   = Rails.configuration.database_configuration
+#    connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
     begin
-=begin
       body = {calibration_info: calibrate_hash(calibration_id), experiment_id: experiment.id, stage_id: stage_id}
       body = body.merge({qt_prob: 0.1, max_normd_qtv:0.9}) if experiment.experiment_definition.guid == "thermal_consistency"
       #logger.info("body=#{body}")
-      response = HTTParty.post("http://127.0.0.1:8080/experiments/#{experiment.id}/meltcurve", body: body.to_json)
+      response = HTTParty.post("http://127.0.0.1:8081/experiments/#{experiment.id}/meltcurve", body: body.to_json)
       if response.code != 200
         raise_julia_error(response)
       else
         results = JSON.parse(response.body)
       end
-=end
-      results = connection.eval("tryCatchError(process_mc, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment.id}, #{stage_id}, #{calibrate_info(calibration_id)} #{", qt_prob=0.1, max_normd_qtv=0.9" if experiment.experiment_definition.guid == "thermal_consistency"})")
-      results = results.to_ruby
+
+#      results = connection.eval("tryCatchError(process_mc, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment.id}, #{stage_id}, #{calibrate_info(calibration_id)} #{", qt_prob=0.1, max_normd_qtv=0.9" if experiment.experiment_definition.guid == "thermal_consistency"})")
+#      results = results.to_ruby
     rescue  => e
-      #logger.error("Julia error: #{e}")
-      kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
+      logger.error("Julia error: #{e}")
+#      kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
       raise e
     ensure
-      connection.close
+#      connection.close
     end
     logger.info("R code time #{Time.now-start_time}")
     #logger.info("results=#{results}")
@@ -1181,7 +1417,6 @@ class ExperimentsController < ApplicationController
     ramp = Ramp.collect_data(stage_id).first
     melt_curve_data = []
     if !results.blank?
-=begin
       melt_curve_results = results["melt_curve_data"]
       melt_curve_analysis_results = results["melt_curve_analysis"]
       (0...melt_curve_results.length).each do |channel|
@@ -1192,7 +1427,7 @@ class ExperimentsController < ApplicationController
           melt_curve_data << hash
         end
       end
-=end
+=begin
       raise results["message"] if !results["message"].blank? #catched error
       (0...results.length).each do |channel|
         results[channel].each_index do |i|
@@ -1201,6 +1436,7 @@ class ExperimentsController < ApplicationController
           melt_curve_data << hash
         end
       end
+=end
     end
     logger.info("Rails code time #{Time.now-start_time}")
     return melt_curve_data
@@ -1208,13 +1444,12 @@ class ExperimentsController < ApplicationController
 
   def background_analyze_data(experiment)
     background("analyze", experiment.id) do
-      config   = Rails.configuration.database_configuration
-      connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
+#      config   = Rails.configuration.database_configuration
+#      connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
       begin
-=begin
         body = {calibration_info: calibrate_hash(experiment.calibration_id), experiment_info: experiment.as_json}
         #logger.info("body=#{body}")
-        response = HTTParty.post("http://127.0.0.1:8080/experiments/#{experiment.id}/analyze", body: body.to_json)
+        response = HTTParty.post("http://127.0.0.1:8081/experiments/#{experiment.id}/analyze", body: body.to_json)
         if response.code != 200
           raise_julia_error(response)
         else
@@ -1225,17 +1460,17 @@ class ExperimentsController < ApplicationController
             experiment.update_attributes(:analyze_status=>(analysis_results["valid"] != true)? "failed" : "success")
           end
         end
-=end
-        connection.eval("source(\"#{Rails.configuration.dynamic_file_path}/#{experiment.experiment_definition.guid}/analyze.R\")")
-        response = connection.eval("tryCatchError(analyze, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment.id}, #{calibrate_info(experiment.calibration_id)})").to_ruby
+
+#        connection.eval("source(\"#{Rails.configuration.dynamic_file_path}/#{experiment.experiment_definition.guid}/analyze.R\")")
+#        response = connection.eval("tryCatchError(analyze, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment.id}, #{calibrate_info(experiment.calibration_id)})").to_ruby
       rescue  => e
-        #logger.error("Julia error: #{e}")
-        kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
+        logger.error("Julia error: #{e}")
+#        kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
         raise e
       ensure
-        connection.close
+#        connection.close
       end
-      raise response["message"] if response && response.is_a?(Array) && !response["message"].blank?
+#      raise response["message"] if response && response.is_a?(Array) && !response["message"].blank?
 
       #update cache
       CachedAnalyzeDatum.import [new_data], :on_duplicate_key_update => [:analyze_result]

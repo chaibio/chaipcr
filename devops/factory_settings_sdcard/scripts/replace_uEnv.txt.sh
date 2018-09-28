@@ -195,7 +195,7 @@ uenvcmdusb=run loadusbfiles; run usbargs; bootz \${loadaddr} \${initrd_addr}:\${
 
 s2pressed=0
 uenvcmdmmc=echo "*** Boot button Unpressed..!!"; run loadfiles; run mmcargs; bootz \${loadaddr} \${initrd_addr}:\${initrd_size} \${fdtaddr}
-uenvcmdsdcard=bootpart=0:1;bootdir=;fdtaddr=0x81FF0000;optargs=quiet capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN;load mmc 0 \${loadaddr} uImage;run loadfdt;setenv bootargs console=\${console} \${optargs} s2pressed=\${s2pressed};bootm \${loadaddr} - \${fdtaddr}
+uenvcmdsdcard=bootpart=0:1;bootdir=;fdtaddr=0x81FF0000;setenv fdtfile am335x-boneblack.dtb;fatload mmc 0:1 \${fdtaddr} \${fdtfile};optargs=quiet capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN;load mmc 0 \${loadaddr} uImage;run loadfdt;setenv bootargs console=\${console} \${optargs} s2pressed=\${s2pressed};bootm \${loadaddr} - \${fdtaddr}
 uenvcmdsdcard_s2pressed=echo "*** Boot button pressed..!!"; setenv s2pressed 1; run uenvcmdsdcard
 
 uenvcmd=run shutdown_usb_power;if gpio input 72; then run uenvcmdsdcard_s2pressed; else run uenvcmdmmc; fi
@@ -217,7 +217,7 @@ uuid=${UUID}
 s2pressed=0
 shutdown_usb_power=i2c dev 0;i2c mw 0x24 1 0xec
 uenvcmdmmc=echo "*** Boot button Unpressed..!!"
-uenvcmdsdcard=bootpart=0:1;bootdir=;fdtaddr=0x81FF0000;optargs=quiet capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN;load mmc 0 \${loadaddr} uImage;run loadfdt;setenv bootargs console=\${console} \${optargs} s2pressed=\${s2pressed};bootm \${loadaddr} - \${fdtaddr}
+uenvcmdsdcard=bootpart=0:1;bootdir=;fdtaddr=0x81FF0000;setenv fdtfile am335x-boneblack.dtb;fatload mmc 0:1 \${fdtaddr} \${fdtfile};optargs=quiet capemgr.disable_setenv partno=BB-BONELT-HDMI,BB-BONELT-HDMIN;load mmc 0 \${loadaddr} uImage;run loadfdt;setenv bootargs console=\${console} \${optargs} s2pressed=\${s2pressed};bootm \${loadaddr} - \${fdtaddr}
 uenvcmdsdcard_s2pressed=echo "*** Boot button pressed..!!"; setenv s2pressed 1; run uenvcmdsdcard
 
 #uenvcmd=run shutdown_usb_power;if gpio input 72; then run uenvcmdsdcard_s2pressed; else run uenvcmdmmc; fi
@@ -227,6 +227,7 @@ uenvcmdsdcard_s2pressed=echo "*** Boot button pressed..!!"; setenv s2pressed 1; 
 #echo  "UEnvCMD is \$uenvcmd"
 
 # Updated: $NOW
+
 _EOF_
 fi
 
@@ -239,7 +240,7 @@ echo "#" >> $uEnvSDCard
 
 echo "SDCard version of uEnv.txt done updating"
 
-if [ -z $UUID_p1 ]
+if $fat_boot && [ -z $UUID_p1 ]
 then
 	echo "Can't find UUID for /boot/uboot partition!"
 	exit 0

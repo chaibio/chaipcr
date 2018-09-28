@@ -22,6 +22,8 @@ then
 fi
 
 rm -rf ./web/log
+ssh-keygen -f "/root/.ssh/known_hosts" -R $1
+
 rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./web "$1:/root/chaipcr/"
 rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./browser "$1:/root/chaipcr/"
 rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./bioinformatics "$1:/root/chaipcr/"

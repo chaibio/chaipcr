@@ -47,7 +47,7 @@ class ProtocolsController < ApplicationController
 			parameter do
 				key :name, :id
 				key :in, :path
-				key :description, 'protocol id'
+				key :description, 'Protocol id'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
@@ -58,7 +58,7 @@ class ProtocolsController < ApplicationController
 				key :description, 'Protocol properties to update'
 				key :required, true
 				schema do
-					key :'$ref', :Protocol_params
+					key :'$ref', :ProtocolInput
 				end
 			end
 			response 200 do

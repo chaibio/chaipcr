@@ -16,9 +16,10 @@ unzip 4.9-ti.zip
 cd dtb-rebuilder-4.9-ti/src/arm/
 patch < ../../../am33xx.dtsi.patch
 cd ../..
-make
-make install
-cp src/arm/am335x-boneblack-emmc-overlay.dtb /lib/firmware/
+make src/arm/am335x-boneblack-emmc-overlay.dtb 
+KERNEL_VERSION=$(uname -r)
+mkdir -p /boot/dtbs/$KERNEL_VERSION/
+cp -v src/arm/*.dtb /boot/dtbs/$KERNEL_VERSION/
 cp src/arm/am335x-boneblack-emmc-overlay.dtb /boot/dtbs/*/
 
 cd ..

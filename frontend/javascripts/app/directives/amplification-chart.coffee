@@ -13,6 +13,7 @@ window.App.directive 'amplificationChart', [
         scroll: '='
         zoom: '='
         onZoom: '&'
+        onUpdateProperties: '&'
         onSelectLine: '&'
         onUnselectLine: '&'
         show: '='
@@ -32,13 +33,19 @@ window.App.directive 'amplificationChart', [
 
         initChart = ->
           return if !$scope.data or !$scope.config or !$scope.show
+
           chart = new $window.ChaiBioCharts.AmplificationChart(elem[0], $scope.data, $scope.config)
           chart.onZoomAndPan($scope.onZoom())
           chart.onSelectLine($scope.onSelectLine())
           chart.onUnselectLine($scope.onUnselectLine())
-          d = chart.getDimensions()
-          $scope.onZoom()(chart.getTransform(), d.width, d.height, chart.getScaleExtent())
 
+          chart.onUpdateProperties($scope.onUpdateProperties())
+
+          d = chart.getDimensions()
+
+          # $scope.onZoom()(chart.getTransform(), d.width, d.height, chart.getScaleExtent())
+          # $scope.onUpdateProperties()($scope.label_cycle, $scope.label_RFU, $scope.label_dF_dC, $scope.label_D2_dc2)
+        
         $scope.$on 'window:resize', ->
           chart.resize() if chart and $scope.show
 
@@ -94,3 +101,4 @@ window.App.directive 'amplificationChart', [
 
     }
 ]
+ 

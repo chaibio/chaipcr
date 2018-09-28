@@ -23,20 +23,43 @@ if ! id | grep -q root; then
 	exit 0
 fi
 
-if [ -e /dev/mmcblk1p4 ] ; then
+if [ -e /dev/mmcblk1p3 ] ; then
 	sdcard_dev="/dev/mmcblk0"
 	eMMC="/dev/mmcblk1"
 fi
 
-if [ -e /dev/mmcblk0p4 ] ; then
+if [ -e /dev/mmcblk0p3 ] ; then
 	sdcard_dev="/dev/mmcblk1"
 	eMMC="/dev/mmcblk0"
 fi
 
-if [ ! -e "${eMMC}p4" ]
+if [ ! -e "${eMMC}p3" ]
 then
         echo "Proper partitionining not found!"
 	exit 1
+fi
+
+eMMC_boot=${eMMC}p1
+eMMC_root=${eMMC}p2
+eMMC_data=${eMMC}p3
+eMMC_perm=${eMMC}p4
+emmc_boot_files=/tmp/emmcboot
+three_partitions=false
+
+if [ -e $eMMC_perm ]
+then
+	mount | grep ${eMMC_boot}
+	if [ $? -gt 0 ]
+	then
+		umount ${eMMC_boot}
+	fi
+else
+	eMMC_boot=${eMMC}
+	eMMC_root=${eMMC}p1
+	eMMC_data=${eMMC}p2
+	eMMC_perm=${eMMC}p3
+	emmc_boot_files=/tmp/rootfs/boot/
+	three_partitions=true
 fi
 
 flush_cache_mounted () {
@@ -48,43 +71,51 @@ flush_cache_mounted () {
 	fi
 }
 
+setLedTimer () {
+	[ -e /sys/class/leds/beaglebone\:green\:usr0/trigger ] && echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+}
+
+setLedDefault () {
+	[ -e /sys/class/leds/beaglebone\:green\:usr0/trigger ] && echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+}
+
 write_pt_image () {
 	echo "Writing partition table image!"
-	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+	setLedTimer
         tar xOf $image_filename_upgrade $image_filename_pt | gunzip -c | dd of=${eMMC} bs=16M
 	flush_cache_mounted
-	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+	setLedDefault
 	echo "Done writing partition table image!"
 }
 
 write_rootfs_image () {
 	echo "Writing rootfs partition image!"
-	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
-        tar xOf $image_filename_upgrade $image_filename_rootfs | gunzip -c | dd of=${eMMC}p2 bs=16M
+	setLedTimer
+        tar xOf $image_filename_upgrade $image_filename_rootfs | gunzip -c | dd of=${eMMC_root} bs=16M
 	flush_cache_mounted
-	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+	setLedDefault
 	echo "Done writing rootfs partition image!"
 }
 
 write_data_image () {
         echo "Writing data partition image!"
-        echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
-        tar xOf $image_filename_upgrade $image_filename_data | gunzip -c | dd of=${eMMC}p3 bs=16M
+       	setLedTimer
+        tar xOf $image_filename_upgrade $image_filename_data | gunzip -c | dd of=${eMMC_data} bs=16M
 	flush_cache_mounted
-        echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+       	setLedDefault
         echo "Done writing data partition image!"
 }
 
 write_boot_image () {
 	echo "Writing boot partition image!"
-	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
-	tar xOf $image_filename_upgrade $image_filename_boot | gunzip -c | dd of=${eMMC}p1 bs=16M
+	setLedTimer
+	tar xOf $image_filename_upgrade $image_filename_boot | gunzip -c | dd of=${eMMC_boot} bs=16M
 	flush_cache_mounted
-	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+	setLedDefault
 	echo "Done writing boot partition image!"
 }
 
-echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+setLedTimer
 
 sdcard_p1="/sdcard/p1"
 sdcard_p2="/sdcard/p2"
@@ -105,28 +136,22 @@ else
 	echo performing upgrade
 fi
 
-mount | grep ${eMMC}p1
+mount | grep ${eMMC_root}
 if [ $? -gt 0 ]
 then
-	umount ${eMMC}p1
+	umount ${eMMC_root}
 fi
 
-mount | grep ${eMMC}p2
+mount | grep ${eMMC_data}
 if [ $? -gt 0 ]
 then
-	umount ${eMMC}p2
+	umount ${eMMC_data}
 fi
 
-mount | grep ${eMMC}p3
+mount | grep ${eMMC_perm}
 if [ $? -gt 0 ]
 then
-	umount ${eMMC}p3
-fi
-
-mount | grep ${eMMC}p4
-if [ $? -gt 0 ]
-then
-	umount ${eMMC}p4
+	umount ${eMMC_perm}
 fi
 
 if [ ! -e ${sdcard_p1} ]
@@ -172,8 +197,8 @@ then
 		rm ${sdcard_p2}/unpack_resume_autorun.flag || true
 	fi
 
-	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
-	echo default-on > /sys/class/leds/beaglebone\:green\:usr1/trigger
+	setLedDefault
+	[ -e /sys/class/leds/beaglebone\:green\:usr1/trigger ] && echo default-on > /sys/class/leds/beaglebone\:green\:usr1/trigger
 
 	exit 0
 fi
@@ -231,21 +256,39 @@ then
 	#reboot needs to set sdcard only
 fi
 
-update_uenv () {                                                        
-# first param =2 in case of upgrade.. =1 for factory settings.                               
-        echo copying coupling uEng.txt                                                           
+update_uenv () {
         if [ ! -e /tmp/emmcboot ]                                                
         then                                                                     
               mkdir -p /tmp/emmcboot                                             
         fi
-		                                                                       
-        mount ${eMMC}p1 /tmp/emmcboot -t vfat || true                            
-                                       
+
+	# first param =2 in case of upgrade.. =1 for factory settings.                               
+        if $three_partitions
+        then
+		echo Dealing with uEnv.txt on three partitions system.
+		if [ ! -e /tmp/rootfs ] 
+		then
+			mkdir -p /tmp/rootfs || true
+		fi
+		mount | grep ${eMMC_root}
+		if [ $? -eq 0 ]
+		then
+			echo ${eMMC_root} is mounted already.
+			mount
+		else
+			mount ${eMMC_root} /tmp/rootfs || true
+		fi
+	else
+		echo Dealing with four partitions system.
+	        echo copying coupling uEng.txt                                                           
+	        mount ${eMMC_boot} $emmc_boot_files -t vfat || true                            
+        fi
+
 	echo resetting to boot switch dependant uEnv                       
-        cp /sdcard/p1/uEnv.txt /tmp/emmcboot/ || true                            
+#        cp /sdcard/p1/uEnv.txt $emmc_boot_files || true                            
         cp /mnt/uEnv.72check.txt /mnt/uEnv.txt || true                
         cp /sdcard/p1/uEnv.72check.txt /sdcard/p1/uEnv.txt || true                
-        cp /tmp/emmcboot/uEnv.72check.txt /tmp/emmcboot/uEnv.txt || true                            
+        cp $emmc_boot_files/uEnv.72check.txt $emmc_boot_files/uEnv.txt || true                            
 
         if [ $1 -eq 2 ]                                             
         then                                                                                     
@@ -264,16 +307,45 @@ update_uenv () {
 
         sync                                                                                     
         sleep 5                                                                                  
-        umount /tmp/emmcboot || true                                                   
+        if $three_partitions
+        then
+		umount /tmp/rootfs || true
+	else
+	        umount /tmp/emmcboot || true                                                   
+        fi
 }                                                                                      
 
 # needs to add a uEnv to swtich things to sdcard
 echo "Freeup boot partition during the backup process"
-mount ${eMMC}p1 /tmp/emmcboot
-rm /tmp/emmcboot/* > /dev/null || true
-sync
-sleep 3
-umount /tmp/emmcboot || true
+
+if $three_partitions
+then
+	echo three partitions system
+	if [ ! -e /tmp/rootfs ] 
+	then
+		mkdir -p /tmp/rootfs || true
+	fi
+	mount | grep ${eMMC_root}
+	if [ $? -eq 0 ]
+	then
+		echo ${eMMC_root} is mounted already
+		mount
+	else
+		mount ${eMMC_root} /tmp/rootfs || true
+	fi
+	rm /tmp/rootfs/boot/* > /dev/null || true
+	sync
+	sleep 3
+	umount /tmp/rootfs || true
+else
+	echo four partitions system
+	mount ${eMMC_boot} $emmc_boot_files || true
+	rm /tmp/emmcboot/* > /dev/null || true
+	sync
+	sleep 3
+	umount /tmp/emmcboot || true
+fi
+
 increment_stage_counter
 
 if [ "$1" = "factorysettings" ]
@@ -312,7 +384,7 @@ echo "Upgrade resume flag down!"
 
 sync
 
-echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+setLedDefault
 
 upgrade_autorun_flag_up () {
 	echo "Autorun scripts after boot.. requested on $NOW" > ${sdcard_p2}/upgrade_autorun.flag
@@ -345,11 +417,11 @@ fi
 if [ "$1" != "factorysettings" ]
 then
 	mkdir -p /tmp/data
-	mount ${eMMC}p3 /tmp/data
+	mount ${eMMC_data} /tmp/data
 	if [ -e /tmp/data/.tmp/shadow.backup ] || [ -e /tmp/data/.tmp/dhclient.*.leases ]
 	then
 		mkdir -p /tmp/rootfs
-		mount ${eMMC}p2 /tmp/rootfs
+		mount ${eMMC_root} /tmp/rootfs
 		mv /tmp/data/.tmp/shadow.backup /tmp/rootfs/etc/shadow || true
 		mv /tmp/data/.tmp/dhclient.*.leases /tmp/rootfs/var/lib/dhcp/ || true
 		rm -r /tmp/data/.tmp || true

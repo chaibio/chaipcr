@@ -23,17 +23,17 @@ if ! id | grep -q root; then
 	exit 0
 fi
 
-if [ -e /dev/mmcblk1p4 ] ; then
+if [ -e /dev/mmcblk1p3 ] ; then
 	sdcard_dev="/dev/mmcblk0"
 	eMMC="/dev/mmcblk1"
 fi
 
-if [ -e /dev/mmcblk0p4 ] ; then
+if [ -e /dev/mmcblk0p3 ] ; then
 	sdcard_dev="/dev/mmcblk1"
 	eMMC="/dev/mmcblk0"
 fi
 
-if [ ! -e "${eMMC}p4" ]
+if [ ! -e "${eMMC}p3" ]
 then
         echo "Proper eMMC partitionining not found!"
 	exit 1

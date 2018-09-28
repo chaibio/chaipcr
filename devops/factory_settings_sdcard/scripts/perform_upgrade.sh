@@ -32,19 +32,40 @@ if ! id | grep -q root; then
 	exit_with_message "must be run as root" 5 $1
 fi
 
-if [ -e /dev/mmcblk1p4 ] ; then
+if [ -e /dev/mmcblk1p3 ] ; then
 	sdcard_dev="/dev/mmcblk0"
 	eMMC="/dev/mmcblk1"
 fi
 
-if [ -e /dev/mmcblk0p4 ] ; then
+if [ -e /dev/mmcblk0p3 ] ; then
 	sdcard_dev="/dev/mmcblk1"
 	eMMC="/dev/mmcblk0"
 fi
 
-if [ ! -e "${eMMC}p4" ]
+if [ ! -e "${eMMC}p3" ]
 then
         exit_with_message "Proper eMMC partitionining not found!" 1 $1
+fi
+
+eMMC_boot=${eMMC}p1
+eMMC_root=${eMMC}p2
+eMMC_data=${eMMC}p3
+eMMC_perm=${eMMC}p4
+uEnvPath=/tmp/uEnvPath
+
+if [ -e $eMMC_perm ]
+then
+	echo four partitions system
+else
+	eMMC_boot=
+	eMMC_root=${eMMC}p1
+	eMMC_data=${eMMC}p2
+	eMMC_perm=${eMMC}p3
+fi
+
+if [ ! -e $emmc_boot_files ]
+then
+	mkdir -p $emmc_boot_files
 fi
 
 verify_checksum () {
@@ -90,9 +111,24 @@ echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
 echo "Verifying.."
 verify_checksum
 
+reset_s2 () {
+	echo "Resetting s2 button!"
+	echo 72 > /sys/class/gpio/export
+	cat /sys/class/gpio/gpio72/value
+	echo out > /sys/class/gpio/gpio72/direction
+	echo 0 > /sys/class/gpio/gpio72/value
+	cat /sys/class/gpio/gpio72/value	
+	echo 72 > /sys/class/gpio/unexport
+}
+
 set_sdcard_uEnv () {
+	if [ -e ${uEnvPath}/uEnv.txt ]
+	then
+		echo Processing ${uEnvPath}/uEnv.txt
+	else
+		return 1
+	fi
 	cp ${uEnvPath}/uEnv.txt ${uEnvPath}/uEnv.org.txt
-#	cp ${uEnvPath}/uEnv.sdcard.txt ${uEnvPath}/uEnv.txt
 	sync
 	file1=${uEnvPath}/uEnv.sdcard.txt
 	file2=${uEnvPath}/uEnv.txt
@@ -122,18 +158,22 @@ reset_sdcard_uEnv () {
 	sync
 }
 
-uEnvPath=/tmp/uEnvPath
 
 if [ ! -e "$uEnvPath" ]
 then
 	mkdir -p ${uEnvPath} > /dev/null
 fi
 
-#umount ${uEnvPath} > /dev/null
-mount ${eMMC}p1 ${uEnvPath} -t vfat
-set_sdcard_uEnv
-sync
-umount ${uEnvPath}> /dev/null
+if [ -z $eMMC_boot ]
+then
+ 	echo none fat boot
+else
+	#umount ${uEnvPath} > /dev/null
+	mount ${eMMC_boot} ${uEnvPath} -t vfat
+	set_sdcard_uEnv
+	sync
+	umount ${uEnvPath}> /dev/null
+fi
 
 mount ${sdcard_dev}p1 ${uEnvPath} -t vfat
 set_sdcard_uEnv
@@ -157,11 +197,16 @@ mount -o remount,rw ${uEnvPath}
 set_sdcard_uEnv
 sync
 
+uEnvPath=/boot
+mount -o remount,rw ${uEnvPath}
+set_sdcard_uEnv
+sync
+
 uEnvPath=/sdcard/factory
 mount -o remount,rw ${uEnvPath}
 
 echo "Checking if factory settings scripts should be upgraded..."
-version_file=/sdcard/factory/fs_Version.inf
+version_file=/sdcard/factory/fs_version.inf
 version_current=0
 if [ -e ${version_file} ]
 then
@@ -215,6 +260,8 @@ fi
 
 cp /var/lib/dhcp/dhclient.*.leases /data/.tmp/
 sync
+
+reset_s2
 
 sh $BASEDIR/rebootx.sh
 exit_with_message Success 0 $1

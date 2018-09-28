@@ -51,7 +51,7 @@ class StagesController < ApplicationController
 			parameter do
 				key :name, :protocol_id
 				key :in, :path
-				key :description, 'id of the protocol'
+				key :description, 'Id of the protocol'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
@@ -60,9 +60,9 @@ class StagesController < ApplicationController
 				key :name, :prev_id
 				key :in, :body
 				key :required, false
-				key :description, 'properties of the stage'
+				key :description, 'Properties of the stage'
 				schema do
-					key :'$ref', :CreateStageInput
+					key :'$ref', :StageInput
 				end
 			end
 			response 200 do
@@ -99,7 +99,7 @@ class StagesController < ApplicationController
 			parameter do
 				key :name, :stage_id
 				key :in, :path
-				key :description, 'id of the stage'
+				key :description, 'Id of the stage'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
@@ -145,7 +145,7 @@ class StagesController < ApplicationController
 			parameter do
 				key :name, :stage_id
 				key :in, :path
-				key :description, 'id of the stage'
+				key :description, 'Id of the stage'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
@@ -156,7 +156,7 @@ class StagesController < ApplicationController
 				key :description, 'Previous stage id'
 				key :required, true
 				schema do
-					 key :'$ref', :StageMoveInput
+					 key :'$ref', :StageInput
 				 end
 			end
 			response 200 do
@@ -192,7 +192,7 @@ class StagesController < ApplicationController
 			parameter do
 				key :name, :stage_id
 				key :in, :path
-				key :description, 'id of the stage'
+				key :description, 'Id of the stage'
 				key :required, true
 				key :type, :integer
 				key :format, :int64

@@ -20,6 +20,7 @@ require "net/http"
 require 'digest/md5'
 require 'json'
 require 'zip'
+require "httparty"
 
 class DevicesController < ApplicationController
   include ParamsHelper
@@ -41,7 +42,7 @@ class DevicesController < ApplicationController
 
   swagger_path '/device' do
     operation :get do
-      key :summary, 'Device information'
+      key :summary, 'Device information. Authentication Token is not required.'
       key :description, 'Returns device specific information'
       key :produces, [
         'application/json',
@@ -50,7 +51,7 @@ class DevicesController < ApplicationController
 				'Device'
 			]
       response 200 do
-        key :description, 'device response'
+        key :description, 'Object containing device information'
         schema do
             key :'$ref', :Device
         end
@@ -100,10 +101,9 @@ class DevicesController < ApplicationController
 				'Device'
 			]
       response 200 do
-        key :description, 'capabilities response'
+        key :description, 'Object containing device capabilities information'
         schema do
-          key :type, :object
-          key :'$ref', :Configuration
+          key :'$ref', :Capabilities
         end
       end
     end
@@ -133,7 +133,7 @@ class DevicesController < ApplicationController
 				'Device'
 			]
       response 200 do
-        key :description, 'Device status response'
+        key :description, 'Object containing device status information'
         schema do
           key :type, :object
           key :'$ref', :Status
@@ -144,12 +144,13 @@ class DevicesController < ApplicationController
 
   api :GET, "/device/status", "status of the machine"
   def status
-    url = URI.parse("http://localhost:8000/status?access_token=#{authentication_token}")
     begin
-      response = Net::HTTP.get_response(url)
+      headers = {"Authorization" => "Token #{authentication_token}"}
+      response = HTTParty.get("http://localhost:8000/status", headers: headers)
       render :json=>response.body, :status=>response.code
     rescue  => e
       render json: {errors: "reatime server port 8000 cannot be reached: #{e}"}, status: 500
+      logger.error("real time server connection error: #{e}")
     end
   end
 
@@ -298,7 +299,7 @@ class DevicesController < ApplicationController
     end
   end
 
-
+=begin
   swagger_path '/device/software_update' do
     operation :get do
       key :summary, 'Query the software update meta data'
@@ -318,6 +319,7 @@ class DevicesController < ApplicationController
       end
     end
   end
+=end
 
   api :GET, "/device/software_update", "query the software update meta data"
   example "{'upgrade':{'version':'1.0.1','release_date':null,'brief_description':'this is the brief description','full_description':'this is the full description'}}"

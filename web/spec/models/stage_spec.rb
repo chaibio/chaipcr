@@ -9,13 +9,13 @@ describe Stage do
     it "cycling stage with default name and default steps" do
       stage = cycle_stage(@protocol).reload
       stage.name.should eq("Cycling Stage")
-      stage.steps.should have(2).items
+      expect(stage.steps.size).to eq(2)
     end
     
     it "meltcurve stage with default name and default steps" do
       stage = meltcurve_stage(@protocol).reload
       stage.name.should eq("Melt Curve Stage")
-      stage.steps.should have(3).items
+      expect(stage.steps.size).to eq(3)
       stage.steps.last.ramp.should_not be_nil
     end
   
@@ -47,7 +47,7 @@ describe Stage do
       new_stage.prev_id = stage.id
       new_stage.save
       new_stage = new_stage.reload
-      new_stage.steps.should have(1).items
+      expect(new_stage.steps.size).to eq(1)
       new_stage.steps.first.should be_same_step_as(stage.steps.last)
     end
     
@@ -58,8 +58,8 @@ describe Stage do
       step.save
       new_stage = Stage.new(:stage_type=>Stage::TYPE_HOLD, :protocol_id=>@protocol.id)
       new_stage.prev_id = stage.id
-      new_stage.save.should be_false
-      new_stage.errors.should have(1).item
+      new_stage.save.should be_falsey
+      expect(new_stage.errors.size).to eq(1)
     end
   end
   
@@ -76,8 +76,8 @@ describe Stage do
     it "last stage cannot be destroyed" do
       stage = hold_stage(@protocol)
       stage.destroy
-      @protocol.reload.stages.should have(1).items
-      stage.errors.should have(1).item
+      expect(@protocol.reload.stages.size).to eq(1)
+      expect(stage.errors.size).to eq(1)
     end
   end
   
@@ -86,7 +86,7 @@ describe Stage do
      stage = hold_stage(@protocol)
      stage.auto_delta = 1
      stage.save
-     stage.errors.should have(1).item
+     expect(stage.errors.size).to eq(1)
     end
     
     it "start cycle cannot be greater than number of cycle" do
@@ -94,7 +94,7 @@ describe Stage do
      stage.auto_delta = 1
      stage.auto_delta_start_cycle = stage.num_cycles + 1
      stage.save
-     stage.errors.should have(1).item
+     expect(stage.errors.size).to eq(1)
     end
   end
 end

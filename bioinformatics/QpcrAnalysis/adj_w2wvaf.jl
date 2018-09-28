@@ -163,7 +163,7 @@ function get_wva_data(
     end # if
 
     if length(well_nums) > length(complete_well_nums) # not use `setdiff` because `well_nums` may be `[]` to select all available wells
-        error("Calibration data are not complete for these wells: $(join(setdiff(well_nums, found_well_nums), ", ")). ")
+        error("Calibration data are not complete for these wells: $(join(setdiff(well_nums, complete_well_nums), ", ")). ")
     end
 
     wva_data_dict = OrderedDict([

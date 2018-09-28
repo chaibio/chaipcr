@@ -51,7 +51,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
 		};
 
 		$scope.select = function(kit){
-			alert(kit);
+			// alert(kit);
 		};
 
 		$scope.create = function(){

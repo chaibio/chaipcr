@@ -20,37 +20,36 @@ class User < ActiveRecord::Base
   include Swagger::Blocks
 
   swagger_schema :User do
-    key :required, [:id, :name]
-    property :id do
-      key :type, :integer
-      key :format, :int64
-    end
-    property :name do
-      key :type, :string
-    end
-    property :email do
-      key :type, :string
-    end
-    property :role do
-      key :type, :string
-    end
+		property :user do
+			property :id do
+				key :type, :integer
+				key :format, :int64
+			end
+			property :name do
+	      key :type, :string
+	    end
+	    property :email do
+	      key :type, :string
+	    end
+	    property :role do
+	      key :type, :string
+	    end
+		end
   end
 
   swagger_schema :UserInput do
-    allOf do
-      schema do
-        key :'$ref', :User
-      end
-      schema do
-        key :required, [:name]
-        property :name do
-          key :type, :string
-        end
-        property :guid do
-          key :type, :string
-        end
-      end
-    end
+		key :required, [:user]
+		property :user do
+			property :name do
+	      key :type, :string
+	    end
+	    property :email do
+	      key :type, :string
+	    end
+	    property :role do
+	      key :type, :string
+	    end
+		end
   end
 
 

@@ -8,6 +8,7 @@ using HttpServer, QpcrAnalysis
 # end
 
 http = HttpHandler() do req::Request, res::Response
+	code = 0
 	if ismatch(r"^/experiments/",req.resource)
 		nodes = split(req.resource,'/');
 		experiment_id = parse(Int,nodes[3])
@@ -28,4 +29,4 @@ http = HttpHandler() do req::Request, res::Response
 end
 
 server = Server( http )
-run( server, 8080 )
+run( server, 8081 )
