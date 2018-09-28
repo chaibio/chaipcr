@@ -162,6 +162,7 @@ window.ChaiBioTech.ngApp
 
     self.getAmplificationData = (expId) ->
       console.log('strange')
+      #alert('strange')
       deferred = $q.defer()
       $http.get("/experiments/#{expId}/amplification_data").then (resp) ->
         deferred.resolve(resp)
@@ -177,7 +178,7 @@ window.ChaiBioTech.ngApp
 
     self.getStandardCurveData = (expId) ->
       deferred = $q.defer()
-      $http.get("/experiments/#{expId}/standard_curve").then (resp) ->
+      $http.get("/experiments/#{expId}/amplification_data").then (resp) ->
         deferred.resolve(resp)
       , (resp) ->
         if resp.toString().indexOf('SyntaxError') > -1

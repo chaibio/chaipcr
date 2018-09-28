@@ -321,7 +321,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           .then (resp) ->
             $scope.fetching = false
             $scope.error = null
-            
+            #alert('haha3');
             # alert(resp)
             # console.log(resp)
 
@@ -357,11 +357,17 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       updateButtonCts = ->
         for well_i in [0..15] by 1
-          cts = _.filter AMPLI_DATA_CACHE.cq, (ct) ->
+          cts = _.filter AMPLI_DATA_CACHE.summary_data, (ct) ->
             ct[1] is well_i+1
           $scope.wellButtons["well_#{well_i}"].ct = [cts[0][2]]
           $scope.wellButtons["well_#{well_i}"].ct.push cts[1][2] if cts[1]
         return
+        # for well_i in [0..15] by 1
+        #   cts = _.filter AMPLI_DATA_CACHE.cq, (ct) ->
+        #     ct[1] is well_i+1
+        #   $scope.wellButtons["well_#{well_i}"].ct = [cts[0][2]]
+        #   $scope.wellButtons["well_#{well_i}"].ct.push cts[1][2] if cts[1]
+        # return
 
       updateSeries = (buttons) ->
         buttons = buttons || $scope.wellButtons || {}
