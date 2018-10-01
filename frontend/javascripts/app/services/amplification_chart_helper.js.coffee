@@ -82,13 +82,18 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         channel_data = _.filter amplification_data, (datum) ->
           datum[0] is channel_i
         for cycle_i in [1..max_cycle] by 1
+          
           data_by_cycle = _.filter channel_data, (datum) ->
             datum[2] is cycle_i
           data_by_cycle = _.sortBy data_by_cycle, (d) ->
             d[1]
           channel_datasets[dataset_name].push data_by_cycle
 
+        console.log('channel_datasets[dataset_name]')
+        console.log(channel_datasets[dataset_name])
+        
         channel_datasets[dataset_name] = _.map channel_datasets[dataset_name], (datum) ->
+      
           pt = cycle_num: datum[0][2]
           for y_item, i in datum by 1
             pt["well_#{i}_background"] = y_item[3]

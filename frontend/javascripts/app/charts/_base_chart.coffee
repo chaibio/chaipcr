@@ -21,6 +21,8 @@ class BaseChart
     bottom: 0
 
   constructor: (@elem, @data, @config) ->
+    # console.log('@data')
+    # console.log(@data)
     @initChart()
 
   getLineCurve: ->
@@ -156,7 +158,6 @@ class BaseChart
 
   drawBox: (line_config) ->
     @box.container.remove() if @box
-
     headerHeight = 25
     headerTextSize = 15
     valuesTextSize = 12
@@ -311,13 +312,19 @@ class BaseChart
         .on 'click', => @unsetActivePath()
 
   makeColoredLine: (line_config) ->
-    
+    # alert('makeColoredLine')
     xScale = @getXScale()
     yScale = @getYScale()
+
     line = d3.line()
     line.curve(@getLineCurve())
+
     line.x (d) -> xScale(d[line_config.x])
     line.y (d) -> yScale(d[line_config.y])
+
+    # console.log('@data')
+    # console.log(@data)
+
     _path = @viewSVG.append("path")
         .datum(@data[line_config.dataset])
         .attr("class", "colored-line")
@@ -361,8 +368,10 @@ class BaseChart
         .attr('stroke-width', @ACTIVE_PATH_STROKE_WIDTH + 3)
 
   drawLines: ->
+    
     series = @config.series
     return if not series
+    
     @guidingLines = @guidingLines || []
     for l in @guidingLines by 1
       l.remove()
@@ -372,6 +381,7 @@ class BaseChart
       l.remove()
     @lines = []
     @activePath = null
+    
     for s in series by 1
     #  console.log(s)
       @guidingLines.push(@makeGuidingLine(s))
@@ -1170,8 +1180,7 @@ class BaseChart
     if typeof @onClickAxisInput is 'function'
       @onClickAxisInput 'y:max', @yAxisUpperExtremeValue
 
-  
-  drawYAxisLowerExtremeValue: ->
+    drawYAxisLowerExtremeValue: ->
 
     textContainer = @chartSVG.append('g')
       .attr('class', 'axes-extreme-value tick')
@@ -1470,8 +1479,6 @@ class BaseChart
         @showMouseIndicators()
 
       @prevMousePosition = [pos.x, pos.y]
-
-     
 
   setHoveredLine: ->
     mouse = @getMousePosition(@mouseOverlay.node())

@@ -37,6 +37,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.chartConfig.channels = if is_dual_channel then 2 else 1
       $scope.chartConfig.axes.x.max = $stateParams.max_cycle || 1
       $scope.amplification_data = helper.paddData()
+
       $scope.COLORS = helper.COLORS
       AMPLI_DATA_CACHE = null
       retryInterval = null
@@ -89,8 +90,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       $scope.bgcolor_target = {
         'background-color':'#666666'
-        
       }
+        
       $scope.bgcolor_wellSample = {
         'background-color':'#666666'
       }
@@ -259,7 +260,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.updateSamplesSet = ->
         $scope.samplesSet = []
 
-        
         for i in [0...16]
           if $scope.samples[i] and $scope.samplesSet.indexOf($scope.samples[i]) < 0
             $scope.samplesSet.push($scope.samples[i])
@@ -321,13 +321,14 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           .then (resp) ->
             $scope.fetching = false
             $scope.error = null
-            #alert('haha3');
-            # alert(resp)
-            # console.log(resp)
+            console.log('-------------------------haha3--------------------------------')
+            console.log(resp)
 
             if (resp.status is 200 and resp.data?.partial and $scope.enterState) or (resp.status is 200 and !resp.data.partial)
               $scope.hasData = true
               $scope.amplification_data = helper.paddData()
+            if (resp.status is 304)
+              $scope.hasData = false
             if resp.status is 200 and !resp.data.partial
               $rootScope.$broadcast 'complete'
             if (resp.data.steps?[0].amplification_data and resp.data.steps?[0].amplification_data?.length > 1 and $scope.enterState) or (resp.data.steps?[0].amplification_data and resp.data.steps?[0].amplification_data?.length > 1 and !resp.data.partial)
@@ -340,10 +341,12 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
               AMPLI_DATA_CACHE = angular.copy data
               $scope.amplification_data = data.amplification_data
+
               updateButtonCts()
               updateSeries()
 
-            if ((resp.data?.partial is true) or (resp.status is 202)) and !$scope.retrying
+              # retry()
+            if ((resp.data?.partial is true) or (resp.status is 202) or (resp.status is 304)) and !$scope.retrying
               retry()
 
           .catch (resp) ->
