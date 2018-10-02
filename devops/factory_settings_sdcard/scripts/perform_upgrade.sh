@@ -261,9 +261,6 @@ fi
 cp /var/lib/dhcp/dhclient.*.leases /data/.tmp/
 sync
 
-echo "Make sure to run mysql upgrade script that updates innodb tables"
-mysql_upgrade
-
 reset_s2
 
 sh $BASEDIR/rebootx.sh
