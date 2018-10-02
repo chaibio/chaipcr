@@ -272,7 +272,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $scope.targets[resp.data[i].well.well_num - 1] = resp.data[i].well.targets[0] if resp.data[i]
         $scope.updateTargetsSet()
         $scope.updateSamplesSet()
-        
+                
         updateSeries()
 
       Experiment.get(id: $stateParams.id).then (data) ->

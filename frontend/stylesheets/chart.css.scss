@@ -188,10 +188,10 @@
   padding-right: 0;
   padding-left: 0;
   // vertical-align: top;
-  $item_switch_gap: 70px;
+  $item_switch_gap: 20px;
   .subheader-switches {
     margin-top: 20px;
-    margin-left: -50px;
+    margin-left: 0px;
     margin-right: 20px;
     .item-switch {
       display: inline-block;
@@ -240,7 +240,7 @@
     .item-switch-channel {
       display: inline-block;
       margin-left: 20px;
-      float: right;
+      float: left;
       .switch {
         height: 15px;
         margin-top: -2px;
@@ -272,7 +272,7 @@
       label {
         color: $gray;
         display: inline-block;
-        margin-left: 6px;
+        margin-left: 15px;
         font-weight: 700;
         padding-right: 18px;
       }
@@ -443,5 +443,5 @@
 }
 
 .chart-well-switch {
-  margin-top: 30px;
+  margin-top: 0px;
 }

@@ -1180,7 +1180,7 @@ class BaseChart
     if typeof @onClickAxisInput is 'function'
       @onClickAxisInput 'y:max', @yAxisUpperExtremeValue
 
-    drawYAxisLowerExtremeValue: ->
+  drawYAxisLowerExtremeValue: ->
 
     textContainer = @chartSVG.append('g')
       .attr('class', 'axes-extreme-value tick')

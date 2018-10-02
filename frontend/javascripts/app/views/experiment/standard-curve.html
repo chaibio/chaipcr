@@ -18,14 +18,14 @@ limitations under the License.
 -->
 <div class="standardcurve-chart-state-active results-charts">
   <div class="page-layout" ng-controller="StandardCurveChartCtrl" ng-show="experiment">
-    <div class="content row">
-      <div class="chart-section col-lg-8 col-md-8 col-sm-6 col-xs-6">
+    <div class="content row" style="padding-left: 0px; padding-right: 0px">
+      <div class="chart-section col-lg-8 col-md-8 col-sm-6 col-xs-6" style="padding-left: 0px; padding-right: 0px;">
         <div>
-          <div class="curve-header">
+          <div class="curve-header" style="margin-top: 20px;">
             <div>
-              <div class="col-lg-4 col-md-5 col-sm-5 col-xs-5 curve-name">
+              <div class="col-lg-4 col-md-5 col-sm-5 col-xs-5 curve-name" style="padding-left: 20px;">
                 <!-- <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()"> -->
-                <chart-chooser class="curve-title H1" experiment="experiment" current-chart="$parent.chart" style="font-size: 30px">
+                <chart-chooser class="curve-title H1" experiment="experiment" current-chart="$parent.chart">
                   Standard Curve
                   <img class="arrow-down" src="/images/arrow-down.png">
                 </chart-chooser>
@@ -210,7 +210,7 @@ limitations under the License.
           <chart-well-switch ng-model="wellButtons" color-by="color_by" chart-type="amplification"></chart-well-switch>
         </div>
       </div>
-      <div class="table-container col-lg-4 col-md-4 col-sm-6 col-xs-6" full-height offset="110" min="808" style="padding-right: 0; padding-left: 0;">
+      <div class="table-container col-lg-4 col-md-4 col-sm-6 col-xs-6" full-height offset="110" min="808" style="padding-right: 0; padding-left: 0; margin-top:0px;">
         <table>
           <tbody>
             <tr>

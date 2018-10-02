@@ -320,7 +320,7 @@
     margin-left: 0;
     margin-right: 0;
     .plot-options {
-      text-align: right;
+      text-align: left;
       padding-right: 30px;
       .plot-option {
         display: inline-block;
@@ -352,100 +352,6 @@
     padding-left: 0;
     // vertical-align: top;
     $item_switch_gap: 70px;
-    .subheader-switches {
-      margin-top: 20px;
-      margin-left: -50px;
-      margin-right: 20px;
-      .item-switch {
-        display: inline-block;
-        margin-left: $item_switch_gap;
-        .switch {
-          height: 15px;
-          margin-top: -2px;
-          width: 31px;
-          vertical-align: middle;
-          margin-left: 6px;
-          small {
-            width: 15px;
-            height: 15px;
-            border-width: 4px;
-          }
-          &.checked {
-            small {
-              left: 16px;
-            }
-          }
-        }
-        &.auto {
-          .switch {
-            background: #BBB;
-            border-color: #BBB;
-          }
-          small {
-            background: #bbb;
-          }
-          .set-auto {
-            color: $gray;
-          }
-        }
-        label {
-          color: $gray;
-          display: inline-block;
-          margin-left: 15px;
-          font-weight: 700;
-        }
-        span.set-auto {
-          color: $blue;
-          cursor: pointer;
-          margin-left: 15px;
-        }
-      }
-      .item-switch-channel {
-        display: inline-block;
-        margin-left: 20px;
-        float: right;
-        .switch {
-          height: 15px;
-          margin-top: -2px;
-          width: 31px;
-          vertical-align: middle;
-          small {
-            width: 15px;
-            height: 15px;
-            border-width: 4px;
-          }
-          &.checked {
-            small {
-              left: 16px;
-            }
-          }
-        }
-        &.auto {
-          .switch {
-            background: #BBB;
-            border-color: #BBB;
-          }
-          small {
-            background: #bbb;
-          }
-          .set-auto {
-            color: $gray;
-          }
-        }
-        label {
-          color: $gray;
-          display: inline-block;
-          margin-left: 6px;
-          font-weight: 700;
-          padding-right: 18px;
-        }
-        span.set-auto {
-          color: $blue;
-          cursor: pointer;
-          margin-left: 15px;
-        }
-      }
-    }
     .chart-container {
       position: relative;
       width: 100%;
