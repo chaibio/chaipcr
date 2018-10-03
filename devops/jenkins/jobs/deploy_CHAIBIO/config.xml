@@ -846,6 +846,8 @@ sed -i &apos;s/#retry 60/retry 20/&apos; /etc/dhcp/dhclient.conf
 sed -i &apos;s/#reboot/reboot/&apos; /etc/dhcp/dhclient.conf
 
 echo Disabling usb1
+cd /opt/scripts/boot        
+
 ls temp.patch &amp;&amp; rm temp.patch
 cat &gt;&gt; temp.patch &lt;&lt; EOF
 --- /opt/scripts/boot/am335x_evm.sh     2018-09-27 10:44:59.465061718 +0000
