@@ -6,10 +6,13 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
   DEFAULT_MAX_X: 40
   MARGIN:
     top: 10
-    left: 80
+    left: 50
     right: 10
     bottom: 20
-
+    # top: 10
+    # left: 80
+    # right: 10
+    # bottom: 20
   inK: ->
     @getMaxY() - @getMinY() > 20000
 
