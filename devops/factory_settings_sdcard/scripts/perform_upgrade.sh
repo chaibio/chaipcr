@@ -259,6 +259,12 @@ then
 fi
 
 cp /var/lib/dhcp/dhclient.*.leases /data/.tmp/
+
+echo "Preserve the existing network configuration file before the upgrade"
+if [ -e /etc/network/interfaces ]
+then
+   cp /etc/network/interfaces /sdcard/upgrade
+fi
 sync
 
 reset_s2
