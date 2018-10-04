@@ -141,7 +141,8 @@ run_migrate_on_upgrade () {
 			sql_running=$?
 		done
 
-		echo mysql server is running.. calling upgrade.sh.
+		echo "mysql server is running.. Upgrade MySQL InnoDB tables and calling RAILS upgrade.sh."
+                mysql_upgrade
 
 		RAILS_ENV=production /root/chaipcr/web/scripts/upgrade.sh >> /var/log/upgrade.log 2>&1 || :
 		echo "Execution done executing upgrade.sh!"
@@ -320,6 +321,31 @@ run_migrate_on_upgrade_logged () {
 	run_migrate_on_upgrade >> $log_file 2>&1
 }
 
+update_wireless_network () {
+    if [ -e /sdcard/upgrade/interfaces ]
+    then
+       cp /sdcard/upgrade/interfaces /etc/network/interfaces
+       rm /sdcard/upgrade/interfaces
+    fi
+
+    echo "Make sure to update fixed name for WiFi endpoint (wlan0)"
+    address=`cat /sys/class/net/wlx*/address`
+    echo "The MAC address of wireless LAN dongle $address"
+    if [ -e /etc/udev/rules.d/70-persistent-net.rules ] && [ $address != "" ]
+    then
+       echo "SUBSYSTEM==\"net\", ACTION==\"add\", ATTR{address}==\"$address\", NAME==\"wlan0\"" >> /etc/udev/rules.d/70-persistent-net.rules
+    fi
+
+    echo "Install wireless tools package..."
+    apt-get -y install wireless-tools
+    sleep 20
+
+    echo "Install WPA SUPPLICANT package..."
+    apt-get -y install wpasupplicant
+    sleep 20
+    echo "Done with updating wireless network..."
+}
+
 check_upgrade_autorun () {
 	sdcard_dev=""
 	if [ -e /dev/mmcblk0p3 ]
@@ -357,6 +383,7 @@ check_upgrade_autorun () {
 			echo "Second SDCard partition not found.. old version? ${sdcard}p2"  >> $log_file
 		fi
 
+                update_wireless_network
 		change_root_password_on_factorysettings
 		run_migrate_on_upgrade_logged
 		return 0
