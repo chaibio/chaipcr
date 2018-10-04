@@ -17,19 +17,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-upgrade_mysql_innodb_tables () {
-        echo "Make sure to upgrade MySQL InnoDB tables before rebooting... "
-        mysql_upgrade
-}
-
 wait_and_reboot () {
 	sync &
 	sleep 2
 	reboot
 }
-
-upgrade_mysql_innodb_tables &
 
 #wait 2 seconds before rebooting to be able to report the reboot to user.
 wait_and_reboot &
