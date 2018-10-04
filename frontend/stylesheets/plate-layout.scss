@@ -44,7 +44,8 @@ background: repeating-linear-gradient(-60deg, #F5F5F5, #F5F5F5 1px, white 4px, w
 .testing-clicking{
 	cursor: pointer;
 	margin-bottom: 0px;
-	padding: 5px;
+	padding: 5px 15px 5px 5px;
+  position: relative;
 }
 
 .sample-target-section{
@@ -59,6 +60,16 @@ background: repeating-linear-gradient(-60deg, #F5F5F5, #F5F5F5 1px, white 4px, w
 	height: 10px;
 	display: inline-block;
 	margin-right: 5px;
+}
+
+.span-arrow-down{
+  background: url(/images/select2.png) no-repeat -3px -8px transparent;
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  margin-top: 3px;
+  position: absolute;
+  right: 5px;
 }
 
 .options-div{
@@ -219,6 +230,7 @@ li {
 
 .no-targetBorder{
 	border: 1px solid #C6C6C6;
+  display: none;
 }
 
 .numberCircle {
@@ -296,4 +308,27 @@ li {
 
 .select-style select:focus {
     outline: none;
+}
+
+.header-plate-layout{
+    height: 50px;
+    box-shadow: 0 2px 3px #aaa;
+
+    &::after{
+        content: ' ';
+        clear: both;
+    }    
+
+    h4{
+        font-family: 'dinot-bold';
+        font-size: 13px;
+        margin: 0;
+        line-height: 50px;
+    }
+}
+
+.experiment-info{
+  float: right;
+  line-height: 50px;
+  font-family: 'dinot';
 }

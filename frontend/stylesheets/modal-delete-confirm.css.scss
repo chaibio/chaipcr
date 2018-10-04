@@ -1,0 +1,94 @@
+// Css classes for modal warning
+// bad practice it over rides other settings, so find another way
+.small-modal .modal-dialog {
+width: 442px;
+}
+
+.modal-dialog-original {
+  width: 600px;
+}
+.modal-delete {
+  background-color: white;
+  min-height: 150px;
+  font-family: "dinot-medium";
+
+  .modal-delete-header {
+    height: 45px;
+    background-color: #e01924;
+    color: #fff;
+    padding: 0 20px;
+
+    .modal-delete-title {
+      font-size: 15px;
+      float: left;
+      font-family: "dinot-bold";
+      line-height: 45px;
+    }
+
+    .modal-delete-close {
+      float: right;
+      width: 15px;
+      height: 15px;
+      margin-top: 15px;
+
+      svg {
+        cursor: pointer;
+        rect{
+          fill: #fff;
+        }
+      }
+    }
+
+  }
+
+
+  .modal-delete-content {
+    min-width: 100px;
+    min-height: 100px;
+    padding: 15px 20px;
+
+    // Message
+    .modal-delete-message {
+      font-size: 14px;
+      font-family: "dinot-medium";
+    }
+    //Button
+    .modal-delete-button-container {
+      text-align: right;
+      margin-top: 20px;
+
+      button {
+        width: 150px;
+        font-family: 'dinot-bold';
+        font-size: 15px;
+        cursor: pointer;
+        line-height: 32px;
+        vertical-align: middle;
+
+        &.cancel-button{
+          background-color: white;
+          color: #000;
+          border: 1px solid transparent;
+          &:hover{
+            border-radius: 3px;
+            border: 1px solid;
+          }
+        }
+
+        &.proceed-button{
+          border-radius: 3px;
+          color: #000;
+          background: #fff;
+          border: 1px solid;
+
+          &:hover{
+            background: #e01924;
+            color: #fff;
+            border: 1px solid transparent;
+          }
+        }
+      }
+    }
+  }
+
+}

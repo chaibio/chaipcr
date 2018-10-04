@@ -37,6 +37,7 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 		});
 
 		$scope.wellInf = [];
+		$scope.rowCharacters = ['A', 'B', 'C', 'D'];
 
 		$scope.sampleSelected = "Select a Sample";
 		$scope.target1Selected = "Select a Target";
@@ -141,8 +142,8 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 				$scope.getWellLayout();
 			}
 			else {
-				for (var x = 0; x < 16; x++) {
-					$scope.wellInf[x] = {
+				for (var y = 0; y < 16; y++) {
+					$scope.wellInf[y] = {
 						sample: "No sample",
 						sampleid: 0,
 						target1: "Not set",

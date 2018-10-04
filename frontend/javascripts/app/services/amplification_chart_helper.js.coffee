@@ -65,6 +65,24 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         '#13A350'
       ]
 
+    @SAMPLE_TARGET_COLORS = [
+        '#04A0D9'
+        '#2455A8'
+        '#75278E'
+        '#FA1485'
+        '#EA244E'
+        '#F0662D'
+        '#FCDF2B'
+        '#68BD43'
+        '#1578BE'
+        '#3D3191'
+        '#B01D8B'
+        '#FF0050'
+        '#FA3C00'
+        '#F6B014'
+        '#B7D436'
+        '#14A451'
+      ]
 
     @neutralizeData = (amplification_data, is_dual_channel=false) ->
       amplification_data = angular.copy amplification_data

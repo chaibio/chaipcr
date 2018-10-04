@@ -24,7 +24,7 @@ class SamplesController < ApplicationController
   before_filter :get_object, :except => [:index, :create]
   
   def index
-    @samples = Sample.includes(:samples_wells).joins("inner join well_layouts on well_layouts.id = samples.well_layout_id").where(["experiment_id=? and parent_type=?", params[:experiment_id], Experiment.name]).order("samples.name")
+    @samples = Sample.includes(:samples_wells).joins("inner join well_layouts on well_layouts.id = samples.well_layout_id").where(["experiment_id=? and parent_type=?", params[:experiment_id], Experiment.name]).order("samples.id")
     respond_to do |format|
       format.json { render "index", :status => :ok}
     end

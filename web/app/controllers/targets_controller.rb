@@ -24,7 +24,7 @@ class TargetsController < ApplicationController
   before_filter :get_object, :except => [:index, :create]
   
   def index
-    @targets = Target.includes(:targets_wells).where(["targets.well_layout_id=? or targets.well_layout_id=?", @experiment.well_layout.id, @experiment.targets_well_layout_id]).order("targets.well_layout_id, targets.name")
+    @targets = Target.includes(:targets_wells).where(["targets.well_layout_id=? or targets.well_layout_id=?", @experiment.well_layout.id, @experiment.targets_well_layout_id]).order("targets.well_layout_id, targets.id")
     if params[:channel]
       @targets.where(["channel=?", params[:channel]])
     end    
