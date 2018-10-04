@@ -6,7 +6,7 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
   DEFAULT_MAX_X: 40
   MARGIN:
     top: 10
-    left: 50
+    left: 60
     right: 10
     bottom: 20
     # top: 10

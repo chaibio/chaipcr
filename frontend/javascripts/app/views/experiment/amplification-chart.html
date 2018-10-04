@@ -129,13 +129,20 @@ limitations under the License.
                 </table> -->
               </div>
               <div style="display: flex; flex-direction: row; height: 10%;">
-                <div style="display: block; width: 5%; display: flex; flex-direction: column; height: 100%;">
-                  <button class="button zoom-button" ng-click="zoomIn()" style="text-align: center; vertical-align: middle; font-size: 20px; margin-right: 30px; padding: 0px; height: 50%; width: 30px;">+</button>
-                  <button class="button zoom-button" ng-click="zoomOut()" style="text-align: center; vertical-align: middle; font-size: 20px; margin-left: 30px; padding: 0px; height: 50%; width: 30px;">-</button>
+                <div style="position: absolute; padding-top: 0px;">
+                  <svg style="width: 40x; height: 40px;">
+                    <g style="width: 40px; height: 40px;">
+                      <line x1=40 y1=5 x2=10 y2=40 stroke="grey" stroke-width=2></line>
+                    </g>
+                  </svg>
                 </div>
-                <div style="display: grid; width: 95%; height: 100%; align-content: center; vertical-align: middle; text-align: center">
+                <div style="position:absolute; display: flex; flex-direction: column;">
+                  <button class="button zoom-button" ng-click="zoomIn()" style="text-align: center; vertical-align: middle; font-size: 20px; margin-top:-8px; margin-left: -5px; padding: 0px; width: 30px;">+</button>
+                  <button class="button zoom-button" ng-click="zoomOut()" style="text-align: center; vertical-align: middle; font-size: 20px; margin-left: 30px; padding: 0px; width: 30px;">–</button>
+                </div>
+                <div style="display: grid; width: 100%; height: 100%; align-content: center; vertical-align: middle; text-align: center">
                     <font style="font-weight: bold; font-size: 10pt; line-height: 16pt;">Cycle Number</font>
-                </div>
+                </div>                
               </div>
             </div>
 
@@ -182,7 +189,7 @@ limitations under the License.
                           <span ng-if="color_by==='target'" class="dot" ng-attr-style="background-color: {{COLORS[$index]}}"></span>
                         </td>
                         <td style="font-size: 15pt; line-height: 20pt; padding-top: 5px; padding-bottom: 5px; color: black;">{{target}}</td>
-                        <td class="td-tik" ng-click="targetClick($index)">
+                        <td class="td-tik" ng-click="targetClick($index)" style="padding-right: 15px;">
                           <span ng-show="!targetsSetHided[$index]">
                             <img src="/images/target_on.svg">
                           </span>
@@ -217,7 +224,7 @@ limitations under the License.
                 <span ng-if="is_dual_channel">Cq</span>
                 <span ng-if="!is_dual_channel">Cq</span>
               </th>
-              <th class="B2" ng-class="{'channel-2': color_by === 'channel'}" >
+              <th class="B2" ng-class="{'channel-2': color_by === 'channel'}" style="padding: 10px 5px;">
                 <span ng-if="is_dual_channel" >Cq M</span>
                 <span ng-if="!is_dual_channel" >Cq M</span>
               </th>
@@ -232,7 +239,7 @@ limitations under the License.
               <td>
                 <input type="checkbox" style="width:50px;" ng-click="toggleOmitIndex($index)" /> 
               </td>
-              <td class="B2" ng-class="{'text-center': color_by==='channel'}">
+              <td class="B2" ng-class="{'text-center': color_by==='channel'}" style="text-align: left">
                 <span class="text">
                   <span ng-show="i < 8">
                     A{{i+1}}
@@ -242,7 +249,7 @@ limitations under the License.
                   </span>
                 </span>
               </td>
-              <td ng-click="focusExpName($index)">
+              <td ng-click="focusExpName($index)" style="text-align: left">
                 <span ng-if="color_by==='sample'" class="dot" ng-attr-style="background-color: {{samplesSet.indexOf(samples[i]) < 0 ? '#000000' : COLORS[samplesSet.indexOf(samples[i])]}}"></span>
                 <span class="sample-span" ng-click="focusExpName($index)" ng-show="!editExpNameMode[$index]" style="font-size:12pt;">
                   {{samples[$index] | truncate:20}}
@@ -254,20 +261,20 @@ limitations under the License.
                   {{types[$index]==='sample'?'S':'' | truncate:20}}
                 </span>
               </td>
-              <td ng-click="focusExpTarget($index)">
+              <td ng-click="focusExpTarget($index)" style="text-align: left">
                 <span class="target-span" ng-click="focusExpTarget($index)" ng-show="!editExpTargetMode[$index]" style="font-size: 12pt">
                   {{targets[$index] | truncate:20}}
                 </span>
                 <input type="text" ng-show="editExpTargetMode[$index]" focus-on="editExpTargetMode" ng-blur="updateTarget($index,targets[$index])"  on-shift-enter="updateTargetEnter($index,targets[$index])"  ng-model="targets[$index]" style="font-size:12pt; line-height: 15pt;">
               </td>
-              <td class="B2">
+              <td class="B2" style="text-align: left">
                 <span class="width1" >
                   <span ng-show="wellButtons['well_'+i].ct[0] > 0">
                     {{(wellButtons['well_'+i].ct[0]) | round:2}}
                   </span>
                 </span>
               </td>
-              <td class="B2">
+              <td class="B2" style="text-align: left">
                 <span class="width1" ng-if="is_dual_channel">
                   <span ng-show="wellButtons['well_'+i].ct[1] > 0">
                     {{(wellButtons['well_'+i].ct[1]) | round:2}}
@@ -278,14 +285,14 @@ limitations under the License.
                 </span>
                 <span class="width1" ng-if="!is_dual_channel">
                   <span class="dummy-placeholder"></span>
+                  <td class="B2" >
                 </span>
-              </td>
-              <td class="B2" >
+              </td style="text-align: left">
                   <span class="width1">
                       <span class="dummy-placeholder"></span>
                     </span>
                   </td>
-              <td class="B2" >
+              <td class="B2" style="text-align: left">
                 <span class="width1">
                   <span class="dummy-placeholder"></span>
                 </span>

@@ -715,6 +715,7 @@ class BaseChart
     @drawYAxisUpperExtremeValue()
     @drawYAxisLowerExtremeValue()
     @updateAxesExtremeValues()
+    @updateBottomXYLabel()
 
   drawXAxisLeftExtremeValue: ->
     textContainer = @chartSVG.append('g')
@@ -747,6 +748,8 @@ class BaseChart
         .attr('dy', '0.71em')
         .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
         .attr('font-family', 'dinot-regular')
+        .style('font-weight', 'bold')
+        .style('font-style', 'italic')
         .on 'click', => @onClickLeftXAxisInput()
 
     inputContainer = textContainer.append('foreignObject')
@@ -771,6 +774,8 @@ class BaseChart
       .style('text-align', 'center')
       .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .style('font-family', 'dinot-regular')
+      .style('font-weight', 'bold')
+      .style('font-style', 'italic')
       .attr('type', 'text')
       .on('mouseenter', =>
         lineWidth = text.node().getBBox().width
@@ -984,6 +989,8 @@ class BaseChart
         .attr('dy', '0.71em')
         .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
         .attr('font-family', 'dinot-regular')
+        .style('font-weight', 'bold')
+        .style('font-style', 'italic')
         .text(@getMaxX())
         .on 'click', => @onClickRightXAxisInput()
 
@@ -1007,6 +1014,8 @@ class BaseChart
       .style('text-align', 'center')
       .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .style('font-family', 'dinot-regular')
+      .style('font-weight', 'bold')
+      .style('font-style', 'italic')
       .attr('type', 'text')
       .on('mouseenter', =>
         lineWidth = text.node().getBBox().width
@@ -1097,6 +1106,8 @@ class BaseChart
       .attr('dy', '0.71em')
       .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .attr('font-family', 'dinot-regular')
+      .style('font-weight', 'bold')
+      .style('font-style', 'italic')
       .text(@getMaxY())
       .on 'click', => @onClickUpperYAxisInput()
 
@@ -1123,6 +1134,8 @@ class BaseChart
       .style('text-align', 'center')
       .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .style('font-family', 'dinot-regular')
+      .style('font-weight', 'bold')
+      .style('font-style', 'italic')
       .attr('type', 'text')
       .on('mouseenter', =>
         textWidth = text.node().getBBox().width
@@ -1215,6 +1228,8 @@ class BaseChart
       .attr('dy', '0.71em')
       .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .attr('font-family', 'dinot-regular')
+      .style('font-weight', 'bold')
+      .style('font-style', 'italic')
       .text(@getMaxY())
       .on 'click', => @onClickLowerYAxisInput()
 
@@ -1242,6 +1257,8 @@ class BaseChart
       .style('text-align', 'center')
       .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .style('font-family', 'dinot-regular')
+      .style('font-weight', 'bold')
+      .style('font-style', 'italic')
       .attr('type', 'text')
       .on('mouseenter', =>
         textWidth = text.node().getBBox().width
@@ -1338,6 +1355,20 @@ class BaseChart
         .attr('width', textWidth)
 
     @hideLastAxesTicks()
+
+  updateBottomXYLabel: ->
+    # divRoot = document.getElementById('label-graph-xy')
+    # svgElement = divRoot.append('svg')
+    # gElement = svgElement.append('g')
+    #     .attr('stroke-width', 0)
+    #     .attr('fill', '#fff')
+    # crossLine = gElement.append('line')
+    #     .attr('x1', 100)
+    #     .attr('y1', 0)
+    #     .attr('x2', 0)
+    #     .attr('y2', 100)
+
+    
 
   hideLastAxesTicks: ->
     spacingX = 20
