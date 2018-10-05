@@ -24,12 +24,15 @@ fi
 rm -rf ./web/log
 ssh-keygen -f "/root/.ssh/known_hosts" -R $1
 
+gulp deploy
+
 rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./web "$1:/root/chaipcr/"
 rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./browser "$1:/root/chaipcr/"
-rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./bioinformatics "$1:/root/chaipcr/"
 rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./device/configuration.json "$1:/root/chaipcr/deploy/"
 rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./device/configuration.json "$1:/root/"
-rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./devops/factory_settings_sdcard/scripts/replace_uEnv.txt.sh "$1:/root/chaipcr/deploy/"
-rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./devops/device "$1:/root/chaipcr/deploy/"
-rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./modules "$1:/root/chaipcr/"
-rsync --delete --rsh="sshpass $remote_password_param ssh -oStrictHostKeyChecking=no -l root" -a ./realtime/overlay "$1:/root/chaipcr/deploy/"
+
+sshpass $remote_password_param ssh -t "root@$1" "cd ~/chaipcr/web; bundle"
+sshpass $remote_password_param ssh -t "root@$1" "cd ~/chaipcr/web; RAILS_ENV=production bundle exec rake db:migrate"
+sshpass $remote_password_param ssh -t "root@$1" "cd ~/chaipcr/web; RAILS_ENV=production bundle exec rake db:seed_fu"
+echo "Deploy complete, restarting $1"
+sshpass $remote_password_param ssh -t "root@$1" "reboot"
