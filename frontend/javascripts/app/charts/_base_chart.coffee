@@ -749,7 +749,7 @@ class BaseChart
         .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
         .attr('font-family', 'dinot-regular')
         .style('font-weight', 'bold')
-        .style('font-style', 'italic')
+        .style('text-decoration', 'underline')
         .on 'click', => @onClickLeftXAxisInput()
 
     inputContainer = textContainer.append('foreignObject')
@@ -775,7 +775,7 @@ class BaseChart
       .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .style('font-family', 'dinot-regular')
       .style('font-weight', 'bold')
-      .style('font-style', 'italic')
+      .style('text-decoration', 'underline')
       .attr('type', 'text')
       .on('mouseenter', =>
         lineWidth = text.node().getBBox().width
@@ -990,7 +990,7 @@ class BaseChart
         .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
         .attr('font-family', 'dinot-regular')
         .style('font-weight', 'bold')
-        .style('font-style', 'italic')
+        .style('text-decoration', 'underline')
         .text(@getMaxX())
         .on 'click', => @onClickRightXAxisInput()
 
@@ -1015,7 +1015,7 @@ class BaseChart
       .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .style('font-family', 'dinot-regular')
       .style('font-weight', 'bold')
-      .style('font-style', 'italic')
+      .style('text-decoration', 'underline')
       .attr('type', 'text')
       .on('mouseenter', =>
         lineWidth = text.node().getBBox().width
@@ -1107,7 +1107,7 @@ class BaseChart
       .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .attr('font-family', 'dinot-regular')
       .style('font-weight', 'bold')
-      .style('font-style', 'italic')
+      .style('text-decoration', 'underline')
       .text(@getMaxY())
       .on 'click', => @onClickUpperYAxisInput()
 
@@ -1135,7 +1135,7 @@ class BaseChart
       .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .style('font-family', 'dinot-regular')
       .style('font-weight', 'bold')
-      .style('font-style', 'italic')
+      .style('text-decoration', 'underline')
       .attr('type', 'text')
       .on('mouseenter', =>
         textWidth = text.node().getBBox().width
@@ -1229,7 +1229,7 @@ class BaseChart
       .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .attr('font-family', 'dinot-regular')
       .style('font-weight', 'bold')
-      .style('font-style', 'italic')
+      .style('text-decoration', 'underline')
       .text(@getMaxY())
       .on 'click', => @onClickLowerYAxisInput()
 
@@ -1258,7 +1258,7 @@ class BaseChart
       .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .style('font-family', 'dinot-regular')
       .style('font-weight', 'bold')
-      .style('font-style', 'italic')
+      .style('text-decoration', 'underline')
       .attr('type', 'text')
       .on('mouseenter', =>
         textWidth = text.node().getBBox().width
