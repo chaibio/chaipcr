@@ -818,45 +818,49 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 			var unLink = [];
 			for (var z = 0; z < 16; z++) {
 				if ($scope.wells["well_" + z].selected) {
-					if ($scope.wellInf[z].target1id != 0 && (clearType == "Target1")) {
-						Experiment.unlinkTarget($stateParams.id, $scope.wellInf[z].target1id, { wells: [z + 1] }).then(function (response) {
-							$scope.wellInf[response.config.data.wells[0] - 1].target1id = 0;
-							$scope.wellInf[response.config.data.wells[0] - 1].target1 = "Not set";
-							$scope.wellInf[response.config.data.wells[0] - 1].target1type = "";
-							$scope.wellInf[response.config.data.wells[0] - 1].target1quantity = "";
-							$scope.wellInf[response.config.data.wells[0] - 1].target1color = "";
-							$scope.enableTarget1Type = false;
-							$scope.enableTarget1Qty = false;
-							$scope.target1Selected = "Select a target";
-							$scope.target1SelectedColor = "white";
-							$scope.selectedTarget1Type = "";
-						});
-					}
-					if ($scope.wellInf[z].target2id != 0 && (clearType == "Target2")) {
-						Experiment.unlinkTarget($stateParams.id, $scope.wellInf[z].target2id, { wells: [z + 1] }).then(function (response) {
-							$scope.wellInf[response.config.data.wells[0] - 1].target2id = 0;
-							$scope.wellInf[response.config.data.wells[0] - 1].target2 = "Not set";
-							$scope.wellInf[response.config.data.wells[0] - 1].target2type = "";
-							$scope.wellInf[response.config.data.wells[0] - 1].target2quantity = "";
-							$scope.wellInf[response.config.data.wells[0] - 1].target2color = "";
-							$scope.enableTarget2Type = false;
-							$scope.enableTarget2Qty = false;
-							$scope.target2Selected = "Select a target";
-							$scope.target2SelectedColor = "white";
-							$scope.selectedTarget2Type = "";
-						});
-					}
-					if ($scope.wellInf[z].sampleid != 0 && (clearType == "Sample")) {
-						Experiment.unlinkSample($stateParams.id, $scope.wellInf[z].sampleid, { wells: [z + 1] }).then(function (response) {
-							console.log(response);
-							$scope.wellInf[response.config.data.wells[0] - 1].sampleid = 0;
-							$scope.wellInf[response.config.data.wells[0] - 1].sample = "No sample";
-							$scope.sampleSelected = "Select a sample";
-						});
-					}
+					unlinkElem(z, clearType);
 				}
 			}
 		};
+
+		function unlinkElem (z, clearType){
+			if ($scope.wellInf[z].target1id != 0 && (clearType == "Target1")) {
+				Experiment.unlinkTarget($stateParams.id, $scope.wellInf[z].target1id, { wells: [z + 1] }).then(function (response) {
+					$scope.wellInf[response.config.data.wells[0] - 1].target1id = 0;
+					$scope.wellInf[response.config.data.wells[0] - 1].target1 = "Not set";
+					$scope.wellInf[response.config.data.wells[0] - 1].target1type = "";
+					$scope.wellInf[response.config.data.wells[0] - 1].target1quantity = "";
+					$scope.wellInf[response.config.data.wells[0] - 1].target1color = "";
+					$scope.enableTarget1Type = false;
+					$scope.enableTarget1Qty = false;
+					$scope.target1Selected = "Select a target";
+					$scope.target1SelectedColor = "white";
+					$scope.selectedTarget1Type = "";
+				});
+			}
+			if ($scope.wellInf[z].target2id != 0 && (clearType == "Target2")) {
+				Experiment.unlinkTarget($stateParams.id, $scope.wellInf[z].target2id, { wells: [z + 1] }).then(function (response) {
+					$scope.wellInf[response.config.data.wells[0] - 1].target2id = 0;
+					$scope.wellInf[response.config.data.wells[0] - 1].target2 = "Not set";
+					$scope.wellInf[response.config.data.wells[0] - 1].target2type = "";
+					$scope.wellInf[response.config.data.wells[0] - 1].target2quantity = "";
+					$scope.wellInf[response.config.data.wells[0] - 1].target2color = "";
+					$scope.enableTarget2Type = false;
+					$scope.enableTarget2Qty = false;
+					$scope.target2Selected = "Select a target";
+					$scope.target2SelectedColor = "white";
+					$scope.selectedTarget2Type = "";
+				});
+			}
+			if ($scope.wellInf[z].sampleid != 0 && (clearType == "Sample")) {
+				Experiment.unlinkSample($stateParams.id, $scope.wellInf[z].sampleid, { wells: [z + 1] }).then(function (response) {
+					console.log(response);
+					$scope.wellInf[response.config.data.wells[0] - 1].sampleid = 0;
+					$scope.wellInf[response.config.data.wells[0] - 1].sample = "No sample";
+					$scope.sampleSelected = "Select a sample";
+				});
+			}
+		}
 
 		$scope.assignTargetQuantity = function () {
 
