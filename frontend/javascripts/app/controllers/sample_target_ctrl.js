@@ -94,9 +94,9 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
         $scope.getTargets();
 
         $scope.validItemName = function(type){
-            var index = 0, isExist = true;
+            var index = 1, isExist = true;
             if(type == 'Sample'){
-                index = $scope.rows.length;
+                index = $scope.rows.length + 1;
                 while(isExist){
                     isExist = false;
                     for (i = 0; i < $scope.rows.length; i++) {
@@ -111,7 +111,7 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
                 }
                 return 'Sample ' + index;
             } else {
-                index = $scope.targets.length;
+                index = $scope.targets.length + 1;
                 while(isExist){
                     isExist = false;
                     for (i = 0; i < $scope.targets.length; i++) {
