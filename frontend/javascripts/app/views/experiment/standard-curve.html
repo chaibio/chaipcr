@@ -27,7 +27,7 @@ limitations under the License.
                 <!-- <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()"> -->
                 <chart-chooser class="curve-title H1" experiment="experiment" current-chart="$parent.chart">
                   Standard Curve
-                  <img class="arrow-down" src="/images/arrow-down.png">
+                  <img class="arrow-down" src="/images/arrow-down_black.png">
                 </chart-chooser>
               </div>
               <div class="col-lg-8 col-md-7 col-sm-7 col-xs-7 ampli-toggles">
@@ -70,7 +70,7 @@ limitations under the License.
                             <div class="dropdown" ng-click="showPlotTypeList()">
                               <button class="dropbtn">
                                 <span class="test" style="float:left;">{{curve_type.charAt(0).toUpperCase() + curve_type.slice(1)}}</span>
-                                <img class="arrow-down" src="/images/arrow-down.png">
+                                <img class="arrow-down" src="/images/arrow-down_white.png">
                               </button>
                               <div id="plotTypeList" class="dropdown-content">
                                 <a href="" ng-click="curve_type='log'" value="abc">Log</a>
@@ -91,7 +91,7 @@ limitations under the License.
                             <div class="dropdown" ng-click="showColorByList()">
                               <button class="dropbtn">
                                 <span class="test" style="float:left;">{{color_by.charAt(0).toUpperCase() + color_by.slice(1)}}</span>
-                                <img class="arrow-down" src="/images/arrow-down.png">
+                                <img class="arrow-down" src="/images/arrow-down_white.png">
                               </button>
                               <div id="colorByList_standard" class="dropdown-content" style="font-size: 15px">
                                 <a href="" ng-click="color_by='sample'" value="abc">Sample</a>

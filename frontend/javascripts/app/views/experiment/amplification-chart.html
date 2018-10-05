@@ -22,12 +22,12 @@ limitations under the License.
       <div class="chart-section col-lg-8 col-md-8 col-sm-6 col-xs-6" offset="-130" force="true" full-height style="padding-left: 0px; padding-right: 0px; display: flex; flex-direction: column; justify-content: space-between; background: #eeeeee">
         <div>
             <!--curve-header-->
-          <div class="curve-header" style="margin-left:0px; margin-right:0px; margin-top: 20px;">
+          <div class="curve-header" style="margin-left:0px; margin-right:0px; padding-top: 20px; height: 120px; background: white">
             <div class="col-lg-4 col-md-5 col-sm-5 col-xs-5 curve-name" style="padding-left: 15px; width: 40%" >
               <!-- <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()"> -->
               <chart-chooser class="curve-title H1" experiment="experiment" current-chart="$parent.chart" style="padding-left: 15px;">
                 Amplification Curve
-                <img class="arrow-down" src="/images/arrow-down.png">
+                <img class="arrow-down" src="/images/arrow-down_black.png">
               </chart-chooser>
             </div>
             <div class="col-lg-8 col-md-7 col-sm-7 col-xs-7 ampli-toggles" style="width:60%;">
@@ -35,14 +35,14 @@ limitations under the License.
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 plot-options" style="width:40%;">
                   <div class="subheader-switches SH" style="font-size: 13pt;">
                     <div class="item-switch">
-                      <label>Baseline Sub.</label>
+                      <label style="font-weight: normal; font-family: 'dinot-regular'">Baseline Sub.</label>
                       <switch class="switch" ng-model="baseline_subtraction"></switch>
                     </div>
                     <div class="item-switch-channel" ng-show="!is_dual_channel">
-                      <label class="amplification-options" style="color: red" ng-click="openOptionsModal()">Advanced Settings</label>
+                      <label class="amplification-options" style="color: red; font-weight: normal; font-family: 'dinot-regular';" ng-click="openOptionsModal()">Advanced Settings</label>
                     </div>
                     <div class="item-switch-channel" ng-show="is_dual_channel">
-                      <label ng-show="experiment.type != 'test_kit'" style="color: red !important;" class="amplification-options" ng-click="openOptionsModal()">Advanced Settings</label>
+                      <label ng-show="experiment.type != 'test_kit'" style="color: red !important; font-weight: normal; font-family: 'dinot-regular';" class="amplification-options" ng-click="openOptionsModal()">Advanced Settings</label>
                       <!-- <label>CHOOSE CHANNEL:</label> &nbsp;
                       <switch ng-model="channel_1"></switch>
                       <label>1</label>
@@ -53,14 +53,16 @@ limitations under the License.
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 plot-options" style="width:27%; text-align: right; padding-right: 0px">
                   <div class="plot-option">
-                    <p>Plot Type</p>
+                    <p style="font-size: 13pt;">Plot Type</p>
                     <form role="form" class="form-horizontal" name="plotType" style="font-size: 13pt" novalidate>
                       <div class="form-group">
                         <div class="col-md-12">
                           <div class="dropdown" ng-click="showPlotTypeList()">
                             <button class="dropbtn" style="font-size: 15pt; line-height: 20pt;">
                               <span class="test" style="float:left;">{{curve_type.charAt(0).toUpperCase() + curve_type.slice(1)}}</span>
-                              <img class="arrow-down" src="/images/arrow-down.png">
+                              <img class="arrow-down" src="/images/arrow-down_white.png">
+                              <!-- <img class="arrow-down" src="/images/arrow-down.svg"> -->
+                              
                             </button>
                             <div id="plotTypeList" class="dropdown-content" style="font-size: 15pt; line-height: 20pt;">
                               <a href="" ng-click="curve_type='log'" value="abc">Log</a>
@@ -74,14 +76,14 @@ limitations under the License.
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 plot-options" style="width:33%; text-align: right; padding-right: 40px">
                   <div class="plot-option">
-                    <p>Color by</p>
+                    <p style="font-size: 13pt;">Color by</p>
                     <form role="form" class="form-horizontal" name="colorBy" style="font-size: 13pt" novalidate>
                       <div class="form-group">
                         <div class="col-md-12" style="padding-right: 10px;">
                           <div class="dropdown" ng-click="showColorByList()">
                             <button class="dropbtn" style="font-size: 15pt; line-height: 20pt;">
                               <span class="test" style="float:left;">{{color_by.charAt(0).toUpperCase() + color_by.slice(1)}}</span>
-                              <img class="arrow-down" src="/images/arrow-down.png">
+                              <img class="arrow-down" src="/images/arrow-down_white.png">
                             </button>
                             <div id="colorByList_ampli" class="dropdown-content" style="font-size: 15pt; line-height: 20pt;">
                               <a href="" ng-click="color_by='sample'" value="abc">Sample</a>
@@ -132,7 +134,7 @@ limitations under the License.
                 <div style="position: absolute; padding-top: 0px;">
                   <svg style="width: 40x; height: 40px;">
                     <g style="width: 40px; height: 40px;">
-                      <line x1=40 y1=5 x2=10 y2=40 stroke="grey" stroke-width=2></line>
+                      <line x1=40 y1=5 x2=10 y2=40 stroke="grey" stroke-width=1></line>
                     </g>
                   </svg>
                 </div>
@@ -201,10 +203,8 @@ limitations under the License.
                     </table>
                   </div>
               </div>
-              
             </div>
           </div>
-
         </div>
         <div class="choose-chart">
           <chart-well-switch ng-model="wellButtons" color-by="color_by" chart-type="amplification"></chart-well-switch>
@@ -216,20 +216,20 @@ limitations under the License.
             <tr>
               <th class="B2" style="border-left:none">Clr</th>
               <th class="B2">Omit</th>
-              <th class="B2">Well</th>
-              <th class="B2">Sample</th>
+              <th class="B2" style="text-align: left; padding-left:0px;" >Well</th>
+              <th class="B2" style="text-align: left; padding-left:0px;" >Sample</th>
               <th class="B2">Type</th>
-              <th class="B2">Target</th>
-              <th class="B2" ng-class="{'channel-1': color_by === 'channel'}">
+              <th class="B2" style="text-align: left; padding-left:0px;">Target</th>
+              <th class="B2" style="text-align: left; padding-left:0px;" ng-class="{'channel-1': color_by === 'channel'}">
                 <span ng-if="is_dual_channel">Cq</span>
                 <span ng-if="!is_dual_channel">Cq</span>
               </th>
-              <th class="B2" ng-class="{'channel-2': color_by === 'channel'}" style="padding: 10px 5px;">
+              <th class="B2" style="text-align: left; padding-left:0px;" ng-class="{'channel-2': color_by === 'channel'}" style="padding: 10px 5px;">
                 <span ng-if="is_dual_channel" >Cq M</span>
                 <span ng-if="!is_dual_channel" >Cq M</span>
               </th>
-              <th class="B2">Qty</th>
-              <th class="B2">Qty M</th>
+              <th class="B2" style="text-align: left; padding-left:0px;">Qty</th>
+              <th class="B2" style="text-align: left; padding-left:0px;">Qty M</th>
             </tr>
             <tr ng-repeat="i in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" ng-class="{selected: (wellButtons['well_'+i].selected)}">
               <td class="B2" ng-class="{'text-center': color_by==='channel'}">
