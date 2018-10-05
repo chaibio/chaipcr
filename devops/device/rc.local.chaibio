@@ -116,6 +116,31 @@ change_root_password_on_factorysettings () {
 	fi
 }
 
+retain_previous_user_credentials_on_upgrade () {
+        if [ -e ${sdcard}/factory/upgrade_autorun.flag ] || [ -e ${sdcard}/upgrade/upgrade_autorun.flag ]
+        then
+           echo "Software upgrade has been performed"
+           echo "Restore user credentials preserved before the software upgrade... "
+           if [ -e /sdcard/upgrade/passwd ] && [ -e /sdcard/upgrade/passwd- ]
+           then
+              cp /sdcard/upgrade/passwd /etc
+              cp /sdcard/upgrade/passwd- /etc
+              chmod 644 /etc/passwd
+              chmod 600 /etc/passwd-
+              rm /sdcard/upgrade/passwd /sdcard/upgrade/passwd-
+           fi
+           if [ -e /sdcard/upgrade/shadow ] && [ -e /sdcard/upgrade/shadow- ]
+           then
+              cp /sdcard/upgrade/shadow /etc
+              cp /sdcard/upgrade/shadow- /etc
+              chmod 640 /etc/shadow
+              chown root:shadow /etc/shadow
+              chmod 600 /etc/shadow-
+              rm /sdcard/upgrade/shadow /sdcard/upgrade/shadow-
+           fi
+        fi
+}
+
 run_migrate_on_upgrade () {
 	echo "Checking for flag file: ${sdcard}/factory/upgrade_autorun.flag and ${sdcard}/upgrade/upgrade_autorun.flag"
 	if [ -e ${sdcard}/factory/upgrade_autorun.flag ] || [ -e ${sdcard}/upgrade/upgrade_autorun.flag ]
@@ -385,6 +410,7 @@ check_upgrade_autorun () {
 
                 update_wireless_network
 		change_root_password_on_factorysettings
+                retain_previous_user_credentials_on_upgrade
 		run_migrate_on_upgrade_logged
 		return 0
 	fi
