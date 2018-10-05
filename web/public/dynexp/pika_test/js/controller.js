@@ -49,6 +49,8 @@
 				$scope.editNotes = false;
 				//	$scope.cq = [["channel","well_num","cq"],[1,1,"39"],[1,2,2],[1,3,40],[1,4,9],[1,5,20],[1,6,"26"],[1,7,"33"],[1,8,"5"],[1,9,"34.5"],[1,10,"19"],[1,11,"12"],[1,12,"6"],[1,13,"24"],[1,14,"39"],[1,15,"32"],[1,16,"18"],[2,1,"11"],[2,2,"25.15"],[2,3,36],[2,4,"8"],[2,5,"34"],[2,6,"10"],[2,7,"15"],[2,8,"25"],[2,9,"35"],[2,10,"28"],[2,11,"2"],[2,12,"7"],[2,13,"0"],[2,14,"35"],[2,15,"28"],[2,16,"17"]];
 
+				this.getResultArray = getResultArray;
+
 				function getId(){
 					if($stateParams.id){
 						$scope.experimentId = $stateParams.id;
@@ -236,9 +238,9 @@
 				function getAmountArray(){
 					for (var i = 2; i < 8; i++) {
 						if($scope.result[i] == "Inhibited"){
-							$scope.amount[i] = "Invalid";
+							$scope.amount[i] = "Repeat";
 						}
-						else if($scope.result[i] == "Unknown"){
+						else if($scope.result[i] == "Invalid"){
 							$scope.amount[i] = "Repeat";
 						}
 						else if ($scope.famCq[i]>=10 && $scope.famCq[i]<= 24) {
@@ -259,7 +261,7 @@
 							if($scope.result[i] == "Inhibited"){
 								$scope.amount[i] = "Invalid";
 							}
-							else if($scope.result[i] == "Unknown"){
+							else if($scope.result[i] == "Invalid"){
 								$scope.amount[i] = "Repeat";
 							}
 							else if ($scope.famCq[i]>=10 && $scope.famCq[i]<= 24) {
@@ -281,9 +283,9 @@
 						$scope.amount[9]="\u2014";
 						for (var i = 10; i < 16; i++) {
 							if($scope.result[i] == "Inhibited"){
-								$scope.amount[i] = "Invalid";
+								$scope.amount[i] = "Repeat";
 							}
-							else if($scope.result[i] == "Unknown"){
+							else if($scope.result[i] == "Invalid"){
 								$scope.amount[i] = "Repeat";
 							}
 							else if ($scope.famCq[i]>=10 && $scope.famCq[i]<= 24) {
@@ -303,13 +305,14 @@
 				}
 
 				function getResultArray(){
-					if($scope.famCq[0]>0 && $scope.famCq[0]<38 ){
+					if($scope.famCq[0]>=20 && $scope.famCq[0]<=34 ){
 						$scope.result[0]="Valid";
 					}
 					else{
 						$scope.result[0]="Invalid";
 					}
-					if(($scope.famCq[1] == 0 || $scope.famCq[1]>39 || !$scope.famCq[1]) && ($scope.hexCq[1]>=25 && $scope.hexCq[1]<=36) ){
+
+					if((!$scope.famCq[1] || $scope.famCq[1] == 0 || ($scope.famCq[1]>38 && $scope.famCq[1]<=40)) && ($scope.hexCq[1]>=20 && $scope.hexCq[1]<=36) ){
 						$scope.result[1]="Valid";
 					}
 					else{
@@ -317,95 +320,98 @@
 					}
 
 					for (var i = 2; i < 8; i++) {
-						if($scope.famCq[i]>=10 && $scope.famCq[i]<=38){
-							if($scope.result[1] == "Invalid"){
-								$scope.result[i]="Unknown";
-							}
-							else{
+						$scope.result[i]="Invalid";
+						if($scope.result[1] == "Invalid"){
+							$scope.result[i]="Invalid";
+						} else if($scope.result[0] == "Valid" && $scope.result[1] == "Valid") {
+							if($scope.famCq[i]>=10 && $scope.famCq[i]<=38){
 								$scope.result[i]="Positive";
-							}
-						}
-						else if (($scope.famCq[i]>38 || !$scope.famCq[i]) && ($scope.hexCq[i]>0 && $scope.hexCq[i]<=36)) {
-							if($scope.result[0] == "Invalid"){
-								$scope.result[i]="Unknown";
-							}
-							else{
+							} else if ((!$scope.famCq[i]) && ($scope.hexCq[i]>=20 && $scope.hexCq[i]<=36)){
+								$scope.result[i]="Negative";
+							} else if ($scope.famCq[i] > 38 && ($scope.hexCq[i]>=20 && $scope.hexCq[i]<=36)){
 								$scope.result[i]="Negative";
 							}
-						}
+						} 
 
-						else if (($scope.famCq[i]>38 || $scope.famCq[i]<10) && ($scope.hexCq[i]>36 || !$scope.hexCq[i])) {
-							$scope.result[i]="Inhibited";
-						}
-
-						else if($scope.famCq[i]<10){
-							$scope.result[i]="Inhibited";
+						if ($scope.result[1] == "Valid"){
+							if((!$scope.famCq[i]) && (!$scope.hexCq[i])){
+								$scope.result[i]="Inhibited";
+							} else if(!($scope.famCq[i]) && $scope.hexCq[i] > 36) {
+								$scope.result[i]="Inhibited";
+							} else if($scope.famCq[i] > 38 && (!$scope.hexCq[i])){
+								$scope.result[i]="Inhibited";
+							} else if($scope.famCq[i] > 38 && $scope.hexCq[i] > 36){
+								$scope.result[i]="Inhibited";
+							}
 						}
 					}
 					if(!$scope.twoKits){
 						for (var i = 8; i < 16; i++) {
-							if($scope.famCq[i]>=10 && $scope.famCq[i]<=38){
-								if($scope.result[1] == "Invalid"){
-									$scope.result[i]="Unknown";
-								}
-								else{
+							$scope.result[i]="Invalid";
+							if($scope.result[1] == "Invalid"){
+								$scope.result[i]="Invalid";
+							} else if($scope.result[0] == "Valid" && $scope.result[1] == "Valid") {
+								if($scope.famCq[i]>=10 && $scope.famCq[i]<=38){
 									$scope.result[i]="Positive";
-								}
-							}
-							else if (($scope.famCq[i]>38 || !$scope.famCq[i]) && ($scope.hexCq[i]>0 && $scope.hexCq[i]<=36)) {
-								if($scope.result[0] == "Invalid"){
-									$scope.result[i]="Unknown";
-								}
-								else{
+								} else if ((!$scope.famCq[i]) && ($scope.hexCq[i]>=20 && $scope.hexCq[i]<=36)){
+									$scope.result[i]="Negative";
+								} else if ($scope.famCq[i] > 38 && ($scope.hexCq[i]>=20 && $scope.hexCq[i]<=36)){
 									$scope.result[i]="Negative";
 								}
-							}
+							} 
 
-							else if (($scope.famCq[i]>38 || $scope.famCq[i]<10) && ($scope.hexCq[i]>36 || !$scope.hexCq[i])) {
-								$scope.result[i]="Inhibited";
-							}
-
-							else if($scope.famCq[i]<10){
-								$scope.result[i]="Inhibited";
+							if ($scope.result[1] == "Valid"){
+								if((!$scope.famCq[i]) && (!$scope.hexCq[i])){
+									$scope.result[i]="Inhibited";
+								} else if(!($scope.famCq[i]) && $scope.hexCq[i] > 36) {
+									$scope.result[i]="Inhibited";
+								} else if($scope.famCq[i] > 38 && (!$scope.hexCq[i])){
+									$scope.result[i]="Inhibited";
+								} else if($scope.famCq[i] > 38 && $scope.hexCq[i] > 36){
+									$scope.result[i]="Inhibited";
+								}
 							}
 						}
 					}
 					else{
-						if($scope.famCq[8]>0 && $scope.famCq[8]<38 ){
+						if($scope.famCq[8]>=20 && $scope.famCq[8]<=34 ){
 							$scope.result[8]="Valid";
 						}
 						else{
 							$scope.result[8]="Invalid";
 						}
-						if(($scope.famCq[9] == 0 || $scope.famCq[9]>39 || !$scope.famCq[9]) && ($scope.hexCq[9]>=25 && $scope.hexCq[9]<=36) ){
+
+						if((!$scope.famCq[9] || $scope.famCq[9] == 0 || ($scope.famCq[9]>38 && $scope.famCq[9]<=40)) && ($scope.hexCq[9]>=20 && $scope.hexCq[9]<=36) ){
 							$scope.result[9]="Valid";
 						}
 						else{
 							$scope.result[9]="Invalid";
 						}
+
 						for (var i = 10; i < 16; i++) {
-							if($scope.famCq[i]>=10 && $scope.famCq[i]<=38){
-								if($scope.result[9] == "Invalid"){
-									$scope.result[i]="Unknown";
-								}
-								else{
+							$scope.result[i]="Invalid";
+							if($scope.result[9] == "Invalid"){
+								$scope.result[i]="Invalid";
+							} else if($scope.result[8] == "Valid" && $scope.result[9] == "Valid") {
+								if($scope.famCq[i]>=10 && $scope.famCq[i]<=38){
 									$scope.result[i]="Positive";
-								}
-							}
-							else if (($scope.famCq[i]>38 || !$scope.famCq[i]) && ($scope.hexCq[i]>0 && $scope.hexCq[i]<=36)) {
-								if($scope.result[8] == "Invalid"){
-									$scope.result[i]="Unknown";
-								}
-								else{
+								} else if ((!$scope.famCq[i]) && ($scope.hexCq[i]>=20 && $scope.hexCq[i]<=36)){
+									$scope.result[i]="Negative";
+								} else if ($scope.famCq[i] > 38 && ($scope.hexCq[i]>=20 && $scope.hexCq[i]<=36)){
 									$scope.result[i]="Negative";
 								}
-							}
-							else if (($scope.famCq[i]>38 || $scope.famCq[i]<10) && ($scope.hexCq[i]>36 || !$scope.hexCq[i])) {
-								$scope.result[i]="Inhibited";
-							}
+							} 
 
-							else if($scope.famCq[i]<10){
-								$scope.result[i]="Inhibited";
+							if ($scope.result[9] == "Valid"){
+								if((!$scope.famCq[i]) && (!$scope.hexCq[i])){
+									$scope.result[i]="Inhibited";
+								} else if(!($scope.famCq[i]) && $scope.hexCq[i] > 36) {
+									$scope.result[i]="Inhibited";
+								} else if($scope.famCq[i] > 38 && (!$scope.hexCq[i])){
+									$scope.result[i]="Inhibited";
+								} else if($scope.famCq[i] > 38 && $scope.hexCq[i] > 36){
+									$scope.result[i]="Inhibited";
+								}
 							}
 						}
 					}

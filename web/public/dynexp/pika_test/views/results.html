@@ -5,10 +5,10 @@
 			<span ng-show="!editExpName">A.{{experiment.name}}</span>
 			<input type="text" placeholder="Enter Experiment Name Here" ng-show="editExpName" class="exp-name H1" required ng-model="experiment.name"  ng-blur="updateExperimentName()"
 			my-enter="updateExperimentName()" focus-on="editExpName">
-		</h2>
-		<h3>{{target}}</h3>
+		</h2>		
 	</div>
 	<div ng-show="experiment.completion_status === 'success' && !analyzing && famCq && !twoKits" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 left-padding">
+		<h3>{{target}}</h3>
 		<table ng-show="!twoKits">
 			<tr class="td-heading">
 				<td style="width:300px">Well</td>
@@ -75,6 +75,7 @@
 		</table>
 	</div>
 	<div ng-show="experiment.completion_status === 'success' && !analyzing && famCq && twoKits" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 left-padding">
+		<h3>{{target}}</h3>
 		<table ng-show="twoKits">
 			<tr class="td-heading">
 				<td style="width:300px">Well</td>
@@ -126,6 +127,8 @@
 		</table>
 	</div>
 	<div ng-show="experiment.completion_status === 'success' && !analyzing && famCq && twoKits" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 left-padding">
+		<br/>
+		<h3>{{target2}}</h3>
 		<table ng-show="twoKits">
 			<tr class="td-heading">
 				<td style="width:300px">Well</td>

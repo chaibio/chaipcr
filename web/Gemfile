@@ -70,11 +70,12 @@ gem 'activerecord-import'
 # gem 'debugger', group: [:development, :test]
 
 # angular-js dependencies
-#gem "angularjs-rails"
-#gem 'angular-rails-templates'
+gem "angularjs-rails"
+gem 'angular-rails-templates'
 
 gem 'unicorn'
 
-# group :test, :development do
-#   gem 'jasmine-rails'
-# end
+group :test, :development do
+  # gem 'jasmine-rails'
+  gem "jasmine", '~> 2.9'
+end
