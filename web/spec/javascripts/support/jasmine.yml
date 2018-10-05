@@ -1,7 +1,7 @@
 # path to parent directory of src_files
 # relative path from Rails.root
 # defaults to app/assets/javascripts
-src_dir: "app/assets/javascripts"
+src_dir: "public/dynexp"
 
 # path to additional directory of source file that are not part of assets pipeline and need to be included
 # relative path from Rails.root
@@ -12,12 +12,37 @@ src_dir: "app/assets/javascripts"
 # path to parent directory of css_files
 # relative path from Rails.root
 # defaults to app/assets/stylesheets
-css_dir: "app/assets/stylesheets"
+css_dir: "public/dynexp"
 
 # list of file expressions to include as source files
 # relative path from src_dir
 src_files:
- - "application.{js.coffee,js,coffee}"
+ - "libs/js/jquery.js"
+ - "libs/js/lodash.js"
+ - "libs/js/angular.js"
+ - "libs/js/angular-resource.js"
+ - "libs/js/angular-ui-router.js"
+ - "libs/js/angular-mock.js"
+ - "libs/js/ui-bootstrap-tpls-0.14.3.js"
+ - "libs/js/http-auth-interceptor.js"
+ - "libs/js/jstorage.js"
+ - "libs/js/moment.js"
+ - "libs/js/angular-moment.min.js"
+ - "libs/js/status.js"
+ - "libs/js/ng-focus-on.js"
+ - "libs/js/ellipsis-animated.js"
+ - "libs/js/global-service.js"
+ - "libs/js/wizard-header.js"
+ - "libs/js/experiment.js"
+ - "libs/js/auth.js"
+ - "pika_test/js/app.js"
+ - "pika_test/js/routes.js"
+ - "pika_test/js/controller.js"
+ - "pika_test/js/seconds-display.js"
+ - "pika_test/js/degree-celcius.js"
+ - "pika_test/js/number-format.js"
+ - "pika_test/js/DeviceInfo.js"
+ - "pika_test/js/constants.js"
 
 # list of file expressions to include as css files
 # relative path from css_dir
@@ -32,7 +57,7 @@ css_files:
 #   - ../engine/spec/javascripts
 #
 # defaults to spec/javascripts
-spec_dir: spec/javascripts
+spec_dir: spec/javascripts/pika_test
 
 # list of file expressions to include as helpers into spec runner
 # relative path from spec_dir
