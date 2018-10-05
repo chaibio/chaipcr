@@ -354,21 +354,23 @@ update_wireless_network () {
     fi
 
     echo "Make sure to update fixed name for WiFi endpoint (wlan0)"
-    address=`cat /sys/class/net/wlx*/address`
-    echo "The MAC address of wireless LAN dongle $address"
-    if [ -e /etc/udev/rules.d/70-persistent-net.rules ] && [ $address != "" ]
+    if [ -e /sys/class/net/wlx*/address ]
     then
-       echo "SUBSYSTEM==\"net\", ACTION==\"add\", ATTR{address}==\"$address\", NAME==\"wlan0\"" >> /etc/udev/rules.d/70-persistent-net.rules
+       address=`cat /sys/class/net/wlx*/address`
+       echo "The MAC address of wireless LAN dongle $address"
+       if [ -e /etc/udev/rules.d/70-persistent-net.rules ]
+       then
+          if grep -q "wlan0" /etc/udev/rules.d/70-persistent-net.rules
+          then
+             echo "Rules file is already updated with fixed wireless LAN name (wlan0)"
+          else
+             echo "SUBSYSTEM==\"net\", ACTION==\"add\", ATTR{address}==\"$address\", NAME==\"wlan0\"" >> /etc/udev/rules.d/70-persistent-net.rules
+             echo "Done with updating wireless network rules..."
+          fi
+       fi
+    else
+       echo "Fixed wireless name (wlan0) has been already configured properly..."
     fi
-
-    echo "Install wireless tools package..."
-    apt-get -y install wireless-tools
-    sleep 20
-
-    echo "Install WPA SUPPLICANT package..."
-    apt-get -y install wpasupplicant
-    sleep 20
-    echo "Done with updating wireless network..."
 }
 
 check_upgrade_autorun () {
