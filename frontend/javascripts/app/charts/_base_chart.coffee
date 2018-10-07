@@ -554,11 +554,11 @@ class BaseChart
     @yAxisLabel = svg.append("text")
       .attr("class", "g-y-axis-text")
       .attr("transform", "rotate(-90)")
-      .attr("y", 0 - @MARGIN.left)
+      .attr("y", 0 - @MARGIN.left + 5)
       .attr("x", 0 - (@height / 2))
       .attr("dy", "1em")
       .attr("font-family", "dinot-bold")
-      .attr("font-size", "#{@AXIS_LABEL_FONT_SIZE}px")
+      .attr("font-size", "#{@AXIS_LABEL_FONT_SIZE}pt")
       .attr("fill", "#333")
       .style("text-anchor", "middle")
       .text(@config.axes.y.label)
@@ -590,19 +590,19 @@ class BaseChart
     # text label for the x axis
     # @setXAxisLabel()
 
-  setXAxisLabel: ->
-    return if not (@config.axes.x.label)
-    svg = @chartSVG.select('.chart-g')
-    @xAxisLabel = svg.append("text")
-      .attr('class', 'g-x-axis-text')
-      .attr("transform",
-        "translate(" + (@width / 2) + " ," +
-        (@height + @MARGIN.top + @MARGIN.bottom - 20) + ")")
-      .style("text-anchor", "middle")
-      .attr("font-family", "dinot-bold")
-      .attr("font-size", "#{@AXIS_LABEL_FONT_SIZE}px")
-      .attr("fill", "#333")
-      .text(@config.axes.x.label)
+  # setXAxisLabel: ->
+    # return if not (@config.axes.x.label)
+    # svg = @chartSVG.select('.chart-g')
+    # @xAxisLabel = svg.append("text")
+    #   .attr('class', 'g-x-axis-text')
+    #   .attr("transform",
+    #     "translate(" + (@width / 2) + " ," +
+    #     (@height + @MARGIN.top + @MARGIN.bottom - 20) + ")")
+    #   .style("text-anchor", "middle")
+    #   .attr("font-family", "dinot-bold")
+    #   .attr("font-size", "#{@AXIS_LABEL_FONT_SIZE}pt")
+    #   .attr("fill", "#333")
+    #   .text(@config.axes.x.label)
 
   updateZoomScaleExtent: ->
     return if !@zooomBehavior

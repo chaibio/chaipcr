@@ -306,9 +306,18 @@
   .chart-legend {
     display: none;
   }
-  .axis.y2-axis {
-    display: none;
+
+  .axis.x-axis {
+    path {
+      stroke: grey;
+    }
   }
+  .axis.y-axis {
+    path {
+      stroke: grey;
+    }
+  }
+
   .num-cycle-text {
     margin-bottom: -30px;
     margin-top: 20px;
