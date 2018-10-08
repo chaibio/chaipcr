@@ -40,7 +40,6 @@ class ApidocsController < ActionController::Base
 		StagesController,
 		StepsController,
 		UsersController,
-		WellsController,
 		AmplificationDatum,
 		AmplificationOption,
     Device,
