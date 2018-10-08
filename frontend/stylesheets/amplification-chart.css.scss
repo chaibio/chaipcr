@@ -235,6 +235,7 @@
       // display: inline-block;
       // width: 85%;
       float: left;
+      box-shadow: 8px 8px 8px 1px grey;
       // height: 100%;
     }
     .additional-info {
@@ -250,6 +251,7 @@
       }
       .parameters {
         padding: 0px;
+        
         .header {
           color: #fff;
           background-color: #000;

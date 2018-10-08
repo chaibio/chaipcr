@@ -40,8 +40,8 @@
 
     &.selected {
       .ct-cq-container {
-        //background-color: #e4f4fa;
-        background-color: white;
+        background-color: #e4f4fa;
+        // background-color: white;
       }
     }
 
@@ -49,8 +49,8 @@
       position: relative;
 
       .well-switch-container {
-        margin: -4px;
-        height: 78px;
+        margin: -5px;
+        height: 81px;
         border: 2px solid #000;
         z-index: 999999;
         position: absolute;
@@ -59,7 +59,7 @@
         box-shadow: 0px 0px 5px #000;
       }
       .ct-cq-container {
-        height: 49px;
+        height: 62px;
         padding: 4px 22px;
       }
 
