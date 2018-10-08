@@ -37,6 +37,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
       $scope.chartConfig.channels = if is_dual_channel then 2 else 1
       $scope.chartConfig.axes.x.max = $stateParams.max_cycle || 1
       $scope.standardcurve_data = helper.paddData()
+
       $scope.COLORS = helper.COLORS
       AMPLI_DATA_CACHE = null
       retryInterval = null
@@ -143,9 +144,9 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
           else
             $scope.baseline_cycle_bounds = [parseInt($scope.cyclesFrom), parseInt($scope.cyclesTo)]
           Experiment
-          .updateAmplificationOptions($stateParams.id,{'cq_method':$scope.method.name,'min_fluorescence': parseInt($scope.minFl.value), 'min_reliable_cycle': parseInt($scope.minCq.value), 'min_d1': parseInt($scope.minDf.value), 'min_d2': parseInt($scope.minD2f.value), 'baseline_cycle_bounds': $scope.baseline_cycle_bounds })
+          .updateStandardcurveOptions($stateParams.id,{'cq_method':$scope.method.name,'min_fluorescence': parseInt($scope.minFl.value), 'min_reliable_cycle': parseInt($scope.minCq.value), 'min_d1': parseInt($scope.minDf.value), 'min_d2': parseInt($scope.minD2f.value), 'baseline_cycle_bounds': $scope.baseline_cycle_bounds })
           .then (resp) ->
-            $scope.amplification_data = helper.paddData()
+            $scope.standardcurve_data = helper.paddData()
             $scope.hasData = false
             for well_i in [0..15] by 1
               $scope.wellButtons["well_#{well_i}"].ct = 0
@@ -165,8 +166,8 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
       $scope.hoverLeave = ->
         $scope.hoverOn = false
 
-      $scope.getStandardcurveOptions = ->
-        Experiment.getAmplificationOptions($stateParams.id).then (resp) ->
+      $scope.getStandardCurveOptions = ->
+        Experiment.getStandardCurveOptions($stateParams.id).then (resp) ->
           $scope.method.name = resp.data.amplification_option.cq_method
           $scope.minFl.value = resp.data.amplification_option.min_fluorescence
           $scope.minCq.value = resp.data.amplification_option.min_reliable_cycle
@@ -183,7 +184,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
           $scope.hoverDescription = resp.data || 'Unknown error'
           $scope.hoverOn = true
 
-      $scope.getStandardcurveOptions()
+      $scope.getStandardCurveOptions()
 
       $scope.focusExpName = (index) ->
         $scope.editExpNameMode[index] = true
@@ -276,6 +277,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
         , 1000
 
       fetchFluorescenceData = ->
+        
         gofetch = true
         gofetch = false if $scope.fetching
         gofetch = false if $scope.$parent.chart isnt 'standard-curve'
@@ -284,19 +286,23 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
         if gofetch
           hasInit = true
           $scope.fetching = true
-
+          
           Experiment
           .getStandardCurveData($stateParams.id)
           .then (resp) ->
             $scope.fetching = false
             $scope.error = null
 
+            console.log("stand3")
+            console.log(resp)
+            
             if (resp.status is 200 and resp.data?.partial and $scope.enterState) or (resp.status is 200 and !resp.data.partial)
               $scope.hasData = true
-              $scope.amplification_data = helper.paddData()
+              $scope.standardcurve_data = helper.paddData()
             if resp.status is 200 and !resp.data.partial
               $rootScope.$broadcast 'complete'
             if (resp.data.steps?[0].amplification_data and resp.data.steps?[0].amplification_data?.length > 1 and $scope.enterState) or (resp.data.steps?[0].amplification_data and resp.data.steps?[0].amplification_data?.length > 1 and !resp.data.partial)
+              
               $scope.chartConfig.axes.x.min = 1
               $scope.hasData = true
               data = resp.data.steps[0]
@@ -305,7 +311,8 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
               data.amplification_data = helper.neutralizeData(data.amplification_data, $scope.is_dual_channel)
 
               AMPLI_DATA_CACHE = angular.copy data
-              $scope.amplification_data = data.amplification_data
+              $scope.standardcurve_data = data.amplification_data
+              
               updateButtonCts()
               updateSeries()
 
@@ -323,7 +330,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
 
       updateButtonCts = ->
         for well_i in [0..15] by 1
-          cts = _.filter AMPLI_DATA_CACHE.cq, (ct) ->
+          cts = _.filter AMPLI_DATA_CACHE.summary_data, (ct) ->
             ct[1] is well_i+1
           $scope.wellButtons["well_#{well_i}"].ct = [cts[0][2]]
           $scope.wellButtons["well_#{well_i}"].ct.push cts[1][2] if cts[1]
@@ -411,16 +418,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
       $scope.$watch ->
         $scope.$parent.chart
       , (chart) ->
-        if chart is 'amplification'
-          fetchFluorescenceData()
-          Experiment.getWells($stateParams.id).then (resp) ->
-            for i in [0...16]
-              $scope.samples[resp.data[i].well.well_num - 1] = resp.data[i].well.sample_name if resp.data[i]
-
-          $timeout ->
-            $scope.showAmpliChart = true
-          , 1000
-        else if chart is 'standard-curve'
+        if chart is 'standard-curve'
           fetchFluorescenceData()
           Experiment.getWells($stateParams.id).then (resp) ->
             for i in [0...16]
@@ -440,7 +438,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
         document.getElementById("plotTypeList").classList.toggle("show")
 
       $scope.showColorByList = ->
-        document.getElementById("colorByList").classList.toggle("show")
+        document.getElementById("colorByList_standard").classList.toggle("show")
       
       $scope.targetClick = (index) ->
         $scope.targetsSetHided[index] = !$scope.targetsSetHided[index]

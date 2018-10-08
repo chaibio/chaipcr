@@ -33,8 +33,7 @@ window.App.directive 'standardCurveChart', [
 
         initChart = ->
           return if !$scope.data or !$scope.config or !$scope.show
-
-          chart = new $window.ChaiBioCharts.AmplificationChart(elem[0], $scope.data, $scope.config)
+          chart = new $window.ChaiBioCharts.StandardCurveChart(elem[0], $scope.data, $scope.config)
           chart.onZoomAndPan($scope.onZoom())
           chart.onSelectLine($scope.onSelectLine())
           chart.onUnselectLine($scope.onUnselectLine())
@@ -60,8 +59,11 @@ window.App.directive 'standardCurveChart', [
           if !chart
             initChart()
           else
+            # console.log('$scope.data')
+            # console.log($scope.data)
             chart.updateData($scope.data)
             chart.updateConfig($scope.config)
+
             if $scope.show
               if isInterpolationChanged(val, oldState) or isBaseBackroundChanged(val, oldState)
                 initChart()

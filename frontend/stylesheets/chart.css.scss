@@ -188,10 +188,10 @@
   padding-right: 0;
   padding-left: 0;
   // vertical-align: top;
-  $item_switch_gap: 70px;
+  $item_switch_gap: 20px;
   .subheader-switches {
     margin-top: 20px;
-    margin-left: -50px;
+    margin-left: 0px;
     margin-right: 20px;
     .item-switch {
       display: inline-block;
@@ -229,7 +229,7 @@
         color: $gray;
         display: inline-block;
         margin-left: 15px;
-        font-weight: 700;
+        // font-weight: 700;
       }
       span.set-auto {
         color: $blue;
@@ -240,7 +240,7 @@
     .item-switch-channel {
       display: inline-block;
       margin-left: 20px;
-      float: right;
+      float: left;
       .switch {
         height: 15px;
         margin-top: -2px;
@@ -272,8 +272,8 @@
       label {
         color: $gray;
         display: inline-block;
-        margin-left: 6px;
-        font-weight: 700;
+        margin-left: 15px;
+        // font-weight: 700;
         padding-right: 18px;
       }
       span.set-auto {
@@ -306,9 +306,18 @@
   .chart-legend {
     display: none;
   }
-  .axis.y2-axis {
-    display: none;
+
+  .axis.x-axis {
+    path {
+      stroke: grey;
+    }
   }
+  .axis.y-axis {
+    path {
+      stroke: grey;
+    }
+  }
+
   .num-cycle-text {
     margin-bottom: -30px;
     margin-top: 20px;
@@ -443,5 +452,6 @@
 }
 
 .chart-well-switch {
-  margin-top: 30px;
+  margin-top: 0px;
+  background: white;
 }

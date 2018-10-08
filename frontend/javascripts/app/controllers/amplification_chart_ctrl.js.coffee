@@ -37,6 +37,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.chartConfig.channels = if is_dual_channel then 2 else 1
       $scope.chartConfig.axes.x.max = $stateParams.max_cycle || 1
       $scope.amplification_data = helper.paddData()
+
       $scope.COLORS = helper.COLORS
       AMPLI_DATA_CACHE = null
       retryInterval = null
@@ -81,17 +82,16 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.label_D2_dc2 = 0
 
       $scope.index_target = 0
-      $scope.index_channel = 0
+      $scope.index_channel = -1
       $scope.label_sample = null
       $scope.label_target = "No Selection"
       $scope.label_well = "No Selection"
-      $scope.label_channel = 0
-      
+      $scope.label_channel = ""
 
       $scope.bgcolor_target = {
         'background-color':'#666666'
-        
       }
+        
       $scope.bgcolor_wellSample = {
         'background-color':'#666666'
       }
@@ -260,7 +260,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.updateSamplesSet = ->
         $scope.samplesSet = []
 
-        
         for i in [0...16]
           if $scope.samples[i] and $scope.samplesSet.indexOf($scope.samples[i]) < 0
             $scope.samplesSet.push($scope.samples[i])
@@ -273,7 +272,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $scope.targets[resp.data[i].well.well_num - 1] = resp.data[i].well.targets[0] if resp.data[i]
         $scope.updateTargetsSet()
         $scope.updateSamplesSet()
-        
+                
         updateSeries()
 
       Experiment.get(id: $stateParams.id).then (data) ->
@@ -322,10 +321,14 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           .then (resp) ->
             $scope.fetching = false
             $scope.error = null
-            
+            console.log('-------------------------haha3--------------------------------')
+            console.log(resp)
+
             if (resp.status is 200 and resp.data?.partial and $scope.enterState) or (resp.status is 200 and !resp.data.partial)
               $scope.hasData = true
               $scope.amplification_data = helper.paddData()
+            if (resp.status is 304)
+              $scope.hasData = false
             if resp.status is 200 and !resp.data.partial
               $rootScope.$broadcast 'complete'
             if (resp.data.steps?[0].amplification_data and resp.data.steps?[0].amplification_data?.length > 1 and $scope.enterState) or (resp.data.steps?[0].amplification_data and resp.data.steps?[0].amplification_data?.length > 1 and !resp.data.partial)
@@ -338,10 +341,12 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
               AMPLI_DATA_CACHE = angular.copy data
               $scope.amplification_data = data.amplification_data
+
               updateButtonCts()
               updateSeries()
 
-            if ((resp.data?.partial is true) or (resp.status is 202)) and !$scope.retrying
+              # retry()
+            if ((resp.data?.partial is true) or (resp.status is 202) or (resp.status is 304)) and !$scope.retrying
               retry()
 
           .catch (resp) ->
@@ -355,11 +360,17 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       updateButtonCts = ->
         for well_i in [0..15] by 1
-          cts = _.filter AMPLI_DATA_CACHE.cq, (ct) ->
+          cts = _.filter AMPLI_DATA_CACHE.summary_data, (ct) ->
             ct[1] is well_i+1
           $scope.wellButtons["well_#{well_i}"].ct = [cts[0][2]]
           $scope.wellButtons["well_#{well_i}"].ct.push cts[1][2] if cts[1]
         return
+        # for well_i in [0..15] by 1
+        #   cts = _.filter AMPLI_DATA_CACHE.cq, (ct) ->
+        #     ct[1] is well_i+1
+        #   $scope.wellButtons["well_#{well_i}"].ct = [cts[0][2]]
+        #   $scope.wellButtons["well_#{well_i}"].ct.push cts[1][2] if cts[1]
+        # return
 
       updateSeries = (buttons) ->
         buttons = buttons || $scope.wellButtons || {}
@@ -397,6 +408,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                   dataset: "channel_#{ch_i}"
                   x: 'cycle_num'
                   y: "well_#{i}_#{subtraction_type}#{if $scope.curve_type is 'log' then '_log' else ''}"
+                  dr1_pred: "well_#{i}_#{'dr1_pred'}"
+                  dr2_pred: "well_#{i}_#{'dr2_pred'}"
                   color: well_color
                   cq: $scope.wellButtons["well_#{i}"]?.ct
                   well: i
@@ -431,16 +444,16 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           if(i == config.config.well)
             $scope.index_target = i % 8
             if (i < 8) 
-              $scope.index_channel = 0
-            else 
               $scope.index_channel = 1
+            else 
+              $scope.index_channel = 2
 
+            $scope.label_channel = $scope.index_channel.toString()
             if i < $scope.targets.length
               if $scope.targets[i]!=null
                 $scope.label_target = $scope.targets[i]
               else
                 $scope.label_target = ""
-              
             else 
               $scope.label_target = ""
 
@@ -452,6 +465,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             else 
               $scope.label_sample = null
 
+            # $scope.label_dF_dC = 
+            # $scope.label_D2_dc2 = 
             wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8']
             $scope.label_well = wells[i]
           
@@ -461,6 +476,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
         $scope.label_target = "No Selection"
         $scope.label_well = "No Selection"
+        $scope.label_channel = ""
+
         $scope.label_sample = null
         $scope.bgcolor_target = {
           'background-color':'#666666'
@@ -509,7 +526,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         document.getElementById("plotTypeList").classList.toggle("show")
 
       $scope.showColorByList = ->
-        document.getElementById("colorByList").classList.toggle("show")
+        document.getElementById("colorByList_ampli").classList.toggle("show")
       
       $scope.targetClick = (index) ->
         $scope.targetsSetHided[index] = !$scope.targetsSetHided[index]

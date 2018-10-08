@@ -22,6 +22,8 @@ class BaseChart
     bottom: 0
 
   constructor: (@elem, @data, @config) ->
+    # console.log('@data')
+    # console.log(@data)
     @initChart()
 
   getLineCurve: ->
@@ -157,7 +159,6 @@ class BaseChart
 
   drawBox: (line_config) ->
     @box.container.remove() if @box
-
     headerHeight = 25
     headerTextSize = 15
     valuesTextSize = 12
@@ -269,7 +270,7 @@ class BaseChart
       conf = @activePathConfig
 
       if (@onUpdateProperties)
-        @onUpdateProperties(d[@config.series[conf.index].x], d[@config.series[conf.index].y], 40, 50)
+        @onUpdateProperties(d[@config.series[conf.index].x], d[@config.series[conf.index].y], d[@config.series[conf.index].dr1_pred], d[@config.series[conf.index].dr2_pred])
 
       # @box.RFYTextValue.text(d[@config.series[conf.index].y]) if @box.RFYTextValue
       # @box.cycleTextValue.text(d[@config.series[conf.index].x]) if @box.cycleTextValue
@@ -300,7 +301,7 @@ class BaseChart
     line.curve(@getLineCurve())
     line.x (d) -> xScale(d[line_config.x])
     line.y (d) -> yScale(d[line_config.y])
-
+   
     @viewSVG.append("path")
         .datum(@data[line_config.dataset])
         .attr("class", "guiding-line")
@@ -312,12 +313,19 @@ class BaseChart
         .on 'click', => @unsetActivePath()
 
   makeColoredLine: (line_config) ->
+    # alert('makeColoredLine')
     xScale = @getXScale()
     yScale = @getYScale()
+
     line = d3.line()
     line.curve(@getLineCurve())
+
     line.x (d) -> xScale(d[line_config.x])
     line.y (d) -> yScale(d[line_config.y])
+
+    # console.log('@data')
+    # console.log(@data)
+
     _path = @viewSVG.append("path")
         .datum(@data[line_config.dataset])
         .attr("class", "colored-line")
@@ -361,8 +369,10 @@ class BaseChart
         .attr('stroke-width', @ACTIVE_PATH_STROKE_WIDTH + 3)
 
   drawLines: ->
+    
     series = @config.series
     return if not series
+    
     @guidingLines = @guidingLines || []
     for l in @guidingLines by 1
       l.remove()
@@ -372,11 +382,15 @@ class BaseChart
       l.remove()
     @lines = []
     @activePath = null
+    
     for s in series by 1
     #  console.log(s)
       @guidingLines.push(@makeGuidingLine(s))
     for s in series by 1
       @lines.push(@makeColoredLine(s))
+
+    # console.log('strange haha')
+    # console.log(@lines)
 
     if @activePathConfig
       @makeCircle()
@@ -387,7 +401,7 @@ class BaseChart
         if (s.well is @activePathConfig.config.well and s.channel is @activePathConfig.config.channel)
           p = @lines[i]
           break
-
+        
       if p
         @setActivePath(p)
         @showMouseIndicators()
@@ -547,11 +561,11 @@ class BaseChart
     @yAxisLabel = svg.append("text")
       .attr("class", "g-y-axis-text")
       .attr("transform", "rotate(-90)")
-      .attr("y", 0 - @MARGIN.left)
+      .attr("y", 0 - @MARGIN.left + 5)
       .attr("x", 0 - (@height / 2))
       .attr("dy", "1em")
       .attr("font-family", "dinot-bold")
-      .attr("font-size", "#{@AXIS_LABEL_FONT_SIZE}px")
+      .attr("font-size", "#{@AXIS_LABEL_FONT_SIZE}pt")
       .attr("fill", "#333")
       .style("text-anchor", "middle")
       .text(@config.axes.y.label)
@@ -583,19 +597,19 @@ class BaseChart
     # text label for the x axis
     # @setXAxisLabel()
 
-  setXAxisLabel: ->
-    return if not (@config.axes.x.label)
-    svg = @chartSVG.select('.chart-g')
-    @xAxisLabel = svg.append("text")
-      .attr('class', 'g-x-axis-text')
-      .attr("transform",
-        "translate(" + (@width / 2) + " ," +
-        (@height + @MARGIN.top + @MARGIN.bottom - 20) + ")")
-      .style("text-anchor", "middle")
-      .attr("font-family", "dinot-bold")
-      .attr("font-size", "#{@AXIS_LABEL_FONT_SIZE}px")
-      .attr("fill", "#333")
-      .text(@config.axes.x.label)
+  # setXAxisLabel: ->
+    # return if not (@config.axes.x.label)
+    # svg = @chartSVG.select('.chart-g')
+    # @xAxisLabel = svg.append("text")
+    #   .attr('class', 'g-x-axis-text')
+    #   .attr("transform",
+    #     "translate(" + (@width / 2) + " ," +
+    #     (@height + @MARGIN.top + @MARGIN.bottom - 20) + ")")
+    #   .style("text-anchor", "middle")
+    #   .attr("font-family", "dinot-bold")
+    #   .attr("font-size", "#{@AXIS_LABEL_FONT_SIZE}pt")
+    #   .attr("fill", "#333")
+    #   .text(@config.axes.x.label)
 
   updateZoomScaleExtent: ->
     return if !@zooomBehavior
@@ -708,6 +722,7 @@ class BaseChart
     @drawYAxisUpperExtremeValue()
     @drawYAxisLowerExtremeValue()
     @updateAxesExtremeValues()
+    @updateBottomXYLabel()
 
   drawXAxisLeftExtremeValue: ->
     textContainer = @chartSVG.append('g')
@@ -740,6 +755,8 @@ class BaseChart
         .attr('dy', '0.71em')
         .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
         .attr('font-family', 'dinot-regular')
+        .style('font-weight', 'bold')
+        .style('text-decoration', 'underline')
         .on 'click', => @onClickLeftXAxisInput()
 
     inputContainer = textContainer.append('foreignObject')
@@ -764,6 +781,8 @@ class BaseChart
       .style('text-align', 'center')
       .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .style('font-family', 'dinot-regular')
+      .style('font-weight', 'bold')
+      .style('text-decoration', 'underline')
       .attr('type', 'text')
       .on('mouseenter', =>
         lineWidth = text.node().getBBox().width
@@ -977,6 +996,8 @@ class BaseChart
         .attr('dy', '0.71em')
         .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
         .attr('font-family', 'dinot-regular')
+        .style('font-weight', 'bold')
+        .style('text-decoration', 'underline')
         .text(@getMaxX())
         .on 'click', => @onClickRightXAxisInput()
 
@@ -1000,6 +1021,8 @@ class BaseChart
       .style('text-align', 'center')
       .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .style('font-family', 'dinot-regular')
+      .style('font-weight', 'bold')
+      .style('text-decoration', 'underline')
       .attr('type', 'text')
       .on('mouseenter', =>
         lineWidth = text.node().getBBox().width
@@ -1090,6 +1113,8 @@ class BaseChart
       .attr('dy', '0.71em')
       .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .attr('font-family', 'dinot-regular')
+      .style('font-weight', 'bold')
+      .style('text-decoration', 'underline')
       .text(@getMaxY())
       .on 'click', => @onClickUpperYAxisInput()
 
@@ -1116,6 +1141,8 @@ class BaseChart
       .style('text-align', 'center')
       .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .style('font-family', 'dinot-regular')
+      .style('font-weight', 'bold')
+      .style('text-decoration', 'underline')
       .attr('type', 'text')
       .on('mouseenter', =>
         textWidth = text.node().getBBox().width
@@ -1173,7 +1200,6 @@ class BaseChart
     if typeof @onClickAxisInput is 'function'
       @onClickAxisInput 'y:max', @yAxisUpperExtremeValue
 
-  
   drawYAxisLowerExtremeValue: ->
 
     textContainer = @chartSVG.append('g')
@@ -1209,6 +1235,8 @@ class BaseChart
       .attr('dy', '0.71em')
       .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .attr('font-family', 'dinot-regular')
+      .style('font-weight', 'bold')
+      .style('text-decoration', 'underline')
       .text(@getMaxY())
       .on 'click', => @onClickLowerYAxisInput()
 
@@ -1236,6 +1264,8 @@ class BaseChart
       .style('text-align', 'center')
       .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       .style('font-family', 'dinot-regular')
+      .style('font-weight', 'bold')
+      .style('text-decoration', 'underline')
       .attr('type', 'text')
       .on('mouseenter', =>
         textWidth = text.node().getBBox().width
@@ -1332,6 +1362,20 @@ class BaseChart
         .attr('width', textWidth)
 
     @hideLastAxesTicks()
+
+  updateBottomXYLabel: ->
+    # divRoot = document.getElementById('label-graph-xy')
+    # svgElement = divRoot.append('svg')
+    # gElement = svgElement.append('g')
+    #     .attr('stroke-width', 0)
+    #     .attr('fill', '#fff')
+    # crossLine = gElement.append('line')
+    #     .attr('x1', 100)
+    #     .attr('y1', 0)
+    #     .attr('x2', 0)
+    #     .attr('y2', 100)
+
+    
 
   hideLastAxesTicks: ->
     spacingX = 20
@@ -1473,8 +1517,6 @@ class BaseChart
         @showMouseIndicators()
 
       @prevMousePosition = [pos.x, pos.y]
-
-     
 
   setHoveredLine: ->
     mouse = @getMousePosition(@mouseOverlay.node())

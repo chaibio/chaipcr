@@ -232,11 +232,10 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
 
         style = {}
         border = '2px solid #000'
-
         if well.selected
           if !(well_left?.selected)
             style['border-left'] = border
-          if !(well_right?.selected)
+          if !(well_right?.selected or (index + 1) % 8==0)
             style['border-right'] = border
           if !(well_top?.selected)
             style['border-top'] = border

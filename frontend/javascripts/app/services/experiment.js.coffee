@@ -123,7 +123,13 @@ window.ChaiBioTech.ngApp
     self.getAmplificationOptions = (id) ->
       $http.get("/experiments/" + id + "/amplification_option")
 
+    self.getStandardCurveOptions = (id) ->
+      $http.get("/experiments/" + id + "/amplification_option")
+
     self.updateAmplificationOptions = (id,amplificationData) ->
+      $http.put "experiments/" + id + "/amplification_option/", amplification_option : amplificationData
+
+    self.updateStandardCurveOptions = (id,amplificationData) ->
       $http.put "experiments/" + id + "/amplification_option/", amplification_option : amplificationData
 
     tempLogsQues = []
@@ -161,6 +167,8 @@ window.ChaiBioTech.ngApp
       return deferred.promise
 
     self.getAmplificationData = (expId) ->
+      console.log('strange')
+      #alert('strange')
       deferred = $q.defer()
       $http.get("/experiments/#{expId}/amplification_data").then (resp) ->
         deferred.resolve(resp)
@@ -176,7 +184,7 @@ window.ChaiBioTech.ngApp
 
     self.getStandardCurveData = (expId) ->
       deferred = $q.defer()
-      $http.get("/experiments/#{expId}/standard_curve").then (resp) ->
+      $http.get("/experiments/#{expId}/amplification_data").then (resp) ->
         deferred.resolve(resp)
       , (resp) ->
         if resp.toString().indexOf('SyntaxError') > -1

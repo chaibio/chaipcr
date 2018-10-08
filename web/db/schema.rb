@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180730182923) do
+ActiveRecord::Schema.define(version: 20180925064008) do
 
   create_table "amplification_curves", force: :cascade do |t|
     t.integer "experiment_id", limit: 4
@@ -73,11 +73,12 @@ ActiveRecord::Schema.define(version: 20180730182923) do
   add_index "cached_melt_curve_data", ["experiment_id", "stage_id", "channel", "well_num"], name: "index_meltcurvedata_by_exp_stage_chan_well", unique: true, using: :btree
 
   create_table "cached_standard_curve_data", force: :cascade do |t|
-    t.integer "experiment_id",         limit: 4
-    t.text    "standard_curve_result", limit: 16777215
+    t.integer "well_layout_id", limit: 4,        null: false
+    t.integer "target_id",      limit: 4,        null: false
+    t.text    "equation",       limit: 16777215
   end
 
-  add_index "cached_standard_curve_data", ["experiment_id"], name: "index_cached_standard_curve_data_on_experiment_id", unique: true, using: :btree
+  add_index "cached_standard_curve_data", ["well_layout_id", "target_id"], name: "index_cached_standard_curve_data_on_well_layout_id_and_target_id", unique: true, using: :btree
 
   create_table "experiment_definitions", force: :cascade do |t|
     t.string "guid",            limit: 255
@@ -95,12 +96,13 @@ ActiveRecord::Schema.define(version: 20180730182923) do
     t.string   "completion_message",       limit: 255
     t.integer  "experiment_definition_id", limit: 4
     t.integer  "calibration_id",           limit: 4
-    t.boolean  "time_valid",                                                   default: true
+    t.boolean  "time_valid",                                                     default: true
     t.string   "analyze_status",           limit: 255
-    t.decimal  "cached_temperature",                   precision: 7, scale: 4
+    t.decimal  "cached_temperature",                     precision: 7, scale: 4
     t.integer  "power_cycles",             limit: 4
     t.string   "name",                     limit: 255
     t.integer  "targets_well_layout_id",   limit: 4
+    t.text     "notes",                    limit: 65535
   end
 
   create_table "fluorescence_data", id: false, force: :cascade do |t|
@@ -164,9 +166,10 @@ ActiveRecord::Schema.define(version: 20180730182923) do
   end
 
   create_table "samples_wells", force: :cascade do |t|
-    t.integer "well_layout_id", limit: 4, null: false
-    t.integer "well_num",       limit: 4, null: false
-    t.integer "sample_id",      limit: 4, null: false
+    t.integer "well_layout_id", limit: 4,        null: false
+    t.integer "well_num",       limit: 4,        null: false
+    t.integer "sample_id",      limit: 4,        null: false
+    t.text    "notes",          limit: 16777215
   end
 
   add_index "samples_wells", ["well_layout_id", "well_num"], name: "well_layout_sample", using: :btree
@@ -294,16 +297,6 @@ ActiveRecord::Schema.define(version: 20180730182923) do
     t.string   "parent_type",              limit: 255, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  create_table "wells", force: :cascade do |t|
-    t.integer "experiment_id", limit: 4,        null: false
-    t.integer "well_num",      limit: 4,        null: false
-    t.string  "well_type",     limit: 255,      null: false, comment: "positive_control, no_template_control, standard, sample"
-    t.string  "sample_name",   limit: 255
-    t.text    "notes",         limit: 16777215
-    t.string  "target1",       limit: 255
-    t.string  "target2",       limit: 255
   end
 
 end

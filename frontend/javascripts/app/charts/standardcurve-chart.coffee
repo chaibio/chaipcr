@@ -1,4 +1,4 @@
-class AmplificationChart extends window.ChaiBioCharts.BaseChart
+class StandardCurveChart extends window.ChaiBioCharts.BaseChart
 
   DEFAULT_MIN_Y: 0
   DEFAULT_MAX_Y: 10000
@@ -6,13 +6,10 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
   DEFAULT_MAX_X: 40
   MARGIN:
     top: 10
-    left: 60
+    left: 80
     right: 10
     bottom: 20
-    # top: 10
-    # left: 80
-    # right: 10
-    # bottom: 20
+
   inK: ->
     @getMaxY() - @getMinY() > 20000
 
@@ -26,16 +23,13 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
     if @config.axes.y.scale is 'log' then d3.curveMonotoneX else d3.curveBasis
 
   # makeColoredLine: (line_config) ->
-
   #   xScale = @getXScale()
   #   yScale = @getYScale()
   #   line = d3.line()
   #   line.curve(@getLineCurve())
   #   line.x (d) -> xScale(d[line_config.x])
   #   line.y (d) -> yScale(d[line_config.y])
-    
   #   if (@config.axes.y.scale is 'log') then line.defined (d) -> d[line_config.y] > 10
-    
   #   _path = @viewSVG.append("path")
   #       .datum(@data[line_config.dataset])
   #       .attr("class", "colored-line")
@@ -277,4 +271,4 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
     super
     
 window.ChaiBioCharts = window.ChaiBioCharts || {}
-window.ChaiBioCharts.AmplificationChart = AmplificationChart
+window.ChaiBioCharts.StandardCurveChart = StandardCurveChart
