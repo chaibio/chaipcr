@@ -244,7 +244,8 @@
 
 
         function getAmountArray(){
-          for (var i = 2; i < 8; i++) {
+          var i = 0;
+          for (i = 2; i < 8; i++) {
             if($scope.result[i] == "Inhibited"){
               $scope.amount[i] = "Repeat";
             }
@@ -265,7 +266,7 @@
             }
           }
           if(!$scope.twoKits){
-            for (var i = 8; i < 16; i++) {
+            for (i = 8; i < 16; i++) {
               if($scope.result[i] == "Inhibited"){
                 $scope.amount[i] = "Invalid";
               }
@@ -289,7 +290,7 @@
           else{
             $scope.amount[8]="\u2014";
             $scope.amount[9]="\u2014";
-            for (var i = 10; i < 16; i++) {
+            for (i = 10; i < 16; i++) {
               if($scope.result[i] == "Inhibited"){
                 $scope.amount[i] = "Repeat";
               }
@@ -313,6 +314,7 @@
         }
 
         function getResultArray() {
+          var i = 0;
           if($scope.famCq[0]>=20 && $scope.famCq[0]<=34 ){
             $scope.result[0]="Valid";
           }
@@ -329,7 +331,7 @@
             $scope.amount[1] = "Repeat";
           }
 
-          for (var i = 2; i < 8; i++) {
+          for (i = 2; i < 8; i++) {
             $scope.result[i]="Invalid";
             if($scope.result[1] == "Invalid"){
               $scope.result[i]="Invalid";
@@ -356,7 +358,7 @@
             }
           }
           if(!$scope.twoKits){
-            for (var i = 8; i < 16; i++) {
+            for (i = 8; i < 16; i++) {
               $scope.result[i]="Invalid";
               if($scope.result[1] == "Invalid"){
                 $scope.result[i]="Invalid";
@@ -398,7 +400,7 @@
               $scope.result[9]="Invalid";
             }
 
-            for (var i = 10; i < 16; i++) {
+            for (i = 10; i < 16; i++) {
               $scope.result[i]="Invalid";
               if($scope.result[9] == "Invalid"){
                 $scope.result[i]="Invalid";
