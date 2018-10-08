@@ -32,8 +32,10 @@
   position: fixed;
 }
 
-table.sample-target-table thead::-webkit-scrollbar {
-    background: transparent;  /* optional: just make scrollbar invisible */
+table.sample-target-table {
+    thead::-webkit-scrollbar{
+        background: transparent;  /* optional: just make scrollbar invisible */
+    }
 }
 
 table.sample-target-table{
@@ -46,7 +48,7 @@ table.sample-target-table{
 .samples, .targets{
     table{
         width: 100%;
-        height: calc(100% - 100px);
+        max-height: calc(100% - 100px);
         td, th{
             font-size: 13px;
             font-family: 'dinot-medium';            
