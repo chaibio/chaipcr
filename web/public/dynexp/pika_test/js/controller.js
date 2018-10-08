@@ -310,6 +310,7 @@
 					}
 					else{
 						$scope.result[0]="Invalid";
+						$scope.amount[0] = "Repeat";
 					}
 
 					if((!$scope.famCq[1] || $scope.famCq[1] == 0 || ($scope.famCq[1]>38 && $scope.famCq[1]<=40)) && ($scope.hexCq[1]>=20 && $scope.hexCq[1]<=36) ){
@@ -317,6 +318,7 @@
 					}
 					else{
 						$scope.result[1]="Invalid";
+						$scope.amount[1] = "Repeat";
 					}
 
 					for (var i = 2; i < 8; i++) {
