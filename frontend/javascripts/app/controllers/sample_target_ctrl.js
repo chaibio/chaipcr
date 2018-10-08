@@ -265,6 +265,9 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
         };
 
         $scope.deleteSample = function (rowContent, index) {
+            if($scope.rows.length == 1)
+                return;
+
             if(rowContent.assigned){
                 $scope.deleteConfirmModal().result.then(function() {
                   $scope.deleteSampleItem(rowContent, index);
@@ -290,6 +293,9 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
         };
 
         $scope.deleteTarget = function (targetContent, index) {
+            if($scope.targets.length == 1)
+                return;
+
             if(targetContent.assigned){
                 $scope.deleteConfirmModal().result.then(function() {
                   $scope.deleteTargetItem(targetContent, index);
