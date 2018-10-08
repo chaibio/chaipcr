@@ -1,5 +1,7 @@
 class BaseChart
 
+  Y_AXIS_NUM_TICKS: 5
+
   NORMAL_PATH_STROKE_WIDTH: 2
   HOVERED_PATH_STROKE_WIDTH: 3
   ACTIVE_PATH_STROKE_WIDTH: 5
@@ -14,6 +16,7 @@ class BaseChart
   zoomTransform: {x: 0, y: 0, k: 1}
   isZooming: false
   INPUT_PADDING: 5
+
   MARGIN:
     left: 0
     top: 0
@@ -512,13 +515,24 @@ class BaseChart
   getYLinearTicks: ->
     max = @getMaxY()
     min = @getMinY()
-    min = Math.floor(min / 5000) * 5000 # ROUND(A2/5,0)*5
-    max = Math.ceil(max / 5000) * 5000
-    
-    ticks = []
-    for y in [min..max] by 5000
-      ticks.push(y)
 
+    # min = Math.floor(min / 5000) * 5000 # ROUND(A2/5,0)*5
+    # max = Math.ceil(max / 5000) * 5000
+    # ticks = []
+    # for y in [min..max] by 5000
+    #   ticks.push(y)
+
+    #append for Y_AXIS_NUM_TICKS start
+    intv = (max - min) / @Y_AXIS_NUM_TICKS
+    intv = Math.ceil(intv / 5000) * 5000
+
+    min = Math.floor(min / intv) * intv # ROUND(A2/5,0)*5
+    max = Math.ceil(max / intv) * intv
+
+    ticks = []
+    for y in [min..max] by intv
+      ticks.push(y)
+    #append for Y_AXIS_NUM_TICKS end
     return ticks
 
   setYAxis: ->
