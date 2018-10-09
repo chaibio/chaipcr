@@ -283,8 +283,17 @@ ENDSSH
         sudo gulp deploy || exit 1
         cd ..
         
-        cat deploy.sh
-        echo | ./deploy.sh $build_machine
+		rm -rf ./web/log
+
+		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./web &quot;$build_machine:/root/chaipcr/&quot; || (echo error copying files to device &amp;&amp; exit 1)
+		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./browser &quot;$build_machine:/root/chaipcr/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
+		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./bioinformatics &quot;$build_machine:/root/chaipcr/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
+		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./device/configuration.json &quot;$build_machine:/root/chaipcr/deploy/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
+		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./device/configuration.json &quot;$build_machine:/root/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
+		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./devops/factory_settings_sdcard/scripts/replace_uEnv.txt.sh &quot;$build_machine:/root/chaipcr/deploy/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
+		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./devops/device &quot;$build_machine:/root/chaipcr/deploy/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
+		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./modules &quot;$build_machine:/root/chaipcr/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
+		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./realtime/overlay &quot;$build_machine:/root/chaipcr/deploy/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
 
         exit 0
     fi
@@ -515,7 +524,7 @@ EOF
 
 echo Patching..
 
-patch -i add_catch.patch
+patch -i add_catch.patch  || (echo error patching ExecBuilder package &amp;&amp; exit 1)
 echo done installation.. creating execuitable:
 
 #exit 0
@@ -827,13 +836,13 @@ chmod +x rc.local
 fi
 
 cd /etc        
-patch -i ~/chaipcr/deploy/device/rc.local.patch
+patch -i ~/chaipcr/deploy/device/rc.local.patch  || (echo error patching rc.local &amp;&amp; exit 1)
 cd
 sync
 
 echo Disable Mass-storage mini-usb
 cd /opt/scripts/boot        
-patch -i ~/chaipcr/deploy/device/storage.disable.patch 
+patch -i ~/chaipcr/deploy/device/storage.disable.patch  || (echo error adding storage disable patch &amp;&amp; exit 1)
 cd ~
 sync
 
@@ -850,6 +859,12 @@ cd /opt/scripts/boot
 
 ls temp.patch &amp;&amp; rm temp.patch
 cat &gt;&gt; temp.patch &lt;&lt; EOF
+--- am335x_evm.sh       2018-10-04 15:06:36.889361025 +0200
++++ am335x_evm.sh       2018-10-04 15:06:26.649444094 +0200
+@@ -682,17 +682,17 @@
+ compare_major=&quot;4&quot;
+ compare_minor=&quot;4&quot;
+
 -if [ &quot;\${kernel_major}&quot; -lt &quot;\${compare_major}&quot; ] ; then
 +#if [ &quot;\${kernel_major}&quot; -lt &quot;\${compare_major}&quot; ] ; then
  	use_old_g_multi
@@ -876,7 +891,7 @@ cat &gt;&gt; temp.patch &lt;&lt; EOF
  	systemctl stop dnsmasq || true
 EOF
 
-patch -i temp.patch
+patch -i temp.patch  || (echo error adding usb1 patch &amp;&amp; exit 1)
 rm temp.patch
 
 exit 0</command>
