@@ -38,7 +38,7 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
         });
 
         Device.isDualChannel().then(function(is_dual_channel){
-            $scope.is_dual_channel = is_dual_channel ;
+            $scope.is_dual_channel = is_dual_channel;
         });
 
         $scope.rows = [];
@@ -46,6 +46,8 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
         $scope.colors = AmplificationChartHelper.SAMPLE_TARGET_COLORS;
         $scope.isAddSample = true;
         $scope.isAddTarget = true;
+        $scope.focustSampleName = '';
+        $scope.focustTargetName = '';
 
         $scope.getSamples = function(){
             Experiment.getSamples($stateParams.id).then(function(resp){
@@ -58,12 +60,6 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
                         $scope.rows[i].assigned = true;
                     } else{
                         $scope.rows[i].assigned = false;
-                    }
-
-                    if($scope.rows[i].name.match(/^Sample [\d]+$/g)){
-                        $scope.rows[i].defaultNumber = $scope.rows[i].name.split(' ')[1];
-                    } else {
-                        $scope.rows[i].defaultNumber = 0;
                     }
                 }
                 if(resp.data.length == 0){
@@ -86,12 +82,6 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
                     else{
                         $scope.targets[i].assigned = false;
                     }
-
-                    if($scope.targets[i].name.match(/^Target [\d]+$/g)){
-                        $scope.targets[i].defaultNumber = $scope.targets[i].name.split(' ')[1];
-                    } else {
-                        $scope.targets[i].defaultNumber = 0;
-                    }
                 }
                 if(resp.data.length == 0){
                     $scope.createTarget();
@@ -105,41 +95,27 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
         $scope.validItemName = function(type){
             var index = 1, isExist = true;
             if(type == 'Sample'){
-                index = $scope.rows.length + 1;
-                while(isExist){
-                    isExist = false;
-                    for (i = 0; i < $scope.rows.length; i++) {
-                        if($scope.rows[i].name == 'Sample ' + index){
-                            isExist = true;
-                            break;
-                        }
-                    }
-                    if(isExist){
-                        index++;
+                for (i = 0; i < $scope.rows.length; i++) {
+                    if($scope.rows[i].name.match(/^Sample [\d]+$/g)){
+                        items = $scope.rows[i].name.split(' ');
+                        index = (index < parseInt(items[1])) ?  parseInt(items[1]) : index;
                     }
                 }
+                index++;
                 return 'Sample ' + index;
             } else {
-                index = $scope.targets.length + 1;
-                while(isExist){
-                    isExist = false;
-                    for (i = 0; i < $scope.targets.length; i++) {
-                        if($scope.targets[i].name == 'Target ' + index){
-                            isExist = true;
-                            break;
-                        }
-                    }
-                    if(isExist){
-                        index++;
+                for (i = 0; i < $scope.targets.length; i++) {
+                    if($scope.targets[i].name.match(/^Target [\d]+$/g)){
+                        items = $scope.targets[i].name.split(' ');
+                        index = (index < parseInt(items[1])) ?  parseInt(items[1]) : index;
                     }
                 }
-
+                index++;
                 return 'Target ' + index;
             }
         };
 
         $scope.create = function() {
-            if($scope.rows.length >= 16) return;
             if(!$scope.isAddSample) return;
 
             $scope.isAddSample = false;
@@ -159,6 +135,8 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
 
                 var trHeight = document.querySelector('table.sample-table tbody tr:first-child td:last-child').offsetHeight - 1;
                 angular.element(document.querySelectorAll('table.sample-table')).css('height', (trHeight * ($scope.rows.length + 2)) + 'px');
+                var scrollHeight = document.querySelector('table.sample-table tbody').scrollHeight;
+                angular.element(document.querySelector('table.sample-table tbody')).animate({scrollTop: scrollHeight}, "slow");
             });
         };
 
@@ -184,7 +162,8 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
                 
                 var trHeight = document.querySelector('table.target-table tbody tr:first-child td:last-child').offsetHeight - 1;
                 angular.element(document.querySelectorAll('table.target-table')).css('height', (trHeight * ($scope.targets.length + 2)) + 'px');
-
+                var scrollHeight = document.querySelector('table.target-table tbody').scrollHeight;
+                angular.element(document.querySelector('table.target-table tbody')).animate({scrollTop: scrollHeight}, "slow");
             });
         };
 
@@ -196,25 +175,20 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
         };
 
         $scope.focusSample = function (rowContent, indexValue){
-            if(rowContent.defaultNumber){
-                $scope.rows[indexValue].name = "";
-            }
+            $scope.focustSampleName = rowContent.name;
         };
 
         $scope.focusTarget = function (targetContent, indexValue){
-            if(targetContent.defaultNumber){
-                $scope.targets[indexValue].name = "";
-            }
+            $scope.focustTargetName = targetContent.name;
         };
 
         $scope.updateSample = function(rowContent, indexValue) {
             document.activeElement.blur();
-            if(rowContent.name == ""){
-                $scope.rows[indexValue].name = "Sample " + (rowContent.defaultNumber);
+            if(rowContent.name == ''){
+                rowContent.name = $scope.focustSampleName;
             } else {
-                Experiment.updateSample($stateParams.id, rowContent.id, {name: rowContent.name}).then(function(resp) {
-                    $scope.rows[indexValue].defaultNumber = 0;
-                });                
+                Experiment.updateSample($stateParams.id, rowContent.id, {name: rowContent.name}).then(function(resp) {                
+                });
             }
             //$scope.editExpNameMode[index] = false;
             //$scope.samples[index - 3] = x;
@@ -222,12 +196,11 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
 
         $scope.updateTargetName = function(targetContent, indexValue) {
             document.activeElement.blur();
-            if(targetContent.name == ""){
-                $scope.targets[indexValue].name = "Target " + (targetContent.defaultNumber);
+            if(targetContent.name == ''){
+                targetContent.name = $scope.focustTargetName;
             } else {
                 Experiment.updateTarget($stateParams.id, targetContent.id, {name: targetContent.name}).then(function(resp) {
-                    $scope.targets[indexValue].defaultNumber = 0;
-                });                
+                });
             }
             //$scope.editExpNameMode[index] = false;
             //$scope.samples[index - 3] = x;

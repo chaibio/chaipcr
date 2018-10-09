@@ -89,9 +89,9 @@ limitations under the License.
                     <input style="border:0px;padding:0px;width:100%;outline: none;" type="text" ng-blur="updateTargetName(targetContent,$index)" ng-focus="focusTarget(targetContent,$index)" placeholder="Enter Target Name"  class="" ng-model="targetContent.name">
                 </td>
                 <td style="border-bottom:1px solid #bbb; padding: 0 2px; width: 80px;" class="text-center">
-                    <div ng-show="targetContent.selectChannel"  class="channel-selector">
-                        <span ng-click="updateTargetChannel(targetContent.id,1, $index)" ng-class="{'select-channel-border':targetContent.channel == 1}">1</span>
-                        <span ng-click="updateTargetChannel(targetContent.id,2, $index)" ng-class="{'select-channel-border':targetContent.channel == 2}">2</span>
+                    <div ng-show="targetContent.selectChannel"  class="channel-selector" ng-class="{'one-channel' : !is_dual_channel}">
+                        <span ng-click="updateTargetChannel(targetContent.id,1, $index)" ng-class="{'select-channel-border':targetContent.channel == 1}">1</span>                        
+                        <span ng-click="updateTargetChannel(targetContent.id,2, $index)" ng-class="{'select-channel-border':targetContent.channel == 2}" ng-if="is_dual_channel">2</span>
                     </div>
                     <div ng-show="!targetContent.selectChannel"  class="cursor-channel">
                         <span ng-click="targetContent.selectChannel = !targetContent.selectChannel" style="text-decoration: underline; display: block;">{{targetContent.channel}}</span>

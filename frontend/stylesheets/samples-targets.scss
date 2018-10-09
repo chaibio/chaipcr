@@ -69,6 +69,13 @@ table.sample-target-table{
                 cursor: pointer;
                 line-height: 24px;
             }
+
+            &.one-channel{
+                max-width: 40px;
+                span{
+                    width:90%;
+                }
+            }
         }
     }
     padding-left: 50px !important;
