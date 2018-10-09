@@ -169,6 +169,7 @@
         font-family: 'dinot-regular';
         //font-weight: 300;
         border: none;
+        border-radius: 10px;
         cursor: pointer;
         width: 120px;
         border: 1px solid black;
@@ -235,7 +236,7 @@
       // display: inline-block;
       // width: 85%;
       float: left;
-      box-shadow: 0 1pt 1pt 1px grey;
+      box-shadow: 1pt 1pt 1pt 1px grey;
       
       // height: 100%;
     }

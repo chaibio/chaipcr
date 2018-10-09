@@ -19,7 +19,7 @@
 <div ng-controller="RunExperimentCtrl">
   <div menu-overlay sidemenu-template="app/views/experiment/left-menu.html">
     <div full-height offset="37">
-      <header-status experiment-id="experiment.id">
+      <header-status experiment-id="experiment.id" style="height:4vh;">
         <div class="stripes-and-name" toggle-sidemenu>
           <div class="stripes">
             <div class="stripe"></div>
@@ -28,7 +28,7 @@
           </div>
         </div>
       </header-status>
-      <div class="chart-screens-container">
+      <div class="chart-screens-container" style="height:92vh;">
         <div ng-show="chart === 'amplification'" ng-include src="'app/views/experiment/amplification-chart.html'">
         </div>
         <div ng-show="chart === 'standard-curve'" ng-include src="'app/views/experiment/standard-curve.html'">
@@ -39,6 +39,6 @@
         </div>
       </div>
     </div>
-    <status-bar experiment-id="experiment.id"></status-bar>
+    <status-bar experiment-id="experiment.id" style="height:4vh;"></status-bar>
   </div>
 </div>
