@@ -210,6 +210,13 @@ uname -a
 ls -ahl
 lsblk
 df -h
+
+if [ -e /root/debug_image ]
+then
+     echo &quot;Cann&apos;t save a debug image&quot;
+     exit 1
+fi
+
 dpkg --configure -a
 swapoff -a
 umount /dev/mmcblk0p*
