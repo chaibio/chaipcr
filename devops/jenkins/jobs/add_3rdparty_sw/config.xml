@@ -421,6 +421,7 @@ cd ~
 if $is_dev
 then
       echo Building a debug image
+      touch /root/debug_image
       cd /sdcard/factory/
 fi
 
@@ -685,8 +686,8 @@ sync
       apt install -y -q liblapack-dev libblas-dev
       apt install -y -q libmysqlclient-dev
 
-      sed -i &apos;1i using DataArrays&apos; /root/chaipcr/bioinformatics/juliaserver.jl
-      sed -i &apos;1i push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;)&apos; /root/chaipcr/bioinformatics/juliaserver.jl
+#      sed -i &apos;1i using DataArrays&apos; /root/chaipcr/bioinformatics/juliaserver.jl
+#      sed -i &apos;1i push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;)&apos; /root/chaipcr/bioinformatics/juliaserver.jl
 
       echo Build time- adding pre-requesits
       free -m
