@@ -22,27 +22,27 @@ limitations under the License.
       <div class="chart-section col-lg-8 col-md-8 col-sm-6 col-xs-6" offset="0" force="true" full-height style="padding-left: 0px; padding-right: 0px; display: flex; flex-direction: column; justify-content: space-between; background: #eeeeee">
         <div>
             <!--curve-header-->
-          <div class="curve-header" style="margin-left:0px; margin-right:0px; padding-top: 20px; height: 120px; background: white; box-shadow: 0px 1pt 1pt 1pt grey; margin-bottom: 10px;">
-            <div class="col-lg-4 col-md-5 col-sm-5 col-xs-5 curve-name" style="padding-left: 15px; width: 40%" >
+          <div class="curve-header">
+            <div class="col-lg-4 col-md-5 col-sm-5 col-xs-5 curve-name" style="padding-left: 15px; width: 40%; display: flex; flex-direction: column; justify-content: center;" >
               <!-- <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()"> -->
               <chart-chooser class="curve-title H1" experiment="experiment" current-chart="$parent.chart" style="padding-left: 15px;">
                 Amplification Curve
                 <img class="arrow-down" src="/images/arrow-down_black.png">
               </chart-chooser>
             </div>
-            <div class="col-lg-8 col-md-7 col-sm-7 col-xs-7 ampli-toggles" style="width:60%;">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+            <div class="col-lg-8 col-md-7 col-sm-7 col-xs-7 ampli-toggles" style="width:60%; display: flex; flex-direction: column; justify-content: center;">
               <div class="row">
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 plot-options" style="width:40%;">
                   <div class="subheader-switches SH" style="font-size: 13pt;">
                     <div class="item-switch">
-                      <label style="font-weight: normal; font-family: 'dinot-regular'">Baseline Sub.</label>
+                      <label class="B1">Baseline Sub.</label>
                       <switch class="switch" ng-model="baseline_subtraction"></switch>
                     </div>
                     <div class="item-switch-channel" ng-show="!is_dual_channel">
-                      <label class="amplification-options" style="color: red; font-weight: normal; font-family: 'dinot-regular';" ng-click="openOptionsModal()">Advanced Settings</label>
+                      <label class="amplification-options B1" style="color: red;" ng-click="openOptionsModal()">Advanced Settings</label>
                     </div>
                     <div class="item-switch-channel" ng-show="is_dual_channel">
-                      <label ng-show="experiment.type != 'test_kit'" style="color: red !important; font-weight: normal; font-family: 'dinot-regular';" class="amplification-options" ng-click="openOptionsModal()">Advanced Settings</label>
+                      <label class="amplification-options B1" ng-show="experiment.type != 'test_kit'" style="color: red !important;" ng-click="openOptionsModal()">Advanced Settings</label>
                       <!-- <label>CHOOSE CHANNEL:</label> &nbsp;
                       <switch ng-model="channel_1"></switch>
                       <label>1</label>
@@ -53,18 +53,18 @@ limitations under the License.
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 plot-options" style="width:27%; text-align: right; padding-right: 0px">
                   <div class="plot-option">
-                    <p style="font-size: 13pt; color:black;">Plot Type</p>
-                    <form role="form" class="form-horizontal" name="plotType" style="font-size: 13pt" novalidate>
-                      <div class="form-group">
+                    <p class="B1">Plot Type</p>
+                    <form role="form" class="form-horizontal B1" name="plotType" novalidate>
+                      <div class="form-group B1">
                         <div class="col-md-12">
-                          <div class="dropdown" ng-click="showPlotTypeList()">
-                            <button class="dropbtn" style="font-size: 15pt; line-height: 20pt;">
-                              <span class="test" style="float:left;">{{curve_type.charAt(0).toUpperCase() + curve_type.slice(1)}}</span>
+                          <div class="dropdown B1" ng-click="showPlotTypeList()">
+                            <button class="dropbtn B1">
+                              <span class="test B1" style="float:left;">{{curve_type.charAt(0).toUpperCase() + curve_type.slice(1)}}</span>
                               <img class="arrow-down" src="/images/arrow-down_white.png">
                               <!-- <img class="arrow-down" src="/images/arrow-down.svg"> -->
                               
                             </button>
-                            <div id="plotTypeList" class="dropdown-content" style="font-size: 15pt; line-height: 20pt;">
+                            <div id="plotTypeList" class="dropdown-content B1">
                               <a href="" ng-click="curve_type='log'" value="abc">Log</a>
                               <a href="" ng-click="curve_type='linear'" value="abc">Linear</a>
                             </div>
@@ -76,16 +76,16 @@ limitations under the License.
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 plot-options" style="width:33%; text-align: right; padding-right: 40px">
                   <div class="plot-option">
-                    <p style="font-size: 13pt; color:black;">Color by</p>
-                    <form role="form" class="form-horizontal" name="colorBy" style="font-size: 13pt" novalidate>
+                    <p class="B1">Color by</p>
+                    <form role="form" class="form-horizontal B1" name="colorBy" novalidate>
                       <div class="form-group">
                         <div class="col-md-12" style="padding-right: 10px;">
-                          <div class="dropdown" ng-click="showColorByList()">
-                            <button class="dropbtn" style="font-size: 15pt; line-height: 20pt;">
-                              <span class="test" style="float:left;">{{color_by.charAt(0).toUpperCase() + color_by.slice(1)}}</span>
+                          <div class="dropdown B1" ng-click="showColorByList()">
+                            <button class="dropbtn B1">
+                              <span class="test B1" style="float:left;">{{color_by.charAt(0).toUpperCase() + color_by.slice(1)}}</span>
                               <img class="arrow-down" src="/images/arrow-down_white.png">
                             </button>
-                            <div id="colorByList_ampli" class="dropdown-content" style="font-size: 15pt; line-height: 20pt;">
+                            <div id="colorByList_ampli" class="B1 dropdown-content">
                               <a href="" ng-click="color_by='sample'" value="abc">Sample</a>
                               <a href="" ng-click="color_by='target'" value="abc">Target</a>
                               <a href="" ng-click="color_by='well'" value="abc">Well</a>
@@ -143,7 +143,7 @@ limitations under the License.
                   <button class="button zoom-button" ng-click="zoomOut()" style="text-align: center; vertical-align: middle; font-size: 20px; margin-left: 30px; padding: 0px; width: 30px;">–</button>
                 </div>
                 <div style="display: grid; width: 100%; height: 100%; align-content: center; vertical-align: middle; text-align: center">
-                    <font style="font-weight: bold; font-size: 10pt; line-height: 16pt;">Cycle Number</font>
+                   <font class="G1">Cycle Number</font>
                 </div>                
               </div>
             </div>
@@ -152,32 +152,32 @@ limitations under the License.
               <div style="height:100%; padding-right: 20px; margin: 0px; background: transparent; display: flex; float: left; flex-direction: column; justify-content: space-between;">
                   <div style="padding: 0; background: transparent; box-shadow: 1pt 1pt 1pt 1px grey;">
                       <div class="parameters">
-                        <div class="header" ng-style="bgcolor_target" style="min-height: 41px; font-size: 15pt; line-height: 20pt; color:white;">
+                        <div class="header B1-M" ng-style="bgcolor_target" style="min-height: 41px; color:white;">
                           <!-- Target: -->
                           {{label_target}}
                         </div>
                         <div>
                           <table class="parameters-table">
                             <tr>
-                              <td style="font-size: 15pt; line-height: 25pt; padding: 2px;">Cycle:</td>
-                              <td style="font-size: 15pt; line-height: 25pt; padding: 2px;">{{label_cycle}}</td>
+                              <td class="B1">Cycle:</td>
+                              <td class="B1-M">{{label_cycle}}</td>
                             </tr>
                             <tr>
-                              <td style="font-size: 15pt; line-height: 25pt; padding: 2px;">RFU:</td>
-                              <td style="font-size: 15pt; line-height: 25pt; padding: 2px;">{{label_RFU}}</td>
+                              <td class="B1">RFU:</td>
+                              <td class="B1-M">{{label_RFU}}</td>
                             </tr>
                             <tr>
-                              <td style="font-size: 15pt; line-height: 25pt; padding: 2px;">dF/dc:</td>
-                              <td style="font-size: 15pt; line-height: 25pt; padding: 2px;">{{label_dF_dC}}</td>
+                              <td class="B1">dF/dc:</td>
+                              <td class="B1-M">{{label_dF_dC}}</td>
                             </tr>
                             <tr>
-                              <td style="font-size: 15pt; line-height: 25pt; padding: 2px;">d<sup>2</sup>/dc<sup>2</sup>:</td>
-                              <td style="font-size: 15pt; line-height: 25pt; padding: 2px;">{{label_D2_dc2}}</td>
+                              <td class="B1">d<sup>2</sup>/dc<sup>2</sup>:</td>
+                              <td class="B1-M">{{label_D2_dc2}}</td>
                             </tr>
                           </table>
                         </div>
                       </div>
-                      <div class="info" style="font-size: 12pt; line-height: 15pt; padding-top: 8px; padding-bottom: 8px; padding-left: 10px;">
+                      <div class="info B2" style="padding-top: 8px; padding-bottom: 8px; padding-left: 10px;">
                         Channel: {{label_channel}}
                       </div>
                       <!-- <div class="info1" ng-style="bgcolor_wellSample"  style="min-height: 41px; font-size: 15px; color:white; margin-top: 5px">
@@ -214,22 +214,22 @@ limitations under the License.
         <table full-height>
           <tbody>
             <tr>
-              <th class="B2" style="border-left:none">Clr</th>
-              <th class="B2">Omit</th>
-              <th class="B2" style="text-align: left; padding-left:0px;" >Well</th>
-              <th class="B2" style="text-align: left; padding-left:0px;" >Sample</th>
-              <th class="B2">Type</th>
-              <th class="B2" style="text-align: left; padding-left:0px;">Target</th>
-              <th class="B2" style="text-align: left; padding-left:0px;" ng-class="{'channel-1': color_by === 'channel'}">
+              <th class="B2-M" style="border-left:none">Clr</th>
+              <th class="B2-M">Omit</th>
+              <th class="B2-M" style="text-align: left; padding-left:0px;" >Well</th>
+              <th class="B2-M" style="text-align: left; padding-left:0px;" >Sample</th>
+              <th class="B2-M">Type</th>
+              <th class="B2-M" style="text-align: left; padding-left:0px;">Target</th>
+              <th class="B2-M" style="text-align: left; padding-left:0px;" ng-class="{'channel-1': color_by === 'channel'}">
                 <span ng-if="is_dual_channel">Cq</span>
                 <span ng-if="!is_dual_channel">Cq</span>
               </th>
-              <th class="B2" style="text-align: left; padding-left:0px;" ng-class="{'channel-2': color_by === 'channel'}" style="padding: 10px 5px;">
+              <th class="B2-M" style="text-align: left; padding-left:0px;" ng-class="{'channel-2': color_by === 'channel'}" style="padding: 10px 5px;">
                 <span ng-if="is_dual_channel" >Cq M</span>
                 <span ng-if="!is_dual_channel" >Cq M</span>
               </th>
-              <th class="B2" style="text-align: left; padding-left:0px;">Qty</th>
-              <th class="B2" style="text-align: left; padding-left:0px;">Qty M</th>
+              <th class="B2-M" style="text-align: left; padding-left:0px;">Qty</th>
+              <th class="B2-M" style="text-align: left; padding-left:0px;">Qty M</th>
             </tr>
             <tr ng-repeat="i in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" ng-class="{selected: (wellButtons['well_'+i].selected)}">
               <td class="B2" ng-class="{'text-center': color_by==='channel'}">
@@ -285,7 +285,7 @@ limitations under the License.
                 </span>
                 <span class="width1" ng-if="!is_dual_channel">
                   <span class="dummy-placeholder"></span>
-                  <td class="B2" >
+                  <td class="B2">
                 </span>
               </td style="text-align: left">
                   <span class="width1">
