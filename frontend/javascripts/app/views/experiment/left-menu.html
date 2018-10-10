@@ -30,8 +30,9 @@
       <div ng-if="status != 'COMPLETED'" class="side-menu-exp-status B1">{{runStatus}}</div>
     </div>
     <div class="side-menu-menu-container">
+      <label class="section-name">Setup</label>
       <div class="side-menu-menu-item">
-        <div class="B1B">EXPERIMENT PROPERTIES
+        <div class="B1B">Experiment Properties
           <span ng-click="showProperties=!showProperties" class="sidemenu-show-text">{{showHide}}</span>
         </div>
       </div>
@@ -43,18 +44,51 @@
           <protocol-item state="{{status}}"></protocol-item>
         </div>
       </div>
-      <!--<div class="side-menu-menu-item">
-        <div class="B1B">PLATE SETUP</div>
-      </div> -->
-      <div class="side-menu-menu-item run-exp">
+      <div class="side-menu-menu-item">
+        <div class="B1B" ui-sref="samples-targets({id: params.id})" toggle-sidemenu>
+          <span>Samples + Targets</span>
+        </div>
+      </div>
+      <div class="side-menu-menu-item">
+        <div class="B1B" ui-sref="plate-layout({id: params.id})" toggle-sidemenu>
+          <span>Well Layout</span>
+        </div>
+      </div>
+
+      <div class="side-menu-button-container">
+        <button ng-show="!exporting" class="side-menu-button SH pull-left" ng-click="exportExperiment()" experiment-id="params.id">Export</button>
+        <button ng-show="exporting" class="side-menu-button SH pull-left">Exporting<ellipsis-animated><ellipsis-animated/></button>
+        <button class="side-menu-button SH second-button pull-right" ng-click="deleteExperiment(params.id)">Delete</button>
+        <span class="text-danger" ng-show="errorExport">Error exporting data. Please try again.</span>
+      </div>
+    </div>
+    <div class="side-menu-menu-container top-border run-exp" style="padding: 0">
+      <div class="side-menu-menu-item">
         <experiment-item show-prop="showProperties" exp="exp" state-val="{{status}}" lid-open="lidOpen" max-cycle="maxCycle"></experiment-item>
+      </div>
     </div>
-    <div class="side-menu-button-container">
-      <button ng-show="!exporting" class="side-menu-button SH" ng-click="exportExperiment()" experiment-id="params.id">EXPORT</button>
-	  <button ng-show="exporting" class="side-menu-button SH">EXPORTING<ellipsis-animated><ellipsis-animated/></button>
-      <button class="side-menu-button SH second-button" ng-click="deleteExperiment(params.id)">DELETE</button>
-	  <span class="text-danger" ng-show="errorExport">Error exporting data. Please try again.</span>
+    <div class="side-menu-menu-container top-border analyze-menu">
+      <label class="section-name">Analyze</label>
+      <div class="side-menu-menu-item">
+        <div class="B1B" ui-sref="run-experiment({id: params.id, chart: 'amplification'})" toggle-sidemenu>
+          <span>Amplification Curve</span>
+        </div>
+      </div>
+      <div class="side-menu-menu-item">
+        <div class="B1B" ui-sref="run-experiment({id: params.id, chart: 'standard-curve'})" toggle-sidemenu>
+          <span>Standard Curve</span>
+        </div>
+      </div>
+      <div class="side-menu-menu-item">
+        <div class="B1B" ui-sref="run-experiment({id: params.id, chart: 'melt-curve'})" toggle-sidemenu>
+          <span>Melt Curve</span>
+        </div>
+      </div>
+      <div class="side-menu-menu-item">
+        <div class="B1B" ui-sref="run-experiment({id: params.id, chart: 'temperature-logs'})" toggle-sidemenu>
+          <span>Thermal Profile</span>
+        </div>
+      </div>
     </div>
-  </div>
   </div>
 </div>

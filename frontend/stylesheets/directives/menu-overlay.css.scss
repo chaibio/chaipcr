@@ -22,7 +22,7 @@ $sidemenu_width: 352px;
       float: left;
       padding-left: 30px;
       padding-top: 13px;
-      cursor: alias;
+      cursor: pointer;
     }
     .close-container {
       @extend .common;
@@ -44,7 +44,18 @@ $sidemenu_width: 352px;
     width: 100%;
     height: 718px;
     padding-left: 35px;
-    padding-right: 50px;
+    padding-right: 35px;
+
+    .analyze-menu{
+      .side-menu-menu-item{
+        color: #999;
+        &:hover{
+          color: #fff !important;
+          background: #00AEEF;
+          padding: 0 5px;
+        }
+      }
+    }
 
     .side-menu-name-container {
       height: 156px;
@@ -52,9 +63,25 @@ $sidemenu_width: 352px;
       .side-menu-exp-name {
         height: 80%;
         //font-size: 30px;
-        .exp-name-container {
-          height: 60px;
+
+        .side-top-header{
+          width: 100%;
+          font-size: 13px;
           padding-top: 15px;
+          font-family: 'dinot-medium';
+          font-weight: 300;
+          label{
+            color: #333;
+            font-weight: 300;
+          }
+          span.edit-experiment-name{
+            color: #df1924;
+            float: right;
+            cursor: pointer;
+          }
+        }
+        .exp-name-container {
+          height: 60px;          
           span {
             font-size: 24px;
             cursor: auto;
@@ -86,24 +113,70 @@ $sidemenu_width: 352px;
 
     .side-menu-menu-container {
       padding-top: 20px;
+      &.top-border{
+        border-top: 1px solid #aaa;
+      }      
       .success {
-        height: 30px;
+        height: 48px;
         background-color: #8dc63f;
         color: white;
-        width: 110px;
+        width: 67px;
         border: none;
         position: absolute;
-        top: 0px;
-        left: 157px;
+        top: 10px;
+        right: 0;
+        font-weight: 600;
+        border-radius: 3px;
         &.ng-hide {
           opacity: 0;
           transition: opacity .1s;
         }
       }
 
-      .run-exp {
-        position: relative;
+      label.section-name{
+        font-size: 13px;
+        font-family: 'dinot-medium';
+        font-weight: 300;        
+        color: #333;
       }
+
+      &.run-exp {        
+        height: 70px;
+        .side-menu-menu-item{
+          position: relative;
+          height: 70px;
+          div{
+            padding-top: 10px;
+            position: relative;
+            overflow: hidden;
+
+            label.exp-message{
+              font-size: 16px;
+              width: 100%;
+              text-align: center;
+              padding: 13px 0;
+              background: #df1924;
+              color: #fff;
+              border-radius: 3px;
+              margin: 0;
+              cursor: pointer;
+              position: relative;
+              left: 0;
+              -webkit-transition: left .2s; /* Safari */
+              transition: left .2s;                
+              &.ready-action{
+                left: -70px;
+              }
+
+              &.started-experiment{
+                background: #00AEEF;
+                color: #fff;
+              }
+            }
+          }
+        }
+      }
+
       .side-menu-menu-item {
         width: 100%;
         height: 30px;
@@ -180,18 +253,34 @@ $sidemenu_width: 352px;
     }
     .side-menu-button-container {
       width: 100%;
-      height: 31px;
+      height: 48px;
       //background-color: green;
-      margin-top: 30px;
+      margin-top: 12px;
       .second-button {
         margin-left: -5px;
       }
       .side-menu-button {
         width: 131px;
-        height: 30px;
+        height: 32px;
         background-color: white;
         border: 1px solid black;
         outline: none;
+        font-size: 14px;
+        border-radius: 3px;
+      }
+
+      .pull-left{
+        float: left;
+      }
+
+      .pull-right{
+        float: right;
+      }
+
+      span{
+        font-size: 12px;
+        font-family: 'dinot-medium';
+        font-weight: 300;        
       }
     }
   }

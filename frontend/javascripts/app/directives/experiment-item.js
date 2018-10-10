@@ -54,11 +54,11 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
         scope.$watch('state', function(val) {
           if(val) {
             if(scope.state === "NOT_STARTED") {
-              scope.message = "RUN EXPERIMENT";
+              scope.message = "Run Experiment";
             } else if(scope.state === "RUNNING") {
-              scope.message = "EXPERIMENT STATUS";
+              scope.message = "Experiment Status";
             } else if(scope.state === 'COMPLETED') {
-              scope.message = "VIEW RESULT";
+              scope.message = "View Result";
             }
           }
         });

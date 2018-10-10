@@ -288,7 +288,6 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 						}
 					}
 				}
-				console.log($scope.wellInf);
 			});
 		};
 
