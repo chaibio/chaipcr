@@ -70,13 +70,6 @@ table.sample-target-table{
                 cursor: pointer;
                 line-height: 24px;
             }
-
-            &.one-channel{
-                max-width: 40px;
-                span{
-                    width:90%;
-                }
-            }
         }
     }
     padding-left: 50px !important;
@@ -126,14 +119,14 @@ table.sample-target-table{
         width: 20px;
         vertical-align: middle;
         cursor: pointer;
-        margin: 0 5px;
+        margin: 0 2px;
         &:hover + .assigned-description{
             display: block;
         }
     }
 
     .icon-wrapper{
-        width: 32px;
+        width: 24px;
         vertical-align: middle;
         position: relative;
         margin: 0;
@@ -148,7 +141,7 @@ table.sample-target-table{
             font-weight: 300;
             position: absolute;
             top: -30px;
-            left: -52px;
+            left: -56px;
             background: #fff;
             z-index: 99;
             display: none;
@@ -183,7 +176,7 @@ table.sample-target-table{
         width: 15px;
         vertical-align: middle;
         cursor: pointer;
-        margin: 0 5px;
+        margin: 0 2px;
     }
 
     .color{

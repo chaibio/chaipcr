@@ -93,7 +93,7 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
         $scope.getTargets();
 
         $scope.validItemName = function(type){
-            var index = 1, isExist = true;
+            var index = 0, isExist = true;
             if(type == 'Sample'){
                 for (i = 0; i < $scope.rows.length; i++) {
                     if($scope.rows[i].name.match(/^Sample [\d]+$/g)){
