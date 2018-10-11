@@ -159,16 +159,25 @@ run_migrate_on_upgrade () {
 			
 			chown -R mysql /data/mysql
 			chgrp -R mysql /data/mysql
-			systemctl start realtime.service
+
+                        echo "Reattempting start the MySQL daemon..."
+                        systemctl start mysql
+
+                        SERVICE=realtime;
+                        if ps ax | grep -v grep | grep $SERVICE > /dev/null
+                        then
+                           echo "$SERVICE service is running, Move ahead with RAILS DB migration"
+                        else
+                           echo "$SERVICE service is not running, start realtime app before moving forward"
+			   systemctl start realtime.service
+                        fi
 
 			sleep 10
 			mysqladmin status | grep Uptime
 			sql_running=$?
 		done
 
-		echo "mysql server is running.. Upgrade MySQL InnoDB tables and calling RAILS upgrade.sh."
-                mysql_upgrade
-
+                echo "Perform RAILS DB migration by calling upgrade.sh script..."
 		RAILS_ENV=production /root/chaipcr/web/scripts/upgrade.sh >> /var/log/upgrade.log 2>&1 || :
 		echo "Execution done executing upgrade.sh!"
 
@@ -183,6 +192,10 @@ run_migrate_on_upgrade () {
 
 		rm ${sdcard}/upgrade/upgrade_autorun.flag || :
         	echo "Upgrade autorun flag down.."
+
+		echo "mysql server is running.. Upgrade MySQL InnoDB tables and calling RAILS upgrade.sh."
+                mysql_upgrade
+		sleep 30
 	else
 		echo "No autorun flag found!"
 	fi
