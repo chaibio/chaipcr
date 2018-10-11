@@ -289,6 +289,9 @@ $sidemenu_width: 352px;
     margin-right: 0;
     -webkit-transition: margin 0.3s; /* Safari */
     transition: margin 0.3s;
+    position: fixed;
+    height: 100%;
+
   }
 
   &.sidemenu-open-remove {
@@ -488,6 +491,7 @@ $sidemenu_width: 352px;
     .page-container {
       top: 0;
       left: 0;
+      height:100%;
     }
 
     .content-overlay {

@@ -109,12 +109,16 @@
 
 .H2 {
   font-family: "dinot-bold";
-  font-size: 20px;
+  font-size: 24px;
+  line-height: 30px;
 }
 
 .H3 {
   font-family: "dinot-bold";
-  font-size: 18px;
+  // font-size: 18px;
+  font-size: 16.25px;
+  line-height: 24px;
+  font-weight: 400;
 }
 
 .H2R {
@@ -144,21 +148,40 @@
 
 .B1 {
   font-family: "dinot-regular";
-  font-size: 16px;
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: normal;
+}
+
+.B1-M {
+  font-family: "dinot-bold";
+  font-size: 13px;
+  line-height: 20px;
 }
 
 .B2 {
   font-family: "dinot-regular";
-  font-size: 12pt;
-  line-height: 15pt;
+  font-size: 10px;
+  line-height: 15px;
+  font-weight: normal;
 }
 
-.B1B {
+.B2-M {
   font-family: "dinot-bold";
-  font-size: 16px;
+  font-size: 10px;
+  line-height: 15px;
 }
 
-.B2B {
-  font-family: "dinot-bold";
-  font-size: 12px;
+.G1 {
+  font-family: "dinot-regular";
+  font-size: 8px;
+  font-weight: normal;
+  line-height: 12px;
+}
+
+.G2 {
+  font-family: "dinot-regular";
+  font-size: 6.5px;
+  line-height: 9.75px;
+  font-weight: normal;
 }

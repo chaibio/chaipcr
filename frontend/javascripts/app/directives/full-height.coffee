@@ -26,7 +26,14 @@ App.directive 'fullHeight', [
 
         height = if $scope.min > height then $scope.min else height
         if height > elem.parent().height()  then height = elem.parent().height()
+
+        if height == 845
+          console.log('height = ' + height)
+          console.log(elem.parent())
+          console.log(elem.parent().height())
+          console.log(elem.parent().parent().height())
         # if height > WindowWrapper.height()  then height = WindowWrapper.height()
+          height+=30
         height
       set = (height) ->
 

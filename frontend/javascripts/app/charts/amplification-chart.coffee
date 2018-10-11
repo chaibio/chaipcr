@@ -193,7 +193,7 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
       @yAxisTickFormat(y)
 
     @gY = svg.append("g")
-          .attr("class", "axis y-axis")
+          .attr("class", "axis y-axis G2")
           .attr('fill', 'none')
           .call(@yAxis)
           .on('mouseenter', => @hideMouseIndicators())
