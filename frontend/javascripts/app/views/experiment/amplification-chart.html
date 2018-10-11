@@ -245,8 +245,8 @@ limitations under the License.
                 <input type="text" class="B2" style="vertical-align: middle" ng-show="editExpNameMode[$index]" focus-on="editExpNameMode" ng-blur="updateSampleName($index,samples[$index])"  on-shift-enter="updateSampleNameEnter($index,samples[$index])"  ng-model="samples[$index]">
               </td>
               <td class="type-td">
-                <span class="B2" style="width: 20px; height: 20px; vertical-align: middle ng-show="types[$index]">
-                  <!-- {{types[$index]==='sample'?'S':'' | truncate:20}} -->
+                <span class="B2" style="width: 20px; height: 20px; vertical-align: middle" ng-show="types[$index]">
+                  {{types[$index]==='sample'?'S':'' | truncate:20}}
                 </span>
               </td>
               <td ng-click="focusExpTarget($index)" style="text-align: left">
