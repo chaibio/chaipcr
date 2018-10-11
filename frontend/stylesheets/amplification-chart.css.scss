@@ -177,7 +177,7 @@
         // font-family: 'dinot-regular';
         //font-weight: 300;
         border: none;
-        border-radius: 10px;
+        border-radius: 3px;
         cursor: pointer;
         width: 120px;
         border: 1px solid black;
@@ -234,7 +234,8 @@
   }
   .curve-body {
     background-color: #eee;
-    padding: 20px;
+    padding: 5px 10px 10px 10px;
+
     display:flex;
     // min-height: 600px;
     // height: 610px;
@@ -347,10 +348,10 @@
     right: 0px;
     // height: 94%;
 
-		.sample-span{
-			font-family: 'dinot-Regular';
-			font-size: 12px;
-    }
+		// .sample-span{
+		// 	font-family: 'dinot-Regular';
+		// 	font-size: 12px;
+    // }
     
     .type-td{
       text-align: center;
@@ -361,21 +362,21 @@
         height: 23px;
         border: #000 1px solid;
         border-radius: 50%;
-        font-family: 'dinot-Regular';
-        font-size: 14px;
+        // font-family: 'dinot-Regular';
+        // font-size: 14px;
       }
     }
 
-		.target-span{
-			font-family: 'dinot-Regular';
-      font-size: 16px;
-    }
+		// .target-span{
+		// 	font-family: 'dinot-Regular';
+    //   font-size: 16px;
+    // }
 
     input {
       outline: none;
       border: none;
-      font-family: 'dinot-Regular';
-      font-size: 12px;
+      // font-family: 'dinot-Regular';
+      // font-size: 12px;
       //width: 140px;
     }
     table {

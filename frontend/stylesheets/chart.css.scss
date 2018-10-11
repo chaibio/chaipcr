@@ -190,7 +190,7 @@
   // vertical-align: top;
   $item_switch_gap: 20px;
   .subheader-switches {
-    margin-top: 20px;
+    // margin-top: 20px;
     margin-left: 0px;
     margin-right: 20px;
     .item-switch {
@@ -365,10 +365,10 @@
   right: 0px;
   // height: 94%;
 
-  .sample-span{
-    font-family: 'dinot-Regular';
-    font-size: 12px;
-  }
+  // .sample-span{
+  //   font-family: 'dinot-Regular';
+  //   font-size: 12px;
+  // }
   
   .type-td{
     text-align: center;
@@ -379,21 +379,21 @@
       height: 23px;
       border: #000 1px solid;
       border-radius: 50%;
-      font-family: 'dinot-Regular';
-      font-size: 14px;
+      // font-family: 'dinot-Regular';
+      // font-size: 14px;
     }
   }
 
-  .target-span{
-    font-family: 'dinot-Regular';
-    font-size: 16px;
-  }
+  // .target-span{
+  //   font-family: 'dinot-Regular';
+  //   font-size: 16px;
+  // }
 
   input {
     outline: none;
     border: none;
-    font-family: 'dinot-Regular';
-    font-size: 16px;
+    // font-family: 'dinot-Regular';
+    // font-size: 16px;
     //width: 140px;
   }
   table {
