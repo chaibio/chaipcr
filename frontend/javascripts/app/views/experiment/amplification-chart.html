@@ -19,8 +19,8 @@ limitations under the License.
 <div class="amplification-chart-state-active results-charts" style="height: 100%;">
   <div class="page-layout" ng-controller="AmplificationChartCtrl" ng-show="experiment" style="height: 100%;">
     <div class="content row" style="padding-top:0px; height: 100%; display: flex;" >
-      <div class="chart-section col-lg-8 col-md-8 col-sm-6 col-xs-6" offset="0" force="true" style="width: 70%; height:100%; padding-left: 0px; padding-right: 0px; display: flex; flex-direction: column; justify-content: space-between; background: #eeeeee">
-        <div style="min-height: 400px; height: 80%; display: flex; flex-direction: column;">
+      <div class="chart-section col-lg-8 col-md-8 col-sm-6 col-xs-6" offset="0" force="true" style="width: 65%; height:100%; padding-left: 0px; padding-right: 0px; display: flex; flex-direction: column; justify-content: space-between; background: #eeeeee">
+        <div style="height: 80%; display: flex; flex-direction: column;">
             <!--curve-header-->
           <div class="curve-header">
             <div class="curve-name" style="padding-left: 15px;  display: flex; flex-direction: column; justify-content: center;" >
@@ -89,8 +89,8 @@ limitations under the License.
             </div>
           </div>
           <div class="curve-body" style="padding-right: 0px; height: 100%; display: flex; flex-direction: row; justify-content: space-between;">
-            <div class="curve-plot" aspect-Ratio offset-x='165' offset-y='20' min-width='600' max-width='1020' min-height='400' max-height='680' id="curve-plot" style="display: block;">
-              <div class="chart-container" min="389" style="height: 90%; min-width: 680px; min-height: 400px; max-width: 1020px; max-height: 600px;"" >
+            <div class="curve-plot" aspect-Ratio offset-x='165' offset-y='20' min-width='680' max-width='1020' min-height='400' max-height='600' id="curve-plot" style="display: block;">
+              <div class="chart-container" min="389" style="height: 90%; min-width: 680px; max-width: 1020px; min-height: 400px; max-height: 600px;" >
                 <div class="chart-error B1" ng-show="retrying && !fetching && error">
                   <strong class="text-black">Unable to load chart data</strong>
                   <p ng-bind="error"></p>
@@ -194,11 +194,11 @@ limitations under the License.
             </div>
           </div>
         </div>
-        <div class="choose-chart" style="flex-grow: 1; position: relative; height: 20%; min-height: 135px;">
+        <div class="choose-chart" style="flex-grow: 1; position: relative; height: 20%; min-height: 160px; max-height: 220px;">
           <chart-well-switch style="position: absolute; height: 100%;" ng-model="wellButtons" color-by="color_by" chart-type="amplification"></chart-well-switch>
         </div>
       </div>
-      <div class="table-container col-lg-4 col-md-4 col-sm-6 col-xs-6" force="true" style="width: 30%; height: 100%; padding-right: 0; padding-left: 0; margin-top:0px; overflow: hidden;">
+      <div class="table-container col-lg-4 col-md-4 col-sm-6 col-xs-6" force="true" style="width: 35%; height: 100%; padding-right: 0; padding-left: 0; margin-top:0px; overflow: hidden;">
         <table style="height: 100%;">
           <tbody>
             <tr>

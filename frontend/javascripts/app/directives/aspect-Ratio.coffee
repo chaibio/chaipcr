@@ -9,7 +9,6 @@ App.directive 'aspectRatio', [
       offsetY: '=?'
       force: '=?'
       doc: '=?'
-      parent: '=?'
       minWidth: '=?'
       minHeight: '=?'
       maxWidth: '=?'
@@ -28,11 +27,12 @@ App.directive 'aspectRatio', [
       elem.addClass 'aspect-Ratio'
 
       getWidth = ->
-        width = WindowWrapper.width() - $scope.offsetX
+        width = elem.parent().width() - $scope.offsetX
         width = if $scope.minWidth then (if width > $scope.minWidth then width else $scope.minWidth) else width
         width
 
       getHeight = -> 
+        
         height = if $scope.doc
                   WindowWrapper.documentHeight() - $scope.offsetY
                 else if $scope.parent
@@ -56,8 +56,8 @@ App.directive 'aspectRatio', [
           width = $scope.minWidth
           height = $scope.minHeight
         else 
-          width = Math.min(width / 3, height / 2) * 3
-          height = Math.min(width / 3, height / 2) * 2
+          width = Math.min(width / 1.7, height) * 1.7
+          height = Math.min(width / 1.7, height)
 
         console.log(width)
         console.log(height)  
