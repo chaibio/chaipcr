@@ -49,7 +49,7 @@
 
       .well-switch-container {
         margin: -5px;
-        height: 81px;
+        height: calc(100% + 13px) !important ;
         border: 2px solid #000;
         z-index: 999999;
         position: absolute;
