@@ -16,6 +16,7 @@
       })
 
       inject(function($injector) {
+        alert('injoectr')
         this.$timeout = $injector.get('$timeout')
         this.$rootScope = $injector.get('$rootScope')
         this.$compile = $injector.get('$compile')

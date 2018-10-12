@@ -18,9 +18,9 @@ limitations under the License.
 -->
 <div class="amplification-chart-state-active results-charts" style="height: 100%;">
   <div class="page-layout" ng-controller="AmplificationChartCtrl" ng-show="experiment" style="height: 100%;">
-    <div class="content row" style="padding-top:0px; height: 100%;" >
-      <div class="chart-section col-lg-8 col-md-8 col-sm-6 col-xs-6" offset="0" force="true" full-height style="padding-left: 0px; padding-right: 0px; display: flex; flex-direction: column; justify-content: space-between; background: #eeeeee">
-        <div style="height: 80%; display: flex; flex-direction: column;">
+    <div class="content row" style="padding-top:0px; height: 100%; display: flex;" >
+      <div class="chart-section col-lg-8 col-md-8 col-sm-6 col-xs-6" offset="0" force="true" style="width: 70%; height:100%; padding-left: 0px; padding-right: 0px; display: flex; flex-direction: column; justify-content: space-between; background: #eeeeee">
+        <div style="min-height: 400px; height: 80%; display: flex; flex-direction: column;">
             <!--curve-header-->
           <div class="curve-header">
             <div class="curve-name" style="padding-left: 15px;  display: flex; flex-direction: column; justify-content: center;" >
@@ -88,9 +88,9 @@ limitations under the License.
               </form>
             </div>
           </div>
-          <div class="curve-body" style="padding-right: 0px; height: 100%;">
-            <div class="curve-plot" id="curve-plot" style="display: block; width: 82%; overflow: auto">
-              <div class="chart-container" min="389" style="height: 90%; min-width: 640px; min-height: 360px;">
+          <div class="curve-body" style="padding-right: 0px; height: 100%; display: flex; flex-direction: row; justify-content: space-between;">
+            <div class="curve-plot" aspect-Ratio offset-x='165' offset-y='20' min-width='600' max-width='1020' min-height='400' max-height='680' id="curve-plot" style="display: block;">
+              <div class="chart-container" min="389" style="height: 90%; min-width: 680px; min-height: 400px; max-width: 1020px; max-height: 600px;"" >
                 <div class="chart-error B1" ng-show="retrying && !fetching && error">
                   <strong class="text-black">Unable to load chart data</strong>
                   <p ng-bind="error"></p>
@@ -119,7 +119,7 @@ limitations under the License.
                 </table> -->
               </div>
               <div style="display: flex; flex-direction: row; height: 10%;">
-                <div style="position: absolute; padding-top: 0px;">
+                <!-- <div style="position: absolute; padding-top: 0px;">
                   <svg style="width: 40x; height: 40px;">
                     <g style="width: 40px; height: 40px;">
                       <line x1=40 y1=5 x2=10 y2=40 stroke="lightgrey" stroke-width=1></line>
@@ -129,14 +129,14 @@ limitations under the License.
                 <div style="position:absolute; display: flex; flex-direction: column;">
                   <button class="button zoom-button" ng-click="zoomIn()" style="text-align: center; vertical-align: middle; font-size: 20px; margin-top:-8px; margin-left: -5px; padding: 0px; width: 30px;">+</button>
                   <button class="button zoom-button" ng-click="zoomOut()" style="text-align: center; vertical-align: middle; font-size: 20px; margin-left: 30px; padding: 0px; width: 30px;">–</button>
-                </div>
+                </div> -->
                 <div style="display: grid; width: 100%; height: 100%; align-content: center; vertical-align: middle; text-align: center">
                    <font class="G1">Cycle Number</font>
                 </div>                
               </div>
             </div>
 
-            <div class="additional-info">
+            <div class="additional-info" style="min-width:135px; flex-grow: 1;">
               <div style="height:100%; padding-right: 20px; margin: 0px; background: transparent; display: flex; float: left; flex-direction: column; justify-content: space-between;">
                   <div style="padding: 0; background: transparent; box-shadow: 1pt 1pt 1pt 1px grey;">
                       <div class="parameters">
@@ -178,7 +178,7 @@ limitations under the License.
                         <td>
                           <span ng-if="color_by==='target'" class="dot" ng-attr-style="background-color: {{COLORS[$index]}}"></span>
                         </td>
-                        <td style="font-size: 15pt; line-height: 20pt; padding-top: 5px; padding-bottom: 5px; color: black;">{{target}}</td>
+                        <td style="padding-top: 5px; padding-bottom: 5px; color: black;">{{target}}</td>
                         <td class="td-tik" ng-click="targetClick($index)" style="padding-right: 15px;">
                           <span ng-show="!targetsSetHided[$index]">
                             <img src="/images/target_on.svg">
@@ -194,12 +194,12 @@ limitations under the License.
             </div>
           </div>
         </div>
-        <div class="choose-chart" style="flex-grow: 1; position: relative; height: 20%;">
+        <div class="choose-chart" style="flex-grow: 1; position: relative; height: 20%; min-height: 135px;">
           <chart-well-switch style="position: absolute; height: 100%;" ng-model="wellButtons" color-by="color_by" chart-type="amplification"></chart-well-switch>
         </div>
       </div>
-      <div class="table-container col-lg-4 col-md-4 col-sm-6 col-xs-6" offset="0" force="true" full-height style="padding-right: 0; padding-left: 0; margin-top:0px;">
-        <table full-height>
+      <div class="table-container col-lg-4 col-md-4 col-sm-6 col-xs-6" force="true" style="width: 30%; height: 100%; padding-right: 0; padding-left: 0; margin-top:0px; overflow: hidden;">
+        <table style="height: 100%;">
           <tbody>
             <tr>
               <th class="B2-M" style="border-left:none">Clr</th>
@@ -220,15 +220,15 @@ limitations under the License.
               <th class="B2-M" style="text-align: left; padding-left:0px;">Qty M</th>
             </tr>
             <tr ng-repeat="i in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" ng-class="{selected: (wellButtons['well_'+i].selected)}">
-              <td class="B2" ng-class="{'text-center': color_by==='channel'}">
-                <span ng-if="color_by==='well'" class="dot" ng-attr-style="background-color: {{wellButtons['well_'+i].color}}"></span>
+              <td class="B2" ng-class="{'text-center': color_by==='channel'}" style="vertical-align: top;">
+                <span ng-if="color_by==='well'" class="B2 dot" ng-attr-style="background-color: {{wellButtons['well_'+i].color}}"></span>
                 </span>
               </td>
-              <td>
-                <input type="checkbox" style="width:50px;" ng-click="toggleOmitIndex($index)" /> 
+              <td class="B2">
+                <input class="B2" type="checkbox" style="width:50px;" ng-click="toggleOmitIndex($index)" /> 
               </td>
               <td class="B2" ng-class="{'text-center': color_by==='channel'}" style="text-align: left">
-                <span class="text">
+                <span class="B2 text">
                   <span ng-show="i < 8">
                     A{{i+1}}
                   </span>
@@ -237,52 +237,54 @@ limitations under the License.
                   </span>
                 </span>
               </td>
-              <td ng-click="focusExpName($index)" style="text-align: left">
-                <span ng-if="color_by==='sample'" class="dot" ng-attr-style="background-color: {{samplesSet.indexOf(samples[i]) < 0 ? '#000000' : COLORS[samplesSet.indexOf(samples[i])]}}"></span>
-                <span class="sample-span B2" ng-click="focusExpName($index)" ng-show="!editExpNameMode[$index]">
+              <td class="B2" ng-click="focusExpName($index)" style="text-align: left;">
+                <span ng-if="color_by==='sample'" class="B2 dot" ng-attr-style="background-color: {{samplesSet.indexOf(samples[i]) < 0 ? '#000000' : COLORS[samplesSet.indexOf(samples[i])]}}"></span>
+                <span class="B2 sample-span" ng-click="focusExpName($index)" ng-show="!editExpNameMode[$index]">
                   {{samples[$index] | truncate:20}}
                 </span>
-                <input type="text" class="B2" style="vertical-align: middle" ng-show="editExpNameMode[$index]" focus-on="editExpNameMode" ng-blur="updateSampleName($index,samples[$index])"  on-shift-enter="updateSampleNameEnter($index,samples[$index])"  ng-model="samples[$index]">
+                <input type="text" class="B2" style="vertical-align: initial;" ng-show="editExpNameMode[$index]" focus-on="editExpNameMode" ng-blur="updateSampleName($index,samples[$index])"  on-shift-enter="updateSampleNameEnter($index,samples[$index])"  ng-model="samples[$index]">
               </td>
-              <td class="type-td">
-                <span class="B2" style="width: 20px; height: 20px; vertical-align: middle" ng-show="types[$index]">
-                  {{types[$index]==='sample'?'S':'' | truncate:20}}
+              <td class="B2 type-td">
+                <!-- <span class="B2" style="width: 20px; height: 20px; vertical-align: middle" ng-show="types[$index]"> -->
+                <!-- {{types[$index]==='sample'?'S':'' | truncate:20}} -->
+                <span class="B2" style="width: 20px; height: 20px;">
+                  S
                 </span>
               </td>
-              <td ng-click="focusExpTarget($index)" style="text-align: left">
-                <span class="B2" style="vertical-align: middle" ng-click="focusExpTarget($index)" ng-show="!editExpTargetMode[$index]">
+              <td class="B2" ng-click="focusExpTarget($index)" style="text-align: left;">
+                <span class="B2" ng-click="focusExpTarget($index)" ng-show="!editExpTargetMode[$index]">
                   {{targets[$index] | truncate:20}}
                 </span>
-                <input type="text" class="B2" style="vertical-align: middle" ng-show="editExpTargetMode[$index]" focus-on="editExpTargetMode" ng-blur="updateTarget($index,targets[$index])" on-shift-enter="updateTargetEnter($index,targets[$index])" ng-model="targets[$index]">
+                <input type="text" class="B2" ng-show="editExpTargetMode[$index]" focus-on="editExpTargetMode" ng-blur="updateTarget($index,targets[$index])" on-shift-enter="updateTargetEnter($index,targets[$index])" ng-model="targets[$index]">
               </td>
               <td class="B2" style="text-align: left">
-                <span class="width1" >
-                  <span ng-show="wellButtons['well_'+i].ct[0] > 0">
+                <span class="B2 width1" >
+                  <span class="B2" ng-show="wellButtons['well_'+i].ct[0] > 0">
                     {{(wellButtons['well_'+i].ct[0]) | round:2}}
                   </span>
                 </span>
               </td>
               <td class="B2" style="text-align: left">
-                <span class="width1" ng-if="is_dual_channel">
-                  <span ng-show="wellButtons['well_'+i].ct[1] > 0">
+                <span class="B2 width1" ng-if="is_dual_channel">
+                  <span class="B2" ng-show="wellButtons['well_'+i].ct[1] > 0">
                     {{(wellButtons['well_'+i].ct[1]) | round:2}}
                   </span>
-                  <span ng-show="wellButtons['well_'+i].ct[1] <= 0">
-                    <span class="dummy-placeholder">&nbsp;</span>
+                  <span class="B2" ng-show="wellButtons['well_'+i].ct[1] <= 0">
+                    <span class="B2 dummy-placeholder">&nbsp;</span>
                   </span>
                 </span>
-                <span class="width1" ng-if="!is_dual_channel">
-                  <span class="dummy-placeholder"></span>
+                <span class="B2 width1" ng-if="!is_dual_channel">
+                  <span class="B2 dummy-placeholder"></span>
                   <td class="B2">
                 </span>
-              </td style="text-align: left">
-                  <span class="width1">
-                      <span class="dummy-placeholder"></span>
-                    </span>
-                  </td>
+              </td class="B2" style="text-align: left">
+                <span class="B2 width1">
+                  <span class="B2 dummy-placeholder"></span>
+                </span>
+              </td>
               <td class="B2" style="text-align: left">
-                <span class="width1">
-                  <span class="dummy-placeholder"></span>
+                <span class="B2 width1">
+                  <span class="B2 dummy-placeholder"></span>
                 </span>
               </td>
             </tr>
