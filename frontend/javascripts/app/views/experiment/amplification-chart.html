@@ -115,9 +115,9 @@ limitations under the License.
                     </g>
                   </svg>
                 </div>
-                <div style="position:absolute; display: flex; flex-direction: column;">
-                  <button class="button zoom-button" ng-click="zoomIn()" style="text-align: center; vertical-align: middle; font-size: 20px; margin-top:-8px; margin-left: -5px; padding: 0px; width: 30px;">+</button>
-                  <button class="button zoom-button" ng-click="zoomOut()" style="text-align: center; vertical-align: middle; font-size: 20px; margin-left: 30px; padding: 0px; width: 30px;">–</button>
+                <div style="position:absolute;">
+                  <button class="button zoom-button" ng-click="zoomIn()" style="text-align: center; vertical-align: middle; font-size: 20px; margin-top:-12px; margin-left: 0px; padding: 0px; width: 30px;">+</button>
+                  <button class="button zoom-button" ng-click="zoomOut()" style="text-align: center; vertical-align: middle; font-size: 20px; margin-left: 32px; padding: 0px; width: 30px;">–</button>
                 </div>
                 <div style="display: grid; width: 100%; height: 100%; align-content: center; vertical-align: middle; text-align: center">
                    <font class="G1">Cycle Number</font>
@@ -191,11 +191,11 @@ limitations under the License.
         <table style="height: 100%;">
           <tbody>
             <tr>
-              <th class="B2-M" style="border-left:none">Clr</th>
-              <th class="B2-M">Omit</th>
+              <th class="B2-M" style="text-align: center; border-left:none">Clr</th>
+              <th class="B2-M" style="text-align: center;">Omit</th>
               <th class="B2-M" style="text-align: left; padding-left:0px;" >Well</th>
               <th class="B2-M" style="text-align: left; padding-left:0px;" >Sample</th>
-              <th class="B2-M">Type</th>
+              <th class="B2-M" style="text-align: center;">Type</th>
               <th class="B2-M" style="text-align: left; padding-left:0px;">Target</th>
               <th class="B2-M" style="text-align: left; padding-left:0px;" ng-class="{'channel-1': color_by === 'channel'}">
                 <span ng-if="is_dual_channel">Cq</span>
