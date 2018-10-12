@@ -90,34 +90,37 @@ limitations under the License.
           </div>
           <div class="curve-body" style="padding-right: 0px; height: 100%; display: flex; flex-direction: row; justify-content: space-between;">
             <div class="curve-plot" aspect-Ratio offset-x='165' offset-y='20' min-width='680' max-width='1020' min-height='400' max-height='600' id="curve-plot" style="display: block;">
-              <div class="chart-container" min="389" style="height: 90%; min-width: 680px; max-width: 1020px; min-height: 400px; max-height: 600px;" >
-                <div class="chart-error B1" ng-show="retrying && !fetching && error">
-                  <strong class="text-black">Unable to load chart data</strong>
-                  <p ng-bind="error"></p>
-                  Retrying in {{retry}} seconds
-                  <ellipsis-animated></ellipsis-animated>
-                </div>
-                <div class="loading-blue-container" ng-show="(fetching || retrying) && !error && !hasData">
-                  <div class="loading-blue"></div>
-                  <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
-                  <p class="B2">May take a minute</p>
-                </div>
-                <amplification-chart data="amplification_data" config="chartConfig" zoom="ampli_zoom" on-zoom="onZoom" on-select-line="onSelectLine" on-unselect-line="onUnselectLine" on-update-properties="onUpdateProperties" scroll="ampli_scroll.value" show="showAmpliChart"></amplification-chart>
-                <!-- <div>
-                  <button class="button zoom-button" ng-click="zoomIn()" style="text-align: center; vertical-align: middle; padding-left: 10px; padding-right: 10px; font-size: 20px">+</button>
-                  <button class="button zoom-button" ng-click="zoomOut()" style="text-align: center; vertical-align: middle; padding-left: 10px; padding-right: 10px; font-size: 20px; margin-left: 30px;">-</button>
-                </div> -->
-                <!-- <table>
-                  <tr>
-                    <td><button class="button zoom-button" ng-click="zoomIn()" style="height: 30px; text-align: center; vertical-align: middle; padding: 5px">+</button></td>
-                    <td></td>
-                  </tr>
-                  <tr>
-                    <td></td>
-                    <td><button class="button zoom-button" ng-click="zoomOut()">-</button></td>
-                  </tr>
-                </table> -->
+              <div style="width:100%; height: 100%;">
+                <div class="chart-container" full-height>
+                  <div class="chart-error B1" ng-show="retrying && !fetching && error">
+                    <strong class="text-black">Unable to load chart data</strong>
+                    <p ng-bind="error"></p>
+                    Retrying in {{retry}} seconds
+                    <ellipsis-animated></ellipsis-animated>
+                  </div>
+                  <div class="loading-blue-container" ng-show="(fetching || retrying) && !error && !hasData">
+                    <div class="loading-blue"></div>
+                    <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
+                    <p class="B2">May take a minute</p>
+                  </div>
+                  <amplification-chart data="amplification_data" config="chartConfig" zoom="ampli_zoom" on-zoom="onZoom" on-select-line="onSelectLine" on-unselect-line="onUnselectLine" on-update-properties="onUpdateProperties" scroll="ampli_scroll.value" show="showAmpliChart"></amplification-chart>
+                  <!-- <div>
+                    <button class="button zoom-button" ng-click="zoomIn()" style="text-align: center; vertical-align: middle; padding-left: 10px; padding-right: 10px; font-size: 20px">+</button>
+                    <button class="button zoom-button" ng-click="zoomOut()" style="text-align: center; vertical-align: middle; padding-left: 10px; padding-right: 10px; font-size: 20px; margin-left: 30px;">-</button>
+                  </div> -->
+                  <!-- <table>
+                    <tr>
+                      <td><button class="button zoom-button" ng-click="zoomIn()" style="height: 30px; text-align: center; vertical-align: middle; padding: 5px">+</button></td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td><button class="button zoom-button" ng-click="zoomOut()">-</button></td>
+                    </tr>
+                  </table> -->
+                </div>  
               </div>
+              
               <div style="display: flex; flex-direction: row; height: 10%;">
                 <!-- <div style="position: absolute; padding-top: 0px;">
                   <svg style="width: 40x; height: 40px;">
@@ -131,7 +134,7 @@ limitations under the License.
                   <button class="button zoom-button" ng-click="zoomOut()" style="text-align: center; vertical-align: middle; font-size: 20px; margin-left: 30px; padding: 0px; width: 30px;">–</button>
                 </div> -->
                 <div style="display: grid; width: 100%; height: 100%; align-content: center; vertical-align: middle; text-align: center">
-                   <font class="G1">Cycle Number</font>
+                   <!-- <font class="G1">Cycle Number</font> -->
                 </div>                
               </div>
             </div>
