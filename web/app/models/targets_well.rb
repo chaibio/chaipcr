@@ -158,7 +158,7 @@ class TargetsWell < ActiveRecord::Base
       if well_type == TYPE_STANDARD
         @quantity = [quantity_m.to_f, quantity_b.to_i]
       elsif well_type == TYPE_UNKNOWN
-        if target_equation != nil && cq != nil
+        if target_equation != nil && target_equation["offset"] != nil && target_equation["slope"] != nil && cq != nil
           quantity_log10 = (cq-target_equation["offset"])/target_equation["slope"]
           quantity_value = 10**quantity_log10
           quantity_nodes = self.class.decimal_to_scientific_notation(quantity_value)

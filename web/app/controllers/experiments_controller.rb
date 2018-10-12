@@ -25,6 +25,7 @@ class ExperimentsController < ApplicationController
   include Swagger::Blocks
 
   before_filter :ensure_authenticated_user
+  before_filter :allow_cors
   before_filter :get_experiment, :except => [:index, :create, :copy]
 
   respond_to :json

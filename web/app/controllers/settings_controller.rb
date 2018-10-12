@@ -21,6 +21,8 @@ class SettingsController < ApplicationController
   include Swagger::Blocks
   respond_to :json
 
+  before_filter :allow_cors
+
   resource_description {
     formats ['json']
   }
