@@ -23,11 +23,9 @@
   </div>
   <form name="expForm">
     <div class="exp-name-container">
-      <span class="exp-name H1 truncate" ng-show="!editExpNameMode">
-        {{experiment.name | truncate:20}}
-      </span>
-      <input type="text" class="exp-name H1" required ng-model="experiment.name" ng-show="editExpNameMode" ng-blur="saveExperiment()"
-        on-key-enter="saveExperiment(exp)" focus-on="editExpNameMode" id="exp_name_field">
+      <p class="exp-name H1" ng-show="!editExpNameMode">{{experiment.name}}</p>
+      <textarea class="exp-name H1" required ng-model="experiment.name" ng-show="editExpNameMode" ng-blur="saveExperiment()"
+        on-key-enter="saveExperiment(exp)" focus-on="editExpNameMode" id="exp_name_field" rows="3"></textarea>
     </div>
 
     <div class="text-center message-container">

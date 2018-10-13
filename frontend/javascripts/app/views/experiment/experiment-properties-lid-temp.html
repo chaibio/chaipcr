@@ -18,42 +18,43 @@
 -->
 <div class="experiment-properties-subtoption">
   <form name="expForm" ng-show="experiment">
-      <div class="text-center message-container">
+      <div class="heading B1M">
+        Lid Temperature :
+      </div>
+
+      <div class="exp-name-container">
+        <span class="exp-name B1M truncate" ng-click="focusLidTemp()" ng-show="!editLidTempMode">
+          {{ (experiment.protocol.lid_temperature) | degreeCelcius }}
+        </span>
+
+        <input required type="text" name="lidTemp" ng-pattern="/^[0-9]+((\.[0-9]+)?)$/" class="exp-name B1M" ng-model="experiment.protocol.lid_temperature"
+          ng-show="editLidTempMode" ng-blur="updateProtocol(experiment.protocol, expForm)" on-key-enter="updateProtocol(experiment.protocol, expForm)"
+          focus-on="editLidTempMode">
+        <span class="help-block B2M" ng-show="expForm.lidTemp.$error.pattern">
+          <span class="text-danger">Must be a valid number.</span>
+        </span>
+
+        <span class="help-block B2M" ng-show="expForm.lidTemp.$error.required">
+          <span class="text-danger">Must not be null</span>
+        </span>
+
+      </div>
+
+      <div class="text-center message-container B2M">
         <span  ng-show="successLid" class="help-block">
           <span class="text-success">{{successLid}}</span>
         </span>
       </div>
 
       <div ng-show="errors">
-        <span class="help-block">
+        <span class="help-block B2M">
           <span class="text-danger">{{errors}}</span>
         </span>
       </div>
 
-      <div class="heading SH">
-        LID TEMPERATURE
-      </div>
-
-      <div class="exp-name-container">
-        <span class="exp-name B1 truncate" ng-click="focusLidTemp()" ng-show="!editLidTempMode">
-          {{ (experiment.protocol.lid_temperature) | degreeCelcius }}
-        </span>
-
-        <input required type="text" name="lidTemp" ng-pattern="/^[0-9]+((\.[0-9]+)?)$/" class="exp-name B1" ng-model="experiment.protocol.lid_temperature"
-          ng-show="editLidTempMode" ng-blur="updateProtocol(experiment.protocol, expForm)" on-key-enter="updateProtocol(experiment.protocol, expForm)"
-          focus-on="editLidTempMode">
-        <span class="help-block" ng-show="expForm.lidTemp.$error.pattern">
-          <span class="text-danger">Must be a valid number.</span>
-        </span>
-
-        <span class="help-block" ng-show="expForm.lidTemp.$error.required">
-          <span class="text-danger">Must not be null</span>
-        </span>
-
-      </div>
   </form>
 
-  <div ng-show="!experiment">
+  <div ng-show="!experiment" class="B2M">
     <img src="/images/loading.gif"> Loading ...
   </div>
 
