@@ -141,6 +141,17 @@ retain_previous_user_credentials_on_upgrade () {
         fi
 }
 
+run_mysql_upgrade_cmd () {
+   echo "Upgrade MySQL InnoDB tables."
+   mysql_upgrade
+   if [ $? -eq 0 ]; then
+      echo "run_mysql_upgrade_cmd: INFO: MySQL upgrade is successful, Proceed with rest of the DB migration"
+   else
+      echo "run_mysql_upgrade_cmd: ERROR: Encountered issues with MySQL upgrade, verify the DB tables"
+   fi
+   return 0
+}
+
 run_migrate_on_upgrade () {
 	echo "Checking for flag file: ${sdcard}/factory/upgrade_autorun.flag and ${sdcard}/upgrade/upgrade_autorun.flag"
 	if [ -e ${sdcard}/factory/upgrade_autorun.flag ] || [ -e ${sdcard}/upgrade/upgrade_autorun.flag ]
@@ -160,7 +171,7 @@ run_migrate_on_upgrade () {
 			chown -R mysql /data/mysql
 			chgrp -R mysql /data/mysql
 
-                        echo "Reattempting start the MySQL daemon..."
+                        echo "Reattempting to start the MySQL daemon..."
                         systemctl start mysql
 
                         SERVICE=realtime;
@@ -176,6 +187,9 @@ run_migrate_on_upgrade () {
 			mysqladmin status | grep Uptime
 			sql_running=$?
 		done
+
+                echo "MySQL is running now, Proceed with MySQL InnoDB tables upgrade"
+                run_mysql_upgrade_cmd
 
                 echo "Perform RAILS DB migration by calling upgrade.sh script..."
 		RAILS_ENV=production /root/chaipcr/web/scripts/upgrade.sh >> /var/log/upgrade.log 2>&1 || :
@@ -193,9 +207,6 @@ run_migrate_on_upgrade () {
 		rm ${sdcard}/upgrade/upgrade_autorun.flag || :
         	echo "Upgrade autorun flag down.."
 
-		echo "mysql server is running.. Upgrade MySQL InnoDB tables and calling RAILS upgrade.sh."
-                mysql_upgrade
-		sleep 30
 	else
 		echo "No autorun flag found!"
 	fi
