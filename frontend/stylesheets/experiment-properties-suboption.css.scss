@@ -1,7 +1,8 @@
 @import "./colors.css.scss";
 
 .experiment-properties-subtoption {
-
+  margin-bottom: 20px;
+  border-bottom: 2px solid #aaa;
   .message-container {
     height: 25px;
     width: 100%;
@@ -16,12 +17,18 @@
   }
 
   .heading {
-    padding-top: 5px;
+    padding-top: 0;
+    width: 150px;
+    display: inline-block;
+    line-height: 30px;
+    vertical-align: middle;
   }
   .exp-name-container {
-    border-bottom: 2px solid #aaa;
-    margin-top: 10px;
+    margin-top: 0;
     height: 30px;
+    width: 150px;
+    display: inline-block;
+    vertical-align: middle;
 
     .exp-name {
       border: none;
@@ -30,12 +37,14 @@
       display: inline-block;
       width: 80%;
       vertical-align: middle;
+      line-height: 30px;
     }
     input.exp-name {
       background: transparent;
       margin-top: 0px;
       padding: 0;
       width: 100%;
+      line-height: 30px;
 
       &:focus {
         outline: 0;

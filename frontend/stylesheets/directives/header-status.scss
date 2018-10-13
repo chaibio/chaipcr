@@ -24,7 +24,11 @@
   }
   .stripes {
     cursor: context-menu;
-    margin-top: 19px;
+    margin-top: 11px;
+    img{
+      width: 30px;
+      vertical-align: middle;      
+    }
     .stripe {
       height: 2px;
       width: 16px;

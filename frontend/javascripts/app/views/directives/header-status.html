@@ -35,7 +35,7 @@
       <div class="clearfix state" ng-show="experiment.id && !experiment.started_at && !experiment.completed_at && !(statusData.optics.lid_open==='true')&& state==='idle'">
         <div class="pull-left menu" ng-transclude>
         </div>
-        <div class="pull-left exp-name H3" title="{{experiment.name|uppercase}}">
+        <div class="pull-left exp-name H2" title="{{experiment.name|uppercase}}">
           <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
         </div>
         <div class="pull-right controls SHR text-right">
@@ -51,7 +51,7 @@
       <div class="clearfix state" ng-show="!experiment.started_at && !experiment.completed_at && (statusData.optics.lid_open==='true')">
         <div class="pull-left menu" ng-transclude>
         </div>
-        <div class="pull-left exp-name H3" title="{{experiment.name|uppercase}}">
+        <div class="pull-left exp-name H2" title="{{experiment.name|uppercase}}">
           <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
         </div>
         <div class="pull-right controls SHR text-right">
@@ -65,7 +65,7 @@
       <div class="clearfix state" ng-show="!experiment.started_at && !experiment.completed_at && (state !== 'idle')">
         <div class="pull-left menu" ng-transclude>
         </div>
-        <div class="pull-left exp-name H3" title="{{experiment.name|uppercase}}">
+        <div class="pull-left exp-name H2" title="{{experiment.name|uppercase}}">
           <div ng-show="experiment.id && experiment.name">{{expName(27)}}</div>
         </div>
         <div class="pull-right controls SHR text-right">
@@ -82,7 +82,7 @@
       <div class="clearfix state" ng-show="!experiment.completed_at && state !== 'idle' && isCurrentExp">
         <div class="pull-left menu" ng-transclude>
         </div>
-        <div class="pull-left exp-name H3" title="{{experiment.name|uppercase}}">
+        <div class="pull-left exp-name H2" title="{{experiment.name|uppercase}}">
           <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
         </div>
         <div class="pull-right controls SHR text-right">
@@ -99,7 +99,7 @@
       <div class="clearfix state" ng-show="experiment.completed_at && state !== 'idle' && isCurrentExp">
         <div class="pull-left menu" ng-transclude>
         </div>
-        <div class="pull-left exp-name H3" title="{{experiment.name|uppercase}}">
+        <div class="pull-left exp-name H2" title="{{experiment.name|uppercase}}">
           <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
         </div>
         <div class="pull-right controls SHR text-right">
@@ -115,7 +115,7 @@
       <div class="clearfix state" ng-show="experiment.completed_at && !(state !== 'idle' && isCurrentExp) && !dataAnalysis && enterState">
         <div class="pull-left menu" ng-transclude>
         </div>
-        <div class="pull-left exp-name x" title="{{experiment.name|uppercase}}">
+        <div class="pull-left exp-name H2" title="{{experiment.name|uppercase}}">
           <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
         </div>
         <div class="pull-right controls SHR text-right">
@@ -128,7 +128,7 @@
       <div class="clearfix state" ng-show="experiment.completed_at && !(state !== 'idle' && isCurrentExp) && (dataAnalysis || !enterState)">
         <div class="pull-left menu" ng-transclude>
         </div>
-        <div class="pull-left exp-name H3" title="{{experiment.name|uppercase}}">
+        <div class="pull-left exp-name H2" title="{{experiment.name|uppercase}}">
           <div ng-show="experiment.id && experiment.name">{{expName(20)}}</div>
         </div>
         <div class="pull-right controls SHR text-right">
@@ -155,7 +155,7 @@
       <div class="clearfix state" ng-show="experiment && experiment.started_at && !experiment.completed_at && state==='idle' && (dataAnalysis || !enterState)">
         <div class="pull-left menu" ng-transclude>
         </div>
-        <div class="pull-left exp-name H3" title="{{experiment.name|uppercase}}">
+        <div class="pull-left exp-name H2" title="{{experiment.name|uppercase}}">
           <div ng-show="experiment.id && experiment.name">{{expName(20)}}</div>
         </div>
         <div class="pull-right controls SHR text-right">
