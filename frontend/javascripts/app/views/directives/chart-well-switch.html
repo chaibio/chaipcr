@@ -30,7 +30,7 @@
           {{ row.index==0? 'A' : 'B' }}
         </td>
         <td ng-repeat="col in columns" class="well-switch" ng-init="i = (row.index * columns.length) + col.index; well = wells['well_' + i];" ng-mousedown="dragStart($event, 'well', i)" ng-mousemove="dragged($event, 'well', i)" ng-mouseup="dragStop($event, 'well', i)" ng-class="{selected: well.selected, active: well.active}" ng-style="getWellStyle(row, col, well, i)">
-          <div class="well-switch-container B1" style="height: 100%;" ng-style="getWellContainerStyle(row, col, well, i)">
+          <div class="well-switch-container B1-Amplification" style="height: 100%;" ng-style="getWellContainerStyle(row, col, well, i)">
             <div class="well-switch-bar-container">
               <div class="well-switch-bar" ng-style="getStyleForWellBar(row, col, well, i)">
               </div>

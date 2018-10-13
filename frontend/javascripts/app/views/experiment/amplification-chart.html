@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<div class="amplification-chart-state-active results-charts" style="height: 100%;">
+<div class="amplification-chart-state-active results-charts" style="height: 100%; margin-left: 0px;  margin-right: 0px;">
   <div class="page-layout" ng-controller="AmplificationChartCtrl" ng-show="experiment" style="height: 100%;">
     <div class="content row" style="padding-top:0px; height: 100%; display: flex;" >
       <div class="chart-section col-lg-8 col-md-8 col-sm-6 col-xs-6" offset="0" force="true" style="width: 65%; height:100%; padding-left: 0px; padding-right: 0px; display: flex; flex-direction: column; justify-content: space-between; background: #eeeeee">
@@ -32,14 +32,14 @@ limitations under the License.
             </div>
             <div class="plot-options subheader-switches SH" style="font-size: 13pt; display: flex; flex-direction: column; justify-content: center;">
               <div class="item-switch">
-                <label class="B1">Baseline Sub.</label>
+                <label class="B1-Amplification">Baseline Sub.</label>
                 <switch class="switch" ng-model="baseline_subtraction"></switch>
               </div>
               <div class="item-switch-channel" ng-show="!is_dual_channel">
-                <label class="amplification-options B1" style="color: red; margin-bottom: 0" ng-click="openOptionsModal()">Advanced Settings</label>
+                <label class="amplification-options B1-Amplification" style="color: red; margin-bottom: 0" ng-click="openOptionsModal()">Advanced Settings</label>
               </div>
               <div class="item-switch-channel" ng-show="is_dual_channel">
-                <label class="amplification-options B1" ng-show="experiment.type != 'test_kit'" style="color: red !important; margin-bottom: 0" ng-click="openOptionsModal()">Advanced Settings</label>
+                <label class="amplification-options B1-Amplification" ng-show="experiment.type != 'test_kit'" style="color: red !important; margin-bottom: 0" ng-click="openOptionsModal()">Advanced Settings</label>
                 <!-- <label>CHOOSE CHANNEL:</label> &nbsp;
                 <switch ng-model="channel_1"></switch>
                 <label>1</label>
@@ -48,17 +48,17 @@ limitations under the License.
               </div>
             </div>
             <div class="plot-options" style="padding-right: 20px; display: flex; flex-direction: column; justify-content: center;">
-              <p class="B1" style="margin-bottom: 3px;">Plot Type</p>
-              <form role="form" class="form-horizontal B1" name="plotType" novalidate>
-                <div class="form-group B1" style="margin-bottom: 0;">
+              <p class="B1-Amplification" style="margin-bottom: 3px;">Plot Type</p>
+              <form role="form" class="form-horizontal B1-Amplification" name="plotType" novalidate>
+                <div class="form-group B1-Amplification" style="margin-bottom: 0;">
                   <div class="col-md-12">
-                    <div class="dropdown B1" ng-click="showPlotTypeList()">
-                      <button class="dropbtn B1">
-                        <span class="test B1" style="float:left;">{{curve_type.charAt(0).toUpperCase() + curve_type.slice(1)}}</span>
+                    <div class="dropdown B1-Amplification" ng-click="showPlotTypeList()">
+                      <button class="dropbtn B1-Amplification">
+                        <span class="test B1-Amplification" style="float:left;">{{curve_type.charAt(0).toUpperCase() + curve_type.slice(1)}}</span>
                         <img class="arrow-down" src="/images/arrow-down_white.png">
                         <!-- <img class="arrow-down" src="/images/arrow-down.svg"> -->
                       </button>
-                      <div id="plotTypeList" class="dropdown-content B1">
+                      <div id="plotTypeList" class="dropdown-content B1-Amplification">
                         <a href="" ng-click="curve_type='log'" value="abc">Log</a>
                         <a href="" ng-click="curve_type='linear'" value="abc">Linear</a>
                       </div>
@@ -68,16 +68,16 @@ limitations under the License.
               </form>
             </div>
             <div class="plot-options" style="padding-right: 10px;  display: flex; flex-direction: column; justify-content: center;">
-              <p class="B1" style="margin-bottom: 3px;">Color by</p>
-              <form role="form" class="form-horizontal B1" name="colorBy" novalidate>
+              <p class="B1-Amplification" style="margin-bottom: 3px;">Color by</p>
+              <form role="form" class="form-horizontal B1-Amplification" name="colorBy" novalidate>
                 <div class="form-group" style="margin-bottom: 0;">
                   <div class="col-md-12" style="padding-right: 10px;">
-                    <div class="dropdown B1" ng-click="showColorByList()">
-                      <button class="dropbtn B1">
-                        <span class="test B1" style="float:left;">{{color_by.charAt(0).toUpperCase() + color_by.slice(1)}}</span>
+                    <div class="dropdown B1-Amplification" ng-click="showColorByList()">
+                      <button class="dropbtn B1-Amplification">
+                        <span class="test B1-Amplification" style="float:left;">{{color_by.charAt(0).toUpperCase() + color_by.slice(1)}}</span>
                         <img class="arrow-down" src="/images/arrow-down_white.png">
                       </button>
-                      <div id="colorByList_ampli" class="B1 dropdown-content">
+                      <div id="colorByList_ampli" class="B1-Amplification dropdown-content">
                         <a href="" ng-click="color_by='sample'" value="abc">Sample</a>
                         <a href="" ng-click="color_by='target'" value="abc">Target</a>
                         <a href="" ng-click="color_by='well'" value="abc">Well</a>
@@ -100,8 +100,8 @@ limitations under the License.
                   </div>
                   <div class="loading-blue-container" ng-show="(fetching || retrying) && !error && !hasData">
                     <div class="loading-blue"></div>
-                    <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
-                    <p class="B2">May take a minute</p>
+                    <h2 class="H2-Amplification">Loading Data <ellipsis-animated></ellipsis-animated></h2>
+                    <p class="B2-Amplification">May take a minute</p>
                   </div>
                   <amplification-chart data="amplification_data" config="chartConfig" zoom="ampli_zoom" on-zoom="onZoom" on-select-line="onSelectLine" on-unselect-line="onUnselectLine" on-update-properties="onUpdateProperties" scroll="ampli_scroll.value" show="showAmpliChart"></amplification-chart>
                 </div>  
@@ -129,32 +129,32 @@ limitations under the License.
               <div style="height:100%; padding-right: 20px; margin: 0px; background: transparent; display: flex; float: left; flex-direction: column; justify-content: space-between;">
                   <div style="padding: 0; background: transparent; box-shadow: 1pt 1pt 1pt 1px grey;">
                       <div class="parameters">
-                        <div class="header B1-M" ng-style="bgcolor_target" style="min-height: 41px; color:white;">
+                        <div class="header B1-M-Amplification" ng-style="bgcolor_target" style="min-height: 41px; color:white;">
                           <!-- Target: -->
                           {{label_target}}
                         </div>
                         <div>
                           <table class="parameters-table">
                             <tr>
-                              <td class="B1">Cycle:</td>
-                              <td class="B1-M">{{label_cycle}}</td>
+                              <td class="B1-Amplification">Cycle:</td>
+                              <td class="B1-M-Amplification">{{label_cycle}}</td>
                             </tr>
                             <tr>
-                              <td class="B1">RFU:</td>
-                              <td class="B1-M">{{label_RFU}}</td>
+                              <td class="B1-Amplification">RFU:</td>
+                              <td class="B1-M-Amplification">{{label_RFU}}</td>
                             </tr>
                             <tr>
-                              <td class="B1">dF/dc:</td>
-                              <td class="B1-M">{{label_dF_dC}}</td>
+                              <td class="B1-Amplification">dF/dc:</td>
+                              <td class="B1-M-Amplification">{{label_dF_dC}}</td>
                             </tr>
                             <tr>
                               <td class="B1">d<sup>2</sup>/dc<sup>2</sup>:</td>
-                              <td class="B1-M">{{label_D2_dc2}}</td>
+                              <td class="B1-M-Amplification">{{label_D2_dc2}}</td>
                             </tr>
                           </table>
                         </div>
                       </div>
-                      <div class="info B2" style="padding-top: 8px; padding-bottom: 8px; padding-left: 10px;">
+                      <div class="info B2-Amplification" style="padding-top: 8px; padding-bottom: 8px; padding-left: 10px;">
                         Channel: {{label_channel}}
                       </div>
                       <!-- <div class="info1" ng-style="bgcolor_wellSample"  style="min-height: 41px; font-size: 15px; color:white; margin-top: 5px">
@@ -191,33 +191,33 @@ limitations under the License.
         <table style="height: 100%;">
           <tbody>
             <tr>
-              <th class="B2-M" style="text-align: center; border-left:none">Clr</th>
-              <th class="B2-M" style="text-align: center;">Omit</th>
-              <th class="B2-M" style="text-align: left; padding-left:0px;" >Well</th>
-              <th class="B2-M" style="text-align: left; padding-left:0px;" >Sample</th>
-              <th class="B2-M" style="text-align: center;">Type</th>
-              <th class="B2-M" style="text-align: left; padding-left:0px;">Target</th>
-              <th class="B2-M" style="text-align: left; padding-left:0px;" ng-class="{'channel-1': color_by === 'channel'}">
+              <th class="B2-M-Amplification" style="text-align: center; border-left:none">Clr</th>
+              <th class="B2-M-Amplification" style="text-align: center;">Omit</th>
+              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;" >Well</th>
+              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;" >Sample</th>
+              <th class="B2-M-Amplification" style="text-align: center;">Type</th>
+              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;">Target</th>
+              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;" ng-class="{'channel-1': color_by === 'channel'}">
                 <span ng-if="is_dual_channel">Cq</span>
                 <span ng-if="!is_dual_channel">Cq</span>
               </th>
-              <th class="B2-M" style="text-align: left; padding-left:0px;" ng-class="{'channel-2': color_by === 'channel'}" style="padding: 10px 5px;">
+              <th class="B2-Amplification" style="text-align: left; padding-left:0px;" ng-class="{'channel-2': color_by === 'channel'}" style="padding: 10px 5px;">
                 <span ng-if="is_dual_channel" >Cq M</span>
                 <span ng-if="!is_dual_channel" >Cq M</span>
               </th>
-              <th class="B2-M" style="text-align: left; padding-left:0px;">Qty</th>
-              <th class="B2-M" style="text-align: left; padding-left:0px;">Qty M</th>
+              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;">Qty</th>
+              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;">Qty M</th>
             </tr>
             <tr ng-repeat="i in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" ng-class="{selected: (wellButtons['well_'+i].selected)}">
-              <td class="B2" ng-class="{'text-center': color_by==='channel'}" style="vertical-align: top;">
-                <span ng-if="color_by==='well'" class="B2 dot" ng-attr-style="background-color: {{wellButtons['well_'+i].color}}"></span>
+              <td class="B2-Amplification" ng-class="{'text-center': color_by==='channel'}" style="vertical-align: top;">
+                <span ng-if="color_by==='well'" class="B2-Amplification dot" ng-attr-style="background-color: {{wellButtons['well_'+i].color}}"></span>
                 </span>
               </td>
-              <td class="B2">
-                <input class="B2" type="checkbox" style="width:50px;" ng-click="toggleOmitIndex($index)" /> 
+              <td class="B2-Amplification">
+                <input class="B2-Amplification" type="checkbox" style="width:50px;" ng-click="toggleOmitIndex($index)" /> 
               </td>
-              <td class="B2" ng-class="{'text-center': color_by==='channel'}" style="text-align: left">
-                <span class="B2 text">
+              <td class="B2-Amplification" ng-class="{'text-center': color_by==='channel'}" style="text-align: left">
+                <span class="B2-Amplification text">
                   <span ng-show="i < 8">
                     A{{i+1}}
                   </span>
@@ -226,54 +226,54 @@ limitations under the License.
                   </span>
                 </span>
               </td>
-              <td class="B2" ng-click="focusExpName($index)" style="text-align: left;">
-                <span ng-if="color_by==='sample'" class="B2 dot" ng-attr-style="background-color: {{samplesSet.indexOf(samples[i]) < 0 ? '#000000' : COLORS[samplesSet.indexOf(samples[i])]}}"></span>
-                <span class="B2 sample-span" ng-click="focusExpName($index)" ng-show="!editExpNameMode[$index]">
+              <td class="B2-Amplification" ng-click="focusExpName($index)" style="text-align: left;">
+                <span ng-if="color_by==='sample'" class="B2-Amplification dot" ng-attr-style="background-color: {{samplesSet.indexOf(samples[i]) < 0 ? '#000000' : COLORS[samplesSet.indexOf(samples[i])]}}"></span>
+                <span class="B2-Amplification sample-span" ng-click="focusExpName($index)" ng-show="!editExpNameMode[$index]">
                   {{samples[$index] | truncate:20}}
                 </span>
-                <input type="text" class="B2" style="vertical-align: initial;" ng-show="editExpNameMode[$index]" focus-on="editExpNameMode" ng-blur="updateSampleName($index,samples[$index])"  on-shift-enter="updateSampleNameEnter($index,samples[$index])"  ng-model="samples[$index]">
+                <input type="text" class="-Amplification" style="vertical-align: initial;" ng-show="editExpNameMode[$index]" focus-on="editExpNameMode" ng-blur="updateSampleName($index,samples[$index])"  on-shift-enter="updateSampleNameEnter($index,samples[$index])"  ng-model="samples[$index]">
               </td>
-              <td class="B2 type-td">
+              <td class="B2-Amplification type-td">
                 <!-- <span class="B2" style="width: 20px; height: 20px; vertical-align: middle" ng-show="types[$index]"> -->
                 <!-- {{types[$index]==='sample'?'S':'' | truncate:20}} -->
-                <span class="B2" style="width: 20px; height: 20px;">
+                <span class="B2-Amplification" style="width: 20px; height: 20px;">
                   S
                 </span>
               </td>
-              <td class="B2" ng-click="focusExpTarget($index)" style="text-align: left;">
-                <span class="B2" ng-click="focusExpTarget($index)" ng-show="!editExpTargetMode[$index]">
+              <td class="B2-Amplification" ng-click="focusExpTarget($index)" style="text-align: left;">
+                <span class="B2-Amplification" ng-click="focusExpTarget($index)" ng-show="!editExpTargetMode[$index]">
                   {{targets[$index] | truncate:20}}
                 </span>
-                <input type="text" class="B2" ng-show="editExpTargetMode[$index]" focus-on="editExpTargetMode" ng-blur="updateTarget($index,targets[$index])" on-shift-enter="updateTargetEnter($index,targets[$index])" ng-model="targets[$index]">
+                <input type="text" class="B2-Amplification" ng-show="editExpTargetMode[$index]" focus-on="editExpTargetMode" ng-blur="updateTarget($index,targets[$index])" on-shift-enter="updateTargetEnter($index,targets[$index])" ng-model="targets[$index]">
               </td>
-              <td class="B2" style="text-align: left">
-                <span class="B2 width1" >
-                  <span class="B2" ng-show="wellButtons['well_'+i].ct[0] > 0">
+              <td class="B2-Amplification" style="text-align: left">
+                <span class="B2-Amplification width1" >
+                  <span class="B2-Amplification" ng-show="wellButtons['well_'+i].ct[0] > 0">
                     {{(wellButtons['well_'+i].ct[0]) | round:2}}
                   </span>
                 </span>
               </td>
-              <td class="B2" style="text-align: left">
-                <!-- <span class="B2 width1" ng-if="is_dual_channel">
-                  <span class="B2" ng-show="wellButtons['well_'+i].ct[1] > 0">
+              <td class="B2-Amplification" style="text-align: left">
+                <!-- <span class="B2-Amplification width1" ng-if="is_dual_channel">
+                  <span class="B2-Amplification" ng-show="wellButtons['well_'+i].ct[1] > 0">
                     {{(wellButtons['well_'+i].ct[1]) | round:2}}
                   </span>
-                  <span class="B2" ng-show="wellButtons['well_'+i].ct[1] <= 0">
-                    <span class="B2 dummy-placeholder">&nbsp;</span>
+                  <span class="B2-Amplification" ng-show="wellButtons['well_'+i].ct[1] <= 0">
+                    <span class="B2-Amplification dummy-placeholder">&nbsp;</span>
                   </span>
                 </span>
-                <span class="B2 width1" ng-if="!is_dual_channel">
-                  <span class="B2 dummy-placeholder"></span>
+                <span class="B2-Amplification width1" ng-if="!is_dual_channel">
+                  <span class="B2-Amplification dummy-placeholder"></span>
                   <td class="B2">
                 </span> -->
-              </td class="B2" style="text-align: left">
-                <!-- <span class="B2 width1">
-                  <span class="B2 dummy-placeholder"></span>
+              </td class="B2-Amplification" style="text-align: left">
+                <!-- <span class="B2-Amplification width1">
+                  <span class="B2-Amplification dummy-placeholder"></span>
                 </span> -->
               </td>
-              <td class="B2" style="text-align: left">
-                <!-- <span class="B2 width1">
-                  <span class="B2 dummy-placeholder"></span>
+              <td class="B2-Amplification" style="text-align: left">
+                <!-- <span class="B2-Amplification width1">
+                  <span class="B2-Amplification dummy-placeholder"></span>
                 </span> -->
               </td>
             </tr>
