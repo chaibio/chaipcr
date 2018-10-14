@@ -45,21 +45,24 @@
     }
 
     &.selected.active {
-      position: relative;
+      position: fixed;
 
       .well-switch-container {
-        margin: -5px;
-        height: calc(100% + 13px) !important ;
+        // margin: -5px;
+        //height: calc(100% + 13px) !important ;
+        height: fit-content !important ;
         border: 2px solid #000;
         z-index: 999999;
         position: absolute;
-        top: 0;
-        left: 0;
+        top: -5px;
+        left: -5px;
+        bottom: -3px;
+        right: -5px;        
         box-shadow: 0px 0px 5px #000;
         font-weight: bold;
       }
       .ct-cq-container {
-        height: 62px;
+        height: 58px;
         padding: 4px 22px;
       }
 
