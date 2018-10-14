@@ -37,6 +37,7 @@
     vertical-align: top;
 
     &.selected {
+      background-color: #e4f4fa;
       .ct-cq-container {
         background-color: #e4f4fa;
         // background-color: white;
@@ -48,7 +49,7 @@
 
       .well-switch-container {
         margin: -5px;
-        height: 81px;
+        height: calc(100% + 13px) !important ;
         border: 2px solid #000;
         z-index: 999999;
         position: absolute;
@@ -76,7 +77,12 @@
     .ct-cq-container {
       border-top: 1px solid #c5c5c5;
       padding: 2px 20px;
+
       min-height: 45px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: calc(100% - 20px)
     }
 
   }

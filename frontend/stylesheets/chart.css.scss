@@ -359,7 +359,7 @@
   // margin-bottom: -4px;
   // width: 35%;
   border-left: 2px solid black;
-  overflow: auto;
+  // overflow: auto;
   top: 0px;
   bottom: 50px;
   right: 0px;
@@ -455,3 +455,19 @@
   margin-top: 0px;
   background: white;
 }
+
+// ::-webkit-scrollbar {
+//   width: 10px;
+// }
+
+// ::-webkit-scrollbar-track {
+//   background: #f1f1f1;
+// }
+
+// ::-webkit-scrollbar-thumb {
+//   background: #888;
+// }
+
+// ::-webkit-scrollbar-thumb:hover {
+//   background: #555;
+// }

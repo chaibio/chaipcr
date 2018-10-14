@@ -246,10 +246,8 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
 
       $scope.getWellContainerStyle = (row, col, well, i) ->
         style = {}
-
         if well.active
-          style.width = "#{@getCellWidth() + ACTIVE_BORDER_WIDTH * 4}px"
-
+          style.width = "#{Math.round(@getCellWidth() + ACTIVE_BORDER_WIDTH * 4)}px"
         return style
 
       $scope.displayCt = (ct) ->

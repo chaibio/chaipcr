@@ -139,8 +139,6 @@
     color: #00b3ed !important;
   }
   .curve-header {
-    margin-left:0;
-    margin-right:0;
     height: 100px;
     display:flex;
     background: white;
@@ -314,8 +312,9 @@
             cursor: pointer;
             span {
               img {
-                width: 15px;
-                height: 15px;
+                width: 10px;
+                height: 10px;
+                margin-bottom: 3px;
               }
             }
           }
@@ -342,7 +341,7 @@
     // margin-bottom: -4px;
     // width: 35%;
     border-left: 2px solid black;
-    overflow: auto;
+    // overflow: auto;
     top: 0px;
     bottom: 50px;
     right: 0px;
