@@ -250,7 +250,7 @@ void WirelessManager::scan(const std::string &interface)
 {
     std::stringstream stream;
 
-    Util::watchProcess("iwlist " + interface + " scan", [&stream](const char *buffer, std::size_t size){ stream.write(buffer, size); });
+    Util::watchProcess("iwlist " + interface + " scan", [&stream](const char *buffer, std::size_t size){ stream.write(buffer, size); }, Util::WatchProcessCallback(), true);
 
     std::map<std::string, ScanResult> resultMap;
     ScanResult result;
