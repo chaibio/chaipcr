@@ -446,6 +446,48 @@
   }
 }
 
+.amplification-chart {
+  .g-y-axis-text {
+    font-family: "dinot-regular";
+    font-size: 8px;
+    font-weight: bold;
+    line-height: 12px;
+  }
+
+  .axis .tick text {
+    font-family: "dinot-regular";
+    font-size: 6.5px;
+    line-height: 9.75px;
+    font-weight: normal;
+  }
+  
+  .g-axis-limit-text {
+    font-family: "dinot-regular";
+    font-size: 6.5px;
+    line-height: 9.75px;
+    font-weight: 500;
+  }
+}
+
+.temperature-log-chart {
+  .g-y-axis-text {
+    font-family: "dinot-regular";
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .axis .tick text {
+    font-family: "dinot-regular";
+    font-size: 10px;
+  }
+ 
+  .g-axis-limit-text {
+    font-family: "dinot-regular";
+    font-size: 10px;
+    font-weight: 500;
+  }
+}
+
 .omit_checkbox {
   color: red;
   width: 50px !important;

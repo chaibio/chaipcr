@@ -46,13 +46,13 @@
         <div style="flex-grow: 1; position: relative;" full-height offset="37 + 50 + 210" min="300">
           <!-- <div class="vertical-text B1B">Temperature (&deg;C)</div> -->
           <div class="chart-container" full-width offset="40" style="height: 100%; position: absolute;">
-            <div full-height min='600'>
+            <div full-height force='true' min='300'>
               <div class="loading-blue-container" ng-show="!experiment || !hasData">
                 <div class="loading-blue"></div>
                 <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
                 <p class="B2">May take a minute</p>
               </div>
-              <thermal-profile-chart data="data" config="options" on-zoom="tempOnZoom" zoom="zoomState" scroll="scrollState.value" on-mouse-move="mouseMove"show="showChart"></thermal-profile-chart>
+              <thermal-profile-chart style='height:100%' data="data" config="options" on-zoom="tempOnZoom" zoom="zoomState" scroll="scrollState.value" on-mouse-move="mouseMove"show="showChart"></thermal-profile-chart>
             </div>
           </div>
         </div>

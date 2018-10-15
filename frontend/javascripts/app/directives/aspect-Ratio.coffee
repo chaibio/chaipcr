@@ -18,8 +18,7 @@ App.directive 'aspectRatio', [
       # alert($scope.offsetX)
       # alert($scope.offsetY)
       # alert($scope.force)
-      # alert($scope.minWidth)
-      # alert($scope.minHeight)
+    
 
       # $scope.offset = ($scope.offset || 0) * 1
       # $scope.width = ($scope.min || 0) * 1
@@ -27,8 +26,8 @@ App.directive 'aspectRatio', [
       elem.addClass 'aspect-Ratio'
 
       getWidth = ->
-        width = elem.parent().width() - $scope.offsetX
         width = if $scope.minWidth then (if width > $scope.minWidth then width else $scope.minWidth) else width
+        width = elem.parent().width() - $scope.offsetX
         width
 
       getHeight = -> 
@@ -42,13 +41,20 @@ App.directive 'aspectRatio', [
 
         height = if $scope.minHeight > height then $scope.minHeight else height
         if height > elem.parent().height()  then height = elem.parent().height()
+        
         height
 
       resizeAspectRatio = -> 
 
         width = getWidth()
         height = getHeight()
-         
+        
+        console.log('width')
+        console.log(width)
+        console.log('height')
+        console.log(height)
+        console.log(elem)
+
         if width > $scope.maxWidth and height > $scope.maxHeight
           width = $scope.maxWidth
           height = $scope.maxHeight
@@ -58,9 +64,6 @@ App.directive 'aspectRatio', [
         else 
           width = Math.min(width / 1.7, height) * 1.7
           height = Math.min(width / 1.7, height)
-
-        console.log(width)
-        console.log(height)  
 
         elem.css('min-Width': width)
         elem.css('Width': width)
@@ -80,9 +83,9 @@ App.directive 'aspectRatio', [
         resizeTimeout = $timeout ->
           # elem.css(overflow: '', width: '', 'min-width': '', height: '', 'min-height': '')
           resizeTimeout = null
-        , 600
+        , 200
 
-      $timeout(resizeAspectRatio, 100)
-
+      # resizeAspectRatio()
+      $timeout(resizeAspectRatio, 300)
 
 ]

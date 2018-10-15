@@ -18,7 +18,7 @@ window.App.directive 'thermalProfileChart', [
       link: ($scope, elem, attrs) ->
 
         chart = null
-        changeVal = null;
+        changeVal = null
         $scope.show = $scope.show || true
 
         initChart = ->
@@ -48,7 +48,7 @@ window.App.directive 'thermalProfileChart', [
               chart.setXAxis()
               chart.drawLines()
               chart.updateAxesExtremeValues()
-
+        
         $scope.$on 'window:resize', ->
           chart.resize() if chart and $scope.show
 
@@ -73,6 +73,6 @@ window.App.directive 'thermalProfileChart', [
               chart.setXAxis()
               chart.drawLines()
               chart.updateAxesExtremeValues()
-
+        $timeout(initChart, 200)
     }
 ]
