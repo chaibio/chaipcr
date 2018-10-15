@@ -48,13 +48,13 @@ limitations under the License.
               </div>
             </div>
             <div class="plot-options" style="padding-right: 20px; display: flex; flex-direction: column; justify-content: center;">
-              <p class="B1-Amplification" style="margin-bottom: 3px;">Plot Type</p>
+              <p class="B1-Amplification">Plot Type</p>
               <form role="form" class="form-horizontal B1-Amplification" name="plotType" novalidate>
                 <div class="form-group B1-Amplification" style="margin-bottom: 0;">
                   <div class="col-md-12">
                     <div class="dropdown B1-Amplification" ng-click="showPlotTypeList()">
-                      <button class="dropbtn B1-Amplification">
-                        <span class="test B1-Amplification" style="float:left;">{{curve_type.charAt(0).toUpperCase() + curve_type.slice(1)}}</span>
+                      <button class="dropbtn B1-Amplification" style="padding:10px;">
+                        <span class="test B1-Amplification" style="float:left; line-height: 100%;">{{curve_type.charAt(0).toUpperCase() + curve_type.slice(1)}}</span>
                         <img class="arrow-down" src="/images/arrow-down_white.png">
                         <!-- <img class="arrow-down" src="/images/arrow-down.svg"> -->
                       </button>
@@ -68,13 +68,13 @@ limitations under the License.
               </form>
             </div>
             <div class="plot-options" style="padding-right: 10px;  display: flex; flex-direction: column; justify-content: center;">
-              <p class="B1-Amplification" style="margin-bottom: 3px;">Color by</p>
+              <p class="B1-Amplification">Color by</p>
               <form role="form" class="form-horizontal B1-Amplification" name="colorBy" novalidate>
                 <div class="form-group" style="margin-bottom: 0;">
                   <div class="col-md-12" style="padding-right: 10px;">
                     <div class="dropdown B1-Amplification" ng-click="showColorByList()">
-                      <button class="dropbtn B1-Amplification">
-                        <span class="test B1-Amplification" style="float:left;">{{color_by.charAt(0).toUpperCase() + color_by.slice(1)}}</span>
+                      <button class="dropbtn B1-Amplification" style="padding:10px;">
+                        <span class="test B1-Amplification" style="float:left; line-height: 100%;">{{color_by.charAt(0).toUpperCase() + color_by.slice(1)}}</span>
                         <img class="arrow-down" src="/images/arrow-down_white.png">
                       </button>
                       <div id="colorByList_ampli" class="B1-Amplification dropdown-content">
@@ -127,7 +127,7 @@ limitations under the License.
 
             <div class="additional-info" style="min-width:115px; flex-grow: 1;">
               <div style="height:100%; padding-right: 20px; margin: 0px; background: transparent; display: flex; float: left; flex-direction: column; justify-content: space-between;">
-                  <div style="padding: 0; background: transparent; box-shadow: 1pt 1pt 1pt 1px grey;">
+                  <div style="padding: 0; background: transparent; box-shadow: 0 1pt 1pt 1px grey;">
                       <div class="parameters">
                         <div class="header B1-M-Amplification" ng-style="bgcolor_target" style="min-height: 41px; color:white;">
                           <!-- Target: -->
