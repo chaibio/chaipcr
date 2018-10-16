@@ -14,14 +14,6 @@ App.directive 'aspectRatio', [
       maxWidth: '=?'
       maxHeight: '=?'
     link: ($scope, elem) ->
-      
-      # alert($scope.offsetX)
-      # alert($scope.offsetY)
-      # alert($scope.force)
-    
-
-      # $scope.offset = ($scope.offset || 0) * 1
-      # $scope.width = ($scope.min || 0) * 1
 
       elem.addClass 'aspect-Ratio'
 
@@ -49,12 +41,6 @@ App.directive 'aspectRatio', [
         width = getWidth()
         height = getHeight()
         
-        console.log('width')
-        console.log(width)
-        console.log('height')
-        console.log(height)
-        console.log(elem)
-
         if width > $scope.maxWidth and height > $scope.maxHeight
           width = $scope.maxWidth
           height = $scope.maxHeight
@@ -74,8 +60,6 @@ App.directive 'aspectRatio', [
       resizeTimeout = null
 
       $scope.$on 'window:resize', ->
-        console.log('window:resize')
-        
         resizeAspectRatio()
         if resizeTimeout
           $timeout.cancel(resizeTimeout)
@@ -85,7 +69,6 @@ App.directive 'aspectRatio', [
           resizeTimeout = null
         , 200
 
-      # resizeAspectRatio()
       $timeout(resizeAspectRatio, 300)
 
 ]
