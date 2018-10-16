@@ -74,6 +74,6 @@ App.directive 'aspectRatio', [
           resizeTimeout = null
         , 200
 
-      $timeout(resizeAspectRatio, 300)
+      $timeout(resizeAspectRatio, 1300)
 
 ]
