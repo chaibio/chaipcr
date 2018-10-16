@@ -2,8 +2,9 @@
 window.App.directive 'chartChooser', [
   '$uibModal'
   'ChoosenChartService'
-  'Experiment'
-  ($uibModal, ChoosenChartService, Experiment) ->
+  'Experiment',
+  '$timeout'
+  ($uibModal, ChoosenChartService, Experiment, $timeout) ->
 
     restrict: 'EA'
     scope:
@@ -15,14 +16,19 @@ window.App.directive 'chartChooser', [
       hasInit = false
       modal = null
 
+      triggerResizeEvent = ->
+        $(window).trigger('resize')
+
       init = ->
         return if hasInit
         hasInit = true
 
         $scope.changeChart = (chart) ->
+          
           ChoosenChartService.chooseChart(chart)
           modal.close()
-
+          $timeout(triggerResizeEvent, 100)
+          
 
         $scope.hasMeltCurve = ->
           return Experiment.hasMeltCurve($scope.experiment)
