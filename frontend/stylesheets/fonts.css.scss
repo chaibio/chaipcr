@@ -174,9 +174,7 @@ H3-Amplification {
 
 .B2 {
   font-family: "dinot-regular";
-  font-size: 10px;
-  line-height: 15px;
-  font-weight: normal;
+  font-size: 12px;
 }
 
 .B2B {
@@ -184,9 +182,17 @@ H3-Amplification {
   font-size: 12px;
 }
 
+.B2-Amplification {
+  font-family: "dinot-regular";
+  font-size: 13px;
+  // font-size: 10px;
+  line-height: 15px;
+}
+
 .B2-M-Amplification {
-  font-family: "dinot-bold";
-  font-size: 10px;
+  font-family: "dinot-medium";
+  // font-size: 10px;
+  font-size: 13px;
   line-height: 15px;
 }
 

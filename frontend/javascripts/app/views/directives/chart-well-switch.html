@@ -20,8 +20,8 @@
   <table style="height: 100%">
     <tbody>
       <tr>
-        <th class="col-header G2" ng-mousedown="dragStart($event, 'corner', 0)" ng-style="{width: row_header_width + 'px'}"></th>
-        <th class="col-header G2" ng-class="{dragged: col.selected}" ng-mousedown="dragStart($event, 'column', col.index)" ng-mouseup="dragStop($event, 'column', col.index)" ng-mousemove="dragged($event, 'column', col.index)" ng-repeat="col in columns" ng-style="{width: getCellWidth() + 'px'}">
+        <th style="height:15px;" class="col-header G2" ng-mousedown="dragStart($event, 'corner', 0)" ng-style="{width: row_header_width + 'px'}"></th>
+        <th style="height:15px;" class="col-header G2" ng-class="{dragged: col.selected}" ng-mousedown="dragStart($event, 'column', col.index)" ng-mouseup="dragStop($event, 'column', col.index)" ng-mousemove="dragged($event, 'column', col.index)" ng-repeat="col in columns" ng-style="{width: getCellWidth() + 'px'}">
           {{col.index + 1}}
         </th>
       </tr>
@@ -30,7 +30,7 @@
           {{ row.index==0? 'A' : 'B' }}
         </td>
         <td ng-repeat="col in columns" class="well-switch" ng-init="i = (row.index * columns.length) + col.index; well = wells['well_' + i];" ng-mousedown="dragStart($event, 'well', i)" ng-mousemove="dragged($event, 'well', i)" ng-mouseup="dragStop($event, 'well', i)" ng-class="{selected: well.selected, active: well.active}" ng-style="getWellStyle(row, col, well, i)">
-          <div class="well-switch-container B1-Amplification" style="height: 100%;" ng-style="getWellContainerStyle(row, col, well, i)">
+          <div class="well-switch-container B1-Amplification" style="height: 100%; background: inherit;" ng-style="getWellContainerStyle(row, col, well, i)">
             <div class="well-switch-bar-container">
               <div class="well-switch-bar" ng-style="getStyleForWellBar(row, col, well, i)">
               </div>

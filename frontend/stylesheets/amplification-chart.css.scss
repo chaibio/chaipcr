@@ -181,8 +181,8 @@
         border: 1px solid black;
         .arrow-down{
           float: right;
-          width: 15px;
-          padding-top: 5px;
+          width: 10px;
+          padding-top: 3px;
         }
       }
       /* Dropdown Content (Hidden by Default) */
@@ -243,7 +243,7 @@
       // display: inline-block;
       // width: 85%;
       float: left;
-      box-shadow: 1pt 1pt 1pt 1px grey;
+      box-shadow: 0 1pt 1pt 1px grey;
       
       // height: 100%;
     }
@@ -326,6 +326,9 @@
     margin-left: 0;
     margin-right: 0;
     .plot-options {
+      p {
+        margin-bottom: 5px;
+      }
       text-align: left;
       padding-right: 30px;
       .plot-option {
