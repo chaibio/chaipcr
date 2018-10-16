@@ -18,12 +18,14 @@ App.directive 'aspectRatio', [
       elem.addClass 'aspect-Ratio'
 
       getWidth = ->
-        width = if $scope.minWidth then (if width > $scope.minWidth then width else $scope.minWidth) else width
         width = elem.parent().width() - $scope.offsetX
+        if width > $scope.maxWidth
+          width = $scope.maxWidth
+        else if width < $scope.minWidth
+          width = $scope.minWidth
         width
 
       getHeight = -> 
-        
         height = if $scope.doc
                   WindowWrapper.documentHeight() - $scope.offsetY
                 else if $scope.parent
@@ -31,9 +33,12 @@ App.directive 'aspectRatio', [
                 else
                   WindowWrapper.height() - $scope.offsetY
 
-        height = if $scope.minHeight > height then $scope.minHeight else height
+        if height > $scope.maxHeight
+          height = $scope.maxHeight
+        else if height < $scope.minHeight
+          height = $scope.minHeight
+
         if height > elem.parent().height()  then height = elem.parent().height()
-        
         height
 
       resizeAspectRatio = -> 

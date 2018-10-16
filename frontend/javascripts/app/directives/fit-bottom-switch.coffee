@@ -23,15 +23,11 @@ App.directive 'fitBottomSwitch', [
         if height > $scope.maxHeight 
             height = $scope.maxHeight 
 
-        console.log('fit-height')
-        console.log(parentHeight)
-        console.log(siblingHeight)
-        console.log(height)
         height
 
       set = (height) ->
         height = height || getHeight()
-        elem.css( 'height':  height)
+        elem.css('height':  height)
           
       resizeTimeout = null
 
@@ -50,5 +46,5 @@ App.directive 'fitBottomSwitch', [
       if $scope.minHeight > 0
         set($scope.minHeight)
 
-      $timeout(set, 100)
+      $timeout(set, 1000)
 ]
