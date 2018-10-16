@@ -31,10 +31,6 @@ App.directive 'fullHeight', [
       set = (height) ->
         height = height || getHeight()
 
-        console.log('full-height:height')
-        console.log(elem)
-        console.log(height)
-
         if ($scope.force)
           elem.css( 'height':  height )
           elem.css( 'min-height' : height )
@@ -54,7 +50,7 @@ App.directive 'fullHeight', [
           elem.css(overflow: '', height: '', 'min-height': '')
           set()
           resizeTimeout = null
-        , 600
+        , 100
 
       if $scope.min > 0
         set($scope.min)
