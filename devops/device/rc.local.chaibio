@@ -425,7 +425,6 @@ check_upgrade_autorun () {
 	then
 		echo "SDCard block device found at $sdcard_dev" >> $log_file
 
-		sdcard=/sdcard
 		if [ ! -e ${sdcard}/factory ]
 		then
 			mkdir -p ${sdcard}/factory>/dev/null || true
@@ -532,6 +531,7 @@ network_watchdog() {
 
 NOW=$(date +"%m-%d-%Y %H:%M:%s")
 log_file="/var/log/life_age.log"
+sdcard=/sdcard
 
 echo Restarting! >> $log_file
 echo $NOW >>  $log_file
