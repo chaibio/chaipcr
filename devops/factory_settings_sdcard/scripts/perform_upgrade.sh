@@ -266,6 +266,12 @@ then
    cp /etc/network/interfaces /sdcard/upgrade
 fi
 
+echo "Preserve the existing network persistent rules file before the upgrade"
+if [ -e /etc/udev/rules.d/70-persistent-net.rules ]
+then
+   cp /etc/udev/rules.d/70-persistent-net.rules /sdcard/upgrade
+fi
+
 echo "Preserve the existing user credentials stored before the upgrade"
 if [ -e /etc/passwd ] && [ -e /etc/passwd- ]
 then
