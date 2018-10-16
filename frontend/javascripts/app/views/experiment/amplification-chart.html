@@ -209,7 +209,7 @@ limitations under the License.
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;">Qty M</th>
             </tr>
             <tr ng-repeat="i in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" ng-class="{selected: (wellButtons['well_'+i].selected)}">
-              <td class="B2-Amplification" ng-class="{'text-center': color_by==='channel'}" style="vertical-align: top;">
+              <td class="B2-Amplification" ng-class="{'text-center': color_by==='channel'}" style="vertical-align: middle; line-height: 10px;">
                 <span ng-if="color_by==='well'" class="B2-Amplification dot" ng-attr-style="background-color: {{wellButtons['well_'+i].color}}"></span>
                 </span>
               </td>
