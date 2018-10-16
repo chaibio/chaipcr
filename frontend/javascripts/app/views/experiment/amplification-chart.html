@@ -136,20 +136,20 @@ limitations under the License.
                         <div>
                           <table class="parameters-table">
                             <tr>
-                              <td class="B1-Amplification">Cycle:</td>
-                              <td class="B1-M-Amplification">{{label_cycle}}</td>
+                              <td class="B1v-Amplification">Cycle:</td>
+                              <td class="B1Mv-Amplification">{{label_cycle}}</td>
                             </tr>
                             <tr>
-                              <td class="B1-Amplification">RFU:</td>
-                              <td class="B1-M-Amplification">{{label_RFU}}</td>
+                              <td class="B1v-Amplification">RFU:</td>
+                              <td class="B1Mv-Amplification">{{label_RFU}}</td>
                             </tr>
                             <tr>
-                              <td class="B1-Amplification">dF/dc:</td>
-                              <td class="B1-M-Amplification">{{label_dF_dC}}</td>
+                              <td class="B1v-Amplification">dF/dc:</td>
+                              <td class="B1Mv-Amplification">{{label_dF_dC}}</td>
                             </tr>
                             <tr>
-                              <td class="B1-Amplification">d<sup>2</sup>/dc<sup>2</sup>:</td>
-                              <td class="B1-M-Amplification">{{label_D2_dc2}}</td>
+                              <td class="B1v-Amplification">d<sup>2</sup>/dc<sup>2</sup>:</td>
+                              <td class="B1Mv-Amplification">{{label_D2_dc2}}</td>
                             </tr>
                           </table>
                         </div>
@@ -161,7 +161,7 @@ limitations under the License.
                         {{label_well}}{{label_sample ? ", " : ""}}{{label_sample}}
                       </div> -->
                   </div>
-                  <div class="targets-set" ng-show="targetsSet.length" style="padding-top:5px; padding-bottom: 0px; box-shadow: 1pt 1pt 1pt 1px grey;">
+                  <div class="targets-set" ng-show="targetsSet.length" style="padding-top:5px; padding-bottom: 0px;">
                     <table class="targets-table">
                       <tr ng-repeat="target in targetsSet">
                         <td>
@@ -183,7 +183,7 @@ limitations under the License.
             </div>
           </div>
         </div>
-        <div class="choose-chart"  fit-bottom-switch min-height='160' max-height='220' style="position: relative;">
+        <div class="choose-chart" fit-bottom-switch min-height='160' max-height='320' style="position: relative;">
           <chart-well-switch style="position: absolute; height: 100%;" ng-model="wellButtons" color-by="color_by" chart-type="amplification"></chart-well-switch>
         </div>
       </div>

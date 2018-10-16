@@ -46,6 +46,11 @@ App.directive 'aspectRatio', [
         width = getWidth()
         height = getHeight()
         
+        # console.log('width')
+        # console.log(width)
+        # console.log('height')
+        # console.log(height)
+
         if width > $scope.maxWidth and height > $scope.maxHeight
           width = $scope.maxWidth
           height = $scope.maxHeight
@@ -60,7 +65,6 @@ App.directive 'aspectRatio', [
         elem.css('Width': width)
         elem.css('min-height': height)
         elem.css('height': height)
-
           
       resizeTimeout = null
 
@@ -68,12 +72,11 @@ App.directive 'aspectRatio', [
         resizeAspectRatio()
         if resizeTimeout
           $timeout.cancel(resizeTimeout)
-
         resizeTimeout = $timeout ->
-          # elem.css(overflow: '', width: '', 'min-width': '', height: '', 'min-height': '')
+          elem.css(overflow: '', width: '', 'min-width': '', height: '', 'min-height': '')
+          resizeAspectRatio()
           resizeTimeout = null
         , 200
-
       $timeout(resizeAspectRatio, 1300)
 
 ]
