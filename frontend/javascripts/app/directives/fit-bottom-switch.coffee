@@ -37,11 +37,12 @@ App.directive 'fitBottomSwitch', [
         if resizeTimeout
           $timeout.cancel(resizeTimeout)
 
-        resizeTimeout = $timeout ->
-          elem.css(overflow: '', height: '',)
-          set()
-          resizeTimeout = null
-        , 600
+        set()
+        # resizeTimeout = $timeout ->
+        #   elem.css(overflow: '', height: '',)
+        #   set()
+        #   resizeTimeout = null
+        # , 100
 
       if $scope.minHeight > 0
         set($scope.minHeight)
