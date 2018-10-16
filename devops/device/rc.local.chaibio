@@ -382,23 +382,52 @@ update_wireless_network () {
        rm /sdcard/upgrade/interfaces
     fi
 
+    if [ -e /etc/udev/rules.d/80-net-setup-link.rules ]
+    then
+       echo "Symbolic link already exists for overriding predictable names for WIFI interface - wlanX"
+    else
+       echo "Make sure to override unpredictable naming for WIFI interface - Always use wlanX"
+       ln -s /lib/udev/rules.d/80-net-setup-link.rules /etc/udev/rules.d/80-net-setup-link.rules
+    fi
+
+    if [ -e /sdcard/upgrade/70-persistent-net.rules ]
+    then
+       cp /sdcard/upgrade/70-persistent-net.rules /etc/udev/rules.d/70-persistent-net.rules
+       rm /sdcard/upgrade/70-persistent-net.rules
+    fi
+
     echo "Make sure to update fixed name for WiFi endpoint (wlan0)"
     if [ -e /sys/class/net/wlx*/address ]
     then
        address=`cat /sys/class/net/wlx*/address`
-       echo "The MAC address of wireless LAN dongle $address"
-       if [ -e /etc/udev/rules.d/70-persistent-net.rules ]
+    elif [ -e /sys/class/net/wlan0/address ]
+    then
+       address=`cat /sys/class/net/wlan0/address`
+    fi
+    echo "The MAC address of wireless LAN dongle $address"
+
+    if [ -e /etc/udev/rules.d/70-persistent-net.rules ]
+    then
+       if grep -q "wlan0" /etc/udev/rules.d/70-persistent-net.rules
        then
-          if grep -q "wlan0" /etc/udev/rules.d/70-persistent-net.rules
+          wlantxt=$(grep wlan0 /etc/udev/rules.d/70-persistent-net.rules)
+          macaddress=$(echo $wlantxt | sed -e 's/SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?\*", ATTR{address}=="\(.*\)", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="wlan\*", NAME="wlan0"/\1/g')
+          echo Existing MAC address in the rules $macaddress
+          if [ "$address" = "$macaddress" ]
           then
              echo "Rules file is already updated with fixed wireless LAN name (wlan0)"
           else
-             echo "SUBSYSTEM==\"net\", ACTION==\"add\", ATTR{address}==\"$address\", NAME==\"wlan0\"" >> /etc/udev/rules.d/70-persistent-net.rules
-             echo "Done with updating wireless network rules..."
+             original="SUBSYSTEM==\"net\", ACTION==\"add\", DRIVERS==\"?\*\", ATTR{address}==\".*\", ATTR{dev_id}==\"0x0\", ATTR{type}==\"1\", KERNEL==\"wlan\*\", NAME=\"wlan0\""
+             replacement="SUBSYSTEM==\"net\", ACTION==\"add\", DRIVERS==\"?*\", ATTR{address}==\"$address\", ATTR{dev_id}==\"0x0\", ATTR{type}==\"1\", KERNEL==\"wlan*\", NAME=\"wlan0\""
+             echo "ORIGINAL.... $original"
+             echo "REPLACEMENT.... $replacement"
+             sed -i "s/$original/$replacement/g" /etc/udev/rules.d/70-persistent-net.rules
+             echo "Updated MAC address for wlan0 network..."
           fi
+       else
+          echo "SUBSYSTEM==\"net\", ACTION==\"add\", DRIVERS==\"?*\", ATTR{address}==\"$address\", ATTR{dev_id}==\"0x0\", ATTR{type}==\"1\", KERNEL==\"wlan*\", NAME=\"wlan0\"" >> /etc/udev/rules.d/70-persistent-net.rules
+          echo "Done with updating wireless network rules..."
        fi
-    else
-       echo "Fixed wireless name (wlan0) has been already configured properly..."
     fi
 }
 
