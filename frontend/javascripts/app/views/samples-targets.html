@@ -22,9 +22,7 @@ limitations under the License.
       <header-status experiment-id="experiment.id">
         <div class="stripes-and-name" toggle-sidemenu>
           <div class="stripes">
-            <div class="stripe"></div>
-            <div class="stripe"></div>
-            <div class="stripe"></div>
+            <img src='/images/menu-white.svg'/>
           </div>
         </div>
       </header-status>
@@ -42,9 +40,9 @@ limitations under the License.
             <thead>
                 <tr>
                     <th width="70%">Name</th>
-                    <th class="text-right" width="10%"></th>
-                    <th class="text-center" width="20%">Color</th>
-                    <th class="text-center" width="50px"></th>
+                    <th class="text-right" width="10%" style="padding: 0 2px; min-width: 50px;"></th>
+                    <th class="text-center" width="20%" style="padding: 0 2px; min-width: 50px;">Color</th>
+                    <th class="text-center" width="50px" style="padding: 0 2px; min-width: 50px;"></th>
                 </tr>
             </thead>
           <tbody>
@@ -52,13 +50,18 @@ limitations under the License.
                 <td style="border-bottom:1px solid #bbb;">
                     <input style="border:0px;padding:0px;outline: none;width:100%;" type="text" ng-blur="updateSample(rowContent, $index)" ng-focus="focusSample(rowContent, $index)" placeholder="Enter Sample Name" class="" ng-model="rowContent.name">
                 </td>
-                <td style="border-bottom:1px solid #bbb;" class="text-center">
-                    <img class="assigned-icon" src="/images/assigned.svg" alt="" ng-show="rowContent.assigned">
+                <td style="border-bottom:1px solid #bbb; min-width: 50px;" class="text-center">
+                    <label class="icon-wrapper">
+                        <img class="assigned-icon" src="/images/assigned.svg" alt="" ng-show="rowContent.assigned">
+                        <div class="assigned-description">
+                            <span>Assigned to Well(s)</span>
+                        </div>                      
+                    </label>
                 </td>
-                <td style="border-bottom:1px solid #bbb;" class="text-center">
+                <td style="border-bottom:1px solid #bbb; min-width: 50px;" class="text-center">
                     <span class="color" ng-attr-style="background-color:{{colors[$index % 16]}};display:inline-block;width:20px;height:20px;border-radius:3px;"></span>
                 </td>
-                <td style="text-align:center; padding: 0;" class="text-center" >
+                <td style="text-align:center; padding: 0; min-width: 50px;" class="text-center" >
                     <span ng-show="!rowContent.confirmDelete" ng-click="confirmDeleteSample(rowContent)"><img class="delete" src="/images/trash_initial.svg" alt=""></span>
                     <span ng-show="rowContent.confirmDelete" ng-click="deleteSample(rowContent, $index)"><img class="delete-confirm" src="/images/confirm_trash.svg" alt=""></span>
                 </td>
@@ -77,10 +80,10 @@ limitations under the License.
             <thead>
                 <tr>
                     <th width="50%">Name</th>
-                    <th class="text-center" width="20%">Ch.</th>
-                    <th class="text-center" width="10%"></th>
-                    <th class="text-center" width="20%">Color</th>
-                    <th width="50px"></th>
+                    <th class="text-center" width="20%" style="padding: 0 2px; min-width: 60px;">Ch.</th>
+                    <th class="text-center" width="10%" style="padding: 0 2px; min-width: 50px;"></th>
+                    <th class="text-center" width="20%" style="padding: 0 2px; min-width: 50px;">Color</th>
+                    <th width="50px" style="padding: 0 2px; min-width: 50px;"></th>
                 </tr>
             </thead>
           <tbody>
@@ -88,23 +91,37 @@ limitations under the License.
                 <td style="border-bottom:1px solid #bbb;">
                     <input style="border:0px;padding:0px;width:100%;outline: none;" type="text" ng-blur="updateTargetName(targetContent,$index)" ng-focus="focusTarget(targetContent,$index)" placeholder="Enter Target Name"  class="" ng-model="targetContent.name">
                 </td>
-                <td style="border-bottom:1px solid #bbb; padding: 0 2px; width: 80px;" class="text-center">
-                    <div ng-show="targetContent.selectChannel"  class="channel-selector" ng-class="{'one-channel' : !is_dual_channel}">
+                <td style="border-bottom:1px solid #bbb; padding: 0 2px; min-width: 60px;" class="text-center">
+                    <div ng-show="targetContent.selectChannel"  class="channel-selector" ng-if="is_dual_channel">
                         <span ng-click="updateTargetChannel(targetContent.id,1, $index)" ng-class="{'select-channel-border':targetContent.channel == 1}">1</span>                        
-                        <span ng-click="updateTargetChannel(targetContent.id,2, $index)" ng-class="{'select-channel-border':targetContent.channel == 2}" ng-if="is_dual_channel">2</span>
+                        <span ng-click="updateTargetChannel(targetContent.id,2, $index)" ng-class="{'select-channel-border':targetContent.channel == 2}">2</span>
                     </div>
                     <div ng-show="!targetContent.selectChannel"  class="cursor-channel">
-                        <span ng-click="targetContent.selectChannel = !targetContent.selectChannel" style="text-decoration: underline; display: block;">{{targetContent.channel}}</span>
+                        <span ng-click="targetContent.selectChannel = !targetContent.selectChannel" 
+                            style="text-decoration: underline; display: block;" 
+                            ng-if="is_dual_channel">
+                            {{targetContent.channel}}
+                        </span>
+                        <span 
+                            style="display: block;" 
+                            ng-if="!is_dual_channel">
+                            {{targetContent.channel}}
+                        </span>
                     </div>
                 </td>
-                <td style="border-bottom:1px solid #bbb;" class="text-right">
-                    <img class="assigned-icon" src="/images/assigned.svg" alt="" ng-show="targetContent.assigned">
+                <td style="border-bottom:1px solid #bbb; padding: 0 2px; min-width: 50px;" class="text-right">
+                    <label class="icon-wrapper">
+                        <img class="assigned-icon" src="/images/assigned.svg" alt="" ng-show="targetContent.assigned">
+                        <div class="assigned-description">
+                            <span>Assigned to Well(s)</span>
+                        </div>                      
+                    </label>
                     <img class="lock-icon" src="/images/lock.svg" alt="" ng-show="targetContent.imported">
                 </td>
-                <td style="border-bottom:1px solid #bbb;" class="text-center">
+                <td style="border-bottom:1px solid #bbb; padding: 0 2px; min-width: 50px;" class="text-center">
                     <span class="color" ng-attr-style="background-color:{{colors[$index % 16]}};display:inline-block;width:20px;height:20px;border-radius:3px;"></span>
                 </td>
-                <td style="text-align:center;padding: 0;" class="text-center">
+                <td style="text-align:center;padding: 0; padding: 0 2px; min-width: 50px;" class="text-center">
                     <span ng-show="!targetContent.confirmDelete" ng-click="confirmDeleteTarget(targetContent)"><img class="delete" src="/images/trash_initial.svg" alt=""></span>
                     <span ng-show="targetContent.confirmDelete" ng-click="deleteTarget(targetContent, $index)"><img class="delete-confirm" src="/images/confirm_trash.svg" alt=""></span>
                 </td>

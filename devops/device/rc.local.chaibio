@@ -67,12 +67,17 @@ pwm_setup_kernel49 ()
 
 wait_for_migrate () {
         echo "Checking for migrate script completation"
-        while [ -e ${sdcard}/factory/upgrade_autorun.flag ] || [ -e ${sdcard}/upgrade/upgrade_autorun.flag ]
-        do
+        while true; do
+           if [ -e ${sdcard}/factory/upgrade_autorun.flag ] || [ -e ${sdcard}/upgrade/upgrade_autorun.flag ];
+           then
                 echo "Still waiting for migrate script to finish ..."
 		sleep 5
+           else
+                echo "DB migration is complete!..."
+                break
+           fi
  	done
-	echo migrate task done
+	echo "Proceed with rest of the operations as migration task is done..."
 }
 
 get_root_password () {
@@ -141,6 +146,17 @@ retain_previous_user_credentials_on_upgrade () {
         fi
 }
 
+run_mysql_upgrade_cmd () {
+   echo "Upgrade MySQL InnoDB tables."
+   mysql_upgrade
+   if [ $? -eq 0 ]; then
+      echo "run_mysql_upgrade_cmd: INFO: MySQL upgrade is successful, Proceed with rest of the DB migration"
+   else
+      echo "run_mysql_upgrade_cmd: ERROR: Encountered issues with MySQL upgrade, verify the DB tables"
+   fi
+   return 0
+}
+
 run_migrate_on_upgrade () {
 	echo "Checking for flag file: ${sdcard}/factory/upgrade_autorun.flag and ${sdcard}/upgrade/upgrade_autorun.flag"
 	if [ -e ${sdcard}/factory/upgrade_autorun.flag ] || [ -e ${sdcard}/upgrade/upgrade_autorun.flag ]
@@ -159,16 +175,28 @@ run_migrate_on_upgrade () {
 			
 			chown -R mysql /data/mysql
 			chgrp -R mysql /data/mysql
-			systemctl start realtime.service
+
+                        echo "Reattempting to start the MySQL daemon..."
+                        systemctl start mysql
+
+                        SERVICE=realtime;
+                        if ps ax | grep -v grep | grep $SERVICE > /dev/null
+                        then
+                           echo "$SERVICE service is running, Move ahead with RAILS DB migration"
+                        else
+                           echo "$SERVICE service is not running, start realtime app before moving forward"
+			   systemctl start realtime.service
+                        fi
 
 			sleep 10
 			mysqladmin status | grep Uptime
 			sql_running=$?
 		done
 
-		echo "mysql server is running.. Upgrade MySQL InnoDB tables and calling RAILS upgrade.sh."
-                mysql_upgrade
+                echo "MySQL is running now, Proceed with MySQL InnoDB tables upgrade"
+                run_mysql_upgrade_cmd
 
+                echo "Perform RAILS DB migration by calling upgrade.sh script..."
 		RAILS_ENV=production /root/chaipcr/web/scripts/upgrade.sh >> /var/log/upgrade.log 2>&1 || :
 		echo "Execution done executing upgrade.sh!"
 
@@ -183,6 +211,7 @@ run_migrate_on_upgrade () {
 
 		rm ${sdcard}/upgrade/upgrade_autorun.flag || :
         	echo "Upgrade autorun flag down.."
+
 	else
 		echo "No autorun flag found!"
 	fi
@@ -425,7 +454,6 @@ check_upgrade_autorun () {
 	then
 		echo "SDCard block device found at $sdcard_dev" >> $log_file
 
-		sdcard=/sdcard
 		if [ ! -e ${sdcard}/factory ]
 		then
 			mkdir -p ${sdcard}/factory>/dev/null || true
@@ -532,6 +560,7 @@ network_watchdog() {
 
 NOW=$(date +"%m-%d-%Y %H:%M:%s")
 log_file="/var/log/life_age.log"
+sdcard=/sdcard
 
 echo Restarting! >> $log_file
 echo $NOW >>  $log_file

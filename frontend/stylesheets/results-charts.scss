@@ -2,8 +2,8 @@
 .results-charts {
   .curve-header {
     padding-bottom: 3px;
-    margin-left: 10px;
-    margin-right: 10px;
+    margin-left: 0px;
+    margin-right: 0px;
     .row {
       margin-top: 0;
       margin-bottom: 0;
@@ -11,9 +11,6 @@
     .curve-title {
       display: inline-block; //width: 70%;
       cursor: pointer;
-      font-size: 30pt;
-      line-height: 35pt;
-      padding-top:13pt;
       img {
         display: inline-block;
         margin-top: -5px;
@@ -124,16 +121,7 @@
       stroke-width: 3px !important;
     }
   }
-  .axis .tick text {
-    font-family: "dinot-regular";
-    font-size: 10px;
-  }
-  .x-axis-text {
-    // font-family: 'Open Sans';
-    // font-size: 10px;
-    // font-weight: bold;
-    // margin-bottom: -15px;
-  }
+  
   .abscissa-text {
     margin-top: 60px;
   }

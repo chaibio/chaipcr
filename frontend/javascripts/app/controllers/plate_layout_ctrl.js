@@ -163,8 +163,6 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 		$scope.samples = [];
 		$scope.getSamples = function () {
 			Experiment.getSamples($stateParams.id).then(function (resp) {
-				console.log(resp);
-				console.log($scope.samples);
 				var i;
 				for (i = 0; i < resp.data.length; i++) {
 					$scope.samples[i] = resp.data[i].sample;
@@ -183,7 +181,6 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 
 		$scope.getTargets = function () {
 			Experiment.getTargets($stateParams.id).then(function (resp) {
-				console.log(resp);
 				var i, l;
 				var p = 0;
 				var q = 0;
@@ -202,11 +199,6 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 				for (l = 0; l < resp.data.length; l++) {
 					lookup[resp.data[l].target.id] = $scope.colors[l];
 				}
-
-				console.log($scope.targets1);
-				console.log($scope.targets2);
-				console.log(lookup);
-
 			});
 		};
 
@@ -222,7 +214,6 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 
 		$scope.getWellLayout = function () {
 			Experiment.getWellLayout($stateParams.id).then(function (resp) {
-				console.log(resp.data);
 				if (resp.data.length > 0) {
 					for (i = 0; i < 16; i++) {
 						if (resp.data[i].samples) {
@@ -239,7 +230,6 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 								}
 								if (resp.data[i].targets[0].quantity) {
 									$scope.wellInf[i].target1quantityTotal = resp.data[i].targets[0].quantity.m.toString() + 'e' + resp.data[i].targets[0].quantity.b.toString();
-									console.log($scope.wellInf[i].target1quantityTotal);
 									$scope.wellInf[i].target1quantityM = resp.data[i].targets[0].quantity.m.toFixed(2);
 									$scope.wellInf[i].target1quantityB = resp.data[i].targets[0].quantity.b;
 								}
@@ -265,7 +255,6 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 									}
 									if (resp.data[i].targets[0].quantity) {
 										$scope.wellInf[i].target1quantityTotal = resp.data[i].targets[0].quantity.m.toString() + 'e' + resp.data[i].targets[0].quantity.b.toString();
-										console.log($scope.wellInf[i].target1quantityTotal);
 										$scope.wellInf[i].target1quantityM = resp.data[i].targets[0].quantity.m.toFixed(2);
 										$scope.wellInf[i].target1quantityB = resp.data[i].targets[0].quantity.b;
 									}
@@ -288,7 +277,6 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 						}
 					}
 				}
-				console.log($scope.wellInf);
 			});
 		};
 
@@ -709,7 +697,6 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 
 		$scope.assignSamples = function (id, name) {
 			$scope.sampleSelected = name;
-			console.log(id);
 			k = 0;
 			var linkSampleWell = [];
 			for (i = 0; i < 16; i++) {
@@ -719,17 +706,19 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 					//console.log($scope.wells["well_" + i]);
 				}
 			}
+
 			Experiment.linkSample($stateParams.id, id, { wells: linkSampleWell }).then(function (response) {
-				$scope.getWellLayout();
+				for (i = 0; i < response.data.sample.samples_wells.length; i++) {
+					$scope.wellInf[response.data.sample.samples_wells[i].well_num - 1].sample = response.data.sample.name;
+					$scope.wellInf[response.data.sample.samples_wells[i].well_num - 1].sampleid = response.data.sample.id;
+				}
 
-			});
-
-			console.log(linkSampleWell);
+				// $scope.getWellLayout();
+			});			
 
 		};
 
 		$scope.assignTarget = function (id, channel, name) {
-			console.log(id);
 			k = 0;
 			if (channel == '1') {
 				$scope.enableTarget1Type = true;
@@ -752,12 +741,58 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 					k++;
 				}
 			}
+
 			Experiment.linkTarget($stateParams.id, id, { wells: linkTargetName }).then(function (response) {
-				$scope.getWellLayout();
-
+				updateTargetWell(response);
+				// $scope.getWellLayout();
 			});
+		};
 
-			console.log(linkTargetName);
+		updateTargetWell = function(response){
+			var index = 0;
+			if(response.data.target.channel == 1){
+				for (i = 0; i < response.data.target.targets_wells.length; i++) {
+					index = response.data.target.targets_wells[i].well_num - 1;
+					$scope.wellInf[index].target1 = response.data.target.name;
+					$scope.wellInf[index].target1id = response.data.target.id;
+					$scope.wellInf[index].target1color = lookup[response.data.target.id];
+					if (response.data.target.targets_wells[i].well_type) {
+						$scope.wellInf[index].target1type = response.data.target.targets_wells[i].well_type;
+					} else {
+						$scope.wellInf[index].target1type = '';
+					}
+					if (response.data.target.targets_wells[i].quantity) {
+						$scope.wellInf[index].target1quantityTotal = response.data.target.targets_wells[i].quantity.m.toString() + 'e' + response.data.target.targets_wells[i].quantity.b.toString();
+						$scope.wellInf[index].target1quantityM = response.data.target.targets_wells[i].quantity.m.toFixed(2);
+						$scope.wellInf[index].target1quantityB = response.data.target.targets_wells[i].quantity.b;
+					} else {
+						$scope.wellInf[index].target1quantityTotal = '';
+						$scope.wellInf[index].target1quantityM = '';
+						$scope.wellInf[index].target1quantityB = '';
+					}
+				}
+			} else {
+				for (i = 0; i < response.data.target.targets_wells.length; i++) {
+					index = response.data.target.targets_wells[i].well_num - 1;
+					$scope.wellInf[index].target2 = response.data.target.name;
+					$scope.wellInf[index].target2id = response.data.target.id;
+					$scope.wellInf[index].target2color = lookup[response.data.target.id];
+					if (response.data.target.targets_wells[i].well_type) {
+						$scope.wellInf[index].target2type = response.data.target.targets_wells[i].well_type;
+					} else {
+						$scope.wellInf[index].target2type = '';
+					}
+					if (response.data.target.targets_wells[i].quantity) {
+						$scope.wellInf[index].target2quantityTotal = response.data.target.targets_wells[i].quantity.m.toString() + 'e' + response.data.target.targets_wells[i].quantity.b.toString();
+						$scope.wellInf[index].target2quantityM = response.data.target.targets_wells[i].quantity.m.toFixed(2);
+						$scope.wellInf[index].target2quantityB = response.data.target.targets_wells[i].quantity.b;
+					} else {
+						$scope.wellInf[index].target2quantityTotal = '';
+						$scope.wellInf[index].target2quantityM = '';
+						$scope.wellInf[index].target2quantityB = '';
+					}
+				}					
+			}
 		};
 
 		$scope.unLinkTarget1 = function (id) {
@@ -784,7 +819,8 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 				}
 			}
 			Experiment.linkTarget($stateParams.id, $scope.target1SelectedId, { wells: linkTargetType }).then(function (response) {
-				$scope.getWellLayout();
+				updateTargetWell(response);
+				// $scope.getWellLayout();
 			});
 		};
 
@@ -808,7 +844,8 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 				}
 			}
 			Experiment.linkTarget($stateParams.id, $scope.target2SelectedId, { wells: linkTargetType }).then(function (response) {
-				$scope.getWellLayout();
+				updateTargetWell(response);
+				// $scope.getWellLayout();
 			});
 		};
 
@@ -831,6 +868,10 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 					$scope.wellInf[response.config.data.wells[0] - 1].target1type = "";
 					$scope.wellInf[response.config.data.wells[0] - 1].target1quantity = "";
 					$scope.wellInf[response.config.data.wells[0] - 1].target1color = "";
+					$scope.wellInf[response.config.data.wells[0] - 1].target1quantityTotal = "";
+					$scope.wellInf[response.config.data.wells[0] - 1].target1quantityM = "";
+					$scope.wellInf[response.config.data.wells[0] - 1].target1quantityB = "";					
+
 					$scope.enableTarget1Type = false;
 					$scope.enableTarget1Qty = false;
 					$scope.target1Selected = "Select a target";
@@ -845,6 +886,10 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 					$scope.wellInf[response.config.data.wells[0] - 1].target2type = "";
 					$scope.wellInf[response.config.data.wells[0] - 1].target2quantity = "";
 					$scope.wellInf[response.config.data.wells[0] - 1].target2color = "";
+					$scope.wellInf[response.config.data.wells[0] - 1].target2quantityTotal = "";
+					$scope.wellInf[response.config.data.wells[0] - 1].target2quantityM = "";
+					$scope.wellInf[response.config.data.wells[0] - 1].target2quantityB = "";					
+
 					$scope.enableTarget2Type = false;
 					$scope.enableTarget2Qty = false;
 					$scope.target2Selected = "Select a target";
@@ -854,7 +899,6 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 			}
 			if ($scope.wellInf[z].sampleid != 0 && (clearType == "Sample")) {
 				Experiment.unlinkSample($stateParams.id, $scope.wellInf[z].sampleid, { wells: [z + 1] }).then(function (response) {
-					console.log(response);
 					$scope.wellInf[response.config.data.wells[0] - 1].sampleid = 0;
 					$scope.wellInf[response.config.data.wells[0] - 1].sample = "No sample";
 					$scope.sampleSelected = "Select a sample";
@@ -891,7 +935,8 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 					}
 				}
 				Experiment.linkTarget($stateParams.id, $scope.target1SelectedId, { wells: linkTargetQuantity }).then(function (response) {
-					$scope.getWellLayout();
+					updateTargetWell(response);
+					// $scope.getWellLayout();
 				});
 			}
 
@@ -930,7 +975,8 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 					}
 				}
 				Experiment.linkTarget($stateParams.id, $scope.target2SelectedId, { wells: linkTargetQuantity }).then(function (response) {
-					$scope.getWellLayout();
+					updateTargetWell(response);
+					// $scope.getWellLayout();
 				});
 			}
 

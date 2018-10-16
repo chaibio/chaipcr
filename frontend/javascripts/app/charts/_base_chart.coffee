@@ -1,13 +1,13 @@
 class BaseChart
 
-  Y_AXIS_NUM_TICKS: 10
+  Y_AXIS_NUM_TICKS: 5
+
   NORMAL_PATH_STROKE_WIDTH: 2
   HOVERED_PATH_STROKE_WIDTH: 3
   ACTIVE_PATH_STROKE_WIDTH: 5
   CIRCLE_STROKE_WIDTH: 2
   CIRCLE_RADIUS: 7
-  AXIS_LABEL_FONT_SIZE: 10
-  AXES_TICKS_FONT_SIZE: 10
+  
   DEFAULT_MAX_Y: 1
   DEFAULT_MAX_X: 1
   DEFAULT_MIN_Y: 0
@@ -15,6 +15,7 @@ class BaseChart
   zoomTransform: {x: 0, y: 0, k: 1}
   isZooming: false
   INPUT_PADDING: 5
+
   MARGIN:
     left: 0
     top: 0
@@ -24,6 +25,7 @@ class BaseChart
   constructor: (@elem, @data, @config) ->
     # console.log('@data')
     # console.log(@data)
+    # setTimeout(@initChart, 100)
     @initChart()
 
   getLineCurve: ->
@@ -513,19 +515,24 @@ class BaseChart
   getYLinearTicks: ->
     max = @getMaxY()
     min = @getMinY()
-    #max = 455543
-    #min = - 35890
+
+    # min = Math.floor(min / 5000) * 5000 # ROUND(A2/5,0)*5
+    # max = Math.ceil(max / 5000) * 5000
+    # ticks = []
+    # for y in [min..max] by 5000
+    #   ticks.push(y)
+
+    #append for Y_AXIS_NUM_TICKS start
     intv = (max - min) / @Y_AXIS_NUM_TICKS
     intv = Math.ceil(intv / 5000) * 5000
-    #console.log('interval', intv)
+
     min = Math.floor(min / intv) * intv # ROUND(A2/5,0)*5
     max = Math.ceil(max / intv) * intv
-    
+
     ticks = []
     for y in [min..max] by intv
       ticks.push(y)
-
-    #console.log ticks
+    #append for Y_AXIS_NUM_TICKS end
     return ticks
 
   setYAxis: ->
@@ -564,8 +571,6 @@ class BaseChart
       .attr("y", 0 - @MARGIN.left + 5)
       .attr("x", 0 - (@height / 2))
       .attr("dy", "1em")
-      .attr("font-family", "dinot-bold")
-      .attr("font-size", "#{@AXIS_LABEL_FONT_SIZE}pt")
       .attr("fill", "#333")
       .style("text-anchor", "middle")
       .text(@config.axes.y.label)
@@ -750,11 +755,10 @@ class BaseChart
         .on 'click', => @onClickLeftXAxisInput()
 
     text = textContainer.append('text')
+        .attr('class', 'g-axis-limit-text')
         .attr('fill', '#000')
         .attr('y', @height + @MARGIN.top + offsetTop)
         .attr('dy', '0.71em')
-        .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
-        .attr('font-family', 'dinot-regular')
         .style('font-weight', 'bold')
         .style('text-decoration', 'underline')
         .on 'click', => @onClickLeftXAxisInput()
@@ -772,6 +776,7 @@ class BaseChart
         .on 'click', => @onClickLeftXAxisInput()
 
     input = form.append('xhtml:input').attr('type', 'text')
+      .attr('class', 'g-axis-limit-text')
       .style('display', 'block')
       .style('opacity', 0)
       .style('width', conWidth + 'px')
@@ -779,8 +784,6 @@ class BaseChart
       .style('padding', 0)
       .style('margin', 0)
       .style('text-align', 'center')
-      .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
-      .style('font-family', 'dinot-regular')
       .style('font-weight', 'bold')
       .style('text-decoration', 'underline')
       .attr('type', 'text')
@@ -991,11 +994,10 @@ class BaseChart
         .on 'click', => @onClickRightXAxisInput()
 
     text = textContainer.append('text')
+        .attr('class', 'g-axis-limit-text')
         .attr('fill', '#000')
         .attr('y', @height + @MARGIN.top + offsetTop)
         .attr('dy', '0.71em')
-        .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
-        .attr('font-family', 'dinot-regular')
         .style('font-weight', 'bold')
         .style('text-decoration', 'underline')
         .text(@getMaxX())
@@ -1012,6 +1014,7 @@ class BaseChart
         .on 'click', => @onClickRightXAxisInput()
 
     input = form.append('xhtml:input').attr('type', 'text')
+      .attr('class', 'g-axis-limit-text')
       .style('display', 'block')
       .style('opacity', '0')
       .style('width', conWidth + 'px')
@@ -1019,8 +1022,6 @@ class BaseChart
       .style('padding', '0px')
       .style('margin', '0px')
       .style('text-align', 'center')
-      .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
-      .style('font-family', 'dinot-regular')
       .style('font-weight', 'bold')
       .style('text-decoration', 'underline')
       .attr('type', 'text')
@@ -1095,7 +1096,6 @@ class BaseChart
     rect = textContainer.append('rect')
       .attr('fill', '#fff')
       .attr('width', conWidth)
-      .attr('height', @AXES_TICKS_FONT_SIZE + offsetTop)
       .attr('y', @MARGIN.top - ((conHeight) / 2))
       .attr('x', @MARGIN.left - (conWidth + offsetRight))
       .on 'click', => @onClickUpperYAxisInput()
@@ -1107,12 +1107,11 @@ class BaseChart
       .on 'click', => @onClickUpperYAxisInput()
 
     text = textContainer.append('text')
+      .attr('class', 'g-axis-limit-text') 
       .attr('fill', '#000')
       .attr('x', @MARGIN.left - (offsetRight + conWidth))
       .attr('y', @MARGIN.top - underlineStroke * 2)
       .attr('dy', '0.71em')
-      .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
-      .attr('font-family', 'dinot-regular')
       .style('font-weight', 'bold')
       .style('text-decoration', 'underline')
       .text(@getMaxY())
@@ -1131,6 +1130,7 @@ class BaseChart
       .on 'click', => @onClickUpperYAxisInput()
 
     input = form.append('xhtml:input').attr('type', 'text')
+      .attr('class', 'g-axis-limit-text')
       .style('display', 'block')
       .style('opacity', 0)
       .style('width', conWidth + 'px')
@@ -1139,8 +1139,6 @@ class BaseChart
       .style('margin', '0px')
       .style('margin-top', '-1px')
       .style('text-align', 'center')
-      .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
-      .style('font-family', 'dinot-regular')
       .style('font-weight', 'bold')
       .style('text-decoration', 'underline')
       .attr('type', 'text')
@@ -1229,12 +1227,13 @@ class BaseChart
       .on 'click', => @onClickLowerYAxisInput()
 
     text = textContainer.append('text')
+      .attr('class', 'g-axis-limit-text')
       .attr('fill', '#000')
       .attr('x', @MARGIN.left - (offsetRight + conWidth))
       .attr('y', @height + @MARGIN.top - underlineStroke * 2)
       .attr('dy', '0.71em')
-      .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
-      .attr('font-family', 'dinot-regular')
+      # .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
+      # .attr('font-family', 'dinot-regular')
       .style('font-weight', 'bold')
       .style('text-decoration', 'underline')
       .text(@getMaxY())
@@ -1254,6 +1253,7 @@ class BaseChart
       .style('padding', 0)
 
     input = form.append('xhtml:input').attr('type', 'text')
+      .attr('class', 'g-axis-limit-text')
       .style('display', 'block')
       .style('opacity', 0)
       .style('width', conWidth + 'px')
@@ -1262,8 +1262,8 @@ class BaseChart
       .style('margin', 0)
       .style('margin-top', '-1px')
       .style('text-align', 'center')
-      .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
-      .style('font-family', 'dinot-regular')
+      # .style('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
+      # .style('font-family', 'dinot-regular')
       .style('font-weight', 'bold')
       .style('text-decoration', 'underline')
       .attr('type', 'text')
@@ -1418,8 +1418,8 @@ class BaseChart
           d3.select(this).attr('opacity', 0)
 
   initChart: ->
-    d3.select(@elem).selectAll("*").remove()
 
+    d3.select(@elem).selectAll("*").remove()
     @width = @elem.parentElement.offsetWidth - @MARGIN.left - @MARGIN.right
     @height = @elem.parentElement.offsetHeight - @MARGIN.top - @MARGIN.bottom
 

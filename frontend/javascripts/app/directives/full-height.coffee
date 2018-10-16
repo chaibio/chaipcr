@@ -24,13 +24,17 @@ App.directive 'fullHeight', [
                 else
                   WindowWrapper.height() - $scope.offset
 
-        height = if $scope.min > height then $scope.min else height
         if height > elem.parent().height()  then height = elem.parent().height()
-        # if height > WindowWrapper.height()  then height = WindowWrapper.height()
+        height = if $scope.min > height then $scope.min else height
         height
+        
       set = (height) ->
-
         height = height || getHeight()
+
+        console.log('full-height:height')
+        console.log(elem)
+        console.log(height)
+
         if ($scope.force)
           elem.css( 'height':  height )
           elem.css( 'min-height' : height )
@@ -38,7 +42,6 @@ App.directive 'fullHeight', [
           # height = if elem.height() > height then elem.height() else height
           elem.css( 'min-height' : height )
           
-
       resizeTimeout = null
 
       $scope.$on 'window:resize', ->

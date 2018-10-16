@@ -112,6 +112,15 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
 
     $scope.getExperiment()
 
+    $scope.hasMeltCurve = ->
+      return if $scope.exp then Experiment.hasMeltCurve($scope.exp) else false
+
+    $scope.hasAmplification = ->
+      return if $scope.exp then Experiment.hasAmplificationCurve($scope.exp) else false
+
+    $scope.hasStandardCurve = ->
+      return if $scope.exp then Experiment.hasStandardCurve($scope.exp) else false
+
     $rootScope.$on 'sidemenu:toggle', ->
       $scope.errorExport = false
       if $scope.showProperties and angular.element('.sidemenu').width() > 100

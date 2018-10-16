@@ -51,7 +51,8 @@ table.sample-target-table{
         max-height: calc(100% - 100px);
         td, th{
             font-size: 13px;
-            font-family: 'dinot-medium';            
+            font-family: 'dinot-medium';
+            position: relative;
         }
 
         .channel-selector{
@@ -68,13 +69,6 @@ table.sample-target-table{
                 text-align:center;
                 cursor: pointer;
                 line-height: 24px;
-            }
-
-            &.one-channel{
-                max-width: 40px;
-                span{
-                    width:90%;
-                }
             }
         }
     }
@@ -125,14 +119,64 @@ table.sample-target-table{
         width: 20px;
         vertical-align: middle;
         cursor: pointer;
-        margin: 0 5px;
+        margin: 0 2px;
+        &:hover + .assigned-description{
+            display: block;
+        }
     }
+
+    .icon-wrapper{
+        width: 24px;
+        vertical-align: middle;
+        position: relative;
+        margin: 0;
+        .assigned-description{
+            width: 130px;
+            border: 1px solid #aaa;
+            border-radius: 3px;
+            box-shadow: 0px 0px 2px #888;
+            padding: 3px 5px;
+            font-family: 'dinot-medium';
+            color: #777;
+            font-weight: 300;
+            position: absolute;
+            top: -30px;
+            left: -56px;
+            background: #fff;
+            z-index: 99;
+            display: none;
+
+            &::after{
+                bottom: -4px;
+                border-color: transparent;
+                border-top-color: #fff;
+                border-width: .5rem .3rem 0;
+                position: absolute;
+                display: block;
+                content: "";
+                border-style: solid;
+                left: 50%;
+            }
+            &::before{
+                bottom: -6px;
+                border-color: transparent;
+                border-top-color: rgba(0, 0, 0, 0.25);
+                border-width: .5rem .3rem 0;
+                position: absolute;
+                display: block;
+                content: "";
+                border-style: solid;
+                left: 50%;
+            }
+        }        
+    }
+
 
     .lock-icon{
         width: 15px;
         vertical-align: middle;
         cursor: pointer;
-        margin: 0 5px;
+        margin: 0 2px;
     }
 
     .color{

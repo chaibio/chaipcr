@@ -19,7 +19,9 @@
 class StagesController < ApplicationController
   include ParamsHelper
 	include Swagger::Blocks
+  
   before_filter :ensure_authenticated_user
+  before_filter :allow_cors
   before_filter :experiment_definition_editable_check
 
   respond_to :json

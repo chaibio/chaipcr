@@ -20,6 +20,8 @@ class TargetsController < ApplicationController
   include ParamsHelper
   
   before_filter :ensure_authenticated_user
+  before_filter :allow_cors
+  
   before_filter -> { well_layout_editable_check }
   before_filter :get_object, :except => [:index, :create]
   

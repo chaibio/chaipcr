@@ -532,13 +532,6 @@ class DevicesController < ApplicationController
     return re.match(str).to_s.strip
   end
 
-  def allow_cors
-    headers["Access-Control-Allow-Origin"] = "*"
-    headers["Access-Control-Allow-Methods"] = "GET,PUT,POST,OPTIONS"
-    headers["Access-Control-Allow-Headers"] = "*"
-    headers["Access-Control-Max-Age"] = "1728000"
-  end
-
   def sleep_until(time)
     time.times do
       break if block_given? && yield

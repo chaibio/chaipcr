@@ -30,7 +30,7 @@ function fixedHeader($timeout, $window) {
         function tableScrollRender() {
             var tbodyElems = elem.querySelector('tbody');
             var scrollWidth = tbodyElems.scrollWidth - tbodyElems.scrollWidth;
-            return tbodyElems.scrollHeight;
+            return tbodyElems.scrollHeight * tbodyElems.offsetHeight;
         }
 
 

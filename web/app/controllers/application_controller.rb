@@ -119,4 +119,12 @@ class ApplicationController < ActionController::Base
       return true
     end
   end
+  
+  def allow_cors
+    headers["Access-Control-Allow-Origin"] = "*"
+    headers["Access-Control-Allow-Methods"] = "GET,PUT,POST,OPTIONS"
+    headers["Access-Control-Allow-Headers"] = "*"
+    headers["Access-Control-Max-Age"] = "1728000"
+  end
+  
 end

@@ -20,6 +20,8 @@ class SessionsController < ApplicationController
   respond_to :json
 	include Swagger::Blocks
 
+  before_filter :allow_cors
+  
   resource_description {
     formats ['json']
   }

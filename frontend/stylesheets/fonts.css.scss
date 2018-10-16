@@ -112,9 +112,22 @@
   font-size: 20px;
 }
 
+.H2-Amplification {
+  font-family: "dinot-bold";
+  font-size: 24px;
+  line-height: 30px;
+}
+
 .H3 {
   font-family: "dinot-bold";
   font-size: 18px;
+}
+
+H3-Amplification {
+  font-family: "dinot-bold";
+  font-size: 16.25px;
+  line-height: 24px;
+  font-weight: 400;
 }
 
 .H2R {
@@ -147,10 +160,63 @@
   font-size: 16px;
 }
 
+.B1-Amplification {
+  font-family: "dinot-regular";
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: normal;
+}
+
+.B1B {
+  font-family: "dinot-bold";
+  font-size: 16px;
+}
+
 .B2 {
   font-family: "dinot-regular";
-  font-size: 12pt;
-  line-height: 15pt;
+  font-size: 12px;
+}
+
+.B2B {
+  font-family: "dinot-bold";
+  font-size: 12px;
+}
+
+.B2-Amplification {
+  font-family: "dinot-regular";
+  font-size: 13px;
+  // font-size: 10px;
+  line-height: 15px;
+}
+
+.B2-M-Amplification {
+  font-family: "dinot-medium";
+  // font-size: 10px;
+  font-size: 13px;
+  line-height: 15px;
+}
+
+.G1 {
+  font-family: "dinot-regular";
+  font-size: 8px;
+  font-weight: normal;
+  line-height: 12px;
+}
+
+.G2 {
+  font-family: "dinot-regular";
+  font-size: 6.5px;
+  line-height: 9.75px;
+  font-weight: normal;
+}
+.B1M {
+  font-family: "dinot-medium";
+  font-size: 16px;
+}
+
+.B2M {
+  font-family: "dinot-medium";
+  font-size: 12px;
 }
 
 .B1B {

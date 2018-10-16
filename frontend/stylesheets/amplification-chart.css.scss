@@ -139,6 +139,12 @@
     color: #00b3ed !important;
   }
   .curve-header {
+    height: 100px;
+    display:flex;
+    background: white;
+    box-shadow: 0px 1pt 1pt 1pt grey;
+    margin-bottom: 10px;
+    
     .plot-type-buttons {
       width: 140px !important;
       .buttons-wrapper {
@@ -165,17 +171,18 @@
         background-color: white;
         color: black;
         padding: 6px;
-        font-size: 16px;
-        font-family: 'dinot-regular';
+        // font-size: 16px;
+        // font-family: 'dinot-regular';
         //font-weight: 300;
         border: none;
+        border-radius: 3px;
         cursor: pointer;
         width: 120px;
         border: 1px solid black;
         .arrow-down{
           float: right;
-          width: 15px;
-          padding-top: 5px;
+          width: 10px;
+          padding-top: 3px;
         }
       }
       /* Dropdown Content (Hidden by Default) */
@@ -225,7 +232,8 @@
   }
   .curve-body {
     background-color: #eee;
-    padding: 20px;
+    padding: 5px 10px 10px 10px;
+
     display:flex;
     // min-height: 600px;
     // height: 610px;
@@ -304,8 +312,9 @@
             cursor: pointer;
             span {
               img {
-                width: 15px;
-                height: 15px;
+                width: 10px;
+                height: 10px;
+                margin-bottom: 3px;
               }
             }
           }
@@ -317,6 +326,9 @@
     margin-left: 0;
     margin-right: 0;
     .plot-options {
+      p {
+        margin-bottom: 5px;
+      }
       text-align: left;
       padding-right: 30px;
       .plot-option {
@@ -332,16 +344,16 @@
     // margin-bottom: -4px;
     // width: 35%;
     border-left: 2px solid black;
-    overflow: auto;
+    // overflow: auto;
     top: 0px;
     bottom: 50px;
     right: 0px;
     // height: 94%;
 
-		.sample-span{
-			font-family: 'dinot-Regular';
-			font-size: 12px;
-    }
+		// .sample-span{
+		// 	font-family: 'dinot-Regular';
+		// 	font-size: 12px;
+    // }
     
     .type-td{
       text-align: center;
@@ -352,21 +364,21 @@
         height: 23px;
         border: #000 1px solid;
         border-radius: 50%;
-        font-family: 'dinot-Regular';
-        font-size: 14px;
+        // font-family: 'dinot-Regular';
+        // font-size: 14px;
       }
     }
 
-		.target-span{
-			font-family: 'dinot-Regular';
-      font-size: 16px;
-    }
+		// .target-span{
+		// 	font-family: 'dinot-Regular';
+    //   font-size: 16px;
+    // }
 
     input {
       outline: none;
       border: none;
-      font-family: 'dinot-Regular';
-      font-size: 12px;
+      // font-family: 'dinot-Regular';
+      // font-size: 12px;
       //width: 140px;
     }
     table {

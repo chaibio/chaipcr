@@ -31,9 +31,9 @@ window.ChaiBioTech.ngApp.directive('protocolItem', [
         scope.$watch('state', function(data) {
           if(data) {
             if(scope.state === 'NOT_STARTED') {
-              scope.message = "EDIT PROTOCOL";
+              scope.message = "Edit Protocol";
             } else {
-              scope.message = "VIEW PROTOCOL";
+              scope.message = "View Protocol";
             }
           }
         });

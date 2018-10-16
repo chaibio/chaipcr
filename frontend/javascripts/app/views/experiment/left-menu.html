@@ -18,8 +18,13 @@
 -->
 <div id="sidemenu-content">
   <div class="side-menu-header-container">
-    <div class="text-container x" ui-sref="home">&lt; BACK TO HOME</div>
-    <div class="close-container x"><span class="close-side-menu x" toggle-sidemenu>x</span></div>
+    <div class="text-container H3" ui-sref="home">
+      <img src="/images/back-home-white.svg">
+      <span style="line-height: 30px;vertical-align: middle;">Back To Home</span>
+    </div>
+    <div class="close-container"><span class="close-side-menu" toggle-sidemenu>
+      <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 5"><title>x_k</title><rect x="2.25" y="-0.79" width="0.5" height="6.57" transform="translate(-1.04 2.5) rotate(-45)"/><rect x="-0.79" y="2.25" width="6.57" height="0.5" transform="translate(-1.04 2.5) rotate(-45)"/></svg>
+    </span></div>
   </div>
 
   <div class="side-menu-content-container">
@@ -29,32 +34,90 @@
       <div ng-if="status == 'COMPLETED'" ng-show="!exp.time_valid" class="side-menu-exp-status B2">Run previously</div>
       <div ng-if="status != 'COMPLETED'" class="side-menu-exp-status B1">{{runStatus}}</div>
     </div>
-    <div class="side-menu-menu-container">
+    <div class="side-menu-menu-container property-menu">
+      <label class="section-name">Setup</label>
       <div class="side-menu-menu-item">
-        <div class="B1B">EXPERIMENT PROPERTIES
-          <span ng-click="showProperties=!showProperties" class="sidemenu-show-text">{{showHide}}</span>
+        <div class="B1M" ng-click="showProperties=true">Experiment Properties &nbsp;
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 9"><title>ArrowR Black</title><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><polygon points="8 4.5 0 0 0 9 8 4.5"/></g></g></svg>          
         </div>
       </div>
-      <div id="new-sub-menu" ng-show="showProperties" ng-class="{'sidemenu-property-container': true, 'ng-show':showProperties}">
-        <edit-lid-temp></edit-lid-temp>
-      </div>
       <div class="side-menu-menu-item">
-        <div class="B1B" ui-sref="edit-protocol({id: params.id})" toggle-sidemenu>
+        <div class="B1M" ui-sref="edit-protocol({id: params.id})" toggle-sidemenu>
           <protocol-item state="{{status}}"></protocol-item>
         </div>
       </div>
-      <!--<div class="side-menu-menu-item">
-        <div class="B1B">PLATE SETUP</div>
-      </div> -->
-      <div class="side-menu-menu-item run-exp">
-        <experiment-item show-prop="showProperties" exp="exp" state-val="{{status}}" lid-open="lidOpen" max-cycle="maxCycle"></experiment-item>
+      <div class="side-menu-menu-item">
+        <div class="B1M" ui-sref="samples-targets({id: params.id})" toggle-sidemenu>
+          <span>Samples + Targets</span>
+        </div>
+      </div>
+      <div class="side-menu-menu-item">
+        <div class="B1M" ui-sref="plate-layout({id: params.id})" toggle-sidemenu>
+          <span>Well Layout</span>
+        </div>
+      </div>
+
+      <div class="side-menu-button-container">
+        <button ng-show="!exporting" class="side-menu-button SH pull-left" ng-click="exportExperiment()" experiment-id="params.id">Export</button>
+        <button ng-show="exporting" class="side-menu-button SH pull-left">Exporting<ellipsis-animated><ellipsis-animated/></button>
+        <button class="side-menu-button SH second-button pull-right" ng-click="deleteExperiment(params.id)">Delete</button>
+        <span class="text-danger" ng-show="errorExport">Error exporting data. Please try again.</span>
+      </div>
     </div>
-    <div class="side-menu-button-container">
-      <button ng-show="!exporting" class="side-menu-button SH" ng-click="exportExperiment()" experiment-id="params.id">EXPORT</button>
-	  <button ng-show="exporting" class="side-menu-button SH">EXPORTING<ellipsis-animated><ellipsis-animated/></button>
-      <button class="side-menu-button SH second-button" ng-click="deleteExperiment(params.id)">DELETE</button>
-	  <span class="text-danger" ng-show="errorExport">Error exporting data. Please try again.</span>
+    <div class="side-menu-menu-container top-border run-exp" style="padding: 0">
+      <div class="side-menu-menu-item">
+        <experiment-item show-prop="showProperties" exp="exp" state-val="{{status}}" lid-open="lidOpen" max-cycle="maxCycle"></experiment-item>
+      </div>
+    </div>
+    <div class="side-menu-menu-container top-border analyze-menu">
+      <label class="section-name">Analyze</label>
+      <div class="side-menu-menu-item" ng-class="{'disabled-link': status == 'NOT_STARTED' || !hasAmplification()}">
+        <div class="B1M" ui-sref="run-experiment({id: params.id, chart: 'amplification'})" toggle-sidemenu ng-if="status != 'NOT_STARTED' && hasAmplification()">
+          <span>Amplification Curve</span>
+        </div>
+        <div class="B1M" ng-if="status == 'NOT_STARTED' || !hasAmplification()">
+          <span>Amplification Curve</span>
+        </div>
+      </div>
+      <div class="side-menu-menu-item" ng-class="{'disabled-link': status == 'NOT_STARTED' || !hasStandardCurve()}">
+        <div class="B1M" ui-sref="run-experiment({id: params.id, chart: 'standard-curve'})" toggle-sidemenu ng-if="status != 'NOT_STARTED' && hasStandardCurve()">
+          <span>Standard Curve</span>
+        </div>
+        <div class="B1M" ng-if="status == 'NOT_STARTED' || !hasStandardCurve()">
+          <span>Standard Curve</span>
+        </div>
+      </div>
+      <div class="side-menu-menu-item" ng-class="{'disabled-link': status == 'NOT_STARTED' || !hasMeltCurve()}">
+        <div class="B1M" ui-sref="run-experiment({id: params.id, chart: 'melt-curve'})" toggle-sidemenu ng-if="status != 'NOT_STARTED' && hasMeltCurve()">
+          <span>Melt Curve</span>
+        </div>
+        <div class="B1M" ng-if="status == 'NOT_STARTED' || !hasMeltCurve()">
+          <span>Melt Curve</span>
+        </div>        
+      </div>
+      <div class="side-menu-menu-item" ng-class="{'disabled-link': status == 'NOT_STARTED'}">
+        <div class="B1M" ui-sref="run-experiment({id: params.id, chart: 'temperature-logs'})" toggle-sidemenu ng-if="status != 'NOT_STARTED'">
+          <span>Thermal Profile</span>
+        </div>
+        <div class="B1M" ng-if="status == 'NOT_STARTED'">
+          <span>Thermal Profile</span>
+        </div>        
+      </div>
     </div>
   </div>
+
+  <div class="side-sub-menu-content-container" ng-show="showProperties">
+    <div class="side-menu-header-container">      
+      <div class="close-container"><span class="close-side-menu" ng-click="showProperties=false">
+        <img src="/images/x_k.svg">
+      </span></div>
+    </div>
+    <div class="side-menu-menu-container">
+      <edit-lid-temp></edit-lid-temp>
+    </div>
+    <div class="side-menu-menu-container">
+      <label class="section-name">Notes</label>
+      <p class="notes-text">{{exp.notes}}</p>
+    </div>
   </div>
 </div>

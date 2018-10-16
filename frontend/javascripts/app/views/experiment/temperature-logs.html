@@ -16,11 +16,11 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<div class="temperatureLog-state-active results-charts">
-  <div class="page-layout run-experiment" ng-controller="TemperatureLogCtrl">
-    <div class="content">
+<div class="temperatureLog-state-active results-charts" style="position: relative; height: 100%;">
+  <div class="page-layout run-experiment" ng-controller="TemperatureLogCtrl" style="position: inherit; height: inherit;">
+    <div class="content" style="height: inherit; display: flex; flex-direction: column;">
       <div class="curve-header">
-        <div class="row">
+        <div class="row" >
           <div class="col-sm-4 chart-name">
             <chart-chooser class="curve-title H1" experiment="experiment" current-chart="$parent.chart">
               Thermal Profile
@@ -42,22 +42,22 @@
           </div>
         </div>
       </div>
-      <div class="temperature-log-chart">
-        <div>
+      <div class="temperature-log-chart" style="display: flex; flex-grow: 1; flex-direction: column;">
+        <div style="flex-grow: 1; position: relative;" full-height offset="37 + 50 + 210" min="300">
           <!-- <div class="vertical-text B1B">Temperature (&deg;C)</div> -->
-          <div class="chart-container" full-width offset="40">
-            <div full-height offset="37 + 50 + 210" min="300">
+          <div class="chart-container" full-width offset="40" style="height: 100%; position: absolute;">
+            <div full-height force='true' min='300'>
               <div class="loading-blue-container" ng-show="!experiment || !hasData">
                 <div class="loading-blue"></div>
                 <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
                 <p class="B2">May take a minute</p>
               </div>
-              <thermal-profile-chart data="data" config="options" on-zoom="tempOnZoom" zoom="zoomState" scroll="scrollState.value" on-mouse-move="mouseMove"show="showChart"></thermal-profile-chart>
+              <thermal-profile-chart style='height:100%' data="data" config="options" on-zoom="tempOnZoom" zoom="zoomState" scroll="scrollState.value" on-mouse-move="mouseMove"show="showChart"></thermal-profile-chart>
             </div>
           </div>
         </div>
         <!-- <div class="text-center abscissa-text B1B">Time</div> -->
-        <div class="indicators-group B1B">
+        <div class="indicators-group B1B" style="margin-bottom: 20px;">
           <div class="row">
             <div class="item-indicator">
               <span class="dot"></span>

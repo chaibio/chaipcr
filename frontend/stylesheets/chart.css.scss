@@ -190,7 +190,7 @@
   // vertical-align: top;
   $item_switch_gap: 20px;
   .subheader-switches {
-    margin-top: 20px;
+    // margin-top: 20px;
     margin-left: 0px;
     margin-right: 20px;
     .item-switch {
@@ -359,16 +359,16 @@
   // margin-bottom: -4px;
   // width: 35%;
   border-left: 2px solid black;
-  overflow: auto;
+  // overflow: auto;
   top: 0px;
   bottom: 50px;
   right: 0px;
   // height: 94%;
 
-  .sample-span{
-    font-family: 'dinot-Regular';
-    font-size: 12px;
-  }
+  // .sample-span{
+  //   font-family: 'dinot-Regular';
+  //   font-size: 12px;
+  // }
   
   .type-td{
     text-align: center;
@@ -379,21 +379,21 @@
       height: 23px;
       border: #000 1px solid;
       border-radius: 50%;
-      font-family: 'dinot-Regular';
-      font-size: 14px;
+      // font-family: 'dinot-Regular';
+      // font-size: 14px;
     }
   }
 
-  .target-span{
-    font-family: 'dinot-Regular';
-    font-size: 16px;
-  }
+  // .target-span{
+  //   font-family: 'dinot-Regular';
+  //   font-size: 16px;
+  // }
 
   input {
     outline: none;
     border: none;
-    font-family: 'dinot-Regular';
-    font-size: 16px;
+    // font-family: 'dinot-Regular';
+    // font-size: 16px;
     //width: 140px;
   }
   table {
@@ -446,6 +446,48 @@
   }
 }
 
+.amplification-chart {
+  .g-y-axis-text {
+    font-family: "dinot-regular";
+    font-size: 8px;
+    font-weight: bold;
+    line-height: 12px;
+  }
+
+  .axis .tick text {
+    font-family: "dinot-regular";
+    font-size: 6.5px;
+    line-height: 9.75px;
+    font-weight: normal;
+  }
+  
+  .g-axis-limit-text {
+    font-family: "dinot-regular";
+    font-size: 6.5px;
+    line-height: 9.75px;
+    font-weight: 500;
+  }
+}
+
+.temperature-log-chart {
+  .g-y-axis-text {
+    font-family: "dinot-regular";
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .axis .tick text {
+    font-family: "dinot-regular";
+    font-size: 10px;
+  }
+ 
+  .g-axis-limit-text {
+    font-family: "dinot-regular";
+    font-size: 10px;
+    font-weight: 500;
+  }
+}
+
 .omit_checkbox {
   color: red;
   width: 50px !important;
@@ -455,3 +497,19 @@
   margin-top: 0px;
   background: white;
 }
+
+// ::-webkit-scrollbar {
+//   width: 10px;
+// }
+
+// ::-webkit-scrollbar-track {
+//   background: #f1f1f1;
+// }
+
+// ::-webkit-scrollbar-thumb {
+//   background: #888;
+// }
+
+// ::-webkit-scrollbar-thumb:hover {
+//   background: #555;
+// }

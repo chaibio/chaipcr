@@ -38,7 +38,7 @@ window.ChaiBioTech.ngApp.directive('leftMenu', [
         });
 
         angular.element(elem).click(function(e) {
-          if($scope.confirmStatus === true && e.target.innerHTML !== "RUN EXPERIMENT") {
+          if($scope.confirmStatus === true && e.target.innerHTML !== "Run Experiment") {
             $rootScope.$broadcast("runReady:false");
             $scope.confirmStatus = false;
           }

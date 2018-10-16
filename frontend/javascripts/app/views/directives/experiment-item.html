@@ -17,8 +17,8 @@
     limitations under the License.
 -->
 <div class="B1B">
-  <span class="exp-message" ng-if="message == 'RUN EXPERIMENT'" ng-class="{'lid-open': lidOpen && message == 'RUN EXPERIMENT'}" ng-click="manageAction()">{{message}}</span>
-  <span class="exp-message" ng-if="message != 'RUN EXPERIMENT'" ng-click="manageAction()" toggle-sidemenu>{{message}}</span>
-  <span class="B2 lid-open-message" ng-if="lidOpen && message == 'RUN EXPERIMENT'"><br>Lid is open</span>
-  <button ng-show="runReady" id="confirm-start-exp" ng-click="startExp()" ng-class="{'ng-hide': !runReady }" toggle-sidemenu class="B1 success">CONFIRM</button>
+  <label class="exp-message" ng-if="message == 'Run Experiment'" ng-class="{'lid-open': lidOpen && message == 'Run Experiment', 'ready-action' : runReady}" ng-click="manageAction()">{{message}}</label>
+  <label class="exp-message started-experiment" ng-if="message != 'Run Experiment'" ng-click="manageAction()" toggle-sidemenu>{{message}}</label>
+  <label class="B2 lid-open-message" ng-if="lidOpen && message == 'Run Experiment'"><br>Lid is open</label>
+  <button ng-show="runReady" id="confirm-start-exp" ng-click="startExp()" ng-class="{'ng-hide': !runReady }" toggle-sidemenu class="B1 success">Confirm</button>
 </div>
