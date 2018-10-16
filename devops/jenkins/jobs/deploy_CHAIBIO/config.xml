@@ -968,6 +968,16 @@ else
         echo &quot;LANG=en_US.UTF-8&quot; &gt; /etc/default/locale
 fi
 
+echo "Install wireless or WIFI related packages"
+sudo apt-get -y -q install wireless-tools
+sudo apt-get -y -q install wpasupplicant
+
+if [ -e /lib/udev/rules.d/80-net-setup-link.rules ]
+then
+   echo "Make sure to override unpredictable naming for WIFI interface - Always use wlanX"
+   sudo ln -s /lib/udev/rules.d/80-net-setup-link.rules /etc/udev/rules.d/80-net-setup-link.rules
+fi
+
 echo setting up website on ngixn
 if [ -e /etc/nginx/sites-available ]
 then
