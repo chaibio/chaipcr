@@ -30,27 +30,9 @@ SELECT step_id, fluorescence_value, well_num, cycle_num, channel
 ;
 
 
--- amplification, 3 queries: calibration query and ...
+-- amplification, 2 queries: calibration query and ...
 -- $exp_id is the experiment_id for the amplification experiment
 -- amp.jl
-
--- amplification, step/ramp info
-SELECT
-        steps.id AS steps_id,
-        steps.collect_data AS steps_collect_data,
-        ramps.id AS ramps_id,
-        ramps.collect_data AS ramps_collect_data
-    FROM experiments
-    LEFT JOIN protocols ON experiments.experiment_definition_id = protocols.experiment_definition_id
-    LEFT JOIN stages ON protocols.id = stages.protocol_id
-    LEFT JOIN steps ON stages.id = steps.stage_id
-    LEFT JOIN ramps ON steps.id = ramps.next_step_id
-    WHERE
-        experiments.id = $exp_id AND
-        stages.stage_type <> 'meltcurve'
-;
-
--- amplification, fluorescence
 SELECT step_id, fluorescence_value, well_num, cycle_num, channel
     FROM fluorescence_data
     WHERE experiment_id = $exp_id
