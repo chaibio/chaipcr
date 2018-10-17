@@ -134,7 +134,12 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
                 $scope.isAddSample = true;
 
                 var trHeight = document.querySelector('table.sample-table tbody tr:first-child td:last-child').offsetHeight - 1;
-                angular.element(document.querySelectorAll('table.sample-table')).css('height', (trHeight * ($scope.rows.length + 2)) + 'px');
+                var parentHeight = angular.element(document.querySelector('table.sample-table')).parent()[0].offsetHeight;
+                var tableHeight = trHeight * ($scope.rows.length + 2);
+                var tbodyHeight = (parentHeight > tableHeight + 100) ? tableHeight - 50 : parentHeight - 150;
+
+                angular.element(document.querySelectorAll('table.sample-table tbody')).css('height', tbodyHeight + 'px');
+
                 var scrollHeight = document.querySelector('table.sample-table tbody').scrollHeight;
                 angular.element(document.querySelector('table.sample-table tbody')).animate({scrollTop: scrollHeight}, "slow");
             });
@@ -161,9 +166,15 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
                 $scope.isAddTarget = true;
                 
                 var trHeight = document.querySelector('table.target-table tbody tr:first-child td:last-child').offsetHeight - 1;
-                angular.element(document.querySelectorAll('table.target-table')).css('height', (trHeight * ($scope.targets.length + 2)) + 'px');
+                var parentHeight = angular.element(document.querySelector('table.target-table')).parent()[0].offsetHeight;
+                var tableHeight = trHeight * ($scope.targets.length + 2);
+                var tbodyHeight = (parentHeight > tableHeight + 100) ? tableHeight - 50 : parentHeight - 150;
+
+                angular.element(document.querySelectorAll('table.target-table tbody')).css('height', tbodyHeight + 'px');
+
                 var scrollHeight = document.querySelector('table.target-table tbody').scrollHeight;
                 angular.element(document.querySelector('table.target-table tbody')).animate({scrollTop: scrollHeight}, "slow");
+
             });
         };
 
@@ -228,7 +239,14 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
                 $scope.rows.splice(index, 1);
 
                 var trHeight = document.querySelector('table.sample-table tbody tr:first-child td:last-child').offsetHeight - 1;
-                angular.element(document.querySelectorAll('table.sample-table')).css('height', (trHeight * ($scope.rows.length + 2)) + 'px');
+                var parentHeight = angular.element(document.querySelector('table.sample-table')).parent()[0].offsetHeight;
+                var tableHeight = trHeight * ($scope.rows.length + 2);
+                var tbodyHeight = (parentHeight > tableHeight + 100) ? tableHeight - 50 : parentHeight - 150;
+
+                console.log('--deleteSampleItem--', parentHeight, tableHeight, tbodyHeight);
+
+                angular.element(document.querySelectorAll('table.sample-table tbody')).css('height', tbodyHeight + 'px');
+
             })
             .catch(function(response){
                 if(response.status == 422){
@@ -256,7 +274,11 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
                 if($scope.confirmModal) $scope.confirmModal.close();
 
                 var trHeight = document.querySelector('table.target-table tbody tr:first-child td:last-child').offsetHeight - 1;
-                angular.element(document.querySelectorAll('table.target-table')).css('height', (trHeight * ($scope.targets.length + 2)) + 'px');
+                var parentHeight = angular.element(document.querySelector('table.target-table')).parent()[0].offsetHeight;
+                var tableHeight = trHeight * ($scope.targets.length + 2);
+                var tbodyHeight = (parentHeight > tableHeight + 100) ? tableHeight - 50 : parentHeight - 150;
+
+                angular.element(document.querySelectorAll('table.target-table tbody')).css('height', tbodyHeight + 'px');
             })
             .catch(function(response){
                 if(response.status == 422){

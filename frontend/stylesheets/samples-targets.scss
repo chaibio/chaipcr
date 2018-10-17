@@ -25,11 +25,12 @@
     cursor: pointer;
 }
 
-.exp-info-bar {
+.exp-info-bar.samples-targets {
   width: 100%;
   height: 40px;
   background-color: #323232;
   position: fixed;
+  bottom: 0;
 }
 
 table.sample-target-table {
@@ -94,7 +95,7 @@ table.sample-target-table{
         display: inline-block;
         border: 1px solid black;
         border-radius: 3px;
-        margin-top: 5px;
+        margin-top: 15px;
         padding: 7px;
         position: relative;
         .add-plus{
