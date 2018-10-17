@@ -31,16 +31,16 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
 		$scope.is_dual_channel = false;
 		$scope.update_available = 'unavailable';
 		$scope.exporting = false;
-		$scope.value = "Choose Manufacturer ..";
+		$scope.value = "PIKA Weihenstephan";
 		$scope.selectedKit = 1;
 		$scope.kit = {
-			name: 'Lactobacillaceae Screening'
+			name: 'Acetics screening'
 		};
 		$scope.kit1 = {
-			name: 'Lactobacillaceae Screening'
+			name: 'Acetics screening'
 		};
 		$scope.kit2 = {
-			name: 'Lactobacillaceae Screening'
+			name: 'Acetics screening'
 		};
 
 		$scope.creating = false;
@@ -114,20 +114,6 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
 				});
 			}
 			//$window.location.href = "/dynexp/pika_test/index.html#/setWellsA/5" ;
-		};
-
-		// Close the dropdown if the user clicks outside of it
-		window.onclick = function(event) {
-			if (!event.target.matches('.dropbtn') && !event.target.matches('.test') && !event.target.matches('.arrow-down') ) {
-				var dropdowns = document.getElementsByClassName("dropdown-content");
-				var i;
-				for (i = 0; i < dropdowns.length; i++) {
-					var openDropdown = dropdowns[i];
-					if (openDropdown.classList.contains('show')) {
-						openDropdown.classList.remove('show');
-					}
-				}
-			}
 		};
 	}
 

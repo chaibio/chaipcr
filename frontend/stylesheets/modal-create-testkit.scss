@@ -1,0 +1,172 @@
+.modal-new-testkit{
+	.modal{
+		overflow: hidden;
+		background: rgba(0, 0, 0, 0.5);
+	}
+
+	.modal-dialog{
+		height: calc(100% - 100px);
+		.modal-content{
+			box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+			border: none;
+			height: 100%;			
+		}
+	}
+
+	.new-testkit-box{
+		height: 100%;
+		.dialog-header{
+			height: 80px;
+			box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+			position: relative;
+			padding: 25px 20px;
+
+			.title{
+				display: inline-block;
+				color: #333;
+			}
+
+			.testkit-type{
+				display: inline-block;
+				margin-left: 30px;
+
+				.checkbox-wrapper{
+					margin-left: 50px;
+					label.outer-line{
+						margin-right: 10px;
+					}
+				}
+			}
+
+			.dialog-close{
+				cursor: pointer;
+				vertical-align: middle;
+				position: absolute;
+				right: 20px;
+				top: 20px;
+				img{
+					border: 1px solid #333;
+					border-radius: 3px;
+					padding: 3px;
+					width: 25px;
+				}				
+			}
+		}
+		.dialog-content{
+			padding: 20px;
+			height: calc(100% - 160px);
+
+			.title{
+				margin-left: 60px;
+				margin-bottom: 10px;
+
+				&.two-field{
+					margin-left: 90px;
+				}
+			}
+
+			.testkit-list{
+				height: calc(100% - 40px);
+				overflow: auto;
+			}
+
+			.testkit-table{
+				width: 100%;
+
+				tr{
+					td{
+						padding: 5px;
+
+						&.radio-cell{
+							text-align: center;
+							color: #888;
+							width: 30px;
+						}
+					}
+				}
+			}
+
+			.two-kit-table{
+				tr{
+					td:nth-child(3){
+						padding-left: 30px;
+					}
+				}
+			}
+
+			.one-kit-table{
+				tr{
+					td:nth-child(2){
+						padding-left: 30px;
+					}
+				}
+			}
+		}
+
+		.dialog-footer{
+			height: 80px;
+			border-top: 2px solid #ccc;
+			padding: 20px;
+			text-align: right;
+
+			.button-continue {
+				background: #fff;
+				border: 1px solid #333;
+				border-radius: 3px;
+				color: #000;
+				display: inline-block;
+				padding: 8px 50px;
+				text-decoration: none;
+			}
+			.button-continue:hover {
+				text-decoration: none;
+				color: white;
+				background-color: #000;
+			}
+
+			.button-creating {
+				background: #fff;
+				border: 1px solid #333;
+				border-radius: 3px;
+				color: #000;
+				display: inline-block;
+				padding: 8px 50px;
+				text-decoration: none;
+			}			
+		}
+
+		.checkbox-wrapper{
+			display: inline-block;
+			cursor: pointer;			
+
+			label.outer-line{
+				width: 15px;
+				height: 15px;
+				overflow: hidden;
+				border-radius: 50%;
+				border: 1px solid #000;
+				vertical-align: middle;
+				margin: 0;
+				cursor: pointer;
+
+				.inner-line{
+					display: none;
+				}
+			}
+
+			&.selected{
+				label.outer-line{
+					.inner-line{
+						display: block;
+						background: #e01924;
+						width: 13px;
+						height: 13px;
+						border: 2px solid #fff;
+						border-radius: 50%;
+					}
+				}
+			}
+		}
+
+	}
+}
