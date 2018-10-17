@@ -563,7 +563,7 @@ EOF
 cat &gt; /tmp/mkexec.jl &lt;&lt; EOF
 println(&quot;Try dispatch on its own&quot;)
 @time include(&quot;/tmp/precompile_QpcrAnalysis.jl&quot;)
-println(&quot;Done checking dispatch.. now building executible..&quot;)
+println(&quot;Done checking dispatch.. now building executable..&quot;)
 
 #Pkg.add(&quot;BuildExecutable&quot;)
 #println(&quot;BE package is added&quot;)
@@ -571,7 +571,7 @@ using BuildExecutable
 println(&quot;BE package is used&quot;)
 
 build_executable(&quot;/root/qpcranalysis&quot;, &quot;/tmp/precompile_QpcrAnalysis.jl&quot;, &quot;/tmp/output/&quot;, &quot;native&quot;)
-println(&quot;Execuable creation finished&quot;)
+println(&quot;Executable creation finished&quot;)
 
 EOF
 
@@ -968,13 +968,13 @@ else
         echo &quot;LANG=en_US.UTF-8&quot; &gt; /etc/default/locale
 fi
 
-echo "Install wireless or WIFI related packages"
+echo &quot;Install wireless or WIFI related packages&quot;
 sudo apt-get -y -q install wireless-tools
 sudo apt-get -y -q install wpasupplicant
 
 if [ -e /lib/udev/rules.d/80-net-setup-link.rules ]
 then
-   echo "Make sure to override unpredictable naming for WIFI interface - Always use wlanX"
+   echo &quot;Make sure to override unpredictable naming for WIFI interface - Always use wlanX&quot;
    sudo ln -s /lib/udev/rules.d/80-net-setup-link.rules /etc/udev/rules.d/80-net-setup-link.rules
 fi
 
@@ -1099,6 +1099,16 @@ else
 fi
 
 df -h
+
+echo Adding USB shutdown script
+
+cat &gt; /uEnv.txt &lt;&lt; EOF
+# Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. check at ${BUILD_URL}
+
+shutdown_usb_power=i2c dev 0;i2c mw 0x24 1 0xec
+uenvcmd=echo Shutting down USB powered devices.;run shutdown_usb_power
+
+EOF
 
 exit 0</command>
       <execEachLine>false</execEachLine>
