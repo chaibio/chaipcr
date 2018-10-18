@@ -133,7 +133,7 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
                 $scope.rows.push(sampleItem);
                 $scope.isAddSample = true;
 
-                var trHeight = document.querySelector('table.sample-table tbody tr:first-child td:last-child').offsetHeight - 1;
+                var trHeight = (document.querySelector('table.sample-table tbody tr:first-child td:last-child')) ? document.querySelector('table.sample-table tbody tr:first-child td:last-child').offsetHeight - 1 : 40;
                 var parentHeight = angular.element(document.querySelector('table.sample-table')).parent()[0].offsetHeight;
                 var tableHeight = trHeight * ($scope.rows.length + 2);
                 var tbodyHeight = (parentHeight > tableHeight + 100) ? tableHeight - 50 : parentHeight - 150;
@@ -165,7 +165,7 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
                 $scope.targets.push(targetItem);
                 $scope.isAddTarget = true;
                 
-                var trHeight = document.querySelector('table.target-table tbody tr:first-child td:last-child').offsetHeight - 1;
+                var trHeight = (document.querySelector('table.target-table tbody tr:first-child td:last-child')) ? document.querySelector('table.target-table tbody tr:first-child td:last-child').offsetHeight - 1 : 40;
                 var parentHeight = angular.element(document.querySelector('table.target-table')).parent()[0].offsetHeight;
                 var tableHeight = trHeight * ($scope.targets.length + 2);
                 var tbodyHeight = (parentHeight > tableHeight + 100) ? tableHeight - 50 : parentHeight - 150;
@@ -242,9 +242,6 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
                 var parentHeight = angular.element(document.querySelector('table.sample-table')).parent()[0].offsetHeight;
                 var tableHeight = trHeight * ($scope.rows.length + 2);
                 var tbodyHeight = (parentHeight > tableHeight + 100) ? tableHeight - 50 : parentHeight - 150;
-
-                console.log('--deleteSampleItem--', parentHeight, tableHeight, tbodyHeight);
-
                 angular.element(document.querySelectorAll('table.sample-table tbody')).css('height', tbodyHeight + 'px');
 
             })

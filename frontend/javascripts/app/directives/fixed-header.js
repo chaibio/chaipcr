@@ -53,7 +53,7 @@ function fixedHeader($timeout, $window) {
             var lastColumnWidth = elem.querySelector('thead tr:first-child th:last-child').attributes.width.value;
             lastColumnWidth = lastColumnWidth.replace('px', '');
             var isScrollExist = tbodyElems.scrollHeight - tbodyElems.offsetHeight;
-            var trHeight = elem.querySelector('tbody tr:first-child td:last-child').offsetHeight - 1;
+            var trHeight = (elem.querySelector('tbody tr:first-child td:last-child')) ? elem.querySelector('tbody tr:first-child td:last-child').offsetHeight - 1 : 0;
             var trCount = (elem.querySelectorAll('tbody tr').length) ? elem.querySelectorAll('tbody tr').length : 0;
 
             var parentHeight = angular.element(elem).parent()[0].offsetHeight;
@@ -81,7 +81,7 @@ function fixedHeader($timeout, $window) {
                     }
                 });
 
-                var overflow_style = (isScrollExist && scrollWidth) ? 'scroll' : 'auto';
+                var overflow_style = (isScrollExist && scrollWidth && trCount) ? 'scroll' : 'auto';
 
                 // set css styles on thead and tbody
                 angular.element(elem.querySelectorAll('thead, tfoot')).css('display', 'block');
@@ -99,7 +99,9 @@ function fixedHeader($timeout, $window) {
                 lastColumn.style.width = lastColumnWidth + 'px';
 
                 lastColumn = elem.querySelector('tbody tr:first-child td:last-child');
-                lastColumn.style.width = lastColumnWidth + 'px';
+                if(lastColumn){
+                    lastColumn.style.width = lastColumnWidth + 'px';
+                }
 
             });
 
@@ -113,7 +115,7 @@ function fixedHeader($timeout, $window) {
             lastColumnWidth = lastColumnWidth.replace('px', '');
             var isScrollExist = tbodyElems.scrollHeight - tbodyElems.offsetHeight;
 
-            var trHeight = elem.querySelector('tbody tr:first-child td:last-child').offsetHeight - 1;
+            var trHeight = (elem.querySelector('tbody tr:first-child td:last-child')) ? elem.querySelector('tbody tr:first-child td:last-child').offsetHeight - 1 : 0;
             var trCount = (elem.querySelectorAll('tbody tr').length) ? elem.querySelectorAll('tbody tr').length : 0;
 
             var parentHeight = angular.element(elem).parent()[0].offsetHeight;
@@ -142,7 +144,7 @@ function fixedHeader($timeout, $window) {
                     }
                 });
 
-                var overflow_style = (isScrollExist && scrollWidth) ? 'scroll' : 'auto';
+                var overflow_style = (isScrollExist && scrollWidth && trCount) ? 'scroll' : 'auto';
 
                 // set css styles on thead and tbody
                 angular.element(elem.querySelectorAll('thead, tfoot')).css('display', 'block');
@@ -160,7 +162,9 @@ function fixedHeader($timeout, $window) {
                 lastColumn.style.width = lastColumnWidth + 'px';
 
                 lastColumn = elem.querySelector('tbody tr:first-child td:last-child');
-                lastColumn.style.width = lastColumnWidth + 'px';                
+                if(lastColumn){
+                    lastColumn.style.width = lastColumnWidth + 'px';
+                }
             });
         }
     }
