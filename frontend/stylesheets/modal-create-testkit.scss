@@ -45,12 +45,21 @@
 				position: absolute;
 				right: 20px;
 				top: 20px;
-				img{
+				svg{
 					border: 1px solid #333;
 					border-radius: 3px;
 					padding: 3px;
 					width: 25px;
-				}				
+				}	
+
+				&:hover{
+					svg{
+						background: #000;
+						rect{
+							fill: #fff;
+						}
+					}
+				}			
 			}
 		}
 		.dialog-content{
