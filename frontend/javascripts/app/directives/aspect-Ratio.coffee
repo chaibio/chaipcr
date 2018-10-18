@@ -23,22 +23,22 @@ App.directive 'aspectRatio', [
           width = $scope.maxWidth
         else if width < $scope.minWidth
           width = $scope.minWidth
+        console.log('resizeAspectRatio_getWidth')
+        console.log(width)
         width
 
       getHeight = -> 
-        height = if $scope.doc
-                  WindowWrapper.documentHeight() - $scope.offsetY
-                else if $scope.parent
-                  elem.parent().height() - $scope.offsetY
-                else
-                  WindowWrapper.height() - $scope.offsetY
-
+        console.log('parent_getHeight')
+        console.log(elem.parent().parent().parent().height())
+        console.log(elem.parent().height())
+        height = elem.parent().parent().parent().height() - ($scope.offsetY)
         if height > $scope.maxHeight
           height = $scope.maxHeight
         else if height < $scope.minHeight
           height = $scope.minHeight
-
-        if height > elem.parent().height()  then height = elem.parent().height()
+        console.log('resizeAspectRatio_getHeight')
+        console.log(height)
+        # if height > elem.parent().height()  then height = elem.parent().height()
         height
 
       resizeAspectRatio = -> 
@@ -46,6 +46,8 @@ App.directive 'aspectRatio', [
         width = getWidth()
         height = getHeight()
         
+        console.log('resizeAspectRatio')
+
         # console.log('width')
         # console.log(width)
         # console.log('height')
@@ -61,6 +63,11 @@ App.directive 'aspectRatio', [
           width = Math.min(width / 1.7, height) * 1.7
           height = Math.min(width / 1.7, height)
 
+        console.log('getWidth')
+        console.log(width)
+        console.log('getHeight')
+        console.log(height)
+
         elem.css('min-Width': width)
         elem.css('Width': width)
         elem.css('min-height': height)
@@ -69,6 +76,7 @@ App.directive 'aspectRatio', [
       resizeTimeout = null
 
       $scope.$on 'window:resize', ->
+        console.log('window:resize')
         resizeAspectRatio()
         if resizeTimeout
           $timeout.cancel(resizeTimeout)
@@ -76,7 +84,8 @@ App.directive 'aspectRatio', [
           elem.css(overflow: '', width: '', 'min-width': '', height: '', 'min-height': '')
           resizeAspectRatio()
           resizeTimeout = null
-        , 200
-      $timeout(resizeAspectRatio, 1300)
+        , 500
+      console.log('aspectRatio: init')
+      $timeout(resizeAspectRatio, 500)
 
 ]

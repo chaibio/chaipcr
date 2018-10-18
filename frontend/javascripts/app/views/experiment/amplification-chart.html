@@ -20,7 +20,7 @@ limitations under the License.
   <div class="page-layout" ng-controller="AmplificationChartCtrl" ng-show="experiment" style="height: 100%;">
     <div class="content row" style="padding-top:0px; height: 100%; display: flex;" >
       <div class="chart-section col-lg-8 col-md-8 col-sm-6 col-xs-6" offset="0" force="true" style="width: 65%; height:100%; padding-left: 0px; padding-right: 0px; display: flex; flex-direction: column; justify-content: space-between; background: #eeeeee">
-        <div style="height: calc(100% - 160px); display: flex; flex-direction: column;">
+        <div style="height: 100%; display: flex; flex-direction: column;">
             <!--curve-header-->
           <div class="curve-header">
             <div class="curve-name" style="padding-left: 15px;  display: flex; flex-direction: column; justify-content: center;" >
@@ -89,7 +89,7 @@ limitations under the License.
             </div>
           </div>
           <div class="curve-body amplification-chart" style="height:100%; padding-right: 0px; display: flex; flex-direction: row; justify-content: space-between;">
-            <div class="curve-plot" aspect-Ratio offset-x='185' offset-y='20' min-width='680' max-width='1020' min-height='400' max-height='600' id="curve-plot" style="display: block;">
+            <div class="curve-plot" aspect-Ratio offset-x='185' offset-y='100 + 160 + 10' min-width='680' max-width='1020' min-height='400' max-height='600' id="curve-plot" style="display: block;">
               <div style="width:100%; height: 90%;">
                 <div class="chart-container" style="height:100%; min-width: 660px; max-width: 1000px; min-height: 340px; max-height: 520px;">
                   <div class="chart-error B1" ng-show="retrying && !fetching && error">
@@ -187,8 +187,8 @@ limitations under the License.
           <chart-well-switch style="position: absolute; height: 100%;" ng-model="wellButtons" color-by="color_by" chart-type="amplification"></chart-well-switch>
         </div>
       </div>
-      <div class="table-container col-lg-4 col-md-4 col-sm-6 col-xs-6" force="true" style="width: 35%; height: 100%; padding-right: 0; padding-left: 0; margin-top:0px; overflow: hidden;">
-        <table style="height: 100%;">
+      <div class="table-container col-lg-4 col-md-4 col-sm-6 col-xs-6" force="true" style="width: 35%; height: 100%; padding-right: 0; padding-left: 0; margin-top:0px; overflow: auto;">
+        <table style="height: fit-content; min-width: 540px;">
           <tbody>
             <tr>
               <th class="B2-M-Amplification" style="text-align: center; border-left:none">Clr</th>
@@ -211,7 +211,6 @@ limitations under the License.
             <tr ng-repeat="i in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" ng-class="{selected: (wellButtons['well_'+i].selected)}">
               <td class="B2-Amplification" ng-class="{'text-center': color_by==='channel'}" style="vertical-align: middle; line-height: 10px;">
                 <span ng-if="color_by==='well'" class="B2-Amplification dot" ng-attr-style="background-color: {{wellButtons['well_'+i].color}}"></span>
-                </span>
               </td>
               <td class="B2-Amplification">
                 <input class="B2-Amplification" type="checkbox" style="width:50px;" ng-click="toggleOmitIndex($index)" /> 
@@ -236,8 +235,8 @@ limitations under the License.
               <td class="B2-Amplification type-td">
                 <!-- <span class="B2" style="width: 20px; height: 20px; vertical-align: middle" ng-show="types[$index]"> -->
                 <!-- {{types[$index]==='sample'?'S':'' | truncate:20}} -->
-                <span class="B2-Amplification" style="width: 20px; height: 20px;">
-                  S
+                <span class="B2-Amplification type-span" style="width: 20px; height: 20px;">
+                  {{'S' | truncate:20}}
                 </span>
               </td>
               <td class="B2-Amplification" ng-click="focusExpTarget($index)" style="text-align: left;">
@@ -247,13 +246,17 @@ limitations under the License.
                 <input type="text" class="B2-Amplification" ng-show="editExpTargetMode[$index]" focus-on="editExpTargetMode" ng-blur="updateTarget($index,targets[$index])" on-shift-enter="updateTargetEnter($index,targets[$index])" ng-model="targets[$index]">
               </td>
               <td class="B2-Amplification" style="text-align: left">
-                <span class="B2-Amplification width1" >
+                <span class="B2-Amplification width1">
+                  <span class="B2-Amplification">20.33</span>
+                </span>
+                <!-- <span class="B2-Amplification width1" >
                   <span class="B2-Amplification" ng-show="wellButtons['well_'+i].ct[0] > 0">
                     {{(wellButtons['well_'+i].ct[0]) | round:2}}
                   </span>
-                </span>
+                </span> -->
               </td>
               <td class="B2-Amplification" style="text-align: left">
+                <span class="B2-Amplification width1" >45.67</span>
                 <!-- <span class="B2-Amplification width1" ng-if="is_dual_channel">
                   <span class="B2-Amplification" ng-show="wellButtons['well_'+i].ct[1] > 0">
                     {{(wellButtons['well_'+i].ct[1]) | round:2}}
@@ -264,14 +267,16 @@ limitations under the License.
                 </span>
                 <span class="B2-Amplification width1" ng-if="!is_dual_channel">
                   <span class="B2-Amplification dummy-placeholder"></span>
-                  <td class="B2">
                 </span> -->
-              </td class="B2-Amplification" style="text-align: left">
+              </td>
+              <td class="B2-Amplification" style="text-align: left">
+                <span class="B2-Amplification width1">123456</span>
                 <!-- <span class="B2-Amplification width1">
                   <span class="B2-Amplification dummy-placeholder"></span>
                 </span> -->
               </td>
               <td class="B2-Amplification" style="text-align: left">
+                <span class="B2-Amplification width1">123456</span>
                 <!-- <span class="B2-Amplification width1">
                   <span class="B2-Amplification dummy-placeholder"></span>
                 </span> -->

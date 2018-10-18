@@ -29,28 +29,32 @@ App.directive 'fitBottomSwitch', [
         if height > $scope.maxHeight 
             height = $scope.maxHeight 
 
+        console.log('realHeight')
+        console.log(height)
+
         height
 
       set = (height) ->
         height = height || getHeight()
         elem.css('height':  height)
+        elem.css('min-height':  height)
           
       resizeTimeout = null
 
       $scope.$on 'window:resize', ->
         height = getHeight()
-        elem.css(height: '', overflow: 'hidden')
+        elem.css(overflow: 'hidden', height: '', 'min-height': '')
         if resizeTimeout
           $timeout.cancel(resizeTimeout)
 
         set()
         resizeTimeout = $timeout ->
-          elem.css(overflow: '', height: '',)
+          elem.css(overflow: '', height: '', 'min-height': '')
           set()
           resizeTimeout = null
         , 1000
 
       if $scope.minHeight > 0
         set($scope.minHeight)
-      $timeout(set, 1500)
+      $timeout(set, 1000)
 ]
