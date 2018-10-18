@@ -341,21 +341,7 @@
   }
   
   .table-container {
-    // display: inline-block;
-    margin-top: -20px;
-    // margin-bottom: -4px;
-    // width: 35%;
     border-left: 2px solid black;
-    // overflow: auto;
-    top: 0px;
-    bottom: 50px;
-    right: 0px;
-    // height: 94%;
-
-		// .sample-span{
-		// 	font-family: 'dinot-Regular';
-		// 	font-size: 12px;
-    // }
     
     .type-td{
       text-align: center;
@@ -385,6 +371,7 @@
     }
     table {
       width: 100%;
+      background: white;
       // box-shadow: -1px 0px 1px $lightgray;
       th {
         background-color: lighten($gray, 15%);
@@ -404,7 +391,7 @@
           // border-left: 1px solid lighten($lightgray, 15%);
           // border-bottom: 1px solid lighten($lightgray, 15%);
           color: $lightgray;
-          padding: 10px 0px;
+          padding: 7px 0px;
           text-align: center;
           &:first-of-type {
             color: $gray;
