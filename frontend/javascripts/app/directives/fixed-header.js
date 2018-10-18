@@ -20,17 +20,20 @@ function fixedHeader($timeout, $window) {
         });
 
         $scope.$watch(tableScrollRender, function(isTableScrollRender) {            
-            if (isTableScrollRender) {
-                transformTableOnResize();
-            }
         });
 
         angular.element($window).on('resize', onResizeWindow);
 
         function tableScrollRender() {
             var tbodyElems = elem.querySelector('tbody');
-            var scrollWidth = tbodyElems.scrollWidth - tbodyElems.scrollWidth;
-            return tbodyElems.scrollHeight * tbodyElems.offsetHeight;
+            var scrollWidth = tbodyElems.offsetWidth - tbodyElems.scrollWidth;
+            var overflow_style = (scrollWidth) ? 'scroll' : 'auto';
+            var head_flow = angular.element(elem.querySelectorAll('thead')).css('overflow-y');
+
+            if(overflow_style != head_flow){
+                transformTableOnResize();
+            }
+            return true;
         }
 
 
