@@ -71,8 +71,8 @@ window.App.directive 'headerStatus', [
       checkStatus = () ->
         getExperiment (exp) ->
           $scope.experiment = exp
-          if !$scope.experiment.completed_at
-            $timeout checkStatus, 1000
+          # if !$scope.experiment.completed_at
+          #   $timeout checkStatus, 1000
 
       #checkStatus()
 

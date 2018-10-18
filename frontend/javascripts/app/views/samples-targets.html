@@ -33,7 +33,7 @@ limitations under the License.
 
             </div>
 
-      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 samples" full-height force="true" offset="144" style="padding-left: 70px !important;">
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 samples" full-height force="true" offset="160" style="padding-left: 70px !important;">
         <p>Samples</p>
 
         <table fixed-header class="sample-target-table sample-table">
@@ -48,7 +48,7 @@ limitations under the License.
           <tbody>
             <tr ng-repeat="rowContent in rows track by $index">
                 <td style="border-bottom:1px solid #bbb;">
-                    <input style="border:0px;padding:0px;outline: none;width:100%;" type="text" ng-blur="updateSample(rowContent, $index)" ng-focus="focusSample(rowContent, $index)" placeholder="Enter Sample Name" class="" ng-model="rowContent.name">
+                    <input style="border:0px;padding:0px;outline: none;width:100%;" type="text" ng-blur="updateSample(rowContent, $index)" ng-focus="focusSample(rowContent, $index)" placeholder="" class="" ng-model="rowContent.name">
                 </td>
                 <td style="border-bottom:1px solid #bbb; min-width: 50px;" class="text-center">
                     <label class="icon-wrapper">
@@ -73,7 +73,7 @@ limitations under the License.
 
       </div>
 
-      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 targets" full-height force="true" offset="144">
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 targets" full-height force="true" offset="160">
         <p>Targets</p>
 
         <table fixed-header class="sample-target-table target-table">
@@ -89,7 +89,7 @@ limitations under the License.
           <tbody>
             <tr ng-repeat="targetContent in targets track by $index">
                 <td style="border-bottom:1px solid #bbb;">
-                    <input style="border:0px;padding:0px;width:100%;outline: none;" type="text" ng-blur="updateTargetName(targetContent,$index)" ng-focus="focusTarget(targetContent,$index)" placeholder="Enter Target Name"  class="" ng-model="targetContent.name">
+                    <input style="border:0px;padding:0px;width:100%;outline: none;" type="text" ng-blur="updateTargetName(targetContent,$index)" ng-focus="focusTarget(targetContent,$index)" placeholder=""  class="" ng-model="targetContent.name">
                 </td>
                 <td style="border-bottom:1px solid #bbb; padding: 0 2px; min-width: 60px;" class="text-center">
                     <div ng-show="targetContent.selectChannel"  class="channel-selector" ng-if="is_dual_channel">
@@ -134,7 +134,7 @@ limitations under the License.
       </div>
 
     </div>
-    <div class="exp-info-bar" sticky-footer>
+    <div class="exp-info-bar samples-targets" sticky-footer>
       <status-bar experiment-id="experiment.id"></status-bar>
     </div>
   </div>

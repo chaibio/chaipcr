@@ -1160,6 +1160,14 @@ class ExperimentsController < ApplicationController
     end
   end
 
+  def resume
+    if @experiment
+      proxy_request("http://localhost:8000/control/resume", @experiment)
+    else
+      render json: {errors: "experiment not found #{params[:id]}"}, status: 404
+    end
+  end
+  
   protected
 
   def proxy_request(url, experiment)

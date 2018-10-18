@@ -89,6 +89,7 @@ Qpcrctl::Application.routes.draw do
     member do
       post 'start'
       post 'stop'
+      post 'resume'
       post 'copy'
       get 'well_layout'
       get 'temperature_data'
