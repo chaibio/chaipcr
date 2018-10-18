@@ -375,6 +375,20 @@ run_migrate_on_upgrade_logged () {
 	run_migrate_on_upgrade >> $log_file 2>&1
 }
 
+bringup_wireless_interface () {
+    if [ -e /sys/class/net/wlan0/operstate ]
+    then
+       wlanState=`cat /sys/class/net/wlan0/operstate`
+       if [ "$wlanState" = "down" ];
+       then
+          echo "The current interface state is $wlanState, Try to bring up the wlan0 interface"
+          ifup wlan0
+       else
+          echo "The WIFI interface wlan0 state is already $wlanState"
+       fi
+    fi
+}
+
 update_wireless_network () {
     if [ -e /sdcard/upgrade/interfaces ]
     then
@@ -428,6 +442,7 @@ update_wireless_network () {
           echo "SUBSYSTEM==\"net\", ACTION==\"add\", DRIVERS==\"?*\", ATTR{address}==\"$address\", ATTR{dev_id}==\"0x0\", ATTR{type}==\"1\", KERNEL==\"wlan*\", NAME=\"wlan0\"" >> /etc/udev/rules.d/70-persistent-net.rules
           echo "Done with updating wireless network rules..."
        fi
+       bringup_wireless_interface
     fi
 }
 
