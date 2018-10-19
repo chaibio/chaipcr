@@ -22,20 +22,25 @@
 -- queries depend on action
 
 
--- calibration, 1 query. needed for amplification, melt curve, and analyze thermal consistency
+-- calibration, 1 query. needed for amplification, meltcurve, analyze optical_cal, analyze optical_test_dual_channel, analyze thermal_consistency
+-- keys (each key represent a step): for all actions - water, channel_1, channel_2; extra key only for analyze optical_test_dual_channel - baseline.
 -- analyze_customized/optical_cal.jl, adj_w2wvaf.jl, calib.jl
-SELECT step_id, fluorescence_value, well_num, cycle_num, channel
+SELECT fluorescence_value, well_num, channel
     FROM fluorescence_data
-    WHERE experiment_id = $calib_id
+    WHERE experiment_id = $calib_id AND step_id = $step_id
+	ORDER BY channel, well_num
 ;
 
 
--- amplification, 2 queries: calibration query and ...
+-- amplification, 3 queries: calibration query and ...
 -- $exp_id is the experiment_id for the amplification experiment
 -- amp.jl
-SELECT step_id, fluorescence_value, well_num, cycle_num, channel
+
+-- amplification, fluorescence
+SELECT fluorescence_value, well_num, cycle_num, channel
     FROM fluorescence_data
-    WHERE experiment_id = $exp_id
+    WHERE experiment_id = $exp_id AND step_id = $step_id
+	ORDER BY channel, well_num, cycle_num
 ;
 
 
@@ -47,6 +52,7 @@ SELECT well_num, temperature, fluorescence_value, channel
     WHERE
         experiment_id = $exp_id AND
         stage_id = $stage_id
+	ORDER BY channel, well_num, temperature
 ;
 
 
@@ -55,28 +61,27 @@ SELECT well_num, temperature, fluorescence_value, channel
 
 -- thermal_performance_diagnostic, 1 query
 -- analyze_customized/thermal_performance_diagnostic.jl
-SELECT * FROM temperature_logs WHERE experiment_id = $exp_id
+SELECT *
+    FROM temperature_logs
+    WHERE experiment_id = $exp_id
+    ORDER BY elapsed_time
+;
 
 -- optical_test_single_channel, 1 query
 -- analyze_customized/optical_test_single_channel.jl
 SELECT step_id, fluorescence_value, well_num, cycle_num
     FROM fluorescence_data
     WHERE experiment_id = $exp_id
+	ORDER BY step_id, well_num, cycle_num
 ;
 
 -- optical_test_dual_channel, 1 query
 -- analyze_customized/optical_test_dual_channel.jl
-SELECT step_id, fluorescence_value, well_num, cycle_num, channel
-    FROM fluorescence_data
-    WHERE experiment_id = $exp_id
-;
+-- see calibration query
 
 -- optical_cal, 1 query
 -- analyze_customized/optical_cal.jl, adj_w2wvaf.jl, calib.jl
-SELECT step_id, fluorescence_value, well_num, cycle_num, channel
-    FROM fluorescence_data
-    WHERE experiment_id = $exp_id
-;
+-- see calibration query
 
 -- thermal_consistency, 2 queries: calibration query and ...
 -- $stage_id is probably 4.
@@ -86,6 +91,7 @@ SELECT well_num, temperature, fluorescence_value, channel
     WHERE
         experiment_id = $exp_id AND
         stage_id = $stage_id
+	ORDER BY channel, well_num, temperature
 ;
 
 
