@@ -434,7 +434,9 @@
           padding: 10px;
         }
         .dummy-placeholder {
-          padding: 25px;
+          // padding: 25px;
+          padding-right: 3px;
+          padding-left: 3px;
         }
       }
       &.selected {

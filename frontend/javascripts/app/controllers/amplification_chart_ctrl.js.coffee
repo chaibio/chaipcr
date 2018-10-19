@@ -362,8 +362,12 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         for well_i in [0..15] by 1
           cts = _.filter AMPLI_DATA_CACHE.summary_data, (ct) ->
             ct[1] is well_i+1
-          $scope.wellButtons["well_#{well_i}"].ct = [cts[0][2]]
-          $scope.wellButtons["well_#{well_i}"].ct.push cts[1][2] if cts[1]
+          
+          $scope.wellButtons["well_#{well_i}"].ct = [cts[0][3]]
+          $scope.wellButtons["well_#{well_i}"].ct.push cts[1][3] if cts[1]
+          console.log(cts)
+          console.log($scope.wellButtons["well_#{well_i}"].ct)
+          
         return
         # for well_i in [0..15] by 1
         #   cts = _.filter AMPLI_DATA_CACHE.cq, (ct) ->

@@ -246,17 +246,20 @@ limitations under the License.
                 <input type="text" class="B2-Amplification" ng-show="editExpTargetMode[$index]" focus-on="editExpTargetMode" ng-blur="updateTarget($index,targets[$index])" on-shift-enter="updateTargetEnter($index,targets[$index])" ng-model="targets[$index]">
               </td>
               <td class="B2-Amplification" style="text-align: left">
-                <span class="B2-Amplification width1">
-                  <span class="B2-Amplification">20.33</span>
-                </span>
-                <!-- <span class="B2-Amplification width1" >
+                <span class="B2-Amplification width1" >
                   <span class="B2-Amplification" ng-show="wellButtons['well_'+i].ct[0] > 0">
                     {{(wellButtons['well_'+i].ct[0]) | round:2}}
                   </span>
-                </span> -->
+                  <span class="B2-Amplification" ng-show="wellButtons['well_'+i].ct[1] <= 0">
+                    <span class="B2-Amplification dummy-placeholder">&nbsp;</span>
+                  </span>
+                </span>
               </td>
               <td class="B2-Amplification" style="text-align: left">
                 <span class="B2-Amplification width1" >45.67</span>
+                <span class="B2-Amplification" ng-show="wellButtons['well_'+i].ct[1] <= 0">
+                  <span class="B2-Amplification dummy-placeholder">&nbsp;</span>
+                </span>
                 <!-- <span class="B2-Amplification width1" ng-if="is_dual_channel">
                   <span class="B2-Amplification" ng-show="wellButtons['well_'+i].ct[1] > 0">
                     {{(wellButtons['well_'+i].ct[1]) | round:2}}
@@ -271,15 +274,15 @@ limitations under the License.
               </td>
               <td class="B2-Amplification" style="text-align: left">
                 <span class="B2-Amplification width1">123456</span>
-                <!-- <span class="B2-Amplification width1">
-                  <span class="B2-Amplification dummy-placeholder"></span>
-                </span> -->
+                <span class="B2-Amplification" ng-show="wellButtons['well_'+i].ct[1] <= 0">
+                  <span class="B2-Amplification dummy-placeholder">&nbsp;</span>
+                </span>
               </td>
               <td class="B2-Amplification" style="text-align: left">
                 <span class="B2-Amplification width1">123456</span>
-                <!-- <span class="B2-Amplification width1">
-                  <span class="B2-Amplification dummy-placeholder"></span>
-                </span> -->
+                <span class="B2-Amplification" ng-show="wellButtons['well_'+i].ct[1] <= 0">
+                  <span class="B2-Amplification dummy-placeholder">&nbsp;</span>
+                </span>
               </td>
             </tr>
           </tbody>
