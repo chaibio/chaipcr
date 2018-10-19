@@ -72,7 +72,9 @@ App.directive 'aspectRatio', [
         elem.css('Width': width)
         elem.css('min-height': height)
         elem.css('height': height)
-          
+        # elem.parent().children().get(1).css('height': height)
+        elem.parent().children().get(1).style.height = height + "px"
+
       resizeTimeout = null
 
       $scope.$on 'window:resize', ->
