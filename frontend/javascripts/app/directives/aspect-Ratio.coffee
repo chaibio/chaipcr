@@ -18,6 +18,8 @@ App.directive 'aspectRatio', [
       elem.addClass 'aspect-Ratio'
 
       getWidth = ->
+        console.log('parent_getWidth')
+        console.log(elem.parent().width())
         width = elem.parent().width() - $scope.offsetX
         if width > $scope.maxWidth
           width = $scope.maxWidth
@@ -48,11 +50,6 @@ App.directive 'aspectRatio', [
         
         console.log('resizeAspectRatio')
 
-        # console.log('width')
-        # console.log(width)
-        # console.log('height')
-        # console.log(height)
-
         if width > $scope.maxWidth and height > $scope.maxHeight
           width = $scope.maxWidth
           height = $scope.maxHeight
@@ -63,10 +60,10 @@ App.directive 'aspectRatio', [
           width = Math.min(width / 1.7, height) * 1.7
           height = Math.min(width / 1.7, height)
 
-        console.log('getWidth')
-        console.log(width)
-        console.log('getHeight')
-        console.log(height)
+        # console.log('getWidth')
+        # console.log(width)
+        # console.log('getHeight')
+        # console.log(height)
 
         elem.css('min-Width': width)
         elem.css('Width': width)

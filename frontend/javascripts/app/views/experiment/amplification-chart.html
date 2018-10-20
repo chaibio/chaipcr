@@ -88,8 +88,8 @@ limitations under the License.
               </form>
             </div>
           </div>
-          <div class="curve-body amplification-chart" style="height:100%; padding-right: 0px; display: flex; flex-direction: row; justify-content: space-between;">
-            <div class="curve-plot" aspect-Ratio offset-x='185' offset-y='100 + 160 + 10' min-width='680' max-width='1020' min-height='400' max-height='600' id="curve-plot" style="display: block;">
+          <div class="curve-body amplification-chart" style="height:100%; display: flex; flex-direction: row; justify-content: space-between;">
+            <div class="curve-plot" aspect-Ratio offset-x='115 + 10 + 20' offset-y='100 + 160 + 10' min-width='680' max-width='1020' min-height='400' max-height='600' id="curve-plot" style="display: block;">
               <div style="width:100%; height: 90%;">
                 <div class="chart-container" style="height:100%; min-width: 660px; max-width: 1000px; min-height: 340px; max-height: 520px;">
                   <div class="chart-error B1" ng-show="retrying && !fetching && error">
@@ -125,65 +125,63 @@ limitations under the License.
               </div>
             </div>
 
-            <div class="additional-info" style="min-width:115px; flex-grow: 1;">
-              <div style="height:100%; padding-right: 20px; margin: 0px; background: transparent; display: flex; float: left; flex-direction: column; justify-content: space-between;">
-                  <div style="padding: 0; background: transparent; box-shadow: 0 1pt 1pt 1px grey;">
-                      <div class="parameters">
-                        <div class="header B1-M-Amplification" ng-style="bgcolor_target" style="min-height: 41px; color:white;">
-                          <!-- Target: -->
-                          {{label_target}}
-                        </div>
-                        <div>
-                          <table class="parameters-table">
-                            <tr>
-                              <td class="B1v-Amplification">Cycle:</td>
-                              <td class="B1Mv-Amplification">{{label_cycle}}</td>
-                            </tr>
-                            <tr>
-                              <td class="B1v-Amplification">RFU:</td>
-                              <td class="B1Mv-Amplification">{{label_RFU}}</td>
-                            </tr>
-                            <tr>
-                              <td class="B1v-Amplification">dF/dc:</td>
-                              <td class="B1Mv-Amplification">{{label_dF_dC}}</td>
-                            </tr>
-                            <tr>
-                              <td class="B1v-Amplification">d<sup>2</sup>/dc<sup>2</sup>:</td>
-                              <td class="B1Mv-Amplification">{{label_D2_dc2}}</td>
-                            </tr>
-                          </table>
-                        </div>
+            <div class="additional-info" style="min-width:115px;">
+                <div style="padding: 0; background: transparent; box-shadow: 0 1pt 1pt 1px grey;">
+                    <div class="parameters">
+                      <div class="header B1-M-Amplification" ng-style="bgcolor_target" style="min-height: 41px; color:white;">
+                        <!-- Target: -->
+                        {{label_target}}
                       </div>
-                      <div class="info B2-Amplification" style="padding-top: 8px; padding-bottom: 8px; padding-left: 10px;">
-                        Channel: {{label_channel}}
+                      <div>
+                        <table class="parameters-table">
+                          <tr>
+                            <td class="B1v-Amplification">Cycle:</td>
+                            <td class="B1Mv-Amplification">{{label_cycle}}</td>
+                          </tr>
+                          <tr>
+                            <td class="B1v-Amplification">RFU:</td>
+                            <td class="B1Mv-Amplification">{{label_RFU}}</td>
+                          </tr>
+                          <tr>
+                            <td class="B1v-Amplification">dF/dc:</td>
+                            <td class="B1Mv-Amplification">{{label_dF_dC}}</td>
+                          </tr>
+                          <tr>
+                            <td class="B1v-Amplification">d<sup>2</sup>/dc<sup>2</sup>:</td>
+                            <td class="B1Mv-Amplification">{{label_D2_dc2}}</td>
+                          </tr>
+                        </table>
                       </div>
-                      <!-- <div class="info1" ng-style="bgcolor_wellSample"  style="min-height: 41px; font-size: 15px; color:white; margin-top: 5px">
-                        {{label_well}}{{label_sample ? ", " : ""}}{{label_sample}}
-                      </div> -->
-                  </div>
-                  <div class="targets-set" ng-show="targetsSet.length" style="padding-top:5px; padding-bottom: 0px;">
-                    <table class="targets-table">
-                      <tr ng-repeat="target in targetsSet">
-                        <td>
-                          <span ng-if="color_by==='target'" class="dot" ng-attr-style="background-color: {{COLORS[$index]}}"></span>
-                        </td>
-                        <td style="padding-top: 5px; padding-bottom: 5px; color: black;">{{target}}</td>
-                        <td class="td-tik" ng-click="targetClick($index)" style="padding-right: 15px;">
-                          <span ng-show="!targetsSetHided[$index]">
-                            <img src="/images/target_on.svg">
+                    </div>
+                    <div class="info B2-Amplification" style="padding-top: 8px; padding-bottom: 8px; padding-left: 10px;">
+                      Channel: {{label_channel}}
+                    </div>
+                    <!-- <div class="info1" ng-style="bgcolor_wellSample"  style="min-height: 41px; font-size: 15px; color:white; margin-top: 5px">
+                      {{label_well}}{{label_sample ? ", " : ""}}{{label_sample}}
+                    </div> -->
+                </div>
+                <div class="targets-set" ng-show="targetsSet.length" style="padding-top:5px; padding-bottom: 0px;">
+                  <table class="targets-table">
+                    <tr ng-repeat="target in targetsSet">
+                      <td>
+                        <span ng-if="color_by==='target'" class="dot" ng-attr-style="background-color: {{COLORS[$index]}}"></span>
+                      </td>
+                      <td style="padding-top: 5px; padding-bottom: 5px; color: black;">{{target}}</td>
+                      <td class="td-tik" ng-click="targetClick($index)" style="padding-right: 15px;">
+                        <span ng-show="!targetsSetHided[$index]">
+                          <img src="/images/target_on.svg">
+                        </span>
+                        <span ng-show="targetsSetHided[$index]">
+                            <img src="/images/target_off.svg">
                           </span>
-                          <span ng-show="targetsSetHided[$index]">
-                              <img src="/images/target_off.svg">
-                            </span>
-                          </td>
-                      </tr>
-                    </table>
-                  </div>
-              </div>
+                        </td>
+                    </tr>
+                  </table>
+                </div>
             </div>
           </div>
         </div>
-        <div class="choose-chart" fit-bottom-switch min-height='160' max-height='320' style="position: relative;">
+        <div class="choose-chart" fit-bottom-switch min-height='160' max-height='240' style="position: relative;">
           <chart-well-switch style="position: absolute; height: 100%;" ng-model="wellButtons" color-by="color_by" chart-type="amplification"></chart-well-switch>
         </div>
       </div>

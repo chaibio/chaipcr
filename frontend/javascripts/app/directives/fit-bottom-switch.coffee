@@ -17,10 +17,10 @@ App.directive 'fitBottomSwitch', [
 
         siblingHeight = elem.parent().children().get(0).childNodes[1].childNodes[0].clientHeight
 
-        console.log('parentHeight')
-        console.log(parentHeight)
-        console.log('siblingHeight')
-        console.log(siblingHeight)
+        # console.log('parentHeight')
+        # console.log(parentHeight)
+        # console.log('siblingHeight')
+        # console.log(siblingHeight)
 
         height = parentHeight - (siblingHeight + 100 + 10)
         if height < $scope.minHeight 
@@ -29,8 +29,8 @@ App.directive 'fitBottomSwitch', [
         if height > $scope.maxHeight 
             height = $scope.maxHeight 
 
-        console.log('realHeight')
-        console.log(height)
+        # console.log('realHeight')
+        # console.log(height)
 
         height
 
