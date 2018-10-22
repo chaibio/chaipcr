@@ -1,112 +1,284 @@
 <!--
 Chai PCR - Software platform for Open qPCR and Chai's Real-Time PCR instruments.
 For more information visit http://www.chaibio.com
-
 Copyright 2016 Chai Biotechnologies Inc. <info@chaibio.com>
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-
 http://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<div class="user-settings">
-	<div class="modal-add-user">
-		<h4 class="underlined">
-			Run a Test Kit
-			<a class="pull-right close" ng-click="$dismiss()">&times;</a>
-		</h4>
-		<p>Please choose the manufacturer of your test kit</p>
-		<p>Supported kits will appear below</p>
-		<form role="form" class="form-horizontal" name="form" ng-submit="submit(newExperimentName)" novalidate>
-			<div class="underlined">
-				<div class="form-group">
-					<div class="col-md-12">
-						<div class="dropdown" ng-click="myFunction()">
-							<button class="dropbtn"><span class="test" style="float:left;">{{value}}</span> <img class="arrow-down" src="/images/arrow-down_black.png"></button>
-							<div id="myDropdown" class="dropdown-content">
-								<a href="" ng-click="value = 'PIKA Weihenstephan'" value="abc">PIKA Weihenstephan</a>
-							</div>
-						</div>
-					</div>
-					<div ng-show="value == 'PIKA Weihenstephan'" class="col-md-12" style="margin-top:25px;">
-						<div class="col-md-6 one-kit" ng-click="selectedKit=1" ng-class="{ 'selected': selectedKit == 1}">
-							Use One Kit
-						</div>
-						<div class="col-md-6" ng-click="selectedKit=2" ng-class="{ 'selected': selectedKit == 2}">
-							Use Two Kits
-						</div>
-					</div>
-					<div ng-show="selectedKit==1 && value == 'PIKA Weihenstephan' " class="col-md-12" style="margin-top:25px;">
-						<label>
-							<input type="radio" ng-model="kit.name" value="Lactobacillaceae Screening">
-								<span class="options-text">4e Kit B 2401-32: Lactobacillaceae Screening</span>
-						</label><br/>
-						<label>
-							<input type="radio" ng-model="kit.name" value="Lactobacillus acetotolerans">
-								<span class="options-text">4e Kit B 2401-52: Lactobacillus acetotolerans</span>
-						</label><br/>
-						<label>
-							<input type="radio" ng-model="kit.name" value="LP Screening (12 beer spoilers)">
-								<span class="options-text">4e Kit B 2401-38: LP Screening (12 beer spoilers)</span>
-						</label><br/>
-						<label>
-							<input type="radio" ng-model="kit.name" value="Pectinatus sp. Screening">
-								<span class="options-text">4e Kit B 2401-44: Pectinatus sp. Screening</span>
-						</label><br/>
-						<label>
-							<input type="radio" ng-model="kit.name" value="Dekkera (Brettanomyces) sp. Screening">
-								<span class="options-text">4e Kit H 2402-20: Dekkera (Brettanomyces) sp. Screening</span>
-						</label><br/>
-						<label>
-							<input type="radio" ng-model="kit.name" value="Saccharomyces cerevisiae var. diastaticus">
-								<span class="options-text">4e Kit H 2402-49: Saccharomyces cerevisiae var. diastaticus</span>
-						</label><br/>
-					</div>
-					<div ng-show="selectedKit==2 && value == 'PIKA Weihenstephan' " class="col-md-12" style="margin-top:25px;">
-						<label>
-							<input ng-change="radioDisable()" type="radio" ng-model="kit1.name" value="Lactobacillaceae Screening">
-							<input type="radio" ng-model="kit2.name" value="Lactobacillaceae Screening">
-								<span class="options-text">4e Kit B 2401-32: Lactobacillaceae Screening</span>
-						</label><br/>
-						<label>
-							<input type="radio" ng-model="kit1.name" value="Lactobacillus acetotolerans">
-							<input type="radio" ng-model="kit2.name" value="Lactobacillus acetotolerans">
-								<span class="options-text">4e Kit B 2401-52: Lactobacillus acetotolerans</span>
-						</label><br/>
-						<label>
-							<input type="radio" ng-model="kit1.name" value="LP Screening (12 beer spoilers)">
-							<input type="radio" ng-model="kit2.name" value="LP Screening (12 beer spoilers)">
-								<span class="options-text">4e Kit B 2401-38: LP Screening (12 beer spoilers)</span>
-						</label><br/>
-						<label>
-							<input type="radio" ng-model="kit1.name" value="Pectinatus sp. Screening">
-							<input type="radio" ng-model="kit2.name" value="Pectinatus sp. Screening">
-								<span class="options-text">4e Kit B 2401-44: Pectinatus sp. Screening</span>
-						</label><br/>
-						<label>
-							<input type="radio" ng-model="kit1.name" value="Dekkera (Brettanomyces) sp. Screening">
-							<input type="radio" ng-model="kit2.name" value="Dekkera (Brettanomyces) sp. Screening">
-								<span class="options-text">4e Kit H 2402-20: Dekkera (Brettanomyces) sp. Screening</span>
-						</label><br/>
-						<label>
-							<input type="radio" ng-model="kit1.name" value="Saccharomyces cerevisiae var. diastaticus">
-							<input type="radio" ng-model="kit2.name" value="Saccharomyces cerevisiae var. diastaticus">
-								<span class="options-text">4e Kit H 2402-49: Saccharomyces cerevisiae var. diastaticus</span>
-						</label><br/>
-					</div>
-				</div>
-				<div ng-show="value == 'PIKA Weihenstephan'" class="text-center">
-					<a ng-show="!creating" href="" ng-click="create()" class="button-continue">Continue</a>
-					<a href="" ng-show="creating" class="button-creating">Creating Experiment<ellipsis-animated><ellipsis-animated/></a>
-					<p ng-show="error">{{error}}</p>
-				</div>
-			</form>
+<div class="new-testkit-box">
+	<div class="dialog-header">
+		<label class="H2 title">Run a Test Kit</label>
+		<div class="testkit-type">			
+			<div class="checkbox-wrapper B1B" ng-click="selectedKit=1" ng-class="{ 'selected': selectedKit == 1}">
+				<label class="outer-line"><lable class="inner-line"></lable></label>
+				Use One Kit
+			</div>
+			<div class="checkbox-wrapper B1B" ng-click="selectedKit=2" ng-class="{ 'selected': selectedKit == 2}">
+				<label class="outer-line"><lable class="inner-line"></lable></label>
+				Use Two Kits
+			</div>
+		</div>
+		<label class="dialog-close" ng-click="$dismiss()">
+			<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 5"><rect x="2.25" y="-0.79" width="0.5" height="6.57" transform="translate(-1.04 2.5) rotate(-45)"/><rect x="-0.79" y="2.25" width="6.57" height="0.5" transform="translate(-1.04 2.5) rotate(-45)"/></svg>
+		</label>
+	</div>
+	<div class="dialog-content">
+		<div class="H3 title" ng-class="{ 'two-field': selectedKit == 2}">PIKA Weihenstephan Test Kits</div>
+		<div class="testkit-list">
+			<table class="one-kit-table testkit-table" ng-show="selectedKit==1">
+				<tr>
+					<td class="radio-cell B1">T1</td>
+					<td class="B1B">Bacteria 4e Kits</td>
+					<td></td>
+				</tr>
+
+				<tr>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit.name='Acetics screening'" ng-class="{ 'selected': kit.name == 'Acetics screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="B1">Acetics screening</td>
+					<td class="B1">(2401-15)</td>
+				</tr>
+
+				<tr>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit.name='Alicyclobacillus screening'" ng-class="{ 'selected': kit.name == 'Alicyclobacillus screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="B1">Alicyclobacillus screening</td>
+					<td class="B1">(2401-18)</td>
+				</tr>
+
+				<tr>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit.name='Lactobacillaceae screening'" ng-class="{ 'selected': kit.name == 'Lactobacillaceae screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="B1">Lactobacillaceae screening</td>
+					<td class="B1">(2401-32)</td>
+				</tr>
+
+				<tr>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit.name='L. acetotolerans detection'" ng-class="{ 'selected': kit.name == 'L. acetotolerans detection'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="B1">L. acetotolerans detection</td>
+					<td class="B1">(2401-52)</td>
+				</tr>
+
+				<tr>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit.name='LP Real Beer Spoiler screening'" ng-class="{ 'selected': kit.name == 'LP Real Beer Spoiler screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="B1">LP Real Beer Spoiler screening</td>
+					<td class="B1">(2401-38)</td>
+				</tr>
+
+				<tr>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit.name='Megasphaera screening'" ng-class="{ 'selected': kit.name == 'Megasphaera screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="B1">Megasphaera screening</td>
+					<td class="B1">(2401-41)</td>
+				</tr>
+
+				<tr>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit.name='Pectinatus screening'" ng-class="{ 'selected': kit.name == 'Pectinatus screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="B1">Pectinatus screening</td>
+					<td class="B1">(2401-44)</td>
+				</tr>
+
+				<tr>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit.name='Single spoiler detection'" ng-class="{ 'selected': kit.name == 'Single spoiler detection'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="B1">Single spoiler detection</td>
+					<td class="B1">(2401-NN)</td>
+				</tr>
+
+				<tr><td>&nbsp;</td></tr>
+
+				<tr>
+					<td class="radio-cell B1">T1</td>
+					<td class="B1B">Yeast 4e Kits</td>
+					<td></td>
+				</tr>
+
+				<tr>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit.name='Brettanomyces (Dekkera) screening'" ng-class="{ 'selected': kit.name == 'Brettanomyces (Dekkera) screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="B1">Brettanomyces (Dekkera) screening</td>
+					<td class="B1">(2402-20)</td>
+				</tr>
+
+				<tr>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit.name='S. diastaticus detection'" ng-class="{ 'selected': kit.name == 'S. diastaticus detection'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="B1">S. diastaticus detection</td>
+					<td class="B1">(2402-49)</td>
+				</tr>
+
+				<tr>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit.name='Superattenuator yeasts screening'" ng-class="{ 'selected': kit.name == 'Superattenuator yeasts screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="B1">Superattenuator yeasts screening</td>
+					<td class="B1">(2402-58)</td>
+				</tr>
+			</table>
+
+			<table class="two-kit-table testkit-table" ng-show="selectedKit==2">
+				<tr>
+					<td class="radio-cell B1">T1</td>
+					<td class="radio-cell B1">T2</td>
+					<td class="B1B">Bacteria 4e Kits</td>
+					<td></td>
+				</tr>
+
+				<tr>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit1.name='Acetics screening'" ng-class="{ 'selected': kit1.name == 'Acetics screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit2.name='Acetics screening'" ng-class="{ 'selected': kit2.name == 'Acetics screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="B1">Acetics screening</td>
+					<td class="B1">(2401-15)</td>
+				</tr>
+
+				<tr>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit1.name='Alicyclobacillus screening'" ng-class="{ 'selected': kit1.name == 'Alicyclobacillus screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit2.name='Alicyclobacillus screening'" ng-class="{ 'selected': kit2.name == 'Alicyclobacillus screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="B1">Alicyclobacillus screening</td>
+					<td class="B1">(2401-18)</td>
+				</tr>
+
+				<tr>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit1.name='Lactobacillaceae screening'" ng-class="{ 'selected': kit1.name == 'Lactobacillaceae screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit2.name='Lactobacillaceae screening'" ng-class="{ 'selected': kit2.name == 'Lactobacillaceae screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="B1">Lactobacillaceae screening</td>
+					<td class="B1">(2401-32)</td>
+				</tr>
+
+				<tr>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit1.name='L. acetotolerans detection'" ng-class="{ 'selected': kit1.name == 'L. acetotolerans detection'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit2.name='L. acetotolerans detection'" ng-class="{ 'selected': kit2.name == 'L. acetotolerans detection'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="B1">L. acetotolerans detection</td>
+					<td class="B1">(2401-52)</td>
+				</tr>
+
+				<tr>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit1.name='LP Real Beer Spoiler screening'" ng-class="{ 'selected': kit1.name == 'LP Real Beer Spoiler screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit2.name='LP Real Beer Spoiler screening'" ng-class="{ 'selected': kit2.name == 'LP Real Beer Spoiler screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="B1">LP Real Beer Spoiler screening</td>
+					<td class="B1">(2401-38)</td>
+				</tr>
+
+				<tr>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit1.name='Megasphaera screening'" ng-class="{ 'selected': kit1.name == 'Megasphaera screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit2.name='Megasphaera screening'" ng-class="{ 'selected': kit2.name == 'Megasphaera screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="B1">Megasphaera screening</td>
+					<td class="B1">(2401-41)</td>
+				</tr>
+
+				<tr>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit1.name='Pectinatus screening'" ng-class="{ 'selected': kit1.name == 'Pectinatus screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit2.name='Pectinatus screening'" ng-class="{ 'selected': kit2.name == 'Pectinatus screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="B1">Pectinatus screening</td>
+					<td class="B1">(2401-44)</td>
+				</tr>
+
+				<tr>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit1.name='Single spoiler detection'" ng-class="{ 'selected': kit1.name == 'Single spoiler detection'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit2.name='Single spoiler detection'" ng-class="{ 'selected': kit2.name == 'Single spoiler detection'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="B1">Single spoiler detection</td>
+					<td class="B1">(2401-NN)</td>
+				</tr>
+
+				<tr><td>&nbsp;</td></tr>
+
+				<tr>
+					<td class="radio-cell B1">T1</td>
+					<td class="radio-cell B1">T2</td>
+					<td class="B1B">Yeast 4e Kits</td>
+					<td></td>
+				</tr>
+
+				<tr>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit1.name='Brettanomyces (Dekkera) screening'" ng-class="{ 'selected': kit1.name == 'Brettanomyces (Dekkera) screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit2.name='Brettanomyces (Dekkera) screening'" ng-class="{ 'selected': kit2.name == 'Brettanomyces (Dekkera) screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="B1">Brettanomyces (Dekkera) screening</td>
+					<td class="B1">(2402-20)</td>
+				</tr>
+
+				<tr>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit1.name='S. diastaticus detection'" ng-class="{ 'selected': kit1.name == 'S. diastaticus detection'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit2.name='S. diastaticus detection'" ng-class="{ 'selected': kit2.name == 'S. diastaticus detection'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="B1">S. diastaticus detection</td>
+					<td class="B1">(2402-49)</td>
+				</tr>
+
+				<tr>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit1.name='Superattenuator yeasts screening'" ng-class="{ 'selected': kit1.name == 'Superattenuator yeasts screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="text-center">
+						<div class="checkbox-wrapper B1B" ng-click="kit2.name='Superattenuator yeasts screening'" ng-class="{ 'selected': kit2.name == 'Superattenuator yeasts screening'}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+					</td>
+					<td class="B1">Superattenuator yeasts screening</td>
+					<td class="B1">(2402-58)</td>
+				</tr>
+			</table>
 		</div>
 	</div>
+	<div class="dialog-footer">
+		<a ng-show="!creating" href="" ng-click="create()" class="button-continue B1B">Continue</a>
+		<a href="" ng-show="creating" class="button-creating  B1B">Creating Experiment<ellipsis-animated/></a>
+		<p ng-show="error" class="SHR error">{{error}}</p>		
+	</div>
+</div>

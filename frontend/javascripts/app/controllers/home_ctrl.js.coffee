@@ -78,7 +78,7 @@ window.ChaiBioTech.ngApp
       modalInstance = $uibModal.open
         templateUrl: 'app/views/experiment/create-testkit-experiment.html'
         controller: 'CreateTestKitCtrl'
-        openedClass: 'modal-open-testkit'
+        openedClass: 'modal-new-testkit'
         backdrop: false
 
     @newExperiment = ->

@@ -3,7 +3,7 @@
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 sidebar" ng-show="showSidebar">
       <h6>Experiment: <span class="edit" ng-click="focusExpName()" ng-show="!editExpName">Edit</span> </h6>
       <h4>
-				<span ng-show="!editExpName">A.{{experiment.name}}</span>
+				<span ng-show="!editExpName">{{experiment.name}}</span>
 				<input type="text" placeholder="Enter Experiment Name Here" ng-show="editExpName" class="exp-name H1" required ng-model="experiment.name"  ng-blur="updateExperimentName()"
 				my-enter="updateExperimentName()" focus-on="editExpName">
 			</h4>
