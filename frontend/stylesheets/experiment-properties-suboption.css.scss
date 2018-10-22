@@ -45,6 +45,7 @@
       padding: 0;
       width: 100%;
       line-height: 30px;
+      border-bottom: 1px solid #aaa;
 
       &:focus {
         outline: 0;
@@ -107,7 +108,36 @@
       }
     }
   }
+}
 
+.experiment-note-option{
+  textarea{
+    width: 100%;
+    min-height: 150px;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    padding: 10px;
+    line-height: 20px;
 
+    &:focus{
+      outline: none;
+    }
+  }
 
+  p{    
+    white-space: pre-line;
+  }
+
+  .message-container {
+    height: 25px;
+    width: 100%;
+
+    .help-block {
+      display: block;
+      margin-top: 0px;
+      .text-success {
+        color: #07CE0A;
+      }
+    }
+  } 
 }

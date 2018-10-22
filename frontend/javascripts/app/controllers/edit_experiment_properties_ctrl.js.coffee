@@ -85,9 +85,14 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
         $scope.editLidTempMode = true
         focus('editLidTempMode')
 
+    $scope.focusNote = ->
+        $scope.editNoteMode = true
+        focus('editNoteMode')
+
     $scope.editModeOff = ->
       $scope.editExpNameMode = false
       $scope.editLidTempMode = false
+      $scope.editNoteMode = false
 
     $scope.saveExperiment = (exp)->
       return if $scope.expForm.$invalid
@@ -106,6 +111,23 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
 
       promise.finally ->
         $scope.editModeOff()
+
+    $scope.updateNote = () ->
+      promise = Experiment.update({id: $scope.experiment.id}, experiment: $scope.experiment).$promise
+
+      promise.then ->
+        $scope.successNote = "Experiment notes updated."
+        $timeout (() ->
+          $scope.successNote = null
+          ), 2000
+
+      promise.catch (resp) ->
+        $scope.errors = resp.data.errors
+        $scope.experiment = angular.copy $scope.experimentOrig
+
+      promise.finally ->
+        $scope.editModeOff()
+
 
     $scope.updateProtocol = (data, expForm) ->
       if expForm.lidTemp.$invalid

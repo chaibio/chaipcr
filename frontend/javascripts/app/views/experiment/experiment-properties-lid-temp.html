@@ -59,3 +59,19 @@
   </div>
 
 </div>
+<div class="experiment-note-option">
+  <label class="section-name B1M">Notes</label>
+  <p class="notes-text B1" ng-click="focusNote()" ng-show="!editNoteMode">{{experiment.notes}}</p>  
+  <textarea class="B1" ng-model="experiment.notes" ng-show="editNoteMode" ng-blur="updateNote()" focus-on="editNoteMode" rows="5"></textarea>
+  <div class="text-center message-container B2M">
+    <span  ng-show="successNote" class="help-block">
+      <span class="text-success">{{successNote}}</span>
+    </span>
+  </div>
+
+  <div ng-show="errors">
+    <span class="help-block B2M">
+      <span class="text-danger">{{errors}}</span>
+    </span>
+  </div>
+</div>
