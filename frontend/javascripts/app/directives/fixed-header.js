@@ -20,6 +20,9 @@ function fixedHeader($timeout, $window) {
         });
 
         $scope.$watch(tableScrollRender, function(isTableScrollRender) {            
+            if(isTableScrollRender){
+                transformTableOnResize();
+            }
         });
 
         angular.element($window).on('resize', onResizeWindow);
@@ -33,7 +36,7 @@ function fixedHeader($timeout, $window) {
             if(overflow_style != head_flow){
                 transformTableOnResize();
             }
-            return true;
+            return angular.element(elem).parent().height();
         }
 
 
