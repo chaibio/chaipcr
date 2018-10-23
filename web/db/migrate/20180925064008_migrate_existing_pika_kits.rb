@@ -1,6 +1,6 @@
 class MigrateExistingPikaKits < ActiveRecord::Migration
   def change
-    results = ActiveRecord::Base.connection.exec_query("select * from wells")
+    results = ActiveRecord::Base.connection.exec_query("select * from wells inner join experiments on experiments.id=wells.experiment_id inner join experiment_definitions on experiment_definitions.id=experiments.experiment_definition_id where experiment_definitions.guid='pika_4e_kit'")
     results.each do |row|
       well_layout = WellLayout.for_experiment(row['experiment_id']).first
       if well_layout
@@ -28,6 +28,21 @@ class MigrateExistingPikaKits < ActiveRecord::Migration
         target_well.save
       end
     end
+    
+    results = ActiveRecord::Base.connection.exec_query("select * from wells inner join experiments on experiments.id=wells.experiment_id inner join experiment_definitions on experiment_definitions.id=experiments.experiment_definition_id where experiment_definitions.guid is NULL or experiment_definitions.guid <> 'pika_4e_kit'")
+    results.each do |row|
+      well_layout = WellLayout.for_experiment(row['experiment_id']).first
+      if well_layout
+        if !row['sample_name'].blank?
+          sample = Sample.new(:name=>row['sample_name'])
+          sample.well_layout_id = well_layout.id
+          sample.save
+          sample_well = SamplesWell.find_or_create(sample, well_layout.id, row['well_num'], row['notes'])
+          sample_well.save
+        end
+      end
+    end
+    
     #drop_table :wells
   end
   
