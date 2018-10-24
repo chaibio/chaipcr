@@ -21,6 +21,13 @@ class MainController < ApplicationController
 
   before_filter :ensure_authenticated_user, :only => :index
 
+  def options
+    #if access_allowed?
+      allow_cors
+      head :ok
+    #end
+  end
+  
   swagger_path '/' do
     operation :get do
       key :summary, 'Home Page'

@@ -66,9 +66,8 @@ Qpcrctl::Application.routes.draw do
   post '/login', :to => 'sessions#create'
   post '/logout', :to => 'sessions#destroy'
 
-  match '/device', to: 'devices#empty', via: [:options]
-  match '/device/*path', to: 'devices#empty', via: [:options]
   get 'capabilities', to: "devices#capabilities"
+
   resource :device, only: [:show, :update] do
     get 'serial_start'
     get 'software_update'
@@ -132,4 +131,7 @@ Qpcrctl::Application.routes.draw do
   resources :apidocs, only: [:index]
   
   get ':controller(/:action(/:id))'
+  
+  match '/*path', :controller => 'main', :action => 'options', :via => [:options]
+  
 end

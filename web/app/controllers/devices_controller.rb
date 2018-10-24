@@ -36,10 +36,6 @@ class DevicesController < ApplicationController
     formats ['json']
   }
 
-  def empty
-     render :nothing => true
-  end
-
   swagger_path '/device' do
     operation :get do
       key :summary, 'Device information. Authentication Token is not required.'
