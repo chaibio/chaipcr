@@ -16,25 +16,25 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<div class="side-menu-exp-name H1">
-  <div class="side-top-header">    
+<div class="side-menu-exp-name XH2B">
+  <div class="side-top-header XB1">    
     <label>Experiment Name</label>  
     <span class="edit-experiment-name" ng-click="focusExpName()" ng-show="!editExpNameMode">Edit</span>
   </div>
   <form name="expForm">
     <div class="exp-name-container">
-      <p class="exp-name H1" ng-show="!editExpNameMode">{{experiment.name}}</p>
-      <textarea class="exp-name H1" required ng-model="experiment.name" ng-show="editExpNameMode" ng-blur="saveExperiment()"
+      <p class="exp-name XH2B" ng-show="!editExpNameMode">{{experiment.name}}</p>
+      <textarea class="exp-name XH2B" required ng-model="experiment.name" ng-show="editExpNameMode" ng-blur="saveExperiment()"
         focus-on="editExpNameMode" id="exp_name_field" rows="3"></textarea>
     </div>
 
     <div class="text-center message-container">
-      <span  ng-show="successName" class="help-block B1">
+      <span  ng-show="successName" class="help-block XB1">
         <span class="text-success">{{successName}}</span>
       </span>
     </div>
     <div ng-show="errors">
-      <span class="help-block B1">
+      <span class="help-block XB1">
         <span class="text-danger">{{errors}}</span>
       </span>
     </div>

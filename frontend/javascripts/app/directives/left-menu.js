@@ -32,6 +32,7 @@ window.ChaiBioTech.ngApp.directive('leftMenu', [
       link: function($scope, elem) {
 
         $scope.confirmStatus = false;
+        $scope.isConfirmDelete = false;        
 
         $scope.$on("runReady:true", function() {
           $scope.confirmStatus = true;
@@ -41,6 +42,10 @@ window.ChaiBioTech.ngApp.directive('leftMenu', [
           if($scope.confirmStatus === true && e.target.innerHTML !== "Run Experiment") {
             $rootScope.$broadcast("runReady:false");
             $scope.confirmStatus = false;
+          }
+
+          if($scope.isConfirmDelete === true && e.target.innerHTML !== "Delete") {
+            $scope.isConfirmDelete = false;
           }
         });
       }

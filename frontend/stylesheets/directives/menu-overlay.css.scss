@@ -1,6 +1,6 @@
 @import "./colors.css.scss";
 
-$sidemenu_width: 352px;
+$sidemenu_width: 360px;
 .menu-overlay-layout {
   width: 100%;
   -webkit-transition: margin 0.3s; /* Safari */
@@ -8,7 +8,7 @@ $sidemenu_width: 352px;
 
   .side-menu-header-container {
     width: 100%;
-    height: 50px;
+    height: 60px;
     background-color: #333;
 
     .common {
@@ -21,11 +21,11 @@ $sidemenu_width: 352px;
       height: 100%;
       float: left;
       padding-left: 20px;
-      padding-top: 10px;
+      padding-top: 15px;
       cursor: pointer;
       img{
         width: 30px;
-        margin-right: 10px;
+        margin-right: 15px;
       }
     }
     .close-container {
@@ -33,8 +33,9 @@ $sidemenu_width: 352px;
       width: 20%;
       height: 100%;
       float: right;
-      padding-top: 13px;
-      text-align: center;
+      padding-top: 17px;
+      text-align: right;
+      padding-right: 20px;
 
       .close-side-menu {
         cursor: pointer;
@@ -54,8 +55,8 @@ $sidemenu_width: 352px;
   .side-menu-content-container {
     width: 100%;
     height: 718px;
-    padding-left: 35px;
-    padding-right: 35px;
+    padding-left: 40px;
+    padding-right: 40px;
 
     .analyze-menu, .property-menu{
       .side-menu-menu-item{
@@ -89,16 +90,13 @@ $sidemenu_width: 352px;
 
     .side-menu-name-container {
       height: auto;
-      border-bottom: 2px black solid;
       .side-menu-exp-name {
         //font-size: 30px;
 
         .side-top-header{
           width: 100%;
-          font-size: 13px;
-          padding-top: 15px;
-          font-family: 'dinot-medium';
-          font-weight: 300;
+          padding-top: 20px;
+          padding-bottom: 10px;
           label{
             color: #333;
             font-weight: 300;
@@ -111,20 +109,16 @@ $sidemenu_width: 352px;
         }
         .exp-name-container {
           p {
-            font-size: 24px;
             cursor: auto;
-            line-height: 28px;
             white-space: pre-line;
           }
           textarea {
-            font-size: 24px;
             background: transparent;
             margin-top: 0px;
             padding: 0px;
             width: 100%;
             border: none;
             outline: none;
-            line-height: 28px;
           }
         }
         .message-container {
@@ -138,12 +132,35 @@ $sidemenu_width: 352px;
       }
       .side-menu-exp-status {
         color: #999;
-        padding-bottom: 5px;        
+        padding: 5px 0;
+        &.run-on-status{
+          color: #333;
+        }
+
+        .side-menu-exp-status-text{
+          background: #fff;
+          color: #333;
+          float: right;
+          margin: 0;
+          font-weight: 300;
+          padding: 5px 10px;
+          border-radius: 3px;
+          position: relative;
+          top: -5px;
+          &.success{
+            padding: 5px 0;
+          }
+          &.failed{
+            background: #df1924;
+            color: #fff;
+          }
+        }
       }
     }
 
     .side-menu-menu-container {
       padding-top: 20px;
+      padding-bottom: 20px;
       &.top-border{
         border-top: 1px solid #aaa;
       }      
@@ -165,38 +182,54 @@ $sidemenu_width: 352px;
       }
 
       label.section-name{
-        font-size: 13px;
-        font-family: 'dinot-medium';
         font-weight: 300;        
         color: #333;
       }
 
       &.run-exp {        
-        height: 70px;
+        height: auto;
         .side-menu-menu-item{
           position: relative;
-          height: 70px;
+          height: auto;
           div{
-            padding-top: 10px;
+            padding-top: 20px;
+            padding-bottom: 0px;
             position: relative;
             overflow: hidden;
 
             label.exp-message{
-              font-size: 16px;
               width: 100%;
               text-align: center;
-              padding: 13px 0;
+              padding: 17px 0;
               background: #df1924;
+              border: 1px solid #df1924;
               color: #fff;
               border-radius: 3px;
               margin: 0;
               cursor: pointer;
               position: relative;
               left: 0;
-              -webkit-transition: left .2s; /* Safari */
-              transition: left .2s;                
+
+              &.lid-open{
+                background: #fff;
+                border: 1px solid #aaa;
+                color: #aaa;
+              }
               &.ready-action{
-                left: -70px;
+                display: none;
+              }
+
+              &.confirm-exp{
+                background: #333;
+                color: #fff;
+                border: 1px solid #333;
+                img{
+                  width: 15px;
+                  margin-right: 5px;
+                  vertical-align: middle;
+                  position: relative;
+                  top: -1px;                  
+                }
               }
 
               &.started-experiment{
@@ -231,6 +264,9 @@ $sidemenu_width: 352px;
         }
         .lid-open-message {
           color: #999;
+          margin: 0;
+          padding-top: 10px;
+          font-weight: 300;
         }
       }
       @keyframes my_hide {
@@ -284,24 +320,31 @@ $sidemenu_width: 352px;
     }
     .side-menu-button-container {
       width: 100%;
-      height: 48px;
+      height: auto;
+      padding-top: 20px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #000;
       //background-color: green;
-      margin-top: 12px;
       .second-button {
         margin-left: -5px;
       }
       .side-menu-button {
-        width: 131px;
-        height: 32px;
+        width: calc(50% - 5px);
+        height: 40px;
         background-color: white;
         border: 1px solid black;
         outline: none;
-        font-size: 14px;
         border-radius: 3px;
         &:hover{
           background: #df1924;
           color: #fff;
           border-color: #df1924;
+        }
+
+        &.confirm-delete{
+          background: #df1924;
+          color: #fff;
+          border-color: #df1924;          
         }
       }
 
@@ -322,13 +365,13 @@ $sidemenu_width: 352px;
   }
 
   .side-sub-menu-content-container{
-    width: 352px;
+    width: 360px;
     height: 100%;
     padding-left: 25px;
     padding-right: 25px;
     position: fixed;
-    top: 50px;
-    left: 352px;
+    top: 60px;
+    left: 360px;
     background: #fff;
     z-index: 999;
     border-left: 1px solid #aaa;
@@ -395,7 +438,9 @@ $sidemenu_width: 352px;
   .sidemenu {
     background-color: white;
     float: left;
-    min-height: 768px;
+    // min-height: 768px;
+    height: auto;
+
     position: relative;
     width: $sidemenu_width;
     overflow: hidden;
@@ -412,6 +457,7 @@ $sidemenu_width: 352px;
     #sidemenu-content {
       height: 100vh;
       width: $sidemenu_width;
+      overflow-y: auto;
     }
 
     .menu-overlay-menu {
