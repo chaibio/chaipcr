@@ -243,7 +243,7 @@
       };
 
       $scope.resumeExperiment = function() {
-        Experiment.resumeExperiment().then(function() {
+        Experiment.resumeExperiment($scope.experiment_id).then(function() {
           $scope.next();
         });
       };

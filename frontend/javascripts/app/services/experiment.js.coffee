@@ -213,13 +213,13 @@ window.ChaiBioTech.ngApp
       $http.post "/experiments/#{expId}/copy", data
 
     self.startExperiment = (expId) ->
-      $http.post "#{host}:8000/control/start", {experiment_id: expId}
+      $http.post "/experiments/#{expId}/start"
 
-    self.stopExperiment = ->
-      $http.post "#{host}:8000/control/stop"
+    self.stopExperiment = (expId) ->
+      $http.post "/experiments/#{expId}/stop"
 
-    self.resumeExperiment = ->
-      $http.post "#{host}:8000/control/resume"
+    self.resumeExperiment = (expId) ->
+      $http.post "/experiments/#{expId}/resume"
 
     self.getExperimentDuration = (exp) ->
       start = new Date(exp.started_at)

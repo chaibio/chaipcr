@@ -69,15 +69,15 @@ angular.module('dynexp.libs')
       return $http.post("/experiments/" + expId + "/copy", data);
     };
     self.startExperiment = function(expId) {
-      return $http.post(host + ":8000/control/start", {
+      return $http.post("/experiments/"+ expId +"/start", {
         experiment_id: expId
       });
     };
-    self.resumeExperiment = function() {
-      return $http.post(host + ":8000/control/resume");
+    self.resumeExperiment = function(expId) {
+      return $http.post("/experiments/"+ expId +"/resume");
     };
-    self.stopExperiment = function() {
-      return $http.post(host + ":8000/control/stop");
+    self.stopExperiment = function(expId) {
+      return $http.post("/experiments/"+ expId +"/stop");
     };
     self.analyze = function(id) {
       return $http.get("/experiments/" + id + "/analyze");
