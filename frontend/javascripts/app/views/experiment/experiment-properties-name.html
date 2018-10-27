@@ -20,12 +20,14 @@
   <div class="side-top-header XB1">    
     <label>Experiment Name</label>  
     <span class="edit-experiment-name" ng-click="focusExpName()" ng-show="!editExpNameMode">Edit</span>
+    <b><span class="edit-experiment-name" ng-click="saveExperiment(experiment)" ng-show="editExpNameMode">Save</span></b>
+    <span class="edit-experiment-name" ng-click="cancelExpName()" ng-show="editExpNameMode" style="margin-right: 10px;">Cancel</span>
   </div>
   <form name="expForm">
     <div class="exp-name-container">
       <p class="exp-name XH2B" ng-show="!editExpNameMode">{{experiment.name}}</p>
-      <textarea class="exp-name XH2B" required ng-model="experiment.name" ng-show="editExpNameMode" ng-blur="saveExperiment()"
-        focus-on="editExpNameMode" id="exp_name_field" rows="3"></textarea>
+      <textarea class="exp-name XH2B" required ng-model="experiment.name" ng-show="editExpNameMode"
+        focus-on="editExpNameMode" id="exp_name_field" rows="3" ng-change="adjustTextHeight()"></textarea>
     </div>
 
 <!--     <div class="text-center message-container">

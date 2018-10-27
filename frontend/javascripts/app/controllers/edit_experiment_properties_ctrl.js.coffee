@@ -37,10 +37,11 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
       $scope.experimentOrig = angular.copy $scope.experiment
 
     $scope.editExpNameMode = false
+    $scope.ori_experiment_name = ''
 
     getData = ->
       Experiment.get(id: $stateParams.id).then (data) ->
-        $scope.experiment = data.experiment
+        $scope.experiment = data.experiment        
         $scope.experimentOrig = angular.copy data.experiment
         if !data.experiment.started_at and !data.experiment.completed_at
           $scope.status = 'NOT_STARTED'
@@ -67,13 +68,24 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
     $scope.typeSelected = (type) ->
       $scope.selectedType = type
 
+    $scope.adjustTextHeight = () ->
+      lines = $scope.experiment.name.split('\n').length
+      angular.element(document.getElementById('exp_name_field')).css('height', (lines + 1) * 30 + 'px')     
+
     $scope.focusExpName = ->
 
       #if $scope.status == "NOT_STARTED"
+      $scope.ori_experiment_name = $scope.experiment.name
       $scope.removeMessages()
       $scope.editExpNameMode = true
       focus('editExpNameMode')
+      lines = $scope.experiment.name.split('\n').length
+      angular.element(document.getElementById('exp_name_field')).css('height', (lines + 1) * 30 + 'px')
       document.getElementById('exp_name_field').select()
+
+    $scope.cancelExpName = ->      
+      $scope.editModeOff()
+      $scope.experiment.name = $scope.ori_experiment_name
 
     $scope.focusLidTemp = ->
       if $scope.status == "NOT_STARTED"
@@ -100,6 +112,7 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
 
       promise.then ->
         $scope.successName = "Experiment name updated."
+        $scope.ori_experiment_name = $scope.experiment.name
         expName.updateName($scope.experiment.name)
         $timeout (() ->
           $scope.successName = null
@@ -108,6 +121,7 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
       promise.catch (resp) ->
         $scope.errors = resp.data.errors
         $scope.experiment = angular.copy $scope.experimentOrig
+        $scope.experiment.name = $scope.ori_experiment_name
 
       promise.finally ->
         $scope.editModeOff()

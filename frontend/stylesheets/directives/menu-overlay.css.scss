@@ -115,12 +115,13 @@ $sidemenu_width: 360px;
             white-space: pre-line;
           }
           textarea {
-            background: transparent;
+            background: url(/images/bottom_pixel.png);
             margin-top: 0px;
             padding: 0px;
             width: 100%;
             border: none;
             outline: none;
+            resize: none;
           }
         }
         .message-container {

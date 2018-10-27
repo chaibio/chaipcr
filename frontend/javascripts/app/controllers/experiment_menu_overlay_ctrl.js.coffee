@@ -35,6 +35,7 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
     $scope.exp = null
     $scope.errorExport = false
     $scope.exporting = false
+    $scope.isIdle = false
 
     $scope.deleteExperiment = ->
       #exp = new Experiment id: $stateParams.id
@@ -94,7 +95,7 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
 
     $scope.$on 'cycle:number:updated', (e, num) ->
       $scope.maxCycle = num
-
+    
     $scope.getExperiment = ->
       Experiment.get(id: $stateParams.id).then (data) ->
         $scope.exp = data.experiment
@@ -132,5 +133,7 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
       state = data?.experiment_controller?.machine?.state
       oldState = oldData?.experiment_controller?.machine?.state
       $scope.getExperiment() if state isnt oldState
-
+      return if !data
+      return if !data.experiment_controller
+      $scope.isIdle = if data.experiment_controller.machine.state == 'idle' then true else false
 ])

@@ -32,6 +32,7 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
       scope: {
         state: '@stateVal',
         lidOpen: '=lidOpen',
+        isIdle: '=isIdle',
         maxCycle: '=maxCycle',
         showProp: '=showProp',
         experiment: "=exp"
@@ -41,6 +42,7 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
       link: function(scope, elem) {
 
         scope.runReady = false;
+        scope.isIdle = false;
         scope.expID = $stateParams.id;
 
        scope.$watch('lidOpen', function(val) {
@@ -48,6 +50,12 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
       			if(val === true){
       				scope.runReady = false;
       			}
+          }
+        });
+
+       scope.$watch('isIdle', function(val) {
+          if(val !== null) {
+            scope.isIdle = val;
           }
         });
 
@@ -80,14 +88,14 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
 
 
         scope.manageAction = function() {
-          if(scope.state === "NOT_STARTED" && scope.lidOpen === false) {
+          if(scope.state === "NOT_STARTED" && scope.lidOpen === false && scope.isIdle === true) {
             scope.runReady = !scope.runReady;
             if(scope.runReady === true) {
               $rootScope.$broadcast("runReady:true");
 			       }
             return;
           }
-          if(scope.state === "NOT_STARTED" && scope.lidOpen === true) {
+          if(scope.state === "NOT_STARTED" && (scope.lidOpen === true || scope.isIdle === false)) {
             return;
           }
           $state.go('run-experiment', {id: $stateParams.id, chart: 'amplification', max_cycle: scope.maxCycle});
