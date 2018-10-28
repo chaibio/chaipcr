@@ -512,6 +512,16 @@ else
         error_exit "mounting $rootfs_partition failed."
 fi
 
+config_filename=
+if ! $fat_boot
+then
+	echo copying configuration.json
+	cp /tmp/emmc/root/configuration.json .
+	config_filename=configuration.json
+else
+	echo Four partitions image
+fi
+
 echo "Zeroing rootfs partition"
 dd if=/dev/zero of=/tmp/emmc/big_zero_file1.bin bs=16777216 > /dev/null 2>&1
 result=$?
@@ -700,7 +710,7 @@ else
 fi
 
 #tarring
-if tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_data $image_filename_rootfs  $image_filename_perm $checksums_filename
+if tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_data $image_filename_rootfs $image_filename_perm $checksums_filename $config_filename
 then
 	echo $image_filename_upgrade_temp generatted.
 else
@@ -740,7 +750,7 @@ fi
 echo "packaging factory scripts in upgrade image."
 cp -r ${output_dir}/p1/* $temp/$factory_scripts
 
-if tar cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs $image_filename_perm $image_filename_format_data $checksums_filename $upgrade_scripts $factory_scripts --exclude=factory_settings.img.tar
+if tar cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs $image_filename_perm $image_filename_format_data $checksums_filename $upgrade_scripts $config_filename $factory_scripts --exclude=factory_settings.img.tar
 then
 	echo $image_filename_upgrade_temp generatted.
 else
