@@ -70,6 +70,8 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
 
     $scope.adjustTextHeight = () ->
       $timeout (() ->
+        field_width = document.getElementById('exp_name_field').offsetWidth
+        angular.element(document.getElementById('exp_name_plat')).css('width', field_width + 'px')
         plat_height = document.getElementById('exp_name_plat').offsetHeight
         angular.element(document.getElementById('exp_name_field')).css('height', (plat_height + 30) + 'px')
         ), 10      
@@ -104,6 +106,7 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
         focus('editNoteMode')
 
     $scope.editModeOff = ->
+      angular.element(document.getElementById('exp_name_plat')).css('width', '100%')
       $scope.editExpNameMode = false
       $scope.editLidTempMode = false
       $scope.editNoteMode = false
