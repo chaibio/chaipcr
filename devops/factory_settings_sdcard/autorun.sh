@@ -43,6 +43,12 @@ then
 		log_file=/tmp/upgrade/booting.log
 	else
        		echo "3 or 4 partitions eMMC not found!"
+
+		eMMC=/dev/mmcblk1
+		sdcard_dev=/dev/mmcblk0
+		mount ${sdcard_dev}p2 /tmp/upgrade
+		log_file=/tmp/upgrade/booting.log
+
 	fi
 
 	echo "Logging boot to: $log_file.. timestamp: $NOW"

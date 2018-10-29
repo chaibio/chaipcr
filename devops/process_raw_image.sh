@@ -512,12 +512,14 @@ else
         error_exit "mounting $rootfs_partition failed."
 fi
 
-config_filename=
+config_filenames=
 if ! $fat_boot
 then
 	echo copying configuration.json
 	cp /tmp/emmc/root/configuration.json .
-	config_filename=configuration.json
+	ls /tmp/emmc/boot/vmlinuz-3.8.13-* >kernel_version.txt
+	cat /tmp/emmc/etc/os-release >>kernel_version.txt
+	config_filenames="configuration.json kernel_version.txt"
 else
 	echo Four partitions image
 fi
@@ -710,7 +712,7 @@ else
 fi
 
 #tarring
-if tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_data $image_filename_rootfs $image_filename_perm $checksums_filename $config_filename
+if tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_data $image_filename_rootfs $image_filename_perm $checksums_filename $config_filenames
 then
 	echo $image_filename_upgrade_temp generatted.
 else
@@ -750,7 +752,7 @@ fi
 echo "packaging factory scripts in upgrade image."
 cp -r ${output_dir}/p1/* $temp/$factory_scripts
 
-if tar cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs $image_filename_perm $image_filename_format_data $checksums_filename $upgrade_scripts $config_filename $factory_scripts --exclude=factory_settings.img.tar
+if tar cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs $image_filename_perm $image_filename_format_data $checksums_filename $upgrade_scripts $config_filenames $factory_scripts --exclude=factory_settings.img.tar
 then
 	echo $image_filename_upgrade_temp generatted.
 else

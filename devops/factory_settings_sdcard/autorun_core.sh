@@ -86,16 +86,6 @@ if [ -e ${version_file} ]
 then
 	factory_settings_script_version=$(cat ${version_file})
 fi
-if [ $factory_settings_script_version -ge 120 ]
-then
-	echo three partitions image on SDCard
-	three_partitions_image=true
-	if ! $three_partitions_emmc
-	then
-		echo four partitions image on eMMC.. migration needed.
-		migration_needed=true
-	fi
-fi
 
 mount_sdcard_partitions () {
 	if [ ! -e ${sdcard_p1} ]
@@ -147,6 +137,7 @@ remove_upgrade_flags ()
 counter=2
 echo 1000 > /proc/sys/kernel/hung_task_timeout_secs
 mount_sdcard_partitions
+
 cat /proc/cmdline | grep s2pressed=1 > /dev/null
 s2pressed=$?
 if [ $s2pressed -eq 0 ]
@@ -289,7 +280,7 @@ repartition_drive () {
 	flush_cache
 	flush_cache_mounted
 
-	if [ $factory_settings_script_version -ge 120 ]
+	if $three_partitions_image
 	then
 		echo Partitioned to 3 partitions eMMC
 		set3PartitionsEMMC
@@ -838,6 +829,33 @@ isValidDataPartition () {
 
 	return $result
 }
+
+if isUpgrade
+then
+	image_information=$(tar -xf /tmp/upgrade/upgrade.img.tar configuration.json --to-stdout)
+else
+	image_information=$(tar -xf ${sdcard_p1}/factory_settings.img.tar configuration.json --to-stdout)
+fi
+
+echo image information: $image_information
+
+if [ $factory_settings_script_version -ge 120 ] && ! [ -z $image_information ]
+then
+	echo three partitions image on SDCard
+	three_partitions_image=true
+	if ! $three_partitions_emmc
+	then
+		echo four partitions image on eMMC.. migration needed.
+		migration_needed=true
+	fi
+else
+	echo four partitions image on sdcard
+	if $three_partitions_emmc
+	then
+		echo Three partitions image on eMMC.. migration needed.
+		migration_needed=true
+	fi
+fi
 
 isValidPermPartition
 isValidPermResult=$?
