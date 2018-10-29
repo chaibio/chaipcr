@@ -517,7 +517,7 @@ if ! $fat_boot
 then
 	echo copying configuration.json
 	cp /tmp/emmc/root/configuration.json .
-	ls /tmp/emmc/boot/vmlinuz-3.8.13-* >kernel_version.txt
+	ls /tmp/emmc/boot/vmlinuz-* >kernel_version.txt
 	cat /tmp/emmc/etc/os-release >>kernel_version.txt
 	config_filenames="configuration.json kernel_version.txt"
 else
