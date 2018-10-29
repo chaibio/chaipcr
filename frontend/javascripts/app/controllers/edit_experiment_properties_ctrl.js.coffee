@@ -69,18 +69,20 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
       $scope.selectedType = type
 
     $scope.adjustTextHeight = () ->
-      lines = $scope.experiment.name.split('\n').length
-      angular.element(document.getElementById('exp_name_field')).css('height', (lines + 1) * 30 + 'px')     
-
+      $timeout (() ->
+        plat_height = document.getElementById('exp_name_plat').offsetHeight
+        angular.element(document.getElementById('exp_name_field')).css('height', (plat_height + 30) + 'px')
+        ), 10      
     $scope.focusExpName = ->
 
       #if $scope.status == "NOT_STARTED"
+      plat_height = document.getElementById('exp_name_plat').offsetHeight
+      angular.element(document.getElementById('exp_name_field')).css('height', (plat_height + 30) + 'px')
+      
       $scope.ori_experiment_name = $scope.experiment.name
       $scope.removeMessages()
       $scope.editExpNameMode = true
       focus('editExpNameMode')
-      lines = $scope.experiment.name.split('\n').length
-      angular.element(document.getElementById('exp_name_field')).css('height', (lines + 1) * 30 + 'px')
       document.getElementById('exp_name_field').select()
 
     $scope.cancelExpName = ->      

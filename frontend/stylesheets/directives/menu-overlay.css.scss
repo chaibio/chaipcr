@@ -113,6 +113,13 @@ $sidemenu_width: 360px;
           p {
             cursor: auto;
             white-space: pre-line;
+            word-break: break-word;
+
+            &.hide-elem{
+              position: absolute;
+              left: 400px;
+              width: 280px;
+            }
           }
           textarea {
             background: url(/images/bottom_pixel.png);
