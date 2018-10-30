@@ -19,7 +19,7 @@
 <div class="XB1 text-center" ng-if="message == 'Run Experiment'">
   <label class="exp-message" ng-if="message == 'Run Experiment'" ng-class="{'lid-open': (lidOpen || !isIdle) && message == 'Run Experiment', 'ready-action' : runReady}" ng-click="manageAction()">{{message}}</label>
 <!--   <label class="exp-message started-experiment" ng-if="message != 'Run Experiment'" ng-click="manageAction()" toggle-sidemenu>{{message}}</label> -->
-  <label class="XB1 lid-open-message" ng-if="lidOpen && message == 'Run Experiment'">Cannot run, hardware lid is open</label>
+  <label class="XB1 lid-open-message" ng-if="lidOpen && message == 'Run Experiment'">Cannot run, lid is open</label>
   <label class="XB1 lid-open-message" ng-if="!lidOpen && !isIdle && message == 'Run Experiment'">Cannot run, another experiment is running.</label>
   <label class="exp-message confirm-exp" ng-show="runReady" ng-class="{'ng-hide': !runReady }" toggle-sidemenu class="B1 success"  ng-click="startExp()">
     <img src="images/conf_check.svg">Confirm Run Experiment
