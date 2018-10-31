@@ -226,7 +226,7 @@ ENDSSH
 		echo now at $(pwd)
 		branch_param=
 
-		if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+	    if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; -eq &quot;trunk&quot; ]
 		then
    			echo No build branch chosen
 		else
@@ -238,7 +238,7 @@ ENDSSH
 	 	mkdir tmp || true
         cd tmp
 		git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
-        
+        cd chaipcr || exit 1   
         if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
 		then
    			echo No build branch chosen
@@ -246,7 +246,7 @@ ENDSSH
      		git checkout $branch_param
 		fi
         
-        cd chaipcr || exit 1
+
         cd web
         echo now at $(pwd)
         
@@ -680,8 +680,7 @@ cd compile-browser/
 apt-get install -y git make linux-headers-`uname -r` build-essential cmake curl pkg-config python sshpass unzip
 
 branch_param=
-
-if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; -eq &quot;trunk&quot; ]
 then
    echo No build branch chosen
 else
@@ -690,8 +689,8 @@ else
 fi
 
 git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
-
-if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+cd chaipcr
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; -eq &quot;trunk&quot; ]
 then
        echo No build branch chosen
 else
@@ -740,7 +739,7 @@ cd /sdcard/factory/realtime-compile
 
 branch_param=
 
-if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; -eq &quot;trunk&quot; ]
 then
         echo No build branch chosen
 else
@@ -749,8 +748,8 @@ else
 fi
 
 git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
-
-if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+cd chaipcr
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; -eq &quot;trunk&quot; ]
 then
         echo No build branch chosen
 else

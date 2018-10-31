@@ -32,6 +32,17 @@
           <defaultValue>Stretch49Clean</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
+        <hudson.scm.listtagsparameter.ListSubversionTagsParameterDefinition plugin="subversion@2.9">
+          <name>build_branch</name>
+          <description>Select a Subversion entry</description>
+          <tagsDir>https://github.com/chaibio/chaipcr.git</tagsDir>
+          <credentialsId></credentialsId>
+          <tagsFilter></tagsFilter>
+          <reverseByDate>false</reverseByDate>
+          <reverseByName>false</reverseByName>
+          <defaultValue>trunk</defaultValue>
+          <maxTags></maxTags>
+        </hudson.scm.listtagsparameter.ListSubversionTagsParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -59,6 +70,14 @@
           <condition></condition>
           <configs>
             <hudson.plugins.parameterizedtrigger.CurrentBuildParameters plugin="parameterized-trigger@2.35.1"/>
+            <hudson.plugins.parameterizedtrigger.BooleanParameters plugin="parameterized-trigger@2.35.1">
+              <configs>
+                <hudson.plugins.parameterizedtrigger.BooleanParameterConfig>
+                  <name>check_badblocks</name>
+                  <value>false</value>
+                </hudson.plugins.parameterizedtrigger.BooleanParameterConfig>
+              </configs>
+            </hudson.plugins.parameterizedtrigger.BooleanParameters>
           </configs>
           <killPhaseOnJobResultCondition>FAILURE</killPhaseOnJobResultCondition>
           <buildOnlyIfSCMChanges>false</buildOnlyIfSCMChanges>
@@ -82,7 +101,16 @@
           <enableCondition>false</enableCondition>
           <abortAllJob>true</abortAllJob>
           <condition></condition>
-          <configs class="empty-list"/>
+          <configs>
+            <hudson.plugins.parameterizedtrigger.BooleanParameters plugin="parameterized-trigger@2.35.1">
+              <configs>
+                <hudson.plugins.parameterizedtrigger.BooleanParameterConfig>
+                  <name>is_dev</name>
+                  <value>false</value>
+                </hudson.plugins.parameterizedtrigger.BooleanParameterConfig>
+              </configs>
+            </hudson.plugins.parameterizedtrigger.BooleanParameters>
+          </configs>
           <killPhaseOnJobResultCondition>FAILURE</killPhaseOnJobResultCondition>
           <buildOnlyIfSCMChanges>false</buildOnlyIfSCMChanges>
           <applyConditionOnlyIfNoSCMChanges>false</applyConditionOnlyIfNoSCMChanges>
@@ -105,7 +133,16 @@
           <enableCondition>false</enableCondition>
           <abortAllJob>true</abortAllJob>
           <condition></condition>
-          <configs class="empty-list"/>
+          <configs>
+            <hudson.plugins.parameterizedtrigger.BooleanParameters plugin="parameterized-trigger@2.35.1">
+              <configs>
+                <hudson.plugins.parameterizedtrigger.BooleanParameterConfig>
+                  <name>no_factorysettings_sdcard</name>
+                  <value>true</value>
+                </hudson.plugins.parameterizedtrigger.BooleanParameterConfig>
+              </configs>
+            </hudson.plugins.parameterizedtrigger.BooleanParameters>
+          </configs>
           <killPhaseOnJobResultCondition>FAILURE</killPhaseOnJobResultCondition>
           <buildOnlyIfSCMChanges>false</buildOnlyIfSCMChanges>
           <applyConditionOnlyIfNoSCMChanges>false</applyConditionOnlyIfNoSCMChanges>

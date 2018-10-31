@@ -59,7 +59,7 @@ Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
         <hudson.model.StringParameterDefinition>
           <name>build_branch</name>
           <description>branch contains building scripts</description>
-          <defaultValue>branches/julia</defaultValue>
+          <defaultValue>trunk</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
@@ -181,8 +181,8 @@ echo now at $(pwd)
 rm build_report.xml
 branch_param=
 rm -r tmp || true
-echo build_branch is $build_branc
-if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
+echo build_branch is $build_branch
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; -eq &quot;trunk&quot; ]
 then
  	echo No build branch chosen
 else
