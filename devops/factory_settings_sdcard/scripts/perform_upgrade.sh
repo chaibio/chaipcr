@@ -233,6 +233,13 @@ then
 	fi
 fi
 
+echo upgrading the upgrade partition scripts
+cd /sdcard/upgrade/
+tar -xf upgrade.img.tar scripts
+sync
+sleep 3
+echo done extracting and updating upgrade scripts.
+
 set_sdcard_uEnv
 sync
 
