@@ -74,6 +74,12 @@ then
 		echo done extracting.  >> $log_file 2>&1
 	fi
 
+	echo upgrading the upgrade partition scripts
+	cd /tmp/upgrade/
+	tar -xf upgrade.img.tar scripts
+	sync
+	echo done extracting and updating upgrade scripts.
+
 	sh /mnt/autorun_core.sh  >> $log_file 2>&1
 	result=$?
 	echo "Boot with logging complete!"
