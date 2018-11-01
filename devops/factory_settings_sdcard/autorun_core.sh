@@ -380,7 +380,7 @@ update_uenv () {
         cp /sdcard/p1/uEnv.72check.txt /sdcard/p1/uEnv.txt || true                
 
 	# first param =2 in case of upgrade.. =1 for factory settings.                               
-        if $three_partitions
+        if $three_partitions_image
         then
 		echo Dealing with uEnv.txt on three partitions system.
 		if [ ! -e /tmp/rootfs ] 
