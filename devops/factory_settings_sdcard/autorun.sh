@@ -55,7 +55,7 @@ then
 	echo "==== New boot at: $NOW" >> $log_file
 	echo "==== Checking if factory settings scripts should be upgraded" >> $log_file
 
-	version_file=/mnt/fs_Version.inf
+	version_file=/mnt/fs_version.inf
 	version_current=0
 	if [ -e ${version_file} ]
 	then

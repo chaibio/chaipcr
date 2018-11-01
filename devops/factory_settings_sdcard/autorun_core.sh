@@ -81,7 +81,7 @@ fi
 
 migration_needed=false
 factory_settings_script_version=0
-version_file=/mnt/fs_Version.inf
+version_file=/mnt/fs_version.inf
 if [ -e ${version_file} ]
 then
 	factory_settings_script_version=$(cat ${version_file})
