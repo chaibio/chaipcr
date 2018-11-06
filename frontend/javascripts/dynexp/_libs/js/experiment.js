@@ -90,6 +90,23 @@ angular.module('dynexp.libs')
         well: well_data
       });
     };
+
+    self.getWellLayout = function(id) {
+      return $http.get("/experiments/" + id + "/well_layout");
+    };
+
+    self.createSample = function(expId, data) {
+      return $http.post("/experiments/" + expId + "/samples", data);
+    };
+
+    self.updateSample = function(expId, sampleId, data) {
+      return $http.put("/experiments/" + expId + "/samples/" + sampleId, data);
+    };
+
+    self.linkSample = function(expId, sampleId, data) {
+      return $http.post("/experiments/" + expId + "/samples/" + sampleId + "/links", data);
+    };
+
     self.updateExperimentName = function(id, name) {
       return $http.put("/experiments/" + id, {
         experiment: name

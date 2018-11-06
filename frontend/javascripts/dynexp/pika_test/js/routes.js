@@ -26,7 +26,7 @@
 				templateUrl: 'dynexp/pika_test/views/setWellsA.html'
 			})
 			.state('pika_test.setWellsB', {
-				url: '/setWellsB',
+				url: '/setWellsB/:id',
 				templateUrl: 'dynexp/pika_test/views/setWellsB.html'
 			})
 			.state('pika_test.review', {

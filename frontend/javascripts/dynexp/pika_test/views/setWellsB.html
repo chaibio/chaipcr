@@ -23,7 +23,7 @@
 		<tr ng-show="!twoKits" ng-repeat="x in samples_B track by $index">
 			<td>
 				<span>B{{$index+1}}.</span>
-				<input type="text" ng-class="{'empty-input':!x}" placeholder="Enter Name Here" class="exp-name H1" required ng-model="x"  ng-blur="updateWellB($index+9,x)"
+				<input type="text" ng-class="{'empty-input':!x.name}" placeholder="Enter Name Here" class="exp-name H1" required ng-model="x.name"  ng-blur="updateWellB($index+9,x)"
 				my-enter="updateWellB($index+9,x)" focus-on="editExpNameMode">
 			</td>
 			<td ng-show="x" class="rxn-center"><img style="width:20px" src="/images/dynexp/pika-test/Sample-Blue.svg"></td>
@@ -34,11 +34,11 @@
 		<tr ng-show="twoKits" ng-repeat="x in samples_B track by $index">
 			<td>
 				<span>B{{$index+3}}.</span>
-				<input type="text" ng-class="{'empty-input':!x}" placeholder="Enter Name Here" class="exp-name H1" required ng-model="x"  ng-blur="updateWellB($index+11,x)"
+				<input type="text" ng-class="{'empty-input':!x.name}" placeholder="Enter Name Here" class="exp-name H1" required ng-model="x.name"  ng-blur="updateWellB($index+11,x)"
 				my-enter="updateWellB($index+11,x)" focus-on="editExpNameMode">
 			</td>
-			<td ng-show="x" class="rxn-center"><img style="width:20px" src="/images/dynexp/pika-test/Sample-Blue.svg"></td>
-			<td ng-show="!x" class="rxn-center"><img style="width:20px" src="/images/dynexp/pika-test/Sample-Blue-Empty.svg"></td>
+			<td ng-show="x.name" class="rxn-center"><img style="width:20px" src="/images/dynexp/pika-test/Sample-Blue.svg"></td>
+			<td ng-show="!x.name" class="rxn-center"><img style="width:20px" src="/images/dynexp/pika-test/Sample-Blue-Empty.svg"></td>
 			<td ng-show="notes[$index+10]" ng-click="openNotes($index+10)" class="rxn-center notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
 			<td ng-show="!notes[$index+10]" ng-click="openNotes($index+10)" class="rxn-center notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
 		</tr>

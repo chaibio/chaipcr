@@ -22,11 +22,11 @@
 				<tr ng-repeat="x in samples track by $index">
 					<td>
 						<span>A{{$index+3}}.</span>
-						<input type="text" ng-class="{'empty-input':!x}" placeholder="Enter Sample Name" class="exp-name H1" required ng-model="x"  ng-blur="updateWellA($index+3,x)"
+						<input type="text" ng-class="{'empty-input':!x.name}" placeholder="Enter Sample Name" class="exp-name H1" required ng-model="x.name"  ng-blur="updateWellA($index+3,x)"
 						my-enter="updateWellA($index+3,x)" focus-on="editExpNameMode">
 					</td>
-					<td ng-show="x" class="rxn-center"><img style="width:20px" src="/images/dynexp/pika-test/Sample-Pink.svg"></td>
-					<td ng-show="!x" class="rxn-center"><img style="width:20px" src="/images/dynexp/pika-test/Sample-Pink-Empty.svg"></td>
+					<td ng-show="x.name" class="rxn-center"><img style="width:20px" src="/images/dynexp/pika-test/Sample-Pink.svg"></td>
+					<td ng-show="!x.name" class="rxn-center"><img style="width:20px" src="/images/dynexp/pika-test/Sample-Pink-Empty.svg"></td>
 					<td ng-show="notes[$index+2]" ng-click="openNotes($index+2)" class="rxn-center notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
 					<td ng-show="!notes[$index+2]" ng-click="openNotes($index+2)" class="rxn-center notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
 				</tr>

@@ -2,7 +2,7 @@
 	<h3>Setup complete. Please review your targets and start your experiment when ready.</h3>
 
 	<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding-top:15px;">
-		<h4>{{target}}</h4>
+		<h4>{{target.name}}</h4>
 		<table>
 			<tr>
 				<td class="td-well">Well Name</td>
@@ -21,7 +21,7 @@
 			</tr>
 			<tr ng-repeat="x in samples track by $index">
 				<td>
-					<span>A{{$index+3}}. {{x | truncate:20}}</span>
+					<span>A{{$index+3}}. {{x.name | truncate:20}}</span>
 				</td>
 				<td ng-show="x" class="td-rxn"><img style="width:20px" src="/images/dynexp/pika-test/Sample.svg"></td>
 				<td ng-show="x">30 &mu;L</td>
@@ -29,7 +29,7 @@
 		</table>
 	</div>
 	<div ng-show="!twoKits" class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding-top:15px;">
-		<h4 style="visibility:hidden">{{target}}</h4>
+		<h4 style="visibility:hidden">{{target.name}}</h4>
 		<table>
 			<tr>
 				<td class="td-well">Well Name</td>
@@ -38,7 +38,7 @@
 			</tr>
 			<tr ng-repeat="x in samples_B track by $index">
 				<td>
-					<span>B{{$index+1}}. {{x | truncate:20}}</span>
+					<span>B{{$index+1}}. {{x.name | truncate:20}}</span>
 				</td>
 				<td ng-show="x" class="td-rxn"><img style="width:20px" src="/images/dynexp/pika-test/Sample.svg"></td>
 				<td ng-show="x">30 &mu;L</td>
@@ -46,7 +46,7 @@
 		</table>
 	</div>
 	<div ng-show="twoKits" class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding-top:15px;">
-		<h4>{{target2}}</h4>
+		<h4>{{target2.name}}</h4>
 		<table>
 			<tr>
 				<td class="td-well">Well Name</td>
@@ -65,7 +65,7 @@
 			</tr>
 			<tr ng-repeat="x in samples_B track by $index">
 				<td>
-					<span>B{{$index+3}}. {{x | truncate:20}}</span>
+					<span>B{{$index+3}}. {{x.name | truncate:20}}</span>
 				</td>
 				<td ng-show="x" class="td-rxn"><img style="width:20px" src="/images/dynexp/pika-test/Sample.svg"></td>
 				<td ng-show="x">30 &mu;L</td>
