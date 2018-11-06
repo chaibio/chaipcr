@@ -992,20 +992,20 @@ then
    sed -i 's/\/sbin\/ifdown $1/ip addr flush dev $1 \&\& \/sbin\/ifdown $1/g' /etc/ifplugd/action.d/ifupdown
 fi
 
-if [ -e /etc/network/if-down.d ]  &&  [ ! -e /etc/network/if-down.d/flush-ethernet-interface-ip ];
+if [ -e /etc/network/if-down.d/flush-ethernet-interface-ip ]
 then
+   echo "Symbolic link for flush-ethernet-interface-ip is already created"
+else
    echo "Create Symbolic link for flush-ethernet-interface-ip"
    ln -s /root/chaipcr/deploy/device/flush-ethernet-interface-ip.sh /etc/network/if-down.d/flush-ethernet-interface-ip
-else
-   echo "Symbolic link for flush-ethernet-interface-ip is already created"
 fi
 
-if [ -e /etc/network/if-up.d ]  &&  [ ! -e /etc/network/if-up.d/force-ethernet-up ];
+if [ -e /etc/network/if-up.d/force-ethernet-up ]
 then
+   echo "Symbolic link for force-ethernet-up is already created"
+else
    echo "Create Symbolic link for force-ethernet-up"
    ln -s /root/chaipcr/deploy/device/force-ethernet-up.sh /etc/network/if-up.d/force-ethernet-up
-else
-   echo "Symbolic link for force-ethernet-up is already created"
 fi
 
 echo setting up website on ngixn
