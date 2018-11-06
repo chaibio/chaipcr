@@ -282,7 +282,23 @@ start_julia () {
 	fi
 }
 
+ethernet_cable_unplugged () {
+   echo "Check Link status: eth0"
+   if [ -e /sys/class/net/eth0/carrier ]
+   then
+      LINK_STATUS=`cat /sys/class/net/eth0/carrier`
+      echo $LINK_STATUS
+      if [ "$LINK_STATUS" = "0" ]
+      then
+         echo "Link is down for eth0, forcebily bring down link"
+         ip addr flush dev eth0 && /sbin/ifdown eth0
+      fi
+   fi
+}
+
 run_clean_user_tokens () {
+        ethernet_cable_unplugged
+  
 	wait_for_migrate
 
 	echo "checking sql up status..."
@@ -500,12 +516,73 @@ check_corruption () {
 	echo "Corruption test result: $?"
 }
 
+isEth0ConfiguredAsStaticIp () {
+   if grep -q "iface eth0 inet static" /etc/network/interfaces;
+   then
+      echo "The interface eth0 configured as static IP"
+      return 1
+   else
+      echo "The interface eth0 configured as dynamic IP"
+      return 0
+   fi
+}
+
+checkEth0IntefaceForStaticIP () {
+   isEth0ConfiguredAsStaticIp
+   retVal=$?
+
+   if [ ! -e /var/lib/chaibio/network_watchdog_ignored_interfaces ]
+   then
+      touch /var/lib/chaibio/network_watchdog_ignored_interfaces
+   fi
+
+   if [ ! -e /var/lib/chaibio/prevstate_of_ethernet_config ]
+   then
+      touch /var/lib/chaibio/prevstate_of_ethernet_config
+   fi
+
+   if [ $retVal = 1 ]
+   then
+      echo "eth0" > /var/lib/chaibio/network_watchdog_ignored_interfaces
+      echo "static" > /var/lib/chaibio/prevstate_of_ethernet_config
+      ps -ef | grep dhclient | grep -v grep | grep eth0
+      result=$?
+      if [ $result -eq 0 ]
+      then
+         echo killing previous eth0 instance.
+         ps -ef | grep dhclient | grep -v grep | grep eth0 | awk '{print $2}' | xargs kill -9
+         #ip addr flush dev eth0 && systemctl restart networking.service
+      else
+         echo no previous eth0 connection found.
+      fi
+   else
+      echo "Check whether eth0 interface has been ignore previously"
+      if grep -q "eth0" /var/lib/chaibio/network_watchdog_ignored_interfaces
+      then
+         echo "Delete the interface eth0 from ignore interface list"
+         sed -i '/eth0/d' /var/lib/chaibio/network_watchdog_ignored_interfaces
+         echo "dhcp" > /var/lib/chaibio/prevstate_of_ethernet_config
+      else
+         echo "No change required as the interface is configured as dynamic IP"
+      fi
+
+   fi
+}
+
 network_watchdog_interface() {
 	iface=$1
 	echo check loop starting for $iface
 
         while [ 1 ]
         do
+                if [ ! -e /var/lib/chaibio ]
+                then
+                   echo "Create the directory that holds interfaces to be ignored as they are configured as static IP address"
+                   mkdir -p /var/lib/chaibio
+                fi
+
+                checkEth0IntefaceForStaticIP
+                
 	        if grep "$iface" /var/lib/chaibio/network_watchdog_ignored_interfaces
         	then
                 	echo Temprary ignoring the interface  $iface
