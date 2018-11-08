@@ -140,29 +140,22 @@ class DevicesController < ApplicationController
 
   api :POST, "/device/start", "start an experiment"
   def start
-    proxy_request("http://localhost:8000/control/start", params[:experiment_id])
+    proxy_request("POST", "http://localhost:8000/control/start", params[:experiment_id])
   end
 
   api :POST, "/device/stop", "stop an experiment"
   def stop
-    proxy_request("http://localhost:8000/control/stop", nil)
+    proxy_request("POST", "http://localhost:8000/control/stop", nil)
   end
 
   api :POST, "/device/resume", "resume an experiment"
   def resume
-    proxy_request("http://localhost:8000/control/resume", nil)
+    proxy_request("POST", "http://localhost:8000/control/resume", nil)
   end
 
   api :GET, "/device/status", "status of the machine"
   def status
-    begin
-      headers = {"Authorization" => "Token #{authentication_token}"}
-      response = HTTParty.get("http://localhost:8000/status", headers: headers)
-      render :json=>response.body, :status=>response.code
-    rescue  => e
-      render json: {errors: "reatime server port 8000 cannot be reached: #{e}"}, status: 500
-      logger.error("real time server connection error: #{e}")
-    end
+    proxy_request("GET", "http://localhost:8000/status", nil)
   end
 
 =begin
@@ -498,10 +491,14 @@ class DevicesController < ApplicationController
 
   private
 
-  def proxy_request(url, experiment_id)
+  def proxy_request(method, url, experiment_id)
     begin
       headers = {"Authorization" => "Token #{authentication_token}", 'Content-Type' => 'application/json' }
-      response = HTTParty.post(url, body: (!experiment_id.blank?)? {experiment_id: experiment_id}.to_json : nil, headers: headers)
+      if method == "POST"
+        response = HTTParty.post(url, body: (!experiment_id.blank?)? {experiment_id: experiment_id}.to_json : nil, headers: headers)
+      else
+        response = HTTParty.get(url, headers: headers)
+      end
       render :json=>response.body, :status=>response.code
     rescue  => e
       render json: {errors: "reatime server port 8000 cannot be reached: #{e}"}, status: 500
