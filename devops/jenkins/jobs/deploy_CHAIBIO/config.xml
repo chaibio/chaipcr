@@ -977,10 +977,10 @@ then
    sudo ln -s /lib/udev/rules.d/80-net-setup-link.rules /etc/udev/rules.d/80-net-setup-link.rules
 fi
 
-echo "Install Ethernet tools required for detecting cable plugged and unplugged events"
+echo Install Ethernet tools required for detecting cable plugged and unplugged events
 sudo apt-get -y -q install ifplugd
 
-echo "Set up ifplugd configuration and actions for detecting ethernet cable unplugged/plugged events"
+echo Set up ifplugd configuration and actions for detecting ethernet cable unplugged and plugged events
 if [ -e /etc/default/ifplugd ]
 then
    sed -i 's/INTERFACES=""/INTERFACES="eth0"/g' /etc/default/ifplugd
@@ -994,17 +994,17 @@ fi
 
 if [ -e /etc/network/if-down.d/flush-ethernet-interface-ip ]
 then
-   echo "Symbolic link for flush-ethernet-interface-ip is already created"
+   echo Symbolic link for flush-ethernet-interface-ip is already created
 else
-   echo "Create Symbolic link for flush-ethernet-interface-ip"
+   echo Create Symbolic link for flush-ethernet-interface-ip
    ln -s /root/chaipcr/deploy/device/flush-ethernet-interface-ip.sh /etc/network/if-down.d/flush-ethernet-interface-ip
 fi
 
 if [ -e /etc/network/if-up.d/force-ethernet-up ]
 then
-   echo "Symbolic link for force-ethernet-up is already created"
+   echo Symbolic link for force-ethernet-up is already created
 else
-   echo "Create Symbolic link for force-ethernet-up"
+   echo Create Symbolic link for force-ethernet-up
    ln -s /root/chaipcr/deploy/device/force-ethernet-up.sh /etc/network/if-up.d/force-ethernet-up
 fi
 
