@@ -1,5 +1,6 @@
 class MigrateExistingPikaKits < ActiveRecord::Migration
   def change
+    if ActiveRecord::Base.connection.table_exists? 'wells'
     results = ActiveRecord::Base.connection.exec_query("select * from wells inner join experiments on experiments.id=wells.experiment_id inner join experiment_definitions on experiment_definitions.id=experiments.experiment_definition_id where experiment_definitions.guid='pika_4e_kit'")
     results.each do |row|
       well_layout = WellLayout.for_experiment(row['experiment_id']).first
@@ -41,6 +42,8 @@ class MigrateExistingPikaKits < ActiveRecord::Migration
           sample_well.save
         end
       end
+    end
+    
     end
     
     #drop_table :wells

@@ -161,15 +161,15 @@ ActiveRecord::Schema.define(version: 20180925064008) do
   add_index "ramps", ["next_step_id"], name: "index_ramps_on_next_step_id", unique: true, using: :btree
 
   create_table "samples", force: :cascade do |t|
-    t.integer "well_layout_id", limit: 4,   null: false
-    t.string  "name",           limit: 255, null: false
+    t.integer "well_layout_id", limit: 4,        null: false
+    t.string  "name",           limit: 255,      null: false
+    t.text    "notes",          limit: 16777215
   end
 
   create_table "samples_wells", force: :cascade do |t|
-    t.integer "well_layout_id", limit: 4,        null: false
-    t.integer "well_num",       limit: 4,        null: false
-    t.integer "sample_id",      limit: 4,        null: false
-    t.text    "notes",          limit: 16777215
+    t.integer "well_layout_id", limit: 4, null: false
+    t.integer "well_num",       limit: 4, null: false
+    t.integer "sample_id",      limit: 4, null: false
   end
 
   add_index "samples_wells", ["well_layout_id", "well_num"], name: "well_layout_sample", using: :btree

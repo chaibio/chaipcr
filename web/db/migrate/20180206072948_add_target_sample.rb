@@ -16,13 +16,13 @@ class AddTargetSample < ActiveRecord::Migration
     create_table :samples do |t|
       t.integer :well_layout_id, :null=>false
       t.string :name, :null=>false
+      t.text :notes, limit: 16777215
     end
     
     create_table :samples_wells do |t|
       t.integer :well_layout_id, :null=>false
       t.integer :well_num, :null=>false
       t.integer :sample_id, :null=>false
-      t.text    :notes, limit: 16777215
     end
     
     create_table :targets_wells do |t|
