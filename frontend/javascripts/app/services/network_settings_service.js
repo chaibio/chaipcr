@@ -53,12 +53,12 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       return delay.promise;
     };
 
-    this.getSettings = function() {
+    this.getSettings = function(interval = 1000) {
 
       this.userSettings = $.jStorage.get('userNetworkSettings');
       this.accessLanLookup();
 
-      this.intervalKey = $interval(that.accessLanLookup, 2000);
+      this.intervalKey = $interval(that.accessLanLookup, interval);
     };
 
     this.accessLanLookup = function() {
