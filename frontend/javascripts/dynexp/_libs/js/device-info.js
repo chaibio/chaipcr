@@ -7,7 +7,7 @@ angular.module('dynexp.libs')
 
       this.getInfo = function(no) {
         var deferred = $q.defer();
-        $http.get(host + ':8000/status').then(function(data) {
+        $http.get('/device/status').then(function(data) {
           /*data.data.optics.lid_open = "true";
           if(no > 15 && no < 30) {
             data.data.optics.lid_open = "false";

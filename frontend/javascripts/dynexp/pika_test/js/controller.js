@@ -48,7 +48,7 @@
         $scope.assignReview = false;
         $scope.experimentComplete = false;
         $('.content').addClass('analyze');
-        $scope.editExpNameMode = [false, false, false, false, false, false];
+        $scope.editExpNameMode = [false, false,false, false, false, false, false, false];
         var enterState = false;
         var fromHome = true;
         $scope.analyzing = true;
@@ -59,6 +59,13 @@
         $scope.editNotes = false;
         $scope.state = '';
         $scope.old_state = '';
+
+        $scope.sample_pos_A = '';
+        $scope.sample_neg_A = '';
+        $scope.sample_pos_B = '';
+        $scope.sample_neg_B = '';
+
+        $scope.selectedSample = '';
         //  $scope.cq = [["channel","well_num","cq"],[1,1,"39"],[1,2,2],[1,3,40],[1,4,9],[1,5,20],[1,6,"26"],[1,7,"33"],[1,8,"5"],[1,9,"34.5"],[1,10,"19"],[1,11,"12"],[1,12,"6"],[1,13,"24"],[1,14,"39"],[1,15,"32"],[1,16,"18"],[2,1,"11"],[2,2,"25.15"],[2,3,36],[2,4,"8"],[2,5,"34"],[2,6,"10"],[2,7,"15"],[2,8,"25"],[2,9,"35"],[2,10,"28"],[2,11,"2"],[2,12,"7"],[2,13,"0"],[2,14,"35"],[2,15,"28"],[2,16,"17"]];
         this.getResultArray = getResultArray;
 
@@ -72,23 +79,26 @@
               if ($scope.target.id != $scope.target2.id) {
                 $scope.twoKits = true;
               }
-
               var j = 0,
               k, i;
-              for (i = 2; i < 8; i++) {
-                $scope.samples[j] = (resp.data[i].samples) ? resp.data[i].samples[0] : {id: 0, name: ''};
-                j++;
+              for (i = 0; i < 8; i++) {
+                $scope.samples[i] = (resp.data[i].samples) ? resp.data[i].samples[0] : {id: 0, name: ''};
               }
-              if (!$scope.twoKits) {
-                for (k = 8; k < 16; k++) {
-                  $scope.samples_B[k - 8] = (resp.data[k].samples) ? resp.data[k].samples[0] : {id: 0, name: ''};
-                }
-              } else {
-                $scope.samples_B = ['', '', '', '', '', ''];
-                for (k = 10; k < 16; k++) {
-                  $scope.samples_B[k - 10] = (resp.data[k].samples) ? resp.data[k].samples[0] : {id: 0, name: ''};
-                }
+
+              for (k = 8; k < 16; k++) {
+                $scope.samples_B[k - 8] = (resp.data[k].samples) ? resp.data[k].samples[0] : {id: 0, name: ''};
               }
+
+              // if (!$scope.twoKits) {
+              //   for (k = 8; k < 16; k++) {
+              //     $scope.samples_B[k - 8] = (resp.data[k].samples) ? resp.data[k].samples[0] : {id: 0, name: ''};
+              //   }
+              // } else {
+              //   $scope.samples_B = ['', '', '', '', '', ''];
+              //   for (k = 10; k < 16; k++) {
+              //     $scope.samples_B[k - 10] = (resp.data[k].samples) ? resp.data[k].samples[0] : {id: 0, name: ''};
+              //   }
+              // }
               for (i = 0; i < 16; i++) {
                 $scope.notes[i] = '';
                 // $scope.notes[i] = resp.data[i].notes;
@@ -113,11 +123,12 @@
           focus('editNotes');
         };
 
-        $scope.updateNotes = function(index, x) {
-          // Experiment.updateWell($scope.experimentId, index + 1, { 'notes': x }).then(function(resp) {
-          //   $scope.editNotes = false;
-          //   $scope.cancel();
-          // });
+        $scope.updateNotes = function() {
+          Experiment.updateSample($scope.experimentId, $scope.selectedSample.id, {notes: $scope.selectedSample.notes}).then(function(resp) {                
+            $scope.editNotes = false;
+            $scope.samples[$scope.selectedSampleIndex] = $scope.selectedSample;              
+            $scope.modalInstance.close();
+          });
         };
 
         $scope.updateExperimentName = function() {
@@ -127,37 +138,42 @@
         };
 
         $scope.cancel = function() {
+          $scope.selectedSample.notes = $scope.oriSampleNotes;
           $scope.modalInstance.close();
-          Experiment.getWells($scope.experimentId).then(function(resp) {
-            for (var i = 0; i < 16; i++) {
-              $scope.notes[i] = resp.data[i].well.notes;
-            }
-          });
         };
 
         $scope.updateWellA = function(index, x) {
           document.activeElement.blur();
           if(x.id){
-            Experiment.updateSample($scope.experimentId, x.id, {name: x.name}).then(function(resp) {                
-              $scope.editExpNameMode[index] = false;
-              $scope.samples[index - 3] = x;              
-            });
-          } else {
-            Experiment.createSample($scope.experimentId, {name: x.name}).then(function(resp) {              
-              $scope.samples[index - 3] = resp.data.sample;              
-              Experiment.linkSample($scope.experimentId, resp.data.sample.id, { wells: [index] }).then(function (response) {                                
-                  $scope.editExpNameMode[index] = false;
+            if(x.name){
+              Experiment.updateSample($scope.experimentId, x.id, {name: x.name}).then(function(resp) {                
+                $scope.editExpNameMode[index] = false;
+                $scope.samples[index] = x;              
               });              
-            });            
+            } else {
+              Experiment.deleteLinkedSample($scope.experimentId, x.id).then(function(resp) {                
+                $scope.editExpNameMode[index] = false;
+                $scope.samples[index] = {id: 0, name: ''};
+              });              
+            }
+          } else {
+            if(x.name){
+              Experiment.createSample($scope.experimentId, {name: x.name}).then(function(resp) {              
+                $scope.samples[index] = resp.data.sample;              
+                Experiment.linkSample($scope.experimentId, resp.data.sample.id, { wells: [index] }).then(function (response) {                                
+                    $scope.editExpNameMode[index] = false;
+                });              
+              });              
+            }
           }
           // Experiment.updateWell($scope.experimentId, index, { 'sample_name': x }).then(function(resp) {});
         };
 
-        $scope.openNotes = function(index) {
-          $scope.indexAB = index;
-          if (!$scope.notes[index]) {
-            $scope.editNotes = true;
-          }
+        $scope.openNotes = function(index, sample) {
+          $scope.selectedSampleIndex = index;
+          $scope.selectedSample = sample;
+          $scope.editNotes = true;
+          $scope.oriSampleNotes = sample.notes;
           openInstance();
         };
 
@@ -172,25 +188,26 @@
         $scope.updateWellB = function(index, x) {
           document.activeElement.blur();
           if(x.id){
-            Experiment.updateSample($scope.experimentId, x.id, {name: x.name}).then(function(resp) {                
-              $scope.editExpNameMode[index] = false;
-              if (!$scope.twoKits) {
-                $scope.samples_B[index - 9] = x;
-              } else {
-                $scope.samples_B[index - 11] = x;
-              }
-            });
-          } else {
-            Experiment.createSample($scope.experimentId, {name: x.name}).then(function(resp) {              
-              if (!$scope.twoKits) {
-                $scope.samples_B[index - 9] = resp.data.sample;
-              } else {
-                $scope.samples_B[index - 11] = resp.data.sample;
-              }
-              Experiment.linkSample($scope.experimentId, resp.data.sample.id, { wells: [index] }).then(function (response) {                                
-                  $scope.editExpNameMode[index] = false;
+            if(x.name){
+              Experiment.updateSample($scope.experimentId, x.id, {name: x.name}).then(function(resp) {                
+                $scope.editExpNameMode[index] = false;
+                $scope.samples_B[index] = x;              
               });              
-            });            
+            } else {
+              Experiment.deleteLinkedSample($scope.experimentId, x.id).then(function(resp) {                
+                $scope.editExpNameMode[index] = false;
+                $scope.samples_B[index] = {id: 0, name: ''};
+              });              
+            }
+          } else {
+            if(x.name){
+              Experiment.createSample($scope.experimentId, {name: x.name}).then(function(resp) {              
+                $scope.samples_B[index] = resp.data.sample;              
+                Experiment.linkSample($scope.experimentId, resp.data.sample.id, { wells: [index + 9] }).then(function (response) {                                
+                    $scope.editExpNameMode[index] = false;
+                });              
+              });              
+            }
           }
         };
 
@@ -201,7 +218,7 @@
         };
 
         $scope.review = function() {
-          $state.go('pika_test.review');
+          $state.go('pika_test.review', {id: $scope.experimentId});
           $scope.assignReview = true;
           $scope.setProgress(160);
         };

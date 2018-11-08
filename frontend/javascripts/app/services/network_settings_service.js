@@ -53,7 +53,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       return delay.promise;
     };
 
-    this.getSettings = function(interval = 1000) {
+    this.getSettings = function(interval) {
 
       this.userSettings = $.jStorage.get('userNetworkSettings');
       this.accessLanLookup();

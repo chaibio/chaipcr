@@ -69,15 +69,15 @@ angular.module('dynexp.libs')
       return $http.post("/experiments/" + expId + "/copy", data);
     };
     self.startExperiment = function(expId) {
-      return $http.post("/experiments/"+ expId +"/start", {
+      return $http.post("/device/start", {
         experiment_id: expId
       });
     };
     self.resumeExperiment = function(expId) {
-      return $http.post("/experiments/"+ expId +"/resume");
+      return $http.post("/device/resume");
     };
     self.stopExperiment = function(expId) {
-      return $http.post("/experiments/"+ expId +"/stop");
+      return $http.post("/device/stop");
     };
     self.analyze = function(id) {
       return $http.get("/experiments/" + id + "/analyze");
@@ -105,6 +105,10 @@ angular.module('dynexp.libs')
 
     self.linkSample = function(expId, sampleId, data) {
       return $http.post("/experiments/" + expId + "/samples/" + sampleId + "/links", data);
+    };
+
+    self.deleteLinkedSample = function(expId, sampleId){
+      return $http.delete("/experiments/" + expId + "/samples/"+sampleId+"?force=true");
     };
 
     self.updateExperimentName = function(id, name) {

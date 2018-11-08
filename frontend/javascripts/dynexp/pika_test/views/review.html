@@ -9,21 +9,13 @@
 				<td>Reaction Type</td>
 				<td>Volume</td>
 			</tr>
-			<tr>
-				<td>A1. Positive Control</td>
-				<td class="td-rxn"><img style="width:20px" src="/images/dynexp/pika-test/Plus.svg"></td>
-				<td>30 &mu;L</td>
-			</tr>
-			<tr>
-				<td>A2. Negative Control</td>
-				<td class="td-rxn"><img style="width:20px" src="/images/dynexp/pika-test/Minus.svg"></td>
-				<td>30 &mu;L</td>
-			</tr>
 			<tr ng-repeat="x in samples track by $index">
 				<td>
-					<span>A{{$index+3}}. {{x.name | truncate:20}}</span>
+					<span>A{{$index+1}}. {{x.name | truncate:20}}</span>
 				</td>
-				<td ng-show="x" class="td-rxn"><img style="width:20px" src="/images/dynexp/pika-test/Sample.svg"></td>
+				<td class="td-rxn" ng-if="$index == 0"><img style="width:20px" src="/images/dynexp/pika-test/Plus.svg"></td>
+				<td class="td-rxn" ng-if="$index == 1"><img style="width:20px" src="/images/dynexp/pika-test/Minus.svg"></td>
+				<td ng-show="x" class="td-rxn" ng-if="$index > 1"><img style="width:20px" src="/images/dynexp/pika-test/Sample.svg"></td>
 				<td ng-show="x">30 &mu;L</td>
 			</tr>
 		</table>
@@ -53,21 +45,13 @@
 				<td>Reaction Type</td>
 				<td>Volume</td>
 			</tr>
-			<tr>
-				<td>B1. Positive Control</td>
-				<td class="td-rxn"><img style="width:20px" src="/images/dynexp/pika-test/Plus.svg"></td>
-				<td>30 &mu;L</td>
-			</tr>
-			<tr>
-				<td>B2. Negative Control</td>
-				<td class="td-rxn"><img style="width:20px" src="/images/dynexp/pika-test/Minus.svg"></td>
-				<td>30 &mu;L</td>
-			</tr>
 			<tr ng-repeat="x in samples_B track by $index">
 				<td>
-					<span>B{{$index+3}}. {{x.name | truncate:20}}</span>
+					<span>B{{$index+1}}. {{x.name | truncate:20}}</span>
 				</td>
-				<td ng-show="x" class="td-rxn"><img style="width:20px" src="/images/dynexp/pika-test/Sample.svg"></td>
+				<td class="td-rxn" ng-if="$index == 0"><img style="width:20px" src="/images/dynexp/pika-test/Plus.svg"></td>
+				<td class="td-rxn" ng-if="$index == 1"><img style="width:20px" src="/images/dynexp/pika-test/Minus.svg"></td>
+				<td ng-show="x" class="td-rxn" ng-if="$index > 1"><img style="width:20px" src="/images/dynexp/pika-test/Sample.svg"></td>
 				<td ng-show="x">30 &mu;L</td>
 			</tr>
 		</table>

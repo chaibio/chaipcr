@@ -58,7 +58,7 @@ window.ChaiBioTech.ngApp
           timeoutPromise = null
           fetching = false
         , 10000
-        $http.get("#{host}\:8000/status")
+        $http.get("/device/status")
         .success (resp) =>
           #console .log isUp
           #isUp = true

@@ -37,7 +37,7 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
 
     // Initiate wifi network service;
     if ($scope.userSettings.wifiSwitchOn) {
-      NetworkSettingsService.getSettings();
+      NetworkSettingsService.getSettings(1000);
     }
 
     /**
@@ -186,7 +186,7 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
 
       if($scope.userSettings.wifiSwitchOn) {
         if(NetworkSettingsService.intervalKey === null) {
-          NetworkSettingsService.getSettings();
+          NetworkSettingsService.getSettings(1000);
         }
 
         $scope.currentWifiSettings = NetworkSettingsService.connectedWifiNetwork;
