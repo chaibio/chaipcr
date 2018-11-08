@@ -138,6 +138,21 @@ class DevicesController < ApplicationController
     end
   end
 
+  api :POST, "/device/start", "start an experiment"
+  def start
+    proxy_request("http://localhost:8000/control/start", params[:experiment_id])
+  end
+
+  api :POST, "/device/stop", "stop an experiment"
+  def stop
+    proxy_request("http://localhost:8000/control/stop", nil)
+  end
+
+  api :POST, "/device/resume", "resume an experiment"
+  def resume
+    proxy_request("http://localhost:8000/control/resume", nil)
+  end
+
   api :GET, "/device/status", "status of the machine"
   def status
     begin
@@ -482,6 +497,17 @@ class DevicesController < ApplicationController
   end
 
   private
+
+  def proxy_request(url, experiment_id)
+    begin
+      headers = {"Authorization" => "Token #{authentication_token}", 'Content-Type' => 'application/json' }
+      response = HTTParty.post(url, body: (!experiment_id.blank?)? {experiment_id: experiment_id}.to_json : nil, headers: headers)
+      render :json=>response.body, :status=>response.code
+    rescue  => e
+      render json: {errors: "reatime server port 8000 cannot be reached: #{e}"}, status: 500
+      logger.error("real time server connection error: #{e}")
+    end
+  end
 
   def erase_data
     system("cp /etc/network/interfaces.orig /etc/network/interfaces")
