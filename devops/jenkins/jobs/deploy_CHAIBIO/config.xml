@@ -977,6 +977,45 @@ then
    sudo ln -s /lib/udev/rules.d/80-net-setup-link.rules /etc/udev/rules.d/80-net-setup-link.rules
 fi
 
+echo &quot;Install Ethernet tools required for detecting cable plugged and unplugged events&quot;
+sudo apt-get -y -q install ifplugd
+
+echo &quot;Set up ifplugd configuration and actions for detecting ethernet cable unplugged and plugged events&quot;
+if [ -e /etc/default/ifplugd ]
+then
+   sed -i &apos;s/INTERFACES=&quot;&quot;/INTERFACES=&quot;eth0&quot;/g&apos; /etc/default/ifplugd
+   sed -i &apos;s/-d10/-d5/g&apos; /etc/default/ifplugd
+fi
+
+if [ -e /etc/ifplugd/action.d/ifupdown ]
+then
+   sed -i &apos;s/\/sbin\/ifdown $1/ip addr flush dev $1 \&amp;\&amp; \/sbin\/ifdown $1/g&apos; /etc/ifplugd/action.d/ifupdown
+fi
+
+if [ -e /etc/network/if-down.d/flush-ethernet-interface-ip ]
+then
+   echo &quot;Symbolic link for flush-ethernet-interface-ip is already created&quot;
+else
+   echo &quot;Create Symbolic link for if-down-d flush-ethernet-interface-ip&quot;
+   ln -s /root/chaipcr/deploy/device/flush-ethernet-interface-ip.sh /etc/network/if-down.d/flush-ethernet-interface-ip
+fi
+
+if [ -e /etc/network/if-pre-up.d/flush-ethernet-interface-ip ]
+then
+   echo &quot;Symbolic link for if-pre-up-d flush-ethernet-interface-ip is already created&quot;
+else
+   echo &quot;Create Symbolic link for flush-ethernet-interface-ip&quot;
+   ln -s /root/chaipcr/deploy/device/flush-ethernet-interface-ip.sh /etc/network/if-pre-up.d/flush-ethernet-interface-ip
+fi
+
+if [ -e /etc/network/if-up.d/force-ethernet-up ]
+then
+   echo &quot;Symbolic link for force-ethernet-up is already created&quot;
+else
+   echo &quot;Create Symbolic link for force-ethernet-up&quot;
+   ln -s /root/chaipcr/deploy/device/force-ethernet-up.sh /etc/network/if-up.d/force-ethernet-up
+fi
+
 echo setting up website on ngixn
 if [ -e /etc/nginx/sites-available ]
 then
