@@ -8,39 +8,21 @@
 			<td class="rxn-type rxn-center">Reaction Type</td>
 			<td class="notes rxn-center">Notes</td>
 		</tr>
-		<tr ng-show="twoKits">
-			<td class="posneg">B1. Positive Control</td>
-			<td class="rxn-center"><img style="width:20px" src="/images/dynexp/pika-test/Plus-Blue.svg"></td>
-			<td ng-show="notes[8]" ng-click="openNotes(8)" class="rxn-center notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
-			<td ng-show="!notes[8]" ng-click="openNotes(8)" class="rxn-center notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
-		</tr>
-		<tr ng-show="twoKits">
-			<td class="posneg">B2. Negative Control</td>
-			<td class="rxn-center"><img style="width:20px" src="/images/dynexp/pika-test/Minus-Blue.svg"></td>
-			<td ng-show="notes[9]" ng-click="openNotes(9)" class="rxn-center notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
-			<td ng-show="!notes[9]" ng-click="openNotes(9)" class="rxn-center notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
-		</tr>
-		<tr ng-show="!twoKits" ng-repeat="x in samples_B track by $index">
-			<td>
+		<tr ng-repeat="x in samples_B track by $index">
+			<td ng-if="twoKits && $index < 2" class="posneg">B{{$index+1}}. {{x.name}}</td>
+			<td ng-if="!twoKits || (twoKits && $index > 1)">
 				<span>B{{$index+1}}.</span>
-				<input type="text" ng-class="{'empty-input':!x.name}" placeholder="Enter Name Here" class="exp-name H1" required ng-model="x.name"  ng-blur="updateWellB($index+9,x)"
-				my-enter="updateWellB($index+9,x)" focus-on="editExpNameMode">
+				<input type="text" ng-class="{'empty-input':!x.name}" placeholder="Enter Name Here" class="exp-name H1" required ng-model="x.name"  ng-blur="updateWellB($index, x)"
+				my-enter="updateWellB($index, x)" focus-on="editExpNameMode">
 			</td>
-			<td ng-show="x" class="rxn-center"><img style="width:20px" src="/images/dynexp/pika-test/Sample-Blue.svg"></td>
-			<td ng-show="!x" class="rxn-center"><img style="width:20px" src="/images/dynexp/pika-test/Sample-Blue-Empty.svg"></td>
-			<td ng-show="notes[$index+8]" ng-click="openNotes($index+8)" class="rxn-center notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
-			<td ng-show="!notes[$index+8]" ng-click="openNotes($index+8)" class="rxn-center notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
-		</tr>
-		<tr ng-show="twoKits" ng-repeat="x in samples_B track by $index">
-			<td>
-				<span>B{{$index+3}}.</span>
-				<input type="text" ng-class="{'empty-input':!x.name}" placeholder="Enter Name Here" class="exp-name H1" required ng-model="x.name"  ng-blur="updateWellB($index+11,x)"
-				my-enter="updateWellB($index+11,x)" focus-on="editExpNameMode">
-			</td>
-			<td ng-show="x.name" class="rxn-center"><img style="width:20px" src="/images/dynexp/pika-test/Sample-Blue.svg"></td>
-			<td ng-show="!x.name" class="rxn-center"><img style="width:20px" src="/images/dynexp/pika-test/Sample-Blue-Empty.svg"></td>
-			<td ng-show="notes[$index+10]" ng-click="openNotes($index+10)" class="rxn-center notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
-			<td ng-show="!notes[$index+10]" ng-click="openNotes($index+10)" class="rxn-center notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
+			<td class="rxn-center" ng-if="twoKits && $index == 0"><img style="width:20px" src="/images/dynexp/pika-test/Plus-Blue.svg"></td>
+			<td class="rxn-center" ng-if="twoKits && $index == 1"><img style="width:20px" src="/images/dynexp/pika-test/Minus-Blue.svg"></td>
+			<td ng-show="x.name" class="rxn-center"  ng-if="!twoKits || $index > 1"><img style="width:20px" src="/images/dynexp/pika-test/Sample-Blue.svg"></td>
+			<td ng-show="!x.name" class="rxn-center" ng-if="!twoKits ||$index > 1"><img style="width:20px" src="/images/dynexp/pika-test/Sample-Blue-Empty.svg"></td>
+
+			<td ng-show="!x.id" class="rxn-center notes-cursor"><img style="width:20px; opacity: .5;" src="/images/dynexp/pika-test/comment_off.svg"></td>
+			<td ng-show="x.id && x.notes" ng-click="openNotes($index, x)" class="rxn-center notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
+			<td ng-show="x.id && !x.notes" ng-click="openNotes($index, x)" class="rxn-center notes-cursor"><img style="width:20px;" src="/images/dynexp/pika-test/comment_off.svg"></td>
 		</tr>
 	</table>
 </div>

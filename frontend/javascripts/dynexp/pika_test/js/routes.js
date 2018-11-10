@@ -30,7 +30,7 @@
 				templateUrl: 'dynexp/pika_test/views/setWellsB.html'
 			})
 			.state('pika_test.review', {
-				url: '/review',
+				url: '/review/:id',
 				templateUrl: 'dynexp/pika_test/views/review.html'
 			})
 			.state('pika_test.results', {

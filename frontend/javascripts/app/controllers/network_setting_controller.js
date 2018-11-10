@@ -37,7 +37,7 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
 
     // Initiate wifi network service;
     if ($scope.userSettings.wifiSwitchOn) {
-      NetworkSettingsService.getSettings();
+      NetworkSettingsService.getSettings(1000);
     }
 
     /**
@@ -76,6 +76,9 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
           NetworkSettingsService.stopInterval();
           $scope.turnOffWifi();
         }
+      } else {
+        NetworkSettingsService.stopInterval();
+        NetworkSettingsService.getSettings(1000);
       }
     });
 
@@ -102,7 +105,6 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
       $scope.wifiNetworkStatus = false;
       $scope.wirelessErrorData = NetworkSettingsService.wirelessErrorData;
       $scope.wifiNetworks = $scope.currentWifiSettings = {};
-
     };
 
     /**
@@ -147,6 +149,10 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
         .then(function(result) {
           if(result.data) {
             $scope.wifiNetworks = result.data.scan_result;
+            if($scope.wifiNetworks.length > 0){
+              NetworkSettingsService.stopInterval();
+              NetworkSettingsService.getSettings(10000);
+            }
           }
         });
       }
@@ -179,16 +185,15 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
       }
 
       if($scope.userSettings.wifiSwitchOn) {
-
         if(NetworkSettingsService.intervalKey === null) {
-          NetworkSettingsService.getSettings();
+          NetworkSettingsService.getSettings(1000);
         }
 
         $scope.currentWifiSettings = NetworkSettingsService.connectedWifiNetwork;
         $scope.findWifiNetworks();
         // If we refresh right on this page, mac address may take some time to load in service , so we wait to load here.
         if($scope.macAddress === null && NetworkSettingsService.wirelessError === true) {
-          var waitForMac = $interval(function() {
+          var waitForMac = $interval(function() {            
             if(NetworkSettingsService.macAddress !== null) {
               $scope.macAddress = NetworkSettingsService.macAddress;
               $interval.cancel(waitForMac);

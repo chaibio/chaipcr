@@ -72,6 +72,9 @@ Qpcrctl::Application.routes.draw do
     get 'serial_start'
     get 'software_update'
     get 'status'
+    post 'start'
+    post 'stop'
+    post 'resume'
     put 'clean'
     put 'unserialize'
     put 'login'
@@ -86,9 +89,6 @@ Qpcrctl::Application.routes.draw do
 
   resources :experiments, defaults: { format: 'json' } do
     member do
-      post 'start'
-      post 'stop'
-      post 'resume'
       post 'copy'
       get 'well_layout'
       get 'temperature_data'

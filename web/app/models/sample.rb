@@ -25,7 +25,7 @@ class Sample < ActiveRecord::Base
   attr_accessor :force_destroy
   
   validates_presence_of :name
-  ACCESSIBLE_ATTRS = [:well_layout_id, :name]
+  ACCESSIBLE_ATTRS = [:well_layout_id, :name, :notes]
   
   before_create do |sample|
     sample.samples_wells.each do |sample_well|

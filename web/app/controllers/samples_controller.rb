@@ -83,7 +83,7 @@ class SamplesController < ApplicationController
   protected
   
   def link_well(well_num)
-    sample_well = SamplesWell.find_or_create(@sample, @experiment.well_layout.id, well_num, params[:notes])
+    sample_well = SamplesWell.find_or_create(@sample, @experiment.well_layout.id, well_num)
     ret = sample_well.save
     if !ret
       sample_well.errors.full_messages.each do |message|
