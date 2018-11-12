@@ -295,6 +295,12 @@ ethernet_cable_unplugged () {
       elif [ "$LINK_STATUS" = "1" ]
       then
          echo "Check whether ethernet interface is configured with static IP address"
+         if [ ! -e /var/lib/chaibio ]
+         then
+            echo "Create the directory that holds interfaces to be ignored as they are configured as static IP address"
+            mkdir -p /var/lib/chaibio
+         fi
+
          if [ ! -e /var/lib/chaibio/network_watchdog_ignored_interfaces ]
          then
             touch /var/lib/chaibio/network_watchdog_ignored_interfaces
