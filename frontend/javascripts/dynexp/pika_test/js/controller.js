@@ -160,7 +160,7 @@
             if(x.name){
               Experiment.createSample($scope.experimentId, {name: x.name}).then(function(resp) {              
                 $scope.samples[index] = resp.data.sample;              
-                Experiment.linkSample($scope.experimentId, resp.data.sample.id, { wells: [index] }).then(function (response) {                                
+                Experiment.linkSample($scope.experimentId, resp.data.sample.id, { wells: [index+1] }).then(function (response) {                                
                     $scope.editExpNameMode[index] = false;
                 });              
               });              
