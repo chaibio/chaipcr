@@ -124,7 +124,16 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
                         Experiment.createTarget(new_experiment_id,{name: $scope.kit.name, channel: 1}).then(function(resp) {
                             $scope.target_1 = resp.data.target;
                             var linkTargetName = [];
-                            for (i = 0; i < 16; i++) {
+                            linkTargetName[0] = {
+                                well_num: 1,
+                                well_type: 'positive_control'
+                            };
+                            linkTargetName[1] = {
+                                well_num: 2,
+                                well_type: 'negative_control'
+                            };
+
+                            for (i = 2; i < 16; i++) {
                                 linkTargetName[i] = {
                                     well_num: i + 1
                                 };
@@ -240,7 +249,15 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
                         Experiment.createTarget(new_experiment_id,{name: $scope.kit1.name, channel: 1}).then(function(resp) {
                             $scope.target_1 = resp.data.target;
                             var linkTargetName = [];
-                            for (i = 0; i < 8; i++) {
+                            linkTargetName[0] = {
+                                well_num: 1,
+                                well_type: 'positive_control'
+                            };
+                            linkTargetName[1] = {
+                                well_num: 2,
+                                well_type: 'negative_control'
+                            };
+                            for (i = 2; i < 8; i++) {
                                 linkTargetName[i] = {
                                     well_num: i + 1
                                 };
@@ -260,7 +277,15 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
                         Experiment.createTarget(new_experiment_id,{name: $scope.kit2.name, channel: 1}).then(function(resp) {
                             $scope.target_2 = resp.data.target;
                             var linkTargetName = [];
-                            for (i = 8; i < 16; i++) {
+                            linkTargetName[8] = {
+                                well_num: 9,
+                                well_type: 'positive_control'
+                            };
+                            linkTargetName[9] = {
+                                well_num: 10,
+                                well_type: 'negative_control'
+                            };
+                            for (i = 10; i < 16; i++) {
                                 linkTargetName[i] = {
                                     well_num: i + 1
                                 };

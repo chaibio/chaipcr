@@ -9,7 +9,7 @@ class MigrateExistingPikaKits < ActiveRecord::Migration
           sample = Sample.new(:name=>row['sample_name'])
           sample.well_layout_id = well_layout.id
           sample.save
-          sample_well = SamplesWell.find_or_create(sample, well_layout.id, row['well_num'], row['notes'])
+          sample_well = SamplesWell.find_or_create(sample, well_layout.id, row['well_num'])
           sample_well.save
         end
         if !row['target1'].blank?
