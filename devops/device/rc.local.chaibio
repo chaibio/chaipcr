@@ -292,42 +292,6 @@ ethernet_cable_unplugged () {
       then
          echo "Link is down for eth0, forcebily bring down link"
          ip addr flush dev eth0 && /sbin/ifdown eth0
-      elif [ "$LINK_STATUS" = "1" ]
-      then
-         echo "Check whether ethernet interface is configured with static IP address"
-         if [ ! -e /var/lib/chaibio ]
-         then
-            echo "Create the directory that holds interfaces to be ignored as they are configured as static IP address"
-            mkdir -p /var/lib/chaibio
-         fi
-
-         if [ ! -e /var/lib/chaibio/network_watchdog_ignored_interfaces ]
-         then
-            touch /var/lib/chaibio/network_watchdog_ignored_interfaces
-         fi
-
-         if [ ! -e /var/lib/chaibio/prevstate_of_ethernet_config ]
-         then
-            touch /var/lib/chaibio/prevstate_of_ethernet_config
-         fi
-
-         isEth0ConfiguredAsStaticIp
-         retVal=$?
-         if [ $retVal = 1 ]
-         then
-            echo "eth0" > /var/lib/chaibio/network_watchdog_ignored_interfaces
-            echo "static" > /var/lib/chaibio/prevstate_of_ethernet_config
-            ps -ef | grep dhclient | grep -v grep | grep eth0
-            result=$?
-            if [ $result -eq 0 ]
-            then
-               echo killing previous eth0 instance.
-               ps -ef | grep dhclient | grep -v grep | grep eth0 | awk '{print $2}' | xargs kill -9
-               ip addr flush dev eth0 && /sbin/ifup eth0
-            else
-               echo no previous eth0 connection found.
-            fi
-         fi
       fi
    fi
 }
@@ -498,60 +462,6 @@ update_wireless_network () {
     fi
 }
 
-check_upgrade_autorun () {
-	sdcard_dev=""
-	if [ -e /dev/mmcblk0p3 ]
-	then
-        	sdcard_dev=/dev/mmcblk1
-	elif [ -e /dev/mmcblk1p3 ]
-	then
-		sdcard_dev=/dev/mmcblk0
-	else
-		echo "No SDCard found!" >> $log_file
-		return 1
-	fi
-
-	if [ -z ${sdcard_dev} ]
-	then
-		echo "No SDCard found! Cannot find ${sdcard_dev}" >> $log_file
-		return 1
-	fi
-
-	if [ -e ${sdcard_dev} ]
-	then
-		echo "SDCard block device found at $sdcard_dev" >> $log_file
-
-		if [ ! -e ${sdcard}/factory ]
-		then
-			mkdir -p ${sdcard}/factory>/dev/null || true
-			mkdir -p ${sdcard}/upgrade>/dev/null || true
-		fi
-
-		mount -o ro ${sdcard_dev}p1 ${sdcard}/factory>/dev/null || true
-		mount ${sdcard_dev}p2 ${sdcard}/upgrade>/dev/null || true
-		if [ $? -gt 0 ]
-		then
-			echo "Second SDCard partition not found.. old version? ${sdcard}p2"  >> $log_file
-		fi
-
-                update_wireless_network
-		change_root_password_on_factorysettings
-                retain_previous_user_credentials_on_upgrade
-		run_migrate_on_upgrade_logged
-		return 0
-	fi
-
-	change_root_password_on_factorysettings
-	run_migrate_on_upgrade_logged
-	return 1
-}
-
-check_corruption () {
-	echo "Corruption test started!"
-	sh $BASEDIR/check_sdcard.sh || true
-	echo "Corruption test result: $?"
-}
-
 isEth0ConfiguredAsStaticIp () {
    if grep -q "iface eth0 inet static" /etc/network/interfaces;
    then
@@ -564,6 +474,12 @@ isEth0ConfiguredAsStaticIp () {
 }
 
 checkEth0IntefaceForStaticIP () {
+   if [ ! -e /var/lib/chaibio ]
+   then
+      echo "Create the directory that holds interfaces to be ignored as they are configured as static IP address"
+      mkdir -p /var/lib/chaibio
+   fi
+
    if [ ! -e /var/lib/chaibio/network_watchdog_ignored_interfaces ]
    then
       touch /var/lib/chaibio/network_watchdog_ignored_interfaces
@@ -604,18 +520,95 @@ checkEth0IntefaceForStaticIP () {
    fi
 }
 
+bringup_ethernet_interface () {
+    if [ -e /sys/class/net/eth0/operstate ]
+    then
+       ethInterfaceState=`cat /sys/class/net/eth0/operstate`
+       if [ "$ethInterfaceState" = "down" ];
+       then
+          echo "The current interface state is $ethInterfaceState, Try to bring up eth0 interface"
+          ifup eth0
+       else
+          echo "The ethernet interface eth0 state is already $ethInterfaceState"
+       fi
+    fi
+}
+
+update_ethernet_network () {
+    checkEth0IntefaceForStaticIP
+    if [ -e /sys/class/net/eth0/carrier ]
+    then
+      LINK_STATUS=`cat /sys/class/net/eth0/carrier`
+      echo $LINK_STATUS
+      if [ "$LINK_STATUS" = "1" ]
+      then
+         echo "Ethernet cable is plugged in"
+         bringup_ethernet_interface
+      fi
+    fi
+}
+
+check_upgrade_autorun () {
+	sdcard_dev=""
+	if [ -e /dev/mmcblk0p3 ]
+	then
+        	sdcard_dev=/dev/mmcblk1
+	elif [ -e /dev/mmcblk1p3 ]
+	then
+		sdcard_dev=/dev/mmcblk0
+	else
+		echo "No SDCard found!" >> $log_file
+		return 1
+	fi
+
+	if [ -z ${sdcard_dev} ]
+	then
+		echo "No SDCard found! Cannot find ${sdcard_dev}" >> $log_file
+		return 1
+	fi
+
+	if [ -e ${sdcard_dev} ]
+	then
+		echo "SDCard block device found at $sdcard_dev" >> $log_file
+
+		if [ ! -e ${sdcard}/factory ]
+		then
+			mkdir -p ${sdcard}/factory>/dev/null || true
+			mkdir -p ${sdcard}/upgrade>/dev/null || true
+		fi
+
+		mount -o ro ${sdcard_dev}p1 ${sdcard}/factory>/dev/null || true
+		mount ${sdcard_dev}p2 ${sdcard}/upgrade>/dev/null || true
+		if [ $? -gt 0 ]
+		then
+			echo "Second SDCard partition not found.. old version? ${sdcard}p2"  >> $log_file
+		fi
+
+                update_wireless_network
+                update_ethernet_network
+		change_root_password_on_factorysettings
+                retain_previous_user_credentials_on_upgrade
+		run_migrate_on_upgrade_logged
+		return 0
+	fi
+
+	change_root_password_on_factorysettings
+	run_migrate_on_upgrade_logged
+	return 1
+}
+
+check_corruption () {
+	echo "Corruption test started!"
+	sh $BASEDIR/check_sdcard.sh || true
+	echo "Corruption test result: $?"
+}
+
 network_watchdog_interface() {
 	iface=$1
 	echo check loop starting for $iface
 
         while [ 1 ]
         do
-                if [ ! -e /var/lib/chaibio ]
-                then
-                   echo "Create the directory that holds interfaces to be ignored as they are configured as static IP address"
-                   mkdir -p /var/lib/chaibio
-                fi
-
                 checkEth0IntefaceForStaticIP
                 
 	        if grep "$iface" /var/lib/chaibio/network_watchdog_ignored_interfaces
