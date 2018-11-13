@@ -86,7 +86,7 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
 
         scope.clickHandler = function() {
 
-          if(scope.inProgress === false) {
+          if(scope.noDevice === false && scope.inProgress === false) {
             console.log("Inside click handler");
             scope.sendData();
           }

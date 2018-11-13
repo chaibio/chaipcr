@@ -78,7 +78,6 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
         }
       } else {
         NetworkSettingsService.stopInterval();
-        NetworkSettingsService.getSettings(1000);
       }
     });
 
@@ -105,6 +104,8 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
       $scope.wifiNetworkStatus = false;
       $scope.wirelessErrorData = NetworkSettingsService.wirelessErrorData;
       $scope.wifiNetworks = $scope.currentWifiSettings = {};
+      $scope.userSettings.wifiSwitchOn = false;
+      $.jStorage.set('userNetworkSettings', $scope.userSettings);
     };
 
     /**
