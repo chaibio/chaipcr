@@ -18,48 +18,30 @@
 				<td style="width:200px">Amount</td>
 				<td style="width:200px">Notes</td>
 			</tr>
-			<tr class="td-description">
-				<td>A1. Positive Control
-					<img ng-show="result[0] == 'Valid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_valid.svg">
-					<img ng-show="result[0] == 'Invalid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_invalid.svg">
-				</td>
-				<td><span ng-show="famCq[0]">{{famCq[0] | round:2}}</span></td>
-				<td>{{result[0]}}</td>
-			<!--	<td>{{hexCq[0]}}</td> -->
-				<td>{{amount[0]}}</td>
-				<td ng-show="notes[0]" ng-click="openNotes(0)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
-				<td ng-show="!notes[0]" ng-click="openNotes(0)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
-			</tr>
-			<tr class="td-description">
-				<td>A2. Negative Control
-					<img ng-show="result[1] == 'Valid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_valid.svg">
-					<img ng-show="result[1] == 'Invalid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_invalid.svg">
-				</td>
-				<td><span ng-show="famCq[1]">{{famCq[1] | round:2}}</span></td>
-				<td>{{result[1]}}</td>
-			<!--	<td>{{hexCq[1]}}</td> -->
-				<td>{{amount[1]}}</td>
-				<td ng-show="notes[1]" ng-click="openNotes(1)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
-				<td ng-show="!notes[1]" ng-click="openNotes(1)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
-			</tr>
 			<tr ng-show="x" class="td-description" ng-repeat="x in samples track by $index">
-				<td>
-					<span>A{{$index+3}}. {{x}}</span>
-					<img ng-show="result[$index+2] == 'Positive'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_pos.svg">
-					<img ng-show="result[$index+2] == 'Negative'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_neg.svg">
-					<img ng-show="result[$index+2] == 'Inhibited'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_inhib.svg">
-					<img ng-show="result[$index+2] == 'Unknown'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_inhib.svg">
+				<td ng-if="$index < 2">
+					A{{$index + 1}}. {{x.name}}
+					<img ng-show="result[$index] == 'Valid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_valid.svg">
+					<img ng-show="result[$index] == 'Invalid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_invalid.svg">
 				</td>
-				<td><span ng-show="famCq[$index+2]">{{famCq[$index+2] | round:2}}</span></td>
-				<td>{{result[$index+2]}}</td>
-			<!--	<td>{{hexCq[$index+2]}}</td> -->
-				<td>{{amount[$index+2]}}</td>
-				<td ng-show="notes[$index+2]" ng-click="openNotes($index+2)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
-				<td ng-show="!notes[$index+2]" ng-click="openNotes($index+2)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
+				<td ng-if="$index >= 2">
+					<span>A{{$index + 1}}. {{x.name}}</span>
+					<img ng-show="result[$index] == 'Positive'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_pos.svg">
+					<img ng-show="result[$index] == 'Negative'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_neg.svg">
+					<img ng-show="result[$index] == 'Inhibited'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_inhib.svg">
+					<img ng-show="result[$index] == 'Unknown'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_inhib.svg">
+				</td>
+				<td><span ng-show="famCq[$index]">{{famCq[$index] | round:2}}</span></td>
+				<td>{{result[$index]}}</td>
+			<!--	<td>{{hexCq[$index]}}</td> -->
+				<td>{{amount[$index]}}</td>
+				<td ng-show="x.id && x.notes" ng-click="openNotes($index, x)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
+				<td ng-show="x.id && !x.notes" ng-click="openNotes($index, x)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
+				<td ng-show="!x.id" class="notes-cursor"><img style="width:20px; opacity: .5;" src="/images/dynexp/pika-test/comment_off.svg"></td>
 			</tr>
 			<tr ng-show="y" class="td-description" ng-repeat="y in samples_B track by $index">
 				<td>
-					<span>B{{$index+1}}. {{y}}</span>
+					<span>B{{$index+1}}. {{y.name}}</span>
 					<img ng-show="result[$index+8] == 'Positive'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_pos.svg">
 					<img ng-show="result[$index+8] == 'Negative'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_neg.svg">
 					<img ng-show="result[$index+8] == 'Inhibited'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_inhib.svg">
@@ -69,8 +51,9 @@
 				<td>{{result[$index+8]}}</td>
 			<!--	<td>{{hexCq[$index+8]}}</td> -->
 				<td>{{amount[$index+8]}}</td>
-				<td ng-show="notes[$index+8]" ng-click="openNotes($index+8)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
-				<td ng-show="!notes[$index+8]" ng-click="openNotes($index+8)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
+				<td ng-show="y.id && y.notes" ng-click="openNotes($index, y)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
+				<td ng-show="y.id && !y.notes" ng-click="openNotes($index, y)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
+				<td ng-show="!y.id" class="notes-cursor"><img style="width:20px; opacity: .5;" src="/images/dynexp/pika-test/comment_off.svg"></td>
 			</tr>
 		</table>
 	</div>
@@ -83,45 +66,27 @@
 			<!--	<td style="width:100px">Hex Cq</td> -->
 				<td style="width:200px">Amount</td>
 				<td style="width:200px">Notes</td>
-			</tr>
-			<tr class="td-description">
-				<td>A1. Positive Control
-					<img ng-show="result[0] == 'Valid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_valid.svg">
-					<img ng-show="result[0] == 'Invalid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_invalid.svg">
-				</td>
-				<td><span ng-show="famCq[0]">{{famCq[0] | round:2}}</span></td>
-				<td>{{result[0]}}</td>
-			<!--	<td>{{hexCq[0]}}</td> -->
-				<td>{{amount[0]}}</td>
-				<td ng-show="notes[0]" ng-click="openNotes(0)" class="notes-cursor" ><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
-				<td ng-show="!notes[0]" ng-click="openNotes(0)" class="notes-cursor" ><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
-			</tr>
-			<tr class="td-description">
-				<td>A2. Negative Control
-					<img ng-show="result[1] == 'Valid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_valid.svg">
-					<img ng-show="result[1] == 'Invalid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_invalid.svg">
-				</td>
-				<td><span ng-show="famCq[1]">{{famCq[1] | round:2}}</span></td>
-				<td>{{result[1]}}</td>
-			<!--	<td>{{hexCq[1]}}</td> -->
-				<td>{{amount[1]}}</td>
-				<td ng-show="notes[1]" ng-click="openNotes(1)" class="notes-cursor" ><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
-				<td ng-show="!notes[1]" ng-click="openNotes(1)" class="notes-cursor" ><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
 			</tr>
 			<tr ng-show="x" class="td-description" ng-repeat="x in samples track by $index">
-				<td>
-					<span>A{{$index+3}}. {{x}}</span>
-					<img ng-show="result[$index+2] == 'Positive'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_pos.svg">
-					<img ng-show="result[$index+2] == 'Negative'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_neg.svg">
-					<img ng-show="result[$index+2] == 'Inhibited'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_inhib.svg">
-					<img ng-show="result[$index+2] == 'Unknown'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_inhib.svg">
+				<td ng-if="$index < 2">
+					A{{$index + 1}}. {{x.name}}
+					<img ng-show="result[$index] == 'Valid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_valid.svg">
+					<img ng-show="result[$index] == 'Invalid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_invalid.svg">
 				</td>
-				<td><span ng-show="famCq[$index+2]">{{famCq[$index+2] | round:2}}</span></td>
-				<td>{{result[$index+2]}}</td>
-			<!--	<td>{{hexCq[$index+2]}}</td> -->
-				<td>{{amount[$index+2]}}</td>
-				<td ng-show="notes[$index+2]" ng-click="openNotes($index+2)" class="notes-cursor" ><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
-				<td ng-show="!notes[$index+2]" ng-click="openNotes($index+2)" class="notes-cursor" ><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
+				<td ng-if="$index >= 2">
+					<span>A{{$index + 1}}. {{x.name}}</span>
+					<img ng-show="result[$index] == 'Positive'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_pos.svg">
+					<img ng-show="result[$index] == 'Negative'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_neg.svg">
+					<img ng-show="result[$index] == 'Inhibited'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_inhib.svg">
+					<img ng-show="result[$index] == 'Unknown'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_inhib.svg">
+				</td>
+				<td><span ng-show="famCq[$index]">{{famCq[$index] | round:2}}</span></td>
+				<td>{{result[$index]}}</td>
+			<!--	<td>{{hexCq[$index]}}</td> -->
+				<td>{{amount[$index]}}</td>
+				<td ng-show="x.id && x.notes" ng-click="openNotes($index, x)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
+				<td ng-show="x.id && !x.notes" ng-click="openNotes($index, x)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
+				<td ng-show="!x.id" class="notes-cursor"><img style="width:20px; opacity: .5;" src="/images/dynexp/pika-test/comment_off.svg"></td>
 			</tr>
 		</table>
 	</div>
@@ -135,44 +100,26 @@
 				<td style="width:200px">Amount</td>
 				<td style="width:200px">Notes</td>
 			</tr>
-			<tr class="td-description">
-				<td>B1. Positive Control
-					<img ng-show="result[8] == 'Valid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_valid.svg">
-					<img ng-show="result[8] == 'Invalid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_invalid.svg">
-				</td>
-				<td><span ng-show="famCq[8]">{{famCq[8] | round:2}}</span></td>
-				<td>{{result[8]}}</td>
-			<!--	<td>{{hexCq[0]}}</td> -->
-				<td>{{amount[8]}}</td>
-				<td ng-show="notes[8]" ng-click="openNotes(8)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
-				<td ng-show="!notes[8]" ng-click="openNotes(8)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
-			</tr>
-			<tr class="td-description">
-				<td>B2. Negative Control
-					<img ng-show="result[9] == 'Valid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_valid.svg">
-					<img ng-show="result[9] == 'Invalid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_invalid.svg">
-				</td>
-				<td><span ng-show="famCq[9]">{{famCq[9] | round:2}}</span></td>
-				<td>{{result[9]}}</td>
-			<!--	<td>{{hexCq[1]}}</td> -->
-				<td>{{amount[9]}}</td>
-				<td ng-show="notes[9]" ng-click="openNotes(9)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
-				<td ng-show="!notes[9]" ng-click="openNotes(9)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
-			</tr>
 			<tr ng-show="y" class="td-description" ng-repeat="y in samples_B track by $index">
-				<td>
-					<span>B{{$index+3}}. {{y}}</span>
-					<img ng-show="result[$index+10] == 'Positive'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_pos.svg">
-					<img ng-show="result[$index+10] == 'Negative'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_neg.svg">
-					<img ng-show="result[$index+10] == 'Inhibited'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_inhib.svg">
-					<img ng-show="result[$index+10] == 'Unknown'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_inhib.svg">
+				<td ng-if="$index < 2">
+					B{{$index + 1}}. {{y.name}}
+					<img ng-show="result[$index+8] == 'Valid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_valid.svg">
+					<img ng-show="result[$index+8] == 'Invalid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_invalid.svg">
+				</td>				
+				<td ng-if="$index >= 2">
+					<span>B{{$index+1}}. {{y.name}}</span>
+					<img ng-show="result[$index+8] == 'Positive'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_pos.svg">
+					<img ng-show="result[$index+8] == 'Negative'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_neg.svg">
+					<img ng-show="result[$index+8] == 'Inhibited'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_inhib.svg">
+					<img ng-show="result[$index+8] == 'Unknown'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_inhib.svg">
 				</td>
-				<td><span ng-show="famCq[$index+10]">{{famCq[$index+10] | round:2}}</span></td>
-				<td>{{result[$index+10]}}</td>
+				<td><span ng-show="famCq[$index+8]">{{famCq[$index+8] | round:2}}</span></td>
+				<td>{{result[$index+8]}}</td>
 			<!--	<td>{{hexCq[$index+8]}}</td> -->
-				<td>{{amount[$index+10]}}</td>
-				<td ng-show="notes[$index+10]" ng-click="openNotes($index+10)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
-				<td ng-show="!notes[$index+10]" ng-click="openNotes($index+10)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
+				<td>{{amount[$index+8]}}</td>
+				<td ng-show="y.id && y.notes" ng-click="openNotes($index, y)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
+				<td ng-show="y.id && !y.notes" ng-click="openNotes($index, y)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
+				<td ng-show="!y.id" class="notes-cursor"><img style="width:20px; opacity: .5;" src="/images/dynexp/pika-test/comment_off.svg"></td>
 			</tr>
 		</table>
 	</div>
