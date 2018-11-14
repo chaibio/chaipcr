@@ -407,8 +407,8 @@ then
     echo sdcard filename is $sdcard_filename
     
     upgrade_image_filename=$tmp_sdcard_dir/p2/upgrade.img.tar
-    upgrade_image_url_local_filename=${local_download_folder}/${output_image_prefix}_upgrade.img.tgz
-    upgrade_image_url=${download_prefix}/${output_image_prefix}_upgrade.img.tgz
+    upgrade_image_url_local_filename=${local_download_folder}/${output_image_prefix}_upgrade.img.tar
+    upgrade_image_url=${download_prefix}/${output_image_prefix}_upgrade.img.tar
     echo upgrade image path $upgrade_image_filename, copying to $upgrade_image_url_local_filename
     cp $upgrade_image_filename $upgrade_image_url_local_filename
     echo Upgrade image URL is $upgrade_image_url
@@ -458,7 +458,7 @@ cat &lt;&lt; EOF &gt; $build_report_filename
     // To display a field
     &lt;field name=&quot;Upgrade Image&quot; titlecolor=&quot;&quot; value=&quot;&quot; detailcolor=&quot;&quot; href=&quot;&quot;&gt; 
     &lt;![CDATA[ 
-Upgrade image (${output_image_prefix}_upgrade.img.tgz) &lt;a href=&quot;$upgrade_image_url&quot; download=&quot;upgrade.img.tgz&quot;&gt;Download&lt;/a&gt;
+Upgrade image (${output_image_prefix}_upgrade.img.tar) &lt;a href=&quot;$upgrade_image_url&quot; download=&quot;upgrade.img.tar&quot;&gt;Download&lt;/a&gt;
     ]]&gt; &lt;/field&gt;
      &lt;field name=&quot;eMMC&quot; titlecolor=&quot;&quot; value=&quot;&quot; detailcolor=&quot;&quot; href=&quot;&quot;&gt; 
       &lt;![CDATA[ 
