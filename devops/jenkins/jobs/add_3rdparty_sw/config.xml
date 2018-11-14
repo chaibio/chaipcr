@@ -321,6 +321,21 @@ fi
 rm mysql_password_flush.sql
 df -h
 echo done resetting mysql password
+
+echo boxing transaction queue.
+
+MYSQL_USER=root
+MYSQL_PASS=
+MYSQL_CONN=&quot;-u${MYSQL_USER} --password=&quot;
+SQL=&quot;SET GLOBAL innodb_fast_shutdown = 0&quot;
+mysql ${MYSQL_CONN} -ANe&quot;${SQL}&quot;
+mysqladmin ${MYSQL_CONN} shutdown
+cd /var/lib/mysql
+rm -f ib_logfile*
+echo &quot;[mysqld]&quot;&gt;/etc/mysql/conf.d/chaibio.cnf
+echo &quot;innodb_log_file_size = 5M&quot;&gt;&gt;/etc/mysql/conf.d/chaibio.cnf
+service mysql start
+
 </command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
