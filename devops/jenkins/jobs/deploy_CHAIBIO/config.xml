@@ -306,10 +306,7 @@ exit 1
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo cleanup some space
-#rm /usr/lib/julia/sys-debug.*
-
-echo Setup MySQL
+      <command>echo Setup MySQL
 mkdir /data /perm || true
 systemctl stop mysql.service
 mount /dev/mmcblk1p2 /data || true
@@ -470,7 +467,8 @@ else
       echo freeing up some space
       rm -r /var/cache/apt /var/log/ /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/tests
       mkdir /var/log/ -p
-      find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
+      find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;/logs/
+      find /root/.julia/.cache/ -name objects | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
       apt update
       julia_pkgdir=&quot;/root&quot;
       export JULIA_PKGDIR=/root/.julia
@@ -1064,10 +1062,8 @@ sync
 swapoff -a
 /sbin/swapoff  -a
 
-echo clearing more space and removing .git julia folders
-
+echo clearing more space
 apt-get -q -y --fix-broken install
-
 rm /sdcard/factory/swapfile
 cd
 
@@ -1076,6 +1072,7 @@ then
       echo Building a debug image
       exit 0
 fi
+rm -r /opt/QtEmbedded/bin/  /opt/QtEmbedded/mkspecs /opt/QtEmbedded/include
 find . -name .git -execdir rm -r {} \;
 find . -name *.o  -exec rm {} \;
 find / -name .git -execdir rm -r {} \;
