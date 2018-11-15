@@ -521,15 +521,15 @@ checkEth0IntefaceForStaticIP () {
 }
 
 bringup_ethernet_interface () {
-    if [ -e /sys/class/net/eth0/operstate ]
+    if [ -e ${sdcard}/factory/upgrade_autorun.flag ] || [ -e ${sdcard}/upgrade/upgrade_autorun.flag ]
     then
-       ethInterfaceState=`cat /sys/class/net/eth0/operstate`
-       if [ "$ethInterfaceState" = "down" ];
+       echo "Software upgrade in progress; Update Ethernet interface IP, if required"
+       echo "Check whether static IP address was configured previously"
+       if grep -q "eth0" /var/lib/chaibio/network_watchdog_ignored_interfaces
        then
-          echo "The current interface state is $ethInterfaceState, Try to bring up eth0 interface"
-          ifup eth0
-       else
-          echo "The ethernet interface eth0 state is already $ethInterfaceState"
+          echo "Static IP address configuration found"
+          echo "Force the switch from dynamic IP address to static IP address during upgrade"
+          ifdown eth0 && ifup eth0
        fi
     fi
 }
