@@ -34,7 +34,7 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     $scope.macAddress = NetworkSettingsService.macAddress || null;
     $scope.userSettings = $.jStorage.get('userNetworkSettings');
     $scope.wifiNetworkStatus = $scope.userSettings.wifiSwitchOn; // If network is on/off
-    $scope.intervalKey = null;
+    NetworkSettingsService.intervalScanKey = null;
     $scope.currentInterval = 1000;
 
     // Initiate wifi network service;
@@ -87,14 +87,14 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     $scope.$watch('wifiNetworks', function(network) {
       if($scope.wirelessError === false) {
         if($scope.wifiNetworkStatus === true) {
-          if(network.length > 0 && ($scope.currentInterval == 1000 || $scope.intervalKey == null) ){
+          if(network.length > 0 && ($scope.currentInterval == 1000 || NetworkSettingsService.intervalScanKey == null) ){
             $scope.stopInterval();
             $scope.currentInterval = 10000;
-            $scope.intervalKey = $interval($scope.findWifiNetworks, $scope.currentInterval);
-          } else if(network.length == 0 && ($scope.currentInterval == 10000 || $scope.intervalKey == null) ){
+            NetworkSettingsService.intervalScanKey = $interval($scope.findWifiNetworks, $scope.currentInterval);
+          } else if(network.length == 0 && ($scope.currentInterval == 10000 || NetworkSettingsService.intervalScanKey == null) ){
             $scope.stopInterval();
             $scope.currentInterval = 1000;
-            $scope.intervalKey = $interval($scope.findWifiNetworks, $scope.currentInterval);
+            NetworkSettingsService.intervalScanKey = $interval($scope.findWifiNetworks, $scope.currentInterval);
           }
         } else {
           $scope.stopInterval();
@@ -179,8 +179,8 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     };
 
     $scope.stopInterval = function() {
-      $interval.cancel($scope.intervalKey);
-      $scope.intervalKey = null;
+      $interval.cancel(NetworkSettingsService.intervalScanKey);
+      NetworkSettingsService.intervalScanKey = null;
     };
 
 
@@ -216,7 +216,7 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
         }
 
         $scope.currentWifiSettings = NetworkSettingsService.connectedWifiNetwork;
-        $scope.intervalKey = $interval($scope.findWifiNetworks, $scope.currentInterval);
+        NetworkSettingsService.intervalScanKey = $interval($scope.findWifiNetworks, $scope.currentInterval);
         // If we refresh right on this page, mac address may take some time to load in service , so we wait to load here.
         if($scope.macAddress === null && NetworkSettingsService.wirelessError === true) {
           var waitForMac = $interval(function() {            

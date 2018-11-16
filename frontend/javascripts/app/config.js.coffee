@@ -21,12 +21,13 @@ window.ChaiBioTech.ngApp
   '$rootScope'
   '$state'
   '$window'
+  '$interval'
   'Status'
   'PeriodicUpdate'
   'NetworkSettingsService'
   'IsTouchScreen'
   'WindowWrapper'
-  ($rootScope, $state, $window, Status, PeriodicUpdate, NetworkSettingsService, IsTouchScreen, WindowWrapper) ->
+  ($rootScope, $state, $window, $interval, Status, PeriodicUpdate, NetworkSettingsService, IsTouchScreen, WindowWrapper) ->
 
     IsTouchScreen()
     WindowWrapper.initEventHandlers()
@@ -48,12 +49,14 @@ window.ChaiBioTech.ngApp
         body.addClass "#{toState.name}-state-active"
         body.removeClass "#{fromState.name}-state-active"
 
+      if NetworkSettingsService.intervalScanKey
+        $interval.cancel NetworkSettingsService.intervalScanKey
+
     $rootScope.$on 'event:auth-loginRequired', (e, rejection)->
       $window.document.cookie = 'authentication_token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
       $.jStorage.deleteKey 'authToken'
       if !Status.isUpdating()
         $window.location.assign '/'
-
 ]
 
 .config [

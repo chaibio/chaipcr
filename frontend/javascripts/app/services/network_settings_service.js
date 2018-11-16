@@ -34,6 +34,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     this.previousConnectionStatus = null; // Connection Status at the moment
     this.userSettings = $.jStorage.get('userNetworkSettings');
     this.intervalKey = null;
+    this.intervalScanKey = null;
     this.listofAllWifi = {};
     this.wifiShutDownInProgress = false;
     this.wifiRestartingInProgress = false;
