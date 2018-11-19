@@ -980,8 +980,10 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 			for (var z = 0; z < 16; z++) {
 				if ($scope.wells["well_" + z].selected) {
 					unlinkElem(z, "Target1");
-					unlinkElem(z, "Target2");
 					unlinkElem(z, "Sample");
+					if($scope.is_dual_channel){
+						unlinkElem(z, "Target2");
+					}
 				}
 			}
 		};
