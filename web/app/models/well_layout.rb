@@ -53,7 +53,7 @@ class WellLayout < ActiveRecord::Base
   end
   
   def self.experiment_id_for_well_layout_id(layout_id)
-    where(:id=>layout_id).pluck("experiment_id").first
+    (layout_id)? where(:id=>layout_id).pluck("experiment_id").first : nil
   end
   
   def editable?
