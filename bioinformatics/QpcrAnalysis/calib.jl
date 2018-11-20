@@ -82,54 +82,6 @@ function dcv_aw(
 end # dcv_aw
 
 
-# get all the data from a calibration experiment, including data from all the channels for all the steps
-function get_full_calib_data(
-    db_conn::MySQL.MySQLHandle,
-    calib_info::OrderedDict,
-    well_nums::AbstractVector=[]
-    )
-
-    calib_info = ensure_ci(db_conn, calib_info)
-
-    calib_key_vec = get_ordered_keys(calib_info)
-    cd_key_vec = calib_key_vec[2:end] # cd = channel of dye. "water" is index 1 per original order.
-    channel_nums = map(cd_key_vec) do cd_key
-        parse(Int, split(cd_key, "_")[2])
-    end
-    num_channels = length(channel_nums)
-
-    calib_dict = OrderedDict(map(calib_key_vec) do calib_key
-        exp_id = calib_info[calib_key]["calibration_id"]
-        step_id = calib_info[calib_key]["step_id"]
-        k_qry_2b = "
-            SELECT fluorescence_value, well_num, channel
-                FROM fluorescence_data
-                WHERE
-                    experiment_id = $exp_id AND
-                    step_id = $step_id AND
-                    cycle_num = 1 AND
-                    step_id is not NULL
-                    well_constraint
-                ORDER BY well_num, channel
-        "
-        calib_data_1key, calib_well_nums = get_mysql_data_well(
-            well_nums, k_qry_2b, db_conn, false
-        )
-        if length(well_nums) > 0 && Set(calib_well_nums) != Set(well_nums)
-            error("Experiment $exp_id, step $step_id: calibration data is not found for all the wells requested. ")
-        end # if
-        calib_data_1key_chwl = vcat(map(channel_nums) do channel
-            transpose(calib_data_1key[:fluorescence_value][calib_data_1key[:channel] .== channel])
-        end...) # do channel. return an array where rows indexed by channels and columns indexed by wells
-
-        return calib_key => (calib_data_1key_chwl, calib_well_nums)
-    end)
-
-    return calib_dict # share the same keys as `calib_info`
-
-end # get_full_calib_data
-
-
 # perform deconvolution and adjustment of well-to-well variation on calibration experiment 1 using the k matrix `wva_data` made from calibration expeirment 2
 
 type CalibCalibOutput

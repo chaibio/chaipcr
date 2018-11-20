@@ -1,20 +1,23 @@
 
--- MySQL queries for data as input to Julia
 
+-- MySQL queries for data as input to Julia
+--
 -- It'll be best if Rails code is designed to easily accommodate changes to these queries in future.
 -- Assuming: before Rails passes data to Julia as JSON, it converted the table returned by SQL query into an associative of name-value pairs, where each pair represents a column in the table, i.e. name is the column header (e.g. "step_id"), value is a vector of the data (e.g. [1,1,2,2,2,3])
---
--- e.g.
--- This table below
--- step_id well_num
---       1        1
---       1        2
---       2        3
---       2        4
---       2        5
---       3        6
--- is converted to...
--- JSON {"step_id":[1,1,2,2,2,3],"well_num":[1,2,3,4,5,6]}
+
+/*
+e.g.
+This table below
+step_id well_num
+      1        1
+      1        2
+      2        3
+      2        4
+      2        5
+      3        6
+is converted to...
+JSON {"step_id":[1,1,2,2,2,3],"well_num":[1,2,3,4,5,6]}
+*/
 
 -- it can be easily converted to data frame in Julia via `DataFrame(JSON.parse("some_json_in_aforementioned_format"))`
 
@@ -30,6 +33,37 @@ SELECT fluorescence_value, well_num, channel
     WHERE experiment_id = $calib_id AND step_id = $step_id
 	ORDER BY channel, well_num
 ;
+/*
+JSON format
+
+single channel
+{"calibration_info":{
+    "water":[
+        [xx,xx,xx,xx],
+        null
+    ],
+    "channel_1":[
+        [xx,xx,xx,xx],
+        null
+    ]
+}}
+
+dual channel. 1st vector for fluorescence from channel 1, 2nd for 2.
+{"calibration_info":{
+    "water":[
+        [xx,xx,xx,xx],
+        [xx,xx,xx,xx]
+    ],
+    "channel_1":[
+        [xx,xx,xx,xx],
+        [xx,xx,xx,xx]
+    ],
+    "channel_2":[
+        [xx,xx,xx,xx],
+        [xx,xx,xx,xx]
+    ],
+}}
+*/
 
 
 -- amplification, 3 queries: calibration query and ...

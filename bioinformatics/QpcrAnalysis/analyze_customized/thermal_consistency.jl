@@ -27,11 +27,12 @@ end
 function analyze_func(
     # copy over the whole signature of `meltcrv`, comment out `stage_id`
     ::ThermalConsistency,
-    db_conn::MySQL.MySQLHandle,
-    exp_id::Integer, # stage_id::Integer,
-    calib_info::Union{Integer,OrderedDict};
-    # start: arguments that might be passed by upstream code
-    well_nums::AbstractVector=[],
+    # db_conn::MySQL.MySQLHandle,
+    # exp_id::Integer, # stage_id::Integer,
+    # calib_info::Union{Integer,OrderedDict};
+    # # start: arguments that might be passed by upstream code
+    # well_nums::AbstractVector=[],
+    exp_data::AbstractArray,
     auto_span_smooth::Bool=false,
     span_smooth_default::Real=0.015,
     span_smooth_factor::Real=7.2,

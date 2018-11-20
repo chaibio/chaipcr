@@ -1,49 +1,58 @@
 # chaipcr/web/public/dynexp/optical_test_single_channel/analyze.R
 
 # constants
-const BASELINE_STEP_ID = 12
-const EXCITATION_STEP_ID = 13
+# const BASELINE_STEP_ID = 12
+# const EXCITATION_STEP_ID = 13
 const MIN_EXCITATION_FLUORESCENCE = 5120
 const MIN_EXCITATION_FLUORESCENCE_MULTIPLE = 3
 const MAX_EXCITATION = 384000
 
 
+# !!!! modified for receiving data instead of experiment ids as input
 function analyze_func(
     ::OpticalTestSingleChannel,
-    db_conn::MySQL.MySQLHandle,
-    exp_id::Integer,
-    calib_info::Union{Integer,OrderedDict}=calib_info_AIR; # not used for computation
+    # db_conn::MySQL.MySQLHandle,
+    # exp_id::Integer,
+    # calib_info::Union{Integer,OrderedDict}=calib_info_AIR; # not used for computation
     # start: arguments that might be passed by upstream code
-    well_nums::AbstractVector=[],
+    # well_nums::AbstractVector=[],
+    exp_data::AbstractArray # new
     )
 
-    step_ids = [BASELINE_STEP_ID, EXCITATION_STEP_ID]
-    ot_dict = OrderedDict(map(step_ids) do step_id
-        ot_qry_2b = "SELECT fluorescence_value, well_num
-            FROM fluorescence_data
-            WHERE
-                experiment_id = $exp_id AND
-                step_id = $step_id AND
-                cycle_num = 1 AND
-                step_id is not NULL
-                well_constraint
-            ORDER BY well_num
-        "
-        ot_nt, fluo_well_nums = get_mysql_data_well(
-            well_nums, ot_qry_2b, db_conn, false
-        )
-        step_id => ot_nt[:fluorescence_value]
-    end) # do step_id
+    # step_ids = [BASELINE_STEP_ID, EXCITATION_STEP_ID]
+    # ot_dict = OrderedDict(map(step_ids) do step_id
+    #     ot_qry_2b = "SELECT fluorescence_value, well_num
+    #         FROM fluorescence_data
+    #         WHERE
+    #             experiment_id = $exp_id AND
+    #             step_id = $step_id AND
+    #             cycle_num = 1 AND
+    #             step_id is not NULL
+    #             well_constraint
+    #         ORDER BY well_num
+    #     "
+    #     ot_nt, fluo_well_nums = get_mysql_data_well(
+    #         well_nums, ot_qry_2b, db_conn, false
+    #     )
+    #     step_id => ot_nt[:fluorescence_value]
+    # end) # do step_id
 
     # assuming the 2 values of `ot_dict` are the same in length (number of wells)
-    results = map(1:length(ot_dict[step_ids[1]])) do well_i
-        baseline, excitation = map(step_ids) do step_id
-            ot_dict[step_id][well_i]
-        end # do step_id
+    results = map(1:length(ot_dict["baseline"])) do well_i
+        baseline = ot_dict["baseline"][well_i]
+        excitation = ot_dict["excitation"][well_i]
         # valid = (excitation >= MIN_EXCITATION_FLUORESCENCE) && (excitation / baseline >= MIN_EXCITATION_FLUORESCENCE_MULTIPLE) && (excitation <= MAX_EXCITATION) # old
         valid = (excitation >= MIN_EXCITATION_FLUORESCENCE) && (baseline < MIN_EXCITATION_FLUORESCENCE) && (excitation <= MAX_EXCITATION) # Josh, 2016-08-15
         OrderedDict("baseline"=>baseline, "excitation"=>excitation, "valid"=>valid)
     end # do well_i
+    # results = map(1:length(ot_dict[step_ids[1]])) do well_i
+    #     baseline, excitation = map(step_ids) do step_id
+    #         ot_dict[step_id][well_i]
+    #     end # do step_id
+    #     # valid = (excitation >= MIN_EXCITATION_FLUORESCENCE) && (excitation / baseline >= MIN_EXCITATION_FLUORESCENCE_MULTIPLE) && (excitation <= MAX_EXCITATION) # old
+    #     valid = (excitation >= MIN_EXCITATION_FLUORESCENCE) && (baseline < MIN_EXCITATION_FLUORESCENCE) && (excitation <= MAX_EXCITATION) # Josh, 2016-08-15
+    #     OrderedDict("baseline"=>baseline, "excitation"=>excitation, "valid"=>valid)
+    # end # do well_i
 
     return json(OrderedDict("optical_data"=>results))
 

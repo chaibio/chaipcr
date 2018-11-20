@@ -5,22 +5,23 @@
 
 function analyze_func(
     ::OpticalCal,
-    db_conn::MySQL.MySQLHandle,
-    exp_id::Integer, # not used for computation
-    calib_info::Union{Integer,OrderedDict}; # really used
-    well_nums::AbstractVector=[],
+    # db_conn::MySQL.MySQLHandle,
+    # exp_id::Integer, # not used for computation
+    # calib_info::Union{Integer,OrderedDict}; # really used
+    # well_nums::AbstractVector=[],
+    exp_data::AbstractArray,
     dye_in::String="FAM", dyes_2bfild::Vector=[],
     out_json=true,
     verbose=false
     )
 
-    calib_info_ori = calib_info
-    calib_info_dict = ensure_ci(db_conn, calib_info_ori)
-    print_v(
-        println, verbose,
-        "original: ", calib_info_ori,
-        "dict: ", calib_info_dict
-    )
+    # calib_info_ori = calib_info
+    # calib_info_dict = ensure_ci(db_conn, calib_info_ori)
+    # print_v(
+    #     println, verbose,
+    #     "original: ", calib_info_ori,
+    #     "dict: ", calib_info_dict
+    # )
 
     result = OrderedDict("valid"=>true)
     err_msg_vec = Vector{String}()

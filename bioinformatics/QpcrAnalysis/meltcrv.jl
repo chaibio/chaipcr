@@ -42,12 +42,13 @@ end
 
 # Top-level function: get melting curve data and Tm for a melt curve experiment
 function process_mc(
-    db_conn::MySQL.MySQLHandle,
-    exp_id::Integer, stage_id::Integer,
-    calib_info::Union{Integer,OrderedDict};
-    # start: arguments that might be passed by upstream code
-    well_nums::AbstractVector=[],
-    channel_nums::AbstractVector=[1],
+    # db_conn::MySQL.MySQLHandle,
+    # exp_id::Integer, stage_id::Integer,
+    # calib_info::Union{Integer,OrderedDict};
+    # # start: arguments that might be passed by upstream code
+    # well_nums::AbstractVector=[],
+    # channel_nums::AbstractVector=[1],
+    exp_data::AbstractArray, calib_data::AbstractArray, # new
     auto_span_smooth::Bool=false,
     span_smooth_default::Real=0.015,
     span_smooth_factor::Real=7.2,
@@ -60,28 +61,31 @@ function process_mc(
     kwdict_mc_tm_pw::OrderedDict=OrderedDict() # keyword arguments passed onto `mc_tm_pw`
     )
 
-    print_v(println, verbose,
-        "db_conn: ", db_conn, "\n",
-        "experiment_id: $exp_id\n",
-        "stage_id: $stage_id\n",
-        "calib_info: $calib_info\n",
-        "max_tmprtr: $max_tmprtr"
-    )
+    # old
+    # print_v(println, verbose,
+    #     "db_conn: ", db_conn, "\n",
+    #     "experiment_id: $exp_id\n",
+    #     "stage_id: $stage_id\n",
+    #     "calib_info: $calib_info\n",
+    #     "max_tmprtr: $max_tmprtr"
+    # )
+    #
+    # calib_info = ensure_ci(db_conn, calib_info, exp_id)
+    #
+    # mcd_qry_2b = "
+    #     SELECT well_num, channel
+    #         FROM melt_curve_data
+    #             WHERE
+    #                 experiment_id = $exp_id AND
+    #                 stage_id = $stage_id AND
+    #                 temperature <= $max_tmprtr
+    #                 well_constraint
+    # "
+    # mcd_nt, fluo_well_nums = get_mysql_data_well(
+    #     well_nums, mcd_qry_2b, db_conn, verbose
+    # )
 
-    calib_info = ensure_ci(db_conn, calib_info, exp_id)
-
-    mcd_qry_2b = "
-        SELECT well_num, channel
-            FROM melt_curve_data
-                WHERE
-                    experiment_id = $exp_id AND
-                    stage_id = $stage_id AND
-                    temperature <= $max_tmprtr
-                    well_constraint
-    "
-    mcd_nt, fluo_well_nums = get_mysql_data_well(
-        well_nums, mcd_qry_2b, db_conn, verbose
-    )
+    # new
     num_fluo_wells = length(fluo_well_nums)
 
     # pre-deconvolution, can process multiple channels

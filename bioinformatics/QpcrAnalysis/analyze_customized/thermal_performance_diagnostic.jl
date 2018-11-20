@@ -15,13 +15,14 @@ const MAX_TIME_TO_HEAT = 90e3 # ms
 
 function analyze_func(
     ::ThermalPerformanceDiagnostic,
-    db_conn::MySQL.MySQLHandle,
-    exp_id::Integer, # really used
-    calib_info::Union{Integer,OrderedDict} # not used for computation
+    # db_conn::MySQL.MySQLHandle,
+    # exp_id::Integer, # really used
+    # calib_info::Union{Integer,OrderedDict} # not used for computation
+    exp_data::AbstractArray
     )
 
     #extract data from database
-    queryTemperatureData = "SELECT * FROM temperature_logs WHERE experiment_id = $exp_id order by elapsed_time"
+    queryTemperatureData = "SELECT * FROM temperature_logs WHERE experiment_id = $exp_id ORDER BY elapsed_time"
     temperatureData = MySQL.mysql_execute(db_conn, queryTemperatureData)[1]
     num_dp = length(temperatureData[1]) # dp = data points
 

@@ -28,11 +28,12 @@ end) # do i
 # analyze function
 function analyze_func(
     ::OpticalTestDualChannel,
-    db_conn::MySQL.MySQLHandle,
-    exp_id::Integer,
-    calib_info::Union{Integer,OrderedDict}; # keys: "baseline", "water", "channel_1", "channel_2". Each value's "calibration_id" value is the same as `exp_id`
-    # start: arguments that might be passed by upstream code
-    well_nums::AbstractVector=[],
+    # db_conn::MySQL.MySQLHandle,
+    # exp_id::Integer,
+    # calib_info::Union{Integer,OrderedDict}; # keys: "baseline", "water", "channel_1", "channel_2". Each value's "calibration_id" value is the same as `exp_id`
+    # # start: arguments that might be passed by upstream code
+    # well_nums::AbstractVector=[],
+    exp_data::AbstractArray
     )
 
     fluo_qry_2b = "SELECT step_id, well_num, fluorescence_value, channel

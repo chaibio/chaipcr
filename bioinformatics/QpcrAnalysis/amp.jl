@@ -93,12 +93,16 @@ end
 #
 function process_amp(
     db_conn::MySQL.MySQLHandle,
-    exp_id::Integer,
-    asrp_vec::Vector{AmpStepRampProperties},
-    calib_info::Union{Integer,OrderedDict};
-
-    # arguments that might be passed by upstream code
-    well_nums::AbstractVector=[],
+    # new: start
+    exp_data::AbstractArray,
+    calib_data::AbstractArray,
+    # new: end
+    # exp_id::Integer,
+    # asrp_vec::Vector{AmpStepRampProperties},
+    # calib_info::Union{Integer,OrderedDict};
+    #
+    # # arguments that might be passed by upstream code
+    # well_nums::AbstractVector=[],
     min_reliable_cyc::Real=5,
     baseline_cyc_bounds::AbstractVector=[],
     cq_method::String="Cy0",
@@ -129,95 +133,103 @@ function process_amp(
     verbose::Bool=false
     )
 
-    print_v(println, verbose,
-        "db_conn: ", db_conn, "\n",
-        "experiment_id: $exp_id\n",
-        "asrp_vec: $asrp_vec\n",
-        "calib_info: $calib_info\n",
-        "max_cycle: $max_cycle"
-    )
+    # old
+    # print_v(println, verbose,
+    #     "db_conn: ", db_conn, "\n",
+    #     "experiment_id: $exp_id\n",
+    #     "asrp_vec: $asrp_vec\n",
+    #     "calib_info: $calib_info\n",
+    #     "max_cycle: $max_cycle"
+    # )
+    #
+    # calib_info = ensure_ci(db_conn, calib_info, exp_id)
+    #
+    # if length(asrp_vec) == 0
+    #     sr_qry = "SELECT
+    #             steps.id AS steps_id,
+    #             steps.collect_data AS steps_collect_data,
+    #             ramps.id AS ramps_id,
+    #             ramps.collect_data AS ramps_collect_data
+    #         FROM experiments
+    #         LEFT JOIN protocols ON experiments.experiment_definition_id = protocols.experiment_definition_id
+    #         LEFT JOIN stages ON protocols.id = stages.protocol_id
+    #         LEFT JOIN steps ON stages.id = steps.stage_id
+    #         LEFT JOIN ramps ON steps.id = ramps.next_step_id
+    #         WHERE
+    #             experiments.id = $exp_id AND
+    #             stages.stage_type <> \'meltcurve\'
+    #     "
+    #     sr = MySQL.mysql_execute(db_conn, sr_qry)[1] # [index] fieldnames (mapping no longer needed after using "AS" in query): [1] steps.id, [2] steps.collect_data, [3] ramps.id, [4] ramps.collect_data
+    #
+    #     step_ids = unique(sr[1][sr[2] .== 1])
+    #     ramp_ids = unique(sr[3][sr[4] .== 1])
+    #
+    #     asrp_vec = vcat(
+    #         map(step_ids) do step_id
+    #             AmpStepRampProperties("step", step_id, DEFAULT_cyc_nums)
+    #         end,
+    #         map(ramp_ids) do ramp_id
+    #             AmpStepRampProperties("ramp", ramp_id, DEFAULT_cyc_nums)
+    #         end
+    #     )
+    # end # if length(sr_str_vec)
+    #
+    # # # find the latest step or ramp
+    # # if out_sr_dict
+    # #     sr_ids = map(asrp -> asrp.id, asrp_vec)
+    # #     max_step_id = maximum(sr_ids)
+    # #     msi_idc = find(sr_id -> sr_id == max_step_id, sr_ids) # msi = max_step_id
+    # #     if length(msi_idc) == 1
+    # #         latest_idx = msi_idc[1]
+    # #     else # length(max_idc) == 2
+    # #         latest_idx = find(asrp_vec) do asrp
+    # #             asrp.step_or_ramp == "step" && aspr.id == max_step_id
+    # #         end[1] # do asrp
+    # #     end # if length(min_idc) == 1
+    # #     asrp_latest = asrp_vec[latest_idx]
+    # # else # implying `sr_vec` has only one element
+    # #     asrp_latest = asrp_vec[1]
+    # # end
+    #
+    # # print_v(println, verbose, asrp_latest)
+    #
+    # # find `asrp`
+    # for asrp in asrp_vec
+    #     fd_qry_2b = "
+    #         SELECT well_num, cycle_num
+    #             FROM fluorescence_data
+    #             WHERE
+    #                 experiment_id = $exp_id AND
+    #                 $(asrp.step_or_ramp)_id = $(asrp.id) AND
+    #                 cycle_num <= $max_cycle AND
+    #                 step_id is not NULL
+    #                 well_constraint
+    #             ORDER BY cycle_num
+    #     " # must "SELECT well_num" for `get_mysql_data_well`
+    #     fd_nt, fluo_well_nums = get_mysql_data_well(
+    #         well_nums, fd_qry_2b, db_conn, verbose
+    #     )
+    #     asrp.cyc_nums = unique(fd_nt[:cycle_num])
+    #  end # for asrp
+    #
+    #  # find `fluo_well_nums` and `channel_nums`. literal i.e. non-pointer variables created in a Julia for-loop is local, i.e. not accessible outside of the for-loop.
+    #  asrp_1 = asrp_vec[1]
+    #  fd_qry_2b = "
+    #      SELECT well_num, channel
+    #          FROM fluorescence_data
+    #          WHERE
+    #              experiment_id = $exp_id AND
+    #              $(asrp_1.step_or_ramp)_id = $(asrp_1.id) AND
+    #              step_id is not NULL
+    #              well_constraint
+    #          ORDER BY well_num
+    #  " # must "SELECT well_num" and "ORDER BY well_num" for `get_mysql_data_well`
+    #  fd_nt, fluo_well_nums = get_mysql_data_well(
+    #      well_nums, fd_qry_2b, db_conn, verbose
+    #  )
 
-    calib_info = ensure_ci(db_conn, calib_info, exp_id)
+    # new
 
-    if length(asrp_vec) == 0
-        sr_qry = "SELECT steps.id, steps.collect_data, ramps.id, ramps.collect_data
-            FROM experiments
-            LEFT JOIN protocols ON experiments.experiment_definition_id = protocols.experiment_definition_id
-            LEFT JOIN stages ON protocols.id = stages.protocol_id
-            LEFT JOIN steps ON stages.id = steps.stage_id
-            LEFT JOIN ramps ON steps.id = ramps.next_step_id
-            WHERE
-                experiments.id = $exp_id AND
-                stages.stage_type <> \'meltcurve\'
-        "
-        sr = MySQL.mysql_execute(db_conn, sr_qry)[1] # fieldnames: [1] steps.id, [2] steps.collect_data, [3] ramps.id, [4] ramps.collect_data
-
-        step_ids = unique(sr[1][sr[2] .== 1])
-        ramp_ids = unique(sr[3][sr[4] .== 1])
-
-        asrp_vec = vcat(
-            map(step_ids) do step_id
-                AmpStepRampProperties("step", step_id, DEFAULT_cyc_nums)
-            end,
-            map(ramp_ids) do ramp_id
-                AmpStepRampProperties("ramp", ramp_id, DEFAULT_cyc_nums)
-            end
-        )
-    end # if length(sr_str_vec)
-
-    # # find the latest step or ramp
-    # if out_sr_dict
-    #     sr_ids = map(asrp -> asrp.id, asrp_vec)
-    #     max_step_id = maximum(sr_ids)
-    #     msi_idc = find(sr_id -> sr_id == max_step_id, sr_ids) # msi = max_step_id
-    #     if length(msi_idc) == 1
-    #         latest_idx = msi_idc[1]
-    #     else # length(max_idc) == 2
-    #         latest_idx = find(asrp_vec) do asrp
-    #             asrp.step_or_ramp == "step" && aspr.id == max_step_id
-    #         end[1] # do asrp
-    #     end # if length(min_idc) == 1
-    #     asrp_latest = asrp_vec[latest_idx]
-    # else # implying `sr_vec` has only one element
-    #     asrp_latest = asrp_vec[1]
-    # end
-
-    # print_v(println, verbose, asrp_latest)
-
-    # find `asrp`
-    for asrp in asrp_vec
-        fd_qry_2b = "
-            SELECT well_num, cycle_num
-                FROM fluorescence_data
-                WHERE
-                    experiment_id = $exp_id AND
-                    $(asrp.step_or_ramp)_id = $(asrp.id) AND
-                    cycle_num <= $max_cycle AND
-                    step_id is not NULL
-                    well_constraint
-                ORDER BY cycle_num
-        " # must "SELECT well_num" for `get_mysql_data_well`
-        fd_nt, fluo_well_nums = get_mysql_data_well(
-            well_nums, fd_qry_2b, db_conn, verbose
-        )
-        asrp.cyc_nums = unique(fd_nt[:cycle_num])
-     end # for asrp
-
-     # find `fluo_well_nums` and `channel_nums`. literal i.e. non-pointer variables created in a Julia for-loop is local, i.e. not accessible outside of the for-loop.
-     asrp_1 = asrp_vec[1]
-     fd_qry_2b = "
-         SELECT well_num, channel
-             FROM fluorescence_data
-             WHERE
-                 experiment_id = $exp_id AND
-                 $(asrp_1.step_or_ramp)_id = $(asrp_1.id) AND
-                 step_id is not NULL
-                 well_constraint
-             ORDER BY well_num
-     " # must "SELECT well_num" and "ORDER BY well_num" for `get_mysql_data_well`
-     fd_nt, fluo_well_nums = get_mysql_data_well(
-         well_nums, fd_qry_2b, db_conn, verbose
-     )
     channel_nums = unique(fd_nt[:channel])
 
     # pre-deconvolution, process all available channel_nums
@@ -229,8 +241,9 @@ function process_amp(
 
     sr_dict = OrderedDict(map(asrp_vec) do asrp
         process_amp_1sr(
-            db_conn, exp_id, asrp, calib_info,
-            fluo_well_nums, well_nums, channel_nums,
+            # db_conn, exp_id, asrp, calib_info,
+            # fluo_well_nums, well_nums, channel_nums,
+            exp_data, calib_data, # new
             dcv,
             dye_in, dyes_2bfild,
             min_reliable_cyc, baseline_cyc_bounds, cq_method, ct_fluos, af_key, kwdict_mbq, ipopt_print2file_prefix,
@@ -270,7 +283,6 @@ function get_amp_data(
             step_id is not NULL
         ORDER BY channel, well_num, cycle_num
     "
-
     fluo_sel = MySQL.mysql_execute(db_conn, fluo_qry)[1]
 
     fluo_raw = reshape(
@@ -644,12 +656,13 @@ end # report_cq!
 
 # process amplification per step
 function process_amp_1sr(
-    db_conn::MySQL.MySQLHandle,
-    exp_id::Integer,
-    asrp::AmpStepRampProperties,
-    calib_info::Union{Integer,OrderedDict},
-    fluo_well_nums::AbstractVector, well_nums::AbstractVector,
-    channel_nums::AbstractVector,
+    # db_conn::MySQL.MySQLHandle,
+    # exp_id::Integer,
+    # asrp::AmpStepRampProperties,
+    # calib_info::Union{Integer,OrderedDict},
+    # fluo_well_nums::AbstractVector, well_nums::AbstractVector,
+    # channel_nums::AbstractVector,
+    exp_data::AbstractArray, calib_data::AbstractArray, # new
     dcv::Bool, # logical, whether to perform multi-channel deconvolution
     dye_in::String, dyes_2bfild::AbstractVector,
     min_reliable_cyc::Real,
