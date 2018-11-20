@@ -322,10 +322,9 @@ rm mysql_password_flush.sql
 df -h
 echo done resetting mysql password
 
-echo boxing transaction queue.
-
+# boxing transactions queue.
+echo boxing transactions queue.
 MYSQL_USER=root
-MYSQL_PASS=
 MYSQL_CONN=&quot;-u${MYSQL_USER} --password=&quot;
 SQL=&quot;SET GLOBAL innodb_fast_shutdown = 0&quot;
 mysql ${MYSQL_CONN} -ANe&quot;${SQL}&quot;
@@ -837,6 +836,8 @@ fi
 
 rm -r /var/cache/apt /var/log/ /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/tests
 mkdir /var/log/ -p
+
+# remove part of .git folder to save more space. Keeping the .git/objects folder under the packages because Pkg.status() verify the package number from there. An extra chance to save space is available here by cherry pick the exact file needed by Pkg.status().
 
 find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;/logs/
 find /root/.julia/.cache/ -name objects | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;

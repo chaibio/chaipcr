@@ -467,6 +467,10 @@ else
       echo freeing up some space
       rm -r /var/cache/apt /var/log/ /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/tests
       mkdir /var/log/ -p
+
+      # remove part of .git folder to save more space. Keeping the .git/objects folder under the packages because 
+Pkg.status() verify the package number from there. An extra chance to save space is available here by cherry pick 
+the exact file needed by Pkg.status().
       find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;/logs/
       find /root/.julia/.cache/ -name objects | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
       apt update
@@ -1072,7 +1076,10 @@ then
       echo Building a debug image
       exit 0
 fi
+
+# remove folders that are needed for the production image. An extra chance to freeup more space is by linking realtime and the browser statically.
 rm -r /opt/QtEmbedded/bin/  /opt/QtEmbedded/mkspecs /opt/QtEmbedded/include
+
 find . -name .git -execdir rm -r {} \;
 find . -name *.o  -exec rm {} \;
 find / -name .git -execdir rm -r {} \;

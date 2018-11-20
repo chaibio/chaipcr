@@ -3,9 +3,8 @@ ruby scripts/upgrade.rb
 /usr/local/bin/bundle exec /usr/local/bin/rake db:migrate
 /usr/local/bin/bundle exec /usr/local/bin/rake db:seed_fu
 
+# boxing transactions queue. This should work on the database upgrade case.
 MYSQL_USER=root
-MYSQL_PASS=
-#MYSQL_CONN="-u${MYSQL_USER} -p${MYSQL_PASS}"
 MYSQL_CONN="-u${MYSQL_USER} --password="
 SQL="SET GLOBAL innodb_fast_shutdown = 0"
 mysql ${MYSQL_CONN} -ANe"${SQL}"
