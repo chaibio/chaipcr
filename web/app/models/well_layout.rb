@@ -52,6 +52,10 @@ class WellLayout < ActiveRecord::Base
     end
   end
   
+  def self.experiment_id_for_well_layout_id(layout_id)
+    where(:id=>layout_id).pluck("experiment_id").first
+  end
+  
   def editable?
     parent_type == Experiment.name
   end

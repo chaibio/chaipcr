@@ -262,6 +262,9 @@ describe "Experiments API", type: :request do
       json = JSON.parse(response.body)
       @experiment1 = create_experiment("test1")
       put "/experiments/#{@experiment1.id}", {experiment: {standard_experiment_id: @experiment.id}}.to_json, http_headers
+      expect(response).to be_success  
+      putjson = JSON.parse(response.body)
+      expect(putjson['experiment']["standard_experiment_id"]).to eq(@experiment.id)
       post "/experiments/#{@experiment1.id}/targets/#{json["target"]["id"]}/links", {wells:[{well_num: 1, well_type: "unknown"}]}.to_json, http_headers
       expect(response).to be_success
       
