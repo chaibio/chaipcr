@@ -99,7 +99,9 @@ background: repeating-linear-gradient(-60deg, #F5F5F5, #F5F5F5 1px, white 4px, w
   white-space: nowrap;
   overflow: hidden;
   width: 100%;
-  text-overflow: ellipsis;      
+  text-overflow: ellipsis;
+  background: url(/images/arrow-down_white.png) no-repeat transparent;
+  background-size: 10px 8px;  
 }
 
 .sample-target-section{
@@ -124,7 +126,7 @@ background: repeating-linear-gradient(-60deg, #F5F5F5, #F5F5F5 1px, white 4px, w
   width: 10px;
   height: 10px;
   display: inline-block;
-  margin-top: 5px;
+  margin-top: 7px;
   position: absolute;
   right: 10px;
 }
@@ -272,8 +274,7 @@ li {
     .well-switch-bar {
       height: 5px;
     }
-    .ct-cq-container {
-      border-top: 1px solid #c5c5c5;
+    .ct-cq-container {      
       padding: 5px 10px;
       min-height: 45px;
 			padding-bottom: 10px;

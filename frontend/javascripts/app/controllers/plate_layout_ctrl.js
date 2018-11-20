@@ -34,6 +34,11 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 
 		Experiment.get({ id: $stateParams.id }).then(function (response) {
 			$scope.experiment = response.experiment;
+			if($scope.experiment.standard_experiment_id){
+				Experiment.get({ id: $scope.experiment.standard_experiment_id }).then(function (resp) {
+					$scope.standard_experiment = resp.experiment;
+				});				
+			}
 		});
 
 		$scope.wellInf = [];
@@ -70,18 +75,19 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 		];
 
 		$scope.selected = null;
+		$scope.standard_experiment = null;
 
 		function adjustMenuItemPosition(type){
 			var container_height = angular.element(document.querySelector('.plate-layout-details')).height();
 			var layout_height = angular.element(document.querySelector('.plate-layout-wells')).height();
 			var menu_max_height = container_height - 25;
-			var init_offset_low = container_height - (layout_height + 132);
+			var init_offset_low = container_height - (layout_height + 137);
 			angular.element(document.querySelector(type)).css('max-height', menu_max_height);
 
 			var menu_height = angular.element(document.querySelector(type)).height();
 			if(init_offset_low <= menu_height){
 				if(init_offset_low + 40 >= menu_height){
-					angular.element(document.querySelector(type)).css('top', 48);
+					angular.element(document.querySelector(type)).css('top', 47);
 				} else {
 					angular.element(document.querySelector(type)).css('top', init_offset_low - menu_height + 85);
 				}
@@ -100,18 +106,18 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 			var container_height = angular.element(document.querySelector('.plate-layout-details')).height();
 			var layout_height = angular.element(document.querySelector('.plate-layout-wells')).height();
 			var menu_max_height = container_height - 25;
-			var init_offset_low = container_height - (layout_height + 132 + 85);
+			var init_offset_low = container_height - (layout_height + 137 + 105);
 			angular.element(document.querySelector(type)).css('max-height', menu_max_height);
 
 			var menu_height = angular.element(document.querySelector(type)).height();
 			if(init_offset_low <= menu_height){
 				if(init_offset_low + 40 >= menu_height){
-					angular.element(document.querySelector(type)).css('top', 43);
+					angular.element(document.querySelector(type)).css('top', 47);
 				} else {
-					angular.element(document.querySelector(type)).css('top', init_offset_low - menu_height + 87);
+					angular.element(document.querySelector(type)).css('top', init_offset_low - menu_height + 85);
 				}
 			} else {
-				angular.element(document.querySelector(type)).css('top', 87);
+				angular.element(document.querySelector(type)).css('top', 85);
 			}
 
 			if(document.querySelector(type + ' li.active')){			
@@ -254,7 +260,6 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 				for (i = 0; i < resp.data.length; i++) {
 					$scope.samples[i] = resp.data[i].sample;
 				}
-
 			});
 		};
 
@@ -395,7 +400,7 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 			}
 			else {
 				$scope.sampleSelected = "Choose a Sample";
-				$scope.sampleSelectedId = 0;				
+				$scope.sampleSelectedId = 0;
 			}
 
 		};
@@ -736,14 +741,45 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 				}
 				well = $scope.wells["well_" + index];
 				well.selected = isCtrlKeyHeld(evt) ? !well.selected : true;
-				$scope.selectionMade = true;
 				$scope.check();
 				$scope.checkTarget1();
 				$scope.checkTarget2();
+				$scope.selectionMade = isSelectMode();
+				if(!$scope.selectionMade){
+					$scope.sampleSelected = "Choose a Sample";
+					$scope.sampleSelectedId = 0;
+
+					$scope.target2Selected = "Choose a Target";
+					$scope.target2SelectedColor = "white";
+					$scope.enableTarget2Type = false;
+					$scope.enableTarget2Qty = false;
+					$scope.selectedTarget2Type = "";
+					$scope.target2Quantity.value = null;
+					$scope.target2SelectedId = 0;
+
+					$scope.target1Selected = "Choose a Target";
+					$scope.target1SelectedColor = "white";
+					$scope.enableTarget1Type = false;
+					$scope.enableTarget1Qty = false;
+					$scope.selectedTarget1Type = "";
+					$scope.target1Quantity.value = null;
+					$scope.target1SelectedId = 0;
+
+				}
 			}
 			//ngModel.$setViewValue(angular.copy($scope.wells));
 			return console.log($scope.wells);
 		};
+
+		function isSelectMode(){
+			for (i = 0; i < 16; i++) {
+				if ($scope.wells["well_" + i].selected) {
+					return true;
+				}
+			}
+			return false;
+		}
+
 		$scope.getWellStyle = function (row, col, well, index) {
 			var border, style, well_bottom, well_bottom_index, well_left, well_left_index, well_right, well_right_index, well_top, well_top_index;
 			if (well.active) {
@@ -1022,6 +1058,7 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 					$scope.enableTarget1Type = false;
 					$scope.enableTarget1Qty = false;
 					$scope.target1Selected = "Choose a Target";
+					$scope.target1SelectedId = 0;
 					$scope.target1SelectedColor = "white";
 					$scope.selectedTarget1Type = "";
 					$scope.target1Quantity.value = null;
@@ -1041,6 +1078,7 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 					$scope.enableTarget2Type = false;
 					$scope.enableTarget2Qty = false;
 					$scope.target2Selected = "Choose a Target";
+					$scope.target2SelectedId = 0;
 					$scope.target2SelectedColor = "white";
 					$scope.selectedTarget2Type = "";
 					$scope.target2Quantity.value = null;
