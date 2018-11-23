@@ -356,7 +356,8 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 						target2quantityB: ""
 					};
 				}
-				$scope.getWellLayout();
+				// $scope.getWellLayout();
+				$scope.getTargets();
 			}
 			else {
 				for (var y = 0; y < 16; y++) {
@@ -371,7 +372,8 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 						target1quantityB: ""
 					};
 				}
-				$scope.getWellLayout();
+				// $scope.getWellLayout();
+				$scope.getTargets();
 
 			}
 		});
@@ -415,10 +417,12 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 				for (l = 0; l < resp.data.length; l++) {
 					lookup[resp.data[l].target.id] = $scope.colors[l % 16];
 				}
+
+				$scope.getWellLayout();
 			});
 		};
 
-		$scope.getTargets();
+		// $scope.getTargets();
 
 		function isEmpty(obj) {
 			for (var key in obj) {
