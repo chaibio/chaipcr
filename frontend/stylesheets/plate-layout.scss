@@ -120,6 +120,13 @@ background: repeating-linear-gradient(-60deg, #F5F5F5, #F5F5F5 1px, white 4px, w
   border: 1px solid #ccc;
 }
 
+span.target-text{
+  display: inline-block;
+  width: calc(100% - 20px);
+  vertical-align: top;  
+  overflow-wrap: break-word;
+}
+
 .span-arrow-down{
   background: url(/images/arrow-down_white.png) no-repeat 0px 0px transparent;
   background-size: 10px 8px;
@@ -138,35 +145,79 @@ background: repeating-linear-gradient(-60deg, #F5F5F5, #F5F5F5 1px, white 4px, w
 	border-radius: 3px;	
 	z-index: 5;
 	width: calc(100% - 40px);
-  overflow: auto;
+  overflow: hidden;
+  padding: 2px;  
 	//cursor: pointer;
 	//top: -84px;
 	//visibility: hidden;
-	ul {
-  list-style: none;
-  padding: 5px;
-  margin: 0;
-	// overflow: scroll;
-	// max-height:  122px;
 
-  
-  //display: flex;
-  //flex-direction: column;
-  //flex-wrap: wrap;
-  //width: 300px;
-  //height: 200px;
+  .dropdown-container{
+    position: relative;
+    display: block;
+    overflow: hidden;
+  }
 
-  li.active,
-  li:hover{
-    background: #00AEEF;
-    color: #fff;
+  label.button-arrow{
+    width: 100%;
+    height: 20px;    
+    cursor: pointer;
+    display: block;
+    margin: 0;
+    position: relative;
+  }
+
+  label.button-arrow:hover{    
     border-radius: 3px;
   }
-}
+
+  label.up-arrow{
+    background: url(/images/dd_up.svg) no-repeat 0px center #fff;
+    &:hover{
+      background: url(/images/dd_up_h.svg) no-repeat 0px center #00AEEF;
+      &.disabled{
+        background: url(/images/dd_up.svg) no-repeat 0px center #fff;
+        cursor: initial;      
+      }
+    }
+  }
+
+  label.down-arrow{
+    background: url(/images/dd_down.svg) no-repeat 0px center #fff;
+    &:hover{
+      background: url(/images/dd_down_h.svg) no-repeat 0px center #00AEEF;
+      &.disabled{
+        background: url(/images/dd_down.svg) no-repeat 0px center #fff;
+        cursor: initial;      
+      }
+    }
+  }
+
+	ul {
+    list-style: none;
+    padding: 0px;
+    margin: 0;
+    position: relative;
+  	// overflow: scroll;
+  	// max-height:  122px;
+
+    
+    //display: flex;
+    //flex-direction: column;
+    //flex-wrap: wrap;
+    //width: 300px;
+    //height: 200px;
+
+    li.active,
+    li:hover{
+      background: #00AEEF;
+      color: #fff;
+      border-radius: 3px;
+    }
+  }
 
 li {
   //height: 12.5%;
-	padding: 8px;
+	padding: 10px 8px;
 	cursor: pointer;
 }
 .ul-height{
