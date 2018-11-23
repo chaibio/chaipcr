@@ -337,7 +337,6 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 
 		Device.isDualChannel().then(function (is_dual_channel) {
 			$scope.is_dual_channel = is_dual_channel;
-			$scope.is_dual_channel = false;
 			if ($scope.is_dual_channel) {
 				for (var x = 0; x < 16; x++) {
 					$scope.wellInf[x] = {
