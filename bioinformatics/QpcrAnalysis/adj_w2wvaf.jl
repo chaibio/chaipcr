@@ -19,7 +19,7 @@ const DYE2CHST = OrderedDict( # mapping from dye to channel and step_id.
 
 # types
 
-immutable Ccsc # channels_check_subset_composite
+struct Ccsc # channels_check_subset_composite
     set::Vector # channels
     description::String
 end
