@@ -40,7 +40,7 @@ limitations under the License.
                                 <tbody>
                                     <tr style="background: #eee;">
                                         <th ng-click="selectAllWells()" ng-style="{width: row_header_width + 'px'}" class="col-header" style="cursor: pointer;"></th>
-                                        <th ng-mousedown="dragStart($event, 'column', col.index)" ng-mouseup="dragStop($event, 'column', col.index)" ng-mousemove="dragged($event, 'column', col.index)" ng-repeat="col in columns" ng-style="{width: getCellWidth() + 'px'}" class="col-header" ng-class="{dragged: col.selected}">
+                                        <th ng-mousedown="dragStart($event, 'column', col.index)" ng-mouseup="dragStop($event, 'column', col.index)" ng-mousemove="dragged($event, 'column', col.index)" ng-repeat="col in columns" ng-style="{width: getCellWidth() + 'px'}" class="col-header XG1" ng-class="{dragged: col.selected}">
                                             {{col.index + 1}}
                                         </th>
                                     </tr>
@@ -52,7 +52,7 @@ limitations under the License.
                                             ng-mouseup="dragStop($event, 'row', row.index)" 
                                             ng-class="{dragged: row.selected}"
                                         >
-                                            <label style="width: 20px;">                                                
+                                            <label style="width: 20px;" class="XG1">                                                
                                                 {{ rowCharacters[row.index] }}
                                             </label>
                                         </td>
