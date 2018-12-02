@@ -21,7 +21,8 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
   'AmplificationChartHelper',
   '$timeout',
   '$state',
-  (AmplificationChartHelper, $timeout) ->
+  '$rootScope',
+  (AmplificationChartHelper, $timeout, $state, $rootScope) ->
     restrict: 'EA',
     require: 'ngModel',
     scope:
@@ -33,7 +34,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
     templateUrl: 'app/views/directives/chart-well-switch.html',
     link: ($scope, elem, attrs, ngModel) ->
 
-      COLORS = AmplificationChartHelper.COLORS
+      COLORS = AmplificationChartHelper.SAMPLE_TARGET_COLORS
       ACTIVE_BORDER_WIDTH = 2
       is_cmd_key_held = false
       wells = {}
@@ -216,6 +217,8 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
           well.selected = if isCtrlKeyHeld(evt) then !well.selected else true
 
         ngModel.$setViewValue(angular.copy($scope.wells))
+
+        $rootScope.$broadcast 'event:switch-chart-well', {active: well.active, index: index}
 
       $scope.getWellStyle = (row, col, well, index) ->
         return {} if well.active

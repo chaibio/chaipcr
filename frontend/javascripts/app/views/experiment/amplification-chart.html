@@ -130,7 +130,7 @@ limitations under the License.
                     <div class="parameters">
                       <div class="header B1-M-Amplification" ng-style="bgcolor_target" style="min-height: 41px; color:white;">
                         <!-- Target: -->
-                        {{label_target}}
+                        {{label_target.name}}
                       </div>
                       <div>
                         <table class="parameters-table">
@@ -160,18 +160,18 @@ limitations under the License.
                       {{label_well}}{{label_sample ? ", " : ""}}{{label_sample}}
                     </div> -->
                 </div>
-                <div class="targets-set" ng-show="targetsSet.length" style="padding-top:5px; padding-bottom: 0px;">
+                <div class="targets-set" style="padding-top:5px; padding-bottom: 0px;">
                   <table class="targets-table">
                     <tr ng-repeat="target in targetsSet">
                       <td>
                         <span ng-if="color_by==='target'" class="dot" ng-attr-style="background-color: {{COLORS[$index]}}"></span>
                       </td>
-                      <td style="padding-top: 5px; padding-bottom: 5px; color: black;">{{target}}</td>
-                      <td class="td-tik" ng-click="targetClick($index)" style="padding-right: 15px;">
-                        <span ng-show="!targetsSetHided[$index]">
+                      <td style="padding-top: 5px; padding-bottom: 5px; color: black;">{{target.name}}</td>
+                      <td class="td-tik" ng-click="targetClick(target.id)" style="padding-right: 15px;">
+                        <span ng-show="!targetsSetHided[target.id]">
                           <img src="/images/target_on.svg">
                         </span>
-                        <span ng-show="targetsSetHided[$index]">
+                        <span ng-show="targetsSetHided[target.id]">
                             <img src="/images/target_off.svg">
                           </span>
                         </td>
@@ -189,96 +189,107 @@ limitations under the License.
         <table style="height: fit-content; min-width: 540px; backface-visibility: white">
           <tbody>
             <tr>
-              <th class="B2-M-Amplification" style="text-align: center; border-left:none">Clr</th>
-              <th class="B2-M-Amplification" style="text-align: center;">Omit</th>
+              <th class="B2-M-Amplification" style="text-align: center; border-left:none; padding: 10px 5px;">Clr</th>
+              <th class="B2-M-Amplification" style="text-align: center; padding: 10px 5px;">Omit</th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;" >Well</th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;" >Sample</th>
               <th class="B2-M-Amplification" style="text-align: center;">Type</th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;">Target</th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;" ng-class="{'channel-1': color_by === 'channel'}">
-                <span ng-if="is_dual_channel">Cq</span>
-                <span ng-if="!is_dual_channel">Cq</span>
+                <span ng-if="is_dual_channel">C<small>q</small></span>
+                <span ng-if="!is_dual_channel">C<small>q</small></span>
               </th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;" ng-class="{'channel-2': color_by === 'channel'}">
-                <span ng-if="is_dual_channel" >Cq M</span>
-                <span ng-if="!is_dual_channel" >Cq M</span>
+                <span ng-if="is_dual_channel" >C<small>q</small> M</span>
+                <span ng-if="!is_dual_channel" >C<small>q</small> M</span>
               </th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;">Qty</th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;">Qty M</th>
             </tr>
-            <tr ng-repeat="i in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" ng-class="{selected: (wellButtons['well_'+i].selected)}">
+            <tr ng-repeat="well_item in well_data" 
+              ng-class="{
+                selected: (wellButtons['well_' + (well_item.well_num - 1)].selected),
+                active: well_item.active
+              }"
+            >
               <td class="B2-Amplification" ng-class="{'text-center': color_by==='channel'}" style="vertical-align: middle; line-height: 10px;">
-                <span ng-if="color_by==='well'" class="B2-Amplification dot" ng-attr-style="background-color: {{wellButtons['well_'+i].color}}"></span>
+                <span ng-if="color_by==='well'" class="B2-Amplification dot" ng-attr-style="background-color: {{wellButtons['well_'+(well_item.well_num - 1)].color}}"></span>
               </td>
               <td class="B2-Amplification">
-                <input class="B2-Amplification" type="checkbox" style="width:50px;" ng-click="toggleOmitIndex($index)" /> 
+                <div 
+                    class="checkbox-wrapper B1B" ng-click="toggleOmitIndex($index)" 
+                    ng-class="{ 'selected': omittedIndexes.indexOf($index) != -1}">
+                  <label class="outer-line"></label>
+                </div>                 
               </td>
               <td class="B2-Amplification" ng-class="{'text-center': color_by==='channel'}" style="text-align: left">
                 <span class="B2-Amplification text">
-                  <span ng-show="i < 8">
-                    A{{i+1}}
+                  <span ng-show="well_item.well_num < 9">
+                    A{{well_item.well_num}}
                   </span>
-                  <span ng-show="i > 7">
-                    B{{i-7}}
+                  <span ng-show="well_item.well_num > 8">
+                    B{{well_item.well_num-8}}
                   </span>
                 </span>
               </td>
-              <td class="B2-Amplification" ng-click="focusExpName($index)" style="text-align: left;">
-                <span ng-if="color_by==='sample'" class="B2-Amplification dot" ng-attr-style="background-color: {{samplesSet.indexOf(samples[i]) < 0 ? '#000000' : COLORS[samplesSet.indexOf(samples[i])]}}"></span>
-                <span class="B2-Amplification sample-span" ng-click="focusExpName($index)" ng-show="!editExpNameMode[$index]">
-                  {{samples[$index] | truncate:20}}
+              <td class="B2-Amplification" style="text-align: left;">
+                <span 
+                  ng-if="color_by==='sample'" 
+                  class="B2-Amplification dot" 
+                  ng-attr-style="background-color: {{samplesSet.indexOf(samples[well_item.well_num - 1]) < 0 ? '#000000' : COLORS[samplesSet.indexOf(samples[well_item.well_num - 1])]}}"></span>
+                <span class="B2-Amplification one-line-span">
+                  {{samples[well_item.well_num - 1] | truncate:20}}
                 </span>
-                <input type="text" class="-Amplification" style="vertical-align: initial;" ng-show="editExpNameMode[$index]" focus-on="editExpNameMode" ng-blur="updateSampleName($index,samples[$index])"  on-shift-enter="updateSampleNameEnter($index,samples[$index])"  ng-model="samples[$index]">
               </td>
               <td class="B2-Amplification type-td">
-                <!-- <span class="B2" style="width: 20px; height: 20px; vertical-align: middle" ng-show="types[$index]"> -->
-                <!-- {{types[$index]==='sample'?'S':'' | truncate:20}} -->
-                <span class="B2-Amplification type-span" style="width: 20px; height: 20px;">
-                  {{'S' | truncate:20}}
+                <span class="B2-Amplification type-span" style="width: 20px; height: 20px;" ng-if="types[well_item.well_num - 1]">
+                  <img src="/images/ring_s.svg" ng-if="types[well_item.well_num - 1] == 'standard'">
+                  <img src="/images/ring_plus.svg" ng-if="types[well_item.well_num - 1] == 'positive_control'">
+                  <img src="/images/ring_neg.svg" ng-if="types[well_item.well_num - 1] == 'negative_control'">
+                  <img src="/images/ring_u.svg" ng-if="types[well_item.well_num - 1] == 'unknown'">
                 </span>
               </td>
-              <td class="B2-Amplification" ng-click="focusExpTarget($index)" style="text-align: left;">
-                <span class="B2-Amplification" ng-click="focusExpTarget($index)" ng-show="!editExpTargetMode[$index]">
-                  {{targets[$index] | truncate:20}}
+              <td class="B2-Amplification" style="text-align: left;">
+                <span class="B2-Amplification one-line-span">
+                  {{targets[$index].name | truncate:20}}
                 </span>
-                <input type="text" class="B2-Amplification" ng-show="editExpTargetMode[$index]" focus-on="editExpTargetMode" ng-blur="updateTarget($index,targets[$index])" on-shift-enter="updateTargetEnter($index,targets[$index])" ng-model="targets[$index]">
               </td>
               <td class="B2-Amplification" style="text-align: left">
                 <span class="B2-Amplification width1" >
-                  <span class="B2-Amplification" ng-show="wellButtons['well_'+i].ct[0] > 0">
-                    {{(wellButtons['well_'+i].ct[0]) | round:2}}
+                  <span class="B2-Amplification" ng-show="well_item.cq > 0">
+                    {{well_item.cq | round:2}}
                   </span>
-                  <span class="B2-Amplification" ng-show="wellButtons['well_'+i].ct[1] <= 0">
+                  <span class="B2-Amplification" ng-show="well_item.cq <= 0">
                     <span class="B2-Amplification dummy-placeholder">&nbsp;</span>
                   </span>
                 </span>
               </td>
               <td class="B2-Amplification" style="text-align: left">
-                <span class="B2-Amplification width1" >45.67</span>
-                <span class="B2-Amplification" ng-show="wellButtons['well_'+i].ct[1] <= 0">
-                  <span class="B2-Amplification dummy-placeholder">&nbsp;</span>
-                </span>
-                <!-- <span class="B2-Amplification width1" ng-if="is_dual_channel">
-                  <span class="B2-Amplification" ng-show="wellButtons['well_'+i].ct[1] > 0">
-                    {{(wellButtons['well_'+i].ct[1]) | round:2}}
+                <span class="B2-Amplification width1" ng-if="is_dual_channel">
+                  <span class="B2-Amplification" ng-show="well_item.mean_cq > 0">
+                    {{well_item.mean_cq | round:2}}
                   </span>
-                  <span class="B2-Amplification" ng-show="wellButtons['well_'+i].ct[1] <= 0">
+                  <span class="B2-Amplification" ng-show="well_item.mean_cq <= 0">
                     <span class="B2-Amplification dummy-placeholder">&nbsp;</span>
                   </span>
                 </span>
                 <span class="B2-Amplification width1" ng-if="!is_dual_channel">
                   <span class="B2-Amplification dummy-placeholder"></span>
-                </span> -->
+                </span>
               </td>
               <td class="B2-Amplification" style="text-align: left">
-                <span class="B2-Amplification width1">123456</span>
-                <span class="B2-Amplification" ng-show="wellButtons['well_'+i].ct[1] <= 0">
+                <span class="B2-Amplification width1" ng-show="well_item.quantity > 0">
+                  {{well_item.quantity | fixedDigit:6}}
+                </span>
+                <span class="B2-Amplification" ng-show="well_item.quantity <= 0">
                   <span class="B2-Amplification dummy-placeholder">&nbsp;</span>
                 </span>
               </td>
               <td class="B2-Amplification" style="text-align: left">
-                <span class="B2-Amplification width1">123456</span>
-                <span class="B2-Amplification" ng-show="wellButtons['well_'+i].ct[1] <= 0">
+                <span class="B2-Amplification width1" ng-show="well_item.mean_quantity > 0">
+                  {{well_item.mean_quantity | fixedDigit:6}}
+                </span>
+                <span class="B2-Amplification" ng-show="well_item.mean_quantity <= 0">
                   <span class="B2-Amplification dummy-placeholder">&nbsp;</span>
                 </span>
               </td>

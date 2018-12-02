@@ -119,11 +119,59 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
             pt["well_#{i}_background_log"] = if y_item[3] > 0 then y_item[3] else 10
             pt["well_#{i}_baseline_log"] =  if y_item[4] > 0 then y_item[4] else 10
 
-            pt["well_#{i}_dr1_pred"] =  y_item[5]
-            pt["well_#{i}_dr2_pred"] =  y_item[6]
+            pt["well_#{i}_dr1_pred"] = y_item[5]
+            pt["well_#{i}_dr2_pred"] = y_item[6]
           return pt
 
       return channel_datasets
+
+    @normalizeWellTargetData = (well_data) ->
+      well_data = angular.copy well_data
+      targets = []
+
+      for i in [0.. well_data.length - 1] by 1
+        targets.push 
+          id: well_data[i].target_id
+          name: well_data[i].target_name
+
+      return targets
+
+    @normalizeTargetData = (target_data) ->
+      target_data = angular.copy target_data
+      targets = []
+
+      for i in [1.. target_data.length - 1] by 1
+        targets.push 
+          id: target_data[i][0]
+          name: target_data[i][1]
+
+      return targets
+
+
+    @normalizeSummaryData = (summary_data, target_data) ->
+      summary_data = angular.copy summary_data
+      target_data = angular.copy target_data
+      well_data = []
+
+      for i in [1.. summary_data.length - 1] by 1
+        item = {}
+        for item_name in [0..summary_data[0].length - 1] by 1
+          item[summary_data[0][item_name]] = summary_data[i][item_name]
+
+        target = _.filter target_data, (target) ->
+          target[0] is item.target_id
+
+        item['target_name'] = target[0][1] if target[0]
+        item['active'] = false
+
+        item['mean_quantity'] = item['mean_quantity_m'] * Math.pow(10, item['mean_quantity_b'])
+        item['quantity'] = item['quantity_m'] * Math.pow(10, item['quantity_b'])
+
+        well_data.push item
+
+      well_data = _.orderBy(well_data,['well_num', 'target_name'],['asc', 'asc']);      
+
+      return well_data
 
     @paddData = (cycle_num = 1) ->
       paddData = cycle_num: cycle_num
