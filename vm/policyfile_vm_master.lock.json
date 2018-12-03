@@ -1,0 +1,352 @@
+{
+  "revision_id": "89c6936ba1f2bebe7eaef04d31c8fc6a0508e3d103764d405c33c6d3dee1dcab",
+  "name": "policyfile_vm_master",
+  "run_list": [
+    "recipe[apt::default]",
+    "recipe[git::default]",
+    "recipe[nodejs::default]",
+    "recipe[nodejs::npm]",
+    "recipe[curl::default]",
+    "recipe[gpg::default]",
+    "recipe[unzip::default]",
+    "recipe[vim::default]",
+    "recipe[vm::master]"
+  ],
+  "included_policy_locks": [
+
+  ],
+  "cookbook_locks": {
+    "apt": {
+      "version": "7.1.1",
+      "identifier": "3bf6cee65c6c91539609905d0cb86f6d5700e05c",
+      "dotted_decimal_identifier": "16878392114441361.23527390887873720.122515401793628",
+      "cache_key": "apt-7.1.1-supermarket.chef.io",
+      "origin": "https://supermarket.chef.io:443/api/v1/cookbooks/apt/versions/7.1.1/download",
+      "source_options": {
+        "artifactserver": "https://supermarket.chef.io:443/api/v1/cookbooks/apt/versions/7.1.1/download",
+        "version": "7.1.1"
+      }
+    },
+    "ark": {
+      "version": "4.0.0",
+      "identifier": "5d82df37c1f7d6f64b0afe4eb8f8affbad642025",
+      "dotted_decimal_identifier": "26321068058867670.69325354859149560.193495480672293",
+      "cache_key": "ark-4.0.0-supermarket.chef.io",
+      "origin": "https://supermarket.chef.io:443/api/v1/cookbooks/ark/versions/4.0.0/download",
+      "source_options": {
+        "artifactserver": "https://supermarket.chef.io:443/api/v1/cookbooks/ark/versions/4.0.0/download",
+        "version": "4.0.0"
+      }
+    },
+    "build-essential": {
+      "version": "8.2.1",
+      "identifier": "4b9d5c72796184085681d3eefd625c90b79530a8",
+      "dotted_decimal_identifier": "21283643636408708.2346915420110178.101776625053864",
+      "cache_key": "build-essential-8.2.1-supermarket.chef.io",
+      "origin": "https://supermarket.chef.io:443/api/v1/cookbooks/build-essential/versions/8.2.1/download",
+      "source_options": {
+        "artifactserver": "https://supermarket.chef.io:443/api/v1/cookbooks/build-essential/versions/8.2.1/download",
+        "version": "8.2.1"
+      }
+    },
+    "curl": {
+      "version": "2.0.4",
+      "identifier": "23925109cdd6b5e34adc72571db2c5c211aa362f",
+      "dotted_decimal_identifier": "10012500939364021.63977130384891314.217437310694959",
+      "cache_key": "curl-2.0.4-supermarket.chef.io",
+      "origin": "https://supermarket.chef.io:443/api/v1/cookbooks/curl/versions/2.0.4/download",
+      "source_options": {
+        "artifactserver": "https://supermarket.chef.io:443/api/v1/cookbooks/curl/versions/2.0.4/download",
+        "version": "2.0.4"
+      }
+    },
+    "git": {
+      "version": "9.0.1",
+      "identifier": "260cfe920ed414d5288948ca45c921d72d161358",
+      "dotted_decimal_identifier": "10710336626676756.59998740136216009.37208058106712",
+      "cache_key": "git-9.0.1-supermarket.chef.io",
+      "origin": "https://supermarket.chef.io:443/api/v1/cookbooks/git/versions/9.0.1/download",
+      "source_options": {
+        "artifactserver": "https://supermarket.chef.io:443/api/v1/cookbooks/git/versions/9.0.1/download",
+        "version": "9.0.1"
+      }
+    },
+    "gpg": {
+      "version": "0.3.0",
+      "identifier": "f26a55da24d7ae6b75d393a2d32c58dedf3bfb60",
+      "dotted_decimal_identifier": "68233861328590766.30247374083511084.97714251234144",
+      "cache_key": "gpg-0.3.0-supermarket.chef.io",
+      "origin": "https://supermarket.chef.io:443/api/v1/cookbooks/gpg/versions/0.3.0/download",
+      "source_options": {
+        "artifactserver": "https://supermarket.chef.io:443/api/v1/cookbooks/gpg/versions/0.3.0/download",
+        "version": "0.3.0"
+      }
+    },
+    "mingw": {
+      "version": "2.1.0",
+      "identifier": "9f5d572c671e4a85015941a73f9d8f54820af19e",
+      "dotted_decimal_identifier": "44857150285487690.37437654767714205.157593121780126",
+      "cache_key": "mingw-2.1.0-supermarket.chef.io",
+      "origin": "https://supermarket.chef.io:443/api/v1/cookbooks/mingw/versions/2.1.0/download",
+      "source_options": {
+        "artifactserver": "https://supermarket.chef.io:443/api/v1/cookbooks/mingw/versions/2.1.0/download",
+        "version": "2.1.0"
+      }
+    },
+    "mysql": {
+      "version": "8.5.1",
+      "identifier": "d4e0746684ec21ce1a36738cc3357a2cddc59e19",
+      "dotted_decimal_identifier": "59919485603474465.58012666371556149.134333117865497",
+      "cache_key": "mysql-8.5.1-supermarket.chef.io",
+      "origin": "https://supermarket.chef.io:443/api/v1/cookbooks/mysql/versions/8.5.1/download",
+      "source_options": {
+        "artifactserver": "https://supermarket.chef.io:443/api/v1/cookbooks/mysql/versions/8.5.1/download",
+        "version": "8.5.1"
+      }
+    },
+    "nodejs": {
+      "version": "6.0.0",
+      "identifier": "7e66fa5599cbf88a3e714617df4abca4edec7cd1",
+      "dotted_decimal_identifier": "35579072429542392.38912203014266698.207416552357073",
+      "cache_key": "nodejs-6.0.0-supermarket.chef.io",
+      "origin": "https://supermarket.chef.io:443/api/v1/cookbooks/nodejs/versions/6.0.0/download",
+      "source_options": {
+        "artifactserver": "https://supermarket.chef.io:443/api/v1/cookbooks/nodejs/versions/6.0.0/download",
+        "version": "6.0.0"
+      }
+    },
+    "nvm": {
+      "version": "0.1.7",
+      "identifier": "ef7694a888f39e92145fd7093de3be0edc045651",
+      "dotted_decimal_identifier": "67402900288631710.41117748461911523.208971030091345",
+      "cache_key": "nvm-0.1.7-supermarket.chef.io",
+      "origin": "https://supermarket.chef.io:443/api/v1/cookbooks/nvm/versions/0.1.7/download",
+      "source_options": {
+        "artifactserver": "https://supermarket.chef.io:443/api/v1/cookbooks/nvm/versions/0.1.7/download",
+        "version": "0.1.7"
+      }
+    },
+    "seven_zip": {
+      "version": "3.1.0",
+      "identifier": "7fc2816d5d906b4e5fd7d69f8e025e37276995e3",
+      "dotted_decimal_identifier": "35961183183671403.22060428806819330.103590977443299",
+      "cache_key": "seven_zip-3.1.0-supermarket.chef.io",
+      "origin": "https://supermarket.chef.io:443/api/v1/cookbooks/seven_zip/versions/3.1.0/download",
+      "source_options": {
+        "artifactserver": "https://supermarket.chef.io:443/api/v1/cookbooks/seven_zip/versions/3.1.0/download",
+        "version": "3.1.0"
+      }
+    },
+    "unzip": {
+      "version": "0.0.1",
+      "identifier": "08dcd8388fe3153de6bfdc9368150898b0a7ca29",
+      "dotted_decimal_identifier": "2494621033685781.17423685293139989.9451891837481",
+      "cache_key": "unzip-0.0.1-supermarket.chef.io",
+      "origin": "https://supermarket.chef.io:443/api/v1/cookbooks/unzip/versions/0.0.1/download",
+      "source_options": {
+        "artifactserver": "https://supermarket.chef.io:443/api/v1/cookbooks/unzip/versions/0.0.1/download",
+        "version": "0.0.1"
+      }
+    },
+    "vim": {
+      "version": "2.0.2",
+      "identifier": "f3ec9e18f2390752e054fc372adc322dc2c4a534",
+      "dotted_decimal_identifier": "68658583108204807.23327603703622364.55172122584372",
+      "cache_key": "vim-2.0.2-supermarket.chef.io",
+      "origin": "https://supermarket.chef.io:443/api/v1/cookbooks/vim/versions/2.0.2/download",
+      "source_options": {
+        "artifactserver": "https://supermarket.chef.io:443/api/v1/cookbooks/vim/versions/2.0.2/download",
+        "version": "2.0.2"
+      }
+    },
+    "vm": {
+      "version": "0.1.0",
+      "identifier": "6a860b3c9b481ca33876ee2436af91fa702577ef",
+      "dotted_decimal_identifier": "29983730350901276.45942504656484015.160504809355247",
+      "source": ".",
+      "cache_key": null,
+      "scm_info": {
+        "scm": "git",
+        "remote": "https://github.com/chaibio/chaipcr.git",
+        "revision": "c545f6363ba18b3349f9cf66d5c58b1afe03f888",
+        "working_tree_clean": false,
+        "published": true,
+        "synchronized_remote_branches": [
+          "origin/HEAD -> origin/master",
+          "origin/master"
+        ]
+      },
+      "source_options": {
+        "path": "."
+      }
+    },
+    "windows": {
+      "version": "5.2.2",
+      "identifier": "2242f89f5d65d240f6f87dc063a515556b21eb79",
+      "dotted_decimal_identifier": "9643784801183186.18285945631564709.23456613788537",
+      "cache_key": "windows-5.2.2-supermarket.chef.io",
+      "origin": "https://supermarket.chef.io:443/api/v1/cookbooks/windows/versions/5.2.2/download",
+      "source_options": {
+        "artifactserver": "https://supermarket.chef.io:443/api/v1/cookbooks/windows/versions/5.2.2/download",
+        "version": "5.2.2"
+      }
+    }
+  },
+  "default_attributes": {
+
+  },
+  "override_attributes": {
+
+  },
+  "solution_dependencies": {
+    "Policyfile": [
+      [
+        "apt",
+        "= 7.1.1"
+      ],
+      [
+        "ark",
+        "= 4.0.0"
+      ],
+      [
+        "build-essential",
+        "= 8.2.1"
+      ],
+      [
+        "curl",
+        "= 2.0.4"
+      ],
+      [
+        "git",
+        "= 9.0.1"
+      ],
+      [
+        "gpg",
+        "= 0.3.0"
+      ],
+      [
+        "mingw",
+        "= 2.1.0"
+      ],
+      [
+        "mysql",
+        "= 8.5.1"
+      ],
+      [
+        "nodejs",
+        "= 6.0.0"
+      ],
+      [
+        "nvm",
+        "= 0.1.7"
+      ],
+      [
+        "seven_zip",
+        "= 3.1.0"
+      ],
+      [
+        "unzip",
+        "= 0.0.1"
+      ],
+      [
+        "vim",
+        "= 2.0.2"
+      ],
+      [
+        "vm",
+        ">= 0.0.0"
+      ],
+      [
+        "windows",
+        "= 5.2.2"
+      ]
+    ],
+    "dependencies": {
+      "apt (7.1.1)": [
+
+      ],
+      "ark (4.0.0)": [
+        [
+          "build-essential",
+          ">= 0.0.0"
+        ],
+        [
+          "seven_zip",
+          ">= 0.0.0"
+        ]
+      ],
+      "build-essential (8.2.1)": [
+        [
+          "seven_zip",
+          ">= 0.0.0"
+        ],
+        [
+          "mingw",
+          ">= 1.1.0"
+        ]
+      ],
+      "curl (2.0.4)": [
+
+      ],
+      "git (9.0.1)": [
+        [
+          "build-essential",
+          ">= 5.0.0"
+        ]
+      ],
+      "gpg (0.3.0)": [
+
+      ],
+      "mingw (2.1.0)": [
+        [
+          "seven_zip",
+          ">= 0.0.0"
+        ]
+      ],
+      "mysql (8.5.1)": [
+
+      ],
+      "nodejs (6.0.0)": [
+        [
+          "build-essential",
+          ">= 5.0.0"
+        ],
+        [
+          "ark",
+          ">= 2.0.2"
+        ]
+      ],
+      "nvm (0.1.7)": [
+        [
+          "build-essential",
+          ">= 0.0.0"
+        ],
+        [
+          "git",
+          ">= 0.0.0"
+        ]
+      ],
+      "seven_zip (3.1.0)": [
+        [
+          "windows",
+          ">= 0.0.0"
+        ]
+      ],
+      "unzip (0.0.1)": [
+
+      ],
+      "vim (2.0.2)": [
+
+      ],
+      "vm (0.1.0)": [
+        [
+          "mysql",
+          ">= 0.0.0"
+        ]
+      ],
+      "windows (5.2.2)": [
+
+      ]
+    }
+  }
+}
