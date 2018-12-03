@@ -8,7 +8,7 @@ bash 'bashrc' do
   user 'vagrant'
   code <<~STARTUP
     source ~/.bashrc
-    touch /tmp/.bashrc_edited
+    touch /tmp/.vagrant-startup
   STARTUP
-  not_if { ::File.exist?('/tmp/.bashrc_edited') }
+  not_if { ::File.exist?('/tmp/.vagrant-startup') }
 end

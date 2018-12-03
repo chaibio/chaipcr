@@ -27,9 +27,9 @@ bash 'mysql' do
         ln -s /var/run/mysqld/mysqld.sock /tmp/mysql.sock
       fi
     BASHRC
-    source ~/.bashrc
+    touch /tmp/.vagrant-mysql
   MYSQL
-  not_if { ::File.exist?('/var/run/mysqld/mysqld.sock') }
+  not_if { ::File.exist?('/tmp/.vagrant-mysql') }
 end
 
 #mysql_service 'server' do

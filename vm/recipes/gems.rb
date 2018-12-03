@@ -11,6 +11,7 @@ bash 'gems' do
     source /usr/local/rvm/scripts/rvm
     rvm --default use 2.2.9
     bundle install
+    touch /tmp/.vagrant-gems
   GEMS
-  only_if (RUBY_VERSION == '2.2.9' && not(system('bundle check')))
+  not_if (system('bundle check'))
 end

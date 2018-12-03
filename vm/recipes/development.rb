@@ -1,6 +1,6 @@
 #
 # Cookbook:: vm
-# Recipe:: master.rb
+# Recipe:: development.rb
 #
 # set up chaipcr development environment on VM
 #

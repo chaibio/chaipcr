@@ -12,11 +12,12 @@ bash 'gulp' do
   user 'vagrant'
   code <<~GULP
     cd ~/chaipcr/web
-    source /usr/local/rvm/scripts/rvm
+    source ~/.rvm/scripts/rvm
     rvm --default use 2.2.9
     sudo npm install node-gyp -g    # avoids downstream compilation error
     sudo npm install gulp -g        # install globally
     npm install gulp                # install locally
+    touch /tmp/.vagrant-gulp
   GULP
-  only_if (RUBY_VERSION == '2.2.9')
+  not_if { ::File.exist?('/tmp/.vagrant-gulp') }
 end

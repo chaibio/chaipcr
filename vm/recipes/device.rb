@@ -14,6 +14,7 @@ bash 'device' do
     ##sudo cp -p ~/chaipcr/device/single_channel_device.json /perm/device.json
     ##sudo cp -p ~/chaipcr/device/dual_channel_device.json /perm/device.json
     echo 'export DEVICE_FILE_PATH=/perm/device.json' >> ~/.bashrc
+    touch /tmp/.vagrant-device
   DEVICE
-  not_if { ::File.exist?('perm/device.json') }
+  not_if { ::File.exist?('/tmp/.vagrant-device') }
 end

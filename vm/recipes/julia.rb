@@ -11,15 +11,19 @@ package [
 ]
 
 bash 'julia' do
+  user 'vagrant'
   code <<~JULIA
     mkdir ~/julia
-    cd ~/julia
-    cp -p /vagrant/julia-0.6.2-linux-x86_64.tar.gz .
-    tar -xzf julia-0.6.2-linux-x86_64.tar.gz
-    rm julia-0.6.2-linux-x86_64.tar.gz
+    mkdir ~/julia/julia-0.6.2-linux-x86_64
+    cd ~/julia/julia-0.6.2-linux-x86_64
+    cp -p /vagrant/julia-0.6.2-linux-x86_64/*.tar.gz .
+    gunzip *.tar.gz
+    for f in $(ls *.tar); do tar -xvf $f; done
+    rm *.tar
     sudo ln -s ~/julia/julia-0.6.2-linux-x86_64/bin/julia /usr/local/bin/julia
     /usr/local/bin/julia -e 'include("../chaipcr/bioinformatics/setup.jl")'
     echo 'export JULIA_ENV=development' >> ~/.bashrc
+    touch /tmp/.vagrant-julia
   JULIA
-  not_if { ::File.exist?('/usr/local/bin/julia') }
+  not_if { ::File.exist?('/tmp/.vagrant-julia') }
 end

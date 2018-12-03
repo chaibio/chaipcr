@@ -1,5 +1,5 @@
 {
-  "revision_id": "89c6936ba1f2bebe7eaef04d31c8fc6a0508e3d103764d405c33c6d3dee1dcab",
+  "revision_id": "5947b9a68ace8beb436c546a9d9db39cbb2d63fb659753256111ace8bd987f14",
   "name": "policyfile_vm_master",
   "run_list": [
     "recipe[apt::default]",
@@ -161,19 +161,18 @@
     },
     "vm": {
       "version": "0.1.0",
-      "identifier": "6a860b3c9b481ca33876ee2436af91fa702577ef",
-      "dotted_decimal_identifier": "29983730350901276.45942504656484015.160504809355247",
+      "identifier": "05715a939e6a3d48ee584d20fc5afeb03d0cd9a8",
+      "dotted_decimal_identifier": "1532008721181245.20528261341707354.280032891951528",
       "source": ".",
       "cache_key": null,
       "scm_info": {
         "scm": "git",
-        "remote": "https://github.com/chaibio/chaipcr.git",
-        "revision": "c545f6363ba18b3349f9cf66d5c58b1afe03f888",
+        "remote": null,
+        "revision": "f7dbd4f13bc0d1479210262bb04978259c164a27",
         "working_tree_clean": false,
         "published": true,
         "synchronized_remote_branches": [
-          "origin/HEAD -> origin/master",
-          "origin/master"
+          "origin/julia-us-4"
         ]
       },
       "source_options": {

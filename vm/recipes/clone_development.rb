@@ -12,6 +12,7 @@ bash 'clone_development' do
     cd chaipcr
     git init
     git checkout development
+    touch /tmp/.vagrant-clone
   CLONE
-  not_if { ::File.exist?('/home/vagrant/chaipcr/.git') }
+  not_if { ::File.exist?('/tmp/.vagrant-clone') }
 end
