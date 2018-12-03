@@ -15,8 +15,8 @@ bash 'gulp' do
     source ~/.rvm/scripts/rvm
     rvm --default use 2.2.9
     sudo npm install node-gyp -g    # avoids downstream compilation error
-    sudo npm install gulp -g        # install globally
-    npm install gulp                # install locally
+    sudo npm install gulp@3.9.1 -g  # install globally
+    npm install gulp@3.9.1          # install locally
     touch /tmp/.vagrant-gulp
   GULP
   not_if { ::File.exist?('/tmp/.vagrant-gulp') }

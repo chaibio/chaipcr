@@ -24,7 +24,7 @@ First install these applications:
 >`git clone https://github.com/chaibio/chaipcr.git`
     
 2. Check the specifications of the virtual machine:
->`cd chaipcr/bioinformatics/vm`  
+>`cd chaipcr/vm`  
 >`kitchen list`
 
 3. Create the virtual machine:
@@ -39,14 +39,15 @@ First install these applications:
 >`kitchen verify`
 
 6. Log in to the test machine as user _vagrant_ (no password required) and check that `MySql` is running:
+>`kitchen exec -c 'uname -a'  
 >`kitchen login`  
->`whoami`  
 >`mysql -u root`
 
 7. Manually test the Rails app:
 >`curl --include http://localhost:3000`
 
-8. Remove the VM when you have finished:
->`kitchen destroy`
+8. Remove the VM when you have finished, and check that all the VM instances are gone:
+>`kitchen destroy`  
+>`vagrant global-status`
     
 

@@ -45,12 +45,14 @@ suites:
       policyfile: policyfile_vm_master.rb
     run_list:
     verifier:
-      inspec_tests:
+      inspec_tests: 
+        - test/integration/master
     attributes:
 #  - name: development
 #    provisioner:
 #      policyfile: policyfile_vm_development.rb
 #    run_list:
 #    verifier:
-#      inspec_tests:
+#      inspec_tests: 
+#        - test/integration/development
 #    attributes:
