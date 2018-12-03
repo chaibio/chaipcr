@@ -938,7 +938,7 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 			well_top = $scope.wells["well_" + well_top_index];
 			well_bottom = $scope.wells["well_" + well_bottom_index];
 			style = {};
-			border = '2px solid #000';
+			border = '1px solid #000';
 			if (well.selected) {
 				if (!(well_left != null ? well_left.selected : void 0)) {
 					style['border-left'] = border;
