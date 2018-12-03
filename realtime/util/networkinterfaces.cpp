@@ -57,7 +57,19 @@ std::string InterfaceSettings::toString() const
     stream << "iface " << interface << " inet " << type << '\n';
 
     for (std::map<std::string, std::string>::const_iterator it = arguments.begin(); it != arguments.end(); ++it)
-        stream << "     " << it->first << ' ' << it->second << '\n';
+    {
+        // Replace the maskAddress string with netmask while configuring static ethernet interface IP
+        std::string argStr(it->first);
+        std::string maskAddr("maskAddress");
+        if (argStr.compare(maskAddr) == 0)
+        {
+           stream << "     " << "netmask"  << ' ' << it->second << '\n';
+        }
+        else
+        {
+           stream << "     " << it->first << ' ' << it->second << '\n';
+        }
+    }
 
     return stream.str();
 }
@@ -124,7 +136,17 @@ InterfaceSettings readInterfaceSettings(const std::string &filePath, const std::
             while (line.front() == ' ')
                 line = line.substr(1);
 
-            interface.arguments[line.substr(0, line.find(' '))] = line.substr(line.find(' ') + 1);
+            // netmask value should be stored in maskAddress map key
+            std::string maskAddrStr(line.substr(0, line.find(' ')));
+            std::string netMaskStr("netmask");
+            if (maskAddrStr.compare(netMaskStr) == 0)
+            {
+               interface.arguments["maskAddress"] = line.substr(line.find(' ') + 1);
+            }
+            else
+            {
+               interface.arguments[line.substr(0, line.find(' '))] = line.substr(line.find(' ') + 1);
+            }
         }
     }
 
