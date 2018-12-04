@@ -15,7 +15,7 @@ package %w(
 bash 'mysql' do
   user 'vagrant'
   code <<~MYSQL
-    mysql -u root << SQLSCRIPT
+    sudo mysql -u root << SQLSCRIPT
       ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY "";
       CREATE DATABASE chaipcr;
       QUIT

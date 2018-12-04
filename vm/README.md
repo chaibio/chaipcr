@@ -2,7 +2,7 @@
 
 ## Summary
 
-* This file describes how to set up and test a _chaipcr_ development environment.
+* This file describes how to set up and test a local development environment.
 
 * We will use `chef` and `vagrant` to set up a `VirtualBox` linux VM and install the _chaipcr_ firmware.
 

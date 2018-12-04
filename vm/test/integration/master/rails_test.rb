@@ -10,14 +10,13 @@
 # The Inspec reference, with examples and extensive documentation, can be
 # found at http://inspec.io/docs/reference/resources/
 #
-describe bash(
-  '. ~/.rvm/scripts/rvm;
-  rvm use 2.2.9;
+describe bash('
+  . ~/.rvm/scripts/rvm;
+  rvm --quiet use 2.2.9;
   cd ~/chaipcr/web;
-  bundle install;
-  ./bin/rake db:migrate:status RAILS_ENV=development|grep up|wc -l'
-  ) do
-  its('stdout') { should eq '55' }
+  ./bin/rake db:migrate:status RAILS_ENV=development|grep up|wc -l
+  ') do
+  its('stdout') { should eq "55\n" }
   its('stderr') { should eq '' }
   its('exit_status') { should eq 0 }
 end

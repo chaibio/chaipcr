@@ -10,10 +10,10 @@
 # The Inspec reference, with examples and extensive documentation, can be
 # found at http://inspec.io/docs/reference/resources/
 #
-describe bash(
-  'source /home/vagrant/.rvm/scripts/rvm;
-  ruby -e "puts RUBY_VERSION"'
-  ) do
+describe bash('
+  source /home/vagrant/.rvm/scripts/rvm;
+  ruby -e "puts RUBY_VERSION"
+  ') do
   its('stdout') { should match /2.2.9/ }
   its('stderr') { should eq '' }
   its('exit_status') { should eq 0 }
