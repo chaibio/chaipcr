@@ -1204,6 +1204,7 @@ class BaseChart
       .attr('class', 'axes-extreme-value tick')
 
     @yAxisLowerExtremeValueContainer = textContainer
+    @AXES_TICKS_FONT_SIZE = 8
 
     conWidth = 30
     conHeight = 14

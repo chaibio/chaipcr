@@ -1,7 +1,8 @@
 App.directive 'fitBottomSwitch', [
   'WindowWrapper'
   '$timeout'
-  (WindowWrapper, $timeout) ->
+  '$rootScope'
+  (WindowWrapper, $timeout, $rootScope) ->
 
     restrict: 'AE',
     scope:
@@ -42,19 +43,28 @@ App.directive 'fitBottomSwitch', [
       resizeTimeout = null
 
       $scope.$on 'window:resize', ->
+        runFitBottomSwitch()
+
+      # if $scope.minHeight > 0
+      #   set($scope.minHeight)
+
+      console.log('fitBottomSwitch: init')
+
+      runFitBottomSwitch = ->
         height = getHeight()
         elem.css(overflow: 'hidden', height: '', 'min-height': '')
+        set()
+       
         if resizeTimeout
           $timeout.cancel(resizeTimeout)
 
-        set()
         resizeTimeout = $timeout ->
           elem.css(overflow: '', height: '', 'min-height': '')
           set()
           resizeTimeout = null
-        , 1000
+        , 500
 
-      if $scope.minHeight > 0
-        set($scope.minHeight)
-      $timeout(set, 1000)
+      $scope.$on 'event:resize-aspect-ratio', (e, data, oldData) ->
+        console.log('fitBottomSwitch: run')
+        runFitBottomSwitch()
 ]
