@@ -264,10 +264,13 @@ li {
     border-right: 1px solid #c5c5c5;
   }
 
-  th, td {
+  th, td{
     border-left: 1px solid #c5c5c5;
-    border-bottom: 1px solid #c5c5c5;
     border-top: 1px solid #c5c5c5;
+  }
+
+  tr:last-child td{
+    border-bottom: 1px solid #c5c5c5;
   }
 
   .col-header {
