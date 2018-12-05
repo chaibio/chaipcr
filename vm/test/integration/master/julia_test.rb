@@ -15,3 +15,10 @@ describe bash('/usr/local/bin/julia -v') do
   its('stderr') { should eq '' }
   its('exit_status') { should eq 0 }
 end
+
+describe bash("julia --compile=min -e 'println(Pkg.installed(\"Ipopt\"))'") do
+  its('stdout') { should match /0.2.6/ }
+  its('stderr') { should eq '' }
+  its('exit_status') { should eq 0 }
+end
+
