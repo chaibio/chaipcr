@@ -82,6 +82,7 @@ function check_subset(small::Ccsc, big::Ccsc)
 end
 
 
+# to be deprecated to remove dependency on MySQL
 # function: get well-to-well variation data well-to-well variation in absolute fluorescence (wva)
 function get_wva_data(
     # calib_id_s and step_id_s as OrderedDict are expected to be OrderedDict{T,T} where T <: Integer
@@ -178,8 +179,9 @@ end # get_wva_data
 
 # function: check whether the data in optical calibration experiment is valid; if yes, prepare calibration data
 function prep_adj_w2wvaf(
-    db_conn::MySQL.MySQLHandle,
-    calib_info::Union{Integer,OrderedDict}, # can be an interger or a OrderedDict in chai format: OrderedDict("water"=OrderedDict(calibration_id=>..., step_id=>...), "channel_1"=OrderedDict(calibration_id=..., step_id=...), "channel_2"=OrderedDict(calibration_id=...", step_id=...).
+    # db_conn::MySQL.MySQLHandle,
+    # calib_info::Union{Integer,OrderedDict}, # can be an interger or a OrderedDict in chai format: OrderedDict("water"=OrderedDict(calibration_id=>..., step_id=>...), "channel_1"=OrderedDict(calibration_id=..., step_id=...), "channel_2"=OrderedDict(calibration_id=...", step_id=...).
+    calib_data::AbstractArray, # new
     well_nums::AbstractVector,
     dye_in::String="FAM",
     dyes_2bfild::AbstractVector=[]

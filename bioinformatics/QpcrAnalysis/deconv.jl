@@ -69,8 +69,9 @@ end # deconv
 
 # function: get cross-over constant matrix k
 function get_k(
-    db_conn::MySQL.MySQLHandle, # MySQL database connection
-    dcv_exp_info::OrderedDict, # OrderedDict("water"=OrderedDict(calibration_id=..., step_id=...), "channel_1"=OrderedDict(calibration_id=..., step_id=...),  "channel_2"=OrderedDict(calibration_id=...", step_id=...). # info on experiment(s) used to calculate matrix k
+    # db_conn::MySQL.MySQLHandle, # MySQL database connection
+    # dcv_exp_info::OrderedDict, # OrderedDict("water"=OrderedDict(calibration_id=..., step_id=...), "channel_1"=OrderedDict(calibration_id=..., step_id=...),  "channel_2"=OrderedDict(calibration_id=...", step_id=...). # info on experiment(s) used to calculate matrix k
+    calib_data::AbstractArray, # new
     well_nums::AbstractVector=[];
     well_proc::String="vec", # options: "mean", "vec".
     Float_T::DataType=Float32, # ensure compatibility with other OSs
