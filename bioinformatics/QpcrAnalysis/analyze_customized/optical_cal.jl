@@ -3,18 +3,27 @@
 
 # check JSON output in UI: http://:ip_address/experiments/:exp_id/analyze
 
+# !!!! modified for receiving data instead of experiment ids as input
 function analyze_func(
     ::OpticalCal,
+
+    # remove MySqldependency
+    #
     # db_conn::MySQL.MySQLHandle,
     # exp_id::Integer, # not used for computation
     # calib_info::Union{Integer,OrderedDict}; # really used
     # well_nums::AbstractVector=[],
-    exp_data::AbstractArray,
-    dye_in::String="FAM", dyes_2bfild::Vector=[],
+
+    exp_data::AbstractArray, # new
+
+    dye_in::String="FAM", 
+    dyes_2bfild::Vector=[],
     out_json=true,
     verbose=false
     )
 
+    # remove MySqldependency
+    #
     # calib_info_ori = calib_info
     # calib_info_dict = ensure_ci(db_conn, calib_info_ori)
     # print_v(

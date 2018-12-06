@@ -25,26 +25,33 @@ const dscrmnts_snr = OrderedDict(map(1:2) do i
 end) # do i
 
 
-# analyze function
+# !!!! modified for receiving data instead of experiment ids as input
 function analyze_func(
     ::OpticalTestDualChannel,
+
+    # remove MySqldependency
+    #
     # db_conn::MySQL.MySQLHandle,
     # exp_id::Integer,
     # calib_info::Union{Integer,OrderedDict}; # keys: "baseline", "water", "channel_1", "channel_2". Each value's "calibration_id" value is the same as `exp_id`
-    # # start: arguments that might be passed by upstream code
+    # 
+    # start: arguments that might be passed by upstream code
     # well_nums::AbstractVector=[],
-    exp_data::AbstractArray
+
+    exp_data::AbstractArray # new
     )
 
-    fluo_qry_2b = "SELECT step_id, well_num, fluorescence_value, channel
-        FROM fluorescence_data
-        WHERE experiment_id = $exp_id AND cycle_num = 1 AND step_id is not NULL
-        well_constraint
-        ORDER BY well_num, channel
-    "
-    fluo_data, fluo_well_nums = get_mysql_data_well(
-        well_nums, fluo_qry_2b, db_conn, false
-    )
+    # remove MySql dependency
+    #
+    # fluo_qry_2b = "SELECT step_id, well_num, fluorescence_value, channel
+    #     FROM fluorescence_data
+    #     WHERE experiment_id = $exp_id AND cycle_num = 1 AND step_id is not NULL
+    #     well_constraint
+    #     ORDER BY well_num, channel
+    # "
+    # fluo_data, fluo_well_nums = get_mysql_data_well(
+    #     well_nums, fluo_qry_2b, db_conn, false
+    # )
 
     num_wells = length(fluo_well_nums)
 

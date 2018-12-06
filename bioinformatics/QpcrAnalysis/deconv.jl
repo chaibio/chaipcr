@@ -16,10 +16,12 @@ function deconv(
     channel_nums::AbstractVector, # must be the same length as 3rd dimension of `array2dcv`
     dcv_well_idc_wfluo::AbstractVector,
 
+    # remove MySql dependency
+    #
     # arguments needed if k matrix needs to be computed
-    db_conn::MySQL.MySQLHandle=db_conn_default, # `db_conn_default` is defined in "__init__.jl"
-    calib_info::Union{Integer,OrderedDict}=calib_info_AIR,
-    well_nums::AbstractVector=[];
+    # db_conn::MySQL.MySQLHandle=db_conn_default, # `db_conn_default` is defined in "__init__.jl"
+    # calib_info::Union{Integer,OrderedDict}=calib_info_AIR,
+    # well_nums::AbstractVector=[];
 
     # keyword arguments
     k4dcv_backup::K4Deconv=K4DCV,
@@ -31,11 +33,13 @@ function deconv(
 
     dcvd_ary3 = similar(ary2dcv)
 
-    k4dcv = (isa(calib_info, Integer) || begin
-        step_ids = map(ci_value -> ci_value["step_id"], values(calib_info))
-        length_step_ids = length(step_ids)
-        length_step_ids <= 2 || length(unique(step_ids)) < length_step_ids
-    end) ? k4dcv_backup : get_k(db_conn, calib_info, well_nums) # use default `well_proc` value
+    # remove MySql dependency
+    #
+    # k4dcv = (isa(calib_info, Integer) || begin
+    #     step_ids = map(ci_value -> ci_value["step_id"], values(calib_info))
+    #     length_step_ids = length(step_ids)
+    #     length_step_ids <= 2 || length(unique(step_ids)) < length_step_ids
+    # end) ? k4dcv_backup : get_k(db_conn, calib_info, well_nums) # use default `well_proc` value
 
     k_inv_vec = k4dcv.k_inv_vec
 
@@ -69,24 +73,31 @@ end # deconv
 
 # function: get cross-over constant matrix k
 function get_k(
+
+    # remove MySql dependency
+    #
     # db_conn::MySQL.MySQLHandle, # MySQL database connection
     # dcv_exp_info::OrderedDict, # OrderedDict("water"=OrderedDict(calibration_id=..., step_id=...), "channel_1"=OrderedDict(calibration_id=..., step_id=...),  "channel_2"=OrderedDict(calibration_id=...", step_id=...). # info on experiment(s) used to calculate matrix k
+
     calib_data::AbstractArray, # new
+
     well_nums::AbstractVector=[];
     well_proc::String="vec", # options: "mean", "vec".
     Float_T::DataType=Float32, # ensure compatibility with other OSs
     save_to::String="" # used: "k.jld"
     )
 
-    dcv_exp_info = ensure_ci(db_conn, dcv_exp_info)
-
-    calib_key_vec = get_ordered_keys(dcv_exp_info)
-    cd_key_vec = calib_key_vec[2:end] # cd = channel of dye. "water" is index 1 per original order.
-
-    dcv_data_dict = get_full_calib_data(db_conn, dcv_exp_info, well_nums)
-
-    water_data, water_well_nums = dcv_data_dict["water"]
-    num_wells = length(water_well_nums)
+    # remove MySql dependency
+    #
+    # dcv_exp_info = ensure_ci(db_conn, dcv_exp_info)
+    #
+    # calib_key_vec = get_ordered_keys(dcv_exp_info)
+    # cd_key_vec = calib_key_vec[2:end] # cd = channel of dye. "water" is index 1 per original order.
+    #
+    # dcv_data_dict = get_full_calib_data(db_conn, dcv_exp_info, well_nums)
+    # 
+    # water_data, water_well_nums = dcv_data_dict["water"]
+    # num_wells = length(water_well_nums)
 
     k4dcv_bydy = OrderedDict(map(cd_key_vec) do cd_key
         k_data_1dye, dcv_well_nums = dcv_data_dict[cd_key]

@@ -13,18 +13,24 @@ const MIN_HEATING_RATE = 1 # C/s
 const MAX_TIME_TO_HEAT = 90e3 # ms
 
 
+# !!!! modified for receiving data instead of experiment ids as input
 function analyze_func(
     ::ThermalPerformanceDiagnostic,
+
+    # remove MySql dependency
+    #
     # db_conn::MySQL.MySQLHandle,
     # exp_id::Integer, # really used
     # calib_info::Union{Integer,OrderedDict} # not used for computation
-    exp_data::AbstractArray
+
+    exp_data::AbstractArray # new
     )
 
-    #extract data from database
-    queryTemperatureData = "SELECT * FROM temperature_logs WHERE experiment_id = $exp_id ORDER BY elapsed_time"
-    temperatureData = MySQL.mysql_execute(db_conn, queryTemperatureData)[1]
-    num_dp = length(temperatureData[1]) # dp = data points
+    # remove MySql dependency
+    #
+    # queryTemperatureData = "SELECT * FROM temperature_logs WHERE experiment_id = $exp_id ORDER BY elapsed_time"
+    # temperatureData = MySQL.mysql_execute(db_conn, queryTemperatureData)[1]
+    # num_dp = length(temperatureData[1]) # dp = data points
 
     #add a new column (not row) that is the average of the two heat block zones
     hbzt_avg = map(1:num_dp) do i

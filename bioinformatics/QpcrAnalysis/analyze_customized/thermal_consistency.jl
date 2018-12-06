@@ -24,15 +24,20 @@ type ThermalConsistencyOutput
 end
 
 
+# !!!! modified for receiving data instead of experiment ids as input
 function analyze_func(
     # copy over the whole signature of `meltcrv`, comment out `stage_id`
     ::ThermalConsistency,
+
+    # remove MySqldependency
+    #
     # db_conn::MySQL.MySQLHandle,
     # exp_id::Integer, # stage_id::Integer,
     # calib_info::Union{Integer,OrderedDict};
-    # # start: arguments that might be passed by upstream code
-    # well_nums::AbstractVector=[],
-    exp_data::AbstractArray,
+    # # start: arguments that might be p
+
+    exp_data::AbstractArray, # new
+    
     auto_span_smooth::Bool=false,
     span_smooth_default::Real=0.015,
     span_smooth_factor::Real=7.2,

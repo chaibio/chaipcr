@@ -1,4 +1,4 @@
-#
+# Module QpcrAnalysis.jl
 
 
 # Notes on using MySQL 0.3.0 instead of current version

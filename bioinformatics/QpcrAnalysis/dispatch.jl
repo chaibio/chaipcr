@@ -2,7 +2,9 @@
 
 function dispatch(action::String, request_body::String)
 
-    req_parsed = JSON.parse(request_body; dicttype=OrderedDict) # Julia 0.4.6, DataStructures 0.4.4. DefautlDict and DefaultOrderedDict constructors sometimes don't work on OrderedDict (https://github.com/JuliaLang/DataStructures.jl/issues/205)
+    req_parsed = JSON.parse(request_body; dicttype=OrderedDict) # Julia 0.4.6, DataStructures 0.4.4.
+    # DefaultDict and DefaultOrderedDict constructors sometimes don't work on OrderedDict
+    # (https://github.com/JuliaLang/DataStructures.jl/issues/205)
 
     if isa(req_parsed, Associative) # amplification, meltcurve, analyze
         req_dict = req_parsed

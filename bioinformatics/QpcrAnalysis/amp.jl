@@ -90,19 +90,24 @@ struct AmpStepRampOutput2Bjson
 end
 
 
-#
+# !!!! modified for receiving data instead of experiment ids as input
 function process_amp(
-    db_conn::MySQL.MySQLHandle,
-    # new: start
-    exp_data::AbstractArray,
-    calib_data::AbstractArray,
-    # new: end
+
+    # remove MySql dependency
+    #
+    # db_conn::MySQL.MySQLHandle,
     # exp_id::Integer,
     # asrp_vec::Vector{AmpStepRampProperties},
     # calib_info::Union{Integer,OrderedDict};
     #
     # # arguments that might be passed by upstream code
     # well_nums::AbstractVector=[],
+
+    # new: start
+    exp_data::AbstractArray,
+    calib_data::AbstractArray,
+    # new: end
+
     min_reliable_cyc::Real=5,
     baseline_cyc_bounds::AbstractVector=[],
     cq_method::String="Cy0",
@@ -134,6 +139,7 @@ function process_amp(
     )
 
     # old
+    #
     # print_v(println, verbose,
     #     "db_conn: ", db_conn, "\n",
     #     "experiment_id: $exp_id\n",
@@ -261,36 +267,42 @@ end # process_amp
 
 
 function get_amp_data(
-    db_conn::MySQL.MySQLHandle,
-    col_name::String, # "fluorescence_value" or "baseline_value"
-    exp_id::Integer,
-    asrp::AmpStepRampProperties,
-    fluo_well_nums::AbstractVector, # not `[]`, all elements are expected to be found
-    channel_nums::AbstractVector,
+
+    # remove MySql dependency
+    #
+    # db_conn::MySQL.MySQLHandle,
+    # col_name::String, # "fluorescence_value" or "baseline_value"
+    # exp_id::Integer,
+    # asrp::AmpStepRampProperties,
+    # fluo_well_nums::AbstractVector, # not `[]`, all elements are expected to be found
+    # channel_nums::AbstractVector,
+    
     )
 
-    cyc_nums = asrp.cyc_nums
+    # cyc_nums = asrp.cyc_nums
 
+    # remove MySql dependency
+    #
     # get fluorescence data for amplification
-    fluo_qry = "SELECT $col_name
-        FROM fluorescence_data
-        WHERE
-            experiment_id= $exp_id AND
-            $(asrp.step_or_ramp)_id = $(asrp.id) AND
-            cycle_num in ($(join(cyc_nums, ","))) AND
-            well_num in ($(join(fluo_well_nums, ","))) AND
-            channel in ($(join(channel_nums, ","))) AND
-            step_id is not NULL
-        ORDER BY channel, well_num, cycle_num
-    "
-    fluo_sel = MySQL.mysql_execute(db_conn, fluo_qry)[1]
+    # fluo_qry = "SELECT $col_name
+    #     FROM fluorescence_data
+    #     WHERE
+    #         experiment_id= $exp_id AND
+    #         $(asrp.step_or_ramp)_id = $(asrp.id) AND
+    #         cycle_num in ($(join(cyc_nums, ","))) AND
+    #         well_num in ($(join(fluo_well_nums, ","))) AND
+    #         channel in ($(join(channel_nums, ","))) AND
+    #         step_id is not NULL
+    #     ORDER BY channel, well_num, cycle_num
+    # "
+    # fluo_sel = MySQL.mysql_execute(db_conn, fluo_qry)[1]
 
-    fluo_raw = reshape(
-        fluo_sel[parse(col_name)],
-        map(length, (cyc_nums, fluo_well_nums, channel_nums))...
-    )
+    # fluo_raw = reshape(
+    #     fluo_sel[parse(col_name)],
+    #     map(length, (cyc_nums, fluo_well_nums, channel_nums))...
+    # )
 
-    return fluo_raw
+    # return fluo_raw
 
 end # get_amp_data
 
@@ -656,13 +668,18 @@ end # report_cq!
 
 # process amplification per step
 function process_amp_1sr(
+
+    # remove MySql dependency
+    #
     # db_conn::MySQL.MySQLHandle,
     # exp_id::Integer,
     # asrp::AmpStepRampProperties,
     # calib_info::Union{Integer,OrderedDict},
     # fluo_well_nums::AbstractVector, well_nums::AbstractVector,
     # channel_nums::AbstractVector,
+
     exp_data::AbstractArray, calib_data::AbstractArray, # new
+
     dcv::Bool, # logical, whether to perform multi-channel deconvolution
     dye_in::String, dyes_2bfild::AbstractVector,
     min_reliable_cyc::Real,

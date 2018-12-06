@@ -30,7 +30,7 @@ First install these applications:
 3. Create the virtual machine:
 >`kitchen create`
 
-4. Check that the virtual machine is present on VirtualBox is configured as expected.
+4. Check that the virtual machine is present on VirtualBox and		 configured as expected.
 
 5. Install the _chaipcr_ development environment:
 >`kitchen converge`

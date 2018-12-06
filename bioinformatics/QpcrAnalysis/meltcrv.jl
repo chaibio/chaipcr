@@ -42,13 +42,19 @@ end
 
 # Top-level function: get melting curve data and Tm for a melt curve experiment
 function process_mc(
+
+    # remove MySql dependency
+    #
     # db_conn::MySQL.MySQLHandle,
     # exp_id::Integer, stage_id::Integer,
     # calib_info::Union{Integer,OrderedDict};
-    # # start: arguments that might be passed by upstream code
+    # 
+    # start: arguments that might be passed by upstream code
     # well_nums::AbstractVector=[],
     # channel_nums::AbstractVector=[1],
+
     exp_data::AbstractArray, calib_data::AbstractArray, # new
+
     auto_span_smooth::Bool=false,
     span_smooth_default::Real=0.015,
     span_smooth_factor::Real=7.2,
@@ -61,7 +67,8 @@ function process_mc(
     kwdict_mc_tm_pw::OrderedDict=OrderedDict() # keyword arguments passed onto `mc_tm_pw`
     )
 
-    # old
+    # remove MySql dependency
+    #
     # print_v(println, verbose,
     #     "db_conn: ", db_conn, "\n",
     #     "experiment_id: $exp_id\n",
@@ -95,7 +102,7 @@ function process_mc(
         dcv = false
     end
 
-    # # pre-deconvolution, process only channel 1
+    # pre-deconvolution, process only channel 1
     # channel_nums = [1]
     # num_channels = 1
     # dcv = false
@@ -196,27 +203,33 @@ end # process_mc
 # function: get raw melt curve data and perform optical calibration
 function get_mc_data(
     channel_num::Integer,
-    db_conn::MySQL.MySQLHandle,
-    exp_id::Integer, stage_id::Integer,
-    well_nums::AbstractVector,
+
+    # remove MySql dependency
+    #
+    # db_conn::MySQL.MySQLHandle,
+    # exp_id::Integer, stage_id::Integer,
+    # well_nums::AbstractVector,
+
 	max_tmprtr::Real
     )
 
+    # remove MySql dependency
+    #
     # get fluorescence data for melting curve
-    fluo_qry_2b = "
-        SELECT well_num, temperature, fluorescence_value
-            FROM melt_curve_data
-            WHERE
-                experiment_id = $exp_id AND
-                stage_id = $stage_id AND
-                channel = $channel_num AND
-				temperature <= $max_tmprtr
-                well_constraint
-            ORDER BY well_num, temperature
-    "
-    fluo_sel, fluo_well_nums = get_mysql_data_well(
-        well_nums, fluo_qry_2b, db_conn, false
-    )
+    # fluo_qry_2b = "
+    #     SELECT well_num, temperature, fluorescence_value
+    #         FROM melt_curve_data
+    #         WHERE
+    #             experiment_id = $exp_id AND
+    #             stage_id = $stage_id AND
+    #             channel = $channel_num AND
+	# 			temperature <= $max_tmprtr
+    #             well_constraint
+    #         ORDER BY well_num, temperature
+    # "
+    # fluo_sel, fluo_well_nums = get_mysql_data_well(
+    #     well_nums, fluo_qry_2b, db_conn, false
+    # )
 
     # split temperature and fluo data by well_num
     tf_names = [:temperature, :fluorescence_value]

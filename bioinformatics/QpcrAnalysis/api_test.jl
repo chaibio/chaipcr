@@ -1,64 +1,149 @@
-===================================================================================
-Here are the REST APIs using HTTP GET
-===================================================================================
-experiments/:experiment_id/standard_curve
+# api_test.jl
+#
+# Author: Tom Price
+# Date: Dec 2018
+#
+# documentation of REST API from juliaapi_new.txt
 
-[{"well": [{"target": 1, "cq": xxx, "quantity":{m:1.111, b:-10}}, 
-	   {"target": 2, "cq":xxx, "quantity":{m:1.111, b:-10}}]
- },
- {"well": [{"target": 3, "cq": xxx, "quantity":{m:1.111, b:-10}}, 
-	   {"target": 4, "cq":xxx, "quantity":{m:1.456, b:12}}]
- },
- {"well": [{"target": 1, "cq": xxx, "quantity":{m:1.111, b:-10}}, 
-	   {"target": 2, "cq":xxx, "quantity":{m:3, b:-12}}]
- },
- {"well": [{}, {}]}
-]
+import JSON
 
-output:
+# ===================================================================================
+# Here are the REST APIs using HTTP GET
+# ===================================================================================
 
-{
-  {"targets":[{"target_id":1, "slope":xx, "offset":xx, "efficiency":1.02, "r2":xx}, 
-	      {"target_id":2, "slope":xx, "offset":xx, "efficiency":0.98, "r2":xx}, 
-	      {"target_id":3, "error":“xxxxx”},{"target":4, "error":“xxxxx”}
-	     ]}
-}
+# experiments/:experiment_id/standard_curve
 
-********************************************************************************
-experiments/:experiment_id/amplification
+input=JSON.parse("[
+    {\"well\": [
+        {\"target\": 1, \"cq\": 999, \"quantity\": {\"m\":1.111, \"b\":-10}},
+        {\"target\": 2, \"cq\": 999, \"quantity\": {\"m\":1.111, \"b\":-10}}
+    ]},
+    {\"well\": [
+        {\"target\": 1, \"cq\": 999, \"quantity\": {\"m\":1.111, \"b\":-10}},
+        {\"target\": 2, \"cq\": 999, \"quantity\": {\"m\":1.456, \"b\":12}}
+    ]},
+    {\"well\": [
+        {\"target\": 1, \"cq\": 999, \"quantity\": {\"m\":1.111, \"b\":-10}},
+        {\"target\": 2, \"cq\": 999, \"quantity\": {\"m\":3, \"b\":-12}}
+    ]},
+    {\"well\": [{}, {}]}
+]")
 
-request body:
-{
-    "experiment_id": xx,
-    "step_id/ramp_id": xx,
-    "min_reliable_cyc": 5,
-    "calibration_info": {
-        "water": {
-	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-				  [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
-        },
-        "channel_1": {
-	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-				  [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
-        },
-        "channel_2": {
-	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-				  [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
-        }
-    },
-    "baseline_cyc_bounds": [],
-	"baseline_method": "sigmoid" (auto) or "linear" or "median"
-    "cq_method": "Cy0",
-    "min_fluomax": 4356,
-    "min_D1max": 472,
-    "min_D2max": 41,
-    “raw_data”: {
-    	“fluorescence_value”: [],
-    	“well_num”: [],
-    	“cycle_num”: [],
-    	“channel”: []
-    }
-}
+assert(isa(input,Array))
+n_targets=0
+for i in range(1,length(input))
+    well=input[i]
+    assert(isa(well,Dict))
+    assert(length(well)==1)
+    assert(haskey(well,"well"))
+    array=well["well"]
+    if (i==1)
+        n_targets=length(array)
+    else
+        assert(length(array)==n_targets)
+    end
+    empty=false
+    for j in range(1,n_targets)
+        dict=array[j]
+        assert(isa(dict,Dict))
+        if (j==1)
+            empty=(length(dict)==0)
+        end
+        if (empty)
+            assert(length(dict)==0)
+        else
+            assert(length(dict)==3)
+            k=keys(dict)
+            assert(haskey(dict,"target"))
+            assert(dict["target"]==j)
+            assert(haskey(dict,"cq"))
+            assert(isa(dict["cq"],Integer))
+            assert(haskey(dict,"quantity"))
+            subdict=dict["quantity"]
+            assert(isa(subdict,Dict))
+            assert(length(subdict)==2)
+            assert(haskey(subdict,"m"))
+            assert(haskey(subdict,"b"))
+            assert(isa(subdict["m"],Number))
+            assert(isa(subdict["b"],Number))
+        end
+    end
+end
+
+output = JSON.parse(
+    "{
+        \"targets\": 
+        [
+            {\"target_id\": 1, \"slope\": 9.99, \"offset\": 9.99, \"efficiency\": 1.02, \"r2\": 0.99}, 
+            {\"target_id\": 2, \"slope\": 9.99, \"offset\": 9.99, \"efficiency\": 0.98, \"r2\": 0.99}, 
+            {\"target_id\": 3, \"error\": \"xxxxx\"},
+            {\"target_id\": 4, \"error\": \"xxxxx\"}
+        ]
+    }"
+)
+
+assert(isa(output,Dict))
+assert(length(output)==1)
+assert(haskey(output,"targets"))
+array=output["targets"]
+assert(isa(array,Array))
+for i in range(1,length(array))
+    dict=array[i]
+    assert(isa(dict,Dict))
+    assert(haskey(dict,"target_id"))
+    assert(dict["target_id"]==i)
+    if (length(dict)==2)
+        assert(haskey(dict,"error"))
+        assert(isa(dict["error"],String))
+    else
+        assert(length(dict)==5)
+        assert(haskey(dict,"slope"))
+        assert(isa(dict["slope"],Number))
+        assert(haskey(dict,"offset"))
+        assert(isa(dict["offset"],Number))
+        assert(haskey(dict,"efficiency"))
+        assert(isa(dict["efficiency"],Number))
+        assert(haskey(dict,"r2"))
+        assert(isa(dict["r2"],Number))
+    end
+end
+
+
+# ********************************************************************************
+# experiments/:experiment_id/amplification
+#
+# request body:
+# {
+#   "experiment_id": xx,
+#   "step_id/ramp_id": xx,
+#   "min_reliable_cyc": 5,
+#   "calibration_info": {
+#       "water": {
+#       “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
+#           [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
+#       },
+#       "channel_1": {
+#       “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
+#           [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
+#       },
+#       "channel_2": {
+#	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
+#           [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
+#       }
+#   },
+#   "baseline_cyc_bounds": [],
+#	"baseline_method": "sigmoid" (auto) or "linear" or "median"
+#   "cq_method": "Cy0",
+#   "min_fluomax": 4356,
+#   "min_D1max": 472,
+#   "min_D2max": 41,
+#   “raw_data”: {
+#   “fluorescence_value”:[],
+#   “well_num”:[],
+#   “cycle_num”:[],
+#   “channel”:[]
+#   }
+# }
 
 Calibration (Water, channel_1, channel_2) data comes from the following sql query:
 
@@ -96,9 +181,7 @@ SELECT fluorescence_value, well_num, cycle_num, channel
 
 success response body:
 {
-    "rbbs_ary3": [ 
-        # after deconvolution (if dual channel) and adjusting well-to-well variation,
-        # before baseline subtraction
+    "rbbs_ary3": [ # after deconvolution (if dual channel) and adjusting well-to-well variation, before baseline subtraction
         [
             [channel_1__well_01__cycle_01, channel_1__well_01__cycle_02, ... channel_1__well_01__cycle_40],
             [channel_1__well_02__cycle_01, channel_1__well_02__cycle_02, ... channel_1__well_02__cycle_40],
@@ -110,43 +193,38 @@ success response body:
             [channel_2__well_02__cycle_01, channel_2__well_02__cycle_02, ... channel_2__well_02__cycle_40],
             ...
             [channel_2__well_16__cycle_01, channel_2__well_16__cycle_02, ... channel_2__well_16__cycle_40]
-        ] # only exists if dual-channel
+        ] # only exist if dual-channel
     ],
 
     "blsub_fluos": [same_format_as_rbbs_ary3],
     
-    # first derivative of the amp curve
-    "dr1_pred": [same_format_as_rbbs_ary3], 
+    "dr1_pred": [same_format_as_rbbs_ary3], #first derivative of the amp curve
 
-    # second derivative of the amp curve
-    "dr2_pred": [same_format_as_rbbs_ary3], 
+    "dr2_pred": [same_format_as_rbbs_ary3], #second derivative of the amp curve
 
     "cq": [
         [channel_1__well_01, channel_1__well_02, ... channel_1__well_16], # the only element if single-channel
         [channel_2__well_01, channel_2__well_02, ... channel_2__well_16] # only exist if dual-channel
     ],
     
-    # starting quantity from absolute quantification
-    "d0": [same_format_as_cq], 
+    "d0": [same_format_as_cq], # starting quantity from absolute quantification
     
-    # fluorescence threshold if Ct method is used: 
-    #   [channel_1] for single channel,
-    #   [channel_1, channel_2] for dual channel,
-    #   [] empty for automatic detection from data
-    "ct_fluos": [], 
+    "ct_fluos": [], # fluorescence threshold if Ct method is used: [channel_1] for single channel, [channel_1, channel_2] for dual channel, [] empty for automatic detection from data
     
-    "assignments_adj_labels_dict": { 
-        # current data categories are: "rbbs_ary3", "blsub_fluos", "d0", "cq"
+    "assignments_adj_labels_dict": { # current data categories are: "rbbs_ary3", "blsub_fluos", "d0", "cq"
         "data_category_1": [well_01, well_02, ... well_16], 
         "data_category_2": [well_01, well_02, ... well_16], 
         ...
     }
 }
 
-error response body:
-{
-    "error": "xxxx"
-}
+# error response body:
+# {
+#   "error": "xxxx"
+# }
+assert(isa(output,Dict))
+assert(length(output)==1)
+assert(haskey(output,"error"))
 
 *************************************************************************************
 experiments/:experiment_id/meltcurve
@@ -212,10 +290,13 @@ success response body:
     ]
 }
 
-error response body:
-{
-    "error": "xxxx"
-}
+# error response body:
+# {
+#   "error": "xxxx"
+# }
+assert(isa(output,Dict))
+assert(length(output)==1)
+assert(haskey(output,"error"))
 
 *************************************************************************************
 system/loadscript?script=path%2Fto%2Fanalyze.jl
@@ -225,10 +306,13 @@ success response body:
     "script": "path/to/analyze.jl"
 }
 
-error response body:
-{
-    "error": "xxxx"
-}
+# error response body:
+# {
+#   "error": "xxxx"
+# }
+assert(isa(output,Dict))
+assert(length(output)==1)
+assert(haskey(output,"error"))
 
 *************************************************************************************
 experiments/:experiment_id/optical_cal
@@ -466,7 +550,7 @@ success response body (optical_test_single_channel):
         "baseline":1731,
         "excitation":90122,
         "valid":true
-    },{
+    },{     
         "baseline":1718,
         "excitation":94174,
         "valid":true
@@ -629,7 +713,11 @@ success response body (optical_test_dual_channel):
     }
 }
 
-error response body:
-{
-    "error": "xxxx"
-}
+# error response body:
+# {
+#   "error": "xxxx"
+# }
+assert(isa(output,Dict))
+assert(length(output)==1)
+assert(haskey(output,"error"))
+

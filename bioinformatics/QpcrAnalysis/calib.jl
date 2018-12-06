@@ -15,18 +15,24 @@ function dcv_aw(
     dcv::Bool,
     channel_nums::AbstractVector,
     # arguments needed if `k_compute=true`
-    db_conn::MySQL.MySQLHandle, # `db_conn_default` is defined in "__init__.jl"
-    calib_info::Union{Integer,OrderedDict},
-    well_nums_found_in_fr::AbstractVector,
-    well_nums_in_req=[]::AbstractVector,
+
+    # remove MySql dependency
+    #
+    # db_conn::MySQL.MySQLHandle, # `db_conn_default` is defined in "__init__.jl"
+    # calib_info::Union{Integer,OrderedDict},
+    # well_nums_found_in_fr::AbstractVector,
+    # well_nums_in_req=[]::AbstractVector,
+
     dye_in::String="FAM",
     dyes_2bfild::AbstractVector=[];
     aw_out_format::String="both" # "array", "dict", "both"
     )
 
-    calib_info = ensure_ci(db_conn, calib_info)
-
-    wva_data, wva_well_nums = prep_adj_w2wvaf(db_conn, calib_info, well_nums_in_req, dye_in, dyes_2bfild)
+    # remove MySql dependency
+    #
+    # calib_info = ensure_ci(db_conn, calib_info)
+    #
+    # wva_data, wva_well_nums = prep_adj_w2wvaf(db_conn, calib_info, well_nums_in_req, dye_in, dyes_2bfild)
 
     num_channels = length(channel_nums)
 
@@ -94,12 +100,16 @@ type CalibCalibOutput
 end
 
 function calib_calib(
-    db_conn_1::MySQL.MySQLHandle,
-    db_conn_2::MySQL.MySQLHandle,
-    calib_info_1::OrderedDict,
-    calib_info_2::OrderedDict,
-    well_nums_1::AbstractVector=[],
-    well_nums_2::AbstractVector=[];
+
+    # remove MySql dependency
+    #
+    # db_conn_1::MySQL.MySQLHandle,
+    # db_conn_2::MySQL.MySQLHandle,
+    # calib_info_1::OrderedDict,
+    # calib_info_2::OrderedDict,
+    # well_nums_1::AbstractVector=[],
+    # well_nums_2::AbstractVector=[];
+
     dye_in::String="FAM", dyes_2bfild::AbstractVector=[]
     )
 
@@ -108,14 +118,16 @@ function calib_calib(
         error("length(well_nums_1) != length(well_nums_2). ")
     end
 
-    calib_dict_1 = get_full_calib_data(db_conn_1, calib_info_1, well_nums_1)
-    water_well_nums_1 = calib_dict_1["water"][2]
-
-    calib_key_vec_1 = get_ordered_keys(calib_info_1)
-    cd_key_vec_1 = calib_key_vec_1[2:end] # cd = channel of dye. "water" is index 1 per original order.
-    channel_nums_1 = map(cd_key_vec_1) do cd_key
-        parse(Int, split(cd_key, "_")[2])
-    end
+    # remove MySql dependency
+    #
+    # calib_dict_1 = get_full_calib_data(db_conn_1, calib_info_1, well_nums_1)
+    # water_well_nums_1 = calib_dict_1["water"][2]
+    #
+    # calib_key_vec_1 = get_ordered_keys(calib_info_1)
+    # cd_key_vec_1 = calib_key_vec_1[2:end] # cd = channel of dye. "water" is index 1 per original order.
+    # channel_nums_1 = map(cd_key_vec_1) do cd_key
+    #     parse(Int, split(cd_key, "_")[2])
+    # end
 
     ary2dcv_1 = cat(1, map(values(calib_dict_1)) do value_1
         fluo_data = value_1[1]
