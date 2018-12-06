@@ -23,7 +23,7 @@ describe bash("julia --compile=min -e 'println(Pkg.installed(\"Ipopt\"))'") do
 end
 
 describe bash("julia --compile=min -e 'println(Pkg.status()))'") do
-  its('stdout') { should match /0.9.1/ }
+  its('stdout') { should match /Clustering\s*0.9.1/ }
   its('stderr') { should eq '' }
   its('exit_status') { should eq 0 }
 end
