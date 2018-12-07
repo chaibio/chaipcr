@@ -8,7 +8,7 @@ const SCALING_FACTOR_adj_w2wvaf = 3.7 # used: 9e5, 1e5, 1.2e6, 3
 
 
 
-# function: deconvolution and adjust well-to-well variation in absolute fluorescence
+# function: perform deconvolution and adjust well-to-well variation in absolute fluorescence
 
 function dcv_aw(
     fr_ary3::AbstractArray,
@@ -16,23 +16,40 @@ function dcv_aw(
     channel_nums::AbstractVector,
     # arguments needed if `k_compute=true`
 
-    # remove MySql dependency
+    ## remove MySql dependency
     #
     # db_conn::MySQL.MySQLHandle, # `db_conn_default` is defined in "__init__.jl"
     # calib_info::Union{Integer,OrderedDict},
-    # well_nums_found_in_fr::AbstractVector,
+
+    well_nums_found_in_fr::AbstractVector,
+
+    ## remove MySql dependency
+    #
     # well_nums_in_req=[]::AbstractVector,
+
+    # new >>
+    calib_data,
+    # << new
 
     dye_in::String="FAM",
     dyes_2bfild::AbstractVector=[];
     aw_out_format::String="both" # "array", "dict", "both"
     )
 
-    # remove MySql dependency
+    ## remove MySql dependency
     #
     # calib_info = ensure_ci(db_conn, calib_info)
     #
     # wva_data, wva_well_nums = prep_adj_w2wvaf(db_conn, calib_info, well_nums_in_req, dye_in, dyes_2bfild)
+
+    # new >>
+
+    ## check whether the data in optical calibration experiment is valid
+    ## if so, prepare data to adjust well-to-well variation in absolute fluorescence values
+    #
+    wva_data, wva_well_nums = prep_adj_w2wvaf(calib_data, well_nums_in_req, dye_in, dyes_2bfild)
+
+    # << new
 
     num_channels = length(channel_nums)
 
@@ -44,8 +61,9 @@ function dcv_aw(
         wva_well_num in well_nums_found_in_fr
     end # do wva_well_num
 
-
-    mw_ary3 = cat(3, map(1:num_channels) do channel_i # mw = minus water
+    # subtract background
+    # mw = minus water
+    mw_ary3 = cat(3, map(1:num_channels) do channel_i
         fr_ary3[:,:,channel_i] .- transpose(
             wva_data["water"][channel_nums[channel_i]][wva_well_idc_wfluo]
         )
@@ -88,7 +106,8 @@ function dcv_aw(
 end # dcv_aw
 
 
-# perform deconvolution and adjustment of well-to-well variation on calibration experiment 1 using the k matrix `wva_data` made from calibration expeirment 2
+# perform deconvolution and adjustment of well-to-well variation on calibration experiment 1
+# using the k matrix `wva_data` made from calibration experiment 2
 
 type CalibCalibOutput
     ary2dcv_1::Array{AbstractFloat,3}
@@ -101,7 +120,7 @@ end
 
 function calib_calib(
 
-    # remove MySql dependency
+    ## remove MySql dependency
     #
     # db_conn_1::MySQL.MySQLHandle,
     # db_conn_2::MySQL.MySQLHandle,
@@ -118,7 +137,7 @@ function calib_calib(
         error("length(well_nums_1) != length(well_nums_2). ")
     end
 
-    # remove MySql dependency
+    ## remove MySql dependency
     #
     # calib_dict_1 = get_full_calib_data(db_conn_1, calib_info_1, well_nums_1)
     # water_well_nums_1 = calib_dict_1["water"][2]

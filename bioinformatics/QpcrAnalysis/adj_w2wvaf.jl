@@ -82,8 +82,8 @@ function check_subset(small::Ccsc, big::Ccsc)
 end
 
 
-# to be deprecated to remove dependency on MySQL
-# function: get well-to-well variation data well-to-well variation in absolute fluorescence (wva)
+# function: get well-to-well variation in absolute fluorescence (wva)
+# deprecated to remove MySQL dependency
 function get_wva_data(
     # calib_id_s and step_id_s as OrderedDict are expected to be OrderedDict{T,T} where T <: Integer
     calib_id_s::Union{Integer,OrderedDict},
@@ -137,7 +137,7 @@ function get_wva_data(
             elseif calib_id_key_isa == "dye" #
                 channel = DYE2CHST[calib_id_key]["channel"]
             else
-                error("If multipe experiments are used for calibration, `calib_id_key_isa` needs to be \"channel\" or \"dye\". ")
+                error("If multiple experiments are used for calibration, `calib_id_key_isa` needs to be \"channel\" or \"dye\". ")
             end
             wva_qry_2b = "
                 SELECT fluorescence_value, well_num
@@ -177,59 +177,83 @@ function get_wva_data(
 end # get_wva_data
 
 
-# function: check whether the data in optical calibration experiment is valid; if yes, prepare calibration data
+# function: check whether the data in optical calibration experiment is valid
+# if so, prepare calibration data
 function prep_adj_w2wvaf(
+
+    ## remove MySql dependency
+    #
     # db_conn::MySQL.MySQLHandle,
-    # calib_info::Union{Integer,OrderedDict}, # can be an interger or a OrderedDict in chai format: OrderedDict("water"=OrderedDict(calibration_id=>..., step_id=>...), "channel_1"=OrderedDict(calibration_id=..., step_id=...), "channel_2"=OrderedDict(calibration_id=...", step_id=...).
-    calib_data::AbstractArray, # new
+    #
+    # calib_info can be an integer or a OrderedDict in chai format:
+    # OrderedDict("water"=OrderedDict(calibration_id=>..., step_id=>...),
+    # "channel_1"=OrderedDict(calibration_id=..., step_id=...),
+    # "channel_2"=OrderedDict(calibration_id=...", step_id=...))
+    # calib_info::Union{Integer,OrderedDict}, 
+
+    # new >>
+    calib_data::AbstractArray, 
+    # << new
+
     well_nums::AbstractVector,
     dye_in::String="FAM",
     dyes_2bfild::AbstractVector=[]
     )
 
-    calib_info = ensure_ci(db_conn, calib_info)
+    ## remove MySql dependency
+    #
+    # calib_info = ensure_ci(db_conn, calib_info)
+    #
+    # if isa(calib_info, Integer) # `calib_info` is an integer. Using `oc_water_step_id` and
+    # `oc_signal_step_ids` defined outside of this function
+    #     water_calib_id  = signal_calib_id_s = calib_info
+    #     # This operation caused oc_water_step_id and oc_signal_step_ids to be compiled
+    #     # as local variables in prep_optic_calib: define oc_water_step_id and oc_signal_step_ids
+    #     # in the module scope, use them in this `if` clause, then try to assign new values
+    #     # to them in the following `else` clause
+    #     oc_water_step_id = oc_water_step_id_PREDFD
+    #     oc_signal_step_ids = oc_signal_step_ids_PREDFD
+    # elseif isa(calib_info, OrderedDict)
+    #     calib_id_key_vec = get_ordered_keys(calib_info) # i.e ["water","channel_1","channel_2"...]
+    #     water_cs_dict = calib_info["water"]
+    #     water_calib_id = water_cs_dict["calibration_id"]
+    #     oc_water_step_id = water_cs_dict["step_id"]
+    #     ci_channel_key_vec = calib_id_key_vec[find(calib_id_key_vec) do ci_key
+    #         ci_key[1:2] == "ch"
+    #     end] # ci = calib_info
+    #     channel_vec = map(ci_channel_key_vec) do ci_channel_key
+    #         parse(Int, split(ci_channel_key, "_")[2])
+    #     end
+    #     signal_calib_id_s = OrderedDict{Int,Int}()
+    #     oc_signal_step_ids = OrderedDict{Int,Int}()
+    #     for ci_channel_key in ci_channel_key_vec
+    #         channel = parse(Int, split(ci_channel_key, "_")[2])
+    #         signal_calib_id_s[channel] = calib_info[ci_channel_key]["calibration_id"]
+    #         oc_signal_step_ids[channel] = calib_info[ci_channel_key]["step_id"]
+    #     end
+    # end
+    #
+    # water_data_dict, channels_in_water, water_well_nums = get_wva_data(water_calib_id, oc_water_step_id, db_conn, "", well_nums)
+    # check_subset(Ccsc(channels_in_water, "Input water channels"), DYE2CHST_ccsc)
+    #
+    # signal_data_dict, channels_in_signal, signal_well_nums = get_wva_data(signal_calib_id_s, oc_signal_step_ids, db_conn, "channel", well_nums)
+    # check_subset(Ccsc(channels_in_signal, "Input signal channels"), DYE2CHST_ccsc)
+    #
+    # if water_well_nums != signal_well_nums
+    #     error("The wells with water data ($(join(water_well_nums, ", "))) are not the same as those with signal data ($(join(signal_well_nums, ", "))). ")
+    # end
+    #
+    ## check data length
+    # water_lengths = map(length, channels_in_water)
+    # signal_lengths = map(length, channels_in_signal)
+    # if length(unique([water_lengths; signal_lengths])) > 1
+    #     error("Data lengths are not equal across all the channels and/or between water and signal. Water: $water_lengths. Signal: $signal_lengths. ")
+    # end
 
-    if isa(calib_info, Integer) # `calib_info` is an integer. Using `oc_water_step_id` and `oc_signal_step_ids` defined outside of this function
-        water_calib_id  = signal_calib_id_s = calib_info
-        # This operation caused oc_water_step_id and oc_signal_step_ids to be compiled as local variables in prep_optic_calib: define oc_water_step_id and oc_signal_step_ids in the module scope, use them in this `if` clause, then try to assign new values to them in the following `else` clause
-        oc_water_step_id = oc_water_step_id_PREDFD
-        oc_signal_step_ids = oc_signal_step_ids_PREDFD
-    elseif isa(calib_info, OrderedDict)
-        calib_id_key_vec = get_ordered_keys(calib_info) # will remain ["water", "channel_1", "channel_2"...]
-        water_cs_dict = calib_info["water"]
-        water_calib_id = water_cs_dict["calibration_id"]
-        oc_water_step_id = water_cs_dict["step_id"]
-        ci_channel_key_vec = calib_id_key_vec[find(calib_id_key_vec) do ci_key
-            ci_key[1:2] == "ch"
-        end] # ci = calib_info
-        channel_vec = map(ci_channel_key_vec) do ci_channel_key
-            parse(Int, split(ci_channel_key, "_")[2])
-        end
-        signal_calib_id_s = OrderedDict{Int,Int}()
-        oc_signal_step_ids = OrderedDict{Int,Int}()
-        for ci_channel_key in ci_channel_key_vec
-            channel = parse(Int, split(ci_channel_key, "_")[2])
-            signal_calib_id_s[channel] = calib_info[ci_channel_key]["calibration_id"]
-            oc_signal_step_ids[channel] = calib_info[ci_channel_key]["step_id"]
-        end
-    end
-
-    water_data_dict, channels_in_water, water_well_nums = get_wva_data(water_calib_id, oc_water_step_id, db_conn, "", well_nums)
-    check_subset(Ccsc(channels_in_water, "Input water channels"), DYE2CHST_ccsc)
-
-    signal_data_dict, channels_in_signal, signal_well_nums = get_wva_data(signal_calib_id_s, oc_signal_step_ids, db_conn, "channel", well_nums)
-    check_subset(Ccsc(channels_in_signal, "Input signal channels"), DYE2CHST_ccsc)
-
-    if water_well_nums != signal_well_nums
-        error("The wells with water data ($(join(water_well_nums, ", "))) are not the same as those with signal data ($(join(signal_well_nums, ", "))). ")
-    end
-
-    # check data length
-    water_lengths = map(length, channels_in_water)
-    signal_lengths = map(length, channels_in_signal)
-    if length(unique([water_lengths; signal_lengths])) > 1
-        error("Data lengths are not equal across all the channels and/or between water and signal. Water: $water_lengths. Signal: $signal_lengths. ")
-    end
+    # new >>
+    water_data_dict = calib_data["water"]
+    signal_data_dict = calib_data["signal"]
+    # << new
 
     # check whether signal fluo > water fluo
     stop_msgs = Vector{String}()
@@ -242,12 +266,11 @@ function prep_adj_w2wvaf(
             push!(stop_msgs,
                 "Invalid well-to-well variation data in channel $channel_in_signal: fluorescence value of water is greater than or equal to that of dye in the following well(s) - $failed_well_nums_str. "
             )
-        end # if
-    end # for
+        end # if invalid
+    end # next channel
     if (length(stop_msgs) > 0)
         error(join(stop_msgs, ""))
     end
-
 
     if length(dyes_2bfild) > 0 # extrapolate well-to-well variation data for missing channels
 

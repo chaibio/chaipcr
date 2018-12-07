@@ -11,33 +11,39 @@ function dispatch(action::String, request_body::String)
 
         keys_req_dict = keys(req_dict)
 
-        calib_info = "calibration_info" in keys_req_dict ? req_dict["calibration_info"] : calib_info_AIR
-
-        db_name = "db_name" in keys_req_dict ? req_dict["db_name"] : db_name_AIR
-        db_conn = "db_key" in keys_req_dict ? DB_CONN_DICT[req_dict["db_key"]] : ((db_name == db_name_AIR) ? DB_CONN_DICT["default"] : mysql_connect(
-            req_dict["db_host"], req_dict["db_usr"], req_dict["db_pswd"], req_dict["db_name"]
-        ))
-        # println("non-default db_name: ", db_name)
+        ## remove MySql dependency
+        #
+        # calib_info = "calibration_info" in keys_req_dict ? req_dict["calibration_info"] : calib_info_AIR
+        #
+        # db_name = "db_name" in keys_req_dict ? req_dict["db_name"] : db_name_AIR
+        # db_conn = "db_key" in keys_req_dict ? DB_CONN_DICT[req_dict["db_key"]] : ((db_name == db_name_AIR) ? DB_CONN_DICT["default"] : mysql_connect(
+        #     req_dict["db_host"], req_dict["db_usr"], req_dict["db_pswd"], req_dict["db_name"]
+        # ))
+        ## println("non-default db_name: ", db_name)
 
     elseif isa(req_parsed, AbstractVector) # standard_curve
         req_vec = req_parsed
-        db_name = db_name_AIR
+
+        ## remove MySql dependency
+        #
+        # db_name = db_name_AIR
+
     end # if isa
 
     result = try
 
         if action == "amplification"
 
-            exp_id = req_dict["experiment_id"]
-
-            # asrp_vec
-            if "step_id" in keys_req_dict
-                asrp_vec = [AmpStepRampProperties("step", req_dict["step_id"], DEFAULT_cyc_nums)]
-            elseif "ramp_id" in keys_req_dict
-                asrp_vec = [AmpStepRampProperties("ramp", req_dict["ramp_id"], DEFAULT_cyc_nums)]
-            else
-                asrp_vec = Vector{AmpStepRampProperties}()
-            end
+            ## remove MySql dependency
+            #
+            ## asrp_vec
+            # if "step_id" in keys_req_dict
+            #     asrp_vec = [AmpStepRampProperties("step", req_dict["step_id"], DEFAULT_cyc_nums)]
+            # elseif "ramp_id" in keys_req_dict
+            #     asrp_vec = [AmpStepRampProperties("ramp", req_dict["ramp_id"], DEFAULT_cyc_nums)]
+            # else
+            #     asrp_vec = Vector{AmpStepRampProperties}()
+            # end
 
             # `report_cq!` arguments
             kwdict_rc = OrderedDict{Symbol,Any}()
@@ -68,7 +74,7 @@ function dispatch(action::String, request_body::String)
                 kwdict_pa1[:categ_well_vec] = categ_well_vec
             end
             if "baseline_method" in keys_req_dict
-                baseline_method = keys_req_dict["baseline_method"]
+                baseline_method = req_dict["baseline_method"]
                 if baseline_method == "sigmoid"
                     kwdict_pa1[:bl_method] = "l4_enl"
                     kwdict_pa1[:bl_fallback_func] = median
@@ -82,7 +88,16 @@ function dispatch(action::String, request_body::String)
 
             # call
             process_amp( # can't use `return` to return within `try`
-                db_conn, exp_id, asrp_vec, calib_info;
+                
+                ## remove MySql dependency
+                #
+                # db_conn, exp_id, asrp_vec, calib_info;
+
+                # new >>
+                exp_data=req_dict["raw_data"],
+                calib_info=req_dict["calibration_info"],
+                # << new
+
                 kwdict_rc=kwdict_rc,
                 out_sr_dict=false,
                 kwdict_pa1...
@@ -142,9 +157,11 @@ function dispatch(action::String, request_body::String)
     success = !isa(result, Exception)
     response_body = success ? result : json(OrderedDict("error"=>repr(result)))
 
-    if db_name != db_name_AIR
-        mysql_disconnect(db_conn)
-    end
+    ## remove MySql dependency
+    #
+    # if db_name != db_name_AIR
+    #     mysql_disconnect(db_conn)
+    # end
 
     return (success, response_body)
 end # dispatch

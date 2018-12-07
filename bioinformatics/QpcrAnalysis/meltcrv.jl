@@ -92,8 +92,9 @@ function process_mc(
     #     well_nums, mcd_qry_2b, db_conn, verbose
     # )
 
-    # new
+    # new >>
     num_fluo_wells = length(fluo_well_nums)
+    # << new
 
     # pre-deconvolution, can process multiple channels
     # channel_nums = sort(unique(mcd_nt[:channel])) # process all available channels in the database

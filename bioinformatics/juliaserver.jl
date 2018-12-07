@@ -18,14 +18,17 @@ using HttpServer, QpcrAnalysis
 # end
 
 http = HttpHandler() do req::Request, res::Response
+
 	code = 0
 	if ismatch(r"^/experiments/", req.resource)
 		nodes = split(req.resource, '/')
-		experiment_id = parse(Int, nodes[3])
-		action = String(nodes[4])
-		request_body = String(req.data)
-		success, response_body = QpcrAnalysis.dispatch(action, request_body)
-		code = (success) ? 200 : 500
+		if (length(nodes) >= 4)
+			experiment_id = parse(Int, nodes[3])
+			action = String(nodes[4])
+			request_body = String(req.data)
+			success, response_body = QpcrAnalysis.dispatch(action, request_body)
+			code = (success) ? 200 : 500
+		end
 	end
 
 	if code == 0

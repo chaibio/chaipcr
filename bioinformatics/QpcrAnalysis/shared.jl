@@ -11,9 +11,7 @@ const JULIA_ENV = ENV["JULIA_ENV"]
 
 
 # functions
-<<<<<<< Updated upstream
 # moved to MySQLforQpcrAnalysis.jl: ensure_ci, get_mysql_data_well
-=======
 
 # function: check whether a value different from `calib_info_AIR` is passed onto `calib_info`; if not, use `exp_id` to find calibration "experiment_id" in MySQL database and assumes water "step_id"=2, signal "step_id"=4, using FAM to calibrate all the channels.
 function ensure_ci(
@@ -68,7 +66,6 @@ function ensure_ci(
     return calib_info
 
 end # ensure_ci
->>>>>>> Stashed changes
 
 
 # find by sliding window the indices in a vector where the value at the index equals the summary value of the window centering at the index (window width = number of data points in the whole window). can be used to find peak summits and nadirs

@@ -93,20 +93,20 @@ end
 # !!!! modified for receiving data instead of experiment ids as input
 function process_amp(
 
-    # remove MySql dependency
+    ## remove MySql dependency
     #
     # db_conn::MySQL.MySQLHandle,
     # exp_id::Integer,
     # asrp_vec::Vector{AmpStepRampProperties},
     # calib_info::Union{Integer,OrderedDict};
     #
-    # # arguments that might be passed by upstream code
+    ## arguments that might be passed by upstream code
     # well_nums::AbstractVector=[],
 
-    # new: start
+    # new >>
     exp_data::AbstractArray,
     calib_data::AbstractArray,
-    # new: end
+    # << new
 
     min_reliable_cyc::Real=5,
     baseline_cyc_bounds::AbstractVector=[],
@@ -138,7 +138,7 @@ function process_amp(
     verbose::Bool=false
     )
 
-    # old
+    ## remove MySql dependency
     #
     # print_v(println, verbose,
     #     "db_conn: ", db_conn, "\n",
@@ -165,7 +165,9 @@ function process_amp(
     #             experiments.id = $exp_id AND
     #             stages.stage_type <> \'meltcurve\'
     #     "
-    #     sr = MySQL.mysql_execute(db_conn, sr_qry)[1] # [index] fieldnames (mapping no longer needed after using "AS" in query): [1] steps.id, [2] steps.collect_data, [3] ramps.id, [4] ramps.collect_data
+    #     # (mapping no longer needed after using "AS" in query):
+    #     # [1] steps.id, [2] steps.collect_data, [3] ramps.id, [4] ramps.collect_data
+    #     sr = MySQL.mysql_execute(db_conn, sr_qry)[1] # [index] fieldnames
     #
     #     step_ids = unique(sr[1][sr[2] .== 1])
     #     ramp_ids = unique(sr[3][sr[4] .== 1])
@@ -180,26 +182,26 @@ function process_amp(
     #     )
     # end # if length(sr_str_vec)
     #
-    # # # find the latest step or ramp
-    # # if out_sr_dict
-    # #     sr_ids = map(asrp -> asrp.id, asrp_vec)
-    # #     max_step_id = maximum(sr_ids)
-    # #     msi_idc = find(sr_id -> sr_id == max_step_id, sr_ids) # msi = max_step_id
-    # #     if length(msi_idc) == 1
-    # #         latest_idx = msi_idc[1]
-    # #     else # length(max_idc) == 2
-    # #         latest_idx = find(asrp_vec) do asrp
-    # #             asrp.step_or_ramp == "step" && aspr.id == max_step_id
-    # #         end[1] # do asrp
-    # #     end # if length(min_idc) == 1
-    # #     asrp_latest = asrp_vec[latest_idx]
-    # # else # implying `sr_vec` has only one element
-    # #     asrp_latest = asrp_vec[1]
-    # # end
+    ### find the latest step or ramp
+    ## if out_sr_dict
+    ##     sr_ids = map(asrp -> asrp.id, asrp_vec)
+    ##     max_step_id = maximum(sr_ids)
+    ##     msi_idc = find(sr_id -> sr_id == max_step_id, sr_ids) # msi = max_step_id
+    ##     if length(msi_idc) == 1
+    ##         latest_idx = msi_idc[1]
+    ##     else # length(max_idc) == 2
+    ##         latest_idx = find(asrp_vec) do asrp
+    ##             asrp.step_or_ramp == "step" && aspr.id == max_step_id
+    ##         end[1] # do asrp
+    ##     end # if length(min_idc) == 1
+    ##     asrp_latest = asrp_vec[latest_idx]
+    ## else # implying `sr_vec` has only one element
+    ##     asrp_latest = asrp_vec[1]
+    ## end
     #
-    # # print_v(println, verbose, asrp_latest)
+    ## print_v(println, verbose, asrp_latest)
     #
-    # # find `asrp`
+    ## find `asrp`
     # for asrp in asrp_vec
     #     fd_qry_2b = "
     #         SELECT well_num, cycle_num
@@ -218,7 +220,9 @@ function process_amp(
     #     asrp.cyc_nums = unique(fd_nt[:cycle_num])
     #  end # for asrp
     #
-    #  # find `fluo_well_nums` and `channel_nums`. literal i.e. non-pointer variables created in a Julia for-loop is local, i.e. not accessible outside of the for-loop.
+    ## find `fluo_well_nums` and `channel_nums`.
+    ## literal i.e. non-pointer variables created in a Julia for-loop is local,
+    ## i.e. not accessible outside of the for-loop.
     #  asrp_1 = asrp_vec[1]
     #  fd_qry_2b = "
     #      SELECT well_num, channel
@@ -233,10 +237,12 @@ function process_amp(
     #  fd_nt, fluo_well_nums = get_mysql_data_well(
     #      well_nums, fd_qry_2b, db_conn, verbose
     #  )
+    #
+    # channel_nums = unique(fd_nt[:channel])
 
-    # new
-
-    channel_nums = unique(fd_nt[:channel])
+    # new >>
+    channel_nums = unique(raw_data[:channel])
+    # << new
 
     # pre-deconvolution, process all available channel_nums
     if length(channel_nums) == 1
@@ -247,9 +253,16 @@ function process_amp(
 
     sr_dict = OrderedDict(map(asrp_vec) do asrp
         process_amp_1sr(
+
+            ## remove MySql dependency
+            #
             # db_conn, exp_id, asrp, calib_info,
             # fluo_well_nums, well_nums, channel_nums,
-            exp_data, calib_data, # new
+
+            # new >>
+            exp_data, calib_data, 
+            # << new
+
             dcv,
             dye_in, dyes_2bfild,
             min_reliable_cyc, baseline_cyc_bounds, cq_method, ct_fluos, af_key, kwdict_mbq, ipopt_print2file_prefix,
@@ -265,23 +278,18 @@ function process_amp(
 
 end # process_amp
 
-
-function get_amp_data(
-
-    # remove MySql dependency
-    #
+## remove MySql dependency
+#
+# function get_amp_data(
     # db_conn::MySQL.MySQLHandle,
     # col_name::String, # "fluorescence_value" or "baseline_value"
     # exp_id::Integer,
     # asrp::AmpStepRampProperties,
     # fluo_well_nums::AbstractVector, # not `[]`, all elements are expected to be found
     # channel_nums::AbstractVector,
-    
-    )
-
+    # )
+    #
     # cyc_nums = asrp.cyc_nums
-
-    # remove MySql dependency
     #
     # get fluorescence data for amplification
     # fluo_qry = "SELECT $col_name
@@ -296,15 +304,15 @@ function get_amp_data(
     #     ORDER BY channel, well_num, cycle_num
     # "
     # fluo_sel = MySQL.mysql_execute(db_conn, fluo_qry)[1]
-
+    #
     # fluo_raw = reshape(
     #     fluo_sel[parse(col_name)],
     #     map(length, (cyc_nums, fluo_well_nums, channel_nums))...
     # )
-
+    #
     # return fluo_raw
-
-end # get_amp_data
+    #
+# end # get_amp_data
 
 
 
@@ -669,16 +677,20 @@ end # report_cq!
 # process amplification per step
 function process_amp_1sr(
 
-    # remove MySql dependency
+    ## remove MySql dependency
     #
     # db_conn::MySQL.MySQLHandle,
     # exp_id::Integer,
     # asrp::AmpStepRampProperties,
     # calib_info::Union{Integer,OrderedDict},
-    # fluo_well_nums::AbstractVector, well_nums::AbstractVector,
+    # fluo_well_nums::AbstractVector,
+    # well_nums::AbstractVector,
     # channel_nums::AbstractVector,
 
-    exp_data::AbstractArray, calib_data::AbstractArray, # new
+    # new >>
+    exp_data::AbstractArray, 
+    calib_data::AbstractArray, 
+    # << new
 
     dcv::Bool, # logical, whether to perform multi-channel deconvolution
     dye_in::String, dyes_2bfild::AbstractVector,
@@ -702,18 +714,48 @@ function process_amp_1sr(
     verbose::Bool
     )
 
-    fr_ary3 = get_amp_data(
-        db_conn,
-        "fluorescence_value", # "fluorescence_value" or "baseline_value"
-        exp_id, asrp,
-        fluo_well_nums, channel_nums
-    )
+    ## remove MySql dependency
+    #
+    # fr_ary3 = get_amp_data(
+    #     db_conn,
+    #     "fluorescence_value", # "fluorescence_value" or "baseline_value"
+    #     exp_id, asrp,
+    #     fluo_well_nums, channel_nums
+    # )
 
+    # new >>
+    # reshape raw fluorescence data to 3-dimensional array
+    #
+    channel_nums    = sort(unique(exp_data["channel"]))
+    fluo_well_nums  = sort(unique(exp_data["well_num"]))
+    cyc_nums        = sort(unique(exp_data["cycle_num"]))
+    fr_ary3 = reshape(
+        exp_data["fluorescence_value"],
+        (cyc_nums, fluo_well_nums, channel_nums))
+    )
+    # << new
+     
     num_cycs, num_fluo_wells, num_channels = size(fr_ary3)
 
+    # perform deconvolution and adjust well-to-well variation in absolute fluorescence
     mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, rbbs_ary3 = dcv_aw(
         fr_ary3, dcv, channel_nums,
-        db_conn, calib_info, fluo_well_nums, well_nums, dye_in, dyes_2bfild;
+
+        ## remove MySql dependency
+        #
+        # db_conn, calib_info, 
+
+        fluo_well_nums,
+
+        ## remove MySql dependency
+        #
+        # well_nums, 
+
+        # new >>
+        calib_data,
+        # << new
+
+        dye_in, dyes_2bfild;
         aw_out_format="array"
     )
 

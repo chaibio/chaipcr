@@ -1,11 +1,11 @@
 #
 # Cookbook:: vm
-# Test:: master_test
+# Test:: default_test
 #
 # Author: Tom Price
 # Date: Dec 2018
 #
-# Inspec tests for recipe vm::master
+# Inspec tests
 #
 # The Inspec reference, with examples and extensive documentation, can be
 # found at http://inspec.io/docs/reference/resources/

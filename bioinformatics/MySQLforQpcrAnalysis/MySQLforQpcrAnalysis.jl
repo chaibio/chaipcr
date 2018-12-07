@@ -2,8 +2,9 @@
 module MySQLforQpcrAnalysis
 
 
-## # for MySQL versions outputing named tuples by default instead of data frames
-# # supposedly, "To get the results as a DataFrame, you can just do MySQL.query(conn, sql, DataFrame)", but there was some challenges that i don't remember exactly
+## for MySQL versions outputing named tuples by default instead of data frames
+## supposedly, "To get the results as a DataFrame, you can just do MySQL.query(conn, sql, DataFrame)",
+## but there was some challenges that i don't remember exactly
 # using Compat, NamedTuples
 # nt1 = @NT(a=[1,2],b=[3,4])
 # DataFrame(OrderedDict(Compat.pairs(nt1)))
