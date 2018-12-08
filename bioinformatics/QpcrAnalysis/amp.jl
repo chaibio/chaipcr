@@ -1,5 +1,7 @@
 # amplification analysis
 
+import JSON, DataStructures.OrderedDict
+
 const Ct_VAL_DomainError = -100 # should be a value that cannot be obtained by normal calculation of Ct
 
 mutable struct AmpStepRampProperties
@@ -104,8 +106,11 @@ function process_amp(
     # well_nums::AbstractVector=[],
 
     # new >>
-    exp_data::AbstractArray,
-    calib_data::AbstractArray,
+    exp_data ::OrderedDict{String,Any},
+    calib_data ::OrderedDict{String,Any},
+    # we will assume that any relevant step/ramp information has already been passed along
+    # and is present in asrp_vec
+    asrp_vec ::Vector{AmpStepRampProperties};
     # << new
 
     min_reliable_cyc::Real=5,
@@ -119,10 +124,10 @@ function process_amp(
     qt_prob_rc::Real=0.9, # quantile probablity for fluo values per well
     af_key::String="sfc",
 
-    kwdict_mbq::Associative=OrderedDict(), # keyword arguments passed onto `mod_bl_q`
     ipopt_print2file_prefix::String="", # file prefix for Ipopt print for `mod_bl_q`
 
-    kwdict_rc::Associative=OrderedDict(), # keyword arguments passed onto `report_cq!`,
+    kwdict_rc::Associative=Dict(), # keyword arguments passed onto `report_cq!`,
+    kwdict_mbq::Associative=Dict(), # keyword arguments passed onto `mod_bl_q`
 
     # allelic discrimination
     ad_cycs::Union{Integer,AbstractVector}=0, # allelic discrimination: cycles of fluorescence to be used, 0 means the last cycle
@@ -151,7 +156,7 @@ function process_amp(
     # calib_info = ensure_ci(db_conn, calib_info, exp_id)
     #
     # if length(asrp_vec) == 0
-    #     sr_qry = "SELECT
+    #     sr_qry = """SELECT
     #             steps.id AS steps_id,
     #             steps.collect_data AS steps_collect_data,
     #             ramps.id AS ramps_id,
@@ -164,7 +169,7 @@ function process_amp(
     #         WHERE
     #             experiments.id = $exp_id AND
     #             stages.stage_type <> \'meltcurve\'
-    #     "
+    #     """
     #     # (mapping no longer needed after using "AS" in query):
     #     # [1] steps.id, [2] steps.collect_data, [3] ramps.id, [4] ramps.collect_data
     #     sr = MySQL.mysql_execute(db_conn, sr_qry)[1] # [index] fieldnames
@@ -203,7 +208,7 @@ function process_amp(
     #
     ## find `asrp`
     # for asrp in asrp_vec
-    #     fd_qry_2b = "
+    #     fd_qry_2b = """
     #         SELECT well_num, cycle_num
     #             FROM fluorescence_data
     #             WHERE
@@ -213,7 +218,8 @@ function process_amp(
     #                 step_id is not NULL
     #                 well_constraint
     #             ORDER BY cycle_num
-    #     " # must "SELECT well_num" for `get_mysql_data_well`
+    #     """ 
+    #     # must "SELECT well_num" for `get_mysql_data_well`
     #     fd_nt, fluo_well_nums = get_mysql_data_well(
     #         well_nums, fd_qry_2b, db_conn, verbose
     #     )
@@ -224,7 +230,7 @@ function process_amp(
     ## literal i.e. non-pointer variables created in a Julia for-loop is local,
     ## i.e. not accessible outside of the for-loop.
     #  asrp_1 = asrp_vec[1]
-    #  fd_qry_2b = "
+    #  fd_qry_2b = """
     #      SELECT well_num, channel
     #          FROM fluorescence_data
     #          WHERE
@@ -233,7 +239,8 @@ function process_amp(
     #              step_id is not NULL
     #              well_constraint
     #          ORDER BY well_num
-    #  " # must "SELECT well_num" and "ORDER BY well_num" for `get_mysql_data_well`
+    #  """
+    #  # must "SELECT well_num" and "ORDER BY well_num" for `get_mysql_data_well`
     #  fd_nt, fluo_well_nums = get_mysql_data_well(
     #      well_nums, fd_qry_2b, db_conn, verbose
     #  )
@@ -241,7 +248,7 @@ function process_amp(
     # channel_nums = unique(fd_nt[:channel])
 
     # new >>
-    channel_nums = unique(raw_data[:channel])
+    channel_nums = unique(exp_data["channel"])
     # << new
 
     # pre-deconvolution, process all available channel_nums
@@ -260,7 +267,8 @@ function process_amp(
             # fluo_well_nums, well_nums, channel_nums,
 
             # new >>
-            exp_data, calib_data, 
+            exp_data ::OrderedDict{String,Any},
+            calib_data ::OrderedDict{String,Any},
             # << new
 
             dcv,
@@ -273,45 +281,44 @@ function process_amp(
     end) # do sr_ele
 
     final_out = out_sr_dict ? sr_dict : collect(values(sr_dict))[1]
-
-    return out_format == "json" ? json(final_out) : final_out
+    return out_format == "json" ? JSON.json(final_out) : final_out
 
 end # process_amp
 
-## remove MySql dependency
+## deprecated to remove MySql dependency
 #
 # function get_amp_data(
-    # db_conn::MySQL.MySQLHandle,
-    # col_name::String, # "fluorescence_value" or "baseline_value"
-    # exp_id::Integer,
-    # asrp::AmpStepRampProperties,
-    # fluo_well_nums::AbstractVector, # not `[]`, all elements are expected to be found
-    # channel_nums::AbstractVector,
-    # )
-    #
-    # cyc_nums = asrp.cyc_nums
-    #
-    # get fluorescence data for amplification
-    # fluo_qry = "SELECT $col_name
-    #     FROM fluorescence_data
-    #     WHERE
-    #         experiment_id= $exp_id AND
-    #         $(asrp.step_or_ramp)_id = $(asrp.id) AND
-    #         cycle_num in ($(join(cyc_nums, ","))) AND
-    #         well_num in ($(join(fluo_well_nums, ","))) AND
-    #         channel in ($(join(channel_nums, ","))) AND
-    #         step_id is not NULL
-    #     ORDER BY channel, well_num, cycle_num
-    # "
-    # fluo_sel = MySQL.mysql_execute(db_conn, fluo_qry)[1]
-    #
-    # fluo_raw = reshape(
-    #     fluo_sel[parse(col_name)],
-    #     map(length, (cyc_nums, fluo_well_nums, channel_nums))...
-    # )
-    #
-    # return fluo_raw
-    #
+#    db_conn::MySQL.MySQLHandle,
+#    col_name::String, # "fluorescence_value" or "baseline_value"
+#    exp_id::Integer,
+#    asrp::AmpStepRampProperties,
+#    fluo_well_nums::AbstractVector, # not `[]`, all elements are expected to be found
+#    channel_nums::AbstractVector,
+#    )
+#    
+#    cyc_nums = asrp.cyc_nums
+#    
+#    get fluorescence data for amplification
+#    fluo_qry = """SELECT $col_name
+#        FROM fluorescence_data
+#        WHERE
+#            experiment_id= $exp_id AND
+#            $(asrp.step_or_ramp)_id = $(asrp.id) AND
+#            cycle_num in ($(join(cyc_nums, ","))) AND
+#            well_num in ($(join(fluo_well_nums, ","))) AND
+#            channel in ($(join(channel_nums, ","))) AND
+#            step_id is not NULL
+#        ORDER BY channel, well_num, cycle_num
+#    """
+#    fluo_sel = MySQL.mysql_execute(db_conn, fluo_qry)[1]
+#    
+#    fluo_raw = reshape(
+#        fluo_sel[JSON.parse(col_name)],
+#        map(length, (cyc_nums, fluo_well_nums, channel_nums))...
+#    )
+#    
+#    return fluo_raw
+#    
 # end # get_amp_data
 
 
@@ -687,31 +694,38 @@ function process_amp_1sr(
     # well_nums::AbstractVector,
     # channel_nums::AbstractVector,
 
-    # new >>
-    exp_data::AbstractArray, 
-    calib_data::AbstractArray, 
+    # new >>    exp_data ::OrderedDict{String,Any},
+    calib_data ::OrderedDict{String,Any},
     # << new
 
-    dcv::Bool, # logical, whether to perform multi-channel deconvolution
-    dye_in::String, dyes_2bfild::AbstractVector,
-    min_reliable_cyc::Real,
-    baseline_cyc_bounds::AbstractArray,
-    cq_method::String,
-    ct_fluos::AbstractVector,
-    af_key::String,
-    kwdict_mbq::Associative, # keyword arguments passed onto `mod_bl_q`
-    ipopt_print2file_prefix::String,
-    qt_prob_rc::Real, # quantile probablity for fluo values per well
-    kwdict_rc::Associative, # keyword arguments passed onto `report_cq`
-    ad_cycs::Union{Integer,AbstractVector},
-    ctrl_well_dict::OrderedDict,
-    cluster_method::String,
-    norm_l::Real,
-    expected_ncg_raw::AbstractMatrix,
-    categ_well_vec::AbstractVector,
-    out_format::String, # "full", "pre_json", "json"
-    json_digits::Integer,
-    verbose::Bool
+    dcv ::Bool, # logical, whether to perform multi-channel deconvolution
+    
+    dye_in ::String, 
+    dyes_2bfild ::
+
+    min_reliable_cyc ::Real,
+    baseline_cyc_bounds ::AbstractVector,
+    cq_method ::String,
+
+    ct_fluos ::AbstractVector,
+    af_key ::String,
+    kwdict_mbq ::Associative, # keyword arguments passed onto `mod_bl_q`
+
+    ipopt_print2file_prefix ::String,
+
+    qt_prob_rc ::Real, # quantile probablity for fluo values per well
+    kwdict_rc ::Associative, # keyword arguments passed onto `report_cq`
+    
+    ad_cycs ::Union{Integer,AbstractVector},
+    ctrl_well_dict ::OrderedDict,
+    cluster_method ::String,
+    norm_l ::Real,
+    expected_ncg_raw ::AbstractMatrix,
+    categ_well_vec ::AbstractVector,
+
+    out_format ::String, # "full", "pre_json", "json"
+    json_digits ::Integer,
+    verbose ::Bool
     )
 
     ## remove MySql dependency
@@ -729,13 +743,15 @@ function process_amp_1sr(
     channel_nums    = sort(unique(exp_data["channel"]))
     fluo_well_nums  = sort(unique(exp_data["well_num"]))
     cyc_nums        = sort(unique(exp_data["cycle_num"]))
+    num_cycs        = length(cyc_nums)
+    num_fluo_wells  = length(fluo_well_nums)
+    num_channels    = length(channel_nums)
     fr_ary3 = reshape(
         exp_data["fluorescence_value"],
-        (cyc_nums, fluo_well_nums, channel_nums))
+        num_cycs, num_fluo_wells, num_channels
     )
     # << new
-     
-    num_cycs, num_fluo_wells, num_channels = size(fr_ary3)
+
 
     # perform deconvolution and adjust well-to-well variation in absolute fluorescence
     mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, rbbs_ary3 = dcv_aw(
@@ -752,7 +768,7 @@ function process_amp_1sr(
         # well_nums, 
 
         # new >>
-        calib_data,
+        calib_data ::OrderedDict{String,Any},
         # << new
 
         dye_in, dyes_2bfild;

@@ -1,3 +1,5 @@
+# calib.jl
+#
 # calibration: deconvolution and adjust well-to-well variation in absolute fluorescence values
 
 
@@ -9,7 +11,6 @@ const SCALING_FACTOR_adj_w2wvaf = 3.7 # used: 9e5, 1e5, 1.2e6, 3
 
 
 # function: perform deconvolution and adjust well-to-well variation in absolute fluorescence
-
 function dcv_aw(
     fr_ary3::AbstractArray,
     dcv::Bool,
@@ -28,7 +29,7 @@ function dcv_aw(
     # well_nums_in_req=[]::AbstractVector,
 
     # new >>
-    calib_data,
+    calib_data ::OrderedDict{String,Any},
     # << new
 
     dye_in::String="FAM",
@@ -43,12 +44,12 @@ function dcv_aw(
     # wva_data, wva_well_nums = prep_adj_w2wvaf(db_conn, calib_info, well_nums_in_req, dye_in, dyes_2bfild)
 
     # new >>
-
     ## check whether the data in optical calibration experiment is valid
     ## if so, prepare data to adjust well-to-well variation in absolute fluorescence values
     #
+    # assume without checking that we are using all the wells, all the time
+    well_nums_in_req = range(0,length(calib_data["water"][1]))
     wva_data, wva_well_nums = prep_adj_w2wvaf(calib_data, well_nums_in_req, dye_in, dyes_2bfild)
-
     # << new
 
     num_channels = length(channel_nums)
@@ -70,8 +71,21 @@ function dcv_aw(
     end...)
 
     if dcv
-        # k_inv_vec = fill(reshape(DataArray([1, 0, 1, 0]), 2, 2), 16) # addition with flexible ratio instead of deconvolution
-        k4dcv, dcvd_ary3 = deconv(1. * mw_ary3, channel_nums, wva_well_idc_wfluo, db_conn, calib_info, well_nums_in_req; out_format="array")
+        ## remove MySql dependency
+        #
+        ## addition with flexible ratio instead of deconvolution (commented out)
+        ## k_inv_vec = fill(reshape(DataArray([1, 0, 1, 0]), 2, 2), 16) 
+        #
+        # k4dcv, dcvd_ary3 = deconV(
+        #     1. * mw_ary3, channel_nums, wva_well_idc_wfluo, db_conn, calib_info, well_nums_in_req;
+        #     out_format="array"
+        # )
+
+        # new >>
+        # nothing implemented so use default
+        k4dcv = K4DCV_EMPTY
+        dcvd_ary3 = mw_ary3
+        # << new
     else
         k4dcv = K4DCV_EMPTY
         dcvd_ary3 = mw_ary3

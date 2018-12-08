@@ -1,14 +1,15 @@
-#
+# dispatch.jl
+
+import JSON, DataStructures.OrderedDict
 
 function dispatch(action::String, request_body::String)
-
-    req_parsed = JSON.parse(request_body; dicttype=OrderedDict) # Julia 0.4.6, DataStructures 0.4.4.
-    # DefaultDict and DefaultOrderedDict constructors sometimes don't work on OrderedDict
+    
+    # NB. DefaultDict and DefaultOrderedDict constructors sometimes don't work on OrderedDict
     # (https://github.com/JuliaLang/DataStructures.jl/issues/205)
+    req_parsed = JSON.parse(request_body; dicttype=OrderedDict)
 
     if isa(req_parsed, Associative) # amplification, meltcurve, analyze
         req_dict = req_parsed
-
         keys_req_dict = keys(req_dict)
 
         ## remove MySql dependency
@@ -34,6 +35,15 @@ function dispatch(action::String, request_body::String)
 
         if action == "amplification"
 
+            # new >>
+            # validate data format
+            test = try
+                amplification_request_test(req_dict)
+            catch err
+               error("data supplied with amplification request is in the wrong format")
+            end
+            # << new
+
             ## remove MySql dependency
             #
             ## asrp_vec
@@ -45,8 +55,20 @@ function dispatch(action::String, request_body::String)
             #     asrp_vec = Vector{AmpStepRampProperties}()
             # end
 
+            # new >>
+            ## we will assume that any relevant step/ramp information has already been passed along
+            ## and is present in step_id / ramp_id
+            if "step_id" in keys_req_dict
+                asrp_vec = [AmpStepRampProperties("step", req_dict["step_id"], DEFAULT_cyc_nums)]
+            elseif "ramp_id" in keys_req_dict
+                asrp_vec = [AmpStepRampProperties("ramp", req_dict["ramp_id"], DEFAULT_cyc_nums)]
+            else
+                error("no step/ramp information found")
+            end
+            # << new
+
             # `report_cq!` arguments
-            kwdict_rc = OrderedDict{Symbol,Any}()
+            kwdict_rc = Dict{Symbol,Any}()
             if "min_fluomax" in keys_req_dict
                 kwdict_rc[:max_bsf_lb] = req_dict["min_fluomax"]
             end
@@ -58,10 +80,10 @@ function dispatch(action::String, request_body::String)
             end
 
             # `process_amp_1sr` arguments
-            kwdict_pa1 = OrderedDict{Symbol,Any}()
-            for key in ["min_reliable_cyc", "baseline_cyc_bounds", "cq_method", "ctrl_well_vec"]
+            kwdict_pa1 = Dict{Symbol,Any}()
+            for key in ["min_reliable_cyc", "baseline_cyc_bounds", "cq_method", "ctrl_well_dict"]
                 if key in keys_req_dict
-                    kwdict_pa1[parse(key)] = req_dict[key]
+                    kwdict_pa1[Symbol(key)] = req_dict[key]
                 end
             end
             if "categ_well_vec" in keys_req_dict
@@ -73,16 +95,19 @@ function dispatch(action::String, request_body::String)
                 end
                 kwdict_pa1[:categ_well_vec] = categ_well_vec
             end
+
+            # `mod_bl_q` arguments
+            kwdict_mbq = Dict{Symbol,Any}()
             if "baseline_method" in keys_req_dict
                 baseline_method = req_dict["baseline_method"]
                 if baseline_method == "sigmoid"
-                    kwdict_pa1[:bl_method] = "l4_enl"
-                    kwdict_pa1[:bl_fallback_func] = median
+                    kwdict_mbq[:bl_method] = "l4_enl"
+                    kwdict_mbq[:bl_fallback_func] = median
                 elseif baseline_method == "linear"
-                    kwdict_pa1[:bl_method] = "lin_1ft"
-                    kwdict_pa1[:bl_fallback_func] = mean
+                    kwdict_mbq[:bl_method] = "lin_1ft"
+                    kwdict_mbq[:bl_fallback_func] = mean
                 elseif baseline_method == "median"
-                    kwdict_pa1[:bl_method] = "median"
+                    kwdict_mbq[:bl_method] = "median"
                 end
             end
 
@@ -94,12 +119,14 @@ function dispatch(action::String, request_body::String)
                 # db_conn, exp_id, asrp_vec, calib_info;
 
                 # new >>
-                exp_data=req_dict["raw_data"],
-                calib_info=req_dict["calibration_info"],
+                req_dict["raw_data"],
+                req_dict["calibration_info"],
+                asrp_vec;
                 # << new
 
-                kwdict_rc=kwdict_rc,
-                out_sr_dict=false,
+                kwdict_rc   = kwdict_rc,
+                kwdict_mbq  = kwdict_mbq,
+                out_sr_dict = false,
                 kwdict_pa1...
             )
 
@@ -155,7 +182,7 @@ function dispatch(action::String, request_body::String)
     end # try
 
     success = !isa(result, Exception)
-    response_body = success ? result : json(OrderedDict("error"=>repr(result)))
+    response_body = success ? result : JSON.json(OrderedDict("error"=>repr(result)))
 
     ## remove MySql dependency
     #

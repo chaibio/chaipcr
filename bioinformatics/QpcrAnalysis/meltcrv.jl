@@ -53,7 +53,10 @@ function process_mc(
     # well_nums::AbstractVector=[],
     # channel_nums::AbstractVector=[1],
 
-    exp_data::AbstractArray, calib_data::AbstractArray, # new
+    # new >>
+    exp_data ::OrderedDict{String,Any},
+    calib_data ::OrderedDict{String,Any},
+    # << new
 
     auto_span_smooth::Bool=false,
     span_smooth_default::Real=0.015,

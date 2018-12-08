@@ -192,7 +192,7 @@ function prep_adj_w2wvaf(
     # calib_info::Union{Integer,OrderedDict}, 
 
     # new >>
-    calib_data::AbstractArray, 
+    calib_data ::OrderedDict{String,Any}, 
     # << new
 
     well_nums::AbstractVector,
@@ -251,8 +251,21 @@ function prep_adj_w2wvaf(
     # end
 
     # new >>
-    water_data_dict = calib_data["water"]
-    signal_data_dict = calib_data["signal"]
+    channels_in_water = (length(calib_data["water"])<2 || calib_data["water"][2]==nothing) ? 1 : 2
+    # assume without checking that
+    # channels_in_signal == channels_in_water
+    channels_in_signal = channels_in_water
+    water_data_dict = Dict{String,Int64}()
+    signal_data_dict = Dict{String,Int64}()
+    for channel in 1:channels_in_water
+        key="channel_$(channel)"
+        water_data_dict[key]  = calib_data["water"][channel]
+        signal_data_dict[key] = calib_data[key][channel]
+    end
+    channels_in_water  = collect(keys(water_data_dict))
+    channels_in_signal = channels_in_water
+    # assume without checking that there are no missing wells anywhere
+    signal_well_nums = range(0,length(signal_data_dict["channel_1"]))
     # << new
 
     # check whether signal fluo > water fluo
@@ -272,35 +285,36 @@ function prep_adj_w2wvaf(
         error(join(stop_msgs, ""))
     end
 
-    if length(dyes_2bfild) > 0 # extrapolate well-to-well variation data for missing channels
-
-        println("Preset well-to-well variation data is used to extrapolate calibration data for missing channels.")
-
-        channels_missing = setdiff(channels_in_water, channels_in_signal)
-        dyes_2bfild_channels = map(dye -> DYE2CHST[dye]["channel"], dyes_2bfild) # DYE2CHST is defined in module scope
-        check_subset(
-            Ccsc(channels_missing, "Channels missing well-to-well variation data"),
-            Ccsc(dyes_2bfild_channels, "channels corresponding to the dyes of which well-to-well variation data is needed")
-        )
-
-        # process preset calibration data
-        preset_step_ids = OrderedDict([
-            dye => DYE2CHST[dye]["step_id"]
-            for dye in keys(DYE2CHST)
-        ])
-        preset_signal_data_dict, dyes_in_preset = get_wva_data(PRESET_calib_ids["signal"], preset_step_ids, db_conn, "dye") # `well_nums` is not passed on
-
-        pivot_preset = preset_signal_data_dict[dye_in]
-
-        pivot_in = signal_data_dict[DYE2CHST[dye_in]["channel"]]
-
-        in2preset = pivot_in ./ pivot_preset
-
-        for dye_2bfild in dyes_2bfild
-            signal_data_dict[DYE2CHST[dye_2bfild]["channel"]] = preset_signal_data_dict[dye_2bfild] .* in2preset
-        end
-
-    end # if
+    # disable this feature temporarily while removing the MySql dependency
+    # if length(dyes_2bfild) > 0 # extrapolate well-to-well variation data for missing channels
+    #
+    #     println("Preset well-to-well variation data is used to extrapolate calibration data for missing channels.")
+    #
+    #     channels_missing = setdiff(channels_in_water, channels_in_signal)
+    #     dyes_2bfild_channels = map(dye -> DYE2CHST[dye]["channel"], dyes_2bfild) # DYE2CHST is defined in module scope
+    #     check_subset(
+    #         Ccsc(channels_missing, "Channels missing well-to-well variation data"),
+    #         Ccsc(dyes_2bfild_channels, "channels corresponding to the dyes of which well-to-well variation data is needed")
+    #     )
+    #
+    #     # process preset calibration data
+    #     preset_step_ids = OrderedDict([
+    #         dye => DYE2CHST[dye]["step_id"]
+    #         for dye in keys(DYE2CHST)
+    #     ])
+    #     preset_signal_data_dict, dyes_in_preset = get_wva_data(PRESET_calib_ids["signal"], preset_step_ids, db_conn, "dye") # `well_nums` is not passed on
+    #
+    #     pivot_preset = preset_signal_data_dict[dye_in]
+    #
+    #     pivot_in = signal_data_dict[DYE2CHST[dye_in]["channel"]]
+    #
+    #     in2preset = pivot_in ./ pivot_preset
+    #
+    #     for dye_2bfild in dyes_2bfild
+    #         signal_data_dict[DYE2CHST[dye_2bfild]["channel"]] = preset_signal_data_dict[dye_2bfild] .* in2preset
+    #     end
+    #
+    # end # if
 
     wva_data = OrderedDict(
         "water" => water_data_dict,

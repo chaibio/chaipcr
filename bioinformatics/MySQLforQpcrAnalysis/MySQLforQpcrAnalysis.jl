@@ -271,7 +271,31 @@ function id2json(
     # return data # for testing
     return JSON.json(data)
 
-end # 2json
+end # id2json
+
+    
+
+
+
+function get_mysql_data_well(
+    well_nums::AbstractVector, # must be sorted in ascending order
+    qry_2b::String, # must select "well_num" column
+    db_conn::MySQL.MySQLHandle,
+    verbose::Bool,
+    )
+
+    well_nums_str = join(well_nums, ',')
+    print_v(println, verbose, "well_nums: $well_nums_str")
+
+    well_constraint = (well_nums_str == "") ? "" : "AND well_num in ($well_nums_str)"
+    qry = replace(qry_2b, "well_constraint", well_constraint)
+    found_well_namedtuple = MySQL.mysql_execute(db_conn, qry)[1]
+
+    found_well_nums = sort(unique(found_well_namedtuple[:well_num]))
+
+    return (found_well_namedtuple, found_well_nums)
+
+end
 
 
 

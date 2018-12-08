@@ -1,6 +1,6 @@
 {
   "experiment_id": 135,
-  "step_id/ramp_id": 351,
+  "step_id": 351,
   "min_reliable_cyc": 5,
   "calibration_info":{
     "water":{

@@ -156,78 +156,40 @@ standard_curve_response_test(response) # true
 # channel_2 will be NULL for single channel: 
 #     "calibration_info": {
 #         "water": {
-#             "fluorescence_value": [[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-#                 NULL]
+#             "fluorescence_value": [
+#                 [water_1__well_01, water_1__well_02, …, water_1__well_16],
+#                 null
+#             ]
 #         },
 #         "channel_1": {
-#             "fluorescence_value": [[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-#                 NULL]
-#         },
-#         "channel_2": {
-#             "fluorescence_value": [[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-#                 NULL]
-#         }
-#     }
-#
-## this is unsatisfactory in a number of ways:
-#
-## 1. The term 'channel' is duplicated
-## 2. Water and signal measurements need to have the same number of channels
-## 3. Water and signal fluorescence values need to be OrderedDict objects keyed by channel
-##    to accommodate the situation where calibration data has more channels than experiment data,
-##    therefore calibration data need to be easily subsetted by channel.
-#
-## This structure is preferable for single channel data:
-# 
-#     "calibration_info": {
-#         "water": {
-#             "fluorescence_value": {
-#                 "channel_1": [channel_1__well_01, channel_1__well_02, …, channel_1__well_16]
-#             }
-#         },
-#         "signal": {
-#             "fluorescence_value": {
-#                 "channel_1": [channel_1__well_01, channel_1__well_02, …, channel_1__well_16]
-#             }
-#         }
-#     }
-#
-## For dual channel data:
-# 
-#     "calibration_info": {
-#         "water": {
-#             "fluorescence_value": {
-#                 "channel_1": [channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-#                 "channel_2": [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]
-#             }
-#         },
-#         "signal": {
-#             "fluorescence_value": {
-#                 "channel_1": [channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-#                 "channel_2": [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]
-#             }
+#             "fluorescence_value": [
+#                 [signal_1__well_01, signal_1__well_02, …, signal_1__well_16],
+#                 null
+#             ]
 #         }
 #     }
 
 function calibration_test(calib)
-    conditions=["water","signal"]
+    conditions=["water","channel_1","channel_2"]
     channels=["channel_1","channel_2"]
-    n_channels=length(calib["water"]["fluorescence_value"])
-    n_wells=length(calib["water"]["fluorescence_value"]["channel_1"])
+    n_channels=(calib["water"]["fluorescence_value"][2]==nothing) ? 1 : 2
+    n_wells=length(calib["water"]["fluorescence_value"][1])
     assert(isa(calib,Dict))
-    assert(length(calib)==length(conditions))
-    for condition in conditions
+    assert(length(calib)<=3)
+    for condition in conditions[range(1,n_channels+1)]
         assert(haskey(calib,condition))
         assert(isa(calib[condition],Dict))
         assert(length(calib[condition])==1)
         assert(haskey(calib[condition],"fluorescence_value"))
-        assert(isa(calib[condition]["fluorescence_value"],Dict))
+        assert(isa(calib[condition]["fluorescence_value"],Array))
         assert(length(calib[condition]["fluorescence_value"])<=2)
-        for channel in channels[range(1,n_channels)]
-            assert(isa(calib[condition]["fluorescence_value"][channel],Array))
-            assert(length(calib[condition]["fluorescence_value"][channel])==n_wells)
-            for i in range(1,n_wells)
-                assert(isa(calib[condition]["fluorescence_value"][channel][i],Number))
+        for channel in range(1,n_channels)
+            if (condition=="water"||condition==channel)
+                assert(isa(calib[condition]["fluorescence_value"][channel],Array))
+                assert(length(calib[condition]["fluorescence_value"][channel])==n_wells)
+                for i in range(1,n_wells)
+                    assert(isa(calib[condition]["fluorescence_value"][channel][i],Number))
+                end
             end
         end
     end
@@ -320,14 +282,16 @@ request=JSON.parse("""{
     "min_reliable_cyc": 5,
     "calibration_info": {
         "water": {
-            "fluorescence_value": {
-                "channel_1": [1.01, 1.02,    1.15, 1.16]
-            }
+            "fluorescence_value": [
+                [0.01, 0.02,    0.15, 0.16],
+                null
+            ]
         },
-        "signal": {
-            "fluorescence_value": {
-                "channel_1": [1.01, 1.02,    1.15, 1.16]
-            }
+        "channel_1": {
+            "fluorescence_value": [
+                [1.01, 1.02,    1.15, 1.16],
+                null
+            ]
         }
     },
     "baseline_cyc_bounds": [5, 10],
@@ -354,16 +318,22 @@ request=JSON.parse("""{
     "min_reliable_cyc": 5,
     "calibration_info": {
         "water": {
-            "fluorescence_value": {
-                "channel_1": [1.01, 1.02,    1.15, 1.16],
-                "channel_2": [2.01, 2.02,    2.15, 2.16]
-            }
+            "fluorescence_value": [
+                [1.01, 1.02,    1.15, 1.16],
+                [2.01, 2.02,    2.15, 2.16]
+            ]
         },
-        "signal": {
-            "fluorescence_value": {
-                "channel_1": [1.01, 1.02,    1.15, 1.16],
-                "channel_2": [2.01, 2.02,    2.15, 2.16]
-            }
+        "channel_1": {
+            "fluorescence_value": [
+                [1.01, 1.02,    1.15, 1.16],
+                [2.01, 2.02,    2.15, 2.16]
+            ]
+        },
+        "channel_2": {
+            "fluorescence_value": [
+                [1.01, 1.02,    1.15, 1.16],
+                [2.01, 2.02,    2.15, 2.16]
+            ]
         }
     },
     "baseline_cyc_bounds": [],
@@ -382,18 +352,23 @@ request=JSON.parse("""{
 
 amplification_request_test(request) # true
 
-request = JSON.parsefile("~/chaibio/bioinformatics/test/singlechannel_amplification_request.json")
+# request = JSON.parsefile("~/chaibio/bioinformatics/test/singlechannel_amplification_request.json")
+request = JSON.parsefile("/mnt/share/singlechannel_amplification_request.json")
 
 amplification_request_test(request) # true
 
-request = JSON.parsefile("~/chaibio/bioinformatics/test/dualchannel_amplification_request.json")
+# request = JSON.parsefile("~/chaibio/bioinformatics/test/dualchannel_amplification_request.json")
+request = JSON.parsefile("/mnt/share/dualchannel_amplification_request.json")
 
 amplification_request_test(request) # true
 
 # test Julia server
 
 request = JSON.parsefile("/mnt/share/dualchannel_amplification_request.json")
+include("QpcrAnalysis.jl")
 
+QpcrAnalysis.dispatch("amplification",String(JSON.json(request)))
+amp_debug = process_amp(request["raw_data"],request["calibration_info"])
 
 run(`curl \
     --header "Content-Type: application/json" \
@@ -401,10 +376,10 @@ run(`curl \
     --data $(JSON.json(request)) \
     http://localhost:8081/experiments/250/amplification`)
 
-run(`curl \
+curl \
     --header "Content-Type: application/json" \
     --data @/mnt/share/dualchannel_amplification_request.json \
-    http://localhost:8081/experiments/250/amplification`)
+    http://localhost:8081/experiments/250/amplification
 
 
 

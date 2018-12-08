@@ -13,60 +13,6 @@ const JULIA_ENV = ENV["JULIA_ENV"]
 # functions
 # moved to MySQLforQpcrAnalysis.jl: ensure_ci, get_mysql_data_well
 
-# function: check whether a value different from `calib_info_AIR` is passed onto `calib_info`; if not, use `exp_id` to find calibration "experiment_id" in MySQL database and assumes water "step_id"=2, signal "step_id"=4, using FAM to calibrate all the channels.
-function ensure_ci(
-    db_conn::MySQL.MySQLHandle,
-    calib_info::Union{Integer,OrderedDict} = calib_info_AIR,
-    exp_id::Integer = calib_info_AIR
-)
-
-    if isa(calib_info, Integer)
-
-        if calib_info == calib_info_AIR
-            calib_id = MySQL.mysql_execute(
-                db_conn,
-                "SELECT calibration_id FROM experiments WHERE id=$exp_id"
-            )[1][:calibration_id][1]
-        else
-            calib_id = calib_info
-        end
-
-        step_qry = "SELECT step_id FROM fluorescence_data WHERE experiment_id=$calib_id"
-        step_ids = sort(unique(MySQL.mysql_execute(db_conn, step_qry)[1][:step_id]))
-
-        calib_info = OrderedDict(
-            "water" => OrderedDict(
-                "calibration_id" => calib_id,
-                "step_id" => step_ids[1]
-            )
-        )
-
-        for i in 2:(length(step_ids))
-            calib_info["channel_$(i-1)"] = OrderedDict(
-                "calibration_id" => calib_id,
-                "step_id" => step_ids[i]
-            )
-        end # for
-
-        channel_qry = "SELECT channel FROM fluorescence_data WHERE experiment_id=$calib_id"
-        channels = sort(unique(MySQL.mysql_execute(db_conn, channel_qry)[1][:channel]))
-
-        for channel in channels
-            channel_key = "channel_$channel"
-            if !(channel_key in keys(calib_info))
-                calib_info[channel_key] = OrderedDict(
-                    "calibration_id" => calib_id,
-                    "step_id" => step_ids[2]
-                )
-            end # if
-        end # for
-
-    end # if isa(calib_info, Integer)
-
-    return calib_info
-
-end # ensure_ci
-
 
 # find by sliding window the indices in a vector where the value at the index equals the summary value of the window centering at the index (window width = number of data points in the whole window). can be used to find peak summits and nadirs
 function find_mid_sumr_bysw(vals::AbstractVector, half_width::Integer, sumr_func::Function=maximum)

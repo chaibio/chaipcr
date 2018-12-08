@@ -49,6 +49,8 @@ end: items to be tested"""
 
 
 
+using QpcrAnalysis, DataStructures, mysql;
+
 # constants
 
 immutable TestDBInfo # need to load each sqldump file named "$db_name_src.sql" as an MySQL database named "db_name"

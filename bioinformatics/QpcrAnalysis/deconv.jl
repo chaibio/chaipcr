@@ -11,15 +11,22 @@ const K4DCV_EMPTY = K4Deconv(ARRAY_EMPTY, ARRAY_EMPTY, "")
 
 
 # multi-channel deconvolution
-function deconv(
-    ary2dcv::AbstractArray, # dim1 is unit, which can be cycle (amplification), temperature point (melting curve), or step type (like "water", "channel_1", "channel_2" for calibration experiment); dim2 must be well, dim3 must be channel
-    channel_nums::AbstractVector, # must be the same length as 3rd dimension of `array2dcv`
+function deconV(
+    # ary2dcv dim1 is unit, which can be cycle (amplification), temperature point (melting curve),
+    # or step type (like "water", "channel_1", "channel_2" for calibration experiment);
+    # ary2dcv dim2 must be well, ary2dcv dim3 must be channel
+    ary2dcv::AbstractArray, 
+
+    # must be the same length as 3rd dimension of `array2dcv`
+    channel_nums::AbstractVector, 
+    
     dcv_well_idc_wfluo::AbstractVector,
 
-    # remove MySql dependency
+    ## remove MySql dependency
     #
-    # arguments needed if k matrix needs to be computed
-    # db_conn::MySQL.MySQLHandle=db_conn_default, # `db_conn_default` is defined in "__init__.jl"
+    ## arguments needed if k matrix needs to be computed
+    ## `db_conn_default` is defined in "__init__.jl"
+    # db_conn::MySQL.MySQLHandle=db_conn_default, 
     # calib_info::Union{Integer,OrderedDict}=calib_info_AIR,
     # well_nums::AbstractVector=[];
 
@@ -33,7 +40,7 @@ function deconv(
 
     dcvd_ary3 = similar(ary2dcv)
 
-    # remove MySql dependency
+    ## remove MySql dependency
     #
     # k4dcv = (isa(calib_info, Integer) || begin
     #     step_ids = map(ci_value -> ci_value["step_id"], values(calib_info))
@@ -74,12 +81,17 @@ end # deconv
 # function: get cross-over constant matrix k
 function get_k(
 
-    # remove MySql dependency
+    ## remove MySql dependency
     #
-    # db_conn::MySQL.MySQLHandle, # MySQL database connection
-    # dcv_exp_info::OrderedDict, # OrderedDict("water"=OrderedDict(calibration_id=..., step_id=...), "channel_1"=OrderedDict(calibration_id=..., step_id=...),  "channel_2"=OrderedDict(calibration_id=...", step_id=...). # info on experiment(s) used to calculate matrix k
+    # db_conn::MySQL.MySQLHandle,
+    # 
+    ## info on experiment(s) used to calculate matrix k
+    ## OrderedDict("water"=OrderedDict(calibration_id=..., step_id=...), "channel_1"=OrderedDict(calibration_id=..., step_id=...),  "channel_2"=OrderedDict(calibration_id=...", step_id=...) 
+    # dcv_exp_info::OrderedDict, 
 
-    calib_data::AbstractArray, # new
+    # new >>
+    calib_data ::OrderedDict{String,Any},
+    # << new
 
     well_nums::AbstractVector=[];
     well_proc::String="vec", # options: "mean", "vec".
@@ -87,7 +99,7 @@ function get_k(
     save_to::String="" # used: "k.jld"
     )
 
-    # remove MySql dependency
+    ## remove MySql dependency
     #
     # dcv_exp_info = ensure_ci(db_conn, dcv_exp_info)
     #
@@ -99,13 +111,17 @@ function get_k(
     # water_data, water_well_nums = dcv_data_dict["water"]
     # num_wells = length(water_well_nums)
 
+    # `dcv_well_nums` is not passed on because expected to be the same as `water_well_nums`,
+    # otherwise error will be raised by `get_full_calib_data`
     k4dcv_bydy = OrderedDict(map(cd_key_vec) do cd_key
         k_data_1dye, dcv_well_nums = dcv_data_dict[cd_key]
         return cd_key => k_data_1dye .- water_data
-    end) # `dcv_well_nums` is not passed on because expected to be the same as `water_well_nums`, otherwise error will be raised by `get_full_calib_data`
+    end) 
 
 
-    # assuming `cd_key` (in the format of "channel_1", "channel_2", etc.) is the target channel of the dye, check whether the water-subtracted signal in target channel is greater than that in non-target channel for each well and each dye.
+    # assuming `cd_key` (in the format of "channel_1", "channel_2", etc.) is the target channel of the dye,
+    # check whether the water-subtracted signal in target channel is greater than that in non-target channel
+    # for each well and each dye.
 
     stop_msgs = Vector{String}()
 
@@ -133,7 +149,6 @@ function get_k(
     if (length(stop_msgs) > 0)
         error(join(stop_msgs, ""))
     end
-
 
     inv_note_pt1 = ""
     inv_note_pt2 = "K matrix is singular, using `pinv` instead of `inv` to compute inverse matrix of K. Deconvolution result may not be accurate. This may be caused by using the same or a similar set of solutions in the steps for different dyes. "
