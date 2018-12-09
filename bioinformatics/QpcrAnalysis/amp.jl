@@ -5,90 +5,90 @@ import JSON, DataStructures.OrderedDict
 const Ct_VAL_DomainError = -100 # should be a value that cannot be obtained by normal calculation of Ct
 
 mutable struct AmpStepRampProperties
-    step_or_ramp::String
-    id::Int
-    cyc_nums::Vector{Int} # accomodating non-continuous sequences of cycles
+    step_or_ramp ::String
+    id ::Int
+    cyc_nums ::Vector{Int} # accomodating non-continuous sequences of cycles
 end
 const DEFAULT_cyc_nums = Vector{Int}()
 
 # `mod_bl_q` output
 struct MbqOutput
-    fitted_prebl::AbstractAmpFitted
-    bl_notes::Vector{String}
-    blsub_fluos::Vector{Float64}
-    fitted_postbl::AbstractAmpFitted
-    postbl_status::Symbol
-    coefs::Vector{Float64}
-    d0::AbstractFloat
-    blsub_fitted::Vector{Float64}
-    dr1_pred::Vector{Float64}
-    dr2_pred::Vector{Float64}
-    max_dr1::AbstractFloat
-    max_dr2::AbstractFloat
-    cyc_vals_4cq::OrderedDict{String,Float64}
-    eff_vals_4cq::OrderedDict{String,Float64}
-    cq_raw::Float64
-    cq::Float64
-    eff::Float64
-    cq_fluo::Float64
+    fitted_prebl ::AbstractAmpFitted
+    bl_notes ::Vector{String}
+    blsub_fluos ::Vector{Float64}
+    fitted_postbl ::AbstractAmpFitted
+    postbl_status ::Symbol
+    coefs ::Vector{Float64}
+    d0 ::AbstractFloat
+    blsub_fitted ::Vector{Float64}
+    dr1_pred ::Vector{Float64}
+    dr2_pred ::Vector{Float64}
+    max_dr1 ::AbstractFloat
+    max_dr2 ::AbstractFloat
+    cyc_vals_4cq ::OrderedDict{String,Float64}
+    eff_vals_4cq ::OrderedDict{String,Float64}
+    cq_raw ::Float64
+    cq ::Float64
+    eff ::Float64
+    cq_fluo ::Float64
 end
 
 # amplification output format per step or ramp
 mutable struct AmpStepRampOutput
     # computed in `process_amp_1sr`
-    fr_ary3::Array{Float64,3}
-    mw_ary3::Array{Float64,3}
-    k4dcv::K4Deconv
-    dcvd_ary3::Array{Float64,3}
-    wva_data::OrderedDict{String,OrderedDict{Int,Vector{Float64}}}
-    rbbs_ary3::Array{Float64,3}
-    fluo_well_nums::Vector{Int}
-    channel_nums::Vector{Int}
-    cq_method::String
+    fr_ary3 ::Array{Float64,3}
+    mw_ary3 ::Array{Float64,3}
+    k4dcv ::K4Deconv
+    dcvd_ary3 ::Array{Float64,3}
+    wva_data ::OrderedDict{String,OrderedDict{Int,Vector{Float64}}}
+    rbbs_ary3 ::Array{Float64,3}
+    fluo_well_nums ::Vector{Int}
+    channel_nums ::Vector{Int}
+    cq_method ::String
     # computed by `mod_bl_q` as part of `MbqOutput` and arranged in arrays in `process_amp_1sr`
-    fitted_prebl::Array{AbstractAmpFitted,2}
-    bl_notes::Array{Array{String,1},2}
-    blsub_fluos::Array{Float64,3}
-    fitted_postbl::Array{AbstractAmpFitted,2}
-    postbl_status::Array{Symbol,2}
-    coefs::Array{Float64,3}
-    d0::Array{Float64,2}
-    blsub_fitted::Array{Float64,3}
-    dr1_pred::Array{Float64,3}
-    dr2_pred::Array{Float64,3}
-    max_dr1::Array{Float64,2}
-    max_dr2::Array{Float64,2}
-    cyc_vals_4cq::Array{OrderedDict{String,Float64},2}
-    eff_vals_4cq::Array{OrderedDict{String,Float64},2}
-    cq_raw::Array{Float64,2}
-    cq::Array{Float64,2}
-    eff::Array{Float64,2}
-    cq_fluo::Array{Float64,2}
+    fitted_prebl ::Array{AbstractAmpFitted,2}
+    bl_notes ::Array{Array{String,1},2}
+    blsub_fluos ::Array{Float64,3}
+    fitted_postbl ::Array{AbstractAmpFitted,2}
+    postbl_status ::Array{Symbol,2}
+    coefs ::Array{Float64,3}
+    d0 ::Array{Float64,2}
+    blsub_fitted ::Array{Float64,3}
+    dr1_pred ::Array{Float64,3}
+    dr2_pred ::Array{Float64,3}
+    max_dr1 ::Array{Float64,2}
+    max_dr2 ::Array{Float64,2}
+    cyc_vals_4cq ::Array{OrderedDict{String,Float64},2}
+    eff_vals_4cq ::Array{OrderedDict{String,Float64},2}
+    cq_raw ::Array{Float64,2}
+    cq ::Array{Float64,2}
+    eff ::Array{Float64,2}
+    cq_fluo ::Array{Float64,2}
     # computed in `process_amp_1sr` from `MbqOutput`
-    qt_fluos::Array{Float64,2}
-    max_qt_fluo::Float64
+    qt_fluos ::Array{Float64,2}
+    max_qt_fluo ::Float64
     # computed by `report_cq!` and arranged in arrays in `process_amp_1sr`
-    max_bsf::Array{Float64,2}
-    scld_max_bsf::Array{Float64,2}
-    scld_max_dr1::Array{Float64,2}
-    scld_max_dr2::Array{Float64,2}
-    why_NaN::Array{String,2}
+    max_bsf ::Array{Float64,2}
+    scld_max_bsf ::Array{Float64,2}
+    scld_max_dr1 ::Array{Float64,2}
+    scld_max_dr2 ::Array{Float64,2}
+    why_NaN ::Array{String,2}
     # for ct method
-    ct_fluos::Vector{Float64}
+    ct_fluos ::Vector{Float64}
     # allelic discrimination
-    assignments_adj_labels_dict::OrderedDict{String,Vector{String}}
-    agr_dict::OrderedDict{String,AssignGenosResult}
+    assignments_adj_labels_dict ::OrderedDict{String,Vector{String}}
+    agr_dict ::OrderedDict{String,AssignGenosResult}
 end # type AmpStepRampOutput
 
 struct AmpStepRampOutput2Bjson
-    rbbs_ary3::Array{Float64,3} # fluorescence after deconvolution and adjusting well-to-well variation
-    blsub_fluos::Array{Float64,3} # fluorescence after baseline subtraction
-    dr1_pred::Array{Float64,3} # dF/dc
-    dr2_pred::Array{Float64,3} # d2F/dc2
-    cq::Array{Float64,2} # cq values, applicable to sigmoid models but not to MAK models
-    d0::Array{Float64,2} # starting quantity from absolute quanitification
-    ct_fluos::Vector{Float64} # fluorescence thresholds (one value per channel) for Ct method
-    assignments_adj_labels_dict::OrderedDict{String,Vector{String}} # assigned genotypes from allelic discrimination, keyed by type of data (see `AD_DATA_CATEG` in "allelic_discrimination.jl")
+    rbbs_ary3 ::Array{Float64,3} # fluorescence after deconvolution and adjusting well-to-well variation
+    blsub_fluos ::Array{Float64,3} # fluorescence after baseline subtraction
+    dr1_pred ::Array{Float64,3} # dF/dc
+    dr2_pred ::Array{Float64,3} # d2F/dc2
+    cq ::Array{Float64,2} # cq values, applicable to sigmoid models but not to MAK models
+    d0 ::Array{Float64,2} # starting quantity from absolute quanitification
+    ct_fluos ::Vector{Float64} # fluorescence thresholds (one value per channel) for Ct method
+    assignments_adj_labels_dict ::OrderedDict{String,Vector{String}} # assigned genotypes from allelic discrimination, keyed by type of data (see `AD_DATA_CATEG` in "allelic_discrimination.jl")
 end
 
 
@@ -97,15 +97,16 @@ function process_amp(
 
     ## remove MySql dependency
     #
-    # db_conn::MySQL.MySQLHandle,
-    # exp_id::Integer,
-    # asrp_vec::Vector{AmpStepRampProperties},
-    # calib_info::Union{Integer,OrderedDict};
+    # db_conn ::MySQL.MySQLHandle,
+    # exp_id ::Integer,
+    # asrp_vec ::Vector{AmpStepRampProperties},
+    # calib_info ::Union{Integer,OrderedDict};
     #
     ## arguments that might be passed by upstream code
-    # well_nums::AbstractVector=[],
+    # well_nums ::AbstractVector=[],
 
     # new >>
+    exp_id ::Integer,
     exp_data ::OrderedDict{String,Any},
     calib_data ::OrderedDict{String,Any},
     # we will assume that any relevant step/ramp information has already been passed along
@@ -113,38 +114,36 @@ function process_amp(
     asrp_vec ::Vector{AmpStepRampProperties};
     # << new
 
-    min_reliable_cyc::Real=5,
-    baseline_cyc_bounds::AbstractVector=[],
-    cq_method::String="Cy0",
-    ct_fluos::AbstractVector=[],
+    min_reliable_cyc ::Real=5,
+    baseline_cyc_bounds ::AbstractVector=[],
+    cq_method ::String="Cy0",
+    ct_fluos ::AbstractVector=[],
 
-    max_cycle::Integer=1000, # maximum temperature to analyze
-    dcv::Bool=true, # logical, whether to perform multi-channel deconvolution
-    dye_in::String="FAM", dyes_2bfild::AbstractVector=[],
-    qt_prob_rc::Real=0.9, # quantile probablity for fluo values per well
-    af_key::String="sfc",
+    max_cycle ::Integer=1000, # maximum temperature to analyze
+    dcv ::Bool=true, # logical, whether to perform multi-channel deconvolution
+    dye_in ::String="FAM", dyes_2bfild ::AbstractVector=[],
+    qt_prob_rc ::Real=0.9, # quantile probablity for fluo values per well
+    af_key ::String="sfc",
 
-    ipopt_print2file_prefix::String="", # file prefix for Ipopt print for `mod_bl_q`
+    ipopt_print2file_prefix ::String="", # file prefix for Ipopt print for `mod_bl_q`
 
-    kwdict_rc::Associative=Dict(), # keyword arguments passed onto `report_cq!`,
-    kwdict_mbq::Associative=Dict(), # keyword arguments passed onto `mod_bl_q`
+    kwdict_rc ::Associative=Dict(), # keyword arguments passed onto `report_cq!`,
+    kwdict_mbq ::Associative=Dict(), # keyword arguments passed onto `mod_bl_q`
 
     # allelic discrimination
-    ad_cycs::Union{Integer,AbstractVector}=0, # allelic discrimination: cycles of fluorescence to be used, 0 means the last cycle
-    ctrl_well_dict::OrderedDict=CTRL_WELL_DICT,
-    cluster_method::String="k-means-medoids", # allelic discrimination: "k-means", "k-medoids", "k-means-medoids"
-    norm_l::Real=2, # norm level for distance matrix, e.g. norm_l = 2 means l2-norm
-    expected_ncg_raw::AbstractMatrix=DEFAULT_encgr, # each column is a vector of binary genotype whose length is number of channels (0 => no signal, 1 => yes signal)
-    categ_well_vec::AbstractVector=CATEG_WELL_VEC,
+    ad_cycs ::Union{Integer,AbstractVector}=0, # allelic discrimination: cycles of fluorescence to be used, 0 means the last cycle
+    ctrl_well_dict ::OrderedDict=CTRL_WELL_DICT,
+    cluster_method ::String="k-means-medoids", # allelic discrimination: "k-means", "k-medoids", "k-means-medoids"
+    norm_l ::Real=2, # norm level for distance matrix, e.g. norm_l = 2 means l2-norm
+    expected_ncg_raw ::AbstractMatrix=DEFAULT_encgr, # each column is a vector of binary genotype whose length is number of channels (0 => no signal, 1 => yes signal)
+    categ_well_vec ::AbstractVector=CATEG_WELL_VEC,
 
-    out_sr_dict::Bool=true, # output an OrderedDict keyed by `sr_str`s
-    out_format::String="json", # "full", "pre_json", "json"
-    json_digits::Integer=JSON_DIGITS,
-    verbose::Bool=false
+    out_sr_dict ::Bool=true, # output an OrderedDict keyed by `sr_str`s
+    out_format ::String="json", # "full", "pre_json", "json"
+    json_digits ::Integer=JSON_DIGITS,
+    verbose ::Bool=false
     )
 
-    ## remove MySql dependency
-    #
     # print_v(println, verbose,
     #     "db_conn: ", db_conn, "\n",
     #     "experiment_id: $exp_id\n",
@@ -152,6 +151,13 @@ function process_amp(
     #     "calib_info: $calib_info\n",
     #     "max_cycle: $max_cycle"
     # )
+    
+    # new >>
+    # not implemented yet
+    calib_data = ensure_ci(calib_data, exp_id)
+    # << new
+    
+    ## remove MySql dependency
     #
     # calib_info = ensure_ci(db_conn, calib_info, exp_id)
     #
@@ -242,13 +248,13 @@ function process_amp(
     #  """
     #  # must "SELECT well_num" and "ORDER BY well_num" for `get_mysql_data_well`
     #  fd_nt, fluo_well_nums = get_mysql_data_well(
-    #      well_nums, fd_qry_2b, db_conn, verbose
+    #      well_nums, fd_qry    _2b, db_conn, verbose
     #  )
     #
     # channel_nums = unique(fd_nt[:channel])
 
     # new >>
-    channel_nums = unique(exp_data["channel"])
+    channel_nums = ["channel_$(i)" for i in sort(unique(exp_data["channel"]))]
     # << new
 
     # pre-deconvolution, process all available channel_nums
@@ -264,14 +270,14 @@ function process_amp(
             ## remove MySql dependency
             #
             # db_conn, exp_id, asrp, calib_info,
-            # fluo_well_nums, well_nums, channel_nums,
+            # fluo_well_nums, well_nums, 
 
             # new >>
             exp_data ::OrderedDict{String,Any},
             calib_data ::OrderedDict{String,Any},
             # << new
 
-            dcv,
+            channel_nums,   dcv,
             dye_in, dyes_2bfild,
             min_reliable_cyc, baseline_cyc_bounds, cq_method, ct_fluos, af_key, kwdict_mbq, ipopt_print2file_prefix,
             qt_prob_rc, kwdict_rc,
@@ -285,15 +291,16 @@ function process_amp(
 
 end # process_amp
 
+
 ## deprecated to remove MySql dependency
 #
 # function get_amp_data(
-#    db_conn::MySQL.MySQLHandle,
-#    col_name::String, # "fluorescence_value" or "baseline_value"
-#    exp_id::Integer,
-#    asrp::AmpStepRampProperties,
-#    fluo_well_nums::AbstractVector, # not `[]`, all elements are expected to be found
-#    channel_nums::AbstractVector,
+#    db_conn ::MySQL.MySQLHandle,
+#    col_name ::String, # "fluorescence_value" or "baseline_value"
+#    exp_id ::Integer,
+#    asrp ::AmpStepRampProperties,
+#    fluo_well_nums ::AbstractVector, # not `[]`, all elements are expected to be found
+#    channel_nums ::AbstractVector,
 #    )
 #    
 #    cyc_nums = asrp.cyc_nums
@@ -322,13 +329,11 @@ end # process_amp
 # end # get_amp_data
 
 
-
-
 # automatically choose baseline cycles as the flat part of the curve
 function auto_choose_bl_cycs(
-    fluos::AbstractVector,
-    last_cyc_wt0::Real, # `floor(min_reliable_cyc) - 1`
-    bl_notes::Vector{String} # will be updated by `push!` and returned
+    fluos ::AbstractVector,
+    last_cyc_wt0 ::Real, # `floor(min_reliable_cyc) - 1`
+    bl_notes ::Vector{String} # will be updated by `push!` and returned
 )
 
     num_cycs = length(fluos)
@@ -381,33 +386,33 @@ end # auto_choose_bl_cycs
 
 # fit model, baseline subtraction, quantification
 function mod_bl_q( # for amplification data per well per channel, fit sigmoid model, extract important information for Cq, subtract baseline.
-    fluos::AbstractVector;
+    fluos ::AbstractVector;
 
-    min_reliable_cyc::Real=5, # >= 1
+    min_reliable_cyc ::Real=5, # >= 1
 
-    af_key::String="sfc", # a string representation of amplification curve model, used for finding the right model `DataType` in `dfc_DICT` and the right empty model instance in `AF_EMPTY_DICT`
+    af_key ::String="sfc", # a string representation of amplification curve model, used for finding the right model `DataType` in `dfc_DICT` and the right empty model instance in `AF_EMPTY_DICT`
 
-    sfc_model_defs::OrderedDict{String,SFCModelDef}=MDs,
+    sfc_model_defs ::OrderedDict{String,SFCModelDef}=MDs,
 
-    bl_method::String="l4_enl",
-    baseline_cyc_bounds::AbstractVector=[],
-    bl_fallback_func::Function=median,
+    bl_method ::String="l4_enl",
+    baseline_cyc_bounds ::AbstractVector=[],
+    bl_fallback_func ::Function=median,
 
-    m_postbl::String="l4_enl",
+    m_postbl ::String="l4_enl",
 
-    denser_factor::Real=100,
+    denser_factor ::Real=100,
 
-    cq_method::String="Cy0",
-    ct_fluo::Real=NaN,
+    cq_method ::String="Cy0",
+    ct_fluo ::Real=NaN,
 
-    verbose::Bool=false,
+    verbose ::Bool=false,
 
-    kwargs_jmp_model::OrderedDict=OrderedDict(
+    kwargs_jmp_model ::OrderedDict=OrderedDict(
         :solver=>IpoptSolver(print_level=0, max_iter=35) # `ReadOnlyMemoryError()` for v0.5.1
         # :solver=>IpoptSolver(print_level=0, max_iter=100) # increase allowed number of iterations for MAK-based methods, due to possible numerical difficulties during search for fitting directions (step size becomes too small to be precisely represented by the precision allowed by the system's capacity)
         # :solver=>NLoptSolver(algorithm=:LN_COBYLA)
     ),
-    ipopt_print2file::String="",
+    ipopt_print2file ::String="",
     )
 
     num_cycs = length(fluos)
@@ -436,7 +441,7 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
         fitted_prebl = fit(dfc_inst, cycs, fluos, wts; kwargs_jmp_model...)
         baseline = fitted_prebl.coefs[1] # "fb" (don't remember what this means, leave it here just in case it's important)
         if af_key in ["MAK3", "MAKERGAUL4"]
-            baseline += fitted_prebl.coefs[2] .* cycs # `.+=` caused "ERROR: MethodError: no method matching broadcast!(::QpcrAnalysis.##278#283, ::Float64, ::Float64, ::Float64, ::StepRangeLen{Float64,Base.TwicePrecision{Float64},Base.TwicePrecision{Float64}})"
+            baseline += fitted_prebl.coefs[2] .* cycs # `.+=` caused "ERROR: MethodError: no method matching broadcast!( ::QpcrAnalysis.##278#283, ::Float64, ::Float64, ::Float64, ::StepRangeLen{Float64,Base.TwicePrecision{Float64},Base.TwicePrecision{Float64}})"
         end # if af_key
 
         fitted_postbl = fitted_prebl
@@ -445,7 +450,7 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
         d0_i_vec = find(fitted_postbl.coef_strs) do coef_str
             coef_str == "d0"
         end
-        d0 = coefs_pob[d0_i_vec[1]] # * 1. # without `* 1.`, MethodError: no method matching kmeans!(::Array{AbstractFloat,2}, ::Array{Float64,2}); Closest candidates are: kmeans!(::Array{T<:AbstractFloat,2}, ::Array{T<:AbstractFloat,2}; weights, maxiter, tol, display) where T<:AbstractFloat at E:\for_programs\julia_pkgs\v0.6\Clustering\src\kmeans.jl:27
+        d0 = coefs_pob[d0_i_vec[1]] # * 1. # without `* 1.`, MethodError: no method matching kmeans!( ::Array{AbstractFloat,2}, ::Array{Float64,2}); Closest candidates are: kmeans!( ::Array{T<:AbstractFloat,2}, ::Array{T<:AbstractFloat,2}; weights, maxiter, tol, display) where T<:AbstractFloat at E:\for_programs\julia_pkgs\v0.6\Clustering\src\kmeans.jl:27
 
         # for `Sfc`-style output
         bl_notes = [af_key]
@@ -608,10 +613,10 @@ end # mod_bl_q
 
 
 function report_cq!(
-    full_amp_out::AmpStepRampOutput,
-    well_i::Integer,
-    channel_i::Integer;
-    before_128x::Bool=false,
+    full_amp_out ::AmpStepRampOutput,
+    well_i ::Integer,
+    channel_i ::Integer;
+    before_128x ::Bool=false,
     max_dr1_lb=472,
     max_dr2_lb=41,
     max_bsf_lb=4356,
@@ -686,22 +691,23 @@ function process_amp_1sr(
 
     ## remove MySql dependency
     #
-    # db_conn::MySQL.MySQLHandle,
-    # exp_id::Integer,
-    # asrp::AmpStepRampProperties,
-    # calib_info::Union{Integer,OrderedDict},
-    # fluo_well_nums::AbstractVector,
-    # well_nums::AbstractVector,
-    # channel_nums::AbstractVector,
+    # db_conn ::MySQL.MySQLHandle,
+    # exp_id ::Integer,
+    # asrp ::AmpStepRampProperties,
+    # calib_info ::Union{Integer,OrderedDict},
+    # fluo_well_nums ::AbstractVector,
+    # well_nums ::AbstractVector,
 
-    # new >>    exp_data ::OrderedDict{String,Any},
+    # new >>    
+    exp_data ::OrderedDict{String,Any},
     calib_data ::OrderedDict{String,Any},
     # << new
 
+    channel_nums ::AbstractVector,
     dcv ::Bool, # logical, whether to perform multi-channel deconvolution
     
     dye_in ::String, 
-    dyes_2bfild ::
+    dyes_2bfild ::AbstractVector,
 
     min_reliable_cyc ::Real,
     baseline_cyc_bounds ::AbstractVector,
@@ -740,7 +746,6 @@ function process_amp_1sr(
     # new >>
     # reshape raw fluorescence data to 3-dimensional array
     #
-    channel_nums    = sort(unique(exp_data["channel"]))
     fluo_well_nums  = sort(unique(exp_data["well_num"]))
     cyc_nums        = sort(unique(exp_data["cycle_num"]))
     num_cycs        = length(cyc_nums)
@@ -752,22 +757,16 @@ function process_amp_1sr(
     )
     # << new
 
-
     # perform deconvolution and adjust well-to-well variation in absolute fluorescence
     mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, rbbs_ary3 = dcv_aw(
         fr_ary3, dcv, channel_nums,
 
         ## remove MySql dependency
         #
-        # db_conn, calib_info, 
-
-        fluo_well_nums,
-
-        ## remove MySql dependency
-        #
-        # well_nums, 
+        # db_conn, calib_info, fluo_well_nums, well_nums, 
 
         # new >>
+        fluo_well_nums,
         calib_data ::OrderedDict{String,Any},
         # << new
 
@@ -785,7 +784,7 @@ function process_amp_1sr(
     end # if ndims
 
     NaN_ary2 = fill(NaN, num_fluo_wells, num_channels)
-    fitted_prebl = fitted_postbl = fill(AF_EMPTY_DICT[af_key], num_fluo_wells, num_channels) # once `::Array{EmptyAmpFitted,2}`, can't be `setfield!` to `::Array{SfcFitted,2}`, and vice versa
+    fitted_prebl = fitted_postbl = fill(AF_EMPTY_DICT[af_key], num_fluo_wells, num_channels) # once ` ::Array{EmptyAmpFitted,2}`, can't be `setfield!` to ` ::Array{SfcFitted,2}`, and vice versa
     blsub_fluos = blsub_fitted = rbbs_ary3
     empty_vals_4cq = fill(OrderedDict{String,AbstractFloat}(), num_fluo_wells, num_channels)
     ct_fluos_empty = fill(NaN, num_channels)
@@ -798,7 +797,7 @@ function process_amp_1sr(
         wva_data,
         rbbs_ary3,
         fluo_well_nums,
-        channel_nums,
+        1:num_channels,
         cq_method,
         fitted_prebl,
         fill(Vector{String}(), num_fluo_wells, num_channels), # bl_notes
@@ -950,7 +949,7 @@ function process_amp_1sr(
 
     return join([asrp.step_or_ramp, asrp.id], "_") => amp_out
 
-end # process_amp_ps
+end # process_amp_1sr
 
 
 #

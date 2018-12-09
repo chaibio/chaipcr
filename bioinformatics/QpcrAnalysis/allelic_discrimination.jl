@@ -1,4 +1,7 @@
-# allelic discrimination (ad)
+# allelic_discrimination.jl
+
+import DataStructures.OrderedDict
+import Clustering.ClusteringResult
 
 # 4 groups
 const DEFAULT_encgr = Array{Int,2}(0, 0)
@@ -13,10 +16,10 @@ const DEFAULT_apg_LABELS = ["ntc", "homo_1", "homo_2", "hetero", "unclassified"]
 # const DEFAULT_eg_LABELS = ["homo_a", "homo_b", "hetero", "unclassified"]
 
 const CATEG_WELL_VEC = [
-    ("rbbs_ary3", Colon()),
+    ("rbbs_ary3",   Colon()),
     ("blsub_fluos", Colon()),
-    ("d0", Colon()),
-    ("cq", Colon())
+    ("d0",          Colon()),
+    ("cq",          Colon())
 ]
 
 # const CTRL_WELL_VEC = fill(Vector{Int}(), length(DEFAULT_init_FACTORS)) # All empty. NTC, homo ch1, homo ch2, hetero
@@ -26,7 +29,7 @@ const CTRL_WELL_DICT = OrderedDict{Vector{Int},Vector{Int}}() # key is genotype 
 #     [0, 0] => [1, 2], # NTC, well 1 and 2
 #     [1, 0] => [3, 4], # homo ch1, well 3 and 4
 #     [0, 1] => [5, 6], # homo ch2, well 5 and 6
-#     [1, 1] => [7, 8] # hetero, well 7 and 8
+#     [1, 1] => [7, 8]  # hetero, well 7 and 8
 # )
 # # old approach
 # const CTRL_WELL_DICT = DefaultOrderedDict(Vector{Int}, Vector{Int}, Vector{Int}())
@@ -37,9 +40,9 @@ NRN_NOT = x -> 1 .- x
 
 # # may be needed if not always called by `process_amp_1sr`
 # type AllelicDiscriminationResult #
-#     cluster_result::ClusteringResult
-#     # assignments_adj::Vector{Int}
-#     assignments_adj_labels::Vector{String}
+#     cluster_result ::ClusteringResult
+#     # assignments_adj ::Vector{Int}
+#     assignments_adj_labels ::Vector{String}
 # end # type
 
 
@@ -47,10 +50,10 @@ NRN_NOT = x -> 1 .- x
 
 
 function prep_input_4ad(
-    full_amp_out::AmpStepRampOutput, # one step/ramp of amplification output
-    categ::String="fluo",
-    well_idc::Union{AbstractVector,Colon}=Colon(),
-    cycs::Union{Integer,AbstractVector}=1 # relevant if `categ == "fluo"`, last available cycle
+    full_amp_out ::AmpStepRampOutput, # one step/ramp of amplification output
+    categ ::String="fluo",
+    well_idc ::Union{AbstractVector,Colon}=Colon(),
+    cycs ::Union{Integer,AbstractVector}=1 # relevant if `categ == "fluo"`, last available cycle
     )
 
     num_cycs, num_wells, num_channels = size(full_amp_out.fr_ary3)
@@ -87,10 +90,10 @@ end # prep_data_4ad
 
 
 function do_cluster_analysis(
-    raw_data::AbstractMatrix,
-    init_centers::AbstractMatrix,
-    cluster_method::String="k-means-medoids",
-    norm_l::Real=2
+    raw_data ::AbstractMatrix,
+    init_centers ::AbstractMatrix,
+    cluster_method ::String="k-means-medoids",
+    norm_l ::Real=2
     )
 
     num_wells = size(raw_data)[2]
@@ -213,17 +216,17 @@ end # do_cluster_analysis
 # 1. check whether expected genotypes are specified, if yes use them, if not start with all possible genotypes determined by number of channels
 # 2.
 function assign_genos(
-    data::AbstractMatrix,
-    nrn::Function,
-    ntc_bool_vec::Vector{Bool},
-    expected_ncg_raw::AbstractMatrix=DEFAULT_encgr,
-    ctrl_well_dict::OrderedDict=CTRL_WELL_DICT,
-    cluster_method::String="k-means-medoids",
-    norm_l::Real=2,
+    data ::AbstractMatrix,
+    nrn ::Function,
+    ntc_bool_vec ::Vector{Bool},
+    expected_ncg_raw ::AbstractMatrix=DEFAULT_encgr,
+    ctrl_well_dict ::OrderedDict=CTRL_WELL_DICT,
+    cluster_method ::String="k-means-medoids",
+    norm_l ::Real=2,
     # below not specified by `process_ad` as of right now
-    init_factors::AbstractVector=DEFAULT_init_FACTORS, # for `init_centers`
-    slht_lb::Real=0; # lower limit of silhouette
-    apg_labels::AbstractVector=DEFAULT_apg_LABELS # apg = all possible genotypes. Julia v0.6.0 on 2017-06-25: `apg_labels::Vector{AbstractString}=DEFAULT_eg_LABELS` resulted in "ERROR: MethodError: no method matching #assign_genos#301(::Array{AbstractString,1}, ::QpcrAnalysis.#assign_genos, ::Array{Float64,2}, ::Array{Float64,2}, ::Float64)"
+    init_factors ::AbstractVector=DEFAULT_init_FACTORS, # for `init_centers`
+    slht_lb ::Real=0; # lower limit of silhouette
+    apg_labels ::AbstractVector=DEFAULT_apg_LABELS # apg = all possible genotypes. Julia v0.6.0 on 2017-06-25: `apg_labels ::Vector{AbstractString}=DEFAULT_eg_LABELS` resulted in "ERROR: MethodError: no method matching #assign_genos#301( ::Array{AbstractString,1}, ::QpcrAnalysis.#assign_genos, ::Array{Float64,2}, ::Array{Float64,2}, ::Float64)"
     )
 
     num_channels, num_wells = size(data)
@@ -528,13 +531,13 @@ end # assign_genos
 
 
 function process_ad(
-    full_amp_out::AmpStepRampOutput,
-    cycs::Union{Integer,AbstractVector}, # relevant if `categ == "fluo"`, last available cycle
-    ctrl_well_dict::OrderedDict,
-    cluster_method::String, # for `assign_genos`
-    norm_l::Real, # for `assign_genos`
-    expected_ncg_raw::AbstractMatrix=DEFAULT_encgr, # each column is a vector of binary geno whose length is number of channels (0 => no signal, 1 => yes signal)
-    categ_well_vec::AbstractVector=CATEG_WELL_VEC,
+    full_amp_out ::AmpStepRampOutput,
+    cycs ::Union{Integer,AbstractVector}, # relevant if `categ == "fluo"`, last available cycle
+    ctrl_well_dict ::OrderedDict,
+    cluster_method ::String, # for `assign_genos`
+    norm_l ::Real, # for `assign_genos`
+    expected_ncg_raw ::AbstractMatrix=DEFAULT_encgr, # each column is a vector of binary geno whose length is number of channels (0 => no signal, 1 => yes signal)
+    categ_well_vec ::AbstractVector=CATEG_WELL_VEC,
     )
 
     # output

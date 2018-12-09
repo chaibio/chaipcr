@@ -2,6 +2,7 @@
 #
 # calibration: deconvolution and adjust well-to-well variation in absolute fluorescence values
 
+using DataStructures.OrderedDict;
 
 # scaling factors
 const SCALING_FACTOR_deconv_vec = [1.0, 4.2] # used: [1, oneof(1, 2, 3.5, 8, 7, 5.6, 4.2)]
@@ -12,29 +13,29 @@ const SCALING_FACTOR_adj_w2wvaf = 3.7 # used: 9e5, 1e5, 1.2e6, 3
 
 # function: perform deconvolution and adjust well-to-well variation in absolute fluorescence
 function dcv_aw(
-    fr_ary3::AbstractArray,
-    dcv::Bool,
-    channel_nums::AbstractVector,
+    fr_ary3 ::AbstractArray,
+    dcv ::Bool,
+    channel_nums ::AbstractVector,
     # arguments needed if `k_compute=true`
 
     ## remove MySql dependency
     #
-    # db_conn::MySQL.MySQLHandle, # `db_conn_default` is defined in "__init__.jl"
-    # calib_info::Union{Integer,OrderedDict},
+    # db_conn ::MySQL.MySQLHandle, # `db_conn_default` is defined in "__init__.jl"
+    # calib_info ::Union{Integer,OrderedDict},
 
-    well_nums_found_in_fr::AbstractVector,
+    well_nums_found_in_fr ::AbstractVector,
 
     ## remove MySql dependency
     #
-    # well_nums_in_req=[]::AbstractVector,
+    # well_nums_in_req ::AbstractVector=[],
 
     # new >>
     calib_data ::OrderedDict{String,Any},
     # << new
 
-    dye_in::String="FAM",
-    dyes_2bfild::AbstractVector=[];
-    aw_out_format::String="both" # "array", "dict", "both"
+    dye_in ::String="FAM",
+    dyes_2bfild ::AbstractVector=[];
+    aw_out_format ::String="both" # "array", "dict", "both"
     )
 
     ## remove MySql dependency
@@ -44,11 +45,13 @@ function dcv_aw(
     # wva_data, wva_well_nums = prep_adj_w2wvaf(db_conn, calib_info, well_nums_in_req, dye_in, dyes_2bfild)
 
     # new >>
-    ## check whether the data in optical calibration experiment is valid
-    ## if so, prepare data to adjust well-to-well variation in absolute fluorescence values
+    # not implemented yet
+    calib_data = ensure_ci(calib_data)
     #
     # assume without checking that we are using all the wells, all the time
-    well_nums_in_req = range(0,length(calib_data["water"][1]))
+    well_nums_in_req = range(0,length(calib_data["water"]["fluorescence_value"][1]))
+    #
+    # prepare data to adjust well-to-well variation in absolute fluorescence values
     wva_data, wva_well_nums = prep_adj_w2wvaf(calib_data, well_nums_in_req, dye_in, dyes_2bfild)
     # << new
 
@@ -66,12 +69,13 @@ function dcv_aw(
     # mw = minus water
     mw_ary3 = cat(3, map(1:num_channels) do channel_i
         fr_ary3[:,:,channel_i] .- transpose(
-            wva_data["water"][channel_nums[channel_i]][wva_well_idc_wfluo]
+            wva_data["water"][channel_i][wva_well_idc_wfluo]
         )
     end...)
 
     if dcv
-        ## remove MySql dependency
+
+        ## this feature disabled while removing MySql dependency
         #
         ## addition with flexible ratio instead of deconvolution (commented out)
         ## k_inv_vec = fill(reshape(DataArray([1, 0, 1, 0]), 2, 2), 16) 
@@ -86,6 +90,7 @@ function dcv_aw(
         k4dcv = K4DCV_EMPTY
         dcvd_ary3 = mw_ary3
         # << new
+
     else
         k4dcv = K4DCV_EMPTY
         dcvd_ary3 = mw_ary3
@@ -94,9 +99,10 @@ function dcv_aw(
     dcvd_aw_vec = map(1:num_channels) do channel_i
         adj_w2wvaf(
             dcvd_ary3[:,:,channel_i],
-            wva_data, wva_well_idc_wfluo,
-            channel_nums[channel_i];
-            minus_water=false
+            wva_data,
+            wva_well_idc_wfluo,
+            channel_i;
+            minus_water = false
         )
     end
 
@@ -124,26 +130,26 @@ end # dcv_aw
 # using the k matrix `wva_data` made from calibration experiment 2
 
 type CalibCalibOutput
-    ary2dcv_1::Array{AbstractFloat,3}
-    mw_ary3_1::Array{AbstractFloat,3}
-    k4dcv_2::K4Deconv
-    dcvd_ary3_1::Array{AbstractFloat,3}
-    wva_data_2::OrderedDict{String,OrderedDict{Int,AbstractVector}}
-    dcv_aw_ary3_1::Array{AbstractFloat,3}
+    ary2dcv_1 ::Array{AbstractFloat,3}
+    mw_ary3_1 ::Array{AbstractFloat,3}
+    k4dcv_2 ::K4Deconv
+    dcvd_ary3_1 ::Array{AbstractFloat,3}
+    wva_data_2 ::OrderedDict{String,OrderedDict{Int,AbstractVector}}
+    dcv_aw_ary3_1 ::Array{AbstractFloat,3}
 end
 
 function calib_calib(
 
     ## remove MySql dependency
     #
-    # db_conn_1::MySQL.MySQLHandle,
-    # db_conn_2::MySQL.MySQLHandle,
-    # calib_info_1::OrderedDict,
-    # calib_info_2::OrderedDict,
-    # well_nums_1::AbstractVector=[],
-    # well_nums_2::AbstractVector=[];
+    # db_conn_1 ::MySQL.MySQLHandle,
+    # db_conn_2 ::MySQL.MySQLHandle,
+    # calib_info_1 ::OrderedDict,
+    # calib_info_2 ::OrderedDict,
+    # well_nums_1 ::AbstractVector=[],
+    # well_nums_2 ::AbstractVector=[];
 
-    dye_in::String="FAM", dyes_2bfild::AbstractVector=[]
+    dye_in ::String="FAM", dyes_2bfild ::AbstractVector=[]
     )
 
     # This function is expected to handle situations where `calib_info_1` and `calib_info_2` have different combinations of wells, but the number of wells should be the same.

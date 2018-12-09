@@ -2,7 +2,7 @@
 
 import JSON, DataStructures.OrderedDict
 
-function dispatch(action::String, request_body::String)
+function dispatch(action ::String, request_body ::String)
     
     # NB. DefaultDict and DefaultOrderedDict constructors sometimes don't work on OrderedDict
     # (https://github.com/JuliaLang/DataStructures.jl/issues/205)
@@ -31,7 +31,8 @@ function dispatch(action::String, request_body::String)
 
     end # if isa
 
-    result = try
+    # commented out whole debugging
+    # result = try
 
         if action == "amplification"
 
@@ -73,10 +74,10 @@ function dispatch(action::String, request_body::String)
                 kwdict_rc[:max_bsf_lb] = req_dict["min_fluomax"]
             end
             if "min_D1max" in keys_req_dict
-                kwdict_rc[:max_d1_lb] = req_dict["min_D1max"]
+                kwdict_rc[:max_dr1_lb] = req_dict["min_D1max"]
             end
             if "min_D2max" in keys_req_dict
-                kwdict_rc[:max_d2_lb] = req_dict["min_D2max"]
+                kwdict_rc[:max_dr2_lb] = req_dict["min_D2max"]
             end
 
             # `process_amp_1sr` arguments
@@ -119,6 +120,7 @@ function dispatch(action::String, request_body::String)
                 # db_conn, exp_id, asrp_vec, calib_info;
 
                 # new >>
+                req_dict["experiment_id"], 
                 req_dict["raw_data"],
                 req_dict["calibration_info"],
                 asrp_vec;
@@ -177,9 +179,11 @@ function dispatch(action::String, request_body::String)
             error("action $action is not found")
         end # if
 
-    catch err
-        err
-    end # try
+
+    # commented out while debugging
+    # catch err
+    #     err
+    # end # try
 
     success = !isa(result, Exception)
     response_body = success ? result : JSON.json(OrderedDict("error"=>repr(result)))
@@ -195,7 +199,7 @@ end # dispatch
 
 
 # get keyword arguments from request
-function get_kw_from_req(key_vec::AbstractVector, req_dict::Associative)
+function get_kw_from_req(key_vec ::AbstractVector, req_dict ::Associative)
     pair_vec = Vector{Pair}()
     for key in key_vec
         if key in keys(req_dict)
@@ -208,23 +212,23 @@ end
 
 # testing function: construct `request_body` from separate arguments
 function args2reqb(
-    action::String,
-    exp_id::Integer,
-    calib_info::Union{Integer,OrderedDict};
-    stage_id::Integer=0,
-    step_id::Integer=0,
-    ramp_id::Integer=0,
-    min_reliable_cyc::Real=5,
-    baseline_method::String="sigmoid",
-    baseline_cyc_bounds::AbstractVector=[],
-    guid::String="",
-    extra_args::OrderedDict=OrderedDict(),
-    wdb::String="dflt", # "handle", "dflt", "connect"
-    db_key::String="default", # "default", "t1", "t2"
-    db_host::String="localhost",
-    db_usr::String="root",
-    db_pswd::String="",
-    db_name::String="chaipcr",
+    action ::String,
+    exp_id ::Integer,
+    calib_info ::Union{Integer,OrderedDict};
+    stage_id ::Integer=0,
+    step_id ::Integer=0,
+    ramp_id ::Integer=0,
+    min_reliable_cyc ::Real=5,
+    baseline_method ::String="sigmoid",
+    baseline_cyc_bounds ::AbstractVector=[],
+    guid ::String="",
+    extra_args ::OrderedDict=OrderedDict(),
+    wdb ::String="dflt", # "handle", "dflt", "connect"
+    db_key ::String="default", # "default", "t1", "t2"
+    db_host ::String="localhost",
+    db_usr ::String="root",
+    db_pswd ::String="",
+    db_name ::String="chaipcr",
     )
 
     reqb = OrderedDict{typeof(""),Any}("calibration_info"=>calib_info)
@@ -262,7 +266,7 @@ function args2reqb(
         nothing
     elseif wdb == "connect"
         reqb["db_host"] = db_host
-        reqb["db_usr"] = db_usr
+        reqb["db_usr"]  = db_usr
         reqb["db_pswd"] = db_pswd
         reqb["db_name"] = db_name
     else

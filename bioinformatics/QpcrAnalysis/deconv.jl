@@ -1,9 +1,11 @@
 # color compensation / multi-channel deconvolution
 
+import DataStructures.OrderedDict
+
 type K4Deconv
-    k_s::AbstractArray
-    k_inv_vec::AbstractArray
-    inv_note::String
+    k_s ::AbstractArray
+    k_inv_vec ::AbstractArray
+    inv_note ::String
 end
 
 const ARRAY_EMPTY = Array{Any}()
@@ -15,25 +17,25 @@ function deconV(
     # ary2dcv dim1 is unit, which can be cycle (amplification), temperature point (melting curve),
     # or step type (like "water", "channel_1", "channel_2" for calibration experiment);
     # ary2dcv dim2 must be well, ary2dcv dim3 must be channel
-    ary2dcv::AbstractArray, 
+    ary2dcv ::AbstractArray, 
 
     # must be the same length as 3rd dimension of `array2dcv`
-    channel_nums::AbstractVector, 
+    channel_nums ::AbstractVector, 
     
-    dcv_well_idc_wfluo::AbstractVector,
+    dcv_well_idc_wfluo ::AbstractVector,
 
     ## remove MySql dependency
     #
     ## arguments needed if k matrix needs to be computed
     ## `db_conn_default` is defined in "__init__.jl"
-    # db_conn::MySQL.MySQLHandle=db_conn_default, 
-    # calib_info::Union{Integer,OrderedDict}=calib_info_AIR,
-    # well_nums::AbstractVector=[];
+    # db_conn ::MySQL.MySQLHandle=db_conn_default, 
+    # calib_info ::Union{Integer,OrderedDict}=calib_info_AIR,
+    # well_nums ::AbstractVector=[];
 
     # keyword arguments
-    k4dcv_backup::K4Deconv=K4DCV,
-    scaling_factor_dcv_vec::AbstractVector=SCALING_FACTOR_deconv_vec,
-    out_format::String="both" # "array", "dict", "both"
+    k4dcv_backup ::K4Deconv=K4DCV,
+    scaling_factor_dcv_vec ::AbstractVector=SCALING_FACTOR_deconv_vec,
+    out_format ::String="both" # "array", "dict", "both"
     )
 
     a2d_dim1, a2d_dim_well, a2d_dim_channel = size(ary2dcv)
@@ -83,21 +85,26 @@ function get_k(
 
     ## remove MySql dependency
     #
-    # db_conn::MySQL.MySQLHandle,
+    # db_conn ::MySQL.MySQLHandle,
     # 
     ## info on experiment(s) used to calculate matrix k
     ## OrderedDict("water"=OrderedDict(calibration_id=..., step_id=...), "channel_1"=OrderedDict(calibration_id=..., step_id=...),  "channel_2"=OrderedDict(calibration_id=...", step_id=...) 
-    # dcv_exp_info::OrderedDict, 
+    # dcv_exp_info ::OrderedDict, 
 
     # new >>
     calib_data ::OrderedDict{String,Any},
     # << new
 
-    well_nums::AbstractVector=[];
-    well_proc::String="vec", # options: "mean", "vec".
-    Float_T::DataType=Float32, # ensure compatibility with other OSs
-    save_to::String="" # used: "k.jld"
+    well_nums ::AbstractVector=[];
+    well_proc ::String="vec", # options: "mean", "vec".
+    Float_T ::DataType=Float32, # ensure compatibility with other OSs
+    save_to ::String="" # used: "k.jld"
     )
+
+    # new >>
+    # not implemented yet
+    dcv_exp_info = ensure_ci(dcv_exp_info)
+    # << new
 
     ## remove MySql dependency
     #
@@ -117,7 +124,6 @@ function get_k(
         k_data_1dye, dcv_well_nums = dcv_data_dict[cd_key]
         return cd_key => k_data_1dye .- water_data
     end) 
-
 
     # assuming `cd_key` (in the format of "channel_1", "channel_2", etc.) is the target channel of the dye,
     # check whether the water-subtracted signal in target channel is greater than that in non-target channel

@@ -3,18 +3,22 @@
 
 # check JSON output in UI: http://:ip_address/experiments/:exp_id/analyze
 
-# !!!! modified for receiving data instead of experiment ids as input
+import DataStructures.OrderedDict
+
 function analyze_func(
     ::OpticalCal,
 
-    # remove MySqldependency
+    ## remove MySql dependency
     #
     # db_conn::MySQL.MySQLHandle,
     # exp_id::Integer, # not used for computation
     # calib_info::Union{Integer,OrderedDict}; # really used
     # well_nums::AbstractVector=[],
 
-    exp_data::AbstractArray, # new
+    # new >>
+    exp_data::OrderedDict{String,Any}, 
+    calib_data::OrderedDict{String,Any},
+    # << new
 
     dye_in::String="FAM", 
     dyes_2bfild::Vector=[],
@@ -22,10 +26,17 @@ function analyze_func(
     verbose=false
     )
 
-    # remove MySqldependency
+    ## remove MySql dependency
     #
     # calib_info_ori = calib_info
     # calib_info_dict = ensure_ci(db_conn, calib_info_ori)
+
+    # new >>
+    # not implemented yet
+    calib_info_ori = calib_data
+    calib_info_dict = ensure_ci(calib_data)
+    # << new
+
     # print_v(
     #     println, verbose,
     #     "original: ", calib_info_ori,
@@ -40,6 +51,8 @@ function analyze_func(
 
     if length(calib_info_dict) >= 3 # 2 or more channels
 
+        ## MySql dependency
+        #
         result_k = try
             get_k(db_conn, calib_info_dict, well_nums)
         catch err
@@ -62,9 +75,15 @@ function analyze_func(
     # prep_adj_w2wvaf
 
     result_aw = try
-        prep_adj_w2wvaf(
-        db_conn, calib_info_dict, well_nums, dye_in, dyes_2bfild
-    )
+
+        ## remove MySql dependency
+        #
+        # prep_adj_w2wvaf(db_conn, calib_info_dict, well_nums, dye_in, dyes_2bfild)
+
+        # new >>
+        prep_adj_w2wvaf(calib_info_dict, well_nums, dye_in, dyes_2bfild)
+        # << new
+        
     catch err
         err
     end

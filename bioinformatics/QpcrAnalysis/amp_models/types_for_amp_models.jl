@@ -1,5 +1,7 @@
 # amp_model_types
 
+import DataStructures.OrderedDict
+
 abstract type AbstractAmpFitted end
 struct EmptyAmpFitted <: AbstractAmpFitted end
 

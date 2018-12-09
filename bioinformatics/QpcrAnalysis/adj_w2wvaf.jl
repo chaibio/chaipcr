@@ -1,4 +1,8 @@
-# optical calibration
+# adj_w2wvaf.jl
+#
+# perform optical calibration
+
+import DataStructures.OrderedDict
 
 # old pre-defined (predfd) step ids for calibration data
 const oc_water_step_id_PREDFD = 2
@@ -20,8 +24,8 @@ const DYE2CHST = OrderedDict( # mapping from dye to channel and step_id.
 # types
 
 struct Ccsc # channels_check_subset_composite
-    set::Vector # channels
-    description::String
+    set ::Vector # channels
+    description ::String
 end
 
 
@@ -38,17 +42,18 @@ const DYE2CHST_ccsc = Ccsc(DYE2CHST_channels, "all channels in the preset well-t
 # functions
 
 # Top-level function: adjust well-to-well variation in absolute fluorescence values (w2wvaf). wva = w2wva. aw = adj_w2wvaf.
-# basic difference: w2wvaf/wva/aw - only used for `adj_w2wvaf`, each dye only has data for its target channel; calibration/calib/oc - used for `deconv` and `adj_w2wvaf`, each dye has data for both target and non-target channels.
+# basic difference: w2wvaf/wva/aw - only used for `adj_w2wvaf`, each dye only has data for its target channel;
+# calibration/calib/oc - used for `deconv` and `adj_w2wvaf`, each dye has data for both target and non-target channels.
 # Input `fluo` and output: dim1 indexed by well and dim2 indexed by unit, which can be cycle (amplification) or temperature point (melt curve).
 # Output does not include the automatically created column at index 1 from rownames of input array as R does
 function adj_w2wvaf(
-    fluo2btp::AbstractArray,
-    wva_data::OrderedDict, wva_well_idc_wfluo::AbstractVector,
-    channel::Integer;
-    minus_water::Bool=false,
-    scaling_factor_adj_w2wvaf::Real=SCALING_FACTOR_adj_w2wvaf
+    fluo2btp ::AbstractArray,
+    wva_data ::Associative,
+    wva_well_idc_wfluo ::AbstractVector,
+    channel ::Integer;
+    minus_water ::Bool =false,
+    scaling_factor_adj_w2wvaf ::Real =SCALING_FACTOR_adj_w2wvaf
     )
-
     fluo = transpose(fluo2btp)
 
     wva_water, wva_signal = map(["water", "signal"]) do wva_type
@@ -75,7 +80,7 @@ end # adj_w2wvaf
 
 
 # function: check subset
-function check_subset(small::Ccsc, big::Ccsc)
+function check_subset(small ::Ccsc, big ::Ccsc)
     if length(setdiff(small.set, big.set)) != 0
         error("$(small.description) is not a subset of $(big.description). ")
     end
@@ -86,11 +91,11 @@ end
 # deprecated to remove MySQL dependency
 function get_wva_data(
     # calib_id_s and step_id_s as OrderedDict are expected to be OrderedDict{T,T} where T <: Integer
-    calib_id_s::Union{Integer,OrderedDict},
-    step_id_s::Union{Integer,OrderedDict},
-    db_conn::MySQL.MySQLHandle,
-    calib_id_key_isa::String, # "channel" or "dye"
-    well_nums::AbstractVector
+    calib_id_s ::Union{Integer,OrderedDict},
+    step_id_s ::Union{Integer,OrderedDict},
+    db_conn ::MySQL.MySQLHandle,
+    calib_id_key_isa ::String, # "channel" or "dye"
+    well_nums ::AbstractVector
     )
 
     step_id_s_uniq = isa(step_id_s, Integer) ? unique(step_id_s) : unique(values(step_id_s))
@@ -183,29 +188,30 @@ function prep_adj_w2wvaf(
 
     ## remove MySql dependency
     #
-    # db_conn::MySQL.MySQLHandle,
+    # db_conn ::MySQL.MySQLHandle,
     #
     # calib_info can be an integer or a OrderedDict in chai format:
     # OrderedDict("water"=OrderedDict(calibration_id=>..., step_id=>...),
     # "channel_1"=OrderedDict(calibration_id=..., step_id=...),
     # "channel_2"=OrderedDict(calibration_id=...", step_id=...))
-    # calib_info::Union{Integer,OrderedDict}, 
+    # calib_info ::Union{Integer,OrderedDict}, 
 
     # new >>
     calib_data ::OrderedDict{String,Any}, 
     # << new
 
-    well_nums::AbstractVector,
-    dye_in::String="FAM",
-    dyes_2bfild::AbstractVector=[]
+    well_nums ::AbstractVector,
+    dye_in ::String ="FAM",
+    dyes_2bfild ::AbstractVector =[]
     )
 
     ## remove MySql dependency
     #
     # calib_info = ensure_ci(db_conn, calib_info)
     #
-    # if isa(calib_info, Integer) # `calib_info` is an integer. Using `oc_water_step_id` and
-    # `oc_signal_step_ids` defined outside of this function
+    # if isa(calib_info, Integer) 
+    #     # `calib_info` is an integer.
+    #     # Using `oc_water_step_id` and `oc_signal_step_ids` defined outside of this function
     #     water_calib_id  = signal_calib_id_s = calib_info
     #     # This operation caused oc_water_step_id and oc_signal_step_ids to be compiled
     #     # as local variables in prep_optic_calib: define oc_water_step_id and oc_signal_step_ids
@@ -251,21 +257,27 @@ function prep_adj_w2wvaf(
     # end
 
     # new >>
-    channels_in_water = (length(calib_data["water"])<2 || calib_data["water"][2]==nothing) ? 1 : 2
-    # assume without checking that
-    # channels_in_signal == channels_in_water
+    # not implemented yet
+    calib_data = ensure_ci(calib_data)
+    #
+    channels_in_water = (length(calib_data["water"]["fluorescence_value"])<2 ||
+        calib_data["water"]["fluorescence_value"][2]==nothing) ? 1 : 2
+    #
+    # assume without checking that channels_in_signal == channels_in_water
     channels_in_signal = channels_in_water
-    water_data_dict = Dict{String,Int64}()
-    signal_data_dict = Dict{String,Int64}()
+    #
+    water_data_dict = OrderedDict{UInt8,Any}()
+    signal_data_dict = OrderedDict{UInt8,Any}()
     for channel in 1:channels_in_water
         key="channel_$(channel)"
-        water_data_dict[key]  = calib_data["water"][channel]
-        signal_data_dict[key] = calib_data[key][channel]
+        water_data_dict[channel]  = calib_data["water"]["fluorescence_value"][channel]
+        signal_data_dict[channel] = calib_data[key]["fluorescence_value"][channel]
     end
     channels_in_water  = collect(keys(water_data_dict))
     channels_in_signal = channels_in_water
+    #
     # assume without checking that there are no missing wells anywhere
-    signal_well_nums = range(0,length(signal_data_dict["channel_1"]))
+    signal_well_nums = range(0,length(signal_data_dict[1]))
     # << new
 
     # check whether signal fluo > water fluo
@@ -285,7 +297,8 @@ function prep_adj_w2wvaf(
         error(join(stop_msgs, ""))
     end
 
-    # disable this feature temporarily while removing the MySql dependency
+    ## this feature temporarily disabled while removing MySql dependency in get_wva_data
+    #
     # if length(dyes_2bfild) > 0 # extrapolate well-to-well variation data for missing channels
     #
     #     println("Preset well-to-well variation data is used to extrapolate calibration data for missing channels.")

@@ -1,6 +1,7 @@
 @time __precompile__()
 module MySQLforQpcrAnalysis
 
+import DataStructures.OrderedDict
 
 ## for MySQL versions outputing named tuples by default instead of data frames
 ## supposedly, "To get the results as a DataFrame, you can just do MySQL.query(conn, sql, DataFrame)",
@@ -45,17 +46,17 @@ const STEP_NAME_to_CALIB_DATA_KEY = OrderedDict(
 
 # top-level
 function id2json(
-    db_conn::MySQL.MySQLHandle,
-    action::String; # calib_like, amplification, meltcurve, analyze
-    guid::String="",
+    db_conn ::MySQL.MySQLHandle,
+    action ::String; # calib_like, amplification, meltcurve, analyze
+    guid ::String="",
     # 0 is not valid
-    exp_id::Integer=0,
-    calib_id::Integer=0,
-    stage_id::Integer=0,
-    step_id::Integer=0,
-    ramp_id::Integer=0,
-    well_nums::Vector=[],
-    step_name_to_calib_data_key::OrderedDict{String,OrderedDict{String,String}}=STEP_NAME_to_CALIB_DATA_KEY
+    exp_id ::Integer=0,
+    calib_id ::Integer=0,
+    stage_id ::Integer=0,
+    step_id ::Integer=0,
+    ramp_id ::Integer=0,
+    well_nums ::Vector=[],
+    step_name_to_calib_data_key ::OrderedDict{String,OrderedDict{String,String}}=STEP_NAME_to_CALIB_DATA_KEY
     )
 
     # sanity check and resolving id if necessary
@@ -274,28 +275,6 @@ function id2json(
 end # id2json
 
     
-
-
-
-function get_mysql_data_well(
-    well_nums::AbstractVector, # must be sorted in ascending order
-    qry_2b::String, # must select "well_num" column
-    db_conn::MySQL.MySQLHandle,
-    verbose::Bool,
-    )
-
-    well_nums_str = join(well_nums, ',')
-    print_v(println, verbose, "well_nums: $well_nums_str")
-
-    well_constraint = (well_nums_str == "") ? "" : "AND well_num in ($well_nums_str)"
-    qry = replace(qry_2b, "well_constraint", well_constraint)
-    found_well_namedtuple = MySQL.mysql_execute(db_conn, qry)[1]
-
-    found_well_nums = sort(unique(found_well_namedtuple[:well_num]))
-
-    return (found_well_namedtuple, found_well_nums)
-
-end
 
 
 

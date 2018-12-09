@@ -70,8 +70,6 @@ function process_mc(
     kwdict_mc_tm_pw::OrderedDict=OrderedDict() # keyword arguments passed onto `mc_tm_pw`
     )
 
-    # remove MySql dependency
-    #
     # print_v(println, verbose,
     #     "db_conn: ", db_conn, "\n",
     #     "experiment_id: $exp_id\n",
@@ -79,6 +77,8 @@ function process_mc(
     #     "calib_info: $calib_info\n",
     #     "max_tmprtr: $max_tmprtr"
     # )
+    
+    ## remove MySql dependency
     #
     # calib_info = ensure_ci(db_conn, calib_info, exp_id)
     #
@@ -96,6 +96,9 @@ function process_mc(
     # )
 
     # new >>
+    # not implemented yet
+    calib_data = ensure_ci(calib_data, exp_id)
+
     num_fluo_wells = length(fluo_well_nums)
     # << new
 
