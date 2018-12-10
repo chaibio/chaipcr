@@ -76,7 +76,7 @@ include("analyze_customized/thermal_consistency.jl")
 include("dispatch.jl")
 # include("test.jl")
 include("../test/api_test.jl")
-include("__init__.jl")
+# include("__init__.jl")
 
 # # no longer needed
 # include("pnmsmu.jl")

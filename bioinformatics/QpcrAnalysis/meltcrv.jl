@@ -147,7 +147,7 @@ function process_mc(
     id = channel_x_well .== collect(keys(counts))'
     shortest = minimum(values(counts))
     keep = mapslices(x -> reduce(|,x), id .& map(x -> x <= shortest, mapslices(cumsum, id, 1)), 2)
-    foreach var in keys(mc_data)
+    for var in keys(mc_data)
         filter!(keep, mc_data[var])
     end
     # << new

@@ -1908,7 +1908,8 @@ function server_tests()
     #     --data $(JSON.json(request)) \
     #     http://localhost:8081/experiments/250/amplification`)
 
-    # system call
+    # system call\
+    cd bioinformatics/QpcrAnalysis
     curl \
         --header "Content-Type: application/json" \
         --data @../test/test_1ch_amp.json \
