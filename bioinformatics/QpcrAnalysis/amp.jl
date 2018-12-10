@@ -96,7 +96,6 @@ struct AmpStepRampOutput2Bjson
 end
 
 
-# !!!! modified for receiving data instead of experiment ids as input
 function process_amp(
 
     ## remove MySql dependency
@@ -277,8 +276,8 @@ function process_amp(
             # fluo_well_nums, well_nums, 
 
             # new >>
-            exp_data ::OrderedDict{String,Any},
-            calib_data ::OrderedDict{String,Any},
+            exp_data,
+            calib_data,
             asrp,
             # << new
 
@@ -747,34 +746,27 @@ function process_amp_1sr(
     #     fluo_well_nums, channel_nums
     # )
 
-    # new >>
-    # reshape raw fluorescence data to 3-dimensional array
-    #
-    fluo_well_nums  = sort(unique(exp_data["well_num"]))
-    cyc_nums        = sort(unique(exp_data["cycle_num"]))
-    num_cycs        = length(cyc_nums)
-    num_fluo_wells  = length(fluo_well_nums)
-    num_channels    = length(channel_nums)
-    fr_ary3 = reshape(
-        exp_data["fluorescence_value"],
-        num_cycs, num_fluo_wells, num_channels
-    )
-    # << new
 
     # perform deconvolution and adjust well-to-well variation in absolute fluorescence
     mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, rbbs_ary3 = dcv_aw(
-        fr_ary3, dcv, channel_nums,
+        fr_ary3,
+        dcv,
+        channel_nums,
 
         ## remove MySql dependency
         #
-        # db_conn, calib_info, fluo_well_nums, well_nums, 
+        # db_conn,
+        # calib_info,
+        # fluo_well_nums,
+        # well_nums, 
 
         # new >>
-        fluo_well_nums,
         calib_data ::OrderedDict{String,Any},
+        fluo_well_nums,
         # << new
 
-        dye_in, dyes_2bfild;
+        dye_in,
+        dyes_2bfild;
         aw_out_format="array"
     )
 

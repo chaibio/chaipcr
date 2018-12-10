@@ -32,7 +32,7 @@ function dispatch(action ::String, request_body ::String)
     end # if isa
 
     # commented out while debugging
-    result = try
+    #result = try
 
         if action == "amplification"
 
@@ -134,15 +134,24 @@ function dispatch(action ::String, request_body ::String)
 
         elseif action == "meltcurve" # may need to change to process only 1-channel before deployed on bbb
 
+            # new >>
+            # validate data format
+            test = try
+                meltcurve_request_test(req_dict)
+            catch err
+               error("data supplied with meltcurve request is in the wrong format")
+            end
+            # << new
+
             exp_id = req_dict["experiment_id"]
             stage_id = req_dict["stage_id"]
-            kwdict_pmc = OrderedDict{Symbol,Any}()
 
-            for key in ["channel_nums"]
-                if key in keys_req_dict
-                    kwdict_pmc[parse(key)] = req_dict[key]
-                end
-            end
+            # kwdict_pmc = OrderedDict{Symbol,Any}()
+            # for key in ["channel_nums"]
+            #     if key in keys_req_dict
+            #         kwdict_pmc[parse(key)] = req_dict[key]
+            #     end
+            # end
 
             kwdict_mc_tm_pw = OrderedDict{Symbol,Any}()
             if "qt_prob" in keys_req_dict
@@ -158,9 +167,23 @@ function dispatch(action ::String, request_body ::String)
             end
 
             process_mc(
-                db_conn, exp_id, stage_id,
-                calib_info;
-                kwdict_pmc...,
+                
+                ## remove MySql dependency
+                #
+                # db_conn,
+                # exp_id,
+                # stage_id,
+                # calib_info;
+
+                # new >>
+                exp_id, 
+                stage_id, 
+                req_dict["raw_data"],
+                req_dict["calibration_info"];
+                channel_nums=req_dict["channel_nums"],
+                # << new
+
+                # kwdict_pmc...,
                 kwdict_mc_tm_pw=kwdict_mc_tm_pw
             )
 
@@ -181,9 +204,9 @@ function dispatch(action ::String, request_body ::String)
 
 
     # commented out while debugging
-    catch err
-        err
-    end # try
+    #catch err
+    #    err
+    #end # try
 
     success = !isa(result, Exception)
     response_body = success ? result : JSON.json(OrderedDict("error"=>repr(result)))

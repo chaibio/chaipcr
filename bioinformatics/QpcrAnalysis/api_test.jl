@@ -21,7 +21,10 @@
 #       http://127.0.0.1:8081/experiments/#{experiment.id}/meltcurve
 #       http://127.0.0.1:8081/experiments/#{experiment.id}/analyze
 
-import JSON, DataStructures.OrderedDict
+import JSON, DataStructures.OrderedDict 
+
+# set default calibration experiment
+calib_info_AIR = -99
 
 # ================================================================================
 # Here are the REST APIs using HTTP GET
@@ -355,93 +358,6 @@ function dualchannel_amplification_request_test()
     }"""; dicttype=OrderedDict)
     amplification_request_test(request) 
 end
-
-# not in run_examples()
-function more_amplification_request_tests()
-
-    # Notes
-
-    # The following are not implemented yet:
-    # ensure_ci in shared.jl
-    # get_mysql_data_well in shared.jl
-    # get_k in deconv.jl <- deconV in deconv.jl <- dcv_aw in calib.jl
-    #                    <- analyze_customized/optical_cal.jl
-
-    # startup script
-    #
-    # ;cd ~/chaipcr/bioinformatics/QpcrAnalysis
-    # ;sudo mount -t vboxsf shared /mnt/share
-    # 
-    #
-    push!(LOAD_PATH,pwd())
-    using QpcrAnalysis
-
-    import Clustering.ClusteringResult
-    import DataStructures.OrderedDict
-    import JuMP.@variable
-    import JuMP.@objective
-    import JuMP.@NLobjective
-    import JuMP.@constraint
-    import JuMP.Model
-    import Ipopt.IpoptSolver
-    import JuMP.solve
-    import JuMP.getvalue
-    import JuMP.getobjectivevalue
-    include("amp_models/sfc_models.jl")
-    include("amp_models/types_for_amp_models.jl")
-    include("types_for_allelic_discrimination.jl")
-    include("allelic_discrimination.jl")
-    include("shared.jl")
-    include("deconv.jl")
-    include("/mnt/share/amp.jl")
-    include("allelic_discrimination.jl")
-    calib_info_AIR = 1
-
-    include("/mnt/share/amp.jl")
-
-    include("/mnt/share/dispatch.jl")
-    include("/mnt/share/api_test.jl")
-    include("/mnt/share/calib.jl")
-    include("/mnt/share/adj_w2wvaf.jl")
-    include("/mnt/share/shared.jl")
-
-
-    # request = JSON.parsefile("~/chaibio/bioinformatics/test/singlechannel_amplification_request.json"; dicttype=OrderedDict)
-    request = JSON.parsefile("/mnt/share/singlechannel_amplification_request.json"; dicttype=OrderedDict)
-
-    amplification_request_test(request)
-    result = dispatch("amplification",String(JSON.json(request)))
-    response = JSON.parse(result[2],dicttype=OrderedDict)
-    amplification_response_test(response)
-
-
-    # request = JSON.parsefile("~/chaibio/bioinformatics/test/dualchannel_amplification_request.json"; dicttype=OrderedDict)
-    request = JSON.parsefile("/mnt/share/dualchannel_amplification_request.json"; dicttype=OrderedDict)
-
-    amplification_request_test(request)
-
-    # test Julia server
-
-    request = JSON.parsefile("/mnt/share/dualchannel_amplification_request.json"; dicttype=OrderedDict)
-
-    amplification_request_test(request)
-    dispatch("amplification",String(JSON.json(request)))
-
-    # run(`curl \
-    #     --header "Content-Type: application/json" \
-    #     --request "GET" \
-    #     --data $(JSON.json(request)) \
-    #     http://localhost:8081/experiments/250/amplification`)
-
-    # curl \
-    #     --header "Content-Type: application/json" \
-    #     --data @/mnt/share/dualchannel_amplification_request.json \
-    #     http://localhost:8081/experiments/250/amplification
-end
-
-
-
-
 
 
 # response
@@ -1907,4 +1823,99 @@ end
 
 # Usage:
 # run_examples() # every test should return true
+
+
+# not in run_examples()
+function server_tests()
+
+    # Notes
+
+    # The following are not implemented yet:
+    # ensure_ci in shared.jl
+    # get_mysql_data_well in shared.jl
+    # get_k in deconv.jl <- deconV in deconv.jl <- dcv_aw in calib.jl
+    #                    <- analyze_customized/optical_cal.jl
+
+    # startup script
+    #
+    # ;cd ~/chaipcr/bioinformatics/QpcrAnalysis
+    # ;sudo mount -t vboxsf shared /mnt/share
+    # 
+    #
+    push!(LOAD_PATH,pwd())
+    using QpcrAnalysis
+
+    import Clustering.ClusteringResult
+    import DataStructures.OrderedDict
+    import JuMP.@variable
+    import JuMP.@objective
+    import JuMP.@NLobjective
+    import JuMP.@constraint
+    import JuMP.Model
+    import Ipopt.IpoptSolver
+    import JuMP.solve
+    import JuMP.getvalue
+    import JuMP.getobjectivevalue
+    import DataArrays.DataArray
+    include("amp_models/sfc_models.jl")
+    include("amp_models/types_for_amp_models.jl")
+    include("types_for_allelic_discrimination.jl")
+    include("allelic_discrimination.jl")
+    include("shared.jl")
+    include("deconv.jl")
+    include("/mnt/share/amp.jl")
+    include("allelic_discrimination.jl")
+    calib_info_AIR = 1
+
+    # single channel amplification test
+    request = JSON.parsefile("/mnt/share/test_1ch_amp.json"; dicttype=OrderedDict)
+    amplification_request_test(request)
+    result = dispatch("amplification",String(JSON.json(request)))
+    response = JSON.parse(result[2],dicttype=OrderedDict)
+    amplification_response_test(response)
+
+
+
+    include("/mnt/share/api_test.jl")
+    include("/mnt/share/calib.jl")
+    include("/mnt/share/dispatch.jl")
+    include("/mnt/share/meltcrv.jl")
+
+    # single channel melting curve test
+    request = JSON.parsefile("/mnt/share/test_1ch_mc.json"; dicttype=OrderedDict)
+    meltcurve_request_test(request)
+    result = dispatch("meltcurve",String(JSON.json(request)))
+
+
+    response = JSON.parse(result[2],dicttype=OrderedDict)
+    meltcurve_response_test(response)
+
+
+
+
+
+    # test Julia server
+
+    # shell script to start julia server
+    julia -e 'push!(LOAD_PATH,"/home/vagrant/chaipcr/bioinformatics/QpcrAnalysis/");include("/home/vagrant/chaipcr/bioinformatics/QpcrAnalysis/QpcrAnalysis.jl");include("/home/vagrant/chaipcr/bioinformatics/juliaserver.jl")' &
+
+    include("../juliaserver.jl")
+
+    # call using Julia object
+    # run(`curl \
+    #     --header "Content-Type: application/json" \
+    #     --request "GET" \
+    #     --data $(JSON.json(request)) \
+    #     http://localhost:8081/experiments/250/amplification`)
+
+    # system call
+    curl \
+        --header "Content-Type: application/json" \
+        --data @../test/test_1ch_amp.json \
+        http://localhost:8081/experiments/250/amplification
+
+end
+
+
+
 

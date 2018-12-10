@@ -1,6 +1,6 @@
 # juliaserver.jl
 #
-# sets up server on channel 8081
+# sets up server to listen on channel 8081
 #
 # in future it might be preferable to migrate to HTTP.jl
 # which has more features than HttpServer.jl and is

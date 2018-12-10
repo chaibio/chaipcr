@@ -1,5 +1,8 @@
 # melt curve analysis
 
+import DataArrays.DataArray
+import StatsBase.countmap
+
 const EMPTY_mc = zeros(1,3)[1:0,:]
 const EMPTY_Ta = zeros(1,2)[1:0,:]
 const EMPTY_mc_tm_pw_out = OrderedDict(
@@ -10,32 +13,32 @@ const EMPTY_mc_tm_pw_out = OrderedDict(
 
 
 struct MeltCurveTF # temperature and fluorescence
-    t_da_vec::Vector{DataArray{Float64,1}}
-    fluo_da::DataArray{Float64,2}
+    t_da_vec ::Vector{DataArray{Float64,1}}
+    fluo_da ::DataArray{Float64,2}
 end
 
 struct MeltCurveTa # Tm and area
-    mc::Array{Float64,2}
-    Ta_fltd::Array{Float64,2}
-    mc_denser::Array{Float64,2}
-    ns_range_mid::Real
-    sn_dict::OrderedDict{String,Array{Float64,2}}
-    Ta_raw::Array{Float64,2}
-    Ta_reported::String
+    mc ::Array{Float64,2}
+    Ta_fltd ::Array{Float64,2}
+    mc_denser ::Array{Float64,2}
+    ns_range_mid ::Real
+    sn_dict ::OrderedDict{String,Array{Float64,2}}
+    Ta_raw ::Array{Float64,2}
+    Ta_reported ::String
 end
 
 struct MeltCurveOutput
-    mc_bychwl::Matrix{MeltCurveTa} # dim1 is well and dim2 is channel
-    channel_nums::Vector{Int}
-    fluo_well_nums::Vector{Int}
-    fr_ary3::Array{Float64,3}
-    mw_ary3::Array{Float64,3}
-    k4dcv::K4Deconv
-    fdcvd_ary3::Array{Float64,3}
-    wva_data::OrderedDict{String,OrderedDict{Int,Vector{Float64}}}
-    wva_well_nums::Vector{Int}
-    faw_ary3::Array{Float64,3}
-    tf_bychwl::OrderedDict{Int,Vector{OrderedDict{String,Vector{Float64}}}}
+    mc_bychwl ::Matrix{MeltCurveTa} # dim1 is well and dim2 is channel
+    channel_nums ::Vector{Int}
+    fluo_well_nums ::Vector{Int}
+    fr_ary3 ::Array{Float64,3}
+    mw_ary3 ::Array{Float64,3}
+    k4dcv ::K4Deconv
+    fdcvd_ary3 ::Array{Float64,3}
+    wva_data ::OrderedDict{String,OrderedDict{Int,Vector{Float64}}}
+    wva_well_nums ::Vector{Int}
+    faw_ary3 ::Array{Float64,3}
+    tf_bychwl ::OrderedDict{Int,Vector{OrderedDict{String,Vector{Float64}}}}
 end
 
 
@@ -45,29 +48,33 @@ function process_mc(
 
     # remove MySql dependency
     #
-    # db_conn::MySQL.MySQLHandle,
-    # exp_id::Integer, stage_id::Integer,
-    # calib_info::Union{Integer,OrderedDict};
-    # 
-    # start: arguments that might be passed by upstream code
-    # well_nums::AbstractVector=[],
-    # channel_nums::AbstractVector=[1],
+    # db_conn ::MySQL.MySQLHandle,
+    # exp_id ::Integer,
+    # stage_id ::Integer,
+    # calib_info ::Union{Integer,OrderedDict};
 
     # new >>
-    exp_data ::OrderedDict{String,Any},
-    calib_data ::OrderedDict{String,Any},
+    exp_id ::Integer,
+    stage_id ::Integer,
+    mc_data ::OrderedDict{String,Any},
+    calib_data ::OrderedDict{String,Any};
+    channel_nums ::AbstractVector =[1],
     # << new
 
-    auto_span_smooth::Bool=false,
-    span_smooth_default::Real=0.015,
-    span_smooth_factor::Real=7.2,
+    # start: arguments that might be passed by upstream code
+    well_nums ::AbstractVector =[],
+    auto_span_smooth ::Bool =false,
+    span_smooth_default ::Real =0.015,
+    span_smooth_factor ::Real =7.2,
     # end: arguments that might be passed by upstream code
-    dye_in::String="FAM", dyes_2bfild::AbstractVector=[],
-    dcv::Bool=true, # logical, whether to perform multi-channel deconvolution
-	max_tmprtr::Real=1000, # maximum temperature to analyze
-    out_format::String="json", # "full", "pre_json", "json"
-    verbose::Bool=false,
-    kwdict_mc_tm_pw::OrderedDict=OrderedDict() # keyword arguments passed onto `mc_tm_pw`
+
+    dye_in ::String ="FAM",
+    dyes_2bfild ::AbstractVector =[],
+    dcv ::Bool =true, # logical, whether to perform multi-channel deconvolution
+	max_tmprtr ::Real =1000, # maximum temperature to analyze
+    out_format ::String ="json", # "full", "pre_json", "json"
+    verbose ::Bool =false,
+    kwdict_mc_tm_pw ::OrderedDict =OrderedDict() # keyword arguments passed onto `mc_tm_pw`
     )
 
     # print_v(println, verbose,
@@ -98,8 +105,6 @@ function process_mc(
     # new >>
     # not implemented yet
     calib_data = ensure_ci(calib_data, exp_id)
-
-    num_fluo_wells = length(fluo_well_nums)
     # << new
 
     # pre-deconvolution, can process multiple channels
@@ -114,21 +119,64 @@ function process_mc(
     # num_channels = 1
     # dcv = false
 
-    mc_data_bych = map(channel_nums) do channel_num
-        get_mc_data(
-            channel_num,
-            db_conn,
-            exp_id, stage_id,
-            well_nums,
-        	max_tmprtr
-        )
-    end
+    ## remove MySql dependency
+    #
+    # mc_data_bych = map(channel_nums) do channel_num
+    #     get_mc_data(
+    #         channel_num,
+    #         db_conn,
+    #         exp_id,
+    #         stage_id,
+    #         well_nums,
+    #     	max_tmprtr
+    #     )
+    # end
+    #
+    # fr_ary3 = cat(3, map(mc_data -> mc_data.fluo_da, mc_data_bych)...) # fr = fluo_raw
 
-    fr_ary3 = cat(3, map(mc_data -> mc_data.fluo_da, mc_data_bych)...) # fr = fluo_raw
+    # new >>
+    # reshape raw fluorescence data to 3-dimensional array
+    #
+    fluo_well_nums  = sort(unique(mc_data["well_num"]))
+    num_fluo_wells  = length(fluo_well_nums)
+    num_channels    = length(channel_nums)
+    #
+    # truncate data where necessary so it fits in 3d matrix
+    channel_x_well = mc_data["channel"] * num_fluo_wells + mc_data["well_num"]
+    counts = StatsBase.countmap(channel_x_well)
+    id = channel_x_well .== collect(keys(counts))'
+    shortest = minimum(values(counts))
+    keep = mapslices(x -> reduce(|,x), id .& map(x -> x <= shortest, mapslices(cumsum, id, 1)), 2)
+    foreach var in keys(mc_data)
+        filter!(keep, mc_data[var])
+    end
+    # << new
+
+    fr_ary3 = reshape(
+        mc_data["fluorescence_value"],
+        shortest, num_fluo_wells, num_channels
+    )
+    # << new
 
     mw_ary3, k4dcv, fdcvd_ary3, wva_data, wva_well_nums, faw_ary3 = dcv_aw(
-        fr_ary3, dcv, channel_nums,
-        db_conn, calib_info, fluo_well_nums, well_nums, dye_in, dyes_2bfild;
+        fr_ary3,
+        dcv,
+        channel_nums,
+
+        ## remove MySql dependency
+        #
+        # db_conn,
+        # calib_info,
+        # fluo_well_nums, 
+        # well_nums,
+
+        # new >>
+        calib_data,
+        fluo_well_nums, 
+        # << new
+
+        dye_in, 
+        dyes_2bfild;
         aw_out_format="array"
     )
 
@@ -209,15 +257,15 @@ end # process_mc
 
 # function: get raw melt curve data and perform optical calibration
 function get_mc_data(
-    channel_num::Integer,
+    channel_num ::Integer,
 
     # remove MySql dependency
     #
-    # db_conn::MySQL.MySQLHandle,
-    # exp_id::Integer, stage_id::Integer,
-    # well_nums::AbstractVector,
+    # db_conn ::MySQL.MySQLHandle,
+    # exp_id ::Integer, stage_id ::Integer,
+    # well_nums ::AbstractVector,
 
-	max_tmprtr::Real
+	max_tmprtr ::Real
     )
 
     # remove MySql dependency
@@ -274,45 +322,45 @@ end # get_mc_data
 
 # function: get melting curve data and Tm peaks for each well
 
-function mc_tm_pw(fake_input::Void; kwargs...)
+function mc_tm_pw(fake_input ::Void; kwargs...)
     EMPTY_mc_tm_pw_out
 end
 
 function mc_tm_pw(
 
     # input data
-    tf_dict::OrderedDict; # temperature and fluorescence
+    tf_dict ::OrderedDict; # temperature and fluorescence
 
     # The maximum fraction of median temperature interval to be considered narrow
-    nti_frac::AbstractFloat=0.05,
+    nti_frac ::AbstractFloat=0.05,
 
     # smoothing -df/dt curve and if `smooth_fluo`, fluorescence curve too
-    auto_span_smooth::Bool=true,
-    span_css_tmprtr::Real=1, # css = choose `span_smooth`. fluorescence fluctuation with the temperature range of approximately `span_css_tmprtr * 2` is considered for choosing `span_smooth`
-    span_smooth_default::Real=0.05, # unit: fraction of data points for smoothing
-    span_smooth_factor::Real=7.2,
+    auto_span_smooth ::Bool=true,
+    span_css_tmprtr ::Real=1, # css = choose `span_smooth`. fluorescence fluctuation with the temperature range of approximately `span_css_tmprtr * 2` is considered for choosing `span_smooth`
+    span_smooth_default ::Real=0.05, # unit: fraction of data points for smoothing
+    span_smooth_factor ::Real=7.2,
 
     # get a denser temperature sequence to get fluorescence and -df/dt from it and fitted spline function
-    denser_factor::Real=10,
-    smooth_fluo_spl::Bool=false,
+    denser_factor ::Real=10,
+    smooth_fluo_spl ::Bool=false,
 
     # identify Tm peaks and calculate peak area
-    peak_span_tmprtr::Real=2, # Within the smoothed -df/dt sequence spanning the temperature range of approximately `peak_span_tmprtr`, if the maximum -df/dt value equals that at the middle point of the sequence, identify this middle point as a peak summit. Similar to `span.peaks` in qpcR code. Combined with `peak_shoulder` (similar to `Tm.border` in qpcR code).
-    # peak_shoulder::Real=1, # 1/2 width of peak in temperature when calculating peak area  # consider changing from 1 to 2, or automatically determined (max and min d2)?
+    peak_span_tmprtr ::Real=2, # Within the smoothed -df/dt sequence spanning the temperature range of approximately `peak_span_tmprtr`, if the maximum -df/dt value equals that at the middle point of the sequence, identify this middle point as a peak summit. Similar to `span.peaks` in qpcR code. Combined with `peak_shoulder` (similar to `Tm.border` in qpcR code).
+    # peak_shoulder ::Real=1, # 1/2 width of peak in temperature when calculating peak area  # consider changing from 1 to 2, or automatically determined (max and min d2)?
 
     # filter Tm peaks
-    qt_prob_range_lb::AbstractFloat=0.21, # quantile probability point for the lower bound of the range considered for number of crossing points
-    ncp_ub::Integer=10, # upper bound of number of data points crossing the mid range value (line parallel to x-axis) of smoothed -df/dt (`ndrv_smu`)
-    noisy_factor::AbstractFloat=0.2, # `num_cross_points` must also <= `noisy_factor * len_raw`
-    qt_prob_flTm::AbstractFloat=0.64, # quantile probability point for normalized -df/dT (range 0-1)
-    normd_qtv_ub::Real=0.8, # upper bound of normalized -df/dt values (range 0-1) at the quantile probablity point
-    top1_from_max_ub::Real=1, # upper bound of temperature difference between top-1 Tm peak and maximum -df/dt
-    top_N::Integer=4, # top number of Tm peaks to report
-    frac_report_lb::Real=0.1, # lower bound of area fraction of the Tm peak to be reported in regards to the largest real Tm peak
+    qt_prob_range_lb ::AbstractFloat=0.21, # quantile probability point for the lower bound of the range considered for number of crossing points
+    ncp_ub ::Integer=10, # upper bound of number of data points crossing the mid range value (line parallel to x-axis) of smoothed -df/dt (`ndrv_smu`)
+    noisy_factor ::AbstractFloat=0.2, # `num_cross_points` must also <= `noisy_factor * len_raw`
+    qt_prob_flTm ::AbstractFloat=0.64, # quantile probability point for normalized -df/dT (range 0-1)
+    normd_qtv_ub ::Real=0.8, # upper bound of normalized -df/dt values (range 0-1) at the quantile probablity point
+    top1_from_max_ub ::Real=1, # upper bound of temperature difference between top-1 Tm peak and maximum -df/dt
+    top_N ::Integer=4, # top number of Tm peaks to report
+    frac_report_lb ::Real=0.1, # lower bound of area fraction of the Tm peak to be reported in regards to the largest real Tm peak
 
-    json_digits::Integer=JSON_DIGITS,
+    json_digits ::Integer=JSON_DIGITS,
 
-    verbose::Bool=false,
+    verbose ::Bool=false,
     )
 
     # parse input data
@@ -428,7 +476,7 @@ function mc_tm_pw(
         end
         fluo_spl_blsub = fluo_spl - minimum(fluo_spl) # assuming baseline is a constant == minimum fluorescence value
 
-        ndrv = -derivative(spl, tp_denser) #  derivative(splin::Dierckx.Spline1D, x::Array{Float61, 1})
+        ndrv = -derivative(spl, tp_denser) #  derivative(splin ::Dierckx.Spline1D, x ::Array{Float61, 1})
         ndrv_smu = supsmu(tp_denser, ndrv, span_smooth) # using default for the rest of `supsmu` parameters
 
         mc_denser = hcat(tp_denser, fluo_spl_blsub, ndrv_smu)

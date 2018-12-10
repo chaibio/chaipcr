@@ -22,20 +22,17 @@ function dcv_aw(
     #
     # db_conn ::MySQL.MySQLHandle, # `db_conn_default` is defined in "__init__.jl"
     # calib_info ::Union{Integer,OrderedDict},
-
-    well_nums_found_in_fr ::AbstractVector,
-
-    ## remove MySql dependency
-    #
+    # well_nums_found_in_fr ::AbstractVector,
     # well_nums_in_req ::AbstractVector=[],
 
     # new >>
     calib_data ::OrderedDict{String,Any},
+    well_nums_found_in_fr ::AbstractVector,
     # << new
 
-    dye_in ::String="FAM",
-    dyes_2bfild ::AbstractVector=[];
-    aw_out_format ::String="both" # "array", "dict", "both"
+    dye_in ::String ="FAM",
+    dyes_2bfild ::AbstractVector =[];
+    aw_out_format ::String ="both" # "array", "dict", "both"
     )
 
     ## remove MySql dependency
