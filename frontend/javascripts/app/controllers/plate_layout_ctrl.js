@@ -207,7 +207,7 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 				for (i = 0; i < item_count; i++) {
 					above_height += document.querySelector(type +  ' .dropdown-container li:nth-child(' + (i + 1) + ')').offsetHeight;
 					above_items++;
-					if(above_height > available_above_height ){
+					if(above_height > available_above_height || (i == item_count - 1)){
 						above_items--;
 						above_height -= document.querySelector(type +  ' .dropdown-container li:nth-child(' + (i + 1) + ')').offsetHeight;
 						break;
@@ -229,7 +229,7 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 					below_items: below_items,
 					above_height: above_height,
 					below_height: below_height,
-					current_height: current_height,
+					current_height: middle_item_height,
 					is_total_scroll: false
 				};
 			} else {				
@@ -907,7 +907,26 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 				for (i = 0; i < 16; i++) {
 					$scope.wells["well_" + i].selected = false;
 				}
-				$scope.selectionMade = false;								
+				$scope.selectionMade = false;
+
+				$scope.target1Selected = "Choose";
+				$scope.target1SelectedColor = "white";
+				$scope.enableTarget1Type = false;
+				$scope.enableTarget1Qty = false;
+				$scope.selectedTarget1Type = "";
+				$scope.target1Quantity.value = null;
+				$scope.target1SelectedId = 0;
+
+				$scope.target2Selected = "Choose";
+				$scope.target2SelectedColor = "white";
+				$scope.enableTarget2Type = false;
+				$scope.enableTarget2Qty = false;
+				$scope.selectedTarget2Type = "";
+				$scope.target2Quantity.value = null;
+				$scope.target2SelectedId = 0;			
+
+				$scope.sampleSelected = "Choose";
+				$scope.sampleSelectedId = 0;
 			}
 		};
 
@@ -973,6 +992,26 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 				$scope.wells["well_" + i].selected = !isAllSelected;
 			}
 			$scope.selectionMade = !isAllSelected;				
+
+			$scope.target1Selected = "Choose";
+			$scope.target1SelectedColor = "white";
+			$scope.enableTarget1Type = false;
+			$scope.enableTarget1Qty = false;
+			$scope.selectedTarget1Type = "";
+			$scope.target1Quantity.value = null;
+			$scope.target1SelectedId = 0;
+
+			$scope.target2Selected = "Choose";
+			$scope.target2SelectedColor = "white";
+			$scope.enableTarget2Type = false;
+			$scope.enableTarget2Qty = false;
+			$scope.selectedTarget2Type = "";
+			$scope.target2Quantity.value = null;
+			$scope.target2SelectedId = 0;			
+
+			$scope.sampleSelected = "Choose";
+			$scope.sampleSelectedId = 0;
+			
 		};
 
 		$scope.dragStart = function (evt, type, index) {
