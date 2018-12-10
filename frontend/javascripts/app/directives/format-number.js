@@ -17,6 +17,41 @@
  * limitations under the License.
  */
 
+  /**
+   * from this source:
+   */
+  function getCaretPosition(oField) {
+    var iCaretPos = 0;
+    if (document.selection) {
+      oField.focus();
+      var oSel = document.selection.createRange();
+      oSel.moveStart('character', -oField.value.length);
+      iCaretPos = oSel.text.length;
+    } else if (oField.selectionStart || oField.selectionStart == '0')
+      iCaretPos = oField.selectionDirection == 'backward' ? oField.selectionStart :
+      oField.selectionEnd;
+    return (iCaretPos);
+  }
+  /**
+   * from this source
+   */
+  function setCaretPosition(elem, caretPos) {
+    if (elem !== null) {
+      if (elem.createTextRange) {
+        var range = elem.createTextRange();
+        range.move('character', caretPos);
+        range.select();
+      } else {
+        if (elem.selectionStart) {
+          elem.focus();
+          elem.setSelectionRange(caretPos, caretPos);
+        } else
+          elem.focus();
+      }
+    }
+  }
+
+
 window.ChaiBioTech.ngApp.directive('formatNumber', [ '$filter',
   function($filter){
      return {
@@ -26,27 +61,113 @@ window.ChaiBioTech.ngApp.directive('formatNumber', [ '$filter',
 
        link: function(scope, element, attrs, modelCtrl) {
           if (!modelCtrl) {
-              return;
+            return;
           }
 
-          modelCtrl.$formatters.unshift(function () {
-              return $filter('number')(modelCtrl.$modelValue);
+          modelCtrl.$formatters.unshift(function () {            
+            return (modelCtrl.$modelValue) ? $filter('numberNotation')(modelCtrl.$modelValue) : '';
           });
 
           modelCtrl.$parsers.unshift(function (viewValue) {
+
+              var cursorPosition = getCaretPosition(element[0]);
+
               var plainNumber = viewValue.replace(/[\,]/g, '');
-              var frontDigit = plainNumber.substr(0, plainNumber.indexOf('.'));
-              var backDigit = plainNumber.substr(plainNumber.indexOf('.'));
-              var b = 0;
-              if(plainNumber.indexOf('.') < 0){
-                b = $filter('number')(plainNumber);
-              } else {
-                b = $filter('number')(frontDigit);
-                b = b + backDigit;                
+              var data = plainNumber.split(/[eE]/);
+              var m1 = Number(data[0]);
+              var b1 = Number(data[1]);
+              var frontDigit ='', backDigit='', powDigit = '';
+              if(!isNaN(m1)){
+                var data1 = data[0].split('.');                
+                if(data1[0].length > 12){
+                  var data2 = m1.toExponential().toString().split(/[eE]/);
+                  b1 = (isNaN(b1)) ? Number(data2[1]) : Number(data2[1]) + b1;
+                  frontDigit = data2[0].substring(0, 12);
+                } else {
+                  frontDigit = data[0];
+                }
               }
 
-              element.val(b);
-              return plainNumber;
+              if(!isNaN(b1)){
+                if(Math.abs(b1) < 100){
+                  powDigit = b1;
+                } else {
+                  if(b1 >= 100){
+                    powDigit = b1.toString().substring(0,2);
+                  } else {
+                    powDigit = b1.toString().substring(0,3);
+                  }
+                }
+              }
+
+              if(frontDigit.indexOf('.') >= 0){                
+                backDigit = frontDigit.substring(frontDigit.indexOf('.'));
+                frontDigit = frontDigit.substring(0, frontDigit.indexOf('.'));
+              }
+
+              console.log('---value---', frontDigit, powDigit, backDigit);
+
+              if(viewValue == ''){
+                element.val('');
+                return '';
+              } else if(viewValue == '-') {
+                element.val('-');
+                return '';
+              } else {
+                var reg = RegExp(/^([0-9,\+\-])*[.]?([0-9E])*$/);
+
+                if(isNaN(m1)){
+                  element.val('');
+                  return '';
+                } else if(!reg.test(frontDigit + backDigit)){
+                  element.val('');
+                  return '';
+                }
+                
+                var resultValue = '';                
+                var match = [];
+                if(powDigit){
+                  resultValue = $filter('numberNotation')(frontDigit) + backDigit + 'E' + powDigit;
+                  element.val(resultValue);                  
+                  if(Math.abs(resultValue.length - viewValue.length) == 1){
+                    setCaretPosition(element[0], cursorPosition + resultValue.length - viewValue.length);
+                  } else if(Math.abs(resultValue.length - viewValue.length) > 1) {
+                    setCaretPosition(element[0], resultValue.length);
+                  } else {
+                    setCaretPosition(element[0], cursorPosition);
+                  }
+                  return Number(frontDigit+backDigit + 'E' + powDigit);
+                } else {
+                  if( ((plainNumber.indexOf('e') > 0) && (plainNumber.indexOf('e') == plainNumber.length - 1)) || 
+                      ((plainNumber.indexOf('E') > 0) && (plainNumber.indexOf('E') == plainNumber.length - 1))){
+
+                    resultValue = $filter('numberNotation')(frontDigit) + backDigit + 'E';
+                  } else if(
+                      ((plainNumber.indexOf('e-') > 0) && (plainNumber.indexOf('e-') == plainNumber.length - 2)) || 
+                      ((plainNumber.indexOf('E-') > 0) && (plainNumber.indexOf('E-') == plainNumber.length - 2))
+                    ) {
+
+                    resultValue = $filter('numberNotation')(frontDigit) + backDigit + 'E-';
+                  } else {
+                    if((frontDigit.indexOf('.') == frontDigit.length - 1) && (frontDigit.indexOf('.') > 0)){
+                      resultValue = $filter('numberNotation')(frontDigit) + '.';
+                    } else {
+                      resultValue = $filter('numberNotation')(frontDigit) + backDigit;
+                    }
+                  }
+
+                  element.val(resultValue);                  
+                  if(Math.abs(resultValue.length - viewValue.length) == 1){
+                    setCaretPosition(element[0], cursorPosition + resultValue.length - viewValue.length);
+                  } else if(Math.abs(resultValue.length - viewValue.length) > 1) {
+                    setCaretPosition(element[0], resultValue.length);
+                  } else {
+                    setCaretPosition(element[0], cursorPosition);
+                  }
+                  return Number(frontDigit+backDigit);
+                }
+              }
+              return '';
           });
        }
      };
