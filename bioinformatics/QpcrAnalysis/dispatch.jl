@@ -31,8 +31,8 @@ function dispatch(action ::String, request_body ::String)
 
     end # if isa
 
-    # commented out whole debugging
-    # result = try
+    # commented out while debugging
+    result = try
 
         if action == "amplification"
 
@@ -181,9 +181,9 @@ function dispatch(action ::String, request_body ::String)
 
 
     # commented out while debugging
-    # catch err
-    #     err
-    # end # try
+    catch err
+        err
+    end # try
 
     success = !isa(result, Exception)
     response_body = success ? result : JSON.json(OrderedDict("error"=>repr(result)))

@@ -253,15 +253,15 @@ function assign_genos(
     non_ntc_geno_idc = geno_idc_all[geno_idc_all .!= ntc_geno_idx]
     non_ntc_geno_combin = expected_genos_all[:, non_ntc_geno_idc]
 
-    unclassfied_assignment = max_num_genos + 1
-    if length(apg_labels) != unclassfied_assignment
+    unclassified_assignment = max_num_genos + 1
+    if length(apg_labels) != unclassified_assignment
         error("The number of labels does not equal the number of all possible genotypes.")
     end
 
     if any(map(i -> length(unique(data[i, :])) == 1, 1:num_channels)) # for any channel, all the data points are the same (would result in "AssertionError: !(isempty(grp))" for `kmedoids`)
 
         car = do_cluster_analysis(data .+ rand(size(data)...), rand(num_channels, 2), cluster_method, norm_l)
-        car.cluster_result.assignments = fill(unclassfied_assignment, num_wells)
+        car.cluster_result.assignments = fill(unclassified_assignment, num_wells)
 
         cluster_result = car.cluster_result
         best_i = 1
@@ -489,7 +489,7 @@ function assign_genos(
             #     end # for i
             #     for ctrl_well_num in ctrl_well_dict[ctrl_geno]
             #         if assignments_agp_idc[ctrl_well_num] != expected_ctrl_assignment
-            #             assignments_agp_idc .= unclassfied_assignment # Because assignments of different clusters depend on one another, if control well(s) is/are assigned incorrectly, the other wells may be assigned incorrectly as well.
+            #             assignments_agp_idc .= unclassified_assignment # Because assignments of different clusters depend on one another, if control well(s) is/are assigned incorrectly, the other wells may be assigned incorrectly as well.
             #         end # if
             #     end # for ctrl_well_num
             # end # for ctrl_geno
@@ -505,10 +505,10 @@ function assign_genos(
 
 
         if all_unclassified
-            assignments_adj = fill(unclassfied_assignment, num_wells)
+            assignments_adj = fill(unclassified_assignment, num_wells)
         else # assign as unclassified the wells where silhouette is below the lower bound `slht_lb`, i.e. unclear which geno should be assigned
             assignments_adj = map(1:length(assignments_agp_idc)) do i
-                slhts[i] < slht_lb ? unclassfied_assignment: assignments_agp_idc[i]
+                slhts[i] < slht_lb ? unclassified_assignment: assignments_agp_idc[i]
             end # do i # previously `assignments_agp_idc .* (relative_diff_closest_dists .> slht_lb)`
         end # if all_unclassified
 
@@ -520,6 +520,7 @@ function assign_genos(
     return (assignments_adj_labels, AssignGenosResult(
         # best
         cluster_result,
+        
         best_i,
         best_geno_combins,
         # all

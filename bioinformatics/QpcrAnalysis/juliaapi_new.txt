@@ -116,10 +116,10 @@ success response body:
     "blsub_fluos": [same_format_as_rbbs_ary3],
     
     # first derivative of the amp curve
-    "dr1_pred": [same_format_as_rbbs_ary3], 
+    "dr1_pred": [same_format_as_rbbs_ary3], # except the inner vector has a different length
 
     # second derivative of the amp curve
-    "dr2_pred": [same_format_as_rbbs_ary3], 
+    "dr2_pred": [same_format_as_dr2_pred], 
 
     "cq": [
         [channel_1__well_01, channel_1__well_02, ... channel_1__well_16], # the only element if single-channel
@@ -136,9 +136,8 @@ success response body:
     "ct_fluos": [], 
     
     "assignments_adj_labels_dict": { 
-        # current data categories are: "rbbs_ary3", "blsub_fluos", "d0", "cq"
-        "data_category_1": [well_01, well_02, ... well_16], 
-        "data_category_2": [well_01, well_02, ... well_16], 
+        "genotype_1": [well_01, well_02, ... well_16], 
+        "genotype_2": [well_01, well_02, ... well_16], 
         ...
     }
 }

@@ -11,6 +11,10 @@ mutable struct AmpStepRampProperties
 end
 const DEFAULT_cyc_nums = Vector{Int}()
 
+#mutable struct NullableVector{T <: Union{Void,Vector{<:Real}}}
+#    vector::T
+#end
+
 # `mod_bl_q` output
 struct MbqOutput
     fitted_prebl ::AbstractAmpFitted
@@ -54,8 +58,8 @@ mutable struct AmpStepRampOutput
     coefs ::Array{Float64,3}
     d0 ::Array{Float64,2}
     blsub_fitted ::Array{Float64,3}
-    dr1_pred ::Array{Float64,3}
-    dr2_pred ::Array{Float64,3}
+    dr1_pred ::Array{Any,2} #::Array{Float64,3}
+    dr2_pred ::Array{Any,2} #::Array{Float64,3}
     max_dr1 ::Array{Float64,2}
     max_dr2 ::Array{Float64,2}
     cyc_vals_4cq ::Array{OrderedDict{String,Float64},2}
@@ -83,8 +87,8 @@ end # type AmpStepRampOutput
 struct AmpStepRampOutput2Bjson
     rbbs_ary3 ::Array{Float64,3} # fluorescence after deconvolution and adjusting well-to-well variation
     blsub_fluos ::Array{Float64,3} # fluorescence after baseline subtraction
-    dr1_pred ::Array{Float64,3} # dF/dc
-    dr2_pred ::Array{Float64,3} # d2F/dc2
+    dr1_pred ::Array{Any,2} # ::Array{Float64,3} # dF/dc
+    dr2_pred ::Array{Any,2} # ::Array{Float64,3} # d2F/dc2
     cq ::Array{Float64,2} # cq values, applicable to sigmoid models but not to MAK models
     d0 ::Array{Float64,2} # starting quantity from absolute quanitification
     ct_fluos ::Vector{Float64} # fluorescence thresholds (one value per channel) for Ct method
@@ -103,7 +107,7 @@ function process_amp(
     # calib_info ::Union{Integer,OrderedDict};
     #
     ## arguments that might be passed by upstream code
-    # well_nums ::AbstractVector=[],
+    # well_nums ::AbstractVector =[],
 
     # new >>
     exp_id ::Integer,
@@ -114,34 +118,34 @@ function process_amp(
     asrp_vec ::Vector{AmpStepRampProperties};
     # << new
 
-    min_reliable_cyc ::Real=5,
-    baseline_cyc_bounds ::AbstractVector=[],
-    cq_method ::String="Cy0",
-    ct_fluos ::AbstractVector=[],
+    min_reliable_cyc ::Real =5,
+    baseline_cyc_bounds ::AbstractVector =[],
+    cq_method ::String ="Cy0",
+    ct_fluos ::AbstractVector =[],
 
-    max_cycle ::Integer=1000, # maximum temperature to analyze
+    max_cycle ::Integer =1000, # maximum temperature to analyze
     dcv ::Bool=true, # logical, whether to perform multi-channel deconvolution
-    dye_in ::String="FAM", dyes_2bfild ::AbstractVector=[],
-    qt_prob_rc ::Real=0.9, # quantile probablity for fluo values per well
-    af_key ::String="sfc",
+    dye_in ::String ="FAM", dyes_2bfild ::AbstractVector=[],
+    qt_prob_rc ::Real =0.9, # quantile probablity for fluo values per well
+    af_key ::String ="sfc",
 
-    ipopt_print2file_prefix ::String="", # file prefix for Ipopt print for `mod_bl_q`
+    ipopt_print2file_prefix ::String ="", # file prefix for Ipopt print for `mod_bl_q`
 
-    kwdict_rc ::Associative=Dict(), # keyword arguments passed onto `report_cq!`,
-    kwdict_mbq ::Associative=Dict(), # keyword arguments passed onto `mod_bl_q`
+    kwdict_rc ::Associative =Dict(), # keyword arguments passed onto `report_cq!`,
+    kwdict_mbq ::Associative =Dict(), # keyword arguments passed onto `mod_bl_q`
 
     # allelic discrimination
-    ad_cycs ::Union{Integer,AbstractVector}=0, # allelic discrimination: cycles of fluorescence to be used, 0 means the last cycle
-    ctrl_well_dict ::OrderedDict=CTRL_WELL_DICT,
-    cluster_method ::String="k-means-medoids", # allelic discrimination: "k-means", "k-medoids", "k-means-medoids"
+    ad_cycs ::Union{Integer,AbstractVector} =0, # allelic discrimination: cycles of fluorescence to be used, 0 means the last cycle
+    ctrl_well_dict ::OrderedDict =CTRL_WELL_DICT,
+    cluster_method ::String ="k-means-medoids", # allelic discrimination: "k-means", "k-medoids", "k-means-medoids"
     norm_l ::Real=2, # norm level for distance matrix, e.g. norm_l = 2 means l2-norm
-    expected_ncg_raw ::AbstractMatrix=DEFAULT_encgr, # each column is a vector of binary genotype whose length is number of channels (0 => no signal, 1 => yes signal)
-    categ_well_vec ::AbstractVector=CATEG_WELL_VEC,
+    expected_ncg_raw ::AbstractMatrix =DEFAULT_encgr, # each column is a vector of binary genotype whose length is number of channels (0 => no signal, 1 => yes signal)
+    categ_well_vec ::AbstractVector =CATEG_WELL_VEC,
 
-    out_sr_dict ::Bool=true, # output an OrderedDict keyed by `sr_str`s
-    out_format ::String="json", # "full", "pre_json", "json"
-    json_digits ::Integer=JSON_DIGITS,
-    verbose ::Bool=false
+    out_sr_dict ::Bool =true, # output an OrderedDict keyed by `sr_str`s
+    out_format ::String ="json", # "full", "pre_json", "json"
+    json_digits ::Integer =JSON_DIGITS,
+    verbose ::Bool =false
     )
 
     # print_v(println, verbose,
@@ -275,9 +279,10 @@ function process_amp(
             # new >>
             exp_data ::OrderedDict{String,Any},
             calib_data ::OrderedDict{String,Any},
+            asrp,
             # << new
 
-            channel_nums,   dcv,
+            channel_nums, dcv,
             dye_in, dyes_2bfild,
             min_reliable_cyc, baseline_cyc_bounds, cq_method, ct_fluos, af_key, kwdict_mbq, ipopt_print2file_prefix,
             qt_prob_rc, kwdict_rc,
@@ -388,31 +393,31 @@ end # auto_choose_bl_cycs
 function mod_bl_q( # for amplification data per well per channel, fit sigmoid model, extract important information for Cq, subtract baseline.
     fluos ::AbstractVector;
 
-    min_reliable_cyc ::Real=5, # >= 1
+    min_reliable_cyc ::Real =5, # >= 1
 
-    af_key ::String="sfc", # a string representation of amplification curve model, used for finding the right model `DataType` in `dfc_DICT` and the right empty model instance in `AF_EMPTY_DICT`
+    af_key ::String ="sfc", # a string representation of amplification curve model, used for finding the right model `DataType` in `dfc_DICT` and the right empty model instance in `AF_EMPTY_DICT`
 
-    sfc_model_defs ::OrderedDict{String,SFCModelDef}=MDs,
+    sfc_model_defs ::OrderedDict{String,SFCModelDef} =MDs,
 
-    bl_method ::String="l4_enl",
-    baseline_cyc_bounds ::AbstractVector=[],
-    bl_fallback_func ::Function=median,
+    bl_method ::String ="l4_enl",
+    baseline_cyc_bounds ::AbstractVector =[],
+    bl_fallback_func ::Function =median,
 
-    m_postbl ::String="l4_enl",
+    m_postbl ::String ="l4_enl",
 
-    denser_factor ::Real=100,
+    denser_factor ::Real =100,
 
-    cq_method ::String="Cy0",
-    ct_fluo ::Real=NaN,
+    cq_method ::String ="Cy0",
+    ct_fluo ::Real =NaN,
 
-    verbose ::Bool=false,
+    verbose ::Bool =false,
 
-    kwargs_jmp_model ::OrderedDict=OrderedDict(
+    kwargs_jmp_model ::OrderedDict =OrderedDict(
         :solver=>IpoptSolver(print_level=0, max_iter=35) # `ReadOnlyMemoryError()` for v0.5.1
         # :solver=>IpoptSolver(print_level=0, max_iter=100) # increase allowed number of iterations for MAK-based methods, due to possible numerical difficulties during search for fitting directions (step size becomes too small to be precisely represented by the precision allowed by the system's capacity)
         # :solver=>NLoptSolver(algorithm=:LN_COBYLA)
     ),
-    ipopt_print2file ::String="",
+    ipopt_print2file ::String ="",
     )
 
     num_cycs = length(fluos)
@@ -472,12 +477,10 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
             else # sigmoid models so far
                 wts = vcat(zeros(last_cyc_wt0), ones(num_cycs - last_cyc_wt0))
             end
-
             fitted_prebl = sfc_model_defs[bl_method].func_fit(cycs, fluos, wts; kwargs_jmp_model...)
 
             prebl_status = string(fitted_prebl.status)
             bl_notes = ["prebl_status $prebl_status"]
-
             baseline = sfc_model_defs[bl_method].funcs_pred["bl"](cycs, fitted_prebl.coefs...) # may be changed later
 
             if prebl_status in ["Optimal", "UserLimit"]
@@ -701,6 +704,7 @@ function process_amp_1sr(
     # new >>    
     exp_data ::OrderedDict{String,Any},
     calib_data ::OrderedDict{String,Any},
+    asrp ::AmpStepRampProperties,
     # << new
 
     channel_nums ::AbstractVector,
@@ -807,8 +811,8 @@ function process_amp_1sr(
         fill(NaN, 1, num_fluo_wells, num_channels), # coefs # size = 1 for 1st dimension may not be correct for the chosen model
         NaN_ary2, # d0s
         blsub_fitted,
-        zeros(0, 0, 0), # dr1_pred
-        zeros(0, 0, 0), # dr2_pred
+        zeros(0, 0), # zeros(0, 0, 0), # dr1_pred
+        zeros(0, 0), # zeros(0, 0, 0), # dr2_pred
         NaN_ary2, # max_dr1
         NaN_ary2, # max_dr2
         empty_vals_4cq, # cyc_vals_4cq
@@ -831,7 +835,7 @@ function process_amp_1sr(
 
     if num_cycs <= 2
         print_v(println, verbose, "Number of cycles $num_cycs <= 2, baseline subtraction and Cq calculation will not be performed.")
-    else
+    else # num_cycs > 2
         if length(ct_fluos) == 0
             if cq_method == "ct"
                 ct_fluos = map(1:num_channels) do channel_i
@@ -873,20 +877,19 @@ function process_amp_1sr(
         end # if length
 
         full_amp_out.ct_fluos = ct_fluos
-
         mbq_ary2 = [
             begin
                 ipopt_print2file = length(ipopt_print2file_prefix) == 0 ? "" : "$(join([ipopt_print2file_prefix, channel_i, well_i], '_')).txt"
                 mod_bl_q(
                     rbbs_ary3[:, well_i, channel_i];
-                    min_reliable_cyc=min_reliable_cyc,
-                    baseline_cyc_bounds=baseline_cyc_bounds[well_i, channel_i],
-                    cq_method=cq_method,
-                    ct_fluo=ct_fluos[channel_i],
-                    af_key=af_key,
+                    min_reliable_cyc = min_reliable_cyc,
+                    baseline_cyc_bounds = baseline_cyc_bounds[well_i, channel_i],
+                    cq_method = cq_method,
+                    ct_fluo = ct_fluos[channel_i],
+                    af_key = af_key,
                     kwdict_mbq...,
-                    ipopt_print2file=ipopt_print2file,
-                    verbose=verbose
+                    ipopt_print2file = ipopt_print2file,
+                    verbose = verbose
                 )
             end
             for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
@@ -898,13 +901,13 @@ function process_amp_1sr(
                 getfield(mbq_ary2[well_i, channel_i], fn_mbq)
                 for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
             ]
-            if fn_mbq in [:blsub_fluos, :coefs, :blsub_fitted, :dr1_pred, :dr2_pred]
+            if fn_mbq in [:blsub_fluos, :coefs, :blsub_fitted] #, :dr1_pred, :dr2_pred]
                 fv = reshape(
                     cat(2, fv...), # 2-dim array of size (`num_cycs` or number of coefs, `num_wells * num_channels`)
                     length(fv[1,1]), size(fv)...
                 )
             end # if fn_mbq in
-            setfield!(full_amp_out, fn_mbq, convert(typeof(getfield(full_amp_out, fn_mbq)), fv)) # `setfield!` doesn't call `convert` on its own
+            setfield!(full_amp_out, fn_mbq, convert(typeof(getfield(full_amp_out, fn_mbq)), fv)) # `setfield!` doesn't call `convert` on its own    
         end # for fn_mbq
 
         full_amp_out.qt_fluos = [
@@ -917,7 +920,7 @@ function process_amp_1sr(
             report_cq!(full_amp_out, well_i, channel_i; kwdict_rc...)
         end
 
-    end # if num_cycs <= 2 ... else
+    end # if num_cycs > 2
 
 
     # allelic discrimination

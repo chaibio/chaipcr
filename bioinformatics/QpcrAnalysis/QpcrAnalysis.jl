@@ -74,7 +74,7 @@ include("analyze_customized/thermal_consistency.jl")
 
 # wrap up
 include("dispatch.jl")
-include("test.jl")
+#include("test.jl")
 include("__init__.jl")
 
 # # no longer needed

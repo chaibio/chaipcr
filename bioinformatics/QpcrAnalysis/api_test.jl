@@ -370,9 +370,12 @@ function more_amplification_request_tests()
     # startup script
     #
     # ;cd ~/chaipcr/bioinformatics/QpcrAnalysis
-    # push!(LOAD_PATH,pwd())
+    # ;sudo mount -t vboxsf shared /mnt/share
+    # 
     #
+    push!(LOAD_PATH,pwd())
     using QpcrAnalysis
+
     import Clustering.ClusteringResult
     import DataStructures.OrderedDict
     import JuMP.@variable
@@ -382,30 +385,34 @@ function more_amplification_request_tests()
     import JuMP.Model
     import Ipopt.IpoptSolver
     import JuMP.solve
+    import JuMP.getvalue
+    import JuMP.getobjectivevalue
     include("amp_models/sfc_models.jl")
     include("amp_models/types_for_amp_models.jl")
     include("types_for_allelic_discrimination.jl")
     include("allelic_discrimination.jl")
     include("shared.jl")
     include("deconv.jl")
-    include("amp.jl")
+    include("/mnt/share/amp.jl")
     include("allelic_discrimination.jl")
     calib_info_AIR = 1
 
+    include("/mnt/share/amp.jl")
 
     include("/mnt/share/dispatch.jl")
     include("/mnt/share/api_test.jl")
-    include("/mnt/share/amp.jl")
     include("/mnt/share/calib.jl")
     include("/mnt/share/adj_w2wvaf.jl")
     include("/mnt/share/shared.jl")
+
 
     # request = JSON.parsefile("~/chaibio/bioinformatics/test/singlechannel_amplification_request.json"; dicttype=OrderedDict)
     request = JSON.parsefile("/mnt/share/singlechannel_amplification_request.json"; dicttype=OrderedDict)
 
     amplification_request_test(request)
-    dispatch("amplification",String(JSON.json(request)))
-
+    result = dispatch("amplification",String(JSON.json(request)))
+    response = JSON.parse(result[2],dicttype=OrderedDict)
+    amplification_response_test(response)
 
 
     # request = JSON.parsefile("~/chaibio/bioinformatics/test/dualchannel_amplification_request.json"; dicttype=OrderedDict)
@@ -453,6 +460,7 @@ function amplification_response_test(response)
     @assert (n_channels==1 || n_channels==2)
     n_wells=length(response["rbbs_ary3"][1])
     n_steps=length(response["rbbs_ary3"][1][1])
+    n_pred=length(response["dr1_pred"][1][1])
     for m in measurements
         @assert (haskey(response,m))
         @assert (isa(response[m],Array))
@@ -462,9 +470,16 @@ function amplification_response_test(response)
             @assert (length(response[m][c])==n_wells)
             for i in range(1,n_wells)
                 @assert (isa(response[m][c][i],Array))
-                @assert (length(response[m][c][i])==n_steps)
-                for j in range(1,n_steps)
-                    @assert (isa(response[m][c][i][j],Number))
+                if (m=="rbbs_ary3" || m=="blsub_fluos")
+                    @assert (length(response[m][c][i])==n_steps)
+                    for j in range(1,n_steps)
+                        @assert (isa(response[m][c][i][j],Number) || response[m][c][i][j]==nothing)
+                    end
+                else # dr1_pred, dr2_pred
+                    @assert (length(response[m][c][i])==n_pred)
+                    for j in range(1,n_pred)
+                        @assert (isa(response[m][c][i][j],Number) || response[m][c][i][j]==nothing)
+                    end
                 end
             end
         end
@@ -478,28 +493,25 @@ function amplification_response_test(response)
             @assert (isa(response[s][c],Array))
             @assert (length(response[s][c])==n_wells)
             for i in range(1,n_wells)
-                @assert (isa(response[s][c][i],Number))
+                @assert (isa(response[s][c][i],Number) || response[s][c][i]==nothing)
             end
         end
     end
     @assert (haskey(response,"ct_fluos"))
     @assert (isa(response["ct_fluos"],Array))
-    if (length(response["ct_fluos"])>0)
-        @assert (length(response["ct_fluos"])==n_channels)
-        for c in range(1,n_channels)
-            @assert (isa(response["ct_fluos"][c],Number))
-        end
+    @assert (length(response["ct_fluos"])==n_channels)
+    for c in range(1,n_channels)
+        @assert (isa(response["ct_fluos"][c],Number) || response["ct_fluos"][c]==nothing)
     end
     variables=["rbbs_ary3","blsub_fluos","cq","d0"]
-    @assert (haskey(response,"assignments_adj_labels_OrderedDict"))
-    @assert (isa(response["assignments_adj_labels_OrderedDict"],OrderedDict))
-    @assert (length(response["assignments_adj_labels_OrderedDict"])==length(variables))
-    for v in variables
-        @assert (haskey(response["assignments_adj_labels_OrderedDict"],v))
-        @assert (isa(response["assignments_adj_labels_OrderedDict"][v],Array))
-        @assert (length(response["assignments_adj_labels_OrderedDict"][v])==n_wells)
+    @assert (haskey(response,"assignments_adj_labels_dict"))
+    @assert (isa(response["assignments_adj_labels_dict"],OrderedDict))
+    # @assert (length(response["assignments_adj_labels_dict"])==n_genotypes)
+    for g in range(1,length(response["assignments_adj_labels_dict"]))
+        @assert (isa(response["assignments_adj_labels_dict"][g],Array))
+        @assert (length(response["assignments_adj_labels_dict"][g])==n_wells)
         for i in range(1,n_wells)
-            @assert (isa(response["assignments_adj_labels_OrderedDict"][v][i],Number))
+            @assert (isa(response["assignments_adj_labels_dict"][g][i],Number))
         end
     end
     true
