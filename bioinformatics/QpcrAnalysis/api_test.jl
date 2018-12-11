@@ -1929,11 +1929,18 @@ function server_tests()
     #     http://localhost:8081/experiments/250/amplification`)
 
     # system call\
-    # cd bioinformatics/QpcrAnalysis
-    # curl \
-    #     --header "Content-Type: application/json" \
-    #     --data @../test/test_1ch_amp.json \
-    #     http://localhost:8081/experiments/250/amplification
+    cd bioinformatics/QpcrAnalysis
+    curl \
+        --header "Content-Type: application/json" \
+        --data @../test/test_1ch_amp.json \
+        http://localhost:8081/experiments/250/amplification
+
+    # system call\
+    cd bioinformatics/QpcrAnalysis
+    curl \
+        --header "Content-Type: application/json" \
+        --data @../test/test_1ch_meltcurve.json \
+        http://localhost:8081/experiments/170/meltcurve
 
 end
 

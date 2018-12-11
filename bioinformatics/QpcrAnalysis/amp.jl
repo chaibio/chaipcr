@@ -155,15 +155,11 @@ function process_amp(
     #     "max_cycle: $max_cycle"
     # )
     
-    # new >>
-    # not implemented yet
-    calib_data = ensure_ci(calib_data, exp_id)
-    # << new
-    
     ## remove MySql dependency
     #
     # calib_info = ensure_ci(db_conn, calib_info, exp_id)
     #
+    ## find step_id/ramp_id information
     # if length(asrp_vec) == 0
     #     sr_qry = """SELECT
     #             steps.id AS steps_id,
@@ -251,7 +247,7 @@ function process_amp(
     #  """
     #  # must "SELECT well_num" and "ORDER BY well_num" for `get_mysql_data_well`
     #  fd_nt, fluo_well_nums = get_mysql_data_well(
-    #      well_nums, fd_qry    _2b, db_conn, verbose
+    #      well_nums, fd_qry_2b, db_conn, verbose
     #  )
     #
     # channel_nums = unique(fd_nt[:channel])
@@ -268,7 +264,14 @@ function process_amp(
     out_format_1sr = (out_format == "json" ? "pre_json" : out_format)
 
     # new >>
-    # currently assumes only 1 step/ramp since that data is not included in request
+    # issues:
+    # 1.
+    # the new code currently assumes only 1 step/ramp
+    # because as the request body is currrently structured
+    # we cannot subset the fluorescence data by step_id/ramp_id
+    # 2.
+    # need to verify that the fluorescence data complies
+    # with the constraints imposed by max_cycle and well_constraint
     # << new
 
     sr_dict = OrderedDict(map([ asrp_vec[1] ]) do asrp
@@ -752,7 +755,9 @@ function process_amp_1sr(
     # )
 
     # new >>
-    # currently assumes only 1 step/ramp since that data is not included in request
+    # issue:
+    # assumes only 1 step/ramp because the current data format
+    # does not allow us to break the fluorescence data down by step_id/ramp_id
     cyc_nums = sort(unique(exp_data["cycle_num"]))
     fluo_well_nums = sort(unique(exp_data["well_num"]))
     num_cycs, num_fluo_wells, num_channels = map(length, (cyc_nums, fluo_well_nums, channel_nums))

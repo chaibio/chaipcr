@@ -33,9 +33,9 @@ function deconV(
     # well_nums ::AbstractVector=[];
 
     # keyword arguments
-    k4dcv_backup ::K4Deconv=K4DCV,
-    scaling_factor_dcv_vec ::AbstractVector=SCALING_FACTOR_deconv_vec,
-    out_format ::String="both" # "array", "dict", "both"
+    k4dcv_backup ::K4Deconv =K4DCV,
+    scaling_factor_dcv_vec ::AbstractVector =SCALING_FACTOR_deconv_vec,
+    out_format ::String ="both" # "array", "dict", "both"
     )
 
     a2d_dim1, a2d_dim_well, a2d_dim_channel = size(ary2dcv)
@@ -95,16 +95,11 @@ function get_k(
     calib_data ::OrderedDict{String,Any},
     # << new
 
-    well_nums ::AbstractVector=[];
-    well_proc ::String="vec", # options: "mean", "vec".
-    Float_T ::DataType=Float32, # ensure compatibility with other OSs
-    save_to ::String="" # used: "k.jld"
+    well_nums ::AbstractVector =[];
+    well_proc ::String ="vec", # options: "mean", "vec".
+    Float_T ::DataType =Float32, # ensure compatibility with other OSs
+    save_to ::String ="" # used: "k.jld"
     )
-
-    # new >>
-    # not implemented yet
-    dcv_exp_info = ensure_ci(dcv_exp_info)
-    # << new
 
     ## remove MySql dependency
     #

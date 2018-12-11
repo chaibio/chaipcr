@@ -257,21 +257,39 @@ function prep_adj_w2wvaf(
     # end
 
     # new >>
-    # not implemented yet
-    calib_data = ensure_ci(calib_data)
-    #
+    ## issue:
+    ## using the current format for the request body there is no well_num information
+    ## associated with the calibration data
     channels_in_water = (length(calib_data["water"]["fluorescence_value"])<2 ||
         calib_data["water"]["fluorescence_value"][2]==nothing) ? 1 : 2
     #
-    # assume without checking that channels_in_signal == channels_in_water
-    channels_in_signal = channels_in_water
-    #
     water_data_dict = OrderedDict{UInt8,Any}()
     signal_data_dict = OrderedDict{UInt8,Any}()
+    stop_msgs = Vector{String}()
     for channel in 1:channels_in_water
         key="channel_$(channel)"
-        water_data_dict[channel]  = calib_data["water"]["fluorescence_value"][channel]
-        signal_data_dict[channel] = calib_data[key]["fluorescence_value"][channel]
+        try
+            water_data_dict[channel]  = calib_data["water"]["fluorescence_value"][channel]
+        catch
+            push!(stop_msgs,
+                "Cannot access water calibration data for channel $(key)"
+            )
+        end
+        try
+            signal_data_dict[channel] = calib_data[key]["fluorescence_value"][channel]
+        catch
+            push!(stop_msgs,
+                "Cannot access signal calibration data for channel $(key)"
+            )
+        end
+        if length(water_data_dict[channel]) != length(signal_data_dict[channel])
+            push!(stop_msgs,
+                "Calibration data lengths are not equal for channel $(key). Water: $(water_lengths). Signal: $(signal_lengths)."
+            )
+        end
+    end
+    if (length(stop_msgs) > 0)
+        error(join(stop_msgs, ""))
     end
     channels_in_water  = collect(keys(water_data_dict))
     channels_in_signal = channels_in_water
@@ -297,7 +315,9 @@ function prep_adj_w2wvaf(
         error(join(stop_msgs, ""))
     end
 
-    ## this feature temporarily disabled while removing MySql dependency in get_wva_data
+    ## issue:
+    ## this feature has been temporarily disabled while removing MySql dependency in get_wva_data because
+    ## using the current format for the request body we cannot subset the calibration data by step_id
     #
     # if length(dyes_2bfild) > 0 # extrapolate well-to-well variation data for missing channels
     #
