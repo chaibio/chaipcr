@@ -1882,6 +1882,7 @@ function server_tests()
 
 
 
+    # amplification tests
 
     include("/mnt/share/amp.jl")
     include("/mnt/share/calib.jl")
@@ -1899,26 +1900,30 @@ function server_tests()
     response = JSON.parse(result[2],dicttype=OrderedDict)
     amplification_response_test(response)
 
+    # dual channel amplification tests
+    #request = JSON.parsefile("/mnt/share/xh-amp1.json"; dicttype=OrderedDict)
+    request = JSON.parsefile("/mnt/share/xh-amp2.json"; dicttype=OrderedDict)
+    amplification_request_test(request)
+    result = dispatch("amplification",String(JSON.json(request)))
+    response = JSON.parse(result[2],dicttype=OrderedDict)
+    amplification_response_test(response)
 
 
 
+ 
+    # meltcurve tests
 
-    
-    LOAD_FROM_DIR = "/home/vagrant/chaipcr/bioinformatics/QpcrAnalysis"
     include("supsmu.jl")
     include("/mnt/share/api_test.jl")
     include("/mnt/share/calib.jl")
     include("/mnt/share/dispatch.jl")
     include("/mnt/share/meltcrv.jl")
 
+
     # single channel melting curve test
     request = JSON.parsefile("/mnt/share/test_1ch_mc.json"; dicttype=OrderedDict)
     meltcurve_request_test(request)
     result = dispatch("meltcurve",String(JSON.json(request)))
-
-
-
-
     response = JSON.parse(result[2],dicttype=OrderedDict)
     meltcurve_response_test(response)
 

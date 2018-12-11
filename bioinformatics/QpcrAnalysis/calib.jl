@@ -47,6 +47,9 @@ function dcv_aw(
     #
     # prepare data to adjust well-to-well variation in absolute fluorescence values
     wva_data, wva_well_nums = prep_adj_w2wvaf(calib_data, well_nums_in_req, dye_in, dyes_2bfild)
+    #
+    # overwrite the dummy well_nums
+    wva_well_nums = well_nums_found_in_fr
     # << new
 
     num_channels = length(channel_nums)
@@ -65,7 +68,7 @@ function dcv_aw(
     # issue:
     # we can't match well numbers between calibration data and experimental data
     # because we don't have that information for the calibration data
-    wva_well_idc_wfluo = wva_well_nums
+    wva_well_idc_wfluo = [i for i in range(1,length(wva_well_nums))]
     # << new
 
     # subtract background
