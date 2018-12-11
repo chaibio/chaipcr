@@ -29,6 +29,11 @@ class AmplificationOption < ActiveRecord::Base
 				key :type, :string
 				key :enum, ['Cy0', 'cpD2']
 			end
+			property :baseline_method do
+				key :description, 'baseline method'
+				key :type, :string
+				key :enum, ['sigmoid', 'linear', 'median']
+			end
 			property :min_fluorescence do
 				key :description, 'The minimum fluorescence threshold for Cq calling. Cq values will not be called when the fluorescence is below this threshold.'
 				key :type, :string
@@ -55,12 +60,17 @@ class AmplificationOption < ActiveRecord::Base
 		end
 	end
 
-  ACCESSIBLE_ATTRS = [:cq_method, :min_fluorescence, :min_reliable_cycle, :min_d1, :min_d2, :baseline_cycle_bounds]
+  ACCESSIBLE_ATTRS = [:cq_method, :baseline_method, :min_fluorescence, :min_reliable_cycle, :min_d1, :min_d2, :baseline_cycle_bounds]
 
   CQ_METHOD_CY0 = "Cy0"
   CQ_METHOD_cpD2 = "cpD2"
 
+  BASELINE_METHOD_SIGMOID = "sigmoid"
+  BASELINE_METHOD_LINEAR = "linear"
+  BASELINE_METHOD_MEDIAN = "median"
+  
   validates_inclusion_of :cq_method, :in => [CQ_METHOD_CY0, CQ_METHOD_cpD2]
+  validates_inclusion_of :baseline_method, :in => [BASELINE_METHOD_SIGMOID, BASELINE_METHOD_LINEAR, BASELINE_METHOD_MEDIAN]
 
   [:min_fluorescence, :min_reliable_cycle, :min_d1, :min_d2, :baseline_cycle_min, :baseline_cycle_max].each do |column|
     validates column, numericality: {greater_than_or_equal_to: 1}, allow_nil: true
@@ -74,6 +84,11 @@ class AmplificationOption < ActiveRecord::Base
     (val.blank?)? CQ_METHOD_CY0 : val
   end
 
+  def baseline_method
+    val = read_attribute(:baseline_method)
+    (val.blank?)? BASELINE_METHOD_SIGMOID : val
+  end
+  
   def min_fluorescence
     val = read_attribute(:min_fluorescence)
     (val.blank?)? 4356 : val
@@ -117,7 +132,7 @@ class AmplificationOption < ActiveRecord::Base
   end
 
   def to_hash
-    {:cq_method=>cq_method, :min_fluomax=>min_fluorescence, :min_D1max=>min_d1, :min_D2max=>min_d2, :min_reliable_cyc=>min_reliable_cycle, :baseline_cyc_bounds=>(baseline_cycle_min.nil?)? [] : [baseline_cycle_min, baseline_cycle_max]}
+    {:cq_method=>cq_method, :baseline_method=>baseline_method, :min_fluomax=>min_fluorescence, :min_D1max=>min_d1, :min_D2max=>min_d2, :min_reliable_cyc=>min_reliable_cycle, :baseline_cyc_bounds=>(baseline_cycle_min.nil?)? [] : [baseline_cycle_min, baseline_cycle_max]}
   end
 
   def changed?
