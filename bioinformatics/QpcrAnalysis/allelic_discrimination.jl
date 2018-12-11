@@ -1,7 +1,8 @@
 # allelic_discrimination.jl
 
 import DataStructures.OrderedDict
-import Clustering.ClusteringResult
+import Clustering: ClusteringResult, kmeans!, kmedoids!, silhouettes
+import Combinatorics.combinations
 
 # 4 groups
 const DEFAULT_encgr = Array{Int,2}(0, 0)
@@ -219,14 +220,20 @@ function assign_genos(
     data ::AbstractMatrix,
     nrn ::Function,
     ntc_bool_vec ::Vector{Bool},
-    expected_ncg_raw ::AbstractMatrix=DEFAULT_encgr,
-    ctrl_well_dict ::OrderedDict=CTRL_WELL_DICT,
-    cluster_method ::String="k-means-medoids",
-    norm_l ::Real=2,
+    expected_ncg_raw ::AbstractMatrix =DEFAULT_encgr,
+    ctrl_well_dict ::OrderedDict =CTRL_WELL_DICT,
+    cluster_method ::String ="k-means-medoids",
+    norm_l ::Real =2,
+
     # below not specified by `process_ad` as of right now
-    init_factors ::AbstractVector=DEFAULT_init_FACTORS, # for `init_centers`
-    slht_lb ::Real=0; # lower limit of silhouette
-    apg_labels ::AbstractVector=DEFAULT_apg_LABELS # apg = all possible genotypes. Julia v0.6.0 on 2017-06-25: `apg_labels ::Vector{AbstractString}=DEFAULT_eg_LABELS` resulted in "ERROR: MethodError: no method matching #assign_genos#301( ::Array{AbstractString,1}, ::QpcrAnalysis.#assign_genos, ::Array{Float64,2}, ::Array{Float64,2}, ::Float64)"
+    init_factors ::AbstractVector =DEFAULT_init_FACTORS, # for `init_centers`
+    slht_lb ::Real =0; # lower limit of silhouette
+    apg_labels ::AbstractVector =DEFAULT_apg_LABELS
+
+    # apg = all possible genotypes.
+    # Julia v0.6.0 on 2017-06-25:
+    # `apg_labels ::Vector{AbstractString} =DEFAULT_eg_LABELS` resulted in
+    # "ERROR: MethodError: no method matching #assign_genos#301( ::Array{AbstractString,1}, ::QpcrAnalysis.#assign_genos, ::Array{Float64,2}, ::Array{Float64,2}, ::Float64)"
     )
 
     num_channels, num_wells = size(data)

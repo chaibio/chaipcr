@@ -32,7 +32,7 @@ function dispatch(action ::String, request_body ::String)
     end # if isa
 
     # commented out while debugging
-    #result = try
+    result = try
 
         if action == "amplification"
 
@@ -204,9 +204,9 @@ function dispatch(action ::String, request_body ::String)
 
 
     # commented out while debugging
-    #catch err
-    #    err
-    #end # try
+    catch err
+        err
+    end # try
 
     success = !isa(result, Exception)
     response_body = success ? result : JSON.json(OrderedDict("error"=>repr(result)))
@@ -238,20 +238,20 @@ function args2reqb(
     action ::String,
     exp_id ::Integer,
     calib_info ::Union{Integer,OrderedDict};
-    stage_id ::Integer=0,
-    step_id ::Integer=0,
-    ramp_id ::Integer=0,
-    min_reliable_cyc ::Real=5,
-    baseline_method ::String="sigmoid",
-    baseline_cyc_bounds ::AbstractVector=[],
-    guid ::String="",
-    extra_args ::OrderedDict=OrderedDict(),
-    wdb ::String="dflt", # "handle", "dflt", "connect"
-    db_key ::String="default", # "default", "t1", "t2"
-    db_host ::String="localhost",
-    db_usr ::String="root",
-    db_pswd ::String="",
-    db_name ::String="chaipcr",
+    stage_id ::Integer =0,
+    step_id ::Integer =0,
+    ramp_id ::Integer =0,
+    min_reliable_cyc ::Real =5,
+    baseline_method ::String ="sigmoid",
+    baseline_cyc_bounds ::AbstractVector =[],
+    guid ::String ="",
+    extra_args ::OrderedDict =OrderedDict(),
+    wdb ::String ="dflt", # "handle", "dflt", "connect"
+    db_key ::String ="default", # "default", "t1", "t2"
+    db_host ::String ="localhost",
+    db_usr ::String ="root",
+    db_pswd ::String ="",
+    db_name ::String ="chaipcr",
     )
 
     reqb = OrderedDict{typeof(""),Any}("calibration_info"=>calib_info)

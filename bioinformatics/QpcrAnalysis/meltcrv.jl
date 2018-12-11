@@ -1,5 +1,6 @@
 # melt curve analysis
 
+import DataStructures.OrderedDict
 import DataArrays.DataArray
 import StatsBase.countmap
 
@@ -56,8 +57,8 @@ function process_mc(
     # new >>
     exp_id ::Integer,
     stage_id ::Integer,
-    mc_data ::OrderedDict{String,Any},
-    calib_data ::OrderedDict{String,Any};
+    mc_data ::Associative,
+    calib_data ::Associative;
     channel_nums ::AbstractVector =[1],
     # << new
 
@@ -74,7 +75,7 @@ function process_mc(
 	max_tmprtr ::Real =1000, # maximum temperature to analyze
     out_format ::String ="json", # "full", "pre_json", "json"
     verbose ::Bool =false,
-    kwdict_mc_tm_pw ::OrderedDict =OrderedDict() # keyword arguments passed onto `mc_tm_pw`
+    kwdict_mc_tm_pw ::Associative =OrderedDict() # keyword arguments passed onto `mc_tm_pw`
     )
 
     # print_v(println, verbose,
@@ -143,15 +144,14 @@ function process_mc(
     #
     # truncate data where necessary so it fits in 3d matrix
     channel_x_well = mc_data["channel"] * num_fluo_wells + mc_data["well_num"]
-    counts = StatsBase.countmap(channel_x_well)
-    id = channel_x_well .== collect(keys(counts))'
-    shortest = minimum(values(counts))
+    cm = StatsBase.countmap(channel_x_well)
+    println(cm)
+    id = channel_x_well .== collect(keys(cm))'
+    shortest = minimum(values(cm))
     keep = mapslices(x -> reduce(|,x), id .& map(x -> x <= shortest, mapslices(cumsum, id, 1)), 2)
     for var in keys(mc_data)
         filter!(keep, mc_data[var])
     end
-    # << new
-
     fr_ary3 = reshape(
         mc_data["fluorescence_value"],
         shortest, num_fluo_wells, num_channels

@@ -6,9 +6,6 @@ import DataStructures.OrderedDict
 
 const JSON_DIGITS = 6 # number of decimal points for floats in JSON output
 
-const JULIA_ENV = ENV["JULIA_ENV"]
-
-
 
 
 # functions

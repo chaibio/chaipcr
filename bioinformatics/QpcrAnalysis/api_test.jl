@@ -1860,12 +1860,17 @@ function server_tests()
     include("amp_models/sfc_models.jl")
     include("amp_models/types_for_amp_models.jl")
     include("types_for_allelic_discrimination.jl")
-    include("allelic_discrimination.jl")
+    include("allelic_discrimination.jl") # gives error
     include("shared.jl")
     include("deconv.jl")
     include("/mnt/share/amp.jl")
     include("allelic_discrimination.jl")
     calib_info_AIR = 1
+
+    include("/mnt/share/calib.jl")
+    include("/mnt/share/adj_w2wvaf.jl")
+    include("/mnt/share/dispatch.jl")
+    include("/mnt/share/api_test.jl")
 
     # single channel amplification test
     request = JSON.parsefile("/mnt/share/test_1ch_amp.json"; dicttype=OrderedDict)
@@ -1909,11 +1914,11 @@ function server_tests()
     #     http://localhost:8081/experiments/250/amplification`)
 
     # system call\
-    cd bioinformatics/QpcrAnalysis
-    curl \
-        --header "Content-Type: application/json" \
-        --data @../test/test_1ch_amp.json \
-        http://localhost:8081/experiments/250/amplification
+    # cd bioinformatics/QpcrAnalysis
+    # curl \
+    #     --header "Content-Type: application/json" \
+    #     --data @../test/test_1ch_amp.json \
+    #     http://localhost:8081/experiments/250/amplification
 
 end
 

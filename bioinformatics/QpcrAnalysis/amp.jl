@@ -58,8 +58,8 @@ mutable struct AmpStepRampOutput
     coefs ::Array{Float64,3}
     d0 ::Array{Float64,2}
     blsub_fitted ::Array{Float64,3}
-    dr1_pred ::Array{Any,2} #::Array{Float64,3}
-    dr2_pred ::Array{Any,2} #::Array{Float64,3}
+    dr1_pred ::Array{Float64,3}
+    dr2_pred ::Array{Float64,3}
     max_dr1 ::Array{Float64,2}
     max_dr2 ::Array{Float64,2}
     cyc_vals_4cq ::Array{OrderedDict{String,Float64},2}
@@ -87,8 +87,8 @@ end # type AmpStepRampOutput
 struct AmpStepRampOutput2Bjson
     rbbs_ary3 ::Array{Float64,3} # fluorescence after deconvolution and adjusting well-to-well variation
     blsub_fluos ::Array{Float64,3} # fluorescence after baseline subtraction
-    dr1_pred ::Array{Any,2} # ::Array{Float64,3} # dF/dc
-    dr2_pred ::Array{Any,2} # ::Array{Float64,3} # d2F/dc2
+    dr1_pred ::Array{Float64,3} # dF/dc
+    dr2_pred ::Array{Float64,3} # d2F/dc2
     cq ::Array{Float64,2} # cq values, applicable to sigmoid models but not to MAK models
     d0 ::Array{Float64,2} # starting quantity from absolute quanitification
     ct_fluos ::Vector{Float64} # fluorescence thresholds (one value per channel) for Ct method
@@ -110,8 +110,8 @@ function process_amp(
 
     # new >>
     exp_id ::Integer,
-    exp_data ::OrderedDict{String,Any},
-    calib_data ::OrderedDict{String,Any},
+    exp_data ::Associative,
+    calib_data ::Associative,
     # we will assume that any relevant step/ramp information has already been passed along
     # and is present in asrp_vec
     asrp_vec ::Vector{AmpStepRampProperties};
@@ -267,7 +267,11 @@ function process_amp(
 
     out_format_1sr = (out_format == "json" ? "pre_json" : out_format)
 
-    sr_dict = OrderedDict(map(asrp_vec) do asrp
+    # new >>
+    # currently assumes only 1 step/ramp since that data is not included in request
+    # << new
+
+    sr_dict = OrderedDict(map([ asrp_vec[1] ]) do asrp
         process_amp_1sr(
 
             ## remove MySql dependency
@@ -701,8 +705,8 @@ function process_amp_1sr(
     # well_nums ::AbstractVector,
 
     # new >>    
-    exp_data ::OrderedDict{String,Any},
-    calib_data ::OrderedDict{String,Any},
+    exp_data ::Associative,
+    calib_data ::Associative,
     asrp ::AmpStepRampProperties,
     # << new
 
@@ -746,6 +750,16 @@ function process_amp_1sr(
     #     fluo_well_nums, channel_nums
     # )
 
+    # new >>
+    # currently assumes only 1 step/ramp since that data is not included in request
+    cyc_nums = sort(unique(exp_data["cycle_num"]))
+    fluo_well_nums = sort(unique(exp_data["well_num"]))
+    num_cycs, num_fluo_wells, num_channels = map(length, (cyc_nums, fluo_well_nums, channel_nums))
+    fr_ary3 = reshape(
+        exp_data["fluorescence_value"],
+        num_cycs, num_fluo_wells, num_channels
+    )
+    # << new
 
     # perform deconvolution and adjust well-to-well variation in absolute fluorescence
     mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, rbbs_ary3 = dcv_aw(
@@ -761,7 +775,7 @@ function process_amp_1sr(
         # well_nums, 
 
         # new >>
-        calib_data ::OrderedDict{String,Any},
+        calib_data, 
         fluo_well_nums,
         # << new
 
@@ -803,8 +817,8 @@ function process_amp_1sr(
         fill(NaN, 1, num_fluo_wells, num_channels), # coefs # size = 1 for 1st dimension may not be correct for the chosen model
         NaN_ary2, # d0s
         blsub_fitted,
-        zeros(0, 0), # zeros(0, 0, 0), # dr1_pred
-        zeros(0, 0), # zeros(0, 0, 0), # dr2_pred
+        zeros(0, 0, 0), # dr1_pred
+        zeros(0, 0, 0), # dr2_pred
         NaN_ary2, # max_dr1
         NaN_ary2, # max_dr2
         empty_vals_4cq, # cyc_vals_4cq
@@ -893,7 +907,7 @@ function process_amp_1sr(
                 getfield(mbq_ary2[well_i, channel_i], fn_mbq)
                 for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
             ]
-            if fn_mbq in [:blsub_fluos, :coefs, :blsub_fitted] #, :dr1_pred, :dr2_pred]
+            if fn_mbq in [:blsub_fluos, :coefs, :blsub_fitted, :dr1_pred, :dr2_pred]
                 fv = reshape(
                     cat(2, fv...), # 2-dim array of size (`num_cycs` or number of coefs, `num_wells * num_channels`)
                     length(fv[1,1]), size(fv)...

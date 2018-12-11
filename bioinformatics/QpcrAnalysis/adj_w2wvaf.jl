@@ -277,7 +277,7 @@ function prep_adj_w2wvaf(
     channels_in_signal = channels_in_water
     #
     # assume without checking that there are no missing wells anywhere
-    signal_well_nums = range(0,length(signal_data_dict[1]))
+    signal_well_nums = Vector(1:length(signal_data_dict[1]))
     # << new
 
     # check whether signal fluo > water fluo
