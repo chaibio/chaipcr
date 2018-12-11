@@ -236,7 +236,6 @@ function raw_test(raw)
 end
 
 function amplification_request_test(request)
-    measurements=["rbbs_ary3","blsub_fluos","dr1_pred","dr2_pred"]
     @assert (isa(request,OrderedDict))
     @assert (length(request)==11)
     @assert (haskey(request,"experiment_id"))
@@ -1869,6 +1868,11 @@ function server_tests()
     include("allelic_discrimination.jl")
     calib_info_AIR = 1
 
+
+
+
+
+
     include("/mnt/share/calib.jl")
     include("/mnt/share/adj_w2wvaf.jl")
     include("/mnt/share/dispatch.jl")
@@ -1882,6 +1886,8 @@ function server_tests()
     result = dispatch("amplification",String(JSON.json(request)))
     response = JSON.parse(result[2],dicttype=OrderedDict)
     amplification_response_test(response)
+
+
 
 
 

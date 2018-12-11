@@ -224,18 +224,17 @@ function process_mc(
 
     mc_bychwl = hcat(map(collect(values(tf_bychwl))) do tf_bywl
 
-if !DEBUG
-        map(tf_bywl) do tf_dict
-            mc_tm_pw(
-                tf_dict;
-                auto_span_smooth=auto_span_smooth,
-                span_smooth_default=span_smooth_default,
-                span_smooth_factor=span_smooth_factor,
-                verbose=verbose,
-                kwdict_mc_tm_pw...
-            )
-        end # do tf_dict
-else # DEBUG
+        # map(tf_bywl) do tf_dict
+        #    mc_tm_pw(
+        #        tf_dict;
+        #        auto_span_smooth=auto_span_smooth,
+        #        span_smooth_default=span_smooth_default,
+        #        span_smooth_factor=span_smooth_factor,
+        #        verbose=verbose,
+        #        kwdict_mc_tm_pw...
+        #    )
+        # end # do tf_dict
+
         # commented out while debugging because I had
         # trouble loading the smoothing library
         # substitute raw data
@@ -245,7 +244,6 @@ else # DEBUG
                 :Ta_fltd => tf_dict["fluos"]
             )
         end
-end # DEBUG
 
     end...)
 

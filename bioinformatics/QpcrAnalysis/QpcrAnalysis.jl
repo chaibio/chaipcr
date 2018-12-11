@@ -19,9 +19,6 @@
 
 
 
-DEBUG = true
-
-
 # using Base
 
 @time __precompile__()
