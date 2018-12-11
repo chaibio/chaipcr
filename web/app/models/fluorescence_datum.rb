@@ -35,6 +35,30 @@ class FluorescenceDatum < ActiveRecord::Base
     (cycle_num.nil?)? 0 : cycle_num
   end
   
+  def self.fluorescence_for_step(experiment_id, step_id)
+    fluorescence_values = [nil, nil]
+    FluorescenceDatum.for_experiment(experiment_id).where(:step_id=>step_id).each do |data|
+        fluorescence_values[data.channel-1] ||= Array.new
+        fluorescence_values[data.channel-1] << data.fluorescence_value
+    end
+    fluorescence_values
+  end
+  
+  def self.fluorescence_for_id(experiment_id, sub_type, sub_id)
+    results = {}
+    FluorescenceDatum.for_experiment(experiment_id).where("#{sub_type}_id=#{sub_id}").each do |data|
+        results[:fluorescence_value] ||= Array.new
+        results[:well_num] ||= Array.new
+        results[:cycle_num] ||= Array.new
+        results[:channel] ||= Array.new
+        results[:fluorescence_value] << data.fluorescence_value
+        results[:well_num] << data.well_num
+        results[:cycle_num] << data.cycle_num
+        results[:channel] << data.channel
+    end
+    results
+  end
+  
   def well_num
     read_attribute(:well_num)+1
   end
