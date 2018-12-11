@@ -105,8 +105,6 @@ window.ChaiBioTech.ngApp.directive('formatNumber', [ '$filter',
                 frontDigit = frontDigit.substring(0, frontDigit.indexOf('.'));
               }
 
-              console.log('---value---', frontDigit, powDigit, backDigit);
-
               if(viewValue == ''){
                 element.val('');
                 return '';

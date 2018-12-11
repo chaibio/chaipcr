@@ -230,14 +230,14 @@ limitations under the License.
                         </div>
                         <div class="selection-section">
                             <div class="sample-target-section">
-                                <div class="inline-block" ng-class="{opacityLess: !selectionMade}" 
+                                <div class="inline-block" 
                                     style="width: 25%; padding-right: 20px;border-right: 1px solid #eee;">
                                     <div class="section-title">                                        
                                         <h4 class="XB1B">Sample</h4>
                                         <span ng-click="clearWellsByType('Sample')" class="XB1M clear-link" ng-show="selectionMade && selectedCountByType('Sample')">Clear</span>
                                     </div>
                                     <hr>
-                                    <div class="select-style">
+                                    <div class="select-style" ng-class="{opacityLess: !selectionMade}">
 
                                     <!--<select name="repeatSelect" ng-disabled="!selectionMade" ng-model="sampleSelected" ng-change="assignSamples(sampleSelected)" >
                                             <option value=0>Select a sample</option>
@@ -277,7 +277,7 @@ limitations under the License.
 
                                 <div class="inline-block" style="width: 75%;">
                                     <div>
-                                        <div class="inline-block" ng-class="{opacityLess: !selectionMade}" 
+                                        <div class="inline-block"
                                             style="width: 42%;padding: 0 20px;">
                                             <div class="section-title">                                        
                                                 <h4 class="XB1B" ng-if="is_dual_channel">Ch 1 Target</h4>
@@ -285,7 +285,7 @@ limitations under the License.
                                                 <span ng-click="clearWellsByType('Target1')" class="XB1M clear-link" ng-show="selectionMade && selectedCountByType('Target1')">Clear</span>
                                             </div>                                            
                                             <hr>
-                                            <div class="select-style">
+                                            <div class="select-style" ng-class="{opacityLess: !selectionMade}" >
 
                                             <!--    <select name="repeatSelect" ng-disabled="!selectionMade" ng-model="target1Selected" ng-change="assignTarget(target1Selected, '1')" >
                                                     <option value=0>Select a target</option>
@@ -330,28 +330,28 @@ limitations under the License.
                                             </div>
                                         </div>
 
-                                        <div class="inline-block" ng-class="{'disabled-clicking':!enableTarget1Type}" style="width: 33%;padding: 0 20px;">
+                                        <div class="inline-block" style="width: 33%;padding: 0 20px;">
                                             <div class="section-title">                                        
                                                 <h4 class="XB1B">Type</h4>
                                                 <span ng-click="clearTargetWellsByType('Target1')" class="XB1M clear-link" ng-show="selectionMade && selectedCountByTargetType('Target1')">Clear</span>
                                             </div>
                                             <hr>
-                                            <span ng-click="assignTargetType('standard')" class="numberCircle" ng-class="{'target-selected':selectedTarget1Type == 'standard'}">
+                                            <span ng-click="assignTargetType('standard')" class="numberCircle" ng-class="{'target-selected':selectedTarget1Type == 'standard', 'disabled-clicking':!enableTarget1Type}">
                                                 <img src="/images/ring_s.svg">
                                             </span>
-                                            <span ng-click="assignTargetType('unknown')" class="numberCircle" ng-class="{'target-selected':selectedTarget1Type == 'unknown'}">
+                                            <span ng-click="assignTargetType('unknown')" class="numberCircle" ng-class="{'target-selected':selectedTarget1Type == 'unknown', 'disabled-clicking':!enableTarget1Type}">
                                                 <img src="/images/ring_u.svg">
                                             </span>
-                                            <span ng-click="assignTargetType('positive_control')" class="numberCircle" ng-class="{'target-selected':selectedTarget1Type == 'positive_control'}">
+                                            <span ng-click="assignTargetType('positive_control')" class="numberCircle" ng-class="{'target-selected':selectedTarget1Type == 'positive_control', 'disabled-clicking':!enableTarget1Type}">
                                                 <img src="/images/ring_plus.svg">
                                             </span>
-                                            <span ng-click="assignTargetType('negative_control')" class="numberCircle" ng-class="{'target-selected':selectedTarget1Type == 'negative_control'}">
+                                            <span ng-click="assignTargetType('negative_control')" class="numberCircle" ng-class="{'target-selected':selectedTarget1Type == 'negative_control', 'disabled-clicking':!enableTarget1Type}">
                                                 <img src="/images/ring_neg.svg">
                                             </span>
 
                                         </div>
 
-                                        <div class="inline-block" ng-class="{'disabled-clicking':!enableTarget1Qty}" style="width: 25%; padding: 0 0 0 20px;">
+                                        <div class="inline-block" style="width: 25%; padding: 0 0 0 20px;">
                                             <h4 class="XB1B">Quantity</h4>
                                             <hr>
                                             <input class="quantity-input XB1" 
@@ -359,7 +359,9 @@ limitations under the License.
                                                 ng-blur="assignTargetQuantity()"
                                                 ng-keydown="keydownTargetQuantity($event)"
                                                 ng-readonly="!enableTarget1Qty"
-                                                ng-class="{error: error_target1Qty, blank: (!target1Quantity.value)}"
+                                                ng-class="{ error: error_target1Qty, 
+                                                            blank: (!target1Quantity.value.toString().length),
+                                                            'opacityLess':!enableTarget1Qty}"
                                                 format-number
                                                 placeholder="Set"
                                                  />
@@ -368,14 +370,14 @@ limitations under the License.
                                         </div>                                        
                                     </div>
                                     <div ng-if="is_dual_channel">
-                                        <div class="inline-block" ng-class="{opacityLess: !selectionMade}" 
+                                        <div class="inline-block"
                                             style="width: 42%;padding: 0 20px;">
                                             <div class="section-title">                                        
                                                 <h4 class="XB1B">Ch 2 Target</h4>
                                                 <span ng-click="clearWellsByType('Target2')" class="XB1M clear-link" ng-show="selectionMade && selectedCountByType('Target2')">Clear</span>
                                             </div>
                                             <hr>
-                                            <div ng-click="openTarget2Options()" class="select-style">
+                                            <div ng-click="openTarget2Options()" class="select-style"  ng-class="{opacityLess: !selectionMade}">
 
                                                 <!--<select name="repeatSelect" ng-disabled="!selectionMade" ng-model="target2Selected" ng-change="assignTarget(target2Selected, '2')" >
                                                     <option value=0>Select a target</option>
@@ -413,29 +415,29 @@ limitations under the License.
 
                                         </div>
 
-                                        <div class="inline-block" ng-class="{'disabled-clicking':!enableTarget2Type}" 
+                                        <div class="inline-block"
                                             style="width: 33%;padding: 0 20px;">
                                             <div class="section-title">                                        
                                                 <h4 class="XB1B">Type</h4>
                                                 <span ng-click="clearTargetWellsByType('Target2')" class="XB1M clear-link" ng-show="selectionMade && selectedCountByTargetType('Target2')">Clear</span>
                                             </div>                                            
                                             <hr>
-                                            <span ng-click="assignTarget2Type('standard')" class="numberCircle" ng-class="{'target-selected':selectedTarget2Type == 'standard'}">
+                                            <span ng-click="assignTarget2Type('standard')" class="numberCircle" ng-class="{'target-selected':selectedTarget2Type == 'standard', 'disabled-clicking':!enableTarget2Type}">
                                                 <img src="/images/ring_s.svg">
                                             </span>
-                                            <span ng-click="assignTarget2Type('unknown')" class="numberCircle" ng-class="{'target-selected':selectedTarget2Type == 'unknown'}">
+                                            <span ng-click="assignTarget2Type('unknown')" class="numberCircle" ng-class="{'target-selected':selectedTarget2Type == 'unknown', 'disabled-clicking':!enableTarget2Type}">
                                                 <img src="/images/ring_u.svg">
                                             </span>
-                                            <span ng-click="assignTarget2Type('positive_control')" class="numberCircle" ng-class="{'target-selected':selectedTarget2Type == 'positive_control'}">
+                                            <span ng-click="assignTarget2Type('positive_control')" class="numberCircle" ng-class="{'target-selected':selectedTarget2Type == 'positive_control', 'disabled-clicking':!enableTarget2Type}">
                                                 <img src="/images/ring_plus.svg">
                                             </span>
-                                            <span ng-click="assignTarget2Type('negative_control')" class="numberCircle" ng-class="{'target-selected':selectedTarget2Type == 'negative_control'}">
+                                            <span ng-click="assignTarget2Type('negative_control')" class="numberCircle" ng-class="{'target-selected':selectedTarget2Type == 'negative_control', 'disabled-clicking':!enableTarget2Type}">
                                                 <img src="/images/ring_neg.svg">
                                             </span>
 
                                         </div>
 
-                                        <div class="inline-block" ng-class="{'disabled-clicking':!enableTarget2Qty}" 
+                                        <div class="inline-block"
                                             style="width: 25%;padding: 0 0 0 20px;">
                                             <h4 class="XB1B">Quantity</h4>
                                             <hr>
@@ -443,7 +445,8 @@ limitations under the License.
                                             ng-blur="assignTarget2Quantity()" 
                                             ng-keydown="keydownTarget2Quantity($event)"
                                             ng-readonly="!enableTarget2Qty"
-                                            ng-class="{error: error_target2Qty, blank: (!target2Quantity.value)}"
+                                            ng-class="{ error: error_target2Qty, 
+                                                        blank: (!target2Quantity.value.toString().length), 'opacityLess':!enableTarget2Qty}"
                                             format-number
                                             placeholder="Set"
                                              />

@@ -106,7 +106,7 @@ background: repeating-linear-gradient(-60deg, #F5F5F5, #F5F5F5 1px, white 4px, w
 
 .disabled-clicking{
 	pointer-events: none;
-	opacity: 0.5;
+	opacity: 0.25 !important;
 }
 
 .hiding-div{
