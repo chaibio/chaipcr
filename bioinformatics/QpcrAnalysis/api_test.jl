@@ -188,13 +188,11 @@ function calibration_test(calib)
         @assert (haskey(calib[condition],"fluorescence_value"))
         @assert (isa(calib[condition]["fluorescence_value"],Array))
         @assert (length(calib[condition]["fluorescence_value"])<=2)
-        for channel in range(1,n_channels)
-            if (condition=="water"||condition==channel)
-                @assert (isa(calib[condition]["fluorescence_value"][channel],Array))
-                @assert (length(calib[condition]["fluorescence_value"][channel])==n_wells)
-                for i in range(1,n_wells)
-                            @assert (isa(calib[condition]["fluorescence_value"][channel][i],Number))
-                end
+    for channel in range(1,n_channels)
+            @assert (isa(calib[condition]["fluorescence_value"][channel],Array))
+            @assert (length(calib[condition]["fluorescence_value"][channel])==n_wells)
+            for i in range(1,n_wells)
+                        @assert (isa(calib[condition]["fluorescence_value"][channel][i],Number))
             end
         end
     end
@@ -237,7 +235,6 @@ end
 
 function amplification_request_test(request)
     @assert (isa(request,OrderedDict))
-    @assert (length(request)==11)
     @assert (haskey(request,"experiment_id"))
     @assert (isa(request["experiment_id"],Integer))
     if (haskey(request,"step_id"))
@@ -247,31 +244,38 @@ function amplification_request_test(request)
     end
     @assert (haskey(request,id))
     @assert (isa(request[id],Integer))
-    @assert (haskey(request,"min_reliable_cyc"))
-    @assert (isa(request["min_reliable_cyc"],Integer))
-    @assert (haskey(request,"baseline_cyc_bounds"))
-    @assert (isa(request["baseline_cyc_bounds"],Array))
-    if (length(request["baseline_cyc_bounds"])>0)
-        @assert (length(request["baseline_cyc_bounds"])==2)
-        @assert (isa(request["baseline_cyc_bounds"][1],Integer))
-        @assert (isa(request["baseline_cyc_bounds"][2],Integer))
+    if (haskey(request,"min_reliable_cyc"))
+        @assert (isa(request["min_reliable_cyc"],Integer))
     end
-    @assert (haskey(request,"baseline_method"))
-    @assert (isa(request["baseline_method"],String))
-    @assert (
-        request["baseline_method"] == "sigmoid" ||
-        request["baseline_method"] == "linear"  ||
-        request["baseline_method"] == "median" 
-    )
-    @assert (haskey(request,"cq_method"))
-    @assert (isa(request["cq_method"],String))
-    @assert (request["cq_method"] == "Cy0")
-    @assert (haskey(request,"min_fluomax"))
-    @assert (isa(request["min_fluomax"],Number))
-    @assert (haskey(request,"min_D1max"))
-    @assert (isa(request["min_D1max"],Number))
-    @assert (haskey(request,"min_D2max"))
-    @assert (isa(request["min_D2max"],Number))
+    if (haskey(request,"baseline_cyc_bounds"))
+        @assert (isa(request["baseline_cyc_bounds"],Array))
+        if (length(request["baseline_cyc_bounds"])>0)
+            @assert (length(request["baseline_cyc_bounds"])==2)
+            @assert (isa(request["baseline_cyc_bounds"][1],Integer))
+            @assert (isa(request["baseline_cyc_bounds"][2],Integer))
+        end
+    end
+    if (haskey(request,"baseline_method"))
+        @assert (isa(request["baseline_method"],String))
+        @assert (
+            request["baseline_method"] == "sigmoid" ||
+            request["baseline_method"] == "linear"  ||
+            request["baseline_method"] == "median" 
+        )
+    end
+    if (haskey(request,"cq_method"))
+        @assert (isa(request["cq_method"],String))
+        @assert (request["cq_method"] in ["cp_dr1","cp_dr2","Cy0","ct"])
+    end
+    if (haskey(request,"min_fluomax"))
+        @assert (isa(request["min_fluomax"],Number))
+    end
+    if (haskey(request,"min_D1max"))
+        @assert (isa(request["min_D1max"],Number))
+    end
+    if (haskey(request,"min_D2max"))
+        @assert (isa(request["min_D2max"],Number))
+    end
     @assert (haskey(request,"calibration_info"))
     @assert (haskey(request,"raw_data"))
     raw=request["raw_data"]
@@ -1870,7 +1874,8 @@ function server_tests()
     include("/mnt/share/amp.jl")
     include("allelic_discrimination.jl")
     calib_info_AIR = 1
-    const K4DCV = JLD.load("$LOAD_FROM_DIR/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv"]
+    const k = JLD.load("$LOAD_FROM_DIR/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv"]
+    const K4DCV = K4Deconv(k.k_s, k.k_inv_vec, k.inv_note)
 
 
 

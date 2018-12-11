@@ -48,11 +48,11 @@ suites:
       inspec_tests: 
         - test/integration/master
     attributes:
-#  - name: development
-#    provisioner:
-#      policyfile: policyfile_vm_development.rb
-#    run_list:
-#    verifier:
-#      inspec_tests: 
-#        - test/integration/development
-#    attributes:
+  - name: development
+    provisioner:
+      policyfile: policyfile_vm_development.rb
+    run_list:
+    verifier:
+      inspec_tests: 
+        - test/integration/master
+    attributes:

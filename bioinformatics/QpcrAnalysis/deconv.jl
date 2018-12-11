@@ -102,8 +102,10 @@ function get_k(
     # dcv_exp_info ::OrderedDict, 
 
     # new >>
-    # issue:
+    # possible issue:
     # step_ids are not provided together with calibration data
+    # i'm not sure that this is a problem because the calibration data
+    # in the request body is already specific to a single step.
     calib_data ::Associative,
     # << new
 
