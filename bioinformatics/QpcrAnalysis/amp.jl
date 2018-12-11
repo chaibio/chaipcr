@@ -743,6 +743,7 @@ function process_amp_1sr(
 
     ## remove MySql dependency
     #
+    ## fr_ary3 = fluo_raw_array_3d
     # fr_ary3 = get_amp_data(
     #     db_conn,
     #     "fluorescence_value", # "fluorescence_value" or "baseline_value"

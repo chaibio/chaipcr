@@ -236,6 +236,7 @@ function raw_test(raw)
 end
 
 function amplification_request_test(request)
+    measurements=["rbbs_ary3","blsub_fluos","dr1_pred","dr2_pred"]
     @assert (isa(request,OrderedDict))
     @assert (length(request)==11)
     @assert (haskey(request,"experiment_id"))
@@ -1845,7 +1846,6 @@ function server_tests()
     push!(LOAD_PATH,pwd())
     using QpcrAnalysis
 
-    import Clustering.ClusteringResult
     import DataStructures.OrderedDict
     import JuMP.@variable
     import JuMP.@objective
@@ -1857,6 +1857,8 @@ function server_tests()
     import JuMP.getvalue
     import JuMP.getobjectivevalue
     import DataArrays.DataArray
+    import Clustering: ClusteringResult, kmeans!, kmedoids!, silhouettes
+    import Combinatorics.combinations
     include("amp_models/sfc_models.jl")
     include("amp_models/types_for_amp_models.jl")
     include("types_for_allelic_discrimination.jl")
@@ -1873,7 +1875,9 @@ function server_tests()
     include("/mnt/share/api_test.jl")
 
     # single channel amplification test
-    request = JSON.parsefile("/mnt/share/test_1ch_amp.json"; dicttype=OrderedDict)
+    #request = JSON.parsefile("/mnt/share/test_1ch_amp.json"; dicttype=OrderedDict)
+    #request = JSON.parsefile("/mnt/share/xh-amp1.json"; dicttype=OrderedDict)
+    request = JSON.parsefile("/mnt/share/xh-amp2.json"; dicttype=OrderedDict)
     amplification_request_test(request)
     result = dispatch("amplification",String(JSON.json(request)))
     response = JSON.parse(result[2],dicttype=OrderedDict)
@@ -1881,6 +1885,9 @@ function server_tests()
 
 
 
+    
+    LOAD_FROM_DIR = "/home/vagrant/chaipcr/bioinformatics/QpcrAnalysis"
+    include("supsmu.jl")
     include("/mnt/share/api_test.jl")
     include("/mnt/share/calib.jl")
     include("/mnt/share/dispatch.jl")
@@ -1890,6 +1897,8 @@ function server_tests()
     request = JSON.parsefile("/mnt/share/test_1ch_mc.json"; dicttype=OrderedDict)
     meltcurve_request_test(request)
     result = dispatch("meltcurve",String(JSON.json(request)))
+
+
 
 
     response = JSON.parse(result[2],dicttype=OrderedDict)

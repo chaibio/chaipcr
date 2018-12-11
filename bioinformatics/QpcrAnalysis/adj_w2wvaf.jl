@@ -87,99 +87,99 @@ function check_subset(small ::Ccsc, big ::Ccsc)
 end
 
 
-# function: get well-to-well variation in absolute fluorescence (wva)
-# deprecated to remove MySQL dependency
-function get_wva_data(
-    # calib_id_s and step_id_s as OrderedDict are expected to be OrderedDict{T,T} where T <: Integer
-    calib_id_s ::Union{Integer,OrderedDict},
-    step_id_s ::Union{Integer,OrderedDict},
-    db_conn ::MySQL.MySQLHandle,
-    calib_id_key_isa ::String, # "channel" or "dye"
-    well_nums ::AbstractVector
-    )
-
-    step_id_s_uniq = isa(step_id_s, Integer) ? unique(step_id_s) : unique(values(step_id_s))
-    len_step_id_s_uniq = length(step_id_s_uniq)
-
-    if isa(calib_id_s, Integer) && len_step_id_s_uniq == 1
-        calib_id = calib_id_s
-        step_id = step_id_s_uniq[1]
-        calib_qry_2b =  "
-            SELECT fluorescence_value, well_num, channel
-                FROM fluorescence_data
-                WHERE
-                    experiment_id = $calib_id AND
-                    step_id = $step_id AND
-                    cycle_num = 1 AND
-                    step_id is not NULL
-                    well_constraint
-                ORDER BY well_num, channel
-        "
-        calib_nt, complete_well_nums = get_mysql_data_well(
-            well_nums, calib_qry_2b, db_conn, false)
-        calib_id_key_vec = channels_in_df = unique(calib_nt[:channel])
-        wva_vecs_byky = map(channels_in_df) do channel_in_df
-            wva_vec = map(
-                AbstractFloat, # integer values may cause type issues for downstream computation
-                calib_nt[:fluorescence_value][calib_nt[:channel] .== channel_in_df]
-            )
-            return wva_vec
-        end # do channel_in_df
-
-    elseif !isa(calib_id_s, Integer) || len_step_id_s_uniq > 1
-
-        calib_id_key_vec = get_ordered_keys(step_id_s)
-
-        if isa(calib_id_s, Integer) && len_uniq_step_id_s > 1
-            calib_id_s = OrderedDict([calib_id_key => calib_id_s for calib_id_key in calib_id_key_vec])
-        end
-
-        wva_vecs_byky = Array{Array{AbstractFloat,1},1}()
-        well_nums_dupd = Vector{Vector}()
-        for calib_id_key in calib_id_key_vec
-            if calib_id_key_isa == "channel" # String
-                channel = calib_id_key
-            elseif calib_id_key_isa == "dye" #
-                channel = DYE2CHST[calib_id_key]["channel"]
-            else
-                error("If multiple experiments are used for calibration, `calib_id_key_isa` needs to be \"channel\" or \"dye\". ")
-            end
-            wva_qry_2b = "
-                SELECT fluorescence_value, well_num
-                FROM fluorescence_data
-                WHERE
-                    experiment_id = $(calib_id_s[calib_id_key]) AND
-                    step_id = $(step_id_s[calib_id_key]) AND
-                    channel = $channel AND
-                    cycle_num = 1 AND
-                    step_id is not NULL
-                    well_constraint
-                ORDER BY well_num
-            "
-            wva_nt, found_well_nums = get_mysql_data_well(
-                well_nums, wva_qry_2b, db_conn, false)
-            push!(wva_vecs_byky, wva_nt[:fluorescence_value])
-            push!(well_nums_dupd, found_well_nums)
-        end
-        complete_well_nums = intersect(well_nums_dupd...)
-
-    else # len_step_id_s_uniq < 1
-        error("Lengths of `calib_id_s` and `step_id_s` need to be greater than 0. ")
-
-    end # if
-
-    if length(well_nums) > length(complete_well_nums) # not use `setdiff` because `well_nums` may be `[]` to select all available wells
-        error("Calibration data are not complete for these wells: $(join(setdiff(well_nums, complete_well_nums), ", ")). ")
-    end
-
-    wva_data_dict = OrderedDict([
-        calib_id_key_vec[i] => wva_vecs_byky[i]
-        for i in 1:length(calib_id_key_vec)
-    ])
-
-    return wva_data_dict, calib_id_key_vec, complete_well_nums # Tuple{DataStructures.OrderedDict{Any,Any}, DataArrays.DataArrays{Int8,1}, DataArrays.DataArray{Int32,1} }
-
-end # get_wva_data
+## function: get well-to-well variation in absolute fluorescence (wva)
+## deprecated to remove MySQL dependency
+# function get_wva_data(
+#    # calib_id_s and step_id_s as OrderedDict are expected to be OrderedDict{T,T} where T <: Integer
+#    calib_id_s ::Union{Integer,OrderedDict},
+#    step_id_s ::Union{Integer,OrderedDict},
+#    db_conn ::MySQL.MySQLHandle,
+#    calib_id_key_isa ::String, # "channel" or "dye"
+#    well_nums ::AbstractVector
+#    )
+#
+#    step_id_s_uniq = isa(step_id_s, Integer) ? unique(step_id_s) : unique(values(step_id_s))
+#    len_step_id_s_uniq = length(step_id_s_uniq)
+#
+#    if isa(calib_id_s, Integer) && len_step_id_s_uniq == 1
+#        calib_id = calib_id_s
+#        step_id = step_id_s_uniq[1]
+#        calib_qry_2b =  "
+#            SELECT fluorescence_value, well_num, channel
+#                FROM fluorescence_data
+#                WHERE
+#                    experiment_id = $calib_id AND
+#                    step_id = $step_id AND
+#                    cycle_num = 1 AND
+#                    step_id is not NULL
+#                    well_constraint
+#                ORDER BY well_num, channel
+#        "
+#        calib_nt, complete_well_nums = get_mysql_data_well(
+#            well_nums, calib_qry_2b, db_conn, false)
+#        calib_id_key_vec = channels_in_df = unique(calib_nt[:channel])
+#        wva_vecs_byky = map(channels_in_df) do channel_in_df
+#            wva_vec = map(
+#                AbstractFloat, # integer values may cause type issues for downstream computation
+#                calib_nt[:fluorescence_value][calib_nt[:channel] .== channel_in_df]
+#            )
+#            return wva_vec
+#        end # do channel_in_df
+#
+#    elseif !isa(calib_id_s, Integer) || len_step_id_s_uniq > 1
+#
+#        calib_id_key_vec = get_ordered_keys(step_id_s)
+#
+#        if isa(calib_id_s, Integer) && len_uniq_step_id_s > 1
+#            calib_id_s = OrderedDict([calib_id_key => calib_id_s for calib_id_key in calib_id_key_vec])
+#        end
+#
+#        wva_vecs_byky = Array{Array{AbstractFloat,1},1}()
+#        well_nums_dupd = Vector{Vector}()
+#        for calib_id_key in calib_id_key_vec
+#            if calib_id_key_isa == "channel" # String
+#                channel = calib_id_key
+#            elseif calib_id_key_isa == "dye" #
+#                channel = DYE2CHST[calib_id_key]["channel"]
+#            else
+#                error("If multiple experiments are used for calibration, `calib_id_key_isa` needs to be \"channel\" or \"dye\". ")
+#            end
+#            wva_qry_2b = "
+#                SELECT fluorescence_value, well_num
+#                FROM fluorescence_data
+#                WHERE
+#                    experiment_id = $(calib_id_s[calib_id_key]) AND
+#                    step_id = $(step_id_s[calib_id_key]) AND
+#                    channel = $channel AND
+#                    cycle_num = 1 AND
+#                    step_id is not NULL
+#                    well_constraint
+#                ORDER BY well_num
+#            "
+#            wva_nt, found_well_nums = get_mysql_data_well(
+#                well_nums, wva_qry_2b, db_conn, false)
+#            push!(wva_vecs_byky, wva_nt[:fluorescence_value])
+#            push!(well_nums_dupd, found_well_nums)
+#        end
+#        complete_well_nums = intersect(well_nums_dupd...)
+#
+#    else # len_step_id_s_uniq < 1
+#        error("Lengths of `calib_id_s` and `step_id_s` need to be greater than 0. ")
+#
+#    end # if
+#
+#    if length(well_nums) > length(complete_well_nums) # not use `setdiff` because `well_nums` may be `[]` to select all available wells
+#        error("Calibration data are not complete for these wells: $(join(setdiff(well_nums, complete_well_nums), ", ")). ")
+#    end
+#
+#    wva_data_dict = OrderedDict([
+#        calib_id_key_vec[i] => wva_vecs_byky[i]
+#        for i in 1:length(calib_id_key_vec)
+#    ])
+#
+#    return wva_data_dict, calib_id_key_vec, complete_well_nums # Tuple{DataStructures.OrderedDict{Any,Any}, DataArrays.DataArrays{Int8,1}, DataArrays.DataArray{Int32,1} }
+#
+# end # get_wva_data
 
 
 # function: check whether the data in optical calibration experiment is valid

@@ -1,6 +1,6 @@
 # wrapper for Fortran subroutine `supsmu` (Friedman 1984)
 
-const libsupsmu = "$LOAD_FROM_DIR/_supsmu.so"
+const libsupsmu = "$LOAD_FROM_DIR/_supsmu_unix.so"
 
 function supsmu(
     X::AbstractVector,
@@ -10,7 +10,7 @@ function supsmu(
     periodic::Bool=false,
     alpha_bass::Real=0, # controles high frequency (small span) penality used with automatic span selection (bass tone control). (alpha.le.0.0 or alpha.gt.10.0 => no effect.)
     x_sorted::Bool=true
-    # IntT_Fortran::DataType=Int32, FloatT_Fortran::DataType=Float32 # Julia DataTypes of integer and float copatible with the Fortran subroutine `supsmu`
+    # IntT_Fortran::DataType=Int32, FloatT_Fortran::DataType=Float32 # Julia DataTypes of integer and float compatible with the Fortran subroutine `supsmu`
     )
 
     if ndims(X) > 1 || ndims(Y) > 1

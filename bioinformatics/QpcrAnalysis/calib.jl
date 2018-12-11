@@ -58,9 +58,17 @@ function dcv_aw(
         well_nums_found_in_fr = wva_well_nums
     end
 
-    wva_well_idc_wfluo = find(wva_well_nums) do wva_well_num
-        wva_well_num in well_nums_found_in_fr
-    end # do wva_well_num
+    ## remove MySql dependency
+    #
+    # wva_well_idc_wfluo = find(wva_well_nums) do wva_well_num
+    #     wva_well_num in well_nums_found_in_fr
+    # end # do wva_well_num
+
+    # new >>
+    # we can't match well numbers between calibration data and experimental data
+    # because we don't have that information for the calibration data
+    wva_well_idc_wfluo = wva_well_nums
+    # << new
 
     # subtract background
     # mw = minus water
