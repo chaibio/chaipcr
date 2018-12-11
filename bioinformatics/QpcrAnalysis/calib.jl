@@ -43,7 +43,7 @@ function dcv_aw(
 
     # new >>
     # assume without checking that we are using all the wells, all the time
-    well_nums_in_req = range(0,length(calib_data["water"]["fluorescence_value"][1]))
+    well_nums_in_req = [i for i in range(0,length(calib_data["water"]["fluorescence_value"][1]))]
     #
     # prepare data to adjust well-to-well variation in absolute fluorescence values
     wva_data, wva_well_nums = prep_adj_w2wvaf(calib_data, well_nums_in_req, dye_in, dyes_2bfild)
@@ -78,15 +78,26 @@ function dcv_aw(
 
     if dcv
 
-        ## this feature disabled while removing MySql dependency
-        #
         ## addition with flexible ratio instead of deconvolution (commented out)
         ## k_inv_vec = fill(reshape(DataArray([1, 0, 1, 0]), 2, 2), 16) 
         
+        ## removing MySql dependency
+        #
+        # k4dcv, dcvd_ary3 = deconV(
+        #     1. * mw_ary3, channel_nums, wva_well_idc_wfluo, db_conn, calib_info, well_nums_in_req;
+        #     out_format="array"
+        # )
+
+        # new >>
         k4dcv, dcvd_ary3 = deconV(
-            1. * mw_ary3, channel_nums, wva_well_idc_wfluo, db_conn, calib_info, well_nums_in_req;
+            1. * mw_ary3,
+            channel_nums,
+            wva_well_idc_wfluo,
+            calib_data,
+            well_nums_in_req;
             out_format="array"
         )
+        # << new
 
     else
         k4dcv = K4DCV_EMPTY
@@ -121,6 +132,56 @@ function dcv_aw(
     return (mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, dcvd_aw...)
 
 end # dcv_aw
+
+
+## deprecated to remove MySql dependency
+#
+## get all the data from a calibration experiment, including data from all the channels for all the steps
+# function get_full_calib_data(
+#    db_conn::MySQL.MySQLHandle,
+#    calib_info::OrderedDict,
+#    well_nums::AbstractVector=[]
+#    )
+#
+#    calib_info = ensure_ci(db_conn, calib_info)
+#
+#    calib_key_vec = get_ordered_keys(calib_info)
+#    cd_key_vec = calib_key_vec[2:end] # cd = channel of dye. "water" is index 1 per original order.
+#    channel_nums = map(cd_key_vec) do cd_key
+#        parse(Int, split(cd_key, "_")[2])
+#    end
+#    num_channels = length(channel_nums)
+#
+#    calib_dict = OrderedDict(map(calib_key_vec) do calib_key
+#        exp_id = calib_info[calib_key]["calibration_id"]
+#        step_id = calib_info[calib_key]["step_id"]
+#        k_qry_2b = "
+#            SELECT fluorescence_value, well_num, channel
+#                FROM fluorescence_data
+#                WHERE
+#                    experiment_id = $exp_id AND
+#                    step_id = $step_id AND
+#                    cycle_num = 1 AND
+#                    step_id is not NULL
+#                    well_constraint
+#                ORDER BY well_num, channel
+#        "
+#        calib_data_1key, calib_well_nums = get_mysql_data_well(
+#            well_nums, k_qry_2b, db_conn, false
+#        )
+#        if length(well_nums) > 0 && Set(calib_well_nums) != Set(well_nums)
+#            error("Experiment $exp_id, step $step_id: calibration data is not found for all the wells requested. ")
+#        end # if
+#        calib_data_1key_chwl = vcat(map(channel_nums) do channel
+#            transpose(calib_data_1key[:fluorescence_value][calib_data_1key[:channel] .== channel])
+#        end...) # do channel. return an array where rows indexed by channels and columns indexed by wells
+#
+#        return calib_key => (calib_data_1key_chwl, calib_well_nums)
+#    end)
+#
+#    return calib_dict # share the same keys as `calib_info`
+#
+# end # get_full_calib_data
 
 
 # perform deconvolution and adjustment of well-to-well variation on calibration experiment 1

@@ -1843,7 +1843,8 @@ function server_tests()
     # 
     #
     push!(LOAD_PATH,pwd())
-    using QpcrAnalysis
+    LOAD_FROM_DIR=pwd()
+    #using QpcrAnalysis
 
     import DataStructures.OrderedDict
     import JuMP.@variable
@@ -1858,25 +1859,29 @@ function server_tests()
     import DataArrays.DataArray
     import Clustering: ClusteringResult, kmeans!, kmedoids!, silhouettes
     import Combinatorics.combinations
+    import JLD.load
+    import JSON
     include("amp_models/sfc_models.jl")
     include("amp_models/types_for_amp_models.jl")
     include("types_for_allelic_discrimination.jl")
     include("allelic_discrimination.jl") # gives error
     include("shared.jl")
-    include("deconv.jl")
+    include("/mnt/share/deconv.jl")
     include("/mnt/share/amp.jl")
     include("allelic_discrimination.jl")
     calib_info_AIR = 1
+    const K4DCV = JLD.load("$LOAD_FROM_DIR/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv"]
 
 
 
 
 
-
+    include("/mnt/share/amp.jl")
     include("/mnt/share/calib.jl")
     include("/mnt/share/adj_w2wvaf.jl")
     include("/mnt/share/dispatch.jl")
     include("/mnt/share/api_test.jl")
+    include("/mnt/share/deconv.jl")
 
     # single channel amplification test
     #request = JSON.parsefile("/mnt/share/test_1ch_amp.json"; dicttype=OrderedDict)

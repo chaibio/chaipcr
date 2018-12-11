@@ -32,6 +32,11 @@ function deconV(
     # calib_info ::Union{Integer,OrderedDict}=calib_info_AIR,
     # well_nums ::AbstractVector=[];
 
+    # new >>
+    calib_data ::Associative,
+    well_nums ::AbstractVector =[];
+    # << new
+
     # keyword arguments
     k4dcv_backup ::K4Deconv =K4DCV,
     scaling_factor_dcv_vec ::AbstractVector =SCALING_FACTOR_deconv_vec,
@@ -49,6 +54,11 @@ function deconV(
     #     length_step_ids = length(step_ids)
     #     length_step_ids <= 2 || length(unique(step_ids)) < length_step_ids
     # end) ? k4dcv_backup : get_k(db_conn, calib_info, well_nums) # use default `well_proc` value
+
+    # new >>
+    # ignore k4dcv_backup
+    k4dcv = get_k(calib_data, well_nums)
+    # << new
 
     k_inv_vec = k4dcv.k_inv_vec
 
@@ -86,13 +96,15 @@ function get_k(
     ## remove MySql dependency
     #
     # db_conn ::MySQL.MySQLHandle,
-    # 
+    
     ## info on experiment(s) used to calculate matrix k
     ## OrderedDict("water"=OrderedDict(calibration_id=..., step_id=...), "channel_1"=OrderedDict(calibration_id=..., step_id=...),  "channel_2"=OrderedDict(calibration_id=...", step_id=...) 
     # dcv_exp_info ::OrderedDict, 
 
     # new >>
-    calib_data ::OrderedDict{String,Any},
+    # issue:
+    # step_ids are not provided together with calibration data
+    calib_data ::Associative,
     # << new
 
     well_nums ::AbstractVector =[];
@@ -112,25 +124,39 @@ function get_k(
     # 
     # water_data, water_well_nums = dcv_data_dict["water"]
     # num_wells = length(water_well_nums)
-
+    #
     # `dcv_well_nums` is not passed on because expected to be the same as `water_well_nums`,
     # otherwise error will be raised by `get_full_calib_data`
-    k4dcv_bydy = OrderedDict(map(cd_key_vec) do cd_key
-        k_data_1dye, dcv_well_nums = dcv_data_dict[cd_key]
-        return cd_key => k_data_1dye .- water_data
+    # k4dcv_bydy = OrderedDict(map(cd_key_vec) do cd_key
+    #    k_data_1dye, dcv_well_nums = dcv_data_dict[cd_key]
+    #    return cd_key => k_data_1dye .- water_data
+    # end) 
+
+    # new >>
+    # better to rely on name of keys than order of keys
+    cd_key_vec = collect(keys(calib_data))
+    filter!(x -> x != "water", cd_key_vec) # cd = channel of dye.
+    water_data = reduce(hcat,calib_data["water"]["fluorescence_value"])'
+    #
+    # no information on well numbers so make default assumptions
+    num_wells = size(water_data)[2]
+    water_well_nums = [i for i in range(1,num_wells)]
+    #
+    channel_nums = map(cd_key_vec) do cd_key
+        parse(Int, split(cd_key, "_")[2])
+    end
+    k4dcv_bydy = OrderedDict(map(channel_nums) do channel
+        signal_data = reduce(hcat,calib_data[cd_key_vec[channel]]["fluorescence_value"])'
+        return cd_key_vec[channel] => signal_data .- water_data
     end) 
+    # << new
 
     # assuming `cd_key` (in the format of "channel_1", "channel_2", etc.) is the target channel of the dye,
     # check whether the water-subtracted signal in target channel is greater than that in non-target channel
     # for each well and each dye.
 
     stop_msgs = Vector{String}()
-
-    channel_nums = map(cd_key_vec) do cd_key
-        parse(Int, split(cd_key, "_")[2])
-    end
-
-    for target_channel_i in 1:length(channel_nums)
+    for target_channel_i in channel_nums
         signals = k4dcv_bydy[cd_key_vec[target_channel_i]]
         target_signals = signals[target_channel_i, :]
         for non_target_channel_i in setdiff(channel_nums, target_channel_i)
@@ -146,7 +172,6 @@ function get_k(
             end # if
         end # for non_target_channel_i
     end # for channel_i
-
     if (length(stop_msgs) > 0)
         error(join(stop_msgs, ""))
     end
@@ -191,7 +216,7 @@ function get_k(
                     throw(err)
                 end # if isa(err
             end # try
-        end # for
+        end # next well
         if length(singular_well_nums) > 0
             inv_note_pt1 = "Well(s) $(join(singular_well_nums, ", "))"
         end # if length
