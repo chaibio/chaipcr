@@ -713,7 +713,6 @@ end
 
 function meltcurve_request_test(request)
     @assert (isa(request,OrderedDict))
-    @assert (length(request)==8)
     @assert (haskey(request,"experiment_id"))
     @assert (isa(request["experiment_id"],Integer))
     @assert (haskey(request,"stage_id"))
@@ -727,12 +726,15 @@ function meltcurve_request_test(request)
     else
         @assert (request["channel_nums"]==[1,2])
     end
-    @assert (haskey(request,"qt_prob"))
-    @assert (isa(request["qt_prob"],Number))
-    @assert (haskey(request,"max_normd_qtv"))
-    @assert (isa(request["max_normd_qtv"],Number))
-    @assert (haskey(request,"top_N"))
-    @assert (isa(request["top_N"],Integer))
+    if (haskey(request,"qt_prob"))
+        @assert (isa(request["qt_prob"],Number))
+    end
+    if (haskey(request,"max_normd_qtv"))
+        @assert (isa(request["max_normd_qtv"],Number))
+    end
+    if (haskey(request,"top_N"))
+        @assert (isa(request["top_N"],Integer))
+    end
     @assert (haskey(request,"raw_data"))
     raw=request["raw_data"]
     calibration_test(calib) && raw_test(raw)
