@@ -64,11 +64,13 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 		$scope.showClearOptions = false;
 		$scope.target1Quantity = {
 			value: null,
-			original_value: null
+			quantityM: null,
+			quantityB: null
 		};
 		$scope.target2Quantity = {
 			value: null,
-			original_value: null
+			quantityM: null,
+			quantityB: null
 		};
 
 		$scope.selectionMade = false;
@@ -426,6 +428,16 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 		$scope.$watch('target1Quantity.value', function(val, oldVal) {
 			if($scope.dragging) return;
 
+			var m1 = '', b1 = '';
+			if($scope.target1Quantity.value){
+				var stn = Number($scope.target1Quantity.value);
+				var data = stn.toExponential().toString().split(/[eE]/);
+				m1 = Number(data[0]);
+				b1 = Number(data[1]);				
+			}
+			$scope.target1Quantity.quantityM = (m1) ? m1.toFixed(2) : '';
+			$scope.target1Quantity.quantityB = b1;
+
 			if(!validateTarget1Quantity()){
 				$scope.error_target1Qty = 'Must be greater than zero';
 				for (i = 0; i < 16; i++) {
@@ -436,13 +448,6 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 				}
 			} else {
 				$scope.error_target1Qty = '';
-				var m1 = '', b1 = '';
-				if($scope.target1Quantity.value){
-					var stn = Number($scope.target1Quantity.value);
-					var data = stn.toExponential().toString().split(/[eE]/);
-					m1 = Number(data[0]);
-					b1 = Number(data[1]);				
-				}
 
 				for (i = 0; i < 16; i++) {
 					if ($scope.wells["well_" + i].selected) {
@@ -455,6 +460,15 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 
 		$scope.$watch('target2Quantity.value', function(val, oldVal) {
 			if($scope.dragging) return;
+			var m1 = '', b1 = '';
+			if($scope.target2Quantity.value){
+				var stn = Number($scope.target2Quantity.value);
+				var data = stn.toExponential().toString().split(/[eE]/);
+				m1 = Number(data[0]);
+				b1 = Number(data[1]);				
+			}
+			$scope.target2Quantity.quantityM = (m1) ? m1.toFixed(2) : '';
+			$scope.target2Quantity.quantityB = b1;
 
 			if(!validateTarget2Quantity()){
 				$scope.error_target2Qty = 'Must be greater than zero';
@@ -466,14 +480,6 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 				}
 			} else {
 				$scope.error_target2Qty = '';
-				var m1 = '', b1 = '';
-				if($scope.target2Quantity.value){
-					var stn = Number($scope.target2Quantity.value);
-					var data = stn.toExponential().toString().split(/[eE]/);
-					m1 = Number(data[0]);
-					b1 = Number(data[1]);				
-				}
-
 				for (i = 0; i < 16; i++) {
 					if ($scope.wells["well_" + i].selected) {
 						$scope.wellInf[i].target2quantityM = (!m1 || isNaN(m1)) ? '' : m1.toFixed(2);
@@ -1618,9 +1624,7 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 				$scope.user = resp.data.user;
 				var show_banner = $scope.user.show_banner;
 				if(show_banner && isBlank){
-					setTimeout(function() {
-						angular.element(document.querySelector(".tip-banner")).addClass("banner-is-shown");
-					}, 3000);
+					angular.element(document.querySelector(".tip-banner")).addClass("banner-is-shown");
 				}
 			});
 		}

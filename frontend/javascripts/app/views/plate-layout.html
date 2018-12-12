@@ -80,7 +80,7 @@ limitations under the License.
                                                     <div ng-class="{'hiding-div': wellInf[col.index].target1 == 'Not set'}">
                                                         <div 
                                                             class="targetRect"                                                             
-                                                            ng-style="{'background-color': (wellInf[col.index].target1type == 'positive_control') ? '#E02127' : ((wellInf[col.index].target1type == 'negative_control') ? '#333' : wellInf[col.index].target1color)}"
+                                                            ng-style="{'background-color': wellInf[col.index].target1color}"
                                                             ng-class="{'no-targetBorder': wellInf[col.index].target1 == 'Not set'}">
                                                             <span ng-if="wellInf[col.index].target1type == 'positive_control'" class="wellCircle" style="line-height: 12px;">+</span>
                                                             <span ng-if="wellInf[col.index].target1type == 'negative_control'" class="wellCircle" style="line-height: 12px;">-</span>
@@ -116,7 +116,7 @@ limitations under the License.
                                                         <div 
                                                             ng-class="{'hiding-div':wellInf[col.index].target2 == 'Not set'}" 
                                                             class="targetRect" 
-                                                            ng-style="{'background-color': (wellInf[col.index].target2type == 'positive_control') ? '#E02127' : ((wellInf[col.index].target2type == 'negative_control') ? '#333' : wellInf[col.index].target2color)}">
+                                                            ng-style="{'background-color': wellInf[col.index].target2color}">
                                                             <span ng-if="wellInf[col.index].target2type == 'positive_control'" class="wellCircle" style="line-height: 12px;">+</span>
                                                             <span ng-if="wellInf[col.index].target2type == 'negative_control'" class="wellCircle" style="line-height: 12px;">-</span>
                                                             <span ng-if="wellInf[col.index].target2type == 'standard'" class="wellCircle">S</span>
@@ -157,7 +157,7 @@ limitations under the License.
                                                     <div ng-class="{'hiding-div': wellInf[col.index+8].target1 == 'Not set'}">
                                                         <div 
                                                         class="targetRect" 
-                                                        ng-style="{'background-color': (wellInf[col.index+8].target1type == 'positive_control') ? '#E02127' : ((wellInf[col.index+8].target1type == 'negative_control') ? '#333' : wellInf[col.index+8].target1color)}"                  
+                                                        ng-style="{'background-color': wellInf[col.index+8].target1color}"                  
                                                         ng-class="{'no-targetBorder': wellInf[col.index+8].target1 == 'Not set'}">
                                                             <span ng-if="wellInf[col.index+8].target1type == 'positive_control'" class="wellCircle" style="line-height: 12px;">+</span>
                                                             <span ng-if="wellInf[col.index+8].target1type == 'negative_control'" class="wellCircle" style="line-height: 12px;">-</span>
@@ -192,7 +192,7 @@ limitations under the License.
                                                         <div 
                                                             ng-class="{'hiding-div':wellInf[col.index+8].target2 == 'Not set'}" 
                                                             class="targetRect" 
-                                                            ng-style="{'background-color': (wellInf[col.index+8].target2type == 'positive_control') ? '#E02127' : ((wellInf[col.index+8].target2type == 'negative_control') ? '#333' : wellInf[col.index+8].target2color)}">
+                                                            ng-style="{'background-color': wellInf[col.index+8].target2color}">
                                                             <span ng-if="wellInf[col.index+8].target2type == 'positive_control'" class="wellCircle" style="line-height: 12px;">+</span>
                                                             <span ng-if="wellInf[col.index+8].target2type == 'negative_control'" class="wellCircle" style="line-height: 12px;">-</span>
                                                             <span ng-if="wellInf[col.index+8].target2type == 'standard'" class="wellCircle">S</span>
@@ -367,6 +367,9 @@ limitations under the License.
                                                  />
                                             <img class="error-field-icon" src="/images/alert.svg" ng-show="error_target1Qty">
                                             <span class="error-field">{{error_target1Qty}}</span>
+                                            <span class="quantity-helper" ng-show="target1Quantity.value && !error_target1Qty">
+                                                {{target1Quantity.quantityM}} x 10<sup>{{target1Quantity.quantityB}}</sup>
+                                            </span>
                                         </div>                                        
                                     </div>
                                     <div ng-if="is_dual_channel">
@@ -451,7 +454,10 @@ limitations under the License.
                                             placeholder="Set"
                                              />
                                             <img class="error-field-icon" src="/images/alert.svg" ng-show="error_target2Qty">
-                                            <span class="error-field">{{error_target2Qty}}</span>                                             
+                                            <span class="error-field">{{error_target2Qty}}</span>
+                                            <span class="quantity-helper" ng-show="target2Quantity.value && !error_target2Qty">
+                                                {{target2Quantity.quantityM}} x 10<sup>{{target2Quantity.quantityB}}</sup>
+                                            </span>                                            
                                         </div>
                                     </div>
                                 </div>

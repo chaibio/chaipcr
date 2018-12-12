@@ -154,7 +154,9 @@ window.ChaiBioTech.ngApp.directive('formatNumber', [ '$filter',
                     }
                   }
 
-                  element.val(resultValue);                  
+                  resultValue = (frontDigit.indexOf('-0') == 0) ? '-' + resultValue : resultValue;
+
+                  element.val(resultValue);
                   if(Math.abs(resultValue.length - viewValue.length) == 1){
                     setCaretPosition(element[0], cursorPosition + resultValue.length - viewValue.length);
                   } else if(Math.abs(resultValue.length - viewValue.length) > 1) {
