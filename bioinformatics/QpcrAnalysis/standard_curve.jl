@@ -4,33 +4,38 @@
 # what if isnull(cq)
 
 immutable TargetResultEle
-    target_id::Int
-    slope::Float64
-    offset::Float64
-    efficiency::Float64
-    r2::Float64
+    target_id ::Int
+    slope ::Float64
+    offset ::Float64
+    efficiency ::Float64
+    r2 ::Float64
 end
 const EMPTY_TRE = TargetResultEle(0, fill(NaN, 4)...)
 
 immutable GroupResultEle
-    well::Vector{Int}
-    target_id::Int
-    cq_mean::Float64
-    cq_sd::Float64
-    qty_mean::Float64
-    qty_sd::Float64
+    well ::Vector{Int}
+    target_id ::Int
+    cq_mean ::Float64
+    cq_sd ::Float64
+    qty_mean ::Float64
+    qty_sd ::Float64
 end
 const EMPTY_GRE = GroupResultEle([], 0, fill(NaN, 4)...)
 
 
+# called by QpcrAnalyze.dispatch
+# formerly called function standard_curve
 # `/slope` for log (DNA copy#) is on the x-axis and Cq on the y-axis, otherwise `*slope`
-function standard_curve(
-    req_vec::Vector{Any};
-    out_format::String="json",
-    json_digits::Integer=JSON_DIGITS,
-    qty_base::Real=10,
-    empty_tre::TargetResultEle=EMPTY_TRE,
-    empty_gre::GroupResultEle=EMPTY_GRE,
+function act(
+    ::StandardCurve,
+
+    req_vec ::Vector{Any};
+
+    out_format ::String ="json",
+    json_digits ::Integer =JSON_DIGITS,
+    qty_base ::Real =10,
+    empty_tre ::TargetResultEl e=EMPTY_TRE,
+    empty_gre ::GroupResultEle =EMPTY_GRE,
     )
 
     # df1.colindex.names
@@ -40,7 +45,7 @@ function standard_curve(
     if size(req_df)[2] == 0 || any(map([:target, :cq, :qty]) do symbl
         all(isnan.(req_df[symbl]))
     end)
-        return json(OrderedDict("target"=>nothing, "group"=>nothing))
+        return json(OrderedDict("target" => nothing, "group" => nothing))
     end
 
     target_result_df = by(req_df, :target) do chunk_target
@@ -101,8 +106,8 @@ function standard_curve(
         for tre in tre_vec
             if isnan(tre.slope) && isnan(tre.offset)
                 target_result = OrderedDict(
-                    "target_id"=>getfield(tre, :target_id),
-                    "error"=>"less 2 valid data points of cq and/or qty available for fitting standard curve"
+                    "target_id" => getfield(tre, :target_id),
+                    "error" => "less 2 valid data points of cq and/or qty available for fitting standard curve"
                 )
             else
                 target_result = tre
@@ -134,25 +139,25 @@ function standard_curve(
                             ),
                             "quantity" => OrderedDict(
                                 "mean" => OrderedDict(
-                                    "m"=>qty_mean_m,
-                                    "b"=>qty_mean_b
+                                    "m" => qty_mean_m,
+                                    "b" => qty_mean_b
                                 ),
                                 "standard_deviation" => OrderedDict(
-                                    "m"=>qty_sd_m,
-                                    "b"=>qty_sd_b
+                                    "m" => qty_sd_m,
+                                    "b" => qty_sd_b
                                 )
                             )
                         ))
                     end # if target_id
                 end # do gre_i
             push!(grp_vec, OrderedDict(
-                "wells"=>well_combin,
-                "targets"=>grp_target_vec
+                "wells" => well_combin,
+                "targets" => grp_target_vec
             ))
             end # if
         end # do well_combin
 
-        jp_dict = OrderedDict("targets"=>target_vec, "groups"=>grp_vec)
+        jp_dict = OrderedDict("targets" => target_vec, "groups" => grp_vec)
         return out_format == "json" ? json(jp_dict) : jp_dict
     end # if
 
@@ -165,7 +170,7 @@ end # standard_curve
 
 
 # transform a real number to scientific notation
-function scinot(x::Real, num_sig_digits::Integer=3; log_base::Integer=10)
+function scinot(x ::Real, num_sig_digits ::Integer=3; log_base ::Integer=10)
     if isnan(x)
         return (NaN, NaN)
     elseif x == 0
@@ -184,7 +189,7 @@ end
 
 
 # parse req_vec into a dataframe
-function reqvec2df(req_vec::AbstractVector)
+function reqvec2df(req_vec ::AbstractVector)
 
     if length(req_vec) == 0
         return DataFrame()

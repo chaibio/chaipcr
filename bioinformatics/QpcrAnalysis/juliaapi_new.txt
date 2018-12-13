@@ -235,16 +235,20 @@ experiments/:experiment_id/optical_cal
 request body:
 {
     "calibration_info": {
-        "water": {
-	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
+        "baseline": {
+    	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
 				  [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
         },
+        "water": {
+            “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
+                  [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
+        },
         "channel_1": {
-	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
+    	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
 				  [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
         },
         "channel_2": {
-	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
+    	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
 				  [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
         }
     }
@@ -500,15 +504,12 @@ request body:
   “baseline”: {
 	“fluorescence_value”:[well_01, well_02, …, well_16]
   },
-
   “water”: {
 	“fluorescence_value”:[well_01, well_02, …, well_16]
   },
-
   “FAM”: {
 	“fluorescence_value”:[well_01, well_02, …, well_16]
   },
-  
   “HEX”: {
 	“fluorescence_value”:[well_01, well_02, …, well_16]
   }

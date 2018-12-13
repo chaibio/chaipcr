@@ -5,25 +5,23 @@
 
 import DataStructures.OrderedDict
 
-function analyze_func(
-    ::OpticalCal,
+
+# called by QpcrAnalyze.dispatch
+function act(
+    ::Type{OpticalCal},
+    calib_info_dict ::OrderedDict{String,Any};
 
     ## remove MySql dependency
     #
     # db_conn::MySQL.MySQLHandle,
     # exp_id::Integer, # not used for computation
     # calib_info::Union{Integer,OrderedDict}; # really used
-    # well_nums::AbstractVector=[],
+    # well_nums::AbstractVector =[],
 
-    # new >>
-    exp_data::OrderedDict{String,Any}, 
-    calib_data::OrderedDict{String,Any},
-    # << new
-
-    dye_in::String="FAM", 
-    dyes_2bfild::Vector=[],
-    out_json=true,
-    verbose=false
+    dye_in ::String ="FAM", 
+    dyes_2bfild ::Vector =[],
+    out_json ="pre-json",
+    verbose =false
     )
 
     ## remove MySql dependency
@@ -31,21 +29,14 @@ function analyze_func(
     # calib_info_ori = calib_info
     # calib_info_dict = ensure_ci(db_conn, calib_info_ori)
 
-    # new >>
-    # not implemented yet
-    calib_info_ori = calib_data
-    calib_info_dict = ensure_ci(calib_data)
-    # << new
-
     # print_v(
     #     println, verbose,
     #     "original: ", calib_info_ori,
     #     "dict: ", calib_info_dict
     # )
 
-    result = OrderedDict("valid"=>true)
+    result = OrderedDict("valid" => true)
     err_msg_vec = Vector{String}()
-
 
     # get_k
 

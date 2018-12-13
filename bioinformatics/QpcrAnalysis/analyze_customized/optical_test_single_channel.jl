@@ -1,4 +1,4 @@
-# chaipcr/web/public/dynexp/optical_test_single_channel/analyze.R
+# optical_test_single_channel.jl
 
 # constants
 # const BASELINE_STEP_ID = 12
@@ -8,19 +8,20 @@ const MIN_EXCITATION_FLUORESCENCE_MULTIPLE = 3
 const MAX_EXCITATION = 384000
 
 
-# !!!! modified for receiving data instead of experiment ids as input
-function analyze_func(
+function act(
     ::OpticalTestSingleChannel,
 
     # remove MySql dependency
     #
-    # db_conn::MySQL.MySQLHandle,
-    # exp_id::Integer,
-    # calib_info::Union{Integer,OrderedDict}=calib_info_AIR; # not used for computation
+    # db_conn ::MySQL.MySQLHandle,
+    # exp_id ::Integer,
+    # calib_info ::Union{Integer,OrderedDict} =calib_info_AIR; # not used for computation
     # start: arguments that might be passed by upstream code
-    # well_nums::AbstractVector=[],
+    # well_nums ::AbstractVector =[],
 
-    exp_data::AbstractArray # new
+    # new >>
+    ot_dict ::Associative;
+    # << new
     )
 
     # remove MySql dependency
@@ -44,23 +45,24 @@ function analyze_func(
     # end) # do step_id
 
     # assuming the 2 values of `ot_dict` are the same in length (number of wells)
-    results = map(1:length(ot_dict["baseline"])) do well_i
-        baseline = ot_dict["baseline"][well_i]
-        excitation = ot_dict["excitation"][well_i]
-        # valid = (excitation >= MIN_EXCITATION_FLUORESCENCE) && (excitation / baseline >= MIN_EXCITATION_FLUORESCENCE_MULTIPLE) && (excitation <= MAX_EXCITATION) # old
-        valid = (excitation >= MIN_EXCITATION_FLUORESCENCE) && (baseline < MIN_EXCITATION_FLUORESCENCE) && (excitation <= MAX_EXCITATION) # Josh, 2016-08-15
-        OrderedDict("baseline"=>baseline, "excitation"=>excitation, "valid"=>valid)
+    results = map(1:length(ot_dict["baseline"]["fluorescence_value"][1])) do well_i
+        baseline = ot_dict["baseline"]["fluorescence_value"][1][well_i]
+        excitation = ot_dict["excitation"]["fluorescence_value"][1][well_i]
+        # valid =
+        #    (excitation >= MIN_EXCITATION_FLUORESCENCE) &&
+        #    (excitation / baseline >= MIN_EXCITATION_FLUORESCENCE_MULTIPLE) &&
+        #    (excitation <= MAX_EXCITATION) # old
+        valid = 
+            (excitation >= MIN_EXCITATION_FLUORESCENCE) &&
+            (baseline < MIN_EXCITATION_FLUORESCENCE) &&
+            (excitation <= MAX_EXCITATION) # Josh, 2016-08-15
+        OrderedDict(
+            "baseline"      => baseline, 
+            "excitation"    => excitation, 
+            "valid"         => valid
+        )
     end # do well_i
-    
-    # results = map(1:length(ot_dict[step_ids[1]])) do well_i
-    #     baseline, excitation = map(step_ids) do step_id
-    #         ot_dict[step_id][well_i]
-    #     end # do step_id
-    #     # valid = (excitation >= MIN_EXCITATION_FLUORESCENCE) && (excitation / baseline >= MIN_EXCITATION_FLUORESCENCE_MULTIPLE) && (excitation <= MAX_EXCITATION) # old
-    #     valid = (excitation >= MIN_EXCITATION_FLUORESCENCE) && (baseline < MIN_EXCITATION_FLUORESCENCE) && (excitation <= MAX_EXCITATION) # Josh, 2016-08-15
-    #     OrderedDict("baseline"=>baseline, "excitation"=>excitation, "valid"=>valid)
-    # end # do well_i
 
-    return json(OrderedDict("optical_data"=>results))
+    return OrderedDict("optical_data" => results)
 
 end # analyze_optical_test_single_channel

@@ -7,7 +7,7 @@
 # under active development.
 # (Tom Price, Dec 2018)
 
-using HttpServer, QpcrAnalysis
+import HttpServer, QpcrAnalysis
 
 
 # Functions like this will be defined as `req2res` in module "QpcrAnalysis"
@@ -17,7 +17,7 @@ using HttpServer, QpcrAnalysis
 # 	return true, request_body
 # end
 
-http = HttpHandler() do req::Request, res::Response
+http = HttpHandler() do req ::HttpServer.Request, res ::HttpServer.Response
 
 	code = 0
 	if ismatch(r"^/experiments/", req.resource)
@@ -33,13 +33,13 @@ http = HttpHandler() do req::Request, res::Response
 
 	if code == 0
 		code = 404
-		response_body = string("{'error': 'method \"", req.resource, "\" not found'}")
+		response_body = Dict(:error => "method \"$req.resource\" not found")
 	end
 
-	res = Response(response_body)
+	res = HttpServer.Response(response_body)
 	res.status = code
 	return res
 end
 
-server = Server(http)
-run(server, 8081)
+server = HttpServer.Server(http)
+HttpServer.run(server, 8081)

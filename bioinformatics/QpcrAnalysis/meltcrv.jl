@@ -43,6 +43,58 @@ struct MeltCurveOutput
 end
 
 
+# called by QpcrAnalyze.dispatch
+function act(
+    ::MeltCurve,
+    req_dict ::Associative
+)
+    keys_req_dict = keys(req_dict)
+    exp_id = req_dict["experiment_id"]
+    stage_id = req_dict["stage_id"]
+
+    # kwdict_pmc = OrderedDict{Symbol,Any}()
+    # for key in ["channel_nums"]
+    #     if key in keys_req_dict
+    #         kwdict_pmc[parse(key)] = req_dict[key]
+    #     end
+    # end
+
+    kwdict_mc_tm_pw = OrderedDict{Symbol,Any}()
+    if "qt_prob" in keys_req_dict
+        kwdict_mc_tm_pw[:qt_prob_flTm] = req_dict["qt_prob"]
+    end
+    if "max_normd_qtv" in keys_req_dict
+        kwdict_mc_tm_pw[:normd_qtv_ub] = req_dict["max_normd_qtv"]
+    end
+    for key in ["top_N"]
+        if key in keys_req_dict
+            kwdict_mc_tm_pw[parse(key)] = req_dict[key]
+        end
+    end
+
+    response = process_mc(
+        
+        ## remove MySql dependency
+        #
+        # db_conn,
+        # exp_id,
+        # stage_id,
+        # calib_info;
+
+        # new >>
+        exp_id, 
+        stage_id, 
+        req_dict["raw_data"],
+        req_dict["calibration_info"];
+        channel_nums=req_dict["channel_nums"],
+        out_format="pre-json",
+        # << new
+
+        # kwdict_pmc...,
+        kwdict_mc_tm_pw=kwdict_mc_tm_pw
+    )
+end
+
 
 # Top-level function: get melting curve data and Tm for a melt curve experiment
 function process_mc(

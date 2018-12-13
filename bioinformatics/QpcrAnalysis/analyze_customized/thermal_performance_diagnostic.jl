@@ -1,5 +1,6 @@
+# thermal_performance_diagnostic.jl
 
-#constants
+# constants
 const deltaTSetPoint = 1
 const highTemperature = 95
 const lowTemperature = 50
@@ -13,17 +14,16 @@ const MIN_HEATING_RATE = 1 # C/s
 const MAX_TIME_TO_HEAT = 90e3 # ms
 
 
-# !!!! modified for receiving data instead of experiment ids as input
 function analyze_func(
-    ::ThermalPerformanceDiagnostic,
+    ::Type{ThermalPerformanceDiagnostic},
 
     # remove MySql dependency
     #
-    # db_conn::MySQL.MySQLHandle,
-    # exp_id::Integer, # really used
-    # calib_info::Union{Integer,OrderedDict} # not used for computation
+    # db_conn ::MySQL.MySQLHandle,
+    # exp_id ::Integer, # really used
+    # calib_info ::Union{Integer,OrderedDict} # not used for computation
 
-    exp_data::AbstractArray # new
+    exp_data ::AbstractArray # new
     )
 
     # remove MySql dependency

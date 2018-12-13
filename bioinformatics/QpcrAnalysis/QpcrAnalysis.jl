@@ -17,7 +17,7 @@
 # 0.3.0 `MySQL.mysql_execute(some_query)[1][:some_header]`
 # 0.5.2 `MySQL.query(some_query)[:some_header]`
 
-
+	
 
 # using Base
 
@@ -39,6 +39,14 @@ end][1] # slice by boolean vector returned a one-element vector. Assumption: LOA
 # include each script, generally in the order of workflow
 
 include("shared.jl")
+
+# dispatch
+include("action_types.jl")
+include("dispatch.jl")
+
+# data format verification
+include("verify_request.jl")
+include("verify_response.jl")
 
 # calibration
 include("deconv.jl") # `type K4Deconv`
@@ -72,7 +80,6 @@ include("analyze_customized/thermal_consistency.jl")
 # include("analyze_customized/your_own_analyze_functionality.jl")
 
 # wrap up
-include("dispatch.jl")
 # include("test.jl")
 include("../test/api_test.jl")
 # include("__init__.jl")

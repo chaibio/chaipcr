@@ -26,6 +26,11 @@ import JSON, DataStructures.OrderedDict
 # set default calibration experiment
 calib_info_AIR = -99
 
+# constants
+
+const CHANNELS = [1, 2]
+const CHANNEL_LABELS = map(channel -> "channel_$channel", CHANNELS)
+
 # ================================================================================
 # Here are the REST APIs using HTTP GET
 # ================================================================================
@@ -174,21 +179,26 @@ end
 #         }
 #     }
 
-function calibration_test(calib)
-    conditions=["water","channel_1","channel_2"]
-    channels=["channel_1","channel_2"]
-    n_channels=(calib["water"]["fluorescence_value"][2]==nothing) ? 1 : 2
-    n_wells=length(calib["water"]["fluorescence_value"][1])
+function calibration_test(
+    calib, 
+    n_channels=length(CHANNELS),
+    conditions=["water",CHANNEL_LABELS][1:n_channels]
+)
+    n_conditions=length(conditions)
     @assert (isa(calib,OrderedDict))
-    @assert (length(calib)<=3)
-    for condition in conditions[range(1,n_channels+1)]
+    @assert (length(calib)==n_conditions)
+    @assert (isa(calib[conditions[1]],OrderedDict))
+    @assert (haskey(calib[conditions[1]],"fluorescence_value"))
+    @assert (isa(calib[conditions[1]]["fluorescence_value"],Array))
+    n_wells=length(calib[conditions[1]]["fluorescence_value"][1])
+    for condition in conditions
         @assert (haskey(calib,condition))
         @assert (isa(calib[condition],OrderedDict))
         @assert (length(calib[condition])==1)
         @assert (haskey(calib[condition],"fluorescence_value"))
         @assert (isa(calib[condition]["fluorescence_value"],Array))
         @assert (length(calib[condition]["fluorescence_value"])<=2)
-    for channel in range(1,n_channels)
+        for channel in range(1,n_channels)
             @assert (isa(calib[condition]["fluorescence_value"][channel],Array))
             @assert (length(calib[condition]["fluorescence_value"][channel])==n_wells)
             for i in range(1,n_wells)
@@ -210,7 +220,6 @@ end
 
 function raw_test(raw)
     @assert (isa(raw,OrderedDict))
-    @assert (length(raw)==4)
     variables=["fluorescence_value","channel","well_num"]
     if (haskey(raw,"temperature"))
         push!(variables,"temperature")
@@ -277,10 +286,20 @@ function amplification_request_test(request)
         @assert (isa(request["min_D2max"],Number))
     end
     @assert (haskey(request,"calibration_info"))
+    calib=request["calibration_info"]
+    @assert (isa(calib,OrderedDict))
+    @assert (isa(calib[conditions[1]],OrderedDict))
+    @assert (haskey(calib[conditions[1]],"fluorescence_value"))
+    @assert (isa(calib[conditions[1]]["fluorescence_value"],Array))
+    if (length(calib["water"]["fluorescence_value"])<2 || calib["water"]["fluorescence_value"][2]==nothing)
+        n_channels=1
+    else
+        n_channels=2
+    end
     @assert (haskey(request,"raw_data"))
     raw=request["raw_data"]
     @assert (isa(raw,OrderedDict))
-    calibration_test(request["calibration_info"]) && raw_test(raw)
+    calibration_test(calib,n_channels) && raw_test(raw)
 end
 
 # single channel
@@ -317,7 +336,7 @@ function singlechannel_amplification_request_test()
             "channel": []
         }
     }"""; dicttype=OrderedDict)
-    amplification_request_test(request)
+    amplification_request_test(request,1)
 end
 
 # dual channel
@@ -360,7 +379,7 @@ function dualchannel_amplification_request_test()
             "channel": []
         }
     }"""; dicttype=OrderedDict)
-    amplification_request_test(request) 
+    amplification_request_test(request,2) 
 end
 
 
@@ -377,7 +396,7 @@ function amplification_response_test(response)
     @assert (length(response)==8)
     measurements=["rbbs_ary3","blsub_fluos","dr1_pred","dr2_pred"]
     n_channels=length(response["rbbs_ary3"])
-    @assert (n_channels==1 || n_channels==2)
+    @assert (n_channels in CHANNELS)
     n_wells=length(response["rbbs_ary3"][1])
     n_steps=length(response["rbbs_ary3"][1][1])
     n_pred=length(response["dr1_pred"][1][1])
@@ -641,42 +660,6 @@ function error_amplification_response_test()
 end
 
 
-# From experiments_controller.rb
-#
-# api :GET, "/experiments/:id/amplification_data?raw=false&background=true&baseline=true&firstderiv=true&secondderiv=true&summary=true&step_id[]=43&step_id[]=44", "Retrieve amplification data"
-# example "{
-#    'partial':false, 
-#    'total_cycles':40, 
-#    'steps':[
-#        'step_id':2, [
-#            'amplification_data':[
-#                ['target_id', 'well_num', 'cycle_num', 'background_subtracted_value',
-#                    'baseline_subtracted_value', 'dr1_pred', 'dr2_pred' 'fluorescence_value'], 
-#                [1, 1, 1, 25488, -2003, 34543, 453344, 86], 
-#                [1, 1, 2, 53984, -409, 56345, 848583, 85]
-#            ],
-#            'summary_data':[
-#                ['target_id','well_num','replic_group','cq','quantity_m','quantity_b','mean_cq',
-#                    'mean_quantity_m','mean_quantity_b'],
-#                [1,1,null,null,null,null,null,null,null],
-#                [2,12,1,7.314787,4.0,2,6.9858934999999995,4.0,2],
-#                [2,14,1,6.657,4.0,2,6.9858934999999995,4.0,2],
-#                [2,3,null,6.2,5.7952962,14,null,null,null]
-#            ],
-#            'targets':[
-#                ['id','name','equation'],
-#                [1,'target1',null],
-#                [2,'target2',{
-#                    'slope':-0.064624,'offset':7.154049,'efficiency':2979647189313701.5,'r2':0.221279
-#                }]
-#            ]
-#        ]
-#    ]
-#}"
-
-
-
-
 
 # ********************************************************************************
 #
@@ -721,10 +704,14 @@ function meltcurve_request_test(request)
     calib=request["calibration_info"]
     @assert (haskey(request,"channel_nums"))
     @assert (isa(request["channel_nums"],Array))
-    if (calib["water"]["fluorescence_value"][2]==nothing)
+    if (length(calib["water"]["fluorescence_value"])<2 || calib["water"]["fluorescence_value"][2]==nothing)
         @assert (request["channel_nums"]==[1])
+        n_channels=1
+        conditions=["baseline","excitation"]
     else
         @assert (request["channel_nums"]==[1,2])
+        n_channels=2
+        conditions=["baseline","water",CHANNEL_LABELS]
     end
     if (haskey(request,"qt_prob"))
         @assert (isa(request["qt_prob"],Number))
@@ -737,7 +724,7 @@ function meltcurve_request_test(request)
     end
     @assert (haskey(request,"raw_data"))
     raw=request["raw_data"]
-    calibration_test(calib) && raw_test(raw)
+    calibration_test(calib,n_channels,conditions) && raw_test(raw)
 end
 
 # single channel
@@ -907,34 +894,6 @@ function error_meltcurve_response_test()
     meltcurve_response_test(response)
 end
 
-# from experiments_controller.rb:
-#
-# api :GET, "/experiments/:id/melt_curve_data?raw=false&normalized=true&derivative=true&tm=true&ramp_id[]=43&ramp_id[]=44", "Retrieve melt curve data"
-#
-# example "{
-#    'partial':false,
-#    'ramps':[
-#        'ramp_id':22,
-#        'melt_curve_data':[
-#            {
-#                'well_num':1,
-#                'temperature':[0,1,2,3,4,5],
-#                'normalized_data':[0,1,2,3,4,5],
-#                'derivative_data':[0,1,2,3,4,5],
-#                'tm':[1,2,3],
-#                'area':[2,4,5]
-#            },
-#            {
-#                'well_num':2,
-#                'temperature':[0,1,2,3,4,5],
-#                'normalized_data':[0,1,2,3,4,5],
-#                'derivative_data':[0,1,2,3,4,5],
-#                'tm':[1,2,3],
-#                'area':[2,4,5]
-#            }
-#        ]
-#    ]
-#}"
 
 
 
@@ -978,124 +937,11 @@ end
 
 
 
-# ********************************************************************************
-#
-# call: experiments/:experiment_id/optical_cal
-#
-# ? not implemented in Rails yet
-#
-# ********************************************************************************
-
-# request body: 
-
-function optical_cal_request_test(request)
-    @assert (isa(request,OrderedDict))
-    @assert (haskey(request,"calibration_info"))
-    @assert (length(request)==1)
-    calib=request["calibration_info"]
-    calibration_test(calib)
-    true
-end
-
-# single channel
-
-function singlechannel_optical_cal_request_test()
-    request=JSON.parse("""{
-        "calibration_info": {
-            "water": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    null
-                ]
-            },
-            "channel_1": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    null
-                ]
-            },
-            "channel_2": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    null
-                ]
-            }
-        }
-    }"""; dicttype=OrderedDict)
-    optical_cal_request_test(request)
-end
-
-# dual channel
-
-function dualchannel_optical_cal_request_test()
-    request=JSON.parse("""{
-        "calibration_info": {
-            "water": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    [2.01, 2.02,    2.15, 2.16]
-                ]
-            },
-            "channel_1": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    [2.01, 2.02,    2.15, 2.16]
-                ]
-            },
-            "channel_2": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    [2.01, 2.02,    2.15, 2.16]
-                ]
-            }
-        }
-    }"""; dicttype=OrderedDict)
-    optical_cal_request_test(request)
-end
-
-# success response body (optical_cal): 
-
-function optical_cal_response_test(response)
-    @assert (isa(response,OrderedDict))
-    @assert (haskey(response,"valid"))
-    if (response["valid"])
-        @assert (length(response)==1)
-    else
-        @assert (length(response)==2)
-        @assert (haskey(response,"error_message"))
-        @assert (isa(response["error_message"],String))
-    end
-    true
-end
-
-# valid
-
-function valid_optical_cal_response_test()
-    response=JSON.parse("""{
-        "valid": true
-    }"""; dicttype=OrderedDict)
-    optical_cal_response_test(response)
-end
-
-# invalid
-
-function invalid_optical_cal_response_test()
-    response=JSON.parse("""{
-        "valid": false, 
-        "error_message": "xxxx"
-    }"""; dicttype=OrderedDict)
-    optical_cal_response_test(response)
-end
-
-
-
 
 
 # ********************************************************************************
 #
 # call: experiments/:experiment_id/thermal_performance_diagnostic
-#
-# ? not implemented in Rails yet
 #
 # ********************************************************************************
 
@@ -1217,8 +1063,6 @@ end
 #
 # call: experiments/:experiment_id/thermal_consistency
 #
-# ? not implemented in Rails yet
-#
 # ********************************************************************************
 
 # request body: 
@@ -1238,7 +1082,10 @@ function thermal_consistency_request_test(request)
     @assert (length(request)==2)
     @assert (haskey(request,"calibration_info"))
     @assert (haskey(request,"raw_data"))
-    calibration_test(request["calibration_info"]) && raw_test(request["raw_data"])
+    @assert (isa(request["raw_data"],OrderedDict))
+    @assert (haskey(request["raw_data"],"channel"))
+    n_channels=unique(request["raw_data"]["channel"])
+    calibration_test(request["calibration_info"],n_channels) && raw_test(request["raw_data"])
 end
 
 # single channel
@@ -1408,11 +1255,13 @@ function example_thermal_consistency_response_test()
     thermal_consistency_response_test(response)
 end
 
+
+
+
+
 # ********************************************************************************
 #
 # call: experiments/:experiment_id/optical_test_single_channel
-#
-# ? not implemented in Rails yet
 #
 # ********************************************************************************
 
@@ -1426,40 +1275,44 @@ end
 #     ORDER BY well_num, cycle_num
 # ;
 
-function optical_test_single_channel_request_test(request)
-    signals=["baseline", "excitation"]
-    n_wells=length(request["baseline"]["fluorescence_value"])
+function optical_request_test(request)
     @assert (isa(request,OrderedDict))
-    @assert (length(request)==length(signals))
-    for signal in signals
-        @assert (haskey(request,signal))
-        @assert (isa(request[signal],OrderedDict))
-        @assert (length(request[signal])==1)
-        @assert (haskey(request[signal],"fluorescence_value"))
-        @assert (isa(request[signal]["fluorescence_value"],Array))
-        @assert (length(request[signal]["fluorescence_value"])==n_wells)
-        for i in range(1,n_wells)
-            @assert (isa(request[signal]["fluorescence_value"][i],Number))
+    @assert (haskey(request,"calibration_info"))
+    calib=request["calibration_info"]
+    @assert (isa(calib,OrderedDict))
+    if (haskey(calib,"excitation"))
+        calibration_test(calib,1,["baseline","excitation"])
+    else
+        if (haskey(calib,"channel_1"))
+            calibration_test(calib,2,["baseline","water",CHANNEL_LABELS])
+        else
+            calibration_test(calib,2,["baseline","water","FAM","HEX"])
         end
     end
-    true
 end
 
-function example_optical_single_channel_request_test()
+function singlechannel_optical_request_test()
     request=JSON.parse("""{
-        "baseline": {
-            "fluorescence_value":  [1.01, 1.02,    1.15, 1.16]
-        },
-        "excitation": {
-            "fluorescence_value":  [1.01, 1.02,    1.15, 1.16]
+        "calibration_info": {
+            "baseline": {
+                "fluorescence_value": [
+                    [1.01, 1.02,    1.15, 1.16],
+                    null
+                ]
+            },
+            "excitation": {
+                "fluorescence_value": [
+                    [1.01, 1.02,    1.15, 1.16],
+                    null
+                ]
         }
     }"""; dicttype=OrderedDict)
-    optical_test_single_channel_request_test(request)
+    optical_request_test(request)
 end
 
 # success response body (optical_test_single_channel): 
 
-function optical_test_single_channel_response_test(response)
+function singlechannel_optical_response_test(response)
     @assert (isa(response,OrderedDict))
     @assert (length(response)==1)
     @assert (haskey(response,"optical_data"))
@@ -1477,7 +1330,7 @@ function optical_test_single_channel_response_test(response)
     true
 end
 
-function example_optical_single_channel_response_test()
+function example_singlechannel_optical_response_test()
     response=JSON.parse("""{
         "optical_data": [
         {
@@ -1546,15 +1399,13 @@ function example_optical_single_channel_response_test()
             "valid": true
         }
     ]}"""; dicttype=OrderedDict)
-    optical_test_single_channel_response_test(response)
+    singlechannel_optical_response_test(response)
 end
 
 
 # ********************************************************************************
 #
 # call: experiments/:experiment_id/optical_test_dual_channel
-#
-# not implemented in Rails yet
 #
 # ********************************************************************************
 
@@ -1568,57 +1419,42 @@ end
 #     ORDER BY well_num, cycle_num
 # ;
 
-function optical_single_channel_request_test(request)
-    signals=["baseline","water","HEX","FAM"]
-    n_wells=length(request["baseline"]["fluorescence_value"])
-    @assert (isa(request,OrderedDict))
-    @assert (length(request)==length(signals))
-    for signal in signals
-        @assert (haskey(request,signal))
-        @assert (isa(request[signal],OrderedDict))
-        @assert (length(request[signal])==1)
-        @assert (haskey(request[signal],"fluorescence_value"))
-        @assert (isa(request[signal]["fluorescence_value"],Array))
-        @assert (length(request[signal]["fluorescence_value"])==n_wells)
-        for i in range(1,n_wells)
-            @assert (isa(request[signal]["fluorescence_value"][i],Number))
-        end
-    end
-    true
-end
-
-function example_optical_dual_channel_request_test()
+function dualchannel_optical_request_test()
     request=JSON.parse("""{
-        "baseline": {
-            "fluorescence_value":  [1.01, 1.02,    1.15, 1.16]
-        },
-
-        "water": {
-            "fluorescence_value":  [1.01, 1.02,    1.15, 1.16]
-        },
-
-        "FAM": {
-            "fluorescence_value":  [1.01, 1.02,    1.15, 1.16]
-        },
-
-        "HEX": {
-            "fluorescence_value":  [1.01, 1.02,    1.15, 1.16]
+        "calibration_info": {
+            "baseline": {
+                "fluorescence_value": [
+                    [1.01, 1.02,    1.15, 1.16],
+                    [2.01, 2.02,    2.15, 2.16]
+                ]
+            },
+            "water": {
+                "fluorescence_value": [
+                    [1.01, 1.02,    1.15, 1.16],
+                    [2.01, 2.02,    2.15, 2.16]
+                ]
+            },
+            "channel_1": {
+                "fluorescence_value": [
+                    [1.01, 1.02,    1.15, 1.16],
+                    [2.01, 2.02,    2.15, 2.16]
+                ]
+            },
+            "channel_2": {
+                "fluorescence_value": [
+                    [1.01, 1.02,    1.15, 1.16],
+                    [2.01, 2.02,    2.15, 2.16]
+                ]
+            }
         }
     }"""; dicttype=OrderedDict)
-    optical_dual_channel_request_test(request)
+    optical_request_test(request)
 end
-
-# run(`curl \
-#     --header "Content-Type: application/json" \
-#     --request "GET" \
-#     --data $(JSON.json(request))
-#     http://localhost:3000/experiments/250/optical_test_dual_channel`)
-
 
 
 # success response body (optical_test_dual_channel): 
 
-function optical_dual_channel_response_test(response)
+function dualchannel_optical_response_test(response)
     @assert (isa(response,OrderedDict))
     if (length(response)==1)
         @assert (isa(response,OrderedDict))
@@ -1661,7 +1497,7 @@ function optical_dual_channel_response_test(response)
     true
 end
 
-function example_optical_dual_channel_response_test()
+function example_dualchannel_optical_response_test()
     response=JSON.parse("""{
         "optical_data": [
             {
@@ -1767,12 +1603,12 @@ function example_optical_dual_channel_response_test()
             "HEX": [0.870219,0.629768,3.175926,3.296024,1.361111,-0.297743,0.506897,-1.341241,-7.712963,0.291667,1.841503,0.680556,-1.681373,-1.852004,-0.397863,2.807292]
         }
     }"""; dicttype=OrderedDict)
-    optical_dual_channel_response_test(response)
+    dualchannel_optical_response_test(response)
 end
 
 # error response body: 
 
-function error_optical_dual_channel_response_test()
+function error_dualchannel_optical_response_test()
     response=JSON.parse("""{
         "error": "xxxx"
     }"""; dicttype=OrderedDict)
@@ -1802,20 +1638,16 @@ function run_examples()
         :error_meltcurve_response_test,
         :example_loadscript_response_test,
         :error_loadscript_response_test,
-        :singlechannel_optical_cal_request_test,
-        :dualchannel_optical_cal_request_test,
-        :valid_optical_cal_response_test,
-        :invalid_optical_cal_response_test,
         :example_thermal_performance_diagnostic_request_test,
         :example_thermal_performance_diagnostic_response_test,
         :single_channel_thermal_consistency_request_test,
         :dual_channel_thermal_consistency_request_test,
         :example_thermal_consistency_response_test,
-        :example_optical_single_channel_request_test,
-        :example_optical_single_channel_response_test,
-        :example_optical_dual_channel_request_test,
-        :example_optical_dual_channel_response_test,
-        :error_optical_dual_channel_response_test
+        :singlechannel_optical_request_test,
+        :example_singlechannel_optical_response_test,
+        :dualchannel_optical_request_test,
+        :example_dualchannel_optical_response_test,
+        :error_dualchannel_optical_response_test
     ]
     OrderedDict(map(examples) do f
         f => 
@@ -1892,7 +1724,7 @@ function server_tests()
     include("/mnt/share/deconv.jl")
 
     # single channel amplification test
-    #request = JSON.parsefile("/mnt/share/test_1ch_amp.json"; dicttype=OrderedDict)
+    #request = JSON.parsefile("/mnt/share/test_1ch_amp_169.json"; dicttype=OrderedDict)
     #request = JSON.parsefile("/mnt/share/xh-amp1.json"; dicttype=OrderedDict)
     request = JSON.parsefile("/mnt/share/xh-amp2.json"; dicttype=OrderedDict)
     amplification_request_test(request)
@@ -1921,7 +1753,7 @@ function server_tests()
 
 
     # single channel melting curve test
-    request = JSON.parsefile("/mnt/share/test_1ch_mc.json"; dicttype=OrderedDict)
+    request = JSON.parsefile("/mnt/share/test_1ch_mc_170.json"; dicttype=OrderedDict)
     meltcurve_request_test(request)
     result = dispatch("meltcurve",String(JSON.json(request)))
     response = JSON.parse(result[2],dicttype=OrderedDict)

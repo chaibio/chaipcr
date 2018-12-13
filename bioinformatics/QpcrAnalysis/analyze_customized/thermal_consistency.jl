@@ -14,40 +14,41 @@ normd_qtv_ub = 0.9
 
 
 type TmCheck1w
-    Tm::Tuple{AbstractFloat,Bool}
-    area::AbstractFloat
+    Tm ::Tuple{AbstractFloat,Bool}
+    area ::AbstractFloat
 end
 
 type ThermalConsistencyOutput
-    tm_check::Vector{TmCheck1w}
-    delta_Tm::Tuple{AbstractFloat,Bool}
+    tm_check ::Vector{TmCheck1w}
+    delta_Tm ::Tuple{AbstractFloat,Bool}
 end
 
 
-# !!!! modified for receiving data instead of experiment ids as input
 function analyze_func(
     # copy over the whole signature of `meltcrv`, comment out `stage_id`
-    ::ThermalConsistency,
+    ::Type{ThermalConsistency},
 
     # remove MySqldependency
     #
-    # db_conn::MySQL.MySQLHandle,
-    # exp_id::Integer, # stage_id::Integer,
-    # calib_info::Union{Integer,OrderedDict};
+    # db_conn ::MySQL.MySQLHandle,
+    # exp_id ::Integer, # stage_id ::Integer,
+    # calib_info ::Union{Integer,OrderedDict};
     # # start: arguments that might be p
 
-    exp_data::AbstractArray, # new
+    # new >>
+    req_dict ::Associative;
+    # << new
     
-    auto_span_smooth::Bool=false,
-    span_smooth_default::Real=0.015,
-    span_smooth_factor::Real=7.2,
+    auto_span_smooth ::Bool =false,
+    span_smooth_default ::Real =0.015,
+    span_smooth_factor ::Real =7.2,
     # end: arguments that might be passed by upstream code
-    dye_in::String="FAM", dyes_2bfild::AbstractVector=[],
-    dcv::Bool=true, # logical, whether to perform multi-channel deconvolution
-	max_tmprtr::Real=1000, # maximum temperature to analyze
-    # out_format::String="json", # "full", "pre_json", "json"
-    verbose::Bool=false,
-    kwdict_mc_tm_pw::OrderedDict=OrderedDict(
+    dye_in ::String ="FAM", dyes_2bfild ::AbstractVector =[],
+    dcv ::Bool =true, # logical, whether to perform multi-channel deconvolution
+	max_tmprtr ::Real =1000, # maximum temperature to analyze
+    # out_format ::String ="json", # "full", "pre_json", "json"
+    verbose ::Bool =false,
+    kwdict_mc_tm_pw ::OrderedDict =OrderedDict(
         :qt_prob_flTm=>qt_prob_flTm,
         :normd_qtv_ub=>normd_qtv_ub
     ) # keyword arguments passed onto `mc_tm_pw`

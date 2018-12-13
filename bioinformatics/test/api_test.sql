@@ -60,9 +60,9 @@ SET @exp_id = 136;
 
 # Look at step_id's in the calibration experiment
 SELECT step_id, channel, well_num
-	FROM fluorescence_data
-	WHERE experiment_id = @calib_id
-	ORDER BY step_id, channel, well_num
+    FROM fluorescence_data
+    WHERE experiment_id = @calib_id
+    ORDER BY step_id, channel, well_num
 ;
 
 # Let's assume step_id=28 is the water condition,
@@ -70,17 +70,17 @@ SELECT step_id, channel, well_num
 # There are 2 channels (1-2) with 16 wells each (0-15).
 SET @step_id = 34;
 SELECT step_id, channel, well_num, count(*)
-	FROM fluorescence_data
-	WHERE experiment_id = @calib_id
-	GROUP BY step_id, channel, well_num
+    FROM fluorescence_data
+    WHERE experiment_id = @calib_id
+    GROUP BY step_id, channel, well_num
 ;
 
 # Now let's look at experiment 136
 # 2 channels * 16 wells * 40 cycles (0-39), 1 step
 SELECT step_id, channel, well_num, cycle_num
-	FROM fluorescence_data
-	WHERE experiment_id = @exp_id
-	ORDER BY step_id, channel, well_num, cycle_num
+    FROM fluorescence_data
+    WHERE experiment_id = @exp_id
+    ORDER BY step_id, channel, well_num, cycle_num
 ;
 
 # Shell script
@@ -151,8 +151,8 @@ signal_cal_1=[2037915,2030879,2356324,2286590,2578814,2660975,2390835,2290655,24
 2599044,2354805,2267721,2879192];
 
 calib_1=OrderedDict(
-	"water" 	=> Dict("fluorescence_value" => [water_cal_1,  nothing]),
-	"channel_1"	=> Dict("fluorescence_value" => [signal_cal_1, nothing])
+    "water"     => Dict("fluorescence_value" => [water_cal_1,  nothing]),
+    "channel_1" => Dict("fluorescence_value" => [signal_cal_1, nothing])
 )
 
 # Test_1ch amplification: Raw data
@@ -209,10 +209,10 @@ well_num_amp_1=repeat(0:15,inner=[40])
 cycle_num_amp_1=repeat(1:40,outer=[16])
 
 raw_amp_1=OrderedDict(
-	"fluorescence_value"=> fluorescence_amp_1,
-	"channel"			=> channel_amp_1,
-	"well_num"			=> well_num_amp_1,
-	"cycle_num"			=> cycle_num_amp_1
+    "fluorescence_value"=> fluorescence_amp_1,
+    "channel"           => channel_amp_1,
+    "well_num"          => well_num_amp_1,
+    "cycle_num"         => cycle_num_amp_1
 )
 
 amp_1=OrderedDict(
@@ -686,21 +686,21 @@ channel_mc_1=fill(1,3220)
 well_num_mc_1=vcat(repeat(0:3,inner=[202]),repeat(4:15,inner=[201]))
 
 raw_mc_1=OrderedDict(
-	"fluorescence_value"	=> fluorescence_mc_1,
-	"temperature"			=> temperature_mc_1,
-	"well_num"				=> well_num_mc_1,
-	"channel"				=> channel_mc_1
+    "fluorescence_value"    => fluorescence_mc_1,
+    "temperature"           => temperature_mc_1,
+    "well_num"              => well_num_mc_1,
+    "channel"               => channel_mc_1
 )
 
 mc_1=OrderedDict(
-	"experiment_id"       => 170,
-	"stage_id"            => 219,
-	"calibration_info"    => calib_1,
-	"channel_nums"		  => [1],
-	"qt_prob"			  => 0.64,
-	"max_normd_qtv"		  => 0.8,
-	"top_N"				  => 4, 
-	"raw_data"            => raw_mc_1
+    "experiment_id"       => 170,
+    "stage_id"            => 219,
+    "calibration_info"    => calib_1,
+    "channel_nums"        => [1],
+    "qt_prob"             => 0.64,
+    "max_normd_qtv"       => 0.8,
+    "top_N"               => 4, 
+    "raw_data"            => raw_mc_1
 )
 
 open("/mnt/share/test_1ch_mc.json","w") do f
@@ -709,6 +709,48 @@ end
 
 
 
+# Test_1ch optical test single channel
+# experiments.id = 161
+# stages.id = 5
+# stages.stage_type = holding
+# step_id = 12 (baseline)
+mysql -u root -B -e "
+USE test_1ch ;
+SELECT fluorescence_value, well_num
+FROM fluorescence_data
+WHERE experiment_id = 161
+AND step_id = 12
+AND cycle_num = 1
+AND step_id is not NULL
+ORDER BY well_num" > ot_161_baseline.tsv
+baseline_ot_1 = [1704,1803,1522,1442,1490,1540,1834,1757,1593,1705,1711,1586,1529,1638,1659,1502]
+
+# experiments.id = 161
+# stages.id = 5
+# stages.stage_type = holding
+# step_id = 13 (excitation)
+mysql -u root -B -e "
+USE test_1ch ;
+SELECT fluorescence_value, well_num
+FROM fluorescence_data
+WHERE experiment_id = 161
+AND step_id = 13
+AND cycle_num = 1
+AND step_id is not NULL
+ORDER BY well_num" > ot_161_excitation.tsv
+excitation_ot_1=[45213,21030,23819,26412,25405,31761,27095,34442,41152,26695,30389,34168,37144,36466,37692,44756]
+
+ot_1 = OrderedDict(
+        "baseline" => OrderedDict(
+                "fluorescence_value" => [ baseline_ot_1 ]
+        ),
+        "excitation" => OrderedDict(
+                "fluorescence_value" => [ excitation_ot_1 ]
+        )
+)
+open("/mnt/share/test_1ch_ot_161.json","w") do f
+    JSON.print(f, ot_1)
+end
 
 
 
@@ -723,8 +765,13 @@ LEFT JOIN protocols ON experiments.experiment_definition_id = protocols.experime
 LEFT JOIN stages ON protocols.id = stages.protocol_id
 WHERE experiments.id = 170 AND stages.stage_type <> 'holding'"
 
-
-mysql -u root -B -e "SELECT stages.id FROM experiments
+USE test_1ch ;
+SELECT stages.id FROM experiments
 LEFT JOIN protocols ON experiments.experiment_definition_id = protocols.experiment_definition_id
 LEFT JOIN stages ON protocols.id = stages.protocol_id
-WHERE experiments.id = 168 AND stages.stage_type <> 'holding'"
+WHERE experiments.id = 161 ;
+
+USE test_1ch ;
+SELECT step_id, COUNT(*) FROM fluorescence_data
+WHERE experiment_id = 161
+GROUP BY step_id ;

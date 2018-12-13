@@ -96,6 +96,103 @@ struct AmpStepRampOutput2Bjson
 end
 
 
+# called by QpcrAnalyze.dispatch
+function act(
+    ::Amplification,
+    req_dict ::Associative
+)
+    keys_req_dict=keys(req_dict)
+
+    ## remove MySql dependency
+    #
+    ## asrp_vec
+    # if "step_id" in keys_req_dict
+    #     asrp_vec = [AmpStepRampProperties("step", req_dict["step_id"], DEFAULT_cyc_nums)]
+    # elseif "ramp_id" in keys_req_dict
+    #     asrp_vec = [AmpStepRampProperties("ramp", req_dict["ramp_id"], DEFAULT_cyc_nums)]
+    # else
+    #     asrp_vec = Vector{AmpStepRampProperties}()
+    # end
+
+    # new >>
+    ## we will assume that any relevant step/ramp information has already been passed along
+    ## and is present in step_id / ramp_id
+    if "step_id" in keys_req_dict
+        asrp_vec = [AmpStepRampProperties("step", req_dict["step_id"], DEFAULT_cyc_nums)]
+    elseif "ramp_id" in keys_req_dict
+        asrp_vec = [AmpStepRampProperties("ramp", req_dict["ramp_id"], DEFAULT_cyc_nums)]
+    else
+        error("no step/ramp information found")
+    end
+    # << new
+
+    # `report_cq!` arguments
+    kwdict_rc = Dict{Symbol,Any}()
+    if "min_fluomax" in keys_req_dict
+        kwdict_rc[:max_bsf_lb] = req_dict["min_fluomax"]
+    end
+    if "min_D1max" in keys_req_dict
+        kwdict_rc[:max_dr1_lb] = req_dict["min_D1max"]
+    end
+    if "min_D2max" in keys_req_dict
+        kwdict_rc[:max_dr2_lb] = req_dict["min_D2max"]
+    end
+
+    # `process_amp_1sr` arguments
+    kwdict_pa1 = Dict{Symbol,Any}()
+    for key in ["min_reliable_cyc", "baseline_cyc_bounds", "cq_method", "ctrl_well_dict"]
+        if key in keys_req_dict
+            kwdict_pa1[Symbol(key)] = req_dict[key]
+        end
+    end
+    if "categ_well_vec" in keys_req_dict
+        categ_well_vec = req_dict["categ_well_vec"]
+        for i in 1:length(categ_well_vec)
+            if length(categ_well_vec[i][2]) == 0
+                categ_well_vec[i][2] = Colon()
+            end
+        end
+        kwdict_pa1[:categ_well_vec] = categ_well_vec
+    end
+
+    # `mod_bl_q` arguments
+    kwdict_mbq = Dict{Symbol,Any}()
+    if "baseline_method" in keys_req_dict
+        baseline_method = req_dict["baseline_method"]
+        if baseline_method == "sigmoid"
+            kwdict_mbq[:bl_method] = "l4_enl"
+            kwdict_mbq[:bl_fallback_func] = median
+        elseif baseline_method == "linear"
+            kwdict_mbq[:bl_method] = "lin_1ft"
+            kwdict_mbq[:bl_fallback_func] = mean
+        elseif baseline_method == "median"
+            kwdict_mbq[:bl_method] = "median"
+        end
+    end
+
+    # call
+    response = process_amp( 
+        
+        ## remove MySql dependency
+        #
+        # db_conn, exp_id, asrp_vec, calib_info;
+
+        # new >>
+        req_dict["experiment_id"], 
+        req_dict["raw_data"],
+        req_dict["calibration_info"],
+        asrp_vec;
+        out_format  = "pre-json",
+        # << new
+
+        kwdict_rc   = kwdict_rc,
+        kwdict_mbq  = kwdict_mbq,
+        out_sr_dict = false,
+        kwdict_pa1...
+    )
+end
+
+
 function process_amp(
 
     ## remove MySql dependency

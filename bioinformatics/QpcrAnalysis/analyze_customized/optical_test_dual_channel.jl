@@ -1,4 +1,4 @@
-# chaipcr/web/public/dynexp/optical_test_dual_channel/analyze.R
+# optical_test_dual_channel.jl
 
 # constants
 
@@ -25,20 +25,19 @@ const dscrmnts_snr = OrderedDict(map(1:2) do i
 end) # do i
 
 
-# !!!! modified for receiving data instead of experiment ids as input
 function analyze_func(
     ::OpticalTestDualChannel,
 
     # remove MySqldependency
     #
-    # db_conn::MySQL.MySQLHandle,
-    # exp_id::Integer,
-    # calib_info::Union{Integer,OrderedDict}; # keys: "baseline", "water", "channel_1", "channel_2". Each value's "calibration_id" value is the same as `exp_id`
+    # db_conn ::MySQL.MySQLHandle,
+    # exp_id ::Integer,
+    # calib_info ::Union{Integer,OrderedDict}; # keys: "baseline", "water", "channel_1", "channel_2". Each value's "calibration_id" value is the same as `exp_id`
     # 
     # start: arguments that might be passed by upstream code
-    # well_nums::AbstractVector=[],
+    # well_nums ::AbstractVector =[],
 
-    exp_data::AbstractArray # new
+    exp_data ::AbstractArray # new
     )
 
     # remove MySql dependency
