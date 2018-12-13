@@ -511,14 +511,14 @@ li {
       color: #fff;
       padding: 0 10px 0 15px;      
       z-index: 10;
-      transition-timing-function: ease-in;
-      transition: 0.5s;
+      // transition-timing-function: ease-in;
+      // transition: 0.5s;
       opacity: 0;
 
       &.banner-is-shown{
         transform: translateX(-50%) translateY(-50%);
-        transition: 0.5s;
-        transition-timing-function: ease-out;       
+        // transition: 0.5s;
+        // transition-timing-function: ease-out;       
         opacity: 1;
       }
 
