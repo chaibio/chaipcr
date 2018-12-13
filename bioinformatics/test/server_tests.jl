@@ -34,6 +34,7 @@ function server_tests()
     include("allelic_discrimination.jl") # gives error
     include("/mnt/share/shared.jl")
     include("/mnt/share/deconv.jl")
+    include("/mnt/share/action_types.jl")
     include("/mnt/share/amp.jl")
     include("allelic_discrimination.jl")
     calib_info_AIR = -99
@@ -48,7 +49,7 @@ function server_tests()
     include("/mnt/share/action_types.jl")
     include("/mnt/share/verify_request.jl")
     include("/mnt/share/verify_response.jl")
-    include("/mnt/share/dispatch.jl
+    include("/mnt/share/dispatch.jl")
     include("/mnt/share/amp.jl")
     include("/mnt/share/calib.jl")
     include("/mnt/share/adj_w2wvaf.jl")
@@ -87,7 +88,7 @@ function server_tests()
     # single channel melting curve test
     request = JSON.parsefile("/mnt/share/test_1ch_mc_170.json"; dicttype=OrderedDict)
     result = dispatch("meltcurve",String(JSON.json(request)))
-    success, response_body) = JSON.parse(result[2],dicttype=OrderedDict)
+    (success, response_body) = JSON.parse(result,dicttype=OrderedDict)
     success
 
     # debug version

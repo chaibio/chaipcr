@@ -21,14 +21,15 @@
 #       http://127.0.0.1:8081/experiments/#{experiment.id}/analyze
 
 import JSON, DataStructures.OrderedDict
+#import FactCheck: facts, @fact, @fact_throws, less_than_or_equal, exitstatus, setstyle
+using FactCheck
 
-# set default calibration experiment
-calib_info_AIR = -99
+FactCheck.setstyle(:default)
 
 # constants
 
 const CHANNELS = [1, 2]
-
+calib_info_AIR = -99 # set default calibration experiment
 
 
 # ================================================================================
@@ -45,63 +46,44 @@ function verify_request(
     ::StandardCurve,
     request ::Any
 )
-    @assert (isa(request,Vector))
-    n_targets=length(request[1]["well"])
-    for i in range(1,length(request))
-        well=request[i]
-        @assert (isa(well,OrderedDict))
-        @assert (length(well)==1)
-        @assert (haskey(well,"well"))
-        array=well["well"]
-        @assert (length(array)==n_targets)
-        empty=(length(array[1])==0)
-        for j in range(1,n_targets)
-            dict=array[j]
-            @assert (isa(dict,OrderedDict))
-            if (empty)
-                @assert (length(dict)==0)
-            else
-                @assert (length(dict)==3)
-                k=keys(dict)
-                @assert (haskey(dict,"target"))
-                @assert (dict["target"]==j)
-                @assert (haskey(dict,"cq"))
-                @assert (isa(dict["cq"],Integer))
-                @assert (haskey(dict,"quantity"))
-                subdict=dict["quantity"]
-                @assert (isa(subdict,OrderedDict))
-                @assert (length(subdict)==2)
-                @assert (haskey(subdict,"m"))
-                @assert (haskey(subdict,"b"))
-                @assert (isa(subdict["m"],Number))
-                @assert (isa(subdict["b"],Number))
+    facts("Standard curve requested") do
+        context("Verifying request body") do
+            @fact (isa(request,Vector)) --> true
+            n_targets=length(request[1]["well"])
+            for i in range(1,length(request))
+                well=request[i]
+                @fact (isa(well,OrderedDict)) --> true
+                @fact (length(well)) --> 1
+                @fact (haskey(well,"well")) --> true
+                array=well["well"]
+                @fact (length(array)) --> n_targets
+                empty=(length(array[1])==0)
+                for j in range(1,n_targets)
+                    dict=array[j]
+                    @fact (isa(dict,OrderedDict)) --> true
+                    if (empty)
+                        @fact (length(dict)) --> 0
+                    else
+                        @fact (length(dict)) --> 3
+                        k=keys(dict)
+                        @fact (haskey(dict,"target")) --> true
+                        @fact (dict["target"]) --> j
+                        @fact (haskey(dict,"cq")) --> true
+                        @fact (isa(dict["cq"],Integer)) --> true
+                        @fact (haskey(dict,"quantity")) --> true
+                        subdict=dict["quantity"]
+                        @fact (isa(subdict,OrderedDict)) --> true
+                        @fact (length(subdict)) --> 2
+                        @fact (haskey(subdict,"m")) --> true
+                        @fact (haskey(subdict,"b")) --> true
+                        @fact (isa(subdict["m"],Number)) --> true
+                        @fact (isa(subdict["b"],Number)) --> true
+                    end
+                end
             end
         end
     end
-    true
-end
-
-
-function standard_curve_request_test()
-    request=JSON.parse("""[
-        {"well": [
-            {"target": 1, "cq": 999, "quantity": {"m": 1.111, "b": -10}},
-            {"target": 2, "cq": 999, "quantity": {"m": 1.111, "b": -10}}
-        ]},
-        {"well": [
-            {"target": 1, "cq": 999, "quantity": {"m": 1.111, "b": -10}},
-            {"target": 2, "cq": 999, "quantity": {"m": 1.456, "b": 12}}
-        ]},
-        {"well": [
-            {"target": 1, "cq": 999, "quantity": {"m": 1.111, "b": -10}},
-            {"target": 2, "cq": 999, "quantity": {"m": 3, "b": -12}}
-        ]},
-        {"well": [{}, {}]}
-    ]"""; dicttype=OrderedDict)
-    verify_request(
-        ActionType_DICT["standard_curve"](),
-        request
-    )
+    FactCheck.exitstatus()
 end
 
 
@@ -144,30 +126,29 @@ function calibration_test(
     conditions=["water","channel_1","channel_2"][1:n_channels] ::AbstractArray
 )
     n_conditions=length(conditions)
-    @assert (isa(calib,OrderedDict))
-    # @assert (length(calib)==n_conditions)
-    @assert (isa(calib[conditions[1]],OrderedDict))
-    @assert (haskey(calib[conditions[1]],"fluorescence_value"))
-    @assert (isa(calib[conditions[1]]["fluorescence_value"],Vector))
+    @fact (isa(calib,OrderedDict)) --> true
+    # @fact (length(calib)) --> n_conditions
+    @fact (isa(calib[conditions[1]],OrderedDict))--> true
+    @fact (haskey(calib[conditions[1]],"fluorescence_value")) --> true
+    @fact (isa(calib[conditions[1]]["fluorescence_value"],Vector)) --> true
     n_wells=length(calib[conditions[1]]["fluorescence_value"][1])
     for condition in conditions
-        @assert (haskey(calib,condition))
-        @assert (isa(calib[condition],OrderedDict))
-        @assert (length(calib[condition])==1)
-        @assert (haskey(calib[condition],"fluorescence_value"))
-        @assert (isa(calib[condition]["fluorescence_value"],Vector))
-        @assert (length(calib[condition]["fluorescence_value"])<=2)
+        @fact (haskey(calib,condition)) --> true
+        @fact (isa(calib[condition],OrderedDict)) --> true
+        @fact (length(calib[condition])) --> 1
+        @fact (haskey(calib[condition],"fluorescence_value")) --> true
+        @fact (isa(calib[condition]["fluorescence_value"],Vector)) --> true
+        @fact (length(calib[condition]["fluorescence_value"])) --> less_than_or_equal(2)
         for channel in range(1,n_channels)
-            @assert (isa(calib[condition]["fluorescence_value"][channel],Vector))
-            @assert (length(calib[condition]["fluorescence_value"][channel])==n_wells)
+            @fact (isa(calib[condition]["fluorescence_value"][channel],Vector)) --> true
+            @fact (length(calib[condition]["fluorescence_value"][channel])) --> n_wells
             for i in range(1,n_wells)
-                        @assert (isa(calib[condition]["fluorescence_value"][channel][i],Number))
+                @fact (isa(calib[condition]["fluorescence_value"][channel][i],Number)) --> true
             end
         end
     end
     true
 end
-
 
 # Raw Data comes from the following sql query: 
 #
@@ -178,7 +159,7 @@ end
 # ;
 
 function raw_test(raw)
-    @assert (isa(raw,OrderedDict))
+    @fact (isa(raw,OrderedDict)) --> true
     variables=["fluorescence_value","channel","well_num"]
     if (haskey(raw,"temperature"))
         push!(variables,"temperature")
@@ -187,171 +168,89 @@ function raw_test(raw)
     end
     n_raw=length(raw["fluorescence_value"])
     for v in variables
-        @assert (haskey(raw,v))
-        @assert (isa(raw[v],Vector))
-        @assert (length(raw[v])==n_raw)
+        @fact (haskey(raw,v)) --> true
+        @fact (isa(raw[v],Vector)) --> true
+        @fact (length(raw[v])) --> n_raw
         for i in range(1,n_raw)
             if (v=="fluorescence_value"||v=="temperature")
-                @assert (isa(raw[v][i],Number))
+                @fact (isa(raw[v][i],Number)) --> true
             else
-                @assert (isa(raw["well_num"][i],Integer))
+                @fact (isa(raw["well_num"][i],Integer)) --> true
             end
         end
     end
     true
 end
 
-
 function verify_request(
     ::Amplification,
     request ::Any
 )
-    @assert (isa(request,OrderedDict))
-    @assert (haskey(request,"experiment_id"))
-    @assert (isa(request["experiment_id"],Integer))
-    if (haskey(request,"step_id"))
-        id="step_id"
-    else
-        id="ramp_id"
-    end
-    @assert (haskey(request,id))
-    @assert (isa(request[id],Integer))
-    if (haskey(request,"min_reliable_cyc"))
-        @assert (isa(request["min_reliable_cyc"],Integer))
-    end
-    if (haskey(request,"baseline_cyc_bounds"))
-        @assert (isa(request["baseline_cyc_bounds"],Vector))
-        if (length(request["baseline_cyc_bounds"])>0)
-            @assert (length(request["baseline_cyc_bounds"])==2)
-            @assert (isa(request["baseline_cyc_bounds"][1],Integer))
-            @assert (isa(request["baseline_cyc_bounds"][2],Integer))
+    facts("Amplification requested") do
+        context("Verifying request body") do
+            @fact (isa(request,OrderedDict)) --> true
+            @fact (haskey(request,"experiment_id")) --> true
+            @fact (isa(request["experiment_id"],Integer)) --> true
+            if (haskey(request,"step_id"))
+                id="step_id"
+            else
+                id="ramp_id"
+            end
+            @fact (haskey(request,id)) --> true
+            @fact (isa(request[id],Integer)) --> true
+            if (haskey(request,"min_reliable_cyc"))
+                @fact (isa(request["min_reliable_cyc"],Integer)) --> true
+            end
+            if (haskey(request,"baseline_cyc_bounds"))
+                @fact (isa(request["baseline_cyc_bounds"],Vector)) --> true
+                if (length(request["baseline_cyc_bounds"])>0)
+                    @fact (length(request["baseline_cyc_bounds"])) --> 2
+                    @fact (isa(request["baseline_cyc_bounds"][1],Integer)) --> true
+                    @fact (isa(request["baseline_cyc_bounds"][2],Integer)) --> true
+                end
+            end
+            if (haskey(request,"baseline_method"))
+                @fact (isa(request["baseline_method"],String)) --> true
+                @fact ( 
+                    request["baseline_method"] == "sigmoid" ||
+                    request["baseline_method"] == "linear"  ||
+                    request["baseline_method"] == "median" 
+                ) --> true
+            end
+            if (haskey(request,"cq_method"))
+                @fact (isa(request["cq_method"],String)) --> true
+                @fact (request["cq_method"] in ["cp_dr1","cp_dr2","Cy0","ct"]) --> true
+            end
+            if (haskey(request,"min_fluomax"))
+                @fact (isa(request["min_fluomax"],Number)) --> true
+            end
+            if (haskey(request,"min_D1max"))
+                @fact (isa(request["min_D1max"],Number)) --> true
+            end
+            if (haskey(request,"min_D2max"))
+                @fact (isa(request["min_D2max"],Number)) --> true
+            end
+            @fact (haskey(request,"calibration_info")) --> true
+            calib=request["calibration_info"]
+            @fact (isa(calib,OrderedDict)) --> true
+            @fact (haskey(calib,"water")) --> true
+            @fact (isa(calib["water"],OrderedDict)) --> true
+            @fact (haskey(calib["water"],"fluorescence_value")) --> true
+            @fact (isa(calib["water"]["fluorescence_value"],Vector)) --> true
+            if length(calib["water"]["fluorescence_value"])<2 ||
+                calib["water"]["fluorescence_value"][2]==nothing
+                n_channels=1
+            else
+                n_channels=2
+            end
+            @fact (haskey(request,"raw_data")) --> true
+            raw=request["raw_data"]
+            @fact (isa(raw,OrderedDict)) --> true
+            calibration_test(calib,n_channels) &&
+                raw_test(raw)
         end
     end
-    if (haskey(request,"baseline_method"))
-        @assert (isa(request["baseline_method"],String))
-        @assert (
-            request["baseline_method"] == "sigmoid" ||
-            request["baseline_method"] == "linear"  ||
-            request["baseline_method"] == "median" 
-        )
-    end
-    if (haskey(request,"cq_method"))
-        @assert (isa(request["cq_method"],String))
-        @assert (request["cq_method"] in ["cp_dr1","cp_dr2","Cy0","ct"])
-    end
-    if (haskey(request,"min_fluomax"))
-        @assert (isa(request["min_fluomax"],Number))
-    end
-    if (haskey(request,"min_D1max"))
-        @assert (isa(request["min_D1max"],Number))
-    end
-    if (haskey(request,"min_D2max"))
-        @assert (isa(request["min_D2max"],Number))
-    end
-    @assert (haskey(request,"calibration_info"))
-    calib=request["calibration_info"]
-    @assert (isa(calib,OrderedDict))
-    @assert (haskey(calib,"water"))
-    @assert (isa(calib["water"],OrderedDict))
-    @assert (haskey(calib["water"],"fluorescence_value"))
-    @assert (isa(calib["water"]["fluorescence_value"],Vector))
-    if length(calib["water"]["fluorescence_value"])<2 ||
-        calib["water"]["fluorescence_value"][2]==nothing
-        n_channels=1
-    else
-        n_channels=2
-    end
-    @assert (haskey(request,"raw_data"))
-    raw=request["raw_data"]
-    @assert (isa(raw,OrderedDict))
-    calibration_test(calib,n_channels) &&
-        raw_test(raw)
-end
-
-# single channel
-
-function singlechannel_amplification_request_test()
-    request=JSON.parse("""{
-        "experiment_id": 99,
-        "step_id": 99,
-        "min_reliable_cyc": 5,
-        "calibration_info": {
-            "water": {
-                "fluorescence_value": [
-                    [0.01, 0.02,    0.15, 0.16],
-                    null
-                ]
-            },
-            "channel_1": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    null
-                ]
-            }
-        },
-        "baseline_cyc_bounds": [5, 10],
-        "baseline_method": "sigmoid", 
-        "cq_method": "Cy0",
-        "min_fluomax": 4356,
-        "min_D1max": 472,
-        "min_D2max": 41,
-        "raw_data": {
-            "fluorescence_value": [],
-            "well_num": [],
-            "cycle_num": [],
-            "channel": []
-        }
-    }"""; dicttype=OrderedDict)
-    verify_request(
-        ActionType_DICT["amplification"](),
-        request
-    )
-end
-
-# dual channel
-
-function dualchannel_amplification_request_test()
-    request=JSON.parse("""{
-        "experiment_id": 99,
-        "ramp_id": 99,
-        "min_reliable_cyc": 5,
-        "calibration_info": {
-            "water": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    [2.01, 2.02,    2.15, 2.16]
-                ]
-            },
-            "channel_1": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    [2.01, 2.02,    2.15, 2.16]
-                ]
-            },
-            "channel_2": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    [2.01, 2.02,    2.15, 2.16]
-                ]
-            }
-        },
-        "baseline_cyc_bounds": [],
-        "baseline_method": "sigmoid", 
-        "cq_method": "Cy0",
-        "min_fluomax": 4356,
-        "min_D1max": 472,
-        "min_D2max": 41,
-        "raw_data": {
-            "fluorescence_value": [],
-            "well_num": [],
-            "cycle_num": [],
-            "channel": []
-        }
-    }"""; dicttype=OrderedDict)
-    verify_request(
-        ActionType_DICT["amplification"](),
-        request
-    )
+    FactCheck.exitstatus()
 end
 
 
@@ -386,132 +285,50 @@ end
 #     ORDER BY channel, well_num
 # ;
 
-
 function verify_request(
     ::MeltCurve,
     request ::Any
 )
-    @assert (isa(request,OrderedDict))
-    @assert (haskey(request,"experiment_id"))
-    @assert (isa(request["experiment_id"],Integer))
-    @assert (haskey(request,"stage_id"))
-    @assert (isa(request["stage_id"],Integer))
-    @assert (haskey(request,"calibration_info"))
-    @assert (haskey(request,"channel_nums"))
-    @assert (isa(request["channel_nums"],Vector))
-    calib=request["calibration_info"]
-    @assert (isa(calib,OrderedDict))
-    @assert (haskey(calib,"water"))
-    @assert (isa(calib["water"],OrderedDict))
-    @assert (haskey(calib["water"],"fluorescence_value"))
-    @assert (isa(calib["water"]["fluorescence_value"],Vector))
-    if length(calib["water"]["fluorescence_value"])<2 ||
-        calib["water"]["fluorescence_value"][2]==nothing
-        @assert (request["channel_nums"]==[1])
-        n_channels=1
-    else
-        @assert (request["channel_nums"]==[1,2])
-        n_channels=2
+    facts("Melting curve requested") do
+        context("Verifying request body") do
+            @fact (isa(request,OrderedDict)) --> true
+            @fact (haskey(request,"experiment_id")) --> true
+            @fact (isa(request["experiment_id"],Integer)) --> true
+            @fact (haskey(request,"stage_id")) --> true
+            @fact (isa(request["stage_id"],Integer)) --> true
+            @fact (haskey(request,"calibration_info")) --> true
+            @fact (haskey(request,"channel_nums")) --> true
+            @fact (isa(request["channel_nums"],Vector)) --> true
+            calib=request["calibration_info"]
+            @fact (isa(calib,OrderedDict)) --> true
+            @fact (haskey(calib,"water")) --> true
+            @fact (isa(calib["water"],OrderedDict)) --> true
+            @fact (haskey(calib["water"],"fluorescence_value")) --> true
+            @fact (isa(calib["water"]["fluorescence_value"],Vector)) --> true
+            if length(calib["water"]["fluorescence_value"])<2 ||
+                calib["water"]["fluorescence_value"][2]==nothing
+                @fact (request["channel_nums"]) --> [1]
+                n_channels=1
+            else
+                @fact (request["channel_nums"]) --> [1,2]
+                n_channels=2
+            end
+            if (haskey(request,"qt_prob"))
+                @fact (isa(request["qt_prob"],Number)) --> true
+            end
+            if (haskey(request,"max_normd_qtv"))
+                @fact (isa(request["max_normd_qtv"],Number)) --> true
+            end
+            if (haskey(request,"top_N"))
+                @fact (isa(request["top_N"],Integer)) --> true
+            end
+            @fact (haskey(request,"raw_data")) --> true
+            raw=request["raw_data"]
+            @fact calibration_test(calib,n_channels) --> true
+            @fact raw_test(raw) --> true
+        end
     end
-    if (haskey(request,"qt_prob"))
-        @assert (isa(request["qt_prob"],Number))
-    end
-    if (haskey(request,"max_normd_qtv"))
-        @assert (isa(request["max_normd_qtv"],Number))
-    end
-    if (haskey(request,"top_N"))
-        @assert (isa(request["top_N"],Integer))
-    end
-    @assert (haskey(request,"raw_data"))
-    raw=request["raw_data"]
-    calibration_test(calib,n_channels) &&
-        raw_test(raw)
-end
-
-# single channel
-
-function singlechannel_meltcurve_request_test()
-    request=JSON.parse("""{
-        "experiment_id": 2,
-        "stage_id": 5,
-        "calibration_info": {
-            "water": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    null
-                ]
-            },
-            "channel_1": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    null
-                ]
-            },
-            "channel_2": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    null
-                ]
-            }
-        },
-        "channel_nums": [1],
-        "qt_prob": 0.64,
-        "max_normd_qtv": 0.8,
-        "top_N": 4, 
-        "raw_data": {
-            "fluorescence_value": [],
-            "temperature": [],
-            "well_num": [],
-            "channel": []
-        }
-    }"""; dicttype=OrderedDict)
-    verify_request(
-        ActionType_DICT["meltcurve"](),
-        request
-    )
-end
-
-# dual channel
-
-function dualchannel_meltcurve_request_test()
-    request=JSON.parse("""{
-        "experiment_id": 2,
-        "stage_id": 5,
-        "calibration_info": {
-            "water": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    [2.01, 2.02,    2.15, 2.16]
-                ]
-            },
-            "channel_1": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    [2.01, 2.02,    2.15, 2.16]
-                ]
-            },
-            "channel_2": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    [2.01, 2.02,    2.15, 2.16]
-                ]
-            }
-        },
-        "channel_nums": [1,2],
-        "qt_prob": 0.64,
-        "max_normd_qtv": 0.8,
-        "top_N": 4, 
-        "raw_data": {
-        	"fluorescence_value": [],
-        	"temperature": [],
-        	"well_num": [],
-        	"channel": []
-        }
-    }"""; dicttype=OrderedDict)
-    verify_request(
-        ActionType_DICT["meltcurve"](),
-        request
-    )
+    FactCheck.exitstatus()
 end
 
 
@@ -533,33 +350,22 @@ function verify_request(
     ::ThermalPerformanceDiagnostic,
     request ::Any
 )
-    variables=["lid_temp","heat_block_zone_1_temp","heat_block_zone_2_temp","elapsed_time","cycle_num"]
-    @assert (isa(request,OrderedDict))
-    @assert (length(request)==length(variables))
-    n_cycles=length(request["cycle_num"])
-    for v in variables
-        @assert (haskey(request,v))
-        @assert (length(request[v])==n_cycles)
-        for i in range(1,n_cycles)
-            @assert (isa(request[v][i],Number))
+    facts("Thermal performance diagnostic requested") do
+        context("Verifying request body") do
+            variables=["lid_temp","heat_block_zone_1_temp","heat_block_zone_2_temp","elapsed_time","cycle_num"]
+            @fact (isa(request,OrderedDict)) --> true
+            @fact (length(request)) --> length(variables)
+            n_cycles=length(request["cycle_num"])
+            for v in variables
+                @fact (haskey(request,v)) --> true
+                @fact (length(request[v])) --> n_cycles
+                for i in range(1,n_cycles)
+                    @fact (isa(request[v][i],Number)) --> true
+                end
+            end
         end
     end
-    true
-end
-
-
-function thermal_performance_diagnostic_request_test()
-    request=JSON.parse("""{
-      "lid_temp": [],
-      "heat_block_zone_1_temp": [],
-      "heat_block_zone_2_temp": [],
-      "elapsed_time": [],
-      "cycle_num": []
-    }"""; dicttype=OrderedDict)
-    verify_request(
-        ActionType_DICT["thermal_performance_diagnostic"](),
-        request
-    )
+    FactCheck.exitstatus()
 end
 
 
@@ -586,101 +392,31 @@ function verify_request(
     ::ThermalConsistency,
     request ::Any
 )
-    @assert (isa(request,OrderedDict))
-    # @assert (length(request)==2)
-    @assert (haskey(request,"raw_data"))
-    @assert (isa(request["raw_data"],OrderedDict))
-    @assert (haskey(request["raw_data"],"channel"))
-    @assert (haskey(request,"calibration_info"))
-    calib=request["calibration_info"]
-    @assert (isa(calib,OrderedDict))
-    @assert (haskey(calib,"water"))
-    @assert (isa(calib["water"],OrderedDict))
-    @assert (haskey(calib["water"],"fluorescence_value"))
-    @assert (isa(calib["water"]["fluorescence_value"],Vector))
-    if length(calib["water"]["fluorescence_value"])<2 ||
-        calib["water"]["fluorescence_value"][2]==nothing
-        n_channels=1
-    else
-        n_channels=2
+    facts("Thermal consistency requested") do
+        context("Verifying request body") do
+            @fact (isa(request,OrderedDict)) --> true
+            # @fact (length(request)) --> 2
+            @fact (haskey(request,"raw_data")) --> true
+            @fact (isa(request["raw_data"],OrderedDict)) --> true
+            @fact (haskey(request["raw_data"],"channel")) --> true
+            @fact (haskey(request,"calibration_info")) --> true
+            calib=request["calibration_info"]
+            @fact (isa(calib,OrderedDict)) --> true
+            @fact (haskey(calib,"water")) --> true
+            @fact (isa(calib["water"],OrderedDict)) --> true
+            @fact (haskey(calib["water"],"fluorescence_value")) --> true
+            @fact (isa(calib["water"]["fluorescence_value"],Vector)) --> true
+            if length(calib["water"]["fluorescence_value"])<2 ||
+                calib["water"]["fluorescence_value"][2]==nothing
+                n_channels=1
+            else
+                n_channels=2
+            end
+            calibration_test(calib,n_channels) &&
+                raw_test(request["raw_data"])
+        end
     end
-    experiment_info(request) &&
-        calibration_test(calib,n_channels) &&
-        raw_test(request["raw_data"])
-end
-
-# single channel
-
-function single_channel_thermal_consistency_request_test()
-    request=JSON.parse("""{
-        "raw_data": {
-            "fluorescence_value":  [],
-            "temperature":  [],
-            "well_num":  [],
-            "channel":  []
-        },
-        "calibration_info": {
-            "water": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    null
-                ]
-            },
-            "channel_1": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    null
-                ]
-            },
-            "channel_2": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    null
-                ]
-            }
-        }
-    }"""; dicttype=OrderedDict)
-    verify_request(
-        ActionType_DICT["thermal_consistency"](),
-        request
-    )
-end
-
-# dual channel
-
-function dual_channel_thermal_consistency_request_test()
-    request=JSON.parse("""{
-        "raw_data": {
-            "fluorescence_value":  [],
-            "temperature":  [],
-            "well_num":  [],
-            "channel":  []
-        },
-        "calibration_info": {
-            "water": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    [2.01, 2.02,    2.15, 2.16]
-                ]
-            },
-            "channel_1": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    [2.01, 2.02,    2.15, 2.16]
-                ]
-            },
-            "channel_2": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    [2.01, 2.02,    2.15, 2.16]
-                ]
-            }
-        }
-    }"""; dicttype=OrderedDict)
-    verify_request(
-        ActionType_DICT["thermal_consistency"](),
-        request
-    )
+    FactCheck.exitstatus()
 end
 
 
@@ -695,85 +431,27 @@ function verify_request(
     ::OpticalCal,
     request ::Any
 )
-    @assert (isa(request,OrderedDict))
-    @assert (haskey(request,"calibration_info"))
-    @assert (length(request)==1)
-    calib=request["calibration_info"]
-    @assert (isa(calib,OrderedDict))
-    @assert (haskey(calib,"water"))
-    @assert (isa(calib["water"],OrderedDict))
-    @assert (haskey(calib["water"],"fluorescence_value"))
-    @assert (isa(calib["water"]["fluorescence_value"],Vector))
-    if length(calib["water"]["fluorescence_value"])<2 ||
-        calib["water"]["fluorescence_value"][2]==nothing
-        n_channels=1
-    else
-        n_channels=2
+    facts("Optical calibration requested") do
+        context("Verifying request body") do
+            @fact (isa(request,OrderedDict)) --> true
+            @fact (haskey(request,"calibration_info")) --> true
+            @fact (length(request)) --> 1
+            calib=request["calibration_info"]
+            @fact (isa(calib,OrderedDict)) --> true
+            @fact (haskey(calib,"water")) --> true
+            @fact (isa(calib["water"],OrderedDict)) --> true
+            @fact (haskey(calib["water"],"fluorescence_value")) --> true
+            @fact (isa(calib["water"]["fluorescence_value"],Vector)) --> true
+            if length(calib["water"]["fluorescence_value"])<2 ||
+                calib["water"]["fluorescence_value"][2]==nothing
+                n_channels=1
+            else
+                n_channels=2
+            end
+            calibration_test(calib,n_channels)
+        end
     end
-    experiment_info(request) &&
-        calibration_test(calib,n_channels)
-end
-
-# single channel
-
-function singlechannel_optical_cal_request_test()
-    request=JSON.parse("""{
-        "calibration_info": {
-            "water": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    null
-                ]
-            },
-            "channel_1": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    null
-                ]
-            },
-            "channel_2": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    null
-                ]
-            }
-        }
-    }"""; dicttype=OrderedDict)
-    verify_request(
-        ActionType_DICT["optical_cal"](),
-        request
-    )
-end
-
-# dual channel
-
-function dualchannel_optical_cal_request_test()
-    request=JSON.parse("""{
-        "calibration_info": {
-            "water": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    [2.01, 2.02,    2.15, 2.16]
-                ]
-            },
-            "channel_1": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    [2.01, 2.02,    2.15, 2.16]
-                ]
-            },
-            "channel_2": {
-                "fluorescence_value": [
-                    [1.01, 1.02,    1.15, 1.16],
-                    [2.01, 2.02,    2.15, 2.16]
-                ]
-            }
-        }
-    }"""; dicttype=OrderedDict)
-    verify_request(
-        ActionType_DICT["optical_cal"](),
-        request
-    )
+    FactCheck.exitstatus()
 end
 
 
@@ -796,26 +474,12 @@ function verify_request(
     ::OpticalTestSingleChannel,
     request ::Any
 )
-    calibration_test(request,1,["baseline","excitation"])
-end
-
-function singlechannel_optical_request_test()
-    request=JSON.parse("""{
-        "baseline": {
-            "fluorescence_value": [
-                [1.01, 1.02,    1.15, 1.16]
-            ]
-        },
-        "excitation": {
-            "fluorescence_value": [
-                [1.01, 1.02,    1.15, 1.16]
-            ]
-        }
-    }"""; dicttype=OrderedDict)
-    verify_request(
-        ActionType_DICT["optical_test"](),
-        request
-    )
+    facts("Single channel optical test requested") do
+        context("Verifying request body") do
+            calibration_test(request,1,["baseline","excitation"])
+        end
+    end
+    FactCheck.exitstatus()
 end
 
 
@@ -838,83 +502,15 @@ function verify_request(
     ::OpticalTestDualChannel,
     request ::Any
 )
-    @assert (isa(request,OrderedDict))
-    @assert (haskey(request,"calibration_info"))
-    calib=request["calibration_info"]
-    @assert (isa(calib,OrderedDict))
-    if (haskey(calib,"channel_1"))
-        calibration_test(calib,2,["baseline","water","channel_1","channel_2"])
-    else
-        calibration_test(calib,2,["baseline","water","FAM","HEX"])
-    end
-end
-
-function dualchannel_optical_request_test()
-    request=JSON.parse("""{
-        "baseline": {
-            "fluorescence_value": [
-                [1.01, 1.02,    1.15, 1.16],
-                [2.01, 2.02,    2.15, 2.16]
-            ]
-        },
-        "water": {
-            "fluorescence_value": [
-                [1.01, 1.02,    1.15, 1.16],
-                [2.01, 2.02,    2.15, 2.16]
-            ]
-        },
-        "channel_1": {
-            "fluorescence_value": [
-                [1.01, 1.02,    1.15, 1.16],
-                [2.01, 2.02,    2.15, 2.16]
-            ]
-        },
-        "channel_2": {
-            "fluorescence_value": [
-                [1.01, 1.02,    1.15, 1.16],
-                [2.01, 2.02,    2.15, 2.16]
-            ]
-        }
-    }"""; dicttype=OrderedDict)
-    verify_request(
-        ActionType_DICT["optical_test"](),
-        request
-    )
-end
-
-
-
-# ********************************************************************************
-#
-#                               R U N   E X A M P L E S
-#
-# ********************************************************************************
-
-function verify_request_examples()
-    examples = [
-        :standard_curve_request_test,
-        :singlechannel_amplification_request_test,
-        :dualchannel_amplification_request_test,
-        :singlechannel_meltcurve_request_test,
-        :dualchannel_meltcurve_request_test,
-        :thermal_performance_diagnostic_request_test,
-        :single_channel_thermal_consistency_request_test,
-        :dual_channel_thermal_consistency_request_test,
-        :singlechannel_optical_cal_request_test,
-        :dualchannel_optical_cal_request_test,
-        :singlechannel_optical_request_test,
-        :singlechannel_optical_request_test,
-        :dualchannel_optical_request_test
-    ]
-    OrderedDict(map(examples) do f
-        f => 
-            try
-                getfield(Main,f)()
-            catch err
-                err
+    facts("Dual channel optical test requested") do
+        context("Verifying request body") do
+            @fact (isa(request,OrderedDict)) --> true
+            if (haskey(request,"channel_1"))
+                calibration_test(request,2,["baseline","water","channel_1","channel_2"])
+            else
+                calibration_test(request,2,["baseline","water","FAM","HEX"])
             end
-    end)
+        end
+    end
+    FactCheck.exitstatus()
 end
-
-# Usage:
-# verify_request_examples() # every test should return true

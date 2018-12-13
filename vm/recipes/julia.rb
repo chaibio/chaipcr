@@ -22,6 +22,15 @@ bash 'julia' do
     rm *.tar
     sudo ln -s ~/julia/julia-0.6.2-linux-x86_64/bin/julia /usr/local/bin/julia
     /usr/local/bin/julia -e 'include("../chaipcr/bioinformatics/setup.jl")'
+    cat <<-START_JULIA >> ~/.juliarc.jl
+      atreplinit() do repl
+          try
+              @eval using Revise
+              @async Revise.wait_steal_repl_backend()
+          catch
+          end
+      end
+START_JULIA
     echo 'export JULIA_ENV=development' >> ~/.bashrc
     touch /tmp/.vagrant-julia
   JULIA

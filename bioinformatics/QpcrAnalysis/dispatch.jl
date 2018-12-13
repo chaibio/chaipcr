@@ -17,20 +17,24 @@ function dispatch(action ::String, request_body ::String)
 
     result = try
 
+        # development >>
         verify_input = try
             verify_request(action_t, req_parsed)
         catch err
             error("data supplied with $action request is in the wrong format")
         end
+        # << development
 
         response = act(action_t, req_parsed)
         json_response=JSON.json(response)
 
+        # development >>
         verify_output = try
             verify_response(action_t,JSON.parse(json_response,dicttype=OrderedDict))
         catch err
            error("data returned from $action request is in the wrong format")
         end
+        # << development
 
         String(json_response)
 

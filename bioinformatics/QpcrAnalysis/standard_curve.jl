@@ -34,8 +34,8 @@ function act(
     out_format ::String ="json",
     json_digits ::Integer =JSON_DIGITS,
     qty_base ::Real =10,
-    empty_tre ::TargetResultEl e=EMPTY_TRE,
-    empty_gre ::GroupResultEle =EMPTY_GRE,
+    empty_tre ::TargetResultEle =EMPTY_TRE,
+    empty_gre ::GroupResultEle =EMPTY_GRE
     )
 
     # df1.colindex.names

@@ -28,6 +28,7 @@ using Clustering, Combinatorics, DataFrames, DataStructures, Dierckx, Ipopt, JLD
 # `, DataArrays` needed if `Pkg.add("DataFrames", v"0.11.2", v"0.11.3-")`, but not needed when using latest version as of 2018-04-10
 # `, NLopt` on BBB but not on PC ("ERROR: LoadError: Declaring __precompile__(false) is not allowed in files that are being precompiled". "ERROR: Failed to precompile NLopt to /root/.julia/lib/v0.6/NLopt.ji") # In addition, "HttpServer" for "juliaserver.jl"
 
+using FactCheck
 
 const MODULE_NAME = "QpcrAnalysis"
 # Other functions than `include` read files from `pwd()` only instead of also `LOAD_PATH`. `pwd()` shows the present working directory in module `Main`, instead of the directory where "QpcrAnalysis.jl" is located. Therefore `LOAD_FROM_DIR` needs to be defined for those functions to find files in the directory where "QpcrAnalysis.jl" is located.
@@ -37,6 +38,10 @@ end][1] # slice by boolean vector returned a one-element vector. Assumption: LOA
 
 
 # include each script, generally in the order of workflow
+
+# development & testing
+import Base.Test
+
 
 include("shared.jl")
 
@@ -71,7 +76,6 @@ include("supsmu.jl")
 include("meltcrv.jl")
 
 # analyze_customized
-include("analyze_customized/analyze_types.jl")
 include("analyze_customized/thermal_performance_diagnostic.jl")
 include("analyze_customized/optical_test_single_channel.jl")
 include("analyze_customized/optical_test_dual_channel.jl")
@@ -81,7 +85,6 @@ include("analyze_customized/thermal_consistency.jl")
 
 # wrap up
 # include("test.jl")
-include("../test/api_test.jl")
 # include("__init__.jl")
 
 # # no longer needed
