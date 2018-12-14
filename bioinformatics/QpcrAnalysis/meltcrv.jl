@@ -82,12 +82,9 @@ function act(
         # calib_info;
 
         # new >>
-        exp_id, 
-        stage_id, 
         req_dict["raw_data"],
         req_dict["calibration_info"];
-        channel_nums=req_dict["channel_nums"],
-        out_format="pre-json",
+        out_format="david json",
         # << new
 
         # kwdict_pmc...,
@@ -107,11 +104,8 @@ function process_mc(
     # calib_info ::Union{Integer,OrderedDict};
 
     # new >>
-    exp_id ::Integer,
-    stage_id ::Integer,
     mc_data ::Associative,
     calib_data ::Associative;
-    channel_nums ::AbstractVector =[1],
     # << new
 
     # start: arguments that might be passed by upstream code
@@ -125,7 +119,7 @@ function process_mc(
     dyes_2bfild ::AbstractVector =[],
     dcv ::Bool =true, # logical, whether to perform multi-channel deconvolution
 	max_tmprtr ::Real =1000, # maximum temperature to analyze
-    out_format ::String ="json", # "full", "pre_json", "json"
+    out_format ::String ="pre_json", # "full", "pre_json", "json"
     verbose ::Bool =false,
     kwdict_mc_tm_pw ::Associative =OrderedDict() # keyword arguments passed onto `mc_tm_pw`
     )
@@ -162,6 +156,7 @@ function process_mc(
     # channel_nums = sort(unique(mcd_nt[:channel])) 
 
     # new >>
+    channel_nums = sort(unique(mc_data["channel"]))
     num_channels = length(channel_nums)
     # << new
 
@@ -179,6 +174,7 @@ function process_mc(
     num_fluo_wells = length(fluo_well_nums)
     # << new
 
+    # get data arrays by channel
     mc_data_bych = map(channel_nums) do channel_num
         get_mc_data(
             channel_num,
@@ -186,23 +182,19 @@ function process_mc(
             ## remove MySql dependency
             #
             # db_conn,
+            # exp_id,
+            # stage_id,
 
             # new >>
             mc_data,
             fluo_well_nums,
             # << new
 
-            exp_id,
-            stage_id,
             well_nums,
             max_tmprtr
         )
     end
 
-    # new >>
-    #num_channels    = length(channel_nums)
-    # << new
-    
     ## truncate data where necessary so it fits in 3d matrix
     #channel_x_well = mc_data["channel"] * num_fluo_wells + mc_data["well_num"]
     #cm = StatsBase.countmap(channel_x_well, alg=:dict)
@@ -221,6 +213,7 @@ function process_mc(
     # reshape raw fluorescence data to 3-dimensional array
     fr_ary3 = cat(3, map(mc_data -> mc_data.fluo_da, mc_data_bych)...) # fr = fluo_raw
 
+    # perform deconvolution and adjust well-to-well variation in absolute fluorescence
     mw_ary3, k4dcv, fdcvd_ary3, wva_data, wva_well_nums, faw_ary3 = dcv_aw(
         fr_ary3,
         dcv,
@@ -252,23 +245,15 @@ function process_mc(
     # channel_only1 = 1 # used: 1, 2
     # fc_bych = OrderedDict(channel_only1 => fc_bych[channel_only1])
 
+    # subset temperature/fluorescence data by channel then by well
     tf_bychwl = OrderedDict( # bychwl = by channel then by well
         map(1:num_channels) do channel_i
-            tf = map(wva_well_nums) do wva_well_num
 
-                ## remove MySql dependency
-                #
-                if wva_well_num in fluo_well_nums
-                    i = indexin([wva_well_num], fluo_well_nums)[1]
+            tf = map(wva_well_nums) do oc_well_num
+
+                if oc_well_num in fluo_well_nums
+                    i = indexin([oc_well_num], fluo_well_nums)[1]
                     tmprtrs_wNaN = mc_data_bych[channel_i].t_da_vec[i]
-
-                    ## new >>
-                    # i = wva_well_num
-                    # k = (mc_data["channel"] .== channel_i) .&
-                    #     (mc_data["well_num"] .== fluo_well_nums[i])
-                    # tmprtrs_wNaN = mc_data["temperature"][k]
-                    ## << new
-
                     fluos_wNaN = faw_ary3[:,i,channel_i]
                     idc_not_NaN = find(tmprtrs_wNaN) do tmprtr
                         !isnan(tmprtr)
@@ -278,50 +263,29 @@ function process_mc(
                     fluos = fluos_raw - minimum(fluos_raw) # where "normalized" came from
                     OrderedDict(
                         "tmprtrs" => tmprtrs,
-                        "fluos" => fluos
+                        "fluos"   => fluos
                     ) # note: selecting one column of a 2-D array results in a vector (1-D array), but selecting one row of it results in a 1-row 2-D array.
-
-                ## remove MySql dependency
-                #
                 else
                    nothing
                 end # if
 
             end # do oc_well_num
             return channel_nums[channel_i] => tf
+
         end) # do channel_i
 
+    # smooth the fluorescence/temperature data and calculate Tm peak, area
     mc_bychwl = hcat(map(collect(values(tf_bychwl))) do tf_bywl
-
-        # commented out while debugging because I had
-        # trouble loading the smoothing library
-        # map(tf_bywl) do tf_dict
-        #    mc_tm_pw(
-        #        tf_dict;
-        #        auto_span_smooth=auto_span_smooth,
-        #        span_smooth_default=span_smooth_default,
-        #        span_smooth_factor=span_smooth_factor,
-        #        verbose=verbose,
-        #        kwdict_mc_tm_pw...
-        #    )
-        # end # do tf_dict
-
-        # DEBUG >>
-        # substitute dummy data
         map(tf_bywl) do tf_dict
-            MeltCurveTa(
-                hcat(tf_dict["tmprtrs"],tf_dict["fluos"]),
-                #zeros(0,0),
-                zeros(0,0),
-                zeros(0,0),
-                NaN,
-                OrderedDict(),
-                zeros(0,0),
-                ""
+            mc_tm_pw(
+                tf_dict;
+                auto_span_smooth=auto_span_smooth,
+                span_smooth_default=span_smooth_default,
+                span_smooth_factor=span_smooth_factor,
+                verbose=verbose,
+                kwdict_mc_tm_pw...
             )
-        end
-        # << DEBUG
-
+        end # do tf_dict
     end...)
 
     if out_format[end-3:end] == "json"
@@ -359,20 +323,20 @@ end # process_mc
 
 # functions called by `process_mc`
 
-# function: get raw melt curve data and perform optical calibration
+# function: get raw melt curve data by channel and perform optical calibration
 function get_mc_data(
     channel_num ::Integer,
 
     ## remove MySql dependency
     #
     # db_conn ::MySQL.MySQLHandle,
+    # exp_id ::Integer,
+    # stage_id ::Integer,
 
     # new >>
-    fluo_sel ::Associative,
+    mc_data ::Associative,
     fluo_well_nums ::AbstractArray,
     # << new
-
-    exp_id ::Integer, stage_id ::Integer,
     well_nums ::AbstractVector,
 
 	max_tmprtr ::Real
@@ -395,6 +359,16 @@ function get_mc_data(
     # fluo_sel, fluo_well_nums = get_mysql_data_well(
     #     well_nums, fluo_qry_2b, db_conn, false
     # )
+
+    # new >>
+    # subset melting curve data by channel
+    s = map(x -> x==channel_num, mc_data["channel"])
+    fluo_sel = OrderedDict(
+        "temperature"         => mc_data["temperature"][s],
+        "fluorescence_value"  => mc_data["fluorescence_value"][s],
+        "well_num"            => mc_data["well_num"][s]
+    )
+    # << new
 
     # split temperature and fluo data by well_num
     tf_names = [:temperature, :fluorescence_value]
@@ -435,6 +409,7 @@ end # get_mc_data
 function mc_tm_pw(fake_input ::Void; kwargs...)
     EMPTY_mc_tm_pw_out
 end
+
 
 function mc_tm_pw(
 

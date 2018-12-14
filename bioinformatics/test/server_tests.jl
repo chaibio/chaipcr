@@ -27,10 +27,11 @@ function server_tests()
     import Combinatorics.combinations
     import JLD.load
     import JSON
+    import Dierckx: Spline1D, derivative
 
     # development & testing
     import Base.Test
-    using FactCheck
+    immport FactCheck: facts, context, @fact, clear_results, exitstatus, less_than_or_equal
     FactCheck.clear_results()
 
     include("shared.jl")
@@ -45,7 +46,6 @@ function server_tests()
       
     # calibration
     include("deconv.jl") 
-    const K4DCV = load("$LOAD_FROM_DIR/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv"]
     include("adj_w2wvaf.jl")
     include("calib.jl") 
 
@@ -88,12 +88,12 @@ function server_tests()
 
     # single channel amplification test
     request = JSON.parsefile("/mnt/share/test_1ch_amp_169.json"; dicttype=OrderedDict)
-    (ok, response_body) = dispatch("amplification",String(JSON.json(request)))
+    (ok, response_body) = dispatch("amplification",String(JSON.json(request)),verify=true)
     ok
 
     # dual channel amplification tests
     request = JSON.parsefile("/mnt/share/xh-amp1.json"; dicttype=OrderedDict)
-    (ok, response_body) = dispatch("amplification",String(JSON.json(request)))
+    (ok, response_body) = dispatch("amplification",String(JSON.json(request)),verify=true)
     ok
 
     # debug version
@@ -110,21 +110,25 @@ function server_tests()
     include("action_types.jl")
     include("verify_request.jl")
     include("verify_response.jl")
-    include("dispatch.jl")
-    include("calib.jl")
-    include("adj_w2wvaf.jl")
-    include("deconv.jl")
-    include("meltcrv.jl")
-    include("supsmu.jl")
+    include("/mnt/share/dispatch.jl")
+    include("/mnt/share/calib.jl")
+    include("/mnt/share/adj_w2wvaf.jl")
+    include("/mnt/share/deconv.jl")
+    include("/mnt/share/meltcrv.jl")
+    include("/mnt/share/supsmu.jl")
+
+    k = JLD.load("$LOAD_FROM_DIR/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv"]
+    kk = K4Deconv(k.k_s,k.k_inv_vec,k.inv_note)
+    const K4DCV = kk
 
     # single channel melting curve test
     request = JSON.parsefile("/mnt/share/test_1ch_mc_170.json"; dicttype=OrderedDict)
-    (ok, response_body) = dispatch("meltcurve",String(JSON.json(request)))
+    (ok, response_body) = dispatch("meltcurve",String(JSON.json(request)),verify=true)
     ok
 
     # dual channel melting curve test
-    request = JSON.parsefile("/mnt/share/test_1ch_mc_170.json"; dicttype=OrderedDict)
-    (ok, response_body) = dispatch("meltcurve",String(JSON.json(request)))
+    request = JSON.parsefile("/mnt/share/test_2ch_mc_223.json"; dicttype=OrderedDict)
+    (ok, response_body) = dispatch("meltcurve",String(JSON.json(request)),verify=true)
     ok
 
     # debug version
@@ -148,12 +152,12 @@ function server_tests()
 
     # single channel optical test
     request = JSON.parsefile("/mnt/share/test_1ch_ot_161.json"; dicttype=OrderedDict)
-    (ok, response_body) = dispatch("optical_test_single_channel",String(JSON.json(request)))
+    (ok, response_body) = dispatch("optical_test_single_channel",String(JSON.json(request)),verify=true)
     ok
     
     # dual channel optical test
     request = JSON.parsefile("/mnt/share/test_2ch_ot_190.json"; dicttype=OrderedDict)
-    (ok, response_body) = dispatch("optical_test_dual_channel",String(JSON.json(request)))
+    (ok, response_body) = dispatch("optical_test_dual_channel",String(JSON.json(request)),verify=true)
     ok
     
     # debug version

@@ -96,7 +96,7 @@ end
 
 ## according to juliaapi_new.txt:
 #
-# each set of calibration data (water, signal_1, signal_2) comes from the following SQL query: 
+## each set of calibration data (water, channel_1, channel_2) comes from the following SQL query: 
 # 
 # SELECT fluorescence_value, well_num, channel
 #     FROM fluorescence_data
@@ -150,8 +150,7 @@ function calibration_test(
     FactCheck.exitstatus()
 end
 
-# Raw Data comes from the following sql query: 
-#
+## Raw Data comes from the following SQL query: 
 # SELECT fluorescence_value, well_num, cycle_num, channel
 #     FROM fluorescence_data
 #     WHERE experiment_id = $exp_id AND step_id = $step_id
@@ -267,16 +266,14 @@ end
 # channel_nums = [1] for 1 channel, [1,2] for 2 channels, etc.
 # top_N = number of Tm peaks to report
 
-# Calibration (Water, signal_1, signal_2) data comes from the following sql query: 
-#
+# Calibration (water, channel_1, channel_2) data comes from the following SQL query: 
 # SELECT fluorescence_value, well_num, channel
 #     FROM fluorescence_data
 #     WHERE experiment_id = $calib_id AND step_id = $step_id
 #     ORDER BY channel, well_num
 # ;
 
-# Raw Data comes from the following sql query: 
-#
+# Raw Data comes from the following SQL query: 
 # SELECT fluorescence_value, temperature, well_num, channel
 #     FROM melt_curve_data
 #     WHERE
@@ -339,7 +336,7 @@ end
 #
 # ********************************************************************************
 
-# MySQL query it is used: 
+# SQL query: 
 # SELECT *
 #     FROM temperature_logs
 #     WHERE experiment_id = $exp_id
@@ -376,10 +373,7 @@ end
 #
 # ********************************************************************************
 
-# request body: 
-
-# MySQL query used: 
-#
+# SQL query: 
 # SELECT fluorescence_value, temperature, well_num, channel
 #     FROM melt_curve_data
 #     WHERE
@@ -462,8 +456,7 @@ end
 #
 # ********************************************************************************
 
-# MySQL query used: 
-#
+## SQL query: 
 # SELECT fluorescence_value, well_num, cycle_num
 #     FROM fluorescence_data
 #     WHERE experiment_id = $exp_id AND step_id = $step_id
@@ -490,8 +483,7 @@ end
 #
 # ********************************************************************************
 
-# MySQL query used: 
-#
+## SQL query: 
 # SELECT fluorescence_value, well_num, cycle_num
 #     FROM fluorescence_data
 #     WHERE experiment_id = $exp_id AND step_id = $step_id

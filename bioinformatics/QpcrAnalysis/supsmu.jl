@@ -1,6 +1,6 @@
 # wrapper for Fortran subroutine `supsmu` (Friedman 1984)
 
-const libsupsmu = "$LOAD_FROM_DIR/_supsmu_unix.so"
+const libsupsmu = "$LOAD_FROM_DIR/_supsmu.so"
 
 function supsmu(
     X::AbstractVector,

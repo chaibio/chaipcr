@@ -263,7 +263,7 @@ function prep_adj_w2wvaf(
     channels_in_water = (length(calib_data["water"]["fluorescence_value"])<2 ||
         calib_data["water"]["fluorescence_value"][2]==nothing) ? 1 : 2
     #
-    water_data_dict = OrderedDict{UInt8,Any}()
+    water_data_dict  = OrderedDict{UInt8,Any}()
     signal_data_dict = OrderedDict{UInt8,Any}()
     stop_msgs = Vector{String}()
     for channel in 1:channels_in_water
@@ -284,7 +284,7 @@ function prep_adj_w2wvaf(
         end
         if length(water_data_dict[channel]) != length(signal_data_dict[channel])
             push!(stop_msgs,
-                "Calibration data lengths are not equal for channel $(key). Water: $(water_lengths). Signal: $(signal_lengths)."
+                "Calibration data lengths are not equal for channel $(key)"
             )
         end
     end

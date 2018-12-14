@@ -454,7 +454,6 @@ function add_funcs_pred!(
                 "map(X_case -> $func_name(X_case..., $coefs_str), X_cases)",
             "end"
         ], "; ")
-        println(func_str)
         md.func_pred_strs[func_key] = func_str
         func_expr = parse(func_str)
         md.funcs_pred[func_key] = @eval $func_expr

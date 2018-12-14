@@ -17,9 +17,9 @@ calibration_id AS calib_id,
 analyze_status AS analyzed,
 cached_temperature AS temp,
 power_cycles,
-name 
-FROM experiments 
-WHERE completion_status="success" 
+name
+FROM experiments
+WHERE completion_status="success"
 AND time_valid="1" ;
 
 
@@ -28,15 +28,15 @@ AND time_valid="1" ;
 
 # 1. Dual channel amplification request test
 #
-# Calibration (Water, channel_1, channel_2) data comes from the following sql query: 
-# 
+# Calibration (Water, channel_1, channel_2) data comes from the following sql query:
+#
 # SELECT fluorescence_value, well_num, channel
 #     FROM fluorescence_data
 #     WHERE experiment_id = $calib_id AND step_id = $step_id
 #     ORDER BY channel, well_num
 # ;
 #
-# Raw Data comes from the following sql query: 
+# Raw Data comes from the following sql query:
 #
 # SELECT fluorescence_value, well_num, cycle_num, channel
 #     FROM fluorescence_data
@@ -105,10 +105,10 @@ ORDER BY channel, well_num, cycle_num ;" > /mnt/share/amp_136.tsv
 
 # Test_1ch and Test_2ch: Match experiments to stages
 USE test_1ch ;
-SELECT experiments.id, stages.id, stages.stage_type 
-FROM experiments 
-LEFT JOIN protocols ON experiments.experiment_definition_id = protocols.experiment_definition_id 
-LEFT JOIN stages ON protocols.id = stages.protocol_id 
+SELECT experiments.id, stages.id, stages.stage_type
+FROM experiments
+LEFT JOIN protocols ON experiments.experiment_definition_id = protocols.experiment_definition_id
+LEFT JOIN stages ON protocols.id = stages.protocol_id
 WHERE experiments.id = @exp_id AND stages.stage_type <> 'holding' ;
 
 # Test_1ch and Test_2ch: Match experiment_id to step_id
@@ -133,7 +133,7 @@ USE test_1ch;
 SELECT fluorescence_value, well_num, channel
 FROM fluorescence_data
 WHERE experiment_id = 168 AND step_id = 2
-ORDER BY channel, well_num ;" | tail -n+2 | cut -f1
+ORDER BY channel, well_num ;" | tail -n+2 | cut -f1 | awk 'BEGIN {RS="";FS=" "}{gsub(/\n/,",")}{print}' -
 water_cal_1=[20351,13854,16950,18614,19292,21191,19613,21150,21611,17390,21328,23590,24131,20167,19417,25120];
 
 # Test_1ch calibration: Signal
@@ -146,7 +146,7 @@ USE test_1ch;
 SELECT fluorescence_value, well_num, channel
 FROM fluorescence_data
 WHERE experiment_id = 168 AND step_id = 4
-ORDER BY channel, well_num ;" | tail -n+2 | cut -f1
+ORDER BY channel, well_num ;" | tail -n+2 | cut -f1 | awk 'BEGIN {RS="";FS=" "}{gsub(/\n/,",")}{print}' -
 signal_cal_1=[2037915,2030879,2356324,2286590,2578814,2660975,2390835,2290655,2419225,2240444,2734095,3069099,
 2599044,2354805,2267721,2879192];
 
@@ -167,7 +167,7 @@ USE test_2ch;
 SELECT fluorescence_value, well_num, channel
 FROM fluorescence_data
 WHERE experiment_id = 219 AND step_id = 325
-ORDER BY channel, well_num ;" | tail -n+2 | cut -f1 | awk 'BEGIN {RS="";FS=" "}{gsub(/\n/," ")}{print}' -
+ORDER BY channel, well_num ;" | tail -n+2 | cut -f1 | awk 'BEGIN {RS="";FS=" "}{gsub(/\n/,",")}{print}' -
 cal_water_2=[
         [12095,20829,14218,19162,14613,12937,12487,14240,7543,14187,12778,12404,13275,18710,10472,8520],
         [ 2163, 2058, 2216, 1869, 1890, 2246, 1997, 2104,2287, 1981, 2120, 3471, 1953, 2018, 1956,2196]
@@ -183,7 +183,7 @@ USE test_2ch;
 SELECT fluorescence_value, well_num, channel
 FROM fluorescence_data
 WHERE experiment_id = 219 AND step_id = 327
-ORDER BY channel, well_num ;" | tail -n+2 | cut -f1 | awk 'BEGIN {RS="";FS=" "}{gsub(/\n/," ")}{print}' -
+ORDER BY channel, well_num ;" | tail -n+2 | cut -f1 | awk 'BEGIN {RS="";FS=" "}{gsub(/\n/,",")}{print}' -
 cal_FAM_2=[
         [79676,104728,95264,90512,109013,103317,92905,100809,82292,115539,93250,106691,113931,134691,78968,80789],
         [35683, 41892,39971,40173, 43931, 44413,43240, 42156,39951, 44385,40652, 40888, 45433, 47371,42637,43064]
@@ -198,11 +198,11 @@ mysql -u root -B -e "
 USE test_2ch;
 SELECT fluorescence_value, well_num, channel
 FROM fluorescence_data
-WHERE experiment_id = 219 AND step_id = 327
-ORDER BY channel, well_num ;" | tail -n+2 | cut -f1 | awk 'BEGIN {RS="";FS=" "}{gsub(/\n/," ")}{print}' -
+WHERE experiment_id = 219 AND step_id = 329
+ORDER BY channel, well_num ;" | tail -n+2 | cut -f1 | awk 'BEGIN {RS="";FS=" "}{gsub(/\n/,",")}{print}' -
     cal_HEX_2=[
-        [79676,104728,95264,90512,109013,103317,92905,100809,82292,115539,93250,106691,113931,134691,78968,80789],
-        [35683, 41892,39971,40173, 43931, 44413,43240, 42156,39951, 44385,40652, 40888, 45433, 47371,42637,43064]
+        [14622,21383,15831,21415,18148,16878,15657,17881,11466,17953,16429,15830,17765,22733,14600,12180],
+        [41396,48051,45444,44977,50132,51689,49093,47231,43050,49144,44858,43502,48565,47037,48413,47160]
     ]
 
 calib_2=OrderedDict(
@@ -265,9 +265,10 @@ ORDER BY channel, well_num ;" > mc_170.tsv
 
 mc_170=readdlm("/mnt/share/mc_223.tsv",'\t',header=true)
 raw_mc_1=OrderedDict(
-    mc_170[2][1]    => [ mc_170[1][:,1], nothing ],
-    mc_170[2][2]    => [ mc_170[1][:,2], nothing ],
-    mc_170[2][3]    => [ mc_170[1][:,3], nothing ]
+    mc_170[2][1]    => mc_170[1][:,1],
+    mc_170[2][2]    => mc_170[1][:,2],
+    mc_170[2][3]    => mc_170[1][:,3],
+    mc_170[2][4]    => mc_170[1][:,4]
 )
 
 mc_1=OrderedDict(
@@ -277,7 +278,7 @@ mc_1=OrderedDict(
     "channel_nums"        => [1],
     "qt_prob"             => 0.64,
     "max_normd_qtv"       => 0.8,
-    "top_N"               => 4, 
+    "top_N"               => 4,
     "raw_data"            => raw_mc_1
 )
 
@@ -298,12 +299,11 @@ WHERE experiment_id = 223 AND stage_id = 311
 ORDER BY channel, well_num ;" > /mnt/share/mc_223.tsv
 
 mc_223=readdlm("/mnt/share/mc_223.tsv",'\t',header=true)
-w=Vector{Integer}(mc_223[1][:,3])
-n=Integer(length(w)/2)
 raw_mc_2=OrderedDict(
-    mc_223[2][1]    => [ mc_223[1][1:n,1], mc_223[1][(n+1):(n+n),1] ],
-    mc_223[2][2]    => [ mc_223[1][1:n,2], mc_223[1][(n+1):(n+n),2] ], 
-    mc_223[2][3]    => [         w[1:n  ],         w[(n+1):(n+n)  ] ]
+    mc_223[2][1]    => mc_223[1][:,1],
+    mc_223[2][2]    => mc_223[1][:,2],
+    mc_223[2][3]    => Vector{Integer}(mc_223[1][:,3]),
+    mc_223[2][4]    => Vector{Integer}(mc_223[1][:,4])
 )
 
 mc_2=OrderedDict(
@@ -313,7 +313,7 @@ mc_2=OrderedDict(
     "channel_nums"        => [1,2],
     "qt_prob"             => 0.64,
     "max_normd_qtv"       => 0.8,
-    "top_N"               => 4, 
+    "top_N"               => 4,
     "raw_data"            => raw_mc_2
 )
 
@@ -336,7 +336,7 @@ FROM fluorescence_data
 WHERE experiment_id = 161
 AND step_id = 12
 AND cycle_num = 1
-ORDER BY well_num" 
+ORDER BY well_num"
 
 # experiments.id = 161
 # stages.id = 5
@@ -349,7 +349,7 @@ FROM fluorescence_data
 WHERE experiment_id = 161
 AND step_id = 13
 AND cycle_num = 1
-ORDER BY well_num" 
+ORDER BY well_num"
 
 baseline_ot_1 = [1704,1803,1522,1442,1490,1540,1834,1757,1593,1705,1711,1586,1529,1638,1659,1502]
 excitation_ot_1=[45213,21030,23819,26412,25405,31761,27095,34442,41152,26695,30389,34168,37144,36466,37692,44756]
@@ -380,7 +380,7 @@ FROM fluorescence_data
 WHERE experiment_id = 190
 AND step_id = 116
 AND cycle_num = 1
-ORDER BY channel, well_num" 
+ORDER BY channel, well_num"
 
 mysql -u root -B -e "
 USE test_2ch ;
@@ -389,7 +389,7 @@ FROM fluorescence_data
 WHERE experiment_id = 190
 AND step_id = 117
 AND cycle_num = 1
-ORDER BY channel, well_num" 
+ORDER BY channel, well_num"
 
 mysql -u root -B -e "
 USE test_2ch ;
@@ -398,7 +398,7 @@ FROM fluorescence_data
 WHERE experiment_id = 190
 AND step_id = 119
 AND cycle_num = 1
-ORDER BY channel, well_num" 
+ORDER BY channel, well_num"
 
 mysql -u root -B -e "
 USE test_2ch ;
@@ -407,7 +407,7 @@ FROM fluorescence_data
 WHERE experiment_id = 190
 AND step_id = 121
 AND cycle_num = 1
-ORDER BY channel, well_num" 
+ORDER BY channel, well_num"
 
 ot_baseline_2=[563  506  559  542  515  531  540  590  480  563  542  571  599  567  519  571;
               1623 1585 1628 1619 1608 1614 1627 1661 1573 1654 1625 1651 1677 1628 1581 1632]

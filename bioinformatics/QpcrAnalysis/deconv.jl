@@ -11,7 +11,6 @@ end
 const ARRAY_EMPTY = Array{Any}()
 const K4DCV_EMPTY = K4Deconv(ARRAY_EMPTY, ARRAY_EMPTY, "")
 
-
 # multi-channel deconvolution
 function deconV(
     # ary2dcv dim1 is unit, which can be cycle (amplification), temperature point (melting curve),
@@ -138,7 +137,10 @@ function get_k(
     # better to rely on name of keys than order of keys
     cd_key_vec = collect(keys(calib_data))
     filter!(x -> x != "water", cd_key_vec) # cd = channel of dye.
-    water_data = reduce(hcat,calib_data["water"]["fluorescence_value"])'
+    water_data = transpose(hcat(
+        calib_data["water"]["fluorescence_value"][1],
+        calib_data["water"]["fluorescence_value"][2]
+    ))
     #
     # no information on well numbers so make default assumptions
     num_wells = size(water_data)[2]
@@ -148,7 +150,10 @@ function get_k(
         parse(Int, split(cd_key, "_")[2])
     end
     k4dcv_bydy = OrderedDict(map(channel_nums) do channel
-        signal_data = reduce(hcat,calib_data[cd_key_vec[channel]]["fluorescence_value"])'
+        signal_data = transpose(hcat(
+            calib_data[cd_key_vec[channel]]["fluorescence_value"][1],
+            calib_data[cd_key_vec[channel]]["fluorescence_value"][2]
+        ))
         return cd_key_vec[channel] => signal_data .- water_data
     end) 
     # << new
