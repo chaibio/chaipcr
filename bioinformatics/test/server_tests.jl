@@ -27,18 +27,50 @@ function server_tests()
     import Combinatorics.combinations
     import JLD.load
     import JSON
-    include("amp_models/sfc_models.jl")
-    include("amp_models/types_for_amp_models.jl")
-    include("types_for_allelic_discrimination.jl")
-    include("allelic_discrimination.jl") # gives error
+
+    # development & testing
+    import Base.Test
+    using FactCheck
+    FactCheck.clear_results()
+
     include("shared.jl")
-    include("deconv.jl")
+
+    # dispatch
     include("action_types.jl")
+    include("dispatch.jl")
+
+    # data format verification
+    include("verify_request.jl")
+    include("verify_response.jl")
+      
+    # calibration
+    include("deconv.jl") 
+    const K4DCV = load("$LOAD_FROM_DIR/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv"]
+    include("adj_w2wvaf.jl")
+    include("calib.jl") 
+
+    # amplification
+    include("amp_models/types_for_amp_models.jl")
+    include("amp_models/sfc_models.jl")
+    include("amp_models/MAKx.jl")
+    include("amp_models/MAKERGAUL.jl")
+    include("types_for_allelic_discrimination.jl")
     include("amp.jl")
     include("allelic_discrimination.jl")
-    calib_info_AIR = -99
-    const k = JLD.load("$LOAD_FROM_DIR/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv"]
-    const K4DCV = K4Deconv(k.k_s, k.k_inv_vec, k.inv_note)
+
+    include("standard_curve.jl")
+
+    # melt curve
+    include("multi_channel.jl")
+    include("supsmu.jl")
+    include("meltcrv.jl")
+
+    # analyze_customized
+    include("analyze_customized/thermal_performance_diagnostic.jl")
+    include("analyze_customized/optical_test_single_channel.jl")
+    include("analyze_customized/optical_test_dual_channel.jl")
+    include("analyze_customized/optical_cal.jl")
+    include("analyze_customized/thermal_consistency.jl")
 
 
 
@@ -75,28 +107,32 @@ function server_tests()
  
     # meltcurve tests
 
-    include("supsmu.jl")
     include("action_types.jl")
     include("verify_request.jl")
     include("verify_response.jl")
     include("dispatch.jl")
     include("calib.jl")
     include("adj_w2wvaf.jl")
+    include("deconv.jl")
     include("meltcrv.jl")
+    include("supsmu.jl")
 
     # single channel melting curve test
     request = JSON.parsefile("/mnt/share/test_1ch_mc_170.json"; dicttype=OrderedDict)
     (ok, response_body) = dispatch("meltcurve",String(JSON.json(request)))
     ok
 
-    # debug version
+    # dual channel melting curve test
     request = JSON.parsefile("/mnt/share/test_1ch_mc_170.json"; dicttype=OrderedDict)
+    (ok, response_body) = dispatch("meltcurve",String(JSON.json(request)))
+    ok
+
+    # debug version
+    request = JSON.parsefile("/mnt/share/test_2ch_mc_223.json"; dicttype=OrderedDict)
     action_t=ActionType_DICT["meltcurve"]()
     verify_request(action_t,request)
     response = act(action_t,request)
     verify_response(action_t,JSON.parse(JSON.json(response),dicttype=OrderedDict))
-
-    # dual channel melting curve test
 
 
 
@@ -123,8 +159,9 @@ function server_tests()
     # debug version
     request = JSON.parsefile("/mnt/share/test_2ch_ot_190.json"; dicttype=OrderedDict)
     action_t=ActionType_DICT["optical_test_dual_channel"]()
-        verify_request(action_t,request)    
-
+    verify_request(action_t,request)    
+    response = act(action_t,request)
+    verify_response(action_t,JSON.parse(JSON.json(response),dicttype=OrderedDict))
 
 
     # test Julia server

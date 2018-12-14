@@ -25,7 +25,7 @@ const dscrmnts_snr = OrderedDict(map(1:2) do i
 end) # do i
 
 
-function analyze_func(
+function act(
     ::OpticalTestDualChannel,
 
     # remove MySqldependency
@@ -68,14 +68,14 @@ function analyze_func(
             # ]
 
             # new >>
-            ot_dict[calib_label][channel]
+            ot_dict[calib_label]["fluorescence_value"][channel]
             # << new
 
         end...) # do channel
     end) # do calib_label
 
     # new >>
-    num_wells = size(fluo_dict["baseline"])[2]
+    num_wells = size(fluo_dict["baseline"])[1]
     # << new
 
     bool_dict = OrderedDict("baseline" => fill(true, num_wells, length(CHANNELS)))
@@ -109,7 +109,6 @@ function analyze_func(
         end) # do cl_i
     end # do well_i
 
-
     # FAM and HEX self-calibrated ((signal_of_dye_x_in_channel_k - water_in_channel_k) / (signal_of_target_dye_in_channel_k - water_in_channel_k); x=FAM,HEX; k=1,2) ratio (self_calib_of_dye_x_where_k_equals_1 / self_calib_of_dye_x_where_k_equals_2) test. Baseline is not subtracted because it is not part of the calibration procedure.
 
     swd_vec = map(CALIB_LABELS_FAM_HEX) do calib_label
@@ -140,3 +139,4 @@ function analyze_func(
     # << new
 
 end # analyze_optical_test_dual_channel
+        

@@ -147,7 +147,7 @@ function calibration_test(
             end
         end
     end
-    true
+    FactCheck.exitstatus()
 end
 
 # Raw Data comes from the following sql query: 
@@ -179,7 +179,7 @@ function raw_test(raw)
             end
         end
     end
-    true
+    FactCheck.exitstatus()
 end
 
 function verify_request(
@@ -246,8 +246,8 @@ function verify_request(
             @fact (haskey(request,"raw_data")) --> true
             raw=request["raw_data"]
             @fact (isa(raw,OrderedDict)) --> true
-            calibration_test(calib,n_channels) &&
-                raw_test(raw)
+            calibration_test(calib,n_channels)
+            raw_test(raw)
         end
     end
     FactCheck.exitstatus()
@@ -324,8 +324,8 @@ function verify_request(
             end
             @fact (haskey(request,"raw_data")) --> true
             raw=request["raw_data"]
-            @fact calibration_test(calib,n_channels) --> true
-            @fact raw_test(raw) --> true
+            calibration_test(calib,n_channels)
+            raw_test(raw)
         end
     end
     FactCheck.exitstatus()
@@ -412,8 +412,8 @@ function verify_request(
             else
                 n_channels=2
             end
-            calibration_test(calib,n_channels) &&
-                raw_test(request["raw_data"])
+            calibration_test(calib,n_channels)
+            raw_test(raw)
         end
     end
     FactCheck.exitstatus()
@@ -506,7 +506,7 @@ function verify_request(
         context("Verifying request body") do
             @fact (isa(request,OrderedDict)) --> true
             if (haskey(request,"channel_1"))
-                calibration_test(request,2,["baseline","water","channel_1","channel_2"])
+                calibration_test(request,2,["baseline","water","channel_1","channel_2"])        
             else
                 calibration_test(request,2,["baseline","water","FAM","HEX"])
             end
