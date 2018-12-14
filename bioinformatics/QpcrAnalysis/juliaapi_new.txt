@@ -411,11 +411,11 @@ experiments/:experiment_id/optical_test_single_channel
 request body:
 {
   “baseline”: {
-	“fluorescence_value”:[well_01, well_02, …, well_16]
+	“fluorescence_value”:[[well_01, well_02, …, well_16]]
   },
 
   “excitation”: {
-	“fluorescence_value”:[well_01, well_02, …, well_16]
+	“fluorescence_value”:[[well_01, well_02, …, well_16]]
   }
 }
 
@@ -501,18 +501,30 @@ experiments/:experiment_id/optical_test_dual_channel
 
 request body:
 {
-  “baseline”: {
-	“fluorescence_value”:[well_01, well_02, …, well_16]
-  },
-  “water”: {
-	“fluorescence_value”:[well_01, well_02, …, well_16]
-  },
-  “FAM”: {
-	“fluorescence_value”:[well_01, well_02, …, well_16]
-  },
-  “HEX”: {
-	“fluorescence_value”:[well_01, well_02, …, well_16]
-  }
+    “baseline”: {
+        “fluorescence_value”:[
+            [1.01, 1.02,    1.15, 1.16],
+            [2.01, 2.02,    2.15, 2.16]
+        ]
+    },
+    “water”: {
+        “fluorescence_value”:[
+            [1.01, 1.02,    1.15, 1.16],
+            [2.01, 2.02,    2.15, 2.16]
+        ]
+    },
+    “FAM”: {
+        “fluorescence_value”:[
+            [1.01, 1.02,    1.15, 1.16],
+            [2.01, 2.02,    2.15, 2.16]
+        ]
+    },
+    “HEX”: {
+        “fluorescence_value”:[
+            [1.01, 1.02,    1.15, 1.16],
+            [2.01, 2.02,    2.15, 2.16]
+        ]
+    }
 }
 
 MySQL query it is used:

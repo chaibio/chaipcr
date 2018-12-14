@@ -242,7 +242,7 @@ end
 mysql -u root -B -e "USE test_1ch ;
 SELECT fluorescence_value, temperature, well_num, channel
 FROM melt_curve_data
-WHERE experiment_id = $exp_id AND stage_id = $stage_id
+WHERE experiment_id = 170 AND stage_id = 219
 ORDER BY channel, well_num ;"
 fluorescence_mc_1 = [266630,264307,264237,264534,265297,266405,264610,262474,260886,263242,261712,259239,
 257991,256489,256512,255272,255885,253317,251896,251425,251181,250863,247908,249429,246155,246000,246802,
@@ -721,9 +721,7 @@ FROM fluorescence_data
 WHERE experiment_id = 161
 AND step_id = 12
 AND cycle_num = 1
-AND step_id is not NULL
 ORDER BY well_num" > ot_161_baseline.tsv
-baseline_ot_1 = [1704,1803,1522,1442,1490,1540,1834,1757,1593,1705,1711,1586,1529,1638,1659,1502]
 
 # experiments.id = 161
 # stages.id = 5
@@ -736,8 +734,9 @@ FROM fluorescence_data
 WHERE experiment_id = 161
 AND step_id = 13
 AND cycle_num = 1
-AND step_id is not NULL
 ORDER BY well_num" > ot_161_excitation.tsv
+
+baseline_ot_1 = [1704,1803,1522,1442,1490,1540,1834,1757,1593,1705,1711,1586,1529,1638,1659,1502]
 excitation_ot_1=[45213,21030,23819,26412,25405,31761,27095,34442,41152,26695,30389,34168,37144,36466,37692,44756]
 
 ot_1 = OrderedDict(
@@ -753,25 +752,86 @@ open("/mnt/share/test_1ch_ot_161.json","w") do f
 end
 
 
+# Test_2ch optical test dual channel
+# experiments.id = 190
+# stages.id = 5
+# stages.stage_type = holding
+# step_ids = 116 (baseline), 117 (water), 119 (FAM/channel_1), 121 (HEX/channel_2)
+mysql -u root -B -e "
+USE test_2ch ;
+SELECT fluorescence_value, channel, well_num
+FROM fluorescence_data
+WHERE experiment_id = 190
+AND step_id = 116
+AND cycle_num = 1
+ORDER BY channel, well_num" > ot_190_baseline.tsv
 
+mysql -u root -B -e "
+USE test_2ch ;
+SELECT fluorescence_value, channel, well_num
+FROM fluorescence_data
+WHERE experiment_id = 190
+AND step_id = 117
+AND cycle_num = 1
+ORDER BY channel, well_num" > ot_190_water.tsv
 
+mysql -u root -B -e "
+USE test_2ch ;
+SELECT fluorescence_value, channel, well_num
+FROM fluorescence_data
+WHERE experiment_id = 190
+AND step_id = 119
+AND cycle_num = 1
+ORDER BY channel, well_num" > ot_190_FAM.tsv
 
+mysql -u root -B -e "
+USE test_2ch ;
+SELECT fluorescence_value, channel, well_num
+FROM fluorescence_data
+WHERE experiment_id = 190
+AND step_id = 121
+AND cycle_num = 1
+ORDER BY channel, well_num" > ot_190_HEX.tsv
 
+ot_baseline_2=[563  506  559  542  515  531  540  590  480  563  542  571  599  567  519  571;
+              1623 1585 1628 1619 1608 1614 1627 1661 1573 1654 1625 1651 1677 1628 1581 1632]
+ot_water_2=[15477 19246 11922 18452 15154 11504 11059 13373  7701 20789 16486 13542 14345 18934  9841  8883;
+             2739  1887  2194  1650  1800  2068  1813  1876  2205  2076  3899  4153  1914  1919  1723  2080]
+ot_FAM_2=[15416 19313 11952 18554 15215 11440 10914 13236  7710 20775 16520 13540 14362 18873 10036  8803;
+           2620  1919  2209  1701  1804  1993  1678  1836  2225  2054  3919  4141  1943  1821  1902  2007]
+ot_HEX_2=[15438 19277 11992 18699 15215 11518 11005 13508  7650 20786 16532 13541 14324 19017  9784  8718;
+           2616  1877  2212  1830  1771  2081  1754  2020  2149  1976  3914  4150  1929  1983  1709  1989]
 
-
+ot_2 = OrderedDict(
+    "baseline" => OrderedDict(
+        "fluorescence_value" => transpose(ot_baseline_2)
+    ),
+    "water" => OrderedDict(
+        "fluorescence_value" => transpose(ot_water_2)
+    ),
+    "channel_1" => OrderedDict(
+        "fluorescence_value" => transpose(ot_FAM_2)
+    ),
+    "channel_2" => OrderedDict(
+        "fluorescence_value" => transpose(ot_HEX_2)
+    )
+)
+open("/mnt/share/test_2ch_ot_190.json","w") do f
+    JSON.print(f, ot_2)
+end
 
 mysql -u root -B -e "SELECT stages.id FROM experiments
 LEFT JOIN protocols ON experiments.experiment_definition_id = protocols.experiment_definition_id
 LEFT JOIN stages ON protocols.id = stages.protocol_id
 WHERE experiments.id = 170 AND stages.stage_type <> 'holding'"
 
-USE test_1ch ;
-SELECT stages.id FROM experiments
+USE test_2ch ;
+SELECT stages.id, stages.stage_type FROM experiments
 LEFT JOIN protocols ON experiments.experiment_definition_id = protocols.experiment_definition_id
 LEFT JOIN stages ON protocols.id = stages.protocol_id
-WHERE experiments.id = 161 ;
+WHERE experiments.id = 190 ;
 
-USE test_1ch ;
+USE test_2ch ;
 SELECT step_id, COUNT(*) FROM fluorescence_data
-WHERE experiment_id = 161
+WHERE experiment_id = 190
 GROUP BY step_id ;

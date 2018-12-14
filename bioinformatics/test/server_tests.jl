@@ -13,11 +13,10 @@ function server_tests()
     #
     # ;cd ~/chaipcr/bioinformatics/QpcrAnalysis
     # ;sudo mount -t vboxsf shared /mnt/share
-    # 
     #
     push!(LOAD_PATH,pwd())
     LOAD_FROM_DIR=pwd()
-    #using QpcrAnalysis
+    using QpcrAnalysis
 
     import DataStructures.OrderedDict
     import JuMP: @variable, @objective, @NLobjective, @constraint,
@@ -32,10 +31,10 @@ function server_tests()
     include("amp_models/types_for_amp_models.jl")
     include("types_for_allelic_discrimination.jl")
     include("allelic_discrimination.jl") # gives error
-    include("/mnt/share/shared.jl")
-    include("/mnt/share/deconv.jl")
-    include("/mnt/share/action_types.jl")
-    include("/mnt/share/amp.jl")
+    include("shared.jl")
+    include("deconv.jl")
+    include("action_types.jl")
+    include("amp.jl")
     include("allelic_discrimination.jl")
     calib_info_AIR = -99
     const k = JLD.load("$LOAD_FROM_DIR/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv"]
@@ -46,24 +45,24 @@ function server_tests()
 
     # amplification tests
 
-    include("/mnt/share/action_types.jl")
-    include("/mnt/share/verify_request.jl")
-    include("/mnt/share/verify_response.jl")
-    include("/mnt/share/dispatch.jl")
-    include("/mnt/share/amp.jl")
-    include("/mnt/share/calib.jl")
-    include("/mnt/share/adj_w2wvaf.jl")
-    include("/mnt/share/deconv.jl")
+    include("action_types.jl")
+    include("verify_request.jl")
+    include("verify_response.jl")
+    include("dispatch.jl")
+    include("amp.jl")
+    include("calib.jl")
+    include("adj_w2wvaf.jl")
+    include("deconv.jl")
 
     # single channel amplification test
     request = JSON.parsefile("/mnt/share/test_1ch_amp_169.json"; dicttype=OrderedDict)
-    (success, response_body) = dispatch("amplification",String(JSON.json(request)))
-    success
+    (ok, response_body) = dispatch("amplification",String(JSON.json(request)))
+    ok
 
     # dual channel amplification tests
     request = JSON.parsefile("/mnt/share/xh-amp1.json"; dicttype=OrderedDict)
-    (success, response_body) = dispatch("amplification",String(JSON.json(request)))
-    success
+    (ok, response_body) = dispatch("amplification",String(JSON.json(request)))
+    ok
 
     # debug version
     request = JSON.parsefile("/mnt/share/xh-amp2.json"; dicttype=OrderedDict)
@@ -77,19 +76,18 @@ function server_tests()
     # meltcurve tests
 
     include("supsmu.jl")
-    include("/mnt/share/action_types.jl")
-    include("/mnt/share/verify_request.jl")
-    include("/mnt/share/verify_response.jl")
-    include("/mnt/share/dispatch.jl")
-    include("/mnt/share/calib.jl")
-    include("/mnt/share/adj_w2wvaf.jl")
-    include("/mnt/share/meltcrv.jl")
+    include("action_types.jl")
+    include("verify_request.jl")
+    include("verify_response.jl")
+    include("dispatch.jl")
+    include("calib.jl")
+    include("adj_w2wvaf.jl")
+    include("meltcrv.jl")
 
     # single channel melting curve test
     request = JSON.parsefile("/mnt/share/test_1ch_mc_170.json"; dicttype=OrderedDict)
-    result = dispatch("meltcurve",String(JSON.json(request)))
-    (success, response_body) = JSON.parse(result,dicttype=OrderedDict)
-    success
+    (ok, response_body) = dispatch("meltcurve",String(JSON.json(request)))
+    ok
 
     # debug version
     request = JSON.parsefile("/mnt/share/test_1ch_mc_170.json"; dicttype=OrderedDict)
@@ -105,25 +103,27 @@ function server_tests()
 
     # optical tests
 
-    include("/mnt/share/action_types.jl")
-    include("/mnt/share/verify_request.jl")
-    include("/mnt/share/verify_response.jl")
-    include("/mnt/share/dispatch.jl")
-    include("/mnt/share/optical_test_single_channel.jl")
+    include("action_types.jl")
+    include("verify_request.jl")
+    include("verify_response.jl")
+    include("dispatch.jl")
+    include("analyze_customized/optical_test_single_channel.jl")
+    include("analyze_customized/optical_test_dual_channel.jl")
 
     # single channel optical test
     request = JSON.parsefile("/mnt/share/test_1ch_ot_161.json"; dicttype=OrderedDict)
-    result = dispatch("analyze",String(JSON.json(request)))
-    success, response_body) = JSON.parse(result[2],dicttype=OrderedDict)
-    success
+    (ok, response_body) = dispatch("optical_test_single_channel",String(JSON.json(request)))
+    ok
+    
+    # dual channel optical test
+    request = JSON.parsefile("/mnt/share/test_2ch_ot_190.json"; dicttype=OrderedDict)
+    (ok, response_body) = dispatch("optical_test_dual_channel",String(JSON.json(request)))
+    ok
     
     # debug version
-    request = JSON.parsefile("/mnt/share/test_1ch_ot_161.json"; dicttype=OrderedDict)
-    action_t=ActionType_DICT["optical_test_single_channel"]()
-    verify_request(action_t,request)
-    response = act(action_t,request)
-    verify_response(action_t,JSON.parse(JSON.json(response),dicttype=OrderedDict))
-
+    request = JSON.parsefile("/mnt/share/test_2ch_ot_190.json"; dicttype=OrderedDict)
+    action_t=ActionType_DICT["optical_test_dual_channel"]()
+        verify_request(action_t,request)    
 
 
 

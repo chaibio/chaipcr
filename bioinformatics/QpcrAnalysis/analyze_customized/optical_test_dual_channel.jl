@@ -37,7 +37,9 @@ function analyze_func(
     # start: arguments that might be passed by upstream code
     # well_nums ::AbstractVector =[],
 
-    exp_data ::AbstractArray # new
+    # new >>
+    ot_dict ::Associative
+    # << new
     )
 
     # remove MySql dependency
@@ -51,19 +53,30 @@ function analyze_func(
     # fluo_data, fluo_well_nums = get_mysql_data_well(
     #     well_nums, fluo_qry_2b, db_conn, false
     # )
-
-    num_wells = length(fluo_well_nums)
+    #
+    # num_wells = length(fluo_well_nums)
 
     old_calib_labels = ["baseline"; "water"; CALIB_LABELS_FAM_HEX]
 
     fluo_dict = OrderedDict(map(old_calib_labels) do calib_label
         calib_label => hcat(map(CHANNELS) do channel
-            fluo_data[:fluorescence_value][
-                (fluo_data[:step_id] .== calib_info[calib_label]["step_id"]) .& (fluo_data[:channel] .== channel)
-            ]
+
+            # remove MySql dependency
+            #
+            # fluo_data[:fluorescence_value][
+            #     (fluo_data[:step_id] .== calib_info[calib_label]["step_id"]) .& (fluo_data[:channel] .== channel)
+            # ]
+
+            # new >>
+            ot_dict[calib_label][channel]
+            # << new
 
         end...) # do channel
     end) # do calib_label
+
+    # new >>
+    num_wells = size(fluo_dict["baseline"])[2]
+    # << new
 
     bool_dict = OrderedDict("baseline" => fill(true, num_wells, length(CHANNELS)))
 
@@ -121,7 +134,9 @@ function analyze_func(
         ["FAM", "HEX"][channel_i] => round.(sc_dye[1] ./ sc_dye[2], JSON_DIGITS)
     end) # do channel_i
 
-
-    return json(OrderedDict("optical_data"=>optical_data, "Ch1:Ch2"=>ch12_ratios))
+    # return json(OrderedDict("optical_data" => optical_data, "Ch1:Ch2" => ch12_ratios))
+    # new >>
+    return OrderedDict("optical_data" => optical_data, "Ch1:Ch2" => ch12_ratios)
+    # << new
 
 end # analyze_optical_test_dual_channel
