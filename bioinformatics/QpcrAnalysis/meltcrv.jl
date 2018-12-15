@@ -46,11 +46,14 @@ end
 # called by QpcrAnalyze.dispatch
 function act(
     ::MeltCurve,
-    req_dict ::Associative
+    req_dict ::Associative;
+    out_format ::String ="pre_json",
+    verbose ::Bool =false
 )
-    keys_req_dict = keys(req_dict)
-    exp_id = req_dict["experiment_id"]
-    stage_id = req_dict["stage_id"]
+    # remove MySql dependency
+    #
+    # exp_id = req_dict["experiment_id"]
+    # stage_id = req_dict["stage_id"]
 
     # kwdict_pmc = OrderedDict{Symbol,Any}()
     # for key in ["channel_nums"]
@@ -59,6 +62,7 @@ function act(
     #     end
     # end
 
+    keys_req_dict = keys(req_dict)
     kwdict_mc_tm_pw = OrderedDict{Symbol,Any}()
     if "qt_prob" in keys_req_dict
         kwdict_mc_tm_pw[:qt_prob_flTm] = req_dict["qt_prob"]
@@ -71,7 +75,7 @@ function act(
             kwdict_mc_tm_pw[parse(key)] = req_dict[key]
         end
     end
-
+    
     response = process_mc(
         
         ## remove MySql dependency
@@ -84,7 +88,8 @@ function act(
         # new >>
         req_dict["raw_data"],
         req_dict["calibration_info"];
-        out_format="david json",
+        out_format=out_format,
+        verbose=verbose,
         # << new
 
         # kwdict_pmc...,
@@ -279,10 +284,10 @@ function process_mc(
         map(tf_bywl) do tf_dict
             mc_tm_pw(
                 tf_dict;
-                auto_span_smooth=auto_span_smooth,
-                span_smooth_default=span_smooth_default,
-                span_smooth_factor=span_smooth_factor,
-                verbose=verbose,
+                auto_span_smooth = auto_span_smooth,
+                span_smooth_default = span_smooth_default,
+                span_smooth_factor = span_smooth_factor,
+                verbose = verbose,
                 kwdict_mc_tm_pw...
             )
         end # do tf_dict
@@ -417,35 +422,35 @@ function mc_tm_pw(
     tf_dict ::OrderedDict; # temperature and fluorescence
 
     # The maximum fraction of median temperature interval to be considered narrow
-    nti_frac ::AbstractFloat=0.05,
+    nti_frac ::AbstractFloat =0.05,
 
     # smoothing -df/dt curve and if `smooth_fluo`, fluorescence curve too
-    auto_span_smooth ::Bool=true,
-    span_css_tmprtr ::Real=1, # css = choose `span_smooth`. fluorescence fluctuation with the temperature range of approximately `span_css_tmprtr * 2` is considered for choosing `span_smooth`
-    span_smooth_default ::Real=0.05, # unit: fraction of data points for smoothing
-    span_smooth_factor ::Real=7.2,
+    auto_span_smooth ::Bool =true,
+    span_css_tmprtr ::Real =1, # css = choose `span_smooth`. fluorescence fluctuation with the temperature range of approximately `span_css_tmprtr * 2` is considered for choosing `span_smooth`
+    span_smooth_default ::Real =0.05, # unit: fraction of data points for smoothing
+    span_smooth_factor ::Real =7.2,
 
     # get a denser temperature sequence to get fluorescence and -df/dt from it and fitted spline function
-    denser_factor ::Real=10,
-    smooth_fluo_spl ::Bool=false,
+    denser_factor ::Real =10,
+    smooth_fluo_spl ::Bool =false,
 
     # identify Tm peaks and calculate peak area
-    peak_span_tmprtr ::Real=2, # Within the smoothed -df/dt sequence spanning the temperature range of approximately `peak_span_tmprtr`, if the maximum -df/dt value equals that at the middle point of the sequence, identify this middle point as a peak summit. Similar to `span.peaks` in qpcR code. Combined with `peak_shoulder` (similar to `Tm.border` in qpcR code).
-    # peak_shoulder ::Real=1, # 1/2 width of peak in temperature when calculating peak area  # consider changing from 1 to 2, or automatically determined (max and min d2)?
+    peak_span_tmprtr ::Real =2, # Within the smoothed -df/dt sequence spanning the temperature range of approximately `peak_span_tmprtr`, if the maximum -df/dt value equals that at the middle point of the sequence, identify this middle point as a peak summit. Similar to `span.peaks` in qpcR code. Combined with `peak_shoulder` (similar to `Tm.border` in qpcR code).
+    # peak_shoulder ::Real =1, # 1/2 width of peak in temperature when calculating peak area  # consider changing from 1 to 2, or automatically determined (max and min d2)?
 
     # filter Tm peaks
-    qt_prob_range_lb ::AbstractFloat=0.21, # quantile probability point for the lower bound of the range considered for number of crossing points
-    ncp_ub ::Integer=10, # upper bound of number of data points crossing the mid range value (line parallel to x-axis) of smoothed -df/dt (`ndrv_smu`)
-    noisy_factor ::AbstractFloat=0.2, # `num_cross_points` must also <= `noisy_factor * len_raw`
-    qt_prob_flTm ::AbstractFloat=0.64, # quantile probability point for normalized -df/dT (range 0-1)
-    normd_qtv_ub ::Real=0.8, # upper bound of normalized -df/dt values (range 0-1) at the quantile probablity point
-    top1_from_max_ub ::Real=1, # upper bound of temperature difference between top-1 Tm peak and maximum -df/dt
+    qt_prob_range_lb ::AbstractFloat =0.21, # quantile probability point for the lower bound of the range considered for number of crossing points
+    ncp_ub ::Integer =10, # upper bound of number of data points crossing the mid range value (line parallel to x-axis) of smoothed -df/dt (`ndrv_smu`)
+    noisy_factor ::AbstractFloat =0.2, # `num_cross_points` must also <= `noisy_factor * len_raw`
+    qt_prob_flTm ::AbstractFloat =0.64, # quantile probability point for normalized -df/dT (range 0-1)
+    normd_qtv_ub ::Real =0.8, # upper bound of normalized -df/dt values (range 0-1) at the quantile probablity point
+    top1_from_max_ub ::Real =1, # upper bound of temperature difference between top-1 Tm peak and maximum -df/dt
     top_N ::Integer=4, # top number of Tm peaks to report
-    frac_report_lb ::Real=0.1, # lower bound of area fraction of the Tm peak to be reported in regards to the largest real Tm peak
+    frac_report_lb ::Real =0.1, # lower bound of area fraction of the Tm peak to be reported in regards to the largest real Tm peak
 
-    json_digits ::Integer=JSON_DIGITS,
+    json_digits ::Integer =JSON_DIGITS,
 
-    verbose ::Bool=false,
+    verbose ::Bool =false,
     )
 
     # parse input data
@@ -460,8 +465,10 @@ function mc_tm_pw(
 
     if len_raw <= 3
         ndrv_cfd = -finite_diff(
-            tmprtrs, fluos;
-            nu=1, method="central"
+            tmprtrs,
+            fluos;
+            nu = 1,
+            method = "central"
         ) # negative derivative by central finite differencing (cfd)
         mc_raw = hcat(tmprtrs, fluos, ndrv_cfd)
         Ta_raw = Ta_fltd = EMPTY_Ta # 0x2 Array{Float,2}
@@ -620,7 +627,8 @@ function mc_tm_pw(
             left_nadir_idx = maximum(nadir_idc[nadir_idc .< summit_idx])
             right_nadir_idx = minimum(nadir_idc[nadir_idc .> summit_idx])
             nadir_vec = [left_nadir_idx, right_nadir_idx]
-            low_nadir_idx, high_nadir_idx = map(func -> nadir_vec[func(ndrv_smu[nadir_vec])[2]], [findmin, findmax])
+            low_nadir_idx, high_nadir_idx =
+                map(func -> nadir_vec[func(ndrv_smu[nadir_vec])[2]], [findmin, findmax])
             hn_ns = ndrv_smu[high_nadir_idx]
 
             # find the nearest location to `summit_idx` where line `ndrv = ndrv_smu[high_nadir_idx]`` is crossed by `ndrv_smu` curve
@@ -668,9 +676,7 @@ function mc_tm_pw(
             Ta_raw = EMPTY_Ta # otherwise `Ta_raw` will be an `Array{Any,1}`
         end
 
-
         # filter in real Tm peaks and out those due to random fluctuation. fltd = filtered
-
 
         ns_range_mid = mean([quantile(ndrv_smu, qt_prob_range_lb), maximum(ndrv_smu)])
         num_cross_points = sum(map(1:(len_denser-1)) do i

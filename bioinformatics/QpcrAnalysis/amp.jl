@@ -96,10 +96,12 @@ struct AmpStepRampOutput2Bjson
 end
 
 
-# called by QpcrAnalyze.dispatch
+# called by QpcrAnalysis.dispatch
 function act(
     ::Amplification,
-    req_dict ::Associative
+    req_dict ::Associative;
+    out_format ::String ="pre_json",
+    verbose ::Bool =false
 )
     keys_req_dict=keys(req_dict)
 
@@ -182,7 +184,8 @@ function act(
         req_dict["raw_data"],
         req_dict["calibration_info"],
         asrp_vec;
-        out_format  = "pre-json",
+        out_format  = out_format,
+        verbose     = verbose,
         # << new
 
         kwdict_rc   = kwdict_rc,

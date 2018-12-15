@@ -252,29 +252,46 @@ end
 #
 # call: experiments/:experiment_id/meltcurve
 #
-#
 # ********************************************************************************
 
-# each matrix m is [[temperature_1, temperature_2 ...], [fluo_1, fluo_2, ...], [derivative_1, derivative_2 ...]]
-m="[
-    [0.101, 0.102, 0.103,    0.199], 
-    [0.201, 0.202, 0.203,    0.299],  
-    [0.301, 0.302, 0.303,    0.399]
-]"
-m1_01=m; m1_02=m; m1_16=m
-m2_01=m; m2_02=m; m2_16=m
+# each matrix r is [ temperature_1 fluo_1 derivative_1;
+#                    temperature_2 fluo_2 derivative_2;
+#                    ...           ...    ...
+#                    temperature_n fluo_n derivative_n]
+# n_grid >> 0 is the same for each well
+#
+# in JSON
+r="[[0.101, 0.102,     0.199]," * # temp
+  " [0.201, 0.202,     0.299]," * # fluo
+  " [0.301, 0.302,     0.399]]"   # slope
+r1_01=r; r1_02=r; r1_16=r
+r2_01=r; r2_02=r; r2_16=r
+
+# each matrix s is [ temp_max_1 peak_area_1;
+#                    temp_max_2 peak_area_2;
+#                    ...           ...    ...
+#                    temp_max_n peak_area_n;]
+# n_peaks >=0 may be different for each well
+#
+# in JSON
+s="[[0.101, 0.102,     0.104]," * # Tm
+  " [0.201, 0.202,     0.204]]"   # area
+s1_01=s; s1_02=s; s1_16=s
+s2_01=s; s2_02=s; s2_16=s
 
 # single channel data
 
 function singlechannel_meltcurve_response_test()
     response=JSON.parse("""{
-        "melt_curve_data": [ 
-            [ $(m1_01), $(m1_02),     $(m1_16) ]
+        "melt_curve_data":     [
+            [ $(r1_01), $(r1_02),     $(r1_16) ]
         ],
         "melt_curve_analysis": [
-            [ $(m1_01), $(m1_02),     $(m1_16) ]
+            [ $(s1_01), $(s1_02),     $(s1_16) ]
         ]
     }"""; dicttype=OrderedDict)
+    println(response)
+    println(JSON.json(response))
     verify_response(
         ActionType_DICT["meltcurve"](),
         response
@@ -286,12 +303,12 @@ end
 function dualchannel_meltcurve_response_test()
     response=JSON.parse("""{
         "melt_curve_data": [ 
-            [ $(m1_01), $(m1_02),     $(m1_16) ], 
-            [ $(m2_01), $(m2_02),     $(m2_16) ]
+            [ $(r1_01), $(r1_02),     $(r1_16) ], 
+            [ $(r2_01), $(r2_02),     $(r2_16) ]
         ],
         "melt_curve_analysis": [
-            [ $(m1_01), $(m1_02),     $(m1_16) ], 
-            [ $(m2_01), $(m2_02),     $(m2_16) ]
+            [ $(s1_01), $(s1_02),     $(s1_16) ], 
+            [ $(s2_01), $(s2_02),     $(s2_16) ]
         ]
     }"""; dicttype=OrderedDict)
     verify_response(
@@ -392,67 +409,67 @@ function thermal_consistency_response_test()
         "tm_check": [
             {
                 "Tm": [79.0773,true],
-                "Area": 1361.5005
+                "area": 1361.5005
             },
             {
                 "Tm": [78.5635,true],
-                "Area": 1763.7998
+                "area": 1763.7998
             },
             {
                 "Tm": [78.4396,true],
-                "Area": 1434.3995
+                "area": 1434.3995
             },
             {
                 "Tm": [78.2172,true],
-                "Area": 1672.9787
+                "area": 1672.9787
             },
             {
                 "Tm": [77.8384,true],
-                "Area": 639.2474
+                "area": 639.2474
             },
             {
                 "Tm": [78.3816,true],
-                "Area": 1076.2143
+                "area": 1076.2143
             },
             {
                 "Tm": [78.6829,true],
-                "Area": 895.6206
+                "area": 895.6206
             },
             {
                 "Tm": [78.6403,true],
-                "Area": 366.6082
+                "area": 366.6082
             },
             {
                 "Tm": [78.0791,true],
-                "Area": 255.8169
+                "area": 255.8169
             },
             {
                 "Tm": [77.5054,true],
-                "Area": 193.9588
+                "area": 193.9588
             },
             {
                 "Tm": [78.0182,true],
-                "Area": 1114.7039
+                "area": 1114.7039
             },
             {
                 "Tm": [78.171,true],
-                "Area": 1324.3671
+                "area": 1324.3671
             },
             {
                 "Tm": [78.1117,true],
-                "Area": 1219.4364
+                "area": 1219.4364
             },
             {
                 "Tm": [77.8815,true],
-                "Area": 499.9462
+                "area": 499.9462
             },
             {
                 "Tm": [78.3167,true],
-                "Area": 1097.0781
+                "area": 1097.0781
             },
             {
                 "Tm": [79.2487,true],
-                "Area": 1318.3026
+                "area": 1318.3026
             }
         ],
         "delta_Tm": [1.7434,true]

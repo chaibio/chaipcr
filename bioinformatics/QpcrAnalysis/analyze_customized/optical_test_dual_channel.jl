@@ -38,7 +38,9 @@ function act(
     # well_nums ::AbstractVector =[],
 
     # new >>
-    ot_dict ::Associative
+    ot_dict ::Associative;
+    out_format ::String ="pre_json",
+    verbose ::Bool =false
     # << new
     )
 
@@ -133,10 +135,12 @@ function act(
         ["FAM", "HEX"][channel_i] => round.(sc_dye[1] ./ sc_dye[2], JSON_DIGITS)
     end) # do channel_i
 
-    # return json(OrderedDict("optical_data" => optical_data, "Ch1:Ch2" => ch12_ratios))
-    # new >>
-    return OrderedDict("optical_data" => optical_data, "Ch1:Ch2" => ch12_ratios)
-    # << new
-
+    output = OrderedDict("optical_data" => optical_data, "Ch1:Ch2" => ch12_ratios)
+    if (out_format=="json")
+        return JSON.json(output)
+    else
+        return output
+    end
+    
 end # analyze_optical_test_dual_channel
         

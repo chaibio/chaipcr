@@ -91,7 +91,7 @@ USE chaipcr ; \
 SELECT fluorescence_value, step_id, channel, well_num \
 FROM fluorescence_data \
 WHERE experiment_id = 135 \
-ORDER BY step_id, channel, well_num ;" > /mnt/share/calib_135.tsv
+ORDER BY step_id, channel, well_num ;" > calib_135.tsv
 
 # Export experimental data (136)
 mysql -u root -B -e "
@@ -99,7 +99,7 @@ USE chaipcr ; \
 SELECT fluorescence_value, channel, well_num, cycle_num \
 FROM fluorescence_data \
 WHERE experiment_id = 136 \
-ORDER BY channel, well_num, cycle_num ;" > /mnt/share/amp_136.tsv
+ORDER BY channel, well_num, cycle_num ;" > amp_136.tsv
 
 
 
@@ -134,7 +134,6 @@ SELECT fluorescence_value, well_num, channel
 FROM fluorescence_data
 WHERE experiment_id = 168 AND step_id = 2
 ORDER BY channel, well_num ;" | tail -n+2 | cut -f1 | awk 'BEGIN {RS="";FS=" "}{gsub(/\n/,",")}{print}' -
-water_cal_1=[20351,13854,16950,18614,19292,21191,19613,21150,21611,17390,21328,23590,24131,20167,19417,25120];
 
 # Test_1ch calibration: Signal
 # experiments.id = 168
@@ -147,13 +146,18 @@ SELECT fluorescence_value, well_num, channel
 FROM fluorescence_data
 WHERE experiment_id = 168 AND step_id = 4
 ORDER BY channel, well_num ;" | tail -n+2 | cut -f1 | awk 'BEGIN {RS="";FS=" "}{gsub(/\n/,",")}{print}' -
-signal_cal_1=[2037915,2030879,2356324,2286590,2578814,2660975,2390835,2290655,2419225,2240444,2734095,3069099,
+
+water_cal_1=
+    [20351,13854,16950,18614,19292,21191,19613,21150,21611,17390,21328,23590,24131,20167,19417,25120];
+signal_cal_1=
+    [2037915,2030879,2356324,2286590,2578814,2660975,2390835,2290655,2419225,2240444,2734095,3069099,
 2599044,2354805,2267721,2879192];
 
 calib_1=OrderedDict(
     "water"     => Dict("fluorescence_value" => [water_cal_1,  nothing]),
     "channel_1" => Dict("fluorescence_value" => [signal_cal_1, nothing])
 )
+
 
 
 
@@ -168,10 +172,6 @@ SELECT fluorescence_value, well_num, channel
 FROM fluorescence_data
 WHERE experiment_id = 219 AND step_id = 325
 ORDER BY channel, well_num ;" | tail -n+2 | cut -f1 | awk 'BEGIN {RS="";FS=" "}{gsub(/\n/,",")}{print}' -
-cal_water_2=[
-        [12095,20829,14218,19162,14613,12937,12487,14240,7543,14187,12778,12404,13275,18710,10472,8520],
-        [ 2163, 2058, 2216, 1869, 1890, 2246, 1997, 2104,2287, 1981, 2120, 3471, 1953, 2018, 1956,2196]
-    ]
 
 # Test_2ch calibration: Channel 1
 # experiments.id = 219
@@ -184,10 +184,6 @@ SELECT fluorescence_value, well_num, channel
 FROM fluorescence_data
 WHERE experiment_id = 219 AND step_id = 327
 ORDER BY channel, well_num ;" | tail -n+2 | cut -f1 | awk 'BEGIN {RS="";FS=" "}{gsub(/\n/,",")}{print}' -
-cal_FAM_2=[
-        [79676,104728,95264,90512,109013,103317,92905,100809,82292,115539,93250,106691,113931,134691,78968,80789],
-        [35683, 41892,39971,40173, 43931, 44413,43240, 42156,39951, 44385,40652, 40888, 45433, 47371,42637,43064]
-    ]
 
 # Test_2ch calibration: Channel 2
 # experiments.id = 219
@@ -200,6 +196,15 @@ SELECT fluorescence_value, well_num, channel
 FROM fluorescence_data
 WHERE experiment_id = 219 AND step_id = 329
 ORDER BY channel, well_num ;" | tail -n+2 | cut -f1 | awk 'BEGIN {RS="";FS=" "}{gsub(/\n/,",")}{print}' -
+
+cal_water_2=[
+        [12095,20829,14218,19162,14613,12937,12487,14240,7543,14187,12778,12404,13275,18710,10472,8520],
+        [ 2163, 2058, 2216, 1869, 1890, 2246, 1997, 2104,2287, 1981, 2120, 3471, 1953, 2018, 1956,2196]
+    ]
+cal_FAM_2=[
+        [79676,104728,95264,90512,109013,103317,92905,100809,82292,115539,93250,106691,113931,134691,78968,80789],
+        [35683, 41892,39971,40173, 43931, 44413,43240, 42156,39951, 44385,40652, 40888, 45433, 47371,42637,43064]
+    ]
     cal_HEX_2=[
         [14622,21383,15831,21415,18148,16878,15657,17881,11466,17953,16429,15830,17765,22733,14600,12180],
         [41396,48051,45444,44977,50132,51689,49093,47231,43050,49144,44858,43502,48565,47037,48413,47160]
@@ -210,6 +215,7 @@ calib_2=OrderedDict(
     "channel_1" => Dict("fluorescence_value" => cal_FAM_2),
     "channel_2" => Dict("fluorescence_value" => cal_HEX_2)
 )
+
 
 
 
@@ -225,12 +231,12 @@ FROM fluorescence_data
 WHERE experiment_id = 169 AND step_id = 400
 ORDER BY channel, well_num, cycle_num ;" > amp_169.tsv
 
-amp_169=readdlm("/mnt/share/amp_169.tsv",'\t',header=true)
+amp_169=readdlm("amp_169.tsv",'\t',header=true)
 raw_amp_1=OrderedDict(
     amp_169[2][1]    => amp_169[1][:,1],
-    amp_169[2][2]    => amp_169[1][:,2],
-    amp_169[2][3]    => amp_169[1][:,3],
-    amp_169[2][4]    => amp_169[1][:,4]
+    amp_169[2][2]    => Vector{Integer}(amp_169[1][:,2]),
+    amp_169[2][3]    => Vector{Integer}(amp_169[1][:,3]),
+    amp_169[2][4]    => Vector{Integer}(amp_169[1][:,4])
 )
 
 amp_1=OrderedDict(
@@ -247,9 +253,10 @@ amp_1=OrderedDict(
   "raw_data"            => raw_amp_1
 )
 
-open("/mnt/share/test_1ch_amp.json","w") do f
+open("test_1ch_amp_169.json","w") do f
     JSON.print(f, amp_1)
 end
+
 
 
 
@@ -263,12 +270,12 @@ FROM melt_curve_data
 WHERE experiment_id = 170 AND stage_id = 219
 ORDER BY channel, well_num ;" > mc_170.tsv
 
-mc_170=readdlm("/mnt/share/mc_223.tsv",'\t',header=true)
+mc_170=readdlm("mc_223.tsv",'\t',header=true)
 raw_mc_1=OrderedDict(
     mc_170[2][1]    => mc_170[1][:,1],
     mc_170[2][2]    => mc_170[1][:,2],
-    mc_170[2][3]    => mc_170[1][:,3],
-    mc_170[2][4]    => mc_170[1][:,4]
+    mc_170[2][3]    => Vector{Integer}(mc_170[1][:,3]),
+    mc_170[2][4]    => Vector{Integer}(mc_170[1][:,4])
 )
 
 mc_1=OrderedDict(
@@ -282,9 +289,10 @@ mc_1=OrderedDict(
     "raw_data"            => raw_mc_1
 )
 
-open("/mnt/share/test_1ch_mc.json","w") do f
+open("test_1ch_mc_170.json","w") do f
     JSON.print(f, mc_1)
 end
+
 
 
 
@@ -296,9 +304,9 @@ mysql -u root -B -e "USE test_2ch ;
 SELECT fluorescence_value, temperature, well_num, channel
 FROM melt_curve_data
 WHERE experiment_id = 223 AND stage_id = 311
-ORDER BY channel, well_num ;" > /mnt/share/mc_223.tsv
+ORDER BY channel, well_num ;" > mc_223.tsv
 
-mc_223=readdlm("/mnt/share/mc_223.tsv",'\t',header=true)
+mc_223=readdlm("mc_223.tsv",'\t',header=true)
 raw_mc_2=OrderedDict(
     mc_223[2][1]    => mc_223[1][:,1],
     mc_223[2][2]    => mc_223[1][:,2],
@@ -317,11 +325,48 @@ mc_2=OrderedDict(
     "raw_data"            => raw_mc_2
 )
 
-open("/mnt/share/test_2ch_mc_223.json","w") do f
+open("test_2ch_mc_223.json","w") do f
     JSON.print(f, mc_2)
 end
 
 
+
+
+# Test_1ch thermal consistency single channel
+# experiments.id = 146
+# stages.id = 4
+# stages.stage_type = meltcurve
+mysql -u root -B -e "
+USE test_1ch ;
+SELECT fluorescence_value, temperature, well_num, channel
+FROM melt_curve_data
+WHERE experiment_id = 146 AND stage_id = 4
+ORDER BY channel, well_num ;" > tc_146.tsv
+
+tc_146=readdlm("tc_146.tsv",'\t',header=true)
+raw_tc_1=OrderedDict(
+    tc_146[2][1]    => tc_146[1][:,1],
+    tc_146[2][2]    => tc_146[1][:,2],
+    tc_146[2][3]    => Vector{Integer}(tc_146[1][:,3]),
+    tc_146[2][4]    => Vector{Integer}(tc_146[1][:,4])
+)
+
+tc_1=OrderedDict(
+    "experiment_id"       => 146,
+    "stage_id"            => 4,
+    "calibration_info"    => calib_1,
+    "channel_nums"        => [1],
+    "qt_prob"             => 0.64,
+    "max_normd_qtv"       => 0.8,
+    "top_N"               => 4,
+    "raw_data"            => raw_tc_1
+)
+
+open("test_1ch_tc_146.json","w") do f
+    JSON.print(f, tc_1)
+end
+
+    
 
 
 # Test_1ch optical test single channel
@@ -362,9 +407,11 @@ ot_1 = OrderedDict(
                 "fluorescence_value" => [ excitation_ot_1 ]
         )
 )
-open("/mnt/share/test_1ch_ot_161.json","w") do f
+
+open("test_1ch_ot_161.json","w") do f
     JSON.print(f, ot_1)
 end
+
 
 
 
@@ -432,29 +479,31 @@ ot_2 = OrderedDict(
         "fluorescence_value" => transpose(ot_HEX_2)
     )
 )
-open("/mnt/share/test_2ch_ot_190.json","w") do f
+open("test_2ch_ot_190.json","w") do f
     JSON.print(f, ot_2)
 end
+
+
+
 
 mysql -u root -B -e "SELECT stages.id FROM experiments
 LEFT JOIN protocols ON experiments.experiment_definition_id = protocols.experiment_definition_id
 LEFT JOIN stages ON protocols.id = stages.protocol_id
 WHERE experiments.id = 170 AND stages.stage_type <> 'holding'"
 
-USE test_2ch ;
+USE test_1ch ;
 SELECT stages.id, stages.stage_type FROM experiments
 LEFT JOIN protocols ON experiments.experiment_definition_id = protocols.experiment_definition_id
 LEFT JOIN stages ON protocols.id = stages.protocol_id
-WHERE experiments.id = 219 ;
+WHERE experiments.id = 146 ;
 
-USE test_2ch ;
+USE test_1ch ;
 SELECT channel, step_id, steps.name, COUNT(*) FROM fluorescence_data
-LEFT JOIN steps ON steps.id = step_id
-WHERE experiment_id = 219
+WHERE experiment_id = 146
 GROUP BY step_id, steps.name, channel ;
 
-USE test_2ch ;
-SELECT channel, COUNT(*)
+USE test_1ch ;
+SELECT channel, well_num, COUNT(*)
 FROM melt_curve_data
-WHERE experiment_id = 223 AND stage_id = 311
-GROUP BY channel ;
+WHERE experiment_id = 146 AND stage_id = 4
+GROUP BY channel, well_num ;

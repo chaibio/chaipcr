@@ -169,8 +169,8 @@ function raw_test(raw)
     for v in variables
         @fact (haskey(raw,v)) --> true
         @fact (isa(raw[v],Vector)) --> true
-        @fact (length(raw[v])) --> n_raw
-        for i in range(1,n_raw)
+        @fact abs(length(raw[v]) - n_raw) --> less_than_or_equal(1)
+        for i in range(1,length(raw[v]))
             if (v=="fluorescence_value"||v=="temperature")
                 @fact (isa(raw[v][i],Number)) --> true
             else
@@ -407,7 +407,7 @@ function verify_request(
                 n_channels=2
             end
             calibration_test(calib,n_channels)
-            raw_test(raw)
+            raw_test(request["raw_data"])
         end
     end
     FactCheck.exitstatus()

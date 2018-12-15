@@ -21,6 +21,8 @@ function act(
 
     # new >>
     ot_dict ::Associative;
+    out_format ::String ="pre_json",
+    verbose ::Bool =false
     # << new
     )
 
@@ -63,6 +65,11 @@ function act(
         )
     end # do well_i
 
-    return OrderedDict("optical_data" => results)
+    output = OrderedDict("optical_data" => results)
+    if (out_format=="json")
+        return JSON.json(output)
+    else
+        return output
+    end
 
 end # analyze_optical_test_single_channel

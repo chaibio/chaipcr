@@ -6,9 +6,9 @@ function dispatch(
     action ::String,
     request_body ::String;
 
-    verify ::Bool =false
+    verify ::Bool =false,
+    verbose ::Bool =false
 )
-    
     # NB. DefaultDict and DefaultOrderedDict constructors sometimes don't work on OrderedDict
     # (https://github.com/JuliaLang/DataStructures.jl/issues/205)
     req_parsed = JSON.parse(request_body; dicttype=OrderedDict)
@@ -30,7 +30,7 @@ function dispatch(
             end
         end
 
-        response = act(action_t, req_parsed)
+        response = act(action_t, req_parsed; out_format="pre_json", verbose=verbose)
         json_response=JSON.json(response)
 
         if (verify)
