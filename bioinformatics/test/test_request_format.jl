@@ -32,18 +32,17 @@ import JSON, DataStructures.OrderedDict
 function standard_curve_request_test()
     request=JSON.parse("""[
         {"well": [
-            {"target": 1, "cq": 999, "quantity": {"m": 1.111, "b": -10}},
-            {"target": 2, "cq": 999, "quantity": {"m": 1.111, "b": -10}}
+            {"target": 1, "cq": 17.9, "quantity": {"m": 31.2, "b": -3.52}},
+            {"target": 2, "cq": 18.1, "quantity": {"m": 27.8, "b": -3.61}}
         ]},
         {"well": [
-            {"target": 1, "cq": 999, "quantity": {"m": 1.111, "b": -10}},
-            {"target": 2, "cq": 999, "quantity": {"m": 1.456, "b": 12}}
+            {"target": 1, "cq": 17.0, "quantity": {"m": 30.1, "b": -3.47}},
+            {"target": 2, "cq": 17.8, "quantity": {"m": 27.5, "b": -3.58}}
         ]},
         {"well": [
-            {"target": 1, "cq": 999, "quantity": {"m": 1.111, "b": -10}},
-            {"target": 2, "cq": 999, "quantity": {"m": 3, "b": -12}}
-        ]},
-        {"well": [{}, {}]}
+            {"target": 1, "cq": 16.2, "quantity": {"m": 29.4, "b": -3.51}},
+            {"target": 2, "cq": 17.9, "quantity": {"m": 28.2, "b": -3.55}}
+        ]}
     ]"""; dicttype=OrderedDict)
     verify_request(
         ActionType_DICT["standard_curve"](),
@@ -250,7 +249,7 @@ end
 
 function thermal_performance_diagnostic_request_test()
     request=JSON.parse("""{
-      "lid_temp": [1,2,3],
+      "lid_temp": [1,2,3],  
       "heat_block_zone_1_temp": [1,2,3],
       "heat_block_zone_2_temp": [1,2,3],
       "elapsed_time": [1,2,3]

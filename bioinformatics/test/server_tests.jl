@@ -28,6 +28,7 @@ import Combinatorics.combinations
 import JLD.load
 import JSON
 import Dierckx: Spline1D, derivative
+import DataFrames: DataFrame, by
 
 # development & testing
 import Base.Test
@@ -233,10 +234,34 @@ ok
 
 ## debug version
 # request = JSON.parsefile("/mnt/share/test_2ch_ot_190.json"; dicttype=OrderedDict)
-# ction_t=ActionType_DICT["optical_test_dual_channel"]()
+# action_t=ActionType_DICT["optical_test_dual_channel"]()
 # verify_request(action_t,request)  
 # response = act(action_t,request)
 # verify_response(action_t,JSON.parse(JSON.json(response),dicttype=OrderedDict))
+
+
+
+
+# standard curve
+    
+# test using fake data for now
+request=JSON.parse("""[
+    {"well": [
+        {"target": 1, "cq": 17.9, "quantity": {"m": 31.2, "b": -3.52}},
+        {"target": 2, "cq": 18.1, "quantity": {"m": 27.8, "b": -3.61}}
+    ]},
+    {"well": [
+        {"target": 1, "cq": 17.0, "quantity": {"m": 30.1, "b": -3.47}},
+        {"target": 2, "cq": 17.8, "quantity": {"m": 27.5, "b": -3.58}}
+    ]},
+    {"well": [
+        {"target": 1, "cq": 16.2, "quantity": {"m": 29.4, "b": -3.51}},
+        {"target": 2, "cq": 17.9, "quantity": {"m": 28.2, "b": -3.55}}
+    ]}
+]"""; dicttype=OrderedDict)
+
+(ok, response_body) = dispatch("standard_curve",String(JSON.json(request)),verify=true)
+ok
 
 
 

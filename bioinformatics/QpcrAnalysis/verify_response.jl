@@ -36,7 +36,7 @@ function verify_response(
     facts() do
         context("Verifying response body") do
             @fact (isa(response,OrderedDict)) --> true
-            @fact (length(response)) --> 1
+            # @fact (length(response)) --> 1 # allow additional fields
             @fact (haskey(response,"targets")) --> true
             array=response["targets"]
             @fact (isa(array,Vector)) --> true

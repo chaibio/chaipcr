@@ -69,7 +69,7 @@ function verify_request(
                         @fact (haskey(dict,"target")) --> true
                         @fact (dict["target"]) --> j
                         @fact (haskey(dict,"cq")) --> true
-                        @fact (isa(dict["cq"],Integer)) --> true
+                        @fact (isa(dict["cq"],Number)) --> true # Integer?
                         @fact (haskey(dict,"quantity")) --> true
                         subdict=dict["quantity"]
                         @fact (isa(subdict,OrderedDict)) --> true

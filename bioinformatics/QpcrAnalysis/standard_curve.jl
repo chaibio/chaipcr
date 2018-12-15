@@ -1,9 +1,13 @@
+# standard_curve.jl
 
+import JSON
 
 # if isnull(sample) well not considered
 # what if isnull(cq)
 
-immutable TargetResultEle
+abstract type Result end
+
+immutable TargetResultEle <: Result
     target_id ::Int
     slope ::Float64
     offset ::Float64
@@ -12,7 +16,7 @@ immutable TargetResultEle
 end
 const EMPTY_TRE = TargetResultEle(0, fill(NaN, 4)...)
 
-immutable GroupResultEle
+immutable GroupResultEle <: Result
     well ::Vector{Int}
     target_id ::Int
     cq_mean ::Float64
@@ -31,11 +35,12 @@ function act(
 
     req_vec ::Vector{Any};
 
-    out_format ::String ="json",
+    out_format ::String ="pre_json",
+    verbose ::Bool =false,
     json_digits ::Integer =JSON_DIGITS,
     qty_base ::Real =10,
     empty_tre ::TargetResultEle =EMPTY_TRE,
-    empty_gre ::GroupResultEle =EMPTY_GRE
+    empty_gre ::GroupResultEle  =EMPTY_GRE
     )
 
     # df1.colindex.names
@@ -45,7 +50,8 @@ function act(
     if size(req_df)[2] == 0 || any(map([:target, :cq, :qty]) do symbl
         all(isnan.(req_df[symbl]))
     end)
-        return json(OrderedDict("target" => nothing, "group" => nothing))
+        result = OrderedDict("target" => nothing, "group" => nothing)
+        return format_output(result)
     end
 
     target_result_df = by(req_df, :target) do chunk_target
@@ -445,6 +451,84 @@ function generate_req_sc(;
     return (json(req_vec), req_vec)
 
 end # generate_req_sc
+
+
+
+
+# experimental code >>
+
+function simplify(x ::Number, out_format ::String)
+println("Number $x format $out_format")
+    x
+end
+
+function simplify(tup ::Tuple, out_format ::String)
+println("Tuple $tup format $out_format")
+    if out_format=="full"
+        tup
+    else
+        Tuple([
+            simplify(tup[i],out_format) for i in range(1,length(tup))
+        ])
+    end
+end
+
+function simplify(vec ::Vector, out_format ::String)
+println("Vector $vec format $out_format")
+    if out_format=="full"
+        vec
+    else
+        Vector([
+            simplify(vec[i],out_format) for i in range(1,length(vec))
+        ])
+    end
+end
+
+function simplify(dict ::Associative, out_format ::String)
+println("Dict $dict format $out_format")
+    if out_format=="full"
+        dict
+    else
+        x = OrderedDict()
+        for i in keys(dict)
+            x[i] = simplify(dict[i],out_format)
+        end
+        x
+    end
+end
+
+function simplify(df ::DataFrame, out_format ::String)
+println("DataFrame $df format $out_format")
+    if out_format=="full"
+        df
+    else
+        x = OrderedDict()
+        for i in names(df)
+            x[i] = simplify(df[i],out_format)
+        end
+        x
+    end
+end
+
+function simplify(r ::Result, out_format ::String)
+println("Result $r format $out_format")
+    if out_format=="full"
+        r
+    else
+        x = OrderedDict()
+        if (haskey(x,:well) && length(x[:well])==0)         ||  # empty gre
+            (haskey(x,:target_id) && isnan(x[:target_id]))      # empty tre
+            return x
+        end
+        for i in fieldnames(r)
+            x[i] = simplify(getfield(r,i),out_format)
+        end
+        x
+    end
+end
+
+# << experimental code
+
 
 
 # notes
