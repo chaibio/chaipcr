@@ -197,24 +197,24 @@ FROM fluorescence_data
 WHERE experiment_id = 219 AND step_id = 329
 ORDER BY channel, well_num ;" | tail -n+2 | cut -f1 | awk 'BEGIN {RS="";FS=" "}{gsub(/\n/,",")}{print}' -
 
-cal_water_2=[
-        [12095,20829,14218,19162,14613,12937,12487,14240,7543,14187,12778,12404,13275,18710,10472,8520],
-        [ 2163, 2058, 2216, 1869, 1890, 2246, 1997, 2104,2287, 1981, 2120, 3471, 1953, 2018, 1956,2196]
-    ]
-cal_FAM_2=[
-        [79676,104728,95264,90512,109013,103317,92905,100809,82292,115539,93250,106691,113931,134691,78968,80789],
-        [35683, 41892,39971,40173, 43931, 44413,43240, 42156,39951, 44385,40652, 40888, 45433, 47371,42637,43064]
-    ]
-    cal_HEX_2=[
-        [14622,21383,15831,21415,18148,16878,15657,17881,11466,17953,16429,15830,17765,22733,14600,12180],
-        [41396,48051,45444,44977,50132,51689,49093,47231,43050,49144,44858,43502,48565,47037,48413,47160]
-    ]
+  cal_water_2=[
+          [12095,20829,14218,19162,14613,12937,12487,14240,7543,14187,12778,12404,13275,18710,10472,8520],
+          [ 2163, 2058, 2216, 1869, 1890, 2246, 1997, 2104,2287, 1981, 2120, 3471, 1953, 2018, 1956,2196]
+      ]
+  cal_FAM_2=[
+          [79676,104728,95264,90512,109013,103317,92905,100809,82292,115539,93250,106691,113931,134691,78968,80789],
+          [35683, 41892,39971,40173, 43931, 44413,43240, 42156,39951, 44385,40652, 40888, 45433, 47371,42637,43064]
+      ]
+      cal_HEX_2=[
+          [14622,21383,15831,21415,18148,16878,15657,17881,11466,17953,16429,15830,17765,22733,14600,12180],
+          [41396,48051,45444,44977,50132,51689,49093,47231,43050,49144,44858,43502,48565,47037,48413,47160]
+      ]
 
-calib_2=OrderedDict(
-    "water"     => Dict("fluorescence_value" => cal_water_2),
-    "channel_1" => Dict("fluorescence_value" => cal_FAM_2),
-    "channel_2" => Dict("fluorescence_value" => cal_HEX_2)
-)
+  calib_2=OrderedDict(
+      "water"     => Dict("fluorescence_value" => cal_water_2),
+      "channel_1" => Dict("fluorescence_value" => cal_FAM_2),
+      "channel_2" => Dict("fluorescence_value" => cal_HEX_2)
+  )
 
 
 
@@ -366,6 +366,43 @@ open("test_1ch_tc_146.json","w") do f
     JSON.print(f, tc_1)
 end
 
+
+
+
+
+  # Test_2ch thermal consistency single channel
+  # experiments.id = 145
+  # stages.id = 4
+  # stages.stage_type = meltcurve
+  mysql -u root -B -e "
+  USE test_2ch ;
+  SELECT fluorescence_value, temperature, well_num, channel
+  FROM melt_curve_data
+  WHERE experiment_id = 145 AND stage_id = 4
+  ORDER BY channel, well_num ;" > tc_145.tsv
+
+tc_145=readdlm("tc_145.tsv",'\t',header=true)
+raw_tc_2=OrderedDict(
+    tc_145[2][1]    => tc_145[1][:,1],
+    tc_145[2][2]    => tc_145[1][:,2],
+    tc_145[2][3]    => Vector{Integer}(tc_145[1][:,3]),
+    tc_145[2][4]    => Vector{Integer}(tc_145[1][:,4])
+)
+
+tc_2=OrderedDict(
+    "experiment_id"       => 145,
+    "stage_id"            => 4,
+    "calibration_info"    => calib_2,
+    "channel_nums"        => [1,2],
+    "qt_prob"             => 0.64,
+    "max_normd_qtv"       => 0.8,
+    "top_N"               => 4,
+    "raw_data"            => raw_tc_2
+)
+
+open("test_2ch_tc_145.json","w") do f
+    JSON.print(f, tc_2)
+end
     
 
 
@@ -491,19 +528,19 @@ LEFT JOIN protocols ON experiments.experiment_definition_id = protocols.experime
 LEFT JOIN stages ON protocols.id = stages.protocol_id
 WHERE experiments.id = 170 AND stages.stage_type <> 'holding'"
 
-USE test_1ch ;
+USE test_2ch ;
 SELECT stages.id, stages.stage_type FROM experiments
 LEFT JOIN protocols ON experiments.experiment_definition_id = protocols.experiment_definition_id
 LEFT JOIN stages ON protocols.id = stages.protocol_id
-WHERE experiments.id = 146 ;
+WHERE experiments.id = 145 ;
 
 USE test_1ch ;
 SELECT channel, step_id, steps.name, COUNT(*) FROM fluorescence_data
-WHERE experiment_id = 146
+WHERE experiment_id = 145
 GROUP BY step_id, steps.name, channel ;
 
-USE test_1ch ;
+USE test_2ch ;
 SELECT channel, well_num, COUNT(*)
 FROM melt_curve_data
-WHERE experiment_id = 146 AND stage_id = 4
+WHERE experiment_id = 145 AND stage_id = 3
 GROUP BY channel, well_num ;

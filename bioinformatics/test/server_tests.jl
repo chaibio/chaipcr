@@ -95,13 +95,16 @@ ok
 request = JSON.parsefile("test/data/xh-amp1.json"; dicttype=OrderedDict)
 (ok, response_body) = dispatch("amplification",String(JSON.json(request)),verify=true)
 ok
-
-# debug version
 request = JSON.parsefile("test/data/xh-amp2.json"; dicttype=OrderedDict)
-action_t=ActionType_DICT["amplification"]()
-verify_request(action_t,request)
-response = act(action_t,request)
-verify_response(action_t,JSON.parse(JSON.json(response),dicttype=OrderedDict))
+(ok, response_body) = dispatch("amplification",String(JSON.json(request)),verify=true)
+ok
+
+## debug version
+# request = JSON.parsefile("test/data/xh-amp2.json"; dicttype=OrderedDict)
+# action_t=ActionType_DICT["amplification"]()
+# verify_request(action_t,request)
+# response = act(action_t,request)
+# verify_response(action_t,JSON.parse(JSON.json(response),dicttype=OrderedDict))
 
 
 
@@ -159,8 +162,9 @@ request = JSON.parsefile("/mnt/share/test_1ch_tc_146.json"; dicttype=OrderedDict
 (ok, response_body) = dispatch("thermal_consistency",String(JSON.json(request)),verify=true)
 ok
 
+# dual channel thermal consistency analysis
 # debug version
-request = JSON.parsefile("/mnt/share/test_1ch_tc_146.json"; dicttype=OrderedDict)
+request = JSON.parsefile("/mnt/share/test_2ch_tc_145.json"; dicttype=OrderedDict)
 action_t=ActionType_DICT["thermal_consistency"]()
 verify_request(action_t,request)
 response = act(action_t,request)
