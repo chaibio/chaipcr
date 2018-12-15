@@ -406,6 +406,58 @@ end
     
 
 
+# Test_1ch thermal performance diagnostic single channel
+# experiments.id = 126
+# stages.id = 4
+# stages.stage_type = meltcurve
+mysql -u root -B -e "
+USE test_1ch ;
+SELECT lid_temp, heat_block_zone_1_temp, heat_block_zone_2_temp, elapsed_time
+FROM temperature_logs
+WHERE experiment_id = 126
+ORDER BY elapsed_time ;" > tpd_126.tsv
+
+tpd_126=readdlm("tpd_126.tsv",'\t',header=true)
+tpd_1=OrderedDict(
+    tpd_126[2][1]    => tpd_126[1][:,1],
+    tpd_126[2][2]    => tpd_126[1][:,2],
+    tpd_126[2][3]    => tpd_126[1][:,3],
+    tpd_126[2][4]    => Vector{Integer}(tpd_126[1][:,4])
+)
+
+open("test_1ch_tpd_126.json","w") do f
+    JSON.print(f, tpd_1)
+end
+
+
+
+
+# Test_2ch thermal performance diagnostic single channel
+# experiments.id = 131
+# stages.id = 2
+# stages.stage_type = holding
+mysql -u root -B -e "
+USE test_1ch ;
+SELECT lid_temp, heat_block_zone_1_temp, heat_block_zone_2_temp, elapsed_time
+FROM temperature_logs
+WHERE experiment_id = 131
+ORDER BY elapsed_time ;" > tpd_126.tsv
+
+tpd_126=readdlm("tpd_126.tsv",'\t',header=true)
+tpd_1=OrderedDict(
+    tpd_126[2][1]    => tpd_126[1][:,1],
+    tpd_126[2][2]    => tpd_126[1][:,2],
+    tpd_126[2][3]    => tpd_126[1][:,3],
+    tpd_126[2][4]    => Vector{Integer}(tpd_126[1][:,4])
+)
+
+open("test_1ch_tpd_126.json","w") do f
+    JSON.print(f, tpd_1)
+end
+
+
+
+
 # Test_1ch optical test single channel
 # experiments.id = 161
 # stages.id = 5
@@ -532,7 +584,7 @@ USE test_2ch ;
 SELECT stages.id, stages.stage_type FROM experiments
 LEFT JOIN protocols ON experiments.experiment_definition_id = protocols.experiment_definition_id
 LEFT JOIN stages ON protocols.id = stages.protocol_id
-WHERE experiments.id = 145 ;
+WHERE experiments.id = 131 ;
 
 USE test_1ch ;
 SELECT channel, step_id, steps.name, COUNT(*) FROM fluorescence_data

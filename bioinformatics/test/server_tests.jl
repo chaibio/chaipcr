@@ -87,24 +87,25 @@ include("adj_w2wvaf.jl")
 include("deconv.jl")
 
 # single channel amplification test
-request = JSON.parsefile("test/data/test_1ch_amp_169.json"; dicttype=OrderedDict)
+request = JSON.parsefile("../test/data/test_1ch_amp_169.json"; dicttype=OrderedDict)
 (ok, response_body) = dispatch("amplification",String(JSON.json(request)),verify=true)
 ok
 
 # dual channel amplification tests
-request = JSON.parsefile("test/data/xh-amp1.json"; dicttype=OrderedDict)
+request = JSON.parsefile("../test/data/xh-amp1.json"; dicttype=OrderedDict)
 (ok, response_body) = dispatch("amplification",String(JSON.json(request)),verify=true)
 ok
-request = JSON.parsefile("test/data/xh-amp2.json"; dicttype=OrderedDict)
+request = JSON.parsefile("../test/data/xh-amp2.json"; dicttype=OrderedDict)
 (ok, response_body) = dispatch("amplification",String(JSON.json(request)),verify=true)
 ok
 
 ## debug version
-# request = JSON.parsefile("test/data/xh-amp2.json"; dicttype=OrderedDict)
+# request = JSON.parsefile("../test/data/xh-amp2.json"; dicttype=OrderedDict)
 # action_t=ActionType_DICT["amplification"]()
 # verify_request(action_t,request)
 # response = act(action_t,request)
 # verify_response(action_t,JSON.parse(JSON.json(response),dicttype=OrderedDict))
+
 
 
 
@@ -125,17 +126,17 @@ kk = K4Deconv(k.k_s,k.k_inv_vec,k.inv_note)
 const K4DCV = kk
 
 # single channel melting curve test
-request = JSON.parsefile("test/data/test_1ch_mc_170.json"; dicttype=OrderedDict)
+request = JSON.parsefile("../test/data/test_1ch_mc_170.json"; dicttype=OrderedDict)
 (ok, response_body) = dispatch("meltcurve",String(JSON.json(request)),verify=true)
 ok
 
 # dual channel melting curve test
-request = JSON.parsefile("test/data/test_2ch_mc_223.json"; dicttype=OrderedDict)
+request = JSON.parsefile("../test/data/test_2ch_mc_223.json"; dicttype=OrderedDict)
 (ok, response_body) = dispatch("meltcurve",String(JSON.json(request)),verify=true)
 ok
 
 ## debug version
-# request = JSON.parsefile("test/data/test_2ch_mc_223.json"; dicttype=OrderedDict)
+# request = JSON.parsefile("../test/data/test_2ch_mc_223.json"; dicttype=OrderedDict)
 # action_t=ActionType_DICT["meltcurve"]()
 # verify_request(action_t,request)
 # response = act(action_t,request)
@@ -158,21 +159,58 @@ include("/mnt/share/supsmu.jl")
 include("/mnt/share/thermal_consistency.jl")
 
 # single channel thermal consistency analysis
-request = JSON.parsefile("/mnt/share/test_1ch_tc_146.json"; dicttype=OrderedDict)
+request = JSON.parsefile("../test/data/test_1ch_tc_146.json"; dicttype=OrderedDict)
 (ok, response_body) = dispatch("thermal_consistency",String(JSON.json(request)),verify=true)
 ok
 
 # dual channel thermal consistency analysis
-# debug version
-request = JSON.parsefile("/mnt/share/test_2ch_tc_145.json"; dicttype=OrderedDict)
-action_t=ActionType_DICT["thermal_consistency"]()
-verify_request(action_t,request)
-response = act(action_t,request)
-verify_response(action_t,JSON.parse(JSON.json(response),dicttype=OrderedDict))
+request = JSON.parsefile("../test/data/test_2ch_tc_145.json"; dicttype=OrderedDict)
+(ok, response_body) = dispatch("thermal_consistency",String(JSON.json(request)),verify=true)
+ok
+
+## debug version
+# request = JSON.parsefile("../test/data/test_2ch_tc_145.json"; dicttype=OrderedDict)
+# action_t=ActionType_DICT["thermal_consistency"]()
+# verify_request(action_t,request)
+# response = act(action_t,request)
+# verify_response(action_t,JSON.parse(JSON.json(response),dicttype=OrderedDict))
 
 
 
-test/data/
+
+
+# thermal performance diagnostic
+
+include("action_types.jl")
+include("verify_request.jl")
+include("verify_response.jl")
+include("/mnt/share/dispatch.jl")
+include("/mnt/share/calib.jl")
+include("/mnt/share/adj_w2wvaf.jl")
+include("/mnt/share/deconv.jl")
+include("/mnt/share/meltcrv.jl")
+include("/mnt/share/supsmu.jl")
+include("/mnt/share/thermal_performance_diagnostic")
+
+# single channel thermal performance diagnostic
+request = JSON.parsefile("../test/data/test_1ch_tpd_126.json"; dicttype=OrderedDict)
+(ok, response_body) = dispatch("thermal_performance_diagnostic",String(JSON.json(request)),verify=true)
+ok
+
+# dual channel thermal performance diagnostic
+request = JSON.parsefile("../test/data/test_2ch_tpd_131.json"; dicttype=OrderedDict)
+(ok, response_body) = dispatch("thermal_performance_diagnostic",String(JSON.json(request)),verify=true)
+ok
+
+## debug version
+# request = JSON.parsefile("../test/data/test_2ch_tpd_131.json"; dicttype=OrderedDict)
+# action_t=ActionType_DICT["thermal_performance_diagnostic"]()
+# verify_request(action_t,request)
+# response = act(action_t,request)
+# verify_response(action_t,JSON.parse(JSON.json(response),dicttype=OrderedDict))
+
+
+
 
 # optical tests
 
@@ -193,12 +231,14 @@ request = JSON.parsefile("/mnt/share/test_2ch_ot_190.json"; dicttype=OrderedDict
 (ok, response_body) = dispatch("optical_test_dual_channel",String(JSON.json(request)),verify=true)
 ok
 
-# debug version
-request = JSON.parsefile("/mnt/share/test_2ch_ot_190.json"; dicttype=OrderedDict)
-action_t=ActionType_DICT["optical_test_dual_channel"]()
-verify_request(action_t,request)  
-response = act(action_t,request)
-verify_response(action_t,JSON.parse(JSON.json(response),dicttype=OrderedDict))
+## debug version
+# request = JSON.parsefile("/mnt/share/test_2ch_ot_190.json"; dicttype=OrderedDict)
+# ction_t=ActionType_DICT["optical_test_dual_channel"]()
+# verify_request(action_t,request)  
+# response = act(action_t,request)
+# verify_response(action_t,JSON.parse(JSON.json(response),dicttype=OrderedDict))
+
+
 
 
 # test Julia server
@@ -234,4 +274,4 @@ end
 
 
 
-}
+#

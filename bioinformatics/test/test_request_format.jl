@@ -250,12 +250,11 @@ end
 
 function thermal_performance_diagnostic_request_test()
     request=JSON.parse("""{
-      "lid_temp": [],
-      "heat_block_zone_1_temp": [],
-      "heat_block_zone_2_temp": [],
-      "elapsed_time": [],
-      "cycle_num": []
-    }"""; dicttype=OrderedDict)
+      "lid_temp": [1,2,3],
+      "heat_block_zone_1_temp": [1,2,3],
+      "heat_block_zone_2_temp": [1,2,3],
+      "elapsed_time": [1,2,3]
+      }"""; dicttype=OrderedDict)
     verify_request(
         ActionType_DICT["thermal_performance_diagnostic"](),
         request

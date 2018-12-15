@@ -349,15 +349,19 @@ function verify_request(
 )
     facts("Thermal performance diagnostic requested") do
         context("Verifying request body") do
-            variables=["lid_temp","heat_block_zone_1_temp","heat_block_zone_2_temp","elapsed_time","cycle_num"]
+            variables=["lid_temp","heat_block_zone_1_temp","heat_block_zone_2_temp","elapsed_time"] # ,"cycle_num"]
             @fact (isa(request,OrderedDict)) --> true
             @fact (length(request)) --> length(variables)
-            n_cycles=length(request["cycle_num"])
+            n_cycles=length(request["elapsed_time"])
             for v in variables
                 @fact (haskey(request,v)) --> true
                 @fact (length(request[v])) --> n_cycles
                 for i in range(1,n_cycles)
-                    @fact (isa(request[v][i],Number)) --> true
+                    if (v=="elapsed_time")
+                        @fact (isa(request[v][i],Integer)) --> true
+                    else
+                        @fact (isa(request[v][i],Number)) --> true
+                    end
                 end
             end
         end
