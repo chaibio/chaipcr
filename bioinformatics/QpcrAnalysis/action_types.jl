@@ -15,17 +15,17 @@ struct         YourOwnAnalyzeFunctionality  <: Action end
 struct         OpticalTestSingleChannel     <: Action end
 struct         OpticalTestDualChannel       <: Action end
 
-const ActionType_DICT = Dict(
-    "amplification"                     => Amplification,
-    "meltcurve"                         => MeltCurve,
-    "standard_curve"                    => StandardCurve,
-    "loadscript"                        => LoadScript,
-    "optical_cal"                       => OpticalCal,
-    "thermal_performance_diagnostic"    => ThermalPerformanceDiagnostic,
-    "thermal_consistency"               => ThermalConsistency,
-    "optical_test_single_channel"       => OpticalTestSingleChannel,
-    "optical_test_dual_channel"         => OpticalTestDualChannel,
-    # "your_own_analyze_functionality"  => YourOwnAnalyzeFunctionality
+const Action_DICT = Dict(           
+    "amplification"                  => Amplification,
+    "meltcurve"                      => MeltCurve,
+    "standard_curve"                 => StandardCurve,
+    "loadscript"                     => LoadScript,
+    "optical_cal"                    => OpticalCal,
+    "thermal_performance_diagnostic" => ThermalPerformanceDiagnostic,
+    "thermal_consistency"            => ThermalConsistency,
+    "optical_test_single_channel"    => OpticalTestSingleChannel,
+    "optical_test_dual_channel"      => OpticalTestDualChannel
+  # "your_own_analyze_functionality" => YourOwnAnalyzeFunctionality
 )
 
 

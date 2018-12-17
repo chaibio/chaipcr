@@ -211,7 +211,7 @@ function ensure_ci(
 
     # use calibration data from experiment `calib_info_AIR` by default
     exp_id::Integer=calib_info_AIR
-    )
+)
 
     # new >>
     # not implemented yet
@@ -276,7 +276,8 @@ end # ensure_ci
 #     qry_2b ::String, # must select "well_num" column
 #     db_conn ::MySQL.MySQLHandle,
 #     verbose ::Bool,
-#     )
+# )
+#
 #     well_nums_str = join(well_nums, ',')
 #     print_v(println, verbose, "well_nums: $well_nums_str")
 #     well_constraint = (well_nums_str == "") ? "" : "AND well_num in ($well_nums_str)"

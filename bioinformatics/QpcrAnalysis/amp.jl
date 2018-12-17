@@ -103,9 +103,10 @@ function act(
     out_format ::String ="pre_json",
     verbose ::Bool =false
 )
+
     keys_req_dict=keys(req_dict)
 
-    ## remove MySql dependency
+    ## remove MySql dependency  
     #
     ## asrp_vec
     # if "step_id" in keys_req_dict
@@ -245,7 +246,7 @@ function process_amp(
     out_format ::String ="json", # "full", "pre_json", "json"
     json_digits ::Integer =JSON_DIGITS,
     verbose ::Bool =false
-    )
+)
 
     # print_v(println, verbose,
     #     "db_conn: ", db_conn, "\n",
@@ -412,7 +413,7 @@ end # process_amp
 #    asrp ::AmpStepRampProperties,
 #    fluo_well_nums ::AbstractVector, # not `[]`, all elements are expected to be found
 #    channel_nums ::AbstractVector,
-#    )
+# )
 #    
 #    cyc_nums = asrp.cyc_nums
 #    
@@ -496,7 +497,7 @@ end # auto_choose_bl_cycs
 
 
 # fit model, baseline subtraction, quantification
-function mod_bl_q( # for amplification data per well per channel, fit sigmoid model, extract important information for Cq, subtract baseline.
+function mod_bl_q( 
     fluos ::AbstractVector;
 
     min_reliable_cyc ::Real =5, # >= 1
@@ -519,12 +520,12 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
     verbose ::Bool =false,
 
     kwargs_jmp_model ::OrderedDict =OrderedDict(
-        :solver=>IpoptSolver(print_level=0, max_iter=35) # `ReadOnlyMemoryError()` for v0.5.1
-        # :solver=>IpoptSolver(print_level=0, max_iter=100) # increase allowed number of iterations for MAK-based methods, due to possible numerical difficulties during search for fitting directions (step size becomes too small to be precisely represented by the precision allowed by the system's capacity)
-        # :solver=>NLoptSolver(algorithm=:LN_COBYLA)
+        :solver => IpoptSolver(print_level=0, max_iter=35) # `ReadOnlyMemoryError()` for v0.5.1
+        # :solver => IpoptSolver(print_level=0, max_iter=100) # increase allowed number of iterations for MAK-based methods, due to possible numerical difficulties during search for fitting directions (step size becomes too small to be precisely represented by the precision allowed by the system's capacity)
+        # :solver =>    NLoptSolver(algorithm=:LN_COBYLA)
     ),
     ipopt_print2file ::String ="",
-    )
+)
 
     num_cycs = length(fluos)
     cycs = 1.0 * (1:num_cycs)
@@ -550,7 +551,7 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
         dfc_inst = dfc_DICT[af_key]()
 
         fitted_prebl = fit(dfc_inst, cycs, fluos, wts; kwargs_jmp_model...)
-        baseline = fitted_prebl.coefs[1] # "fb" (don't remember what this means, leave it here just in case it's important)
+        baseline = fitted_prebl.coefs[1] # "fb" (fallback)
         if af_key in ["MAK3", "MAKERGAUL4"]
             baseline += fitted_prebl.coefs[2] .* cycs # `.+=` caused "ERROR: MethodError: no method matching broadcast!( ::QpcrAnalysis.##278#283, ::Float64, ::Float64, ::Float64, ::StepRangeLen{Float64,Base.TwicePrecision{Float64},Base.TwicePrecision{Float64}})"
         end # if af_key
@@ -707,7 +708,7 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
         blsub_fitted,
         dr1_pred,
         dr2_pred,
-        max_dr1,
+        max_dr1,    
         max_dr2,
         cyc_vals_4cq,
         eff_vals_4cq,
@@ -731,8 +732,8 @@ function report_cq!(
     max_bsf_lb=4356,
     scld_max_dr1_lb=0.0089, # look like real amplification, scld_max_dr1 0.00894855, ip223, exp. 75, well A7, channel 2.
     scld_max_dr2_lb=0.000689,
-    scld_max_bsf_lb=0.086
-    )
+    scld_max_bsf_lb=0.086   
+)
 
     if before_128x
         max_dr1_lb, max_dr2_lb, max_bsf_lb = [max_dr1_lb, max_dr2_lb, max_bsf_lb] / 128

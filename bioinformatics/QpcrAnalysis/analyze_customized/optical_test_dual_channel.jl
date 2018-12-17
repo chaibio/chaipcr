@@ -42,7 +42,7 @@ function act(
     out_format ::String ="pre_json",
     verbose ::Bool =false
     # << new
-    )
+)
 
     # remove MySql dependency
     #

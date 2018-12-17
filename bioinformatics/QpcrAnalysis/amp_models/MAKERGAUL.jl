@@ -1,8 +1,9 @@
-
 # different formula for each cycle (dfc)
 
 # write functions to fit MAKERGAUL model here, which will be called in `mod_bl_q` in "amp.jl"
 
+import JuMP: Model, @variable, @constraint, @NLconstraint, @NLobjective,
+    solve, getvalue, getobjectivevalue
 
 # bounds
 const fb_B_MULTIPLE = 1.9

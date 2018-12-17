@@ -1,6 +1,7 @@
 # amp_model_types
 
 import DataStructures.OrderedDict
+import JuMP: Model
 
 abstract type AbstractAmpFitted end
 struct EmptyAmpFitted <: AbstractAmpFitted end
@@ -8,12 +9,12 @@ struct EmptyAmpFitted <: AbstractAmpFitted end
 
 # sfc: same formula for each cycle
 struct SfcFitted <: AbstractAmpFitted
-    coef_strs::Vector{String}
-    coefs::Vector{Float64}
-    status::Symbol
-    obj_val::AbstractFloat
-    jmp_model::JuMP.Model
-    init_coefs::OrderedDict{String,Float64}
+    coef_strs ::Vector{String}
+    coefs ::Vector{Float64}
+    status ::Symbol
+    obj_val ::AbstractFloat
+    jmp_model ::JuMP.Model
+    init_coefs ::OrderedDict{String,Float64}
 end
 const SfcFitted_EMPTY = SfcFitted(
     Vector{String}(), # coef_strs
@@ -37,21 +38,21 @@ struct MAKERGAUL3 <: AbstractDfcArg end
 struct MAKERGAUL4 <: AbstractDfcArg end
 
 const dfc_DICT = OrderedDict(
-    "MAK2"=>MAK2,
-    "MAK3"=>MAK3,
-    "MAKERGAUL3"=>MAKERGAUL3,
-    "MAKERGAUL4"=>MAKERGAUL4
+    "MAK2" => MAK2,
+    "MAK3" => MAK3,
+    "MAKERGAUL3" => MAKERGAUL3,
+    "MAKERGAUL4" => MAKERGAUL4
 ) # calling `process_amp` with `dfc=QpcrAnalysis.Essentials.MAK2()` raised error `TypeError: typeassert: expected QpcrAnalysis.Essentials.Dfc, got QpcrAnalysis.Essentials.MAK2`
 
 abstract type DfcFitted <: AbstractAmpFitted end
 
 struct MAK2Fitted <: DfcFitted
-    max_d_idx::Int
-    coef_strs::Vector{String}
-    coefs::Vector{Float64}
-    status::Symbol
-    obj_val::Float64
-    jmp_model::JuMP.Model
+    max_d_idx ::Int
+    coef_strs ::Vector{String}
+    coefs ::Vector{Float64}
+    status ::Symbol
+    obj_val ::Float64
+    jmp_model ::JuMP.Model
 end
 const MAK2Fitted_EMPTY = MAK2Fitted(
     0, # max_d_idx
@@ -63,14 +64,14 @@ const MAK2Fitted_EMPTY = MAK2Fitted(
 )
 
 struct MAK3Fitted <: DfcFitted
-    max_d_idx::Int
-    fb_start::Float64
-    bl_k_start::Float64
-    coef_strs::Vector{String}
-    coefs::Vector{Float64}
-    status::Symbol
-    obj_val::Float64
-    jmp_model::JuMP.Model
+    max_d_idx ::Int
+    fb_start ::Float64
+    bl_k_start ::Float64
+    coef_strs ::Vector{String}
+    coefs ::Vector{Float64}
+    status ::Symbol
+    obj_val ::Float64
+    jmp_model ::JuMP.Model
 end
 const MAK3Fitted_EMPTY = MAK3Fitted(
     0, # max_d_idx
@@ -84,12 +85,12 @@ const MAK3Fitted_EMPTY = MAK3Fitted(
 )
 
 struct MAKERGAUL3Fitted <: DfcFitted
-    max_of_idx::Int
-    coef_strs::Vector{String}
-    coefs::Vector{Float64}
-    status::Symbol
-    obj_val::Float64
-    jmp_model::JuMP.Model
+    max_of_idx ::Int
+    coef_strs ::Vector{String}
+    coefs ::Vector{Float64}
+    status ::Symbol
+    obj_val ::Float64
+    jmp_model ::JuMP.Model
 end
 const MAKERGAUL3Fitted_EMPTY = MAKERGAUL3Fitted(
     0, # max_of_idx
@@ -101,14 +102,14 @@ const MAKERGAUL3Fitted_EMPTY = MAKERGAUL3Fitted(
 )
 
 struct MAKERGAUL4Fitted <: DfcFitted
-    max_of_idx::Int
-    fb_start::Float64
-    bl_k_start::Float64
-    coef_strs::Vector{String}
-    coefs::Vector{Float64}
-    status::Symbol
-    obj_val::Float64
-    jmp_model::JuMP.Model
+    max_of_idx ::Int
+    fb_start ::Float64
+    bl_k_start ::Float64
+    coef_strs ::Vector{String}
+    coefs ::Vector{Float64}
+    status ::Symbol
+    obj_val ::Float64
+    jmp_model ::JuMP.Model
 end
 const MAKERGAUL4Fitted_EMPTY = MAKERGAUL4Fitted(
     0, # max_of_idx

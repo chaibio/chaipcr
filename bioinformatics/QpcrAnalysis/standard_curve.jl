@@ -41,8 +41,7 @@ function act(
     qty_base ::Real =10,
     empty_tre ::TargetResultEle =EMPTY_TRE,
     empty_gre ::GroupResultEle  =EMPTY_GRE
-    )
-
+)
     # df1.colindex.names
 
     req_df = reqvec2df(req_vec)
@@ -164,7 +163,7 @@ function act(
         end # do well_combin
 
         jp_dict = OrderedDict("targets" => target_vec, "groups" => grp_vec)
-        return out_format == "json" ? json(jp_dict) : jp_dict
+        return out_format == "json" ? JSON.json(jp_dict) : jp_dict
     end # if
 
 end # standard_curve

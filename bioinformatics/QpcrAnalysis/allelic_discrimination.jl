@@ -55,7 +55,7 @@ function prep_input_4ad(
     categ ::String="fluo",
     well_idc ::Union{AbstractVector,Colon}=Colon(),
     cycs ::Union{Integer,AbstractVector}=1 # relevant if `categ == "fluo"`, last available cycle
-    )
+)
 
     num_cycs, num_wells, num_channels = size(full_amp_out.fr_ary3)
 
@@ -95,7 +95,7 @@ function do_cluster_analysis(
     init_centers ::AbstractMatrix,
     cluster_method ::String="k-means-medoids",
     norm_l ::Real=2
-    )
+)
 
     num_wells = size(raw_data)[2]
 
@@ -234,7 +234,7 @@ function assign_genos(
     # Julia v0.6.0 on 2017-06-25:
     # `apg_labels ::Vector{AbstractString} =DEFAULT_eg_LABELS` resulted in
     # "ERROR: MethodError: no method matching #assign_genos#301( ::Array{AbstractString,1}, ::QpcrAnalysis.#assign_genos, ::Array{Float64,2}, ::Array{Float64,2}, ::Float64)"
-    )
+)
 
     num_channels, num_wells = size(data)
 
@@ -546,7 +546,7 @@ function process_ad(
     norm_l ::Real, # for `assign_genos`
     expected_ncg_raw ::AbstractMatrix=DEFAULT_encgr, # each column is a vector of binary geno whose length is number of channels (0 => no signal, 1 => yes signal)
     categ_well_vec ::AbstractVector=CATEG_WELL_VEC,
-    )
+)
 
     # output
     # OrderedDict(

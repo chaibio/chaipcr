@@ -1,28 +1,31 @@
-# chaipcr/web/public/dynexp/optical_cal/analyze.R
+# optical_cal.jl
 # use `prep_adj_w2wvaf` to check validity of calibration data for adjusting well-to-well variation in absolute fluo
 
 # check JSON output in UI: http://:ip_address/experiments/:exp_id/analyze
 
 import DataStructures.OrderedDict
-
+import JSON
 
 # called by QpcrAnalyze.dispatch
 function act(
-    ::Type{OpticalCal},
-    calib_info_dict ::OrderedDict{String,Any};
+    ::OpticalCal,
+    calib_info_dict ::Associative;
 
-    ## remove MySql dependency
+    # new >>
+    well_nums ::AbstractVector =[],
+    out_format ::String ="pre_json",
+    verbose ::Bool =false,
+    # << new
+
+    ## remove MySql dependency  
     #
     # db_conn::MySQL.MySQLHandle,
     # exp_id::Integer, # not used for computation
     # calib_info::Union{Integer,OrderedDict}; # really used
-    # well_nums::AbstractVector =[],
 
     dye_in ::String ="FAM", 
-    dyes_2bfild ::Vector =[],
-    out_json ="pre-json",
-    verbose =false
-    )
+    dyes_2bfild ::Vector =[]
+)
 
     ## remove MySql dependency
     #
@@ -42,13 +45,17 @@ function act(
 
     if length(calib_info_dict) >= 3 # 2 or more channels
 
-        ## MySql dependency
+        result_k = # try
+
+        ## remove MySql dependency
         #
-        result_k = try
-            get_k(db_conn, calib_info_dict, well_nums)
-        catch err
-            err
-        end # try
+        #    get_k(db_conn, calib_info_dict, well_nums)
+
+            get_k(calib_info_dict, well_nums)
+            
+        # catch err
+        #     err
+        # end
 
         if isa(result_k, Exception)
             err_msg = isa(result_k, ErrorException) ? result_k.msg : "$(string(result_k)). "
@@ -62,10 +69,9 @@ function act(
 
     end # if length
 
-
     # prep_adj_w2wvaf
 
-    result_aw = try
+    result_aw = # try
 
         ## remove MySql dependency
         #
@@ -75,9 +81,9 @@ function act(
         prep_adj_w2wvaf(calib_info_dict, well_nums, dye_in, dyes_2bfild)
         # << new
         
-    catch err
-        err
-    end
+    # catch err
+    #     err
+    # end
 
     if isa(result_aw, Exception)
         err_msg = isa(result_aw, ErrorException) ? result_aw.msg : "$(string(result_aw)). "
@@ -92,8 +98,8 @@ function act(
         )
     end
 
-    if out_json
-        result = json(result) # become a string
+    if (out_format=="json")
+        result = JSON.json(result) # become a string
     end
 
     return result

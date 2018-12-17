@@ -1,4 +1,4 @@
-# verify_response.jl
+# test_response_format.jl
 #
 # Author: Tom Price
 # Date: Dec 2018

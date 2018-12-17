@@ -21,8 +21,7 @@
 #       http://127.0.0.1:8081/experiments/#{experiment.id}/analyze
 
 import JSON, DataStructures.OrderedDict
-#import FactCheck: facts, @fact, @fact_throws, less_than_or_equal, exitstatus, setstyle
-using FactCheck
+import FactCheck: @fact, facts, convert, getindex, clear_results, setstyle
 
 FactCheck.setstyle(:default)
 
@@ -44,7 +43,7 @@ calib_info_AIR = -99 # set default calibration experiment
 
 function verify_request(
     ::StandardCurve,
-    request ::Any
+    request ::AbstractArray
 )
     facts("Standard curve requested") do
         context("Verifying request body") do
@@ -183,7 +182,7 @@ end
 
 function verify_request(
     ::Amplification,
-    request ::Any
+    request ::Associative
 )
     facts("Amplification requested") do
         context("Verifying request body") do
@@ -284,7 +283,7 @@ end
 
 function verify_request(
     ::MeltCurve,
-    request ::Any
+    request ::Associative
 )
     facts("Melting curve requested") do
         context("Verifying request body") do
@@ -345,7 +344,7 @@ end
 
 function verify_request(
     ::ThermalPerformanceDiagnostic,
-    request ::Any
+    request ::Associative
 )
     facts("Thermal performance diagnostic requested") do
         context("Verifying request body") do
@@ -388,7 +387,7 @@ end
 
 function verify_request(
     ::ThermalConsistency,
-    request ::Any
+    request ::Associative
 )
     facts("Thermal consistency requested") do
         context("Verifying request body") do
@@ -427,26 +426,23 @@ end
 
 function verify_request(
     ::OpticalCal,
-    request ::Any
+    request ::Associative
 )
     facts("Optical calibration requested") do
         context("Verifying request body") do
             @fact (isa(request,OrderedDict)) --> true
-            @fact (haskey(request,"calibration_info")) --> true
-            @fact (length(request)) --> 1
-            calib=request["calibration_info"]
-            @fact (isa(calib,OrderedDict)) --> true
-            @fact (haskey(calib,"water")) --> true
-            @fact (isa(calib["water"],OrderedDict)) --> true
-            @fact (haskey(calib["water"],"fluorescence_value")) --> true
-            @fact (isa(calib["water"]["fluorescence_value"],Vector)) --> true
-            if length(calib["water"]["fluorescence_value"])<2 ||
-                calib["water"]["fluorescence_value"][2]==nothing
+            @fact (isa(request,OrderedDict)) --> true
+            @fact (haskey(request,"water")) --> true
+            @fact (isa(request["water"],OrderedDict)) --> true
+            @fact (haskey(request["water"],"fluorescence_value")) --> true
+            @fact (isa(request["water"]["fluorescence_value"],Vector)) --> true
+            if length(request["water"]["fluorescence_value"])<2 ||
+                request["water"]["fluorescence_value"][2]==nothing
                 n_channels=1
             else
                 n_channels=2
             end
-            calibration_test(calib,n_channels)
+            calibration_test(request,n_channels)
         end
     end
     FactCheck.exitstatus()
@@ -469,7 +465,7 @@ end
 
 function verify_request(
     ::OpticalTestSingleChannel,
-    request ::Any
+    request ::Associative
 )
     facts("Single channel optical test requested") do
         context("Verifying request body") do
@@ -496,7 +492,7 @@ end
 
 function verify_request(
     ::OpticalTestDualChannel,
-    request ::Any
+    request ::Associative
 )
     facts("Dual channel optical test requested") do
         context("Verifying request body") do

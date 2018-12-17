@@ -9,18 +9,18 @@ function dispatch(
     verify ::Bool =false,
     verbose ::Bool =false
 )
-    # NB. DefaultDict and DefaultOrderedDict constructors sometimes don't work on OrderedDict
-    # (https://github.com/JuliaLang/DataStructures.jl/issues/205)
-    req_parsed = JSON.parse(request_body; dicttype=OrderedDict)
-
-    if !(action in keys(ActionType_DICT))
-        error("action $action is not found")
-    end
-
-    # else
-    action_t = ActionType_DICT[action]()
-
     result = try
+
+        # NB. DefaultDict and DefaultOrderedDict constructors sometimes don't work on OrderedDict
+        # (https://github.com/JuliaLang/DataStructures.jl/issues/205)
+        req_parsed = JSON.parse(request_body; dicttype=OrderedDict)
+
+        if !(action in keys(Action_DICT))
+            error("action $action is not found")
+        end
+
+        # else
+        action_t = Action_DICT[action]()
 
         if (verify)
             verify_input = try
@@ -48,7 +48,7 @@ function dispatch(
     end
 
     success = !isa(result, Exception)
-    response_body = success ? result : Dict(:error => repr(result))
+    response_body = success ? result : String(JSON.json(Dict(:error => repr(result))))
 
     return (success, response_body)
 end # dispatch
@@ -85,8 +85,7 @@ function args2reqb(
     db_usr ::String ="root",
     db_pswd ::String ="",
     db_name ::String ="chaipcr",
-    )
-
+)
     reqb = OrderedDict{typeof(""),Any}("calibration_info"=>calib_info)
 
     if action == "amplification"
@@ -105,8 +104,8 @@ function args2reqb(
         reqb["stage_id"] = stage_id
     elseif action == "analyze"
         reqb["experiment_info"] = OrderedDict(
-            "id"=>exp_id,
-            "guid"=>guid
+            "id"   => exp_id,
+            "guid" => guid
         )
     else
         error("Unrecognized action.")
@@ -132,6 +131,7 @@ function args2reqb(
     return json(reqb)
 
 end # args2reqb
+
 
 
 

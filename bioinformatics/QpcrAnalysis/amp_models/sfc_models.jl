@@ -1,7 +1,8 @@
 # models with same formula for each cycle (Sfc models)
 
 import DataStructures.OrderedDict;
-import JuMP.@variable;
+import JuMP: Model, @variable, @constraint, @NLconstraint, @NLobjective,
+    solve, getvalue, getobjectivevalue
 
 mutable struct SFCModelDef # non-linear model, one feature (`x`)
 
