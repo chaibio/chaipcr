@@ -20,21 +20,26 @@ class User < ActiveRecord::Base
   include Swagger::Blocks
 
   swagger_schema :User do
-		property :user do
-			property :id do
-				key :type, :integer
-				key :format, :int64
-			end
-			property :name do
-	      key :type, :string
-	    end
-	    property :email do
-	      key :type, :string
-	    end
-	    property :role do
-	      key :type, :string
-	    end
-		end
+       property :user do
+	  property :id do
+            key :type, :integer
+            key :format, :int64
+          end
+          property :name do
+            key :type, :string
+          end
+          property :email do
+            key :type, :string
+          end
+          property :role do
+            key :type, :string
+          end
+          property :show_banner do
+            key :type, :boolean
+            key :description, 'Show getting started banner'
+            key :default, true
+          end
+       end
   end
 
   swagger_schema :UserInput do

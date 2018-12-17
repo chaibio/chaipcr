@@ -1,7 +1,8 @@
 App.directive 'aspectRatio', [
   'WindowWrapper'
   '$timeout'
-  (WindowWrapper, $timeout) ->
+  '$rootScope'
+  (WindowWrapper, $timeout, $rootScope) ->
 
     restrict: 'AE',
     scope:
@@ -66,16 +67,19 @@ App.directive 'aspectRatio', [
         # console.log(height)
 
         elem.css('min-Width': width)
-        elem.css('Width': width)
+        elem.css('width': width)
         elem.css('min-height': height)
         elem.css('height': height)
         # elem.parent().children().get(1).css('height': height)
-        elem.parent().children().get(1).style.height = height + "px"
+        elem.parent().children().get(1).style.height = height + "px"        
 
       resizeTimeout = null
 
       $scope.$on 'window:resize', ->
         console.log('window:resize')
+        runAspectRatio()
+
+      runAspectRatio = (send_event = false) ->
         resizeAspectRatio()
         if resizeTimeout
           $timeout.cancel(resizeTimeout)
@@ -83,8 +87,16 @@ App.directive 'aspectRatio', [
           elem.css(overflow: '', width: '', 'min-width': '', height: '', 'min-height': '')
           resizeAspectRatio()
           resizeTimeout = null
+          if send_event
+            $rootScope.$broadcast 'event:resize-aspect-ratio'
         , 500
-      console.log('aspectRatio: init')
-      $timeout(resizeAspectRatio, 500)
 
+      console.log('aspectRatio: init')      
+      
+      $scope.$on 'event:start-resize-aspect-ratio', ->
+        runAspectRatio(true)
+
+      $timeout ->
+        runAspectRatio(true)
+      , 1000       
 ]

@@ -84,8 +84,10 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         '#14A451'
       ]
 
-    @neutralizeData = (amplification_data, is_dual_channel=false) ->
+    @neutralizeData = (amplification_data, targets, is_dual_channel=false) ->
       amplification_data = angular.copy amplification_data
+      targets = angular.copy targets
+
       channel_datasets = {}
       channels_count = if is_dual_channel then 2 else 1
 
@@ -98,9 +100,11 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         dataset_name = "channel_#{channel_i}"
         channel_datasets[dataset_name] = []
         channel_data = _.filter amplification_data, (datum) ->
-          datum[0] is channel_i
-        for cycle_i in [1..max_cycle] by 1
-          
+          target = _.filter targets, (target) ->
+            target && target.id is datum[0]          
+          target.length && target[0].channel is channel_i
+
+        for cycle_i in [1..max_cycle] by 1          
           data_by_cycle = _.filter channel_data, (datum) ->
             datum[2] is cycle_i
           data_by_cycle = _.sortBy data_by_cycle, (d) ->
@@ -111,17 +115,19 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         console.log(channel_datasets[dataset_name])
         
         channel_datasets[dataset_name] = _.map channel_datasets[dataset_name], (datum) ->
-      
-          pt = cycle_num: datum[0][2]
-          for y_item, i in datum by 1
-            pt["well_#{i}_background"] = y_item[3]
-            pt["well_#{i}_baseline"] =  y_item[4]
-            pt["well_#{i}_background_log"] = if y_item[3] > 0 then y_item[3] else 10
-            pt["well_#{i}_baseline_log"] =  if y_item[4] > 0 then y_item[4] else 10
+          if datum[0]
+            pt = cycle_num: datum[0][2]
+            for y_item, i in datum by 1
+              pt["well_#{i}_background"] = y_item[3]
+              pt["well_#{i}_baseline"] =  y_item[4]
+              pt["well_#{i}_background_log"] = if y_item[3] > 0 then y_item[3] else 10
+              pt["well_#{i}_baseline_log"] =  if y_item[4] > 0 then y_item[4] else 10
 
-            pt["well_#{i}_dr1_pred"] = y_item[5]
-            pt["well_#{i}_dr2_pred"] = y_item[6]
-          return pt
+              pt["well_#{i}_dr1_pred"] = y_item[5]
+              pt["well_#{i}_dr2_pred"] = y_item[6]
+            return pt
+          else
+            {}
 
       return channel_datasets
 
@@ -133,11 +139,13 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         targets.push 
           id: well_data[i].target_id
           name: well_data[i].target_name
+          channel: well_data[i].channel
 
       return targets
 
-    @normalizeTargetData = (target_data) ->
+    @normalizeTargetData = (target_data, well_targets) ->
       target_data = angular.copy target_data
+      well_targets = angular.copy well_targets
       targets = []
 
       for i in [1.. target_data.length - 1] by 1
@@ -148,9 +156,11 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
       return targets
 
 
-    @normalizeSummaryData = (summary_data, target_data) ->
+    @normalizeSummaryData = (summary_data, target_data, well_targets) ->
       summary_data = angular.copy summary_data
       target_data = angular.copy target_data
+      well_targets = angular.copy well_targets
+
       well_data = []
 
       for i in [1.. summary_data.length - 1] by 1
@@ -158,10 +168,18 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         for item_name in [0..summary_data[0].length - 1] by 1
           item[summary_data[0][item_name]] = summary_data[i][item_name]
 
-        target = _.filter target_data, (target) ->
-          target[0] is item.target_id
+        target = _.filter well_targets, (target) ->
+          target && target.id is item.target_id
 
-        item['target_name'] = target[0][1] if target[0]
+        if target.length
+          item['target_name'] = target[0].name if target[0]
+          item['channel'] = target[0].channel if target[0]
+        else
+          target = _.filter target_data, (target) ->
+            target[0] is item.target_id
+          item['target_name'] = target[0][1] if target[0]
+          item['channel'] = if item['target_name'] == 'Ch 1' then 2 else 1
+
         item['active'] = false
 
         item['mean_quantity'] = item['mean_quantity_m'] * Math.pow(10, item['mean_quantity_b'])
@@ -169,7 +187,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
         well_data.push item
 
-      well_data = _.orderBy(well_data,['well_num', 'target_name'],['asc', 'asc']);      
+      well_data = _.orderBy(well_data,['well_num', 'channel'],['asc', 'asc']);      
 
       return well_data
 

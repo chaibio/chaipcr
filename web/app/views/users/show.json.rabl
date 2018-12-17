@@ -1,5 +1,5 @@
 object @user
-attribute :id, :email, :role, :name
+attribute :id, :email, :role, :name, :show_banner
 
 node(:authentication_token, :unless => lambda { |obj| obj != current_user }) do |o|
 	authentication_token

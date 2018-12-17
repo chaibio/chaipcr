@@ -76,11 +76,12 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.editExpNameMode = []
       $scope.editExpTargetMode = []
       $scope.omittedIndexes = []
+      $scope.well_targets = []
 
-      $scope.label_cycle = 0
-      $scope.label_RFU = 0
-      $scope.label_dF_dC = 0
-      $scope.label_D2_dc2 = 0
+      $scope.label_cycle = ''
+      $scope.label_RFU = ''
+      $scope.label_dF_dC = ''
+      $scope.label_D2_dc2 = ''
 
       $scope.index_target = 0
       $scope.index_channel = -1
@@ -109,6 +110,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         # alert $scope.omittedIndexes
         # return
         updateSeries()
+
+      $scope.$watch '$viewContentLoaded', ->
+        $rootScope.$broadcast 'event:start-resize-aspect-ratio'
 
       $scope.$on 'expName:Updated', ->
         $scope.experiment?.name = expName.name
@@ -256,7 +260,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.targetsSet = []
         for i in [0...$scope.targets.length]
           if $scope.targets[i] and $scope.targetsSet.indexOf($scope.targets[i]) < 0
-            $scope.targetsSet.push($scope.targets[i])
+            target = _.filter $scope.targetsSet, (target) ->
+              target.id is $scope.targets[i].id
+            if !target.length
+              $scope.targetsSet.push($scope.targets[i])
 
       $scope.updateSamplesSet = ->
         $scope.samplesSet = []
@@ -270,30 +277,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $scope.onUnselectLine()
         wellScrollTop = (data.index + 1) * 36 * 2 + 36 - document.querySelector('.table-container').offsetHeight
         angular.element(document.querySelector('.table-container')).animate { scrollTop: wellScrollTop }, 'fast'
-
-
-      Experiment.getWellLayout($stateParams.id).then (resp) ->
-
-        for i in [0...16]
-          $scope.samples[i] = resp.data[i].samples[0].name if resp.data[i].samples
-          # $scope.targets[i] = resp.data[i].targets[0].name if resp.data[i].targets && resp.data[i].targets[0]
-          $scope.types[i] = resp.data[i].targets[0].well_type if resp.data[i].targets && resp.data[i].targets[0]
-
-        # $scope.updateTargetsSet()
-        $scope.updateSamplesSet()
-                
-        updateSeries()
-      
-      # Experiment.getWells($stateParams.id).then (resp) ->
-      #   $scope.targetsSet = []
-      #   for i in [0...16]
-      #     $scope.samples[resp.data[i].well.well_num - 1] = resp.data[i].well.sample_name if resp.data[i]
-      #     $scope.types[resp.data[i].well.well_num - 1] = resp.data[i].well.well_type if resp.data[i]
-      #     $scope.targets[resp.data[i].well.well_num - 1] = resp.data[i].well.targets[0] if resp.data[i]
-      #   $scope.updateTargetsSet()
-      #   $scope.updateSamplesSet()
-                
-      #   updateSeries()
 
       Experiment.get(id: $stateParams.id).then (data) ->
         maxCycle = helper.getMaxExperimentCycle(data.experiment)
@@ -354,20 +337,22 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               $scope.chartConfig.axes.x.min = 1
               $scope.hasData = true
               data = resp.data.steps[0]
+
+              $scope.well_data = helper.normalizeSummaryData(data.summary_data, data.targets, $scope.well_targets)
+              $scope.targets = helper.normalizeWellTargetData($scope.well_data)
+
+              console.log($scope.targets)
+
               data.amplification_data?.shift()
               data.cq?.shift()
-              data.amplification_data = helper.neutralizeData(data.amplification_data, $scope.is_dual_channel)
+              data.amplification_data = helper.neutralizeData(data.amplification_data, $scope.targets, $scope.is_dual_channel)
 
               AMPLI_DATA_CACHE = angular.copy data
               $scope.amplification_data = data.amplification_data
 
-              $scope.well_data = helper.normalizeSummaryData(data.summary_data, data.targets)
-              $scope.targets = helper.normalizeWellTargetData($scope.well_data)
-              $scope.targetsSet = helper.normalizeTargetData(data.targets)
-
+              $scope.updateTargetsSet()
               updateButtonCts()
               updateSeries()
-
 
               # retry()
             if ((resp.data?.partial is true) or (resp.status is 202) or (resp.status is 304)) and !$scope.retrying
@@ -518,10 +503,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.label_well = "No Selection"
         $scope.label_channel = ""
 
-        $scope.label_cycle = 0
-        $scope.label_RFU = 0
-        $scope.label_dF_dC = 0
-        $scope.label_D2_dc2 = 0
+        $scope.label_cycle = ''
+        $scope.label_RFU = ''
+        $scope.label_dF_dC = ''
+        $scope.label_D2_dc2 = ''
 
         $scope.label_sample = null
         $scope.bgcolor_target = {
@@ -551,16 +536,23 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.$parent.chart
       , (chart) ->
         if chart is 'amplification'
-          fetchFluorescenceData()
-          # Experiment.getWells($stateParams.id).then (resp) ->
-          #   for i in [0...16]
-          #     $scope.samples[resp.data[i].well.well_num - 1] = resp.data[i].well.sample_name if resp.data[i]
-
+          $scope.well_targets = []
           Experiment.getWellLayout($stateParams.id).then (resp) ->
-            for i in [0...16]
-              $scope.samples[i] = resp.data[i].samples[0].name if resp.data[i].samples
+            for i in [0...resp.data.length]
+              $scope.samples[i] = if resp.data[i].samples then resp.data[i].samples[0].name else null
+              $scope.well_targets[2*i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0]  else null
+              $scope.well_targets[2*i+1] = if resp.data[i].targets && resp.data[i].targets[1] then resp.data[i].targets[1] else null
+              $scope.types[2*i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0].well_type  else null
+              $scope.types[2*i+1] = if resp.data[i].targets && resp.data[i].targets[1] then resp.data[i].targets[1].well_type else null
+            
+            $scope.updateSamplesSet()                   
+            updateSeries()
+
+
+            fetchFluorescenceData()
 
           $timeout ->
+            $rootScope.$broadcast 'event:start-resize-aspect-ratio'
             $scope.showAmpliChart = true
           , 1000
         else

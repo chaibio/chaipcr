@@ -34,6 +34,7 @@ class UsersController < ApplicationController
       param :password, String, :desc => "User Password", :required => true, :action_aware => true
       param :password_confirmation, String, :desc => "User Password Confirmation", :required => true, :action_aware => true
       param :role, ["admin", "user"], :desc => "User Role", :required => false
+      param :show_banner, :bool, :desc => "Show getting started help banner", :required=>false
      end
   end
 
@@ -88,7 +89,7 @@ class UsersController < ApplicationController
   end
 
   api :GET, "/users/:id or /users/current", "show user with id or current user info"
-  example "[{'user':{'id':1,'name':'test','email':'test@test.com','role':'user'}}]"
+  example "[{'user':{'id':1,'name':'test','email':'test@test.com','role':'user', 'show_banner':true}}]"
   def show
     if params[:id] == "current"
       @user = current_user
@@ -177,7 +178,7 @@ class UsersController < ApplicationController
 
   api :PUT, "/users/:id", "Update an user"
   param_group :user
-  example "[{'user':{'id':1,'name':'test','email':'test@test.com','role':'user'}}]"
+  example "[{'user':{'id':1,'name':'test','email':'test@test.com','role':'user', 'show_banner':false}}]"
   def update
     @user = User.find_by_id(params[:id])
     ret  = @user.update_attributes(user_params)
@@ -225,7 +226,7 @@ class UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:name, :email, :password, :password_confirmation, :role)
+    params.require(:user).permit(:name, :email, :password, :password_confirmation, :role, :show_banner)
   end
 
   def authorized?
