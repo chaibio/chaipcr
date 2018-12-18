@@ -411,11 +411,11 @@ experiments/:experiment_id/optical_test_single_channel
 request body:
 {
   “baseline”: {
-	“fluorescence_value”:[[well_01, well_02, …, well_16]]
+	“fluorescence_value”:[well_01, well_02, …, well_16]
   },
 
   “excitation”: {
-	“fluorescence_value”:[[well_01, well_02, …, well_16]]
+	“fluorescence_value”:[well_01, well_02, …, well_16]
   }
 }
 
