@@ -356,6 +356,12 @@ end
 function singlechannel_optical_cal_request_test()
     request=JSON.parse("""{
         "calibration_info": {
+            "baseline": {
+                "fluorescence_value": [
+                    [1.01, 1.02,    1.15, 1.16],
+                    null
+                ]
+            },
             "water": {
                 "fluorescence_value": [
                     [1.01, 1.02,    1.15, 1.16],
@@ -387,6 +393,12 @@ end
 function dualchannel_optical_cal_request_test()
     request=JSON.parse("""{
         "calibration_info": {
+            "baseline": {
+                "fluorescence_value": [
+                    [1.01, 1.02,    1.15, 1.16],
+                    [2.01, 2.02,    2.15, 2.16]
+                ]
+            },
             "water": {
                 "fluorescence_value": [
                     [1.01, 1.02,    1.15, 1.16],
@@ -511,4 +523,4 @@ function verify_request_examples()
 end
 
 # Usage:
-# verify_request_examples() # every test should return true
+# verify_request_examples() # every test should return false

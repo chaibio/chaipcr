@@ -8,7 +8,9 @@
 # obtain data from databases test_1ch and test_2ch
 # to test Julia API
 
-
+# test_1ch = database 20160825_chaipcr_ip201.sql
+# test_2ch = database 20160720_chaipcr_ip223.sql
+# chaipcr  = database 20180907_juliatestdb.sql
 
 # Test_1ch calibration: Water
 # experiments.id = 168
@@ -374,7 +376,7 @@ FROM fluorescence_data
 WHERE experiment_id = 161
 AND step_id = 12
 AND cycle_num = 1
-ORDER BY well_num"
+ORDER BY well_num ;"
 
 # experiments.id = 161
 # stages.id = 5
@@ -387,7 +389,7 @@ FROM fluorescence_data
 WHERE experiment_id = 161
 AND step_id = 13
 AND cycle_num = 1
-ORDER BY well_num"
+ORDER BY well_num ;"
 
 # Julia code
 
@@ -421,7 +423,7 @@ FROM fluorescence_data
 WHERE experiment_id = 190
 AND step_id = 116
 AND cycle_num = 1
-ORDER BY channel, well_num"
+ORDER BY channel, well_num ;"
 
 mysql -u root -B -e "
 USE test_2ch ;
@@ -430,7 +432,7 @@ FROM fluorescence_data
 WHERE experiment_id = 190
 AND step_id = 117
 AND cycle_num = 1
-ORDER BY channel, well_num"
+ORDER BY channel, well_num ;"
 
 mysql -u root -B -e "
 USE test_2ch ;
@@ -439,7 +441,7 @@ FROM fluorescence_data
 WHERE experiment_id = 190
 AND step_id = 119
 AND cycle_num = 1
-ORDER BY channel, well_num"
+ORDER BY channel, well_num ;"
 
 mysql -u root -B -e "
 USE test_2ch ;
@@ -448,7 +450,7 @@ FROM fluorescence_data
 WHERE experiment_id = 190
 AND step_id = 121
 AND cycle_num = 1
-ORDER BY channel, well_num"
+ORDER BY channel, well_num ;"
 
 # Julia code
 
@@ -477,4 +479,86 @@ ORDER BY channel, well_num"
 # )
 # open("test_2ch_ot_190.json","w") do f
 #     JSON.print(f, ot_2)
+# end
+
+# optical calibration dual channel
+# database chaipcr
+# experiments.id = 250
+# stages.id = 8
+# stages.stage_type = holding
+
+# baseline values
+# step_id = 28 (water)
+mysql -u root -B -e "
+USE chaipcr ;
+SELECT fluorescence_value, baseline_value, channel, well_num
+FROM fluorescence_data
+WHERE experiment_id = 250
+AND step_id = 28
+AND cycle_num = 1
+ORDER BY channel, well_num ;" | tail -n+2 | cut -f2 | awk 'BEGIN {RS="";FS=" "}{gsub(/\n/,",")}{print}' -
+
+# fluorescence values
+# step_id = 28 (water)
+mysql -u root -B -e "
+USE chaipcr ;
+SELECT fluorescence_value, channel, well_num
+FROM fluorescence_data
+WHERE experiment_id = 250
+AND step_id = 28
+AND cycle_num = 1
+ORDER BY channel, well_num ;" | tail -n+2 | cut -f1 | awk 'BEGIN {RS="";FS=" "}{gsub(/\n/,",")}{print}' -
+
+# fluorescence values
+# step_id = 31 (FAM)
+mysql -u root -B -e "
+USE chaipcr ;
+SELECT fluorescence_value, channel, well_num
+FROM fluorescence_data
+WHERE experiment_id = 250
+AND step_id = 31
+AND cycle_num = 1
+ORDER BY channel, well_num ;" | tail -n+2 | cut -f1 | awk 'BEGIN {RS="";FS=" "}{gsub(/\n/,",")}{print}' -
+
+# fluorescence values
+# step_id = 34 (HEX)
+mysql -u root -B -e "
+USE chaipcr ;
+SELECT fluorescence_value, channel, well_num
+FROM fluorescence_data
+WHERE experiment_id = 250
+AND step_id = 34
+AND cycle_num = 1
+ORDER BY channel, well_num ;" | tail -n+2 | cut -f1 | awk 'BEGIN {RS="";FS=" "}{gsub(/\n/,",")}{print}' -
+
+# Julia code
+
+# baseline_oc_2=[
+#     [1485,1448,1492,1509,1482,1484,1487,1483,1493,1484,1474,1494,1502,1508,1487,1500],
+#     [1917,1932,1930,1951,1918,1947,1959,1943,1948,1941,1951,1937,1947,1947,1950,1953]
+# ]
+# water_oc_2=[
+#     [8525,8043,8755,9495,10750,10192,7013,7334,5924,6777,7875,8525,8144,7604,7884,8911],
+#     [2485,2593,2407,2372, 2328, 2384,2321,2267,2328,2321,2322,2427,2301,2361,2573,2316]
+# ]
+# FAM_oc_2=[
+#     [70056,89715,72404,82865,77659,82263,78819,79312,47242,67354,81660,91499,83662,80465,76021,64812],
+#     [30573,37557,32803,34660,34493,34880,31446,28226,23787,28319,32130,35547,34286,32361,30811,29689]
+# ]
+# HEX_oc_2=[
+#   [ 7848, 8121, 8223, 8805, 9573, 9535, 7176, 7193, 6186, 6962, 8166, 8643, 8419, 7705, 7996, 8477],
+#   [26135,28667,27338,27808,27588,26933,24851,21993,18950,24650,25694,27906,27953,25249,25187,25624]
+# ]
+
+# chaipcr_oc_2 = OrderedDict(
+#     "calibration_info" => OrderedDict(
+#         #"baseline"  => OrderedDict("fluorescence_value" => baseline_oc_2),
+#         "water"     => OrderedDict("fluorescence_value" => water_oc_2),
+#         "channel_1" => OrderedDict("fluorescence_value" => FAM_oc_2),
+#         "channel_2" => OrderedDict("fluorescence_value" => HEX_oc_2)
+#     )
+# )
+
+# open("chaipcr_oc_250.json","w") do f
+#     JSON.print(f, chaipcr_oc_2)
 # end

@@ -121,8 +121,8 @@ end
 
 function calibration_test(
     calib ::Associative, 
-    n_channels=length(CHANNELS) ::Integer,
-    conditions=["water","channel_1","channel_2"][1:n_channels] ::AbstractArray
+    n_channels ::Integer =length(CHANNELS),
+    conditions ::AbstractArray =["water","channel_1","channel_2"][1:n_channels]
 )
     n_conditions=length(conditions)
     @fact (isa(calib,OrderedDict)) --> true
@@ -430,6 +430,7 @@ function verify_request(
 )
     facts("Optical calibration requested") do
         context("Verifying request body") do
+            conditions=["baseline","water","channel_1","channel_2"]
             @fact (isa(request,OrderedDict)) --> true
             @fact (haskey(request,"calibration_info")) --> true
             calib=request["calibration_info"]
@@ -440,11 +441,10 @@ function verify_request(
             @fact (isa(calib["water"]["fluorescence_value"],Vector)) --> true
             if length(calib["water"]["fluorescence_value"])<2 ||
                 calib["water"]["fluorescence_value"][2]==nothing
-                n_channels=1
+                calibration_test(calib,1,conditions[1:3])
             else
-                n_channels=2
+                calibration_test(calib,2,conditions)
             end
-            calibration_test(calib,n_channels)
         end
     end
     FactCheck.exitstatus()

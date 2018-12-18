@@ -9,7 +9,7 @@ import JSON
 # called by QpcrAnalyze.dispatch
 function act(
     ::OpticalCal,
-    calib_info_dict ::Associative;
+    calib_info ::Associative;
 
     # new >>
     well_nums ::AbstractVector =[],
@@ -37,6 +37,10 @@ function act(
     #     "original: ", calib_info_ori,
     #     "dict: ", calib_info_dict
     # )
+
+    # new >>
+    calib_info_dict = calib_info["calibration_info"]
+    # << new
 
     result = OrderedDict("valid" => true)
     err_msg_vec = Vector{String}()
