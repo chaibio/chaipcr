@@ -90,4 +90,19 @@ class MeltCurveDatum < ActiveRecord::Base
   def self.maxid(experiment_id, stage_id)
     self.for_experiment(experiment_id).for_stage(stage_id).maximum(:id)
   end
+  
+  def self.julia_hash(experiment_id, stage_id)
+    results = {}
+    MeltCurveDatum.for_experiment(experiment_id).for_stage(stage_id).order("channel, well_num").each do |data|
+      results[:fluorescence_value] ||= Array.new
+      results[:temperature] ||= Array.new
+      results[:well_num] ||= Array.new
+      results[:channel] ||= Array.new
+      results[:fluorescence_value] << data.fluorescence_value
+      results[:temperature] << data.temperature
+      results[:well_num] << data.well_num
+      results[:channel] << data.channel
+    end
+    results
+  end
 end
