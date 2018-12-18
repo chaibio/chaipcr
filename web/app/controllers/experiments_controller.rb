@@ -24,7 +24,7 @@ class ExperimentsController < ApplicationController
   include ParamsHelper
   include Swagger::Blocks
 
-  before_filter :ensure_authenticated_user
+  #before_filter :ensure_authenticated_user
   before_filter :allow_cors
   before_filter :get_experiment, :except => [:index, :create, :copy]
 
@@ -1347,7 +1347,7 @@ class ExperimentsController < ApplicationController
     begin
       body = {calibration_info: calibrate_hash(calibration_id), experiment_id: experiment.id, stage_id: stage_id, raw_data: MeltCurveDatum.julia_hash(experiment.id, stage_id)}
       body = body.merge({qt_prob: 0.1, max_normd_qtv:0.9}) if experiment.experiment_definition.guid == "thermal_consistency"
-      #logger.info("body=#{body.to_json}")
+      logger.info("body=#{body.to_json}")
       response = HTTParty.post("http://127.0.0.1:8081/experiments/#{experiment.id}/meltcurve", body: body.to_json)
       if response.code != 200
         raise_julia_error(response)
@@ -1399,7 +1399,7 @@ class ExperimentsController < ApplicationController
     {calibration_info: calibrate_hash(experiment.calibration_id)}
   end
   
-  def thermal_performance_diagnostic
+  def thermal_performance_diagnostic(experiment)
     TemperatureLog.julia_hash(experiment.id)
   end
   
@@ -1426,16 +1426,16 @@ class ExperimentsController < ApplicationController
 #      config   = Rails.configuration.database_configuration
 #      connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
       begin
-        if experiment.experiment_definitions.guid == "optical_cal" || experiment.experiment_definitions.guid == "dual_channel_optical_cal_v2"
+        if experiment.experiment_definition.guid == "optical_cal" || experiment.experiment_definition.guid == "dual_channel_optical_cal_v2"
           body = optical_cal(experiment)
-          #logger.info("body=#{body.to_json}")
-          HTTParty.post("http://127.0.0.1:8081/experiments/#{experiment.id}/optical_cal", body: body.to_json)
-        elsif respond_to?(experiment.experiment_definitions.guid)
-          body = send(experiment.experiment_definitions.guid)
-          #logger.info("body=#{body.to_json}")
-          response = HTTParty.post("http://127.0.0.1:8081/experiments/#{experiment.id}/#{experiment.experiment_definitions.guid}", body: body.to_json)
+          logger.info("body=#{body.to_json}")
+          response = HTTParty.post("http://127.0.0.1:8081/experiments/#{experiment.id}/optical_cal", body: body.to_json)
+        elsif self.class.method_defined?(experiment.experiment_definition.guid)
+          body = send(experiment.experiment_definition.guid, experiment)
+          logger.info("body=#{body.to_json}")
+          response = HTTParty.post("http://127.0.0.1:8081/experiments/#{experiment.id}/#{experiment.experiment_definition.guid}", body: body.to_json)
         else
-          raise "#{experiment.experiment_definitions.guid} not implemented"
+          raise "**#{experiment.experiment_definition.guid}** not implemented"
         end
       
         if response.code != 200
@@ -1498,7 +1498,7 @@ class ExperimentsController < ApplicationController
     if protocol && protocol.stages[0]
       water_index = protocol.stages[0].steps.find_index{|item| item.name == "Water"}
       step_water = (!water_index.nil?)? protocol.stages[0].steps[water_index].id : nil
-      if true
+      if true || Device.dual_channel?
         if calibration_id == 1
           channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "Signal"}
           channel_2_index = channel_1_index
