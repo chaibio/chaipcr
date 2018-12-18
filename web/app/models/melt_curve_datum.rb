@@ -99,7 +99,7 @@ class MeltCurveDatum < ActiveRecord::Base
       results[:well_num] ||= Array.new
       results[:channel] ||= Array.new
       results[:fluorescence_value] << data.fluorescence_value
-      results[:temperature] << data.temperature
+      results[:temperature] << Float(data.temperature)
       results[:well_num] << data.well_num
       results[:channel] << data.channel
     end
