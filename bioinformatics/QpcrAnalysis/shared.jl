@@ -76,7 +76,7 @@ end
 function dictvec2df(dict_keys ::AbstractVector, dict_values ::AbstractVector) 
     df = DataFrame()
     for dict_key in dict_keys
-        df[parse(dict_key)] = map(dict_ele -> dict_ele[dict_key], dict_values)
+        df[Symbol(dict_key)] = map(dict_ele -> dict_ele[dict_key], dict_values)
     end
     return df
 end

@@ -21,6 +21,7 @@
 #       http://127.0.0.1:8081/experiments/#{experiment.id}/analyze
 
 import JSON, DataStructures.OrderedDict
+import QpcrAnalysis.Action_DICT
 
 
 # ********************************************************************************
@@ -502,7 +503,7 @@ function verify_request_examples()
     OrderedDict(map(examples) do f
         f => 
             try
-                getfield(Main,f)()
+                !getfield(Main,f)()
             catch err
                 err
             end
@@ -510,4 +511,4 @@ function verify_request_examples()
 end
 
 # Usage:
-# verify_request_examples() # every test should return false
+# verify_request_examples() # every test should return true

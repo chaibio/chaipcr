@@ -147,7 +147,7 @@ function get_k(
     water_well_nums = [i for i in range(1,num_wells)]
     #
     channel_nums = map(cd_key_vec) do cd_key
-        parse(Int, split(cd_key, "_")[2])
+        Symbol(Int, split(cd_key, "_")[2])
     end
     k4dcv_bydy = OrderedDict(map(channel_nums) do channel
         signal_data = transpose(hcat(

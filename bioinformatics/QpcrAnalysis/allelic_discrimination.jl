@@ -62,7 +62,7 @@ function prep_input_4ad(
     nrn = NRN_SELF
 
     if categ in ["rbbs_ary3", "blsub_fluos"]
-        fluos = getfield(full_amp_out, parse(categ))
+        fluos = getfield(full_amp_out, Symbol(categ))
         if cycs == 0
             cycs = num_cycs
         end # if cycs == 0

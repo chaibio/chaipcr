@@ -758,12 +758,13 @@ function verify_response_examples()
     OrderedDict(map(examples) do f
         f => 
             try
-                getfield(Main,f)()
+                !getfield(Main,f)()
             catch err
                 err
             end
+
     end)
 end
 
 # Usage:
-# verify_response_examples() # every test should return false
+# verify_response_examples() # every test should return true
