@@ -15,7 +15,7 @@ struct         YourOwnAnalyzeFunctionality  <: Action end
 struct         OpticalTestSingleChannel     <: Action end
 struct         OpticalTestDualChannel       <: Action end
 
-const Action_DICT = Dict(           
+global const Action_DICT = Dict(           
     "amplification"                  => Amplification,
     "meltcurve"                      => MeltCurve,
     "standard_curve"                 => StandardCurve,

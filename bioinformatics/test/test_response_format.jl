@@ -40,7 +40,7 @@ function standard_curve_response_test()
         ]
     }"""; dicttype=OrderedDict)
     verify_response(
-        ActionType_DICT["standard_curve"](),
+        Action_DICT["standard_curve"](),
         response
     )
 end
@@ -125,7 +125,7 @@ function singlechannel_amplification_response_test()
         }
     }"""; dicttype=OrderedDict)
     verify_response(
-        ActionType_DICT["amplification"](),
+        Action_DICT["amplification"](),
         response
     )
 end
@@ -229,7 +229,7 @@ function dualchannel_amplification_response_test()
         }
     }"""; dicttype=OrderedDict)
     verify_response(
-        ActionType_DICT["amplification"](),
+        Action_DICT["amplification"](),
         response
     )
 end
@@ -241,7 +241,7 @@ function error_amplification_response_test()
         "error": "xxxx"
     }"""; dicttype=OrderedDict)
     verify_response(
-        ActionType_DICT["amplification"](),
+        Action_DICT["amplification"](),
         response
     )
 end
@@ -293,7 +293,7 @@ function singlechannel_meltcurve_response_test()
     println(response)
     println(JSON.json(response))
     verify_response(
-        ActionType_DICT["meltcurve"](),
+        Action_DICT["meltcurve"](),
         response
     )
 end
@@ -312,7 +312,7 @@ function dualchannel_meltcurve_response_test()
         ]
     }"""; dicttype=OrderedDict)
     verify_response(
-        ActionType_DICT["meltcurve"](),
+        Action_DICT["meltcurve"](),
         response
     )
 end
@@ -324,7 +324,7 @@ function error_meltcurve_response_test()
         "error": "xxxx"
     }"""; dicttype=OrderedDict)
     verify_response(
-        ActionType_DICT["meltcurve"](),
+        Action_DICT["meltcurve"](),
         response
     )
 end
@@ -344,7 +344,7 @@ function loadscript_response_test()
         "script": "path/to/analyze.jl"
     }"""; dicttype=OrderedDict)
     verify_response(
-        ActionType_DICT["loadscript"](),
+        Action_DICT["loadscript"](),
         response
     )
 end
@@ -356,7 +356,7 @@ function error_loadscript_response_test()
         "error": "xxxx"
     }"""; dicttype=OrderedDict)
     verify_response(
-        ActionType_DICT["loadscript"](),
+        Action_DICT["loadscript"](),
         response
     )
 end
@@ -389,7 +389,7 @@ function thermal_performance_diagnostic_response_test()
         }
     }"""; dicttype=OrderedDict)
     verify_response(
-        ActionType_DICT["thermal_performance_diagnostic"](),
+        Action_DICT["thermal_performance_diagnostic"](),
         response
     )
 end
@@ -475,7 +475,7 @@ function thermal_consistency_response_test()
         "delta_Tm": [1.7434,true]
     }"""; dicttype=OrderedDict)
     verify_response(
-        ActionType_DICT["thermal_consistency"](),
+        Action_DICT["thermal_consistency"](),
         response
     )
 end
@@ -495,7 +495,7 @@ function valid_optical_cal_response_test()
         "valid": true
     }"""; dicttype=OrderedDict)
     verify_response(
-        ActionType_DICT["optical_cal"](),
+        Action_DICT["optical_cal"](),
         response
     )
 end
@@ -508,7 +508,7 @@ function invalid_optical_cal_response_test()
         "error_message": "xxxx"
     }"""; dicttype=OrderedDict)
     verify_response(
-        ActionType_DICT["optical_cal"](),
+        Action_DICT["optical_cal"](),
         response
     )
 end
@@ -591,7 +591,7 @@ function singlechannel_optical_response_test()
         }
     ]}"""; dicttype=OrderedDict)
     verify_response(
-        ActionType_DICT["optical_test_single_channel"](),
+        Action_DICT["optical_test_single_channel"](),
         response
     )
 end
@@ -711,7 +711,7 @@ function dualchannel_optical_response_test()
         }
     }"""; dicttype=OrderedDict)
     verify_response(
-        ActionType_DICT["optical_test_dual_channel"](),
+        Action_DICT["optical_test_dual_channel"](),
         response
     )
 end
@@ -723,7 +723,7 @@ function error_dualchannel_optical_response_test()
         "error": "xxxx"
     }"""; dicttype=OrderedDict)
     verify_response(
-        ActionType_DICT["optical_test_dual_channel"](),
+        Action_DICT["optical_test_dual_channel"](),
         response
     )
 end

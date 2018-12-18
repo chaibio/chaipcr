@@ -3,8 +3,8 @@
 import JSON, DataStructures.OrderedDict
 
 function dispatch(
-    action ::String,
-    request_body ::String;
+    action ::AbstractString,
+    request_body ::AbstractString;
 
     verify ::Bool =false,
     verbose ::Bool =false

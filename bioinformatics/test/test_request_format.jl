@@ -45,7 +45,7 @@ function standard_curve_request_test()
         ]}
     ]"""; dicttype=OrderedDict)
     verify_request(
-        ActionType_DICT["standard_curve"](),
+        Action_DICT["standard_curve"](),
         request
     )
 end
@@ -93,7 +93,7 @@ function singlechannel_amplification_request_test()
         }
     }"""; dicttype=OrderedDict)
     verify_request(
-        ActionType_DICT["amplification"](),
+        Action_DICT["amplification"](),
         request
     )
 end
@@ -139,7 +139,7 @@ function dualchannel_amplification_request_test()
         }
     }"""; dicttype=OrderedDict)
     verify_request(
-        ActionType_DICT["amplification"](),
+        Action_DICT["amplification"](),
         request
     )
 end
@@ -191,7 +191,7 @@ function singlechannel_meltcurve_request_test()
         }
     }"""; dicttype=OrderedDict)
     verify_request(
-        ActionType_DICT["meltcurve"](),
+        Action_DICT["meltcurve"](),
         request
     )
 end
@@ -234,7 +234,7 @@ function dualchannel_meltcurve_request_test()
         }
     }"""; dicttype=OrderedDict)
     verify_request(
-        ActionType_DICT["meltcurve"](),
+        Action_DICT["meltcurve"](),
         request
     )
 end
@@ -255,7 +255,7 @@ function thermal_performance_diagnostic_request_test()
       "elapsed_time": [1,2,3]
       }"""; dicttype=OrderedDict)
     verify_request(
-        ActionType_DICT["thermal_performance_diagnostic"](),
+        Action_DICT["thermal_performance_diagnostic"](),
         request
     )
 end
@@ -300,7 +300,7 @@ function single_channel_thermal_consistency_request_test()
         }
     }"""; dicttype=OrderedDict)
     verify_request(
-        ActionType_DICT["thermal_consistency"](),
+        Action_DICT["thermal_consistency"](),
         request
     )
 end
@@ -337,7 +337,7 @@ function dual_channel_thermal_consistency_request_test()
         }
     }"""; dicttype=OrderedDict)
     verify_request(
-        ActionType_DICT["thermal_consistency"](),
+        Action_DICT["thermal_consistency"](),
         request
     )
 end
@@ -376,7 +376,7 @@ function singlechannel_optical_cal_request_test()
         }
     }"""; dicttype=OrderedDict)
     verify_request(
-        ActionType_DICT["optical_cal"](),
+        Action_DICT["optical_cal"](),
         request
     )
 end
@@ -407,7 +407,7 @@ function dualchannel_optical_cal_request_test()
         }
     }"""; dicttype=OrderedDict)
     verify_request(
-        ActionType_DICT["optical_cal"](),
+        Action_DICT["optical_cal"](),
         request
     )
 end
@@ -423,18 +423,14 @@ end
 function singlechannel_optical_request_test()
     request=JSON.parse("""{
         "baseline": {
-            "fluorescence_value": [
-                [1.01, 1.02,    1.15, 1.16]
-            ]
+            "fluorescence_value": [1.01, 1.02,    1.15, 1.16]
         },
         "excitation": {
-            "fluorescence_value": [
-                [1.01, 1.02,    1.15, 1.16]
-            ]
+            "fluorescence_value": [1.01, 1.02,    1.15, 1.16]
         }
     }"""; dicttype=OrderedDict)
     verify_request(
-        ActionType_DICT["optical_test_single_channel"](),
+        Action_DICT["optical_test_single_channel"](),
         request
     )
 end
@@ -475,7 +471,7 @@ function dualchannel_optical_request_test()
         }
     }"""; dicttype=OrderedDict)
     verify_request(
-        ActionType_DICT["optical_test_dual_channel"](),
+        Action_DICT["optical_test_dual_channel"](),
         request
     )
 end

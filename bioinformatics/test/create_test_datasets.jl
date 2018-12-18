@@ -54,6 +54,32 @@ end
 
 
 
+# Test_1ch optical calibration
+
+oc_1=OrderedDict(
+    "calibration_info" => calib_1
+    }
+)
+
+open("test_2ch_oc_219.json","w") do f
+    JSON.print(f, calib_2)
+end
+
+
+
+
+# Test_2ch optical calibration
+
+oc_2=OrderedDict(
+    "calibration_info" => calib_2
+)
+
+open("test_1ch_oc_168.json","w") do f
+    JSON.print(f, calib_1)
+end
+
+
+
 # Test_1ch amplification
 
 amp_169=readdlm("amp_169.tsv",'\t',header=true)
@@ -231,10 +257,10 @@ excitation_ot_1=[45213,21030,23819,26412,25405,31761,27095,34442,41152,26695,303
 
 ot_1 = OrderedDict(
         "baseline" => OrderedDict(
-                "fluorescence_value" => [ baseline_ot_1 ]
+                "fluorescence_value" => baseline_ot_1
         ),
         "excitation" => OrderedDict(
-                "fluorescence_value" => [ excitation_ot_1 ]
+                "fluorescence_value" => excitation_ot_1
         )
 )
 

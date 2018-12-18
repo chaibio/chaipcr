@@ -431,18 +431,20 @@ function verify_request(
     facts("Optical calibration requested") do
         context("Verifying request body") do
             @fact (isa(request,OrderedDict)) --> true
-            @fact (isa(request,OrderedDict)) --> true
-            @fact (haskey(request,"water")) --> true
-            @fact (isa(request["water"],OrderedDict)) --> true
-            @fact (haskey(request["water"],"fluorescence_value")) --> true
-            @fact (isa(request["water"]["fluorescence_value"],Vector)) --> true
-            if length(request["water"]["fluorescence_value"])<2 ||
-                request["water"]["fluorescence_value"][2]==nothing
+            @fact (haskey(request,"calibration_info")) --> true
+            calib=request["calibration_info"]
+            @fact (isa(calib,OrderedDict)) --> true
+            @fact (haskey(calib,"water")) --> true
+            @fact (isa(calib["water"],OrderedDict)) --> true
+            @fact (haskey(calib["water"],"fluorescence_value")) --> true
+            @fact (isa(calib["water"]["fluorescence_value"],Vector)) --> true
+            if length(calib["water"]["fluorescence_value"])<2 ||
+                calib["water"]["fluorescence_value"][2]==nothing
                 n_channels=1
             else
                 n_channels=2
             end
-            calibration_test(request,n_channels)
+            calibration_test(calib,n_channels)
         end
     end
     FactCheck.exitstatus()
@@ -469,7 +471,25 @@ function verify_request(
 )
     facts("Single channel optical test requested") do
         context("Verifying request body") do
-            calibration_test(request,1,["baseline","excitation"])
+            conditions=["baseline","excitation"]
+            @fact (isa(request,OrderedDict)) --> true
+            # @fact (length(request)) --> length(conditions)
+            @fact (isa(request["baseline"],OrderedDict))--> true
+            @fact (haskey(request["baseline"],"fluorescence_value")) --> true
+            @fact (isa(request["baseline"]["fluorescence_value"],Vector)) --> true
+            n_wells=length(request["baseline"]["fluorescence_value"])
+            for condition in conditions
+                @fact (haskey(request,condition)) --> true
+                @fact (isa(request[condition],OrderedDict)) --> true
+                @fact (length(request[condition])) --> 1
+                @fact (haskey(request[condition],"fluorescence_value")) --> true
+                @fact (isa(request[condition]["fluorescence_value"],Vector)) --> true
+                @fact (isa(request[condition]["fluorescence_value"],Vector)) --> true
+                @fact (length(request[condition]["fluorescence_value"])) --> n_wells
+                for i in range(1,n_wells)
+                    @fact (isa(request[condition]["fluorescence_value"][i],Number)) --> true
+                end
+            end
         end
     end
     FactCheck.exitstatus()

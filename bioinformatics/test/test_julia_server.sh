@@ -9,7 +9,7 @@
 
 # first start up Julia on the VM, directing all output to STDERR
 # it may be preferable to use these commands from within Julia REPL to examine the Julia output
-julia -e 'cd("/home/vagrant/chaipcr/bioinformatics/QpcrAnalysis/");push!(LOAD_PATH,pwd());include("../test/startup.jl");include("../juliaserver.jl")' 2>&1 &
+julia -e 'cd("/home/vagrant/chaipcr/bioinformatics/QpcrAnalysis/");push!(LOAD_PATH,pwd());include("QpcrAnalysis.jl");include("../juliaserver.jl")' 2>&1 &
 
 # call using Julia object
 # run(`curl \
