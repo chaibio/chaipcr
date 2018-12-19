@@ -197,7 +197,7 @@ function prep_adj_w2wvaf(
     # calib_info ::Union{Integer,OrderedDict}, 
 
     # new >>
-    calib_data ::OrderedDict{String,Any}, 
+    calib_data ::Associative, 
     # << new
 
     well_nums ::AbstractVector,

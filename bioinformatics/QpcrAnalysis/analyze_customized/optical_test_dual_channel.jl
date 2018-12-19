@@ -38,7 +38,7 @@ function act(
     # well_nums ::AbstractVector =[],
 
     # new >>
-    ot_dict ::Associative;
+    ot_dict ::Associative; # keys: "baseline", "water", "FAM", "HEX"
     out_format ::String ="pre_json",
     verbose ::Bool =false
     # << new
@@ -60,8 +60,13 @@ function act(
 
     old_calib_labels = ["baseline"; "water"; CALIB_LABELS_FAM_HEX]
 
-    fluo_dict = OrderedDict(map(old_calib_labels) do calib_label
-        calib_label => hcat(map(CHANNELS) do channel
+    # new >>
+    # fluo_dict = OrderedDict(map(old_calib_labels) do calib_label # old
+    new_calib_labels = ["baseline"; "water"; "FAM"; "HEX"]
+    fluo_dict = OrderedDict(map(1:length(old_calib_labels)) do calib_label_i
+    # << new
+
+        old_calib_labels[calib_label_i] => hcat(map(CHANNELS) do channel # use old labels internally
 
             # remove MySql dependency
             #
@@ -70,7 +75,7 @@ function act(
             # ]
 
             # new >>
-            ot_dict[calib_label]["fluorescence_value"][channel]
+            ot_dict[new_calib_labels[calib_label_i]]["fluorescence_value"][channel]
             # << new
 
         end...) # do channel
@@ -101,7 +106,6 @@ function act(
     end # for
 
     # organize "optical_data"
-    new_calib_labels = ["baseline", "water", "FAM", "HEX"]
     optical_data = map(1:num_wells) do well_i
         OrderedDict(map(1:length(old_calib_labels)) do cl_i
             old_calib_label = old_calib_labels[cl_i]

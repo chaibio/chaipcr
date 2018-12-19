@@ -472,7 +472,8 @@ function verify_response(
                     @fact (isa(response["Ch1:Ch2"][signal],Vector)) --> true
                     @fact (length(response["Ch1:Ch2"][signal])) --> n_wells
                     for i in range(1,n_wells) # well
-                        @fact (isa(response["Ch1:Ch2"][signal][i],Number)) --> true
+                        @fact (isa(response["Ch1:Ch2"][signal][i],Number) ||
+                            response["Ch1:Ch2"][signal][i] == nothing) --> true # division by zero: JSON parser converts Inf, -Inf, NaN -> "null"
                     end
                 end
             end

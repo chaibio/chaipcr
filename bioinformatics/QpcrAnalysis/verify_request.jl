@@ -122,7 +122,7 @@ end
 function calibration_test(
     calib ::Associative, 
     n_channels ::Integer =length(CHANNELS),
-    conditions ::AbstractArray =["water","channel_1","channel_2"][1:n_channels]
+    conditions ::AbstractArray =["water","channel_1","channel_2"][1:(n_channels+1)]
 )
     n_conditions=length(conditions)
     @fact (isa(calib,OrderedDict)) --> true
