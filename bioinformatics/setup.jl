@@ -13,6 +13,7 @@ if Pkg.Dir.isdir(metadata_dir)
 end
 
 println("installing library: Compat");Pkg.add("Compat", v"0.61.0", v"0.61.1-")
+println("installing library: FactCheck");Pkg.add("FactCheck",v"0.4.3",v"0.4.3-")
 println("installing library: GZip"); Pkg.add("GZip", v"0.3.0", v"0.3.1-")
 println("installing library: Polynomials");Pkg.add("Polynomials", v"0.2.2", v"0.2.3-")
 println("installing library: IterTools");Pkg.add("IterTools", v"0.2.1", v"0.2.2-")
