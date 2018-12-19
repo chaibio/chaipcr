@@ -44,7 +44,9 @@ const PRODUCTION_MODE = false
 include("constants.jl")
 include("action_types.jl")
 include("types_for_allelic_discrimination.jl")
-include("amp_models/types_for_amp_models.jl")
+include("types_for_amp.jl")
+include("amp_models/types_for_sfc_models.jl")
+include("amp_models/types_for_dfc_models.jl")
 
 # shared functions
 include("shared.jl")

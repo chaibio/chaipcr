@@ -7,7 +7,8 @@ function dispatch(
     action ::AbstractString,
     request_body ::AbstractString;
 
-    verbose ::Bool =false
+    verbose ::Bool =false,
+    verify  ::Bool =false
 )
     result = try
 
@@ -23,10 +24,12 @@ function dispatch(
         action_t = Action_DICT[action]()
 
         if (!PRODUCTION_MODE)
-            verify_input = try
-                verify_request(action_t, req_parsed)
-            catch err
-                error("data supplied with $action request is in the wrong format")
+            if (verify)
+                verify_input = try
+                    verify_request(action_t, req_parsed)
+                catch err
+                    error("data supplied with $action request is in the wrong format")
+                end
             end
         end
 
@@ -34,10 +37,12 @@ function dispatch(
         json_response=JSON.json(response)
 
         if (!PRODUCTION_MODE)
-            verify_output = try
-                verify_response(action_t,JSON.parse(json_response,dicttype=OrderedDict))
-            catch err
-               error("data returned from $action request is in the wrong format")
+            if (verify)
+                verify_output = try
+                    verify_response(action_t,JSON.parse(json_response,dicttype=OrderedDict))
+                catch err
+                   error("data returned from $action request is in the wrong format")
+                end
             end
         end
 
