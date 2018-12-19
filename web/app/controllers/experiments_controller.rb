@@ -24,7 +24,7 @@ class ExperimentsController < ApplicationController
   include ParamsHelper
   include Swagger::Blocks
 
-  #before_filter :ensure_authenticated_user
+  before_filter :ensure_authenticated_user
   before_filter :allow_cors
   before_filter :get_experiment, :except => [:index, :create, :copy]
 
@@ -1171,7 +1171,7 @@ class ExperimentsController < ApplicationController
       wells = []
     end
     body = wells.map {|well| (well)? well.as_json_standard_curve : {}}
-    logger.info("body=#{body}")
+    logger.info("body=#{body.to_json}")
     
     if body.blank?
       return nil
@@ -1494,34 +1494,40 @@ class ExperimentsController < ApplicationController
   end
 
   def calibrate_hash(calibration_id)
-    protocol = Protocol.includes(:stages).where("protocols.experiment_definition_id=(SELECT experiment_definition_id from experiments where experiments.id=#{calibration_id} LIMIT 1)").references(:stages).first
-    if protocol && protocol.stages[0]
-      water_index = protocol.stages[0].steps.find_index{|item| item.name == "Water"}
-      step_water = (!water_index.nil?)? protocol.stages[0].steps[water_index].id : nil
-      if true || Device.dual_channel?
-        if calibration_id == 1
-          channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "Signal"}
-          channel_2_index = channel_1_index
-        else
+    if calibration_id == 1
+      if Device.dual_channel?
+        result = {:water=>{:fluorescence_value=>FluorescenceDatum::FAKE_CALIBRATION_DUAL_CHANNEL_WATER},
+                  :channel_1=>{:fluorescence_value=>FluorescenceDatum::FAKE_CALIBRATION_DUAL_CHANNEL_FAM},
+                  :channel_2=>{:fluorescence_value=>FluorescenceDatum::FAKE_CALIBRATION_DUAL_CHANNEL_HEX}}
+      else
+        result = {:water=>{:fluorescence_value=>FluorescenceDatum::FAKE_CALIBRATION_SINGLE_CHANNEL_WATER},
+                  :channel_1=>{:fluorescence_value=>FluorescenceDatum::FAKE_CALIBRATION_SINGLE_CHANNEL_SIGNAL}}
+      end
+    else
+      protocol = Protocol.includes(:stages).where("protocols.experiment_definition_id=(SELECT experiment_definition_id from experiments where experiments.id=#{calibration_id} LIMIT 1)").references(:stages).first
+      if protocol && protocol.stages[0]
+        water_index = protocol.stages[0].steps.find_index{|item| item.name == "Water"}
+        step_water = (!water_index.nil?)? protocol.stages[0].steps[water_index].id : nil
+        if Device.dual_channel?
           channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "FAM"}
           channel_2_index = protocol.stages[0].steps.find_index{|item| item.name == "HEX"}
           baseline_index = protocol.stages[0].steps.find_index{|item| item.name == "Baseline"}
+        else
+          channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "Signal"}
+          channel_2_index = nil
         end
-      else
-        channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "Signal"}
-        channel_2_index = nil
+        step_channel_1 = (!channel_1_index.nil?)? protocol.stages[0].steps[channel_1_index].id : nil
+        step_channel_2 = (!channel_2_index.nil?)? protocol.stages[0].steps[channel_2_index].id : nil
+        step_baseline = (!baseline_index.nil?)? protocol.stages[0].steps[baseline_index].id : nil
+
+        logger.info ("************calibration_id=#{calibration_id} channel_1=#{step_channel_1}, channel_2=#{step_channel_2}, baseline=#{step_baseline}")
+        fluorescence_values = FluorescenceDatum.fluorescence_for_steps(calibration_id, [step_water, step_channel_1, step_channel_2, step_baseline])
+
+        result = {:water=>{:fluorescence_value=>fluorescence_values[0]},
+                  :channel_1=>{:fluorescence_value=>fluorescence_values[1]}}
+        result.merge!(:channel_2=>{:fluorescence_value=>fluorescence_values[1]}) if !fluorescence_values[2].nil?
+        result.merge!(:baseline=>{:fluorescence_value=>fluorescence_values[3]}) if !fluorescence_values[3].nil?
       end
-      step_channel_1 = (!channel_1_index.nil?)? protocol.stages[0].steps[channel_1_index].id : nil
-      step_channel_2 = (!channel_2_index.nil?)? protocol.stages[0].steps[channel_2_index].id : nil
-      step_baseline = (!baseline_index.nil?)? protocol.stages[0].steps[baseline_index].id : nil
-
-      logger.info ("************calibration_id=#{calibration_id} channel_1=#{step_channel_1}, channel_2=#{step_channel_2}, baseline=#{step_baseline}")
-      fluorescence_values = FluorescenceDatum.fluorescence_for_steps(calibration_id, [step_water, step_channel_1, step_channel_2, step_baseline])
-
-      result = {:water=>{:fluorescence_value=>fluorescence_values[0]},
-                :channel_1=>{:fluorescence_value=>fluorescence_values[1]}}
-      result.merge!(:channel_2=>{:fluorescence_value=>fluorescence_values[2]}) if !fluorescence_values[2].nil?
-      result.merge!(:baseline=>{:fluorescence_value=>fluorescence_values[3]}) if !fluorescence_values[3].nil?
     end
     result
   end

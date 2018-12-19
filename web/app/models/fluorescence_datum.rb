@@ -24,6 +24,12 @@ class FluorescenceDatum < ActiveRecord::Base
                                        .where(["steps.stage_id=?", stage_id])
                                        .order("steps.order_number")}
   
+  FAKE_CALIBRATION_SINGLE_CHANNEL_WATER = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], nil]
+  FAKE_CALIBRATION_SINGLE_CHANNEL_SIGNAL = [[100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100], nil]
+  FAKE_CALIBRATION_DUAL_CHANNEL_WATER = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]]
+  FAKE_CALIBRATION_DUAL_CHANNEL_FAM = [[100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100], [50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50]]
+  FAKE_CALIBRATION_DUAL_CHANNEL_HEX = [[50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50], [100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100]]
+  
   def self.new_data_generated?(experiment_id, stage_id)
     data = self.for_stage(stage_id).for_experiment(experiment_id).joins("LEFT JOIN amplification_data ON amplification_data.stage_id = steps.stage_id AND amplification_data.experiment_id = fluorescence_data.experiment_id AND amplification_data.well_num = fluorescence_data.well_num+1 AND amplification_data.cycle_num = fluorescence_data.cycle_num")
             .reorder("fluorescence_data.cycle_num DESC").select("fluorescence_data.*, background_subtracted_value").first
