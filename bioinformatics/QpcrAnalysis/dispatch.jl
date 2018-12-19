@@ -6,7 +6,6 @@ function dispatch(
     action ::AbstractString,
     request_body ::AbstractString;
 
-    verify ::Bool =false,
     verbose ::Bool =false
 )
     result = try
@@ -22,7 +21,7 @@ function dispatch(
         # else
         action_t = Action_DICT[action]()
 
-        if (verify)
+        if (!PRODUCTION_MODE)
             verify_input = try
                 verify_request(action_t, req_parsed)
             catch err
@@ -33,7 +32,7 @@ function dispatch(
         response = act(action_t, req_parsed; out_format="pre_json", verbose=verbose)
         json_response=JSON.json(response)
 
-        if (verify)
+        if (!PRODUCTION_MODE)
             verify_output = try
                 verify_response(action_t,JSON.parse(json_response,dicttype=OrderedDict))
             catch err

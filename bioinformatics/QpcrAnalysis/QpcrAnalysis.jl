@@ -1,5 +1,7 @@
 # Module QpcrAnalysis.jl
 
+global const PRODUCTION_MODE = false
+
 
 # Notes on using MySQL 0.3.0 instead of current version
 # ----
@@ -37,20 +39,22 @@ end][1] # slice by boolean vector returned a one-element vector. Assumption: LOA
 
 # include each script, generally in the order of workflow
 
-# development & testing
-import Base.Test
-using FactCheck
-FactCheck.clear_results()
+if !PRODUCTION_MODE
+	# development & testing
+	import Base.Test
+	using FactCheck
+	FactCheck.clear_results()
+
+	# data format verification
+	include("../test/verify_request.jl")
+	include("../test/verify_response.jl")
+end
 
 include("shared.jl")
 
 # dispatch
 include("action_types.jl")
 include("dispatch.jl")
-
-# data format verification
-include("verify_request.jl")
-include("verify_response.jl")
 
 # calibration
 include("deconv.jl") # `type K4Deconv`
@@ -82,11 +86,12 @@ include("analyze_customized/optical_cal.jl")
 include("analyze_customized/thermal_consistency.jl")
 # include("analyze_customized/your_own_analyze_functionality.jl")
 
+## no longer needed
+#
 # wrap up
 # include("test.jl")
 # include("__init__.jl")
-
-# # no longer needed
+#
 # include("pnmsmu.jl")
 
 
