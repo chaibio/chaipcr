@@ -48,35 +48,32 @@ function verify_request(
     facts("Standard curve requested") do
         context("Verifying request body") do
             @fact (isa(request,Vector)) --> true
-            n_targets=length(request[1]["well"])
+            n_targets=-99
             for i in range(1,length(request))
                 well=request[i]
                 @fact (isa(well,OrderedDict)) --> true
-                @fact (length(well)) --> 1
-                @fact (haskey(well,"well")) --> true
-                array=well["well"]
-                @fact (length(array)) --> n_targets
-                empty=(length(array[1])==0)
-                for j in range(1,n_targets)
-                    dict=array[j]
-                    @fact (isa(dict,OrderedDict)) --> true
-                    if (empty)
-                        @fact (length(dict)) --> 0
-                    else
-                        @fact (length(dict)) --> 3
-                        k=keys(dict)
-                        @fact (haskey(dict,"target")) --> true
-                        @fact (dict["target"]) --> j
-                        @fact (haskey(dict,"cq")) --> true
-                        @fact (isa(dict["cq"],Number)) --> true # Integer?
-                        @fact (haskey(dict,"quantity")) --> true
-                        subdict=dict["quantity"]
-                        @fact (isa(subdict,OrderedDict)) --> true
-                        @fact (length(subdict)) --> 2
-                        @fact (haskey(subdict,"m")) --> true
-                        @fact (haskey(subdict,"b")) --> true
-                        @fact (isa(subdict["m"],Number)) --> true
-                        @fact (isa(subdict["b"],Number)) --> true
+                if (length(well)>0)
+                    @fact (length(well)) --> 1
+                    @fact (haskey(well,"well")) --> true
+                    array=well["well"]
+                    for j in range(1,length(array))
+                        dict=array[j]
+                        @fact (isa(dict,OrderedDict)) --> true
+                        if (length(dict)>0)
+                            # fact (length(dict)) --> 3
+                            @fact (haskey(dict,"target")) --> true
+                            @fact (isa(dict["target"],Integer)) --> true
+                            @fact (haskey(dict,"cq")) --> true
+                            @fact (isa(dict["cq"],Number)) --> true
+                            @fact (haskey(dict,"quantity")) --> true
+                            subdict=dict["quantity"]
+                            @fact (isa(subdict,OrderedDict)) --> true
+                            @fact (length(subdict)) --> 2
+                            @fact (haskey(subdict,"m")) --> true
+                            @fact (haskey(subdict,"b")) --> true
+                            @fact (isa(subdict["m"],Number)) --> true
+                            @fact (isa(subdict["b"],Number)) --> true
+                        end
                     end
                 end
             end

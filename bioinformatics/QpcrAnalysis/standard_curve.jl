@@ -1,6 +1,7 @@
 # standard_curve.jl
 
 import JSON
+import DataFrames.DataFrame
 
 # if isnull(sample) well not considered
 # what if isnull(cq)
@@ -231,7 +232,7 @@ function reqvec2df(req_vec ::AbstractVector)
                 target = nothing2NaN(measrmt_dict["target"])
                 cq = nothing2NaN(measrmt_dict["cq"])
                 qty_dict = measrmt_dict["quantity"]
-                qty = nothing2NaN(qty_dict["m"]) * 10 ^ nothing2NaN(qty_dict["b"])
+                qty = nothing2NaN(qty_dict["m"]) * 10.0 ^ nothing2NaN(qty_dict["b"])
             end # if
             push!(well_vec, well_i)
             push!(channel_vec, channel_i)

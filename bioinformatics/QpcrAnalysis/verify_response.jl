@@ -36,15 +36,14 @@ function verify_response(
     facts() do
         context("Verifying response body") do
             @fact (isa(response,OrderedDict)) --> true
-            # @fact (length(response)) --> 1 # allow additional fields
             @fact (haskey(response,"targets")) --> true
+            @fact (haskey(response,"groups")) --> true # do not verify groups
             array=response["targets"]
             @fact (isa(array,Vector)) --> true
             for i in range(1,length(array))
                 dict=array[i]
                 @fact (isa(dict,OrderedDict)) --> true
                 @fact (haskey(dict,"target_id")) --> true
-                @fact (dict["target_id"]) --> i
                 if (length(dict)==2)
                     @fact (haskey(dict,"error")) --> true
                     @fact (isa(dict["error"],String)) --> true
