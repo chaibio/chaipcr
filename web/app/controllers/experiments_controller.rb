@@ -1396,7 +1396,7 @@ class ExperimentsController < ApplicationController
   end
 
   def optical_cal(experiment)
-    {calibration_info: calibrate_hash(experiment.calibration_id)}
+    {calibration_info: calibrate_hash(experiment.id)}
   end
   
   def thermal_performance_diagnostic(experiment)
@@ -1414,7 +1414,7 @@ class ExperimentsController < ApplicationController
   end
   
   def optical_test_dual_channel(experiment)
-    fluorescence_values = FluorescenceDatum.fluorescence_for_steps(experiment.calibration_id, [14, 15, 17, 19])
+    fluorescence_values = FluorescenceDatum.fluorescence_for_steps(experiment.id, [14, 15, 17, 19])
     {baseline: {fluorescence_value: fluorescence_values[0]},
      water: {fluorescence_value: fluorescence_values[1]},
      FAM: {fluorescence_value: fluorescence_values[2]},
@@ -1525,7 +1525,7 @@ class ExperimentsController < ApplicationController
 
         result = {:water=>{:fluorescence_value=>fluorescence_values[0]},
                   :channel_1=>{:fluorescence_value=>fluorescence_values[1]}}
-        result.merge!(:channel_2=>{:fluorescence_value=>fluorescence_values[1]}) if !fluorescence_values[2].nil?
+        result.merge!(:channel_2=>{:fluorescence_value=>fluorescence_values[2]}) if !fluorescence_values[2].nil?
         result.merge!(:baseline=>{:fluorescence_value=>fluorescence_values[3]}) if !fluorescence_values[3].nil?
       end
     end

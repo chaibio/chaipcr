@@ -44,7 +44,7 @@ class FluorescenceDatum < ActiveRecord::Base
   def self.fluorescence_for_steps(experiment_id, step_ids)
     fluorescence_values = Array.new(step_ids.length)
     fluorescence_index = -1
-    FluorescenceDatum.for_experiment(experiment_id).where(:step_id=>step_ids.compact).order("fluorescence_data.step_id, fluorescence_data.channel, fluorescence_data.well_num").each do |data|
+    FluorescenceDatum.order("fluorescence_data.step_id").for_experiment(experiment_id).where(:step_id=>step_ids.compact).each do |data|
       if fluorescence_index == -1 || data.step_id != step_ids[fluorescence_index]
         fluorescence_index = -1
         step_ids.each_with_index do |step_id, index|
