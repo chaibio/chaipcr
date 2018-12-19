@@ -5,11 +5,6 @@ import JuMP: Model, @variable, @constraint, @NLconstraint, @NLobjective,
     solve, getvalue, getobjectivevalue
 
 
-# function empty_func() end
-function empty_func(args...; kwargs...) end
-# function empty_func(arg1::Any=0, args...; kwargs...) end
-
-
 
 function add_funcs_pred!(
     md::SFCModelDef,

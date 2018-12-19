@@ -1,6 +1,5 @@
 # Module QpcrAnalysis.jl
 
-global const PRODUCTION_MODE = false
 
 
 # Notes on using MySQL 0.3.0 instead of current version
@@ -36,8 +35,19 @@ const LOAD_FROM_DIR = LOAD_PATH[find(LOAD_PATH) do path_
     isfile("$path_/$MODULE_NAME.jl")
 end][1] # slice by boolean vector returned a one-element vector. Assumption: LOAD_PATH is global
 
+# set to true to remove development and test code
+const PRODUCTION_MODE = false
 
 # include each script, generally in the order of workflow
+
+# types and constants
+include("constants.jl")
+include("action_types.jl")
+include("types_for_allelic_discrimination.jl")
+include("amp_models/types_for_amp_models.jl")
+
+# shared functions
+include("shared.jl")
 
 if !PRODUCTION_MODE
 	# development & testing
@@ -50,27 +60,23 @@ if !PRODUCTION_MODE
 	include("../test/verify_response.jl")
 end
 
-include("shared.jl")
 
 # dispatch
-include("action_types.jl")
 include("dispatch.jl")
 
 # calibration
-include("deconv.jl") # `type K4Deconv`
-const K4DCV = load("$LOAD_FROM_DIR/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv"] # sometimes crash REPL
+include("deconv.jl") # `type K4Deconv` REPL
 include("adj_w2wvaf.jl")
 include("calib.jl") # `type CalibCalibOutput` currently not in production
 
 # amplification
-include("amp_models/types_for_amp_models.jl")
 include("amp_models/sfc_models.jl")
 include("amp_models/MAKx.jl")
 include("amp_models/MAKERGAUL.jl")
-include("types_for_allelic_discrimination.jl")
 include("amp.jl")
 include("allelic_discrimination.jl")
 
+# standard curve
 include("standard_curve.jl")
 
 # melt curve
