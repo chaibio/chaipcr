@@ -1,28 +1,6 @@
 # thermal_consistency.jl
 # 72C thermal consistency test
 
-# constants
-const MIN_FLUORESCENCE_VAL = 8e5
-const MIN_TM_VAL = 77
-const MAX_TM_VAL = 81
-const MAX_DELTA_TM_VAL = 2
-# used to be in `thermal_consistency`
-stage_id = 4
-# passed onto `mc_tm_pw`, different than default
-qt_prob_flTm = 0.1
-normd_qtv_ub = 0.9
-
-
-type TmCheck1w
-    Tm ::Tuple{AbstractFloat,Bool}
-    area ::AbstractFloat
-end
-
-type ThermalConsistencyOutput
-    tm_check ::Vector{TmCheck1w}
-    delta_Tm ::Tuple{AbstractFloat,Bool}
-end
-
 
 function act(
     ::ThermalConsistency,

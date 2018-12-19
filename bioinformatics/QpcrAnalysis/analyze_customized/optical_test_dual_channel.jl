@@ -1,21 +1,5 @@
 # optical_test_dual_channel.jl
 
-# constants
-
-const CHANNELS = [1, 2]
-const CHANNEL_IS = 1:length(CHANNELS)
-const CALIB_LABELS_FAM_HEX = map(channel -> "channel_$channel", CHANNELS)
-
-# bounds of signal-to-noise ratio (SNR)
-const SNR_FAM_CH1_MIN = 0.75
-const SNR_FAM_CH2_MAX = 1
-const SNR_HEX_CH1_MAX = 0.50
-const SNR_HEX_CH2_MIN = 0.88
-
-# fluo values: channel 1, channel 2
-const WATER_MAX = [32000, 5000]
-const WATER_MIN = [1000, -1000]
-
 
 # signal-to-noise ratio discriminant functions for each well
 dscrmnt_snr_fam(snr_2chs) = [snr_2chs[1] > SNR_FAM_CH1_MIN, snr_2chs[2] < SNR_FAM_CH2_MAX]
@@ -58,15 +42,12 @@ function act(
     #
     # num_wells = length(fluo_well_nums)
 
-    old_calib_labels = ["baseline"; "water"; CALIB_LABELS_FAM_HEX]
-
     # new >>
     # fluo_dict = OrderedDict(map(old_calib_labels) do calib_label # old
-    new_calib_labels = ["baseline"; "water"; "FAM"; "HEX"]
-    fluo_dict = OrderedDict(map(1:length(old_calib_labels)) do calib_label_i
+    fluo_dict = OrderedDict(map(1:length(OLD_CALIB_LABELS)) do calib_label_i
     # << new
 
-        old_calib_labels[calib_label_i] => hcat(map(CHANNELS) do channel # use old labels internally
+        OLD_CALIB_LABELS[calib_label_i] => hcat(map(CHANNELS) do channel # use old labels internally
 
             # remove MySql dependency
             #
@@ -75,7 +56,7 @@ function act(
             # ]
 
             # new >>
-            ot_dict[new_calib_labels[calib_label_i]]["fluorescence_value"][channel]
+            ot_dict[NEW_CALIB_LABELS[calib_label_i]]["fluorescence_value"][channel]
             # << new
 
         end...) # do channel
@@ -107,9 +88,9 @@ function act(
 
     # organize "optical_data"
     optical_data = map(1:num_wells) do well_i
-        OrderedDict(map(1:length(old_calib_labels)) do cl_i
-            old_calib_label = old_calib_labels[cl_i]
-            new_calib_labels[cl_i] => map(CHANNEL_IS) do channel_i
+        OrderedDict(map(1:length(OLD_CALIB_LABELS)) do cl_i
+            old_calib_label = OLD_CALIB_LABELS[cl_i]
+            NEW_CALIB_LABELS[cl_i] => map(CHANNEL_IS) do channel_i
                 (fluo_dict[old_calib_label][well_i, channel_i], bool_dict[old_calib_label][well_i, channel_i])
             end # do channel_i
         end) # do cl_i

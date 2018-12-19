@@ -25,12 +25,6 @@ import FactCheck: @fact, facts, convert, getindex, clear_results, setstyle
 
 FactCheck.setstyle(:default)
 
-# constants
-
-const CHANNELS = [1, 2]
-calib_info_AIR = -99 # set default calibration experiment
-
-
 # ================================================================================
 # Here are the REST APIs using HTTP GET
 # ================================================================================

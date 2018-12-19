@@ -2,10 +2,6 @@
 
 import DataStructures.OrderedDict
 
-# constants
-
-const JSON_DIGITS = 6 # number of decimal points for floats in JSON output
-
 
 
 # functions

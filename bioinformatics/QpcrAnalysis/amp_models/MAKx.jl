@@ -6,9 +6,6 @@ import DataStructures.OrderedDict;
 import JuMP: Model, @variable, @constraint, @NLconstraint, @NLobjective,
     solve, getvalue, getobjectivevalue
 
-const MAK_d0_START = 0 # 0 good, 1 bad
-const k_START = 10 # used: 10 better, 2 good, 1e-10 bad, 1 bad
-
 
 function pred_from_d_nm1(::Union{MAK2, MAK3}, d_nm1::Real, k::Real)
     d_nm1 + k * log(1+ d_nm1 / k)

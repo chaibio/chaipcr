@@ -1,18 +1,5 @@
 # thermal_performance_diagnostic.jl
 
-# constants
-const deltaTSetPoint = 1
-const highTemperature = 95
-const lowTemperature = 50
-# xqrm
-const HIGH_TEMP_mDELTA = highTemperature - deltaTSetPoint
-const LOW_TEMP_pDELTA = lowTemperature + deltaTSetPoint
-const MIN_AVG_RAMP_RATE = 2 # C/s
-const MAX_TOTAL_TIME = 22.5e3 # ms
-const MAX_BLOCK_DELTA = 2 # C
-const MIN_HEATING_RATE = 1 # C/s
-const MAX_TIME_TO_HEAT = 90e3 # MySql
-
 
 function act(
     ::ThermalPerformanceDiagnostic,

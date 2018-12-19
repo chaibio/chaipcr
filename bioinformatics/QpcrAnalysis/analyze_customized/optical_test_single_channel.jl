@@ -1,11 +1,5 @@
 # optical_test_single_channel.jl
 
-# constants
-# const BASELINE_STEP_ID = 12
-# const EXCITATION_STEP_ID = 13
-const MIN_EXCITATION_FLUORESCENCE = 5120
-const MIN_EXCITATION_FLUORESCENCE_MULTIPLE = 3
-const MAX_EXCITATION = 384000
 
 
 function act(

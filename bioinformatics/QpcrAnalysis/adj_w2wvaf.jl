@@ -4,40 +4,6 @@
 
 import DataStructures.OrderedDict
 
-# old pre-defined (predfd) step ids for calibration data
-const oc_water_step_id_PREDFD = 2
-const oc_signal_step_ids_PREDFD = OrderedDict(1=>4, 2=>4)
-
-# mapping from factory to user dye data
-# db_name_ = "20160406_chaipcr"
-const PRESET_calib_ids = OrderedDict(
-    "water" => 114,
-    "signal" => OrderedDict("FAM"=>115, "HEX"=>116, "JOE"=>117)
-)
-const DYE2CHST = OrderedDict( # mapping from dye to channel and step_id.
-    "FAM" => OrderedDict("channel"=>1, "step_id"=>266),
-    "HEX" => OrderedDict("channel"=>2, "step_id"=>268),
-    "JOE" => OrderedDict("channel"=>2, "step_id"=>270)
-)
-
-
-# types
-
-struct Ccsc # channels_check_subset_composite
-    set ::Vector # channels
-    description ::String
-end
-
-
-# process preset calibration data
-
-const DYE2CHST_channels = Vector{Int}(unique(map(
-    dye_dict -> dye_dict["channel"],
-    values(DYE2CHST)
-))) # change type from Any to Int (8e-6 to 13e-6 sec on PC)
-
-const DYE2CHST_ccsc = Ccsc(DYE2CHST_channels, "all channels in the preset well-to-well variation data")
-
 
 # functions
 

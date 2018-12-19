@@ -4,12 +4,6 @@
 
 using DataStructures.OrderedDict;
 
-# scaling factors
-const SCALING_FACTOR_deconv_vec = [1.0, 4.2] # used: [1, oneof(1, 2, 3.5, 8, 7, 5.6, 4.2)]
-const SCALING_FACTOR_adj_w2wvaf = 3.7 # used: 9e5, 1e5, 1.2e6, 3
-
-
-
 
 # function: perform deconvolution and adjust well-to-well variation in absolute fluorescence
 function dcv_aw(

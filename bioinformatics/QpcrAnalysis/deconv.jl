@@ -2,14 +2,6 @@
 
 import DataStructures.OrderedDict
 
-type K4Deconv
-    k_s ::AbstractArray
-    k_inv_vec ::AbstractArray
-    inv_note ::String
-end
-
-const ARRAY_EMPTY = Array{Any}()
-const K4DCV_EMPTY = K4Deconv(ARRAY_EMPTY, ARRAY_EMPTY, "")
 
 # multi-channel deconvolution
 function deconV(
