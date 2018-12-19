@@ -427,7 +427,6 @@ function verify_request(
 )
     facts("Optical calibration requested") do
         context("Verifying request body") do
-            conditions=["baseline","water","channel_1","channel_2"]
             @fact (isa(request,OrderedDict)) --> true
             @fact (haskey(request,"calibration_info")) --> true
             calib=request["calibration_info"]
@@ -438,10 +437,11 @@ function verify_request(
             @fact (isa(calib["water"]["fluorescence_value"],Vector)) --> true
             if length(calib["water"]["fluorescence_value"])<2 ||
                 calib["water"]["fluorescence_value"][2]==nothing
-                calibration_test(calib,1,conditions[1:3])
+                n_channels=1
             else
-                calibration_test(calib,2,conditions)
+                n_channels=2
             end
+            calibration_test(calib,n_channels)
         end
     end
     FactCheck.exitstatus()

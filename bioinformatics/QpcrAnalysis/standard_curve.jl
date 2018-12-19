@@ -1,5 +1,7 @@
 # standard_curve.jl
 
+# parts of this code are untested according to Xia Hong 2018-12-18
+
 import JSON
 import DataFrames.DataFrame
 
