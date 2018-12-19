@@ -8,7 +8,8 @@
 import FactCheck: clear_results
 import DataFrames: DataFrame, rename
 import DataStructures: OrderedDict
-import QpcrAnalysis: dispatch, act, verify_request, verify_response, print_v, LOAD_FROM_DIR 
+# import QpcrAnalysis: dispatch, act, verify_request, verify_response, print_v, LOAD_FROM_DIR
+using QpcrAnalysis
 
 td  = readdlm("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/test_data.csv",',',header=true)
 td1 = DataFrame(td[1])

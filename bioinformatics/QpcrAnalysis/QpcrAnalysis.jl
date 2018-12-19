@@ -35,8 +35,7 @@ const LOAD_FROM_DIR = LOAD_PATH[find(LOAD_PATH) do path_
     isfile("$path_/$MODULE_NAME.jl")
 end][1] # slice by boolean vector returned a one-element vector. Assumption: LOAD_PATH is global
 
-# set to true to remove development and test code
-const PRODUCTION_MODE = false
+const PRODUCTION_MODE = (run(`uname -a`) |> x->ismatch(r"beaglebone",x))
 
 # include each script, generally in the order of workflow
 
@@ -51,7 +50,9 @@ include("amp_models/types_for_dfc_models.jl")
 # shared functions
 include("shared.jl")
 
-if !PRODUCTION_MODE
+@static if (!PRODUCTION_MODE) 
+	# this code is hidden from the parser on the BeagleBone
+
 	# development & testing
 	import Base.Test
 	using FactCheck

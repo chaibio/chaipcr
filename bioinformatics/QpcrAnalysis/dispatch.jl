@@ -23,7 +23,8 @@ function dispatch(
         # else
         action_t = Action_DICT[action]()
 
-        if (!PRODUCTION_MODE)
+        @static if (!PRODUCTION_MODE)
+            # this code is hidden from the parser on the BeagleBone
             if (verify)
                 verify_input = try
                     verify_request(action_t, req_parsed)
@@ -36,7 +37,8 @@ function dispatch(
         response = act(action_t, req_parsed; out_format="pre_json", verbose=verbose)
         json_response=JSON.json(response)
 
-        if (!PRODUCTION_MODE)
+        @static if (!PRODUCTION_MODE)
+            # this code is hidden from the parser on the BeagleBone
             if (verify)
                 verify_output = try
                     verify_response(action_t,JSON.parse(json_response,dicttype=OrderedDict))
