@@ -60,6 +60,7 @@ if !PRODUCTION_MODE
 	# data format verification
 	include("../test/verify_request.jl")
 	include("../test/verify_response.jl")
+	include("../test/test_functions.jl")
 end
 
 
