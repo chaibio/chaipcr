@@ -68,9 +68,9 @@ class TemperatureLog < ActiveRecord::Base
       results[:heat_block_zone_2_temp] ||= Array.new
       results[:elapsed_time] ||= Array.new
       results[:cycle_num] ||= Array.new
-      results[:lid_temp] << data.lid_temp
-      results[:heat_block_zone_1_temp] << data.heat_block_zone_1_temp
-      results[:heat_block_zone_2_temp] << data.heat_block_zone_2_temp
+      results[:lid_temp] << Float(data.lid_temp)
+      results[:heat_block_zone_1_temp] << Float(data.heat_block_zone_1_temp)
+      results[:heat_block_zone_2_temp] << Float(data.heat_block_zone_2_temp)
       results[:elapsed_time] << data.elapsed_time
       results[:cycle_num] << data.cycle_num
     end
