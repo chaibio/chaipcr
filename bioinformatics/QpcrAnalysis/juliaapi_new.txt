@@ -281,7 +281,7 @@ success response body (thermal_performance_diagnostic):
         "HeatingRate":[1.3031,true],
         "TotalTime":[32999,false]}
     },
-    "valid":true
+    "valid":true # not implemented yet in julia API (TP)
 }
 
 *************************************************************************************
@@ -391,7 +391,7 @@ success response body (thermal_consistency):
         }
     ],
     "delta_Tm":[1.7434,true],
-    "valid":true
+    "valid":true # not implemented yet in julia API (TP)
 }
 
 *************************************************************************************
@@ -484,7 +484,7 @@ success response body (optical_test_single_channel):
         "valid":true
     }
  ],
- "valid":true
+ "valid":true # not implemented yet in julia API (TP)
 }
 
 *************************************************************************************
@@ -622,7 +622,7 @@ success response body (optical_test_dual_channel):
         "HEX":[0.870219,0.629768,3.175926,3.296024,1.361111,-0.297743,0.506897,-1.341241,-7.712963,0.291667,1.841503,0.680556,-1.681373,-1.852004,-0.397863,2.807292]
     }
 
-	"valid":true
+	"valid":true # not implemented yet in julia API (TP)
 }
 
 error response body:

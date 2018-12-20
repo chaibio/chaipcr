@@ -35,7 +35,7 @@ const LOAD_FROM_DIR = LOAD_PATH[find(LOAD_PATH) do path_
     isfile("$path_/$MODULE_NAME.jl")
 end][1] # slice by boolean vector returned a one-element vector. Assumption: LOAD_PATH is global
 
-const PRODUCTION_MODE = (run(`uname -a`) |> x->ismatch(r"beaglebone",x))
+const PRODUCTION_MODE = (readstring(`uname -a`) |> x->ismatch(r"beaglebone",x))
 
 # include each script, generally in the order of workflow
 
