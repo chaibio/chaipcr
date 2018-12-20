@@ -41,9 +41,13 @@ const PRODUCTION_MODE = (readstring(`uname -a`) |> x->ismatch(r"beaglebone",x))
 
 # types and constants
 include("constants.jl")
-include("action_types.jl")
+include("types_for_dispatch.jl")
+include("types_for_calibration.jl")
 include("types_for_allelic_discrimination.jl")
-include("types_for_amp.jl")
+include("types_for_amplification.jl")
+include("types_for_meltcurve.jl")
+include("types_for_standard_curve.jl")
+include("types_for_thermal_consistency.jl")
 include("amp_models/types_for_sfc_models.jl")
 include("amp_models/types_for_dfc_models.jl")
 

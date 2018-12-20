@@ -180,19 +180,6 @@ end # dcv_aw
 #
 # end # get_full_calib_data
 
-
-# perform deconvolution and adjustment of well-to-well variation on calibration experiment 1
-# using the k matrix `wva_data` made from calibration experiment 2
-
-type CalibCalibOutput
-    ary2dcv_1 ::Array{AbstractFloat,3}
-    mw_ary3_1 ::Array{AbstractFloat,3}
-    k4dcv_2 ::K4Deconv
-    dcvd_ary3_1 ::Array{AbstractFloat,3}
-    wva_data_2 ::OrderedDict{String,OrderedDict{Int,AbstractVector}}
-    dcv_aw_ary3_1 ::Array{AbstractFloat,3}
-end
-
 function calib_calib(
 
     ## remove MySql dependency

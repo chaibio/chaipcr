@@ -1,4 +1,4 @@
-# action_types.jl
+# types_for_dispatch.jl
 #
 # Author: Tom Price
 # Date: Dec 2018

@@ -38,12 +38,6 @@ const DYE2CHST = OrderedDict( # mapping from dye to channel and step_id.
     "JOE" => OrderedDict("channel"=>2, "step_id"=>270)
 )
 
-# type used in adj_w2wvaf.jl
-struct Ccsc # channels_check_subset_composite
-    set ::Vector # channels
-    description ::String
-end
-
 # process preset calibration data
 # used in adj_w2wvaf.jl
 const DYE2CHST_channels = Vector{Int}(unique(map(
@@ -58,13 +52,7 @@ const DEFAULT_init_FACTORS = [1, 1, 1, 1] # sometimes "hetero" may not have very
 const DEFAULT_apg_LABELS = ["ntc", "homo_1", "homo_2", "hetero", "unclassified"] # [0 1 0 1; 0 0 1 1]
 # const DEFAULT_apg_LABELS = ["hetero", "homo_2", "homo_1", "ntc", "unclassified"] # [1 0 1 0; 1 1 0 0]
 
-# type and constants for K matrix
-# used in deconv.jl
-type K4Deconv
-    k_s ::AbstractArray
-    k_inv_vec ::AbstractArray
-    inv_note ::String
-end
+# constants used in deconv.jl
 const ARRAY_EMPTY = Array{Any}()
 const K4DCV_EMPTY = K4Deconv(ARRAY_EMPTY, ARRAY_EMPTY, "")
 const K4DCV = JLD.load("$LOAD_FROM_DIR/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv"] # sometimes crash REPL
@@ -77,58 +65,6 @@ const EMPTY_mc_tm_pw_out = OrderedDict(
     "Ta_raw" => EMPTY_Ta,
     "Ta_fltd" => EMPTY_Ta
 )
-
-# used in meltcurve.jl
-struct MeltCurveTF # temperature and fluorescence
-    t_da_vec ::Vector{DataArray{Float64,1}}
-    fluo_da ::DataArray{Float64,2}
-end
-
-# used in meltcurve.jl
-struct MeltCurveTa # Tm and area
-    mc ::Array{Float64,2}
-    Ta_fltd ::Array{Float64,2}
-    mc_denser ::Array{Float64,2}
-    ns_range_mid ::Real
-    sn_dict ::OrderedDict{String,Array{Float64,2}}
-    Ta_raw ::Array{Float64,2}
-    Ta_reported ::String
-end
-
-# used in meltcurve.jl
-struct MeltCurveOutput
-    mc_bychwl ::Matrix{MeltCurveTa} # dim1 is well and dim2 is channel
-    channel_nums ::Vector{Int}
-    fluo_well_nums ::Vector{Int}
-    fr_ary3 ::Array{Float64,3}
-    mw_ary3 ::Array{Float64,3}
-    k4dcv ::K4Deconv
-    fdcvd_ary3 ::Array{Float64,3}
-    wva_data ::OrderedDict{String,OrderedDict{Int,Vector{Float64}}}
-    wva_well_nums ::Vector{Int}
-    faw_ary3 ::Array{Float64,3}
-    tf_bychwl ::OrderedDict{Int,Vector{OrderedDict{String,Vector{Float64}}}}
-end
-
-# used in standard_curve.jl
-abstract type Result end
-immutable TargetResultEle <: Result
-    target_id ::Int
-    slope ::Float64
-    offset ::Float64
-    efficiency ::Float64
-    r2 ::Float64
-end
-const EMPTY_TRE = TargetResultEle(0, fill(NaN, 4)...)
-immutable GroupResultEle <: Result
-    well ::Vector{Int}
-    target_id ::Int
-    cq_mean ::Float64
-    cq_sd ::Float64
-    qty_mean ::Float64
-    qty_sd ::Float64
-end
-const EMPTY_GRE = GroupResultEle([], 0, fill(NaN, 4)...)
 
 ## used in optical_test_single_channel.jl
 # const BASELINE_STEP_ID = 12
@@ -167,16 +103,6 @@ stage_id = 4
 # passed onto `mc_tm_pw`, different than default
 qt_prob_flTm = 0.1
 normd_qtv_ub = 0.9
-
-# types used in thermal_consistency.jl
-type TmCheck1w
-    Tm ::Tuple{AbstractFloat,Bool}
-    area ::AbstractFloat
-end
-type ThermalConsistencyOutput
-    tm_check ::Vector{TmCheck1w}
-    delta_Tm ::Tuple{AbstractFloat,Bool}
-end
 
 # used in thermal_performance_diagnostic.jl
 const deltaTSetPoint = 1
