@@ -545,9 +545,9 @@ EOF
 
 echo Patching..
 
-patch -i add_catch.patch  || (echo error patching ExecBuilder package &amp;&amp; exit 1)
+patch -i add_catch.patch || (echo error patching ExecBuilder package &amp;&amp; exit 1)
 echo done installation.. creating execuitable:
-
+rm add_catch.patch
 #exit 0
 
 JULIA=julia
