@@ -6,15 +6,17 @@
   -ms-user-select: none;
   user-select: none;
 
-  table {
-    border-top: 2px solid #c5c5c5;
+  table {    
     border-right: 1px solid #c5c5c5;
   }
 
-  th, td {
+  th, td{
     border-left: 1px solid #c5c5c5;
-    border-bottom: 1px solid #c5c5c5;
     border-top: 1px solid #c5c5c5;
+  }
+
+  tr:last-child td{
+    border-bottom: 1px solid #c5c5c5;
   }
 
   .col-header {
@@ -38,9 +40,8 @@
     position: relative;
 
     &.selected {
-      background-color: #e4f4fa;
+      background-color: #a2dded;
       .ct-cq-container {
-        background-color: #e4f4fa;
         // background-color: white;
       }
     }
@@ -69,11 +70,26 @@
 
     .well-switch-bar-container {
       background-color: #fff;
-      padding: 5px 10px;
+      padding: 5px;
     }
 
     .well-switch-bar {
       height: 5px;
+      .well-target{
+        width: 50%;
+        height: 100%;
+        display: block;        
+        float: left;         
+      }
+      .well-hr-bar{
+        position: absolute;
+        height: 15px;
+        width: 6px;
+        background: #fff;
+        left: calc(50% - 3px);
+        top: 0;
+        transform: rotate(30deg);
+      }
     }
     
     .ct-cq-container {

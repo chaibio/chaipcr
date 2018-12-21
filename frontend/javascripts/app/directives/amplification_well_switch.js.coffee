@@ -27,6 +27,8 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
     require: 'ngModel',
     scope:
       colorBy: '='
+      samples: '='
+      targets: '='
       buttonLabelsNum: '=?' #numbe of labels in button
       labelUnit: '=?'
       chartType: '@'
@@ -53,20 +55,10 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
 
         if $scope.colorBy is 'well'
           well_color = COLORS[b]
-        # else if $scope.colorBy is 'target'
-        #   color_number = $scope.targetsSet.indexOf($scope.targets[i])
-        #   if color_number < 0
-        #     well_color = '#000000'
-        #   else
-        #     well_color = $scope.COLORS[color_number]
-        # else if $scope.colorBy is 'sample'
-        #   color_number = $scope.samplesSet.indexOf($scope.samples[i])
-        #   if color_number < 0
-        #     well_color = '#000000'
-        #   else
-        #     well_color = $scope.COLORS[color_number]
-        # else
-        #   well_color = '#75278E'
+        else if $scope.colorBy is 'target'
+          well_color = if $scope.targets[i] then $scope.targets[i].color else 'transparent'
+        else if $scope.colorBy is 'sample'
+          well_color = if $scope.samples[i] then $scope.samples[i].color else 'transparent'
         else
           well_color = '#FFFFFF'
 
@@ -78,7 +70,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
       ngModel.$setViewValue wells
       $scope.wells = wells
 
-      $scope.row_header_width = 30
+      $scope.row_header_width = 20
       $scope.columns = []
       $scope.rows = []
       for i in [0...8]
@@ -113,18 +105,12 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
 
           if color_by is 'well'
             well_color = COLORS[i]
-          # else if color_by is 'target'
-          #   color_number = $scope.targetsSet.indexOf($scope.targets[i])
-          #   if color_number < 0
-          #     well_color = '#000000'
-          #   else
-          #     well_color = $scope.COLORS[color_number]
-          # else if color_by is 'sample'
-          #   color_number = $scope.samplesSet.indexOf($scope.samples[i])
-          #   if color_number < 0
-          #     well_color = '#000000'
-          #   else
-          #     well_color = $scope.COLORS[color_number]
+          else if color_by is 'target'
+            well_color = if $scope.targets[i] then $scope.targets[i].color else 'transparent'
+            $scope.wells["well_#{i}"].color1 = if $scope.targets[i*2] then $scope.targets[i*2].color else 'transparent'
+            $scope.wells["well_#{i}"].color2 = if $scope.targets[i*2+1] then $scope.targets[i*2+1].color else 'transparent'
+          else if color_by is 'sample'
+            well_color = if $scope.samples[i] then $scope.samples[i].color else 'transparent'
           # else
           #   well_color = '#75278E'
           else
@@ -135,6 +121,14 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
 
       $scope.getStyleForWellBar = (row, col, config, i) ->
         'background-color': config.color
+        'opacity': if config.selected then 1 else 0.25
+
+      $scope.getStyleForTarget1Bar = (row, col, config, i) ->
+        'background-color': config.color1
+        'opacity': if config.selected then 1 else 0.25
+
+      $scope.getStyleForTarget2Bar = (row, col, config, i) ->
+        'background-color': config.color2
         'opacity': if config.selected then 1 else 0.25
 
       $scope.dragStart = (evt, type, index) ->
@@ -218,7 +212,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
 
         ngModel.$setViewValue(angular.copy($scope.wells))
 
-        $rootScope.$broadcast 'event:switch-chart-well', {active: well.active, index: index}
+        $rootScope.$broadcast 'event:switch-chart-well', {active: well?.active, index: index}
 
       $scope.getWellStyle = (row, col, well, index) ->
         return {} if well.active
@@ -234,11 +228,11 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
         well_bottom = $scope.wells["well_#{well_bottom_index}"]
 
         style = {}
-        border = '2px solid #000'
+        border = '1px solid #000'
         if well.selected
           if !(well_left?.selected)
             style['border-left'] = border
-          if !(well_right?.selected or (index + 1) % 8==0)
+          if !(well_right?.selected)
             style['border-right'] = border
           if !(well_top?.selected)
             style['border-top'] = border
@@ -249,7 +243,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
 
       $scope.getWellContainerStyle = (row, col, well, i) ->
         style = {}
-        if well.active
+        if well.active && well.selected
           style.width = "#{Math.round(@getCellWidth() + ACTIVE_BORDER_WIDTH * 4)}px"
         return style
 

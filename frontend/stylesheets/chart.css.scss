@@ -295,6 +295,49 @@
   //   margin-bottom: -$marginTop;
   // }
 
+  .target-switch {
+    .switch {
+      height: 15px;
+      margin-top: -2px;
+      width: 31px;
+      vertical-align: middle;
+      margin-left: 6px;
+      small {
+        width: 15px;
+        height: 15px;
+        border-width: 4px;
+      }
+      &.checked {
+        small {
+          left: 16px;
+        }
+      }
+    }
+    &.auto {
+      .switch {
+        background: #BBB;
+        border-color: #BBB;
+      }
+      small {
+        background: #bbb;
+      }
+      .set-auto {
+        color: $gray;
+      }
+    }
+    label {
+      color: $gray;
+      display: inline-block;
+      margin-left: 15px;
+      // font-weight: 700;
+    }
+    span.set-auto {
+      color: $blue;
+      cursor: pointer;
+      margin-left: 15px;
+    }
+  }
+
   .chart-container {
     // margin-left: 30px;
     // margin-bottom: -35px;
@@ -451,22 +494,22 @@
 .amplification-chart {
   .g-y-axis-text {
     font-family: "dinot-regular";
-    font-size: 8px;
+    font-size: 10px;
     font-weight: bold;
     line-height: 12px;
   }
 
   .axis .tick text {
     font-family: "dinot-regular";
-    font-size: 6.5px;
-    line-height: 9.75px;
+    font-size: 10px;
+    line-height: 12px;
     font-weight: normal;
   }
   
   .g-axis-limit-text {
     font-family: "dinot-regular";
-    font-size: 6.5px;
-    line-height: 9.75px;
+    font-size: 10px;
+    line-height: 12px;
     font-weight: 500;
   }
 }
@@ -480,12 +523,12 @@
 
   .axis .tick text {
     font-family: "dinot-regular";
-    font-size: 10px;
+    font-size: 12px;
   }
  
   .g-axis-limit-text {
     font-family: "dinot-regular";
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 500;
   }
 }

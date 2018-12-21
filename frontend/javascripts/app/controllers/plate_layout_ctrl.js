@@ -589,17 +589,17 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 				for (i = 0; i < resp.data.length; i++) {
 					if (resp.data[i].target.channel == 1) {
 						$scope.targets1[p] = resp.data[i].target;
-						$scope.targets1[p].color = $scope.colors[i % 16];
+						$scope.targets1[p].color = $scope.colors[i % $scope.colors.length];
 						p++;
 					}
 					else {
 						$scope.targets2[q] = resp.data[i].target;
-						$scope.targets2[q].color = $scope.colors[i % 16];
+						$scope.targets2[q].color = $scope.colors[i % $scope.colors.length];
 						q++;
 					}
 				}
 				for (l = 0; l < resp.data.length; l++) {
-					lookup[resp.data[l].target.id] = $scope.colors[l % 16];
+					lookup[resp.data[l].target.id] = $scope.colors[l % $scope.colors.length];
 				}
 
 				$scope.getWellLayout();

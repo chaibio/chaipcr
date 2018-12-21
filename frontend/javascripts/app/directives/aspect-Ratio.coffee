@@ -2,7 +2,8 @@ App.directive 'aspectRatio', [
   'WindowWrapper'
   '$timeout'
   '$rootScope'
-  (WindowWrapper, $timeout, $rootScope) ->
+  '$window'
+  (WindowWrapper, $timeout, $rootScope, $window) ->
 
     restrict: 'AE',
     scope:
@@ -33,7 +34,6 @@ App.directive 'aspectRatio', [
       getHeight = -> 
         console.log('parent_getHeight')
         console.log(elem.parent().parent().parent().height())
-        console.log(elem.parent().height())
         height = elem.parent().parent().parent().height() - ($scope.offsetY)
         if height > $scope.maxHeight
           height = $scope.maxHeight
@@ -48,7 +48,7 @@ App.directive 'aspectRatio', [
 
         width = getWidth()
         height = getHeight()
-        
+
         console.log('resizeAspectRatio')
 
         if width > $scope.maxWidth and height > $scope.maxHeight
@@ -57,23 +57,34 @@ App.directive 'aspectRatio', [
         else if width < $scope.minWidth and height < $scope.minHeight
           width = $scope.minWidth
           height = $scope.minHeight
-        else 
-          width = Math.min(width / 1.7, height) * 1.7
-          height = Math.min(width / 1.7, height)
-
-        # console.log('getWidth')
-        # console.log(width)
-        # console.log('getHeight')
-        # console.log(height)
+        else           
+          if height <= $scope.minHeight            
+            width = Math.min(width / 1.7, height) * 1.7
+            height = Math.min(width / 1.7, height) - 20
+          else
+            width = Math.max(width / 1.7, height) * 1.7
+            height = Math.max(width / 1.7, height)
 
         elem.css('min-Width': width)
         elem.css('width': width)
         elem.css('min-height': height)
-        elem.css('height': height)
-        # elem.parent().children().get(1).css('height': height)
-        elem.parent().children().get(1).style.height = height + "px"        
+        elem.css('height': height)        
+        elem.parent().children().get(1).style.height = height + "px"
+        if height == 380
+          angular.element(elem.parent().children().get(1)).children().get(1).style.height = "189px"
+        else
+          angular.element(elem.parent().children().get(1)).children().get(1).style.height = "215px"
 
       resizeTimeout = null
+      
+      $scope.$watch (->
+        angular.element(elem).parent().parent().parent().height()        
+      ), (isResize) ->
+        if isResize
+          runAspectRatio()
+          $timeout ->
+            $rootScope.$broadcast 'event:resize-draw-chart'
+          , 100
 
       $scope.$on 'window:resize', ->
         console.log('window:resize')
