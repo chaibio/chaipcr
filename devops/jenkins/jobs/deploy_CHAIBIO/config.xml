@@ -375,7 +375,9 @@ sudo swapon /sdcard/factory/swapfile
 sudo swapon -s
 
 free -m
-
+apt autoremove -y -q
+du -h --max-depth=1 /
+df -h
 exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
@@ -384,6 +386,10 @@ exit 0</command>
       <command>echo Maintenance
 df -h
 export RAILS_ENV=production
+export DEBIAN_FRONTEND=noninteractive
+apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data
+apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data
+
 cd /root/chaipcr/web
 bundle install
 gem install bcrypt -v &apos;3.1.11&apos;
