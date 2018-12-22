@@ -1,12 +1,7 @@
 # optical_test_dual_channel.jl
 
-
-# signal-to-noise ratio discriminant functions for each well
-dscrmnt_snr_fam(snr_2chs) = [snr_2chs[1] > SNR_FAM_CH1_MIN, snr_2chs[2] < SNR_FAM_CH2_MAX]
-dscrmnt_snr_hex(snr_2chs) = [snr_2chs[1] < SNR_HEX_CH1_MAX, snr_2chs[2] > SNR_HEX_CH2_MIN]
-const dscrmnts_snr = OrderedDict(map(1:2) do i
-    CALIB_LABELS_FAM_HEX[i] => [dscrmnt_snr_fam, dscrmnt_snr_hex][i]
-end) # do i
+import DataStructures.OrderedDict
+import JSON.json
 
 
 function act(
@@ -128,4 +123,8 @@ function act(
     end
     
 end # analyze_optical_test_dual_channel
-        
+
+
+
+
+#      

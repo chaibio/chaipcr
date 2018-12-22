@@ -78,8 +78,9 @@ const MAX_EXCITATION = 384000
 const CHANNELS = [1, 2]
 const CHANNEL_IS = 1:length(CHANNELS)
 const CALIB_LABELS_FAM_HEX = map(channel -> "channel_$channel", CHANNELS)
+const SYMBOLS_FAM_HEX = [:FAM, :HEX]
 const OLD_CALIB_LABELS = ["baseline"; "water"; CALIB_LABELS_FAM_HEX]
-const NEW_CALIB_LABELS = ["baseline"; "water"; "FAM"; "HEX"]
+const NEW_CALIB_LABELS = ["baseline"; "water"; map(string,SYMBOLS_FAM_HEX)]
 
 # bounds of signal-to-noise ratio (SNR)
 # used in optical_test_dual_channel.jl
@@ -87,6 +88,14 @@ const SNR_FAM_CH1_MIN = 0.75
 const SNR_FAM_CH2_MAX = 1
 const SNR_HEX_CH1_MAX = 0.50
 const SNR_HEX_CH2_MIN = 0.88
+
+# signal-to-noise ratio discriminant functions for each well
+# used in optical_test_dual_channel.jl
+dscrmnt_snr_fam(snr_2chs) = [snr_2chs[1] > SNR_FAM_CH1_MIN, snr_2chs[2] < SNR_FAM_CH2_MAX]
+dscrmnt_snr_hex(snr_2chs) = [snr_2chs[1] < SNR_HEX_CH1_MAX, snr_2chs[2] > SNR_HEX_CH2_MIN]
+const dscrmnts_snr = OrderedDict(map(1:2) do i
+    CALIB_LABELS_FAM_HEX[i] => [dscrmnt_snr_fam, dscrmnt_snr_hex][i]
+end) # do i
 
 # fluo values: channel 1, channel 2
 # used in optical_test_dual_channel.jl

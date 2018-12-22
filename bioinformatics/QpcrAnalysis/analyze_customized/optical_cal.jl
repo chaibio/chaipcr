@@ -1,10 +1,10 @@
 # optical_cal.jl
+#
 # use `prep_adj_w2wvaf` to check validity of calibration data for adjusting well-to-well variation in absolute fluo
-
-# check JSON output in UI: http://:ip_address/experiments/:exp_id/analyze
 
 import DataStructures.OrderedDict
 import JSON
+
 
 # called by QpcrAnalyze.dispatch
 function act(
@@ -47,9 +47,12 @@ function act(
 
     # get_k
 
-    if length(calib_info_dict) >= 3 # 2 or more channels
+    # if there are 2 or more channels then
+    # the deconvoltion matrix K is calculate
+    # otherwise deconvolution is not performed
+    if length(calib_info_dict) >= 3
 
-        result_k = # try
+        result_k = try
 
         ## remove MySql dependency
         #
@@ -57,9 +60,9 @@ function act(
 
             get_k(calib_info_dict, well_nums)
             
-        # catch err
-        #     err
-        # end
+        catch err
+            err
+        end
 
         if isa(result_k, Exception)
             err_msg = isa(result_k, ErrorException) ? result_k.msg : "$(string(result_k)). "
@@ -75,7 +78,7 @@ function act(
 
     # prep_adj_w2wvaf
 
-    result_aw = # try
+    result_aw = try
 
         ## remove MySql dependency
         #
@@ -85,9 +88,9 @@ function act(
         prep_adj_w2wvaf(calib_info_dict, well_nums, dye_in, dyes_2bfild)
         # << new
         
-    # catch err
-    #     err
-    # end
+    catch err
+        err
+    end
 
     if isa(result_aw, Exception)
         err_msg = isa(result_aw, ErrorException) ? result_aw.msg : "$(string(result_aw)). "
