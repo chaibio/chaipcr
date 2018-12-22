@@ -19,7 +19,7 @@ function adj_w2wvaf(
     channel ::Integer;
     minus_water ::Bool =false,
     scaling_factor_adj_w2wvaf ::Real =SCALING_FACTOR_adj_w2wvaf
-    )
+)
     fluo = transpose(fluo2btp)
 
     wva_water, wva_signal = map(["water", "signal"]) do wva_type
@@ -149,7 +149,7 @@ end
 
 
 # function: check whether the data in optical calibration experiment is valid
-# if so, prepare calibration data
+# if so, prepare calibration data by subtracting background (water) fluorescence values
 function prep_adj_w2wvaf(
 
     ## remove MySql dependency
@@ -257,8 +257,8 @@ function prep_adj_w2wvaf(
     if (length(stop_msgs) > 0)
         error(join(stop_msgs, ""))
     end
-    channels_in_water  = collect(keys(water_data_dict))
-    channels_in_signal = channels_in_water
+    channels_in_water  = sort(collect(keys(water_data_dict)))
+    channels_in_signal = sort(collect(keys(signal_data_dict)))
     #
     # assume without checking that there are no missing wells anywhere
     signal_well_nums = Vector(1:length(signal_data_dict[1]))
@@ -268,7 +268,8 @@ function prep_adj_w2wvaf(
     stop_msgs = Vector{String}()
     for channel_in_signal in channels_in_signal
         wva_invalid_idc = find(
-            signal_minus_water -> signal_minus_water <= 0, signal_data_dict[channel_in_signal] .- water_data_dict[channel_in_signal]
+            signal_minus_water -> (signal_minus_water <= 0),
+            signal_data_dict[channel_in_signal] .- water_data_dict[channel_in_signal]
         )
         if length(wva_invalid_idc) > 0
             failed_well_nums_str = join(signal_well_nums[wva_invalid_idc], ", ")
@@ -282,8 +283,10 @@ function prep_adj_w2wvaf(
     end
 
     ## issue:
-    ## this feature has been temporarily disabled while removing MySql dependency in get_wva_data because
-    ## using the current format for the request body we cannot subset the calibration data by step_id
+    ## this feature has been temporarily disabled while
+    ## removing MySql dependency in get_wva_data because
+    ## using the current format for the request body
+    ## we cannot subset the calibration data by step_id
     #
     # if length(dyes_2bfild) > 0 # extrapolate well-to-well variation data for missing channels
     #
@@ -315,10 +318,14 @@ function prep_adj_w2wvaf(
     #
     # end # if
 
+    # water_data and signal_data are OrderedDict objects keyed by channels,
+    # to accommodate the situation where calibration data has more channels
+    # than experiment data, so that calibration data need to be easily
+    # subsetted by channel.
     wva_data = OrderedDict(
-        "water" => water_data_dict,
+        "water"  => water_data_dict,
         "signal" => signal_data_dict
-    ) # water_data and signal_data are OrderedDict objects keyed by channels, to accommodate the situation where calibration data has more channels than experiment data, therefore calibration data need to be easily subsetted by channel.
+    )
 
     return (wva_data, signal_well_nums)
 

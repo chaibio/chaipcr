@@ -286,6 +286,30 @@ end # ensure_ci
 
 
 
+function num_channels(
+    calib ::Associative
+)
+    n_channels = 1
+    for field in keys(calib)
+        (length(field) > 1) && (calib[field]["fluorescence_value"][2]!=nothing) &&
+            n_channels = 2
+    end
+    return n_channels
+end
+
+function num_wells(
+    calib ::Associative
+)
+    maximum(map(
+        x -> maximum(map(
+            y -> length(y),
+            calib[x]["fluorescence_value"]
+        )),
+        keys(calib)
+    ))
+end
+
+
 
 
 #

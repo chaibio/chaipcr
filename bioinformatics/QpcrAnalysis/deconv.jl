@@ -32,8 +32,7 @@ function deconV(
     k4dcv_backup ::K4Deconv =K4DCV,
     scaling_factor_dcv_vec ::AbstractVector =SCALING_FACTOR_deconv_vec,
     out_format ::String ="both" # "array", "dict", "both"
-    )
-
+)
     a2d_dim1, a2d_dim_well, a2d_dim_channel = size(ary2dcv)
 
     dcvd_ary3 = similar(ary2dcv)
@@ -61,15 +60,15 @@ function deconV(
         ) .* scaling_factor_dcv_vec
     end
 
-    if out_format == "array"
+    if (out_format == "array")
         dcvd = (dcvd_ary3,)
     else
         dcvd_dict = OrderedDict(map(1:a2d_dim_channel) do channel_i
             channel_nums[channel_i] => dcvd_ary3[:,:,channel_i]
         end) # do channel_i
-        if out_format == "dict"
+        if (out_format == "dict")
             dcvd = (dcvd_dict,)
-        elseif out_format == "both"
+        elseif (out_format == "both")
             dcvd = (dcvd_ary3, dcvd_dict)
         else
             error("`out_format` must be \"array\", \"dict\" or \"both\".")
@@ -81,15 +80,18 @@ function deconV(
 end # deconv
 
 
-# function: get cross-over constant matrix k
+# function: get cross-over constant matrix K
 function get_k(
 
     ## remove MySql dependency
     #
     # db_conn ::MySQL.MySQLHandle,
     
-    ## info on experiment(s) used to calculate matrix k
-    ## OrderedDict("water"=OrderedDict(calibration_id=..., step_id=...), "channel_1"=OrderedDict(calibration_id=..., step_id=...),  "channel_2"=OrderedDict(calibration_id=...", step_id=...) 
+    ## info on experiment(s) used to calculate matrix K
+    ## OrderedDict(
+    ##    "water"=OrderedDict(calibration_id=..., step_id=...),
+    ##    "channel_1"=OrderedDict(calibration_id=..., step_id=...),
+    ##    "channel_2"=OrderedDict(calibration_id=...", step_id=...) 
     # dcv_exp_info ::OrderedDict, 
 
     # new >>
@@ -104,8 +106,7 @@ function get_k(
     well_proc ::String ="vec", # options: "mean", "vec".
     Float_T ::DataType =Float32, # ensure compatibility with other OSs
     save_to ::String ="" # used: "k.jld"
-    )
-
+)
     ## remove MySql dependency
     #
     # dcv_exp_info = ensure_ci(db_conn, dcv_exp_info)
@@ -126,32 +127,30 @@ function get_k(
     # end) 
 
     # new >>
-    # better to rely on name of keys than order of keys
-    cd_key_vec = collect(keys(calib_data))
-    filter!(x -> x != "water", cd_key_vec) # cd = channel of dye.
-    water_data = transpose(hcat(
-        calib_data["water"]["fluorescence_value"][1],
-        calib_data["water"]["fluorescence_value"][2]
-    ))
+    # subtract water calibration data
+    # this essentially duplicates similar code in function prep_adj_w2wvaf
     #
-    # no information on well numbers so make default assumptions
+    # better to rely on name of keys than order of keys
+    cd_key_vec = filter(
+        x -> (x != "water"),
+        collect(keys(calib_data))
+    ) # cd = channel of dye.
+    water_data = transpose(reduce(hcat,calib_data["water"]["fluorescence_value"]))
+    #
+    # no information on well numbers in calibration info so make default assumptions
     num_wells = size(water_data)[2]
     water_well_nums = [i for i in range(1,num_wells)]
     #
-    channel_nums = map(cd_key_vec) do cd_key
-        parse(split(cd_key, "_")[2])
-    end
+    channel_nums = map(x -> parse(split(x, "_")[2]), cd_key_vec)
     k4dcv_bydy = OrderedDict(map(channel_nums) do channel
-        signal_data = transpose(hcat(
-            calib_data[cd_key_vec[channel]]["fluorescence_value"][1],
-            calib_data[cd_key_vec[channel]]["fluorescence_value"][2]
-        ))
+        signal_data = transpose(reduce(hcat,calib_data[cd_key_vec[channel]]["fluorescence_value"]))
         return cd_key_vec[channel] => signal_data .- water_data
     end) 
     # << new
 
-    # assuming `cd_key` (in the format of "channel_1", "channel_2", etc.) is the target channel of the dye,
-    # check whether the water-subtracted signal in target channel is greater than that in non-target channel
+    # assuming `cd_key` (in the format of "channel_1", "channel_2", etc.)
+    # is the target channel of the dye, check whether the water-subtracted signal
+    # in the target channel is greater than that in the non-target channel(s)   
     # for each well and each dye.
 
     stop_msgs = Vector{String}()
@@ -161,9 +160,10 @@ function get_k(
         for non_target_channel_i in setdiff(channel_nums, target_channel_i)
             non_target_signals = signals[non_target_channel_i, :]
             failed_idc = find(
-                target_minus_non_target -> target_minus_non_target <= 0, target_signals .- non_target_signals
+                target_minus_non_target -> (target_minus_non_target <= 0),
+                target_signals .- non_target_signals
             )
-            if length(failed_idc) > 0
+            if (length(failed_idc) > 0)
                 failed_well_nums_str = join(water_well_nums[failed_idc], ", ")
                 push!(stop_msgs,
                     "Invalid deconvolution data for the dye targeting channel $target_channel_i: fluorescence value of non-target channel $non_target_channel_i is greater than or equal to that of target channel $target_channel_i in the following well(s) - $failed_well_nums_str. "
@@ -178,14 +178,15 @@ function get_k(
     inv_note_pt1 = ""
     inv_note_pt2 = "K matrix is singular, using `pinv` instead of `inv` to compute inverse matrix of K. Deconvolution result may not be accurate. This may be caused by using the same or a similar set of solutions in the steps for different dyes. "
 
-    if well_proc == "mean"
+    if (well_proc == "mean")
         k_s = hcat(
             map(cd_key_vec) do cd_key
                 k_mean_vec_1dye = mean(k4dcv_bydy[cd_key], 2)
                 k_1dye = k_mean_vec_1dye / sum(k_mean_vec_1dye)
                 return Array{Float_T}(k_1dye)
             end...) # do cd_key
-        k_inv = try inv(k_s)
+        k_inv = try
+            inv(k_s)
         catch err
             if isa(err, Base.LinAlg.SingularException)
                 inv_note_pt1 = "Well mean"
@@ -194,7 +195,7 @@ function get_k(
         end # try
         k_inv_vec = fill(k_inv, num_wells)
 
-    elseif well_proc == "vec"
+    elseif (well_proc == "vec")
         singular_well_nums = Vector{Int}()
         k_s = fill(ones(1,1), num_wells)
         k_inv_vec = similar(k_s)
@@ -206,7 +207,8 @@ function get_k(
             end...) # do cd_key
             k_s[i] = k_mtx
             # k_inv_vec[i] = inv(k_mtx)
-            k_inv_vec[i] = try inv(k_mtx)
+            k_inv_vec[i] = try
+                inv(k_mtx)
             catch err
                 if isa(err, Union{Base.LinAlg.SingularException, Base.LinAlg.LAPACKException})
                     push!(singular_well_nums, water_well_nums[i])
@@ -216,17 +218,17 @@ function get_k(
                 end # if isa(err
             end # try
         end # next well
-        if length(singular_well_nums) > 0
+        if (length(singular_well_nums) > 0)
             inv_note_pt1 = "Well(s) $(join(singular_well_nums, ", "))"
         end # if length
 
     end # if well_proc
 
-    inv_note = length(inv_note_pt1) > 0 ? "$inv_note_pt1: $inv_note_pt2" : ""
+    inv_note = (length(inv_note_pt1) > 0) ? "$inv_note_pt1: $inv_note_pt2" : ""
 
     k4dcv = K4Deconv(k_s, k_inv_vec, inv_note)
 
-    if length(save_to) > 0
+    if (length(save_to) > 0)
         save(save_to, "k4dcv", k4dcv)
     end
 
