@@ -227,7 +227,7 @@ ENDSSH
 		branch_param=
         branch_name=
 
-	    if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; -eq &quot;trunk&quot; ]
+	    if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
 		then
    			echo No build branch chosen
 		else
@@ -721,21 +721,23 @@ cd compile-browser/
 apt-get install -y git make linux-headers-`uname -r` build-essential cmake curl pkg-config python sshpass unzip
 
 branch_param=
-if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; -eq &quot;trunk&quot; ]
+branch_name=
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
 then
    echo No build branch chosen
 else
      branch_param=&quot;-b $(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
+     branch_name=&quot;$(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
      echo Cloning branch $branch_param
 fi
 
 git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
 cd chaipcr
-if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; -eq &quot;trunk&quot; ]
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
 then
        echo No build branch chosen
 else
-       git checkout $branch_param
+     		git checkout $branch_name
 fi
 
 cd /sdcard/factory/compile-browser/chaipcr/browser/ || exit 1
@@ -779,22 +781,24 @@ mkdir -p /sdcard/factory/realtime-compile
 cd /sdcard/factory/realtime-compile
 
 branch_param=
+branch_name=
 
-if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; -eq &quot;trunk&quot; ]
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
 then
         echo No build branch chosen
 else
          branch_param=&quot;-b $(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
+         branch_name=&quot;$(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
 	echo Cloning branch $branch_param
 fi
 
 git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
 cd chaipcr
-if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; -eq &quot;trunk&quot; ]
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
 then
         echo No build branch chosen
 else
-       git checkout $branch_param
+     	git checkout $branch_name
 fi
 
 cd /sdcard/factory/realtime-compile/chaipcr/realtime || exit 1
