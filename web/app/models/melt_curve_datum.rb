@@ -93,7 +93,7 @@ class MeltCurveDatum < ActiveRecord::Base
   
   def self.julia_hash(experiment_id, stage_id)
     results = {}
-    MeltCurveDatum.for_experiment(experiment_id).for_stage(stage_id).order("channel, well_num").each do |data|
+    MeltCurveDatum.for_experiment(experiment_id).for_stage(stage_id).order("channel, well_num, id").each do |data|
       results[:fluorescence_value] ||= Array.new
       results[:temperature] ||= Array.new
       results[:well_num] ||= Array.new
