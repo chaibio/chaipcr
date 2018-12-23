@@ -255,7 +255,7 @@ function process_mc(
         end # do tf_dict
     end...)
 
-    if out_format[end-3:end] == "json"
+    if (out_format[end-3:end] == "json")
         fns = [:mc, :Ta_fltd]
         mc_keys = ["melt_curve_data", "melt_curve_analysis"]
         mc_out = OrderedDict(map(1:length(mc_keys)) do fk_i
@@ -267,7 +267,7 @@ function process_mc(
         if out_format == "json"
             mc_out = JSON.json(mc_out)
         end
-    elseif out_format == "full"
+    elseif (out_format == "full")
         mc_out = MeltCurveOutput(
             mc_bychwl,
             channel_nums,
@@ -329,7 +329,7 @@ function get_mc_data(
 
     # new >>
     # subset melting curve data by channel
-    s = map(x -> x==channel_num, mc_data["channel"])
+    s = map(x -> (x == channel_num), mc_data["channel"])
     fluo_sel = OrderedDict(
         "temperature"         => mc_data["temperature"][s],
         "fluorescence_value"  => mc_data["fluorescence_value"][s],
