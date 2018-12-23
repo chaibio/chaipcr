@@ -9,7 +9,7 @@ import JuMP: Model, @variable, @constraint, @NLconstraint, @NLobjective,
 function add_funcs_pred!(
     md::SFCModelDef,
     verbose::Bool=false
-    )
+)
 
     _x_args_str = join(map(_x_str -> "$_x_str::Real", md._x_strs), ", ")
     coefs_str = join(map(str -> "$str::Real", md.coef_strs), ", ")
@@ -39,7 +39,7 @@ function add_func_fit!( # vco = variable constraints objective
     Y_str::String="Y",
     obj_algrt::String="RSS",
     sense::String="Min", # "Min", "Max"
-    )
+)
 
     # X_strs
     X_strs = md.X_strs
