@@ -27,6 +27,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
     require: 'ngModel',
     scope:
       colorBy: '='
+      isDual: '='
       samples: '='
       targets: '='
       buttonLabelsNum: '=?' #numbe of labels in button
@@ -107,6 +108,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
             well_color = COLORS[i]
           else if color_by is 'target'
             well_color = if $scope.targets[i] then $scope.targets[i].color else 'transparent'
+            $scope.wells["well_#{i}"].color = if $scope.targets[i] then $scope.targets[i].color else 'transparent'
             $scope.wells["well_#{i}"].color1 = if $scope.targets[i*2] then $scope.targets[i*2].color else 'transparent'
             $scope.wells["well_#{i}"].color2 = if $scope.targets[i*2+1] then $scope.targets[i*2+1].color else 'transparent'
           else if color_by is 'sample'

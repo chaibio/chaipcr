@@ -46,7 +46,8 @@
           <div class="well-switch-container B1-Amplification" style="height: 100%; background: inherit;" ng-style="getWellContainerStyle(row, col, well, i)">
             <div class="well-switch-bar-container">
               <div class="well-switch-bar" ng-style="getStyleForWellBar(row, col, well, i)" ng-if="colorBy!='target'"></div>
-              <div class="well-switch-bar" ng-if="colorBy=='target'">
+              <div class="well-switch-bar" ng-style="getStyleForWellBar(row, col, well, i)" ng-if="colorBy=='target' && !isDual"></div>
+              <div class="well-switch-bar" ng-if="colorBy=='target' && isDual">
                 <div class="well-target" ng-style="getStyleForTarget1Bar(row, col, well, i)" ></div>
                 <div class="well-target" ng-style="getStyleForTarget2Bar(row, col, well, i)" ></div>
                 <div class="well-hr-bar"></div>

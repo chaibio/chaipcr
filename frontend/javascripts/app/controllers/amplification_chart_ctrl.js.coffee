@@ -451,9 +451,11 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         config.config.well = well_item.well_num - 1
         config.config.channel = well_item.channel
 
+        dual_value = if $scope.is_dual_channel then 2 else 1
+
         if $scope.wellButtons['well_' + (well_item.well_num - 1)].selected and $scope.omittedIndexes.indexOf(index) == -1 and $scope.targetsSetHided[$scope.targets[index].id]
           for well_i in [0..$scope.well_data.length - 1]
-            $scope.well_data[well_i].active = (well_i == config.config.well * 2 + config.config.channel - 1)
+            $scope.well_data[well_i].active = (well_i == config.config.well * dual_value + config.config.channel - 1)
 
           for i in [0..15] by 1
             $scope.wellButtons["well_#{i}"].active = (i == config.config.well)
@@ -467,7 +469,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               $scope.label_channel = $scope.index_channel.toString()
               if i < $scope.targets.length
                 if $scope.targets[i]!=null
-                  $scope.label_target = $scope.targets[config.config.well * 2 + config.config.channel - 1]
+                  $scope.label_target = $scope.targets[config.config.well * dual_value + config.config.channel - 1]
                 else
                   $scope.label_target = ""
               else 
@@ -475,7 +477,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
               if i < $scope.targets.length
                 if $scope.samples[i]!=null
-                  $scope.label_sample = $scope.samples[i].name
+                  $scope.label_sample = $scope.samples[i].name if $scope.samples[i]
                 else
                   $scope.label_sample = null
               else 
@@ -497,9 +499,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         # $scope.bgcolor_wellSample = { 'background-color':'black' }
 
         # $scope.bgcolor_target = { 'background-color':config.config.color }
+        dual_value = if $scope.is_dual_channel then 2 else 1
 
         for well_i in [0..$scope.well_data.length - 1]
-          $scope.well_data[well_i].active = (well_i == config.config.well * 2 + config.config.channel - 1)
+          $scope.well_data[well_i].active = (well_i == config.config.well * dual_value + config.config.channel - 1)
 
         for i in [0..15] by 1
           $scope.wellButtons["well_#{i}"].active = (i == config.config.well)
@@ -532,7 +535,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8']
             $scope.label_well = wells[i]
 
-        wellScrollTop = (config.config.well * 2 + config.config.channel - 1 + 2) * 36 - document.querySelector('.table-container').offsetHeight
+        wellScrollTop = (config.config.well * dual_value + config.config.channel - 1 + dual_value) * 36 - document.querySelector('.table-container').offsetHeight
         angular.element(document.querySelector('.table-container')).animate { scrollTop: wellScrollTop }, 'fast'
           
       $scope.onUnselectLine = ->
