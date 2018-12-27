@@ -1,6 +1,6 @@
 # optical_test_single_channel.jl
 
-import DataStrucures.OrderedDict
+import DataStructures.OrderedDict
 import JSON.json
 
 

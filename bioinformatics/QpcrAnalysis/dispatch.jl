@@ -23,7 +23,7 @@ function dispatch(
         # else
         action_t = Action_DICT[action]()
 
-        @static if (!PRODUCTION_MODE)
+	@static if (get(ENV, "JULIA_ENV", nothing)!="production")
             # this code is hidden from the parser on the BeagleBone
             if (verify)
                 verify_input = try
@@ -37,7 +37,7 @@ function dispatch(
         response = act(action_t, req_parsed; out_format="pre_json", verbose=verbose)
         json_response=JSON.json(response)
 
-        @static if (!PRODUCTION_MODE)
+	@static if (get(ENV, "JULIA_ENV", nothing)!="production")
             # this code is hidden from the parser on the BeagleBone
             if (verify)
                 verify_output = try
