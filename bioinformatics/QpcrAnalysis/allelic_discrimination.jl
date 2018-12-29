@@ -1,64 +1,31 @@
-# allelic discrimination (ad)
+# allelic_discrimination.jl
 
-# 4 groups
-const DEFAULT_encgr = Array{Int,2}(0, 0)
-# const DEFAULT_encgr = [0 1 0 1; 0 0 1 1] # NTC, homo ch1, homo ch2, hetero
-const DEFAULT_init_FACTORS = [1, 1, 1, 1] # sometimes "hetero" may not have very high end-point fluo
-const DEFAULT_apg_LABELS = ["ntc", "homo_1", "homo_2", "hetero", "unclassified"] # [0 1 0 1; 0 0 1 1]
-# const DEFAULT_apg_LABELS = ["hetero", "homo_2", "homo_1", "ntc", "unclassified"] # [1 0 1 0; 1 1 0 0]
+import DataStructures.OrderedDict
+import Clustering: ClusteringResult, kmeans!, kmedoids!, silhouettes
+import Combinatorics.combinations
 
-# # 3 groups without NTC
-# const DEFAULT_egr = [1 0 1; 0 1 1] # homo ch1, homo ch2, hetero
-# const DEFAULT_init_FACTORS = [1, 1, 1] # sometimes "hetero" may not have very high end-point fluo
-# const DEFAULT_eg_LABELS = ["homo_a", "homo_b", "hetero", "unclassified"]
-
-const CATEG_WELL_VEC = [
-    ("rbbs_ary3", Colon()),
-    ("blsub_fluos", Colon()),
-    ("d0", Colon()),
-    ("cq", Colon())
-]
-
-# const CTRL_WELL_VEC = fill(Vector{Int}(), length(DEFAULT_init_FACTORS)) # All empty. NTC, homo ch1, homo ch2, hetero
-const CTRL_WELL_DICT = OrderedDict{Vector{Int},Vector{Int}}() # key is genotype (Vector{Int}), value is well numbers (Vector{Int})
-# # example
-# const CTRL_WELL_DICT = OrderedDict(
-#     [0, 0] => [1, 2], # NTC, well 1 and 2
-#     [1, 0] => [3, 4], # homo ch1, well 3 and 4
-#     [0, 1] => [5, 6], # homo ch2, well 5 and 6
-#     [1, 1] => [7, 8] # hetero, well 7 and 8
-# )
-# # old approach
-# const CTRL_WELL_DICT = DefaultOrderedDict(Vector{Int}, Vector{Int}, Vector{Int}())
 
 # nrn: whether to flip the binary genotype or not
 NRN_SELF = x -> x
 NRN_NOT = x -> 1 .- x
-
-# # may be needed if not always called by `process_amp_1sr`
-# type AllelicDiscriminationResult #
-#     cluster_result::ClusteringResult
-#     # assignments_adj::Vector{Int}
-#     assignments_adj_labels::Vector{String}
-# end # type
 
 
 # start with bottom-level function, goes step-wise
 
 
 function prep_input_4ad(
-    full_amp_out::AmpStepRampOutput, # one step/ramp of amplification output
-    categ::String="fluo",
-    well_idc::Union{AbstractVector,Colon}=Colon(),
-    cycs::Union{Integer,AbstractVector}=1 # relevant if `categ == "fluo"`, last available cycle
-    )
+    full_amp_out ::AmpStepRampOutput, # one step/ramp of amplification output
+    categ ::String="fluo",
+    well_idc ::Union{AbstractVector,Colon}=Colon(),
+    cycs ::Union{Integer,AbstractVector}=1 # relevant if `categ == "fluo"`, last available cycle
+)
 
     num_cycs, num_wells, num_channels = size(full_amp_out.fr_ary3)
 
     nrn = NRN_SELF
 
     if categ in ["rbbs_ary3", "blsub_fluos"]
-        fluos = getfield(full_amp_out, parse(categ))
+        fluos = getfield(full_amp_out, Symbol(categ))
         if cycs == 0
             cycs = num_cycs
         end # if cycs == 0
@@ -87,11 +54,11 @@ end # prep_data_4ad
 
 
 function do_cluster_analysis(
-    raw_data::AbstractMatrix,
-    init_centers::AbstractMatrix,
-    cluster_method::String="k-means-medoids",
-    norm_l::Real=2
-    )
+    raw_data ::AbstractMatrix,
+    init_centers ::AbstractMatrix,
+    cluster_method ::String="k-means-medoids",
+    norm_l ::Real=2
+)
 
     num_wells = size(raw_data)[2]
 
@@ -213,18 +180,24 @@ end # do_cluster_analysis
 # 1. check whether expected genotypes are specified, if yes use them, if not start with all possible genotypes determined by number of channels
 # 2.
 function assign_genos(
-    data::AbstractMatrix,
-    nrn::Function,
-    ntc_bool_vec::Vector{Bool},
-    expected_ncg_raw::AbstractMatrix=DEFAULT_encgr,
-    ctrl_well_dict::OrderedDict=CTRL_WELL_DICT,
-    cluster_method::String="k-means-medoids",
-    norm_l::Real=2,
+    data ::AbstractMatrix,
+    nrn ::Function,
+    ntc_bool_vec ::Vector{Bool},
+    expected_ncg_raw ::AbstractMatrix =DEFAULT_encgr,
+    ctrl_well_dict ::OrderedDict =CTRL_WELL_DICT,
+    cluster_method ::String ="k-means-medoids",
+    norm_l ::Real =2,
+
     # below not specified by `process_ad` as of right now
-    init_factors::AbstractVector=DEFAULT_init_FACTORS, # for `init_centers`
-    slht_lb::Real=0; # lower limit of silhouette
-    apg_labels::AbstractVector=DEFAULT_apg_LABELS # apg = all possible genotypes. Julia v0.6.0 on 2017-06-25: `apg_labels::Vector{AbstractString}=DEFAULT_eg_LABELS` resulted in "ERROR: MethodError: no method matching #assign_genos#301(::Array{AbstractString,1}, ::QpcrAnalysis.#assign_genos, ::Array{Float64,2}, ::Array{Float64,2}, ::Float64)"
-    )
+    init_factors ::AbstractVector =DEFAULT_init_FACTORS, # for `init_centers`
+    slht_lb ::Real =0; # lower limit of silhouette
+    apg_labels ::AbstractVector =DEFAULT_apg_LABELS
+
+    # apg = all possible genotypes.
+    # Julia v0.6.0 on 2017-06-25:
+    # `apg_labels ::Vector{AbstractString} =DEFAULT_eg_LABELS` resulted in
+    # "ERROR: MethodError: no method matching #assign_genos#301( ::Array{AbstractString,1}, ::QpcrAnalysis.#assign_genos, ::Array{Float64,2}, ::Array{Float64,2}, ::Float64)"
+)
 
     num_channels, num_wells = size(data)
 
@@ -250,15 +223,15 @@ function assign_genos(
     non_ntc_geno_idc = geno_idc_all[geno_idc_all .!= ntc_geno_idx]
     non_ntc_geno_combin = expected_genos_all[:, non_ntc_geno_idc]
 
-    unclassfied_assignment = max_num_genos + 1
-    if length(apg_labels) != unclassfied_assignment
+    unclassified_assignment = max_num_genos + 1
+    if length(apg_labels) != unclassified_assignment
         error("The number of labels does not equal the number of all possible genotypes.")
     end
 
     if any(map(i -> length(unique(data[i, :])) == 1, 1:num_channels)) # for any channel, all the data points are the same (would result in "AssertionError: !(isempty(grp))" for `kmedoids`)
 
         car = do_cluster_analysis(data .+ rand(size(data)...), rand(num_channels, 2), cluster_method, norm_l)
-        car.cluster_result.assignments = fill(unclassfied_assignment, num_wells)
+        car.cluster_result.assignments = fill(unclassified_assignment, num_wells)
 
         cluster_result = car.cluster_result
         best_i = 1
@@ -486,7 +459,7 @@ function assign_genos(
             #     end # for i
             #     for ctrl_well_num in ctrl_well_dict[ctrl_geno]
             #         if assignments_agp_idc[ctrl_well_num] != expected_ctrl_assignment
-            #             assignments_agp_idc .= unclassfied_assignment # Because assignments of different clusters depend on one another, if control well(s) is/are assigned incorrectly, the other wells may be assigned incorrectly as well.
+            #             assignments_agp_idc .= unclassified_assignment # Because assignments of different clusters depend on one another, if control well(s) is/are assigned incorrectly, the other wells may be assigned incorrectly as well.
             #         end # if
             #     end # for ctrl_well_num
             # end # for ctrl_geno
@@ -502,10 +475,10 @@ function assign_genos(
 
 
         if all_unclassified
-            assignments_adj = fill(unclassfied_assignment, num_wells)
+            assignments_adj = fill(unclassified_assignment, num_wells)
         else # assign as unclassified the wells where silhouette is below the lower bound `slht_lb`, i.e. unclear which geno should be assigned
             assignments_adj = map(1:length(assignments_agp_idc)) do i
-                slhts[i] < slht_lb ? unclassfied_assignment: assignments_agp_idc[i]
+                slhts[i] < slht_lb ? unclassified_assignment: assignments_agp_idc[i]
             end # do i # previously `assignments_agp_idc .* (relative_diff_closest_dists .> slht_lb)`
         end # if all_unclassified
 
@@ -517,6 +490,7 @@ function assign_genos(
     return (assignments_adj_labels, AssignGenosResult(
         # best
         cluster_result,
+        
         best_i,
         best_geno_combins,
         # all
@@ -528,14 +502,14 @@ end # assign_genos
 
 
 function process_ad(
-    full_amp_out::AmpStepRampOutput,
-    cycs::Union{Integer,AbstractVector}, # relevant if `categ == "fluo"`, last available cycle
-    ctrl_well_dict::OrderedDict,
-    cluster_method::String, # for `assign_genos`
-    norm_l::Real, # for `assign_genos`
-    expected_ncg_raw::AbstractMatrix=DEFAULT_encgr, # each column is a vector of binary geno whose length is number of channels (0 => no signal, 1 => yes signal)
-    categ_well_vec::AbstractVector=CATEG_WELL_VEC,
-    )
+    full_amp_out ::AmpStepRampOutput,
+    cycs ::Union{Integer,AbstractVector}, # relevant if `categ == "fluo"`, last available cycle
+    ctrl_well_dict ::OrderedDict,
+    cluster_method ::String, # for `assign_genos`
+    norm_l ::Real, # for `assign_genos`
+    expected_ncg_raw ::AbstractMatrix=DEFAULT_encgr, # each column is a vector of binary geno whose length is number of channels (0 => no signal, 1 => yes signal)
+    categ_well_vec ::AbstractVector=CATEG_WELL_VEC,
+)
 
     # output
     # OrderedDict(

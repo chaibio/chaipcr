@@ -1,11 +1,10 @@
-
 # different formula for each cycle (dfc)
 
 # write functions to fit MAKx (MAK2 and MAK3) model here, which will be called in `mod_bl_q` in "amp.jl"
 
-
-const MAK_d0_START = 0 # 0 good, 1 bad
-const k_START = 10 # used: 10 better, 2 good, 1e-10 bad, 1 bad
+import DataStructures.OrderedDict;
+import JuMP: Model, @variable, @constraint, @NLconstraint, @NLobjective,
+    solve, getvalue, getobjectivevalue
 
 
 function pred_from_d_nm1(::Union{MAK2, MAK3}, d_nm1::Real, k::Real)

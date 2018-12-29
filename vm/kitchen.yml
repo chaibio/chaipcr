@@ -1,0 +1,58 @@
+---
+# kitchen.yml
+# configure test kitchen for cookbook vm
+# see   https://docs.chef.io/config_yml_kitchen.html
+
+# vagrant driver
+# see https://docs.chef.io/plugin_kitchen_vagrant.html
+driver:
+  name: vagrant
+  box: ubuntu/xenial64
+  vm_hostname: vm-chaipcr
+  boot_timeout: 1200
+  gui: false
+  network: 
+    - [ "forwarded_port", { guest: 3000, host: 3000 } ]
+  synced_folders: 
+    - [ ".", "/vagrant" ]
+
+provisioner:
+  name: chef_zero
+  product_name: chef
+  product_version: 14.7
+  always_update_cookbooks: false
+
+verifier:
+  name: inspec
+
+transport:
+  name: ssh
+  elevated: true
+  username: chaibio
+  password:
+
+platforms:
+  - name: ubuntu-16.04
+    driver:
+      customize:
+        memory: 2048
+
+# example with master and development VMs
+# based on different branches of the chaipcr git
+suites:
+  - name: master
+    provisioner:
+      policyfile: policyfile_vm_master.rb
+    run_list:
+    verifier:
+      inspec_tests: 
+        - test/integration/master
+    attributes:
+  - name: development
+    provisioner:
+      policyfile: policyfile_vm_development.rb
+    run_list:
+    verifier:
+      inspec_tests: 
+        - test/integration/master
+    attributes:

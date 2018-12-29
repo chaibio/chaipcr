@@ -1,44 +1,45 @@
-
-#constants
-const deltaTSetPoint = 1
-const highTemperature = 95
-const lowTemperature = 50
-# xqrm
-const HIGH_TEMP_mDELTA = highTemperature - deltaTSetPoint
-const LOW_TEMP_pDELTA = lowTemperature + deltaTSetPoint
-const MIN_AVG_RAMP_RATE = 2 # C/s
-const MAX_TOTAL_TIME = 22.5e3 # ms
-const MAX_BLOCK_DELTA = 2 # C
-const MIN_HEATING_RATE = 1 # C/s
-const MAX_TIME_TO_HEAT = 90e3 # ms
+# thermal_performance_diagnostic.jl
 
 
-function analyze_func(
+function act(
     ::ThermalPerformanceDiagnostic,
-    db_conn::MySQL.MySQLHandle,
-    exp_id::Integer, # really used
-    calib_info::Union{Integer,OrderedDict} # not used for computation
-    )
 
-    #extract data from database
-    queryTemperatureData = "SELECT * FROM temperature_logs WHERE experiment_id = $exp_id order by elapsed_time"
-    temperatureData = MySQL.mysql_execute(db_conn, queryTemperatureData)[1]
-    num_dp = length(temperatureData[1]) # dp = data points
+    # remove MySql dependency               
+    #
+    # db_conn ::MySQL.MySQLHandle,
+    # exp_id ::Integer, # really used
+    # calib_info ::Union{Integer,OrderedDict} # not used for computation
 
-    #add a new column (not row) that is the average of the two heat block zones
+    # new >>
+    temperatureData ::Associative;
+    out_format ::String ="pre_json",
+    verbose ::Bool =false
+    # << new
+)
+    # remove MySql dependency
+    #
+    # queryTemperatureData = "SELECT * FROM temperature_logs WHERE experiment_id = $exp_id ORDER BY elapsed_time"
+    # temperatureData = MySQL.mysql_execute(db_conn, queryTemperatureData)[1]       
+    # num_dp = length(temperatureData[1]) # dp = data points
+
+    # new >>
+    num_dp = length(temperatureData["elapsed_time"])
+    # << new
+
+    # add a new column (not row) that is the average of the two heat block zones
     hbzt_avg = map(1:num_dp) do i
-        mean(map(name -> temperatureData[name][i], [:heat_block_zone_1_temp, :heat_block_zone_2_temp]))
+        mean(map(name -> temperatureData[name][i], ["heat_block_zone_1_temp", "heat_block_zone_2_temp"]))
     end # do i
 
-    elapsed_times = temperatureData[:elapsed_time]
+    elapsed_times = temperatureData["elapsed_time"]
 
-    #calculate average ramp rates up and down of the heat block
+    # calculate average ramp rates up and down of the heat block
 
-    #first, calculate the time the heat block reaches the high temperature/also the time the ramp up ends and the ramp down starts
+    # first, calculate the time the heat block reaches the high temperature/also the time the ramp up ends and the ramp down starts
     elapsed_times_high_temp = elapsed_times[hbzt_avg .> HIGH_TEMP_mDELTA]
     apprxRampUpEndTime, apprxRampDownStartTime = extrema(elapsed_times_high_temp)
 
-    #second, calculate the time the ramp up starts and the ramp down ends
+    # second, calculate the time the ramp up starts and the ramp down ends
     elapsed_times_low_temp = elapsed_times[hbzt_avg .< LOW_TEMP_pDELTA]
     apprxRampDownEndTime, apprxRampUpStartTime = extrema(elapsed_times_low_temp)
 
@@ -57,13 +58,13 @@ function analyze_func(
 
     temp_range_adj = (HIGH_TEMP_mDELTA - LOW_TEMP_pDELTA) * 1000
 
-    #calculate the average ramp rate up and down in degrees C per second
+    # calculate the average ramp rate up and down in degrees C per second
     Heating_TotalTime = apprxRampUpEndTime - apprxRampUpStartTime
     Heating_AvgRampRate = temp_range_adj / Heating_TotalTime
     Cooling_TotalTime = apprxRampDownEndTime - apprxRampDownStartTime
     Cooling_AvgRampRate = temp_range_adj / Cooling_TotalTime
 
-    #calculate maximum temperature difference between heat block zones during ramp up and down
+    # calculate maximum temperature difference between heat block zones during ramp up and down
     Heating_MaxBlockDeltaT, Cooling_MaxBlockDeltaT = map((
         [apprxRampUpStartTime, apprxRampUpEndTime],
         [apprxRampDownStartTime, apprxRampDownEndTime]
@@ -71,17 +72,18 @@ function analyze_func(
         elapsed_time_idc = find(elapsed_times) do elapsed_time
             time_vec[1] < elapsed_time < time_vec[2]
         end # do elapsed_time
-        maximum(abs.(temperatureData[:heat_block_zone_1_temp][elapsed_time_idc] .- temperatureData[:heat_block_zone_2_temp][elapsed_time_idc]))
+        maximum(abs.(temperatureData["heat_block_zone_1_temp"][elapsed_time_idc] .-
+            temperatureData["heat_block_zone_2_temp"][elapsed_time_idc]))
     end # do time_vec
 
-    #calculate the average ramp rate of the lid heater in degrees C per second
+    # calculate the average ramp rate of the lid heater in degrees C per second
     lidHeaterStartRampTime = minimum(elapsed_times[
-        find(temperatureData[:lid_temp]) do lid_temp
+        find(temperatureData["lid_temp"]) do lid_temp
             lid_temp > LOW_TEMP_pDELTA
         end
     ])
     lidHeaterStopRampTime = maximum(elapsed_times[
-        find(temperatureData[:lid_temp]) do lid_temp
+        find(temperatureData["lid_temp"]) do lid_temp
             lid_temp < HIGH_TEMP_mDELTA
         end
     ])
@@ -106,6 +108,10 @@ function analyze_func(
         )
     )
 
-    return(json(results))
+    if (out_format=="json")
+        return JSON.json(results)
+    else
+        return results
+    end
 
 end # analyze_thermal_performance_diagnostic

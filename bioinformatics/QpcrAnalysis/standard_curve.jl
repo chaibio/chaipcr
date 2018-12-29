@@ -1,38 +1,27 @@
+# standard_curve.jl
 
+import JSON
+import DataFrames.DataFrame
 
 # if isnull(sample) well not considered
 # what if isnull(cq)
 
-immutable TargetResultEle
-    target_id::Int
-    slope::Float64
-    offset::Float64
-    efficiency::Float64
-    r2::Float64
-end
-const EMPTY_TRE = TargetResultEle(0, fill(NaN, 4)...)
 
-immutable GroupResultEle
-    well::Vector{Int}
-    target_id::Int
-    cq_mean::Float64
-    cq_sd::Float64
-    qty_mean::Float64
-    qty_sd::Float64
-end
-const EMPTY_GRE = GroupResultEle([], 0, fill(NaN, 4)...)
-
-
+# called by QpcrAnalyze.dispatch
+# formerly called function standard_curve
 # `/slope` for log (DNA copy#) is on the x-axis and Cq on the y-axis, otherwise `*slope`
-function standard_curve(
-    req_vec::Vector{Any};
-    out_format::String="json",
-    json_digits::Integer=JSON_DIGITS,
-    qty_base::Real=10,
-    empty_tre::TargetResultEle=EMPTY_TRE,
-    empty_gre::GroupResultEle=EMPTY_GRE,
-    )
+function act(
+    ::StandardCurve,
 
+    req_vec ::Vector{Any};
+
+    out_format ::String ="pre_json",
+    verbose ::Bool =false,
+    json_digits ::Integer =JSON_DIGITS,
+    qty_base ::Real =10,
+    empty_tre ::TargetResultEle =EMPTY_TRE,
+    empty_gre ::GroupResultEle  =EMPTY_GRE
+)
     # df1.colindex.names
 
     req_df = reqvec2df(req_vec)
@@ -40,7 +29,8 @@ function standard_curve(
     if size(req_df)[2] == 0 || any(map([:target, :cq, :qty]) do symbl
         all(isnan.(req_df[symbl]))
     end)
-        return json(OrderedDict("target"=>nothing, "group"=>nothing))
+        result = OrderedDict("target" => nothing, "group" => nothing)
+        return format_output(result)
     end
 
     target_result_df = by(req_df, :target) do chunk_target
@@ -101,8 +91,8 @@ function standard_curve(
         for tre in tre_vec
             if isnan(tre.slope) && isnan(tre.offset)
                 target_result = OrderedDict(
-                    "target_id"=>getfield(tre, :target_id),
-                    "error"=>"less 2 valid data points of cq and/or qty available for fitting standard curve"
+                    "target_id" => getfield(tre, :target_id),
+                    "error" => "less 2 valid data points of cq and/or qty available for fitting standard curve"
                 )
             else
                 target_result = tre
@@ -134,26 +124,26 @@ function standard_curve(
                             ),
                             "quantity" => OrderedDict(
                                 "mean" => OrderedDict(
-                                    "m"=>qty_mean_m,
-                                    "b"=>qty_mean_b
+                                    "m" => qty_mean_m,
+                                    "b" => qty_mean_b
                                 ),
                                 "standard_deviation" => OrderedDict(
-                                    "m"=>qty_sd_m,
-                                    "b"=>qty_sd_b
+                                    "m" => qty_sd_m,
+                                    "b" => qty_sd_b
                                 )
                             )
                         ))
                     end # if target_id
                 end # do gre_i
             push!(grp_vec, OrderedDict(
-                "wells"=>well_combin,
-                "targets"=>grp_target_vec
+                "wells" => well_combin,
+                "targets" => grp_target_vec
             ))
             end # if
         end # do well_combin
 
-        jp_dict = OrderedDict("targets"=>target_vec, "groups"=>grp_vec)
-        return out_format == "json" ? json(jp_dict) : jp_dict
+        jp_dict = OrderedDict("targets" => target_vec, "groups" => grp_vec)
+        return out_format == "json" ? JSON.json(jp_dict) : jp_dict
     end # if
 
 end # standard_curve
@@ -165,7 +155,7 @@ end # standard_curve
 
 
 # transform a real number to scientific notation
-function scinot(x::Real, num_sig_digits::Integer=3; log_base::Integer=10)
+function scinot(x ::Real, num_sig_digits ::Integer=3; log_base ::Integer=10)
     if isnan(x)
         return (NaN, NaN)
     elseif x == 0
@@ -184,7 +174,7 @@ end
 
 
 # parse req_vec into a dataframe
-function reqvec2df(req_vec::AbstractVector)
+function reqvec2df(req_vec ::AbstractVector)
 
     if length(req_vec) == 0
         return DataFrame()
@@ -221,7 +211,7 @@ function reqvec2df(req_vec::AbstractVector)
                 target = nothing2NaN(measrmt_dict["target"])
                 cq = nothing2NaN(measrmt_dict["cq"])
                 qty_dict = measrmt_dict["quantity"]
-                qty = nothing2NaN(qty_dict["m"]) * 10 ^ nothing2NaN(qty_dict["b"])
+                qty = nothing2NaN(qty_dict["m"]) * 10.0 ^ nothing2NaN(qty_dict["b"])
             end # if
             push!(well_vec, well_i)
             push!(channel_vec, channel_i)
@@ -440,6 +430,84 @@ function generate_req_sc(;
     return (json(req_vec), req_vec)
 
 end # generate_req_sc
+
+
+
+
+# experimental code >>
+
+function simplify(x ::Number, out_format ::String)
+println("Number $x format $out_format")
+    x
+end
+
+function simplify(tup ::Tuple, out_format ::String)
+println("Tuple $tup format $out_format")
+    if out_format=="full"
+        tup
+    else
+        Tuple([
+            simplify(tup[i],out_format) for i in range(1,length(tup))
+        ])
+    end
+end
+
+function simplify(vec ::Vector, out_format ::String)
+println("Vector $vec format $out_format")
+    if out_format=="full"
+        vec
+    else
+        Vector([
+            simplify(vec[i],out_format) for i in range(1,length(vec))
+        ])
+    end
+end
+
+function simplify(dict ::Associative, out_format ::String)
+println("Dict $dict format $out_format")
+    if out_format=="full"
+        dict
+    else
+        x = OrderedDict()
+        for i in keys(dict)
+            x[i] = simplify(dict[i],out_format)
+        end
+        x
+    end
+end
+
+function simplify(df ::DataFrame, out_format ::String)
+println("DataFrame $df format $out_format")
+    if out_format=="full"
+        df
+    else
+        x = OrderedDict()
+        for i in names(df)
+            x[i] = simplify(df[i],out_format)
+        end
+        x
+    end
+end
+
+function simplify(r ::Result, out_format ::String)
+println("Result $r format $out_format")
+    if out_format=="full"
+        r
+    else
+        x = OrderedDict()
+        if (haskey(x,:well) && length(x[:well])==0)         ||  # empty gre
+            (haskey(x,:target_id) && isnan(x[:target_id]))      # empty tre
+            return x
+        end
+        for i in fieldnames(r)
+            x[i] = simplify(getfield(r,i),out_format)
+        end
+        x
+    end
+end
+
+# << experimental code
+
 
 
 # notes

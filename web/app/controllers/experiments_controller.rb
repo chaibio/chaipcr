@@ -1171,7 +1171,7 @@ class ExperimentsController < ApplicationController
       wells = []
     end
     body = wells.map {|well| (well)? well.as_json_standard_curve : {}}
-    logger.info("body=#{body}")
+    logger.info("body=#{body.to_json}")
     
     if body.blank?
       return nil
@@ -1239,9 +1239,11 @@ class ExperimentsController < ApplicationController
 #    connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
     begin
-      body = {calibration_info: calibrate_hash(calibration_id), experiment_id: experiment.id}
-      body = body.merge(experiment.experiment_definition.amplification_option.to_hash) if !experiment.experiment_definition.amplification_option.nil?
-      logger.info("body=#{body}")
+      body = {calibration_info: calibrate_hash(calibration_id), experiment_id: experiment.id, raw_data: FluorescenceDatum.julia_hash(experiment.id, sub_type, sub_id)}
+      amplification_option = (experiment.experiment_definition.amplification_option.nil?)? AmplificationOption.new : experiment.experiment_definition.amplification_option
+      body = body.merge(amplification_option.to_hash)
+      body = body.merge("#{sub_type}_id"=>sub_id)
+      logger.info("body=#{body.to_json}")
       response = HTTParty.post("http://127.0.0.1:8081/experiments/#{experiment.id}/amplification", body: body.to_json, timeout: 180)
       if response.code != 200
         raise_julia_error(response)
@@ -1343,9 +1345,9 @@ class ExperimentsController < ApplicationController
 #    connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
     begin
-      body = {calibration_info: calibrate_hash(calibration_id), experiment_id: experiment.id, stage_id: stage_id}
+      body = {calibration_info: calibrate_hash(calibration_id), experiment_id: experiment.id, stage_id: stage_id, raw_data: MeltCurveDatum.julia_hash(experiment.id, stage_id)}
       body = body.merge({qt_prob: 0.1, max_normd_qtv:0.9}) if experiment.experiment_definition.guid == "thermal_consistency"
-      #logger.info("body=#{body}")
+      logger.info("body=#{body.to_json}")
       response = HTTParty.post("http://127.0.0.1:8081/experiments/#{experiment.id}/meltcurve", body: body.to_json)
       if response.code != 200
         raise_julia_error(response)
@@ -1393,14 +1395,49 @@ class ExperimentsController < ApplicationController
     return melt_curve_data
   end
 
+  def optical_cal(experiment)
+    {calibration_info: calibrate_hash(experiment.id)}
+  end
+  
+  def thermal_performance_diagnostic(experiment)
+    TemperatureLog.julia_hash(experiment.id)
+  end
+  
+  def thermal_consistency(experiment)
+    {calibration_info: calibrate_hash(experiment.calibration_id), raw_data: MeltCurveDatum.julia_hash(experiment.id, 4)}
+  end
+  
+  def optical_test_single_channel(experiment)
+    fluorescence_values = FluorescenceDatum.fluorescence_for_steps(experiment.id, [12, 13])
+    #??? fluorescence_values check nil
+    {baseline: {fluorescence_value: fluorescence_values[0][0]}, excitation:{fluorescence_value: fluorescence_values[1][0]}}
+  end
+  
+  def optical_test_dual_channel(experiment)
+    fluorescence_values = FluorescenceDatum.fluorescence_for_steps(experiment.id, [14, 15, 17, 19])
+    {baseline: {fluorescence_value: fluorescence_values[0]},
+     water: {fluorescence_value: fluorescence_values[1]},
+     FAM: {fluorescence_value: fluorescence_values[2]},
+     HEX: {fluorescence_value: fluorescence_values[3]}}
+  end
+  
   def background_analyze_data(experiment)
     background("analyze", experiment.id) do
 #      config   = Rails.configuration.database_configuration
 #      connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
       begin
-        body = {calibration_info: calibrate_hash(experiment.calibration_id), experiment_info: experiment.as_json}
-        #logger.info("body=#{body}")
-        response = HTTParty.post("http://127.0.0.1:8081/experiments/#{experiment.id}/analyze", body: body.to_json)
+        if experiment.experiment_definition.guid == "optical_cal" || experiment.experiment_definition.guid == "dual_channel_optical_cal_v2"
+          body = optical_cal(experiment)
+          logger.info("body=#{body.to_json}")
+          response = HTTParty.post("http://127.0.0.1:8081/experiments/#{experiment.id}/optical_cal", body: body.to_json)
+        elsif self.class.method_defined?(experiment.experiment_definition.guid)
+          body = send(experiment.experiment_definition.guid, experiment)
+          logger.info("body=#{body.to_json}")
+          response = HTTParty.post("http://127.0.0.1:8081/experiments/#{experiment.id}/#{experiment.experiment_definition.guid}", body: body.to_json)
+        else
+          raise "**#{experiment.experiment_definition.guid}** not implemented"
+        end
+      
         if response.code != 200
           raise_julia_error(response)
         else
@@ -1457,33 +1494,44 @@ class ExperimentsController < ApplicationController
   end
 
   def calibrate_hash(calibration_id)
-    protocol = Protocol.includes(:stages).where("protocols.experiment_definition_id=(SELECT experiment_definition_id from experiments where experiments.id=#{calibration_id} LIMIT 1)").references(:stages).first
-    if protocol && protocol.stages[0]
-      water_index = protocol.stages[0].steps.find_index{|item| item.name == "Water"}
-      step_water = (!water_index.nil?)? protocol.stages[0].steps[water_index].id : nil
+    if calibration_id == 1
       if Device.dual_channel?
-        if calibration_id == 1
-          channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "Signal"}
-          channel_2_index = channel_1_index
-        else
+        result = {:water=>{:fluorescence_value=>FluorescenceDatum::FAKE_CALIBRATION_DUAL_CHANNEL_WATER},
+                  :channel_1=>{:fluorescence_value=>FluorescenceDatum::FAKE_CALIBRATION_DUAL_CHANNEL_FAM},
+                  :channel_2=>{:fluorescence_value=>FluorescenceDatum::FAKE_CALIBRATION_DUAL_CHANNEL_HEX}}
+      else
+        result = {:water=>{:fluorescence_value=>FluorescenceDatum::FAKE_CALIBRATION_SINGLE_CHANNEL_WATER},
+                  :channel_1=>{:fluorescence_value=>FluorescenceDatum::FAKE_CALIBRATION_SINGLE_CHANNEL_SIGNAL}}
+      end
+    else
+      protocol = Protocol.includes(:stages).where("protocols.experiment_definition_id=(SELECT experiment_definition_id from experiments where experiments.id=#{calibration_id} LIMIT 1)").references(:stages).first
+      if protocol && protocol.stages[0]
+        water_index = protocol.stages[0].steps.find_index{|item| item.name == "Water"}
+        step_water = (!water_index.nil?)? protocol.stages[0].steps[water_index].id : nil
+        if Device.dual_channel?
           channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "FAM"}
           channel_2_index = protocol.stages[0].steps.find_index{|item| item.name == "HEX"}
           baseline_index = protocol.stages[0].steps.find_index{|item| item.name == "Baseline"}
+        else
+          channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "Signal"}
+          channel_2_index = nil
         end
-      else
-        channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "Signal"}
-        channel_2_index = nil
+        step_channel_1 = (!channel_1_index.nil?)? protocol.stages[0].steps[channel_1_index].id : nil
+        step_channel_2 = (!channel_2_index.nil?)? protocol.stages[0].steps[channel_2_index].id : nil
+        step_baseline = (!baseline_index.nil?)? protocol.stages[0].steps[baseline_index].id : nil
+
+        logger.info ("************calibration_id=#{calibration_id} channel_1=#{step_channel_1}, channel_2=#{step_channel_2}, baseline=#{step_baseline}")
+        fluorescence_values = FluorescenceDatum.fluorescence_for_steps(calibration_id, [step_water, step_channel_1, step_channel_2, step_baseline])
+
+        result = {:water=>{:fluorescence_value=>fluorescence_values[0]},
+                  :channel_1=>{:fluorescence_value=>fluorescence_values[1]}}
+        result.merge!(:channel_2=>{:fluorescence_value=>fluorescence_values[2]}) if !fluorescence_values[2].nil?
+        result.merge!(:baseline=>{:fluorescence_value=>fluorescence_values[3]}) if !fluorescence_values[3].nil?
       end
-      step_channel_1 = (!channel_1_index.nil?)? protocol.stages[0].steps[channel_1_index].id : nil
-      step_channel_2 = (!channel_2_index.nil?)? protocol.stages[0].steps[channel_2_index].id : nil
-      step_baseline = (!baseline_index.nil?)? protocol.stages[0].steps[baseline_index].id : nil
-      result = {:water=>{:calibration_id=>calibration_id, :step_id=>step_water}, :channel_1=>{:calibration_id=>calibration_id, :step_id=>step_channel_1}}
-      result.merge!(:channel_2=>{:calibration_id=>calibration_id, :step_id=>step_channel_2}) if step_channel_2
-      result.merge!(:baseline=>{:calibration_id=>calibration_id, :step_id=>step_baseline}) if step_baseline
     end
     result
   end
-
+  
   def background(action, experiment_id, &block)
     if @@background_last_task && @@background_last_task.match?(action, experiment_id)
       error = @@background_last_task.complete_result

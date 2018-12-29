@@ -1,40 +1,68 @@
-# chaipcr/web/public/dynexp/optical_cal/analyze.R
+# optical_cal.jl
+#
 # use `prep_adj_w2wvaf` to check validity of calibration data for adjusting well-to-well variation in absolute fluo
 
-# check JSON output in UI: http://:ip_address/experiments/:exp_id/analyze
+import DataStructures.OrderedDict
+import JSON
 
-function analyze_func(
+
+# called by QpcrAnalyze.dispatch
+function act(
     ::OpticalCal,
-    db_conn::MySQL.MySQLHandle,
-    exp_id::Integer, # not used for computation
-    calib_info::Union{Integer,OrderedDict}; # really used
-    well_nums::AbstractVector=[],
-    dye_in::String="FAM", dyes_2bfild::Vector=[],
-    out_json=true,
-    verbose=false
-    )
+    calib_info ::Associative;
 
-    calib_info_ori = calib_info
-    calib_info_dict = ensure_ci(db_conn, calib_info_ori)
-    print_v(
-        println, verbose,
-        "original: ", calib_info_ori,
-        "dict: ", calib_info_dict
-    )
+    # new >>
+    well_nums ::AbstractVector =[],
+    out_format ::String ="pre_json",
+    verbose ::Bool =false,
+    # << new
 
-    result = OrderedDict("valid"=>true)
+    ## remove MySql dependency  
+    #
+    # db_conn::MySQL.MySQLHandle,
+    # exp_id::Integer, # not used for computation
+    # calib_info::Union{Integer,OrderedDict}; # really used
+
+    dye_in ::String ="FAM", 
+    dyes_2bfild ::Vector =[]
+)
+
+    ## remove MySql dependency
+    #
+    # calib_info_ori = calib_info
+    # calib_info_dict = ensure_ci(db_conn, calib_info_ori)
+
+    # print_v(
+    #     println, verbose,
+    #     "original: ", calib_info_ori,
+    #     "dict: ", calib_info_dict
+    # )
+
+    # new >>
+    calib_info_dict = calib_info["calibration_info"]
+    # << new
+
+    result = OrderedDict("valid" => true)
     err_msg_vec = Vector{String}()
-
 
     # get_k
 
-    if length(calib_info_dict) >= 3 # 2 or more channels
+    # if there are 2 or more channels then
+    # the deconvoltion matrix K is calculate
+    # otherwise deconvolution is not performed
+    if length(calib_info_dict) >= 3
 
         result_k = try
-            get_k(db_conn, calib_info_dict, well_nums)
+
+        ## remove MySql dependency
+        #
+        #    get_k(db_conn, calib_info_dict, well_nums)
+
+            get_k(calib_info_dict, well_nums)
+            
         catch err
             err
-        end # try
+        end
 
         if isa(result_k, Exception)
             err_msg = isa(result_k, ErrorException) ? result_k.msg : "$(string(result_k)). "
@@ -48,13 +76,18 @@ function analyze_func(
 
     end # if length
 
-
     # prep_adj_w2wvaf
 
     result_aw = try
-        prep_adj_w2wvaf(
-        db_conn, calib_info_dict, well_nums, dye_in, dyes_2bfild
-    )
+
+        ## remove MySql dependency
+        #
+        # prep_adj_w2wvaf(db_conn, calib_info_dict, well_nums, dye_in, dyes_2bfild)
+
+        # new >>
+        prep_adj_w2wvaf(calib_info_dict, well_nums, dye_in, dyes_2bfild)
+        # << new
+        
     catch err
         err
     end
@@ -72,8 +105,8 @@ function analyze_func(
         )
     end
 
-    if out_json
-        result = json(result) # become a string
+    if (out_format=="json")
+        result = JSON.json(result) # become a string
     end
 
     return result
