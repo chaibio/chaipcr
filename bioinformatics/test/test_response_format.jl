@@ -238,6 +238,7 @@ end
 
 function error_amplification_response_test()
     response=JSON.parse("""{
+        "valid": false,
         "error": "xxxx"
     }"""; dicttype=OrderedDict)
     verify_response(
@@ -321,6 +322,7 @@ end
 
 function error_meltcurve_response_test()
     response=JSON.parse("""{
+        "valid": false,
         "error": "xxxx"
     }"""; dicttype=OrderedDict)
     verify_response(
@@ -353,6 +355,7 @@ end
 
 function error_loadscript_response_test()
     response=JSON.parse("""{
+        "valid": false,
         "error": "xxxx"
     }"""; dicttype=OrderedDict)
     verify_response(
@@ -386,7 +389,8 @@ function thermal_performance_diagnostic_response_test()
         "Lid": {
             "HeatingRate": [1.3031,true],
             "TotalTime": [32999,false]
-        }
+        },
+        "valid": true
     }"""; dicttype=OrderedDict)
     verify_response(
         Action_DICT["thermal_performance_diagnostic"](),
@@ -472,7 +476,8 @@ function thermal_consistency_response_test()
                 "area": 1318.3026
             }
         ],
-        "delta_Tm": [1.7434,true]
+        "delta_Tm": [1.7434,true],
+        "valid": true
     }"""; dicttype=OrderedDict)
     verify_response(
         Action_DICT["thermal_consistency"](),
@@ -505,7 +510,7 @@ end
 function invalid_optical_cal_response_test()
     response=JSON.parse("""{
         "valid": false,
-        "error_message": "xxxx"
+        "error": "xxxx"
     }"""; dicttype=OrderedDict)
     verify_response(
         Action_DICT["optical_cal"](),
@@ -588,7 +593,8 @@ function singlechannel_optical_response_test()
             "baseline": 1864,
             "excitation": 98680,
             "valid": true
-        }
+        },
+        "valid": true
     ]}"""; dicttype=OrderedDict)
     verify_response(
         Action_DICT["optical_test_single_channel"](),
@@ -708,7 +714,8 @@ function dualchannel_optical_response_test()
         "Ch1:Ch2": {
             "FAM": [1.406863,-0.425347,1.633333,4.803922,-9.868056,-0.235926,0.594856,-4.9,-3.811111,6.186869,1.020833,0.340278,0.704023,-0.888889,-0.106456,1.696728],
             "HEX": [0.870219,0.629768,3.175926,3.296024,1.361111,-0.297743,0.506897,-1.341241,-7.712963,0.291667,1.841503,0.680556,-1.681373,-1.852004,-0.397863,2.807292]
-        }
+        },
+        "valid": true
     }"""; dicttype=OrderedDict)
     verify_response(
         Action_DICT["optical_test_dual_channel"](),
@@ -720,6 +727,7 @@ end
 
 function error_dualchannel_optical_response_test()
     response=JSON.parse("""{
+        "valid": false,
         "error": "xxxx"
     }"""; dicttype=OrderedDict)
     verify_response(

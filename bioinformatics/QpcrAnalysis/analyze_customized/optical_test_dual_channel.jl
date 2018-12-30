@@ -126,7 +126,10 @@ function act(
     end) # do channel_i
 
     # format output
-    output = OrderedDict("optical_data" => optical_data, "Ch1:Ch2" => ch12_ratios)
+    output = OrderedDict(
+        "optical_data" => optical_data,
+        "Ch1:Ch2" => ch12_ratios,
+        "valid" => true)
     if (out_format=="json")
         return JSON.json(output)
     else

@@ -13,4 +13,5 @@ end
 type ThermalConsistencyOutput
     tm_check ::Vector{TmCheck1w}
     delta_Tm ::Tuple{AbstractFloat,Bool}
+    valid ::Bool
 end

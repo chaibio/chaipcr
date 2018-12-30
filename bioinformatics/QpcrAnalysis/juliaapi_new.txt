@@ -3,25 +3,26 @@ Here are the REST APIs using HTTP GET
 ===================================================================================
 experiments/:experiment_id/standard_curve
 
-[{"well": [{"target": 1, "cq": xxx, "quantity":{m:1.111, b:-10}}, 
-	   {"target": 2, "cq":xxx, "quantity":{m:1.111, b:-10}}]
- },
- {"well": [{"target": 3, "cq": xxx, "quantity":{m:1.111, b:-10}}, 
-	   {"target": 4, "cq":xxx, "quantity":{m:1.456, b:12}}]
- },
- {"well": [{"target": 1, "cq": xxx, "quantity":{m:1.111, b:-10}}, 
-	   {"target": 2, "cq":xxx, "quantity":{m:3, b:-12}}]
- },
- {"well": [{}, {}]}
+[
+    {"well": [
+        {"target": 1, "cq": xxx, "quantity":{m:1.111, b:-10}}, 
+        {"target": 2, "cq":xxx, "quantity":{m:1.111, b:-10}}]},
+    {"well": [
+        {"target": 3, "cq": xxx, "quantity":{m:1.111, b:-10}}, 
+        {"target": 4, "cq":xxx, "quantity":{m:1.456, b:12}}]},
+    {"well": [
+        {"target": 1, "cq": xxx, "quantity":{m:1.111, b:-10}}, 
+        {"target": 2, "cq":xxx, "quantity":{m:3, b:-12}}]},
+    {"well": [{}, {}]}
 ]
 
 output:
 
 {
-  {"targets":[{"target_id":1, "slope":xx, "offset":xx, "efficiency":1.02, "r2":xx}, 
-	      {"target_id":2, "slope":xx, "offset":xx, "efficiency":0.98, "r2":xx}, 
-	      {"target_id":3, "error":“xxxxx”},{"target":4, "error":“xxxxx”}
-	     ]}
+    {"targets":[
+        {"target_id":1, "slope":xx, "offset":xx, "efficiency":1.02, "r2":xx}, 
+        {"target_id":2, "slope":xx, "offset":xx, "efficiency":0.98, "r2":xx}, 
+        {"target_id":3, "error":"xxxxx"},{"target":4, "error":"xxxxx"}]}
 }
 
 ********************************************************************************
@@ -34,29 +35,29 @@ request body:
     "min_reliable_cyc": 5,
     "calibration_info": {
         "water": {
-	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-				  [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
+        "fluorescence_value":[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
+            [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
         },
         "channel_1": {
-	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-				  [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
+        "fluorescence_value":[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
+            [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
         },
         "channel_2": {
-	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-				  [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
+        "fluorescence_value":[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
+            [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
         }
     },
     "baseline_cyc_bounds": [],
-	"baseline_method": "sigmoid" (auto) or "linear" or "median"
+    "baseline_method": "sigmoid" (auto) or "linear" or "median"
     "cq_method": "Cy0",
     "min_fluomax": 4356,
     "min_D1max": 472,
     "min_D2max": 41,
-    “raw_data”: {
-	“fluorescence_value”:[],
-	“well_num”:[],
-	“cycle_num”:[],
-	“channel”:[]
+    "raw_data": {
+        "fluorescence_value":[],
+        "well_num":[],
+        "cycle_num":[],
+        "channel":[]
     }
 }
 
@@ -71,16 +72,16 @@ SELECT fluorescence_value, well_num, channel
 channel_2 will be NULL for single channel:
     "calibration_info": {
         "water": {
-	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-				  NULL]
+        "fluorescence_value":[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
+            NULL]
         },
         "channel_1": {
-	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-				  NULL]
+        "fluorescence_value":[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
+            NULL]
         },
         "channel_2": {
-	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-				  NULL]
+        "fluorescence_value":[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
+            NULL]
         }
     },
 
@@ -91,7 +92,7 @@ Raw Data comes from the following sql query:
 SELECT fluorescence_value, well_num, cycle_num, channel
     FROM fluorescence_data
     WHERE experiment_id = $exp_id AND step_id = $step_id
-	ORDER BY channel, well_num, cycle_num
+    ORDER BY channel, well_num, cycle_num
 ;
 
 success response body:
@@ -135,6 +136,7 @@ success response body:
 
 error response body:
 {
+    "valid": false,
     "error": "xxxx"
 }
 
@@ -147,27 +149,27 @@ request body:
     "stage_id": 5,
     "calibration_info": {
         "water": {
-	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-				  [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
+        "fluorescence_value":[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
+            [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
         },
         "channel_1": {
-	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-				  [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
+        "fluorescence_value":[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
+            [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
         },
         "channel_2": {
-	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-				  [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
+        "fluorescence_value":[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
+            [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
         }
     },
     "channel_nums": [1] # [1] for single channel, [1,2] for dual channel, etc.
     "qt_prob": 0.64,
     "max_normd_qtv": 0.8,
     "top_N": 4 # number of Tm peaks to report
-    “raw_data”: {
-	“fluorescence_value”:[],
-	“temperature”:[],
-	“well_num”:[],
-	“channel”:[]
+    "raw_data": {
+    "fluorescence_value":[],
+    "temperature":[],
+    "well_num":[],
+    "channel":[]
     }
 }
 
@@ -187,7 +189,7 @@ SELECT fluorescence_value, temperature, well_num, channel
     WHERE
         experiment_id = $exp_id AND
         stage_id = $stage_id
-	ORDER BY channel, well_num
+    ORDER BY channel, well_num
 ;
 
 success response body:
@@ -204,6 +206,7 @@ success response body:
 
 error response body:
 {
+    "valid": false,
     "error": "xxxx"
 }
 
@@ -217,6 +220,7 @@ success response body:
 
 error response body:
 {
+    "valid": false,
     "error": "xxxx"
 }
 
@@ -227,16 +231,16 @@ request body:
 {
     "calibration_info": {
         "water": {
-	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-				  [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
+        "fluorescence_value":[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
+            [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
         },
         "channel_1": {
-	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-				  [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
+        "fluorescence_value":[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
+            [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
         },
         "channel_2": {
-	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-				  [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
+        "fluorescence_value":[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
+            [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
         }
     }
 }
@@ -244,18 +248,18 @@ request body:
 success response body (optical_cal):
 {"valid": true}
 or
-{"valid": false, "error_message": "xxxx"}
+{"valid": false, "error": "xxxx"} # changed from "error_message" TP
 
 *************************************************************************************
 experiments/:experiment_id/thermal_performance_diagnostic
 
 request body:
 {
-  “lid_temp”: [],
-  “heat_block_zone_1_temp”: [],
-  “heat_block_zone_2_temp”: [],
-  “elapsed_time”, [],
-  “cycle_num”: [],
+    "lid_temp": [],
+    "heat_block_zone_1_temp": [],
+    "heat_block_zone_2_temp": [],
+    "elapsed_time", [],
+    "cycle_num": [],
 }
 
 MySQL query it is used:
@@ -267,7 +271,7 @@ SELECT *
 
 success response body (thermal_performance_diagnostic):
 {
-    "Heating":  {
+    "Heating": {
         "AvgRampRate":[5.3743,true],
         "TotalTime":[8001,false],
         "MaxBlockDeltaT":[1.27,true]
@@ -281,7 +285,7 @@ success response body (thermal_performance_diagnostic):
         "HeatingRate":[1.3031,true],
         "TotalTime":[32999,false]}
     },
-    "valid":true # not implemented yet in julia API (TP)
+    "valid": true
 }
 
 *************************************************************************************
@@ -289,25 +293,24 @@ experiments/:experiment_id/thermal_consistency
 
 request body:
 {
-  “raw_data”: {
-	“fluorescence_value”:[],
-	“temperature”:[],
-	“well_num”:[],
-	“channel”:[]
-  },
+    "raw_data": {
+    "fluorescence_value":[],
+    "temperature":[],
+    "well_num":[],
+    "channel":[]},
   
-  "calibration_info": {
+    "calibration_info": {
         "water": {
-	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-				  [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
+            "fluorescence_value":[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
+                [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
         },
         "channel_1": {
-	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-				  [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
+            "fluorescence_value":[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
+                [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
         },
         "channel_2": {
-	    “fluorescence_value”:[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
-				  [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
+            "fluorescence_value":[[channel_1__well_01, channel_1__well_02, …, channel_1__well_16],
+                [channel_2__well_01, channel_2__well_02, …, channel_2__well_16]]
         }
   }
 }
@@ -319,7 +322,7 @@ SELECT fluorescence_value, temperature, well_num, channel
     WHERE
         experiment_id = $exp_id AND
         stage_id = $stage_id
-	ORDER BY channel, well_num
+    ORDER BY channel, well_num
 ;
 
 success response body (thermal_consistency):
@@ -390,8 +393,8 @@ success response body (thermal_consistency):
             "Area":1318.3026
         }
     ],
-    "delta_Tm":[1.7434,true],
-    "valid":true # not implemented yet in julia API (TP)
+    "delta_Tm": [1.7434,true],
+    "valid": true
 }
 
 *************************************************************************************
@@ -399,13 +402,13 @@ experiments/:experiment_id/optical_test_single_channel
 
 request body:
 {
-  “baseline”: {
-	“fluorescence_value”:[well_01, well_02, …, well_16]
-  },
+    "baseline": {
+        "fluorescence_value": [well_01, well_02, …, well_16]
+    },
 
-  “excitation”: {
-	“fluorescence_value”:[well_01, well_02, …, well_16]
-  }
+    "excitation": {
+        "fluorescence_value": [well_01, well_02, …, well_16]
+    }
 }
 
 MySQL query it is used:
@@ -483,30 +486,30 @@ success response body (optical_test_single_channel):
         "excitation":98680,
         "valid":true
     }
- ],
- "valid":true # not implemented yet in julia API (TP)
+  ],
+  "valid": true
 }
 
 *************************************************************************************
 experiments/:experiment_id/optical_test_dual_channel
 
 request body:
-{
-  “baseline”: {
-	“fluorescence_value”:[well_01, well_02, …, well_16]
-  },
+    {
+    "baseline": {
+        "fluorescence_value":[well_01, well_02, …, well_16]
+    },
 
-  “water”: {
-	“fluorescence_value”:[well_01, well_02, …, well_16]
-  },
+    "water": {
+        "fluorescence_value":[well_01, well_02, …, well_16]
+    },
 
-  “FAM”: {
-	“fluorescence_value”:[well_01, well_02, …, well_16]
-  },
-  
-  “HEX”: {
-	“fluorescence_value”:[well_01, well_02, …, well_16]
-  }
+    "FAM": {
+        "fluorescence_value":[well_01, well_02, …, well_16]
+    },
+
+    "HEX": {
+        "fluorescence_value":[well_01, well_02, …, well_16]
+    }
 }
 
 MySQL query it is used:
@@ -616,16 +619,15 @@ success response body (optical_test_dual_channel):
             "water":[[10674,true],[2133,true]]
         }
     ],
-    
     "Ch1:Ch2":{
         "FAM":[1.406863,-0.425347,1.633333,4.803922,-9.868056,-0.235926,0.594856,-4.9,-3.811111,6.186869,1.020833,0.340278,0.704023,-0.888889,-0.106456,1.696728],
         "HEX":[0.870219,0.629768,3.175926,3.296024,1.361111,-0.297743,0.506897,-1.341241,-7.712963,0.291667,1.841503,0.680556,-1.681373,-1.852004,-0.397863,2.807292]
-    }
-
-	"valid":true # not implemented yet in julia API (TP)
+    },
+    "valid": true
 }
 
 error response body:
 {
+    "valid": false,
     "error": "xxxx"
 }

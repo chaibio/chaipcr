@@ -247,11 +247,14 @@ function verify_response(
     facts() do
         context("Verifying response body") do
             @fact (isa(response,OrderedDict)) --> true
+            @fact (haskey(response,"valid")) --> true
             if (haskey(response,"error"))
-                @fact (length(response)) --> 1
+                @fact (length(response)) --> 2
                 @fact (isa(response["error"],String)) --> true
+                @fact (response["valid"]) --> false
             else
-                @fact (length(response)) --> 3
+                @fact (length(response)) --> 4
+                @fact (response["valid"]) --> true
                 @fact (haskey(response,"Heating")) --> true
                 @fact (haskey(response,"Cooling")) --> true
                 @fact (haskey(response,"Lid")) --> true
@@ -322,11 +325,14 @@ function verify_response(
     facts() do
         context("Verifying response body") do
             @fact (isa(response,OrderedDict)) --> true
+            @fact (haskey(response,"valid")) --> true
             if (haskey(response,"error"))
-                @fact (length(response)) --> 1
-                @fact (isa(response["error"],String)) --> true
-            else
                 @fact (length(response)) --> 2
+                @fact (isa(response["error"],String)) --> true
+                @fact (response["valid"]) --> false
+            else
+                @fact (length(response)) --> 3
+                @fact (response["valid"]) --> true
                 @fact (haskey(response,"tm_check")) --> true
                 @fact (haskey(response,"delta_Tm")) --> true
                 @fact (isa(response["tm_check"],Vector)) --> true
@@ -368,19 +374,13 @@ function verify_response(
     facts() do
         context("Verifying response body") do
             @fact (isa(response,OrderedDict)) --> true
-            if (haskey(response,"error"))
+            if (response["valid"]==true)
                 @fact (length(response)) --> 1
-                @fact (isa(response["error"],String)) --> true
             else
-                @fact (haskey(response,"valid")) --> true
-                if (response["valid"]==true)
-                    @fact (length(response)) --> 1
-                else
-                    @fact (response["valid"]) --> false
-                    @fact (length(response)) --> 2
-                    @fact (haskey(response,"error_message")) --> true
-                    @fact (isa(response["error_message"],String)) --> true
-                end
+                @fact (response["valid"]) --> false
+                @fact (length(response)) --> 2
+                @fact (haskey(response,"error")) --> true
+                @fact (isa(response["error"],String)) --> true
             end
         end
     end
@@ -402,10 +402,13 @@ function verify_response(
     facts() do
         context("Verifying response body") do
             @fact (isa(response,OrderedDict)) --> true
-            @fact (length(response)) --> 1
+            @fact (haskey(response,"valid")) --> true
             if (haskey(response,"error"))
+                @fact (length(response)) --> 2
                 @fact (isa(response["error"],String)) --> true
+                @fact (response["valid"]) --> false
             else
+                @fact (response["valid"]) --> true
                 @fact (haskey(response,"optical_data")) --> true
                 @fact (isa(response["optical_data"],Vector)) --> true
                 for i in range(1,length(response["optical_data"]))
@@ -439,12 +442,15 @@ function verify_response(
     facts() do
         context("Verifying response body") do
             @fact (isa(response,OrderedDict)) --> true
+            @fact (haskey(response,"valid")) --> true
             if (haskey(response,"error"))
-                @fact (length(response)) --> 1
+                @fact (length(response)) --> 2
                 @fact (isa(response["error"],String)) --> true
+                @fact (response["valid"]) --> false
             else
                 signals=["baseline","water","HEX","FAM"]
-                @fact (length(response)) --> 2
+                @fact (response["valid"]) --> true
+                @fact (length(response)) --> 3
                 @fact (haskey(response,"optical_data")) --> true
                 @fact (isa(response["optical_data"],Vector)) --> true
                 n_wells=length(response["optical_data"])

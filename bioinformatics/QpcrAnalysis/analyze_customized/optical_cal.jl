@@ -96,11 +96,11 @@ function act(
 
     end # if length
 
-    # I think the cleanest thing is to not have an error_message at all if it is the success case
+    # report valid in success case
     if (length(err_msg_vec) > 0)
         result = OrderedDict(
             "valid" => false,
-            "error_message" => join(err_msg_vec, "")
+            "error" => join(err_msg_vec, "")
         )
     end
 
