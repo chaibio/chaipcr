@@ -142,8 +142,6 @@
     height: 100px;
     display:flex;
     background: white;
-    box-shadow: 0px 1pt 1pt 1pt grey;
-    margin-bottom: 10px;
     
     .plot-type-buttons {
       width: 140px !important;
@@ -232,7 +230,7 @@
   }
   .curve-body {
     background-color: #eee;
-    padding: 5px 10px 10px 10px;
+    padding: 10px;
 
     display:flex;
     // min-height: 600px;
@@ -242,8 +240,7 @@
       padding: 10px;
       // display: inline-block;
       // width: 85%;
-      float: left;
-      box-shadow: 0 1pt 1pt 1px grey;
+      float: left;      
       
       // height: 100%;
     }
@@ -253,8 +250,8 @@
       width: 18%;
       // height: 100%;
       // margin-left: 20px;
-      padding-right: 10px;
-      padding-left: 20px;
+      padding-right: 0px;
+      padding-left: 10px;
       margin: 0px;
       background: transparent;
       flex-grow: 1;
@@ -274,6 +271,11 @@
           color: #fff;
           background-color: #000;
           padding: 10px;
+
+          width: 100%;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
         div {
           padding: 10px;
@@ -296,6 +298,7 @@
         background-color: #595959;
         margin-top: 2px;
       }
+
       .targets-set {
         // position: absolute;
         position: relative;
@@ -306,9 +309,7 @@
         padding: 10px;
         display: block;
         width: 100%;
-        height: 175px;
-        overflow: auto;
-        box-shadow: 0 1pt 1pt 1px grey;
+        height: 215px;
 
         .targets-table {
           width: 100%;
@@ -316,6 +317,12 @@
             font-family: "Dinot";
             font-size: 13px;
             // line-height: 20px;
+            .target-name{
+              width: 90px;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;              
+            }
           }
           .td-tik {
             min-width: 30px;
@@ -351,6 +358,7 @@
   
   .table-container {
     border-left: 2px solid black;
+    min-width: 400px;
     
     .type-td{
       text-align: center;
@@ -396,7 +404,7 @@
         }
       }
       tr {
-        border-bottom: 1px solid #eee;
+        // border-bottom: 1px solid #eee;
         td {
           // border-left: 1px solid lighten($lightgray, 15%);
           // border-bottom: 1px solid lighten($lightgray, 15%);
@@ -425,13 +433,16 @@
         }
 
         &.selected {
+          cursor: pointer;
           td {
             color: #000;
           }
         }
 
         &.active{
-          background: #e4f4fa;
+          td{
+            background: #09b0ef;
+          }
         }
       }
     }
@@ -452,29 +463,22 @@
     cursor: pointer;      
 
     label.outer-line{
-      width: 18px;
-      height: 18px;
+      width: 16px;
+      height: 16px;
       overflow: hidden;
       border-radius: 2px;
       border: 1px solid #2f2f2f;
       vertical-align: middle;
       margin: 0;
       cursor: pointer;
-      padding: 1px;      
-
-      &:hover{
-        background: #333;
-      }      
+      padding: 1px;   
+      background: #fff;   
     }
 
     &.selected{
       label.outer-line{
-        background: url(/images/conf_check_black.svg) no-repeat center center transparent;
-        background-size: 12px 12px;
-        &:hover{
-          background: url(/images/conf_check.svg) no-repeat center center #333;
-          background-size: 12px 12px;
-        }              
+        background: url(/images/omit_check.svg) no-repeat center center #fff;
+        background-size: 10px 10px;
       }
     }
   }

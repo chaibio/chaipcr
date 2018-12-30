@@ -114,6 +114,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.$watch '$viewContentLoaded', ->
         $rootScope.$broadcast 'event:start-resize-aspect-ratio'
 
+      $scope.$watchCollection 'targetsSetHided', ->
+        updateSeries()
+
       $scope.$on 'expName:Updated', ->
         $scope.experiment?.name = expName.name
 
@@ -259,7 +262,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.updateTargetsSet = ->
         $scope.targetsSet = []
         for i in [0...$scope.targets.length]
-          if $scope.targets[i] and $scope.targetsSet.indexOf($scope.targets[i]) < 0
+          if $scope.targets[i]
             target = _.filter $scope.targetsSet, (target) ->
               target.id is $scope.targets[i].id
             if !target.length
@@ -268,9 +271,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.updateSamplesSet = ->
         $scope.samplesSet = []
 
-        for i in [0...16]
-          if $scope.samples[i] and $scope.samplesSet.indexOf($scope.samples[i]) < 0
-            $scope.samplesSet.push($scope.samples[i])
+        # for i in [0...16]
+        #   if $scope.samples[i] and $scope.samplesSet.indexOf($scope.samples[i]) < 0
+        #     $scope.samplesSet.push($scope.samples[i])
 
       $scope.$on 'event:switch-chart-well', (e, data, oldData) ->
         if !data.active
@@ -341,7 +344,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               $scope.well_data = helper.normalizeSummaryData(data.summary_data, data.targets, $scope.well_targets)
               $scope.targets = helper.normalizeWellTargetData($scope.well_data)
 
-              console.log($scope.targets)
+              for i in [0..$scope.targets.length - 1] by 1
+                $scope.targetsSetHided[$scope.targets[i].id] = true
 
               data.amplification_data?.shift()
               data.cq?.shift()
@@ -399,21 +403,13 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         for ch_i in [channel_start..channel_end] by 1
           for i in [0..15] by 1
             if $scope.omittedIndexes.indexOf(i * 2 + (ch_i - 1)) == -1
-              if buttons["well_#{i}"]?.selected and $scope.targets[i * 2 + (ch_i - 1)] and !$scope.targetsSetHided[$scope.targets[i * 2 + (ch_i - 1)].id]
+              if buttons["well_#{i}"]?.selected and $scope.targets[i * 2 + (ch_i - 1)] and $scope.targetsSetHided[$scope.targets[i * 2 + (ch_i - 1)].id]
                 if $scope.color_by is 'well'
                   well_color = buttons["well_#{i}"].color
                 else if $scope.color_by is 'target'
-                  color_number = $scope.targets[i].id % 16
-                  if color_number < 0
-                    well_color = '#000000'
-                  else
-                    well_color = $scope.COLORS[color_number]
+                  well_color = if $scope.targets[(ch_i - 1)+i*2] then $scope.targets[(ch_i - 1)+i*2].color else 'transparent'
                 else if $scope.color_by is 'sample'
-                  color_number = $scope.samplesSet.indexOf($scope.samples[i])
-                  if color_number < 0
-                    well_color = '#000000'
-                  else
-                    well_color = $scope.COLORS[color_number]
+                  well_color = if $scope.samples[i] then $scope.samples[i].color else 'transparent'
                 else if ch_i is 1
                   well_color = '#00AEEF'
                 else
@@ -449,14 +445,64 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.zoomOut = ->
         $scope.ampli_zoom = Math.max($scope.ampli_zoom * 0.5, 0.001)
 
+      $scope.onSelectWell = (well_item, index) ->
+        config = {}
+        config.config = {}
+        config.config.well = well_item.well_num - 1
+        config.config.channel = well_item.channel
+
+        dual_value = if $scope.is_dual_channel then 2 else 1
+
+        if $scope.wellButtons['well_' + (well_item.well_num - 1)].selected and $scope.omittedIndexes.indexOf(index) == -1 and $scope.targetsSetHided[$scope.targets[index].id]
+          for well_i in [0..$scope.well_data.length - 1]
+            $scope.well_data[well_i].active = (well_i == config.config.well * dual_value + config.config.channel - 1)
+
+          for i in [0..15] by 1
+            $scope.wellButtons["well_#{i}"].active = (i == config.config.well)
+            if(i == config.config.well)
+              $scope.index_target = i % 8
+              if (i < 8) 
+                $scope.index_channel = 1
+              else 
+                $scope.index_channel = 2
+
+              $scope.label_channel = $scope.index_channel.toString()
+              if i < $scope.targets.length
+                if $scope.targets[i]!=null
+                  $scope.label_target = $scope.targets[config.config.well * dual_value + config.config.channel - 1]
+                else
+                  $scope.label_target = ""
+              else 
+                $scope.label_target = ""
+
+              if i < $scope.targets.length
+                if $scope.samples[i]!=null
+                  $scope.label_sample = $scope.samples[i].name if $scope.samples[i]
+                else
+                  $scope.label_sample = null
+              else 
+                $scope.label_sample = null
+
+              # $scope.label_dF_dC = 
+              # $scope.label_D2_dc2 = 
+              wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8']
+              $scope.label_well = wells[i]
+
+        if $scope.label_target.name
+          $scope.bgcolor_target = { 'background-color':'black' }
+        else 
+          $scope.bgcolor_target = { 'background-color':'#666' }
+
+
       $scope.onSelectLine = (config) ->
-        # $scope.bgcolor_target = { 'background-color':'black' }
+        $scope.bgcolor_target = { 'background-color':'black' }
         # $scope.bgcolor_wellSample = { 'background-color':'black' }
 
         # $scope.bgcolor_target = { 'background-color':config.config.color }
+        dual_value = if $scope.is_dual_channel then 2 else 1
 
         for well_i in [0..$scope.well_data.length - 1]
-          $scope.well_data[well_i].active = (well_i == config.config.well * 2 + config.config.channel - 1)
+          $scope.well_data[well_i].active = (well_i == config.config.well * dual_value + config.config.channel - 1)
 
         for i in [0..15] by 1
           $scope.wellButtons["well_#{i}"].active = (i == config.config.well)
@@ -478,7 +524,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
             if i < $scope.targets.length
               if $scope.samples[i]!=null
-                $scope.label_sample = $scope.samples[i]
+                $scope.label_sample = $scope.samples[i].name
               else
                 $scope.label_sample = null
             else 
@@ -489,7 +535,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8']
             $scope.label_well = wells[i]
 
-        wellScrollTop = (config.config.well * 2 + config.config.channel - 1 + 2) * 36 - document.querySelector('.table-container').offsetHeight
+        wellScrollTop = (config.config.well * dual_value + config.config.channel - 1 + dual_value) * 36 - document.querySelector('.table-container').offsetHeight
         angular.element(document.querySelector('.table-container')).animate { scrollTop: wellScrollTop }, 'fast'
           
       $scope.onUnselectLine = ->
@@ -536,25 +582,56 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.$parent.chart
       , (chart) ->
         if chart is 'amplification'
-          $scope.well_targets = []
-          Experiment.getWellLayout($stateParams.id).then (resp) ->
-            for i in [0...resp.data.length]
-              $scope.samples[i] = if resp.data[i].samples then resp.data[i].samples[0].name else null
-              $scope.well_targets[2*i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0]  else null
-              $scope.well_targets[2*i+1] = if resp.data[i].targets && resp.data[i].targets[1] then resp.data[i].targets[1] else null
-              $scope.types[2*i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0].well_type  else null
-              $scope.types[2*i+1] = if resp.data[i].targets && resp.data[i].targets[1] then resp.data[i].targets[1].well_type else null
-            
-            $scope.updateSamplesSet()                   
-            updateSeries()
+          $scope.expTargets = []
+          $scope.lookupTargets = []
+          Experiment.getTargets($stateParams.id).then (resp_target) ->
+            for i in [0...resp_target.data.length]
+              $scope.expTargets[i] = resp_target.data[i].target
+              $scope.lookupTargets[resp_target.data[i].target.id] = $scope.COLORS[i % $scope.COLORS.length]
+
+            $scope.expSamples = []
+            Experiment.getSamples($stateParams.id).then (response) ->
+              for i in [0...response.data.length]
+                $scope.expSamples[i] = response.data[i].sample
+
+              $scope.well_targets = []
+              Experiment.getWellLayout($stateParams.id).then (resp) ->
+                for i in [0...resp.data.length]
+                  $scope.samples[i] = if resp.data[i].samples then resp.data[i].samples[0] else null
+                  if $scope.samples[i]
+                    for j in [0...$scope.expSamples.length]
+                      if $scope.samples[i].id == $scope.expSamples[j].id
+                        $scope.samples[i].color = $scope.COLORS[j % $scope.COLORS.length]
+                        break
+                      else
+                        $scope.samples[i].color = 'transparent'
+                  if $scope.is_dual_channel
+                    $scope.well_targets[2*i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0]  else null
+                    $scope.well_targets[2*i+1] = if resp.data[i].targets && resp.data[i].targets[1] then resp.data[i].targets[1] else null
+
+                    if $scope.well_targets[2*i]
+                      $scope.well_targets[2*i].color = if $scope.well_targets[2*i] then $scope.lookupTargets[$scope.well_targets[2*i].id] else 'transparent'
+                    if $scope.well_targets[2*i+1]
+                      $scope.well_targets[2*i+1].color = if $scope.well_targets[2*i+1] then $scope.lookupTargets[$scope.well_targets[2*i+1].id] else 'transparent'
+
+                    $scope.types[2*i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0].well_type  else null
+                    $scope.types[2*i+1] = if resp.data[i].targets && resp.data[i].targets[1] then resp.data[i].targets[1].well_type else null
+                  else
+                    $scope.well_targets[i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0]  else null
+                    if $scope.well_targets[i]
+                      $scope.well_targets[i].color = if $scope.well_targets[i] then $scope.lookupTargets[$scope.well_targets[i].id] else 'transparent'
+                    $scope.types[i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0].well_type  else null
+                
+                $scope.updateSamplesSet()                   
+                updateSeries()
 
 
-            fetchFluorescenceData()
+                fetchFluorescenceData()
 
-          $timeout ->
-            $rootScope.$broadcast 'event:start-resize-aspect-ratio'
-            $scope.showAmpliChart = true
-          , 1000
+              $timeout ->
+                $rootScope.$broadcast 'event:start-resize-aspect-ratio'
+                $scope.showAmpliChart = true
+              , 1000
         else
           $scope.showAmpliChart = false
           $scope.showStandardChart = false
@@ -568,10 +645,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.showColorByList = ->
         document.getElementById("colorByList_ampli").classList.toggle("show")
       
-      $scope.targetClick = (index) ->
-        $scope.targetsSetHided[index] = !$scope.targetsSetHided[index]
-        updateSeries()
-
       # $scope.targetGridTop = ->
       #   document.getElementById("curve-plot").clientHeight + 30
       $scope.targetGridTop = ->

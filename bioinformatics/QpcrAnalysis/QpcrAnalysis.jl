@@ -35,14 +35,14 @@ const LOAD_FROM_DIR = LOAD_PATH[find(LOAD_PATH) do path_
     isfile("$path_/$MODULE_NAME.jl")
 end][1] # slice by boolean vector returned a one-element vector. Assumption: LOAD_PATH is global
 
-const PRODUCTION_MODE = (readstring(`uname -a`) |> x->ismatch(r"beaglebone",x))
-
 # include each script, generally in the order of workflow
 
 # types and constants
-include("constants.jl")
+#include("constants.jl")
 include("types_for_dispatch.jl")
 include("types_for_calibration.jl")
+include("constants.jl")
+
 include("types_for_allelic_discrimination.jl")
 include("types_for_amplification.jl")
 include("types_for_meltcurve.jl")
@@ -54,7 +54,8 @@ include("amp_models/types_for_dfc_models.jl")
 # shared functions
 include("shared.jl")
 
-@static if (!PRODUCTION_MODE) 
+@static if (get(ENV, "JULIA_ENV", nothing)!="production")
+
 	# this code is hidden from the parser on the BeagleBone
 
 	# development & testing

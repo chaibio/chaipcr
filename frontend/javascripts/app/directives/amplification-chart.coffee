@@ -47,7 +47,16 @@ window.App.directive 'amplificationChart', [
           # $scope.onUpdateProperties()($scope.label_cycle, $scope.label_RFU, $scope.label_dF_dC, $scope.label_D2_dc2)
         
         $scope.$on 'window:resize', ->
-          chart.resize() if chart and $scope.show
+          if chart and $scope.show
+            $timeout ->
+              chart.resize()
+            , 500
+
+        $scope.$on 'event:resize-draw-chart', ->
+          if chart and $scope.show
+            $timeout ->
+              chart.resize()
+            , 500
 
         $scope.$watchCollection ($scope) ->
           return {
