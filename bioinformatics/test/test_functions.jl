@@ -1,15 +1,27 @@
-# test_functions.jl
+## test_functions.jl
 #
-# Author: Tom Price
-# Date: Dec 2018
+## Author: Tom Price
+## Date: Dec 2018
 #
-# automated test script for Julia API
+## automated test script for Julia API
+## this code should be run at startup in fresh julia REPL
+
+# example test
+if (const RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE = false)
+    cd("/home/vagrant/chaipcr/bioinformatics/QpcrAnalysis")
+    push!(LOAD_PATH,pwd())
+    using QpcrAnalysis
+    # test code: precompilation should ensure
+    # that the first and second runs are equally fast
+    include("../test/test_functions.jl") # this file
+    test_functions=generate_tests()
+    t1 = @elapsed test_functions["amplification dual channel"]()
+    t2 = @elapsed test_functions["amplification dual channel"]()
+end
 
 import FactCheck: clear_results
 import DataFrames: DataFrame, rename
 import DataStructures: OrderedDict
-# import QpcrAnalysis: dispatch, act, verify_request, verify_response, print_v, LOAD_FROM_DIR
-using QpcrAnalysis
 
 td = readdlm("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/test_data.csv",',',header=true)
 const TEST_DATA = DataFrame([slicedim(td[1],2,i) for i in 1:size(td[1])[2]],map(Symbol,td[2][:]))
@@ -67,18 +79,4 @@ function test_dispatch()
         test_results[testname] = test_functions[testname]() 
     end
     return test_results
-end
-
-function example_test()
-    # this code run at startup in fresh julia REPL
-    cd("/home/vagrant/chaipcr/bioinformatics/QpcrAnalysis")
-    push!(LOAD_PATH,pwd())
-    using QpcrAnalysis
-    include("../test/test_functions.jl")
-
-    # test code: precompilation should ensure
-    # that the first and second runs are equally fast
-    test_functions=generate_tests()
-    @time test_functions["amplification dual channel"])
-    @time test_functions["amplification dual channel"])
 end
