@@ -22,7 +22,6 @@
 
 # using Base
 
-@time __precompile__()
 module QpcrAnalysis
 
 using Clustering, Combinatorics, DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NamedTuples, DataArrays #, NLopt
@@ -54,10 +53,8 @@ include("amp_models/types_for_dfc_models.jl")
 # shared functions
 include("shared.jl")
 
+# this code is hidden from the parser on the BeagleBone
 @static if (get(ENV, "JULIA_ENV", nothing)!="production")
-
-	# this code is hidden from the parser on the BeagleBone
-
 	# development & testing
 	import Base.Test
 	using FactCheck
@@ -108,7 +105,35 @@ include("analyze_customized/thermal_consistency.jl")
 #
 # include("pnmsmu.jl")
 
+# these files are included so that the important analysis methods
+# are precompiled ahead of time -- only important in production mode
+include("precompile_Base.jl")
+include("precompile_DataArrays.jl")
+include("precompile_ForwardDiff.jl")
+include("precompile_Main.jl")
+include("precompile_StatsBase.jl")
+include("precompile_Blosc.jl")
+include("precompile_DataFrames.jl")
+include("precompile_HDF5.jl")
+include("precompile_MathProgBase.jl")
+include("precompile_unknown.jl")
+include("precompile_Clustering.jl")
+include("precompile_DataStructures.jl")
+include("precompile_Ipopt.jl")
+include("precompile_Missings.jl")
+include("precompile_Combinatorics.jl")
+include("precompile_Dierckx.jl")
+include("precompile_JLD.jl")
+include("precompile_QpcrAnalysis.jl")
+include("precompile_Compat.jl")
+include("precompile_Distances.jl")
+include("precompile_JSON.jl")
+include("precompile_ReverseDiffSparse.jl")
+include("precompile_Core.jl")
+include("precompile_FactCheck.jl")
+include("precompile_JuMP.jl")
+include("precompile_SpecialFunctions.jl")
 
-
+@time __precompile__()
 
 end # module QpcrAnalysis

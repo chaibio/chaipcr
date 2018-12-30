@@ -542,9 +542,10 @@ function mod_bl_q(
         blsub_fluos = fluos .- baseline
 
         fitted_postbl = sfc_model_defs[m_postbl].func_fit(
-            cycs, blsub_fluos, wts;
-            kwargs_jmp_model...
-        )
+            cycs,
+            blsub_fluos,
+            wts;
+            kwargs_jmp_model...)
 
         coefs_pob = fitted_postbl.coefs
 
@@ -572,11 +573,10 @@ function mod_bl_q(
         end # try
 
         cyc_vals_4cq = OrderedDict(
-            "cp_dr1"=>cyc_max_dr1,
-            "cp_dr2"=>cyc_max_dr2,
-            "Cy0"=>Cy0,
-            "ct"=>ct
-        )
+            "cp_dr1" => cyc_max_dr1,
+            "cp_dr2" => cyc_max_dr2,
+            "Cy0" => Cy0,
+            "ct" => ct)
 
         func_pred_eff = function (cyc)
             try
@@ -636,13 +636,13 @@ function report_cq!(
     full_amp_out ::AmpStepRampOutput,
     well_i ::Integer,
     channel_i ::Integer;
-    before_128x ::Bool=false,
-    max_dr1_lb=472,
-    max_dr2_lb=41,
-    max_bsf_lb=4356,
-    scld_max_dr1_lb=0.0089, # look like real amplification, scld_max_dr1 0.00894855, ip223, exp. 75, well A7, channel 2.
-    scld_max_dr2_lb=0.000689,
-    scld_max_bsf_lb=0.086   
+    before_128x ::Bool =false,
+    max_dr1_lb =472,
+    max_dr2_lb =41,
+    max_bsf_lb =4356,
+    scld_max_dr1_lb ::Real =0.0089, # look like real amplification, scld_max_dr1 0.00894855, ip223, exp. 75, well A7, channel 2.
+    scld_max_dr2_lb ::Real =0.000689,
+    scld_max_bsf_lb ::Real =0.086   
 )
 
     if before_128x
@@ -686,7 +686,7 @@ function report_cq!(
         why_NaN = "scld_max_bsf $scld_max_bsf < scld_max_bsf_lb $scld_max_bsf_lb"
     end
 
-    if why_NaN != ""
+    if (why_NaN != "")
         full_amp_out.cq[well_i, channel_i] = NaN
     end
 
@@ -695,8 +695,7 @@ function report_cq!(
         (:scld_max_dr1, scld_max_dr1),
         (:scld_max_dr2, scld_max_dr2),
         (:scld_max_bsf, scld_max_bsf),
-        (:why_NaN, why_NaN)
-    )
+        (:why_NaN, why_NaN))
         getfield(full_amp_out, tup[1])[well_i, channel_i] = tup[2]
     end
 
@@ -753,7 +752,7 @@ function process_amp_1sr(
     out_format ::String, # "full", "pre_json", "json"
     json_digits ::Integer,
     verbose ::Bool
-    )
+)
 
     ## remove MySql dependency
     #
@@ -762,8 +761,7 @@ function process_amp_1sr(
     #     db_conn,
     #     "fluorescence_value", # "fluorescence_value" or "baseline_value"
     #     exp_id, asrp,
-    #     fluo_well_nums, channel_nums
-    # )
+    #     fluo_well_nums, channel_nums)
 
     # new >>
     # issue:
@@ -774,8 +772,7 @@ function process_amp_1sr(
     num_cycs, num_fluo_wells, num_channels = map(length, (cyc_nums, fluo_well_nums, channel_nums))
     fr_ary3 = reshape(
         exp_data["fluorescence_value"],
-        num_cycs, num_fluo_wells, num_channels
-    )
+        num_cycs, num_fluo_wells, num_channels)
     # << new
 
     # perform deconvolution and adjust well-to-well variation in absolute fluorescence
@@ -798,8 +795,7 @@ function process_amp_1sr(
 
         dye_in,
         dyes_2bfild;
-        aw_out_format="array"
-    )
+        aw_out_format="array")
 
     size_bcb = size(baseline_cyc_bounds)
     if size_bcb == (0,) || (size_bcb == (2,) && size(baseline_cyc_bounds[1]) == ()) # can't use `eltype(baseline_cyc_bounds) <: Integer` because `JSON.parse("[1,2]")` results in `Any[1,2]` instead of `Int[1,2]`
