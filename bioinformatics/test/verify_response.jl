@@ -37,7 +37,7 @@ function verify_response(
         context("Verifying response body") do
             @fact (isa(response,OrderedDict)) --> true
             @fact (haskey(response,"targets")) --> true
-            @fact (haskey(response,"groups")) --> true # do not verify groups
+            # @fact (haskey(response,"groups")) --> true # do not verify groups
             array=response["targets"]
             @fact (isa(array,Vector)) --> true
             for i in range(1,length(array))
@@ -79,14 +79,17 @@ function verify_response(
     facts() do
         context("Verifying response body") do
             @fact (isa(response,OrderedDict)) --> true
+            @fact (haskey(response,"valid")) --> true
             if (haskey(response,"error"))
-                @fact (length(response)) --> 1
+                @fact (length(response)) --> 2
                 @fact (isa(response["error"],String)) --> true
+                @fact (response["valid"]) --> false
             else
-                @fact (length(response)) --> 8
+                # @fact (length(response)) --> 8
+                @fact (response["valid"]) --> true
                 measurements=["rbbs_ary3","blsub_fluos","dr1_pred","dr2_pred"]
                 n_channels=length(response["rbbs_ary3"])
-                @fact (n_channels in CHANNELS) --> true
+                @fact (n_channels in QpcrAnalysis.CHANNELS) --> true
                 n_wells=length(response["rbbs_ary3"][1])
                 n_steps=length(response["rbbs_ary3"][1][1])
                 n_pred=length(response["dr1_pred"][1][1])
@@ -115,37 +118,37 @@ function verify_response(
                         end
                     end
                 end
-            end
-            statistics=["cq","d0"]
-            for s in statistics
-                @fact (haskey(response,s)) --> true
-                @fact (isa(response[s],Vector)) --> true
-                @fact (length(response[s])) --> n_channels
-                for c in range(1,n_channels)
-                    @fact (isa(response[s][c],Vector)) --> true
-                    @fact (length(response[s][c])) --> n_wells
-                    for i in range(1,n_wells)
-                        @fact (isa(response[s][c][i],Number) ||
-                            response[s][c][i]==nothing) --> true
+                statistics=["cq","d0"]
+                for s in statistics
+                    @fact (haskey(response,s)) --> true
+                    @fact (isa(response[s],Vector)) --> true
+                    @fact (length(response[s])) --> n_channels
+                    for c in range(1,n_channels)
+                        @fact (isa(response[s][c],Vector)) --> true
+                        @fact (length(response[s][c])) --> n_wells
+                        for i in range(1,n_wells)
+                            @fact (isa(response[s][c][i],Number) ||
+                                response[s][c][i]==nothing) --> true
+                        end
                     end
                 end
-            end
-            @fact (haskey(response,"ct_fluos")) --> true
-            @fact (isa(response["ct_fluos"],Vector)) --> true
-            @fact (length(response["ct_fluos"])) --> n_channels
-            for c in range(1,n_channels)
-                @fact (isa(response["ct_fluos"][c],Number) ||
-                    response["ct_fluos"][c]==nothing) --> true
-            end
-            variables=["rbbs_ary3","blsub_fluos","cq","d0"]
-            @fact (haskey(response,"assignments_adj_labels_dict")) --> true
-            @fact (isa(response["assignments_adj_labels_dict"],OrderedDict)) --> true
-            # @fact (length(response["assignments_adj_labels_dict"])) --> n_genotypes
-            for g in range(1,length(response["assignments_adj_labels_dict"]))
-                @fact (isa(response["assignments_adj_labels_dict"][variables[g]],Vector)) --> true
-                @fact (length(response["assignments_adj_labels_dict"][variables[g]])) --> n_wells
-                for i in range(1,n_wells)
-                    @fact (isa(response["assignments_adj_labels_dict"][variables[g]][i],String)) --> true
+                @fact (haskey(response,"ct_fluos")) --> true
+                @fact (isa(response["ct_fluos"],Vector)) --> true
+                @fact (length(response["ct_fluos"])) --> n_channels
+                for c in range(1,n_channels)
+                    @fact (isa(response["ct_fluos"][c],Number) ||
+                        response["ct_fluos"][c]==nothing) --> true
+                end
+                variables=["rbbs_ary3","blsub_fluos","cq","d0"]
+                @fact (haskey(response,"assignments_adj_labels_dict")) --> true
+                @fact (isa(response["assignments_adj_labels_dict"],OrderedDict)) --> true
+                # @fact (length(response["assignments_adj_labels_dict"])) --> n_genotypes
+                for g in range(1,length(response["assignments_adj_labels_dict"]))
+                    @fact (isa(response["assignments_adj_labels_dict"][variables[g]],Vector)) --> true
+                    @fact (length(response["assignments_adj_labels_dict"][variables[g]])) --> n_wells
+                    for i in range(1,n_wells)
+                        @fact (isa(response["assignments_adj_labels_dict"][variables[g]][i],String)) --> true
+                    end
                 end
             end
         end
@@ -169,12 +172,15 @@ function verify_response(
     facts() do
         context("Verifying response body") do
             @fact (isa(response,OrderedDict)) --> true
+            @fact (haskey(response,"valid")) --> true
             if (haskey(response,"error"))
-                @fact (length(response)) --> 1
+                @fact (length(response)) --> 2
                 @fact (isa(response["error"],String)) --> true
+                @fact (response["valid"]) --> false
             else
+                @fact (response["valid"]) --> true
                 variables=["melt_curve_data","melt_curve_analysis"]
-                @fact length(response) --> length(variables)
+                # @fact length(response) --> length(variables)
                 n_channels=length(response["melt_curve_data"])
                 n_wells=length(response["melt_curve_data"][1])
                 n_grid=length(response["melt_curve_data"][1][1][1])
@@ -220,10 +226,13 @@ function verify_response(
     facts() do
         context("Verifying response body") do
             @fact (isa(response,OrderedDict)) --> true
+            @fact (haskey(response,"valid")) --> true
             if (haskey(response,"error"))
-                @fact (length(response)) --> 1
+                @fact (length(response)) --> 2
                 @fact (isa(response["error"],String)) --> true
+                @fact (response["valid"]) --> false
             else
+                @fact (response["valid"]) --> true
                 @fact (haskey(response,"script")) --> true
                 @fact (isa(response["script"],String)) --> true
             end

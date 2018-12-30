@@ -122,7 +122,8 @@ function singlechannel_amplification_response_test()
             "blsub_fluos": ["aA", "aa",     "aa"],
             "d0":          ["aa", "AA",     "Aa"],
             "cq":          ["aa", "Aa",     "aa"]
-        }
+        },
+        "valid": true
     }"""; dicttype=OrderedDict)
     verify_response(
         Action_DICT["amplification"](),
@@ -226,7 +227,8 @@ function dualchannel_amplification_response_test()
             "blsub_fluos": ["aA", "aa",     "aa"],
             "d0":          ["aa", "AA",     "Aa"],
             "cq":          ["aa", "Aa",     "aa"]
-        }
+        },
+        "valid": true
     }"""; dicttype=OrderedDict)
     verify_response(
         Action_DICT["amplification"](),
@@ -289,7 +291,8 @@ function singlechannel_meltcurve_response_test()
         ],
         "melt_curve_analysis": [
             [ $(s1_01), $(s1_02),     $(s1_16) ]
-        ]
+        ],
+        "valid": true
     }"""; dicttype=OrderedDict)
     println(response)
     println(JSON.json(response))
@@ -310,7 +313,8 @@ function dualchannel_meltcurve_response_test()
         "melt_curve_analysis": [
             [ $(s1_01), $(s1_02),     $(s1_16) ], 
             [ $(s2_01), $(s2_02),     $(s2_16) ]
-        ]
+        ],
+        "valid": true
     }"""; dicttype=OrderedDict)
     verify_response(
         Action_DICT["meltcurve"](),
@@ -343,7 +347,8 @@ end
 
 function loadscript_response_test()
     response=JSON.parse("""{
-        "script": "path/to/analyze.jl"
+        "script": "path/to/analyze.jl",
+        "valid": true
     }"""; dicttype=OrderedDict)
     verify_response(
         Action_DICT["loadscript"](),
@@ -528,8 +533,7 @@ end
 
 function singlechannel_optical_response_test()
     response=JSON.parse("""{
-        "optical_data": [
-        {
+        "optical_data": [{
             "baseline": 1704,
             "excitation": 84756,
             "valid": true
@@ -593,9 +597,9 @@ function singlechannel_optical_response_test()
             "baseline": 1864,
             "excitation": 98680,
             "valid": true
-        },
+        }],
         "valid": true
-    ]}"""; dicttype=OrderedDict)
+    }"""; dicttype=OrderedDict)
     verify_response(
         Action_DICT["optical_test_single_channel"](),
         response
@@ -763,6 +767,7 @@ function verify_response_examples()
         :dualchannel_optical_response_test,
         :error_dualchannel_optical_response_test
     ]
+    FactCheck.clear_results()
     OrderedDict(map(examples) do f
         f => 
             try

@@ -308,6 +308,7 @@ function process_amp(
     end) # do sr_ele
 
     final_out = out_sr_dict ? sr_dict : collect(values(sr_dict))[1]
+    final_out["valid"] = true
     return out_format == "json" ? JSON.json(final_out) : final_out
 
 end # process_amp
