@@ -105,8 +105,10 @@ include("analyze_customized/thermal_consistency.jl")
 #
 # include("pnmsmu.jl")
 
-# these files are included so that the important analysis methods
-# are precompiled ahead of time -- only important in production mode
+# precompile important analysis methods ahead of time
+# this is only important in production mode
+# these files need to be recreated using ../test/snoop.jl
+# before each production run
 include("precompile/precompile_Base.jl")
 include("precompile/precompile_DataArrays.jl")
 include("precompile/precompile_ForwardDiff.jl")

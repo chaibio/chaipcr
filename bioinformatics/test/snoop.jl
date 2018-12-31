@@ -22,4 +22,27 @@ end
 # This can be run repeatedly to tweak the scripts
 data = SnoopCompile.read("/tmp/qpcr_compiles.csv")
 pc = SnoopCompile.parcel(reverse!(data[2]))
+
+# remove test functions not used in production mode
+filter!(
+    x -> (match(r"QpcrAnalysis\.verify_re",x) == nothing),
+    pc[:QpcrAnalysis])
+filter!(
+    x -> (match(r"QpcrAnalysis\.\w+_test",x) == nothing),
+    pc[:QpcrAnalysis
+filter!(
+    x -> (match(r"FactCheck",x) == nothing),
+    pc[:Base])
+filter!(
+    x -> (match(r"FactCheck",x) == nothing),
+    pc[:Core])
+delete!(pc,:FactCheck)
+delete!(pc,:Main)
+
+# write output files to be included in QpcrAnalysis.jl
 SnoopCompile.write("/tmp/precompile", pc)
+
+
+
+
+filter(x -> (match(r"FactCheck",x) != nothing),p)
