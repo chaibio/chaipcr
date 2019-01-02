@@ -265,7 +265,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.updateTargetsSet = ->
         $scope.targetsSet = []
         for i in [0...$scope.targets.length]
-          if $scope.targets[i]
+          if $scope.targets[i].id
             target = _.filter $scope.targetsSet, (target) ->
               target.id is $scope.targets[i].id
             if !target.length
@@ -615,14 +615,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                       $scope.well_targets[2*i].color = if $scope.well_targets[2*i] then $scope.lookupTargets[$scope.well_targets[2*i].id] else 'transparent'
                     if $scope.well_targets[2*i+1]
                       $scope.well_targets[2*i+1].color = if $scope.well_targets[2*i+1] then $scope.lookupTargets[$scope.well_targets[2*i+1].id] else 'transparent'
-
-                    $scope.types[2*i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0].well_type  else null
-                    $scope.types[2*i+1] = if resp.data[i].targets && resp.data[i].targets[1] then resp.data[i].targets[1].well_type else null
                   else
                     $scope.well_targets[i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0]  else null
                     if $scope.well_targets[i]
                       $scope.well_targets[i].color = if $scope.well_targets[i] then $scope.lookupTargets[$scope.well_targets[i].id] else 'transparent'
-                    $scope.types[i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0].well_type  else null
                 
                 $scope.well_data = helper.blankWellData($scope.is_dual_channel, $scope.well_targets)
                 $scope.targets = helper.normalizeWellTargetData($scope.well_data)

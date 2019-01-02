@@ -175,12 +175,14 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           item['target_name'] = target[0].name if target[0]
           item['channel'] = target[0].channel if target[0]
           item['color'] = target[0].color if target[0]
+          item['well_type'] = target[0].well_type if target[0]
         else
           target = _.filter target_data, (target) ->
             target[0] is item.target_id
           item['target_name'] = target[0][1] if target[0]
           item['channel'] = if item['target_name'] == 'Ch 1' then 1 else 2
           item['color'] = if item['target_name'] == 'Ch 1' then @SAMPLE_TARGET_COLORS[0] else @SAMPLE_TARGET_COLORS[1]
+          item['well_type'] = ''
 
         item['active'] = false
 
@@ -215,10 +217,12 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           item['target_name'] = well_targets[2*i].name if well_targets[2*i]
           item['target_id'] = well_targets[2*i].id if well_targets[2*i]
           item['color'] = well_targets[2*i].color if well_targets[2*i]
+          item['well_type'] = well_targets[2*i].well_type if well_targets[2*i]
         else
           item['target_name'] = well_targets[i].name if well_targets[i]
           item['target_id'] = well_targets[i].id if well_targets[i]
           item['color'] = well_targets[i].color if well_targets[i]
+          item['well_type'] = well_targets[i].well_type if well_targets[i]
 
         well_data.push item
 
@@ -227,6 +231,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           dual_item['target_name'] = well_targets[2*i+1].name if well_targets[2*i+1]
           dual_item['target_id'] = well_targets[2*i+1].id if well_targets[2*i+1]
           dual_item['color'] = well_targets[2*i+1].color if well_targets[2*i+1]
+          dual_item['well_type'] = well_targets[2*i+1].well_type if well_targets[2*i+1]
           dual_item['channel'] = 2
           well_data.push dual_item
 

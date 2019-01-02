@@ -257,11 +257,11 @@ limitations under the License.
                 </span>
               </td>
               <td class="B2-Amplification type-td">
-                <span class="B2-Amplification type-span" style="width: 20px; height: 20px;" ng-if="types[$index]">
-                  <img src="/images/ring_s.svg" ng-if="types[$index] == 'standard'">
-                  <img src="/images/ring_plus.svg" ng-if="types[$index] == 'positive_control'">
-                  <img src="/images/ring_neg.svg" ng-if="types[$index] == 'negative_control'">
-                  <img src="/images/ring_u.svg" ng-if="types[$index] == 'unknown'">
+                <span class="B2-Amplification type-span" style="width: 20px; height: 20px;" ng-if="well_item.well_type">
+                  <img src="/images/ring_s.svg" ng-if="well_item.well_type == 'standard'">
+                  <img src="/images/ring_plus.svg" ng-if="well_item.well_type == 'positive_control'">
+                  <img src="/images/ring_neg.svg" ng-if="well_item.well_type == 'negative_control'">
+                  <img src="/images/ring_u.svg" ng-if="well_item.well_type == 'unknown'">
                 </span>
               </td>
               <td class="B2-Amplification" style="text-align: left;">
