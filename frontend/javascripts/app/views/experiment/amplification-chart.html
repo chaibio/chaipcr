@@ -89,7 +89,7 @@ limitations under the License.
             </div>
           </div>
           <div class="curve-body amplification-chart" style="height:100%; display: flex; flex-direction: row; justify-content: space-between;">
-            <div class="curve-plot" aspect-Ratio offset-x='160 + 10 + 20' offset-y='100 + 160 + 20 + 10' min-width='680' max-width='1020' min-height='400' max-height='600' id="curve-plot" style="display: block;">
+            <div class="curve-plot" aspect-ratio offset-x='160 + 10 + 20' offset-y='100 + 160 + 20 + 10' min-width='680' max-width='1020' min-height='400' max-height='600' id="curve-plot" style="display: block;">
               <div style="width:100%; height: 90%;">
                 <div class="chart-container" style="height:100%; min-width: 660px; max-width: 1000px; min-height: 340px; max-height: 520px;">
                   <div class="chart-error B1" ng-show="retrying && !fetching && error">
@@ -188,6 +188,7 @@ limitations under the License.
             chart-type="amplification"
             samples="samples"
             targets="targets"
+            init-sample-color="init_sample_color"
             >
             </chart-well-switch>
         </div>
@@ -199,36 +200,35 @@ limitations under the License.
               <th class="B2-M-Amplification" style="text-align: center; border-left:none; padding: 10px 5px;">Clr</th>
               <th class="B2-M-Amplification" style="text-align: center; padding: 10px 5px;">Omit</th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;" >Well</th>
-              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;" >Sample</th>
+              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; width: 20%;" >Sample</th>
               <th class="B2-M-Amplification" style="text-align: center;">Type</th>
-              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;">Target</th>
+              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; width: 20%;">Target</th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;" ng-class="{'channel-1': color_by === 'channel'}">
                 <span ng-if="is_dual_channel">C<small>q</small></span>
                 <span ng-if="!is_dual_channel">C<small>q</small></span>
               </th>
-              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;" ng-class="{'channel-2': color_by === 'channel'}">
+              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; min-width: 45px;" ng-class="{'channel-2': color_by === 'channel'}">
                 <span ng-if="is_dual_channel" >C<small>q</small> M</span>
                 <span ng-if="!is_dual_channel" >C<small>q</small> M</span>
               </th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;">Qty</th>
-              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;">Qty M</th>
+              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; min-width: 55px;">Qty M</th>
             </tr>
             <tr ng-repeat="well_item in well_data" 
               ng-class="{
-                selected: (
+                selected: !has_init || (
                   (wellButtons['well_' + (well_item.well_num - 1)].selected) && 
                   (omittedIndexes.indexOf($index) == -1) && 
                   (targetsSetHided[targets[$index].id])),
                 active: well_item.active
-              }"
-              ng-click="onSelectWell(well_item, $index)"
+              }"              
             >
               <td class="B2-Amplification" ng-class="{'text-center': color_by==='channel'}" style="vertical-align: middle; line-height: 10px;background: #fff;">
                 <span ng-if="color_by==='well'" class="B2-Amplification dot" ng-attr-style="background-color: {{wellButtons['well_'+(well_item.well_num - 1)].color}}"></span>
                 <span 
                   ng-if="color_by==='sample'" 
                   class="B2-Amplification dot" 
-                  ng-attr-style="background-color: {{samples[well_item.well_num - 1].color}}"></span>
+                  ng-attr-style="background-color: {{(samples[well_item.well_num - 1]) ? samples[well_item.well_num - 1].color : init_sample_color}}"></span>
                 <span 
                   ng-if="color_by==='target'" 
                   class="B2-Amplification dot" 
@@ -266,7 +266,8 @@ limitations under the License.
               </td>
               <td class="B2-Amplification" style="text-align: left;">
                 <span class="B2-Amplification one-line-span">
-                  {{targets[$index].name | truncate:20}}
+                  {{well_item.target_name | truncate:20}}
+                  <!-- {{targets[$index].name | truncate:20}} -->
                 </span>
               </td>
               <td class="B2-Amplification" style="text-align: left">

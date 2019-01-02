@@ -90,6 +90,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.label_well = "No Selection"
       $scope.label_channel = ""
 
+      $scope.has_init = false
+      $scope.init_sample_color = '#ccc'
+
       $scope.bgcolor_target = {
         'background-color':'#666666'
       }
@@ -324,10 +327,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
           Experiment.getAmplificationData($stateParams.id)
           .then (resp) ->
+            $scope.has_init = true
             $scope.fetching = false
             $scope.error = null
-            console.log('-------------------------haha3--------------------------------')
-            console.log(resp)
 
             if (resp.status is 200 and resp.data?.partial and $scope.enterState) or (resp.status is 200 and !resp.data.partial)
               $scope.hasData = true
@@ -409,7 +411,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                 else if $scope.color_by is 'target'
                   well_color = if $scope.targets[(ch_i - 1)+i*2] then $scope.targets[(ch_i - 1)+i*2].color else 'transparent'
                 else if $scope.color_by is 'sample'
-                  well_color = if $scope.samples[i] then $scope.samples[i].color else 'transparent'
+                  well_color = if $scope.samples[i] then $scope.samples[i].color else $scope.init_sample_color
                 else if ch_i is 1
                   well_color = '#00AEEF'
                 else
@@ -604,7 +606,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                         $scope.samples[i].color = $scope.COLORS[j % $scope.COLORS.length]
                         break
                       else
-                        $scope.samples[i].color = 'transparent'
+                        $scope.samples[i].color = $scope.init_sample_color
                   if $scope.is_dual_channel
                     $scope.well_targets[2*i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0]  else null
                     $scope.well_targets[2*i+1] = if resp.data[i].targets && resp.data[i].targets[1] then resp.data[i].targets[1] else null
@@ -622,9 +624,14 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                       $scope.well_targets[i].color = if $scope.well_targets[i] then $scope.lookupTargets[$scope.well_targets[i].id] else 'transparent'
                     $scope.types[i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0].well_type  else null
                 
-                $scope.updateSamplesSet()                   
-                updateSeries()
+                $scope.well_data = helper.blankWellData($scope.is_dual_channel, $scope.well_targets)
+                $scope.targets = helper.normalizeWellTargetData($scope.well_data)
+                for i in [0..$scope.targets.length - 1] by 1
+                  $scope.targetsSetHided[$scope.targets[i].id] = true
 
+                $scope.updateSamplesSet()
+                $scope.updateTargetsSet()
+                updateSeries()
 
                 fetchFluorescenceData()
 
