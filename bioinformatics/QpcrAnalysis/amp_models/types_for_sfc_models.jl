@@ -1,7 +1,7 @@
 # types_for_sfc_models.jl
 
 import DataStructures.OrderedDict
-import JuMP: Model
+using JuMP
 
 
 # sfc: same formula for each cycle

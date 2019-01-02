@@ -1,5 +1,7 @@
 # types for allelic discrimination, needed for `type AmpStepRampOutput`, therefore needed to be included before "amp.jl", can't be in "allelic_discrimination.jl" because in there `prep_input_4ad` utilize `type AmpStepRampOutput`
 
+import Clustering.ClusteringResult
+
 # clustering analysis result from a possible combination of expected genotypes
 struct ClusterAnalysisResult
     init_centers::Array{Float64,2} # no longer necessary because it represents one combination of genotypes, but different combinations of genotypes with the same number of genotypes may result in the same clustering results

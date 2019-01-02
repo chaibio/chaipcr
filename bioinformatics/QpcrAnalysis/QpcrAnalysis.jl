@@ -18,7 +18,11 @@
 # 0.3.0 `MySQL.mysql_execute(some_query)[1][:some_header]`
 # 0.5.2 `MySQL.query(some_query)[:some_header]`
 
-	
+
+
+@time __precompile__()
+
+
 
 # using Base
 
@@ -104,36 +108,5 @@ include("analyze_customized/thermal_consistency.jl")
 # include("__init__.jl")
 #
 # include("pnmsmu.jl")
-
-# precompile important analysis methods ahead of time
-# this is only important in production mode
-# these files need to be recreated using ../test/snoop.jl
-# before each production run
-include("precompile/precompile_Base.jl")
-include("precompile/precompile_DataArrays.jl")
-include("precompile/precompile_ForwardDiff.jl")
-include("precompile/precompile_StatsBase.jl")
-include("precompile/precompile_Blosc.jl")
-include("precompile/precompile_DataFrames.jl")
-include("precompile/precompile_HDF5.jl")
-include("precompile/precompile_MathProgBase.jl")
-include("precompile/precompile_unknown.jl")
-include("precompile/precompile_Clustering.jl")
-include("precompile/precompile_DataStructures.jl")
-include("precompile/precompile_Ipopt.jl")
-include("precompile/precompile_Missings.jl")
-include("precompile/precompile_Combinatorics.jl")
-include("precompile/precompile_Dierckx.jl")
-include("precompile/precompile_JLD.jl")
-include("precompile/precompile_QpcrAnalysis.jl")
-include("precompile/precompile_Compat.jl")
-include("precompile/precompile_Distances.jl")
-include("precompile/precompile_JSON.jl")
-include("precompile/precompile_ReverseDiffSparse.jl")
-include("precompile/precompile_Core.jl")
-include("precompile/precompile_JuMP.jl")
-include("precompile/precompile_SpecialFunctions.jl")
-
-@time __precompile__()
 
 end # module QpcrAnalysis

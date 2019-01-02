@@ -14,7 +14,7 @@ if (const RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE = false)
     # test code: precompilation should ensure
     # that the first and second runs are equally fast
     include("../test/test_functions.jl") # this file
-    test_functions=generate_tests()
+    test_functions = generate_tests()
     t1 = @elapsed test_functions["amplification dual channel"]()
     t2 = @elapsed test_functions["amplification dual channel"]()
 end
@@ -52,8 +52,10 @@ function generate_tests(;
                         ok = true
                     else # continue tests after errors reported
                         (ok, response_body) = QpcrAnalysis.dispatch(
-                            action,body;
-                            verbose=verbose,verify=true)
+                            action,
+                            body;
+                            verbose=verbose,
+                            verify=true)
                     end # if debug
                     QpcrAnalysis.print_v(println,verbose,"Passed $testname\n")
                     ok

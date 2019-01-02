@@ -3,6 +3,8 @@
 # Author: Tom Price
 # Date: Dec 2018
 
+import DataArrays.DataArray
+
 struct MeltCurveTF # temperature and fluorescence
     t_da_vec ::Vector{DataArray{Float64,1}}
     fluo_da ::DataArray{Float64,2}
