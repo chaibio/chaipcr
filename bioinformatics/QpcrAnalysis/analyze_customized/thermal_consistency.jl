@@ -1,6 +1,7 @@
 # thermal_consistency.jl
 # 72C thermal consistency test
 
+import Dierckx: Spline1D, derivative
 
 function act(
     ::ThermalConsistency,

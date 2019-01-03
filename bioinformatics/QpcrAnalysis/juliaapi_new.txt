@@ -19,10 +19,12 @@ experiments/:experiment_id/standard_curve
 output:
 
 {
-    {"targets":[
+    "targets": [
         {"target_id":1, "slope":xx, "offset":xx, "efficiency":1.02, "r2":xx}, 
         {"target_id":2, "slope":xx, "offset":xx, "efficiency":0.98, "r2":xx}, 
-        {"target_id":3, "error":"xxxxx"},{"target":4, "error":"xxxxx"}]}
+        {"target_id":3, "error":"xxxxx"},{"target":4, "error":"xxxxx"}]},
+    "groups": [],
+    "valid": true
 }
 
 ********************************************************************************

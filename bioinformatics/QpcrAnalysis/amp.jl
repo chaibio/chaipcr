@@ -2,7 +2,10 @@
 #
 # amplification analysis
 
-import JSON, DataStructures.OrderedDict
+import JSON
+import DataStructures.OrderedDict
+import Ipopt: IpoptSolver #, NLoptSolver
+using Ipopt
 
 
 # called by QpcrAnalysis.dispatch
@@ -307,8 +310,15 @@ function process_amp(
         )
     end) # do sr_ele
 
-    final_out = out_sr_dict ? sr_dict : collect(values(sr_dict))[1]
-    final_out["valid"] = true
+    if (out_sr_dict)
+        final_out = sr_dict
+    else
+        first_sr_out = first(values(sr_dict))
+        final_out = OrderedDict(map(fieldnames(first_sr_out)) do key
+            key => getfield(first_sr_out,key)
+        end)
+    end
+    final_out[:valid] = true
     return out_format == "json" ? JSON.json(final_out) : final_out
 
 end # process_amp
@@ -432,7 +442,7 @@ function mod_bl_q(
     kwargs_jmp_model ::OrderedDict =OrderedDict(
         :solver => IpoptSolver(print_level=0, max_iter=35) # `ReadOnlyMemoryError()` for v0.5.1
         # :solver => IpoptSolver(print_level=0, max_iter=100) # increase allowed number of iterations for MAK-based methods, due to possible numerical difficulties during search for fitting directions (step size becomes too small to be precisely represented by the precision allowed by the system's capacity)
-        # :solver =>    NLoptSolver(algorithm=:LN_COBYLA)
+        # :solver => NLoptSolver(algorithm=:LN_COBYLA)
     ),
     ipopt_print2file ::String ="",
 )
@@ -452,7 +462,7 @@ function mod_bl_q(
     bl_notes = ["last_cyc_wt0 <= 1 || num_cycs < min_reliable_cyc, fallback"]
 
     solver = kwargs_jmp_model[:solver]
-    if isa(solver, IpoptSolver)
+    if isa(solver, Ipopt.IpoptSolver)
         push!(solver.options, (:output_file, ipopt_print2file))
     end
 

@@ -58,11 +58,10 @@ end
 
 oc_1=OrderedDict(
     "calibration_info" => calib_1
-    }
 )
 
-open("test_2ch_oc_219.json","w") do f
-    JSON.print(f, calib_2)
+open("test_1ch_oc_168.json","w") do f
+    JSON.print(f, oc_1)
 end
 
 
@@ -310,10 +309,10 @@ ot_2 = OrderedDict(
     "water" => OrderedDict(
         "fluorescence_value" => transpose(ot_water_2)
     ),
-    "channel_1" => OrderedDict(
+    "FAM" => OrderedDict(
         "fluorescence_value" => transpose(ot_FAM_2)
     ),
-    "channel_2" => OrderedDict(
+    "HEX" => OrderedDict(
         "fluorescence_value" => transpose(ot_HEX_2)
     )
 )
