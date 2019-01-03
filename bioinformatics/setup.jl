@@ -91,7 +91,7 @@ println("installing library: ProfileView"); Pkg.add("ProfileView", v"0.3.0", v"0
 println("installing library: Dierckx"); Pkg.add("Dierckx", v"0.3.0", v"0.3.1-")
 # println("installing library: MySQL"); Pkg.add("MySQL", v"0.3.0", v"0.3.1-") # remove MySQL dependency
 println("installing library: DataArrays"); Pkg.add("DataArrays", v"0.7.0", v"0.7.1-")
-@static if (!PRODUCTION_MODE)
+@static if (get(ENV, "JULIA_ENV", nothing)!="production")
     println("installing library: FactCheck"); Pkg.add("FactCheck", v"0.4.3", v"0.4.4-") # for testing
 end
 
