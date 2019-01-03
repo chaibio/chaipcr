@@ -225,12 +225,14 @@ ENDSSH
 
 		echo now at $(pwd)
 		branch_param=
+        branch_name=
 
-	    if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; -eq &quot;trunk&quot; ]
+	    if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
 		then
    			echo No build branch chosen
 		else
      		branch_param=&quot;-b $(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
+            branch_name=&quot;$(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
 		    echo Cloning branch $branch_param
 		fi
 
@@ -243,9 +245,8 @@ ENDSSH
 		then
    			echo No build branch chosen
 		else
-     		git checkout $branch_param
+     		git checkout $branch_name
 		fi
-        
 
         cd web
         echo now at $(pwd)
@@ -269,12 +270,16 @@ ENDSSH
         sudo chmod 0777 /usr/share/rvm/tmp/*
         sudo chmod 0777 /usr/share/rvm/*
 
-		sudo rvm install ruby-2.1.5
-        sudo /usr/share/rvm/bin/rvm install ruby-2.1.5
+		sudo rvm install ruby-2.2.9
+        sudo /usr/share/rvm/bin/rvm install ruby-2.2.9
 
         source /etc/profile.d/rvm.sh
-        sudo rvm install ruby-2.1.5
-        sudo /usr/share/rvm/bin/rvm install ruby-2.1.5
+        sudo rvm install ruby-2.2.9
+        sudo /usr/share/rvm/bin/rvm install ruby-2.2.9
+
+		echo installing nodejs v4.5.0
+ 		sudo bash -ic &apos;curl https://raw.githubusercontent.com/creationix/nvm/v0.32.0/install.sh | bash; export NVM_DIR=&quot;/var/lib/jenkins/.nvm&quot;; echo &quot;dir2: $NVM_DIR&quot;; [ -s &quot;$NVM_DIR/nvm.sh&quot; ] &amp;&amp; . &quot;$NVM_DIR/nvm.sh&quot; ; nvm install 4.5.0;nvm use 4.5.0&apos;
+		
 
         sudo npm install --global gulp
         sudo npm install --global gulp-cli
@@ -282,6 +287,7 @@ ENDSSH
         
         sudo gulp deploy || exit 1
         cd ..
+        echo done gulp deploy
         
 		rm -rf ./web/log
 
@@ -308,10 +314,7 @@ exit 1
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo cleanup some space
-#rm /usr/lib/julia/sys-debug.*
-
-echo Setup MySQL
+      <command>echo Setup MySQL
 mkdir /data /perm || true
 systemctl stop mysql.service
 mount /dev/mmcblk1p2 /data || true
@@ -326,6 +329,8 @@ sync
 cd
 
 echo unmounting any sdcard folders
+DEBIAN_FRONTEND=noninteractive apt-get -q -y  install parted
+
 swapoff -a
 umount /sdcard/*
 umount /dev/mmcblk0p*
@@ -372,7 +377,9 @@ sudo swapon /sdcard/factory/swapfile
 sudo swapon -s
 
 free -m
-
+apt autoremove -y -q
+du -h --max-depth=1 /
+df -h
 exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
@@ -381,6 +388,10 @@ exit 0</command>
       <command>echo Maintenance
 df -h
 export RAILS_ENV=production
+export DEBIAN_FRONTEND=noninteractive
+apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data
+apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data
+
 cd /root/chaipcr/web
 bundle install
 gem install bcrypt -v &apos;3.1.11&apos;
@@ -419,6 +430,7 @@ bundle install
 gem install bcrypt -v &apos;3.1.11&apos;
 echo done rserev
 
+echo running db migrate script
 bundle exec rake db:migrate --trace # migrates database as needed
 
 df -h
@@ -439,8 +451,11 @@ if [ -e /root/chaipcr/bioinformatics/juliaserver.jl ]
 then
       julia -v
       echo about to start using QpcrAnalysis
+      df -h
       free -m
       export DEBIAN_FRONTEND=noninteractive
+apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data
+apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data
 
         if [ -e /tmp/mysql.sock ]
 	then
@@ -455,43 +470,55 @@ then
 		fi
 	fi
 
-export PATH=$PATH:/sbin:/usr/sbin
-export TERM=linux
-echo &apos;debconf debconf/frontend select Noninteractive&apos; | debconf-set-selections
-DEBIAN_FRONTEND=noninteractive apt-get -q -y  install patchelf
-DEBIAN_FRONTEND=noninteractive apt-get -q -y  install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3
+	export PATH=$PATH:/sbin:/usr/sbin
+	export TERM=linux
+	echo &apos;debconf debconf/frontend select Noninteractive&apos; | debconf-set-selections
+	DEBIAN_FRONTEND=noninteractive apt-get -q -y  install patchelf
+	DEBIAN_FRONTEND=noninteractive apt-get -q -y  install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3
 
-DEBIAN_FRONTEND=noninteractive apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3  || exit 1
+	DEBIAN_FRONTEND=noninteractive apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3  || exit 1
 
-if $is_dev
-then
-      echo Building a debug image
-      julia_pkgdir=&quot;/sdcard/factory&quot;
-     export JULIA_PKGDIR=/sdcard/factory/.julia
-else
-      echo freeing up some space
-      rm -r /var/cache/apt /var/log/ /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/tests
-      mkdir /var/log/ -p
-      find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
-      apt update
-      julia_pkgdir=&quot;/root&quot;
-      export JULIA_PKGDIR=/root/.julia
-fi
+      pkill -9 julia
+      pkill -9 julia
+      pkill -9 julia
+      pkill -9 julia
+      pkill -9 julia
+      ps -aux
 
-      JULIA_ENV=production julia -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;);reload(&quot;QpcrAnalysis&quot;);using QpcrAnalysis;&apos; --compile=all
-
-      echo tested using QpcrAnalysis
-      if [ -e ${julia_pkgdir}/.julia/lib/v0.6/QpcrAnalysis.ji ]
+      if $is_dev
       then
-            echo QpcrAnalysis package precompiled.
+             echo Building a debug image
+             echo Building precompiling julia on sdcard
+             julia_pkgdir=&quot;/sdcard/factory&quot;
+             export JULIA_PKGDIR=/sdcard/factory/.julia
       else
-            echo Error precompiling QpcrAnalysis package
-            exit 1
+             echo freeing up some space
+             rm -r /var/cache/apt /var/log/ /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/tests
+             mkdir /var/log/ -p
+	     echo freeing up some space
+	     # remove part of .git folder to save more space. Keeping the .git/objects folder under the packages because Pkg.status() verify the package number from there. An extra chance to save space is available here by cherry pick the exact file needed by Pkg.status().
+	     apt update
+	     find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;/logs/
+	     find /root/.julia/.cache/ -name objects | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
+             apt update
+             julia_pkgdir=&quot;/root&quot;
+             export JULIA_PKGDIR=/root/.julia
       fi
 
-julia -e &apos;Pkg.add(&quot;BuildExecutable&quot;);Pkg.checkout(&quot;BuildExecutable&quot;)&apos;
+       JULIA_ENV=production julia -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;);reload(&quot;QpcrAnalysis&quot;);using QpcrAnalysis;&apos; --compile=all
 
-cd ${julia_pkgdir}/.julia/v0.6/BuildExecutable/src/
+       echo tested using QpcrAnalysis
+       if [ -e ${julia_pkgdir}/.julia/lib/v0.6/QpcrAnalysis.ji ]
+       then
+            echo QpcrAnalysis package precompiled.
+       else
+            echo Error precompiling QpcrAnalysis package
+            exit 1
+       fi
+
+	julia -e &apos;Pkg.add(&quot;BuildExecutable&quot;);Pkg.checkout(&quot;BuildExecutable&quot;)&apos;
+
+	cd ${julia_pkgdir}/.julia/v0.6/BuildExecutable/src/
 
 cat &lt;&lt; &apos;EOF&apos; &gt;  add_catch.patch
 
@@ -526,9 +553,9 @@ EOF
 
 echo Patching..
 
-patch -i add_catch.patch  || (echo error patching ExecBuilder package &amp;&amp; exit 1)
+patch -i add_catch.patch || (echo error patching ExecBuilder package &amp;&amp; exit 1)
 echo done installation.. creating execuitable:
-
+rm add_catch.patch
 #exit 0
 
 JULIA=julia
@@ -588,8 +615,6 @@ mkdir -p /usr/lib/lib/root/
 rm /usr/lib/lib/root/qpcranalysis.ji
 rm /usr/lib/lib/root/qpcranalysis.so
 rm /usr/share/julia/base/userimg.jl
-#echo try script on its onwn
-#JULIA_ENV=production $JULIA /tmp/precompile_QpcrAnalysis.jl
 
 echo creating the image
 time JULIA_ENV=production $JULIA /tmp/mkexec.jl
@@ -603,7 +628,8 @@ echo testing juliaserver script to make sure nothing left to precompile as we ar
 
 test_julia_server2()
 {
-     JULIA_ENV=production julia -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;); include(&quot;/root/chaipcr/bioinformatics/juliaserver.jl&quot;)&apos;
+     JULIA_ENV=production julia -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;); 
+     include(&quot;/root/chaipcr/bioinformatics/juliaserver.jl&quot;)&apos;
      echo error: julia server terminated
 }
 
@@ -642,10 +668,25 @@ pkill -9 julia
 pkill -9 julia
 pkill -9 julia
 sleep 100
-ps -aux | grep julia
 
-#echo testing building julia  exec.. 
-#exit 1
+ps -aux | grep julia
+df -h
+echo moving julia to eMMC
+if $is_dev
+then
+     echo No clean for dev image
+else
+     echo Cleaning julia folder
+#       find /sdcard/factory/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
+       find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
+fi
+
+julia_pkgdir=&quot;/root&quot;
+export JULIA_PKGDIR=/root/.julia
+#mv /sdcard/factory/.julia ~/.julia
+#ls -ahl  /sdcard/factory/
+df -h
+
 exit 0
 </command>
       <execEachLine>false</execEachLine>
@@ -665,7 +706,7 @@ find . -name *.o  -exec rm {} \;
 find / -name .git -execdir rm -r {} \;
 rm -r /var/cache/apt /var/log/ /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/tests
 mkdir /var/log/ -p
-find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
+
 apt update
 
 exit 0
@@ -682,21 +723,23 @@ cd compile-browser/
 apt-get install -y git make linux-headers-`uname -r` build-essential cmake curl pkg-config python sshpass unzip
 
 branch_param=
-if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; -eq &quot;trunk&quot; ]
+branch_name=
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
 then
    echo No build branch chosen
 else
      branch_param=&quot;-b $(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
+     branch_name=&quot;$(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
      echo Cloning branch $branch_param
 fi
 
 git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
 cd chaipcr
-if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; -eq &quot;trunk&quot; ]
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
 then
        echo No build branch chosen
 else
-       git checkout $branch_param
+     		git checkout $branch_name
 fi
 
 cd /sdcard/factory/compile-browser/chaipcr/browser/ || exit 1
@@ -740,22 +783,24 @@ mkdir -p /sdcard/factory/realtime-compile
 cd /sdcard/factory/realtime-compile
 
 branch_param=
+branch_name=
 
-if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; -eq &quot;trunk&quot; ]
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
 then
         echo No build branch chosen
 else
          branch_param=&quot;-b $(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
+         branch_name=&quot;$(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
 	echo Cloning branch $branch_param
 fi
 
 git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
 cd chaipcr
-if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; -eq &quot;trunk&quot; ]
+if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
 then
         echo No build branch chosen
 else
-       git checkout $branch_param
+     	git checkout $branch_name
 fi
 
 cd /sdcard/factory/realtime-compile/chaipcr/realtime || exit 1
@@ -858,7 +903,7 @@ sed -i &apos;s/#reboot/reboot/&apos; /etc/dhcp/dhclient.conf
 echo Disabling usb1
 cd /opt/scripts/boot        
 
-ls temp.patch &amp;&amp; rm temp.patch
+[ -e temp.patch ] &amp;&amp; rm temp.patch
 cat &gt;&gt; temp.patch &lt;&lt; EOF
 --- am335x_evm.sh       2018-10-04 15:06:36.889361025 +0200
 +++ am335x_evm.sh       2018-10-04 15:06:26.649444094 +0200
@@ -1066,10 +1111,8 @@ sync
 swapoff -a
 /sbin/swapoff  -a
 
-echo clearing more space and removing .git julia folders
-
+echo clearing more space
 apt-get -q -y --fix-broken install
-
 rm /sdcard/factory/swapfile
 cd
 
@@ -1078,6 +1121,10 @@ then
       echo Building a debug image
       exit 0
 fi
+
+# remove folders that are needed for the production image. An extra chance to freeup more space is by linking realtime and the browser statically.
+rm -r /opt/QtEmbedded/bin/  /opt/QtEmbedded/mkspecs /opt/QtEmbedded/include
+
 find . -name .git -execdir rm -r {} \;
 find . -name *.o  -exec rm {} \;
 find / -name .git -execdir rm -r {} \;
@@ -1099,11 +1146,15 @@ then
       exit 0
 fi
 
+# should be safe to remove the following: [only 5M save]
+#cd /opt/QtEmbedded/lib
+#rm libQtMultimedia* libQtDeclarative* libQtScriptTools* libQtSql* libQtSv* libQtTest* libQtXml* libQtScript*
+
 for retryloop in 1 2 3
 do
 apt-get  -y -q --purge autoremove g++-4.7 g++-4.8 gcc-4.8 g++-4.8 gcc-4.8 g++-4.8 
 apt-get  -y -q --purge autoremove libblas3gf libblas3gf
-apt-get  -y -q --purge autoremove parted linux-headers-`uname -r` parted automake build-essential cmake curl device-tree-compiler evtest g++ gfortran git i2c-tools libarpack2 libblas-common libblas-dev libblas3 libedit-dev libfftw3-dev libfftw3-double3 libfftw3-single3 libfontconfig1-dev libfreetype6-dev libgfortran3 libgfortran3 libgmp3-dev liblapack3 liblapack3gf libllvm3.8 libmetis5 libmpfr-dev libopenblas-base libopenblas-dev libqt4-webkit libssl-dev libtool libunwind8 libxcursor-dev libxext-dev libxfixes-dev libxft-dev libxi-dev libxml2-dev libxrandr-dev libxrender-dev libxslt-dev lsb-release m4 nodejs ntp ntpdate parted pkg-config python unzip
+apt-get  -y -q --purge autoremove parted linux-headers-`uname -r` automake build-essential cmake curl device-tree-compiler evtest g++ gfortran git i2c-tools libarpack2 libblas-common libblas-dev libblas3 libedit-dev libfftw3-dev libfftw3-double3 libfftw3-single3 libfontconfig1-dev libfreetype6-dev libgfortran3 libgfortran3 libgmp3-dev liblapack3 liblapack3gf libllvm3.8 libmetis5 libmpfr-dev libopenblas-base libopenblas-dev libqt4-webkit libssl-dev libtool libunwind8 libxcursor-dev libxext-dev libxfixes-dev libxft-dev libxi-dev libxml2-dev libxrandr-dev libxrender-dev libxslt-dev lsb-release m4 nodejs ntp ntpdate pkg-config python unzip
 
 apt-get install -y -q liblapack-dev 
 apt-get -f  -y -q install
@@ -1123,6 +1174,8 @@ DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge gcc-4.9 cmake
 DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge python2*
 
 apt-get autoremove -y --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data
+
+apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data
 
 df -h
 done
@@ -1237,7 +1290,7 @@ LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
 ,,0xe,*
 __EOF__
 
-partprobe /dev/mmcblk0
+/sbin/partprobe /dev/mmcblk0
 mkfs.ext4 /dev/mmcblk0p1 -F
 
 sync

@@ -231,6 +231,13 @@ df -h
 rm /var/lib/dpkg/lock
 echo -e &quot;\n&quot; | dpkg --configure -a
 #dpkg --configure -a
+pkill julia
+pkill julia
+pkill julia
+pkill julia
+pkill realtime
+pkill realtime
+
 swapoff -a
 
 umount /dev/mmcblk0p*
