@@ -20,7 +20,7 @@
 
 
 
-@time __precompile__()
+__precompile__()
 
 
 
@@ -28,7 +28,7 @@
 
 module QpcrAnalysis
 
-using Clustering, Combinatorics, DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NamedTuples, DataArrays #, NLopt
+# using Clustering, Combinatorics, DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NamedTuples, DataArrays #, NLopt
 # `, DataArrays` needed if `Pkg.add("DataFrames", v"0.11.2", v"0.11.3-")`, but not needed when using latest version as of 2018-04-10
 # `, NLopt` on BBB but not on PC ("ERROR: LoadError: Declaring __precompile__(false) is not allowed in files that are being precompiled". "ERROR: Failed to precompile NLopt to /root/.julia/lib/v0.6/NLopt.ji") # In addition, "HttpServer" for "juliaserver.jl"
 
@@ -44,8 +44,6 @@ end][1] # slice by boolean vector returned a one-element vector. Assumption: LOA
 #include("constants.jl")
 include("types_for_dispatch.jl")
 include("types_for_calibration.jl")
-include("constants.jl")
-
 include("types_for_allelic_discrimination.jl")
 include("types_for_amplification.jl")
 include("types_for_meltcurve.jl")

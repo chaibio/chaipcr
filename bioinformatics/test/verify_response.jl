@@ -36,27 +36,35 @@ function verify_response(
     facts() do
         context("Verifying response body") do
             @fact (isa(response,OrderedDict)) --> true
-            @fact (haskey(response,"targets")) --> true
-            # @fact (haskey(response,"groups")) --> true # do not verify groups
-            array=response["targets"]
-            @fact (isa(array,Vector)) --> true
-            for i in range(1,length(array))
-                dict=array[i]
-                @fact (isa(dict,OrderedDict)) --> true
-                @fact (haskey(dict,"target_id")) --> true
-                if (length(dict)==2)
-                    @fact (haskey(dict,"error")) --> true
-                    @fact (isa(dict["error"],String)) --> true
-                else
-                    @fact (length(dict)) --> 5
-                    @fact (haskey(dict,"slope")) --> true
-                    @fact (isa(dict["slope"],Number)) --> true
-                    @fact (haskey(dict,"offset")) --> true
-                    @fact (isa(dict["offset"],Number)) --> true
-                    @fact (haskey(dict,"efficiency")) --> true
-                    @fact (isa(dict["efficiency"],Number)) --> true
-                    @fact (haskey(dict,"r2")) --> true
-                    @fact (isa(dict["r2"],Number)) --> true
+            @fact (haskey(response,"valid")) --> true
+            if (haskey(response,"error"))
+                @fact (length(response)) --> 2
+                @fact (isa(response["error"],String)) --> true
+                @fact (response["valid"]) --> false
+            else
+                @fact (response["valid"]) --> true
+                @fact (haskey(response,"targets")) --> true
+                # @fact (haskey(response,"groups")) --> true # do not verify groups
+                array=response["targets"]
+                @fact (isa(array,Vector)) --> true
+                for i in range(1,length(array))
+                    dict=array[i]
+                    @fact (isa(dict,OrderedDict)) --> true
+                    @fact (haskey(dict,"target_id")) --> true
+                    if (length(dict)==2)
+                        @fact (haskey(dict,"error")) --> true
+                        @fact (isa(dict["error"],String)) --> true
+                    else
+                        @fact (length(dict)) --> 5
+                        @fact (haskey(dict,"slope")) --> true
+                        @fact (isa(dict["slope"],Number)) --> true
+                        @fact (haskey(dict,"offset")) --> true
+                        @fact (isa(dict["offset"],Number)) --> true
+                        @fact (haskey(dict,"efficiency")) --> true
+                        @fact (isa(dict["efficiency"],Number)) --> true
+                        @fact (haskey(dict,"r2")) --> true
+                        @fact (isa(dict["r2"],Number)) --> true
+                    end
                 end
             end
         end

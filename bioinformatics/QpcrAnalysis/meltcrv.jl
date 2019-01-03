@@ -3,6 +3,7 @@
 import DataStructures.OrderedDict
 import DataArrays.DataArray
 import StatsBase.countmap
+import Dierckx: Spline1D, derivative
 
 
 # called by QpcrAnalyze.dispatch
@@ -258,12 +259,13 @@ function process_mc(
     if (out_format[end-3:end] == "json")
         fns = [:mc, :Ta_fltd]
         mc_keys = ["melt_curve_data", "melt_curve_analysis"]
-        mc_out = OrderedDict(map(1:length(mc_keys)) do fk_i
+        mc_out = OrderedDict{String,Any}(map(1:length(mc_keys)) do fk_i
             mc_keys[fk_i] => [
                 getfield(mc_bychwl[well_i, channel_i], fns[fk_i])
                 for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
             ]
         end) # do key_i
+        mc_out["valid"] = true
         if out_format == "json"
             mc_out = JSON.json(mc_out)
         end
