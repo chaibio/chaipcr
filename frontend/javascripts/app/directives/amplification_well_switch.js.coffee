@@ -62,6 +62,8 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
           well_color = if $scope.targets[i] then $scope.targets[i].color else 'transparent'
         else if $scope.colorBy is 'sample'
           well_color = if $scope.samples[i] then $scope.samples[i].color else $scope.initSampleColor
+          if ($scope.isDual and !$scope.targets[b*2].id and !$scope.targets[b*2+1].id) or (!$scope.isDual and !$scope.targets[b].id)
+            well_color = 'transparent'
         else
           well_color = '#FFFFFF'
 
@@ -105,7 +107,6 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
 
       $scope.$watch 'colorBy', (color_by) ->
         for i in [0..15] by 1
-
           if color_by is 'well'
             well_color = WELL_COLORS[i]
           else if color_by is 'target'
@@ -115,6 +116,8 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
             $scope.wells["well_#{i}"].color2 = if $scope.targets[i*2+1] then $scope.targets[i*2+1].color else 'transparent'
           else if color_by is 'sample'
             well_color = if $scope.samples[i] then $scope.samples[i].color else $scope.initSampleColor
+            if ($scope.isDual and !$scope.targets[i*2].id and !$scope.targets[i*2+1].id) or (!$scope.isDual and !$scope.targets[i].id)
+              well_color = 'transparent'
           # else
           #   well_color = '#75278E'
           else

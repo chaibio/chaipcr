@@ -413,6 +413,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                   well_color = if $scope.targets[(ch_i - 1)+i*2] then $scope.targets[(ch_i - 1)+i*2].color else 'transparent'
                 else if $scope.color_by is 'sample'
                   well_color = if $scope.samples[i] then $scope.samples[i].color else $scope.init_sample_color
+                  if ($scope.is_dual_channel and !$scope.targets[i*2].id and !$scope.targets[i*2+1].id) or (!$scope.is_dual_channel and !$scope.targets[i].id)
+                    well_color = 'transparent'
                 else if ch_i is 1
                   well_color = '#00AEEF'
                 else
