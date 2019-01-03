@@ -197,13 +197,13 @@ limitations under the License.
         <table style="height: fit-content; min-width: 540px; backface-visibility: white">
           <tbody>
             <tr>
-              <th class="B2-M-Amplification" style="text-align: center; border-left:none; padding: 10px 5px;">Clr</th>
-              <th class="B2-M-Amplification" style="text-align: center; padding: 10px 5px;">Omit</th>
-              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;" >Well</th>
+              <th class="B2-M-Amplification" style="text-align: center; border-left:none; padding: 10px 5px; width: 45px;">Clr</th>
+              <th class="B2-M-Amplification" style="text-align: center; padding: 10px 5px; width: 50px;">Omit</th>
+              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; width: 45px;" >Well</th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; width: 20%;" >Sample</th>
-              <th class="B2-M-Amplification" style="text-align: center;">Type</th>
+              <th class="B2-M-Amplification" style="text-align: center; width: 50px;">Type</th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; width: 20%;">Target</th>
-              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;" ng-class="{'channel-1': color_by === 'channel'}">
+              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; min-width: 40px;" ng-class="{'channel-1': color_by === 'channel'}">
                 <span ng-if="is_dual_channel">C<small>q</small></span>
                 <span ng-if="!is_dual_channel">C<small>q</small></span>
               </th>
@@ -211,7 +211,7 @@ limitations under the License.
                 <span ng-if="is_dual_channel" >C<small>q</small> M</span>
                 <span ng-if="!is_dual_channel" >C<small>q</small> M</span>
               </th>
-              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px;">Qty</th>
+              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; min-width: 40px;">Qty</th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; min-width: 55px;">Qty M</th>
             </tr>
             <tr ng-repeat="well_item in well_data" 
@@ -221,7 +221,8 @@ limitations under the License.
                   (omittedIndexes.indexOf($index) == -1) && 
                   (targetsSetHided[targets[$index].id])),
                 active: well_item.active
-              }"              
+              }"
+              ng-if="well_item.target_id"
             >
               <td class="B2-Amplification" ng-class="{'text-center': color_by==='channel'}" style="vertical-align: middle; line-height: 10px;background: #fff;">
                 <span ng-if="color_by==='well'" class="B2-Amplification dot" ng-attr-style="background-color: {{wellButtons['well_'+(well_item.well_num - 1)].color}}"></span>

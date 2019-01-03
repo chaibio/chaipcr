@@ -50,19 +50,19 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         '#04A0D9'
         '#1578BE'
         '#2455A8'
-        '#3B2F90'
-        '#73258C'
-        '#B01C8B'
-        '#FA1284'
-        '#FF004E'
+        '#3D3191'
+        '#75278E'
+        '#B01D8B'
+        '#FA1485'
+        '#FF0050'
         '#EA244E'
         '#FA3C00'
-        '#EF632A'
-        '#F5AF13'
-        '#FBDE26'
-        '#B6D333'
-        '#67BC42'
-        '#13A350'
+        '#F0662D'
+        '#F6B014'
+        '#FCDF2B'
+        '#B7D436'
+        '#68BD43'
+        '#14A451'
       ]
 
     @SAMPLE_TARGET_COLORS = [
@@ -198,9 +198,9 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
     @blankWellData = (is_dual_channel, well_targets) ->
       well_targets = angular.copy well_targets
       well_data = []
-      for i in [1.. 16] by 1
+      for i in [0.. 15] by 1
         item = {}
-        item['well_num'] = i
+        item['well_num'] = i+1
         item['replic_group'] = null
         item['quantity_m'] = null
         item['quantity_b'] = null

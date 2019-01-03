@@ -40,6 +40,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.well_data = []
 
       $scope.COLORS = helper.SAMPLE_TARGET_COLORS
+      $scope.WELL_COLORS = helper.COLORS      
       AMPLI_DATA_CACHE = null
       retryInterval = null
       $scope.baseline_subtraction = true
@@ -619,7 +620,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                     $scope.well_targets[i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0]  else null
                     if $scope.well_targets[i]
                       $scope.well_targets[i].color = if $scope.well_targets[i] then $scope.lookupTargets[$scope.well_targets[i].id] else 'transparent'
-                
+
                 $scope.well_data = helper.blankWellData($scope.is_dual_channel, $scope.well_targets)
                 $scope.targets = helper.normalizeWellTargetData($scope.well_data)
                 for i in [0..$scope.targets.length - 1] by 1

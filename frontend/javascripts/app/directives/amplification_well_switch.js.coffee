@@ -39,6 +39,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
     link: ($scope, elem, attrs, ngModel) ->
 
       COLORS = AmplificationChartHelper.SAMPLE_TARGET_COLORS
+      WELL_COLORS = AmplificationChartHelper.COLORS
       ACTIVE_BORDER_WIDTH = 2
       is_cmd_key_held = false
       wells = {}
@@ -56,7 +57,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
       for b in [0...16] by 1
 
         if $scope.colorBy is 'well'
-          well_color = COLORS[b]
+          well_color = WELL_COLORS[b]
         else if $scope.colorBy is 'target'
           well_color = if $scope.targets[i] then $scope.targets[i].color else 'transparent'
         else if $scope.colorBy is 'sample'
@@ -106,7 +107,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
         for i in [0..15] by 1
 
           if color_by is 'well'
-            well_color = COLORS[i]
+            well_color = WELL_COLORS[i]
           else if color_by is 'target'
             well_color = if $scope.targets[i] then $scope.targets[i].color else 'transparent'
             $scope.wells["well_#{i}"].color = if $scope.targets[i] then $scope.targets[i].color else 'transparent'
