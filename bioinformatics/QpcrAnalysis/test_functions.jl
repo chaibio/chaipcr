@@ -22,7 +22,7 @@ end
 import FactCheck: clear_results
 import DataFrames: DataFrame
 import DataStructures: OrderedDict
-import BSON: bson
+import BSON: bson, load
 
 td = readdlm("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/test_data.csv",',',header=true)
 const TEST_DATA = DataFrame([slicedim(td[1],2,i) for i in 1:size(td[1])[2]],map(Symbol,td[2][:]))

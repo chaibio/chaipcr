@@ -133,14 +133,18 @@ function main()
 	#reload("QpcrAnalysis")
 
   # load test functions
-  include("../test_functions.jl")
-  test_functions = generate_tests()
-  dispatch_results = OrderedDict(map(
-    testname -> testname => test_functions[testname](),
-    keys(test_functions)))
+  import BSON.load
+  import DataStructures.OrderedDict
+  test_functions = BSON.load("../test/data/dispatch_tests.bson")
 
-	println("About to test dispatch. First time dispatch time:")
-	@time QpcrAnalysis.dispatch("amplification", "{\"calibration_info\":{\"water\":{\"calibration_id\":44,\"step_id\":28},\"channel_1\":{\"calibration_id\":44,\"step_id\":31},\"channel_2\":{\"calibration_id\":44,\"step_id\":34}},\"experiment_id\":68,\"min_ct\":5,\"baseline_cyc_bounds\":[],\"cq_method\":\"Cy0\"}")
+  # run 13 analyses through QpcrAnalysis.dispatch()
+  println("Accessing dispatch functions")
+  check = OrderedDict(map(keys(test_functions)) do testname
+      result = test_functions[testname]()
+      testname => result[1] && result[2]["valid"]
+  end)
+  # all test results must be positive, or else an error will be raised
+  @assert all(values(check)) 
 
 	println("dispatch time no JIT:")
 	@time QpcrAnalysis.dispatch("amplification", "{\"calibration_info\":{\"water\":{\"calibration_id\":44,\"step_id\":28},\"channel_1\":{\"calibration_id\":44,\"step_id\":31},\"channel_2\":{\"calibration_id\":44,\"step_id\":34}},\"experiment_id\":68,\"min_ct\":5,\"baseline_cyc_bounds\":[],\"cq_method\":\"Cy0\"}")
