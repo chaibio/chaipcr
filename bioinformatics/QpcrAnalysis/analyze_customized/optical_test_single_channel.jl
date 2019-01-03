@@ -61,7 +61,9 @@ function act(
         )
     end # do well_i
 
-    output = OrderedDict("optical_data" => results)
+    output = OrderedDict(
+        "optical_data" => results,
+        "valid" => true)
     if (out_format=="json")
         return JSON.json(output)
     else

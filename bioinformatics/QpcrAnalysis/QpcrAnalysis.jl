@@ -18,14 +18,17 @@
 # 0.3.0 `MySQL.mysql_execute(some_query)[1][:some_header]`
 # 0.5.2 `MySQL.query(some_query)[:some_header]`
 
-	
+
+
+__precompile__()
+
+
 
 # using Base
 
-@time __precompile__()
 module QpcrAnalysis
 
-using Clustering, Combinatorics, DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NamedTuples, DataArrays #, NLopt
+# using Clustering, Combinatorics, DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NamedTuples, DataArrays #, NLopt
 # `, DataArrays` needed if `Pkg.add("DataFrames", v"0.11.2", v"0.11.3-")`, but not needed when using latest version as of 2018-04-10
 # `, NLopt` on BBB but not on PC ("ERROR: LoadError: Declaring __precompile__(false) is not allowed in files that are being precompiled". "ERROR: Failed to precompile NLopt to /root/.julia/lib/v0.6/NLopt.ji") # In addition, "HttpServer" for "juliaserver.jl"
 
@@ -41,8 +44,6 @@ end][1] # slice by boolean vector returned a one-element vector. Assumption: LOA
 #include("constants.jl")
 include("types_for_dispatch.jl")
 include("types_for_calibration.jl")
-include("constants.jl")
-
 include("types_for_allelic_discrimination.jl")
 include("types_for_amplification.jl")
 include("types_for_meltcurve.jl")
@@ -54,10 +55,8 @@ include("amp_models/types_for_dfc_models.jl")
 # shared functions
 include("shared.jl")
 
+# this code is hidden from the parser on the BeagleBone
 @static if (get(ENV, "JULIA_ENV", nothing)!="production")
-
-	# this code is hidden from the parser on the BeagleBone
-
 	# development & testing
 	import Base.Test
 	using FactCheck
@@ -107,8 +106,5 @@ include("analyze_customized/thermal_consistency.jl")
 # include("__init__.jl")
 #
 # include("pnmsmu.jl")
-
-
-
 
 end # module QpcrAnalysis

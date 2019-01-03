@@ -1,6 +1,7 @@
 # multi-channel.jl
 #
 # process multi-channel (mtch) data. 
+# these functions are not currently used
 
 # Top-level function: run qPCR functions on multi-channel fluorescence data and output consolidated results. original matrix will become 3-D array, original string or list will be come list.
 function process_mtch(

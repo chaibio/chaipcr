@@ -24,25 +24,25 @@ function finite_diff(
     X ::AbstractVector, Y ::AbstractVector; # X and Y must be of same length
     nu ::Integer=1, # order of derivative
     method ::String="central"
-    )
+)
 
     dlen = length(X)
     if dlen != length(Y)
         error("X and Y must be of same length.")
     end
 
-    if dlen == 1
+    if (dlen == 1)
         return zeros(1)
     end
 
-    if nu == 1
-        if method == "central"
+    if (nu == 1)
+        if (method == "central")
             range1 = 3:dlen+2
             range2 = 1:dlen
-        elseif method == "forward"
+        elseif (method == "forward")
             range1 = 3:dlen+2
             range2 = 2:dlen+1
-        elseif method == "backward"
+        elseif (method == "backward")
             range1 = 2:dlen+1
             range2 = 1:dlen
         end
@@ -51,8 +51,7 @@ function finite_diff(
             vcat(
                 ori[2] * 2 - ori[1],
                 ori,
-                ori[dlen-1] * 2 - ori[dlen]
-            )
+                ori[dlen-1] * 2 - ori[dlen])
         end
 
         return (Y_p2[range1] .- Y_p2[range2]) ./ (X_p2[range1] .- X_p2[range2])
@@ -68,11 +67,14 @@ function finite_diff(
 end
 
 # construct DataFrame from dictionary key and value vectors
-# `dict_keys` need to be a vector of strings to construct DataFrame column indices correctly
+# `dict_keys` need to be a vector of strings
+# to construct DataFrame column indices correctly
 function dictvec2df(dict_keys ::AbstractVector, dict_values ::AbstractVector) 
     df = DataFrame()
     for dict_key in dict_keys
-        df[Symbol(dict_key)] = map(dict_ele -> dict_ele[dict_key], dict_values)
+        df[Symbol(dict_key)] = map(
+            dict_ele -> dict_ele[dict_key], 
+            dict_values)
     end
     return df
 end
@@ -91,7 +93,11 @@ end
     # x_mp_i = index of middle point in selected data points from X
     # sel_idc = selected indices
 
-function giis_even(dlen ::Integer, i ::Integer, span_dp ::Integer)
+function giis_even(
+    dlen ::Integer,
+    i ::Integer,
+    span_dp ::Integer
+)
     start_idx = i > span_dp ? i - span_dp : 1
     end_idx = i < dlen - span_dp ? i + span_dp : dlen
     return start_idx:end_idx
@@ -99,7 +105,8 @@ end
 
 function giis_uneven(
     X ::AbstractVector,
-    i ::Integer, span_x ::Real)
+    i ::Integer, span_x ::Real
+)
     return find(X) do x_dp
         X[i] - span_x <= x_dp <= X[i] + span_x # dp = data point
     end # do x_dp
@@ -107,13 +114,16 @@ end
 
 
 # mutate duplicated elements in a numeric vector so that all the elements become unique
-function mutate_dups(vec_2mut ::AbstractVector, frac2add ::Real=0.01)
+function mutate_dups(
+    vec_2mut ::AbstractVector,
+    frac2add ::Real =0.01
+)
 
     vec_len = length(vec_2mut)
     vec_uniq = sort(unique(vec_2mut))
     vec_uniq_len = length(vec_uniq)
 
-    if vec_len == vec_uniq_len
+    if (vec_len == vec_uniq_len)
         return vec_2mut
     else
         order_to = sortperm(vec_2mut)
@@ -153,7 +163,12 @@ end
 
 
 # print with verbose control
-function print_v(print_func ::Function, verbose ::Bool, args...; kwargs...)
+function print_v(
+    print_func ::Function,
+    verbose ::Bool,
+    args...;
+    kwargs...
+)
     if verbose
         print_func(args...; kwargs...)
     end
@@ -162,7 +177,13 @@ end
 
 
 # repeat n times: take the output of an function and use it as the input for the same function
-function redo(func ::Function, input, times ::Integer, extra_args...; kwargs...)
+function redo(
+    func ::Function,
+    input,
+    times ::Integer,
+    extra_args...;
+    kwargs...
+)
     output = input
     while times > 0
         output = func(output, extra_args...; kwargs...)
@@ -178,14 +199,16 @@ end
 # (e.g. each element is atomic / not an array when `num_layers_lift == 0`,
 # a vector of atomic elements when `num_layers_lift == 1`,
 # vector of vector of atomic elements when `num_layers_lift == 2`).
-function reshape_lv(layered_vector ::AbstractVector, num_layers_left ::Integer=0)
+function reshape_lv(
+    layered_vector ::AbstractVector,
+    num_layers_left ::Integer=0
+)
     md_array = copy(layered_vector) # safe in case `eltype(layered_vector) <: AbstractArray`
     while redo(eltype, md_array, num_layers_left + 1) <: AbstractArray
         md_array = reshape(
             cat(2, md_array...),
             length(md_array[1]),
-            size(md_array)...
-        )
+            size(md_array)...)
     end
     return md_array
 end
@@ -231,15 +254,12 @@ function ensure_ci(
         calib_info = OrderedDict(
             "water" => OrderedDict(
                 "calibration_id" => calib_id,
-                "step_id" => step_ids[1]
-            )
-        )
+                "step_id" => step_ids[1]))
 
         for i in 2:(length(step_ids))
             calib_info["channel_$(i-1)"] = OrderedDict(
                 "calibration_id" => calib_id,
-                "step_id" => step_ids[i]
-            )
+                "step_id" => step_ids[i])
         end # for
 
         channel_qry = "SELECT channel FROM fluorescence_data WHERE experiment_id=$calib_id"
@@ -250,8 +270,7 @@ function ensure_ci(
             if !(channel_key in keys(calib_info))
                 calib_info[channel_key] = OrderedDict(
                     "calibration_id" => calib_id,
-                    "step_id" => step_ids[2]
-                )
+                    "step_id" => step_ids[2])
             end # if
         end # for
 
@@ -284,6 +303,29 @@ end # ensure_ci
 # end
 
 
+
+
+function num_channels(
+    calib ::Associative
+)
+    n_channels = 1
+    for field in keys(calib)
+        if (length(field) > 1) && (calib[field]["fluorescence_value"][2]!=nothing)
+            n_channels = 2
+        end
+    end
+    return n_channels
+end
+
+function num_wells(
+    calib ::Associative
+)
+    maximum(map(
+        x -> maximum(map(
+            y -> length(y),
+            calib[x]["fluorescence_value"])),
+        keys(calib)))
+end
 
 
 

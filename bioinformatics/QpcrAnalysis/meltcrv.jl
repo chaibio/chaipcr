@@ -3,6 +3,7 @@
 import DataStructures.OrderedDict
 import DataArrays.DataArray
 import StatsBase.countmap
+import Dierckx: Spline1D, derivative
 
 
 # called by QpcrAnalyze.dispatch
@@ -255,19 +256,20 @@ function process_mc(
         end # do tf_dict
     end...)
 
-    if out_format[end-3:end] == "json"
+    if (out_format[end-3:end] == "json")
         fns = [:mc, :Ta_fltd]
         mc_keys = ["melt_curve_data", "melt_curve_analysis"]
-        mc_out = OrderedDict(map(1:length(mc_keys)) do fk_i
+        mc_out = OrderedDict{String,Any}(map(1:length(mc_keys)) do fk_i
             mc_keys[fk_i] => [
                 getfield(mc_bychwl[well_i, channel_i], fns[fk_i])
                 for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
             ]
         end) # do key_i
+        mc_out["valid"] = true
         if out_format == "json"
             mc_out = JSON.json(mc_out)
         end
-    elseif out_format == "full"
+    elseif (out_format == "full")
         mc_out = MeltCurveOutput(
             mc_bychwl,
             channel_nums,
@@ -329,7 +331,7 @@ function get_mc_data(
 
     # new >>
     # subset melting curve data by channel
-    s = map(x -> x==channel_num, mc_data["channel"])
+    s = map(x -> (x == channel_num), mc_data["channel"])
     fluo_sel = OrderedDict(
         "temperature"         => mc_data["temperature"][s],
         "fluorescence_value"  => mc_data["fluorescence_value"][s],

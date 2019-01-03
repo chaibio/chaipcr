@@ -45,12 +45,32 @@ function act(
     result = OrderedDict("valid" => true)
     err_msg_vec = Vector{String}()
 
-    # get_k
+    # prep_adj_w2wvaf
 
-    # if there are 2 or more channels then
-    # the deconvoltion matrix K is calculate
-    # otherwise deconvolution is not performed
-    if length(calib_info_dict) >= 3
+    result_aw = try
+
+        ## remove MySql dependency
+        #
+        # prep_adj_w2wvaf(db_conn, calib_info_dict, well_nums, dye_in, dyes_2bfild)
+
+        # new >>
+        prep_adj_w2wvaf(calib_info_dict, well_nums, dye_in, dyes_2bfild)
+        # << new
+        
+    catch err
+        err
+    end
+
+    if isa(result_aw, Exception)
+        err_msg = isa(result_aw, ErrorException) ? result_aw.msg : "$(string(result_aw)). "
+        push!(err_msg_vec, err_msg)
+    elseif (length(calib_info_dict) >= 3)
+
+        # get_k
+
+        # if there are 2 or more channels then
+        # the deconvoltion matrix K is calculate
+        # otherwise deconvolution is not performed
 
         result_k = try
 
@@ -76,32 +96,11 @@ function act(
 
     end # if length
 
-    # prep_adj_w2wvaf
-
-    result_aw = try
-
-        ## remove MySql dependency
-        #
-        # prep_adj_w2wvaf(db_conn, calib_info_dict, well_nums, dye_in, dyes_2bfild)
-
-        # new >>
-        prep_adj_w2wvaf(calib_info_dict, well_nums, dye_in, dyes_2bfild)
-        # << new
-        
-    catch err
-        err
-    end
-
-    if isa(result_aw, Exception)
-        err_msg = isa(result_aw, ErrorException) ? result_aw.msg : "$(string(result_aw)). "
-        push!(err_msg_vec, err_msg)
-    end
-
-    # I think the cleanest thing is to not have an error_message at all if it is the success case
-    if length(err_msg_vec) > 0
+    # report valid in success case
+    if (length(err_msg_vec) > 0)
         result = OrderedDict(
             "valid" => false,
-            "error_message" => join(err_msg_vec, "")
+            "error" => join(err_msg_vec, "")
         )
     end
 

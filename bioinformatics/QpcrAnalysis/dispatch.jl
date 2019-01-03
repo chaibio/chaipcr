@@ -55,7 +55,11 @@ function dispatch(
     end
 
     success = !isa(result, Exception)
-    response_body = success ? result : String(JSON.json(Dict(:error => repr(result))))
+    response_body = success ?
+        result :
+        String(JSON.json(Dict(
+            "valid" => false,
+            "error" => repr(result))))
 
     return (success, response_body)
 end # dispatch

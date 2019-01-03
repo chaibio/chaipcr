@@ -3,6 +3,8 @@
 # Author: Tom Price
 # Date: Dec 2018
 
+import DataStructures.OrderedDict
+
 # type for K matrix
 # used in deconv.jl
 type K4Deconv

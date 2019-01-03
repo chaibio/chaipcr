@@ -6,8 +6,7 @@
 # header file for QpcrAnalysis.jl module
 # defines all constants used anywhere in the module
 
-import JLD.load
-
+import JLD
 
 # output format
 const JSON_DIGITS = 6 # number of decimal points for floats in JSON output

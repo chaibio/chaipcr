@@ -105,7 +105,8 @@ function act(
         "Lid" => OrderedDict(
             "HeatingRate" => (Lid_HeatingRate, Lid_HeatingRate >= MIN_HEATING_RATE),
             "TotalTime" => (Lid_TotalTime, Lid_TotalTime <= MAX_TIME_TO_HEAT)
-        )
+        ),
+        "valid" => true
     )
 
     if (out_format=="json")

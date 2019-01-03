@@ -1,0 +1,15 @@
+function _precompile_()
+    ccall(:jl_generating_output, Cint, ()) == 1 || return nothing
+    precompile(Tuple{typeof(Clustering.update_centers!), Array{Float64, 2}, Void, Array{Int64, 1}, Array{Bool, 1}, Array{Float64, 2}, Array{Float64, 1}})
+    precompile(Tuple{typeof(Clustering.sil_aggregate_dists), Int64, Array{Int64, 1}, Array{Float64, 2}})
+    precompile(Tuple{typeof(Clustering._kmed_update_assignments!), Array{Float64, 2}, Array{Int64, 1}, Array{Int64, 1}, Array{Array{Int64, 1}, 1}, Array{Float64, 1}, Bool})
+    precompile(Tuple{typeof(Clustering.update_assignments!), Array{Float64, 2}, Bool, Array{Int64, 1}, Array{Float64, 1}, Array{Int64, 1}, Array{Bool, 1}, Array{Int64, 1}})
+    precompile(Tuple{typeof(Clustering.silhouettes), Array{Int64, 1}, Array{Int64, 1}, Array{Float64, 2}})
+    precompile(Tuple{typeof(Clustering._kmeans!), Array{Float64, 2}, Void, Array{Float64, 2}, Array{Int64, 1}, Array{Float64, 1}, Array{Int64, 1}, Array{Float64, 1}, Int64, Float64, Int64, Distances.SqEuclidean})
+    precompile(Tuple{typeof(Clustering.display_level), Symbol})
+    precompile(Tuple{typeof(Clustering._kmedoids!), Array{Int64, 1}, Array{Float64, 2}, Int64, Float64, Int64})
+    precompile(Tuple{getfield(Clustering, Symbol("##kmedoids!#4")), Int64, Float64, Symbol, typeof(identity), Array{Float64, 2}, Array{Int64, 1}})
+    precompile(Tuple{typeof(Clustering.repick_unused_centers), Array{Float64, 2}, Array{Float64, 1}, Array{Float64, 2}, Array{Int64, 1}})
+    precompile(Tuple{typeof(Clustering._find_medoid), Array{Float64, 2}, Array{Int64, 1}})
+    precompile(Tuple{getfield(Clustering, Symbol("##kmeans!#1")), Void, Int64, Float64, Symbol, Distances.SqEuclidean, typeof(identity), Array{Float64, 2}, Array{Float64, 2}})
+end

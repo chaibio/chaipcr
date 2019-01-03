@@ -1,7 +1,7 @@
 # types_for_dfc_models.jl
 
 import DataStructures.OrderedDict
-import JuMP: Model
+using JuMP
 
 
 

@@ -1,6 +1,7 @@
 # thermal_consistency.jl
 # 72C thermal consistency test
 
+import Dierckx: Spline1D, derivative
 
 function act(
     ::ThermalConsistency,
@@ -114,12 +115,14 @@ function act(
     if (out_format=="full")
         return ThermalConsistencyOutput(
             tm_check_vec,
-            (delta_Tm_val, delta_Tm_val <= MAX_DELTA_TM_VAL)
+            (delta_Tm_val, delta_Tm_val <= MAX_DELTA_TM_VAL),
+            true
         )
     else
         mc_w72c_out = OrderedDict(
             "tm_check" => tm_check_vec,
-            "delta_Tm" => (round(delta_Tm_val, JSON_DIGITS), delta_Tm_val <= MAX_DELTA_TM_VAL)
+            "delta_Tm" => (round(delta_Tm_val, JSON_DIGITS), delta_Tm_val <= MAX_DELTA_TM_VAL),
+            "valid" => true
         )
         if (out_format=="json")
             return JSON.json(mc_w72c_out)

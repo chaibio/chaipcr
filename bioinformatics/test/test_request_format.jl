@@ -512,6 +512,7 @@ function verify_request_examples()
         :singlechannel_optical_request_test,
         :dualchannel_optical_request_test
     ]
+    FactCheck.clear_results()
     OrderedDict(map(examples) do f
         f => 
             try

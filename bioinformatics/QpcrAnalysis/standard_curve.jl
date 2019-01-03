@@ -1,7 +1,7 @@
 # standard_curve.jl
 
 import JSON
-import DataFrames.DataFrame
+import DataFrames: DataFrame, by
 
 # if isnull(sample) well not considered
 # what if isnull(cq)
@@ -142,7 +142,10 @@ function act(
             end # if
         end # do well_combin
 
-        jp_dict = OrderedDict("targets" => target_vec, "groups" => grp_vec)
+        jp_dict = OrderedDict(
+            "targets" => target_vec,
+            "groups" => grp_vec,
+            "valid" => true)
         return out_format == "json" ? JSON.json(jp_dict) : jp_dict
     end # if
 
