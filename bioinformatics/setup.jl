@@ -91,6 +91,7 @@ println("installing library: ProfileView"); Pkg.add("ProfileView", v"0.3.0", v"0
 println("installing library: Dierckx"); Pkg.add("Dierckx", v"0.3.0", v"0.3.1-")
 # println("installing library: MySQL"); Pkg.add("MySQL", v"0.3.0", v"0.3.1-") # remove MySQL dependency
 println("installing library: DataArrays"); Pkg.add("DataArrays", v"0.7.0", v"0.7.1-")
+println("installing library: DataArrays"); Pkg.add("BSON", v"0.1.3", v"0.1.4-")
 @static if (!PRODUCTION_MODE)
     println("installing library: FactCheck"); Pkg.add("FactCheck", v"0.4.3", v"0.4.4-") # for testing
 end
@@ -114,6 +115,7 @@ println("All packages used")
         "BinDeps"           => v"0.8.0",
         "BinaryProvider"    => v"0.2.5",
         "Blosc"             => v"0.3.0",
+        "BSON"              => v"0.1.3",
         "Cairo"             => v"0.5.1",
         "Calculus"          => v"0.2.2",
         "CategoricalArrays" => v"0.3.6",
@@ -177,6 +179,7 @@ println("All packages used")
     for pkg in keys(version)
         Pkg.pin(pkg,version[pkg])
     end
+else
     # autorun precompilation on startup
     code ="""
         ## open QpcrAnalysis odule on startup

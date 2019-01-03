@@ -13,41 +13,24 @@ if (const RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE = false)
     using QpcrAnalysis
     # test code: precompilation should ensure
     # that the first and second runs are equally fast
-
     include("../test/test_functions.jl") # this file
-    test_functions = generate_tests(debug=false)
-    r = test_functions["amplification dual channel"]()
-
     test_functions = generate_tests()
     t1 = @elapsed test_functions["amplification dual channel"]()
     t2 = @elapsed test_functions["amplification dual channel"]()
-
-    # save test functions as JLD object for convenient loading
-    jldopen("../test/data/dispatch_tests.jld", "w") do file
-        addrequire(file, "types_for_dispatch.jl")
-        addrequire(file, "types_for_calibration.jl")
-        addrequire(file, "types_for_allelic_discrimination.jl")
-        addrequire(file, "types_for_amplification.jl")
-        addrequire(file, "types_for_meltcurve.jl")
-        addrequire(file, "types_for_standard_curve.jl")
-        addrequire(file, "types_for_thermal_consistency.jl")
-        addrequire(file, "amp_models/types_for_sfc_models.jl")
-        addrequire(file, "amp_models/types_for_dfc_models.jl")
-        addrequire(file, "constants.jl")
-        write(file, "x", x)
-    end
 end
 
 import FactCheck: clear_results
-import DataFrames: DataFrame, rename
+import DataFrames: DataFrame
 import DataStructures: OrderedDict
+import BSON: bson
 
 td = readdlm("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/test_data.csv",',',header=true)
 const TEST_DATA = DataFrame([slicedim(td[1],2,i) for i in 1:size(td[1])[2]],map(Symbol,td[2][:]))
 
 function generate_tests(;
     debug     ::Bool =false,
-    verbose   ::Bool =true
+    verbose   ::Bool =true,
+    verify    ::Bool =true
 )
     test_functions = OrderedDict()
     strip = [" single"," dual"," channel"]
@@ -66,18 +49,20 @@ function generate_tests(;
                     if (debug) # errors fail out
                         QpcrAnalysis.verify_request(action_t,request)
                         response = QpcrAnalysis.act(action_t,request;verbose=verbose)
-                        response_body = JSON.parse(JSON.json(response),dicttype=OrderedDict)
-                        QpcrAnalysis.verify_response(action_t,response_body)
+                        response_body = JSON.json(response)
+                        response_parsed = JSON.parse(response_body,dicttype=OrderedDict)
+                        QpcrAnalysis.verify_response(action_t,response_parsed)
                         ok = true
                     else # continue tests after errors reported
                         (ok, response_body) = QpcrAnalysis.dispatch(
                             action,
                             body;
                             verbose=verbose,
-                            verify=true)
+                            verify=verify)
+                        response_parsed = JSON.parse(response_body,dicttype=OrderedDict)
                     end # if debug
                     QpcrAnalysis.print_v(println,verbose,"Passed $testname\n")
-                    return (ok, response_body)
+                    return (ok, response_parsed)
                 end
 
                 testname = replace(TEST_DATA[i,:action],r"_"=>" ")
@@ -93,9 +78,28 @@ function generate_tests(;
 end
 
 # run test functions
-function test_dispatch()
-    test_functions = generate_tests()
-    OrderedDict(map(
-        testname -> testname => test_functions[testname](),
-        keys(test_functions)))
+function run_tests(
+    test_functions ::Associative =generate_tests()
+)
+    check = OrderedDict(map(keys(test_functions)) do testname
+        result = test_functions[testname]()
+        testname => result[1] && result[2]["valid"]
+    end)
+    @assert all(values(check)) # check that all test results are positive
+end
+
+# package test functions for production
+function test_dispatch(
+    test_functions ::Associative =OrderedDict()
+)
+    test_functions = generate_tests(debug=false,verbose=false,verify=false)
+    run_tests(test_functions) # the tests should work!
+    # save test functions as BSON object for convenient loading
+    # (NB. JLD format does not allow functions or closures)
+    BSON.bson("../test/data/dispatch_tests.bson", test_functions)
+    # to reload and run:
+    # using QpcrAnalysis
+    # import DataStructures.OrderedDict
+    # test_functions = BSON.load("../test/data/dispatch_tests.bson")
+    # run_tests(test_functions)
 end
