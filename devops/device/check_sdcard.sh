@@ -33,11 +33,15 @@ if [ -e /dev/mmcblk0p3 ] ; then
 	eMMC="/dev/mmcblk0"
 fi
 
+exit_with_message () {
+	echo $1
+	exit 1
+}
+
 if [ ! -e "${eMMC}p3" ]
 then
         exit_with_message "Proper eMMC partitionining not found!"
 fi
-
 
 all_done () {
 	if [ -e /tmp/checked_partition/write_test.txt ]
@@ -56,7 +60,7 @@ all_done () {
 	fi
 }
 
-end_error () {
+format_upgrade_exit () {
 	all_done
 
 	echo "Trying to format ${sdcard_dev}p2"
@@ -92,8 +96,7 @@ then
 
 	if [ $? -gt 0 ]
 	then
-		echo "Cannt create folder /tmp/checked_partition"
-		end_error
+		exit_with_message "Cannt create folder /tmp/checked_partition"
 	fi
 fi
 
@@ -102,7 +105,7 @@ mount ${sdcard_dev}p2 /tmp/checked_partition
 if [ $? -gt 0 ]
 then
 	echo "Cannt mount to /tmp/checked_partition"
-	end_error
+	format_upgrade_exit
 fi
 
 NOW=$(date +"%m-%d-%Y %H:%M:%S")
@@ -111,14 +114,14 @@ echo $NOW>/tmp/checked_partition/write_test.txt
 if [ $? -gt 0 ]
 then
 	echo "Cannt write to /tmp/checked_partition"
-	end_error
+	format_upgrade_exit
 fi
 
 read_text=$(cat /tmp/checked_partition/write_test.txt)
 if [ $? -gt 0 ]
 then
 	echo "Cannt read from /tmp/checked_partition/write_test.txt"
-	end_error
+	format_upgrade_exit
 fi
 
 if [ "$NOW" = "$read_text" ]
@@ -126,7 +129,7 @@ then
 	echo "Partition is read/write OK.. exit."
 else
 	echo "Error reading from /tmp/checked_partition/write_test.txt.. wrote text: $NOW, read text: $read_text"
-	end_error
+	format_upgrade_exit
 fi
 
 all_done

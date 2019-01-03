@@ -156,7 +156,6 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
       return targets
 
-
     @normalizeSummaryData = (summary_data, target_data, well_targets) ->
       summary_data = angular.copy summary_data
       target_data = angular.copy target_data
@@ -176,12 +175,14 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           item['target_name'] = target[0].name if target[0]
           item['channel'] = target[0].channel if target[0]
           item['color'] = target[0].color if target[0]
+          item['well_type'] = target[0].well_type if target[0]
         else
           target = _.filter target_data, (target) ->
             target[0] is item.target_id
           item['target_name'] = target[0][1] if target[0]
           item['channel'] = if item['target_name'] == 'Ch 1' then 1 else 2
           item['color'] = if item['target_name'] == 'Ch 1' then @SAMPLE_TARGET_COLORS[0] else @SAMPLE_TARGET_COLORS[1]
+          item['well_type'] = ''
 
         item['active'] = false
 
@@ -193,6 +194,49 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
       well_data = _.orderBy(well_data,['well_num', 'channel'],['asc', 'asc']);      
 
       return well_data
+
+    @blankWellData = (is_dual_channel, well_targets) ->
+      well_targets = angular.copy well_targets
+      well_data = []
+      for i in [1.. 16] by 1
+        item = {}
+        item['well_num'] = i
+        item['replic_group'] = null
+        item['quantity_m'] = null
+        item['quantity_b'] = null
+        item['quantity'] = 0
+        item['mean_quantity_m'] = null
+        item['mean_quantity_b'] = null
+        item['mean_quantity'] = 0
+        item['mean_cq'] = null
+        item['cq'] = null
+        item['channel'] = 1
+        item['active'] = false
+
+        if is_dual_channel
+          item['target_name'] = well_targets[2*i].name if well_targets[2*i]
+          item['target_id'] = well_targets[2*i].id if well_targets[2*i]
+          item['color'] = well_targets[2*i].color if well_targets[2*i]
+          item['well_type'] = well_targets[2*i].well_type if well_targets[2*i]
+        else
+          item['target_name'] = well_targets[i].name if well_targets[i]
+          item['target_id'] = well_targets[i].id if well_targets[i]
+          item['color'] = well_targets[i].color if well_targets[i]
+          item['well_type'] = well_targets[i].well_type if well_targets[i]
+
+        well_data.push item
+
+        if is_dual_channel
+          dual_item = angular.copy item
+          dual_item['target_name'] = well_targets[2*i+1].name if well_targets[2*i+1]
+          dual_item['target_id'] = well_targets[2*i+1].id if well_targets[2*i+1]
+          dual_item['color'] = well_targets[2*i+1].color if well_targets[2*i+1]
+          dual_item['well_type'] = well_targets[2*i+1].well_type if well_targets[2*i+1]
+          dual_item['channel'] = 2
+          well_data.push dual_item
+
+      return well_data
+
 
     @paddData = (cycle_num = 1) ->
       paddData = cycle_num: cycle_num

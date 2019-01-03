@@ -17,9 +17,17 @@ export_pwm ()
 	for chip in $1/pwmchip?
 	do
 		echo exporting $chip
-		echo $2>$chip/export || continue
-		echo $chip/pwm$2>>/run/chaipcr/realtime/pwms.inf
-		ln -s $chip/pwm$2 /run/chaipcr/realtime/$3
+		chip_path="$chip/pwm$2"
+		if [ -e $chip_path ]
+		then
+			echo "Chip is enabled already: $chip_path"
+		else
+			echo "Enabling chip: $chip_path"
+			echo $2>$chip/export || continue
+			echo Successfully enabled: $chip_path
+		fi
+		echo $chip_path>>/run/chaipcr/realtime/pwms.inf
+		ln -s $chip_path /run/chaipcr/realtime/$3
 	done
 	if [ -e /run/chaipcr/realtime/$3 ]
 	then
@@ -40,7 +48,6 @@ pwm_setup_kernel49 ()
 		if [ -e /run/chaipcr/realtime/ ]
 		then
 			echo pwm endpoints folder created before
-#			rm /run/chaipcr/realtime/ -r || true
 			return
 		fi
 
@@ -59,8 +66,6 @@ pwm_setup_kernel49 ()
 		export_pwm /sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm 1 kHeatBlockZone1.pwm 50000
 		export_pwm /sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm 0 kHeatBlockZone2.pwm 50000
 
-		#LCD Backlight: P9.42
-		export_pwm /sys/devices/platform/ocp/48300000.epwmss/48300100.ecap/pwm 0 kLCDBacklight.pwm 50000
 		ls -ahl /run/chaipcr/realtime/ || true
 	fi
 }

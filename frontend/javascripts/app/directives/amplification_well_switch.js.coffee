@@ -30,6 +30,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
       isDual: '='
       samples: '='
       targets: '='
+      initSampleColor: '='
       buttonLabelsNum: '=?' #numbe of labels in button
       labelUnit: '=?'
       chartType: '@'
@@ -59,7 +60,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
         else if $scope.colorBy is 'target'
           well_color = if $scope.targets[i] then $scope.targets[i].color else 'transparent'
         else if $scope.colorBy is 'sample'
-          well_color = if $scope.samples[i] then $scope.samples[i].color else 'transparent'
+          well_color = if $scope.samples[i] then $scope.samples[i].color else $scope.initSampleColor
         else
           well_color = '#FFFFFF'
 
@@ -112,7 +113,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
             $scope.wells["well_#{i}"].color1 = if $scope.targets[i*2] then $scope.targets[i*2].color else 'transparent'
             $scope.wells["well_#{i}"].color2 = if $scope.targets[i*2+1] then $scope.targets[i*2+1].color else 'transparent'
           else if color_by is 'sample'
-            well_color = if $scope.samples[i] then $scope.samples[i].color else 'transparent'
+            well_color = if $scope.samples[i] then $scope.samples[i].color else $scope.initSampleColor
           # else
           #   well_color = '#75278E'
           else
