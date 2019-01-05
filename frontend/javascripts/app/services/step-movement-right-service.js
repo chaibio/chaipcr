@@ -24,6 +24,7 @@ window.ChaiBioTech.ngApp.service('StepMovementRightService', [
         return {
 
             ifOverRightSide: function(stepIndicator) {
+                
                 stepIndicator.movedStepIndex = null;
 
                 StepPositionService.allPositions.some(this.ifOverRightSideCallback, stepIndicator);
@@ -32,14 +33,27 @@ window.ChaiBioTech.ngApp.service('StepMovementRightService', [
 
             ifOverRightSideCallback: function(points, index) {
                 // Note , this method works in the context of stepIndicator, dont confuse with this keyword.
-                if((this.movement.left + this.rightOffset) > points[1] && (this.movement.left + this.rightOffset) < points[2]) {
+                var edge = this.movement.referencePoint;
+                if(edge > points[1] && edge < points[2]) {
                     
                     if(index !== this.currentMoveRight) {
-                        moveStepToSides.moveToSide(this.kanvas.allStepViews[index], "left");
+
+                        this.currentMouseOver.exitDirection = "right";
+                        //this.currentMouseOver.index = index;
+                        moveStepToSides.moveToSide(this.kanvas.allStepViews[index], "left", this.currentMouseOver, this);
                         this.currentMoveRight = this.movedStepIndex = index;
                         StepPositionService.getPositionObject(this.kanvas.allStepViews);
                     }
                     return true;
+                } else if(edge > points[0] && edge < points[1]) {
+                    if(index !== this.currentMouseOver.index) {
+                        this.currentMouseOver = {
+                            index: index,
+                            enterDirection: "left",
+                            exitDirection: null,
+                        };
+                    }
+                    
                 }
             },
 
@@ -48,20 +62,35 @@ window.ChaiBioTech.ngApp.service('StepMovementRightService', [
                 stepIndicator.currentDrop = stepIndicator.kanvas.allStepViews[stepIndicator.movedStepIndex];
                 stepIndicator.currentDropStage = stepIndicator.currentDrop.parentStage;
                 this.manageVerticalLineRight(stepIndicator);
-                this.manageBorderLeftForRight(stepIndicator);
+                //this.manageBorderLeftForRight(stepIndicator);
                 stepIndicator.currentMoveLeft = null; // Resetting
             },
 
             manageVerticalLineRight: function(si) {
-
+                
                 var index = si.movedStepIndex;
-                var place = (si.kanvas.allStepViews[index].left + si.kanvas.allStepViews[index].myWidth - 2);
+                var place = (si.kanvas.allStepViews[index].left + si.kanvas.allStepViews[index].myWidth);
                 
                 if(si.kanvas.allStepViews[index].nextIsMoving === true) {
+                    console.log("nextIsMoving");
                     place = si.kanvas.moveDots.left + 7;
+                    si.verticalLine.setLeft(place);
+                    si.verticalLine.setCoords();
+                    return;
                 }
-                si.verticalLine.setLeft(place);
+                
+                var step = si.kanvas.allStepViews[index];
+                
+                if(! step.nextStep) {
+                    si.verticalLine.setLeft(place);
+                    si.verticalLine.borderS.setLeft(place + 15);
+                } else {
+                    si.verticalLine.setLeft(place + 5);
+                    si.verticalLine.borderS.setLeft(place + 25);
+                }
                 si.verticalLine.setCoords();
+                si.verticalLine.borderS.setCoords();
+
             },
 
             manageBorderLeftForRight: function(sI) {

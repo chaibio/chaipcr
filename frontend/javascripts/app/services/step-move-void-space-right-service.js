@@ -24,10 +24,14 @@ window.ChaiBioTech.ngApp.service('StepMoveVoidSpaceRightService', [
        this.verticalLineForVoidRight = function(sI, index) {
            
             if(sI.kanvas.allStageViews[index - 1]) {
+               
                 var length = sI.kanvas.allStageViews[index - 1].childSteps.length;
                 var tStep = sI.kanvas.allStageViews[index - 1].childSteps[length - 1];
-                var place = sI.kanvas.allStageViews[index - 1].left + 
-                            sI.kanvas.allStageViews[index - 1].myWidth - 5;
+                var place = tStep.left + tStep.myWidth;
+                sI.increaseHeaderLengthRight(tStep.parentStage.index);
+                //console.log("fsd");
+                /*sI.kanvas.allStageViews[index - 1].left + 
+                            sI.kanvas.allStageViews[index - 1].myWidth - 5;*/
             
                 if(tStep.nextIsMoving) {
                     place = sI.kanvas.moveDots.left + 7;
@@ -37,6 +41,9 @@ window.ChaiBioTech.ngApp.service('StepMoveVoidSpaceRightService', [
                 sI.currentDropStage = sI.kanvas.allStageViews[index - 1]; // We need to insert the step as the last.
                 sI.verticalLine.setLeft(place);
                 sI.verticalLine.setCoords();
+
+                sI.verticalLine.borderS.setLeft(place + 14);
+                sI.verticalLine.borderS.setCoords();
             }
             
         };
@@ -52,8 +59,8 @@ window.ChaiBioTech.ngApp.service('StepMoveVoidSpaceRightService', [
             voidSpaceCallbackRight: function(point, index) {
                 // Context of this method is sI
                 
-                var abPlace = this.movement.left;
-                if(point[1] - point[0] > 25 && abPlace > point[0] && abPlace < (point[1] - 25)) {
+                var abPlace = this.movement.referencePoint;
+                if(point[1] - point[0] > 25 && abPlace > point[0] && abPlace < point[1]) {
                     that.verticalLineForVoidRight(this, index);
                     return true;
                 }

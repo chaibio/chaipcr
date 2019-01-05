@@ -22,7 +22,9 @@ angular.module("canvasApp").factory('verticalLineStepGroup', [
     'verticalLineStepLine',
     'verticalLineStepSmallCircle',
     'verticalLineStepSmallCircleTop',
+
     function(Group, verticalLineStepLine, verticalLineStepSmallCircle, verticalLineStepSmallCircleTop) {
+
         return function() {
             
             var smallCircle = new verticalLineStepSmallCircle();

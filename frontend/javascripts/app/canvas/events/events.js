@@ -123,6 +123,7 @@ angular.module("canvasApp").factory('events', [
 
         var lastStep = C.allStepViews[C.allStepViews.length - 1];
         var lastStage = C.allStageViews[C.allStageViews.length - 1];
+        
         if(stage.index === lastStage.index) {
           C.moveLimit = stage.previousStage.left + stage.previousStage.myWidth;
           return;
@@ -140,6 +141,27 @@ angular.module("canvasApp").factory('events', [
 
          C.moveLimit = lastStep.left + 120;
          C.stepMoveLimit = lastStep.left;
+      };
+
+      this.calculateMoveLimitForStep = function(moveElement, step) {
+
+        var lastStep = C.allStepViews[C.allStepViews.length - 1];
+        var lastStage = C.allStageViews[C.allStageViews.length - 1];
+        var stage = step.parentStage;
+
+        if(lastStep.circle.holdTime.text === "∞") {
+          if(moveElement === "step") {
+            C.stepMoveLimit = lastStep.left;
+            return;
+          }
+        }
+
+        if(stage.index === lastStage.index) {
+          C.stepMoveLimit = (lastStage.left +lastStage.myWidth) - 120;
+          return;
+        }
+
+        C.stepMoveLimit = (lastStage.left +lastStage.myWidth) - 60;
       };
 
       this.footerMouseOver = function(indicate, me, moveElement) {

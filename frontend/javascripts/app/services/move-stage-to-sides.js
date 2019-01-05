@@ -99,8 +99,13 @@ window.ChaiBioTech.ngApp.service('moveStageToSides', [
         
         targetStage.stageGroup.set({left: targetStage.left + moveCount });
         targetStage.stageGroup.setCoords();
+
         targetStage.dots.set({left: (targetStage.left + moveCount ) + 3});
         targetStage.dots.setCoords();
+
+        targetStage.border.set({left: (targetStage.left + moveCount)});
+        targetStage.border.setCoords();
+
         targetStage.left = targetStage.left + moveCount;
         
         targetStage.childSteps.forEach(function(step, index) {

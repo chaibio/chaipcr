@@ -33,9 +33,11 @@ angular.module("canvasApp").factory('moveStepRect', [
   'StepMoveVoidSpaceRightService',
   'StepMoveVoidSpaceLeftService',
   'addStageService',
+  'stageHeaderLineExtender',
+  'verticalLineBorder',
   function(ExperimentLoader, previouslySelected, circleManager, StepPositionService, moveStepIndicator, verticalLineStepGroup, StagePositionService,
   movingStepGraphics, StepMovementRightService, StepMovementLeftService, StageMovementRightService, StageMovementLeftService,
-  StepMoveVoidSpaceRightService, StepMoveVoidSpaceLeftService, addStageService) {
+  StepMoveVoidSpaceRightService, StepMoveVoidSpaceLeftService, addStageService, stageHeaderLineExtender, verticalLineBorder) {
 
     return {
 
@@ -43,30 +45,60 @@ angular.module("canvasApp").factory('moveStepRect', [
        
       this.indicator = new moveStepIndicator(me);
       this.indicator.verticalLine = new verticalLineStepGroup();
-      
+      this.indicator.verticalLine.borderS = new verticalLineBorder();
+      this.indicator.headerExtender = new stageHeaderLineExtender(20);
+
       this.indicator.init = function(step, footer, C, backupStageModel) {
 
+        this.currentMouseOver = {
+          index: null,
+          enterDirection: null,
+          exitDirection: null,
+        };
+        console.log(step.ordealStatus);
         this.tagSteps(step);
         step.parentStage.sourceStage = true;
         step.parentStage.stageHeader();
-        
+        this.roofChanged = null;
+        this.lastStepInStage = false;
         if(step.parentStage.childSteps.length === 0) {
           //step.parentStage.adjustHeader();
         }
 
-        this.movement = this.movedStepIndex = this.currentMoveRight = this.currentMoveLeft =
-        this.movedStageIndex = this.movedRightStageIndex = this.movedLeftStageIndex = null;
+        this.movement = null;
+        this.movedStepIndex = null;
+        this.currentMoveRight = null;
+        this.currentMoveLeft = null;
+        this.movedStageIndex = null;
+        this.movedRightStageIndex = null; 
+        this.movedLeftStageIndex = null;
+        this.sourceStageFirstStepMove = false;
+        this.moveStepMovedOutOfSourceStage = false;
+        
+        this.emptySpaceTrackerForStage = {
+          left: null,
+          right: null
+        };
 
+        this.emptySpaceTracker = {
+          stageIndex: null,
+          left: null,
+          right: null
+        };
         this.currentLeft = footer.left;
 
         this.backupStageModel = backupStageModel;        
-        this.rightOffset = 96;
+        this.rightOffset = (step.nextStep) ? 128 : 64;
         this.leftOffset = 0;
         this.kanvas = C;
         this.currentDropStage = step.parentStage;
         this.currentDrop = (step.previousStep) ? step.previousStep : "NOTHING";
         
         this.verticalLine.setLeft(C.moveDots.left + 7).setVisible(true).setCoords();
+        this.verticalLine.borderS.setLeft(C.moveDots.left + 7).setVisible(true).setCoords();
+       
+        C.canvas.bringToFront(this.verticalLine.borderS);
+        C.canvas.bringToFront(this);
         C.canvas.bringToFront(this.verticalLine);
         this.setLeft(footer.left).setVisible(true);
         this.changeText(step);
@@ -76,23 +108,47 @@ angular.module("canvasApp").factory('moveStepRect', [
       };
 
       this.indicator.initForOneStepStage = function(step, footer, C, backupStageModel) {
-        
+        // Update this part so that, new implementation works for one step stage scenarion.
+        // Remember, now borderS is not visible, enable it.
+        // change rightOffset part.
+
         step.parentStage.stageHeader();
         
-        this.movement = this.movedStepIndex = this.currentMoveRight = this.currentMoveLeft =
-        this.movedStageIndex = this.movedRightStageIndex = this.movedLeftStageIndex = null;
+        this.movement = null;
+        this.movedStepIndex = null;
+        this.currentMoveRight = null;
+        this.currentMoveLeft = null;
+        this.movedStageIndex = null;
+        this.movedRightStageIndex = null; 
+        this.movedLeftStageIndex = null;
 
         this.currentLeft = footer.left;
 
         this.backupStageModel = backupStageModel;        
-        this.rightOffset = 96;
+        this.rightOffset = 128;
         this.leftOffset = 0;
         this.kanvas = C;
         this.currentDropStage = step.parentStage;
         this.currentDrop = (step.previousStep) ? step.previousStep : "NOTHING";
         
-        this.verticalLine.setLeft(footer.left).setVisible(true).setCoords();
+        this.verticalLine.setLeft(footer.left - 20).setVisible(true).setCoords();
+        this.verticalLine.borderS.setLeft(footer.left - 7).setVisible(true).setCoords();
+
+        this.emptySpaceTrackerForStage = {
+          left: null,
+          right: null
+        };
+
+        this.emptySpaceTracker = {
+          stageIndex: null,
+          left: null,
+          right: null
+        };
+
+        C.canvas.bringToFront(this.verticalLine.borderS);
+        C.canvas.bringToFront(this);
         C.canvas.bringToFront(this.verticalLine);
+        
         this.setLeft(footer.left).setVisible(true);
         
         StepPositionService.getPositionObject(this.kanvas.allStepViews);
@@ -122,59 +178,79 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         if(this.movement.left > this.currentLeft && this.direction !== "right") {
           this.direction = "right";
-          this.updateLocationOnMoveRight();
+          this.currentMouseOver = {};
         } else if(this.movement.left < this.currentLeft && this.direction !== "left") {
           this.direction = "left";
-          this.updateLocationOnMoveLeft();    
+          this.currentMouseOver = {};
         }
         return this.direction;
       };
 
-      this.indicator.updateLocationOnMoveRight = function() {
+      /*this.indicator.updateLocationOnMoveRight = function() {
         //this.movedStepIndex = this.currentMoveLeft;
         //StepMovementRightService.movedRightAction(this);
-        this.movement.left = this.movement.left - 40;
+        //this.movement.left = this.movement.left - 64;
         //this.manageMovingRight();
-
       };
 
       this.indicator.updateLocationOnMoveLeft = function() {
         //this.movedStepIndex = this.currentMoveRight;
         //StepMovementLeftService.movedLeftAction(this);
-        this.movement.left = this.movement.left + 40;
+        //this.movement.left = this.movement.left + 64;
         //this.manageMovingLeft();
-      };
+      };*/
       
       this.indicator.onTheMove = function(movement) {
+
+        var displacement = this.getDisplacement(movement.left);
+        
+        if(displacement > 30) {
+          this.currentLeft = movement.left;
+          return false;
+        }
+
+        if(((this.left - 40) < movement.left) && (movement.left < this.left + 90)) {
+
+        } else {
+          this.currentLeft = movement.left;
+          return false;
+        }
 
         this.setLeft(movement.left);
         this.setCoords();
         this.movement = movement;
+        
         var direction = this.getDirection();
         this.currentLeft = movement.left;
         
+        this.movement.referencePoint = this.left + 64;
+
         if(direction === 'right') {
-          this.movedLeftStageIndex = this.currentDropStage.index - 1;
+          //this.movedLeftStageIndexHeader = this.currentDropStage.index - 1;
           this.manageMovingRight();
         } else if(direction === 'left') {
-          this.movedRightStageIndex = this.currentDropStage.index + 1;
+          //this.movedRightStageIndexHeader = this.currentDropStage.index + 1;
           this.manageMovingLeft();
         } 
       };
 
+      this.indicator.getDisplacement = function(left) {
+
+        return Math.abs(left - this.currentLeft);
+      }; 
       // Manage the movement of the indicator right side.
       this.indicator.manageMovingRight = function() {
+
+        StepMoveVoidSpaceLeftService.checkVoidSpaceLeft(this);
+        
+        if(StageMovementLeftService.shouldStageMoveLeft(this) !== null) {
+          this.moveStepMovedOutOfSourceStage = true;
+        }
 
         if(StepMovementRightService.ifOverRightSide(this) !== null) {
           StepMovementRightService.movedRightAction(this);
         }
-
-        if(StageMovementLeftService.shouldStageMoveLeft(this) !== null) {
-          
-          this.movedRightStageIndex = null; // Resetting
-          this.hideFirstStepBorderLeft();
-        }
-        StepMoveVoidSpaceLeftService.checkVoidSpaceLeft(this);
+       
       };
 
       // Manage the movement of the indicator left side.
@@ -185,10 +261,37 @@ angular.module("canvasApp").factory('moveStepRect', [
         }
 
         if(StageMovementRightService.shouldStageMoveRight(this) !== null) {
-          this.movedLeftStageIndex = null; // Resetting
-          this.hideFirstStepBorderLeft();
+          this.moveStepMovedOutOfSourceStage = true;
         }
         StepMoveVoidSpaceRightService.checkVoidSpaceRight(this);
+      };
+
+      this.indicator.increaseHeaderLengthLeft = function(index) {
+        
+        //if(this.kanvas.allStageViews[index + 1]) {
+          var stage = this.kanvas.allStageViews[index];
+          if(stage.previousStage && this.emptySpaceTrackerForStage.right === stage.index) {
+            var left = stage.left - 27;
+            stage.extendHeader(left, this.headerExtender);
+          }
+          
+        //}
+        
+      };
+
+      this.indicator.increaseHeaderLengthRight = function(index) {
+        //console.log("Viola");
+        //if(this.kanvas.allStageViews[index - 1]) {
+          
+          var stage = this.kanvas.allStageViews[index];
+          if(stage.nextStage && this.emptySpaceTrackerForStage.left === stage.index) {
+            var left = (stage.left + stage.myWidth) - 4;
+            stage.extendHeader(left, this.headerExtender);
+          }
+          
+        //} else {
+          //this.increaseHeaderLengthLeft(-1);
+        //}
       };
 
       this.indicator.hideFirstStepBorderLeft = function() {
@@ -226,6 +329,8 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.processMovement = function(step, C) {
         
         this.verticalLine.setVisible(false);
+        this.verticalLine.borderS.setVisible(false);
+        this.headerExtender.setVisible(false);
         if(this.manageSingleStepStage(step) === true) {
           return true;
         }

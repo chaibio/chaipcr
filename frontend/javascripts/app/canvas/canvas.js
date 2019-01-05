@@ -163,13 +163,16 @@ angular.module("canvasApp").factory('canvas', [
       this.stageIndicator = moveStageRect.getMoveStageRect(this);
       this.stageVerticalLine = this.stageIndicator.verticalLine;
       this.stepVerticalLine = this.stepIndicator.verticalLine;
+      this.stepVerticalLine.border = this.stepIndicator.verticalLine.borderS;
       this.moveDots = this.getMoveDots();
       return this;
     };
 
     this.addComponentsToStage = function() {
 
+      this.canvas.add(this.stepVerticalLine.border);
       this.canvas.add(this.stepIndicator);
+      this.canvas.add(this.stepIndicator.headerExtender);
       this.canvas.add(this.stageIndicator);
       this.canvas.add(this.stageVerticalLine);
       this.canvas.add(this.stepVerticalLine);

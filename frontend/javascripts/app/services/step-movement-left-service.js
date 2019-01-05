@@ -25,6 +25,7 @@ window.ChaiBioTech.ngApp.service('StepMovementLeftService', [
         return {
 
             ifOverLeftSide: function(stepIndicator) {
+                console.log("White box moving left");
                 stepIndicator.movedStepIndex = null;
                 StepPositionService.allPositions.some(this.ifOverLeftSideCallback, stepIndicator);
                 return stepIndicator.movedStepIndex;
@@ -32,14 +33,24 @@ window.ChaiBioTech.ngApp.service('StepMovementLeftService', [
 
             ifOverLeftSideCallback: function(points, index) {
                 
-                if((this.movement.left + this.leftOffset) > points[0] && (this.movement.left + this.leftOffset) < points[1]) {
+                if((this.movement.referencePoint) > points[0] && (this.movement.referencePoint) < points[1]) {
 
                     if(this.currentMoveLeft !== index) {
-                        moveStepToSides.moveToSide(this.kanvas.allStepViews[index], "right");
+                        this.currentMouseOver.exitDirection = "left";
+                        moveStepToSides.moveToSide(this.kanvas.allStepViews[index], "right", this.currentMouseOver, this);
                         this.currentMoveLeft = this.movedStepIndex = index;
                         StepPositionService.getPositionObject(this.kanvas.allStepViews);
                     }
                 return true;
+                } else if(this.movement.referencePoint > points[1] && this.movement.referencePoint < points[2]) {
+
+                    if(index !== this.currentMouseOver.index) {
+                        this.currentMouseOver = {
+                            index: index,
+                            enterDirection: "right",
+                            exitDirection: null,
+                        };
+                    }
                 }
             },
 
@@ -56,20 +67,35 @@ window.ChaiBioTech.ngApp.service('StepMovementLeftService', [
                 }
                 
                 this.manageVerticalLineLeft(sI);
-                this.manageBorderLeftForLeft(sI);
+                //this.manageBorderLeftForLeft(sI);
                 sI.currentMoveRight = null; // Resetting
             },
 
             manageVerticalLineLeft: function(sI) {
-                
+                console.log("here .. manageVerticalLineLeft");
                 var index = sI.movedStepIndex;
-                var place = (sI.kanvas.allStepViews[index].left - 12);
+                var place;
+                place = (sI.kanvas.allStepViews[index].left - 10);
                 
                 if(sI.kanvas.allStepViews[index].previousIsMoving === true) {
+                    console.log("previousIsMoving");
                     place = sI.kanvas.moveDots.left + 7;
+                    sI.verticalLine.setLeft(place);
+                    sI.verticalLine.setCoords();
+                    return;
                 }        
-                sI.verticalLine.setLeft(place);
+                
+                var step = sI.kanvas.allStepViews[index];
+                if(! step.previousStep) {
+                    sI.verticalLine.setLeft(place - 8);
+                    sI.verticalLine.borderS.setLeft(place - 12);
+                } else {
+                    sI.verticalLine.setLeft(place - 5);
+                    sI.verticalLine.borderS.setLeft(place + 15);
+                }
                 sI.verticalLine.setCoords();
+                sI.verticalLine.borderS.setCoords();
+                //si.kanvas.canvas.bringToFront(sI.verticalLine.border);
             },
 
             manageBorderLeftForLeft: function(sI) {

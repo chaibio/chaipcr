@@ -22,10 +22,12 @@ window.ChaiBioTech.ngApp.service('StepMoveVoidSpaceLeftService', [
     function(StagePositionService) {
 
         this.verticalLineForVoidLeft = function(sI, index) {
-
-            var tStep = sI.kanvas.allStageViews[index].childSteps[0];
-            var place = sI.kanvas.allStageViews[index].left - 5;
             
+            var tStep = sI.kanvas.allStageViews[index].childSteps[0];
+            var place = sI.kanvas.allStageViews[index].left - 14;
+            console.log("This is the place", tStep.parentStage.index);
+            sI.increaseHeaderLengthLeft(tStep.parentStage.index);
+
             if(tStep.previousIsMoving) {
                 place = sI.kanvas.moveDots.left + 7;
             }
@@ -34,6 +36,14 @@ window.ChaiBioTech.ngApp.service('StepMoveVoidSpaceLeftService', [
             sI.currentDropStage = sI.kanvas.allStageViews[index]; // We need to insert the step as the first.
             sI.verticalLine.setLeft(place);
             sI.verticalLine.setCoords();
+
+            sI.verticalLine.borderS.setLeft(place);
+            sI.verticalLine.borderS.setCoords();
+
+            if(sI.rightOffset === 64) {
+                sI.rightOffset = 128;
+            }
+            
         };
         
         var that = this;
@@ -46,8 +56,9 @@ window.ChaiBioTech.ngApp.service('StepMoveVoidSpaceLeftService', [
 
             voidSpaceCallbackLeft: function(point, index) {
                 
-                var abPlace = this.movement.left + this.rightOffset;
-                if(point[1] - point[0] > 25 && abPlace > (point[0] + 25) && abPlace < point[1]) {
+                var abPlace = this.movement.referencePoint;
+                if(point[1] - point[0] > 25 && abPlace > point[0] && abPlace < point[1]) {
+                    console.log("Hola stage void");
                     that.verticalLineForVoidLeft(this, index);
                     return true;
                 }

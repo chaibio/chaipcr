@@ -72,6 +72,7 @@ angular.module("canvasApp").factory('stage', [
         this.stageRect.setWidth(this.myWidth);
         this.stageRect.setCoords();
         this.roof.setWidth(this.myWidth);
+        //this.roof.setLeft(0);
       };
 
       this.collapseStage = function() {
@@ -157,8 +158,10 @@ angular.module("canvasApp").factory('stage', [
         stage.stageGroup.setCoords();
         stage.dots.setLeft(stage.left + 3);
         stage.dots.setCoords();
+        stage.border.setLeft(stage.left);
+        stage.border.setCoords();
         //stage.myWidth = (stage.model.steps.length * (constants.stepWidth)) + constants.additionalWidth;
-        this.moveStepAction = (del === true) ? -1 : 1; 
+        this.moveStepAction = (del === true) ? -1 : 1;
         stage.childSteps.forEach(this.manageMovingChildsteps, this);
 
       };
@@ -301,12 +304,13 @@ angular.module("canvasApp").factory('stage', [
           this.visualComponents = {
             'stageGroup': this.stageGroup,
             'dots': this.dots,
-            'borderRight': this.borderRight
+            'borderRight': this.borderRight,
+            'borderLeft': this.border
           };
 
           this.canvas.add(this.stageGroup);
           this.canvas.add(this.dots);
-
+          this.canvas.add(this.border);
           this.setShadows();
           this.addSteps();
       };
@@ -372,6 +376,23 @@ angular.module("canvasApp").factory('stage', [
         previousSelectedStage.changeFillsAndStrokes("white", 2);
         previousSelectedStage.manageBordersOnSelection("#ff9f00");
       };
+
+      this.extendHeader = function(left, headerExtender) {
+
+          var stroke = this.roof.get('stroke');
+          var strokeWidth = this.roof.get('strokeWidth');
+          //headerExtender.setLeft(left);
+          //headerExtender.setVisible(true);
+          //headerExtender.setStroke(stroke);
+          //headerExtender.setStrokeWidth(strokeWidth);
+          headerExtender.set({
+            'visible': true,
+            'stroke': stroke,
+            'strokeWidth': strokeWidth,
+            'left': left
+          });
+      };
+
     };
 
   }
