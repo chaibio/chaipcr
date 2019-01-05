@@ -48,18 +48,19 @@ function dispatch(
             end
         end
 
-        String(json_response)
+        return json_response
 
     catch err
         err
     end
 
     success = !isa(result, Exception)
-    response_body = success ?
-        result :
-        String(JSON.json(Dict(
-            "valid" => false,
-            "error" => repr(result))))
+    response_body = string(
+        success ?
+            result :
+            JSON.json(Dict(
+                "valid" => false,
+                "error" => repr(result)))))
 
     return (success, response_body)
 end # dispatch

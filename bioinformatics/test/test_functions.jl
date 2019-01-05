@@ -6,44 +6,33 @@
 ## automated test script for Julia API
 ## this code should be run at startup in fresh julia REPL
 
-# example test
+import FactCheck: clear_results
+import DataFrames: DataFrame
+import DataStructures: OrderedDict
+import BSON: bson
+
+td = readdlm("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/test_data.csv",',',header=true)
+const TEST_DATA = DataFrame([slicedim(td[1],2,i) for i in 1:size(td[1])[2]],map(Symbol,td[2][:]))
+
+
+# example code to generate, run, and save tests
+# BSON preferred to JLD because it can save functions and closures
 if (const RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE = false)
     cd("/home/vagrant/chaipcr/bioinformatics/QpcrAnalysis")
     push!(LOAD_PATH,pwd())
     using QpcrAnalysis
-    # test code: precompilation should ensure
-    # that the first and second runs are equally fast
-
     include("../test/test_functions.jl") # this file
-    test_functions = generate_tests(debug=false)
-    r = test_functions["amplification dual channel"]()
-
     test_functions = generate_tests()
-    t1 = @elapsed test_functions["amplification dual channel"]()
-    t2 = @elapsed test_functions["amplification dual channel"]()
-
-    # save test functions as JLD object for convenient loading
-    jldopen("../test/data/dispatch_tests.jld", "w") do file
-        addrequire(file, "types_for_dispatch.jl")
-        addrequire(file, "types_for_calibration.jl")
-        addrequire(file, "types_for_allelic_discrimination.jl")
-        addrequire(file, "types_for_amplification.jl")
-        addrequire(file, "types_for_meltcurve.jl")
-        addrequire(file, "types_for_standard_curve.jl")
-        addrequire(file, "types_for_thermal_consistency.jl")
-        addrequire(file, "amp_models/types_for_sfc_models.jl")
-        addrequire(file, "amp_models/types_for_dfc_models.jl")
-        addrequire(file, "constants.jl")
-        write(file, "x", x)
+    check = test_dispatch(test_functions)
+    if all(values(check))
+        BSON.bson("../test/data/dispatch_tests.bson",test_functions)
+        println("All test functions checked and saved")
+    else
+        println("Test functions failed check:")
+        println(results)
     end
 end
 
-import FactCheck: clear_results
-import DataFrames: DataFrame, rename
-import DataStructures: OrderedDict
-
-td = readdlm("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/test_data.csv",',',header=true)
-const TEST_DATA = DataFrame([slicedim(td[1],2,i) for i in 1:size(td[1])[2]],map(Symbol,td[2][:]))
 
 function generate_tests(;
     debug     ::Bool =false,
@@ -93,9 +82,10 @@ function generate_tests(;
 end
 
 # run test functions
-function test_dispatch()
-    test_functions = generate_tests()
-    OrderedDict(map(
-        testname -> testname => test_functions[testname](),
-        keys(test_functions)))
+# returns true for every test that runs without errors
+function test_dispatch(test_functions ::Associative)
+    OrderedDict(map(keys(test_functions)) do testname
+        result = test_functions[testname]()
+        testname => result[1] && result[2]["valid"]
+        end)
 end
