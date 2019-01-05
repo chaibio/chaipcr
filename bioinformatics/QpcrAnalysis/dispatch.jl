@@ -1,6 +1,7 @@
 # dispatch.jl
 
-import JSON, DataStructures.OrderedDict
+import JSON: parse, json
+import DataStructures.OrderedDict
 
 
 function dispatch(
@@ -48,19 +49,19 @@ function dispatch(
             end
         end
 
-        return json_response
+        json_response
 
     catch err
         err
     end
 
     success = !isa(result, Exception)
-    response_body = string(
+    response_body = 
         success ?
-            result :
-            JSON.json(Dict(
+            string(result) :
+            string(JSON.json(Dict(
                 "valid" => false,
-                "error" => repr(result)))))
+                "error" => repr(result))))
 
     return (success, response_body)
 end # dispatch

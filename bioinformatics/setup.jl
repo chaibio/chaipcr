@@ -92,8 +92,8 @@ println("installing library: Dierckx"); Pkg.add("Dierckx", v"0.3.0", v"0.3.1-")
 # println("installing library: MySQL"); Pkg.add("MySQL", v"0.3.0", v"0.3.1-") # remove MySQL dependency
 println("installing library: DataArrays"); Pkg.add("DataArrays", v"0.7.0", v"0.7.1-")
 println("installing library: DataArrays"); Pkg.add("BSON", v"0.1.3", v"0.1.4-")
-@static if (!PRODUCTION_MODE)
-    println("installing library: FactCheck"); Pkg.add("FactCheck", v"0.4.3", v"0.4.4-") # for testing
+@static if (!PRODUCTION_MODE) # for testing
+    println("installing library: FactCheck"); Pkg.add("FactCheck", v"0.4.3", v"0.4.4-")
 end
 
 Pkg.build("DataArrays", "DataStructures", "SpecialFunctions", "MathProgBase", "HDF5", "Clustering", "Nullables", "JSON", "JLD", "NLopt", "JuMP", "HttpServer", "ProfileView", "Dierckx", "Ipopt", "DataFrames")

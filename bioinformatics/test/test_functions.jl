@@ -10,6 +10,7 @@ import FactCheck: clear_results
 import DataFrames: DataFrame
 import DataStructures: OrderedDict
 import BSON: bson
+import JSON: json, parse, parsefile
 
 td = readdlm("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/test_data.csv",',',header=true)
 const TEST_DATA = DataFrame([slicedim(td[1],2,i) for i in 1:size(td[1])[2]],map(Symbol,td[2][:]))
@@ -21,9 +22,8 @@ if (const RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE = false)
     cd("/home/vagrant/chaipcr/bioinformatics/QpcrAnalysis")
     push!(LOAD_PATH,pwd())
     using QpcrAnalysis
-    include("../test/test_functions.jl") # this file
-    test_functions = generate_tests()
-    check = test_dispatch(test_functions)
+    test_functions = QpcrAnalysis.generate_tests()
+    check = QpcrAnalysis.test_dispatch(test_functions)
     if all(values(check))
         BSON.bson("../test/data/dispatch_tests.bson",test_functions)
         println("All test functions checked and saved")
@@ -55,8 +55,9 @@ function generate_tests(;
                     if (debug) # errors fail out
                         QpcrAnalysis.verify_request(action_t,request)
                         response = QpcrAnalysis.act(action_t,request;verbose=verbose)
-                        response_body = JSON.parse(JSON.json(response),dicttype=OrderedDict)
-                        QpcrAnalysis.verify_response(action_t,response_body)
+                        response_body = string(JSON.json(response))
+                        response_parsed = JSON.parse(response_body,dicttype=OrderedDict)
+                        QpcrAnalysis.verify_response(action_t,response_parsed)
                         ok = true
                     else # continue tests after errors reported
                         (ok, response_body) = QpcrAnalysis.dispatch(
@@ -64,9 +65,10 @@ function generate_tests(;
                             body;
                             verbose=verbose,
                             verify=true)
+                        response_parsed = JSON.parse(response_body,dicttype=OrderedDict)
                     end # if debug
                     QpcrAnalysis.print_v(println,verbose,"Passed $testname\n")
-                    return (ok, response_body)
+                    return (ok, response_parsed)
                 end
 
                 testname = replace(TEST_DATA[i,:action],r"_"=>" ")
@@ -85,6 +87,7 @@ end
 # returns true for every test that runs without errors
 function test_dispatch(test_functions ::Associative)
     OrderedDict(map(keys(test_functions)) do testname
+        println("Making dispatch call: $testname")
         result = test_functions[testname]()
         testname => result[1] && result[2]["valid"]
         end)

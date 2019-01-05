@@ -2,7 +2,7 @@
 #
 # amplification analysis
 
-import JSON
+import JSON: parse
 import DataStructures.OrderedDict
 import Ipopt: IpoptSolver #, NLoptSolver
 using Ipopt
@@ -15,7 +15,6 @@ function act(
     out_format ::String ="pre_json",
     verbose ::Bool =false
 )
-
     keys_req_dict=keys(req_dict)
 
     ## remove MySql dependency  

@@ -1,0 +1,987 @@
+        - # amp.jl
+        - #
+        - # amplification analysis
+        - 
+        - import JSON: parse
+        - import DataStructures.OrderedDict
+        - import Ipopt: IpoptSolver #, NLoptSolver
+        - using Ipopt
+        - 
+        - 
+        - # called by QpcrAnalysis.dispatch
+        - function act(
+        -     ::Amplification,
+        -     req_dict ::Associative;
+        -     out_format ::String ="pre_json",
+        -     verbose ::Bool =false
+        - )
+      224     keys_req_dict=keys(req_dict)
+        - 
+        -     ## remove MySql dependency  
+        -     #
+        -     ## asrp_vec
+        -     # if "step_id" in keys_req_dict
+        -     #     asrp_vec = [AmpStepRampProperties("step", req_dict["step_id"], DEFAULT_cyc_nums)]
+        -     # elseif "ramp_id" in keys_req_dict
+        -     #     asrp_vec = [AmpStepRampProperties("ramp", req_dict["ramp_id"], DEFAULT_cyc_nums)]
+        -     # else
+        -     #     asrp_vec = Vector{AmpStepRampProperties}()
+        -     # end
+        - 
+        -     # new >>
+        -     ## we will assume that any relevant step/ramp information has already been passed along
+        -     ## and is present in step_id / ramp_id
+        0     if "step_id" in keys_req_dict
+       96         asrp_vec = [AmpStepRampProperties("step", req_dict["step_id"], DEFAULT_cyc_nums)]
+        0     elseif "ramp_id" in keys_req_dict
+       96         asrp_vec = [AmpStepRampProperties("ramp", req_dict["ramp_id"], DEFAULT_cyc_nums)]
+        -     else
+        0         error("no step/ramp information found")
+        -     end
+        -     # << new
+        - 
+        -     # `report_cq!` arguments
+      160     kwdict_rc = Dict{Symbol,Any}()
+        0     if "min_fluomax" in keys_req_dict
+       32         kwdict_rc[:max_bsf_lb] = req_dict["min_fluomax"]
+        -     end
+        0     if "min_D1max" in keys_req_dict
+        0         kwdict_rc[:max_dr1_lb] = req_dict["min_D1max"]
+        -     end
+        0     if "min_D2max" in keys_req_dict
+        0         kwdict_rc[:max_dr2_lb] = req_dict["min_D2max"]
+        -     end
+        - 
+        -     # `process_amp_1sr` arguments
+      160     kwdict_pa1 = Dict{Symbol,Any}()
+      224     for key in ["min_reliable_cyc", "baseline_cyc_bounds", "cq_method", "ctrl_well_dict"]
+        0         if key in keys_req_dict
+        0             kwdict_pa1[Symbol(key)] = req_dict[key]
+        -         end
+        -     end
+        0     if "categ_well_vec" in keys_req_dict
+        0         categ_well_vec = req_dict["categ_well_vec"]
+        0         for i in 1:length(categ_well_vec)
+        0             if length(categ_well_vec[i][2]) == 0
+        0                 categ_well_vec[i][2] = Colon()
+        -             end
+        -         end
+        0         kwdict_pa1[:categ_well_vec] = categ_well_vec
+        -     end
+        - 
+        -     # `mod_bl_q` arguments
+      160     kwdict_mbq = Dict{Symbol,Any}()
+        0     if "baseline_method" in keys_req_dict
+        0         baseline_method = req_dict["baseline_method"]
+        0         if baseline_method == "sigmoid"
+        0             kwdict_mbq[:bl_method] = "l4_enl"
+        0             kwdict_mbq[:bl_fallback_func] = median
+        0         elseif baseline_method == "linear"
+        0             kwdict_mbq[:bl_method] = "lin_1ft"
+        0             kwdict_mbq[:bl_fallback_func] = mean
+        0         elseif baseline_method == "median"
+        0             kwdict_mbq[:bl_method] = "median"
+        -         end
+        -     end
+        - 
+        -     # call
+      864     response = process_amp( 
+        -         
+        -         ## remove MySql dependency
+        -         #
+        -         # db_conn, exp_id, asrp_vec, calib_info;
+        - 
+        -         # new >>
+        -         req_dict["experiment_id"], 
+        -         req_dict["raw_data"],
+        -         req_dict["calibration_info"],
+        -         asrp_vec;
+        -         out_format  = out_format,
+        -         verbose     = verbose,
+        -         # << new
+        - 
+        -         kwdict_rc   = kwdict_rc,
+        -         kwdict_mbq  = kwdict_mbq,
+        -         out_sr_dict = false,
+        -         kwdict_pa1...
+        -     )
+        - end
+        - 
+        - 
+        - function process_amp(
+        - 
+        -     ## remove MySql dependency
+        -     #
+        -     # db_conn ::MySQL.MySQLHandle,
+        -     # exp_id ::Integer,
+        -     # asrp_vec ::Vector{AmpStepRampProperties},
+        -     # calib_info ::Union{Integer,OrderedDict};
+        -     #
+        -     ## arguments that might be passed by upstream code
+        -     # well_nums ::AbstractVector =[],
+        - 
+        -     # new >>
+        -     exp_id ::Integer,
+        -     exp_data ::Associative,
+        -     calib_data ::Associative,
+        -     # we will assume that any relevant step/ramp information has already been passed along
+        -     # and is present in asrp_vec
+        -     asrp_vec ::Vector{AmpStepRampProperties};
+        -     # << new
+        - 
+        -     min_reliable_cyc ::Real =5,
+        -     baseline_cyc_bounds ::AbstractVector =[],
+        -     cq_method ::String ="Cy0",
+        -     ct_fluos ::AbstractVector =[],
+        - 
+        -     max_cycle ::Integer =1000, # maximum temperature to analyze
+        -     dcv ::Bool=true, # logical, whether to perform multi-channel deconvolution
+        -     dye_in ::String ="FAM", dyes_2bfild ::AbstractVector=[],
+        -     qt_prob_rc ::Real =0.9, # quantile probablity for fluo values per well
+        -     af_key ::String ="sfc",
+        - 
+        -     ipopt_print2file_prefix ::String ="", # file prefix for Ipopt print for `mod_bl_q`
+        - 
+        -     kwdict_rc ::Associative =Dict(), # keyword arguments passed onto `report_cq!`,
+        -     kwdict_mbq ::Associative =Dict(), # keyword arguments passed onto `mod_bl_q`
+        - 
+        -     # allelic discrimination
+        -     ad_cycs ::Union{Integer,AbstractVector} =0, # allelic discrimination: cycles of fluorescence to be used, 0 means the last cycle
+        -     ctrl_well_dict ::OrderedDict =CTRL_WELL_DICT,
+        -     cluster_method ::String ="k-means-medoids", # allelic discrimination: "k-means", "k-medoids", "k-means-medoids"
+        -     norm_l ::Real=2, # norm level for distance matrix, e.g. norm_l = 2 means l2-norm
+        -     expected_ncg_raw ::AbstractMatrix =DEFAULT_encgr, # each column is a vector of binary genotype whose length is number of channels (0 => no signal, 1 => yes signal)
+        -     categ_well_vec ::AbstractVector =CATEG_WELL_VEC,
+        - 
+        -     out_sr_dict ::Bool =true, # output an OrderedDict keyed by `sr_str`s
+        -     out_format ::String ="json", # "full", "pre_json", "json"
+        -     json_digits ::Integer =JSON_DIGITS,
+        -     verbose ::Bool =false
+        - )
+        - 
+        -     # print_v(println, verbose,
+        -     #     "db_conn: ", db_conn, "\n",
+        -     #     "experiment_id: $exp_id\n",
+        -     #     "asrp_vec: $asrp_vec\n",
+        -     #     "calib_info: $calib_info\n",
+        -     #     "max_cycle: $max_cycle"
+        -     # )
+        -     
+        -     ## remove MySql dependency
+        -     #
+        -     # calib_info = ensure_ci(db_conn, calib_info, exp_id)
+        -     #
+        -     ## find step_id/ramp_id information
+        -     # if length(asrp_vec) == 0
+        -     #     sr_qry = """SELECT
+        -     #             steps.id AS steps_id,
+        -     #             steps.collect_data AS steps_collect_data,
+        -     #             ramps.id AS ramps_id,
+        -     #             ramps.collect_data AS ramps_collect_data
+        -     #         FROM experiments
+        -     #         LEFT JOIN protocols ON experiments.experiment_definition_id = protocols.experiment_definition_id
+        -     #         LEFT JOIN stages ON protocols.id = stages.protocol_id
+        -     #         LEFT JOIN steps ON stages.id = steps.stage_id
+        -     #         LEFT JOIN ramps ON steps.id = ramps.next_step_id
+        -     #         WHERE
+        -     #             experiments.id = $exp_id AND
+        -     #             stages.stage_type <> \'meltcurve\'
+        -     #     """
+        -     #     # (mapping no longer needed after using "AS" in query):
+        -     #     # [1] steps.id, [2] steps.collect_data, [3] ramps.id, [4] ramps.collect_data
+        -     #     sr = MySQL.mysql_execute(db_conn, sr_qry)[1] # [index] fieldnames
+        -     #
+        -     #     step_ids = unique(sr[1][sr[2] .== 1])
+        -     #     ramp_ids = unique(sr[3][sr[4] .== 1])
+        -     #
+        -     #     asrp_vec = vcat(
+        -     #         map(step_ids) do step_id
+        -     #             AmpStepRampProperties("step", step_id, DEFAULT_cyc_nums)
+        -     #         end,
+        -     #         map(ramp_ids) do ramp_id
+        -     #             AmpStepRampProperties("ramp", ramp_id, DEFAULT_cyc_nums)
+        -     #         end
+        -     #     )
+        -     # end # if length(sr_str_vec)
+        -     #
+        -     ### find the latest step or ramp
+        -     ## if out_sr_dict
+        -     ##     sr_ids = map(asrp -> asrp.id, asrp_vec)
+        -     ##     max_step_id = maximum(sr_ids)
+        -     ##     msi_idc = find(sr_id -> sr_id == max_step_id, sr_ids) # msi = max_step_id
+        -     ##     if length(msi_idc) == 1
+        -     ##         latest_idx = msi_idc[1]
+        -     ##     else # length(max_idc) == 2
+        -     ##         latest_idx = find(asrp_vec) do asrp
+        -     ##             asrp.step_or_ramp == "step" && aspr.id == max_step_id
+        -     ##         end[1] # do asrp
+        -     ##     end # if length(min_idc) == 1
+        -     ##     asrp_latest = asrp_vec[latest_idx]
+        -     ## else # implying `sr_vec` has only one element
+        -     ##     asrp_latest = asrp_vec[1]
+        -     ## end
+        -     #
+        -     ## print_v(println, verbose, asrp_latest)
+        -     #
+        -     ## find `asrp`
+        -     # for asrp in asrp_vec
+        -     #     fd_qry_2b = """
+        -     #         SELECT well_num, cycle_num
+        -     #             FROM fluorescence_data
+        -     #             WHERE
+        -     #                 experiment_id = $exp_id AND
+        -     #                 $(asrp.step_or_ramp)_id = $(asrp.id) AND
+        -     #                 cycle_num <= $max_cycle AND
+        -     #                 step_id is not NULL
+        -     #                 well_constraint
+        -     #             ORDER BY cycle_num
+        -     #     """ 
+        -     #     # must "SELECT well_num" for `get_mysql_data_well`
+        -     #     fd_nt, fluo_well_nums = get_mysql_data_well(
+        -     #         well_nums, fd_qry_2b, db_conn, verbose
+        -     #     )
+        -     #     asrp.cyc_nums = unique(fd_nt[:cycle_num])
+        -     #  end # for asrp
+        -     #
+        -     ## find `fluo_well_nums` and `channel_nums`.
+        -     ## literal i.e. non-pointer variables created in a Julia for-loop is local,
+        -     ## i.e. not accessible outside of the for-loop.
+        -     #  asrp_1 = asrp_vec[1]
+        -     #  fd_qry_2b = """
+        -     #      SELECT well_num, channel
+        -     #          FROM fluorescence_data
+        -     #          WHERE
+        -     #              experiment_id = $exp_id AND
+        -     #              $(asrp_1.step_or_ramp)_id = $(asrp_1.id) AND
+        -     #              step_id is not NULL
+        -     #              well_constraint
+        -     #          ORDER BY well_num
+        -     #  """
+        -     #  # must "SELECT well_num" and "ORDER BY well_num" for `get_mysql_data_well`
+        -     #  fd_nt, fluo_well_nums = get_mysql_data_well(
+        -     #      well_nums, fd_qry_2b, db_conn, verbose
+        -     #  )
+        -     #
+        -     # channel_nums = unique(fd_nt[:channel])
+        - 
+        -     # new >>
+     4272     channel_nums = ["channel_$(i)" for i in sort(unique(exp_data["channel"]))]
+        -     # << new
+        - 
+        -     # pre-deconvolution, process all available channel_nums
+        0     if length(channel_nums) == 1
+        0         dcv = false
+        -     end
+        - 
+        0     out_format_1sr = (out_format == "json" ? "pre_json" : out_format)
+        - 
+        -     # new >>
+        -     # issues:
+        -     # 1.
+        -     # the new code currently assumes only 1 step/ramp
+        -     # because as the request body is currrently structured
+        -     # we cannot subset the fluorescence data by step_id/ramp_id
+        -     # 2.
+        -     # need to verify that the fluorescence data complies
+        -     # with the constraints imposed by max_cycle and well_constraint
+        -     # << new
+        - 
+      864     sr_dict = OrderedDict(map([ asrp_vec[1] ]) do asrp
+        -         process_amp_1sr(
+        - 
+        -             ## remove MySql dependency
+        -             #
+        -             # db_conn, exp_id, asrp, calib_info,
+        -             # fluo_well_nums, well_nums, 
+        - 
+        -             # new >>
+        -             exp_data,
+        -             calib_data,
+        -             asrp,
+        -             # << new
+        - 
+        -             channel_nums, dcv,
+        -             dye_in, dyes_2bfild,
+        -             min_reliable_cyc, baseline_cyc_bounds, cq_method, ct_fluos, af_key, kwdict_mbq, ipopt_print2file_prefix,
+        -             qt_prob_rc, kwdict_rc,
+        -             ad_cycs, ctrl_well_dict, cluster_method, norm_l, expected_ncg_raw, categ_well_vec,
+        -             out_format_1sr, json_digits, verbose
+        -         )
+        -     end) # do sr_ele
+        - 
+        0     if (out_sr_dict)
+        0         final_out = sr_dict
+        -     else
+       32         first_sr_out = first(values(sr_dict))
+     2304         final_out = OrderedDict(map(fieldnames(first_sr_out)) do key
+        -             key => getfield(first_sr_out,key)
+        -         end)
+        -     end
+        0     final_out[:valid] = true
+        0     return out_format == "json" ? JSON.json(final_out) : final_out
+        - 
+        - end # process_amp
+        - 
+        - 
+        - ## deprecated to remove MySql dependency
+        - #
+        - # function get_amp_data(
+        - #    db_conn ::MySQL.MySQLHandle,
+        - #    col_name ::String, # "fluorescence_value" or "baseline_value"
+        - #    exp_id ::Integer,
+        - #    asrp ::AmpStepRampProperties,
+        - #    fluo_well_nums ::AbstractVector, # not `[]`, all elements are expected to be found
+        - #    channel_nums ::AbstractVector,
+        - # )
+        - #    
+        - #    cyc_nums = asrp.cyc_nums
+        - #    
+        - #    get fluorescence data for amplification
+        - #    fluo_qry = """SELECT $col_name
+        - #        FROM fluorescence_data
+        - #        WHERE
+        - #            experiment_id= $exp_id AND
+        - #            $(asrp.step_or_ramp)_id = $(asrp.id) AND
+        - #            cycle_num in ($(join(cyc_nums, ","))) AND
+        - #            well_num in ($(join(fluo_well_nums, ","))) AND
+        - #            channel in ($(join(channel_nums, ","))) AND
+        - #            step_id is not NULL
+        - #        ORDER BY channel, well_num, cycle_num
+        - #    """
+        - #    fluo_sel = MySQL.mysql_execute(db_conn, fluo_qry)[1]
+        - #    
+        - #    fluo_raw = reshape(
+        - #        fluo_sel[JSON.parse(col_name)],
+        - #        map(length, (cyc_nums, fluo_well_nums, channel_nums))...
+        - #    )
+        - #    
+        - #    return fluo_raw
+        - #    
+        - # end # get_amp_data
+        - 
+        - 
+        - # automatically choose baseline cycles as the flat part of the curve
+        - function auto_choose_bl_cycs(
+        -     fluos ::AbstractVector,
+        -     last_cyc_wt0 ::Real, # `floor(min_reliable_cyc) - 1`
+        -     bl_notes ::Vector{String} # will be updated by `push!` and returned
+        - )
+        - 
+        0     num_cycs = length(fluos)
+        0     cycs = 1.0 * (1:num_cycs)
+        - 
+     2304     min_fluo, min_fluo_cyc = findmin(fluos)
+        0     dr2_cfd = finite_diff(cycs, fluos; nu=2) # `Dierckx.Spline1D` resulted in all `NaN` in some cases
+        - 
+     8224     dr2_cfd_left = dr2_cfd[1:min_fluo_cyc]
+    20688     dr2_cfd_right = dr2_cfd[min_fluo_cyc:end]
+        0     max_dr2_left_cyc, max_dr2_right_cyc = map((dr2_cfd_left, dr2_cfd_right)) do dr2_vec
+     3072         findmax(dr2_vec)[2]
+        -     end # do dr2_vec
+        - 
+        0     if max_dr2_right_cyc <= last_cyc_wt0 # fluo on fitted spline may not be close to raw fluo at `cyc_m2l` and `cyc_m2r`
+     5600         push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) <= last_cyc_wt0 ($last_cyc_wt0), bl_cycs = $(last_cyc_wt0+1):$num_cycs")
+      224         bl_cycs = last_cyc_wt0+1:num_cycs
+        -     else
+        0         bl_cyc_start = max(last_cyc_wt0+1, max_dr2_left_cyc)
+    44608         push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) > last_cyc_wt0 ($last_cyc_wt0), bl_cyc_start = $bl_cyc_start (max(last_cyc_wt0+1, max_dr2_left_cyc), i.e. max($(last_cyc_wt0+1), $max_dr2_left_cyc))")
+        - 
+        0         if max_dr2_right_cyc - bl_cyc_start <= 1
+     3456             push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) - bl_cyc_start ($bl_cyc_start) <= 1")
+     2816             max_dr2_right_2, max_dr2_right_cyc_2_shifted = findmax(dr2_cfd[max_dr2_right_cyc+1:end])
+        0             max_dr2_right_cyc_2 = max_dr2_right_cyc_2_shifted + max_dr2_right_cyc
+        0             if max_dr2_right_cyc_2 - max_dr2_right_cyc == 1
+        0                 bl_cyc_end = num_cycs
+        0                 push!(bl_notes, "max_dr2_right_cyc_2 ($max_dr2_right_cyc_2) - max_dr2_right_cyc ($max_dr2_right_cyc) == 1")
+        -             else
+     3552                 push!(bl_notes, "max_dr2_right_cyc_2 ($max_dr2_right_cyc_2) - max_dr2_right_cyc ($max_dr2_right_cyc) != 1")
+        0                 bl_cyc_end = max_dr2_right_cyc_2
+        -             end # if m2r2_idx
+        -         else
+    20160             push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) - bl_cyc_start ($bl_cyc_start) > 1")
+        0             bl_cyc_end = max_dr2_right_cyc
+        -         end # if cyc_m2r - bl_cyc_start <= 1
+    13776         push!(bl_notes, "bl_cyc_end = $bl_cyc_end")
+        - 
+     1312         bl_cycs = bl_cyc_start:bl_cyc_end
+    18368         push!(bl_notes, "bl_cycs = $bl_cyc_start:$bl_cyc_end")
+        - 
+        -     end # cyc_m2r <= last_cyc_wt0
+        - 
+     1536     return (bl_cycs, bl_notes)
+        - 
+        - end # auto_choose_bl_cycs
+        - 
+        - 
+        - 
+        - 
+        - # fit model, baseline subtraction, quantification
+        - function mod_bl_q( 
+        -     fluos ::AbstractVector;
+        - 
+        -     min_reliable_cyc ::Real =5, # >= 1
+        - 
+        -     af_key ::String ="sfc", # a string representation of amplification curve model, used for finding the right model `DataType` in `dfc_DICT` and the right empty model instance in `AF_EMPTY_DICT`
+        - 
+        -     sfc_model_defs ::OrderedDict{String,SFCModelDef} =MDs,
+        - 
+        -     bl_method ::String ="l4_enl",
+        -     baseline_cyc_bounds ::AbstractVector =[],
+        -     bl_fallback_func ::Function =median,
+        - 
+        -     m_postbl ::String ="l4_enl",
+        - 
+        -     denser_factor ::Real =100,
+        - 
+        -     cq_method ::String ="Cy0",
+        -     ct_fluo ::Real =NaN,
+        - 
+        -     verbose ::Bool =false,
+        - 
+        -     kwargs_jmp_model ::OrderedDict =OrderedDict(
+        -         :solver => IpoptSolver(print_level=0, max_iter=35) # `ReadOnlyMemoryError()` for v0.5.1
+        -         # :solver => IpoptSolver(print_level=0, max_iter=100) # increase allowed number of iterations for MAK-based methods, due to possible numerical difficulties during search for fitting directions (step size becomes too small to be precisely represented by the precision allowed by the system's capacity)
+        -         # :solver => NLoptSolver(algorithm=:LN_COBYLA)
+        -     ),
+        -     ipopt_print2file ::String ="",
+        - )
+        - 
+     3072     num_cycs = length(fluos)
+        0     cycs = 1.0 * (1:num_cycs)
+    46080     cycs_denser = Array(colon(1, (num_cycs - 1) / denser_factor, num_cycs))
+        - 
+        0     len_bcb = length(baseline_cyc_bounds)
+        - 
+        0     last_cyc_wt0 = floor(min_reliable_cyc) - 1 # to determine weights (`wts`) for sigmoid fitting per `min_reliable_cyc`
+        - 
+        -     # will remain the same `if len_bcb == 0 && (last_cyc_wt0 <= 1 || num_cycs < min_reliable_cyc)`
+    21504     wts = ones(num_cycs)
+        0     fitted_prebl = AF_EMPTY_DICT[af_key]
+     8448     baseline = bl_fallback_func(fluos)
+     4608     bl_notes = ["last_cyc_wt0 <= 1 || num_cycs < min_reliable_cyc, fallback"]
+        - 
+        0     solver = kwargs_jmp_model[:solver]
+        -     if isa(solver, Ipopt.IpoptSolver)
+     1536         push!(solver.options, (:output_file, ipopt_print2file))
+        -     end
+        - 
+        0     if af_key == "dfc" # no fallback for baseline, because: (1) curve may fit well though :Error or :UserLimit (search step becomes very small but has not converge); (2) the guessed basedline (`start` of `fb`) is usually quite close to a sensible baseline.
+        - 
+        0         dfc_inst = dfc_DICT[af_key]()
+        - 
+        0         fitted_prebl = fit(dfc_inst, cycs, fluos, wts; kwargs_jmp_model...)
+        0         baseline = fitted_prebl.coefs[1] # "fb" (fallback)
+        0         if af_key in ["MAK3", "MAKERGAUL4"]
+        0             baseline += fitted_prebl.coefs[2] .* cycs # `.+=` caused "ERROR: MethodError: no method matching broadcast!( ::QpcrAnalysis.##278#283, ::Float64, ::Float64, ::Float64, ::StepRangeLen{Float64,Base.TwicePrecision{Float64},Base.TwicePrecision{Float64}})"
+        -         end # if af_key
+        - 
+        0         fitted_postbl = fitted_prebl
+        0         coefs_pob = fitted_postbl.coefs
+        - 
+        0         d0_i_vec = find(fitted_postbl.coef_strs) do coef_str
+        -             coef_str == "d0"
+        -         end
+        0         d0 = coefs_pob[d0_i_vec[1]] # * 1. # without `* 1.`, MethodError: no method matching kmeans!( ::Array{AbstractFloat,2}, ::Array{Float64,2}); Closest candidates are: kmeans!( ::Array{T<:AbstractFloat,2}, ::Array{T<:AbstractFloat,2}; weights, maxiter, tol, display) where T<:AbstractFloat at E:\for_programs\julia_pkgs\v0.6\Clustering\src\kmeans.jl:27
+        - 
+        -         # for `Sfc`-style output
+        0         bl_notes = [af_key]
+        0         blsub_fluos = fluos .- baseline
+        0         blsub_fitted = pred_from_cycs(dfc_inst, cycs, coefs_pob...)
+        0         max_dr1 = max_dr2 = Inf
+        0         cyc_vals_4cq = eff_vals_4cq = OrderedDict()
+        0         eff = NaN
+        0         cq_raw = NaN
+        0         cq_fluo = NaN
+        - 
+        0     elseif af_key == "sfc"
+        - 
+        0         if bl_method in keys(sfc_model_defs)
+        - 
+     4608             if bl_method in ["lin_1ft", "lin_2ft"]
+        0                 wts = zeros(num_cycs)
+        0                 wts[colon(baseline_cyc_bounds...)] .= 1
+        -             else # sigmoid models so far
+    46080                 wts = vcat(zeros(last_cyc_wt0), ones(num_cycs - last_cyc_wt0))
+        -             end
+        0             fitted_prebl = sfc_model_defs[bl_method].func_fit(cycs, fluos, wts; kwargs_jmp_model...)
+        - 
+     9216             prebl_status = string(fitted_prebl.status)
+     6912             bl_notes = ["prebl_status $prebl_status"]
+  1505280             baseline = sfc_model_defs[bl_method].funcs_pred["bl"](cycs, fitted_prebl.coefs...) # may be changed later
+        - 
+     4608             if prebl_status in ["Optimal", "UserLimit"]
+        0                 push!(bl_notes, "model-derived baseline") # may be changed later
+   254880                 blsub_fluos_draft = fluos .- baseline
+     5760                 min_bfd, max_bfd = extrema(blsub_fluos_draft) # bfd = blsub_fluos_draft
+     1440                 if max_bfd - min_bfd <= abs(min_bfd)
+        0                     bl_notes[2] = "fallback" # change
+     1344                     push!(bl_notes, "max_bfd ($max_bfd) - min_bfd ($min_bfd) == $(max_bfd - min_bfd) <= abs(min_bfd)")
+        -                 end # if max_bfd
+        0             elseif prebl_status == "Error"
+        0                 push!(bl_notes, "fallback")
+        -             end # if prebl_status
+        - 
+        0             if bl_notes[2] == "fallback"
+        0                 bl_func = bl_fallback_func
+        -             end
+        - 
+        -         else # if not fit model to find baseline
+        0             bl_notes = ["no prebl_status", "no fallback"]
+        0             if bl_method == "median"
+        0                 bl_func = median
+        -             end
+        -         end # if bl_method
+        - 
+        0         if len_bcb == 0 && last_cyc_wt0 > 1 && num_cycs >= min_reliable_cyc
+        -         # if last_cyc_wt0 > 1 && num_cycs >= min_reliable_cyc
+     1536             bl_cycs, bl_notes = auto_choose_bl_cycs(fluos, last_cyc_wt0, bl_notes)
+        0         elseif len_bcb == 2
+        0             bl_cycs = colon(baseline_cyc_bounds...)
+        0             push!(bl_notes, "User-defined")
+        -             # baseline = bl_fallback_func(fluos[colon(baseline_cyc_bounds...)])
+        -             # bl_notes = ["User-defined"]
+        0         elseif !(len_bcb in [0, 2])
+        0             error("Length of `baseline_cyc_bounds` must be 0 or 2.")
+        -         end # if len_bcb
+        - 
+        0         if bl_notes[2] != "model-derived baseline"
+     2240             baseline = bl_func(fluos[bl_cycs]) # change or new def
+        -         end
+        - 
+   273312         blsub_fluos = fluos .- baseline
+        - 
+        0         fitted_postbl = sfc_model_defs[m_postbl].func_fit(
+        -             cycs,
+        -             blsub_fluos,
+        -             wts;
+        -             kwargs_jmp_model...)
+        - 
+        0         coefs_pob = fitted_postbl.coefs
+        - 
+        0         d0 = NaN
+        - 
+        0         func_pred_f = sfc_model_defs[m_postbl].funcs_pred["f"]
+      768         blsub_fitted = func_pred_f(cycs, coefs_pob...)
+        - 
+        0         len_denser = length(cycs_denser)
+        - 
+      768         dr1_pred = sfc_model_defs[m_postbl].funcs_pred["dr1"](cycs_denser, coefs_pob...)
+     2304         max_dr1, idx_max_dr1 = findmax(dr1_pred)
+      768         cyc_max_dr1 = cycs_denser[idx_max_dr1]
+        - 
+      768         dr2_pred = sfc_model_defs[m_postbl].funcs_pred["dr2"](cycs_denser, coefs_pob...)
+     2304         max_dr2, idx_max_dr2 = findmax(dr2_pred)
+      768         cyc_max_dr2 = cycs_denser[idx_max_dr2]
+        - 
+     2304         Cy0 = cyc_max_dr1 - func_pred_f(cyc_max_dr1, coefs_pob...) / max_dr1
+        - 
+        0         ct = try
+      768             sfc_model_defs[m_postbl].funcs_pred["inv"](ct_fluo, coefs_pob...)
+        -         catch err
+        0             isa(err, DomainError) ? Ct_VAL_DomainError : "unhandled error"
+        -         end # try
+        - 
+        0         cyc_vals_4cq = OrderedDict(
+        -             "cp_dr1" => cyc_max_dr1,
+        -             "cp_dr2" => cyc_max_dr2,
+        -             "Cy0" => Cy0,
+        -             "ct" => ct)
+        - 
+     1536         func_pred_eff = function (cyc)
+        -             try
+  1095856                 log(2, /(map([0.5, -0.5]) do epsilon
+        -                     func_pred_f(cyc + epsilon, coefs_pob...)
+        -                 end...))
+        -             catch err
+        0                 isa(err, DomainError) ? NaN : "unhandled error"
+        -             end # try
+        -         end # function. needed because `Cy0` may not be in `cycs_denser`
+        - 
+     3840         eff_vals_4cq = OrderedDict(map(keys(cyc_vals_4cq)) do key
+        -             key => func_pred_eff(cyc_vals_4cq[key])
+        -         end)
+        - 
+        0         eff_pred = map(func_pred_eff, cycs_denser)
+     2304         eff_vals_4cq["max_eff"], idx_max_eff = findmax(eff_pred)
+        0         cyc_vals_4cq["max_eff"] = cycs_denser[idx_max_eff]
+        - 
+      768         cq_raw = cyc_vals_4cq[cq_method]
+      768         eff = eff_vals_4cq[cq_method]
+        - 
+      768         cq_fluo = func_pred_f(cq_raw <= 0 ? NaN : cq_raw, coefs_pob...)
+        - 
+        -     else
+        0         error("`af_key` \"$af_key\" is not recognized.")
+        - 
+        -     end # if af_key
+        - 
+        - 
+        0     return MbqOutput(
+        -         fitted_prebl,
+        -         bl_notes,
+        -         blsub_fluos,
+        -         fitted_postbl,
+        -         fitted_postbl.status,
+        -         coefs_pob,
+        -         d0,
+        -         blsub_fitted,
+        -         dr1_pred,
+        -         dr2_pred,
+        -         max_dr1,    
+        -         max_dr2,
+        -         cyc_vals_4cq,
+        -         eff_vals_4cq,
+        -         cq_raw,
+        -         copy(cq_raw),
+        -         eff,
+        -         cq_fluo
+        -     )
+        - #
+        - 
+        - end # mod_bl_q
+        - 
+        - 
+        - function report_cq!(
+        -     full_amp_out ::AmpStepRampOutput,
+        -     well_i ::Integer,
+        -     channel_i ::Integer;
+        -     before_128x ::Bool =false,
+        -     max_dr1_lb =472,
+        -     max_dr2_lb =41,
+        -     max_bsf_lb =4356,
+        -     scld_max_dr1_lb ::Real =0.0089, # look like real amplification, scld_max_dr1 0.00894855, ip223, exp. 75, well A7, channel 2.
+        -     scld_max_dr2_lb ::Real =0.000689,
+        -     scld_max_bsf_lb ::Real =0.086   
+        - )
+        - 
+    10752     if before_128x
+        0         max_dr1_lb, max_dr2_lb, max_bsf_lb = [max_dr1_lb, max_dr2_lb, max_bsf_lb] / 128
+        -     end
+        - 
+        0     num_cycs = size(full_amp_out.fr_ary3)[1]
+        - 
+    22272     postbl_status,   cq_raw,  max_dr1,  max_dr2 = map([
+        -     :postbl_status, :cq_raw, :max_dr1, :max_dr2
+        -     ]) do fn
+        -         getindex(getfield(full_amp_out, fn), well_i, channel_i)
+        -     end # do fn
+        - 
+        0     max_bsf = maximum(full_amp_out.blsub_fluos[:, well_i, channel_i])
+        - 
+        0     b_ = full_amp_out.coefs[1, well_i, channel_i]
+        - 
+    19200     scld_max_dr1, scld_max_dr2, scld_max_bsf = [max_dr1, max_dr2, max_bsf] / full_amp_out.max_qt_fluo
+        0     why_NaN = ""
+        - 
+        0     if postbl_status == :Error
+        0         why_NaN = "postbl_status == :Error"
+        0     elseif b_ > 0
+        0         why_NaN = "b > 0"
+        0     elseif full_amp_out.cq_method == "ct" && cq_raw == Ct_VAL_DomainError
+        0         why_NaN = "DomainError when calculating Ct"
+        0     elseif cq_raw <= 0.1 || cq_raw >= num_cycs
+        0         why_NaN = "cq_raw <= 0.1 || cq_raw >= num_cycs"
+        0     elseif max_dr1 < max_dr1_lb
+     5376         why_NaN = "max_dr1 $max_dr1 < max_dr1_lb $max_dr1_lb"
+        0     elseif max_dr2 < max_dr2_lb
+        0         why_NaN = "max_dr2 $max_dr2 < max_dr2_lb $max_dr2_lb"
+      928     elseif max_bsf < max_bsf_lb
+      576         why_NaN = "max_bsf $max_bsf < max_bsf_lb $max_bsf_lb"
+      448     elseif scld_max_dr1 < scld_max_dr1_lb
+        0         why_NaN = "scld_max_dr1 $scld_max_dr1 < scld_max_dr1_lb $scld_max_dr1_lb"
+      448     elseif scld_max_dr2 < scld_max_dr2_lb
+        0         why_NaN = "scld_max_dr2 $scld_max_dr2 < scld_max_dr2_lb $scld_max_dr2_lb"
+      448     elseif scld_max_bsf < scld_max_bsf_lb
+        0         why_NaN = "scld_max_bsf $scld_max_bsf < scld_max_bsf_lb $scld_max_bsf_lb"
+        -     end
+        - 
+        0     if (why_NaN != "")
+        0         full_amp_out.cq[well_i, channel_i] = NaN
+        -     end
+        - 
+     9984     for tup in (
+        -         (:max_bsf, max_bsf),
+        -         (:scld_max_dr1, scld_max_dr1),
+        -         (:scld_max_dr2, scld_max_dr2),
+        -         (:scld_max_bsf, scld_max_bsf),
+        -         (:why_NaN, why_NaN))
+     3072         getfield(full_amp_out, tup[1])[well_i, channel_i] = tup[2]
+        -     end
+        - 
+        0     return nothing
+        - 
+        - end # report_cq!
+        - 
+        - 
+        - 
+        - # process amplification per step
+        - function process_amp_1sr(
+        - 
+        -     ## remove MySql dependency
+        -     #
+        -     # db_conn ::MySQL.MySQLHandle,
+        -     # exp_id ::Integer,
+        -     # asrp ::AmpStepRampProperties,
+        -     # calib_info ::Union{Integer,OrderedDict},
+        -     # fluo_well_nums ::AbstractVector,
+        -     # well_nums ::AbstractVector,
+        - 
+        -     # new >>    
+        -     exp_data ::Associative,
+        -     calib_data ::Associative,
+        -     asrp ::AmpStepRampProperties,
+        -     # << new
+        - 
+        -     channel_nums ::AbstractVector,
+        -     dcv ::Bool, # logical, whether to perform multi-channel deconvolution
+        -     
+        -     dye_in ::String, 
+        -     dyes_2bfild ::AbstractVector,
+        - 
+        -     min_reliable_cyc ::Real,
+        -     baseline_cyc_bounds ::AbstractVector,
+        -     cq_method ::String,
+        - 
+        -     ct_fluos ::AbstractVector,
+        -     af_key ::String,
+        -     kwdict_mbq ::Associative, # keyword arguments passed onto `mod_bl_q`
+        - 
+        -     ipopt_print2file_prefix ::String,
+        - 
+        -     qt_prob_rc ::Real, # quantile probablity for fluo values per well
+        -     kwdict_rc ::Associative, # keyword arguments passed onto `report_cq`
+        -     
+        -     ad_cycs ::Union{Integer,AbstractVector},
+        -     ctrl_well_dict ::OrderedDict,
+        -     cluster_method ::String,
+        -     norm_l ::Real,
+        -     expected_ncg_raw ::AbstractMatrix,
+        -     categ_well_vec ::AbstractVector,
+        - 
+        -     out_format ::String, # "full", "pre_json", "json"
+        -     json_digits ::Integer,
+        -     verbose ::Bool
+        - )
+        - 
+        -     ## remove MySql dependency
+        -     #
+        -     ## fr_ary3 = fluo_raw_array_3d
+        -     # fr_ary3 = get_amp_data(
+        -     #     db_conn,
+        -     #     "fluorescence_value", # "fluorescence_value" or "baseline_value"
+        -     #     exp_id, asrp,
+        -     #     fluo_well_nums, channel_nums)
+        - 
+        -     # new >>
+        -     # issue:
+        -     # assumes only 1 step/ramp because the current data format
+        -     # does not allow us to break the fluorescence data down by step_id/ramp_id
+     7712     cyc_nums = sort(unique(exp_data["cycle_num"]))
+     5248     fluo_well_nums = sort(unique(exp_data["well_num"]))
+        0     num_cycs, num_fluo_wells, num_channels = map(length, (cyc_nums, fluo_well_nums, channel_nums))
+      288     fr_ary3 = reshape(
+        -         exp_data["fluorescence_value"],
+        -         num_cycs, num_fluo_wells, num_channels)
+        -     # << new
+        - 
+        -     # perform deconvolution and adjust well-to-well variation in absolute fluorescence
+        0     mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, rbbs_ary3 = dcv_aw(
+        -         fr_ary3,
+        -         dcv,
+        -         channel_nums,
+        - 
+        -         ## remove MySql dependency
+        -         #
+        -         # db_conn,
+        -         # calib_info,
+        -         # fluo_well_nums,
+        -         # well_nums, 
+        - 
+        -         # new >>
+        -         calib_data, 
+        -         fluo_well_nums,
+        -         # << new
+        - 
+        -         dye_in,
+        -         dyes_2bfild;
+        -         aw_out_format="array")
+        - 
+       32     size_bcb = size(baseline_cyc_bounds)
+        0     if size_bcb == (0,) || (size_bcb == (2,) && size(baseline_cyc_bounds[1]) == ()) # can't use `eltype(baseline_cyc_bounds) <: Integer` because `JSON.parse("[1,2]")` results in `Any[1,2]` instead of `Int[1,2]`
+      608         baseline_cyc_bounds = fill(baseline_cyc_bounds, num_fluo_wells, num_channels)
+        0     elseif size_bcb == (num_fluo_wells, num_channels) && eltype(baseline_cyc_bounds) <: AbstractVector # final format of `baseline_cyc_bounds`
+        0         nothing
+        -     else
+        0         error("`baseline_cyc_bounds` is not in the right format.")
+        -     end # if ndims
+        - 
+      608     NaN_ary2 = fill(NaN, num_fluo_wells, num_channels)
+      608     fitted_prebl = fitted_postbl = fill(AF_EMPTY_DICT[af_key], num_fluo_wells, num_channels) # once ` ::Array{EmptyAmpFitted,2}`, can't be `setfield!` to ` ::Array{SfcFitted,2}`, and vice versa
+        -     blsub_fluos = blsub_fitted = rbbs_ary3
+      704     empty_vals_4cq = fill(OrderedDict{String,AbstractFloat}(), num_fluo_wells, num_channels)
+      192     ct_fluos_empty = fill(NaN, num_channels)
+        - 
+     3008     full_amp_out = AmpStepRampOutput(
+        -         fr_ary3,
+        -         mw_ary3,
+        -         k4dcv,
+        -         dcvd_ary3,
+        -         wva_data,
+        -         rbbs_ary3,
+        -         fluo_well_nums,
+        -         1:num_channels,
+        -         cq_method,
+        -         fitted_prebl,
+        -         fill(Vector{String}(), num_fluo_wells, num_channels), # bl_notes
+        -         blsub_fluos,
+        -         fitted_postbl,
+        -         fill(:not_fitted, num_fluo_wells, num_channels), # postbl_status
+        -         fill(NaN, 1, num_fluo_wells, num_channels), # coefs # size = 1 for 1st dimension may not be correct for the chosen model
+        -         NaN_ary2, # d0s
+        -         blsub_fitted,
+        -         zeros(0, 0, 0), # dr1_pred
+        -         zeros(0, 0, 0), # dr2_pred
+        -         NaN_ary2, # max_dr1
+        -         NaN_ary2, # max_dr2
+        -         empty_vals_4cq, # cyc_vals_4cq
+        -         empty_vals_4cq, # eff_vals_4cq
+        -         NaN_ary2, # cq_raw
+        -         NaN_ary2, # cq
+        -         NaN_ary2, # eff
+        -         NaN_ary2, # cq_fluo
+        -         NaN_ary2, # qt_fluos
+        -         Inf, # max_qt_fluo
+        -         NaN_ary2, # max_bsf
+        -         NaN_ary2, # scld_max_bsf
+        -         NaN_ary2, # scld_max_dr1
+        -         NaN_ary2, # scld_max_dr2
+        -         fill("", num_fluo_wells, num_channels), # why_NaN
+        -         ct_fluos,
+        -         OrderedDict{String,Vector{String}}(), # assignments_adj_labels_dict
+        -         OrderedDict{String,AssignGenosResult}() # agr_dict
+        -     )
+        - 
+        0     if num_cycs <= 2
+        0         print_v(println, verbose, "Number of cycles $num_cycs <= 2, baseline subtraction and Cq calculation will not be performed.")
+        -     else # num_cycs > 2
+        0         if length(ct_fluos) == 0
+        0             if cq_method == "ct"
+        0                 ct_fluos = map(1:num_channels) do channel_i
+        -                     mbq_ary1 = map(1:num_fluo_wells) do well_i
+        -                         mod_bl_q(
+        -                             rbbs_ary3[:, well_i, channel_i];
+        -                             min_reliable_cyc=min_reliable_cyc,
+        -                             baseline_cyc_bounds=baseline_cyc_bounds[well_i, channel_i],
+        -                             cq_method="cp_dr1",
+        -                             ct_fluo=NaN,
+        -                             af_key=af_key,
+        -                             kwdict_mbq...,
+        -                             verbose=verbose
+        -                         )
+        -                     end # do well_i
+        - 
+        -                     # find `idc_useful`
+        -                     postbl_stata = map(mbq -> mbq["postbl_status"], mbq_ary1)
+        -                     idc_useful = find(postbl_stata) do postbl_status
+        -                         postbl_status == :Optimal
+        -                     end # do postbl_status
+        -                     if length(idc_useful) == 0
+        -                         idc_useful = find(postbl_stata) do postbl_status
+        -                             postbl_status == :UserLimit
+        -                         end # do postbl_status
+        -                         if length(idc_useful) == 0
+        -                             idc_useful = 1:length(postbl_status)
+        -                         end # if length(idc_useful)
+        -                     end # if length(idc_useful)
+        - 
+        -                     fluos_useful = map(idc_useful) do mbq_i
+        -                         mbq_ary1[mbq_i]["cq_fluo"]
+        -                     end # do mbq_i
+        -                     median(fluos_useful)
+        -                 end # do channel_i
+        -             else
+      192                 ct_fluos = fill(NaN, num_channels)
+        -             end # if cq_method
+        -         end # if length
+        - 
+        0         full_amp_out.ct_fluos = ct_fluos
+      480         mbq_ary2 = [
+        -             begin
+      608                 ipopt_print2file = length(ipopt_print2file_prefix) == 0 ? "" : "$(join([ipopt_print2file_prefix, channel_i, well_i], '_')).txt"
+    19968                 mod_bl_q(
+        -                     rbbs_ary3[:, well_i, channel_i];
+        -                     min_reliable_cyc = min_reliable_cyc,
+        -                     baseline_cyc_bounds = baseline_cyc_bounds[well_i, channel_i],
+        -                     cq_method = cq_method,
+        -                     ct_fluo = ct_fluos[channel_i],
+        -                     af_key = af_key,
+        -                     kwdict_mbq...,
+        -                     ipopt_print2file = ipopt_print2file,
+        -                     verbose = verbose
+        -                 )
+        -             end
+        -             for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
+        -         ]
+        - 
+      448         fns_mbq = fieldnames(MbqOutput)
+      576         for fn_mbq in fns_mbq
+    24384             fv = [
+        -                 getfield(mbq_ary2[well_i, channel_i], fn_mbq)
+        -                 for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
+        -             ]
+     4608             if fn_mbq in [:blsub_fluos, :coefs, :blsub_fitted, :dr1_pred, :dr2_pred]
+   285248                 fv = reshape(
+        -                     cat(2, fv...), # 2-dim array of size (`num_cycs` or number of coefs, `num_wells * num_channels`)
+        -                     length(fv[1,1]), size(fv)...
+        -                 )
+        -             end # if fn_mbq in
+     1216             setfield!(full_amp_out, fn_mbq, convert(typeof(getfield(full_amp_out, fn_mbq)), fv)) # `setfield!` doesn't call `convert` on its own    
+        -         end # for fn_mbq
+        - 
+    54176         full_amp_out.qt_fluos = [
+        -             quantile(full_amp_out.blsub_fluos[:, well_i, channel_i], qt_prob_rc)
+        -             for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
+        -         ]
+       64         full_amp_out.max_qt_fluo = maximum(full_amp_out.qt_fluos)
+        - 
+     1088         for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
+        0             report_cq!(full_amp_out, well_i, channel_i; kwdict_rc...)
+        -         end
+        - 
+        -     end # if num_cycs > 2
+        - 
+        - 
+        -     # allelic discrimination
+        0     if dcv
+        0         full_amp_out.assignments_adj_labels_dict, full_amp_out.agr_dict = process_ad(
+        -             full_amp_out,
+        -             ad_cycs,
+        -             ctrl_well_dict,
+        -             cluster_method,
+        -             norm_l,
+        -             expected_ncg_raw,
+        -             categ_well_vec
+        -         )
+        -     end # if dcv
+        - 
+        - 
+        0     if endswith(out_format, "json")
+      640         amp_out = AmpStepRampOutput2Bjson(map(fieldnames(AmpStepRampOutput2Bjson)) do fn # numeric fields only
+     1920             field_value = getfield(full_amp_out, fn)
+        0             try
+   126656                 round.(field_value, json_digits)
+        -             catch
+        0                 field_value
+        -             end # try
+        -         end...) # do fn
+        0     elseif out_format == "full"
+        0         amp_out = full_amp_out
+        -     end
+        - 
+     1056     return join([asrp.step_or_ramp, asrp.id], "_") => amp_out
+        - 
+        - end # process_amp_1sr
+        - 
+        - 
+        - #
+        - 

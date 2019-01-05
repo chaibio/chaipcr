@@ -1,0 +1,520 @@
+        - # verify_request.jl
+        - #
+        - # Author: Tom Price
+        - # Date: Dec 2018
+        - #
+        - # This Julia script tests the JSON data structures 
+        - # that are supplied in the body of GET requests
+        - # 
+        - # *     based on documentation of REST API from juliaapi_new.txt
+        - #
+        - # *     Julia listens on http://localhost:8081 via HttpServer.jl and dispatch.jl
+        - #       and sends responses to the Rails app on http://localhost:3000
+        - #
+        - # *     the relevant controller in the Rails app is
+        - #       chaipcr/web/app/controllers/experiments_controller.rb
+        - #
+        - # *     currently calls are POST-ed to
+        - #       http://127.0.0.1:8081/experiments/#{experiment.id}/standard_curve
+        - #       http://127.0.0.1:8081/experiments/#{experiment.id}/amplification
+        - #       http://127.0.0.1:8081/experiments/#{experiment.id}/meltcurve
+        - #       http://127.0.0.1:8081/experiments/#{experiment.id}/analyze
+        - 
+        - import JSON, DataStructures.OrderedDict
+        - import FactCheck: facts, context, @fact, clear_results, exitstatus, less_than_or_equal
+        - 
+        - FactCheck.setstyle(:default)
+        - 
+        - # ================================================================================
+        - # Here are the REST APIs using HTTP GET
+        - # ================================================================================
+        - 
+        - # ********************************************************************************
+        - #
+        - # call: experiments/:experiment_id/standard_curve
+        - #
+        - # ********************************************************************************
+        - 
+        - function verify_request(
+        -     ::QpcrAnalysis.StandardCurve,
+        -     request ::AbstractArray
+        - )
+       16     facts("Standard curve requested") do
+       16         context("Verifying request body") do
+        0             @fact (isa(request,Vector)) --> true
+        -             n_targets=-99
+      192             for i in range(1,length(request))
+        0                 well=request[i]
+        0                 @fact (isa(well,OrderedDict)) --> true
+        0                 if (length(well)>0)
+        0                     @fact (length(well)) --> 1
+        0                     @fact (haskey(well,"well")) --> true
+        0                     array=well["well"]
+     1632                     for j in range(1,length(array))
+        0                         dict=array[j]
+        0                         @fact (isa(dict,OrderedDict)) --> true
+        0                         if (length(dict)>0)
+        -                             # fact (length(dict)) --> 3
+        0                             @fact (haskey(dict,"target")) --> true
+        0                             @fact (isa(dict["target"],Integer)) --> true
+        0                             @fact (haskey(dict,"cq")) --> true
+        0                             @fact (isa(dict["cq"],Number)) --> true
+        0                             @fact (haskey(dict,"quantity")) --> true
+        0                             subdict=dict["quantity"]
+        0                             @fact (isa(subdict,OrderedDict)) --> true
+        0                             @fact (length(subdict)) --> 2
+        0                             @fact (haskey(subdict,"m")) --> true
+        0                             @fact (haskey(subdict,"b")) --> true
+        0                             @fact (isa(subdict["m"],Number)) --> true
+        0                             @fact (isa(subdict["b"],Number)) --> true
+        -                         end
+        -                     end
+        -                 end
+        -             end
+        -         end
+        -     end
+        0     FactCheck.exitstatus()
+        - end
+        - 
+        - 
+        - 
+        - # ********************************************************************************
+        - #
+        - # call: experiments/:experiment_id/amplification
+        - #
+        - # ********************************************************************************
+        - 
+        - ## according to juliaapi_new.txt:
+        - #
+        - ## each set of calibration data (water, channel_1, channel_2) comes from the following SQL query: 
+        - # 
+        - # SELECT fluorescence_value, well_num, channel
+        - #     FROM fluorescence_data
+        - #     WHERE experiment_id = $calib_id AND step_id = $step_id
+        - #     ORDER BY channel, well_num
+        - # ;
+        - #
+        - # channel_2 will be NULL for single channel: 
+        - #     "calibration_info": {
+        - #         "water": {
+        - #             "fluorescence_value": [
+        - #                 [water_1__well_01, water_1__well_02, …, water_1__well_16],
+        - #                 null
+        - #             ]
+        - #         },
+        - #         "channel_1": {
+        - #             "fluorescence_value": [
+        - #                 [signal_1__well_01, signal_1__well_02, …, signal_1__well_16],
+        - #                 null
+        - #             ]
+        - #         }
+        - #     }
+        - 
+        - function calibration_test(
+        -     calib ::Associative, 
+        -     n_channels ::Integer =length(CHANNELS),
+        -     conditions ::AbstractArray =["water","channel_1","channel_2"][1:(n_channels+1)]
+        - )
+     1008     n_conditions=length(conditions)
+        0     @fact (isa(calib,OrderedDict)) --> true
+        -     # @fact (length(calib)) --> n_conditions
+        0     @fact (isa(calib[conditions[1]],OrderedDict))--> true
+        0     @fact (haskey(calib[conditions[1]],"fluorescence_value")) --> true
+        0     @fact (isa(calib[conditions[1]]["fluorescence_value"],Vector)) --> true
+        0     n_wells=length(calib[conditions[1]]["fluorescence_value"][1])
+     2688     for condition in conditions
+        0         @fact (haskey(calib,condition)) --> true
+        0         @fact (isa(calib[condition],OrderedDict)) --> true
+        0         @fact (length(calib[condition])) --> 1
+        0         @fact (haskey(calib[condition],"fluorescence_value")) --> true
+        0         @fact (isa(calib[condition]["fluorescence_value"],Vector)) --> true
+        0         @fact (length(calib[condition]["fluorescence_value"])) --> less_than_or_equal(2)
+     1920         for channel in range(1,n_channels)
+        0             @fact (isa(calib[condition]["fluorescence_value"][channel],Vector)) --> true
+        0             @fact (length(calib[condition]["fluorescence_value"][channel])) --> n_wells
+    42240             for i in range(1,n_wells)
+        0                 @fact (isa(calib[condition]["fluorescence_value"][channel][i],Number)) --> true
+        -             end
+        -         end
+        -     end
+        0     FactCheck.exitstatus()
+        - end
+        - 
+        - ## Raw Data comes from the following SQL query: 
+        - # SELECT fluorescence_value, well_num, cycle_num, channel
+        - #     FROM fluorescence_data
+        - #     WHERE experiment_id = $exp_id AND step_id = $step_id
+        - #   ORDER BY channel, well_num, cycle_num
+        - # ;
+        - 
+        - function raw_test(raw)
+       96     @fact (isa(raw,OrderedDict)) --> true
+      672     variables=["fluorescence_value","channel","well_num"]
+        0     if (haskey(raw,"temperature"))
+        0         push!(variables,"temperature")
+        -     else
+        0         push!(variables,"cycle_num")
+        -     end
+       96     n_raw=length(raw["fluorescence_value"])
+     1536     for v in variables
+        0         @fact (haskey(raw,v)) --> true
+        0         @fact (isa(raw[v],Vector)) --> true
+        0         @fact abs(length(raw[v]) - n_raw) --> less_than_or_equal(1)
+  7112832         for i in range(1,length(raw[v]))
+        0             if (v=="fluorescence_value"||v=="temperature")
+        0                 @fact (isa(raw[v][i],Number)) --> true
+        -             else
+        0                 @fact (isa(raw["well_num"][i],Integer)) --> true
+        -             end
+        -         end
+        -     end
+        0     FactCheck.exitstatus()
+        - end
+        - 
+        - function verify_request(
+        -     ::QpcrAnalysis.Amplification,
+        -     request ::Associative
+        - )
+       32     facts("Amplification requested") do
+       32         context("Verifying request body") do
+      800             @fact (isa(request,OrderedDict)) --> true
+        0             @fact (haskey(request,"experiment_id")) --> true
+        0             @fact (isa(request["experiment_id"],Integer)) --> true
+        0             if (haskey(request,"step_id"))
+        0                 id="step_id"
+        -             else
+        0                 id="ramp_id"
+        -             end
+        0             @fact (haskey(request,id)) --> true
+        0             @fact (isa(request[id],Integer)) --> true
+        0             if (haskey(request,"min_reliable_cyc"))
+        0                 @fact (isa(request["min_reliable_cyc"],Integer)) --> true
+        -             end
+        0             if (haskey(request,"baseline_cyc_bounds"))
+        0                 @fact (isa(request["baseline_cyc_bounds"],Vector)) --> true
+        0                 if (length(request["baseline_cyc_bounds"])>0)
+        0                     @fact (length(request["baseline_cyc_bounds"])) --> 2
+        0                     @fact (isa(request["baseline_cyc_bounds"][1],Integer)) --> true
+        0                     @fact (isa(request["baseline_cyc_bounds"][2],Integer)) --> true
+        -                 end
+        -             end
+        0             if (haskey(request,"baseline_method"))
+        0                 @fact (isa(request["baseline_method"],String)) --> true
+        0                 @fact ( 
+        -                     request["baseline_method"] == "sigmoid" ||
+        -                     request["baseline_method"] == "linear"  ||
+        -                     request["baseline_method"] == "median" 
+        -                 ) --> true
+        -             end
+        0             if (haskey(request,"cq_method"))
+        0                 @fact (isa(request["cq_method"],String)) --> true
+        0                 @fact (request["cq_method"] in ["cp_dr1","cp_dr2","Cy0","ct"]) --> true
+        -             end
+        0             if (haskey(request,"min_fluomax"))
+        0                 @fact (isa(request["min_fluomax"],Number)) --> true
+        -             end
+        0             if (haskey(request,"min_D1max"))
+        0                 @fact (isa(request["min_D1max"],Number)) --> true
+        -             end
+        0             if (haskey(request,"min_D2max"))
+        0                 @fact (isa(request["min_D2max"],Number)) --> true
+        -             end
+        0             @fact (haskey(request,"calibration_info")) --> true
+        0             calib=request["calibration_info"]
+        0             @fact (isa(calib,OrderedDict)) --> true
+        0             @fact (haskey(calib,"water")) --> true
+        0             @fact (isa(calib["water"],OrderedDict)) --> true
+        0             @fact (haskey(calib["water"],"fluorescence_value")) --> true
+        0             @fact (isa(calib["water"]["fluorescence_value"],Vector)) --> true
+        0             if length(calib["water"]["fluorescence_value"])<2 ||
+        -                 calib["water"]["fluorescence_value"][2]==nothing
+        0                 n_channels=1
+        -             else
+        0                 n_channels=2
+        -             end
+        0             @fact (haskey(request,"raw_data")) --> true
+        0             raw=request["raw_data"]
+        0             @fact (isa(raw,OrderedDict)) --> true
+        0             calibration_test(calib,n_channels)
+        0             raw_test(raw)
+        -         end
+        -     end
+        0     FactCheck.exitstatus()
+        - end
+        - 
+        - 
+        - 
+        - # ********************************************************************************
+        - #
+        - # call: experiments/:experiment_id/meltcurve
+        - #
+        - #
+        - # ********************************************************************************
+        - 
+        - # Notes: 
+        - # 
+        - # channel_nums = [1] for 1 channel, [1,2] for 2 channels, etc.
+        - # top_N = number of Tm peaks to report
+        - 
+        - # Calibration (water, channel_1, channel_2) data comes from the following SQL query: 
+        - # SELECT fluorescence_value, well_num, channel
+        - #     FROM fluorescence_data
+        - #     WHERE experiment_id = $calib_id AND step_id = $step_id
+        - #     ORDER BY channel, well_num
+        - # ;
+        - 
+        - # Raw Data comes from the following SQL query: 
+        - # SELECT fluorescence_value, temperature, well_num, channel
+        - #     FROM melt_curve_data
+        - #     WHERE
+        - #         experiment_id = $exp_id AND
+        - #         stage_id = $stage_id
+        - #     ORDER BY channel, well_num
+        - # ;
+        - 
+        - function verify_request(
+        -     ::QpcrAnalysis.MeltCurve,
+        -     request ::Associative
+        - )
+       32     facts("Melting curve requested") do
+       32         context("Verifying request body") do
+      192             @fact (isa(request,OrderedDict)) --> true
+        0             @fact (haskey(request,"experiment_id")) --> true
+        0             @fact (isa(request["experiment_id"],Integer)) --> true
+        0             @fact (haskey(request,"stage_id")) --> true
+        0             @fact (isa(request["stage_id"],Integer)) --> true
+        0             @fact (haskey(request,"calibration_info")) --> true
+        0             @fact (haskey(request,"channel_nums")) --> true
+        0             @fact (isa(request["channel_nums"],Vector)) --> true
+        0             calib=request["calibration_info"]
+        0             @fact (isa(calib,OrderedDict)) --> true
+        0             @fact (haskey(calib,"water")) --> true
+        0             @fact (isa(calib["water"],OrderedDict)) --> true
+        0             @fact (haskey(calib["water"],"fluorescence_value")) --> true
+        0             @fact (isa(calib["water"]["fluorescence_value"],Vector)) --> true
+        0             if length(calib["water"]["fluorescence_value"])<2 ||
+        -                 calib["water"]["fluorescence_value"][2]==nothing
+        0                 @fact (request["channel_nums"]) --> [1]
+        0                 n_channels=1
+        -             else
+        0                 @fact (request["channel_nums"]) --> [1,2]
+        0                 n_channels=2
+        -             end
+        0             if (haskey(request,"qt_prob"))
+        0                 @fact (isa(request["qt_prob"],Number)) --> true
+        -             end
+        0             if (haskey(request,"max_normd_qtv"))
+        0                 @fact (isa(request["max_normd_qtv"],Number)) --> true
+        -             end
+        0             if (haskey(request,"top_N"))
+        0                 @fact (isa(request["top_N"],Integer)) --> true
+        -             end
+        0             @fact (haskey(request,"raw_data")) --> true
+        0             raw=request["raw_data"]
+        0             calibration_test(calib,n_channels)
+        0             raw_test(raw)
+        -         end
+        -     end
+        0     FactCheck.exitstatus()
+        - end
+        - 
+        - 
+        - 
+        - # ********************************************************************************
+        - #
+        - # call: experiments/:experiment_id/thermal_performance_diagnostic
+        - #
+        - # ********************************************************************************
+        - 
+        - # SQL query: 
+        - # SELECT *
+        - #     FROM temperature_logs
+        - #     WHERE experiment_id = $exp_id
+        - #     ORDER BY id
+        - # ;
+        - 
+        - function verify_request(
+        -     ::QpcrAnalysis.ThermalPerformanceDiagnostic,
+        -     request ::Associative
+        - )
+       32     facts("Thermal performance diagnostic requested") do
+       32         context("Verifying request body") do
+      224             variables=["lid_temp","heat_block_zone_1_temp","heat_block_zone_2_temp","elapsed_time"] # ,"cycle_num"]
+        0             @fact (isa(request,OrderedDict)) --> true
+        0             @fact (length(request)) --> length(variables)
+        0             n_cycles=length(request["elapsed_time"])
+      384             for v in variables
+        0                 @fact (haskey(request,v)) --> true
+        0                 @fact (length(request[v])) --> n_cycles
+    72896                 for i in range(1,n_cycles)
+        0                     if (v=="elapsed_time")
+        0                         @fact (isa(request[v][i],Integer)) --> true
+        -                     else
+        0                         @fact (isa(request[v][i],Number)) --> true
+        -                     end
+        -                 end
+        -             end
+        -         end
+        -     end
+        0     FactCheck.exitstatus()
+        - end
+        - 
+        - 
+        - 
+        - # ********************************************************************************
+        - #
+        - # call: experiments/:experiment_id/thermal_consistency
+        - #
+        - # ********************************************************************************
+        - 
+        - # SQL query: 
+        - # SELECT fluorescence_value, temperature, well_num, channel
+        - #     FROM melt_curve_data
+        - #     WHERE
+        - #         experiment_id = $exp_id AND
+        - #         stage_id = $stage_id
+        - #   ORDER BY channel, well_num
+        - # ;
+        - 
+        - function verify_request(
+        -     ::QpcrAnalysis.ThermalConsistency,
+        -     request ::Associative
+        - )
+       32     facts("Thermal consistency requested") do
+       32         context("Verifying request body") do
+        0             @fact (isa(request,OrderedDict)) --> true
+        -             # @fact (length(request)) --> 2
+        0             @fact (haskey(request,"raw_data")) --> true
+        0             @fact (isa(request["raw_data"],OrderedDict)) --> true
+        0             @fact (haskey(request["raw_data"],"channel")) --> true
+        0             @fact (haskey(request,"calibration_info")) --> true
+        0             calib=request["calibration_info"]
+        0             @fact (isa(calib,OrderedDict)) --> true
+        0             @fact (haskey(calib,"water")) --> true
+        0             @fact (isa(calib["water"],OrderedDict)) --> true
+        0             @fact (haskey(calib["water"],"fluorescence_value")) --> true
+        0             @fact (isa(calib["water"]["fluorescence_value"],Vector)) --> true
+        0             if length(calib["water"]["fluorescence_value"])<2 ||
+        -                 calib["water"]["fluorescence_value"][2]==nothing
+        0                 n_channels=1
+        -             else
+        0                 n_channels=2
+        -             end
+        0             calibration_test(calib,n_channels)
+        0             raw_test(request["raw_data"])
+        -         end
+        -     end
+        0     FactCheck.exitstatus()
+        - end
+        - 
+        - 
+        - 
+        - # ********************************************************************************
+        - #
+        - # call: experiments/:experiment_id/optical_cal
+        - #
+        - # ********************************************************************************
+        - 
+        - function verify_request(
+        -     ::QpcrAnalysis.OpticalCal,
+        -     request ::Associative
+        - )
+       32     facts("Optical calibration requested") do
+       32         context("Verifying request body") do
+        0             @fact (isa(request,OrderedDict)) --> true
+        0             @fact (haskey(request,"calibration_info")) --> true
+        0             calib=request["calibration_info"]
+        0             @fact (isa(calib,OrderedDict)) --> true
+        0             @fact (haskey(calib,"water")) --> true
+        0             @fact (isa(calib["water"],OrderedDict)) --> true
+        0             @fact (haskey(calib["water"],"fluorescence_value")) --> true
+        0             @fact (isa(calib["water"]["fluorescence_value"],Vector)) --> true
+        0             if length(calib["water"]["fluorescence_value"])<2 ||
+        -                 calib["water"]["fluorescence_value"][2]==nothing
+        0                 n_channels=1
+        -             else
+        0                 n_channels=2
+        -             end
+        0             calibration_test(calib,n_channels)
+        -         end
+        -     end
+        0     FactCheck.exitstatus()
+        - end
+        - 
+        - 
+        - 
+        - # ********************************************************************************
+        - #
+        - # call: experiments/:experiment_id/optical_test_single_channel
+        - #
+        - # ********************************************************************************
+        - 
+        - ## SQL query: 
+        - # SELECT fluorescence_value, well_num, cycle_num
+        - #     FROM fluorescence_data
+        - #     WHERE experiment_id = $exp_id AND step_id = $step_id
+        - #     ORDER BY well_num, cycle_num
+        - # ;
+        - 
+        - function verify_request(
+        -     ::QpcrAnalysis.OpticalTestSingleChannel,
+        -     request ::Associative
+        - )
+       16     facts("Single channel optical test requested") do
+       16         context("Verifying request body") do
+       96             conditions=["baseline","excitation"]
+        0             @fact (isa(request,OrderedDict)) --> true
+        -             # @fact (length(request)) --> length(conditions)
+        0             @fact (isa(request["baseline"],OrderedDict))--> true
+        0             @fact (haskey(request["baseline"],"fluorescence_value")) --> true
+        0             @fact (isa(request["baseline"]["fluorescence_value"],Vector)) --> true
+        0             n_wells=length(request["baseline"]["fluorescence_value"])
+      256             for condition in conditions
+        0                 @fact (haskey(request,condition)) --> true
+        0                 @fact (isa(request[condition],OrderedDict)) --> true
+        0                 @fact (length(request[condition])) --> 1
+        0                 @fact (haskey(request[condition],"fluorescence_value")) --> true
+        0                 @fact (isa(request[condition]["fluorescence_value"],Vector)) --> true
+        0                 @fact (isa(request[condition]["fluorescence_value"],Vector)) --> true
+        0                 @fact (length(request[condition]["fluorescence_value"])) --> n_wells
+     2112                 for i in range(1,n_wells)
+        0                     @fact (isa(request[condition]["fluorescence_value"][i],Number)) --> true
+        -                 end
+        -             end
+        -         end
+        -     end
+        0     FactCheck.exitstatus()
+        - end
+        - 
+        - 
+        - 
+        - # ********************************************************************************
+        - #
+        - # call: experiments/:experiment_id/optical_test_dual_channel
+        - #
+        - # ********************************************************************************
+        - 
+        - ## SQL query: 
+        - # SELECT fluorescence_value, well_num, cycle_num
+        - #     FROM fluorescence_data
+        - #     WHERE experiment_id = $exp_id AND step_id = $step_id
+        - #     ORDER BY well_num, cycle_num
+        - # ;
+        - 
+        - function verify_request(
+        -     ::QpcrAnalysis.OpticalTestDualChannel,
+        -     request ::Associative
+        - )
+       16     facts("Dual channel optical test requested") do
+       16         context("Verifying request body") do
+        0             @fact (isa(request,OrderedDict)) --> true
+        0             if (haskey(request,"channel_1"))
+        0                 calibration_test(request,2,["baseline","water","channel_1","channel_2"])        
+        -             else
+        0                 calibration_test(request,2,["baseline","water","FAM","HEX"])
+        -             end
+        -         end
+        -     end
+        0     FactCheck.exitstatus()
+        - end
+        - 

@@ -7,9 +7,6 @@
 ## See https://docs.julialang.org/en/v0.6/manual/profile/#Memory-allocation-analysis-1
 ## Usage: julia --track-allocation=user memory_allocation.jl
 
-import DataStructures: OrderedDict
-import BSON: load
-
 
 # performance is better with dispatch calls
 # in a function rather than global scope
@@ -32,19 +29,28 @@ function test_memory_allocation()
 end
 
 
-# main code >>
+# start of main code >> 
+
 autorun = joinpath(Base.JULIA_HOME,Base.SYSCONFDIR,"julia/juliarc.jl")
-if all(map(
-    x->match(r"6004dbc584427ce1297c8e89e547057e",x)==nothing, # look for magic number
+# look for magic number
+if !isfile(autorun) || all(map(
+    x -> match(r"6004dbc584427ce1297c8e89e547057e",x)==nothing,
     readlines(autorun)))
-    # run these three commands which have not been included in the startup script:
+    # if not found, run these three commands
+    # which have not been included in the startup script:
     cd("/home/vagrant/chaipcr/bioinformatics/QpcrAnalysis")
     push!(LOAD_PATH,pwd())
     using QpcrAnalysis
 end
-include("../test/test_functions.jl") # need test_dispatch()
+
+import FactCheck: clear_results
+import DataFrames: DataFrame
+import DataStructures: OrderedDict
+import BSON: bson
+import JSON: json, parse, parsefile
 test_memory_allocation()
-# << main code
+
+# << end of main code
 
 
 
