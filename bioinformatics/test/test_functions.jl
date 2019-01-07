@@ -28,10 +28,11 @@ if (const RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE = false)
         BSON.bson("../test/data/dispatch_tests.bson",test_functions)
         println("All test functions checked and saved")
         # time functions second time around (after compilation)
+        # filter results using `grep -e 'Making dispatch call:' -e 'allocations:'`
         timing = QpcrAnalysis.time_dispatch(test_functions)
     else
         println("Test functions failed check:")
-        println(results)
+        println(check)
     end
 end
 
@@ -83,7 +84,7 @@ function generate_tests(;
                             action,
                             body;
                             verbose=verbose,
-                            verify=true)
+                            verify=false)
                         response_parsed = JSON.parse(response_body,dicttype=OrderedDict)
                     end # if debug
                     QpcrAnalysis.print_v(println,verbose,"Passed $testname\n")
@@ -116,7 +117,7 @@ end
 function time_dispatch(test_functions ::Associative)
     OrderedDict(map(keys(test_functions)) do testname
         println("Making dispatch call: $testname")
-        @time result = test_functions[testname]()
+        @timev result = test_functions[testname]()
         testname => result[1] && result[2]["valid"]
         end)
 end
