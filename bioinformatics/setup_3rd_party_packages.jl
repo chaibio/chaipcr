@@ -30,9 +30,9 @@ end
 
 println("installing library: Compat");Pkg.add("Compat", v"0.61.0", v"0.61.1-")
 println("installing library: GZip"); Pkg.add("GZip", v"0.3.0", v"0.3.1-")
-#println("installing library: Polynomials");Pkg.add("Polynomials", v"0.2.2", v"0.2.3-")
-#println("installing library: IterTools");Pkg.add("IterTools", v"0.2.1", v"0.2.2-")
-#println("installing library: Combinatorics");Pkg.add("Combinatorics", v"0.6.0", v"0.6.1-")
+println("installing library: Polynomials");Pkg.add("Polynomials", v"0.2.2", v"0.2.3-")
+println("installing library: IterTools");Pkg.add("IterTools", v"0.2.1", v"0.2.2-")
+println("installing library: Combinatorics");Pkg.add("Combinatorics", v"0.6.0", v"0.6.1-")
 println("installing library: SHA");Pkg.add("SHA", v"0.5.7", v"0.5.8-")
 println("installing library: URIParser"); Pkg.add("URIParser", v"0.3.1", v"0.3.2-")
 println("installing library: BinDeps"); Pkg.add("BinDeps", v"0.8.7", v"0.8.8-")
@@ -97,7 +97,7 @@ Pkg.build("DataArrays", "DataStructures", "SpecialFunctions", "MathProgBase", "H
 # Pkg.build("MySQL") # remove MySQL dependency
 println("Building: Done")
 
-using DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering
+using Combinatorics, DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering
 println("Used DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering")
 using JSON, JLD, JuMP, HttpServer, DataArrays
 println("Used Nullables, JSON, JLD, JuMP, HttpServer, DataArrays")
