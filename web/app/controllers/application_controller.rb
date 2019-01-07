@@ -125,6 +125,6 @@ class ApplicationController < ActionController::Base
     headers["Access-Control-Allow-Methods"] = "GET,PUT,POST,OPTIONS"
     headers["Access-Control-Allow-Headers"] = "*"
     headers["Access-Control-Max-Age"] = "1728000"
+    headers["Access-Control-Allow-Credentials"] = "true"
   end
-  
 end
