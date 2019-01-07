@@ -21,6 +21,7 @@ class AmplificationOptionsController < ApplicationController
 	include Swagger::Blocks
 
   before_filter :ensure_authenticated_user
+  before_filter :allow_cors
   before_filter :get_experiment
   before_filter :amplification_option_editable_check, :except => [:show]
 

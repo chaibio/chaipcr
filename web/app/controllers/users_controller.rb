@@ -18,7 +18,7 @@
 #
 class UsersController < ApplicationController
   include Swagger::Blocks
-  before_filter :ensure_authenticated_user, :except => :create
+  before_filter :ensure_authenticated_user, :allow_cors, :except => :create
 
   respond_to :json
 
