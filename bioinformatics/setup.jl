@@ -182,7 +182,7 @@ println("All packages used")
 else
     # autorun precompilation on startup
     code ="""
-        ## open QpcrAnalysis odule on startup
+        ## open QpcrAnalysis module on startup
         ## magic number 6004dbc584427ce1297c8e89e547057e
         cd("/home/vagrant/chaipcr/bioinformatics/QpcrAnalysis")
         push!(LOAD_PATH,pwd())
@@ -197,6 +197,9 @@ else
             write(io,code)
             close(io)
     end
+    # compile _supsmu.so from source
+    # (may not be necessary in every case)
+    run(`gfortran -Wall -Wextra -o _supsmu.so -c _supsmu.f`)
 end
 
 Pkg.status()

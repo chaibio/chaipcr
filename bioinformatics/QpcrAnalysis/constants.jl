@@ -56,6 +56,9 @@ const ARRAY_EMPTY = Array{Any}()
 const K4DCV_EMPTY = K4Deconv(ARRAY_EMPTY, ARRAY_EMPTY, "")
 const K4DCV = JLD.load("$LOAD_FROM_DIR/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv"] # sometimes crash REPL
 
+# used in supsmu.jl
+const libsupsmu = "$LOAD_FROM_DIR/_supsmu.so"
+
 # used in meltcurve.jl
 const EMPTY_mc = zeros(1,3)[1:0,:]
 const EMPTY_Ta = zeros(1,2)[1:0,:]
