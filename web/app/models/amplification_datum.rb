@@ -147,7 +147,7 @@ class AmplificationDatum < ActiveRecord::Base
     end
   end
 
-  scope :filter_by_targets, lambda {|well_layout_id| unscope(:select).select("amplification_data.*, targets_wells.target_id as target_id").joins("inner join targets_wells on targets_wells.well_num = amplification_data.well_num and targets_wells.well_layout_id = #{well_layout_id} inner join targets on targets.id=targets_wells.target_id and targets.channel = amplification_data.channel")}
+  scope :filter_by_targets, lambda {|well_layout_id| unscope(:select).select("amplification_data.*, targets_wells.target_id as target_id").joins("inner join targets_wells on targets_wells.well_num = amplification_data.well_num and targets_wells.well_layout_id = #{well_layout_id} inner join targets on targets.id=targets_wells.target_id and targets.channel = amplification_data.channel").where("targets_wells.omit=false")}
 
   attr_accessor :fluorescence_value
 
