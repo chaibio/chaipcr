@@ -55,7 +55,6 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
         return evt.ctrlKey or is_cmd_key_held
 
       for b in [0...16] by 1
-
         if $scope.colorBy is 'well'
           well_color = WELL_COLORS[b]
         else if $scope.colorBy is 'target'
@@ -123,7 +122,20 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
           else
             well_color = '#FFFFFF'
 
+          selected = true
+          if $scope.targets and (($scope.isDual and (!$scope.targets[i*2] or !$scope.targets[i*2].id) and (!$scope.targets[i*2+1] or !$scope.targets[i*2+1].id)) or (!$scope.isDual and (!$scope.targets[i] or !$scope.targets[i].id)))
+            selected = false
+
+          $scope.wells["well_#{i}"].selected = selected
           $scope.wells["well_#{i}"].color = well_color
+        ngModel.$setViewValue angular.copy($scope.wells)
+
+      $scope.$watch 'targets', (target) ->
+        for i in [0..15] by 1
+          selected = true
+          if $scope.targets and (($scope.isDual and (!$scope.targets[i*2] or !$scope.targets[i*2].id) and (!$scope.targets[i*2+1] or !$scope.targets[i*2+1].id)) or (!$scope.isDual and (!$scope.targets[i] or !$scope.targets[i].id)))
+            selected = false
+          $scope.wells["well_#{i}"].selected = selected
         ngModel.$setViewValue angular.copy($scope.wells)
 
       $scope.getStyleForWellBar = (row, col, config, i) ->

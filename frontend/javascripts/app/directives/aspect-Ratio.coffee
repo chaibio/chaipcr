@@ -72,6 +72,15 @@ App.directive 'aspectRatio', [
         elem.parent().children().get(1).style.height = height + "px"
         angular.element(elem.parent().children().get(1)).children().get(1).style.height = height - 201 + "px"
 
+        element = elem.parent().children().get(1)
+        offsetWidth = element.getElementsByClassName('target-box')[0].offsetWidth if element.getElementsByClassName('target-box')[0]
+        offsetHeight = element.getElementsByClassName('target-box')[0].offsetHeight if element.getElementsByClassName('target-box')[0]
+        scrollHeight = element.getElementsByClassName('target-box')[0].scrollHeight if element.getElementsByClassName('target-box')[0]
+        if offsetHeight != scrollHeight and offsetWidth == 150
+          element.getElementsByClassName('target-box')[0].style.padding = "5px 20px 5px 10px"
+        else
+          element.getElementsByClassName('target-box')[0].style.padding = "5px 10px"
+
       resizeTimeout = null
       
       $scope.$watch (->

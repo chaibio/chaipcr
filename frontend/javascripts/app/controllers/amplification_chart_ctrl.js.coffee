@@ -569,7 +569,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       $scope.$watch 'baseline_subtraction', (val) ->
         updateSeries()
-
+        
       $scope.$watch 'channel_1', (val) ->
         updateSeries()
 
