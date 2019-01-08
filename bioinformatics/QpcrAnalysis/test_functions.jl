@@ -23,7 +23,7 @@ if (const RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE = false)
     t2 = @elapsed test_functions["amplification dual channel"]()
 
     # save test functions as JLD object for convenient loading
-    jldopen("../test/data/dispatch_tests.jld", "w") do file
+    jldopen("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/dispatch_tests.jld", "w") do file
         addrequire(file, "types_for_dispatch.jl")
         addrequire(file, "types_for_calibration.jl")
         addrequire(file, "types_for_allelic_discrimination.jl")
@@ -57,7 +57,7 @@ function generate_tests(;
             if (datafile != "")
                 action = TEST_DATA[i,:action]
                 action_t = QpcrAnalysis.Action_DICT[action]()
-                request = JSON.parsefile("../test/data/$datafile.json",dicttype=OrderedDict)
+                request = JSON.parsefile("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/$datafile.json",dicttype=OrderedDict)
                 body = String(JSON.json(request))
 
                 function test_function()
@@ -70,13 +70,16 @@ function generate_tests(;
                         QpcrAnalysis.verify_response(action_t,response_body)
                         ok = true
                     else # continue tests after errors reported
+			tic()
                         (ok, response_body) = QpcrAnalysis.dispatch(
                             action,
                             body;
                             verbose=verbose,
                             verify=true)
                     end # if debug
-                    QpcrAnalysis.print_v(println,verbose,"Passed $testname\n")
+                    QpcrAnalysis.print_v(println,verbose,"Passed $testname")
+		    toc()
+                    println("=================\n")
                     return (ok, response_body)
                 end
 
