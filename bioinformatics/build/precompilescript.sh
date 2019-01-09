@@ -1,4 +1,10 @@
 echo precompile julia packages if needed
+julia_pkgdir=/root
+if [ -d $1 ] && ! [ -z $1 ]
+then
+    julia_pkgdir=$1
+    echo setting julia dir to $1
+fi
 
 if [ -e /root/chaipcr/bioinformatics/juliaserver.jl ]
 then
@@ -26,7 +32,7 @@ then
 
       JULIA_ENV=production julia -e 'push!(LOAD_PATH, "/root/chaipcr/bioinformatics/QpcrAnalysis/");reload("QpcrAnalysis");using QpcrAnalysis;' --compile=all
 
-      echo tested using QpcrAnalysis
+      echo .julia/lib/v0.6/QpcrAnalysis.ji tested using QpcrAnalysis
       if [ -e ${julia_pkgdir}/.julia/lib/v0.6/QpcrAnalysis.ji ]
       then
             echo QpcrAnalysis package is precompiled.
