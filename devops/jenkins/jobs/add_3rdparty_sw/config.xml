@@ -351,7 +351,7 @@ __EOF__
 
 /sbin/partprobe /dev/mmcblk0
 /sbin/mkfs.ext4 /dev/mmcblk0p1 -F
-/sbin/mkfs.ext4 /dev/mmcblk0p2 -F
+/sbin/mkfs.ext4 /dev/mmcblk0p2 -F -N 300000
 mkdir -p /sdcard/factory
 if mount /dev/mmcblk0p1 /sdcard/factory/
 then
@@ -672,23 +672,22 @@ cd ..
 rm -r downloadjulia
 sync
 
-#if $is_dev
-#then
-  #    echo Building a debug image
-   #   echo &quot;export JULIA_PKGDIR=/sdcard/factory/.julia&quot;&gt;&gt;~/.profile
-    #  export JULIA_PKGDIR=/sdcard/factory/.julia
-#else
-  #    echo Formatting disk!  
-    #  echo &quot;export JULIA_PKGDIR=/root/.julia&quot;&gt;&gt;~/.profile
-#      export JULIA_PKGDIR=/root/.julia
-#fi
-
-rm -r /root/.julia
-mkdir -p /root/.julia
-chmod 0777 /root/.julia
-mount /dev/mmcblk0p2 /root/.julia
-echo &quot;export JULIA_PKGDIR=/root/.julia&quot;&gt;&gt;~/.profile
-export JULIA_PKGDIR=/root/.julia
+if $is_dev
+then
+      echo Building a debug image
+      echo &quot;export JULIA_PKGDIR=/sdcard/factory/.julia&quot;&gt;&gt;~/.profile
+      export JULIA_PKGDIR=/sdcard/factory/.julia
+else
+      echo Formatting disk!  
+      echo &quot;export JULIA_PKGDIR=/root/.julia&quot;&gt;&gt;~/.profile
+      export JULIA_PKGDIR=/root/.julia
+      rm -r /root/.julia
+      mkdir -p /root/.julia
+      chmod 0777 /root/.julia
+      mount /dev/mmcblk0p2 /root/.julia
+      echo &quot;export JULIA_PKGDIR=/root/.julia&quot;&gt;&gt;~/.profile
+      export JULIA_PKGDIR=/root/.julia
+fi
 
 source ~/.profile
 sync
@@ -702,8 +701,6 @@ fi
 #============== test
 echo test finished. cleaning..
 sync
-
-
       apt-get  -y -q install  libblas3gf libblas3gf
       apt-get install -y -q liblapack-dev
       apt install -y -q liblapack-dev libblas-dev
@@ -719,14 +716,14 @@ sync
 #  PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get -q -y install libgtk-3-0
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get -q -y install libpango1.0-0 
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get -q -y install libglib2.0-0
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get -q -y install libcairo2
+#PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get -q -y install libcairo2
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get -q -y install gettext
 
 apt-get -q -y --fix-broken install
 
 DEBIAN_FRONTEND=noninteractive apt-get -q -y install gettext
 # DEBIAN_FRONTEND=noninteractive apt-get -q -y install libgtk-3-0
-apt-get -y -q install libpango1.0-0 libglib2.0-0 libcairo2
+#apt-get -y -q install libpango1.0-0 libglib2.0-0 libcairo2
 
 echo $(date) Performing precompilling julia packages
 if [ -e /tmp/mysql.sock ]
@@ -761,14 +758,13 @@ sleep 60
 echo &quot;Setting up Julia: Initializing rep&quot;
 cd /tmp
 wget https://github.com/chaibio/chaipcr/raw/master/bioinformatics/setup_3rd_party_packages.jl
-#if $is_dev
-#then
-#      echo Building a debug image
-#      rm -r /sdcard/factory/.julia
-#else
-#      rm -r ~/.julia
-#fi
-#export JULIA_ENV=production
+if $is_dev
+then
+      echo Building a debug image
+      rm -r /sdcard/factory/.julia
+else
+      rm -r ~/.julia
+fi
 
 julia -e &apos;include(&quot;/tmp/setup_3rd_party_packages.jl&quot;)&apos;
 
@@ -812,17 +808,6 @@ else
 fi
 
 rm chaibio_packages.jl
-
-#cd /tmp
-#wget https://github.com/chaibio/chaipcr/raw/master/bioinformatics/setup_3rd_party_packages.jl
-#if $is_dev
-#then
-#      echo Building a debug image
-#      sed -i &apos;s/is_nullable = mysql_is/is_nullable = false # mysql_is/&apos; /sdcard/factory/.julia/v0.6/MySQL/src/types.jl
-#else
-#      sed -i &apos;s/is_nullable = mysql_is/is_nullable = false # mysql_is/&apos; /root/.julia/v0.6/MySQL/src/types.jl
-#fi
-
 echo test finished. cleaning..
 sync
 cd
@@ -832,9 +817,6 @@ sync
 sync
 fsck /dev/mmcblk1p1 -y -f
 fsck /dev/mmcblk0p1 -y -f
-
-#find . -name .git -execdir rm -r {} \;
-#find . -name *.o  -exec rm {} \;
 
 if $is_dev
 then
@@ -848,20 +830,19 @@ mkdir /var/log/ -p
 # remove part of .git folder to save more space. Keeping the .git/objects folder under the packages because Pkg.status() verify the package number from there. An extra chance to save space is available here by cherry pick the exact file needed by Pkg.status().
 
 cd
+#mount /dev/mmcblk1p2 /data || true
+tar czf /data/dot_julia_complete.tgz .julia 
 
-mount /dev/mmcblk1p2 /data || true
-tar czfv /data/dot_julia_complete.tgz .julia 
+#find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;/logs/
+#find /root/.julia/.cache/ -name objects | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
 
-find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;/logs/
-find /root/.julia/.cache/ -name objects | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
-
-tar czfv dot_julia.tgz .julia 
+#tar czf dot_julia.tgz .julia 
 
 umount /root/.julia
 rm -r /root/.julia
 ls -ahl
 
-apt update
+#apt update
 
 exit 0
 </command>
