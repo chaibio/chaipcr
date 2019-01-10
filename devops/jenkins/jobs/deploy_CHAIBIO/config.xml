@@ -291,8 +291,6 @@ ENDSSH
         
 		rm -rf ./web/log
 
-		sed -i &apos;s/&quot;version&quot;: &quot;1.0.0&quot;,/&quot;version&quot;: &quot;1.1.0.&apos;${BUILD_NUMBER}&apos;&quot;,/g&apos; ./device/configuration.json
-
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./web &quot;$build_machine:/root/chaipcr/&quot; || (echo error copying files to device &amp;&amp; exit 1)
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./browser &quot;$build_machine:/root/chaipcr/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./bioinformatics &quot;$build_machine:/root/chaipcr/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
@@ -340,11 +338,15 @@ then
       echo Building a debug image
 else
       echo Formatting disk!  
+
 LC_ALL=C /sbin/sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
+,10485760,0x83,*
 ,,0x83,*
 __EOF__
+
 /sbin/partprobe /dev/mmcblk0
 /sbin/mkfs.ext4 /dev/mmcblk0p1 -F
+/sbin/mkfs.ext4 /dev/mmcblk0p2 -F
 
 fi
 
@@ -451,24 +453,23 @@ if [ -e /root/chaipcr/bioinformatics/juliaserver.jl ]
 then
       julia -v
       echo about to start using QpcrAnalysis
+else
+      echo building with no julia
+      exit 0
+fi
+
+      mkdir -p /root/.julia
+      chmod 777 /root/.julia
+      mount /dev/mmcblk0p2 /root/.julia
+      cd
+      tar xfz /data/dot_julia_complete.tgz
+      rm dot_julia.tgz
+
       df -h
       free -m
       export DEBIAN_FRONTEND=noninteractive
 apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data
 apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data
-
-        if [ -e /tmp/mysql.sock ]
-	then
-		echo &quot;MySQL sockets cloned file found&quot;
-	else
-		if [ -e /run/mysqld/mysqld.sock ]
-		then
-			echo &quot;Clonning MySQL sockets file&quot;
-			ln -s /run/mysqld/mysqld.sock /tmp/mysql.sock
-		else
-			echo &quot;MySQL sockets file not found.&quot; 
-		fi
-	fi
 
 	export PATH=$PATH:/sbin:/usr/sbin
 	export TERM=linux
@@ -491,201 +492,58 @@ apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hic
              echo Building precompiling julia on sdcard
              julia_pkgdir=&quot;/sdcard/factory&quot;
              export JULIA_PKGDIR=/sdcard/factory/.julia
+             echo &quot;export JULIA_PKGDIR=/sdcard/factory/.julia&quot;&gt;&gt;~/.profile
       else
              echo freeing up some space
-             rm -r /var/cache/apt /var/log/ /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/tests
+             #rm -r /var/cache/apt /var/log/ /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/tests
              mkdir /var/log/ -p
 	     echo freeing up some space
 	     # remove part of .git folder to save more space. Keeping the .git/objects folder under the packages because Pkg.status() verify the package number from there. An extra chance to save space is available here by cherry pick the exact file needed by Pkg.status().
-	     apt update
-	     find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;/logs/
-	     find /root/.julia/.cache/ -name objects | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
+	     #apt update
+	     #find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;/logs/
+	     #find /root/.julia/.cache/ -name objects | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
              apt update
              julia_pkgdir=&quot;/root&quot;
              export JULIA_PKGDIR=/root/.julia
       fi
 
-       JULIA_ENV=production julia -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;);reload(&quot;QpcrAnalysis&quot;);using QpcrAnalysis;&apos; --compile=all
+      cd /root/chaipcr/bioinformatics/build/
+      chmod +x precompilescript.sh
+      time ./precompilescript.sh
 
-       echo tested using QpcrAnalysis
-       if [ -e ${julia_pkgdir}/.julia/lib/v0.6/QpcrAnalysis.ji ]
-       then
-            echo QpcrAnalysis package precompiled.
-       else
-            echo Error precompiling QpcrAnalysis package
-            exit 1
-       fi
+     if [ -e /root/chaipcr/bioinformatics/qpcranalysis.so ]
+     then
+          echo julia binaries generated successfully.
+     else
+          echo Error generating julia binaries.
+          exit 1
+     fi
 
-	julia -e &apos;Pkg.add(&quot;BuildExecutable&quot;);Pkg.checkout(&quot;BuildExecutable&quot;)&apos;
+     if $is_dev
+     then
+          echo No clean for dev image
+     else
+            echo Cleaning julia folder
+            find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
+            find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;/logs/
+            find /root/.julia/.cache/ -name objects | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;  
+     fi
 
-	cd ${julia_pkgdir}/.julia/v0.6/BuildExecutable/src/
-
-cat &lt;&lt; &apos;EOF&apos; &gt;  add_catch.patch
-
---- src/BuildExecutable.jl	2018-05-29 22:08:45.271522602 +0000
-+++ src/BuildExecutable.jl	2018-05-29 20:48:13.108040252 +0000
-@@ -143,10 +143,13 @@
-     run(cmd)
-     println()
- 
-+try
-     println(&quot;running: rm -rf $(tmpdir) $(sys.buildfile).o $(sys.inference).o $(sys.inference).ji $(sys.inference0).o $(sys.inference0).ji&quot;)
-     map(f-&gt; rm(f, recursive=true), [tmpdir, sys.buildfile*&quot;.o&quot;, sys.inference*&quot;.o&quot;, sys.inference*&quot;.ji&quot;, sys.inference0*&quot;.o&quot;, sys.inference0*&quot;.ji&quot;])
-     println()
-+end
- 
-+try
-     if targetdir != nothing
-         # Move created files to target directory
-         for file in [exe_file.buildfile, sys.buildfile * &quot;.$(Libdl.dlext)&quot;, sys.buildfile * &quot;.ji&quot;]
-@@ -194,7 +197,7 @@
-             end
-         end
-     end
--
-+end
-     println(&quot;$(exe_file.targetfile) successfully created.&quot;)
-     return 0
- end
-
-
-EOF
-
-echo Patching..
-
-patch -i add_catch.patch || (echo error patching ExecBuilder package &amp;&amp; exit 1)
-echo done installation.. creating execuitable:
-rm add_catch.patch
-#exit 0
-
-JULIA=julia
-
-cat &gt; /tmp/precompile_QpcrAnalysis.jl &lt;&lt; EOF
-
-println(&quot;Starting precompile template !!!&quot;)
-push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;)
-
-println(&quot;Using time: &quot;)
-@time using QpcrAnalysis
-println(&quot;Done Using!&quot;)
-
-function main()
-
-	println(&quot;Main is executed!&quot;)
-	#reload(&quot;QpcrAnalysis&quot;)
-
-	println(&quot;About to dispatch. First time dispatch time:&quot;)
-	@time QpcrAnalysis.dispatch(&quot;amplification&quot;, &quot;{\&quot;calibration_info\&quot;:{\&quot;water\&quot;:{\&quot;calibration_id\&quot;:44,\&quot;step_id\&quot;:28},\&quot;channel_1\&quot;:{\&quot;calibration_id\&quot;:44,\&quot;step_id\&quot;:31},\&quot;channel_2\&quot;:{\&quot;calibration_id\&quot;:44,\&quot;step_id\&quot;:34}},\&quot;experiment_id\&quot;:68,\&quot;min_ct\&quot;:5,\&quot;baseline_cyc_bounds\&quot;:[],\&quot;cq_method\&quot;:\&quot;Cy0\&quot;}&quot;)
-
-	println(&quot;dispatch time no JIT:&quot;)
-	@time QpcrAnalysis.dispatch(&quot;amplification&quot;, &quot;{\&quot;calibration_info\&quot;:{\&quot;water\&quot;:{\&quot;calibration_id\&quot;:44,\&quot;step_id\&quot;:28},\&quot;channel_1\&quot;:{\&quot;calibration_id\&quot;:44,\&quot;step_id\&quot;:31},\&quot;channel_2\&quot;:{\&quot;calibration_id\&quot;:44,\&quot;step_id\&quot;:34}},\&quot;experiment_id\&quot;:68,\&quot;min_ct\&quot;:5,\&quot;baseline_cyc_bounds\&quot;:[],\&quot;cq_method\&quot;:\&quot;Cy0\&quot;}&quot;)
-	println(&quot;Done dispatch time test&quot;)
-	include(&quot;/root/chaipcr/bioinformatics/juliaserver.jl&quot;)
-	println(&quot;Server Exit&quot;)
-end
-
-println(&quot;Done with precompilescript!&quot;)
-
-
-EOF
-
-cat &gt; /tmp/mkexec.jl &lt;&lt; EOF
-println(&quot;Try dispatch on its own&quot;)
-@time include(&quot;/tmp/precompile_QpcrAnalysis.jl&quot;)
-println(&quot;Done checking dispatch.. now building executable..&quot;)
-
-#Pkg.add(&quot;BuildExecutable&quot;)
-#println(&quot;BE package is added&quot;)
-using BuildExecutable
-println(&quot;BE package is used&quot;)
-
-build_executable(&quot;/root/qpcranalysis&quot;, &quot;/tmp/precompile_QpcrAnalysis.jl&quot;, &quot;/tmp/output/&quot;, &quot;native&quot;)
-println(&quot;Executable creation finished&quot;)
-
-EOF
-
-rm -r /tmp/output/
-mkdir -p /tmp/output/
-ls /root/qpcranalysis &amp;&amp; rm /root/qpcranalysis
-
-rm -r /usr/lib/lib/root/
-mkdir -p /root/julia/julia6RBinaries/lib/lib/root/
-mkdir -p /usr/lib/lib/root/
-
-rm /usr/lib/lib/root/qpcranalysis.ji
-rm /usr/lib/lib/root/qpcranalysis.so
-rm /usr/share/julia/base/userimg.jl
-
-echo creating the image
-time JULIA_ENV=production $JULIA /tmp/mkexec.jl
-
-mkdir -p /root/lib/root/
-cp /usr/lib/lib/root/qpcranalysis.so /root/lib/root/qpcranalysis.so
-
-fi
-
-echo testing juliaserver script to make sure nothing left to precompile as we are removing the compilation tools later to free up space.
-
-test_julia_server2()
-{
-     JULIA_ENV=production julia -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;); 
-     include(&quot;/root/chaipcr/bioinformatics/juliaserver.jl&quot;)&apos;
-     echo error: julia server terminated
-}
-
-test_julia_server()
-{
-       if [ -e /tmp/output/qpcranalysis.so ] 
-       then
-             echo moving qpcranalysis.so
-             date
-             cp /tmp/output/qpcranalysis  /root/chaipcr/bioinformatics/
-             cp /tmp/output/qpcranalysis.so /root/chaipcr/bioinformatics/
-             rm -r /tmp/output
-
-             echo running with qpcranalysis.so
-             JULIA_ENV=production julia  -J /root/chaipcr/bioinformatics/qpcranalysis.so -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;); include(&quot;/root/chaipcr/bioinformatics/juliaserver.jl&quot;)&apos;
-             echo exit running with qpcranalysis.so
-             date
-       else
-             echo running without qpcranalysis.so
-             JULIA_ENV=production julia  -e &apos;push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;); include(&quot;/root/chaipcr/bioinformatics/juliaserver.jl&quot;)&apos;
-             echo exit running without qpcranalysis.so
-             date
-       fi
-}
-
-test_julia_server &amp;
-echo starting julia server on a different thread
-sleep 1800
-echo julia server testing period due. Cleaning up.
-rm -r /root/julia/julia6RBinaries/lib/lib/root/
-rm -r /root/lib/root/
-
-pkill -9 julia
-pkill -9 julia
-pkill -9 julia
-pkill -9 julia
-pkill -9 julia
-sleep 100
-
-ps -aux | grep julia
 df -h
+
+cd
 echo moving julia to eMMC
-if $is_dev
-then
-     echo No clean for dev image
-else
-     echo Cleaning julia folder
-#       find /sdcard/factory/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
-       find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
-fi
-
-julia_pkgdir=&quot;/root&quot;
-export JULIA_PKGDIR=/root/.julia
-#mv /sdcard/factory/.julia ~/.julia
-#ls -ahl  /sdcard/factory/
-df -h
+tar czf /data/dot_julia_precompiled.tgz .julia 
+pkill -9 julia
+pkill -9 julia
+umount .julia
+echo cleaning up old julia folder
+rm -r .julia
+rm /data/dot_julia_complete.tgz
+tar xzf /data/dot_julia_precompiled.tgz
+#      rm /data/dot_julia_precompiled.tgz
+echo returned Julia folder
+du -h --max-depth=1 .
 
 exit 0
 </command>
@@ -832,7 +690,7 @@ fi
 
 echo  Deploy realtime to ~/tmp
 cp ~/chaipcr/deploy/device/realtime.service /lib/systemd/system/
-systemctl enable realtime.service
+systemctl disable realtime.service
 
 sync
 </command>
@@ -1169,7 +1027,7 @@ apt-get  -y -q -f install
 apt-get  -y -q --purge autoremove gfortran* git i2c-tools 
 apt-get  -y -q --purge autoremove icu-devtools
 apt-get -y -q remove qt4-default qt5-default gettext
-DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge libgtk-3-0
+#DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge libgtk-3-0
 DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge gcc-4.9 cmake
 DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge python2*
 
@@ -1181,7 +1039,7 @@ df -h
 done
 
 DEBIAN_FRONTEND=noninteractive apt-get -q -y install gettext
-DEBIAN_FRONTEND=noninteractive apt-get -q -y install libgtk-3-0
+#DEBIAN_FRONTEND=noninteractive apt-get -q -y install libgtk-3-0
 apt-get -y -q install libpango1.0-0 libglib2.0-0 libcairo2
 apt-get -q -y install libboost-chrono-dev libboost-system-dev
 if [ -e /etc/bypassjulia.flag ]
@@ -1193,6 +1051,7 @@ fi
 
 df -h
 
+rm /data/dot_julia*
 echo Adding USB shutdown script
 
 cat &gt; /uEnv.txt &lt;&lt; EOF
@@ -1203,6 +1062,24 @@ uenvcmd=echo Shutting down USB powered devices.;run shutdown_usb_power
 
 EOF
 
+exit 0</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>root@$build_machine:22</siteName>
+      <command>if $is_dev
+then
+      echo Building a debug image
+      exit 0
+fi
+
+echo returnning Julia folder
+df -h
+tar xzf /data/dot_julia_precompiled.tgz
+      rm /data/dot_julia_precompiled.tgz
+echo returned Julia folder
+du -h --max-depth=1 .
+df -h
 exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
@@ -1285,18 +1162,17 @@ umount /dev/mmcblk0p*
 rm -r /sdcard/upgrade
 mkdir -p /sdcard/upgrade/
 
-echo cleaning up sdcard
-LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
-,,0xe,*
-__EOF__
+#echo cleaning up sdcard
+#LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
+#,,0xe,*
+#__EOF__
 
-/sbin/partprobe /dev/mmcblk0
+#/sbin/partprobe /dev/mmcblk0
 mkfs.ext4 /dev/mmcblk0p1 -F
 
 sync
 sync
- fsck /dev/mmcblk1p1 -y -f
- fsck /dev/mmcblk0p1 -y -f
+fsck /dev/mmcblk1p1 -y -f
 
 mount /dev/mmcblk0p1 /sdcard/factory/
 
