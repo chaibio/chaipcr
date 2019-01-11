@@ -7,7 +7,7 @@ println("Using time: ")
 println("Done Using!")
 
 # load test functions
-include("/root/chaipcr/bioinformatics/QpcrAnalysis/test_functions.jl")
+include("/root/chaipcr/bioinformatics/test/test_functions.jl")
 test_functions = generate_tests()
 println("Test functions generated.. running first pass.... JIT timing if exists!")
 
