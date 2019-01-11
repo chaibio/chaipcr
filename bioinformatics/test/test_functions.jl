@@ -9,12 +9,20 @@
 const BBB = match(r"beaglebone",readlines(`uname -a`)[1]) != nothing
 const RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE = false
 
-@static BBB || import FactCheck: clear_results
-@static BBB || import BSON: bson
 import DataFrames: DataFrame
 import DataStructures: OrderedDict
 import JSON: json, parse, parsefile
 
+@static if !BBB
+    import FactCheck: clear_results
+    import BSON: bson
+end
+
+const td = readdlm(
+    "$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/test_data.csv",',',header=true)
+const TEST_DATA = DataFrame([
+    slicedim(td[1],2,i) for i in 1:size(td[1])[2]],
+    map(Symbol,td[2][:]))
 
 # example code to generate, run, and save tests
 # BSON preferred to JLD because it can save functions and closures
@@ -22,10 +30,10 @@ if (RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE & !BBB)
     cd("/home/vagrant/chaipcr/bioinformatics/QpcrAnalysis")
     push!(LOAD_PATH,pwd())
     using QpcrAnalysis
-    td = readdlm("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/test_data.csv",',',header=true)
-    const TEST_DATA = DataFrame([
-            slicedim(td[1],2,i) for i in 1:size(td[1])[2]],map(Symbol,td[2][:]))
-    test_functions = QpcrAnalysis.generate_tests()
+    test_functions = QpcrAnalysis.generate_tests(debug=false)
+    d1=test_functions["meltcurve single channel"]()
+    @timev d2=test_functions["meltcurve single channel"]()
+
     check = QpcrAnalysis.test_dispatch(test_functions)
     if all(values(check))
         BSON.bson("../test/data/dispatch_tests.bson",test_functions)
@@ -44,9 +52,6 @@ if (RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE & BBB)
     cd("/root/chaipcr/bioinformatics/QpcrAnalysis")
     push!(LOAD_PATH,pwd())
     using QpcrAnalysis
-    td = readdlm("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/test_data.csv",',',header=true)
-    const TEST_DATA = DataFrame([
-            slicedim(td[1],2,i) for i in 1:size(td[1])[2]],map(Symbol,td[2][:]))
     include("../test/test_functions.jl") # this file
     test_functions = generate_tests()
     check = test_dispatch(test_functions)
@@ -59,55 +64,6 @@ if (RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE & BBB)
         println(check)
     end
 end
-
-# results 2019-01-05
-# commit 88e502ecb3ec8b642a376c1964af21d6c6350668
-#
-# amplification single channel, 10.1 sec (3.88 M allocations: 241.9 MiB, 0.97% gc time)
-# amplification dual channel, 22.7 sec (8.35 M allocations: 512.7 MiB, 1.53% gc time)
-# meltcurve single channel, 32.8 sec (12.5 M allocations: 821.6 MiB, 0.97% gc time)
-# meltcurve dual channel, 70.8 sec (31.2 M allocations: 1.91 GiB, 1.34% gc time)
-# standard curve single channel, 0.18 sec (55.4 k allocations: 3.44 MiB, 5.56% gc time)
-# optical cal single channel, 0.10 sec (33.3 k allocations: 2.03 MiB)
-# optical cal dual channel, 0.22 sec (77.3 k allocations: 4.70 MiB)
-# thermal perf. diagnostic single channel, 1.00 sec (296.2 k alloc.: 18.3 MiB, 1.10% gc time)
-# thermal perf. diagnostic dual channel, 0.79 sec (225.6 k allocations: 13.9 MiB)
-# thermal consistency single channel, 9.03 sec (2.58 M allocations: 173.6 MiB, 0.84% gc time)
-# thermal consistency dual channel, 17.3 sec (9.01 M allocations: 576.7 MiB, 1.38% gc time)
-# optical test single channel, 0.09 sec (31.5 k allocations: 1.96 MiB)
-# optical test dual channel, 1.40 sec (481.5 k allocations: 29.9 MiB, 0.66% gc time)
-
-# results 2019-01-06
-# time (seconds) on fast laptop (i7 8th gen, 16 GB RAM)
-#
-# amplification single channel, 0.544
-# amplification dual channel, 1.480
-# meltcurve single channel, 0.195
-# meltcurve dual channel, 2.544
-# standard curve single channel, 0.004
-# optical cal single channel, 0.001
-# optical cal dual channel, 0.002
-# thermal performance diagnostic single channel, 0.002
-# thermal performance diagnostic dual channel, 0.002
-# thermal consistency single channel, 0.081
-# thermal consistency dual channel, 1.069
-# optical test single channel, 0.000
-# optical test dual channel, 0.001
-
-#
-# amplification single channel, 0.544
-# amplification dual channel, 1.480
-# meltcurve single channel, 0.195
-# meltcurve dual channel, 2.544
-# standard curve single channel, 0.004
-# optical cal single channel, 0.001
-# optical cal dual channel, 0.002
-# thermal performance diagnostic single channel, 0.002
-# thermal performance diagnostic dual channel, 0.002
-# thermal consistency single channel, 0.081
-# thermal consistency dual channel, 1.069
-# optical test single channel, 0.000
-# optical test dual channel, 0.001
 
 function generate_tests(;
     debug     ::Bool =false,
@@ -175,7 +131,7 @@ end
 # time performance
 function time_dispatch(test_functions ::Associative)
     OrderedDict(map(keys(test_functions)) do testname
-        println("Making dispatch call: $testname")
+        println("Making dispatch call: $testname")  
         @timev result = test_functions[testname]()
         testname => result[1] && result[2]["valid"]
         end)
@@ -183,7 +139,7 @@ end
 
 
 # BBB results 2019-01-07
-# run by Tom Price as root@     10.0.100.231
+# run by Tom Price as root@10.0.100.231
 
 # Making dispatch call: amplification single channel
 #   6.335094 seconds (315.82 k allocations: 13.261 MiB, 3.85% gc time)
