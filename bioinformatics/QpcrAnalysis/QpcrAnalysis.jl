@@ -41,7 +41,6 @@ end][1] # slice by boolean vector returned a one-element vector. Assumption: LOA
 # include each script, generally in the order of workflow
 
 # types and constants
-#include("constants.jl")
 include("types_for_dispatch.jl")
 include("types_for_calibration.jl")
 include("types_for_allelic_discrimination.jl")
@@ -51,6 +50,7 @@ include("types_for_standard_curve.jl")
 include("types_for_thermal_consistency.jl")
 include("amp_models/types_for_sfc_models.jl")
 include("amp_models/types_for_dfc_models.jl")
+include("constants.jl")
 
 # shared functions
 include("shared.jl")
