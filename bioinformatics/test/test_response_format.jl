@@ -21,6 +21,9 @@
 #       http://127.0.0.1:8081/experiments/#{experiment.id}/analyze
 
 import JSON, DataStructures.OrderedDict
+import FactCheck: facts, context, @fact, clear_results, exitstatus, less_than_or_equal
+
+FactCheck.setstyle(:default)
 
 
 # ********************************************************************************
