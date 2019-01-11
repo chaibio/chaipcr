@@ -290,7 +290,7 @@ ENDSSH
         echo done gulp deploy
         
 		rm -rf ./web/log
-
+		sed -i &apos;s/&quot;version&quot;: &quot;1.0.0&quot;,/&quot;version&quot;: &quot;1.1.0.&apos;${BUILD_NUMBER}&apos;&quot;,/g&apos; ./device/configuration.json
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./web &quot;$build_machine:/root/chaipcr/&quot; || (echo error copying files to device &amp;&amp; exit 1)
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./browser &quot;$build_machine:/root/chaipcr/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./bioinformatics &quot;$build_machine:/root/chaipcr/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
@@ -690,7 +690,7 @@ fi
 
 echo  Deploy realtime to ~/tmp
 cp ~/chaipcr/deploy/device/realtime.service /lib/systemd/system/
-systemctl disable realtime.service
+systemctl enable realtime.service
 
 sync
 </command>
