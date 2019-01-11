@@ -108,11 +108,25 @@ function main()
 	println("Main is executed!")
 	#reload("QpcrAnalysis")
 
-	println("About to test dispatch. First time dispatch time:")
-	@time QpcrAnalysis.dispatch("amplification", "{\"calibration_info\":{\"water\":{\"calibration_id\":44,\"step_id\":28},\"channel_1\":{\"calibration_id\":44,\"step_id\":31},\"channel_2\":{\"calibration_id\":44,\"step_id\":34}},\"experiment_id\":68,\"min_ct\":5,\"baseline_cyc_bounds\":[],\"cq_method\":\"Cy0\"}")
+  # load test functions
+  import FactCheck: clear_results
+  import DataFrames: DataFrame
+  import DataStructures: OrderedDict
+  import BSON: bson
+  import JSON: json, parse, parsefile
+  test_functions = BSON.load("../test/data/dispatch_tests.bson")
+
+  # run 13 analyses through QpcrAnalysis.dispatch()
+  println("Accessing dispatch functions")
+  check = OrderedDict(map(keys(test_functions)) do testname
+      result = test_functions[testname]()
+      testname => result[1] && result[2]["valid"]
+  end)
+  # all test results must be positive, or else an error will be raised
+  @assert all(values(check)) 
 
 	println("dispatch time no JIT:")
-	@time QpcrAnalysis.dispatch("amplification", "{\"calibration_info\":{\"water\":{\"calibration_id\":44,\"step_id\":28},\"channel_1\":{\"calibration_id\":44,\"step_id\":31},\"channel_2\":{\"calibration_id\":44,\"step_id\":34}},\"experiment_id\":68,\"min_ct\":5,\"baseline_cyc_bounds\":[],\"cq_method\":\"Cy0\"}")
+	@time test_functions["amplification dual channel"]() 
 	println("Done dispatch time test")
 	include("/root/chaipcr/bioinformatics/juliaserver.jl")
 	println("Server Exit")

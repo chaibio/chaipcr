@@ -157,7 +157,7 @@ end
 # parse AbstractFloat on BBB
 function parse_af{T<:AbstractFloat}( ::Type{T}, strval ::String)
     str_parts = split(strval, '.')
-    float_parts = map(str_part -> parse(Int32, str_part), str_parts)
+    float_parts = map(str_part -> Base.parse(Int32, str_part), str_parts)
     return float_parts[1] + float_parts[2] / 10^length(str_parts[2])
 end
 

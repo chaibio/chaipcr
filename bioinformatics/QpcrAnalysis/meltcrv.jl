@@ -216,9 +216,7 @@ function process_mc(
     # subset temperature/fluorescence data by channel then by well
     tf_bychwl = OrderedDict( # bychwl = by channel then by well
         map(1:num_channels) do channel_i
-
             tf = map(wva_well_nums) do oc_well_num
-
                 if oc_well_num in fluo_well_nums
                     i = indexin([oc_well_num], fluo_well_nums)[1]
                     tmprtrs_wNaN = mc_data_bych[channel_i].t_da_vec[i]
@@ -236,10 +234,8 @@ function process_mc(
                 else
                    nothing
                 end # if
-
             end # do oc_well_num
             return channel_nums[channel_i] => tf
-
         end) # do channel_i
 
     # smooth the fluorescence/temperature data and calculate Tm peak, area

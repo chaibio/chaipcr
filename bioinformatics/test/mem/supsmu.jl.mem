@@ -1,0 +1,82 @@
+        - # wrapper for Fortran subroutine `supsmu` (Friedman 1984)
+        - 
+        - const libsupsmu = "$LOAD_FROM_DIR/_supsmu.so"
+        - 
+        - function supsmu(
+        -     X::AbstractVector,
+        -     Y::AbstractVector,
+        -     span::Real,
+        -     wt::AbstractVector=ones(length(X)), # weight
+        -     periodic::Bool=false,
+        -     alpha_bass::Real=0, # controles high frequency (small span) penality used with automatic span selection (bass tone control). (alpha.le.0.0 or alpha.gt.10.0 => no effect.)
+        -     x_sorted::Bool=true
+        -     # IntT_Fortran::DataType=Int32, FloatT_Fortran::DataType=Float32 # Julia DataTypes of integer and float compatible with the Fortran subroutine `supsmu`
+        -     )
+        - 
+  1186864     if ndims(X) > 1 || ndims(Y) > 1
+        0         error("X and Y must be 1-dimension.")
+        -     end
+        - 
+        0     n = length(X)
+        - 
+        0     if length(Y) != n
+        0         error("X and Y must be equal in length.")
+        -     end
+        - 
+        0     if n < 3
+        0         warn("Lengths of X and Y are less than 3, no smoothing will be done.")
+        -     end
+        - 
+        0     if span < 0 || span > 1
+        0         error("`span` must be between 0 and 1.")
+        -     end
+        - 
+        0     if periodic # X is assumed to be a periodic variable with values in the range (0.0,1.0) and period 1.0.
+        0         if minimum(x) < 0 || maximum(x) > 1
+        0             error("If X is assumed to be periodic, its values must be between 0 and 1.")
+        -         end
+        0         iper = 2
+        -     else
+        0         iper = 1
+        -     end
+        - 
+        - 
+        -     # check done
+        - 
+        - 
+        0     FloatT_in = typeof(Y[1])
+        - 
+        0     if !x_sorted
+        0         indice_sorted = sortperm(X)
+        0         indice_back = sortperm(indice_sorted)
+        0         X = X[indice_sorted]
+        0         Y = Y[indice_sorted]
+        -     end
+        - 
+        -     # convert types for compatibility with Fortran `supsmu`
+   614784     X, Y, span, wt, alpha_bass = map(
+        -         var -> map(Float32, var),
+        -         (Array(X), Array(Y), span, wt, alpha_bass) )
+        0     n, iper = map(var -> Int32(var), (n, iper))
+        - 
+        -     # variables to be modified
+   602496     smo = zeros(Float32, n)
+  4067392     sc = zeros(Float32, n, 7)
+        - 
+        -     # call Fortran subroutine `supsmu`
+    43008     ccall((:supsmu_, libsupsmu), Void, (
+        -         Ref{Int32}, Ref{Float32}, Ref{Float32}, # n, X, Y
+        -         Ref{Float32}, Ref{Int32}, # wt, iper
+        -         Ref{Float32}, Ref{Float32}, # span, alpha_bass
+        -         Ref{Float32}, Ref{Float32} # smo, sc
+        -         ), # must be literal, cannot be variable(s) to be evaluated
+        -         n, X, Y, wt, iper, span, alpha_bass, smo, sc
+        -     ) # smo and sc change values but not
+        - 
+        -     # convert back to the DataType of input
+  1191472     smo = map(FloatT_in, smo)
+        - 
+        0     return x_sorted ? smo : smo[indice_back]
+        - 
+        - end
+        - 

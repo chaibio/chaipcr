@@ -27,11 +27,9 @@ import Ipopt.IpoptSolver
 import DataArrays.DataArray
 import Clustering: ClusteringResult, kmeans!, kmedoids!, silhouettes
 import Combinatorics.combinations
-import JLD.load
-import JSON
+import JSON, BSON, JLD.load
 import Dierckx: Spline1D, derivative
 import DataFrames: DataFrame, by
-import FactCheck: @fact, facts, convert, getindex, clear_results, setstyle
 
 # development & testing
 import Base.Test
