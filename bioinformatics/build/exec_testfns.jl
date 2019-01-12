@@ -8,7 +8,7 @@ println("Done Using!")
 
 # load test functions
 include("/root/chaipcr/bioinformatics/test/test_functions.jl")
-test_functions = generate_tests()
+test_functions = generate_tests( verbose=true )
 println("Test functions generated.. running first pass.... JIT timing if exists!")
 
 println("QpcrAnalysis.LOAD_FROM_DIR $(QpcrAnalysis.LOAD_FROM_DIR)")
