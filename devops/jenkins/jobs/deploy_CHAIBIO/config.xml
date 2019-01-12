@@ -61,6 +61,7 @@
       <command>#!/bin/bash
 echo checking Jenkins server
 echo &quot;Bash version ${BASH_VERSION}...&quot;
+echo Image build version $image_version
 uname -a
 ls -ahl
 lsblk
@@ -290,6 +291,7 @@ ENDSSH
         echo done gulp deploy
         
 		rm -rf ./web/log
+		sed -i &apos;s/&quot;version&quot;: &quot;1.0.0&quot;,/&quot;version&quot;: &quot;&apos;${image_version}&apos;&quot;,/g&apos; ./device/configuration.json
 
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./web &quot;$build_machine:/root/chaipcr/&quot; || (echo error copying files to device &amp;&amp; exit 1)
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./browser &quot;$build_machine:/root/chaipcr/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
@@ -690,7 +692,7 @@ fi
 
 echo  Deploy realtime to ~/tmp
 cp ~/chaipcr/deploy/device/realtime.service /lib/systemd/system/
-systemctl disable realtime.service
+systemctl enable realtime.service
 
 sync
 </command>

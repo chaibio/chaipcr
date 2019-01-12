@@ -109,8 +109,11 @@ function main()
 	#reload("QpcrAnalysis")
 
   # load test functions
-  import BSON.load
-  import DataStructures.OrderedDict
+  import FactCheck: clear_results
+  import DataFrames: DataFrame
+  import DataStructures: OrderedDict
+  import BSON: bson
+  import JSON: json, parse, parsefile
   test_functions = BSON.load("../test/data/dispatch_tests.bson")
 
   # run 13 analyses through QpcrAnalysis.dispatch()
@@ -123,7 +126,7 @@ function main()
   @assert all(values(check)) 
 
 	println("dispatch time no JIT:")
-	@time test_functions["amplification dual channel"]()
+	@time test_functions["amplification dual channel"]() 
 	println("Done dispatch time test")
 	include("/root/chaipcr/bioinformatics/juliaserver.jl")
 	println("Server Exit")

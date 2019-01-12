@@ -1,0 +1,157 @@
+        - # dispatch.jl
+        - 
+        - import JSON: parse, json
+        - import DataStructures.OrderedDict
+        - 
+        - 
+        - function dispatch(
+        -     action ::AbstractString,
+        -     request_body ::AbstractString;
+        - 
+        -     verbose ::Bool =false,
+        -     verify  ::Bool =false
+        - )
+     1456     result = try
+        - 
+        -         # NB. DefaultDict and DefaultOrderedDict constructors sometimes don't work on OrderedDict
+        -         # (https://github.com/JuliaLang/DataStructures.jl/issues/205)
+        0         req_parsed = JSON.parse(request_body; dicttype=OrderedDict)
+        - 
+        0         if !(action in keys(Action_DICT))
+        0             error("action $action is not found")
+        -         end
+        - 
+        -         # else
+        0         action_t = Action_DICT[action]()
+        - 
+        - 	@static if (get(ENV, "JULIA_ENV", nothing)!="production")
+        -             # this code is hidden from the parser on the BeagleBone
+        0             if (verify)
+        0                 verify_input = try
+        0                     verify_request(action_t, req_parsed)
+        -                 catch err
+        0                     error("data supplied with $action request is in the wrong format")
+        -                 end
+        -             end
+        -         end
+        - 
+        0         response = act(action_t, req_parsed; out_format="pre_json", verbose=verbose)
+        0         json_response=JSON.json(response)
+        - 
+        - 	@static if (get(ENV, "JULIA_ENV", nothing)!="production")
+        -             # this code is hidden from the parser on the BeagleBone
+        0             if (verify)
+        0                 verify_output = try
+        0                     verify_response(action_t,JSON.parse(json_response,dicttype=OrderedDict))
+        -                 catch err
+        0                    error("data returned from $action request is in the wrong format")
+        -                 end
+        -             end
+        -         end
+        - 
+        0         string(json_response)
+        - 
+        -     catch err
+        0         err
+        -     end
+        - 
+        0     success = !isa(result, Exception)
+        0     response_body = 
+        -         success ?
+        -             result :
+        -             string(JSON.json(Dict(
+        -                 "valid" => false,
+        -                 "error" => repr(result))))
+        - 
+      416     return (success, response_body)
+        - end # dispatch
+        - 
+        - 
+        - # get keyword arguments from request
+        - function get_kw_from_req(key_vec ::AbstractVector, req_dict ::Associative)
+        -     pair_vec = Vector{Pair}()
+        -     for key in key_vec
+        -         if key in keys(req_dict)
+        -             push!(pair_vec, Symbol(key) => req_dict[key])
+        -         end # if
+        -     end # for
+        -     return OrderedDict(pair_vec)
+        - end
+        - 
+        - 
+        - # testing function: construct `request_body` from separate arguments
+        - function args2reqb(
+        -     action ::String,
+        -     exp_id ::Integer,
+        -     calib_info ::Union{Integer,OrderedDict};
+        -     stage_id ::Integer =0,
+        -     step_id ::Integer =0,
+        -     ramp_id ::Integer =0,
+        -     min_reliable_cyc ::Real =5,
+        -     baseline_method ::String ="sigmoid",
+        -     baseline_cyc_bounds ::AbstractVector =[],
+        -     guid ::String ="",
+        -     extra_args ::OrderedDict =OrderedDict(),
+        -     wdb ::String ="dflt", # "handle", "dflt", "connect"
+        -     db_key ::String ="default", # "default", "t1", "t2"
+        -     db_host ::String ="localhost",
+        -     db_usr ::String ="root",
+        -     db_pswd ::String ="",
+        -     db_name ::String ="chaipcr",
+        - )
+        -     reqb = OrderedDict{typeof(""),Any}("calibration_info"=>calib_info)
+        - 
+        -     if action == "amplification"
+        -         reqb["experiment_id"] = exp_id
+        -         reqb["min_reliable_cyc"] = min_reliable_cyc
+        -         reqb["baseline_cyc_bounds"] = baseline_cyc_bounds
+        -         if step_id != 0
+        -             reqb["step_id"] = step_id
+        -         elseif ramp_id != 0
+        -             reqb["ramp_id"] = ramp_id
+        -         # else
+        -         #     println("No step_id or ramp_id will be specified.")
+        -         end
+        -     elseif action == "meltcurve"
+        -         reqb["experiment_id"] = exp_id
+        -         reqb["stage_id"] = stage_id
+        -     elseif action == "analyze"
+        -         reqb["experiment_info"] = OrderedDict(
+        -             "id"   => exp_id,
+        -             "guid" => guid
+        -         )
+        -     else
+        -         error("Unrecognized action.")
+        -     end
+        - 
+        -     for key in keys(extra_args)
+        -         reqb[key] = extra_args[key]
+        -     end
+        - 
+        -     if wdb == "handle"
+        -         reqb["db_key"] = db_key
+        -     elseif wdb == "dflt"
+        -         nothing
+        -     elseif wdb == "connect"
+        -         reqb["db_host"] = db_host
+        -         reqb["db_usr"]  = db_usr
+        -         reqb["db_pswd"] = db_pswd
+        -         reqb["db_name"] = db_name
+        -     else
+        -         error("`wdb` must be one of the following: \"handle\", \"dflt\", \"connect\".")
+        -     end
+        - 
+        -     return json(reqb)
+        - 
+        - end # args2reqb
+        - 
+        - 
+        - 
+        - 
+        - 
+        - # test: it works
+        - function test0()
+        -     println(guids)
+        - end
+        - #
+        - 

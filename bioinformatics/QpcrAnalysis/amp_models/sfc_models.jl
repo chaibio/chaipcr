@@ -25,7 +25,7 @@ function add_funcs_pred!(
             "end"
         ], "; ")
         md.func_pred_strs[func_key] = func_str
-        func_expr = parse(func_str)
+        func_expr = Base.parse(func_str) # not JSON.parse
         md.funcs_pred[func_key] = @eval $func_expr
     end
 
@@ -121,7 +121,7 @@ function add_func_fit!( # vco = variable constraints objective
     )
     md.func_fit_str = func_str
 
-    func_expr = parse(func_str)
+    func_expr = Base.parse(func_str) # not JSON.parse
     md.func_fit = @eval $func_expr
 
     return nothing
