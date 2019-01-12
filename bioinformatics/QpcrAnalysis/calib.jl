@@ -26,7 +26,7 @@ function dcv_aw(
 
     dye_in ::String ="FAM",
     dyes_2bfild ::AbstractVector =[];
-    aw_out_format ::String ="both" # "array", "dict", "both"
+    aw_out_format ::Symbol = :both # :array, :dict, :both
     )
 
     ## remove MySql dependency
@@ -116,11 +116,11 @@ function dcv_aw(
         channel_nums[channel_i] => dcvd_aw_vec[channel_i]
     end) # do channel_i
 
-    if aw_out_format == "array"
+    if aw_out_format == :array
         dcvd_aw = (dcvd_aw_ary3,)
-    elseif aw_out_format == "dict"
+    elseif aw_out_format == :dict
         dcvd_aw = (dcvd_aw_dict,)
-    elseif out_format == "both"
+    elseif out_format == :both
         dcvd_aw = (dcvd_aw_ary3, dcvd_aw_dict)
     else
         error("`out_format` must be \"array\", \"dict\" or \"both\". ")

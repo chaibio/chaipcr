@@ -17,11 +17,11 @@ subset(i,x) = getindex(x,i)
 # synonym for getfield
 field(f,x)  = getfield(x,f)
 
-# used in meltcrv.jl
+# unused function
 # curried function
 # returns true when data == value, false otherwise
 function selector(
-    value ::Integer    
+    value ::Integer
 )
     data  ::AbstractArray -> (data .== value)
 end
@@ -47,9 +47,9 @@ function extend_NaN(
     len  ::Integer,
     vec  ::AbstractVector
 )
-    (m -> 
-        (m >= 0) ? 
-            (m |> fill[NaN] |> vcat[vec]) : 
+    (m ->
+        (m >= 0) ?
+            (m |> fill[NaN] |> vcat[vec]) :
             error("vector is too long")
         )(len - length(vec))
 end
@@ -77,7 +77,7 @@ function normalize_range(
     min_x = minimum(x)
     max_x = maximum(x)
     range_x = max_x - min_x
-    return (x .- min_x) ./ span_x
+    return (x .- min_x) ./ range_x
 end
 
 # used in meltcrv.jl

@@ -57,17 +57,20 @@ const ARRAY_EMPTY = Array{Any}()
 const K4DCV_EMPTY = K4Deconv(ARRAY_EMPTY, ARRAY_EMPTY, "")
 const K4DCV = JLD.load("$LOAD_FROM_DIR/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv"] # sometimes crash REPL
 
+# used in supsmu.jl
+const libsupsmu = "$LOAD_FROM_DIR/_supsmu.so"
+
 # used in meltcurve.jl
 const EMPTY_mc = zeros(1,3)[1:0,:]
 const EMPTY_Ta = zeros(1,2)[1:0,:]
 const EMPTY_mc_tm_pw_out = MeltCurveTa(
-    EMPTY_mc,                       # mc_raw
-    EMPTY_Ta,                       # Ta_fltd
-    EMPTY_mc,                       # mc_denser
-    NaN,                            # ns_range_mid
-    Dict(:tmprtrs=[], :fluos=[]),   # sn_dict
-    EMPTY_Ta,                       # Ta_raw
-    ""                              # Ta_reported
+    EMPTY_mc,                                   # mc_raw
+    EMPTY_Ta,                                   # Ta_fltd
+    EMPTY_mc,                                   # mc_denser
+    NaN,                                        # ns_range_mid
+    Dict(:tmprtrs=>EMPTY_Ta, :fluos=>EMPTY_Ta), # sn_dict
+    EMPTY_Ta,                                   # Ta_raw
+    ""                                          # Ta_reported
 )
 const MC_FIELDS = OrderedDict(
     :mc      => "melt_curve_data",
