@@ -44,7 +44,7 @@ function act(
     end
     for key in ["top_N"]
         if key in keys_req_dict
-            kwdict_mc_tm_pw[parse(key)] = req_dict[key]
+            kwdict_mc_tm_pw[Base.parse(key)] = req_dict[key]
         end
     end
 

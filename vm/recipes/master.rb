@@ -6,7 +6,7 @@
 #
 include_recipe 'vm::clone_master'
 include_recipe 'vm::device'
-include_recipe 'vm::mysql'
+# include_recipe 'vm::mysql' # removed MySQL dependency from Julia API
 include_recipe 'vm::julia'
 include_recipe 'vm::rvm'
 include_recipe 'vm::ruby'

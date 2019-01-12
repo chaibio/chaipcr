@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version='1.1' encoding='UTF-8'?>
 <com.tikal.jenkins.plugins.multijob.MultiJobProject plugin="jenkins-multijob-plugin@1.27">
   <actions/>
   <description>Flash the BB with the latest fresh kernel image. And deploy our software and create a factory settings sdcard.</description>
@@ -13,11 +13,13 @@
           <name>build_machine</name>
           <description>IP address of the remote beaglebone.</description>
           <defaultValue>10.0.100.240</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>download_prefix</name>
           <description></description>
           <defaultValue>http://10.0.1.20/download</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.scm.listtagsparameter.ListSubversionTagsParameterDefinition plugin="subversion@2.9">
           <name>build_branch</name>
@@ -34,11 +36,13 @@
           <name>input_image_prefix</name>
           <description>Image prefix to start with.</description>
           <defaultValue>Stretch49Clean</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>output_image_prefix</name>
           <description>eMMC image released</description>
           <defaultValue>Stretch49Release</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>no_factorysettings_sdcard</name>
@@ -94,7 +98,11 @@
           <enableCondition>false</enableCondition>
           <abortAllJob>true</abortAllJob>
           <condition></condition>
-          <configs class="empty-list"/>
+          <configs>
+            <hudson.plugins.parameterizedtrigger.PredefinedBuildParameters plugin="parameterized-trigger@2.35.1">
+              <properties>image_version=1.0.0.$BUILD_NUMBER</properties>
+            </hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
+          </configs>
           <killPhaseOnJobResultCondition>FAILURE</killPhaseOnJobResultCondition>
           <buildOnlyIfSCMChanges>false</buildOnlyIfSCMChanges>
           <applyConditionOnlyIfNoSCMChanges>false</applyConditionOnlyIfNoSCMChanges>

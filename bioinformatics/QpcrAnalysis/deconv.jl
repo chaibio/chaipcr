@@ -141,7 +141,7 @@ function get_k(
     num_wells = size(water_data)[2]
     water_well_nums = [i for i in range(1,num_wells)]
     #
-    channel_nums = map(x -> parse(split(x, "_")[2]), cd_key_vec)
+    channel_nums = map(x -> Base.parse(split(x, "_")[2]), cd_key_vec)
     k4dcv_bydy = OrderedDict(map(channel_nums) do channel
         signal_data = transpose(reduce(hcat,calib_data[cd_key_vec[channel]]["fluorescence_value"]))
         return cd_key_vec[channel] => signal_data .- water_data

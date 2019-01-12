@@ -36,7 +36,7 @@ if (RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE & !BBB)
 
     check = QpcrAnalysis.test_dispatch(test_functions)
     if all(values(check))
-        BSON.bson("../test/data/dispatch_tests.bson",test_functions)
+        BSON.bson("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/dispatch_tests.bson",test_functions)
         println("All test functions checked and saved")
         # time functions second time around (after compilation)
         timing = QpcrAnalysis.time_dispatch(test_functions)
@@ -52,7 +52,7 @@ if (RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE & BBB)
     cd("/root/chaipcr/bioinformatics/QpcrAnalysis")
     push!(LOAD_PATH,pwd())
     using QpcrAnalysis
-    include("../test/test_functions.jl") # this file
+    include("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/test_functions.jl") # this file
     test_functions = generate_tests()
     check = test_dispatch(test_functions)
     if all(values(check))
@@ -77,7 +77,7 @@ function generate_tests(;
             if (datafile != "")
                 action = TEST_DATA[i,:action]
                 action_t = QpcrAnalysis.Action_DICT[action]()
-                request = JSON.parsefile("../test/data/$datafile.json",dicttype=OrderedDict)
+                request = JSON.parsefile("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/$datafile.json",dicttype=OrderedDict)
                 body = String(JSON.json(request))
 
                 function test_function()
