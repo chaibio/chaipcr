@@ -6,6 +6,7 @@
 # header file for QpcrAnalysis.jl module
 # defines all constants used anywhere in the module
 
+import DataStructures.OrderedDict
 import JLD
 
 # output format
@@ -56,17 +57,21 @@ const ARRAY_EMPTY = Array{Any}()
 const K4DCV_EMPTY = K4Deconv(ARRAY_EMPTY, ARRAY_EMPTY, "")
 const K4DCV = JLD.load("$LOAD_FROM_DIR/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv"] # sometimes crash REPL
 
-# used in supsmu.jl
-const libsupsmu = "$LOAD_FROM_DIR/_supsmu.so"
-
 # used in meltcurve.jl
 const EMPTY_mc = zeros(1,3)[1:0,:]
 const EMPTY_Ta = zeros(1,2)[1:0,:]
-const EMPTY_mc_tm_pw_out = OrderedDict(
-    "mc" => EMPTY_mc,
-    "Ta_raw" => EMPTY_Ta,
-    "Ta_fltd" => EMPTY_Ta
+const EMPTY_mc_tm_pw_out = MeltCurveTa(
+    EMPTY_mc,                       # mc_raw
+    EMPTY_Ta,                       # Ta_fltd
+    EMPTY_mc,                       # mc_denser
+    NaN,                            # ns_range_mid
+    Dict(:tmprtrs=[], :fluos=[]),   # sn_dict
+    EMPTY_Ta,                       # Ta_raw
+    ""                              # Ta_reported
 )
+const MC_FIELDS = OrderedDict(
+    :mc      => "melt_curve_data",
+    :Ta_fltd => "melt_curve_analysis")
 
 ## used in optical_test_single_channel.jl
 # const BASELINE_STEP_ID = 12
