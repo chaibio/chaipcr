@@ -804,7 +804,7 @@ function process_amp_1sr(
 
         dye_in,
         dyes_2bfild;
-        aw_out_format="array")
+        aw_out_format=:array)
 
     size_bcb = size(baseline_cyc_bounds)
     if size_bcb == (0,) || (size_bcb == (2,) && size(baseline_cyc_bounds[1]) == ()) # can't use `eltype(baseline_cyc_bounds) <: Integer` because `JSON.parse("[1,2]")` results in `Any[1,2]` instead of `Int[1,2]`

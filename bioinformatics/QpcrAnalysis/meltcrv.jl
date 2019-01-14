@@ -6,7 +6,7 @@ import DataStructures.OrderedDict
 import DataArrays.DataArray
 import StatsBase: rle
 import Dierckx: Spline1D, derivative
-import Base: start, next, done, eltype
+import Base: start, next, done, eltype, collect, iteratorsize, SizeUnknown
 
 
 ## called by QpcrAnalyze.dispatch
@@ -119,7 +119,10 @@ function process_mc(
     remove_when_NaN_in_first(x...) =
         map(y -> y[(x |> first |> broadcast[!isnan])],x)
 
-    normalize_fluos(tmprtrs ::AbstractVector, fluos_raw ::AbstractVector) =
+    normalize_fluos(
+        tmprtrs     ::DataArray{S} where S <: AbstractFloat,
+        fluos_raw   ::AbstractVector{T} where T <: Real
+    ) =
         Dict(
             :tmprtrs => tmprtrs,
             :fluos   => subtract_minimum(fluos_raw))
@@ -244,23 +247,32 @@ function mc_tm_pw(
 
     ## filter out data points separated by narrow temperature intervals
     ## `nti` - narrow temperature interval
-    filter_nti(tf_dict ::Associative) =
+    filter_nti(
+        tf_dict     ::Associative
+    ) =
         Dict(
-            key => tf_dict[key][(tf_dict[:tmprtrs] |> tmprtr_intvls |> no_nti)])
+            key => tf_dict[key][(tf_dict[:tmprtrs] |> tmprtr_intvls |> no_nti)]
             for key in keys(tf_dict))
 
     ## temperature intervals
-    tmprtr_intvls(tmprtrs_ori ::AbstractVector) =
+    tmprtr_intvls(
+        tmprtrs_ori ::DataArray{T,1} where T <: AbstractFloat
+    ) =
         vcat(diff(tmprtrs_ori), Inf)
 
     ## flag datapoints
-    no_nti(tmprtr_intvls ::AbstractVector) =
+    no_nti(
+        tmprtr_intvls ::DataArray{T,1} where T <: AbstractFloat
+    ) =
         tmprtr_intvls .> nti_frac * median(tmprtr_intvls)
 
     ## functions used to calculate `span_smooth`
 
     ## choose the value for `span_smooth`
-    choose_span_smooth(tmprtrs ::AbstractVector, fluos ::AbstractVector) =
+    choose_span_smooth(
+        tmprtrs     ::DataArray{S,1} where S <: AbstractFloat,
+        fluos       ::AbstractVector{T} where T <: Real
+    ) =
         if auto_span_smooth
             print_v(println, verbose, "Automatic selection of `span_smooth`...")
             calc_span_smooth(tmprtrs, fluos, fu_rle(tmprtrs, fluos))
@@ -271,9 +283,9 @@ function mc_tm_pw(
 
     ## calculate the smoothing parameter
     calc_span_smooth(
-        tmprtrs ::AbstractVector,
-        fluos   ::AbstractVector,
-        fu_rle  ::Tuple{Vector{Bool},Vector{T} where T<:Integer}
+        tmprtrs     ::DataArray{S,1} where S <: AbstractFloat,
+        fluos       ::AbstractVector{T} where T <: Real,
+        fu_rle      ::Tuple{Vector{Bool},Vector{T} where T<:Integer}
     ) =
         if fu_rle[1] == [false]
             print_v(println, verbose, "No fluo increase as temperature increase was detected, use `span_smooth_default` $span_smooth_default.")
@@ -295,38 +307,56 @@ function mc_tm_pw(
     ## `span_smooth_product` = the longest temperature span
     ## where fluorescence increases as temperature increases
     span_smooth_product(
-        tmprtrs ::AbstractVector,
-        fluos   ::AbstractVector,
-        fu_rle  ::Tuple{Vector{Bool},Vector{T} where T<:Integer}
+        tmprtrs     ::DataArray{S,1} where S <: AbstractFloat,
+        fluos       ::AbstractVector{T} where T <: Real,
+        fu_rle      ::Tuple{Vector{Bool},Vector{U} where U <: Integer}
     ) =
         span_smooth_factor * max_fu_tp_span(tmprtrs, fu_idc(fu_rle)) / whole_tp_span
 
-    max_fu_tp_span(tmprtrs ::AbstractVector, fu_idc ::AbstractVector) =
+    max_fu_tp_span(
+        tmprtrs     ::DataArray{S,1} where S <: AbstractFloat,
+        fu_idc      ::AbstractVector{Int}
+    ) =
         maximum(tmprtrs[fu_idc[2:2:end]] .- tmprtrs[fu_idc[1:2:end]])
 
-    fu_idc(fu_rle ::Tuple{Vector{Bool},Vector{T} where T<:Integer}) =
+    fu_idc(fu_rle   ::Tuple{Vector{Bool},Vector{T} where T<:Integer}) =
         (cumsum(fu_rle[1][1] ? vcat(0,fu_rle[2]) : fu_rle[2]) .+ 1)[1:2*sum(fu_rle[1])]
 
     ## find the region(s) where there is a positive gradient
     ## such that fluorescence increases as the temperature increases
     ## `fu_rle` - fluo_up run length encoding
-    fu_rle(tmprtrs ::AbstractVector, fluos ::AbstractVector) =
+    fu_rle(
+        tmprtrs     ::DataArray{S,1} where S <: AbstractFloat,
+        fluos       ::AbstractVector{T} where T <: Real
+    ) =
         calc_fu_rle(fluos, giis_tp(max_fluo_dcrs(tmprtrs, fluos)))
 
-    calc_fu_rle(fluos ::AbstractVector, css_idc ::AbstractVector) =
+    calc_fu_rle(
+        fluos       ::AbstractVector{T} where T <: Real,
+        css_idc     ::AbstractVector{Int}
+    ) =
         rle(is_increasing(fluos[css_idc]))
 
     ## find the region of length 2 * span_css_tmprtr
     ## showing the steepest fluo decrease (`fluo_dcrs`) between start and end
-    max_fluo_dcrs(tmprtrs ::AbstractVector, fluos ::AbstractVector) =
+    max_fluo_dcrs(
+        tmprtrs     ::DataArray{S,1} where S <: AbstractFloat,
+        fluos       ::AbstractVector{T} where T <: Real
+    ) =
         indmax(
             fluo_dcrs(fluos, giis_tp(tmprtrs, i))
             for i in 1:len_raw)
 
-    fluo_dcrs(fluos ::AbstractVector, sel_idc_int ::AbstractVector) =
+    fluo_dcrs(
+        fluos       ::AbstractVector{T} where T <: Real,
+        sel_idc_int ::AbstractVector{Int}
+    ) =
         fluos[sel_idc_int[1]] - fluos[sel_idc_int[end]]
 
-    giis_tp(tmprtrs ::AbstractVector, i ::Integer) =
+    giis_tp(
+        tmprtrs     ::DataArray{S,1} where S <: AbstractFloat,
+        i           ::Integer
+    ) =
         giis_uneven(tmprtrs, i, span_css_tmprtr)
 
     ## smoothing functions
@@ -337,12 +367,18 @@ function mc_tm_pw(
         Spline1D(shorten(x...)..., k=3)
 
     ## smooth raw fluo values
-    smooth_raw_fluo(tmprtrs ::AbstractVector, fluos ::AbstractVector) =
+    smooth_raw_fluo(
+        tmprtrs     ::DataArray{S,1} where S <: AbstractFloat,
+        fluos       ::AbstractVector{T} where T <: Real
+    ) =
         supsmu(tmprtrs, fluos, span_smooth / denser_factor)
 
     ## fit cubic spline to fluos ~ tmprtrs, re-calculate fluorescence,
     ## and calculate -df/dt using `tp_denser` (a denser sequence of temperatures)
-    smoothing_process(spl ::Spline1D, tp_denser ::AbstractVector) =
+    smoothing_process(
+        spl         ::Spline1D,
+        tp_denser   ::AbstractVector{S} where S <: AbstractFloat,
+    ) =
         hcat(
             ## collate processed, interpolated data into matrix
             ## note: memory intensive
@@ -351,7 +387,10 @@ function mc_tm_pw(
             ndrv_smu(tp_denser, -derivative(spl, tp_denser)))
 
     ## baseline-subtracted spline-smoothed fluorescence data
-    fluo_spl_blsub(tp_denser ::AbstractVector, fluo_spl ::AbstractVector) =
+    fluo_spl_blsub(
+        tp_denser   ::AbstractVector{S} where S <: AbstractFloat,
+        fluo_spl    ::AbstractVector{T} where T <: AbstractFloat,
+    ) =
         ## assumes constant baseline == minimum fluorescence value
         subtract_minimum(
             ## optionally, smooth the output of the spline function
@@ -361,7 +400,10 @@ function mc_tm_pw(
 
     ## calculate negative derivative at interpolated temperatures
     ## smooth output using `supsmu`
-    ndrv_smu(tp_denser ::AbstractVector, ndrv ::AbstractVector) =
+    ndrv_smu(
+        tp_denser   ::AbstractVector{S} where S <: AbstractFloat,
+        ndrv        ::AbstractVector{T} where T <: AbstractFloat,
+    ) =
         supsmu(tp_denser, ndrv, span_smooth)
 
     ## create denser array of interpolated temperature values
@@ -382,46 +424,55 @@ function mc_tm_pw(
             0))
 
     ## find summit and nadir indices of Tm peaks in `ndrv_smu`
-    find_sn(ndrv_smu ::AbstractVector) =
-        map(
-            sumr_func -> find_mid_sumr_bysw(ndrv_smu, span_peaks_dp(), sumr_func),
-            [maximum, minimum])
+    find_sn(
+        ndrv_smu        ::AbstractVector{T} where T <: AbstractFloat
+    ) =
+        [maximum, minimum] |> map[find_mid_sumr_bysw[ndrv_smu, span_peaks_dp()]]
 
-    summits_and_nadirs(mc_denser ::AbstractArray, sn_idc...) = 
+    summits_and_nadirs(
+        mc_denser       ::AbstractArray{T,2} where T <: AbstractFloat,
+        sn_idc...
+    ) = 
         OrderedDict(zip(
             [:summit_pre, :nadir],
             map(
                 idc -> mc_denser[idc, :],
-                sn_idc...)))
+                sn_idc)))
 
     find_peaks(
-        tp_denser       ::AbstractVector,
-        ndrv_smu        ::AbstractVector,
+        tp_denser       ::AbstractVector{S} where S <: AbstractFloat,
+        ndrv_smu        ::AbstractVector{T} where T <: AbstractFloat,
         spl             ::Spline1D,
-        summit_pre_idc  ::AbstractVector,
-        nadir_idc       ::AbstractVector
+        summit_pre_idc  ::AbstractVector{Int},
+        nadir_idc       ::AbstractVector{Int}
     ) =
         ## return value Ta_raw =
-        PeakIndices(sn_idc...)                      |>
-            map[peak_Ta[tp_denser, ndrv_smu, spl]]  |>
-            reduce[hcat]                            |>
-            round.[json_digits]
+        PeakIndices(
+            ndrv_smu[summit_pre_idc],
+            summit_pre_idc,
+            nadir_idc)                                  |>
+                collect                                 |>
+                map[peak_Ta[tp_denser, ndrv_smu, spl]]  |>
+                reduce[hcat]                            |>
+                broadcast[x -> round(x,json_digits)]    |>
+                transpose
 
     ## calculate peak area
     peak_Ta(
-        tp_denser       ::AbstractVector,
-        ndrv_smu        ::AbstractVector,
+        tp_denser       ::AbstractVector{S} where S <: AbstractFloat,
+        ndrv_smu        ::AbstractVector{T} where T <: AbstractFloat,
         spl             ::Spline1D,
         peak_idc        ::Tuple{Int,Int,Int}
-    ) =
-        [   peak_idc[2],                                # summit_idx
-            tp_denser[peak_idc[2]],                     # Tm = temperature at peak
-            peak_bounds(ndrv_smu, peak_idc...) |>
-                calc_area[tp_denser, ndrv_smu, spl] ]   # area
+    ) = peak_idc == nothing ?
+            EMPTY_mc :
+            [   peak_idc[2],                                # summit_idx
+                tp_denser[peak_idc[2]],                     # Tm = temperature at peak
+                peak_bounds(ndrv_smu, peak_idc...) |>
+                    calc_area[tp_denser, ndrv_smu, spl] ]   # area
 
     ## find shoulders of peak
     function peak_bounds(
-        ndrv_smu        ::AbstractVector,
+        ndrv_smu        ::AbstractVector{T} where T <: AbstractFloat,
         left_nadir_idx  ::Integer,
         summit_idx      ::Integer,
         right_nadir_idx ::Integer
@@ -433,7 +484,7 @@ function mc_tm_pw(
         const low_nadir_idx, high_nadir_idx =
             (ndrv_smu[left_nadir_idx] < ndrv_smu[right_nadir_idx]) ?
                 (left_nadir_idx, right_nadir_idx) :
-                (right_nadir_idx, left_nadir_idx)
+                (right_nadir_idx, left_nadir_idx)   
         const hn_ns = ndrv_smu[high_nadir_idx]
         #
         ## find the nearest location to `summit_idx`
@@ -465,25 +516,26 @@ function mc_tm_pw(
     ## Proposed solution: recode using Dierckx.integrate
     ## requires tp_denser, ndrv_smu, ndrv ???
     function calc_area(
-        tp_denser       ::AbstractVector,
-        ndrv_smu        ::AbstractVector,
+        tp_denser       ::AbstractVector{S} where S <: AbstractFloat,
+        ndrv_smu        ::AbstractVector{T} where T <: AbstractFloat,
         spl             ::Spline1D,
         peak_bound_idc  ::Tuple{Int,Int}
     )
-        area_func(tp_low_end ::Real, tp_high_end ::Real) =
-            -sum(ndrv_smu[peak_bound_idc]) * (tp_high_end - tp_low_end) / 2.0 -
+        function area_func(tp_low_end ::Real, tp_high_end ::Real)
+            -sum(ndrv_smu[[peak_bound_idc...]]) * (tp_high_end - tp_low_end) / 2.0 -
                 (spl(tp_high_end) - spl(tp_low_end))
+            end
         ## end of function definition nested in peak_area()
-        #
+
         # tp_low_end, tp_high_end = map(
         #     func -> func(tp_denser[peak_bound_idc]),
         #     [minimum, maximum])
-        return area_func(ordered_tuple(tp_denser[peak_bound_idc])...)
+        return area_func(ordered_tuple(tp_denser[[peak_bound_idc...]]...)...)
     end # calc_area
 
     ## count cross points
     function count_cross_points(
-        ndrv_smu            ::AbstractVector,
+        ndrv_smu            ::AbstractVector{T} where T <: AbstractFloat,
         ns_range_mid        ::AbstractFloat
     )
         ## vectorized version
@@ -511,13 +563,14 @@ function mc_tm_pw(
     ## requires len_Tms
     ## note: top1_Tm_idx calculated incorrectly in original code
     function filter_peaks(
+        ndrv_smu            ::AbstractVector{T} where T <: AbstractFloat,
         tmprtr_max_ndrv     ::AbstractFloat,
-        areas_raw           ::AbstractVector,
+        areas_raw           ::AbstractVector{T} where T <: AbstractFloat,
         top1_Tm_idx         ::Integer,
         fn_mc_slope         ::Function,         # linear regression fluos ~ tmprtrs
         fn_num_cross_points ::Function,
     )
-        top_peaks(fltd_idc_topNp1 ::AbstractVector) =
+        top_peaks(fltd_idc_topNp1 ::AbstractVector{Int}) =
             length(fltd_idc_topNp1) > top_N ?
                 EMPTY_Ta :
                 Ta_raw[fltd_idc_topNp1, 2:3]    # indices in column 1 removed
@@ -588,7 +641,7 @@ function mc_tm_pw(
                 hcat(
                     tmprtrs,
                     fluos,
-                    -finite_diff(tmprtrs, fluos; nu = 1, method = "central"))
+                    -finite_diff(tmprtrs, fluos; nu = 1, method = "central")),
                 json_digits),                           # mc_raw
             EMPTY_Ta,                                   # Ta_fltd
             EMPTY_mc,                                   # mc_denser
@@ -630,7 +683,7 @@ function mc_tm_pw(
     if (len_Tms == 0)
         return MeltCurveTa(
             mc_raw,
-            EMPTY_Ta,       # Ta_fltd
+            EMPTY_Ta,       # Ta_fltd   
             mc_denser,
             ns_range_mid,
             sn_dict,
@@ -651,11 +704,12 @@ function mc_tm_pw(
     const ns_range_mid  = mean([quantile(ndrv_smu, qt_prob_range_lb), max_ndrv_smu[1]])
     const Ta_fltd       =
         filter_peaks(
-            tp_denser[max_ndrv_smu[2]],       # tmprtr_max_ndrv
-            Ta_raw[:, 3],                     # areas_raw
-            Ta_raw[idc_sb_area[1], 1],        # summit_idx of peak with largest area
-            () -> linreg(tmprtrs, fluos)[2],  # () -> mc_slope
-            () -> count_cross_points(ndrv_smu, ns_range_mid)) # () -> num_cross_points
+            ndrv_smu,
+            tp_denser[max_ndrv_smu[2]],                         # tmprtr_max_ndrv
+            Ta_raw[:, 3],                                       # areas_raw
+            Int(round(Ta_raw[idc_sb_area[1], 1], 0)),           # idx of peak with largest area
+            () -> linreg(tmprtrs, fluos)[2],                    # () -> mc_slope
+            () -> count_cross_points(ndrv_smu, ns_range_mid))   # () -> num_cross_points
     #
     return MeltCurveTa(
         round.(mc_raw, json_digits),
@@ -748,82 +802,83 @@ function finite_diff(
     end # if nu == 1
 end
 
+## PeakIndices methods
+## iterator functions to find peaks and flanking nadirs
+
+Base.start(iter ::PeakIndices) = (0,0,0)
+
+Base.done(iter ::PeakIndices, state) =
+    state == nothing || state[1] > iter.len_summit_idc
+
+Base.iteratorsize(::PeakIndices) = SizeUnknown()
+
+Base.eltype(iter ::PeakIndices) = Tuple{Int,Int,Int}
+
+function Base.collect(iter ::PeakIndices)
+    collection = []
+    for peak in iter
+        peak == nothing || push!(collection, peak)
+    end
+    return collection
+end
+
+function Base.next(iter ::PeakIndices, state ::Tuple{Int,Int,Int})
+    ## fail if state == nothing
+    if (state == nothing)
+        return (nothing, nothing)
+    end
+    ## state != nothing
+    left_nadir_ii, summit_ii, right_nadir_ii = state
+    ## fail if no more summits
+    if (summit_ii >= iter.len_summit_idc)
+        return (nothing, nothing)
+    end
+    while true
+        ## summit_ii < iter.len_summit_idc
+        ## increment the summit index
+        summit_ii += 1
+        ## extend nadir range to the right
+        while (right_nadir_ii < iter.len_nadir_idc)
+            right_nadir_ii += 1
+            if (iter.summit_idc[summit_ii] < iter.nadir_idc[right_nadir_ii])
+                break
+            end
+        end
+        ## decrease nadir range to the left, if possible
+        while (left_nadir_ii < iter.len_nadir_idc &&
+            iter.nadir_idc[left_nadir_ii + 1] < iter.summit_idc[summit_ii])
+                left_nadir_ii += 1
+        end
+        ## if there is nadir to the left, break out of loop
+        if (left_nadir_ii > 0)
+            break
+        end
+        ## otherwise try the next summit
+    end
+    ## fail if no flanking nadirs
+    if !(iter.nadir_idc[left_nadir_ii] < iter.summit_idc[summit_ii] < iter.nadir_idc[right_nadir_ii])
+        return (nothing, nothing) 
+    end
+    ## find duplicate summits
+    right_summit_ii = summit_ii
+    while (right_summit_ii < iter.len_summit_idc &&
+        iter.summit_idc[right_summit_ii + 1] < iter.nadir_idc[right_nadir_ii])
+        right_summit_ii += 1
+    end
+    ## remove duplicate summits by choosing highest summit
+    if (right_summit_ii > summit_ii)
+        summit_ii =
+            (iis -> iis[indmax(iter.summit_heights[iis])])(
+                summit_ii:right_summit_ii)
+    end
+    return (
+        (iter.nadir_idc[left_nadir_ii],
+            iter.summit_idc[summit_ii],
+            iter.nadir_idc[right_nadir_ii]),        # element
+        (left_nadir_ii, summit_ii, right_nadir_ii)) # state
+end
+
 
 
 
 #
-
-
-
-struct PeakIndices
-    summit_idc ::Vector{Int}
-    nadir_idc ::Vector{Int}
-    len_summit_idc ::Int
-    len_nadir_idc ::Int
-    PeakIndices(s,n) = new(vcat(s,0), vcat(n,0), length(s), length(n))
-end
-
-Base.start(iter ::PeakIndices) = (1,1,2)
-
-# requires ndrv_smu
-function Base.next(iter ::PeakIndices, state ::Tuple{Int,Int,Int})
-    left_nadir_ii, summit_ii, right_nadir_ii = state
-    #
-    ## increment the summit index
-    if (summit_ii >= iter.len_summit_idc)
-        return (-1,-1,-1) # there is no next summit
-    end
-    ## else
-    summit_ii += 1
-    #
-    ## increment the nadir indices
-    left_nadir_ii = right_nadir_ii
-    right_nadir_ii = inc_index(right_nadir_ii, len_nadir_idc)
-    ## extend nadir range to the right, if necessary
-    while (right_nadir_ii < len_nadir_idc &&
-        summit_idc[summit_ii] > nadir_idc[right_nadir_ii])
-            right_nadir_ii += 1
-    end
-    ## decrease nadir range to the left, if possible
-    while (left_nadir_ii < iter.len_nadir_idc &&
-        nadir_idc[left_nadir_ii + 1] < summit_idc[summit_ii])
-            left_nadir_ii += 1
-    end
-    if !(left_nadir_ii < summit_ii < right_nadir_ii)
-        return (-1,-1,-1) # no flanking nadirs
-    end
-    #
-    ## find duplicate summits
-    right_summit_ii = summit_ii
-    while (right_summit_ii < iter.len_summit_idc &&
-        summit_idc[right_summit_ii + 1] < nadir_idc[right_nadir_ii])
-        right_summit_ii += 1
-    end
-    #
-    ## remove duplicate summits by choosing highest
-    if (right_summit_ii > summit_ii)
-        ## pick the summit with highest ndrv_smu
-        summit_ii = (idc -> idc[indmax(ndrv_smu[summit_idc[idc]]])(colon(summit_ii,right_summit_ii))
-    end
-    return (left_nadir_ii, summit_ii, right_nadir_ii)
-end
-
-Base.done(iter ::PeakIndices, state) =
-    state[1] > iter.len_summit_idc
-
-Base.eltype(iter::PeakIndices) =
-    Tuple{Int,Int,Int}
-
-next_summit_idc(
-    summit_ii ::Int,
-    right_nadir_ii ::Int,
-    len_summit_idc,
-    len_nadir_idc) =
-        (right_nadir_ii, summit_ii+1, right_nadir_ii+1)
-
-filtered_peaks = PeakIndices([11,13,15],[10,12,14,16])
-
-for p in filtered_peaks
-    println(p)
-end
-

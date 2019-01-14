@@ -67,17 +67,18 @@ end
 # where the value at the index equals the summary
 # value of the sliding window centering at the index
 # (window width = number of data points in the whole window).
-# can be used to find peak summits and nadirs
+# can be used to find local summits and nadirs
 function find_mid_sumr_bysw(
     vals       ::AbstractVector,
     half_width ::Integer,
     sumr_func  ::Function =maximum
 )
+    vals_iw(i ::Integer) = vals_padded[i : i + half_width * 2]
+    #
     const padding = fill(-sumr_func(-vals), half_width)
     const vals_padded = [padding; vals; padding]
-    vals_iw(i ::Integer) = vals_padded[i : i + half_width * 2]
-    vals |> length |> range[1] |> vals_iw |> 
-        v -> sumr_func(v) == v[half_width + 1] |> find
+    vals |> length |> range[1] |> collect |> map[vals_iw] |> 
+        map[v -> sumr_func(v) == v[half_width + 1]] |> find
 end
 
 # used in meltcrv.jl
