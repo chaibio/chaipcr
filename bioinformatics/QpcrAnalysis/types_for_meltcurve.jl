@@ -4,6 +4,7 @@
 # Date: Dec 2018
 
 import DataArrays.DataArray
+import Base: start, next, done, eltype
 
 struct MeltCurveTF # temperature and fluorescence
     t_da_vec ::DataArray{Float64,2}
@@ -31,4 +32,17 @@ struct MeltCurveOutput
     wva_data ::Dict{Symbol,Dict{Int,Vector{Float64}}}
     wva_well_nums ::Vector{Int}
     faw_ary3 ::Array{Float64,3}
+end
+
+struct Peak
+    Tm ::Float64
+    area ::Float64
+end
+
+struct PeakIndices
+    summit_idc ::Vector{Int}
+    nadir_idc ::Vector{Int}
+    len_summit_idc ::Int
+    len_nadir_idc ::Int
+    PeakIndices(s,n) = new(vcat(s,0), vcat(n,0), length(s), length(n))
 end

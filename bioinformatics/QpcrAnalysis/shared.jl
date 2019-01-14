@@ -17,68 +17,71 @@ subset(i,x) = getindex(x,i)
 # synonym for getfield
 field(f,x)  = getfield(x,f)
 
+# used in meltcrv.jl
+inc_index(i ::Integer, len ::Integer) = (i >= len) ? len : i + 1
+dec_index(i ::Integer) = (i <= 1) ? 1 : i - 1
+
 # unused function
 # curried function
 # returns true when data == value, false otherwise
-function selector(
-    value ::Integer
-)
-    data  ::AbstractArray -> (data .== value)
-end
+selector(value ::Integer) =
+    data ::AbstractArray -> (data .== value)
 
 # used in meltcrv.jl
-function is_increasing(
-    x ::AbstractVector
-)
+is_increasing(x ::AbstractVector) =
     x[1:end-1] .< x[2:end]
-end
 
 # used in meltcrv.jl
-# truncate array elements to length of shortest element
-function shorten(
-    x ::AbstractArray
-)
-    map(subset[1:(x |> map[length] |> minimum)], x)
-end
+# truncate elements to length of shortest element
+shorten(x...) =
+    map(y -> y[range(1, x |> map[length] |> minimum)], x)
 
 # used in meltcrv.jl
 # extend vector with NaN values to a specified length
-function extend_NaN(
-    len  ::Integer,
-    vec  ::AbstractVector
-)
-    (m ->
-        (m >= 0) ?
-            (m |> fill[NaN] |> vcat[vec]) :
-            error("vector is too long")
-        )(len - length(vec))
-end
+extend_NaN(len ::Integer, vec ::AbstractVector) =
+    len - length(vec) |>
+        m -> 
+            m >= 0 ?
+                (m |> fill[NaN] |> vcat[vec]) :
+                error("vector is too long")
 
 # extend array elements with NaNs to length of longest element
-function extend(
-    x ::AbstractArray
-)
+extend(x ::AbstractArray) =
     map(extend_NaN[(x |> map[length] |> maximum)], x)
-end
 
 # used in meltcrv.jl
 # normalize values to floor of 0
-function subtract_minimum(
-    x ::AbstractArray
-)
+subtract_minimum(x ::AbstractArray) =
     x .- minimum(x)
-end
 
 # used in meltcrv.jl
 # normalize values to a range from 0 to 1
-function normalize_range(
-    x ::AbstractArray
-)
+function normalize_range(x ::AbstractArray)
     min_x = minimum(x)
     max_x = maximum(x)
     range_x = max_x - min_x
     return (x .- min_x) ./ range_x
 end
+
+# find the indices in a vector
+# where the value at the index equals the summary
+# value of the sliding window centering at the index
+# (window width = number of data points in the whole window).
+# can be used to find peak summits and nadirs
+function find_mid_sumr_bysw(
+    vals       ::AbstractVector,
+    half_width ::Integer,
+    sumr_func  ::Function =maximum
+)
+    const padding = fill(-sumr_func(-vals), half_width)
+    const vals_padded = [padding; vals; padding]
+    vals_iw(i ::Integer) = vals_padded[i : i + half_width * 2]
+    vals |> length |> range[1] |> vals_iw |> 
+        v -> sumr_func(v) == v[half_width + 1] |> find
+end
+
+# used in meltcrv.jl
+ordered_tuple(x, y) = (x < y) ? (x, y) : (y, x)
 
 # used in meltcrv.jl
 function split_vector_and_return_larger_quantile(
@@ -113,12 +116,11 @@ end
 
 
 # duplicated in MySQLforQpcrAnalysis.jl
-function get_ordered_keys(dict ::Dict)
+get_ordered_keys(dict ::Dict) =
     sort(collect(keys(dict)))
-end
-function get_ordered_keys(ordered_dict ::OrderedDict)
+
+get_ordered_keys(ordered_dict ::OrderedDict) =
     collect(keys(ordered_dict))
-end
 
 
 # used in meltcrv.jl
@@ -288,23 +290,17 @@ end # ensure_ci
 #     return (found_well_namedtuple, found_well_nums)
 # end
 
-function num_channels(
-    calib ::Associative
-)
+num_channels(calib ::Associative) =
     any([
-        (length(field) > 1) && (calib[field]["fluorescence_value"][2]!=nothing)
-        for field in keys(calib)
-    ]) ? 2 : 1
-end
+        (length(field) > 1) && (calib[field]["fluorescence_value"][2] != nothing)
+        for field in keys(calib)]) ? 
+            2 : 1
 
-function num_wells(
-    calib ::Associative
-)
+num_wells(calib ::Associative) =
     calib |>
         keys |>
         map[key -> (calib[key]["fluorescence_value"] |> map[length] |> maximum)] |>
         maximum
-end
 
 
 
