@@ -34,10 +34,11 @@ struct MeltCurveOutput
     # tf_bychwl ::OrderedDict{Int,Vector{OrderedDict{String,Vector{Float64}}}}
 end
 
-# struct Peak
-#     Tm ::Float64
-#     area ::Float64
-# end
+struct Peak
+    idx ::Int
+    Tm ::Float64
+    area ::Float64
+end
 
 struct PeakIndices
     summit_heights ::Vector{Float64}
