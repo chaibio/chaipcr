@@ -1,16 +1,16 @@
-# calib.jl
+## calib.jl
 #
-# calibration: deconvolution and adjust well-to-well variation in absolute fluorescence values
+## calibration: deconvolution and adjust well-to-well variation in absolute fluorescence values
 
 using DataStructures.OrderedDict;
 
 
-# function: perform deconvolution and adjust well-to-well variation in absolute fluorescence
+## function: perform deconvolution and adjust well-to-well variation in absolute fluorescence
 function dcv_aw(
-    fr_ary3 ::AbstractArray,
-    dcv ::Bool,
-    channel_nums ::AbstractVector,
-    # arguments needed if `k_compute=true`
+    fr_ary3                 ::AbstractArray,
+    dcv                     ::Bool,
+    channel_nums            ::AbstractVector,
+    ## arguments needed if `k_compute=true`
 
     ## remove MySql dependency
     #
@@ -20,31 +20,30 @@ function dcv_aw(
     # well_nums_in_req ::AbstractVector=[],
 
     # new >>
-    calib_data ::OrderedDict{String,Any},
-    well_nums_found_in_fr ::AbstractVector,
+    calib_data              ::OrderedDict{String,Any},
+    well_nums_found_in_fr   ::AbstractVector,
     # << new
 
-    dye_in ::String ="FAM",
-    dyes_2bfild ::AbstractVector =[];
-    aw_out_format ::Symbol = :both # :array, :dict, :both
-    )
-
+    dye_in                  ::String ="FAM",
+    dyes_2bfild             ::AbstractVector =[];
+    aw_out_format           ::Symbol = :both # :array, :dict, :both
+)
     ## remove MySql dependency
     #
     # calib_info = ensure_ci(db_conn, calib_info)
     #
     # wva_data, wva_well_nums = prep_adj_w2wvaf(db_conn, calib_info, well_nums_in_req, dye_in, dyes_2bfild)
 
-    # new >>
-    # assume without checking that we are using all the wells, all the time
+    ## new >>
+    ## assume without checking that we are using all the wells, all the time
     well_nums_in_req = [i for i in range(0,length(calib_data["water"]["fluorescence_value"][1]))]
     #
-    # prepare data to adjust well-to-well variation in absolute fluorescence values
+    ## prepare data to adjust well-to-well variation in absolute fluorescence values
     wva_data, wva_well_nums = prep_adj_w2wvaf(calib_data, well_nums_in_req, dye_in, dyes_2bfild)
     #
-    # overwrite the dummy well_nums
+    ## overwrite the dummy well_nums
     wva_well_nums = well_nums_found_in_fr
-    # << new
+    ## << new
 
     num_channels = length(channel_nums)
 
@@ -58,18 +57,18 @@ function dcv_aw(
     #     wva_well_num in well_nums_found_in_fr
     # end # do wva_well_num
 
-    # new >>
-    # issue:
-    # we can't match well numbers between calibration data and experimental data
-    # because we don't have that information for the calibration data
+    ## new >>
+    ## issue:
+    ## we can't match well numbers between calibration data and experimental data
+    ## because we don't have that information for the calibration data
     wva_well_idc_wfluo = [i for i in range(1,length(wva_well_nums))]
-    # << new
+    ## << new
 
-    # subtract background
-    # mw = minus water
+    ## subtract background
+    ## mw = minus water
     mw_ary3 = cat(3, map(1:num_channels) do channel_i
         fr_ary3[:,:,channel_i] .- transpose(
-            wva_data["water"][channel_i][wva_well_idc_wfluo]
+            wva_data[:water][channel_i][wva_well_idc_wfluo]
         )
     end...)
 
@@ -85,16 +84,16 @@ function dcv_aw(
         #     out_format="array"
         # )
 
-        # new >>
+        ## new >>
         k4dcv, dcvd_ary3 = deconV(
             1. * mw_ary3,
             channel_nums,
             wva_well_idc_wfluo,
             calib_data,
             well_nums_in_req;
-            out_format="array"
+            out_format = :array
         )
-        # << new
+        ## << new
 
     else
         k4dcv = K4DCV_EMPTY
@@ -123,11 +122,12 @@ function dcv_aw(
     elseif out_format == :both
         dcvd_aw = (dcvd_aw_ary3, dcvd_aw_dict)
     else
-        error("`out_format` must be \"array\", \"dict\" or \"both\". ")
+        error("`out_format` must be :array, :dict or :both. ")
     end
 
+    ## Performance issue:
+    ## enforce data types for this output
     return (mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, dcvd_aw...)
-
 end # dcv_aw
 
 
@@ -219,7 +219,7 @@ function calib_calib(
     mw_ary3_1, k4dcv_2, dcvd_ary3_1, wva_data_2, wva_well_nums_2, dcv_aw_ary3_1 = dcv_aw(
         ary2dcv_1, true, channel_nums_1,
         db_conn_2, calib_info_2, well_nums_2, well_nums_2, dye_in, dyes_2bfild;
-        aw_out_format="array"
+        aw_out_format = :array
     )
 
     return CalibCalibOutput(

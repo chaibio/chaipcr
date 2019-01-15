@@ -8,12 +8,12 @@ function deconV(
     # ary2dcv dim1 is unit, which can be cycle (amplification), temperature point (melting curve),
     # or step type (like "water", "channel_1", "channel_2" for calibration experiment);
     # ary2dcv dim2 must be well, ary2dcv dim3 must be channel
-    ary2dcv ::AbstractArray, 
+    ary2dcv                 ::AbstractArray, 
 
     # must be the same length as 3rd dimension of `array2dcv`
-    channel_nums ::AbstractVector, 
+    channel_nums            ::AbstractVector, 
     
-    dcv_well_idc_wfluo ::AbstractVector,
+    dcv_well_idc_wfluo      ::AbstractVector,
 
     ## remove MySql dependency
     #
@@ -24,14 +24,14 @@ function deconV(
     # well_nums ::AbstractVector=[];
 
     # new >>
-    calib_data ::Associative,
-    well_nums ::AbstractVector =[];
+    calib_data              ::Associative,
+    well_nums               ::AbstractVector =[];
     # << new
 
     # keyword arguments
-    k4dcv_backup ::K4Deconv =K4DCV,
-    scaling_factor_dcv_vec ::AbstractVector =SCALING_FACTOR_deconv_vec,
-    out_format ::String ="both" # "array", "dict", "both"
+    k4dcv_backup            ::K4Deconv =K4DCV,
+    scaling_factor_dcv_vec  ::AbstractVector =SCALING_FACTOR_deconv_vec,
+    out_format              ::Symbol = :both # :array, :dict, :both
 )
     a2d_dim1, a2d_dim_well, a2d_dim_channel = size(ary2dcv)
 
@@ -60,20 +60,20 @@ function deconV(
         ) .* scaling_factor_dcv_vec
     end
 
-    if (out_format == "array")
+    if (out_format == :array)
         dcvd = (dcvd_ary3,)
     else
         dcvd_dict = OrderedDict(map(1:a2d_dim_channel) do channel_i
             channel_nums[channel_i] => dcvd_ary3[:,:,channel_i]
         end) # do channel_i
-        if (out_format == "dict")
+        if (out_format == :dict)
             dcvd = (dcvd_dict,)
-        elseif (out_format == "both")
+        elseif (out_format == :both)
             dcvd = (dcvd_ary3, dcvd_dict)
         else
-            error("`out_format` must be \"array\", \"dict\" or \"both\".")
-        end # if out_format == "dict"
-    end # if out_format == "array"
+            error("`out_format` must be :array, :dict or :both.")
+        end # if out_format == :dict
+    end # if out_format == :array
 
     return (k4dcv, dcvd...)
 
@@ -102,10 +102,10 @@ function get_k(
     calib_data ::Associative,
     # << new
 
-    well_nums ::AbstractVector =[];
-    well_proc ::String ="vec", # options: "mean", "vec".
-    Float_T ::DataType =Float32, # ensure compatibility with other OSs
-    save_to ::String ="" # used: "k.jld"
+    well_nums  ::AbstractVector =[];
+    well_proc  ::Symbol = :vec, # options: :mean, :vec.
+    Float_T    ::DataType =Float32, # ensure compatibility with other OSs
+    save_to    ::String ="" # used: "k.jld"
 )
     ## remove MySql dependency
     #
@@ -178,7 +178,7 @@ function get_k(
     inv_note_pt1 = ""
     inv_note_pt2 = "K matrix is singular, using `pinv` instead of `inv` to compute inverse matrix of K. Deconvolution result may not be accurate. This may be caused by using the same or a similar set of solutions in the steps for different dyes. "
 
-    if (well_proc == "mean")
+    if (well_proc == :mean)
         k_s = hcat(
             map(cd_key_vec) do cd_key
                 k_mean_vec_1dye = mean(k4dcv_bydy[cd_key], 2)
@@ -195,7 +195,7 @@ function get_k(
         end # try
         k_inv_vec = fill(k_inv, num_wells)
 
-    elseif (well_proc == "vec")
+    elseif (well_proc == :vec)
         singular_well_nums = Vector{Int}()
         k_s = fill(ones(1,1), num_wells)
         k_inv_vec = similar(k_s)

@@ -1,4 +1,4 @@
-# dispatch.jl
+## dispatch.jl
 
 import JSON: parse, json
 import DataStructures.OrderedDict
@@ -13,19 +13,27 @@ function dispatch(
 )
     result = try
 
-        # NB. DefaultDict and DefaultOrderedDict constructors sometimes don't work on OrderedDict
-        # (https://github.com/JuliaLang/DataStructures.jl/issues/205)
+        ## NB. DefaultDict and DefaultOrderedDict constructors sometimes don't work on OrderedDict
+        ## (https://github.com/JuliaLang/DataStructures.jl/issues/205)
         req_parsed = JSON.parse(request_body; dicttype=OrderedDict)
+
+        ## Performance issue:
+        ## By default the JSON parser uses type ::Any
+        ## This wastes time and memory downstream.
+        ## It is important to annotate the type of data structures
+        ## wherever it is known.
+        ## Since the data structures are specific to each action,
+        ## this should generally be done in the generic act() methods.
 
         if !(action in keys(Action_DICT))
             error("action $action is not found")
         end
 
-        # else
+        ## else
         action_t = Action_DICT[action]()
 
 	@static if (get(ENV, "JULIA_ENV", nothing)!="production")
-            # this code is hidden from the parser on the BeagleBone
+            ## this code is hidden from the parser on the BeagleBone
             if (verify)
                 verify_input = try
                     verify_request(action_t, req_parsed)
@@ -35,11 +43,11 @@ function dispatch(
             end
         end
 
-        response = act(action_t, req_parsed; out_format="pre_json", verbose=verbose)
+        response = act(action_t, req_parsed; out_format=:pre_json, verbose=verbose)
         json_response=JSON.json(response)
 
 	@static if (get(ENV, "JULIA_ENV", nothing)!="production")
-            # this code is hidden from the parser on the BeagleBone
+            ## this code is hidden from the parser on the BeagleBone
             if (verify)
                 verify_output = try
                     verify_response(action_t,JSON.parse(json_response,dicttype=OrderedDict))
@@ -60,14 +68,14 @@ function dispatch(
         success ?
             string(result) :
             string(JSON.json(Dict(
-                "valid" => false,
-                "error" => repr(result))))
+                :valid => false,
+                :error => repr(result))))
 
     return (success, response_body)
 end # dispatch
 
 
-# get keyword arguments from request
+## get keyword arguments from request
 function get_kw_from_req(key_vec ::AbstractVector, req_dict ::Associative)
     pair_vec = Vector{Pair}()
     for key in key_vec
@@ -79,7 +87,7 @@ function get_kw_from_req(key_vec ::AbstractVector, req_dict ::Associative)
 end
 
 
-# testing function: construct `request_body` from separate arguments
+## testing function: construct `request_body` from separate arguments
 function args2reqb(
     action ::String,
     exp_id ::Integer,
@@ -149,7 +157,7 @@ end # args2reqb
 
 
 
-# test: it works
+## test: it works
 function test0()
     println(guids)
 end

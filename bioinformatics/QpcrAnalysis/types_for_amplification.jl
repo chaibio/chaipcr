@@ -1,4 +1,4 @@
-# types_for_amp.jl
+## types_for_amp.jl
 
 import DataStructures.OrderedDict
 
@@ -11,45 +11,45 @@ abstract type AbstractAmpFitted end
 struct EmptyAmpFitted <: AbstractAmpFitted end
 
 mutable struct AmpStepRampProperties
-    step_or_ramp ::String
-    id ::Int
-    cyc_nums ::Vector{Int} # accomodating non-continuous sequences of cycles
+    step_or_ramp    ::Symbol
+    id              ::Int
+    cyc_nums        ::Vector{Int} # accomodating non-continuous sequences of cycles
 end
 
-# `mod_bl_q` output
+## `mod_bl_q` output
 struct MbqOutput
-    fitted_prebl ::AbstractAmpFitted
-    bl_notes ::Vector{String}
-    blsub_fluos ::Vector{Float64}
-    fitted_postbl ::AbstractAmpFitted
-    postbl_status ::Symbol
-    coefs ::Vector{Float64}
-    d0 ::AbstractFloat
-    blsub_fitted ::Vector{Float64}
-    dr1_pred ::Vector{Float64}
-    dr2_pred ::Vector{Float64}
-    max_dr1 ::AbstractFloat
-    max_dr2 ::AbstractFloat
-    cyc_vals_4cq ::OrderedDict{String,Float64}
-    eff_vals_4cq ::OrderedDict{String,Float64}
-    cq_raw ::Float64
-    cq ::Float64
-    eff ::Float64
-    cq_fluo ::Float64
+    fitted_prebl    ::AbstractAmpFitted
+    bl_notes        ::Vector{String}
+    blsub_fluos     ::Vector{Float64}
+    fitted_postbl   ::AbstractAmpFitted
+    postbl_status   ::Symbol
+    coefs           ::Vector{Float64}
+    d0              ::AbstractFloat
+    blsub_fitted    ::Vector{Float64}
+    dr1_pred        ::Vector{Float64}
+    dr2_pred        ::Vector{Float64}
+    max_dr1         ::AbstractFloat
+    max_dr2         ::AbstractFloat
+    cyc_vals_4cq    ::OrderedDict{String,Float64}
+    eff_vals_4cq    ::OrderedDict{String,Float64}
+    cq_raw          ::Float64
+    cq              ::Float64
+    eff             ::Float64
+    cq_fluo         ::Float64
 end
 
-# amplification output format per step or ramp
+## amplification output format per step or ramp
 mutable struct AmpStepRampOutput
-    # computed in `process_amp_1sr`
-    fr_ary3 ::Array{Float64,3}
-    mw_ary3 ::Array{Float64,3}
-    k4dcv ::K4Deconv
-    dcvd_ary3 ::Array{Float64,3}
-    wva_data ::OrderedDict{String,OrderedDict{Int,Vector{Float64}}}
-    rbbs_ary3 ::Array{Float64,3}
-    fluo_well_nums ::Vector{Int}
-    channel_nums ::Vector{Int}
-    cq_method ::String
+    ## computed in `process_amp_1sr`
+    fr_ary3         ::Array{Float64,3}
+    mw_ary3         ::Array{Float64,3}
+    k4dcv           ::K4Deconv
+    dcvd_ary3       ::Array{Float64,3}
+    wva_data        ::OrderedDict{Symbol,OrderedDict{Int,Vector{Float64}}}
+    rbbs_ary3       ::Array{Float64,3}
+    fluo_well_nums  ::Vector{Int}
+    channel_nums    ::Vector{Int}
+    cq_method       ::String
     # computed by `mod_bl_q` as part of `MbqOutput` and arranged in arrays in `process_amp_1sr`
     fitted_prebl ::Array{AbstractAmpFitted,2}
     bl_notes ::Array{Array{String,1},2}

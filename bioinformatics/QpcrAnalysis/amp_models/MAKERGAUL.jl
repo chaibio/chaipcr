@@ -1,13 +1,18 @@
-# different formula for each cycle (dfc)
+## different formula for each cycle (dfc)
 
-# write functions to fit MAKERGAUL model here, which will be called in `mod_bl_q` in "amp.jl"
+## write functions to fit MAKERGAUL model here, which will be called in `mod_bl_q` in "amp.jl"
 
 import JuMP: Model, @variable, @constraint, @NLconstraint, @NLobjective,
     solve, getvalue, getobjectivevalue
 
 
 
-function pred_from_nm1(::Union{MAKERGAUL3, MAKERGAUL4}, eu_nm1::Real, d_nm1::Real, inh::Real)
+function pred_from_nm1(
+    ::Union{MAKERGAUL3, MAKERGAUL4},
+    eu_nm1      ::Real,
+    d_nm1       ::Real,
+    inh         ::Real
+)
     eu_n = eu_nm1 / (1 + inh * d_nm1)
     d_n = d_nm1 + d_nm1 * eu_n / (eu_n + d_nm1)
     return [eu_n d_n]
@@ -16,9 +21,12 @@ end
 
 function pred_from_cycs( # 0.7to1.2e-5 sec for 40 cycles on PC
     ::MAKERGAUL3,
-    cycs::AbstractVector,
-    fb::Real, eu0::Real, d0::Real, inh::Real
-    )
+    cycs2fit    ::AbstractVector,
+    fb_start    ::Real,
+    eu0         ::Real,
+    d0          ::Real,
+    inh         ::Real
+)
     max_cyc = maximum(cycs)
     pred_ary_eu_d_w0 = [eu0 d0]
     i = 1
@@ -36,9 +44,13 @@ end
 
 function pred_from_cycs(
     ::MAKERGAUL4,
-    cycs::AbstractVector,
-    fb::Real, bl_k::Real, eu0::Real, d0::Real, inh::Real
-    )
+    cycs        ::AbstractVector,
+    fb          ::Real,
+    bl_k        ::Real,
+    eu0         ::Real,
+    d0          ::Real,
+    inh         ::Real
+)
     max_cyc = maximum(cycs)
     pred_ary_eu_d_w0 = [eu0 d0]
     i = 1
@@ -55,13 +67,12 @@ end
 
 function fit(
     ::MAKERGAUL3,
-    cycs::AbstractVector, # continous integers or not
-    obs_fluos::AbstractVector,
-    wts::AbstractVector=ones(length(obs_fluos));
+    cycs        ::AbstractVector, # continous integers or not
+    obs_fluos   ::AbstractVector,
+    wts         ::AbstractVector =ones(length(obs_fluos));
     kwargs_Model... # argument for `JuMP.Model`
-    )
-
-    # find maximum observed fluorescence
+)
+    ## find maximum observed fluorescence
     max_of, max_of_idx = findmax(obs_fluos)
     idc2fit = 1:max_of_idx
     obs2fit = obs_fluos[idc2fit]
@@ -72,23 +83,21 @@ function fit(
     min_of = minimum(obs_fluos)
     of_diff = max_of - min_of
     fb_b_abs = fb_B_MULTIPLE * of_diff
+    
     @variable(jmp_model,
         # min_of - fb_b_abs <= fb <= min_of + fb_b_abs,
         fb,
-        start=min_of
-    )
+        start=min_of)
     @variable(jmp_model, # eu0
         # eu0_inh_LB <= eu0 <= eu0_UB_MULTIPLE * of_diff,
         eu0 >= 0,
-        start=eu0_START
-    )
+        start=eu0_START)
     # @variable(jmp_model, d0_LB <= d0 <= d0_UB, start=MAKERGAUL_d0_START) # change_a1
     @variable(jmp_model, d0 >= 0, start=MAKERGAUL_d0_START) # change_a2
     @variable(jmp_model, # inh
         # eu0_inh_LB <= inh <= inh_UB_MULTIPLE * of_diff,
         inh >= 0,
-        start=inh_START
-    )
+        start=inh_START)
     @variable(jmp_model, f[cycs2fit])
     # @variable(jmp_model, eu[cycs2fit]) # change_b1
     @variable(jmp_model, eu[cycs2fit] >= 0) # change_b2
@@ -102,27 +111,27 @@ function fit(
     @NLconstraint(jmp_model, eu_constr_2p[cyc in cycs2fit[2:end]], eu[cyc] == eu[cyc-1] / (1 + inh * d[cyc-1]))
     # @NLconstraint(jmp_model, d_constr_2p[cyc in cycs2fit[2:end]], d[cyc] == d[cyc-1] + d[cyc-1] * eu[cyc] / (eu[cyc] + d[cyc-1])) # "Invalid_Number_Detected"
     @NLconstraint(jmp_model, d_constr_2p[cyc in cycs2fit[2:end]], d[cyc] == d[cyc-1] + 1 / (1 / d[cyc-1] + 1 / eu[cyc]))
-    # # # #
-    # # change_e2: get rid of division by multiplying both sides by denominator
+    # 
+    ## change_e2: get rid of division by multiplying both sides by denominator
     # @NLconstraint(jmp_model, eu_constr_01, eu[1] * (1 + inh * d0) == eu0)
     # @NLconstraint(jmp_model, d_constr_01, d[1] * (eu[1] + d0) == d0 * (d0 + 2 * eu[1]))
     # @NLconstraint(jmp_model, eu_constr_2p[cyc in cycs2fit[2:end]], eu[cyc] * (1 + inh * d[cyc-1]) == eu[cyc-1])
     # # @NLconstraint(jmp_model, d_constr_2p[cyc in cycs2fit[2:end]], d[cyc] == d[cyc-1] + d[cyc-1] * eu[cyc] / (eu[cyc] + d[cyc-1])) # "Invalid_Number_Detected"
     # @NLconstraint(jmp_model, d_constr_2p[cyc in cycs2fit[2:end]], d[cyc] * (eu[cyc] + d[cyc-1]) == d[cyc-1] * (d[cyc-1] + 2 * eu[cyc]))
 
-    # # ssre by mean of predicted
+    ## ssre by mean of predicted
     # len_cycs = length(cycs)
     # @NLobjective(
     #     jmp_model, Min,
     #     sum( ((f[cycs[idx]] - obs_fluos[idx]) / (sum(f[cycs[idx]] / len_cycs for idx in idc2fit) - obs_fluos[idx])) ^ 2 for idx in idc2fit )
     # )
-    # # ssre by mean of observed
+    ## ssre by mean of observed
     # mean_of = mean(obs2fit)
     # @NLobjective(
     #     jmp_model, Min,
     #     sum( ((f[cycs[idx]] - obs_fluos[idx]) / (mean_of - obs_fluos[idx])) ^ 2 for idx in idc2fit )
     # )
-    # sse # the only one with optimal so far
+    ## sse # the only one with optimal so far
     @NLobjective(jmp_model, Min, sum((f[cycs[idx]] - obs_fluos[idx]) ^ 2 for idx in idc2fit)) # can solve to optimal when ssre can't
 
     # @NLobjective(
@@ -144,25 +153,23 @@ function fit(
         jmp_model,
         # init_coefs
     )
-
-end # fit
+end # fit(::MAKERGAUL3)
 
 
 function fit(
-    ::MAKERGAUL4,
-    cycs::AbstractVector, # continous integers or not
-    obs_fluos::AbstractVector,
-    wts::AbstractVector=ones(length(obs_fluos));
+    ::MAKERGAUL3,
+    cycs        ::AbstractVector, # continous integers or not
+    obs_fluos   ::AbstractVector,
+    wts         ::AbstractVector=ones(length(obs_fluos));
     kwargs_Model... # argument for `JuMP.Model`
-    )
-
-    # find maximum observed fluorescence
+)
+    ## find maximum observed fluorescence
     max_of, max_of_idx = findmax(obs_fluos)
     idc2fit = 1:max_of_idx
     obs2fit = obs_fluos[idc2fit]
     cycs2fit = 1:cycs[max_of_idx]
 
-    # fit a linear model to the estimated baseline portion of the curve
+    ## fit a linear model to the estimated baseline portion of the curve
     d2_vec = finite_diff(cycs, obs_fluos; nu=2)
     max_d2_idx = indmax(d2_vec)
     idc2fit_4bl = 1:(max(1, max_d2_idx - 1))
@@ -173,27 +180,24 @@ function fit(
     min_of = minimum(obs_fluos)
     of_diff = max_of - min_of
     fb_b_abs = fb_B_MULTIPLE * of_diff
+
     @variable(jmp_model,
         # min_of - fb_b_abs <= fb <= min_of + fb_b_abs,
         fb,
-        start=fb_start
-    )
+        start=fb_start)
     @variable(jmp_model,
         bl_k,
-        start=bl_k_start
-    )
+        start=bl_k_start)
     @variable(jmp_model, # eu0
         # eu0_inh_LB <= eu0 <= eu0_UB_MULTIPLE * of_diff,
         eu0 >= 0,
-        start=eu0_START
-    )
+        start=eu0_START)
     # @variable(jmp_model, d0_LB <= d0 <= d0_UB, start=MAKERGAUL_d0_START) # change_a1
     @variable(jmp_model, d0 >= 0, start=MAKERGAUL_d0_START) # change_a2
     @variable(jmp_model, # inh
         # eu0_inh_LB <= inh <= inh_UB_MULTIPLE * of_diff,
         inh >= 0,
-        start=inh_START
-    )
+        start=inh_START)
     @variable(jmp_model, f[cycs2fit])
     # @variable(jmp_model, eu[cycs2fit]) # change_b1
     @variable(jmp_model, eu[cycs2fit] >= 0) # change_b2
@@ -202,35 +206,34 @@ function fit(
 
     @constraint(jmp_model,
         f_constr[cyc in cycs2fit],
-        f[cyc] == fb + bl_k * cyc + d[cyc]
-    )
+        f[cyc] == fb + bl_k * cyc + d[cyc])
     # change_e1: with division
     @NLconstraint(jmp_model, eu_constr_01, eu[1] == eu0 / (1 + inh * d0))
     @NLconstraint(jmp_model, d_constr_01, d[1] == d0 + d0 * eu[1] / (eu[1] + d0))
     @NLconstraint(jmp_model, eu_constr_2p[cyc in cycs2fit[2:end]], eu[cyc] == eu[cyc-1] / (1 + inh * d[cyc-1]))
     # @NLconstraint(jmp_model, d_constr_2p[cyc in cycs2fit[2:end]], d[cyc] == d[cyc-1] + d[cyc-1] * eu[cyc] / (eu[cyc] + d[cyc-1])) # "Invalid_Number_Detected"
     @NLconstraint(jmp_model, d_constr_2p[cyc in cycs2fit[2:end]], d[cyc] == d[cyc-1] + 1 / (1 / d[cyc-1] + 1 / eu[cyc]))
-    # # # #
-    # # change_e2: get rid of division by multiplying both sides by denominator
+    #
+    ## change_e2: get rid of division by multiplying both sides by denominator
     # @NLconstraint(jmp_model, eu_constr_01, eu[1] * (1 + inh * d0) == eu0)
     # @NLconstraint(jmp_model, d_constr_01, d[1] * (eu[1] + d0) == d0 * (d0 + 2 * eu[1]))
     # @NLconstraint(jmp_model, eu_constr_2p[cyc in cycs2fit[2:end]], eu[cyc] * (1 + inh * d[cyc-1]) == eu[cyc-1])
     # # @NLconstraint(jmp_model, d_constr_2p[cyc in cycs2fit[2:end]], d[cyc] == d[cyc-1] + d[cyc-1] * eu[cyc] / (eu[cyc] + d[cyc-1])) # "Invalid_Number_Detected"
     # @NLconstraint(jmp_model, d_constr_2p[cyc in cycs2fit[2:end]], d[cyc] * (eu[cyc] + d[cyc-1]) == d[cyc-1] * (d[cyc-1] + 2 * eu[cyc]))
 
-    # # ssre by mean of predicted
+    ## ssre by mean of predicted
     # len_cycs = length(cycs)
     # @NLobjective(
     #     jmp_model, Min,
     #     sum( ((f[cycs[idx]] - obs_fluos[idx]) / (sum(f[cycs[idx]] / len_cycs for idx in idc2fit) - obs_fluos[idx])) ^ 2 for idx in idc2fit )
     # )
-    # # ssre by mean of observed
+    ## ssre by mean of observed
     # mean_of = mean(obs2fit)
     # @NLobjective(
     #     jmp_model, Min,
     #     sum( ((f[cycs[idx]] - obs_fluos[idx]) / (mean_of - obs_fluos[idx])) ^ 2 for idx in idc2fit )
     # )
-    # sse # the only one with optimal so far
+    ## sse # the only one with optimal so far
     @NLobjective(jmp_model, Min, sum((f[cycs[idx]] - obs_fluos[idx]) ^ 2 for idx in idc2fit)) # can solve to optimal when ssre can't
 
     # @NLobjective(
@@ -254,8 +257,7 @@ function fit(
         jmp_model,
         # init_coefs
     )
-
-end # fit
+end # fit(::MAKERGAUL4)
 
 
 

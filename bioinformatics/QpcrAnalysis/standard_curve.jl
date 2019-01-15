@@ -13,14 +13,14 @@ import DataFrames: DataFrame, by
 function act(
     ::StandardCurve,
 
-    req_vec ::Vector{Any};
+    req_vec     ::Vector{Any};
 
-    out_format ::String ="pre_json",
-    verbose ::Bool =false,
+    out_format  ::Symbol = :pre_json,
+    verbose     ::Bool =false,
     json_digits ::Integer =JSON_DIGITS,
-    qty_base ::Real =10,
-    empty_tre ::TargetResultEle =EMPTY_TRE,
-    empty_gre ::GroupResultEle  =EMPTY_GRE
+    qty_base    ::Real =10,
+    empty_tre   ::TargetResultEle =EMPTY_TRE,
+    empty_gre   ::GroupResultEle  =EMPTY_GRE
 )
     # df1.colindex.names
 
@@ -83,7 +83,7 @@ function act(
         end # if
     end # do chunk
 
-    if out_format == "full"
+    if out_format == :full
         return (target_result_df, group_result_df)
     else
         tre_vec = target_result_df[.!isnan.(target_result_df[:target]), 2]
@@ -146,7 +146,7 @@ function act(
             "targets" => target_vec,
             "groups" => grp_vec,
             "valid" => true)
-        return out_format == "json" ? JSON.json(jp_dict) : jp_dict
+        return out_format == :json ? JSON.json(jp_dict) : jp_dict
     end # if
 
 end # standard_curve
@@ -439,14 +439,14 @@ end # generate_req_sc
 
 # experimental code >>
 
-function simplify(x ::Number, out_format ::String)
+function simplify(x ::Number, out_format ::Symbol)
 println("Number $x format $out_format")
     x
 end
 
-function simplify(tup ::Tuple, out_format ::String)
+function simplify(tup ::Tuple, out_format ::Symbol)
 println("Tuple $tup format $out_format")
-    if out_format=="full"
+    if out_format == :full
         tup
     else
         Tuple([
@@ -455,9 +455,9 @@ println("Tuple $tup format $out_format")
     end
 end
 
-function simplify(vec ::Vector, out_format ::String)
+function simplify(vec ::Vector, out_format ::Symbol)
 println("Vector $vec format $out_format")
-    if out_format=="full"
+    if out_format == :full
         vec
     else
         Vector([
@@ -466,9 +466,9 @@ println("Vector $vec format $out_format")
     end
 end
 
-function simplify(dict ::Associative, out_format ::String)
+function simplify(dict ::Associative, out_format ::Symbol)
 println("Dict $dict format $out_format")
-    if out_format=="full"
+    if out_format == :full
         dict
     else
         x = OrderedDict()
@@ -479,9 +479,9 @@ println("Dict $dict format $out_format")
     end
 end
 
-function simplify(df ::DataFrame, out_format ::String)
+function simplify(df ::DataFrame, out_format ::Symbol)
 println("DataFrame $df format $out_format")
-    if out_format=="full"
+    if out_format == :full
         df
     else
         x = OrderedDict()
@@ -492,9 +492,9 @@ println("DataFrame $df format $out_format")
     end
 end
 
-function simplify(r ::Result, out_format ::String)
+function simplify(r ::Result, out_format ::Symbol)
 println("Result $r format $out_format")
-    if out_format=="full"
+    if out_format == :full
         r
     else
         x = OrderedDict()

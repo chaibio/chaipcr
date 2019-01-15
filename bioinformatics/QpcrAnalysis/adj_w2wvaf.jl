@@ -1,23 +1,23 @@
-# adj_w2wvaf.jl
+## adj_w2wvaf.jl
 #
-# perform optical calibration
+## perform optical calibration
 
 import DataStructures.OrderedDict
 
 
-# functions
+## functions
 
-# Top-level function: adjust well-to-well variation in absolute fluorescence values (w2wvaf). wva = w2wva. aw = adj_w2wvaf.
-# basic difference: w2wvaf/wva/aw - only used for `adj_w2wvaf`, each dye only has data for its target channel;
-# calibration/calib/oc - used for `deconv` and `adj_w2wvaf`, each dye has data for both target and non-target channels.
-# Input `fluo` and output: dim1 indexed by well and dim2 indexed by unit, which can be cycle (amplification) or temperature point (melt curve).
-# Output does not include the automatically created column at index 1 from rownames of input array as R does
+## Top-level function: adjust well-to-well variation in absolute fluorescence values (w2wvaf). wva = w2wva. aw = adj_w2wvaf.
+## basic difference: w2wvaf/wva/aw - only used for `adj_w2wvaf`, each dye only has data for its target channel;
+## calibration/calib/oc - used for `deconv` and `adj_w2wvaf`, each dye has data for both target and non-target channels.
+## Input `fluo` and output: dim1 indexed by well and dim2 indexed by unit, which can be cycle (amplification) or temperature point (melt curve).
+## Output does not include the automatically created column at index 1 from rownames of input array as R does
 function adj_w2wvaf(
-    fluo2btp ::AbstractArray,
-    wva_data ::Associative,
-    wva_well_idc_wfluo ::AbstractVector,
-    channel ::Integer;
-    minus_water ::Bool =false,
+    fluo2btp                  ::AbstractArray,
+    wva_data                  ::Associative,
+    wva_well_idc_wfluo        ::AbstractVector,
+    channel                   ::Integer;
+    minus_water               ::Bool =false,
     scaling_factor_adj_w2wvaf ::Real =SCALING_FACTOR_adj_w2wvaf
 )
     fluo = transpose(fluo2btp)
@@ -163,11 +163,11 @@ function prep_adj_w2wvaf(
     # calib_info ::Union{Integer,OrderedDict}, 
 
     # new >>
-    calib_data ::Associative, 
+    calib_data  ::Associative, 
     # << new
 
-    well_nums ::AbstractVector,
-    dye_in ::String ="FAM",
+    well_nums   ::AbstractVector,
+    dye_in      ::Symbol = :FAM,
     dyes_2bfild ::AbstractVector =[]
 )
 
@@ -323,8 +323,8 @@ function prep_adj_w2wvaf(
     # than experiment data, so that calibration data need to be easily
     # subsetted by channel.
     wva_data = OrderedDict(
-        "water"  => water_data_dict,
-        "signal" => signal_data_dict
+        :water  => water_data_dict, # enforce data type
+        :signal => signal_data_dict # enforce data type
     )
 
     return (wva_data, signal_well_nums)
