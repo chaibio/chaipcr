@@ -672,8 +672,8 @@ function mc_tm_pw(
     return MeltCurveTa(
         mc_raw              |> report[json_digits],
         Ta_fltd             |> report[json_digits],
-        mc_denser           |> report[json_digits],
-        ns_range_mid        |> report[json_digits],
+        mc_denser,          # do we want to round this to json_digits as well?
+        ns_range_mid,
         sn_dict,
         Ta_raw[idc_sb_area] |> report[json_digits],
         length(Ta_fltd) == 0 ? "No" : "Yes")
@@ -839,7 +839,7 @@ end
 report(digits ::Int, peaks ::Vector{Peak}) =
     length(peaks) == 0 ?
         EMPTY_Ta :
-        peaks |> map[p -> [p.Tm, p.area]] |> report[digits] |> reduce[hcat] |> transpose
+        peaks |> map[p -> round.([p.Tm, p.area], digits)] |> reduce[hcat] |> transpose
 
 
 
