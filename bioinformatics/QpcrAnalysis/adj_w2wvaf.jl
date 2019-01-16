@@ -23,17 +23,14 @@ function adj_w2wvaf(
     subtract_water(x) = minus_water ?
         x .- wva_data[:water][channel][wva_well_idc_wfluo] : x
     # end of function definitions nested within adj_w2wvaf()
+    const fluo = transpose(fluo2btp)
     const swd_normd =
         wva_data[:signal][channel][wva_well_idc_wfluo] |>
-            subtract_water |> sweep(mean)(/)
-    transpose(
-        hcat(
-            map(1:size(fluo2btp)[1]) do i
-                transpose(fluo2btp)[:,i]                    |>
-                    subtract_water                          |>
-                    x -> x ./ swd_normd                     |>
-                    broadcast[*, scaling_factor_adj_w2wvaf]
-            end...))
+            subtract_water |> sweep(mean)(-)
+    hcat(
+        map(1:size(fluo)[2]) do i
+            subtract_water(fluo[:,i]) ./ swd_normd .* scaling_factor_adj_w2wvaf
+        end...) |> transpose
 end # adj_w2wvaf
 
 
