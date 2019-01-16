@@ -12,23 +12,22 @@ then
       echo about to start using QpcrAnalysis
       df -h
       free -m
-      export DEBIAN_FRONTEND=noninteractive
-      apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data
-      apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data
-
-      export PATH=$PATH:/sbin:/usr/sbin
-      export TERM=linux
-      echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
-      DEBIAN_FRONTEND=noninteractive apt-get -q -y  install patchelf
-      DEBIAN_FRONTEND=noninteractive apt-get -q -y  install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3
-      DEBIAN_FRONTEND=noninteractive apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3  || exit 1
-
-      pkill -9 julia
-      pkill -9 julia
-      pkill -9 julia
-      pkill -9 julia
       pkill -9 julia
       ps -aux
+
+      echo compilaing _supsmu.so
+      cd /root/chaipcr/bioinformatics/QpcrAnalysis
+      rm _supsmu.so
+      #gfortran -Wall -Wextra -o _supsmu.so -c _supsmu.f
+      gfortran -Wall -Wextra -o _supsmu.so _supsmu.f -fPIC -shared
+      if [ -e _supsmu.so ]
+      then
+	echo "_supsmu.so compiled successfully"
+      else
+	echo "Error compiling _supsmu.so"
+        exit 1
+      fi
+      cd
 
       JULIA_ENV=production julia -e 'push!(LOAD_PATH, "/root/chaipcr/bioinformatics/QpcrAnalysis/");reload("QpcrAnalysis");using QpcrAnalysis;' --compile=all
 
@@ -41,7 +40,7 @@ then
             exit 1
       fi
 
-      echo "Creating executiable"
+      echo "Creating executable"
       julia -e 'Pkg.add("BuildExecutable");Pkg.checkout("BuildExecutable")'
 
       cd ${julia_pkgdir}/.julia/v0.6/BuildExecutable/src/
@@ -53,13 +52,13 @@ cat << 'EOF' >  add_catch.patch
 @@ -143,10 +143,13 @@
      run(cmd)
      println()
- 
+
 +try
      println("running: rm -rf $(tmpdir) $(sys.buildfile).o $(sys.inference).o $(sys.inference).ji $(sys.inference0).o $(sys.inference0).ji")
      map(f-> rm(f, recursive=true), [tmpdir, sys.buildfile*".o", sys.inference*".o", sys.inference*".ji", sys.inference0*".o", sys.inference0*".ji"])
      println()
 +end
- 
+
 +try
      if targetdir != nothing
          # Move created files to target directory
@@ -98,7 +97,9 @@ println("Done Using!")
 
 if isfile("/root/chaipcr/bioinformatics/build/exec_testfns.jl")
 	println("Function test script found.. executing by precompile script!")
+try
 	include("/root/chaipcr/bioinformatics/build/exec_testfns.jl")
+end
 else
 	println("Function test script not found!")
 end
@@ -107,27 +108,7 @@ function main()
 
 	println("Main is executed!")
 	#reload("QpcrAnalysis")
-
-  # load test functions
-  import FactCheck: clear_results
-  import DataFrames: DataFrame
-  import DataStructures: OrderedDict
-  import BSON: bson
-  import JSON: json, parse, parsefile
-  test_functions = BSON.load("../test/data/dispatch_tests.bson")
-
-  # run 13 analyses through QpcrAnalysis.dispatch()
-  println("Accessing dispatch functions")
-  check = OrderedDict(map(keys(test_functions)) do testname
-      result = test_functions[testname]()
-      testname => result[1] && result[2]["valid"]
-  end)
-  # all test results must be positive, or else an error will be raised
-  @assert all(values(check)) 
-
 	println("dispatch time no JIT:")
-	@time test_functions["amplification dual channel"]() 
-	println("Done dispatch time test")
 	include("/root/chaipcr/bioinformatics/juliaserver.jl")
 	println("Server Exit")
 end
@@ -173,16 +154,9 @@ fi
 
 echo testing juliaserver script to make sure nothing left to precompile as we are removing the compilation tools later to free up space.
 
-test_julia_server2()
-{
-     JULIA_ENV=production julia -e 'push!(LOAD_PATH, "/root/chaipcr/bioinformatics/QpcrAnalysis/"); 
-     include("/root/chaipcr/bioinformatics/juliaserver.jl")'
-     echo error: julia server terminated
-}
-
 test_julia_server()
 {
-       if [ -e /tmp/output/qpcranalysis.so ] 
+       if [ -e /tmp/output/qpcranalysis.so ]
        then
              echo moving qpcranalysis.so
              date
