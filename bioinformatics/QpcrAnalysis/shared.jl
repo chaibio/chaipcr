@@ -1,43 +1,55 @@
-# functions used by multiple analytic methods
+## functions used by multiple analytic methods
 
 import DataStructures.OrderedDict
 import Base: getindex
 
 
-# using suggestion of MikeInnes https://github.com/JuliaLang/julia/issues/5571#issuecomment-446321504
-# overload :[ operator to enable function composition by piping with arguments
-# e.g. dict |> values |> map[function] |> reduce[vcat]
+## using suggestion of MikeInnes https://github.com/JuliaLang/julia/issues/5571#issuecomment-446321504
+## overload :[ operator to enable function composition by piping with arguments
+## e.g. dict |> values |> map[function] |> reduce[vcat]
 
 getindex(f ::Function, x...) = (y...) -> f(x..., y...)
 
-# synonyms for getindex
+## synonyms for getindex
 index(i,x)  = getindex(x,i)
 subset(i,x) = getindex(x,i)
 
-# synonym for getfield
+## synonym for getfield
 field(f,x)  = getfield(x,f)
 
-# used in meltcrv.jl
-inc_index(i ::Integer, len ::Integer) = (i >= len) ? len : i + 1
-dec_index(i ::Integer) = (i <= 1) ? 1 : i - 1
-
-# unused function
-# curried function
-# returns true when data == value, false otherwise
+## unused function
+## curried function
+## returns true when data == value, false otherwise
 selector(value ::Integer) =
     data ::AbstractArray -> (data .== value)
 
-# used in meltcrv.jl
+## used in amp.jl
+str2sym(x) = typeof(x) == String ? Symbol(x) : x
+
+## used in adj_w2wvaf.jl
+## used in meltcrv.jl
+sweep(summary_func) = sweep_func -> (x -> sweep_func.(x, summary_func(x)))
+
+## used in meltcrv.jl
+## normalize values to a range from 0 to 1
+normalize_range(x ::AbstractArray) =
+    sweep(minimum)(-)(x) |> sweep(maximum)(/)
+
+## used in meltcrv.jl
+inc_index(i ::Integer, len ::Integer) = (i >= len) ? len : i + 1
+dec_index(i ::Integer) = (i <= 1) ? 1 : i - 1
+
+## used in meltcrv.jl
 is_increasing(x ::AbstractVector) =
     x[1:end-1] .< x[2:end]
 
-# used in meltcrv.jl
-# truncate elements to length of shortest element
+## used in meltcrv.jl
+## truncate elements to length of shortest element
 shorten(x...) =
     map(y -> y[range(1, x |> map[length] |> minimum)], x)
 
-# used in meltcrv.jl
-# extend vector with NaN values to a specified length
+## used in meltcrv.jl
+## extend vector with NaN values to a specified length
 extend_NaN(len ::Integer, vec ::AbstractVector) =
     len - length(vec) |>
         m -> 
@@ -45,29 +57,29 @@ extend_NaN(len ::Integer, vec ::AbstractVector) =
                 (m |> fill[NaN] |> vcat[vec]) :
                 error("vector is too long")
 
-# extend array elements with NaNs to length of longest element
+## extend array elements with NaNs to length of longest element
 extend(x ::AbstractArray) =
     map(extend_NaN[(x |> map[length] |> maximum)], x)
 
-# used in meltcrv.jl
-# normalize values to floor of 0
-subtract_minimum(x ::AbstractArray) =
-    x .- minimum(x)
-
-# used in meltcrv.jl
-# normalize values to a range from 0 to 1
-function normalize_range(x ::AbstractArray)
-    min_x = minimum(x)
-    max_x = maximum(x)
-    range_x = max_x - min_x
-    return (x .- min_x) ./ range_x
+## used in meltcrv.jl
+## used in pnmsmu.jl
+# find nearby data points in vector
+# `giis` - get indices in span
+function giis_uneven(
+    X      ::AbstractVector,
+    i      ::Integer,
+    span_x ::Real
+)
+    return find(X) do x
+        X[i] - span_x <= x <= X[i] + span_x
+    end
 end
 
-# find the indices in a vector
-# where the value at the index equals the summary
-# value of the sliding window centering at the index
-# (window width = number of data points in the whole window).
-# can be used to find local summits and nadirs
+## find the indices in a vector
+## where the value at the index equals the summary
+## value of the sliding window centering at the index
+## (window width = number of data points in the whole window).
+## can be used to find local summits and nadirs
 function find_mid_sumr_bysw(
     vals       ::AbstractVector,
     half_width ::Integer,
@@ -81,10 +93,10 @@ function find_mid_sumr_bysw(
         map[v -> sumr_func(v) == v[half_width + 1]] |> find
 end
 
-# used in meltcrv.jl
+## used in meltcrv.jl
 ordered_tuple(x, y) = (x < y) ? (x, y) : (y, x)
 
-# used in meltcrv.jl
+## used in meltcrv.jl
 function split_vector_and_return_larger_quantile(
     x                   ::AbstractVector,
     len                 ::Integer,          # == length(x)
@@ -96,12 +108,11 @@ function split_vector_and_return_larger_quantile(
         maximum
 end
 
-# used in meltcrv.jl
+## used in meltcrv.jl
 report(digits ::Int, x) = round.(x, digits)
 
-# functions
-# moved to MySQLforQpcrAnalysis.jl: get_mysql_data_well
-
+## functions
+## moved to MySQLforQpcrAnalysis.jl: get_mysql_data_well
 
 # construct DataFrame from dictionary key and value vectors
 # `dict_keys` need to be a vector of strings
@@ -116,29 +127,31 @@ function dictvec2df(dict_keys ::AbstractVector, dict_values ::AbstractVector)
     return df
 end
 
+## used in adj_w2wvaf.jl
+num_channels(fluos ::AbstractArray) =
+    (length(fluos) > 1) && (fluos[2] != nothing) ? 2 : 1
+
+num_channels(calib ::Associative) =
+    calib |>
+        keys |>
+        map[key -> num_channels(calib[key]["fluorescence_value"])] |>
+        maximum
+
+num_wells(fluos ::AbstractArray) =
+    fluos |> map[length] |> maximum
+
+num_wells(calib ::Associative) =
+    calib |>
+        keys |>
+        map[key -> num_wells(calib[key]["fluorescence_value"])] |>
+        maximum
 
 # duplicated in MySQLforQpcrAnalysis.jl
 get_ordered_keys(dict ::Dict) =
-    sort(collect(keys(dict)))
-
+    dict |> keys |> collect |> sort
+    
 get_ordered_keys(ordered_dict ::OrderedDict) =
-    collect(keys(ordered_dict))
-
-
-# used in meltcrv.jl
-# used in pnmsmu.jl
-# find nearby data points in vector
-# `giis` - get indices in span
-function giis_uneven(
-    X      ::AbstractVector,
-    i      ::Integer,
-    span_x ::Real
-)
-    return find(X) do x
-        X[i] - span_x <= x <= X[i] + span_x
-    end
-end
-
+    ordered_dict |> keys |> collect
 
 # parse AbstractFloat on BBB
 function parse_af{T<:AbstractFloat}( ::Type{T}, strval ::String)
@@ -146,7 +159,6 @@ function parse_af{T<:AbstractFloat}( ::Type{T}, strval ::String)
     float_parts = map(str_part -> Base.parse(Int32, str_part), str_parts)
     return float_parts[1] + float_parts[2] / 10^length(str_parts[2])
 end
-
 
 # print with verbose control
 function print_v(
@@ -162,7 +174,6 @@ function print_v(
 end
 
 # unused function
-#
 # repeat n times: take the output of an function and use it as the input for the same function
 function redo(
     func ::Function,
@@ -292,17 +303,6 @@ end # ensure_ci
 #     return (found_well_namedtuple, found_well_nums)
 # end
 
-num_channels(calib ::Associative) =
-    any([
-        (length(field) > 1) && (calib[field]["fluorescence_value"][2] != nothing)
-        for field in keys(calib)]) ? 
-            2 : 1
-
-num_wells(calib ::Associative) =
-    calib |>
-        keys |>
-        map[key -> (calib[key]["fluorescence_value"] |> map[length] |> maximum)] |>
-        maximum
 
 
 

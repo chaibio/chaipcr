@@ -7,7 +7,7 @@ struct ClusterAnalysisResult
     init_centers        ::Array{Float64,2} # no longer necessary because it represents one combination of genotypes, but different combinations of genotypes with the same number of genotypes may result in the same clustering results
     dist_mtx_winit      ::Array{Float64,2}
     cluster_result      ::ClusteringResult
-    init_centers        ::Array{Float64,2}
+    centers             ::Array{Float64,2}
     slhts               ::Vector{Float64}
     slht_mean           ::Float64
     check_dist_mtx      ::Array{Float64,2}
@@ -31,10 +31,10 @@ end # type
 
 ## constant for in allelic_discrimination.jl
 const CATEG_WELL_VEC = [
-    ("rbbs_ary3",   Colon()),
-    ("blsub_fluos", Colon()),
-    ("d0",          Colon()),
-    ("cq",          Colon())
+    (:rbbs_ary3,   Colon()),
+    (:blsub_fluos, Colon()),
+    (:d0,          Colon()),
+    (:cq,          Colon())
 ]
 
 ## 3 groups without NTC

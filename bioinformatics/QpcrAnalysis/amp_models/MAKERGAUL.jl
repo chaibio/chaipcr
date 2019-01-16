@@ -83,7 +83,7 @@ function fit(
     min_of = minimum(obs_fluos)
     of_diff = max_of - min_of
     fb_b_abs = fb_B_MULTIPLE * of_diff
-    
+
     @variable(jmp_model,
         # min_of - fb_b_abs <= fb <= min_of + fb_b_abs,
         fb,
@@ -157,7 +157,7 @@ end # fit(::MAKERGAUL3)
 
 
 function fit(
-    ::MAKERGAUL3,
+    ::MAKERGAUL4,
     cycs        ::AbstractVector, # continous integers or not
     obs_fluos   ::AbstractVector,
     wts         ::AbstractVector=ones(length(obs_fluos));

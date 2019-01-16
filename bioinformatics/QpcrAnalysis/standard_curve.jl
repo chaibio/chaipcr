@@ -12,9 +12,7 @@ import DataFrames: DataFrame, by
 # `/slope` for log (DNA copy#) is on the x-axis and Cq on the y-axis, otherwise `*slope`
 function act(
     ::StandardCurve,
-
     req_vec     ::Vector{Any};
-
     out_format  ::Symbol = :pre_json,
     verbose     ::Bool =false,
     json_digits ::Integer =JSON_DIGITS,

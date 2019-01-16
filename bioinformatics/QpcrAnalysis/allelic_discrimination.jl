@@ -7,7 +7,7 @@ import Combinatorics.combinations
 
 ## nrn: whether to flip the binary genotype or not
 NRN_SELF = x -> x
-NRN_NOT = x -> 1 .- x
+NRN_NOT  = x -> 1 .- x
 
 
 ## start with bottom-level function, goes step-wise
@@ -50,7 +50,7 @@ end # prep_data_4ad
 function do_cluster_analysis(
     raw_data        ::AbstractMatrix,
     init_centers    ::AbstractMatrix,
-    cluster_method  ::Symbol = :k-means-medoids,
+    cluster_method  ::Symbol = :k_means_medoids,
     norm_l          ::Real =2
 )
     num_wells = size(raw_data)[2]
@@ -70,16 +70,16 @@ function do_cluster_analysis(
         for i in 1:num_wells_winit, j in 1:num_wells_winit ]
 
     ## clustering
-    if cluster_method in [:k-means, :k-means-medoids]
+    if cluster_method in [:k_means, :k_means_medoids]
         # run k-means whether finally using k-means or k-medoids
         cluster_result = kmeans!(new_data, copy(init_centers)) # ideally the element with the same index between `init_centers` and `cluster_result.centers` should be for the same genotype
-        if cluster_method == :k-means
+        if cluster_method == :k_means
             centers = cluster_result.centers
-        elseif cluster_method == :k-means-medoids
+        elseif cluster_method == :k_means_medoids
             init_centers = cluster_result.centers # using centers found by k-means
         end
     end
-    if cluster_method in [:k-means-medoids, :k-medoids]
+    if cluster_method in [:k_means_medoids, :k_medoids]
         cluster_result = kmedoids!(dist_mtx_winit, Vector{Int}((1:num_centers) + num_wells))
         centers = data_winit[:, cluster_result.medoids]
     end # if cluster_method
@@ -172,7 +172,7 @@ function assign_genos(
     ntc_bool_vec        ::Vector{Bool},
     expected_ncg_raw    ::AbstractMatrix =DEFAULT_encgr,
     ctrl_well_dict      ::OrderedDict =CTRL_WELL_DICT,
-    cluster_method      ::Symbol = :k-means-medoids,
+    cluster_method      ::Symbol = :k_means_medoids,
     norm_l              ::Real =2,
 
     ## below not specified by `process_ad` as of right now
@@ -453,8 +453,8 @@ function process_ad(
     # OrderedDict(
     #     categ => Clustering.ClusteringResult,
     # )
-    assignments_adj_labels_dict = OrderedDict{String,Vector{String}}()
-    agr_dict = OrderedDict{String,AssignGenosResult}()
+    assignments_adj_labels_dict = OrderedDict{Symbol,Vector{Symbol}}()
+    agr_dict = OrderedDict{Symbol,AssignGenosResult}()
     #
     ## indicate a well as NTC if all the channels have NaN as Cq
     ntc_bool_vec = map(1:length(full_amp_out.fluo_well_nums)) do i

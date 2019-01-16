@@ -6,7 +6,6 @@ import JSON.json
 
 function act(
     ::OpticalTestDualChannel,
-
     ## remove MySqldependency    
     #
     # db_conn ::MySQL.MySQLHandle,
@@ -15,12 +14,9 @@ function act(
     # 
     # start: arguments that might be passed by upstream code
     # well_nums ::AbstractVector =[],
-
-    ## new >>
     ot_dict         ::Associative; # keys: "baseline", "water", "FAM", "HEX"
     out_format      ::Symbol = :pre_json,
     verbose         ::Bool =false
-    ## << new
 )
     ## remove MySql dependency
     #
@@ -36,40 +32,33 @@ function act(
     #
     # num_wells = length(fluo_well_nums)
 
-    ## new >>
     # fluo_dict = OrderedDict(map(old_calib_labels) do calib_label # old
-    fluo_dict = OrderedDict(map(1:length(OLD_CALIB_LABELS)) do calib_label_i
-    ## << new
-        OLD_CALIB_LABELS[calib_label_i] => hcat(map(CHANNELS) do channel # use old labels internally
+    fluo_dict = OrderedDict(map(1:length(OLD_CALIB_SYMBOLS)) do calib_label_i
+        OLD_CALIB_SYMBOLS[calib_label_i] => hcat(map(CHANNELS) do channel # use old labels internally
             ## remove MySql dependency
             #
             # fluo_data[:fluorescence_value][
             #     (fluo_data[:step_id] .== calib_info[calib_label]["step_id"]) .& (fluo_data[:channel] .== channel)
             # ]
-
-            ## new >>
-            ot_dict[NEW_CALIB_LABELS[calib_label_i]]["fluorescence_value"][channel]
-            ## << new
+            ot_dict[string(NEW_CALIB_SYMBOLS[calib_label_i])]["fluorescence_value"][channel]
         end...) # do channel
     end) # do calib_label
-    ## new >>
-    num_wells = size(fluo_dict["baseline"])[1]
-    ## << new
+    num_wells = size(fluo_dict[:baseline])[1]
     bool_dict = OrderedDict(:baseline => fill(true, num_wells, length(CHANNELS)))
     #
     ## water test
     bool_dict[:water] = hcat(map(CHANNEL_IS) do channel_i
-        map(fluo_dict["water"][:, channel_i]) do fluo_pw
+        map(fluo_dict[:water][:, channel_i]) do fluo_pw
             fluo_pw < WATER_MAX[channel_i] && fluo_pw > WATER_MIN[channel_i]
         end # do fluo_pw
     end...) # end
     #
     ## FAM and HEX SNR test
-    for calib_label in CALIB_LABELS_FAM_HEX
+    for calib_label in CALIB_SYMBOLS_FAM_HEX
         bool_dict[calib_label] = vcat(map(1:num_wells) do well_i
-            baseline_2chs = fluo_dict["baseline"][well_i, :]
+            baseline_2chs = fluo_dict[:baseline][well_i, :]
             signal_fluo_2chs = fluo_dict[calib_label][well_i, :] .- baseline_2chs
-            water_fluo_2chs = fluo_dict["water"][well_i, :] .- baseline_2chs
+            water_fluo_2chs = fluo_dict[:water][well_i, :] .- baseline_2chs
             snr_2chs = (signal_fluo_2chs .- water_fluo_2chs) ./ signal_fluo_2chs
             transpose(dscrmnts_snr[calib_label](transpose(snr_2chs)))
         end...) # do well_i
@@ -77,9 +66,9 @@ function act(
     #
     ## organize "optical_data"
     optical_data = map(1:num_wells) do well_i
-        OrderedDict(map(1:length(OLD_CALIB_LABELS)) do cl_i
-            old_calib_label = OLD_CALIB_LABELS[cl_i]
-            NEW_CALIB_LABELS[cl_i] => map(CHANNEL_IS) do channel_i
+        OrderedDict(map(1:length(OLD_CALIB_SYMBOLS)) do cl_i
+            old_calib_label = OLD_CALIB_SYMBOLS[cl_i]
+            NEW_CALIB_SYMBOLS[cl_i] => map(CHANNEL_IS) do channel_i
                 (fluo_dict[old_calib_label][well_i, channel_i], bool_dict[old_calib_label][well_i, channel_i])
             end # do channel_i
         end) # do cl_i
@@ -99,9 +88,9 @@ function act(
     ## reporting negative or infinite values
     #
     ## substract water values from signal values
-    swd_vec = map(CALIB_LABELS_FAM_HEX) do calib_label
+    swd_vec = map(CALIB_SYMBOLS_FAM_HEX) do calib_label
         map(CHANNEL_IS) do channel_i
-            fluo_dict[calib_label][:, channel_i] .- fluo_dict["water"][:, channel_i]
+            fluo_dict[calib_label][:, channel_i] .- fluo_dict[:water][:, channel_i]
         end # do channel_i
     end # do calib_label
     ## calculate normalization values from data in target channels

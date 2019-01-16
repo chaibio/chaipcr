@@ -3,18 +3,14 @@
 
 function act(
     ::ThermalPerformanceDiagnostic,
-
     ## remove MySql dependency               
     #
     # db_conn ::MySQL.MySQLHandle,
     # exp_id ::Integer, # really used
     # calib_info ::Union{Integer,OrderedDict} # not used for computation
-
-    ## new >>
     temperatureData ::Associative;
     out_format      ::Symbol = :pre_json,
     verbose         ::Bool =false
-    ## << new
 )
     ## remove MySql dependency
     #
@@ -22,10 +18,8 @@ function act(
     # temperatureData = MySQL.mysql_execute(db_conn, queryTemperatureData)[1]       
     # num_dp = length(temperatureData[1]) # dp = data points
 
-    ## new >>
     num_dp = length(temperatureData["elapsed_time"])
-    ## << new
-
+    #
     ## add a new column (not row) that is the average of the two heat block zones
     hbzt_avg = map(1:num_dp) do i
         mean(map(name -> temperatureData[name][i], ["heat_block_zone_1_temp", "heat_block_zone_2_temp"]))

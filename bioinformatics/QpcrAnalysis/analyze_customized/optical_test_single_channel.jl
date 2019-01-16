@@ -6,7 +6,6 @@ import JSON.json
 
 function act(
     ::OpticalTestSingleChannel,
-
     ## remove MySql dependency
     #
     # db_conn ::MySQL.MySQLHandle,
@@ -14,12 +13,9 @@ function act(
     # calib_info ::Union{Integer,OrderedDict} =calib_info_AIR; # not used for computation
     # start: arguments that might be passed by upstream code
     # well_nums ::AbstractVector =[],
-
-    ## new >>
     ot_dict         ::Associative;
     out_format      ::Symbol = :pre_json,
     verbose         ::Bool =false
-    ## << new
 )
     ## remove MySql dependency
     #
@@ -69,3 +65,8 @@ function act(
         return output
     end
 end # analyze_optical_test_single_channel()
+
+
+
+
+#

@@ -10,19 +10,14 @@ import JSON
 function act(
     ::OpticalCal,
     calib_info  ::Associative;
-
-    ## new >>
     well_nums   ::AbstractVector =[],
-    out_format  ::String = :pre_json,
+    out_format  ::Symbol = :pre_json,
     verbose     ::Bool =false,
-    ## << new
-
     ## remove MySql dependency  
     #
     # db_conn::MySQL.MySQLHandle,
     # exp_id::Integer, # not used for computation
     # calib_info::Union{Integer,OrderedDict}; # really used
-
     dye_in      ::Symbol = :FAM, 
     dyes_2bfild ::Vector =[]
 )
@@ -37,22 +32,16 @@ function act(
     #     "dict: ", calib_info_dict
     # )
 
-    ## new >>
     calib_info_dict = calib_info["calibration_info"]
-    ## << new
     result = OrderedDict(:valid => true)
     err_msg_vec = Vector{String}()
     #
     ## prep_adj_w2wvaf
     result_aw = try
-
         ## remove MySql dependency
         #
         # prep_adj_w2wvaf(db_conn, calib_info_dict, well_nums, dye_in, dyes_2bfild)
-
-        ## new >>
         prep_adj_w2wvaf(calib_info_dict, well_nums, dye_in, dyes_2bfild)
-        ## << new
     catch err
         err
     end
@@ -65,11 +54,8 @@ function act(
         ## the deconvoltion matrix K is calculate
         ## otherwise deconvolution is not performed
         result_k = try
-
             ## remove MySql dependency
-            #
             #    get_k(db_conn, calib_info_dict, well_nums)
-
             get_k(calib_info_dict, well_nums)
         catch err
             err

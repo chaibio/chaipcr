@@ -5,59 +5,46 @@ import Dierckx: Spline1D, derivative
 
 function act(
     ::ThermalConsistency,
-
     ## remove MySql dependency
     #
     # db_conn ::MySQL.MySQLHandle,
     # exp_id ::Integer,
     # stage_id ::Integer,
     # calib_info ::Union{Integer,OrderedDict};
-
-    ## new >>
     req_dict            ::Associative;
     out_format          ::Symbol = :pre_json,
     verbose             ::Bool =false,
-    ## << new
-    
     ## start: arguments that might be passed by upstream code
     well_nums           ::AbstractVector =[],
     auto_span_smooth    ::Bool =false,
     span_smooth_default ::Real =0.015,
     span_smooth_factor  ::Real =7.2,
     # end: arguments that might be passed by upstream code
-
-    dye_in              ::String ="FAM",
+    dye_in              ::Symbol =:FAM,
     dyes_2bfild         ::AbstractVector =[],
     dcv                 ::Bool =true, # logical, whether to perform multi-channel deconvolution
 	max_tmprtr          ::Real =1000, # maximum temperature to analyze
 )
-    const keys_req_dict = keys(req_dict)
     kwdict_mc_tm_pw = OrderedDict{Symbol,Any}()
-    if "qt_prob" in keys_req_dict
-        kwdict_mc_tm_pw[:qt_prob_flTm] ::Float64 = req_dict["qt_prob"]
+    if haskey(req_dict, "qt_prob")
+        kwdict_mc_tm_pw[:qt_prob_flTm] = req_dict["qt_prob"]
     end
-    if "max_normd_qtv" in keys_req_dict
-        kwdict_mc_tm_pw[:normd_qtv_ub] ::Float64 = req_dict["max_normd_qtv"]
+    if haskey(req_dict, "max_normd_qtv")
+        kwdict_mc_tm_pw[:normd_qtv_ub] = req_dict["max_normd_qtv"]
     end
-    if "top_N" in keys_req_dict
-        kwdict_mc_tm_pw[:top_N] ::Int = req_dict["top_N"]
+    if haskey(req_dict, "max_normd_qtv")
+        kwdict_mc_tm_pw[:top_N] = req_dict["top_N"]
     end
 
     ## process data as melting curve
     mc_w72c = process_mc(
-
         ## remove MySql dependency
-        #
         # db_conn,
         # exp_id,
         # stage_id,
         # calib_info;
-
-        ## new >>
         req_dict["raw_data"],
         req_dict["calibration_info"];
-        ## << new
-
         well_nums = well_nums,
         auto_span_smooth = auto_span_smooth,
         span_smooth_default = span_smooth_default,

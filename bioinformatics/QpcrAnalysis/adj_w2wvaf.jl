@@ -20,25 +20,17 @@ function adj_w2wvaf(
     minus_water               ::Bool =false,
     scaling_factor_adj_w2wvaf ::Real =SCALING_FACTOR_adj_w2wvaf
 )
-    fluo = transpose(fluo2btp)
-
-    wva_water, wva_signal = map(["water", "signal"]) do wva_type
-        wva_data[wva_type][channel][wva_well_idc_wfluo]
-    end # do oc_type
-
-    if !minus_water
-        wva_water = 0
-    end # if
-
-    signal_water_diff = wva_signal .- wva_water
-    swd_normd = signal_water_diff ./ mean(signal_water_diff)
-
-    fluo_aw_vec = map(1:size(fluo)[2]) do i
+    const fluo = transpose(fluo2btp)
+    const wva_water = minus_water ?
+        wva_data[:water ][channel][wva_well_idc_wfluo] : 0
+    const wva_signal = 
+        wva_data[:signal][channel][wva_well_idc_wfluo]
+    const signal_water_diff = wva_signal .- wva_water
+    const swd_normd = sweep(mean)(-)(signal_water_diff)
+    const fluo_aw_vec = map(1:size(fluo)[2]) do i
         scaling_factor_adj_w2wvaf .* (fluo[:,i] .- wva_water) ./ swd_normd
     end # do i
-
     return transpose(hcat(fluo_aw_vec...))
-
 end # adj_w2wvaf
 
 
@@ -151,7 +143,6 @@ end
 # function: check whether the data in optical calibration experiment is valid
 # if so, prepare calibration data by subtracting background (water) fluorescence values
 function prep_adj_w2wvaf(
-
     ## remove MySql dependency
     #
     # db_conn ::MySQL.MySQLHandle,
@@ -161,16 +152,11 @@ function prep_adj_w2wvaf(
     # "channel_1"=OrderedDict(calibration_id=..., step_id=...),
     # "channel_2"=OrderedDict(calibration_id=...", step_id=...))
     # calib_info ::Union{Integer,OrderedDict}, 
-
-    # new >>
     calib_data  ::Associative, 
-    # << new
-
     well_nums   ::AbstractVector,
     dye_in      ::Symbol = :FAM,
     dyes_2bfild ::AbstractVector =[]
 )
-
     ## remove MySql dependency
     #
     # calib_info = ensure_ci(db_conn, calib_info)
@@ -222,11 +208,10 @@ function prep_adj_w2wvaf(
     #     error("Data lengths are not equal across all the channels and/or between water and signal. Water: $water_lengths. Signal: $signal_lengths. ")
     # end
 
-    # new >>
     ## issue:
     ## using the current format for the request body there is no well_num information
     ## associated with the calibration data
-    channels_in_water = (length(calib_data["water"]["fluorescence_value"])<2 ||
+    channels_in_water = (length(calib_data["water"]["fluorescence_value"]) < 2 ||
         calib_data["water"]["fluorescence_value"][2]==nothing) ? 1 : 2
     #
     water_data_dict  = OrderedDict{UInt8,Any}()
@@ -257,20 +242,17 @@ function prep_adj_w2wvaf(
     if (length(stop_msgs) > 0)
         error(join(stop_msgs, ""))
     end
-    channels_in_water  = sort(collect(keys(water_data_dict)))
-    channels_in_signal = sort(collect(keys(signal_data_dict)))
+    channels_in_water, channels_in_signal =
+        (water_data_dict, signal_data_dict) |> map[get_ordered_keys]
     #
     # assume without checking that there are no missing wells anywhere
-    signal_well_nums = Vector(1:length(signal_data_dict[1]))
-    # << new
-
+    const signal_well_nums = collect(1:length(signal_data_dict[1]))
+    #
     # check whether signal fluo > water fluo
     stop_msgs = Vector{String}()
     for channel_in_signal in channels_in_signal
         wva_invalid_idc = find(
-            signal_minus_water -> (signal_minus_water <= 0),
-            signal_data_dict[channel_in_signal] .- water_data_dict[channel_in_signal]
-        )
+            signal_data_dict[channel_in_signal] .<= water_data_dict[channel_in_signal])
         if length(wva_invalid_idc) > 0
             failed_well_nums_str = join(signal_well_nums[wva_invalid_idc], ", ")
             push!(stop_msgs,
@@ -326,9 +308,7 @@ function prep_adj_w2wvaf(
         :water  => water_data_dict, # enforce data type
         :signal => signal_data_dict # enforce data type
     )
-
     return (wva_data, signal_well_nums)
-
 end # prep_adj_w2wvaf
 
 
