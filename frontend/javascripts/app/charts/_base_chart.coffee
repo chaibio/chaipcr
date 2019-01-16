@@ -15,6 +15,7 @@ class BaseChart
   zoomTransform: {x: 0, y: 0, k: 1}
   isZooming: false
   INPUT_PADDING: 5
+  EXTREME_PADDING: 10
 
   MARGIN:
     left: 0
@@ -325,6 +326,8 @@ class BaseChart
     line.x (d) -> xScale(d[line_config.x])
     line.y (d) -> yScale(d[line_config.y])
 
+    if (@config.axes.y.scale is 'log') then line.defined (d) -> d[line_config.y] > 10
+
     # console.log('@data')
     # console.log(@data)
 
@@ -421,15 +424,17 @@ class BaseChart
         .attr('r', @CIRCLE_RADIUS)
         .attr('stroke', '#fff')
         .attr('stroke-width', @CIRCLE_STROKE_WIDTH)
-        .attr('transform', 'translate (50,50)')
-        .on('mouseout', => @hideMouseIndicators())
-        .on('mousemove', => @mouseMoveCb())
+        .attr('transform', 'translate (0,0)')
+        .on('mouseout', =>           
+          @hideMouseIndicators())
+        .on('mousemove', =>           
+          @mouseMoveCb())
         .on('click', =>
           @circle.remove()
           @unsetActivePath()
           if @hoveredLine
             mouse = @getMousePosition(@mouseOverlay.node())
-            @setActivePath(@hoveredLine, mouse)
+            @setActivePath(@hoveredLine, mouse)          
         )
 
     if @activePathConfig
@@ -556,6 +561,16 @@ class BaseChart
         .call(@yAxis)
         .on('mouseenter', => @hideMouseIndicators())
 
+    svg.append("line")
+    .attr("shape-rendering", "crispEdges")
+    .attr("class", "long-axis")
+    .attr("x1", 0)
+    .attr("y1", 0 - @height * 0.2)
+    .attr("x2", 0)
+    .attr("y2", @height * 1.2)
+    .style("stroke-width", 1)
+    .style("fill", "none");
+
     if @zoomTransform.rescaleY
       @gY.call(@yAxis.scale(@zoomTransform.rescaleY(@yScale)))
     #text label for the y axis
@@ -566,9 +581,9 @@ class BaseChart
     return if not @config.axes.y.label
     svg = @chartSVG.select('.chart-g')
     @yAxisLabel = svg.append("text")
-      .attr("class", "g-y-axis-text")
+      .attr("class", "G1M")
       .attr("transform", "rotate(-90)")
-      .attr("y", 0 - @MARGIN.left + 5)
+      .attr("y", 0 - @MARGIN.left + 10)
       .attr("x", 0 - (@height / 2))
       .attr("dy", "1em")
       .attr("fill", "#333")
@@ -596,25 +611,34 @@ class BaseChart
         .attr("transform", "translate(0," + @height + ")")
         .call(@xAxis)
         .on('mouseenter', => @hideMouseIndicators())
+
+    svg.append("line")
+    .attr("shape-rendering", "crispEdges")
+    .attr("class", "long-axis")
+    .attr("x1", 0 - @width * 0.2)
+    .attr("y1", @height)
+    .attr("x2", @width * 1.2)
+    .attr("y2", @height)
+    .style("stroke-width", 1)
+    .style("fill", "none");
+
     if @zoomTransform.rescaleX
       @gX.call(@xAxis.scale(@zoomTransform.rescaleX(@xScale)))
 
     # text label for the x axis
-    # @setXAxisLabel()
+    @setXAxisLabel()
 
-  # setXAxisLabel: ->
-    # return if not (@config.axes.x.label)
-    # svg = @chartSVG.select('.chart-g')
-    # @xAxisLabel = svg.append("text")
-    #   .attr('class', 'g-x-axis-text')
-    #   .attr("transform",
-    #     "translate(" + (@width / 2) + " ," +
-    #     (@height + @MARGIN.top + @MARGIN.bottom - 20) + ")")
-    #   .style("text-anchor", "middle")
-    #   .attr("font-family", "dinot-bold")
-    #   .attr("font-size", "#{@AXIS_LABEL_FONT_SIZE}pt")
-    #   .attr("fill", "#333")
-    #   .text(@config.axes.x.label)
+  setXAxisLabel: ->
+    return if not (@config.axes.x.label)
+    svg = @chartSVG.select('.chart-g')
+    @xAxisLabel = svg.append("text")
+      .attr('class', 'G1M')
+      .attr("transform",
+        "translate(" + (@width / 2) + " ," +
+        (@height + @MARGIN.top + @MARGIN.bottom - 40) + ")")
+      .style("text-anchor", "middle")
+      .attr("fill", "#333")
+      .text(@config.axes.x.label)
 
   updateZoomScaleExtent: ->
     return if !@zooomBehavior
@@ -649,7 +673,7 @@ class BaseChart
         conWidth = textWidth + @INPUT_PADDING
         extremeValue.inputContainer
           .attr('width', conWidth)
-          .attr('x', @MARGIN.left - (conWidth / 2))
+          .attr('x', @MARGIN.left + @EXTREME_PADDING)
         extremeValue.text
           .attr('x', @MARGIN.left - (textWidth / 2))
         extremeValue.input
@@ -682,7 +706,7 @@ class BaseChart
       conWidth = extremeValue.text.node().getBBox().width + @INPUT_PADDING
       extremeValue.inputContainer
         .attr('width', conWidth)
-        .attr('x', @MARGIN.left + (if loc is 'x:min' then 0 else @width) - (conWidth / 2))
+        .attr('x', @MARGIN.left + (if loc is 'x:min' then (conWidth / 2) + @EXTREME_PADDING else @width) - (conWidth / 2))
       extremeValue.input
         .style('opacity', 1)
         .style('width', "#{conWidth}px")
@@ -735,9 +759,9 @@ class BaseChart
     @xAxisLeftExtremeValueContainer = textContainer
 
     conWidth = 30
-    conHeight = 14
+    conHeight = 12
     offsetTop = 8.5
-    underlineStroke = 2
+    underlineStroke = 1
     lineWidth = 15
 
     rect = textContainer.append('rect')
@@ -749,9 +773,10 @@ class BaseChart
       .on 'click', => @onClickLeftXAxisInput()
 
     line = textContainer.append('line')
+        .attr("shape-rendering", "crispEdges")
         .attr('stroke', '#000')
         .attr('stroke-width', underlineStroke)
-        .attr('opacity', 0)
+        .attr('opacity', 1)
         .on 'click', => @onClickLeftXAxisInput()
 
     text = textContainer.append('text')
@@ -760,14 +785,14 @@ class BaseChart
         .attr('y', @height + @MARGIN.top + offsetTop)
         .attr('dy', '0.71em')
         .style('font-weight', 'bold')
-        .style('text-decoration', 'underline')
+        # .style('text-decoration', 'underline')
         .on 'click', => @onClickLeftXAxisInput()
 
     inputContainer = textContainer.append('foreignObject')
         .attr('width', conWidth)
         .attr('height', conHeight)
         .attr('y', @height + @MARGIN.top + offsetTop - 4)
-        .attr('x', @MARGIN.left - (conWidth / 2))
+        .attr('x', @MARGIN.left + @EXTREME_PADDING)
         .on 'click', => @onClickLeftXAxisInput()
 
     form = inputContainer.append('xhtml:form')
@@ -785,18 +810,10 @@ class BaseChart
       .style('margin', 0)
       .style('text-align', 'center')
       .style('font-weight', 'bold')
-      .style('text-decoration', 'underline')
+      # .style('text-decoration', 'underline')
       .attr('type', 'text')
-      .on('mouseenter', =>
-        lineWidth = text.node().getBBox().width
-        line.attr('opacity', 1)
-          .attr('x1', @MARGIN.left - (lineWidth / 2))
-          .attr('y1', @height + @MARGIN.top + offsetTop + conHeight - underlineStroke)
-          .attr('x2', @MARGIN.left - (lineWidth / 2) + lineWidth)
-          .attr('y2', @height + @MARGIN.top + offsetTop + conHeight - underlineStroke)
-      )
       .on('mouseout', ->
-        line.attr('opacity', 0)
+        line.attr('opacity', 1)
       )
       .on('click', =>
         @onClickLeftXAxisInput()
@@ -974,9 +991,9 @@ class BaseChart
     @xAxisLeftExtremeValueContainer = textContainer
 
     conWidth = 30
-    conHeight = 14
+    conHeight = 12
     offsetTop = 8.5
-    underlineStroke = 2
+    underlineStroke = 1
     lineWidth = 20
 
     rect = textContainer.append('rect')
@@ -988,6 +1005,7 @@ class BaseChart
         .on 'click', => @onClickRightXAxisInput()
 
     line = textContainer.append('line')
+        .attr("shape-rendering", "crispEdges")
         .attr('stroke', '#000')
         .attr('stroke-width', underlineStroke)
         .attr('opacity', 0)
@@ -999,7 +1017,7 @@ class BaseChart
         .attr('y', @height + @MARGIN.top + offsetTop)
         .attr('dy', '0.71em')
         .style('font-weight', 'bold')
-        .style('text-decoration', 'underline')
+        # .style('text-decoration', 'underline')
         .text(@getMaxX())
         .on 'click', => @onClickRightXAxisInput()
 
@@ -1034,7 +1052,7 @@ class BaseChart
           .attr('y2', @height + @MARGIN.top + offsetTop + conHeight - underlineStroke)
       )
       .on('mouseout', =>
-        line.attr('opacity', 0)
+        line.attr('opacity', 1)
       )
       .on('click', =>
         @onClickRightXAxisInput()
@@ -1086,10 +1104,10 @@ class BaseChart
     @yAxisUpperExtremeValueContainer = textContainer
 
     conWidth = 30
-    conHeight = 14
+    conHeight = 12
     offsetRight = 9
     offsetTop = 2
-    underlineStroke = 2
+    underlineStroke = 1
     lineWidth = 15
     inputContainerOffset = 5
 
@@ -1101,6 +1119,7 @@ class BaseChart
       .on 'click', => @onClickUpperYAxisInput()
 
     line = textContainer.append('line')
+      .attr("shape-rendering", "crispEdges")
       .attr('opacity', 0)
       .attr('stroke', '#000')
       .attr('stroke-width', underlineStroke)
@@ -1113,7 +1132,7 @@ class BaseChart
       .attr('y', @MARGIN.top - underlineStroke * 2)
       .attr('dy', '0.71em')
       .style('font-weight', 'bold')
-      .style('text-decoration', 'underline')
+      # .style('text-decoration', 'underline')
       .text(@getMaxY())
       .on 'click', => @onClickUpperYAxisInput()
 
@@ -1145,13 +1164,13 @@ class BaseChart
       .on('mouseenter', =>
         textWidth = text.node().getBBox().width
         line.attr('x1', @MARGIN.left - (textWidth + offsetRight))
-          .attr('y1', @MARGIN.top + (conHeight / 2) - (underlineStroke / 2))
+          .attr('y1', @MARGIN.top + conHeight - underlineStroke - offsetTop)
           .attr('x2', @MARGIN.left - (textWidth + offsetRight) + textWidth)
-          .attr('y2', @MARGIN.top + (conHeight / 2) - (underlineStroke / 2))
+          .attr('y2', @MARGIN.top + conHeight - underlineStroke - offsetTop)
           .attr('opacity', 1)
       )
       .on('mouseout', ->
-        line.attr('opacity', 0)
+        line.attr('opacity', 1)
       )
       .on('click', =>
         @onClickUpperYAxisInput()
@@ -1209,19 +1228,20 @@ class BaseChart
     conWidth = 30
     conHeight = 14
     offsetRight = 9
-    offsetTop = 2
-    underlineStroke = 2
+    offsetTop = 0
+    underlineStroke = 1
     lineWidth = 15
 
     rect = textContainer.append('rect')
       .attr('fill', '#fff')
       .attr('width', conWidth)
       .attr('height', @AXES_TICKS_FONT_SIZE + offsetTop)
-      .attr('y', @height + @MARGIN.top - (conHeight / 2))
+      .attr('y', @height + @MARGIN.top - conHeight)
       .attr('x', @MARGIN.left - (conWidth + offsetRight))
       .on 'click', => @onClickLowerYAxisInput()
 
     line = textContainer.append('line')
+      .attr("shape-rendering", "crispEdges")
       .attr('opacity', 0)
       .attr('stroke', '#000')
       .attr('stroke-width', underlineStroke)
@@ -1231,12 +1251,12 @@ class BaseChart
       .attr('class', 'g-axis-limit-text')
       .attr('fill', '#000')
       .attr('x', @MARGIN.left - (offsetRight + conWidth))
-      .attr('y', @height + @MARGIN.top - underlineStroke * 2)
+      .attr('y', @height + @MARGIN.top - @EXTREME_PADDING - conHeight)
       .attr('dy', '0.71em')
       # .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       # .attr('font-family', 'dinot-regular')
       .style('font-weight', 'bold')
-      .style('text-decoration', 'underline')
+      # .style('text-decoration', 'underline')
       .text(@getMaxY())
       .on 'click', => @onClickLowerYAxisInput()
 
@@ -1246,7 +1266,7 @@ class BaseChart
       .attr('width', conWidth)
       .attr('x', @MARGIN.left - (conWidth + offsetRight))
       .attr('height', conHeight - offsetTop)
-      .attr('y', @height + @MARGIN.top - (conHeight / 2))
+      .attr('y', @height + @MARGIN.top - conHeight - @EXTREME_PADDING)
       .on 'click', => @onClickLowerYAxisInput()
 
     form = inputContainer.append('xhtml:form')
@@ -1268,16 +1288,8 @@ class BaseChart
       .style('font-weight', 'bold')
       .style('text-decoration', 'underline')
       .attr('type', 'text')
-      .on('mouseenter', =>
-        textWidth = text.node().getBBox().width
-        line.attr('x1', @MARGIN.left - (textWidth + offsetRight))
-          .attr('y1', @height + @MARGIN.top + (conHeight / 2) - (underlineStroke / 2))
-          .attr('x2', @MARGIN.left - (textWidth + offsetRight) + textWidth)
-          .attr('y2', @height + @MARGIN.top + (conHeight / 2) - (underlineStroke / 2))
-          .attr('opacity', 1)
-      )
       .on('mouseout', ->
-        line.attr('opacity', 0)
+        line.attr('opacity', 1)
       )
       .on('click', =>
         @onClickLowerYAxisInput()
@@ -1328,14 +1340,22 @@ class BaseChart
     yScale = @getYScale()
     minWidth = 10
     if @xAxisLeftExtremeValue.text
+      line = @xAxisLeftExtremeValue.line
       text = @xAxisLeftExtremeValue.text
       rect = @xAxisLeftExtremeValue.rect
       minX = if @hasData() then Math.round(xScale.invert(0) * 10) / 10 else @DEFAULT_MIN_X
       text.text(@xAxisTickFormat(minX))
       textWidth = text.node().getBBox().width
-      text.attr('x', @MARGIN.left - (textWidth / 2))
-      rect.attr('x', @MARGIN.left - (textWidth / 2))
+      text.attr('x', @MARGIN.left + @EXTREME_PADDING)
+      rect.attr('x', @MARGIN.left + @EXTREME_PADDING)
         .attr('width', textWidth)
+
+      line.attr('opacity', 1)
+        .attr('x1', @MARGIN.left + @EXTREME_PADDING)
+        .attr('y1', @height + @MARGIN.top + @xAxisLeftExtremeValue.config.offsetTop + @xAxisLeftExtremeValue.config.conHeight - @xAxisLeftExtremeValue.config.underlineStroke)
+        .attr('x2', @MARGIN.left + @EXTREME_PADDING + textWidth)
+        .attr('y2', @height + @MARGIN.top + @xAxisLeftExtremeValue.config.offsetTop + @xAxisLeftExtremeValue.config.conHeight - @xAxisLeftExtremeValue.config.underlineStroke)
+
     if @xAxisRightExtremeValue.text
       maxX = if @hasData() then Math.round(xScale.invert(@width) * 10) / 10 else @DEFAULT_MAX_X
       @xAxisRightExtremeValue.text.text(@xAxisTickFormat(maxX))
@@ -1343,6 +1363,16 @@ class BaseChart
       @xAxisRightExtremeValue.text.attr('x', @width + @MARGIN.left - (textWidth / 2))
       @xAxisRightExtremeValue.rect.attr('x', @width + @MARGIN.left - (textWidth / 2))
         .attr('width', textWidth)
+
+      line = @xAxisRightExtremeValue.line
+      text = @xAxisRightExtremeValue.text
+      textWidth = text.node().getBBox().width
+      line.attr('opacity', 1)
+        .attr('x1', @MARGIN.left + @width - (textWidth / 2))
+        .attr('y1', @height + @MARGIN.top + @xAxisRightExtremeValue.config.offsetTop + @xAxisRightExtremeValue.config.conHeight - @xAxisRightExtremeValue.config.underlineStroke)
+        .attr('x2', @MARGIN.left + @width + (textWidth / 2))
+        .attr('y2', @height + @MARGIN.top + @xAxisRightExtremeValue.config.offsetTop + @xAxisRightExtremeValue.config.conHeight - @xAxisRightExtremeValue.config.underlineStroke)
+
     if @yAxisUpperExtremeValue.text
       text = @yAxisUpperExtremeValue.text
       rect = @yAxisUpperExtremeValue.rect
@@ -1352,7 +1382,17 @@ class BaseChart
       text.attr('x', @MARGIN.left - (@yAxisUpperExtremeValue.config.offsetRight + textWidth))
       rect.attr('x', @MARGIN.left - (@yAxisUpperExtremeValue.config.offsetRight + textWidth))
         .attr('width', textWidth)
+
+      line = @yAxisUpperExtremeValue.line
+      textWidth = text.node().getBBox().width
+      line.attr('x1', @MARGIN.left - (textWidth + @yAxisUpperExtremeValue.config.offsetRight))
+        .attr('y1', @MARGIN.top + @yAxisUpperExtremeValue.config.conHeight - @yAxisUpperExtremeValue.config.underlineStroke - @yAxisUpperExtremeValue.config.offsetTop)
+        .attr('x2', @MARGIN.left - (textWidth + @yAxisUpperExtremeValue.config.offsetRight) + textWidth)
+        .attr('y2', @MARGIN.top + @yAxisUpperExtremeValue.config.conHeight - @yAxisUpperExtremeValue.config.underlineStroke - @yAxisUpperExtremeValue.config.offsetTop)
+        .attr('opacity', 1)
+
     if @yAxisLowerExtremeValue.text
+      line = @yAxisLowerExtremeValue.line
       rect = @yAxisLowerExtremeValue.rect
       text = @yAxisLowerExtremeValue.text
       minY = if @hasData() then Math.round(yScale.invert(@height) * 10) / 10 else @DEFAULT_MIN_Y
@@ -1361,6 +1401,12 @@ class BaseChart
       text.attr('x', @MARGIN.left - (@yAxisLowerExtremeValue.config.offsetRight + textWidth))
       rect.attr('x', @MARGIN.left - (@yAxisLowerExtremeValue.config.offsetRight + textWidth))
         .attr('width', textWidth)
+
+      line.attr('x1', @MARGIN.left - (textWidth + @yAxisLowerExtremeValue.config.offsetRight))
+        .attr('y1', @height + @MARGIN.top - @EXTREME_PADDING * 1.5)
+        .attr('x2', @MARGIN.left - (textWidth + @yAxisLowerExtremeValue.config.offsetRight) + textWidth)
+        .attr('y2', @height + @MARGIN.top - @EXTREME_PADDING * 1.5)
+        .attr('opacity', 1)
 
     @hideLastAxesTicks()
 
@@ -1403,6 +1449,7 @@ class BaseChart
         textWidth = xAxisRightExtremeValueText.node().getBBox().width
         if x >  width - (textWidth + spacingX)
           d3.select(this).attr('opacity', 0)
+      d3.select(this).select('line').attr('opacity', 0)
     # y ticks
     ticks = @chartSVG.selectAll('g.axis.y-axis > g.tick')
     num_ticks = ticks.size()
@@ -1417,6 +1464,10 @@ class BaseChart
         textHeight = yAxisUpperExtremeValueText.node().getBBox().height
         if y < textHeight + spacingY
           d3.select(this).attr('opacity', 0)
+      d3.select(this).select('line').attr('opacity', 0)
+
+    @chartSVG.selectAll('g.axis.x-axis > path.domain').attr('opacity', 0)
+    @chartSVG.selectAll('g.axis.y-axis > path.domain').attr('opacity', 0)
 
   initChart: ->
 

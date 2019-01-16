@@ -350,15 +350,19 @@
     display: none;
   }
 
-  .axis.x-axis {
+  .axis.x-axis{
     path {
-      stroke: grey;
+      stroke: #ccc;
     }
   }
   .axis.y-axis {
     path {
-      stroke: grey;
+      stroke: #ccc;
     }
+  }
+
+  .long-axis{
+    stroke: #ccc;
   }
 
   .num-cycle-text {
@@ -504,6 +508,7 @@
     font-size: 10px;
     line-height: 12px;
     font-weight: normal;
+    fill: #595959;
   }
   
   .g-axis-limit-text {

@@ -397,11 +397,11 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       updateSeries = (buttons) ->
         buttons = buttons || $scope.wellButtons || {}
         $scope.chartConfig.series = []
+        nonGreySeries = []
         subtraction_type = if $scope.baseline_subtraction then 'baseline' else 'background'
         channel_count = if $scope.is_dual_channel then 2 else 1
         channel_end = if $scope.channel_1 && $scope.channel_2 then 2 else if $scope.channel_1 && !$scope.channel_2 then 1 else if !$scope.channel_1 && $scope.channel_2 then 2
         channel_start = if $scope.channel_1 && $scope.channel_2 then 1 else if $scope.channel_1 && !$scope.channel_2 then 1 else if !$scope.channel_1 && $scope.channel_2 then 2
-
 
         for ch_i in [channel_start..channel_end] by 1
           for i in [0..15] by 1
@@ -420,16 +420,44 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                 else
                   well_color = '#8FC742'
 
-                $scope.chartConfig.series.push
-                  dataset: "channel_#{ch_i}"
-                  x: 'cycle_num'
-                  y: "well_#{i}_#{subtraction_type}#{if $scope.curve_type is 'log' then '_log' else ''}"
-                  dr1_pred: "well_#{i}_#{'dr1_pred'}"
-                  dr2_pred: "well_#{i}_#{'dr2_pred'}"
-                  color: well_color
-                  cq: $scope.wellButtons["well_#{i}"]?.ct
-                  well: i
-                  channel: ch_i
+                if $scope.color_by is 'sample'
+                  if well_color is $scope.init_sample_color
+                    $scope.chartConfig.series.push
+                      dataset: "channel_#{ch_i}"
+                      x: 'cycle_num'
+                      y: "well_#{i}_#{subtraction_type}#{if $scope.curve_type is 'log' then '_log' else ''}"
+                      dr1_pred: "well_#{i}_#{'dr1_pred'}"
+                      dr2_pred: "well_#{i}_#{'dr2_pred'}"
+                      color: well_color
+                      cq: $scope.wellButtons["well_#{i}"]?.ct
+                      well: i
+                      channel: ch_i
+                  else
+                    nonGreySeries.push
+                      dataset: "channel_#{ch_i}"
+                      x: 'cycle_num'
+                      y: "well_#{i}_#{subtraction_type}#{if $scope.curve_type is 'log' then '_log' else ''}"
+                      dr1_pred: "well_#{i}_#{'dr1_pred'}"
+                      dr2_pred: "well_#{i}_#{'dr2_pred'}"
+                      color: well_color
+                      cq: $scope.wellButtons["well_#{i}"]?.ct
+                      well: i
+                      channel: ch_i                   
+                else
+                  $scope.chartConfig.series.push
+                    dataset: "channel_#{ch_i}"
+                    x: 'cycle_num'
+                    y: "well_#{i}_#{subtraction_type}#{if $scope.curve_type is 'log' then '_log' else ''}"
+                    dr1_pred: "well_#{i}_#{'dr1_pred'}"
+                    dr2_pred: "well_#{i}_#{'dr2_pred'}"
+                    color: well_color
+                    cq: $scope.wellButtons["well_#{i}"]?.ct
+                    well: i
+                    channel: ch_i
+
+        if $scope.color_by is 'sample'
+          for i in [0..nonGreySeries.length - 1] by 1
+            $scope.chartConfig.series.push(nonGreySeries[i])
 
       $scope.onUpdateProperties = (cycle, rfu, dF_dC, d2_dc2) ->
         $scope.label_cycle = cycle
@@ -498,6 +526,12 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         else 
           $scope.bgcolor_target = { 'background-color':'#666' }
 
+      $scope.onSelectRow = (well_item, index) ->
+        if !$scope.has_init or (($scope.wellButtons['well_' + (well_item.well_num - 1)].selected) and ($scope.omittedIndexes.indexOf(index) == -1) and ($scope.targetsSetHided[$scope.targets[index].id]))
+          if !well_item.active
+            $rootScope.$broadcast 'event:select-row', {well: well_item.well_num, channel: well_item.channel}
+          else
+            $rootScope.$broadcast 'event:unselect-row', {well: well_item.well_num, channel: well_item.channel}
 
       $scope.onSelectLine = (config) ->
         $scope.bgcolor_target = { 'background-color':'black' }
@@ -529,7 +563,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
             if i < $scope.targets.length
               if $scope.samples[i]!=null
-                $scope.label_sample = $scope.samples[i].name
+                $scope.label_sample = $scope.samples[i]?.name
               else
                 $scope.label_sample = null
             else 
