@@ -61,6 +61,7 @@ const K4DCV = JLD.load("$LOAD_FROM_DIR/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv
 const libsupsmu = "$LOAD_FROM_DIR/_supsmu.so"
 
 # used in meltcurve.jl
+const TF_KEYS = [:temperature, :fluorescence_value]
 const EMPTY_mc = zeros(1,3)[1:0,:]
 const EMPTY_Ta = zeros(1,2)[1:0,:]
 const EMPTY_mc_tm_pw_out = MeltCurveTa(

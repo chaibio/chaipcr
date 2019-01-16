@@ -24,14 +24,14 @@ function dcv_aw(
     ## remove MySql dependency
     #
     # calib_info = ensure_ci(db_conn, calib_info)
-    #
     # wva_data, wva_well_nums = prep_adj_w2wvaf(db_conn, calib_info, well_nums_in_req, dye_in, dyes_2bfild)
 
     ## assume without checking that we are using all the wells, all the time
-    well_nums_in_req = [i for i in range(0,length(calib_data["water"]["fluorescence_value"][1]))]
+    well_nums_in_req = collect(range(0,num_wells(calib_data)))
     #
     ## prepare data to adjust well-to-well variation in absolute fluorescence values
-    wva_data, wva_well_nums = prep_adj_w2wvaf(calib_data, well_nums_in_req, dye_in, dyes_2bfild)
+    wva_data, wva_well_nums =
+        prep_adj_w2wvaf(calib_data, well_nums_in_req, dye_in, dyes_2bfild)
     #
     ## overwrite the dummy well_nums
     wva_well_nums = well_nums_found_in_fr
@@ -80,35 +80,37 @@ function dcv_aw(
                 calib_data,
                 well_nums_in_req;
                 out_format = :array)
-    else
+    else # !dcv
         const k4dcv = K4DCV_EMPTY
         const dcvd_ary3 = mw_ary3
     end
     #
-    const dcvd_aw_vec =
-        map(1:num_channels) do channel_i
-            adj_w2wvaf(
-                dcvd_ary3[:,:,channel_i],
-                wva_data,
-                wva_well_idc_wfluo,
-                channel_i;
-                minus_water = false)
-        end
-    const dcvd_aw_ary3 = Array{AbstractFloat}(cat(3, dcvd_aw_vec...))
     const dcvd_aw_dict = 
         OrderedDict(
             map(1:num_channels) do channel_i
-                channel_nums[channel_i] => dcvd_aw_vec[channel_i]
+                channel_nums[channel_i] => 
+                    adj_w2wvaf(
+                        dcvd_ary3[:,:,channel_i],
+                        wva_data,
+                        wva_well_idc_wfluo,
+                        channel_i;
+                        minus_water = false)
             end)
-    #
-    if aw_out_format == :array
-        const dcvd_aw = (dcvd_aw_ary3,)
-    elseif aw_out_format == :dict
+    if aw_out_format == :array || aw_out_format == :both
+        ## the following line of code requires keys(dcvd_aw_dict) to be in sort order
+        const dcvd_aw_ary3 = Array{AbstractFloat}(
+                cat(3, map(
+                    key -> dcvd_aw_dict[key],
+                    keys(dcvd_aw_dict))...))
+        if aw_out_format == :both
+            const dcvd_aw = (dcvd_aw_ary3, dcvd_aw_dict)
+        else # :array
+            const dcvd_aw = (dcvd_aw_ary3,)
+        end
+    elseif aw_out_format == :dict # bug in original code (`out_format` not `aw_out_format`)
         const dcvd_aw = (dcvd_aw_dict,)
-    elseif out_format == :both
-        const dcvd_aw = (dcvd_aw_ary3, dcvd_aw_dict)
     else
-        error("`out_format` must be :array, :dict or :both. ")
+        error("`aw_out_format` must be :array, :dict or :both. ")
     end
     ## Performance issue:
     ## enforce data types for this output
@@ -194,9 +196,7 @@ function calib_calib(
     # end
 
     ary2dcv_1 = cat(1, map(values(calib_dict_1)) do value_1
-        fluo_data = value_1[1]
-        num_channels, num_wells = size(fluo_data)
-        reshape(transpose(fluo_data), 1, num_wells, num_channels)
+        reshape(transpose(fluo_data), 1, size(value_1[1])[2:-1:1]...)
     end...) # do value_1
     #
     mw_ary3_1, k4dcv_2, dcvd_ary3_1, wva_data_2, wva_well_nums_2, dcv_aw_ary3_1 =

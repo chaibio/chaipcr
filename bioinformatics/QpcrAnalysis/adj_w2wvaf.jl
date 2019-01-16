@@ -20,29 +20,21 @@ function adj_w2wvaf(
     minus_water               ::Bool =false,
     scaling_factor_adj_w2wvaf ::Real =SCALING_FACTOR_adj_w2wvaf
 )
-    const fluo = transpose(fluo2btp)
-    const wva_water = minus_water ?
-        wva_data[:water ][channel][wva_well_idc_wfluo] : 0
-    const wva_signal = 
-        wva_data[:signal][channel][wva_well_idc_wfluo]
-    const signal_water_diff = wva_signal .- wva_water
-    const swd_normd = sweep(mean)(-)(signal_water_diff)
-    const fluo_aw_vec = map(1:size(fluo)[2]) do i
-        scaling_factor_adj_w2wvaf .* (fluo[:,i] .- wva_water) ./ swd_normd
-    end # do i
-    return transpose(hcat(fluo_aw_vec...))
+    subtract_water(x) = minus_water ?
+        x .- wva_data[:water][channel][wva_well_idc_wfluo] : x
+    # end of function definitions nested within adj_w2wvaf()
+    const swd_normd =
+        wva_data[:signal][channel][wva_well_idc_wfluo] |>
+            subtract_water |> sweep(mean)(/)
+    transpose(
+        hcat(
+            map(1:size(fluo2btp)[1]) do i
+                transpose(fluo2btp)[:,i]                    |>
+                    subtract_water                          |>
+                    x -> x ./ swd_normd                     |>
+                    broadcast[*, scaling_factor_adj_w2wvaf]
+            end...))
 end # adj_w2wvaf
-
-
-# functions called by `adj_w2wvaf`
-
-
-# function: check subset
-function check_subset(small ::Ccsc, big ::Ccsc)
-    if length(setdiff(small.set, big.set)) != 0
-        error("$(small.description) is not a subset of $(big.description). ")
-    end
-end
 
 
 ## function: get well-to-well variation in absolute fluorescence (wva)
@@ -140,17 +132,10 @@ end
 # end # get_wva_data
 
 
-# function: check whether the data in optical calibration experiment is valid
-# if so, prepare calibration data by subtracting background (water) fluorescence values
+## function: check whether the data in optical calibration experiment is valid
 function prep_adj_w2wvaf(
     ## remove MySql dependency
-    #
     # db_conn ::MySQL.MySQLHandle,
-    #
-    # calib_info can be an integer or a OrderedDict in chai format:
-    # OrderedDict("water"=OrderedDict(calibration_id=>..., step_id=>...),
-    # "channel_1"=OrderedDict(calibration_id=..., step_id=...),
-    # "channel_2"=OrderedDict(calibration_id=...", step_id=...))
     # calib_info ::Union{Integer,OrderedDict}, 
     calib_data  ::Associative, 
     well_nums   ::AbstractVector,
@@ -211,9 +196,7 @@ function prep_adj_w2wvaf(
     ## issue:
     ## using the current format for the request body there is no well_num information
     ## associated with the calibration data
-    channels_in_water = (length(calib_data["water"]["fluorescence_value"]) < 2 ||
-        calib_data["water"]["fluorescence_value"][2]==nothing) ? 1 : 2
-    #
+    channels_in_water = num_channels(calib_data["water"]["fluorescence_value"])
     water_data_dict  = OrderedDict{UInt8,Any}()
     signal_data_dict = OrderedDict{UInt8,Any}()
     stop_msgs = Vector{String}()
@@ -222,47 +205,33 @@ function prep_adj_w2wvaf(
         try
             water_data_dict[channel]  = calib_data["water"]["fluorescence_value"][channel]
         catch
-            push!(stop_msgs,
-                "Cannot access water calibration data for channel $(key)"
-            )
+            push!(stop_msgs, "Cannot access water calibration data for channel $(key)")
         end
         try
             signal_data_dict[channel] = calib_data[key]["fluorescence_value"][channel]
         catch
-            push!(stop_msgs,
-                "Cannot access signal calibration data for channel $(key)"
-            )
+            push!(stop_msgs, "Cannot access signal calibration data for channel $(key)")
         end
         if length(water_data_dict[channel]) != length(signal_data_dict[channel])
-            push!(stop_msgs,
-                "Calibration data lengths are not equal for channel $(key)"
-            )
+            push!(stop_msgs, "Calibration data lengths are not equal for channel $(key)")
         end
     end
-    if (length(stop_msgs) > 0)
-        error(join(stop_msgs, ""))
-    end
+    (length(stop_msgs) > 0) && error(join(stop_msgs, ""))
     channels_in_water, channels_in_signal =
         (water_data_dict, signal_data_dict) |> map[get_ordered_keys]
-    #
     # assume without checking that there are no missing wells anywhere
     const signal_well_nums = collect(1:length(signal_data_dict[1]))
     #
     # check whether signal fluo > water fluo
     stop_msgs = Vector{String}()
-    for channel_in_signal in channels_in_signal
-        wva_invalid_idc = find(
-            signal_data_dict[channel_in_signal] .<= water_data_dict[channel_in_signal])
+    for channel in channels_in_signal
+        wva_invalid_idc = find(signal_data_dict[channel] .<= water_data_dict[channel])
         if length(wva_invalid_idc) > 0
             failed_well_nums_str = join(signal_well_nums[wva_invalid_idc], ", ")
-            push!(stop_msgs,
-                "Invalid well-to-well variation data in channel $channel_in_signal: fluorescence value of water is greater than or equal to that of dye in the following well(s) - $failed_well_nums_str. "
-            )
+            push!(stop_msgs, "Invalid well-to-well variation data in channel $channel: fluorescence value of water is greater than or equal to that of dye in the following well(s) - $failed_well_nums_str. ")
         end # if invalid
     end # next channel
-    if (length(stop_msgs) > 0)
-        error(join(stop_msgs, ""))
-    end
+    (length(stop_msgs) > 0) && error(join(stop_msgs, ""))
 
     ## issue:
     ## this feature has been temporarily disabled while
@@ -300,13 +269,13 @@ function prep_adj_w2wvaf(
     #
     # end # if
 
-    # water_data and signal_data are OrderedDict objects keyed by channels,
-    # to accommodate the situation where calibration data has more channels
-    # than experiment data, so that calibration data need to be easily
-    # subsetted by channel.
+    ## water_data and signal_data are OrderedDict objects keyed by channels,
+    ## to accommodate the situation where calibration data has more channels
+    ## than experiment data, so that calibration data needs to be easily
+    ## subsetted by channel.
     wva_data = OrderedDict(
-        :water  => water_data_dict, # enforce data type
-        :signal => signal_data_dict # enforce data type
+        :water  => water_data_dict, # performance issue: enforce data type here
+        :signal => signal_data_dict # performance issue: enforce data type here
     )
     return (wva_data, signal_well_nums)
 end # prep_adj_w2wvaf

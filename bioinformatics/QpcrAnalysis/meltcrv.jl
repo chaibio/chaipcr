@@ -38,10 +38,10 @@ function act(
     return process_mc(
         req_dict["raw_data"],
         req_dict["calibration_info"];
-        out_format=Symbol(out_format),
-        verbose=verbose,
+        out_format = out_format,
+        verbose = verbose,
         # kwdict_pmc...,
-        kwdict_mc_tm_pw=kwdict_mc_tm_pw
+        kwdict_mc_tm_pw = kwdict_mc_tm_pw
     )
 end # act()
 
@@ -71,32 +71,38 @@ function process_mc(
         select_mcdata_by_channel(channel_num ::Integer) = 
             mc_data ::Associative ->
                 Dict(
-                     Symbol(key) => mc_data[key][mc_data["channel"] .== channel_num]
-                     for key in ["temperature","fluorescence_value","well_num"])
+                    map(["temperature","fluorescence_value","well_num"]) do key
+                        Symbol(key) => mc_data[key][mc_data["channel"] .== channel_num]
+                    end)
 
         ## split temperature and fluorescence data by well
         split_tf_by_well(fluo_sel ::Associative) =
             map(fluo_well_nums) do well_num
                 Dict(
-                    key => fluo_sel[key][fluo_sel[:well_num] .== well_num]
-                    for key in [:temperature, :fluorescence_value])
+                    map(TF_KEYS) do key
+                        key => fluo_sel[key][fluo_sel[:well_num] .== well_num]
+                    end)
             end
 
         ## extend data vectors with NaN values where necessary to make them equal in length
         extend_tf_vecs(tf_dict_vec ::AbstractArray) =
             map(tf_dict_vec) do tf_dict
                 Dict(
-                    key => extend_NaN(
-                        tf_dict_vec |> map[(length ∘ index)[:temperature]] |> maximum,
-                        tf_dict[key])
-                    for key in [:temperature, :fluorescence_value])
+                    map(TF_KEYS) do key
+                        key => extend_NaN(
+                            tf_dict_vec |> map[x -> length(x[:temperature])] |> maximum,
+                            tf_dict[key])
+                    end)
             end
         
         ## convert to MeltCurveTF object
         toMeltCurveTF(tf_nv_adj ::AbstractArray) =
             MeltCurveTF(
-                tf_nv_adj |> map[index[:temperature]]        |> reduce[hcat],
-                tf_nv_adj |> map[index[:fluorescence_value]] |> reduce[hcat])
+                # tf_nv_adj |> map[index[:temperature]]        |> reduce[hcat],
+                # tf_nv_adj |> map[index[:fluorescence_value]] |> reduce[hcat])
+                map(TF_KEYS) do key
+                    tf_nv_adj |> map[index[key]] |> x -> hcat(x...)
+                end...)
     #
     ## end of function definitions nested in get_mc_data()
 
@@ -114,7 +120,7 @@ function process_mc(
                 faw_ary3[:,i,channel_i])...)
 
     remove_when_NaN_in_first(x...) =
-        map(y -> y[(x |> first |> broadcast[!isnan])],x)
+        map(y -> y[(x |> first |> broadcast[!isnan])], x)
 
     normalize_fluos(
         tmprtrs     ::DataArray{S} where S <: AbstractFloat,
@@ -126,9 +132,11 @@ function process_mc(
     #
     ## end of function definitions nested in process_mc()
 
-    const channel_nums   = sort(unique(mc_data["channel"]))
+    const channel_nums, fluo_well_nums =
+        map(("channel","well_num")) do key
+            mc_data |> index[key] |> unique |> sort
+        end
     const num_channels   = length(channel_nums)
-    const fluo_well_nums = sort(unique(mc_data["well_num"]))
     const num_fluo_wells = length(fluo_well_nums)
     #
     ## get data arrays by channel
@@ -173,9 +181,9 @@ function process_mc(
                 )
             else
                 EMPTY_mc_tm_pw_out
-            end
-        end
-    end |> x -> hcat(x...)
+            end # if
+        end # oc_well_num
+    end |> reduce[hcat]
     #
     if (out_format == :full)
         return MeltCurveOutput(
@@ -425,13 +433,13 @@ function mc_tm_pw(
             nadir_idc)              |>
                 collect             |>
                 map[peak_Ta]        |>
-                x -> vcat(x...)
+                filter[thing]
 
     ## calculate peak area
     peak_Ta(
         peak_idc        ::Tuple{Int,Int,Int}
     ) = peak_idc == nothing ?
-            Vector{Peak}([]) :
+            nothing :
             Peak(
                 peak_idc[2],                                # summit_idx
                 tp_denser[peak_idc[2]],                     # Tm = temperature at peak

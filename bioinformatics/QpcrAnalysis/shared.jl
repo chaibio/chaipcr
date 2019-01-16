@@ -2,6 +2,7 @@
 
 import DataStructures.OrderedDict
 import Base: getindex
+# import Iterators.filter
 
 
 ## using suggestion of MikeInnes https://github.com/JuliaLang/julia/issues/5571#issuecomment-446321504
@@ -16,6 +17,10 @@ subset(i,x) = getindex(x,i)
 
 ## synonym for getfield
 field(f,x)  = getfield(x,f)
+
+## unused functions
+inc_index(i ::Integer, len ::Integer) = (i >= len) ? len : i + 1
+dec_index(i ::Integer) = (i <= 1) ? 1 : i - 1
 
 ## unused function
 ## curried function
@@ -36,8 +41,7 @@ normalize_range(x ::AbstractArray) =
     sweep(minimum)(-)(x) |> sweep(maximum)(/)
 
 ## used in meltcrv.jl
-inc_index(i ::Integer, len ::Integer) = (i >= len) ? len : i + 1
-dec_index(i ::Integer) = (i <= 1) ? 1 : i - 1
+thing(x) = x != nothing
 
 ## used in meltcrv.jl
 is_increasing(x ::AbstractVector) =
@@ -137,12 +141,16 @@ num_channels(calib ::Associative) =
         map[key -> num_channels(calib[key]["fluorescence_value"])] |>
         maximum
 
+## used in calib.jl
 num_wells(fluos ::AbstractArray) =
-    fluos |> map[length] |> maximum
+    fluos |> filter[thing] |> map[length] |> maximum
 
 num_wells(calib ::Associative) =
     calib |>
         keys |>
+        collect |>
+        # Iterators.filter[key -> haskey(calib[key],"fluorescence_value")] |>
+        filter[key -> haskey(calib[key],"fluorescence_value")] |>
         map[key -> num_wells(calib[key]["fluorescence_value"])] |>
         maximum
 
