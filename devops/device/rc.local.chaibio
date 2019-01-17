@@ -553,6 +553,29 @@ update_ethernet_network () {
     fi
 }
 
+create_swapfile () {
+	echo creating a temporary swap file on sdcard
+	if [ ! -e /sdcard/upgrade/swapfile ]
+	then
+		if fallocate -l 1G /sdcard/upgrade/swapfile #or dd if=/dev/zero of=/sdcard/upgrade/swapfile bs=10M count=300
+		then
+		    echo "swap file created successfully"
+		else
+   			echo "failed creating swap file"
+   			return
+		fi
+	fi
+
+	sudo chmod 600 /sdcard/upgrade/swapfile
+	sudo mkswap /sdcard/upgrade/swapfile
+	sudo swapon /sdcard/upgrade/swapfile
+
+	echo verifying swap file is successfully added
+	sudo swapon -s
+
+	free -m
+}
+
 check_upgrade_autorun () {
 	sdcard_dev=""
 	if [ -e /dev/mmcblk0p3 ]
@@ -589,6 +612,7 @@ check_upgrade_autorun () {
 			echo "Second SDCard partition not found.. old version? ${sdcard}p2"  >> $log_file
 		fi
 
+		create_swapfile &
                 update_wireless_network
                 update_ethernet_network
 		change_root_password_on_factorysettings
