@@ -33,6 +33,7 @@ str2sym(x) = typeof(x) == String ? Symbol(x) : x
 
 ## used in adj_w2wvaf.jl
 ## used in meltcrv.jl
+## used in deconv.jl
 sweep(summary_func) = sweep_func -> (x -> sweep_func.(x, summary_func(x)))
 
 ## used in meltcrv.jl
@@ -40,8 +41,28 @@ sweep(summary_func) = sweep_func -> (x -> sweep_func.(x, summary_func(x)))
 normalize_range(x ::AbstractArray) =
     sweep(minimum)(-)(x) |> sweep(maximum)(/)
 
-## used in meltcrv.jl
+## used in meltcrv.jl       
+## used in shared.jl
 thing(x) = x != nothing
+
+## used in standard_curve.jl
+## transform `nothing` to NaN
+function nothing2NaN(input)
+    return isa(input, Void) ? NaN : input
+end
+
+## used in standard_curve.jl
+## transform a real number to scientific notation
+function scinot(x ::Real, num_sig_digits ::Integer=3; log_base ::Integer=10)
+    if isnan(x)
+        return (NaN, NaN)
+    elseif x == 0
+        return (0, 0)
+    end
+    exponent = floor(log(log_base, abs(x)))
+    mantissa = round(x / log_base ^ exponent, num_sig_digits)
+    return (mantissa, Int(exponent))
+end
 
 ## used in meltcrv.jl
 is_increasing(x ::AbstractVector) =
