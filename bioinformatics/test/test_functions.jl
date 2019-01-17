@@ -6,7 +6,7 @@
 ## automated test script for Julia API
 ## this code should be run at startup in fresh julia REPL
 
-const BBB = match(r"beaglebone",readlines(`uname -a`)[1]) != nothing
+const BBB = (get(ENV, "JULIA_ENV", nothing)=="production")
 const RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE = false
 
 import DataFrames: DataFrame
