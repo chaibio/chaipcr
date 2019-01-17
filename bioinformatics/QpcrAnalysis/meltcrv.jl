@@ -252,30 +252,23 @@ function mc_tm_pw(
 
     ## filter out data points separated by narrow temperature intervals
     ## `nti` - narrow temperature interval
-    filter_nti(
-        tf_dict     ::Associative
-    ) =
+    filter_nti(tf_dict ::Associative) =
         Dict(
             key => tf_dict[key][(tf_dict[:tmprtrs] |> tmprtr_intvls |> no_nti)]
             for key in keys(tf_dict))
 
     ## temperature intervals
-    tmprtr_intvls(
-        tmprtrs_ori ::DataArray{T,1} where T <: AbstractFloat
-    ) =
+    tmprtr_intvls(tmprtrs_ori ::DataArray{T,1} where T <: AbstractFloat) =
         vcat(diff(tmprtrs_ori), Inf)
 
     ## flag datapoints
-    no_nti(
-        tmprtr_intvls ::DataArray{T,1} where T <: AbstractFloat
-    ) =
+    no_nti(tmprtr_intvls ::DataArray{T,1} where T <: AbstractFloat) =
         tmprtr_intvls .> nti_frac * median(tmprtr_intvls)
 
     ## functions used to calculate `span_smooth`
 
     ## choose the value for `span_smooth`
-    choose_span_smooth(
-    ) =
+    choose_span_smooth() =
         if auto_span_smooth
             print_v(println, verbose, "Automatic selection of `span_smooth`...")
             calc_span_smooth(fu_rle())
@@ -285,18 +278,9 @@ function mc_tm_pw(
         end
 
     ## calculate the smoothing parameter
-    calc_span_smooth(
-        fu_rle      ::Tuple{Vector{Bool},Vector{T} where T<:Integer}
-    ) =
-        if fu_rle[1] == [false]
-            print_v(println, verbose, "No fluo increase as temperature increase was detected, use `span_smooth_default` $span_smooth_default.")
-            return span_smooth_default
-        else
-            # println("Fluorescence increase with temperature increase was detected.")
-            return larger_span(span_smooth_product(fu_rle))
-        end
+    function calc_span_smooth(fu_rle ::Tuple{Vector{Bool},Vector{T} where T<:Integer})
 
-    larger_span(span_smooth_product ::Real) =
+        larger_span(span_smooth_product ::Real) =
         if span_smooth_product > span_smooth_default
             print_v(println, verbose, "`span_smooth` was selected as $span_smooth.")
             return span_smooth_product(tmprtrs, fluos, fu_rle)
@@ -305,49 +289,48 @@ function mc_tm_pw(
             return span_smooth_default
         end
 
-    ## `span_smooth_product` = the longest temperature span
-    ## where fluorescence increases as temperature increases
-    span_smooth_product(
-        fu_rle      ::Tuple{Vector{Bool},Vector{U} where U <: Integer}
-    ) =
-        span_smooth_factor * max_fu_tp_span(fu_idc(fu_rle)) / whole_tp_span
+        ## `span_smooth_product` = the longest temperature span
+        ## where fluorescence increases as temperature increases
+        span_smooth_product() =
+            span_smooth_factor * max_fu_tp_span(fu_idc()) / whole_tp_span
 
-    max_fu_tp_span(
-        fu_idc      ::AbstractVector{Int}
-    ) =
-        maximum(tmprtrs[fu_idc[2:2:end]] .- tmprtrs[fu_idc[1:2:end]])
+        max_fu_tp_span(fu_idc ::AbstractVector{Int}) =
+            maximum(tmprtrs[fu_idc[2:2:end]] .- tmprtrs[fu_idc[1:2:end]])
 
-    fu_idc(fu_rle   ::Tuple{Vector{Bool},Vector{T} where T<:Integer}) =
-        (cumsum(fu_rle[1][1] ? vcat(0,fu_rle[2]) : fu_rle[2]) .+ 1)[1:2*sum(fu_rle[1])]
+        fu_idc() =
+            (cumsum(fu_rle[1][1] ? vcat(0,fu_rle[2]) : fu_rle[2]) .+ 1)[1:2*sum(fu_rle[1])]
+        #
+        ## end of function definitions nested within calc_span_smooth()
+
+        if fu_rle[1] == [false]
+            print_v(println, verbose, "No fluo increase as temperature increase was detected, use `span_smooth_default` $span_smooth_default.")
+            return span_smooth_default
+        else
+            # println("Fluorescence increase with temperature increase was detected.")
+            return larger_span(span_smooth_product())
+        end
+    end
 
     ## find the region(s) where there is a positive gradient
     ## such that fluorescence increases as the temperature increases
     ## `fu_rle` - fluo_up run length encoding
-    fu_rle(
-    ) =
+    fu_rle() =
         calc_fu_rle(giis_tp(max_fluo_dcrs()))
 
-    calc_fu_rle(
-        css_idc     ::AbstractVector{Int}
-    ) =
+    calc_fu_rle(css_idc ::AbstractVector{Int}) =
         rle(is_increasing(fluos[css_idc]))
 
     ## find the region of length 2 * span_css_tmprtr
     ## showing the steepest fluo decrease (`fluo_dcrs`) between start and end
-    max_fluo_dcrs(
-    ) =
+    max_fluo_dcrs() =
         indmax(
             fluo_dcrs(giis_tp(i))
             for i in 1:len_raw)
 
-    fluo_dcrs(
-        sel_idc_int ::AbstractVector{Int}
-    ) =
+    fluo_dcrs(sel_idc_int ::AbstractVector{Int}) =
         fluos[sel_idc_int[1]] - fluos[sel_idc_int[end]]
 
-    giis_tp(
-        i           ::Integer
-    ) =
+    giis_tp(i ::Int) =
         giis_uneven(tmprtrs, i, span_css_tmprtr)
 
     ## smoothing functions
@@ -358,14 +341,13 @@ function mc_tm_pw(
         Spline1D(shorten(x...)...; k=3)
 
     ## smooth raw fluo values
-    smooth_raw_fluo(
-    ) = (   tmprtrs,
-            supsmu(tmprtrs, fluos, span_smooth / denser_factor) )
+    smooth_raw_fluo() =
+        (   tmprtrs,
+                supsmu(tmprtrs, fluos, span_smooth / denser_factor) )
 
     ## fit cubic spline to fluos ~ tmprtrs, re-calculate fluorescence,
     ## and calculate -df/dt using `tp_denser` (a denser sequence of temperatures)
-    smoothing_process(
-    ) =
+    smoothing_process() =
         hcat(
             ## collate processed, interpolated data into matrix
             ## note: memory intensive
@@ -374,9 +356,7 @@ function mc_tm_pw(
             ndrv_smu(-derivative(spl, tp_denser)))
 
     ## baseline-subtracted spline-smoothed fluorescence data
-    fluo_spl_blsub(
-        fluo_spl    ::AbstractVector{T} where T <: AbstractFloat,
-    ) =
+    fluo_spl_blsub(fluo_spl ::AbstractVector{T} where T <: AbstractFloat) =
         ## assumes constant baseline == minimum fluorescence value
         sweep(minimum)(-)(
             ## optionally, smooth the output of the spline function
@@ -386,9 +366,7 @@ function mc_tm_pw(
 
     ## calculate negative derivative at interpolated temperatures
     ## smooth output using `supsmu`
-    ndrv_smu(
-        ndrv        ::AbstractVector{T} where T <: AbstractFloat,
-    ) =
+    ndrv_smu(ndrv ::AbstractVector{T} where T <: AbstractFloat) =
         supsmu(tp_denser, ndrv, span_smooth)
 
     ## create denser array of interpolated temperature values
@@ -409,13 +387,10 @@ function mc_tm_pw(
             0))
 
     ## find summit and nadir indices of Tm peaks in `ndrv_smu`
-    find_sn(
-    ) =
+    find_sn() =
         [maximum, minimum] |> map[find_mid_sumr_bysw[ndrv_smu, span_peaks_dp()]]
 
-    summits_and_nadirs(
-        sn_idc...
-    ) = 
+    summits_and_nadirs(sn_idc...) = 
         OrderedDict(zip(
             [:summit_pre, :nadir],
             map(
@@ -436,9 +411,8 @@ function mc_tm_pw(
                 filter[thing]
 
     ## calculate peak area
-    peak_Ta(
-        peak_idc        ::Tuple{Int,Int,Int}
-    ) = peak_idc == nothing ?
+    peak_Ta(peak_idc ::Tuple{Int,Int,Int}) =
+        peak_idc == nothing ?
             nothing :
             Peak(
                 peak_idc[2],                                # summit_idx
@@ -489,9 +463,8 @@ function mc_tm_pw(
     ## Issue: ??? function looks wrong, does not match R algorithm
     ## Proposed solution: recode using Dierckx.integrate
     ## requires tp_denser, ndrv_smu, ndrv ???
-    function calc_area(
-        peak_bound_idc  ::Tuple{Int,Int}
-    )
+    function calc_area(peak_bound_idc ::Tuple{Int,Int})
+        #
         area_func(tp_low_end ::Real, tp_high_end ::Real) =
             -sum(ndrv_smu[[peak_bound_idc...]]) * (tp_high_end - tp_low_end) / 2.0 -
                 (spl(tp_high_end) - spl(tp_low_end))
@@ -504,8 +477,7 @@ function mc_tm_pw(
     end # calc_area
 
     ## count cross points
-    function count_cross_points(
-    )
+    function count_cross_points()
         ## vectorized version
         # num_cross_points = sum(map(1:(len_denser-1)) do i
         #     (ndrv_smu[i] - ns_range_mid) * (ndrv_smu[i+1] - ns_range_mid) <= 0
@@ -602,7 +574,7 @@ function mc_tm_pw(
             hcat(
                 tmprtrs,
                 fluos,
-                -finite_diff(tmprtrs, fluos; nu = 1, method = "central")) |>
+                -finite_diff(tmprtrs, fluos; nu = 1, method = :central)) |>
                     report[json_digits],    # mc_raw
             EMPTY_Ta,                       # Ta_fltd
             EMPTY_mc,                       # mc_denser
@@ -727,8 +699,8 @@ end
     function finite_diff(
         X ::AbstractVector,
         Y ::AbstractVector; # X and Y must be of same length
-        nu ::Integer=1, # order of derivative
-        method ::String="central"
+        nu ::Integer =1, # order of derivative
+        method ::Symbol = :central
     )
         const dlen = length(X)
         if dlen != length(Y)
@@ -738,13 +710,13 @@ end
             return zeros(1)
         end
         if (nu == 1)
-            if (method == "central")
+            if (method == :central)
                 const range1 = 3:dlen+2
                 const range2 = 1:dlen
-            elseif (method == "forward")
+            elseif (method == :forward)
                 const range1 = 3:dlen+2
                 const range2 = 2:dlen+1
-            elseif (method == "backward")
+            elseif (method == :backward)
                 const range1 = 2:dlen+1
                 const range2 = 1:dlen
             end
@@ -758,9 +730,9 @@ end
         else
             return finite_diff(
                 X,
-                finite_diff(X, Y; nu=nu-1, method=method),
-                nu=1;
-                method=method)
+                finite_diff(X, Y; nu = nu - 1, method = method),
+                nu = 1;
+                method = method)
         end # if nu == 1
     end
 
