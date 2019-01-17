@@ -7,11 +7,15 @@ import DataStructures.OrderedDict
 
 ## functions
 
-## Top-level function: adjust well-to-well variation in absolute fluorescence values (w2wvaf). wva = w2wva. aw = adj_w2wvaf.
-## basic difference: w2wvaf/wva/aw - only used for `adj_w2wvaf`, each dye only has data for its target channel;
-## calibration/calib/oc - used for `deconv` and `adj_w2wvaf`, each dye has data for both target and non-target channels.
-## Input `fluo` and output: dim1 indexed by well and dim2 indexed by unit, which can be cycle (amplification) or temperature point (melt curve).
-## Output does not include the automatically created column at index 1 from rownames of input array as R does
+## Top-level function: adjust well-to-well variation in absolute fluorescence values (w2wvaf).
+## wva = w2wva. aw = adj_w2wvaf. basic difference: w2wvaf/wva/aw - only used for `adj_w2wvaf`,
+## each dye only has data for its target channel;
+## calibration/calib/oc - used for `deconv` and `adj_w2wvaf`,
+## each dye has data for both target and non-target channels.
+## Input `fluo` and output: dim2 indexed by well and dim1 indexed by unit,
+## which can be cycle (amplification) or temperature point (melt curve).
+## Output does not include the automatically created column at index 1
+## from rownames of input array as R does
 function adj_w2wvaf(
     fluo2btp                  ::AbstractArray,
     wva_data                  ::Associative,
@@ -20,17 +24,24 @@ function adj_w2wvaf(
     minus_water               ::Bool =false,
     scaling_factor_adj_w2wvaf ::Real =SCALING_FACTOR_adj_w2wvaf
 )
-    subtract_water(x) = minus_water ?
-        x .- wva_data[:water][channel][wva_well_idc_wfluo] : x
-    # end of function definitions nested within adj_w2wvaf()
-    const fluo = transpose(fluo2btp)
-    const swd_normd =
-        wva_data[:signal][channel][wva_well_idc_wfluo] |>
-            subtract_water |> sweep(mean)(-)
-    hcat(
-        map(1:size(fluo)[2]) do i
-            subtract_water(fluo[:,i]) ./ swd_normd .* scaling_factor_adj_w2wvaf
-        end...) |> transpose
+    ## devectorized code avoids transposing data matrix
+    if minus_water == false
+        const swd =
+            wva_data[:signal][channel][wva_well_idc_wfluo]
+        return ([
+            scaling_factor_adj_w2wvaf * mean(swd) *
+                fluo2btp[i,w] / swd[w]
+                    for i in 1:size(fluo2btp)[1], w in 1:size(fluo2btp)[2]]) # w = well
+    end
+    ## minus_water == true
+    const wva_water = wva_data[:water][channel][wva_well_idc_wfluo]
+    const swd =
+        wva_data[:signal][channel][wva_well_idc_wfluo] .-
+            wva_data[:water][channel][wva_well_idc_wfluo]
+    return ([
+        scaling_factor_adj_w2wvaf * mean(swd) *
+            (fluo2btp[i,w] - wva_water[w]) / swd[w]
+                for i in 1:size(fluo2btp)[1], w in 1:size(fluo2btp)[2]]) # w = well
 end # adj_w2wvaf
 
 
@@ -194,8 +205,9 @@ function prep_adj_w2wvaf(
     ## using the current format for the request body there is no well_num information
     ## associated with the calibration data
     channels_in_water = num_channels(calib_data["water"]["fluorescence_value"])
-    water_data_dict  = OrderedDict{UInt8,Any}()
-    signal_data_dict = OrderedDict{UInt8,Any}()
+    const V = typeof(calib_data["water"]["fluorescence_value"][1])
+    water_data_dict  = OrderedDict{UInt8,V}()
+    signal_data_dict = OrderedDict{UInt8,V}()
     stop_msgs = Vector{String}()
     for channel in 1:channels_in_water
         key="channel_$(channel)"
@@ -216,10 +228,10 @@ function prep_adj_w2wvaf(
     (length(stop_msgs) > 0) && error(join(stop_msgs, ""))
     channels_in_water, channels_in_signal =
         (water_data_dict, signal_data_dict) |> map[get_ordered_keys]
-    # assume without checking that there are no missing wells anywhere
+    ## assume without checking that there are no missing wells anywhere
     const signal_well_nums = collect(1:length(signal_data_dict[1]))
     #
-    # check whether signal fluo > water fluo
+    ## check whether signal fluo > water fluo
     stop_msgs = Vector{String}()
     for channel in channels_in_signal
         wva_invalid_idc = find(signal_data_dict[channel] .<= water_data_dict[channel])

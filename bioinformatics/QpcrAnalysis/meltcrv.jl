@@ -693,161 +693,160 @@ function mutate_dups(
     vec_2mut ::AbstractVector,
     frac2add ::Real =0.01
 )
-    const vec_len = length(vec_2mut)
-    const vec_uniq = sort(unique(vec_2mut))
-    const vec_uniq_len = length(vec_uniq)
+    const vec_len       = vec_2mut |> length
+    const vec_uniq      = vec_2mut |> unique |> sort
+    const vec_uniq_len  = vec_uniq |> length
     #
-    if (vec_len == vec_uniq_len)
-        return vec_2mut
-    else
-        const order_to = sortperm(vec_2mut)
-        const order_back = sortperm(order_to)
-        vec_sorted = (vec_2mut + .0)[order_to]
-        const vec_sorted_prev = vcat(vec_sorted[1]-1, vec_sorted[1:vec_len-1])
-        const dups = (1:vec_len)[map(1:vec_len) do i
-            vec_sorted[i] == vec_sorted_prev[i]
-        end]
-        const add1 = frac2add * median(map(2:vec_uniq_len) do i
-            vec_uniq[i] - vec_uniq[i-1]
-        end)
-        for dup_i in 1:length(dups)
-            dup_i_moveup = dup_i
-            rank = 1
-            while dup_i_moveup > 1 && dups[dup_i_moveup] - dups[dup_i_moveup-1] == 1
-                dup_i_moveup -= 1
-                rank += 1
+    ## return if no ties
+    (vec_len == vec_uniq_len) && return vec_2mut
+    #
+    ## find ties
+    const order_to = sortperm(vec_2mut)
+    const order_back = sortperm(order_to)
+    vec_sorted = (vec_2mut + .0)[order_to]
+    const dups = find(diff(vec_sorted) .== 0.0) .+ 1
+    #
+    ## calculate value of jitter constant
+    const add1 = frac2add * median(diff(vec_uniq))
+    #
+    ## break ties
+    accumulator1 = 0
+    accumulator2 = 0
+    for i in 1:length(dups)
+        multiway_tie  = i > 1 && dups[i] - dups[i-1] == 1
+        accumulator1 += multiway_tie
+        accumulator2  = multiway_tie ? accumulator2 : accumulator1
+        rank = accumulator1 - accumulator2 + 1
+        vec_sorted[dups[i]] += add1 * rank
+    end
+    #
+    return vec_sorted[order_back]
+end
+
+    ## finite differencing function
+    function finite_diff(
+        X ::AbstractVector,
+        Y ::AbstractVector; # X and Y must be of same length
+        nu ::Integer=1, # order of derivative
+        method ::String="central"
+    )
+        const dlen = length(X)
+        if dlen != length(Y)
+            error("X and Y must be of same length.")
+        end
+        if (dlen == 1)
+            return zeros(1)
+        end
+        if (nu == 1)
+            if (method == "central")
+                const range1 = 3:dlen+2
+                const range2 = 1:dlen
+            elseif (method == "forward")
+                const range1 = 3:dlen+2
+                const range2 = 2:dlen+1
+            elseif (method == "backward")
+                const range1 = 2:dlen+1
+                const range2 = 1:dlen
             end
-            vec_sorted[dups[dup_i]] += add1 * rank
+            const X_p2, Y_p2 = map((X, Y)) do ori
+                vcat(
+                    ori[2] * 2 - ori[1],
+                    ori,
+                    ori[dlen-1] * 2 - ori[dlen])
+            end
+            return (Y_p2[range1] .- Y_p2[range2]) ./ (X_p2[range1] .- X_p2[range2])
+        else
+            return finite_diff(
+                X,
+                finite_diff(X, Y; nu=nu-1, method=method),
+                nu=1;
+                method=method)
+        end # if nu == 1
+    end
+
+    ## PeakIndices methods
+    ## iterator functions to find peaks and flanking nadirs
+
+    Base.start(iter ::PeakIndices) = (0,0,0)
+
+    Base.done(iter ::PeakIndices, state) =
+        state == nothing || state[1] > iter.len_summit_idc
+
+    Base.iteratorsize(::PeakIndices) = SizeUnknown()
+
+    Base.eltype(iter ::PeakIndices) = Tuple{Int,Int,Int}
+
+    function Base.collect(iter ::PeakIndices)
+        collection = []
+        for peak in iter
+            peak == nothing || push!(collection, peak)
         end
-        #
-        return vec_sorted[order_back]
+        return collection
     end
-end
 
-## finite differencing function
-function finite_diff(
-    X ::AbstractVector,
-    Y ::AbstractVector; # X and Y must be of same length
-    nu ::Integer=1, # order of derivative
-    method ::String="central"
-)
-    const dlen = length(X)
-    if dlen != length(Y)
-        error("X and Y must be of same length.")
-    end
-    if (dlen == 1)
-        return zeros(1)
-    end
-    if (nu == 1)
-        if (method == "central")
-            const range1 = 3:dlen+2
-            const range2 = 1:dlen
-        elseif (method == "forward")
-            const range1 = 3:dlen+2
-            const range2 = 2:dlen+1
-        elseif (method == "backward")
-            const range1 = 2:dlen+1
-            const range2 = 1:dlen
+    function Base.next(iter ::PeakIndices, state ::Tuple{Int,Int,Int})
+        ## fail if state == nothing
+        if (state == nothing)
+            return (nothing, nothing)
         end
-        const X_p2, Y_p2 = map((X, Y)) do ori
-            vcat(
-                ori[2] * 2 - ori[1],
-                ori,
-                ori[dlen-1] * 2 - ori[dlen])
-        end
-        return (Y_p2[range1] .- Y_p2[range2]) ./ (X_p2[range1] .- X_p2[range2])
-    else
-        return finite_diff(
-            X,
-            finite_diff(X, Y; nu=nu-1, method=method),
-            nu=1;
-            method=method)
-    end # if nu == 1
-end
-
-## PeakIndices methods
-## iterator functions to find peaks and flanking nadirs
-
-Base.start(iter ::PeakIndices) = (0,0,0)
-
-Base.done(iter ::PeakIndices, state) =
-    state == nothing || state[1] > iter.len_summit_idc
-
-Base.iteratorsize(::PeakIndices) = SizeUnknown()
-
-Base.eltype(iter ::PeakIndices) = Tuple{Int,Int,Int}
-
-function Base.collect(iter ::PeakIndices)
-    collection = []
-    for peak in iter
-        peak == nothing || push!(collection, peak)
-    end
-    return collection
-end
-
-function Base.next(iter ::PeakIndices, state ::Tuple{Int,Int,Int})
-    ## fail if state == nothing
-    if (state == nothing)
-        return (nothing, nothing)
-    end
-    ## state != nothing
-    left_nadir_ii, summit_ii, right_nadir_ii = state
-    ## next summit
-    while (summit_ii < iter.len_summit_idc)
-        ## summit_ii < iter.len_summit_idc
-        ## increment the summit index
-        summit_ii += 1
-        ## extend nadir range to the right
-        while (right_nadir_ii < iter.len_nadir_idc)
-            right_nadir_ii += 1
-            if (iter.summit_idc[summit_ii] < iter.nadir_idc[right_nadir_ii])
+        ## state != nothing
+        left_nadir_ii, summit_ii, right_nadir_ii = state
+        ## next summit
+        while (summit_ii < iter.len_summit_idc)
+            ## summit_ii < iter.len_summit_idc
+            ## increment the summit index
+            summit_ii += 1
+            ## extend nadir range to the right
+            while (right_nadir_ii < iter.len_nadir_idc)
+                right_nadir_ii += 1
+                if (iter.summit_idc[summit_ii] < iter.nadir_idc[right_nadir_ii])
+                    break
+                end
+            end
+            ## decrease nadir range to the left, if possible
+            while (left_nadir_ii < iter.len_nadir_idc &&
+                iter.nadir_idc[left_nadir_ii + 1] < iter.summit_idc[summit_ii])
+                    left_nadir_ii += 1
+            end
+            ## if there is a nadir to the left, break out of loop
+            if (left_nadir_ii > 0)
                 break
             end
+            ## otherwise try the next summit
+        end    
+        ## fail if no more summits
+        if (summit_ii >= iter.len_summit_idc)   ||
+                ## fail if no flanking nadirs
+            !(iter.nadir_idc[left_nadir_ii] < iter.summit_idc[summit_ii] < iter.nadir_idc[right_nadir_ii])
+                return (nothing, nothing) 
         end
-        ## decrease nadir range to the left, if possible
-        while (left_nadir_ii < iter.len_nadir_idc &&
-            iter.nadir_idc[left_nadir_ii + 1] < iter.summit_idc[summit_ii])
-                left_nadir_ii += 1
+        ## find duplicate summits
+        right_summit_ii = summit_ii
+        while (right_summit_ii < iter.len_summit_idc &&
+            iter.summit_idc[right_summit_ii + 1] < iter.nadir_idc[right_nadir_ii])
+            right_summit_ii += 1
         end
-        ## if there is a nadir to the left, break out of loop
-        if (left_nadir_ii > 0)
-            break
+        ## remove duplicate summits by choosing highest summit
+        if (right_summit_ii > summit_ii)
+            summit_ii =
+                (iis -> iis[indmax(iter.summit_heights[iis])])(
+                    summit_ii:right_summit_ii)
         end
-        ## otherwise try the next summit
-    end    
-    ## fail if no more summits
-    if (summit_ii >= iter.len_summit_idc)   ||
-            ## fail if no flanking nadirs
-        !(iter.nadir_idc[left_nadir_ii] < iter.summit_idc[summit_ii] < iter.nadir_idc[right_nadir_ii])
-            return (nothing, nothing) 
+        return (
+            (iter.nadir_idc[left_nadir_ii],
+                iter.summit_idc[summit_ii],
+                iter.nadir_idc[right_nadir_ii]),        # element
+            (left_nadir_ii, summit_ii, right_nadir_ii)) # state
     end
-    ## find duplicate summits
-    right_summit_ii = summit_ii
-    while (right_summit_ii < iter.len_summit_idc &&
-        iter.summit_idc[right_summit_ii + 1] < iter.nadir_idc[right_nadir_ii])
-        right_summit_ii += 1
-    end
-    ## remove duplicate summits by choosing highest summit
-    if (right_summit_ii > summit_ii)
-        summit_ii =
-            (iis -> iis[indmax(iter.summit_heights[iis])])(
-                summit_ii:right_summit_ii)
-    end
-    return (
-        (iter.nadir_idc[left_nadir_ii],
-            iter.summit_idc[summit_ii],
-            iter.nadir_idc[right_nadir_ii]),        # element
-        (left_nadir_ii, summit_ii, right_nadir_ii)) # state
-end
 
-## do not report indices for each peak, only Tm and area
-report(digits ::Int, peaks ::Vector{Peak}) =
-    length(peaks) == 0 ?
-        EMPTY_Ta :
-        peaks |> map[p -> round.([p.Tm, p.area], digits)] |> reduce[hcat] |> transpose
+    ## do not report indices for each peak, only Tm and area
+    report(digits ::Int, peaks ::Vector{Peak}) =
+        length(peaks) == 0 ?
+            EMPTY_Ta :
+            peaks |> map[p -> round.([p.Tm, p.area], digits)] |> reduce[hcat] |> transpose
 
 
 
 
 
-#
+    #

@@ -37,9 +37,9 @@ function dcv_aw(
     wva_well_nums = well_nums_found_in_fr
     #
     num_channels = length(channel_nums)
-    if length(well_nums_found_in_fr) == 0
-        well_nums_found_in_fr = wva_well_nums
-    end
+    # if length(well_nums_found_in_fr) == 0
+    #     well_nums_found_in_fr = wva_well_nums
+    # end
 
     ## remove MySql dependency
     #
@@ -57,10 +57,12 @@ function dcv_aw(
     mw_ary3 =
         cat(
             3,
-            map(1:num_channels) do channel_i
-                    fr_ary3[:,:,channel_i] .-
-                        transpose(wva_data[:water][channel_i][wva_well_idc_wfluo])
-                end...)
+            ## devectorized code avoids transposition
+            [   
+                [   fr_ary3[u,w,c] - wva_data[:water][c][wva_well_idc_wfluo][w]
+                    for u in 1:size(fr_ary3)[1],
+                        w in wva_well_idc_wfluo     ]
+                for c in 1:num_channels                 ]...)
 
     if dcv
         ## addition with flexible ratio instead of deconvolution (commented out)
