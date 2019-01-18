@@ -1,6 +1,7 @@
-# different formula for each cycle (dfc)
+## different formula for each cycle (dfc)
 
-# write functions to fit MAKx (MAK2 and MAK3) model here, which will be called in `mod_bl_q` in "amp.jl"
+## write functions to fit MAKx (MAK2 and MAK3) model here,
+## which will be called in `mod_bl_q` in "amp.jl"
 
 import DataStructures.OrderedDict;
 import JuMP: Model, @variable, @constraint, @NLconstraint, @NLobjective,
@@ -14,9 +15,11 @@ end
 
 function pred_from_cycs( # 0.7to1.2e-5 sec for 40 cycles on PC
     ::MAK2,
-    cycs::AbstractVector,
-    fb::Real, d0::Real, k::Real
-    )
+    cycs    ::AbstractVector,
+    fb      ::Real,
+    d0      ::Real,
+    k       ::Real
+)
     max_cyc = maximum(cycs)
     pred_ds = [AbstractFloat(d0)]
     i = 1
@@ -29,9 +32,12 @@ end
 
 function pred_from_cycs( #  sec for 40 cycles on PC
     ::MAK3,
-    cycs::AbstractVector,
-    fb::Real, bl_k::Real, d0::Real, k::Real
-    )
+    cycs    ::AbstractVector,
+    fb      ::Real,
+    bl_k    ::Real,
+    d0      ::Real,
+    k       ::Real
+)
     max_cyc = maximum(cycs)
     pred_ds = [AbstractFloat(d0)]
     i = 1
@@ -45,13 +51,12 @@ end
 
 function fit(
     ::MAK2,
-    cycs::AbstractVector, # continous integers or not
-    obs_fluos::AbstractVector,
-    wts::AbstractVector=ones(length(obs_fluos));
+    cycs        ::AbstractVector, # continous integers or not
+    obs_fluos   ::AbstractVector,
+    wts         ::AbstractVector =ones(length(obs_fluos));
     kwargs_Model... # argument for `JuMP.Model`
-    )
-
-    # find approximate `max_d` by `finite_diff` from "shared.jl"
+)
+    ## find approximate `max_d` by `finite_diff` from "shared.jl"
     d_vec = finite_diff(cycs, obs_fluos; nu=1) # should use `nu=2` per Boggy 2010 paper (because MAK2 is no longer valid at max_d1), but use `nu=1` to increase the number of data points used for fit and seems to provide better fitting results
     max_d, max_d_idx = findmax(d_vec)
     idc2fit = 1:max_d_idx
@@ -100,25 +105,23 @@ function fit(
         jmp_model,
         # init_coefs
     )
-
-end
+end # fit(::MAK2)
 
 
 function fit(
     ::MAK3,
-    cycs::AbstractVector, # continous integers or not
-    obs_fluos::AbstractVector,
-    wts::AbstractVector=ones(length(obs_fluos));
+    cycs        ::AbstractVector, # continous integers or not
+    obs_fluos   ::AbstractVector,
+    wts         ::AbstractVector =ones(length(obs_fluos));
     kwargs_Model... # argument for `JuMP.Model`
-    )
-
-    # find approximate `max_d` by `finite_diff` from "shared.jl"
+)
+    ## find approximate `max_d` by `finite_diff` from "shared.jl"
     d_vec = finite_diff(cycs, obs_fluos; nu=1) # should use `nu=2` per Boggy 2010 paper (because MAK2 is no longer valid at max_d1), but use `nu=1` to increase the number of data points used for fit and seems to provide better fitting results
     max_d, max_d_idx = findmax(d_vec)
     idc2fit = 1:max_d_idx
     cycs2fit = 1:cycs[max_d_idx]
 
-    # fit a linear model to the estimated baseline portion of the curve
+    ## fit a linear model to the estimated baseline portion of the curve
     d2_vec = finite_diff(cycs, obs_fluos; nu=2)
     max_d2, max_d2_idx = findmax(d2_vec)
     idc2fit_4bl = 1:(max(1, max_d2_idx - 1))
@@ -171,14 +174,12 @@ function fit(
         jmp_model,
         # init_coefs
     )
-
-
-end
+end # fit(::MAK3)
 
 
 
 
-# # need `@eval`, not used
+## need `@eval`, not used
 #
 #
 # const d_nm1_STR = "d_nm1"
@@ -187,7 +188,7 @@ end
 # const fb_STR = "fb"
 #
 #
-# # associated with "get_mak2_pff"
+## associated with "get_mak2_pff"
 # function get_mak2_psf(
 #     num_cycs::Integer;
 #     d_nm1_str::String=d_nm1_STR,
@@ -210,7 +211,7 @@ end
 # end # get_mak2_psf
 #
 #
-# # `OutOfMemoryError()` upon macro expansion
+## `OutOfMemoryError()` upon macro expansion
 # function get_mak2_pff( # return an array whose each element is a prediction function for each cycle.
 #     num_cycs::Integer;
 #     d_nm1_str::String=d_nm1_STR,
@@ -230,7 +231,7 @@ end
 # end
 #
 #
-# # for `@NLobjective(jmp_model, Min, @eval ...)` from `fit_mak2`
+## for `@NLobjective(jmp_model, Min, @eval ...)` from `fit_mak2`
 # function get_mak2_rsq_str(
 #     obs_fluos::AbstractVector;
 #     kwdict_gmp::Associative=OrderedDict(), # keyword arguments passed onto `get_mak2_psf`
@@ -246,7 +247,7 @@ end
 
 
 
-# # for later use
+## for later use
 # pred_funcs = get_mak2_pff(num_cycs)
 # preds = map(func -> func(fb, d0, k), funcs)
 #

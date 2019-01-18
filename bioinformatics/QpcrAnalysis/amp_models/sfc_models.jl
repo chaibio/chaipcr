@@ -7,8 +7,8 @@ import JuMP: Model, @variable, @constraint, @NLconstraint, @NLobjective,
 
 
 function add_funcs_pred!(
-    md::SFCModelDef,
-    verbose::Bool=false
+    md          ::SFCModelDef,
+    verbose     ::Bool=false
 )
 
     _x_args_str = join(map(_x_str -> "$_x_str::Real", md._x_strs), ", ")
@@ -35,10 +35,10 @@ end
 
 
 function add_func_fit!( # vco = variable constraints objective
-    md::SFCModelDef;
-    Y_str::String="Y",
-    obj_algrt::String="RSS",
-    sense::String="Min", # "Min", "Max"
+    md          ::SFCModelDef;
+    Y_str       ::String = "Y",
+    obj_algrt   ::Symbol = :RSS,
+    sense       ::Symbol = :Min, # :Min, :Max
 )
 
     # X_strs
@@ -81,7 +81,7 @@ function add_func_fit!( # vco = variable constraints objective
 
     obj_macro_str = md.linear ? "@objective" : "@NLobjective" # `a1 = :(@some_macro); :($a1(arg1, arg2))` is equivalent to :((@some_macro()(arg1,arg2))), both of which raises "syntax: invalid macro use \"@($a1)\"". This why obj_macro need to be string, and other expressions are started as strings too for convenience.
 
-    func_str_replaced = md.pred_strs["f"]
+    func_str_replaced = md.pred_strs[:f]
     for j in 1:num_fts
         func_str_replaced = replace(
             func_str_replaced,
@@ -93,10 +93,10 @@ function add_func_fit!( # vco = variable constraints objective
     residual_str = "($func_str_replaced - $Y_str[i])"
     iter_str = "for i in 1:length($(X_strs[1]))" # assuming X and Y have the same length
 
-    if obj_algrt == "RSS"
+    if obj_algrt == :RSS
         obj_expr_str = "sum(wts[i] * $residual_str^2 $iter_str)"
         # sumabs2(map(eval(x_symbol) -> eval(func_expr), X) .- Y)
-    elseif obj_algrt == "l1_norm"
+    elseif obj_algrt == :l1_norm
         obj_expr_str = "sum(abs($residual_str) $iter_str)" # `abs()` may cause "Ipopt finished with status Restoration_Faild"
     end
 

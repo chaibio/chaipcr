@@ -1,70 +1,140 @@
-# constants and functions used by multiple types of analyses
+## functions used by multiple analytic methods
 
 import DataStructures.OrderedDict
+import Base: getindex
+# import Iterators.filter
 
 
+## using suggestion of MikeInnes https://github.com/JuliaLang/julia/issues/5571#issuecomment-446321504
+## overload :[ operator to enable function composition by piping with arguments
+## e.g. dict |> values |> map[function] |> reduce[vcat]
 
-# functions
-# moved to MySQLforQpcrAnalysis.jl: get_mysql_data_well
+getindex(f ::Function, x...) = (y...) -> f(x..., y...)
 
+## synonyms for getindex
+index(i,x)  = getindex(x,i)
+subset(i,x) = getindex(x,i)
 
-# find by sliding window the indices in a vector where the value at the index equals the summary value of the window centering at the index (window width = number of data points in the whole window). can be used to find peak summits and nadirs
-function find_mid_sumr_bysw(vals ::AbstractVector, half_width ::Integer, sumr_func ::Function=maximum)
-    padding = fill(-sumr_func(-vals), half_width)
-    vals_padded = [padding; vals; padding]
-    find(1:length(vals)) do i
-        vals_iw = vals_padded[i : i + half_width * 2] # iw = in window
-        return sumr_func(vals_iw) == vals_iw[half_width + 1]
-    end # do i
+## synonym for getfield
+field(f,x)  = getfield(x,f)
+
+## used in meltcrv.jl
+report(digits ::Int, x) = round.(x, digits)
+
+## unused functions
+inc_index(i ::Integer, len ::Integer) = (i >= len) ? len : i + 1
+dec_index(i ::Integer) = (i <= 1) ? 1 : i - 1
+
+## unused function
+## curried function
+## returns true when data == value, false otherwise
+selector(value ::Integer) =
+    data ::AbstractArray -> (data .== value)
+
+## used in amp.jl
+str2sym(x) = typeof(x) == String ? Symbol(x) : x
+
+## used in adj_w2wvaf.jl
+## used in meltcrv.jl
+## used in deconv.jl
+sweep(summary_func) = sweep_func -> (x -> sweep_func.(x, summary_func(x)))
+
+## used in meltcrv.jl
+## normalize values to a range from 0 to 1
+normalize_range(x ::AbstractArray) =
+    sweep(minimum)(-)(x) |> sweep(maximum)(/)
+
+## used in meltcrv.jl       
+## used in shared.jl
+thing(x) = x != nothing
+
+## used in standard_curve.jl
+## transform `nothing` to NaN
+nothing2NaN(x) =
+    isa(x, Void) ? NaN : x
+
+## used in standard_curve.jl
+## transform a real number to scientific notation
+function scinot(x ::Real, num_sig_digits ::Integer=3; log_base ::Integer=10)
+    if isnan(x)
+        return (NaN, NaN)
+    elseif x == 0
+        return (0, 0)
+    end
+    exponent = x |> abs |> log[log_base] |> floor
+    mantissa = round(x / log_base ^ exponent, num_sig_digits)
+    return (mantissa, Int(exponent))
 end
 
+## used in meltcrv.jl
+is_increasing(x ::AbstractVector) =
+    x[1:end-1] .< x[2:end]
 
-# finite differencing
-function finite_diff(
-    X ::AbstractVector, Y ::AbstractVector; # X and Y must be of same length
-    nu ::Integer=1, # order of derivative
-    method ::String="central"
+## used in meltcrv.jl
+## truncate elements to length of shortest element
+shorten(x...) =
+    map(y -> y[range(1, x |> map[length] |> minimum)], x)
+
+## used in meltcrv.jl
+## extend vector with NaN values to a specified length
+extend_NaN(len ::Integer, vec ::AbstractVector) =
+    len - length(vec) |>
+        m -> 
+            m >= 0 ?
+                (m |> fill[NaN] |> vcat[vec]) :
+                error("vector is too long")
+
+## extend array elements with NaNs to length of longest element
+extend(x ::AbstractArray) =
+    map(extend_NaN[(x |> map[length] |> maximum)], x)
+
+## used in meltcrv.jl
+## used in pnmsmu.jl
+# find nearby data points in vector
+# `giis` - get indices in span
+giis_uneven(
+    X      ::AbstractVector,
+    i      ::Integer,
+    span_x ::Real
+) =
+    find(X) do x
+        X[i] - span_x <= x <= X[i] + span_x
+    end
+
+## find the indices in a vector
+## where the value at the index equals the summary
+## value of the sliding window centering at the index
+## (window width = number of data points in the whole window).
+## can be used to find local summits and nadirs
+function find_mid_sumr_bysw(
+    vals       ::AbstractVector,
+    half_width ::Integer,
+    sumr_func  ::Function =maximum
 )
-
-    dlen = length(X)
-    if dlen != length(Y)
-        error("X and Y must be of same length.")
-    end
-
-    if (dlen == 1)
-        return zeros(1)
-    end
-
-    if (nu == 1)
-        if (method == "central")
-            range1 = 3:dlen+2
-            range2 = 1:dlen
-        elseif (method == "forward")
-            range1 = 3:dlen+2
-            range2 = 2:dlen+1
-        elseif (method == "backward")
-            range1 = 2:dlen+1
-            range2 = 1:dlen
-        end
-
-        X_p2, Y_p2 = map((X, Y)) do ori
-            vcat(
-                ori[2] * 2 - ori[1],
-                ori,
-                ori[dlen-1] * 2 - ori[dlen])
-        end
-
-        return (Y_p2[range1] .- Y_p2[range2]) ./ (X_p2[range1] .- X_p2[range2])
-
-    else
-        return finite_diff(
-            X,
-            finite_diff(X, Y; nu=nu-1, method=method),
-            nu=1;
-            method=method)
-    end # if nu == 1
-
+    vals_iw(i ::Integer) = vals_padded[i : i + half_width * 2]
+    #
+    const padding = fill(-sumr_func(-vals), half_width)
+    const vals_padded = [padding; vals; padding]
+    vals |> length |> range[1] |> collect |> map[vals_iw] |> 
+        map[v -> sumr_func(v) == v[half_width + 1]] |> find
 end
+
+## used in meltcrv.jl
+ordered_tuple(x, y) = (x < y) ? (x, y) : (y, x)
+
+## used in meltcrv.jl
+split_vector_and_return_larger_quantile(
+    x                   ::AbstractVector,
+    len                 ::Integer,          # == length(x)
+    idx                 ::Integer,          # 1 <= idx <= len
+    p                   ::AbstractFloat     # 0 <= p <= 1
+) =
+    (1:idx, idx:len) |>
+        map[range -> quantile(x[range], p)] |>
+        maximum
+
+## functions
+## moved to MySQLforQpcrAnalysis.jl: get_mysql_data_well
 
 # construct DataFrame from dictionary key and value vectors
 # `dict_keys` need to be a vector of strings
@@ -79,80 +149,35 @@ function dictvec2df(dict_keys ::AbstractVector, dict_values ::AbstractVector)
     return df
 end
 
+## used in adj_w2wvaf.jl
+num_channels(fluos ::AbstractArray) =
+    (length(fluos) > 1) && (fluos[2] != nothing) ? 2 : 1
+
+num_channels(calib ::Associative) =
+    calib |>
+        keys |>
+        map[key -> num_channels(calib[key]["fluorescence_value"])] |>
+        maximum
+
+## used in calib.jl
+num_wells(fluos ::AbstractArray) =
+    fluos |> filter[thing] |> map[length] |> maximum
+
+num_wells(calib ::Associative) =
+    calib |>
+        keys |>
+        collect |>
+        # Iterators.filter[key -> haskey(calib[key],"fluorescence_value")] |>
+        filter[key -> haskey(calib[key],"fluorescence_value")] |>
+        map[key -> num_wells(calib[key]["fluorescence_value"])] |>
+        maximum
 
 # duplicated in MySQLforQpcrAnalysis.jl
-function get_ordered_keys(dict ::Dict)
-    sort(collect(keys(dict)))
-end
-function get_ordered_keys(ordered_dict ::OrderedDict)
-    collect(keys(ordered_dict))
-end
-
-
-# functions to get indices in span.
-    # x_mp_i = index of middle point in selected data points from X
-    # sel_idc = selected indices
-
-function giis_even(
-    dlen ::Integer,
-    i ::Integer,
-    span_dp ::Integer
-)
-    start_idx = i > span_dp ? i - span_dp : 1
-    end_idx = i < dlen - span_dp ? i + span_dp : dlen
-    return start_idx:end_idx
-end
-
-function giis_uneven(
-    X ::AbstractVector,
-    i ::Integer, span_x ::Real
-)
-    return find(X) do x_dp
-        X[i] - span_x <= x_dp <= X[i] + span_x # dp = data point
-    end # do x_dp
-end
-
-
-# mutate duplicated elements in a numeric vector so that all the elements become unique
-function mutate_dups(
-    vec_2mut ::AbstractVector,
-    frac2add ::Real =0.01
-)
-
-    vec_len = length(vec_2mut)
-    vec_uniq = sort(unique(vec_2mut))
-    vec_uniq_len = length(vec_uniq)
-
-    if (vec_len == vec_uniq_len)
-        return vec_2mut
-    else
-        order_to = sortperm(vec_2mut)
-        order_back = sortperm(order_to)
-        vec_sorted = (vec_2mut + .0)[order_to]
-        vec_sorted_prev = vcat(vec_sorted[1]-1, vec_sorted[1:vec_len-1])
-        dups = (1:vec_len)[map(1:vec_len) do i
-            vec_sorted[i] == vec_sorted_prev[i]
-        end]
-
-        add1 = frac2add * median(map(2:vec_uniq_len) do i
-            vec_uniq[i] - vec_uniq[i-1]
-        end)
-
-        for dup_i in 1:length(dups)
-            dup_i_moveup = dup_i
-            rank = 1
-            while dup_i_moveup > 1 && dups[dup_i_moveup] - dups[dup_i_moveup-1] == 1
-                dup_i_moveup -= 1
-                rank += 1
-            end
-            vec_sorted[dups[dup_i]] += add1 * rank
-        end
-
-        return vec_sorted[order_back]
-    end
-
-end
-
+get_ordered_keys(dict ::Dict) =
+    dict |> keys |> collect |> sort
+    
+get_ordered_keys(ordered_dict ::OrderedDict) =
+    ordered_dict |> keys |> collect
 
 # parse AbstractFloat on BBB
 function parse_af{T<:AbstractFloat}( ::Type{T}, strval ::String)
@@ -160,7 +185,6 @@ function parse_af{T<:AbstractFloat}( ::Type{T}, strval ::String)
     float_parts = map(str_part -> Base.parse(Int32, str_part), str_parts)
     return float_parts[1] + float_parts[2] / 10^length(str_parts[2])
 end
-
 
 # print with verbose control
 function print_v(
@@ -175,7 +199,7 @@ function print_v(
     return nothing
 end
 
-
+# unused function
 # repeat n times: take the output of an function and use it as the input for the same function
 function redo(
     func ::Function,
@@ -193,6 +217,8 @@ function redo(
 end
 
 
+# unused function
+#
 # reshape a layered vector into a multi-dimension array
 # where outer layer is converted to higher dimension
 # and each element has `num_layers_left` layers left
@@ -213,7 +239,9 @@ function reshape_lv(
     return md_array
 end
 
-
+# legacy function
+# deprecated to remove MySql dependency
+#
 # function: check whether a value different from `calib_info_AIR` is passed onto `calib_info`
 # if not, use `exp_id` to find calibration experiment in MySQL database
 # and assumes water "step_id"=2, signal "step_id"=4, using FAM to calibrate all the channels.
@@ -231,7 +259,6 @@ function ensure_ci(
     # use calibration data from experiment `calib_info_AIR` by default
     exp_id::Integer=calib_info_AIR
 )
-
     # new >>
     # not implemented yet
     return calib_data
@@ -283,7 +310,7 @@ end # ensure_ci
 
 
 
-
+# legacy function
 # deprecated to remove MySql dependency
 #
 # function get_mysql_data_well(
@@ -302,30 +329,6 @@ end # ensure_ci
 #     return (found_well_namedtuple, found_well_nums)
 # end
 
-
-
-
-function num_channels(
-    calib ::Associative
-)
-    n_channels = 1
-    for field in keys(calib)
-        if (length(field) > 1) && (calib[field]["fluorescence_value"][2]!=nothing)
-            n_channels = 2
-        end
-    end
-    return n_channels
-end
-
-function num_wells(
-    calib ::Associative
-)
-    maximum(map(
-        x -> maximum(map(
-            y -> length(y),
-            calib[x]["fluorescence_value"])),
-        keys(calib)))
-end
 
 
 

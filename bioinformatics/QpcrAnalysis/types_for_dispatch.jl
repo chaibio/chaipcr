@@ -1,7 +1,7 @@
-# types_for_dispatch.jl
+## types_for_dispatch.jl
 #
-# Author: Tom Price
-# Date: Dec 2018
+## Author: Tom Price
+## Date: Dec 2018
 
 abstract type  Action                                 end
 struct         Amplification                <: Action end

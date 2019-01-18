@@ -6,6 +6,7 @@
 # header file for QpcrAnalysis.jl module
 # defines all constants used anywhere in the module
 
+import DataStructures.OrderedDict
 import JLD
 
 # output format
@@ -60,13 +61,21 @@ const K4DCV = JLD.load("$LOAD_FROM_DIR/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv
 const libsupsmu = "$LOAD_FROM_DIR/_supsmu.so"
 
 # used in meltcurve.jl
+const TF_KEYS = [:temperature, :fluorescence_value]
 const EMPTY_mc = zeros(1,3)[1:0,:]
 const EMPTY_Ta = zeros(1,2)[1:0,:]
-const EMPTY_mc_tm_pw_out = OrderedDict(
-    "mc" => EMPTY_mc,
-    "Ta_raw" => EMPTY_Ta,
-    "Ta_fltd" => EMPTY_Ta
+const EMPTY_mc_tm_pw_out = MeltCurveTa(
+    EMPTY_mc,                                   # mc_raw
+    EMPTY_Ta,                                   # Ta_fltd
+    EMPTY_mc,                                   # mc_denser
+    NaN,                                        # ns_range_mid
+    Dict(:tmprtrs=>EMPTY_Ta, :fluos=>EMPTY_Ta), # sn_dict
+    EMPTY_Ta,                                   # Ta_raw
+    ""                                          # Ta_reported
 )
+const MC_OUT_FIELDS = OrderedDict(
+    :mc      => :melt_curve_data,
+    :Ta_fltd => :melt_curve_analysis)
 
 ## used in optical_test_single_channel.jl
 # const BASELINE_STEP_ID = 12
@@ -79,10 +88,10 @@ const MAX_EXCITATION = 384000
 # used in optical_test_dual_channel.jl
 const CHANNELS = [1, 2]
 const CHANNEL_IS = 1:length(CHANNELS)
-const CALIB_LABELS_FAM_HEX = map(channel -> "channel_$channel", CHANNELS)
+const CALIB_SYMBOLS_FAM_HEX = Symbol.(map(channel -> "channel_$channel", CHANNELS))
 const SYMBOLS_FAM_HEX = [:FAM, :HEX]
-const OLD_CALIB_LABELS = ["baseline"; "water"; CALIB_LABELS_FAM_HEX]
-const NEW_CALIB_LABELS = ["baseline"; "water"; map(string,SYMBOLS_FAM_HEX)]
+const OLD_CALIB_SYMBOLS = [:baseline; :water; CALIB_SYMBOLS_FAM_HEX]
+const NEW_CALIB_SYMBOLS = [:baseline; :water; SYMBOLS_FAM_HEX]
 
 # bounds of signal-to-noise ratio (SNR)
 # used in optical_test_dual_channel.jl
@@ -96,7 +105,7 @@ const SNR_HEX_CH2_MIN = 0.88
 dscrmnt_snr_fam(snr_2chs) = [snr_2chs[1] > SNR_FAM_CH1_MIN, snr_2chs[2] < SNR_FAM_CH2_MAX]
 dscrmnt_snr_hex(snr_2chs) = [snr_2chs[1] < SNR_HEX_CH1_MAX, snr_2chs[2] > SNR_HEX_CH2_MIN]
 const dscrmnts_snr = OrderedDict(map(1:2) do i
-    CALIB_LABELS_FAM_HEX[i] => [dscrmnt_snr_fam, dscrmnt_snr_hex][i]
+    CALIB_SYMBOLS_FAM_HEX[i] => [dscrmnt_snr_fam, dscrmnt_snr_hex][i]
 end) # do i
 
 # fluo values: channel 1, channel 2
