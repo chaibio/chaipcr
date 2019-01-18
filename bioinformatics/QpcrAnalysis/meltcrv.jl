@@ -56,7 +56,7 @@ function process_mc(
     span_smooth_default ::Real =0.015,
     span_smooth_factor  ::Real =7.2,
     ## end: arguments that might be passed by upstream code
-    dye_in              ::Symbol =:FAM,
+    dye_in              ::Symbol = :FAM,
     dyes_2bfild         ::AbstractVector =[],
     dcv                 ::Bool =true, # logical, whether to perform multi-channel deconvolution
 	max_tmprtr          ::Real =1000, # maximum temperature to analyze

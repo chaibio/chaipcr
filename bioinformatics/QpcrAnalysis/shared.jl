@@ -18,6 +18,9 @@ subset(i,x) = getindex(x,i)
 ## synonym for getfield
 field(f,x)  = getfield(x,f)
 
+## used in meltcrv.jl
+report(digits ::Int, x) = round.(x, digits)
+
 ## unused functions
 inc_index(i ::Integer, len ::Integer) = (i >= len) ? len : i + 1
 dec_index(i ::Integer) = (i <= 1) ? 1 : i - 1
@@ -47,9 +50,8 @@ thing(x) = x != nothing
 
 ## used in standard_curve.jl
 ## transform `nothing` to NaN
-function nothing2NaN(input)
-    return isa(input, Void) ? NaN : input
-end
+nothing2NaN(x) =
+    isa(x, Void) ? NaN : x
 
 ## used in standard_curve.jl
 ## transform a real number to scientific notation
@@ -59,7 +61,7 @@ function scinot(x ::Real, num_sig_digits ::Integer=3; log_base ::Integer=10)
     elseif x == 0
         return (0, 0)
     end
-    exponent = floor(log(log_base, abs(x)))
+    exponent = x |> abs |> log[log_base] |> floor
     mantissa = round(x / log_base ^ exponent, num_sig_digits)
     return (mantissa, Int(exponent))
 end
@@ -90,15 +92,14 @@ extend(x ::AbstractArray) =
 ## used in pnmsmu.jl
 # find nearby data points in vector
 # `giis` - get indices in span
-function giis_uneven(
+giis_uneven(
     X      ::AbstractVector,
     i      ::Integer,
     span_x ::Real
-)
-    return find(X) do x
+) =
+    find(X) do x
         X[i] - span_x <= x <= X[i] + span_x
     end
-end
 
 ## find the indices in a vector
 ## where the value at the index equals the summary
@@ -122,19 +123,15 @@ end
 ordered_tuple(x, y) = (x < y) ? (x, y) : (y, x)
 
 ## used in meltcrv.jl
-function split_vector_and_return_larger_quantile(
+split_vector_and_return_larger_quantile(
     x                   ::AbstractVector,
     len                 ::Integer,          # == length(x)
     idx                 ::Integer,          # 1 <= idx <= len
     p                   ::AbstractFloat     # 0 <= p <= 1
-)
+) =
     (1:idx, idx:len) |>
         map[range -> quantile(x[range], p)] |>
         maximum
-end
-
-## used in meltcrv.jl
-report(digits ::Int, x) = round.(x, digits)
 
 ## functions
 ## moved to MySQLforQpcrAnalysis.jl: get_mysql_data_well

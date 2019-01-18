@@ -6,7 +6,6 @@ import Dierckx: Spline1D, derivative
 function act(
     ::ThermalConsistency,
     ## remove MySql dependency
-    #
     # db_conn ::MySQL.MySQLHandle,
     # exp_id ::Integer,
     # stage_id ::Integer,
@@ -32,10 +31,9 @@ function act(
     if haskey(req_dict, "max_normd_qtv")
         kwdict_mc_tm_pw[:normd_qtv_ub] = req_dict["max_normd_qtv"]
     end
-    if haskey(req_dict, "max_normd_qtv")
+    if haskey(req_dict, "top_N")
         kwdict_mc_tm_pw[:top_N] = req_dict["top_N"]
     end
-
     ## process data as melting curve
     mc_w72c = process_mc(
         ## remove MySql dependency
@@ -95,19 +93,16 @@ function act(
         return ThermalConsistencyOutput(
             tm_check_vec,
             (delta_Tm_val, delta_Tm_val <= MAX_DELTA_TM_VAL),
-            true
-        )
-    else
-        mc_w72c_out = OrderedDict(
-            :tm_check => tm_check_vec,
-            :delta_Tm => (round(delta_Tm_val, JSON_DIGITS), delta_Tm_val <= MAX_DELTA_TM_VAL),
-            :valid    => true
-        )
-        if (out_format == :json)
-            return JSON.json(mc_w72c_out)
-        end
+            true)
     end
-    return mc_w72c_out
+    ## out_format != :full
+    mc_w72c_out = OrderedDict(
+        :tm_check => tm_check_vec,
+        :delta_Tm => (round(delta_Tm_val, JSON_DIGITS), delta_Tm_val <= MAX_DELTA_TM_VAL),
+        :valid    => true)
+    return (out_format == :json) ?
+        JSON.json(mc_w72c_out) :
+        mc_w72c_out
 end
 
 

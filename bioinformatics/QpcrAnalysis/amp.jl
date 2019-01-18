@@ -15,7 +15,7 @@ function act(
     out_format      ::Symbol = :pre_json,
     verbose         ::Bool =false
 )
-    ## remove MySql dependency  
+    ## remove MySql dependency
     ## asrp_vec
     # if "step_id" in keys_req_dict
     #     asrp_vec = [AmpStepRampProperties("step", req_dict["step_id"], DEFAULT_cyc_nums)]
@@ -72,10 +72,10 @@ function act(
         end
     end
     ## call
-    response = process_amp( 
+    response = process_amp(
         ## remove MySql dependency
         # db_conn, exp_id, asrp_vec, calib_info;
-        req_dict["experiment_id"], 
+        req_dict["experiment_id"],
         req_dict["raw_data"],
         req_dict["calibration_info"],
         asrp_vec;
@@ -102,8 +102,8 @@ function process_amp(
     exp_id                  ::Integer,
     exp_data                ::Associative,
     calib_data              ::Associative,
-    ## we will assume that any relevant step/ramp information has already been passed along
-    ## and is present in asrp_vec
+    ## we will assume that any relevant step/ramp information
+    ## has already been passed along and is present in asrp_vec
     asrp_vec                ::Vector{AmpStepRampProperties};
     ## keyword arguments
     min_reliable_cyc        ::Real =5,
@@ -251,7 +251,7 @@ function process_amp(
         process_amp_1sr(
             ## remove MySql dependency
             # db_conn, exp_id, asrp, calib_info,
-            # fluo_well_nums, well_nums, 
+            # fluo_well_nums, well_nums,
             exp_data,
             calib_data,
             asrp,
@@ -289,7 +289,9 @@ function process_amp(
         end)
     end
     final_out[:valid] = true
-    return out_format == :json ? JSON.json(final_out) : final_out
+    return out_format == :json ?
+        JSON.json(final_out) :
+        final_out
 end # process_amp()
 
 
@@ -303,7 +305,7 @@ end # process_amp()
 #    fluo_well_nums ::AbstractVector, # not `[]`, all elements are expected to be found
 #    channel_nums ::AbstractVector,
 # )
-#    
+#
 #    cyc_nums = asrp.cyc_nums
 #    
 #    get fluorescence data for amplification
@@ -324,55 +326,10 @@ end # process_amp()
 #        fluo_sel[JSON.parse(col_name)],
 #        map(length, (cyc_nums, fluo_well_nums, channel_nums))...
 #    )
-#    
+#
 #    return fluo_raw
-#    
+#
 # end # get_amp_data
-
-
-## automatically choose baseline cycles as the flat part of the curve
-function auto_choose_bl_cycs(
-    fluos           ::AbstractVector,
-    last_cyc_wt0    ::Real, # `floor(min_reliable_cyc) - 1`
-    bl_notes        ::Vector{String} # will be updated by `push!` and returned
-)
-    num_cycs = length(fluos)
-    cycs = 1.0 * (1:num_cycs)
-    min_fluo, min_fluo_cyc = findmin(fluos)
-    dr2_cfd = finite_diff(cycs, fluos; nu=2) # `Dierckx.Spline1D` resulted in all `NaN` in some cases
-    dr2_cfd_left = dr2_cfd[1:min_fluo_cyc]
-    dr2_cfd_right = dr2_cfd[min_fluo_cyc:end]
-    max_dr2_left_cyc, max_dr2_right_cyc = map((dr2_cfd_left, dr2_cfd_right)) do dr2_vec
-        findmax(dr2_vec)[2]
-    end # do dr2_vec
-    #
-    if max_dr2_right_cyc <= last_cyc_wt0 # fluo on fitted spline may not be close to raw fluo at `cyc_m2l` and `cyc_m2r`
-        push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) <= last_cyc_wt0 ($last_cyc_wt0), bl_cycs = $(last_cyc_wt0+1):$num_cycs")
-        bl_cycs = last_cyc_wt0+1:num_cycs
-    else
-        bl_cyc_start = max(last_cyc_wt0+1, max_dr2_left_cyc)
-        push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) > last_cyc_wt0 ($last_cyc_wt0), bl_cyc_start = $bl_cyc_start (max(last_cyc_wt0+1, max_dr2_left_cyc), i.e. max($(last_cyc_wt0+1), $max_dr2_left_cyc))")
-        if max_dr2_right_cyc - bl_cyc_start <= 1
-            push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) - bl_cyc_start ($bl_cyc_start) <= 1")
-            max_dr2_right_2, max_dr2_right_cyc_2_shifted = findmax(dr2_cfd[max_dr2_right_cyc+1:end])
-            max_dr2_right_cyc_2 = max_dr2_right_cyc_2_shifted + max_dr2_right_cyc
-            if max_dr2_right_cyc_2 - max_dr2_right_cyc == 1
-                bl_cyc_end = num_cycs
-                push!(bl_notes, "max_dr2_right_cyc_2 ($max_dr2_right_cyc_2) - max_dr2_right_cyc ($max_dr2_right_cyc) == 1")
-            else
-                push!(bl_notes, "max_dr2_right_cyc_2 ($max_dr2_right_cyc_2) - max_dr2_right_cyc ($max_dr2_right_cyc) != 1")
-                bl_cyc_end = max_dr2_right_cyc_2
-            end # if m2r2_idx
-        else
-            push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) - bl_cyc_start ($bl_cyc_start) > 1")
-            bl_cyc_end = max_dr2_right_cyc
-        end # if cyc_m2r - bl_cyc_start <= 1
-        push!(bl_notes, "bl_cyc_end = $bl_cyc_end")
-        bl_cycs = bl_cyc_start:bl_cyc_end
-        push!(bl_notes, "bl_cycs = $bl_cyc_start:$bl_cyc_end")
-    end # cyc_m2r <= last_cyc_wt0
-    return (bl_cycs, bl_notes)
-end # auto_choose_bl_cycs
 
 
 ## fit model, baseline subtraction, quantification
@@ -396,135 +353,141 @@ function mod_bl_q(
     ),
     ipopt_print2file ::String ="",
 )
-    const num_cycs = length(fluos)
-    const cycs = 1.0 * (1:num_cycs)
-    const cycs_denser = Array(colon(1, (num_cycs - 1) / denser_factor, num_cycs))
-    const len_bcb = length(baseline_cyc_bounds)
-    const last_cyc_wt0 = floor(min_reliable_cyc) - 1 # to determine weights (`wts`) for sigmoid fitting per `min_reliable_cyc`
-    ## will remain the same `if len_bcb == 0 && (last_cyc_wt0 <= 1 || num_cycs < min_reliable_cyc)`
-    #
-    wts = ones(num_cycs)
-    fitted_prebl = AF_EMPTY_DICT[af_key]
-    baseline = bl_fallback_func(fluos)
-    bl_notes = ["last_cyc_wt0 <= 1 || num_cycs < min_reliable_cyc, fallback"]
-    #
-    solver = kwargs_jmp_model[:solver]
-    if isa(solver, Ipopt.IpoptSolver)
-        push!(solver.options, (:output_file, ipopt_print2file))
-    end
-    #
-    if af_key == :dfc 
+    function fit_dfc_model()
         ## no fallback for baseline, because:
         ## (1) curve may fit well though :Error or :UserLimit
         ## (search step becomes very small but has not converge);
         ## (2) the guessed basedline (`start` of `fb`) is usually
         ## quite close to a sensible baseline.
-        dfc_inst = dfc_DICT[af_key]()
-        fitted_prebl = fit(dfc_inst, cycs, fluos, wts; kwargs_jmp_model...)
-        baseline = fitted_prebl.coefs[1] # "fb" (fallback)
+        const dfc_inst = dfc_DICT[af_key]()
+        const wts = ones(num_cycs)
+        const fitted_prebl = fit(dfc_inst, cycs, fluos, wts; kwargs_jmp_model...)
         if af_key in [:MAK3, :MAKERGAUL4]
-            baseline += fitted_prebl.coefs[2] .* cycs # `.+=` caused "ERROR: MethodError: no method matching broadcast!( ::QpcrAnalysis.##278#283, ::Float64, ::Float64, ::Float64, ::StepRangeLen{Float64,Base.TwicePrecision{Float64},Base.TwicePrecision{Float64}})"
+            baseline = fitted_prebl.coefs[1] + fitted_prebl.coefs[2] .* cycs # .+ ???
+        else
+            baseline = fitted_prebl.coefs[1] # `fb` - fallback
         end # if af_key
-        fitted_postbl = fitted_prebl
-        coefs_pob = fitted_postbl.coefs
-        d0_i_vec = find(coef_sym -> coef_sym == :d0, fitted_postbl.coef_syms)
-        d0 = coefs_pob[d0_i_vec[1]] # * 1. # without `* 1.`, MethodError: no method matching kmeans!( ::Array{AbstractFloat,2}, ::Array{Float64,2}); Closest candidates are: kmeans!( ::Array{T<:AbstractFloat,2}, ::Array{T<:AbstractFloat,2}; weights, maxiter, tol, display) where T<:AbstractFloat at E:\for_programs\julia_pkgs\v0.6\Clustering\src\kmeans.jl:27
-        ## for `Sfc`-style output
-        bl_notes = [af_key]
-        blsub_fluos = fluos .- baseline
-        blsub_fitted = pred_from_cycs(dfc_inst, cycs, coefs_pob...)
-        max_dr1 = max_dr2 = Inf
-        cyc_vals_4cq = eff_vals_4cq = OrderedDict()
-        eff = NaN
-        cq_raw = NaN
-        cq_fluo = NaN
-    elseif af_key == :sfc
-        if bl_method in keys(sfc_model_defs)
+        const fitted_postbl = fitted_prebl
+        const coefs_pob = fitted_postbl.coefs
+        const d0_i_vec = find(coef_sym -> coef_sym == :d0, fitted_postbl.coef_syms)
+        return MbqOutput(
+            fitted_prebl,
+            [af_key], # bl_notes,
+            fluos .- baseline, # blsub_fluos
+            fitted_postbl,
+            fitted_postbl.status,
+            coefs_pob, # coefs
+            coefs_pob[d0_i_vec[1]], # d0
+            pred_from_cycs(dfc_inst, cycs, coefs_pob...), # blsub_fitted
+            NaN, # dr1_pred,
+            NaN, # dr2_pred,
+            Inf, # max_dr1
+            Inf, # max_dr2
+            OrderedDict(), # cyc_vals_4cq
+            OrderedDict(), # eff_vals_4cq
+            NaN, # cq_raw
+            NaN, # cq
+            NaN, # eff
+            NaN # cq_fluo
+        )
+    end
+
+    function fit_sfc_model()
+
+        function sfc_wts()
             if bl_method in [:lin_1ft, :lin_2ft]
-                wts = zeros(num_cycs)
-                wts[colon(baseline_cyc_bounds...)] .= 1
+                _wts = zeros(num_cycs)
+                _wts[colon(baseline_cyc_bounds...)] .= 1
+                return _wts
             else # sigmoid models so far
-                wts = vcat(zeros(last_cyc_wt0), ones(num_cycs - last_cyc_wt0))
+                return vcat(zeros(last_cyc_wt0), ones(num_cycs - last_cyc_wt0))
             end
-            #
-            fitted_prebl = sfc_model_defs[bl_method].func_fit(cycs, fluos, wts; kwargs_jmp_model...)
-            prebl_status = fitted_prebl.status
-            bl_notes = ["prebl_status $prebl_status"]
-            baseline = sfc_model_defs[bl_method].funcs_pred[:bl](cycs, fitted_prebl.coefs...) # may be changed later
-            #
+        end
+
+        ## update bl_notes
+        function sfc_prebl_status(prebl_status)            
+            bl_notes = ["prebl_status $prebl_status", "model-derived baseline"]
             if prebl_status in [:Optimal, :UserLimit]
-                push!(bl_notes, "model-derived baseline") # may be changed later
-                blsub_fluos_draft = fluos .- baseline
-                min_bfd, max_bfd = extrema(blsub_fluos_draft) # bfd = blsub_fluos_draft
+                const min_bfd, max_bfd = extrema(fluos .- baseline) # `bfd` - blsub_fluos_draft
                 if max_bfd - min_bfd <= abs(min_bfd)
-                    bl_notes[2] = "fallback" # change
+                    bl_notes[2] = "fallback"
                     push!(bl_notes, "max_bfd ($max_bfd) - min_bfd ($min_bfd) == $(max_bfd - min_bfd) <= abs(min_bfd)")
                 end # if max_bfd
             elseif prebl_status == :Error
-                push!(bl_notes, "fallback")
-            end # if prebl_status
-            if length(bl_notes) >= 2 && bl_notes[2] == "fallback"
-                bl_func = bl_fallback_func
+                bl_notes[2] = "fallback"
+            else
+                ## other status codes include
+                ## ::Infeasible, :Unbounded, :DualityFailure, and possibly others
+                ## https://mathprogbasejl.readthedocs.io/en/latest/solverinterface.html
+                ## My suggestion is to treat the same as :Error (TP Jan 2019):
+                bl_notes[2] = "fallback"
+                ## Alternatively, an error could be raised:
+                # error("Baseline estimation returned unrecognized termination status $prebl_status")
             end
-        else # if not fit model to find baseline
-            bl_notes = ["no prebl_status", "no fallback"]
-            if bl_method == :median
-                bl_func = median
-            end
-        end # if bl_method
-        #
-        if len_bcb == 0 && last_cyc_wt0 > 1 && num_cycs >= min_reliable_cyc
-        # if last_cyc_wt0 > 1 && num_cycs >= min_reliable_cyc
-            bl_cycs, bl_notes = auto_choose_bl_cycs(fluos, last_cyc_wt0, bl_notes)
-        elseif len_bcb == 2
-            bl_cycs = colon(baseline_cyc_bounds...)
-            push!(bl_notes, "User-defined")
-            # baseline = bl_fallback_func(fluos[colon(baseline_cyc_bounds...)])
-            # bl_notes = ["User-defined"]
-        elseif !(len_bcb in [0, 2])
-            error("Length of `baseline_cyc_bounds` must be 0 or 2.")
-        end # if len_bcb
-        #
-        if !(length(bl_notes) >= 2 && bl_notes[2] == "model-derived baseline")
-            baseline = bl_func(fluos[bl_cycs]) # change or new def
+            return bl_notes
         end
-        #
-        blsub_fluos = fluos .- baseline
-        fitted_postbl = sfc_model_defs[m_postbl].func_fit(
-            cycs,
-            blsub_fluos,
-            wts;
-            kwargs_jmp_model...)
-        coefs_pob = fitted_postbl.coefs
-        d0 = NaN
-        #
-        func_pred_f = sfc_model_defs[m_postbl].funcs_pred[:f]
-        blsub_fitted = func_pred_f(cycs, coefs_pob...)
-        len_denser = length(cycs_denser)
-        #
-        dr1_pred = sfc_model_defs[m_postbl].funcs_pred[:dr1](cycs_denser, coefs_pob...)
-        max_dr1, idx_max_dr1 = findmax(dr1_pred)
-        cyc_max_dr1 = cycs_denser[idx_max_dr1]
-        #
-        dr2_pred = sfc_model_defs[m_postbl].funcs_pred[:dr2](cycs_denser, coefs_pob...)
-        max_dr2, idx_max_dr2 = findmax(dr2_pred)
-        cyc_max_dr2 = cycs_denser[idx_max_dr2]
-        #
-        Cy0 = cyc_max_dr1 - func_pred_f(cyc_max_dr1, coefs_pob...) / max_dr1
-        #
-        ct = try
-            sfc_model_defs[m_postbl].funcs_pred[:inv](ct_fluo, coefs_pob...)
-        catch err
-            isa(err, DomainError) ? Ct_VAL_DomainError : "unhandled error"
-        end # try
-        #
-        cyc_vals_4cq = OrderedDict(
-            :cp_dr1 => cyc_max_dr1,
-            :cp_dr2 => cyc_max_dr2,
-            :Cy0    => Cy0,
-            :ct     => ct)
-        #
-        func_pred_eff = function(cyc)
+
+        function calc_bl_cycs()
+            if !(len_bcb in [0, 2])
+                error("Length of `baseline_cyc_bounds` must be 0 or 2.")
+            elseif len_bcb == 2
+                push!(bl_notes, "User-defined")
+                # baseline = bl_fallback_func(fluos[colon(baseline_cyc_bounds...)])
+                return colon(baseline_cyc_bounds...)
+            elseif len_bcb == 0 && last_cyc_wt0 > 1 && num_cycs >= min_reliable_cyc
+                return auto_choose_bl_cycs()
+            end
+            ## fallthrough
+            error("Cannot calculate `bl_cycs`")
+        end
+
+        ## automatically choose baseline cycles as the flat part of the curve
+        ## uses `fluos`, `last_cyc_wt0`; updates `bl_notes` using push!()
+        ## `last_cyc_wt0 == floor(min_reliable_cyc) - 1`
+        function auto_choose_bl_cycs()
+            const num_cycs = length(fluos)
+            const cycs = range(1.0, num_cycs)
+            const min_fluo, min_fluo_cyc = findmin(fluos)
+            const dr2_cfd = finite_diff(cycs, fluos; nu=2) # `Dierckx.Spline1D` resulted in all `NaN` in some cases
+            const dr2_cfd_left = dr2_cfd[1:min_fluo_cyc]
+            const dr2_cfd_right = dr2_cfd[min_fluo_cyc:end]
+            const max_dr2_left_cyc, max_dr2_right_cyc =
+                map(
+                    dr2_vec -> findmax(dr2_vec)[2],
+                    (dr2_cfd_left, dr2_cfd_right))
+            if max_dr2_right_cyc <= last_cyc_wt0 
+                ## fluo on fitted spline may not be close to raw fluo
+                ## at `cyc_m2l` and `cyc_m2r`
+                push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) <= last_cyc_wt0 ($last_cyc_wt0), bl_cycs = $(last_cyc_wt0+1):$num_cycs")
+                return colon(last_cyc_wt0+1, num_cycs)
+            end
+            ## max_dr2_right_cyc > last_cyc_wt0
+            const bl_cyc_start = max(last_cyc_wt0+1, max_dr2_left_cyc)
+            push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) > last_cyc_wt0 ($last_cyc_wt0), bl_cyc_start = $bl_cyc_start (max(last_cyc_wt0+1, max_dr2_left_cyc), i.e. max($(last_cyc_wt0+1), $max_dr2_left_cyc))")
+            if max_dr2_right_cyc - bl_cyc_start <= 1
+                push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) - bl_cyc_start ($bl_cyc_start) <= 1")
+                const max_dr2_right_2, max_dr2_right_cyc_2_shifted =
+                    findmax(dr2_cfd[max_dr2_right_cyc+1:end])
+                const max_dr2_right_cyc_2 = max_dr2_right_cyc_2_shifted + max_dr2_right_cyc
+                if max_dr2_right_cyc_2 - max_dr2_right_cyc == 1
+                    const bl_cyc_end = num_cycs
+                    push!(bl_notes, "max_dr2_right_cyc_2 ($max_dr2_right_cyc_2) - max_dr2_right_cyc ($max_dr2_right_cyc) == 1")
+                else # max_dr2_right_cyc_2 - max_dr2_right_cyc != 1
+                    push!(bl_notes, "max_dr2_right_cyc_2 ($max_dr2_right_cyc_2) - max_dr2_right_cyc ($max_dr2_right_cyc) != 1")
+                    const bl_cyc_end = max_dr2_right_cyc_2
+                end # if
+            else # cyc_m2r - bl_cyc_start > 1
+                push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) - bl_cyc_start ($bl_cyc_start) > 1")
+                const bl_cyc_end = max_dr2_right_cyc
+            end # if
+            push!(bl_notes, "bl_cyc_end = $bl_cyc_end")
+            const bl_cycs = bl_cyc_start:bl_cyc_end
+            push!(bl_notes, "bl_cycs = $bl_cyc_start:$bl_cyc_end")
+            return bl_cycs
+        end # auto_choose_bl_cycs()
+
+        ## function needed because `Cy0` may not be in `cycs_denser`
+        function func_pred_eff(cyc)
             try
                 log(2, /(map([0.5, -0.5]) do epsilon
                     func_pred_f(cyc + epsilon, coefs_pob...)
@@ -532,40 +495,112 @@ function mod_bl_q(
             catch err
                 isa(err, DomainError) ? NaN : "unhandled error"
             end # try
-        end # function. needed because `Cy0` may not be in `cycs_denser`
-        eff_vals_4cq = OrderedDict(map(keys(cyc_vals_4cq)) do key
-            key => func_pred_eff(cyc_vals_4cq[key])
-        end)
-        eff_pred = map(func_pred_eff, cycs_denser)
-        eff_vals_4cq[:max_eff], idx_max_eff = findmax(eff_pred)
-        cyc_vals_4cq[:max_eff] = cycs_denser[idx_max_eff]
-        cq_raw = cyc_vals_4cq[cq_method]
-        eff = eff_vals_4cq[cq_method]
-        cq_fluo = func_pred_f(cq_raw <= 0 ? NaN : cq_raw, coefs_pob...)
-    else
-        error("`af_key` $af_key is not recognized.")
-    end # if af_key
+        end
+        ## end of function definitions nested within fit_sfc()
+
+        if bl_method in keys(sfc_model_defs)
+            ## fit model to find baseline
+            const wts = sfc_wts()
+            const fitted_prebl = sfc_model_defs[bl_method].func_fit(
+                cycs, fluos, wts; kwargs_jmp_model...)
+            baseline = sfc_model_defs[bl_method].funcs_pred[:bl](
+                cycs, fitted_prebl.coefs...) # may be changed later
+            bl_notes = sfc_prebl_status(fitted_prebl.status)
+            if length(bl_notes) >= 2 && bl_notes[2] == "fallback"
+                const bl_func = bl_fallback_func
+            end
+        else
+            ## do not fit model to find baseline
+            const wts = ones(num_cycs)
+            const fitted_prebl = AF_EMPTY_DICT[af_key]
+            bl_notes = ["no prebl_status", "no fallback"]
+            if bl_method == :median
+                const bl_func = median
+            else
+                ## `bl_func` undefined
+                error("Baseline estimation function `bl_func` not defined for `bl_method` $bl_method")
+            end
+        end
+        const bl_cycs = calc_bl_cycs()
+        if !(length(bl_notes) >= 2 && bl_notes[2] == "model-derived baseline")
+            baseline = bl_func(fluos[bl_cycs]) # change or new def
+        end
+        const blsub_fluos = fluos .- baseline
+        const fitted_postbl = sfc_model_defs[m_postbl].func_fit(
+            cycs, blsub_fluos, wts; kwargs_jmp_model...)
+        const coefs_pob = fitted_postbl.coefs
+        const func_pred_f = sfc_model_defs[m_postbl].funcs_pred[:f]
+        const dr1_pred = sfc_model_defs[m_postbl].funcs_pred[:dr1](
+            cycs_denser, coefs_pob...)
+        const max_dr1, idx_max_dr1 = findmax(dr1_pred)
+        const cyc_max_dr1 = cycs_denser[idx_max_dr1]
+        const dr2_pred = sfc_model_defs[m_postbl].funcs_pred[:dr2](
+            cycs_denser, coefs_pob...)
+        const max_dr2, idx_max_dr2 = findmax(dr2_pred)
+        const cyc_max_dr2 = cycs_denser[idx_max_dr2]
+        const Cy0 = cyc_max_dr1 - func_pred_f(cyc_max_dr1, coefs_pob...) / max_dr1
+        const ct = try
+            sfc_model_defs[m_postbl].funcs_pred[:inv](ct_fluo, coefs_pob...)
+        catch err
+            isa(err, DomainError) ? Ct_VAL_DomainError : "unhandled error"
+        end # try
+        const eff_pred = map(func_pred_eff, cycs_denser)
+        const eff_max, idx_max_eff = findmax(eff_pred)
+        const cyc_vals_4cq = OrderedDict(
+            :cp_dr1  => cyc_max_dr1,
+            :cp_dr2  => cyc_max_dr2,
+            :Cy0     => Cy0,
+            :ct      => ct,
+            :max_eff => cycs_denser[idx_max_eff])
+        const cq_raw = cyc_vals_4cq[cq_method]
+        const eff_vals_4cq =
+            OrderedDict(
+                map(keys(cyc_vals_4cq)) do key
+                    key => key == :max_eff ? eff_max : func_pred_eff(cyc_vals_4cq[key])
+                end)
+        return MbqOutput(
+            fitted_prebl,
+            bl_notes,
+            blsub_fluos,
+            fitted_postbl,
+            fitted_postbl.status, # postbl_status
+            coefs_pob, # coefs
+            NaN, # d0
+            func_pred_f(cycs, coefs_pob...), # blsub_fitted
+            dr1_pred,
+            dr2_pred,
+            max_dr1,
+            max_dr2,
+            cyc_vals_4cq,
+            eff_vals_4cq,
+            cq_raw,
+            copy(cyc_vals_4cq[cq_method]), # cq
+            eff_vals_4cq[cq_method], # eff
+            func_pred_f(cq_raw <= 0 ? NaN : cq_raw, coefs_pob...) # cq_fluo
+        )
+    end
+    ## end of function definitions nested within mod_bl_q
+
+    const num_cycs = length(fluos)
+    const cycs = range(1.0, num_cycs)
+    const cycs_denser = Array(colon(1, (num_cycs - 1) / denser_factor, num_cycs))
+    const len_bcb = length(baseline_cyc_bounds)
+    const last_cyc_wt0 = floor(min_reliable_cyc) - 1 # to determine weights (`wts`) for sigmoid fitting per `min_reliable_cyc`
+    ## will remain the same `if len_bcb == 0 && (last_cyc_wt0 <= 1 || num_cycs < min_reliable_cyc)`
     #
-    return MbqOutput(
-        fitted_prebl,
-        bl_notes,
-        blsub_fluos,
-        fitted_postbl,
-        fitted_postbl.status,
-        coefs_pob,
-        d0,
-        blsub_fitted,
-        dr1_pred,
-        dr2_pred,
-        max_dr1,    
-        max_dr2,
-        cyc_vals_4cq,
-        eff_vals_4cq,
-        cq_raw,
-        copy(cq_raw),
-        eff,
-        cq_fluo
-    )
+    ## set up solver
+    solver = kwargs_jmp_model[:solver]
+    if isa(solver, Ipopt.IpoptSolver)
+        push!(solver.options, (:output_file, ipopt_print2file))
+    end
+    ## fit model
+    if af_key == :dfc
+        return fit_dfc_model()
+    elseif af_key == :sfc
+        return fit_sfc_model()
+    end
+    ## fallthrough
+    error("`af_key` $af_key is not recognized.")
 end # mod_bl_q()
 
 
@@ -668,6 +703,102 @@ function process_amp_1sr(
     json_digits             ::Integer,
     verbose                 ::Bool
 )
+    function find_ct_fluos()
+
+        function find_idc_useful()
+            const postbl_stata = mbq_ary1 |> map[index["postbl_status"]]
+            idc_useful = find(postbl_stata .== :Optimal)
+            (length(idc_useful) > 0) && return idc_useful
+            idc_useful = find(postbl_stata .== :UserLimit)
+            (length(idc_useful) > 0) && return idc_useful
+            return 1:length(postbl_status)
+        end
+        ## end of function definition nested within find_ct_fluos()
+
+        if num_cycs > 2
+            if length(ct_fluos) == 0
+                if cq_method == :ct
+                    return map(1:num_channels) do channel_i
+                        const mbq_ary1 =
+                            map(1:num_fluo_wells) do well_i
+                                mod_bl_q(
+                                    rbbs_ary3[:, well_i, channel_i];
+                                    min_reliable_cyc = min_reliable_cyc,
+                                    baseline_cyc_bounds = baseline_cyc_bounds[well_i, channel_i],
+                                    cq_method = :cp_dr1,
+                                    ct_fluo = NaN,
+                                    af_key = af_key,
+                                    kwdict_mbq...,
+                                    verbose = verbose)
+                            end
+                        const fluos_useful =
+                            map(find_idc_useful()) do mbq_i
+                                mbq_ary1[mbq_i][:cq_fluo]
+                            end
+                        median(fluos_useful)
+                    end
+                else # cq_method != :ct
+                    return fill(NaN, num_channels)
+                end # if
+            end # if
+        end # if
+        return ct_fluos
+    end
+
+    function calc_mbq_ary2()
+        [
+            begin
+                ipopt_print2file = length(ipopt_print2file_prefix) == 0 ?
+                    "" : "$(join([ipopt_print2file_prefix, channel_i, well_i], '_')).txt"
+                mod_bl_q(
+                    rbbs_ary3[:, well_i, channel_i];
+                    min_reliable_cyc = min_reliable_cyc,
+                    baseline_cyc_bounds = baseline_cyc_bounds[well_i, channel_i],
+                    cq_method = cq_method,
+                    ct_fluo = _ct_fluos[channel_i],
+                    af_key = af_key,
+                    kwdict_mbq...,
+                    ipopt_print2file = ipopt_print2file,
+                    verbose = verbose)
+            end
+            for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
+        ]
+    end
+
+    function set_fn_mbq!()
+        for fn_mbq in fieldnames(MbqOutput)
+            fv =
+                [   getfield(mbq_ary2[well_i, channel_i], fn_mbq)
+                    for well_i in 1:num_fluo_wells, channel_i in 1:num_channels ]
+            if fn_mbq in [:blsub_fluos, :coefs, :blsub_fitted, :dr1_pred, :dr2_pred]
+                fv = reshape(
+                        cat(2, fv...), # 2-dim array of size (`num_cycs` or number of coefs, `num_wells * num_channels`)
+                        length(fv[1,1]),
+                        size(fv)...)
+            end # if fn_mbq in
+            setfield!(
+                full_amp_out,
+                fn_mbq,
+                convert(typeof(getfield(full_amp_out, fn_mbq)), fv)) # `setfield!` doesn't call `convert` on its own    
+        end # for fn_mbq
+        return nothing
+    end
+
+    function set_qt_fluos!()
+        full_amp_out.qt_fluos =
+            [   quantile(full_amp_out.blsub_fluos[:, well_i, channel_i], qt_prob_rc)
+                for well_i in 1:num_fluo_wells, channel_i in 1:num_channels ]
+        full_amp_out.max_qt_fluo = maximum(full_amp_out.qt_fluos)
+        return nothing
+    end
+
+    function set_fn_rcq!()
+        for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
+            report_cq!(full_amp_out, well_i, channel_i; kwdict_rc...)
+        end
+    end
+    ## end of function definitions nested within process_amp_1sr
+
     ## remove MySql dependency
     #
     ## fr_ary3 = fluo_raw_array_3d
@@ -680,30 +811,32 @@ function process_amp_1sr(
     ## issue:
     ## assumes only 1 step/ramp because the current data format
     ## does not allow us to break the fluorescence data down by step_id/ramp_id
-    cyc_nums = sort(unique(exp_data["cycle_num"]))
-    fluo_well_nums = sort(unique(exp_data["well_num"]))
-    num_cycs, num_fluo_wells, num_channels = map(length, (cyc_nums, fluo_well_nums, channel_nums))
-    fr_ary3 = reshape(
+    const cyc_nums        = exp_data["cycle_num"] |> unique |> sort
+    const fluo_well_nums  = exp_data["well_num"]  |> unique |> sort
+    const num_cycs, num_fluo_wells, num_channels =
+        (cyc_nums, fluo_well_nums, channel_nums) |> map[length]
+    const fr_ary3 = reshape(
         exp_data["fluorescence_value"],
         num_cycs, num_fluo_wells, num_channels)
     #
     ## perform deconvolution and adjust well-to-well variation in absolute fluorescence
-    mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, rbbs_ary3 = dcv_aw(
-        fr_ary3,
-        dcv,
-        channel_nums,
-        ## remove MySql dependency
-        # db_conn,
-        # calib_info,
-        # fluo_well_nums,
-        # well_nums, 
-        calib_data, 
-        fluo_well_nums,
-        dye_in,
-        dyes_2bfild;
-        aw_out_format = :array)
+    const mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, rbbs_ary3 =
+        dcv_aw(
+            fr_ary3,
+            dcv,
+            channel_nums,
+            ## remove MySql dependency
+            # db_conn,
+            # calib_info,
+            # fluo_well_nums,
+            # well_nums, 
+            calib_data, 
+            fluo_well_nums,
+            dye_in,
+            dyes_2bfild;
+            aw_out_format = :array)
     #
-    size_bcb = size(baseline_cyc_bounds)
+    const size_bcb = size(baseline_cyc_bounds)
     if size_bcb == (0,) || (size_bcb == (2,) && size(baseline_cyc_bounds[1]) == ()) # can't use `eltype(baseline_cyc_bounds) <: Integer` because `JSON.parse("[1,2]")` results in `Any[1,2]` instead of `Int[1,2]`
         baseline_cyc_bounds = fill(baseline_cyc_bounds, num_fluo_wells, num_channels)
     elseif size_bcb == (num_fluo_wells, num_channels) && eltype(baseline_cyc_bounds) <: AbstractVector # final format of `baseline_cyc_bounds`
@@ -712,11 +845,16 @@ function process_amp_1sr(
         error("`baseline_cyc_bounds` is not in the right format.")
     end # if ndims
     #
-    NaN_ary2 = fill(NaN, num_fluo_wells, num_channels)
-    fitted_prebl = fitted_postbl = fill(AF_EMPTY_DICT[af_key], num_fluo_wells, num_channels) # once ` ::Array{EmptyAmpFitted,2}`, can't be `setfield!` to ` ::Array{SfcFitted,2}`, and vice versa
-    blsub_fluos = blsub_fitted = rbbs_ary3
-    empty_vals_4cq = fill(OrderedDict{String,AbstractFloat}(), num_fluo_wells, num_channels)
-    ct_fluos_empty = fill(NaN, num_channels)
+    const NaN_ary2 =
+        fill(NaN, num_fluo_wells, num_channels)
+    const fitted_prebl = const fitted_postbl =
+        fill(AF_EMPTY_DICT[af_key], num_fluo_wells, num_channels) # once ` ::Array{EmptyAmpFitted,2}`, can't be `setfield!` to ` ::Array{SfcFitted,2}`, and vice versa
+    const empty_vals_4cq =
+        fill(OrderedDict{String,AbstractFloat}(), num_fluo_wells, num_channels)
+    const ct_fluos_empty =
+        fill(NaN, num_channels)
+    const blsub_fluos = const blsub_fitted = rbbs_ary3
+    const _ct_fluos = find_ct_fluos()
     #
     full_amp_out = AmpStepRampOutput(
         fr_ary3,
@@ -734,7 +872,7 @@ function process_amp_1sr(
         fitted_postbl,
         fill(:not_fitted, num_fluo_wells, num_channels), # postbl_status
         fill(NaN, 1, num_fluo_wells, num_channels), # coefs # size = 1 for 1st dimension may not be correct for the chosen model
-        NaN_ary2, # d0s
+        NaN_ary2, # d0
         blsub_fitted,
         zeros(0, 0, 0), # dr1_pred
         zeros(0, 0, 0), # dr2_pred
@@ -753,127 +891,49 @@ function process_amp_1sr(
         NaN_ary2, # scld_max_dr1
         NaN_ary2, # scld_max_dr2
         fill("", num_fluo_wells, num_channels), # why_NaN
-        ct_fluos,
+        _ct_fluos, # ct_fluos
         OrderedDict{String,Vector{String}}(), # assignments_adj_labels_dict
         OrderedDict{String,AssignGenosResult}() # agr_dict
     )
-    #
     if num_cycs <= 2
         print_v(println, verbose, "Number of cycles $num_cycs <= 2, baseline subtraction and Cq calculation will not be performed.")
     else # num_cycs > 2
-        if length(ct_fluos) == 0
-            if cq_method == :ct
-                ct_fluos = map(1:num_channels) do channel_i
-                    mbq_ary1 = map(1:num_fluo_wells) do well_i
-                        mod_bl_q(
-                            rbbs_ary3[:, well_i, channel_i];
-                            min_reliable_cyc = min_reliable_cyc,
-                            baseline_cyc_bounds = baseline_cyc_bounds[well_i, channel_i],
-                            cq_method = :cp_dr1,
-                            ct_fluo = NaN,
-                            af_key = af_key,
-                            kwdict_mbq...,
-                            verbose = verbose
-                        )
-                    end # do well_i
-                    ## find `idc_useful`
-                    postbl_stata = map(mbq -> mbq["postbl_status"], mbq_ary1)
-                    idc_useful = find(postbl_stata) do postbl_status
-                        postbl_status == :Optimal
-                    end # do postbl_status
-                    if length(idc_useful) == 0
-                        idc_useful = find(postbl_stata) do postbl_status
-                            postbl_status == :UserLimit
-                        end # do postbl_status
-                        if length(idc_useful) == 0
-                            idc_useful = 1:length(postbl_status)
-                        end # if length(idc_useful)
-                    end # if length(idc_useful)
-
-                    fluos_useful = map(idc_useful) do mbq_i
-                        mbq_ary1[mbq_i][:cq_fluo]
-                    end # do mbq_i
-                    median(fluos_useful)
-                end # do channel_i
-            else
-                ct_fluos = fill(NaN, num_channels)
-            end # if cq_method
-        end # if length
-        full_amp_out.ct_fluos = ct_fluos
-        #
-        mbq_ary2 = [
-            begin
-                ipopt_print2file = length(ipopt_print2file_prefix) == 0 ?
-                        "" : "$(join([ipopt_print2file_prefix, channel_i, well_i], '_')).txt"
-                mod_bl_q(
-                    rbbs_ary3[:, well_i, channel_i];
-                    min_reliable_cyc = min_reliable_cyc,
-                    baseline_cyc_bounds = baseline_cyc_bounds[well_i, channel_i],
-                    cq_method = cq_method,
-                    ct_fluo = ct_fluos[channel_i],
-                    af_key = af_key,
-                    kwdict_mbq...,
-                    ipopt_print2file = ipopt_print2file,
-                    verbose = verbose
-                )
-            end
-            for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
-        ]
-        #
-        fns_mbq = fieldnames(MbqOutput)
-        for fn_mbq in fns_mbq
-            fv =
-                [   getfield(mbq_ary2[well_i, channel_i], fn_mbq)
-                    for well_i in 1:num_fluo_wells, channel_i in 1:num_channels ]
-            if fn_mbq in [:blsub_fluos, :coefs, :blsub_fitted, :dr1_pred, :dr2_pred]
-                fv = reshape(
-                        cat(2, fv...), # 2-dim array of size (`num_cycs` or number of coefs, `num_wells * num_channels`)
-                        length(fv[1,1]),
-                        size(fv)...)
-            end # if fn_mbq in
-            setfield!(
-                full_amp_out,
-                fn_mbq,
-                convert(typeof(getfield(full_amp_out, fn_mbq)), fv)) # `setfield!` doesn't call `convert` on its own    
-        end # for fn_mbq
-        #
-        full_amp_out.qt_fluos =
-            [   quantile(full_amp_out.blsub_fluos[:, well_i, channel_i], qt_prob_rc)
-                for well_i in 1:num_fluo_wells, channel_i in 1:num_channels ]
-        full_amp_out.max_qt_fluo = maximum(full_amp_out.qt_fluos)
-        #
-        for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
-            report_cq!(full_amp_out, well_i, channel_i; kwdict_rc...)
-        end
-    end # if num_cycs > 2
+        const mbq_ary2 = calc_mbq_ary2()
+        set_fn_mbq!()
+        set_qt_fluos!()
+        set_fn_rcq!()
+    end # if
     #
     ## allelic discrimination
     if dcv
-        full_amp_out.assignments_adj_labels_dict, full_amp_out.agr_dict = process_ad(
-            full_amp_out,
-            ad_cycs,
-            ctrl_well_dict,
-            cluster_method,
-            norm_l,
-            expected_ncg_raw,
-            categ_well_vec
-        )
+        full_amp_out.assignments_adj_labels_dict, full_amp_out.agr_dict =
+            process_ad(
+                full_amp_out,
+                ad_cycs,
+                ctrl_well_dict,
+                cluster_method,
+                norm_l,
+                expected_ncg_raw,
+                categ_well_vec)
     end # if dcv
     #
+    ## format output
     if out_format == :json || out_format == :pre_json
-        amp_out = AmpStepRampOutput2Bjson(map(fieldnames(AmpStepRampOutput2Bjson)) do fn # numeric fields only
-            field_value = getfield(full_amp_out, fn)
-            try
-                round.(field_value, json_digits)
-            catch
-                field_value
-            end # try
-        end...) # do fn
+        amp_out = AmpStepRampOutput2Bjson(
+            map(fieldnames(AmpStepRampOutput2Bjson)) do fn # numeric fields only
+                field_value = getfield(full_amp_out, fn)
+                try
+                    round.(field_value, json_digits)
+                catch
+                    field_value
+                end # try
+            end...) # do fn
     elseif out_format == :full
         amp_out = full_amp_out
     end
     return join([asrp.step_or_ramp, asrp.id], "_") => amp_out
 end # process_amp_1sr
+
 
 
 
