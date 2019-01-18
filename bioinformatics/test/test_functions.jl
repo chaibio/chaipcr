@@ -6,7 +6,7 @@
 ## automated test script for Julia API
 ## this code should be run at startup in fresh julia REPL
 
-const BBB = (get(ENV, "JULIA_ENV", nothing)=="production")
+const BBB = match(r"beaglebone",readlines(`uname -a`)[1]) != nothing
 const RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE = false
 
 import DataFrames: DataFrame
@@ -26,14 +26,86 @@ const TEST_DATA = DataFrame([
 
 # example code to generate, run, and save tests
 # BSON preferred to JLD because it can save functions and closures
-if (RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE & !BBB)
-    cd("/home/vagrant/chaipcr/bioinformatics/QpcrAnalysis")
-    push!(LOAD_PATH,pwd())
-    using QpcrAnalysis
-    test_functions = QpcrAnalysis.generate_tests(debug=false)
-    d1=test_functions["meltcurve single channel"]()
-    @timev d2=test_functions["meltcurve single channel"]()
+    if (RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE & !BBB)
+        cd("/home/vagrant/chaipcr/bioinformatics/QpcrAnalysis")
+        push!(LOAD_PATH,pwd())
+        using QpcrAnalysis
+        
+        QpcrAnalysis.generate_test_script("revised_exec_testfns.jl")
+        run("mv exec_testfns.jl ../build")
 
+        test_functions = QpcrAnalysis.generate_tests(debug=true)
+
+        mc3 = test_functions["meltcurve single channel"]()
+        # open("/tmp/mc3-master.json","w") do f
+        #     JSON.print(f, mc3[2]["melt_curve_analysis"])
+        # end
+        meltcrv = mc3[2]["melt_curve_analysis"]
+        master3 = JSON.parsefile("/tmp/mc3-master.json")
+        meltcrv == master3 # should be true
+        @timev for i in 1:100; test_functions["meltcurve single channel"](); end;
+        ## trailing semicolon suppresses output to REPL
+
+        mc4 = test_functions["meltcurve dual channel"]()
+        @timev for i in 1:100; test_functions["meltcurve dual channel"](); end;
+
+# meltcrv commit  932b24a9be5bb148074830b0fd812618234ccfc1 (don't round mc_denser)
+#  10.571982 seconds (61.91 M allocations: 8.668 GiB, 11.33% gc time)
+# elapsed time (ns): 10571982383
+# gc time (ns):      1197314629
+# bytes allocated:   9307300800
+# pool allocs:       61839800
+# non-pool GC allocs:58000
+# malloc() calls:    10900
+# realloc() calls:   600
+# GC pauses:         405
+# full collections:  2
+
+# meltcrv commit  932b24a9be5bb148074830b0fd812618234ccfc1 (remove args from nested funcs)
+#  14.142563 seconds (63.41 M allocations: 8.969 GiB, 7.87% gc time)
+# elapsed time (ns): 14142562549
+# gc time (ns):      1113163232
+# bytes allocated:   9630603200
+# pool allocs:       63321800
+# non-pool GC allocs:79700
+# malloc() calls:    12500
+# realloc() calls:   600
+# GC pauses:         419
+# full collections:  2
+
+# meltcrv commit f12f5bda9485e307481be0012fc9ec4555aed0a6 (slowest)
+# 18.955378 seconds (49.29 M allocations: 8.766 GiB, 7.62% gc time)
+# elapsed time (ns): 18955377866
+# gc time (ns):      1443815331
+# bytes allocated:   9412268800
+# pool allocs:       49198400
+# non-pool GC allocs:80300
+# malloc() calls:    12500
+# realloc() calls:   600
+# GC pauses:         410
+# full collections:  3
+
+# master commit c39573826114c84d3a516d3ec447c83765871368
+# 9.707145 seconds (66.11 M allocations: 8.753 GiB, 12.19% gc time)
+# elapsed time (ns): 9707144763
+# gc time (ns):      1182875365
+# bytes allocated:   9398664064
+# pool allocs:       66009104
+# non-pool GC allocs:94900
+# malloc() calls:    9600
+# realloc() calls:   600
+# GC pauses:         410
+# full collections:  3
+
+        mc11 = test_functions["thermal consistency dual channel"]()
+        # open("/tmp/mc11-master.json","w") do f
+        #     JSON.print(f, mc11[2])
+        # end
+        master11 = JSON.parsefile("/tmp/mc11-master.json")
+        mc11[2] == master11 # should be true
+        @timev for i in 1:100; test_functions["thermal consistency dual channel"](); end;
+
+    @timev d2=test_functions["meltcurve single channel"]()
     check = QpcrAnalysis.test_dispatch(test_functions)
     if all(values(check))
         BSON.bson("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/dispatch_tests.bson",test_functions)
@@ -79,16 +151,16 @@ function generate_tests(;
                 action_t = QpcrAnalysis.Action_DICT[action]()
                 request = JSON.parsefile("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/$datafile.json",dicttype=OrderedDict)
                 body = String(JSON.json(request))
+
                 function test_function()
                     QpcrAnalysis.print_v(println,verbose,"Testing $testname")
-		    tic()
                     @static BBB || FactCheck.clear_results()
                     if (debug) # errors fail out
-                        QpcrAnalysis.verify_request(action_t,request)
+                        #QpcrAnalysis.verify_request(action_t,request)
                         response = QpcrAnalysis.act(action_t,request;verbose=verbose)
                         response_body = string(JSON.json(response))
                         response_parsed = JSON.parse(response_body,dicttype=OrderedDict)
-                        QpcrAnalysis.verify_response(action_t,response_parsed)
+                        #QpcrAnalysis.verify_response(action_t,response_parsed)
                         ok = true
                     else # continue tests after errors reported
                         (ok, response_body) = QpcrAnalysis.dispatch(
@@ -99,12 +171,10 @@ function generate_tests(;
                         response_parsed = JSON.parse(response_body,dicttype=OrderedDict)
                     end # if debug
                     if (ok && response_parsed["valid"] )
-                        QpcrAnalysis.print_v(println,verbose,"Passed $testname")
+                        QpcrAnalysis.print_v(println,verbose,"Passed $testname\n")
                     else
-                        QpcrAnalysis.print_v(println,verbose,"Failed $testname")
+                        QpcrAnalysis.print_v(println,verbose,"Failed $testname\n")
                     end
-                    toc()
-                    QpcrAnalysis.print_v(println,verbose,"===================\n")
                     return (ok, response_parsed)
                 end
 
@@ -119,6 +189,57 @@ function generate_tests(;
     end # next action (i)
     return test_functions
 end
+
+## generate script to call test functions
+## to precompile julia routines for BBB
+function generate_test_script(outfile ::String)
+    open(outfile, "w") do f
+        write(f,"""
+        println("Starting precompile template !!!")
+        push!(LOAD_PATH, "/root/chaipcr/bioinformatics/QpcrAnalysis/")
+
+        println("Using time: ")
+        @time using QpcrAnalysis
+        println("Done Using!")
+        for \$iteration in ["First","Second"]
+            println("\\nAbout to test dispatch. \$iteration time dispatch time:")
+        """)
+        write_dispatch_calls(f)
+        write(f,"""
+            println("\\nDone dispatch time test")
+        end # next iteration
+        println("\\nDone with test functions!")
+        """)
+    end # close file
+end # generate_test_script()
+
+## write dispatch calls for generate_test_script()
+function write_dispatch_calls(f)
+    strip = [" single"," dual"," channel"]
+    for i in 1:size(TEST_DATA)[1]
+        for channel_num in [:single_channel,:dual_channel]
+            datafile = TEST_DATA[i,channel_num]
+            if (datafile != "")
+                action = TEST_DATA[i,:action]
+                request = JSON.parsefile("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/$datafile.json",dicttype=OrderedDict)
+                body = String(JSON.json(request))
+                testname = replace(TEST_DATA[i,:action],r"_"=>" ")
+                for str in strip
+                    testname = replace(testname,str=>"")
+                end
+                testname = replace("$testname "*string(channel_num),r"_"=>" ")
+                write(f,"""
+                    println("\\nTesting \$testname")
+                    action=\"\"\"$action\"\"\"
+                    body=\"\"\"$body\"\"\"
+                    @time (ok, response_body) =
+                        QpcrAnalysis.dispatch(action, body; verbose=false, verify=false)
+                    println("OK? \$ok")
+                """)
+            end # if datafile
+        end # single/dual channel (channel_num)
+    end # next action (i)
+end # write_dispatch_calls()
 
 # run test functions
 # returns true for every test that runs without errors
@@ -256,4 +377,3 @@ end
 # pool allocs:       4135
 # non-pool GC allocs:1
 # realloc() calls:   1
-
