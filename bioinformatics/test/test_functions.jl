@@ -6,7 +6,7 @@
 ## automated test script for Julia API
 ## this code should be run at startup in fresh julia REPL
 
-const BBB = match(r"beaglebone",readlines(`uname -a`)[1]) != nothing
+const BBB = (get(ENV, "JULIA_ENV", nothing)=="production")
 const RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE = false
 
 import DataFrames: DataFrame
@@ -79,9 +79,9 @@ function generate_tests(;
                 action_t = QpcrAnalysis.Action_DICT[action]()
                 request = JSON.parsefile("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/$datafile.json",dicttype=OrderedDict)
                 body = String(JSON.json(request))
-
                 function test_function()
                     QpcrAnalysis.print_v(println,verbose,"Testing $testname")
+		    tic()
                     @static BBB || FactCheck.clear_results()
                     if (debug) # errors fail out
                         QpcrAnalysis.verify_request(action_t,request)
@@ -99,10 +99,12 @@ function generate_tests(;
                         response_parsed = JSON.parse(response_body,dicttype=OrderedDict)
                     end # if debug
                     if (ok && response_parsed["valid"] )
-                        QpcrAnalysis.print_v(println,verbose,"Passed $testname\n")
+                        QpcrAnalysis.print_v(println,verbose,"Passed $testname")
                     else
-                        QpcrAnalysis.print_v(println,verbose,"Failed $testname\n")
+                        QpcrAnalysis.print_v(println,verbose,"Failed $testname")
                     end
+                    toc()
+                    QpcrAnalysis.print_v(println,verbose,"===================\n")
                     return (ok, response_parsed)
                 end
 

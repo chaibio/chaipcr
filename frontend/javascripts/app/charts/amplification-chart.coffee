@@ -5,10 +5,10 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
   DEFAULT_MIN_X: 1
   DEFAULT_MAX_X: 40
   MARGIN:
-    top: 10
+    top: 20
     left: 60
-    right: 10
-    bottom: 20
+    right: 20
+    bottom: 60
     # top: 10
     # left: 80
     # right: 10
@@ -186,9 +186,10 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
       @yScale.range([@height, 0]).domain([min, max])
       @yAxis = d3.axisLeft(@yScale)
       @yAxis.ticks(8)
+
       if @inK()
         @yAxis.tickValues(@getYLinearTicks())
-    
+
     @yAxis.tickFormat (y) =>
       @yAxisTickFormat(y)
 
@@ -198,9 +199,19 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
           .call(@yAxis)
           .on('mouseenter', => @hideMouseIndicators())
 
-    
+    svg.append("line")
+    .attr("shape-rendering", "crispEdges")
+    .attr("class", "long-axis")
+    .attr("x1", 0)
+    .attr("y1", 0 - @height * 0.2)
+    .attr("x2", 0)
+    .attr("y2", @height * 1.2)
+    .style("stroke-width", 1)
+    .style("fill", "none");
+
     if @zoomTransform.rescaleY
       @gY.call(@yAxis.scale(@zoomTransform.rescaleY(@yScale)))
+
     #text label for the y axis
     @setYAxisLabel()
     @lastYScale = @yScale
@@ -275,6 +286,15 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
       val = val.toString()
       
     super
+
+  activeLine: (well_data) ->
+    path = null
+    for line, i in @lines by 1
+      if @config.series[i].well == well_data.well - 1 and @config.series[i].channel == well_data.channel
+        path = line
+        break
+
+    @setActivePath(path)
     
 window.ChaiBioCharts = window.ChaiBioCharts || {}
 window.ChaiBioCharts.AmplificationChart = AmplificationChart

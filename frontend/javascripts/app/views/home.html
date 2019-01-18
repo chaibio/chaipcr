@@ -82,7 +82,8 @@
                 <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at && !exp.experiment.time_valid">Run previously, #{{exp.experiment.id}}</span>
                 <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && !exp.experiment.completed_at">IN PROGRESS&nbsp;<ellipsis-animated><ellipsis-animated/></span>
               </a>
-              <a class="experiment-links" ng-if="exp.experiment.started_at" href="/#/experiments/{{exp.experiment.id}}/run-experiment?chart=amplification">
+              <a class="experiment-links" ng-if="exp.experiment.started_at && exp.experiment.type !== 'test_kit'" href="/#/experiments/{{exp.experiment.id}}/run-experiment?chart=amplification">
+              <!-- <a class="experiment-links" ng-if="exp.experiment.started_at" href="/#/experiments/{{exp.experiment.id}}/run-experiment?chart=amplification"> -->
                 <div class="home-page-exp-name B1B">
                   {{exp.experiment.name}}
                 </div>
@@ -92,7 +93,7 @@
                 <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at && !exp.experiment.time_valid">Run previously, #{{exp.experiment.id}}</span>
                 <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && !exp.experiment.completed_at">IN PROGRESS&nbsp;<ellipsis-animated><ellipsis-animated/></span>
               </a>
-<!--               <a class="experiment-links" ng-if="exp.experiment.started_at && exp.experiment.completed_at && exp.experiment.type === 'test_kit'" ui-sref="pika_test.results({id: exp.experiment.id})">
+              <a class="experiment-links" ng-if="exp.experiment.started_at && exp.experiment.completed_at && exp.experiment.type === 'test_kit'" ui-sref="pika_test.results({id: exp.experiment.id})">
                 <div class="home-page-exp-name B1B">
                   {{exp.experiment.name}}
                 </div>
@@ -111,7 +112,7 @@
                 <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at && exp.experiment.time_valid">Run {{exp.experiment.started_at | amCalendar}}, #{{exp.experiment.id}}</span>
                 <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at && !exp.experiment.time_valid">Run previously, #{{exp.experiment.id}}</span>
                 <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && !exp.experiment.completed_at">IN PROGRESS&nbsp;<ellipsis-animated><ellipsis-animated/></span>
-              </a> -->
+              </a>
             </div>
             <delete-mode mode="deleteMode" experiment="exp.experiment" delete-exp="HomeCtrl.deleteExperiment(exp)"></delete-mode>
           </div>

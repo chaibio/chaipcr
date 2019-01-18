@@ -89,9 +89,9 @@ limitations under the License.
             </div>
           </div>
           <div class="curve-body amplification-chart" style="height:100%; display: flex; flex-direction: row; justify-content: space-between;">
-            <div class="curve-plot" aspect-ratio offset-x='160 + 10 + 20' offset-y='100 + 160 + 20 + 10' min-width='680' max-width='1020' min-height='400' max-height='600' id="curve-plot" style="display: block;">
-              <div style="width:100%; height: 90%;">
-                <div class="chart-container" style="height:100%; min-width: 660px; max-width: 1000px; min-height: 340px; max-height: 520px;">
+            <div class="curve-plot" aspect-ratio offset-x='160 + 10 + 20' offset-y='100 + 160 + 20 + 10' min-width='680' max-width='1020' min-height='400' max-height='600' id="curve-plot" style="display: block;padding: 0;">
+              <div class="chart-wrapper">
+                <div class="chart-container" style="height:100%; min-width: 660px; min-height: 340px;">
                   <div class="chart-error B1" ng-show="retrying && !fetching && error">
                     <strong class="text-black">Unable to load chart data</strong>
                     <p ng-bind="error"></p>
@@ -105,24 +105,26 @@ limitations under the License.
                   </div>
                   <amplification-chart data="amplification_data" config="chartConfig" zoom="ampli_zoom" on-zoom="onZoom" on-select-line="onSelectLine" on-unselect-line="onUnselectLine" on-update-properties="onUpdateProperties" scroll="ampli_scroll.value" show="showAmpliChart"></amplification-chart>
                 </div>  
-              </div>
-              
-              <div style="display: flex; flex-direction: row; height: 10%;">
-                <div style="position: absolute; padding-top: 0px;">
-                  <svg style="width: 40x; height: 40px;">
-                    <g style="width: 40px; height: 40px;">
-                      <line x1=40 y1=5 x2=10 y2=40 stroke="lightgrey" stroke-width=1></line>
-                    </g>
-                  </svg>
-                </div>
-                <div style="position:absolute;">
-                  <button class="button zoom-button" ng-click="zoomIn()" style="text-align: center; vertical-align: middle; font-size: 20px; margin-top:-12px; margin-left: 0px; padding: 0px; width: 30px;">+</button>
-                  <button class="button zoom-button" ng-click="zoomOut()" style="text-align: center; vertical-align: middle; font-size: 20px; margin-left: 32px; padding: 0px; width: 30px;">–</button>
-                </div>
-                <div style="display: grid; width: 100%; height: 100%; align-content: center; vertical-align: middle; text-align: center">
-                   <font class="G1" style="font-weight: bold;">Cycle Number</font>
+                <div class="zoom-box">
+                  <div class="zoom-button-divider">
+                    <svg style="width: 40px; height: 40px;">
+                      <g style="width: 40px; height: 40px;">
+                        <line x1=40 y1=0 x2=0 y2=40 stroke="#efefef" stroke-width=1></line>
+                      </g>
+                    </svg>
+                  </div>
+                  <div class="zoom-button-box">
+                    <button class="zoom-button button-plus" ng-click="zoomIn()">+</button>
+                    <button class="zoom-button button-minus" ng-click="zoomOut()">–</button>
+                  </div>                  
                 </div>                
               </div>
+              
+<!--               <div style="display: flex; flex-direction: row; height: 10%;">
+                <div style="display: grid; width: 100%; height: 100%; align-content: center; vertical-align: middle; text-align: center">
+                   <label class="G1M" style="margin: 0; color: #333;">Cycle Number</label>
+                </div>                
+              </div> -->
             </div>
             <div class="additional-info" style="min-width:160px;">
                 <div style="padding: 0; background: transparent;">
@@ -204,12 +206,12 @@ limitations under the License.
               <th class="B2-M-Amplification" style="text-align: center; width: 50px;">Type</th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; width: 20%;">Target</th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; min-width: 40px;" ng-class="{'channel-1': color_by === 'channel'}">
-                <span ng-if="is_dual_channel">C<small>q</small></span>
-                <span ng-if="!is_dual_channel">C<small>q</small></span>
+                <span ng-if="is_dual_channel">C<sub>q</sub></span>
+                <span ng-if="!is_dual_channel">C<sub>q</sub></span>
               </th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; min-width: 45px;" ng-class="{'channel-2': color_by === 'channel'}">
-                <span ng-if="is_dual_channel" >C<small>q</small> M</span>
-                <span ng-if="!is_dual_channel" >C<small>q</small> M</span>
+                <span ng-if="is_dual_channel" >C<sub>q</sub> M</span>
+                <span ng-if="!is_dual_channel" >C<sub>q</sub> M</span>
               </th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; min-width: 40px;">Qty</th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; min-width: 55px;">Qty M</th>
@@ -224,7 +226,9 @@ limitations under the License.
               }"
               ng-if="well_item.target_id"
             >
-              <td class="B2-Amplification" ng-class="{'text-center': color_by==='channel'}" style="vertical-align: middle; line-height: 10px;background: #fff;">
+              <td class="B2-Amplification" ng-class="{'text-center': color_by==='channel'}" style="vertical-align: middle; line-height: 10px;background: #fff;"
+                ng-click="onSelectRow(well_item, $index)"
+              >
                 <span ng-if="color_by==='well'" class="B2-Amplification dot" ng-attr-style="background-color: {{wellButtons['well_'+(well_item.well_num - 1)].color}}"></span>
                 <span 
                   ng-if="color_by==='sample'" 
@@ -242,7 +246,7 @@ limitations under the License.
                   <label class="outer-line"></label>
                 </div>                 
               </td>
-              <td class="B2-Amplification" ng-class="{'text-center': color_by==='channel'}" style="text-align: left">
+              <td class="B2-Amplification" ng-class="{'text-center': color_by==='channel'}" style="text-align: left" ng-click="onSelectRow(well_item, $index)">
                 <span class="B2-Amplification text">
                   <span ng-show="well_item.well_num < 9">
                     A{{well_item.well_num}}
@@ -252,12 +256,12 @@ limitations under the License.
                   </span>
                 </span>
               </td>
-              <td class="B2-Amplification" style="text-align: left;">
+              <td class="B2-Amplification" style="text-align: left;" ng-click="onSelectRow(well_item, $index)">
                 <span class="B2-Amplification one-line-span">
                   {{samples[well_item.well_num - 1].name | truncate:20}}
                 </span>
               </td>
-              <td class="B2-Amplification type-td">
+              <td class="B2-Amplification type-td" ng-click="onSelectRow(well_item, $index)">
                 <span class="B2-Amplification type-span" style="width: 20px; height: 20px;" ng-if="well_item.well_type">
                   <img src="/images/ring_s.svg" ng-if="well_item.well_type == 'standard'">
                   <img src="/images/ring_plus.svg" ng-if="well_item.well_type == 'positive_control'">
@@ -265,13 +269,13 @@ limitations under the License.
                   <img src="/images/ring_u.svg" ng-if="well_item.well_type == 'unknown'">
                 </span>
               </td>
-              <td class="B2-Amplification" style="text-align: left;">
+              <td class="B2-Amplification" style="text-align: left;" ng-click="onSelectRow(well_item, $index)">
                 <span class="B2-Amplification one-line-span">
                   {{well_item.target_name | truncate:20}}
                   <!-- {{targets[$index].name | truncate:20}} -->
                 </span>
               </td>
-              <td class="B2-Amplification" style="text-align: left">
+              <td class="B2-Amplification" style="text-align: left" ng-click="onSelectRow(well_item, $index)">
                 <span class="B2-Amplification width1" >
                   <span class="B2-Amplification" ng-show="well_item.cq > 0">
                     {{well_item.cq | round:2}}
@@ -281,7 +285,7 @@ limitations under the License.
                   </span>
                 </span>
               </td>
-              <td class="B2-Amplification" style="text-align: left">
+              <td class="B2-Amplification" style="text-align: left" ng-click="onSelectRow(well_item, $index)">
                 <span class="B2-Amplification width1" ng-if="is_dual_channel">
                   <span class="B2-Amplification" ng-show="well_item.mean_cq > 0">
                     {{well_item.mean_cq | round:2}}
@@ -294,7 +298,7 @@ limitations under the License.
                   <span class="B2-Amplification dummy-placeholder"></span>
                 </span>
               </td>
-              <td class="B2-Amplification" style="text-align: left">
+              <td class="B2-Amplification" style="text-align: left" ng-click="onSelectRow(well_item, $index)">
                 <span class="B2-Amplification width1" ng-show="well_item.quantity > 0">
                   {{well_item.quantity | fixedDigit:6}}
                 </span>
@@ -302,7 +306,7 @@ limitations under the License.
                   <span class="B2-Amplification dummy-placeholder">&nbsp;</span>
                 </span>
               </td>
-              <td class="B2-Amplification" style="text-align: left; border-top-right-radius: 3px;border-bottom-right-radius: 3px;">
+              <td class="B2-Amplification" style="text-align: left; border-top-right-radius: 3px;border-bottom-right-radius: 3px;" ng-click="onSelectRow(well_item, $index)">
                 <span class="B2-Amplification width1" ng-show="well_item.mean_quantity > 0">
                   {{well_item.mean_quantity | fixedDigit:6}}
                 </span>

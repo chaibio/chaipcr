@@ -112,7 +112,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           channel_datasets[dataset_name].push data_by_cycle
 
         console.log('channel_datasets[dataset_name]')
-        console.log(channel_datasets[dataset_name])
+        # console.log(channel_datasets[dataset_name])
         
         channel_datasets[dataset_name] = _.map channel_datasets[dataset_name], (datum) ->
           if datum[0]
