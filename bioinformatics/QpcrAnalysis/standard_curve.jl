@@ -246,17 +246,16 @@ function insert2ary(
     rng                 ::AbstractRNG =Base.GLOBAL_RNG
 )
     dim_len = size(ary)[seek2ins_along_dim]
-
     idx_range = 1:(dim_len + num_ins)
     ins_idc = generate_uniq_ints(num_ins, idx_range, rng)
-
     ins_vec = sort(ins_idc) .- (1:num_ins) .+ 1
-    ins_mtx = hcat(vcat(1, ins_vec), vcat(ins_vec .- 1, dim_len))
+    ins_mtx = hcat(
+                vcat(1, ins_vec),
+                vcat(ins_vec .- 1, dim_len))
 
     ary_ndims = ndims(ary)
     ary_ut = Array{Union{eltype(ary),typeof(el2ins)},ary_ndims}(ary)
     select_all_idx_vec = Vector{Any}(fill(Colon(), ary_ndims)) # make sure eltype is a supertype of Vector{Int}
-
     ary_size = size(ary)
     ins_size = map(1:ary_ndims) do i
         i == seek2ins_along_dim ? 1 : ary_size[i]
@@ -271,7 +270,6 @@ function insert2ary(
                 cat(seek2ins_along_dim, getindex(ary_ut, select_idx_vec...), ins_slice)
             end...),
         setindex!(select_all_idx_vec, idx_range, seek2ins_along_dim)...)
-
     return ary_wins
 end # insert2ary
 

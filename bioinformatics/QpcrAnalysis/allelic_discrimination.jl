@@ -412,7 +412,7 @@ function assign_genos(
         # println("_new_center_idc ", _new_center_idc)
         return _new_center_idc
     end
-
+u
     ## if dual channel && no heteros only homo1, homo2, NTC
     function ntc2hetero(_new_center_idc)
         const ntc_center_idc = (_new_center_idc .== ntc_geno_idx)

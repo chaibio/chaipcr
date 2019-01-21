@@ -118,6 +118,69 @@ ORDER BY channel, well_num ;" | tail -n+2 | cut -f1 | awk 'BEGIN {RS="";FS=" "}{
 
 
 
+# Chaipcr calibration: Water
+# experiments.id = 175
+# stages.id = 8
+# stages.stage_type = holding
+# fluorescence_data.step_id = 28
+mysql -u root -B -e "
+USE chaipcr;
+SELECT fluorescence_value, well_num, channel
+FROM fluorescence_data
+WHERE experiment_id = 175  AND step_id = 28
+ORDER BY channel, well_num ;" | tail -n+2 | cut -f1 | awk 'BEGIN {RS="";FS=" "}{gsub(/\n/,",")}{print}' -
+
+# Chaipcr calibration: FAM
+# experiments.id = 175
+# stages.id = 8
+# stages.stage_type = holding
+# fluorescence_data.step_id = 31
+mysql -u root -B -e "
+USE chaipcr;
+SELECT fluorescence_value, well_num, channel
+FROM fluorescence_data
+WHERE experiment_id = 175 AND step_id = 31
+ORDER BY channel, well_num ;" | tail -n+2 | cut -f1 | awk 'BEGIN {RS="";FS=" "}{gsub(/\n/,",")}{print}' -
+
+# Chaipcr calibration: HEX
+# experiments.id = 175
+# stages.id = 8
+# stages.stage_type = holding
+# fluorescence_data.step_id = 34
+mysql -u root -B -e "
+USE chaipcr;
+SELECT fluorescence_value, well_num, channel
+FROM fluorescence_data
+WHERE experiment_id = 175 AND step_id = 34
+ORDER BY channel, well_num ;" | tail -n+2 | cut -f1 | awk 'BEGIN {RS="";FS=" "}{gsub(/\n/,",")}{print}' -
+
+# Julia code
+
+# cal_water_175=[
+#         [7980,8143,8784,9404,10658,9818,4409,6788,5553,6510,8074,8162,7988,6774,7104,8159],
+#         [2720,2870,2719,2688, 2659,2655,2473,2560,2685,2577,2651,2695,2657,2645,2895,2613]
+#     ]
+# cal_FAM_175=[
+#         [68328,77769,69792,78364,73407,75765,44114,68583,42381,69996,76600,85065,82071,71601,68981,61379],
+#         [32592,35283,33302,34717,34300,33866,19168,26253,22305,29974,31753,34080,35184,30651,30342,30266]
+#     ]
+# cal_HEX_175=[
+#         [ 8871, 9694, 9222, 9996,10381,10430, 5740, 8500, 6279, 8338, 9762,10475,10346, 9289, 9528, 8971],
+#         [29347,34003,32414,33407,32460,31620,18094,24103,19945,27478,29500,31694,33605,28289,28734,27943]
+#     ]
+
+# calib_175=OrderedDict(
+#     "water"     => Dict("fluorescence_value" => cal_water_175),
+#     "channel_1" => Dict("fluorescence_value" => cal_FAM_175),
+#     "channel_2" => Dict("fluorescence_value" => cal_HEX_175)
+# )
+
+# open("chaipcr_cal_175.json","w") do f
+#     JSON.print(f, calib_175)
+# end
+
+
+
 # Test_1ch amplification: Raw data
 # experiments.id = 169
 # stages.id = 216
@@ -172,7 +235,7 @@ ORDER BY channel, well_num ;" > mc_170.tsv
 
 # Julia code
 
-# mc_170=readdlm("mc_223.tsv",'\t',header=true)
+# mc_170=readdlm("mc_170.tsv",'\t',header=true)
 # raw_mc_1=OrderedDict(
 #     mc_170[2][1]    => mc_170[1][:,1],
 #     mc_170[2][2]    => mc_170[1][:,2],
@@ -230,6 +293,43 @@ ORDER BY channel, well_num ;" > mc_223.tsv
 
 # open("test_2ch_mc_223.json","w") do f
 #     JSON.print(f, mc_2)
+# end
+
+
+
+# Chaipcr meltcurve data
+# experiments.id = 189
+# stages.id = 290
+# stages.stage_type = meltcurve
+mysql -u root -B -e "USE chaipcr ;
+SELECT fluorescence_value, temperature, well_num, channel
+FROM melt_curve_data
+WHERE experiment_id = 189 AND stage_id = 290
+ORDER BY channel, well_num ;" > mc_189.tsv
+
+# Julia code
+
+# mc_189=readdlm("mc_189.tsv",'\t',header=true)
+# raw_mc_189=OrderedDict(
+#     mc_189[2][1]    => mc_189[1][:,1],
+#     mc_189[2][2]    => mc_189[1][:,2],
+#     mc_189[2][3]    => Vector{Integer}(mc_189[1][:,3]),
+#     mc_189[2][4]    => Vector{Integer}(mc_189[1][:,4])
+# )
+
+# mc_189=OrderedDict(
+#     "experiment_id"       => 189,
+#     "stage_id"            => 290,
+#     "calibration_info"    => calib_175,
+#     "channel_nums"        => [1,2],
+#     "qt_prob"             => 0.64,
+#     "max_normd_qtv"       => 0.8,
+#     "top_N"               => 4,
+#     "raw_data"            => raw_mc_189
+# )
+
+# open("chaipcr_mc_189.json","w") do f
+#     JSON.print(f, mc_189)
 # end
 
 
