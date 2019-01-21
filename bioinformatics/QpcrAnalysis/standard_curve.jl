@@ -26,11 +26,10 @@ function act(
     req_df = reqvec2df(req_vec)
     #
     ## empty dataset
-    if size(req_df)[2] == 0 || any(map([:target, :cq, :qty]) do symbl
-        all(isnan.(req_df[symbl]))
-    end)
-        result = OrderedDict("target" => nothing, "group" => nothing)
-        return format_output(result)
+    if  size(req_df)[2] == 0 ||
+        any(map(symbl -> all(isnan.(req_df[symbl])),[:target, :cq, :qty]))
+            result = OrderedDict(:target => nothing, :group => nothing)
+            return format_output(result)
     end
     #
     ## target result set
@@ -63,17 +62,19 @@ function act(
     ## group result set
     group_result_df = by(req_df, :sample) do chunk_sample
         if isnan(chunk_sample[1, :sample])
-            return hcat(DataFrame(target=0), DataFrame(x1=empty_gre)) # assuming the default column name is `:x1`
+            return hcat(
+                DataFrame(target=0),
+                DataFrame(x1=empty_gre)) # assuming the default column name is `:x1`
         else
             return by(chunk_sample, :target) do chunk_target
                 target_id = chunk_target[1, :target]
                 if isnan(target_id)
                     return empty_gre
                 else
-                    cq_vec = chunk_target[.!isnan.(chunk_target[:cq]), :cq]
+                    cq_vec  = chunk_target[.!isnan.(chunk_target[:cq]), :cq]
                     qty_vec = chunk_target[.!isnan.(chunk_target[:qty]), :qty]
                     return GroupResultEle(
-                        sort(unique(chunk_target[:well])),
+                        chunk_target[:well] |> unique |> sort,
                         chunk_target[1, :target],
                         round.([
                             mean(cq_vec),
@@ -99,9 +100,8 @@ function act(
     for tre in tre_vec
         if isnan(tre.slope) && isnan(tre.offset)
             target_result = OrderedDict(
-                "target_id" => getfield(tre, :target_id),
-                "error" => "less 2 valid data points of cq and/or qty available for fitting standard curve"
-            )
+                :target_id => getfield(tre, :target_id),
+                :error     => "less 2 valid data points of cq and/or qty available for fitting standard curve")
         else
             target_result = tre
         end
@@ -126,35 +126,29 @@ function act(
                     qty_mean_m, qty_mean_b = scinot(getfield(gre, :qty_mean), json_digits)
                     qty_sd_m, qty_sd_b = scinot(getfield(gre, :qty_sd), json_digits)
                     push!(grp_target_vec, OrderedDict(
-                        "target_id" => target_id,
-                        "cq" => OrderedDict(
-                            "mean" => getfield(gre, :cq_mean),
-                            "standard_deviation" => getfield(gre, :cq_sd)
-                        ),
-                        "quantity" => OrderedDict(
-                            "mean" => OrderedDict(
-                                "m" => qty_mean_m,
-                                "b" => qty_mean_b
-                            ),
-                            "standard_deviation" => OrderedDict(
-                                "m" => qty_sd_m,
-                                "b" => qty_sd_b
-                            )
-                        )
-                    ))
+                        :target_id              =>  target_id,
+                        :cq                     =>  OrderedDict(
+                            :mean               =>      getfield(gre, :cq_mean),
+                            :standard_deviation =>      getfield(gre, :cq_sd)),
+                        :quantity               =>  OrderedDict(
+                            :mean               =>      OrderedDict(
+                                :m              =>          qty_mean_m,
+                                :b              =>          qty_mean_b),
+                            :standard_deviation =>      OrderedDict(
+                                :m              =>          qty_sd_m,
+                                :b              =>          qty_sd_b))))
                 end # if target_id
             end # do gre_i
         push!(grp_vec, OrderedDict(
-            "wells" => well_combin,
-            "targets" => grp_target_vec
-        ))
+            :wells   => well_combin,
+            :targets => grp_target_vec))
         end # if
     end # do well_combin
     #
     jp_dict = OrderedDict(
-        "targets" => target_vec,
-        "groups" => grp_vec,
-        "valid" => true)
+        :targets => target_vec,
+        :groups  => grp_vec,
+        :valid   => true)
     return out_format == :json ? JSON.json(jp_dict) : jp_dict
 end # standard_curve
 
@@ -218,8 +212,7 @@ function reqvec2df(req_vec ::AbstractVector)
         target = target_vec,
         cq = cq_vec,
         qty = qty_vec,
-        sample = sample_vec
-    )
+        sample = sample_vec)
 end
 
 ## end: dependencies of `standard_curve`
@@ -245,7 +238,13 @@ end
 ## insert slice of the same element into array
 ## by searching along one dimension for positions to insert.
 ## user specifies element, number of insertion actions, destination array, search dimension.
-function insert2ary(el2ins, num_ins::Integer, ary::AbstractArray, seek2ins_along_dim::Integer=1, rng::AbstractRNG=Base.GLOBAL_RNG)
+function insert2ary(
+    el2ins,
+    num_ins             ::Integer,
+    ary                 ::AbstractArray,
+    seek2ins_along_dim  ::Integer =1,
+    rng                 ::AbstractRNG =Base.GLOBAL_RNG
+)
     dim_len = size(ary)[seek2ins_along_dim]
 
     idx_range = 1:(dim_len + num_ins)
@@ -264,11 +263,14 @@ function insert2ary(el2ins, num_ins::Integer, ary::AbstractArray, seek2ins_along
     end
     ins_slice = fill(el2ins, ins_size...)
 
-    ary_wins = getindex(cat(seek2ins_along_dim, map(1:(num_ins+1)) do i
-        select_idx_vec = copy(select_all_idx_vec)
-        setindex!(select_idx_vec, ins_mtx[i,1] : ins_mtx[i,2], seek2ins_along_dim)
-        cat(seek2ins_along_dim, getindex(ary_ut, select_idx_vec...), ins_slice)
-    end...), setindex!(select_all_idx_vec, idx_range, seek2ins_along_dim)...)
+    ary_wins = getindex(
+        cat(seek2ins_along_dim,
+            map(1:(num_ins+1)) do i
+                select_idx_vec = copy(select_all_idx_vec)
+                setindex!(select_idx_vec, ins_mtx[i,1] : ins_mtx[i,2], seek2ins_along_dim)
+                cat(seek2ins_along_dim, getindex(ary_ut, select_idx_vec...), ins_slice)
+            end...),
+        setindex!(select_all_idx_vec, idx_range, seek2ins_along_dim)...)
 
     return ary_wins
 end # insert2ary
@@ -276,7 +278,6 @@ end # insert2ary
 
 ## generate standard_curve request
 function generate_req_sc(;
-
     ## random unless individually specified
     ## NA not counted as a unique value for `num_uniq`
 
@@ -304,8 +305,7 @@ function generate_req_sc(;
 
     rng_type::DataType=MersenneTwister,
     seed::Integer=1
-    )
-
+)
     rng = rng_type(seed)
 
     println("num_wells: ", num_wells)
@@ -329,29 +329,19 @@ function generate_req_sc(;
     num_targets = length(target_vec)
     if num_targets == 0
         println("randomly generating targets...") # target values should not be the same across different channels for the same well
-
         num_nna_targets = num_measrmts - channelwide_num_na_targets - addi_num_na_targets
-
         target_vec = insert2ary(NaN, addi_num_na_targets, fill(0, num_nna_targets), 1, rng)
-
         nna_channel_idc = find(1:num_channels) do channel_i
             !(channel_i in na_channel_idc)
         end
-
         available_targets = 1:num_uniq_targets
         num_uniq_targets_perchannel = Int(floor(num_uniq_targets / num_channels))
-
         for channel_i in nna_channel_idc
             target_idc_thischannel = ((1:num_wells) .-1) .* num_channels .+ channel_i
-
             nna_target_idc = target_idc_thischannel[map(target_idx -> !isnan(target_vec[target_idx]), target_idc_thischannel)]
-
             uniq_targets_thischannel = generate_uniq_ints(num_uniq_targets_perchannel, available_targets, rng)
-
             available_targets = setdiff(available_targets, uniq_targets_thischannel)
-
             nna_target_vec = rand(rng, uniq_targets_thischannel, length(nna_target_idc))
-
             for nna_idx_i in 1:length(nna_target_idc)
                 target_vec[nna_target_idc[nna_idx_i]] = nna_target_vec[nna_idx_i]
             end
@@ -400,23 +390,19 @@ function generate_req_sc(;
 
     req_vec = map(1:num_wells) do well_i
         OrderedDict(
-            "well" => map(1:num_channels) do channel_i
-                measrmt_i = (well_i - 1) * num_channels + channel_i
-                OrderedDict(
-                    "target" => target_vec[measrmt_i],
-                    "cq" => cq_vec[measrmt_i],
-                    "quantity" => OrderedDict(
-                        "m" => qm_vec[measrmt_i],
-                        "b" => qb_vec[measrmt_i]
-                    )
-                )
-            end,
-            "sample" => sample_vec[well_i]
-        )
+            :well   => map(1:num_channels) do channel_i
+                    measrmt_i = (well_i - 1) * num_channels + channel_i
+                    OrderedDict(
+                        :target     => target_vec[measrmt_i],
+                        :cq         => cq_vec[measrmt_i],
+                        :quantity   => OrderedDict(
+                            :m          => qm_vec[measrmt_i],
+                            :b          => qb_vec[measrmt_i]))
+                end,
+            :sample => sample_vec[well_i])
     end # do well_i
 
     return (json(req_vec), req_vec)
-
 end # generate_req_sc
 
 

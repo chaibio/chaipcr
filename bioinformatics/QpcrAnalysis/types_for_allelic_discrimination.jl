@@ -1,4 +1,6 @@
-## types for allelic discrimination, needed for `type AmpStepRampOutput`, therefore needed to be included before "amp.jl", can't be in "allelic_discrimination.jl" because in there `prep_input_4ad` utilize `type AmpStepRampOutput`
+## types for allelic discrimination
+#
+## needed for `type AmpStepRampOutput` so must be included before "amp.jl"
 
 import Clustering.ClusteringResult
 
@@ -29,7 +31,7 @@ struct AssignGenosResult
     ucc_dict            ::OrderedDict{Set{Vector{Float64}},UniqCombinCenters}
 end # type
 
-## constant for in allelic_discrimination.jl
+## constant used in allelic_discrimination.jl
 const CATEG_WELL_VEC = [
     (:rbbs_ary3,   Colon()),
     (:blsub_fluos, Colon()),
@@ -37,7 +39,7 @@ const CATEG_WELL_VEC = [
     (:cq,          Colon())
 ]
 
-## 3 groups without NTC
+## 3 groups without NTC (non-template control)
 # const DEFAULT_egr = [1 0 1; 0 1 1] # homo ch1, homo ch2, hetero
 # const DEFAULT_init_FACTORS = [1, 1, 1] # sometimes "hetero" may not have very high end-point fluo
 # const DEFAULT_eg_LABELS = ["homo_a", "homo_b", "hetero", "unclassified"]
@@ -54,6 +56,8 @@ const CTRL_WELL_DICT = OrderedDict{Vector{Int},Vector{Int}}() # key is genotype 
 ## old approach
 # const CTRL_WELL_DICT = DefaultOrderedDict(Vector{Int}, Vector{Int}, Vector{Int}())
 
+EMPTY_UCC_DICT = OrderedDict{Set{Vector{AbstractFloat}},UniqCombinCenters}()
+EMPTY_BEST_GENO_COMBINS = Vector{Matrix{Int}}()
 
 
 #
