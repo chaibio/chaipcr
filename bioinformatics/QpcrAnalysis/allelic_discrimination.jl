@@ -3,6 +3,7 @@
 import DataStructures.OrderedDict
 import Clustering: ClusteringResult, kmeans!, kmedoids!, silhouettes
 import Combinatorics.combinations
+import StatsBase.counts
 
 
 ## nrn: whether to flip the binary genotype or not
@@ -21,7 +22,7 @@ function prep_input_4ad(
     ## relevant if `categ == :fluo`, last available cycle
     cycs            ::Union{Integer,AbstractVector} =1 
 )
-    num_cycs, num_wells, num_channels = size(full_amp_out.fr_ary3)
+    num_cycs, n_wells, num_channels = size(full_amp_out.fr_ary3)
     nrn = NRN_SELF
     #
     if categ in [:rbbs_ary3, :blsub_fluos]
@@ -30,9 +31,9 @@ function prep_input_4ad(
             cycs = num_cycs
         end # if cycs == 0
         if isa(cycs, Integer)
-            cycs = (cycs:cycs) # `blsub_fluos[an_integer, :, :]` results in size `(num_wells, num_channels)` instead of `(1, num_wells, num_channels)`
+            cycs = (cycs:cycs) # `blsub_fluos[an_integer, :, :]` results in size `(n_wells, num_channels)` instead of `(1, n_wells, num_channels)`
         end # if isa(cycs, Integer)
-        data_t = reshape(mean(fluos[cycs, :, :], 1), num_wells, num_channels)
+        data_t = reshape(mean(fluos[cycs, :, :], 1), n_wells, num_channels)
     #
     elseif categ == :d0
         data_t = map(full_amp_out.d0) do d0
@@ -56,58 +57,50 @@ end # prep_data_4ad
 function do_cluster_analysis(
     raw_data        ::AbstractMatrix,
     init_centers    ::AbstractMatrix,
-    cluster_method  ::Symbol = :k_means_medoids,
+    cluster_method  ::ClusteringMethod = :K_means_medoids(),
     norm_l          ::Real =2
 )
     ## get pair-wise distance (cost) matrix
     ## matrix is symmetric with zeros on major diagonal
     ## calculate upper triangle and convert to Symmetric
     function calc_dist_mtx()
-        _dist_mtx = zeros(Float64,num_wells,num_wells)
-        for j in colon(2,num_wells) # columns
+        _dist_mtx = zeros(Float64,n_wells,n_wells)
+        for j in colon(2,n_wells) # columns
             for i in colon(1,j - 1) # rows
                 _dist_mtx[i,j] = norm(raw_data[:, i] .- raw_data[:, j], norm_l)
             end
         end
-        return Symmetric(_dist_mtx)
+        return _dist_mtx |> Symmetric |> Matrix # kmedoids! does not accept ::Symmetric
     end
 
-    ## cluster analysis
-    function clustering(_init_centers)
-        if !(cluster_method in [:k_means, :k_means_medoids, :k_medoids])
-            error("Clustering method $cluster_method not implemented")
-        end
-        if cluster_method in [:k_means, :k_means_medoids]
-            ## ideally the element with the same index between
-            ## `init_centers` and `cluster_result.centers` should be for the same genotype
-            cluster_result = kmeans!(new_data, _init_centers)
-            #
-            if cluster_method == :k_means
-                const _centers = cluster_result.centers
-            end
-            ## cluster_method == :k_means_medoids
-            ## Issue: how is this used as input for :k_medoids algorithm ???
-            ## kmeans! updates init_centers in place, so no need for this next statement 
-            # _init_centers = cluster_result.centers
-        end
-        if cluster_method in [:k_means_medoids, :k_medoids]
-            cluster_result = kmedoids!(dist_mtx, _init_centers)  # dist_mtx not dist_mtx_winit
-            const _centers = raw_data[:, cluster_result.medoids] # raw_data not data_winit
-        end # if cluster_method
-        return (_centers, get_silhouettes(cluster_result.assignments[well_idc]))
+    ## cluster analysis methods
+    function clustering(::K_means, _init_centers)
+        ## ideally the element with the same index between
+        ## `init_centers` and `cluster_result.centers` should be for the same genotype
+        _cluster_result = kmeans!(raw_data, _init_centers)
+        return (_cluster_result, _cluster_result.centers)
     end
+
+    ## Issue: how to use output from k-means clustering as input for k-medoids ???
+    clustering(::K_means_medoids, _init_centers) =
+        clustering(K_medoids(), clustering(K_means(), _init_centers)[2])
+
+    function clustering(::K_medoids, _)
+        ## _init_centers is [2 x num_centers] matrix, kmedoids! requires vector
+        ## use dummy values 1:num_centers for now
+        _cluster_result = kmedoids!(dist_mtx, collect(1:num_centers)) # dist_mtx not dist_mtx_winit
+        return (_cluster_result, raw_data[:, _cluster_result.medoids]) # raw_data not data_winit
+    end
+
+    clustering(unknown_cluster_method, _) =
+        error("Clustering method $unknown_cluster_method not implemented")
 
     ## get cluster silhouettes
-    function get_silhouettes(assignments_woinit)
-        const counts_woinit =
-            map(1:maximum(assignments_woinit)) do assignment
-                sum(assignments_woinit .== assignment)
-            end
-        return silhouettes(
+    get_silhouettes() =
+        silhouettes(
             assignments_woinit,
-            counts_woinit,
+            counts(assignments_woinit),
             dist_mtx)
-    end
 
     ## let's designate a data point in group g1 as g1_dp1,
     ## another data point in group g1 as g1_dp2,
@@ -127,65 +120,75 @@ function do_cluster_analysis(
 
             dist_between_min() =
                 (sum_gi_bool_vec == 0 || sum_gi_bool_vec == num_centers) ?
-                    0. :
+                    Float64(0) :
                     minimum(dist_mtx[gi_bool_vec, .!gi_bool_vec])
 
             function dist_within_margin_max()
-                if sum_gi_bool_vec <= 1
-                    return 0.
-                else
-                    const gi_idc = well_idc[gi_bool_vec]
-                    if sum_gi_bool_vec == 2
-                        return getindex(dist_mtx, gi_idc...)
-                    else # sum_gi_bool_vec > 2
-                        return calc_dist_within_margin_max()
+
+                ## find the edge whose length always ranked 2nd
+                ## (can tie 1st or 3rd) in any triangle that forms
+                ## within grp_i and contains this edge,
+                ## then assign `dist_within_margin_max` the length of this edge
+                function calc_dist_within_margin_max()
+
+                    is_second_longest(gi_idx_ne) =
+                        prod(gi_idx_e -> dist_mtx[gi_idx_ne, gi_idx_e] - dist_edge,
+                            edge) <= Float64(0)
+
+                    edge_always_second_longest() =
+                        setdiff(gi_idc, edge) |> all[is_second_longest[]]
+                    ## end of function definitions nested within calc_dist_within_margin_max()
+
+                    ## vectorized code
+                    edge = ()
+                    dist_edge = Float64(0)
+                    for edge in combinations(gi_idc, 2)
+                        dist_edge = dist_mtx[edge...]
+                        edge_always_second_longest() && return dist_edge
                     end
-                end
+                    Float64(0)
+                    ## devectorized code
+                    # _dist_within_margin_max = Float64(0)
+                    # update_dwmm = false
+                    # for edge in combinations(gi_idc, 2)
+                    #     gi_idx_e1, gi_idx_e2 = edge
+                    #     dist_edge = dist_mtx[gi_idx_e1, gi_idx_e2]
+                    #     for gi_idx_ne in gi_idc
+                    #         if !(gi_idx_ne in edge)
+                    #             update_dwmm = true
+                    #             if  (dist_mtx[gi_idx_ne, gi_idx_e1] - dist_edge) *
+                    #                 (dist_mtx[gi_idx_ne, gi_idx_e2] - dist_edge) > Float64(0) # edge not ranked 2nd
+                    #                     update_dwmm = false
+                    #                     break
+                    #             end # if
+                    #         end # if
+                    #     end # for gi_idx_ne
+                    #     if update_dwmm
+                    #         _dist_within_margin_max = dist_edge
+                    #         break
+                    #     end # if
+                    # end # for edge
+                    # return _dist_within_margin_max
+                end # calc_dist_within_margin_max()
+                ## end of function definition nested within dist_within_margin_max()
+
+                (sum_gi_bool_vec <= 1) && return Float64(0)
+                const gi_idc = well_idc[gi_bool_vec]
+                (sum_gi_bool_vec == 2) && return getindex(dist_mtx, gi_idc...)
+                calc_dist_within_margin_max()
             end
-            #
             ## end of function definitions nested within check_grp()
 
             const sum_gi_bool_vec = sum(gi_bool_vec)
-            return [dist_within_margin_max() dist_between_min()]
+            [dist_within_margin_max() dist_between_min()]
         end # check_grp()
+        ## end of function definition nested within check_groups()
 
-        ## find the edge whose length always ranked 2nd
-        ## (can tie 1st or 3rd) in any triangle that forms
-        ## within grp_i and contains this edge,
-        ## then assign `dist_within_margin_max` the length of this edge
-        function calc_dist_within_margin_max()
-            _dist_within_margin_max = 0
-            update_dwmm = false
-            for edge in combinations(gi_idc, 2)
-                gi_idx_e1, gi_idx_e2 = edge
-                dist_edge = dist_mtx[gi_idx_e1, gi_idx_e2]
-                for gi_idx_ne in gi_idc
-                    if !(gi_idx_ne in edge)
-                        update_dwmm = true
-                        if  (dist_mtx[gi_idx_ne, gi_idx_e1] - dist_edge) *
-                            (dist_mtx[gi_idx_ne, gi_idx_e2] - dist_edge) > 0 # edge not ranked 2nd
-                                update_dwmm = false
-                                break
-                        end # if
-                    end # if
-                end # for gi_idx_ne
-                if update_dwmm
-                    _dist_within_margin_max = dist_edge
-                    break
-                end # if
-            end # for edge
-            return _dist_within_margin_max
-        end # calc_dist_within_margin_max()
-        #
-        ## end of function definitions nested within check_groups()
-
-        return
-            map(
-                grp_i -> check_grp(assignments_woinit .== grp_i),
-                1:num_centers) |>
-                    reduce[vcat]
+        mapreduce(
+            grp_i -> check_grp(assignments_woinit .== grp_i),
+            vcat,
+            1:num_centers)
     end # check_groups()
-    #
     ## end of function definitions nested within do_cluster_analysis()
 
     ## add slope 2/1 scaled as another dimension
@@ -193,16 +196,17 @@ function do_cluster_analysis(
     # new_data = vcat(raw_data, transpose(slope_vec) .* mean(raw_data[1:2,:], 1) ./ median(slope_vec))
     # init_centers = vcat(init_centers, ones(1, size(init_centers)[2]))
     
-    const well_idc = 1:num_wells
-    const num_wells = size(raw_data,2)
+    const n_wells = size(raw_data,2)
+    const well_idc = 1:n_wells
     const num_centers = size(init_centers,2)
     const dist_mtx = calc_dist_mtx()
-    # const num_wells_winit = num_wells + num_centers
+    # const n_wells_winit = n_wells + num_centers
     # dist_mtx_winit = calc_dist_mtx_winit(init_centers)
-    # Symmetric(dist_mtx_winit[well_idc, well_idc])
-    const centers, slhts = clustering(copy(init_centers))
+    const cluster_result, centers = clustering(cluster_method, copy(init_centers))
+    const assignments_woinit = cluster_result.assignments[well_idc]
+    const slhts = get_silhouettes()
     const slht_mean = mean(slhts)
-    const check_dist_mtx  = check_groups()
+    const check_dist_mtx = check_groups()
     const check_dist_bool = maximum(check_dist_mtx[:, 1]) < minimum(check_dist_mtx[:, 2])
 
     ## add to collection, TBD list or dict
@@ -230,7 +234,7 @@ function assign_genos(
     ntc_bool_vec        ::Vector{Bool},
     expected_ncg_raw    ::AbstractMatrix =DEFAULT_encgr,
     ctrl_well_dict      ::OrderedDict =CTRL_WELL_DICT,
-    cluster_method      ::Symbol = :k_means_medoids,
+    cluster_method      ::ClusteringMethod = :K_means_medoids(),
     norm_l              ::Real =2,
     ## below not specified by `process_ad` as of right now
     init_factors        ::AbstractVector =DEFAULT_init_FACTORS, # for `init_centers`
@@ -242,26 +246,26 @@ function assign_genos(
     ## "ERROR: MethodError: no method matching #assign_genos#301( ::Array{AbstractString,1}, ::QpcrAnalysis.#assign_genos, ::Array{Float64,2}, ::Array{Float64,2}, ::Float64)"
 )
     calc_expected_genos_all() =
-        map(
+        mapreduce(
             i -> fill(
                     map(geno -> fill(geno, 1, 2 ^ (i-1)), [0, 1]) |> reduce[hcat],
                     2 ^ (num_channels - i)
                 ) |> reduce[hcat],
+            vcat,
             1:num_channels
-        ) |> reduce[vcat] |> nrn
+        ) |> nrn
 
     ## for any channel, all the data points are the same
     ## (would result in "AssertionError: !(isempty(grp))" for `kmedoids`)
     function channel_all_equal()
-        car =
-            do_cluster_analysis(
+        car = do_cluster_analysis(
                 data .+ rand(size(data)...),
                 rand(num_channels, 2),
                 cluster_method,
                 norm_l)
-        car.cluster_result.assignments = fill(unclassified_assignment, num_wells)
+        car.cluster_result.assignments = fill(unclassified_assignment, n_wells)
         return (
-            fill(apg_labels[end], num_wells), # assignments_adj_labels
+            fill(apg_labels[end], n_wells), # assignments_adj_labels
             AssignGenosResult(
                 car.cluster_result, # cluster_result
                 1, # best_i # Potential issue: ucc_dict empty so should return 0 ???
@@ -328,9 +332,10 @@ function assign_genos(
         end # while
         ## find the best model (possible combination of genotypes
         ## resulting in largest silhouette mean)
-        const _ucc_vec = _ucc_dict |> values |> collect
-        const _best_ucc = _ucc_vec[best_i]
-        const _best_i = findmax(map(_ucc -> _ucc.slht_mean, _ucc_vec))[2]
+        const ucc_keys = _ucc_dict |> keys |> collect
+        const _best_i = findmax(ucc_keys |>
+            map[key -> getfield(_ucc_dict[key],:slht_mean)] |> collect)[2]
+        const _best_ucc = _ucc_dict[ucc_keys[_best_i]]
         # expected_genos = expected_genos_vec[best_i]
         return (_best_i, _best_ucc, _ucc_dict)
     end
@@ -369,14 +374,9 @@ function assign_genos(
             cluster_method,
             norm_l)
         const _geno_combin = expected_genos_all[:, _geno_idc]
-        const _center_set = uniq_combin_centers(_car.centers)
+        const _center_set = Set(_car.centers[:, i] for i in 1:size(_car.centers, 2))
         return (_car, _geno_combin, _center_set)
     end
-
-    uniq_combin_centers(_centers) =
-        Set(map(1:size(_centers)[2]) do i
-            car.centers[:, i]
-        end)
 
     ## re-assign centers based on distance to initial centers
     ## (works like US medical residency match)
@@ -416,7 +416,7 @@ function assign_genos(
     end
 
     ## if dual channel && no heteros only homo1, homo2, NTC
-    function ntc2hetero(_new_center_idc)
+    function ntc2hetero!(_new_center_idc)
         const ntc_center_idc = (_new_center_idc .== ntc_geno_idx)
         const ntc_center    = car.centers[:, ntc_center_idc]
         const homo1_center  = car.centers[:,
@@ -432,12 +432,11 @@ function assign_genos(
                 find(geno_idx -> all(expected_genos_all[:, geno_idx] .== [1, 1]),
                      geno_idc_all)[1]
         end
-        return _new_center_idc
     end
     #
     ## end of function definitions nested within assign_genos()
 
-    const num_channels, num_wells = size(data)
+    const num_channels, n_wells = size(data)
     const max_num_genos = 2 ^ num_channels # 2 comes from the binary possible values, i.e. presence/absence of signal for each channel
     const unclassified_assignment = max_num_genos + 1
     if length(apg_labels) != unclassified_assignment
@@ -480,26 +479,25 @@ function assign_genos(
         init_centers_all[:, ctrl_geno_idc[i]] = mean(ctrl_well_data, 2)
     end
     ## are expected genotypes specified for non-control wells?
-    if length(expected_ncg_raw) > 0
-        const best_i, best_ucc, ucc_dict = encg_cluster_model() # yes
-    else
-        const best_i, best_ucc, ucc_dict = best_cluster_model() # no
-    end
+    const best_i, best_ucc, ucc_dict =
+        length(expected_ncg_raw) > 0 ?
+            encg_cluster_model() :      # yes
+            best_cluster_model()        # no
     ## use output of best clustering model
     const best_geno_combins = best_ucc.geno_combins
-    const best_num_genos = length(_best_ucc.uniq_combin_centers)
+    const best_num_genos = length(best_ucc.uniq_combin_centers)
     const car = best_ucc.car
     # const init_centers, dist_mtx_winit, cluster_result, centers, slhts, slht_mean =
     #     map(fn -> getfield(car, fn), fieldnames(car))
     ## can we call any of the genotypes?
     if (best_num_genos < max_num_genos - 1 ) # cannot call genotypes
         # const all_unclassified = true
-        const assignments_adj = fill(unclassified_assignment, num_wells)
+        const assignments_adj = fill(unclassified_assignment, n_wells)
     else # can call genotypes
         # const all_unclassified = false
         #
         ## when `cluster_method == "k-medoids"`
-        const assignments_raw = car.cluster_result.assignments[1:num_wells]
+        const assignments_raw = car.cluster_result.assignments[1:n_wells]
         #
         # if best_num_genos == max_num_genos
         #     const ref_center_idc = 1:max_num_genos
@@ -510,12 +508,11 @@ function assign_genos(
         # end # no possible case for `else`
         # const expected_genos = expected_genos_all[:, ref_center_idc]
         #
+        new_center_idc = calc_new_center_idc()
         if num_channels == 2 && all(sum(expected_genos_all[:, new_center_idc], 1) .< 2) 
             ## if dual channel && no heteros only homo1, homo2, NTC
             ## change NTC to hetero
-            const new_center_idc = ntc2hetero(calc_new_center_idc())
-        else
-            const new_center_idc = calc_new_center_idc()
+            new_center_idc = ntc2hetero!(new_center_idc)
         end # if num_channels
 
         ## is this necessary?
@@ -559,7 +556,7 @@ function assign_genos(
         assignments_adj_labels,
         AssignGenosResult(
             ## best
-            cluster_result,
+            car.cluster_result,
             best_i,
             best_geno_combins,
             ## all
@@ -575,7 +572,7 @@ function process_ad(
     cycs                ::Union{Integer,AbstractVector},
 
     ctrl_well_dict      ::OrderedDict,
-    cluster_method      ::Symbol, # for `assign_genos`
+    cluster_method      ::ClusteringMethod, # for `assign_genos`
     norm_l              ::Real, # for `assign_genos`
     
     ## each column is a vector of binary geno whose length is number of channels

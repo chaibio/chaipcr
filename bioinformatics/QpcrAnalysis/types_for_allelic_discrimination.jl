@@ -4,6 +4,13 @@
 
 import Clustering.ClusteringResult
 
+import Clustering.ClusteringResult
+
+abstract type  ClusteringMethod                         end
+struct         K_means              <: ClusteringMethod end
+struct         K_means_medoids      <: ClusteringMethod end
+struct         K_medoids            <: ClusteringMethod end
+
 ## clustering analysis result from a possible combination of expected genotypes
 struct ClusterAnalysisResult
     init_centers        ::Array{Float64,2} # no longer necessary because it represents one combination of genotypes, but different combinations of genotypes with the same number of genotypes may result in the same clustering results

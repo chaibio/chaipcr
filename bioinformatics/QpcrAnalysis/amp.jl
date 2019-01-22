@@ -122,7 +122,7 @@ function process_amp(
     ## allelic discrimination
     ad_cycs                 ::Union{Integer,AbstractVector} =0, # allelic discrimination: cycles of fluorescence to be used, 0 means the last cycle
     ctrl_well_dict          ::OrderedDict =CTRL_WELL_DICT,
-    cluster_method          ::Symbol = :k_means_medoids, # allelic discrimination: :k_means, :k_medoids, :k_means_medoids
+    cluster_method          ::ClusteringMethod = K_means_medoids(), # allelic discrimination: K_means(), K_medoids(), K_means_medoids()
     norm_l                  ::Real =2, # norm level for distance matrix, e.g. norm_l = 2 means l2-norm
     expected_ncg_raw        ::AbstractMatrix =DEFAULT_encgr, # each column is a vector of binary genotype whose length is number of channels (0 => no signal, 1 => yes signal)
     categ_well_vec          ::AbstractVector =CATEG_WELL_VEC,
@@ -695,7 +695,7 @@ function process_amp_1sr(
     kwdict_rc               ::Associative, # keyword arguments passed onto `report_cq`
     ad_cycs                 ::Union{Integer,AbstractVector},
     ctrl_well_dict          ::OrderedDict,
-    cluster_method          ::Symbol,
+    cluster_method          ::ClusteringMethod,
     norm_l                  ::Real,
     expected_ncg_raw        ::AbstractMatrix,
     categ_well_vec          ::AbstractVector,
