@@ -1,6 +1,6 @@
 "action","dtype","single_channel","dual_channel"
 "amplification","Amplification","test_1ch_amp_169","xh-amp1"
-"meltcurve","MeltCurve","test_1ch_mc_170","test_2ch_mc_223"
+"meltcurve","MeltCurve","test_1ch_mc_170","chaipcr_mc_189"
 "standard_curve","StandardCurve","sim_1ch_sd",""
 "loadscript","LoadScript","",""
 "optical_cal","OpticalCal","test_1ch_cal_168","test_2ch_cal_219"

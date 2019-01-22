@@ -70,6 +70,7 @@ function do_cluster_analysis(
             end
         end
         return Symmetric(_dist_mtx)
+    end
 
     ## cluster analysis
     function clustering(_init_centers)
@@ -124,13 +125,10 @@ function do_cluster_analysis(
 
         function check_grp(gi_bool_vec)
 
-            function dist_between_min()
-                if sum_gi_bool_vec == 0 || sum_gi_bool_vec == num_centers
-                    return 0.
-                else
+            dist_between_min() =
+                (sum_gi_bool_vec == 0 || sum_gi_bool_vec == num_centers) ?
+                    0. :
                     minimum(dist_mtx[gi_bool_vec, .!gi_bool_vec])
-                end
-            end
 
             function dist_within_margin_max()
                 if sum_gi_bool_vec <= 1
@@ -181,7 +179,11 @@ function do_cluster_analysis(
         #
         ## end of function definitions nested within check_groups()
 
-        map(grp_i -> check_grp(assignments_woinit .== grp_i), 1:num_centers) |> reduce[vcat]
+        return
+            map(
+                grp_i -> check_grp(assignments_woinit .== grp_i),
+                1:num_centers) |>
+                    reduce[vcat]
     end # check_groups()
     #
     ## end of function definitions nested within do_cluster_analysis()
@@ -412,7 +414,7 @@ function assign_genos(
         # println("_new_center_idc ", _new_center_idc)
         return _new_center_idc
     end
-u
+
     ## if dual channel && no heteros only homo1, homo2, NTC
     function ntc2hetero(_new_center_idc)
         const ntc_center_idc = (_new_center_idc .== ntc_geno_idx)
@@ -549,7 +551,7 @@ u
         ## the lower bound `slht_lb`, i.e. unclear which geno should be assigned
         ## previously `assignments_agp_idc .* (relative_diff_closest_dists .> slht_lb)`
         const assignments_adj =
-            map(i -> (car.slhts[i] < slht_lb) ? unclassified_assignment : assignments_agp_idc[i]),
+            map(i -> (car.slhts[i] < slht_lb) ? unclassified_assignment : assignments_agp_idc[i],
                 1:length(assignments_agp_idc))
     end # if best_num_genos
     const assignments_adj_labels = map(a -> apg_labels[a], assignments_adj)
