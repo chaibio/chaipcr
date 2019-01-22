@@ -40,7 +40,7 @@ function deconV(
     dcvd_ary3 = similar(ary2dcv)
     const k_inv_vs = 
         map(1:a2d_dim_well) do w
-            k4dcv.k_inv_vec[dcv_well_idc_wfluo[w]] * diagm(scaling_factor_dcv_vec)
+            k4dcv.k_inv_vec[dcv_well_idc_wfluo[w]] .* scaling_factor_dcv_vec
         end
     for x in 1:a2d_dim_unit, w in 1:a2d_dim_well
         dcvd_ary3[x, w, :] = k_inv_vs[w] * ary2dcv[x, w, :] # matrix * vector
@@ -114,7 +114,7 @@ function get_k(
     water_data_2bt = calib_data["water"]["fluorescence_value"] |> reduce[hcat]
     #
     ## no information on well numbers in calibration info so make default assumptions
-    n_wells = size(water_data_2bt)[1]
+    n_wells = size(water_data_2bt, 1)
     water_well_nums = collect(1:n_wells)
     #
     ## vectorized

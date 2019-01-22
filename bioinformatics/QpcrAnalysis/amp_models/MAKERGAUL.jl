@@ -22,7 +22,7 @@ end
 function pred_from_cycs( # 0.7to1.2e-5 sec for 40 cycles on PC
     ::MAKERGAUL3,
     cycs2fit    ::AbstractVector,
-    fb_start    ::Real,
+    fb          ::Real,
     eu0         ::Real,
     d0          ::Real,
     inh         ::Real
