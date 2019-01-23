@@ -110,7 +110,7 @@ function act(
     #
     ## group result set
     gre_vec = group_result_df[:, 3]
-    uniq_well_combins = unique(map(gre -> getfield(gre, :well), gre_vec))
+    uniq_well_combins = gre_vec |> map[field[:well]] |> unique
     grp_vec = Vector{OrderedDict}()
     for well_combin in uniq_well_combins
         if length(well_combin) > 1
@@ -224,7 +224,7 @@ end
 ## not to be used in production
 
 ## generate unique integers
-function generate_uniq_ints(num_ints::Integer, S, rng::AbstractRNG=Base.GLOBAL_RNG)
+function generate_uniq_ints(num_ints ::Integer, S, rng ::AbstractRNG =Base.GLOBAL_RNG)
     if num_ints > length(S)
         error("num_ints > length(S), i.e. no enough values to choose from")
     end
@@ -336,8 +336,10 @@ function generate_req_sc(;
         num_uniq_targets_perchannel = Int(floor(num_uniq_targets / num_channels))
         for channel_i in nna_channel_idc
             target_idc_thischannel = ((1:num_wells) .-1) .* num_channels .+ channel_i
-            nna_target_idc = target_idc_thischannel[map(target_idx -> !isnan(target_vec[target_idx]), target_idc_thischannel)]
-            uniq_targets_thischannel = generate_uniq_ints(num_uniq_targets_perchannel, available_targets, rng)
+            nna_target_idc = target_idc_thischannel[
+                map(target_idx -> !isnan(target_vec[target_idx]), target_idc_thischannel)]
+            uniq_targets_thischannel =
+                generate_uniq_ints(num_uniq_targets_perchannel, available_targets, rng)
             available_targets = setdiff(available_targets, uniq_targets_thischannel)
             nna_target_vec = rand(rng, uniq_targets_thischannel, length(nna_target_idc))
             for nna_idx_i in 1:length(nna_target_idc)

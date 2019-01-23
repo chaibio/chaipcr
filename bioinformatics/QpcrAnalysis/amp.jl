@@ -247,46 +247,49 @@ function process_amp(
     ## 2.
     ## need to verify that the fluorescence data complies
     ## with the constraints imposed by max_cycle and well_constraint
-    sr_dict = OrderedDict(map([ asrp_vec[1] ]) do asrp
-        process_amp_1sr(
-            ## remove MySql dependency
-            # db_conn, exp_id, asrp, calib_info,
-            # fluo_well_nums, well_nums,
-            exp_data,
-            calib_data,
-            asrp,
-            channel_nums,
-            dcv && length(channel_nums) > 1, # dcv
-            dye_in,
-            dyes_2bfild,
-            min_reliable_cyc,
-            baseline_cyc_bounds,
-            cq_method,
-            ct_fluos,
-            af_key,
-            kwdict_mbq,
-            ipopt_print2file_prefix,
-            qt_prob_rc,
-            kwdict_rc,
-            ad_cycs,
-            ctrl_well_dict,
-            cluster_method,
-            norm_l,
-            expected_ncg_raw,
-            categ_well_vec,
-            (out_format == :json ? :pre_json : out_format), # out_format_1sr
-            json_digits,
-            verbose
-        )
-    end) # do sr_ele
+    sr_dict = OrderedDict(
+        map([ asrp_vec[1] ]) do asrp
+            join([asrp.step_or_ramp, asrp.id], "_") => 
+                process_amp_1sr(
+                    ## remove MySql dependency
+                    # db_conn, exp_id, asrp, calib_info,
+                    # fluo_well_nums, well_nums,
+                    exp_data,
+                    calib_data,
+                    asrp,
+                    channel_nums,
+                    dcv && length(channel_nums) > 1, # dcv
+                    dye_in,
+                    dyes_2bfild,
+                    min_reliable_cyc,
+                    baseline_cyc_bounds,
+                    cq_method,
+                    ct_fluos,
+                    af_key,
+                    kwdict_mbq,
+                    ipopt_print2file_prefix,
+                    qt_prob_rc,
+                    kwdict_rc,
+                    ad_cycs,
+                    ctrl_well_dict,
+                    cluster_method,
+                    norm_l,
+                    expected_ncg_raw,
+                    categ_well_vec,
+                    (out_format == :json ? :pre_json : out_format), # out_format_1sr
+                    json_digits,
+                    verbose)
+        end) # do sr_ele
     ## output
     if (out_sr_dict)
         final_out = sr_dict
     else
         first_sr_out = first(values(sr_dict))
-        final_out = OrderedDict(map(fieldnames(first_sr_out)) do key
-            key => getfield(first_sr_out,key)
-        end)
+        final_out =
+            OrderedDict(
+                map(fieldnames(first_sr_out)) do key
+                    key => getfield(first_sr_out,key)
+                end)
     end
     final_out[:valid] = true
     return out_format == :json ?
@@ -556,7 +559,9 @@ function mod_bl_q(
         const eff_vals_4cq =
             OrderedDict(
                 map(keys(cyc_vals_4cq)) do key
-                    key => key == :max_eff ? eff_max : func_pred_eff(cyc_vals_4cq[key])
+                    key => (key == :max_eff) ?
+                        eff_max :
+                        func_pred_eff(cyc_vals_4cq[key])
                 end)
         return MbqOutput(
             fitted_prebl,
@@ -731,11 +736,9 @@ function process_amp_1sr(
                                     kwdict_mbq...,
                                     verbose = verbose)
                             end
-                        const fluos_useful =
-                            map(find_idc_useful()) do mbq_i
-                                mbq_ary1[mbq_i][:cq_fluo]
-                            end
-                        median(fluos_useful)
+                        find_idc_useful() |>
+                            map[mbq_i -> mbq_ary1[mbq_i][:cq_fluo]] |>
+                            median
                     end
                 else # cq_method != :ct
                     return fill(NaN, num_channels)
@@ -745,7 +748,7 @@ function process_amp_1sr(
         return ct_fluos
     end
 
-    function calc_mbq_ary2()
+    calc_mbq_ary2() =
         [
             begin
                 ipopt_print2file = length(ipopt_print2file_prefix) == 0 ?
@@ -763,7 +766,6 @@ function process_amp_1sr(
             end
             for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
         ]
-    end
 
     function set_fn_mbq!()
         for fn_mbq in fieldnames(MbqOutput)
@@ -918,20 +920,19 @@ function process_amp_1sr(
     end # if dcv
     #
     ## format output
-    if out_format == :json || out_format == :pre_json
-        amp_out = AmpStepRampOutput2Bjson(
-            map(fieldnames(AmpStepRampOutput2Bjson)) do fn # numeric fields only
-                field_value = getfield(full_amp_out, fn)
-                try
-                    round.(field_value, json_digits)
-                catch
-                    field_value
-                end # try
-            end...) # do fn
-    elseif out_format == :full
-        amp_out = full_amp_out
+    if out_format == :full
+        return full_amp_out
     end
-    return join([asrp.step_or_ramp, asrp.id], "_") => amp_out
+    ## out_format == :json || out_format == :pre_json
+    return AmpStepRampOutput2Bjson(
+        map(fieldnames(AmpStepRampOutput2Bjson)) do fn # numeric fields only
+            field_value = getfield(full_amp_out, fn)
+            try
+                round.(field_value, json_digits)
+            catch
+                field_value
+            end # try
+        end...) # do fn
 end # process_amp_1sr
 
 

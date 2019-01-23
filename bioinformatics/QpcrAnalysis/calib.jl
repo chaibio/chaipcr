@@ -22,7 +22,6 @@ function dcv_aw(
     aw_out_format           ::Symbol = :both # :array, :dict, :both
 )
     ## remove MySql dependency
-    #
     # calib_info = ensure_ci(db_conn, calib_info)
     # wva_data, wva_well_nums = prep_adj_w2wvaf(db_conn, calib_info, well_nums_in_req, dye_in, dyes_2bfild)
 
@@ -69,7 +68,6 @@ function dcv_aw(
         # k_inv_vec = fill(reshape(DataArray([1, 0, 1, 0]), 2, 2), 16) 
         
         ## removing MySql dependency
-        #
         # k4dcv, dcvd_ary3 = deconV(
         #     1. * mw_ary3, channel_nums, wva_well_idc_wfluo, db_conn, calib_info, well_nums_in_req;
         #     out_format="array"
@@ -101,9 +99,11 @@ function dcv_aw(
     if aw_out_format == :array || aw_out_format == :both
         ## the following line of code requires keys(dcvd_aw_dict) to be in sort order
         const dcvd_aw_ary3 = Array{AbstractFloat}(
-                cat(3, map(
-                    key -> dcvd_aw_dict[key],
-                    keys(dcvd_aw_dict))...))
+                cat(3, 
+                    map(
+                        key -> dcvd_aw_dict[key],
+                        keys(dcvd_aw_dict))...
+                ))
         if aw_out_format == :both
             const dcvd_aw = (dcvd_aw_ary3, dcvd_aw_dict)
         else # :array
@@ -197,10 +197,10 @@ function calib_calib(
     #     parse(Int, split(cd_key, "_")[2])
     # end
 
-    ary2dcv_1 = cat(1, map(values(calib_dict_1)) do value_1
-        reshape(transpose(fluo_data), 1, size(value_1[1])[2:-1:1]...)
-    end...) # do value_1
-    #
+    ary2dcv_1 = cat(1, 
+                    map(values(calib_dict_1)) do value_1
+                        reshape(transpose(fluo_data), 1, size(value_1[1])[2:-1:1]...)
+                    end...) # do value_1
     mw_ary3_1, k4dcv_2, dcvd_ary3_1, wva_data_2, wva_well_nums_2, dcv_aw_ary3_1 =
         dcv_aw(
             ary2dcv_1,
@@ -213,15 +213,13 @@ function calib_calib(
             dye_in,
             dyes_2bfild;
             aw_out_format = :array)
-    #
     return CalibCalibOutput(
         ary2dcv_1,
         mw_ary3_1,
         k4dcv_2,
         dcvd_ary3_1,
         wva_data_2,
-        dcv_aw_ary3_1
-    )
+        dcv_aw_ary3_1)
 end # calib_calib
 
 

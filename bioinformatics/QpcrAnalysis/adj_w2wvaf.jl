@@ -41,7 +41,7 @@ function adj_w2wvaf(
     return ([
         scaling_factor_adj_w2wvaf * mean(swd) *
             (fluo2btp[i,w] - wva_water[w]) / swd[w]
-                for i in 1:size(fluo2btp,1), w in 1:size(fluo2btp,2)]) # w = well
+                for i in 1:size(fluo2btp,1), w in 1:size(fluo2btp,2)])   # w = well
 end # adj_w2wvaf
 
 

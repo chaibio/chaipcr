@@ -248,7 +248,7 @@ function assign_genos(
     calc_expected_genos_all() =
         mapreduce(
             i -> fill(
-                    map(geno -> fill(geno, 1, 2 ^ (i-1)), [0, 1]) |> reduce[hcat],
+                    mapreduce(geno -> fill(geno, 1, 2 ^ (i-1)), hcat, [0, 1]),
                     2 ^ (num_channels - i)
                 ) |> reduce[hcat],
             vcat,

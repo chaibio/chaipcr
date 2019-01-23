@@ -160,9 +160,10 @@ function get_k(
 
     if (well_proc == :mean) # use average over channels, by well
         k_s =
-            map(cd_key_vec) do cd_key # `cd` - channel of dye
-                Array{Float_T}(sweep(sum)(/)(mean(k4dcv_bydy[cd_key], 2)))
-            end |> reduce[hcat]
+            mapreduce( # `cd` - channel of dye
+                cd_key -> Array{Float_T}(sweep(sum)(/)(mean(k4dcv_bydy[cd_key], 2))),
+                hcat,
+                cd_key_vec)
         k_inv = try
             inv(k_s)
         catch err
@@ -179,9 +180,10 @@ function get_k(
         k_inv_vec = similar(k_s)
         for i in 1:n_wells
             k_mtx =
-                map(cd_key_vec) do cd_key
-                    Array{Float_T}(sweep(sum)(/)(k4dcv_bydy[cd_key][:,i]))
-                end |> reduce[hcat]
+                mapreduce(
+                    cd_key -> Array{Float_T}(sweep(sum)(/)(k4dcv_bydy[cd_key][:,i])),
+                    hcat,
+                    cd_key_vec)
             k_s[i] = k_mtx
             ## k_inv_vec[i] = inv(k_mtx)
             k_inv_vec[i] = try

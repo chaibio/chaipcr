@@ -22,7 +22,10 @@ function act(
     #
     ## add a new column (not row) that is the average of the two heat block zones
     hbzt_avg = map(1:num_dp) do i
-        mean(map(name -> temperatureData[name][i], ["heat_block_zone_1_temp", "heat_block_zone_2_temp"]))
+        mean(
+            map(
+                name -> temperatureData[name][i],
+                ["heat_block_zone_1_temp", "heat_block_zone_2_temp"]))
     end # do i
     #
     elapsed_times = temperatureData["elapsed_time"]
@@ -61,19 +64,23 @@ function act(
     )) do time_vec
         elapsed_time_idc = find(elapsed_times) do elapsed_time
             time_vec[1] < elapsed_time < time_vec[2]
-        end # do elapsed_time
-        maximum(abs.(temperatureData["heat_block_zone_1_temp"][elapsed_time_idc] .-
-            temperatureData["heat_block_zone_2_temp"][elapsed_time_idc]))
-    end # do time_vec
+        end # find
+        maximum(
+            abs.(
+                temperatureData["heat_block_zone_1_temp"][elapsed_time_idc] .-
+                    temperatureData["heat_block_zone_2_temp"][elapsed_time_idc]))
+    end # map
     ## calculate the average ramp rate of the lid heater in degrees C per second
-    lidHeaterStartRampTime = minimum(elapsed_times[
-        find(temperatureData["lid_temp"]) do lid_temp
-            lid_temp > LOW_TEMP_pDELTA
-        end])
-    lidHeaterStopRampTime = maximum(elapsed_times[
-        find(temperatureData["lid_temp"]) do lid_temp
-            lid_temp < HIGH_TEMP_mDELTA
-        end])
+    lidHeaterStartRampTime =
+        minimum(elapsed_times[
+            find(temperatureData["lid_temp"]) do lid_temp
+                lid_temp > LOW_TEMP_pDELTA
+            end])
+    lidHeaterStopRampTime =
+        maximum(elapsed_times[
+            find(temperatureData["lid_temp"]) do lid_temp
+                lid_temp < HIGH_TEMP_mDELTA
+            end])
     Lid_TotalTime = lidHeaterStopRampTime - lidHeaterStartRampTime
     Lid_HeatingRate = temp_range_adj / Lid_TotalTime
     #
@@ -94,11 +101,9 @@ function act(
         ),
         :valid => true
     )
-    if (out_format == :json)
-        return JSON.json(results)
-    else
-        return results
-    end
+    return (out_format == :json) ?
+        JSON.json(results) :
+        results
 end # analyze_thermal_performance_diagnostic()
 
 

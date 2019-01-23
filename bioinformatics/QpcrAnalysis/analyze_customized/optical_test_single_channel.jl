@@ -38,32 +38,30 @@ function act(
     # end) # do step_id
 
     ## assuming the 2 values of `ot_dict` are the same in length (number of wells)
-    results = map(1:length(ot_dict["baseline"]["fluorescence_value"][1])) do well_i
-        baseline = ot_dict["baseline"]["fluorescence_value"][1][well_i]
-        excitation = ot_dict["excitation"]["fluorescence_value"][1][well_i]
-        # valid =
-        #    (excitation >= MIN_EXCITATION_FLUORESCENCE) &&
-        #    (excitation / baseline >= MIN_EXCITATION_FLUORESCENCE_MULTIPLE) &&
-        #    (excitation <= MAX_EXCITATION) # old
-        valid = 
-            (excitation >= MIN_EXCITATION_FLUORESCENCE) &&
-            (baseline   <  MIN_EXCITATION_FLUORESCENCE) &&
-            (excitation <= MAX_EXCITATION) # Josh, 2016-08-15
-        OrderedDict(
-            :baseline   => baseline, 
-            :excitation => excitation, 
-            :valid      => valid
-        )
-    end # do well_i
-    #
-    output = OrderedDict(
+    const results =
+        map(1:length(ot_dict["baseline"]["fluorescence_value"][1])) do well_i
+            const baseline = ot_dict["baseline"]["fluorescence_value"][1][well_i]
+            const excitation = ot_dict["excitation"]["fluorescence_value"][1][well_i]
+            # valid =
+            #    (excitation >= MIN_EXCITATION_FLUORESCENCE) &&
+            #    (excitation / baseline >= MIN_EXCITATION_FLUORESCENCE_MULTIPLE) &&
+            #    (excitation <= MAX_EXCITATION) # old
+            const valid = 
+                (excitation >= MIN_EXCITATION_FLUORESCENCE) &&
+                (baseline   <  MIN_EXCITATION_FLUORESCENCE) &&
+                (excitation <= MAX_EXCITATION) # Josh, 2016-08-15
+            OrderedDict(
+                :baseline   => baseline, 
+                :excitation => excitation, 
+                :valid      => valid
+            )
+        end # do well_i
+    const output = OrderedDict(
         :optical_data => results,
         :valid        => true)
-    if (out_format == :json)
-        return JSON.json(output)
-    else
-        return output
-    end
+    return (out_format == :json) ?
+        JSON.json(output) :
+        output
 end # analyze_optical_test_single_channel()
 
 

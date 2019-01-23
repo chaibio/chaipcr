@@ -16,7 +16,7 @@ struct MeltCurveRawData
 end
 
 struct MeltCurveTF # `temperature and fluorescence` - TF
-    t_da_vec        ::DataArray{Float64,2}
+    t_da            ::DataArray{Float64,2}
     fluo_da         ::DataArray{Float64,2}
 end
 

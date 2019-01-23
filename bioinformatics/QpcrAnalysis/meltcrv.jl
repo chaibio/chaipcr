@@ -101,9 +101,8 @@ function process_mc(
                 # tf_nv_adj |> map[index[:temperature]]        |> reduce[hcat],
                 # tf_nv_adj |> map[index[:fluorescence_value]] |> reduce[hcat])
                 map(TF_KEYS) do key
-                    tf_nv_adj |> map[index[key]] |> x -> hcat(x...)
+                    mapreduce(tf_dict -> tf_dict[key], hcat, tf_nv_adj)
                 end...)
-    #
     ## end of function definitions nested in get_mc_data()
 
         mc_data |>
@@ -116,7 +115,7 @@ function process_mc(
     normalize_tf(channel_i ::Integer, i ::Integer) =
         normalize_fluos(
             remove_when_NaN_in_first(
-                mc_data_bych[channel_i].t_da_vec[:,i],
+                mc_data_bych[channel_i].t_da[:,i],
                 faw_ary3[:,i,channel_i])...)
 
     remove_when_NaN_in_first(x...) =
@@ -129,7 +128,6 @@ function process_mc(
         Dict(
             :tmprtrs => tmprtrs,
             :fluos   => sweep(minimum)(-)(fluos_raw))
-    #
     ## end of function definitions nested in process_mc()
 
     const channel_nums, fluo_well_nums =
@@ -166,24 +164,26 @@ function process_mc(
     ## subset temperature/fluorescence data by channel then by well
     ## then smooth the fluorescence/temperature data and calculate Tm peak, area
     ## bychwl = by channel then by well_nums
-    const mc_bychwl = map(1:num_channels) do channel_i
-        map(wva_well_nums_alt) do oc_well_num
-            if oc_well_num in fluo_well_nums
-                mc_tm_pw(
-                    normalize_tf(
-                        channel_i,
-                        indexin([oc_well_num], fluo_well_nums)[1]);
-                    auto_span_smooth = auto_span_smooth,
-                    span_smooth_default = span_smooth_default,
-                    span_smooth_factor = span_smooth_factor,
-                    verbose = verbose,
-                    kwdict_mc_tm_pw...
-                )
-            else
-                EMPTY_mc_tm_pw_out
-            end # if
-        end # oc_well_num
-    end |> reduce[hcat]
+    const mc_bychwl = mapreduce(
+        channel_i ->
+            map(wva_well_nums_alt) do oc_well_num
+                if oc_well_num in fluo_well_nums
+                    mc_tm_pw(
+                        normalize_tf(
+                            channel_i,
+                            indexin([oc_well_num], fluo_well_nums)[1]);
+                        auto_span_smooth = auto_span_smooth,
+                        span_smooth_default = span_smooth_default,
+                        span_smooth_factor = span_smooth_factor,
+                        verbose = verbose,
+                        kwdict_mc_tm_pw...
+                    )
+                else
+                    EMPTY_mc_tm_pw_out
+                end # if
+            end, # oc_well_num
+        hcat,
+        1:num_channels)
     #
     if (out_format == :full)
         return MeltCurveOutput(
@@ -196,8 +196,7 @@ function process_mc(
             fdcvd_ary3,
             wva_data,
             wva_well_nums_alt,
-            faw_ary3
-        )
+            faw_ary3)
     else
         mc_out = OrderedDict{Symbol,Any}(map(keys(MC_OUT_FIELDS)) do f
             MC_OUT_FIELDS[f] =>
@@ -815,8 +814,9 @@ end
     report(digits ::Int, peaks ::Vector{Peak}) =
         length(peaks) == 0 ?
             EMPTY_Ta :
-            peaks |> map[p -> round.([p.Tm, p.area], digits)] |> reduce[hcat] |> transpose
-
+            mapreduce(p -> round.([p.Tm, p.area], digits),
+                hcat,
+                peaks) |> transpose
 
 
 
