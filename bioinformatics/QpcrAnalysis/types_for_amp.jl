@@ -24,12 +24,12 @@ struct MbqOutput
     fitted_postbl   ::AbstractAmpFitted
     postbl_status   ::Symbol
     coefs           ::Vector{Float64}
-    d0              ::AbstractFloat
+    d0              ::Float64
     blsub_fitted    ::Vector{Float64}
     dr1_pred        ::Vector{Float64}
     dr2_pred        ::Vector{Float64}
-    max_dr1         ::AbstractFloat
-    max_dr2         ::AbstractFloat
+    max_dr1         ::Float64
+    max_dr2         ::Float64
     cyc_vals_4cq    ::OrderedDict{Symbol,Float64}
     eff_vals_4cq    ::OrderedDict{Symbol,Float64}
     cq_raw          ::Float64
@@ -41,11 +41,11 @@ end
 # amplification output format per step or ramp
 mutable struct AmpStepRampOutput
     # computed in `process_amp_1sr`
-    fr_ary3         ::Array{Float64,3}
-    mw_ary3         ::Array{Float64,3}
+    fr_ary3         ::Array{R,3} where R <: Real
+    mw_ary3         ::Array{S,3} where S <: Real
     k4dcv           ::K4Deconv
     dcvd_ary3       ::Array{Float64,3}
-    wva_data        ::OrderedDict{String,OrderedDict{Int,Vector{Float64}}}
+    wva_data        ::OrderedDict{String,OrderedDict{Int,Vector{T}}} where T <: Real
     rbbs_ary3       ::Array{Float64,3}
     fluo_well_nums  ::Vector{Int}
     channel_nums    ::Vector{Int}

@@ -16,7 +16,7 @@ function dcv_aw(
     # well_nums_found_in_fr ::AbstractVector,
     # well_nums_in_req ::AbstractVector=[],
     calib_data              ::Associative,
-    well_nums_found_in_fr   ::AbstractVector,
+    well_nums_found_in_fr   ::Vector{I} where I <: Integer,
     dye_in                  ::Symbol = :FAM,
     dyes_2bfild             ::AbstractVector =[];
     aw_out_format           ::Symbol = :both # :array, :dict, :both
@@ -98,12 +98,11 @@ function dcv_aw(
             end)
     if aw_out_format == :array || aw_out_format == :both
         ## the following line of code requires keys(dcvd_aw_dict) to be in sort order
-        const dcvd_aw_ary3 = Array{AbstractFloat}(
+        const dcvd_aw_ary3 =
                 cat(3, 
                     map(
                         key -> dcvd_aw_dict[key],
-                        keys(dcvd_aw_dict))...
-                ))
+                        keys(dcvd_aw_dict))...)
         if aw_out_format == :both
             const dcvd_aw = (dcvd_aw_ary3, dcvd_aw_dict)
         else # :array

@@ -10,8 +10,8 @@ import DataStructures.OrderedDict
 ## type for K matrix
 ## used in deconv.jl
 type K4Deconv
-    k_s             ::AbstractArray
-    k_inv_vec       ::AbstractArray
+    k_s             ::Array{Array{F,2},1} where F <: AbstractFloat
+    k_inv_vec       ::Array{Array{G,2},1} where G <: AbstractFloat
     inv_note        ::String
 end
 

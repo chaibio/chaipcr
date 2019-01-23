@@ -809,7 +809,6 @@ function process_amp_1sr(
     #     "fluorescence_value", # "fluorescence_value" or "baseline_value"
     #     exp_id, asrp,
     #     fluo_well_nums, channel_nums)
-
     ## issue:
     ## assumes only 1 step/ramp because the current data format
     ## does not allow us to break the fluorescence data down by step_id/ramp_id
@@ -817,7 +816,8 @@ function process_amp_1sr(
     const fluo_well_nums  = exp_data["well_num"]  |> unique |> sort
     const num_cycs, num_fluo_wells, num_channels =
         (cyc_nums, fluo_well_nums, channel_nums) |> map[length]
-    const fr_ary3 = reshape(
+    const R = typeof(exp_data["fluorescence_value"][1][1])
+    const fr_ary3 ::Array{R,3} = reshape(
         exp_data["fluorescence_value"],
         num_cycs, num_fluo_wells, num_channels)
     #

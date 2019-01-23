@@ -17,9 +17,9 @@ import DataStructures.OrderedDict
 ## Output does not include the automatically created column at index 1
 ## from rownames of input array as R does
 function adj_w2wvaf(
-    fluo2btp                  ::AbstractArray,
+    fluo2btp                  ::Array{R,2} where R <: Real,
     wva_data                  ::Associative,
-    wva_well_idc_wfluo        ::AbstractVector,
+    wva_well_idc_wfluo        ::Vector{I} where I <: Integer,
     channel                   ::Integer;
     minus_water               ::Bool =false,
     scaling_factor_adj_w2wvaf ::Real =SCALING_FACTOR_adj_w2wvaf
@@ -205,9 +205,9 @@ function prep_adj_w2wvaf(
     ## using the current format for the request body there is no well_num information
     ## associated with the calibration data
     channels_in_water = num_channels(calib_data["water"]["fluorescence_value"])
-    const V = typeof(calib_data["water"]["fluorescence_value"][1])
-    water_data_dict  = OrderedDict{UInt8,V}()
-    signal_data_dict = OrderedDict{UInt8,V}()
+    const V = typeof(calib_data["water"]["fluorescence_value"][1][1])
+    water_data_dict  = OrderedDict{UInt8,Vector{V}}() # enforce type
+    signal_data_dict = OrderedDict{UInt8,Vector{V}}() # enforce type
     stop_msgs = Vector{String}()
     for channel in 1:channels_in_water
         key="channel_$(channel)"
@@ -283,8 +283,8 @@ function prep_adj_w2wvaf(
     ## than experiment data, so that calibration data needs to be easily
     ## subsetted by channel.
     wva_data = OrderedDict(
-        :water  => water_data_dict, # performance issue: enforce data type here
-        :signal => signal_data_dict # performance issue: enforce data type here
+        :water  => water_data_dict,
+        :signal => signal_data_dict
     )
     return (wva_data, signal_well_nums)
 end # prep_adj_w2wvaf

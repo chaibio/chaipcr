@@ -107,7 +107,6 @@ function get_k(
     # end) 
 
     ## subtract water calibration data
-    ## this essentially duplicates similar code in function prep_adj_w2wvaf
     cd_key_vec = calib_data |> keys |> collect |> filter[x -> (x != "water")] # `cd` - channel of dye.
     channel_nums = map(x -> Base.parse(split(x, "_")[2]), cd_key_vec)
     n_channels = length(channel_nums)
