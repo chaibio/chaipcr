@@ -86,9 +86,9 @@ const MAX_EXCITATION = 384000
 ## used in optical_test_dual_channel.jl
 const CHANNELS = [1, 2]
 const CHANNEL_IS = 1:length(CHANNELS)
-const CALIB_SYMBOLS_FAM_HEX = Symbol.(map(channel -> "channel_$channel", CHANNELS))
+# const CALIB_SYMBOLS_FAM_HEX = Symbol.(map(channel -> "channel_$channel", CHANNELS))
 const SYMBOLS_FAM_HEX = [:FAM, :HEX]
-const OLD_CALIB_SYMBOLS = [:baseline; :water; CALIB_SYMBOLS_FAM_HEX]
+# const OLD_CALIB_SYMBOLS = [:baseline; :water; CALIB_SYMBOLS_FAM_HEX]
 const NEW_CALIB_SYMBOLS = [:baseline; :water; SYMBOLS_FAM_HEX]
 
 ## bounds of signal-to-noise ratio (SNR)
@@ -103,7 +103,7 @@ const SNR_HEX_CH2_MIN = 0.88
 dscrmnt_snr_fam(snr_2chs) = [snr_2chs[1] > SNR_FAM_CH1_MIN, snr_2chs[2] < SNR_FAM_CH2_MAX]
 dscrmnt_snr_hex(snr_2chs) = [snr_2chs[1] < SNR_HEX_CH1_MAX, snr_2chs[2] > SNR_HEX_CH2_MIN]
 const dscrmnts_snr = OrderedDict(map(1:2) do i
-    CALIB_SYMBOLS_FAM_HEX[i] => [dscrmnt_snr_fam, dscrmnt_snr_hex][i]
+    SYMBOLS_FAM_HEX[i] => [dscrmnt_snr_fam, dscrmnt_snr_hex][i]
 end) # do i
 
 ## fluo values: channel 1, channel 2

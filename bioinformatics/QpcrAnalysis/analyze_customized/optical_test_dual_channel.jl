@@ -19,6 +19,7 @@ function act(
     verbose         ::Bool =false
 )
     function SNR_test(w, cl)
+        println("size ",size(baseline_2chs))
         const baseline_2chs, water_fluo_2chs, signal_fluo_2chs =
             map([:baseline, :water, cl]) do key
                 fluo_dict[key][w, :]
