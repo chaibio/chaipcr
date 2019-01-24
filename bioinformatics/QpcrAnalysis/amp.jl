@@ -866,7 +866,7 @@ function process_amp_1sr(
         wva_data,
         rbbs_ary3,
         fluo_well_nums,
-        1:num_channels,
+        collect(1:num_channels),
         cq_method,
         fitted_prebl,
         fill(Vector{String}(), num_fluo_wells, num_channels), # bl_notes
