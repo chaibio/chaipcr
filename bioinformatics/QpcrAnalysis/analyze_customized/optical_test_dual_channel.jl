@@ -119,6 +119,18 @@ function act(
                 swd_dye[channel_i] ./ swd_normd[channel_i]
             end # do channel_i
         end # do swd_dye
+    ## raise an error if there are negative or zero values in the normalized data
+    ## that will cause the channel1:channel2 ratio to be zero, infinite, or negative
+    ## vectorized
+    # if self_calib_vec |> mapreduce[mapreduce[mapreduce[broadcast[>=,0.0],|],|],|]
+    #     error("Zero or negative values in the self-calibrated fluorescence data.")
+    # end
+    ## devectorized
+    for dye in CHANNEL_IS, channel in CHANNEL_IS
+        if any(self_calib_vec[dye][channel] .<= 0.0)
+            error("Zero or negative values in the self-calibrated fluorescence data.")
+        end
+    end
     ## calculate channel1:channel2 ratios
     const ch12_ratios =
         OrderedDict(
