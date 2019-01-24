@@ -14,13 +14,13 @@ NRN_NOT  = x -> 1 .- x
 ## start with bottom-level function, goes step-wise
 function prep_input_4ad(
     ## one step/ramp of amplification output
-    full_amp_out    ::AmpStepRampOutput, 
+    full_amp_out    ::AmpStepRampOutput,
 
     categ           ::Symbol = :fluo,
     well_idc        ::Union{AbstractVector,Colon} =Colon(),
 
     ## relevant if `categ == :fluo`, last available cycle
-    cycs            ::Union{Integer,AbstractVector} =1 
+    cycs            ::Union{Integer,AbstractVector} =1
 )
     num_cycs, n_wells, num_channels = size(full_amp_out.fr_ary3)
     nrn = NRN_SELF
@@ -195,7 +195,7 @@ function do_cluster_analysis(
     # slope_vec = raw_data[2,:] ./ raw_data[1,:]
     # new_data = vcat(raw_data, transpose(slope_vec) .* mean(raw_data[1:2,:], 1) ./ median(slope_vec))
     # init_centers = vcat(init_centers, ones(1, size(init_centers)[2]))
-    
+
     const n_wells = size(raw_data,2)
     const well_idc = 1:n_wells
     const num_centers = size(init_centers,2)
@@ -285,7 +285,7 @@ function assign_genos(
 
     ## no expected genotypes specified for non-control wells,
     ## perform cluster analysis on all possible combinations of genotypes
-    function best_cluster_model()        
+    function best_cluster_model()
         ## non-control genotypes
         const non_ctrl_geno_idc = geno_idc_all[.!ctrl_geno_bool_vec]
         ## initial conditions for `while` loop
@@ -314,7 +314,7 @@ function assign_genos(
                             ## in both cr_1 and cr_2
                             push!(_ucc_dict[center_set].geno_combins, geno_combin)
                             ## `geno_combin` includes all genotypes except NTC
-                            if geno_combin == non_ntc_geno_combin 
+                            if geno_combin == non_ntc_geno_combin
                                 _ucc_dict[center_set].car = car
                             end # if num_genos
                         end # if !
@@ -340,10 +340,10 @@ function assign_genos(
         return (_best_i, _best_ucc, _ucc_dict)
     end
 
-    ## expected genotypes specified for non-control wells 
+    ## expected genotypes specified for non-control wells
     ## BUG: these 3 variables left undefined in previous code
     ## best_geno_combins, best_num_genos, ucc_dict
-    function encg_cluster_model()        
+    function encg_cluster_model()
         const expected_ncg = nrn(expected_ncg_raw)
         const non_ctrl_geno_idc = map(
             encg_idx ->
@@ -509,7 +509,7 @@ function assign_genos(
         # const expected_genos = expected_genos_all[:, ref_center_idc]
         #
         new_center_idc = calc_new_center_idc()
-        if num_channels == 2 && all(sum(expected_genos_all[:, new_center_idc], 1) .< 2) 
+        if num_channels == 2 && all(sum(expected_genos_all[:, new_center_idc], 1) .< 2)
             ## if dual channel && no heteros only homo1, homo2, NTC
             ## change NTC to hetero
             new_center_idc = ntc2hetero!(new_center_idc)
@@ -574,11 +574,11 @@ function process_ad(
     ctrl_well_dict      ::OrderedDict,
     cluster_method      ::ClusteringMethod, # for `assign_genos`
     norm_l              ::Real, # for `assign_genos`
-    
+
     ## each column is a vector of binary geno whose length is number of channels
     ## (0 => no signal, 1 => yes signal)
     expected_ncg_raw    ::AbstractMatrix =DEFAULT_encgr,
-    
+
     categ_well_vec      ::AbstractVector =CATEG_WELL_VEC,
 )
     ## indicate a well as NTC (non-template control) if all the channels have NaN as Cq
@@ -591,7 +591,7 @@ function process_ad(
     agr_dict = OrderedDict{Symbol,AssignGenosResult}()
     for categ_well_tuple in categ_well_vec
         categ, well_idc = categ_well_tuple
-        data, nrn = 
+        data, nrn =
             prep_input_4ad(
                 full_amp_out,
                 categ,

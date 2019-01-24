@@ -3,7 +3,7 @@
 
 function act(
     ::ThermalPerformanceDiagnostic,
-    ## remove MySql dependency               
+    ## remove MySql dependency
     #
     # db_conn ::MySQL.MySQLHandle,
     # exp_id ::Integer, # really used
@@ -15,7 +15,7 @@ function act(
     ## remove MySql dependency
     #
     # queryTemperatureData = "SELECT * FROM temperature_logs WHERE experiment_id = $exp_id ORDER BY elapsed_time"
-    # temperatureData = MySQL.mysql_execute(db_conn, queryTemperatureData)[1]       
+    # temperatureData = MySQL.mysql_execute(db_conn, queryTemperatureData)[1]
     # num_dp = length(temperatureData[1]) # dp = data points
 
     num_dp = length(temperatureData["elapsed_time"])

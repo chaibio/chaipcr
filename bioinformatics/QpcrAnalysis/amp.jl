@@ -50,7 +50,7 @@ function act(
     end
     ## categ_well_vec argument
     if haskey(req_dict, "categ_well_vec")
-        kwdict_pa1[:categ_well_vec] = 
+        kwdict_pa1[:categ_well_vec] =
             map(x -> str2sym.(x), req_dict["categ_well_vec"])
         for i in req_dict["categ_well_vec"] |> length |> range[1]
             if length(req_dict["categ_well_vec"][i][2]) == 0
@@ -139,7 +139,7 @@ function process_amp(
     #     "calib_info: $calib_info\n",
     #     "max_cycle: $max_cycle"
     # )
-    
+
     ## remove MySql dependency
     #
     # calib_info = ensure_ci(db_conn, calib_info, exp_id)
@@ -208,7 +208,7 @@ function process_amp(
     #                 step_id is not NULL
     #                 well_constraint
     #             ORDER BY cycle_num
-    #     """ 
+    #     """
     #     # must "SELECT well_num" for `get_mysql_data_well`
     #     fd_nt, fluo_well_nums = get_mysql_data_well(
     #         well_nums, fd_qry_2b, db_conn, verbose
@@ -249,7 +249,7 @@ function process_amp(
     ## with the constraints imposed by max_cycle and well_constraint
     sr_dict = OrderedDict(
         map([ asrp_vec[1] ]) do asrp
-            join([asrp.step_or_ramp, asrp.id], "_") => 
+            join([asrp.step_or_ramp, asrp.id], "_") =>
                 process_amp_1sr(
                     ## remove MySql dependency
                     # db_conn, exp_id, asrp, calib_info,
@@ -310,7 +310,7 @@ end # process_amp()
 # )
 #
 #    cyc_nums = asrp.cyc_nums
-#    
+#
 #    get fluorescence data for amplification
 #    fluo_qry = """SELECT $col_name
 #        FROM fluorescence_data
@@ -324,7 +324,7 @@ end # process_amp()
 #        ORDER BY channel, well_num, cycle_num
 #    """
 #    fluo_sel = MySQL.mysql_execute(db_conn, fluo_qry)[1]
-#    
+#
 #    fluo_raw = reshape(
 #        fluo_sel[JSON.parse(col_name)],
 #        map(length, (cyc_nums, fluo_well_nums, channel_nums))...
@@ -336,7 +336,7 @@ end # process_amp()
 
 
 ## fit model, baseline subtraction, quantification
-function mod_bl_q( 
+function mod_bl_q(
     fluos               ::AbstractVector;
     min_reliable_cyc    ::Real =5, # >= 1
     af_key              ::Symbol = :sfc, # a string representation of amplification curve model, used for finding the right model `DataType` in `dfc_DICT` and the right empty model instance in `AF_EMPTY_DICT`
@@ -408,7 +408,7 @@ function mod_bl_q(
         end
 
         ## update bl_notes
-        function sfc_prebl_status(prebl_status)            
+        function sfc_prebl_status(prebl_status)
             bl_notes = ["prebl_status $prebl_status", "model-derived baseline"]
             if prebl_status in [:Optimal, :UserLimit]
                 const min_bfd, max_bfd = extrema(fluos .- baseline) # `bfd` - blsub_fluos_draft
@@ -458,7 +458,7 @@ function mod_bl_q(
                 map(
                     dr2_vec -> findmax(dr2_vec)[2],
                     (dr2_cfd_left, dr2_cfd_right))
-            if max_dr2_right_cyc <= last_cyc_wt0 
+            if max_dr2_right_cyc <= last_cyc_wt0
                 ## fluo on fitted spline may not be close to raw fluo
                 ## at `cyc_m2l` and `cyc_m2r`
                 push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) <= last_cyc_wt0 ($last_cyc_wt0), bl_cycs = $(last_cyc_wt0+1):$num_cycs")
@@ -619,7 +619,7 @@ function report_cq!(
     max_bsf_lb =4356,
     scld_max_dr1_lb ::Real =0.0089, # look like real amplification, scld_max_dr1 0.00894855, ip223, exp. 75, well A7, channel 2.
     scld_max_dr2_lb ::Real =0.000689,
-    scld_max_bsf_lb ::Real =0.086   
+    scld_max_bsf_lb ::Real =0.086
 )
     if before_128x
         max_dr1_lb, max_dr2_lb, max_bsf_lb = [max_dr1_lb, max_dr2_lb, max_bsf_lb] / 128
@@ -687,7 +687,7 @@ function process_amp_1sr(
     asrp                    ::AmpStepRampProperties,
     channel_nums            ::AbstractVector,
     dcv                     ::Bool, # logical, whether to perform multi-channel deconvolution
-    dye_in                  ::Symbol, 
+    dye_in                  ::Symbol,
     dyes_2bfild             ::AbstractVector,
     min_reliable_cyc        ::Real,
     baseline_cyc_bounds     ::AbstractVector,
@@ -781,7 +781,7 @@ function process_amp_1sr(
             setfield!(
                 full_amp_out,
                 fn_mbq,
-                convert(typeof(getfield(full_amp_out, fn_mbq)), fv)) # `setfield!` doesn't call `convert` on its own    
+                convert(typeof(getfield(full_amp_out, fn_mbq)), fv)) # `setfield!` doesn't call `convert` on its own
         end # for fn_mbq
         return nothing
     end
@@ -831,8 +831,8 @@ function process_amp_1sr(
             # db_conn,
             # calib_info,
             # fluo_well_nums,
-            # well_nums, 
-            calib_data, 
+            # well_nums,
+            calib_data,
             fluo_well_nums,
             dye_in,
             dyes_2bfild;

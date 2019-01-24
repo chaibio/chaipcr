@@ -6,12 +6,12 @@ import JSON.json
 
 function act(
     ::OpticalTestDualChannel,
-    ## remove MySqldependency    
+    ## remove MySqldependency
     #
     # db_conn ::MySQL.MySQLHandle,
     # exp_id ::Integer,
     # calib_info ::Union{Integer,OrderedDict}; # keys: "baseline", "water", "channel_1", "channel_2". Each value's "calibration_id" value is the same as `exp_id`
-    # 
+    #
     # start: arguments that might be passed by upstream code
     # well_nums ::AbstractVector =[],
     ot_dict         ::Associative; # keys: "baseline", "water", "FAM", "HEX"
@@ -63,7 +63,7 @@ function act(
         mapreduce(
             channel_i ->
                 map(fluo_dict[:water][:, channel_i]) do fluo_pw
-                    WATER_MIN[channel_i] < fluo_pw < WATER_MAX[channel_i] 
+                    WATER_MIN[channel_i] < fluo_pw < WATER_MAX[channel_i]
                 end,
             hcat,
             CHANNEL_IS)
@@ -139,4 +139,4 @@ end # analyze_optical_test_dual_channel()
 
 
 
-#      
+#

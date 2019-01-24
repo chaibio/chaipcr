@@ -46,13 +46,13 @@ function act(
             #    (excitation >= MIN_EXCITATION_FLUORESCENCE) &&
             #    (excitation / baseline >= MIN_EXCITATION_FLUORESCENCE_MULTIPLE) &&
             #    (excitation <= MAX_EXCITATION) # old
-            const valid = 
+            const valid =
                 (excitation >= MIN_EXCITATION_FLUORESCENCE) &&
                 (baseline   <  MIN_EXCITATION_FLUORESCENCE) &&
                 (excitation <= MAX_EXCITATION) # Josh, 2016-08-15
             OrderedDict(
-                :baseline   => baseline, 
-                :excitation => excitation, 
+                :baseline   => baseline,
+                :excitation => excitation,
                 :valid      => valid
             )
         end # do well_i

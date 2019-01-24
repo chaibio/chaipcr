@@ -44,7 +44,7 @@ sweep(summary_func) = sweep_func -> (x -> sweep_func.(x, summary_func(x)))
 normalize_range(x ::AbstractArray) =
     sweep(minimum)(-)(x) |> sweep(maximum)(/)
 
-## used in meltcrv.jl       
+## used in meltcrv.jl
 ## used in shared.jl
 thing(x) = x != nothing
 
@@ -79,7 +79,7 @@ shorten(x...) =
 ## extend vector with NaN values to a specified length
 extend_NaN(len ::Integer, vec ::AbstractVector) =
     len - length(vec) |>
-        m -> 
+        m ->
             m >= 0 ?
                 (m |> fill[NaN] |> vcat[vec]) :
                 error("vector is too long")
@@ -115,7 +115,7 @@ function find_mid_sumr_bysw(
     #
     const padding = fill(-sumr_func(-vals), half_width)
     const vals_padded = [padding; vals; padding]
-    vals |> length |> range[1] |> collect |> map[vals_iw] |> 
+    vals |> length |> range[1] |> collect |> map[vals_iw] |>
         map[v -> sumr_func(v) == v[half_width + 1]] |> find
 end
 
@@ -139,11 +139,11 @@ split_vector_and_return_larger_quantile(
 # construct DataFrame from dictionary key and value vectors
 # `dict_keys` need to be a vector of strings
 # to construct DataFrame column indices correctly
-function dictvec2df(dict_keys ::AbstractVector, dict_values ::AbstractVector) 
+function dictvec2df(dict_keys ::AbstractVector, dict_values ::AbstractVector)
     df = DataFrame()
     for dict_key in dict_keys
         df[Symbol(dict_key)] = map(
-            dict_ele -> dict_ele[dict_key], 
+            dict_ele -> dict_ele[dict_key],
             dict_values)
     end
     return df
@@ -175,7 +175,7 @@ num_wells(calib ::Associative) =
 # duplicated in MySQLforQpcrAnalysis.jl
 get_ordered_keys(dict ::Dict) =
     dict |> keys |> collect |> sort
-    
+
 get_ordered_keys(ordered_dict ::OrderedDict) =
     ordered_dict |> keys |> collect
 

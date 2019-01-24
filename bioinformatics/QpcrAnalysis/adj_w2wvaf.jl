@@ -144,8 +144,8 @@ end # adj_w2wvaf
 function prep_adj_w2wvaf(
     ## remove MySql dependency
     # db_conn ::MySQL.MySQLHandle,
-    # calib_info ::Union{Integer,OrderedDict}, 
-    calib_data  ::Associative, 
+    # calib_info ::Union{Integer,OrderedDict},
+    calib_data  ::Associative,
     well_nums   ::AbstractVector,
     dye_in      ::Symbol = :FAM,
     dyes_2bfild ::AbstractVector =[]
@@ -154,7 +154,7 @@ function prep_adj_w2wvaf(
     #
     # calib_info = ensure_ci(db_conn, calib_info)
     #
-    # if isa(calib_info, Integer) 
+    # if isa(calib_info, Integer)
     #     # `calib_info` is an integer.
     #     # Using `oc_water_step_id` and `oc_signal_step_ids` defined outside of this function
     #     water_calib_id  = signal_calib_id_s = calib_info

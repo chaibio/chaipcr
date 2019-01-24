@@ -111,7 +111,7 @@ function fit(
     @NLconstraint(jmp_model, eu_constr_2p[cyc in cycs2fit[2:end]], eu[cyc] == eu[cyc-1] / (1 + inh * d[cyc-1]))
     # @NLconstraint(jmp_model, d_constr_2p[cyc in cycs2fit[2:end]], d[cyc] == d[cyc-1] + d[cyc-1] * eu[cyc] / (eu[cyc] + d[cyc-1])) # "Invalid_Number_Detected"
     @NLconstraint(jmp_model, d_constr_2p[cyc in cycs2fit[2:end]], d[cyc] == d[cyc-1] + 1 / (1 / d[cyc-1] + 1 / eu[cyc]))
-    # 
+    #
     ## change_e2: get rid of division by multiplying both sides by denominator
     # @NLconstraint(jmp_model, eu_constr_01, eu[1] * (1 + inh * d0) == eu0)
     # @NLconstraint(jmp_model, d_constr_01, d[1] * (eu[1] + d0) == d0 * (d0 + 2 * eu[1]))

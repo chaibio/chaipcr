@@ -64,7 +64,7 @@ function dispatch(
     end
 
     success = !isa(result, Exception)
-    response_body = 
+    response_body =
         success ?
             string(result) :
             string(JSON.json(Dict(

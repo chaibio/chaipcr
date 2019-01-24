@@ -57,7 +57,7 @@ function dcv_aw(
         cat(
             3,
             ## devectorized code avoids transposition
-            [   
+            [
                 [   fr_ary3[u,w,c] - wva_data[:water][c][wva_well_idc_wfluo][w]
                     for u in 1:size(fr_ary3)[1],
                         w in wva_well_idc_wfluo     ]
@@ -65,8 +65,8 @@ function dcv_aw(
 
     if dcv
         ## addition with flexible ratio instead of deconvolution (commented out)
-        # k_inv_vec = fill(reshape(DataArray([1, 0, 1, 0]), 2, 2), 16) 
-        
+        # k_inv_vec = fill(reshape(DataArray([1, 0, 1, 0]), 2, 2), 16)
+
         ## removing MySql dependency
         # k4dcv, dcvd_ary3 = deconV(
         #     1. * mw_ary3, channel_nums, wva_well_idc_wfluo, db_conn, calib_info, well_nums_in_req;
@@ -85,10 +85,10 @@ function dcv_aw(
         const dcvd_ary3 = mw_ary3
     end
     #
-    const dcvd_aw_dict = 
+    const dcvd_aw_dict =
         OrderedDict(
             map(1:num_channels) do channel_i
-                channel_nums[channel_i] => 
+                channel_nums[channel_i] =>
                     adj_w2wvaf(
                         dcvd_ary3[:,:,channel_i],
                         wva_data,
@@ -99,7 +99,7 @@ function dcv_aw(
     if aw_out_format == :array || aw_out_format == :both
         ## the following line of code requires keys(dcvd_aw_dict) to be in sort order
         const dcvd_aw_ary3 =
-                cat(3, 
+                cat(3,
                     map(
                         key -> dcvd_aw_dict[key],
                         keys(dcvd_aw_dict))...)
@@ -196,7 +196,7 @@ function calib_calib(
     #     parse(Int, split(cd_key, "_")[2])
     # end
 
-    ary2dcv_1 = cat(1, 
+    ary2dcv_1 = cat(1,
                     map(values(calib_dict_1)) do value_1
                         reshape(transpose(fluo_data), 1, size(value_1[1])[2:-1:1]...)
                     end...) # do value_1

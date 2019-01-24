@@ -68,7 +68,7 @@ function process_mc(
     function get_mc_data(channel_num ::Integer)
 
         ## subset melting curve data by channel (curried)
-        select_mcdata_by_channel(channel_num ::Integer) = 
+        select_mcdata_by_channel(channel_num ::Integer) =
             mc_data ::Associative ->
                 Dict(
                     map(["temperature","fluorescence_value","well_num"]) do key
@@ -94,7 +94,7 @@ function process_mc(
                             tf_dict[key])
                     end)
             end
-        
+
         ## convert to MeltCurveTF object
         toMeltCurveTF(tf_nv_adj ::AbstractArray) =
             MeltCurveTF(
@@ -389,7 +389,7 @@ function mc_tm_pw(
     find_sn() =
         [maximum, minimum] |> map[find_mid_sumr_bysw[ndrv_smu, span_peaks_dp()]]
 
-    summits_and_nadirs(sn_idc...) = 
+    summits_and_nadirs(sn_idc...) =
         OrderedDict(zip(
             [:summit_pre, :nadir],
             map(
@@ -431,7 +431,7 @@ function mc_tm_pw(
         const low_nadir_idx, high_nadir_idx =
             (ndrv_smu[left_nadir_idx] < ndrv_smu[right_nadir_idx]) ?
                 (left_nadir_idx, right_nadir_idx) :
-                (right_nadir_idx, left_nadir_idx)   
+                (right_nadir_idx, left_nadir_idx)
         const hn_ns = ndrv_smu[high_nadir_idx]
         #
         ## find the nearest location to `summit_idx`
@@ -615,7 +615,7 @@ function mc_tm_pw(
     const Ta_raw        = find_peaks(sn_idc...)
     const len_Tms       = length(Ta_raw)
     #
-    ## return smoothed data if no peaks 
+    ## return smoothed data if no peaks
     if (len_Tms == 0)
         return MeltCurveTa(
             mc_raw          |> report[json_digits],
@@ -784,12 +784,12 @@ end
                 break
             end
             ## otherwise try the next summit
-        end    
+        end
         ## fail if no more summits
         if (summit_ii >= iter.len_summit_idc)   ||
                 ## fail if no flanking nadirs
             !(iter.nadir_idc[left_nadir_ii] < iter.summit_idc[summit_ii] < iter.nadir_idc[right_nadir_ii])
-                return (nothing, nothing) 
+                return (nothing, nothing)
         end
         ## find duplicate summits
         right_summit_ii = summit_ii
