@@ -14,7 +14,58 @@ function act(
     req_dict        ::Associative;
     out_format      ::Symbol = :pre_json,
     verbose         ::Bool =false
-)
+)   
+    ## issue:
+    ## the following assumes only 1 step/ramp because the current data format
+    ## does not allow us to break the fluorescence data down by step_id/ramp_id
+    function parsed_raw_data()
+        const cyc_nums, fluo_well_nums, channel_nums =
+            map(["cycle_num", "well_num", "channel"]) do key
+                req_dict["raw_data"][key] |> unique             # in order of appearance
+            end
+        const num_cycs, num_fluo_wells, num_channels =
+            (cyc_nums, fluo_well_nums, channel_nums) |> map[length]
+        try
+            assert(req_dict["raw_data"]["cycle_num"] ==
+                repeat(
+                    cyc_nums,
+                    outer = num_fluo_wells * num_channels))
+            assert(req_dict["raw_data"]["well_num" ] ==
+                repeat(
+                    fluo_well_nums,
+                    inner = num_cycs,
+                    outer = num_channels))
+            assert(req_dict["raw_data"]["channel"  ] ==
+                repeat(
+                    channel_nums,
+                    inner = num_cycs * num_fluo_wells))
+        catch
+            error("The format of the fluorescence data does not lend itself" *
+                " to transformation into a 3-dimensional array. Please make sure" *
+                " that it is sorted by channel, well number, and cycle number.")
+        end
+        ## `fr_ary3` - fluo_raw_array_3d
+        ## this code assumes that the data in the request
+        ## is formatted appropriately for this transformation
+        ## we can check the cycle/well/channel data if necessary
+        const R = typeof(req_dict["raw_data"]["fluorescence_value"][1][1])
+        const fr_ary3 ::Array{R,3} =
+            reshape(
+                req_dict["raw_data"]["fluorescence_value"],
+                num_cycs, num_fluo_wells, num_channels)
+        ## rearrange data in sort order of each index
+        const cyc_perm  = sortperm(cyc_nums)
+        const well_perm = sortperm(fluo_well_nums)
+        const chan_perm = sortperm(channel_nums)
+        return (
+            cyc_nums[cyc_perm],
+            fluo_well_nums[well_perm],
+            channel_nums[chan_perm] |> map[i -> "channel_$(i)"],
+            num_cycs,
+            num_fluo_wells,
+            num_channels,
+            fr_ary3[cyc_perm,well_perm,chan_perm])
+    end
     ## remove MySql dependency
     ## asrp_vec
     # if "step_id" in keys_req_dict
@@ -71,12 +122,14 @@ function act(
             kwdict_mbq[:bl_method] = median
         end
     end
+    
+
     ## call
     response = process_amp(
         ## remove MySql dependency
         # db_conn, exp_id, asrp_vec, calib_info;
-        req_dict["experiment_id"],
-        req_dict["raw_data"],
+        # req_dict["experiment_id"],
+        parsed_raw_data()...,
         req_dict["calibration_info"],
         asrp_vec;
         out_format  = out_format,
@@ -89,6 +142,9 @@ function act(
 end # act(::Amplification)
 
 
+## currently this function does nothing
+## it just passes data through to process_amp_1sr()
+## the compiler might be able to eliminate it
 function process_amp(
     ## remove MySql dependency
     #
@@ -96,11 +152,17 @@ function process_amp(
     # exp_id ::Integer,
     # asrp_vec ::Vector{AmpStepRampProperties},
     # calib_info ::Union{Integer,OrderedDict};
+    # exp_id                  ::Integer,
     #
     ## arguments that might be passed by upstream code
     # well_nums ::AbstractVector =[],
-    exp_id                  ::Integer,
-    exp_data                ::Associative,
+    cyc_nums                ::Vector{I} where I <: Integer,
+    fluo_well_nums          ::Vector{J} where J <: Integer,
+    channel_nums            ::Vector{String},
+    num_cycs                ::Integer,
+    num_fluo_wells          ::Integer,
+    num_channels            ::Integer,
+    fr_ary3                 ::DenseArray,
     calib_data              ::Associative,
     ## we will assume that any relevant step/ramp information
     ## has already been passed along and is present in asrp_vec
@@ -237,7 +299,6 @@ function process_amp(
     #
     # channel_nums = unique(fd_nt[:channel])
 
-    const channel_nums = exp_data["channel"] |> sort |> unique |> map[i -> "channel_$(i)"]
     const out_format_1sr =  (out_format == "json" ? "pre_json" : out_format)
     ## issues:
     ## 1.
@@ -254,11 +315,16 @@ function process_amp(
                     ## remove MySql dependency
                     # db_conn, exp_id, asrp, calib_info,
                     # fluo_well_nums, well_nums,
-                    exp_data,
+                    cyc_nums,
+                    fluo_well_nums,
+                    channel_nums,
+                    num_cycs,
+                    num_fluo_wells,
+                    num_channels,
+                    fr_ary3,
                     calib_data,
                     asrp,
-                    channel_nums,
-                    dcv && length(channel_nums) > 1, # dcv
+                    dcv && num_channels > 1, # `dcv`
                     dye_in,
                     dyes_2bfild,
                     min_reliable_cyc,
@@ -682,10 +748,15 @@ function process_amp_1sr(
     # calib_info ::Union{Integer,OrderedDict},
     # fluo_well_nums ::AbstractVector,
     # well_nums ::AbstractVector,
-    exp_data                ::Associative,
+    cyc_nums                ::Vector{I} where I <: Integer,
+    fluo_well_nums          ::Vector{J} where J <: Integer,
+    channel_nums            ::Vector{String},
+    num_cycs                ::Integer,
+    num_fluo_wells          ::Integer,
+    num_channels            ::Integer,
+    fr_ary3                 ::DenseArray,
     calib_data              ::Associative,
     asrp                    ::AmpStepRampProperties,
-    channel_nums            ::AbstractVector,
     dcv                     ::Bool, # logical, whether to perform multi-channel deconvolution
     dye_in                  ::Symbol,
     dyes_2bfild             ::AbstractVector,
@@ -802,25 +873,12 @@ function process_amp_1sr(
     ## end of function definitions nested within process_amp_1sr
 
     ## remove MySql dependency
-    #
-    ## fr_ary3 = fluo_raw_array_3d
     # fr_ary3 = get_amp_data(
     #     db_conn,
     #     "fluorescence_value", # "fluorescence_value" or "baseline_value"
     #     exp_id, asrp,
     #     fluo_well_nums, channel_nums)
-    ## issue:
-    ## assumes only 1 step/ramp because the current data format
-    ## does not allow us to break the fluorescence data down by step_id/ramp_id
-    const cyc_nums        = exp_data["cycle_num"] |> unique |> sort
-    const fluo_well_nums  = exp_data["well_num"]  |> unique |> sort
-    const num_cycs, num_fluo_wells, num_channels =
-        (cyc_nums, fluo_well_nums, channel_nums) |> map[length]
-    const R = typeof(exp_data["fluorescence_value"][1][1])
-    const fr_ary3 ::Array{R,3} = reshape(
-        exp_data["fluorescence_value"],
-        num_cycs, num_fluo_wells, num_channels)
-    #
+
     ## perform deconvolution and adjust well-to-well variation in absolute fluorescence
     const mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, rbbs_ary3 =
         dcv_aw(
