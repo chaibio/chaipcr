@@ -70,8 +70,7 @@ function dcv_aw(
         ## removing MySql dependency
         # k4dcv, dcvd_ary3 = deconV(
         #     1. * mw_ary3, channel_nums, wva_well_idc_wfluo, db_conn, calib_info, well_nums_in_req;
-        #     out_format="array"
-        # )
+        #     out_format="array")
         const k4dcv, dcvd_ary3 =
             deconV(
                 1. * mw_ary3,

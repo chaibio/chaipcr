@@ -206,8 +206,8 @@ function prep_adj_w2wvaf(
     ## associated with the calibration data
     channels_in_water = num_channels(calib_data["water"]["fluorescence_value"])
     const V = typeof(calib_data["water"]["fluorescence_value"][1][1])
-    water_data_dict  = OrderedDict{UInt8,Vector{V}}() # enforce type
-    signal_data_dict = OrderedDict{UInt8,Vector{V}}() # enforce type
+    water_data_dict  = OrderedDict{Integer,Vector{V}}() # enforce type
+    signal_data_dict = OrderedDict{Integer,Vector{V}}() # enforce type
     stop_msgs = Vector{String}()
     for channel in 1:channels_in_water
         key="channel_$(channel)"

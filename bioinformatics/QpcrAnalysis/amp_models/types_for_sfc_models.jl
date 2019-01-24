@@ -7,19 +7,19 @@ using JuMP
 ## sfc: same formula for each cycle
 struct SfcFitted <: AbstractAmpFitted
     coef_strs   ::Vector{String}
-    coefs       ::Vector{Float64}
+    coefs       ::Vector{Float_T}
     status      ::Symbol
     obj_val     ::AbstractFloat
     jmp_model   ::JuMP.Model
-    init_coefs  ::OrderedDict{String,Float64}
+    init_coefs  ::OrderedDict{String,Float_T}
 end
 const SfcFitted_EMPTY = SfcFitted(
     Vector{String}(), # coef_strs
     zeros(0), # coefs
     :not_fitted, # status
-    0., # obj_val
+    0.0, # obj_val
     JuMP.Model(),
-    OrderedDict{String,Float64}() # init_coefs
+    OrderedDict{String,Float_T}() # init_coefs
 )
 
 mutable struct SFCModelDef # non-linear model, one feature (`x`)

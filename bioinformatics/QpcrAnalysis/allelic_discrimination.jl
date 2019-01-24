@@ -64,7 +64,7 @@ function do_cluster_analysis(
     ## matrix is symmetric with zeros on major diagonal
     ## calculate upper triangle and convert to Symmetric
     function calc_dist_mtx()
-        _dist_mtx = zeros(Float64,n_wells,n_wells)
+        _dist_mtx = zeros(Float_T,n_wells,n_wells)
         for j in colon(2,n_wells) # columns
             for i in colon(1,j - 1) # rows
                 _dist_mtx[i,j] = norm(raw_data[:, i] .- raw_data[:, j], norm_l)
@@ -120,7 +120,7 @@ function do_cluster_analysis(
 
             dist_between_min() =
                 (sum_gi_bool_vec == 0 || sum_gi_bool_vec == num_centers) ?
-                    Float64(0) :
+                    0.0 :
                     minimum(dist_mtx[gi_bool_vec, .!gi_bool_vec])
 
             function dist_within_margin_max()
@@ -133,7 +133,7 @@ function do_cluster_analysis(
 
                     is_second_longest(gi_idx_ne) =
                         prod(gi_idx_e -> dist_mtx[gi_idx_ne, gi_idx_e] - dist_edge,
-                            edge) <= Float64(0)
+                            edge) <= 0.0
 
                     edge_always_second_longest() =
                         setdiff(gi_idc, edge) |> all[is_second_longest[]]
@@ -141,14 +141,14 @@ function do_cluster_analysis(
 
                     ## vectorized code
                     edge = ()
-                    dist_edge = Float64(0)
+                    dist_edge = 0.0
                     for edge in combinations(gi_idc, 2)
                         dist_edge = dist_mtx[edge...]
                         edge_always_second_longest() && return dist_edge
                     end
-                    Float64(0)
+                    0.0
                     ## devectorized code
-                    # _dist_within_margin_max = Float64(0)
+                    # _dist_within_margin_max = 0.0
                     # update_dwmm = false
                     # for edge in combinations(gi_idc, 2)
                     #     gi_idx_e1, gi_idx_e2 = edge
@@ -157,7 +157,7 @@ function do_cluster_analysis(
                     #         if !(gi_idx_ne in edge)
                     #             update_dwmm = true
                     #             if  (dist_mtx[gi_idx_ne, gi_idx_e1] - dist_edge) *
-                    #                 (dist_mtx[gi_idx_ne, gi_idx_e2] - dist_edge) > Float64(0) # edge not ranked 2nd
+                    #                 (dist_mtx[gi_idx_ne, gi_idx_e2] - dist_edge) > 0.0 # edge not ranked 2nd
                     #                     update_dwmm = false
                     #                     break
                     #             end # if
@@ -172,7 +172,7 @@ function do_cluster_analysis(
                 end # calc_dist_within_margin_max()
                 ## end of function definition nested within dist_within_margin_max()
 
-                (sum_gi_bool_vec <= 1) && return Float64(0)
+                (sum_gi_bool_vec <= 1) && return 0.0
                 const gi_idc = well_idc[gi_bool_vec]
                 (sum_gi_bool_vec == 2) && return getindex(dist_mtx, gi_idc...)
                 calc_dist_within_margin_max()
@@ -243,7 +243,8 @@ function assign_genos(
     # `apg` - all possible genotypes.
     ## Julia v0.6.0 on 2017-06-25:
     ## `apg_labels ::Vector{AbstractString} =DEFAULT_eg_LABELS` resulted in
-    ## "ERROR: MethodError: no method matching #assign_genos#301( ::Array{AbstractString,1}, ::QpcrAnalysis.#assign_genos, ::Array{Float64,2}, ::Array{Float64,2}, ::Float64)"
+    ## "ERROR: MethodError: no method matching #assign_genos#301( ::Array{AbstractString,1},
+    ## ::QpcrAnalysis.#assign_genos, ::Array{Float64,2}, ::Array{Float64,2}, ::Float64)"
 )
     calc_expected_genos_all() =
         mapreduce(
@@ -362,7 +363,7 @@ function assign_genos(
         return (
             1, # best_1
             ucc, # best_ucc
-            OrderedDict{Set{Vector{Float64}},UniqCombinCenters}(
+            OrderedDict{Set{Vector{Float_T}},UniqCombinCenters}(
                 center_set => ucc)) # ucc_dict
     end
 

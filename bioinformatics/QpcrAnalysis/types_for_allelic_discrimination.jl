@@ -13,21 +13,21 @@ struct         K_medoids            <: ClusteringMethod end
 
 ## clustering analysis result from a possible combination of expected genotypes
 struct ClusterAnalysisResult
-    init_centers        ::Array{Float64,2} # no longer necessary because it represents one combination of genotypes, but different combinations of genotypes with the same number of genotypes may result in the same clustering results
-    dist_mtx_winit      ::Array{Float64,2}
+    init_centers        ::Array{Float_T,2} # no longer necessary because it represents one combination of genotypes, but different combinations of genotypes with the same number of genotypes may result in the same clustering results
+    dist_mtx_winit      ::Array{Float_T,2}
     cluster_result      ::ClusteringResult
-    centers             ::Array{Float64,2}
-    slhts               ::Vector{Float64}
-    slht_mean           ::Float64
-    check_dist_mtx      ::Array{Float64,2}
+    centers             ::Array{Float_T,2}
+    slhts               ::Vector{Float_T}
+    slht_mean           ::Float_T
+    check_dist_mtx      ::Array{Float_T,2}
     check_dist_bool     ::Bool
 end # type
 
 mutable struct UniqCombinCenters
-    uniq_combin_centers ::Set{Vector{Float64}}
+    uniq_combin_centers ::Set{Vector{Float_T}}
     car                 ::ClusterAnalysisResult
-    slht_mean           ::Float64
-    geno_combins        ::Vector{Matrix{Float64}}
+    slht_mean           ::Float_T
+    geno_combins        ::Vector{Matrix{Float_T}}
 end # type
 
 struct AssignGenosResult
@@ -35,7 +35,7 @@ struct AssignGenosResult
     best_i              ::Int
     best_genos_combins  ::Vector{Matrix{Int}}
     expected_genos_all  ::Matrix{Int}
-    ucc_dict            ::OrderedDict{Set{Vector{Float64}},UniqCombinCenters}
+    ucc_dict            ::OrderedDict{Set{Vector{Float_T}},UniqCombinCenters}
 end # type
 
 ## constant used in allelic_discrimination.jl
@@ -63,8 +63,6 @@ const CTRL_WELL_DICT = OrderedDict{Vector{Int},Vector{Int}}() # key is genotype 
 ## old approach
 # const CTRL_WELL_DICT = DefaultOrderedDict(Vector{Int}, Vector{Int}, Vector{Int}())
 
-EMPTY_UCC_DICT = OrderedDict{Set{Vector{AbstractFloat}},UniqCombinCenters}()
+EMPTY_UCC_DICT = OrderedDict{Set{Vector{Float_T}},UniqCombinCenters}()
 EMPTY_BEST_GENO_COMBINS = Vector{Matrix{Int}}()
 
-
-#

@@ -122,8 +122,6 @@ function act(
             kwdict_mbq[:bl_method] = median
         end
     end
-    
-
     ## call
     response = process_amp(
         ## remove MySql dependency
@@ -869,6 +867,7 @@ function process_amp_1sr(
         for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
             report_cq!(full_amp_out, well_i, channel_i; kwdict_rc...)
         end
+        return nothing
     end
     ## end of function definitions nested within process_amp_1sr
 

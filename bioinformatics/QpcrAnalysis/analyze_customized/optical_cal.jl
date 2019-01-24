@@ -33,13 +33,13 @@ function act(
     err_msg_vec = Vector{String}()
     #
     ## prep_adj_w2wvaf
-    const result_aw = try
+    const result_aw = ##try
         ## remove MySql dependency
         # prep_adj_w2wvaf(db_conn, calib_info_dict, well_nums, dye_in, dyes_2bfild)
         prep_adj_w2wvaf(calib_info_dict, well_nums, dye_in, dyes_2bfild)
-    catch err
-        err
-    end
+    #catch err
+    #    err
+    #end
     if isa(result_aw, Exception)
         const err_msg = isa(result_aw, ErrorException) ?
             result_aw.msg :

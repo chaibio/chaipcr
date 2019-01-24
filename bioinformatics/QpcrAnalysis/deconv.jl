@@ -84,7 +84,6 @@ function get_k(
     calib_data ::Associative,
     well_nums  ::AbstractVector =[];
     well_proc  ::Symbol = :vec, # options: :mean, :vec.
-    Float_T    ::DataType =Float32, # ensure compatibility with other OSs
     save_to    ::String ="" # used: "k.jld"
 )
     ## remove MySql dependency
@@ -180,7 +179,7 @@ function get_k(
         for i in 1:n_wells
             k_mtx =
                 mapreduce(
-                    cd_key -> Array{Float_T}(sweep(sum)(/)(k4dcv_bydy[cd_key][:,i])),
+                    cd_key -> Array{Float_T}(sweep(sum)(/)(k4dcv_bydy[cd_key][:, i])),
                     hcat,
                     cd_key_vec)
             k_s[i] = k_mtx

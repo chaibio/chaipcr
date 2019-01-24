@@ -410,7 +410,7 @@ function mc_tm_pw(
                 filter[thing]
 
     ## calculate peak area
-    peak_Ta(peak_idc ::Tuple{Int,Int,Int}) =
+    peak_Ta(peak_idc ::Tuple{I,I,I} where I <: Integer) =
         peak_idc == nothing ?
             nothing :
             Peak(
@@ -462,7 +462,7 @@ function mc_tm_pw(
     ## Issue: ??? function looks wrong, does not match R algorithm
     ## Proposed solution: recode using Dierckx.integrate
     ## requires tp_denser, ndrv_smu, ndrv ???
-    function calc_area(peak_bound_idc ::Tuple{Int,Int})
+    function calc_area(peak_bound_idc ::Tuple{Integer, Integer})
         #
         area_func(tp_low_end ::Real, tp_high_end ::Real) =
             -sum(ndrv_smu[[peak_bound_idc...]]) * (tp_high_end - tp_low_end) / 2.0 -
@@ -502,12 +502,12 @@ function mc_tm_pw(
     ## note: top1_Tm_idx calculated incorrectly in original code
     function real_peaks(
         tmprtr_max_ndrv     ::AbstractFloat,
-        areas_raw           ::AbstractVector{T} where T <: AbstractFloat,
+        areas_raw           ::AbstractVector{F} where F <: AbstractFloat,
         top1_Tm_idx         ::Integer,
         fn_mc_slope         ::Function,         # linear regression fluos ~ tmprtrs
         fn_num_cross_points ::Function
     )
-        top_peaks(fltd_idc_topNp1 ::AbstractVector{Int}) =
+        top_peaks(fltd_idc_topNp1 ::AbstractVector{I} where I <: Integer) =
             length(fltd_idc_topNp1) > top_N ? [] : fltd_idc_topNp1
         # end of function definition nested in real_peaks()
 
@@ -696,10 +696,10 @@ end
 
     ## finite differencing function
     function finite_diff(
-        X ::AbstractVector,
-        Y ::AbstractVector; # X and Y must be of same length
-        nu ::Integer =1, # order of derivative
-        method ::Symbol = :central
+        X       ::AbstractVector,
+        Y       ::AbstractVector; # X and Y must be of same length
+        nu      ::Integer =1, # order of derivative
+        method  ::Symbol = :central
     )
         const dlen = length(X)
         if dlen != length(Y)
@@ -745,7 +745,7 @@ end
 
     Base.iteratorsize(::PeakIndices) = SizeUnknown()
 
-    Base.eltype(iter ::PeakIndices) = Tuple{Int,Int,Int}
+    Base.eltype(iter ::PeakIndices) = Tuple{Int, Int, Int}
 
     function Base.collect(iter ::PeakIndices)
         collection = []
@@ -755,7 +755,7 @@ end
         return collection
     end
 
-    function Base.next(iter ::PeakIndices, state ::Tuple{Int,Int,Int})
+    function Base.next(iter ::PeakIndices, state ::Tuple{Int, Int, Int})
         ## fail if state == nothing
         if (state == nothing)
             return (nothing, nothing)
@@ -811,7 +811,7 @@ end
     end
 
     ## do not report indices for each peak, only Tm and area
-    report(digits ::Int, peaks ::Vector{Peak}) =
+    report(digits ::Integer, peaks ::Vector{Peak}) =
         length(peaks) == 0 ?
             EMPTY_Ta :
             mapreduce(p -> round.([p.Tm, p.area], digits),

@@ -51,7 +51,7 @@ const DEFAULT_apg_LABELS = ["ntc", "homo_1", "homo_2", "hetero", "unclassified"]
 ## const DEFAULT_apg_LABELS = ["hetero", "homo_2", "homo_1", "ntc", "unclassified"] # [1 0 1 0; 1 1 0 0]
 
 ## constants used in deconv.jl
-const ARRAY_EMPTY = Array{Array{Float64,2},1}(0)
+const ARRAY_EMPTY = Array{Array{Float_T,2},1}(0)
 const K4DCV_EMPTY = K4Deconv(ARRAY_EMPTY, ARRAY_EMPTY, "")
 const K4DCV = JLD.load("$LOAD_FROM_DIR/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv"] # sometimes crash REPL
 

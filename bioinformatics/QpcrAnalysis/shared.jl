@@ -19,7 +19,7 @@ subset(i,x) = getindex(x,i)
 field(f,x)  = getfield(x,f)
 
 ## used in meltcrv.jl
-report(digits ::Int, x) = round.(x, digits)
+report(digits ::Integer, x) = round.(x, digits)
 
 ## unused functions
 inc_index(i ::Integer, len ::Integer) = (i >= len) ? len : i + 1
