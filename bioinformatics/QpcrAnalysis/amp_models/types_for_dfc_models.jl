@@ -16,12 +16,12 @@ struct MAK3       <: AbstractDfcArg end
 struct MAKERGAUL3 <: AbstractDfcArg end
 struct MAKERGAUL4 <: AbstractDfcArg end
 
+## calling `process_amp` with `dfc=QpcrAnalysis.Essentials.MAK2()` raised error `TypeError: typeassert: expected QpcrAnalysis.Essentials.Dfc, got QpcrAnalysis.Essentials.MAK2`
 const dfc_DICT = OrderedDict(
     :MAK2       => MAK2,
     :MAK3       => MAK3,
     :MAKERGAUL3 => MAKERGAUL3,
-    :MAKERGAUL4 => MAKERGAUL4
-) # calling `process_amp` with `dfc=QpcrAnalysis.Essentials.MAK2()` raised error `TypeError: typeassert: expected QpcrAnalysis.Essentials.Dfc, got QpcrAnalysis.Essentials.MAK2`
+    :MAKERGAUL4 => MAKERGAUL4)
 
 abstract type DfcFitted <: AbstractAmpFitted end
 
@@ -39,8 +39,7 @@ const MAK2Fitted_EMPTY = MAK2Fitted(
     zeros(0),           # coefs
     :not_fitted,        # status
     0.0,                # obj_val
-    JuMP.Model()
-)
+    JuMP.Model())
 
 struct MAK3Fitted <: DfcFitted
     max_d_idx   ::Int
@@ -60,8 +59,7 @@ const MAK3Fitted_EMPTY = MAK3Fitted(
     zeros(0),           # coefs
     :not_fitted,        # status
     0.0,                # obj_val
-    JuMP.Model()
-)
+    JuMP.Model())
 
 struct MAKERGAUL3Fitted <: DfcFitted
     max_of_idx  ::Int
@@ -77,8 +75,7 @@ const MAKERGAUL3Fitted_EMPTY = MAKERGAUL3Fitted(
     zeros(0),           # coefs
     :not_fitted,        # status
     0.0,                # obj_val
-    JuMP.Model()
-)
+    JuMP.Model())
 
 struct MAKERGAUL4Fitted <: DfcFitted
     max_of_idx  ::Int
@@ -98,8 +95,7 @@ const MAKERGAUL4Fitted_EMPTY = MAKERGAUL4Fitted(
     zeros(0), # coefs
     :not_fitted, # status
     0.0, # obj_val
-    JuMP.Model()
-)
+    JuMP.Model())
 
 ## bounds for MAKERGAUL.jl
 const fb_B_MULTIPLE     = 1.9
@@ -124,5 +120,4 @@ const AF_EMPTY_DICT = OrderedDict(
     :MAK2       => MAK2Fitted_EMPTY,
     :MAK3       => MAK3Fitted_EMPTY,
     :MAKERGAUL3 => MAKERGAUL3Fitted_EMPTY,
-    :MAKERGAUL4 => MAKERGAUL4Fitted_EMPTY,
-)
+    :MAKERGAUL4 => MAKERGAUL4Fitted_EMPTY)
