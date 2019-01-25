@@ -533,10 +533,14 @@ function mod_bl_q(
             push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) > last_cyc_wt0 ($last_cyc_wt0), bl_cyc_start = $bl_cyc_start (max(last_cyc_wt0+1, max_dr2_left_cyc), i.e. max($(last_cyc_wt0+1), $max_dr2_left_cyc))")
             if max_dr2_right_cyc - bl_cyc_start <= 1
                 push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) - bl_cyc_start ($bl_cyc_start) <= 1")
-                const max_dr2_right_2, max_dr2_right_cyc_2_shifted =
-                    findmax(dr2_cfd[max_dr2_right_cyc+1:end])
+                if (max_dr2_right_cyc < num_cycs)
+                    const max_dr2_right_2, max_dr2_right_cyc_2_shifted =
+                        findmax(dr2_cfd[max_dr2_right_cyc+1:end])
+                else
+                    max_dr2_right_cyc_2_shifted = 0
+                end
                 const max_dr2_right_cyc_2 = max_dr2_right_cyc_2_shifted + max_dr2_right_cyc
-                if max_dr2_right_cyc_2 - max_dr2_right_cyc == 1
+                if max_dr2_right_cyc_2 - max_dr2_right_cyc <= 1
                     const bl_cyc_end = num_cycs
                     push!(bl_notes, "max_dr2_right_cyc_2 ($max_dr2_right_cyc_2) - max_dr2_right_cyc ($max_dr2_right_cyc) == 1")
                 else # max_dr2_right_cyc_2 - max_dr2_right_cyc != 1
