@@ -13,12 +13,23 @@ window.App.directive 'meltCurveChart', [
         scroll: '='
         zoom: '='
         onZoom: '&'
+        onUpdateProperties: '&'
         onSelectLine: '&'
         onUnselectLine: '&'
         show: '='
       link: ($scope, elem, attrs) ->
 
         chart = null
+        oldState = null
+
+        isInterpolationChanged = (val, oldState) ->
+          return (oldState?.y_axis?.scale isnt val?.y_axis?.scale)
+
+        isBaseBackroundChanged = (val, old_val) ->
+          return false if (!val or !old_val)
+          return false if !val.series
+          return false if !val.series[0]
+          return val.series[0].y isnt old_val.series[0]?.y
 
         initChart = ->
           return if !$scope.data or !$scope.config or !$scope.show
@@ -26,18 +37,36 @@ window.App.directive 'meltCurveChart', [
           chart.onZoomAndPan($scope.onZoom())
           chart.onSelectLine($scope.onSelectLine())
           chart.onUnselectLine($scope.onUnselectLine())
+          chart.onUpdateProperties($scope.onUpdateProperties())
+
           d = chart.getDimensions()
-          $scope.onZoom()(chart.getTransform(), d.width, d.height, chart.getScaleExtent())
+
+          # $scope.onZoom()(chart.getTransform(), d.width, d.height, chart.getScaleExtent())
+
+        $scope.$on 'event:select-row', (e, data, oldData) ->
+          chart.activeLine(data, true)
+        
+        $scope.$on 'event:unselect-row', (e, data, oldData) ->
+          chart.unsetActivePath()
 
         $scope.$on 'window:resize', ->
-          chart.resize() if chart and $scope.show
+          if chart and $scope.show
+            $timeout ->
+              chart.resize()
+            , 500
 
-        $scope.$watch ->
-          series = $scope.config?.series || []
-          series[0]?.y
-        , (val, oldVal) ->
-          if val and (val isnt oldVal)
-            initChart()
+        $scope.$on 'event:resize-draw-chart', ->
+          if chart and $scope.show
+            $timeout ->
+              chart.resize()
+            , 500
+
+        # $scope.$watch ->
+        #   series = $scope.config?.series || []
+        #   series[0]?.y
+        # , (val, oldVal) ->
+        #   if val and (val isnt oldVal)
+        #     initChart()
 
         $scope.$watchCollection ($scope) ->
           return {
@@ -53,10 +82,15 @@ window.App.directive 'meltCurveChart', [
             chart.updateData($scope.data)
             chart.updateConfig($scope.config)
             if $scope.show
-              chart.setYAxis()
-              chart.setXAxis()
-              chart.drawLines()
-              chart.updateAxesExtremeValues()
+              if isInterpolationChanged(val, oldState) or isBaseBackroundChanged(val, oldState)
+                initChart()
+              else
+                chart.setYAxis(false)
+                chart.setXAxis(false)
+                chart.drawLines()
+                chart.updateAxesExtremeValues()
+
+          oldState = angular.copy(val)
 
         $scope.$watch 'scroll', (scroll) ->
           return if !scroll or !chart or !$scope.show
@@ -78,12 +112,10 @@ window.App.directive 'meltCurveChart', [
           if !chart
             reinitChart()
           else
-            if show
+            if $scope.show
               chart.setYAxis()
               chart.setXAxis()
               chart.drawLines()
               chart.updateAxesExtremeValues()
-
-
     }
 ]

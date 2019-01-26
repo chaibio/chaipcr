@@ -42,7 +42,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
     });
 
     $rootScope.$on('event:error-server', function() {
-      alerts.showMessage(alerts.internalServerError, $scope, 'app/views/modal-error-warning.html');
+      // alerts.showMessage(alerts.internalServerError, $scope, 'app/views/modal-error-warning.html');
     });
 
     $rootScope.$on('alerts.nonDigit', function() {

@@ -1,163 +1,162 @@
 @import './colors.css.scss';
 
-.melt-curve-chart-state-active {
-  font-family: 'dinot';
+// .melt-curve-chart-state-active {
+//   font-family: 'dinot';
 
-  .chart-section {
-    display: inline-block;
-    padding-right: 20px;
-    padding-left: 20px;
-    width: 65%;
-    vertical-align: top;
+//   .chart-section {
+//     display: inline-block;
+//     padding-right: 20px;
+//     padding-left: 20px;
+//     width: 65%;
+//     vertical-align: top;
 
-    .chart-container {
-      position: relative;
-      width: 100%;
-      padding-right: 20px;
-      // height: 300px;
-    }
+//     .chart-container {
+//       position: relative;
+//       width: 100%;
+//       padding-right: 20px;
+//       // height: 300px;
+//     }
 
-    .chart-legend {
-      display: none;
-    }
+//     .chart-legend {
+//       display: none;
+//     }
 
-    .chart-error {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      padding-top: 100px;
-      padding-left: 150px;
-      padding-right: 50px;
-      text-align: center;
-    }
+//     .chart-error {
+//       position: absolute;
+//       left: 0;
+//       top: 0;
+//       width: 100%;
+//       padding-top: 100px;
+//       padding-left: 150px;
+//       padding-right: 50px;
+//       text-align: center;
+//     }
 
-    .axis.y2-axis {
-      display: none;
-    }
+//     .axis.y2-axis {
+//       display: none;
+//     }
 
-    .num-cycle-text {
-      margin-bottom: -30px;
-      margin-top: 40px;
-    }
+//     .num-cycle-text {
+//       margin-bottom: -30px;
+//       margin-top: 40px;
+//     }
 
-    .chart-zoom-scroll-container {
-      margin-top: 30px;
-      padding-left: 50px;
-      padding-right: 50px;
+//     .chart-zoom-scroll-container {
+//       margin-top: 30px;
+//       padding-left: 50px;
+//       padding-right: 50px;
 
-      .zoom-container {
-        cursor: pointer;
+//       .zoom-container {
+//         cursor: pointer;
 
-        .zoom-text {
-          display: inline-block;
-          width: 20%;
-          vertical-align: middle;
-        }
-        .ampli-slider {
-          display: inline-block;
-          width: 80%;
-          vertical-align: middle;
-          cursor: pointer;
-        }
-      }
+//         .zoom-text {
+//           display: inline-block;
+//           width: 20%;
+//           vertical-align: middle;
+//         }
+//         .ampli-slider {
+//           display: inline-block;
+//           width: 80%;
+//           vertical-align: middle;
+//           cursor: pointer;
+//         }
+//       }
 
-      .ampli-scrollbar-container {
-        .scrollbar-container {
-          height: 5px;
-          border-radius: 10px;
-          margin-top: -5px;
-          position: relative;
-          top: 11.5px;
-          background: #ccc;
+//       .ampli-scrollbar-container {
+//         .scrollbar-container {
+//           height: 5px;
+//           border-radius: 10px;
+//           margin-top: -5px;
+//           position: relative;
+//           top: 11.5px;
+//           background: #ccc;
 
-          .scrollbar {
-            border-radius: 10px;
-          }
-        }
-      }
+//           .scrollbar {
+//             border-radius: 10px;
+//           }
+//         }
+//       }
 
-    }
+//     }
 
-  }
+//   }
 
-  .table-container {
-    display: inline-block;
-    margin-top: -20px;
-    margin-bottom: -4px;
-    width: 35%;
+//   .table-container {
+//     display: inline-block;
+//     margin-top: -20px;
+//     margin-bottom: -4px;
+//     width: 35%;
 
-    table {
-      width: 100%;
-      // box-shadow: -1px 0px 1px $lightgray;
+//     table {
+//       width: 100%;
+//       // box-shadow: -1px 0px 1px $lightgray;
 
-			input{
-			outline: none;
-			border: none;
-			font-family: 'dinot-Regular';
-			font-size: 16px;
-			//width: 140px;
-			}
+// 			input{
+// 			outline: none;
+// 			border: none;
+// 			font-family: 'dinot-Regular';
+// 			font-size: 16px;
+// 			//width: 140px;
+// 			}
 
-			.sample-span{
-				font-family: 'dinot-Regular';
-				font-size: 12px;
-			}
+// 			.sample-span{
+// 				font-family: 'dinot-Regular';
+// 				font-size: 12px;
+// 			}
 
-      th {
-        background-color: lighten($gray, 15%);
-        border-left: 1px solid lighten($lightgray, 15%);
-        border-bottom: 1px solid lighten($lightgray, 15%);
-        color: #fff;
-        padding: 10px 15px;
-        &.channel-1 {
-          background-color: $blue;
-        }
-        &.channel-2 {
-          background-color: $green;
-        }
-      }
+//       th {
+//         background-color: lighten($gray, 15%);
+//         border-left: 1px solid lighten($lightgray, 15%);
+//         border-bottom: 1px solid lighten($lightgray, 15%);
+//         color: #fff;
+//         padding: 10px 15px;
+//         &.channel-1 {
+//           background-color: $blue;
+//         }
+//         &.channel-2 {
+//           background-color: $green;
+//         }
+//       }
 
-      tr {
-        td {
-          border-left: 1px solid lighten($lightgray, 15%);
-          border-bottom: 1px solid lighten($lightgray, 15%);
-          color: $lightgray;
-          padding: 10px 15px;
+//       tr {
+//         td {
+//           border-left: 1px solid lighten($lightgray, 15%);
+//           border-bottom: 1px solid lighten($lightgray, 15%);
+//           color: $lightgray;
+//           padding: 10px 15px;
 
-          &:first-of-type {
-            color: $gray;
-            font-weight: bold;
-          }
+//           &:first-of-type {
+//             color: $gray;
+//             font-weight: bold;
+//           }
 
-          &:last-of-type {
-            // border-right: 1px solid lighten($lightgray, 15%);
-            border-right: none;
-          }
+//           &:last-of-type {
+//             // border-right: 1px solid lighten($lightgray, 15%);
+//             border-right: none;
+//           }
 
-          .dot {
-            border-radius: 100px;
-            display: inline-block;
-            height: 10px;
-            margin-right: 10px;
-            vertical-align: middle;
-            width: 10px;
-          }
+//           .dot {
+//             border-radius: 100px;
+//             display: inline-block;
+//             height: 10px;
+//             margin-right: 10px;
+//             vertical-align: middle;
+//             width: 10px;
+//           }
 
-          .text {
-            display: inline-block;
-            vertical-align: middle;
-          }
-        }
+//           .text {
+//             display: inline-block;
+//             vertical-align: middle;
+//           }
+//         }
 
-        &.selected {
-          td {
-            color: #000;
-          }
-        }
-      }
+//         &.selected {
+//           td {
+//             color: #000;
+//           }
+//         }
+//       }
 
-    }
-  }
-  
-}
+//     }
+//   }  
+// }

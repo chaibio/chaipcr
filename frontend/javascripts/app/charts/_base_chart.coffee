@@ -591,7 +591,7 @@ class BaseChart
       .text(@config.axes.y.label)
 
 
-  setXAxis: ->
+  setXAxis: (showLabel = true)->
     @chartSVG.selectAll('g.axis.x-axis').remove()
     @chartSVG.selectAll('.g-x-axis-text').remove()
     svg = @chartSVG.select('.chart-g')
@@ -626,7 +626,8 @@ class BaseChart
       @gX.call(@xAxis.scale(@zoomTransform.rescaleX(@xScale)))
 
     # text label for the x axis
-    @setXAxisLabel()
+    if showLabel
+      @setXAxisLabel()
 
   setXAxisLabel: ->
     return if not (@config.axes.x.label)

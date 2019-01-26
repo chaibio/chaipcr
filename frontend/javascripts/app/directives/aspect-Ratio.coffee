@@ -15,6 +15,7 @@ App.directive 'aspectRatio', [
       minHeight: '=?'
       maxWidth: '=?'
       maxHeight: '=?'
+      offsetTop: '=?'
     link: ($scope, elem) ->
 
       elem.addClass 'aspect-Ratio'
@@ -70,7 +71,7 @@ App.directive 'aspectRatio', [
         elem.css('min-height': height)
         elem.css('height': height)        
         elem.parent().children().get(1).style.height = height + "px"
-        angular.element(elem.parent().children().get(1)).children().get(1).style.height = height - 201 + "px"
+        angular.element(elem.parent().children().get(1)).children().get(1).style.height = height - $scope.offsetTop + "px"
 
         element = elem.parent().children().get(1)
         offsetWidth = element.getElementsByClassName('target-box')[0].offsetWidth if element.getElementsByClassName('target-box')[0]

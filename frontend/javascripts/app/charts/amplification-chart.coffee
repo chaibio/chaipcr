@@ -167,7 +167,7 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
       val = val.toString().replace(/(\d+)(\d{3})/, '$1'+','+'$2')
     return val
 
-  setYAxis: ->
+  setYAxis: (showLabel = true)->
     @chartSVG.selectAll('g.axis.y-axis').remove()
     @chartSVG.selectAll('.g-y-axis-text').remove()
     svg = @chartSVG.select('.chart-g')
@@ -213,7 +213,8 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
       @gY.call(@yAxis.scale(@zoomTransform.rescaleY(@yScale)))
 
     #text label for the y axis
-    @setYAxisLabel()
+    if showLabel
+      @setYAxisLabel()
     @lastYScale = @yScale
 
   validateBackSpace: (loc, input) ->
@@ -294,7 +295,8 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
         path = line
         break
 
-    @setActivePath(path)
+    if path._groups[0]?[0]?.__data__.length
+      @setActivePath(path)
     
 window.ChaiBioCharts = window.ChaiBioCharts || {}
 window.ChaiBioCharts.AmplificationChart = AmplificationChart

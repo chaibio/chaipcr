@@ -10,6 +10,16 @@
 // }
 
 // if there is 3 charts
+.modal-4-row {
+  .modal-dialog {
+    width: 1082px !important;
+  }
+  .modal-content {
+    width: 1082px;
+    height: 240px;
+  }
+}
+
 .modal-3-row {
   .modal-dialog {
     width: 825px !important;

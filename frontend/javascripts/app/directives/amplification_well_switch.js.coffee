@@ -115,7 +115,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
             $scope.wells["well_#{i}"].color2 = if $scope.targets[i*2+1] then $scope.targets[i*2+1].color else 'transparent'
           else if color_by is 'sample'
             well_color = if $scope.samples[i] then $scope.samples[i].color else $scope.initSampleColor
-            if ($scope.isDual and !$scope.targets[i*2].id and !$scope.targets[i*2+1].id) or (!$scope.isDual and !$scope.targets[i].id)
+            if ($scope.isDual and !$scope.targets[i*2]?.id and !$scope.targets[i*2+1]?.id) or (!$scope.isDual and !$scope.targets[i]?.id)
               well_color = 'transparent'
           # else
           #   well_color = '#75278E'
@@ -129,6 +129,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
           $scope.wells["well_#{i}"].selected = selected
           $scope.wells["well_#{i}"].color = well_color
         ngModel.$setViewValue angular.copy($scope.wells)
+
 
       $scope.$watch 'targets', (target) ->
         for i in [0..15] by 1
