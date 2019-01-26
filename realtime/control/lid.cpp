@@ -20,10 +20,11 @@
 #include "experimentcontroller.h"
 #include "lid.h"
 
-Lid::Lid(Settings settings, const std::string &pwmPath, unsigned long pwmPeriod, double startTempThreshold)
+Lid::Lid(Settings settings, const std::string &pwmPath, unsigned long pwmPeriod, double startTempThreshold, double completionTurnOffTemp)
     :TemperatureController(settings), PWMControl(pwmPath, pwmPeriod)
 {
     _startTempThreshold = startTempThreshold;
+    _completionTurnOffTemp = completionTurnOffTemp;
 
     resetOutput();
 }
@@ -50,6 +51,14 @@ void Lid::resetOutput()
 
 void Lid::processOutput()
 {
-    if (ExperimentController::getInstance()->machineState() == ExperimentController::LidHeatingMachineState && currentTemperature() >= (targetTemperature() - _startTempThreshold))
-        startThresholdReached();
+    if (ExperimentController::getInstance()->machineState() == ExperimentController::LidHeatingMachineState)
+    {
+        if (currentTemperature() >= (targetTemperature() - _startTempThreshold))
+            startThresholdReached();
+    }
+    else if (ExperimentController::getInstance()->machineState() == ExperimentController::CompleteMachineState)
+    {
+        if (currentTemperature() <= _completionTurnOffTemp)
+            setEnableMode(false);
+    }
 }

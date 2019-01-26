@@ -26,7 +26,7 @@
 class Lid : public TemperatureController, public PWMControl
 {
 public:
-    Lid(Settings settings, const std::string &pwmPath, unsigned long pwmPeriod, double startTempThreshold);
+    Lid(Settings settings, const std::string &pwmPath, unsigned long pwmPeriod, double startTempThreshold, double completionTurnOffTemp);
     ~Lid();
 
     boost::signals2::lockfree_signal<void()> startThresholdReached;
@@ -40,6 +40,7 @@ protected:
 
 private:
     double _startTempThreshold;
+    double _completionTurnOffTemp;
 };
 
 #endif // LID_H

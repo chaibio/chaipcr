@@ -49,6 +49,8 @@ const double kLidHighTempShutdownThreshold = 140;
 
 const double kProgramStartLidTempThreshold = 2;
 
+const double kLidCompletionTurnOffTemp = 25.0;
+
 //PID
 const int kPIDDerivativeGainLimiter = 12;
 

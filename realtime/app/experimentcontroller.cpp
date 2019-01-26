@@ -283,7 +283,7 @@ void ExperimentController::complete()
         _machineState = CompleteMachineState;
         _thermalState = IdleThermalState;
 
-        LidInstance::getInstance()->setEnableMode(false);
+        //LidInstance::getInstance()->setEnableMode(false);
         OpticsInstance::getInstance()->stopCollectData();
 
         _experiment.setCompletionStatus(Experiment::Success);
