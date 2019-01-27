@@ -662,7 +662,7 @@ function mod_bl_q(
         push!(solver.options, (:output_file, ipopt_print2file))
     end
     ## fit model
-    if af_key == :dfc
+    if af_key in [:MAK2, :MAK3, :MAKERGAUL3, :MAKERGAUL4]
         return fit_dfc_model()
     elseif af_key == :sfc
         return fit_sfc_model()
