@@ -16,96 +16,281 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<div class="melt-curve-chart-state-active results-charts">
-  <div class="page-layout" ng-controller="MeltCurveChartCtrl" ng-show="experiment">
-    <div class="content">
-      <div class="chart-section" style="padding-left: 0px; padding-right: 0px">
-        <div class="curve-header" style="margin-top: 20px;">
-          <div class="row">
-            <div class="col-sm-6 curve-name">
-              <chart-chooser class="curve-title H1" experiment="experiment" current-chart="$parent.chart">
+
+
+<div class="experiment-chart-state-active results-charts" style="height: 100%; margin-left: 0px;  margin-right: 0px;">
+  <div class="page-layout" ng-controller="MeltCurveChartCtrl" ng-show="experiment" style="height: 100%;">
+    <div class="content" style="padding-top:0px; height: 100%; display: flex;">
+      <div class="chart-section" offset="0" force="true" style="height:100%; padding-left: 0px; padding-right: 0px; background: #eeeeee">
+        <div>
+          <div class="curve-header">
+            <div class="curve-name">
+              <!-- <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()"> -->
+              <chart-chooser class="curve-title H1" experiment="experiment" current-chart="$parent.chart" style="padding-left: 15px;">
                 Melt Curve
                 <img class="arrow-down" src="/images/arrow-down_black.png">
               </chart-chooser>
             </div>
-            <div class="col-sm-6 ampli-toggles">
-              <div class="plot-type-buttons">
-                <div class="plot-type-text SHR">PLOT TYPE</div>
-                <div class="buttons-wrapper SH">
-                  <div class="button" ng-click="curve_type='derivative'" ng-class="{'selected': curve_type==='derivative'}">DERIVATIVE</div>
-                  <div class="button" ng-click="curve_type='normalized'" ng-class="{'selected': curve_type==='normalized'}">NORMALIZED</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div style="padding-top:70px;">
-          <div>
-            <div class="chart-container" full-height offset="450" min="336">
-              <div class="chart-error B1" ng-show="error">
-                <strong class="text-black">Unable to load chart data</strong>
-                <p ng-bind="error"></p>
-                Retrying in {{retry}} seconds
-                <ellipsis-animated></ellipsis-animated>
-              </div>
-              <div class="loading-blue-container" ng-show="(fetching || retrying || !enterState) && !hasData && !error">
-                <div class="loading-blue"></div>
-                <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
-                <p class="B2">May take a minute</p>
-              </div>
-              <melt-curve-chart data="data" config="config" zoom="mc_zoom" on-zoom="onZoom" on-select-line="onSelectLine" on-unselect-line="onUnselectLine" scroll="mc_scroll.value" show="showMeltCurveChart"></melt-curve-chart>
-            </div>
-            <div class="chart-zoom-scroll-container">
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="zoom-container">
-                    <div class="zoom-text SH">
-                      <b>ZOOM</b>
+            <div class="plot-options">
+              <p class="B1-Amplification">Color by</p>
+              <form role="form" class="form-horizontal B1-Amplification" name="colorBy" novalidate>
+                <div class="form-group" style="margin: 0;">
+                  <div class="col-md-12" style="padding: 0px;">
+                    <div class="dropdown B1-Amplification" ng-click="showColorByList()">
+                      <button class="dropbtn B1-Amplification" style="padding:10px;">
+                        <span class="test B1-Amplification" style="float:left; line-height: 100%;">{{color_by.charAt(0).toUpperCase() + color_by.slice(1)}}</span>
+                        <img class="arrow-down" src="/images/arrow-down_white.png">
+                      </button>
+                      <div id="colorByList_ampli" class="B1-Amplification dropdown-content">
+                        <a href="" ng-click="color_by='sample'" value="abc">Sample</a>
+                        <a href="" ng-click="color_by='target'" value="abc">Target</a>
+                        <a href="" ng-click="color_by='well'" value="abc">Well</a>
+                      </div>
                     </div>
-                    <ampli-slider ng-model="$parent.mc_zoom" ng-if="chart === 'melt-curve'"></ampli-slider>
                   </div>
                 </div>
-                <div class="col-md-6 ampli-scrollbar-container">
-                  <scrollbar ng-model="$parent.mc_scroll" ng-if="chart === 'melt-curve'"></scrollbar>
+              </form>
+            </div>
+            <div class="plot-options" style="padding-right: 40px;">
+              <p class="B1-Amplification">Plot Type</p>
+              <form role="form" class="form-horizontal B1-Amplification" name="plotType" novalidate>
+                <div class="form-group B1-Amplification" style="margin: 0;">
+                  <div class="col-md-12" style="padding: 0px;">
+                    <div class="dropdown B1-Amplification" ng-click="showPlotTypeList()">
+                      <button class="dropbtn B1-Amplification" style="padding:10px;">
+                        <span class="test B1-Amplification" style="float:left; line-height: 100%;">{{curve_type.charAt(0).toUpperCase() + curve_type.slice(1)}}</span>
+                        <img class="arrow-down" src="/images/arrow-down_white.png">
+                        <!-- <img class="arrow-down" src="/images/arrow-down.svg"> -->
+                      </button>
+                      <div id="plotTypeList" class="dropdown-content B1-Amplification">
+                        <a href="" ng-click="onChangeSlotType('derivative')" value="abc">Derivative</a>
+                        <a href="" ng-click="onChangeSlotType('normalized')" value="abc">Normalized</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="curve-body amplification-chart" style="height:100%; display: flex; flex-direction: row; justify-content: space-between;">
+            <div class="curve-plot" aspect-ratio offset-x='160 + 10 + 20' offset-y='100 + 160 + 20 + 10' min-width='680' max-width='1020' min-height='400' max-height='600' offset-top='176' id="curve-plot" style="display: block;padding: 0;">
+              <div class="chart-wrapper">
+                <div class="chart-container" style="height:100%; min-width: 660px; min-height: 340px;">
+                  <div class="chart-error B1" ng-show="retrying && !fetching && error">
+                    <strong class="text-black">Unable to load chart data</strong>
+                    <p ng-bind="error"></p>
+                    Retrying in {{retry}} seconds
+                    <ellipsis-animated></ellipsis-animated>
+                  </div>
+                  <div class="loading-blue-container" ng-show="(fetching || retrying || !enterState) && !hasData && !error">
+                    <div class="loading-blue"></div>
+                    <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
+                    <p class="B2">May take a minute</p>
+                  </div>
+                  <melt-curve-chart data="data" config="config" zoom="mc_zoom" on-zoom="onZoom" on-select-line="onSelectLine" on-unselect-line="onUnselectLine" on-update-properties="onUpdateProperties" scroll="mc_scroll.value" show="showMeltCurveChart"></melt-curve-chart>
+                </div>
+                <div class="zoom-box">
+                  <div class="zoom-button-divider">
+                    <svg style="width: 40px; height: 40px;">
+                      <g style="width: 40px; height: 40px;">
+                        <line x1=40 y1=0 x2=0 y2=40 stroke="#efefef" stroke-width=1></line>
+                      </g>
+                    </svg>
+                  </div>
+                  <div class="zoom-button-box">
+                    <button class="zoom-button button-plus" ng-click="zoomIn()">+</button>
+                    <button class="zoom-button button-minus" ng-click="zoomOut()">–</button>
+                  </div>                  
                 </div>
               </div>
             </div>
-          </div>
-          <div class="choose-chart" style="margin-left: -20px; margin-right: -20px; margin-top: 30px;">
-            <chart-well-switch ng-model="wellButtons" color-by="color_by" button-labels-num="1" label-unit="'Tm'" chart-type="melt-curve"></chart-well-switch>
+            <div class="additional-info" style="min-width:160px;">
+                <div class="selection-set">
+                    <div class="parameters">
+                      <div class="header B1-M-Amplification" ng-style="bgcolor_target" style="min-height: 35px; color:white;">
+                        <!-- Target: -->
+                        {{label_well}}{{label_target.name ? ', [' + label_target.name + ']' : ''}}
+                      </div>
+                      <div>
+                        <table class="parameters-table">
+                          <tr>
+                            <td class="B1v-Amplification">-dF/dT:</td>
+                            <td class="B1Mv-Amplification">{{(curve_type=='derivative') ? label_Norm : ''}}</td>
+                          </tr>
+                          <tr>
+                            <td class="B1v-Amplification">Norm:</td>
+                            <td class="B1Mv-Amplification">{{(curve_type=='normalized') ? label_Norm : ''}}</td>
+                          </tr>
+                          <tr>
+                            <td class="B1v-Amplification">Temp:</td>
+                            <td class="B1Mv-Amplification">{{label_Temp}}</td>
+                          </tr>
+                        </table>
+                      </div>
+                    </div>
+                    <div class="info B2-Amplification" style="padding-top: 8px; padding-bottom: 8px; padding-left: 10px;">
+                      Channel: {{label_channel}}
+                    </div>
+                    <!-- <div class="info1" ng-style="bgcolor_wellSample"  style="min-height: 35px; font-size: 15px; color:white; margin-top: 5px">
+                      {{label_well}}{{label_sample ? ", " : ""}}{{label_sample}}
+                    </div> -->
+                </div>
+                <div class="targets-set">
+                  <div class="header B1-M-Amplification" style="background-color: #666;min-height: 35px; color:white; padding: 10px;">
+                    Targets
+                  </div>
+                  <div class="target-box">                    
+                    <table class="targets-table">
+                      <tr ng-repeat="target in targetsSet">
+                        <td style="padding-top: 5px; padding-bottom: 5px; color: black;">
+                          <div class="target-name">{{target.name}}</div>
+                        </td>
+                        <td class="td-tik target-switch">
+                          <switch class="switch" ng-model="targetsSetHided[target.id]"></switch>
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+            </div>            
           </div>
         </div>
+        <div class="choose-chart" style="position: relative;margin: 0 10px; height: 160px;">
+          <chart-well-switch 
+            style="position: absolute; height: 100%;" 
+            ng-model="wellButtons" 
+            is-dual="is_dual_channel"
+            color-by="color_by" 
+            chart-type="melt-curve"
+            samples="samples"
+            targets="targets"
+            init-sample-color="init_sample_color"
+            button-labels-num="1" label-unit="'Tm'"
+            >
+            </chart-well-switch>          
+        </div>
       </div>
-      <div class="table-container">
-        <table>
+      <div class="table-container" force="true">
+        <table style="height: fit-content; min-width: 540px; backface-visibility: white">
           <tbody>
             <tr>
-              <th class="B1">Well</th>
-              <th class="B1">Sample Name</th>
-              <th class="B1">Tm</th>
+              <th class="B2-M-Amplification" style="text-align: center; border-left:none; padding: 10px 5px; width: 45px;">Clr</th>
+              <th class="B2-M-Amplification" style="text-align: center; padding: 10px 5px; width: 50px;">Omit</th>
+              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; width: 45px;" >Well</th>
+              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; width: 20%;" >Sample</th>
+              <th class="B2-M-Amplification" style="text-align: center; width: 50px;">Type</th>
+              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; width: 20%;">Target</th>
+              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; min-width: 45px;">
+                <span>T<sub>m</sub> 1</span>
+              </th>
+              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; min-width: 45px;">
+                <span>T<sub>m</sub> 2</span>
+              </th>
+              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; min-width: 45px;">
+                <span>T<sub>m</sub> 3</span>
+              </th>
+              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; min-width: 45px;">
+                <span>T<sub>m</sub> 4</span>
+              </th>
             </tr>
-            <tr ng-repeat="i in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" ng-class="{selected: (wellButtons['well_'+i].selected)}">
-              <td class="B1" ng-class="{'text-center': color_by==='channel'}">
-                <span ng-if="color_by==='well'" class="dot" style="background-color: {{wellButtons['well_'+i].color}}"></span>
-                <span class="text">
-            <span ng-show="i < 8">
-              A{{i+1}}
-            </span>
-                <span ng-show="i > 7">
-              B{{i-7}}
-            </span>
+            <tr ng-repeat="well_item in well_data" 
+              ng-class="{
+                selected: !has_init || (
+                  (wellButtons['well_' + (well_item.well_num - 1)].selected) && 
+                  (omittedIndexes.indexOf($index) == -1) && 
+                  (targetsSetHided[targets[$index].id])),
+                active: well_item.active
+              }"
+              ng-if="well_item.target_id"
+            >
+              <td class="B2-Amplification" ng-class="{'text-center': color_by==='channel'}" style="vertical-align: middle; line-height: 10px;background: #fff;"
+                ng-click="onSelectRow(well_item, $index)"
+              >
+                <span ng-if="color_by==='well'" class="B2-Amplification dot" ng-attr-style="background-color: {{wellButtons['well_'+(well_item.well_num - 1)].color}}"></span>
+                <span 
+                  ng-if="color_by==='sample'" 
+                  class="B2-Amplification dot" 
+                  ng-attr-style="background-color: {{(samples[well_item.well_num - 1]) ? samples[well_item.well_num - 1].color : init_sample_color}}"></span>
+                <span 
+                  ng-if="color_by==='target'" 
+                  class="B2-Amplification dot" 
+                  ng-attr-style="background-color: {{targets[$index].color}}"></span>
+              </td>
+              <td class="B2-Amplification" style="border-top-left-radius: 3px;border-bottom-left-radius: 3px;">
+                <div 
+                    class="checkbox-wrapper B1B" ng-click="toggleOmitIndex($index)" 
+                    ng-class="{ 'selected': omittedIndexes.indexOf($index) != -1}">
+                  <label class="outer-line"></label>
+                </div>                 
+              </td>
+              <td class="B2-Amplification" ng-class="{'text-center': color_by==='channel'}" style="text-align: left" ng-click="onSelectRow(well_item, $index)">
+                <span class="B2-Amplification text">
+                  <span ng-show="well_item.well_num < 9">
+                    A{{well_item.well_num}}
+                  </span>
+                  <span ng-show="well_item.well_num > 8">
+                    B{{well_item.well_num-8}}
+                  </span>
                 </span>
               </td>
-              <td ng-click="focusExpName($index)">
-                <span class="sample-span" ng-click="focusExpName($index)" ng-show="!editExpNameMode[$index]">
-            {{samples[$index] | truncate:20}}
-          </span>
-                <input type="text" class="sample-input" ng-show="editExpNameMode[$index]" focus-on="editExpNameMode" ng-blur="updateSampleName($index,samples[$index])" on-shift-enter="updateSampleNameEnter($index,samples[$index])" ng-model="samples[$index]">
+              <td class="B2-Amplification" style="text-align: left;" ng-click="onSelectRow(well_item, $index)">
+                <span class="B2-Amplification one-line-span">
+                  {{samples[well_item.well_num - 1].name | truncate:20}}
+                </span>
               </td>
-              <td class="B1">
-                <span ng-show="wellButtons['well_'+i].ct[0] !== null && wellButtons['well_'+i].ct[0] ">
-            {{wellButtons['well_'+i].ct[0] | round:2}}
-          </span>
+              <td class="B2-Amplification type-td" ng-click="onSelectRow(well_item, $index)">
+                <span class="B2-Amplification type-span" style="width: 20px; height: 20px;" ng-if="well_item.well_type">
+                  <img src="/images/ring_s.svg" ng-if="well_item.well_type == 'standard'">
+                  <img src="/images/ring_plus.svg" ng-if="well_item.well_type == 'positive_control'">
+                  <img src="/images/ring_neg.svg" ng-if="well_item.well_type == 'negative_control'">
+                  <img src="/images/ring_u.svg" ng-if="well_item.well_type == 'unknown'">
+                </span>
+              </td>
+              <td class="B2-Amplification" style="text-align: left;" ng-click="onSelectRow(well_item, $index)">
+                <span class="B2-Amplification one-line-span">
+                  {{well_item.target_name | truncate:20}}
+                  <!-- {{targets[$index].name | truncate:20}} -->
+                </span>
+              </td>
+              <td class="B2-Amplification" style="text-align: left" ng-click="onSelectRow(well_item, $index)">
+                <span class="B2-Amplification width1" >
+                  <span class="B2-Amplification" ng-if="well_item.tm[0]">
+                    {{well_item.tm[0] | round:2}}
+                  </span>
+                  <span class="B2-Amplification" ng-if="!well_item.tm[0]">
+                    <span class="B2-Amplification dummy-placeholder">&nbsp;</span>
+                  </span>
+                </span>
+              </td>
+              <td class="B2-Amplification" style="text-align: left" ng-click="onSelectRow(well_item, $index)">
+                <span class="B2-Amplification width1" >
+                  <span class="B2-Amplification" ng-if="well_item.tm[1]">
+                    {{well_item.tm[1] | round:2}}
+                  </span>
+                  <span class="B2-Amplification" ng-if="!well_item.tm[1]">
+                    <span class="B2-Amplification dummy-placeholder">&nbsp;</span>
+                  </span>
+                </span>
+              </td>
+              <td class="B2-Amplification" style="text-align: left" ng-click="onSelectRow(well_item, $index)">
+                <span class="B2-Amplification width1" >
+                  <span class="B2-Amplification" ng-if="well_item.tm[2]">
+                    {{well_item.tm[2] | round:2}}
+                  </span>
+                  <span class="B2-Amplification" ng-if="!well_item.tm[2]">
+                    <span class="B2-Amplification dummy-placeholder">&nbsp;</span>
+                  </span>
+                </span>
+              </td>
+              <td class="B2-Amplification" style="text-align: left" ng-click="onSelectRow(well_item, $index)">
+                <span class="B2-Amplification width1" >
+                  <span class="B2-Amplification" ng-if="well_item.tm[3]">
+                    {{well_item.tm[3] | round:2}}
+                  </span>
+                  <span class="B2-Amplification" ng-if="!well_item.tm[3]">
+                    <span class="B2-Amplification dummy-placeholder">&nbsp;</span>
+                  </span>
+                </span>
               </td>
             </tr>
           </tbody>

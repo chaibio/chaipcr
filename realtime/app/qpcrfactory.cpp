@@ -103,7 +103,7 @@ shared_ptr<IControl> QPCRFactory::constructLid(ADCController::ConsumersList &con
 
     consumers[ADCController::EReadLid] = settings.thermistor;
 
-    return LidInstance::createInstance(settings, kLidControlPWMPath, kLidPWMPeriodNs, kProgramStartLidTempThreshold);
+    return LidInstance::createInstance(settings, kLidControlPWMPath, kLidPWMPeriodNs, kProgramStartLidTempThreshold, kLidCompletionTurnOffTemp);
 }
 
 shared_ptr<IControl> QPCRFactory::constructHeatSink() {

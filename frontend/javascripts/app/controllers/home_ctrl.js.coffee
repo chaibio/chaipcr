@@ -124,18 +124,18 @@ window.ChaiBioTech.ngApp
             $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
           else
             $state.go 'edit-protocol', {id: exp.id}
-          # if exp.type isnt 'test_kit'
-          #   if exp.started_at
-          #     $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
-          #   else
-          #     $state.go 'edit-protocol', {id: exp.id}
-          # else
-          #   if not exp.started_at
-          #     $state.go('pika_test.setWellsA', id: exp.id)
-          #   else if exp.started_at isnt null && exp.completed_at isnt null
-          #     $state.go('pika_test.results', id: exp.id)
-          #   else
-          #     $state.go 'pika_test.exp-running', id: exp.id
+          if exp.type isnt 'test_kit'
+            if exp.started_at
+              $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
+            else
+              $state.go 'edit-protocol', {id: exp.id}
+          else
+            if not exp.started_at
+              $state.go('pika_test.setWellsA', id: exp.id)
+            else if exp.started_at isnt null && exp.completed_at isnt null
+              $state.go('pika_test.results', id: exp.id)
+            else
+              $state.go 'pika_test.exp-running', id: exp.id
 
 
     return

@@ -16,21 +16,61 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<div class="amplification-chart-state-active results-charts" style="height: 100%; margin-left: 0px;  margin-right: 0px;">
+<div class="experiment-chart-state-active results-charts" style="height: 100%; margin-left: 0px;  margin-right: 0px;">
   <div class="page-layout" ng-controller="AmplificationChartCtrl" ng-show="experiment" style="height: 100%;">
     <div class="content" style="padding-top:0px; height: 100%; display: flex;">
       <div class="chart-section" offset="0" force="true" style="height:100%; padding-left: 0px; padding-right: 0px; background: #eeeeee">
         <div>
           <!--curve-header-->
           <div class="curve-header">
-            <div class="curve-name" style="padding-left: 15px;  display: flex; flex-direction: column; justify-content: center;" >
+            <div class="curve-name">
               <!-- <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()"> -->
               <chart-chooser class="curve-title H1" experiment="experiment" current-chart="$parent.chart" style="padding-left: 15px;">
                 Amplification Curve
                 <img class="arrow-down" src="/images/arrow-down_black.png">
               </chart-chooser>
             </div>
-            <div class="plot-options subheader-switches SH" style="font-size: 13pt; display: flex; flex-direction: column; justify-content: center;">
+            <div class="plot-options">
+              <p class="B1-Amplification">Color by</p>
+              <form role="form" class="form-horizontal B1-Amplification" name="colorBy" novalidate>
+                <div class="form-group" style="margin: 0;">
+                  <div class="col-md-12" style="padding: 0px;">
+                    <div class="dropdown B1-Amplification" ng-click="showColorByList()">
+                      <button class="dropbtn B1-Amplification" style="padding:10px;">
+                        <span class="test B1-Amplification" style="float:left; line-height: 100%;">{{color_by.charAt(0).toUpperCase() + color_by.slice(1)}}</span>
+                        <img class="arrow-down" src="/images/arrow-down_white.png">
+                      </button>
+                      <div id="colorByList_ampli" class="B1-Amplification dropdown-content">
+                        <a href="" ng-click="color_by='sample'" value="abc">Sample</a>
+                        <a href="" ng-click="color_by='target'" value="abc">Target</a>
+                        <a href="" ng-click="color_by='well'" value="abc">Well</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="plot-options" style="padding-right: 40px;">
+              <p class="B1-Amplification">Plot Type</p>
+              <form role="form" class="form-horizontal B1-Amplification" name="plotType" novalidate>
+                <div class="form-group B1-Amplification" style="margin: 0;">
+                  <div class="col-md-12" style="padding: 0;">
+                    <div class="dropdown B1-Amplification" ng-click="showPlotTypeList()">
+                      <button class="dropbtn B1-Amplification" style="padding:10px;">
+                        <span class="test B1-Amplification" style="float:left; line-height: 100%;">{{curve_type.charAt(0).toUpperCase() + curve_type.slice(1)}}</span>
+                        <img class="arrow-down" src="/images/arrow-down_white.png">
+                        <!-- <img class="arrow-down" src="/images/arrow-down.svg"> -->
+                      </button>
+                      <div id="plotTypeList" class="dropdown-content B1-Amplification">
+                        <a href="" ng-click="curve_type='log'" value="abc">Log</a>
+                        <a href="" ng-click="curve_type='linear'" value="abc">Linear</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="plot-options subheader-switches SH" style="margin-top: 30px; padding-right: 40px;">
               <div class="item-switch">
                 <label class="B1-Amplification">Baseline Sub.</label>
                 <switch class="switch" ng-model="baseline_subtraction"></switch>
@@ -47,49 +87,9 @@ limitations under the License.
                 <label style="padding-right:0px;">2</label> -->
               </div>
             </div>
-            <div class="plot-options" style="padding-right: 20px; display: flex; flex-direction: column; justify-content: center;">
-              <p class="B1-Amplification">Plot Type</p>
-              <form role="form" class="form-horizontal B1-Amplification" name="plotType" novalidate>
-                <div class="form-group B1-Amplification" style="margin-bottom: 0;">
-                  <div class="col-md-12">
-                    <div class="dropdown B1-Amplification" ng-click="showPlotTypeList()">
-                      <button class="dropbtn B1-Amplification" style="padding:10px;">
-                        <span class="test B1-Amplification" style="float:left; line-height: 100%;">{{curve_type.charAt(0).toUpperCase() + curve_type.slice(1)}}</span>
-                        <img class="arrow-down" src="/images/arrow-down_white.png">
-                        <!-- <img class="arrow-down" src="/images/arrow-down.svg"> -->
-                      </button>
-                      <div id="plotTypeList" class="dropdown-content B1-Amplification">
-                        <a href="" ng-click="curve_type='log'" value="abc">Log</a>
-                        <a href="" ng-click="curve_type='linear'" value="abc">Linear</a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
-            <div class="plot-options" style="padding-right: 10px;  display: flex; flex-direction: column; justify-content: center;">
-              <p class="B1-Amplification">Color by</p>
-              <form role="form" class="form-horizontal B1-Amplification" name="colorBy" novalidate>
-                <div class="form-group" style="margin-bottom: 0;">
-                  <div class="col-md-12" style="padding-right: 10px;">
-                    <div class="dropdown B1-Amplification" ng-click="showColorByList()">
-                      <button class="dropbtn B1-Amplification" style="padding:10px;">
-                        <span class="test B1-Amplification" style="float:left; line-height: 100%;">{{color_by.charAt(0).toUpperCase() + color_by.slice(1)}}</span>
-                        <img class="arrow-down" src="/images/arrow-down_white.png">
-                      </button>
-                      <div id="colorByList_ampli" class="B1-Amplification dropdown-content">
-                        <a href="" ng-click="color_by='sample'" value="abc">Sample</a>
-                        <a href="" ng-click="color_by='target'" value="abc">Target</a>
-                        <a href="" ng-click="color_by='well'" value="abc">Well</a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
           </div>
           <div class="curve-body amplification-chart" style="height:100%; display: flex; flex-direction: row; justify-content: space-between;">
-            <div class="curve-plot" aspect-ratio offset-x='160 + 10 + 20' offset-y='100 + 160 + 20 + 10' min-width='680' max-width='1020' min-height='400' max-height='600' id="curve-plot" style="display: block;padding: 0;">
+            <div class="curve-plot" aspect-ratio offset-x='160 + 10 + 20' offset-y='100 + 160 + 20 + 10' min-width='680' max-width='1020' min-height='400' max-height='600' offset-top='201' id="curve-plot" style="display: block;padding: 0;">
               <div class="chart-wrapper">
                 <div class="chart-container" style="height:100%; min-width: 660px; min-height: 340px;">
                   <div class="chart-error B1" ng-show="retrying && !fetching && error">
@@ -117,14 +117,8 @@ limitations under the License.
                     <button class="zoom-button button-plus" ng-click="zoomIn()">+</button>
                     <button class="zoom-button button-minus" ng-click="zoomOut()">–</button>
                   </div>                  
-                </div>                
+                </div>
               </div>
-              
-<!--               <div style="display: flex; flex-direction: row; height: 10%;">
-                <div style="display: grid; width: 100%; height: 100%; align-content: center; vertical-align: middle; text-align: center">
-                   <label class="G1M" style="margin: 0; color: #333;">Cycle Number</label>
-                </div>                
-              </div> -->
             </div>
             <div class="additional-info" style="min-width:160px;">
                 <div class="selection-set">

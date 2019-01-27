@@ -405,15 +405,15 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
         for ch_i in [channel_start..channel_end] by 1
           for i in [0..15] by 1
-            if $scope.omittedIndexes.indexOf(i * 2 + (ch_i - 1)) == -1
-              if buttons["well_#{i}"]?.selected and $scope.targets[i * 2 + (ch_i - 1)] and $scope.targetsSetHided[$scope.targets[i * 2 + (ch_i - 1)].id]
+            if $scope.omittedIndexes.indexOf(i * channel_count + (ch_i - 1)) == -1
+              if buttons["well_#{i}"]?.selected and $scope.targets[i * channel_count + (ch_i - 1)] and $scope.targets[i * channel_count + (ch_i - 1)].id and $scope.targetsSetHided[$scope.targets[i * channel_count + (ch_i - 1)].id]
                 if $scope.color_by is 'well'
                   well_color = buttons["well_#{i}"].color
                 else if $scope.color_by is 'target'
-                  well_color = if $scope.targets[(ch_i - 1)+i*2] then $scope.targets[(ch_i - 1)+i*2].color else 'transparent'
+                  well_color = if $scope.targets[(ch_i - 1)+i*channel_count] then $scope.targets[(ch_i - 1)+i*channel_count].color else 'transparent'
                 else if $scope.color_by is 'sample'
                   well_color = if $scope.samples[i] then $scope.samples[i].color else $scope.init_sample_color
-                  if ($scope.is_dual_channel and !$scope.targets[i*2].id and !$scope.targets[i*2+1].id) or (!$scope.is_dual_channel and !$scope.targets[i].id)
+                  if ($scope.is_dual_channel and !$scope.targets[i*channel_count].id and !$scope.targets[i*channel_count+1].id) or (!$scope.is_dual_channel and !$scope.targets[i].id)
                     well_color = 'transparent'
                 else if ch_i is 1
                   well_color = '#00AEEF'

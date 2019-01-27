@@ -75,17 +75,14 @@ window.App.directive 'amplificationChart', [
           if !chart
             initChart()
           else
-            console.log('$scope.data')
-            console.log($scope.data)
-
             chart.updateData($scope.data)
             chart.updateConfig($scope.config)
             if $scope.show
               if isInterpolationChanged(val, oldState) or isBaseBackroundChanged(val, oldState)
                 initChart()
               else
-                chart.setYAxis()
-                chart.setXAxis()
+                chart.setYAxis(false)
+                chart.setXAxis(false)
                 chart.drawLines()
                 chart.updateAxesExtremeValues()
 
