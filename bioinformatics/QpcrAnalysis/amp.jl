@@ -343,7 +343,7 @@ function process_amp(
                     (out_format == :json ? :pre_json : out_format), # out_format_1sr
                     json_digits,
                     verbose)
-        end) # do sr_ele
+        end) # do asrp
     ## output
     if (out_sr_dict)
         final_out = sr_dict
@@ -902,7 +902,7 @@ function process_amp_1sr(
             dyes_2bfild;
             aw_out_format = :array)
     #
-    const _baseline_cyc_bounds = baseline_cyc_bounds()
+    const _baseline_cyc_bounds = find_baseline_cyc_bounds()
     const NaN_ary2 = fill(NaN, num_fluo_wells, num_channels)
     const fitted_prebl = const fitted_postbl =
         fill(AF_EMPTY_DICT[af_key], num_fluo_wells, num_channels) # once ` ::Array{EmptyAmpFitted,2}`, can't be `setfield!` to ` ::Array{SfcFitted,2}`, and vice versa
