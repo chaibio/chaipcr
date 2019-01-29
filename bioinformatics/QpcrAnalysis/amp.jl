@@ -474,7 +474,7 @@ function mod_bl_q(
         function sfc_prebl_status(prebl_status)
             bl_notes = ["prebl_status $prebl_status", "model-derived baseline"]
             if prebl_status in [:Optimal, :UserLimit]
-                const min_bfd, max_bfd = extrema(fluos .- baseline) # `bfd` - blsub_fluos_draft
+                const min_bfd, max_bfd = extrema(blsub_fluos) # `bfd` - blsub_fluos_draft
                 if max_bfd - min_bfd <= abs(min_bfd)
                     bl_notes[2] = "fallback"
                     push!(bl_notes, "max_bfd ($max_bfd) - min_bfd ($min_bfd) == $(max_bfd - min_bfd) <= abs(min_bfd)")
@@ -493,7 +493,7 @@ function mod_bl_q(
             return bl_notes
         end
 
-        function calc_bl_cycs()
+        function bl_cycs()
             const len_bcb = length(baseline_cyc_bounds)
             if !(len_bcb in [0, 2])
                 error("Length of `baseline_cyc_bounds` must be 0 or 2.")
@@ -573,10 +573,10 @@ function mod_bl_q(
         if bl_method in keys(sfc_model_defs)
             ## fit model to find baseline
             const wts = sfc_wts()
-            const fitted_prebl = sfc_model_defs[bl_method].func_fit(
-                cycs, fluos, wts; kwargs_jmp_model...)
-            baseline = sfc_model_defs[bl_method].funcs_pred[:bl](
-                cycs, fitted_prebl.coefs...) # may be changed later
+            const sfc_model_prebl = sfc_model_defs[bl_method]
+            const fitted_prebl = sfc_model_prebl.func_fit(cycs, fluos, wts; kwargs_jmp_model...)
+            baseline = sfc_model_prebl.funcs_pred[:bl](cycs, fitted_prebl.coefs...) # may be changed later
+            blsub_fluos = fluos .- baseline
             bl_notes = sfc_prebl_status(fitted_prebl.status)
             if length(bl_notes) >= 2 && bl_notes[2] == "fallback"
                 const bl_func = bl_fallback_func
@@ -593,24 +593,25 @@ function mod_bl_q(
                 error("Baseline estimation function `bl_func` not defined for `bl_method` $bl_method")
             end
         end
-        const bl_cycs = calc_bl_cycs()
         if !(length(bl_notes) >= 2 && bl_notes[2] == "model-derived baseline")
-            baseline = bl_func(fluos[bl_cycs]) # change or new def
+            baseline = bl_func(fluos[bl_cycs()]) # change or new def
+            blsub_fluos = fluos .- baseline
         end
-        const blsub_fluos = fluos .- baseline
-        const fitted_postbl = sfc_model_defs[m_postbl].func_fit(
+        const sfc_model_postbl = sfc_model_defs[m_postbl]
+        const fitted_postbl = sfc_model_postbl.func_fit(
             cycs, blsub_fluos, wts; kwargs_jmp_model...)
         const coefs_pob = fitted_postbl.coefs
-        const dr1_pred = sfc_model_defs[m_postbl].funcs_pred[:dr1](cycs_denser, coefs_pob...)
+        const funcs_pred = sfc_model_postbl.funcs_pred
+        const dr1_pred = funcs_pred[:dr1](cycs_denser, coefs_pob...)
         const max_dr1, idx_max_dr1 = findmax(dr1_pred)
         const cyc_max_dr1 = cycs_denser[idx_max_dr1]
-        const dr2_pred = sfc_model_defs[m_postbl].funcs_pred[:dr2](cycs_denser, coefs_pob...)
+        const dr2_pred = funcs_pred[:dr2](cycs_denser, coefs_pob...)
         const max_dr2, idx_max_dr2 = findmax(dr2_pred)
         const cyc_max_dr2 = cycs_denser[idx_max_dr2]
-        const func_pred_f = sfc_model_defs[m_postbl].funcs_pred[:f]
+        const func_pred_f = funcs_pred[:f]
         const Cy0 = cyc_max_dr1 - func_pred_f(cyc_max_dr1, coefs_pob...) / max_dr1
         const ct = try
-            sfc_model_defs[m_postbl].funcs_pred[:inv](ct_fluo, coefs_pob...)
+            funcs_pred[:inv](ct_fluo, coefs_pob...)
         catch err
             isa(err, DomainError) ? Ct_VAL_DomainError : "unhandled error"
         end # try
@@ -777,10 +778,12 @@ function process_amp_1sr(
     json_digits             ::Integer,
     verbose                 ::Bool
 )
+    amp_init(x...) = fill(x..., num_fluo_wells, num_channels)
+
     function find_baseline_cyc_bounds()
         const size_bcb = size(baseline_cyc_bounds)
         if size_bcb == (0,) || (size_bcb == (2,) && size(baseline_cyc_bounds[1]) == ()) # can't use `eltype(baseline_cyc_bounds) <: Integer` because `JSON.parse("[1,2]")` results in `Any[1,2]` instead of `Int[1,2]`
-            return fill(baseline_cyc_bounds, num_fluo_wells, num_channels)
+            return amp_init(baseline_cyc_bounds)
         elseif size_bcb == (num_fluo_wells, num_channels) && eltype(baseline_cyc_bounds) <: AbstractVector # final format of `baseline_cyc_bounds`
             return baseline_cyc_bounds
         end
@@ -802,7 +805,7 @@ function process_amp_1sr(
             return ct_fluos
         end
         if cq_method != :ct
-            return fill(NaN, num_channels)
+            return ct_fluos_empty
         end
         ## num_cycs > 2 && length(ct_fluos) == 0 && cq_method == :ct
         map(1:num_channels) do channel_i
@@ -903,13 +906,10 @@ function process_amp_1sr(
             aw_out_format = :array)
     #
     const _baseline_cyc_bounds = find_baseline_cyc_bounds()
-    const NaN_ary2 = fill(NaN, num_fluo_wells, num_channels)
-    const fitted_prebl = const fitted_postbl =
-        fill(AF_EMPTY_DICT[af_key], num_fluo_wells, num_channels) # once ` ::Array{EmptyAmpFitted,2}`, can't be `setfield!` to ` ::Array{SfcFitted,2}`, and vice versa
-    const empty_vals_4cq =
-        fill(OrderedDict{String,AbstractFloat}(), num_fluo_wells, num_channels)
+    const NaN_ary2 = amp_init(NaN)
+    const fitted_init = amp_init(AF_EMPTY_DICT[af_key]) # once ` ::Array{EmptyAmpFitted,2}`, can't be `setfield!` to ` ::Array{SfcFitted,2}`, and vice versa
+    const empty_vals_4cq = amp_init(OrderedDict{Symbol,AbstractFloat}())
     const ct_fluos_empty = fill(NaN, num_channels)
-    const blsub_fluos = const blsub_fitted = rbbs_ary3
     const _ct_fluos = find_ct_fluos()
     #
     ## Issue: AmpStepRampOutput is a 'god object' anti-pattern
@@ -923,16 +923,16 @@ function process_amp_1sr(
         wva_data,
         rbbs_ary3,
         fluo_well_nums,
-        collect(1:num_channels),
+        collect(1:num_channels), # channel_nums
         cq_method,
-        fitted_prebl,
-        fill(Vector{String}(), num_fluo_wells, num_channels), # bl_notes
-        blsub_fluos,
-        fitted_postbl,
-        fill(:not_fitted, num_fluo_wells, num_channels), # postbl_status
-        fill(NaN, 1, num_fluo_wells, num_channels), # coefs # size = 1 for 1st dimension may not be correct for the chosen model
+        fitted_init, # fitted_prebl,
+        amp_init(Vector{String}()), # bl_notes
+        rbbs_ary3, # blsub_fluos
+        fitted_init, # fitted_postbl,
+        amp_init(:not_fitted), # postbl_status
+        amp_init(NaN, 1), # coefs # size = 1 for 1st dimension may not be correct for the chosen model
         NaN_ary2, # d0
-        blsub_fitted,
+        rbbs_ary3, # blsub_fitted,
         zeros(0, 0, 0), # dr1_pred
         zeros(0, 0, 0), # dr2_pred
         NaN_ary2, # max_dr1
@@ -949,10 +949,10 @@ function process_amp_1sr(
         NaN_ary2, # scld_max_bsf
         NaN_ary2, # scld_max_dr1
         NaN_ary2, # scld_max_dr2
-        fill("", num_fluo_wells, num_channels), # why_NaN
+        amp_init(""), # why_NaN
         _ct_fluos, # ct_fluos
-        OrderedDict{String,Vector{String}}(), # assignments_adj_labels_dict
-        OrderedDict{String,AssignGenosResult}() # agr_dict
+        OrderedDict{Symbol,Vector{String}}(), # assignments_adj_labels_dict
+        OrderedDict{Symbol,AssignGenosResult}() # agr_dict
     )
     if num_cycs <= 2
         print_v(println, verbose, "Number of cycles $num_cycs <= 2, baseline subtraction and Cq calculation will not be performed.")
