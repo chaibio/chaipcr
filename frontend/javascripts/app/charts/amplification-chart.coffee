@@ -297,6 +297,23 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
 
     if path._groups[0]?[0]?.__data__.length
       @setActivePath(path)
+
+  setBoxRFYAndCycleTexts: (x) ->
+    line_config = @activePathConfig.config
+    x0 = if @zoomTransform.k > 1 then @zoomTransform.rescaleX(@xScale).invert(x) else @xScale.invert(x)
+    i = @bisectX(line_config)(@data[line_config.dataset], x0, 1)
+    d0 = @data[line_config.dataset][i - 1]
+    return if not d0
+    d1 = @data[line_config.dataset][i]
+    return if not d1
+    d = if x0 - d0[line_config.x] > d1[line_config.x] - x0 then d1 else d0
+
+    if @activePath
+
+      conf = @activePathConfig
+
+      if (@onUpdateProperties)
+        @onUpdateProperties(d[@config.series[conf.index].x], d[@config.series[conf.index].y], d[@config.series[conf.index].dr1_pred], d[@config.series[conf.index].dr2_pred])
     
 window.ChaiBioCharts = window.ChaiBioCharts || {}
 window.ChaiBioCharts.AmplificationChart = AmplificationChart

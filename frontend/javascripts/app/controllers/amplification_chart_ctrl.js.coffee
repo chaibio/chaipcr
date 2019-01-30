@@ -499,7 +499,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               else 
                 $scope.index_channel = 2
 
-              $scope.label_channel = $scope.index_channel.toString()
+              $scope.label_channel = config.config.channel
               if i < $scope.targets.length
                 if $scope.targets[i]!=null
                   $scope.label_target = $scope.targets[config.config.well * dual_value + config.config.channel - 1]
@@ -552,7 +552,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             else 
               $scope.index_channel = 2
 
-            $scope.label_channel = $scope.index_channel.toString()
+            $scope.label_channel = config.config.channel
             if i < $scope.targets.length
               if $scope.targets[i]!=null
                 $scope.label_target = $scope.targets[config.config.well * 2 + config.config.channel - 1]

@@ -173,6 +173,14 @@ App.controller 'MeltCurveChartCtrl', [
           cb(data.experiment) if !!cb
 
       updateButtonTms = (data) ->
+        isBlankTarget = true
+        for item, i in $scope.targets by 1 
+          if item
+            isBlankTarget = false
+            break
+
+        isBlankTarget = if $scope.targets.length == 0 then true else false
+        targets = []
         for well_data, well_i in data.ramps[0].melt_curve_data by 1
           if $scope.wellButtons["well_#{well_i}"].ct == undefined
             $scope.wellButtons["well_#{well_i}"].ct = ['', '']
@@ -180,8 +188,24 @@ App.controller 'MeltCurveChartCtrl', [
 
           for well_i in [0..$scope.well_data.length - 1]
             if $scope.well_data[well_i].channel == well_data.channel and $scope.well_data[well_i].well_num == well_data.well_num
+              if isBlankTarget
+                if $scope.is_dual_channel
+                  targets[(well_data.well_num - 1) * 2 + well_data.channel - 1] = { channel: well_data.channel, name: "Ch " + well_data.channel, id: well_data.channel , color: $scope.COLORS[well_data.channel - 1], well_num: well_data.well_num, well_type: null}
+                else
+                  targets[well_data.well_num - 1] = { channel: well_data.channel, name: "Ch " + well_data.channel, id: well_data.channel , color: $scope.COLORS[well_data.channel - 1], well_num: well_data.well_num, well_type: null}
+                $scope.well_data[well_i].target_name = "Ch " + well_data.channel
+                $scope.well_data[well_i].target_id = well_data.channel
+                $scope.well_data[well_i].color = $scope.COLORS[well_data.channel - 1]                
+                $scope.well_data[well_i].well_type = null
+                
               $scope.well_data[well_i].tm = well_data.tm
-              break
+              break            
+        if isBlankTarget
+          $scope.targets = targets
+          for i in [0..$scope.targets.length - 1] by 1
+            $scope.targetsSetHided[$scope.targets[i]?.id] = true
+          $scope.updateTargetsSet()
+          $rootScope.$broadcast 'event:reinit-targets-melt'
 
         updateSeries()
 
@@ -250,10 +274,10 @@ App.controller 'MeltCurveChartCtrl', [
           for i in [0..nonGreySeries.length - 1] by 1
             $scope.config.series.push(nonGreySeries[i])
 
-      $scope.onUpdateProperties = (temp, norm, dF_dC, d2_dc2) ->
+      $scope.onUpdateProperties = (temp, norm, dF_dt) ->
         $scope.label_Temp = temp
         $scope.label_Norm = norm
-        $scope.label_dF_dT = dF_dC
+        $scope.label_dF_dT = dF_dt
 
       getMeltCurveDataCallBack = (data) ->
         updateButtonTms(data)
@@ -311,7 +335,7 @@ App.controller 'MeltCurveChartCtrl', [
                       $scope.well_targets[i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0]  else null
                       if $scope.well_targets[i]
                         $scope.well_targets[i].color = if $scope.well_targets[i] then $scope.lookupTargets[$scope.well_targets[i].id] else 'transparent'
-
+                  
                   $scope.targets = $scope.well_targets
                   for i in [0..$scope.targets.length - 1] by 1
                     $scope.targetsSetHided[$scope.targets[i]?.id] = true
@@ -373,7 +397,7 @@ App.controller 'MeltCurveChartCtrl', [
               else 
                 $scope.index_channel = 2
 
-              $scope.label_channel = $scope.index_channel.toString()
+              $scope.label_channel = config.config.channel
               if i < $scope.targets.length
                 if $scope.targets[i]!=null
                   $scope.label_target = $scope.targets[config.config.well * dual_value + config.config.channel - 1]
@@ -426,7 +450,7 @@ App.controller 'MeltCurveChartCtrl', [
             else 
               $scope.index_channel = 2
 
-            $scope.label_channel = $scope.index_channel.toString()
+            $scope.label_channel = config.config.channel
             if i < $scope.targets.length
               if $scope.targets[i]!=null
                 $scope.label_target = $scope.targets[config.config.well * 2 + config.config.channel - 1]
@@ -462,10 +486,9 @@ App.controller 'MeltCurveChartCtrl', [
         $scope.label_well = "No Selection"
         $scope.label_channel = ""
 
-        $scope.label_cycle = ''
-        $scope.label_RFU = ''
-        $scope.label_dF_dC = ''
-        $scope.label_D2_dc2 = ''
+        $scope.label_Temp = ''
+        $scope.label_Norm = ''
+        $scope.label_dF_dT = ''
 
         $scope.label_sample = null
         $scope.bgcolor_target = {
@@ -484,6 +507,7 @@ App.controller 'MeltCurveChartCtrl', [
 
     $scope.onChangeSlotType = (type) ->
       $scope.curve_type = type
-      $scope.label_Norm = ''
       $scope.label_Temp = ''
+      $scope.label_Norm = ''
+      $scope.label_dF_dT = ''
 ]

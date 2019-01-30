@@ -81,7 +81,6 @@ App.service 'MeltCurveService', [
       series: series
       axes:
         x:
-          unit: ' °C'
           key: 'temperature'
           label: 'Temperature (°C)'
           ticks: 8

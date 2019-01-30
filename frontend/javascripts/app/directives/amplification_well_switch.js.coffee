@@ -139,6 +139,19 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
           $scope.wells["well_#{i}"].selected = selected
         ngModel.$setViewValue angular.copy($scope.wells)
 
+      $scope.$on 'event:reinit-targets-melt', ->
+        for i in [0..15] by 1
+          selected = true
+          if $scope.targets and (($scope.isDual and (!$scope.targets[i*2] or !$scope.targets[i*2].id) and (!$scope.targets[i*2+1] or !$scope.targets[i*2+1].id)) or (!$scope.isDual and (!$scope.targets[i] or !$scope.targets[i].id)))
+            selected = false
+          $scope.wells["well_#{i}"].selected = selected
+        cts = []
+        for i in [0..15] by 1
+          cts.push ngModel.$modelValue["well_#{i}"].ct
+        for ct, i in cts by 1
+          $scope.wells["well_#{i}"].ct = ct if $scope.wells["well_#{i}"]
+        ngModel.$setViewValue angular.copy($scope.wells)
+
       $scope.getStyleForWellBar = (row, col, config, i) ->
         'background-color': config.color
         'opacity': if config.selected then 1 else 0.25

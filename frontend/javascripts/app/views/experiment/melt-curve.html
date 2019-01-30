@@ -115,11 +115,11 @@ limitations under the License.
                         <table class="parameters-table">
                           <tr>
                             <td class="B1v-Amplification">-dF/dT:</td>
-                            <td class="B1Mv-Amplification">{{(curve_type=='derivative') ? label_Norm : ''}}</td>
+                            <td class="B1Mv-Amplification">{{label_dF_dT | showInteger}}</td>
                           </tr>
                           <tr>
                             <td class="B1v-Amplification">Norm:</td>
-                            <td class="B1Mv-Amplification">{{(curve_type=='normalized') ? label_Norm : ''}}</td>
+                            <td class="B1Mv-Amplification">{{label_Norm | showInteger}}</td>
                           </tr>
                           <tr>
                             <td class="B1v-Amplification">Temp:</td>
