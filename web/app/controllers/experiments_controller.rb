@@ -607,7 +607,7 @@ class ExperimentsController < ApplicationController
             end
 
             fake_targets = TargetsWell.fake_targets?(@experiment)
-            @amplification_data = AmplificationDatum.retrieve(@experiment, @first_stage_collect_data.id, !fake_targets).to_a
+            @amplification_data = AmplificationDatum.retrieve(@experiment, @first_stage_collect_data.id, fake_targets).to_a
             if @amplification_data.blank? && !task_submitted.nil?
               #no data but background task is submitted
               render :nothing => true, :status => (task_submitted)? 202 : 503
@@ -647,6 +647,7 @@ class ExperimentsController < ApplicationController
             else
               fluorescence_data = FluorescenceDatum.for_stage(@first_stage_collect_data.id).for_experiment(@experiment.id)
             end
+            fluorescence_data = fluorescence_data.filtered_by_targets(@experiment.well_layout.id, fake_targets).order_by_target(fake_targets).to_a
 
             if !analyze_required && !fluorescence_data.blank?
               #set etag
@@ -848,7 +849,7 @@ class ExperimentsController < ApplicationController
             end
 
             fake_targets = TargetsWell.fake_targets?(@experiment)
-            @melt_curve_data = CachedMeltCurveDatum.retrieve(@experiment, @first_stage_meltcurve_data.id, !fake_targets).to_a
+            @melt_curve_data = CachedMeltCurveDatum.retrieve(@experiment, @first_stage_meltcurve_data.id, fake_targets).to_a
 
             if @melt_curve_data.blank? && !task_submitted.nil?
               #no data but background task is submitted
@@ -884,10 +885,11 @@ class ExperimentsController < ApplicationController
 
             #query to database
             if !wheres.blank?
-              raw_data = MeltCurveDatum.for_experiment(@experiment.id).where(wheres).group_by_well.to_a
+              raw_data = MeltCurveDatum.for_experiment(@experiment.id).where(wheres).group_by_well
             else
-              raw_data = MeltCurveDatum.for_stage(@first_stage_meltcurve_data.id).for_experiment(@experiment.id).group_by_well.to_a
+              raw_data = MeltCurveDatum.for_stage(@first_stage_meltcurve_data.id).for_experiment(@experiment.id).group_by_well
             end
+            raw_data = raw_data.filtered_by_targets(@experiment.well_layout.id, fake_targets).order_by_target(fake_targets).to_a
 
             if !analyze_required && !raw_data.blank?
               #set etag
@@ -1002,7 +1004,7 @@ class ExperimentsController < ApplicationController
         if first_stage_collect_data
           begin
             task_submitted = background_calculate_amplification_data(@experiment, first_stage_collect_data.id)
-            amplification_data = AmplificationDatum.retrieve(@experiment, first_stage_collect_data.id, !fake_targets)
+            amplification_data = AmplificationDatum.retrieve(@experiment, first_stage_collect_data.id, fake_targets)
 
             if !task_submitted.nil? && (!@experiment.running? || amplification_data.blank?)
               #background task is submitted
@@ -1019,10 +1021,10 @@ class ExperimentsController < ApplicationController
           if request.method == "HEAD"
             amplification_data = nil
           else
-            fluorescence_data = FluorescenceDatum.for_stage(first_stage_collect_data.id).for_experiment(@experiment.id)
+            fluorescence_data = FluorescenceDatum.for_stage(first_stage_collect_data.id).for_experiment(@experiment.id).filtered_by_targets(@experiment.well_layout.id, fake_targets).order_by_target(fake_targets).to_a
 
             if fake_targets == true
-              targets = AmplificationCurve.retrieve(@experiment.id, first_stage_collect_data.id).select("channel as target_id, #{Constants::FAKE_TARGET_NAME}").to_a
+              targets = AmplificationCurve.retrieve(@experiment.id, first_stage_collect_data.id).filtered_by_targets(@experiment.well_layout.id, fake_targets).to_a
             else
               targets = TargetsWell.with_data(@experiment, first_stage_collect_data).with_samples.to_a
               TargetsWell.process_data(targets)
@@ -1031,7 +1033,7 @@ class ExperimentsController < ApplicationController
         end
 
         if amplification_data
-          out.put_next_entry("#{experiment_dir}/amplification.csv")
+          out.put_next_entry("#{experiment_dir}/amplification_data.csv")
           columns = ["baseline_subtracted_value", "background_subtracted_value", "dr1_pred", "dr2_pred", "fluorescence_value", "channel", "well_num", "target_name", "cycle_num"]
           fluorescence_index = 0
           csv_string = CSV.generate do |csv|
@@ -1041,7 +1043,7 @@ class ExperimentsController < ApplicationController
                     !(fluorescence_data[fluorescence_index].channel == data.channel &&
                       fluorescence_data[fluorescence_index].well_num == data.well_num &&
                       fluorescence_data[fluorescence_index].cycle_num == data.cycle_num)) do
-                    fluorescence_index += 1
+                        fluorescence_index += 1
               end
               fluorescence_value = (fluorescence_index < fluorescence_data.length)? fluorescence_data[fluorescence_index].fluorescence_value : nil
               attributes = data.attributes
@@ -1057,7 +1059,7 @@ class ExperimentsController < ApplicationController
         if first_stage_meltcurve_data
           begin
             task_submitted = background_calculate_melt_curve_data(@experiment, first_stage_meltcurve_data.id)
-            melt_curve_data = CachedMeltCurveDatum.retrieve(@experiment, first_stage_meltcurve_data.id, !fake_targets)
+            melt_curve_data = CachedMeltCurveDatum.retrieve(@experiment, first_stage_meltcurve_data.id, fake_targets)
 
             if !task_submitted.nil? && (!@experiment.running? || melt_curve_data.blank?)
               #background task is submitted
@@ -1094,8 +1096,10 @@ class ExperimentsController < ApplicationController
 
             index = targets.index { |x| x.well_num == data.well_num && x.target_id == data.target_id }
             if index
-              targets[index].class.send(:define_method, :tm) { return @tm }
-              targets[index].instance_variable_set("@tm", data.tm)
+              if data.tm
+                targets[index].class.send(:define_method, :tm) { return @tm }
+                targets[index].instance_variable_set("@tm", data.tm)
+              end
             else
               targets.push(TargetsWell.new(data))
             end
@@ -1594,7 +1598,7 @@ class ExperimentsController < ApplicationController
           data_array << column_names
         end
       end
-      data_array << node.attributes.values_at(*column_names)
+      data_array << column_names.map {|method| node.send(method)}
     end
 
     if key != nil

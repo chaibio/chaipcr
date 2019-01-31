@@ -17,9 +17,11 @@
 # limitations under the License.
 #
 class AmplificationDatum < ActiveRecord::Base
+  include TargetsHelper
+  include Swagger::Blocks
+  
   belongs_to :experiment
-	include Swagger::Blocks
-
+	
 	swagger_schema :AmplificationData do
 		property :partial do
 			key :type, :boolean
@@ -149,14 +151,8 @@ class AmplificationDatum < ActiveRecord::Base
 
   attr_accessor :fluorescence_value
 
-  def self.retrieve(experiment, stage_id, filter_by_targets)
-    clause = self.where(:experiment_id=>experiment.id, :stage_id=>stage_id).order(:channel, :well_num, :cycle_num)
-    if filter_by_targets
-      clause = clause.select("amplification_data.*, targets_wells.target_id as target_id, targets.name as target_name").joins("inner join targets_wells on targets_wells.well_num = amplification_data.well_num and targets_wells.well_layout_id = #{experiment.well_layout.id} inner join targets on targets.id=targets_wells.target_id and targets.channel = amplification_data.channel").where("targets_wells.omit=false")
-    else
-      clause = clause.select("amplification_data.*, channel as target_id, #{Constants::FAKE_TARGET_NAME}")
-    end
-    clause
+  def self.retrieve(experiment, stage_id, fake_targets)
+    filtered_by_targets(experiment.well_layout.id, fake_targets).where(:experiment_id=>experiment.id, :stage_id=>stage_id).order_by_target(fake_targets)
   end
 
   def self.maxid(experiment_id, stage_id)

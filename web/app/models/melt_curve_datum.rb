@@ -17,8 +17,10 @@
 # limitations under the License.
 #
 class MeltCurveDatum < ActiveRecord::Base
-  belongs_to :experiment
+  include TargetsHelper
 	include Swagger::Blocks
+
+  belongs_to :experiment
 
 	swagger_schema :MeltData do
 		property :partial do
@@ -66,9 +68,9 @@ class MeltCurveDatum < ActiveRecord::Base
 		end
 	end
 
-  scope :for_experiment, lambda {|experiment_id| where(["experiment_id=?", experiment_id])}
-  scope :for_stage, lambda {|stage_id| where(["stage_id=?", stage_id])}
-  scope :group_by_well, -> { select("experiment_id,ramp_id,channel,well_num,MAX(id) AS id,GROUP_CONCAT(temperature SEPARATOR ',') AS temperature,GROUP_CONCAT(fluorescence_value SEPARATOR ',') AS fluorescence_data").group("well_num").order("ramp_id, channel, well_num") }
+  scope :for_experiment, lambda {|experiment_id| where(["#{table_name}.experiment_id=?", experiment_id])}
+  scope :for_stage, lambda {|stage_id| where(["#{table_name}.stage_id=?", stage_id])}
+  scope :group_by_well, -> { select("#{table_name}.experiment_id,#{table_name}.ramp_id,#{table_name}.channel,#{table_name}.well_num,MAX(#{table_name}.id) AS id,GROUP_CONCAT(temperature SEPARATOR ',') AS temperature,GROUP_CONCAT(fluorescence_value SEPARATOR ',') AS fluorescence_data").group("well_num") }
 
   def self.new_data_generated?(experiment, stage_id)
     lastrow = self.for_experiment(experiment.id).for_stage(stage_id).order("id DESC").select("temperature").first
@@ -93,7 +95,7 @@ class MeltCurveDatum < ActiveRecord::Base
   
   def self.julia_hash(experiment_id, stage_id)
     results = {}
-    MeltCurveDatum.for_experiment(experiment_id).for_stage(stage_id).order("channel, well_num, id").each do |data|
+    MeltCurveDatum.for_experiment(experiment_id).for_stage(stage_id).order(:channel, :well_num, :id).each do |data|
       results[:fluorescence_value] ||= Array.new
       results[:temperature] ||= Array.new
       results[:well_num] ||= Array.new
@@ -104,5 +106,9 @@ class MeltCurveDatum < ActiveRecord::Base
       results[:channel] << data.channel
     end
     results
+  end
+  
+  def well_num
+    read_attribute(:well_num)+1
   end
 end

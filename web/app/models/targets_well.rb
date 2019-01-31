@@ -22,9 +22,6 @@ class TargetsWell < ActiveRecord::Base
   TYPE_STANDARD = "standard"
   TYPE_UNKNOWN = "unknown"
 
-  FAKE_TARGET_1 = "Ch 1"
-  FAKE_TARGET_2 = "Ch 2"
-
   scope :for_experiment, lambda {|experiment| where(:well_layout_id=>experiment.well_layout.id)}
 
   scope :with_data, lambda {|experiment, stage|
@@ -141,8 +138,8 @@ class TargetsWell < ActiveRecord::Base
 
   def self.fake_targets
     targets = []
-    targets << OpenStruct.new(:target_id => 1, :target_name=>FAKE_TARGET_1, :target_equation=>nil)
-    targets << OpenStruct.new(:target_id => 2, :target_name=>FAKE_TARGET_2, :target_equation=>nil) if Device.dual_channel?
+    targets << OpenStruct.new(:target_id => 1, :target_name=>TargetsHelper::FAKE_TARGET_1, :target_equation=>nil)
+    targets << OpenStruct.new(:target_id => 2, :target_name=>TargetsHelper::FAKE_TARGET_2, :target_equation=>nil) if Device.dual_channel?
     targets
   end
   

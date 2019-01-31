@@ -17,13 +17,16 @@
 # limitations under the License.
 #
 class FluorescenceDatum < ActiveRecord::Base
+  include TargetsHelper
+  
   belongs_to :experiment
   
-  scope :for_experiment, lambda {|experiment_id| where(["fluorescence_data.experiment_id=?", experiment_id]).order("fluorescence_data.channel, fluorescence_data.well_num, fluorescence_data.cycle_num")}
+  scope :for_experiment, lambda {|experiment_id| where(["fluorescence_data.experiment_id=?", experiment_id])}
   scope :for_stage, lambda {|stage_id| joins("LEFT JOIN ramps ON fluorescence_data.ramp_id = ramps.id INNER JOIN steps ON fluorescence_data.step_id = steps.id OR steps.id = ramps.next_step_id")
                                        .where(["steps.stage_id=?", stage_id])
                                        .order("steps.order_number")}
-  
+  scope :order_by_channel_first, -> { order("fluorescence_data.channel, fluorescence_data.well_num, fluorescence_data.cycle_num")  }
+
   FAKE_CALIBRATION_SINGLE_CHANNEL_WATER = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], nil]
   FAKE_CALIBRATION_SINGLE_CHANNEL_SIGNAL = [[100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100], nil]
   FAKE_CALIBRATION_DUAL_CHANNEL_WATER = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]]
@@ -44,7 +47,7 @@ class FluorescenceDatum < ActiveRecord::Base
   def self.fluorescence_for_steps(experiment_id, step_ids)
     fluorescence_values = Array.new(step_ids.length)
     fluorescence_index = -1
-    FluorescenceDatum.order("fluorescence_data.step_id").for_experiment(experiment_id).where(:step_id=>step_ids.compact).each do |data|
+    FluorescenceDatum.order("fluorescence_data.step_id").for_experiment(experiment_id).where(:step_id=>step_ids.compact).order_by_channel_first.each do |data|
       if fluorescence_index == -1 || data.step_id != step_ids[fluorescence_index]
         fluorescence_index = -1
         step_ids.each_with_index do |step_id, index|
@@ -67,7 +70,7 @@ class FluorescenceDatum < ActiveRecord::Base
   
   def self.julia_hash(experiment_id, sub_type, sub_id)
     results = {}
-    FluorescenceDatum.for_experiment(experiment_id).where("#{sub_type}_id=#{sub_id}").each do |data|
+    FluorescenceDatum.for_experiment(experiment_id).where("#{sub_type}_id=#{sub_id}").order_by_channel_first.each do |data|
         results[:fluorescence_value] ||= Array.new
         results[:well_num] ||= Array.new
         results[:cycle_num] ||= Array.new

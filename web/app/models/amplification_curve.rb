@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 class AmplificationCurve < ActiveRecord::Base
+  include TargetsHelper
+  
   belongs_to :experiment
   
   attr_accessor :replic, :mean_cq
