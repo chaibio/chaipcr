@@ -1024,8 +1024,8 @@ class ExperimentsController < ApplicationController
             if fake_targets == true
               targets = AmplificationCurve.retrieve(@experiment.id, first_stage_collect_data.id).select("channel as target_id, #{Constants::FAKE_TARGET_NAME}").to_a
             else
-              summary_data = TargetsWell.with_data(@experiment, first_stage_collect_data).joins("left join samples on samples.id = samples_wells.sample_id").select("samples.name as sample_name").to_a
-              targets = TargetsWell.process_data(summary_data)
+              targets = TargetsWell.with_data(@experiment, first_stage_collect_data).with_samples.to_a
+              TargetsWell.process_data(targets)
             end
           end
         end
@@ -1083,10 +1083,10 @@ class ExperimentsController < ApplicationController
 
           targets ||= []
           if fake_targets == false
-            melt_curve_data = melt_curve_data.joins("left join samples on samples.id = samples_wells.sample_id").select("targets_wells.omit as omit, targets_wells.well_type as well_type, targets_wells.quantity_m as quantity_m, targets_wells.quantity_b as quantity_b, samples.name as sample_name").unscope(where: :omit)
+            melt_curve_data = melt_curve_data.with_samples.select("targets_wells.omit as omit, targets_wells.well_type as well_type, targets_wells.quantity_m as quantity_m, targets_wells.quantity_b as quantity_b").unscope(where: :targets_wells)
           end
           melt_curve_data.each do |data|
-            if !data.respond_to?(:omit) || data.omit == false
+            if !data.respond_to?(:omit) || data.omit == 0
               data.temperature.each_index do |index|
                 out.write "#{data.channel}, #{data.well_num}, #{data.target_name}, #{data.temperature[index]}, #{data.normalized_data[index]}, #{data.derivative_data[index]}\r\n"
               end

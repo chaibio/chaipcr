@@ -36,6 +36,8 @@ class TargetsWell < ActiveRecord::Base
   
   scope :filtered, -> { where("targets_wells.omit=false and targets_wells.well_type is NOT NULL")}
 
+  scope :with_samples, -> { joins("left join samples on samples.id = samples_wells.sample_id").select("samples.name as sample_name") }
+
   belongs_to :well_layout
   belongs_to :target
   

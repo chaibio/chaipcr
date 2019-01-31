@@ -152,7 +152,7 @@ class AmplificationDatum < ActiveRecord::Base
   def self.retrieve(experiment, stage_id, filter_by_targets)
     clause = self.where(:experiment_id=>experiment.id, :stage_id=>stage_id).order(:channel, :well_num, :cycle_num)
     if filter_by_targets
-      clause = clause.select("amplification_data.*, targets_wells.target_id as target_id, targets.name as target_name").joins("inner join targets_wells on targets_wells.well_num = amplification_data.well_num and targets_wells.well_layout_id = #{experiment.well_layout_id} inner join targets on targets.id=targets_wells.target_id and targets.channel = amplification_data.channel").where("targets_wells.omit=false")
+      clause = clause.select("amplification_data.*, targets_wells.target_id as target_id, targets.name as target_name").joins("inner join targets_wells on targets_wells.well_num = amplification_data.well_num and targets_wells.well_layout_id = #{experiment.well_layout.id} inner join targets on targets.id=targets_wells.target_id and targets.channel = amplification_data.channel").where("targets_wells.omit=false")
     else
       clause = clause.select("amplification_data.*, channel as target_id, #{Constants::FAKE_TARGET_NAME}")
     end
