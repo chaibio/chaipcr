@@ -154,6 +154,10 @@ class AmplificationDatum < ActiveRecord::Base
   def self.retrieve(experiment, stage_id, fake_targets)
     filtered_by_targets(experiment.well_layout.id, fake_targets).where(:experiment_id=>experiment.id, :stage_id=>stage_id).order_by_target(fake_targets)
   end
+  
+  def self.retrieve_all(experiment, stage_id, fake_targets)
+    filtered_by_targets(experiment.well_layout.id, fake_targets).unscope(:where).where(:experiment_id=>experiment.id, :stage_id=>stage_id).order_by_target(fake_targets)
+  end
 
   def self.maxid(experiment_id, stage_id)
     self.where(:experiment_id=>experiment_id, :stage_id=>stage_id).maximum(:id)

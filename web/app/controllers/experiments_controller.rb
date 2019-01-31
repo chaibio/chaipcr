@@ -1059,7 +1059,7 @@ class ExperimentsController < ApplicationController
         if first_stage_meltcurve_data
           begin
             task_submitted = background_calculate_melt_curve_data(@experiment, first_stage_meltcurve_data.id)
-            melt_curve_data = CachedMeltCurveDatum.retrieve(@experiment, first_stage_meltcurve_data.id, fake_targets)
+            melt_curve_data = CachedMeltCurveDatum.retrieve_all(@experiment, first_stage_meltcurve_data.id, fake_targets)
 
             if !task_submitted.nil? && (!@experiment.running? || melt_curve_data.blank?)
               #background task is submitted
@@ -1085,7 +1085,7 @@ class ExperimentsController < ApplicationController
 
           targets ||= []
           if fake_targets == false
-            melt_curve_data = melt_curve_data.with_samples.select("targets_wells.omit as omit, targets_wells.well_type as well_type, targets_wells.quantity_m as quantity_m, targets_wells.quantity_b as quantity_b").unscope(where: :targets_wells)
+            melt_curve_data = melt_curve_data.with_samples.select("targets_wells.omit as omit, targets_wells.well_type as well_type, targets_wells.quantity_m as quantity_m, targets_wells.quantity_b as quantity_b")
           end
           melt_curve_data.each do |data|
             if !data.respond_to?(:omit) || data.omit == 0
