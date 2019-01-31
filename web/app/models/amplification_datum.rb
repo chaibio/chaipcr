@@ -147,12 +147,16 @@ class AmplificationDatum < ActiveRecord::Base
     end
   end
 
-  scope :filter_by_targets, lambda {|well_layout_id| unscope(:select).select("amplification_data.*, targets_wells.target_id as target_id").joins("inner join targets_wells on targets_wells.well_num = amplification_data.well_num and targets_wells.well_layout_id = #{well_layout_id} inner join targets on targets.id=targets_wells.target_id and targets.channel = amplification_data.channel").where("targets_wells.omit=false")}
-
   attr_accessor :fluorescence_value
 
-  def self.retrieve(experiment_id, stage_id)
-    self.where(:experiment_id=>experiment_id, :stage_id=>stage_id).order(:channel, :well_num, :cycle_num).select("amplification_data.*, channel as target_id")
+  def self.retrieve(experiment, stage_id, filter_by_targets)
+    clause = self.where(:experiment_id=>experiment.id, :stage_id=>stage_id).order(:channel, :well_num, :cycle_num)
+    if filter_by_targets
+      clause = clause.select("amplification_data.*, targets_wells.target_id as target_id, targets.name as target_name").joins("inner join targets_wells on targets_wells.well_num = amplification_data.well_num and targets_wells.well_layout_id = #{experiment.well_layout_id} inner join targets on targets.id=targets_wells.target_id and targets.channel = amplification_data.channel").where("targets_wells.omit=false")
+    else
+      clause = clause.select("amplification_data.*, channel as target_id, #{Constants::FAKE_TARGET_NAME}")
+    end
+    clause
   end
 
   def self.maxid(experiment_id, stage_id)

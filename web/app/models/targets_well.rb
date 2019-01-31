@@ -22,15 +22,20 @@ class TargetsWell < ActiveRecord::Base
   TYPE_STANDARD = "standard"
   TYPE_UNKNOWN = "unknown"
 
+  FAKE_TARGET_1 = "Ch 1"
+  FAKE_TARGET_2 = "Ch 2"
+
   scope :for_experiment, lambda {|experiment| where(:well_layout_id=>experiment.well_layout.id)}
 
   scope :with_data, lambda {|experiment, stage|
     select("targets_wells.*, samples_wells.sample_id AS sample_id, amplification_curves.ct as cq, targets.name as target_name, targets.channel as channel, cached_standard_curve_data.equation as target_equation")
     .joins("inner join targets on targets.id = targets_wells.target_id left join amplification_curves on amplification_curves.well_num = targets_wells.well_num and amplification_curves.channel = targets.channel and amplification_curves.experiment_id=#{experiment.id} and amplification_curves.stage_id=#{stage.id} left join samples_wells on samples_wells.well_num = targets_wells.well_num AND samples_wells.well_layout_id = targets_wells.well_layout_id left join cached_standard_curve_data on cached_standard_curve_data.target_id=targets_wells.target_id and (cached_standard_curve_data.well_layout_id=targets_wells.well_layout_id or cached_standard_curve_data.well_layout_id=targets.well_layout_id)")
-    .where(["targets_wells.well_layout_id=? and targets_wells.omit=false and targets_wells.well_type is NOT NULL", experiment.well_layout.id])
-    .order("targets_wells.target_id, targets_wells.well_type, sample_id, quantity_m, quantity_b, targets_wells.well_num")
+    .where(["targets_wells.well_layout_id=?", experiment.well_layout.id])
+    .order("targets_wells.omit, targets_wells.well_type IS NULL, targets_wells.target_id, targets_wells.well_type, sample_id, quantity_m, quantity_b, targets_wells.well_num")
   }
   
+  scope :filtered, -> { where("targets_wells.omit=false and targets_wells.well_type is NOT NULL")}
+
   belongs_to :well_layout
   belongs_to :target
   
@@ -71,7 +76,10 @@ class TargetsWell < ActiveRecord::Base
     targets = []
     targets_wells << nil
     targets_wells.each do |target|
-      if lasttarget != nil && target != nil && lasttarget.target_id == target.target_id && lasttarget.well_type == target.well_type && lasttarget.sample_id == target.sample_id
+      if lasttarget != nil && target != nil &&
+         lasttarget.omit == false && target.omit == false &&
+         !lasttarget.well_type.nil? && !target.well_type.nil? &&
+         lasttarget.target_id == target.target_id && lasttarget.well_type == target.well_type && lasttarget.sample_id == target.sample_id
         replic = false
         if lasttarget.well_type == TYPE_STANDARD
           if lasttarget.quantity_m != nil && lasttarget.quantity_b != nil && lasttarget.quantity_m == target.quantity_m && lasttarget.quantity_b == target.quantity_b
@@ -88,12 +96,12 @@ class TargetsWell < ActiveRecord::Base
           if replic_group.empty?
             lasttarget.replic = replic_group_num
             cq_sum += lasttarget.cq if !lasttarget.cq.nil?
-            quantity_sum = BigDecimal.new("#{lasttarget.quantity[0]}e#{lasttarget.quantity[1]}") if !lasttarget.quantity_blank?
+            quantity_sum = BigDecimal.new(to_scientific_notation_str(lasttarget.quantity)) if !lasttarget.quantity_blank?
             replic_group << lasttarget
           end
           target.replic = replic_group_num
           cq_sum += target.cq if !target.cq.nil?
-          quantity_sum += BigDecimal.new("#{target.quantity[0]}e#{target.quantity[1]}") if !target.quantity_blank?
+          quantity_sum += BigDecimal.new(to_scientific_notation_str(target.quantity)) if !target.quantity_blank?
           replic_group << target
         end
       else
@@ -131,11 +139,38 @@ class TargetsWell < ActiveRecord::Base
 
   def self.fake_targets
     targets = []
-    targets << OpenStruct.new(:target_id => 1, :target_name=>"Ch 1", :target_equation=>nil)
-    targets << OpenStruct.new(:target_id => 2, :target_name=>"Ch 2", :target_equation=>nil)
+    targets << OpenStruct.new(:target_id => 1, :target_name=>FAKE_TARGET_1, :target_equation=>nil)
+    targets << OpenStruct.new(:target_id => 2, :target_name=>FAKE_TARGET_2, :target_equation=>nil) if Device.dual_channel?
     targets
   end
+  
+  def self.fake_targets?(experiment)
+    !TargetsWell.for_experiment(experiment).exists?
+  end
 
+  def initialize(data)
+    super(nil)
+    self.well_num = data.well_num
+    self.target_id = data.target_id
+
+    self.well_type = data.well_type if data.respond_to?(:well_type)
+    self.quantity_m = data.quantity_m if data.respond_to?(:quantity_m)
+    self.quantity_b = data.quantity_b if data.respond_to?(:quantity_b)
+    
+    if data.respond_to?(:omit)
+      self.omit = data.omit
+    else
+      self.omit = nil
+    end
+    
+    [:target_name, :channel, :sample_name, :tm].each do |method|
+      if data.respond_to?(method)
+        self.class.send(:define_method, method) { return instance_variable_get("@#{method}") }
+        instance_variable_set("@#{method}", data.__send__(method))
+      end
+    end
+  end
+  
   def mean_quantity
     @mean_quantity || [nil, nil]
   end
@@ -176,6 +211,14 @@ class TargetsWell < ActiveRecord::Base
     self.quantity.blank? || self.quantity[0].nil?
   end
 
+  def self.to_scientific_notation_str(arr)
+    if arr.blank? || arr[0].nil? || arr[1].nil?
+      return nil
+    else
+      return "#{arr[0]}e#{arr[1]}"
+    end
+  end
+  
   protected
 
   def self.decimal_to_scientific_notation(decimal)

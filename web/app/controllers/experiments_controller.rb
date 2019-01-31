@@ -606,15 +606,8 @@ class ExperimentsController < ApplicationController
               return
             end
 
-            @amplification_data = AmplificationDatum.retrieve(@experiment.id, @first_stage_collect_data.id)
-            if TargetsWell.for_experiment(@experiment).exists?
-              @amplification_data = @amplification_data.filter_by_targets(@experiment.well_layout.id)
-              fake_targets = false
-            else
-              fake_targets = true
-            end
-            @amplification_data = @amplification_data.to_a
-            
+            fake_targets = TargetsWell.fake_targets?(@experiment)
+            @amplification_data = AmplificationDatum.retrieve(@experiment, @first_stage_collect_data.id, !fake_targets).to_a
             if @amplification_data.blank? && !task_submitted.nil?
               #no data but background task is submitted
               render :nothing => true, :status => (task_submitted)? 202 : 503
@@ -697,7 +690,7 @@ class ExperimentsController < ApplicationController
           summary_data = AmplificationCurve.retrieve(@experiment.id, @first_stage_collect_data.id).select("channel as target_id").to_a
           targets = TargetsWell.fake_targets
         elsif params[:summary] == true && @first_stage_collect_data
-          summary_data = TargetsWell.with_data(@experiment, @first_stage_collect_data).to_a
+          summary_data = TargetsWell.filtered.with_data(@experiment, @first_stage_collect_data).to_a
           targets = TargetsWell.process_data(summary_data)
         else
           targets = nil
@@ -808,8 +801,10 @@ class ExperimentsController < ApplicationController
 
   api :GET, "/experiments/:id/melt_curve_data?raw=false&normalized=true&derivative=true&tm=true&ramp_id[]=43&ramp_id[]=44", "Retrieve melt curve data"
   example "{'partial':false, 'ramps':['ramp_id':22,
-            'melt_curve_data':[{'well_num':1, 'temperature':[0,1,2,3,4,5], 'normalized_data':[0,1,2,3,4,5], 'derivative_data':[0,1,2,3,4,5], 'tm':[1,2,3], 'area':[2,4,5]},
-                               {'well_num':2, 'temperature':[0,1,2,3,4,5], 'normalized_data':[0,1,2,3,4,5], 'derivative_data':[0,1,2,3,4,5], 'tm':[1,2,3], 'area':[2,4,5]}]]}"
+            'melt_curve_data':[{'well_num':1, 'target_id':1, 'temperature':[0,1,2,3,4,5], 'normalized_data':[0,1,2,3,4,5], 'derivative_data':[0,1,2,3,4,5], 'tm':[1,2,3], 'area':[2,4,5]},
+                               {'well_num':2, 'target_id':1, 'temperature':[0,1,2,3,4,5], 'normalized_data':[0,1,2,3,4,5], 'derivative_data':[0,1,2,3,4,5], 'tm':[1,2,3], 'area':[2,4,5]}]],
+            'targets':[{'target_id':1,'target_name':'Ch 1'},{'target_id':2,'target_name':'Ch 2'}]
+           }"
   def melt_curve_data
     params[:raw] = params[:raw].to_bool if !params[:raw].nil?
     params[:normalized] = params[:normalized].to_bool if !params[:normalized].nil?
@@ -852,7 +847,8 @@ class ExperimentsController < ApplicationController
               return
             end
 
-            @melt_curve_data = CachedMeltCurveDatum.retrieve(@experiment.id, @first_stage_meltcurve_data.id)
+            fake_targets = TargetsWell.fake_targets?(@experiment)
+            @melt_curve_data = CachedMeltCurveDatum.retrieve(@experiment, @first_stage_meltcurve_data.id, !fake_targets).to_a
 
             if @melt_curve_data.blank? && !task_submitted.nil?
               #no data but background task is submitted
@@ -888,9 +884,9 @@ class ExperimentsController < ApplicationController
 
             #query to database
             if !wheres.blank?
-              raw_data = MeltCurveDatum.for_experiment(@experiment.id).where(wheres).group_by_well.all
+              raw_data = MeltCurveDatum.for_experiment(@experiment.id).where(wheres).group_by_well.to_a
             else
-              raw_data = MeltCurveDatum.for_stage(@first_stage_meltcurve_data.id).for_experiment(@experiment.id).group_by_well.all
+              raw_data = MeltCurveDatum.for_stage(@first_stage_meltcurve_data.id).for_experiment(@experiment.id).group_by_well.to_a
             end
 
             if !analyze_required && !raw_data.blank?
@@ -918,27 +914,19 @@ class ExperimentsController < ApplicationController
           @melt_curve_data = raw_data
         end
 
+        if fake_targets == true
+          @targets = TargetsWell.fake_targets
+        end
+
         if !@melt_curve_data.blank?
           @melt_curve_data_group = []
           melt_curve_data_hash = @melt_curve_data.group_by { |obj| obj.ramp_id }
           melt_curve_data_hash.each do |ramp_id, data_array|
-            data_array.each do |data|
-              if params[:raw] == false && data.respond_to?(:fluorescence_data)
-                data.instance_eval 'undef :fluorescence_data'
-              end
-              if params[:normalized] == false && data.respond_to?(:normalized_data)
-                data.instance_eval 'undef :normalized_data'
-              end
-              if params[:derivative] == false && data.respond_to?(:derivative_data)
-                data.instance_eval 'undef :derivative_data'
-              end
-              if params[:tm] == false && data.respond_to?(:tm)
-                data.instance_eval 'undef :tm'
-                data.instance_eval 'undef :area'
-              end
-            end
             @melt_curve_data_group << OpenStruct.new(:ramp_id=>ramp_id, :melt_curve_data=>data_array)
           end
+          @targets ||= @melt_curve_data.uniq { |s| s.target_id }
+        else
+          @targets ||= []
         end
 
         respond_to do |format|
@@ -995,18 +983,26 @@ class ExperimentsController < ApplicationController
   api :GET, "/experiments/:id/export", "zip temperature, amplification and meltcurv csv files"
   def export
     t = Tempfile.new("tmpexport_#{request.remote_ip}")
+    experiment_dir = "qpcr_experiment_#{(@experiment)? @experiment.name : "null"}"
     begin
       Zip::OutputStream.open(t.path) do |out|
         if request.method != "HEAD"
-          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/temperature_log.csv")
+          out.put_next_entry("#{experiment_dir}/temperature_log.csv")
           out.write TemperatureLog.as_csv(params[:id])
         end
+
+        if request.method != "HEAD"
+          out.put_next_entry("#{experiment_dir}/experiment.csv")
+          out.write @experiment.as_csv
+        end
+
+        fake_targets = TargetsWell.fake_targets?(@experiment)
 
         first_stage_collect_data = Stage.collect_data(@experiment.experiment_definition_id).first
         if first_stage_collect_data
           begin
             task_submitted = background_calculate_amplification_data(@experiment, first_stage_collect_data.id)
-            amplification_data = AmplificationDatum.retrieve(@experiment, first_stage_collect_data.id)
+            amplification_data = AmplificationDatum.retrieve(@experiment, first_stage_collect_data.id, !fake_targets)
 
             if !task_submitted.nil? && (!@experiment.running? || amplification_data.blank?)
               #background task is submitted
@@ -1023,14 +1019,20 @@ class ExperimentsController < ApplicationController
           if request.method == "HEAD"
             amplification_data = nil
           else
-            cqs = AmplificationCurve.retrieve(@experiment, first_stage_collect_data.id)
             fluorescence_data = FluorescenceDatum.for_stage(first_stage_collect_data.id).for_experiment(@experiment.id)
+
+            if fake_targets == true
+              targets = AmplificationCurve.retrieve(@experiment.id, first_stage_collect_data.id).select("channel as target_id, #{Constants::FAKE_TARGET_NAME}").to_a
+            else
+              summary_data = TargetsWell.with_data(@experiment, first_stage_collect_data).joins("left join samples on samples.id = samples_wells.sample_id").select("samples.name as sample_name").to_a
+              targets = TargetsWell.process_data(summary_data)
+            end
           end
         end
 
         if amplification_data
-          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/amplification.csv")
-          columns = ["baseline_subtracted_value", "background_subtracted_value", "dr1_pred", "dr2_pred", "fluorescence_value", "channel", "well_num", "well_name", "cycle_num"]
+          out.put_next_entry("#{experiment_dir}/amplification.csv")
+          columns = ["baseline_subtracted_value", "background_subtracted_value", "dr1_pred", "dr2_pred", "fluorescence_value", "channel", "well_num", "target_name", "cycle_num"]
           fluorescence_index = 0
           csv_string = CSV.generate do |csv|
             csv << columns
@@ -1044,20 +1046,8 @@ class ExperimentsController < ApplicationController
               fluorescence_value = (fluorescence_index < fluorescence_data.length)? fluorescence_data[fluorescence_index].fluorescence_value : nil
               attributes = data.attributes
               attributes["fluorescence_value"] = fluorescence_value
-              attributes["well_name"] = well_name(data.well_num)
               csv << attributes.values_at(*columns)
               fluorescence_index += 1
-            end
-          end
-          out.write csv_string
-        end
-
-        if cqs
-          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/cq.csv")
-          csv_string = CSV.generate do |csv|
-            csv << ["channel", "well_num", "well_name", "cq"];
-            cqs.each do |cq|
-              csv << [cq.channel, cq.well_num, well_name(cq.well_num), cq.cq]
             end
           end
           out.write csv_string
@@ -1067,7 +1057,7 @@ class ExperimentsController < ApplicationController
         if first_stage_meltcurve_data
           begin
             task_submitted = background_calculate_melt_curve_data(@experiment, first_stage_meltcurve_data.id)
-            melt_curve_data = CachedMeltCurveDatum.retrieve(@experiment.id, first_stage_meltcurve_data.id)
+            melt_curve_data = CachedMeltCurveDatum.retrieve(@experiment, first_stage_meltcurve_data.id, !fake_targets)
 
             if !task_submitted.nil? && (!@experiment.running? || melt_curve_data.blank?)
               #background task is submitted
@@ -1087,28 +1077,49 @@ class ExperimentsController < ApplicationController
         end
 
         if melt_curve_data
-          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_data.csv")
-          columns = ["channel", "well_num", "well_name", "temperature", "normalized_data", "derivative_data"]
+          out.put_next_entry("#{experiment_dir}/melt_curve_data.csv")
+          columns = ["channel", "well_num", "target_name", "temperature", "normalized_data", "derivative_data"]
           out.write columns.to_csv
+
+          targets ||= []
+          if fake_targets == false
+            melt_curve_data = melt_curve_data.joins("left join samples on samples.id = samples_wells.sample_id").select("targets_wells.omit as omit, targets_wells.well_type as well_type, targets_wells.quantity_m as quantity_m, targets_wells.quantity_b as quantity_b, samples.name as sample_name").unscope(where: :omit)
+          end
           melt_curve_data.each do |data|
-            data.temperature.each_index do |index|
-              out.write "#{data.channel}, #{data.well_num}, #{well_name(data.well_num)}, #{data.temperature[index]}, #{data.normalized_data[index]}, #{data.derivative_data[index]}\r\n"
+            if !data.respond_to?(:omit) || data.omit == false
+              data.temperature.each_index do |index|
+                out.write "#{data.channel}, #{data.well_num}, #{data.target_name}, #{data.temperature[index]}, #{data.normalized_data[index]}, #{data.derivative_data[index]}\r\n"
+              end
+            end
+
+            index = targets.index { |x| x.well_num == data.well_num && x.target_id == data.target_id }
+            if index
+              targets[index].class.send(:define_method, :tm) { return @tm }
+              targets[index].instance_variable_set("@tm", data.tm)
+            else
+              targets.push(TargetsWell.new(data))
             end
           end
+        end
 
-          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_analysis.csv")
-          columns = ["channel", "well_num", "well_name", "Tm1", "Tm2", "Tm3", "Tm4", "area1", "area2", "area3", "area4"]
+        if targets
+          targets = targets.sort_by { |target| [target.well_num, target.target_name] }
+          out.put_next_entry("#{experiment_dir}/analysis.csv")
           csv_string = CSV.generate do |csv|
-            csv << columns
-            melt_curve_data.each do |data|
-              tm_arr = Array.new(4)
-              data.tm.each_index{|i| tm_arr[i] = data.tm[i]}
-              area_arr = Array.new(4)
-              data.area.each_index{|i| area_arr[i] = data.area[i]}
-              csv << [data.channel, data.well_num, well_name(data.well_num)]+tm_arr+area_arr
+            csv << ["well_num", "well", "omit", "sample_name", "target_type", "target_name", "channel", "cq", "cq_mean", "quantity", "quantity_mean", "Tm1", "Tm2", "Tm3", "Tm4"];
+            targets.each do |target|
+              csv << [target.well_num, well_name(target.well_num), 
+                      (target.respond_to?(:omit))? target.omit : nil, 
+                      (target.respond_to?(:sample_name))? target.sample_name : nil, 
+                      (target.respond_to?(:well_type))? target.well_type : nil, 
+                      target.target_name,
+                      target.channel, 
+                      target.cq, 
+                      (target.respond_to?(:mean_cq))? target.mean_cq : nil, 
+                      (target.respond_to?(:quantity))? TargetsWell.to_scientific_notation_str(target.quantity) : nil, 
+                      (target.respond_to?(:mean_quantity))? TargetsWell.to_scientific_notation_str(target.mean_quantity) : nil] + ((target.respond_to?(:tm))? target.tm : [nil, nil, nil, nil])
             end
           end
-
           out.write csv_string
         end
       end
@@ -1147,8 +1158,11 @@ class ExperimentsController < ApplicationController
   protected
 
   def well_name(well_num)
-    @wells ||= Well.wells(@experiment.id) if @experiment
-    (@wells && @wells[well_num])? @wells[well_num].sample_name : ""
+    if well_num >= 1 && well_num <= 8
+      return "A#{well_num}"
+    else
+      return "B#{well_num-8}"
+    end
   end
 
   def get_experiment

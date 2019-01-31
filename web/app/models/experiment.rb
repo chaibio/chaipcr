@@ -251,6 +251,13 @@ class Experiment < ActiveRecord::Base
       }
   end
   
+  def as_csv
+    CSV.generate do |csv|
+      csv << ["id", "name", "status", "status_message", "created on", "run on"]
+      csv << [id, name, completion_status, completion_message, created_at, started_at]
+    end
+  end
+  
   protected
   
   def validate
