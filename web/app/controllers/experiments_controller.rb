@@ -1112,7 +1112,7 @@ class ExperimentsController < ApplicationController
           csv_string = CSV.generate do |csv|
             csv << ["well_num", "well", "omit", "sample_name", "target_type", "target_name", "channel", "cq", "cq_mean", "quantity", "quantity_mean", "Tm1", "Tm2", "Tm3", "Tm4"];
             targets.each do |target|
-              csv << [target.well_num, well_name(target.well_num), 
+             fields = [target.well_num, well_name(target.well_num), 
                       (target.respond_to?(:omit))? target.omit : nil, 
                       (target.respond_to?(:sample_name))? target.sample_name : nil, 
                       (target.respond_to?(:well_type))? target.well_type : nil, 
@@ -1121,7 +1121,11 @@ class ExperimentsController < ApplicationController
                       target.cq, 
                       (target.respond_to?(:mean_cq))? target.mean_cq : nil, 
                       (target.respond_to?(:quantity))? TargetsWell.to_scientific_notation_str(target.quantity) : nil, 
-                      (target.respond_to?(:mean_quantity))? TargetsWell.to_scientific_notation_str(target.mean_quantity) : nil] + ((target.respond_to?(:tm))? target.tm : [nil, nil, nil, nil])
+                      (target.respond_to?(:mean_quantity))? TargetsWell.to_scientific_notation_str(target.mean_quantity) : nil]
+             if target.respond_to?(:tm) && !target.tm.blank?
+               fields.concat(target.tm)
+             end
+             csv << fields
             end
           end
           out.write csv_string
