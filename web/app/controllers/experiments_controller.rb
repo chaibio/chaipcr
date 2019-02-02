@@ -688,7 +688,7 @@ class ExperimentsController < ApplicationController
         #summary data
         summary_data = nil
         if fake_targets == true
-          summary_data = AmplificationCurve.retrieve(@experiment.id, @first_stage_collect_data.id).select("channel as target_id").to_a
+          summary_data = AmplificationCurve.retrieve(@experiment.id, @first_stage_collect_data.id).filtered_by_targets(@experiment.well_layout.id, fake_targets).to_a
           targets = TargetsWell.fake_targets
         elsif params[:summary] == true && @first_stage_collect_data
           summary_data = TargetsWell.filtered.with_data(@experiment, @first_stage_collect_data).to_a
