@@ -70,10 +70,10 @@ App.directive 'aspectRatio', [
         elem.css('width': width)
         elem.css('min-height': height)
         elem.css('height': height)        
-        elem.parent().children().get(1).style.height = height + "px"
-        angular.element(elem.parent().children().get(1)).children().get(1).style.height = height - $scope.offsetTop + "px"
+        elem.parent().children().last().get(0).style.height = height + "px"
+        angular.element(elem.parent().children().last().get(0)).children().last().get(0).style.height = height - $scope.offsetTop + "px"
 
-        element = elem.parent().children().get(1)
+        element = elem.parent().children().last().get(0)
         offsetWidth = element.getElementsByClassName('target-box')[0].offsetWidth if element.getElementsByClassName('target-box')[0]
         offsetHeight = element.getElementsByClassName('target-box')[0].offsetHeight if element.getElementsByClassName('target-box')[0]
         scrollHeight = element.getElementsByClassName('target-box')[0].scrollHeight if element.getElementsByClassName('target-box')[0]

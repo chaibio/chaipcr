@@ -345,7 +345,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               data = resp.data.steps[0]
 
               $scope.well_data = helper.normalizeSummaryData(data.summary_data, data.targets, $scope.well_targets)
-              $scope.targets = helper.normalizeWellTargetData($scope.well_data)
+              $scope.targets = helper.normalizeWellTargetData($scope.well_data, $scope.targets)
 
               for i in [0..$scope.targets.length - 1] by 1
                 $scope.targetsSetHided[$scope.targets[i].id] = true
@@ -488,7 +488,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
         if $scope.wellButtons['well_' + (well_item.well_num - 1)].selected and $scope.omittedIndexes.indexOf(index) == -1 and $scope.targetsSetHided[$scope.targets[index].id]
           for well_i in [0..$scope.well_data.length - 1]
-            $scope.well_data[well_i].active = (well_i == config.config.well * dual_value + config.config.channel - 1)
+            $scope.well_data[well_i].active = ($scope.well_data[well_i].well_num - 1 == config.config.well and $scope.well_data[well_i].channel == config.config.channel)
 
           for i in [0..15] by 1
             $scope.wellButtons["well_#{i}"].active = (i == config.config.well)
@@ -529,9 +529,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.onSelectRow = (well_item, index) ->
         if !$scope.has_init or (($scope.wellButtons['well_' + (well_item.well_num - 1)].selected) and ($scope.omittedIndexes.indexOf(index) == -1) and ($scope.targetsSetHided[$scope.targets[index].id]))
           if !well_item.active
-            $rootScope.$broadcast 'event:select-row', {well: well_item.well_num, channel: well_item.channel}
+            $rootScope.$broadcast 'event:amp-select-row', {well: well_item.well_num, channel: well_item.channel}
           else
-            $rootScope.$broadcast 'event:unselect-row', {well: well_item.well_num, channel: well_item.channel}
+            $rootScope.$broadcast 'event:amp-unselect-row', {well: well_item.well_num, channel: well_item.channel}
 
       $scope.onSelectLine = (config) ->
         $scope.bgcolor_target = { 'background-color':'black' }
@@ -541,7 +541,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         dual_value = if $scope.is_dual_channel then 2 else 1
 
         for well_i in [0..$scope.well_data.length - 1]
-          $scope.well_data[well_i].active = (well_i == config.config.well * dual_value + config.config.channel - 1)
+          $scope.well_data[well_i].active = ($scope.well_data[well_i].well_num - 1 == config.config.well and $scope.well_data[well_i].channel == config.config.channel)
 
         for i in [0..15] by 1
           $scope.wellButtons["well_#{i}"].active = (i == config.config.well)
@@ -658,7 +658,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                       $scope.well_targets[i].color = if $scope.well_targets[i] then $scope.lookupTargets[$scope.well_targets[i].id] else 'transparent'
 
                 $scope.well_data = helper.blankWellData($scope.is_dual_channel, $scope.well_targets)
-                $scope.targets = helper.normalizeWellTargetData($scope.well_data)
+                $scope.targets = helper.blankWellTargetData($scope.well_data)
                 for i in [0..$scope.targets.length - 1] by 1
                   $scope.targetsSetHided[$scope.targets[i].id] = true
 

@@ -604,6 +604,24 @@
       display: block;
       float: right;
       margin-top: 15px;
+
+      ul.data-point-type{
+        width: 90px;
+        margin-top: 24px;
+        li{
+          label{
+            width: 70px;
+            display: inline-block;
+            color: #333;
+            font-weight: 300;
+          }
+          img{
+            width: 14px;
+            display: inline-block;
+            vertical-align: middle;
+          }
+        }
+      }
     }
 
     .form-horizontal .editable
@@ -779,7 +797,7 @@
         padding: 0px;
       }
 
-      .selection-set{
+      .selection-set, .sub-selection-set{
         padding: 0; 
         background: transparent;
         box-shadow: 0 2px 3px rgba(0, 0, 0, 0.25);

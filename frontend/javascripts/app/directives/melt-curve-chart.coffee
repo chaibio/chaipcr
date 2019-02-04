@@ -43,10 +43,10 @@ window.App.directive 'meltCurveChart', [
 
           # $scope.onZoom()(chart.getTransform(), d.width, d.height, chart.getScaleExtent())
 
-        $scope.$on 'event:select-row', (e, data, oldData) ->
+        $scope.$on 'event:melt-select-row', (e, data, oldData) ->
           chart.activeLine(data, true)
         
-        $scope.$on 'event:unselect-row', (e, data, oldData) ->
+        $scope.$on 'event:melt-unselect-row', (e, data, oldData) ->
           chart.unsetActivePath()
 
         $scope.$on 'window:resize', ->

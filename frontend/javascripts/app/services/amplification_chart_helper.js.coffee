@@ -131,7 +131,27 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
       return channel_datasets
 
-    @normalizeWellTargetData = (well_data) ->
+    @normalizeWellTargetData = (well_data, init_targets) ->
+      well_data = angular.copy well_data
+      targets = angular.copy init_targets
+
+      for i in [0.. targets.length - 1] by 1
+        targets[i] = 
+          id: null
+          name: null
+          channel: null
+          color: null
+
+      for i in [0.. well_data.length - 1] by 1
+        targets[(well_data[i].well_num - 1) * 2 + well_data[i].channel - 1] = 
+          id: well_data[i].target_id
+          name: well_data[i].target_name
+          channel: well_data[i].channel
+          color: well_data[i].color        
+
+      return targets
+
+    @blankWellTargetData = (well_data) ->
       well_data = angular.copy well_data
       targets = []
 
@@ -236,7 +256,6 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           well_data.push dual_item
 
       return well_data
-
 
     @paddData = (cycle_num = 1) ->
       paddData = cycle_num: cycle_num

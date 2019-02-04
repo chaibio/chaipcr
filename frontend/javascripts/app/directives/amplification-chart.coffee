@@ -46,10 +46,10 @@ window.App.directive 'amplificationChart', [
           # $scope.onZoom()(chart.getTransform(), d.width, d.height, chart.getScaleExtent())
           # $scope.onUpdateProperties()($scope.label_cycle, $scope.label_RFU, $scope.label_dF_dC, $scope.label_D2_dc2)
         
-        $scope.$on 'event:select-row', (e, data, oldData) ->
+        $scope.$on 'event:amp-select-row', (e, data, oldData) ->
           chart.activeLine(data, true)
         
-        $scope.$on 'event:unselect-row', (e, data, oldData) ->
+        $scope.$on 'event:amp-unselect-row', (e, data, oldData) ->
           chart.unsetActivePath()
 
         $scope.$on 'window:resize', ->

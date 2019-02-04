@@ -22,6 +22,44 @@ App.service 'MeltCurveService', [
   (AmplificationChartHelper, Webworker) ->
     self = @
 
+    @COLORS = [
+        '#04A0D9'
+        '#1578BE'
+        '#2455A8'
+        '#3D3191'
+        '#75278E'
+        '#B01D8B'
+        '#FA1485'
+        '#FF0050'
+        '#EA244E'
+        '#FA3C00'
+        '#F0662D'
+        '#F6B014'
+        '#FCDF2B'
+        '#B7D436'
+        '#68BD43'
+        '#14A451'
+      ]
+
+    @SAMPLE_TARGET_COLORS = [
+        '#04A0D9'
+        '#2455A8'
+        '#75278E'
+        '#FA1485'
+        '#EA244E'
+        '#F0662D'
+        '#FCDF2B'
+        '#68BD43'
+        '#1578BE'
+        '#3D3191'
+        '#B01D8B'
+        '#FF0050'
+        '#FA3C00'
+        '#F6B014'
+        '#B7D436'
+        '#14A451'
+      ]
+
     self.defaultData = (is_dual_channel) ->
       datasets = {}
 
@@ -69,6 +107,75 @@ App.service 'MeltCurveService', [
 
       return well_data
 
+    @normalizeSummaryData = (summary_data, target_data, well_targets) ->
+      summary_data = angular.copy summary_data
+      target_data = angular.copy target_data
+      well_targets = angular.copy well_targets
+
+      well_data = []
+
+      for i in [0.. summary_data.length - 1] by 1
+        item = summary_data[i]
+        target = _.filter well_targets, (target) ->
+          target && target.id is item.target_id
+
+        if target.length
+          item['target_name'] = target[0].name if target[0]
+          item['channel'] = target[0].channel if target[0]
+          item['color'] = target[0].color if target[0]
+          item['well_type'] = target[0].well_type if target[0]
+        else
+          target = _.filter target_data, (target) ->
+            target.target_id is item.target_id
+          item['target_name'] = target[0].target_name if target[0]
+          item['channel'] = if item['target_name'] == 'Ch 1' then 1 else 2
+          item['color'] = if item['target_name'] == 'Ch 1' then @SAMPLE_TARGET_COLORS[0] else @SAMPLE_TARGET_COLORS[1]
+          item['well_type'] = ''
+
+        item['active'] = false        
+
+        well_data.push item
+
+      return well_data    
+
+    @normalizeChartData = (chart_data, target_data, well_targets) ->
+      chart_data = angular.copy chart_data
+      target_data = angular.copy target_data
+      well_targets = angular.copy well_targets
+
+      for i in [0.. chart_data.length - 1] by 1
+        item = chart_data[i]
+        target = _.filter well_targets, (target) ->
+          target && target.id is item.target_id
+
+        if target.length
+          chart_data[i]['channel'] = target[0].channel if target[0]
+        else
+          target = _.filter target_data, (target) ->
+            target.target_id is item.target_id
+          chart_data[i]['channel'] = if target[0]['target_name'] == 'Ch 1' then 1 else 2
+
+      return chart_data    
+
+    @normalizeWellTargetData = (well_data, is_dual_channel) ->
+      well_data = angular.copy well_data
+      channel_count = if is_dual_channel then 2 else 1
+      targets = []
+      for i in [0.. 16 * channel_count - 1] by 1
+        targets[i] = 
+          id: null
+          name: null
+          channel: null
+          color: null
+
+      for i in [0.. well_data.length - 1] by 1
+        targets[(well_data[i].well_num - 1) * 2 + well_data[i].channel - 1] = 
+          id: well_data[i].target_id
+          name: well_data[i].target_name
+          channel: well_data[i].channel
+          color: well_data[i].color        
+
+      return targets
 
     self.chartConfig = ->
       series = []
