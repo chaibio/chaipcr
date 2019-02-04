@@ -1193,12 +1193,14 @@ class ExperimentsController < ApplicationController
       wells = []
     end
     body = wells.map {|well| (well)? well.as_json_standard_curve : {}}
-    logger.info("body=#{body.to_json}")
     
     if body.blank?
+      logger.info("**********no targets, standard curve julia code is not called")
       return nil
     end
- 
+
+    logger.info("body=#{body.to_json}")
+
     background("standardcurve", experiment.id) do
       begin
         start_time = Time.now
@@ -1236,6 +1238,8 @@ class ExperimentsController < ApplicationController
       #update cache
       AmplificationDatum.import amplification_data, :on_duplicate_key_update => [:background_subtracted_value,:baseline_subtracted_value,:dr1_pred,:dr2_pred]
       AmplificationCurve.import cts, :on_duplicate_key_update => [:ct]
+
+      background_run_standard_curve(experiment)
     end
   end
 
@@ -1559,10 +1563,10 @@ class ExperimentsController < ApplicationController
       error = @@background_last_task.complete_result
       @@background_last_task = nil
       raise error
-    elsif @@background_task == nil
-      @@background_task = BackgroundTask.new(action, experiment_id, nil)
-      Thread.new do
+    elsif @@background_task == nil || Thread.current.thread_variable_get(:background_thread) == 1
+      thread_block = Proc.new {
         begin
+          Thread.current.thread_variable_set(:background_thread, 1)
           yield
         rescue => e
           logger.error ("background task error: #{e}")
@@ -1572,6 +1576,16 @@ class ExperimentsController < ApplicationController
           ActiveRecord::Base.connection.close
           @@background_task = nil
         end
+      }
+      if @@background_task != nil && Thread.current.thread_variable_get(:background_thread) == 1
+        #modify background_task
+        @@background_task.action = action
+        @@background_task.experiment_id = experiment_id
+        #already in background thread, no thread needs to be created
+        thread_block.call
+      else
+        @@background_task = BackgroundTask.new(action, experiment_id, nil)
+        Thread.new(&thread_block)
       end
       return true #background process is started
     elsif @@background_task.match?(action, experiment_id)
