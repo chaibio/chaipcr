@@ -392,7 +392,7 @@ echo Report filename is $build_report_filename
 cat &lt;&lt; EOF &gt; $build_report_filename
 &lt;section name=&quot;&quot; fontcolor=&quot;&quot;&gt;
     // To display a field
-     &lt;field name=&quot;eMMC&quot; titlecolor=&quot;&quot; value=&quot;&quot; detailcolor=&quot;&quot; href=&quot;&quot;&gt; 
+     &lt;field name=&quot;eMMC&quot; titlecolor=&quot;&quot; value=&quot;Download&quot; detailcolor=&quot;&quot; href=&quot;$full_emmc_url&quot;&gt; 
       &lt;![CDATA[ 
 eMMC image ($emmc_image_latest_compressed) &lt;a href=&quot;$full_emmc_url&quot; download=&quot;eMMC.img.tgz&quot;&gt;Download&lt;/a&gt;
     ]]&gt; &lt;/field&gt;
@@ -472,15 +472,15 @@ echo Report filename is $build_report_filename
 cat &lt;&lt; EOF &gt; $build_report_filename
 &lt;section name=&quot;&quot; fontcolor=&quot;&quot;&gt;
     // To display a field
-    &lt;field name=&quot;Upgrade Image&quot; titlecolor=&quot;&quot; value=&quot;&quot; detailcolor=&quot;&quot; href=&quot;&quot;&gt; 
+    &lt;field name=&quot;Upgrade Image&quot; titlecolor=&quot;&quot; value=&quot;Download&quot; detailcolor=&quot;&quot; href=&quot;$upgrade_image_url&quot;&gt; 
     &lt;![CDATA[ 
 Upgrade image (${output_image_prefix}_upgrade.img.tar) &lt;a href=&quot;$upgrade_image_url&quot; download=&quot;upgrade.img.tar&quot;&gt;Download&lt;/a&gt;
     ]]&gt; &lt;/field&gt;
-     &lt;field name=&quot;eMMC&quot; titlecolor=&quot;&quot; value=&quot;&quot; detailcolor=&quot;&quot; href=&quot;&quot;&gt; 
+     &lt;field name=&quot;eMMC&quot; titlecolor=&quot;&quot; value=&quot;Download&quot; detailcolor=&quot;&quot; href=&quot;$full_emmc_url&quot;&gt; 
       &lt;![CDATA[ 
 eMMC image ($emmc_image_latest_compressed) &lt;a href=&quot;$full_emmc_url&quot; download=&quot;eMMC.img.tgz&quot;&gt;Download&lt;/a&gt;
     ]]&gt; &lt;/field&gt;
-    &lt;field name=&quot;SDCard&quot; titlecolor=&quot;&quot; value=&quot;&quot; detailcolor=&quot;&quot; href=&quot;&quot;&gt; 
+    &lt;field name=&quot;SDCard&quot; titlecolor=&quot;&quot; value=&quot;Download&quot; detailcolor=&quot;&quot; href=&quot;$sdcard_url&quot;&gt; 
       &lt;![CDATA[ 
 SDCard image ($sdcard_filename) &lt;a href=&quot;$sdcard_url&quot; download=&quot;sdcard.img&quot;&gt;Download&lt;/a&gt;
     ]]&gt; &lt;/field&gt;
