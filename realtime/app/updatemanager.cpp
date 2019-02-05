@@ -102,7 +102,7 @@ void UpdateManager::startChecking()
 {
     stopChecking();
 
-    _updateTimer->schedule(Poco::Util::TimerTask::Ptr(new CheckTimerTask(std::bind(&UpdateManager::checkUpdateCallback, this, true), _updateEvent)), 3 * 60 * 1000, kUpdateInterval);
+    _updateTimer->schedule(Poco::Util::TimerTask::Ptr(new CheckTimerTask(std::bind(&UpdateManager::checkUpdateCallback, this, true), _updateEvent)), kUpdateStartDelay, kUpdateInterval);
 }
 
 void UpdateManager::stopChecking(bool wait)

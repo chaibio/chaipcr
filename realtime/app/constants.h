@@ -155,6 +155,7 @@ const long kAppSignalInterval = 50 * 1000 * 1000; //Nanosec
 //Http updage client
 
 //Updater
+const long kUpdateStartDelay = 15 * 60 * 1000;
 const long kUpdateInterval = 4 * 60 * 60 * 1000;
 
 const std::string kUpdateHost = "update.chaibio.com";
