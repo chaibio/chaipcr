@@ -148,25 +148,30 @@ class TargetsWell < ActiveRecord::Base
   end
 
   def initialize(data)
-    super(nil)
-    self.well_num = data.well_num
-    self.target_id = data.target_id
+    if data.is_a?(ActiveRecord::Base)
+      super(nil)
+      
+      self.well_num = data.well_num
+      self.target_id = data.target_id
 
-    self.well_type = data.well_type if data.respond_to?(:well_type)
-    self.quantity_m = data.quantity_m if data.respond_to?(:quantity_m)
-    self.quantity_b = data.quantity_b if data.respond_to?(:quantity_b)
+      self.well_type = data.well_type if data.respond_to?(:well_type)
+      self.quantity_m = data.quantity_m if data.respond_to?(:quantity_m)
+      self.quantity_b = data.quantity_b if data.respond_to?(:quantity_b)
     
-    if data.respond_to?(:omit)
-      self.omit = data.omit
-    else
-      self.omit = nil
-    end
-    
-    [:target_name, :channel, :sample_name, :tm].each do |method|
-      if data.respond_to?(method)
-        self.class.send(:define_method, method) { return instance_variable_get("@#{method}") }
-        instance_variable_set("@#{method}", data.__send__(method))
+      if data.respond_to?(:omit)
+        self.omit = data.omit
+      else
+        self.omit = nil
       end
+    
+      [:target_name, :channel, :sample_name, :tm].each do |method|
+        if data.respond_to?(method)
+          self.class.send(:define_method, method) { return instance_variable_get("@#{method}") }
+          instance_variable_set("@#{method}", data.__send__(method))
+        end
+      end
+    else
+      super(data)
     end
   end
   

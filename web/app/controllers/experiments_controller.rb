@@ -577,6 +577,7 @@ class ExperimentsController < ApplicationController
         if !@first_stage_collect_data.blank?
           last_cycle = FluorescenceDatum.last_cycle(@experiment.id, @first_stage_collect_data.id)
           @partial = (@experiment.running? && last_cycle < @first_stage_collect_data.num_cycles)
+          fake_targets = TargetsWell.fake_targets?(@experiment)
           analyze_required = params[:background] == true || params[:baseline] == true || params[:firstderiv] == true || params[:secondderiv] == true || params[:summary] == true
           if analyze_required
             begin
@@ -606,7 +607,6 @@ class ExperimentsController < ApplicationController
               return
             end
 
-            fake_targets = TargetsWell.fake_targets?(@experiment)
             @amplification_data = AmplificationDatum.retrieve(@experiment, @first_stage_collect_data.id, fake_targets).to_a
             if @amplification_data.blank? && !task_submitted.nil?
               #no data but background task is submitted
@@ -648,7 +648,6 @@ class ExperimentsController < ApplicationController
               fluorescence_data = FluorescenceDatum.for_stage(@first_stage_collect_data.id).for_experiment(@experiment.id)
             end
             fluorescence_data = fluorescence_data.filtered_by_targets(@experiment.well_layout.id, fake_targets).order_by_target(fake_targets).to_a
-
             if !analyze_required && !fluorescence_data.blank?
               #set etag
               fresh_when(:etag => generate_etag(@partial, fluorescence_data.last.cycle_num, standard_curve_pending))

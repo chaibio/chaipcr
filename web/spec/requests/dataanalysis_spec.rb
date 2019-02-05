@@ -133,6 +133,8 @@ describe "DataAnalysis API", type: :request do
     json["steps"][0]["step_id"].should eq(step.id)
     json["steps"][0]["amplification_data"].length.should == amplification_data_length(stage.num_cycles) 
     json["steps"][0]["amplification_data"][0].join(",").should eq("target_id,well_num,cycle_num,fluorescence_value")
+    json["steps"][0]["amplification_data"][1][0].should == 1
+    json["steps"][0]["amplification_data"][1][1].should == 1
     json["steps"][0]["summary_data"].should be_nil
   
     #data cached  
