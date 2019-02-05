@@ -254,7 +254,7 @@ class Experiment < ActiveRecord::Base
   def as_csv
     CSV.generate do |csv|
       csv << ["id", "name", "status", "status_message", "created on", "run on"]
-      csv << [id, name, completion_status, completion_message, created_at, started_at]
+      csv << [id, name, completion_status, completion_message, created_at.iso8601, started_at.iso8601]
     end
   end
   
