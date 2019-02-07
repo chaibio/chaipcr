@@ -55,9 +55,9 @@
             </div>
             <div class="ct-cq-container">
               <div ng-if="chartType == 'amplification'"> C<sub>q</sub> <strong class="value">{{ displayCt(well.ct[0]) }}</strong> </div>
-              <div ng-if="chartType == 'amplification'"> C<sub>q</sub> <strong class="value">{{ displayCt(well.ct[1]) }}</strong> </div>
+              <div ng-if="chartType == 'amplification' && isDual"> C<sub>q</sub> <strong class="value">{{ displayCt(well.ct[1]) }}</strong> </div>
               <div ng-if="chartType == 'melt-curve'"> T<sub>m</sub> 1: <strong class="value">{{ displayCt(well.ct[0]) }}</strong> </div>
-              <div ng-if="chartType == 'melt-curve'"> T<sub>m</sub> 1: <strong class="value">{{ displayCt(well.ct[1]) }}</strong> </div>
+              <div ng-if="chartType == 'melt-curve' && isDual"> T<sub>m</sub> 1: <strong class="value">{{ displayCt(well.ct[1]) }}</strong> </div>
             </div>
           </div>
         </td>

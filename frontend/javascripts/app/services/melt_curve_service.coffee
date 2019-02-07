@@ -201,7 +201,6 @@ App.service 'MeltCurveService', [
           ticks: 10
           tickFormat: (y) -># Math.round( y * 10 ) / 10
             Math.round(( y / 1000) * 10) / 10
-
       
       box:
         label:
