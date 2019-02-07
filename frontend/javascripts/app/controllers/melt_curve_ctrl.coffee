@@ -176,7 +176,7 @@ App.controller 'MeltCurveChartCtrl', [
         $scope.well_data = MeltCurveService.normalizeSummaryData(data.ramps[0].melt_curve_data, data.targets, $scope.well_targets)
         $scope.targets = MeltCurveService.normalizeWellTargetData($scope.well_data, $scope.is_dual_channel)
         for i in [0..$scope.targets.length - 1] by 1
-          $scope.targetsSetHided[$scope.targets[i].id] = true
+          $scope.targetsSetHided[$scope.targets[i]?.id] = true
 
         for well_data, well_i in $scope.well_data by 1
           if $scope.wellButtons["well_#{well_i}"].ct == undefined

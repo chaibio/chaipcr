@@ -172,7 +172,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
               $scope.targets = helper.normalizeWellTargetData($scope.well_data, $scope.targets)
 
               for i in [0..$scope.targets.length - 1] by 1
-                $scope.targetsSetHided[$scope.targets[i].id] = true
+                $scope.targetsSetHided[$scope.targets[i]?.id] = true
 
               AMPLI_DATA_CACHE = angular.copy data
 
@@ -484,7 +484,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
                 $scope.well_data = helper.blankWellData($scope.is_dual_channel, $scope.well_targets)
                 $scope.targets = helper.blankWellTargetData($scope.well_data)
                 for i in [0..$scope.targets.length - 1] by 1
-                  $scope.targetsSetHided[$scope.targets[i].id] = true
+                  $scope.targetsSetHided[$scope.targets[i]?.id] = true
 
                 $scope.updateTargetsSet()
                 updateSeries()
