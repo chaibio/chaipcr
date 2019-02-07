@@ -32,53 +32,59 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
     Device.isDualChannel().then (is_dual_channel) ->
       $scope.is_dual_channel = is_dual_channel
 
-      hasInit = false
       $scope.chartConfig = helper.chartConfig()
       $scope.chartConfig.channels = if is_dual_channel then 2 else 1
-      $scope.chartConfig.axes.x.max = $stateParams.max_cycle || 1
+      # $scope.chartConfig.axes.x.max = 1
       $scope.standardcurve_data = helper.paddData()
+      $scope.well_data = []
+      $scope.line_data = {target_line: []}
 
-      $scope.COLORS = helper.COLORS
+      $scope.COLORS = helper.SAMPLE_TARGET_COLORS
+      $scope.WELL_COLORS = helper.COLORS      
       AMPLI_DATA_CACHE = null
       retryInterval = null
       $scope.baseline_subtraction = true
-      $scope.curve_type = 'linear'
       $scope.color_by = 'well'
       $scope.retrying = false
       $scope.retry = 0
       $scope.fetching = false
       $scope.channel_1 = true
       $scope.channel_2 = if is_dual_channel then true else false
-      $scope.ampli_zoom = 0
+      $scope.standardcurve_zoom = 0
       $scope.showOptions = true
       $scope.isError = false
-      $scope.method = {name: 'Cy0'}
-      $scope.cy0 = {name:'Cy0', desciption:'A Cq calling method based on the max first derivative of the curve (recommended).'}
-      $scope.cpd2 = {name:'cpD2', desciption:'A Cq calling method based on the max second derivative of the curve.'}
-      $scope.minFl = {name: 'Min Flouresence', desciption:'The minimum fluorescence threshold for Cq calling. Cq values will not be called when the fluorescence is below this threshold.', value:null}
-      $scope.minCq = {name: 'Min Cycle', desciption:'The earliest cycle to use in Cq calling & baseline subtraction. Data for earlier cycles will be ignored.', value:null}
-      $scope.minDf = {name: 'Min 1st Derivative', desciption:'The threshold which the first derivative of the curve must exceed for a Cq to be called.', value:null}
-      $scope.minD2f = {name: 'Min 2nd Derivative', desciption:'The threshold which the second derivative of the curve must exceed for a Cq to be called.', value:null}
-      $scope.baseline_sub = 'auto'
-      $scope.baseline_auto = {name:'Auto', desciption:'Automatically detect the baseline cycles.'}
-      $scope.baseline_manual = {name:'Manual', desciption:'Manually specify the baseline cycles.'}
-      $scope.cyclesFrom = null
-      $scope.cyclesTo = null
-      $scope.hoverName = 'Min. Flouresence'
-      $scope.hoverDescription = 'This is a test description'
       $scope.samples = []
       $scope.types = []
       $scope.targets = []
       $scope.targetsSet = []
       $scope.targetsSetHided = []
-      $scope.samplesSet = []
-      $scope.editExpNameMode = []
-      $scope.editExpTargetMode = []
       $scope.omittedIndexes = []
+      $scope.well_targets = []
 
-      modal = document.getElementById('myModal')
-      span = document.getElementsByClassName("close")[0]
+      $scope.label_effic = ''
+      $scope.label_r2 = ''
+      $scope.label_slope = ''
+      $scope.label_yint = ''
 
+      $scope.index_target = 0
+      $scope.index_channel = -1
+      $scope.label_sample = null
+      $scope.label_target = "No Selection"
+      $scope.label_well = "No Selection"
+      $scope.label_channel = ""
+      $scope.label_plot = null
+
+      $scope.has_init = false
+      $scope.init_sample_color = '#ccc'
+
+      $scope.line_bgcolor_target = {
+        'background-color':'#666666'
+      }
+
+      $scope.plot_bgcolor_target = {
+        'background-color':'#666666'
+      }
+      
       $scope.toggleOmitIndex = (omit_index) ->
         if $scope.omittedIndexes.indexOf(omit_index) != -1
           $scope.omittedIndexes.splice $scope.omittedIndexes.indexOf(omit_index), 1
@@ -87,170 +93,28 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
         # alert $scope.omittedIndexes
         # return
         updateSeries()
-
-      $scope.$on 'expName:Updated', ->
-        $scope.experiment?.name = expName.name
-
-      $scope.openOptionsModal = ->
-        #$scope.showOptions = true
-        #Device.openOptionsModal()
-        modal.style.display = "block"
-
-      $scope.close = ->
-        modal.style.display = "none"
-        $scope.getStandardCurveOptions()
-
-      $scope.check = ->
-        $scope.errorCheck = false
-        if !$scope.minFl.value
-          $scope.hoverName = 'Error'
-          $scope.hoverDescription = 'Min Flourescence cannot be left empty'
-          $scope.hoverOn = true
-          $scope.errorCheck = true
-          $scope.errorFl = true
-        if !$scope.minCq.value
-          $scope.hoverName = 'Error'
-          $scope.hoverDescription = 'Min Cycles cannot be left empty'
-          $scope.hoverOn = true
-          $scope.errorCheck = true
-          $scope.errorCq = true
-        if $scope.minCq.value < 1 && $scope.minCq.value
-          $scope.hoverName = 'Error'
-          $scope.hoverDescription = 'Min Cycles should be greater than 0'
-          $scope.hoverOn = true
-          $scope.errorCheck = true
-          $scope.errorCq = true
-        if !$scope.minDf.value
-          $scope.hoverName = 'Error'
-          $scope.hoverDescription = 'Min 1st Derivative cannot be left empty'
-          $scope.hoverOn = true
-          $scope.errorCheck = true
-          $scope.errorDf = true
-        if !$scope.minD2f.value
-          $scope.hoverName = 'Error'
-          $scope.hoverDescription = 'Min 2nd Derivative cannot be left empty'
-          $scope.hoverOn = true
-          $scope.errorCheck = true
-          $scope.errorD2f = true
-        if $scope.baseline_sub != 'auto' && (!$scope.cyclesFrom || !$scope.cyclesTo)
-          $scope.hoverName = 'Error'
-          $scope.hoverDescription = 'Range for baseline cycles cannot be left empty'
-          $scope.hoverOn = true
-          $scope.errorCheck = true
-
-        if !$scope.errorCheck
-          if $scope.baseline_sub == 'auto'
-            $scope.baseline_cycle_bounds = null
-          else
-            $scope.baseline_cycle_bounds = [parseInt($scope.cyclesFrom), parseInt($scope.cyclesTo)]
-          Experiment
-          .updateStandardcurveOptions($stateParams.id,{'cq_method':$scope.method.name,'min_fluorescence': parseInt($scope.minFl.value), 'min_reliable_cycle': parseInt($scope.minCq.value), 'min_d1': parseInt($scope.minDf.value), 'min_d2': parseInt($scope.minD2f.value), 'baseline_cycle_bounds': $scope.baseline_cycle_bounds })
-          .then (resp) ->
-            $scope.standardcurve_data = helper.paddData()
-            $scope.hasData = false
-            for well_i in [0..15] by 1
-              $scope.wellButtons["well_#{well_i}"].ct = 0
-            $scope.close()
-            fetchFluorescenceData()
-          .catch (resp) ->
-            if resp != 'canceled'
-              $scope.hoverName = 'Error'
-              $scope.hoverDescription = resp.data || 'Unknown error'
-              $scope.hoverOn = true
-
-      $scope.hover = (model) ->
-        $scope.hoverName = model.name
-        $scope.hoverDescription = model.desciption
-        $scope.hoverOn = true
-
-      $scope.hoverLeave = ->
-        $scope.hoverOn = false
-
-      $scope.getStandardCurveOptions = ->
-        Experiment.getStandardCurveOptions($stateParams.id).then (resp) ->
-          $scope.method.name = resp.data.amplification_option.cq_method
-          $scope.minFl.value = resp.data.amplification_option.min_fluorescence
-          $scope.minCq.value = resp.data.amplification_option.min_reliable_cycle
-          $scope.minDf.value = resp.data.amplification_option.min_d1
-          $scope.minD2f.value = resp.data.amplification_option.min_d2
-          if resp.data.amplification_option.baseline_cycle_bounds is null
-            $scope.baseline_sub = 'auto'
-          else
-            $scope.baseline_sub = 'cycles'
-            $scope.cyclesFrom = resp.data.amplification_option.baseline_cycle_bounds[0]
-            $scope.cyclesTo = resp.data.amplification_option.baseline_cycle_bounds[1]
-        .catch (resp) ->
-          $scope.hoverName = 'Error'
-          $scope.hoverDescription = resp.data || 'Unknown error'
-          $scope.hoverOn = true
-
-      $scope.getStandardCurveOptions()
-
-      $scope.focusExpName = (index) ->
-        $scope.editExpNameMode[index] = true
-        focus('editExpNameMode')
-
-      $scope.updateSampleNameEnter = (well_num, name) ->
-        Experiment.updateWell($stateParams.id, well_num + 1, {'well_type':'sample','sample_name':name})
-        $scope.editExpNameMode[well_num] = false
-        if event.shiftKey
-          $scope.focusExpName(well_num - 1)
-        else
-          $scope.focusExpName(well_num + 1)
-        $scope.updateSamplesSet()
-        updateSeries()
-
-      $scope.updateSampleName = (well_num, name) ->
-        Experiment.updateWell($stateParams.id, well_num + 1, {'well_type':'sample','sample_name':name})
-        $scope.editExpNameMode[well_num] = false
-        $scope.updateSamplesSet()
-        updateSeries()
-
-      $scope.focusExpTarget = (index) ->
-        $scope.editExpTargetMode[index] = true
-        focus('editExpTargetMode')
-
-      $scope.updateTargetEnter = (well_num, target) ->
-        Experiment.updateWell($stateParams.id, well_num + 1, {'well_type':'sample','targets':[target]})
-        $scope.editExpTargetMode[well_num] = false
-        if event.shiftKey
-          $scope.focusExpTarget(well_num - 1)
-        else
-          $scope.focusExpTarget(well_num + 1)
-        $scope.updateTargetsSet()
-        updateSeries()
-
-      $scope.updateTarget = (well_num, target) ->
-        Experiment.updateWell($stateParams.id, well_num + 1, {'well_type':'sample','targets':[target]})
-        $scope.editExpTargetMode[well_num] = false
-        $scope.updateTargetsSet()
-        updateSeries()
-      
+    
       $scope.updateTargetsSet = ->
         $scope.targetsSet = []
-        for i in [0...16]
-          if $scope.targets[i] and $scope.targetsSet.indexOf($scope.targets[i]) < 0
-            $scope.targetsSet.push($scope.targets[i])
+        for i in [0...$scope.targets.length]
+          if $scope.targets[i].id
+            target = _.filter $scope.targetsSet, (target) ->
+              target.id is $scope.targets[i].id
+            if !target.length
+              $scope.targetsSet.push($scope.targets[i])
 
-      $scope.updateSamplesSet = ->
-        $scope.samplesSet = []
-        for i in [0...16]
-          if $scope.samples[i] and $scope.samplesSet.indexOf($scope.samples[i]) < 0
-            $scope.samplesSet.push($scope.samples[i])
-      
-      Experiment.getWells($stateParams.id).then (resp) ->
-        $scope.targetsSet = []
-        for i in [0...16]
-          $scope.samples[resp.data[i].well.well_num - 1] = resp.data[i].well.sample_name if resp.data[i]
-          $scope.types[resp.data[i].well.well_num - 1] = resp.data[i].well.well_type if resp.data[i]
-          $scope.targets[resp.data[i].well.well_num - 1] = resp.data[i].well.targets[0] if resp.data[i]
-        $scope.updateTargetsSet()
-        $scope.updateSamplesSet()
+      $scope.$watchCollection 'targetsSetHided', ->
         updateSeries()
+      
+      $scope.$on 'event:switch-chart-well', (e, data, oldData) ->
+        if !data.active
+          $scope.onUnselectLine()
+        wellScrollTop = (data.index + 1) * 36 * 2 + 36 - document.querySelector('.table-container').offsetHeight
+        angular.element(document.querySelector('.table-container')).animate { scrollTop: wellScrollTop }, 'fast'
 
       Experiment.get(id: $stateParams.id).then (data) ->
         maxCycle = helper.getMaxExperimentCycle(data.experiment)
-        $scope.chartConfig.axes.x.max = maxCycle
+        # $scope.chartConfig.axes.x.max = 1
         $scope.experiment = data.experiment
 
       $scope.$on 'status:data:updated', (e, data, oldData) ->
@@ -284,7 +148,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
         gofetch = false if $scope.retrying
         
         if gofetch
-          hasInit = true
+          $scope.has_init = true
           $scope.fetching = true
           
           Experiment
@@ -292,9 +156,6 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
           .then (resp) ->
             $scope.fetching = false
             $scope.error = null
-
-            console.log("stand3")
-            console.log(resp)
             
             if (resp.status is 200 and resp.data?.partial and $scope.enterState) or (resp.status is 200 and !resp.data.partial)
               $scope.hasData = true
@@ -303,18 +164,46 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
               $rootScope.$broadcast 'complete'
             if (resp.data.steps?[0].amplification_data and resp.data.steps?[0].amplification_data?.length > 1 and $scope.enterState) or (resp.data.steps?[0].amplification_data and resp.data.steps?[0].amplification_data?.length > 1 and !resp.data.partial)
               
-              $scope.chartConfig.axes.x.min = 1
+              # $scope.chartConfig.axes.x.min = 0
               $scope.hasData = true
               data = resp.data.steps[0]
-              data.amplification_data?.shift()
-              data.cq?.shift()
-              data.amplification_data = helper.neutralizeData(data.amplification_data, $scope.is_dual_channel)
+
+              $scope.well_data = helper.normalizeSummaryData(data.summary_data, data.targets, $scope.well_targets)
+              $scope.targets = helper.normalizeWellTargetData($scope.well_data, $scope.targets)
+
+              for i in [0..$scope.targets.length - 1] by 1
+                $scope.targetsSetHided[$scope.targets[i].id] = true
 
               AMPLI_DATA_CACHE = angular.copy data
-              $scope.standardcurve_data = data.amplification_data
-              
+
+              $scope.standardcurve_data = helper.neutralizeChartData(data.summary_data, data.targets, $scope.targets, $scope.is_dual_channel)
+              $scope.line_data = helper.neutralizeLineData(data.targets)
+
+              minQt = if $scope.well_data[0] then $scope.well_data[0].quantity else 0
+              maxQt = 0
+              minCq = if $scope.well_data[0] then $scope.well_data[0].cq else 0
+              maxCq = 0
+
+              for well_item in $scope.well_data by 1
+                if well_item.quantity <= minQt then minQt = well_item.quantity
+                if well_item.quantity >= maxQt then maxQt = well_item.quantity
+                if well_item.cq <= minCq then minCq = well_item.cq
+                if well_item.cq >= maxCq then maxCq = well_item.cq
+
+              maxQt = Math.log10(maxQt)
+              minQt = Math.log10(minQt)
+              gapX = maxQt - minQt
+              gapY = maxCq - minCq
+
+              $scope.chartConfig.axes.x.min = minQt - gapX * 0.05
+              $scope.chartConfig.axes.x.max = maxQt + gapX * 0.05
+              $scope.chartConfig.axes.y.min = minCq - gapY * 0.05
+              $scope.chartConfig.axes.y.max = maxCq + gapY * 0.05
+
+              $scope.updateTargetsSet()
               updateButtonCts()
               updateSeries()
+
 
             if ((resp.data?.partial is true) or (resp.status is 202)) and !$scope.retrying
               retry()
@@ -332,85 +221,222 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
         for well_i in [0..15] by 1
           cts = _.filter AMPLI_DATA_CACHE.summary_data, (ct) ->
             ct[1] is well_i+1
-          $scope.wellButtons["well_#{well_i}"].ct = [cts[0][2]]
-          $scope.wellButtons["well_#{well_i}"].ct.push cts[1][2] if cts[1]
+
+          $scope.wellButtons["well_#{well_i}"].ct = []
+          for ct_i in [0..cts.length - 1] by 1
+            $scope.wellButtons["well_#{well_i}"].ct.push(cts[ct_i][3])
         return
 
       updateSeries = (buttons) ->
         buttons = buttons || $scope.wellButtons || {}
         $scope.chartConfig.series = []
-        subtraction_type = if $scope.baseline_subtraction then 'baseline' else 'background'
+        nonGreySeries = []
         channel_count = if $scope.is_dual_channel then 2 else 1
         channel_end = if $scope.channel_1 && $scope.channel_2 then 2 else if $scope.channel_1 && !$scope.channel_2 then 1 else if !$scope.channel_1 && $scope.channel_2 then 2
         channel_start = if $scope.channel_1 && $scope.channel_2 then 1 else if $scope.channel_1 && !$scope.channel_2 then 1 else if !$scope.channel_1 && $scope.channel_2 then 2
-        for ch_i in [channel_start..channel_end] by 1
-          for i in [0..15] by 1
-            if $scope.omittedIndexes.indexOf(i) == -1
-              # alert(i)
-              if buttons["well_#{i}"]?.selected and !$scope.targetsSetHided[$scope.targetsSet.indexOf($scope.targets[i])]
 
+        $scope.chartConfig.line_series = []
+        for i in [0..$scope.line_data['target_line'].length - 1] by 1
+          well_color = '#c5c5c5'
+          if $scope.targetsSetHided[$scope.line_data['target_line'][i].id]
+            if $scope.color_by is 'target'
+              target = _.filter $scope.targets, (target) ->
+                target && target.id is $scope.line_data['target_line'][i].id
+              if target.length
+                well_color = target[0].color
+          else
+            well_color = 'transparent'
+          $scope.line_data['target_line'][i].color = well_color
+
+        for ch_i in [channel_start..channel_end] by 1
+          for i in [0..15] by 1            
+            if $scope.omittedIndexes.indexOf(getWellDataIndex(i + 1, ch_i)) == -1
+              # alert(i)
+              if buttons["well_#{i}"]?.selected and $scope.targets[i * channel_count + (ch_i - 1)] and $scope.targets[i * channel_count + (ch_i - 1)].id and $scope.targetsSetHided[$scope.targets[i * channel_count + (ch_i - 1)].id]
                 if $scope.color_by is 'well'
                   well_color = buttons["well_#{i}"].color
                 else if $scope.color_by is 'target'
-                  color_number = $scope.targetsSet.indexOf($scope.targets[i])
-                  if color_number < 0
-                    well_color = '#000000'
-                  else
-                    well_color = $scope.COLORS[color_number]
+                  well_color = if $scope.targets[(ch_i - 1)+i*channel_count] then $scope.targets[(ch_i - 1)+i*channel_count].color else 'transparent'
                 else if $scope.color_by is 'sample'
-                  color_number = $scope.samplesSet.indexOf($scope.samples[i])
-                  if color_number < 0
-                    well_color = '#000000'
-                  else
-                    well_color = $scope.COLORS[color_number]
+                  well_color = if $scope.samples[i] then $scope.samples[i].color else $scope.init_sample_color
+                  if ($scope.is_dual_channel and !$scope.targets[i*channel_count].id and !$scope.targets[i*channel_count+1].id) or (!$scope.is_dual_channel and !$scope.targets[i].id)
+                    well_color = 'transparent'
                 else if ch_i is 1
                   well_color = '#00AEEF'
                 else
                   well_color = '#8FC742'
 
-                $scope.chartConfig.series.push
-                  dataset: "channel_#{ch_i}"
-                  x: 'cycle_num'
-                  y: "well_#{i}_#{subtraction_type}#{if $scope.curve_type is 'log' then '_log' else ''}"
-                  color: well_color
-                  cq: $scope.wellButtons["well_#{i}"]?.ct
-                  well: i
-                  channel: ch_i
+                if $scope.color_by is 'sample'
+                  if well_color is $scope.init_sample_color
+                    $scope.chartConfig.series.push
+                      dataset: "well_#{i}_#{ch_i}"
+                      x: 'log_quantity'
+                      y: "cq"
+                      color: well_color
+                      cq: $scope.wellButtons["well_#{i}"]?.ct
+                      well: i
+                      channel: ch_i
+                      well_type: $scope.targets[i * channel_count + (ch_i - 1)].well_type
+                      target_id: $scope.targets[i * channel_count + (ch_i - 1)].id
+                  else
+                    nonGreySeries.push
+                      dataset: "well_#{i}_#{ch_i}"
+                      x: 'log_quantity'
+                      y: "cq"
+                      color: well_color
+                      cq: $scope.wellButtons["well_#{i}"]?.ct
+                      well: i
+                      channel: ch_i
+                      well_type: $scope.targets[i * channel_count + (ch_i - 1)].well_type
+                      target_id: $scope.targets[i * channel_count + (ch_i - 1)].id
+                else
+                  $scope.chartConfig.series.push
+                    dataset: "well_#{i}_#{ch_i}"
+                    x: 'log_quantity'
+                    y: "cq"
+                    color: well_color
+                    cq: $scope.wellButtons["well_#{i}"]?.ct
+                    well: i
+                    channel: ch_i
+                    well_type: $scope.targets[i * channel_count + (ch_i - 1)].well_type
+                    target_id: $scope.targets[i * channel_count + (ch_i - 1)].id
 
-      $scope.onZoom = (transform, w, h, scale_extent) ->
-        $scope.ampli_scroll = {
-          value: Math.abs(transform.x/(w*transform.k - w))
-          width: w/(w*transform.k)
-        }
-        $scope.ampli_zoom = (transform.k - 1)/ (scale_extent)
+        if $scope.color_by is 'sample'
+          for i in [0..nonGreySeries.length - 1] by 1
+            $scope.chartConfig.series.push(nonGreySeries[i])
 
+      getWellDataIndex = (well_num, channel) ->
+        for i in [0..$scope.well_data.length - 1] by 1
+          if $scope.well_data[i].well_num is well_num and $scope.well_data[i].channel is channel
+            return i
+        return -1
 
-      $scope.zoomIn = ->
-        $scope.ampli_zoom = Math.min($scope.ampli_zoom * 2 || 0.001 * 2, 1)
+      $scope.onUpdateProperties = (line_config) ->
+        $scope.label_effic = line_config.efficiency
+        $scope.label_r2 = line_config.r2
+        $scope.label_slope = line_config.slope
+        $scope.label_yint = line_config.offset
+        target = _.filter $scope.targets, (target) ->
+          target && target.id is line_config.id
 
-      $scope.zoomOut = ->
-        $scope.ampli_zoom = Math.max($scope.ampli_zoom * 0.5, 0.001)
+        if target.length
+          $scope.label_well = target[0].name
+          $scope.label_channel = target[0].channel          
+        $scope.line_bgcolor_target = { 'background-color':'black' }
+        for well_i in [0..$scope.well_data.length - 1]
+          $scope.well_data[well_i].active = false
 
-      $scope.onSelectLine = (config) ->
-        for i in [0..15] by 1
-          $scope.wellButtons["well_#{i}"].active = (i == config.config.well)
-
-      $scope.onUnselectLine = ->
         for i in [0..15] by 1
           $scope.wellButtons["well_#{i}"].active = false
 
-      $scope.$watch 'baseline_subtraction', (val) ->
-        updateSeries()
+      $scope.onHoverPlot = (plot_config) ->
+        $scope.onUnselectPlot()
+        $scope.label_plot = plot_config
 
-      $scope.$watch 'channel_1', (val) ->
-        updateSeries()
+      $scope.onZoom = (transform, w, h, scale_extent) ->
+        $scope.std_scroll = {
+          value: Math.abs(transform.x/(w*transform.k - w))
+          width: w/(w*transform.k)
+        }
+        $scope.standardcurve_zoom = (transform.k - 1)/ (scale_extent)
 
-      $scope.$watch 'channel_2', (val) ->
-        updateSeries()
 
-      $scope.$watch 'curve_type', (type) ->
-        $scope.chartConfig.axes.y.scale = type
-        updateSeries()
+      $scope.zoomIn = ->
+        $scope.standardcurve_zoom = Math.min($scope.standardcurve_zoom * 2 || 0.001 * 2, 1)
+
+      $scope.zoomOut = ->
+        $scope.standardcurve_zoom = Math.max($scope.standardcurve_zoom * 0.5, 0.001)
+
+      $scope.onSelectWell = (well_item, index) ->
+        config = {}
+        config.config = {}
+        config.config.well = well_item.well_num - 1
+        config.config.channel = well_item.channel
+
+        dual_value = if $scope.is_dual_channel then 2 else 1
+
+        if $scope.wellButtons['well_' + (well_item.well_num - 1)].selected and $scope.omittedIndexes.indexOf(index) == -1 and $scope.targetsSetHided[$scope.targets[index].id]
+          for well_i in [0..$scope.well_data.length - 1]
+            $scope.well_data[well_i].active = ($scope.well_data[well_i].well_num - 1 == config.config.well and $scope.well_data[well_i].channel == config.config.channel)
+
+          for i in [0..15] by 1
+            $scope.wellButtons["well_#{i}"].active = (i == config.config.well)
+            if(i == config.config.well)
+              $scope.index_target = i % 8
+              if (i < 8) 
+                $scope.index_channel = 1
+              else 
+                $scope.index_channel = 2
+
+              $scope.label_channel = config.config.channel
+              if i < $scope.targets.length
+                if $scope.targets[i]!=null
+                  $scope.label_target = $scope.targets[config.config.well * dual_value + config.config.channel - 1]
+                else
+                  $scope.label_target = ""
+              else 
+                $scope.label_target = ""
+
+              if i < $scope.targets.length
+                if $scope.samples[i]!=null
+                  $scope.label_sample = $scope.samples[i].name if $scope.samples[i]
+                else
+                  $scope.label_sample = null
+              else 
+                $scope.label_sample = null
+
+              # $scope.label_slope = 
+              # $scope.label_yint = 
+              wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8']
+
+        if $scope.label_target.name
+          $scope.line_bgcolor_target = { 'background-color':'black' }
+        else 
+          $scope.line_bgcolor_target = { 'background-color':'#666' }
+
+      $scope.onSelectRow = (well_item, index) ->
+        if !$scope.has_init or (($scope.wellButtons['well_' + (well_item.well_num - 1)].selected) and ($scope.omittedIndexes.indexOf(index) == -1) and ($scope.targetsSetHided[$scope.targets[index].id]))
+          if !well_item.active
+            $rootScope.$broadcast 'event:standard-select-row', {well: well_item.well_num, channel: well_item.channel, well_type: well_item.well_type}
+          else
+            $rootScope.$broadcast 'event:standard-unselect-row', {well: well_item.well_num, channel: well_item.channel, well_type: well_item.well_type }
+            $scope.onUnselectPlot()
+
+      $scope.onSelectPlot = (config) ->
+        $scope.plot_bgcolor_target = { 'background-color':'black' }
+        $scope.line_bgcolor_target = { 'background-color':'#666666' }
+        $scope.label_plot = config
+
+        # $scope.line_bgcolor_target = { 'background-color':config.config.color }
+        dual_value = if $scope.is_dual_channel then 2 else 1
+
+        for well_i in [0..$scope.well_data.length - 1]
+          $scope.well_data[well_i].active = ($scope.well_data[well_i].well_num - 1 == config.well and $scope.well_data[well_i].channel == config.channel)
+
+        for i in [0..15] by 1
+          $scope.wellButtons["well_#{i}"].active = (i == config.well)
+
+        wellScrollTop = (config.well * dual_value + config.channel - 1 + dual_value) * 36 - document.querySelector('.table-container').offsetHeight
+        angular.element(document.querySelector('.table-container')).animate { scrollTop: wellScrollTop }, 'fast'
+          
+      $scope.onUnselectLine = ->
+        $scope.label_well = "No Selection"
+        $scope.label_channel = ""
+        $scope.label_effic = ''
+        $scope.label_r2 = ''
+        $scope.label_slope = ''
+        $scope.label_yint = ''
+        $scope.line_bgcolor_target = {'background-color':'#666666'}
+
+      $scope.onUnselectPlot = ->
+        for well_i in [0..$scope.well_data.length - 1]
+          $scope.well_data[well_i].active = false
+
+        for i in [0..15] by 1
+          $scope.wellButtons["well_#{i}"].active = false
+
+        $scope.plot_bgcolor_target = {'background-color':'#666666'}
+        $scope.label_plot = null
 
       $scope.$watchCollection 'wellButtons', ->
         updateSeries()
@@ -419,14 +445,56 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
         $scope.$parent.chart
       , (chart) ->
         if chart is 'standard-curve'
-          fetchFluorescenceData()
-          Experiment.getWells($stateParams.id).then (resp) ->
-            for i in [0...16]
-              $scope.samples[resp.data[i].well.well_num - 1] = resp.data[i].well.sample_name if resp.data[i]
+          $scope.expTargets = []
+          $scope.lookupTargets = []
+          Experiment.getTargets($stateParams.id).then (resp_target) ->
+            for i in [0...resp_target.data.length]
+              $scope.expTargets[i] = resp_target.data[i].target
+              $scope.lookupTargets[resp_target.data[i].target.id] = $scope.COLORS[i % $scope.COLORS.length]
 
-          $timeout ->
-            $scope.showStandardChart = true
-          , 1000
+            $scope.expSamples = []
+            Experiment.getSamples($stateParams.id).then (response) ->
+              for i in [0...response.data.length]
+                $scope.expSamples[i] = response.data[i].sample
+
+              $scope.well_targets = []
+              Experiment.getWellLayout($stateParams.id).then (resp) ->
+                for i in [0...resp.data.length]
+                  $scope.samples[i] = if resp.data[i].samples then resp.data[i].samples[0] else null
+                  if $scope.samples[i]
+                    for j in [0...$scope.expSamples.length]
+                      if $scope.samples[i].id == $scope.expSamples[j].id
+                        $scope.samples[i].color = $scope.COLORS[j % $scope.COLORS.length]
+                        break
+                      else
+                        $scope.samples[i].color = $scope.init_sample_color
+                  if $scope.is_dual_channel
+                    $scope.well_targets[2*i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0]  else null
+                    $scope.well_targets[2*i+1] = if resp.data[i].targets && resp.data[i].targets[1] then resp.data[i].targets[1] else null
+
+                    if $scope.well_targets[2*i]
+                      $scope.well_targets[2*i].color = if $scope.well_targets[2*i] then $scope.lookupTargets[$scope.well_targets[2*i].id] else 'transparent'
+                    if $scope.well_targets[2*i+1]
+                      $scope.well_targets[2*i+1].color = if $scope.well_targets[2*i+1] then $scope.lookupTargets[$scope.well_targets[2*i+1].id] else 'transparent'
+                  else
+                    $scope.well_targets[i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0]  else null
+                    if $scope.well_targets[i]
+                      $scope.well_targets[i].color = if $scope.well_targets[i] then $scope.lookupTargets[$scope.well_targets[i].id] else 'transparent'
+
+                $scope.well_data = helper.blankWellData($scope.is_dual_channel, $scope.well_targets)
+                $scope.targets = helper.blankWellTargetData($scope.well_data)
+                for i in [0..$scope.targets.length - 1] by 1
+                  $scope.targetsSetHided[$scope.targets[i].id] = true
+
+                $scope.updateTargetsSet()
+                updateSeries()
+
+                fetchFluorescenceData()
+
+              $timeout ->
+                $rootScope.$broadcast 'event:start-resize-aspect-ratio'
+                $scope.showStandardChart = true
+              , 1000
         else
           $scope.showAmpliChart = false
           $scope.showStandardChart = false

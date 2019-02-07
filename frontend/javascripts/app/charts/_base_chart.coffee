@@ -1455,11 +1455,12 @@ class BaseChart
     ticks = @chartSVG.selectAll('g.axis.y-axis > g.tick')
     num_ticks = ticks.size()
     height = @height
+
     ticks.each (d, i) ->
       y = this.transform.baseVal.consolidate().matrix.f
       if (i is 0)
         textHeight = yAxisLowerExtremeValueText.node().getBBox().height
-        if y >  height - (textHeight + spacingY)
+        if y >  height - textHeight - spacingY - 20
           d3.select(this).attr('opacity', 0)
       if (i is num_ticks - 1)
         textHeight = yAxisUpperExtremeValueText.node().getBBox().height

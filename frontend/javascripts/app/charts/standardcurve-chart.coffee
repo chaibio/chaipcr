@@ -1,14 +1,33 @@
 class StandardCurveChart extends window.ChaiBioCharts.BaseChart
 
   DEFAULT_MIN_Y: 0
-  DEFAULT_MAX_Y: 10000
-  DEFAULT_MIN_X: 1
-  DEFAULT_MAX_X: 40
+  DEFAULT_MAX_Y: 2.5
+  DEFAULT_MIN_X: 0
+  DEFAULT_MAX_X: 1
+  DEFAULT_PT_SMALL_SIZE: 4
+  DEFAULT_PT_SIZE: 15
+  DEFAULT_PT_HOVER_SIZE: 18
+  DEFAULT_PT_ACTIVE_SIZE: 20
+
+  NORMAL_LINE_STROKE_WIDTH: 1.5
+  HOVERED_LINE_STROKE_WIDTH: 2.5
+  THICK_LINE_STROKE_WIDTH: 0.8
+
+  NORMAL_PLOT_STROKE_WIDTH: 0
+  HOVERED_PLOT_STROKE_WIDTH: 0.5
+  ACTIVED_PLOT_STROKE_WIDTH: 1
+
   MARGIN:
-    top: 10
-    left: 80
-    right: 10
-    bottom: 20
+    top: 20
+    left: 60
+    right: 20
+    bottom: 60
+
+  constructor: (@elem, @data, @config, @line_data) ->
+    # console.log('@data')
+    # console.log(@data)
+    # setTimeout(@initChart, 100)
+    @initChart()
 
   inK: ->
     @getMaxY() - @getMinY() > 20000
@@ -22,44 +41,24 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
   getLineCurve: ->
     if @config.axes.y.scale is 'log' then d3.curveMonotoneX else d3.curveBasis
 
-  # makeColoredLine: (line_config) ->
-  #   xScale = @getXScale()
-  #   yScale = @getYScale()
-  #   line = d3.line()
-  #   line.curve(@getLineCurve())
-  #   line.x (d) -> xScale(d[line_config.x])
-  #   line.y (d) -> yScale(d[line_config.y])
-  #   if (@config.axes.y.scale is 'log') then line.defined (d) -> d[line_config.y] > 10
-  #   _path = @viewSVG.append("path")
-  #       .datum(@data[line_config.dataset])
-  #       .attr("class", "colored-line")
-  #       .attr("stroke", line_config.color)
-  #       .attr('fill', 'none')
-  #       .attr("d", line)
-  #       .attr('stroke-width', @NORMAL_PATH_STROKE_WIDTH)
-  #       .on('click', (e, a, path) =>
-  #         el = _path.node()
-  #         # @setActivePath(_path, @getMousePosition(el))
-  #         @mouseMoveCb()
-  #       )
-  #       .on('mousemove', (e, a, path) =>
-  #         if (_path isnt @activePath)
-  #           _path.attr('stroke-width', @HOVERED_PATH_STROKE_WIDTH)
-  #           @hoveredLine = _path
-  #           @hovering = true
-  #         @mouseMoveCb()
-  #       )
-  #       .on('mouseout', (e, a, path) =>
-  #         if (_path isnt @activePath)
-  #           _path.attr('stroke-width', @NORMAL_PATH_STROKE_WIDTH)
-  #           @hovering = false
-  #       )
-
   getYExtremeValuesAllowance: ->
     max = @getMaxY()
     min = @getMinY()
     diff = max - min
     diff * 0.05
+
+  hasData: ->
+    return false if !@data
+    if @data and @config
+      if @config.series?.length > 0
+        if (@data[@config.series[0].dataset]?.length)
+          true
+        else
+          false
+      else
+        false
+    else
+      false
 
   computedMaxY: ->
     max = if angular.isNumber(@config.axes.y.max) then @config.axes.y.max else if @hasData() then @getMaxY() else @DEFAULT_MAX_Y
@@ -161,13 +160,15 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
       val = val.toString().replace(/(\d+)(\d{3})/, '$1'+','+'$2')
     return val
 
-  setYAxis: ->
+  setYAxis: (showLabel = true) ->
     @chartSVG.selectAll('g.axis.y-axis').remove()
     @chartSVG.selectAll('.g-y-axis-text').remove()
     svg = @chartSVG.select('.chart-g')
 
     min = @computedMinY()
     max = @computedMaxY()
+
+    @gapY = max - min
 
     @yScale = if @config.axes.y.scale is 'log' then d3.scaleLog() else d3.scaleLinear()
 
@@ -177,7 +178,7 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
       @yAxis = d3.axisLeft(@yScale)
       @yAxis.tickValues(ticks)
     else
-      @yScale.range([@height, 0]).domain([min, max])
+      @yScale.range([@height, 0]).domain([min - @gapY * 0.05, max + @gapY * 0.05])
       @yAxis = d3.axisLeft(@yScale)
       @yAxis.ticks(8)
       if @inK()
@@ -192,12 +193,60 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
           .call(@yAxis)
           .on('mouseenter', => @hideMouseIndicators())
 
-    
+    svg.append("line")
+    .attr("shape-rendering", "crispEdges")
+    .attr("class", "long-axis")
+    .attr("x1", 0)
+    .attr("y1", 0 - @height * 0.2)
+    .attr("x2", 0)
+    .attr("y2", @height * 1.2)
+    .style("stroke-width", 1)
+    .style("fill", "none");
+
     if @zoomTransform.rescaleY
       @gY.call(@yAxis.scale(@zoomTransform.rescaleY(@yScale)))
     #text label for the y axis
-    @setYAxisLabel()
+    if showLabel
+      @setYAxisLabel()
     @lastYScale = @yScale
+
+  setXAxis: (showLabel = true)->
+    @chartSVG.selectAll('g.axis.x-axis').remove()
+    @chartSVG.selectAll('.g-x-axis-text').remove()
+    svg = @chartSVG.select('.chart-g')
+    @xScale = d3.scaleLinear().range([0, @width])
+
+    min = if angular.isNumber(@config.axes.x.min) then @config.axes.x.min else if @hasData() then @getMinX() else @DEFAULT_MIN_X
+    max = if angular.isNumber(@config.axes.x.max) then @config.axes.x.max else if @hasData() then @getMaxX() else @DEFAULT_MAX_X
+    
+    @xScale.domain([min, max])
+
+    @xAxis = d3.axisBottom(@xScale)
+    if typeof @config.axes.x.tickFormat is 'function'
+      @xAxis.tickFormat (x) => @xAxisTickFormat(x)
+    @gX = svg.append("g")
+        .attr("class", "axis x-axis")
+        .attr('fill', 'none')
+        .attr("transform", "translate(0," + @height + ")")
+        .call(@xAxis)
+        .on('mouseenter', => @hideMouseIndicators())
+
+    svg.append("line")
+    .attr("shape-rendering", "crispEdges")
+    .attr("class", "long-axis")
+    .attr("x1", 0 - @width * 0.2)
+    .attr("y1", @height)
+    .attr("x2", @width * 1.2)
+    .attr("y2", @height)
+    .style("stroke-width", 1)
+    .style("fill", "none");
+
+    if @zoomTransform.rescaleX
+      @gX.call(@xAxis.scale(@zoomTransform.rescaleX(@xScale)))
+
+    # text label for the x axis
+    if showLabel
+      @setXAxisLabel()
 
   validateBackSpace: (loc, input) ->
     axis = if loc is 'y:min' or loc is 'y:max' then 'y' else 'x'
@@ -236,7 +285,6 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
         .style('width', "#{inputWidth + @INPUT_PADDING}px")
         .style('opacity', 1)
 
-
   onAxisInput: (loc, input, val) ->
     if @config.axes.y.scale is 'log' and (loc is 'y:min' or loc is 'y:max')
       val = val.replace(/[^0-9\.\-]/g, '')
@@ -269,6 +317,474 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
       val = val.toString()
       
     super
-    
+
+  activePlotRow: (well_data) ->
+    path = null
+    isStandard = if well_data.well_type is 'standard' then true else false
+    plot_config = null
+    if isStandard
+      for p, i in @std_plots by 1
+        if @config.series[i].well == well_data.well - 1 and @config.series[i].channel == well_data.channel
+          path = p.plot
+          plot_config = @config.series[i] 
+          break
+    else        
+      for p, i in @plots by 1
+        if @config.series[i].well == well_data.well - 1 and @config.series[i].channel == well_data.channel
+          path = p.plot
+          plot_config = @config.series[i] 
+          break
+
+      @setActivePlot(path, isStandard, plot_config)
+
+  getTargetLineConfig: (path) ->
+    activeLineConfig = null
+    activeLineIndex = null
+
+    for line, i in @target_lines by 1
+      if line is path
+        activeLineConfig = @line_data['target_line'][i]
+        activeLineIndex = i
+        break
+    return {
+      config: activeLineConfig,
+      index: activeLineIndex,
+    }
+
+  getPlotConfig: (path) ->
+    activePlotConfig = null
+    activePlotIndex = null
+
+    for p, i in @std_plots by 1
+      if p.plot is path
+        activePlotConfig = @config.series[i]
+        activePlotIndex = i
+        break
+
+    if !activePlotIndex
+      for p, i in @plots by 1
+        if p.plot is path
+          activePlotConfig = @config.series[i]
+          activePlotIndex = i
+          break
+
+    return {
+      config: activePlotConfig,
+      index: activePlotIndex,
+    }
+
+
+  setActiveTargetLine: (path, mouse) ->
+    @activeTargetLine = path
+    @activeTargetLine.attr('stroke-width', @NORMAL_LINE_STROKE_WIDTH)
+    @activeTargetLineConfig = @getTargetLineConfig(path)
+
+    if typeof @onUpdateProperties is 'function'
+      @onUpdateProperties(@activeTargetLineConfig.config)
+
+    @prevMousePosition = mouse
+    @deprioritItem()
+    @unselectPlot()
+
+  unselectTargetLine: () ->
+    if typeof @onUnselectLine is 'function'
+      @onUnselectLine()
+    @prioritItem()
+    @unselectPlot()
+
+  setActivePlot: (path, isStandard, plot_config) ->
+    line_index = -1
+    for l, i in @line_data['target_line'] by 1
+      if l.id is plot_config.target_id
+        line_index = i
+        break
+
+    @setActiveTargetLine(@target_lines[line_index], null)
+
+    if isStandard
+      @activeStdPlot = path
+      @activeStdPlot.attr('stroke-width', @ACTIVED_PLOT_STROKE_WIDTH + 1)
+      for plot in @plots by 1
+        if plot.well == plot_config.well and plot.channel == plot_config.channel
+          @activePlot = plot.plot
+          @activePlot.attr('stroke-width', @ACTIVED_PLOT_STROKE_WIDTH + 1)
+          break
+    else
+      @activePlot = path
+      @activePlot.attr('stroke-width', @ACTIVED_PLOT_STROKE_WIDTH)
+    @activePlotConfig = @getPlotConfig(path)
+
+    if typeof @onSelectPlot is 'function'
+      @onSelectPlot(@activePlotConfig.config)
+
+  prioritItem: () ->
+    for l in @target_lines by 1
+      l.attr('stroke-width', @NORMAL_LINE_STROKE_WIDTH)
+      l.attr('opacity', 1)
+    @activeTargetLine = null
+
+    for p in @plots by 1
+      p.plot.attr('opacity', 1)
+      p.plot.attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH)
+
+    for p in @std_plots by 1
+      p.plot.attr('opacity', 1)
+      p.plot.attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH + 1)
+
+  deprioritItem: () ->
+    for l in @target_lines by 1
+      if l isnt @activeTargetLine
+        l.attr('stroke-width', @THICK_LINE_STROKE_WIDTH)
+        l.attr('opacity', 0.5)
+
+    for p in @plots by 1
+      if p.target_id isnt @activeTargetLineConfig.config.id
+        p.plot.attr('opacity', 0.5)
+        p.plot.attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH)
+
+    for p in @std_plots by 1
+      if p.target_id isnt @activeTargetLineConfig.config.id
+        p.plot.attr('opacity', 0.5)
+        p.plot.attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH + 1)    
+
+  unselectPlot: ->
+    if @activePlot
+      @activePlot.attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH)
+      @activePlot = null
+    if @activeStdPlot
+      @activeStdPlot.attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH + 1)
+      @activeStdPlot = null
+
+    @activePlotConfig = null
+    if typeof @onUnSelectPlot is 'function'
+      @onUnSelectPlot()
+
+  initChart: ->
+
+    d3.select(@elem).selectAll("*").remove()
+    @width = @elem.parentElement.offsetWidth - @MARGIN.left - @MARGIN.right
+    @height = @elem.parentElement.offsetHeight - @MARGIN.top - @MARGIN.bottom
+
+    @zooomBehavior = d3.zoom()
+      .on 'start', => @isZooming = true
+      .on 'end', => @isZooming = false
+      .on 'zoom', => @zoomed()
+
+    @chartSVG = d3.select(@elem).append("svg")
+        .attr("width", @width + @MARGIN.left + @MARGIN.right)
+        .attr("height", @height + @MARGIN.top + @MARGIN.bottom)
+        .call(@zooomBehavior)
+
+    svg = @chartSVG.append("g")
+        .attr("transform", "translate(" + @MARGIN.left + "," + @MARGIN.top + ")")
+        .attr('class', 'chart-g')
+
+    @viewSVG = svg.append('svg')
+        .attr('width', @width)
+        .attr('height', @height)
+        .append('g')
+        .attr('width', @width)
+        .attr('height', @height)
+        .attr('class', 'viewSVG')
+
+    @setMouseOverlay()
+    @setYAxis()
+    @setXAxis()
+    @drawTargetLines()
+    @drawPlots()
+    @updateZoomScaleExtent()
+    @drawAxesExtremeValues()
+
+    if @activePlotConfig
+      if @activePlotConfig.config.well_type is 'standard'
+        @activeStdPlot = @std_plots[@activePlotConfig.index].plot
+        @activeStdPlot.attr('stroke-width', @ACTIVED_PLOT_STROKE_WIDTH + 1)
+        for plot in @plots by 1
+          if plot.well == plot_config.well and plot.channel == plot_config.channel
+            @activePlot = plot.plot
+            @activePlot.attr('stroke-width', @ACTIVED_PLOT_STROKE_WIDTH + 1)
+            break
+      else
+        @activePlot = @plots[@activePlotConfig.index].plot
+        @activePlot.attr('stroke-width', @ACTIVED_PLOT_STROKE_WIDTH)
+
+      if typeof @onSelectPlot is 'function'
+        @onSelectPlot(@activePlotConfig.config)
+
+  drawTargetLines: ->
+
+    xScale = @getXScale()
+    yScale = @getYScale()
+
+    @target_lines = @target_lines || []
+    for l in @target_lines by 1
+      l.remove()
+    @target_lines = []
+
+    if @hasData()
+      x1 = @config.axes.x.min
+      x2 = @config.axes.x.max
+      for s in @line_data['target_line'] by 1
+        y1 = s.slope * x1 + s.offset
+        y2 = s.slope * x2 + s.offset
+        if s.color != 'transparent'
+          _line = @viewSVG.append("line")
+              .attr("x1", xScale(x1))
+              .attr("y1", yScale(y1))
+              .attr("x2", xScale(x2))
+              .attr("y2", yScale(y2))
+              .attr("stroke-width", @NORMAL_LINE_STROKE_WIDTH)
+              .attr('stroke', s.color)
+              .style("fill", s.color)
+              .on('click', (e, a, path) =>
+                el = _line.node()                
+                @setActiveTargetLine(_line, @getMousePosition(el))
+                @onUnselectPlot()
+              )
+              .on('mousemove', (e, a, path) =>
+                if (_line isnt @activeTargetLine)
+                  _line.attr('stroke-width', @HOVERED_LINE_STROKE_WIDTH)
+                  @hoveredLine = _line
+                  @hovering = true
+              )
+              .on('mouseout', (e, a, path) =>
+                if (_line isnt @activeTargetLine)
+                  _line.attr('stroke-width', @NORMAL_LINE_STROKE_WIDTH)
+                  @hovering = false
+              )
+
+          @target_lines.push(_line)
+
+  drawPlots: ->
+    series = @config.series
+    return if not series
+
+    @plots = @plots || []
+    for l in @plots by 1
+      l.plot.remove()
+    @plots = []
+
+    for s in series by 1
+      @plots.push
+        well: s.well
+        channel: s.channel
+        target_id: s.target_id
+        plot: @makeColoredPlot(s)
+
+    @std_plots = @std_plots || []
+    for l in @std_plots by 1
+      l.plot.remove()
+    @std_plots = []
+
+    for s in series by 1
+      _path = @makeColoredStdPlot(s)
+      if _path
+        @std_plots.push
+          well: s.well
+          channel: s.channel
+          target_id: s.target_id
+          plot: _path
+
+
+    return
+
+  setHoverPlot: (plot_config, isHover = true)->
+    for plot in @plots by 1
+      if plot.well == plot_config.well and plot.channel == plot_config.channel
+        _path = plot.plot
+        if isHover
+          _path.attr('stroke-width', @HOVERED_PLOT_STROKE_WIDTH)
+          if typeof @onHoverPlot is 'function'
+            @onHoverPlot(plot_config)
+        else
+          _path.attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH)
+          if typeof @onHoverPlot is 'function'
+            @onHoverPlot(null)
+        break
+
+    if @activePlot
+      @activePlot.attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH)
+      @activePlot = null
+    if @activeStdPlot
+      @activeStdPlot.attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH + 1)
+      @activeStdPlot = null
+
+  makeColoredStdPlot: (plot_config)->
+    # alert('makeColoredLine')
+    xScale = @getXScale()
+    yScale = @getYScale()
+
+    plotPoint = 
+      draw: (context, size) =>
+        r = size / 2
+        context.moveTo(r, 0)
+        context.arc(0, 0, r, 0, Math.PI * 2)
+
+    _path = null
+    if plot_config.well_type isnt 'standard'
+      plot = d3.symbol().type(plotPoint).size(@DEFAULT_PT_SIZE)
+      _path = @viewSVG.append("path")
+          .data(@data[plot_config.dataset])
+          .attr("class", "point")
+          .attr("d", plot)
+          .attr("fill", 'transparent')
+          .attr('stroke', plot_config.color)
+          .attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH + 1)
+          .attr("transform", (d) => 
+            "translate(" + xScale(d[plot_config.x]) + "," + yScale(d[plot_config.y]) + ")rotate(45)"
+          )
+          .on('click', (e, a, path) =>
+            @setActivePlot(_path, true, plot_config)
+          )
+          .on('mousemove', (e, a, path) =>
+            if (_path isnt @activeStdPlot)
+              _path.attr('stroke-width', @HOVERED_PLOT_STROKE_WIDTH + 1)
+              @hoveredLine = _path
+              @hovering = true
+              @setHoverPlot(plot_config, true)
+          )
+          .on('mouseout', (e, a, path) =>
+            if (_path isnt @activeStdPlot)
+              _path.attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH + 1)
+              @hovering = false
+              @setHoverPlot(plot_config, false)
+          )
+    _path  
+
+  makeColoredPlot: (plot_config)->
+    # alert('makeColoredLine')
+    xScale = @getXScale()
+    yScale = @getYScale()
+
+    plotCross = 
+      draw: (context, size) =>
+        r = Math.sqrt(size / 20)
+        context.moveTo(-10 * r, -r)
+        context.lineTo(-r, -r)
+        context.lineTo(-r, -10 * r)
+        context.lineTo(r, -10 * r)
+        context.lineTo(r, -r)
+        context.lineTo(10 * r, -r)
+        context.lineTo(10 * r, r)
+        context.lineTo(r, r)
+        context.lineTo(r, 10 * r)
+        context.lineTo(-r, 10 * r)
+        context.lineTo(-r, r)
+        context.lineTo(-10 * r, r)
+        context.closePath()
+
+    plotPoint = 
+      draw: (context, size) =>
+        r = size / 2
+        context.moveTo(r, 0)
+        context.arc(0, 0, r, 0, Math.PI * 2)
+
+    if plot_config.well_type isnt 'standard'
+      plot = d3.symbol().type(plotPoint).size(@DEFAULT_PT_SMALL_SIZE)
+    else
+      plot = d3.symbol().type(plotCross).size(@DEFAULT_PT_SIZE)
+
+    _path = @viewSVG.append("path")
+        .data(@data[plot_config.dataset])
+        .attr("class", "point")
+        .attr("d", plot)
+        .attr("fill", plot_config.color)
+        .attr('stroke', plot_config.color)
+        .attr('stroke-location', 'outside')        
+        .attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH)
+        .attr("transform", (d) => 
+          "translate(" + xScale(d[plot_config.x]) + "," + yScale(d[plot_config.y]) + ")rotate(45)"
+        )
+        .on('click', (e, a, path) =>
+          @setActivePlot(_path, false, plot_config)
+        )
+        .on('mousemove', (e, a, path) =>
+          if (_path isnt @activePlot)
+            _path.attr('stroke-width', @HOVERED_PLOT_STROKE_WIDTH)
+            @hoveredLine = _path
+            @hovering = true
+            @setHoverPlot(plot_config, true)
+        )
+        .on('mouseout', (e, a, path) =>
+          if (_path isnt @activePlot)
+            _path.attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH)
+            @hovering = false
+            @setHoverPlot(plot_config, false)
+        )
+
+  updateData: (data, line_data) ->
+    @data = data
+    @line_data = line_data
+    @updateZoomScaleExtent()
+    setTimeout =>
+      @updateAxesExtremeValues()
+    , 500
+
+  onSelectPlot: (fn) ->
+    @onSelectPlot = fn
+
+  onUnselectPlot: (fn) ->
+    @onUnselectPlot = fn
+
+  onHoverPlot: (fn) ->
+    @onHoverPlot = fn
+
+  zoomed: ->
+    return if not d3.event
+    if d3.event.sourceEvent?.srcElement
+      if d3.event.sourceEvent.srcElement is @xAxisLeftExtremeValue.input.node()
+        @onClickLeftXAxisInput()
+      if d3.event.sourceEvent.srcElement is @xAxisRightExtremeValue.input.node()
+        @onClickRightXAxisInput()
+      if d3.event.sourceEvent.srcElement is @yAxisUpperExtremeValue.input.node()
+        @onClickUpperYAxisInput()
+      if d3.event.sourceEvent.srcElement is @yAxisLowerExtremeValue.input.node()
+        @onClickLowerYAxisInput()
+
+    transform = d3.event.transform
+    transform.x = transform.x || 0
+    transform.y = transform.y || 0
+    transform.k = transform.k || 0
+
+    if (transform.x > 0)
+      transform.x = 0
+
+    if (transform.x + (@width * transform.k) < @width)
+      transform.x = -(@width * transform.k - @width)
+
+    if (transform.y > 0)
+      transform.y = 0
+
+    if (transform.y + (@height * transform.k) < @height)
+      transform.y = -(@height * transform.k - @height)
+
+    if (transform.k < 1)
+      transform.k = 1
+
+    if (@editingYAxis)
+      @lastYScale = transform.rescaleY(@yScale)
+      @gY.call(@yAxis.scale(@lastYScale))
+    else
+      @lastXScale = transform.rescaleX(@xScale)
+      @gX.call(@xAxis.scale(@lastXScale))
+
+    @zoomTransform = transform
+    @updateAxesExtremeValues()
+
+    if (@onZoomAndPan and !@editingYAxis)
+      @onZoomAndPan(@zoomTransform, @width, @height, @getScaleExtent() - @getMinX() )
+
+    @drawTargetLines()
+    @drawPlots()
+
+  setMouseOverlay: ->
+    @mouseOverlay = @viewSVG.append('rect')
+        .attr('width', @width)
+        .attr('height', @height)
+        .attr('fill', 'transparent')
+        .on 'click', =>
+          @unselectTargetLine()
+          @onUnselectPlot()
+
 window.ChaiBioCharts = window.ChaiBioCharts || {}
 window.ChaiBioCharts.StandardCurveChart = StandardCurveChart

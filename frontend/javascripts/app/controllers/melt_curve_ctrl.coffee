@@ -200,7 +200,7 @@ App.controller 'MeltCurveChartCtrl', [
 
         for ch_i in [channel_start..channel_end] by 1
           for i in [0..15] by 1
-            if $scope.omittedIndexes.indexOf(i * channel_count + (ch_i - 1)) == -1
+            if $scope.omittedIndexes.indexOf(getWellDataIndex(i + 1, ch_i)) == -1
               if buttons["well_#{i}"]?.selected and $scope.targets[i * channel_count + (ch_i - 1)] and $scope.targets[i * channel_count + (ch_i - 1)].id and $scope.targetsSetHided[$scope.targets[i * channel_count + (ch_i - 1)].id]
                 if $scope.color_by is 'well'
                   well_color = buttons["well_#{i}"].color
@@ -250,6 +250,12 @@ App.controller 'MeltCurveChartCtrl', [
         if $scope.color_by is 'sample'
           for i in [0..nonGreySeries.length - 1] by 1
             $scope.config.series.push(nonGreySeries[i])
+
+      getWellDataIndex = (well_num, channel) ->
+        for i in [0..$scope.well_data.length - 1] by 1
+          if $scope.well_data[i].well_num is well_num and $scope.well_data[i].channel is channel
+            return i
+        return -1
 
       $scope.onUpdateProperties = (temp, norm, dF_dt) ->
         $scope.label_Temp = temp

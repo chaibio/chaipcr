@@ -9,6 +9,7 @@ window.App.directive 'standardCurveChart', [
       template: '<div></div>'
       scope:
         data: '='
+        lineData: '='
         config: '='
         scroll: '='
         zoom: '='
@@ -16,6 +17,9 @@ window.App.directive 'standardCurveChart', [
         onUpdateProperties: '&'
         onSelectLine: '&'
         onUnselectLine: '&'
+        onSelectPlot: '&'
+        onUnselectPlot: '&'
+        onHoverPlot: '&'
         show: '='
       link: ($scope, elem, attrs) ->
 
@@ -33,17 +37,22 @@ window.App.directive 'standardCurveChart', [
 
         initChart = ->
           return if !$scope.data or !$scope.config or !$scope.show
-          chart = new $window.ChaiBioCharts.StandardCurveChart(elem[0], $scope.data, $scope.config)
+          chart = new $window.ChaiBioCharts.StandardCurveChart(elem[0], $scope.data, $scope.config, $scope.lineData)
           chart.onZoomAndPan($scope.onZoom())
           chart.onSelectLine($scope.onSelectLine())
           chart.onUnselectLine($scope.onUnselectLine())
-
+          chart.onSelectPlot($scope.onSelectPlot())
+          chart.onUnselectPlot($scope.onUnselectPlot())
+          chart.onHoverPlot($scope.onHoverPlot())
           chart.onUpdateProperties($scope.onUpdateProperties())
 
           d = chart.getDimensions()
 
-          # $scope.onZoom()(chart.getTransform(), d.width, d.height, chart.getScaleExtent())
-          # $scope.onUpdateProperties()($scope.label_cycle, $scope.label_RFU, $scope.label_dF_dC, $scope.label_D2_dc2)
+        $scope.$on 'event:standard-select-row', (e, data, oldData) ->
+          chart.activePlotRow(data, true)
+        
+        $scope.$on 'event:standard-unselect-row', (e, data, oldData) ->
+          chart.unselectPlot()
         
         $scope.$on 'window:resize', ->
           chart.resize() if chart and $scope.show
@@ -61,16 +70,17 @@ window.App.directive 'standardCurveChart', [
           else
             # console.log('$scope.data')
             # console.log($scope.data)
-            chart.updateData($scope.data)
+            chart.updateData($scope.data, $scope.lineData)
             chart.updateConfig($scope.config)
 
             if $scope.show
               if isInterpolationChanged(val, oldState) or isBaseBackroundChanged(val, oldState)
                 initChart()
               else
-                chart.setYAxis()
-                chart.setXAxis()
-                chart.drawLines()
+                chart.setYAxis(false)
+                chart.setXAxis(false)
+                chart.drawTargetLines()
+                chart.drawPlots()
                 chart.updateAxesExtremeValues()
 
           oldState = angular.copy(val)
@@ -98,7 +108,8 @@ window.App.directive 'standardCurveChart', [
             if $scope.show
               chart.setYAxis()
               chart.setXAxis()
-              chart.drawLines()
+              chart.drawTargetLines()
+              chart.drawPlots()
               chart.updateAxesExtremeValues()
 
     }
