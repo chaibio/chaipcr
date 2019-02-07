@@ -320,10 +320,10 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
 
   activePlotRow: (well_data) ->
     path = null
-    isStandard = if well_data.well_type is 'standard' then true else false
+    isUnknown = if well_data.well_type isnt 'standard' then true else false
     plot_config = null
-    if isStandard
-      for p, i in @std_plots by 1
+    if isUnknown
+      for p, i in @unknown_plots by 1
         if @config.series[i].well == well_data.well - 1 and @config.series[i].channel == well_data.channel
           path = p.plot
           plot_config = @config.series[i] 
@@ -335,7 +335,7 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
           plot_config = @config.series[i] 
           break
 
-      @setActivePlot(path, isStandard, plot_config)
+    @setActivePlot(path, isUnknown, plot_config)
 
   getTargetLineConfig: (path) ->
     activeLineConfig = null
@@ -355,7 +355,7 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
     activePlotConfig = null
     activePlotIndex = null
 
-    for p, i in @std_plots by 1
+    for p, i in @unknown_plots by 1
       if p.plot is path
         activePlotConfig = @config.series[i]
         activePlotIndex = i
@@ -392,18 +392,18 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
     @prioritItem()
     @unselectPlot()
 
-  setActivePlot: (path, isStandard, plot_config) ->
+  setActivePlot: (path, isUnknown, plot_config) ->
     line_index = -1
     for l, i in @line_data['target_line'] by 1
       if l.id is plot_config.target_id
         line_index = i
-        break
+        break    
 
     @setActiveTargetLine(@target_lines[line_index], null)
 
-    if isStandard
-      @activeStdPlot = path
-      @activeStdPlot.attr('stroke-width', @ACTIVED_PLOT_STROKE_WIDTH + 1)
+    if isUnknown
+      @activeUnknownPlot = path
+      @activeUnknownPlot.attr('stroke-width', @ACTIVED_PLOT_STROKE_WIDTH + 1)
       for plot in @plots by 1
         if plot.well == plot_config.well and plot.channel == plot_config.channel
           @activePlot = plot.plot
@@ -427,7 +427,7 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
       p.plot.attr('opacity', 1)
       p.plot.attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH)
 
-    for p in @std_plots by 1
+    for p in @unknown_plots by 1
       p.plot.attr('opacity', 1)
       p.plot.attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH + 1)
 
@@ -442,7 +442,7 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
         p.plot.attr('opacity', 0.5)
         p.plot.attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH)
 
-    for p in @std_plots by 1
+    for p in @unknown_plots by 1
       if p.target_id isnt @activeTargetLineConfig.config.id
         p.plot.attr('opacity', 0.5)
         p.plot.attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH + 1)    
@@ -451,9 +451,9 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
     if @activePlot
       @activePlot.attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH)
       @activePlot = null
-    if @activeStdPlot
-      @activeStdPlot.attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH + 1)
-      @activeStdPlot = null
+    if @activeUnknownPlot
+      @activeUnknownPlot.attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH + 1)
+      @activeUnknownPlot = null
 
     @activePlotConfig = null
     if typeof @onUnSelectPlot is 'function'
@@ -496,9 +496,9 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
     @drawAxesExtremeValues()
 
     if @activePlotConfig
-      if @activePlotConfig.config.well_type is 'standard'
-        @activeStdPlot = @std_plots[@activePlotConfig.index].plot
-        @activeStdPlot.attr('stroke-width', @ACTIVED_PLOT_STROKE_WIDTH + 1)
+      if @activePlotConfig.config.well_type isnt 'standard'
+        @activeUnknownPlot = @unknown_plots[@activePlotConfig.index].plot
+        @activeUnknownPlot.attr('stroke-width', @ACTIVED_PLOT_STROKE_WIDTH + 1)
         for plot in @plots by 1
           if plot.well == plot_config.well and plot.channel == plot_config.channel
             @activePlot = plot.plot
@@ -571,15 +571,15 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
         target_id: s.target_id
         plot: @makeColoredPlot(s)
 
-    @std_plots = @std_plots || []
-    for l in @std_plots by 1
+    @unknown_plots = @unknown_plots || []
+    for l in @unknown_plots by 1
       l.plot.remove()
-    @std_plots = []
+    @unknown_plots = []
 
     for s in series by 1
-      _path = @makeColoredStdPlot(s)
+      _path = @makeColoredUnknownPlot(s)
       if _path
-        @std_plots.push
+        @unknown_plots.push
           well: s.well
           channel: s.channel
           target_id: s.target_id
@@ -605,11 +605,11 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
     if @activePlot
       @activePlot.attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH)
       @activePlot = null
-    if @activeStdPlot
-      @activeStdPlot.attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH + 1)
-      @activeStdPlot = null
+    if @activeUnknownPlot
+      @activeUnknownPlot.attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH + 1)
+      @activeUnknownPlot = null
 
-  makeColoredStdPlot: (plot_config)->
+  makeColoredUnknownPlot: (plot_config)->
     # alert('makeColoredLine')
     xScale = @getXScale()
     yScale = @getYScale()
@@ -637,14 +637,14 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
             @setActivePlot(_path, true, plot_config)
           )
           .on('mousemove', (e, a, path) =>
-            if (_path isnt @activeStdPlot)
+            if (_path isnt @activeUnknownPlot)
               _path.attr('stroke-width', @HOVERED_PLOT_STROKE_WIDTH + 1)
               @hoveredLine = _path
               @hovering = true
               @setHoverPlot(plot_config, true)
           )
           .on('mouseout', (e, a, path) =>
-            if (_path isnt @activeStdPlot)
+            if (_path isnt @activeUnknownPlot)
               _path.attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH + 1)
               @hovering = false
               @setHoverPlot(plot_config, false)

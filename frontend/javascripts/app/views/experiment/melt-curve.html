@@ -198,7 +198,7 @@ limitations under the License.
                 selected: !has_init || (
                   (wellButtons['well_' + (well_item.well_num - 1)].selected) && 
                   (omittedIndexes.indexOf($index) == -1) && 
-                  (targetsSetHided[targets[$index].id])),
+                  (targetsSetHided[targets[config.channels * (well_item.well_num - 1) + well_item.channel - 1].id])),
                 active: well_item.active
               }"
               ng-if="well_item.target_id"
@@ -214,7 +214,7 @@ limitations under the License.
                 <span 
                   ng-if="color_by==='target'" 
                   class="B2-Amplification dot" 
-                  ng-attr-style="background-color: {{targets[chartConfig.channels * (well_item.well_num - 1) + well_item.channel - 1].color}}"></span>
+                  ng-attr-style="background-color: {{targets[config.channels * (well_item.well_num - 1) + well_item.channel - 1].color}}"></span>
               </td>
               <td class="B2-Amplification" style="border-top-left-radius: 3px;border-bottom-left-radius: 3px;">
                 <div 

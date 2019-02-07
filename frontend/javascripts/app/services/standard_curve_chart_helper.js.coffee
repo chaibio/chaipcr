@@ -182,7 +182,7 @@ window.ChaiBioTech.ngApp.service 'StandardCurveChartHelper', [
 
       return datasets
 
-    @normalizeWellTargetData = (well_data, init_targets) ->
+    @normalizeWellTargetData = (well_data, init_targets, is_dual_channel) ->
       well_data = angular.copy well_data
       targets = angular.copy init_targets
 
@@ -194,8 +194,10 @@ window.ChaiBioTech.ngApp.service 'StandardCurveChartHelper', [
           color: null
           well_type: null
 
+      channel_count = if is_dual_channel then 2 else 1
+
       for i in [0.. well_data.length - 1] by 1
-        targets[(well_data[i].well_num - 1) * 2 + well_data[i].channel - 1] = 
+        targets[(well_data[i].well_num - 1) * channel_count + well_data[i].channel - 1] = 
           id: well_data[i].target_id
           name: well_data[i].target_name
           channel: well_data[i].channel

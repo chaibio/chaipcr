@@ -169,7 +169,7 @@ App.service 'MeltCurveService', [
           color: null
 
       for i in [0.. well_data.length - 1] by 1
-        targets[(well_data[i].well_num - 1) * 2 + well_data[i].channel - 1] = 
+        targets[(well_data[i].well_num - 1) * channel_count + well_data[i].channel - 1] = 
           id: well_data[i].target_id
           name: well_data[i].target_name
           channel: well_data[i].channel

@@ -215,7 +215,7 @@ limitations under the License.
                 selected: !has_init || (
                   (wellButtons['well_' + (well_item.well_num - 1)].selected) && 
                   (omittedIndexes.indexOf($index) == -1) && 
-                  (targetsSetHided[targets[$index].id])),
+                  (targetsSetHided[targets[chartConfig.channels * (well_item.well_num - 1) + well_item.channel - 1].id])),
                 active: well_item.active
               }"
               ng-if="well_item.target_id"

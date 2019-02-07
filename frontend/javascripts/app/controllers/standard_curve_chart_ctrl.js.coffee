@@ -109,7 +109,8 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
       $scope.$on 'event:switch-chart-well', (e, data, oldData) ->
         if !data.active
           $scope.onUnselectLine()
-        wellScrollTop = (data.index + 1) * 36 * 2 + 36 - document.querySelector('.table-container').offsetHeight
+        channel_count = if $scope.is_dual_channel then 2 else 1
+        wellScrollTop = (data.index * channel_count + channel_count) * 36 - document.querySelector('.table-container').offsetHeight
         angular.element(document.querySelector('.table-container')).animate { scrollTop: wellScrollTop }, 'fast'
 
       Experiment.get(id: $stateParams.id).then (data) ->
@@ -169,7 +170,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
               data = resp.data.steps[0]
 
               $scope.well_data = helper.normalizeSummaryData(data.summary_data, data.targets, $scope.well_targets)
-              $scope.targets = helper.normalizeWellTargetData($scope.well_data, $scope.targets)
+              $scope.targets = helper.normalizeWellTargetData($scope.well_data, $scope.targets, $scope.is_dual_channel)
 
               for i in [0..$scope.targets.length - 1] by 1
                 $scope.targetsSetHided[$scope.targets[i]?.id] = true

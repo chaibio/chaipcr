@@ -30,7 +30,6 @@ App.controller 'MeltCurveChartCtrl', [
   ($scope, Experiment, $stateParams, MeltCurveService, $timeout, $interval, $rootScope, focus, Device, helper) ->
     Device.isDualChannel().then (is_dual_channel) ->
       $scope.is_dual_channel = is_dual_channel
-      # $scope.is_dual_channel = false
 
       $scope.curve_type = 'derivative'
       $scope.color_by = 'well'
@@ -111,7 +110,8 @@ App.controller 'MeltCurveChartCtrl', [
       $scope.$on 'event:switch-chart-well', (e, data, oldData) ->
         if !data.active
           $scope.onUnselectLine()
-        wellScrollTop = (data.index + 1) * 36 * 2 + 36 - document.querySelector('.table-container').offsetHeight
+        channel_count = if $scope.is_dual_channel then 2 else 1
+        wellScrollTop = (data.index * channel_count + channel_count) * 36 - document.querySelector('.table-container').offsetHeight
         angular.element(document.querySelector('.table-container')).animate { scrollTop: wellScrollTop }, 'fast'
 
       $scope.$on 'status:data:updated', (e, data, oldData) ->
@@ -174,7 +174,9 @@ App.controller 'MeltCurveChartCtrl', [
 
       updateButtonTms = (data) ->
         $scope.well_data = MeltCurveService.normalizeSummaryData(data.ramps[0].melt_curve_data, data.targets, $scope.well_targets)
-        $scope.targets = MeltCurveService.normalizeWellTargetData($scope.well_data, $scope.is_dual_channel)
+        $scope.targets = MeltCurveService.normalizeWellTargetData($scope.well_data, $scope.is_dual_channel)        
+
+        $scope.targetsSetHided = []
         for i in [0..$scope.targets.length - 1] by 1
           $scope.targetsSetHided[$scope.targets[i]?.id] = true
 
@@ -321,6 +323,7 @@ App.controller 'MeltCurveChartCtrl', [
                         $scope.well_targets[i].color = if $scope.well_targets[i] then $scope.lookupTargets[$scope.well_targets[i].id] else 'transparent'
                   
                   $scope.targets = $scope.well_targets
+                  $scope.targetsSetHided = []
                   for i in [0..$scope.targets.length - 1] by 1
                     $scope.targetsSetHided[$scope.targets[i]?.id] = true
 
