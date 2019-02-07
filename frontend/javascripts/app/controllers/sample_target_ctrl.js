@@ -83,9 +83,9 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
                         $scope.targets[i].assigned = false;
                     }
                 }
-                if(resp.data.length == 0){
-                    $scope.createTarget();
-                }
+                // if(resp.data.length == 0){
+                //     $scope.createTarget();
+                // }
             });
         };
 
