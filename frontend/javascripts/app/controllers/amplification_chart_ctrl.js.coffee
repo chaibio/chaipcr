@@ -456,6 +456,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                     cq: $scope.wellButtons["well_#{i}"]?.ct
                     well: i
                     channel: ch_i
+            else
+              $scope.onUnselectLine()
 
         if $scope.color_by is 'sample'
           for i in [0..nonGreySeries.length - 1] by 1

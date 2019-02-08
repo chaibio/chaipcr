@@ -301,6 +301,8 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
                     channel: ch_i
                     well_type: $scope.targets[i * channel_count + (ch_i - 1)].well_type
                     target_id: $scope.targets[i * channel_count + (ch_i - 1)].id
+            else
+              $scope.onUnselectPlot()
 
         if $scope.color_by is 'sample'
           for i in [0..nonGreySeries.length - 1] by 1

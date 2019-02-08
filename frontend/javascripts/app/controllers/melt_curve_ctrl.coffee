@@ -248,6 +248,8 @@ App.controller 'MeltCurveChartCtrl', [
                     color: well_color
                     ct: buttons["well_#{i}"]?.ct
                     well: i
+            else
+              $scope.onUnselectLine()
 
         if $scope.color_by is 'sample'
           for i in [0..nonGreySeries.length - 1] by 1

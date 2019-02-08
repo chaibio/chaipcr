@@ -1514,7 +1514,10 @@ class BaseChart
         .attr('fill', 'transparent')
         .on('mousemove', => @mouseMoveCb())
         .on('mouseenter', => @showMouseIndicators())
-        .on('mouseout', => @hideMouseIndicators())
+        .on('mouseout', => 
+          @hideMouseIndicators()
+          @mouseMoveCb(false)
+        )
         .on 'click', =>
           @unsetActivePath()
           if @hoveredLine
@@ -1545,9 +1548,15 @@ class BaseChart
 
     return { x: x, y: pos.y }
 
-  mouseMoveCb: ->
+  mouseMoveCb: (isHover = true)->
 
-      @setHoveredLine()
+      if isHover
+        @setHoveredLine()
+      else
+        if @hoveredLine
+          @hoveredLine.attr('stroke-width', @NORMAL_PATH_STROKE_WIDTH)
+          @hoveredLine = null
+
       if !@activePath
         @hideMouseIndicators()
         return
