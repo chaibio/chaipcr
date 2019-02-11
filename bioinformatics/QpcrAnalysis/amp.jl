@@ -192,6 +192,233 @@ function process_amp(
     json_digits             ::Integer =JSON_DIGITS,
     verbose                 ::Bool =false
 )
+    ## process amplification per step
+    function process_amp_1sr(
+        ## remove MySql dependency
+        # db_conn ::MySQL.MySQLHandle,
+        # exp_id ::Integer,
+        # asrp ::AmpStepRampProperties,
+        # calib_info ::Union{Integer,OrderedDict},
+        # fluo_well_nums ::AbstractVector,
+        # well_nums ::AbstractVector,
+        asrp                    ::AmpStepRampProperties,
+        dcv                     ::Bool, # logical, whether to perform multi-channel deconvolution
+        out_format              ::Symbol # :full, :pre_json, :json
+    )
+        amp_init(x...) = fill(x..., num_fluo_wells, num_channels)
+
+        function find_baseline_cyc_bounds()
+            const size_bcb = size(baseline_cyc_bounds)
+            if size_bcb == (0,) || (size_bcb == (2,) && size(baseline_cyc_bounds[1]) == ()) # can't use `eltype(baseline_cyc_bounds) <: Integer` because `JSON.parse("[1,2]")` results in `Any[1,2]` instead of `Int[1,2]`
+                return amp_init(baseline_cyc_bounds)
+            elseif size_bcb == (num_fluo_wells, num_channels) && eltype(baseline_cyc_bounds) <: AbstractVector # final format of `baseline_cyc_bounds`
+                return baseline_cyc_bounds
+            end
+            error("`baseline_cyc_bounds` is not in the right format.")
+        end
+
+        function find_ct_fluos()
+
+            function find_idc_useful(postbl_stata)
+                idc_useful = find(postbl_stata .== :Optimal)
+                (length(idc_useful) > 0) && return idc_useful
+                idc_useful = find(postbl_stata .== :UserLimit)
+                (length(idc_useful) > 0) && return idc_useful
+                return 1:length(postbl_status)
+            end
+            ## end of function definition nested within find_ct_fluos()
+
+            if num_cycs <= 2 || length(ct_fluos) > 0
+                return ct_fluos
+            end
+            if cq_method != :ct
+                return ct_fluos_empty
+            end
+            ## num_cycs > 2 && length(ct_fluos) == 0 && cq_method == :ct
+            map(1:num_channels) do channel_i
+                const mbq_ary1 =
+                    map(1:num_fluo_wells) do well_i
+                        mod_bl_q(
+                            rbbs_ary3[:, well_i, channel_i];
+                            min_reliable_cyc = min_reliable_cyc,
+                            baseline_cyc_bounds = _baseline_cyc_bounds[well_i, channel_i],
+                            cq_method = :cp_dr1,
+                            ct_fluo = NaN,
+                            af_key = af_key,
+                            kwdict_mbq...,
+                            verbose = verbose)
+                    end # do well_i
+                mbq_ary1 |> map[index[:postbl_status]] |> find_idc_useful |>
+                    map[mbq_i -> mbq_ary1[mbq_i][:cq_fluo]] |> median
+            end # do channel_i
+        end
+
+        calc_mbq_ary2() =
+            [
+                begin
+                    ipopt_print2file = length(ipopt_print2file_prefix) == 0 ?
+                        "" : "$(join([ipopt_print2file_prefix, channel_i, well_i], '_')).txt"
+                    mod_bl_q(
+                        rbbs_ary3[:, well_i, channel_i];
+                        min_reliable_cyc = min_reliable_cyc,
+                        baseline_cyc_bounds = _baseline_cyc_bounds[well_i, channel_i],
+                        cq_method = cq_method,
+                        ct_fluo = _ct_fluos[channel_i],
+                        af_key = af_key,
+                        kwdict_mbq...,
+                        ipopt_print2file = ipopt_print2file,
+                        verbose = verbose)
+                end
+                for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
+            ]
+
+        function set_fn_mbq!(mbq_ary2)
+            for fn_mbq in fieldnames(MbqOutput)
+                fv =
+                    [   getfield(mbq_ary2[well_i, channel_i], fn_mbq)
+                        for well_i in 1:num_fluo_wells, channel_i in 1:num_channels ]
+                if fn_mbq in [:blsub_fluos, :coefs, :blsub_fitted, :dr1_pred, :dr2_pred]
+                    fv = reshape(
+                            cat(2, fv...), # 2-dim array of size (`num_cycs` or number of coefs, `num_wells * num_channels`)
+                            length(fv[1,1]),
+                            size(fv)...)
+                end # if fn_mbq in
+                setfield!(
+                    full_amp_out,
+                    fn_mbq,
+                    convert(typeof(getfield(full_amp_out, fn_mbq)), fv)) # `setfield!` doesn't call `convert` on its own
+            end # for fn_mbq
+            return nothing # side effects only
+        end
+
+        function set_qt_fluos!()
+            full_amp_out.qt_fluos =
+                [   quantile(full_amp_out.blsub_fluos[:, well_i, channel_i], qt_prob_rc)
+                    for well_i in 1:num_fluo_wells, channel_i in 1:num_channels ]
+            full_amp_out.max_qt_fluo = maximum(full_amp_out.qt_fluos)
+            return nothing # side effects only
+        end
+
+        function set_fn_rcq!()
+            for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
+                report_cq!(full_amp_out, well_i, channel_i; kwdict_rc...)
+            end
+            return nothing # side effects only
+        end
+        ## end of function definitions nested within process_amp_1sr
+
+        ## remove MySql dependency
+        # fr_ary3 = get_amp_data(
+        #     db_conn,
+        #     "fluorescence_value", # "fluorescence_value" or "baseline_value"
+        #     exp_id, asrp,
+        #     fluo_well_nums, channel_nums)
+
+        ## perform deconvolution and adjust well-to-well variation in absolute fluorescence
+        ## rbbs_ary3 is the calibrated fluorescence data
+        const mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, rbbs_ary3 =
+            dcv_aw(
+                fr_ary3,
+                dcv,
+                channel_nums,
+                ## remove MySql dependency
+                # db_conn,
+                # calib_info,
+                # fluo_well_nums,
+                # well_nums,
+                calib_data,
+                fluo_well_nums,
+                dye_in,
+                dyes_2bfild;
+                aw_out_format = :array)
+        #
+        const _baseline_cyc_bounds = find_baseline_cyc_bounds()
+        const NaN_ary2 = amp_init(NaN)
+        const fitted_init = amp_init(AF_EMPTY_DICT[af_key]) # once ` ::Array{EmptyAmpFitted,2}`, can't be `setfield!` to ` ::Array{SfcFitted,2}`, and vice versa
+        const empty_vals_4cq = amp_init(OrderedDict{Symbol,AbstractFloat}())
+        const ct_fluos_empty = fill(NaN, num_channels)
+        const _ct_fluos = find_ct_fluos()
+        #
+        ## Issue: AmpStepRampOutput is a 'god object' anti-pattern
+        ## this can be fixed, but first
+        ## the allelic discrimination code needs to be stable
+        full_amp_out = AmpStepRampOutput(
+            fr_ary3,
+            mw_ary3,
+            k4dcv,
+            dcvd_ary3,
+            wva_data,
+            rbbs_ary3,
+            fluo_well_nums,
+            collect(1:num_channels), # channel_nums
+            cq_method,
+            fitted_init, # fitted_prebl,
+            amp_init(Vector{String}()), # bl_notes
+            rbbs_ary3, # blsub_fluos
+            fitted_init, # fitted_postbl,
+            amp_init(:not_fitted), # postbl_status
+            amp_init(NaN, 1), # coefs # size = 1 for 1st dimension may not be correct for the chosen model
+            NaN_ary2, # d0
+            rbbs_ary3, # blsub_fitted,
+            zeros(0, 0, 0), # dr1_pred
+            zeros(0, 0, 0), # dr2_pred
+            NaN_ary2, # max_dr1
+            NaN_ary2, # max_dr2
+            empty_vals_4cq, # cyc_vals_4cq
+            empty_vals_4cq, # eff_vals_4cq
+            NaN_ary2, # cq_raw
+            NaN_ary2, # cq
+            NaN_ary2, # eff
+            NaN_ary2, # cq_fluo
+            NaN_ary2, # qt_fluos
+            Inf, # max_qt_fluo
+            NaN_ary2, # max_bsf
+            NaN_ary2, # scld_max_bsf
+            NaN_ary2, # scld_max_dr1
+            NaN_ary2, # scld_max_dr2
+            amp_init(""), # why_NaN
+            _ct_fluos, # ct_fluos
+            OrderedDict{Symbol,Vector{String}}(), # assignments_adj_labels_dict
+            OrderedDict{Symbol,AssignGenosResult}() # agr_dict
+        )
+        if num_cycs <= 2
+            print_v(println, verbose, "Number of cycles $num_cycs <= 2, baseline subtraction and Cq calculation will not be performed.")
+        else # num_cycs > 2
+            set_fn_mbq!(calc_mbq_ary2())
+            set_qt_fluos!()
+            set_fn_rcq!()
+        end # if
+        #
+        ## allelic discrimination
+        if dcv
+            full_amp_out.assignments_adj_labels_dict, full_amp_out.agr_dict =
+                process_ad(
+                    full_amp_out,
+                    ad_cycs,
+                    ctrl_well_dict,
+                    cluster_method,
+                    norm_l,
+                    expected_ncg_raw,
+                    categ_well_vec)
+        end # if dcv
+        #
+        ## format output
+        if out_format == :full
+            return full_amp_out
+        end
+        ## out_format == :json || out_format == :pre_json
+        return AmpStepRampOutput2Bjson(
+            map(fieldnames(AmpStepRampOutput2Bjson)) do fn # numeric fields only
+                field_value = getfield(full_amp_out, fn)
+                try
+                    round.(field_value, json_digits)
+                catch
+                    field_value
+                end # try
+            end...) # do fn
+    end # process_amp_1sr()
+    # end of function definition nested within process_amp()
+
     # print_v(println, verbose,
     #     "db_conn: ", db_conn, "\n",
     #     "experiment_id: $exp_id\n",
@@ -313,36 +540,9 @@ function process_amp(
                     ## remove MySql dependency
                     # db_conn, exp_id, asrp, calib_info,
                     # fluo_well_nums, well_nums,
-                    cyc_nums,
-                    fluo_well_nums,
-                    channel_nums,
-                    num_cycs,
-                    num_fluo_wells,
-                    num_channels,
-                    fr_ary3,
-                    calib_data,
                     asrp,
                     dcv && num_channels > 1, # `dcv`
-                    dye_in,
-                    dyes_2bfild,
-                    min_reliable_cyc,
-                    baseline_cyc_bounds,
-                    cq_method,
-                    ct_fluos,
-                    af_key,
-                    kwdict_mbq,
-                    ipopt_print2file_prefix,
-                    qt_prob_rc,
-                    kwdict_rc,
-                    ad_cycs,
-                    ctrl_well_dict,
-                    cluster_method,
-                    norm_l,
-                    expected_ncg_raw,
-                    categ_well_vec,
-                    (out_format == :json ? :pre_json : out_format), # out_format_1sr
-                    json_digits,
-                    verbose)
+                    (out_format == :json ? :pre_json : out_format)) # out_format_1sr
         end) # do asrp
     ## output
     if (out_sr_dict)
@@ -465,8 +665,14 @@ function mod_bl_q(
                 _wts = zeros(num_cycs)
                 _wts[colon(baseline_cyc_bounds...)] .= 1
                 return _wts
-            else # sigmoid models so far
-                return vcat(zeros(last_cyc_wt0), ones(num_cycs - last_cyc_wt0))
+            else
+                ## some kind of sigmoid model is used to estimate amplification curve
+                ## issue: why are `baseline_cyc_bounds` not baked into the weights as per above ???
+                if num_cycs >= last_cyc_wt0
+                    return vcat(zeros(last_cyc_wt0), ones(num_cycs - last_cyc_wt0))
+                else
+                    return zeros(num_cycs)
+                end
             end
         end
 
@@ -573,9 +779,9 @@ function mod_bl_q(
         if bl_method in keys(sfc_model_defs)
             ## fit model to find baseline
             const wts = sfc_wts()
-            const sfc_model_prebl = sfc_model_defs[bl_method]
-            const fitted_prebl = sfc_model_prebl.func_fit(cycs, fluos, wts; kwargs_jmp_model...)
-            baseline = sfc_model_prebl.funcs_pred[:bl](cycs, fitted_prebl.coefs...) # may be changed later
+            const fitted_prebl = sfc_model_defs[bl_method].func_fit(
+                cycs, fluos, wts; kwargs_jmp_model...)
+            baseline = sfc_model_defs[bl_method].funcs_pred[:bl](cycs, fitted_prebl.coefs...) # may be changed later
             blsub_fluos = fluos .- baseline
             bl_notes = sfc_prebl_status(fitted_prebl.status)
             if length(bl_notes) >= 2 && bl_notes[2] == "fallback"
@@ -597,11 +803,10 @@ function mod_bl_q(
             baseline = bl_func(fluos[bl_cycs()]) # change or new def
             blsub_fluos = fluos .- baseline
         end
-        const sfc_model_postbl = sfc_model_defs[m_postbl]
-        const fitted_postbl = sfc_model_postbl.func_fit(
+        const fitted_postbl = sfc_model_defs[m_postbl].func_fit(
             cycs, blsub_fluos, wts; kwargs_jmp_model...)
         const coefs_pob = fitted_postbl.coefs
-        const funcs_pred = sfc_model_postbl.funcs_pred
+        const funcs_pred = sfc_model_defs[m_postbl].funcs_pred
         const dr1_pred = funcs_pred[:dr1](cycs_denser, coefs_pob...)
         const max_dr1, idx_max_dr1 = findmax(dr1_pred)
         const cyc_max_dr1 = cycs_denser[idx_max_dr1]
@@ -738,258 +943,6 @@ function report_cq!(
 end # report_cq!
 
 
-## process amplification per step
-function process_amp_1sr(
-    ## remove MySql dependency
-    # db_conn ::MySQL.MySQLHandle,
-    # exp_id ::Integer,
-    # asrp ::AmpStepRampProperties,
-    # calib_info ::Union{Integer,OrderedDict},
-    # fluo_well_nums ::AbstractVector,
-    # well_nums ::AbstractVector,
-    cyc_nums                ::Vector{I} where I <: Integer,
-    fluo_well_nums          ::Vector{J} where J <: Integer,
-    channel_nums            ::Vector{String},
-    num_cycs                ::Integer,
-    num_fluo_wells          ::Integer,
-    num_channels            ::Integer,
-    fr_ary3                 ::DenseArray,
-    calib_data              ::Associative,
-    asrp                    ::AmpStepRampProperties,
-    dcv                     ::Bool, # logical, whether to perform multi-channel deconvolution
-    dye_in                  ::Symbol,
-    dyes_2bfild             ::AbstractVector,
-    min_reliable_cyc        ::Real,
-    baseline_cyc_bounds     ::AbstractVector,
-    cq_method               ::Symbol,
-    ct_fluos                ::AbstractVector,
-    af_key                  ::Symbol,
-    kwdict_mbq              ::Associative, # keyword arguments passed onto `mod_bl_q`
-    ipopt_print2file_prefix ::String,
-    qt_prob_rc              ::Real, # quantile probablity for fluo values per well
-    kwdict_rc               ::Associative, # keyword arguments passed onto `report_cq`
-    ad_cycs                 ::Union{Integer,AbstractVector},
-    ctrl_well_dict          ::OrderedDict,
-    cluster_method          ::ClusteringMethod,
-    norm_l                  ::Real,
-    expected_ncg_raw        ::AbstractMatrix,
-    categ_well_vec          ::AbstractVector,
-    out_format              ::Symbol, # :full, :pre_json, :json
-    json_digits             ::Integer,
-    verbose                 ::Bool
-)
-    amp_init(x...) = fill(x..., num_fluo_wells, num_channels)
-
-    function find_baseline_cyc_bounds()
-        const size_bcb = size(baseline_cyc_bounds)
-        if size_bcb == (0,) || (size_bcb == (2,) && size(baseline_cyc_bounds[1]) == ()) # can't use `eltype(baseline_cyc_bounds) <: Integer` because `JSON.parse("[1,2]")` results in `Any[1,2]` instead of `Int[1,2]`
-            return amp_init(baseline_cyc_bounds)
-        elseif size_bcb == (num_fluo_wells, num_channels) && eltype(baseline_cyc_bounds) <: AbstractVector # final format of `baseline_cyc_bounds`
-            return baseline_cyc_bounds
-        end
-        error("`baseline_cyc_bounds` is not in the right format.")
-    end
-
-    function find_ct_fluos()
-
-        function find_idc_useful(postbl_stata)
-            idc_useful = find(postbl_stata .== :Optimal)
-            (length(idc_useful) > 0) && return idc_useful
-            idc_useful = find(postbl_stata .== :UserLimit)
-            (length(idc_useful) > 0) && return idc_useful
-            return 1:length(postbl_status)
-        end
-        ## end of function definition nested within find_ct_fluos()
-
-        if num_cycs <= 2 || length(ct_fluos) > 0
-            return ct_fluos
-        end
-        if cq_method != :ct
-            return ct_fluos_empty
-        end
-        ## num_cycs > 2 && length(ct_fluos) == 0 && cq_method == :ct
-        map(1:num_channels) do channel_i
-            const mbq_ary1 =
-                map(1:num_fluo_wells) do well_i
-                    mod_bl_q(
-                        rbbs_ary3[:, well_i, channel_i];
-                        min_reliable_cyc = min_reliable_cyc,
-                        baseline_cyc_bounds = _baseline_cyc_bounds[well_i, channel_i],
-                        cq_method = :cp_dr1,
-                        ct_fluo = NaN,
-                        af_key = af_key,
-                        kwdict_mbq...,
-                        verbose = verbose)
-                end # do well_i
-            mbq_ary1 |> map[index[:postbl_status]] |> find_idc_useful |>
-                map[mbq_i -> mbq_ary1[mbq_i][:cq_fluo]] |> median
-        end # do channel_i
-    end
-
-    calc_mbq_ary2() =
-        [
-            begin
-                ipopt_print2file = length(ipopt_print2file_prefix) == 0 ?
-                    "" : "$(join([ipopt_print2file_prefix, channel_i, well_i], '_')).txt"
-                mod_bl_q(
-                    rbbs_ary3[:, well_i, channel_i];
-                    min_reliable_cyc = min_reliable_cyc,
-                    baseline_cyc_bounds = _baseline_cyc_bounds[well_i, channel_i],
-                    cq_method = cq_method,
-                    ct_fluo = _ct_fluos[channel_i],
-                    af_key = af_key,
-                    kwdict_mbq...,
-                    ipopt_print2file = ipopt_print2file,
-                    verbose = verbose)
-            end
-            for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
-        ]
-
-    function set_fn_mbq!(mbq_ary2)
-        for fn_mbq in fieldnames(MbqOutput)
-            fv =
-                [   getfield(mbq_ary2[well_i, channel_i], fn_mbq)
-                    for well_i in 1:num_fluo_wells, channel_i in 1:num_channels ]
-            if fn_mbq in [:blsub_fluos, :coefs, :blsub_fitted, :dr1_pred, :dr2_pred]
-                fv = reshape(
-                        cat(2, fv...), # 2-dim array of size (`num_cycs` or number of coefs, `num_wells * num_channels`)
-                        length(fv[1,1]),
-                        size(fv)...)
-            end # if fn_mbq in
-            setfield!(
-                full_amp_out,
-                fn_mbq,
-                convert(typeof(getfield(full_amp_out, fn_mbq)), fv)) # `setfield!` doesn't call `convert` on its own
-        end # for fn_mbq
-        return nothing # side effects only
-    end
-
-    function set_qt_fluos!()
-        full_amp_out.qt_fluos =
-            [   quantile(full_amp_out.blsub_fluos[:, well_i, channel_i], qt_prob_rc)
-                for well_i in 1:num_fluo_wells, channel_i in 1:num_channels ]
-        full_amp_out.max_qt_fluo = maximum(full_amp_out.qt_fluos)
-        return nothing # side effects only
-    end
-
-    function set_fn_rcq!()
-        for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
-            report_cq!(full_amp_out, well_i, channel_i; kwdict_rc...)
-        end
-        return nothing # side effects only
-    end
-    ## end of function definitions nested within process_amp_1sr
-
-    ## remove MySql dependency
-    # fr_ary3 = get_amp_data(
-    #     db_conn,
-    #     "fluorescence_value", # "fluorescence_value" or "baseline_value"
-    #     exp_id, asrp,
-    #     fluo_well_nums, channel_nums)
-
-    ## perform deconvolution and adjust well-to-well variation in absolute fluorescence
-    ## rbbs_ary3 is the calibrated fluorescence data
-    const mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, rbbs_ary3 =
-        dcv_aw(
-            fr_ary3,
-            dcv,
-            channel_nums,
-            ## remove MySql dependency
-            # db_conn,
-            # calib_info,
-            # fluo_well_nums,
-            # well_nums,
-            calib_data,
-            fluo_well_nums,
-            dye_in,
-            dyes_2bfild;
-            aw_out_format = :array)
-    #
-    const _baseline_cyc_bounds = find_baseline_cyc_bounds()
-    const NaN_ary2 = amp_init(NaN)
-    const fitted_init = amp_init(AF_EMPTY_DICT[af_key]) # once ` ::Array{EmptyAmpFitted,2}`, can't be `setfield!` to ` ::Array{SfcFitted,2}`, and vice versa
-    const empty_vals_4cq = amp_init(OrderedDict{Symbol,AbstractFloat}())
-    const ct_fluos_empty = fill(NaN, num_channels)
-    const _ct_fluos = find_ct_fluos()
-    #
-    ## Issue: AmpStepRampOutput is a 'god object' anti-pattern
-    ## this can be fixed, but first
-    ## the allelic discrimination code needs to be stable
-    full_amp_out = AmpStepRampOutput(
-        fr_ary3,
-        mw_ary3,
-        k4dcv,
-        dcvd_ary3,
-        wva_data,
-        rbbs_ary3,
-        fluo_well_nums,
-        collect(1:num_channels), # channel_nums
-        cq_method,
-        fitted_init, # fitted_prebl,
-        amp_init(Vector{String}()), # bl_notes
-        rbbs_ary3, # blsub_fluos
-        fitted_init, # fitted_postbl,
-        amp_init(:not_fitted), # postbl_status
-        amp_init(NaN, 1), # coefs # size = 1 for 1st dimension may not be correct for the chosen model
-        NaN_ary2, # d0
-        rbbs_ary3, # blsub_fitted,
-        zeros(0, 0, 0), # dr1_pred
-        zeros(0, 0, 0), # dr2_pred
-        NaN_ary2, # max_dr1
-        NaN_ary2, # max_dr2
-        empty_vals_4cq, # cyc_vals_4cq
-        empty_vals_4cq, # eff_vals_4cq
-        NaN_ary2, # cq_raw
-        NaN_ary2, # cq
-        NaN_ary2, # eff
-        NaN_ary2, # cq_fluo
-        NaN_ary2, # qt_fluos
-        Inf, # max_qt_fluo
-        NaN_ary2, # max_bsf
-        NaN_ary2, # scld_max_bsf
-        NaN_ary2, # scld_max_dr1
-        NaN_ary2, # scld_max_dr2
-        amp_init(""), # why_NaN
-        _ct_fluos, # ct_fluos
-        OrderedDict{Symbol,Vector{String}}(), # assignments_adj_labels_dict
-        OrderedDict{Symbol,AssignGenosResult}() # agr_dict
-    )
-    if num_cycs <= 2
-        print_v(println, verbose, "Number of cycles $num_cycs <= 2, baseline subtraction and Cq calculation will not be performed.")
-    else # num_cycs > 2
-        set_fn_mbq!(calc_mbq_ary2())
-        set_qt_fluos!()
-        set_fn_rcq!()
-    end # if
-    #
-    ## allelic discrimination
-    if dcv
-        full_amp_out.assignments_adj_labels_dict, full_amp_out.agr_dict =
-            process_ad(
-                full_amp_out,
-                ad_cycs,
-                ctrl_well_dict,
-                cluster_method,
-                norm_l,
-                expected_ncg_raw,
-                categ_well_vec)
-    end # if dcv
-    #
-    ## format output
-    if out_format == :full
-        return full_amp_out
-    end
-    ## out_format == :json || out_format == :pre_json
-    return AmpStepRampOutput2Bjson(
-        map(fieldnames(AmpStepRampOutput2Bjson)) do fn # numeric fields only
-            field_value = getfield(full_amp_out, fn)
-            try
-                round.(field_value, json_digits)
-            catch
-                field_value
-            end # try
-        end...) # do fn
-end # process_amp_1sr
 
 
 
