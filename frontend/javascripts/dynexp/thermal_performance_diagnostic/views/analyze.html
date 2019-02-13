@@ -40,7 +40,7 @@
       <div class="info">
         <div class="info-text">
           <div class="info-title">Max. Block &Delta;T:</div>
-          <div class="info-details"><b>{{analyzedExp.Heating.MaxBlockDeltaT[0]}}</b> &deg;C</div>
+          <div class="info-details"><b>{{analyzedExp.Heating.MaxBlockDeltaT[0] | round:2}}</b> &deg;C</div>
           <div class="img-button">
             <img ng-src="{{ analyzedExp.Heating.MaxBlockDeltaT[1] ? '/images/dynexp/diagnostic-wizard-check-button.png' : '/images/dynexp/diagnostic-wizard-x-button.png' }}">
           </div>
@@ -83,7 +83,7 @@
       <div class="info">
         <div class="info-text">
           <div class="info-title">Max. Block &Delta;T:</div>
-          <div class="info-details"><b>{{analyzedExp.Cooling.MaxBlockDeltaT[0]}}</b> &deg;C</div>
+          <div class="info-details"><b>{{analyzedExp.Cooling.MaxBlockDeltaT[0] | round:2 }}</b> &deg;C</div>
           <div class="img-button">
             <img ng-src="{{ analyzedExp.Cooling.MaxBlockDeltaT[1] ? '/images/dynexp/diagnostic-wizard-check-button.png' : '/images/dynexp/diagnostic-wizard-x-button.png' }}">
           </div>
