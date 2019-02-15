@@ -73,7 +73,7 @@ sudo apt-get -y -q update
 sudo apt-get -y -q install sshpass parted
 sudo apt-get -y -q install ruby
 sudo apt-get -y -q install inetutils-traceroute
-sudo apt-get -y -q install install mdadm npm 
+sudo apt-get -y -q install mdadm npm 
 sudo apt-get -y -q install nodejs ruby-dev 
 sudo apt-get -y -q install libxslt-dev 
 sudo apt-get -y -q install libxml2-dev
@@ -491,27 +491,15 @@ apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hic
       if $is_dev
       then
              echo Building a debug image
-             echo Building precompiling julia on sdcard
-             julia_pkgdir=&quot;/sdcard/factory&quot;
-             export JULIA_PKGDIR=/sdcard/factory/.julia
-             echo &quot;export JULIA_PKGDIR=/sdcard/factory/.julia&quot;&gt;&gt;~/.profile
-      else
-             echo freeing up some space
-             #rm -r /var/cache/apt /var/log/ /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/tests
-             mkdir /var/log/ -p
-	     echo freeing up some space
-	     # remove part of .git folder to save more space. Keeping the .git/objects folder under the packages because Pkg.status() verify the package number from there. An extra chance to save space is available here by cherry pick the exact file needed by Pkg.status().
-	     #apt update
-	     #find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;/logs/
-	     #find /root/.julia/.cache/ -name objects | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
-             apt update
-             julia_pkgdir=&quot;/root&quot;
-             export JULIA_PKGDIR=/root/.julia
       fi
+      mkdir /var/log/ -p
+      julia_pkgdir=&quot;/root&quot;
+      export JULIA_PKGDIR=/root/.julia
 
       cd /root/chaipcr/bioinformatics/build/
       chmod +x precompilescript.sh
-      time ./precompilescript.sh
+
+      time ./precompilescript.sh $julia_pkgdir
 
      if [ -e /root/chaipcr/bioinformatics/qpcranalysis.so ]
      then
@@ -524,29 +512,29 @@ apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hic
      if $is_dev
      then
           echo No clean for dev image
+         df -h
      else
             echo Cleaning julia folder
             find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
             find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;/logs/
             find /root/.julia/.cache/ -name objects | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;  
+  
+            df -h
+            cd
+
+            echo moving julia to eMMC
+            tar czf /data/dot_julia_precompiled.tgz .julia 
+            pkill -9 julia
+            pkill -9 julia
+            umount .julia
+            echo cleaning up old julia folder
+            rm -r .julia
+            rm /data/dot_julia_complete.tgz
+            tar xzf /data/dot_julia_precompiled.tgz
+            echo returned Julia folder
      fi
 
-df -h
-
-cd
-echo moving julia to eMMC
-tar czf /data/dot_julia_precompiled.tgz .julia 
-pkill -9 julia
-pkill -9 julia
-umount .julia
-echo cleaning up old julia folder
-rm -r .julia
-rm /data/dot_julia_complete.tgz
-tar xzf /data/dot_julia_precompiled.tgz
-#      rm /data/dot_julia_precompiled.tgz
-echo returned Julia folder
 du -h --max-depth=1 .
-
 exit 0
 </command>
       <execEachLine>false</execEachLine>
@@ -979,6 +967,13 @@ cd
 if $is_dev
 then
       echo Building a debug image
+      touch /etc/development_build.flag
+      if [ -e /etc/bypassjulia.flag ]
+      then
+          echo  Bypass julia build
+      else
+            echo &quot;/dev/mmcblk0p2  /root/.julia  ext4  noatime,errors=remount-ro  0  1&quot;&gt;&gt;/etc/fstab
+      fi
       exit 0
 fi
 
