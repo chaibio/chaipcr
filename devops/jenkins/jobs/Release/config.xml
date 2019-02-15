@@ -59,7 +59,7 @@
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers/>
-  <concurrentBuild>false</concurrentBuild>
+  <concurrentBuild>true</concurrentBuild>
   <builders>
     <com.tikal.jenkins.plugins.multijob.MultiJobBuilder>
       <phaseName>BB Flashing</phaseName>
@@ -143,8 +143,21 @@
       <continuationCondition>SUCCESSFUL</continuationCondition>
       <executionType>SEQUENTIALLY</executionType>
     </com.tikal.jenkins.plugins.multijob.MultiJobBuilder>
+    <hudson.tasks.Shell>
+      <command>#echo save_emmc build number $SAVE_EMMC_IMAGE_BUILD_NUMBER .. This one is $BUILD_NUMBER
+mkdir -p /var/lib/jenkins/jobs/Release/builds/$BUILD_NUMBER/archive/ || true
+#echo &quot;cp /var/lib/jenkins/jobs/SAVE_EMMC_IMAGE/builds/$SAVE_EMMC_IMAGE_BUILD_NUMBER/archive/build_report.xml /var/lib/jenkins/jobs/Release/builds/$BUILD_NUMBER/archive&quot;
+cp /var/lib/jenkins/jobs/save_emmc_image/builds/$SAVE_EMMC_IMAGE_BUILD_NUMBER/archive/build_report.xml /var/lib/jenkins/jobs/Release/builds/$BUILD_NUMBER/archive/ || true
+
+exit 0</command>
+    </hudson.tasks.Shell>
   </builders>
-  <publishers/>
+  <publishers>
+    <hudson.plugins.summary__report.ACIPluginPublisher plugin="summary_report@1.15">
+      <name>*.xml</name>
+      <shownOnProjectPage>true</shownOnProjectPage>
+    </hudson.plugins.summary__report.ACIPluginPublisher>
+  </publishers>
   <buildWrappers>
     <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.34">
       <deleteDirs>false</deleteDirs>
