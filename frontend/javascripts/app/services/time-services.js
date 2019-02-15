@@ -22,38 +22,40 @@ window.ChaiBioTech.ngApp.service('TimeService', [
   function($rootScope) {
 
     this.convertToSeconds = function(durationString) {
-      console.log(durationString);
       var durationArray = durationString.split(":");
 
       if(durationArray.length > 1) {
         var tt = [0, 0, 0], len = durationArray.length, HH = 0, MM = 0, SS = 0;
+        var secIndex = (durationArray.length == 2) ? 1 : 2;
+        var minIndex = (durationArray.length == 2) ? 0 : 1;
+        var hourIndex = (durationArray.length == 2) ? -1 : 0;
 
-        if(durationArray[len - 1] === "") {
-          durationArray[len - 1] = "0";
+        if(durationArray[secIndex] === "") {
+          durationArray[secIndex] = "0";
         }
-        if(durationArray[len - 1] && Number(durationArray[len - 1]) <= 60) {
-          SS = Number(durationArray[len - 1]);
+        if(durationArray[secIndex] && Number(durationArray[secIndex]) <= 60) {
+          SS = Number(durationArray[secIndex]);
         } else {
           console.log("Plz verify seconds");
           return false;
         }
 
-        if(durationArray[len - 2] === "") {
+        if(durationArray[minIndex] === "") {
             //Probably user input value in the format :60;
-            durationArray[len - 2] = "0";
+            durationArray[minIndex] = "0";
         }
 
-        if(Number(durationArray[len - 2])) {
-          MM = Number(durationArray[len - 2]);
+        if(durationArray[minIndex]) {
+          MM = Number(durationArray[minIndex]);
         } else {
           console.log("Plz verify Minutes");
           return false;
         }
 
-        if(durationArray[len - 3]) {
+        if(durationArray[hourIndex]) {
 
-          if(Number(durationArray[len - 3]) < 9999) {
-            HH = Number(durationArray[len - 3]);
+          if(Number(durationArray[hourIndex]) < 9999) {
+            HH = Number(durationArray[hourIndex]);
           } else {
             console.log("Plz verify Hours we support upto 9999");
             return false;

@@ -48,6 +48,7 @@ angular.module("canvasApp").service('stepHoldTimeService', [
                 parent.doThingsForLast(newHoldTime, previousHoldTime);
                 this.saveHoldTime($scope);
             } else {
+                $scope.step.hold_time = newHoldTime;
                 alerts.showMessage(alerts.holdDurationZeroWarning, $scope);
             }
         };

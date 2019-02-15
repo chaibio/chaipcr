@@ -72,7 +72,7 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
 
         scope.ifLastStep = function() {
 
-          var myCircle = scope.$parent.fabricStep.circle;
+          var myCircle = scope.$parent.fabricStep.circle;          
           return myCircle.next === null;
         };
 
@@ -103,6 +103,7 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
                   });
                 });
               } else {
+                scope.reading = newHoldTime;
                 alerts.showMessage(alerts.holdDurationZeroWarning, scope);
               }
             } else {
