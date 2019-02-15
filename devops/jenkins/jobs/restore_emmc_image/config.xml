@@ -42,7 +42,6 @@
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <authToken>123</authToken>
   <triggers/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
@@ -50,7 +49,8 @@
       <command>#!/bin/bash
 echo checking Jenkins server
 echo &quot;Bash version ${BASH_VERSION}...&quot;
-uname -a
+
+
 ls -ahl
 lsblk
 df -h
@@ -152,6 +152,10 @@ uname -a
 ls -ahl
 lsblk
 df -h
+
+# debug markers 
+# mark=`date &apos;+%m_%d__%H_%M_%S&apos;`;mkdir -p /root/REST_B4_rootfs_${mark} /perm/REST_B4_perm_${mark} /data/REST_B4_data_${mark};sync
+
 echo processing incomplete installations
 dpkg --configure -a --force-confdef
 
@@ -178,7 +182,7 @@ if LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
 ,,0xe,*
 __EOF__
 then
-	echo SDCard formated!
+	echo SDCard formatted!
 else
 	echo error formatting SDCard. retrying..
         partprobe /dev/mmcblk0
@@ -195,7 +199,7 @@ if LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
 ,,0xe,*
 __EOF__
         then
-	       echo SDCard formated!
+	       echo SDCard partitioned!
         else
  	       echo error formatting SDCard.
 #	       exit 1
@@ -203,12 +207,15 @@ __EOF__
 fi
 
 partprobe /dev/mmcblk0
+echo Formatting..
+
 if command mkfs.fat
 then
       mkfs.fat /dev/mmcblk0p1 -n CHAIBIO
 else
       mkfs.vfat /dev/mmcblk0p1 -n CHAIBIO
 fi
+echo SDCard formatted!
 
 mkdir -p /tmp/grep_sdcard
 if mount /dev/mmcblk0p1 /tmp/grep_sdcard
@@ -219,7 +226,9 @@ else
      exit 1
 fi
 
-lsblk</command>
+lsblk
+df -h
+exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
@@ -272,8 +281,10 @@ ls /tmp/grep_sdcard -ahl
 umount /tmp/grep_sdcard
 
 echo scheduling a restart in a min
+sync
 shutdown -r 1
-</command>
+
+exit 0</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
@@ -301,6 +312,8 @@ exit 1</command>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo All done.
+# debug markers 
+# mark=`date &apos;+%m_%d__%H_%M_%S&apos;`;mkdir -p /root/jr_$download_prefix_rootfs_${mark} /perm/jr_$download_prefix_perm_${mark} /data/jr_$download_prefix_data_${mark};sync
 
 exit 0
 </command>
