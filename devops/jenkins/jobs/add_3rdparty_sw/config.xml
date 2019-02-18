@@ -272,6 +272,7 @@ then
     echo data partition is mounted
 else
     echo mounting data partition
+    mkdir -p /data /perm || true
     mount /dev/mmcblk1p2 /data || true
     service mysql start
 fi
@@ -287,6 +288,7 @@ export DEBIAN_FRONTEND=noninteractive
 sudo -E apt-get install -y -q --allow-unauthenticated mysql-server
 
 echo Installing mysql client package
+sudo -E apt-get install -y -q --allow-unauthenticated default-libmysqlclient-dev 
 if sudo -E apt-get install -y -q --allow-unauthenticated libmysqlclient-dev 
 then
      echo mysql client is installed
@@ -300,7 +302,7 @@ else
       fi
 fi
 echo done installing mysql
-
+service mysqld start
 echo resetting mysql password
 cat &gt;&gt; mysql_password_flush.sql &lt;&lt; EOF
     UPDATE user SET password=PASSWORD(&apos;&apos;) WHERE user=&apos;root&apos;;
@@ -352,7 +354,7 @@ __EOF__
 /sbin/partprobe /dev/mmcblk0
 /sbin/mkfs.ext4 /dev/mmcblk0p1 -F
 /sbin/mkfs.ext4 /dev/mmcblk0p2 -F -N 300000
-mkdir -p /sdcard/factory
+mkdir -p /sdcard/factory /sdcard/upgrade/ || true
 if mount /dev/mmcblk0p1 /sdcard/factory/
 then
     echo &quot;temp sdcard folder mounted&quot;
@@ -360,9 +362,6 @@ else
    echo &quot;Error mounting temp sdcard folder&quot;
    exit 1
 fi
-
-rm -r /sdcard/upgrade
-ln -s /sdcard/factory /sdcard/upgrade
 
 # creating a temporary swap file on sdcard
 if fallocate -l 2G /sdcard/factory/swapfile #or dd if=/dev/zero of=/sdcard/factory/swapfile bs=10M count=300
@@ -672,26 +671,25 @@ cd ..
 rm -r downloadjulia
 sync
 
-if $is_dev
-then
-      echo Building a debug image
-      echo &quot;export JULIA_PKGDIR=/sdcard/factory/.julia&quot;&gt;&gt;~/.profile
-      export JULIA_PKGDIR=/sdcard/factory/.julia
-else
-      echo Formatting disk!  
-      echo &quot;export JULIA_PKGDIR=/root/.julia&quot;&gt;&gt;~/.profile
-      export JULIA_PKGDIR=/root/.julia
+#if $is_dev
+#then
+#      echo Building a debug image
+#      echo &quot;export JULIA_PKGDIR=/sdcard/factory/.julia&quot;&gt;&gt;~/.profile
+#      export JULIA_PKGDIR=/sdcard/factory/.julia
+#else
+#      echo Formatting disk!  
+#      echo &quot;export JULIA_PKGDIR=/root/.julia&quot;&gt;&gt;~/.profile
+#      export JULIA_PKGDIR=/root/.julia
       rm -r /root/.julia
       mkdir -p /root/.julia
       chmod 0777 /root/.julia
-      mount /dev/mmcblk0p2 /root/.julia
-      echo &quot;export JULIA_PKGDIR=/root/.julia&quot;&gt;&gt;~/.profile
-      export JULIA_PKGDIR=/root/.julia
-fi
-
-source ~/.profile
-sync
-sleep 60
+      mount /dev/mmcblk0p2 /root/.julia || exit 1
+#      echo &quot;export JULIA_PKGDIR=/root/.julia&quot;&gt;&gt;~/.profile
+#      export JULIA_PKGDIR=/root/.julia
+#fi
+# source ~/.profile
+#sync
+#sleep 60
 
 if [ -e /usr/share/julia/bin/julia ] &amp;&amp; [ ! -e /usr/bin/julia ]
 then
@@ -758,13 +756,8 @@ sleep 60
 echo &quot;Setting up Julia: Initializing rep&quot;
 cd /tmp
 wget https://github.com/chaibio/chaipcr/raw/master/bioinformatics/setup_3rd_party_packages.jl
-if $is_dev
-then
-      echo Building a debug image
-      rm -r /sdcard/factory/.julia
-else
-      rm -r ~/.julia
-fi
+
+rm -r ~/.julia/*
 
 julia -e &apos;include(&quot;/tmp/setup_3rd_party_packages.jl&quot;)&apos;
 
