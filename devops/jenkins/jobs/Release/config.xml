@@ -134,6 +134,12 @@
                 </hudson.plugins.parameterizedtrigger.BooleanParameterConfig>
               </configs>
             </hudson.plugins.parameterizedtrigger.BooleanParameters>
+            <hudson.plugins.parameterizedtrigger.PredefinedBuildParameters plugin="parameterized-trigger@2.35.1">
+              <properties>release_build_number=$BUILD_NUMBER
+image_version=1.0.0.$BUILD_NUMBER
+sdcard_filename=sdcard_release_$BUILD_NUMBER.img
+</properties>
+            </hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
           </configs>
           <killPhaseOnJobResultCondition>FAILURE</killPhaseOnJobResultCondition>
           <buildOnlyIfSCMChanges>false</buildOnlyIfSCMChanges>
