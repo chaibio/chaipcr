@@ -62,6 +62,12 @@ Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
           <defaultValue>trunk</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>image_version</name>
+          <description>Build version number. Helps in output files naming.</description>
+          <defaultValue>0.0.0.0</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -85,12 +91,12 @@ df -h
 #the block device of the created factory settings sdcard: You can say:
 #/dev/sdb to write directly to a physical sdcard.
 #or /tmp/sdcard_image.img to export a factory settings sdcard image.
-tmp_output_sdcard=/tmp/${BUILD_NUMBER}/sdcard_${BUILD_NUMBER}.img
+#tmp_output_sdcard=/tmp/${BUILD_NUMBER}/sdcard_${BUILD_NUMBER}.img
 
 echo user: $(whoami)
 
 echo Creating an sdcard image for the device at $build_machine
-echo Path to SDCard image: $tmp_output_sdcard
+#echo Path to SDCard image: $tmp_output_sdcard
 echo Environmental variables:
 env
 
@@ -420,6 +426,14 @@ then
     then
 	    sdcard_filename=sdcard_$BUILD_NUMBER.img
     fi
+    if [ &quot;$image_version&quot; = &quot;0.0.0.0&quot; ]
+    then
+        echo Release number not provided.
+    else
+	    sdcard_filename=sdcard_released_$image_version.img
+    fi
+    
+    
     echo sdcard filename is $sdcard_filename
     
     upgrade_image_filename=$tmp_sdcard_dir/p2/upgrade.img.tar
@@ -434,7 +448,7 @@ then
 	echo backup eMMC image to $full_emmc_image
     tar zfvc $full_emmc_image /tmp/image_creator/eMMC.img
     sdcard_url=${download_prefix}/$sdcard_filename
-	tmp_output_sdcard=/tmp/${BUILD_NUMBER}/sdcard_${BUILD_NUMBER}.img
+	tmp_output_sdcard=/tmp/${BUILD_NUMBER}/$sdcard_filename
 
 #	cp $full_emmc_image $emmc_image_latest_compressed_full_local_path
 
