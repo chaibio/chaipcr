@@ -5,6 +5,11 @@
     padding-right: 20px;
   }
   .curve-header {
+    box-shadow: none;
+    border-bottom: 3px solid;
+    margin-left: 10px;
+    padding-bottom: 10px;
+
     .row {
       margin-right: 0;
       margin-left: 0;
@@ -25,14 +30,14 @@
     .zoom-text {
       text-align: right;
       padding-right: 15px;
-      vertical-align: baseline;
+      vertical-align: baseline !important;
     }
   }
   padding-bottom: 20px;
   .zoom-scroll-container {
     padding-left: 0;
     padding-right: 0;
-    margin-top: 15px;
+    padding-top: 15px;
     margin-right: 0;
     .scrollbar-container {
       .scrollbar-directive {
@@ -86,7 +91,7 @@
     .item-indicator {
       float: left;
       width: (1/3)*100%;
-      padding-left: 35px;
+      padding-left: 25px;
       strong {
         color: #000;
       }

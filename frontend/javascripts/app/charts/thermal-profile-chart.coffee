@@ -227,6 +227,76 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
     total = secs + mins * 60 + hours * 60 * 60
     return total
     
+  drawAxesExtremeValues: ->
+    @chartSVG.selectAll('.axes-extreme-value').remove()
+
+  updateAxesExtremeValues: ->
+    xScale = @getXScale()
+    yScale = @getYScale()
+    minWidth = 10
+
+  zoomed: ->
+    return if not d3.event
+
+    transform = d3.event.transform
+    transform.x = transform.x || 0
+    transform.y = transform.y || 0
+    transform.k = transform.k || 0
+
+    if (transform.x > 0)
+      transform.x = 0
+
+    if (transform.x + (@width * transform.k) < @width)
+      transform.x = -(@width * transform.k - @width)
+
+    if (transform.y > 0)
+      transform.y = 0
+
+    if (transform.y + (@height * transform.k) < @height)
+      transform.y = -(@height * transform.k - @height)
+
+    if (transform.k < 1)
+      transform.k = 1
+
+    if (@editingYAxis)
+      @lastYScale = transform.rescaleY(@yScale)
+      @gY.call(@yAxis.scale(@lastYScale))
+    else
+      @lastXScale = transform.rescaleX(@xScale)
+      @gX.call(@xAxis.scale(@lastXScale))
+
+    @zoomTransform = transform
+    @updateAxesExtremeValues()
+
+    if (@onZoomAndPan and !@editingYAxis)
+      @onZoomAndPan(@zoomTransform, @width, @height, @getScaleExtent() - @getMinX() )
+
+    @drawLines()
+
+  setXAxisLabel: ->
+    return if not (@config.axes.x.label)
+    svg = @chartSVG.select('.chart-g')
+    @xAxisLabel = svg.append("text")
+      .attr('class', 'XH3M')
+      .attr("transform",
+        "translate(" + (@width / 2) + " ," +
+        (@height + @MARGIN.top + @MARGIN.bottom - 40) + ")")
+      .style("text-anchor", "middle")
+      .attr("fill", "#333")
+      .text(@config.axes.x.label)
+
+  setYAxisLabel: ->
+    return if not @config.axes.y.label
+    svg = @chartSVG.select('.chart-g')
+    @yAxisLabel = svg.append("text")
+      .attr("class", "XH3M")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - @MARGIN.left + 10)
+      .attr("x", 0 - (@height / 2))
+      .attr("dy", "1em")
+      .attr("fill", "#333")
+      .style("text-anchor", "middle")
+      .text(@config.axes.y.label)
 
 window.ChaiBioCharts = window.ChaiBioCharts || {}
 window.ChaiBioCharts.ThermalProfileChart = ThermalProfileChart
