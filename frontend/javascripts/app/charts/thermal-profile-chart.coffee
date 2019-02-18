@@ -280,7 +280,7 @@ class ThermalProfileChart extends window.ChaiBioCharts.BaseChart
       .attr('class', 'XH3M')
       .attr("transform",
         "translate(" + (@width / 2) + " ," +
-        (@height + @MARGIN.top + @MARGIN.bottom - 40) + ")")
+        (@height + @MARGIN.top + @MARGIN.bottom - 30) + ")")
       .style("text-anchor", "middle")
       .attr("fill", "#333")
       .text(@config.axes.x.label)
