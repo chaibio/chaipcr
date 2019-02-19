@@ -20,6 +20,9 @@
 #include "experimentcontroller.h"
 #include "lid.h"
 
+#include "db/protocol.h"
+#include "db/step.h"
+
 Lid::Lid(Settings settings, const std::string &pwmPath, unsigned long pwmPeriod, double startTempThreshold, double completionTurnOffTemp)
     :TemperatureController(settings), PWMControl(pwmPath, pwmPeriod)
 {
@@ -58,7 +61,7 @@ void Lid::processOutput()
     }
     else if (ExperimentController::getInstance()->machineState() == ExperimentController::CompleteMachineState)
     {
-        if (currentTemperature() <= _completionTurnOffTemp)
+        if (ExperimentController::getInstance()->experiment().protocol()->currentStep()->temperature() <= _completionTurnOffTemp)
             setEnableMode(false);
     }
 }
