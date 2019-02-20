@@ -85,8 +85,6 @@ App.controller 'MeltCurveChartCtrl', [
           $scope.omittedIndexes.splice $scope.omittedIndexes.indexOf(omit_index), 1
         else
           $scope.omittedIndexes.push omit_index
-        # alert $scope.omittedIndexes
-        # return
         updateSeries()
 
       $scope.$watch '$viewContentLoaded', ->
@@ -181,9 +179,9 @@ App.controller 'MeltCurveChartCtrl', [
           $scope.targetsSetHided[$scope.targets[i]?.id] = true
 
         for well_data, well_i in $scope.well_data by 1
-          if $scope.wellButtons["well_#{well_i}"].ct == undefined
-            $scope.wellButtons["well_#{well_i}"].ct = ['', '']
-          $scope.wellButtons["well_#{well_i}"].ct[well_data.channel - 1] = MeltCurveService.averagedTm(well_data.tm)
+          if $scope.wellButtons["well_#{well_data.well_num - 1}"].ct == undefined
+            $scope.wellButtons["well_#{well_data.well_num - 1}"].ct = ['', '']
+          $scope.wellButtons["well_#{well_data.well_num - 1}"].ct[well_data.channel - 1] = MeltCurveService.averagedTm(well_data.tm)
 
         $scope.updateTargetsSet()
         updateSeries()
@@ -272,7 +270,6 @@ App.controller 'MeltCurveChartCtrl', [
         chart_data = MeltCurveService.normalizeChartData(data.ramps[0].melt_curve_data, data.targets, $scope.well_targets)
         MeltCurveService.parseData(chart_data, $scope.is_dual_channel).then (data) ->
           $scope.data = data
-          # y_extrems = MeltCurveService.getYExtrems(data, $scope.curve_type)
 
           $scope.fetching = false
           $scope.hasData = true
@@ -403,8 +400,6 @@ App.controller 'MeltCurveChartCtrl', [
               else 
                 $scope.label_sample = null
 
-              # $scope.label_dF_dC = 
-              # $scope.label_D2_dc2 = 
               wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8']
               $scope.label_well = wells[i]
 
@@ -422,9 +417,6 @@ App.controller 'MeltCurveChartCtrl', [
 
       $scope.onSelectLine = (config) ->
         $scope.bgcolor_target = { 'background-color':'black' }
-        # $scope.bgcolor_wellSample = { 'background-color':'black' }
-
-        # $scope.bgcolor_target = { 'background-color':config.config.color }
         dual_value = if $scope.is_dual_channel then 2 else 1
 
         for well_i in [0..$scope.well_data.length - 1]
@@ -456,8 +448,6 @@ App.controller 'MeltCurveChartCtrl', [
             else 
               $scope.label_sample = null
 
-            # $scope.label_dF_dC = 
-            # $scope.label_D2_dc2 = 
             wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8']
             $scope.label_well = wells[i]
 
