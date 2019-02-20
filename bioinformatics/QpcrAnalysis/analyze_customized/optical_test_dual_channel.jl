@@ -119,7 +119,8 @@ function act(
                 swd_dye[channel_i] ./ swd_normd[channel_i]
             end # do channel_i
         end # do swd_dye
-    ## raise an error if there are negative or zero values in the normalized data
+    validity = true
+    ## call as invalid analysis if there are negative or zero values in the normalized data
     ## that will cause the channel1:channel2 ratio to be zero, infinite, or negative
     ## vectorized
     # if self_calib_vec |> mapreduce[mapreduce[mapreduce[broadcast[>=,0.0],|],|],|]
@@ -128,7 +129,9 @@ function act(
     ## devectorized
     for dye in CHANNEL_IS, channel in CHANNEL_IS
         if any(self_calib_vec[dye][channel] .<= 0.0)
-            error("Zero or negative values in the self-calibrated fluorescence data.")
+            ## call as invalid analysis instead of raising an error
+            # error("Zero or negative values in the self-calibrated fluorescence data.")
+            validity = false
         end
     end
     ## calculate channel1:channel2 ratios
@@ -138,11 +141,15 @@ function act(
                 sc_dye = self_calib_vec[channel_i]
                 [:FAM, :HEX][channel_i] => round.(sc_dye[1] ./ sc_dye[2], JSON_DIGITS)
             end) # do channel_i
+    if !(ch12_ratios |> values |> map[x -> all(isfinite.(x))] |> all) ||
+        (ch12_ratios |> values |> map[x -> any(x .<= 0)] |> any)
+            validity = false
+    end
     ## format output
     const output = OrderedDict(
         optical_data        => optical_data,
         Symbol("Ch1:Ch2")   => ch12_ratios,
-        :valid              => true)
+        :valid              => validity)
     return (out_format == :json) ?
         JSON.json(output) :
         output
