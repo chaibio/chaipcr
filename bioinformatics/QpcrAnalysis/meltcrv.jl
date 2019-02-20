@@ -29,7 +29,7 @@ function act(
     if haskey(req_dict, "max_normd_qtv")
         kwdict_mc_tm_pw[:normd_qtv_ub] = req_dict["max_normd_qtv"]
     end
-    if haskey(req_dict, "max_normd_qtv")
+    if haskey(req_dict, "top_N")
         kwdict_mc_tm_pw[:top_N] = req_dict["top_N"]
     end
     #
