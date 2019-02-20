@@ -19,7 +19,6 @@ function act(
     verbose         ::Bool =false
 )
     function SNR_test(w, cl)
-        println("size ",size(baseline_2chs))
         const baseline_2chs, water_fluo_2chs, signal_fluo_2chs =
             map([:baseline, :water, cl]) do key
                 fluo_dict[key][w, :]
@@ -45,8 +44,8 @@ function act(
     # fluo_dict = OrderedDict(map(old_calib_labels) do calib_label # old
     const fluo_dict =
         OrderedDict(
-            map(1:length(OLD_CALIB_SYMBOLS)) do calib_label_i
-                OLD_CALIB_SYMBOLS[calib_label_i] =>
+            map(1:length(NEW_CALIB_SYMBOLS)) do calib_label_i
+                NEW_CALIB_SYMBOLS[calib_label_i] =>
                     mapreduce(
                         ## old
                         # fluo_data[:fluorescence_value][
@@ -69,7 +68,7 @@ function act(
             hcat,
             CHANNEL_IS)
     ## FAM and HEX SNR test
-    for calib_label in CALIB_SYMBOLS_FAM_HEX
+    for calib_label in SYMBOLS_FAM_HEX
         bool_dict[calib_label] =
             mapreduce(
                 well_i -> SNR_test(well_i, calib_label),
@@ -80,11 +79,11 @@ function act(
     const optical_data =
         map(1:num_wells) do well_i
             OrderedDict(
-                map(1:length(OLD_CALIB_SYMBOLS)) do cl_i
+                map(1:length(NEW_CALIB_SYMBOLS)) do cl_i
                     NEW_CALIB_SYMBOLS[cl_i] =>
                         map(channel_i ->
-                                (fluo_dict[OLD_CALIB_SYMBOLS[cl_i]][well_i, channel_i],
-                                    bool_dict[OLD_CALIB_SYMBOLS[cl_i]][well_i, channel_i]),
+                            (fluo_dict[NEW_CALIB_SYMBOLS[cl_i]][well_i, channel_i],
+                                bool_dict[NEW_CALIB_SYMBOLS[cl_i]][well_i, channel_i]),
                             CHANNEL_IS)
                 end) # do cl_i
         end # do well_i
@@ -103,7 +102,7 @@ function act(
     #
     ## substract water values from signal values
     const swd_vec =
-        map(CALIB_SYMBOLS_FAM_HEX) do calib_label
+        map(SYMBOLS_FAM_HEX) do calib_label
             map(CHANNEL_IS) do channel_i
                 fluo_dict[calib_label][:, channel_i] .- fluo_dict[:water][:, channel_i]
             end # do channel_i
