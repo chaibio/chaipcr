@@ -61,13 +61,13 @@ angular.module("canvasApp").factory('htmlEvents', [
             kanvas.canvas.renderAll();
         }
 
-        if (editMode.tempActive === true) {
-          editMode.currentActiveTemp.fire('text:editing:exited');
-        }
+        // if (editMode.tempActive === true) {
+        //   editMode.currentActiveTemp.fire('text:editing:exited');
+        // }
 
-        if (editMode.holdActive === true) {
-          editMode.currentActiveHold.fire('text:editing:exited');
-        }
+        // if (editMode.holdActive === true) {
+        //   editMode.currentActiveHold.fire('text:editing:exited');
+        // }
     };
 
     return this;
