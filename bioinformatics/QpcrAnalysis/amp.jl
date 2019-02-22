@@ -609,7 +609,7 @@ function mod_bl_q(
     baseline_cyc_bounds ::AbstractVector =[],
     bl_fallback_func    ::Function =median,
     m_postbl            ::Symbol = :l4_enl,
-    denser_factor       ::Real =100,
+    denser_factor       ::Int =3,
     cq_method           ::Symbol = :Cy0,
     ct_fluo             ::Real =NaN,
     verbose             ::Bool =false,
@@ -773,7 +773,9 @@ function mod_bl_q(
         end
         ## end of function definitions nested within fit_sfc()
 
-        const cycs_denser = Array(colon(1, (num_cycs - 1) / denser_factor, num_cycs))
+        const len_denser = denser_factor*(num_cycs-1)+1
+        const cycs_denser = Array(range(1, 1/denser_factor, len_denser))
+        const raw_cycs_index = colon(1, denser_factor, len_denser)
         ## to determine weights (`wts`) for sigmoid fitting per `min_reliable_cyc`
         const last_cyc_wt0 = floor(min_reliable_cyc) - 1
         if bl_method in keys(sfc_model_defs)
@@ -845,8 +847,8 @@ function mod_bl_q(
             coefs_pob, # coefs
             NaN, # d0
             func_pred_f(cycs, coefs_pob...), # blsub_fitted
-            dr1_pred,
-            dr2_pred,
+            dr1_pred[raw_cycs_index],
+            dr2_pred[raw_cycs_index],
             max_dr1,
             max_dr2,
             cyc_vals_4cq,
