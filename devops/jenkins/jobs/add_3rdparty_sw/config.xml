@@ -354,7 +354,7 @@ __EOF__
 /sbin/partprobe /dev/mmcblk0
 /sbin/mkfs.ext4 /dev/mmcblk0p1 -F
 /sbin/mkfs.ext4 /dev/mmcblk0p2 -F -N 300000
-mkdir -p /sdcard/factory /sdcard/upgrade/ || true
+mkdir -p /sdcard/factory || true
 if mount /dev/mmcblk0p1 /sdcard/factory/
 then
     echo &quot;temp sdcard folder mounted&quot;
@@ -362,6 +362,9 @@ else
    echo &quot;Error mounting temp sdcard folder&quot;
    exit 1
 fi
+
+rm -r /sdcard/upgrade
+ln -s /sdcard/factory /sdcard/upgrade
 
 # creating a temporary swap file on sdcard
 if fallocate -l 2G /sdcard/factory/swapfile #or dd if=/dev/zero of=/sdcard/factory/swapfile bs=10M count=300

@@ -361,9 +361,6 @@ else
    exit 1
 fi
 
-rm -r /sdcard/upgrade
-ln -s /sdcard/factory /sdcard/upgrade
-
 # creating a temporary swap file on sdcard
 if fallocate -l 2G /sdcard/factory/swapfile #or dd if=/dev/zero of=/sdcard/factory/swapfile bs=10M count=300
 then
@@ -1159,11 +1156,6 @@ umount /dev/mmcblk0p*
 rm -r /sdcard/upgrade
 mkdir -p /sdcard/upgrade/
 
-#echo cleaning up sdcard
-#LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
-#,,0xe,*
-#__EOF__
-
 #/sbin/partprobe /dev/mmcblk0
 mkfs.ext4 /dev/mmcblk0p1 -F
 
@@ -1171,7 +1163,8 @@ sync
 sync
 fsck /dev/mmcblk1p1 -y -f
 
-mount /dev/mmcblk0p1 /sdcard/factory/
+mount /dev/mmcblk0p1 /sdcard/factory/ || true
+mount /dev/mmcblk0p2 /sdcard/upgrade/ || true
 
 df -h
 
