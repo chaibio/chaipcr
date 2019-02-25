@@ -1,7 +1,7 @@
 class StandardCurveChart extends window.ChaiBioCharts.BaseChart
 
   DEFAULT_MIN_Y: 0
-  DEFAULT_MAX_Y: 2.5
+  DEFAULT_MAX_Y: 20
   DEFAULT_MIN_X: 0
   DEFAULT_MAX_X: 1
   DEFAULT_PT_SMALL_SIZE: 4
@@ -61,18 +61,18 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
       false
 
   computedMaxY: ->
-    max = if angular.isNumber(@config.axes.y.max) then @config.axes.y.max else if @hasData() then @getMaxY() else @DEFAULT_MAX_Y
+    max = if angular.isNumber(@config.axes.y.max) and @hasData() then @config.axes.y.max else if @hasData() then @getMaxY() else @DEFAULT_MAX_Y
     if @config.axes.y.scale is 'linear'
       m = @roundUpExtremeValue( max + @getYExtremeValuesAllowance())
-      return m
+      return if @hasData() then m else max
     else
       ticks = @getYLogTicks(@getMinY(), @getMaxY())
       return ticks[ticks.length - 1]
 
   computedMinY: ->
-    min = if angular.isNumber(@config.axes.y.min) then @config.axes.y.min else if @hasData() then @getMinY() else @DEFAULT_MIN_Y
+    min = if angular.isNumber(@config.axes.y.min) and @hasData() then @config.axes.y.min else if @hasData() then @getMinY() else @DEFAULT_MIN_Y    
     if @config.axes.y.scale is 'linear'
-      return @roundDownExtremeValue(min - @getYExtremeValuesAllowance())
+      return if @hasData() then @roundDownExtremeValue(min - @getYExtremeValuesAllowance()) else min
     else
       ticks = @getYLogTicks(@getMinY(), @getMaxY())
       return ticks[0]
@@ -178,7 +178,11 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
       @yAxis = d3.axisLeft(@yScale)
       @yAxis.tickValues(ticks)
     else
-      @yScale.range([@height, 0]).domain([min - @gapY * 0.05, max + @gapY * 0.05])
+      if @hasData()
+        @yScale.range([@height, 0]).domain([min - @gapY * 0.05, max + @gapY * 0.05])
+      else
+        @yScale.range([@height, 0]).domain([min, max])
+
       @yAxis = d3.axisLeft(@yScale)
       @yAxis.ticks(8)
       if @inK()
@@ -216,8 +220,8 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
     svg = @chartSVG.select('.chart-g')
     @xScale = d3.scaleLinear().range([0, @width])
 
-    min = if angular.isNumber(@config.axes.x.min) then @config.axes.x.min else if @hasData() then @getMinX() else @DEFAULT_MIN_X
-    max = if angular.isNumber(@config.axes.x.max) then @config.axes.x.max else if @hasData() then @getMaxX() else @DEFAULT_MAX_X
+    min = if angular.isNumber(@config.axes.x.min) and @hasData() then @config.axes.x.min else if @hasData() then @getMinX() else @DEFAULT_MIN_X
+    max = if angular.isNumber(@config.axes.x.max) and @hasData() then @config.axes.x.max else if @hasData() then @getMaxX() else @DEFAULT_MAX_X
     
     @xScale.domain([min, max])
 

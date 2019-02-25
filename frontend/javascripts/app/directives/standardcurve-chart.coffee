@@ -68,8 +68,6 @@ window.App.directive 'standardCurveChart', [
           if !chart
             initChart()
           else
-            # console.log('$scope.data')
-            # console.log($scope.data)
             chart.updateData($scope.data, $scope.lineData)
             chart.updateConfig($scope.config)
 
