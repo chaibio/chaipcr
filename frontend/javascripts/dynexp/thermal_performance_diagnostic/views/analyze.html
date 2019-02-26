@@ -1,6 +1,6 @@
-<div class="text-center">
+<div class="text-center analyze-title">
   <h2>Diagnostic complete</h2>
-  <p>{{experiment.started_at | date: 'MMM. d, yyyy hh:mm:ssa'}}</p>
+  <p>{{experiment.started_at | fixedDate}}</p>
 </div>
 <div ng-show="!analyzedExp" class="text-center">
   Analyzing results. Please wait ... <img src="/images/loading.gif">

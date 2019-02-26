@@ -1,6 +1,24 @@
 (function() {
 
   angular.module('dynexp.thermal_performance_diagnostic')
+    .filter('fixedDate', [
+    function() {
+      return function(value) {
+        var space_index = value.toString().indexOf(' ');
+        var time_body = value.toString().substring(0, space_index);
+        var date_body = value.toString().substring(space_index, value.length);
+
+        if(time_body.indexOf(':')){
+          return date_body + ' ' + time_body;
+        }
+
+        return value;
+      };
+    }
+  ]);
+
+
+  angular.module('dynexp.thermal_performance_diagnostic')
     .controller('DiagnosticWizardCtrl', [
       '$scope',
       'dynexpExperimentService',
