@@ -6,9 +6,12 @@ class MigrateExistingPikaKits < ActiveRecord::Migration
       well_layout = WellLayout.for_experiment(row['experiment_id']).first
       if well_layout
         if !row['sample_name'].blank?
-          sample = Sample.new(:name=>row['sample_name'])
-          sample.well_layout_id = well_layout.id
-          sample.save
+          sample = Sample.where(:name=>row['sample_name'], :well_layout_id=>well_layout.id).first
+          if sample == nil
+            sample = Sample.new(:name=>row['sample_name'])
+            sample.well_layout_id = well_layout.id
+            sample.save
+          end
           sample_well = SamplesWell.find_or_create(sample, well_layout.id, row['well_num'])
           sample_well.save
         end
@@ -35,9 +38,12 @@ class MigrateExistingPikaKits < ActiveRecord::Migration
       well_layout = WellLayout.for_experiment(row['experiment_id']).first
       if well_layout
         if !row['sample_name'].blank?
-          sample = Sample.new(:name=>row['sample_name'], :notes=>row['notes'])
-          sample.well_layout_id = well_layout.id
-          sample.save
+          sample = Sample.where(:name=>row['sample_name'], :well_layout_id=>well_layout.id).first
+          if sample == nil
+            sample = Sample.new(:name=>row['sample_name'])
+            sample.well_layout_id = well_layout.id
+            sample.save
+          end
           sample_well = SamplesWell.find_or_create(sample, well_layout.id, row['well_num'])
           sample_well.save
         end
