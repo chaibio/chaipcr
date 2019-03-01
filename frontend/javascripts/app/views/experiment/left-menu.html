@@ -32,13 +32,13 @@
       <edit-exp-name status="status"></edit-exp-name>
       <div ng-if="status == 'COMPLETED'" ng-show="exp.time_valid" class="side-menu-exp-status XB1 run-on-status">
         {{runStatus}} {{exp.started_at}}
-        <label class="side-menu-exp-status-text success XB1" ng-show="experiment.completion_status === 'success'">Completed</label>
-        <label class="side-menu-exp-status-text failed XB1" ng-show="experiment.completion_status !== 'success'">Failed</label>
+        <label class="side-menu-exp-status-text success XB1" ng-show="exp.completion_status === 'success'">Completed</label>
+        <label class="side-menu-exp-status-text failed XB1" ng-show="exp.completion_status !== 'success'">Failed</label>
       </div>
       <div ng-if="status == 'COMPLETED'" ng-show="!exp.time_valid" class="side-menu-exp-status XB1 run-on-status">
         Run previously
-        <label class="side-menu-exp-status-text success" ng-show="experiment.completion_status === 'success'">Completed</label>
-        <label class="side-menu-exp-status-text failed" ng-show="experiment.completion_status !== 'success'">Failed</label>
+        <label class="side-menu-exp-status-text success" ng-show="exp.completion_status === 'success'">Completed</label>
+        <label class="side-menu-exp-status-text failed" ng-show="exp.completion_status !== 'success'">Failed</label>
       </div>
       <div ng-if="status != 'COMPLETED'" class="side-menu-exp-status XB1">{{runStatus}}</div>
     </div>
