@@ -157,7 +157,7 @@ window.ChaiBioTech.ngApp.service 'StandardCurveChartHelper', [
         target = _.filter targets, (target) ->
           target && target.id is summary_data[i][0]        
         channel = if target.length then target[0].channel else 1
-        if summary_data[i][4] and summary_data[i][5]
+        if (summary_data[i][4] or summary_data[i][4] is 0) and (summary_data[i][5] or summary_data[i][5] is 0)
           datasets["well_#{summary_data[i][1] - 1}_#{channel}"] = []
           datasets["well_#{summary_data[i][1] - 1}_#{channel}"].push
             cq: summary_data[i][3]
