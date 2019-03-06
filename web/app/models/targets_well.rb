@@ -117,7 +117,7 @@ class TargetsWell < ActiveRecord::Base
             replic_group.each do |replic_target|
               replic_target.mean_cq = mean_cq
               replic_target.mean_quantity = mean_quantity_nodes
-              logger.info("replic group #{replic_group_num}: #{replic_target.id}")
+              #logger.info("replic group #{replic_group_num}: #{replic_target.id}")
             end
             replic_group_num += 1
           end
