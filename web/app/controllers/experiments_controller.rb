@@ -1033,7 +1033,7 @@ class ExperimentsController < ApplicationController
 
         if amplification_data
           out.put_next_entry("#{experiment_dir}/amplification_data.csv")
-          columns = ["baseline_subtracted_value", "background_subtracted_value", "dr1_pred", "dr2_pred", "fluorescence_value", "channel", "well_num", "target_name", "cycle_num"]
+          columns = ["well_num", "target_name", "channel", "cycle_num", "fluorescence_value", "background_subtracted_value", "baseline_subtracted_value", "dr1_pred", "dr2_pred"]
           fluorescence_index = 0
           csv_string = CSV.generate do |csv|
             csv << columns
@@ -1079,7 +1079,7 @@ class ExperimentsController < ApplicationController
 
         if melt_curve_data
           out.put_next_entry("#{experiment_dir}/melt_curve_data.csv")
-          columns = ["channel", "well_num", "target_name", "temperature", "normalized_data", "derivative_data"]
+          columns = ["well_num", "target_name", "channel", "temperature", "normalized_data", "derivative_data"]
           out.write columns.to_csv
 
           targets ||= []
@@ -1089,7 +1089,7 @@ class ExperimentsController < ApplicationController
           melt_curve_data.each do |data|
             if !data.respond_to?(:omit) || data.omit == 0
               data.temperature.each_index do |index|
-                out.write "#{data.channel}, #{data.well_num}, #{data.target_name}, #{data.temperature[index]}, #{data.normalized_data[index]}, #{data.derivative_data[index]}\r\n"
+                out.write "#{data.well_num}, #{data.target_name}, #{data.channel}, #{data.temperature[index]}, #{data.normalized_data[index]}, #{data.derivative_data[index]}\r\n"
               end
             end
 
