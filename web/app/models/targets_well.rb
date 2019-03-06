@@ -68,29 +68,32 @@ class TargetsWell < ActiveRecord::Base
   
   def self.process_data(targets_wells)
     lasttarget = nil
-    replic_group = nil
+    replic_group = []
     replic_group_num = 1
     cq_sum = 0
     quantity_sum = nil
     targets = []
     targets_wells << nil
     targets_wells.each do |target|
-      if lasttarget != nil && target != nil &&
+      if target == nil || (lasttarget != nil &&
          lasttarget.omit == false && target.omit == false &&
          !lasttarget.well_type.nil? && !target.well_type.nil? &&
-         lasttarget.target_id == target.target_id && lasttarget.well_type == target.well_type && lasttarget.sample_id == target.sample_id
+         lasttarget.target_id == target.target_id && lasttarget.well_type == target.well_type && lasttarget.sample_id == target.sample_id)
         replic = false
-        if lasttarget.well_type == TYPE_STANDARD
-          if lasttarget.quantity_m != nil && lasttarget.quantity_b != nil && lasttarget.quantity_m == target.quantity_m && lasttarget.quantity_b == target.quantity_b
+        if target != nil
+          if lasttarget.well_type == TYPE_STANDARD
+            if lasttarget.quantity_m != nil && lasttarget.quantity_b != nil && lasttarget.quantity_m == target.quantity_m && lasttarget.quantity_b == target.quantity_b
+              replic = true
+            end
+          elsif lasttarget.well_type == TYPE_UNKNOWN
+            if lasttarget.sample_id != nil
+              replic = true
+            end
+          else
             replic = true
           end
-        elsif lasttarget.well_type == TYPE_UNKNOWN
-          if lasttarget.sample_id != nil
-            replic = true
-          end
-        else
-          replic = true
         end
+        #logger.info("last_target=#{lasttarget.id}, target=#{(target)? target.id : "nil"} replic=#{replic}")
         if replic == true
           if replic_group.empty?
             lasttarget.replic = replic_group_num
@@ -102,25 +105,26 @@ class TargetsWell < ActiveRecord::Base
           cq_sum += target.cq if !target.cq.nil?
           quantity_sum += BigDecimal.new(to_scientific_notation_str(target.quantity)) if !target.quantity_blank?
           replic_group << target
-        end
-      else
-        if !replic_group.blank?
-          mean_cq = cq_sum/replic_group.length
-          if !quantity_sum.nil?
-            mean_quantity = quantity_sum/replic_group.length
-            mean_quantity_nodes = decimal_to_scientific_notation(mean_quantity)
-          else
-            mean_quantity_nodes = [nil, nil]
+        else
+          if !replic_group.blank?
+            mean_cq = cq_sum/replic_group.length
+            if !quantity_sum.nil?
+              mean_quantity = quantity_sum/replic_group.length
+              mean_quantity_nodes = decimal_to_scientific_notation(mean_quantity)
+            else
+              mean_quantity_nodes = [nil, nil]
+            end
+            replic_group.each do |replic_target|
+              replic_target.mean_cq = mean_cq
+              replic_target.mean_quantity = mean_quantity_nodes
+              logger.info("replic group #{replic_group_num}: #{replic_target.id}")
+            end
+            replic_group_num += 1
           end
-          replic_group.each do |replic_target|
-            replic_target.mean_cq = mean_cq
-            replic_target.mean_quantity = mean_quantity_nodes
-          end
-          replic_group_num += 1
+          replic_group = []
+          cq_sum = 0
+          quantity_sum = nil
         end
-        replic_group = []
-        cq_sum = 0
-        quantity_sum = nil
       end
       #create targets list with unique target
       if target
