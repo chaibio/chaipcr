@@ -190,7 +190,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           item[summary_data[0][item_name]] = summary_data[i][item_name]
 
         target = _.filter well_targets, (target) ->
-          target && target.id is item.target_id
+          target and target.id is item.target_id and target.well_num is item.well_num
 
         if target.length
           item['target_name'] = target[0].name if target[0]

@@ -218,7 +218,7 @@ window.ChaiBioTech.ngApp.service 'StandardCurveChartHelper', [
           item[summary_data[0][item_name]] = summary_data[i][item_name]
 
         target = _.filter well_targets, (target) ->
-          target && target.id is item.target_id
+          target and target.id is item.target_id and target.well_num is item.well_num
 
         if target.length
           item['target_name'] = target[0].name if target[0]
@@ -301,15 +301,11 @@ window.ChaiBioTech.ngApp.service 'StandardCurveChartHelper', [
       return targets
 
     @paddData = (cycle_num = 1) ->
-      paddData = cycle_num: cycle_num
+      datasets = {}
       for i in [0..15] by 1
-        paddData["well_#{i}_baseline"] = 0
-        paddData["well_#{i}_background"] = 0
-        paddData["well_#{i}_background_log"] = 0
-        paddData["well_#{i}_baseline_log"] = 0
+        datasets["well_#{i}_1"] = []
 
-      channel_1: [paddData]
-      channel_2: [paddData]
+      datasets
 
     @getMaxExperimentCycle = Experiment.getMaxExperimentCycle
 

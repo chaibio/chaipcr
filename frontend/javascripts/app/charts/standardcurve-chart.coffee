@@ -328,16 +328,19 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
     plot_config = null
     if isUnknown
       for p, i in @unknown_plots by 1
-        if @config.series[i].well == well_data.well - 1 and @config.series[i].channel == well_data.channel
+        if p.well == well_data.well - 1 and p.channel == well_data.channel
           path = p.plot
-          plot_config = @config.series[i] 
           break
     else        
       for p, i in @plots by 1
-        if @config.series[i].well == well_data.well - 1 and @config.series[i].channel == well_data.channel
+        if p.well == well_data.well - 1 and p.channel == well_data.channel
           path = p.plot
-          plot_config = @config.series[i] 
           break
+
+    for j in [0..@config.series.length - 1]
+      if @config.series[j].well == well_data.well - 1 and @config.series[j].channel == well_data.channel
+        plot_config = @config.series[j] 
+        break
 
     @setActivePlot(path, isUnknown, plot_config)
 
@@ -355,22 +358,14 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
       index: activeLineIndex,
     }
 
-  getPlotConfig: (path) ->
+  getPlotConfig: (plot_config) ->
     activePlotConfig = null
     activePlotIndex = null
-
-    for p, i in @unknown_plots by 1
-      if p.plot is path
+    for i in [0..@config.series.length - 1]
+      if @config.series[i].dataset is plot_config.dataset
         activePlotConfig = @config.series[i]
         activePlotIndex = i
         break
-
-    if !activePlotIndex
-      for p, i in @plots by 1
-        if p.plot is path
-          activePlotConfig = @config.series[i]
-          activePlotIndex = i
-          break
 
     return {
       config: activePlotConfig,
@@ -416,8 +411,8 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
     else
       @activePlot = path
       @activePlot.attr('stroke-width', @ACTIVED_PLOT_STROKE_WIDTH)
-    @activePlotConfig = @getPlotConfig(path)
 
+    @activePlotConfig = @getPlotConfig(plot_config)
     if typeof @onSelectPlot is 'function'
       @onSelectPlot(@activePlotConfig.config)
 
@@ -774,6 +769,7 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
 
     @zoomTransform = transform
     @updateAxesExtremeValues()
+
 
     if (@onZoomAndPan and !@editingYAxis)
       @onZoomAndPan(@zoomTransform, @width, @height, @getScaleExtent() - @getMinX() )

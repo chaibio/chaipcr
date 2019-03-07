@@ -17,6 +17,7 @@
       host, $http, $interval, $uibModal, $rootScope, $timeout) {
 
       var checkMachineStatusInterval = null;
+      $scope.analyze_failed = false;
 
       $scope.$on('$destroy', function() {
         if (checkMachineStatusInterval) {
@@ -156,6 +157,21 @@
 
       checkMachineStatusInterval = $interval(checkMachineStatus, 1000);
 
+      // getExperimentForAnalyze();
+      function getExperimentForAnalyze(){
+        if($state.current.name == '2_channel_optical_cal.analyze' && !$scope.experiment && $state.params.id){
+          Experiment.get($state.params.id).then(function(resp) {
+            $scope.experiment = resp.data.experiment;
+            if ($scope.experiment.completed_at) {
+              params = { id: $scope.experiment.id };
+              if ($scope.experiment.completion_status == 'success') {
+                $scope.analyzeExperiment();
+              }
+            }
+          });
+        }
+      }
+
       $scope.analyzeExperiment = function() {
         Experiment.analyze($scope.experiment.id)
           .then(function(resp) {
@@ -174,16 +190,16 @@
               if ($scope.valid)
                 $http.put(host + '/settings', { settings: { "calibration_id": $scope.experiment.id } });
             }
-
+            $scope.analyze_failed = false;
           })
           .catch(function(resp) {
             if (resp.status == 503) {
               $timeout($scope.analyzeExperiment, 1000);
             } else {
               $state.go('2_channel_optical_cal.analyze', params);
+              $scope.analyze_failed = true;
             }
           });
-
       };
 
       $scope.lidHeatPercentage = function() {

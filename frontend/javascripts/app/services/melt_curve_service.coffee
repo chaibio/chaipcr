@@ -117,7 +117,7 @@ App.service 'MeltCurveService', [
       for i in [0.. summary_data.length - 1] by 1
         item = summary_data[i]
         target = _.filter well_targets, (target) ->
-          target && target.id is item.target_id
+          target and target.id is item.target_id and target.well_num is item.well_num
 
         if target.length
           item['target_name'] = target[0].name if target[0]

@@ -144,10 +144,10 @@ limitations under the License.
                       <div class="header B1-M-Amplification" ng-style="plot_bgcolor_target" style="min-height: 38px; color:white; padding: 8px 10px;">
                         <!-- Target: -->
                         <span ng-show="label_plot">
-                          <span ng-show="label_plot.well < 9">
+                          <span ng-show="label_plot.well < 8">
                             A{{label_plot.well + 1}},
                           </span>
-                          <span ng-show="label_plot.well > 8">
+                          <span ng-show="label_plot.well > 7">
                             B{{label_plot.well-8 + 1}},
                           </span>
                           <label class="B2-Amplification data-point-info" ng-show="label_plot.well_type">
@@ -157,7 +157,7 @@ limitations under the License.
                             <label ng-show="label_plot.well_type == 'unknown'">U</label>
                           </label>
                           <span class="B2-Amplification">
-                            {{samples[label_plot.well - 1].name | truncate:10}}
+                            {{samples[label_plot.well].name | truncate:10}}
                           </span>                          
                         </span>
                         <span ng-show="!label_plot">Choose Data Point</span>                        

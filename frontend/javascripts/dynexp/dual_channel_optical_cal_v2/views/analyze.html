@@ -1,5 +1,5 @@
-<div class="step-9 text-center" ng-show="experiment.completion_status === 'success' && valid">
-  <p class="step" style="text-align: center;"><b>STEP 9</b>/9</p>
+<div class="step-9" ng-show="experiment.completion_status === 'success' && valid">
+  <p class="step"><b>STEP 9</b>/9</p>
   <h2>Calibration Complete</h2>
 
   <div class="machine-icon">
@@ -16,8 +16,8 @@
   </div>
 </div>
 
-<div class="step-9 text-center" ng-show="experiment.completion_status !== 'success' || !valid">
-  <p class="step" style="text-align: center;"><b>STEP 9</b>/9</p>
+<div class="step-9" ng-show="experiment.completion_status !== 'success' || !valid">
+  <p class="step"><b>STEP 9</b>/9</p>
   <h2>Calibration Failed</h2>
 
   <div class="machine-icon">
@@ -29,7 +29,7 @@
       {{experiment.completion_message}}
     </p>
 
-    <p class="heating" ng-show="!experiment.completed_at">
+    <p class="heating" ng-show="!experiment.completed_at || analyze_failed">
       Experiment was aborted due to an unknown error.
     </p>
 
