@@ -118,7 +118,7 @@ limitations under the License.
                         <table class="parameters-table">
                           <tr>
                             <td class="B1v-Amplification">Effic:</td>
-                            <td class="B1Mv-Amplification">{{label_effic | fixed_number: 1}}</td>
+                            <td class="B1Mv-Amplification">{{label_effic * 100 | fixed_number: 1}}{{(label_effic !='') ? '%' : ''}}</td>
                           </tr>
                           <tr>
                             <td class="B1v-Amplification">R<sup>2</sup>:</td>

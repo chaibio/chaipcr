@@ -17,6 +17,8 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
   HOVERED_PLOT_STROKE_WIDTH: 0.5
   ACTIVED_PLOT_STROKE_WIDTH: 1
 
+  DEFAULT_SCALE_EXTENT: 5
+
   MARGIN:
     top: 20
     left: 60
@@ -785,6 +787,11 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
         .on 'click', =>
           @unselectTargetLine()
           @onUnselectPlot()
+
+  updateZoomScaleExtent: ->
+    return if !@zooomBehavior
+    extent = if @getScaleExtent() - @getMinX() < @DEFAULT_SCALE_EXTENT then @DEFAULT_SCALE_EXTENT else @getScaleExtent() - @getMinX()
+    @zooomBehavior.scaleExtent([1, extent])
 
 window.ChaiBioCharts = window.ChaiBioCharts || {}
 window.ChaiBioCharts.StandardCurveChart = StandardCurveChart
