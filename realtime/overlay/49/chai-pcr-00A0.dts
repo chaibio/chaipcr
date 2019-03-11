@@ -205,69 +205,8 @@
 	    };
 	};
 
-	
-	fragment@6 {
-		target = <&ocp>;
-		__overlay__ {
-			peltier1_pwm {
-			    compatible      = "pwm_test";
-			    pwms            = <&ehrpwm2 1 50000 0>;
-			    pwm-names       = "PWM_P8_13";
-			    pinctrl-names   = "default";
-			    pinctrl-0       = <&peltier1_pwm_pin>;
-			    enabled         = <1>;
-			    duty            = <0>;
-			    status          = "okay";
-			};
-
-			peltier2_pwm {
-			    compatible      = "pwm_test";
-			    pwms            = <&ehrpwm2 0 50000 0>;
-			    pwm-names       = "PWM_P8_19";
-			    pinctrl-names   = "default";
-			    pinctrl-0       = <&peltier2_pwm_pin>;
-			    enabled         = <1>;
-			    duty            = <0>;
-			    status          = "okay";
-			};
-	
-			lid_heater_pwm {
-			    compatible      = "pwm_test";
-			    pwms            = <&ehrpwm1 1 500000 0>;
-			    pwm-names       = "PWM_P9_16";
-			    pinctrl-names   = "default";
-			    pinctrl-0       = <&lid_heater_pwm_pin>;
-			    enabled         = <1>;
-			    duty            = <0>;
-			    status          = "okay";
-			};
-
-			fan_pwm {
-			    compatible      = "pwm_test";
-			    pwms 	    = <&ehrpwm1 0 500000 0>;
-			    pwm-names       = "PWM_P9_14";				    
-			    pinctrl-names   = "default";
-			    pinctrl-0       = <&fan_pwm_pin>;
-			    enabled         = <1>;
-			    duty            = <0>;
-			    status          = "okay";
-			};
-			
-			lia_ref_pwm {
-			    compatible      = "pwm_test";
-			    pwms 	    = <&ecap2 0 500000 1>;
-			    pwm-names       = "PWM_P9_28";			    
-			    pinctrl-names   = "default";
-			    pinctrl-0       = <&lia_ref_pwm_pin>;
-			    enabled         = <1>;
-			    duty            = <0>;
-			    status          = "okay";
-			};
-		};
-	};
-
 	/* SPI0 */
-	fragment@7 {
+	fragment@6 {
 		target = <&spi0>;
 		__overlay__ {
 			#address-cells = <1>;
@@ -292,7 +231,7 @@
 	};
 	
 	/* SPI1 */
-	fragment@8 {
+	fragment@7 {
 		target = <&spi1>;
 		__overlay__ {
 			#address-cells = <1>;
@@ -316,7 +255,7 @@
 		};
 	};
 	/* GPIO */
-	fragment@9 {
+	fragment@8 {
 		target = <&ocp>;
 		__overlay__ {
 			test_helper: helper {
@@ -327,7 +266,7 @@
 			};
 		};
 	};
-	fragment@10 {
+	fragment@9 {
                 target = <&tscadc>;
                 __overlay__ {
                         status = "okay";
@@ -339,35 +278,4 @@
                         };
                 };
         };
-	/* old ADC work 
-	fragment@10 {
-		target = <&ocp>;
-		__overlay__ {
-			/* avoid stupid warning * /
-			#address-cells = <1>;
-			#size-cells = <1>;
-
-			tscadc {
-				compatible = "ti,ti-tscadc";
-				reg = <0x44e0d000 0x1000>;
-
-				interrupt-parent = <&intc>;
-				interrupts = <16>;
-				ti,hwmods = "adc_tsc";
-				status = "okay";
-
-				adc {
-					ti,adc-channels = <0 1 2 3 4 5 6 7>;
-				};
-			};
-
-			test_helper_adc: helper {
-				compatible = "bone-iio-helper";
-				vsense-name  = "AIN0", "AIN1", "AIN2", "AIN3", "AIN4", "AIN5", "AIN6", "AIN7";
-				vsense-scale = <100     100     100     100     100     100     100     100>;
-				status = "okay";
-			};
-		};
-	};*/
-
 };
