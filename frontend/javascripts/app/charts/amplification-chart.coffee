@@ -25,42 +25,6 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
   getLineCurve: ->
     if @config.axes.y.scale is 'log' then d3.curveMonotoneX else d3.curveBasis
 
-  # makeColoredLine: (line_config) ->
-
-  #   xScale = @getXScale()
-  #   yScale = @getYScale()
-  #   line = d3.line()
-  #   line.curve(@getLineCurve())
-  #   line.x (d) -> xScale(d[line_config.x])
-  #   line.y (d) -> yScale(d[line_config.y])
-    
-  #   if (@config.axes.y.scale is 'log') then line.defined (d) -> d[line_config.y] > 10
-    
-  #   _path = @viewSVG.append("path")
-  #       .datum(@data[line_config.dataset])
-  #       .attr("class", "colored-line")
-  #       .attr("stroke", line_config.color)
-  #       .attr('fill', 'none')
-  #       .attr("d", line)
-  #       .attr('stroke-width', @NORMAL_PATH_STROKE_WIDTH)
-  #       .on('click', (e, a, path) =>
-  #         el = _path.node()
-  #         # @setActivePath(_path, @getMousePosition(el))
-  #         @mouseMoveCb()
-  #       )
-  #       .on('mousemove', (e, a, path) =>
-  #         if (_path isnt @activePath)
-  #           _path.attr('stroke-width', @HOVERED_PATH_STROKE_WIDTH)
-  #           @hoveredLine = _path
-  #           @hovering = true
-  #         @mouseMoveCb()
-  #       )
-  #       .on('mouseout', (e, a, path) =>
-  #         if (_path isnt @activePath)
-  #           _path.attr('stroke-width', @NORMAL_PATH_STROKE_WIDTH)
-  #           @hovering = false
-  #       )
-
   getYExtremeValuesAllowance: ->
     max = @getMaxY()
     min = @getMinY()

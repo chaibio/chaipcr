@@ -33,7 +33,7 @@ window.App.directive 'standardCurveChart', [
           return false if (!val or !old_val)
           return false if !val.series
           return false if !val.series[0]
-          return val.series[0].y isnt old_val.series[0]?.y
+          return !(val.series[0].dataset is old_val.series[0]?.dataset and val.series.length is old_val.series.length)
 
         initChart = ->
           return if !$scope.data or !$scope.config or !$scope.show
@@ -55,7 +55,17 @@ window.App.directive 'standardCurveChart', [
           chart.unselectPlot()
         
         $scope.$on 'window:resize', ->
-          chart.resize() if chart and $scope.show
+          if chart and $scope.show
+            $timeout ->
+              chart.resize()
+            , 500
+
+        $scope.$on 'event:resize-draw-chart', ->
+          if chart and $scope.show
+            $timeout ->
+              chart.resize()
+            , 500
+
 
         $scope.$watchCollection ($scope) ->
           return {
@@ -70,7 +80,6 @@ window.App.directive 'standardCurveChart', [
           else
             chart.updateData($scope.data, $scope.lineData)
             chart.updateConfig($scope.config)
-
             if $scope.show
               if isInterpolationChanged(val, oldState) or isBaseBackroundChanged(val, oldState)
                 initChart()

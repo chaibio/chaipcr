@@ -433,15 +433,17 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
 
       $scope.onUnselectPlot = ->
         for well_i in [0..$scope.well_data.length - 1]
-          $scope.well_data[well_i].active = false
+          $scope.well_data[well_i]?.active = false
 
         for i in [0..15] by 1
-          $scope.wellButtons["well_#{i}"].active = false
+          $scope.wellButtons["well_#{i}"]?.active = false
 
         $scope.plot_bgcolor_target = {'background-color':'#666666'}
         $scope.label_plot = null
 
       $scope.$watchCollection 'wellButtons', ->
+        $scope.onUnselectLine()
+        $scope.onUnselectPlot()
         updateSeries()
 
       $scope.$watch ->
