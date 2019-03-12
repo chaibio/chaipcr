@@ -52,7 +52,7 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
     max = @getMaxY()
     min = @getMinY()
     diff = max - min
-    diff * 0.05
+    diff * 0.2
 
   hasData: ->
     return false if !@data
@@ -175,8 +175,6 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
     min = @computedMinY()
     max = @computedMaxY()
 
-    @gapY = max - min
-
     @yScale = if @config.axes.y.scale is 'log' then d3.scaleLog() else d3.scaleLinear()
 
     if @config.axes.y.scale is 'log'
@@ -185,11 +183,7 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
       @yAxis = d3.axisLeft(@yScale)
       @yAxis.tickValues(ticks)
     else
-      if @hasData()
-        @yScale.range([@height, 0]).domain([min - @gapY * 0.05, max + @gapY * 0.05])
-      else
-        @yScale.range([@height, 0]).domain([min, max])
-
+      @yScale.range([@height, 0]).domain([min, max])
       @yAxis = d3.axisLeft(@yScale)
       @yAxis.ticks(8)
       if @inK()

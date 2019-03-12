@@ -25,14 +25,14 @@ window.ChaiBioTech.ngApp.filter('fixedDigit', [
         return "";
       }
 
-      if(value.toString().replace('.', '').length <= numDigit){
-        return value;
-      }
-
       stn = Number(value);
       var data = stn.toExponential().toString().split(/[eE]/);
       var m1 = Number(data[0]);
       var b1 = Number(data[1]);
+
+      if(Math.abs(b1) <= numDigit){        
+        return Number(value.toString().substring(0, numDigit + 1));
+      }
       return m1.toFixed(2).toString()+"E"+b1.toString();
     };
   }

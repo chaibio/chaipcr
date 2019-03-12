@@ -196,10 +196,10 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
               gapX = maxQt - minQt
               gapY = maxCq - minCq
 
-              $scope.chartConfig.axes.x.min = minQt - gapX * 0.05
-              $scope.chartConfig.axes.x.max = maxQt + gapX * 0.05
-              $scope.chartConfig.axes.y.min = minCq - gapY * 0.05
-              $scope.chartConfig.axes.y.max = maxCq + gapY * 0.05
+              $scope.chartConfig.axes.x.min = Math.floor(minQt)
+              $scope.chartConfig.axes.x.max = Math.ceil(maxQt)
+              $scope.chartConfig.axes.y.min = minCq
+              $scope.chartConfig.axes.y.max = maxCq
 
               $scope.updateTargetsSet()
               updateButtonCts()
