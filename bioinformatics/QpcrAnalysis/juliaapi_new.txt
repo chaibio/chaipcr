@@ -50,7 +50,7 @@ request body:
         }
     },
     "baseline_cyc_bounds": [],
-    "baseline_method": "sigmoid" (auto) or "linear" or "median"
+    "baseline_method": "sigmoid" (auto) or "linear" or "median",
     "cq_method": "Cy0",
     "min_fluomax": 4356,
     "min_D1max": 472,

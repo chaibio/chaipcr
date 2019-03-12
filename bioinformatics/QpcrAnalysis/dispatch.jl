@@ -79,7 +79,7 @@ end # dispatch
 function get_kw_from_req(key_vec ::AbstractVector, req_dict ::Associative)
     pair_vec = Vector{Pair}()
     for key in key_vec
-        if key in keys(req_dict)
+        if haskey(req_dict, key)
             push!(pair_vec, Symbol(key) => req_dict[key])
         end # if
     end # for

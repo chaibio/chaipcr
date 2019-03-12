@@ -76,6 +76,11 @@ function act(
     #     asrp_vec = Vector{AmpStepRampProperties}()
     # end
 
+    ## calibration data is required
+    if !haskey(req_dict, "calibration_info") || !(typeof(req_dict["calibration_info"]) <: Associative)
+        error("no calibration information found")
+    end
+
     ## we will assume that any relevant step/ramp information has already been passed along
     ## and is present in step_id / ramp_id
     if haskey(req_dict, "step_id")
