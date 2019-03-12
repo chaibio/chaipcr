@@ -29,7 +29,13 @@ function act(
     #     "original: ", calib_info_ori,
     #     "dict: ", calib_info_dict
     # )
+
+    ## calibration data is required
+    if !haskey(calib_info, "calibration_info") || !(typeof(calib_info["calibration_info"]) <: Associative)
+        error("no calibration information found")
+    end
     const calib_info_dict = calib_info["calibration_info"]
+    
     err_msg_vec = Vector{String}()
     #
     ## prep_adj_w2wvaf

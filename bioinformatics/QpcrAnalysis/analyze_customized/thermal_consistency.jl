@@ -24,6 +24,11 @@ function act(
     dcv                 ::Bool =true, # logical, whether to perform multi-channel deconvolution
 	max_tmprtr          ::Real =1000, # maximum temperature to analyze
 )
+    ## calibration data is required
+    if !haskey(req_dict, "calibration_info") || !(typeof(req_dict["calibration_info"]) <: Associative)
+        error("no calibration information found")
+    end
+    
     kwdict_mc_tm_pw = OrderedDict{Symbol,Any}()
     if haskey(req_dict, "qt_prob")
         kwdict_mc_tm_pw[:qt_prob_flTm] = req_dict["qt_prob"]

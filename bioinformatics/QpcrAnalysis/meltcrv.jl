@@ -16,6 +16,11 @@ function act(
     out_format  ::Symbol = :pre_json,
     verbose     ::Bool =false
 )
+    ## calibration data is required
+    if !haskey(req_dict, "calibration_info") || !(typeof(req_dict["calibration_info"]) <: Associative)
+        error("no calibration information found")
+    end
+
     # kwdict_pmc = OrderedDict{Symbol,Any}()
     # for key in ["channel_nums"]
     #     if key in keys_req_dict
