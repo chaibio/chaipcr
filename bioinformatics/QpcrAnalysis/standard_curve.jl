@@ -58,39 +58,44 @@ function act(
             )
         end
     end # do chunk_target
+    
+    ## group results calculation commented out
+    ## as this calculation is duplicated in the front end
+    ## TP 2019/03/12
     #
     ## group result set
-    group_result_df = by(req_df, :sample) do chunk_sample
-        if isnan(chunk_sample[1, :sample])
-            return hcat(
-                DataFrame(target=0),
-                DataFrame(x1=empty_gre)) # assuming the default column name is `:x1`
-        else
-            return by(chunk_sample, :target) do chunk_target
-                target_id = chunk_target[1, :target]
-                if isnan(target_id)
-                    return empty_gre
-                else
-                    cq_vec  = chunk_target[.!isnan.(chunk_target[:cq]), :cq]
-                    qty_vec = chunk_target[.!isnan.(chunk_target[:qty]), :qty]
-                    return GroupResultEle(
-                        chunk_target[:well] |> unique |> sort,
-                        chunk_target[1, :target],
-                        round.([
-                            mean(cq_vec),
-                            std(cq_vec),
-                            mean(qty_vec),
-                            std(qty_vec)
-                        ], json_digits)...
-                    )
-                end # if
-            end # do chunk_target
-        end # if
-    end # do chunk
-    #
+    # group_result_df = by(req_df, :sample) do chunk_sample
+    #     if isnan(chunk_sample[1, :sample])
+    #         return hcat(
+    #             DataFrame(target=0),
+    #             DataFrame(x1=empty_gre)) # assuming the default column name is `:x1`
+    #     else
+    #         return by(chunk_sample, :target) do chunk_target
+    #             target_id = chunk_target[1, :target]
+    #             if isnan(target_id)
+    #                 return empty_gre
+    #             else
+    #                 cq_vec  = chunk_target[.!isnan.(chunk_target[:cq]), :cq]
+    #                 qty_vec = chunk_target[.!isnan.(chunk_target[:qty]), :qty]
+    #                 return GroupResultEle(
+    #                     chunk_target[:well] |> unique |> sort,
+    #                     chunk_target[1, :target],
+    #                     round.([
+    #                         mean(cq_vec),
+    #                         std(cq_vec),
+    #                         mean(qty_vec),
+    #                         std(qty_vec)
+    #                     ], json_digits)...
+    #                 )
+    #             end # if
+    #         end # do chunk_target
+    #     end # if
+    # end # do chunk
+    
     ## report results
     if out_format == :full
-        return (target_result_df, group_result_df)
+        # return (target_result_df, group_result_df)
+        return (target_result_df)
     end
     #
     ## out_format != :full
@@ -107,47 +112,51 @@ function act(
         end
         push!(target_vec, target_result)
     end # for
+    
+    ## group results reporting commented out
+    ## as the calculation is duplicated in the front end
+    ## TP 2019/03/12
     #
     ## group result set
-    gre_vec = group_result_df[:, 3]
-    uniq_well_combins = gre_vec |> map[field[:well]] |> unique
-    grp_vec = Vector{OrderedDict}()
-    for well_combin in uniq_well_combins
-        if length(well_combin) > 1
-            grp_target_vec = Vector{OrderedDict}()
-            gre_idc = find(gre_vec) do gre
-                gre_wells = getfield(gre, :well)
-                return length(gre_wells) == length(well_combin) && all(gre_wells .== well_combin)
-            end
-            for gre_idx in gre_idc
-                gre = gre_vec[gre_idx]
-                target_id = getfield(gre, :target_id)
-                if target_id != 0
-                    qty_mean_m, qty_mean_b = scinot(getfield(gre, :qty_mean), json_digits)
-                    qty_sd_m, qty_sd_b = scinot(getfield(gre, :qty_sd), json_digits)
-                    push!(grp_target_vec, OrderedDict(
-                        :target_id              =>  target_id,
-                        :cq                     =>  OrderedDict(
-                            :mean               =>      getfield(gre, :cq_mean),
-                            :standard_deviation =>      getfield(gre, :cq_sd)),
-                        :quantity               =>  OrderedDict(
-                            :mean               =>      OrderedDict(
-                                :m              =>          qty_mean_m,
-                                :b              =>          qty_mean_b),
-                            :standard_deviation =>      OrderedDict(
-                                :m              =>          qty_sd_m,
-                                :b              =>          qty_sd_b))))
-                end # if target_id
-            end # do gre_i
-        push!(grp_vec, OrderedDict(
-            :wells   => well_combin,
-            :targets => grp_target_vec))
-        end # if
-    end # do well_combin
+    # gre_vec = group_result_df[:, 3]
+    # uniq_well_combins = gre_vec |> map[field[:well]] |> unique
+    # grp_vec = Vector{OrderedDict}()
+    # for well_combin in uniq_well_combins
+    #     if length(well_combin) > 1
+    #         grp_target_vec = Vector{OrderedDict}()
+    #         gre_idc = find(gre_vec) do gre
+    #             gre_wells = getfield(gre, :well)
+    #             return length(gre_wells) == length(well_combin) && all(gre_wells .== well_combin)
+    #         end
+    #         for gre_idx in gre_idc
+    #             gre = gre_vec[gre_idx]
+    #             target_id = getfield(gre, :target_id)
+    #             if target_id != 0
+    #                 qty_mean_m, qty_mean_b = scinot(getfield(gre, :qty_mean), json_digits)
+    #                 qty_sd_m, qty_sd_b = scinot(getfield(gre, :qty_sd), json_digits)
+    #                 push!(grp_target_vec, OrderedDict(
+    #                     :target_id              =>  target_id,
+    #                     :cq                     =>  OrderedDict(
+    #                         :mean               =>      getfield(gre, :cq_mean),
+    #                         :standard_deviation =>      getfield(gre, :cq_sd)),
+    #                     :quantity               =>  OrderedDict(
+    #                         :mean               =>      OrderedDict(
+    #                             :m              =>          qty_mean_m,
+    #                             :b              =>          qty_mean_b),
+    #                         :standard_deviation =>      OrderedDict(
+    #                             :m              =>          qty_sd_m,
+    #                             :b              =>          qty_sd_b))))
+    #             end # if target_id
+    #         end # do gre_i
+    #     push!(grp_vec, OrderedDict(
+    #         :wells   => well_combin,
+    #         :targets => grp_target_vec))
+    #     end # if
+    # end # do well_combin
     #
     jp_dict = OrderedDict(
         :targets => target_vec,
-        :groups  => grp_vec,
+        :groups  => Vector(),
         :valid   => true)
     return out_format == :json ? JSON.json(jp_dict) : jp_dict
 end # standard_curve
