@@ -39,9 +39,9 @@ function act(
 
     ## assuming the 2 values of `ot_dict` are the same in length (number of wells)
     const results =
-        map(1:length(ot_dict["baseline"]["fluorescence_value"][1])) do well_i
-            const baseline = ot_dict["baseline"]["fluorescence_value"][1][well_i]
-            const excitation = ot_dict["excitation"]["fluorescence_value"][1][well_i]
+        map(1:length(ot_dict["baseline"]["fluorescence_value"])) do well_i
+            const baseline = ot_dict["baseline"]["fluorescence_value"][well_i]
+            const excitation = ot_dict["excitation"]["fluorescence_value"][well_i]
             # valid =
             #    (excitation >= MIN_EXCITATION_FLUORESCENCE) &&
             #    (excitation / baseline >= MIN_EXCITATION_FLUORESCENCE_MULTIPLE) &&
