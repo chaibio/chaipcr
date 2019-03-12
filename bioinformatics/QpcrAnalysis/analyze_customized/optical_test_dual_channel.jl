@@ -120,6 +120,7 @@ function act(
             end # do channel_i
         end # do swd_dye
     validity = true
+    error_msg = ""
     ## call as invalid analysis if there are negative or zero values in the normalized data
     ## that will cause the channel1:channel2 ratio to be zero, infinite, or negative
     ## vectorized
@@ -132,6 +133,7 @@ function act(
             ## call as invalid analysis instead of raising an error
             # error("Zero or negative values in the self-calibrated fluorescence data.")
             validity = false
+            error_msg = "Zero or negative values in the self-calibrated fluorescence data."
         end
     end
     ## calculate channel1:channel2 ratios
@@ -149,7 +151,8 @@ function act(
     const output = OrderedDict(
         optical_data        => optical_data,
         Symbol("Ch1:Ch2")   => ch12_ratios,
-        :valid              => validity)
+        :valid              => validity
+        :error              => error_msg)
     return (out_format == :json) ?
         JSON.json(output) :
         output
