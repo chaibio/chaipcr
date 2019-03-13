@@ -46,12 +46,12 @@ class AmplificationDatum < ActiveRecord::Base
 			key :description, 'Step id'
 		end
 		property :amplification_data do
-			key :description, 'Describe the properties'
+			key :description, 'Describe the amplification_data'
 			key :type, :array
 			items do
 				key :type, :array
 				items do
-					property :channel do
+					property :target_id do
 						key :type, :integer
 						key :description, '?'
 					end
@@ -79,16 +79,20 @@ class AmplificationDatum < ActiveRecord::Base
 						key :type, :integer
 						key :description, '?'
 					end
+					property :fluorescence_value do
+						key :type, :integer
+						key :description, '?'
+					end
 				end
 			end
 		end
-		property :cq do
-			key :description, 'Describe the properties'
+		property :summary_data do
+			key :description, 'Describe summary'
 			key :type, :array
 			items do
 				key :type, :array
 				items do
-					property :channel do
+					property :target_id do
 						key :type, :integer
 						key :description, '?'
 					end
@@ -96,53 +100,70 @@ class AmplificationDatum < ActiveRecord::Base
 						key :type, :integer
 						key :description, '?'
 					end
+					property :replic_group do
+						key :type, :integer
+						key :description, '?'
+					end
 					property :cq do
+						key :type, :integer
+						key :description, '?'
+					end
+					property :quantity_m do
+						key :type, :float
+						key :description, '?'
+					end
+					property :quantity_b do
+						key :type, :integer
+						key :description, '?'
+					end
+					property :mean_cq do
+						key :type, :float
+						key :description, '?'
+					end
+					property :mean_quantity_m do
+						key :type, :float
+						key :description, '?'
+					end
+					property :mean_quantity_b do
 						key :type, :integer
 						key :description, '?'
 					end
 				end
 			end
 		end
-	end
-=begin
-	swagger_schema :AmplificationDataProp do
-		property :channel do
-			key :type, :integer
-			key :description, '?'
-		end
-		property :well_num do
-			key :type, :integer
-			key :description, '?'
-		end
-		property :cycle_num do
-			key :type, :integer
-			key :description, '?'
-		end
-		property :background_subtracted_value do
-			key :type, :integer
-			key :description, '?'
-		end
-		property :baseline_subtracted_value do
-			key :type, :integer
-			key :description, '?'
+		property :targets do
+			key :description, 'Describe targets'
+			key :type, :array
+			items do
+				key :type, :array
+				items do
+					property :target_id do
+						key :type, :integer
+						key :description, '?'
+					end
+					property :name do
+						key :type, :integer
+						key :description, '?'
+					end
+          property :equation do
+            property :slope do
+              key :type, :float
+            end
+            property :offset do
+              key :type, :float
+            end
+            property :efficiency do
+              key :type, :float
+            end
+            property :r2 do
+              key :type, :float
+            end
+          end
+				end
+			end
 		end
 	end
 
-	swagger_schema :AmplificationDataCq do
-		property :channel do
-			key :type, :integer
-			key :description, '?'
-		end
-		property :well_num do
-			key :type, :integer
-			key :description, '?'
-		end
-		property :cq do
-			key :type, :integer
-			key :description, '?'
-		end
-	end
-=end
   Constants::KEY_NAMES.each do |variable|
     define_method("#{variable}") do
       (!sub_type.nil? && "#{sub_type}_id" == variable)? sub_id : nil

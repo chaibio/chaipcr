@@ -52,7 +52,7 @@ class AmplificationOptionsController < ApplicationController
 				'application/json',
 			]
 			key :tags, [
-				'Experiment'
+				'AmplificationOptions'
 			]
 			parameter do
 				key :name, :id
@@ -90,7 +90,7 @@ class AmplificationOptionsController < ApplicationController
 				'application/json',
 			]
 			key :tags, [
-				'Experiment'
+				'AmplificationOptions'
 			]
 			parameter do
 				key :name, :id

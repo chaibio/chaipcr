@@ -1,8 +1,7 @@
-class StatusModel  # Notice, this is just a plain ruby object.
+class DeviceStatus  # Notice, this is just a plain ruby object.
   include Swagger::Blocks
 
-
-	swagger_schema :Status do
+	swagger_schema :DeviceStatus do
 		property :experiment_controller do
 			property :machine do
 				property :state do
@@ -105,8 +104,5 @@ class StatusModel  # Notice, this is just a plain ruby object.
 			end
 		end
 	end
-
-
-
 
 end

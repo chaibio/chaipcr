@@ -25,7 +25,7 @@ class SessionsController < ApplicationController
   resource_description {
     formats ['json']
   }
-
+  
 	swagger_path '/login' do
 		operation :post do
 			key :summary, 'Login'
@@ -34,27 +34,37 @@ class SessionsController < ApplicationController
 				'application/json',
 			]
 			key :tags, [
-				'Sessions'
+				'Login'
 			]
 			parameter do
 				key :name, :login_params
 				key :in, :body
-				key :description, 'Login detals'
+				key :description, 'Login details'
 				key :required, true
 				schema do
-					key :'$ref', :LoginInput
+          property :email do
+            key :type, :string
+          end
+        	property :password do
+        		key :type, :string
+        	end
 				end
 			end
 			response 201 do
 				key :description, 'User is logged in to the application. Cookie will be set with the authentication token, the token will expire in a day'
 				schema do
-					key :'$ref', :Login
+        	property :user_id do
+        		key :description, 'User id'
+        		key :type, :integer
+        	end
+        	property :authentication_token do
+        		key :description, 'Authentication token required to pass with api calls'
+        		key :type, :string
+        	end
 				end
 			end
 		end
 	end
-
-
 
   api :POST, "/login", "Login"
   param :email, String, :desc => "Email", :required => true
@@ -80,7 +90,7 @@ class SessionsController < ApplicationController
 				'application/json',
 			]
 			key :tags, [
-				'Sessions'
+				'Login'
 			]
 			response 200 do
 				key :description, 'User is logged out'

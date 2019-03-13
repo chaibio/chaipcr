@@ -22,7 +22,7 @@ class MeltCurveDatum < ActiveRecord::Base
 
   belongs_to :experiment
 
-	swagger_schema :MeltData do
+	swagger_schema :MeltCurveData do
 		property :partial do
 			key :type, :boolean
 			key :description, 'Indicates if the returned data is complete or partial'
@@ -37,8 +37,11 @@ class MeltCurveDatum < ActiveRecord::Base
 				property :melt_curve_data do
 					key :type, :array
 					items do
-						key :type, :object
 						property :well_num do
+							key :type, :integer
+							key :description, '?'
+						end
+						property :target_id do
 							key :type, :integer
 							key :description, '?'
 						end
@@ -64,6 +67,19 @@ class MeltCurveDatum < ActiveRecord::Base
 						end
 					end
 				end
+				property :targets do
+					key :type, :array
+					items do
+						property :target_id do
+							key :type, :integer
+							key :description, '?'
+            end
+						property :target_name do
+							key :type, :string
+							key :description, '?'
+            end
+          end
+        end
 			end
 		end
 	end

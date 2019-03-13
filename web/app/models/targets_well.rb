@@ -18,6 +18,32 @@
 #
 class TargetsWell < ActiveRecord::Base
   include ProtocolLayoutHelper
+  include Swagger::Blocks
+    
+  swagger_schema :TargetWell do
+    property :well_num do
+      key :type, :integer
+      key :description, 'between 1 to 16'
+    end
+    property :well_type do
+      key :type, :integer
+      key :format, :int64
+    end
+    property :quantity do
+      property :m do
+        key :type, :float
+        key :description, 'has to be > 0, with 1 digit before dot, and precision to 8 decimal point'
+      end
+      property :b do
+        key :type, :integer
+      end
+    end
+    property :omit do
+      key :type, :boolean
+      key :description, 'omit target'
+      key :default, false
+    end
+  end
   
   TYPE_STANDARD = "standard"
   TYPE_UNKNOWN = "unknown"
@@ -176,6 +202,16 @@ class TargetsWell < ActiveRecord::Base
       end
     else
       super(data)
+    end
+  end
+  
+  def well_type=(val)
+    if val.blank?
+      write_attribute(:well_type, nil)
+      write_attribute(:quantity_m, nil)
+      write_attribute(:quantity_b, nil)
+    else
+      write_attribute(:well_type, val)
     end
   end
   

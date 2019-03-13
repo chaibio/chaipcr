@@ -118,9 +118,86 @@ class DevicesController < ApplicationController
     render json: result_hash.to_json, status: :ok
   end
 
+  swagger_path '/device/start' do
+    operation :post do
+      key :summary, 'Start Device'
+      key :description, 'start device'
+      key :produces, [
+        'application/json',
+      ]
+			key :tags, [
+				'Device'
+			]
+			
+			parameter do
+				key :name, :experiment_id
+				key :in, :body
+				key :description, 'Id of the experiment'
+				key :required, true
+				schema do
+          property :experiment_id do
+    				key :type, :integer
+    				key :format, :int64
+          end
+				end
+			end
+      
+      response 200 do
+        key :description, 'The experiment is started'
+      end
+    end
+  end
+  
+  api :POST, "/device/start", "start an experiment"
+  def start
+    proxy_request("POST", "http://localhost:8000/control/start", params[:experiment_id])
+  end
+
+  swagger_path '/device/stop' do
+    operation :post do
+      key :summary, 'Stop Device'
+      key :description, 'stop device'
+      key :produces, [
+        'application/json',
+      ]
+			key :tags, [
+				'Device'
+			]
+      response 200 do
+        key :description, 'The current running experiment is stopped'
+      end
+    end
+  end
+  
+  api :POST, "/device/stop", "stop an experiment"
+  def stop
+    proxy_request("POST", "http://localhost:8000/control/stop", nil)
+  end
+
+  swagger_path '/device/resume' do
+    operation :post do
+      key :summary, 'Resume Device'
+      key :description, 'resume device'
+      key :produces, [
+        'application/json',
+      ]
+			key :tags, [
+				'Device'
+			]
+      response 200 do
+        key :description, 'The current paused experiment is resumed'
+      end
+    end
+  end
+  
+  api :POST, "/device/resume", "resume an experiment"
+  def resume
+    proxy_request("POST", "http://localhost:8000/control/resume", nil)
+  end
+
   swagger_path '/device/status' do
     operation :get do
-      key :summary, 'Device status'
+      key :summary, 'Device Status'
       key :description, 'Returns the current status of the device'
       key :produces, [
         'application/json',
@@ -131,28 +208,12 @@ class DevicesController < ApplicationController
       response 200 do
         key :description, 'Object containing device status information'
         schema do
-          key :type, :object
-          key :'$ref', :Status
+          key :'$ref', :DeviceStatus
         end
       end
     end
   end
-
-  api :POST, "/device/start", "start an experiment"
-  def start
-    proxy_request("POST", "http://localhost:8000/control/start", params[:experiment_id])
-  end
-
-  api :POST, "/device/stop", "stop an experiment"
-  def stop
-    proxy_request("POST", "http://localhost:8000/control/stop", nil)
-  end
-
-  api :POST, "/device/resume", "resume an experiment"
-  def resume
-    proxy_request("POST", "http://localhost:8000/control/resume", nil)
-  end
-
+  
   api :GET, "/device/status", "status of the machine"
   def status
     proxy_request("GET", "http://localhost:8000/status", nil)

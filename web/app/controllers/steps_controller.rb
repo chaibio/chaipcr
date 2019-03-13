@@ -52,6 +52,7 @@ class StepsController < ApplicationController
       key :tags, [
         'Steps'
       ]
+      
       parameter do
         key :name, :stage_id
         key :in, :path
@@ -60,18 +61,31 @@ class StepsController < ApplicationController
         key :type, :integer
         key :format, :int64
       end
+      
       parameter do
-        key :name, :prev_id
+        key :name, :step_params
         key :in, :body
         key :required, false
         schema do
-          key :'$ref', :StepInput
+          property :prev_id do
+    			   key :type, :integer
+    			   key :format, :int64
+    			   key :description, 'prev step id or null if it is the first node'
+          end
+          property :step do
+            key :'$ref', :Step
+            key :description, 'if step is created with no params, it will be the same as previous step;
+    when step is created, default ramp with max rate (5) will be created'
+          end
         end
       end
+      
       response 200 do
         key :description, 'Created step is returned'
         schema do
-          key :'$ref', :Step
+          property :step do
+            key :'$ref', :Step
+          end
         end
       end
     end
@@ -117,13 +131,17 @@ class StepsController < ApplicationController
         key :description, 'Step to update'
         key :required, true
         schema do
-          key :'$ref', :StepProperties
+          property :step do
+            key :'$ref', :Step
+          end
         end
       end
       response 200 do
         key :description, 'Updated step is returned'
         schema do
-          key :'$ref', :StepProperties
+          property :step do
+            key :'$ref', :Step
+          end
         end
       end
     end
@@ -141,8 +159,8 @@ class StepsController < ApplicationController
 
   swagger_path '/steps/{step_id}/move' do
     operation :post do
-      key :summary, 'Move Step'
-      key :description, 'Move a step'
+      key :summary, 'Reorder Step'
+      key :description, 'Reorder a step'
       key :produces, [
         'application/json',
       ]
@@ -158,18 +176,24 @@ class StepsController < ApplicationController
         key :format, :int64
       end
       parameter do
-        key :name, :step
+        key :name, :prev_id
         key :in, :body
-        key :description, 'Step to move ??'
+        key :description, 'step id where this step will go after'
         key :required, true
         schema do
-           key :'$ref', :StepInput
-         end
+          property :prev_id do
+    			  key :type, :integer
+    			  key :format, :int64
+    			  key :description, 'prev step id or null if it is the first node'
+          end
+        end
       end
       response 200 do
         key :description, 'Updated step is returned'
         schema do
-          key :'$ref', :StepProperties
+          property :step do
+            key :'$ref', :Step
+          end
         end
       end
     end

@@ -63,7 +63,7 @@ class ExperimentsController < ApplicationController
         'application/json',
       ]
 			key :tags, [
-				'Experiment'
+				'Experiments'
 			]
 			parameter do
 				key :name, :type
@@ -77,7 +77,9 @@ class ExperimentsController < ApplicationController
         schema do
           key :type, :array
           items do
-            key :'$ref', :Experiments
+            property :experiment do
+              key :'$ref', :Experiment
+            end
           end
         end
       end
@@ -90,7 +92,7 @@ class ExperimentsController < ApplicationController
         'application/json'
       ]
 			key :tags, [
-				'Experiment'
+				'Experiments'
 			]
       parameter do
         key :name, :experiment
@@ -98,19 +100,25 @@ class ExperimentsController < ApplicationController
         key :description, 'Experiment to create'
         key :required, true
         schema do
-           key :'$ref', :ExperimentInput
-         end
+          property :experiment do
+             key :'$ref', :FullExperiment
+          end
+        end
       end
       response 200 do
         key :description, 'Created experiment is returned'
         schema do
-          key :'$ref', :Experiment
+          property :experiment do
+            key :'$ref', :FullExperiment
+          end
         end
       end
       response 422 do
         key :description, 'Experiment create error'
 				schema do
-					key :'$ref', :Experiment
+          property :experiment do
+					  key :'$ref', :FullExperiment
+          end
 				end
       end
     end
@@ -157,7 +165,7 @@ class ExperimentsController < ApplicationController
 				'application/json'
 			]
 			key :tags, [
-				'Experiment'
+				'Experiments'
 			]
 			parameter do
 				key :name, :id
@@ -173,19 +181,25 @@ class ExperimentsController < ApplicationController
 				key :description, 'Experiment to update'
 				key :required, true
 				schema do
-					 key :'$ref', :ExperimentInput
-				 end
+          property :experiment do
+					  key :'$ref', :Experiment
+          end
+				end
 			end
 			response 200 do
 				key :description, 'Updated experiment is returned'
 				schema do
-					key :'$ref', :Experiment
+          property :experiment do
+					  key :'$ref', :Experiment
+          end
 				end
 			end
 			response 422 do
 				key :description, 'Experiment update error'
 				schema do
-					key :'$ref', :Experiment
+          property :experiment do
+					  key :'$ref', :Experiment
+          end
 				end
 			end
 		end
@@ -215,7 +229,7 @@ class ExperimentsController < ApplicationController
 				'application/json'
 			]
 			key :tags, [
-				'Experiment'
+				'Experiments'
 			]
 			parameter do
 				key :name, :id
@@ -228,13 +242,17 @@ class ExperimentsController < ApplicationController
 			response 200 do
 				key :description, 'Copied experiment is retuned'
 				schema do
-					key :'$ref', :Experiment
+          property :experiment do
+					  key :'$ref', :FullExperiment
+          end
 				end
 			end
 			response 422 do
 				key :description, 'Experiment copy error'
 				schema do
-					key :'$ref', :Experiment
+          property :experiment do
+					  key :'$ref', :FullExperiment
+          end
 				end
 			end
 		end
@@ -264,7 +282,7 @@ class ExperimentsController < ApplicationController
 				'application/json',
 			]
 			key :tags, [
-				'Experiment'
+				'Experiments'
 			]
 			parameter do
 				key :name, :id
@@ -277,13 +295,17 @@ class ExperimentsController < ApplicationController
 			response 200 do
 				key :description, 'Fetched experiment is retuned'
 				schema do
-					key :'$ref', :Experiment
+          property :experiment do
+					  key :'$ref', :FullExperiment
+          end
 				end
 			end
 			response 422 do
 				key :description, 'Unexpected error'
 				schema do
-					key :'$ref', :ErrorModel
+          property :experiment do
+					  key :'$ref', :FullExperiment
+          end
 				end
 			end
 		end
@@ -310,7 +332,7 @@ class ExperimentsController < ApplicationController
 				'application/json',
 			]
 			key :tags, [
-				'Experiment'
+				'Experiments'
 			]
 			parameter do
 				key :name, :id
@@ -322,12 +344,6 @@ class ExperimentsController < ApplicationController
 			end
 			response 200 do
 				key :description, 'Experiment deleted'
-			end
-			response 422 do
-				key :description, 'Unexpected error'
-				schema do
-					key :'$ref', :Experiment
-				end
 			end
 		end
 	end
@@ -344,6 +360,44 @@ class ExperimentsController < ApplicationController
     end
   end
 
+	swagger_path '/experiments/{id}/well_layout' do
+		operation :get do
+			key :summary, 'Retrieve well layout'
+			key :description, 'Retrieve all targets and samples'
+			key :produces, [
+				'application/json',
+			]
+			key :tags, [
+				'Experiments'
+			]
+      
+			parameter do
+				key :name, :id
+				key :in, :path
+				key :description, 'Id of the experiment for which we need temperature data'
+				key :required, true
+				key :type, :integer
+				key :format, :int64
+			end
+
+			response 200 do
+				key :description, 'WellLayout'
+				schema do
+					key :type, :array
+					items do
+						key :'$ref', :WellLayout
+					end
+				end
+			end
+			response :default do
+				key :description, 'Unexpected error'
+				schema do
+					key :'$ref', :ErrorModel
+				end
+			end
+		end
+	end
+  
   def well_layout
     @well_layout = WellLayout.for_experiment(params[:id]).first
     if @well_layout.is_a? WellLayout
@@ -361,7 +415,7 @@ class ExperimentsController < ApplicationController
 				'application/json',
 			]
 			key :tags, [
-				'Experiment'
+				'Experiments'
 			]
 			parameter do
 				key :name, :id
@@ -432,7 +486,7 @@ class ExperimentsController < ApplicationController
 				'application/json',
 			]
 			key :tags, [
-				'Experiment'
+				'Experiments'
 			]
 			parameter do
 				key :name, :id
@@ -718,7 +772,7 @@ class ExperimentsController < ApplicationController
 				'application/json',
 			]
 			key :tags, [
-				'Experiment'
+				'Experiments'
 			]
 			parameter do
 				key :name, :id
@@ -777,7 +831,7 @@ class ExperimentsController < ApplicationController
 				schema do
 					key :type, :array
 					items do
-						key :'$ref', :MeltData
+						key :'$ref', :MeltCurveData
 					end
 				end
 			end
@@ -949,7 +1003,7 @@ class ExperimentsController < ApplicationController
 				'application/zip',
 			]
 			key :tags, [
-				'Experiment'
+				'Experiments'
 			]
 			parameter do
 				key :name, :id

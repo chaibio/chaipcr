@@ -9,6 +9,10 @@ node :type do |experiment|
  experiment.experiment_definition.experiment_type
 end
 
+node :guid do |experiment|
+ experiment.experiment_definition.guid
+end
+
 node(:errors, :unless => lambda { |obj| obj.errors.empty? }) do |o|
   o.errors.as_json
 end

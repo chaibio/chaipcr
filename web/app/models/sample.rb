@@ -18,6 +18,39 @@
 #
 class Sample < ActiveRecord::Base
   include ProtocolLayoutHelper
+  include Swagger::Blocks
+    
+  swagger_schema :Sample do
+    property :id do
+      key :type, :integer
+      key :format, :int64
+      key :readOnly, true
+    end
+    property :name do
+      key :type, :string
+      key :description, 'Name of the sample'
+    end
+    property :notes do
+      key :type, :string
+      key :description, 'Notes of the sample'
+    end
+  end
+  
+	swagger_schema :FullSample do
+    allOf do
+      schema do
+        key :'$ref', :Sample
+      end
+      schema do
+        property :samples_wells do
+          key :type, :array
+          items do
+            key :'$ref', :SampleWell
+          end
+        end
+      end
+    end
+  end
   
   belongs_to :well_layout
   has_many :samples_wells, dependent: :destroy

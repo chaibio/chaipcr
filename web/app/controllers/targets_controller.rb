@@ -18,12 +18,84 @@
 #
 class TargetsController < ApplicationController
   include ParamsHelper
+  include Swagger::Blocks
   
   before_filter :ensure_authenticated_user
   before_filter :allow_cors
   
   before_filter -> { well_layout_editable_check }
   before_filter :get_object, :except => [:index, :create]
+  
+  swagger_path '/experiments/{experiment_id}/targets' do
+    operation :get do
+      key :summary, 'List all targets'
+      key :description, 'List all targets for the experiment sort by id'
+      key :produces, [
+        'application/json',
+      ]
+			key :tags, [
+				'Targets'
+			]
+      parameter do
+        key :name, :experiment_id
+        key :in, :path
+        key :description, 'Id of the experiment'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      
+      response 200 do
+        key :description, 'Object containing list of all the targets'
+        schema do
+          key :type, :array
+          items do
+            key :'$ref', :FullTarget
+          end
+        end
+      end
+    end
+    
+    operation :post do
+      key :summary, 'Create Target'
+      key :description, 'Create a new target for the experiment'
+      key :produces, [
+        'application/json',
+      ]
+      key :tags, [
+        'Targets'
+      ]
+      
+      parameter do
+        key :name, :experiment_id
+        key :in, :path
+        key :description, 'Id of the experiment'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      
+      parameter do
+        key :name, :target_params
+        key :in, :body
+        key :required, false
+        schema do
+          property :target do
+            key :'$ref', :Target
+          end
+        end
+      end
+      
+      response 200 do
+        key :description, 'Created target is returned'
+        schema do
+          property :target do
+            key :'$ref', :FullTarget
+          end
+        end
+      end
+    end
+  end
   
   def index
     @targets = Target.includes(:targets_wells).where(["targets.well_layout_id=? or targets.well_layout_id=?", @experiment.well_layout.id, @experiment.targets_well_layout_id]).order("targets.well_layout_id, targets.id")
@@ -62,6 +134,57 @@ class TargetsController < ApplicationController
     end
   end
   
+  swagger_path '/experiments/{experiment_id}/targets/{target_id}' do
+    operation :put do
+      key :summary, 'Update Target'
+      key :description, 'Update properties of a target'
+      key :produces, [
+        'application/json',
+      ]
+      key :tags, [
+        'Targets'
+      ]
+      
+      parameter do
+        key :name, :experiment_id
+        key :in, :path
+        key :description, 'Id of the experiment'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      
+      parameter do
+        key :name, :target_id
+        key :in, :path
+        key :description, 'Id of the target'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      
+      parameter do
+        key :name, :target_params
+        key :in, :body
+        key :description, 'Target to update'
+        key :required, true
+        schema do
+          property :target do
+            key :'$ref', :Target
+          end
+        end
+      end
+      response 200 do
+        key :description, 'Updated target is returned'
+        schema do
+          property :target do
+            key :'$ref', :FullTarget
+          end
+        end
+      end
+    end
+  end
+  
   def update
     if @target.well_layout_id == @experiment.well_layout.id
       ret  = @target.update_attributes(target_params)
@@ -73,6 +196,41 @@ class TargetsController < ApplicationController
     end
   end
 
+  swagger_path '/experiments/{experiment_id}/targets/{target_id}' do
+    operation :delete do
+      key :summary, 'Delete target'
+      key :description, 'If target is imported and linked to another experiment, it is not allowed to be deleted.'
+      key :produces, [
+        'application/json',
+      ]
+      key :tags, [
+        'Targets'
+      ]
+      
+      parameter do
+        key :name, :experiment_id
+        key :in, :path
+        key :description, 'Id of the experiment'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      
+      parameter do
+        key :name, :target_id
+        key :in, :path
+        key :description, 'Id of the target'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      
+      response 200 do
+        key :description, 'Target is Deleted'
+      end
+    end
+  end
+  
   def destroy
     if @target.well_layout_id == @experiment.well_layout.id
       @target.force_destroy = (params["force"] == true || params["force"] == "true")? true : false
@@ -88,7 +246,62 @@ class TargetsController < ApplicationController
       format.json { render "destroy", :status => (ret)? :ok : :unprocessable_entity}
     end
   end
-
+  
+  swagger_path '/experiments/{experiment_id}/targets/{target_id}/links' do
+    operation :post do
+      key :summary, 'Link Target'
+      key :description, 'Link target to a well'
+      key :produces, [
+        'application/json',
+      ]
+      key :tags, [
+        'Targets'
+      ]
+      
+      parameter do
+        key :name, :experiment_id
+        key :in, :path
+        key :description, 'Id of the experiment'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      
+      parameter do
+        key :name, :target_id
+        key :in, :path
+        key :description, 'Id of the target'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      
+      parameter do
+        key :name, :target_well_params
+        key :in, :body
+        key :description, 'wells parameters to be linked'
+        key :required, true
+        schema do
+          property :wells do
+            key :type, :array
+            items do
+              key :'$ref', :TargetWell
+            end
+          end
+        end
+      end
+      
+      response 200 do
+        key :description, 'Updated target is returned'
+        schema do
+          property :target do
+            key :'$ref', :FullTarget
+          end
+        end
+      end
+    end
+  end
+  
   def links
     if @target.belongs_to_experiment?(@experiment)
       params[:wells].each do |well|
@@ -108,6 +321,62 @@ class TargetsController < ApplicationController
     end
   end
   
+  swagger_path '/experiments/{experiment_id}/targets/{target_id}/unlinks' do
+    operation :post do
+      key :summary, 'Unlink Target'
+      key :description, 'Unlink target to a well'
+      key :produces, [
+        'application/json',
+      ]
+      key :tags, [
+        'Targets'
+      ]
+      
+      parameter do
+        key :name, :experiment_id
+        key :in, :path
+        key :description, 'Id of the experiment'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      
+      parameter do
+        key :name, :target_id
+        key :in, :path
+        key :description, 'Id of the target'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      
+      parameter do
+        key :name, :target_well_params
+        key :in, :body
+        key :description, 'wells to be unlinked'
+        key :required, true
+        schema do
+          property :wells do
+            key :type, :array
+            items do
+              key :type, :integer
+              key :description, "well_num (1-16)"
+            end
+          end
+        end
+      end
+      
+      response 200 do
+        key :description, 'Updated target is returned'
+        schema do
+          property :target do
+            key :'$ref', :FullTarget
+          end
+        end
+      end
+    end
+  end
+  
   def unlinks
     params[:wells].each do |well_num|
       unlink_well(well_num)
@@ -123,18 +392,11 @@ class TargetsController < ApplicationController
   def link_well(well_num, target_well_params)
     target_well = TargetsWell.find_or_create(@target, @experiment.well_layout.id, well_num)
     if target_well_params
-      unless target_well_params[:well_type] == ''
-        target_well.well_type = target_well_params[:well_type] if !target_well_params[:well_type].nil?
-        target_well.omit = target_well_params[:omit] if !target_well_params[:omit].nil?
-        if !target_well_params[:quantity].nil?
-          target_well.quantity_m = target_well_params[:quantity][:m]
-          target_well.quantity_b = target_well_params[:quantity][:b]
-        end
-      else
-        target_well.well_type = nil
-        target_well.omit = nil
-        target_well.quantity_m = nil
-        target_well.quantity_b = nil
+      target_well.omit = target_well_params[:omit] if !target_well_params[:omit].nil?
+      target_well.well_type = target_well_params[:well_type] if !target_well_params[:well_type].nil?
+      if !target_well_params[:quantity].nil?
+        target_well.quantity_m = target_well_params[:quantity][:m]
+        target_well.quantity_b = target_well_params[:quantity][:b]
       end
     end
     ret = target_well.save

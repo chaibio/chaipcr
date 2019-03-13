@@ -187,6 +187,22 @@ describe "Targets API", type: :request do
       json = JSON.parse(response.body)
       expect(json["target"]["errors"]).not_to be_nil
     end
+    
+    it 'target well_type cleared' do
+      post "/experiments/#{@experiment.id}/targets/#{@target1.id}/links", {wells:[{well_num: 2, well_type: "standard", quantity:{m: 1.12345678, b:-2}}]}.to_json, http_headers
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json["target"]["targets_wells"].length).to eq(1) #for target2
+      expect(json["target"]["targets_wells"][0]["well_num"]).to eq(2)
+      expect(json["target"]["targets_wells"][0]["well_type"]).not_to be_nil
+      post "/experiments/#{@experiment.id}/targets/#{@target1.id}/links", {wells:[{well_num: 2, well_type: ""}]}.to_json, http_headers
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json["target"]["targets_wells"].length).to eq(1) #for target2
+      expect(json["target"]["targets_wells"][0]["well_num"]).to eq(2)
+      expect(json["target"]["targets_wells"][0]["well_type"]).to be_nil
+      expect(json["target"]["targets_wells"][0]["quantity"]).to be_nil
+    end
   end
   
   describe "#unlink" do

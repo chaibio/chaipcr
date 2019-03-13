@@ -26,6 +26,7 @@ class Stage < ActiveRecord::Base
     property :id do
       key :type, :integer
       key :format, :int64
+      key :readOnly, true
     end
     property :stage_type do
       key :type, :string
@@ -50,49 +51,28 @@ class Stage < ActiveRecord::Base
 			key :description, "Cycle to start delta temperature"
       key :type, :integer
     end
-    property :steps do
-      key :type, :array
-      items do
-        key :'$ref', :Step
-      end
+    property :order_number do
+      key :type, :integer
+      key :description, 'sort order'
+      key :readOnly, true
     end
   end
 
-	swagger_schema :StageValue do
-		property :stage do
-			key :description, 'Give a description of all the parameters'
-			property :id do
-				key :type, :integer
-				key :format, :int64
-			end
-			property :stage_type do
-				key :type, :string
-			end
-			property :name do
-				key :type, :string
-			end
-			property :num_cycles do
-				key :type, :integer
-				key :format, :int32
-			end
-			property :auto_delta do
-				key :type, :boolean
-				key :default, false
-			end
-			property :auto_delta_start_cycle do
-				key :type, :integer
-			end
-		end
-	end
-
-	swagger_schema :StageInput do
-		property :prev_id do
-			key :type, :integer
-			key :format, :int64
-			key :required, true
-			key :description, 'prev stage id or null if it is the first node'
-		end
-	end
+	swagger_schema :FullStage do
+    allOf do
+      schema do
+        property :steps do
+          key :type, :array
+          items do
+            key :'$ref', :FullStep
+          end
+        end
+      end
+      schema do
+        key :'$ref', :Stage
+      end
+    end
+  end
 
   belongs_to :protocol
   has_many :steps, -> {order("order_number")}

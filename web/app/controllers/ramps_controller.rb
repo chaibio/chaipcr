@@ -45,7 +45,7 @@ class RampsController < ApplicationController
 				'application/json',
 			]
 			key :tags, [
-				'Ramp'
+				'Ramps'
 			]
 			parameter do
 				key :name, :id
@@ -61,15 +61,17 @@ class RampsController < ApplicationController
 				key :description, 'Ramp properties to update'
 				key :required, true
 				schema do
-					key :'$ref', :Ramp_params
+          property :ramp do
+					  key :'$ref', :Ramp
+          end
 				end
 			end
 			response 200 do
 				key :description, 'Returns an object ramp which has the list of ramp properties'
 				schema do
-					key :name, :Ramp
-					key :type, :object
-					key :'$ref', :Ramp
+          property :ramp do
+					  key :'$ref', :Ramp
+          end
 				end
 			end
 		end

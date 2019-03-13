@@ -18,7 +18,46 @@
 #
 class Target < ActiveRecord::Base
   include ProtocolLayoutHelper
+  include Swagger::Blocks
     
+  swagger_schema :Target do
+    property :id do
+      key :type, :integer
+      key :format, :int64
+      key :readOnly, true
+    end
+    property :name do
+      key :type, :string
+      key :description, 'Name of the target'
+    end
+    property :channel do
+      key :type, :integer
+      key :enum, [1, 2]
+      key :description, 'target channel'
+    end
+    property :imported do
+      key :type, :boolean
+      key :description, 'imported target'
+      key :readOnly, true
+    end
+  end
+  
+	swagger_schema :FullTarget do
+    allOf do
+      schema do
+        key :'$ref', :Target
+      end
+      schema do
+        property :targets_wells do
+          key :type, :array
+          items do
+            key :'$ref', :TargetWell
+          end
+        end
+      end
+    end
+  end
+  
   belongs_to :well_layout
   has_many :targets_wells, dependent: :destroy
   

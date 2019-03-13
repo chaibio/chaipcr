@@ -18,6 +18,14 @@
 #
 class SamplesWell < ActiveRecord::Base
   include ProtocolLayoutHelper
+  include Swagger::Blocks
+    
+  swagger_schema :SampleWell do
+    property :well_num do
+      key :type, :integer
+      key :description, 'between 1 to 16'
+    end
+  end
   
   belongs_to :well_layout
   belongs_to :sample

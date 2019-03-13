@@ -19,103 +19,86 @@
 class Experiment < ActiveRecord::Base
   include Swagger::Blocks
 
-	swagger_schema :Experiments do
-		property :experiment do
-			property :id do
-	      key :type, :integer
-	      key :format, :int64
-	    end
-	    property :name do
-				key :description, 'Name of the experiment'
-	      key :type, :string
-	    end
-	    property :type do
-				key :description, 'Josh to describe'
-	      key :type, :string
-				key :enum, ['user', 'diagnostic', 'calibration']
-	    end
-	    property :time_valid do
-	      key :type, :boolean
-	    end
-	    property :created_at do
-				key :description, 'Date at which the experiment was created'
-	      key :type, :string
-	      key :format, :date
-	    end
-	    property :started_at do
-				key :description, 'Date at which the experiment was started'
-	      key :type, :string
-	      key :format, :date
-	    end
-	    property :completed_at do
-				key :description, 'Date at which the experiment was completed'
-	      key :type, :string
-	      key :format, :date
-	    end
-	    property :completion_status do
-				key :description, 'If the experiment was completed successfully or aborted'
-	      key :type, :string
-	    end
-	    property :completion_message do
-				key :description, '?'
-	      key :type, :string
-	    end
-		end
-	end
-
-  swagger_schema :Experiment do
-    key :required, [:id, :name]
-    property :id do
+	swagger_schema :Experiment do
+		property :id do
       key :type, :integer
       key :format, :int64
+      key :readOnly, true
     end
     property :name do
-      key :type, :string
-    end
-    property :type do
-      key :type, :string
-      key :enum, ['user', 'diagnostic', 'calibration']
-    end
-    property :time_valid do
-      key :type, :boolean
-    end
-    property :created_at do
-      key :type, :string
-      key :format, :date
-    end
-    property :started_at do
-      key :type, :string
-      key :format, :date
-    end
-    property :completed_at do
-      key :type, :string
-      key :format, :date
-    end
-    property :completion_status do
-      key :type, :string
-    end
-    property :completion_message do
-      key :type, :string
-    end
-    property :protocol do
-      key :type, :object
-      key :'$ref', :Protocol
-    end
-    property :errors do
-      key :type, :array
-      items do
-        key :type, :string
-      end
-    end
-  end
-
-  swagger_schema :ExperimentInput do
-    key :required, [:name]
-    property :name do
+			key :description, 'Name of the experiment'
       key :type, :string
     end
     property :guid do
+			key :description, 'guid of the experiment'
       key :type, :string
+    end
+    property :notes do
+			key :description, 'Notes of the experiment'
+      key :type, :string
+    end
+    property :standard_experiment_id do
+			key :description, 'imported standard experiment id'
+      key :type, :integer
+      key :format, :int64
+    end
+    property :type do
+			key :description, 'experiment type'
+      key :type, :string
+			key :enum, ['user', 'diagnostic', 'calibration', 'test_kit']
+      key :readOnly, true
+    end
+    property :time_valid do
+      key :type, :boolean
+      key :readOnly, true
+    end
+    property :created_at do
+			key :description, 'Date at which the experiment was created'
+      key :type, :string
+      key :format, :date
+      key :readOnly, true
+    end
+    property :started_at do
+			key :description, 'Date at which the experiment was started'
+      key :type, :string
+      key :format, :date
+      key :readOnly, true
+    end
+    property :completed_at do
+			key :description, 'Date at which the experiment was completed'
+      key :type, :string
+      key :format, :date
+      key :readOnly, true
+    end
+    property :completion_status do
+			key :description, 'If the experiment was completed successfully or aborted'
+      key :type, :string
+      key :readOnly, true
+    end
+    property :completion_message do
+			key :description, '?'
+      key :type, :string
+      key :readOnly, true
+    end
+	end
+
+  swagger_schema :FullExperiment do
+    allOf do
+      schema do
+        property :protocol do
+          key :type, :object
+          key :'$ref', :FullProtocol
+        end
+        property :errors do
+          key :type, :array
+          items do
+            key :type, :string
+          end
+        end
+      end
+      schema do
+        key :'$ref', :Experiment
+      end
     end
   end
 

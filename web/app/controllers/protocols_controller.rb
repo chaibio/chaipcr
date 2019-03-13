@@ -44,7 +44,7 @@ class ProtocolsController < ApplicationController
 				'application/json',
 			]
 			key :tags, [
-				'Protocol'
+				'Protocols'
 			]
 			parameter do
 				key :name, :id
@@ -60,15 +60,17 @@ class ProtocolsController < ApplicationController
 				key :description, 'Protocol properties to update'
 				key :required, true
 				schema do
-					key :'$ref', :ProtocolInput
+          property :protocol do
+					  key :'$ref', :FullProtocol
+          end
 				end
 			end
 			response 200 do
 				key :description, 'Returns an object protocol which has the list of protocol properties'
 				schema do
-					key :name, :Protocol
-					key :type, :object
-					key :'$ref', :Protocol
+          property :protocol do
+					  key :'$ref', :Protocol
+          end
 				end
 			end
 		end

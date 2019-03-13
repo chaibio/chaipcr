@@ -25,6 +25,7 @@ class Ramp < ActiveRecord::Base
     property :id do
       key :type, :integer
       key :format, :int64
+      key :readOnly, true
     end
     property :rate do
       key :type, :number
@@ -40,26 +41,6 @@ class Ramp < ActiveRecord::Base
       key :default, false
     end
   end
-
-	swagger_schema :Ramp_params do
-		key :required, [:ramp]
-		property :ramp do
-			key :description, 'Give a description of all the parameters'
-			property :rate do
-				key :type, :number
-				key :format, :float
-				key :description, 'Rate of the ramp, in degrees C/s, precision to 8 decimal point'
-				key :default, 0
-				key :minimum, 0
-				key :maximum, 5
-			end
-			property :collect_data do
-				key :type, :boolean
-				key :description, 'Collect data'
-				key :default, false
-			end
-		end
-	end
 
   belongs_to :step, foreign_key: "next_step_id"
 

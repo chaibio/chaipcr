@@ -1,5 +1,5 @@
 object @sample
-attribute :id, :name
+attribute :id, :name, :notes
 
 child :samples_wells, :object_root => false do
 	attribute :well_num

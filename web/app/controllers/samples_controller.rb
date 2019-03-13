@@ -18,11 +18,83 @@
 #
 class SamplesController < ApplicationController
   include ParamsHelper
+  include Swagger::Blocks
   
   before_filter :ensure_authenticated_user
   before_filter :allow_cors
   before_filter -> { well_layout_editable_check }
   before_filter :get_object, :except => [:index, :create]
+  
+  swagger_path '/experiments/{experiment_id}/samples' do
+    operation :get do
+      key :summary, 'List all samples'
+      key :description, 'List all samples for the experiment sort by id'
+      key :produces, [
+        'application/json',
+      ]
+			key :tags, [
+				'Samples'
+			]
+      parameter do
+        key :name, :experiment_id
+        key :in, :path
+        key :description, 'Id of the experiment'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      
+      response 200 do
+        key :description, 'Object containing list of all the samples'
+        schema do
+          key :type, :array
+          items do
+            key :'$ref', :FullSample
+          end
+        end
+      end
+    end
+    
+    operation :post do
+      key :summary, 'Create Sample'
+      key :description, 'Create a new sample for the experiment'
+      key :produces, [
+        'application/json',
+      ]
+      key :tags, [
+        'Samples'
+      ]
+      
+      parameter do
+        key :name, :experiment_id
+        key :in, :path
+        key :description, 'Id of the experiment'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      
+      parameter do
+        key :name, :sample_params
+        key :in, :body
+        key :required, false
+        schema do
+          property :sample do
+            key :'$ref', :Sample
+          end
+        end
+      end
+      
+      response 200 do
+        key :description, 'Created sample is returned'
+        schema do
+          property :sample do
+            key :'$ref', :FullSample
+          end
+        end
+      end
+    end
+  end
   
   def index
     @samples = Sample.includes(:samples_wells).joins("inner join well_layouts on well_layouts.id = samples.well_layout_id").where(["experiment_id=? and parent_type=?", params[:experiment_id], Experiment.name]).order("samples.id")
@@ -40,10 +112,95 @@ class SamplesController < ApplicationController
     end
   end
   
+  swagger_path '/experiments/{experiment_id}/samples/{sample_id}' do
+    operation :put do
+      key :summary, 'Update Sample'
+      key :description, 'Update properties of a sample'
+      key :produces, [
+        'application/json',
+      ]
+      key :tags, [
+        'Samples'
+      ]
+      
+      parameter do
+        key :name, :experiment_id
+        key :in, :path
+        key :description, 'Id of the experiment'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      
+      parameter do
+        key :name, :sample_id
+        key :in, :path
+        key :description, 'Id of the sample'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      
+      parameter do
+        key :name, :sample_params
+        key :in, :body
+        key :description, 'Sample to update'
+        key :required, true
+        schema do
+          property :sample do
+            key :'$ref', :Sample
+          end
+        end
+      end
+      response 200 do
+        key :description, 'Updated sample is returned'
+        schema do
+          property :sample do
+            key :'$ref', :FullSample
+          end
+        end
+      end
+    end
+  end
+  
   def update
     ret  = @sample.update_attributes(sample_params)
     respond_to do |format|
       format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
+    end
+  end
+  
+  swagger_path '/experiments/{experiment_id}/samples/{sample_id}' do
+    operation :delete do
+      key :summary, 'Delete sample'
+      key :produces, [
+        'application/json',
+      ]
+      key :tags, [
+        'Samples'
+      ]
+      
+      parameter do
+        key :name, :experiment_id
+        key :in, :path
+        key :description, 'Id of the experiment'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      
+      parameter do
+        key :name, :sample_id
+        key :in, :path
+        key :description, 'Id of the sample'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      
+      response 200 do
+        key :description, 'Sample is Deleted'
+      end
     end
   end
 
@@ -52,6 +209,61 @@ class SamplesController < ApplicationController
     ret = @sample.destroy
     respond_to do |format|
       format.json { render "destroy", :status => (ret)? :ok : :unprocessable_entity}
+    end
+  end
+
+  swagger_path '/experiments/{experiment_id}/samples/{sample_id}/links' do
+    operation :post do
+      key :summary, 'Link Sample'
+      key :description, 'Link sample to a well'
+      key :produces, [
+        'application/json',
+      ]
+      key :tags, [
+        'Samples'
+      ]
+      
+      parameter do
+        key :name, :experiment_id
+        key :in, :path
+        key :description, 'Id of the experiment'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      
+      parameter do
+        key :name, :sample_id
+        key :in, :path
+        key :description, 'Id of the sample'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      
+      parameter do
+        key :in, :body
+        key :description, 'wells to be linked'
+        key :required, true
+        schema do
+          property :wells do
+            key :type, :array
+            items do
+              key :type, :integer
+              key :description, "well_num (1-16)"
+            end
+          end
+        end
+      end
+      
+      response 200 do
+        key :description, 'Updated sample is returned'
+        schema do
+          property :sample do
+            key :'$ref', :FullSample
+          end
+        end
+      end
     end
   end
 
@@ -67,6 +279,61 @@ class SamplesController < ApplicationController
     
     respond_to do |format|
       format.json { render "show", :status => (@sample.errors.empty?)? :ok : :unprocessable_entity}
+    end
+  end
+  
+  swagger_path '/experiments/{experiment_id}/samples/{sample_id}/unlinks' do
+    operation :post do
+      key :summary, 'Unlink Sample'
+      key :description, 'Unlink sample to a well'
+      key :produces, [
+        'application/json',
+      ]
+      key :tags, [
+        'Samples'
+      ]
+      
+      parameter do
+        key :name, :experiment_id
+        key :in, :path
+        key :description, 'Id of the experiment'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      
+      parameter do
+        key :name, :sample_id
+        key :in, :path
+        key :description, 'Id of the sample'
+        key :required, true
+        key :type, :integer
+        key :format, :int64
+      end
+      
+      parameter do
+        key :in, :body
+        key :description, 'wells to be unlinked'
+        key :required, true
+        schema do
+          property :wells do
+            key :type, :array
+            items do
+              key :type, :integer
+              key :description, "well_num (1-16)"
+            end
+          end
+        end
+      end
+      
+      response 200 do
+        key :description, 'Updated sample is returned'
+        schema do
+          property :sample do
+            key :'$ref', :FullSample
+          end
+        end
+      end
     end
   end
   

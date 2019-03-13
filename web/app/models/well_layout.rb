@@ -30,6 +30,45 @@ class WellNode #change to Well later
 end
 
 class WellLayout < ActiveRecord::Base
+  include Swagger::Blocks
+  
+  swagger_schema :WellLayout do
+    property :samples do
+      key :type, :array
+      items do
+        key :'$ref', :WellLayoutSample
+      end
+    end
+    property :targets do
+      key :type, :array
+      items do
+        key :'$ref', :WellLayoutTarget
+      end
+    end
+  end
+  
+  swagger_schema :WellLayoutSample do
+    allOf do
+      schema do
+        key :'$ref', :SampleWell
+      end
+      schema do
+        key :'$ref', :Sample
+      end
+    end
+  end
+    
+  swagger_schema :WellLayoutTarget do
+    allOf do
+      schema do
+        key :'$ref', :TargetWell
+      end
+      schema do
+        key :'$ref', :Target
+      end
+    end
+  end
+  
   has_many :samples
   has_many :targets
   

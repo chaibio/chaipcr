@@ -46,14 +46,16 @@ class UsersController < ApplicationController
         'application/json',
       ]
 			key :tags, [
-				'User'
+				'Users'
 			]
       response 200 do
         key :description, 'User response'
         schema do
           key :type, :array
           items do
-            key :'$ref', :User
+            property :user do
+              key :'$ref', :User
+            end
           end
         end
       end
@@ -71,18 +73,41 @@ class UsersController < ApplicationController
 
   swagger_path '/users/current' do
     operation :get do
-      key :summary, 'Show User'
-      key :description, 'List the current user'
+      key :summary, 'Show Current User'
+      key :description, 'Show the current user'
       key :produces, [
         'application/json',
       ]
 			key :tags, [
-				'User'
+				'Users'
 			]
       response 200 do
         key :description, 'Current user response'
         schema do
-          key :'$ref', :User
+          property :user do
+            key :'$ref', :User
+          end
+        end
+      end
+    end
+  end
+  
+  swagger_path '/users/{user_id}' do
+    operation :get do
+      key :summary, 'Show User'
+      key :description, 'show user for the specified id'
+      key :produces, [
+        'application/json',
+      ]
+			key :tags, [
+				'Users'
+			]
+      response 200 do
+        key :description, 'user response'
+        schema do
+          property :user do
+            key :'$ref', :User
+          end
         end
       end
     end
@@ -109,21 +134,27 @@ class UsersController < ApplicationController
         'application/json',
       ]
 			key :tags, [
-				'User'
+				'Users'
 			]
+      
       parameter do
         key :name, :user
         key :in, :body
         key :description, 'User to create'
         key :required, true
         schema do
-           key :'$ref', :UserInput
-         end
+          property :user do
+            key :'$ref', :User
+          end
+        end
       end
+      
       response 200 do
         key :description, 'User response'
         schema do
-          key :'$ref', :User
+          property :user do
+            key :'$ref', :User
+          end
         end
       end
     end
@@ -145,12 +176,12 @@ class UsersController < ApplicationController
   swagger_path '/users/{id}' do
     operation :put do
 			key :summary, 'Update User'
-      key :description, 'Update an user'
+      key :description, 'If you are admin, you can update any user; otherwise, you can only update yourself'
       key :produces, [
         'application/json',
       ]
 			key :tags, [
-				'User'
+				'Users'
 			]
       parameter do
         key :name, :id
@@ -164,13 +195,17 @@ class UsersController < ApplicationController
 				key :description, 'User to update'
 				key :required, true
 				schema do
-					 key :'$ref', :UserInput
-				 end
+          property :user do
+					   key :'$ref', :User
+          end
+				end
 			end
       response 200 do
         key :description, 'User response'
         schema do
-          key :'$ref', :User
+          property :user do
+            key :'$ref', :User
+          end
         end
       end
     end
@@ -195,7 +230,7 @@ class UsersController < ApplicationController
         'application/json',
       ]
 			key :tags, [
-				'User'
+				'Users'
 			]
       parameter do
         key :name, :id
@@ -203,6 +238,7 @@ class UsersController < ApplicationController
         key :description, 'Id of the user to delete'
         key :required, true
       end
+      
       response 200 do
         key :description, 'User Deleted'
       end

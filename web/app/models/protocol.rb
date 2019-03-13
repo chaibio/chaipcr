@@ -23,38 +23,38 @@ class Protocol < ActiveRecord::Base
     property :id do
       key :type, :integer
       key :format, :int64
+      key :readOnly, true
     end
     property :lid_temperature do
       key :type, :number
-      key :format, :double
+      key :format, :float
       key :description, 'Lid temperature, in degree C, default is 110, with precision to one decimal point'
+      key :default, 110
     end
     property :estimate_duration do
       key :type, :integer
 			key :description, 'Estimated duration in seconds'
       key :format, :int32
+      key :readOnly, true
     end
-    property :stages do
-      key :type, :array
-      items do
-        key :'$ref', :Stage
+  end
+  
+	swagger_schema :FullProtocol do
+    allOf do
+      schema do
+        property :stages do
+          key :type, :array
+          items do
+            key :'$ref', :FullStage
+          end
+        end
+      end
+      schema do
+        key :'$ref', :Protocol
       end
     end
   end
-
-	swagger_schema :ProtocolInput do
-		key :required, [:protocol]
-		property :protocol do
-			key :description, 'Contains properties to update'
-			property :lid_temperature do
-				key :type, :number
-				key :format, :float
-				key :description, 'lid temperature, in degree C, default is 110, with precision to one decimal point'
-				key :default, 110
-			end
-		end
-	end
-
+  
   belongs_to :experiment_definition
   has_many :stages, -> {order("order_number").includes(:steps, :ramps)}
 

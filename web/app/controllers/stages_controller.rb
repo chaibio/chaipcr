@@ -48,8 +48,9 @@ class StagesController < ApplicationController
 				'application/json',
 			]
 			key :tags, [
-				'Stage'
+				'Stages'
 			]
+      
 			parameter do
 				key :name, :protocol_id
 				key :in, :path
@@ -58,19 +59,29 @@ class StagesController < ApplicationController
 				key :type, :integer
 				key :format, :int64
 			end
-			parameter do
-				key :name, :prev_id
-				key :in, :body
-				key :required, false
-				key :description, 'Properties of the stage'
-				schema do
-					key :'$ref', :StageInput
-				end
-			end
+      
+      parameter do
+        key :name, :stage_params
+        key :in, :body
+        key :required, false
+        schema do
+          property :prev_id do
+    			   key :type, :integer
+    			   key :format, :int64
+    			   key :description, 'prev stage id or null if it is the first node'
+          end
+          property :stage do
+            key :'$ref', :Stage
+          end
+        end
+      end
+      
 			response 200 do
 				key :description, 'Created stage is returned'
 				schema do
-					key :'$ref', :Stage
+          property :stage do
+					  key :'$ref', :Stage
+          end
 				end
 			end
 		end
@@ -96,7 +107,7 @@ class StagesController < ApplicationController
 				'application/json',
 			]
 			key :tags, [
-				'Stage'
+				'Stages'
 			]
 			parameter do
 				key :name, :stage_id
@@ -112,13 +123,17 @@ class StagesController < ApplicationController
 				key :description, 'Stage to update'
 				key :required, true
 				schema do
-					key :'$ref', :StageValue
+          property :stage do
+            key :'$ref', :Stage
+          end
 				end
 			end
 			response 200 do
 				key :description, 'Updated stage is returned'
 				schema do
-					key :'$ref', :StageValue
+          property :stage do
+					  key :'$ref', :Stage
+          end
 				end
 			end
 		end
@@ -136,14 +151,15 @@ class StagesController < ApplicationController
 
 	swagger_path '/stages/{stage_id}/move' do
 		operation :post do
-			key :summary, 'Move Stage'
-			key :description, 'Move a Stage'
+			key :summary, 'Reorder Stage'
+			key :description, 'Reorder a stage'
 			key :produces, [
 				'application/json',
 			]
 			key :tags, [
-				'Stage'
+				'Stages'
 			]
+      
 			parameter do
 				key :name, :stage_id
 				key :in, :path
@@ -152,20 +168,26 @@ class StagesController < ApplicationController
 				key :type, :integer
 				key :format, :int64
 			end
+      
 			parameter do
 				key :name, :prev_id
 				key :in, :body
-				key :description, 'Previous stage id'
+				key :description, 'stage id where this stage will go after'
 				key :required, true
 				schema do
-					 key :'$ref', :StageInput
+          property :prev_id do
+    			  key :type, :integer
+    			  key :format, :int64
+    			  key :description, 'prev stage id or null if it is the first node'
+          end
 				 end
 			end
 			response 200 do
 				key :description, 'Moved Stage'
 				schema do
-					key :type, :object
-					key :'$ref', :StageValue
+          property :stage do
+					  key :'$ref', :Stage
+          end
 				end
 			end
 		end
@@ -189,7 +211,7 @@ class StagesController < ApplicationController
 				'application/json',
 			]
 			key :tags, [
-				'Stage'
+				'Stages'
 			]
 			parameter do
 				key :name, :stage_id
