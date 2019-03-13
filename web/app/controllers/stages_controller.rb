@@ -16,6 +16,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+module ParameterStageId
+  def self.extended(base)
+		base.parameter do
+			key :name, :stage_id
+			key :in, :path
+			key :description, 'Stage ID'
+			key :required, true
+			key :type, :integer
+			key :format, :int64
+		end
+  end
+end
+
 class StagesController < ApplicationController
   include ParamsHelper
 	include Swagger::Blocks
@@ -42,6 +56,8 @@ class StagesController < ApplicationController
 
 	swagger_path '/protocols/{protocol_id}/stages' do
 		operation :post do
+      extend SwaggerHelper::AuthenticationError
+      
 			key :summary, 'Create Stage'
 			key :description, 'Create a new stage in the protocol'
 			key :produces, [
@@ -54,7 +70,7 @@ class StagesController < ApplicationController
 			parameter do
 				key :name, :protocol_id
 				key :in, :path
-				key :description, 'Id of the protocol'
+				key :description, 'Protocol ID'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
@@ -101,6 +117,9 @@ class StagesController < ApplicationController
 
 	swagger_path '/stages/{stage_id}' do
 		operation :put do
+      extend SwaggerHelper::AuthenticationError
+      extend ParameterStageId
+            
 			key :summary, 'Update Stage'
 			key :description, 'Update properties of a stage'
 			key :produces, [
@@ -109,16 +128,9 @@ class StagesController < ApplicationController
 			key :tags, [
 				'Stages'
 			]
+
 			parameter do
-				key :name, :stage_id
-				key :in, :path
-				key :description, 'Id of the stage'
-				key :required, true
-				key :type, :integer
-				key :format, :int64
-			end
-			parameter do
-				key :name, :step
+				key :name, :stage_params
 				key :in, :body
 				key :description, 'Stage to update'
 				key :required, true
@@ -151,6 +163,9 @@ class StagesController < ApplicationController
 
 	swagger_path '/stages/{stage_id}/move' do
 		operation :post do
+      extend SwaggerHelper::AuthenticationError
+      extend ParameterStageId
+      
 			key :summary, 'Reorder Stage'
 			key :description, 'Reorder a stage'
 			key :produces, [
@@ -159,15 +174,6 @@ class StagesController < ApplicationController
 			key :tags, [
 				'Stages'
 			]
-      
-			parameter do
-				key :name, :stage_id
-				key :in, :path
-				key :description, 'Id of the stage'
-				key :required, true
-				key :type, :integer
-				key :format, :int64
-			end
       
 			parameter do
 				key :name, :prev_id
@@ -205,6 +211,9 @@ class StagesController < ApplicationController
 
 	swagger_path '/stages/{stage_id}' do
 		operation :delete do
+      extend SwaggerHelper::AuthenticationError
+      extend ParameterStageId
+      
 			key :summary, 'Delete Stage'
 			key :description, 'Delete the entire stage'
 			key :produces, [
@@ -213,16 +222,16 @@ class StagesController < ApplicationController
 			key :tags, [
 				'Stages'
 			]
-			parameter do
-				key :name, :stage_id
-				key :in, :path
-				key :description, 'Id of the stage'
-				key :required, true
-				key :type, :integer
-				key :format, :int64
-			end
-			response 200 do
+
+      response 200 do
 				key :description, 'Stage is Deleted'
+			end
+      
+			response 422 do
+				key :description, 'Stage delete error'
+				schema do
+					key :'$ref', :ErrorModel
+				end
 			end
 		end
 	end

@@ -40,6 +40,8 @@ class UsersController < ApplicationController
 
   swagger_path '/users' do
     operation :get do
+      extend SwaggerHelper::AuthenticationError
+      
       key :summary, 'List all Users'
       key :description, 'Gives a list of all the users'
       key :produces, [
@@ -73,6 +75,8 @@ class UsersController < ApplicationController
 
   swagger_path '/users/current' do
     operation :get do
+      extend SwaggerHelper::AuthenticationError
+      
       key :summary, 'Show Current User'
       key :description, 'Show the current user'
       key :produces, [
@@ -94,6 +98,8 @@ class UsersController < ApplicationController
   
   swagger_path '/users/{user_id}' do
     operation :get do
+      extend SwaggerHelper::AuthenticationError
+      
       key :summary, 'Show User'
       key :description, 'show user for the specified id'
       key :produces, [
@@ -128,8 +134,10 @@ class UsersController < ApplicationController
 
   swagger_path '/users' do
     operation :post do
+      extend SwaggerHelper::AuthenticationError
+      
 			key :summary, 'Create User'
-      key :description, 'Create an user. Authentication token is not required.'
+      key :description, 'Create an user -- only allowed by admin'
       key :produces, [
         'application/json',
       ]
@@ -138,7 +146,7 @@ class UsersController < ApplicationController
 			]
       
       parameter do
-        key :name, :user
+        key :name, :user_params
         key :in, :body
         key :description, 'User to create'
         key :required, true
@@ -175,6 +183,8 @@ class UsersController < ApplicationController
 
   swagger_path '/users/{id}' do
     operation :put do
+      extend SwaggerHelper::AuthenticationError
+      
 			key :summary, 'Update User'
       key :description, 'If you are admin, you can update any user; otherwise, you can only update yourself'
       key :produces, [
@@ -190,7 +200,7 @@ class UsersController < ApplicationController
         key :required, true
       end
 			parameter do
-				key :name, :user
+				key :name, :user_params
 				key :in, :body
 				key :description, 'User to update'
 				key :required, true
@@ -224,8 +234,10 @@ class UsersController < ApplicationController
 
   swagger_path '/users/{id}' do
     operation :delete do
+      extend SwaggerHelper::AuthenticationError
+      
 			key :summary, 'Delete User'
-      key :description, 'Delete a user'
+      key :description, 'Delete a user -- only allowed by admin'
       key :produces, [
         'application/json',
       ]
@@ -235,7 +247,7 @@ class UsersController < ApplicationController
       parameter do
         key :name, :id
         key :in, :path
-        key :description, 'Id of the user to delete'
+        key :description, 'User ID'
         key :required, true
       end
       

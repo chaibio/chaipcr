@@ -16,6 +16,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+module ParameterStepId
+  def self.extended(base)
+		base.parameter do
+			key :name, :step_id
+			key :in, :path
+			key :description, 'Step ID'
+			key :required, true
+			key :type, :integer
+			key :format, :int64
+		end
+  end
+end
+
 class StepsController < ApplicationController
   include ParamsHelper
   include Swagger::Blocks
@@ -44,6 +58,8 @@ class StepsController < ApplicationController
 
   swagger_path '/stages/{stage_id}/steps' do
     operation :post do
+      extend SwaggerHelper::AuthenticationError
+      
       key :summary, 'Create Step'
       key :description, 'Create a new step in the stage'
       key :produces, [
@@ -56,7 +72,7 @@ class StepsController < ApplicationController
       parameter do
         key :name, :stage_id
         key :in, :path
-        key :description, 'Id of the stage'
+        key :description, 'Stage ID'
         key :required, true
         key :type, :integer
         key :format, :int64
@@ -109,6 +125,9 @@ class StepsController < ApplicationController
 
   swagger_path '/steps/{step_id}' do
     operation :put do
+      extend SwaggerHelper::AuthenticationError
+      extend ParameterStepId
+      
       key :summary, 'Update Step'
       key :description, 'Update properties of a step'
       key :produces, [
@@ -117,16 +136,9 @@ class StepsController < ApplicationController
       key :tags, [
         'Steps'
       ]
+
       parameter do
-        key :name, :step_id
-        key :in, :path
-        key :description, 'Id of the step'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
-      parameter do
-        key :name, :step
+        key :name, :step_params
         key :in, :body
         key :description, 'Step to update'
         key :required, true
@@ -159,6 +171,9 @@ class StepsController < ApplicationController
 
   swagger_path '/steps/{step_id}/move' do
     operation :post do
+      extend SwaggerHelper::AuthenticationError
+      extend ParameterStepId
+      
       key :summary, 'Reorder Step'
       key :description, 'Reorder a step'
       key :produces, [
@@ -167,14 +182,7 @@ class StepsController < ApplicationController
       key :tags, [
         'Steps'
       ]
-      parameter do
-        key :name, :step_id
-        key :in, :path
-        key :description, 'Id of the step'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
+
       parameter do
         key :name, :prev_id
         key :in, :body
@@ -221,6 +229,9 @@ class StepsController < ApplicationController
 
   swagger_path '/steps/{step_id}' do
     operation :delete do
+      extend SwaggerHelper::AuthenticationError
+      extend ParameterStepId
+      
       key :summary, 'Delete Step'
       key :description, 'If last step in the asoociated stage is destroyed, the stage will be destroyed too if it is not the last stage in the protocol. '
       key :produces, [
@@ -229,17 +240,17 @@ class StepsController < ApplicationController
       key :tags, [
         'Steps'
       ]
-      parameter do
-        key :name, :step_id
-        key :in, :path
-        key :description, 'Id of the step'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
+
       response 200 do
         key :description, 'Step is Deleted'
       end
+      
+			response 422 do
+				key :description, 'Step delete error'
+				schema do
+					key :'$ref', :ErrorModel
+				end
+			end
     end
   end
 

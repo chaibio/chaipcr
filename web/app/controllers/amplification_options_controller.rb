@@ -44,8 +44,10 @@ class AmplificationOptionsController < ApplicationController
     end
   end
 
-	swagger_path '/experiments/{id}/amplification_option' do
+	swagger_path '/experiments/{experiment_id}/amplification_option' do
 		operation :get do
+      extend SwaggerHelper::AuthenticationError
+      
 			key :summary, 'Amplification Options'
 			key :description, 'Returns the amplification options for the experiment'
 			key :produces, [
@@ -54,18 +56,12 @@ class AmplificationOptionsController < ApplicationController
 			key :tags, [
 				'AmplificationOptions'
 			]
-			parameter do
-				key :name, :id
-				key :in, :path
-				key :description, 'Id of the experiment'
-				key :required, true
-				key :type, :integer
-				key :format, :int64
-			end
+      
+      parameter :experiment_id
+
 			response 200 do
 				key :description, 'Returns an object amplification_option which has the list of options'
 				schema do
-					key :name, :amplification_option
 					key :'$ref', :Amplification_option
 				end
 			end
@@ -82,8 +78,10 @@ class AmplificationOptionsController < ApplicationController
     end
   end
 
-	swagger_path '/experiments/{id}/amplification_option' do
+	swagger_path '/experiments/{experiment_id}/amplification_option' do
 		operation :put do
+      extend SwaggerHelper::AuthenticationError
+      
 			key :summary, 'Update Amplification Options'
 			key :description, 'Updates the passed amplification options for the experiment'
 			key :produces, [
@@ -92,14 +90,9 @@ class AmplificationOptionsController < ApplicationController
 			key :tags, [
 				'AmplificationOptions'
 			]
-			parameter do
-				key :name, :id
-				key :in, :path
-				key :description, 'id of the experiment'
-				key :required, true
-				key :type, :integer
-				key :format, :int64
-			end
+      
+      parameter :experiment_id
+
 			parameter do
 				key :name, :amplification_option_params
 				key :in, :body
@@ -109,14 +102,20 @@ class AmplificationOptionsController < ApplicationController
 					key :'$ref', :Amplification_option
 				end
 			end
+      
 			response 200 do
 				key :description, 'Returns an object amplification_option which has the list of options'
 				schema do
-					key :name, :amplification_option
-					key :type, :object
 					key :'$ref', :Amplification_option
 				end
 			end
+      
+      response 422 do
+        key :description, 'Not allowed if experiment is derived from GUID'
+        schema do
+          key :'$ref', :ErrorMessage
+        end
+      end
 		end
 	end
 

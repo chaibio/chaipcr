@@ -37,8 +37,10 @@ class RampsController < ApplicationController
     end
   end
 
-	swagger_path '/ramps/{id}' do
+	swagger_path '/ramps/{ramp_id}' do
 		operation :put do
+      extend SwaggerHelper::AuthenticationError
+      
 			key :summary, 'Update Ramp'
 			key :description, 'Updates the passed ramp data for the experiment'
 			key :produces, [
@@ -48,9 +50,9 @@ class RampsController < ApplicationController
 				'Ramps'
 			]
 			parameter do
-				key :name, :id
+				key :name, :ramp_id
 				key :in, :path
-				key :description, 'Ramp id'
+				key :description, 'Ramp ID'
 				key :required, true
 				key :type, :integer
 				key :format, :int64

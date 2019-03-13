@@ -36,8 +36,10 @@ class ProtocolsController < ApplicationController
     end
   end
 
-	swagger_path '/protocols/{id}' do
+	swagger_path '/protocols/{protocol_id}' do
 		operation :put do
+      extend SwaggerHelper::AuthenticationError
+      
 			key :summary, 'Update Protocol'
 			key :description, 'Updates the passed protocol data for the experiment'
 			key :produces, [
@@ -47,9 +49,9 @@ class ProtocolsController < ApplicationController
 				'Protocols'
 			]
 			parameter do
-				key :name, :id
+				key :name, :protocol_id
 				key :in, :path
-				key :description, 'Protocol id'
+				key :description, 'Protocol ID'
 				key :required, true
 				key :type, :integer
 				key :format, :int64
@@ -61,7 +63,7 @@ class ProtocolsController < ApplicationController
 				key :required, true
 				schema do
           property :protocol do
-					  key :'$ref', :FullProtocol
+					  key :'$ref', :Protocol
           end
 				end
 			end

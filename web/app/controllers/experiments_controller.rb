@@ -57,6 +57,8 @@ class ExperimentsController < ApplicationController
 
   swagger_path '/experiments' do
     operation :get do
+      extend SwaggerHelper::AuthenticationError
+      
       key :summary, 'List all Experiments'
       key :description, 'Returns all experiments from the system sorted by the id'
       key :produces, [
@@ -68,10 +70,12 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :type
 				key :in, :query
-				key :description, 'filter by type (i.e. standard)'
+				key :description, 'filter by type'
 				key :required, false
         key :type, :string
+        key :enum, ["standard"]
 			end
+      
       response 200 do
         key :description, 'Object containing list of all the experiments'
         schema do
@@ -84,16 +88,34 @@ class ExperimentsController < ApplicationController
         end
       end
     end
+  end
 
+  #api :GET, "/experiments", "List all the experiments"
+  #example "[{'experiment':{'id':1,'name':'test1','type':'user','started_at':null,'completed_at':null,'completed_status':null}},{'experiment':{'id':2,'name':'test2','type':'user','started_at':null,'completed_at':null,'completed_status':null}}]"
+  def index
+    @experiments = Experiment.includes(:experiment_definition).where("experiment_definitions.experiment_type"=>[ExperimentDefinition::TYPE_USER_DEFINED, ExperimentDefinition::TYPE_TESTKIT]).order("experiments.id DESC")
+    if params[:type] == "standard"
+      @experiments = @experiments.joins(:well_layout).joins("inner join targets_wells on targets_wells.well_layout_id = well_layouts.id").where("targets_wells.well_type"=>TargetsWell::TYPE_STANDARD, "completion_status"=>"success")
+    end
+    @experiments = @experiments.to_a
+ 
+    respond_to do |format|
+      format.json { render "index", :status => :ok }
+    end
+  end
+
+  swagger_path '/experiments' do
     operation :post do
-			key :summary, 'Create Experiment'
+      extend SwaggerHelper::AuthenticationError
+    
+  		key :summary, 'Create Experiment'
       key :description, 'Creates a new experiment, default protocol will be created'
       key :produces, [
         'application/json'
       ]
-			key :tags, [
-				'Experiments'
-			]
+  		key :tags, [
+  			'Experiments'
+  		]
       parameter do
         key :name, :experiment
         key :in, :body
@@ -113,31 +135,9 @@ class ExperimentsController < ApplicationController
           end
         end
       end
-      response 422 do
-        key :description, 'Experiment create error'
-				schema do
-          property :experiment do
-					  key :'$ref', :FullExperiment
-          end
-				end
-      end
     end
   end
-
-  #api :GET, "/experiments", "List all the experiments"
-  #example "[{'experiment':{'id':1,'name':'test1','type':'user','started_at':null,'completed_at':null,'completed_status':null}},{'experiment':{'id':2,'name':'test2','type':'user','started_at':null,'completed_at':null,'completed_status':null}}]"
-  def index
-    @experiments = Experiment.includes(:experiment_definition).where("experiment_definitions.experiment_type"=>[ExperimentDefinition::TYPE_USER_DEFINED, ExperimentDefinition::TYPE_TESTKIT]).order("experiments.id DESC")
-    if params[:type] == "standard"
-      @experiments = @experiments.joins(:well_layout).joins("inner join targets_wells on targets_wells.well_layout_id = well_layouts.id").where("targets_wells.well_type"=>TargetsWell::TYPE_STANDARD, "completion_status"=>"success")
-    end
-    @experiments = @experiments.to_a
- 
-    respond_to do |format|
-      format.json { render "index", :status => :ok }
-    end
-  end
-
+  
   api :POST, "/experiments", "Create an experiment"
   param_group :experiment
   description "when experiment is created, default protocol will be created"
@@ -159,6 +159,8 @@ class ExperimentsController < ApplicationController
 
 	swagger_path '/experiments/{id}' do
 		operation :put do
+      extend SwaggerHelper::AuthenticationError
+      
 			key :summary, 'Update Experiment'
 			key :description, 'Updates experiment'
 			key :produces, [
@@ -167,14 +169,9 @@ class ExperimentsController < ApplicationController
 			key :tags, [
 				'Experiments'
 			]
-			parameter do
-				key :name, :id
-				key :in, :path
-				key :description, 'Id of the experiment to update'
-				key :required, true
-				key :type, :integer
-				key :format, :int64
-			end
+      
+      parameter :experiment_id
+
 			parameter do
 				key :name, :experiment
 				key :in, :body
@@ -194,14 +191,6 @@ class ExperimentsController < ApplicationController
           end
 				end
 			end
-			response 422 do
-				key :description, 'Experiment update error'
-				schema do
-          property :experiment do
-					  key :'$ref', :Experiment
-          end
-				end
-			end
 		end
 	end
 
@@ -213,7 +202,6 @@ class ExperimentsController < ApplicationController
       render json: {errors: "The experiment is not found"}, status: :not_found
       return
     end
-    @experiment.targets_well_layout_id = WellLayout.for_experiment(params[:experiment][:standard_experiment_id]).pluck(:id).first if params[:experiment][:standard_experiment_id]
     ret = @experiment.update_attributes(experiment_params)
     respond_to do |format|
       format.json { render "show", :status => (ret)? :ok :  :unprocessable_entity}
@@ -221,8 +209,10 @@ class ExperimentsController < ApplicationController
   end
 
   
-	swagger_path '/experiments/{id}/copy' do
+	swagger_path '/experiments/{experimend_id}/copy' do
 		operation :post do
+      extend SwaggerHelper::AuthenticationError
+      
 			key :summary, 'Copy Experiment'
 			key :description, 'Creates a new copy of the experiment'
 			key :produces, [
@@ -231,24 +221,11 @@ class ExperimentsController < ApplicationController
 			key :tags, [
 				'Experiments'
 			]
-			parameter do
-				key :name, :id
-				key :in, :path
-				key :description, 'Id of the experiment to copy'
-				key :required, true
-				key :type, :integer
-				key :format, :int64
-			end
+      
+      parameter :experiment_id
+
 			response 200 do
-				key :description, 'Copied experiment is retuned'
-				schema do
-          property :experiment do
-					  key :'$ref', :FullExperiment
-          end
-				end
-			end
-			response 422 do
-				key :description, 'Experiment copy error'
+				key :description, 'Copied experiment is returned'
 				schema do
           property :experiment do
 					  key :'$ref', :FullExperiment
@@ -274,8 +251,10 @@ class ExperimentsController < ApplicationController
     end
   end
 
-	swagger_path '/experiments/{id}' do
+	swagger_path '/experiments/{experimend_id}' do
 		operation :get do
+      extend SwaggerHelper::AuthenticationError
+      
 			key :summary, 'Show Experiment'
 			key :description, 'Returns a single experiment based on the id'
 			key :produces, [
@@ -284,24 +263,11 @@ class ExperimentsController < ApplicationController
 			key :tags, [
 				'Experiments'
 			]
-			parameter do
-				key :name, :id
-				key :in, :path
-				key :description, 'Id of the experiment to fetch'
-				key :required, true
-				key :type, :integer
-				key :format, :int64
-			end
+      
+      parameter :experiment_id
+
 			response 200 do
-				key :description, 'Fetched experiment is retuned'
-				schema do
-          property :experiment do
-					  key :'$ref', :FullExperiment
-          end
-				end
-			end
-			response 422 do
-				key :description, 'Unexpected error'
+				key :description, 'Fetched experiment is returned'
 				schema do
           property :experiment do
 					  key :'$ref', :FullExperiment
@@ -324,8 +290,10 @@ class ExperimentsController < ApplicationController
     end
   end
 
-	swagger_path '/experiments/{id}' do
+	swagger_path '/experiments/{experimend_id}' do
 		operation :delete do
+      extend SwaggerHelper::AuthenticationError
+      
 			key :summary, 'Delete Experiment'
 			key :description, 'Deletes the experiment from the database based on id'
 			key :produces, [
@@ -334,16 +302,18 @@ class ExperimentsController < ApplicationController
 			key :tags, [
 				'Experiments'
 			]
-			parameter do
-				key :name, :id
-				key :in, :path
-				key :description, 'Id of the experiment to delete'
-				key :required, true
-				key :type, :integer
-				key :format, :int64
-			end
+      
+      parameter :experiment_id
+
 			response 200 do
 				key :description, 'Experiment deleted'
+			end
+      
+			response 422 do
+				key :description, 'Experiment deleted error'
+				schema do
+					key :'$ref', :ErrorModel
+				end
 			end
 		end
 	end
@@ -360,8 +330,10 @@ class ExperimentsController < ApplicationController
     end
   end
 
-	swagger_path '/experiments/{id}/well_layout' do
+	swagger_path '/experiments/{experimend_id}/well_layout' do
 		operation :get do
+      extend SwaggerHelper::AuthenticationError
+      
 			key :summary, 'Retrieve well layout'
 			key :description, 'Retrieve all targets and samples'
 			key :produces, [
@@ -371,14 +343,7 @@ class ExperimentsController < ApplicationController
 				'Experiments'
 			]
       
-			parameter do
-				key :name, :id
-				key :in, :path
-				key :description, 'Id of the experiment for which we need temperature data'
-				key :required, true
-				key :type, :integer
-				key :format, :int64
-			end
+      parameter :experiment_id
 
 			response 200 do
 				key :description, 'WellLayout'
@@ -387,12 +352,6 @@ class ExperimentsController < ApplicationController
 					items do
 						key :'$ref', :WellLayout
 					end
-				end
-			end
-			response :default do
-				key :description, 'Unexpected error'
-				schema do
-					key :'$ref', :ErrorModel
 				end
 			end
 		end
@@ -407,8 +366,10 @@ class ExperimentsController < ApplicationController
     end
   end
   
-	swagger_path '/experiments/{id}/temperature_data' do
+	swagger_path '/experiments/{experimend_id}/temperature_data' do
 		operation :get do
+      extend SwaggerHelper::AuthenticationError
+      
 			key :summary, 'Retrieve temperature data'
 			key :description, 'Returns the temperature data of an experiment based on the parameters specified'
 			key :produces, [
@@ -417,14 +378,9 @@ class ExperimentsController < ApplicationController
 			key :tags, [
 				'Experiments'
 			]
-			parameter do
-				key :name, :id
-				key :in, :path
-				key :description, 'Id of the experiment for which we need temperature data'
-				key :required, true
-				key :type, :integer
-				key :format, :int64
-			end
+      
+      parameter :experiment_id
+
 			parameter do
 				key :name, :starttime
 				key :in, :query
@@ -458,12 +414,6 @@ class ExperimentsController < ApplicationController
 					end
 				end
 			end
-			response :default do
-				key :description, 'Unexpected error'
-				schema do
-					key :'$ref', :ErrorModel
-				end
-			end
 		end
 	end
 
@@ -478,8 +428,10 @@ class ExperimentsController < ApplicationController
     end
   end
 
-	swagger_path '/experiments/{id}/amplification_data' do
+	swagger_path '/experiments/{experimend_id}/amplification_data' do
 		operation :get do
+      extend SwaggerHelper::AuthenticationError
+      
 			key :summary, 'Retrieve amplification data'
 			key :description, 'Returns the amplification data of an experiment based on the parameters specified'
 			key :produces, [
@@ -488,14 +440,9 @@ class ExperimentsController < ApplicationController
 			key :tags, [
 				'Experiments'
 			]
-			parameter do
-				key :name, :id
-				key :in, :path
-				key :description, 'Id of the experiment for which we need amplification data'
-				key :required, true
-				key :type, :integer
-				key :format, :int64
-			end
+
+      parameter :experiment_id
+
 			parameter do
 				key :name, :raw
 				key :in, :query
@@ -507,7 +454,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :background
 				key :in, :query
-				key :description, 'If background subtracted data should be returned, by default it is retuned'
+				key :description, 'If background subtracted data should be returned, by default it is returned'
 				key :type, :boolean
 				key :required, false
         key :default, true
@@ -515,7 +462,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :baseline
 				key :in, :query
-				key :description, 'If baseline subtracted data should be returned, by default it is retuned'
+				key :description, 'If baseline subtracted data should be returned, by default it is returned'
 				key :type, :boolean
 				key :required, false
         key :default, true
@@ -523,7 +470,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :firstderiv
 				key :in, :query
-				key :description, 'If first derivative data should be returned, by default it is retuned'
+				key :description, 'If first derivative data should be returned, by default it is returned'
 				key :type, :boolean
 				key :required, false
 				key :default, true
@@ -531,7 +478,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :secondderiv
 				key :in, :query
-				key :description, 'If second derivative data should be returned, by default it is retuned'
+				key :description, 'If second derivative data should be returned, by default it is returned'
 				key :type, :boolean
 				key :required, false
 				key :default, true
@@ -539,7 +486,7 @@ class ExperimentsController < ApplicationController
 			parameter do
 				key :name, :summary
 				key :in, :query
-				key :description, 'If cq values should be returned, by default it is retuned'
+				key :description, 'If cq values should be returned, by default it is returned'
 				key :type, :boolean
 				key :required, false
         key :default, true
@@ -585,10 +532,10 @@ class ExperimentsController < ApplicationController
 				key :description, 'Amplification data is not modified if etag is the same'
 			end
 
-			response :default do
+			response 500 do
 				key :description, 'Unexpected error'
 				schema do
-					key :'$ref', :ErrorModel
+					key :'$ref', :ErrorMessage
 				end
 			end
 		end
@@ -764,8 +711,10 @@ class ExperimentsController < ApplicationController
     end
   end
 
-	swagger_path '/experiments/{id}/melt_curve_data' do
+	swagger_path '/experiments/{experimend_id}/melt_curve_data' do
 		operation :get do
+      extend SwaggerHelper::AuthenticationError
+      
 			key :summary, 'Retrieve melt curve data'
 			key :description, 'Returns the melt curve data of an experiment based on the parameters specified'
 			key :produces, [
@@ -774,14 +723,9 @@ class ExperimentsController < ApplicationController
 			key :tags, [
 				'Experiments'
 			]
-			parameter do
-				key :name, :id
-				key :in, :path
-				key :description, 'Id of the experiment for which we need melt curve data'
-				key :required, true
-				key :type, :integer
-				key :format, :int64
-			end
+      
+      parameter :experiment_id
+
 			parameter do
 				key :name, :raw
 				key :in, :query
@@ -844,10 +788,10 @@ class ExperimentsController < ApplicationController
 				key :description, 'Melt curve data is not modified if etag is the same'
 			end
 
-			response :default do
+			response 500 do
 				key :description, 'Unexpected error'
 				schema do
-					key :'$ref', :ErrorModel
+					key :'$ref', :ErrorMessage
 				end
 			end
 		end
@@ -995,8 +939,10 @@ class ExperimentsController < ApplicationController
     end
   end
   
-	swagger_path '/experiments/{id}/export' do
+	swagger_path '/experiments/{experimend_id}/export' do
 		operation :get do
+      extend SwaggerHelper::AuthenticationError
+      
 			key :summary, 'Export Experiment'
 			key :description, 'Downloads a zip file which has csv files for temperature, amplification and meltcurve data'
 			key :produces, [
@@ -1005,14 +951,8 @@ class ExperimentsController < ApplicationController
 			key :tags, [
 				'Experiments'
 			]
-			parameter do
-				key :name, :id
-				key :in, :path
-				key :description, 'Id of the experiment for which we need melt curve data'
-				key :required, true
-				key :type, :integer
-				key :format, :int64
-			end
+      
+      parameter :experiment_id
 
 			response 200 do
 				key :description, 'Zipped data'
@@ -1029,7 +969,7 @@ class ExperimentsController < ApplicationController
 			response :default do
 				key :description, 'Unexpected error'
 				schema do
-					key :'$ref', :ErrorModel
+					key :'$ref', :ErrorMessage
 				end
 			end
 		end

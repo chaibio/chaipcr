@@ -16,6 +16,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+module ParameterTargetId
+  def self.extended(base)
+		base.parameter do
+      key :name, :target_id
+      key :in, :path
+      key :description, 'Target ID'
+      key :required, true
+      key :type, :integer
+      key :format, :int64
+		end
+  end
+end
+
 class TargetsController < ApplicationController
   include ParamsHelper
   include Swagger::Blocks
@@ -28,6 +42,8 @@ class TargetsController < ApplicationController
   
   swagger_path '/experiments/{experiment_id}/targets' do
     operation :get do
+      extend SwaggerHelper::AuthenticationError
+      
       key :summary, 'List all targets'
       key :description, 'List all targets for the experiment sort by id'
       key :produces, [
@@ -36,60 +52,14 @@ class TargetsController < ApplicationController
 			key :tags, [
 				'Targets'
 			]
-      parameter do
-        key :name, :experiment_id
-        key :in, :path
-        key :description, 'Id of the experiment'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
+      
+      parameter :experiment_id
       
       response 200 do
         key :description, 'Object containing list of all the targets'
         schema do
           key :type, :array
           items do
-            key :'$ref', :FullTarget
-          end
-        end
-      end
-    end
-    
-    operation :post do
-      key :summary, 'Create Target'
-      key :description, 'Create a new target for the experiment'
-      key :produces, [
-        'application/json',
-      ]
-      key :tags, [
-        'Targets'
-      ]
-      
-      parameter do
-        key :name, :experiment_id
-        key :in, :path
-        key :description, 'Id of the experiment'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
-      
-      parameter do
-        key :name, :target_params
-        key :in, :body
-        key :required, false
-        schema do
-          property :target do
-            key :'$ref', :Target
-          end
-        end
-      end
-      
-      response 200 do
-        key :description, 'Created target is returned'
-        schema do
-          property :target do
             key :'$ref', :FullTarget
           end
         end
@@ -125,6 +95,43 @@ class TargetsController < ApplicationController
     end
   end
 
+  swagger_path '/experiments/{experiment_id}/targets' do
+    operation :post do
+      extend SwaggerHelper::AuthenticationError
+      
+      key :summary, 'Create Target'
+      key :description, 'Create a new target for the experiment'
+      key :produces, [
+        'application/json',
+      ]
+      key :tags, [
+        'Targets'
+      ]
+      
+      parameter :experiment_id
+      
+      parameter do
+        key :name, :target_params
+        key :in, :body
+        key :required, false
+        schema do
+          property :target do
+            key :'$ref', :Target
+          end
+        end
+      end
+      
+      response 200 do
+        key :description, 'Created target is returned'
+        schema do
+          property :target do
+            key :'$ref', :FullTarget
+          end
+        end
+      end
+    end
+  end
+  
   def create
     @target = Target.new(target_params)
     @target.well_layout_id = @experiment.well_layout.id
@@ -136,6 +143,9 @@ class TargetsController < ApplicationController
   
   swagger_path '/experiments/{experiment_id}/targets/{target_id}' do
     operation :put do
+      extend SwaggerHelper::AuthenticationError
+      extend ParameterTargetId
+      
       key :summary, 'Update Target'
       key :description, 'Update properties of a target'
       key :produces, [
@@ -145,23 +155,7 @@ class TargetsController < ApplicationController
         'Targets'
       ]
       
-      parameter do
-        key :name, :experiment_id
-        key :in, :path
-        key :description, 'Id of the experiment'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
-      
-      parameter do
-        key :name, :target_id
-        key :in, :path
-        key :description, 'Id of the target'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
+      parameter :experiment_id
       
       parameter do
         key :name, :target_params
@@ -198,6 +192,9 @@ class TargetsController < ApplicationController
 
   swagger_path '/experiments/{experiment_id}/targets/{target_id}' do
     operation :delete do
+      extend SwaggerHelper::AuthenticationError
+      extend ParameterTargetId
+      
       key :summary, 'Delete target'
       key :description, 'If target is imported and linked to another experiment, it is not allowed to be deleted.'
       key :produces, [
@@ -207,27 +204,18 @@ class TargetsController < ApplicationController
         'Targets'
       ]
       
-      parameter do
-        key :name, :experiment_id
-        key :in, :path
-        key :description, 'Id of the experiment'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
-      
-      parameter do
-        key :name, :target_id
-        key :in, :path
-        key :description, 'Id of the target'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
+      parameter :experiment_id
       
       response 200 do
         key :description, 'Target is Deleted'
       end
+      
+			response 422 do
+				key :description, 'Target delete error'
+				schema do
+					key :'$ref', :ErrorModel
+				end
+			end
     end
   end
   
@@ -249,6 +237,9 @@ class TargetsController < ApplicationController
   
   swagger_path '/experiments/{experiment_id}/targets/{target_id}/links' do
     operation :post do
+      extend SwaggerHelper::AuthenticationError
+      extend ParameterTargetId
+      
       key :summary, 'Link Target'
       key :description, 'Link target to a well'
       key :produces, [
@@ -258,23 +249,7 @@ class TargetsController < ApplicationController
         'Targets'
       ]
       
-      parameter do
-        key :name, :experiment_id
-        key :in, :path
-        key :description, 'Id of the experiment'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
-      
-      parameter do
-        key :name, :target_id
-        key :in, :path
-        key :description, 'Id of the target'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
+      parameter :experiment_id
       
       parameter do
         key :name, :target_well_params
@@ -323,6 +298,9 @@ class TargetsController < ApplicationController
   
   swagger_path '/experiments/{experiment_id}/targets/{target_id}/unlinks' do
     operation :post do
+      extend SwaggerHelper::AuthenticationError
+      extend ParameterTargetId
+      
       key :summary, 'Unlink Target'
       key :description, 'Unlink target to a well'
       key :produces, [
@@ -332,23 +310,7 @@ class TargetsController < ApplicationController
         'Targets'
       ]
       
-      parameter do
-        key :name, :experiment_id
-        key :in, :path
-        key :description, 'Id of the experiment'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
-      
-      parameter do
-        key :name, :target_id
-        key :in, :path
-        key :description, 'Id of the target'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
+      parameter :experiment_id
       
       parameter do
         key :name, :target_well_params

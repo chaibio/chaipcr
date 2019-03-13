@@ -25,12 +25,13 @@ class Experiment < ActiveRecord::Base
       key :format, :int64
       key :readOnly, true
     end
+    property :guid do
+			key :description, 'GUID of the experiment'
+      key :type, :string
+      key :readOnly, true
+    end
     property :name do
 			key :description, 'Name of the experiment'
-      key :type, :string
-    end
-    property :guid do
-			key :description, 'guid of the experiment'
       key :type, :string
     end
     property :notes do
@@ -85,15 +86,16 @@ class Experiment < ActiveRecord::Base
   swagger_schema :FullExperiment do
     allOf do
       schema do
+        key :'$ref', :ErrorModel
+      end
+      schema do
+        property :guid do
+    			key :description, 'GUID of the experiment'
+          key :type, :string
+        end
         property :protocol do
           key :type, :object
           key :'$ref', :FullProtocol
-        end
-        property :errors do
-          key :type, :array
-          items do
-            key :type, :string
-          end
         end
       end
       schema do
@@ -217,7 +219,11 @@ class Experiment < ActiveRecord::Base
       return read_attribute(:calibration_id)
     end
   end
-
+  
+  def standard_experiment_id=(val)
+    write_attribute(:targets_well_layout_id, WellLayout.for_experiment(val).pluck(:id).first) if !val.blank?
+  end
+  
   def as_json(options={})
       {:id=>id,
        :guid=>experiment_definition.guid,

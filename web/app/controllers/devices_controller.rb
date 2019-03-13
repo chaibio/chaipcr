@@ -38,7 +38,7 @@ class DevicesController < ApplicationController
 
   swagger_path '/device' do
     operation :get do
-      key :summary, 'Device information. Authentication Token is not required.'
+      key :summary, 'Device information'
       key :description, 'Returns device specific information'
       key :produces, [
         'application/json',
@@ -88,6 +88,8 @@ class DevicesController < ApplicationController
 
   swagger_path '/capabilities' do
     operation :get do
+      extend SwaggerHelper::AuthenticationError
+      
       key :summary, 'Device capabilities information'
       key :description, 'Returns device capabilities'
       key :produces, [
@@ -120,6 +122,8 @@ class DevicesController < ApplicationController
 
   swagger_path '/device/start' do
     operation :post do
+      extend SwaggerHelper::AuthenticationError
+      
       key :summary, 'Start Device'
       key :description, 'start device'
       key :produces, [
@@ -132,7 +136,7 @@ class DevicesController < ApplicationController
 			parameter do
 				key :name, :experiment_id
 				key :in, :body
-				key :description, 'Id of the experiment'
+				key :description, 'Experiment ID'
 				key :required, true
 				schema do
           property :experiment_id do
@@ -155,6 +159,8 @@ class DevicesController < ApplicationController
 
   swagger_path '/device/stop' do
     operation :post do
+      extend SwaggerHelper::AuthenticationError
+      
       key :summary, 'Stop Device'
       key :description, 'stop device'
       key :produces, [
@@ -176,6 +182,8 @@ class DevicesController < ApplicationController
 
   swagger_path '/device/resume' do
     operation :post do
+      extend SwaggerHelper::AuthenticationError
+      
       key :summary, 'Resume Device'
       key :description, 'resume device'
       key :produces, [
@@ -197,6 +205,8 @@ class DevicesController < ApplicationController
 
   swagger_path '/device/status' do
     operation :get do
+      extend SwaggerHelper::AuthenticationError
+      
       key :summary, 'Device Status'
       key :description, 'Returns the current status of the device'
       key :produces, [
@@ -496,6 +506,8 @@ class DevicesController < ApplicationController
 
   swagger_path '/device/export_database' do
     operation :get do
+      extend SwaggerHelper::AuthenticationError
+      
       key :summary, 'Export database'
       key :description, 'Downloads the current database on the machine to exportdb.zip'
       key :produces, [

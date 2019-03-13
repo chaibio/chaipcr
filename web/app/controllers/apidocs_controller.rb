@@ -18,15 +18,25 @@ class ApidocsController < ActionController::Base
       end
     end
 		security_definition :access_token do
-			key :name, 'access_token'
-			key :description, 'An authorization token is returned when you login which needs to be passed for api calls unless the api specifies that the token is not required'
+			key :name, 'Authorization'
+			key :description, 'An authorization token is required to be passed for all api calls'
 			key :type, :apiKey
 			key :in, :header
+      key :example, "Authorization: Token GX7ym6gC4gw09LzdlSHBJA"
 		end
     key :host, 'chaipcr.readme.io'
     key :basePath, '/api'
     key :consumes, ['application/json']
     key :produces, ['application/json']
+    
+    parameter :experiment_id do
+      key :name, :experiment_id
+      key :in, :path
+      key :description, 'Experiment ID'
+      key :required, true
+      key :type, :integer
+      key :format, :int64
+    end
   end
 
   # A list of all classes that have swagger_* declarations.

@@ -16,6 +16,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+module ParameterSampleId
+  def self.extended(base)
+		base.parameter do
+      key :name, :sample_id
+      key :in, :path
+      key :description, 'Sample ID'
+      key :required, true
+      key :type, :integer
+      key :format, :int64
+		end
+  end
+end
+
 class SamplesController < ApplicationController
   include ParamsHelper
   include Swagger::Blocks
@@ -27,6 +41,8 @@ class SamplesController < ApplicationController
   
   swagger_path '/experiments/{experiment_id}/samples' do
     operation :get do
+      extend SwaggerHelper::AuthenticationError
+      
       key :summary, 'List all samples'
       key :description, 'List all samples for the experiment sort by id'
       key :produces, [
@@ -35,14 +51,8 @@ class SamplesController < ApplicationController
 			key :tags, [
 				'Samples'
 			]
-      parameter do
-        key :name, :experiment_id
-        key :in, :path
-        key :description, 'Id of the experiment'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
+      
+      parameter :experiment_id
       
       response 200 do
         key :description, 'Object containing list of all the samples'
@@ -54,8 +64,19 @@ class SamplesController < ApplicationController
         end
       end
     end
-    
+  end
+  
+  def index
+    @samples = Sample.includes(:samples_wells).joins("inner join well_layouts on well_layouts.id = samples.well_layout_id").where(["experiment_id=? and parent_type=?", params[:experiment_id], Experiment.name]).order("samples.id")
+    respond_to do |format|
+      format.json { render "index", :status => :ok}
+    end
+  end
+
+  swagger_path '/experiments/{experiment_id}/samples' do
     operation :post do
+      extend SwaggerHelper::AuthenticationError
+      
       key :summary, 'Create Sample'
       key :description, 'Create a new sample for the experiment'
       key :produces, [
@@ -65,14 +86,7 @@ class SamplesController < ApplicationController
         'Samples'
       ]
       
-      parameter do
-        key :name, :experiment_id
-        key :in, :path
-        key :description, 'Id of the experiment'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
+      parameter :experiment_id
       
       parameter do
         key :name, :sample_params
@@ -95,13 +109,6 @@ class SamplesController < ApplicationController
       end
     end
   end
-  
-  def index
-    @samples = Sample.includes(:samples_wells).joins("inner join well_layouts on well_layouts.id = samples.well_layout_id").where(["experiment_id=? and parent_type=?", params[:experiment_id], Experiment.name]).order("samples.id")
-    respond_to do |format|
-      format.json { render "index", :status => :ok}
-    end
-  end
 
   def create
     @sample = Sample.new(sample_params)
@@ -114,6 +121,9 @@ class SamplesController < ApplicationController
   
   swagger_path '/experiments/{experiment_id}/samples/{sample_id}' do
     operation :put do
+      extend SwaggerHelper::AuthenticationError
+      extend ParameterSampleId
+      
       key :summary, 'Update Sample'
       key :description, 'Update properties of a sample'
       key :produces, [
@@ -123,23 +133,7 @@ class SamplesController < ApplicationController
         'Samples'
       ]
       
-      parameter do
-        key :name, :experiment_id
-        key :in, :path
-        key :description, 'Id of the experiment'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
-      
-      parameter do
-        key :name, :sample_id
-        key :in, :path
-        key :description, 'Id of the sample'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
+      parameter :experiment_id
       
       parameter do
         key :name, :sample_params
@@ -172,6 +166,9 @@ class SamplesController < ApplicationController
   
   swagger_path '/experiments/{experiment_id}/samples/{sample_id}' do
     operation :delete do
+      extend SwaggerHelper::AuthenticationError
+      extend ParameterSampleId
+      
       key :summary, 'Delete sample'
       key :produces, [
         'application/json',
@@ -180,27 +177,18 @@ class SamplesController < ApplicationController
         'Samples'
       ]
       
-      parameter do
-        key :name, :experiment_id
-        key :in, :path
-        key :description, 'Id of the experiment'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
-      
-      parameter do
-        key :name, :sample_id
-        key :in, :path
-        key :description, 'Id of the sample'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
+      parameter :experiment_id
       
       response 200 do
         key :description, 'Sample is Deleted'
       end
+      
+			response 422 do
+				key :description, 'Sample delete error'
+				schema do
+					key :'$ref', :ErrorModel
+				end
+			end
     end
   end
 
@@ -214,6 +202,9 @@ class SamplesController < ApplicationController
 
   swagger_path '/experiments/{experiment_id}/samples/{sample_id}/links' do
     operation :post do
+      extend SwaggerHelper::AuthenticationError
+      extend ParameterSampleId
+      
       key :summary, 'Link Sample'
       key :description, 'Link sample to a well'
       key :produces, [
@@ -223,23 +214,7 @@ class SamplesController < ApplicationController
         'Samples'
       ]
       
-      parameter do
-        key :name, :experiment_id
-        key :in, :path
-        key :description, 'Id of the experiment'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
-      
-      parameter do
-        key :name, :sample_id
-        key :in, :path
-        key :description, 'Id of the sample'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
+      parameter :experiment_id
       
       parameter do
         key :in, :body
@@ -284,6 +259,9 @@ class SamplesController < ApplicationController
   
   swagger_path '/experiments/{experiment_id}/samples/{sample_id}/unlinks' do
     operation :post do
+      extend SwaggerHelper::AuthenticationError
+      extend ParameterSampleId
+      
       key :summary, 'Unlink Sample'
       key :description, 'Unlink sample to a well'
       key :produces, [
@@ -293,23 +271,7 @@ class SamplesController < ApplicationController
         'Samples'
       ]
       
-      parameter do
-        key :name, :experiment_id
-        key :in, :path
-        key :description, 'Id of the experiment'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
-      
-      parameter do
-        key :name, :sample_id
-        key :in, :path
-        key :description, 'Id of the sample'
-        key :required, true
-        key :type, :integer
-        key :format, :int64
-      end
+      parameter :experiment_id
       
       parameter do
         key :in, :body
