@@ -62,7 +62,9 @@ class AmplificationOptionsController < ApplicationController
 			response 200 do
 				key :description, 'Returns an object amplification_option which has the list of options'
 				schema do
-					key :'$ref', :Amplification_option
+          property :amplification_option do
+					  key :'$ref', :AmplificationOption
+          end
 				end
 			end
 		end
@@ -99,14 +101,18 @@ class AmplificationOptionsController < ApplicationController
 				key :description, 'Amplification options to update'
 				key :required, true
 				schema do
-					key :'$ref', :Amplification_option
+          property :amplification_option do
+					  key :'$ref', :AmplificationOption
+          end
 				end
 			end
       
 			response 200 do
 				key :description, 'Returns an object amplification_option which has the list of options'
 				schema do
-					key :'$ref', :Amplification_option
+          property :amplification_option do
+					  key :'$ref', :AmplificationOption
+          end
 				end
 			end
       

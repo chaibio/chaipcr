@@ -21,42 +21,45 @@ class AmplificationOption < ActiveRecord::Base
 	include Swagger::Blocks
 
 
-	swagger_schema :Amplification_option do
-		key :required, [:amplification_option]
-		property :amplification_option do
-			property :cq_method do
-				key :description, 'Cy0:A Cq calling method based on the max first derivative of the curve (recommended). cpD2:A Cq calling method based on the max second derivative of the curve.'
-				key :type, :string
-				key :enum, ['Cy0', 'cpD2']
-			end
-			property :baseline_method do
-				key :description, 'baseline method'
-				key :type, :string
-				key :enum, ['sigmoid', 'linear', 'median']
-			end
-			property :min_fluorescence do
-				key :description, 'The minimum fluorescence threshold for Cq calling. Cq values will not be called when the fluorescence is below this threshold.'
-				key :type, :string
-			end
-			property :min_reliable_cycle do
-				key :description, 'The earliest cycle to use in Cq calling & baseline subtraction. Data for earlier cycles will be ignored.'
-				key :type, :string
-			end
-			property :min_d1 do
-				key :description, 'The threshold which the first derivative of the curve must exceed for a Cq to be called.'
-				key :type, :integer
-				key :format, :int32
-			end
-			property :min_d2 do
-				key :description, 'The threshold which the second derivative of the curve must exceed for a Cq to be called.'
-				key :type, :boolean
-				key :default, false
-			end
-			property :baseline_cycle_bounds do
-				key :description, 'Automatically or manually detect the baseline cycles'
-				key :type, :string
-				key :enum, ['Auto', 'Manual']
-			end
+	swagger_schema :AmplificationOption do
+		property :cq_method do
+			key :description, 'Cy0:A Cq calling method based on the max first derivative of the curve (recommended). cpD2:A Cq calling method based on the max second derivative of the curve.'
+			key :type, :string
+			key :enum, ['Cy0', 'cpD2']
+      key :default, 'Cy0'
+		end
+		property :baseline_method do
+			key :description, 'baseline method'
+			key :type, :string
+			key :enum, ['sigmoid', 'linear', 'median']
+      key :default, 'sigmoid'
+		end
+		property :min_fluorescence do
+			key :description, 'The minimum fluorescence threshold for Cq calling. Cq values will not be called when the fluorescence is below this threshold.'
+			key :type, :integer
+      key :default, 4356
+		end
+		property :min_reliable_cycle do
+			key :description, 'The earliest cycle to use in Cq calling & baseline subtraction. Data for earlier cycles will be ignored.'
+			key :type, :integer
+      key :default, 5
+		end
+		property :min_d1 do
+			key :description, 'The threshold which the first derivative of the curve must exceed for a Cq to be called.'
+			key :type, :integer
+      key :default, 472
+		end
+		property :min_d2 do
+			key :description, 'The threshold which the second derivative of the curve must exceed for a Cq to be called.'
+			key :type, :integer
+			key :default, 41
+		end
+		property :baseline_cycle_bounds do
+			key :description, '[baseline_cycle_min, baseline_cycle_max]'
+			key :type, :Array
+      items do
+        key :type, :integer
+      end
 		end
 	end
 
