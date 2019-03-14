@@ -38,12 +38,12 @@ class Step < ActiveRecord::Base
     end
     property :name do
       key :type, :string
-      key :description, 'Name of the step'
+      key :description, 'Step name'
       key :default, 'Step <order_number>'
     end
     property :pause do
       key :type, :boolean
-      key :description, 'machine will be paused when the step is reached'
+      key :description, 'Device will be paused when the step is reached'
       key :default, false
     end
     property :collect_data do
@@ -62,7 +62,7 @@ class Step < ActiveRecord::Base
     end
     property :order_number do
       key :type, :integer
-      key :description, 'sort order'
+      key :description, 'Sort order'
       key :readOnly, true
     end
   end
@@ -71,8 +71,8 @@ class Step < ActiveRecord::Base
     allOf do
       schema do
         property :ramp do
-          key :type, :object
           key :'$ref', :Ramp
+          key :description, 'Ramp before this step is reached'
         end
       end
       schema do

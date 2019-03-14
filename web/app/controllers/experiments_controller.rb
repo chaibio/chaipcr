@@ -335,7 +335,7 @@ class ExperimentsController < ApplicationController
       extend SwaggerHelper::AuthenticationError
       
 			key :summary, 'Retrieve well layout'
-			key :description, 'Retrieve all targets and samples'
+			key :description, 'Retrieve all targets and samples sort by well number'
 			key :produces, [
 				'application/json',
 			]

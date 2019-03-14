@@ -59,7 +59,7 @@ class StagesController < ApplicationController
       extend SwaggerHelper::AuthenticationError
       
 			key :summary, 'Create Stage'
-			key :description, 'Create a new stage in the protocol'
+			key :description, 'Create a new stage with default steps created'
 			key :produces, [
 				'application/json',
 			]
@@ -96,7 +96,7 @@ class StagesController < ApplicationController
 				key :description, 'Created stage is returned'
 				schema do
           property :stage do
-					  key :'$ref', :Stage
+					  key :'$ref', :FullStage
           end
 				end
 			end
@@ -167,7 +167,7 @@ class StagesController < ApplicationController
       extend ParameterStageId
       
 			key :summary, 'Reorder Stage'
-			key :description, 'Reorder a stage'
+			key :description, 'Reorder a stage, prev_id is the stage id where this stage goes after'
 			key :produces, [
 				'application/json',
 			]
@@ -178,7 +178,7 @@ class StagesController < ApplicationController
 			parameter do
 				key :name, :prev_id
 				key :in, :body
-				key :description, 'stage id where this stage will go after'
+				key :description, 'stage id where this stage goes after'
 				key :required, true
 				schema do
           property :prev_id do

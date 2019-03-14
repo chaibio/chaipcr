@@ -25,10 +25,10 @@ class MeltCurveDatum < ActiveRecord::Base
 	swagger_schema :MeltCurveData do
 		property :partial do
 			key :type, :boolean
-			key :description, 'Indicates if the returned data is complete or partial'
+			key :description, 'Keep polling the data until partial is false'
 		end
 		property :ramps do
-			key :description, 'Describe temperature, normalized_data, derivative_data, tm and area arrays'
+			key :description, 'Contains temperature, normalized_data, derivative_data, tm and area arrays'
 			key :type, :array
 			items do
 				property :ramp_id do
@@ -36,18 +36,20 @@ class MeltCurveDatum < ActiveRecord::Base
 				end
 				property :melt_curve_data do
 					key :type, :array
+          key :description, "[{'well_num':1, 'target_id':1, 'temperature':[0,1,2,3,4,5], 'normalized_data':[0,1,2,3,4,5], 'derivative_data':[0,1,2,3,4,5], 'tm':[1,2,3], 'area':[2,4,5]},
+                              {'well_num':2, 'target_id':1, 'temperature':[0,1,2,3,4,5], 'normalized_data':[0,1,2,3,4,5], 'derivative_data':[0,1,2,3,4,5], 'tm':[1,2,3], 'area':[2,4,5]}]"
 					items do
 						property :well_num do
 							key :type, :integer
-							key :description, '?'
+							key :description, 'Well number from 1 to 16'
 						end
 						property :target_id do
 							key :type, :integer
-							key :description, '?'
+							key :description, 'Target ID'
 						end
 						property :temperature do
 							key :type, :array
-							key :description, '?'
+							key :description, 'Temperature, in degree C'
 						end
 						property :normalized_data do
 							key :type, :array
@@ -69,14 +71,16 @@ class MeltCurveDatum < ActiveRecord::Base
 				end
 				property :targets do
 					key :type, :array
+          key :description, "[{'target_id':1,'target_name':'Ch 1'},{'target_id':2,'target_name':'Ch 2'}]"
 					items do
 						property :target_id do
 							key :type, :integer
-							key :description, '?'
+							key :description, 'Target ID'
             end
 						property :target_name do
 							key :type, :string
-							key :description, '?'
+							key :description, 'Target name'
+              key :default, "Ch 1 or Ch 2"
             end
           end
         end

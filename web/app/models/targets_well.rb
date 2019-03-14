@@ -23,13 +23,14 @@ class TargetsWell < ActiveRecord::Base
   swagger_schema :TargetWell do
     property :well_num do
       key :type, :integer
-      key :description, 'between 1 to 16'
+      key :description, 'Well number from 1 to 16'
     end
     property :well_type do
-      key :type, :integer
-      key :format, :int64
+      key :type, :string
+      key :enum, ["standard", "unknown", "positive_control", "negative_control"]
     end
     property :quantity do
+      key :description, 'set when well_type is standard'
       property :m do
         key :type, :float
         key :description, 'has to be > 0, with 1 digit before dot, and precision to 8 decimal point'
@@ -40,7 +41,7 @@ class TargetsWell < ActiveRecord::Base
     end
     property :omit do
       key :type, :boolean
-      key :description, 'omit target'
+      key :description, 'If set to true, target in this well is not included in the standard curve calculation'
       key :default, false
     end
   end

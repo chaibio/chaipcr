@@ -25,14 +25,14 @@ class AmplificationDatum < ActiveRecord::Base
 	swagger_schema :AmplificationData do
 		property :partial do
 			key :type, :boolean
-			key :description, 'Indicates if the returned data is complete or partial'
+			key :description, 'Keep polling the data until partial is false'
 		end
 		property :total_cycles do
 			key :type, :integer
-			key :description, 'No of cycles for the experiment'
+			key :description, 'Number of cycles for the experiment'
 		end
 		property :steps do
-			key :description, 'Contains the step id and and a 2d array amplification_data - every array object contains the channel, the well number, the cycle number and the background and baseline subtracted values for them.'
+			key :description, 'Contains amplification data for each step'
 			key :type, :array
 			items do
 				key :'$ref', :AmplificationDataSteps
@@ -46,22 +46,22 @@ class AmplificationDatum < ActiveRecord::Base
 			key :description, 'Step id'
 		end
 		property :amplification_data do
-			key :description, 'Describe the amplification_data'
+			key :description, "Two dimensional array like [['target_id', 'well_num', 'cycle_num', 'background_subtracted_value', 'baseline_subtracted_value', 'dr1_pred', 'dr2_pred' 'fluorescence_value'], [1, 1, 1, 25488, -2003, 34543, 453344, 86], [1, 1, 2, 53984, -409, 56345, 848583, 85]]"
 			key :type, :array
 			items do
 				key :type, :array
 				items do
 					property :target_id do
 						key :type, :integer
-						key :description, '?'
+						key :description, 'Target ID'
 					end
 					property :well_num do
 						key :type, :integer
-						key :description, '?'
+						key :description, 'Well number from 1 to 16'
 					end
 					property :cycle_num do
 						key :type, :integer
-						key :description, '?'
+						key :description, 'Cycle number'
 					end
 					property :background_subtracted_value do
 						key :type, :integer
@@ -87,18 +87,18 @@ class AmplificationDatum < ActiveRecord::Base
 			end
 		end
 		property :summary_data do
-			key :description, 'Describe summary'
+			key :description, "Two dimensional array like [['target_id','well_num','replic_group','cq','quantity_m','quantity_b','mean_cq','mean_quantity_m','mean_quantity_b'], [1,1,null,null,null,null,null,null,null], [2,12,1,7.314787,4.0,2,6.9858934999999995,4.0,2], [2,14,1,6.657,4.0,2,6.9858934999999995,4.0,2], [2,3,null,6.2,5.7952962,14,null,null,null]]"
 			key :type, :array
 			items do
 				key :type, :array
 				items do
 					property :target_id do
 						key :type, :integer
-						key :description, '?'
+						key :description, 'Target ID'
 					end
 					property :well_num do
 						key :type, :integer
-						key :description, '?'
+						key :description, 'Well number from 1 to 16'
 					end
 					property :replic_group do
 						key :type, :integer
@@ -132,18 +132,19 @@ class AmplificationDatum < ActiveRecord::Base
 			end
 		end
 		property :targets do
-			key :description, 'Describe targets'
+			key :description, "Two dimensional array like [['id','name','equation'],[1,'target1',null],[2,'target2',{'slope':-0.064624,'offset':7.154049,'efficiency':2979647189313701.5,'r2':0.221279}]]"
 			key :type, :array
 			items do
 				key :type, :array
 				items do
 					property :target_id do
 						key :type, :integer
-						key :description, '?'
+						key :description, 'Target ID'
 					end
 					property :name do
 						key :type, :integer
-						key :description, '?'
+						key :description, 'Target name'
+            key :default, "Ch 1 or Ch 2"
 					end
           property :equation do
             property :slope do

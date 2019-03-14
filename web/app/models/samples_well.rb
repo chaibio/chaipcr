@@ -23,7 +23,7 @@ class SamplesWell < ActiveRecord::Base
   swagger_schema :SampleWell do
     property :well_num do
       key :type, :integer
-      key :description, 'between 1 to 16'
+      key :description, 'Well number from 1 to 16'
     end
   end
   

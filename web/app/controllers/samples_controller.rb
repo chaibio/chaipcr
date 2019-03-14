@@ -263,7 +263,7 @@ class SamplesController < ApplicationController
       extend ParameterSampleId
       
       key :summary, 'Unlink Sample'
-      key :description, 'Unlink sample to a well'
+      key :description, 'Unlink sample from a well'
       key :produces, [
         'application/json',
       ]

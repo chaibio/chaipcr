@@ -241,7 +241,7 @@ class TargetsController < ApplicationController
       extend ParameterTargetId
       
       key :summary, 'Link Target'
-      key :description, 'Link target to a well'
+      key :description, 'Link target to a well -- first time to call will create the link, subsequent calls will update any changed parameters'
       key :produces, [
         'application/json',
       ]
@@ -302,7 +302,7 @@ class TargetsController < ApplicationController
       extend ParameterTargetId
       
       key :summary, 'Unlink Target'
-      key :description, 'Unlink target to a well'
+      key :description, 'Unlink target from a well'
       key :produces, [
         'application/json',
       ]

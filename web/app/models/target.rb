@@ -28,16 +28,16 @@ class Target < ActiveRecord::Base
     end
     property :name do
       key :type, :string
-      key :description, 'Name of the target'
+      key :description, 'Target name'
     end
     property :channel do
       key :type, :integer
       key :enum, [1, 2]
-      key :description, 'target channel'
+      key :description, 'Target channel'
     end
     property :imported do
       key :type, :boolean
-      key :description, 'imported target'
+      key :description, 'If set to true, target is imported from a different experiment'
       key :readOnly, true
     end
   end
@@ -45,15 +45,15 @@ class Target < ActiveRecord::Base
 	swagger_schema :FullTarget do
     allOf do
       schema do
-        key :'$ref', :Target
-      end
-      schema do
         property :targets_wells do
           key :type, :array
           items do
             key :'$ref', :TargetWell
           end
         end
+      end
+      schema do
+        key :'$ref', :Target
       end
     end
   end

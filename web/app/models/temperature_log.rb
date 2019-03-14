@@ -31,17 +31,17 @@ class TemperatureLog < ActiveRecord::Base
 		property :lid_temp do
       key :type, :number
       key :format, :float
-      key :description, 'temperature, in degree C, with precision to two decimal points'
+      key :description, 'Temperature, in degree C, with precision to two decimal points'
 		end
 		property :heat_block_zone_1_temp do
       key :type, :number
       key :format, :float
-      key :description, 'temperature, in degree C, with precision to two decimal points'
+      key :description, 'Temperature, in degree C, with precision to two decimal points'
 		end
 		property :heat_block_zone_2_temp do
       key :type, :number
       key :format, :float
-      key :description, 'temperature, in degree C, with precision to two decimal points'
+      key :description, 'Temperature, in degree C, with precision to two decimal points'
 		end
 	end
 

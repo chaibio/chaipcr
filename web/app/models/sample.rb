@@ -28,19 +28,16 @@ class Sample < ActiveRecord::Base
     end
     property :name do
       key :type, :string
-      key :description, 'Name of the sample'
+      key :description, 'Sample name'
     end
     property :notes do
       key :type, :string
-      key :description, 'Notes of the sample'
+      key :description, 'Sample notes'
     end
   end
   
 	swagger_schema :FullSample do
     allOf do
-      schema do
-        key :'$ref', :Sample
-      end
       schema do
         property :samples_wells do
           key :type, :array
@@ -48,6 +45,9 @@ class Sample < ActiveRecord::Base
             key :'$ref', :SampleWell
           end
         end
+      end
+      schema do
+        key :'$ref', :Sample
       end
     end
   end

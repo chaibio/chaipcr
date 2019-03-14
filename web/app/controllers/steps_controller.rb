@@ -61,7 +61,8 @@ class StepsController < ApplicationController
       extend SwaggerHelper::AuthenticationError
       
       key :summary, 'Create Step'
-      key :description, 'Create a new step in the stage'
+      key :description, 'Create a new step in the stage -- if step is created with no params, it will be the same as previous step;
+    when step is created, default ramp with max rate (5) is created, the ramp is used before this step is reached'
       key :produces, [
         'application/json',
       ]
@@ -90,8 +91,6 @@ class StepsController < ApplicationController
           end
           property :step do
             key :'$ref', :Step
-            key :description, 'if step is created with no params, it will be the same as previous step;
-    when step is created, default ramp with max rate (5) will be created'
           end
         end
       end
@@ -100,7 +99,7 @@ class StepsController < ApplicationController
         key :description, 'Created step is returned'
         schema do
           property :step do
-            key :'$ref', :Step
+            key :'$ref', :FullStep
           end
         end
       end
@@ -175,7 +174,7 @@ class StepsController < ApplicationController
       extend ParameterStepId
       
       key :summary, 'Reorder Step'
-      key :description, 'Reorder a step'
+      key :description, 'Reorder a step, prev_id is the step id where this step goes after'
       key :produces, [
         'application/json',
       ]
@@ -186,7 +185,7 @@ class StepsController < ApplicationController
       parameter do
         key :name, :prev_id
         key :in, :body
-        key :description, 'step id where this step will go after'
+        key :description, 'step id where this step goes after'
         key :required, true
         schema do
           property :prev_id do

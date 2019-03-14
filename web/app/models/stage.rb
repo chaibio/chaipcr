@@ -33,8 +33,9 @@ class Stage < ActiveRecord::Base
       key :enum, ['holding', 'cycling', 'meltcurve']
     end
     property :name do
-			key :description, "Name of the stage, if not provided, default name is '<stage type> Stage'"
       key :type, :string
+			key :description, "Stage name"
+      key :default, '<stage_type> Stage'
     end
     property :num_cycles do
 			key :description, "Number of cycles in a stage, must be >= 1, default to 1"
@@ -53,7 +54,7 @@ class Stage < ActiveRecord::Base
     end
     property :order_number do
       key :type, :integer
-      key :description, 'sort order'
+      key :description, 'Sort order'
       key :readOnly, true
     end
   end
