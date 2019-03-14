@@ -28,6 +28,8 @@ class SessionsController < ApplicationController
   
 	swagger_path '/login' do
 		operation :post do
+      extend SwaggerHelper::AuthenticationError
+      
 			key :summary, 'Login'
 			key :description, 'Logs in the user'
 			key :produces, [
