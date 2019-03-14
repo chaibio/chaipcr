@@ -21,10 +21,7 @@ class SamplesWell < ActiveRecord::Base
   include Swagger::Blocks
     
   swagger_schema :SampleWell do
-    property :well_num do
-      key :type, :integer
-      key :description, 'Well number from 1 to 16'
-    end
+    extend SwaggerHelper::PropertyWellnum
   end
   
   belongs_to :well_layout

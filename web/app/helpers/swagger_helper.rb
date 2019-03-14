@@ -12,4 +12,13 @@ module SwaggerHelper
       end
     end
   end
+  
+  module PropertyWellnum
+    def self.extended(base)
+      base.property :well_num do
+        key :type, :integer
+        key :description, 'Well number from 1 to 16'
+      end
+    end
+  end
 end

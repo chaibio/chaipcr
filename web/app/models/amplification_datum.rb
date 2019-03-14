@@ -51,14 +51,13 @@ class AmplificationDatum < ActiveRecord::Base
 			items do
 				key :type, :array
 				items do
+          extend SwaggerHelper::PropertyWellnum
+          
 					property :target_id do
 						key :type, :integer
 						key :description, 'Target ID'
 					end
-					property :well_num do
-						key :type, :integer
-						key :description, 'Well number from 1 to 16'
-					end
+	
 					property :cycle_num do
 						key :type, :integer
 						key :description, 'Cycle number'
@@ -92,13 +91,11 @@ class AmplificationDatum < ActiveRecord::Base
 			items do
 				key :type, :array
 				items do
+          extend SwaggerHelper::PropertyWellnum
+          
 					property :target_id do
 						key :type, :integer
 						key :description, 'Target ID'
-					end
-					property :well_num do
-						key :type, :integer
-						key :description, 'Well number from 1 to 16'
 					end
 					property :replic_group do
 						key :type, :integer
@@ -137,7 +134,7 @@ class AmplificationDatum < ActiveRecord::Base
 			items do
 				key :type, :array
 				items do
-					property :target_id do
+					property :id do
 						key :type, :integer
 						key :description, 'Target ID'
 					end

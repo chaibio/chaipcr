@@ -21,10 +21,8 @@ class TargetsWell < ActiveRecord::Base
   include Swagger::Blocks
     
   swagger_schema :TargetWell do
-    property :well_num do
-      key :type, :integer
-      key :description, 'Well number from 1 to 16'
-    end
+    extend SwaggerHelper::PropertyWellnum
+
     property :well_type do
       key :type, :string
       key :enum, ["standard", "unknown", "positive_control", "negative_control"]

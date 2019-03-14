@@ -433,7 +433,7 @@ class ExperimentsController < ApplicationController
       extend SwaggerHelper::AuthenticationError
       
 			key :summary, 'Retrieve amplification data'
-			key :description, 'Returns the amplification data of an experiment based on the parameters specified'
+			key :description, "If targets are defined, amplification data will be filtered by these targets; otherwise, all data will be returned with target 'Ch 1' and target 'Ch 2'"
 			key :produces, [
 				'application/json',
 			]
@@ -716,7 +716,7 @@ class ExperimentsController < ApplicationController
       extend SwaggerHelper::AuthenticationError
       
 			key :summary, 'Retrieve melt curve data'
-			key :description, 'Returns the melt curve data of an experiment based on the parameters specified'
+			key :description, "If targets are defined, melt curve data will be filtered by these targets; otherwise, all data will be returned with target 'Ch 1' and target 'Ch 2'"
 			key :produces, [
 				'application/json',
 			]

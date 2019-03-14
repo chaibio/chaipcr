@@ -39,10 +39,8 @@ class MeltCurveDatum < ActiveRecord::Base
           key :description, "[{'well_num':1, 'target_id':1, 'temperature':[0,1,2,3,4,5], 'normalized_data':[0,1,2,3,4,5], 'derivative_data':[0,1,2,3,4,5], 'tm':[1,2,3], 'area':[2,4,5]},
                               {'well_num':2, 'target_id':1, 'temperature':[0,1,2,3,4,5], 'normalized_data':[0,1,2,3,4,5], 'derivative_data':[0,1,2,3,4,5], 'tm':[1,2,3], 'area':[2,4,5]}]"
 					items do
-						property :well_num do
-							key :type, :integer
-							key :description, 'Well number from 1 to 16'
-						end
+            extend SwaggerHelper::PropertyWellnum
+
 						property :target_id do
 							key :type, :integer
 							key :description, 'Target ID'
