@@ -157,7 +157,7 @@ class ExperimentsController < ApplicationController
     end
 	end
 
-	swagger_path '/experiments/{id}' do
+	swagger_path '/experiments/{experiment_id}' do
 		operation :put do
       extend SwaggerHelper::AuthenticationError
       
@@ -531,7 +531,11 @@ class ExperimentsController < ApplicationController
       response 304 do
 				key :description, 'Amplification data is not modified if etag is the same'
 			end
-
+      
+      response 503 do
+				key :description, 'Out of resources (i.e. device is busy processing data)'
+			end
+      
 			response 500 do
 				key :description, 'Unexpected error'
 				schema do
@@ -788,6 +792,10 @@ class ExperimentsController < ApplicationController
 				key :description, 'Melt curve data is not modified if etag is the same'
 			end
 
+      response 503 do
+				key :description, 'Out of resources (i.e. device is busy processing data)'
+			end
+      
 			response 500 do
 				key :description, 'Unexpected error'
 				schema do
@@ -966,6 +974,10 @@ class ExperimentsController < ApplicationController
 				key :description, 'Job accepted'
 			end
 
+      response 503 do
+				key :description, 'Out of resources (i.e. device is busy processing data)'
+			end
+      
 			response :default do
 				key :description, 'Unexpected error'
 				schema do
