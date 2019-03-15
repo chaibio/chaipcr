@@ -197,6 +197,7 @@
               $timeout($scope.analyzeExperiment, 1000);
             } else {
               $state.go('2_channel_optical_cal.analyze', params);
+              $scope.result = resp.data;
               $scope.analyze_failed = true;
             }
           });

@@ -33,8 +33,8 @@
       Experiment was aborted due to an unknown error.
     </p>
 
-    <p class="heating" ng-repeat="err_msg in result.error_message">
-      {{err_msg}}
+    <p class="heating">
+      {{result.errors}}
     </p>
 
     <a ui-sref="settings.root" class="button">OKAY</a>

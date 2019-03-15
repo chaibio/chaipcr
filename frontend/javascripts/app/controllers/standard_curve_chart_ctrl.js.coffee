@@ -85,15 +85,34 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
         'background-color':'#666666'
       }
       
-      $scope.toggleOmitIndex = (omit_index) ->
+      $scope.toggleOmitIndex = (omit_index, well_item) ->
+        isOmitted = 0
         if $scope.omittedIndexes.indexOf(omit_index) != -1
           $scope.omittedIndexes.splice $scope.omittedIndexes.indexOf(omit_index), 1
+          isOmitted = 0
         else
           $scope.omittedIndexes.push omit_index
-        # alert $scope.omittedIndexes
-        # return
-        updateSeries()
-    
+          isOmitted = 1
+
+        omitTargetLink = [] 
+        omitTargetLink. push
+          well_num: well_item.well_num,
+          omit: isOmitted
+
+        Experiment.linkTarget($stateParams.id, well_item.target_id, { wells: omitTargetLink }).then (data) ->
+          reInitChartData()
+
+      reInitChartData = ->
+        $scope.chartConfig.line_series = []
+        $scope.chartConfig.series = []
+
+        $scope.retrying = false
+        $scope.retry = 0
+        $scope.fetching = false
+        $scope.hasData = false
+        $scope.error = null
+        fetchFluorescenceData()
+
       $scope.updateTargetsSet = ->
         $scope.targetsSet = []
         for i in [0...$scope.targets.length]
@@ -335,6 +354,11 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
       $scope.onHoverPlot = (plot_config) ->
         $scope.onUnselectPlot()
         $scope.label_plot = plot_config
+        if $scope.label_plot
+          if $scope.label_plot.well < 8 
+            $scope.label_plot.well_label = 'A' + ($scope.label_plot.well + 1) 
+          else 
+            $scope.label_plot.well_label = 'B' + ($scope.label_plot.well - 7) 
 
       $scope.onZoom = (transform, w, h, scale_extent) ->
         $scope.std_scroll = {
@@ -409,6 +433,11 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
         $scope.plot_bgcolor_target = { 'background-color':'black' }
         $scope.line_bgcolor_target = { 'background-color':'#666666' }
         $scope.label_plot = config
+        if $scope.label_plot
+          if $scope.label_plot.well < 8 
+            $scope.label_plot.well_label = 'A' + ($scope.label_plot.well + 1) 
+          else 
+            $scope.label_plot.well_label = 'B' + ($scope.label_plot.well - 7) 
 
         # $scope.line_bgcolor_target = { 'background-color':config.config.color }
         dual_value = if $scope.is_dual_channel then 2 else 1

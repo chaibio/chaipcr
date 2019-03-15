@@ -53,7 +53,7 @@ limitations under the License.
               <ul class="data-point-type">
                 <li>
                   <label class="XB1M">Standard</label>
-                  <img src="/images/x_k.svg" style="width: 12px;">
+                  <img src="/images/x_k.svg" style="width: 12px; margin: 0 1px;">
                 </li>
                 <li>
                   <label class="XB1M">Unknown</label>
@@ -144,12 +144,7 @@ limitations under the License.
                       <div class="header B1-M-Amplification" ng-style="plot_bgcolor_target" style="min-height: 38px; color:white; padding: 8px 10px;">
                         <!-- Target: -->
                         <span ng-show="label_plot">
-                          <span ng-show="label_plot.well < 8">
-                            A{{label_plot.well + 1}},
-                          </span>
-                          <span ng-show="label_plot.well > 7">
-                            B{{label_plot.well-8 + 1}},
-                          </span>
+                          <span>{{label_plot.well_label}},&nbsp;</span>
                           <label class="B2-Amplification data-point-info" ng-show="label_plot.well_type">
                             <label ng-show="label_plot.well_type == 'standard'">S</label>
                             <label ng-show="label_plot.well_type == 'positive_control'" style="font-size: 22px; margin-top: -1px;">+</label>
@@ -243,7 +238,7 @@ limitations under the License.
               </td>
               <td class="B2-Amplification" style="border-top-left-radius: 3px;border-bottom-left-radius: 3px;">
                 <div 
-                    class="checkbox-wrapper B1B" ng-click="toggleOmitIndex($index)" 
+                    class="checkbox-wrapper B1B" ng-click="toggleOmitIndex($index, well_item)" 
                     ng-class="{ 'selected': omittedIndexes.indexOf($index) != -1}">
                   <label class="outer-line"></label>
                 </div>                 

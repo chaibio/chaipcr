@@ -16,6 +16,7 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
   NORMAL_LINE_STROKE_WIDTH: 1
   HOVERED_LINE_STROKE_WIDTH: 1.5
   THICK_LINE_STROKE_WIDTH: 0.8
+  TRANSPARENT_LINE_STROKE_WIDTH: 8
 
   NORMAL_PLOT_STROKE_WIDTH: 0.7
   HOVERED_PLOT_STROKE_WIDTH: 1
@@ -215,6 +216,31 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
       @setYAxisLabel()
     @lastYScale = @yScale
 
+  setYAxisLabel: ->
+    return if not @config.axes.y.label
+    svg = @chartSVG.select('.chart-g')
+    @yAxisLabel = svg.append("text")
+      .attr("class", "G1M")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - @MARGIN.left + 10)
+      .attr("x", 0 - (@height / 2))
+      .attr("dy", "1em")
+      .attr("fill", "#333")
+      .style("text-anchor", "middle")
+      .text("C")
+
+    svg.append("text")
+      .attr("class", "G1M")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - @MARGIN.left + 10)
+      .attr("x", 0 - (@height / 2))
+      .attr("dy", "1.4em")
+      .attr("dx", "0.6em")
+      .attr("fill", "#333")
+      .style("text-anchor", "middle")
+      .style("font-size", "10px")
+      .text("q")
+
   setXAxis: (showLabel = true)->
     @chartSVG.selectAll('g.axis.x-axis').remove()
     @chartSVG.selectAll('.g-x-axis-text').remove()
@@ -339,7 +365,7 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
     activeLineIndex = null
 
     for line, i in @target_lines by 1
-      if line is path
+      if line.line is path
         activeLineConfig = @line_data['target_line'][i]
         activeLineIndex = i
         break
@@ -374,7 +400,7 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
         line_index = i
         break    
 
-    @setActiveTargetLine(@target_lines[line_index], null)
+    @setActiveTargetLine(@target_lines[line_index].line, null)
 
     for plot, plot_index in @plots by 1
       if plot.well == plot_config.well and plot.channel == plot_config.channel
@@ -407,8 +433,8 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
 
   prioritItem: () ->
     for l in @target_lines by 1
-      l.attr('stroke-width', @NORMAL_LINE_STROKE_WIDTH)
-      l.attr('opacity', 1)
+      l.line.attr('stroke-width', @NORMAL_LINE_STROKE_WIDTH)
+      l.line.attr('opacity', 1)
     @activeTargetLine = null
 
     for p in @plots by 1
@@ -417,9 +443,9 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
 
   deprioritItem: () ->
     for l in @target_lines by 1
-      if l isnt @activeTargetLine
-        l.attr('stroke-width', @THICK_LINE_STROKE_WIDTH)
-        l.attr('opacity', 0.5)
+      if l.line isnt @activeTargetLine
+        l.line.attr('stroke-width', @THICK_LINE_STROKE_WIDTH)
+        l.line.attr('opacity', 0.5)
 
     for p in @plots by 1
       if p.target_id isnt @activeTargetLineConfig.config.id
@@ -515,7 +541,8 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
 
     @target_lines = @target_lines || []
     for l in @target_lines by 1
-      l.remove()
+      l.line.remove()
+      l.hoverLine.remove();
     @target_lines = []
 
     if @hasData()
@@ -533,6 +560,15 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
               .attr("stroke-width", @NORMAL_LINE_STROKE_WIDTH)
               .attr('stroke', s.color)
               .style("fill", s.color)
+
+          _hover_line = @viewSVG.append("line")
+              .attr("x1", xScale(x1))
+              .attr("y1", yScale(y1))
+              .attr("x2", xScale(x2))
+              .attr("y2", yScale(y2))
+              .attr("stroke-width", @TRANSPARENT_LINE_STROKE_WIDTH)
+              .attr('stroke', 'transparent')
+              .style("fill", 'transparent')
               .on('click', (e, a, path) =>
                 el = _line.node()                
                 @setActiveTargetLine(_line, @getMousePosition(el))
@@ -550,7 +586,9 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
                   @hovering = false
               )
 
-          @target_lines.push(_line)
+          @target_lines.push
+            line: _line
+            hoverLine: _hover_line
 
   drawPlots: ->
     series = @config.series
@@ -627,6 +665,9 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
       _path.remove()
       _unknown_path.remove() if _unknown_path
 
+    else
+      if typeof @onHoverPlot is 'function'
+        @onHoverPlot(null)
 
   setHoverPlot: (plot_config, isHover = true)->
     for plot, plot_index in @plots by 1
