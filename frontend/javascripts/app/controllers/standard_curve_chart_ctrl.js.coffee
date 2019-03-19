@@ -215,8 +215,8 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
               gapX = maxQt - minQt
               gapY = maxCq - minCq
 
-              $scope.chartConfig.axes.x.min = Math.floor(minQt)
-              $scope.chartConfig.axes.x.max = Math.ceil(maxQt)
+              $scope.chartConfig.axes.x.min = if Math.floor(minQt) is minQt then minQt - 1 else Math.floor(minQt)
+              $scope.chartConfig.axes.x.max = if Math.ceil(maxQt) is maxQt then maxQt + 1 else Math.ceil(maxQt)
               $scope.chartConfig.axes.y.min = minCq
               $scope.chartConfig.axes.y.max = maxCq
 

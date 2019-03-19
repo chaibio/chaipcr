@@ -75,20 +75,7 @@ window.App.directive 'standardCurveChart', [
             series: $scope.config?.series
           }
         , (val) ->
-          if !chart
-            initChart()
-          else
-            chart.updateData($scope.data, $scope.lineData)
-            chart.updateConfig($scope.config)
-            if $scope.show
-              if isInterpolationChanged(val, oldState) or isBaseBackroundChanged(val, oldState)
-                initChart()
-              else
-                chart.setYAxis(false)
-                chart.setXAxis(false)
-                chart.drawTargetLines()
-                chart.drawPlots()
-                chart.updateAxesExtremeValues()
+          initChart()
 
           oldState = angular.copy(val)
 

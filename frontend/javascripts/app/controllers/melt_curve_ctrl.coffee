@@ -191,7 +191,7 @@ App.controller 'MeltCurveChartCtrl', [
         nonGreySeries = []
 
         $scope.config.series = []
-        $scope.config.axes.y.label = $scope.curve_type.charAt(0).toUpperCase() + $scope.curve_type.slice(1) + ' Reporter'
+        $scope.config.axes.y.label = 'Fluorescence (' + $scope.curve_type.charAt(0).toUpperCase() + $scope.curve_type.slice(1) + ')'
         $scope.config.box.label.y = if $scope.curve_type is 'derivative' then '-dF/dT' else 'RFU'
 
         channel_count = if $scope.is_dual_channel then 2 else 1

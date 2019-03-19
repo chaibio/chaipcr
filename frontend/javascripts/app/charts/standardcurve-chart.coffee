@@ -21,9 +21,11 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
   NORMAL_PLOT_STROKE_WIDTH: 0.7
   HOVERED_PLOT_STROKE_WIDTH: 1
   ACTIVED_PLOT_STROKE_WIDTH: 2
+  TRANSPARENT_PLOT_STROKE_WIDTH: 6
 
   DEFAULT_SCALE_EXTENT: 5
-  INACTIVE_OPACITY: 0.4
+  INACTIVE_OPACITY: 0.2
+  INACTIVE_LINE_OPACITY: 0.4
 
   MARGIN:
     top: 20
@@ -70,9 +72,8 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
 
   computedMaxY: ->
     max = if angular.isNumber(@config.axes.y.max) and @hasData() then @config.axes.y.max else if @hasData() then @getMaxY() else @DEFAULT_MAX_Y
-    if @config.axes.y.scale is 'linear'
-      m = @roundUpExtremeValue( max + @getYExtremeValuesAllowance())
-      return if @hasData() then m else max
+    if @config.axes.y.scale is 'linear'      
+      return if @hasData() then @roundUpExtremeValue( max + @getYExtremeValuesAllowance()) else max
     else
       ticks = @getYLogTicks(@getMinY(), @getMaxY())
       return ticks[ticks.length - 1]
@@ -374,15 +375,18 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
       index: activeLineIndex,
     }
 
-  setActiveTargetLine: (path, mouse) ->
-    @activeTargetLine = path
-    @activeTargetLine.attr('stroke-width', @NORMAL_LINE_STROKE_WIDTH)
-    @activeTargetLineConfig = @getTargetLineConfig(path)
+  setActiveTargetLine: (target_id) ->
+    @prioritItem()
+    for item in @target_lines
+      if item.id is target_id            
+        @activeTargetLine = item.line
+        @activeTargetLine.attr('stroke-width', @NORMAL_LINE_STROKE_WIDTH)
+        @activeTargetLineConfig = @getTargetLineConfig(item.line)
 
     if typeof @onUpdateProperties is 'function'
       @onUpdateProperties(@activeTargetLineConfig.config)
 
-    @prevMousePosition = mouse
+    @prevMousePosition = @getMousePosition(@activeTargetLine.node()) if @activeTargetLine
     @deprioritItem()
     @unselectPlot()
 
@@ -398,14 +402,18 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
     for l, i in @line_data['target_line'] by 1
       if l.id is plot_config.target_id
         line_index = i
-        break    
+        break
 
-    @setActiveTargetLine(@target_lines[line_index].line, null)
+    # return if @activeTargetLineConfig and @activeTargetLineConfig.config.id isnt plot_config.target_id
+
+    @setActiveTargetLine(@target_lines[line_index].id)
 
     for plot, plot_index in @plots by 1
       if plot.well == plot_config.well and plot.channel == plot_config.channel
         _path = plot.plot
         _unknown_path = plot.unknown
+        _hover_path = plot.hover_plot
+        _hover_unknown_path = plot.hover_unknown
 
         new_plot_path = @makeWhitePlot(plot.config)
         @activeWhitePlot = new_plot_path[0]
@@ -414,11 +422,15 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
         new_plot_path = @makeColoredPlot(plot.config, 'active')
         @plots[plot_index].plot = new_plot_path[0]
         @plots[plot_index].unknown = new_plot_path[1]
+        @plots[plot_index].hover_plot = new_plot_path[2]
+        @plots[plot_index].hover_unknown = new_plot_path[3]
         @activePlot = new_plot_path[0]
         @activeUnknownPlot = new_plot_path[1]
 
         _unknown_path.remove() if _unknown_path          
         _path.remove()
+        _hover_unknown_path.remove() if _hover_unknown_path          
+        _hover_path.remove()
         
         activePlotIndex = plot_index
         break
@@ -433,9 +445,10 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
 
   prioritItem: () ->
     for l in @target_lines by 1
-      l.line.attr('stroke-width', @NORMAL_LINE_STROKE_WIDTH)
-      l.line.attr('opacity', 1)
+      l.line.attr('stroke-width', @NORMAL_LINE_STROKE_WIDTH) if l.line
+      l.line.attr('opacity', 1) if l.line
     @activeTargetLine = null
+    @activeTargetLineConfig = null
 
     for p in @plots by 1
       p.plot.attr('opacity', 1)
@@ -443,9 +456,9 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
 
   deprioritItem: () ->
     for l in @target_lines by 1
-      if l.line isnt @activeTargetLine
-        l.line.attr('stroke-width', @THICK_LINE_STROKE_WIDTH)
-        l.line.attr('opacity', 0.5)
+      if l.id isnt @activeTargetLineConfig.config.id
+        l.line.attr('stroke-width', @THICK_LINE_STROKE_WIDTH)  if l.line
+        l.line.attr('opacity', @INACTIVE_LINE_OPACITY)  if l.line
 
     for p in @plots by 1
       if p.target_id isnt @activeTargetLineConfig.config.id
@@ -456,10 +469,14 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
     if @activePlotConfig
       _path = @plots[@activePlotConfig.plot_index].plot
       _unknown_path = @plots[@activePlotConfig.plot_index].unknown
+      _hover_path = @plots[@activePlotConfig.plot_index].hover_plot
+      _hover_unknown_path = @plots[@activePlotConfig.plot_index].hover_unknown
 
       new_plot_path = @makeColoredPlot(@activePlotConfig.config)
       @plots[@activePlotConfig.plot_index].plot = new_plot_path[0]
       @plots[@activePlotConfig.plot_index].unknown = new_plot_path[1]
+      @plots[@activePlotConfig.plot_index].hover_plot = new_plot_path[2]
+      @plots[@activePlotConfig.plot_index].hover_unknown = new_plot_path[3]
       @activePlot = null
       @activeUnknownPlot = null
       @activePlotConfig = null
@@ -471,6 +488,8 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
 
       _unknown_path.remove() if _unknown_path          
       _path.remove()
+      _hover_unknown_path.remove() if _hover_unknown_path          
+      _hover_path.remove()
     
     if typeof @onUnSelectPlot is 'function'
       @onUnSelectPlot()
@@ -529,75 +548,85 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
     @setMouseOverlay()
     @setYAxis()
     @setXAxis()
-    @drawTargetLines()
-    @drawPlots()
-    @updateZoomScaleExtent()
+
+    if @hasData()
+      @drawTargetLines()
+      @drawPlots()
+      @updateZoomScaleExtent()
     @drawAxesExtremeValues()
 
   drawTargetLines: ->
 
-    xScale = @getXScale()
-    yScale = @getYScale()
-
     @target_lines = @target_lines || []
     for l in @target_lines by 1
-      l.line.remove()
-      l.hoverLine.remove();
+      l.line.remove() if l.line
+      l.hoverLine.remove() if l.hoverLine
     @target_lines = []
 
     if @hasData()
-      x1 = @config.axes.x.min
-      x2 = @config.axes.x.max
       for s in @line_data['target_line'] by 1
-        y1 = s.slope * x1 + s.offset
-        y2 = s.slope * x2 + s.offset
-        if s.color != 'transparent'
-          _line = @viewSVG.append("line")
-              .attr("x1", xScale(x1))
-              .attr("y1", yScale(y1))
-              .attr("x2", xScale(x2))
-              .attr("y2", yScale(y2))
-              .attr("stroke-width", @NORMAL_LINE_STROKE_WIDTH)
-              .attr('stroke', s.color)
-              .style("fill", s.color)
+        lines = @makeTargetLine(s)
+        @target_lines.push
+          line: lines[0]
+          hoverLine: lines[1]
+          id: s.id
 
-          _hover_line = @viewSVG.append("line")
-              .attr("x1", xScale(x1))
-              .attr("y1", yScale(y1))
-              .attr("x2", xScale(x2))
-              .attr("y2", yScale(y2))
-              .attr("stroke-width", @TRANSPARENT_LINE_STROKE_WIDTH)
-              .attr('stroke', 'transparent')
-              .style("fill", 'transparent')
-              .on('click', (e, a, path) =>
-                el = _line.node()                
-                @setActiveTargetLine(_line, @getMousePosition(el))
-                @onUnselectPlot()
-              )
-              .on('mousemove', (e, a, path) =>
-                if (_line isnt @activeTargetLine)
-                  _line.attr('stroke-width', @HOVERED_LINE_STROKE_WIDTH)
-                  @hoveredLine = _line
-                  @hovering = true
-              )
-              .on('mouseout', (e, a, path) =>
-                if (_line isnt @activeTargetLine)
-                  _line.attr('stroke-width', @NORMAL_LINE_STROKE_WIDTH)
-                  @hovering = false
-              )
+  makeTargetLine: (s) ->
+    xScale = @getXScale()
+    yScale = @getYScale()
 
-          @target_lines.push
-            line: _line
-            hoverLine: _hover_line
+    x1 = @config.axes.x.min
+    x2 = @config.axes.x.max
+    y1 = s.slope * x1 + s.offset
+    y2 = s.slope * x2 + s.offset
+    if s.color != 'transparent'
+      if @activeTargetLineConfig and s.id isnt @activeTargetLineConfig.config.id
+        line_opacity = @INACTIVE_LINE_OPACITY
+      else
+        line_opacity = 1
+
+      _line = @viewSVG.append("line")
+          .attr("x1", xScale(x1))
+          .attr("y1", yScale(y1))
+          .attr("x2", xScale(x2))
+          .attr("y2", yScale(y2))
+          .attr("stroke-width", @NORMAL_LINE_STROKE_WIDTH)
+          .attr('stroke', s.color)
+          .attr('opacity', line_opacity)          
+          .style("fill", s.color)
+
+      _hover_line = @viewSVG.append("line")
+          .attr("x1", xScale(x1))
+          .attr("y1", yScale(y1))
+          .attr("x2", xScale(x2))
+          .attr("y2", yScale(y2))
+          .attr("stroke-width", @TRANSPARENT_LINE_STROKE_WIDTH)
+          .attr('stroke', 'transparent')
+          .style("fill", 'transparent')
+          .on('click', (e, a, path) =>
+            @setActiveTargetLine(s.id)
+            @onUnselectPlot()
+          )
+          .on('mousemove', (e, a, path) =>
+            @setHoverLine(s, true)
+          )
+          .on('mouseout', (e, a, path) =>
+            @setHoverLine(s, false)
+          )
+
+    [_line, _hover_line]
+
 
   drawPlots: ->
     series = @config.series
-    return if not series
+    return if not series or not @hasData()
 
     @plots = @plots || []
     for l in @plots by 1
       l.plot.remove()
       l.unknown.remove() if l.unknown
+      l.hover_plot.remove()
+      l.hover_unknown.remove() if l.hover_unknown
     @plots = []
 
     for s in series by 1
@@ -609,10 +638,14 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
         config: s
         plot: plot_path[0]
         unknown: plot_path[1]
+        hover_plot: plot_path[2]
+        hover_unknown: plot_path[3]
 
     if @activePlotConfig
       _path = @plots[@activePlotConfig.plot_index].plot
       _unknown_path = @plots[@activePlotConfig.plot_index].unknown
+      _hover_path = @plots[@activePlotConfig.plot_index].hover_plot
+      _hover_unknown_path = @plots[@activePlotConfig.plot_index].hover_unknown
 
       new_plot_path = @makeWhitePlot(@activePlotConfig.config)
       @activeWhitePlot = new_plot_path[0]
@@ -621,11 +654,15 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
       new_plot_path = @makeColoredPlot(@activePlotConfig.config, 'active')
       @plots[@activePlotConfig.plot_index].plot = new_plot_path[0]
       @plots[@activePlotConfig.plot_index].unknown = new_plot_path[1]
+      @plots[@activePlotConfig.plot_index].hover_plot = new_plot_path[2]
+      @plots[@activePlotConfig.plot_index].hover_unknown = new_plot_path[3]
       @activePlot = new_plot_path[0]
       @activeUnknownPlot = new_plot_path[1]
 
       _unknown_path.remove() if _unknown_path          
       _path.remove()
+      _hover_unknown_path.remove() if _hover_unknown_path          
+      _hover_path.remove()
 
       if typeof @onSelectPlot is 'function'
         @onSelectPlot(@activePlotConfig.config)
@@ -637,17 +674,25 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
       if plot.config.dataset isnt @activePlotConfig?.config.dataset
         _path = plot.plot
         _unknown_path = plot.unknown
+        _hover_path = plot.hover_plot
+        _hover_unknown_path = plot.hover_unknown
 
         new_plot_path = @makeColoredPlot(plot.config)
         @plots[plot_index].plot = new_plot_path[0]
         @plots[plot_index].unknown = new_plot_path[1]
+        @plots[plot_index].hover_plot = new_plot_path[2]
+        @plots[plot_index].hover_unknown = new_plot_path[3]
         
         _path.remove()
         _unknown_path.remove() if _unknown_path
+        _hover_path.remove()
+        _hover_unknown_path.remove() if _hover_unknown_path
 
     if @activePlotConfig
       _path = @plots[@activePlotConfig.plot_index].plot
       _unknown_path = @plots[@activePlotConfig.plot_index].unknown
+      _hover_path = @plots[@activePlotConfig.plot_index].hover_plot
+      _hover_unknown_path = @plots[@activePlotConfig.plot_index].hover_unknown
 
       @activeWhiteUnknownPlot.remove() if @activeWhiteUnknownPlot
       @activeWhitePlot.remove() if @activeWhitePlot
@@ -658,12 +703,16 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
       new_plot_path = @makeColoredPlot(@activePlotConfig.config, 'active')
       @plots[@activePlotConfig.plot_index].plot = new_plot_path[0]
       @plots[@activePlotConfig.plot_index].unknown = new_plot_path[1]     
+      @plots[@activePlotConfig.plot_index].hover_plot = new_plot_path[2]
+      @plots[@activePlotConfig.plot_index].hover_unknown = new_plot_path[3]     
 
       @activePlot = new_plot_path[0]
       @activeUnknownPlot = new_plot_path[1]
 
       _path.remove()
       _unknown_path.remove() if _unknown_path
+      _hover_path.remove()
+      _hover_unknown_path.remove() if _hover_unknown_path
 
     else
       if typeof @onHoverPlot is 'function'
@@ -671,22 +720,30 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
 
   setHoverPlot: (plot_config, isHover = true)->
     for plot, plot_index in @plots by 1
-      if plot.well == plot_config.well and plot.channel == plot_config.channel
+      if plot.well == plot_config.well and plot.channel == plot_config.channel and plot.plot.attr('opacity') isnt @INACTIVE_OPACITY.toString()
         _path = plot.plot
         _unknown_path = plot.unknown
+        _hover_path = plot.hover_plot
+        _hover_unknown_path = plot.hover_unknown
 
         if isHover
           if plot.config.dataset isnt @activePlotConfig?.config.dataset
             new_plot_path = @makeColoredPlot(plot_config, 'hover')
             @plots[plot_index].plot = new_plot_path[0]
             @plots[plot_index].unknown = new_plot_path[1]            
+            @plots[plot_index].hover_plot = new_plot_path[2]
+            @plots[plot_index].hover_unknown = new_plot_path[3]
             _path.remove()
             _unknown_path.remove() if _unknown_path          
+            _hover_path.remove()
+            _hover_unknown_path.remove() if _hover_unknown_path
 
             if @activePlotConfig
               new_plot_path = @makeColoredPlot(@activePlotConfig.config)
               @plots[@activePlotConfig.plot_index].plot = new_plot_path[0]
               @plots[@activePlotConfig.plot_index].unknown = new_plot_path[1]
+              @plots[@activePlotConfig.plot_index].hover_plot = new_plot_path[2]
+              @plots[@activePlotConfig.plot_index].hover_unknown = new_plot_path[3]
               
               @activePlot.remove() if @activePlot
               @activeUnknownPlot.remove() if @activeUnknownPlot
@@ -708,15 +765,33 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
             new_plot_path = @makeColoredPlot(plot_config)
             @plots[plot_index].plot = new_plot_path[0]
             @plots[plot_index].unknown = new_plot_path[1]
+            @plots[plot_index].hover_plot = new_plot_path[2]
+            @plots[plot_index].hover_unknown = new_plot_path[3]
 
             if typeof @onHoverPlot is 'function'
               @onHoverPlot(null)
 
             _path.remove()
             _unknown_path.remove() if _unknown_path
+            _hover_path.remove()
+            _hover_unknown_path.remove() if _hover_unknown_path
           @isSetHovered = false
 
         break
+
+  setHoverLine: (line_config, isHover = true) ->
+    for line in @target_lines by 1
+      if line_config.id is line.id
+        _line = line.line
+        if isHover and !@activeTargetLine
+          if (_line isnt @activeTargetLine)
+            _line.attr('stroke-width', @HOVERED_LINE_STROKE_WIDTH)
+            @hoveredLine = _line
+            @hovering = true
+        else
+          if (_line isnt @activeTargetLine)
+            _line.attr('stroke-width', @NORMAL_LINE_STROKE_WIDTH)
+            @hovering = false
 
   makeWhitePlot: (plot_config) ->
     xScale = @getXScale()
@@ -815,6 +890,19 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
         .attr("transform", (d) => 
           "translate(" + xScale(d[plot_config.x]) + "," + yScale(d[plot_config.y]) + ")rotate(45)"
         )
+
+    _hover_path = @viewSVG.append("path")
+        .data(@data[plot_config.dataset])
+        .attr("class", "point")
+        .attr("d", plot)
+        .attr("opacity", plot_opacity)
+        .attr("fill", 'transparent')
+        .attr('stroke', 'transparent')
+        .attr('stroke-location', 'outside')        
+        .attr('stroke-width', @TRANSPARENT_PLOT_STROKE_WIDTH)
+        .attr("transform", (d) => 
+          "translate(" + xScale(d[plot_config.x]) + "," + yScale(d[plot_config.y]) + ")rotate(45)"
+        )
         .on('click', (e, a, path) =>
           @setActivePlot(_path, plot_config)
         )
@@ -830,6 +918,7 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
         )
 
     _unknown_path = null
+    _hover_unknown_path = null
 
     if plot_config.well_type isnt 'standard'
       plot_size = if type is 'normal' then @DEFAULT_PT_SIZE + 1 else if type is 'hover' then @DEFAULT_PT_HOVER_SIZE - 2 else @DEFAULT_PT_ACTIVE_SIZE - 1
@@ -842,6 +931,18 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
           .attr("fill", 'transparent')
           .attr('stroke', plot_config.color)
           .attr('stroke-width', @NORMAL_PLOT_STROKE_WIDTH + 1)
+          .attr("transform", (d) => 
+            "translate(" + xScale(d[plot_config.x]) + "," + yScale(d[plot_config.y]) + ")"
+          )
+
+      _hover_unknown_path = @viewSVG.append("path")
+          .data(@data[plot_config.dataset])
+          .attr("class", "point")
+          .attr("d", plot)
+          .attr("opacity", plot_opacity)
+          .attr("fill", 'transparent')
+          .attr('stroke', 'transparent')
+          .attr('stroke-width', @TRANSPARENT_PLOT_STROKE_WIDTH)
           .attr("transform", (d) => 
             "translate(" + xScale(d[plot_config.x]) + "," + yScale(d[plot_config.y]) + ")"
           )
@@ -859,7 +960,7 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
               @setHoverPlot(plot_config, false)
           )
 
-    [_path, _unknown_path]
+    [_path, _unknown_path, _hover_path, _hover_unknown_path]
 
   updateData: (data, line_data) ->
     @data = data
@@ -941,6 +1042,7 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
           @unselectTargetLine()
           @unselectPlot()
           @onUnselectPlot()
+          @hovering = false
 
   updateZoomScaleExtent: ->
     return if !@zooomBehavior

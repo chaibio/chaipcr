@@ -27,12 +27,12 @@ window.ChaiBioTech.ngApp.service 'StandardCurveChartHelper', [
         x:
           key: 'cycle_num'
           ticks: 8
-          label: 'Log (Quantity)'
+          label: 'Log Quantity'
           min: 0
           max: 1
         y:
-          min: 0
-          max: 1
+          min: 1
+          max: 20
           unit: 'k'
           label: 'Cq'
           ticks: 10
