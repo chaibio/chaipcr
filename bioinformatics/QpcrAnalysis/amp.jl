@@ -395,17 +395,17 @@ function process_amp(
         end # if
         #
         ## allelic discrimination
-        if dcv
-            full_amp_out.assignments_adj_labels_dict, full_amp_out.agr_dict =
-                process_ad(
-                    full_amp_out,
-                    ad_cycs,
-                    ctrl_well_dict,
-                    cluster_method,
-                    norm_l,
-                    expected_ncg_raw,
-                    categ_well_vec)
-        end # if dcv
+        # if dcv
+        #     full_amp_out.assignments_adj_labels_dict, full_amp_out.agr_dict =
+        #         process_ad(
+        #             full_amp_out,
+        #             ad_cycs,
+        #             ctrl_well_dict,
+        #             cluster_method,
+        #             norm_l,
+        #             expected_ncg_raw,
+        #             categ_well_vec)
+        # end # if dcv
         #
         ## format output
         if out_format == :full
