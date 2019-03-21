@@ -1239,11 +1239,12 @@ class ExperimentsController < ApplicationController
     return nil if !FluorescenceDatum.new_data_generated?(experiment.id, stage_id)
     experiment.experiment_definition #load experiment_definition before go to background thread
     return background("amplification", experiment.id) do
-      amplification_data, cts = calculate_amplification_data(experiment, stage_id, experiment.calibration_id)
+      amplification_data_schema, amplification_data, cqs_schema, cqs = calculate_amplification_data(experiment, stage_id, experiment.calibration_id)
       #update cache
-      AmplificationDatum.import amplification_data, :on_duplicate_key_update => [:background_subtracted_value,:baseline_subtracted_value,:dr1_pred,:dr2_pred]
-      AmplificationCurve.import cts, :on_duplicate_key_update => [:ct]
-
+      start_time = Time.now
+      AmplificationDatum.import amplification_data_schema, amplification_data, :on_duplicate_key_update => [:background_subtracted_value,:baseline_subtracted_value,:dr1_pred,:dr2_pred], :validate => false
+      AmplificationCurve.import cqs_schema, cqs, :on_duplicate_key_update => [:ct], :validate => false
+      logger.info("Amplification data import time #{Time.now-start_time}")
       background_run_standard_curve(experiment)
     end
   end
@@ -1291,11 +1292,11 @@ class ExperimentsController < ApplicationController
     ensure
 #      connection.close
     end
-    logger.info("R code time #{Time.now-start_time}")
+    logger.info("Julia code time #{Time.now-start_time}")
     logger.info("results=#{results}")
     start_time = Time.now
     amplification_data = []
-    cts = []
+    cqs = []
     if !results.blank?
 #     new julia code
       background_subtracted_results = results["rbbs_ary3"]
@@ -1310,14 +1311,13 @@ class ExperimentsController < ApplicationController
           (0...num_cycles).each do |cycle_num|
             background_subtracted_value = background_subtracted_results[channel][well_num][cycle_num]
             baseline_subtracted_value = baseline_subtracted_results[channel][well_num][cycle_num]
-						dr1_pred = first_derivative_results[channel][well_num][cycle_num]
-						dr2_pred = second_derivative_results[channel][well_num][cycle_num]
-            amplification_data << AmplificationDatum.new(:experiment_id=>experiment.id, :stage_id=>stage_id, :sub_type=>sub_type, :sub_id=>sub_id, :channel=>channel+1, :well_num=>well_num+1, :cycle_num=>cycle_num+1, :background_subtracted_value=>background_subtracted_value,
-																												 :baseline_subtracted_value=>baseline_subtracted_value, :dr1_pred=>dr1_pred, :dr2_pred=>dr2_pred)
+            dr1_pred = first_derivative_results[channel][well_num][cycle_num]
+            dr2_pred = second_derivative_results[channel][well_num][cycle_num]
+            amplification_data << [experiment.id, stage_id, sub_type, sub_id, channel+1, well_num+1, cycle_num+1, background_subtracted_value, baseline_subtracted_value, dr1_pred, dr2_pred]
           end
         end
         (0...cq_results[channel].length).each do |well_num|
-          cts << AmplificationCurve.new(:experiment_id=>experiment.id, :stage_id=>stage_id, :channel=>channel+1, :well_num=>well_num+1, :ct=>cq_results[channel][well_num])
+          cqs << [experiment.id, stage_id, channel+1, well_num+1, cq_results[channel][well_num]]
         end
       end
 =begin
@@ -1348,19 +1348,29 @@ class ExperimentsController < ApplicationController
 =end
     end
     logger.info("Rails code time #{Time.now-start_time}")
-    return amplification_data, cts
+    return [:experiment_id, :stage_id, :sub_type, :sub_id, :channel, :well_num, :cycle_num, :background_subtracted_value, :baseline_subtracted_value, :dr1_pred, :dr2_pred],
+           amplification_data,
+           [:experiment_id, :stage_id, :channel, :well_num, :ct],
+           cqs
   end
 
   def background_calculate_melt_curve_data(experiment, stage_id)
     new_data = MeltCurveDatum.new_data_generated?(experiment, stage_id)
     return nil if new_data.nil?
     return background("meltcurve", experiment.id) do
-      melt_curve_data = calculate_melt_curve_data(experiment, stage_id, experiment.calibration_id)
+      melt_curve_data_schema, melt_curve_data = calculate_melt_curve_data(experiment, stage_id, experiment.calibration_id)
       #update cache
-      CachedMeltCurveDatum.import melt_curve_data, :on_duplicate_key_update => [:temperature_text, :normalized_data_text, :derivative_data_text, :tm_text, :area_text]
+      start_time = Time.now
+      CachedMeltCurveDatum.import melt_curve_data_schema, melt_curve_data, :on_duplicate_key_update => [:temperature_text, :normalized_data_text, :derivative_data_text, :tm_text, :area_text], :validate => false
+      logger.info("Melt curve import time #{Time.now-start_time}")
       #update cached_temperature
       if melt_curve_data.last
-        cached_temperature = (experiment.running?)? melt_curve_data.last.temperature.last : new_data.temperature
+        if experiment.running?
+          melt_curve_last = CachedMeltCurveDatum.new(melt_curve_data_schema.zip(melt_curve_data.last).to_h)
+          cached_temperature = melt_curve_last.temperature.last
+        else
+          cached_temperature = new_data.temperature
+        end
         if cached_temperature
           experiment.update_attributes(:cached_temperature=>cached_temperature)
         end
@@ -1395,7 +1405,7 @@ class ExperimentsController < ApplicationController
     ensure
 #      connection.close
     end
-    logger.info("R code time #{Time.now-start_time}")
+    logger.info("Julia code time #{Time.now-start_time}")
     #logger.info("results=#{results}")
     start_time = Time.now
     ramp = Ramp.collect_data(stage_id).first
@@ -1407,8 +1417,7 @@ class ExperimentsController < ApplicationController
         melt_curve_results[channel].each_index do |i|
           melt_curve_results_per_well = melt_curve_results[channel][i]
           melt_curve_analysis_per_well = melt_curve_analysis_results[channel][i]
-          hash = CachedMeltCurveDatum.new({:experiment_id=>experiment.id, :stage_id=>stage_id, :ramp_id=>(ramp)? ramp.id : nil, :channel=>channel+1, :well_num=>i+1, :temperature=>melt_curve_results_per_well[0], :normalized_data=>melt_curve_results_per_well[1], :derivative_data=>melt_curve_results_per_well[2], :tm=>melt_curve_analysis_per_well[0], :area=>melt_curve_analysis_per_well[1]})
-          melt_curve_data << hash
+          melt_curve_data << [experiment.id, stage_id, (ramp)? ramp.id : nil, channel+1, i+1, melt_curve_results_per_well[0].join(","), melt_curve_results_per_well[1].join(","), melt_curve_results_per_well[2].join(","), melt_curve_analysis_per_well[0].join(","), melt_curve_analysis_per_well[1].join(",")]
         end
       end
 =begin
@@ -1423,7 +1432,7 @@ class ExperimentsController < ApplicationController
 =end
     end
     logger.info("Rails code time #{Time.now-start_time}")
-    return melt_curve_data
+    return [:experiment_id, :stage_id, :ramp_id, :channel, :well_num, :temperature_text, :normalized_data_text, :derivative_data_text, :tm_text, :area_text], melt_curve_data
   end
 
   def optical_cal(experiment)

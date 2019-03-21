@@ -84,10 +84,10 @@ class CronDB
 
    def clean_cache
      @logger.info "clean cached data"
-     execute("DELETE FROM `amplification_curves`")
-     execute("DELETE FROM `amplification_data`")
-     execute("DELETE FROM `cached_melt_curve_data`")
-     execute("DELETE FROM `cached_analyze_data`")
+     execute("TRUNCATE TABLE `amplification_curves`")
+     execute("TRUNCATE TABLE `amplification_data`")
+     execute("TRUNCATE TABLE `cached_melt_curve_data`")
+     execute("TRUNCATE TABLE `cached_analyze_data`")
      execute("UPDATE experiments SET cached_temperature = NULL")
    end
    
