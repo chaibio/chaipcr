@@ -75,6 +75,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
       $scope.label_plot = null
 
       $scope.has_init = false
+      $scope.re_init_chart_data = false
       $scope.init_sample_color = '#ccc'
 
       $scope.line_bgcolor_target = {
@@ -86,18 +87,18 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
       }
       
       $scope.toggleOmitIndex = (omit_index, well_item) ->
-        isOmitted = 0
+        return if !$scope.hasData
         if $scope.omittedIndexes.indexOf(omit_index) != -1
           $scope.omittedIndexes.splice $scope.omittedIndexes.indexOf(omit_index), 1
-          isOmitted = 0
         else
           $scope.omittedIndexes.push omit_index
-          isOmitted = 1
+
+        well_item.omit = if well_item.omit then 0 else 1
 
         omitTargetLink = [] 
         omitTargetLink. push
           well_num: well_item.well_num,
-          omit: isOmitted
+          omit: well_item.omit
 
         Experiment.linkTarget($stateParams.id, well_item.target_id, { wells: omitTargetLink }).then (data) ->
           reInitChartData()
@@ -111,7 +112,34 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
         $scope.fetching = false
         $scope.hasData = false
         $scope.error = null
-        fetchFluorescenceData()
+        $scope.has_init = false
+        $scope.re_init_chart_data = true
+
+        $scope.well_targets = []
+        Experiment.getWellLayout($stateParams.id).then (resp) ->
+          for i in [0...resp.data.length]
+            $scope.samples[i] = if resp.data[i].samples then resp.data[i].samples[0] else null
+            if $scope.samples[i]
+              for j in [0...$scope.expSamples.length]
+                if $scope.samples[i].id == $scope.expSamples[j].id
+                  $scope.samples[i].color = $scope.COLORS[j % $scope.COLORS.length]
+                  break
+                else
+                  $scope.samples[i].color = $scope.init_sample_color
+            if $scope.is_dual_channel
+              $scope.well_targets[2*i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0]  else null
+              $scope.well_targets[2*i+1] = if resp.data[i].targets && resp.data[i].targets[1] then resp.data[i].targets[1] else null
+
+              if $scope.well_targets[2*i]
+                $scope.well_targets[2*i].color = if $scope.well_targets[2*i] then $scope.lookupTargets[$scope.well_targets[2*i].id] else 'transparent'
+              if $scope.well_targets[2*i+1]
+                $scope.well_targets[2*i+1].color = if $scope.well_targets[2*i+1] then $scope.lookupTargets[$scope.well_targets[2*i+1].id] else 'transparent'
+            else
+              $scope.well_targets[i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0]  else null
+              if $scope.well_targets[i]
+                $scope.well_targets[i].color = if $scope.well_targets[i] then $scope.lookupTargets[$scope.well_targets[i].id] else 'transparent'
+
+          fetchFluorescenceData()
 
       $scope.updateTargetsSet = ->
         $scope.targetsSet = []
@@ -122,8 +150,8 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
             if !target.length
               $scope.targetsSet.push($scope.targets[i])
 
-      $scope.$watchCollection 'targetsSetHided', ->
-        updateSeries()
+      $scope.$watchCollection 'targetsSetHided', ->        
+        updateSeries() if $scope.hasData
       
       $scope.$on 'event:switch-chart-well', (e, data, oldData) ->
         if !data.active
@@ -191,8 +219,14 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
               $scope.well_data = helper.normalizeSummaryData(data.summary_data, data.targets, $scope.well_targets)
               $scope.targets = helper.normalizeWellTargetData($scope.well_data, $scope.targets, $scope.is_dual_channel)
 
-              for i in [0..$scope.targets.length - 1] by 1
-                $scope.targetsSetHided[$scope.targets[i]?.id] = true
+              $scope.omittedIndexes = []
+              for well, i in $scope.well_data by 1
+                if well.omit
+                  $scope.omittedIndexes.push i
+
+              if !$scope.re_init_chart_data
+                for i in [0..$scope.targets.length - 1] by 1
+                  $scope.targetsSetHided[$scope.targets[i]?.id] = true
 
               AMPLI_DATA_CACHE = angular.copy data
 
@@ -471,9 +505,10 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
         $scope.label_plot = null
 
       $scope.$watchCollection 'wellButtons', ->
-        $scope.onUnselectLine()
-        $scope.onUnselectPlot()
-        updateSeries()
+        if $scope.hasData
+          $scope.onUnselectLine()
+          $scope.onUnselectPlot()
+          updateSeries()
 
       $scope.$watch ->
         $scope.$parent.chart
@@ -519,6 +554,11 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
                 $scope.targets = helper.blankWellTargetData($scope.well_data)
                 for i in [0..$scope.targets.length - 1] by 1
                   $scope.targetsSetHided[$scope.targets[i]?.id] = true
+
+                $scope.omittedIndexes = []
+                for well, i in $scope.well_data by 1
+                  if well.omit
+                    $scope.omittedIndexes.push i
 
                 $scope.updateTargetsSet()
                 updateSeries()

@@ -215,9 +215,9 @@ limitations under the License.
             </tr>
             <tr ng-repeat="well_item in well_data" 
               ng-class="{
-                selected: !has_init || (
+                selected: (!has_init && !re_init_chart_data) || (
                   (wellButtons['well_' + (well_item.well_num - 1)].selected) && 
-                  (omittedIndexes.indexOf($index) == -1) && 
+                  (well_item.omit == 0) && 
                   (targetsSetHided[targets[chartConfig.channels * (well_item.well_num - 1) + well_item.channel - 1].id])),
                 active: well_item.active
               }"
@@ -239,7 +239,7 @@ limitations under the License.
               <td class="B2-Amplification" style="border-top-left-radius: 3px;border-bottom-left-radius: 3px;">
                 <div 
                     class="checkbox-wrapper B1B" ng-click="toggleOmitIndex($index, well_item)" 
-                    ng-class="{ 'selected': omittedIndexes.indexOf($index) != -1}">
+                    ng-class="{ 'selected': well_item.omit == 1}">
                   <label class="outer-line"></label>
                 </div>                 
               </td>

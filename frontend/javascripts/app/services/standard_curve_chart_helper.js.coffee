@@ -225,6 +225,7 @@ window.ChaiBioTech.ngApp.service 'StandardCurveChartHelper', [
           item['channel'] = target[0].channel if target[0]
           item['color'] = target[0].color if target[0]
           item['well_type'] = target[0].well_type if target[0]
+          item['omit'] = target[0].omit if target[0]
         else
           target = _.filter target_data, (target) ->
             target[0] is item.target_id
@@ -232,11 +233,38 @@ window.ChaiBioTech.ngApp.service 'StandardCurveChartHelper', [
           item['channel'] = if item['target_name'] == 'Ch 1' then 1 else 2
           item['color'] = if item['target_name'] == 'Ch 1' then @SAMPLE_TARGET_COLORS[0] else @SAMPLE_TARGET_COLORS[1]
           item['well_type'] = ''
+          item['omit'] = 0
 
         item['active'] = false
 
         item['mean_quantity'] = item['mean_quantity_m'] * Math.pow(10, item['mean_quantity_b'])
         item['quantity'] = item['quantity_m'] * Math.pow(10, item['quantity_b'])
+
+        well_data.push item
+
+      # Add omitted target
+      omit_targets = _.filter well_targets, (target) ->
+        target and target.omit is 1
+
+      for elem in omit_targets
+        item = {}
+        item['well_num'] = elem.well_num
+        item['replic_group'] = null
+        item['quantity_m'] = elem.quantity?.m
+        item['quantity_b'] = elem.quantity?.b
+        item['quantity'] = item['quantity_m'] * Math.pow(10, item['quantity_b'])
+        item['mean_quantity_m'] = null
+        item['mean_quantity_b'] = null
+        item['mean_quantity'] = 0
+        item['mean_cq'] = null
+        item['cq'] = null
+        item['channel'] = elem.channel
+        item['active'] = false       
+        item['target_name'] = elem.name
+        item['target_id'] = elem.id
+        item['color'] = elem.color
+        item['well_type'] = elem.well_type
+        item['omit'] = elem.omit
 
         well_data.push item
 
@@ -267,11 +295,13 @@ window.ChaiBioTech.ngApp.service 'StandardCurveChartHelper', [
           item['target_id'] = well_targets[2*i].id if well_targets[2*i]
           item['color'] = well_targets[2*i].color if well_targets[2*i]
           item['well_type'] = well_targets[2*i].well_type if well_targets[2*i]
+          item['omit'] = well_targets[2*i].omit if well_targets[2*i]
         else
           item['target_name'] = well_targets[i].name if well_targets[i]
           item['target_id'] = well_targets[i].id if well_targets[i]
           item['color'] = well_targets[i].color if well_targets[i]
           item['well_type'] = well_targets[i].well_type if well_targets[i]
+          item['omit'] = well_targets[i].omit if well_targets[i]
 
         well_data.push item
 
@@ -281,6 +311,7 @@ window.ChaiBioTech.ngApp.service 'StandardCurveChartHelper', [
           dual_item['target_id'] = well_targets[2*i+1].id if well_targets[2*i+1]
           dual_item['color'] = well_targets[2*i+1].color if well_targets[2*i+1]
           dual_item['well_type'] = well_targets[2*i+1].well_type if well_targets[2*i+1]
+          dual_item['omit'] = well_targets[2*i+1].omit if well_targets[2*i+1]
           dual_item['channel'] = 2
           well_data.push dual_item
 
