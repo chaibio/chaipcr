@@ -77,7 +77,7 @@ function act(
             #
             ## report valid in success case
             if (length(err_msg_vec) > 0)
-                join(err_msg_vec, ""))
+                join(err_msg_vec, "")
             else
                 ""
             end
