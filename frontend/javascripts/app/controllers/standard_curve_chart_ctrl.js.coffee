@@ -239,15 +239,16 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
               maxCq = 0
 
               for well_item in $scope.well_data by 1
-                if well_item.quantity <= minQt then minQt = well_item.quantity
-                if well_item.quantity >= maxQt then maxQt = well_item.quantity
-                if well_item.cq <= minCq then minCq = well_item.cq
-                if well_item.cq >= maxCq then maxCq = well_item.cq
+                if well_item.quantity <= minQt and well_item.quantity then minQt = well_item.quantity
+                if well_item.quantity >= maxQt and well_item.quantity then maxQt = well_item.quantity
+                if well_item.cq <= minCq and well_item.cq then minCq = well_item.cq
+                if well_item.cq >= maxCq and well_item.cq then maxCq = well_item.cq
 
               maxQt = Math.log10(maxQt)
               minQt = Math.log10(minQt)
               gapX = maxQt - minQt
               gapY = maxCq - minCq
+
 
               $scope.chartConfig.axes.x.min = if Math.floor(minQt) is minQt then minQt - 1 else Math.floor(minQt)
               $scope.chartConfig.axes.x.max = if Math.ceil(maxQt) is maxQt then maxQt + 1 else Math.ceil(maxQt)
@@ -320,6 +321,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
                 else
                   well_color = '#8FC742'
 
+                continue if Math.abs($scope.standardcurve_data["well_#{i}_#{ch_i}"][0]['log_quantity']) is Number.POSITIVE_INFINITY
                 if $scope.color_by is 'sample'
                   if well_color is $scope.init_sample_color
                     $scope.chartConfig.series.push
