@@ -54,16 +54,25 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.ampli_zoom = 0
       $scope.showOptions = true
       $scope.isError = false
+
       $scope.method = {name: 'Cy0'}
-      $scope.cy0 = {name:'Cy0', desciption:'A Cq calling method based on the max first derivative of the curve (recommended).'}
-      $scope.cpd2 = {name:'cpD2', desciption:'A Cq calling method based on the max second derivative of the curve.'}
-      $scope.minFl = {name: 'Min Flouresence', desciption:'The minimum fluorescence threshold for Cq calling. Cq values will not be called when the fluorescence is below this threshold.', value:null}
-      $scope.minCq = {name: 'Min Cycle', desciption:'The earliest cycle to use in Cq calling & baseline subtraction. Data for earlier cycles will be ignored.', value:null}
-      $scope.minDf = {name: 'Min 1st Derivative', desciption:'The threshold which the first derivative of the curve must exceed for a Cq to be called.', value:null}
-      $scope.minD2f = {name: 'Min 2nd Derivative', desciption:'The threshold which the second derivative of the curve must exceed for a Cq to be called.', value:null}
       $scope.baseline_sub = 'auto'
+
+      $scope.baseline_method = {name: 'Sigmoid'}
+      
+      $scope.cy0 = {name:'Cy0', desciption:'A C<sub>q</sub> calling method based on the max first derivative of the curve (recommended).'}
+      $scope.cpd2 = {name:'cpD2', desciption:'A C<sub>q</sub> calling method based on the max second derivative of the curve.'}
+      $scope.minFl = {name: 'Min Flouresence', desciption:'The minimum fluorescence threshold for C<sub>q</sub> calling. C<sub>q</sub> values will not be called when the fluorescence is below this threshold.', value:null}
+      $scope.minCq = {name: 'Min Cycle', desciption:'The earliest cycle to use in C<sub>q</sub> calling & baseline subtraction. Data for earlier cycles will be ignored.', value:null}
+      $scope.minDf = {name: 'Min dF/dc', desciption:'The threshold which the first derivative of the curve must exceed for a C<sub>q</sub> to be called.', value:null}
+      $scope.minD2f = {name: 'Min d<sup>2</sup>F/dc', desciption:'The threshold which the second derivative of the curve must exceed for a C<sub>q</sub> to be called.', value:null}
       $scope.baseline_auto = {name:'Auto', desciption:'Automatically detect the baseline cycles.'}
       $scope.baseline_manual = {name:'Manual', desciption:'Manually specify the baseline cycles.'}
+
+      $scope.sigmoid = {name:'Sigmoid', desciption:'Hover description'}
+      $scope.linear = {name:'Linear', desciption:'Hover desciption'}
+      $scope.median = {name:'Median', desciption:'Hover desciption'}
+
       $scope.cyclesFrom = null
       $scope.cyclesTo = null
       $scope.hoverName = 'Min. Flouresence'
@@ -155,13 +164,13 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $scope.errorCq = true
         if !$scope.minDf.value
           $scope.hoverName = 'Error'
-          $scope.hoverDescription = 'Min 1st Derivative cannot be left empty'
+          $scope.hoverDescription = 'Min dF/dc cannot be left empty'
           $scope.hoverOn = true
           $scope.errorCheck = true
           $scope.errorDf = true
         if !$scope.minD2f.value
           $scope.hoverName = 'Error'
-          $scope.hoverDescription = 'Min 2nd Derivative cannot be left empty'
+          $scope.hoverDescription = 'Min d<sup>2</sup>F/dc cannot be left empty'
           $scope.hoverOn = true
           $scope.errorCheck = true
           $scope.errorD2f = true
@@ -177,7 +186,16 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           else
             $scope.baseline_cycle_bounds = [parseInt($scope.cyclesFrom), parseInt($scope.cyclesTo)]
           Experiment
-          .updateAmplificationOptions($stateParams.id,{'cq_method':$scope.method.name,'min_fluorescence': parseInt($scope.minFl.value), 'min_reliable_cycle': parseInt($scope.minCq.value), 'min_d1': parseInt($scope.minDf.value), 'min_d2': parseInt($scope.minD2f.value), 'baseline_cycle_bounds': $scope.baseline_cycle_bounds })
+          .updateAmplificationOptions(
+            $stateParams.id,
+            {
+              'cq_method':$scope.method.name,
+              'min_fluorescence': parseInt($scope.minFl.value), 
+              'min_reliable_cycle': parseInt($scope.minCq.value), 
+              'min_d1': parseInt($scope.minDf.value), 
+              'min_d2': parseInt($scope.minD2f.value), 
+              'baseline_cycle_bounds': $scope.baseline_cycle_bounds 
+            })
           .then (resp) ->
             $scope.amplification_data = helper.paddData()
             $scope.hasData = false

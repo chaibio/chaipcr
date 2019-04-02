@@ -7,14 +7,42 @@
   padding: 20px;
   border: 1px solid #888;
   width: 750px;
-  height: 550px;
   text-align: center;
   font-family: 'dinot-Regular';
   color: black !important;
+  border-radius: 3px;
+
+  .close{
+    opacity: .8;
+    width: 15px;
+    height: 15px;
+    &:hover,
+    &:focus
+    {
+      opacity: 1;
+    }    
+  }
+
+  h2{
+    margin: 0;
+  }
+
+  hr.hr-header{
+    height: 0;
+    border-top: 1px solid #000;
+    margin: 10px 0;
+  }
+
+  hr.hr-section{
+    height: 0;
+    border-top: 1px solid #ccc;
+    margin: 0;    
+    margin-bottom: 10px;    
+  }
+
   .h3-baseline {
-    font-family: 'dinot-Bold';
     color: black;
-    font-size: 20px;
+    margin: 10px 0;
   }
   .baseline-cycles {
     border-top: 1px solid black;
@@ -28,42 +56,43 @@
   }
   .h3-cq {
     color: black;
-    font-size: 20px;
-    margin-top: 10px;
-    font-weight: 300;
-    font-family: 'dinot';
+    margin-top: 5px;
   }
-  .button {
-    border: 2px solid #787878;
+  .option-btn {
     background: #fff;
-    color: #333;
     display: inline-block;
-    border-radius: 0;
-    font-weight: bold;
-    min-width: 150px;
-    margin-right: 15px;
-    margin-top: 10px;
-    padding: 6px 0;
-    //position: absolute;
-    top: 530px;
+    border-radius: 2px;
+    min-width: 120px;
+    margin-right: 0px;
+    margin-top: 45px;
+    padding: 4px 0 8px 0;
+    text-decoration: none;
+    outline: none;
   }
   .button-cancel {
-    left: 650px;
+    color: #888;
+    border: 2px solid transparent;
+    &:hover{
+      color: #222;
+      background: #fff;
+    }
   }
   .button-apply {
-    left: 850px;
+    color: #000;
+    border: 2px solid #000;
+
+    &:hover{
+      background: #222;
+      color: #fff;
+      border: 2px solid #222;
+    }
   }
-  .button:hover {
-    background: #8FC742;
-    color: white;
-    border: none;
-    height: 34px;
-  }
+
   input {
     border: 0;
     outline: 0;
     background: transparent;
-    width: 50px;
+    width: 30px;
   }
   input[type="radio"] {
     width: 20px;
@@ -83,46 +112,54 @@
     left: 0;
     border: 2px solid white;
     bottom: 1px;
-    box-shadow: 0 0 0 0.07em #000;
+    box-shadow: 0 0 0 0.07em #ccc;
   }
   input[type='radio']:checked + label.radio-pcr {
     background: #8FC742;
-    box-shadow: 0 0 0 0.07em #000;
+    box-shadow: 0 0 0 0.07em #ccc;
   }
   label {
-    padding-top: 5px;
-    color: black;
-    font-size: 15px;
+    padding-bottom: 5px;
+    color: black;  
+    vertical-align: middle;
+    cursor: pointer;
+    display: block;
   }
   .div-style {
     text-align: left;
-    height: 275px;
   }
   .ct-label {
     border-bottom: 1px solid #ccc;
     margin-left: 25px;
+    margin-right: 10px;
+    display: inline-block;
+    padding: 0;
   }
   .params-label {
     border-bottom: 1px solid #ccc;
-    width: 180px;
+    width: 100%;
     text-align: left;
-    span {
-      width: 125px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    span {      
       display: inline-block;
     }
   }
   .by-label {
     border-bottom: 1px solid #ccc;
-    margin-left: 5px;
+    margin-left: 10px;
+    display: inline-block;
+    padding: 0;
   }
   .col-md-6 {
     text-align: left;
-    border-top: 1px solid black;
+    border-top: 1px solid #ccc;
     padding-left: 0;
   }
   .cq-method {
     text-align: left;
-    border-top: 1px solid black;
+    border-top: 1px solid #ccc;
     padding-left: 0;
   }
 }
