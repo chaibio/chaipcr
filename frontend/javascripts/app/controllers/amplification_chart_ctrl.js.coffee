@@ -228,6 +228,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.getAmplificationOptions = ->
         Experiment.getAmplificationOptions($stateParams.id).then (resp) ->
           $scope.method.name = resp.data.amplification_option.cq_method
+          $scope.baseline_method.name = resp.data.amplification_option.baseline_method
           $scope.minFl.value = resp.data.amplification_option.min_fluorescence
           $scope.minCq.value = resp.data.amplification_option.min_reliable_cycle
           $scope.minDf.value = resp.data.amplification_option.min_d1
