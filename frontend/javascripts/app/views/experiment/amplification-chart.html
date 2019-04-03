@@ -318,90 +318,90 @@ limitations under the License.
         <span class="close" ng-click="close()">
           <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 5"><rect x="2.25" y="-0.79" width="0.5" height="6.57" transform="translate(-1.04 2.5) rotate(-45)"/><rect x="-0.79" y="2.25" width="6.57" height="0.5" transform="translate(-1.04 2.5) rotate(-45)"/></svg>
         </span>
-        <h2 class="text-left H2">Advanced Settings</h2>
+        <h2 class="text-left XH3B">Advanced Settings</h2>
         <hr class="hr-header"/>
         <div class="row">
           <div class="col-md-7 col-sm-7 col-xs-7 div-style">
-            <h3 class="h3-baseline H2">C<sub>q</sub> Calling</h3>
+            <h3 class="h3-baseline XH3B">C<sub>q</sub> Calling</h3>
             <hr class="hr-section"/>
             <div class="row">              
               <div class="col-md-5 col-sm-5 col-xs-5">
-                <h3 class="h3-cq H2">Method</h3>
+                <h3 class="h3-cq XH3B">Method</h3>
                 <hr class="hr-section"/>
                 <label ng-mouseover="hover(cy0)" ng-mouseleave="hoverLeave()">
                   <input type="radio" id="cy0" ng-model="method.name" value="Cy0" style="display:none">
                   <label class="radio-pcr" for="cy0"></label>
-                  <span class="H3R">Cy0</span>
+                  <span class="XB2">Cy0</span>
                 </label>
                 <label ng-mouseover="hover(cpd2)" ng-mouseleave="hoverLeave()">
                   <input type="radio" id="cpD2" ng-model="method.name" value="cpD2" style="display:none">
                   <label class="radio-pcr" for="cpD2"></label>
-                  <span class="H3R">cpD<sup>2</sup></span>
+                  <span class="XB2">cpD<sup>2</sup></span>
                 </label>
               </div>
               <div class="col-md-7 col-sm-7 col-xs-7" style="padding-left: 0;">
-                <h3 class="h3-cq H2">Parameters</h3>
+                <h3 class="h3-cq XH3B">Parameters</h3>
                 <hr class="hr-section"/>
                 <label class="text-right params-label" ng-model="minFl" ng-mouseover="hover(minFl)" ng-mouseleave="hoverLeave()">
-                  <span ng-class="{'error-color': errorFl}" class="H3R">Min Flourescence</span>
-                  <input type="text" style="text-align:right" numbers-only ng-model="minFl.value" placeholder="XX" class="H3" />
+                  <span ng-class="{'error-color': errorFl}" class="XB2">Min Flourescence</span>
+                  <input type="text" style="text-align:right" numbers-only ng-model="minFl.value" placeholder="XX" class="XB2B" />
                 </label>
                 <label class="text-right params-label" ng-mouseover="hover(minCq)" ng-mouseleave="hoverLeave()">
-                  <span ng-class="{'error-color': errorCq}" class="H3R">Min Cycle</span>
-                  <input style="text-align:right" type="text" numbers-only ng-model="minCq.value" placeholder="XX" class="H3" />
+                  <span ng-class="{'error-color': errorCq}" class="XB2">Min Cycle</span>
+                  <input style="text-align:right" type="text" numbers-only ng-model="minCq.value" placeholder="XX" class="XB2B" />
                 </label>
                 <label class="text-right params-label" ng-model="minDf" ng-mouseover="hover(minDf)" ng-mouseleave="hoverLeave()">
-                  <span ng-class="{'error-color': errorDf}" class="H3R">Min dF/dc</span>
-                  <input style="text-align:right" type="text" numbers-only ng-model="minDf.value" placeholder="XX" class="H3" />
+                  <span ng-class="{'error-color': errorDf}" class="XB2">Min dF/dc</span>
+                  <input style="text-align:right" type="text" numbers-only ng-model="minDf.value" placeholder="XX" class="XB2B" />
                 </label>
                 <label class="text-right params-label" ng-model="minD2f" ng-mouseover="hover(minD2f)" ng-mouseleave="hoverLeave()">
-                  <span ng-class="{'error-color': errorD2f}" class="H3R">Min d<sup>2</sup>F/dc</span>
-                  <input style="text-align:right" type="text" numbers-only ng-model="minD2f.value" placeholder="XX" class="H3" />
+                  <span ng-class="{'error-color': errorD2f}" class="XB2">Min d<sup>2</sup>F/dc</span>
+                  <input style="text-align:right" type="text" numbers-only ng-model="minD2f.value" placeholder="XX" class="XB2B" />
                 </label>
               </div>
             </div>
           </div>
           <div class="col-md-5 col-sm-5 col-xs-5 div-style">
-            <h3 class="h3-baseline H2">Baseline Subtraction</h3>            
+            <h3 class="h3-baseline XH3B">Baseline Subtraction</h3>            
             <hr class="hr-section"/>
             <div class="row">
               <div class="col-xs-5">
-                <h3 class="h3-cq H2">Method</h3>
+                <h3 class="h3-cq XH3B">Method</h3>
                 <hr class="hr-section"/>                
                 <label ng-mouseover="hover(sigmoid)" ng-mouseleave="hoverLeave()">
                   <input type="radio" id="sigmoid" ng-model="baseline_method.name" value="Sigmoid" style="display:none">
                   <label class="radio-pcr" for="sigmoid"></label>
-                  <span class="H3R">Sigmoid</span>
+                  <span class="XB2">Sigmoid</span>
                 </label>
                 <label ng-mouseover="hover(linear)" ng-mouseleave="hoverLeave()">
                   <input type="radio" id="linear" ng-model="baseline_method.name" value="Linear" style="display:none">
                   <label class="radio-pcr" for="linear"></label>
-                  <span class="H3R">Linear</span>
+                  <span class="XB2">Linear</span>
                 </label>
                 <label ng-mouseover="hover(median)" ng-mouseleave="hoverLeave()">
                   <input type="radio" id="median" ng-model="baseline_method.name" value="Median" style="display:none">
                   <label class="radio-pcr" for="median"></label>
-                  <span class="H3R">Median</span>
+                  <span class="XB2">Median</span>
                 </label>
               </div>
               <div class="col-xs-7" style="padding-left: 0;">
-                <h3 class="h3-cq H2">Baseline Cycles</h3>
+                <h3 class="h3-cq XH3B">Baseline Cycles</h3>
                 <hr class="hr-section"/>                
                 <label ng-mouseover="hover(baseline_auto)" ng-mouseleave="hoverLeave()">
                   <input type="radio" ng-model="baseline_sub" id="auto" value="auto" style="display:none">
                   <label class="radio-pcr" for="auto"></label>
-                  <span class="H3R">Auto</span>
+                  <span class="XB2">Auto</span>
                 </label>
                 <label ng-mouseover="hover(baseline_manual)" ng-mouseleave="hoverLeave()">
                   <input type="radio" ng-model="baseline_sub" id="cycles" value="cycles" style="display:none">
                   <label class="radio-pcr" for="cycles"></label>
-                  <span class="H3R">Manual</span>
+                  <span class="XB2">Manual</span>
                 </label>
                 <label ng-class="{'hover-desc': baseline_sub=='auto'}" class="text-right ct-label H3">
-                  <input type="text" ng-class="{'hover-desc': baseline_sub=='auto'}" numbers-only ng-model="cyclesFrom" placeholder="XX" />
-                </label> <span ng-class="{'hover-desc': baseline_sub=='auto'}" class="H3R" style="vertical-align: middle;"> to </span>
+                  <input type="text" ng-class="{'hover-desc': baseline_sub=='auto'}" numbers-only ng-model="cyclesFrom" placeholder="XX" class="XB2B cycles-input" />
+                </label> <span ng-class="{'hover-desc': baseline_sub=='auto'}" class="XB2" style="vertical-align: middle;"> to </span>
                 <label ng-class="{'hover-desc': baseline_sub=='auto'}" class="text-right by-label H3">
-                  <input type="text" ng-class="{'hover-desc': baseline_sub=='auto'}" numbers-only ng-model="cyclesTo" placeholder="XX" />
+                  <input type="text" ng-class="{'hover-desc': baseline_sub=='auto'}" numbers-only ng-model="cyclesTo" placeholder="XX" class="XB2B cycles-input"/>
                 </label>
               </div>
             </div>
@@ -409,12 +409,12 @@ limitations under the License.
         </div>
         <div class="row">
           <div class="col-xs-7">
-            <h4 ng-class="{'hover-desc': !hoverOn, 'error-color': hoverName == 'Error'}" class="text-left B1B" ng-bind-html="hoverName | trustHtml"></h4>
-            <p ng-class="{'hover-desc': !hoverOn, 'error-color': hoverName == 'Error'}" class="text-left B1" ng-bind-html="hoverDescription | trustHtml"></p>            
+            <h4 ng-class="{'hover-desc': !hoverOn, 'error-color': hoverName == 'Error'}" class="text-left XB1B" ng-bind-html="hoverName | trustHtml"></h4>
+            <p ng-class="{'hover-desc': !hoverOn, 'error-color': hoverName == 'Error'}" class="text-left XB1" ng-bind-html="hoverDescription | trustHtml"></p>            
           </div>
           <div class="col-xs-5 text-right">
-            <button class="option-btn button-apply H3R" ng-click="check()">Apply</button>
-            <button class="option-btn button-cancel H3R" ng-click="close()">Cancel</button>
+            <button class="option-btn button-apply XB2" ng-click="check()">Apply</button>
+            <button class="option-btn button-cancel XB2" ng-click="close()">Cancel</button>
           </div>
         </div>
       </div>

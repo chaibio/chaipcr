@@ -136,7 +136,13 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.openOptionsModal = ->
         #$scope.showOptions = true
         #Device.openOptionsModal()
-        modal.style.display = "block"
+        $scope.errorCheck = false
+        $scope.errorCheck = false
+        $scope.errorCq = false
+        $scope.errorDf = false
+        $scope.errorD2f = false
+
+        modal.style.display = "block"        
 
       $scope.close = ->
         modal.style.display = "none"
