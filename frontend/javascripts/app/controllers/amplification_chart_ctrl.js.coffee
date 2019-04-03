@@ -58,7 +58,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.method = {name: 'Cy0'}
       $scope.baseline_sub = 'auto'
 
-      $scope.baseline_method = {name: 'Sigmoid'}
+      $scope.baseline_method = {name: 'sigmoid'}
       
       $scope.cy0 = {name:'Cy0', desciption:'A C<sub>q</sub> calling method based on the max first derivative of the curve (recommended).'}
       $scope.cpd2 = {name:'cpD2', desciption:'A C<sub>q</sub> calling method based on the max second derivative of the curve.'}
@@ -200,7 +200,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               'min_reliable_cycle': parseInt($scope.minCq.value), 
               'min_d1': parseInt($scope.minDf.value), 
               'min_d2': parseInt($scope.minD2f.value), 
-              'baseline_cycle_bounds': $scope.baseline_cycle_bounds 
+              'baseline_cycle_bounds': $scope.baseline_cycle_bounds,
+              'baseline_method': $scope.baseline_method.name
             })
           .then (resp) ->
             $scope.amplification_data = helper.paddData()
