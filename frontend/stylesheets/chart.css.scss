@@ -815,6 +815,18 @@
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
+
+          .target-name{
+            max-width: 90px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            background: transparent;
+            padding: 0;
+            display: inline-block;
+            vertical-align: top;
+            width: auto;
+          }
         }
 
         label.data-point-info{

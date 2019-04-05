@@ -125,7 +125,7 @@ limitations under the License.
                     <div class="parameters">
                       <div class="header B1-M-Amplification" ng-style="bgcolor_target" style="min-height: 35px; color:white;">
                         <!-- Target: -->
-                        {{label_well}}{{label_target.name ? ', [' + label_target.name + ']' : ''}}
+                        {{label_well}}<span ng-if="label_target.name">, [<div class="target-name">{{label_target.name}}</div>]</span>
                       </div>
                       <div>
                         <table class="parameters-table">

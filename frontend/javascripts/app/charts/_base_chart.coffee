@@ -1442,15 +1442,11 @@ class BaseChart
     num_ticks = ticks.size()
     ticks.each (d, i) ->
       x = this.transform.baseVal.consolidate().matrix.e
-      if (i is 0)
-        textWidth = xAxisLeftExtremeValueText.node().getBBox().width
-        if x < textWidth + spacingX
-          d3.select(this).attr('opacity', 0)
-      if (i is num_ticks - 1)
-        textWidth = xAxisRightExtremeValueText.node().getBBox().width
-        if x >  width - (textWidth + spacingX)
-          d3.select(this).attr('opacity', 0)
+      textWidth = xAxisLeftExtremeValueText.node().getBBox().width
+      if x < textWidth + spacingX or x >  width - (textWidth + spacingX)
+        d3.select(this).attr('opacity', 0)
       d3.select(this).select('line').attr('opacity', 0)
+
     # y ticks
     ticks = @chartSVG.selectAll('g.axis.y-axis > g.tick')
     num_ticks = ticks.size()
@@ -1458,14 +1454,9 @@ class BaseChart
 
     ticks.each (d, i) ->
       y = this.transform.baseVal.consolidate().matrix.f
-      if (i is 0)
-        textHeight = yAxisLowerExtremeValueText.node().getBBox().height
-        if y >  height - textHeight - spacingY - 20
-          d3.select(this).attr('opacity', 0)
-      if (i is num_ticks - 1)
-        textHeight = yAxisUpperExtremeValueText.node().getBBox().height
-        if y < textHeight + spacingY
-          d3.select(this).attr('opacity', 0)
+      textHeight = yAxisLowerExtremeValueText.node().getBBox().height
+      if y >  height - textHeight - spacingY - 20 or y < textHeight + spacingY
+        d3.select(this).attr('opacity', 0)
       d3.select(this).select('line').attr('opacity', 0)
 
     @chartSVG.selectAll('g.axis.x-axis > path.domain').attr('opacity', 0)
