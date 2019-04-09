@@ -115,6 +115,9 @@ window.ChaiBioTech.ngApp.directive('formatNumber', [ '$filter',
               } else if(viewValue == 'E') {
                 element.val('1E');
                 return '1E';
+              } else if(viewValue == '.') {
+                element.val('0.');
+                return '0.';
               } else {
                 var reg = RegExp(/^([0-9,\+\-])*[.]?([0-9E])*$/);
 
