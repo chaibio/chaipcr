@@ -433,7 +433,11 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 				var stn = Number($scope.target1Quantity.value);
 				var data = stn.toExponential().toString().split(/[eE]/);
 				m1 = Number(data[0]);
-				b1 = Number(data[1]);				
+				b1 = Number(data[1]);
+				if($scope.target1Quantity.value == '1E'){
+					m1 = 1;
+					b1 = 1;
+				}
 			}
 			$scope.target1Quantity.quantityM = (m1) ? m1.toFixed(2) : '';
 			$scope.target1Quantity.quantityB = b1;

@@ -77,6 +77,7 @@ window.ChaiBioTech.ngApp.directive('formatNumber', [ '$filter',
               var m1 = Number(data[0]);
               var b1 = Number(data[1]);
               var frontDigit ='', backDigit='', powDigit = '';
+
               if(!isNaN(m1)){
                 var data1 = data[0].split('.');                
                 if(data1[0].length > 12){
@@ -111,6 +112,9 @@ window.ChaiBioTech.ngApp.directive('formatNumber', [ '$filter',
               } else if(viewValue == '-') {
                 element.val('-');
                 return '';
+              } else if(viewValue == 'E') {
+                element.val('1E');
+                return '1E';
               } else {
                 var reg = RegExp(/^([0-9,\+\-])*[.]?([0-9E])*$/);
 
