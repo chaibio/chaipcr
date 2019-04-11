@@ -126,7 +126,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
           if $scope.targets and (($scope.isDual and (!$scope.targets[i*2] or !$scope.targets[i*2].id) and (!$scope.targets[i*2+1] or !$scope.targets[i*2+1].id)) or (!$scope.isDual and (!$scope.targets[i] or !$scope.targets[i].id)))
             selected = false
 
-          $scope.wells["well_#{i}"].selected = selected
+          # $scope.wells["well_#{i}"].selected = selected
           $scope.wells["well_#{i}"].color = well_color
 
         ngModel.$setViewValue angular.copy($scope.wells)
