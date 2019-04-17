@@ -1,13 +1,19 @@
 #!/bin/bash
 
-retval = 0
+export SLOTS=/sys/devices/platform/bone_capemgr/slots
+export PINS=/sys/kernel/debug/pinctrl/44e10800.pinmux/pins
+
+error_message=""
+retval=0
 test_mux () {
 	if cat $PINS | grep -i $2 | grep -i $3 > /dev/zero
 	then
-		echo Testing $1: OK 
+		echo Testing $1: OK
 	else
                 echo Testing $1: Error
 		retval=1
+		error_message="$error_message
+Testing $1: Error"
 	fi
 }
 
@@ -63,11 +69,9 @@ test_mux "pin 9.13" 874 00000007
 test_mux "pin 9.15" 840 00000007
 test_mux "pin 9.12" 878 00000007
 
-
 echo LID:
 #test_mux "pin 8.26" 994 00000033
 test_mux "pin 9.28"  99c 00000004
-
 
 echo Heatsink:
 test_mux "pin 9.14 PWM" 848 00000006
@@ -79,10 +83,9 @@ test_mux "pin 9.14 PWM" 848 00000006
 #test_mux "pin 9.36" 994 00000033
 #test_mux "pin 9.35" 994 00000033
 
-echo LTC2444:
-test_mux "pin 9.41.1 SPI_BUSY" 8B4 00000037
-test_mux "pin 9.41.2 shared with SPI_BUSY or LTC2444 busy gpio0_20" 8A8 00000037
-
+#echo LTC2444:
+test_mux "pin 9.41.1 SPI_BUSY" 9B4 00000037
+test_mux "pin 9.41.2 shared with SPI_BUSY or LTC2444 busy gpio0_20" 9a8 00000037
 
 echo LCD:
 test_mux "pin 8.45"  8a0 00000008
@@ -113,5 +116,11 @@ test_mux "pin 9.27 gpio3_19 LCD DISEN"  9a4 00000017
 echo Backlight:
 test_mux "pin 9.42.1 eCAP0"  964 00000000
 
+if [[ "$retval" -eq "1" ]]
+then
+	echo "$(tput setaf 7)Error:
+$(tput setab 1)$error_message$(tput sgr 0)"
+fi
 
+echo mux test script returning $retval
 exit $retval
