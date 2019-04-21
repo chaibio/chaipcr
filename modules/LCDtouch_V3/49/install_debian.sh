@@ -21,9 +21,9 @@ cp -v src/arm/*.dtb /boot/dtbs/$KERNEL_VERSION/am335x-boneblack.dtb
 cp src/arm/am335x-boneblack-emmc-overlay.dtb /boot/dtbs/*/am335x-boneblack.dtb
 
 cd ..
-rm 4.9-ti.zip 
-exit 0
-
+rm 4.9-ti.zip
+rm -r dtb-rebuilder-4.9-ti
+ 
 cd ..
 
 cp /boot/initrd* /boot/initrd*.org
