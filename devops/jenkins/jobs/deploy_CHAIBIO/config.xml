@@ -58,10 +58,7 @@
   <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>echo bypass 1
-exit 0
-
-#!/bin/bash
+      <command>#!/bin/bash
 echo checking Jenkins server
 echo &quot;Bash version ${BASH_VERSION}...&quot;
 echo Image build version $image_version
@@ -164,10 +161,7 @@ echo done connection check.
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo bypass 2
-exit 0
-
-echo &quot;Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}&quot;
+      <command>echo &quot;Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}&quot;
 echo &quot;Slave Beaglebone at ${build_machine}&quot;
 echo checking build device 
 echo &quot;Bash version ${BASH_VERSION}...&quot;
@@ -191,10 +185,7 @@ dpkg --configure -a</command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
-      <command>echo bypass 3
-exit 0
-
-#!/bin/bash
+      <command>#!/bin/bash
 # waiting 20min for the bulding device to become connectable
 echo &quot;Waiting for the build device ($build_machine) to become ready!&quot;
 #sleep 1500
@@ -322,10 +313,7 @@ exit 1
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo bypass 4
-exit 0
-
-echo Setup MySQL
+      <command>echo Setup MySQL
 mkdir /data /perm || true
 systemctl stop mysql.service
 mount /dev/mmcblk1p2 /data || true
@@ -397,10 +385,7 @@ exit 0</command>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo bypass 5
-exit 0
-
-echo Maintenance
+      <command>echo Maintenance
 df -h
 export RAILS_ENV=production
 export DEBIAN_FRONTEND=noninteractive
@@ -455,10 +440,7 @@ exit 0</command>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo bypass julia
-exit 0
-
-echo precompile julia packages if needed
+      <command>echo precompile julia packages if needed
 if [ -e /etc/bypassjulia.flag ]
 then
     echo  Bypass julia build
@@ -555,10 +537,7 @@ exit 0
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo bypass 7
-exit 0
-
-if $is_dev
+      <command>if $is_dev
 then
       echo Building a debug image
       exit 0
