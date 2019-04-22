@@ -28,6 +28,8 @@ cd ..
 
 cp /boot/initrd* /boot/initrd*.org
 cd ft5x0x
+
+apt-get install -y make linux-headers-`uname -r` build-essential
 make
 
 if [ -e ft5x0x_ts.ko ]
