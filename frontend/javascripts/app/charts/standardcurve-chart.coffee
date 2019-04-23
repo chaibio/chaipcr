@@ -391,7 +391,7 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
     @unselectPlot()
 
   unselectTargetLine: () ->
-    if typeof @onUnselectLine is 'function'
+    if typeof @onUnselectLine is 'function' and @target_lines.length > 1
       @onUnselectLine()
     @prioritItem()
     @unselectPlot()
@@ -553,7 +553,12 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
       @drawTargetLines()
       @drawPlots()
       @updateZoomScaleExtent()
+
     @drawAxesExtremeValues()
+
+  activeDefaultLine: ->
+    if @target_lines and @target_lines.length == 1
+      @setActiveTargetLine(@target_lines[0].id)
 
   drawTargetLines: ->
 

@@ -45,6 +45,7 @@ window.App.directive 'standardCurveChart', [
           chart.onUnselectPlot($scope.onUnselectPlot())
           chart.onHoverPlot($scope.onHoverPlot())
           chart.onUpdateProperties($scope.onUpdateProperties())
+          chart.activeDefaultLine()
 
           d = chart.getDimensions()
 
