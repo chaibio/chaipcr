@@ -23,23 +23,17 @@ cp src/arm/am335x-boneblack-emmc-overlay.dtb /boot/dtbs/*/am335x-boneblack.dtb
 cd ..
 rm 4.9-ti.zip
 rm -r dtb-rebuilder-4.9-ti
- 
 cd ..
-
-cp /boot/initrd* /boot/initrd*.org
-cd ft5x0x
+cd ilitek
 
 apt-get install -y make linux-headers-`uname -r` build-essential
-make
+make mod
 
-if [ -e ft5x0x_ts.ko ]
+if [ -e ilitek_aimv20.ko ]
 then
-	cp ft5x0x_ts.ko /lib/modules/$(uname -r)/kernel/drivers/input/touchscreen
-	depmod -a
-
-	echo ft5x0x_ts > /etc/modules-load.d/ft5x0x_ts.conf
+	make install_mod
 else
-	echo Error compiling touch driver
+	echo Error compiling ilitek touch driver
 	exit 1
 fi
 

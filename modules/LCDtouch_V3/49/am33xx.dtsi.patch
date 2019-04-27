@@ -365,7 +365,7 @@ diff -Naur am335x-bone-common-no-capemgr.dtsi am335x-bone-common-no-capemgr.dtsi
  	ti,scale-data-fw = "am335x-bone-scale-data.bin";
 diff -Naur am335x-boneblack-emmc-overlay.dts am335x-boneblack-emmc-overlay.dts
 --- am335x-boneblack-emmc-overlay.dts	2019-04-03 18:45:28.000000000 +0000
-+++ am335x-boneblack-emmc-overlay.dts	2019-04-22 08:34:39.000000000 +0000
++++ am335x-boneblack-emmc-overlay.dts	2019-04-27 19:58:37.243734070 +0000
 @@ -8,7 +8,7 @@
  /dts-v1/;
  
@@ -375,7 +375,7 @@ diff -Naur am335x-boneblack-emmc-overlay.dts am335x-boneblack-emmc-overlay.dts
  /* #include <dt-bindings/display/tda998x.h> */
  /* #include "am335x-bone-jtag.dtsi" */
  
-@@ -45,3 +45,306 @@
+@@ -45,3 +45,308 @@
  		opp-supported-hw = <0x06 0x0100>;
  	};
  };
@@ -419,7 +419,7 @@ diff -Naur am335x-boneblack-emmc-overlay.dts am335x-boneblack-emmc-overlay.dts
 +					AM33XX_IOPAD(0x8e8, PIN_OUTPUT_PULLDOWN | MUX_MODE0)	/* lcd_pclk.lcd_pclk */
 +					AM33XX_IOPAD(0x8ec, PIN_OUTPUT_PULLDOWN | MUX_MODE0)	/* lcd_ac_bias_en.lcd_ac_bias_en */
 +					AM33XX_IOPAD(0x9a4, 0x17)	/* mcasp0_fsr.gpio3_19, OUTPUT | MODE7  LCD DISEN */
-+					AM33XX_IOPAD(0x844, 0x2f)
++					AM33XX_IOPAD(0x844, 0x2f) 	/* TSC_INTn gpmc_a1.gpio1_17, INPUT | PULLDIS | MODE7 */
 +				>;
 +	};
 +
@@ -670,12 +670,14 @@ diff -Naur am335x-boneblack-emmc-overlay.dts am335x-boneblack-emmc-overlay.dts
 +       #address-cells = <1>;
 +       #size-cells = <0>;
 +
-+	ft5x06@38 {
-+		compatible = "ft5x0x_ts";
-+		reg = <0x38>;
-+		interrupt-parent = <&gpio2>;
++	ili2139c@41 {
++        	compatible = "ilitek,ilitek_i2c";
++		reg = <0x41>;
++		// for kernel 3.8 the gpio controllers are indexed from 1
++		// for kernel 4.9 the gpio controllers are indexed from 0
++		interrupt-parent = <&gpio1>;
 +		interrupts = <17 0x0>;
-+		irq-gpio = <&gpio2 17 0>;
++		irq-gpio = <&gpio1 17 0>;
 +	};
 +};
 +/*
