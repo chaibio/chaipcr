@@ -18,10 +18,10 @@ install:
 	sync
 
 install_mod:
-        cp ilitek_aimv20.ko /lib/modules/$(shell uname -r)/kernel/drivers/input$
-        depmod -a
-        echo ilitek_aimv20 > /etc/modules-load.d/ilitek_aimv20.conf
-        sync
+	cp ilitek_aimv20.ko /lib/modules/$(shell uname -r)/kernel/drivers/input$
+	depmod -a
+	echo ilitek_aimv20 > /etc/modules-load.d/ilitek_aimv20.conf
+	sync
 
 clean:
 	make -C $(KDIR) M=$(shell pwd) clean
