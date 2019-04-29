@@ -152,6 +152,19 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
         'background-color': config.color2
         'opacity': if config.selected then 1 else 0.25
 
+      $scope.selectAllWells = () ->
+        isAllSelected = true
+        for i in [0..15] by 1
+          if !$scope.wells["well_" + i].selected
+            isAllSelected = false
+
+        for i in [0..15] by 1
+          $scope.wells["well_" + i].selected = !isAllSelected
+
+        ngModel.$setViewValue(angular.copy($scope.wells))
+
+        $rootScope.$broadcast 'event:switch-chart-well', {active: well?.active, index: index}
+
       $scope.dragStart = (evt, type, index) ->
         # type can be 'column', 'row', 'well' or 'corner'
         # index is index of the type
@@ -159,6 +172,32 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
         $scope.dragStartingPoint =
           type: type
           index: index
+
+        if $scope.dragStartingPoint.type is 'column'
+          if type is 'well'
+            index = if index >= $scope.columns.length then index - $scope.columns.length else index
+
+          max = Math.max.apply(Math, [index, $scope.dragStartingPoint.index])
+          min = if max is index then $scope.dragStartingPoint.index else index
+          $scope.columns.forEach (col) ->
+            col.selected = col.index >= min and col.index <= max
+            $scope.rows.forEach (row) ->
+              well = $scope.wells["well_#{row.index * $scope.columns.length + col.index}"]
+              if not (isCtrlKeyHeld(evt) and well.selected)
+                well.selected = col.selected
+
+        if $scope.dragStartingPoint.type is 'row'
+          if type is 'well'
+            index = if index >= 8 then 1 else 0
+          max = Math.max.apply(Math, [index, $scope.dragStartingPoint.index])
+          min = if max is index then $scope.dragStartingPoint.index else index
+          $scope.rows.forEach (row) ->
+            row.selected = row.index >= min and row.index <= max
+            $scope.columns.forEach (col) ->
+              well = $scope.wells["well_#{row.index * $scope.columns.length + col.index}"]
+              # ctrl or command key held
+              if not (isCtrlKeyHeld(evt) and well.selected)
+                well.selected = row.selected
 
         #$scope.dragged(evt, type, index)
 

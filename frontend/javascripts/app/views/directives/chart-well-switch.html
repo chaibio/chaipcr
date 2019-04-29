@@ -20,7 +20,7 @@
   <table style="height: 100%">
     <tbody>
       <tr>
-        <th style="height:20px;" class="col-header G2" ng-mousedown="dragStart($event, 'corner', 0)" ng-style="{width: row_header_width + 'px'}"></th>
+        <th style="height:20px;" class="col-header G2" ng-click="selectAllWells()" ng-style="{width: row_header_width + 'px'}"></th>
         <th style="height:20px;" class="col-header G2" ng-class="{dragged: col.selected}" ng-mousedown="dragStart($event, 'column', col.index)" ng-mouseup="dragStop($event, 'column', col.index)" ng-mousemove="dragged($event, 'column', col.index)" ng-repeat="col in columns" ng-style="{width: getCellWidth() + 'px'}">
           {{col.index + 1}}
         </th>

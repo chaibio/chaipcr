@@ -1007,44 +1007,11 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 			}
 			$scope.selectionMade = !isAllSelected;				
 
-			$scope.target1Selected = "Choose";
-			$scope.target1SelectedColor = "white";
-			$scope.enableTarget1Type = false;
-			$scope.enableTarget1Qty = false;
-			$scope.selectedTarget1Type = "";
-			$scope.target1Quantity.value = null;
-			$scope.target1SelectedId = 0;
-
-			$scope.target2Selected = "Choose";
-			$scope.target2SelectedColor = "white";
-			$scope.enableTarget2Type = false;
-			$scope.enableTarget2Qty = false;
-			$scope.selectedTarget2Type = "";
-			$scope.target2Quantity.value = null;
-			$scope.target2SelectedId = 0;			
-
-			$scope.sampleSelected = "Choose";
-			$scope.sampleSelectedId = 0;
-			
+			checkWellPanel();			
 		};
 
-		$scope.dragStart = function (evt, type, index) {
-			$scope.dragging = true;
-			$scope.dragStartingPoint = {
-				type: type,
-				index: index
-			};
-
-			return $scope.dragStartingPoint;
-		};
-		$scope.dragged = function (evt, type, index) {
+		$scope.selectDraggedWell = function (evt, type, index, is_boundary) {
 			var col1, col2, max, max_col, max_row, min, min_col, min_row, row1, row2;
-			if (!$scope.dragging) {
-				return;
-			}
-			if (type === $scope.dragStartingPoint.type && index === $scope.dragStartingPoint.index) {
-				return;
-			}
 			if ($scope.dragStartingPoint.type === 'column') {
 				if (type === 'well') {
 					index = index >= $scope.columns.length ? index - $scope.columns.length : index;
@@ -1081,7 +1048,7 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 					});
 				});
 			}
-			if ($scope.dragStartingPoint.type === 'well') {
+			if (!is_boundary && $scope.dragStartingPoint.type === 'well') {
 				if (type === 'well') {
 					row1 = Math.floor($scope.dragStartingPoint.index / $scope.columns.length);
 					$scope.selectionMade = true;
@@ -1109,6 +1076,28 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 				}
 			}
 		};
+
+		$scope.dragStart = function (evt, type, index) {
+			$scope.dragging = true;
+			$scope.dragStartingPoint = {
+				type: type,
+				index: index
+			};
+
+			$scope.selectDraggedWell(evt, type, index, true);
+
+			return $scope.dragStartingPoint;
+		};
+		$scope.dragged = function (evt, type, index) {
+			if (!$scope.dragging) {
+				return;
+			}
+			if (type === 'well' && type === $scope.dragStartingPoint.type && index === $scope.dragStartingPoint.index) {
+				return;
+			}
+
+			$scope.selectDraggedWell(evt, type, index, false);
+		};
 		$scope.dragStop = function (evt, type, index) {
 			var well;
 			$scope.dragging = false;
@@ -1120,7 +1109,7 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 				row.selected = false;
 				return row.selected;
 			});
-			if (type === 'well' && index === $scope.dragStartingPoint.index) {
+			if ((type === 'well' && index === $scope.dragStartingPoint.index)) {
 				if (!isCtrlKeyHeld(evt)) {
 					$scope.rows.forEach(function (r) {
 						return $scope.columns.forEach(function (c) {
@@ -1131,35 +1120,38 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 				}
 				well = $scope.wells["well_" + index];
 				well.selected = isCtrlKeyHeld(evt) ? !well.selected : true;
-				$scope.check();
-				$scope.checkTarget1();
-				$scope.checkTarget2();
-				$scope.selectionMade = isSelectMode();
-				if(!$scope.selectionMade){
-					$scope.sampleSelected = "Choose";
-					$scope.sampleSelectedId = 0;
-
-					$scope.target2Selected = "Choose";
-					$scope.target2SelectedColor = "white";
-					$scope.enableTarget2Type = false;
-					$scope.enableTarget2Qty = false;
-					$scope.selectedTarget2Type = "";
-					$scope.target2Quantity.value = null;
-					$scope.target2SelectedId = 0;
-
-					$scope.target1Selected = "Choose";
-					$scope.target1SelectedColor = "white";
-					$scope.enableTarget1Type = false;
-					$scope.enableTarget1Qty = false;
-					$scope.selectedTarget1Type = "";
-					$scope.target1Quantity.value = null;
-					$scope.target1SelectedId = 0;
-
-				}
 			}
+			checkWellPanel();
 			//ngModel.$setViewValue(angular.copy($scope.wells));
-			return console.log($scope.wells);
+			return true;
 		};
+
+		function checkWellPanel(){
+			$scope.check();
+			$scope.checkTarget1();
+			$scope.checkTarget2();
+			$scope.selectionMade = isSelectMode();
+			if(!$scope.selectionMade){
+				$scope.sampleSelected = "Choose";
+				$scope.sampleSelectedId = 0;
+
+				$scope.target2Selected = "Choose";
+				$scope.target2SelectedColor = "white";
+				$scope.enableTarget2Type = false;
+				$scope.enableTarget2Qty = false;
+				$scope.selectedTarget2Type = "";
+				$scope.target2Quantity.value = null;
+				$scope.target2SelectedId = 0;
+
+				$scope.target1Selected = "Choose";
+				$scope.target1SelectedColor = "white";
+				$scope.enableTarget1Type = false;
+				$scope.enableTarget1Qty = false;
+				$scope.selectedTarget1Type = "";
+				$scope.target1Quantity.value = null;
+				$scope.target1SelectedId = 0;
+			}			
+		}
 
 		function isSelectMode(){
 			for (i = 0; i < 16; i++) {
