@@ -44,6 +44,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
       is_cmd_key_held = false
       wells = {}
       $scope.dragging = false
+      $scope.shiftStartIndex = -1
 
       $scope.$on 'keypressed:command', ->
         is_cmd_key_held = true
@@ -52,7 +53,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
         is_cmd_key_held = false
 
       isCtrlKeyHeld = (evt) ->
-        return evt.ctrlKey or is_cmd_key_held
+        return evt.ctrlKey and is_cmd_key_held
 
       for b in [0...16] by 1
         if $scope.colorBy is 'well'
@@ -269,6 +270,26 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
           # toggle selected state
           well = $scope.wells["well_#{index}"]
           well.selected = if isCtrlKeyHeld(evt) then !well.selected else true
+
+
+        if $scope.dragStartingPoint.type is 'well' and $scope.shiftStartIndex >= 0
+          if type is 'well'
+            row1 = Math.floor($scope.shiftStartIndex / $scope.columns.length)
+            col1 = $scope.shiftStartIndex - row1 * $scope.columns.length
+            row2 = Math.floor(index / $scope.columns.length)
+            col2 = index - row2 * $scope.columns.length
+            max_row = Math.max.apply(Math, [row1, row2])
+            min_row = if max_row is row1 then row2 else row1
+            max_col = Math.max.apply(Math, [col1, col2])
+            min_col = if max_col is col1 then col2 else col1
+            $scope.rows.forEach (row) ->
+              $scope.columns.forEach (col) ->
+                selected = (row.index >= min_row && row.index <= max_row) && (col.index >= min_col && col.index <= max_col)
+                well = $scope.wells["well_" + (row.index * $scope.columns.length + col.index)]
+                if evt.shiftKey 
+                  well.selected = selected
+
+        if not evt.shiftKey then $scope.shiftStartIndex = index
 
         ngModel.$setViewValue(angular.copy($scope.wells))
 

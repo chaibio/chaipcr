@@ -88,6 +88,8 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 		$scope.error_target1Qty = '';
 		$scope.error_target2Qty = '';
 
+		$scope.shiftStartIndex = -1;
+
 		$scope.user = {};
 
 		function adjustMenuItemPosition(type){
@@ -959,8 +961,9 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 			return is_cmd_key_held;
 		});
 		isCtrlKeyHeld = function (evt) {
-			return evt.ctrlKey || is_cmd_key_held;
+			return evt.ctrlKey && is_cmd_key_held;
 		};
+
 		for (b = _i = 0; _i < 16; b = _i += 1) {
 			wells["well_" + b] = {
 				selected: false,
@@ -1009,6 +1012,34 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 
 			checkWellPanel();			
 		};
+
+		function selectSectionWell(evt, type, index){
+			if($scope.shiftStartIndex < 0) return;
+
+			if ($scope.dragStartingPoint.type === 'well') {
+				if (type === 'well') {
+					row1 = Math.floor($scope.shiftStartIndex / $scope.columns.length);
+					col1 = $scope.shiftStartIndex - row1 * $scope.columns.length;
+					row2 = Math.floor(index / $scope.columns.length);
+					col2 = index - row2 * $scope.columns.length;
+					max_row = Math.max.apply(Math, [row1, row2]);
+					min_row = max_row === row1 ? row2 : row1;
+					max_col = Math.max.apply(Math, [col1, col2]);
+					min_col = max_col === col1 ? col2 : col1;
+					$scope.rows.forEach(function (row) {
+						return $scope.columns.forEach(function (col) {
+							var selected, well;
+							selected = (row.index >= min_row && row.index <= max_row) && (col.index >= min_col && col.index <= max_col);
+							well = $scope.wells["well_" + (row.index * $scope.columns.length + col.index)];
+							if (evt.shiftKey) {
+								well.selected = selected;
+								return well.selected;
+							}
+						});
+					});
+				}
+			}
+		}
 
 		$scope.selectDraggedWell = function (evt, type, index, is_boundary) {
 			var col1, col2, max, max_col, max_row, min, min_col, min_row, row1, row2;
@@ -1121,7 +1152,12 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 				well = $scope.wells["well_" + index];
 				well.selected = isCtrlKeyHeld(evt) ? !well.selected : true;
 			}
+			selectSectionWell(evt, type, index);
+
 			checkWellPanel();
+			if(!evt.shiftKey){
+				$scope.shiftStartIndex = index;
+			}
 			//ngModel.$setViewValue(angular.copy($scope.wells));
 			return true;
 		};
