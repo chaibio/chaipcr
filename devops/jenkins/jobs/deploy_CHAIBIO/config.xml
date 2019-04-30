@@ -301,8 +301,7 @@ ENDSSH
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./devops/factory_settings_sdcard/scripts/replace_uEnv.txt.sh &quot;$build_machine:/root/chaipcr/deploy/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./devops/device &quot;$build_machine:/root/chaipcr/deploy/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./modules &quot;$build_machine:/root/chaipcr/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
-		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./realtime/overlay &quot;$build_machine:/root/chaipcr/deploy/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
-
+		
         exit 0
     fi
 done
@@ -806,20 +805,6 @@ systemctl enable qpcrbrowser.service</command>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo &quot;Install device tree overlay and PRU binary(do this every time it changes):&quot;
-cd ~/chaipcr/deploy/overlay
-bash ./build.sh
-echo chai-pcr &gt; /sys/devices/platform/bone_capemgr/slots &amp;
-sleep 60
-
-cat /sys/devices/platform/bone_capemgr/slots
-
-exit 0
-</command>
-      <execEachLine>false</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
       <command>echo Build/install LCD drivers
 # this needs some optimization.. it takes 90MB
 apt-get  -y -q install device-tree-compiler
@@ -835,9 +820,10 @@ then
       echo Building a debug image
 else
       apt-get  -y -q --purge autoremove device-tree-compiler
+      rm -r /root/chaipcr/modules
+      rm -r /root/chaipcr/deploy/overlay
 fi
 modprobe -i tilcdc
-
 echo done installing LCD driver.
 
 sync
@@ -1067,11 +1053,11 @@ then
       exit 0
 fi
 
-echo returnning Julia folder
-df -h
-tar xzf /data/dot_julia_precompiled.tgz
-      rm /data/dot_julia_precompiled.tgz
-echo returned Julia folder
+#echo returnning Julia folder
+#df -h
+#tar xzf /data/dot_julia_precompiled.tgz
+#      rm /data/dot_julia_precompiled.tgz
+#echo returned Julia folder
 du -h --max-depth=1 .
 df -h
 exit 0</command>

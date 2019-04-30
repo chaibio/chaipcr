@@ -24,13 +24,8 @@ cmdline=coherent_pool=1M quiet cape_universal=disable
 #uuid=
 
 s2pressed=0
-uenvcmdoverlay1=cape_disable=bone_capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN,BB-SPIDEV0,BB-SPIDEV1,BB-BONE-EMMC-2G
-uenvcmdoverlay2=cape_enable=bone_capemgr.enable_partno=chai-pcr,CHAI-LCDtouch5 
-uenvcmdoverlay3=dtb=am335x-boneblack-emmc-overlay.dtb;setenv fdtfile am335x-boneblack-emmc-overlay.dtb
-uenvcmdoverlay=echo "*** Overlays Configuration ***";run uenvcmdoverlay1;run uenvcmdoverlay2;run uenvcmdoverlay3
-
 shutdown_usb_power=i2c dev 0;i2c mw 0x24 1 0xec
-uenvcmdmmc=echo "*** Boot button Unpressed..!!";run uenvcmdoverlay;run uenvcmdemmcfromsdcard
+uenvcmdmmc=echo "*** Boot button Unpressed..!!";run uenvcmdemmcfromsdcard
 uenvcmdsdcard=bootpart=0:1;bootdir=;fdtaddr=0x81FF0000;setenv fdtfile am335x-boneblack.dtb;fatload mmc 0:1 ${fdtaddr} ${fdtfile};optargs=quiet capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN;load mmc 0 ${loadaddr} uImage;run loadfdt;setenv bootargs console=${console} ${optargs} s2pressed=${s2pressed};bootm ${loadaddr} - ${fdtaddr}
 uenvcmdsdcard_s2pressed=echo "*** Boot button pressed..!!";setenv s2pressed 1;run uenvcmdsdcard
 
