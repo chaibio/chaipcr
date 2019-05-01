@@ -20,10 +20,9 @@ install:
 install_mod:
 	cp ilitek_aimv20.ko /lib/modules/$(shell uname -r)/kernel/drivers/input/touchscreen
 	depmod -a
-	echo ilitek_aimv20 > /etc/modules-load.d/ilitek_aimv20.conf
+#	echo ilitek_aimv20 > /etc/modules-load.d/ilitek_aimv20.conf
 	sync
 
 clean:
 	make -C $(KDIR) M=$(shell pwd) clean
 	rm CHAI-LCDtouch5-00A0.dtbo
-
