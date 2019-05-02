@@ -14,22 +14,30 @@ class MigrateExistingPikaKits < ActiveRecord::Migration
           end
           sample_well = SamplesWell.find_or_create(sample, well_layout.id, row['well_num'])
           sample_well.save
-        end
-        if !row['target1'].blank?
-          target = Target.new(:name=>row['target1'], :channel=>1)
-          target.well_layout_id = well_layout.id
-          target.save
+        
+          if !row['target1'].blank?
+            target = Target.where(:name=>row['target1'], :channel=>1, :well_layout_id=>well_layout.id).first
+            if target == nil
+              target = Target.new(:name=>row['target1'], :channel=>1)
+              target.well_layout_id = well_layout.id
+              target.save
+            end
+            target_well = TargetsWell.find_or_create(target, well_layout.id, row['well_num'])
+            target_well.well_type = map_well_type(row['well_type'])
+            target_well.save
+          end
+          
+          target2_name = (row['target2'].blank?)? "IPC" : row['target2']
+          target = Target.where(:name=>target2_name, :channel=>2, :well_layout_id=>well_layout.id).first
+          if target == nil
+            target = Target.new(:name=>target2_name, :channel=>2)
+            target.well_layout_id = well_layout.id
+            target.save
+          end
           target_well = TargetsWell.find_or_create(target, well_layout.id, row['well_num'])
           target_well.well_type = map_well_type(row['well_type'])
           target_well.save
         end
-        target2_name = (row['target2'].blank?)? "IPC" : row['target2']
-        target = Target.new(:name=>target2_name, :channel=>2)
-        target.well_layout_id = well_layout.id
-        target.save
-        target_well = TargetsWell.find_or_create(target, well_layout.id, row['well_num'])
-        target_well.well_type = map_well_type(row['well_type'])
-        target_well.save
       end
     end
     
