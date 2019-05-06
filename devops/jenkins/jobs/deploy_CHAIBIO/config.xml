@@ -456,11 +456,11 @@ else
       exit 0
 fi
 
-      mkdir -p /root/.julia
-      chmod 777 /root/.julia
-      mount /dev/mmcblk0p2 /root/.julia
+      mkdir -p /root/.julia || exit 1
+      chmod 777 /root/.julia || exit 1
+      mount /dev/mmcblk0p2 /root/.julia || exit 1
       cd
-      tar xfz /data/dot_julia_complete.tgz
+      tar xfz /data/dot_julia_complete.tgz || exit 1
       rm dot_julia.tgz
 
       df -h
@@ -488,14 +488,14 @@ apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hic
       then
              echo Building a debug image
       fi
-      mkdir /var/log/ -p
+      mkdir /var/log/ -p || exit 1
       julia_pkgdir=&quot;/root&quot;
       export JULIA_PKGDIR=/root/.julia
 
-      cd /root/chaipcr/bioinformatics/build/
-      chmod +x precompilescript.sh
+      cd /root/chaipcr/bioinformatics/build/ || exit 1
+      chmod +x precompilescript.sh || exit 1
 
-      time ./precompilescript.sh $julia_pkgdir
+      time ./precompilescript.sh $julia_pkgdir || exit 1
 
      if [ -e /root/chaipcr/bioinformatics/qpcranalysis.so ]
      then
@@ -519,14 +519,14 @@ apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hic
             cd
 
             echo moving julia to eMMC
-            tar czf /data/dot_julia_precompiled.tgz .julia 
+            tar czf /data/dot_julia_precompiled.tgz .julia || exit 1
             pkill -9 julia
             pkill -9 julia
-            umount .julia
+            umount .julia || exit 1
             echo cleaning up old julia folder
             rm -r .julia
-            rm /data/dot_julia_complete.tgz
-            tar xzf /data/dot_julia_precompiled.tgz
+            rm /data/dot_julia_complete.tgz 
+            tar xzf /data/dot_julia_precompiled.tgz || exit 1
             echo returned Julia folder
      fi
 
@@ -583,7 +583,7 @@ if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot
 then
        echo No build branch chosen
 else
-     		git checkout $branch_name
+     	git checkout $branch_name
 fi
 
 cd /sdcard/factory/compile-browser/chaipcr/browser/ || exit 1
@@ -598,14 +598,12 @@ sed -i &apos;/^DEFINES[[:space:]]\+=/ s/$/ -DKERNEL_49/&apos; Makefile
 
 make || exit 1
 make install || exit 1
-#cp realtime ~/tmp
-#cp libraries/lib/* /usr/lib/
 
 if $is_dev
 then
       echo Building a debug image
 else
-      cd /sdcard/factory/
+      cd /sdcard/factory/ || exit 1
       rm -r compile-browser
      cd
 fi
@@ -618,13 +616,13 @@ echo done compiling browser
       <siteName>root@$build_machine:22</siteName>
       <command>echo compiling realtime
 
-cd /sdcard/factory/
+cd /sdcard/factory/ || exit 1
 free -m
 sync
 
 rm -r /sdcard/factory/realtime-compile || true
-mkdir -p /sdcard/factory/realtime-compile
-cd /sdcard/factory/realtime-compile
+mkdir -p /sdcard/factory/realtime-compile || exit 1
+cd /sdcard/factory/realtime-compile || exit 1
 
 branch_param=
 branch_name=
@@ -674,8 +672,8 @@ else
       rm -r /sdcard/factory/realtime-compile
 fi
 
-echo  Deploy realtime to ~/tmp
-cp ~/chaipcr/deploy/device/realtime.service /lib/systemd/system/
+echo  Deploy realtime to ~/tmp 
+cp ~/chaipcr/deploy/device/realtime.service /lib/systemd/system/ || exit 1
 systemctl enable realtime.service
 
 sync
@@ -731,7 +729,7 @@ cd
 sync
 
 echo Disable Mass-storage mini-usb
-cd /opt/scripts/boot        
+cd /opt/scripts/boot        || exit 1
 patch -i ~/chaipcr/deploy/device/storage.disable.patch  || (echo error adding storage disable patch &amp;&amp; exit 1)
 cd ~
 sync
@@ -745,7 +743,7 @@ sed -i &apos;s/#retry 60/retry 20/&apos; /etc/dhcp/dhclient.conf
 sed -i &apos;s/#reboot/reboot/&apos; /etc/dhcp/dhclient.conf
 
 echo Disabling usb1
-cd /opt/scripts/boot        
+cd /opt/scripts/boot        || exit 1
 
 [ -e temp.patch ] &amp;&amp; rm temp.patch
 cat &gt;&gt; temp.patch &lt;&lt; EOF
@@ -790,17 +788,17 @@ exit 0</command>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Configure Logrotate
-cp ~/chaipcr/deploy/device/logrotate/logrotate.conf /etc
-cp ~/chaipcr/deploy/device/logrotate/logrotate.d/* /etc/logrotate.d/
-mv /etc/cron.daily/logrotate /etc/cron.hourly/ 
+cp ~/chaipcr/deploy/device/logrotate/logrotate.conf /etc || exit 1
+cp ~/chaipcr/deploy/device/logrotate/logrotate.d/* /etc/logrotate.d/ || exit 1
+mv /etc/cron.daily/logrotate /etc/cron.hourly/  || exit 1
 
 echo Build/update wifi drivers- ignored now.. lets see if the latest is making any issues
 
 echo copy browser resources
 # Deploy browser to ~/tmp
-cp -r ~/chaipcr/browser/resources ~/tmp/
-cp ~/chaipcr/browser/qpcrbrowser.service /lib/systemd/system/
-systemctl enable qpcrbrowser.service</command>
+cp -r ~/chaipcr/browser/resources ~/tmp/ || exit 1
+cp ~/chaipcr/browser/qpcrbrowser.service /lib/systemd/system/ || exit 1
+systemctl enable qpcrbrowser.service </command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
@@ -823,7 +821,7 @@ else
       rm -r /root/chaipcr/modules
       rm -r /root/chaipcr/deploy/overlay
 fi
-modprobe -i tilcdc
+modprobe -i tilcdc || exit 1
 echo done installing LCD driver.
 
 sync
@@ -923,15 +921,13 @@ update-rc.d -f nginx defaults
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Unicorn
-mkdir ~/shared
-mkdir ~/shared/pids
-mkdir ~/shared/log
-mkdir ~/shared/sockets 
+mkdir ~/shared || exit 1
+mkdir ~/shared/pids ~/shared/log ~/shared/sockets || exit 1
 
-cp ~/chaipcr/web/config/etc/unicorn_init.d /etc/init.d/unicorn
-chmod +x /etc/init.d/unicorn
-mkdir /etc/unicorn
-cp ~/chaipcr/web/config/etc/unicorn/chaipcr.conf /etc/unicorn/
+cp ~/chaipcr/web/config/etc/unicorn_init.d /etc/init.d/unicorn || exit 1
+chmod +x /etc/init.d/unicorn || exit 1
+mkdir /etc/unicorn || exit 1
+cp ~/chaipcr/web/config/etc/unicorn/chaipcr.conf /etc/unicorn/ || exit 1
 </command>
       <execEachLine>false</execEachLine>
     </org.jvnet.hudson.plugins.SSHBuilder>
@@ -944,7 +940,7 @@ swapoff -a
 
 echo clearing more space
 apt-get -q -y --fix-broken install
-rm /sdcard/factory/swapfile
+rm /sdcard/factory/swapfile 
 cd
 
 if $is_dev
@@ -1047,24 +1043,6 @@ exit 0</command>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>if $is_dev
-then
-      echo Building a debug image
-      exit 0
-fi
-
-#echo returnning Julia folder
-#df -h
-#tar xzf /data/dot_julia_precompiled.tgz
-#      rm /data/dot_julia_precompiled.tgz
-#echo returned Julia folder
-du -h --max-depth=1 .
-df -h
-exit 0</command>
-      <execEachLine>false</execEachLine>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
-      <siteName>root@$build_machine:22</siteName>
       <command>echo zeroing 2
 
 dd if=/dev/zero of=/zeros.bigfile bs=16M
@@ -1142,7 +1120,6 @@ umount /dev/mmcblk0p*
 rm -r /sdcard/upgrade
 mkdir -p /sdcard/upgrade/
 
-#/sbin/partprobe /dev/mmcblk0
 mkfs.ext4 /dev/mmcblk0p1 -F
 
 sync

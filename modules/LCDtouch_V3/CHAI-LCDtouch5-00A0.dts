@@ -187,14 +187,15 @@ pinmux_LCDtouch5_lcd_pins {
 		       #address-cells = <1>;
 		       #size-cells = <0>;
 
-			ft5x06@38 {
-				compatible = "ft5x0x_ts";
-				reg = <0x38>;
-				interrupt-parent = <&gpio2>;
+			ili2139c@41 {
+		        	compatible = "ilitek,ilitek_i2c";
+				reg = <0x41>;
+				// for kernel 3.8 the gpio controllers are indexed from 1
+				// for kernel 4.9 the gpio controllers are indexed from 0
+				interrupt-parent = <&gpio1>;
 				interrupts = <17 0x0>;
-				irq-gpio = <&gpio2 17 0>;
+				irq-gpio = <&gpio1 17 0>;
 			};
-
                };
        };
 	fragment@5 {
