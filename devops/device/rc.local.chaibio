@@ -11,11 +11,21 @@
 #
 # By default this script does nothing.
 
+check_for_exit ()
+{
+        if [ -e /run/chaipcr/exit_all.flag ]
+        then
+                echo exit all flag is up
+        	exit 0
+	fi
+}
+
 export_pwm ()
 {
 	echo PWM: Creating $3 endpoint. Exporting $1
 	for chip in $1/pwmchip?
 	do
+		check_for_exit
 		echo exporting $chip
 		chip_path="$chip/pwm$2"
 		if [ -e $chip_path ]
@@ -73,6 +83,7 @@ pwm_setup_kernel49 ()
 wait_for_migrate () {
         echo "Checking for migrate script completation"
         while true; do
+	   check_for_exit 
            if [ -e ${sdcard}/factory/upgrade_autorun.flag ] || [ -e ${sdcard}/upgrade/upgrade_autorun.flag ];
            then
                 echo "Still waiting for migrate script to finish ..."
@@ -174,6 +185,7 @@ run_migrate_on_upgrade () {
 
 		while [ $sql_running -eq 1 ]
 		do
+			check_for_exit 
 			echo "mysql server not up yet.. code $sql_running. waiting 10 seconds."
 			echo "MySql status:"
 			mysqladmin status
@@ -192,7 +204,7 @@ run_migrate_on_upgrade () {
                            echo "$SERVICE service is not running, start realtime app before moving forward"
 			   systemctl start realtime.service
                         fi
-
+			check_for_exit
 			sleep 10
 			mysqladmin status | grep Uptime
 			sql_running=$?
@@ -226,6 +238,7 @@ run_cleanup_user_tokens_every4hours () {
 	wait_for_migrate
 	while true
 	do
+		check_for_exit
 		echo Cleaning up every 4 hours.
 		sleep 14400
 		echo cleaning task due.
@@ -271,6 +284,7 @@ start_julia () {
 	then
 		while true
 		do
+			check_for_exit
 			echo starting julia
 			if [ -e  /root/chaipcr/bioinformatics/qpcranalysis.so ]
 			then
@@ -280,6 +294,7 @@ start_julia () {
 				JULIA_ENV=production julia -e 'push!(LOAD_PATH, "/root/chaipcr/bioinformatics/QpcrAnalysis/"); include("/root/chaipcr/bioinformatics/juliaserver.jl")' || true
 			fi
 			echo julia exit
+			check_for_exit
 			sleep 10
 		done
 	else
@@ -311,6 +326,7 @@ run_clean_user_tokens () {
 	sql_running=$?
 	while [ $sql_running -eq 1 ]
 	do
+		check_for_exit
 		echo "mysql server not up yet.. code $sql_running. waiting 5 seconds."
 		echo "MySql status:"
 		mysqladmin status
@@ -376,6 +392,7 @@ run_clean_user_tokens () {
 mysql_watchdog () {
 	while true
 	do
+		check_for_exit
 		/etc/init.d/mysql status | grep running
 		sql_running=$?
 		if [ $sql_running -eq 1 ]
@@ -638,6 +655,7 @@ network_watchdog_interface() {
 
         while [ 1 ]
         do
+		check_for_exit 
                 checkEth0IntefaceForStaticIP
                 
 	        if grep "$iface" /var/lib/chaibio/network_watchdog_ignored_interfaces
@@ -671,6 +689,7 @@ network_watchdog_interface() {
 			cmd="dhclient -1 -4 -d -v $iface -lf $lfile $extras"
 			echo calling $cmd
 			$cmd
+			check_for_exit
 			sleep 3
                 else
                         echo "Network watchdog.. Network found: $ip_address"
@@ -681,24 +700,25 @@ network_watchdog_interface() {
 }
 
 network_watchdog_interfaces() {
-while true
-do
-        read interface
-        if [ -z $interface ]
-        then
-#               echo Empty if $interface
-                return
-        fi
+	while true
+	do
+		check_for_exit
+	        read interface
+        	if [ -z $interface ]
+	        then
+#               	echo Empty if $interface
+        	        return
+	        fi
 
-        #echo "Network watchdog for interface: $interface"
-	if echo "$interface" | grep -q "lo"
-        then
-                echo Invalid interface $interface
-                continue
-        fi
-        echo "Network watchdog for interface: $interface"
-	network_watchdog_interface $interface &
-done
+	        #echo "Network watchdog for interface: $interface"
+		if echo "$interface" | grep -q "lo"
+	        then
+        	        echo Invalid interface $interface
+	                continue
+        	fi
+	        echo "Network watchdog for interface: $interface"
+		network_watchdog_interface $interface &
+	done
 }
 
 network_watchdog() {
