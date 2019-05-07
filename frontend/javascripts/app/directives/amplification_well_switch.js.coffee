@@ -53,7 +53,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
         is_cmd_key_held = false
 
       isCtrlKeyHeld = (evt) ->
-        return evt.ctrlKey and is_cmd_key_held
+        return (evt.ctrlKey or evt.metaKey) and is_cmd_key_held
 
       for b in [0...16] by 1
         if $scope.colorBy is 'well'

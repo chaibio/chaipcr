@@ -961,7 +961,7 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 			return is_cmd_key_held;
 		});
 		isCtrlKeyHeld = function (evt) {
-			return evt.ctrlKey && is_cmd_key_held;
+			return (evt.ctrlKey || evt.metaKey) && is_cmd_key_held;
 		};
 
 		for (b = _i = 0; _i < 16; b = _i += 1) {
