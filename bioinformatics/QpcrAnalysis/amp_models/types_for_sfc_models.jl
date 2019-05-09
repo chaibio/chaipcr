@@ -310,7 +310,15 @@ const SFC_MODEL_BASES = [ # vector of tuples
             Y_logit = log.((d_ - Y_4be) ./ (Y_4be - c_))
             lin1_coefs = linreg(log.(X[idc_4be]), Y_logit)
             b_ = lin1_coefs[2]
-            e_ = -lin1_coefs[1] / b_
+            # e_ = -lin1_coefs[1] / b_
+            if isnan(b_) || b_ == 0.0
+                b_ = NaN
+                e_ = NaN
+                c_ = NaN
+                d_ = NaN
+            else
+                e_ = -lin1_coefs[1] / b_
+            end
             return OrderedDict("b_"=>b_, "c_"=>c_, "d_"=>d_, "e_"=>e_)
         end,
         OrderedDict( # pred_strs
