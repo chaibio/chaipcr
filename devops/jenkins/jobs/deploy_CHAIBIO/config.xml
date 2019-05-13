@@ -1077,7 +1077,12 @@ echo basic beaglebone setup done!</command>
 sudo systemctl disable getty@tty1.service
 echo &quot;root:chaipcr&quot; | chpasswd
 sync
+echo starting time sync
 service ntp start
+
+echo limiting paging area for VM
+echo &quot;vm.min_free_kbytes=65536&quot; &gt;&gt; /etc/sysctl.conf
+
 echo rebooting
 shutdown -r 1
 echo a reboot is scheduled after a minute</command>
