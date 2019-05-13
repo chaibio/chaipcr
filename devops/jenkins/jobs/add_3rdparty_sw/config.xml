@@ -927,6 +927,9 @@ echo ifup script fix
 echo &quot;Due to a bug (https://bugs.launchpad.net/ubuntu/+source/ntp/+bug/1206164) a script from ifup has to be fixed&quot;
 sed -i &apos;s/) \&amp;/) &lt;\/dev\/null &gt;\/dev\/null 2&gt;\&amp;1 \&amp;/g&apos; /etc/network/if-up.d/ntpdate
 
+#echo Calling timezone setter on ifup
+#echo &quot;/root/chaipcr/deploy/device/set_timezone.sh &amp;&quot; &gt;&gt; /etc/network/if-up.d/ntpdate
+
 apt-get clean
 apt-get autoclean
 

@@ -1077,6 +1077,7 @@ echo basic beaglebone setup done!</command>
 sudo systemctl disable getty@tty1.service
 echo &quot;root:chaipcr&quot; | chpasswd
 sync
+service ntp start
 echo rebooting
 shutdown -r 1
 echo a reboot is scheduled after a minute</command>
