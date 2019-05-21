@@ -1,4 +1,4 @@
-<div class="intro page-9" ng-controller="OpticalTestDualChannelAnalyzeCtrl" style="max-width: 720px;">
+<div class="intro page-9" ng-controller="OpticalTestDualChannelAnalyzeCtrl" style="max-width: 720px; margin: auto;">
 
   <h2 class="text-center text-success" ng-show="experiment.completion_status === 'success' && !analyzing && isPassed()">Optical Diagnostic Passed</h2>
   <h2 class="text-center text-danger" ng-show="(!isPassed() || experiment.completion_status !== 'success') && !analyzing">Optical Diagnostic Failed</h2>
