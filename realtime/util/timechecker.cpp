@@ -62,7 +62,7 @@ void TimeChecker::timeCheckCallback(Poco::Timer &/*timer*/)
             {
                 boost::chrono::seconds savedTime = getSavedTime();
 
-                if (savedTime > boost::chrono::duration_cast<boost::chrono::seconds>(boost::chrono::system_clock::now().time_since_epoch()))
+                if (savedTime > boost::chrono::duration_cast<boost::chrono::seconds>(boost::chrono::steady_clock::now().time_since_epoch()))
                     setCurrentTime(savedTime);
                 else
                     saveCurrentTime();
@@ -92,7 +92,7 @@ void TimeChecker::saveCurrentTime()
     std::ofstream file(kSavedTimePath, std::ofstream::out | std::ofstream::trunc);
 
     if (file.is_open())
-        file << boost::chrono::duration_cast<boost::chrono::seconds>(boost::chrono::system_clock::now().time_since_epoch()).count();
+        file << boost::chrono::duration_cast<boost::chrono::seconds>(boost::chrono::steady_clock::now().time_since_epoch()).count();
     else
         APP_LOGGER << "TimeChecker::saveCurrentTime - unable to open file: " << std::strerror(errno) << std::endl;
 }

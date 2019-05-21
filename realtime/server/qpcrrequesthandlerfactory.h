@@ -43,11 +43,11 @@ private:
         CachedUser(int id)
         {
             this->id = id;
-            cacheTime = boost::chrono::system_clock::now();
+            cacheTime = boost::chrono::steady_clock::now();
         }
 
         int id;
-        boost::chrono::system_clock::time_point cacheTime;
+        boost::chrono::steady_clock::time_point cacheTime;
     };
 
     std::map<std::string, CachedUser> _cachedUsers;

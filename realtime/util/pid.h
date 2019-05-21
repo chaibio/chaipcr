@@ -57,7 +57,7 @@ private:
 
     double _previousProcessValue;
     double _integratorS;
-    boost::chrono::high_resolution_clock::time_point _previousExecutionTime;
+    boost::chrono::steady_clock::time_point _previousExecutionTime;
 
     mutable std::mutex _lock;
 };

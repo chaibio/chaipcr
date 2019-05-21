@@ -18,9 +18,7 @@
 //
 
 #include "thermistor.h"
-#ifdef KERNEL_49
-	#include <math.h>
-#endif
+#include <cmath>
 
 using namespace std;
 

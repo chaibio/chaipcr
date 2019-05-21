@@ -71,12 +71,12 @@ private:
     public:
         SampleData();
 
-        void write(std::ostream &stream, const boost::chrono::system_clock::time_point &triggetPoint) const;
+        void write(std::ostream &stream, const boost::chrono::steady_clock::time_point &triggetPoint) const;
 
         static void writeHeaders(std::ostream &stream);
 
     public:
-        boost::chrono::system_clock::time_point time;
+        boost::chrono::steady_clock::time_point time;
 
         std::tuple<std::int32_t, std::int32_t, std::array<std::int32_t, Channels>, std::int32_t> adcValues;
         std::uint8_t adcValuesSize;

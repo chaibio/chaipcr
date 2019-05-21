@@ -220,7 +220,7 @@ int QPCRRequestHandlerFactory::getCachedUserId(const string &token)
 
     if (it != _cachedUsers.end())
     {
-        if ((boost::chrono::system_clock::now() - it->second.cacheTime) < USER_CACHE_DURATION)
+        if ((boost::chrono::steady_clock::now() - it->second.cacheTime) < USER_CACHE_DURATION)
             return it->second.id;
         else
             _cachedUsers.erase(it);

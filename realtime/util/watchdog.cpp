@@ -48,7 +48,7 @@ void start()
 
 void watch()
 {
-    std::map<Watchdog::Watchable*, boost::chrono::system_clock::time_point> watchTimes;
+    std::map<Watchdog::Watchable*, boost::chrono::steady_clock::time_point> watchTimes;
 
     timespec time;
     time.tv_sec = 1;
@@ -61,13 +61,13 @@ void watch()
 
             if (watchableListState)
             {
-                std::map<Watchdog::Watchable*, boost::chrono::system_clock::time_point> tmp = std::move(watchTimes);
+                std::map<Watchdog::Watchable*, boost::chrono::steady_clock::time_point> tmp = std::move(watchTimes);
 
                 for (Watchdog::Watchable *watchable: watchableList)
                 {
                     auto it = tmp.find(watchable);
 
-                    watchTimes.emplace(watchable, it != tmp.end() ? it->second : boost::chrono::system_clock::now());
+                    watchTimes.emplace(watchable, it != tmp.end() ? it->second : boost::chrono::steady_clock::now());
                 }
 
                 watchableListState = false;
@@ -77,8 +77,8 @@ void watch()
         for (auto &watchable: watchTimes)
         {
             if (watchable.first->checkout())
-                watchable.second = boost::chrono::system_clock::now();
-            else if ((boost::chrono::system_clock::now() - watchable.second) > watchable.first->watchInterval())
+                watchable.second = boost::chrono::steady_clock::now();
+            else if ((boost::chrono::steady_clock::now() - watchable.second) > watchable.first->watchInterval())
             {
                 APP_LOGGER << watchable.first->name() << " thread has blocked for over " << watchable.first->watchInterval().count() << " seconds. Killing the app" << std::endl;
 

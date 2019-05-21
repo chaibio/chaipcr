@@ -20,6 +20,8 @@
 #include "protocol.h"
 #include "experiment.h"
 
+#include <boost/date_time.hpp>
+
 Experiment::Experiment()
 {
     _definationId = -1;
@@ -28,9 +30,8 @@ Experiment::Experiment()
     _startedAt = boost::posix_time::not_a_date_time;
     _completedAt = boost::posix_time::not_a_date_time;
     _completionStatus = None;
-    _estimatedDuration = 0;
-    _pausedDuration = 0;
-    _lastPauseTime = boost::posix_time::not_a_date_time;
+    _estimatedDuration = boost::chrono::milliseconds::zero();
+    _pausedDuration = boost::chrono::milliseconds::zero();
     _extendedState = false;
     _stepBeganState = false;
     _protocol = nullptr;
@@ -51,6 +52,9 @@ Experiment::Experiment(const Experiment &other)
     setStartedAt(other.startedAt());
     setCompletedAt(other.completedAt());
     setCompletionStatus(other.completionStatus());
+    setCompletionMessage(other.completionMessage());
+    setStartedAtPoint(other.startedAtPoint());
+    setCompletedAtPoint(other.completedAtPoint());
     setEstimatedDuration(other.estimatedDuration());
     setPausedDuration(other.pausedDuration());
     setPauseTime(other.lastPauseTime());
@@ -71,6 +75,8 @@ Experiment::Experiment(Experiment &&other)
     _completedAt = other._completedAt;
     _completionStatus = other._completionStatus;
     _completionMessage = std::move(other._completionMessage);
+    _startedAtPoint = other._startedAtPoint;
+    _completedAtPoint = other._completedAtPoint;
     _estimatedDuration = other._estimatedDuration;
     _pausedDuration = other._pausedDuration;
     _lastPauseTime = other._lastPauseTime;
@@ -84,9 +90,11 @@ Experiment::Experiment(Experiment &&other)
     other._startedAt = boost::posix_time::not_a_date_time;
     other._completedAt = boost::posix_time::not_a_date_time;
     other._completionStatus = None;
-    other._estimatedDuration = 0;
-    other._pausedDuration = 0;
-    other._lastPauseTime = boost::posix_time::not_a_date_time;
+    other._startedAtPoint = boost::chrono::steady_clock::time_point();
+    other._completedAtPoint = boost::chrono::steady_clock::time_point();
+    other._estimatedDuration = boost::chrono::milliseconds::zero();
+    other._pausedDuration = boost::chrono::milliseconds::zero();
+    other._lastPauseTime = boost::chrono::steady_clock::time_point();
     other._extendedState = false;
     other._stepBeganState = false;
     other._protocol = nullptr;
@@ -107,6 +115,8 @@ Experiment& Experiment::operator= (const Experiment &other)
     setCompletedAt(other.completedAt());
     setCompletionStatus(other.completionStatus());
     setCompletionMessage(other.completionMessage());
+    setStartedAtPoint(other.startedAtPoint());
+    setCompletedAtPoint(other.completedAtPoint());
     setEstimatedDuration(other.estimatedDuration());
     setPausedDuration(other.pausedDuration());
     setPauseTime(other.lastPauseTime());
@@ -130,6 +140,8 @@ Experiment& Experiment::operator= (Experiment &&other)
     _startedAt = other._startedAt;
     _completedAt = other._completedAt;
     _completionMessage = std::move(other._completionMessage);
+    _startedAtPoint = other._startedAtPoint;
+    _completedAtPoint = other._completedAtPoint;
     _estimatedDuration = other._estimatedDuration;
     _pausedDuration = other._pausedDuration;
     _lastPauseTime = other._lastPauseTime;
@@ -148,9 +160,11 @@ Experiment& Experiment::operator= (Experiment &&other)
     other._startedAt = boost::posix_time::not_a_date_time;
     other._completedAt = boost::posix_time::not_a_date_time;
     other._completionStatus = None;
-    other._estimatedDuration = 0;
-    other._pausedDuration = 0;
-    other._lastPauseTime = boost::posix_time::not_a_date_time;
+    other._startedAtPoint = boost::chrono::steady_clock::time_point();
+    other._completedAtPoint = boost::chrono::steady_clock::time_point();
+    other._estimatedDuration = boost::chrono::milliseconds::zero();
+    other._pausedDuration = boost::chrono::milliseconds::zero();
+    other._lastPauseTime = boost::chrono::steady_clock::time_point();
     other._extendedState = false;
     other._stepBeganState = false;
     other._protocol = nullptr;
@@ -180,4 +194,16 @@ void Experiment::setProtocol(Protocol *protocol)
         delete _protocol;
 
     _protocol = protocol;
+}
+
+void Experiment::setStartedTime()
+{
+    setStartedAt(boost::posix_time::microsec_clock::local_time());
+    setStartedAtPoint(boost::chrono::steady_clock::now());
+}
+
+void Experiment::setCompletedTime()
+{
+    setCompletedAt(boost::posix_time::microsec_clock::local_time());
+    setCompletedAtPoint(boost::chrono::steady_clock::now());
 }

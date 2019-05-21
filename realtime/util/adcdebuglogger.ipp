@@ -11,7 +11,7 @@
 template <int Channels>
 ADCDebugLogger<Channels>::SampleData::SampleData()
 {
-    time = boost::chrono::system_clock::now();
+    time = boost::chrono::steady_clock::now();
 
     adcValuesSize = 0;
     heatBlockZone1Drive = HeatBlockInstance::getInstance()->zone1DriveValue() * 100;
@@ -23,7 +23,7 @@ ADCDebugLogger<Channels>::SampleData::SampleData()
 }
 
 template <int Channels>
-void ADCDebugLogger<Channels>::SampleData::write(std::ostream &stream, const boost::chrono::system_clock::time_point &triggetPoint) const
+void ADCDebugLogger<Channels>::SampleData::write(std::ostream &stream, const boost::chrono::steady_clock::time_point &triggetPoint) const
 {
     stream << boost::chrono::duration_cast<boost::chrono::milliseconds>(time - triggetPoint).count() << ',' << (heatBlockZone1Drive / 100.0)
            << ',' << (heatBlockZone2Drive / 100.0) << ',' << (fanDrive / 100.0) << ',' << static_cast<int>(muxChannel) << ',' << (lidDrive / 100.0)
@@ -151,7 +151,7 @@ void ADCDebugLogger<Channels>::save()
 
         stream << '\n';
 
-        boost::chrono::system_clock::time_point triggetPoint = _postSamples.front().time;
+        boost::chrono::steady_clock::time_point triggetPoint = _postSamples.front().time;
 
         for (const SampleData &sample: _preSamples)
         {

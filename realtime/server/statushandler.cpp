@@ -46,27 +46,34 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
 
         case ExperimentController::LidHeatingMachineState:
             responsePt.put("experiment_controller.machine.state", "lid_heating");
-            responsePt.put("experiment_controller.experiment.run_duration", (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_seconds());
+            responsePt.put("experiment_controller.experiment.run_duration",
+                           boost::chrono::duration_cast<boost::chrono::seconds>(boost::chrono::steady_clock::now() - experiment.startedAtPoint()).count());
             break;
 
         case ExperimentController::RunningMachineState:
             responsePt.put("experiment_controller.machine.state", "running");
-            responsePt.put("experiment_controller.experiment.run_duration", (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_seconds());
-            responsePt.put("experiment_controller.experiment.estimated_duration", experiment.estimatedDuration());
-            responsePt.put("experiment_controller.experiment.paused_duration", experiment.pausedDuration());
+            responsePt.put("experiment_controller.experiment.run_duration",
+                           boost::chrono::duration_cast<boost::chrono::seconds>(boost::chrono::steady_clock::now() - experiment.startedAtPoint()).count());
+            responsePt.put("experiment_controller.experiment.estimated_duration",
+                           boost::chrono::duration_cast<boost::chrono::seconds>(experiment.estimatedDuration()).count());
+            responsePt.put("experiment_controller.experiment.paused_duration",
+                           boost::chrono::duration_cast<boost::chrono::seconds>(experiment.pausedDuration()).count());
             break;
 
         case ExperimentController::PausedMachineState:
             responsePt.put("experiment_controller.machine.state", "paused");
-            responsePt.put("experiment_controller.experiment.run_duration", (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_seconds());
-            responsePt.put("experiment_controller.experiment.estimated_duration", experiment.estimatedDuration());
-            responsePt.put("experiment_controller.experiment.paused_duration", experiment.pausedDuration() +
-                           (boost::posix_time::microsec_clock::local_time() - experiment.lastPauseTime()).total_seconds());
+            responsePt.put("experiment_controller.experiment.run_duration",
+                           boost::chrono::duration_cast<boost::chrono::seconds>(boost::chrono::steady_clock::now() - experiment.startedAtPoint()).count());
+            responsePt.put("experiment_controller.experiment.estimated_duration",
+                           boost::chrono::duration_cast<boost::chrono::seconds>(experiment.estimatedDuration()).count());
+            responsePt.put("experiment_controller.experiment.paused_duration",
+                           boost::chrono::duration_cast<boost::chrono::seconds>(experiment.pausedDuration() + (boost::chrono::steady_clock::now() - experiment.lastPauseTime())).count());
             break;
 
         case ExperimentController::CompleteMachineState:
             responsePt.put("experiment_controller.machine.state", "complete");
-            responsePt.put("experiment_controller.experiment.run_duration", (experiment.completedAt() - experiment.startedAt()).total_seconds());
+            responsePt.put("experiment_controller.experiment.run_duration",
+                           boost::chrono::duration_cast<boost::chrono::seconds>(experiment.completedAtPoint() - experiment.startedAtPoint()).count());
             break;
 
         default:

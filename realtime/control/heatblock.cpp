@@ -19,9 +19,9 @@
 
 #include "bidirectionalpwmcontroller.h"
 #include "heatblock.h"
-#ifdef KERNEL_49
-	#include <math.h>
-#endif
+
+#include <cmath>
+
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -194,15 +194,15 @@ void HeatBlock::Ramp::set(double targetTemperature, double rate) {
 
     _targetTemperature = targetTemperature;
     _rate = rate;
-    _lastChangesTime = boost::chrono::high_resolution_clock::now();
+    _lastChangesTime = boost::chrono::steady_clock::now();
 }
 
 double HeatBlock::Ramp::computeTemperature(double currentTargetTemperature) {
     if (isEmpty())
         return _targetTemperature;
 
-    boost::chrono::high_resolution_clock::time_point previousTime = _lastChangesTime;
-    _lastChangesTime = boost::chrono::high_resolution_clock::now();
+    boost::chrono::steady_clock::time_point previousTime = _lastChangesTime;
+    _lastChangesTime = boost::chrono::steady_clock::now();
 
     boost::chrono::milliseconds pastTime(boost::chrono::duration_cast<boost::chrono::milliseconds>(_lastChangesTime - previousTime));
 

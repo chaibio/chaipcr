@@ -71,7 +71,7 @@ void ADCController::process() {
     _ltc2444->readSingleEndedChannel(0, kThermistorOversamplingRate); //start first read
 
     static const boost::chrono::nanoseconds repeatFrequencyInterval((boost::chrono::nanoseconds::rep)round(1.0 / kADCRepeatFrequency * 1000 * 1000 * 1000));
-    boost::chrono::high_resolution_clock::time_point repeatFrequencyLastTime = boost::chrono::high_resolution_clock::now();
+    boost::chrono::steady_clock::time_point repeatFrequencyLastTime = boost::chrono::steady_clock::now();
 
     try {
         _workState = true;
@@ -107,8 +107,8 @@ void ADCController::process() {
                     qpcrApp.stopExperiment(ex.what());
                 }
 
-                boost::chrono::high_resolution_clock::time_point previousTime = repeatFrequencyLastTime;
-                repeatFrequencyLastTime = boost::chrono::high_resolution_clock::now();
+                boost::chrono::steady_clock::time_point previousTime = repeatFrequencyLastTime;
+                repeatFrequencyLastTime = boost::chrono::steady_clock::now();
 
                 boost::chrono::nanoseconds executionTime = repeatFrequencyLastTime - previousTime;
 
@@ -119,7 +119,7 @@ void ADCController::process() {
 
                     nanosleep(&time, nullptr);
 
-                    repeatFrequencyLastTime = boost::chrono::high_resolution_clock::now();
+                    repeatFrequencyLastTime = boost::chrono::steady_clock::now();
                 }
                 //else
                 //    logStream << "ADCController::process - ADC measurements could not be completed in scheduled time" << std::endl;

@@ -47,7 +47,7 @@ PIDController::~PIDController() {
 //------------------------------------------------------------------------------
 double PIDController::compute(double setpoint, double processValue) {
     const SPIDTuning& pidTuning = determineGainSchedule(setpoint);
-    boost::chrono::high_resolution_clock::time_point currentExecutionTime = boost::chrono::high_resolution_clock::now();
+    boost::chrono::steady_clock::time_point currentExecutionTime = boost::chrono::steady_clock::now();
     double error = setpoint - processValue;
     double output = 0;
 
@@ -80,7 +80,7 @@ double PIDController::compute(double setpoint, double processValue) {
 //------------------------------------------------------------------------------
 void PIDController::reset() {
     _lock.lock();
-    _previousExecutionTime = boost::chrono::high_resolution_clock::time_point();
+    _previousExecutionTime = boost::chrono::steady_clock::time_point();
     _lock.unlock();
 }
 //------------------------------------------------------------------------------

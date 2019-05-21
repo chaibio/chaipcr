@@ -154,7 +154,7 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
         return OutOfStorageSpace;
     }
 
-    experiment.setStartedAt(boost::posix_time::microsec_clock::local_time());
+    experiment.setStartedTime();
 
     if (machineState() != IdleMachineState)
         return MachineRunning;
@@ -264,7 +264,8 @@ void ExperimentController::resume()
 
         _machineState = RunningMachineState;
 
-        _experiment.setPausedDuration(_experiment.pausedDuration() + (boost::posix_time::microsec_clock::local_time() - _experiment.lastPauseTime()).total_seconds());
+        _experiment.setPausedDuration(_experiment.pausedDuration() +
+                                      boost::chrono::duration_cast<boost::chrono::milliseconds>(boost::chrono::steady_clock::now() - _experiment.lastPauseTime()));
 
         _holdStepTimer->stop();
         _holdStepTimer->setStartInterval(0);
@@ -287,7 +288,7 @@ void ExperimentController::complete()
         OpticsInstance::getInstance()->stopCollectData();
 
         _experiment.setCompletionStatus(Experiment::Success);
-        _experiment.setCompletedAt(boost::posix_time::microsec_clock::local_time());
+        _experiment.setCompletedTime();
 
         _dbControl->completeExperiment(_experiment);
     }
@@ -310,7 +311,7 @@ void ExperimentController::stop()
         if (_machineState != CompleteMachineState)
         {
             _experiment.setCompletionStatus(Experiment::Aborted);
-            _experiment.setCompletedAt(boost::posix_time::microsec_clock::local_time());
+            _experiment.setCompletedTime();
 
             _dbControl->completeExperiment(_experiment);
         }
@@ -347,7 +348,7 @@ void ExperimentController::stop(const std::string &errorMessage)
 
         _experiment.setCompletionStatus(Experiment::Failed);
         _experiment.setCompletionMessage(errorMessage);
-        _experiment.setCompletedAt(boost::posix_time::microsec_clock::local_time());
+        _experiment.setCompletedTime();
 
         _dbControl->completeExperiment(_experiment);
 
@@ -495,7 +496,7 @@ void ExperimentController::stepBegun()
         }
         else
         {
-            _experiment.setPauseTime(boost::posix_time::microsec_clock::local_time());
+            _experiment.setPauseTime(boost::chrono::steady_clock::now());
             _machineState = PausedMachineState;
 
             onPause = true;
@@ -628,7 +629,7 @@ void ExperimentController::addLogCallback(Poco::Timer &)
             log.setRampId(_experiment.protocol()->currentRamp()->id());
 
         log.setCycleNum(_experiment.protocol()->currentStage()->currentCycle());
-        log.setElapsedTime((boost::posix_time::microsec_clock::local_time() - _experiment.startedAt()).total_milliseconds());
+        log.setElapsedTime(boost::chrono::duration_cast<boost::chrono::milliseconds>(boost::chrono::steady_clock::now() - _experiment.startedAtPoint()).count());
     }
 
     if (log.hasTemperatureInfo())
@@ -688,7 +689,7 @@ void ExperimentController::checkDataSpace(Poco::Timer &/*timer*/)
 void ExperimentController::calculateEstimatedDuration()
 {
     Experiment experiment = this->experiment();
-    double duration = (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_milliseconds() - (experiment.pausedDuration() * 1000);
+    double duration = boost::chrono::duration_cast<boost::chrono::milliseconds>((boost::chrono::steady_clock::now() - experiment.startedAtPoint()) - experiment.pausedDuration()).count();
     double previousTargetTemp = HeatBlockInstance::getInstance()->temperature();
 
     do
@@ -732,6 +733,6 @@ void ExperimentController::calculateEstimatedDuration()
 
     {
         Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
-        _experiment.setEstimatedDuration(std::round(duration / 1000));
+        _experiment.setEstimatedDuration(boost::chrono::milliseconds(boost::chrono::milliseconds::rep(duration)));
     }
 }

@@ -48,7 +48,7 @@ class HeatBlock : public IControl
     private:
         double _targetTemperature;
         double _rate;
-        boost::chrono::high_resolution_clock::time_point _lastChangesTime;
+        boost::chrono::steady_clock::time_point _lastChangesTime;
     };
 
 public:

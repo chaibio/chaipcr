@@ -20,6 +20,8 @@
 #define EXPERIMENT_H
 
 #include <string>
+
+#include <boost/chrono.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 
 class Protocol;
@@ -79,14 +81,20 @@ public:
     inline void setCompletionMessage(std::string &&message) {_completionMessage = std::move(message);}
     inline const std::string& completionMessage() const {return _completionMessage;}
 
-    inline std::time_t estimatedDuration() const { return _estimatedDuration; }
-    inline void setEstimatedDuration(std::time_t duration) { _estimatedDuration = duration; }
+    inline const boost::chrono::steady_clock::time_point& startedAtPoint() const { return _startedAtPoint; }
+    void setStartedAtPoint(const boost::chrono::steady_clock::time_point &time) { _startedAtPoint = time; }
 
-    inline std::time_t pausedDuration() const { return _pausedDuration; }
-    inline void setPausedDuration(std::time_t duration) { _pausedDuration = duration; }
+    inline const boost::chrono::steady_clock::time_point& completedAtPoint() const { return _startedAtPoint; }
+    void setCompletedAtPoint(const boost::chrono::steady_clock::time_point &time) { _startedAtPoint = time; }
 
-    inline const boost::posix_time::ptime& lastPauseTime() const { return _lastPauseTime; }
-    void setPauseTime(const boost::posix_time::ptime &time) { _lastPauseTime = time; }
+    inline const boost::chrono::milliseconds& estimatedDuration() const { return _estimatedDuration; }
+    inline void setEstimatedDuration(const boost::chrono::milliseconds &duration) { _estimatedDuration = duration; }
+
+    inline const boost::chrono::milliseconds& pausedDuration() const { return _pausedDuration; }
+    inline void setPausedDuration(const boost::chrono::milliseconds &duration) { _pausedDuration = duration; }
+
+    inline const boost::chrono::steady_clock::time_point& lastPauseTime() const { return _lastPauseTime; }
+    void setPauseTime(const boost::chrono::steady_clock::time_point &time) { _lastPauseTime = time; }
 
     inline bool isExtended() const { return _extendedState; }
     inline void setExtended(bool state) { _extendedState = state; }
@@ -99,6 +107,9 @@ public:
     void setProtocol(Protocol *protocol);
     inline Protocol* protocol() const {return _protocol;}
 
+    void setStartedTime();
+    void setCompletedTime();
+
 private:
     int _definationId;
     std::string _name;
@@ -110,9 +121,12 @@ private:
     CompletionStatus _completionStatus;
     std::string _completionMessage;
 
-    std::time_t _estimatedDuration;
-    std::time_t _pausedDuration;
-    boost::posix_time::ptime _lastPauseTime;
+    boost::chrono::steady_clock::time_point _startedAtPoint;
+    boost::chrono::steady_clock::time_point _completedAtPoint;
+
+    boost::chrono::milliseconds _estimatedDuration;
+    boost::chrono::milliseconds _pausedDuration;
+    boost::chrono::steady_clock::time_point _lastPauseTime;
 
     bool _extendedState;
     bool _stepBeganState;
