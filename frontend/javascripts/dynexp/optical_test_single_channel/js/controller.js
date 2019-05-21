@@ -41,9 +41,7 @@
           $scope.loop.push(i);
         }
 
-        $scope.$watch(function() {
-          return Status.getData();
-        }, function(data, oldData) {
+        $scope.$on('status:data:updated', function(e, data, oldData) {
           if (!data) return;
           if (!data.experiment_controller) return;
           if (!oldData) return;
