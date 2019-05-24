@@ -465,6 +465,9 @@ diff -Naur am335x-boneblack-emmc-overlay.dts am335x-boneblack-emmc-overlay.dts
 +					0x03c 0x0F  /* P8.15 PELTIER 2_INA gpio1_15, OUTPUT_PULLUP | MODE7 */
 +					0x02c 0x0F  /* P8.17 PELTIER 2_INB gpio0_27, OUTPUT_PULLUP | MODE7 */
 +					
++                                       /* LID Switch */
++                                       0x07c 0x27  /* P8.26 lid open/close sense - Input gpio1_2, INPUT_PULLDOWN | MODE7 */
++
 +					/* LED board GPIO */
 +					0x08c 0x17  /* P8.18 LED_DIGIPOT_CS gpio2_1, OUTPUT_PULLUP | MODE7 */
 +					0x030 0x17  /* P8.12 LED XLAT/LED_CONTROL_CS gpio1_12, OUTPUT_PULLUP | MODE7 */
@@ -680,8 +683,8 @@ diff -Naur am335x-boneblack-emmc-overlay.dts am335x-boneblack-emmc-overlay.dts
 +		irq-gpio = <&gpio1 17 0>;
 +	};
 +};
-+/*
-+&lcdc {
++
++/*&lcdc {
 +	status = "okay";
 +};*/
 \ No newline at end of file

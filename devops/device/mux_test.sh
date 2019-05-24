@@ -70,7 +70,7 @@ test_mux "pin 9.15" 840 00000007
 test_mux "pin 9.12" 878 00000007
 
 echo LID:
-#test_mux "pin 8.26" 994 00000033
+test_mux "pin 8.26 open/close sense - Input gpio1_2" 87c 00000027
 test_mux "pin 9.28"  99c 00000004
 
 echo Heatsink:
