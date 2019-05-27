@@ -6,12 +6,12 @@ INCLUDEPATH += ./server/
 INCLUDEPATH += ./util/
 INCLUDEPATH += ./db/
 INCLUDEPATH += ./test/
-INCLUDEPATH += ./libraries/include/
-INCLUDEPATH += ./libraries/include/soci #for internal SOCI use
-INCLUDEPATH += ./libraries/include/mysql
+INCLUDEPATH += /usr/include/
+INCLUDEPATH += /usr/local/include/soci #for internal SOCI use
+INCLUDEPATH += /usr/include/mysql
 INCLUDEPATH += $(BOOST_INCLUDE_PATH)
 
-LIBS += -L$$_PRO_FILE_PWD_/libraries/lib/
+LIBS += -L/usr/local/lib/
 
 #Poco
 LIBS += -lPocoFoundation
