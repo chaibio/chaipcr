@@ -55,7 +55,7 @@ public:
 };
 
 // Class QPCRApplication
-QPCRApplication::QPCRApplication(): Watchdog::Watchable("Main")
+QPCRApplication::QPCRApplication(): Watchdog::Watchable("Main"), _disable_watchdog(false)
 {
 
 }
@@ -77,6 +77,9 @@ int QPCRApplication::getUserId(const std::string &token) const
 void QPCRApplication::defineOptions(OptionSet &options)
 {
     options.addOption(Option("enable_log_file", "flog", "enables log files", false, "path", true));
+    options.addOption(Option("no_whachdog", "nwd", "disables watchdogs")
+		.required(false)
+		.repeatable(false));
 
     ServerApplication::defineOptions(options);
 }
@@ -91,11 +94,14 @@ void QPCRApplication::handleOption(const string &name, const string &value)
 
         setLogger(Logger::get());
     }
+    if (name == "no_whachdog")
+    {
+	_disable_watchdog=true;
+    }
 }
 
 void QPCRApplication::initialize(Application&) {
     _workState = false;
-
     try {
         if (!Logger::isSetup())
         {
@@ -160,7 +166,12 @@ int QPCRApplication::main(const vector<string>&) {
 
         _workState = true;
 
-        Watchdog::start(); //Must be called after _workState is set because watchdog tracks this state
+	if(_disable_watchdog)
+	{
+	        APP_LOGGER << "Disable all watchdogs" << std::endl;
+	}
+        else
+		Watchdog::start(); //Must be called after _workState is set because watchdog tracks this state
 
         while (!waitSignal() && _workState) {
             checkin();

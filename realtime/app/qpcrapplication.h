@@ -115,6 +115,7 @@ private:
     sigset_t _signalsSet;
 
     std::atomic<bool> _workState;
+    std::atomic<bool> _disable_watchdog;
 
     MachineSettings _settings;
 
