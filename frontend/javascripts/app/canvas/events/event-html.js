@@ -53,7 +53,6 @@ angular.module("canvasApp").factory('htmlEvents', [
     };
 
     this.mouseLeaveEventHandler = function() {
-        console.log(kanvas);
         if (kanvas.editStageStatus === false) {
             if (previouslyHoverd.step) {
               previouslyHoverd.step.closeImage.setOpacity(false);

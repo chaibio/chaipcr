@@ -74,16 +74,19 @@ angular.module("canvasApp").factory('mouseOver', [
         me = evt.target.me;
 
         if(ParentKanvas.editStageStatus === false) {
+          if(originalScope.protocol.protocol.stages.length == 1 && originalScope.protocol.protocol.stages.stage.steps.length == 1){
+            me.closeImage.animate('opacity', 0, {
+              duration: 400,
+              onChange: ParentKanvas.canvas.renderAll.bind(ParentKanvas.canvas),            
+            });
+          } else {
+            me.closeImage.animate('opacity', 1, {
+              duration: 400,
+              onChange: ParentKanvas.canvas.renderAll.bind(ParentKanvas.canvas),            
+            });
+          }
 
-          me.closeImage.animate('opacity', 1, {
-            duration: 400,
-            onChange: ParentKanvas.canvas.renderAll.bind(ParentKanvas.canvas),
-            
-          });
-
-          //me.closeImage.setVisible(true);
           if(previouslyHoverd.step && (me.model.id !== previouslyHoverd.step.model.id)) {
-            //previouslyHoverd.step.closeImage.setVisible(false);
             previouslyHoverd.step.closeImage.animate('opacity', 0, {
               duration: 400,
               onChange: ParentKanvas.canvas.renderAll.bind(ParentKanvas.canvas),
