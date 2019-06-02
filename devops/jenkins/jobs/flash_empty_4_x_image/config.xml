@@ -48,7 +48,7 @@ df -h
 echo user: $(whoami)
 ping google.com -c 10
 echo Checking for nessasery packages:
-sudo apt-get -y -q install sshpass parted mdadm
+sudo apt-get -y -q install sshpass parted mdadm --allow-unauthenticated
 
 sudo chmod 777      /var/lib/jenkins/.ssh/known_hosts
 ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
@@ -237,7 +237,12 @@ pkill julia;pkill julia;pkill julia;pkill julia;pkill julia;pkill julia;pkill ju
 
 echo disable swapping
 free -m
-swapoff -a
+while ! swapoff -a
+do
+     sleep 10
+     sync
+     free -m
+done
 
 umount /dev/mmcblk0p*
 umount /sdcard/*
@@ -291,7 +296,8 @@ ping google.com -c 10
 apt-get update
 apt-get install -f -y -q
 
-apt-get install xz-utils parted  -y -q  || exit 1
+apt-get install xz-utils -y -q --allow-unauthenticated 
+apt-get install parted  -y -q --allow-unauthenticated 
 apt-get install -f -y -q
 
 echo wrting to sdcard
@@ -327,6 +333,11 @@ sync
 #apt-get install -y -q parted
 blockdev --flushbufs /dev/mmcblk0
 partprobe /dev/mmcblk0
+sfdisk -R /dev/mmcblk0
+udevadm trigger --subsystem-match=block; udevadm settle
+blockdev --rereadpt /dev/mmcblk0
+hdparm -z /dev/mmcblk0
+
 echo patching sdcard
 mount /dev/mmcblk0p1 /mnt  || exit 1
 cd /mnt/opt/scripts/tools/eMMC/

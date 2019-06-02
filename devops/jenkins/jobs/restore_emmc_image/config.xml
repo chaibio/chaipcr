@@ -181,7 +181,13 @@ echo installing missing packages.
 apt-get update
 echo installing parted.
 apt-get install parted -y -q
+
+blockdev --flushbufs /dev/mmcblk0
 partprobe /dev/mmcblk0
+sfdisk -R /dev/mmcblk0
+udevadm trigger --subsystem-match=block; udevadm settle
+blockdev --rereadpt /dev/mmcblk0
+hdparm -z /dev/mmcblk0
 
 if LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
 ,,0xe,*
@@ -190,15 +196,31 @@ then
 	echo SDCard formatted!
 else
 	echo error formatting SDCard. retrying..
+        blockdev --flushbufs /dev/mmcblk0
         partprobe /dev/mmcblk0
+        sfdisk -R /dev/mmcblk0
+        udevadm trigger --subsystem-match=block; udevadm settle
+        blockdev --rereadpt /dev/mmcblk0
+        hdparm -z /dev/mmcblk0
+
         dd if=/dev/zero of=/dev/mmcblk0 bs=51200 count=1000
         sync
+        blockdev --flushbufs /dev/mmcblk0
         partprobe /dev/mmcblk0
+        sfdisk -R /dev/mmcblk0
+        udevadm trigger --subsystem-match=block; udevadm settle
+        blockdev --rereadpt /dev/mmcblk0
+        hdparm -z /dev/mmcblk0
  LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
 ,,0xe,*
 __EOF__
         mkfs.ext4 /dev/mmcblk0p1
+        blockdev --flushbufs /dev/mmcblk0
         partprobe /dev/mmcblk0
+        sfdisk -R /dev/mmcblk0
+        udevadm trigger --subsystem-match=block; udevadm settle
+        blockdev --rereadpt /dev/mmcblk0
+        hdparm -z /dev/mmcblk0
 
 if LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
 ,,0xe,*
@@ -211,7 +233,13 @@ __EOF__
        fi
 fi
 
+blockdev --flushbufs /dev/mmcblk0
 partprobe /dev/mmcblk0
+sfdisk -R /dev/mmcblk0
+udevadm trigger --subsystem-match=block; udevadm settle
+blockdev --rereadpt /dev/mmcblk0
+hdparm -z /dev/mmcblk0
+
 echo Formatting..
 
 if command mkfs.fat
