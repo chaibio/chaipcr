@@ -74,7 +74,7 @@ angular.module("canvasApp").factory('mouseOver', [
         me = evt.target.me;
 
         if(ParentKanvas.editStageStatus === false) {
-          if(originalScope.protocol.protocol.stages.length == 1 && originalScope.protocol.protocol.stages[0].stage.steps.length == 1){
+          if(ParentKanvas.allStepViews.length == 1){
             me.closeImage.animate('opacity', 0, {
               duration: 400,
               onChange: ParentKanvas.canvas.renderAll.bind(ParentKanvas.canvas),            

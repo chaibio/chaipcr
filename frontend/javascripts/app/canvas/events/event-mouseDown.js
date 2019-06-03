@@ -113,15 +113,21 @@ angular.module("canvasApp").factory('mouseDown', [
     };
 
     this.deleteStepHandler = function(evt) {
-
+      if(!ExperimentLoader.isDeleting){
+        ExperimentLoader.isDeleting = true;
         me  = evt.target.me;
         parentEventReference.selectStep(me.circle);
+        ExperimentLoader.deletedItem = me;
         ExperimentLoader.deleteStep(originalScope)
         .then(function(data) {
-          console.log("deleted", data);
-          me.parentStage.deleteStep({}, me);
+          ExperimentLoader.deletedItem.parentStage.deleteStep({}, ExperimentLoader.deletedItem);
           ParentKanvas.canvas.renderAll();
+          ExperimentLoader.isDeleting = false;
+        })
+        .catch(function(data){
+          ExperimentLoader.isDeleting = false;
         }); 
+      }
     };
 
     this.moveStageHandler = function(evt) {

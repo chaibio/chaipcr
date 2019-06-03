@@ -27,7 +27,8 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
 
     this.protocol = {};
     this.index = 0;
-    this.deleted_step_ids = [];
+    this.isDeleting = false;
+    this.deletedItem = {};
 
     this.getExperiment = function() {
 
@@ -200,21 +201,16 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
       var that = this,
       url = "/steps/" + $scope.step.id,
       delay = $q.defer();
+      var step_id = $scope.step.id;
 
-      if(this.deleted_step_ids.indexOf($scope.step.id) < 0){
-        this.deleted_step_ids.push($scope.step.id);
-        $http.delete(url)
-          .success(function(data) {
-            that.deleted_step_ids.slice(that.deleted_step_ids.indexOf($scope.step.id), 1);
-            delay.resolve(data);
-          })
-          .error(function(data) {
-            delay.reject(data);
-          }
-        );
-      } else {
-        delay.reject({});
-      }
+      $http.delete(url)
+        .success(function(data) {
+          delay.resolve(step_id);
+        })
+        .error(function(data) {
+          delay.reject(0);
+        }
+      );
       return delay.promise;
     };
 
