@@ -114,6 +114,7 @@ angular.module("canvasApp").factory('mouseDown', [
 
     this.deleteStepHandler = function(evt) {
       if(!ExperimentLoader.isDeleting){
+        angular.element('.canvas-in-progress').show();
         ExperimentLoader.isDeleting = true;
         me  = evt.target.me;
         parentEventReference.selectStep(me.circle);
@@ -123,9 +124,11 @@ angular.module("canvasApp").factory('mouseDown', [
           ExperimentLoader.deletedItem.parentStage.deleteStep({}, ExperimentLoader.deletedItem);
           ParentKanvas.canvas.renderAll();
           ExperimentLoader.isDeleting = false;
+          angular.element('.canvas-in-progress').hide();
         })
         .catch(function(data){
           ExperimentLoader.isDeleting = false;
+          angular.element('.canvas-in-progress').hide();
         }); 
       }
     };
