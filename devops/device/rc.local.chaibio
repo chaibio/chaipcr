@@ -571,26 +571,44 @@ update_ethernet_network () {
 }
 
 create_swapfile () {
-	echo creating a temporary swap file on sdcard
-	if [ ! -e /sdcard/upgrade/swapfile ]
-	then
-		if fallocate -l 1G /sdcard/upgrade/swapfile #or dd if=/dev/zero of=/sdcard/upgrade/swapfile bs=10M count=300
-		then
-		    echo "swap file created successfully"
-		else
-   			echo "failed creating swap file"
-   			return
-		fi
-	fi
+        swapfile=/sdcard/upgrade/swapfile
+        freespace=$(($(stat -f --format="%a*%S" /tmp)))
+        swapsize=$((freespace-50000000))        # 47.8MB of margine
+        if [ $swapsize -gt 536870912 ]          # capped to 512MB
+        then
+                echo capping swap file to 512MB
+                swapsize=536870912
+        fi
 
-	sudo chmod 600 /sdcard/upgrade/swapfile
-	sudo mkswap /sdcard/upgrade/swapfile
-	sudo swapon /sdcard/upgrade/swapfile
+        echo "swap file size (bytes) $swapsize"
+        if [ $swapsize -lt 157286400 ]  # Minimum of 150M
+        then
+                echo No free space for the swap file under /tmp.
+                echo creating a temporary swap file on sdcard
+                swapsize=1G
+        else
+                echo creating swap file under /tmp.
+                swapfile=/tmp/swapfile
+        fi
 
-	echo verifying swap file is successfully added
-	sudo swapon -s
+        if [ ! -e $swapfile ]
+        then
+                if fallocate -l $swapsize $swapfile
+                then
+                        echo "swap file created successfully"
+                else
+                        echo "failed creating swap file"
+                        return
+                fi
+        fi
 
-	free -m
+        sudo chmod 600 $swapfile
+        sudo mkswap $swapfile
+        sudo swapon $swapfile
+
+        echo verifying swap file is successfully added to $swapfile
+        sudo swapon -s
+        free -m
 }
 
 check_upgrade_autorun () {
