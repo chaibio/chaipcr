@@ -225,7 +225,11 @@ function prep_adj_w2wvaf(
             push!(stop_msgs, "Calibration data lengths are not equal for channel $(key)")
         end
     end
-    (length(stop_msgs) > 0) && error(join(stop_msgs, ""))
+    #(length(stop_msgs) > 0) && error(join(stop_msgs, ""))
+    if length(stop_msgs) > 0
+        msg = join(stop_msgs, "")
+        return ErrorException(msg)
+    end
     channels_in_water, channels_in_signal =
         (water_data_dict, signal_data_dict) |> map[get_ordered_keys]
     ## assume without checking that there are no missing wells anywhere
@@ -240,7 +244,11 @@ function prep_adj_w2wvaf(
             push!(stop_msgs, "Invalid well-to-well variation data in channel $channel: fluorescence value of water is greater than or equal to that of dye in the following well(s) - $failed_well_nums_str. ")
         end # if invalid
     end # next channel
-    (length(stop_msgs) > 0) && error(join(stop_msgs, ""))
+    if length(stop_msgs) > 0
+        msg = join(stop_msgs, "")
+        return ErrorException(msg)
+    end
+    #(length(stop_msgs) > 0) && error(join(stop_msgs, ""))
 
     ## issue:
     ## this feature has been temporarily disabled while
