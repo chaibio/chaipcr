@@ -1,12 +1,13 @@
 QT -= core gui network
 
+OBJECTS_DIR = tmp
 INCLUDEPATH += ./app/
 INCLUDEPATH += ./control/
 INCLUDEPATH += ./server/
 INCLUDEPATH += ./util/
 INCLUDEPATH += ./db/
 INCLUDEPATH += ./test/
-INCLUDEPATH += /usr/include/
+#INCLUDEPATH += /usr/include/
 INCLUDEPATH += /usr/local/include/soci #for internal SOCI use
 INCLUDEPATH += /usr/include/mysql
 INCLUDEPATH += $(BOOST_INCLUDE_PATH)
@@ -27,8 +28,6 @@ LIBS += -lPocoJSON
 #SOCI
 LIBS += -lsoci_core
 
-#LIBS += -lsqlite3
-#LIBS += -lsoci_sqlite3
 LIBS += -lmysqlclient
 LIBS += -lsoci_mysql
 
