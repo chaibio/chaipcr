@@ -2311,7 +2311,9 @@ ilitek_init(
 	// register i2c device
 	ret = ilitek_i2c_register_device();
 	if(ret < 0){
-		printk(ILITEK_ERROR_LEVEL "%s, register i2c device, error\n", __func__);
+		printk(ILITEK_ERROR_LEVEL "%s, register i2c device, error (%d)\n", __func__, ret);
+		i2c_del_driver(&ilitek_i2c_driver);
+	        i2c.wr_sem.count = 0;
 		return ret;
 	}
 
