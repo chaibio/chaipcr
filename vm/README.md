@@ -20,34 +20,32 @@ First install these applications:
 
 ## Procedure
 
-1. Clone the _chaipcr_ repo:
->`git clone https://github.com/chaibio/chaipcr.git`
+1. Clone the _chaipcr_ repo:  
+`git clone https://github.com/chaibio/chaipcr.git`
     
-2. Check the specifications of the virtual machine:
->`cd chaipcr/vm`  
->`kitchen list`
+2. Check the specifications of the virtual machine:  
+`cd chaipcr/vm`  
+`kitchen list`
 
-3. Create the virtual machine:
->`kitchen create`
+3. Create the virtual machine:  
+`kitchen create`
 
-4. Check that the virtual machine is present on VirtualBox and		 configured as expected.
+4. Check that the virtual machine is present on VirtualBox and configured as expected.
 
-5. Install the _chaipcr_ development environment:
->`kitchen converge`
+5. Install the _chaipcr_ development environment:  
+`kitchen converge`
 
-6. Run some automated tests on the environment:
->`kitchen verify`
+6. Run some automated tests on the environment:  
+`kitchen verify`
 
-6. Log in to the test machine as user _vagrant_ (no password required) and check that `MySql` is running:
->`kitchen exec -c 'uname -a'  
->`kitchen login`  
->`mysql -u root`
+6. Log in to the test machine as user _vagrant_ (no password required) and check that `MySql` is running:  
+`kitchen exec -c 'uname -a'`  
+`kitchen login master-ubuntu-1604`  
+`mysql -u root`  
 
-7. Manually test the Rails app:
->`curl --include http://localhost:3000`
+7. Manually test the Rails app:  
+`curl --include http://localhost:3000`
 
-8. Remove the VM when you have finished, and check that all the VM instances are gone:
->`kitchen destroy`  
->`vagrant global-status`
-    
-
+8. Remove the VM when you have finished, and check that all the VM instances are gone:  
+`kitchen destroy`  
+`vagrant global-status`
