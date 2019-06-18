@@ -62,10 +62,12 @@
           }
 
           if ($scope.state === 'idle' && $scope.old_state === 'idle' && $state.current.name === 'exp-running') {
-            getExperiment(data.experiment_controller.experiment.id);
-            if ($scope.experiment.completion_status === 'failure') {
-              $state.go('optical_test_1ch.optical_test_1ch.analyze', { id: $scope.experiment.id });
-            }
+            getExperiment(data.experiment_controller.experiment.id, function(exp){
+              $scope.experiment = exp;
+              if ($scope.experiment.completion_status) {
+                $state.go('optical_test_1ch.optical_test_1ch.analyze', { id: $scope.experiment.id });
+              }
+            });
           }
 
           if ($state.current.name === 'optical_test_1ch.analyze') Status.stopSync();
@@ -86,14 +88,16 @@
 
         $scope.checkMachineStatus = function() {
 
-          DeviceInfo.getInfo($scope.check).then(function(deviceStatus) {
+          Status
+            .fetch()
+            .then(function(deviceStatus) {
             // Incase connected
             if ($scope.modal) {
               $scope.modal.close();
               $scope.modal = null;
             }
 
-            if (deviceStatus.data.optics.lid_open === "true" || deviceStatus.data.lid.open === true) { // lid is open
+            if (deviceStatus.optics.lid_open === "true" || deviceStatus.lid.open === true) { // lid is open
               $scope.error = true;
               $scope.lidMessage = "Close lid to begin.";
             } else {
