@@ -668,21 +668,21 @@ diff -Naur am335x-boneblack-emmc-overlay.dts am335x-boneblack-emmc-overlay.dts
 +	};
 +};
 +    
-+&i2c2 {
++//&i2c2 {
 +       /* needed to avoid gripping by DTC */
-+       #address-cells = <1>;
-+       #size-cells = <0>;
++//       #address-cells = <1>;
++//       #size-cells = <0>;
 +
-+	ili2139c@41 {
-+        	compatible = "ilitek,ilitek_i2c";
-+		reg = <0x41>;
++//	ili2139c@41 {
++//        	compatible = "ilitek,ilitek_i2c";
++//		reg = <0x41>;
 +		// for kernel 3.8 the gpio controllers are indexed from 1
 +		// for kernel 4.9 the gpio controllers are indexed from 0
-+		interrupt-parent = <&gpio1>;
-+		interrupts = <17 0x0>;
-+		irq-gpio = <&gpio1 17 0>;
-+	};
-+};
++//		interrupt-parent = <&gpio1>;
++//		interrupts = <17 0x0>;
++//		irq-gpio = <&gpio1 17 0>;
++//	};
++//};
 +
 +/*&lcdc {
 +	status = "okay";

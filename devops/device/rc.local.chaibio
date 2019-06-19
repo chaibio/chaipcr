@@ -734,6 +734,11 @@ network_watchdog_interfaces() {
         	        echo Invalid interface $interface
 	                continue
         	fi
+                if echo "$interface" | grep -q "usb"
+                then
+                        echo For $interface there should be no dhcp discovery. The instrument is the dhcp server on that interface.
+                        continue
+                fi
 	        echo "Network watchdog for interface: $interface"
 		network_watchdog_interface $interface &
 	done
