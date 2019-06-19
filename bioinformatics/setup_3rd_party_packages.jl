@@ -1,8 +1,7 @@
-# setup_3rd_party_packages.jl
+## setup_3rd_party_packages.jl
 #
-# installs julia packages
-# julia version is 0.6.2
-#
+## installs julia packages
+## julia version is 0.6.2
 
 ## some annotations
 ## Tom Price December 2018
@@ -98,6 +97,7 @@ install("HttpServer", v"0.2.0", v"0.2.1-")
 install("Dierckx", v"0.3.0", v"0.3.1-")
 install("DataArrays", v"0.7.0", v"0.7.1-")
 install("FactCheck", v"0.4.3", v"0.4.4-") # for testing and precompiling
+install("MicroLogging", v"0.2.0", v"0.2.0-")
 
 # install("NLopt", v"0.3.6", v"0.3.7-")
 # install("ProfileView", v"0.3.0", v"0.3.1-")

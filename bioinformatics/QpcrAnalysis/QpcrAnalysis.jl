@@ -44,13 +44,28 @@ const LOAD_FROM_DIR = LOAD_PATH[find(LOAD_PATH) do path_
     isfile("$path_/$MODULE_NAME.jl")
 end][1] # slice by boolean vector returned a one-element vector. Assumption: LOAD_PATH is global
 
+## delete temporary log files if this is the only julia process
+cd("/tmp")
+if eachmatch(r"julia", read(`ps -eo comm`, String)) |> collect |> length == 1
+    foreach(rm, filter(x -> match(r"^julia", x) != nothing, readdir()))
+end
+
+## set up logger
+using MicroLogging
+logger = SimpleLogger(open(tempname(), "w"))
+# global_logger(MicroLogging.configure_logging(logger, min_level=:debug))
+@info(string(now()) * " global logger constructed in module QpcrAnalysis\n")
+
 ## default data width in production mode:  32 bits (BBB)
 ## default data width in development mode: 64 bits
-if (get(ENV, "JULIA_ENV", nothing)!="production")
-	const Float_T	= Float32
+const production_env = (get(ENV, "JULIA_ENV", nothing) == "production")
+if !production_env
+    const Float_T   = Float32
 else
-	const Float_T 	= Float64
+    const Float_T   = Float64
 end
+@info(string(now()) * " Julia is running in " *
+    (production_env ? "production" : "development") * " mode\n")
 
 ## include each script, generally in the order of workflow
 
@@ -70,16 +85,16 @@ include("constants.jl")
 include("shared.jl")
 
 ## this code is hidden from the parser on the BeagleBone
-@static if (get(ENV, "JULIA_ENV", nothing)!="production")
-	## development & testing
-	import Base.Test
-	using FactCheck
-	FactCheck.clear_results()
+@static if !production_env
+    ## development & testing
+    import Base.Test
+    using FactCheck
+    FactCheck.clear_results()
 
-	## data format verification
-	include("../test/verify_request.jl")
-	include("../test/verify_response.jl")
-	include("../test/test_functions.jl")
+    ## data format verification
+    include("../test/verify_request.jl")
+    include("../test/verify_response.jl")
+    include("../test/test_functions.jl")
 end
 
 ## dispatch
@@ -121,4 +136,5 @@ include("analyze_customized/thermal_consistency.jl")
 #
 # include("pnmsmu.jl")
 
-end # module QpcrAnalysis
+@debug(string(now()) * " module QpcrAnalysis loaded\n")
+end ## module QpcrAnalysis

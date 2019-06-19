@@ -2,6 +2,7 @@
 
 import JSON: parse, json
 import DataStructures.OrderedDict
+using MicroLogging
 
 
 function dispatch(
@@ -11,7 +12,8 @@ function dispatch(
     verbose ::Bool =false,
     verify  ::Bool =false
 )
-    result = try
+    @debug(string(now()) * " at dispatch() with action $action\n"
+    const result = try
 
         ## NB. DefaultDict and DefaultOrderedDict constructors sometimes don't work on OrderedDict
         ## (https://github.com/JuliaLang/DataStructures.jl/issues/205)
@@ -26,53 +28,65 @@ function dispatch(
         ## this should generally be done in the generic act() methods.
 
         if !(action in keys(Action_DICT))
-            error("action $action is not found")
+            const err_msg0 = "action $action is not found"
+            error(err_msg0)
+            @error(string(now()) * " $err_msg0\n")
         end
 
         ## else
-        action_t = Action_DICT[action]()
+        const action_t = Action_DICT[action]()
 
-	@static if (get(ENV, "JULIA_ENV", nothing)!="production")
+    const production_env = (get(ENV, "JULIA_ENV", nothing) == "production")
+    @static if !production_env
             ## this code is hidden from the parser on the BeagleBone
             if (verify)
-                verify_input = try
+                const verify_input = try
                     verify_request(action_t, req_parsed)
                 catch err
-                    error("data supplied with $action request is in the wrong format")
+                    const err_msg1 = "data supplied with $action request is in the wrong format"
+                    error(err_msg1)
+                    @error(string(now()) * " $err_msg1\n")
                 end
             end
         end
 
-        response = act(action_t, req_parsed; out_format=:pre_json, verbose=verbose)
-        json_response=JSON.json(response)
+        @debug(string(now()) * " dispatching to act()\n")
+        const response = act(action_t, req_parsed; out_format=:pre_json, verbose=verbose)
+        @debug(string(now()) * " response received from act()\n")
+        const json_response = JSON.json(response)
 
-	@static if (get(ENV, "JULIA_ENV", nothing)!="production")
+    @static if !production_env
             ## this code is hidden from the parser on the BeagleBone
             if (verify)
-                verify_output = try
-                    verify_response(action_t,JSON.parse(json_response,dicttype=OrderedDict))
+                const verify_output = try
+                    verify_response(action_t, JSON.parse(json_response, dicttype=OrderedDict))
                 catch err
-                   error("data returned from $action request is in the wrong format")
+                    const err_msg2 = "data returned from $action request is in the wrong format"
+                    error(err_msg2)
+                    @error(string(now()) * " $err_msg2\n")
                 end
             end
         end
 
+        ## return value
         json_response
 
     catch err
         err
     end
 
-    success = !isa(result, Exception)
-    response_body =
-        success ?
-            string(result) :
+    const success = !isa(result, Exception)
+    const response_body =
+        if success
+            string(result)
+        else
             string(JSON.json(Dict(
                 :valid => false,
                 :error => repr(result))))
-
+        end
+    @debug(string(now()) * " returning from dispatch()\n")
     return (success, response_body)
-end # dispatch
+end ## dispatch
 
 
 ## get keyword arguments from request
@@ -81,8 +95,8 @@ function get_kw_from_req(key_vec ::AbstractVector, req_dict ::Associative)
     for key in key_vec
         if haskey(req_dict, key)
             push!(pair_vec, Symbol(key) => req_dict[key])
-        end # if
-    end # for
+        end ## if
+    end ## for
     return OrderedDict(pair_vec)
 end
 
@@ -100,14 +114,14 @@ function args2reqb(
     baseline_cyc_bounds ::AbstractVector =[],
     guid ::String ="",
     extra_args ::OrderedDict =OrderedDict(),
-    wdb ::String ="dflt", # "handle", "dflt", "connect"
-    db_key ::String ="default", # "default", "t1", "t2"
+    wdb ::String ="dflt", ## "handle", "dflt", "connect"
+    db_key ::String ="default", ## "default", "t1", "t2"
     db_host ::String ="localhost",
     db_usr ::String ="root",
     db_pswd ::String ="",
     db_name ::String ="chaipcr",
 )
-    reqb = OrderedDict{typeof(""),Any}("calibration_info"=>calib_info)
+    reqb = OrderedDict{typeof(""), Any}("calibration_info" => calib_info)
 
     if action == "amplification"
         reqb["experiment_id"] = exp_id
@@ -150,10 +164,7 @@ function args2reqb(
     end
 
     return json(reqb)
-
-end # args2reqb
-
-
+end ## args2reqb
 
 
 
@@ -161,4 +172,5 @@ end # args2reqb
 function test0()
     println(guids)
 end
+
 #
