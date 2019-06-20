@@ -14,10 +14,10 @@ struct SfcFitted <: AbstractAmpFitted
     init_coefs  ::OrderedDict{String,Float_T}
 end
 const SfcFitted_EMPTY = SfcFitted(
-    Vector{String}(), # coef_strs
-    zeros(0), # coefs
-    :not_fitted, # status
-    0.0, # obj_val
+    Vector{String}(),   ## coef_strs
+    zeros(0),           ## coefs
+    :not_fitted,        ## status
+    0.0,                ## obj_val
     JuMP.Model(),
     OrderedDict{String,Float_T}() # init_coefs
 )
@@ -47,19 +47,19 @@ function empty_func(args...; kwargs...) end
 
 ## `EMPTY_fp` for `func_pred_strs` and `funcs_pred`
 const EMPTY_fp = map(("", empty_func)) do empty_val
-    ## OrderedDict(map(MD_func_keys) do func_key # v0.4, `supertype` not defined, `typeof(some_function) == Function`
-    OrderedDict{Symbol,supertype(typeof(empty_val))}(map(MD_func_keys) do func_key # v0.5, `super` becomes `supertype`, `typeof(some_function) == #some_function AND supertype(typeof(some_function)) == Function`
+    # OrderedDict(map(MD_func_keys) do func_key ## v0.4, `supertype` not defined, `typeof(some_function) == Function`
+    OrderedDict{Symbol,supertype(typeof(empty_val))}(map(MD_func_keys) do func_key ## v0.5, `super` becomes `supertype`, `typeof(some_function) == some_function AND supertype(typeof(some_function)) == Function`
         func_key => empty_val
-    end) # do func_key
-end # do empty_val
+    end) ## do func_key
+end ## do empty_val
 
 const MD_EMPTY_vals = (
-    EMPTY_fp..., # :func_pred_strs, :funcs_pred
-    "", # func_fit_str
-    empty_func # func_fit
+    EMPTY_fp...,    ## :func_pred_strs, :funcs_pred
+    "",             ## func_fit_str
+    empty_func      ## func_fit
 )
 
-const SFC_MODEL_BASES = [ # vector of tuples
+const SFC_MODEL_BASES = [ ## vector of tuples
 
 ## generic
 
@@ -94,7 +94,7 @@ const SFC_MODEL_BASES = [ # vector of tuples
         end,
         OrderedDict(
             :f   => "c0 + c1 * _x1 + c2 * _x2",
-            :inv => "0", # not applicable
+            :inv => "0", ## not applicable
             :bl  => "0",
             :dr1 => "[c1, c2]",
             :dr2 => "[0, 0]"
@@ -102,7 +102,7 @@ const SFC_MODEL_BASES = [ # vector of tuples
     ),
 
 
-# amplification curve
+## amplification curve
 
     (
         :b4,
@@ -139,12 +139,12 @@ const SFC_MODEL_BASES = [ # vector of tuples
     ),
 
     (
-        :l4, # name
-        false, # linear
+        :l4, ## name
+        false, ## linear
         ["_x"],
         ["X"],
-        ["b_", "c_", "d_", "e_"], # coef_strs
-        ["e_ >= 1e-100"], # removing bound did not improve Cq accuracy
+        ["b_", "c_", "d_", "e_"], ## coef_strs
+        ["e_ >= 1e-100"], ## removing bound did not improve Cq accuracy
         function l4_func_init_coefs(
             X::AbstractVector,
             Y::AbstractVector,
@@ -161,7 +161,7 @@ const SFC_MODEL_BASES = [ # vector of tuples
             e_ = exp(-lin1_coefs[1] / b_)
             return OrderedDict("b_"=>b_, "c_"=>c_, "d_"=>d_, "e_"=>e_)
         end,
-        OrderedDict( # pred_strs
+        OrderedDict( ## pred_strs
             :f   => "c_ + (d_ - c_) / (1 + exp(b_ * (log(_x) - log(e_))))",
             :inv => "((e_^b_ * (-d_ + _x))/(c_ - _x))^(1/b_)",
             :bl  => "c_",
@@ -172,7 +172,7 @@ const SFC_MODEL_BASES = [ # vector of tuples
     ),
 
     (
-        :l4_hbl, # hyperbolic baseline: increase before log-phase then minimal at plateau (most simple version is -1/x). baseline model `c + bl_k / (e_ - x)` model caused "Ipopt finished with status Restoration_Failed"
+        :l4_hbl, ## hyperbolic baseline: increase before log-phase then minimal at plateau (most simple version is -1/x). baseline model `c + bl_k / (e_ - x)` model caused "Ipopt finished with status Restoration_Failed"
         false,
         ["_x"],
         ["X"],
@@ -199,10 +199,10 @@ const SFC_MODEL_BASES = [ # vector of tuples
                 "bl_k"=>bl_k, "bl_o"=>bl_o
             )
         end,
-        OrderedDict( # pred_strs
+        OrderedDict( ## pred_strs
             :f   =>
                 "c_ + bl_k / (_x + bl_o) + (d_ - c_) / (1 + exp(b_ * (log(_x) - log(e_))))",
-            :inv => "0", # not calculated yet
+            :inv => "0", ## not calculated yet
             :bl  => "c_ + bl_k / (_x + bl_o)",
             :dr1 =>
                 "-bl_k / (_x + bl_o)^2 + (b_ * (c_ - d_) * e_^b_ * _x^(-1 + b_)) / (e_^b_ + _x^b_)^2",
@@ -212,7 +212,7 @@ const SFC_MODEL_BASES = [ # vector of tuples
     ),
 
     (
-        :l4_lbl, # linear baseline
+        :l4_lbl, ## linear baseline
         false,
         ["_x"],
         ["X"],
@@ -238,10 +238,10 @@ const SFC_MODEL_BASES = [ # vector of tuples
                 "k1"=>k1
             )
         end,
-        OrderedDict( # pred_strs
+        OrderedDict( ## pred_strs
             :f   =>
                 "c_ + k1 * _x + (d_ - c_) / (1 + exp(b_ * (log(_x) - log(e_))))",
-            :inv => "0", # not calculated yet
+            :inv => "0", ## not calculated yet
             :bl  => "c_ + k1 * _x",
             :dr1 =>
                 "k1 + (b_ * (c_ - d_) * e_^b_ * _x^(-1 + b_)) / (e_^b_ + _x^b_)^2",
@@ -251,7 +251,7 @@ const SFC_MODEL_BASES = [ # vector of tuples
     ),
 
     (
-        :l4_qbl, # quadratic baseline
+        :l4_qbl, ## quadratic baseline
         false,
         ["_x"],
         ["X"],
@@ -278,10 +278,10 @@ const SFC_MODEL_BASES = [ # vector of tuples
                 "k1"=>k1, "k2"=>k2
             )
         end,
-        OrderedDict( # pred_strs
+        OrderedDict( ## pred_strs
             :f   =>
                 "c_ + k1 * _x + k2 * _x^2 + (d_ - c_) / (1 + exp(b_ * (log(_x) - log(e_))))",
-            :inv => "0", # not calculated yet
+            :inv => "0", ## not calculated yet
             :bl  => "c_ + k1 * _x + k2 * _x^2",
             :dr1 =>
                 "k1 + 2 * k2 * _x + (b_ * (c_ - d_) * e_^b_ * _x^(-1 + b_)) / (e_^b_ + _x^b_)^2",
@@ -291,8 +291,8 @@ const SFC_MODEL_BASES = [ # vector of tuples
     ),
 
     (
-        :l4_enl, # name
-        false, # linear
+        :l4_enl, ## name
+        false, ## linear
         ["_x"],
         ["X"],
         ["b_", "c_", "d_", "e_"], # coef_strs
@@ -321,7 +321,7 @@ const SFC_MODEL_BASES = [ # vector of tuples
             end
             return OrderedDict("b_"=>b_, "c_"=>c_, "d_"=>d_, "e_"=>e_)
         end,
-        OrderedDict( # pred_strs
+        OrderedDict( ## pred_strs
             :f   => "c_ + (d_ - c_) / (1 + exp(b_ * (log(_x) - e_)))",
             :inv => "((exp(e_ * b_) * (-d_ + _x))/(c_ - _x))^(1/b_)",
             :bl  => "c_",
@@ -332,7 +332,7 @@ const SFC_MODEL_BASES = [ # vector of tuples
     ),
 
     (
-        :l4_enl_hbl, # hyperbolic baseline: increase before log-phase then minimal at plateau (most simple version is -1/x). baseline model `c + bl_k / (e_ - x)` model caused "Ipopt finished with status Restoration_Failed"
+        :l4_enl_hbl, ## hyperbolic baseline: increase before log-phase then minimal at plateau (most simple version is -1/x). baseline model `c + bl_k / (e_ - x)` model caused "Ipopt finished with status Restoration_Failed"
         false,
         ["_x"],
         ["X"],
@@ -359,10 +359,10 @@ const SFC_MODEL_BASES = [ # vector of tuples
                 "bl_k"=>bl_k, "bl_o"=>bl_o
             )
         end,
-        OrderedDict( # pred_strs
+        OrderedDict( ## pred_strs
             :f   =>
                 "c_ + bl_k / (_x + bl_o) + (d_ - c_) / (1 + exp(b_ * (log(_x) - e_)))",
-            :inv => "0", # not calculated yet
+            :inv => "0", ## not calculated yet
             :bl  => "c_ + bl_k / (_x + bl_o)",
             :dr1 =>
                 "-bl_k / (_x + bl_o)^2 + (b_ * (c_ - d_) * exp(e_ * b_) * _x^(-1 + b_)) / (exp(e_ * b_) + _x^b_)^2",
@@ -372,7 +372,7 @@ const SFC_MODEL_BASES = [ # vector of tuples
     ),
 
     (
-        :l4_enl_lbl, # linear baseline
+        :l4_enl_lbl, ## linear baseline
         false,
         ["_x"],
         ["X"],
@@ -398,7 +398,7 @@ const SFC_MODEL_BASES = [ # vector of tuples
                 "k1"=>k1
             )
         end,
-        OrderedDict( # pred_strs
+        OrderedDict( ## pred_strs
             :f   =>
                 "c_ + k1 * _x + (d_ - c_) / (1 + exp(b_ * (log(_x) - log(e_))))",
             :inv => "0", # not calculated yet
@@ -411,7 +411,7 @@ const SFC_MODEL_BASES = [ # vector of tuples
     ),
 
     (
-        :l4_enl_qbl, # quadratic baseline
+        :l4_enl_qbl, ## quadratic baseline
         false,
         ["_x"],
         ["X"],
@@ -434,14 +434,14 @@ const SFC_MODEL_BASES = [ # vector of tuples
             k1 = 0
             k2 = 0
             return OrderedDict(
-                "b_"=>b_, "c_"=>c_, "d_"=>d_, "e_"=>e_,
-                "k1"=>k1, "k2"=>k2
+                "b_" => b_, "c_" => c_, "d_" => d_, "e_" => e_,
+                "k1" => k1, "k2" => k2
             )
         end,
-        OrderedDict( # pred_strs
+        OrderedDict( ## pred_strs
             :f   =>
                 "c_ + k1 * _x + k2 * _x^2 + (d_ - c_) / (1 + exp(b_ * (log(_x) - log(e_))))",
-            :inv => "0", # not calculated yet
+            :inv => "0", ## not calculated yet
             :bl  => "c_ + k1 * _x + k2 * _x^2",
             :dr1 =>
                 "k1 + 2 * k2 * _x + (b_ * (c_ - d_) * exp(e_ * b_) * _x^(-1 + b_)) / (exp(e_ * b_) + _x^b_)^2",
@@ -451,14 +451,14 @@ const SFC_MODEL_BASES = [ # vector of tuples
     )
 ]
 
-# generate generic md objects
+## generate generic md objects
 const MDs = OrderedDict(map(SFC_MODEL_BASES) do sfc_model_base
     sfc_model_base[1] => SFCModelDef(
         sfc_model_base...,
         deepcopy(MD_EMPTY_vals)...
     )
-end) # do generic_sfc_model_base
+end) ## do generic_sfc_model_base
 
-# choose model for amplification curve fitting
+## choose model for amplification curve fitting
 const AMP_MODEL_NAME = :l4_enl
 const AMP_MD = MDs[AMP_MODEL_NAME]

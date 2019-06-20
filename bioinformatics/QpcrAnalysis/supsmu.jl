@@ -10,37 +10,36 @@ function supsmu(
     x_sorted::Bool=true
     # IntT_Fortran::DataType=Int32, FloatT_Fortran::DataType=Float32 # Julia DataTypes of integer and float compatible with the Fortran subroutine `supsmu`
 )
+    log_debug("at supsmu()")
 
     if ndims(X) > 1 || ndims(Y) > 1
-        error("X and Y must be 1-dimension.")
+        log_error("X and Y must be 1-dimension")
     end
 
     n = length(X)
 
     if length(Y) != n
-        error("X and Y must be equal in length.")
+        log_error("X and Y must be equal in length")
     end
 
     if n < 3
-        warn("Lengths of X and Y are less than 3, no smoothing will be done.")
+        log_warn("lengths of X and Y are less than 3, no smoothing will be done")
     end
 
     if span < 0 || span > 1
-        error("`span` must be between 0 and 1.")
+        log_error("`span` must be between 0 and 1")
     end
 
     if periodic # X is assumed to be a periodic variable with values in the range (0.0,1.0) and period 1.0.
         if minimum(x) < 0 || maximum(x) > 1
-            error("If X is assumed to be periodic, its values must be between 0 and 1.")
+            log_error("if X is assumed to be periodic, its values must be between 0 and 1")
         end
         iper = 2
     else
         iper = 1
     end
 
-
     # check done
-
 
     FloatT_in = typeof(Y[1])
 
@@ -75,5 +74,4 @@ function supsmu(
     smo = map(FloatT_in, smo)
 
     return x_sorted ? smo : smo[indice_back]
-
 end

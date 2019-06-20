@@ -11,7 +11,7 @@ function dcv_aw(
     dcv                     ::Bool,
     channel_nums            ::AbstractVector,
     ## remove MySql dependency
-    # db_conn ::MySQL.MySQLHandle, # `db_conn_default` is defined in "__init__.jl"
+    # db_conn ::MySQL.MySQLHandle, ## `db_conn_default` is defined in "__init__.jl"
     # calib_info ::Union{Integer,OrderedDict},
     # well_nums_found_in_fr ::AbstractVector,
     # well_nums_in_req ::AbstractVector=[],
@@ -21,6 +21,8 @@ function dcv_aw(
     dyes_2bfild             ::AbstractVector =[];
     aw_out_format           ::Symbol = :both # :array, :dict, :both
 )
+    log_debug("at dcv_aw()")
+
     ## remove MySql dependency
     # calib_info = ensure_ci(db_conn, calib_info)
     # wva_data, wva_well_nums = prep_adj_w2wvaf(db_conn, calib_info, well_nums_in_req, dye_in, dyes_2bfild)
@@ -44,7 +46,7 @@ function dcv_aw(
     #
     # wva_well_idc_wfluo = find(wva_well_nums) do wva_well_num
     #     wva_well_num in well_nums_found_in_fr
-    # end # do wva_well_num
+    # end ## do wva_well_num
 
     ## issue:
     ## we can't match well numbers between calibration data and experimental data
@@ -68,18 +70,18 @@ function dcv_aw(
         # k_inv_vec = fill(reshape(DataArray([1, 0, 1, 0]), 2, 2), 16)
 
         ## removing MySql dependency
-        # k4dcv, dcvd_ary3 = deconV(
+        # k4dcv, dcvd_ary3 = deconvolute(
         #     1. * mw_ary3, channel_nums, wva_well_idc_wfluo, db_conn, calib_info, well_nums_in_req;
         #     out_format="array")
         const k4dcv, dcvd_ary3 =
-            deconV(
+            deconvolute(
                 1. * mw_ary3,
                 channel_nums,
                 wva_well_idc_wfluo,
                 calib_data,
                 well_nums_in_req;
                 out_format = :array)
-    else # !dcv
+    else ## !dcv
         const k4dcv = K4DCV_EMPTY
         const dcvd_ary3 = mw_ary3
     end
@@ -104,18 +106,18 @@ function dcv_aw(
                         keys(dcvd_aw_dict))...)
         if aw_out_format == :both
             const dcvd_aw = (dcvd_aw_ary3, dcvd_aw_dict)
-        else # :array
+        else ## :array
             const dcvd_aw = (dcvd_aw_ary3,)
         end
     elseif aw_out_format == :dict # bug in original code (`out_format` not `aw_out_format`)
         const dcvd_aw = (dcvd_aw_dict,)
     else
-        error("`aw_out_format` must be :array, :dict or :both. ")
+        log_error("`aw_out_format` must be :array, :dict or :both. ")
     end
     ## Performance issue:
     ## enforce data types for this output
     return (mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, dcvd_aw...)
-end # dcv_aw
+end ## dcv_aw
 
 
 ## deprecated to remove MySql dependency
@@ -154,18 +156,18 @@ end # dcv_aw
 #            well_nums, k_qry_2b, db_conn, false
 #        )
 #        if length(well_nums) > 0 && Set(calib_well_nums) != Set(well_nums)
-#            error("Experiment $exp_id, step $step_id: calibration data is not found for all the wells requested. ")
-#        end # if
+#            log_error("experiment $exp_id, step $step_id: calibration data is not found for all the wells requested")
+#        end ## if
 #        calib_data_1key_chwl = vcat(map(channel_nums) do channel
 #            transpose(calib_data_1key[:fluorescence_value][calib_data_1key[:channel] .== channel])
-#        end...) # do channel. return an array where rows indexed by channels and columns indexed by wells
+#        end...) ## do channel. return an array where rows indexed by channels and columns indexed by wells
 #
 #        return calib_key => (calib_data_1key_chwl, calib_well_nums)
 #    end)
 #
-#    return calib_dict # share the same keys as `calib_info`
+#    return calib_dict ## share the same keys as `calib_info`
 #
-# end # get_full_calib_data
+# end ## get_full_calib_data
 
 function calib_calib(
     ## remove MySql dependency
@@ -181,7 +183,7 @@ function calib_calib(
 )
     ## This function is expected to handle situations where `calib_info_1` and `calib_info_2` have different combinations of wells, but the number of wells should be the same.
     if length(well_nums_1) != length(well_nums_2)
-        error("length(well_nums_1) != length(well_nums_2). ")
+        log_error("length(well_nums_1) != length(well_nums_2). ")
     end
 
     ## remove MySql dependency
@@ -218,7 +220,7 @@ function calib_calib(
         dcvd_ary3_1,
         wva_data_2,
         dcv_aw_ary3_1)
-end # calib_calib
+end ## calib_calib
 
 
 

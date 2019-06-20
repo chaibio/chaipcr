@@ -10,13 +10,14 @@ function act(
     #
     # db_conn ::MySQL.MySQLHandle,
     # exp_id ::Integer,
-    # calib_info ::Union{Integer,OrderedDict} =calib_info_AIR; # not used for computation
+    # calib_info ::Union{Integer,OrderedDict} =calib_info_AIR; ## not used for computation
     # start: arguments that might be passed by upstream code
     # well_nums ::AbstractVector =[],
     ot_dict         ::Associative;
-    out_format      ::Symbol = :pre_json,
-    verbose         ::Bool =false
+    out_format      ::Symbol = :pre_json
 )
+    log_debug("at act(::OpticalTestSingleChannel)")
+ 
     ## remove MySql dependency
     #
     # step_ids = [BASELINE_STEP_ID, EXCITATION_STEP_ID]
@@ -49,22 +50,20 @@ function act(
             const valid =
                 (excitation >= MIN_EXCITATION_FLUORESCENCE) &&
                 (baseline   <  MIN_EXCITATION_FLUORESCENCE) &&
-                (excitation <= MAX_EXCITATION) # Josh, 2016-08-15
+                (excitation <= MAX_EXCITATION) ## Josh, 2016-08-15
             OrderedDict(
                 :baseline   => baseline,
                 :excitation => excitation,
                 :valid      => valid
             )
-        end # do well_i
+        end ## do well_i
     const output = OrderedDict(
         :optical_data => results,
         :valid        => true)
     return (out_format == :json) ?
         JSON.json(output) :
         output
-end # analyze_optical_test_single_channel()
-
-
+end ## act()
 
 
 #

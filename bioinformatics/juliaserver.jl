@@ -9,7 +9,7 @@
 
 import HttpServer: HttpHandler, Server, run
 import QpcrAnalysis
-using MicroLogger
+import MicroLogging: @error
 
 
 ## Functions like this will be defined as `req2res` in module "QpcrAnalysis"
@@ -20,7 +20,7 @@ using MicroLogger
 # end
 
 http = HttpServer.HttpHandler() do req ::HttpServer.Request, res ::HttpServer.Response
-    @info(string(now()) * " at HttpHandler() with method $req.resource\n")
+    log_info("at HttpHandler() with method $req.resource")
 
     const code0 =
         if ismatch(r"^/experiments/", req.resource)
@@ -29,20 +29,19 @@ http = HttpServer.HttpHandler() do req ::HttpServer.Request, res ::HttpServer.Re
                 const experiment_id = parse(Int, nodes[3])
                 const action = String(nodes[4])
                 const request_body = String(req.data)
-                @debug(string(now()) * " request body is\n$request_body\n")
+                log_debug("request body is\n$request_body")
 
-                ## calls to http://localhost/experiments/0/ will activate a verbose test mode
+                ## calls to http://localhost/experiments/0/ will activate a slow test mode
                 if (experiment_id == 0)
                     const kwargs = Dict{Symbol,Bool}(
-                        :verbose => true,
                         :verify  => true)
                 else
                     const kwargs = Dict{Symbol,Bool}()
                 end
 
                 const success, response_body = QpcrAnalysis.dispatch(action, request_body; kwargs...)
-                @debug(string(now()) * " success is $success\n")
-                @debug(string(now()) * " response body is\n$response_body\n")
+                log_debug("success is $success")
+                log_debug("response body is\n$response_body")
 
                 ## return code
                 (success) ? 200 : 500
@@ -57,17 +56,17 @@ http = HttpServer.HttpHandler() do req ::HttpServer.Request, res ::HttpServer.Re
         if code0 == 0
             const err_msg = "method \"$req.resource\" not found"
             response_body = Dict(:error => err_msg)
-            @error(string(now()) * " $err_msg\n")
+            MicroLogging.@error(string(now()) * " $err_msg")
             ## return code
             404
         else
             code0
         end
 
-    @debug(string(now()) * " returning from HttpHandler()\n")
+    log_debug("returning from HttpHandler()")
     res = HttpServer.Response(response_body)
     res.status = code
-    @debug(string(now()) * " result is\n$res\n")
+    log_debug("result is\n$res")
     return res
 end
 

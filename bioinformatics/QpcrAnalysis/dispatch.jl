@@ -2,17 +2,14 @@
 
 import JSON: parse, json
 import DataStructures.OrderedDict
-using MicroLogging
 
 
 function dispatch(
     action ::AbstractString,
     request_body ::AbstractString;
-
-    verbose ::Bool =false,
     verify  ::Bool =false
 )
-    @debug(string(now()) * " at dispatch() with action $action\n"
+    log_debug("at dispatch() with action $action")
     const result = try
 
         ## NB. DefaultDict and DefaultOrderedDict constructors sometimes don't work on OrderedDict
@@ -28,9 +25,7 @@ function dispatch(
         ## this should generally be done in the generic act() methods.
 
         if !(action in keys(Action_DICT))
-            const err_msg0 = "action $action is not found"
-            error(err_msg0)
-            @error(string(now()) * " $err_msg0\n")
+            log_error("action $action is not found")
         end
 
         ## else
@@ -43,16 +38,14 @@ function dispatch(
                 const verify_input = try
                     verify_request(action_t, req_parsed)
                 catch err
-                    const err_msg1 = "data supplied with $action request is in the wrong format"
-                    error(err_msg1)
-                    @error(string(now()) * " $err_msg1\n")
+                    log_error("data supplied with $action request is in the wrong format")
                 end
             end
         end
 
-        @debug(string(now()) * " dispatching to act()\n")
-        const response = act(action_t, req_parsed; out_format=:pre_json, verbose=verbose)
-        @debug(string(now()) * " response received from act()\n")
+        log_debug("dispatching to act()")
+        const response = act(action_t, req_parsed; out_format=:pre_json)
+        log_debug("response received from act()")
         const json_response = JSON.json(response)
 
     @static if !production_env
@@ -61,9 +54,7 @@ function dispatch(
                 const verify_output = try
                     verify_response(action_t, JSON.parse(json_response, dicttype=OrderedDict))
                 catch err
-                    const err_msg2 = "data returned from $action request is in the wrong format"
-                    error(err_msg2)
-                    @error(string(now()) * " $err_msg2\n")
+                    log_error("data returned from $action request is in the wrong format")
                 end
             end
         end
@@ -84,7 +75,7 @@ function dispatch(
                 :valid => false,
                 :error => repr(result))))
         end
-    @debug(string(now()) * " returning from dispatch()\n")
+    log_debug("returning from dispatch()")
     return (success, response_body)
 end ## dispatch
 
@@ -143,7 +134,7 @@ function args2reqb(
             "guid" => guid
         )
     else
-        error("Unrecognized action.")
+        log_error("unrecognized action")
     end
 
     for key in keys(extra_args)
@@ -160,7 +151,7 @@ function args2reqb(
         reqb["db_pswd"] = db_pswd
         reqb["db_name"] = db_name
     else
-        error("`wdb` must be one of the following: \"handle\", \"dflt\", \"connect\".")
+        log_error("`wdb` must be one of the following: \"handle\", \"dflt\", \"connect\"")
     end
 
     return json(reqb)

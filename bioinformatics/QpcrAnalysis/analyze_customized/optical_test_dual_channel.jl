@@ -10,13 +10,12 @@ function act(
     #
     # db_conn ::MySQL.MySQLHandle,
     # exp_id ::Integer,
-    # calib_info ::Union{Integer,OrderedDict}; # keys: "baseline", "water", "channel_1", "channel_2". Each value's "calibration_id" value is the same as `exp_id`
+    # calib_info ::Union{Integer,OrderedDict}; ## keys: "baseline", "water", "channel_1", "channel_2". Each value's "calibration_id" value is the same as `exp_id`
     #
     # start: arguments that might be passed by upstream code
     # well_nums ::AbstractVector =[],
-    ot_dict         ::Associative; # keys: "baseline", "water", "FAM", "HEX"
-    out_format      ::Symbol = :pre_json,
-    verbose         ::Bool =false
+    ot_dict         ::Associative; ## keys: "baseline", "water", "FAM", "HEX"
+    out_format      ::Symbol = :pre_json
 )
     function SNR_test(w, cl)
         const baseline_2chs, water_fluo_2chs, signal_fluo_2chs =
@@ -26,6 +25,8 @@ function act(
         const snr_2chs = (signal_fluo_2chs .- water_fluo_2chs) ./ (signal_fluo_2chs .- baseline_2chs)
         transpose(dscrmnts_snr[cl](transpose(snr_2chs)))
     end
+
+    log_debug("at act(::OpticalTestDualChannel)")
 
     ## remove MySql dependency
     #
@@ -41,7 +42,7 @@ function act(
     #
     # num_wells = length(fluo_well_nums)
 
-    # fluo_dict = OrderedDict(map(old_calib_labels) do calib_label # old
+    # fluo_dict = OrderedDict(map(old_calib_labels) do calib_label ## old
     const fluo_dict =
         OrderedDict(
             map(1:length(NEW_CALIB_SYMBOLS)) do calib_label_i
@@ -85,8 +86,8 @@ function act(
                             (fluo_dict[NEW_CALIB_SYMBOLS[cl_i]][well_i, channel_i],
                                 bool_dict[NEW_CALIB_SYMBOLS[cl_i]][well_i, channel_i]),
                             CHANNEL_IS)
-                end) # do cl_i
-        end # do well_i
+                end) ## do cl_i
+        end ## do well_i
     ## FAM and HEX self-calibrated
     ## ((signal_of_dye_x_in_channel_k - water_in_channel_k) /
     ##     (signal_of_target_dye_in_channel_k - water_in_channel_k); x=FAM,HEX; k=1,2)
@@ -131,9 +132,9 @@ function act(
     for dye in CHANNEL_IS, channel in CHANNEL_IS
         if any(self_calib_vec[dye][channel] .<= 0.0)
             ## call as invalid analysis instead of raising an error
-            # error("Zero or negative values in the self-calibrated fluorescence data.")
+            # log_error("zero or negative values in the self-calibrated fluorescence data")
             validity = false
-            error_msg = "Zero or negative values in the self-calibrated fluorescence data."
+            error_msg = "zero or negative values in the self-calibrated fluorescence data"
         end
     end
     ## calculate channel1:channel2 ratios

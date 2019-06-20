@@ -1,5 +1,5 @@
 ## thermal_consistency.jl
-## 72C thermal consistency test
+## 72°C thermal consistency test
 
 import Dierckx: Spline1D, derivative
 
@@ -12,21 +12,22 @@ function act(
     # calib_info ::Union{Integer,OrderedDict};
     req_dict            ::Associative;
     out_format          ::Symbol = :pre_json,
-    verbose             ::Bool =false,
-    ## start: arguments that might be passed by upstream code
+    
+    ## the following options are never used
     well_nums           ::AbstractVector =[],
     auto_span_smooth    ::Bool =false,
     span_smooth_default ::Real =0.015,
     span_smooth_factor  ::Real =7.2,
-    # end: arguments that might be passed by upstream code
     dye_in              ::Symbol =:FAM,
     dyes_2bfild         ::AbstractVector =[],
-    dcv                 ::Bool =true, # logical, whether to perform multi-channel deconvolution
-	max_tmprtr          ::Real =1000, # maximum temperature to analyze
+    dcv                 ::Bool =true, ## if true, perform multi-channel deconvolution
+	max_tmprtr          ::Real =1000, ## maximum temperature to analyze
 )
+    log_debug("at act(::ThermalConsistency)")
+ 
     ## calibration data is required
     if !haskey(req_dict, "calibration_info") || !(typeof(req_dict["calibration_info"]) <: Associative)
-        error("no calibration information found")
+        log_error("no calibration information found")
     end
     
     kwdict_mc_tm_pw = OrderedDict{Symbol,Any}()
@@ -57,14 +58,13 @@ function act(
         dcv = dcv,
         max_tmprtr = max_tmprtr,
         out_format = :full,
-        verbose = verbose,
         kwdict_mc_tm_pw = kwdict_mc_tm_pw
     )
     ## process the data from only one channel
     channel_proc = 1
     channel_proc_i = find(mc_w72c.channel_nums) do channel_num
         channel_num == channel_proc
-    end[1] # do channel_num
+    end[1] ## do channel_num
     #
     mc_tm = map(
         mc_bywl -> mc_bywl.Ta_fltd,
@@ -89,9 +89,9 @@ function act(
                 (top1_Tm, MIN_TM_VAL <= top1_Tm <= MAX_TM_VAL),
                 Ta[1,2]
             )
-        end # if size
+        end ## if size
         push!(tm_check_vec, tm_check_1w)
-    end # for
+    end ## for
     #
     delta_Tm_val = max_Tm - min_Tm
     if (out_format == :full)
@@ -109,8 +109,6 @@ function act(
         JSON.json(mc_w72c_out) :
         mc_w72c_out
 end
-
-
 
 
 #

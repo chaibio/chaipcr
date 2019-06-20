@@ -1,17 +1,17 @@
 ## thermal_performance_diagnostic.jl
 
-
 function act(
     ::ThermalPerformanceDiagnostic,
     ## remove MySql dependency
     #
     # db_conn ::MySQL.MySQLHandle,
     # exp_id ::Integer, # really used
-    # calib_info ::Union{Integer,OrderedDict} # not used for computation
+    # calib_info ::Union{Integer,OrderedDict} ## not used for computation
     temperatureData ::Associative;
-    out_format      ::Symbol = :pre_json,
-    verbose         ::Bool =false
+    out_format      ::Symbol = :pre_json
 )
+    log_debug("at act(::ThermalPerformanceDiagnostic)")
+
     ## remove MySql dependency
     #
     # queryTemperatureData = "SELECT * FROM temperature_logs WHERE experiment_id = $exp_id ORDER BY elapsed_time"
@@ -26,7 +26,7 @@ function act(
             map(
                 name -> temperatureData[name][i],
                 ["heat_block_zone_1_temp", "heat_block_zone_2_temp"]))
-    end # do i
+    end ## do i
     #
     elapsed_times = temperatureData["elapsed_time"]
     #
@@ -43,16 +43,16 @@ function act(
         minimum(elapsed_times[hbzt_lower .& (elapsed_times .> apprxRampDownStartTime)])
     catch
         Inf
-    end # try minimum
+    end ## try minimum
     apprxRampUpStartTime = try
         maximum(elapsed_times[hbzt_lower .& (elapsed_times .< apprxRampUpEndTime)])
     catch
         -Inf
-    end # try maximum
+    end ## try maximum
     #
     temp_range_adj = (HIGH_TEMP_mDELTA - LOW_TEMP_pDELTA) * 1000
     #
-    ## calculate the average ramp rate up and down in degrees C per second
+    ## calculate the average ramp rate up and down in °C per second
     Heating_TotalTime = apprxRampUpEndTime - apprxRampUpStartTime
     Heating_AvgRampRate = temp_range_adj / Heating_TotalTime
     Cooling_TotalTime = apprxRampDownEndTime - apprxRampDownStartTime
@@ -64,12 +64,12 @@ function act(
     )) do time_vec
         elapsed_time_idc = find(elapsed_times) do elapsed_time
             time_vec[1] < elapsed_time < time_vec[2]
-        end # find
+        end ## find
         maximum(
             abs.(
                 temperatureData["heat_block_zone_1_temp"][elapsed_time_idc] .-
                     temperatureData["heat_block_zone_2_temp"][elapsed_time_idc]))
-    end # map
+    end ## map
     ## calculate the average ramp rate of the lid heater in degrees C per second
     lidHeaterStartRampTime =
         minimum(elapsed_times[
@@ -104,9 +104,7 @@ function act(
     return (out_format == :json) ?
         JSON.json(results) :
         results
-end # analyze_thermal_performance_diagnostic()
-
-
+end ## act()
 
 
 #

@@ -2,6 +2,7 @@
 
 import JSON
 import DataFrames: DataFrame, by
+import MicroLogging:@error
 
 ## if isnull(sample) well not considered
 ## what if isnull(cq)
@@ -14,12 +15,13 @@ function act(
     ::StandardCurve,
     req_vec     ::Vector{Any};
     out_format  ::Symbol = :pre_json,
-    verbose     ::Bool =false,
     json_digits ::Integer =JSON_DIGITS,
     qty_base    ::Real =10,
     empty_tre   ::TargetResultEle =EMPTY_TRE,
     empty_gre   ::GroupResultEle  =EMPTY_GRE
 )
+    log_debug("at act(::StandardCurve")
+
     ## df1.colindex.names
     #
     ## parse data
@@ -57,7 +59,7 @@ function act(
                 round.([b1, b0, eff, r2_], json_digits)...
             )
         end
-    end # do chunk_target
+    end ## do chunk_target
     
     ## group results calculation commented out
     ## as this calculation is duplicated in the front end
@@ -68,7 +70,7 @@ function act(
     #     if isnan(chunk_sample[1, :sample])
     #         return hcat(
     #             DataFrame(target=0),
-    #             DataFrame(x1=empty_gre)) # assuming the default column name is `:x1`
+    #             DataFrame(x1=empty_gre)) ## assuming the default column name is `:x1`
     #     else
     #         return by(chunk_sample, :target) do chunk_target
     #             target_id = chunk_target[1, :target]
@@ -87,10 +89,10 @@ function act(
     #                         std(qty_vec)
     #                     ], json_digits)...
     #                 )
-    #             end # if
-    #         end # do chunk_target
-    #     end # if
-    # end # do chunk
+    #             end ## if
+    #         end ## do chunk_target
+    #     end ## if
+    # end ## do chunk
     
     ## report results
     if out_format == :full
@@ -104,14 +106,16 @@ function act(
     target_vec = Vector{Any}()
     for tre in tre_vec
         if isnan(tre.slope) && isnan(tre.offset)
+            const err_msg = "less 2 valid data points of cq and/or qty available for fitting standard curve"
             target_result = OrderedDict(
                 :target_id => getfield(tre, :target_id),
-                :error     => "less 2 valid data points of cq and/or qty available for fitting standard curve")
+                :error     => err_msg)
+            MicroLogging.@error(string(now()) * " $err_msg")
         else
             target_result = tre
         end
         push!(target_vec, target_result)
-    end # for
+    end ## for
     
     ## group results reporting commented out
     ## as the calculation is duplicated in the front end
@@ -146,20 +150,20 @@ function act(
     #                         :standard_deviation =>      OrderedDict(
     #                             :m              =>          qty_sd_m,
     #                             :b              =>          qty_sd_b))))
-    #             end # if target_id
-    #         end # do gre_i
+    #             end ## if target_id
+    #         end ## do gre_i
     #     push!(grp_vec, OrderedDict(
     #         :wells   => well_combin,
     #         :targets => grp_target_vec))
-    #     end # if
-    # end # do well_combin
+    #     end ## if
+    # end ## do well_combin
     #
     jp_dict = OrderedDict(
         :targets => target_vec,
         :groups  => Vector(),
         :valid   => true)
     return out_format == :json ? JSON.json(jp_dict) : jp_dict
-end # standard_curve
+end ## standard_curve
 
 
 
@@ -235,7 +239,7 @@ end
 ## generate unique integers
 function generate_uniq_ints(num_ints ::Integer, S, rng ::AbstractRNG =Base.GLOBAL_RNG)
     if num_ints > length(S)
-        error("num_ints > length(S), i.e. no enough values to choose from")
+        log_error("num_ints > length(S), i.e. no enough values to choose from")
     end
     uniq_ints = unique(rand(rng, S, num_ints))
     while length(uniq_ints) < num_ints
@@ -357,7 +361,7 @@ function generate_req_sc(;
         end # for channel_i
 
     elseif num_targets != num_measrmts
-        error("target_vec not empty but length not same as num_measrmts")
+        log_error("target_vec not empty but length not same as num_measrmts")
     end # if num_targets
 
     num_cqs = length(cq_vec)
@@ -367,7 +371,7 @@ function generate_req_sc(;
         nna_cq_vec = rand(rng, num_nna_cqs) .* -(cq_bounds...) .+ cq_bounds[2] # upperbound - (0,1)seq * scaling_factor
         cq_vec = insert2ary(NaN, num_na_cqs, nna_cq_vec, 1, rng)
     elseif num_cqs != num_measrmts
-        error("cq_vec not empty but length not same as num_measrmts")
+        log_error("cq_vec not empty but length not same as num_measrmts")
     end
 
     num_qm = length(qm_vec)
@@ -382,9 +386,9 @@ function generate_req_sc(;
         qm_vec = qty_mtx[:, 1]
         qb_vec = qty_mtx[:, 2] # not convert to integer due to NaN
     elseif num_qm != num_qb
-        error("lengths of qm_vec and qb_vec not equal")
+        log_error("lengths of qm_vec and qb_vec not equal")
     elseif num_qm != num_measrmts
-        error("qm_vec and qb_vec with equal non-0 length but not same as num_measrmts")
+        log_error("qm_vec and qb_vec with equal non-0 length but not same as num_measrmts")
     end
 
     num_samples = length(sample_vec)
@@ -394,7 +398,7 @@ function generate_req_sc(;
         nna_sample_vec = rand(rng, 1:num_uniq_samples, num_nna_samples)
         sample_vec = insert2ary(NaN, num_na_samples, nna_sample_vec, 1, rng)
     elseif num_samples != num_wells
-        error("sample_vec not empty but length not same as num_wells")
+        log_error("sample_vec not empty but length not same as num_wells")
     end
 
     req_vec = map(1:num_wells) do well_i

@@ -24,6 +24,7 @@ function adj_w2wvaf(
     minus_water               ::Bool =false,
     scaling_factor_adj_w2wvaf ::Real =SCALING_FACTOR_adj_w2wvaf
 )
+    log_debug("at adj_w2wvaf()")
     ## devectorized code avoids transposing data matrix
     if minus_water == false
         const swd =
@@ -31,7 +32,7 @@ function adj_w2wvaf(
         return ([
             scaling_factor_adj_w2wvaf * mean(swd) *
                 fluo2btp[i,w] / swd[w]
-                    for i in 1:size(fluo2btp,1), w in 1:size(fluo2btp,2)]) # w = well
+                    for i in 1:size(fluo2btp,1), w in 1:size(fluo2btp,2)]) ## w = well
     end
     ## minus_water == true
     const wva_water = wva_data[:water][channel][wva_well_idc_wfluo]
@@ -41,8 +42,8 @@ function adj_w2wvaf(
     return ([
         scaling_factor_adj_w2wvaf * mean(swd) *
             (fluo2btp[i,w] - wva_water[w]) / swd[w]
-                for i in 1:size(fluo2btp,1), w in 1:size(fluo2btp,2)])   # w = well
-end # adj_w2wvaf
+                for i in 1:size(fluo2btp,1), w in 1:size(fluo2btp,2)])   ## w = well
+end ## adj_w2wvaf
 
 
 ## function: get well-to-well variation in absolute fluorescence (wva)
@@ -121,10 +122,10 @@ end # adj_w2wvaf
 #        end
 #        complete_well_nums = intersect(well_nums_dupd...)
 #
-#    else # len_step_id_s_uniq < 1
+#    else ## len_step_id_s_uniq < 1
 #        error("Lengths of `calib_id_s` and `step_id_s` need to be greater than 0. ")
 #
-#    end # if
+#    end ## if
 #
 #    if length(well_nums) > length(complete_well_nums) # not use `setdiff` because `well_nums` may be `[]` to select all available wells
 #        error("Calibration data are not complete for these wells: $(join(setdiff(well_nums, complete_well_nums), ", ")). ")
@@ -137,7 +138,7 @@ end # adj_w2wvaf
 #
 #    return wva_data_dict, calib_id_key_vec, complete_well_nums # Tuple{DataStructures.OrderedDict{Any,Any}, DataArrays.DataArrays{Int8,1}, DataArrays.DataArray{Int32,1} }
 #
-# end # get_wva_data
+# end ## get_wva_data
 
 
 ## function: check whether the data in optical calibration experiment is valid
@@ -150,6 +151,7 @@ function prep_adj_w2wvaf(
     dye_in      ::Symbol = :FAM,
     dyes_2bfild ::AbstractVector =[]
 )
+    log_debug("at prep_adj_w2wvaf()")
     ## remove MySql dependency
     #
     # calib_info = ensure_ci(db_conn, calib_info)
@@ -225,7 +227,7 @@ function prep_adj_w2wvaf(
             push!(stop_msgs, "Calibration data lengths are not equal for channel $(key)")
         end
     end
-    #(length(stop_msgs) > 0) && error(join(stop_msgs, ""))
+    # (length(stop_msgs) > 0) && error(join(stop_msgs, ""))
     if length(stop_msgs) > 0
         msg = join(stop_msgs, "")
         return ErrorException(msg)
@@ -241,14 +243,16 @@ function prep_adj_w2wvaf(
         wva_invalid_idc = find(signal_data_dict[channel] .<= water_data_dict[channel])
         if length(wva_invalid_idc) > 0
             failed_well_nums_str = join(signal_well_nums[wva_invalid_idc], ", ")
-            push!(stop_msgs, "Invalid well-to-well variation data in channel $channel: fluorescence value of water is greater than or equal to that of dye in the following well(s) - $failed_well_nums_str. ")
-        end # if invalid
-    end # next channel
+            push!(stop_msgs, "Invalid well-to-well variation data in channel $channel: " *
+                "fluorescence value of water is greater than or equal to that of dye " *
+                "in the following well(s) - $failed_well_nums_str")
+        end ## if invalid
+    end ## next channel
     if length(stop_msgs) > 0
         msg = join(stop_msgs, "")
         return ErrorException(msg)
     end
-    #(length(stop_msgs) > 0) && error(join(stop_msgs, ""))
+    # (length(stop_msgs) > 0) && error(join(stop_msgs, ""))
 
     ## issue:
     ## this feature has been temporarily disabled while
@@ -272,7 +276,7 @@ function prep_adj_w2wvaf(
     #         dye => DYE2CHST[dye]["step_id"]
     #         for dye in keys(DYE2CHST)
     #     ])
-    #     preset_signal_data_dict, dyes_in_preset = get_wva_data(PRESET_calib_ids["signal"], preset_step_ids, db_conn, "dye") # `well_nums` is not passed on
+    #     preset_signal_data_dict, dyes_in_preset = get_wva_data(PRESET_calib_ids["signal"], preset_step_ids, db_conn, "dye") ## `well_nums` is not passed on
     #
     #     pivot_preset = preset_signal_data_dict[dye_in]
     #
@@ -284,7 +288,7 @@ function prep_adj_w2wvaf(
     #         signal_data_dict[DYE2CHST[dye_2bfild]["channel"]] = preset_signal_data_dict[dye_2bfild] .* in2preset
     #     end
     #
-    # end # if
+    # end ## if
 
     ## water_data and signal_data are OrderedDict objects keyed by channels,
     ## to accommodate the situation where calibration data has more channels
@@ -295,7 +299,7 @@ function prep_adj_w2wvaf(
         :signal => signal_data_dict
     )
     return (wva_data, signal_well_nums)
-end # prep_adj_w2wvaf
+end ## prep_adj_w2wvaf
 
 
 

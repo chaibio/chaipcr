@@ -3,7 +3,19 @@
 import DataStructures.OrderedDict
 import Base: getindex
 # import Iterators.filter
+using MicroLogging
 
+## logging functions
+log_debug(msg ::String) = @debug(string(now()) * " $msg")
+log_info(msg ::String) = @info(string(now()) * " $msg")
+log_warn(msg ::String)
+    @warn(string(now()) * " $msg")
+    warn(msg)
+end
+log_error(msg ::String)
+    @error(string(now()) * " $msg")
+    error(msg)
+end
 
 ## using suggestion of MikeInnes https://github.com/JuliaLang/julia/issues/5571#issuecomment-446321504
 ## overload :[ operator to enable function composition by piping with arguments
@@ -82,7 +94,7 @@ extend_NaN(len ::Integer, vec ::AbstractVector) =
         m ->
             m >= 0 ?
                 (m |> fill[NaN] |> vcat[vec]) :
-                error("vector is too long")
+                log_error("vector is too long")
 
 ## extend array elements with NaNs to length of longest element
 extend(x ::AbstractArray) =
@@ -187,6 +199,7 @@ function parse_af{T<:AbstractFloat}( ::Type{T}, strval ::String)
 end
 
 # print with verbose control
+# deprecated in favour of log_info()
 function print_v(
     print_func ::Function,
     verbose ::Bool,

@@ -98,6 +98,7 @@ install("Dierckx", v"0.3.0", v"0.3.1-")
 install("DataArrays", v"0.7.0", v"0.7.1-")
 install("FactCheck", v"0.4.3", v"0.4.4-") # for testing and precompiling
 install("MicroLogging", v"0.2.0", v"0.2.0-")
+install("FunctionalData", v"0.1.2", v"0.1.2-")
 
 # install("NLopt", v"0.3.6", v"0.3.7-")
 # install("ProfileView", v"0.3.0", v"0.3.1-")

@@ -3,7 +3,7 @@
 import DataStructures.OrderedDict
 
 ## multi-channel deconvolution
-function deconV(
+function deconvolute(
     ## ary2dcv dim1 is unit, which can be cycle (amplification), temperature point (melting curve),
     ## or step type (like "water", "channel_1", "channel_2" for calibration experiment);
     ## ary2dcv dim2 must be well, ary2dcv dim3 must be channel
@@ -28,12 +28,13 @@ function deconV(
     scaling_factor_dcv_vec  ::AbstractVector =SCALING_FACTOR_deconv_vec,
     out_format              ::Symbol = :both # :array, :dict, :both
 )
+    log_debug("at deconvolute()")
     ## remove MySql dependency
     # k4dcv = (isa(calib_info, Integer) || begin
     #     step_ids = map(ci_value -> ci_value["step_id"], values(calib_info))
     #     length_step_ids = length(step_ids)
     #     length_step_ids <= 2 || length(unique(step_ids)) < length_step_ids
-    # end) ? k4dcv_backup : get_k(db_conn, calib_info, well_nums) # use default `well_proc` value
+    # end) ? k4dcv_backup : get_k(db_conn, calib_info, well_nums) ## use default `well_proc` value
     const k4dcv = get_k(calib_data, well_nums)
     #
     const a2d_dim_unit, a2d_dim_well, a2d_dim_channel = size(ary2dcv)
@@ -43,7 +44,7 @@ function deconV(
             k4dcv.k_inv_vec[dcv_well_idc_wfluo[w]] .* scaling_factor_dcv_vec
         end
     for x in 1:a2d_dim_unit, w in 1:a2d_dim_well
-        dcvd_ary3[x, w, :] = k_inv_vs[w] * ary2dcv[x, w, :] # matrix * vector
+        dcvd_ary3[x, w, :] = k_inv_vs[w] * ary2dcv[x, w, :] ## matrix * vector
     end
     #
     ## format output
@@ -58,11 +59,11 @@ function deconV(
         elseif (out_format == :both)
             dcvd = (dcvd_ary3, dcvd_dict)
         else
-            error("`out_format` must be :array, :dict or :both.")
+            log_error("`out_format` must be :array, :dict or :both.")
         end
     end
     return (k4dcv, dcvd...)
-end # deconV()
+end ## deconvolute()
 
 
 ## function: get cross-over constant matrix K
@@ -83,9 +84,11 @@ function get_k(
     ## in the request body is already specific to a single step.
     calib_data ::Associative,
     well_nums  ::AbstractVector =[];
-    well_proc  ::Symbol = :vec, # options: :mean, :vec.
-    save_to    ::String ="" # used: "k.jld"
+    well_proc  ::Symbol = :vec, ## options: :mean, :vec.
+    save_to    ::String ="" ## used: "k.jld"
 )
+    log_debug("at get_k()")
+
     ## remove MySql dependency
     #
     # dcv_exp_info = ensure_ci(db_conn, dcv_exp_info)
@@ -106,7 +109,7 @@ function get_k(
     # end)
 
     ## subtract water calibration data
-    cd_key_vec = calib_data |> keys |> collect |> filter[x -> (x != "water")] # `cd` - channel of dye.
+    cd_key_vec = calib_data |> keys |> collect |> filter[x -> (x != "water")] ## `cd` - channel of dye.
     channel_nums = map(x -> Base.parse(split(x, "_")[2]), cd_key_vec)
     n_channels = length(channel_nums)
     water_data_2bt = calib_data["water"]["fluorescence_value"] |> reduce[hcat]
@@ -122,7 +125,7 @@ function get_k(
     #     return cd_key_vec[channel] => signal_data .- water_data
     # end)
     ## devectorized
-    k4dcv_bydy = OrderedDict( # `bydy` - by dye
+    k4dcv_bydy = OrderedDict( ## `bydy` - by dye
         map(channel_nums) do c
             signal_data_2bt = calib_data[cd_key_vec[c]]["fluorescence_value"] |> reduce[hcat]
             k4dcv_c = Array{Float_T,2}(n_channels, n_wells)
@@ -146,19 +149,23 @@ function get_k(
                 failed_idc = find(target_signals .<= non_target_signals)
                 if (length(failed_idc) > 0)
                     failed_well_nums_str = join(water_well_nums[failed_idc], ", ")
-                    push!(stop_msgs, "Invalid deconvolution data for the dye targeting channel $target_channel_i: fluorescence value of non-target channel $non_target_channel_i is greater than or equal to that of target channel $target_channel_i in the following well(s) - $failed_well_nums_str. ")
+                    push!(stop_msgs, "Invalid deconvolution data for the dye targeting channel $target_channel_i: " *
+                        "fluorescence value of non-target channel $non_target_channel_i is greater than or equal " *
+                        "to that of target channel $target_channel_i in the following well(s) - $failed_well_nums_str")
                 end
             end
-        end # for non_target_channel_i
-    end # for channel_i
-    (length(stop_msgs) > 0) && error(join(stop_msgs, ""))
+        end ## for non_target_channel_i
+    end ## for channel_i
+    (length(stop_msgs) > 0) && log_error(join(stop_msgs, ""))
 
     inv_note_pt1 = ""
-    inv_note_pt2 = "K matrix is singular, using `pinv` instead of `inv` to compute inverse matrix of K. Deconvolution result may not be accurate. This may be caused by using the same or a similar set of solutions in the steps for different dyes. "
+    inv_note_pt2 = "K matrix is singular, using `pinv` instead of `inv` to compute inverse matrix of K. " *
+        "Deconvolution result may not be accurate. " *
+        "This may be caused by using the same or a similar set of solutions in the steps for different dyes."
 
     if (well_proc == :mean) # use average over channels, by well
         k_s =
-            mapreduce( # `cd` - channel of dye
+            mapreduce( ## `cd` - channel of dye
                 cd_key -> Array{Float_T}(sweep(sum)(/)(mean(k4dcv_bydy[cd_key], 2))),
                 hcat,
                 cd_key_vec)
@@ -168,8 +175,8 @@ function get_k(
             if isa(err, Base.LinAlg.SingularException)
                 inv_note_pt1 = "Well mean"
                 pinv(k_s)
-            end # if isa(err,
-        end # try
+            end ## if isa(err,
+        end ## try
         k_inv_vec = fill(k_inv, n_wells)
         #
     elseif (well_proc == :vec)
@@ -192,17 +199,17 @@ function get_k(
                     pinv(k_mtx)
                 else
                     throw(err)
-                end # if isa(err
-            end # try
-        end # next well
+                end ## if isa(err
+            end ## try
+        end ## next well
         if (length(singular_well_nums) > 0)
             inv_note_pt1 = "Well(s) $(join(singular_well_nums, ", "))"
         end
-    end # if well_proc
+    end ## if well_proc
     #
     inv_note = (length(inv_note_pt1) > 0) ? "$inv_note_pt1: $inv_note_pt2" : ""
     k4dcv = K4Deconv(k_s, k_inv_vec, inv_note)
     #
     (length(save_to) > 0) && save(save_to, "k4dcv", k4dcv)
     return k4dcv
-end # get_k()
+end ## get_k()

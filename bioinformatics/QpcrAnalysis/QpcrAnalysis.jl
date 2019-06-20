@@ -52,8 +52,10 @@ end
 
 ## set up logger
 using MicroLogging
-logger = SimpleLogger(open(tempname(), "w"))
-# global_logger(MicroLogging.configure_logging(logger, min_level=:debug))
+global_logger(
+    configure_logging(
+        SimpleLogger(
+            open(tempname(), "w")), min_level=:info)) ## :debug for verbose output
 @info(string(now()) * " global logger constructed in module QpcrAnalysis\n")
 
 ## default data width in production mode:  32 bits (BBB)
