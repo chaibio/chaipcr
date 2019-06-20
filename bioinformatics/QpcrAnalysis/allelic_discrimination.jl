@@ -17,10 +17,10 @@ function prep_input_4ad(
     full_amp_out    ::AmpStepRampOutput,
 
     categ           ::Symbol = :fluo,
-    well_idc        ::Union{AbstractVector,Colon} =Colon(),
+    well_idc        ::Union{AbstractVector, Colon} =Colon(),
 
     ## relevant if `categ == :fluo`, last available cycle
-    cycs            ::Union{Integer,AbstractVector} =1
+    cycs            ::Union{Integer, AbstractVector} =1
 )
     num_cycs, n_wells, num_channels = size(full_amp_out.fr_ary3)
     nrn = NRN_SELF
@@ -29,10 +29,10 @@ function prep_input_4ad(
         fluos = getfield(full_amp_out, Symbol(categ))
         if cycs == 0
             cycs = num_cycs
-        end # if cycs == 0
+        end ## if cycs == 0
         if isa(cycs, Integer)
             cycs = (cycs:cycs) # `blsub_fluos[an_integer, :, :]` results in size `(n_wells, num_channels)` instead of `(1, n_wells, num_channels)`
-        end # if isa(cycs, Integer)
+        end ## if isa(cycs, Integer)
         data_t = reshape(mean(fluos[cycs, :, :], 1), n_wells, num_channels)
     #
     elseif categ == :d0
@@ -43,15 +43,15 @@ function prep_input_4ad(
     elseif categ == :cq
         data_t = map(full_amp_out.cq) do cq_val
             isnan(cq_val) ? AbstractFloat(num_cycs) : cq_val # `Integer` resulted in `InexactError()`
-        end # do cq_val
+        end ## do cq_val
         nrn = NRN_NOT
     #
     ## any other value of `categ`: do nothing
-    end # if categ
+    end ## if categ
     #
     data = transpose(data_t[well_idc, :])
     return (data, nrn)
-end # prep_data_4ad
+end ## prep_data_4ad
 
 
 function do_cluster_analysis(
@@ -65,8 +65,8 @@ function do_cluster_analysis(
     ## calculate upper triangle and convert to Symmetric
     function calc_dist_mtx()
         _dist_mtx = zeros(Float_T,n_wells,n_wells)
-        for j in colon(2,n_wells) # columns
-            for i in colon(1,j - 1) # rows
+        for j in colon(2,n_wells) ## columns
+            for i in colon(1,j - 1) ## rows
                 _dist_mtx[i,j] = norm(raw_data[:, i] .- raw_data[:, j], norm_l)
             end
         end
@@ -88,12 +88,12 @@ function do_cluster_analysis(
     function clustering(::K_medoids, _)
         ## _init_centers is [2 x num_centers] matrix, kmedoids! requires vector
         ## use dummy values 1:num_centers for now
-        _cluster_result = kmedoids!(dist_mtx, collect(1:num_centers)) # dist_mtx not dist_mtx_winit
-        return (_cluster_result, raw_data[:, _cluster_result.medoids]) # raw_data not data_winit
+        _cluster_result = kmedoids!(dist_mtx, collect(1:num_centers)) ## dist_mtx not dist_mtx_winit
+        return (_cluster_result, raw_data[:, _cluster_result.medoids]) ## raw_data not data_winit
     end
 
     clustering(unknown_cluster_method, _) =
-        error("Clustering method $unknown_cluster_method not implemented")
+        log_error("clustering method $unknown_cluster_method not implemented")
 
     ## get cluster silhouettes
     get_silhouettes() =
@@ -132,11 +132,10 @@ function do_cluster_analysis(
                 function calc_dist_within_margin_max()
 
                     is_second_longest(gi_idx_ne) =
-                        prod(gi_idx_e -> dist_mtx[gi_idx_ne, gi_idx_e] - dist_edge,
-                            edge) <= 0.0
+                        prod(gi_idx_e -> dist_mtx[gi_idx_ne, gi_idx_e] - dist_edge, edge) <= 0.0
 
                     edge_always_second_longest() =
-                        all(is_second_longest(setdiff(gi_idc, edge)))
+                        @p setdiff gi_idc edge | is_second_longest | all
                     ## end of function definitions nested within calc_dist_within_margin_max()
 
                     ## vectorized code
@@ -160,16 +159,16 @@ function do_cluster_analysis(
                     #                 (dist_mtx[gi_idx_ne, gi_idx_e2] - dist_edge) > 0.0 # edge not ranked 2nd
                     #                     update_dwmm = false
                     #                     break
-                    #             end # if
-                    #         end # if
-                    #     end # for gi_idx_ne
+                    #             end ## if
+                    #         end ## if
+                    #     end ## for gi_idx_ne
                     #     if update_dwmm
                     #         _dist_within_margin_max = dist_edge
                     #         break
-                    #     end # if
-                    # end # for edge
+                    #     end ## if
+                    # end ## for edge
                     # return _dist_within_margin_max
-                end # calc_dist_within_margin_max()
+                end ## calc_dist_within_margin_max()
                 ## end of function definition nested within dist_within_margin_max()
 
                 (sum_gi_bool_vec <= 1) && return 0.0
@@ -181,14 +180,14 @@ function do_cluster_analysis(
 
             const sum_gi_bool_vec = sum(gi_bool_vec)
             [dist_within_margin_max() dist_between_min()]
-        end # check_grp()
+        end ## check_grp()
         ## end of function definition nested within check_groups()
 
         mapreduce(
             grp_i -> check_grp(assignments_woinit .== grp_i),
             vcat,
             1:num_centers)
-    end # check_groups()
+    end ## check_groups()
     ## end of function definitions nested within do_cluster_analysis()
 
     ## add slope 2/1 scaled as another dimension
@@ -220,7 +219,7 @@ function do_cluster_analysis(
         check_dist_mtx,
         check_dist_bool
     )
-end # do_cluster_analysis()
+end ## do_cluster_analysis()
 
 
 ## steps to assign genotypes:
@@ -251,7 +250,7 @@ function assign_genos(
             i -> @p fill
                     mapreduce(geno -> fill(geno, 1, 2 ^ (i-1)), hcat, [0, 1]),
                     2 ^ (num_channels - i)
-                        | reduce hcat _,
+                        | reduce hcat,
             vcat,
             1:num_channels
         ) |> nrn
@@ -266,20 +265,20 @@ function assign_genos(
                 norm_l)
         car.cluster_result.assignments = fill(unclassified_assignment, n_wells)
         return (
-            fill(apg_labels[end], n_wells), # assignments_adj_labels
+            fill(apg_labels[end], n_wells), ## assignments_adj_labels
             AssignGenosResult(
-                car.cluster_result, # cluster_result
-                1, # best_i # Potential issue: ucc_dict empty so should return 0 ???
-                EMPTY_BEST_GENO_COMBINS, # best_geno_combins
+                car.cluster_result, ## cluster_result
+                1, ## best_i # Potential issue: ucc_dict empty so should return 0 ???
+                EMPTY_BEST_GENO_COMBINS, ## best_geno_combins
                 expected_genos_all,
-                EMPTY_UCC_DICT)) # ucc_dict
+                EMPTY_UCC_DICT)) ## ucc_dict
     end
 
     calc_init_centers_all() =
         [
             channel_extrema[
                 channel_i,
-                expected_genos_all[channel_i, geno_i] + 1 # allele == 0 => channel_extrema[,1], allele == 1 => channel_extrema[,2]
+                expected_genos_all[channel_i, geno_i] + 1 ## allele == 0 => channel_extrema[,1], allele == 1 => channel_extrema[,2]
             ]
             for channel_i in 1:num_channels, geno_i in 1:max_num_genos
         ] .* transpose(init_factors)
@@ -293,7 +292,7 @@ function assign_genos(
         const num_genos = max_num_genos
         _ucc_dict = EMPTY_UCC_DICT
         good_enough = false
-        while num_genos >= 2 # `p_` = possible
+        while num_genos >= 2 ## `p_` = possible
             good_enough_vec = Vector{Bool}()
             for num_expected_ncg in
                 colon((num_genos - num_ctrl_genos), -1, max(2 - num_ctrl_genos, 0))
@@ -317,20 +316,20 @@ function assign_genos(
                             ## `geno_combin` includes all genotypes except NTC
                             if geno_combin == non_ntc_geno_combin
                                 _ucc_dict[center_set].car = car
-                            end # if num_genos
-                        end # if !
+                            end ## if num_genos
+                        end ## if !
                         push!(good_enough_vec, car.check_dist_bool)
-                    end # for possible_ncg_idc
+                    end ## for possible_ncg_idc
                     if any(good_enough_vec)
                         good_enough = true
                         break
                     end
-            end # for num_expected_ncg
+            end ## for num_expected_ncg
             if good_enough
                 break
             end
             num_genos -= 1
-        end # while
+        end ## while
         ## find the best model (possible combination of genotypes
         ## resulting in largest silhouette mean)
         const ucc_keys = _ucc_dict |> keys |> collect
@@ -363,10 +362,10 @@ function assign_genos(
                         car.slht_mean,
                         [geno_combin])
         return (
-            1, # best_1
-            ucc, # best_ucc
+            1, ## best_1
+            ucc, ## best_ucc
             OrderedDict{Set{Vector{Float_T}},UniqCombinCenters}(
-                center_set => ucc)) # ucc_dict
+                center_set => ucc)) ## ucc_dict
     end
 
     function cluster_geno(idc...)
@@ -407,13 +406,13 @@ function assign_genos(
                             _new_center_idc[i] = closest_j
                             dist_optm_init_centers[i, :] = +Inf
                             dist_optm_init_centers[:, closest_j] = +Inf
-                        end # if closest_i
-                    end # if !
-                end # if _new_center_idc
-            end # for i
+                        end ## if closest_i
+                    end ## if !
+                end ## if _new_center_idc
+            end ## for i
             # println(dist_optm_init_centers)
             # println(_new_center_idc)
-        end # while
+        end ## while
         # println("_new_center_idc ", _new_center_idc)
         return _new_center_idc
     end
@@ -439,11 +438,12 @@ function assign_genos(
     #
     ## end of function definitions nested within assign_genos()
 
+    log_debug("at assign_genos()")
     const num_channels, n_wells = size(data)
     const max_num_genos = 2 ^ num_channels # 2 comes from the binary possible values, i.e. presence/absence of signal for each channel
     const unclassified_assignment = max_num_genos + 1
     if length(apg_labels) != unclassified_assignment
-        error("The number of labels does not equal the number of all possible genotypes.")
+        log_error("the number of labels does not equal the number of all possible genotypes")
     end
     ## `expected_genos_all` - each column is a vector of binary geno
     ## whose length is number of channels (0 => channel min, 1 => channel max)
@@ -477,15 +477,15 @@ function assign_genos(
     init_centers_all = calc_init_centers_all()
     ## update initial centers according to controls with known genotypes if present
     for i in 1:length(ctrl_genos)
-        ctrl_well_idc = ctrl_well_dict[ctrl_genos[i]] .+ 1 # transform 0-indexed well_nums to 1-indexed well_idc
+        ctrl_well_idc = ctrl_well_dict[ctrl_genos[i]] .+ 1 ## transform 0-indexed well_nums to 1-indexed well_idc
         ctrl_well_data = data[:, ctrl_well_idc]
         init_centers_all[:, ctrl_geno_idc[i]] = mean(ctrl_well_data, 2)
     end
     ## are expected genotypes specified for non-control wells?
     const best_i, best_ucc, ucc_dict =
         length(expected_ncg_raw) > 0 ?
-            encg_cluster_model() :      # yes
-            best_cluster_model()        # no
+            encg_cluster_model() :      ## yes
+            best_cluster_model()        ## no
     ## use output of best clustering model
     const best_geno_combins = best_ucc.geno_combins
     const best_num_genos = length(best_ucc.uniq_combin_centers)
@@ -493,7 +493,7 @@ function assign_genos(
     # const init_centers, dist_mtx_winit, cluster_result, centers, slhts, slht_mean =
     #     map(fn -> getfield(car, fn), fieldnames(car))
     ## can we call any of the genotypes?
-    if (best_num_genos < max_num_genos - 1 ) # cannot call genotypes
+    if (best_num_genos < max_num_genos - 1 ) ## cannot call genotypes
         # const all_unclassified = true
         const assignments_adj = fill(unclassified_assignment, n_wells)
     else # can call genotypes
@@ -508,7 +508,7 @@ function assign_genos(
         # elseif best_num_genos == max_num_genos - 1
         #     const ref_center_idc = non_ntc_geno_idc
         #     # assignments_agp_idc = map(a -> non_ntc_geno_idc[a], assignments_raw)
-        # end # no possible case for `else`
+        # end ## no possible case for `else`
         # const expected_genos = expected_genos_all[:, ref_center_idc]
         #
         new_center_idc = calc_new_center_idc()
@@ -516,7 +516,7 @@ function assign_genos(
             ## if dual channel && no heteros only homo1, homo2, NTC
             ## change NTC to hetero
             new_center_idc = ntc2hetero!(new_center_idc)
-        end # if num_channels
+        end ## if num_channels
 
         ## is this necessary?
         # if best_num_genos == max_num_genos - 1 && ntc_geno_idx in new_center_idc
@@ -527,16 +527,16 @@ function assign_genos(
         # for ctrl_geno in keys(ctrl_well_dict)
         #     for i in 1:size(expected_genos)[2]
         #         if expected_genos[:, i] == ctrl_geno
-        #             expected_ctrl_assignment = i # needs to use `centers`, `assignments_agp_idc`
+        #             expected_ctrl_assignment = i ## needs to use `centers`, `assignments_agp_idc`
         #             break
-        #         end # if
-        #     end # for i
+        #         end ## if
+        #     end ## for i
         #     for ctrl_well_num in ctrl_well_dict[ctrl_geno]
         #         if assignments_agp_idc[ctrl_well_num] != expected_ctrl_assignment
         #             assignments_agp_idc .= unclassified_assignment # Because assignments of different clusters depend on one another, if control well(s) is/are assigned incorrectly, the other wells may be assigned incorrectly as well.
-        #         end # if
-        #     end # for ctrl_well_num
-        # end # for ctrl_geno
+        #         end ## if
+        #     end ## for ctrl_well_num
+        # end ## for ctrl_geno
         # for which contrast (1, 0). Venn diagram showing overlapping among the significant for each contrast.
         # write.table(twl_cic[apply(twl_cic[,contrast_vec], 1, function(row_) sum(row_) > 0),], sprintf()
 
@@ -553,7 +553,7 @@ function assign_genos(
         const assignments_adj =
             map(i -> (car.slhts[i] < slht_lb) ? unclassified_assignment : assignments_agp_idc[i],
                 1:length(assignments_agp_idc))
-    end # if best_num_genos
+    end ## if best_num_genos
     const assignments_adj_labels = map(a -> apg_labels[a], assignments_adj)
     return (
         assignments_adj_labels,
@@ -565,7 +565,7 @@ function assign_genos(
             ## all
             expected_genos_all,
             ucc_dict))
-end # assign_genos()
+end ## assign_genos()
 
 
 function process_ad(
@@ -584,6 +584,7 @@ function process_ad(
 
     categ_well_vec      ::AbstractVector =CATEG_WELL_VEC,
 )
+    log_debug("at process_ad()")
     ## indicate a well as NTC (non-template control) if all the channels have NaN as Cq
     const ntc_bool_vec =
         map(1:length(full_amp_out.fluo_well_nums)) do well_idx
@@ -609,11 +610,9 @@ function process_ad(
                 ctrl_well_dict,
                 cluster_method,
                 norm_l)
-    end # for
+    end ## for
     return (assignments_adj_labels_dict, agr_dict)
-end # process_ad()
-
-
+end ## process_ad()
 
 
 #
