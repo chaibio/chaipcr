@@ -86,7 +86,7 @@ function get_k(
     ## in the request body is already specific to a single step.
     calib_data ::Associative,
     well_nums  ::AbstractVector =[];
-    well_proc  ::Symbol = :vec, ## options: :mean, :vec.
+    well_proc  ::WellProc = WellProcVec(), ## options: WellProcMean(), WellProcVec()
     save_to    ::String ="" ## used: "k.jld"
 )
     log_debug("at get_k()")
@@ -111,14 +111,14 @@ function get_k(
     # end)
 
     ## subtract water calibration data
-    cd_key_vec = @p keys calib_data | collect | filter x -> (x != "water") ## `cd` - channel of dye.
-    channel_nums = map(x -> Base.parse(split(x, "_")[2]), cd_key_vec)
-    n_channels = length(channel_nums)
-    water_data_2bt = reduce(hcat, calib_data["water"]["fluorescence_value"])
+    const cd_key_vec = @p keys calib_data | collect | filter x -> (x != "water") ## `cd` - channel of dye.
+    const channel_nums = map(x -> Base.parse(split(x, "_")[2]), cd_key_vec)
+    const n_channels = length(channel_nums)
+    const water_data_2bt = reduce(hcat, calib_data["water"]["fluorescence_value"])
     #
     ## no information on well numbers in calibration info so make default assumptions
-    n_wells = size(water_data_2bt, 1)
-    water_well_nums = collect(1:n_wells)
+    const n_wells = size(water_data_2bt, 1)
+    const water_well_nums = collect(1:n_wells)
     #
     ## vectorized
     # water_data = transpose(reduce(hcat,calib_data["water"]["fluorescence_value"]))
@@ -127,93 +127,95 @@ function get_k(
     #     return cd_key_vec[channel] => signal_data .- water_data
     # end)
     ## devectorized
-    k4dcv_bydy = OrderedDict( ## `bydy` - by dye
+    const k4dcv_bydy = OrderedDict( ## `bydy` - by dye
         map(channel_nums) do c
             signal_data_2bt = reduce(hcat, calib_data[cd_key_vec[c]]["fluorescence_value"])
-            k4dcv_c = Array{Float_T,2}(n_channels, n_wells)
-            for i in 1:n_wells, j in channel_nums
-                k4dcv_c[j,i] = signal_data_2bt[i,j] - water_data_2bt[i,j]
-            end
+            const k4dcv_c ::Array{Float_T,2}(n_channels, n_wells) = 
+                [ signal_data_2bt[i,j] - water_data_2bt[i,j] for j in channel_nums, i in 1:n_wells ]
             cd_key_vec[c] => k4dcv_c
         end)
-
+    #
     ## assuming `cd_key` (in the format of "channel_1", "channel_2", etc.)
     ## is the target channel of the dye, check whether the water-subtracted signal
     ## in the target channel is greater than that in the non-target channel(s)
     ## for each well and each dye.
-    stop_msgs = Vector{String}()
+    err_msgs = Vector{String}()
     for target_channel_i in channel_nums
-        signals = k4dcv_bydy[cd_key_vec[target_channel_i]]
-        target_signals = signals[target_channel_i, :]
+        const target_signals = view(k4dcv_bydy[cd_key_vec[target_channel_i]], target_channel_i, :)
         for non_target_channel_i in channel_nums
             if (target_channel_i != non_target_channel_i)
-                non_target_signals = signals[non_target_channel_i, :]
+                non_target_signals = view(k4dcv_bydy[cd_key_vec[target_channel_i]], non_target_channel_i, :)
                 failed_idc = find(target_signals .<= non_target_signals)
                 if (length(failed_idc) > 0)
-                    failed_well_nums_str = join(water_well_nums[failed_idc], ", ")
-                    push!(stop_msgs, "Invalid deconvolution data for the dye targeting channel $target_channel_i: " *
-                        "fluorescence value of non-target channel $non_target_channel_i is greater than or equal " *
-                        "to that of target channel $target_channel_i in the following well(s) - $failed_well_nums_str")
+                    push!(err_msgs, FAILED_STR1 * target_channel_i *
+                        FAILED_STR2 * non_target_channel_i *
+                        FAILED_STR3 * target_channel_i *
+                        FAILED_STR4 * join(water_well_nums[failed_idc], ", "))
                 end
             end
         end ## for non_target_channel_i
     end ## for channel_i
-    (length(stop_msgs) > 0) && log_error(join(stop_msgs, ""))
+    if (length(err_msgs) > 0) && log_error(join(err_msgs, ". "))
 
-    inv_note_pt1 = ""
-    inv_note_pt2 = "K matrix is singular, using `pinv` instead of `inv` to compute inverse matrix of K. " *
-        "Deconvolution result may not be accurate. " *
-        "This may be caused by using the same or a similar set of solutions in the steps for different dyes."
+    ## compute inverses and return
+    const k_s, k_inv_vec, inv_note = calc_kinv(well_proc, k4dcv_bydy, cd_key_vec)
+    k4dcv = K4Deconv(k_s, k_inv_vec, (length(inv_note) > 0) ? inv_note * INV_NOTE_PT2 : "")
+    (length(save_to) > 0) && save(save_to, "k4dcv", k4dcv)
+    return k4dcv
+end ## get_k()
 
-    if (well_proc == :mean) ## use average over channels, by well
-        k_s =
-            mapreduce( ## `cd` - channel of dye
-                cd_key -> Array{Float_T}(sweep(sum)(/)(mean(k4dcv_bydy[cd_key], 2))),
+
+## dependencies of get_k()
+
+function calc_kinv(
+    ::WellProcMean
+    k4dcv_bydy ::Associative
+    cd_key_vec ::AbstractVector
+)
+    inv_note = false
+    const k_s =
+        mapreduce( ## `cd` - channel of dye
+            cd_key -> Array{Float_T}(sweep(sum)(/)(mean(k4dcv_bydy[cd_key], 2))),
+            hcat,
+            cd_key_vec)
+    const k_inv = try
+        inv(k_s)
+    catch err
+        if isa(err, Base.LinAlg.SingularException)
+            inv_note = true
+            pinv(k_s)
+        else
+            throw(err)
+        end ## if isa(err,
+    end ## try
+    return k_s, fill(k_inv, n_wells), inv_note ? "" : "Well mean"
+end
+
+function calc_kinv(
+    ::WellProcVec
+    k4dcv_bydy ::Associative
+    cd_key_vec ::AbstractVector
+)
+    singular_well_nums = Vector{Int}()
+    const k_s =
+        [   mapreduce(
+                cd_key -> Array{Float_T}(sweep(sum)(/)(k4dcv_bydy[cd_key][:, i])),
                 hcat,
                 cd_key_vec)
-        k_inv = try
-            inv(k_s)
-        catch err
-            if isa(err, Base.LinAlg.SingularException)
-                inv_note_pt1 = "Well mean"
-                pinv(k_s)
-            else
-                throw(err)
-            end ## if isa(err,
-        end ## try
-        k_inv_vec = fill(k_inv, n_wells)
-        #
-    elseif (well_proc == :vec)
-        singular_well_nums = Vector{Int}()
-        k_s = fill(ones(1,1), n_wells)
-        k_inv_vec = similar(k_s)
-        for i in 1:n_wells
-            k_mtx =
-                mapreduce(
-                    cd_key -> Array{Float_T}(sweep(sum)(/)(k4dcv_bydy[cd_key][:, i])),
-                    hcat,
-                    cd_key_vec)
-            k_s[i] = k_mtx
-            ## k_inv_vec[i] = inv(k_mtx)
-            k_inv_vec[i] = try
-                inv(k_mtx)
+            for i in range(1, n_wells) ]
+    const k_inv_vec =
+        [   try
+                inv(k_s[i])
             catch err
                 if isa(err, Union{Base.LinAlg.SingularException, Base.LinAlg.LAPACKException})
                     push!(singular_well_nums, water_well_nums[i])
-                    pinv(k_mtx)
+                    pinv(k_s[i])
                 else
                     throw(err)
                 end ## if isa(err
             end ## try
-        end ## next well
-        if (length(singular_well_nums) > 0)
-            inv_note_pt1 = "Well(s) $(join(singular_well_nums, ", "))"
-        end
-    end ## if well_proc
-    #
-    inv_note = (length(inv_note_pt1) > 0) ? "$inv_note_pt1: $inv_note_pt2" : ""
-    k4dcv = K4Deconv(k_s, k_inv_vec, inv_note)
-    #
-    (length(save_to) > 0) && save(save_to, "k4dcv", k4dcv)
-    return k4dcv
-end ## get_k()
+            for i in range(1, n_wells) ]
+    const inv_note = (length(singular_well_nums) > 0) ?
+        "Well(s) $(join(singular_well_nums, ", "))" : ""
+    return k_s, k_inv_vec, inv_note
+end

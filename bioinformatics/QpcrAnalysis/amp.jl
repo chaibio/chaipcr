@@ -129,19 +129,27 @@ function act(
         end
     end
     ## call
-    response = process_amp(
-        ## remove MySql dependency
-        # db_conn, exp_id, asrp_vec, calib_info;
-        # req_dict["experiment_id"],
-        parsed_raw_data()...,
-        req_dict["calibration_info"],
-        asrp_vec;
-        out_format  = out_format,
-        kwdict_rc   = kwdict_rc,
-        kwdict_mbq  = kwdict_mbq,
-        out_sr_dict = false,
-        kwdict_pa1...
-    )
+    const response = 
+        try
+            process_amp(
+                ## remove MySql dependency
+                # db_conn, exp_id, asrp_vec, calib_info;
+                # req_dict["experiment_id"],
+                parsed_raw_data()...,
+                req_dict["calibration_info"],
+                asrp_vec;
+                out_format  = out_format,
+                kwdict_rc   = kwdict_rc,
+                kwdict_mbq  = kwdict_mbq,
+                out_sr_dict = false,
+                kwdict_pa1...)
+        catch err
+            OrderedDict(
+                :valid => false,
+                :error => string(err))
+        end
+    return out_format == :json ?
+        JSON.json(response) : response)
 end ## act(::Amplification)
 
 
@@ -559,9 +567,7 @@ function process_amp(
                 end)
     end
     final_out[:valid] = true
-    return out_format == :json ?
-        JSON.json(final_out) :
-        final_out
+    return final_out
 end ## process_amp()
 
 

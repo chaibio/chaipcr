@@ -40,13 +40,21 @@ function act(
     #
     ## pass call through to process_mc
     ## which will perform the analysis for the entire dataset
-    return process_mc(
-        req_dict["raw_data"],
-        req_dict["calibration_info"];
-        out_format = out_format,
-        # kwdict_pmc...,
-        kwdict_mc_tm_pw = kwdict_mc_tm_pw
-    )
+    const response =
+        try
+            process_mc(
+                req_dict["raw_data"],
+                req_dict["calibration_info"];
+                out_format = out_format,
+                # kwdict_pmc...,
+                kwdict_mc_tm_pw = kwdict_mc_tm_pw
+            )
+        catch err
+            OrderedDict(
+                :valid => false,
+                :error => string(err))
+        end
+    return out_format == :json ? JSON.json(response) : response
 end ## act()
 
 
@@ -205,7 +213,7 @@ function process_mc(
                     for well_i in 1:num_fluo_wells, channel_i in 1:num_channels ]
         end)
         mc_out[:valid] = true
-        return out_format == :json ? JSON.json(mc_out) : mc_out
+        return mc_out
     end ## out_format
 end ## process_mc()
 

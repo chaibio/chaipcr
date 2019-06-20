@@ -54,6 +54,10 @@ const DEFAULT_apg_LABELS = ["ntc", "homo_1", "homo_2", "hetero", "unclassified"]
 const ARRAY_EMPTY = Array{Array{Float_T,2},1}(0)
 const K4DCV_EMPTY = K4Deconv(ARRAY_EMPTY, ARRAY_EMPTY, "")
 const K4DCV = JLD.load("$LOAD_FROM_DIR/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv"] # sometimes crash REPL
+const INV_NOTE_PT2 =
+    "K matrix is singular, using `pinv` instead of `inv` to compute inverse matrix of K. " *
+    "Deconvolution result may not be accurate. " *
+    "This may be caused by using the same or a similar set of solutions in the steps for different dyes."
 
 ## used in supsmu.jl
 const libsupsmu = "$LOAD_FROM_DIR/_supsmu.so"
