@@ -123,7 +123,7 @@ function act(
     #
     ## group result set
     # gre_vec = group_result_df[:, 3]
-    # uniq_well_combins = @p id gre_vec | map x -> x[:well] | unique
+    # uniq_well_combins = map(x -> x[:well], gre_vec) |> unique
     # grp_vec = Vector{OrderedDict}()
     # for well_combin in uniq_well_combins
     #     if length(well_combin) > 1
@@ -187,7 +187,7 @@ function reqvec2df(req_vec ::AbstractVector)
             length(req_ele["well"])
         catch
             0
-        end # try
+        end ## try
     end)
     #
     for well_i in 1:length(req_vec)
@@ -197,7 +197,7 @@ function reqvec2df(req_vec ::AbstractVector)
                 req_ele["well"][channel_i]
             catch
                 Dict{String,Any}()
-            end # try
+            end ## try
             if length(measrmt_dict) == 0
                 target = cq = qty = NaN
             else
@@ -205,7 +205,7 @@ function reqvec2df(req_vec ::AbstractVector)
                 cq = nothing2NaN(measrmt_dict["cq"])
                 qty_dict = measrmt_dict["quantity"]
                 qty = nothing2NaN(qty_dict["m"]) * 10.0 ^ nothing2NaN(qty_dict["b"])
-            end # if
+            end ## if
             push!(well_vec, well_i)
             push!(channel_vec, channel_i)
             push!(target_vec, target)
@@ -216,8 +216,8 @@ function reqvec2df(req_vec ::AbstractVector)
             catch
                 NaN
             end)
-        end # for channel_i
-    end # for well_i
+        end ## for channel_i
+    end ## for well_i
     #
     return DataFrame(
         well = well_vec,
@@ -229,8 +229,6 @@ function reqvec2df(req_vec ::AbstractVector)
 end
 
 ## end: dependencies of `standard_curve`
-
-
 
 
 ## generate standard_curve request for testing, and dependency functions;
@@ -284,7 +282,7 @@ function insert2ary(
             end...),
         setindex!(select_all_idx_vec, idx_range, seek2ins_along_dim)...)
     return ary_wins
-end # insert2ary
+end ## insert2ary
 
 
 ## generate standard_curve request
@@ -292,30 +290,29 @@ function generate_req_sc(;
     ## random unless individually specified
     ## NA not counted as a unique value for `num_uniq`
 
-    num_wells::Integer=16,
+    num_wells ::Integer =16,
+    num_channels ::Integer =2,
 
-    num_channels::Integer=2,
+    target_vec ::AbstractVector =[],
+    num_uniq_targets ::Integer =10,
+    lb_num_na_targets ::Integer =2,
 
-    target_vec::AbstractVector=[],
-    num_uniq_targets::Integer=10,
-    lb_num_na_targets::Integer=2,
+    cq_vec ::AbstractVector =[],
+    cq_bounds ::Tuple =(0.01, 40.0),
+    num_na_cqs ::Integer =3,
 
-    cq_vec::AbstractVector=[],
-    cq_bounds::Tuple=(0.01, 40.),
-    num_na_cqs::Integer=3,
+    qm_vec ::AbstractVector =[],
+    qm_bounds ::Tuple =(1, 10),
+    qb_vec ::AbstractVector =[],
+    qb_bounds ::Tuple{Int,Int} =(-20, 20),
+    num_na_qtys ::Integer =0,
 
-    qm_vec::AbstractVector=[],
-    qm_bounds::Tuple=(1, 10),
-    qb_vec::AbstractVector=[],
-    qb_bounds::Tuple{Int,Int}=(-20, 20),
-    num_na_qtys::Integer=0,
+    sample_vec ::AbstractVector =[],
+    num_uniq_samples ::Integer =4,
+    num_na_samples ::Integer =2,
 
-    sample_vec::AbstractVector=[],
-    num_uniq_samples::Integer=4,
-    num_na_samples::Integer=2,
-
-    rng_type::DataType=MersenneTwister,
-    seed::Integer=1
+    rng_type ::DataType =MersenneTwister,
+    seed ::Integer =1
 )
     rng = rng_type(seed)
 
@@ -339,7 +336,7 @@ function generate_req_sc(;
 
     num_targets = length(target_vec)
     if num_targets == 0
-        println("randomly generating targets...") # target values should not be the same across different channels for the same well
+        println("randomly generating targets...") ## target values should not be the same across different channels for the same well
         num_nna_targets = num_measrmts - channelwide_num_na_targets - addi_num_na_targets
         target_vec = insert2ary(NaN, addi_num_na_targets, fill(0, num_nna_targets), 1, rng)
         nna_channel_idc = find(1:num_channels) do channel_i
@@ -358,11 +355,11 @@ function generate_req_sc(;
             for nna_idx_i in 1:length(nna_target_idc)
                 target_vec[nna_target_idc[nna_idx_i]] = nna_target_vec[nna_idx_i]
             end
-        end # for channel_i
+        end ## for channel_i
 
     elseif num_targets != num_measrmts
         log_error("target_vec not empty but length not same as num_measrmts")
-    end # if num_targets
+    end ## if num_targets
 
     num_cqs = length(cq_vec)
     if num_cqs == 0
@@ -413,10 +410,10 @@ function generate_req_sc(;
                             :b          => qb_vec[measrmt_i]))
                 end,
             :sample => sample_vec[well_i])
-    end # do well_i
+    end ## do well_i
 
     return (json(req_vec), req_vec)
-end # generate_req_sc
+end ## generate_req_sc
 
 
 
