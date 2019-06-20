@@ -1,3 +1,4 @@
+## deconv.jl
 ## color compensation / multi-channel deconvolution
 
 import DataStructures.OrderedDict
@@ -15,7 +16,7 @@ function deconvolute(
 
     ## remove MySql dependency
     #
-    ## arguments needed if k matrix needs to be computed
+    ## arguments needed if `k` matrix needs to be computed
     ## `db_conn_default` is defined in "__init__.jl"
     # db_conn ::MySQL.MySQLHandle=db_conn_default,
     # calib_info ::Union{Integer,OrderedDict}=calib_info_AIR,
@@ -26,9 +27,10 @@ function deconvolute(
     ## keyword arguments
     k4dcv_backup            ::K4Deconv =K4DCV,
     scaling_factor_dcv_vec  ::AbstractVector =SCALING_FACTOR_deconv_vec,
-    out_format              ::Symbol = :both # :array, :dict, :both
+    out_format              ::Symbol = :both ## :array, :dict, :both
 )
     log_debug("at deconvolute()")
+
     ## remove MySql dependency
     # k4dcv = (isa(calib_info, Integer) || begin
     #     step_ids = map(ci_value -> ci_value["step_id"], values(calib_info))
@@ -66,7 +68,7 @@ function deconvolute(
 end ## deconvolute()
 
 
-## function: get cross-over constant matrix K
+## function: get cross-over constant matrix `k`
 function get_k(
     ## remove MySql dependency
     # db_conn ::MySQL.MySQLHandle,
@@ -109,10 +111,10 @@ function get_k(
     # end)
 
     ## subtract water calibration data
-    cd_key_vec = calib_data |> keys |> collect |> filter[x -> (x != "water")] ## `cd` - channel of dye.
+    cd_key_vec = @p keys calib_data | collect | filter x -> (x != "water") ## `cd` - channel of dye.
     channel_nums = map(x -> Base.parse(split(x, "_")[2]), cd_key_vec)
     n_channels = length(channel_nums)
-    water_data_2bt = calib_data["water"]["fluorescence_value"] |> reduce[hcat]
+    water_data_2bt = reduce(hcat, calib_data["water"]["fluorescence_value"])
     #
     ## no information on well numbers in calibration info so make default assumptions
     n_wells = size(water_data_2bt, 1)
@@ -121,13 +123,13 @@ function get_k(
     ## vectorized
     # water_data = transpose(reduce(hcat,calib_data["water"]["fluorescence_value"]))
     # k4dcv_bydy = OrderedDict(map(channel_nums) do channel
-    #     signal_data = transpose(reduce(hcat,calib_data[cd_key_vec[channel]]["fluorescence_value"]))
+    #     signal_data = transpose(reduce(hcat, calib_data[cd_key_vec[channel]]["fluorescence_value"]))
     #     return cd_key_vec[channel] => signal_data .- water_data
     # end)
     ## devectorized
     k4dcv_bydy = OrderedDict( ## `bydy` - by dye
         map(channel_nums) do c
-            signal_data_2bt = calib_data[cd_key_vec[c]]["fluorescence_value"] |> reduce[hcat]
+            signal_data_2bt = reduce(hcat, calib_data[cd_key_vec[c]]["fluorescence_value"])
             k4dcv_c = Array{Float_T,2}(n_channels, n_wells)
             for i in 1:n_wells, j in channel_nums
                 k4dcv_c[j,i] = signal_data_2bt[i,j] - water_data_2bt[i,j]
@@ -163,7 +165,7 @@ function get_k(
         "Deconvolution result may not be accurate. " *
         "This may be caused by using the same or a similar set of solutions in the steps for different dyes."
 
-    if (well_proc == :mean) # use average over channels, by well
+    if (well_proc == :mean) ## use average over channels, by well
         k_s =
             mapreduce( ## `cd` - channel of dye
                 cd_key -> Array{Float_T}(sweep(sum)(/)(mean(k4dcv_bydy[cd_key], 2))),
@@ -175,6 +177,8 @@ function get_k(
             if isa(err, Base.LinAlg.SingularException)
                 inv_note_pt1 = "Well mean"
                 pinv(k_s)
+            else
+                throw(err)
             end ## if isa(err,
         end ## try
         k_inv_vec = fill(k_inv, n_wells)

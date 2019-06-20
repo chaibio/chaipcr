@@ -92,17 +92,15 @@ function process_mc(
             map(tf_dict_vec) do tf_dict
                 Dict(
                     map(TF_KEYS) do key
-                        key => extend_NaN(
-                            tf_dict_vec |> map[x -> length(x[:temperature])] |> maximum,
-                            tf_dict[key])
+                        key => extend_NaN(map(x -> length(x[:temperature]), tf_dict_vec) |> maximum)(tf_dict[key])
                     end)
             end
 
         ## convert to MeltCurveTF object
         toMeltCurveTF(tf_nv_adj ::AbstractArray) =
             MeltCurveTF(
-                # tf_nv_adj |> map[index[:temperature]]        |> reduce[hcat],
-                # tf_nv_adj |> map[index[:fluorescence_value]] |> reduce[hcat])
+                ## @p id tf_nv_adj | map x -> x[:temperature]        | reduce hcat,
+                ## @p id tf_nv_adj | map x -> x[:fluorescence_value] | reduce hcat)
                 map(TF_KEYS) do key
                     mapreduce(tf_dict -> tf_dict[key], hcat, tf_nv_adj)
                 end...)
@@ -122,7 +120,7 @@ function process_mc(
                 faw_ary3[:,i,channel_i])...)
 
     remove_when_NaN_in_first(x...) =
-        map(y -> y[(x |> first |> broadcast[!isnan])], x)
+        map(y -> y[@p first x | broadcast !isnan], x)
 
     normalize_fluos(
         tmprtrs     ::DataArray{S} where S <: AbstractFloat,
@@ -136,7 +134,7 @@ function process_mc(
     log_debug("at process_mc()")
     const channel_nums, fluo_well_nums =
         map(("channel","well_num")) do key
-            mc_data |> index[key] |> unique |> sort
+            mc_data[key] |> unique |> sort
         end
     const num_channels   = length(channel_nums)
     const num_fluo_wells = length(fluo_well_nums)
@@ -226,7 +224,7 @@ function mc_tm_pw(
     ## smoothing -df/dt curve and if `smooth_fluo`, fluorescence curve too
     auto_span_smooth    ::Bool =true,
     span_css_tmprtr     ::Real =1.0, ## css = choose `span_smooth`. fluorescence fluctuation with the temperature range of approximately `span_css_tmprtr * 2` is considered for choosing `span_smooth`
-    span_smooth_default ::AbstractFloat =0.05, # unit: fraction of data points for smoothing
+    span_smooth_default ::AbstractFloat =0.05, ## unit: fraction of data points for smoothing
     span_smooth_factor  ::Real =7.2,
     #
     ## get a denser temperature sequence to get fluorescence and -df/dt from it and fitted spline function
@@ -286,7 +284,8 @@ function mc_tm_pw(
             log_info("`span_smooth` was selected as $span_smooth")
             return span_smooth_product(tmprtrs, fluos, fu_rle)
         else
-            log_info("`span_smooth_product` $span_smooth_product < `span_smooth_default`, use `span_smooth_default` $span_smooth_default")
+            log_info("`span_smooth_product` $span_smooth_product < `span_smooth_default`, " *
+                "use `span_smooth_default` $span_smooth_default")
             return span_smooth_default
         end
 
@@ -304,7 +303,8 @@ function mc_tm_pw(
         ## end of function definitions nested within calc_span_smooth()
 
         if fu_rle[1] == [false]
-            log_info("no fluo increase as temperature increase was detected: using `span_smooth_default` $span_smooth_default")
+            log_info("no fluo increase as temperature increase was detected: " *
+                "using `span_smooth_default` $span_smooth_default")
             return span_smooth_default
         else
             # log_info("fluorescence increase with temperature increase was detected")
@@ -315,8 +315,7 @@ function mc_tm_pw(
     ## find the region(s) where there is a positive gradient
     ## such that fluorescence increases as the temperature increases
     ## `fu_rle` - fluo_up run length encoding
-    fu_rle() =
-        calc_fu_rle(giis_tp(max_fluo_dcrs()))
+    fu_rle() = calc_fu_rle(giis_tp(max_fluo_dcrs()))
 
     calc_fu_rle(css_idc ::AbstractVector{Int}) =
         rle(is_increasing(fluos[css_idc]))
@@ -338,8 +337,7 @@ function mc_tm_pw(
 
     ## fit cubic spline to fluos ~ tmprtrs using Dierckx
     ## default parameter s=0.0 interpolates without smoothing
-    spline_model(x) =
-        Spline1D(shorten(x...)...; k=3)
+    spline_model(x) = Spline1D(shorten(x...)...; k=3)
 
     ## smooth raw fluo values
     smooth_raw_fluo() =
@@ -388,28 +386,30 @@ function mc_tm_pw(
             0))
 
     ## find summit and nadir indices of Tm peaks in `ndrv_smu`
-    find_sn() =
-        [maximum, minimum] |> map[find_mid_sumr_bysw[ndrv_smu, span_peaks_dp()]]
+    find_sn() = map(
+        x -> find_mid_sumr_bysw(ndrv_smu, span_peaks_dp(), x),
+        [maximum, minimum])
 
     summits_and_nadirs(sn_idc...) =
-        OrderedDict(zip(
-            [:summit_pre, :nadir],
-            map(
-                idc -> mc_denser[idc, :],
-                sn_idc)))
+        OrderedDict(
+            zip(
+                [:summit_pre, :nadir],
+                map(
+                    idc -> mc_denser[idc, :],
+                    sn_idc)))
 
     find_peaks(
         summit_pre_idc  ::AbstractVector{Int},
         nadir_idc       ::AbstractVector{Int}
     ) =
         ## return value Ta_raw =
-        PeakIndices(
-            ndrv_smu[summit_pre_idc],
-            summit_pre_idc,
-            nadir_idc)              |>
-                collect             |>
-                map[peak_Ta]        |>
-                filter[thing]
+        @p PeakIndices
+            ndrv_smu[summit_pre_idc]
+            summit_pre_idc
+            nadir_idc               |
+                collect             |
+                map peak_Ta         |
+                filter thing
 
     ## calculate peak area
     peak_Ta(peak_idc ::Tuple{I,I,I} where I <: Integer) =
@@ -475,7 +475,7 @@ function mc_tm_pw(
         #     func -> func(tp_denser[peak_bound_idc]),
         #     [minimum, maximum])
         return area_func(ordered_tuple(tp_denser[[peak_bound_idc...]]...)...)
-    end # calc_area
+    end ## calc_area
 
     ## count cross points
     function count_cross_points()
@@ -506,7 +506,7 @@ function mc_tm_pw(
         tmprtr_max_ndrv     ::AbstractFloat,
         areas_raw           ::AbstractVector{F} where F <: AbstractFloat,
         top1_Tm_idx         ::Integer,
-        fn_mc_slope         ::Function,         # linear regression fluos ~ tmprtrs
+        fn_mc_slope         ::Function,         ## linear regression fluos ~ tmprtrs
         fn_num_cross_points ::Function
     )
         top_peaks(fltd_idc_topNp1 ::AbstractVector{I} where I <: Integer) =
@@ -573,11 +573,12 @@ function mc_tm_pw(
     ## only used if the data array is too short to find peaks
     if (len_raw <= 3)
         return MeltCurveTa(
-            hcat(
-                tmprtrs,
-                fluos,
-                -finite_diff(tmprtrs, fluos; nu = 1, method = :central)) |>
-                    report[json_digits],    ## mc_raw
+            report(json_digits,
+                hcat(
+                    tmprtrs,
+                    fluos,
+                    -finite_diff(tmprtrs, fluos; nu = 1, method = :central))),
+                                            ## mc_raw
             EMPTY_Ta,                       ## Ta_fltd
             EMPTY_mc,                       ## mc_denser
             NaN,                            ## ns_range_mid
@@ -621,7 +622,7 @@ function mc_tm_pw(
     ## return smoothed data if no peaks
     if (len_Tms == 0)
         return MeltCurveTa(
-            mc_raw          |> report[json_digits],
+            report(json_digits, mc_raw),
             EMPTY_Ta,   ## Ta_fltd
             mc_denser,
             ns_range_mid,
@@ -649,12 +650,12 @@ function mc_tm_pw(
                 count_cross_points)]                ## () -> num_cross_points
     #
     return MeltCurveTa(
-        mc_raw              |> report[json_digits],
-        Ta_fltd             |> report[json_digits],
+        report(json_digits, mc_raw),
+        report(json_digits, Ta_fltd),
         mc_denser,          ## do we want to round this to json_digits as well?
         ns_range_mid,
         sn_dict,
-        Ta_raw[idc_sb_area] |> report[json_digits],
+        report(json_digits, Ta_raw[idc_sb_area]),
         length(Ta_fltd) == 0 ? "No" : "Yes")
 end ## mc_tm_pw()
 
@@ -697,129 +698,121 @@ function mutate_dups(
     return vec_sorted[order_back]
 end
 
-    ## finite differencing function
-    function finite_diff(
-        X       ::AbstractVector,
-        Y       ::AbstractVector; ## X and Y must be of same length
-        nu      ::Integer =1, ## order of derivative
-        method  ::Symbol = :central
-    )
-        const dlen = length(X)
-        if dlen != length(Y)
-            log_error("X and Y must be of same length.")
-        end
-        if (dlen == 1)
-            return zeros(1)
-        end
-        if (nu == 1)
-            if (method == :central)
-                const range1 = 3:dlen+2
-                const range2 = 1:dlen
-            elseif (method == :forward)
-                const range1 = 3:dlen+2
-                const range2 = 2:dlen+1
-            elseif (method == :backward)
-                const range1 = 2:dlen+1
-                const range2 = 1:dlen
-            end
-            const X_p2, Y_p2 = map((X, Y)) do ori
-                vcat(
-                    ori[2] * 2 - ori[1],
-                    ori,
-                    ori[dlen-1] * 2 - ori[dlen])
-            end
-            return (Y_p2[range1] .- Y_p2[range2]) ./ (X_p2[range1] .- X_p2[range2])
-        else
-            return finite_diff(
-                X,
-                finite_diff(X, Y; nu = nu - 1, method = method),
-                nu = 1;
-                method = method)
-        end # if nu == 1
+## finite differencing function
+function finite_diff(
+    X       ::AbstractVector,
+    Y       ::AbstractVector; ## X and Y must be of same length
+    nu      ::Integer =1, ## order of derivative
+    method  ::Symbol = :central
+)
+    const dlen = length(X)
+    if dlen != length(Y)
+        log_error("X and Y must be of same length.")
     end
-
-    ## PeakIndices methods
-    ## iterator functions to find peaks and flanking nadirs
-
-    Base.start(iter ::PeakIndices) = (0,0,0)
-
-    Base.done(iter ::PeakIndices, state) =
-        state == nothing || state[1] > iter.len_summit_idc
-
-    Base.iteratorsize(::PeakIndices) = SizeUnknown()
-
-    Base.eltype(iter ::PeakIndices) = Tuple{Int, Int, Int}
-
-    function Base.collect(iter ::PeakIndices)
-        collection = []
-        for peak in iter
-            peak == nothing || push!(collection, peak)
-        end
-        return collection
+    if (dlen == 1)
+        return zeros(1)
     end
+    if (nu == 1)
+        if (method == :central)
+            const range1 = 3:dlen+2
+            const range2 = 1:dlen
+        elseif (method == :forward)
+            const range1 = 3:dlen+2
+            const range2 = 2:dlen+1
+        elseif (method == :backward)
+            const range1 = 2:dlen+1
+            const range2 = 1:dlen
+        end
+        const X_p2, Y_p2 = map((X, Y)) do ori
+            vcat(
+                ori[2] * 2 - ori[1],
+                ori,
+                ori[dlen-1] * 2 - ori[dlen])
+        end
+        return (Y_p2[range1] .- Y_p2[range2]) ./ (X_p2[range1] .- X_p2[range2])
+    else
+        return finite_diff(
+            X,
+            finite_diff(X, Y; nu = nu - 1, method = method),
+            nu = 1;
+            method = method)
+    end # if nu == 1
+end
 
-    function Base.next(iter ::PeakIndices, state ::Tuple{Int, Int, Int})
-        ## fail if state == nothing
-        if (state == nothing)
-            return (nothing, nothing)
-        end
-        ## state != nothing
-        left_nadir_ii, summit_ii, right_nadir_ii = state
-        ## next summit
-        while (summit_ii < iter.len_summit_idc)
-            ## summit_ii < iter.len_summit_idc
-            ## increment the summit index
-            summit_ii += 1
-            ## extend nadir range to the right
-            while (right_nadir_ii < iter.len_nadir_idc)
-                right_nadir_ii += 1
-                if (iter.summit_idc[summit_ii] < iter.nadir_idc[right_nadir_ii])
-                    break
-                end
-            end
-            ## decrease nadir range to the left, if possible
-            while (left_nadir_ii < iter.len_nadir_idc &&
-                iter.nadir_idc[left_nadir_ii + 1] < iter.summit_idc[summit_ii])
-                    left_nadir_ii += 1
-            end
-            ## if there is a nadir to the left, break out of loop
-            if (left_nadir_ii > 0)
-                break
-            end
-            ## otherwise try the next summit
-        end
-        ## fail if no more summits
-        if (summit_ii >= iter.len_summit_idc)   ||
-                ## fail if no flanking nadirs
-            !(iter.nadir_idc[left_nadir_ii] < iter.summit_idc[summit_ii] < iter.nadir_idc[right_nadir_ii])
-                return (nothing, nothing)
-        end
-        ## find duplicate summits
-        right_summit_ii = summit_ii
-        while (right_summit_ii < iter.len_summit_idc &&
-            iter.summit_idc[right_summit_ii + 1] < iter.nadir_idc[right_nadir_ii])
-            right_summit_ii += 1
-        end
-        ## remove duplicate summits by choosing highest summit
-        if (right_summit_ii > summit_ii)
-            summit_ii =
-                (iis -> iis[indmax(iter.summit_heights[iis])])(
-                    summit_ii:right_summit_ii)
-        end
-        return (
-            (iter.nadir_idc[left_nadir_ii],
-                iter.summit_idc[summit_ii],
-                iter.nadir_idc[right_nadir_ii]),        ## element
-            (left_nadir_ii, summit_ii, right_nadir_ii)) ## state
+## PeakIndices methods
+## iterator functions to find peaks and flanking nadirs
+
+Base.start(iter ::PeakIndices) = (0, 0, 0)
+
+Base.done(iter ::PeakIndices, state) =
+    state == nothing || state[1] > iter.len_summit_idc
+
+Base.iteratorsize(::PeakIndices) = SizeUnknown()
+
+Base.eltype(iter ::PeakIndices) = Tuple{Int, Int, Int}
+
+function Base.collect(iter ::PeakIndices)
+    collection = []
+    for peak in iter
+        peak == nothing || push!(collection, peak)
     end
+    return collection
+end
 
-    ## do not report indices for each peak, only Tm and area
-    report(digits ::Integer, peaks ::Vector{Peak}) =
-        length(peaks) == 0 ?
-            EMPTY_Ta :
-            mapreduce(p -> round.([p.Tm, p.area], digits),
-                hcat,
-                peaks) |> transpose
+function Base.next(iter ::PeakIndices, state ::Tuple{Int, Int, Int})
+    ## fail if state == nothing
+    (state == nothing) && return (nothing, nothing)
+    ## state != nothing
+    left_nadir_ii, summit_ii, right_nadir_ii = state
+    ## next summit
+    while (summit_ii < iter.len_summit_idc)
+        ## summit_ii < iter.len_summit_idc
+        ## increment the summit index
+        summit_ii += 1
+        ## extend nadir range to the right
+        while (right_nadir_ii < iter.len_nadir_idc)
+            right_nadir_ii += 1
+            (iter.summit_idc[summit_ii] < iter.nadir_idc[right_nadir_ii]) && break
+        end
+        ## decrease nadir range to the left, if possible
+        while (left_nadir_ii < iter.len_nadir_idc &&
+            iter.nadir_idc[left_nadir_ii + 1] < iter.summit_idc[summit_ii])
+                left_nadir_ii += 1
+        end
+        ## if there is a nadir to the left, break out of loop
+        (left_nadir_ii > 0) && break
+        ## otherwise try the next summit
+    end
+    ## fail if no more summits or no flanking nadirs
+    (summit_ii >= iter.len_summit_idc)   ||
+        !(iter.nadir_idc[left_nadir_ii] < iter.summit_idc[summit_ii] < iter.nadir_idc[right_nadir_ii])
+            && return (nothing, nothing)
+    ## find duplicate summits
+    right_summit_ii = summit_ii
+    while (right_summit_ii < iter.len_summit_idc &&
+        iter.summit_idc[right_summit_ii + 1] < iter.nadir_idc[right_nadir_ii])
+        right_summit_ii += 1
+    end
+    ## remove duplicate summits by choosing highest summit
+    if (right_summit_ii > summit_ii)
+        summit_ii =
+            (iis -> iis[indmax(iter.summit_heights[iis])])(
+                summit_ii:right_summit_ii)
+    end
+    return (
+        (iter.nadir_idc[left_nadir_ii],
+            iter.summit_idc[summit_ii],
+            iter.nadir_idc[right_nadir_ii]),        ## element
+        (left_nadir_ii, summit_ii, right_nadir_ii)) ## state
+end
+
+## do not report indices for each peak, only Tm and area
+report(digits ::Integer, peaks ::Vector{Peak}) =
+    length(peaks) == 0 ?
+        EMPTY_Ta :
+        mapreduce(p -> round.([p.Tm, p.area], digits),
+            hcat,
+            peaks) |> transpose
 
 
-    #
+#

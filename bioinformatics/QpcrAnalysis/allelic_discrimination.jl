@@ -136,7 +136,7 @@ function do_cluster_analysis(
                             edge) <= 0.0
 
                     edge_always_second_longest() =
-                        setdiff(gi_idc, edge) |> all[is_second_longest[]]
+                        all(is_second_longest(setdiff(gi_idc, edge)))
                     ## end of function definitions nested within calc_dist_within_margin_max()
 
                     ## vectorized code
@@ -248,10 +248,10 @@ function assign_genos(
 )
     calc_expected_genos_all() =
         mapreduce(
-            i -> fill(
+            i -> @p fill
                     mapreduce(geno -> fill(geno, 1, 2 ^ (i-1)), hcat, [0, 1]),
                     2 ^ (num_channels - i)
-                ) |> reduce[hcat],
+                        | reduce hcat _,
             vcat,
             1:num_channels
         ) |> nrn
@@ -334,8 +334,10 @@ function assign_genos(
         ## find the best model (possible combination of genotypes
         ## resulting in largest silhouette mean)
         const ucc_keys = _ucc_dict |> keys |> collect
-        const _best_i = findmax(ucc_keys |>
-            map[key -> getfield(_ucc_dict[key],:slht_mean)] |> collect)[2]
+        const _best_i =
+            findmax(
+                collect(
+                    map(key -> getfield(_ucc_dict[key],:slht_mean), ucc_keys)))[2]
         const _best_ucc = _ucc_dict[ucc_keys[_best_i]]
         # expected_genos = expected_genos_vec[best_i]
         return (_best_i, _best_ucc, _ucc_dict)

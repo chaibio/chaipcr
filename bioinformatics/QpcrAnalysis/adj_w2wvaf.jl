@@ -232,8 +232,7 @@ function prep_adj_w2wvaf(
         msg = join(stop_msgs, "")
         return ErrorException(msg)
     end
-    channels_in_water, channels_in_signal =
-        (water_data_dict, signal_data_dict) |> map[get_ordered_keys]
+    channels_in_water, channels_in_signal = map(get_ordered_keys, (water_data_dict, signal_data_dict))
     ## assume without checking that there are no missing wells anywhere
     const signal_well_nums = collect(1:length(signal_data_dict[1]))
     #

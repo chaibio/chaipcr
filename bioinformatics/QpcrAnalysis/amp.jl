@@ -25,7 +25,7 @@ function act(
                 req_dict["raw_data"][key] |> unique             ## in order of appearance
             end
         const num_cycs, num_fluo_wells, num_channels =
-            (cyc_nums, fluo_well_nums, channel_nums) |> map[length]
+            map(length, (cyc_nums, fluo_well_nums, channel_nums))
         try
             assert(req_dict["raw_data"]["cycle_num"] ==
                 repeat(
@@ -61,7 +61,7 @@ function act(
         return (
             cyc_nums[cyc_perm],
             fluo_well_nums[well_perm],
-            channel_nums[chan_perm] |> map[i -> "channel_$(i)"],
+            map(i -> "channel_$(i)", channel_nums[chan_perm]),
             num_cycs,
             num_fluo_wells,
             num_channels,
@@ -109,7 +109,7 @@ function act(
     if haskey(req_dict, "categ_well_vec")
         kwdict_pa1[:categ_well_vec] =
             map(x -> str2sym.(x), req_dict["categ_well_vec"])
-        for i in req_dict["categ_well_vec"] |> length |> range[1]
+        for i in range(1, length(req_dict["categ_well_vec"]))
             if length(req_dict["categ_well_vec"][i][2]) == 0
                 kwdict_pa1[:categ_well_vec][i][2] = Colon()
             end
@@ -251,8 +251,7 @@ function process_amp(
                             af_key = af_key,
                             kwdict_mbq...)
                     end ## do well_i
-                mbq_ary1 |> map[index[:postbl_status]] |> find_idc_useful |>
-                    map[mbq_i -> mbq_ary1[mbq_i][:cq_fluo]] |> median
+                @p map x -> x[:postbl_status] mbq_ary1 | find_idc_useful | map mbq_i -> mbq_ary1[mbq_i][:cq_fluo] | median
             end # do channel_i
         end
 
@@ -556,7 +555,7 @@ function process_amp(
         final_out =
             OrderedDict(
                 map(fieldnames(first_sr_out)) do key
-                    key => getfield(first_sr_out,key)
+                    key => getfield(first_sr_out, key)
                 end)
     end
     final_out[:valid] = true

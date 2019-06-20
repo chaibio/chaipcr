@@ -51,7 +51,7 @@ function dcv_aw(
     ## issue:
     ## we can't match well numbers between calibration data and experimental data
     ## because we don't have that information for the calibration data
-    wva_well_idc_wfluo = wva_well_nums |> length |> range[1] |> collect
+    wva_well_idc_wfluo = @p id wva_well_nums | length | range 1 | collect
 
     ## subtract background
     ## mw = minus water
@@ -109,7 +109,7 @@ function dcv_aw(
         else ## :array
             const dcvd_aw = (dcvd_aw_ary3,)
         end
-    elseif aw_out_format == :dict # bug in original code (`out_format` not `aw_out_format`)
+    elseif aw_out_format == :dict ## bug in original code (`out_format` not `aw_out_format`)
         const dcvd_aw = (dcvd_aw_dict,)
     else
         log_error("`aw_out_format` must be :array, :dict or :both. ")
@@ -132,7 +132,7 @@ end ## dcv_aw
 #    calib_info = ensure_ci(db_conn, calib_info)
 #
 #    calib_key_vec = get_ordered_keys(calib_info)
-#    cd_key_vec = calib_key_vec[2:end] # cd = channel of dye. "water" is index 1 per original order.
+#    cd_key_vec = calib_key_vec[2:end] ## cd = channel of dye. "water" is index 1 per original order.
 #    channel_nums = map(cd_key_vec) do cd_key
 #        parse(Int, split(cd_key, "_")[2])
 #    end
@@ -181,9 +181,10 @@ function calib_calib(
     dye_in      ::Symbol = :FAM,
     dyes_2bfild ::AbstractVector =[]
 )
-    ## This function is expected to handle situations where `calib_info_1` and `calib_info_2` have different combinations of wells, but the number of wells should be the same.
+    ## This function is expected to handle situations where `calib_info_1` and `calib_info_2`
+    ## have different combinations of wells, but the number of wells should be the same.
     if length(well_nums_1) != length(well_nums_2)
-        log_error("length(well_nums_1) != length(well_nums_2). ")
+        log_error("length(well_nums_1) != length(well_nums_2)")
     end
 
     ## remove MySql dependency
@@ -192,7 +193,7 @@ function calib_calib(
     # water_well_nums_1 = calib_dict_1["water"][2]
     #
     # calib_key_vec_1 = get_ordered_keys(calib_info_1)
-    # cd_key_vec_1 = calib_key_vec_1[2:end] # cd = channel of dye. "water" is index 1 per original order.
+    # cd_key_vec_1 = calib_key_vec_1[2:end] ## cd = channel of dye. "water" is index 1 per original order.
     # channel_nums_1 = map(cd_key_vec_1) do cd_key
     #     parse(Int, split(cd_key, "_")[2])
     # end

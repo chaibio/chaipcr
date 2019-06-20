@@ -123,7 +123,7 @@ function act(
     #
     ## group result set
     # gre_vec = group_result_df[:, 3]
-    # uniq_well_combins = gre_vec |> map[field[:well]] |> unique
+    # uniq_well_combins = @p id gre_vec | map x -> x[:well] | unique
     # grp_vec = Vector{OrderedDict}()
     # for well_combin in uniq_well_combins
     #     if length(well_combin) > 1
