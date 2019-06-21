@@ -45,8 +45,8 @@ function deconvolute(
         map(1:a2d_dim_well) do w
             k4dcv.k_inv_vec[dcv_well_idc_wfluo[w]] .* scaling_factor_dcv_vec
         end
-    const dcvd_ary3 = 
-        [   
+    const dcvd_ary3 =
+        [
             dcvd_ary3[x, w, :] = k_inv_vs[w] * ary2dcv[x, w, :] ## matrix * vector
             for x in 1:a2d_dim_unit, w in 1:a2d_dim_well
         ]
@@ -129,7 +129,7 @@ function get_k(
     const k4dcv_bydy = OrderedDict( ## `bydy` - by dye
         map(channel_nums) do c
             signal_data_2bt = reduce(hcat, calib_data[cd_key_vec[c]][FLUORESCENCE_VALUE_KEY])
-            const k4dcv_c ::Array{Float_T,2}(n_channels, n_wells) = 
+            const k4dcv_c ::Array{Float_T,2}(n_channels, n_wells) =
                 [ signal_data_2bt[i,j] - water_data_2bt[i,j] for j in channel_nums, i in 1:n_wells ]
             cd_key_vec[c] => k4dcv_c
         end)

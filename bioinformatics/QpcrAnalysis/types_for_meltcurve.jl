@@ -30,7 +30,7 @@ struct MeltCurveTa # `Tm and area` - Ta
     ns_range_mid    ::Float_T
     sn_dict         ::Dict{Symbol,Array{Float_T,2}}
     Ta_raw          ::Array{Float_T,2}
-    Ta_reported     ::String
+    Ta_reported     ::Symbol
 end
 
 struct MeltCurveOutput

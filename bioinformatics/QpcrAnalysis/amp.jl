@@ -85,7 +85,7 @@ function act(
 
     ## we will assume that any relevant step/ramp information has already been passed along
     ## and is present in step_id / ramp_id
-    const asrp_vec = 
+    const asrp_vec =
         @match map(key -> key in keys(req_dict), [STEP_ID_KEY, RAMP_ID_KEY]) begin
             [true, _ ]      =>  [AmpStepRampProperties(:step, req_dict[STEP_ID_KEY], DEFAULT_cyc_nums)]
             [false, true]   =>  [AmpStepRampProperties(:ramp, req_dict[RAMP_ID_KEY], DEFAULT_cyc_nums)]
@@ -113,7 +113,7 @@ function act(
             end ## if
         end ## map
     ## `mod_bl_q` arguments
-    const kwdict_mbq = 
+    const kwdict_mbq =
         if haskey(req_dict, BASELINE_METHOD_KEY)
             @match req_dict[BASELINE_METHOD_KEY] begin
                 SIGMOID_KEY =>
@@ -133,7 +133,7 @@ function act(
         end) ## if haskey
     #
     ## call
-    const response = 
+    const response =
         try
             process_amp(
                 ## remove MySql dependency
@@ -295,7 +295,7 @@ function process_amp(
                             cat(2, fv...), ## 2-dim array of size (`num_cycs` or number of coefs, `num_wells * num_channels`)
                             length(fv[1,1]),
                             size(fv)...)
-                end # if fn_mbq in
+                end ## if fn_mbq in
                 setfield!(
                     full_amp_out,
                     fn_mbq,
@@ -421,7 +421,7 @@ function process_amp(
         end
         ## out_format == :json || out_format == :pre_json
         return AmpStepRampOutput2Bjson(
-            map(fieldnames(AmpStepRampOutput2Bjson)) do fn # numeric fields only
+            map(fieldnames(AmpStepRampOutput2Bjson)) do fn ## numeric fields only
                 field_value = getfield(full_amp_out, fn)
                 try
                     round.(field_value, json_digits)
@@ -642,7 +642,7 @@ function mod_bl_q(
         const fitted_prebl = fit(dfc_inst, cycs, fluos, wts; kwargs_jmp_model...)
         const baseline = fitted_prebl.coefs[1] +
             af_key in [:MAK3, :MAKERGAUL4] ?
-                fitted_prebl.coefs[2] .* cycs : # .+ ???
+                fitted_prebl.coefs[2] .* cycs : ## .+ ???
                 0.0
         const fitted_postbl = fitted_prebl
         const coefs_pob = fitted_postbl.coefs
@@ -665,7 +665,7 @@ function mod_bl_q(
             NaN, ## cq_raw
             NaN, ## cq
             NaN, ## eff
-            NaN ## cq_fluo
+            NaN  ## cq_fluo
         )
     end
 
@@ -886,7 +886,7 @@ function mod_bl_q(
     return @match af_key begin
         :MAK2 || :MAK3 || :MAKERGAUL3 || :MAKERGAUL4
                 =>  fit_dfc_model()
-        :sfc    =>  fit_sfc_model() 
+        :sfc    =>  fit_sfc_model()
         _       =>  log_error("`af_key` $af_key is not recognized.")
     end ## @match
 end ## mod_bl_q()
@@ -900,7 +900,7 @@ function report_cq!(
     max_dr1_lb =472,
     max_dr2_lb =41,
     max_bsf_lb =4356,
-    scld_max_dr1_lb ::Real =0.0089, # look like real amplification, scld_max_dr1 0.00894855, ip223, exp. 75, well A7, channel 2.
+    scld_max_dr1_lb ::Real =0.0089, ## look like real amplification, scld_max_dr1 0.00894855, ip223, exp. 75, well A7, channel 2.
     scld_max_dr2_lb ::Real =0.000689,
     scld_max_bsf_lb ::Real =0.086
 )
@@ -919,29 +919,30 @@ function report_cq!(
     const scld_max_dr1, scld_max_dr2, scld_max_bsf =
         [max_dr1, max_dr2, max_bsf] ./ full_amp_out.max_qt_fluo
     #
-    if postbl_status == :Error
-        const why_NaN = "postbl_status == :Error"
-    elseif b_ > 0
-        const why_NaN = "b > 0"
-    elseif full_amp_out.cq_method == :ct && cq_raw == Ct_VAL_DomainError
-        const why_NaN = "DomainError when calculating Ct"
-    elseif cq_raw <= 0.1 || cq_raw >= num_cycs
-        const why_NaN = "cq_raw <= 0.1 || cq_raw >= num_cycs"
-    elseif max_dr1 < max_dr1_lb
-        const why_NaN = "max_dr1 $max_dr1 < max_dr1_lb $max_dr1_lb"
-    elseif max_dr2 < max_dr2_lb
-        const why_NaN = "max_dr2 $max_dr2 < max_dr2_lb $max_dr2_lb"
-    elseif max_bsf < max_bsf_lb
-        const why_NaN = "max_bsf $max_bsf < max_bsf_lb $max_bsf_lb"
-    elseif scld_max_dr1 < scld_max_dr1_lb
-        why_NaN = "scld_max_dr1 $scld_max_dr1 < scld_max_dr1_lb $scld_max_dr1_lb"
-    elseif scld_max_dr2 < scld_max_dr2_lb
-        const why_NaN = "scld_max_dr2 $scld_max_dr2 < scld_max_dr2_lb $scld_max_dr2_lb"
-    elseif scld_max_bsf < scld_max_bsf_lb
-        const why_NaN = "scld_max_bsf $scld_max_bsf < scld_max_bsf_lb $scld_max_bsf_lb"
-    else
-        const why_NaN = ""
-    end
+    const why_NaN =
+        if postbl_status == :Error
+            "postbl_status == :Error"
+        elseif b_ > 0
+            "b > 0"
+        elseif full_amp_out.cq_method == :ct && cq_raw == Ct_VAL_DomainError
+            "DomainError when calculating Ct"
+        elseif cq_raw <= 0.1 || cq_raw >= num_cycs
+            "cq_raw <= 0.1 || cq_raw >= num_cycs"
+        elseif max_dr1 < max_dr1_lb
+            "max_dr1 $max_dr1 < max_dr1_lb $max_dr1_lb"
+        elseif max_dr2 < max_dr2_lb
+            "max_dr2 $max_dr2 < max_dr2_lb $max_dr2_lb"
+        elseif max_bsf < max_bsf_lb
+            "max_bsf $max_bsf < max_bsf_lb $max_bsf_lb"
+        elseif scld_max_dr1 < scld_max_dr1_lb
+            "scld_max_dr1 $scld_max_dr1 < scld_max_dr1_lb $scld_max_dr1_lb"
+        elseif scld_max_dr2 < scld_max_dr2_lb
+            "scld_max_dr2 $scld_max_dr2 < scld_max_dr2_lb $scld_max_dr2_lb"
+        elseif scld_max_bsf < scld_max_bsf_lb
+            "scld_max_bsf $scld_max_bsf < scld_max_bsf_lb $scld_max_bsf_lb"
+        else
+            ""
+        end
     if (why_NaN != "")
         full_amp_out.cq[well_i, channel_i] = NaN
     end

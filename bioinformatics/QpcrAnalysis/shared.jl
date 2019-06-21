@@ -191,7 +191,7 @@ function parse_af{T<:AbstractFloat}( ::Type{T}, strval ::String)
 end
 
 ## print with verbose control
-## deprecated in favour of log_info()    
+## deprecated in favour of log_info()
 function print_v(
     print_func ::Function,
     verbose ::Bool,

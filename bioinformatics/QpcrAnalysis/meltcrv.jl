@@ -454,9 +454,9 @@ function mc_tm_pw(
             if ndrv_smu1 <= hn_ns <= ndrv_smu0
                 about2cross_idx = idx
                 break
-            end # if
+            end ## if
             idx = idx1
-        end # while
+        end ## while
         return (high_nadir_idx, about2cross_idx)
     end ## peak_bounds()
 
@@ -560,7 +560,7 @@ function mc_tm_pw(
                 idx -> areas_raw[idx] >= areas_raw[idc_sb_area[1]] * frac_report_lb,
                 idc_sb_area[range(1, min(top_N+1, len_Tms))])
         )
-    end # real_peaks()
+    end ## real_peaks()
     #
     ## end of function definitions nested in mc_tm_pw()
 
@@ -588,7 +588,7 @@ function mc_tm_pw(
                 :tmprtrs => EMPTY_Ta,
                 :fluos   => EMPTY_Ta),      ## sn_dict
             EMPTY_Ta,                       ## Ta_raw
-            "No"                            ## Ta_reported
+            :No                             ## Ta_reported
         )
     end
     ## else
@@ -630,7 +630,7 @@ function mc_tm_pw(
             ns_range_mid,
             sn_dict,
             EMPTY_Ta,   ## Ta_raw
-            "No")
+            :No)
     end
     ## else
     #
@@ -658,7 +658,7 @@ function mc_tm_pw(
         ns_range_mid,
         sn_dict,
         report(json_digits, Ta_raw[idc_sb_area]),
-        length(Ta_fltd) == 0 ? "No" : "Yes")
+        length(Ta_fltd) == 0 ? :No : :Yes)
 end ## mc_tm_pw()
 
 ## functions called by mc_tm_pw()
@@ -738,7 +738,7 @@ function finite_diff(
             finite_diff(X, Y; nu = nu - 1, method = method),
             nu = 1;
             method = method)
-    end # if nu == 1
+    end ## if nu == 1
 end
 
 ## PeakIndices methods

@@ -60,7 +60,7 @@ function act(
             )
         end
     end ## do chunk_target
-    
+
     ## group results calculation commented out
     ## as this calculation is duplicated in the front end
     ## TP 2019/03/12
@@ -93,7 +93,7 @@ function act(
     #         end ## do chunk_target
     #     end ## if
     # end ## do chunk
-    
+
     ## report results
     if out_format == :full
         # return (target_result_df, group_result_df)
@@ -116,7 +116,7 @@ function act(
         end
         push!(target_vec, target_result)
     end ## for
-    
+
     ## group results reporting commented out
     ## as the calculation is duplicated in the front end
     ## TP 2019/03/12
