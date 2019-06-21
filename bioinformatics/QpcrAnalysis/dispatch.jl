@@ -31,7 +31,7 @@ function dispatch(
         ## else
         const action_t = Action_DICT[action]()
 
-    const production_env = (get(ENV, "JULIA_ENV", nothing) == "production")
+    const production_env = (get(ENV, "JULIA_ENV", nothing) == PRODUCTION_MODE)
     @static if !production_env
             ## this code is hidden from the parser on the BeagleBone
             if (verify)
@@ -163,5 +163,6 @@ end ## args2reqb
 function test0()
     println(guids)
 end
+
 
 #

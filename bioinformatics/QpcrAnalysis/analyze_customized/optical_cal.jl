@@ -33,10 +33,9 @@ function act(
 
     const err_msg =
         ## calibration data is required
-        if !haskey(calib_info, "calibration_info") || !(typeof(calib_info["calibration_info"]) <: Associative)
             "no calibration information found"
         else
-            const calib_info_dict = calib_info["calibration_info"]
+            const calib_info_dict = calib_info[CALIBRATION_INFO_KEY]
             
             err_msg_vec = Vector{String}()
             #
@@ -96,10 +95,6 @@ function act(
         JSON.json(result) :
         result
 end # optical_calibration()
-
-
-
-
 
 
 #

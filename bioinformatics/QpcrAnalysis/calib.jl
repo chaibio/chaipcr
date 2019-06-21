@@ -112,7 +112,7 @@ function dcv_aw(
     elseif aw_out_format == :dict ## bug in original code (`out_format` not `aw_out_format`)
         const dcvd_aw = (dcvd_aw_dict,)
     else
-        log_error("`aw_out_format` must be :array, :dict or :both. ")
+        log_error("`aw_out_format` must be :array, :dict, or :both")
     end
     ## Performance issue:
     ## enforce data types for this output
@@ -184,7 +184,7 @@ function calib_calib(
     ## This function is expected to handle situations where `calib_info_1` and `calib_info_2`
     ## have different combinations of wells, but the number of wells should be the same.
     if length(well_nums_1) != length(well_nums_2)
-        log_error("length(well_nums_1) != length(well_nums_2)")
+        log_error("length(wellnums_1) != length(wellnums_2)")
     end
 
     ## remove MySql dependency
@@ -222,7 +222,6 @@ function calib_calib(
         wva_data_2,
         dcv_aw_ary3_1)
 end ## calib_calib
-
 
 
 #

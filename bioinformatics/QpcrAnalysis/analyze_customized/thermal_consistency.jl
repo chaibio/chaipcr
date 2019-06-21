@@ -26,20 +26,15 @@ function act(
     log_debug("at act(::ThermalConsistency)")
  
     ## calibration data is required
-    if !haskey(req_dict, "calibration_info") || !(typeof(req_dict["calibration_info"]) <: Associative)
+    if !haskey(req_dict, CALIBRATION_INFO_KEY) || !(typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative)
         log_error("no calibration information found")
     end
+
+    const kwdict_mc_tm_pw = OrderedDict{Symbol,Any}(
+        map(keys(MC_TM_PW_KEYWORDS)) do key
+            key => req_dict[MC_TM_PW_KEYWORDS[key]]
+        end) ## do key
     
-    kwdict_mc_tm_pw = OrderedDict{Symbol,Any}()
-    if haskey(req_dict, "qt_prob")
-        kwdict_mc_tm_pw[:qt_prob_flTm] = req_dict["qt_prob"]
-    end
-    if haskey(req_dict, "max_normd_qtv")
-        kwdict_mc_tm_pw[:normd_qtv_ub] = req_dict["max_normd_qtv"]
-    end
-    if haskey(req_dict, "top_N")
-        kwdict_mc_tm_pw[:top_N] = req_dict["top_N"]
-    end
     ## process data as melting curve
     mc_w72c = process_mc(
         ## remove MySql dependency
@@ -47,8 +42,8 @@ function act(
         # exp_id,
         # stage_id,
         # calib_info;
-        req_dict["raw_data"],
-        req_dict["calibration_info"];
+        req_dict[RAW_DATA_KEY],
+        req_dict[CALIBRATION_INFO_KEY];
         well_nums = well_nums,
         auto_span_smooth = auto_span_smooth,
         span_smooth_default = span_smooth_default,

@@ -104,7 +104,21 @@ install("FunctionalData", v"0.1.2", v"0.1.2-")
 # install("ProfileView", v"0.3.0", v"0.3.1-")
 # install("MySQL", v"0.3.0", v"0.3.1-") # remove MySQL dependency
 
-Pkg.build("DataArrays", "DataStructures", "SpecialFunctions", "MathProgBase", "HDF5", "Clustering", "Nullables", "JSON", "JLD", "JuMP", "HttpServer", "Dierckx", "Ipopt", "DataFrames")
+Pkg.build(
+	"DataArrays",
+	"DataStructures",
+	"SpecialFunctions",
+	"MathProgBase",
+	"HDF5",
+	"Clustering",
+	"Nullables",
+	"JSON",
+	"JLD",
+	"JuMP",
+	"HttpServer",
+	"Dierckx",
+	"Ipopt",
+	"DataFrames")
 # Pkg.build("MySQL") # remove MySQL dependency
 println("Building: Done")
 

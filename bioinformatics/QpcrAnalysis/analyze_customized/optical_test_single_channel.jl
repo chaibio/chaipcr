@@ -20,7 +20,7 @@ function act(
  
     ## remove MySql dependency
     #
-    # step_ids = [BASELINE_STEP_ID, EXCITATION_STEP_ID]
+    # step_ids = ["baseline_step_id", "excitation_step_id"]
     # ot_dict = OrderedDict(map(step_ids) do step_id
     #     ot_qry_2b = "SELECT fluorescence_value, well_num
     #         FROM fluorescence_data
@@ -40,9 +40,9 @@ function act(
 
     ## assuming the 2 values of `ot_dict` are the same in length (number of wells)
     const results =
-        map(1:length(ot_dict["baseline"]["fluorescence_value"])) do well_i
-            const baseline = ot_dict["baseline"]["fluorescence_value"][well_i]
-            const excitation = ot_dict["excitation"]["fluorescence_value"][well_i]
+        map(1:length(ot_dict[BASELINE_KEY][FLUORESCENCE_VALUE_KEY])) do well_i
+            const baseline = ot_dict[BASELINE_KEY][FLUORESCENCE_VALUE_KEY][well_i]
+            const excitation = ot_dict[EXCITATION_KEY][FLUORESCENCE_VALUE_KEY][well_i]
             # valid =
             #    (excitation >= MIN_EXCITATION_FLUORESCENCE) &&
             #    (excitation / baseline >= MIN_EXCITATION_FLUORESCENCE_MULTIPLE) &&

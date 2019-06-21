@@ -164,7 +164,7 @@ num_channels(fluos ::AbstractArray) =
     (length(fluos) > 1) && (fluos[2] != nothing) ? 2 : 1
 
 num_channels(calib ::Associative) =
-    @p keys calib | map key -> num_channels(calib[key]["fluorescence_value"]) | maximum
+    @p keys calib | map key -> num_channels(calib[key][FLUORESCENCE_VALUE_KEY]) | maximum
 
 ## used in calib.jl
 num_wells(fluos ::AbstractArray) =
@@ -172,8 +172,8 @@ num_wells(fluos ::AbstractArray) =
 
 num_wells(calib ::Associative) =
     @p keys calib | collect |
-        filter key -> haskey(calib[key],"fluorescence_value")  |
-        map key -> num_wells(calib[key]["fluorescence_value"]) |
+        filter key -> haskey(calib[key],FLUORESCENCE_VALUE_KEY)  |
+        map key -> num_wells(calib[key][FLUORESCENCE_VALUE_KEY]) |
         maximum
 
 ## duplicated in MySQLforQpcrAnalysis.jl
@@ -269,44 +269,44 @@ function ensure_ci(
     return calib_data
     ## << new
 
-    if isa(calib_info, Integer)
-
-        if calib_info == calib_info_AIR
-            calib_id = MySQL.mysql_execute(
-                db_conn,
-                "SELECT calibration_id FROM experiments WHERE id=$exp_id"
-            )[1][:calibration_id][1]
-        else
-            calib_id = calib_info
-        end
-
-        step_qry = "SELECT step_id FROM fluorescence_data WHERE experiment_id=$calib_id"
-        step_ids = sort(unique(MySQL.mysql_execute(db_conn, step_qry)[1][:step_id]))
-
-        calib_info = OrderedDict(
-            "water" => OrderedDict(
-                "calibration_id" => calib_id,
-                "step_id" => step_ids[1]))
-
-        for i in 2:(length(step_ids))
-            calib_info["channel_$(i-1)"] = OrderedDict(
-                "calibration_id" => calib_id,
-                "step_id" => step_ids[i])
-        end ## for
-
-        channel_qry = "SELECT channel FROM fluorescence_data WHERE experiment_id=$calib_id"
-        channels = sort(unique(MySQL.mysql_execute(db_conn, channel_qry)[1][:channel]))
-
-        for channel in channels
-            channel_key = "channel_$channel"
-            if !(channel_key in keys(calib_info))
-                calib_info[channel_key] = OrderedDict(
-                    "calibration_id" => calib_id,
-                    "step_id" => step_ids[2])
-            end ## if
-        end ## for
-    end ## if isa(calib_info, Integer)
-    return calib_info
+    # if isa(calib_info, Integer)
+    #
+    #     if calib_info == calib_info_AIR
+    #         calib_id = MySQL.mysql_execute(
+    #             db_conn,
+    #             "SELECT calibration_id FROM experiments WHERE id=$exp_id"
+    #         )[1][:calibration_id][1]
+    #     else
+    #         calib_id = calib_info
+    #     end
+    #
+    #     step_qry = "SELECT step_id FROM fluorescence_data WHERE experiment_id=$calib_id"
+    #     step_ids = sort(unique(MySQL.mysql_execute(db_conn, step_qry)[1][:step_id]))
+    #
+    #     calib_info = OrderedDict(
+    #         "water" => OrderedDict(
+    #             "calibration_id" => calib_id,
+    #             "step_id" => step_ids[1]))
+    #
+    #     for i in 2:(length(step_ids))
+    #         calib_info["channel_$(i-1)"] = OrderedDict(
+    #             "calibration_id" => calib_id,
+    #             "step_id" => step_ids[i])
+    #     end ## for
+    #
+    #     channel_qry = "SELECT channel FROM fluorescence_data WHERE experiment_id=$calib_id"
+    #     channels = sort(unique(MySQL.mysql_execute(db_conn, channel_qry)[1][:channel]))
+    #
+    #     for channel in channels
+    #         channel_key = "channel_$channel"
+    #         if !(channel_key in keys(calib_info))
+    #             calib_info[channel_key] = OrderedDict(
+    #                 "calibration_id" => calib_id,
+    #                 "step_id" => step_ids[2])
+    #         end ## if
+    #     end ## for
+    # end ## if isa(calib_info, Integer)
+    # return calib_info
 end ## ensure_ci
 
 

@@ -19,17 +19,17 @@ const SfcFitted_EMPTY = SfcFitted(
     :not_fitted,        ## status
     0.0,                ## obj_val
     JuMP.Model(),
-    OrderedDict{String,Float_T}() # init_coefs
+    OrderedDict{String,Float_T}() ## init_coefs
 )
 
-mutable struct SFCModelDef # non-linear model, one feature (`x`)
+mutable struct SFCModelDef ## non-linear model, one feature (`x`)
     ## included in SFC_MODEL_BASE
     name            ::Symbol
     linear          ::Bool
     _x_strs         ::AbstractVector
     X_strs          ::AbstractVector
     coef_strs       ::AbstractVector
-    coef_cnstrnts   ::AbstractVector # assume all linear
+    coef_cnstrnts   ::AbstractVector ## assume all linear
     func_init_coefs ::Function
     pred_strs       ::OrderedDict
     ## added by `add*!`` functions
@@ -39,7 +39,7 @@ mutable struct SFCModelDef # non-linear model, one feature (`x`)
     func_fit        ::Function
 end
 
-const MD_func_keys = [:f, :inv, :bl, :dr1, :dr2] # when `num_fts > 1`, "d*" are partial derivatives in vector of length `num_fts`
+const MD_func_keys = [:f, :inv, :bl, :dr1, :dr2] ## when `num_fts > 1`, "d*" are partial derivatives in vector of length `num_fts`
 
 # function empty_func() end
 function empty_func(args...; kwargs...) end
@@ -295,8 +295,8 @@ const SFC_MODEL_BASES = [ ## vector of tuples
         false, ## linear
         ["_x"],
         ["X"],
-        ["b_", "c_", "d_", "e_"], # coef_strs
-        [], # coef_cnstrnts
+        ["b_", "c_", "d_", "e_"], ## coef_strs
+        [], ## coef_cnstrnts
         function l4_enl_func_init_coefs(
             X::AbstractVector,
             Y::AbstractVector,
@@ -401,7 +401,7 @@ const SFC_MODEL_BASES = [ ## vector of tuples
         OrderedDict( ## pred_strs
             :f   =>
                 "c_ + k1 * _x + (d_ - c_) / (1 + exp(b_ * (log(_x) - log(e_))))",
-            :inv => "0", # not calculated yet
+            :inv => "0", ## not calculated yet
             :bl  => "c_ + k1 * _x",
             :dr1 =>
                 "k1 + (b_ * (c_ - d_) * exp(e_ * b_) * _x^(-1 + b_)) / (exp(e_ * b_) + _x^b_)^2",

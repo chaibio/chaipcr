@@ -11,17 +11,17 @@ function pnmsmu(
     Y ::AbstractVector,
     span_frac ::Real=0.05,
     polynomial_degree ::Integer=1, ## polynomial_degree <= 1 will yield same results as == 1
-    x_sortedb::Bool=true,
-    x_evenly_spacedb::Bool=true
+    x_sortedb ::Bool=true,
+    x_evenly_spacedb ::Bool=true
 )
     if ndims(X) > 1 || ndims(Y) > 1
-        log_error("X and Y must be 1-dimension.")
+        log_error("X and Y must be 1-dimensional")
     end
 
     dlen = length(X)
 
     if dlen < 5 || length(Y) != dlen
-        log_error("X and Y must be equal and >= 5 in length.")
+        log_error("X and Y must be equal and >= 5 in length")
     end
 
     if !x_sorted
@@ -77,3 +77,6 @@ function pnm_lsq(x_ary ::AbstractArray, Y ::AbstractVector)
     x_w1_T = transpose(x_w1)
     coefs = *(inv(x_w1_T * x_w1), x_w1_T, Y)
 end
+
+
+#

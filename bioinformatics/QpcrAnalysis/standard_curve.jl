@@ -110,7 +110,7 @@ function act(
             target_result = OrderedDict(
                 :target_id => getfield(tre, :target_id),
                 :error     => err_msg)
-            MicroLogging.@error(string(now()) * " $err_msg")
+            @error(string(now()) * " $err_msg")
         else
             target_result = tre
         end
@@ -184,7 +184,7 @@ function reqvec2df(req_vec ::AbstractVector)
     #
     num_channels = maximum(map(req_vec) do req_ele
         try
-            length(req_ele["well"])
+            length(req_ele[WELL_KEY])
         catch
             0
         end ## try
@@ -194,16 +194,16 @@ function reqvec2df(req_vec ::AbstractVector)
         req_ele = req_vec[well_i]
         for channel_i in 1:num_channels
             measrmt_dict = try
-                req_ele["well"][channel_i]
+                req_ele[WELL_KEY][channel_i]
             catch
                 Dict{String,Any}()
             end ## try
             if length(measrmt_dict) == 0
                 target = cq = qty = NaN
             else
-                target = nothing2NaN(measrmt_dict["target"])
+                target = nothing2NaN(measrmt_dict[TARGET_KEY])
                 cq = nothing2NaN(measrmt_dict["cq"])
-                qty_dict = measrmt_dict["quantity"]
+                qty_dict = measrmt_dict[QUANTITY_KEY]
                 qty = nothing2NaN(qty_dict["m"]) * 10.0 ^ nothing2NaN(qty_dict["b"])
             end ## if
             push!(well_vec, well_i)
@@ -212,7 +212,7 @@ function reqvec2df(req_vec ::AbstractVector)
             push!(cq_vec, cq)
             push!(qty_vec, qty)
             push!(sample_vec, try
-                nothing2NaN(req_ele["sample"])
+                nothing2NaN(req_ele[SAMPLE_KEY])
             catch
                 NaN
             end)

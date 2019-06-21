@@ -93,7 +93,7 @@ function do_cluster_analysis(
     end
 
     clustering(unknown_cluster_method, _) =
-        log_error("clustering method $unknown_cluster_method not implemented")
+        log_error(CLUSTERING * " " * METHOD * " $unknown_cluster_method" * NOT * IMPLEMENTED)
 
     ## get cluster silhouettes
     get_silhouettes() =
@@ -438,12 +438,13 @@ function assign_genos(
     #
     ## end of function definitions nested within assign_genos()
 
-    log_debug("at assign_genos()")
+    log_debug(AT * "assign_genos()")
     const num_channels, n_wells = size(data)
     const max_num_genos = 2 ^ num_channels # 2 comes from the binary possible values, i.e. presence/absence of signal for each channel
     const unclassified_assignment = max_num_genos + 1
     if length(apg_labels) != unclassified_assignment
-        log_error("the number of labels does not equal the number of all possible genotypes")
+        log_error(THE * NUMBER * OF * "labels does" * NOT * EQUAL * " " *
+            THE * NUMBER * OF * ALL * " possible genotypes")
     end
     ## `expected_genos_all` - each column is a vector of binary geno
     ## whose length is number of channels (0 => channel min, 1 => channel max)
@@ -584,7 +585,7 @@ function process_ad(
 
     categ_well_vec      ::AbstractVector =CATEG_WELL_VEC,
 )
-    log_debug("at process_ad()")
+    log_debug(AT * "process_ad()")
     ## indicate a well as NTC (non-template control) if all the channels have NaN as Cq
     const ntc_bool_vec =
         map(1:length(full_amp_out.fluo_well_nums)) do well_idx

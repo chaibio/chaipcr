@@ -53,7 +53,7 @@ function act(
                         #     (fluo_data[:step_id] .== calib_info[calib_label]["step_id"]) .& (fluo_data[:channel] .== channel)
                         # ]
                         channel -> ot_dict[string(NEW_CALIB_SYMBOLS[calib_label_i])][
-                            "fluorescence_value"][channel],
+                            FLUORESCENCE_VALUE][channel],
                         hcat,
                         CHANNELS)
             end)
@@ -134,7 +134,7 @@ function act(
             ## call as invalid analysis instead of raising an error
             # log_error("zero or negative values in the self-calibrated fluorescence data")
             validity = false
-            error_msg = "zero or negative values in the self-calibrated fluorescence data"
+            error_msg = "Zero or negative values in ther self-calibrated fluorescence data"
         end
     end
     ## calculate channel1:channel2 ratios
@@ -158,8 +158,6 @@ function act(
         JSON.json(output) :
         output
 end # analyze_optical_test_dual_channel()
-
-
 
 
 #

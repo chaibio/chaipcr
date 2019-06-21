@@ -58,16 +58,19 @@ global_logger(
             open(tempname(), "w")), min_level=:info)) ## :debug for verbose output
 @info(string(now()) * " global logger constructed in module QpcrAnalysis\n")
 
+## include key string constants
+include("keystrings.jl")
+
 ## default data width in production mode:  32 bits (BBB)
 ## default data width in development mode: 64 bits
-const production_env = (get(ENV, "JULIA_ENV", nothing) == "production")
+const production_env = (get(ENV, "JULIA_ENV", nothing) == PRODUCTION_MODE)
 if !production_env
     const Float_T   = Float32
 else
     const Float_T   = Float64
 end
 @info(string(now()) * " Julia is running in " *
-    (production_env ? "production" : "development") * " mode\n")
+    (production_env ? PRODUCTION_MODE : DEVELOPMENT_MODE) * " mode\n")
 
 ## include each script, generally in the order of workflow
 
@@ -78,7 +81,6 @@ include("types_for_allelic_discrimination.jl")
 include("types_for_amplification.jl")
 include("types_for_meltcurve.jl")
 include("types_for_standard_curve.jl")
-include("types_for_thermal_consistency.jl")
 include("amp_models/types_for_sfc_models.jl")
 include("amp_models/types_for_dfc_models.jl")
 include("constants.jl")
@@ -140,3 +142,6 @@ include("analyze_customized/thermal_consistency.jl")
 
 @debug(string(now()) * " module QpcrAnalysis loaded\n")
 end ## module QpcrAnalysis
+
+
+#

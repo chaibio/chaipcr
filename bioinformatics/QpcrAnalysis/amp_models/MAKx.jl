@@ -1,3 +1,5 @@
+## MAKx.jl
+#
 ## different formula for each cycle (dfc)
 
 ## write functions to fit MAKx (MAK2 and MAK3) model here,
@@ -13,7 +15,7 @@ function pred_from_d_nm1(::Union{MAK2, MAK3}, d_nm1::Real, k::Real)
 end
 
 
-function pred_from_cycs( # 0.7to1.2e-5 sec for 40 cycles on PC
+function pred_from_cycs( ## 0.7to1.2e-5 sec for 40 cycles on PC
     ::MAK2,
     cycs    ::AbstractVector,
     fb      ::Real,
@@ -110,7 +112,7 @@ end ## fit(::MAK2)
 
 function fit(
     ::MAK3,
-    cycs        ::AbstractVector, # continous integers or not
+    cycs        ::AbstractVector, ## continous integers or not
     obs_fluos   ::AbstractVector,
     wts         ::AbstractVector =ones(length(obs_fluos));
     kwargs_Model... ## argument for `JuMP.Model`
@@ -175,7 +177,6 @@ function fit(
         # init_coefs
     )
 end ## fit(::MAK3)
-
 
 
 
@@ -246,13 +247,10 @@ end ## fit(::MAK3)
 
 
 
-
 ## for later use
 # pred_funcs = get_mak2_pff(num_cycs)
 # preds = map(func -> func(fb, d0, k), funcs)
 #
-
-
 
 
 #

@@ -1,3 +1,5 @@
+## sfc_models.jl
+#
 ## models with same formula for each cycle (Sfc models)
 
 import DataStructures.OrderedDict;
@@ -35,7 +37,7 @@ function add_func_fit!( ## vco = variable constraints objective
     md          ::SFCModelDef;
     Y_str       ::String = "Y",
     obj_algrt   ::Symbol = :RSS,
-    sense       ::Symbol = :Min, # :Min, :Max
+    sense       ::Symbol = :Min, ## :Min, :Max
 )
     ## X_strs
     X_strs = md.X_strs

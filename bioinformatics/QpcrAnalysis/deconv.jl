@@ -2,6 +2,7 @@
 ## color compensation / multi-channel deconvolution
 
 import DataStructures.OrderedDict
+import Match.@match
 
 ## multi-channel deconvolution
 function deconvolute(
@@ -40,30 +41,28 @@ function deconvolute(
     const k4dcv = get_k(calib_data, well_nums)
     #
     const a2d_dim_unit, a2d_dim_well, a2d_dim_channel = size(ary2dcv)
-    dcvd_ary3 = similar(ary2dcv)
     const k_inv_vs =
         map(1:a2d_dim_well) do w
             k4dcv.k_inv_vec[dcv_well_idc_wfluo[w]] .* scaling_factor_dcv_vec
         end
-    for x in 1:a2d_dim_unit, w in 1:a2d_dim_well
-        dcvd_ary3[x, w, :] = k_inv_vs[w] * ary2dcv[x, w, :] ## matrix * vector
-    end
-    #
+    const dcvd_ary3 = 
+        [   
+            dcvd_ary3[x, w, :] = k_inv_vs[w] * ary2dcv[x, w, :] ## matrix * vector
+            for x in 1:a2d_dim_unit, w in 1:a2d_dim_well
+        ]
+    dcvd_ary2dict() =
+        OrderedDict(map(1:a2d_dim_channel) do channel_i
+            channel_nums[channel_i] => dcvd_ary3[:, :, channel_i]
+        end) ## do channel_i
+
     ## format output
-    if (out_format == :array)
-        dcvd = (dcvd_ary3,)
-    else
-        dcvd_dict = OrderedDict(map(1:a2d_dim_channel) do channel_i
-            channel_nums[channel_i] => dcvd_ary3[:,:,channel_i]
-        end) # do channel_i
-        if (out_format == :dict)
-            dcvd = (dcvd_dict,)
-        elseif (out_format == :both)
-            dcvd = (dcvd_ary3, dcvd_dict)
-        else
-            log_error("`out_format` must be :array, :dict or :both.")
+    const dcvd =
+        @match out_format begin
+            :array  =>  (dcvd_ary3,)
+            :dict   =>  (dcvd_ary2dict(),)
+            :both   =>  (dcvd_ary3, dcvd_ary2dict())
+            _       =>  log_error("`out_format` must be :array, :dict or :both.")
         end
-    end
     return (k4dcv, dcvd...)
 end ## deconvolute()
 
@@ -111,25 +110,25 @@ function get_k(
     # end)
 
     ## subtract water calibration data
-    const cd_key_vec = @p keys calib_data | collect | filter x -> (x != "water") ## `cd` - channel of dye.
+    const cd_key_vec = @p keys calib_data | collect | filter x -> (x != WATER_KEY) ## `cd` - channel of dye.
     const channel_nums = map(x -> Base.parse(split(x, "_")[2]), cd_key_vec)
     const n_channels = length(channel_nums)
-    const water_data_2bt = reduce(hcat, calib_data["water"]["fluorescence_value"])
+    const water_data_2bt = reduce(hcat, calib_data[WATER_KEY][FLUORESCENCE_VALUE_KEY])
     #
     ## no information on well numbers in calibration info so make default assumptions
     const n_wells = size(water_data_2bt, 1)
     const water_well_nums = collect(1:n_wells)
     #
     ## vectorized
-    # water_data = transpose(reduce(hcat,calib_data["water"]["fluorescence_value"]))
+    # water_data = transpose(reduce(hcat,calib_data[WATER_KEY][FLUORESCENCE_VALUE_KEY]))
     # k4dcv_bydy = OrderedDict(map(channel_nums) do channel
-    #     signal_data = transpose(reduce(hcat, calib_data[cd_key_vec[channel]]["fluorescence_value"]))
+    #     signal_data = transpose(reduce(hcat, calib_data[cd_key_vec[channel]][FLUORESCENCE_VALUE_KEY]))
     #     return cd_key_vec[channel] => signal_data .- water_data
     # end)
     ## devectorized
     const k4dcv_bydy = OrderedDict( ## `bydy` - by dye
         map(channel_nums) do c
-            signal_data_2bt = reduce(hcat, calib_data[cd_key_vec[c]]["fluorescence_value"])
+            signal_data_2bt = reduce(hcat, calib_data[cd_key_vec[c]][FLUORESCENCE_VALUE_KEY])
             const k4dcv_c ::Array{Float_T,2}(n_channels, n_wells) = 
                 [ signal_data_2bt[i,j] - water_data_2bt[i,j] for j in channel_nums, i in 1:n_wells ]
             cd_key_vec[c] => k4dcv_c
@@ -147,10 +146,11 @@ function get_k(
                 non_target_signals = view(k4dcv_bydy[cd_key_vec[target_channel_i]], non_target_channel_i, :)
                 failed_idc = find(target_signals .<= non_target_signals)
                 if (length(failed_idc) > 0)
-                    push!(err_msgs, FAILED_STR1 * target_channel_i *
-                        FAILED_STR2 * non_target_channel_i *
-                        FAILED_STR3 * target_channel_i *
-                        FAILED_STR4 * join(water_well_nums[failed_idc], ", "))
+                    push!(err_msgs,
+                        DECONV_FAILED_STR1 * target_channel_i *
+                        DECONV_FAILED_STR2 * non_target_channel_i *
+                        DECONV_FAILED_STR3 * target_channel_i *
+                        DECONV_FAILED_STR4 * join(water_well_nums[failed_idc], ", "))
                 end
             end
         end ## for non_target_channel_i
@@ -216,6 +216,6 @@ function calc_kinv(
             end ## try
             for i in range(1, n_wells) ]
     const inv_note = (length(singular_well_nums) > 0) ?
-        "Well(s) $(join(singular_well_nums, ", "))" : ""
+        "Well(s) $(join(singular_well_nums, ", ")) * ": "
     return k_s, k_inv_vec, inv_note
 end

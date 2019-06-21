@@ -17,7 +17,7 @@ function act(
 )
     log_debug("at act(::MeltCurve")
     ## calibration data is required
-    if !haskey(req_dict, "calibration_info") || !(typeof(req_dict["calibration_info"]) <: Associative)
+    if !haskey(req_dict, CALIBRATION_INFO_KEY) || !(typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative)
         log_error("no calibration information found")
     end
 
@@ -27,24 +27,18 @@ function act(
     #         kwdict_pmc[parse(key)] = req_dict[key]
     #     end
     # end
-    kwdict_mc_tm_pw = OrderedDict{Symbol,Any}()
-    if haskey(req_dict, "qt_prob")
-        kwdict_mc_tm_pw[:qt_prob_flTm] = req_dict["qt_prob"]
-    end
-    if haskey(req_dict, "max_normd_qtv")
-        kwdict_mc_tm_pw[:normd_qtv_ub] = req_dict["max_normd_qtv"]
-    end
-    if haskey(req_dict, "top_N")
-        kwdict_mc_tm_pw[:top_N] = req_dict["top_N"]
-    end
+    const kwdict_mc_tm_pw = OrderedDict{Symbol,Any}(
+        map(keys(MC_TM_PW_KEYWORDS)) do key
+            key => req_dict[MC_TM_PW_KEYWORDS[key]]
+        end) ## do key
     #
     ## pass call through to process_mc
     ## which will perform the analysis for the entire dataset
     const response =
         try
             process_mc(
-                req_dict["raw_data"],
-                req_dict["calibration_info"];
+                req_dict[RAW_DATA_KEY],
+                req_dict[CALIBRATION_INFO_KEY];
                 out_format = out_format,
                 # kwdict_pmc...,
                 kwdict_mc_tm_pw = kwdict_mc_tm_pw
@@ -82,8 +76,8 @@ function process_mc(
         select_mcdata_by_channel(channel_num ::Integer) =
             mc_data ::Associative ->
                 Dict(
-                    map(["temperature","fluorescence_value","well_num"]) do key
-                        Symbol(key) => mc_data[key][mc_data["channel"] .== channel_num]
+                    map([TEMPERATURE_KEY, FLUORESCENCE_VALUE_KEY, WELL_NUM_KEY]) do key
+                        Symbol(key) => mc_data[key][mc_data[CHANNEL_KEY] .== channel_num]
                     end)
 
         ## split temperature and fluorescence data by well
@@ -141,7 +135,7 @@ function process_mc(
 
     log_debug("at process_mc()")
     const channel_nums, fluo_well_nums =
-        map(("channel","well_num")) do key
+        map((CHANNEL_KEY, WELL_NUM_KEY)) do key
             mc_data[key] |> unique |> sort
         end
     const num_channels   = length(channel_nums)

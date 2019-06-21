@@ -16,19 +16,19 @@ function act(
     #
     # queryTemperatureData = "SELECT * FROM temperature_logs WHERE experiment_id = $exp_id ORDER BY elapsed_time"
     # temperatureData = MySQL.mysql_execute(db_conn, queryTemperatureData)[1]
-    # num_dp = length(temperatureData[1]) # dp = data points
+    # num_dp = length(temperatureData[1]) ## dp = data points
 
-    num_dp = length(temperatureData["elapsed_time"])
+    num_dp = length(temperatureData[ELAPSED_TIME_KEY])
     #
     ## add a new column (not row) that is the average of the two heat block zones
     hbzt_avg = map(1:num_dp) do i
         mean(
             map(
                 name -> temperatureData[name][i],
-                ["heat_block_zone_1_temp", "heat_block_zone_2_temp"]))
+                [HEAT_BLOCK_ZONE_1_TEMP_KEY, HEAT_BLOCK_ZONE_2_TEMP_KEY]))
     end ## do i
     #
-    elapsed_times = temperatureData["elapsed_time"]
+    elapsed_times = temperatureData[ELAPSED_TIME_KEY]
     #
     ## calculate average ramp rates up and down of the heat block
     ## first, calculate the time the heat block reaches the high temperature/also the time the ramp up ends and the ramp down starts
@@ -67,18 +67,18 @@ function act(
         end ## find
         maximum(
             abs.(
-                temperatureData["heat_block_zone_1_temp"][elapsed_time_idc] .-
-                    temperatureData["heat_block_zone_2_temp"][elapsed_time_idc]))
+                temperatureData[HEAT_BLOCK_ZONE_1_TEMP_KEY][elapsed_time_idc] .-
+                    temperatureData[HEAT_BLOCK_ZONE_2_TEMP_KEY][elapsed_time_idc]))
     end ## map
-    ## calculate the average ramp rate of the lid heater in degrees C per second
+    ## calculate the average ramp rate of the lid heater in degrees °C per second
     lidHeaterStartRampTime =
         minimum(elapsed_times[
-            find(temperatureData["lid_temp"]) do lid_temp
+            find(temperatureData[LID_TEMP_KEY]) do lid_temp
                 lid_temp > LOW_TEMP_pDELTA
             end])
     lidHeaterStopRampTime =
         maximum(elapsed_times[
-            find(temperatureData["lid_temp"]) do lid_temp
+            find(temperatureData[LID_TEMP_KEY]) do lid_temp
                 lid_temp < HIGH_TEMP_mDELTA
             end])
     Lid_TotalTime = lidHeaterStopRampTime - lidHeaterStartRampTime

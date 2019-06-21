@@ -3,6 +3,7 @@
 ## perform optical calibration
 
 import DataStructures.OrderedDict
+import MicroLogging.@error
 
 
 ## functions
@@ -24,11 +25,10 @@ function adj_w2wvaf(
     minus_water               ::Bool =false,
     scaling_factor_adj_w2wvaf ::Real =SCALING_FACTOR_adj_w2wvaf
 )
-    log_debug("at adj_w2wvaf()")
+    log_debug(AT * ADJ_W2WVAF)
     ## devectorized code avoids transposing data matrix
     if minus_water == false
-        const swd =
-            wva_data[:signal][channel][wva_well_idc_wfluo]
+        const swd = wva_data[:signal][channel][wva_well_idc_wfluo]
         return ([
             scaling_factor_adj_w2wvaf * mean(swd) *
                 fluo2btp[i,w] / swd[w]
@@ -151,7 +151,7 @@ function prep_adj_w2wvaf(
     dye_in      ::Symbol = :FAM,
     dyes_2bfild ::AbstractVector =[]
 )
-    log_debug("at prep_adj_w2wvaf()")
+    log_debug(AT * "prep_" * ADJ_W2WVAF)
     ## remove MySql dependency
     #
     # calib_info = ensure_ci(db_conn, calib_info)
@@ -206,30 +206,31 @@ function prep_adj_w2wvaf(
     ## issue:
     ## using the current format for the request body there is no well_num information
     ## associated with the calibration data
-    channels_in_water = num_channels(calib_data["water"]["fluorescence_value"])
-    const V = typeof(calib_data["water"]["fluorescence_value"][1][1])
+    channels_in_water = num_channels(calib_data[WATER_KEY][FLUORESCENCE_VALUE_KEY])
+    const V = typeof(calib_data[WATER_KEY][FLUORESCENCE_VALUE_KEY][1][1])
     water_data_dict  = OrderedDict{Integer,Vector{V}}() # enforce type
     signal_data_dict = OrderedDict{Integer,Vector{V}}() # enforce type
     stop_msgs = Vector{String}()
     for channel in 1:channels_in_water
-        key="channel_$(channel)"
+        key = CHANNEL * "_$(channel)"
         try
-            water_data_dict[channel]  = calib_data["water"]["fluorescence_value"][channel]
+            water_data_dict[channel]  = calib_data[WATER_KEY][FLUORESCENCE_VALUE_KEY][channel]
         catch
-            push!(stop_msgs, "Cannot access water calibration data for channel $(key)")
+            push!(stop_msgs, CALIB_ERR_1 * key)
         end
         try
-            signal_data_dict[channel] = calib_data[key]["fluorescence_value"][channel]
+            signal_data_dict[channel] = calib_data[key][FLUORESCENCE_VALUE_KEY][channel]
         catch
-            push!(stop_msgs, "Cannot access signal calibration data for channel $(key)")
+            push!(stop_msgs, CALIB_ERR_2 * key)
         end
         if length(water_data_dict[channel]) != length(signal_data_dict[channel])
-            push!(stop_msgs, "Calibration data lengths are not equal for channel $(key)")
+            push!(stop_msgs, CALIB_ERR_3 * key)
         end
     end
     # (length(stop_msgs) > 0) && error(join(stop_msgs, ""))
     if length(stop_msgs) > 0
         msg = join(stop_msgs, "")
+        @error(string(now()) * " " * msg)
         return ErrorException(msg)
     end
     channels_in_water, channels_in_signal = map(get_ordered_keys, (water_data_dict, signal_data_dict))
@@ -242,13 +243,14 @@ function prep_adj_w2wvaf(
         wva_invalid_idc = find(signal_data_dict[channel] .<= water_data_dict[channel])
         if length(wva_invalid_idc) > 0
             failed_well_nums_str = join(signal_well_nums[wva_invalid_idc], ", ")
-            push!(stop_msgs, "Invalid well-to-well variation data in channel $channel: " *
-                "fluorescence value of water is greater than or equal to that of dye " *
-                "in the following well(s) - $failed_well_nums_str")
+            push!(stop_msgs, "In" * VALID * " " * WELL * "-to-" * WELL * " variation " * DATA * IN *
+                CHANNEL * " $channel: " * FLUORESCENCE * " " * VALUE * OF * WATER * IS * GREATER * THAN *
+                OR * EQUAL * TO * THAT * OF * DYE * IN * THE * FOLLOWING * " " * WELL * S_ * "$failed_well_nums_str")
         end ## if invalid
     end ## next channel
     if length(stop_msgs) > 0
         msg = join(stop_msgs, "")
+        @error(string(now()) * " " * msg)
         return ErrorException(msg)
     end
     # (length(stop_msgs) > 0) && error(join(stop_msgs, ""))
@@ -299,8 +301,6 @@ function prep_adj_w2wvaf(
     )
     return (wva_data, signal_well_nums)
 end ## prep_adj_w2wvaf
-
-
 
 
 #

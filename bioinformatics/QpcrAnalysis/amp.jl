@@ -5,6 +5,7 @@
 import JSON: parse
 import DataStructures.OrderedDict
 import Ipopt: IpoptSolver #, NLoptSolver
+import Match.@match
 using Ipopt
 
 
@@ -21,22 +22,22 @@ function act(
     ## does not allow us to break the fluorescence data down by step_id/ramp_id
     function parsed_raw_data()
         const cyc_nums, fluo_well_nums, channel_nums =
-            map(["cycle_num", "well_num", "channel"]) do key
-                req_dict["raw_data"][key] |> unique             ## in order of appearance
+            map([CYCLE_NUM_KEY, WELL_NUM_KEY, CHANNEL_KEY]) do key
+                req_dict[RAW_DATA_KEY][key] |> unique             ## in order of appearance
             end
         const num_cycs, num_fluo_wells, num_channels =
             map(length, (cyc_nums, fluo_well_nums, channel_nums))
         try
-            assert(req_dict["raw_data"]["cycle_num"] ==
+            assert(req_dict[RAW_DATA_KEY][CYCLE_NUM_KEY] ==
                 repeat(
                     cyc_nums,
                     outer = num_fluo_wells * num_channels))
-            assert(req_dict["raw_data"]["well_num" ] ==
+            assert(req_dict[RAW_DATA_KEY][WELL_NUM_KEY ] ==
                 repeat(
                     fluo_well_nums,
                     inner = num_cycs,
                     outer = num_channels))
-            assert(req_dict["raw_data"]["channel"  ] ==
+            assert(req_dict[RAW_DATA_KEY][CHANNEL_KEY  ] ==
                 repeat(
                     channel_nums,
                     inner = num_cycs * num_fluo_wells))
@@ -49,10 +50,10 @@ function act(
         ## this code assumes that the data in the request
         ## is formatted appropriately for this transformation
         ## we can check the cycle/well/channel data if necessary
-        const R = typeof(req_dict["raw_data"]["fluorescence_value"][1][1])
+        const R = typeof(req_dict[RAW_DATA_KEY][FLUORESCENCE_VALUE_KEY][1][1])
         const fr_ary3 ::Array{R,3} =
             reshape(
-                req_dict["raw_data"]["fluorescence_value"],
+                req_dict[RAW_DATA_KEY][FLUORESCENCE_VALUE_KEY],
                 num_cycs, num_fluo_wells, num_channels)
         ## rearrange data in sort order of each index
         const cyc_perm  = sortperm(cyc_nums)
@@ -78,56 +79,59 @@ function act(
     # end
 
     ## calibration data is required
-    if !haskey(req_dict, "calibration_info") || !(typeof(req_dict["calibration_info"]) <: Associative)
+    if !haskey(req_dict, CALIBRATION_INFO_KEY) || !(typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative)
         log_error("no calibration information found")
     end
 
     ## we will assume that any relevant step/ramp information has already been passed along
     ## and is present in step_id / ramp_id
-    if haskey(req_dict, "step_id")
-        const asrp_vec = [AmpStepRampProperties(:step, req_dict["step_id"], DEFAULT_cyc_nums)]
-    elseif haskey(req_dict, "ramp_id")
-        const asrp_vec = [AmpStepRampProperties(:ramp, req_dict["ramp_id"], DEFAULT_cyc_nums)]
-    else
-        log_error("no step/ramp information found")
-    end
+    const asrp_vec = 
+        @match map(key -> key in keys(req_dict), [STEP_ID_KEY, RAMP_ID_KEY]) begin
+            [true, _ ]      =>  [AmpStepRampProperties(:step, req_dict[STEP_ID_KEY], DEFAULT_cyc_nums)]
+            [false, true]   =>  [AmpStepRampProperties(:ramp, req_dict[RAMP_ID_KEY], DEFAULT_cyc_nums)]
+            _               =>  log_error("no step/ramp information found")
+        end
     ## `report_cq!` arguments
     kwdict_rc = Dict{Symbol,Any}()
     for key in keys(KWDICT_RC_SYMBOLS)
         if haskey(req_dict, key)
             kwdict_rc[KWDICT_RC_SYMBOLS[key]] = req_dict[key]
-        end
-    end
+        end ## if
+    end ## for
     ## `process_amp_1sr` arguments
-    kwdict_pa1 = Dict{Symbol,Any}()
-    for key in KWDICT_PA1_KEYWORDS
-        if haskey(req_dict, key)
-            kwdict_pa1[Symbol(key)] = str2sym.(req_dict[key])
-        end
-    end
-    ## categ_well_vec argument
-    if haskey(req_dict, "categ_well_vec")
-        kwdict_pa1[:categ_well_vec] =
-            map(x -> str2sym.(x), req_dict["categ_well_vec"])
-        for i in range(1, length(req_dict["categ_well_vec"]))
-            if length(req_dict["categ_well_vec"][i][2]) == 0
-                kwdict_pa1[:categ_well_vec][i][2] = Colon()
-            end
-        end
-    end
+    const kwdict_pa1 = Dict{Symbol,Any}(
+        map(@p keys KWDICT_PA1_KEYWORDS | filter haskey req_dict) do key
+            if (key == CATEG_WELL_VEC_KEY)
+                :categ_well_vec =>
+                    map(req_dict[CATEG_WELL_VEC_KEY]) do x
+                        const element = str2sym.(x)
+                        return (length(element[2]) == 0) ?
+                            element : Colon()
+                    end ## do x
+            else
+                Symbol(key) => str2sym.(req_dict[key])
+            end ## if
+        end ## map
     ## `mod_bl_q` arguments
-    kwdict_mbq = Dict{Symbol,Any}()
-    if haskey(req_dict, "baseline_method")
-        if req_dict["baseline_method"] == "sigmoid"
-            kwdict_mbq[:bl_method] = :l4_enl
-            kwdict_mbq[:bl_fallback_func] = median
-        elseif req_dict["baseline_method"] == "linear"
-            kwdict_mbq[:bl_method] = :lin_1ft
-            kwdict_mbq[:bl_fallback_func] = mean
-        elseif req_dict["baseline_method"] == "median"
-            kwdict_mbq[:bl_method] = median
-        end
-    end
+    const kwdict_mbq = 
+        if haskey(req_dict, BASELINE_METHOD_KEY)
+            @match req_dict[BASELINE_METHOD_KEY] begin
+                SIGMOID_KEY =>
+                    Dict{Symbol,Any}(
+                        :bl_method]         =>  :l4_enl,
+                        :bl_fallback_func]  =>  median)
+                LINEAR_KEY  =>
+                    Dict{Symbol,Any}(
+                        :bl_method]         =>  :lin_1ft,
+                        :bl_fallback_func]  =>  mean)
+                MEDIAN_KEY  =>
+                    Dict{Symbol,Any}(
+                        :bl_method]         =>  median)
+            end ## @match
+        else
+            Dict{Symbol,Any}()
+        end) ## if haskey
+    #
     ## call
     const response = 
         try
@@ -136,7 +140,7 @@ function act(
                 # db_conn, exp_id, asrp_vec, calib_info;
                 # req_dict["experiment_id"],
                 parsed_raw_data()...,
-                req_dict["calibration_info"],
+                req_dict[CALIBRATION_INFO_KEY],
                 asrp_vec;
                 out_format  = out_format,
                 kwdict_rc   = kwdict_rc,
@@ -535,7 +539,6 @@ function process_amp(
     #
     # channel_nums = unique(fd_nt[:channel])
 
-    const out_format_1sr =  (out_format == "json" ? "pre_json" : out_format)
     ## issues:
     ## 1.
     ## the new code currently assumes only 1 step/ramp
@@ -544,7 +547,7 @@ function process_amp(
     ## 2.
     ## need to verify that the fluorescence data complies
     ## with the constraints imposed by max_cycle and well_constraint
-    sr_dict = OrderedDict(
+    const sr_dict = OrderedDict(
         map([ asrp_vec[1] ]) do asrp
             join([asrp.step_or_ramp, asrp.id], "_") =>
                 process_amp_1sr(
@@ -737,14 +740,14 @@ function mod_bl_q(
             if max_dr2_right_cyc <= last_cyc_wt0
                 ## fluo on fitted spline may not be close to raw fluo
                 ## at `cyc_m2l` and `cyc_m2r`
-                push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) <= last_cyc_wt0 ($last_cyc_wt0), bl_cycs = $(last_cyc_wt0+1):$num_cycs")
+                # push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) <= last_cyc_wt0 ($last_cyc_wt0), bl_cycs = $(last_cyc_wt0+1):$num_cycs")
                 return colon(last_cyc_wt0+1, num_cycs)
             end
             ## max_dr2_right_cyc > last_cyc_wt0
             const bl_cyc_start = max(last_cyc_wt0+1, max_dr2_left_cyc)
-            push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) > last_cyc_wt0 ($last_cyc_wt0), bl_cyc_start = $bl_cyc_start (max(last_cyc_wt0+1, max_dr2_left_cyc), i.e. max($(last_cyc_wt0+1), $max_dr2_left_cyc))")
+            # push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) > last_cyc_wt0 ($last_cyc_wt0), bl_cyc_start = $bl_cyc_start (max(last_cyc_wt0+1, max_dr2_left_cyc), i.e. max($(last_cyc_wt0+1), $max_dr2_left_cyc))")
             if max_dr2_right_cyc - bl_cyc_start <= 1
-                push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) - bl_cyc_start ($bl_cyc_start) <= 1")
+                # push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) - bl_cyc_start ($bl_cyc_start) <= 1")
                 if (max_dr2_right_cyc < num_cycs)
                     const max_dr2_right_2, max_dr2_right_cyc_2_shifted =
                         findmax(dr2_cfd[max_dr2_right_cyc+1:end])
@@ -754,18 +757,18 @@ function mod_bl_q(
                 const max_dr2_right_cyc_2 = max_dr2_right_cyc_2_shifted + max_dr2_right_cyc
                 if max_dr2_right_cyc_2 - max_dr2_right_cyc <= 1
                     const bl_cyc_end = num_cycs
-                    push!(bl_notes, "max_dr2_right_cyc_2 ($max_dr2_right_cyc_2) - max_dr2_right_cyc ($max_dr2_right_cyc) == 1")
+                    # push!(bl_notes, "max_dr2_right_cyc_2 ($max_dr2_right_cyc_2) - max_dr2_right_cyc ($max_dr2_right_cyc) == 1")
                 else # max_dr2_right_cyc_2 - max_dr2_right_cyc != 1
-                    push!(bl_notes, "max_dr2_right_cyc_2 ($max_dr2_right_cyc_2) - max_dr2_right_cyc ($max_dr2_right_cyc) != 1")
+                    # push!(bl_notes, "max_dr2_right_cyc_2 ($max_dr2_right_cyc_2) - max_dr2_right_cyc ($max_dr2_right_cyc) != 1")
                     const bl_cyc_end = max_dr2_right_cyc_2
                 end ## if
             else ## cyc_m2r - bl_cyc_start > 1
-                push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) - bl_cyc_start ($bl_cyc_start) > 1")
+                # push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) - bl_cyc_start ($bl_cyc_start) > 1")
                 const bl_cyc_end = max_dr2_right_cyc
             end ## if
-            push!(bl_notes, "bl_cyc_end = $bl_cyc_end")
+            # push!(bl_notes, "bl_cyc_end = $bl_cyc_end")
             const bl_cycs = bl_cyc_start:bl_cyc_end
-            push!(bl_notes, "bl_cycs = $bl_cyc_start:$bl_cyc_end")
+            # push!(bl_notes, "bl_cycs = $bl_cyc_start:$bl_cyc_end")
             return bl_cycs
         end ## auto_choose_bl_cycs()
 
@@ -880,13 +883,12 @@ function mod_bl_q(
         push!(solver.options, (:output_file, ipopt_print2file))
     end
     ## fit model
-    if af_key in [:MAK2, :MAK3, :MAKERGAUL3, :MAKERGAUL4]
-        return fit_dfc_model()
-    elseif af_key == :sfc
-        return fit_sfc_model()
-    end
-    ## fallthrough
-    log_error("`af_key` $af_key is not recognized.")
+    return @match af_key begin
+        :MAK2 || :MAK3 || :MAKERGAUL3 || :MAKERGAUL4
+                =>  fit_dfc_model()
+        :sfc    =>  fit_sfc_model() 
+        _       =>  log_error("`af_key` $af_key is not recognized.")
+    end ## @match
 end ## mod_bl_q()
 
 

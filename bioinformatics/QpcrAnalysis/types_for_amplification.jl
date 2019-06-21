@@ -3,14 +3,7 @@
 import DataStructures.OrderedDict
 
 
-const Ct_VAL_DomainError = -99 # a value that cannot be obtained by normal calculation of Ct
-const DEFAULT_cyc_nums = Vector{Int}()
-const KWDICT_RC_SYMBOLS = Dict(
-    "min_fluomax"   => :max_bsf_lb,
-    "min_D1max"     => :max_dr1_lb,
-    "min_D2max"     => :max_dr2_lb)
-const KWDICT_PA1_KEYWORDS =
-    ["min_reliable_cyc", "baseline_cyc_bounds", "cq_method", "ctrl_well_dict"]
+## types
 
 abstract type AbstractAmpFitted end
 struct EmptyAmpFitted <: AbstractAmpFitted end
@@ -18,7 +11,7 @@ struct EmptyAmpFitted <: AbstractAmpFitted end
 struct AmpStepRampProperties
     step_or_ramp    ::String
     id              ::Int
-    cyc_nums        ::Vector{Int} # accommodates non-continuous sequences of cycles
+    cyc_nums        ::Vector{Int} ## accommodates non-continuous sequences of cycles
 end
 
 ## `mod_bl_q` output
@@ -91,13 +84,26 @@ mutable struct AmpStepRampOutput
 end # type AmpStepRampOutput
 
 struct AmpStepRampOutput2Bjson
-    rbbs_ary3       ::Array{Float_T,3} # fluorescence after deconvolution and adjusting well-to-well variation
-    blsub_fluos     ::Array{Float_T,3} # fluorescence after baseline subtraction
-    dr1_pred        ::Array{Float_T,3} # dF/dc
-    dr2_pred        ::Array{Float_T,3} # d2F/dc2
-    cq              ::Array{Float_T,2} # cq values, applicable to sigmoid models but not to MAK models
-    d0              ::Array{Float_T,2} # starting quantity from absolute quanitification
-    ct_fluos        ::Vector{Float_T} # fluorescence thresholds (one value per channel) for Ct method
-    assignments_adj_labels_dict ::OrderedDict{String,Vector{String}} # assigned genotypes from allelic discrimination, keyed by type of data (see `AD_DATA_CATEG` in "allelic_discrimination.jl")
+    rbbs_ary3       ::Array{Float_T,3} ## fluorescence after deconvolution and adjusting well-to-well variation
+    blsub_fluos     ::Array{Float_T,3} ## fluorescence after baseline subtraction
+    dr1_pred        ::Array{Float_T,3} ## dF/dc
+    dr2_pred        ::Array{Float_T,3} ## d2F/dc2
+    cq              ::Array{Float_T,2} ## cq values, applicable to sigmoid models but not to MAK models
+    d0              ::Array{Float_T,2} ## starting quantity from absolute quanitification
+    ct_fluos        ::Vector{Float_T}  ## fluorescence thresholds (one value per channel) for Ct method
+    assignments_adj_labels_dict ::OrderedDict{String,Vector{String}} ## assigned genotypes from allelic discrimination, keyed by type of data (see `AD_DATA_CATEG` in "allelic_discrimination.jl")
 end
+
+
+## constants
+
+const Ct_VAL_DomainError = -99 ## a value that cannot be obtained by normal calculation of Ct
+const DEFAULT_cyc_nums = Vector{Int}()
+const KWDICT_RC_SYMBOLS = Dict(
+    "min_fluomax"   => :max_bsf_lb,
+    "min_D1max"     => :max_dr1_lb,
+    "min_D2max"     => :max_dr2_lb)
+const KWDICT_PA1_KEYWORDS =
+    ["min_reliable_cyc", "baseline_cyc_bounds", "cq_method", "ctrl_well_dict"]
+
 
