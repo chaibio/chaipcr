@@ -32,6 +32,7 @@ function act(
     # )
 
     const err_msg =
+        if !haskey(calib_info, CALIBRATION_INFO_KEY) || !(typeof(calib_info[CALIBRATION_INFO_KEY]) <: Associative)
         ## calibration data is required
             "no calibration information found"
         else
@@ -81,7 +82,7 @@ function act(
             else
                 ""
             end
-        end
+        end ## err_msg
 
     if err_msg == ""
         const result = OrderedDict(

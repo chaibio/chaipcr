@@ -7,6 +7,7 @@ import DataArrays.DataArray
 import StatsBase: rle
 import Dierckx: Spline1D, derivative
 import Base: start, next, done, eltype, collect, iteratorsize, SizeUnknown
+import FunctionalData.@p
 
 
 ## called by QpcrAnalyze.dispatch
@@ -137,7 +138,7 @@ function process_mc(
     const channel_nums, fluo_well_nums =
         map((CHANNEL_KEY, WELL_NUM_KEY)) do key
             mc_data[key] |> unique |> sort
-        end
+        end ## do key
     const num_channels   = length(channel_nums)
     const num_fluo_wells = length(fluo_well_nums)
     #
@@ -168,25 +169,26 @@ function process_mc(
     ## subset temperature/fluorescence data by channel then by well
     ## then smooth the fluorescence/temperature data and calculate Tm peak, area
     ## bychwl = by channel then by well_nums
-    const mc_bychwl = mapreduce(
-        channel_i ->
-            map(wva_well_nums_alt) do oc_well_num
-                if oc_well_num in fluo_well_nums
-                    mc_tm_pw(
-                        normalize_tf(
-                            channel_i,
-                            indexin([oc_well_num], fluo_well_nums)[1]);
-                        auto_span_smooth = auto_span_smooth,
-                        span_smooth_default = span_smooth_default,
-                        span_smooth_factor = span_smooth_factor,
-                        kwdict_mc_tm_pw...
-                    )
-                else
-                    EMPTY_mc_tm_pw_out
-                end ## if
-            end, ## oc_well_num
-        hcat,
-        1:num_channels)
+    const mc_bychwl =
+        mapreduce(
+            channel_i ->
+                map(wva_well_nums_alt) do oc_well_num
+                    if oc_well_num in fluo_well_nums
+                        mc_tm_pw(
+                            normalize_tf(
+                                channel_i,
+                                indexin([oc_well_num], fluo_well_nums)[1]);
+                            auto_span_smooth = auto_span_smooth,
+                            span_smooth_default = span_smooth_default,
+                            span_smooth_factor = span_smooth_factor,
+                            kwdict_mc_tm_pw...
+                        )
+                    else
+                        EMPTY_mc_tm_pw_out
+                    end ## if
+                end, ## do oc_well_num
+            hcat,
+            range(1, num_channels))
     #
     if (out_format == :full)
         return MeltCurveOutput(
@@ -205,10 +207,10 @@ function process_mc(
             MC_OUT_FIELDS[f] =>
                 [   (getfield(mc_bychwl[well_i, channel_i], f))
                     for well_i in 1:num_fluo_wells, channel_i in 1:num_channels ]
-        end)
+        end) ## do f
         mc_out[:valid] = true
         return mc_out
-    end ## out_format
+    end ## if out_format
 end ## process_mc()
 
 
@@ -289,7 +291,7 @@ function mc_tm_pw(
             log_info("`span_smooth_product` $span_smooth_product < `span_smooth_default`, " *
                 "use `span_smooth_default` $span_smooth_default")
             return span_smooth_default
-        end
+        end ## if
 
         ## `span_smooth_product` = the longest temperature span
         ## where fluorescence increases as temperature increases
@@ -311,8 +313,8 @@ function mc_tm_pw(
         else
             # log_info("fluorescence increase with temperature increase was detected")
             return larger_span(span_smooth_product())
-        end
-    end
+        end ## if
+    end ## calc_span_smooth()
 
     ## find the region(s) where there is a positive gradient
     ## such that fluorescence increases as the temperature increases
@@ -400,18 +402,18 @@ function mc_tm_pw(
                     idc -> mc_denser[idc, :],
                     sn_idc)))
 
-    find_peaks(
+    function find_peaks(
         summit_pre_idc  ::AbstractVector{Int},
         nadir_idc       ::AbstractVector{Int}
-    ) =
-        ## return value Ta_raw =
-        @p PeakIndices
-            ndrv_smu[summit_pre_idc]
-            summit_pre_idc
-            nadir_idc               |
-                collect             |
-                map peak_Ta         |
-                filter thing
+    )
+        const pi =
+            PeakIndices(
+                ndrv_smu[summit_pre_idc],
+                summit_pre_idc,
+                nadir_idc)
+        ## return value Ta_raw = 
+        @p collect pi | map peak_Ta | filter thing
+    end ## find_peaks()
 
     ## calculate peak area
     peak_Ta(peak_idc ::Tuple{I,I,I} where I <: Integer) =
@@ -477,7 +479,7 @@ function mc_tm_pw(
         #     func -> func(tp_denser[peak_bound_idc]),
         #     [minimum, maximum])
         return area_func(ordered_tuple(tp_denser[[peak_bound_idc...]]...)...)
-    end ## calc_area
+    end ## calc_area()
 
     ## count cross points
     function count_cross_points()
@@ -524,7 +526,7 @@ function mc_tm_pw(
             (fn_num_cross_points() > min(ncp_ub, len_raw * noisy_factor)) ||
             (fn_mc_slope() >= 0.0)
             return []
-        end
+        end ## if
         ## else
         #
         ## Disabled because it caused false suppression of Tm peak reporting for
@@ -590,7 +592,8 @@ function mc_tm_pw(
             EMPTY_Ta,                       ## Ta_raw
             :No                             ## Ta_reported
         )
-    end
+    end ## if
+    #
     ## else
     const min_tp        = minimum(tmprtrs)
     const max_tp        = maximum(tmprtrs)
@@ -631,9 +634,9 @@ function mc_tm_pw(
             sn_dict,
             EMPTY_Ta,   ## Ta_raw
             :No)
-    end
-    ## else
+    end ## if
     #
+    ## else
     ## peak indices sorted by area
     ## `idc_sb` - indices sorted by
     const idc_sb_area   = sortperm(map(p -> p.area, Ta_raw), rev=true)
@@ -759,7 +762,7 @@ function Base.collect(iter ::PeakIndices)
         peak == nothing || push!(collection, peak)
     end
     return collection
-end
+end ## collect()
 
 function Base.next(iter ::PeakIndices, state ::Tuple{Int, Int, Int})
     ## fail if state == nothing
@@ -786,9 +789,10 @@ function Base.next(iter ::PeakIndices, state ::Tuple{Int, Int, Int})
         ## otherwise try the next summit
     end
     ## fail if no more summits or no flanking nadirs
-    (summit_ii >= iter.len_summit_idc)   ||
+    if  (summit_ii >= iter.len_summit_idc)   ||
         !(iter.nadir_idc[left_nadir_ii] < iter.summit_idc[summit_ii] < iter.nadir_idc[right_nadir_ii])
-            && return (nothing, nothing)
+            return (nothing, nothing)
+    end
     ## find duplicate summits
     right_summit_ii = summit_ii
     while (right_summit_ii < iter.len_summit_idc &&
@@ -806,7 +810,7 @@ function Base.next(iter ::PeakIndices, state ::Tuple{Int, Int, Int})
             iter.summit_idc[summit_ii],
             iter.nadir_idc[right_nadir_ii]),        ## element
         (left_nadir_ii, summit_ii, right_nadir_ii)) ## state
-end
+end ## next()
 
 ## do not report indices for each peak, only Tm and area
 report(digits ::Integer, peaks ::Vector{Peak}) =

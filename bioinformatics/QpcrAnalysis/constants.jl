@@ -7,7 +7,6 @@
 ## defines constants used at various places in the module
 
 import DataStructures.OrderedDict
-import JLD
 
 
 ## output format

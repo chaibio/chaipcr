@@ -4,6 +4,7 @@ import DataStructures.OrderedDict
 import Clustering: ClusteringResult, kmeans!, kmedoids!, silhouettes
 import Combinatorics.combinations
 import StatsBase.counts
+import FunctionalData.@p
 
 
 ## nrn: whether to flip the binary genotype or not
@@ -93,7 +94,7 @@ function do_cluster_analysis(
     end
 
     clustering(unknown_cluster_method, _) =
-        log_error(CLUSTERING * " " * METHOD * " $unknown_cluster_method" * NOT * IMPLEMENTED)
+        log_error("clustering method $unknown_cluster_method not implemented")
 
     ## get cluster silhouettes
     get_silhouettes() =
@@ -245,15 +246,22 @@ function assign_genos(
     ## "ERROR: MethodError: no method matching #assign_genos#301( ::Array{AbstractString,1},
     ## ::QpcrAnalysis.#assign_genos, ::Array{Float64,2}, ::Array{Float64,2}, ::Float64)"
 )
-    calc_expected_genos_all() =
+    function calc_expected_genos_all()
+        f(c ::Int) = 
+            reduce(
+                hcat,
+                fill(
+                    mapreduce(
+                        geno -> fill(geno, 1, 2^(c-1)),
+                        hcat,
+                        [0, 1]),
+                    2^(num_channels - c)))
         mapreduce(
-            i -> @p fill
-                    mapreduce(geno -> fill(geno, 1, 2 ^ (i-1)), hcat, [0, 1]),
-                    2 ^ (num_channels - i)
-                        | reduce hcat,
+            f,
             vcat,
-            1:num_channels
+            range(1, num_channels)
         ) |> nrn
+    end
 
     ## for any channel, all the data points are the same
     ## (would result in "AssertionError: !(isempty(grp))" for `kmedoids`)

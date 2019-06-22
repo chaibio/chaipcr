@@ -6,6 +6,7 @@
 ## Date: Dec 2018
 
 import DataStructures.OrderedDict
+import JLD
 
 
 ## types
@@ -13,8 +14,8 @@ import DataStructures.OrderedDict
 ## type for K matric calculation
 ## used in deconv.jl
 abstract type  WellProc         end
-struct         WellProcMean     <: Action end
-struct         WellProcVec      <: Action end
+struct         WellProcMean     <: WellProc end
+struct         WellProcVec      <: WellProc end
 
 ## type for K matrix
 ## used in deconv.jl

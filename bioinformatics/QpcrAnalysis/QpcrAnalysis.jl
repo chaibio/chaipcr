@@ -45,10 +45,10 @@ const LOAD_FROM_DIR = LOAD_PATH[find(LOAD_PATH) do path_
 end][1] # slice by boolean vector returned a one-element vector. Assumption: LOAD_PATH is global
 
 ## delete temporary log files if this is the only julia process
-cd("/tmp")
-if eachmatch(r"julia", read(`ps -eo comm`, String)) |> collect |> length == 1
-    foreach(rm, filter(x -> match(r"^julia", x) != nothing, readdir()))
-end
+const io = open("/tmp/julia-delete-tmp-files.sh", "w")
+write(io, "#!/usr/bin/bash\nif [ \$(ps -eo comm|grep julia|wc -l) == 1 ]; then rm /tmp/julia*; fi")
+close(io)
+run(`bash /tmp/julia-delete-tmp-files.sh`)
 
 ## set up logger
 using MicroLogging

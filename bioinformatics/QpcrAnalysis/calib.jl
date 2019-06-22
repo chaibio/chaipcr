@@ -2,7 +2,8 @@
 #
 ## calibration: deconvolution and adjust well-to-well variation in absolute fluorescence values
 
-using DataStructures.OrderedDict;
+using DataStructures.OrderedDict
+import FunctionalData.@p
 
 
 ## function: perform deconvolution and adjust well-to-well variation in absolute fluorescence

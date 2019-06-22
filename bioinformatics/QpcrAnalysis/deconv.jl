@@ -3,6 +3,7 @@
 
 import DataStructures.OrderedDict
 import Match.@match
+import FunctionalData.@p
 
 ## multi-channel deconvolution
 function deconvolute(
@@ -74,9 +75,9 @@ function get_k(
 
     ## info on experiment(s) used to calculate matrix K
     ## OrderedDict(
-    ##    "water"=OrderedDict(calibration_id=..., step_id=...),
+    ##    "water"    =OrderedDict(calibration_id=..., step_id=...),
     ##    "channel_1"=OrderedDict(calibration_id=..., step_id=...),
-    ##    "channel_2"=OrderedDict(calibration_id=...", step_id=...)
+    ##    "channel_2"=OrderedDict(calibration_id=..., step_id=...))
     # dcv_exp_info ::OrderedDict,
 
     ## possible  issue:
@@ -85,7 +86,8 @@ function get_k(
     ## in the request body is already specific to a single step.
     calib_data ::Associative,
     well_nums  ::AbstractVector =[];
-    well_proc  ::WellProc = WellProcVec(), ## options: WellProcMean(), WellProcVec()
+    ## keyword arguments
+    well_proc  ::WellProc =WellProcVec(), ## options: WellProcMean(), WellProcVec()
     save_to    ::String ="" ## used: "k.jld"
 )
     log_debug("at get_k()")
@@ -132,7 +134,7 @@ function get_k(
             const k4dcv_c ::Array{Float_T,2}(n_channels, n_wells) =
                 [ signal_data_2bt[i,j] - water_data_2bt[i,j] for j in channel_nums, i in 1:n_wells ]
             cd_key_vec[c] => k4dcv_c
-        end)
+        end) ## do c
     #
     ## assuming `cd_key` (in the format of "channel_1", "channel_2", etc.)
     ## is the target channel of the dye, check whether the water-subtracted signal
@@ -151,11 +153,11 @@ function get_k(
                         DECONV_FAILED_STR2 * non_target_channel_i *
                         DECONV_FAILED_STR3 * target_channel_i *
                         DECONV_FAILED_STR4 * join(water_well_nums[failed_idc], ", "))
-                end
-            end
+                end ## if
+            end ## if
         end ## for non_target_channel_i
     end ## for channel_i
-    if (length(err_msgs) > 0) && log_error(join(err_msgs, ". "))
+    (length(err_msgs) > 0) && log_error(join(err_msgs, ". "))
 
     ## compute inverses and return
     const k_s, k_inv_vec, inv_note = calc_kinv(well_proc, k4dcv_bydy, cd_key_vec)
@@ -168,8 +170,8 @@ end ## get_k()
 ## dependencies of get_k()
 
 function calc_kinv(
-    ::WellProcMean
-    k4dcv_bydy ::Associative
+    ::WellProcMean,
+    k4dcv_bydy ::Associative,
     cd_key_vec ::AbstractVector
 )
     inv_note = false
@@ -192,8 +194,8 @@ function calc_kinv(
 end
 
 function calc_kinv(
-    ::WellProcVec
-    k4dcv_bydy ::Associative
+    ::WellProcVec,
+    k4dcv_bydy ::Associative,
     cd_key_vec ::AbstractVector
 )
     singular_well_nums = Vector{Int}()
@@ -216,6 +218,6 @@ function calc_kinv(
             end ## try
             for i in range(1, n_wells) ]
     const inv_note = (length(singular_well_nums) > 0) ?
-        "Well(s) $(join(singular_well_nums, ", ")) * ": "
+        "Well(s) " * string(join(singular_well_nums, ", ")) : ""
     return k_s, k_inv_vec, inv_note
 end

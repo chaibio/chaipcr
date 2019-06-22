@@ -6,6 +6,7 @@ import JSON: parse
 import DataStructures.OrderedDict
 import Ipopt: IpoptSolver #, NLoptSolver
 import Match.@match
+import FunctionalData.@p
 using Ipopt
 
 
@@ -92,12 +93,10 @@ function act(
             _               =>  log_error("no step/ramp information found")
         end
     ## `report_cq!` arguments
-    kwdict_rc = Dict{Symbol,Any}()
-    for key in keys(KWDICT_RC_SYMBOLS)
-        if haskey(req_dict, key)
-            kwdict_rc[KWDICT_RC_SYMBOLS[key]] = req_dict[key]
-        end ## if
-    end ## for
+    const kwdict_rc = Dict{Symbol,Any}(
+        map(@p keys KWDICT_RC_SYMBOLS | filter haskey req_dict) do key
+            key => req_dict[key]
+        end) ## map
     ## `process_amp_1sr` arguments
     const kwdict_pa1 = Dict{Symbol,Any}(
         map(@p keys KWDICT_PA1_KEYWORDS | filter haskey req_dict) do key
@@ -111,26 +110,26 @@ function act(
             else
                 Symbol(key) => str2sym.(req_dict[key])
             end ## if
-        end ## map
+        end) ## map
     ## `mod_bl_q` arguments
     const kwdict_mbq =
         if haskey(req_dict, BASELINE_METHOD_KEY)
             @match req_dict[BASELINE_METHOD_KEY] begin
                 SIGMOID_KEY =>
                     Dict{Symbol,Any}(
-                        :bl_method]         =>  :l4_enl,
-                        :bl_fallback_func]  =>  median)
+                        :bl_method          =>  :l4_enl,
+                        :bl_fallback_func   =>  median)
                 LINEAR_KEY  =>
                     Dict{Symbol,Any}(
-                        :bl_method]         =>  :lin_1ft,
-                        :bl_fallback_func]  =>  mean)
+                        :bl_method          =>  :lin_1ft,
+                        :bl_fallback_func   =>  mean)
                 MEDIAN_KEY  =>
                     Dict{Symbol,Any}(
-                        :bl_method]         =>  median)
+                        :bl_method          =>  median)
             end ## @match
         else
             Dict{Symbol,Any}()
-        end) ## if haskey
+        end ## if haskey
     #
     ## call
     const response =
@@ -153,7 +152,7 @@ function act(
                 :error => string(err))
         end
     return out_format == :json ?
-        JSON.json(response) : response)
+        JSON.json(response) : response
 end ## act(::Amplification)
 
 
@@ -883,11 +882,10 @@ function mod_bl_q(
         push!(solver.options, (:output_file, ipopt_print2file))
     end
     ## fit model
-    return @match af_key begin
-        :MAK2 || :MAK3 || :MAKERGAUL3 || :MAKERGAUL4
-                =>  fit_dfc_model()
-        :sfc    =>  fit_sfc_model()
-        _       =>  log_error("`af_key` $af_key is not recognized.")
+    @match af_key begin
+        :MAK2 || :MAK3 || :MAKERGAUL3 || :MAKERGAUL4    =>  fit_dfc_model()
+                                                :sfc    =>  fit_sfc_model()
+                                                _       =>  log_error("`af_key` $af_key is not recognized.")
     end ## @match
 end ## mod_bl_q()
 
