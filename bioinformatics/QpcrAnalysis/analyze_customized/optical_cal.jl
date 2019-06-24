@@ -4,6 +4,7 @@
 
 import DataStructures.OrderedDict
 import JSON
+import Memento.debug
 
 
 ## called by QpcrAnalyze.dispatch
@@ -20,7 +21,7 @@ function act(
     dye_in      ::Symbol = :FAM, 
     dyes_2bfild ::Vector =[]
 )
-    log_debug("at act(::OpticalCal)")
+    debug(logger, "at act(::OpticalCal)")
  
     ## remove MySql dependency
     # calib_info_ori = calib_info

@@ -2,6 +2,9 @@
 ## 72°C thermal consistency test
 
 import Dierckx: Spline1D, derivative
+import Match.@match
+import Memento: debug, error
+
 
 function act(
     ::ThermalConsistency,
@@ -23,20 +26,20 @@ function act(
     dcv                 ::Bool =true, ## if true, perform multi-channel deconvolution
 	max_tmprtr          ::Real =1000, ## maximum temperature to analyze
 )
-    log_debug("at act(::ThermalConsistency)")
+    debug(logger, "at act(::ThermalConsistency)")
  
     ## calibration data is required
     if !haskey(req_dict, CALIBRATION_INFO_KEY) || !(typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative)
-        log_error("no calibration information found")
+        error(logger, "no calibration information found")
     end
 
     const kwdict_mc_tm_pw = OrderedDict{Symbol,Any}(
         map(keys(MC_TM_PW_KEYWORDS)) do key
             key => req_dict[MC_TM_PW_KEYWORDS[key]]
-        end) ## do key
+        end)
     
     ## process data as melting curve
-    mc_w72c = process_mc(
+    const mc_w72c = process_mc(
         ## remove MySql dependency
         # db_conn,
         # exp_id,
@@ -56,22 +59,18 @@ function act(
         kwdict_mc_tm_pw = kwdict_mc_tm_pw
     )
     ## process the data from only one channel
-    channel_proc = 1
-    channel_proc_i = find(mc_w72c.channel_nums) do channel_num
-        channel_num == channel_proc
-    end[1] ## do channel_num
+    const channel_proc = 1
+    const channel_proc_i = find(channel_proc .== mc_w72c.channel_nums)[1]
     #
-    mc_tm = map(
-        mc_bywl -> mc_bywl.Ta_fltd,
-        mc_w72c.mc_bychwl[:, channel_proc_i]
-    )
+    const mc_tm = map(
+        field(Ta_fltd),
+        mc_w72c.mc_bychwl[:, channel_proc_i])
     #
-    tm_check_vec = []
     min_Tm = max_tmprtr + 1
     max_Tm = 0
-    for Ta in mc_tm
+    const tm_check_vec = map(mc_tm) do Ta
         if size(Ta)[1] == 0
-            tm_check_1w = TmCheck1w((NaN, false), NaN)
+            TmCheck1w((NaN, false), NaN)
         else
             top1_Tm = Ta[1,1]
             if top1_Tm < min_Tm
@@ -80,30 +79,27 @@ function act(
             if top1_Tm > max_Tm
                 max_Tm = top1_Tm
             end
-            tm_check_1w = TmCheck1w(
+            TmCheck1w(
                 (top1_Tm, MIN_TM_VAL <= top1_Tm <= MAX_TM_VAL),
-                Ta[1,2]
-            )
+                Ta[1,2])
         end ## if size
-        push!(tm_check_vec, tm_check_1w)
-    end ## for
+    end ## do Ta
     #
-    delta_Tm_val = max_Tm - min_Tm
-    if (out_format == :full)
-        return ThermalConsistencyOutput(
-            tm_check_vec,
-            (delta_Tm_val, delta_Tm_val <= MAX_DELTA_TM_VAL),
-            true)
-    end
-    ## out_format != :full
-    mc_w72c_out = OrderedDict(
+    ## return values
+    const delta_Tm_val = max_Tm - min_Tm
+    mc_w72c_out() = OrderedDict(
         :tm_check => tm_check_vec,
-        :delta_Tm => (round(delta_Tm_val, JSON_DIGITS), delta_Tm_val <= MAX_DELTA_TM_VAL),
+        :delta_Tm => (round(delta_Tm_val, JSON_DIGITS), delta_Tm_val .<= MAX_DELTA_TM_VAL),
         :valid    => true)
-    return (out_format == :json) ?
-        JSON.json(mc_w72c_out) :
-        mc_w72c_out
-end
+    @match out_format begin
+        :full   =>  ThermalConsistencyOutput(
+                        tm_check_vec,
+                        (delta_Tm_val, delta_Tm_val .<= MAX_DELTA_TM_VAL),
+                        true)
+        :json   =>  JSON.json(mc_w72c_out())
+        _       =>  mc_w72c_out()
+    end
+end ## act()
 
 
 #

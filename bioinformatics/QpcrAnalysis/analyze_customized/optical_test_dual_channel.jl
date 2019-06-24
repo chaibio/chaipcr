@@ -1,7 +1,9 @@
 ## optical_test_dual_channel.jl
 
 import DataStructures.OrderedDict
+import Match.@match
 import JSON.json
+import Memento.debug
 
 
 function act(
@@ -26,7 +28,7 @@ function act(
         transpose(dscrmnts_snr[cl](transpose(snr_2chs)))
     end
 
-    log_debug("at act(::OpticalTestDualChannel)")
+    debug(logger, "at act(::OpticalTestDualChannel)")
 
     ## remove MySql dependency
     #
@@ -45,19 +47,19 @@ function act(
     # fluo_dict = OrderedDict(map(old_calib_labels) do calib_label ## old
     const fluo_dict =
         OrderedDict(
-            map(1:length(NEW_CALIB_SYMBOLS)) do calib_label_i
+            map(range(1, length(NEW_CALIB_SYMBOLS))) do calib_label_i
                 NEW_CALIB_SYMBOLS[calib_label_i] =>
                     mapreduce(
                         ## old
                         # fluo_data[:fluorescence_value][
                         #     (fluo_data[:step_id] .== calib_info[calib_label]["step_id"]) .& (fluo_data[:channel] .== channel)
                         # ]
-                        channel -> ot_dict[string(NEW_CALIB_SYMBOLS[calib_label_i])][
-                            FLUORESCENCE_VALUE][channel],
+                        channel -> ot_dict[string(NEW_CALIB_SYMBOLS[calib_label_i])][FLUORESCENCE_VALUE][channel],
                         hcat,
                         CHANNELS)
             end)
     const num_wells = size(fluo_dict[:baseline], 1)
+
     bool_dict = OrderedDict(:baseline => fill(true, num_wells, length(CHANNELS)))
     ## water test
     bool_dict[:water] =
@@ -76,18 +78,21 @@ function act(
                 vcat,
                 1:num_wells)
     end
+
     ## organize "optical_data"
     const optical_data =
-        map(1:num_wells) do well_i
+        map(range(1, num_wells)) do well_i
             OrderedDict(
-                map(1:length(NEW_CALIB_SYMBOLS)) do cl_i
+                map(range(1, length(NEW_CALIB_SYMBOLS))) do cl_i
                     NEW_CALIB_SYMBOLS[cl_i] =>
-                        map(channel_i ->
+                        map(CHANNEL_IS) do channel_i
                             (fluo_dict[NEW_CALIB_SYMBOLS[cl_i]][well_i, channel_i],
-                                bool_dict[NEW_CALIB_SYMBOLS[cl_i]][well_i, channel_i]),
-                            CHANNEL_IS)
+                                bool_dict[NEW_CALIB_SYMBOLS[cl_i]][well_i, channel_i])
+                        end ## do channel_i
+                            
                 end) ## do cl_i
         end ## do well_i
+
     ## FAM and HEX self-calibrated
     ## ((signal_of_dye_x_in_channel_k - water_in_channel_k) /
     ##     (signal_of_target_dye_in_channel_k - water_in_channel_k); x=FAM,HEX; k=1,2)
@@ -106,37 +111,34 @@ function act(
         map(SYMBOLS_FAM_HEX) do calib_label
             map(CHANNEL_IS) do channel_i
                 fluo_dict[calib_label][:, channel_i] .- fluo_dict[:water][:, channel_i]
-            end # do channel_i
-        end # do calib_label
+            end ## do channel_i
+        end ## do calib_label
     ## calculate normalization values from data in target channels
     const swd_normd =
         map(CHANNEL_IS) do channel_i
             sweep(mean)(/)(swd_vec[channel_i][channel_i])
-        end # do channel_i
+        end
     ## normalize signal data
     const self_calib_vec =
         map(swd_vec) do swd_dye
             map(CHANNEL_IS) do channel_i
                 swd_dye[channel_i] ./ swd_normd[channel_i]
-            end # do channel_i
-        end # do swd_dye
-    validity = true
-    error_msg = ""
+            end ## do channel_i
+        end ## do swd_dye
+
     ## call as invalid analysis if there are negative or zero values in the normalized data
     ## that will cause the channel1:channel2 ratio to be zero, infinite, or negative
-    ## vectorized
-    # if self_calib_vec |> mapreduce[mapreduce[mapreduce[broadcast[>=,0.0],|],|],|]
-    #     error("Zero or negative values in the self-calibrated fluorescence data.")
-    # end
     ## devectorized
-    for dye in CHANNEL_IS, channel in CHANNEL_IS
-        if any(self_calib_vec[dye][channel] .<= 0.0)
+    error_msgs = Vector{String}
+    for dye in CHANNEL_IS, channel in CHANNEL_IS, value in self_calib_vec[dye][channel]
+        if value <= 0.0
             ## call as invalid analysis instead of raising an error
-            # log_error("zero or negative values in the self-calibrated fluorescence data")
-            validity = false
-            error_msg = "Zero or negative values in ther self-calibrated fluorescence data"
-        end
-    end
+            # error(logger, "zero or negative values in the self-calibrated fluorescence data")
+            push!(error_msgs, "Zero or negative values in the self-calibrated fluorescence data")
+            break ## exit nested loops
+        end ## if
+    end ## for dye, channel, value
+    #
     ## calculate channel1:channel2 ratios
     const ch12_ratios =
         OrderedDict(
@@ -144,20 +146,22 @@ function act(
                 sc_dye = self_calib_vec[channel_i]
                 [:FAM, :HEX][channel_i] => round.(sc_dye[1] ./ sc_dye[2], JSON_DIGITS)
             end) # do channel_i
-    if !(ch12_ratios |> values |> map[x -> all(isfinite.(x))] |> all) ||
-        (ch12_ratios |> values |> map[x -> any(x .<= 0)] |> any)
-            validity = false
+    if !(@p values ch12_ratios | map x -> all(isfinite.(x)) | all) ||
+        (@p values ch12_ratios | map x -> any(x .<= 0)      | any)
+            push!(error_msgs, "Zero, negative, or infinite values of channel 1:channel 2 ratio"
     end
-    ## format output
+
+    ## return values
     const output = OrderedDict(
         optical_data        => optical_data,
         Symbol("Ch1:Ch2")   => ch12_ratios,
-        :valid              => validity
-        :error              => error_msg)
-    return (out_format == :json) ?
-        JSON.json(output) :
-        output
-end # analyze_optical_test_dual_channel()
+        :valid              => length(error_msgs) == 0,
+        :error              => join(error_msgs, ", "))
+    @match out_format begin
+        :json   => JSON.json(output)
+        _       => output
+    end
+end ## act()
 
 
 #

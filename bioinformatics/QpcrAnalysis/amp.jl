@@ -7,6 +7,7 @@ import DataStructures.OrderedDict
 import Ipopt: IpoptSolver #, NLoptSolver
 import Match.@match
 import FunctionalData.@p
+import Memento: debug, info, error
 using Ipopt
 
 
@@ -16,7 +17,7 @@ function act(
     req_dict        ::Associative;
     out_format      ::Symbol = :pre_json
 )
-    log_debug("at act(::Amplification")
+    debug(logger, "at act(::Amplification")
 
     ## issue:
     ## the following assumes only 1 step/ramp because the current data format
@@ -43,7 +44,7 @@ function act(
                     channel_nums,
                     inner = num_cycs * num_fluo_wells))
         catch
-            log_error("The format of the fluorescence data does not lend itself " *
+            error(logger, "The format of the fluorescence data does not lend itself " *
                 "to transformation into a 3-dimensional array. Please make sure " *
                 "that it is sorted by channel, well number, and cycle number.")
         end
@@ -81,7 +82,7 @@ function act(
 
     ## calibration data is required
     if !haskey(req_dict, CALIBRATION_INFO_KEY) || !(typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative)
-        log_error("no calibration information found")
+        error(logger, "no calibration information found")
     end
 
     ## we will assume that any relevant step/ramp information has already been passed along
@@ -90,7 +91,7 @@ function act(
         @match map(key -> key in keys(req_dict), [STEP_ID_KEY, RAMP_ID_KEY]) begin
             [true, _ ]      =>  [AmpStepRampProperties(:step, req_dict[STEP_ID_KEY], DEFAULT_cyc_nums)]
             [false, true]   =>  [AmpStepRampProperties(:ramp, req_dict[RAMP_ID_KEY], DEFAULT_cyc_nums)]
-            _               =>  log_error("no step/ramp information found")
+            _               =>  error(logger, "no step/ramp information found")
         end
     ## `report_cq!` arguments
     const kwdict_rc = Dict{Symbol,Any}(
@@ -229,7 +230,7 @@ function process_amp(
             elseif size_bcb == (num_fluo_wells, num_channels) && eltype(baseline_cyc_bounds) <: AbstractVector ## final format of `baseline_cyc_bounds`
                 return baseline_cyc_bounds
             end
-            log_error("`baseline_cyc_bounds` is not in the right format.")
+            error(logger, "`baseline_cyc_bounds` is not in the right format.")
         end
 
         function find_ct_fluos()
@@ -394,7 +395,7 @@ function process_amp(
             OrderedDict{Symbol,AssignGenosResult}() ## agr_dict
         )
         if num_cycs <= 2
-            log_info("number of cycles $num_cycs <= 2: baseline subtraction and Cq calculation will not be performed")
+            info(logger, "number of cycles $num_cycs <= 2: baseline subtraction and Cq calculation will not be performed")
         else ## num_cycs > 2
             set_fn_mbq!(calc_mbq_ary2())
             set_qt_fluos!()
@@ -431,7 +432,7 @@ function process_amp(
     end ## process_amp_1sr()
     # end of function definition nested within process_amp()
 
-    log_debug("at process_amp()")
+    debug(logger, "at process_amp()")
 
     # print_v(println, verbose,
     #     "db_conn: ", db_conn, "\n",
@@ -704,7 +705,7 @@ function mod_bl_q(
                 ## My suggestion is to treat the same as :Error (TP Jan 2019):
                 bl_notes[2] = "fallback"
                 ## Alternatively, an error could be raised:
-                # log_error("Baseline estimation returned unrecognized termination status $prebl_status")
+                # error(logger, "Baseline estimation returned unrecognized termination status $prebl_status")
             end
             return bl_notes
         end
@@ -712,7 +713,7 @@ function mod_bl_q(
         function bl_cycs()
             const len_bcb = length(baseline_cyc_bounds)
             if !(len_bcb in [0, 2])
-                log_error("length of `baseline_cyc_bounds` must be 0 or 2")
+                error(logger, "length of `baseline_cyc_bounds` must be 0 or 2")
             elseif len_bcb == 2
                 push!(bl_notes, "User-defined")
                 # baseline = bl_fallback_func(fluos[colon(baseline_cyc_bounds...)])
@@ -721,7 +722,7 @@ function mod_bl_q(
                 return auto_choose_bl_cycs()
             end
             ## fallthrough
-            log_error("too few cycles to estimate baseline")
+            error(logger, "too few cycles to estimate baseline")
         end
 
         ## automatically choose baseline cycles as the flat part of the curve
@@ -783,7 +784,7 @@ function mod_bl_q(
         end
         ## end of function definitions nested within fit_sfc()
 
-        log_debug("at fit_sfc()")
+        debug(logger, "at fit_sfc()")
         const len_denser = denser_factor * (num_cycs - 1) + 1
         const cycs_denser = Array(range(1, 1/denser_factor, len_denser))
         const raw_cycs_index = colon(1, denser_factor, len_denser)
@@ -809,7 +810,8 @@ function mod_bl_q(
                 const bl_func = median
             else
                 ## `bl_func` undefined
-                log_error("baseline estimation function `bl_func` not defined for `bl_method` $bl_method")
+                error(logger, "baseline estimation function `bl_func` " *
+                    "not defined for `bl_method` $bl_method")
             end
         end
         if !(length(bl_notes) >= 2 && bl_notes[2] == "model-derived baseline")
@@ -872,7 +874,7 @@ function mod_bl_q(
     end
     ## end of function definitions nested within mod_bl_q
 
-    log_debug("at mod_bl_q()")
+    debug(logger, "at mod_bl_q()")
     const num_cycs = length(fluos)
     const cycs = range(1.0, num_cycs)
     #
@@ -885,7 +887,7 @@ function mod_bl_q(
     @match af_key begin
         :MAK2 || :MAK3 || :MAKERGAUL3 || :MAKERGAUL4    =>  fit_dfc_model()
                                                 :sfc    =>  fit_sfc_model()
-                                                _       =>  log_error("`af_key` $af_key is not recognized.")
+                                                _       =>  error(logger, "`af_key` $af_key is not recognized.")
     end ## @match
 end ## mod_bl_q()
 
@@ -902,7 +904,7 @@ function report_cq!(
     scld_max_dr2_lb ::Real =0.000689,
     scld_max_bsf_lb ::Real =0.086
 )
-    log_debug("at report_cq!()")
+    debug(logger, "at report_cq!()")
     if before_128x
         max_dr1_lb, max_dr2_lb, max_bsf_lb = [max_dr1_lb, max_dr2_lb, max_bsf_lb] ./ 128
     end

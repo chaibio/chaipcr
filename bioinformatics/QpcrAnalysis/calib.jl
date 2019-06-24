@@ -2,9 +2,10 @@
 #
 ## calibration: deconvolution and adjust well-to-well variation in absolute fluorescence values
 
-using DataStructures.OrderedDict
+import DataStructures.OrderedDict
 import FunctionalData.@p
-
+import Match.@match
+import Memento: debug, error
 
 ## function: perform deconvolution and adjust well-to-well variation in absolute fluorescence
 function dcv_aw(
@@ -22,7 +23,7 @@ function dcv_aw(
     dyes_2bfild             ::AbstractVector =[];
     aw_out_format           ::Symbol = :both # :array, :dict, :both
 )
-    log_debug("at dcv_aw()")
+    debug(logger, "at dcv_aw()")
 
     ## remove MySql dependency
     # calib_info = ensure_ci(db_conn, calib_info)
@@ -89,32 +90,30 @@ function dcv_aw(
     #
     const dcvd_aw_dict =
         OrderedDict(
-            map(1:num_channels) do channel_i
+            map(range(1, num_channels)) do channel_i
                 channel_nums[channel_i] =>
                     adj_w2wvaf(
-                        dcvd_ary3[:,:,channel_i],
+                        dcvd_ary3[:, :, channel_i],
                         wva_data,
                         wva_well_idc_wfluo,
                         channel_i;
                         minus_water = false)
             end)
-    if aw_out_format == :array || aw_out_format == :both
-        ## the following line of code requires keys(dcvd_aw_dict) to be in sort order
-        const dcvd_aw_ary3 =
-                cat(3,
-                    map(
-                        key -> dcvd_aw_dict[key],
-                        keys(dcvd_aw_dict))...)
-        if aw_out_format == :both
-            const dcvd_aw = (dcvd_aw_ary3, dcvd_aw_dict)
-        else ## :array
-            const dcvd_aw = (dcvd_aw_ary3,)
+
+    ## format output
+    dcvd_aw_ary3() =
+            cat(3,
+                map(
+                    key -> dcvd_aw_dict[key],
+                    keys(dcvd_aw_dict))...)        
+    const dcvd_aw =
+        @match aw_out_format begin
+            :array  =>  (dcvd_aw_ary3(),)
+            :dict   =>  (dcvd_aw_dict,)
+            :both   =>  (dcvd_aw_ary3(), dcvd_aw_dict)
+            _       =>  error(logger, "`out_format` must be :array, :dict or :both")
         end
-    elseif aw_out_format == :dict ## bug in original code (`out_format` not `aw_out_format`)
-        const dcvd_aw = (dcvd_aw_dict,)
-    else
-        log_error("`aw_out_format` must be :array, :dict, or :both")
-    end
+
     ## Performance issue:
     ## enforce data types for this output
     return (mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, dcvd_aw...)
@@ -157,7 +156,7 @@ end ## dcv_aw
 #            well_nums, k_qry_2b, db_conn, false
 #        )
 #        if length(well_nums) > 0 && Set(calib_well_nums) != Set(well_nums)
-#            log_error("experiment $exp_id, step $step_id: calibration data is not found for all the wells requested")
+#            error(logger, "experiment $exp_id, step $step_id: calibration data is not found for all the wells requested")
 #        end ## if
 #        calib_data_1key_chwl = vcat(map(channel_nums) do channel
 #            transpose(calib_data_1key[:fluorescence_value][calib_data_1key[:channel] .== channel])
@@ -185,7 +184,7 @@ function calib_calib(
     ## This function is expected to handle situations where `calib_info_1` and `calib_info_2`
     ## have different combinations of wells, but the number of wells should be the same.
     if length(well_nums_1) != length(well_nums_2)
-        log_error("length(wellnums_1) != length(wellnums_2)")
+        error(logger, "length(wellnums_1) != length(wellnums_2)")
     end
 
     ## remove MySql dependency
@@ -202,7 +201,7 @@ function calib_calib(
     ary2dcv_1 = cat(1,
                     map(values(calib_dict_1)) do value_1
                         reshape(transpose(fluo_data), 1, size(value_1[1])[2:-1:1]...)
-                    end...) # do value_1
+                    end...) ## do value_1
     mw_ary3_1, k4dcv_2, dcvd_ary3_1, wva_data_2, wva_well_nums_2, dcv_aw_ary3_1 =
         dcv_aw(
             ary2dcv_1,

@@ -8,7 +8,7 @@ import StatsBase: rle
 import Dierckx: Spline1D, derivative
 import Base: start, next, done, eltype, collect, iteratorsize, SizeUnknown
 import FunctionalData.@p
-
+import Memento: debug, info, error
 
 ## called by QpcrAnalyze.dispatch
 function act(
@@ -16,10 +16,11 @@ function act(
     req_dict    ::Associative;
     out_format  ::Symbol = :pre_json
 )
-    log_debug("at act(::MeltCurve")
+    debug(logger, "at act(::MeltCurve")
+    
     ## calibration data is required
     if !haskey(req_dict, CALIBRATION_INFO_KEY) || !(typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative)
-        log_error("no calibration information found")
+        error("no calibration information found")
     end
 
     # kwdict_pmc = OrderedDict{Symbol,Any}()
@@ -134,7 +135,7 @@ function process_mc(
             :fluos   => sweep(minimum)(-)(fluos_raw))
     ## end of function definitions nested in process_mc()
 
-    log_debug("at process_mc()")
+    debug(logger, "at process_mc()")
     const channel_nums, fluo_well_nums =
         map((CHANNEL_KEY, WELL_NUM_KEY)) do key
             mc_data[key] |> unique |> sort
@@ -273,10 +274,10 @@ function mc_tm_pw(
     ## choose the value for `span_smooth`
     choose_span_smooth() =
         if auto_span_smooth
-            log_info("automatic selection of `span_smooth`...")
+            info(logger, "automatic selection of `span_smooth`...")
             calc_span_smooth(fu_rle())
         else
-            log_info("no automatic selection, use span_smooth_default $span_smooth_default as `span_smooth`")
+            info(logger, "no automatic selection, use span_smooth_default $span_smooth_default as `span_smooth`")
             span_smooth_default
         end
 
@@ -285,10 +286,10 @@ function mc_tm_pw(
 
         larger_span(span_smooth_product ::Real) =
         if span_smooth_product > span_smooth_default
-            log_info("`span_smooth` was selected as $span_smooth")
+            info(logger, "`span_smooth` was selected as $span_smooth")
             return span_smooth_product(tmprtrs, fluos, fu_rle)
         else
-            log_info("`span_smooth_product` $span_smooth_product < `span_smooth_default`, " *
+            info(logger, "`span_smooth_product` $span_smooth_product < `span_smooth_default`, " *
                 "use `span_smooth_default` $span_smooth_default")
             return span_smooth_default
         end ## if
@@ -307,11 +308,11 @@ function mc_tm_pw(
         ## end of function definitions nested within calc_span_smooth()
 
         if fu_rle[1] == [false]
-            log_info("no fluo increase as temperature increase was detected: " *
+            info(logger, "no fluo increase as temperature increase was detected: " *
                 "using `span_smooth_default` $span_smooth_default")
             return span_smooth_default
         else
-            # log_info("fluorescence increase with temperature increase was detected")
+            info(logger, "fluorescence increase with temperature increase was detected")
             return larger_span(span_smooth_product())
         end ## if
     end ## calc_span_smooth()
@@ -566,7 +567,7 @@ function mc_tm_pw(
     #
     ## end of function definitions nested in mc_tm_pw()
 
-    log_debug("at mc_tm_pw()")
+    debug(logger, "at mc_tm_pw()")
     ## filter out data points separated by narrow temperature intervals
     ## `nti` - narrow temperature interval
     const tmprtrs, fluos =
@@ -712,7 +713,7 @@ function finite_diff(
 )
     const dlen = length(X)
     if dlen != length(Y)
-        log_error("X and Y must be of same length.")
+        error(logger, "X and Y must be of same length.")
     end
     if (dlen == 1)
         return zeros(1)

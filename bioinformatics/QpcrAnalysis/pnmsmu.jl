@@ -15,13 +15,13 @@ function pnmsmu(
     x_evenly_spacedb ::Bool=true
 )
     if ndims(X) > 1 || ndims(Y) > 1
-        log_error("X and Y must be 1-dimensional")
+        error(logger, "X and Y must be 1-dimensional")
     end
 
     dlen = length(X)
 
     if dlen < 5 || length(Y) != dlen
-        log_error("X and Y must be equal and >= 5 in length")
+        error(logger, "X and Y must be equal and >= 5 in length")
     end
 
     if !x_sorted

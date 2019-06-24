@@ -7,68 +7,68 @@
 ## under active development.
 ## (Tom Price, Dec 2018)
 
-import HttpServer: HttpHandler, Server, run
+## usage:
+## cd("QpcrAnalysis")
+## julia -e 'push!(LOAD_PATH,pwd()); include("../juliaserver.jl")'
+
+import HTTP: listen, setstatus, setheader, URIs.splitpath
+import JSON: json
 import QpcrAnalysis
-import MicroLogging: @error
+import Memento: getlogger, gethandlers, debug, info, error
+import FunctionalData.@p
 
 
-## Functions like this will be defined as `req2res` in module "QpcrAnalysis"
-# function amplification(experiment_id, request_body)
-#   ## return true, json response
-#   ## or return false, json error response
-#   return true, request_body
-# end
+## set up logging
+logger = getlogger("QpcrAnalysis")
+debug(logger, "logfile " * (@p gethandlers logger|values|collect|getindex _ 1|getfield _ :io|getfield _ :filepath))
 
-http = HttpServer.HttpHandler() do req ::HttpServer.Request, res ::HttpServer.Response
-    log_info("at HttpHandler() with method $req.resource")
+HTTP.listen("127.0.0.1", 8081) do http
+    info(logger, "at HttpHandler() with target $(http.message.target)")
+    const code0 = 0 |
+        (ismatch(r"^/experiments/", http.message.target) &&
+            begin
+                const nodes = HTTP.URIs.splitpath(http.message.target)
+                (length(nodes) >= 3 &&
+                    begin
+                        const experiment_id = parse(Int, nodes[2])
+                        const action = String(nodes[3])
+                        const request_body = read(http, String)
+                        debug(logger, "request body:$request_body")
 
-    const code0 =
-        if ismatch(r"^/experiments/", req.resource)
-            const nodes = split(req.resource, '/')
-            if (length(nodes) >= 4)
-                const experiment_id = parse(Int, nodes[3])
-                const action = String(nodes[4])
-                const request_body = String(req.data)
-                log_debug("request body is\n$request_body")
+                        ## calls to http://localhost/experiments/0/
+                        ## will activate a slow test mode
+                        const kwargs = Dict{Symbol,Bool}(
+                            (experiment_id == 0) ? :verify => true : ())
 
-                ## calls to http://localhost/experiments/0/ will activate a slow test mode
-                if (experiment_id == 0)
-                    const kwargs = Dict{Symbol,Bool}(
-                        :verify  => true)
-                else
-                    const kwargs = Dict{Symbol,Bool}()
-                end
+                        ## dispatch request to Julia engine
+                        const success, response_body =
+                            QpcrAnalysis.dispatch(action, request_body; kwargs...)
+                        ## return value
+                        (success) ? 200 : 500
+                    end) ## length(nodes) >= 3
+            end) ## ismatch(r"^/experiments/"
 
-                const success, response_body = QpcrAnalysis.dispatch(action, request_body; kwargs...)
-                log_debug("success is $success")
-                log_debug("response body is\n$response_body")
+    const code = code0 |
+        (code0 == 0 &&
+            begin
+                const err_msg = "no method for target \"$(http.message.target)\""
+                response_body = JSON.json(Dict(:error => err_msg))
+                ## return value
+                404
+            end)
 
-                ## return code
-                (success) ? 200 : 500
-            else
-                0
-            end
-        else
-            0
-        end
-
-    const code =
-        if code0 == 0
-            const err_msg = "method \"$req.resource\" not found"
-            response_body = Dict(:error => err_msg)
-            MicroLogging.@error(string(now()) * " $err_msg")
-            ## return code
-            404
-        else
-            code0
-        end
-
-    log_debug("returning from HttpHandler()")
-    res = HttpServer.Response(response_body)
-    res.status = code
-    log_debug("result is\n$res")
-    return res
+    debug(logger, "returning from HttpHandler()")
+    debug(logger, "status: $code")
+    debug(logger, "response body: $response_body")
+    HTTP.setstatus(http, code)
+    HTTP.setheader(http, "Server"           => "Julia/$VERSION")
+    HTTP.setheader(http, "Content-Type"     => "text/html; charset=utf-8")
+    HTTP.setheader(http, "Content-Language" => "en")
+    HTTP.setheader(http, "Date"             => Dates.format(now(Dates.UTC), Dates.RFC1123Format))
+    write(http, response_body)
 end
 
-server = HttpServer.Server(http)
-HttpServer.run(server, 8081)
+info(logger, "Listening on: 127.0.0.1:8081")
+
+
+#

@@ -2,6 +2,7 @@
 
 import JSON: parse, json
 import DataStructures.OrderedDict
+import Memento: gethandlers, debug, error
 
 
 function dispatch(
@@ -9,7 +10,9 @@ function dispatch(
     request_body ::AbstractString;
     verify  ::Bool =false
 )
-    log_debug("at dispatch() with action $action")
+    debug(logger, "at dispatch() with action $action")
+    # debug(logger, "request body is:\n" * request_body)
+
     const result = try
 
         ## NB. DefaultDict and DefaultOrderedDict constructors sometimes don't work on OrderedDict
@@ -25,7 +28,7 @@ function dispatch(
         ## this should generally be done in the generic act() methods.
 
         if !(action in keys(Action_DICT))
-            log_error("action $action is not found")
+            error(logger, "action $action is not found")
         end
 
         ## else
@@ -38,14 +41,14 @@ function dispatch(
                 const verify_input = try
                     verify_request(action_t, req_parsed)
                 catch err
-                    log_error("data supplied with $action request is in the wrong format")
+                    error(logger, "data supplied with $action request is in the wrong format")
                 end
             end
         end
 
-        log_debug("dispatching to act()")
+        debug(logger, "dispatching to act() from dispatch()")
         const response = act(action_t, req_parsed; out_format=:pre_json)
-        log_debug("response received from act()")
+        debug(logger, "response received from act() by dispatch()")
         const json_response = JSON.json(response)
 
     @static if !production_env
@@ -54,7 +57,7 @@ function dispatch(
                 const verify_output = try
                     verify_response(action_t, JSON.parse(json_response, dicttype=OrderedDict))
                 catch err
-                    log_error("data returned from $action request is in the wrong format")
+                    error(logger, "data returned from $action request is in the wrong format")
                 end
             end
         end
@@ -71,11 +74,13 @@ function dispatch(
         if success
             string(result)
         else
-            string(JSON.json(Dict(
+            JSON.json(Dict(
                 :valid => false,
-                :error => repr(result))))
+                :error => repr(result)))
         end
-    log_debug("returning from dispatch()")
+    debug(logger, "returning from dispatch()")
+    debug(logger, "success: $success")
+    debug(logger, "response body:\n" * response_body)
     return (success, response_body)
 end ## dispatch
 
@@ -134,7 +139,7 @@ function args2reqb(
             "guid" => guid
         )
     else
-        log_error("unrecognized action")
+        error(logger, "unrecognized action")
     end
 
     for key in keys(extra_args)
@@ -151,7 +156,7 @@ function args2reqb(
         reqb["db_pswd"] = db_pswd
         reqb["db_name"] = db_name
     else
-        log_error("`wdb` must be one of the following: \"handle\", \"dflt\", \"connect\"")
+        error(logger, "`wdb` must be one of the following: \"handle\", \"dflt\", \"connect\"")
     end
 
     return json(reqb)

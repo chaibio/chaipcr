@@ -2,7 +2,7 @@
 
 import JSON
 import DataFrames: DataFrame, by
-import MicroLogging:@error
+import Memento: debug, error
 
 ## if isnull(sample) well not considered
 ## what if isnull(cq)
@@ -20,7 +20,7 @@ function act(
     empty_tre   ::TargetResultEle =EMPTY_TRE,
     empty_gre   ::GroupResultEle  =EMPTY_GRE
 )
-    log_debug("at act(::StandardCurve")
+    debug(logger, "at act(::StandardCurve")
 
     ## df1.colindex.names
     #
@@ -110,7 +110,7 @@ function act(
             target_result = OrderedDict(
                 :target_id => getfield(tre, :target_id),
                 :error     => err_msg)
-            @error(string(now()) * " $err_msg")
+            error(logger, err_msg)
         else
             target_result = tre
         end
@@ -237,7 +237,7 @@ end
 ## generate unique integers
 function generate_uniq_ints(num_ints ::Integer, S, rng ::AbstractRNG =Base.GLOBAL_RNG)
     if num_ints > length(S)
-        log_error("num_ints > length(S), i.e. no enough values to choose from")
+        error(logger, "num_ints > length(S), i.e. no enough values to choose from")
     end
     uniq_ints = unique(rand(rng, S, num_ints))
     while length(uniq_ints) < num_ints
@@ -358,7 +358,7 @@ function generate_req_sc(;
         end ## for channel_i
 
     elseif num_targets != num_measrmts
-        log_error("target_vec not empty but length not same as num_measrmts")
+        error(logger, "target_vec not empty but length not same as num_measrmts")
     end ## if num_targets
 
     num_cqs = length(cq_vec)
@@ -368,7 +368,7 @@ function generate_req_sc(;
         nna_cq_vec = rand(rng, num_nna_cqs) .* -(cq_bounds...) .+ cq_bounds[2] # upperbound - (0,1)seq * scaling_factor
         cq_vec = insert2ary(NaN, num_na_cqs, nna_cq_vec, 1, rng)
     elseif num_cqs != num_measrmts
-        log_error("cq_vec not empty but length not same as num_measrmts")
+        error(logger, "cq_vec not empty but length not same as num_measrmts")
     end
 
     num_qm = length(qm_vec)
@@ -383,9 +383,9 @@ function generate_req_sc(;
         qm_vec = qty_mtx[:, 1]
         qb_vec = qty_mtx[:, 2] # not convert to integer due to NaN
     elseif num_qm != num_qb
-        log_error("lengths of qm_vec and qb_vec not equal")
+        error(logger, "lengths of qm_vec and qb_vec not equal")
     elseif num_qm != num_measrmts
-        log_error("qm_vec and qb_vec with equal non-0 length but not same as num_measrmts")
+        error(logger, "qm_vec and qb_vec with equal non-0 length but not same as num_measrmts")
     end
 
     num_samples = length(sample_vec)
@@ -395,7 +395,7 @@ function generate_req_sc(;
         nna_sample_vec = rand(rng, 1:num_uniq_samples, num_nna_samples)
         sample_vec = insert2ary(NaN, num_na_samples, nna_sample_vec, 1, rng)
     elseif num_samples != num_wells
-        log_error("sample_vec not empty but length not same as num_wells")
+        error(logger, "sample_vec not empty but length not same as num_wells")
     end
 
     req_vec = map(1:num_wells) do well_i

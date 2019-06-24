@@ -4,6 +4,8 @@
 import DataStructures.OrderedDict
 import Match.@match
 import FunctionalData.@p
+import Memento: debug, error
+
 
 ## multi-channel deconvolution
 function deconvolute(
@@ -31,7 +33,7 @@ function deconvolute(
     scaling_factor_dcv_vec  ::AbstractVector =SCALING_FACTOR_deconv_vec,
     out_format              ::Symbol = :both ## :array, :dict, :both
 )
-    log_debug("at deconvolute()")
+    debug(logger, "at deconvolute()")
 
     ## remove MySql dependency
     # k4dcv = (isa(calib_info, Integer) || begin
@@ -62,7 +64,7 @@ function deconvolute(
             :array  =>  (dcvd_ary3,)
             :dict   =>  (dcvd_ary2dict(),)
             :both   =>  (dcvd_ary3, dcvd_ary2dict())
-            _       =>  log_error("`out_format` must be :array, :dict or :both.")
+            _       =>  error(logger, "`out_format` must be :array, :dict or :both.")
         end
     return (k4dcv, dcvd...)
 end ## deconvolute()
@@ -90,7 +92,7 @@ function get_k(
     well_proc  ::WellProc =WellProcVec(), ## options: WellProcMean(), WellProcVec()
     save_to    ::String ="" ## used: "k.jld"
 )
-    log_debug("at get_k()")
+    debug(logger, "at get_k()")
 
     ## remove MySql dependency
     #
@@ -157,7 +159,7 @@ function get_k(
             end ## if
         end ## for non_target_channel_i
     end ## for channel_i
-    (length(err_msgs) > 0) && log_error(join(err_msgs, ". "))
+    (length(err_msgs) > 0) && error(logging, join(err_msgs, ". "))
 
     ## compute inverses and return
     const k_s, k_inv_vec, inv_note = calc_kinv(well_proc, k4dcv_bydy, cd_key_vec)
@@ -221,3 +223,6 @@ function calc_kinv(
         "Well(s) " * string(join(singular_well_nums, ", ")) : ""
     return k_s, k_inv_vec, inv_note
 end
+
+
+#

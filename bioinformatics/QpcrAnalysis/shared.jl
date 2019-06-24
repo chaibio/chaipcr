@@ -3,37 +3,12 @@
 import DataStructures.OrderedDict
 import Base: getindex
 import FunctionalData.@p
-# import Iterators.filter
-using MicroLogging
+import Memento.error
 
-## logging functions
-log_debug(msg ::String) = @debug(string(now()) * " $msg")
-log_info(msg ::String) = @info(string(now()) * " $msg")
-function log_warn(msg ::String)
-    @warn(string(now()) * " $msg")
-    warn(msg)
-end
-function log_error(msg ::String)
-    @error(string(now()) * " $msg")
-    error(msg)
-end
 
-## deprecated
-#
-## using suggestion of MikeInnes https://github.com/JuliaLang/julia/issues/5571#issuecomment-446321504
-## overload :[ operator to enable function composition by piping with arguments
-## e.g. dict |> values |> map[function] |> reduce[vcat]
-
-getindex(f ::Function, x...) = (y...) -> f(x..., y...)
-
-## deprecated
-#
-## synonyms for getindex
-index(i,x)  = getindex(x,i)
-subset(i,x) = getindex(x,i)
-#
-## synonym for getfield
-field(f,x)  = getfield(x,f)
+## curried functions
+field(f) = x -> getfield(x, f)
+index(i) = x -> getindex(x, i)
 
 ## used in meltcrv.jl
 report(digits ::Integer, x) = round.(x, digits)
@@ -41,12 +16,6 @@ report(digits ::Integer, x) = round.(x, digits)
 ## unused functions
 inc_index(i ::Integer, len ::Integer) = (i >= len) ? len : i + 1
 dec_index(i ::Integer) = (i <= 1) ? 1 : i - 1
-
-## unused function
-## curried function
-## returns true when data == value, false otherwise
-selector(value ::Integer) =
-    data ::AbstractArray -> (data .== value)
 
 ## used in amp.jl
 str2sym(x) = typeof(x) == String ? Symbol(x) : x
@@ -98,7 +67,7 @@ extend_NaN(len ::Integer) =
             m ->
                 m >= 0 ?
                     (@p fill NaN m | vcat vec) :
-                    log_error("vector is too long")
+                    error(logger, "vector is too long")
 
 ## extend array elements with NaNs to length of longest element
 extend(x ::AbstractArray) = map(extend_NaN(@p map length x | maximum), x)
@@ -192,7 +161,7 @@ function parse_af{T<:AbstractFloat}( ::Type{T}, strval ::String)
 end
 
 ## print with verbose control
-## deprecated in favour of log_info()
+## deprecated in favour of Memento.info()
 function print_v(
     print_func ::Function,
     verbose ::Bool,
