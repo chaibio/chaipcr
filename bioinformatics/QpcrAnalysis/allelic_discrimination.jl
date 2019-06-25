@@ -203,7 +203,7 @@ function do_cluster_analysis(
     const dist_mtx = calc_dist_mtx()
     # const n_wells_winit = n_wells + num_centers
     # dist_mtx_winit = calc_dist_mtx_winit(init_centers)
-    const cluster_result, centers = clustering(cluster_method, copy(init_centers))
+    const (cluster_result, centers) = clustering(cluster_method, copy(init_centers))
     const assignments_woinit = cluster_result.assignments[well_idc]
     const slhts = get_silhouettes()
     const slht_mean = mean(slhts)
@@ -363,7 +363,7 @@ function assign_genos(
                     1:size(expected_genos_all,2)
                 )[1],
             1:size(expected_ncg,2))
-        const car, geno_combin, center_set = cluster_geno(ctrl_geno_idc, non_ctrl_geno_idc)
+        const (car, geno_combin, center_set) = cluster_geno(ctrl_geno_idc, non_ctrl_geno_idc)
         ## ??? is it OK to save cluster model in ucc_dict ???
         const ucc = UniqCombinCenters(
                         center_set,
@@ -448,7 +448,7 @@ function assign_genos(
     ## end of function definitions nested within assign_genos()
 
     debug(logger, "at assign_genos()")
-    const num_channels, n_wells = size(data)
+    const (num_channels, n_wells) = size(data)
     const max_num_genos = 2 ^ num_channels # 2 comes from the binary possible values, i.e. presence/absence of signal for each channel
     const unclassified_assignment = max_num_genos + 1
     if length(apg_labels) != unclassified_assignment
@@ -491,7 +491,7 @@ function assign_genos(
         init_centers_all[:, ctrl_geno_idc[i]] = mean(ctrl_well_data, 2)
     end
     ## are expected genotypes specified for non-control wells?
-    const best_i, best_ucc, ucc_dict =
+    const (best_i, best_ucc, ucc_dict) =
         length(expected_ncg_raw) > 0 ?
             encg_cluster_model() :      ## yes
             best_cluster_model()        ## no

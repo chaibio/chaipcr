@@ -1,7 +1,6 @@
 ## optical_test_dual_channel.jl
 
 import DataStructures.OrderedDict
-import Match.@match
 import JSON.json
 import Memento.debug
 
@@ -20,10 +19,8 @@ function act(
     out_format      ::Symbol = :pre_json
 )
     function SNR_test(w, cl)
-        const baseline_2chs, water_fluo_2chs, signal_fluo_2chs =
-            map([:baseline, :water, cl]) do key
-                fluo_dict[key][w, :]
-            end
+        const (baseline_2chs, water_fluo_2chs, signal_fluo_2chs) =
+            map(key -> fluo_dict[key][w, :], [:baseline, :water, cl])
         const snr_2chs = (signal_fluo_2chs .- water_fluo_2chs) ./ (signal_fluo_2chs .- baseline_2chs)
         transpose(dscrmnts_snr[cl](transpose(snr_2chs)))
     end
@@ -54,7 +51,7 @@ function act(
                         # fluo_data[:fluorescence_value][
                         #     (fluo_data[:step_id] .== calib_info[calib_label]["step_id"]) .& (fluo_data[:channel] .== channel)
                         # ]
-                        channel -> ot_dict[string(NEW_CALIB_SYMBOLS[calib_label_i])][FLUORESCENCE_VALUE][channel],
+                        channel -> ot_dict[string(NEW_CALIB_SYMBOLS[calib_label_i])][FLUORESCENCE_VALUE_KEY][channel],
                         hcat,
                         CHANNELS)
             end)
@@ -76,7 +73,7 @@ function act(
             mapreduce(
                 well_i -> SNR_test(well_i, calib_label),
                 vcat,
-                1:num_wells)
+                range(1, num_wells))
     end
 
     ## organize "optical_data"
@@ -129,12 +126,11 @@ function act(
     ## call as invalid analysis if there are negative or zero values in the normalized data
     ## that will cause the channel1:channel2 ratio to be zero, infinite, or negative
     ## devectorized
-    error_msgs = Vector{String}
+    error_msgs = Vector{String}()
     for dye in CHANNEL_IS, channel in CHANNEL_IS, value in self_calib_vec[dye][channel]
         if value <= 0.0
             ## call as invalid analysis instead of raising an error
-            # error(logger, "zero or negative values in the self-calibrated fluorescence data")
-            push!(error_msgs, "Zero or negative values in the self-calibrated fluorescence data")
+            push!(error_msgs, "zero or negative values in the self-calibrated fluorescence data")
             break ## exit nested loops
         end ## if
     end ## for dye, channel, value
@@ -146,21 +142,18 @@ function act(
                 sc_dye = self_calib_vec[channel_i]
                 [:FAM, :HEX][channel_i] => round.(sc_dye[1] ./ sc_dye[2], JSON_DIGITS)
             end) # do channel_i
-    if !(@p values ch12_ratios | map x -> all(isfinite.(x)) | all) ||
-        (@p values ch12_ratios | map x -> any(x .<= 0)      | any)
-            push!(error_msgs, "Zero, negative, or infinite values of channel 1:channel 2 ratio"
+    if !(@p values ch12_ratios | collect | map (x -> all(isfinite.(x))) | all) ||
+        (@p values ch12_ratios | collect | map (x -> any(x .<= 0))      | any)
+            push!(error_msgs, "zero, negative, or infinite values of channel 1:channel 2 ratio")
     end
 
     ## return values
     const output = OrderedDict(
-        optical_data        => optical_data,
+        :optical_data       => optical_data,
         Symbol("Ch1:Ch2")   => ch12_ratios,
         :valid              => length(error_msgs) == 0,
-        :error              => join(error_msgs, ", "))
-    @match out_format begin
-        :json   => JSON.json(output)
-        _       => output
-    end
+        :error              => join(error_msgs, "; "))
+    return (out_format == :json) && JSON.json(output) || output
 end ## act()
 
 

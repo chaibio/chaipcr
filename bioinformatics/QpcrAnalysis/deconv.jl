@@ -2,8 +2,7 @@
 ## color compensation / multi-channel deconvolution
 
 import DataStructures.OrderedDict
-import Match.@match
-import FunctionalData.@p
+import FunctionalData: @p, unequal
 import Memento: debug, error
 
 
@@ -31,7 +30,7 @@ function deconvolute(
     ## keyword arguments
     k4dcv_backup            ::K4Deconv =K4DCV,
     scaling_factor_dcv_vec  ::AbstractVector =SCALING_FACTOR_deconv_vec,
-    out_format              ::Symbol = :both ## :array, :dict, :both
+    out_format              ::Symbol = :array ## :array, :dict, :both
 )
     debug(logger, "at deconvolute()")
 
@@ -41,31 +40,39 @@ function deconvolute(
     #     length_step_ids = length(step_ids)
     #     length_step_ids <= 2 || length(unique(step_ids)) < length_step_ids
     # end) ? k4dcv_backup : get_k(db_conn, calib_info, well_nums) ## use default `well_proc` value
-    const k4dcv = get_k(calib_data, well_nums)
+    const k4dcv =
+        try get_k(calib_data, well_nums)
+        catch
+            debug(logger, "error rethrown in deconvolute()")
+            rethrow()
+        end ## try
     #
-    const a2d_dim_unit, a2d_dim_well, a2d_dim_channel = size(ary2dcv)
+    const (a2d_dim_unit, a2d_dim_well, a2d_dim_channel) = size(ary2dcv)
     const k_inv_vs =
-        map(1:a2d_dim_well) do w
+        map(range(1, a2d_dim_well)) do w
             k4dcv.k_inv_vec[dcv_well_idc_wfluo[w]] .* scaling_factor_dcv_vec
         end
-    const dcvd_ary3 =
-        [
-            dcvd_ary3[x, w, :] = k_inv_vs[w] * ary2dcv[x, w, :] ## matrix * vector
-            for x in 1:a2d_dim_unit, w in 1:a2d_dim_well
-        ]
+    dcvd_ary3 = similar(ary2dcv)
+    for x in range(1, a2d_dim_unit), w in range(1, a2d_dim_well)
+        dcvd_ary3[x, w, :] = k_inv_vs[w] * ary2dcv[x, w, :] ## matrix * vector
+    end
     dcvd_ary2dict() =
-        OrderedDict(map(1:a2d_dim_channel) do channel_i
+        OrderedDict(map(range(1, a2d_dim_channel)) do channel_i
             channel_nums[channel_i] => dcvd_ary3[:, :, channel_i]
         end) ## do channel_i
 
     ## format output
     const dcvd =
-        @match out_format begin
-            :array  =>  (dcvd_ary3,)
-            :dict   =>  (dcvd_ary2dict(),)
-            :both   =>  (dcvd_ary3, dcvd_ary2dict())
-            _       =>  error(logger, "`out_format` must be :array, :dict or :both.")
-        end
+        if      (out_format == :array)  tuple(dcvd_ary3)
+        elseif  (out_format == :dict)   tuple(dcvd_ary2dict())
+        elseif  (out_format == :both)   tuple(dcvd_ary3, dcvd_ary2dict())
+        else
+            try throw(ArgumentError("`out_format` must be :array, :dict or :both"))
+            catch err
+                debug(logger, sprint(showerror, err))
+                debug(logger, string(stacktrace(catch_backtrace())))
+            end ## try
+        end ## if
     return (k4dcv, dcvd...)
 end ## deconvolute()
 
@@ -112,16 +119,15 @@ function get_k(
     #    k_data_1dye, dcv_well_nums = dcv_data_dict[cd_key]
     #    return cd_key => k_data_1dye .- water_data
     # end)
-
     ## subtract water calibration data
-    const cd_key_vec = @p keys calib_data | collect | filter x -> (x != WATER_KEY) ## `cd` - channel of dye.
+    const cd_key_vec = @p keys calib_data | collect | filter (x -> x != WATER_KEY) ## `cd` - channel of dye.
     const channel_nums = map(x -> Base.parse(split(x, "_")[2]), cd_key_vec)
     const n_channels = length(channel_nums)
     const water_data_2bt = reduce(hcat, calib_data[WATER_KEY][FLUORESCENCE_VALUE_KEY])
     #
     ## no information on well numbers in calibration info so make default assumptions
     const n_wells = size(water_data_2bt, 1)
-    const water_well_nums = collect(1:n_wells)
+    const water_well_nums = collect(range(1, n_wells))
     #
     ## vectorized
     # water_data = transpose(reduce(hcat,calib_data[WATER_KEY][FLUORESCENCE_VALUE_KEY]))
@@ -132,9 +138,9 @@ function get_k(
     ## devectorized
     const k4dcv_bydy = OrderedDict( ## `bydy` - by dye
         map(channel_nums) do c
-            signal_data_2bt = reduce(hcat, calib_data[cd_key_vec[c]][FLUORESCENCE_VALUE_KEY])
-            const k4dcv_c ::Array{Float_T,2}(n_channels, n_wells) =
-                [ signal_data_2bt[i,j] - water_data_2bt[i,j] for j in channel_nums, i in 1:n_wells ]
+            const signal_data_2bt = reduce(hcat, calib_data[cd_key_vec[c]][FLUORESCENCE_VALUE_KEY])
+            const k4dcv_c ::Array{Float_T,2} =
+                [ signal_data_2bt[i,j] - water_data_2bt[i,j] for j in channel_nums, i in range(1, n_wells) ]
             cd_key_vec[c] => k4dcv_c
         end) ## do c
     #
@@ -151,19 +157,25 @@ function get_k(
                 failed_idc = find(target_signals .<= non_target_signals)
                 if (length(failed_idc) > 0)
                     push!(err_msgs,
-                        DECONV_FAILED_STR1 * target_channel_i *
-                        DECONV_FAILED_STR2 * non_target_channel_i *
-                        DECONV_FAILED_STR3 * target_channel_i *
-                        DECONV_FAILED_STR4 * join(water_well_nums[failed_idc], ", "))
+                        "invalid deconvolution data for the dye targeting channel $target_channel_i: " *
+                        "fluorescence value of non-target channel $non_target_channel_i " *
+                        "is greater than or equal to that of target channel $target_channel_i " *
+                        "in the following well(s) - " * join(water_well_nums[failed_idc], ", "))
                 end ## if
             end ## if
         end ## for non_target_channel_i
     end ## for channel_i
-    (length(err_msgs) > 0) && error(logging, join(err_msgs, ". "))
+    if length(err_msgs) > 0
+        try throw(DomainError(join(err_msgs, "; ")))
+        catch err
+            debug(logger, sprint(showerror, err))
+            debug(logger, string(stacktrace(catch_backtrace())))
+        end ## try
+    end ## if
 
     ## compute inverses and return
-    const k_s, k_inv_vec, inv_note = calc_kinv(well_proc, k4dcv_bydy, cd_key_vec)
-    k4dcv = K4Deconv(k_s, k_inv_vec, (length(inv_note) > 0) ? inv_note * INV_NOTE_PT2 : "")
+    const (k_s, k_inv_vec, inv_note) = calc_kinv(well_proc, k4dcv_bydy, cd_key_vec, n_wells)
+    const k4dcv = K4Deconv(k_s, k_inv_vec, (length(inv_note) > 0 ? inv_note * INV_NOTE_PT2 : ""))
     (length(save_to) > 0) && save(save_to, "k4dcv", k4dcv)
     return k4dcv
 end ## get_k()
@@ -174,7 +186,8 @@ end ## get_k()
 function calc_kinv(
     ::WellProcMean,
     k4dcv_bydy ::Associative,
-    cd_key_vec ::AbstractVector
+    cd_key_vec ::AbstractVector,
+    n_wells    ::Integer
 )
     inv_note = false
     const k_s =
@@ -189,7 +202,12 @@ function calc_kinv(
             inv_note = true
             pinv(k_s)
         else
-            throw(err)
+            try
+                rethrow(err)
+            catch same_err
+                debug(logger, sprint(showerror, same_err))
+                debug(logger, string(stacktrace(catch_backtrace())))
+            end ## try
         end ## if isa(err,
     end ## try
     return k_s, fill(k_inv, n_wells), inv_note ? "" : "Well mean"
@@ -198,7 +216,8 @@ end
 function calc_kinv(
     ::WellProcVec,
     k4dcv_bydy ::Associative,
-    cd_key_vec ::AbstractVector
+    cd_key_vec ::AbstractVector,
+    n_wells    ::Integer
 )
     singular_well_nums = Vector{Int}()
     const k_s =
@@ -215,7 +234,12 @@ function calc_kinv(
                     push!(singular_well_nums, water_well_nums[i])
                     pinv(k_s[i])
                 else
-                    throw(err)
+                    try
+                        rethrow(err)
+                    catch same_err
+                        debug(logger, sprint(showerror, same_err))
+                        debug(logger, string(stacktrace(catch_backtrace())))
+                    end ## try
                 end ## if isa(err
             end ## try
             for i in range(1, n_wells) ]

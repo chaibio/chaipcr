@@ -2,6 +2,7 @@
 
 import JSON
 import DataFrames: DataFrame, by
+import Match.@match
 import Memento: debug, error
 
 ## if isnull(sample) well not considered
@@ -20,45 +21,45 @@ function act(
     empty_tre   ::TargetResultEle =EMPTY_TRE,
     empty_gre   ::GroupResultEle  =EMPTY_GRE
 )
-    debug(logger, "at act(::StandardCurve")
+    debug(logger, "at act(::StandardCurve)")
 
     ## df1.colindex.names
     #
     ## parse data
-    req_df = reqvec2df(req_vec)
+    const req_df = reqvec2df(req_vec)
     #
     ## empty dataset
-    if  size(req_df)[2] == 0 ||
+    if  size(req_df, 2) == 0 ||
         any(map(symbl -> all(isnan.(req_df[symbl])),[:target, :cq, :qty]))
-            result = OrderedDict(:target => nothing, :group => nothing)
+            const result = OrderedDict(:target => nothing, :group => nothing)
             return format_output(result)
     end
     #
     ## target result set
-    target_result_df = by(req_df, :target) do chunk_target
-        target_id = chunk_target[1, :target]
+    const target_result_df = by(req_df, :target) do chunk_target
+        const target_id = chunk_target[1, :target]
         if isnan(target_id)
-            return empty_tre
+            empty_tre
         else
-            nna_vec = map(1:size(chunk_target)[1]) do i
+            const nna_vec = map(range(1, size(chunk_target, 1))) do i
                 !isnan(chunk_target[i, :qty]) && !isnan(chunk_target[i, :cq])
             end
-            used_chunk_target = chunk_target[nna_vec, :]
+            const used_chunk_target = chunk_target[nna_vec, :]
             ## better to use GLM.jl here
-            x_vec = log.(qty_base, used_chunk_target[:qty])
-            y_vec = used_chunk_target[:cq]
-            b0, b1 = linreg(x_vec, y_vec)
-            eff = exp(-log(e, qty_base) / b1) - 1
-            y_mean = mean(y_vec)
-            ss_res = sum(map(i -> (b0 + b1 * x_vec[i] - y_vec[i])^2, 1:sum(nna_vec)))
-            ss_tot = sum(map(y -> (y - y_mean)^2, y_vec))
-            r2_ = 1 - ss_res / ss_tot
+            const x_vec = log.(qty_base, used_chunk_target[:qty])
+            const y_vec = used_chunk_target[:cq]
+            const b0, b1 = linreg(x_vec, y_vec)
+            const eff = exp(-log(e, qty_base) / b1) - 1
+            const y_mean = mean(y_vec)
+            const ss_res = sum(map(i -> (b0 + b1 * x_vec[i] - y_vec[i])^2, range(1, sum(nna_vec))))
+            const ss_tot = sum(map(y -> (y - y_mean)^2, y_vec))
+            const r2_ = 1 - ss_res / ss_tot
             ## adjusted R2 ?
-            return TargetResultEle(
+            TargetResultEle(
                 target_id,
                 round.([b1, b0, eff, r2_], json_digits)...
             )
-        end
+        end ## if isnan
     end ## do chunk_target
 
     ## group results calculation commented out
@@ -158,14 +159,12 @@ function act(
     #     end ## if
     # end ## do well_combin
     #
-    jp_dict = OrderedDict(
+    output = OrderedDict(
         :targets => target_vec,
         :groups  => Vector(),
         :valid   => true)
-    return out_format == :json ? JSON.json(jp_dict) : jp_dict
+    return out_format == :json ? JSON.json(output) : output
 end ## standard_curve
-
-
 
 
 ## dependencies of `standard_curve`
@@ -183,21 +182,20 @@ function reqvec2df(req_vec ::AbstractVector)
     sample_vec = Vector{Real}()
     #
     num_channels = maximum(map(req_vec) do req_ele
-        try
-            length(req_ele[WELL_KEY])
+        try length(req_ele[WELL_KEY])
         catch
             0
         end ## try
-    end)
+    end) ## do req_ele
     #
-    for well_i in 1:length(req_vec)
+    for well_i in range(1, length(req_vec))
         req_ele = req_vec[well_i]
-        for channel_i in 1:num_channels
-            measrmt_dict = try
-                req_ele[WELL_KEY][channel_i]
-            catch
-                Dict{String,Any}()
-            end ## try
+        for channel_i in range(1, num_channels)
+            measrmt_dict =
+                try req_ele[WELL_KEY][channel_i]
+                catch
+                    Dict{String,Any}()
+                end ## try
             if length(measrmt_dict) == 0
                 target = cq = qty = NaN
             else
@@ -211,11 +209,11 @@ function reqvec2df(req_vec ::AbstractVector)
             push!(target_vec, target)
             push!(cq_vec, cq)
             push!(qty_vec, qty)
-            push!(sample_vec, try
-                nothing2NaN(req_ele[SAMPLE_KEY])
-            catch
-                NaN
-            end)
+            push!(sample_vec,
+                try nothing2NaN(req_ele[SAMPLE_KEY])
+                catch
+                    NaN
+                end) ## try
         end ## for channel_i
     end ## for well_i
     #
@@ -256,31 +254,33 @@ function insert2ary(
     seek2ins_along_dim  ::Integer =1,
     rng                 ::AbstractRNG =Base.GLOBAL_RNG
 )
-    dim_len = size(ary)[seek2ins_along_dim]
-    idx_range = 1:(dim_len + num_ins)
-    ins_idc = generate_uniq_ints(num_ins, idx_range, rng)
-    ins_vec = sort(ins_idc) .- (1:num_ins) .+ 1
-    ins_mtx = hcat(
-                vcat(1, ins_vec),
-                vcat(ins_vec .- 1, dim_len))
+    const dim_len = size(ary)[seek2ins_along_dim]
+    const idx_range = 1:(dim_len + num_ins)
+    const ins_idc = generate_uniq_ints(num_ins, idx_range, rng)
+    const ins_vec = sort(ins_idc) .- (1:num_ins) .+ 1
+    const ins_mtx =
+        hcat(
+            vcat(1, ins_vec),
+            vcat(ins_vec .- 1, dim_len))
 
-    ary_ndims = ndims(ary)
-    ary_ut = Array{Union{eltype(ary),typeof(el2ins)},ary_ndims}(ary)
-    select_all_idx_vec = Vector{Any}(fill(Colon(), ary_ndims)) # make sure eltype is a supertype of Vector{Int}
-    ary_size = size(ary)
-    ins_size = map(1:ary_ndims) do i
+    const ary_ndims = ndims(ary)
+    const ary_ut = Array{Union{eltype(ary),typeof(el2ins)},ary_ndims}(ary)
+    select_all_idx_vec = Vector{Any}(fill(Colon(), ary_ndims)) ## make sure eltype is a supertype of Vector{Int}
+    const ary_size = size(ary)
+    const ins_size = map(range(1, ary_ndims)) do i
         i == seek2ins_along_dim ? 1 : ary_size[i]
     end
-    ins_slice = fill(el2ins, ins_size...)
+    const ins_slice = fill(el2ins, ins_size...)
 
-    ary_wins = getindex(
-        cat(seek2ins_along_dim,
-            map(1:(num_ins+1)) do i
-                select_idx_vec = copy(select_all_idx_vec)
-                setindex!(select_idx_vec, ins_mtx[i,1] : ins_mtx[i,2], seek2ins_along_dim)
-                cat(seek2ins_along_dim, getindex(ary_ut, select_idx_vec...), ins_slice)
-            end...),
-        setindex!(select_all_idx_vec, idx_range, seek2ins_along_dim)...)
+    const ary_wins =
+        getindex(
+            cat(seek2ins_along_dim,
+                map(range(1, num_ins + 1)) do i
+                    select_idx_vec = copy(select_all_idx_vec)
+                    setindex!(select_idx_vec, ins_mtx[i,1] : ins_mtx[i,2], seek2ins_along_dim)
+                    cat(seek2ins_along_dim, getindex(ary_ut, select_idx_vec...), ins_slice)
+                end...), ## do i
+            setindex!(select_all_idx_vec, idx_range, seek2ins_along_dim)...)
     return ary_wins
 end ## insert2ary
 

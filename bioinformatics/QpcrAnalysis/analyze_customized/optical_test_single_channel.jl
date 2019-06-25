@@ -1,8 +1,9 @@
+
+
 ## optical_test_single_channel.jl
 
 import DataStructures.OrderedDict
 import JSON.json
-import Match.@match
 import Memento.debug
 
 
@@ -41,6 +42,7 @@ function act(
     # end) # do step_id
 
     ## assuming the 2 values of `ot_dict` are the same in length (number of wells)
+    all_valid = true
     const results =
         map(range(1, length(ot_dict[BASELINE_KEY][FLUORESCENCE_VALUE_KEY]))) do well_i
             const baseline   = ot_dict[BASELINE_KEY][FLUORESCENCE_VALUE_KEY][well_i]
@@ -53,6 +55,7 @@ function act(
                 (excitation .>= MIN_EXCITATION_FLUORESCENCE) &&
                 (baseline   .<  MIN_EXCITATION_FLUORESCENCE) &&
                 (excitation .<= MAX_EXCITATION) ## Josh, 2016-08-15
+            all_valid &= valid
             OrderedDict(
                 :baseline   => baseline,
                 :excitation => excitation,
@@ -61,11 +64,8 @@ function act(
         end ## do well_i
     const output = OrderedDict(
         :optical_data => results,
-        :valid        => true)
-    @match out_format begin
-        :json   => JSON.json(output)
-        _       => output
-    end
+        :valid        => all_valid)
+    return (out_format == :json) && JSON.json(output) || output
 end ## act()
 
 

@@ -2,20 +2,20 @@
 
 import DataStructures.OrderedDict
 import Base: getindex
-import FunctionalData.@p
+import FunctionalData: @p, id
 import Memento.error
 
 
-## curried functions
+## used in amp.jl
+indict(d) = x -> haskey(d, x)
+
+## curried functions, flipped
 field(f) = x -> getfield(x, f)
 index(i) = x -> getindex(x, i)
 
-## used in meltcrv.jl
-report(digits ::Integer, x) = round.(x, digits)
-
 ## unused functions
-inc_index(i ::Integer, len ::Integer) = (i >= len) ? len : i + 1
-dec_index(i ::Integer) = (i <= 1) ? 1 : i - 1
+# inc_index(i ::Integer, len ::Integer) = (i >= len) ? len : i + 1
+# dec_index(i ::Integer) = (i <= 1) ? 1 : i - 1
 
 ## used in amp.jl
 str2sym(x) = typeof(x) == String ? Symbol(x) : x
@@ -52,11 +52,11 @@ function scinot(x ::Real, num_sig_digits ::Integer=3; log_base ::Integer=10)
 end
 
 ## used in meltcrv.jl
-is_increasing(x ::AbstractVector) = x[1:end-1] .< x[2:end]
+is_increasing(x ::AbstractVector) = diff(x) .> 0
 
 ## used in meltcrv.jl
 ## truncate elements to length of shortest element
-shorten(x...) = map(y -> y[@p map length x | minimum | range 1], x)
+shorten(x) = map(y -> y[@p id x | map length | minimum | range 1 _], x)
 
 ## used in meltcrv.jl
 ## extend vector with NaN values to a specified length
@@ -99,7 +99,7 @@ function find_mid_sumr_bysw(
     #
     const padding = fill(-sumr_func(-vals), half_width)
     const vals_padded = [padding; vals; padding]
-    @p length vals | range 1 | collect | map vals_iw | map v -> sumr_func(v) == v[half_width + 1] | find
+    @p length vals | range 1 _ | collect | map vals_iw | map (v -> sumr_func(v) == v[half_width + 1]) | find
 end
 
 ## used in meltcrv.jl
@@ -134,17 +134,14 @@ num_channels(fluos ::AbstractArray) =
     (length(fluos) > 1) && (fluos[2] != nothing) ? 2 : 1
 
 num_channels(calib ::Associative) =
-    @p keys calib | map key -> num_channels(calib[key][FLUORESCENCE_VALUE_KEY]) | maximum
+    @p keys calib | map (key -> num_channels(calib[key][FLUORESCENCE_VALUE_KEY])) | maximum
 
 ## used in calib.jl
 num_wells(fluos ::AbstractArray) =
-    @p filter thing fluos | map length | maximum
+    @p id fluos | filter thing | map length | maximum
 
 num_wells(calib ::Associative) =
-    @p keys calib | collect |
-        filter key -> haskey(calib[key],FLUORESCENCE_VALUE_KEY)  |
-        map key -> num_wells(calib[key][FLUORESCENCE_VALUE_KEY]) |
-        maximum
+    @p keys calib | collect | filter (key -> haskey(calib[key],FLUORESCENCE_VALUE_KEY)) | map (key -> num_wells(calib[key][FLUORESCENCE_VALUE_KEY])) | maximum
 
 ## duplicated in MySQLforQpcrAnalysis.jl
 get_ordered_keys(dict ::Dict) =
@@ -162,6 +159,7 @@ end
 
 ## print with verbose control
 ## deprecated in favour of Memento.info()
+## still used in test functions
 function print_v(
     print_func ::Function,
     verbose ::Bool,

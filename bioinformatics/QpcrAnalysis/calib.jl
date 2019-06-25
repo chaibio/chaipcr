@@ -4,7 +4,6 @@
 
 import DataStructures.OrderedDict
 import FunctionalData.@p
-import Match.@match
 import Memento: debug, error
 
 ## function: perform deconvolution and adjust well-to-well variation in absolute fluorescence
@@ -21,7 +20,7 @@ function dcv_aw(
     well_nums_found_in_fr   ::Vector{I} where I <: Integer,
     dye_in                  ::Symbol = :FAM,
     dyes_2bfild             ::AbstractVector =[];
-    aw_out_format           ::Symbol = :both # :array, :dict, :both
+    aw_out_format           ::Symbol = :both ## :array, :dict, :both
 )
     debug(logger, "at dcv_aw()")
 
@@ -30,16 +29,20 @@ function dcv_aw(
     # wva_data, wva_well_nums = prep_adj_w2wvaf(db_conn, calib_info, well_nums_in_req, dye_in, dyes_2bfild)
 
     ## assume without checking that we are using all the wells, all the time
-    well_nums_in_req = collect(range(0,num_wells(calib_data)))
+    const well_nums_in_req = @p num_wells calib_data | range 0 _ | collect
     #
     ## prepare data to adjust well-to-well variation in absolute fluorescence values
-    wva_data, wva_well_nums =
-        prep_adj_w2wvaf(calib_data, well_nums_in_req, dye_in, dyes_2bfild)
+    const (wva_data, wva_well_nums) =
+        try prep_adj_w2wvaf(calib_data, well_nums_in_req, dye_in, dyes_2bfild)
+        catch
+            debug(logger, "error rethrown in dcv_aw()")
+            rethrow()
+        end ## try
     #
     ## overwrite the dummy well_nums
     wva_well_nums = well_nums_found_in_fr
     #
-    num_channels = length(channel_nums)
+    const num_channels = length(channel_nums)
     # if length(well_nums_found_in_fr) == 0
     #     well_nums_found_in_fr = wva_well_nums
     # end
@@ -53,71 +56,139 @@ function dcv_aw(
     ## issue:
     ## we can't match well numbers between calibration data and experimental data
     ## because we don't have that information for the calibration data
-    wva_well_idc_wfluo = @p id wva_well_nums | length | range 1 | collect
+    const wva_well_idc_wfluo = @p length wva_well_nums | range 1 _ | collect
 
     ## subtract background
     ## mw = minus water
-    mw_ary3 =
-        cat(
-            3,
+    const mw_ary3 =
+        cat(3,
             ## devectorized code avoids transposition
             [
                 [   fr_ary3[u,w,c] - wva_data[:water][c][wva_well_idc_wfluo][w]
-                    for u in 1:size(fr_ary3)[1],
+                    for u in range(1, size(fr_ary3, 1)),
                         w in wva_well_idc_wfluo     ]
-                for c in 1:num_channels                 ]...)
+                for c in range(1, num_channels)         ]...)
 
-    if dcv
-        ## addition with flexible ratio instead of deconvolution (commented out)
-        # k_inv_vec = fill(reshape(DataArray([1, 0, 1, 0]), 2, 2), 16)
+    const (k4dcv, dcvd_ary3) =
+        if dcv
+            ## addition with flexible ratio instead of deconvolution (commented out)
+            # k_inv_vec = fill(reshape(DataArray([1, 0, 1, 0]), 2, 2), 16)
 
-        ## removing MySql dependency
-        # k4dcv, dcvd_ary3 = deconvolute(
-        #     1. * mw_ary3, channel_nums, wva_well_idc_wfluo, db_conn, calib_info, well_nums_in_req;
-        #     out_format="array")
-        const k4dcv, dcvd_ary3 =
-            deconvolute(
-                1. * mw_ary3,
-                channel_nums,
-                wva_well_idc_wfluo,
-                calib_data,
-                well_nums_in_req;
-                out_format = :array)
-    else ## !dcv
-        const k4dcv = K4DCV_EMPTY
-        const dcvd_ary3 = mw_ary3
-    end
+            ## removing MySql dependency
+            # k4dcv, dcvd_ary3 = deconvolute(
+            #     1. * mw_ary3, channel_nums, wva_well_idc_wfluo, db_conn, calib_info, well_nums_in_req;
+            #     out_format="array")
+            try deconvolute(
+                    1. * mw_ary3,
+                    channel_nums,
+                    wva_well_idc_wfluo,
+                    calib_data,
+                    well_nums_in_req;
+                    out_format = :array)
+            catch
+                debug(logger, "error rethrown in dcv_aw()")
+                rethrow()
+            end ## try
+        else ## !dcv
+            K4DCV_EMPTY, mw_ary3
+        end
     #
     const dcvd_aw_dict =
         OrderedDict(
             map(range(1, num_channels)) do channel_i
                 channel_nums[channel_i] =>
-                    adj_w2wvaf(
-                        dcvd_ary3[:, :, channel_i],
-                        wva_data,
-                        wva_well_idc_wfluo,
-                        channel_i;
-                        minus_water = false)
-            end)
+                    try adj_w2wvaf(
+                            dcvd_ary3[:, :, channel_i],
+                            wva_data,
+                            wva_well_idc_wfluo,
+                            channel_i;
+                            minus_water = false)
+                    catch
+                        debug(logger, "error rethrown in dcv_aw()")
+                        rethrow()
+                    end ## try
+            end) ## do channel_i
 
     ## format output
-    dcvd_aw_ary3() =
-            cat(3,
-                map(
-                    key -> dcvd_aw_dict[key],
-                    keys(dcvd_aw_dict))...)        
+    ## the following line of code needs the keys of dcvd_aw_dict to be in sort order
+    dcvd_aw_ary3() = cat(3, values(dcvd_aw_dict)...)
     const dcvd_aw =
-        @match aw_out_format begin
-            :array  =>  (dcvd_aw_ary3(),)
-            :dict   =>  (dcvd_aw_dict,)
-            :both   =>  (dcvd_aw_ary3(), dcvd_aw_dict)
-            _       =>  error(logger, "`out_format` must be :array, :dict or :both")
-        end
-
+        if      (aw_out_format == :array) tuple(dcvd_aw_ary3())
+        elseif  (aw_out_format == :dict)  tuple(dcvd_aw_dict)
+        elseif  (aw_out_format == :both)  tuple(dcvd_aw_ary3(), dcvd_aw_dict)
+        else
+            try throw(ArgumentException("`aw_out_format` must be :array, :dict or :both"))
+            catch err
+                debug(logger, sprint(showerror, err))
+                debug(logger, string(stacktrace(catch_backtrace())))
+            end ## try
+        end ## if
     ## Performance issue:
-    ## enforce data types for this output
+    ## enforce data types for this output ?
     return (mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, dcvd_aw...)
 end ## dcv_aw
+
+
+function calib_calib(
+    ## remove MySql dependency
+    #
+    # db_conn_1 ::MySQL.MySQLHandle,
+    # db_conn_2 ::MySQL.MySQLHandle,
+    # calib_info_1 ::OrderedDict,
+    # calib_info_2 ::OrderedDict,
+    # well_nums_1 ::AbstractVector=[],
+    # well_nums_2 ::AbstractVector=[];
+    dye_in      ::Symbol =:FAM,
+    dyes_2bfild ::AbstractVector =[]
+)
+    debug(logger, "at calib_calib()")
+    ## This function is expected to handle situations where `calib_info_1` and `calib_info_2`
+    ## have different combinations of wells, but the number of wells should be the same.
+    if length(well_nums_1) != length(well_nums_2)
+        try
+            throw(DimensionMismatch("length(well_nums_1) != length(well_nums_2)"))
+        catch err
+            debug(logger, sprint(showerror, err))
+            debug(logger, string(stacktrace(catch_backtrace())))
+        end
+    end
+
+    ## remove MySql dependency
+    #
+    # calib_dict_1 = get_full_calib_data(db_conn_1, calib_info_1, well_nums_1)
+    # water_well_nums_1 = calib_dict_1["water"][2]
+    #
+    # calib_key_vec_1 = get_ordered_keys(calib_info_1)
+    # cd_key_vec_1 = calib_key_vec_1[2:end] ## cd = channel of dye. "water" is index 1 per original order.
+    # channel_nums_1 = map(cd_key_vec_1) do cd_key
+    #     parse(Int, split(cd_key, "_")[2])
+    # end
+
+    const ary2dcv_1 =
+        cat(1,
+            map(values(calib_dict_1)) do value_1
+                reshape(transpose(fluo_data), 1, size(value_1[1])[2:-1:1]...)
+            end...) ## do value_1
+    const (mw_ary3_1, k4dcv_2, dcvd_ary3_1, wva_data_2, wva_well_nums_2, dcv_aw_ary3_1) =
+        dcv_aw(
+            ary2dcv_1,
+            true,
+            channel_nums_1,
+            db_conn_2,
+            calib_info_2,
+            well_nums_2,
+            well_nums_2,
+            dye_in,
+            dyes_2bfild;
+            aw_out_format = :array)
+    return CalibCalibOutput(
+        ary2dcv_1,
+        mw_ary3_1,
+        k4dcv_2,
+        dcvd_ary3_1,
+        wva_data_2,
+        dcv_aw_ary3_1)
+end ## calib_calib
 
 
 ## deprecated to remove MySql dependency
@@ -168,60 +239,6 @@ end ## dcv_aw
 #    return calib_dict ## share the same keys as `calib_info`
 #
 # end ## get_full_calib_data
-
-function calib_calib(
-    ## remove MySql dependency
-    #
-    # db_conn_1 ::MySQL.MySQLHandle,
-    # db_conn_2 ::MySQL.MySQLHandle,
-    # calib_info_1 ::OrderedDict,
-    # calib_info_2 ::OrderedDict,
-    # well_nums_1 ::AbstractVector=[],
-    # well_nums_2 ::AbstractVector=[];
-    dye_in      ::Symbol = :FAM,
-    dyes_2bfild ::AbstractVector =[]
-)
-    ## This function is expected to handle situations where `calib_info_1` and `calib_info_2`
-    ## have different combinations of wells, but the number of wells should be the same.
-    if length(well_nums_1) != length(well_nums_2)
-        error(logger, "length(wellnums_1) != length(wellnums_2)")
-    end
-
-    ## remove MySql dependency
-    #
-    # calib_dict_1 = get_full_calib_data(db_conn_1, calib_info_1, well_nums_1)
-    # water_well_nums_1 = calib_dict_1["water"][2]
-    #
-    # calib_key_vec_1 = get_ordered_keys(calib_info_1)
-    # cd_key_vec_1 = calib_key_vec_1[2:end] ## cd = channel of dye. "water" is index 1 per original order.
-    # channel_nums_1 = map(cd_key_vec_1) do cd_key
-    #     parse(Int, split(cd_key, "_")[2])
-    # end
-
-    ary2dcv_1 = cat(1,
-                    map(values(calib_dict_1)) do value_1
-                        reshape(transpose(fluo_data), 1, size(value_1[1])[2:-1:1]...)
-                    end...) ## do value_1
-    mw_ary3_1, k4dcv_2, dcvd_ary3_1, wva_data_2, wva_well_nums_2, dcv_aw_ary3_1 =
-        dcv_aw(
-            ary2dcv_1,
-            true,
-            channel_nums_1,
-            db_conn_2,
-            calib_info_2,
-            well_nums_2,
-            well_nums_2,
-            dye_in,
-            dyes_2bfild;
-            aw_out_format = :array)
-    return CalibCalibOutput(
-        ary2dcv_1,
-        mw_ary3_1,
-        k4dcv_2,
-        dcvd_ary3_1,
-        wva_data_2,
-        dcv_aw_ary3_1)
-end ## calib_calib
 
 
 #

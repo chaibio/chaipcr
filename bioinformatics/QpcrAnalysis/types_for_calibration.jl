@@ -89,10 +89,6 @@ const DEFAULT_apg_LABELS = ["ntc", "homo_1", "homo_2", "hetero", "unclassified"]
 const ARRAY_EMPTY = Array{Array{Float_T,2},1}(0)
 const K4DCV_EMPTY = K4Deconv(ARRAY_EMPTY, ARRAY_EMPTY, "")
 const K4DCV = JLD.load("$LOAD_FROM_DIR/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv"] ## sometimes crash REPL
-const DECONV_FAILED_STR1 = "Invalid deconvolution data for the dye targeting channel "
-const DECONV_FAILED_STR2 = ": fluorescence value of non-target channel "
-const DECONV_FAILED_STR3 = " is greater than or equal to that of target channel "
-const DECONV_FAILED_STR4 = " in the following well(s) - "
 const INV_NOTE_PT2 =
     ": K matrix is singular, using `pinv` instead of `inv` to compute inverse matrix of K. " *
     "Deconvolution result may not be accurate. " *

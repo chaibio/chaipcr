@@ -249,7 +249,8 @@ request body:
 
 success response body (optical_cal):
 {"valid": true}
-or
+
+error response body:
 {"valid": false, "error": "xxxx"} # changed from "error_message" TP
 
 *************************************************************************************
@@ -397,6 +398,12 @@ success response body (thermal_consistency):
     ],
     "delta_Tm": [1.7434,true],
     "valid": true
+}
+
+error response body:
+{
+    "valid": false,
+    "error": "xxxx"
 }
 
 *************************************************************************************
@@ -625,11 +632,6 @@ success response body (optical_test_dual_channel):
         "FAM":[1.406863,-0.425347,1.633333,4.803922,-9.868056,-0.235926,0.594856,-4.9,-3.811111,6.186869,1.020833,0.340278,0.704023,-0.888889,-0.106456,1.696728],
         "HEX":[0.870219,0.629768,3.175926,3.296024,1.361111,-0.297743,0.506897,-1.341241,-7.712963,0.291667,1.841503,0.680556,-1.681373,-1.852004,-0.397863,2.807292]
     },
-    "valid": true
-}
-
-error response body:
-{
-    "valid": false,
-    "error": "xxxx"
+    "valid": true,
+    "error": ""
 }

@@ -38,65 +38,45 @@ function act(
             "no calibration information found"
         else
             const calib_info_dict = calib_info[CALIBRATION_INFO_KEY]
-            
-            err_msg_vec = Vector{String}()
-            #
-            ## prep_adj_w2wvaf
-            const result_aw = ##try
-                ## remove MySql dependency
-                # prep_adj_w2wvaf(db_conn, calib_info_dict, well_nums, dye_in, dyes_2bfild)
-                prep_adj_w2wvaf(calib_info_dict, well_nums, dye_in, dyes_2bfild)
-            #catch err
-            #    err
-            #end
+            const result_aw =
+                try prep_adj_w2wvaf(calib_info_dict, well_nums, dye_in, dyes_2bfild)
+                catch err
+                    debug(logger, "catching error in act(::OpticalCal)")
+                    debug(logger, sprint(showerror, err, catch_backtrace()))
+                end
             if isa(result_aw, Exception)
-                const err_msg = isa(result_aw, ErrorException) ?
-                    result_aw.msg :
-                    string(result_aw)
-                push!(err_msg_vec, err_msg)
+                ## return value
+                sprint(showerror, result_aw)
             elseif (length(calib_info_dict) >= 3)
                 ## get_k
                 ## if there are 2 or more channels then
                 ## the deconvoltion matrix K is calculate
                 ## otherwise deconvolution is not performed
-                const result_k = try
-                    ## remove MySql dependency
-                    #    get_k(db_conn, calib_info_dict, well_nums)
-                    get_k(calib_info_dict, well_nums)
-                catch err
-                    err
-                end
+                const result_k =
+                    try get_k(calib_info_dict, well_nums)
+                    catch err
+                        debug(logger, "catching error in act(::OpticalCal)")
+                        debug(logger, sprint(showerror, err, catch_backtrace()))
+                    end
                 if isa(result_k, Exception)
-                    const err_msg = isa(result_k, ErrorException) ?
-                        result_k.msg :
-                        string(result_k)
-                    push!(err_msg_vec, "K matrix: $err_msg")
-                else
-                    const inv_note = result_k.inv_note
-                    (length(inv_note) > 0) && push!(err_msg_vec, inv_note)
-                end ## if isa
-            end ## if length
-            #
-            ## report valid in success case
-            if (length(err_msg_vec) > 0)
-                join(err_msg_vec, "")
-            else
-                ""
-            end
+                    ## return value
+                    sprint(showerror, result_k)
+                elseif length(result_k.inv_note) > 0
+                    ## return value
+                    result_k.inv_note
+                end ## if
+            end ## if
         end ## err_msg
 
-    if err_msg == ""
-        const result = OrderedDict(
-                :valid => true)
-    else
-        const result = OrderedDict(
+    const output =
+        thing(err_msg) ?
+            OrderedDict(
                 :valid => false,
-                :error => err_msg)
-    end
-    return (out_format == :json) ?
-        JSON.json(result) :
-        result
-end # optical_calibration()
+                :error => err_msg) :
+            OrderedDict(
+                :valid => true)
+    return (out_format == :json) && JSON.json(output) || output
+end ## optical_calibration()
 
 
 #

@@ -11,64 +11,73 @@
 ## cd("QpcrAnalysis")
 ## julia -e 'push!(LOAD_PATH,pwd()); include("../juliaserver.jl")'
 
-import HTTP: listen, setstatus, setheader, URIs.splitpath
-import JSON: json
-import QpcrAnalysis
+import HTTP: serve, Request, Response, HandlerFunction, mkheaders, URI, URIs.splitpath
+import JSON.json
 import Memento: getlogger, gethandlers, debug, info, error
 import FunctionalData.@p
+import QpcrAnalysis
 
+
+function get_response(req ::HTTP.Request)
+    info(logger, "Julia webserver has received $(req.method) request to http://127.0.0.1:8081$(req.target)")
+    debug(logger, "at get_response() with target $(req.target)")
+    const code =
+        if req.method == "GET"
+            const nodes = HTTP.URIs.splitpath(req.target)
+            if length(nodes) >= 3
+                const experiment_id = nodes[2]
+                const action        = nodes[3]
+                const request_body  = String(req.body)
+                debug(logger, "request body: " * request_body)
+
+                ## calls to http://localhost/experiments/0/
+                ## will activate a slow test mode
+                const kwargs = Dict{Symbol,Bool}(
+                    (experiment_id == "0") ? :verify => true : ())
+
+                ## dispatch request to Julia engine
+                debug(logger, "calling QpcrAnalysis.dispatch() from get_response()")
+                const success, response_body =
+                    QpcrAnalysis.dispatch(action, request_body; kwargs...)
+                debug(logger, "at get_response() receiving results from QpcrAnalysis.dispatch()")
+                ## code =
+                (success) ? 200 : 500
+            else ## length(nodes) < 3
+                404
+            end
+        else ## not GET
+            404
+        end
+    #
+    (code == 404) &&
+        const response_body = JSON.json(Dict(:error => "not found"))
+    #
+    debug(logger, "returning from get_response()")
+    debug(logger, "status: $code")
+    debug(logger, "response body: $response_body")
+    return HTTP.Response(code, RESPONSE_HEADERS; body=response_body)
+end ## get_response
 
 ## set up logging
 logger = getlogger("QpcrAnalysis")
-debug(logger, "logfile " * (@p gethandlers logger|values|collect|getindex _ 1|getfield _ :io|getfield _ :filepath))
+logIO = (@p gethandlers logger|values|collect|getindex _ 1|getfield _ :io)
+debug(logger, "logfile " * getfield(logIO, :filepath))
 
-HTTP.listen("127.0.0.1", 8081) do http
-    info(logger, "at HttpHandler() with target $(http.message.target)")
-    const code0 = 0 |
-        (ismatch(r"^/experiments/", http.message.target) &&
-            begin
-                const nodes = HTTP.URIs.splitpath(http.message.target)
-                (length(nodes) >= 3 &&
-                    begin
-                        const experiment_id = parse(Int, nodes[2])
-                        const action = String(nodes[3])
-                        const request_body = read(http, String)
-                        debug(logger, "request body:$request_body")
+## headers
+const RESPONSE_HEADERS = HTTP.mkheaders([
+    "Server"           => "Julia/$VERSION",
+    "Content-Type"     => "text/html; charset=utf-8",
+    "Content-Language" => "en",
+    "Date"             => Dates.format(now(Dates.UTC), Dates.RFC1123Format)])
 
-                        ## calls to http://localhost/experiments/0/
-                        ## will activate a slow test mode
-                        const kwargs = Dict{Symbol,Bool}(
-                            (experiment_id == 0) ? :verify => true : ())
-
-                        ## dispatch request to Julia engine
-                        const success, response_body =
-                            QpcrAnalysis.dispatch(action, request_body; kwargs...)
-                        ## return value
-                        (success) ? 200 : 500
-                    end) ## length(nodes) >= 3
-            end) ## ismatch(r"^/experiments/"
-
-    const code = code0 |
-        (code0 == 0 &&
-            begin
-                const err_msg = "no method for target \"$(http.message.target)\""
-                response_body = JSON.json(Dict(:error => err_msg))
-                ## return value
-                404
-            end)
-
-    debug(logger, "returning from HttpHandler()")
-    debug(logger, "status: $code")
-    debug(logger, "response body: $response_body")
-    HTTP.setstatus(http, code)
-    HTTP.setheader(http, "Server"           => "Julia/$VERSION")
-    HTTP.setheader(http, "Content-Type"     => "text/html; charset=utf-8")
-    HTTP.setheader(http, "Content-Language" => "en")
-    HTTP.setheader(http, "Date"             => Dates.format(now(Dates.UTC), Dates.RFC1123Format))
-    write(http, response_body)
-end
-
-info(logger, "Listening on: 127.0.0.1:8081")
+## set up REST endpoints to dispatch to service functions
+HTTP.serve(
+    host=ip"127.0.0.1",
+    port=8081,
+    handler=HandlerFunction(get_response),
+    logger=logIO,
+    verbose=true)
+info(logger, "Webserver listening on: http://127.0.0.1:8081")
 
 
 #

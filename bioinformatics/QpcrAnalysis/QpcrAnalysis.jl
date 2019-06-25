@@ -126,9 +126,9 @@ module QpcrAnalysis
         ## otherwise segfaults are liable to occur
         push!(logger,
             DefaultHandler(
-                FileRoller("julia-QpcrAnalysis.log", "/tmp"), ## default max size ~5MB
+                FileRoller("julia.log", "/var/log"), ## default max size ~5MB
                 DefaultFormatter("[ {date} | {level} ]: {msg}")))
-        setlevel!(logger, "debug")
+        (production_env == DEVELOPMENT_MODE) && setlevel!(logger, "debug")
         ## Register the module level logger at runtime
         ## so it is accessible via `get_logger(QpcrAnalysis)`
         Memento.register(logger)

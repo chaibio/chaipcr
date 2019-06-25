@@ -77,6 +77,7 @@ install("Dierckx", v"0.3.0", v"0.3.1-")
 install("DataArrays", v"0.7.0", v"0.7.1-")
 install("FactCheck", v"0.4.3", v"0.4.4-") ## for testing and precompiling
 install("FunctionalData", v"0.1.2", v"0.1.2-")
+install("Match", v"0.4.0", v"0.4.0-")
 install("Memento", v"0.6.0", v"0.6.0-")
 install("HTTP", v"0.6.9", v"0.6.9-")
 

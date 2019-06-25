@@ -19,18 +19,33 @@ function supsmu(
 
     n = length(X)
     (ndims(X) > 1 || ndims(Y) > 1) &&
-        error(logger, "X and Y must be 1-dimenional")
+        try error(logger, "X and Y must be 1-dimensional")
+        catch err
+            debug(logger, sprint(showerror, err))
+            debug(logger, string(stacktrace(catch_backtrace())))
+        end ## try                
     (length(Y) != n) &&
-        error(logger, "X and Y must be equal in length")
+        try error(logger, "X and Y must be equal in length")
+        catch err
+            debug(logger, sprint(showerror, err))
+            debug(logger, string(stacktrace(catch_backtrace())))
+        end ## try        
     (n < 3) &&
         warn(logger, "lengths of X and Y are less than 3, no smoothing will be performed")
     (span < 0 || span > 1) &&
-        error(logger, "`span` must be between 0 and 1")
+        try error(logger, "`span` must be between 0 and 1")
+        catch err
+            debug(logger, sprint(showerror, err))
+            debug(logger, string(stacktrace(catch_backtrace())))
+        end ## try                
 
     if periodic ## X is assumed to be a periodic variable with values in the range (0.0,1.0) and period 1.0.
-        if minimum(x) < 0 || maximum(x) > 1
-            error(logger, "if X is assumed to be periodic, its values must be between 0 and 1")
-        end
+        (minimum(x) < 0 || maximum(x) > 1) &&
+            try error(logger, "if X is assumed to be periodic, its values must be between 0 and 1")
+            catch err
+                debug(logger, sprint(showerror, err))
+                debug(logger, string(stacktrace(catch_backtrace())))
+            end ## try                
         iper = 2
     else
         iper = 1
@@ -70,7 +85,7 @@ function supsmu(
     smo = map(FloatT_in, smo)
 
     return x_sorted ? smo : smo[indice_back]
-end
+end     
 
 
 #

@@ -6,7 +6,7 @@
 ## automated test script for Julia API
 ## this code should be run at startup in fresh julia REPL
 
-const BBB = match(r"beaglebone",readlines(`uname -a`)[1]) != nothing
+const BBB = match(r"beaglebone", readlines(`uname -a`)[1]) != nothing
 const RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE = false
 
 import DataFrames: DataFrame
@@ -19,36 +19,64 @@ import JSON: json, parse, parsefile
 end
 
 const td = readdlm(
-    "$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/test_data.csv",',',header=true)
+    "$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/test_data.csv", ',', header=true)
 const TEST_DATA = DataFrame([
-    slicedim(td[1],2,i) for i in 1:size(td[1])[2]],
-    map(Symbol,td[2][:]))
+    slicedim(td[1], 2, i) for i in 1:size(td[1])[2]],
+    map(Symbol, td[2][:]))
 
-# example code to generate, run, and save tests
-# BSON preferred to JLD because it can save functions and closures
-    if (RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE & !BBB)
-        cd("/home/vagrant/chaipcr/bioinformatics/QpcrAnalysis")
-        push!(LOAD_PATH,pwd())
-        using QpcrAnalysis
-        
-        QpcrAnalysis.generate_test_script("revised_exec_testfns.jl")
-        run("mv exec_testfns.jl ../build")
+## example code to generate, run, and save tests
+## BSON preferred to JLD because it can save functions and closures
+if (RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE & !BBB)
+    cd("/home/vagrant/chaipcr/bioinformatics/QpcrAnalysis")
+    push!(LOAD_PATH, pwd())
+    using QpcrAnalysis
 
-        test_functions = QpcrAnalysis.generate_tests(debug=true)
+    test_functions = QpcrAnalysis.generate_tests(debug=false)
+    check = QpcrAnalysis.test_dispatch(test_functions)
 
-        mc3 = test_functions["meltcurve single channel"]()
-        # open("/tmp/mc3-master.json","w") do f
-        #     JSON.print(f, mc3[2]["melt_curve_analysis"])
-        # end
-        meltcrv = mc3[2]["melt_curve_analysis"]
-        master3 = JSON.parsefile("/tmp/mc3-master.json")
-        meltcrv == master3 # should be true
-        @timev for i in 1:100; test_functions["meltcurve single channel"](); end;
-        ## trailing semicolon suppresses output to REPL
+    if all(values(check))
+        BSON.bson("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/dispatch_tests.bson", test_functions)
+        println("All test functions checked and saved")
+        ## time functions second time around (after compilation)
+        timing = QpcrAnalysis.time_dispatch(test_functions)
+    else
+        println("Test functions failed check:")
+        println(check)
+    end
+end
 
-        mc4 = test_functions["meltcurve dual channel"]()
-        @timev for i in 1:100; test_functions["meltcurve dual channel"](); end;
 
+## alternative test functions
+# QpcrAnalysis.generate_test_script("revised_exec_testfns.jl")
+# run(`mv exec_testfns.jl ../build`)
+
+
+## Meltcurve test code
+#
+# mc3 = test_functions["meltcurve single channel"]()
+# # open("/tmp/mc3-master.json","w") do f
+# #     JSON.print(f, mc3[2]["melt_curve_analysis"])
+# # end
+# meltcrv = mc3[2]["melt_curve_analysis"]
+# master3 = JSON.parsefile("/tmp/mc3-master.json")
+# meltcrv == master3 ## should be true
+# @timev for i in 1:100; test_functions["meltcurve single channel"](); end;
+# ## trailing semicolon suppresses output to REPL
+#
+# mc4 = test_functions["meltcurve dual channel"]()
+# @timev for i in 1:100; test_functions["meltcurve dual channel"](); end;
+#
+# mc11 = test_functions["thermal consistency dual channel"]()
+# # open("/tmp/mc11-master.json","w") do f
+# #     JSON.print(f, mc11[2])
+# # end
+# master11 = JSON.parsefile("/tmp/mc11-master.json")
+# mc11[2] == master11 ## should be true
+# @timev for i in 1:100; test_functions["thermal consistency dual channel"](); end;
+
+
+## Meltcurve timings
+#
 # meltcrv commit  932b24a9be5bb148074830b0fd812618234ccfc1 (don't round mc_denser)
 #  10.571982 seconds (61.91 M allocations: 8.668 GiB, 11.33% gc time)
 # elapsed time (ns): 10571982383
@@ -97,45 +125,29 @@ const TEST_DATA = DataFrame([
 # GC pauses:         410
 # full collections:  3
 
-        mc11 = test_functions["thermal consistency dual channel"]()
-        # open("/tmp/mc11-master.json","w") do f
-        #     JSON.print(f, mc11[2])
-        # end
-        master11 = JSON.parsefile("/tmp/mc11-master.json")
-        mc11[2] == master11 # should be true
-        @timev for i in 1:100; test_functions["thermal consistency dual channel"](); end;
 
-    @timev d2=test_functions["meltcurve single channel"]()
-    check = QpcrAnalysis.test_dispatch(test_functions)
-    if all(values(check))
-        BSON.bson("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/dispatch_tests.bson",test_functions)
-        println("All test functions checked and saved")
-        # time functions second time around (after compilation)
-        timing = QpcrAnalysis.time_dispatch(test_functions)
-    else
-        println("Test functions failed check:")
-        println(check)
-    end
-end
 
-# timing tests on BBB
+## timing tests on BBB
 if (RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE & BBB)
     ENV["JULIA_ENV"]="production"
     cd("/root/chaipcr/bioinformatics/QpcrAnalysis")
-    push!(LOAD_PATH,pwd())
+    push!(LOAD_PATH, pwd())
     using QpcrAnalysis
-    include("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/test_functions.jl") # this file
+    include("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/test_functions.jl") ## this file
     test_functions = generate_tests()
     check = test_dispatch(test_functions)
     if all(values(check))
         println("All test functions passed check")
-        # time functions second time around (after compilation)
+        ## time functions second time around (after compilation)
         timing = time_dispatch(test_functions)
     else
         println("Test functions failed check:")
         println(check)
     end
 end
+
+
+
 
 function generate_tests(;
     debug     ::Bool =false,
@@ -144,49 +156,49 @@ function generate_tests(;
     test_functions = OrderedDict()
     strip = [" single"," dual"," channel"]
     for i in 1:size(TEST_DATA)[1]
-        for channel_num in [:single_channel,:dual_channel]
-            datafile = TEST_DATA[i,channel_num]
+        for channel_num in [:single_channel, :dual_channel]
+            datafile = TEST_DATA[i, channel_num]
             if (datafile != "")
-                action = TEST_DATA[i,:action]
+                action = TEST_DATA[i, :action]
                 action_t = QpcrAnalysis.Action_DICT[action]()
-                request = JSON.parsefile("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/$datafile.json",dicttype=OrderedDict)
+                request = JSON.parsefile("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/$datafile.json",
+                    dicttype=OrderedDict)
                 body = String(JSON.json(request))
 
                 function test_function()
-                    QpcrAnalysis.print_v(println,verbose,"Testing $testname")
+                    QpcrAnalysis.print_v(println, verbose, "Testing $testname")
                     @static BBB || FactCheck.clear_results()
-                    if (debug) # errors fail out
-                        #QpcrAnalysis.verify_request(action_t,request)
-                        response = QpcrAnalysis.act(action_t,request;verbose=verbose)
+                    if (debug) ## errors fail out
+                        # QpcrAnalysis.verify_request(action_t,request)
+                        response = QpcrAnalysis.act(action_t, request)
                         response_body = string(JSON.json(response))
-                        response_parsed = JSON.parse(response_body,dicttype=OrderedDict)
-                        #QpcrAnalysis.verify_response(action_t,response_parsed)
+                        response_parsed = JSON.parse(response_body, dicttype=OrderedDict)
+                        # QpcrAnalysis.verify_response(action_t,response_parsed)
                         ok = true
-                    else # continue tests after errors reported
+                    else ## continue tests after errors reported
                         (ok, response_body) = QpcrAnalysis.dispatch(
-                            action,
-                            body;
-                            verbose=verbose,
-                            verify=false)
-                        response_parsed = JSON.parse(response_body,dicttype=OrderedDict)
-                    end # if debug
+                            action, body; verify=false)
+                        println("response_body:")
+                        println(response_body)
+                        response_parsed = JSON.parse(response_body, dicttype=OrderedDict)
+                    end ## if debug
                     if (ok && response_parsed["valid"] )
-                        QpcrAnalysis.print_v(println,verbose,"Passed $testname\n")
+                        QpcrAnalysis.print_v(println, verbose, "Passed $testname\n")
                     else
-                        QpcrAnalysis.print_v(println,verbose,"Failed $testname\n")
+                        QpcrAnalysis.print_v(println, verbose, "Failed $testname\n")
                     end
                     return (ok, response_parsed)
                 end
 
-                testname = replace(TEST_DATA[i,:action],r"_"=>" ")
+                testname = replace(TEST_DATA[i, :action], r"_"=>" ")
                 for str in strip
-                    testname = replace(testname,str=>"")
+                    testname = replace(testname, str=>"")
                 end
-                testname = replace("$testname "*string(channel_num),r"_"=>" ")
+                testname = replace("$testname "*string(channel_num), r"_"=>" ")
                 test_functions[testname] = test_function
-            end # if datafile
-        end # single/dual channel (channel_num)
-    end # next action (i)
+            end ## if datafile
+        end ## single/dual channel (channel_num)
+    end ## next action (i)
     return test_functions
 end
 
@@ -194,70 +206,71 @@ end
 ## to precompile julia routines for BBB
 function generate_test_script(outfile ::String)
     open(outfile, "w") do f
-        write(f,"""
+        write(f, """
         println("Starting precompile template !!!")
         push!(LOAD_PATH, "/root/chaipcr/bioinformatics/QpcrAnalysis/")
 
         println("Using time: ")
         @time using QpcrAnalysis
         println("Done Using!")
-        for \$iteration in ["First","Second"]
+        for \$iteration in ["First", "Second"]
             println("\\nAbout to test dispatch. \$iteration time dispatch time:")
         """)
         write_dispatch_calls(f)
-        write(f,"""
+        write(f, """
             println("\\nDone dispatch time test")
         end # next iteration
         println("\\nDone with test functions!")
         """)
-    end # close file
-end # generate_test_script()
+    end ## close file
+end ## generate_test_script()
 
 ## write dispatch calls for generate_test_script()
 function write_dispatch_calls(f)
-    strip = [" single"," dual"," channel"]
+    strip = [" single", " dual", " channel"]
     for i in 1:size(TEST_DATA)[1]
-        for channel_num in [:single_channel,:dual_channel]
-            datafile = TEST_DATA[i,channel_num]
+        for channel_num in [:single_channel, :dual_channel]
+            datafile = TEST_DATA[i, channel_num]
             if (datafile != "")
-                action = TEST_DATA[i,:action]
-                request = JSON.parsefile("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/$datafile.json",dicttype=OrderedDict)
+                action = TEST_DATA[i, :action]
+                request = JSON.parsefile("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/$datafile.json",
+                    dicttype=OrderedDict)
                 body = String(JSON.json(request))
-                testname = replace(TEST_DATA[i,:action],r"_"=>" ")
+                testname = replace(TEST_DATA[i,:action], r"_"=>" ")
                 for str in strip
-                    testname = replace(testname,str=>"")
+                    testname = replace(testname, str=>"")
                 end
-                testname = replace("$testname "*string(channel_num),r"_"=>" ")
-                write(f,"""
+                testname = replace("$testname "*string(channel_num), r"_"=>" ")
+                write(f, """
                     println("\\nTesting \$testname")
                     action=\"\"\"$action\"\"\"
                     body=\"\"\"$body\"\"\"
                     @time (ok, response_body) =
-                        QpcrAnalysis.dispatch(action, body; verbose=false, verify=false)
+                        QpcrAnalysis.dispatch(action, body; verify=false)
                     println("OK? \$ok")
                 """)
-            end # if datafile
-        end # single/dual channel (channel_num)
-    end # next action (i)
-end # write_dispatch_calls()
+            end ## if datafile
+        end ## single/dual channel (channel_num)
+    end ## next action (i)
+end ## write_dispatch_calls()
 
-# run test functions
-# returns true for every test that runs without errors
+## run test functions
+## returns true for every test that runs without errors
 function test_dispatch(test_functions ::Associative)
     OrderedDict(map(keys(test_functions)) do testname
         println("Making dispatch call: $testname")
         result = test_functions[testname]()
         testname => result[1] && result[2]["valid"]
-        end)
+    end)
 end
 
-# time performance
+## time performance
 function time_dispatch(test_functions ::Associative)
     OrderedDict(map(keys(test_functions)) do testname
         println("Making dispatch call: $testname")  
         @timev result = test_functions[testname]()
         testname => result[1] && result[2]["valid"]
-        end)
+    end)
 end
 
 

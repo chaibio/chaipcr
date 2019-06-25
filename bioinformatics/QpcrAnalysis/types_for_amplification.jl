@@ -5,7 +5,7 @@ import DataStructures.OrderedDict
 
 ## types
 
-abstract type AbstractAmpFitted end
+abstract type            AbstractAmpFitted end
 struct EmptyAmpFitted <: AbstractAmpFitted end
 
 struct AmpStepRampProperties
@@ -79,8 +79,8 @@ mutable struct AmpStepRampOutput
     ## for ct method
     ct_fluos        ::Vector{Float_T}
     ## allelic discrimination
-    assignments_adj_labels_dict ::OrderedDict{String,Vector{String}}
-    agr_dict        ::OrderedDict{String,AssignGenosResult}
+    assignments_adj_labels_dict ::OrderedDict{Symbol,Vector{String}}
+    agr_dict        ::OrderedDict{Symbol,AssignGenosResult}
 end # type AmpStepRampOutput
 
 struct AmpStepRampOutput2Bjson
@@ -91,7 +91,7 @@ struct AmpStepRampOutput2Bjson
     cq              ::Array{Float_T,2} ## cq values, applicable to sigmoid models but not to MAK models
     d0              ::Array{Float_T,2} ## starting quantity from absolute quanitification
     ct_fluos        ::Vector{Float_T}  ## fluorescence thresholds (one value per channel) for Ct method
-    assignments_adj_labels_dict ::OrderedDict{String,Vector{String}} ## assigned genotypes from allelic discrimination, keyed by type of data (see `AD_DATA_CATEG` in "allelic_discrimination.jl")
+    assignments_adj_labels_dict ::OrderedDict{Symbol,Vector{String}} ## assigned genotypes from allelic discrimination, keyed by type of data (see `AD_DATA_CATEG` in "allelic_discrimination.jl")
 end
 
 

@@ -33,7 +33,8 @@ function adj_w2wvaf(
         return ([
             scaling_factor_adj_w2wvaf * mean(swd) *
                 fluo2btp[i,w] / swd[w]
-                    for i in 1:size(fluo2btp,1), w in 1:size(fluo2btp,2)]) ## w = well
+                    for i in range(1, size(fluo2btp, 1)),
+                        w in range(1, size(fluo2btp, 2))]) ## w = well
     end
 
     ## minus_water == true
@@ -44,7 +45,8 @@ function adj_w2wvaf(
     return ([
         scaling_factor_adj_w2wvaf * mean(swd) *
             (fluo2btp[i,w] - wva_water[w]) / swd[w]
-                for i in 1:size(fluo2btp,1), w in 1:size(fluo2btp,2)]) ## w = well
+                for i in range(1, size(fluo2btp, 1)),
+                    w in range(1, size(fluo2btp, 2))]) ## w = well
 end ## adj_w2wvaf
 
 
@@ -101,58 +103,65 @@ function prep_adj_w2wvaf(
     # check_subset(Ccsc(channels_in_signal, "Input signal channels"), DYE2CHST_ccsc)
     #
     # if water_well_nums != signal_well_nums
-    #     error(logger, "The wells with water data ($(join(water_well_nums, ", "))) are not the same as those with signal data ($(join(signal_well_nums, ", "))). ")
+    #     error(logger, "the wells with water data ($(join(water_well_nums, ", "))) are not the same as those with signal data ($(join(signal_well_nums, ", "))). ")
     # end
     #
     ## check data length
     # water_lengths = map(length, channels_in_water)
     # signal_lengths = map(length, channels_in_signal)
     # if length(unique([water_lengths; signal_lengths])) > 1
-    #     error(logger, "Data lengths are not equal across all the channels and/or between water and signal. Water: $water_lengths. Signal: $signal_lengths. ")
+    #     error(logger, "data lengths are not equal across all the channels and/or between water and signal. Water: $water_lengths. Signal: $signal_lengths. ")
     # end
 
     ## issue:
     ## using the current format for the request body there is no well_num information
     ## associated with the calibration data
-    channels_in_water = num_channels(calib_data[WATER_KEY][FLUORESCENCE_VALUE_KEY])
     const V = typeof(calib_data[WATER_KEY][FLUORESCENCE_VALUE_KEY][1][1])
     water_data_dict  = OrderedDict{Integer,Vector{V}}() ## enforce type
     signal_data_dict = OrderedDict{Integer,Vector{V}}() ## enforce type
-    stop_msgs = Vector{String}()
-    for channel in 1:channels_in_water
+    const stop_msgs = Vector{String}()
+    for channel in range(1, num_channels(calib_data[WATER_KEY][FLUORESCENCE_VALUE_KEY]))
         key = CHANNEL_KEY * "_$(channel)"
-        try
-            water_data_dict[channel]  = calib_data[WATER_KEY][FLUORESCENCE_VALUE_KEY][channel]
-        catch
-            push!(stop_msgs, CALIB_ERR_1 * key)
-        end
-        try
-            signal_data_dict[channel] = calib_data[key][FLUORESCENCE_VALUE_KEY][channel]
-        catch
-            push!(stop_msgs, CALIB_ERR_2 * key)
-        end
+        try water_data_dict[channel]  = calib_data[WATER_KEY][FLUORESCENCE_VALUE_KEY][channel]
+            catch
+                push!(stop_msgs, "Cannot access water calibration data for channel $channel")
+            end
+        try signal_data_dict[channel] = calib_data[key][FLUORESCENCE_VALUE_KEY][channel]
+            catch
+                push!(stop_msgs, "Cannot access signal calibration data for channel $channel")
+            end
         if length(water_data_dict[channel]) != length(signal_data_dict[channel])
-            push!(stop_msgs, CALIB_ERR_3 * key)
+            push!(stop_msgs, "Calibration data lengths are not equal for channel $channel")
         end
-    end
-    (length(stop_msgs) > 0) && error(logger, join(stop_msgs, "\n"))
-    
-    channels_in_water, channels_in_signal = map(get_ordered_keys, (water_data_dict, signal_data_dict))
+    end ## next channel
+    if (length(stop_msgs) > 0)
+        try throw(DomainError(join(stop_msgs, "; ")))
+        catch err
+            debug(logger, sprint(showerror, err))
+            debug(logger, string(stacktrace(catch_backtrace())))
+        end ## try
+    end ## if
+    const (channels_in_water, channels_in_signal) = map(get_ordered_keys, (water_data_dict, signal_data_dict))
     ## assume without checking that there are no missing wells anywhere
-    const signal_well_nums = collect(1:length(signal_data_dict[1]))
+    const signal_well_nums = collect(range(1, length(signal_data_dict[1])))
     #
     ## check whether signal fluo > water fluo
-    stop_msgs = Vector{String}()
     for channel in channels_in_signal
-        wva_invalid_idc = find(signal_data_dict[channel] .<= water_data_dict[channel])
+        const wva_invalid_idc = find(signal_data_dict[channel] .<= water_data_dict[channel])
         if length(wva_invalid_idc) > 0
-            failed_well_nums_str = join(signal_well_nums[wva_invalid_idc], ", ")
-            push!(stop_msgs, "Invalid well-to-well variation data in channel $channel: " *
+            const failed_well_nums_str = join(signal_well_nums[wva_invalid_idc], ", ")
+            push!(stop_msgs, "invalid well-to-well variation data in channel $channel: " *
                 "fluorescence value of water is greater than or equal to that of dye " *
                 "in the following well(s) - $failed_well_nums_str")
         end ## if invalid
     end ## next channel
-    (length(stop_msgs) > 0) && error(logger, join(stop_msgs, "\n"))
+    if (length(stop_msgs) > 0)
+        try throw(DomainError(join(stop_msgs, "; ")))
+        catch err
+            debug(logger, sprint(showerror, err))
+            debug(logger, string(stacktrace(catch_backtrace())))
+        end ## try
+    end ## if
 
     ## issue:
     ## this feature has been temporarily disabled while
@@ -194,10 +203,9 @@ function prep_adj_w2wvaf(
     ## to accommodate the situation where calibration data has more channels
     ## than experiment data, so that calibration data needs to be easily
     ## subsetted by channel.
-    wva_data = OrderedDict(
+    const wva_data = OrderedDict(
         :water  => water_data_dict,
-        :signal => signal_data_dict
-    )
+        :signal => signal_data_dict)
     return (wva_data, signal_well_nums)
 end ## prep_adj_w2wvaf
 
@@ -257,7 +265,7 @@ end ## prep_adj_w2wvaf
 #            elseif calib_id_key_isa == "dye" #
 #                channel = DYE2CHST[calib_id_key]["channel"]
 #            else
-#                error("If multiple experiments are used for calibration, `calib_id_key_isa` needs to be \"channel\" or \"dye\". ")
+#                error(logger, "if multiple experiments are used for calibration, `calib_id_key_isa` needs to be \"channel\" or \"dye\". ")
 #            end
 #            wva_qry_2b = "
 #                SELECT fluorescence_value, well_num
@@ -279,12 +287,12 @@ end ## prep_adj_w2wvaf
 #        complete_well_nums = intersect(well_nums_dupd...)
 #
 #    else ## len_step_id_s_uniq < 1
-#        error("Lengths of `calib_id_s` and `step_id_s` need to be greater than 0. ")
+#        error(logger, "lengths of `calib_id_s` and `step_id_s` need to be greater than 0. ")
 #
 #    end ## if
 #
 #    if length(well_nums) > length(complete_well_nums) ## not use `setdiff` because `well_nums` may be `[]` to select all available wells
-#        error("Calibration data are not complete for these wells: $(join(setdiff(well_nums, complete_well_nums), ", ")). ")
+#        error(logger, "calibration data are not complete for these wells: $(join(setdiff(well_nums, complete_well_nums), ", ")). ")
 #    end
 #
 #    wva_data_dict = OrderedDict([
