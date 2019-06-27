@@ -879,7 +879,7 @@ function mod_bl_q(
                 end ## try
             end ## if bl_method
         end ## if
-        if length(bl_notes) >= 2 || bl_notes[2] == "model-derived baseline"
+        if length(bl_notes) < 2 || bl_notes[2] != "model-derived baseline"
             const bl_cycs =
                 try bl_cycs()
                 catch

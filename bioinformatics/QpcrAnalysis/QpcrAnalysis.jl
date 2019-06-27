@@ -134,10 +134,6 @@ module QpcrAnalysis
         ## so it is accessible via `get_logger(QpcrAnalysis)`
         Memento.register(logger)
     end
-
-    info(logger, "Julia is running in " *
-        (production_env ? PRODUCTION_MODE : DEVELOPMENT_MODE) * " mode")
-    info(logger, "module QpcrAnalysis loaded")
 end ## module QpcrAnalysis
 
 
