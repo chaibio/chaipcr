@@ -124,9 +124,10 @@ module QpcrAnalysis
     function __init__()
         ## Changes to the default logger must happen at runtime
         ## otherwise segfaults are liable to occur
+        const logdir = production_env ? "/var/log" : "/tmp"
         push!(logger,
             DefaultHandler(
-                FileRoller("julia.log", "/var/log"), ## default max size ~5MB
+                FileRoller("julia.log", logdir), ## default max size ~5MB
                 DefaultFormatter("[ {date} | {level} ]: {msg}")))
         (production_env == DEVELOPMENT_MODE) && setlevel!(logger, "debug")
         ## Register the module level logger at runtime
