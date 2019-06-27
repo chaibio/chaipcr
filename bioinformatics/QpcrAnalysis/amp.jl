@@ -738,7 +738,7 @@ function mod_bl_q(
         ## update bl_notes
         function sfc_prebl_status(prebl_status ::Symbol)
             bl_notes = ["prebl_status $prebl_status", "model-derived baseline"]
-            if prebl_status in [:Optimal]
+            if prebl_status in [:Optimal, :UserLimit]
                 const (min_bfd, max_bfd) = extrema(blsub_fluos) ## `bfd` - blsub_fluos_draft
                 if max_bfd - min_bfd <= abs(min_bfd)
                     bl_notes[2] = "fallback"
