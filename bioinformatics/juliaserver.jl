@@ -1,56 +1,83 @@
-# juliaserver.jl
+## juliaserver.jl
 #
-# sets up server to listen on channel 8081
+## sets up server to listen on channel 8081
 #
-# in future it might be preferable to migrate to HTTP.jl
-# which has more features than HttpServer.jl and is
-# under active development.
-# (Tom Price, Dec 2018)
+## in future it might be preferable to migrate to HTTP.jl
+## which has more features than HttpServer.jl and is
+## under active development.
+## (Tom Price, Dec 2018)
 
-import HttpServer: HttpHandler, Server, run
+## usage:
+## cd("QpcrAnalysis")
+## julia -e 'push!(LOAD_PATH,pwd()); include("../juliaserver.jl")'
+
+import HTTP: serve, Request, Response, HandlerFunction, mkheaders, URI, URIs.splitpath
+import JSON.json
+import Memento: getlogger, gethandlers, debug, info, error
+import FunctionalData.@p
 import QpcrAnalysis
 
 
-# Functions like this will be defined as `req2res` in module "QpcrAnalysis"
-# function amplification(experiment_id, request_body)
-# 	# return true, json response
-# 	# or return false, json error response
-# 	return true, request_body
-# end
+function get_response(req ::HTTP.Request)
+    info(logger, "Julia webserver has received $(req.method) request to http://127.0.0.1:8081$(req.target)")
+    debug(logger, "at get_response() with target $(req.target)")
+    const code =
+        if req.method == "GET"
+            const nodes = HTTP.URIs.splitpath(req.target)
+            if length(nodes) >= 3
+                const experiment_id = nodes[2]
+                const action        = nodes[3]
+                const request_body  = String(req.body)
+                debug(logger, "request body: " * request_body)
 
-http = HttpServer.HttpHandler() do req ::HttpServer.Request, res ::HttpServer.Response
+                ## calls to http://localhost/experiments/0/
+                ## will activate a slow test mode
+                const kwargs = Dict{Symbol,Bool}(
+                    (experiment_id == "0") ? :verify => true : ())
 
-	code = 0
-	if ismatch(r"^/experiments/", req.resource)
-		nodes = split(req.resource, '/')
-		if (length(nodes) >= 4)
-			experiment_id = parse(Int, nodes[3])
-			action = String(nodes[4])
-			request_body = String(req.data) 
+                ## dispatch request to Julia engine
+                debug(logger, "calling QpcrAnalysis.dispatch() from get_response()")
+                const success, response_body =
+                    QpcrAnalysis.dispatch(action, request_body; kwargs...)
+                debug(logger, "at get_response() receiving results from QpcrAnalysis.dispatch()")
+                ## code =
+                (success) ? 200 : 500
+            else ## length(nodes) < 3
+                404
+            end
+        else ## not GET
+            404
+        end
+    #
+    (code == 404) &&
+        const response_body = JSON.json(Dict(:error => "not found"))
+    #
+    debug(logger, "returning from get_response()")
+    debug(logger, "status: $code")
+    debug(logger, "response body: $response_body")
+    return HTTP.Response(code, RESPONSE_HEADERS; body=response_body)
+end ## get_response
 
-			# calls to http://localhost/experiments/0/ will activate a verbose test mode
-			kwargs = Dict{Symbol,Any}()
-			if (experiment_id==0)
-				kwargs[:verbose] = true
-				kwargs[:verify]  = true
-			end
+## set up logging
+logger = getlogger("QpcrAnalysis")
+logIO = (@p gethandlers logger|values|collect|getindex _ 1|getfield _ :io)
+debug(logger, "logfile " * getfield(logIO, :filepath))
 
-			success, response_body = QpcrAnalysis.dispatch(action, request_body; kwargs...)
-			println("success $success")
-			println("request_body $request_body")
-			code = (success) ? 200 : 500
-		end
-	end
+## headers
+const RESPONSE_HEADERS = HTTP.mkheaders([
+    "Server"           => "Julia/$VERSION",
+    "Content-Type"     => "text/html; charset=utf-8",
+    "Content-Language" => "en",
+    "Date"             => Dates.format(now(Dates.UTC), Dates.RFC1123Format)])
 
-	if code == 0
-		code = 404
-		response_body = Dict(:error => "method \"$req.resource\" not found")
-	end
+## set up REST endpoints to dispatch to service functions
+HTTP.serve(
+    host=ip"127.0.0.1",
+    port=8081,
+    handler=HandlerFunction(get_response),
+    logger=logIO,
+    verbose=true)
+info(logger, "Webserver listening on: http://127.0.0.1:8081")
 
-	res = HttpServer.Response(response_body)
-	res.status = code
-	return res
-end
 
-server = HttpServer.Server(http)
-HttpServer.run(server, 8081)
+#

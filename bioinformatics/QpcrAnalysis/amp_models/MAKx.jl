@@ -1,3 +1,5 @@
+## MAKx.jl
+#
 ## different formula for each cycle (dfc)
 
 ## write functions to fit MAKx (MAK2 and MAK3) model here,
@@ -13,7 +15,7 @@ function pred_from_d_nm1(::Union{MAK2, MAK3}, d_nm1::Real, k::Real)
 end
 
 
-function pred_from_cycs( # 0.7to1.2e-5 sec for 40 cycles on PC
+function pred_from_cycs( ## 0.7to1.2e-5 sec for 40 cycles on PC
     ::MAK2,
     cycs    ::AbstractVector,
     fb      ::Real,
@@ -30,7 +32,7 @@ function pred_from_cycs( # 0.7to1.2e-5 sec for 40 cycles on PC
     return fb + pred_ds[2:end][map(Int, cycs)]
 end
 
-function pred_from_cycs( #  sec for 40 cycles on PC
+function pred_from_cycs( ## sec for 40 cycles on PC
     ::MAK3,
     cycs    ::AbstractVector,
     fb      ::Real,
@@ -51,13 +53,13 @@ end
 
 function fit(
     ::MAK2,
-    cycs        ::AbstractVector, # continous integers or not
+    cycs        ::AbstractVector, ## continous integers or not
     obs_fluos   ::AbstractVector,
     wts         ::AbstractVector =ones(length(obs_fluos));
     kwargs_Model... # argument for `JuMP.Model`
 )
     ## find approximate `max_d` by `finite_diff` from "shared.jl"
-    d_vec = finite_diff(cycs, obs_fluos; nu=1) # should use `nu=2` per Boggy 2010 paper (because MAK2 is no longer valid at max_d1), but use `nu=1` to increase the number of data points used for fit and seems to provide better fitting results
+    d_vec = finite_diff(cycs, obs_fluos; nu=1) ## should use `nu=2` per Boggy 2010 paper (because MAK2 is no longer valid at max_d1), but use `nu=1` to increase the number of data points used for fit and seems to provide better fitting results
     max_d, max_d_idx = findmax(d_vec)
     idc2fit = 1:max_d_idx
     obs2fit = obs_fluos[idc2fit]
@@ -70,8 +72,8 @@ function fit(
     @variable(jmp_model, k >= 1e-10, start=k_START)
     # @variable(jmp_model, bl_k, start=0)
     @variable(jmp_model, f[cycs2fit])
-    @variable(jmp_model, d[cycs2fit]) # change_a1
-    # @variable(jmp_model, d[cycs2fit] >= 0) # change_a2 # didn't work as well as "change_a1", see "20170312_0302_ip137_exp187_ch1_mak2_ylims_obs_*.png"
+    @variable(jmp_model, d[cycs2fit]) ## change_a1
+    # @variable(jmp_model, d[cycs2fit] >= 0) ## change_a2 # didn't work as well as "change_a1", see "20170312_0302_ip137_exp187_ch1_mak2_ylims_obs_*.png"
 
     @constraint(jmp_model, f_constr[cyc in cycs2fit], f[cyc] == fb + d[cyc])
     @NLconstraint(jmp_model, d_constr_01, d[1] == d0 + k * log(1 + d0 / k))
@@ -88,7 +90,7 @@ function fit(
 
     # @NLobjective(
     #     jmp_model, Min,
-    #     @eval $(parse(get_mak2_rsq_str(obs_fluos[1:max_d_idx]))) # `OutOfMemoryError()`
+    #     @eval $(parse(get_mak2_rsq_str(obs_fluos[1:max_d_idx]))) ## `OutOfMemoryError()`
     # )
 
     status = solve(jmp_model)
@@ -105,18 +107,18 @@ function fit(
         jmp_model,
         # init_coefs
     )
-end # fit(::MAK2)
+end ## fit(::MAK2)
 
 
 function fit(
     ::MAK3,
-    cycs        ::AbstractVector, # continous integers or not
+    cycs        ::AbstractVector, ## continous integers or not
     obs_fluos   ::AbstractVector,
     wts         ::AbstractVector =ones(length(obs_fluos));
-    kwargs_Model... # argument for `JuMP.Model`
+    kwargs_Model... ## argument for `JuMP.Model`
 )
     ## find approximate `max_d` by `finite_diff` from "shared.jl"
-    d_vec = finite_diff(cycs, obs_fluos; nu=1) # should use `nu=2` per Boggy 2010 paper (because MAK2 is no longer valid at max_d1), but use `nu=1` to increase the number of data points used for fit and seems to provide better fitting results
+    d_vec = finite_diff(cycs, obs_fluos; nu=1) ## should use `nu=2` per Boggy 2010 paper (because MAK2 is no longer valid at max_d1), but use `nu=1` to increase the number of data points used for fit and seems to provide better fitting results
     max_d, max_d_idx = findmax(d_vec)
     idc2fit = 1:max_d_idx
     cycs2fit = 1:cycs[max_d_idx]
@@ -155,7 +157,7 @@ function fit(
 
     # @NLobjective(
     #     jmp_model, Min,
-    #     @eval $(parse(get_mak2_rsq_str(obs_fluos[1:max_d_idx]))) # `OutOfMemoryError()`
+    #     @eval $(parse(get_mak2_rsq_str(obs_fluos[1:max_d_idx]))) ## `OutOfMemoryError()`
     # )
 
     status = solve(jmp_model)
@@ -174,8 +176,7 @@ function fit(
         jmp_model,
         # init_coefs
     )
-end # fit(::MAK3)
-
+end ## fit(::MAK3)
 
 
 
@@ -208,7 +209,7 @@ end # fit(::MAK3)
 #         "fb + $pred_str_d"
 #     end
 #     return pred_strs_fluo
-# end # get_mak2_psf
+# end ## get_mak2_psf
 #
 #
 ## `OutOfMemoryError()` upon macro expansion
@@ -227,7 +228,7 @@ end # fit(::MAK3)
 #     return map(1:num_cycs) do cyc_n
 #         func_expr = parse("function pred_$cyc_n($fb_str::Real, $d0_str::Real, $k_str::Real) return $(pred_strs_fluo[cyc_n]) end")
 #         @eval $func_expr # `OutOfMemoryError()`
-#     end # do pred_str_fluo
+#     end ## do pred_str_fluo
 # end
 #
 #
@@ -240,10 +241,9 @@ end # fit(::MAK3)
 #     pred_strs_fluo = get_mak2_psf(num_cycs; kwdict_gmp...)
 #     rsq_str = join(map(1:num_cycs) do cyc_n
 #         "($(pred_strs_fluo[cyc_n]) - $(obs_fluos[cyc_n])) ^ 2"
-#     end, " + ") # do cyc_n
+#     end, " + ") ## do cyc_n
 #     return rsq_str
-# end # get_mak2_rsq_str
-
+# end ## get_mak2_rsq_str
 
 
 
@@ -251,8 +251,6 @@ end # fit(::MAK3)
 # pred_funcs = get_mak2_pff(num_cycs)
 # preds = map(func -> func(fb, d0, k), funcs)
 #
-
-
 
 
 #

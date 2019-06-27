@@ -218,7 +218,7 @@ ORDER BY channel, well_num, cycle_num ;" > amp_169.tsv
 # )
 
 # open("test_1ch_amp_169.json","w") do f
-#     JSON.print(f, mc_1)
+#     JSON.print(f, amp_1)
 # end
 
 

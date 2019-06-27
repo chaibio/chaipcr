@@ -1,3 +1,5 @@
+## MAKERGAUL.jl
+#
 ## different formula for each cycle (dfc)
 
 ## write functions to fit MAKERGAUL model here, which will be called in `mod_bl_q` in "amp.jl"
@@ -19,7 +21,7 @@ function pred_from_nm1(
 end
 
 
-function pred_from_cycs( # 0.7to1.2e-5 sec for 40 cycles on PC
+function pred_from_cycs( ## 0.7to1.2e-5 sec for 40 cycles on PC
     ::MAKERGAUL3,
     cycs2fit    ::AbstractVector,
     fb          ::Real,
@@ -67,10 +69,10 @@ end
 
 function fit(
     ::MAKERGAUL3,
-    cycs        ::AbstractVector, # continous integers or not
+    cycs        ::AbstractVector, ## continous integers or not
     obs_fluos   ::AbstractVector,
     wts         ::AbstractVector =ones(length(obs_fluos));
-    kwargs_Model... # argument for `JuMP.Model`
+    kwargs_Model... ## argument for `JuMP.Model`
 )
     ## find maximum observed fluorescence
     max_of, max_of_idx = findmax(obs_fluos)
@@ -92,17 +94,17 @@ function fit(
         # eu0_inh_LB <= eu0 <= eu0_UB_MULTIPLE * of_diff,
         eu0 >= 0,
         start=eu0_START)
-    # @variable(jmp_model, d0_LB <= d0 <= d0_UB, start=MAKERGAUL_d0_START) # change_a1
-    @variable(jmp_model, d0 >= 0, start=MAKERGAUL_d0_START) # change_a2
-    @variable(jmp_model, # inh
+    # @variable(jmp_model, d0_LB <= d0 <= d0_UB, start=MAKERGAUL_d0_START) ## change_a1
+    @variable(jmp_model, d0 >= 0, start=MAKERGAUL_d0_START) ## change_a2
+    @variable(jmp_model, ## inh
         # eu0_inh_LB <= inh <= inh_UB_MULTIPLE * of_diff,
         inh >= 0,
         start=inh_START)
     @variable(jmp_model, f[cycs2fit])
-    # @variable(jmp_model, eu[cycs2fit]) # change_b1
-    @variable(jmp_model, eu[cycs2fit] >= 0) # change_b2
-    # @variable(jmp_model, d[cycs2fit]) # change_c1
-    @variable(jmp_model, d[cycs2fit] >= 0) # change_c2
+    # @variable(jmp_model, eu[cycs2fit]) ## change_b1
+    @variable(jmp_model, eu[cycs2fit] >= 0) ## change_b2
+    # @variable(jmp_model, d[cycs2fit]) ## change_c1
+    @variable(jmp_model, d[cycs2fit] >= 0) ## change_c2
 
     @constraint(jmp_model, f_constr[cyc in cycs2fit], f[cyc] == fb + d[cyc])
     # change_e1: with division
@@ -132,11 +134,11 @@ function fit(
     #     sum( ((f[cycs[idx]] - obs_fluos[idx]) / (mean_of - obs_fluos[idx])) ^ 2 for idx in idc2fit )
     # )
     ## sse # the only one with optimal so far
-    @NLobjective(jmp_model, Min, sum((f[cycs[idx]] - obs_fluos[idx]) ^ 2 for idx in idc2fit)) # can solve to optimal when ssre can't
+    @NLobjective(jmp_model, Min, sum((f[cycs[idx]] - obs_fluos[idx]) ^ 2 for idx in idc2fit)) ## can solve to optimal when ssre can't
 
     # @NLobjective(
     #     jmp_model, Min,
-    #     @eval $(parse(get_mak2_rsq_str(obs_fluos[1:max_d2_idx]))) # `OutOfMemoryError()`
+    #     @eval $(parse(get_mak2_rsq_str(obs_fluos[1:max_d2_idx]))) ## `OutOfMemoryError()`
     # )
 
     status = solve(jmp_model)
@@ -153,15 +155,15 @@ function fit(
         jmp_model,
         # init_coefs
     )
-end # fit(::MAKERGAUL3)
+end ## fit(::MAKERGAUL3)
 
 
 function fit(
     ::MAKERGAUL4,
-    cycs        ::AbstractVector, # continous integers or not
+    cycs        ::AbstractVector, ## continous integers or not
     obs_fluos   ::AbstractVector,
     wts         ::AbstractVector=ones(length(obs_fluos));
-    kwargs_Model... # argument for `JuMP.Model`
+    kwargs_Model... ## argument for `JuMP.Model`
 )
     ## find maximum observed fluorescence
     max_of, max_of_idx = findmax(obs_fluos)
@@ -188,26 +190,26 @@ function fit(
     @variable(jmp_model,
         bl_k,
         start=bl_k_start)
-    @variable(jmp_model, # eu0
+    @variable(jmp_model, ## eu0
         # eu0_inh_LB <= eu0 <= eu0_UB_MULTIPLE * of_diff,
         eu0 >= 0,
         start=eu0_START)
-    # @variable(jmp_model, d0_LB <= d0 <= d0_UB, start=MAKERGAUL_d0_START) # change_a1
-    @variable(jmp_model, d0 >= 0, start=MAKERGAUL_d0_START) # change_a2
-    @variable(jmp_model, # inh
+    # @variable(jmp_model, d0_LB <= d0 <= d0_UB, start=MAKERGAUL_d0_START) ## change_a1
+    @variable(jmp_model, d0 >= 0, start=MAKERGAUL_d0_START) ## change_a2
+    @variable(jmp_model, ## inh
         # eu0_inh_LB <= inh <= inh_UB_MULTIPLE * of_diff,
         inh >= 0,
         start=inh_START)
     @variable(jmp_model, f[cycs2fit])
-    # @variable(jmp_model, eu[cycs2fit]) # change_b1
-    @variable(jmp_model, eu[cycs2fit] >= 0) # change_b2
-    # @variable(jmp_model, d[cycs2fit]) # change_c1
-    @variable(jmp_model, d[cycs2fit] >= 0) # change_c2
+    # @variable(jmp_model, eu[cycs2fit])    ## change_b1
+    @variable(jmp_model, eu[cycs2fit] >= 0) ## change_b2
+    # @variable(jmp_model, d[cycs2fit])     ## change_c1
+    @variable(jmp_model, d[cycs2fit] >= 0)  ## change_c2
 
     @constraint(jmp_model,
         f_constr[cyc in cycs2fit],
         f[cyc] == fb + bl_k * cyc + d[cyc])
-    # change_e1: with division
+    ## change_e1: with division
     @NLconstraint(jmp_model, eu_constr_01, eu[1] == eu0 / (1 + inh * d0))
     @NLconstraint(jmp_model, d_constr_01, d[1] == d0 + d0 * eu[1] / (eu[1] + d0))
     @NLconstraint(jmp_model, eu_constr_2p[cyc in cycs2fit[2:end]], eu[cyc] == eu[cyc-1] / (1 + inh * d[cyc-1]))
@@ -233,12 +235,12 @@ function fit(
     #     jmp_model, Min,
     #     sum( ((f[cycs[idx]] - obs_fluos[idx]) / (mean_of - obs_fluos[idx])) ^ 2 for idx in idc2fit )
     # )
-    ## sse # the only one with optimal so far
-    @NLobjective(jmp_model, Min, sum((f[cycs[idx]] - obs_fluos[idx]) ^ 2 for idx in idc2fit)) # can solve to optimal when ssre can't
+    ## sse ## the only one with optimal so far
+    @NLobjective(jmp_model, Min, sum((f[cycs[idx]] - obs_fluos[idx]) ^ 2 for idx in idc2fit)) ## can solve to optimal when ssre can't
 
     # @NLobjective(
     #     jmp_model, Min,
-    #     @eval $(parse(get_mak2_rsq_str(obs_fluos[1:max_d2_idx]))) # `OutOfMemoryError()`
+    #     @eval $(parse(get_mak2_rsq_str(obs_fluos[1:max_d2_idx]))) ## `OutOfMemoryError()`
     # )
 
     status = solve(jmp_model)
@@ -257,9 +259,7 @@ function fit(
         jmp_model,
         # init_coefs
     )
-end # fit(::MAKERGAUL4)
-
-
+end ## fit(::MAKERGAUL4)
 
 
 #

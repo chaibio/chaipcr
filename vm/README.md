@@ -41,11 +41,12 @@ First install these applications:
 6. Log in to the test machine as user _vagrant_ (no password required) and check that `MySql` is running:  
 `kitchen exec -c 'uname -a'`  
 `kitchen login master-ubuntu-1604`  
-`mysql -u root`  
+`sudo /etc/init.d/mysql start`  
+`sudo mysql`  
 
 7. Manually test the Rails app:  
 `curl --include http://localhost:3000`
 
 8. Remove the VM when you have finished, and check that all the VM instances are gone:  
 `kitchen destroy`  
-`vagrant global-status`
+`vagrant global-status`	

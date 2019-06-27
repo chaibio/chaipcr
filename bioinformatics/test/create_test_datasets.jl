@@ -236,6 +236,10 @@ mc_189=OrderedDict(
 open("chaipcr_mc_189.json","w") do f
     JSON.print(f, mc_189)
 end
+
+
+
+
 # Test_1ch thermal consistency single channel
 
 tc_146=readdlm("tc_146.tsv",'\t',header=true)

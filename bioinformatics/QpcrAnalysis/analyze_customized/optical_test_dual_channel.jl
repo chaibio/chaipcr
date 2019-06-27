@@ -2,6 +2,7 @@
 
 import DataStructures.OrderedDict
 import JSON.json
+import Memento.debug
 
 
 function act(
@@ -10,22 +11,21 @@ function act(
     #
     # db_conn ::MySQL.MySQLHandle,
     # exp_id ::Integer,
-    # calib_info ::Union{Integer,OrderedDict}; # keys: "baseline", "water", "channel_1", "channel_2". Each value's "calibration_id" value is the same as `exp_id`
+    # calib_info ::Union{Integer,OrderedDict}; ## keys: "baseline", "water", "channel_1", "channel_2". Each value's "calibration_id" value is the same as `exp_id`
     #
     # start: arguments that might be passed by upstream code
     # well_nums ::AbstractVector =[],
-    ot_dict         ::Associative; # keys: "baseline", "water", "FAM", "HEX"
-    out_format      ::Symbol = :pre_json,
-    verbose         ::Bool =false
+    ot_dict         ::Associative; ## keys: "baseline", "water", "FAM", "HEX"
+    out_format      ::Symbol = :pre_json
 )
     function SNR_test(w, cl)
-        const baseline_2chs, water_fluo_2chs, signal_fluo_2chs =
-            map([:baseline, :water, cl]) do key
-                fluo_dict[key][w, :]
-            end
+        const (baseline_2chs, water_fluo_2chs, signal_fluo_2chs) =
+            map(key -> fluo_dict[key][w, :], [:baseline, :water, cl])
         const snr_2chs = (signal_fluo_2chs .- water_fluo_2chs) ./ (signal_fluo_2chs .- baseline_2chs)
         transpose(dscrmnts_snr[cl](transpose(snr_2chs)))
     end
+
+    debug(logger, "at act(::OpticalTestDualChannel)")
 
     ## remove MySql dependency
     #
@@ -41,22 +41,22 @@ function act(
     #
     # num_wells = length(fluo_well_nums)
 
-    # fluo_dict = OrderedDict(map(old_calib_labels) do calib_label # old
+    # fluo_dict = OrderedDict(map(old_calib_labels) do calib_label ## old
     const fluo_dict =
         OrderedDict(
-            map(1:length(NEW_CALIB_SYMBOLS)) do calib_label_i
+            map(range(1, length(NEW_CALIB_SYMBOLS))) do calib_label_i
                 NEW_CALIB_SYMBOLS[calib_label_i] =>
                     mapreduce(
                         ## old
                         # fluo_data[:fluorescence_value][
                         #     (fluo_data[:step_id] .== calib_info[calib_label]["step_id"]) .& (fluo_data[:channel] .== channel)
                         # ]
-                        channel -> ot_dict[string(NEW_CALIB_SYMBOLS[calib_label_i])][
-                            "fluorescence_value"][channel],
+                        channel -> ot_dict[string(NEW_CALIB_SYMBOLS[calib_label_i])][FLUORESCENCE_VALUE_KEY][channel],
                         hcat,
                         CHANNELS)
             end)
     const num_wells = size(fluo_dict[:baseline], 1)
+
     bool_dict = OrderedDict(:baseline => fill(true, num_wells, length(CHANNELS)))
     ## water test
     bool_dict[:water] =
@@ -73,20 +73,23 @@ function act(
             mapreduce(
                 well_i -> SNR_test(well_i, calib_label),
                 vcat,
-                1:num_wells)
+                range(1, num_wells))
     end
+
     ## organize "optical_data"
     const optical_data =
-        map(1:num_wells) do well_i
+        map(range(1, num_wells)) do well_i
             OrderedDict(
-                map(1:length(NEW_CALIB_SYMBOLS)) do cl_i
+                map(range(1, length(NEW_CALIB_SYMBOLS))) do cl_i
                     NEW_CALIB_SYMBOLS[cl_i] =>
-                        map(channel_i ->
+                        map(CHANNEL_IS) do channel_i
                             (fluo_dict[NEW_CALIB_SYMBOLS[cl_i]][well_i, channel_i],
-                                bool_dict[NEW_CALIB_SYMBOLS[cl_i]][well_i, channel_i]),
-                            CHANNEL_IS)
-                end) # do cl_i
-        end # do well_i
+                                bool_dict[NEW_CALIB_SYMBOLS[cl_i]][well_i, channel_i])
+                        end ## do channel_i
+                            
+                end) ## do cl_i
+        end ## do well_i
+
     ## FAM and HEX self-calibrated
     ## ((signal_of_dye_x_in_channel_k - water_in_channel_k) /
     ##     (signal_of_target_dye_in_channel_k - water_in_channel_k); x=FAM,HEX; k=1,2)
@@ -105,37 +108,33 @@ function act(
         map(SYMBOLS_FAM_HEX) do calib_label
             map(CHANNEL_IS) do channel_i
                 fluo_dict[calib_label][:, channel_i] .- fluo_dict[:water][:, channel_i]
-            end # do channel_i
-        end # do calib_label
+            end ## do channel_i
+        end ## do calib_label
     ## calculate normalization values from data in target channels
     const swd_normd =
         map(CHANNEL_IS) do channel_i
             sweep(mean)(/)(swd_vec[channel_i][channel_i])
-        end # do channel_i
+        end
     ## normalize signal data
     const self_calib_vec =
         map(swd_vec) do swd_dye
             map(CHANNEL_IS) do channel_i
                 swd_dye[channel_i] ./ swd_normd[channel_i]
-            end # do channel_i
-        end # do swd_dye
-    validity = true
-    error_msg = ""
+            end ## do channel_i
+        end ## do swd_dye
+
     ## call as invalid analysis if there are negative or zero values in the normalized data
     ## that will cause the channel1:channel2 ratio to be zero, infinite, or negative
-    ## vectorized
-    # if self_calib_vec |> mapreduce[mapreduce[mapreduce[broadcast[>=,0.0],|],|],|]
-    #     error("Zero or negative values in the self-calibrated fluorescence data.")
-    # end
     ## devectorized
-    for dye in CHANNEL_IS, channel in CHANNEL_IS
-        if any(self_calib_vec[dye][channel] .<= 0.0)
+    error_msgs = Vector{String}()
+    for dye in CHANNEL_IS, channel in CHANNEL_IS, value in self_calib_vec[dye][channel]
+        if value <= 0.0
             ## call as invalid analysis instead of raising an error
-            # error("Zero or negative values in the self-calibrated fluorescence data.")
-            validity = false
-            error_msg = "Zero or negative values in the self-calibrated fluorescence data."
-        end
-    end
+            push!(error_msgs, "zero or negative values in the self-calibrated fluorescence data")
+            break ## exit nested loops
+        end ## if
+    end ## for dye, channel, value
+    #
     ## calculate channel1:channel2 ratios
     const ch12_ratios =
         OrderedDict(
@@ -143,22 +142,19 @@ function act(
                 sc_dye = self_calib_vec[channel_i]
                 [:FAM, :HEX][channel_i] => round.(sc_dye[1] ./ sc_dye[2], JSON_DIGITS)
             end) # do channel_i
-    if !(ch12_ratios |> values |> map[x -> all(isfinite.(x))] |> all) ||
-        (ch12_ratios |> values |> map[x -> any(x .<= 0)] |> any)
-            validity = false
+    if !(@p values ch12_ratios | collect | map (x -> all(isfinite.(x))) | all) ||
+        (@p values ch12_ratios | collect | map (x -> any(x .<= 0))      | any)
+            push!(error_msgs, "zero, negative, or infinite values of channel 1:channel 2 ratio")
     end
-    ## format output
+
+    ## return values
     const output = OrderedDict(
-        optical_data        => optical_data,
+        :optical_data       => optical_data,
         Symbol("Ch1:Ch2")   => ch12_ratios,
-        :valid              => validity
-        :error              => error_msg)
-    return (out_format == :json) ?
-        JSON.json(output) :
-        output
-end # analyze_optical_test_dual_channel()
-
-
+        :valid              => length(error_msgs) == 0,
+        :error              => join(error_msgs, "; "))
+    return (out_format == :json) && JSON.json(output) || output
+end ## act()
 
 
 #

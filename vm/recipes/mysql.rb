@@ -21,10 +21,10 @@ bash 'mysql' do
       QUIT
     SQLSCRIPT
     cat << BASHRC >> ~/.bashrc
-      if [ -L /tmp/mysql.sock ] && [ -e /tmp/mysql.sock ] ; then
-        echo "Symbolic link for /tmp/mysql.sock created, Good to go with DB testing"
-      else
+      if [ ! -L /tmp/mysql.sock ] ; then
         ln -s /var/run/mysqld/mysqld.sock /tmp/mysql.sock
+      # else
+      #   echo "Symbolic link for /tmp/mysql.sock created, Good to go with DB testing"
       fi
     BASHRC
     touch /tmp/.vagrant-mysql
