@@ -2,7 +2,7 @@
 
 import JSON: parse, json
 import DataStructures.OrderedDict
-import Memento: gethandlers, debug, warn, error
+import Memento: debug, warn, error
 
 
 function dispatch(
