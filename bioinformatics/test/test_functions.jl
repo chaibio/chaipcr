@@ -17,11 +17,10 @@ import JSON: json, parse, parsefile
     import FactCheck: clear_results
     import BSON: bson
 end
-
-const td = readdlm(
-    "$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/test_data.csv", ',', header=true)
+    
+const td = readdlm("$LOAD_FROM_DIR/../test/data/test_data.csv", ',', header=true)
 const TEST_DATA = DataFrame([
-    slicedim(td[1], 2, i) for i in 1:size(td[1])[2]],
+    slicedim(td[1], 2, i) for i in 1:size(td[1],2)],
     map(Symbol, td[2][:]))
 
 ## example code to generate, run, and save tests

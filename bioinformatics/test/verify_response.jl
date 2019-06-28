@@ -385,7 +385,7 @@ end
 # success response body (optical_cal):
 
 function verify_response(
-    ::Val{optical_cal},
+    ::Val{optical_calibration},
     response ::Any
 )
     facts() do

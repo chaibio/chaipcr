@@ -416,7 +416,7 @@ end
 # ********************************************************************************
 
 function verify_request(
-    ::Val{QpcrAnalysis.optical_cal},
+    ::Val{QpcrAnalysis.optical_calibration},
     request ::Any
 )
     facts("Optical calibration requested") do
