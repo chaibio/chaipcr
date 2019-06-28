@@ -33,7 +33,7 @@ function dispatch(
             end
 
             ## else
-            const action_t = Val{Action_DICT[action]}
+            const action_t = Val{Action_DICT[action]}()
 
             const production_env = (get(ENV, "JULIA_ENV", nothing) == PRODUCTION_MODE)
             @static if !production_env

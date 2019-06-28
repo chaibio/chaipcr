@@ -6,7 +6,7 @@ import Memento: debug, warn, error
 
 
 function act(
-    Val{thermal_consistency},
+    ::Val{thermal_consistency},
     ## remove MySql dependency
     # db_conn ::MySQL.MySQLHandle,
     # exp_id ::Integer,
@@ -25,7 +25,7 @@ function act(
     dcv                 ::Bool =true, ## if true, perform multi-channel deconvolution
     max_tmprtr          ::Real =1000, ## maximum temperature to analyze
 )
-    debug(logger, "at act(Val{thermal_consistency})")
+    debug(logger, "at act(::Val{thermal_consistency})")
  
     ## calibration data is required
     haskey(req_dict, CALIBRATION_INFO_KEY) &&
@@ -64,7 +64,7 @@ function act(
                 out_format = :full,
                 kwdict_mc_tm_pw = kwdict_mc_tm_pw)
         catch err
-            debug(logger, "catching error in act(Val{thermal_consistency})")
+            debug(logger, "catching error in act(::Val{thermal_consistency})")
             println(stacktrace(catch_backtrace()))
             # debug(logger, sprint(showerror, err))
             # debug(logger, string(stacktrace(catch_backtrace())))

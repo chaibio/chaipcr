@@ -30,7 +30,7 @@ import JSON, DataStructures.OrderedDict
 # ********************************************************************************
 
 function verify_response(
-    Val{standard_curve},
+    ::Val{standard_curve},
     response ::Any
 )
     facts() do
@@ -81,7 +81,7 @@ end
 # ********************************************************************************
 
 function verify_response(
-    Val{amplification},
+    ::Val{amplification},
     response ::Any
 )
     facts() do
@@ -174,7 +174,7 @@ end
 # ********************************************************************************
 
 function verify_response(
-    Val{melt_curve},
+    ::Val{melt_curve},
     response ::Any
 )
     facts() do
@@ -228,7 +228,7 @@ end
 # ********************************************************************************
 
 function verify_response(
-    Val{load_script},
+    ::Val{load_script},
     response ::Any
 )
     facts() do
@@ -258,7 +258,7 @@ end
 # ********************************************************************************
 
 function verify_response(
-    Val{thermal_performance_diagnostic},
+    ::Val{thermal_performance_diagnostic},
     response ::Any
 )
     facts() do
@@ -336,7 +336,7 @@ end
 # ********************************************************************************
 
 function verify_response(
-    Val{thermal_consistency},
+    ::Val{thermal_consistency},
     response ::Any
 )
     facts() do
@@ -385,7 +385,7 @@ end
 # success response body (optical_cal):
 
 function verify_response(
-    Val{optical_cal},
+    ::Val{optical_cal},
     response ::Any
 )
     facts() do
@@ -413,7 +413,7 @@ end
 # ********************************************************************************
 
 function verify_response(
-    Val{optical_test_single_channel},
+    ::Val{optical_test_single_channel},
     response ::Any
 )
     facts() do
@@ -453,7 +453,7 @@ end
 # *******************************************************************************
 
 function verify_response(
-    Val{optical_test_dual_channel},
+    ::Val{optical_test_dual_channel},
     response ::Any
 )
     facts() do

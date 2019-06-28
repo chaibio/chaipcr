@@ -96,7 +96,7 @@ function get_k(
     calib_data ::Associative,
     well_nums  ::AbstractVector =[];
     ## keyword arguments
-    well_proc  ::Val{T where T::WellProc} =Val{well_proc_vec}, ## options: Val{well_proc_mean}, Val{well_proc_vec}
+    well_proc  ::WellProc} =well_proc_vec, ## options: well_proc_mean, well_proc_vec
     save_to    ::String ="" ## used: "k.jld"
 )
     debug(logger, "at get_k()")
@@ -174,7 +174,7 @@ function get_k(
     end ## if
 
     ## compute inverses and return
-    const (k_s, k_inv_vec, inv_note) = calc_kinv(well_proc, k4dcv_bydy, cd_key_vec, n_wells)
+    const (k_s, k_inv_vec, inv_note) = calc_kinv(Val{well_proc}(), k4dcv_bydy, cd_key_vec, n_wells)
     const k4dcv = K4Deconv(k_s, k_inv_vec, (length(inv_note) > 0 ? inv_note * INV_NOTE_PT2 : ""))
     (length(save_to) > 0) && save(save_to, "k4dcv", k4dcv)
     return k4dcv
@@ -184,7 +184,7 @@ end ## get_k()
 ## dependencies of get_k()
 
 function calc_kinv(
-    Val{well_proc_mean},
+    ::Val{well_proc_mean},
     k4dcv_bydy ::Associative,
     cd_key_vec ::AbstractVector,
     n_wells    ::Integer
@@ -214,7 +214,7 @@ function calc_kinv(
 end
 
 function calc_kinv(
-    Val{well_proc_vec},
+    ::Val{well_proc_vec},
     k4dcv_bydy ::Associative,
     cd_key_vec ::AbstractVector,
     n_wells    ::Integer
