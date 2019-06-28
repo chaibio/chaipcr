@@ -174,7 +174,7 @@ end
 # ********************************************************************************
 
 function verify_response(
-    ::Val{melt_curve},
+    ::Val{meltcurve},
     response ::Any
 )
     facts() do

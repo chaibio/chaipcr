@@ -96,7 +96,7 @@ function get_k(
     calib_data ::Associative,
     well_nums  ::AbstractVector =[];
     ## keyword arguments
-    well_proc  ::WellProc} =well_proc_vec, ## options: well_proc_mean, well_proc_vec
+    well_proc  ::WellProc =well_proc_vec, ## options: well_proc_mean, well_proc_vec
     save_to    ::String ="" ## used: "k.jld"
 )
     debug(logger, "at get_k()")

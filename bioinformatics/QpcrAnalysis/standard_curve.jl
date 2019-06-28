@@ -13,7 +13,7 @@ import Memento: debug, error
 ## formerly called function standard_curve
 ## `/slope` for log (DNA copy#) is on the x-axis and Cq on the y-axis, otherwise `*slope`
 function act(
-    Val{standard_curve},
+    ::Val{standard_curve},
     req_vec     ::Vector{Any};
     out_format  ::Symbol = :pre_json,
     json_digits ::Integer =JSON_DIGITS,
@@ -21,7 +21,7 @@ function act(
     empty_tre   ::TargetResultEle =EMPTY_TRE,
     empty_gre   ::GroupResultEle  =EMPTY_GRE
 )
-    debug(logger, "at act(Val{standard_curve})")
+    debug(logger, "at act(::Val{standard_curve})")
 
     ## df1.colindex.names
     #
@@ -164,8 +164,7 @@ function act(
         :groups  => Vector(),
         :valid   => true)
     return out_format == :json ? JSON.json(output) : output
-end ## act(
-Val{standard_curve})
+end ## act(::Val{standard_curve})
 
 
 ## dependencies of `standard_curve`

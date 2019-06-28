@@ -113,7 +113,7 @@ end
 function calibration_test(
     calib ::Associative, 
     n_channels ::Integer =length(CHANNELS),
-    conditions ::AbstractArray =["water","channel_1","channel_2"][1:(n_channels+1)]
+    conditions ::AbstractArray =["water","channel_1","channel_2"][range(1, n_channels+1)]
 )
     n_conditions=length(conditions)
     @fact (isa(calib,OrderedDict)) --> true
@@ -147,7 +147,7 @@ end
 #   ORDER BY channel, well_num, cycle_num
 # ;
 
-function raw_test(raw)
+function raw_test(raw ::Associative)
     @fact (isa(raw,OrderedDict)) --> true
     variables=["fluorescence_value", "channel", "well_num"]
     if (haskey(raw,"temperature"))
@@ -172,7 +172,7 @@ function raw_test(raw)
 end
 
 function verify_request(
-    ::Val{QpcrAnalysis.amplification}
+    ::Val{amplification},
     request ::Associative
 )
     facts("Amplification requested") do
@@ -192,7 +192,7 @@ function verify_request(
             end
             if (haskey(request,"baseline_cyc_bounds"))
                 @fact (isa(request["baseline_cyc_bounds"],Vector)) --> true
-                if (length(request["baseline_cyc_bounds"])>0)
+                if (length(request["baseline_cyc_bounds"]) > 0)
                     @fact (length(request["baseline_cyc_bounds"])) --> 2
                     @fact (isa(request["baseline_cyc_bounds"][1],Integer)) --> true
                     @fact (isa(request["baseline_cyc_bounds"][2],Integer)) --> true
@@ -226,7 +226,7 @@ function verify_request(
             @fact (isa(calib["water"],OrderedDict)) --> true
             @fact (haskey(calib["water"],"fluorescence_value")) --> true
             @fact (isa(calib["water"]["fluorescence_value"],Vector)) --> true
-            if length(calib["water"]["fluorescence_value"])<2 ||
+            if length(calib["water"]["fluorescence_value"]) < 2 ||
                 calib["water"]["fluorescence_value"][2]==nothing
                 n_channels=1
             else
@@ -273,8 +273,8 @@ end
 # ;
 
 function verify_request(
-    ::Val{QpcrAnalysis.meltcurve}
-    request ::Associative
+    ::Val{QpcrAnalysis.meltcurve},
+    request ::Any
 )
     facts("Melting curve requested") do
         context("Verifying request body") do
@@ -334,9 +334,8 @@ end
 # ;
 
 function verify_request(
-    ::Val{QpcrAnalysis.thermal_performance_diagnostic}
-    ::QpcrAnalysis.ThermalPerformanceDiagnostic,
-    request ::Associative
+    ::Val{QpcrAnalysis.thermal_performance_diagnostic},
+    request ::Any
 )
     facts("Thermal performance diagnostic requested") do
         context("Verifying request body") do
@@ -378,8 +377,8 @@ end
 # ;
 
 function verify_request(
-    ::Val{QpcrAnalysis.thermal_consistency}
-    request ::Associative
+    ::Val{QpcrAnalysis.thermal_consistency},
+    request ::Any
 )
     facts("Thermal consistency requested") do
         context("Verifying request body") do
@@ -395,7 +394,7 @@ function verify_request(
             @fact (isa(calib["water"],OrderedDict)) --> true
             @fact (haskey(calib["water"],"fluorescence_value")) --> true
             @fact (isa(calib["water"]["fluorescence_value"],Vector)) --> true
-            if length(calib["water"]["fluorescence_value"])<2 ||
+            if length(calib["water"]["fluorescence_value"]) < 2 ||
                 calib["water"]["fluorescence_value"][2]==nothing
                 n_channels=1
             else
@@ -417,8 +416,8 @@ end
 # ********************************************************************************
 
 function verify_request(
-    ::Val{QpcrAnalysis.optical_cal}
-    request ::Associative
+    ::Val{QpcrAnalysis.optical_cal},
+    request ::Any
 )
     facts("Optical calibration requested") do
         context("Verifying request body") do
@@ -430,7 +429,7 @@ function verify_request(
             @fact (isa(calib["water"],OrderedDict)) --> true
             @fact (haskey(calib["water"],"fluorescence_value")) --> true
             @fact (isa(calib["water"]["fluorescence_value"],Vector)) --> true
-            if length(calib["water"]["fluorescence_value"])<2 ||
+            if length(calib["water"]["fluorescence_value"]) < 2 ||
                 calib["water"]["fluorescence_value"][2]==nothing
                 n_channels=1
             else
@@ -458,8 +457,8 @@ end
 # ;
 
 function verify_request(
-    ::Val{QpcrAnalysis.optical_test_single_channel}
-    request ::Associative
+    ::Val{QpcrAnalysis.optical_test_single_channel},
+    request ::Any
 )
     facts("Single channel optical test requested") do
         context("Verifying request body") do
@@ -503,8 +502,8 @@ end
 # ;
 
 function verify_request(
-    ::Val{QpcrAnalysis.optical_test_dual_channel}
-    request ::Associative
+    ::Val{QpcrAnalysis.optical_test_dual_channel},
+    request ::Any
 )
     facts("Dual channel optical test requested") do
         context("Verifying request body") do

@@ -41,8 +41,7 @@ function dispatch(
                 if (verify)
                     const verify_input =
                         try verify_request(action_t, req_parsed)
-                        catch err
-                            warn(logger, "data supplied with $action_s request is in the wrong format")
+                        catch() warn(logger, "data supplied with $action_s request is in the wrong format")
                         end ## try
                 end ## if verify
             end ## if !production_env
@@ -57,8 +56,7 @@ function dispatch(
                 if (verify)
                     const verify_output =
                         try verify_response(action_t, JSON.parse(json_response, dicttype=OrderedDict))
-                        catch err
-                            warn(logger, "data returned from $action_s request is in the wrong format")
+                        catch() warn(logger, "data returned from $action_s request is in the wrong format")
                         end ## try
                 end ## if verify
             end ## if !production_env
