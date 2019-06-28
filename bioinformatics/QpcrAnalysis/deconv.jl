@@ -96,7 +96,7 @@ function get_k(
     calib_data ::Associative,
     well_nums  ::AbstractVector =[];
     ## keyword arguments
-    well_proc  ::WellProc =WellProcVec(), ## options: WellProcMean(), WellProcVec()
+    well_proc  ::Val{T where T::WellProc} =Val{well_proc_vec}, ## options: Val{well_proc_mean}, Val{well_proc_vec}
     save_to    ::String ="" ## used: "k.jld"
 )
     debug(logger, "at get_k()")
@@ -184,7 +184,7 @@ end ## get_k()
 ## dependencies of get_k()
 
 function calc_kinv(
-    ::WellProcMean,
+    Val{well_proc_mean},
     k4dcv_bydy ::Associative,
     cd_key_vec ::AbstractVector,
     n_wells    ::Integer
@@ -214,7 +214,7 @@ function calc_kinv(
 end
 
 function calc_kinv(
-    ::WellProcVec,
+    Val{well_proc_vec},
     k4dcv_bydy ::Associative,
     cd_key_vec ::AbstractVector,
     n_wells    ::Integer

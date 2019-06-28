@@ -6,7 +6,7 @@ import Memento.debug
 
 
 function act(
-    ::OpticalTestDualChannel,
+    Val{optical_test_dual_channel},
     ## remove MySqldependency
     #
     # db_conn ::MySQL.MySQLHandle,
@@ -25,7 +25,7 @@ function act(
         transpose(dscrmnts_snr[cl](transpose(snr_2chs)))
     end
 
-    debug(logger, "at act(::OpticalTestDualChannel)")
+    debug(logger, "at act(Val{optical_test_dual_channel})")
 
     ## remove MySql dependency
     #

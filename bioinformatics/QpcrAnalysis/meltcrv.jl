@@ -13,11 +13,11 @@ import Memento: debug, info, warn, error
 
 ## called by QpcrAnalyze.dispatch
 function act(
-    ::MeltCurve,
+    Val{meltcurve},
     req_dict    ::Associative;
     out_format  ::Symbol = :pre_json
 )
-    debug(logger, "at act(::MeltCurve)")
+    debug(logger, "at act(Val{meltcurve})")
 
     ## calibration data is required    
     haskey(req_dict, CALIBRATION_INFO_KEY) &&
@@ -49,9 +49,10 @@ function act(
                 # kwdict_pmc...,
                 kwdict_mc_tm_pw = kwdict_mc_tm_pw)
         catch err
-            debug(logger, "catching error in act(::MeltCurve)")
+            debug(logger, "catching error in act(Val{meltcurve})")
             # debug(logger, sprint(showerror, err))
             # debug(logger, string(stacktrace(catch_backtrace())))
+     
             OrderedDict(
                 :valid => false,
                 :error => sprint(showerror, err))

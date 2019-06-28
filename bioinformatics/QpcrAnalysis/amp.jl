@@ -11,11 +11,11 @@ using Ipopt
 
 ## called by QpcrAnalysis.dispatch
 function act(
-    ::Amplification,
+    Val{amplification},
     req_dict        ::Associative;
     out_format      ::Symbol = :pre_json
 )
-    debug(logger, "at act(::Amplification)")
+    debug(logger, "at act(Val{amplification})")
 
     ## issue:
     ## the following assumes only 1 step/ramp because the current data format
@@ -151,7 +151,7 @@ function act(
     const parsed_raw_data =
         try parse_raw_data()
         catch
-            debug(logger, "error rethrown in act(::Amplification)")
+            debug(logger, "error rethrown in act(Val{amplification})")
             rethrow()
         end ## try
     const response =
@@ -168,7 +168,7 @@ function act(
                 out_sr_dict = false,
                 kwdict_pa1...)
         catch err
-            debug(logger, "error caught in act(::Amplification)")
+            debug(logger, "error caught in act(Val{amplification})")
             debug(logger, sprint(showerror, err))
             debug(logger, string(stacktrace(catch_backtrace())))
             OrderedDict(
@@ -176,7 +176,7 @@ function act(
                 :error => sprint(showerror, err))
         end ## try
     return (out_format == :json) ? JSON.json(response) : response
-end ## act(::Amplification)
+end ## act(Val{amplification})
 
 
 ## currently this function does nothing

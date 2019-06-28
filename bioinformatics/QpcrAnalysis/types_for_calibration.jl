@@ -11,11 +11,9 @@ import JLD
 
 ## types
 
-## type for K matric calculation
+## Enum type for K matrix calculation
 ## used in deconv.jl
-abstract type  WellProc         end
-struct         WellProcMean     <: WellProc end
-struct         WellProcVec      <: WellProc end
+@enum WellProc well_proc_mean well_proc_vec
 
 ## type for K matrix
 ## used in deconv.jl

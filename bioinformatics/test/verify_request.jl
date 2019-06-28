@@ -36,7 +36,7 @@ FactCheck.setstyle(:default)
 # ********************************************************************************
 
 function verify_request(
-    ::QpcrAnalysis.StandardCurve,
+    Val{QpcrAnalysis.standard_curve},
     request ::AbstractArray
 )
     facts("Standard curve requested") do
@@ -149,7 +149,7 @@ end
 
 function raw_test(raw)
     @fact (isa(raw,OrderedDict)) --> true
-    variables=["fluorescence_value","channel","well_num"]
+    variables=["fluorescence_value", "channel", "well_num"]
     if (haskey(raw,"temperature"))
         push!(variables,"temperature")
     else
@@ -158,13 +158,13 @@ function raw_test(raw)
     n_raw=length(raw["fluorescence_value"])
     for v in variables
         @fact (haskey(raw,v)) --> true
-        @fact (isa(raw[v],Vector)) --> true
+        @fact (isa(raw[v], Vector)) --> true
         @fact abs(length(raw[v]) - n_raw) --> less_than_or_equal(1)
         for i in range(1,length(raw[v]))
-            if (v=="fluorescence_value"||v=="temperature")
-                @fact (isa(raw[v][i],Number)) --> true
+            if (v=="fluorescence_value" || v=="temperature")
+                @fact (isa(raw[v][i], Number)) --> true
             else
-                @fact (isa(raw["well_num"][i],Integer)) --> true
+                @fact (isa(raw["well_num"][i], Integer)) --> true
             end
         end
     end
@@ -172,7 +172,7 @@ function raw_test(raw)
 end
 
 function verify_request(
-    ::QpcrAnalysis.Amplification,
+    Val{QpcrAnalysis.amplification}
     request ::Associative
 )
     facts("Amplification requested") do
@@ -273,7 +273,7 @@ end
 # ;
 
 function verify_request(
-    ::QpcrAnalysis.MeltCurve,
+    Val{QpcrAnalysis.meltcurve}
     request ::Associative
 )
     facts("Melting curve requested") do
@@ -334,6 +334,7 @@ end
 # ;
 
 function verify_request(
+    Val{QpcrAnalysis.thermal_performance_diagnostic}
     ::QpcrAnalysis.ThermalPerformanceDiagnostic,
     request ::Associative
 )
@@ -377,7 +378,7 @@ end
 # ;
 
 function verify_request(
-    ::QpcrAnalysis.ThermalConsistency,
+    Val{QpcrAnalysis.thermal_consistency}
     request ::Associative
 )
     facts("Thermal consistency requested") do
@@ -416,7 +417,7 @@ end
 # ********************************************************************************
 
 function verify_request(
-    ::QpcrAnalysis.OpticalCal,
+    Val{QpcrAnalysis.optical_cal}
     request ::Associative
 )
     facts("Optical calibration requested") do
@@ -457,7 +458,7 @@ end
 # ;
 
 function verify_request(
-    ::QpcrAnalysis.OpticalTestSingleChannel,
+    Val{QpcrAnalysis.optical_test_single_channel}
     request ::Associative
 )
     facts("Single channel optical test requested") do
@@ -502,7 +503,7 @@ end
 # ;
 
 function verify_request(
-    ::QpcrAnalysis.OpticalTestDualChannel,
+    Val{QpcrAnalysis.optical_test_dual_channel}
     request ::Associative
 )
     facts("Dual channel optical test requested") do

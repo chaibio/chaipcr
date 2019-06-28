@@ -7,7 +7,7 @@
 ## see the lines that contain `YourOwnAnalyzeFunctionality`
 
 # function analyze_func(
-#     ::Type{YourOwnAnalyzeFunctionality},
+#     Val{your_own_analyze_functionality},
 #     req_dict ::Associative;
 #     # whatever keyword arguments you want to add
 #     )

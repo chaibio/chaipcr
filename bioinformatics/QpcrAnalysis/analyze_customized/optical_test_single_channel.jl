@@ -8,7 +8,7 @@ import Memento.debug
 
 
 function act(
-    ::OpticalTestSingleChannel,
+    Val{optical_test_single_channel},
     ## remove MySql dependency
     #
     # db_conn ::MySQL.MySQLHandle,
@@ -19,7 +19,7 @@ function act(
     ot_dict         ::Associative;
     out_format      ::Symbol = :pre_json
 )
-    debug(logger, "at act(::OpticalTestSingleChannel)")
+    debug(logger, "at act(Val{optical_test_single_channel})")
  
     ## remove MySql dependency
     #

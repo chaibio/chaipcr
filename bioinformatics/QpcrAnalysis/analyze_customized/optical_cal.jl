@@ -9,7 +9,7 @@ import Memento.debug
 
 ## called by QpcrAnalyze.dispatch
 function act(
-    ::OpticalCal,
+    Val{optical_cal},
     calib_info  ::Associative;
     well_nums   ::AbstractVector =[],
     out_format  ::Symbol = :pre_json,
@@ -21,7 +21,7 @@ function act(
     dye_in      ::Symbol = :FAM, 
     dyes_2bfild ::Vector =[]
 )
-    debug(logger, "at act(::OpticalCal)")
+    debug(logger, "at act(Val{optical_cal})")
  
     ## remove MySql dependency
     # calib_info_ori = calib_info
@@ -41,7 +41,7 @@ function act(
             const result_aw =
                 try prep_adj_w2wvaf(calib_info_dict, well_nums, dye_in, dyes_2bfild)
                 catch err
-                    debug(logger, "catching error in act(::OpticalCal)")
+                    debug(logger, "catching error in act(Val{optical_cal})")
                     debug(logger, sprint(showerror, err, catch_backtrace()))
                 end
             if isa(result_aw, Exception)
@@ -55,7 +55,7 @@ function act(
                 const result_k =
                     try get_k(calib_info_dict, well_nums)
                     catch err
-                        debug(logger, "catching error in act(::OpticalCal)")
+                        debug(logger, "catching error in act(Val{optical_cal})")
                         debug(logger, sprint(showerror, err, catch_backtrace()))
                     end
                 if isa(result_k, Exception)

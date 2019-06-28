@@ -6,11 +6,12 @@ import Memento: gethandlers, debug, warn, error
 
 
 function dispatch(
-    action ::AbstractString,
-    request_body ::AbstractString;
-    verify  ::Bool =false
+    action          ::Symbol,
+    request_body    ::AbstractString;
+    verify          ::Bool =false
 )
-    debug(logger, "at dispatch() with action $action")
+    const action_s = "\"" * replace(string(action), r"_", " ") * "\""
+    debug(logger, "at dispatch() with action $action_s")
     # debug(logger, "request body is:\n" * request_body)
 
     const result =
@@ -28,11 +29,11 @@ function dispatch(
             ## this should generally be done in the generic act() methods.
 
             if !(action in keys(Action_DICT))
-                error(logger, "action $action is not found")
+                error(logger, "action $action_s is not recognized")
             end
 
             ## else
-            const action_t = Action_DICT[action]()
+            const action_t = Val{Action_DICT[action]}
 
             const production_env = (get(ENV, "JULIA_ENV", nothing) == PRODUCTION_MODE)
             @static if !production_env
@@ -41,7 +42,7 @@ function dispatch(
                     const verify_input =
                         try verify_request(action_t, req_parsed)
                         catch err
-                            warn(logger, "data supplied with $action request is in the wrong format")
+                            warn(logger, "data supplied with $action_s request is in the wrong format")
                         end ## try
                 end ## if verify
             end ## if !production_env
@@ -57,7 +58,7 @@ function dispatch(
                     const verify_output =
                         try verify_response(action_t, JSON.parse(json_response, dicttype=OrderedDict))
                         catch err
-                            warn(logger, "data returned from $action request is in the wrong format")
+                            warn(logger, "data returned from $action_s request is in the wrong format")
                         end ## try
                 end ## if verify
             end ## if !production_env

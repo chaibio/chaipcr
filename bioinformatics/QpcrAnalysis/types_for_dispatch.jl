@@ -3,30 +3,18 @@
 ## Author: Tom Price
 ## Date: Dec 2018
 
-abstract type  Action                                 end
-struct         Amplification                <: Action end
-struct         MeltCurve                    <: Action end
-struct         StandardCurve                <: Action end
-struct         LoadScript                   <: Action end
-struct         OpticalCal                   <: Action end
-struct         ThermalPerformanceDiagnostic <: Action end
-struct         ThermalConsistency           <: Action end
-struct         YourOwnAnalyzeFunctionality  <: Action end
-struct         OpticalTestSingleChannel     <: Action end
-struct         OpticalTestDualChannel       <: Action end
+import DataStructures.OrderedDict
 
-global const Action_DICT = Dict(
-    "amplification"                  => Amplification,
-    "meltcurve"                      => MeltCurve,
-    "standard_curve"                 => StandardCurve,
-    "loadscript"                     => LoadScript,
-    "optical_cal"                    => OpticalCal,
-    "thermal_performance_diagnostic" => ThermalPerformanceDiagnostic,
-    "thermal_consistency"            => ThermalConsistency,
-    "optical_test_single_channel"    => OpticalTestSingleChannel,
-    "optical_test_dual_channel"      => OpticalTestDualChannel
-  # "your_own_analyze_functionality" => YourOwnAnalyzeFunctionality
-)
+## NB enumerated instances of type Action
+## are preferred to subtypes of an abstract type:
+## https://docs.julialang.org/en/v1/manual/style-guide/index.html#Avoid-confusion-about-whether-something-is-an-instance-or-a-type-1
+## we can dispatch on the instances using Val{instance}
+## NB in Julia v0.7 we can use the syntax @enum begin ... end
+@enum Action amplification meltcurve standard_curve loadscript optical_cal thermal_performance_diagnostic thermal_consistency optical_test_single_channel optical_test_dual_channel # your_own_analyze_functionality
+
+const Action_DICT = OrderedDict(
+    zip(map(Symbol, instances(Action)),
+        instances(Action)))
 
 
 #

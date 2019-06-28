@@ -6,7 +6,7 @@ import Memento.debug
 
 
 function act(
-    ::ThermalPerformanceDiagnostic,
+    Val{thermal_performance_diagnostic},
     ## remove MySql dependency
     #
     # db_conn ::MySQL.MySQLHandle,
@@ -15,7 +15,7 @@ function act(
     temperatureData ::Associative;
     out_format      ::Symbol = :pre_json
 )
-    debug(logger, "at act(::ThermalPerformanceDiagnostic)")
+    debug(logger, "at act(Val{thermal_performance_diagnostic})")
 
     ## remove MySql dependency
     #
