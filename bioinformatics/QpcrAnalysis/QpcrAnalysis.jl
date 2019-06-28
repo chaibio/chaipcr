@@ -129,7 +129,7 @@ module QpcrAnalysis
             DefaultHandler(
                 FileRoller("julia.log", logdir), ## default max size ~5MB
                 DefaultFormatter("[ {date} | {level} ]: {msg}")))
-        (production_env == DEVELOPMENT_MODE) && setlevel!(logger, "debug")
+        !production_env && setlevel!(logger, "debug")
         ## Register the module level logger at runtime
         ## so it is accessible via `get_logger(QpcrAnalysis)`
         Memento.register(logger)

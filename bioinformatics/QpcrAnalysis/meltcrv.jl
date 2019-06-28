@@ -697,7 +697,7 @@ function mutate_dups(
     const vec_uniq_len  = vec_uniq |> length
     #
     ## return if no ties
-    (vec_len == vec_uniq_len) && return vec_2mut
+    (vec_len == vec_uniq_len) && (return vec_2mut)
     #
     ## find ties
     const order_to = sortperm(vec_2mut)

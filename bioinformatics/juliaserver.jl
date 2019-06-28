@@ -50,7 +50,7 @@ function get_response(req ::HTTP.Request)
         end
     #
     (code == 404) &&
-        const response_body = JSON.json(Dict(:error => "not found"))
+        (const response_body = JSON.json(Dict(:error => "not found")))
     #
     debug(logger, "returning from get_response()")
     debug(logger, "status: $code")
