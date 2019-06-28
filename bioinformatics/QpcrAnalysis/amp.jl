@@ -41,14 +41,10 @@ function act(
                 repeat(
                     channel_nums,
                     inner = num_cycs * num_fluo_wells))
-        catch err
-            try throw(AssertionError("The format of the fluorescence data does not " *
-                    "lend itself to transformation into a 3-dimensional array. " *
-                    "Please make sure that it is sorted by channel, well number, and cycle number."))
-            catch same_err
-                debug(logger, sprint(showerror, err))
-                debug(logger, string(stacktrace(catch_backtrace())))
-            end ## try
+        catch
+            throw(AssertionError("The format of the fluorescence data does not " *
+                "lend itself to transformation into a 3-dimensional array. " *
+                "Please make sure that it is sorted by channel, well number, and cycle number."))
         end ## try
         ## `fr_ary3` - fluo_raw_array_3d
         ## this code assumes that the data in the request
@@ -87,23 +83,16 @@ function act(
     req_key = indict(req_dict)
     req_key(CALIBRATION_INFO_KEY) &&
         typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative ||
-            try throw(ArgumentError("no calibration information found"))
-            catch err
-                debug(logger, sprint(showerror, err))
-                debug(logger, string(stacktrace(catch_backtrace())))
-            end ## try
+            return fail(logger,
+                        ArgumentError("no calibration information found"),
+                        out_format)
 
     ## we will assume that any relevant step/ramp information has already been passed along
     ## and is present in step_id / ramp_id
     const sr_key =
-        if     req_key(STEP_ID_KEY) STEP_ID_KEY
-        elseif req_key(RAMP_ID_KEY) RAMP_ID_KEY
-        else
-            try throw(ArgumentError("no step/ramp information found"))
-            catch err
-                debug(logger, sprint(showerror, err))
-                debug(logger, string(stacktrace(catch_backtrace())))
-            end ## try
+        if      req_key(STEP_ID_KEY) STEP_ID_KEY
+        elseif  req_key(RAMP_ID_KEY) RAMP_ID_KEY
+        else throw(ArgumentError("no step/ramp information found"))
         end
     const asrp_vec = [AmpStepRampProperties(:ramp, req_dict[sr_key], DEFAULT_cyc_nums)]
     ## `report_cq!` arguments
@@ -148,33 +137,22 @@ function act(
             end
         end
     ## call
-    const parsed_raw_data =
-        try parse_raw_data()
-        catch
-            debug(logger, "error rethrown in act(::Val{amplification})")
-            rethrow()
-        end ## try
-    const response =
-        try process_amp(
-                ## remove MySql dependency
-                # db_conn, exp_id, asrp_vec, calib_info;
-                # req_dict["experiment_id"],
-                parsed_raw_data...,
-                req_dict[CALIBRATION_INFO_KEY],
-                asrp_vec;
-                out_format  = out_format,
-                kwdict_rc   = kwdict_rc,
-                kwdict_mbq  = kwdict_mbq,
-                out_sr_dict = false,
-                kwdict_pa1...)
-        catch err
-            debug(logger, "error caught in act(::Val{amplification})")
-            debug(logger, sprint(showerror, err))
-            debug(logger, string(stacktrace(catch_backtrace())))
-            OrderedDict(
-                :valid => false,
-                :error => sprint(showerror, err))
-        end ## try
+    const response = try
+        process_amp(
+            ## remove MySql dependency
+            # db_conn, exp_id, asrp_vec, calib_info;
+            # req_dict["experiment_id"],
+            parse_raw_data()...,
+            req_dict[CALIBRATION_INFO_KEY],
+            asrp_vec;
+            out_format  = out_format,
+            kwdict_rc   = kwdict_rc,
+            kwdict_mbq  = kwdict_mbq,
+            out_sr_dict = false,
+            kwdict_pa1...)
+    catch err
+        return fail(logger, err, out_format; bt=true)
+    end ## try
     return (out_format == :json) ? JSON.json(response) : response
 end ## act(::Val{amplification})
 
@@ -253,11 +231,7 @@ function process_amp(
             elseif size_bcb == (num_fluo_wells, num_channels) && eltype(baseline_cyc_bounds) <: AbstractVector ## final format of `baseline_cyc_bounds`
                 return baseline_cyc_bounds
             end
-            try throw(ArgumentError("`baseline_cyc_bounds` is not in the right format."))
-            catch err
-                debug(logger, sprint(showerror, err))
-                debug(logger, string(stacktrace(catch_backtrace())))
-            end ## try
+            throw(ArgumentError("`baseline_cyc_bounds` is not in the right format."))
         end ## find_baseline_cyc_bounds()
 
         function find_ct_fluos()
@@ -363,24 +337,20 @@ function process_amp(
         ## perform deconvolution and adjust well-to-well variation in absolute fluorescence
         ## rbbs_ary3 is the calibrated fluorescence data
         const (mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, rbbs_ary3) =
-            try dcv_aw(
-                    fr_ary3,
-                    dcv,
-                    channel_nums,
-                    ## remove MySql dependency
-                    # db_conn,
-                    # calib_info,
-                    # fluo_well_nums,
-                    # well_nums,
-                    calib_data,
-                    fluo_well_nums,
-                    dye_in,
-                    dyes_2bfild;
-                    aw_out_format = :array)
-            catch
-                debug(logger, "error rethrown in process_amp_1sr()")
-                rethrow()
-            end ## try
+            dcv_aw(
+                fr_ary3,
+                dcv,
+                channel_nums,
+                ## remove MySql dependency
+                # db_conn,
+                # calib_info,
+                # fluo_well_nums,
+                # well_nums,
+                calib_data,
+                fluo_well_nums,
+                dye_in,
+                dyes_2bfild;
+                aw_out_format = :array)
         #
         const _baseline_cyc_bounds = find_baseline_cyc_bounds()
         const NaN_ary2 = amp_init(NaN)
@@ -435,13 +405,7 @@ function process_amp(
             warn(logger, "number of cycles $num_cycs <= 2: baseline subtraction " *
                 "and Cq calculation will not be performed")
         else ## num_cycs > 2
-            const mbq_ary2 =
-                try calc_mbq_ary2()
-                catch
-                    debug(logger, "error rethrown in process_amp_1sr()")
-                    rethrow()
-                end ## try set_fn_mbq!
-            set_fn_mbq!(mbq_ary2)
+            set_fn_mbq!(calc_mbq_ary2())
             set_qt_fluos!()
             set_fn_rcq!()
         end ## if
@@ -465,7 +429,8 @@ function process_amp(
         AmpStepRampOutput2Bjson(
             map(fieldnames(AmpStepRampOutput2Bjson)) do fn ## numeric fields only
                 const field_value = getfield(full_amp_out, fn)
-                try round.(field_value, JSON_DIGITS)
+                try
+                    round.(field_value, json_digits)
                 catch
                     field_value
                 end ## try
@@ -589,22 +554,17 @@ function process_amp(
     ## need to verify that the fluorescence data complies
     ## with the constraints imposed by max_cycle and well_constraint
     const sr_dict = 
-        try
-            OrderedDict(
-                map([ asrp_vec[1] ]) do asrp
-                    join([asrp.step_or_ramp, asrp.id], "_") =>
-                        process_amp_1sr(
-                            ## remove MySql dependency
-                            # db_conn, exp_id, asrp, calib_info,
-                            # fluo_well_nums, well_nums,
-                            asrp,
-                            dcv && num_channels > 1, ## `dcv`
-                            (out_format == :json ? :pre_json : out_format)) ## out_format_1sr
-                end) ## do asrp
-        catch
-            debug(logger, "error rethrown in process_amp()")
-            rethrow()
-        end ## try
+        OrderedDict(
+            map([ asrp_vec[1] ]) do asrp
+                join([asrp.step_or_ramp, asrp.id], "_") =>
+                    process_amp_1sr(
+                        ## remove MySql dependency
+                        # db_conn, exp_id, asrp, calib_info,
+                        # fluo_well_nums, well_nums,
+                        asrp,
+                        dcv && num_channels > 1, ## `dcv`
+                        (out_format == :json ? :pre_json : out_format)) ## out_format_1sr
+            end) ## do asrp
     ## output
     if (out_sr_dict)
         final_out = sr_dict
@@ -761,11 +721,7 @@ function mod_bl_q(
         function bl_cycs()
             const len_bcb = length(baseline_cyc_bounds)
             if !(len_bcb in [0, 2])
-                try throw(ArgumentError("length of `baseline_cyc_bounds` must be 0 or 2"))
-                catch err
-                    debug(logger, sprint(showerror, err))
-                    debug(logger, string(stacktrace(catch_backtrace())))
-                end
+                throw(ArgumentError("length of `baseline_cyc_bounds` must be 0 or 2"))
             elseif len_bcb == 2
                 push!(bl_notes, "User-defined")
                 # baseline = bl_fallback_func(fluos[colon(baseline_cyc_bounds...)])
@@ -774,11 +730,7 @@ function mod_bl_q(
                 return auto_choose_bl_cycs()
             end
             ## fallthrough
-            try throw(DomainError("too few cycles to estimate baseline"))
-            catch err
-                debug(logger, sprint(showerror, err))
-                debug(logger, string(stacktrace(catch_backtrace())))
-            end ## try
+            throw(DomainError("too few cycles to estimate baseline"))
         end
 
         ## automatically choose baseline cycles as the flat part of the curve
@@ -830,17 +782,14 @@ function mod_bl_q(
 
         ## function needed because `Cy0` may not be in `cycs_denser`
         function func_pred_eff(cyc)
-            try -(map([0.5, -0.5]) do epsilon
+            try
+                -(map([0.5, -0.5]) do epsilon
                     log2(func_pred_f(cyc + epsilon, coefs_pob...))
                 end...)
             catch err
                 isa(err, DomainError) ?
                     NaN :
-                    try throw(ErrorException("unhandled error in func_pred_eff()"))
-                    catch same_err
-                        debug(logger, sprint(showerror, err))
-                        debug(logger, string(stacktrace(catch_backtrace())))
-                    end ## try
+                    throw(ErrorException("unhandled error in func_pred_eff()"))
             end ## try
         end
         ## end of function definitions nested within fit_sfc()
@@ -871,22 +820,12 @@ function mod_bl_q(
                 const bl_func = median
             else
                 ## `bl_func` undefined
-                try throw(ArgumentError("baseline estimation function `bl_func` " *
+                throw(ArgumentError("baseline estimation function `bl_func` " *
                     "not defined for `bl_method` $bl_method"))
-                catch err
-                    debug(logger, sprint(showerror, err))
-                    debug(logger, string(stacktrace(catch_backtrace())))
-                end ## try
             end ## if bl_method
         end ## if
         if length(bl_notes) < 2 || bl_notes[2] != "model-derived baseline"
-            const bl_cycs =
-                try bl_cycs()
-                catch
-                    debug(logger, "error rethrown in fit_sfc()")
-                    rethrow()
-                end ## try
-            baseline = bl_func(fluos[bl_cycs]) ## change or new def
+            baseline = bl_func(fluos[bl_cycs()]) ## change or new def
             blsub_fluos = fluos .- baseline
         end      
         const fitted_postbl = sfc_model_defs[m_postbl].func_fit(
@@ -901,16 +840,12 @@ function mod_bl_q(
         const cyc_max_dr2 = cycs_denser[idx_max_dr2]
         const func_pred_f = funcs_pred[:f]
         const Cy0 = cyc_max_dr1 - func_pred_f(cyc_max_dr1, coefs_pob...) / max_dr1
-        const ct =
-            try funcs_pred[:inv](ct_fluo, coefs_pob...)
+        const ct = try
+                funcs_pred[:inv](ct_fluo, coefs_pob...)
             catch err
                 isa(err, DomainError) ?
                     Ct_VAL_DomainError :
-                    try throw(ErrorException("unhandled error in funcs_pred()"))
-                    catch same_err
-                        debug(logger, sprint(showerror, err))
-                        debug(logger, string(stacktrace(catch_backtrace())))
-                    end ## try
+                    rethrow()
             end ## try
         const eff_pred = map(func_pred_eff, cycs_denser)
         const (eff_max, idx_max_eff) = findmax(eff_pred)
@@ -961,18 +896,13 @@ function mod_bl_q(
         push!(solver.options, (:output_file, ipopt_print2file))
     end
     ## fit model
-    try
-        if (af_key == :sfc)
-            fit_sfc_model()
-        elseif (af_key in (:MAK2, :MAK3, :MAKERGAUL3, :MAKERGAUL4))
-            fit_dfc_model()
-        else
-            throw(ArgumentError("`af_key` $af_key is not recognized"))
-        end ## if
-    catch err
-        debug(logger, sprint(showerror, err))
-        debug(logger, string(stacktrace(catch_backtrace())))
-    end ## try
+    if (af_key == :sfc)
+        fit_sfc_model()
+    elseif (af_key in (:MAK2, :MAK3, :MAKERGAUL3, :MAKERGAUL4))
+        fit_dfc_model()
+    else
+        throw(ArgumentError("`af_key` $af_key is not recognized"))
+    end ## if
 end ## mod_bl_q()
 
 

@@ -48,9 +48,7 @@ function get_response(req ::HTTP.Request)
         else ## not GET
             404
         end
-    #
-    (code == 404) &&
-        (const response_body = JSON.json(Dict(:error => "not found")))
+    (code == 404) && (const response_body = JSON.json(Dict(:error => "not found")))
     #
     debug(logger, "returning from get_response()")
     debug(logger, "status: $code")
@@ -72,11 +70,11 @@ const RESPONSE_HEADERS = HTTP.mkheaders([
 
 ## set up REST endpoints to dispatch to service functions
 HTTP.serve(
-    host=ip"127.0.0.1",
-    port=8081,
-    handler=HandlerFunction(get_response),
-    logger=logIO,
-    verbose=true)
+    host    =ip"127.0.0.1",
+    port    =8081,
+    handler =HandlerFunction(get_response),
+    logger  =logIO,
+    verbose =true) ## logs server activity
 info(logger, "Webserver listening on: http://127.0.0.1:8081")
 
 

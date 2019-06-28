@@ -1,21 +1,17 @@
 ## functions used by multiple analytic methods
 
 import DataStructures.OrderedDict
-import Base: getindex
 import FunctionalData: @p, id
-import Memento.error
+import Memento: debug, warn, error, Logger
 
 
 ## used in amp.jl
+## curried function
 indict(d) = x -> haskey(d, x)
 
 ## curried functions, flipped
 field(f) = x -> getfield(x, f)
 index(i) = x -> getindex(x, i)
-
-## unused functions
-# inc_index(i ::Integer, len ::Integer) = (i >= len) ? len : i + 1
-# dec_index(i ::Integer) = (i <= 1) ? 1 : i - 1
 
 ## used in amp.jl
 str2sym(x) = typeof(x) == String ? Symbol(x) : x
@@ -37,6 +33,73 @@ thing(x) = x != nothing
 ## used in standard_curve.jl
 ## transform `nothing` to NaN
 nothing2NaN(x) = isa(x, Void) ? NaN : x
+
+## overloaded log format methods
+# function format(fmt ::DefaultFormatter, rec ::Record)
+#     notrace = getindex(rec, :levelnum) <= _log_levels["notice"]
+#     parts = map(fmt.tokens) do token
+#         content = token.first
+#         value = content
+#         if token.second
+#             tmp_val = rec[content]
+#             if content === :lookup && !notrace
+#                 name, file, line = if isa(tmp_val, StackFrame)
+#                     # lookup is a StackFrame
+#                     tmp_val.func, tmp_val.file, tmp_val.line
+#                 else
+#                     "<nothing>", "", -1
+#                 end
+#                 value = "$(name)@$(basename(string(file))):$(line)"
+#             elseif content === :stacktrace && !notrace
+#                 # stacktrace is a vector of StackFrames
+#                 str_frames = map(tmp_val) do frame
+#                     string(frame.func, "@", basename(string(frame.file)), ":", frame.line)
+#                 end
+#                 value = string(" stack:[", join(str_frames, ", "), "]")
+#             else
+#                 value = tmp_val
+#             end
+#         end
+#         return value
+#     end
+#     return string(parts...)
+# end
+    
+## used in amp.jl
+## used in meltcrv.jl
+## used in optical_cal.jl
+## used in thermal_consistency.jl
+function fail(
+    logger      ::Logger,
+    err         ::Exception,
+    out_format  ::Symbol = :pre_json;
+    bt          ::Bool =false ## backtrace?
+)
+    const err_msg = sprint(showerror, err)
+    bt && (const st = stacktrace(catch_backtrace()))
+    try
+        error(logger, err_msg)
+    catch ## just report the error
+        if bt
+            const stl = collect(enumerate(IndexStyle(st), st))
+            try
+                error(logger, "error thrown in " *
+                    string(st[1]) * "\nStacktrace:\n" *
+                    join(
+                        map(stl[1:end]) do tup
+                            index, ptr = tup
+                            " [$index] $ptr\n"
+                        end))
+            catch
+            end ## try
+        end ## if bt
+    end ## try
+    const fail_output =
+        OrderedDict(
+            :valid => false,
+            :error => err_msg)
+    return (out_format == :json) ? JSON.json(fail_output) : fail_output
+end ## fail()
 
 ## used in standard_curve.jl
 ## transform a real number to scientific notation
@@ -189,6 +252,9 @@ function redo(
     return output
 end
 
+## unused functions
+# inc_index(i ::Integer, len ::Integer) = (i >= len) ? len : i + 1
+# dec_index(i ::Integer) = (i <= 1) ? 1 : i - 1
 
 ## unused function
 #

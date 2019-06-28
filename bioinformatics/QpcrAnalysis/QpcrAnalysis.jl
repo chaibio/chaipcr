@@ -124,16 +124,15 @@ module QpcrAnalysis
     function __init__()
         ## Changes to the default logger must happen at runtime
         ## otherwise segfaults are liable to occur
-        const logdir = production_env ? "/var/log" : "/tmp"
         push!(logger,
             DefaultHandler(
-                FileRoller("julia.log", logdir), ## default max size ~5MB
+                FileRoller("julia.log", production_env ? "/var/log" : "/tmp"), ## default max size ~5MB
                 DefaultFormatter("[ {date} | {level} ]: {msg}")))
         !production_env && setlevel!(logger, "debug")
         ## Register the module level logger at runtime
         ## so it is accessible via `get_logger(QpcrAnalysis)`
         Memento.register(logger)
-    end
+    end ## __init__()
 end ## module QpcrAnalysis
 
 

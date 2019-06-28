@@ -22,11 +22,9 @@ function act(
     ## calibration data is required    
     haskey(req_dict, CALIBRATION_INFO_KEY) &&
         typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative ||
-            try error(logger, "no calibration information found")
-            catch err
-                debug(logger, sprint(showerror, err))
-                debug(logger, string(stacktrace(catch_backtrace())))
-            end ## try
+            return fail(logger,
+                        ArgumentError("no calibration information found"),
+                        out_format)
 
     # kwdict_pmc = OrderedDict{Symbol,Any}()
     # for key in ["channel_nums"]
@@ -49,13 +47,7 @@ function act(
                 # kwdict_pmc...,
                 kwdict_mc_tm_pw = kwdict_mc_tm_pw)
         catch err
-            debug(logger, "catching error in act(::Val{meltcurve})")
-            # debug(logger, sprint(showerror, err))
-            # debug(logger, string(stacktrace(catch_backtrace())))
-     
-            OrderedDict(
-                :valid => false,
-                :error => sprint(showerror, err))
+            return fail(logger, err, out_format; bt=true)
         end ## try
     return (out_format == :json) ? JSON.json(response) : response
 end ## act()
@@ -160,19 +152,15 @@ function process_mc(
     #
     ## perform deconvolution and adjust well-to-well variation in absolute fluorescence
     const (mw_ary3, k4dcv, fdcvd_ary3, wva_data, wva_well_nums, faw_ary3) =
-        try dcv_aw(
-                fr_ary3,
-                num_channels == 1 ? false : dcv,
-                channel_nums,
-                calib_data,
-                fluo_well_nums,
-                dye_in,
-                dyes_2bfild;
-                aw_out_format = :array)
-        catch
-            debug(logger, "error rethrown in process_mc()")
-            rethrow()
-        end ## try
+        dcv_aw(
+            fr_ary3,
+            num_channels == 1 ? false : dcv,
+            channel_nums,
+            calib_data,
+            fluo_well_nums,
+            dye_in,
+            dyes_2bfild;
+            aw_out_format = :array)
     #
     ## ignore dummy well_nums from dcv_aw
     const wva_well_nums_alt = fluo_well_nums
@@ -185,18 +173,14 @@ function process_mc(
             channel_i ->
                 map(wva_well_nums_alt) do oc_well_num
                     if oc_well_num in fluo_well_nums
-                        try mc_tm_pw(
-                                normalize_tf(
-                                    channel_i,
-                                    indexin([oc_well_num], fluo_well_nums)[1]);
-                                auto_span_smooth = auto_span_smooth,
-                                span_smooth_default = span_smooth_default,
-                                span_smooth_factor = span_smooth_factor,
-                                kwdict_mc_tm_pw...)
-                        catch
-                            debug(logger, "error rethrown in process_mc()")
-                            rethrow()
-                        end ## try
+                        mc_tm_pw(
+                            normalize_tf(
+                                channel_i,
+                                indexin([oc_well_num], fluo_well_nums)[1]);
+                            auto_span_smooth = auto_span_smooth,
+                            span_smooth_default = span_smooth_default,
+                            span_smooth_factor = span_smooth_factor,
+                            kwdict_mc_tm_pw...)
                     else
                         EMPTY_mc_tm_pw_out
                     end ## if
@@ -525,9 +509,7 @@ function mc_tm_pw(
     )
         top_peaks(fltd_idc_topNp1 ::AbstractVector{I} where I <: Integer) =
             length(fltd_idc_topNp1) > top_N ? [] : fltd_idc_topNp1
-        ## end of function definition nested in real_peaks()
 
-        debug(logger, "at real_peaks()")
         if  (split_vector_and_return_larger_quantile(
                 normalize_range(ndrv_smu), ## originally normalize_range(ndrv), but why ???
                 len_denser,
@@ -586,21 +568,18 @@ function mc_tm_pw(
     ## negative derivative by central finite differencing (cfd)
     ## only used if the data array is too short to find peaks
     if (len_raw <= 3)
+        const slope = finite_diff(tmprtrs, fluos; nu = 1, method = :central)
         return MeltCurveTa(
             report(json_digits,
-                hcat(
-                    tmprtrs,
-                    fluos,
-                    -finite_diff(tmprtrs, fluos; nu = 1, method = :central))),
-                                            ## mc_raw
-            EMPTY_Ta,                       ## Ta_fltd
-            EMPTY_mc,                       ## mc_denser
-            NaN,                            ## ns_range_mid
+                hcat(tmprtrs, fluos, -slope)),  ## mc_raw
+            EMPTY_Ta,                           ## Ta_fltd
+            EMPTY_mc,                           ## mc_denser
+            NaN,                                ## ns_range_mid
             Dict(
                 :tmprtrs => EMPTY_Ta,
-                :fluos   => EMPTY_Ta),      ## sn_dict
-            EMPTY_Ta,                       ## Ta_raw
-            :No                             ## Ta_reported
+                :fluos   => EMPTY_Ta),          ## sn_dict
+            EMPTY_Ta,                           ## Ta_raw
+            :No                                 ## Ta_reported
         )
     end ## if
     #
@@ -637,7 +616,7 @@ function mc_tm_pw(
     ## return smoothed data if no peaks
     if (len_Tms == 0)
         return MeltCurveTa(
-            report(JSON_DIGITS, mc_raw),
+            report(json_digits, mc_raw),
             EMPTY_Ta,   ## Ta_fltd
             mc_denser,
             ns_range_mid,
@@ -673,12 +652,12 @@ function mc_tm_pw(
                 count_cross_points)]                ## () -> num_cross_points
     #
     return MeltCurveTa(
-        report(JSON_DIGITS, mc_raw),
-        report(JSON_DIGITS, Ta_fltd),
+        report(json_digits, mc_raw),
+        report(json_digits, Ta_fltd),
         mc_denser,          ## do we want to round this to json_digits as well?
         ns_range_mid,
         sn_dict,
-        report(JSON_DIGITS, Ta_raw[idc_sb_area]),
+        report(json_digits, Ta_raw[idc_sb_area]),
         length(Ta_fltd) == 0 ? :No : :Yes)
 end ## mc_tm_pw()
 
@@ -730,14 +709,9 @@ function finite_diff(
     method  ::Symbol = :central
 )
     debug(logger, "at finite_diff()")
-    #
     const dlen = length(X)
     if dlen != length(Y)
-        try throw(DimensionError, "X and Y must be of same length")
-        catch err
-            debug(logger, sprint(showerror, err))
-            debug(logger, string(stacktrace(catch_backtrace())))
-        end ## try
+        throw(DimensionError, "X and Y must be of same length")
     end ## if
     (dlen == 1) && (return zeros(1))
     if (nu == 1)
@@ -746,11 +720,7 @@ function finite_diff(
             elseif  (method == :forward)  tuple(3:dlen+2, 1:dlen+1)
             elseif  (method == :backward) tuple(2:dlen+1, 1:dlen)
             else
-                try throw(ArgmentError, "method \"$method\" not recognized")
-                catch err
-                    debug(logger, sprint(showerror, err))
-                    debug(logger, string(stacktrace(catch_backtrace())))
-                end ## try
+                throw(ArgmentError, "method \"$method\" not recognized")
             end ## if
         const (X_p2, Y_p2) = map((X, Y)) do ori
             vcat(

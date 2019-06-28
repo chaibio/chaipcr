@@ -40,13 +40,7 @@ function deconvolute(
     #     length_step_ids = length(step_ids)
     #     length_step_ids <= 2 || length(unique(step_ids)) < length_step_ids
     # end) ? k4dcv_backup : get_k(db_conn, calib_info, well_nums) ## use default `well_proc` value
-    const k4dcv =
-        try get_k(calib_data, well_nums)
-        catch
-            debug(logger, "error rethrown in deconvolute()")
-            rethrow()
-        end ## try
-    #
+    const k4dcv = get_k(calib_data, well_nums)
     const (a2d_dim_unit, a2d_dim_well, a2d_dim_channel) = size(ary2dcv)
     const k_inv_vs =
         map(range(1, a2d_dim_well)) do w
@@ -67,11 +61,7 @@ function deconvolute(
         elseif  (out_format == :dict)   tuple(dcvd_ary2dict())
         elseif  (out_format == :both)   tuple(dcvd_ary3, dcvd_ary2dict())
         else
-            try throw(ArgumentError("`out_format` must be :array, :dict or :both"))
-            catch err
-                debug(logger, sprint(showerror, err))
-                debug(logger, string(stacktrace(catch_backtrace())))
-            end ## try
+            throw(ArgumentError("`out_format` must be :array, :dict or :both"))
         end ## if
     return (k4dcv, dcvd...)
 end ## deconvolute()
@@ -165,13 +155,7 @@ function get_k(
             end ## if
         end ## for non_target_channel_i
     end ## for channel_i
-    if length(err_msgs) > 0
-        try throw(DomainError(join(err_msgs, "; ")))
-        catch err
-            debug(logger, sprint(showerror, err))
-            debug(logger, string(stacktrace(catch_backtrace())))
-        end ## try
-    end ## if
+    (length(err_msgs) > 0) && throw(DomainError(join(err_msgs, "; ")))
 
     ## compute inverses and return
     const (k_s, k_inv_vec, inv_note) = calc_kinv(Val{well_proc}(), k4dcv_bydy, cd_key_vec, n_wells)
@@ -202,12 +186,7 @@ function calc_kinv(
             inv_note = true
             pinv(k_s)
         else
-            try
-                rethrow(err)
-            catch same_err
-                debug(logger, sprint(showerror, same_err))
-                debug(logger, string(stacktrace(catch_backtrace())))
-            end ## try
+            rethrow(err)
         end ## if isa(err,
     end ## try
     return k_s, fill(k_inv, n_wells), inv_note ? "" : "Well mean"
@@ -234,12 +213,7 @@ function calc_kinv(
                     push!(singular_well_nums, water_well_nums[i])
                     pinv(k_s[i])
                 else
-                    try
-                        rethrow(err)
-                    catch same_err
-                        debug(logger, sprint(showerror, same_err))
-                        debug(logger, string(stacktrace(catch_backtrace())))
-                    end ## try
+                    rethrow(err)
                 end ## if isa(err
             end ## try
             for i in range(1, n_wells) ]

@@ -3,7 +3,7 @@
 import JSON
 import DataFrames: DataFrame, by
 import Match.@match
-import Memento: debug, error
+import Memento: debug, warn, error
 
 ## if isnull(sample) well not considered
 ## what if isnull(cq)
@@ -22,8 +22,6 @@ function act(
     empty_gre   ::GroupResultEle  =EMPTY_GRE
 )
     debug(logger, "at act(::Val{standard_curve})")
-
-    ## df1.colindex.names
     #
     ## parse data
     const req_df = reqvec2df(req_vec)
@@ -31,8 +29,8 @@ function act(
     ## empty dataset
     if  size(req_df, 2) == 0 ||
         any(map(symbl -> all(isnan.(req_df[symbl])),[:target, :cq, :qty]))
-            const result = OrderedDict(:target => nothing, :group => nothing)
-            return format_output(result)
+            const output = OrderedDict(:targets => [], :groups => [], :valid => false)
+            return out_format == :json ? JSON.json(output) : output
     end
     #
     ## target result set
@@ -57,8 +55,7 @@ function act(
             ## adjusted R2 ?
             TargetResultEle(
                 target_id,
-                round.([b1, b0, eff, r2_], json_digits)...
-            )
+                round.([b1, b0, eff, r2_], json_digits)...)
         end ## if isnan
     end ## do chunk_target
 
@@ -96,11 +93,8 @@ function act(
     # end ## do chunk
 
     ## report results
-    if out_format == :full
-        # return (target_result_df, group_result_df)
-        return (target_result_df)
-    end
-    #
+    (out_format == :full) && return target_result_df
+
     ## out_format != :full
     ## target result set
     tre_vec = target_result_df[.!isnan.(target_result_df[:target]), 2]
@@ -108,15 +102,15 @@ function act(
     for tre in tre_vec
         if isnan(tre.slope) && isnan(tre.offset)
             const err_msg = "less 2 valid data points of cq and/or qty available for fitting standard curve"
+            warn(logger, err_msg)
             target_result = OrderedDict(
                 :target_id => getfield(tre, :target_id),
                 :error     => err_msg)
-            error(logger, err_msg)
         else
             target_result = tre
         end
         push!(target_vec, target_result)
-    end ## for
+    end ## next tre
 
     ## group results reporting commented out
     ## as the calculation is duplicated in the front end
@@ -495,7 +489,6 @@ end
 ## << experimental code
 
 
-
 ## notes
 ## 2018-04-21. not reproducible:
 ## Tuple{Float16,Float16}((0.01, 40)) gives (Float16(0.04), Float16(40.0))
@@ -504,13 +497,6 @@ end
 ## Tuple{Float64,Float16}((0.001, 40)) gives (0.001, Float16(40.0))
 ## Tuple{Float16,Float16}((0.001, 40)) gives (Float16(0.004), Float16(40.0))
 ## then as expected
-
-
-## for testing, need commented for production
-# using DataStructures, DataFrames, JSON
-# JSON_DIGITS = 3
-
-
 
 
 #

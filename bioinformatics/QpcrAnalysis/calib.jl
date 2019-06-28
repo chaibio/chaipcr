@@ -33,11 +33,7 @@ function dcv_aw(
     #
     ## prepare data to adjust well-to-well variation in absolute fluorescence values
     const (wva_data, wva_well_nums) =
-        try prep_adj_w2wvaf(calib_data, well_nums_in_req, dye_in, dyes_2bfild)
-        catch
-            debug(logger, "error rethrown in dcv_aw()")
-            rethrow()
-        end ## try
+        prep_adj_w2wvaf(calib_data, well_nums_in_req, dye_in, dyes_2bfild)
     #
     ## overwrite the dummy well_nums
     wva_well_nums = well_nums_found_in_fr
@@ -78,17 +74,13 @@ function dcv_aw(
             # k4dcv, dcvd_ary3 = deconvolute(
             #     1. * mw_ary3, channel_nums, wva_well_idc_wfluo, db_conn, calib_info, well_nums_in_req;
             #     out_format="array")
-            try deconvolute(
-                    1. * mw_ary3,
-                    channel_nums,
-                    wva_well_idc_wfluo,
-                    calib_data,
-                    well_nums_in_req;
-                    out_format = :array)
-            catch
-                debug(logger, "error rethrown in dcv_aw()")
-                rethrow()
-            end ## try
+            deconvolute(
+                1. * mw_ary3,
+                channel_nums,
+                wva_well_idc_wfluo,
+                calib_data,
+                well_nums_in_req;
+                out_format = :array)
         else ## !dcv
             K4DCV_EMPTY, mw_ary3
         end
@@ -97,16 +89,12 @@ function dcv_aw(
         OrderedDict(
             map(range(1, num_channels)) do channel_i
                 channel_nums[channel_i] =>
-                    try adj_w2wvaf(
-                            dcvd_ary3[:, :, channel_i],
-                            wva_data,
-                            wva_well_idc_wfluo,
-                            channel_i;
-                            minus_water = false)
-                    catch
-                        debug(logger, "error rethrown in dcv_aw()")
-                        rethrow()
-                    end ## try
+                    adj_w2wvaf(
+                        dcvd_ary3[:, :, channel_i],
+                        wva_data,
+                        wva_well_idc_wfluo,
+                        channel_i;
+                        minus_water = false)
             end) ## do channel_i
 
     ## format output
@@ -116,12 +104,8 @@ function dcv_aw(
         if      (aw_out_format == :array) tuple(dcvd_aw_ary3())
         elseif  (aw_out_format == :dict)  tuple(dcvd_aw_dict)
         elseif  (aw_out_format == :both)  tuple(dcvd_aw_ary3(), dcvd_aw_dict)
-        else
-            try throw(ArgumentException("`aw_out_format` must be :array, :dict or :both"))
-            catch err
-                debug(logger, sprint(showerror, err))
-                debug(logger, string(stacktrace(catch_backtrace())))
-            end ## try
+        else                              throw(ArgumentException(
+                                              "`aw_out_format` must be :array, :dict or :both"))
         end ## if
     ## Performance issue:
     ## enforce data types for this output ?
@@ -144,14 +128,8 @@ function calib_calib(
     debug(logger, "at calib_calib()")
     ## This function is expected to handle situations where `calib_info_1` and `calib_info_2`
     ## have different combinations of wells, but the number of wells should be the same.
-    if length(well_nums_1) != length(well_nums_2)
-        try
-            throw(DimensionMismatch("length(well_nums_1) != length(well_nums_2)"))
-        catch err
-            debug(logger, sprint(showerror, err))
-            debug(logger, string(stacktrace(catch_backtrace())))
-        end
-    end
+    (length(well_nums_1) != length(well_nums_2)) &&
+        throw(DimensionMismatch("length(well_nums_1) != length(well_nums_2)"))
 
     ## remove MySql dependency
     #

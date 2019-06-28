@@ -26,16 +26,13 @@ function act(
     max_tmprtr          ::Real =1000, ## maximum temperature to analyze
 )
     debug(logger, "at act(::Val{thermal_consistency})")
- 
+
     ## calibration data is required
     haskey(req_dict, CALIBRATION_INFO_KEY) &&
         typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative ||
-            try
-                error(logger, "no calibration information found")
-            catch err
-                debug(logger, sprint(showerror, err))
-                debug(logger, string(stacktrace(catch_backtrace())))
-            end ## try
+            return fail(logger,
+                        ArgumentError("no calibration information found"),
+                        out_format)
 
     const kwdict_mc_tm_pw = OrderedDict{Symbol,Any}(
         map(keys(MC_TM_PW_KEYWORDS)) do key
@@ -64,15 +61,7 @@ function act(
                 out_format = :full,
                 kwdict_mc_tm_pw = kwdict_mc_tm_pw)
         catch err
-            debug(logger, "catching error in act(::Val{thermal_consistency})")
-            println(stacktrace(catch_backtrace()))
-            # debug(logger, sprint(showerror, err))
-            # debug(logger, string(stacktrace(catch_backtrace())))
-            const fail_output =
-                OrderedDict(
-                    :valid => false,
-                    :error => sprint(showerror, err))
-            return (out_format == :json) ? JSON.json(fail_output) : fail_output
+            return fail(logger, err, out_format, bt=true)
         end ## try
     ## process the data from only one channel
     const channel_proc = 1

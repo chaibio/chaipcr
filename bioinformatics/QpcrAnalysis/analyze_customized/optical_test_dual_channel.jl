@@ -2,7 +2,7 @@
 
 import DataStructures.OrderedDict
 import JSON.json
-import Memento.debug
+import Memento: debug, warn
 
 
 function act(
@@ -131,6 +131,7 @@ function act(
         if value <= 0.0
             ## call as invalid analysis instead of raising an error
             push!(error_msgs, "zero or negative values in the self-calibrated fluorescence data")
+            warn(logger, error_msgs[end])
             break ## exit nested loops
         end ## if
     end ## for dye, channel, value
@@ -144,7 +145,8 @@ function act(
             end) # do channel_i
     if !(@p values ch12_ratios | collect | map (x -> all(isfinite.(x))) | all) ||
         (@p values ch12_ratios | collect | map (x -> any(x .<= 0))      | any)
-            push!(error_msgs, "zero, negative, or infinite values of channel 1:channel 2 ratio")
+            push!(error_msgs, "zero, negative, or infinite values of channel 1 : channel 2 ratio")
+            warn(logger, error_msgs[end])
     end
 
     ## return values

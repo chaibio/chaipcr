@@ -14,71 +14,69 @@ function dispatch(
     debug(logger, "at dispatch() with action $action_s")
     # debug(logger, "request body is:\n" * request_body)
 
-    const result =
-        try
-            ## NB. DefaultDict and DefaultOrderedDict constructors sometimes don't work on OrderedDict
-            ## (https://github.com/JuliaLang/DataStructures.jl/issues/205)
-            req_parsed = JSON.parse(request_body; dicttype=OrderedDict)
+    const result = try
+        ## NB. DefaultDict and DefaultOrderedDict constructors sometimes don't work on OrderedDict
+        ## (https://github.com/JuliaLang/DataStructures.jl/issues/205)
+        req_parsed = JSON.parse(request_body; dicttype=OrderedDict)
 
-            ## Performance issue:
-            ## By default the JSON parser uses type ::Any
-            ## This wastes time and memory downstream.
-            ## It is important to annotate the type of data structures
-            ## wherever it is known.
-            ## Since the data structures are specific to each action,
-            ## this should generally be done in the generic act() methods.
+        ## Performance issue:
+        ## By default the JSON parser uses type ::Any
+        ## This wastes time and memory downstream.
+        ## It is important to annotate the type of data structures
+        ## wherever it is known.
+        ## Since the data structures are specific to each action,
+        ## this should generally be done in the generic act() methods.
 
-            if !(action in keys(Action_DICT))
-                error(logger, "action $action_s is not recognized")
-            end
+        if !(action in keys(Action_DICT))
+            error(logger, "action $action_s is not recognized")
+        end
+        ## else
+        const action_t = Val{Action_DICT[action]}()
 
-            ## else
-            const action_t = Val{Action_DICT[action]}()
+        const production_env = (get(ENV, "JULIA_ENV", nothing) == PRODUCTION_MODE)
+        @static if !production_env
+            ## this code is hidden from the parser on the BeagleBone
+            if verify
+                const verify_input = try
+                    verify_request(action_t, req_parsed)
+                catch
+                    warn(logger, "data supplied with $action_s request is in the wrong format")
+                end ## try
+            end ## if verify
+        end ## if !production_env
 
-            const production_env = (get(ENV, "JULIA_ENV", nothing) == PRODUCTION_MODE)
-            @static if !production_env
-                ## this code is hidden from the parser on the BeagleBone
-                if (verify)
-                    const verify_input =
-                        try verify_request(action_t, req_parsed)
-                        catch() warn(logger, "data supplied with $action_s request is in the wrong format")
-                        end ## try
-                end ## if verify
-            end ## if !production_env
+        debug(logger, "dispatching to act() from dispatch()")
+        const response = act(action_t, req_parsed; out_format = :pre_json)
+        debug(logger, "response received from act() by dispatch()")
+        const json_response = JSON.json(response)
 
-            debug(logger, "dispatching to act() from dispatch()")
-            const response = act(action_t, req_parsed; out_format=:pre_json)
-            debug(logger, "response received from act() by dispatch()")
-            const json_response = JSON.json(response)
+        @static if !production_env
+            ## this code is hidden from the parser on the BeagleBone
+            if verify
+                const verify_output = try
+                    verify_response(action_t, JSON.parse(json_response, dicttype = OrderedDict))
+                catch
+                    warn(logger, "data returned from $action_s request is in the wrong format")
+                end ## try
+            end ## if verify
+        end ## if !production_env
 
-            @static if !production_env
-                ## this code is hidden from the parser on the BeagleBone
-                if (verify)
-                    const verify_output =
-                        try verify_response(action_t, JSON.parse(json_response, dicttype=OrderedDict))
-                        catch() warn(logger, "data returned from $action_s request is in the wrong format")
-                        end ## try
-                end ## if verify
-            end ## if !production_env
+        ## return value
+        json_response
 
-            ## return value
-            json_response
-
-        catch err
-            debug(logger, "catching error in dispatch()")
-            warn(logger, sprint(showerror, err, catch_backtrace()))
-            err
-        end ## result = try
+    catch err
+        fail(logger, err, :pre-json, bt=true)
+        err
+    end ## result = try
 
     const success = !isa(result, Exception)
-    const response_body =
-        if success
-            string(result)
-        else
-            JSON.json(Dict(
-                :valid => false,
-                :error => sprint(showerror, result)))
-        end
+    const response_body = if success
+        string(result)
+    else
+        JSON.json(Dict(
+            :valid => false,
+            :error => sprint(showerror, result)))
+    end ## if success
     debug(logger, "returning from dispatch()")
     debug(logger, "success: $success")
     debug(logger, "response body: " * response_body)
