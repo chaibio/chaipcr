@@ -123,7 +123,7 @@ function act(
             end ## do channel_i
         end ## do swd_dye
 
-    ## call as invalid analysis if there are negative or zero values in the normalized data
+    ## call as invalid aonalysis if there are negative or zero values in the normalized data
     ## that will cause the channel1:channel2 ratio to be zero, infinite, or negative
     ## devectorized
     error_msgs = Vector{String}()

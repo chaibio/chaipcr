@@ -93,7 +93,7 @@ function act(
     # end ## do chunk
 
     ## report results
-    (out_format == :full) && return target_result_df
+    @when out_format == :full return target_result_df
 
     ## out_format != :full
     ## target result set
@@ -166,7 +166,7 @@ end ## act(::Val{standard_curve})
 ## parse req_vec into a dataframe
 function reqvec2df(req_vec ::AbstractVector)
     #
-    (length(req_vec) == 0) && return DataFrame()
+    @when length(req_vec) == 0 return DataFrame()
     #
     well_vec = Vector{Int}()
     channel_vec = Vector{Int}()

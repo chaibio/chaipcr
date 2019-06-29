@@ -33,15 +33,14 @@ function act(
     # )
 
     ## calibration data is required
-    haskey(calib_info, CALIBRATION_INFO_KEY) &&
-       typeof(calib_info[CALIBRATION_INFO_KEY]) <: Associative ||
+    @unless(req_key(CALIBRATION_INFO_KEY) &&
+        typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative,
             return fail(logger,
                         ArgumentError("no calibration information found"),
-                        out_format)
+                        out_format))
     const calib_info_dict = calib_info[CALIBRATION_INFO_KEY]
-    const result_aw =
-        try prep_adj_w2wvaf(
-            calib_info_dict, well_nums, dye_in, dyes_2bfild)
+    const result_aw = try
+            prep_adj_w2wvaf(calib_info_dict, well_nums, dye_in, dyes_2bfild)
         catch err
             return fail(logger, err, out_format, bt=true)
         end
@@ -50,13 +49,13 @@ function act(
         ## if there are 2 or more channels then
         ## the deconvolution matrix K is calculated
         ## otherwise deconvolution is not performed
-        const result_k =
-            try get_k(calib_info_dict, well_nums)
+        const result_k = try
+                get_k(calib_info_dict, well_nums)
             catch err
                 return fail(logger, err, out_format, bt=true)
             end
-        (length(result_k.inv_note) > 0) &&
-            return fail(logger, result_k.inv_note, out_format)
+        @when(length(result_k.inv_note) > 0,
+            return fail(logger, result_k.inv_note, out_format))
     end ## if
 
     const output = OrderedDict(:valid => true)

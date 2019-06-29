@@ -81,11 +81,11 @@ function act(
 
     ## calibration data is required
     req_key = indict(req_dict)
-    req_key(CALIBRATION_INFO_KEY) &&
-        typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative ||
+    @unless(req_key(CALIBRATION_INFO_KEY) &&
+        typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative,
             return fail(logger,
                         ArgumentError("no calibration information found"),
-                        out_format)
+                        out_format))
 
     ## we will assume that any relevant step/ramp information has already been passed along
     ## and is present in step_id / ramp_id
@@ -238,17 +238,17 @@ function process_amp(
 
             function find_idc_useful(postbl_stata)
                 idc_useful = find(postbl_stata .== :Optimal)
-                (length(idc_useful) > 0) && return idc_useful
+                @when length(idc_useful) > 0 return idc_useful
                 idc_useful = find(postbl_stata .== :UserLimit)
-                (length(idc_useful) > 0) && return idc_useful
+                @when length(idc_useful) > 0 return idc_useful
                 return 1:length(postbl_status)
             end ## find_idc_useful(postbl_stata)
             ## end of function definition nested within find_ct_fluos()
 
             debug(logger, "at find_ct_fluos()")
-            (num_cycs <= 2)         && return ct_fluos
-            (length(ct_fluos) > 0)  && return ct_fluos
-            (cq_method != :ct)      && return ct_fluos_empty
+            @when num_cycs <= 2        return ct_fluos
+            @when length(ct_fluos) > 0 return ct_fluos
+            @when cq_method != :ct     return ct_fluos_empty
             ## num_cycs > 2 && length(ct_fluos) == 0 && cq_method == :ct
             map(range(1, num_channels)) do channel_i
                 const mbq_ary1 =
@@ -424,7 +424,7 @@ function process_amp(
         # end # if dcv
         #
         ## format output
-        (out_format == :full) && (return full_amp_out)
+        @when out_format == :full return full_amp_out
         ## else
         AmpStepRampOutput2Bjson(
             map(fieldnames(AmpStepRampOutput2Bjson)) do fn ## numeric fields only
@@ -808,9 +808,8 @@ function mod_bl_q(
             baseline = sfc_model_defs[bl_method].funcs_pred[:bl](cycs, fitted_prebl.coefs...) ## may be changed later
             blsub_fluos = fluos .- baseline
             bl_notes = sfc_prebl_status(fitted_prebl.status)
-            if length(bl_notes) >= 2 && bl_notes[2] == "fallback"
-                const bl_func = bl_fallback_func
-            end ## if
+            @when(length(bl_notes) >= 2 && bl_notes[2] == "fallback",
+                const bl_func = bl_fallback_func)
         else
             ## do not fit model to find baseline
             const wts = ones(num_cycs)
@@ -954,7 +953,7 @@ function report_cq!(
         else
             ""
         end ## why_NaN
-    (why_NaN != "") && (full_amp_out.cq[well_i, channel_i] = NaN)
+    @when (why_NaN != "") full_amp_out.cq[well_i, channel_i] = NaN
     #
     for tup in (
         (:max_bsf,      max_bsf),

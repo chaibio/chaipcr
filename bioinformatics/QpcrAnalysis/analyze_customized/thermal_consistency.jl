@@ -28,11 +28,11 @@ function act(
     debug(logger, "at act(::Val{thermal_consistency})")
 
     ## calibration data is required
-    haskey(req_dict, CALIBRATION_INFO_KEY) &&
-        typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative ||
+    @unless(req_key(CALIBRATION_INFO_KEY) &&
+        typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative,
             return fail(logger,
                         ArgumentError("no calibration information found"),
-                        out_format)
+                        out_format))
 
     const kwdict_mc_tm_pw = OrderedDict{Symbol,Any}(
         map(keys(MC_TM_PW_KEYWORDS)) do key
@@ -78,8 +78,8 @@ function act(
             TmCheck1w((NaN, false), NaN)
         else
             const top1_Tm = Ta[1,1]
-            (top1_Tm < min_Tm) && (min_Tm = top1_Tm)
-            (top1_Tm > max_Tm) && (max_Tm = top1_Tm)
+            @when (top1_Tm < min_Tm) min_Tm = top1_Tm
+            @when (top1_Tm > max_Tm) max_Tm = top1_Tm
             TmCheck1w(
                 (top1_Tm, MIN_TM_VAL <= top1_Tm <= MAX_TM_VAL),
                 Ta[1,2])

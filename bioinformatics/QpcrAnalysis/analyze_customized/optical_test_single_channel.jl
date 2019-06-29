@@ -1,5 +1,3 @@
-
-
 ## optical_test_single_channel.jl
 
 import DataStructures.OrderedDict

@@ -5,6 +5,18 @@ import FunctionalData: @p, id
 import Memento: debug, warn, error, Logger
 
 
+## simple macros
+macro when(predicate, conditional)
+    return :(if ($predicate)
+        ($conditional)
+    end)
+end
+macro unless(predicate, conditional)
+    return :(if !($predicate)
+        ($conditional)
+    end)
+end
+
 ## used in amp.jl
 ## curried function
 indict(d) = x -> haskey(d, x)

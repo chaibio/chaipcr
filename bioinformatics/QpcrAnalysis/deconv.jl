@@ -155,12 +155,12 @@ function get_k(
             end ## if
         end ## for non_target_channel_i
     end ## for channel_i
-    (length(err_msgs) > 0) && throw(DomainError(join(err_msgs, "; ")))
+    @when (length(err_msgs) > 0) throw(DomainError(join(err_msgs, "; ")))
 
     ## compute inverses and return
     const (k_s, k_inv_vec, inv_note) = calc_kinv(Val{well_proc}(), k4dcv_bydy, cd_key_vec, n_wells)
     const k4dcv = K4Deconv(k_s, k_inv_vec, (length(inv_note) > 0 ? inv_note * INV_NOTE_PT2 : ""))
-    (length(save_to) > 0) && save(save_to, "k4dcv", k4dcv)
+    @when (length(save_to) > 0) save(save_to, "k4dcv", k4dcv)
     return k4dcv
 end ## get_k()
 

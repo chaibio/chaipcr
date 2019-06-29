@@ -128,8 +128,9 @@ function calib_calib(
     debug(logger, "at calib_calib()")
     ## This function is expected to handle situations where `calib_info_1` and `calib_info_2`
     ## have different combinations of wells, but the number of wells should be the same.
-    (length(well_nums_1) != length(well_nums_2)) &&
+    if length(well_nums_1) != length(well_nums_2)
         throw(DimensionMismatch("length(well_nums_1) != length(well_nums_2)"))
+    end
 
     ## remove MySql dependency
     #

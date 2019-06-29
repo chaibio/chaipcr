@@ -20,11 +20,11 @@ function act(
     debug(logger, "at act(::Val{meltcurve})")
 
     ## calibration data is required    
-    haskey(req_dict, CALIBRATION_INFO_KEY) &&
-        typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative ||
+    @unless(req_key(CALIBRATION_INFO_KEY) &&
+        typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative,
             return fail(logger,
                         ArgumentError("no calibration information found"),
-                        out_format)
+                        out_format))
 
     # kwdict_pmc = OrderedDict{Symbol,Any}()
     # for key in ["channel_nums"]
@@ -491,8 +491,8 @@ function mc_tm_pw(
             i += 1
             ndrv_smu_centred0 = ndrv_smu_centred1
             ndrv_smu_centred1 = sign(ndrv_smu[i] - ns_range_mid)
-            (ndrv_smu_centred0 != ndrv_smu_centred1) &&
-                (num_cross_points += 1)
+            @when(ndrv_smu_centred0 != ndrv_smu_centred1,
+                num_cross_points += 1)
         end ## while
         return num_cross_points
     end ## count_cross_points()
@@ -676,7 +676,7 @@ function mutate_dups(
     const vec_uniq_len  = vec_uniq |> length
     #
     ## return if no ties
-    (vec_len == vec_uniq_len) && (return vec_2mut)
+    @when (vec_len == vec_uniq_len) return vec_2mut
     #
     ## find ties
     const order_to = sortperm(vec_2mut)
@@ -713,7 +713,7 @@ function finite_diff(
     if dlen != length(Y)
         throw(DimensionError, "X and Y must be of same length")
     end ## if
-    (dlen == 1) && (return zeros(1))
+    @when dlen == 1 return zeros(1)
     if (nu == 1)
         const (range1, range2) =
             if      (method == :central)  tuple(3:dlen+2, 1:dlen)
@@ -754,7 +754,7 @@ Base.collect(iter ::PeakIndices) =
 
 function Base.next(iter ::PeakIndices, state ::Tuple{Int, Int, Int})
     ## fail if state == nothing
-    (state == nothing) && return (nothing, nothing)
+    @when state == nothing return (nothing, nothing)
     ## state != nothing
     left_nadir_ii, summit_ii, right_nadir_ii = state
     ## next summit
@@ -775,7 +775,7 @@ function Base.next(iter ::PeakIndices, state ::Tuple{Int, Int, Int})
                 left_nadir_ii += 1
         end
         ## if there is a nadir to the left, break out of loop
-        (left_nadir_ii > 0) && break
+        @when left_nadir_ii > 0 break
         ## otherwise try the next summit
     end
     ## fail if no more summits or no flanking nadirs
@@ -791,8 +791,9 @@ function Base.next(iter ::PeakIndices, state ::Tuple{Int, Int, Int})
             right_summit_ii += 1
     end
     ## remove duplicate summits by choosing highest summit
-    (right_summit_ii > summit_ii) &&
-        (summit_ii = (iis -> iis[indmax(iter.summit_heights[iis])])(summit_ii:right_summit_ii))
+    if right_summit_ii > summit_ii
+        summit_ii = (iis -> iis[indmax(iter.summit_heights[iis])])(summit_ii:right_summit_ii)
+    end
     ## return value
     ((iter.nadir_idc[left_nadir_ii], iter.summit_idc[summit_ii], iter.nadir_idc[right_nadir_ii]), ## element
         (left_nadir_ii, summit_ii, right_nadir_ii)) ## state

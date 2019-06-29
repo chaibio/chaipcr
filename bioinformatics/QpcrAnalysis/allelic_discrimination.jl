@@ -145,7 +145,7 @@ function do_cluster_analysis(
                     dist_edge = 0.0
                     for edge in combinations(gi_idc, 2)
                         dist_edge = dist_mtx[edge...]
-                        edge_always_second_longest() && return dist_edge
+                        @when edge_always_second_longest() return dist_edge
                     end
                     0.0
                     ## devectorized code
@@ -173,9 +173,9 @@ function do_cluster_analysis(
                 end ## calc_dist_within_margin_max()
                 ## end of function definition nested within dist_within_margin_max()
 
-                (sum_gi_bool_vec <= 1) && return 0.0
+                @when sum_gi_bool_vec <= 1 return 0.0
                 const gi_idc = well_idc[gi_bool_vec]
-                (sum_gi_bool_vec == 2) && return getindex(dist_mtx, gi_idc...)
+                @when sum_gi_bool_vec == 2 return getindex(dist_mtx, gi_idc...)
                 calc_dist_within_margin_max()
             end
             ## end of function definitions nested within check_grp()
