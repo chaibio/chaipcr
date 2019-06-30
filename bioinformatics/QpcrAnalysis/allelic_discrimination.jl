@@ -1,4 +1,6 @@
 ## allelic_discrimination.jl
+##
+## clusters data to identify allele groups
 
 import DataStructures.OrderedDict
 import Clustering: ClusteringResult, kmeans!, kmedoids!, silhouettes
@@ -9,7 +11,7 @@ import Memento: debug, info, error
 
 
 ## nrn: whether to flip the binary genotype or not
-NRN_SELF = x -> x
+NRN_SELF = id
 NRN_NOT  = x -> 1 .- x
 
 
@@ -17,10 +19,8 @@ NRN_NOT  = x -> 1 .- x
 function prep_input_4ad(
     ## one step/ramp of amplification output
     full_amp_out    ::AmpStepRampOutput,
-
     categ           ::Symbol = :fluo,
     well_idc        ::Union{AbstractVector, Colon} =Colon(),
-
     ## relevant if `categ == :fluo`, last available cycle
     cycs            ::Union{Integer, AbstractVector} =1
 )
@@ -59,7 +59,7 @@ end ## prep_data_4ad
 function do_cluster_analysis(
     raw_data        ::AbstractMatrix,
     init_centers    ::AbstractMatrix,
-    cluster_method  ::ClusteringMethod = :K_means_medoids(),
+    cluster_method  ::ClusteringMethod = :K_means_medoids,
     norm_l          ::Real =2
 )
     ## get pair-wise distance (cost) matrix
@@ -76,7 +76,7 @@ function do_cluster_analysis(
     end
 
     ## cluster analysis methods
-    function clustering(::K_means, _init_centers)
+    function clustering(::Val{:K_means}, _init_centers)
         ## ideally the element with the same index between
         ## `init_centers` and `cluster_result.centers` should be for the same genotype
         _cluster_result = kmeans!(raw_data, _init_centers)
@@ -84,10 +84,10 @@ function do_cluster_analysis(
     end
 
     ## Issue: how to use output from k-means clustering as input for k-medoids ???
-    clustering(::K_means_medoids, _init_centers) =
+    clustering(::Val{:K_means_medoids}, _init_centers) =
         clustering(K_medoids(), clustering(K_means(), _init_centers)[2])
 
-    function clustering(::K_medoids, _)
+    function clustering(::Val{:K_medoids}, _)
         ## _init_centers is [2 x num_centers] matrix, kmedoids! requires vector
         ## use dummy values 1:num_centers for now
         _cluster_result = kmedoids!(dist_mtx, collect(1:num_centers)) ## dist_mtx not dist_mtx_winit
@@ -95,7 +95,7 @@ function do_cluster_analysis(
     end
 
     clustering(unknown_cluster_method, _) =
-        error(logger, "clustering method $unknown_cluster_method not implemented")
+        throw(ArgumentError, "clustering method $unknown_cluster_method not implemented")
 
     ## get cluster silhouettes
     get_silhouettes() =
@@ -203,7 +203,8 @@ function do_cluster_analysis(
     const dist_mtx = calc_dist_mtx()
     # const n_wells_winit = n_wells + num_centers
     # dist_mtx_winit = calc_dist_mtx_winit(init_centers)
-    const (cluster_result, centers) = clustering(cluster_method, copy(init_centers))
+    const (cluster_result, centers) =
+        clustering(Val{cluster_method}(), copy(init_centers))
     const assignments_woinit = cluster_result.assignments[well_idc]
     const slhts = get_silhouettes()
     const slht_mean = mean(slhts)
@@ -235,7 +236,7 @@ function assign_genos(
     ntc_bool_vec        ::Vector{Bool},
     expected_ncg_raw    ::AbstractMatrix =DEFAULT_encgr,
     ctrl_well_dict      ::OrderedDict =CTRL_WELL_DICT,
-    cluster_method      ::ClusteringMethod = :K_means_medoids(),
+    cluster_method      ::ClusteringMethod = :K_means_medoids,
     norm_l              ::Real =2,
     ## below not specified by `process_ad` as of right now
     init_factors        ::AbstractVector =DEFAULT_init_FACTORS, # for `init_centers`
@@ -260,9 +261,9 @@ function assign_genos(
         mapreduce(
             f,
             vcat,
-            range(1, num_channels)
+            1:num_channels
         ) |> nrn
-    end
+    end ## calc_expected_genos_all()
 
     ## for any channel, all the data points are the same
     ## (would result in "AssertionError: !(isempty(grp))" for `kmedoids`)
@@ -281,7 +282,7 @@ function assign_genos(
                 EMPTY_BEST_GENO_COMBINS, ## best_geno_combins
                 expected_genos_all,
                 EMPTY_UCC_DICT)) ## ucc_dict
-    end
+    end ## channel_all_equal()
 
     calc_init_centers_all() =
         [
@@ -334,9 +335,7 @@ function assign_genos(
                         break
                     end
             end ## for num_expected_ncg
-            if good_enough
-                break
-            end
+            @when good_enough break
             num_genos -= 1
         end ## while
         ## find the best model (possible combination of genotypes
@@ -349,21 +348,21 @@ function assign_genos(
         const _best_ucc = _ucc_dict[ucc_keys[_best_i]]
         # expected_genos = expected_genos_vec[best_i]
         return (_best_i, _best_ucc, _ucc_dict)
-    end
+    end ## best_cluster_model()
 
     ## expected genotypes specified for non-control wells
     ## BUG: these 3 variables left undefined in previous code
     ## best_geno_combins, best_num_genos, ucc_dict
     function encg_cluster_model()
         const expected_ncg = nrn(expected_ncg_raw)
-        const non_ctrl_geno_idc = map(
-            encg_idx ->
-                find(
-                    geno_idx -> expected_ncg[:, encg_idx] == expected_genos_all[:, geno_idx],
-                    1:size(expected_genos_all,2)
-                )[1],
-            1:size(expected_ncg,2))
-        const (car, geno_combin, center_set) = cluster_geno(ctrl_geno_idc, non_ctrl_geno_idc)
+        const non_ctrl_geno_idc =
+            map(1:size(expected_ncg,2)) do encg_idx
+                find(1:size(expected_genos_all,2) do geno_idx
+                    expected_ncg[:, encg_idx] == expected_genos_all[:, geno_idx]
+                end)[1]
+            end
+        const (car, geno_combin, center_set) =
+            cluster_geno(ctrl_geno_idc, non_ctrl_geno_idc)
         ## ??? is it OK to save cluster model in ucc_dict ???
         const ucc = UniqCombinCenters(
                         center_set,
@@ -387,7 +386,7 @@ function assign_genos(
         const _geno_combin = expected_genos_all[:, _geno_idc]
         const _center_set = Set(_car.centers[:, i] for i in 1:size(_car.centers, 2))
         return (_car, _geno_combin, _center_set)
-    end
+    end ## cluster_geno()
 
     ## re-assign centers based on distance to initial centers
     ## (works like US medical residency match)
@@ -424,7 +423,7 @@ function assign_genos(
         end ## while
         # println("_new_center_idc ", _new_center_idc)
         return _new_center_idc
-    end
+    end ## calc_new_center_idc()
 
     ## if dual channel && no heteros only homo1, homo2, NTC
     function ntc2hetero!(_new_center_idc)
@@ -440,10 +439,11 @@ function assign_genos(
         if angle_1n2 > 0.5 * pi
             ## change NTC to hetero
             _new_center_idc[ntc_center_idc] =
-                find(geno_idx -> all(expected_genos_all[:, geno_idx] .== [1, 1]),
-                     geno_idc_all)[1]
-        end
-    end
+                find(geno_idc_all) do geno_idx
+                    all(expected_genos_all[:, geno_idx] .== [1, 1])
+                end)[1]
+        end ## if
+    end ## ntc2hetero!()
     #
     ## end of function definitions nested within assign_genos()
 
@@ -489,7 +489,7 @@ function assign_genos(
         ctrl_well_idc = ctrl_well_dict[ctrl_genos[i]] .+ 1 ## transform 0-indexed well_nums to 1-indexed well_idc
         ctrl_well_data = data[:, ctrl_well_idc]
         init_centers_all[:, ctrl_geno_idc[i]] = mean(ctrl_well_data, 2)
-    end
+    end ## next i
     ## are expected genotypes specified for non-control wells?
     const (best_i, best_ucc, ucc_dict) =
         length(expected_ncg_raw) > 0 ?
@@ -619,9 +619,6 @@ function process_ad(
                 ctrl_well_dict,
                 cluster_method,
                 norm_l)
-    end ## for
+    end ## next categ_well_tuple
     return (assignments_adj_labels_dict, agr_dict)
 end ## process_ad()
-
-
-#

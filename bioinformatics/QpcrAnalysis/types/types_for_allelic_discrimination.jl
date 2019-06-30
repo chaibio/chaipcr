@@ -1,15 +1,11 @@
-## types for allelic discrimination
-#
+## types_for_allelic_discrimination.jl
+##
 ## needed for `type AmpStepRampOutput` so must be included before "amp.jl"
 
 import Clustering.ClusteringResult
 
-import Clustering.ClusteringResult
+include("ClusteringMethod.jl")
 
-abstract type  ClusteringMethod                         end
-struct         K_means              <: ClusteringMethod end
-struct         K_means_medoids      <: ClusteringMethod end
-struct         K_medoids            <: ClusteringMethod end
 
 ## clustering analysis result from a possible combination of expected genotypes
 struct ClusterAnalysisResult
@@ -65,4 +61,3 @@ const CTRL_WELL_DICT = OrderedDict{Vector{Int},Vector{Int}}() # key is genotype 
 
 EMPTY_UCC_DICT = OrderedDict{Set{Vector{Float_T}},UniqCombinCenters}()
 EMPTY_BEST_GENO_COMBINS = Vector{Matrix{Int}}()
-

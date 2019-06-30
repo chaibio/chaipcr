@@ -37,10 +37,10 @@ module QpcrAnalysis
     ## for those functions to find files in the directory where "QpcrAnalysis.jl" is located.
     const LOAD_FROM_DIR = LOAD_PATH[find(LOAD_PATH) do path_
         isfile("$path_/$MODULE_NAME.jl")
-    end][1] # slice by boolean vector returned a one-element vector. Assumption: LOAD_PATH is global
+    end][1] ## slice by boolean vector returned a one-element vector. Assumption: LOAD_PATH is global
 
     ## include key string constants
-    include("keystrings.jl")
+    include("constants/keystrings.jl")
 
     ## default data width in production mode:  32 bits (BBB)
     ## default data width in development mode: 64 bits
@@ -50,15 +50,14 @@ module QpcrAnalysis
     ## include each script, generally in the order of workflow
 
     ## types and constants
-    include("types_for_dispatch.jl")
-    include("types_for_calibration.jl")
-    include("types_for_allelic_discrimination.jl")
-    include("types_for_amplification.jl")
-    include("types_for_meltcurve.jl")
-    include("types_for_standard_curve.jl")
-    include("amp_models/types_for_sfc_models.jl")
-    include("amp_models/types_for_dfc_models.jl")
-    include("constants.jl")
+    include("types/Action.jl")
+    include("types/types_for_calibration.jl")
+    include("types/types_for_allelic_discrimination.jl")
+    include("types/types_for_amplification.jl")
+    include("types/types_for_meltcurve.jl")
+    include("types/types_for_standard_curve.jl")
+    include("amp_models/types/types_for_amp_models.jl")
+    include("constants/constants.jl")
 
     ## shared functions
     include("shared.jl")
@@ -68,7 +67,6 @@ module QpcrAnalysis
         ## development & testing
         import Base.Test
         using FactCheck
-        FactCheck.clear_results()
 
         ## data format verification
         include("../test/verify_request.jl")
@@ -80,39 +78,31 @@ module QpcrAnalysis
     include("dispatch.jl")
 
     ## calibration
-    include("deconv.jl") # `type K4Deconv` REPL
+    include("calib.jl")
     include("adj_w2wvaf.jl")
-    include("calib.jl") # `type CalibCalibOutput` currently not in production
+    include("deconv.jl")
 
     ## amplification
+    include("amp.jl")
+    include("allelic_discrimination.jl")
     include("amp_models/sfc_models.jl")
     include("amp_models/MAKx.jl")
     include("amp_models/MAKERGAUL.jl")
-    include("amp.jl")
-    include("allelic_discrimination.jl")
+
+    ## melt curve
+    include("meltcrv.jl")
+    include("supsmu.jl")
 
     ## standard curve
     include("standard_curve.jl")
 
-    ## melt curve
-    include("multi_channel.jl")
-    include("supsmu.jl")
-    include("meltcrv.jl")
-
     ## analyze_customized
-    include("analyze_customized/thermal_performance_diagnostic.jl")
+    include("analyze_customized/optical_cal.jl")
     include("analyze_customized/optical_test_single_channel.jl")
     include("analyze_customized/optical_test_dual_channel.jl")
-    include("analyze_customized/optical_cal.jl")
     include("analyze_customized/thermal_consistency.jl")
+    include("analyze_customized/thermal_performance_diagnostic.jl")
     # include("analyze_customized/your_own_analyze_functionality.jl")
-
-    ## no longer needed
-    #
-    ## wrap up
-    # include("test.jl")
-    # include("pnmsmu.jl")
-    # include("__init__.jl")
 
     ## Create module level logger
     ## this can be precompiled
@@ -132,8 +122,8 @@ module QpcrAnalysis
         ## Register the module level logger at runtime
         ## so it is accessible via `get_logger(QpcrAnalysis)`
         Memento.register(logger)
+
+        ## clear Fact Checks
+        @when !production_env FactCheck.clear_results()
     end ## __init__()
 end ## module QpcrAnalysis
-
-
-#

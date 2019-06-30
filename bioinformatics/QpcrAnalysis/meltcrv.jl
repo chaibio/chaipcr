@@ -6,7 +6,6 @@ import DataStructures.OrderedDict
 import DataArrays.DataArray
 import StatsBase: rle
 import Dierckx: Spline1D, derivative
-import Base: start, next, done, eltype, collect, iteratorsize, SizeUnknown
 import FunctionalData: @p, id
 import Memento: debug, info, warn, error
 
@@ -39,13 +38,13 @@ function act(
     #
     ## pass call through to process_mc
     ## which will perform the analysis for the entire dataset
-    const response =
-        try process_mc(
-                req_dict[RAW_DATA_KEY],
-                req_dict[CALIBRATION_INFO_KEY];
-                out_format = out_format,
-                # kwdict_pmc...,
-                kwdict_mc_tm_pw = kwdict_mc_tm_pw)
+    const response = try
+        process_mc(
+            req_dict[RAW_DATA_KEY],
+            req_dict[CALIBRATION_INFO_KEY];
+            out_format = out_format,
+            # kwdict_pmc...,
+            kwdict_mc_tm_pw = kwdict_mc_tm_pw)
         catch err
             return fail(logger, err, out_format; bt=true)
         end ## try
@@ -95,7 +94,10 @@ function process_mc(
             map(tf_dict_vec) do tf_dict
                 Dict(
                     map(TF_KEYS) do key
-                        key => extend_NaN(map(x -> length(x[:temperature]), tf_dict_vec) |> maximum)(tf_dict[key])
+                        key => extend_NaN(
+                                    maximum ∘
+                                        map(length ∘ index(:temperature),
+                                            tf_dict_vec))(tf_dict[key])
                     end)
             end
 
@@ -105,7 +107,7 @@ function process_mc(
                 ## @p id tf_nv_adj | map index(:temperature)        | reduce hcat,
                 ## @p id tf_nv_adj | map index(:fluorescence_value) | reduce hcat)
                 map(TF_KEYS) do key
-                    mapreduce(tf_dict -> tf_dict[key], hcat, tf_nv_adj)
+                    mapreduce(index(key), hcat, tf_nv_adj)
                 end...)
     ## end of function definitions nested in get_mc_data()
 
@@ -123,7 +125,7 @@ function process_mc(
                 faw_ary3[:, i, channel_i])...)
 
     remove_when_NaN_in_first(x...) =
-        map(y -> y[broadcast(!isnan, first(x))], x)
+        map(first(x) |> cast(!isnan) |> index, x)
 
     normalize_fluos(
         tmprtrs     ::DataArray{S} where S <: AbstractFloat,
@@ -148,7 +150,7 @@ function process_mc(
     ## reshape raw fluorescence data to 3-dimensional array
     ## dimensions 1,2,3 = temperature,well,channel
     ## `fr` - fluo_raw
-    const fr_ary3       = cat(3, map(mc_data -> mc_data.fluo_da, mc_data_bych)...)
+    const fr_ary3       = cat(3, map(field(:fluo_da), mc_data_bych)...)
     #
     ## perform deconvolution and adjust well-to-well variation in absolute fluorescence
     const (mw_ary3, k4dcv, fdcvd_ary3, wva_data, wva_well_nums, faw_ary3) =
@@ -182,11 +184,11 @@ function process_mc(
                             span_smooth_factor = span_smooth_factor,
                             kwdict_mc_tm_pw...)
                     else
-                        EMPTY_mc_tm_pw_out
+                        MeltCurveTa()
                     end ## if
                 end, ## do oc_well_num
             hcat,
-            range(1, num_channels))
+            1:num_channels)
     #
     if (out_format == :full)
         return MeltCurveOutput(
@@ -204,7 +206,7 @@ function process_mc(
         mc_out = OrderedDict{Symbol,Any}(map(keys(MC_OUT_FIELDS)) do f
             MC_OUT_FIELDS[f] =>
                 [   (getfield(mc_bychwl[well_i, channel_i], f))
-                    for well_i in range(1, num_fluo_wells), channel_i in range(1, num_channels) ]
+                    for well_i in 1:num_fluo_wells, channel_i in 1:num_channels ]
         end) ## do f
         mc_out[:valid] = true
         return mc_out
@@ -247,7 +249,7 @@ function mc_tm_pw(
     top_N               ::Integer =4, ## top number of Tm peaks to report
     frac_report_lb      ::AbstractFloat =0.1, ## lower bound of area fraction of the Tm peak to be reported in regards to the largest real Tm peak
     #
-    json_digits         ::Integer =JSON_DIGITS,
+    reporting           =roundoff(JSON_DIGITS), ## reporting function
 )
     ## functions to parse input data
 
@@ -381,9 +383,8 @@ function mc_tm_pw(
     ## `dp` - data point
     # half_peak_span_tmprtr = (peak_span_tmprtr / 2.0)
     span_peaks_dp() =
-        Int(round(
-            (peak_span_tmprtr / 2.0) / (max_tp - min_tp) * len_denser,
-            0))
+        (peak_span_tmprtr / 2.0) / (max_tp - min_tp) * len_denser |>
+            roundoff(0) |> Int
 
     ## find summit and nadir indices of Tm peaks in `ndrv_smu`
     find_sn() =
@@ -412,12 +413,10 @@ function mc_tm_pw(
 
     ## calculate peak area
     peak_Ta(peak_idc ::Tuple{I, I, I} where I <: Integer) =
-        peak_idc == nothing ?
-            nothing :
-            Peak(
-                peak_idc[2],                                ## summit_idx
-                tp_denser[peak_idc[2]],                     ## Tm = temperature at peak
-                peak_bounds(peak_idc...) |> calc_area)      ## area
+        @when thing(peak_idc) Peak(
+            peak_idc[2],                                ## summit_idx
+            tp_denser[peak_idc[2]],                     ## Tm = temperature at peak
+            peak_bounds(peak_idc...) |> calc_area)      ## area
 
     ## find shoulders of peak
     function peak_bounds(
@@ -553,7 +552,7 @@ function mc_tm_pw(
         return top_peaks(
             filter(
                 idx -> areas_raw[idx] >= areas_raw[idc_sb_area[1]] * frac_report_lb,
-                idc_sb_area[range(1, min(top_N+1, len_Tms))]))
+                idc_sb_area[1:min(top_N+1, len_Tms)]))
     end ## real_peaks()
     #
     ## end of function definitions nested in mc_tm_pw()
@@ -569,18 +568,7 @@ function mc_tm_pw(
     ## only used if the data array is too short to find peaks
     if (len_raw <= 3)
         const slope = finite_diff(tmprtrs, fluos; nu = 1, method = :central)
-        return MeltCurveTa(
-            report(json_digits,
-                hcat(tmprtrs, fluos, -slope)),  ## mc_raw
-            EMPTY_Ta,                           ## Ta_fltd
-            EMPTY_mc,                           ## mc_denser
-            NaN,                                ## ns_range_mid
-            Dict(
-                :tmprtrs => EMPTY_Ta,
-                :fluos   => EMPTY_Ta),          ## sn_dict
-            EMPTY_Ta,                           ## Ta_raw
-            :No                                 ## Ta_reported
-        )
+        return MeltCurveTa(mc = reporting(hcat(tmprtrs, fluos, -slope)))
     end ## if
     #
     ## else
@@ -614,21 +602,19 @@ function mc_tm_pw(
     const len_Tms       = length(Ta_raw)
     #
     ## return smoothed data if no peaks
-    if (len_Tms == 0)
-        return MeltCurveTa(
-            report(json_digits, mc_raw),
-            EMPTY_Ta,   ## Ta_fltd
-            mc_denser,
-            ns_range_mid,
-            sn_dict,
-            EMPTY_Ta,   ## Ta_raw
-            :No)
+    if len_Tms == 0
+        return
+            MeltCurveTa(
+                mc              = reporting(mc_raw),
+                mc_denser       = mc_denser,
+                ns_range_mid    = ns_range_mid,
+                sn_dict         = sn_dict)
     end ## if
     #
     ## else
     ## peak indices sorted by area
     ## `idc_sb` - indices sorted by
-    const idc_sb_area = sortperm(map(p -> p.area, Ta_raw), rev=true)
+    const idc_sb_area = sortperm(map(field(:area), Ta_raw), rev=true)
     #
     ## keep only the biggest peak(s)
     ## passes functions instead of values for mc_slope & num_cross_points
@@ -646,18 +632,18 @@ function mc_tm_pw(
         Ta_raw[ 
             real_peaks(
                 tp_denser[max_ndrv_smu[2]],         ## tmprtr_max_ndrv
-                map(p -> p.area, Ta_raw),           ## areas_raw
+                map(field(:area), Ta_raw),          ## areas_raw
                 Ta_raw[idc_sb_area[1]].idx,         ## idx of peak with largest area
                 () -> linreg(tmprtrs, fluos)[2],    ## () -> mc_slope
                 count_cross_points)]                ## () -> num_cross_points
     #
     return MeltCurveTa(
-        report(json_digits, mc_raw),
-        report(json_digits, Ta_fltd),
-        mc_denser,          ## do we want to round this to json_digits as well?
+        reporting(mc_raw),
+        reporting(Ta_fltd),
+        mc_denser,          ## should we be `reporting` this as well?
         ns_range_mid,
         sn_dict,
-        report(json_digits, Ta_raw[idc_sb_area]),
+        reporting(Ta_raw[idc_sb_area]),
         length(Ta_fltd) == 0 ? :No : :Yes)
 end ## mc_tm_pw()
 
@@ -690,7 +676,7 @@ function mutate_dups(
     ## break ties
     accumulator1 = 0
     accumulator2 = 0
-    for i in range(1, length(dups)) 
+    for i in 1:length(dups) 
         multiway_tie  = i > 1 && dups[i] - dups[i-1] == 1
         accumulator1 += multiway_tie
         accumulator2  = multiway_tie ? accumulator2 : accumulator1
@@ -736,81 +722,3 @@ function finite_diff(
         nu = 1;
         method = method)
 end ## finite_diff()
-
-## PeakIndices methods
-## iterator functions to find peaks and flanking nadirs
-
-Base.start(iter ::PeakIndices) = (0, 0, 0)
-
-Base.done(iter ::PeakIndices, state) =
-    state == nothing || state[1] > iter.len_summit_idc
-
-Base.iteratorsize(::PeakIndices) = SizeUnknown()
-
-Base.eltype(iter ::PeakIndices) = Tuple{Int, Int, Int}
-
-Base.collect(iter ::PeakIndices) =
-    [peak for peak in iter if thing(peak)]
-
-function Base.next(iter ::PeakIndices, state ::Tuple{Int, Int, Int})
-    ## fail if state == nothing
-    @when state == nothing return (nothing, nothing)
-    ## state != nothing
-    left_nadir_ii, summit_ii, right_nadir_ii = state
-    ## next summit
-    while (summit_ii < iter.len_summit_idc)
-        ## summit_ii < iter.len_summit_idc
-        ## increment the summit index
-        summit_ii += 1
-        ## extend nadir range to the right
-        while
-            (right_nadir_ii < iter.len_nadir_idc)
-                right_nadir_ii += 1
-                (iter.summit_idc[summit_ii] < iter.nadir_idc[right_nadir_ii]) && break
-        end
-        ## decrease nadir range to the left, if possible
-        while
-            (left_nadir_ii < iter.len_nadir_idc) &&
-            (iter.nadir_idc[left_nadir_ii + 1] < iter.summit_idc[summit_ii])
-                left_nadir_ii += 1
-        end
-        ## if there is a nadir to the left, break out of loop
-        @when left_nadir_ii > 0 break
-        ## otherwise try the next summit
-    end
-    ## fail if no more summits or no flanking nadirs
-    if  (summit_ii >= iter.len_summit_idc) ||
-       !(iter.nadir_idc[left_nadir_ii] < iter.summit_idc[summit_ii] < iter.nadir_idc[right_nadir_ii])
-            return (nothing, nothing)
-    end
-    ## find duplicate summits
-    right_summit_ii = summit_ii
-    while
-        (right_summit_ii < iter.len_summit_idc) &&
-        (iter.summit_idc[right_summit_ii + 1] < iter.nadir_idc[right_nadir_ii])
-            right_summit_ii += 1
-    end
-    ## remove duplicate summits by choosing highest summit
-    if right_summit_ii > summit_ii
-        summit_ii = (iis -> iis[indmax(iter.summit_heights[iis])])(summit_ii:right_summit_ii)
-    end
-    ## return value
-    ((iter.nadir_idc[left_nadir_ii], iter.summit_idc[summit_ii], iter.nadir_idc[right_nadir_ii]), ## element
-        (left_nadir_ii, summit_ii, right_nadir_ii)) ## state
-end ## next()
-
-## report methods
-report(digits ::Integer, x) = round.(x, digits)
-
-## do not report indices for each peak, only Tm and area
-report(digits ::Integer, p ::Peak) =
-    round.([p.Tm, p.area], digits) |> transpose
-
-report(digits ::Integer, peaks ::Vector{Peak}) =
-    length(peaks) == 0 ?
-        EMPTY_Ta :
-        mapreduce(p -> round.([p.Tm, p.area], digits),
-            hcat,
-            peaks) |> transpose
-
-#

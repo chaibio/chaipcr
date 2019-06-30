@@ -55,11 +55,11 @@ function prep_adj_w2wvaf(
     ## remove MySql dependency
     # db_conn ::MySQL.MySQLHandle,
     # calib_info ::Union{Integer,OrderedDict},
-    calib_data  ::Associative,
+    calib_data  ::CalibData{V},
     well_nums   ::AbstractVector,
     dye_in      ::Symbol = :FAM,
     dyes_2bfild ::AbstractVector =[]
-)
+) where {V <: Real}
     debug(logger, "at prep_adj_w2wvaf()")
 
     ## remove MySql dependency
@@ -117,8 +117,8 @@ function prep_adj_w2wvaf(
     ## using the current format for the request body there is no well_num information
     ## associated with the calibration data
     const V = typeof(calib_data[WATER_KEY][FLUORESCENCE_VALUE_KEY][1][1])
-    water_data_dict  = OrderedDict{Integer,Vector{V}}() ## enforce type
-    signal_data_dict = OrderedDict{Integer,Vector{V}}() ## enforce type
+    water_data_dict  = OrderedDict{UInt8,Vector{V}}() ## enforce type
+    signal_data_dict = OrderedDict{UInt8,Vector{V}}() ## enforce type
     const stop_msgs = Vector{String}()
     for channel in range(1, num_channels(calib_data[WATER_KEY][FLUORESCENCE_VALUE_KEY]))
         key = CHANNEL_KEY * "_$(channel)"

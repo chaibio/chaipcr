@@ -1,27 +1,30 @@
 ## calib.jl
-#
-## calibration: deconvolution and adjust well-to-well variation in absolute fluorescence values
+##
+## calibration procedure:
+## 1. multichannel deconvolution
+## 2. adjust well-to-well variation in absolute fluorescence values
 
 import DataStructures.OrderedDict
 import FunctionalData.@p
 import Memento: debug, error
 
+
 ## function: perform deconvolution and adjust well-to-well variation in absolute fluorescence
 function dcv_aw(
-    fr_ary3                 ::AbstractArray,
-    dcv                     ::Bool,
-    channel_nums            ::AbstractVector,
+    fr_ary3                 ::AbstractArray, ## array of raw fluorescence by cycle, well, channel
+    dcv                     ::Bool,          ## signal to perform multi-channel deconvolution
+    channel_nums            ::Vector{I},     ## vector of channel numbers
     ## remove MySql dependency
     # db_conn ::MySQL.MySQLHandle, ## `db_conn_default` is defined in "__init__.jl"
     # calib_info ::Union{Integer,OrderedDict},
     # well_nums_found_in_fr ::AbstractVector,
     # well_nums_in_req ::AbstractVector=[],
-    calib_data              ::Associative,
-    well_nums_found_in_fr   ::Vector{I} where I <: Integer,
+    calib_data              ::CalibData,     ## calibration dataset
+    well_nums_found_in_fr   ::Vector{I},     ## vector of well numbers
     dye_in                  ::Symbol = :FAM,
     dyes_2bfild             ::AbstractVector =[];
     aw_out_format           ::Symbol = :both ## :array, :dict, :both
-)
+) where I <: Integer
     debug(logger, "at dcv_aw()")
 
     ## remove MySql dependency
@@ -82,7 +85,7 @@ function dcv_aw(
                 well_nums_in_req;
                 out_format = :array)
         else ## !dcv
-            K4DCV_EMPTY, mw_ary3
+            K4Deconv(), mw_ary3
         end
     #
     const dcvd_aw_dict =
@@ -107,67 +110,65 @@ function dcv_aw(
         else                              throw(ArgumentException(
                                               "`aw_out_format` must be :array, :dict or :both"))
         end ## if
-    ## Performance issue:
-    ## enforce data types for this output ?
     return (mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, dcvd_aw...)
 end ## dcv_aw
 
 
-function calib_calib(
-    ## remove MySql dependency
-    #
-    # db_conn_1 ::MySQL.MySQLHandle,
-    # db_conn_2 ::MySQL.MySQLHandle,
-    # calib_info_1 ::OrderedDict,
-    # calib_info_2 ::OrderedDict,
-    # well_nums_1 ::AbstractVector=[],
-    # well_nums_2 ::AbstractVector=[];
-    dye_in      ::Symbol =:FAM,
-    dyes_2bfild ::AbstractVector =[]
-)
-    debug(logger, "at calib_calib()")
-    ## This function is expected to handle situations where `calib_info_1` and `calib_info_2`
-    ## have different combinations of wells, but the number of wells should be the same.
-    if length(well_nums_1) != length(well_nums_2)
-        throw(DimensionMismatch("length(well_nums_1) != length(well_nums_2)"))
-    end
+## unused function
+# function calib_calib(
+#     ## remove MySql dependency
+#     #
+#     # db_conn_1 ::MySQL.MySQLHandle,
+#     # db_conn_2 ::MySQL.MySQLHandle,
+#     # calib_info_1 ::OrderedDict,
+#     # calib_info_2 ::OrderedDict,
+#     # well_nums_1 ::AbstractVector=[],
+#     # well_nums_2 ::AbstractVector=[];
+#     dye_in      ::Symbol =:FAM,
+#     dyes_2bfild ::AbstractVector =[]
+# )
+#     ## This function is expected to handle situations where `calib_info_1` and `calib_info_2`
+#     ## have different combinations of wells, but the number of wells should be the same.
+#     if length(well_nums_1) != length(well_nums_2)
+#         throw(DimensionMismatch("length(well_nums_1) != length(well_nums_2)"))
+#     end
 
-    ## remove MySql dependency
-    #
-    # calib_dict_1 = get_full_calib_data(db_conn_1, calib_info_1, well_nums_1)
-    # water_well_nums_1 = calib_dict_1["water"][2]
-    #
-    # calib_key_vec_1 = get_ordered_keys(calib_info_1)
-    # cd_key_vec_1 = calib_key_vec_1[2:end] ## cd = channel of dye. "water" is index 1 per original order.
-    # channel_nums_1 = map(cd_key_vec_1) do cd_key
-    #     parse(Int, split(cd_key, "_")[2])
-    # end
-
-    const ary2dcv_1 =
-        cat(1,
-            map(values(calib_dict_1)) do value_1
-                reshape(transpose(fluo_data), 1, size(value_1[1])[2:-1:1]...)
-            end...) ## do value_1
-    const (mw_ary3_1, k4dcv_2, dcvd_ary3_1, wva_data_2, wva_well_nums_2, dcv_aw_ary3_1) =
-        dcv_aw(
-            ary2dcv_1,
-            true,
-            channel_nums_1,
-            db_conn_2,
-            calib_info_2,
-            well_nums_2,
-            well_nums_2,
-            dye_in,
-            dyes_2bfild;
-            aw_out_format = :array)
-    return CalibCalibOutput(
-        ary2dcv_1,
-        mw_ary3_1,
-        k4dcv_2,
-        dcvd_ary3_1,
-        wva_data_2,
-        dcv_aw_ary3_1)
-end ## calib_calib
+#     ## remove MySql dependency
+#     #
+#     # calib_dict_1 = get_full_calib_data(db_conn_1, calib_info_1, well_nums_1)
+#     # water_well_nums_1 = calib_dict_1["water"][2]
+#     #
+#     # calib_key_vec_1 = get_ordered_keys(calib_info_1)
+#     # cd_key_vec_1 = calib_key_vec_1[2:end] ## cd = channel of dye. "water" is index 1 per original order.
+#     # channel_nums_1 = map(cd_key_vec_1) do cd_key
+#     #     parse(Int, split(cd_key, "_")[2])
+#     # end
+#
+#     const ary2dcv_1 =
+#         cat(1,
+#             map(values(calib_dict_1)) do value_1
+#                 reshape(transpose(fluo_data), 1, size(value_1[1])[2:-1:1]...)
+#             end...) ## do value_1
+#     const (mw_ary3_1, k4dcv_2, dcvd_ary3_1, wva_data_2, wva_well_nums_2, dcv_aw_ary3_1) =
+#         dcv_aw(
+#             ary2dcv_1,
+#             true,
+#             channel_nums_1,
+#             db_conn_2,
+#             calib_info_2,
+#             well_nums_2,
+#             well_nums_2,
+#             dye_in,
+#             dyes_2bfild;
+#             aw_out_format = :array)
+#     return CalibCalibOutput(
+#         ary2dcv_1,
+#         mw_ary3_1,
+#         k4dcv_2,
+#         dcvd_ary3_1,
+#         wva_data_2,
+#         dcv_aw_ary3_1)
+# end ## calib_calib
 
 
 ## deprecated to remove MySql dependency
@@ -218,6 +219,3 @@ end ## calib_calib
 #    return calib_dict ## share the same keys as `calib_info`
 #
 # end ## get_full_calib_data
-
-
-#

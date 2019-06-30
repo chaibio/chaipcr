@@ -18,15 +18,32 @@ macro unless(predicate, conditional)
 end
 
 ## used in amp.jl
-## curried function
-indict(d) = x -> haskey(d, x)
+## used in shared.jl
+## currying function
+curry(f) = y -> x -> f(x, y)
 
-## curried functions, flipped
-field(f) = x -> getfield(x, f)
-index(i) = x -> getindex(x, i)
+## flipped functions
+# flop(f)  = y -> x -> f(y, x)
+
+## used in meltcrv.jl
+## thermal_consistency.jl
+field(f) = x -> getfield(x, f)  ## flop(getfield)(f)
 
 ## used in amp.jl
-str2sym(x) = typeof(x) == String ? Symbol(x) : x
+## used in meltcrv.jl
+index(i) = x -> getindex(x, i)  ## flop(getindex)(i)
+
+## used in meltcrv.jl
+## used in shared.jl
+cast(f)  = x -> broadcast(f, x) ## flop(broadcast(f))
+
+## used in amp.jl
+## used in meltcrv.jl
+## curried reporter function, flipped
+roundoff(digits ::Integer) = cast(curry(round)(digits))
+
+## used in amp.jl
+str2sym(x) = isa(x, String) ? Symbol(x) : x
 
 ## used in adj_w2wvaf.jl
 ## used in meltcrv.jl
@@ -40,11 +57,11 @@ normalize_range(x ::AbstractArray) =
 
 ## used in meltcrv.jl
 ## used in shared.jl
-thing(x) = x != nothing
+thing = !isequal(nothing)
 
 ## used in standard_curve.jl
 ## transform `nothing` to NaN
-nothing2NaN(x) = isa(x, Void) ? NaN : x
+nothing2NaN(x) = thing(x) ? x : NaN
 
 ## overloaded log format methods
 # function format(fmt ::DefaultFormatter, rec ::Record)
@@ -145,7 +162,7 @@ extend_NaN(len ::Integer) =
                     error(logger, "vector is too long")
 
 ## extend array elements with NaNs to length of longest element
-extend(x ::AbstractArray) = map(extend_NaN(@p map length x | maximum), x)
+extend(x ::AbstractArray) = map(extend_NaN(@p map length y | maximum), x)
 
 ## used in meltcrv.jl
 ## used in pnmsmu.jl
@@ -276,19 +293,19 @@ end
 ## (e.g. each element is atomic / not an array when `num_layers_lift == 0`,
 ## a vector of atomic elements when `num_layers_lift == 1`,
 ## vector of vector of atomic elements when `num_layers_lift == 2`).
-function reshape_lv(
-    layered_vector ::AbstractVector,
-    num_layers_left ::Integer=0
-)
-    md_array = copy(layered_vector) # safe in case `eltype(layered_vector) <: AbstractArray`
-    while redo(eltype, md_array, num_layers_left + 1) <: AbstractArray
-        md_array = reshape(
-            cat(2, md_array...),
-            length(md_array[1]),
-            size(md_array)...)
-    end
-    return md_array
-end
+# function reshape_lv(
+#     layered_vector ::AbstractVector,
+#     num_layers_left ::Integer=0
+# )
+#     md_array = copy(layered_vector) # safe in case `eltype(layered_vector) <: AbstractArray`
+#     while redo(eltype, md_array, num_layers_left + 1) <: AbstractArray
+#         md_array = reshape(
+#             cat(2, md_array...),
+#             length(md_array[1]),
+#             size(md_array)...)
+#     end
+#     return md_array
+# end
 
 ## legacy function
 ## deprecated to remove MySql dependency
@@ -296,64 +313,59 @@ end
 ## function: check whether a value different from `calib_info_AIR` is passed onto `calib_info`
 ## if not, use `exp_id` to find calibration experiment in MySQL database
 ## and assumes water "step_id"=2, signal "step_id"=4, using FAM to calibrate all the channels.
-function ensure_ci(
-
-    ## remove MySql dependency
-    #
-    # db_conn ::MySQL.MySQLHandle,
-    # calib_info ::Union{Integer,OrderedDict}=calib_info_AIR,
-
-    ## new >>
-    calib_data ::OrderedDict{String,Any},
-    ## << new
-
-    ## use calibration data from experiment `calib_info_AIR` by default
-    exp_id::Integer=calib_info_AIR
-)
-    ## new >>
-    ## not implemented yet
-    return calib_data
-    ## << new
-
-    # if isa(calib_info, Integer)
-    #
-    #     if calib_info == calib_info_AIR
-    #         calib_id = MySQL.mysql_execute(
-    #             db_conn,
-    #             "SELECT calibration_id FROM experiments WHERE id=$exp_id"
-    #         )[1][:calibration_id][1]
-    #     else
-    #         calib_id = calib_info
-    #     end
-    #
-    #     step_qry = "SELECT step_id FROM fluorescence_data WHERE experiment_id=$calib_id"
-    #     step_ids = sort(unique(MySQL.mysql_execute(db_conn, step_qry)[1][:step_id]))
-    #
-    #     calib_info = OrderedDict(
-    #         "water" => OrderedDict(
-    #             "calibration_id" => calib_id,
-    #             "step_id" => step_ids[1]))
-    #
-    #     for i in 2:(length(step_ids))
-    #         calib_info["channel_$(i-1)"] = OrderedDict(
-    #             "calibration_id" => calib_id,
-    #             "step_id" => step_ids[i])
-    #     end ## for
-    #
-    #     channel_qry = "SELECT channel FROM fluorescence_data WHERE experiment_id=$calib_id"
-    #     channels = sort(unique(MySQL.mysql_execute(db_conn, channel_qry)[1][:channel]))
-    #
-    #     for channel in channels
-    #         channel_key = "channel_$channel"
-    #         if !(channel_key in keys(calib_info))
-    #             calib_info[channel_key] = OrderedDict(
-    #                 "calibration_id" => calib_id,
-    #                 "step_id" => step_ids[2])
-    #         end ## if
-    #     end ## for
-    # end ## if isa(calib_info, Integer)
-    # return calib_info
-end ## ensure_ci
+# function ensure_ci(
+#
+#     ## remove MySql dependency
+#     #
+#     # db_conn ::MySQL.MySQLHandle,
+#     # calib_info ::Union{Integer,OrderedDict}=calib_info_AIR,
+#
+#     ## new >>
+#     calib_data  ::OrderedDict{String,Any},
+#     ## << new
+#
+#     ## use calibration data from experiment `calib_info_AIR` by default
+#     exp_id      ::Integer ##=calib_info_AIR
+# )
+#     if isa(calib_info, Integer)
+#    
+#         if calib_info == calib_info_AIR
+#             calib_id = MySQL.mysql_execute(
+#                 db_conn,
+#                 "SELECT calibration_id FROM experiments WHERE id=$exp_id"
+#             )[1][:calibration_id][1]
+#         else
+#             calib_id = calib_info
+#         end
+#    
+#         step_qry = "SELECT step_id FROM fluorescence_data WHERE experiment_id=$calib_id"
+#         step_ids = sort(unique(MySQL.mysql_execute(db_conn, step_qry)[1][:step_id]))
+#    
+#         calib_info = OrderedDict(
+#             "water" => OrderedDict(
+#                 "calibration_id" => calib_id,
+#                 "step_id" => step_ids[1]))
+#    
+#         for i in 2:(length(step_ids))
+#             calib_info["channel_$(i-1)"] = OrderedDict(
+#                 "calibration_id" => calib_id,
+#                 "step_id" => step_ids[i])
+#         end ## for
+#   
+#         channel_qry = "SELECT channel FROM fluorescence_data WHERE experiment_id=$calib_id"
+#         channels = sort(unique(MySQL.mysql_execute(db_conn, channel_qry)[1][:channel]))
+#    
+#         for channel in channels
+#             channel_key = "channel_$channel"
+#             if !(channel_key in keys(calib_info))
+#                 calib_info[channel_key] = OrderedDict(
+#                     "calibration_id" => calib_id,
+#                     "step_id" => step_ids[2])
+#             end ## if
+#         end ## for
+#     end ## if isa(calib_info, Integer)
+#     return calib_info
+# end ## ensure_ci
 
 
 ## legacy function
@@ -375,5 +387,3 @@ end ## ensure_ci
 #     return (found_well_namedtuple, found_well_nums)
 # end
 
-
-#

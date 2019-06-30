@@ -1,4 +1,5 @@
 ## thermal_consistency.jl
+##
 ## 72°C thermal consistency test
 
 import Dierckx: Spline1D, derivative
@@ -14,7 +15,6 @@ function act(
     # calib_info ::Union{Integer,OrderedDict};
     req_dict            ::Associative;
     out_format          ::Symbol = :pre_json,
-    
     ## the following options are never used
     well_nums           ::AbstractVector =[],
     auto_span_smooth    ::Bool =false,
@@ -24,6 +24,7 @@ function act(
     dyes_2bfild         ::AbstractVector =[],
     dcv                 ::Bool =true, ## if true, perform multi-channel deconvolution
     max_tmprtr          ::Real =1000, ## maximum temperature to analyze
+    reporting           =rounding(JSON_DIGITS) ## reporting function
 )
     debug(logger, "at act(::Val{thermal_consistency})")
 
@@ -40,8 +41,7 @@ function act(
         end)
     
     ## process data as melting curve
-    const mc_w72c =
-        try
+    const mc_w72c = try
             process_mc(
                 ## remove MySql dependency
                 # db_conn,
@@ -96,7 +96,8 @@ function act(
     pre_json_out() =
         OrderedDict(
             :tm_check => tm_check_vec,
-            :delta_Tm => (report(JSON_DIGITS, delta_Tm_val), delta_Tm_val .<= MAX_DELTA_TM_VAL),
+            :delta_Tm => (reporting(delta_Tm_val),
+                            delta_Tm_val .<= MAX_DELTA_TM_VAL),
             :valid    => true)
     ## return values
     if     (out_format == :full) full_out()

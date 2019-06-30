@@ -26,7 +26,7 @@ function act(
                 req_dict[RAW_DATA_KEY][key] |> unique             ## in order of appearance
             end
         const (num_cycs, num_fluo_wells, num_channels) =
-            map(length, (cyc_nums, fluo_well_nums, channel_nums))
+            map(UInt8 ∘ length, (cyc_nums, fluo_well_nums, channel_nums))
         try
             assert(req_dict[RAW_DATA_KEY][CYCLE_NUM_KEY] ==
                 repeat(
@@ -80,7 +80,7 @@ function act(
     # end
 
     ## calibration data is required
-    req_key = indict(req_dict)
+    req_key = curry(haskey)(req_dict)
     @unless(req_key(CALIBRATION_INFO_KEY) &&
         typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative,
             return fail(logger,
@@ -171,14 +171,14 @@ function process_amp(
     #
     ## arguments that might be passed by upstream code
     # well_nums ::AbstractVector =[],
-    cyc_nums                ::Vector{I} where I <: Integer,
-    fluo_well_nums          ::Vector{J} where J <: Integer,
+    cyc_nums                ::Vector{UInt8},
+    fluo_well_nums          ::Vector{UInt8},
     channel_nums            ::Vector{String},
-    num_cycs                ::Integer,
-    num_fluo_wells          ::Integer,
-    num_channels            ::Integer,
+    num_cycs                ::UInt8,
+    num_channels            ::UInt8,
+    num_fluo_wells          ::UInt8,
     fr_ary3                 ::DenseArray,
-    calib_data              ::Associative,
+    calib_data              ::CalibData{V},
     ## we will assume that any relevant step/ramp information
     ## has already been passed along and is present in asrp_vec
     asrp_vec                ::Vector{AmpStepRampProperties};
@@ -192,22 +192,22 @@ function process_amp(
     dye_in                  ::Symbol = :FAM,
     dyes_2bfild             ::AbstractVector =[],
     qt_prob_rc              ::Real =0.9, ## quantile probablity for fluo values per well
-    af_key                  ::Symbol = :sfc,
+    am_key                  ::Symbol = :SfcModel, ## :SfcModel, :MAKx, :MAKERGAULx
     ipopt_print2file_prefix ::String ="", ## file prefix for Ipopt print for `mod_bl_q`
     kwdict_rc               ::Associative =Dict(), ## keyword arguments passed onto `report_cq!`,
     kwdict_mbq              ::Associative =Dict(), ## keyword arguments passed onto `mod_bl_q`
     ## allelic discrimination
     ad_cycs                 ::Union{Integer,AbstractVector} =0, ## allelic discrimination: cycles of fluorescence to be used, 0 means the last cycle
     ctrl_well_dict          ::OrderedDict =CTRL_WELL_DICT,
-    cluster_method          ::ClusteringMethod = K_means_medoids(), ## allelic discrimination: K_means(), K_medoids(), K_means_medoids()
+    cluster_method          ::ClusteringMethod = :K_means_medoids, ## allelic discrimination: K_means(), K_medoids(), K_means_medoids()
     norm_l                  ::Real =2, ## norm level for distance matrix, e.g. norm_l = 2 means l2-norm
     expected_ncg_raw        ::AbstractMatrix =DEFAULT_encgr, ## each column is a vector of binary genotype whose length is number of channels (0 => no signal, 1 => yes signal)
     categ_well_vec          ::AbstractVector =CATEG_WELL_VEC,
     ## output options
     out_sr_dict             ::Bool =true, ## output an OrderedDict keyed by `sr_str`s
     out_format              ::Symbol = :json, ## :full, :pre_json, :json
-    json_digits             ::Integer =JSON_DIGITS,
-)
+    reporting               =roundoff(JSON_DIGITS), ## reporting function
+) where {V < :Real}
     ## process amplification per step
     function process_amp_1sr(
         ## remove MySql dependency
@@ -237,7 +237,7 @@ function process_amp(
         function find_ct_fluos()
 
             function find_idc_useful(postbl_stata)
-                idc_useful = find(postbl_stata .== :Optimal)
+                idc_useful = find(postbl_stata .in [:Optimal)
                 @when length(idc_useful) > 0 return idc_useful
                 idc_useful = find(postbl_stata .== :UserLimit)
                 @when length(idc_useful) > 0 return idc_useful
@@ -250,16 +250,16 @@ function process_amp(
             @when length(ct_fluos) > 0 return ct_fluos
             @when cq_method != :ct     return ct_fluos_empty
             ## num_cycs > 2 && length(ct_fluos) == 0 && cq_method == :ct
-            map(range(1, num_channels)) do channel_i
+            map(1:num_channels) do channel_i
                 const mbq_ary1 =
-                    map(range(1, num_fluo_wells)) do well_i
+                    map(1:num_fluo_wells) do well_i
                         mod_bl_q(
                             rbbs_ary3[:, well_i, channel_i];
                             min_reliable_cyc = min_reliable_cyc,
                             baseline_cyc_bounds = _baseline_cyc_bounds[well_i, channel_i],
                             cq_method = :cp_dr1,
-                            ct_fluo = NaN,
-                            af_key = af_key,
+-                            ct_fluo = NaN,
+                            am_key = am_key,
                             kwdict_mbq...)
                     end ## do well_i
                 @p map index(:postbl_status) mbq_ary1 | find_idc_useful | map (mbq_i -> mbq_ary1[mbq_i][:cq_fluo]) | median
@@ -278,12 +278,11 @@ function process_amp(
                         baseline_cyc_bounds = _baseline_cyc_bounds[well_i, channel_i],
                         cq_method = cq_method,
                         ct_fluo = _ct_fluos[channel_i],
-                        af_key = af_key,
+                        am_key = am_key,
                         kwdict_mbq...,
                         ipopt_print2file = ipopt_print2file)
                 end
-                for well_i in range(1, num_fluo_wells),
-                    channel_i in range(1, num_channels)
+                for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
             ]
         end ## calc_mbq_ary2()
 
@@ -291,8 +290,7 @@ function process_amp(
             debug(logger, "at set_fn_mbq!()")
             for fn_mbq in fieldnames(MbqOutput)
                 fv = [  getfield(mbq_ary2[well_i, channel_i], fn_mbq)
-                        for well_i in range(1, num_fluo_wells),
-                            channel_i in range(1, num_channels)     ]
+                        for well_i in 1:num_fluo_wells, channel_i in 1:num_channels     ]
                 if fn_mbq in [:blsub_fluos, :coefs, :blsub_fitted, :dr1_pred, :dr2_pred]
                     fv = reshape(
                             cat(2, fv...), ## 2-dim array of size (`num_cycs` or number of coefs, `num_wells * num_channels`)
@@ -311,14 +309,14 @@ function process_amp(
             debug(logger, "at set_qt_fluos!()")
             full_amp_out.qt_fluos =
                 [   quantile(full_amp_out.blsub_fluos[:, well_i, channel_i], qt_prob_rc)
-                    for well_i in range(1, num_fluo_wells), channel_i in range(1, num_channels) ]
+                    for well_i in 1:num_fluo_wells, channel_i in 1:num_channels             ]
             full_amp_out.max_qt_fluo = maximum(full_amp_out.qt_fluos)
             return nothing ## side effects only
         end
 
         function set_fn_rcq!()
             debug(logger, "at set_fn_rcq!()")
-            for well_i in range(1, num_fluo_wells), channel_i in range(1, num_channels)
+            for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
                 report_cq!(full_amp_out, well_i, channel_i; kwdict_rc...)
             end
             return nothing ## side effects only
@@ -354,7 +352,7 @@ function process_amp(
         #
         const _baseline_cyc_bounds = find_baseline_cyc_bounds()
         const NaN_ary2 = amp_init(NaN)
-        const fitted_init = amp_init(AF_EMPTY_DICT[af_key]) ## once `::Array{EmptyAmpFitted,2}`, can't be `setfield!` to ` ::Array{SfcFitted,2}`, and vice versa
+        const fitted_init = amp_init(AmpModelFit_DICT[am_key]())
         const empty_vals_4cq = amp_init(OrderedDict{Symbol, AbstractFloat}())
         const ct_fluos_empty = fill(NaN, num_channels)
         const _ct_fluos = find_ct_fluos()
@@ -370,7 +368,7 @@ function process_amp(
             wva_data,
             rbbs_ary3,
             fluo_well_nums,
-            collect(range(1, num_channels)), ## channel_nums
+            collect(1:num_channels), ## channel_nums
             cq_method,
             fitted_init, ## fitted_prebl,
             amp_init(Vector{String}()), ## bl_notes
@@ -430,7 +428,7 @@ function process_amp(
             map(fieldnames(AmpStepRampOutput2Bjson)) do fn ## numeric fields only
                 const field_value = getfield(full_amp_out, fn)
                 try
-                    round.(field_value, json_digits)
+                    reporting(field_value)
                 catch
                     field_value
                 end ## try
@@ -622,7 +620,7 @@ end ## process_amp()
 function mod_bl_q(
     fluos               ::AbstractVector;
     min_reliable_cyc    ::Real =5, ## >= 1
-    af_key              ::Symbol = :sfc, ## a string representation of amplification curve model, used for finding the right model `DataType` in `dfc_DICT` and the right empty model instance in `AF_EMPTY_DICT`
+    am_key              ::Symbol = :SfcModel, ## :SfcModel, :MAKx, :MAKERGAULx
     sfc_model_defs      ::OrderedDict{Symbol, SFCModelDef} =MDs,
     bl_method           ::Symbol = :l4_enl,
     baseline_cyc_bounds ::AbstractVector =[],
@@ -644,20 +642,20 @@ function mod_bl_q(
         ## (search step becomes very small but has not converge);
         ## (2) the guessed basedline (`start` of `fb`) is usually
         ## quite close to a sensible baseline.
-        const dfc_inst = dfc_DICT[af_key]()
+        const dfc_inst = Var{AmpModel_DICT[am_key]}()
         const wts = ones(num_cycs)
         const fitted_prebl = fit(dfc_inst, cycs, fluos, wts; kwargs_jmp_model...)
         const baseline =
             fitted_prebl.coefs[1] +
-                af_key in [:MAK3, :MAKERGAUL4] ?
+                am_key in [:MAK3, :MAKERGAUL4] ?
                     fitted_prebl.coefs[2] .* cycs : ## .+ ???
                     0.0
         const fitted_postbl = fitted_prebl
         const coefs_pob = fitted_postbl.coefs
-        const d0_i_vec = find(coef_sym -> coef_sym == :d0, fitted_postbl.coef_syms)
+        const d0_i_vec = find(isequal(:d0), fitted_postbl.coef_syms)
         return MbqOutput(
             fitted_prebl,
-            [af_key], ## bl_notes,
+            [am_key], ## bl_notes,
             fluos .- baseline, ## blsub_fluos
             fitted_postbl,
             fitted_postbl.status,
@@ -675,7 +673,7 @@ function mod_bl_q(
             NaN, ## eff
             NaN  ## cq_fluo
         )
-    end
+    end ## fit_dfc_model()
 
     function fit_sfc_model()
 
@@ -742,9 +740,7 @@ function mod_bl_q(
             const dr2_cfd_left = dr2_cfd[1:min_fluo_cyc]
             const dr2_cfd_right = dr2_cfd[min_fluo_cyc:end]
             const (max_dr2_left_cyc, max_dr2_right_cyc) =
-                map(
-                    dr2_vec -> findmax(dr2_vec)[2],
-                    (dr2_cfd_left, dr2_cfd_right))
+                map(index(2) ∘ findmax, (dr2_cfd_left, dr2_cfd_right))
             if max_dr2_right_cyc <= last_cyc_wt0
                 ## fluo on fitted spline may not be close to raw fluo
                 ## at `cyc_m2l` and `cyc_m2r`
@@ -813,7 +809,7 @@ function mod_bl_q(
         else
             ## do not fit model to find baseline
             const wts = ones(num_cycs)
-            const fitted_prebl = AF_EMPTY_DICT[af_key]
+            const fitted_prebl = AF_EMPTY_DICT[am_key]
             bl_notes = ["no prebl_status", "no fallback"]
             if bl_method == :median
                 const bl_func = median
@@ -895,12 +891,12 @@ function mod_bl_q(
         push!(solver.options, (:output_file, ipopt_print2file))
     end
     ## fit model
-    if (af_key == :sfc)
+    if (am_key == :SfcModel)
         fit_sfc_model()
-    elseif (af_key in (:MAK2, :MAK3, :MAKERGAUL3, :MAKERGAUL4))
+    elseif (am_key in (:MAK2, :MAK3, :MAKERGAUL3, :MAKERGAUL4))
         fit_dfc_model()
     else
-        throw(ArgumentError("`af_key` $af_key is not recognized"))
+        throw(ArgumentError("`am_key` $am_key is not recognized"))
     end ## if
 end ## mod_bl_q()
 

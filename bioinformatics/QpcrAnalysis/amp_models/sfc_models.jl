@@ -2,7 +2,7 @@
 #
 ## models with same formula for each cycle (Sfc models)
 
-import DataStructures.OrderedDict;
+import DataStructures.OrderedDict
 import JuMP: Model, @variable, @constraint, @NLconstraint, @NLobjective,
     solve, getvalue, getobjectivevalue
 
@@ -114,15 +114,12 @@ function add_func_fit!( ## vco = variable constraints objective
     func_expr = Base.parse(func_str) ## not JSON.parse
     md.func_fit = @eval $func_expr
     #
-    return nothing
+    return nothing ## side effects only
 end
 
 
-## generate generic md objects
+## generate generic model definition objects
 for md_ in collect(values(MDs))
     add_funcs_pred!(md_)
     add_func_fit!(md_)
 end
-
-
-#

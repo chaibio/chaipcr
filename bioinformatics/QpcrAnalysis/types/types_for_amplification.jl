@@ -1,12 +1,15 @@
 ## types_for_amplification.jl
+##
+## requires types_for_allelic_discrimination.jl
+## for type AssignGenosResult
+##
+## requires types_for_calibration.jl
+## for type K4Deconv
 
 import DataStructures.OrderedDict
 
 
-## types
-
-abstract type            AbstractAmpFitted end
-struct EmptyAmpFitted <: AbstractAmpFitted end
+abstract type AmpModelFit end
 
 struct AmpStepRampProperties
     step_or_ramp    ::String
@@ -16,10 +19,10 @@ end
 
 ## `mod_bl_q` output
 struct MbqOutput
-    fitted_prebl    ::AbstractAmpFitted
+    fitted_prebl    ::AmpModelFit
     bl_notes        ::Vector{String}
     blsub_fluos     ::Vector{Float_T}
-    fitted_postbl   ::AbstractAmpFitted
+    fitted_postbl   ::AmpModelFit
     postbl_status   ::Symbol
     coefs           ::Vector{Float_T}
     d0              ::Float_T
@@ -49,10 +52,10 @@ mutable struct AmpStepRampOutput
     channel_nums    ::Vector{Integer}
     cq_method       ::Symbol
     ## computed by `mod_bl_q` as part of `MbqOutput` and arranged in arrays in `process_amp_1sr`
-    fitted_prebl    ::Array{AbstractAmpFitted,2}
+    fitted_prebl    ::Array{AmpModelFit,2}
     bl_notes        ::Array{Array{String,1},2}
     blsub_fluos     ::Array{Float_T,3}
-    fitted_postbl   ::Array{AbstractAmpFitted,2}
+    fitted_postbl   ::Array{AmpModelFit,2}
     postbl_status   ::Array{Symbol,2}
     coefs           ::Array{Float_T,3}
     d0              ::Array{Float_T,2}

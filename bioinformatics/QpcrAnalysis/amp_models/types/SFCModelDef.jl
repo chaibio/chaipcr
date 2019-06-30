@@ -1,26 +1,10 @@
-## types_for_sfc_models.jl
+## SFCModelDef.jl
+##
+## Author: Tom Price
+## Date:   June 2019
 
 import DataStructures.OrderedDict
-using JuMP
 
-
-## sfc: same formula for each cycle
-struct SfcFitted <: AbstractAmpFitted
-    coef_strs   ::Vector{String}
-    coefs       ::Vector{Float_T}
-    status      ::Symbol
-    obj_val     ::AbstractFloat
-    jmp_model   ::JuMP.Model
-    init_coefs  ::OrderedDict{String,Float_T}
-end
-const SfcFitted_EMPTY = SfcFitted(
-    Vector{String}(),   ## coef_strs
-    zeros(0),           ## coefs
-    :not_fitted,        ## status
-    0.0,                ## obj_val
-    JuMP.Model(),
-    OrderedDict{String,Float_T}() ## init_coefs
-)
 
 mutable struct SFCModelDef ## non-linear model, one feature (`x`)
     ## included in SFC_MODEL_BASE
@@ -451,13 +435,12 @@ const SFC_MODEL_BASES = [ ## vector of tuples
     )
 ]
 
-## generate generic md objects
+## generate generic model definition objects
 const MDs = OrderedDict(map(SFC_MODEL_BASES) do sfc_model_base
     sfc_model_base[1] => SFCModelDef(
         sfc_model_base...,
-        deepcopy(MD_EMPTY_vals)...
-    )
-end) ## do generic_sfc_model_base
+        deepcopy(MD_EMPTY_vals)...)
+end) ## do sfc_model_base
 
 ## choose model for amplification curve fitting
 const AMP_MODEL_NAME = :l4_enl

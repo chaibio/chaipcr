@@ -1,4 +1,6 @@
 ## dispatch.jl
+##
+## dispatches API GET requests to the appropriate act() method
 
 import JSON: parse, json
 import DataStructures.OrderedDict
@@ -27,7 +29,7 @@ function dispatch(
         ## Since the data structures are specific to each action,
         ## this should generally be done in the generic act() methods.
 
-        if !(action in keys(Action_DICT))
+        if !(action in actions)
             error(logger, "action $action_s is not recognized")
         end
         ## else

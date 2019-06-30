@@ -1,4 +1,4 @@
-## supsmu.jl
+f## supsmu.jl
 #
 ## wrapper for Fortran subroutine `supsmu` (Friedman 1984)
 

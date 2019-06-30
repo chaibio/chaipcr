@@ -8,6 +8,9 @@
 
 import DataArrays.DataArray
 
+include("peak.jl")
+include("peakindices.jl")
+
 
 ## types
 
@@ -53,14 +56,6 @@ struct Peak
     area            ::Float_T
 end
 
-struct PeakIndices
-    summit_heights  ::Vector{Float_T}
-    summit_idc      ::Vector{Int}
-    nadir_idc       ::Vector{Int}
-    len_summit_idc  ::Int
-    len_nadir_idc   ::Int
-    PeakIndices(h,s,n) = new(vcat(h,0), vcat(s,0), vcat(n,0), length(s), length(n))
-end
 
 ## types used in thermal_consistency.jl
 

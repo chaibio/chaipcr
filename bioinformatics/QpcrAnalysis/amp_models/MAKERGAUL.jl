@@ -8,6 +8,21 @@ import JuMP: Model, @variable, @constraint, @NLconstraint, @NLobjective,
     solve, getvalue, getobjectivevalue
 
 
+## bounds
+const fb_B_MULTIPLE     = 1.9
+const d0_LB             = 1e-14
+const d0_UB             = Inf ## used: 0.1 (Bultmann 2013)
+const eu0_inh_LB        = 0.0001
+const eu0_UB_MULTIPLE   = 10
+const inh_UB_MULTIPLE   = 10
+
+## start values
+const eu0_START             = 7e3  ## used: eu0_inh_LB, 0.01, 1, 50
+const MAKERGAUL_d0_START    = 1    ## used: 0, 1e-14 (change_d3), 0.01, 1 (change_d2), 50 (change_d1)
+const inh_START             = 4e-6 ## used: eu0_inh_LB (Infeasible for flat line), 0, 0.05, 1, (Invalid_Number_Detected for flat line), 10 (Infeasible for flat line), 50 `:Optimal` when `max_of_idx == 1`, "Invalid_Number_Detected" for the rest: eu0_START = 0.01, inh_START = 0; eu0_START = 50, inh_START = 0.05; eu0_START = 50, inh_START = 1; eu0_START = 50, inh_START = 50;
+
+
+# function definitions
 
 function pred_from_nm1(
     ::Union{MAKERGAUL3, MAKERGAUL4},
@@ -18,7 +33,7 @@ function pred_from_nm1(
     eu_n = eu_nm1 / (1 + inh * d_nm1)
     d_n = d_nm1 + d_nm1 * eu_n / (eu_n + d_nm1)
     return [eu_n d_n]
-end
+end ## pred_from_nm1()
 
 
 function pred_from_cycs( ## 0.7to1.2e-5 sec for 40 cycles on PC
@@ -41,8 +56,7 @@ function pred_from_cycs( ## 0.7to1.2e-5 sec for 40 cycles on PC
     end
     fs_w0 = pred_ary_eu_d_w0[:, 2] + fb
     return fs_w0[2:end][map(Int, cycs)]
-end
-
+end ## pred_from_cycs(::MAKERGAUL3)
 
 function pred_from_cycs(
     ::MAKERGAUL4,
@@ -64,8 +78,7 @@ function pred_from_cycs(
         i += 1
     end
     return fb + bl_k * cycs .+ pred_ary_eu_d_w0[:, 2][2:end][map(Int, cycs)]
-end
-
+end ## pred_from_cycs(::MAKERGAUL4)
 
 function fit(
     ::MAKERGAUL3,
@@ -156,7 +169,6 @@ function fit(
         # init_coefs
     )
 end ## fit(::MAKERGAUL3)
-
 
 function fit(
     ::MAKERGAUL4,
@@ -260,6 +272,3 @@ function fit(
         # init_coefs
     )
 end ## fit(::MAKERGAUL4)
-
-
-#
