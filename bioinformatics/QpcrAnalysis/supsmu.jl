@@ -1,4 +1,4 @@
-f## supsmu.jl
+## supsmu.jl
 #
 ## wrapper for Fortran subroutine `supsmu` (Friedman 1984)
 
@@ -18,11 +18,11 @@ function supsmu(
     debug(logger, "at supsmu()")
 
     n = length(X)
-    @when ndims(X) > 1 || ndims(Y) > 1  throw(ArgumentError, "X and Y must be 1-dimensional")
-    @when length(Y) != n                throw(ArgumentError, "X and Y must be equal in length")
-    @when n < 3                         warn(logger, "lengths of X and Y are less than 3, " *
+    (ndims(X) > 1 || ndims(Y) > 1) && throw(ArgumentError, "X and Y must be 1-dimensional")
+    (length(Y) != n)               && throw(ArgumentError, "X and Y must be equal in length")
+    (n < 3)                        && warn(logger, "lengths of X and Y are less than 3, " *
                                             "no smoothing will be performed")
-    @when span < 0 || span > 1          throw(ArgumentError, "`span` must be between 0 and 1")
+    (span < 0 || span > 1)         && throw(ArgumentError, "`span` must be between 0 and 1")
     if periodic && (minimum(x) < 0 || maximum(x) > 1) ## iper = 2
         throw(ArgumentError, "if X is assumed to be periodic, its values must be between 0 and 1")
     end
@@ -39,7 +39,7 @@ function supsmu(
 
     ## convert types for compatibility with Fortran `supsmu`
     X, Y, span, wt, alpha_bass =
-        map(Float32, (Array(X), Array(Y), span, wt, alpha_bass))
+        (Array(X), Array(Y), span, wt, alpha_bass) |> cast(cast(Float32))
     n, iper = map(Int32, (n, iper))
 
     ## variables to be modified

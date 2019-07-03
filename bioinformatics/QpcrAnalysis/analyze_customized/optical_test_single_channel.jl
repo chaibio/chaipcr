@@ -5,6 +5,7 @@ import JSON.json
 import Memento.debug
 
 
+## called by dispatch()
 function act(
     ::Val{optical_test_single_channel},
     ## remove MySql dependency
@@ -63,8 +64,5 @@ function act(
     const output = OrderedDict(
         :optical_data => results,
         :valid        => all_valid)
-    return (out_format == :json) && JSON.json(output) || output
-end ## act()
-
-
-#
+    return output |> out(out_format)
+end ## act(::Val{optical_test_single_channel})

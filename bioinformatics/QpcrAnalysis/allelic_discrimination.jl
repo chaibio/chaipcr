@@ -6,12 +6,11 @@ import DataStructures.OrderedDict
 import Clustering: ClusteringResult, kmeans!, kmedoids!, silhouettes
 import Combinatorics.combinations
 import StatsBase.counts
-import FunctionalData.@p
 import Memento: debug, info, error
 
 
 ## nrn: whether to flip the binary genotype or not
-NRN_SELF = id
+NRN_SELF = identity
 NRN_NOT  = x -> 1 .- x
 
 
@@ -137,7 +136,7 @@ function do_cluster_analysis(
                         prod(gi_idx_e -> dist_mtx[gi_idx_ne, gi_idx_e] - dist_edge, edge) <= 0.0
 
                     edge_always_second_longest() =
-                        @p setdiff gi_idc edge | is_second_longest | all
+                        setdiff(gi_idc, edge) |> is_second_longest |> all
                     ## end of function definitions nested within calc_dist_within_margin_max()
 
                     ## vectorized code
@@ -145,7 +144,7 @@ function do_cluster_analysis(
                     dist_edge = 0.0
                     for edge in combinations(gi_idc, 2)
                         dist_edge = dist_mtx[edge...]
-                        @when edge_always_second_longest() return dist_edge
+                        edge_always_second_longest() && return dist_edge
                     end
                     0.0
                     ## devectorized code
@@ -173,9 +172,9 @@ function do_cluster_analysis(
                 end ## calc_dist_within_margin_max()
                 ## end of function definition nested within dist_within_margin_max()
 
-                @when sum_gi_bool_vec <= 1 return 0.0
+                (sum_gi_bool_vec <= 1) && return 0.0
                 const gi_idc = well_idc[gi_bool_vec]
-                @when sum_gi_bool_vec == 2 return getindex(dist_mtx, gi_idc...)
+                (sum_gi_bool_vec == 2) && return getindex(dist_mtx, gi_idc...)
                 calc_dist_within_margin_max()
             end
             ## end of function definitions nested within check_grp()
@@ -335,7 +334,7 @@ function assign_genos(
                         break
                     end
             end ## for num_expected_ncg
-            @when good_enough break
+            good_enough && break
             num_genos -= 1
         end ## while
         ## find the best model (possible combination of genotypes
@@ -441,7 +440,7 @@ function assign_genos(
             _new_center_idc[ntc_center_idc] =
                 find(geno_idc_all) do geno_idx
                     all(expected_genos_all[:, geno_idx] .== [1, 1])
-                end)[1]
+                end[1]
         end ## if
     end ## ntc2hetero!()
     #

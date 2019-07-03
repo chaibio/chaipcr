@@ -5,18 +5,16 @@
 import JSON: parse
 import DataStructures.OrderedDict
 import Ipopt: IpoptSolver #, NLoptSolver
-import FunctionalData.@p
 import Memento: debug, warn, error
 using Ipopt
 
-## called by QpcrAnalysis.dispatch
+
+## called by dispatch
 function act(
     ::Val{amplification},
     req_dict        ::Associative;
     out_format      ::Symbol = :pre_json
 )
-    debug(logger, "at act(::Val{amplification})")
-
     ## issue:
     ## the following assumes only 1 step/ramp because the current data format
     ## does not allow us to break the fluorescence data down by step_id/ramp_id
@@ -26,7 +24,7 @@ function act(
                 req_dict[RAW_DATA_KEY][key] |> unique             ## in order of appearance
             end
         const (num_cycs, num_fluo_wells, num_channels) =
-            map(UInt8 ∘ length, (cyc_nums, fluo_well_nums, channel_nums))
+            map(length, (cyc_nums, fluo_well_nums, channel_nums))
         try
             assert(req_dict[RAW_DATA_KEY][CYCLE_NUM_KEY] ==
                 repeat(
@@ -69,6 +67,10 @@ function act(
             fr_ary3[cyc_perm,well_perm,chan_perm])
     end ## parse_raw_data()
 
+    ## << end of function definition nested within amp()
+
+    debug(logger, "at act(::Val{amplification})")
+
     ## remove MySql dependency
     ## asrp_vec
     # if "step_id" in keys_req_dict
@@ -81,11 +83,11 @@ function act(
 
     ## calibration data is required
     req_key = curry(haskey)(req_dict)
-    @unless(req_key(CALIBRATION_INFO_KEY) &&
-        typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative,
-            return fail(logger,
-                        ArgumentError("no calibration information found"),
-                        out_format))
+    if !(req_key(CALIBRATION_INFO_KEY) &&
+        typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative)
+            return fail(logger, ArgumentError(
+                "no calibration information found")) |> out(out_format)
+    end
 
     ## we will assume that any relevant step/ramp information has already been passed along
     ## and is present in step_id / ramp_id
@@ -97,12 +99,12 @@ function act(
     const asrp_vec = [AmpStepRampProperties(:ramp, req_dict[sr_key], DEFAULT_cyc_nums)]
     ## `report_cq!` arguments
     const kwdict_rc = Dict{Symbol,Any}(
-        map(@p keys KWDICT_RC_SYMBOLS   | collect | filter req_key) do key
+        map(KWDICT_RC_SYMBOLS   |> keys |> collect |> sift(req_key)) do key
             KWDICT_RC_SYMBOLS[key] => req_dict[key]
         end) ## map
     ## `process_amp_1sr` arguments
     const kwdict_pa1 = Dict{Symbol,Any}(
-        map(@p keys KWDICT_PA1_KEYWORDS | collect | filter req_key) do key
+        map(KWDICT_PA1_KEYWORDS |> keys |> collect |> sift(req_key)) do key
             if (key == CATEG_WELL_VEC_KEY)
                 :categ_well_vec =>
                     map(req_dict[CATEG_WELL_VEC_KEY]) do x
@@ -151,9 +153,9 @@ function act(
             out_sr_dict = false,
             kwdict_pa1...)
     catch err
-        return fail(logger, err, out_format; bt=true)
+        return fail(logger, err; bt=true) |> out(out_format)
     end ## try
-    return (out_format == :json) ? JSON.json(response) : response
+    return response |> out(out_format)
 end ## act(::Val{amplification})
 
 
@@ -171,14 +173,14 @@ function process_amp(
     #
     ## arguments that might be passed by upstream code
     # well_nums ::AbstractVector =[],
-    cyc_nums                ::Vector{UInt8},
-    fluo_well_nums          ::Vector{UInt8},
+    cyc_nums                ::Vector{<: Integer},
+    fluo_well_nums          ::Vector{<: Integer},
     channel_nums            ::Vector{String},
-    num_cycs                ::UInt8,
-    num_channels            ::UInt8,
-    num_fluo_wells          ::UInt8,
-    fr_ary3                 ::DenseArray,
-    calib_data              ::CalibData{V},
+    num_cycs                ::Integer,
+    num_fluo_wells          ::Integer,
+    num_channels            ::Integer,
+    fr_ary3                 ::Array{<: Real,3},
+    calib_data              ::Associative,
     ## we will assume that any relevant step/ramp information
     ## has already been passed along and is present in asrp_vec
     asrp_vec                ::Vector{AmpStepRampProperties};
@@ -199,7 +201,7 @@ function process_amp(
     ## allelic discrimination
     ad_cycs                 ::Union{Integer,AbstractVector} =0, ## allelic discrimination: cycles of fluorescence to be used, 0 means the last cycle
     ctrl_well_dict          ::OrderedDict =CTRL_WELL_DICT,
-    cluster_method          ::ClusteringMethod = :K_means_medoids, ## allelic discrimination: K_means(), K_medoids(), K_means_medoids()
+    cluster_method          ::ClusteringMethod = K_means_medoids, ## allelic discrimination: K_means(), K_medoids(), K_means_medoids()
     norm_l                  ::Real =2, ## norm level for distance matrix, e.g. norm_l = 2 means l2-norm
     expected_ncg_raw        ::AbstractMatrix =DEFAULT_encgr, ## each column is a vector of binary genotype whose length is number of channels (0 => no signal, 1 => yes signal)
     categ_well_vec          ::AbstractVector =CATEG_WELL_VEC,
@@ -207,7 +209,7 @@ function process_amp(
     out_sr_dict             ::Bool =true, ## output an OrderedDict keyed by `sr_str`s
     out_format              ::Symbol = :json, ## :full, :pre_json, :json
     reporting               =roundoff(JSON_DIGITS), ## reporting function
-) where {V < :Real}
+)
     ## process amplification per step
     function process_amp_1sr(
         ## remove MySql dependency
@@ -237,18 +239,18 @@ function process_amp(
         function find_ct_fluos()
 
             function find_idc_useful(postbl_stata)
-                idc_useful = find(postbl_stata .in [:Optimal)
-                @when length(idc_useful) > 0 return idc_useful
+                idc_useful = find(postbl_stata .== :Optimal)
+                (length(idc_useful) > 0) && return idc_useful
                 idc_useful = find(postbl_stata .== :UserLimit)
-                @when length(idc_useful) > 0 return idc_useful
+                (length(idc_useful) > 0) && return idc_useful
                 return 1:length(postbl_status)
             end ## find_idc_useful(postbl_stata)
             ## end of function definition nested within find_ct_fluos()
 
             debug(logger, "at find_ct_fluos()")
-            @when num_cycs <= 2        return ct_fluos
-            @when length(ct_fluos) > 0 return ct_fluos
-            @when cq_method != :ct     return ct_fluos_empty
+            (num_cycs <= 2)        && return ct_fluos
+            (length(ct_fluos) > 0) && return ct_fluos
+            (cq_method != :ct)     && return ct_fluos_empty
             ## num_cycs > 2 && length(ct_fluos) == 0 && cq_method == :ct
             map(1:num_channels) do channel_i
                 const mbq_ary1 =
@@ -258,11 +260,15 @@ function process_amp(
                             min_reliable_cyc = min_reliable_cyc,
                             baseline_cyc_bounds = _baseline_cyc_bounds[well_i, channel_i],
                             cq_method = :cp_dr1,
--                            ct_fluo = NaN,
+                            ct_fluo = NaN,
                             am_key = am_key,
                             kwdict_mbq...)
                     end ## do well_i
-                @p map index(:postbl_status) mbq_ary1 | find_idc_useful | map (mbq_i -> mbq_ary1[mbq_i][:cq_fluo]) | median
+                mbq_ary1 |>
+                    mold(index(:postbl_status)) |>
+                    find_idc_useful |>
+                    mold(mbq_i -> mbq_ary1[mbq_i][:cq_fluo]) |>
+                    median
             end ## do channel_i
         end ## find_ct_fluos()
 
@@ -422,7 +428,7 @@ function process_amp(
         # end # if dcv
         #
         ## format output
-        @when out_format == :full return full_amp_out
+        (out_format == :full) && return full_amp_out
         ## else
         AmpStepRampOutput2Bjson(
             map(fieldnames(AmpStepRampOutput2Bjson)) do fn ## numeric fields only
@@ -804,8 +810,9 @@ function mod_bl_q(
             baseline = sfc_model_defs[bl_method].funcs_pred[:bl](cycs, fitted_prebl.coefs...) ## may be changed later
             blsub_fluos = fluos .- baseline
             bl_notes = sfc_prebl_status(fitted_prebl.status)
-            @when(length(bl_notes) >= 2 && bl_notes[2] == "fallback",
-                const bl_func = bl_fallback_func)
+            if length(bl_notes) >= 2 && bl_notes[2] == "fallback"
+                const bl_func = bl_fallback_func
+            end
         else
             ## do not fit model to find baseline
             const wts = ones(num_cycs)
@@ -949,7 +956,7 @@ function report_cq!(
         else
             ""
         end ## why_NaN
-    @when (why_NaN != "") full_amp_out.cq[well_i, channel_i] = NaN
+    (why_NaN != "") && (full_amp_out.cq[well_i, channel_i] = NaN)
     #
     for tup in (
         (:max_bsf,      max_bsf),
@@ -961,6 +968,3 @@ function report_cq!(
     end
     return nothing ## side effects only
 end ## report_cq!
-
-
-#

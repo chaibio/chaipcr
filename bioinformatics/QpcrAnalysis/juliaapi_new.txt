@@ -32,8 +32,8 @@ experiments/:experiment_id/amplification
 
 request body:
 {
-    "experiment_id": xx,
-    "step_id/ramp_id": xx,
+    "experiment_id": integer,
+    "step_id/ramp_id": integer,
     "min_reliable_cyc": 5,
     "calibration_info": {
         "water": {
@@ -50,7 +50,7 @@ request body:
         }
     },
     "baseline_cyc_bounds": [],
-    "baseline_method": "sigmoid" (auto) or "linear" or "median",
+    "baseline_method": "sigmoid" (default) or "linear" or "median",
     "cq_method": "Cy0",
     "min_fluomax": 4356,
     "min_D1max": 472,
@@ -99,7 +99,7 @@ SELECT fluorescence_value, well_num, cycle_num, channel
 
 success response body:
 {
-    "rbbs_ary3": [ # after deconvolution (if dual channel) and adjusting well-to-well variation, before baseline subtraction
+    "rbbs_ary3": [ # a.k.a. "calibrated"
         [
             [channel_1__well_01__cycle_01, channel_1__well_01__cycle_02, ... channel_1__well_01__cycle_40],
             [channel_1__well_02__cycle_01, channel_1__well_02__cycle_02, ... channel_1__well_02__cycle_40],
@@ -168,10 +168,10 @@ request body:
     "max_normd_qtv": 0.8,
     "top_N": 4 # number of Tm peaks to report
     "raw_data": {
-    "fluorescence_value":[],
-    "temperature":[],
-    "well_num":[],
-    "channel":[]
+        "fluorescence_value":[],
+        "temperature":[],
+        "well_num":[],
+        "channel":[]
     }
 }
 

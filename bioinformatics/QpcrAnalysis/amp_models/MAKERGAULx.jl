@@ -1,5 +1,5 @@
-## MAKERGAUL.jl
-#
+## MAKERGAULx.jl
+##
 ## different formula for each cycle (dfc)
 
 ## write functions to fit MAKERGAUL model here, which will be called in `mod_bl_q` in "amp.jl"
@@ -22,10 +22,10 @@ const MAKERGAUL_d0_START    = 1    ## used: 0, 1e-14 (change_d3), 0.01, 1 (chang
 const inh_START             = 4e-6 ## used: eu0_inh_LB (Infeasible for flat line), 0, 0.05, 1, (Invalid_Number_Detected for flat line), 10 (Infeasible for flat line), 50 `:Optimal` when `max_of_idx == 1`, "Invalid_Number_Detected" for the rest: eu0_START = 0.01, inh_START = 0; eu0_START = 50, inh_START = 0.05; eu0_START = 50, inh_START = 1; eu0_START = 50, inh_START = 50;
 
 
-# function definitions
+## function definitions
 
 function pred_from_nm1(
-    ::Union{MAKERGAUL3, MAKERGAUL4},
+    ::Union{Val{:MAKERGAUL3}, Val{:MAKERGAUL4}},
     eu_nm1      ::Real,
     d_nm1       ::Real,
     inh         ::Real
@@ -37,7 +37,7 @@ end ## pred_from_nm1()
 
 
 function pred_from_cycs( ## 0.7to1.2e-5 sec for 40 cycles on PC
-    ::MAKERGAUL3,
+    ::Val{:MAKERGAUL3},
     cycs2fit    ::AbstractVector,
     fb          ::Real,
     eu0         ::Real,
@@ -56,10 +56,10 @@ function pred_from_cycs( ## 0.7to1.2e-5 sec for 40 cycles on PC
     end
     fs_w0 = pred_ary_eu_d_w0[:, 2] + fb
     return fs_w0[2:end][map(Int, cycs)]
-end ## pred_from_cycs(::MAKERGAUL3)
+end ## pred_from_cycs(::Val{:MAKERGAUL3})
 
 function pred_from_cycs(
-    ::MAKERGAUL4,
+    ::Val{:MAKERGAUL4},
     cycs        ::AbstractVector,
     fb          ::Real,
     bl_k        ::Real,
@@ -81,7 +81,7 @@ function pred_from_cycs(
 end ## pred_from_cycs(::MAKERGAUL4)
 
 function fit(
-    ::MAKERGAUL3,
+    ::Val{:MAKERGAUL3},
     cycs        ::AbstractVector, ## continous integers or not
     obs_fluos   ::AbstractVector,
     wts         ::AbstractVector =ones(length(obs_fluos));
@@ -168,10 +168,10 @@ function fit(
         jmp_model,
         # init_coefs
     )
-end ## fit(::MAKERGAUL3)
+end ## fit(::Val{:MAKERGAUL3})
 
 function fit(
-    ::MAKERGAUL4,
+    ::Val{:MAKERGAUL4},
     cycs        ::AbstractVector, ## continous integers or not
     obs_fluos   ::AbstractVector,
     wts         ::AbstractVector=ones(length(obs_fluos));
@@ -271,4 +271,4 @@ function fit(
         jmp_model,
         # init_coefs
     )
-end ## fit(::MAKERGAUL4)
+end ## fit(::Val{:MAKERGAUL4})

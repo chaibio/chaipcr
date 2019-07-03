@@ -1,11 +1,11 @@
 ## sfc_models.jl
-#
+##
 ## models with same formula for each cycle (Sfc models)
 
 import DataStructures.OrderedDict
-import JuMP: Model, @variable, @constraint, @NLconstraint, @NLobjective,
-    solve, getvalue, getobjectivevalue
+using JuMP
 
+## function definitions
 
 function add_funcs_pred!(
     md          ::SFCModelDef,
@@ -102,7 +102,7 @@ function add_func_fit!( ## vco = variable constraints objective
         "coef_strs = [\"$(join(md.coef_strs, "\", \""))\"]",
         "coefs = map(getvalue, [$(join(md.coef_strs, ", "))])",
         "obj_val = getobjectivevalue(jmp_model)",
-        "return SfcFitted(coef_strs, coefs, status, obj_val, jmp_model, init_coefs); end"
+        "return SfcModelFit(coef_strs, coefs, status, obj_val, jmp_model, init_coefs); end"
     ], "; ")
     #
     ## add definition of func_fit
@@ -118,8 +118,39 @@ function add_func_fit!( ## vco = variable constraints objective
 end
 
 
+
+## constants (MD_ = model definition)
+
+## when `num_fts > 1`, "d*" are partial derivatives in vector of length `num_fts`
+const MD_func_keys = [:f, :inv, :bl, :dr1, :dr2]
+
+# function empty_func() end
+# function empty_func(arg1::Any=0, args...; kwargs...) end
+function empty_func(args...; kwargs...) end
+
+## `EMPTY_fp` for `func_pred_strs` and `funcs_pred`
+const EMPTY_fp = map(("", empty_func)) do empty_val
+    # OrderedDict(map(MD_func_keys) do func_key ## v0.4, `supertype` not defined, `typeof(some_function) == Function`
+    OrderedDict{Symbol,supertype(typeof(empty_val))}(map(MD_func_keys) do func_key ## v0.5, `super` becomes `supertype`, `typeof(some_function) == some_function AND supertype(typeof(some_function)) == Function`
+        func_key => empty_val
+    end) ## do func_key
+end ## do empty_val
+
 ## generate generic model definition objects
-for md_ in collect(values(MDs))
+const MD_EMPTY_vals = (
+    EMPTY_fp...,    ## :func_pred_strs, :funcs_pred
+    "",             ## func_fit_str
+    empty_func)     ## func_fit
+const MDs = OrderedDict(map(SFC_MODEL_BASES) do sfc_model_base
+    sfc_model_base[1] => SFCModelDef(
+        sfc_model_base...,
+        deepcopy(MD_EMPTY_vals)...)
+end)
+for md_ in values(MDs)
     add_funcs_pred!(md_)
     add_func_fit!(md_)
 end
+
+## choose model for amplification curve fitting
+const AMP_MODEL_NAME = :l4_enl
+const AMP_MD = MDs[AMP_MODEL_NAME]

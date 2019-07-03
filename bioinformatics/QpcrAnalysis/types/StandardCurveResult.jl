@@ -1,11 +1,12 @@
-## types_for_standard_curve.jl
-#
+## StandardCurveResult.jl
+##
 ## Author: Tom Price
 ## Date: Dec 2018
 
-abstract type Result end
 
-immutable TargetResultEle <: Result
+abstract type StandardCurveResult end
+
+struct TargetResultEle <: StandardCurveResult
     target_id   ::Int
     slope       ::Float_T
     offset      ::Float_T
@@ -14,7 +15,7 @@ immutable TargetResultEle <: Result
 end
 const EMPTY_TRE = TargetResultEle(0, fill(NaN, 4)...)
 
-immutable GroupResultEle <: Result
+struct GroupResultEle <: StandardCurveResult
     well        ::Vector{Int}
     target_id   ::Int
     cq_mean     ::Float_T

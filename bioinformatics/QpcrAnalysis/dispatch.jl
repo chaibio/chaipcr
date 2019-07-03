@@ -4,11 +4,11 @@
 
 import JSON: parse, json
 import DataStructures.OrderedDict
-import Memento: debug, warn, error
+    import Memento: debug, warn, error
 
 
 function dispatch(
-    action          ::Symbol,
+        action          ::Symbol,
     request_body    ::AbstractString;
     verify          ::Bool =false
 )
@@ -29,7 +29,7 @@ function dispatch(
         ## Since the data structures are specific to each action,
         ## this should generally be done in the generic act() methods.
 
-        if !(action in actions)
+        if !(action in keys(Action_DICT))
             error(logger, "action $action_s is not recognized")
         end
         ## else
@@ -49,7 +49,9 @@ function dispatch(
 
         debug(logger, "dispatching to act() from dispatch()")
         const response = act(action_t, req_parsed; out_format = :pre_json)
+        println("response received")
         debug(logger, "response received from act() by dispatch()")
+        debug(logger, repr(response))
         const json_response = JSON.json(response)
 
         @static if !production_env
@@ -67,8 +69,7 @@ function dispatch(
         json_response
 
     catch err
-        fail(logger, err, :pre-json, bt=true)
-        err
+        fail(logger, err; bt=true)
     end ## result = try
 
     const success = !isa(result, Exception)

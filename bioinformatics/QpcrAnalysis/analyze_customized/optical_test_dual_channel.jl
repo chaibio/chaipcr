@@ -5,6 +5,7 @@ import JSON.json
 import Memento: debug, warn
 
 
+## called by dispatch()
 function act(
     ::Val{optical_test_dual_channel},
     ## remove MySqldependency
@@ -143,8 +144,8 @@ function act(
                 sc_dye = self_calib_vec[channel_i]
                 [:FAM, :HEX][channel_i] => round.(sc_dye[1] ./ sc_dye[2], JSON_DIGITS)
             end) # do channel_i
-    if !(@p values ch12_ratios | collect | map (x -> all(isfinite.(x))) | all) ||
-        (@p values ch12_ratios | collect | map (x -> any(x .<= 0))      | any)
+    if !(ch12_ratios |> values |> collect |> mold(x -> all(isfinite.(x))) |> all) ||
+        (ch12_ratios |> values |> collect |> mold(x -> any(x .<= 0))      |> any)
             push!(error_msgs, "zero, negative, or infinite values of channel 1 : channel 2 ratio")
             warn(logger, error_msgs[end])
     end
@@ -155,8 +156,5 @@ function act(
         Symbol("Ch1:Ch2")   => ch12_ratios,
         :valid              => length(error_msgs) == 0,
         :error              => join(error_msgs, "; "))
-    return (out_format == :json) && JSON.json(output) || output
-end ## act()
-
-
-#
+    return output |> out(out_format)
+end ## act(::Val{optical_test_dual_channel})

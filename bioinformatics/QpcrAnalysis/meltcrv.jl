@@ -6,11 +6,10 @@ import DataStructures.OrderedDict
 import DataArrays.DataArray
 import StatsBase: rle
 import Dierckx: Spline1D, derivative
-import FunctionalData: @p, id
 import Memento: debug, info, warn, error
 
 
-## called by QpcrAnalyze.dispatch
+## called by dispatch()
 function act(
     ::Val{meltcurve},
     req_dict    ::Associative;
@@ -19,11 +18,11 @@ function act(
     debug(logger, "at act(::Val{meltcurve})")
 
     ## calibration data is required    
-    @unless(req_key(CALIBRATION_INFO_KEY) &&
-        typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative,
-            return fail(logger,
-                        ArgumentError("no calibration information found"),
-                        out_format))
+    if !(haskey(req_dict,CALIBRATION_INFO_KEY) &&
+        typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative)
+            return fail(logger, ArgumentError(
+                "no calibration information found")) |> out(out_format)
+    end
 
     # kwdict_pmc = OrderedDict{Symbol,Any}()
     # for key in ["channel_nums"]
@@ -45,11 +44,11 @@ function act(
             out_format = out_format,
             # kwdict_pmc...,
             kwdict_mc_tm_pw = kwdict_mc_tm_pw)
-        catch err
-            return fail(logger, err, out_format; bt=true)
-        end ## try
-    return (out_format == :json) ? JSON.json(response) : response
-end ## act()
+    catch err
+        return fail(logger, err; bt=true) |> out(out_format)
+    end ## try
+    return response |> out(out_format)
+end ## act(::Val{meltcurve})
 
 
 ## Top-level function: get melting curve data and Tm for a melt curve experiment
@@ -70,6 +69,8 @@ function process_mc(
     kwdict_mc_tm_pw     ::Associative =OrderedDict() ## keyword arguments passed onto `mc_tm_pw`
 )
     ## function: get raw melt curve data by channel and perform optical calibration
+    ##
+    ## issue: this would be vastly simpler using DataFrames
     function get_mc_data(channel_num ::Integer)
 
         ## subset melting curve data by channel (curried)
@@ -81,6 +82,7 @@ function process_mc(
                     end)
 
         ## split temperature and fluorescence data by well
+        ## return vector of TF Dicts
         split_tf_by_well(fluo_sel ::Associative) =
             map(fluo_well_nums) do well_num
                 Dict(
@@ -90,50 +92,75 @@ function process_mc(
             end
 
         ## extend data vectors with NaN values where necessary to make them equal in length
+        ##
+        ## issue:
+        ## this is performed to convert the fluorescence data to a 3D array
+        ## it is, however, completely unnecessary to convert the data to this format
+        ## because the 3D array is immediately sliced by channel
+        ## and all the NaN values that have been inserted by this function
+        ## must then be removed in normalize_tf()
         extend_tf_vecs(tf_dict_vec ::AbstractArray) =
+            # map(tf_dict_vec) do tf_dict
+            #     Dict(
+            #         map(TF_KEYS) do key
+            #             key => extend_NaN(map(x -> length(x[:temperature]), tf_dict_vec) |> maximum)(tf_dict[key])
+            #         end)
+            # end
             map(tf_dict_vec) do tf_dict
                 Dict(
                     map(TF_KEYS) do key
                         key => extend_NaN(
-                                    maximum ∘
+                                    maximum(
                                         map(length ∘ index(:temperature),
-                                            tf_dict_vec))(tf_dict[key])
+                                            tf_dict_vec)))(tf_dict[key])
                     end)
             end
 
         ## convert to MeltCurveTF object
         toMeltCurveTF(tf_nv_adj ::AbstractArray) =
             MeltCurveTF(
-                ## @p id tf_nv_adj | map index(:temperature)        | reduce hcat,
-                ## @p id tf_nv_adj | map index(:fluorescence_value) | reduce hcat)
                 map(TF_KEYS) do key
+                    # mapreduce(tf_dict -> tf_dict[key], hcat, tf_nv_adj)
                     mapreduce(index(key), hcat, tf_nv_adj)
                 end...)
-    ## end of function definitions nested in get_mc_data()
+
+    ## << end of function definitions nested in get_mc_data()
 
         mc_data |>
-            select_mcdata_by_channel(channel_num) |>
-            split_tf_by_well |>
-            extend_tf_vecs |>
-            toMeltCurveTF
+        select_mcdata_by_channel(channel_num) |>
+        split_tf_by_well |>
+        extend_tf_vecs |>
+        toMeltCurveTF
     end ## get_mc_data
 
-    normalize_tf(channel_i ::Integer, i ::Integer) =
+    # function normalize_tf(channel_i ::Integer, i ::Integer)
+    #     debug(logger, repr(mc_data_bych[channel_i].temperature[:, i]))
+    #     debug(logger, repr(faw_ary3[:, i, channel_i]))
+    #     throw("stop")
+    #     normalize_fluos(
+    #         remove_when_NaN_in_first(
+    #             mc_data_bych[channel_i].t_da[:, i],
+    #             faw_ary3[:, i, channel_i])...)
+    # end
+    normalize_tf(c ::Integer, w ::Integer) =
         normalize_fluos(
-            remove_when_NaN_in_first(
-                mc_data_bych[channel_i].t_da[:, i],
-                faw_ary3[:, i, channel_i])...)
+            remove_when_temperature_NaN(
+                mc_data_bych[c].temperature[:, w],
+                faw_ary3[:, w, c])...)
 
-    remove_when_NaN_in_first(x...) =
-        map(first(x) |> cast(!isnan) |> index, x)
+    remove_when_temperature_NaN(x...) =
+        map(y -> y[broadcast(!isnan, first(x))], x)
+        # map(first(x) |> cast(!isnan) |> index, x)
 
     normalize_fluos(
-        tmprtrs     ::DataArray{S} where S <: AbstractFloat,
-        fluos_raw   ::AbstractVector{T} where T <: Real) =
+        tmprtrs     ::DataArray{<: AbstractFloat},
+        fluos_raw   ::AbstractVector{<: AbstractFloat}) =
             Dict(
                 :tmprtrs => tmprtrs,
-                :fluos   => sweep(minimum)(-)(fluos_raw))
-    ## end of function definitions nested in process_mc()
+                # :fluos   => sweep(minimum)(-)(fluos_raw))
+                :fluos   => fluos_raw .- minimum(fluos_raw |> sift(!isnan)))
+
+    ## << end of function definitions nested in process_mc()
 
     debug(logger, "at process_mc()")
     const (channel_nums, fluo_well_nums) =
@@ -150,9 +177,9 @@ function process_mc(
     ## reshape raw fluorescence data to 3-dimensional array
     ## dimensions 1,2,3 = temperature,well,channel
     ## `fr` - fluo_raw
-    const fr_ary3       = cat(3, map(field(:fluo_da), mc_data_bych)...)
+    const fr_ary3       = cat(3, map(field(:fluorescence), mc_data_bych)...)
     #
-    ## perform deconvolution and adjust well-to-well variation in absolute fluorescence
+    ## deconvolute and normalize
     const (mw_ary3, k4dcv, fdcvd_ary3, wva_data, wva_well_nums, faw_ary3) =
         dcv_aw(
             fr_ary3,
@@ -260,11 +287,11 @@ function mc_tm_pw(
             for key in keys(tf_dict))
 
     ## temperature intervals
-    tmprtr_intvls(tmprtrs_ori ::DataArray{T,1} where T <: AbstractFloat) =
+    tmprtr_intvls(tmprtrs_ori ::DataArray{<: AbstractFloat,1}) =
         vcat(diff(tmprtrs_ori), Inf)
 
     ## flag datapoints
-    no_nti(tmprtr_intvls ::DataArray{T,1} where T <: AbstractFloat) =
+    no_nti(tmprtr_intvls ::DataArray{<: AbstractFloat,1}) =
         tmprtr_intvls .> nti_frac * median(tmprtr_intvls)
 
     ## functions used to calculate `span_smooth`
@@ -280,7 +307,7 @@ function mc_tm_pw(
         end ## if
 
     ## calculate the smoothing parameter
-    function calc_span_smooth(fu_rle ::Tuple{Vector{Bool},Vector{T} where T <: Integer})
+    function calc_span_smooth(fu_rle ::Tuple{Vector{Bool},Vector{<: Integer}})
 
         larger_span(span_smooth_product ::Real) =
         if span_smooth_product > span_smooth_default
@@ -357,7 +384,7 @@ function mc_tm_pw(
             ndrv_smu(-derivative(spl, tp_denser)))
 
     ## baseline-subtracted spline-smoothed fluorescence data
-    fluo_spl_blsub(fluo_spl ::AbstractVector{T} where T <: AbstractFloat) =
+    fluo_spl_blsub(fluo_spl ::AbstractVector{<: AbstractFloat}) =
         ## assumes constant baseline == minimum fluorescence value
         sweep(minimum)(-)(
             ## optionally, smooth the output of the spline function
@@ -367,7 +394,7 @@ function mc_tm_pw(
 
     ## calculate negative derivative at interpolated temperatures
     ## smooth output using `supsmu`
-    ndrv_smu(ndrv ::AbstractVector{T} where T <: AbstractFloat) =
+    ndrv_smu(ndrv ::AbstractVector{<: AbstractFloat}) =
         supsmu(tp_denser, ndrv, span_smooth)
 
     ## create denser array of interpolated temperature values
@@ -398,25 +425,25 @@ function mc_tm_pw(
                     sn_idc)))
 
     function find_peaks(
-        summit_pre_idc  ::AbstractVector{Int},
-        nadir_idc       ::AbstractVector{Int}
+        summit_pre_idc  ::AbstractVector,
+        nadir_idc       ::AbstractVector
     )
         const pi =
             PeakIndices(
                 ndrv_smu[summit_pre_idc],
                 summit_pre_idc,
                 nadir_idc)
-        # const Ta_raw = @p collect pi | map peak_Ta | filter thing
-        # return thing(Ta_raw) ? Vector{Peak}(Ta_raw) : Peak([]) 
-        Vector{Peak}(@p collect pi | map peak_Ta | filter thing)
+        Vector{Peak}(pi |> collect |> mold(peak_Ta) |> sift(thing))
     end ## find_peaks()
 
     ## calculate peak area
     peak_Ta(peak_idc ::Tuple{I, I, I} where I <: Integer) =
-        @when thing(peak_idc) Peak(
-            peak_idc[2],                                ## summit_idx
-            tp_denser[peak_idc[2]],                     ## Tm = temperature at peak
-            peak_bounds(peak_idc...) |> calc_area)      ## area
+        peak_idc == nothing ?
+            nothing :
+            Peak(
+                peak_idc[2],                                ## summit_idx
+                tp_denser[peak_idc[2]],                     ## Tm = temperature at peak
+                peak_bounds(peak_idc...) |> calc_area)      ## area
 
     ## find shoulders of peak
     function peak_bounds(
@@ -490,8 +517,9 @@ function mc_tm_pw(
             i += 1
             ndrv_smu_centred0 = ndrv_smu_centred1
             ndrv_smu_centred1 = sign(ndrv_smu[i] - ns_range_mid)
-            @when(ndrv_smu_centred0 != ndrv_smu_centred1,
-                num_cross_points += 1)
+            if ndrv_smu_centred0 != ndrv_smu_centred1
+                num_cross_points += 1
+            end
         end ## while
         return num_cross_points
     end ## count_cross_points()
@@ -501,12 +529,12 @@ function mc_tm_pw(
     ## note: top1_Tm_idx calculated incorrectly in original code
     function real_peaks(
         tmprtr_max_ndrv     ::AbstractFloat,
-        areas_raw           ::AbstractVector{F} where F <: AbstractFloat,
+        areas_raw           ::AbstractVector{<: AbstractFloat},
         top1_Tm_idx         ::Integer,
         fn_mc_slope         ::Function,         ## linear regression fluos ~ tmprtrs
         fn_num_cross_points ::Function
     )
-        top_peaks(fltd_idc_topNp1 ::AbstractVector{I} where I <: Integer) =
+        top_peaks(fltd_idc_topNp1 ::AbstractVector{<: Integer}) =
             length(fltd_idc_topNp1) > top_N ? [] : fltd_idc_topNp1
 
         if  (split_vector_and_return_larger_quantile(
@@ -560,8 +588,10 @@ function mc_tm_pw(
     debug(logger, "at mc_tm_pw()")
     ## filter out data points separated by narrow temperature intervals
     ## `nti` - narrow temperature interval
+    ## return temperatures as array, assuming no missing values
+    # debug(logger, repr(tf_dict))
     const (tmprtrs, fluos) =
-        tf_dict |> filter_nti |> tf -> (mutate_dups(tf[:tmprtrs]), tf[:fluos])
+        tf_dict |> filter_nti |> tf -> (mutate_dups(tf[:tmprtrs].data), tf[:fluos])
     const len_raw = length(tmprtrs)
     #
     ## negative derivative by central finite differencing (cfd)
@@ -581,6 +611,7 @@ function mc_tm_pw(
     #
     ## fit a cubic spline model in order to interpolate data points
     ## then smooth data and calculate slope at denser sequence of temperatures
+    debug(logger,repr(smooth_raw_fluo()))
     const spl           = spline_model(smooth_raw_fluo())
     const tp_denser     = interpolated_temperatures()
     const mc_denser     = smoothing_process()
@@ -662,7 +693,7 @@ function mutate_dups(
     const vec_uniq_len  = vec_uniq |> length
     #
     ## return if no ties
-    @when (vec_len == vec_uniq_len) return vec_2mut
+    (vec_len == vec_uniq_len) && return vec_2mut
     #
     ## find ties
     const order_to = sortperm(vec_2mut)
@@ -685,40 +716,4 @@ function mutate_dups(
     end
     #
     return vec_sorted[order_back]
-end ## mutate_dups
-
-## finite differencing function
-function finite_diff(
-    X       ::AbstractVector,
-    Y       ::AbstractVector; ## X and Y must be of same length
-    nu      ::Integer =1, ## order of derivative
-    method  ::Symbol = :central
-)
-    debug(logger, "at finite_diff()")
-    const dlen = length(X)
-    if dlen != length(Y)
-        throw(DimensionError, "X and Y must be of same length")
-    end ## if
-    @when dlen == 1 return zeros(1)
-    if (nu == 1)
-        const (range1, range2) =
-            if      (method == :central)  tuple(3:dlen+2, 1:dlen)
-            elseif  (method == :forward)  tuple(3:dlen+2, 1:dlen+1)
-            elseif  (method == :backward) tuple(2:dlen+1, 1:dlen)
-            else
-                throw(ArgmentError, "method \"$method\" not recognized")
-            end ## if
-        const (X_p2, Y_p2) = map((X, Y)) do ori
-            vcat(
-                ori[2] * 2 - ori[1],
-                ori,
-                ori[dlen-1] * 2 - ori[dlen])
-            end ## do ori
-        return (Y_p2[range1] .- Y_p2[range2]) ./ (X_p2[range1] .- X_p2[range2])
-    end ## nu == 1
-    return finite_diff(
-        X,
-        finite_diff(X, Y; nu = nu - 1, method = method),
-        nu = 1;
-        method = method)
-end ## finite_diff()
+end ## mutate_dups()

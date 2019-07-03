@@ -5,26 +5,25 @@
 ## 2. adjust well-to-well variation in absolute fluorescence values
 
 import DataStructures.OrderedDict
-import FunctionalData.@p
 import Memento: debug, error
 
 
 ## function: perform deconvolution and adjust well-to-well variation in absolute fluorescence
 function dcv_aw(
-    fr_ary3                 ::AbstractArray, ## array of raw fluorescence by cycle, well, channel
-    dcv                     ::Bool,          ## signal to perform multi-channel deconvolution
-    channel_nums            ::Vector{I},     ## vector of channel numbers
+    fr_ary3                 ::AbstractArray,        ## array of raw fluorescence by cycle, well, channel
+    dcv                     ::Bool,                 ## signal to perform multi-channel deconvolution
+    channel_nums            ::AbstractVector,       ## vector of channel numbers
     ## remove MySql dependency
     # db_conn ::MySQL.MySQLHandle, ## `db_conn_default` is defined in "__init__.jl"
     # calib_info ::Union{Integer,OrderedDict},
     # well_nums_found_in_fr ::AbstractVector,
     # well_nums_in_req ::AbstractVector=[],
-    calib_data              ::CalibData,     ## calibration dataset
-    well_nums_found_in_fr   ::Vector{I},     ## vector of well numbers
+    calib_data              ::Associative,          ## calibration dataset
+    well_nums_found_in_fr   ::AbstractVector,       ## vector of well numbers
     dye_in                  ::Symbol = :FAM,
     dyes_2bfild             ::AbstractVector =[];
-    aw_out_format           ::Symbol = :both ## :array, :dict, :both
-) where I <: Integer
+    aw_out_format           ::Symbol = :both        ## :array, :dict, :both
+)
     debug(logger, "at dcv_aw()")
 
     ## remove MySql dependency
@@ -32,7 +31,7 @@ function dcv_aw(
     # wva_data, wva_well_nums = prep_adj_w2wvaf(db_conn, calib_info, well_nums_in_req, dye_in, dyes_2bfild)
 
     ## assume without checking that we are using all the wells, all the time
-    const well_nums_in_req = @p num_wells calib_data | range 0 _ | collect
+    const well_nums_in_req = calib_data |> num_wells |> from(0) |> collect
     #
     ## prepare data to adjust well-to-well variation in absolute fluorescence values
     const (wva_data, wva_well_nums) =
@@ -55,7 +54,8 @@ function dcv_aw(
     ## issue:
     ## we can't match well numbers between calibration data and experimental data
     ## because we don't have that information for the calibration data
-    const wva_well_idc_wfluo = @p length wva_well_nums | range 1 _ | collect
+    const wva_well_idc_wfluo = wva_well_nums |> length |> from(1) |> collect
+    debug(logger, repr(wva_well_idc_wfluo))
 
     ## subtract background
     ## mw = minus water
@@ -64,9 +64,9 @@ function dcv_aw(
             ## devectorized code avoids transposition
             [
                 [   fr_ary3[u,w,c] - wva_data[:water][c][wva_well_idc_wfluo][w]
-                    for u in range(1, size(fr_ary3, 1)),
+                    for u in 1:size(fr_ary3, 1),
                         w in wva_well_idc_wfluo     ]
-                for c in range(1, num_channels)         ]...)
+                for c in 1:num_channels                 ]...)
 
     const (k4dcv, dcvd_ary3) =
         if dcv

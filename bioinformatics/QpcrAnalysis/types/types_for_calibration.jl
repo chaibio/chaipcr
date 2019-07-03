@@ -7,21 +7,21 @@
 
 import DataStructures.OrderedDict
 
-include("CalibData.jl")
-include("K4Deconv.jl")
+# include("CalibData.jl")
+# include("K4Deconv.jl")
 
 
-## types
+# ## types
 
-## Enum type for K matrix calculation
-## used in deconv.jl
-@enum WellProc well_proc_mean well_proc_vec
+# ## Enum type for K matrix calculation
+# ## used in deconv.jl
+# @enum WellProc well_proc_mean well_proc_vec
 
-# used in adj_w2wvaf.jl
-struct Ccsc # channels_check_subset_composite
-    set             ::Vector ## channels
-    description     ::String
-end
+# # used in adj_w2wvaf.jl
+# struct Ccsc # channels_check_subset_composite
+#     set             ::Vector ## channels
+#     description     ::String
+# end
 
 ## unused
 # type CalibCalibOutput

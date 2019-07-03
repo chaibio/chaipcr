@@ -7,10 +7,10 @@ import JSON.json
 import Memento.debug
 
 
-## called by QpcrAnalyze.dispatch
+## called by dispatch()
 function act(
     ::Val{optical_calibration},
-    calib_info  ::Associative;
+    req_dict    ::Associative;
     well_nums   ::AbstractVector =[],
     out_format  ::Symbol = :pre_json,
     ## remove MySql dependency  
@@ -33,16 +33,16 @@ function act(
     # )
 
     ## calibration data is required
-    @unless(req_key(CALIBRATION_INFO_KEY) &&
-        typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative,
-            return fail(logger,
-                        ArgumentError("no calibration information found"),
-                        out_format))
-    const calib_info_dict = calib_info[CALIBRATION_INFO_KEY]
+    if !(haskey(req_dict, CALIBRATION_INFO_KEY) &&
+        typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative)
+            return fail(logger, ArgumentError(
+                "no calibration information found")) |> out(out_format)
+    end
+    const calib_info_dict = req_dict[CALIBRATION_INFO_KEY]
     const result_aw = try
             prep_adj_w2wvaf(calib_info_dict, well_nums, dye_in, dyes_2bfild)
         catch err
-            return fail(logger, err, out_format, bt=true)
+            return fail(logger, err; bt=true) |> out(out_format)
         end
     if (length(calib_info_dict) >= 3)
         ## get_k
@@ -52,15 +52,11 @@ function act(
         const result_k = try
                 get_k(calib_info_dict, well_nums)
             catch err
-                return fail(logger, err, out_format, bt=true)
+                return fail(logger, err; bt=true) |> out(out_format)
             end
-        @when(length(result_k.inv_note) > 0,
-            return fail(logger, result_k.inv_note, out_format))
+        (length(result_k.inv_note) > 0) &&
+            return fail(logger, result_k.inv_note) |> out(out_format)
     end ## if
 
-    const output = OrderedDict(:valid => true)
-    return (out_format == :json) && JSON.json(output) || output
-end ## optical_calibration()
-
-
-#
+    return OrderedDict(:valid => true) |> out(out_format)
+end ## act(::Val{optical_calibration})

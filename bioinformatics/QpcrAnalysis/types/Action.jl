@@ -1,4 +1,4 @@
-## Actions.jl
+## Action.jl
 ##
 ## Author: Tom Price
 ## Date:   Dec 2018

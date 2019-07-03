@@ -2,37 +2,37 @@
 ##
 ## needed for `type AmpStepRampOutput` so must be included before "amp.jl"
 
-import Clustering.ClusteringResult
+# import Clustering.ClusteringResult
 
-include("ClusteringMethod.jl")
+# include("ClusteringMethod.jl")
 
 
-## clustering analysis result from a possible combination of expected genotypes
-struct ClusterAnalysisResult
-    init_centers        ::Array{Float_T,2} ## no longer necessary because it represents one combination of genotypes, but different combinations of genotypes with the same number of genotypes may result in the same clustering results
-    dist_mtx_winit      ::Array{Float_T,2}
-    cluster_result      ::ClusteringResult
-    centers             ::Array{Float_T,2}
-    slhts               ::Vector{Float_T}
-    slht_mean           ::Float_T
-    check_dist_mtx      ::Array{Float_T,2}
-    check_dist_bool     ::Bool
-end ## type
+# ## clustering analysis result from a possible combination of expected genotypes
+# struct ClusterAnalysisResult
+#     init_centers        ::Array{Float_T,2} ## no longer necessary because it represents one combination of genotypes, but different combinations of genotypes with the same number of genotypes may result in the same clustering results
+#     dist_mtx_winit      ::Array{Float_T,2}
+#     cluster_result      ::ClusteringResult
+#     centers             ::Array{Float_T,2}
+#     slhts               ::Vector{Float_T}
+#     slht_mean           ::Float_T
+#     check_dist_mtx      ::Array{Float_T,2}
+#     check_dist_bool     ::Bool
+# end ## type
 
-mutable struct UniqCombinCenters
-    uniq_combin_centers ::Set{Vector{Float_T}}
-    car                 ::ClusterAnalysisResult
-    slht_mean           ::Float_T
-    geno_combins        ::Vector{Matrix{Float_T}}
-end ## type
+# mutable struct UniqCombinCenters
+#     uniq_combin_centers ::Set{Vector{Float_T}}
+#     car                 ::ClusterAnalysisResult
+#     slht_mean           ::Float_T
+#     geno_combins        ::Vector{Matrix{Float_T}}
+# end ## type
 
-struct AssignGenosResult
-    cluster_result      ::ClusteringResult
-    best_i              ::Int
-    best_genos_combins  ::Vector{Matrix{Int}}
-    expected_genos_all  ::Matrix{Int}
-    ucc_dict            ::OrderedDict{Set{Vector{Float_T}},UniqCombinCenters}
-end ## type
+# struct AssignGenosResult
+#     cluster_result      ::ClusteringResult
+#     best_i              ::Int
+#     best_genos_combins  ::Vector{Matrix{Int}}
+#     expected_genos_all  ::Matrix{Int}
+#     ucc_dict            ::OrderedDict{Set{Vector{Float_T}},UniqCombinCenters}
+# end ## type
 
 ## constant used in allelic_discrimination.jl
 const CATEG_WELL_VEC = [

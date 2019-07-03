@@ -2,15 +2,13 @@
 
 import JSON
 import DataFrames: DataFrame, by
-import Match.@match
 import Memento: debug, warn, error
 
 ## if isnull(sample) well not considered
 ## what if isnull(cq)
 
 
-## called by QpcrAnalyze.dispatch
-## formerly called function standard_curve
+## called by dispatch()
 ## `/slope` for log (DNA copy#) is on the x-axis and Cq on the y-axis, otherwise `*slope`
 function act(
     ::Val{standard_curve},
@@ -93,7 +91,7 @@ function act(
     # end ## do chunk
 
     ## report results
-    @when out_format == :full return target_result_df
+    (out_format == :full) && return target_result_df
 
     ## out_format != :full
     ## target result set
@@ -157,7 +155,7 @@ function act(
         :targets => target_vec,
         :groups  => Vector(),
         :valid   => true)
-    return out_format == :json ? JSON.json(output) : output
+    return output |> out(out_format)
 end ## act(::Val{standard_curve})
 
 
@@ -166,7 +164,7 @@ end ## act(::Val{standard_curve})
 ## parse req_vec into a dataframe
 function reqvec2df(req_vec ::AbstractVector)
     #
-    @when length(req_vec) == 0 return DataFrame()
+    (length(req_vec) == 0) && return DataFrame()
     #
     well_vec = Vector{Int}()
     channel_vec = Vector{Int}()
@@ -469,7 +467,7 @@ println("DataFrame $df format $out_format")
     end
 end
 
-function simplify(r ::Result, out_format ::Symbol)
+function simplify(r ::StandardCurveResult, out_format ::Symbol)
 println("Result $r format $out_format")
     if out_format == :full
         r
@@ -497,6 +495,3 @@ end
 ## Tuple{Float64,Float16}((0.001, 40)) gives (0.001, Float16(40.0))
 ## Tuple{Float16,Float16}((0.001, 40)) gives (Float16(0.004), Float16(40.0))
 ## then as expected
-
-
-#

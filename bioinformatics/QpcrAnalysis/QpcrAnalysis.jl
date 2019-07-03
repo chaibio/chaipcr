@@ -49,30 +49,67 @@ module QpcrAnalysis
 
     ## include each script, generally in the order of workflow
 
-    ## types and constants
+    ## shared functions
+    include("shared.jl")
+
+    ## structs for:
+
+    ## dispatch
     include("types/Action.jl")
+    ## calibration
+    include("types/CalibrationData.jl")
+    ## deconvolution
+    # include("types/DeconvMatrices.jl")
+    include("types/K4Deconv.jl")
+    include("types/WellProc.jl")
+    ## allelic discrimination
+    include("types/ClusteringMethod.jl")
+    include("types/ClusterAnalysisResult.jl")
+    include("types/UniqCombinCenters.jl")
+    include("types/AssignGenosResult.jl")
+    ## amplification
+    include("amp_models/types/AmpModel.jl")
+    include("amp_models/types/AmpModelFit.jl")
+    include("amp_models/types/SFCModelDef.jl")
+    # include("types/AmpRawData.jl")
+    include("types/AmpStepRampProperties.jl")
+    include("types/AmpStepRampOutput.jl")
+    include("types/AmpStepRampOutput2Bjson.jl")
+    # include("types/AmpQuantification.jl")
+    include("types/MbqOutput.jl")
+    ## melting curve
+    # include("types/MeltCurveRawData.jl")
+    include("types/MeltCurveTF.jl")
+    include("types/Peak.jl")
+    include("types/PeakIndices.jl")
+    include("types/MeltCurveTa.jl")
+    include("types/MeltCurveOutput.jl")
+    ## standard curve
+    include("types/StandardCurveResult.jl")
+    ## thermal consistency
+    include("types/TmCheck1w.jl")
+    include("types/ThermalConsistencyOutput.jl")
+
+    ## miscellaneous constants
     include("types/types_for_calibration.jl")
     include("types/types_for_allelic_discrimination.jl")
     include("types/types_for_amplification.jl")
     include("types/types_for_meltcurve.jl")
-    include("types/types_for_standard_curve.jl")
-    include("amp_models/types/types_for_amp_models.jl")
+    # include("amp_models/types/types_for_amp_models.jl")
     include("constants/constants.jl")
-
-    ## shared functions
-    include("shared.jl")
 
     ## this code is hidden from the parser on the BeagleBone
     @static if !production_env
         ## development & testing
         import Base.Test
         using FactCheck
-
+        include("../test/test_functions.jl")
         ## data format verification
         include("../test/verify_request.jl")
         include("../test/verify_response.jl")
-        include("../test/test_functions.jl")
     end
+
+    ## function definitions for:
 
     ## dispatch
     include("dispatch.jl")
@@ -85,24 +122,22 @@ module QpcrAnalysis
     ## amplification
     include("amp.jl")
     include("allelic_discrimination.jl")
-    include("amp_models/sfc_models.jl")
     include("amp_models/MAKx.jl")
-    include("amp_models/MAKERGAUL.jl")
-
-    ## melt curve
+    include("amp_models/MAKERGAULx.jl")
+    include("amp_models/sfc_model_bases.jl")
+    include("amp_models/sfc_models.jl")
+    ## melting curve
     include("meltcrv.jl")
     include("supsmu.jl")
-
     ## standard curve
     include("standard_curve.jl")
-
-    ## analyze_customized
+    ## custom analyses
     include("analyze_customized/optical_cal.jl")
     include("analyze_customized/optical_test_single_channel.jl")
     include("analyze_customized/optical_test_dual_channel.jl")
     include("analyze_customized/thermal_consistency.jl")
     include("analyze_customized/thermal_performance_diagnostic.jl")
-    # include("analyze_customized/your_own_analyze_functionality.jl")
+    # include("analyze_customized/your_own_analysis.jl")
 
     ## Create module level logger
     ## this can be precompiled
@@ -118,12 +153,12 @@ module QpcrAnalysis
             DefaultHandler(
                 FileRoller("julia.log", production_env ? "/var/log" : "/tmp"), ## default max size ~5MB
                 DefaultFormatter("[ {date} | {level} ]: {msg}")))
-        @when !production_env setlevel!(logger, "debug")
+        !production_env && setlevel!(logger, "debug")
         ## Register the module level logger at runtime
         ## so it is accessible via `get_logger(QpcrAnalysis)`
         Memento.register(logger)
-
+        #   
         ## clear Fact Checks
-        @when !production_env FactCheck.clear_results()
+        !production_env && FactCheck.clear_results()
     end ## __init__()
 end ## module QpcrAnalysis

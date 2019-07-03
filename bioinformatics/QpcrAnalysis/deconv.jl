@@ -2,7 +2,6 @@
 ## color compensation / multi-channel deconvolution
 
 import DataStructures.OrderedDict
-import FunctionalData: @p, unequal
 import Memento: debug, error
 
 
@@ -110,7 +109,7 @@ function get_k(
     #    return cd_key => k_data_1dye .- water_data
     # end)
     ## subtract water calibration data
-    const cd_key_vec = @p keys calib_data | collect | filter (x -> x != WATER_KEY) ## `cd` - channel of dye.
+    const cd_key_vec = calib_data |> keys |> collect |> sift(!isequal(WATER_KEY)) ## `cd` - channel of dye.
     const channel_nums = map(x -> Base.parse(split(x, "_")[2]), cd_key_vec)
     const n_channels = length(channel_nums)
     const water_data_2bt = reduce(hcat, calib_data[WATER_KEY][FLUORESCENCE_VALUE_KEY])
@@ -155,12 +154,12 @@ function get_k(
             end ## if
         end ## for non_target_channel_i
     end ## for channel_i
-    @when (length(err_msgs) > 0) throw(DomainError(join(err_msgs, "; ")))
+    (length(err_msgs) > 0) && throw(DomainError(join(err_msgs, "; ")))
 
     ## compute inverses and return
     const (k_s, k_inv_vec, inv_note) = calc_kinv(Val{well_proc}(), k4dcv_bydy, cd_key_vec, n_wells)
     const k4dcv = K4Deconv(k_s, k_inv_vec, (length(inv_note) > 0 ? inv_note * INV_NOTE_PT2 : ""))
-    @when (length(save_to) > 0) save(save_to, "k4dcv", k4dcv)
+    (length(save_to) > 0) && save(save_to, "k4dcv", k4dcv)
     return k4dcv
 end ## get_k()
 

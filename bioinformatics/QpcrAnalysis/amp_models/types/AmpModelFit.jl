@@ -1,19 +1,18 @@
 ## AmpModelFit.jl
 ##
-## requires types_for_amp_models.jl
-## for abstract type AmpModelFit
-##
 ## requires AmpModel.jl
 ## for const ampmodels
 ##
 ## Author: Tom Price
 ## Date:   June 2019
 
-import JuMP: Model
+import JuMP
 import DataStructures.OrderedDict
 
 
-# types and constructors
+## structs and constructors
+
+abstract type AmpModelFit end
 
 struct SfcModelFit <: AmpModelFit
     coef_strs   ::Vector{String}
@@ -118,7 +117,7 @@ struct MAKERGAUL4Fit <: AmpModelFit
 end
 
 ## Constructor method
-MAKERGAUL4Fit(
+MAKERGAUL4Fit(;
     max_of_idx  ::Int               =0,
     fb_start    ::Float_T           =0.0,
     bl_k_start  ::Float_T           =0.0,

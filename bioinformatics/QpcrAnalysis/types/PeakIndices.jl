@@ -1,8 +1,8 @@
 ## PeakIndices.jl
-#
+##
 ## data type and methods for melting curve
 ## and temperature consistency experiments
-#
+##
 ## Author: Tom Price
 ## Date: June 2019
 
@@ -15,7 +15,7 @@ struct PeakIndices
     nadir_idc       ::Vector{Int}
     len_summit_idc  ::Int
     len_nadir_idc   ::Int
-    PeakIndices(h,s,n) = new(vcat(h,0), vcat(s,0), vcat(n,0), length(s), length(n))
+    PeakIndices(h,s,n) = new(vcat(h,0.0), vcat(s,0), vcat(n,0), length(s), length(n))
 end
 
 
@@ -36,7 +36,7 @@ Base.collect(iter ::PeakIndices) =
 
 function Base.next(iter ::PeakIndices, state ::Tuple{Int, Int, Int})
     ## fail if state == nothing
-    @when state == nothing return (nothing, nothing)
+    (state == nothing) && return (nothing, nothing)
     ## state != nothing
     left_nadir_ii, summit_ii, right_nadir_ii = state
     ## next summit
@@ -57,7 +57,7 @@ function Base.next(iter ::PeakIndices, state ::Tuple{Int, Int, Int})
                 left_nadir_ii += 1
         end
         ## if there is a nadir to the left, break out of loop
-        @when left_nadir_ii > 0 break
+        (left_nadir_ii > 0) && break
         ## otherwise try the next summit
     end
     ## fail if no more summits or no flanking nadirs
@@ -80,4 +80,3 @@ function Base.next(iter ::PeakIndices, state ::Tuple{Int, Int, Int})
     ((iter.nadir_idc[left_nadir_ii], iter.summit_idc[summit_ii], iter.nadir_idc[right_nadir_ii]), ## element
         (left_nadir_ii, summit_ii, right_nadir_ii)) ## state
 end ## next()
-

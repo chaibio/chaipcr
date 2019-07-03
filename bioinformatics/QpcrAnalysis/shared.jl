@@ -1,46 +1,64 @@
 ## functions used by multiple analytic methods
 
 import DataStructures.OrderedDict
-import FunctionalData: @p, id
 import Memento: debug, warn, error, Logger
 
 
 ## simple macros
-macro when(predicate, conditional)
-    return :(if ($predicate)
-        ($conditional)
-    end)
-end
-macro unless(predicate, conditional)
-    return :(if !($predicate)
-        ($conditional)
-    end)
-end
+# macro when(predicate, conditional)
+#     return :(if ($predicate)
+#         ($conditional)
+#     end)
+# end
+# macro unless(predicate, conditional)
+#     return :(if !($predicate)
+#         ($conditional)
+#     end)
+# end
 
 ## used in amp.jl
 ## used in shared.jl
 ## currying function
-curry(f) = y -> x -> f(x, y)
-
-## flipped functions
-# flop(f)  = y -> x -> f(y, x)
-
-## used in meltcrv.jl
-## thermal_consistency.jl
-field(f) = x -> getfield(x, f)  ## flop(getfield)(f)
+curry(f) = x -> (y...) -> f(x, y...)
 
 ## used in amp.jl
+## used in shared.jl
 ## used in meltcrv.jl
-index(i) = x -> getindex(x, i)  ## flop(getindex)(i)
+## used in optical_test_dual_channel.jl
+mold  = curry(map)       ## mold(f)  = x -> map(f, x)
+
+## used in amp.jl
+## used in shared.jl
+## used in meltcrv.jl
+## used in deconvolute.jl
+sift  = curry(filter)    ## sift(f)  = x -> filter(f, x)
 
 ## used in meltcrv.jl
 ## used in shared.jl
-cast(f)  = x -> broadcast(f, x) ## flop(broadcast(f))
+cast  = curry(broadcast) ## cast(f)  = x -> broadcast(f, x)
+
+## used in calib.jl
+## used in shared.jl
+from  = curry(range)     ## from(b)  = e -> range(b, e)
+
+## used in shared.jl
+## flip function
+flip(f)  = y -> x -> f(x, y)
+
+## used in amp.jl
+## used in meltcrv.jl
+## thermal_consistency.jl
+field = flip(getfield)  ## field(f) = x -> getfield(x, f)
+
+## used in amp.jl
+## used in meltcrv.jl
+index = flip(getindex)  ## index(i) = x -> getindex(x, i)
 
 ## used in amp.jl
 ## used in meltcrv.jl
 ## curried reporter function, flipped
-roundoff(digits ::Integer) = cast(curry(round)(digits))
+report(digits ::Integer, x) = round(x, digits)
+roundoff(digits ::Integer) = curry(report)(digits)
 
 ## used in amp.jl
 str2sym(x) = isa(x, String) ? Symbol(x) : x
@@ -48,7 +66,7 @@ str2sym(x) = isa(x, String) ? Symbol(x) : x
 ## used in adj_w2wvaf.jl
 ## used in meltcrv.jl
 ## used in deconv.jl
-sweep(summary_func) = sweep_func -> (x -> sweep_func.(x, summary_func(x)))
+sweep(summary_func) = sweep_func -> x -> broadcast(sweep_func, x, summary_func(x))
 
 ## used in meltcrv.jl
 ## normalize values to a range from 0 to 1
@@ -57,7 +75,8 @@ normalize_range(x ::AbstractArray) =
 
 ## used in meltcrv.jl
 ## used in shared.jl
-thing = !isequal(nothing)
+# thing(x) = !(x == nothing)
+thing = (!isequal)(nothing)
 
 ## used in standard_curve.jl
 ## transform `nothing` to NaN
@@ -93,19 +112,23 @@ nothing2NaN(x) = thing(x) ? x : NaN
 #     end
 #     return string(parts...)
 # end
-    
+
+out(out_format ::Symbol) =
+    output -> (out_format == :json) ? JSON.json(output) : output
+
 ## used in amp.jl
 ## used in meltcrv.jl
 ## used in optical_cal.jl
 ## used in thermal_consistency.jl
 function fail(
     logger      ::Logger,
-    err         ::Exception,
-    out_format  ::Symbol = :pre_json;
+    err         ::Exception;
     bt          ::Bool =false ## backtrace?
 )
     const err_msg = sprint(showerror, err)
-    bt && (const st = stacktrace(catch_backtrace()))
+    if bt
+        const st = stacktrace(catch_backtrace())
+    end
     try
         error(logger, err_msg)
     catch ## just report the error
@@ -123,32 +146,65 @@ function fail(
             end ## try
         end ## if bt
     end ## try
-    const fail_output =
-        OrderedDict(
-            :valid => false,
-            :error => err_msg)
-    return (out_format == :json) ? JSON.json(fail_output) : fail_output
+    OrderedDict(
+        :valid => false,
+        :error => err_msg)
 end ## fail()
+
+## used in amp.jl
+## used in meltcrv.jl
+## finite differencing function
+function finite_diff(
+    X       ::AbstractVector,
+    Y       ::AbstractVector; ## X and Y must be of same length
+    nu      ::Integer =1, ## order of derivative
+    method  ::Symbol = :central
+)
+    debug(logger, "at finite_diff()")
+    const dlen = length(X)
+    if dlen != length(Y)
+        throw(DimensionError, "X and Y must be of same length")
+    end ## if
+    (dlen == 1) && return zeros(1)
+    if (nu == 1)
+        const (range1, range2) =
+            if      (method == :central)  tuple(3:dlen+2, 1:dlen)
+            elseif  (method == :forward)  tuple(3:dlen+2, 1:dlen+1)
+            elseif  (method == :backward) tuple(2:dlen+1, 1:dlen)
+            else
+                throw(ArgmentError, "method \"$method\" not recognized")
+            end ## if
+        const (X_p2, Y_p2) = map((X, Y)) do ori
+            vcat(
+                ori[2] * 2 - ori[1],
+                ori,
+                ori[dlen-1] * 2 - ori[dlen])
+            end ## do ori
+        return (Y_p2[range1] .- Y_p2[range2]) ./ (X_p2[range1] .- X_p2[range2])
+    end ## nu == 1
+    return finite_diff(
+        X,
+        finite_diff(X, Y; nu = nu - 1, method = method),
+        nu = 1;
+        method = method)
+end ## finite_diff()
 
 ## used in standard_curve.jl
 ## transform a real number to scientific notation
 function scinot(x ::Real, num_sig_digits ::Integer=3; log_base ::Integer=10)
-    if isnan(x)
-        return (NaN, NaN)
-    elseif x == 0
-        return (0, 0)
-    end
-    exponent = @p abs x | log log_base | floor
-    mantissa = round(x / log_base ^ exponent, num_sig_digits)
-    return (mantissa, Int(exponent))
+    isnan(x) && return (NaN, NaN)
+    (x == 0) && return (0, 0)
+    _exponent = log(log_base, abs(x)) |> floor
+    _mantissa = round(x / log_base ^ _exponent, num_sig_digits)
+    return (_mantissa, Int(_exponent))
 end
 
 ## used in meltcrv.jl
-is_increasing(x ::AbstractVector) = diff(x) .> 0
+is_increasing(x ::AbstractVector) = diff(x) .> zero(x)
 
 ## used in meltcrv.jl
 ## truncate elements to length of shortest element
-shorten(x) = map(y -> y[@p id x | map length | minimum | range 1 _], x)
+shorten(x) = map(y -> y[x |> mold(length) |> minimum |> from(1)], x)
 
 ## used in meltcrv.jl
 ## extend vector with NaN values to a specified length
@@ -158,11 +214,12 @@ extend_NaN(len ::Integer) =
         len - length(vec) |>
             m ->
                 m >= 0 ?
-                    (@p fill NaN m | vcat vec) :
+                    vcat(vec, fill(NaN, m)) :
                     error(logger, "vector is too long")
 
 ## extend array elements with NaNs to length of longest element
-extend(x ::AbstractArray) = map(extend_NaN(@p map length y | maximum), x)
+extend(x ::AbstractArray) =
+    map(extend_NaN(y |> mold(length) |> maximum), x)
 
 ## used in meltcrv.jl
 ## used in pnmsmu.jl
@@ -191,7 +248,8 @@ function find_mid_sumr_bysw(
     #
     const padding = fill(-sumr_func(-vals), half_width)
     const vals_padded = [padding; vals; padding]
-    @p length vals | range 1 _ | collect | map vals_iw | map (v -> sumr_func(v) == v[half_width + 1]) | find
+    vals |> length |> from(1) |> collect |> mold(vals_iw) |>
+        mold(v -> sumr_func(v) == v[half_width + 1]) |> find
 end
 
 ## used in meltcrv.jl
@@ -203,7 +261,9 @@ split_vector_and_return_larger_quantile(
     len                 ::Integer,          ## == length(x)
     idx                 ::Integer,          ## 1 <= idx <= len
     p                   ::AbstractFloat     ## 0 <= p <= 1
-) = map(range -> quantile(x[range], p), (1:idx, idx:len)) |> maximum
+) = map((1:idx, idx:len)) do range
+        quantile(x[range], p)
+    end |> maximum
 
 ## functions
 ## moved to MySQLforQpcrAnalysis.jl: get_mysql_data_well
@@ -211,29 +271,35 @@ split_vector_and_return_larger_quantile(
 ## construct DataFrame from dictionary key and value vectors
 ## `dict_keys` need to be a vector of strings
 ## to construct DataFrame column indices correctly
-function dictvec2df(dict_keys ::AbstractVector, dict_values ::AbstractVector)
+function dictvec2df(
+    dict_keys           ::AbstractVector,
+    dict_values         ::AbstractVector
+)
     df = DataFrame()
     for dict_key in dict_keys
-        df[Symbol(dict_key)] = map(
-            dict_ele -> dict_ele[dict_key],
-            dict_values)
-    end
+        df[Symbol(dict_key)] = map(index(dict_key), dict_values)
+    end 
     return df
 end
 
 ## used in adj_w2wvaf.jl
 num_channels(fluos ::AbstractArray) =
-    (length(fluos) > 1) && (fluos[2] != nothing) ? 2 : 1
+    (length(fluos) > 1) && thing(fluos[2]) ? 2 : 1
 
 num_channels(calib ::Associative) =
-    @p keys calib | map (key -> num_channels(calib[key][FLUORESCENCE_VALUE_KEY])) | maximum
+    calib |> keys |>
+        mold(key -> num_channels(calib[key][FLUORESCENCE_VALUE_KEY])) |>
+        maximum
 
 ## used in calib.jl
 num_wells(fluos ::AbstractArray) =
-    @p id fluos | filter thing | map length | maximum
+    fluos |> sift(thing) |> mold(length) |> maximum
 
 num_wells(calib ::Associative) =
-    @p keys calib | collect | filter (key -> haskey(calib[key],FLUORESCENCE_VALUE_KEY)) | map (key -> num_wells(calib[key][FLUORESCENCE_VALUE_KEY])) | maximum
+    calib |> keys |> collect |>
+        sift(key -> haskey(calib[key],FLUORESCENCE_VALUE_KEY)) |>
+        mold(key -> num_wells(calib[key][FLUORESCENCE_VALUE_KEY])) |>
+        maximum
 
 ## duplicated in MySQLforQpcrAnalysis.jl
 get_ordered_keys(dict ::Dict) =

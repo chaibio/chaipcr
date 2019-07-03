@@ -6,6 +6,7 @@ import Dierckx: Spline1D, derivative
 import Memento: debug, warn, error
 
 
+## called by dispatch()
 function act(
     ::Val{thermal_consistency},
     ## remove MySql dependency
@@ -24,16 +25,16 @@ function act(
     dyes_2bfild         ::AbstractVector =[],
     dcv                 ::Bool =true, ## if true, perform multi-channel deconvolution
     max_tmprtr          ::Real =1000, ## maximum temperature to analyze
-    reporting           =rounding(JSON_DIGITS) ## reporting function
+    reporting           =roundoff(JSON_DIGITS) ## reporting function
 )
     debug(logger, "at act(::Val{thermal_consistency})")
 
     ## calibration data is required
-    @unless(req_key(CALIBRATION_INFO_KEY) &&
-        typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative,
-            return fail(logger,
-                        ArgumentError("no calibration information found"),
-                        out_format))
+    if !(haskey(req_dict, CALIBRATION_INFO_KEY) &&
+        typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative)
+            return fail(logger, ArgumentError(
+                "no calibration information found")) |> out(out_format)
+    end
 
     const kwdict_mc_tm_pw = OrderedDict{Symbol,Any}(
         map(keys(MC_TM_PW_KEYWORDS)) do key
@@ -61,7 +62,7 @@ function act(
                 out_format = :full,
                 kwdict_mc_tm_pw = kwdict_mc_tm_pw)
         catch err
-            return fail(logger, err, out_format, bt=true)
+            return fail(logger, err; bt=true) |> out(out_format)
         end ## try
     ## process the data from only one channel
     const channel_proc = 1
@@ -69,7 +70,7 @@ function act(
     #
     const mc_tm = map(
         field(:Ta_fltd),
-        mc_w72c.mc_bychwl[:, channel_proc_i])
+        mc_w72c.mc_array[:, channel_proc_i]) ## mc_bychwl
     #
     min_Tm = max_tmprtr + 1
     max_Tm = 0
@@ -78,8 +79,8 @@ function act(
             TmCheck1w((NaN, false), NaN)
         else
             const top1_Tm = Ta[1,1]
-            @when (top1_Tm < min_Tm) min_Tm = top1_Tm
-            @when (top1_Tm > max_Tm) max_Tm = top1_Tm
+            (top1_Tm < min_Tm) && (min_Tm = top1_Tm)
+            (top1_Tm > max_Tm) && (max_Tm = top1_Tm)
             TmCheck1w(
                 (top1_Tm, MIN_TM_VAL <= top1_Tm <= MAX_TM_VAL),
                 Ta[1,2])
@@ -100,11 +101,7 @@ function act(
                             delta_Tm_val .<= MAX_DELTA_TM_VAL),
             :valid    => true)
     ## return values
-    if     (out_format == :full) full_out()
-    elseif (out_format == :json) JSON.json(pre_json_out())
-    else                         pre_json_out()
-    end
-end ## act()
-
-
-#
+    (out_format == :full) && return full_out()
+    ## else
+    return pre_json_out() |> out(out_format)
+end ## act(::Val{thermal_consistency})

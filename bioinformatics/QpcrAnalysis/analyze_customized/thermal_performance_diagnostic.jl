@@ -5,6 +5,7 @@ import JSON.json
 import Memento.debug
 
 
+## called by dispatch()
 function act(
     ::Val{thermal_performance_diagnostic},
     ## remove MySql dependency
@@ -105,8 +106,5 @@ function act(
                 :TotalTime      => (Lid_TotalTime,   Lid_TotalTime   .<= MAX_TIME_TO_HEAT)
             ),
             :valid => true)
-    return (out_format == :json) && JSON.json(output) || output
-end ## act()
-
-
-#
+    return output |> out(out_format)
+end ## act(::Val{thermal_performance_diagnostic})

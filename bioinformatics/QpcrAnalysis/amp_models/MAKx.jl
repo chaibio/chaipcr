@@ -17,12 +17,11 @@ const k_START       = 10 ## used: 10 better, 2 good, 1e-10 bad, 1 bad
 
 ## function definitions
 
-function pred_from_d_nm1(::Union{Var{:MAK2}, Var{:MAK3}}, d_nm1::Real, k::Real)
-    d_nm1 + k * log(1+ d_nm1 / k)
-end
+pred_from_d_nm1(::Union{Val{:MAK2}, Val{:MAK3}}, d_nm1::Real, k::Real) =
+    d_nm1 + k * log(1 + d_nm1 / k)
 
 function pred_from_cycs( ## 0.7to1.2e-5 sec for 40 cycles on PC
-    ::Var{:MAK2},
+    ::Val{:MAK2},
     cycs    ::AbstractVector,
     fb      ::Real,
     d0      ::Real,
@@ -36,10 +35,10 @@ function pred_from_cycs( ## 0.7to1.2e-5 sec for 40 cycles on PC
         i += 1
     end
     return fb + pred_ds[2:end][map(Int, cycs)]
-end ## pred_from_cycs(::Var{:MAK2})
+end ## pred_from_cycs(::Val{:MAK2})
 
 function pred_from_cycs( ## sec for 40 cycles on PC
-    ::Var{:MAK3},
+    ::Val{:MAK3},
     cycs    ::AbstractVector,
     fb      ::Real,
     bl_k    ::Real,
@@ -54,10 +53,10 @@ function pred_from_cycs( ## sec for 40 cycles on PC
         i += 1
     end
     return fb + bl_k * cycs .+ pred_ds[2:end][map(Int, cycs)]
-end ## pred_from_cycs(::Var{:MAK3})
+end ## pred_from_cycs(::Val{:MAK3})
 
 function fit(
-    ::Var{:MAK2},
+    ::Val{:MAK2},
     cycs        ::AbstractVector, ## continous integers or not
     obs_fluos   ::AbstractVector,
     wts         ::AbstractVector =ones(length(obs_fluos));
@@ -112,10 +111,10 @@ function fit(
         jmp_model,
         # init_coefs
     )
-end ## fit(::Var{:MAK2})
+end ## fit(::Val{:MAK2})
 
 function fit(
-    ::Var{:MAK3},
+    ::Val{:MAK3},
     cycs        ::AbstractVector, ## continous integers or not
     obs_fluos   ::AbstractVector,
     wts         ::AbstractVector =ones(length(obs_fluos));
@@ -180,7 +179,7 @@ function fit(
         jmp_model,
         # init_coefs
     )
-end ## fit(::Var{:MAK3})
+end ## fit(::Val{:MAK3})
 
 
 ## need `@eval`, not used
