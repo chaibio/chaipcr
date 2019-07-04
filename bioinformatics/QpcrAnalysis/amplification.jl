@@ -58,7 +58,6 @@ function act(
                 "lend itself to transformation into a 3-dimensional array. " *
                 "Please make sure that it is sorted by channel, well number, and cycle number."))
         end ## try
-        ## `raw_data` - fluo_raw_array_3d
         ## this code assumes that the data in the request
         ## is formatted appropriately for this transformation
         ## we can check the cycle/well/channel data if necessary
@@ -599,43 +598,6 @@ function process_amp(
 end ## process_amp()
 
 
-## deprecated to remove MySql dependency
-#
-# function get_amp_data(
-#    db_conn ::MySQL.MySQLHandle,
-#    col_name ::String, ## "fluorescence_value" or "baseline_value"
-#    exp_id ::Integer,
-#    asrp ::AmpStepRampProperties,
-#    fluo_well_nums ::AbstractVector, ## not `[]`, all elements are expected to be found
-#    channel_nums ::AbstractVector,
-# )
-#
-#    cyc_nums = asrp.cyc_nums
-#
-#    get fluorescence data for amplification
-#    fluo_qry = """SELECT $col_name
-#        FROM fluorescence_data
-#        WHERE
-#            experiment_id= $exp_id AND
-#            $(asrp.step_or_ramp)_id = $(asrp.id) AND
-#            cycle_num in ($(join(cyc_nums, ","))) AND
-#            well_num in ($(join(fluo_well_nums, ","))) AND
-#            channel in ($(join(channel_nums, ","))) AND
-#            step_id is not NULL
-#        ORDER BY channel, well_num, cycle_num
-#    """
-#    fluo_sel = MySQL.mysql_execute(db_conn, fluo_qry)[1]
-#
-#    fluo_raw = reshape(
-#        fluo_sel[JSON.parse(col_name)],
-#        map(length, (cyc_nums, fluo_well_nums, channel_nums))...
-#    )
-#
-#    return fluo_raw
-#
-# end ## get_amp_data
-
-
 ## fit model, baseline subtraction, quantification
 function mod_bl_q(
     fluos               ::AbstractVector;
@@ -982,3 +944,40 @@ function report_cq!(
     end
     return nothing ## side effects only
 end ## report_cq!
+
+
+## deprecated to remove MySql dependency
+#
+# function get_amp_data(
+#    db_conn ::MySQL.MySQLHandle,
+#    col_name ::String, ## "fluorescence_value" or "baseline_value"
+#    exp_id ::Integer,
+#    asrp ::AmpStepRampProperties,
+#    fluo_well_nums ::AbstractVector, ## not `[]`, all elements are expected to be found
+#    channel_nums ::AbstractVector,
+# )
+#
+#    cyc_nums = asrp.cyc_nums
+#
+#    get fluorescence data for amplification
+#    fluo_qry = """SELECT $col_name
+#        FROM fluorescence_data
+#        WHERE
+#            experiment_id= $exp_id AND
+#            $(asrp.step_or_ramp)_id = $(asrp.id) AND
+#            cycle_num in ($(join(cyc_nums, ","))) AND
+#            well_num in ($(join(fluo_well_nums, ","))) AND
+#            channel in ($(join(channel_nums, ","))) AND
+#            step_id is not NULL
+#        ORDER BY channel, well_num, cycle_num
+#    """
+#    fluo_sel = MySQL.mysql_execute(db_conn, fluo_qry)[1]
+#
+#    fluo_raw = reshape(
+#        fluo_sel[JSON.parse(col_name)],
+#        map(length, (cyc_nums, fluo_well_nums, channel_nums))...
+#    )
+#
+#    return fluo_raw
+#
+# end ## get_amp_data

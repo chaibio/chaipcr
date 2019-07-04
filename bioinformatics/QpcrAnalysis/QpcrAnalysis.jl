@@ -55,40 +55,40 @@ module QpcrAnalysis
     ## struct definitions for:
 
     ## dispatch
-    include("types/Action.jl")
+    include("structs/Action.jl")
     ## calibration
-    include("types/CalibrationData.jl")
+    include("structs/CalibrationData.jl")
     ## deconvolution
-    # include("types/DeconvMatrices.jl")
-    include("types/K4deconv.jl")
-    include("types/WellProc.jl")
+    # include("structs/DeconvMatrices.jl")
+    include("structs/K4deconv.jl")
+    include("structs/WellProc.jl")
     ## allelic discrimination
-    include("types/ClusteringMethod.jl")
-    include("types/ClusterAnalysisResult.jl")
-    include("types/UniqCombinCenters.jl")
-    include("types/AssignGenosResult.jl")
+    include("structs/ClusteringMethod.jl")
+    include("structs/ClusterAnalysisResult.jl")
+    include("structs/UniqCombinCenters.jl")
+    include("structs/AssignGenosResult.jl")
     ## amplification
-    include("amp_models/types/AmpModel.jl")
-    include("amp_models/types/AmpModelFit.jl")
-    include("amp_models/types/SFCModelDef.jl")
-    # include("types/AmpRawData.jl")
-    include("types/AmpStepRampProperties.jl")
-    include("types/AmpStepRampOutput.jl")
-    include("types/AmpStepRampOutput2Bjson.jl")
-    # include("types/AmpQuantification.jl")
-    include("types/MbqOutput.jl")
+    include("amp_models/structs/AmpModel.jl")
+    include("amp_models/structs/AmpModelFit.jl")
+    include("amp_models/structs/SFCModelDef.jl")
+    # include("structs/AmpRawData.jl")
+    include("structs/AmpStepRampProperties.jl")
+    include("structs/AmpStepRampOutput.jl")
+    include("structs/AmpStepRampOutput2Bjson.jl")
+    # include("structs/AmpQuantification.jl")
+    include("structs/MbqOutput.jl")
     ## melting curve
-    # include("types/MeltCurveRawData.jl")
-    include("types/MeltCurveTF.jl")
-    include("types/Peak.jl")
-    include("types/PeakIndices.jl")
-    include("types/MeltCurveTa.jl")
-    include("types/MeltCurveOutput.jl")
+    # include("structs/MeltCurveRawData.jl")
+    include("structs/MeltCurveTF.jl")
+    include("structs/Peak.jl")
+    include("structs/PeakIndices.jl")
+    include("structs/MeltCurveTa.jl")
+    include("structs/MeltCurveOutput.jl")
     ## standard curve
-    include("types/StandardCurveResult.jl")
+    include("structs/StandardCurveResult.jl")
     ## thermal consistency
-    include("types/TmCheck1w.jl")
-    include("types/ThermalConsistencyOutput.jl")
+    include("structs/TmCheck1w.jl")
+    include("structs/ThermalConsistencyOutput.jl")
 
     ## this code is hidden from the parser on the BeagleBone
     @static if !production_env
