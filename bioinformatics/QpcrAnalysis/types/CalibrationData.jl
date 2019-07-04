@@ -1,7 +1,6 @@
 ## CalibrationData.jl
 ##
 ## raw calibration data struct
-## issue: is Union{T,Void} or Nullable{T} preferred in Julia v0.62?
 ##
 ## Author: Tom Price
 ## Date:   June 2019

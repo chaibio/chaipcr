@@ -9,6 +9,20 @@ import Dierckx: Spline1D, derivative
 import Memento: debug, info, warn, error
 
 
+## constants >>
+
+const MC_TM_PW_KEYWORDS = Dict{Symbol,String}(
+    :qt_prob_flTm   => "qt_prob",
+    :normd_qtv_ub   => "max_normd_qtv",
+    :top_N          => "top_N")
+const TF_KEYS = [:temperature, :fluorescence_value]
+const MC_OUT_FIELDS = OrderedDict(
+    :mc      => :melt_curve_data,
+    :Ta_fltd => :melt_curve_analysis)
+
+
+## function definitions >>
+
 ## called by dispatch()
 function act(
     ::Val{meltcurve},

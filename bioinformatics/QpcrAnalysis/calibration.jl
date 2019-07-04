@@ -8,6 +8,8 @@ import DataStructures.OrderedDict
 import Memento: debug, error
 
 
+## function definitions >>
+
 ## function: perform deconvolution and adjust well-to-well variation in absolute fluorescence
 function calibrate(
     fr_ary3                 ::AbstractArray,        ## array of raw fluorescence by cycle, well, channel

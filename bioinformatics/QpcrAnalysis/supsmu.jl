@@ -5,6 +5,10 @@
 import Memento: debug, error
 
 
+## location of executable
+const libsupsmu = "$LOAD_FROM_DIR/_supsmu.so"
+
+## wrapper function
 function supsmu(
     X           ::AbstractVector,
     Y           ::AbstractVector,
@@ -61,6 +65,3 @@ function supsmu(
 
     return x_sorted ? smo : smo[indice_back]
 end     
-
-
-#

@@ -59,6 +59,7 @@ index = flip(getindex)  ## index(i) = x -> getindex(x, i)
 ## curried reporter function, flipped
 report(digits ::Integer, x) = round(x, digits)
 roundoff(digits ::Integer) = curry(report)(digits)
+const JSON_DIGITS = 6 ## number of decimal points for floats in JSON output
 
 ## used in amp.jl
 str2sym(x) = isa(x, String) ? Symbol(x) : x

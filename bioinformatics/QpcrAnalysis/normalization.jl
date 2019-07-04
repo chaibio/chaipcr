@@ -6,7 +6,10 @@ import DataStructures.OrderedDict
 import Memento: debug, error
 
 
+## constants >>
 const NORMALIZATION_SCALING_FACTOR  = 3.7           ## used: 9e5, 1e5, 1.2e6, 3.0
+
+## function definitions >>
 
 ## Top-level function: normalize variation between wells in absolute fluorescence values (normalize).
 ## each dye only has data for its target channel;

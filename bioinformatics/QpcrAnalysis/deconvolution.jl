@@ -5,6 +5,8 @@ import DataStructures.OrderedDict
 import Memento: debug, error
 
 
+const DECONVOLUTION_SCALING_FACTOR = [1.0, 4.2]    ## used: [1, oneof(1, 2, 3.5, 8, 7, 5.6, 4.2)]
+
 ## multi-channel deconvolution
 function deconvolute(
     ## ary2dcv dim1 is unit, which can be cycle (amplification), temperature point (melting curve),
@@ -28,7 +30,7 @@ function deconvolute(
     well_nums               ::AbstractVector =[];
     ## keyword arguments
     k4dcv_backup            ::K4Deconv =K4DCV,
-    scaling_factor_dcv_vec  ::AbstractVector =SCALING_FACTOR_deconv_vec,
+    scaling_factor_dcv_vec  ::AbstractVector =DECONVOLUTION_SCALING_FACTOR,
     out_format              ::Symbol = :array ## :array, :dict, :both
 )
     debug(logger, "at deconvolute()")
@@ -157,6 +159,10 @@ function get_k(
     (length(err_msgs) > 0) && throw(DomainError(join(err_msgs, "; ")))
 
     ## compute inverses and return
+    const INV_NOTE_PT2 = ": K matrix is singular, using `pinv` instead of `inv` " *
+    "to compute inverse matrix of K. Deconvolution result may not be accurate. " *
+    "This may be caused by using the same or a similar set of solutions " *
+    "in the steps for different dyes."
     const (k_s, k_inv_vec, inv_note) = calc_kinv(Val{well_proc}(), k4dcv_bydy, cd_key_vec, n_wells)
     const k4dcv = K4Deconv(k_s, k_inv_vec, (length(inv_note) > 0 ? inv_note * INV_NOTE_PT2 : ""))
     (length(save_to) > 0) && save(save_to, "k4dcv", k4dcv)

@@ -52,7 +52,7 @@ module QpcrAnalysis
     ## shared functions
     include("shared.jl")
 
-    ## structs for:
+    ## struct definitions for:
 
     ## dispatch
     include("types/Action.jl")
@@ -60,7 +60,7 @@ module QpcrAnalysis
     include("types/CalibrationData.jl")
     ## deconvolution
     # include("types/DeconvMatrices.jl")
-    include("types/K4Deconv.jl")
+    include("types/K4deconv.jl")
     include("types/WellProc.jl")
     ## allelic discrimination
     include("types/ClusteringMethod.jl")
@@ -89,14 +89,6 @@ module QpcrAnalysis
     ## thermal consistency
     include("types/TmCheck1w.jl")
     include("types/ThermalConsistencyOutput.jl")
-
-    ## miscellaneous constants
-    include("types/types_for_calibration.jl")
-    include("types/types_for_allelic_discrimination.jl")
-    include("types/types_for_amplification.jl")
-    include("types/types_for_meltcurve.jl")
-    # include("amp_models/types/types_for_amp_models.jl")
-    include("constants/constants.jl")
 
     ## this code is hidden from the parser on the BeagleBone
     @static if !production_env

@@ -1,4 +1,4 @@
-## amp.jl
+## amplification.jl
 #
 ## amplification analysis
 
@@ -8,6 +8,20 @@ import Ipopt: IpoptSolver #, NLoptSolver
 import Memento: debug, warn, error
 using Ipopt
 
+
+## constants >>
+
+const Ct_VAL_DomainError = -99 ## a value that cannot be obtained by normal calculation of Ct
+const DEFAULT_cyc_nums = Vector{Int}()
+const KWDICT_RC_SYMBOLS = Dict(
+    "min_fluomax"   => :max_bsf_lb,
+    "min_D1max"     => :max_dr1_lb,
+    "min_D2max"     => :max_dr2_lb)
+const KWDICT_PA1_KEYWORDS =
+    ["min_reliable_cyc", "baseline_cyc_bounds", "cq_method", "ctrl_well_dict"]
+
+
+## function definitions >>
 
 ## called by dispatch
 function act(

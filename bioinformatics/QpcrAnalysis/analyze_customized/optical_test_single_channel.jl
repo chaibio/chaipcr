@@ -5,6 +5,12 @@ import JSON.json
 import Memento.debug
 
 
+## default values
+const MIN_EXCITATION_FLUORESCENCE = 5120
+const MIN_EXCITATION_FLUORESCENCE_MULTIPLE = 3
+const MAX_EXCITATION = 384000
+
+
 ## called by dispatch()
 function act(
     ::Val{optical_test_single_channel},

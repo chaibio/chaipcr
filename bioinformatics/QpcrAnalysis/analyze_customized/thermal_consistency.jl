@@ -6,6 +6,13 @@ import Dierckx: Spline1D, derivative
 import Memento: debug, warn, error
 
 
+## constants
+const MIN_FLUORESCENCE_VAL = 8e5
+const MIN_TM_VAL = 77
+const MAX_TM_VAL = 81
+const MAX_DELTA_TM_VAL = 2
+
+
 ## called by dispatch()
 function act(
     ::Val{thermal_consistency},
