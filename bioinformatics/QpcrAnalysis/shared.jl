@@ -63,7 +63,7 @@ roundoff(digits ::Integer) = curry(report)(digits)
 ## used in amp.jl
 str2sym(x) = isa(x, String) ? Symbol(x) : x
 
-## used in adj_w2wvaf.jl
+## used in normalize.jl
 ## used in meltcrv.jl
 ## used in deconv.jl
 sweep(summary_func) = sweep_func -> x -> broadcast(sweep_func, x, summary_func(x))
@@ -282,7 +282,7 @@ function dictvec2df(
     return df
 end
 
-## used in adj_w2wvaf.jl
+## used in normalize.jl
 num_channels(fluos ::AbstractArray) =
     (length(fluos) > 1) && thing(fluos[2]) ? 2 : 1
 

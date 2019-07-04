@@ -115,9 +115,9 @@ module QpcrAnalysis
     include("dispatch.jl")
 
     ## calibration
-    include("calib.jl")
-    include("adj_w2wvaf.jl")
-    include("deconv.jl")
+    include("calibration.jl")
+    include("normalization.jl")
+    include("deconvolution.jl")
 
     ## amplification
     include("amp.jl")

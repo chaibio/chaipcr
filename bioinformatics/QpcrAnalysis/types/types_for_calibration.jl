@@ -17,7 +17,7 @@ import DataStructures.OrderedDict
 # ## used in deconv.jl
 # @enum WellProc well_proc_mean well_proc_vec
 
-# # used in adj_w2wvaf.jl
+# # used in normalize.jl
 # struct Ccsc # channels_check_subset_composite
 #     set             ::Vector ## channels
 #     description     ::String
@@ -42,12 +42,12 @@ const SCALING_FACTOR_deconv_vec = [1.0, 4.2]    ## used: [1, oneof(1, 2, 3.5, 8,
 const SCALING_FACTOR_adj_w2wvaf = 3.7           ## used: 9e5, 1e5, 1.2e6, 3.0
 
 ## old pre-defined (predfd) step ids for calibration data
-## used in adj_w2wvaf.jl
+## used in normalize.jl
 const oc_water_step_id_PREDFD = 2
 const oc_signal_step_ids_PREDFD = OrderedDict(1 => 4, 2 => 4)
 
 ## mapping from factory to user dye data
-## used in adj_w2wvaf.jl
+## used in normalize.jl
 ## db_name_ = "20160406_chaipcr"
 # const PRESET_calib_ids = OrderedDict(
 #     "water" => 114,
@@ -63,7 +63,7 @@ const oc_signal_step_ids_PREDFD = OrderedDict(1 => 4, 2 => 4)
 # const DYE2CHST_ccsc = Ccsc(DYE2CHST_channels, "all channels in the preset well-to-well variation data")
 
 ## process preset calibration data
-## used in adj_w2wvaf.jl
+## used in normalize.jl
 ## 4 groups
 const DEFAULT_encgr = Array{Int,2}(0, 0)
 ## const DEFAULT_encgr = [0 1 0 1; 0 0 1 1] ## NTC, homo ch1, homo ch2, hetero

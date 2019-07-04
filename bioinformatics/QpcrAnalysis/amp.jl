@@ -341,7 +341,7 @@ function process_amp(
         ## perform deconvolution and adjust well-to-well variation in absolute fluorescence
         ## rbbs_ary3 is the calibrated fluorescence data
         const (mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, rbbs_ary3) =
-            dcv_aw(
+            calibrate(
                 fr_ary3,
                 dcv,
                 channel_nums,

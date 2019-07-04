@@ -1,4 +1,4 @@
-## calib.jl
+## calibration.jl
 ##
 ## calibration procedure:
 ## 1. multichannel deconvolution
@@ -9,7 +9,7 @@ import Memento: debug, error
 
 
 ## function: perform deconvolution and adjust well-to-well variation in absolute fluorescence
-function dcv_aw(
+function calibrate(
     fr_ary3                 ::AbstractArray,        ## array of raw fluorescence by cycle, well, channel
     dcv                     ::Bool,                 ## signal to perform multi-channel deconvolution
     channel_nums            ::AbstractVector,       ## vector of channel numbers
@@ -24,7 +24,7 @@ function dcv_aw(
     dyes_2bfild             ::AbstractVector =[];
     aw_out_format           ::Symbol = :both        ## :array, :dict, :both
 )
-    debug(logger, "at dcv_aw()")
+    debug(logger, "at calibrate()")
 
     ## remove MySql dependency
     # calib_info = ensure_ci(db_conn, calib_info)
@@ -35,7 +35,7 @@ function dcv_aw(
     #
     ## prepare data to adjust well-to-well variation in absolute fluorescence values
     const (wva_data, wva_well_nums) =
-        prep_adj_w2wvaf(calib_data, well_nums_in_req, dye_in, dyes_2bfild)
+        prep_normalize(calib_data, well_nums_in_req, dye_in, dyes_2bfild)
     #
     ## overwrite the dummy well_nums
     wva_well_nums = well_nums_found_in_fr
@@ -92,7 +92,7 @@ function dcv_aw(
         OrderedDict(
             map(range(1, num_channels)) do channel_i
                 channel_nums[channel_i] =>
-                    adj_w2wvaf(
+                    normalize(
                         dcvd_ary3[:, :, channel_i],
                         wva_data,
                         wva_well_idc_wfluo,
@@ -111,7 +111,7 @@ function dcv_aw(
                                               "`aw_out_format` must be :array, :dict or :both"))
         end ## if
     return (mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, dcvd_aw...)
-end ## dcv_aw
+end ## calibrate()
 
 
 ## unused function

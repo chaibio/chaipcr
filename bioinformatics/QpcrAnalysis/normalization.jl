@@ -16,7 +16,7 @@ const NORMALIZATION_SCALING_FACTOR  = 3.7           ## used: 9e5, 1e5, 1.2e6, 3.
 ## which can be cycle (amplification) or temperature point (melt curve).
 ## Output does not include the automatically created column at index 1
 ## from rownames of input array as R does
-function adj_w2wvaf(
+function normalize(
     fluo2btp                        ::Array{<: Real,2},
     normalized_data                 ::Associative,
     matched_well_idc                ::AbstractVector,
@@ -50,7 +50,7 @@ end ## normalize
 
 
 ## function: check whether the data in optical calibration experiment is valid
-function prep_adj_w2wvaf(
+function prep_normalize(
     calibration_data    ::Associative,
     well_nums           ::AbstractVector,
     dye_in              ::Symbol = :FAM,

@@ -181,7 +181,7 @@ function process_mc(
     #
     ## deconvolute and normalize
     const (mw_ary3, k4dcv, fdcvd_ary3, wva_data, wva_well_nums, faw_ary3) =
-        dcv_aw(
+        calibrate(
             fr_ary3,
             num_channels == 1 ? false : dcv,
             channel_nums,
@@ -191,7 +191,7 @@ function process_mc(
             dyes_2bfild;
             aw_out_format = :array)
     #
-    ## ignore dummy well_nums from dcv_aw
+    ## ignore dummy well_nums from calibrate()
     const wva_well_nums_alt = fluo_well_nums
     #
     ## subset temperature/fluorescence data by channel then by well

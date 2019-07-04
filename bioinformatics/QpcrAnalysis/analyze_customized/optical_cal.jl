@@ -1,6 +1,6 @@
 ## optical_cal.jl
 #
-## use `prep_adj_w2wvaf` to check validity of calibration data for adjusting well-to-well variation in absolute fluo
+## uses prep_normalize() to check validity of calibration data
 
 import DataStructures.OrderedDict
 import JSON.json
@@ -40,7 +40,7 @@ function act(
     end
     const calib_info_dict = req_dict[CALIBRATION_INFO_KEY]
     const result_aw = try
-            prep_adj_w2wvaf(calib_info_dict, well_nums, dye_in, dyes_2bfild)
+            prep_normalize(calib_info_dict, well_nums, dye_in, dyes_2bfild)
         catch err
             return fail(logger, err; bt=true) |> out(out_format)
         end
