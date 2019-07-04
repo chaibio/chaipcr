@@ -112,24 +112,24 @@ module QpcrAnalysis
     include("deconvolution.jl")
 
     ## amplification
-    include("amp.jl")
+    include("amplification.jl")
     include("allelic_discrimination.jl")
     include("amp_models/MAKx.jl")
     include("amp_models/MAKERGAULx.jl")
     include("amp_models/sfc_model_bases.jl")
     include("amp_models/sfc_models.jl")
     ## melting curve
-    include("meltcrv.jl")
+    include("melting_curve.jl")
     include("supsmu.jl")
     ## standard curve
     include("standard_curve.jl")
     ## custom analyses
-    include("analyze_customized/optical_cal.jl")
-    include("analyze_customized/optical_test_single_channel.jl")
-    include("analyze_customized/optical_test_dual_channel.jl")
-    include("analyze_customized/thermal_consistency.jl")
-    include("analyze_customized/thermal_performance_diagnostic.jl")
-    # include("analyze_customized/your_own_analysis.jl")
+    include("custom_analyses/optical_cal.jl")
+    include("custom_analyses/optical_test_single_channel.jl")
+    include("custom_analyses/optical_test_dual_channel.jl")
+    include("custom_analyses/thermal_consistency.jl")
+    include("custom_analyses/thermal_performance_diagnostic.jl")
+    # include("custom_analyses/your_own_analysis.jl")
 
     ## Create module level logger
     ## this can be precompiled

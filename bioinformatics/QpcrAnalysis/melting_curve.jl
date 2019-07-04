@@ -1,6 +1,6 @@
-## meltcrv.jl
-#
-## melt curve analysis
+## melting_curve.jl
+##
+## melting curve analysis
 
 import DataStructures.OrderedDict
 import DataArrays.DataArray
