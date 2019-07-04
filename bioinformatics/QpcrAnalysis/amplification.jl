@@ -58,12 +58,12 @@ function act(
                 "lend itself to transformation into a 3-dimensional array. " *
                 "Please make sure that it is sorted by channel, well number, and cycle number."))
         end ## try
-        ## `fr_ary3` - fluo_raw_array_3d
+        ## `raw_data` - fluo_raw_array_3d
         ## this code assumes that the data in the request
         ## is formatted appropriately for this transformation
         ## we can check the cycle/well/channel data if necessary
         const R = typeof(req_dict[RAW_DATA_KEY][FLUORESCENCE_VALUE_KEY][1][1])
-        const fr_ary3 ::Array{R,3} =
+        const raw_data ::Array{R,3} =
             reshape(
                 req_dict[RAW_DATA_KEY][FLUORESCENCE_VALUE_KEY],
                 num_cycs, num_fluo_wells, num_channels)
@@ -78,7 +78,7 @@ function act(
             num_cycs,
             num_fluo_wells,
             num_channels,
-            fr_ary3[cyc_perm,well_perm,chan_perm])
+            raw_data[cyc_perm,well_perm,chan_perm])
     end ## parse_raw_data()
 
     ## << end of function definition nested within amp()
@@ -193,7 +193,7 @@ function process_amp(
     num_cycs                ::Integer,
     num_fluo_wells          ::Integer,
     num_channels            ::Integer,
-    fr_ary3                 ::Array{<: Real,3},
+    raw_data                ::Array{<: Real,3},
     calib_data              ::Associative,
     ## we will assume that any relevant step/ramp information
     ## has already been passed along and is present in asrp_vec
@@ -206,7 +206,7 @@ function process_amp(
     max_cycle               ::Integer =1000, ## maximum temperature to analyze
     dcv                     ::Bool =true, ## if true, perform multi-channel deconvolution
     dye_in                  ::Symbol = :FAM,
-    dyes_2bfild             ::AbstractVector =[],
+    dyes_to_be_filled       ::AbstractVector =[],
     qt_prob_rc              ::Real =0.9, ## quantile probablity for fluo values per well
     am_key                  ::Symbol = :SfcModel, ## :SfcModel, :MAKx, :MAKERGAULx
     ipopt_print2file_prefix ::String ="", ## file prefix for Ipopt print for `mod_bl_q`
@@ -267,10 +267,10 @@ function process_amp(
             (cq_method != :ct)     && return ct_fluos_empty
             ## num_cycs > 2 && length(ct_fluos) == 0 && cq_method == :ct
             map(1:num_channels) do channel_i
-                const mbq_ary1 =
+                const mbq_array1 =
                     map(1:num_fluo_wells) do well_i
                         mod_bl_q(
-                            rbbs_ary3[:, well_i, channel_i];
+                            calibrated_data[:, well_i, channel_i];
                             min_reliable_cyc = min_reliable_cyc,
                             baseline_cyc_bounds = _baseline_cyc_bounds[well_i, channel_i],
                             cq_method = :cp_dr1,
@@ -278,22 +278,22 @@ function process_amp(
                             am_key = am_key,
                             kwdict_mbq...)
                     end ## do well_i
-                mbq_ary1 |>
+                mbq_array1 |>
                     mold(index(:postbl_status)) |>
                     find_idc_useful |>
-                    mold(mbq_i -> mbq_ary1[mbq_i][:cq_fluo]) |>
+                    mold(mbq_i -> mbq_array1[mbq_i][:cq_fluo]) |>
                     median
             end ## do channel_i
         end ## find_ct_fluos()
 
-        function calc_mbq_ary2()
-            debug(logger, "at calc_mbq_ary2()")
+        function calc_mbq_array2()
+            debug(logger, "at calc_mbq_array2()")
             [
                 begin
                     ipopt_print2file = length(ipopt_print2file_prefix) == 0 ?
                         "" : "$(join([ipopt_print2file_prefix, channel_i, well_i], '_')).txt"
                     mod_bl_q(
-                        rbbs_ary3[:, well_i, channel_i];
+                        calibrated_data[:, well_i, channel_i];
                         min_reliable_cyc = min_reliable_cyc,
                         baseline_cyc_bounds = _baseline_cyc_bounds[well_i, channel_i],
                         cq_method = cq_method,
@@ -304,12 +304,12 @@ function process_amp(
                 end
                 for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
             ]
-        end ## calc_mbq_ary2()
+        end ## calc_mbq_array2()
 
-        function set_fn_mbq!(mbq_ary2)
+        function set_fn_mbq!(mbq_array2)
             debug(logger, "at set_fn_mbq!()")
             for fn_mbq in fieldnames(MbqOutput)
-                fv = [  getfield(mbq_ary2[well_i, channel_i], fn_mbq)
+                fv = [  getfield(mbq_array2[well_i, channel_i], fn_mbq)
                         for well_i in 1:num_fluo_wells, channel_i in 1:num_channels     ]
                 if fn_mbq in [:blsub_fluos, :coefs, :blsub_fitted, :dr1_pred, :dr2_pred]
                     fv = reshape(
@@ -346,17 +346,17 @@ function process_amp(
         debug(logger, "at process_amp_1sr()")
 
         ## remove MySql dependency
-        # fr_ary3 = get_amp_data(
+        # raw_data = get_amp_data(
         #     db_conn,
         #     "fluorescence_value", # "fluorescence_value" or "baseline_value"
         #     exp_id, asrp,
         #     fluo_well_nums, channel_nums)
 
         ## perform deconvolution and adjust well-to-well variation in absolute fluorescence
-        ## rbbs_ary3 is the calibrated fluorescence data
-        const (mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, rbbs_ary3) =
+        const (background_subtracted_data, k4dcv, deconvoluted_data,
+                norm_data, norm_well_nums, calibrated_data) =
             calibrate(
-                fr_ary3,
+                raw_data,
                 dcv,
                 channel_nums,
                 ## remove MySql dependency
@@ -367,11 +367,11 @@ function process_amp(
                 calib_data,
                 fluo_well_nums,
                 dye_in,
-                dyes_2bfild;
-                aw_out_format = :array)
+                dyes_to_be_filled;
+                out_format = :array)
         #
         const _baseline_cyc_bounds = find_baseline_cyc_bounds()
-        const NaN_ary2 = amp_init(NaN)
+        const NaN_array2 = amp_init(NaN)
         const fitted_init = amp_init(AmpModelFit_DICT[am_key]())
         const empty_vals_4cq = amp_init(OrderedDict{Symbol, AbstractFloat}())
         const ct_fluos_empty = fill(NaN, num_channels)
@@ -381,39 +381,39 @@ function process_amp(
         ## this can be fixed, but first
         ## the allelic discrimination code needs to be stable
         full_amp_out = AmpStepRampOutput(
-            fr_ary3,
-            mw_ary3,
+            raw_data, ## formerly fr_ary3
+            background_subtracted_data, ## formerly mw_ary3
             k4dcv,
-            dcvd_ary3,
-            wva_data,
-            rbbs_ary3,
+            deconvoluted_data, ## formerly dcvd_ary3
+            norm_data, ## formerly wva_data
+            calibrated_data, ## formerly rbbs_ary3
             fluo_well_nums,
             collect(1:num_channels), ## channel_nums
             cq_method,
             fitted_init, ## fitted_prebl,
             amp_init(Vector{String}()), ## bl_notes
-            rbbs_ary3, ## blsub_fluos
+            calibrated_data, ## blsub_fluos
             fitted_init, ## fitted_postbl,
             amp_init(:not_fitted), ## postbl_status
             amp_init(NaN, 1), ## coefs # size = 1 for 1st dimension may not be correct for the chosen model
-            NaN_ary2, ## d0
-            rbbs_ary3, ## blsub_fitted,
+            NaN_array2, ## d0
+            calibrated_data, ## blsub_fitted,
             zeros(0, 0, 0), ## dr1_pred
             zeros(0, 0, 0), ## dr2_pred
-            NaN_ary2, ## max_dr1
-            NaN_ary2, ## max_dr2
+            NaN_array2, ## max_dr1
+            NaN_array2, ## max_dr2
             empty_vals_4cq, ## cyc_vals_4cq
             empty_vals_4cq, ## eff_vals_4cq
-            NaN_ary2, ## cq_raw
-            NaN_ary2, ## cq
-            NaN_ary2, ## eff
-            NaN_ary2, ## cq_fluo
-            NaN_ary2, ## qt_fluos
+            NaN_array2, ## cq_raw
+            NaN_array2, ## cq
+            NaN_array2, ## eff
+            NaN_array2, ## cq_fluo
+            NaN_array2, ## qt_fluos
             Inf, ## max_qt_fluo
-            NaN_ary2, ## max_bsf
-            NaN_ary2, ## scld_max_bsf
-            NaN_ary2, ## scld_max_dr1
-            NaN_ary2, ## scld_max_dr2
+            NaN_array2, ## max_bsf
+            NaN_array2, ## scld_max_bsf
+            NaN_array2, ## scld_max_dr1
+            NaN_array2, ## scld_max_dr2
             amp_init(""), ## why_NaN
             _ct_fluos, ## ct_fluos
             OrderedDict{Symbol, Vector{String}}(), ## assignments_adj_labels_dict
@@ -423,7 +423,7 @@ function process_amp(
             warn(logger, "number of cycles $num_cycs <= 2: baseline subtraction " *
                 "and Cq calculation will not be performed")
         else ## num_cycs > 2
-            set_fn_mbq!(calc_mbq_ary2())
+            set_fn_mbq!(calc_mbq_array2())
             set_qt_fluos!()
             set_fn_rcq!()
         end ## if
@@ -938,7 +938,7 @@ function report_cq!(
         max_dr1_lb, max_dr2_lb, max_bsf_lb = [max_dr1_lb, max_dr2_lb, max_bsf_lb] ./ 128
     end
     #
-    const num_cycs = size(full_amp_out.fr_ary3, 1)
+    const num_cycs = size(full_amp_out.raw_data, 1)
     const (postbl_status, cq_raw, max_dr1, max_dr2) =
         map(fn -> getfield(full_amp_out, fn)[well_i, channel_i],
             [ :postbl_status, :cq_raw, :max_dr1, :max_dr2 ])

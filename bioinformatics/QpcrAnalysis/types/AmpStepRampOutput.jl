@@ -9,14 +9,15 @@
 import DataStructures.OrderedDict
 
 
+## issue: rename `rbbs_3ary` as `calibrated` once juliaapi_new has been updated
 mutable struct AmpStepRampOutput
     ## computed in process_amp_1sr()
-    fr_ary3                 ::Array{<: Real,3} ## raw
-    mw_ary3                 ::Array{<: Real,3} ## background subtracted
+    fr_ary3                 ::Array{<: Real,3} ## raw_data
+    mw_ary3                 ::Array{<: Real,3} ## background_subtracted_data
     k4dcv                   ::K4Deconv
-    dcvd_ary3               ::Array{Float_T,3} ## deconvoluted
-    wva_data                ::OrderedDict{Symbol,OrderedDict{Integer,Vector{Float_T}}} ## normalizable
-    rbbs_3ary               ::Array{Float_T,3} ## calibrated
+    dcvd_ary3               ::Array{Float_T,3} ## deconvoluted_dat
+    wva_data                ::OrderedDict{Symbol,OrderedDict{Integer,Vector{Float_T}}} ## norm_data
+    rbbs_3ary               ::Array{Float_T,3} ## calibrated_data
     fluo_well_nums          ::Vector{Int}
     channel_nums            ::Vector{Int}
     cq_method               ::Symbol

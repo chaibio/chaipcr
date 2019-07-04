@@ -76,7 +76,7 @@ function process_mc(
     span_smooth_factor  ::Real =7.2,
     ## end: arguments that might be passed by upstream code
     dye_in              ::Symbol = :FAM,
-    dyes_2bfild         ::AbstractVector =[],
+    dyes_to_be_filled   ::AbstractVector =[],
     dcv                 ::Bool =true, ## logical, whether to perform multi-channel deconvolution
 	max_tmprtr          ::Real =1000, ## maximum temperature to analyze
     out_format          ::Symbol = :pre_json, ## :full, :pre_json, :json
@@ -149,18 +149,18 @@ function process_mc(
 
     # function normalize_tf(channel_i ::Integer, i ::Integer)
     #     debug(logger, repr(mc_data_bych[channel_i].temperature[:, i]))
-    #     debug(logger, repr(faw_ary3[:, i, channel_i]))
+    #     debug(logger, repr(calibrated_data[:, i, channel_i]))
     #     throw("stop")
     #     normalize_fluos(
     #         remove_when_NaN_in_first(
     #             mc_data_bych[channel_i].t_da[:, i],
-    #             faw_ary3[:, i, channel_i])...)
+    #             calibrated_data[:, i, channel_i])...)
     # end
     normalize_tf(c ::Integer, w ::Integer) =
         normalize_fluos(
             remove_when_temperature_NaN(
                 mc_data_bych[c].temperature[:, w],
-                faw_ary3[:, w, c])...)
+                calibrated_data[:, w, c])...)
 
     remove_when_temperature_NaN(x...) =
         map(y -> y[broadcast(!isnan, first(x))], x)
@@ -190,23 +190,23 @@ function process_mc(
     #
     ## reshape raw fluorescence data to 3-dimensional array
     ## dimensions 1,2,3 = temperature,well,channel
-    ## `fr` - fluo_raw
-    const fr_ary3       = cat(3, map(field(:fluorescence), mc_data_bych)...)
+    const raw_data      = cat(3, map(field(:fluorescence), mc_data_bych)...)
     #
     ## deconvolute and normalize
-    const (mw_ary3, k4dcv, fdcvd_ary3, wva_data, wva_well_nums, faw_ary3) =
+    const (background_subtracted_data, k4dcv, deconvoluted_data,
+            norm_data, norm_well_nums, calibrated_data) =
         calibrate(
-            fr_ary3,
+            raw_data,
             num_channels == 1 ? false : dcv,
             channel_nums,
             calib_data,
             fluo_well_nums,
             dye_in,
-            dyes_2bfild;
-            aw_out_format = :array)
+            dyes_to_be_filled;
+            out_format = :array)
     #
     ## ignore dummy well_nums from calibrate()
-    const wva_well_nums_alt = fluo_well_nums
+    const norm_well_nums_alt = fluo_well_nums
     #
     ## subset temperature/fluorescence data by channel then by well
     ## then smooth the fluorescence/temperature data and calculate Tm peak, area
@@ -214,7 +214,7 @@ function process_mc(
     const mc_bychwl =
         mapreduce(
             channel_i ->
-                map(wva_well_nums_alt) do oc_well_num
+                map(norm_well_nums_alt) do oc_well_num
                     if oc_well_num in fluo_well_nums
                         mc_tm_pw(
                             normalize_tf(
@@ -236,13 +236,13 @@ function process_mc(
             mc_bychwl,
             channel_nums,
             fluo_well_nums,
-            fr_ary3,
-            mw_ary3,
+            raw_data,
+            background_subtracted_data,
             k4dcv,
-            fdcvd_ary3,
-            wva_data,
-            wva_well_nums_alt,
-            faw_ary3)
+            deconvoluted_data,
+            norm_data,
+            norm_well_nums_alt,
+            calibrated_data)
     else
         mc_out = OrderedDict{Symbol,Any}(map(keys(MC_OUT_FIELDS)) do f
             MC_OUT_FIELDS[f] =>

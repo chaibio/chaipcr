@@ -23,7 +23,7 @@ const DEFAULT_apg_LABELS = ["ntc", "homo_1", "homo_2", "hetero", "unclassified"]
 # const DEFAULT_init_FACTORS = [1, 1, 1] # sometimes "hetero" may not have very high end-point fluo
 # const DEFAULT_eg_LABELS = ["homo_a", "homo_b", "hetero", "unclassified"]
 
-const CTRL_WELL_DICT = OrderedDict{Vector{Int},Vector{Int}}() # key is genotype (Vector{Int}), value is well numbers (Vector{Int})
+const CTRL_WELL_DICT = OrderedDict{Vector{Int},Vector{Int}}() ## key is genotype (Vector{Int}), value is well numbers (Vector{Int})
 ## example
 # const CTRL_WELL_DICT = OrderedDict(
 #     [0, 0] => [1, 2], # NTC, well 1 and 2
@@ -68,7 +68,7 @@ function prep_input_4ad(
             cycs = num_cycs
         end ## if cycs == 0
         if isa(cycs, Integer)
-            cycs = (cycs:cycs) # `blsub_fluos[an_integer, :, :]` results in size `(n_wells, num_channels)` instead of `(1, n_wells, num_channels)`
+            cycs = (cycs:cycs) ## `blsub_fluos[an_integer, :, :]` results in size `(n_wells, num_channels)` instead of `(1, n_wells, num_channels)`
         end ## if isa(cycs, Integer)
         data_t = reshape(mean(fluos[cycs, :, :], 1), n_wells, num_channels)
     #
@@ -79,7 +79,7 @@ function prep_input_4ad(
     #
     elseif categ == :cq
         data_t = map(full_amp_out.cq) do cq_val
-            isnan(cq_val) ? AbstractFloat(num_cycs) : cq_val # `Integer` resulted in `InexactError()`
+            isnan(cq_val) ? AbstractFloat(num_cycs) : cq_val ## `Integer` resulted in `InexactError()`
         end ## do cq_val
         nrn = NRN_NOT
     #
@@ -94,7 +94,7 @@ end ## prep_data_4ad
 function do_cluster_analysis(
     raw_data        ::AbstractMatrix,
     init_centers    ::AbstractMatrix,
-    cluster_method  ::ClusteringMethod = :K_means_medoids,
+    cluster_method  ::ClusteringMethod = K_means_medoids,
     norm_l          ::Real =2
 )
     ## get pair-wise distance (cost) matrix
@@ -107,11 +107,11 @@ function do_cluster_analysis(
                 _dist_mtx[i,j] = norm(raw_data[:, i] .- raw_data[:, j], norm_l)
             end
         end
-        return _dist_mtx |> Symmetric |> Matrix # kmedoids! does not accept ::Symmetric
+        return _dist_mtx |> Symmetric |> Matrix ## kmedoids! does not accept ::Symmetric
     end
 
     ## cluster analysis methods
-    function clustering(::Val{:K_means}, _init_centers)
+    function clustering(::Val{K_means}, _init_centers)
         ## ideally the element with the same index between
         ## `init_centers` and `cluster_result.centers` should be for the same genotype
         _cluster_result = kmeans!(raw_data, _init_centers)
@@ -119,10 +119,10 @@ function do_cluster_analysis(
     end
 
     ## Issue: how to use output from k-means clustering as input for k-medoids ???
-    clustering(::Val{:K_means_medoids}, _init_centers) =
-        clustering(K_medoids(), clustering(K_means(), _init_centers)[2])
+    clustering(::Val{K_means_medoids}, _init_centers) =
+        clustering(Val{K_medoids}(), clustering(Val{K_means}(), _init_centers)[2])
 
-    function clustering(::Val{:K_medoids}, _)
+    function clustering(::Val{K_medoids}, _)
         ## _init_centers is [2 x num_centers] matrix, kmedoids! requires vector
         ## use dummy values 1:num_centers for now
         _cluster_result = kmedoids!(dist_mtx, collect(1:num_centers)) ## dist_mtx not dist_mtx_winit
@@ -130,7 +130,7 @@ function do_cluster_analysis(
     end
 
     clustering(unknown_cluster_method, _) =
-        throw(ArgumentError, "clustering method $unknown_cluster_method not implemented")
+        throw(ArgumentError, "clustering method \"$unknown_cluster_method\" not implemented")
 
     ## get cluster silhouettes
     get_silhouettes() =
@@ -277,7 +277,7 @@ function assign_genos(
     init_factors        ::AbstractVector =DEFAULT_init_FACTORS, # for `init_centers`
     slht_lb             ::Real =0; # lower limit of silhouette
     apg_labels          ::AbstractVector =DEFAULT_apg_LABELS
-    # `apg` - all possible genotypes.
+    ## `apg` - all possible genotypes.
     ## Julia v0.6.0 on 2017-06-25:
     ## `apg_labels ::Vector{AbstractString} =DEFAULT_eg_LABELS` resulted in
     ## "ERROR: MethodError: no method matching #assign_genos#301( ::Array{AbstractString,1},
@@ -415,7 +415,7 @@ function assign_genos(
         const _geno_idc = vcat(idc...)
         const _car = do_cluster_analysis(
             data,
-            init_centers_all[:, _geno_idc], # init_centers
+            init_centers_all[:, _geno_idc], ## init_centers
             cluster_method,
             norm_l)
         const _geno_combin = expected_genos_all[:, _geno_idc]
@@ -479,12 +479,12 @@ function assign_genos(
                 end[1]
         end ## if
     end ## ntc2hetero!()
-    #
-    ## end of function definitions nested within assign_genos()
+
+    ## << end of function definitions nested within assign_genos()
 
     debug(logger, "at assign_genos()")
     const (num_channels, n_wells) = size(data)
-    const max_num_genos = 2 ^ num_channels # 2 comes from the binary possible values, i.e. presence/absence of signal for each channel
+    const max_num_genos = 2 ^ num_channels ## 2 comes from the binary possible values, i.e. presence/absence of signal for each channel
     const unclassified_assignment = max_num_genos + 1
     if length(apg_labels) != unclassified_assignment
         error(logger, "the number of labels does not equal the number of all possible genotypes")
@@ -508,7 +508,7 @@ function assign_genos(
     const non_ntc_geno_idc = geno_idc_all[geno_idc_all .!= ntc_geno_idx]
     const non_ntc_geno_combin = expected_genos_all[:, non_ntc_geno_idc]
     ## control genotypes
-    const ctrl_genos = ctrl_well_dict |> keys |> collect # Vector{Vector{Int}}
+    const ctrl_genos = ctrl_well_dict |> keys |> collect ## Vector{Vector{Int}}
     const ctrl_geno_bool_vec = map(geno_idc_all) do geno_idx
         expected_genos_all[:, geno_idx] in ctrl_genos
     end
@@ -619,8 +619,8 @@ function process_ad(
     cycs                ::Union{Integer,AbstractVector},
 
     ctrl_well_dict      ::OrderedDict,
-    cluster_method      ::ClusteringMethod, # for `assign_genos`
-    norm_l              ::Real, # for `assign_genos`
+    cluster_method      ::ClusteringMethod, ## for `assign_genos`
+    norm_l              ::Real, ## for `assign_genos`
 
     ## each column is a vector of binary geno whose length is number of channels
     ## (0 => no signal, 1 => yes signal)

@@ -20,8 +20,8 @@ const NORMALIZATION_SCALING_FACTOR  = 3.7           ## used: 9e5, 1e5, 1.2e6, 3.
 ## Output does not include the automatically created column at index 1
 ## from rownames of input array as R does
 function normalize(
-    fluo2btp                        ::Array{<: Real,2},
-    normalized_data                 ::Associative,
+    fluorescence                    ::Array{<: Real,2},
+    norm_data                       ::Associative,
     matched_well_idc                ::AbstractVector,
     channel                         ::Integer;
     minus_water                     ::Bool =false,
@@ -31,24 +31,22 @@ function normalize(
 
     ## devectorized code avoids transposing data matrix
     if minus_water == false
-        const swd = normalized_data[:signal][channel][matched_well_idc]
+        const swd = norm_data[:signal][channel][matched_well_idc]
         return ([
             normalization_scaling_factor * mean(swd) *
-                fluo2btp[i,w] / swd[w]
-                    for i in 1:size(fluo2btp, 1),
-                        w in 1:size(fluo2btp, 2)]) ## w = well
+                fluorescence[i,w] / swd[w]
+                    for i in 1:size(fluorescence, 1),
+                        w in 1:size(fluorescence, 2)]) ## w = well
     end
 
     ## minus_water == true
-    const normalized_water = normalized_data[:water][channel][matched_well_idc]
-    const swd =
-        normalized_data[:signal][channel][matched_well_idc] .-
-            normalized_data[:water][channel][matched_well_idc]
+    const norm_water = norm_data[:water][channel][matched_well_idc]
+    const swd = norm_data[:signal][channel][matched_well_idc] .- norm_water
     return ([
         normalization_scaling_factor * mean(swd) *
-            (fluo2btp[i,w] - normalized_water[w]) / swd[w]
-                for i in 1:size(fluo2btp, 1),
-                    w in 1:size(fluo2btp, 2)]) ## w = well
+            (fluorescence[i,w] - norm_water[w]) / swd[w]
+                for i in 1:size(fluorescence, 1),
+                    w in 1:size(fluorescence, 2)]) ## w = well
 end ## normalize
 
 
@@ -129,10 +127,10 @@ function prep_normalize(
 
     ## water_data and signal_data are OrderedDict objects keyed by channels,
     ## to accommodate the situation where calibration data has more channels
-    ## than experiment data, so that calibration data needs to be easily
+    ## than experiment data, so that the calibration data needs to be easily
     ## subsetted by channel.
-    const normalizable = OrderedDict(
+    const norm_data = OrderedDict(
         :water  => water_data_dict,
         :signal => signal_data_dict)
-    return (normalizable, signal_well_nums)
+    return (norm_data, signal_well_nums)
 end ## prep_normalize

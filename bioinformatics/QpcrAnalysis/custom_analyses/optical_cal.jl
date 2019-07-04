@@ -10,16 +10,16 @@ import Memento.debug
 ## called by dispatch()
 function act(
     ::Val{optical_calibration},
-    req_dict    ::Associative;
-    well_nums   ::AbstractVector =[],
-    out_format  ::Symbol = :pre_json,
+    req_dict            ::Associative;
+    well_nums           ::AbstractVector =[],
+    out_format          ::Symbol = :pre_json,
     ## remove MySql dependency  
     #
     # db_conn::MySQL.MySQLHandle,
     # exp_id::Integer, ## not used for computation
     # calib_info::Union{Integer,OrderedDict}; ## really used
-    dye_in      ::Symbol = :FAM, 
-    dyes_2bfild ::Vector =[]
+    dye_in              ::Symbol = :FAM, 
+    dyes_to_be_filled   ::Vector =[]
 )
     debug(logger, "at act(::Val{optical_calibration})")
  
@@ -39,21 +39,21 @@ function act(
                 "no calibration information found")) |> out(out_format)
     end
     const calib_info_dict = req_dict[CALIBRATION_INFO_KEY]
-    const result_aw = try
-            prep_normalize(calib_info_dict, well_nums, dye_in, dyes_2bfild)
-        catch err
-            return fail(logger, err; bt=true) |> out(out_format)
-        end
+    try
+        prep_normalize(calib_info_dict, well_nums, dye_in, dyes_to_be_filled)
+    catch err
+        return fail(logger, err; bt=true) |> out(out_format)
+    end
     if (length(calib_info_dict) >= 3)
         ## get_k
         ## if there are 2 or more channels then
         ## the deconvolution matrix K is calculated
         ## otherwise deconvolution is not performed
         const result_k = try
-                get_k(calib_info_dict, well_nums)
-            catch err
-                return fail(logger, err; bt=true) |> out(out_format)
-            end
+            get_k(calib_info_dict, well_nums)
+        catch err
+            return fail(logger, err; bt=true) |> out(out_format)
+        end
         (length(result_k.inv_note) > 0) &&
             return fail(logger, result_k.inv_note) |> out(out_format)
     end ## if

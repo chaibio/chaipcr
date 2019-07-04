@@ -12,7 +12,7 @@ import Memento: debug, error
 
 ## function: perform deconvolution and adjust well-to-well variation in absolute fluorescence
 function calibrate(
-    fr_ary3                 ::AbstractArray,        ## array of raw fluorescence by cycle, well, channel
+    raw_data                ::AbstractArray,        ## array of raw fluorescence by cycle, well, channel
     dcv                     ::Bool,                 ## signal to perform multi-channel deconvolution
     channel_nums            ::AbstractVector,       ## vector of channel numbers
     ## remove MySql dependency
@@ -23,96 +23,97 @@ function calibrate(
     calib_data              ::Associative,          ## calibration dataset
     well_nums_found_in_fr   ::AbstractVector,       ## vector of well numbers
     dye_in                  ::Symbol = :FAM,
-    dyes_2bfild             ::AbstractVector =[];
-    aw_out_format           ::Symbol = :both        ## :array, :dict, :both
+    dyes_to_be_filled       ::AbstractVector =[];
+    out_format              ::Symbol = :both        ## :array, :dict, :both
 )
     debug(logger, "at calibrate()")
 
     ## remove MySql dependency
     # calib_info = ensure_ci(db_conn, calib_info)
-    # wva_data, wva_well_nums = prep_adj_w2wvaf(db_conn, calib_info, well_nums_in_req, dye_in, dyes_2bfild)
+    # norm_data, norm_well_nums = prep_normalize(db_conn, calib_info, well_nums_in_req, dye_in, dyes_to_be_filled)
 
     ## assume without checking that we are using all the wells, all the time
     const well_nums_in_req = calib_data |> num_wells |> from(0) |> collect
     #
     ## prepare data to adjust well-to-well variation in absolute fluorescence values
-    const (wva_data, wva_well_nums) =
-        prep_normalize(calib_data, well_nums_in_req, dye_in, dyes_2bfild)
+    const (norm_data, norm_well_nums) =
+        prep_normalize(calib_data, well_nums_in_req, dye_in, dyes_to_be_filled)
     #
     ## overwrite the dummy well_nums
-    wva_well_nums = well_nums_found_in_fr
+    norm_well_nums = well_nums_found_in_fr
     #
     const num_channels = length(channel_nums)
     # if length(well_nums_found_in_fr) == 0
-    #     well_nums_found_in_fr = wva_well_nums
+    #     well_nums_found_in_fr = norm_well_nums
     # end
 
     ## remove MySql dependency
     #
-    # wva_well_idc_wfluo = find(wva_well_nums) do wva_well_num
-    #     wva_well_num in well_nums_found_in_fr
-    # end ## do wva_well_num
+    # matched_well_idc = find(norm_well_nums) do norm_well_num
+    #     norm_well_num in well_nums_found_in_fr
+    # end ## do norm_well_num
 
     ## issue:
     ## we can't match well numbers between calibration data and experimental data
     ## because we don't have that information for the calibration data
-    const wva_well_idc_wfluo = wva_well_nums |> length |> from(1) |> collect
-    debug(logger, repr(wva_well_idc_wfluo))
+    const matched_well_idc = norm_well_nums |> length |> from(1) |> collect
+    debug(logger, repr(matched_well_idc))
 
     ## subtract background
     ## mw = minus water
-    const mw_ary3 =
+    const background_subtracted_data =
         cat(3,
             ## devectorized code avoids transposition
             [
-                [   fr_ary3[u,w,c] - wva_data[:water][c][wva_well_idc_wfluo][w]
-                    for u in 1:size(fr_ary3, 1),
-                        w in wva_well_idc_wfluo     ]
+                [   raw_data[u,w,c] - norm_data[:water][c][matched_well_idc][w]
+                    for u in 1:size(raw_data, 1),
+                        w in matched_well_idc     ]
                 for c in 1:num_channels                 ]...)
 
-    const (k4dcv, dcvd_ary3) =
+    const (k4dcv, deconvoluted_data) =
         if dcv
             ## addition with flexible ratio instead of deconvolution (commented out)
             # k_inv_vec = fill(reshape(DataArray([1, 0, 1, 0]), 2, 2), 16)
 
             ## removing MySql dependency
-            # k4dcv, dcvd_ary3 = deconvolute(
-            #     1. * mw_ary3, channel_nums, wva_well_idc_wfluo, db_conn, calib_info, well_nums_in_req;
+            # k4dcv, deconvoluted_data = deconvolute(
+            #     1. * background_subtracted_data, channel_nums, matched_well_idc, db_conn, calib_info, well_nums_in_req;
             #     out_format="array")
             deconvolute(
-                1. * mw_ary3,
+                1. * background_subtracted_data,
                 channel_nums,
-                wva_well_idc_wfluo,
+                matched_well_idc,
                 calib_data,
                 well_nums_in_req;
                 out_format = :array)
         else ## !dcv
-            K4Deconv(), mw_ary3
+            K4Deconv(), background_subtracted_data
         end
     #
-    const dcvd_aw_dict =
+    const calibrated_dict =
         OrderedDict(
             map(range(1, num_channels)) do channel_i
                 channel_nums[channel_i] =>
                     normalize(
-                        dcvd_ary3[:, :, channel_i],
-                        wva_data,
-                        wva_well_idc_wfluo,
+                        deconvoluted_data[:, :, channel_i],
+                        norm_data,
+                        matched_well_idc,
                         channel_i;
                         minus_water = false)
             end) ## do channel_i
 
     ## format output
-    ## the following line of code needs the keys of dcvd_aw_dict to be in sort order
-    dcvd_aw_ary3() = cat(3, values(dcvd_aw_dict)...)
-    const dcvd_aw =
-        if      (aw_out_format == :array) tuple(dcvd_aw_ary3())
-        elseif  (aw_out_format == :dict)  tuple(dcvd_aw_dict)
-        elseif  (aw_out_format == :both)  tuple(dcvd_aw_ary3(), dcvd_aw_dict)
-        else                              throw(ArgumentException(
-                                              "`aw_out_format` must be :array, :dict or :both"))
+    ## the following line of code needs the keys of calibrated_dict to be in sort order
+    calibrated_array() = cat(3, values(calibrated_dict)...)
+    const calibrated_data =
+        if      (out_format == :array)  tuple(calibrated_array())
+        elseif  (out_format == :dict)   tuple(calibrated_dict)
+        elseif  (out_format == :both)   tuple(calibrated_array(), calibrated_dict)
+        else                            throw(ArgumentException(
+                                            "`out_format` must be :array, :dict or :both"))
         end ## if
-    return (mw_ary3, k4dcv, dcvd_ary3, wva_data, wva_well_nums, dcvd_aw...)
+    return (background_subtracted_data, k4dcv, deconvoluted_data,
+            norm_data, norm_well_nums, calibrated_data...)
 end ## calibrate()
 
 
@@ -127,7 +128,7 @@ end ## calibrate()
 #     # well_nums_1 ::AbstractVector=[],
 #     # well_nums_2 ::AbstractVector=[];
 #     dye_in      ::Symbol =:FAM,
-#     dyes_2bfild ::AbstractVector =[]
+#     dyes_to_be_filled ::AbstractVector =[]
 # )
 #     ## This function is expected to handle situations where `calib_info_1` and `calib_info_2`
 #     ## have different combinations of wells, but the number of wells should be the same.
@@ -151,8 +152,8 @@ end ## calibrate()
 #             map(values(calib_dict_1)) do value_1
 #                 reshape(transpose(fluo_data), 1, size(value_1[1])[2:-1:1]...)
 #             end...) ## do value_1
-#     const (mw_ary3_1, k4dcv_2, dcvd_ary3_1, wva_data_2, wva_well_nums_2, dcv_aw_ary3_1) =
-#         dcv_aw(
+#     const (background_subtracted_data_1, k4dcv_2, deconvoluted_data_1, norm_data_2, norm_well_nums_2, calibrated_data_1) =
+#         calibrate(
 #             ary2dcv_1,
 #             true,
 #             channel_nums_1,
@@ -161,15 +162,15 @@ end ## calibrate()
 #             well_nums_2,
 #             well_nums_2,
 #             dye_in,
-#             dyes_2bfild;
-#             aw_out_format = :array)
+#             dyes_to_be_filled;
+#             out_format = :array)
 #     return CalibCalibOutput(
 #         ary2dcv_1,
-#         mw_ary3_1,
+#         background_subtracted_data_1,
 #         k4dcv_2,
-#         dcvd_ary3_1,
-#         wva_data_2,
-#         dcv_aw_ary3_1)
+#         deconvoluted_data_1,
+#         norm_data_2,
+#         calibrated_data_1)
 # end ## calib_calib
 
 

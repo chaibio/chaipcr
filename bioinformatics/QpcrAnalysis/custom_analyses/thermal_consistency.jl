@@ -29,7 +29,7 @@ function act(
     span_smooth_default ::Real =0.015,
     span_smooth_factor  ::Real =7.2,
     dye_in              ::Symbol =:FAM,
-    dyes_2bfild         ::AbstractVector =[],
+    dyes_to_be_filled   ::AbstractVector =[],
     dcv                 ::Bool =true, ## if true, perform multi-channel deconvolution
     max_tmprtr          ::Real =1000, ## maximum temperature to analyze
     reporting           =roundoff(JSON_DIGITS) ## reporting function
@@ -63,7 +63,7 @@ function act(
                 span_smooth_default = span_smooth_default,
                 span_smooth_factor = span_smooth_factor,
                 dye_in = dye_in,
-                dyes_2bfild = dyes_2bfild,
+                dyes_to_be_filled = dyes_to_be_filled,
                 dcv = dcv,
                 max_tmprtr = max_tmprtr,
                 out_format = :full,
