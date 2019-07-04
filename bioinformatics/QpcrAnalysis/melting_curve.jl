@@ -37,6 +37,7 @@ function act(
             return fail(logger, ArgumentError(
                 "no calibration information found")) |> out(out_format)
     end
+    const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
 
     # kwdict_pmc = OrderedDict{Symbol,Any}()
     # for key in ["channel_nums"]
@@ -54,7 +55,7 @@ function act(
     const response = try
         process_mc(
             req_dict[RAW_DATA_KEY],
-            req_dict[CALIBRATION_INFO_KEY];
+            calibration_data;
             out_format = out_format,
             # kwdict_pmc...,
             kwdict_mc_tm_pw = kwdict_mc_tm_pw)
@@ -65,20 +66,18 @@ function act(
 end ## act(::Val{meltcurve})
 
 
-## Top-level function: get melting curve data and Tm for a melt curve experiment
+## analyse melting curve experiment
 function process_mc(
     mc_data             ::Associative,
-    calib_data          ::Associative;
-    ## start: arguments that might be passed by upstream code
+    calibration_data    ::CalibrationData{<: Real};
     well_nums           ::AbstractVector =[],
     auto_span_smooth    ::Bool =false,
     span_smooth_default ::Real =0.015,
     span_smooth_factor  ::Real =7.2,
-    ## end: arguments that might be passed by upstream code
     dye_in              ::Symbol = :FAM,
     dyes_to_be_filled   ::AbstractVector =[],
     dcv                 ::Bool =true, ## logical, whether to perform multi-channel deconvolution
-	max_tmprtr          ::Real =1000, ## maximum temperature to analyze
+	max_temperature     ::Real =1000, ## maximum temperature (argument not used)
     out_format          ::Symbol = :pre_json, ## :full, :pre_json, :json
     kwdict_mc_tm_pw     ::Associative =OrderedDict() ## keyword arguments passed onto `mc_tm_pw`
 )
@@ -199,7 +198,7 @@ function process_mc(
             raw_data,
             num_channels == 1 ? false : dcv,
             channel_nums,
-            calib_data,
+            calibration_data,
             fluo_well_nums,
             dye_in,
             dyes_to_be_filled;

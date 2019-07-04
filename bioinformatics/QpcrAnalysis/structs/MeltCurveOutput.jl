@@ -10,7 +10,7 @@ struct MeltCurveOutput
     fluo_well_nums          ::Vector{Int}
     raw                     ::DataArray{Float_T,3}
     background_subtracted   ::DataArray{Float_T,3}
-    k4dcv                   ::DeconvMatrices
+    k4dcv                   ::K4Deconv
     deconvoluted            ::DataArray{Float_T,3}
     normalizable            ::OrderedDict{Symbol,Dict{Int,Vector{Float_T}}}
     norm_well_nums          ::Vector{Int}

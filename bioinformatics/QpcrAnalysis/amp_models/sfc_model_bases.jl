@@ -1,4 +1,4 @@
-## sfc_model_bases.jl
+## SFC_model_bases.jl
 ##
 ## Author: Tom Price
 ## Date:   June 2019

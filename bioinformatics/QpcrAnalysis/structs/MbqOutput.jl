@@ -1,6 +1,6 @@
 ## AmpQuantification.jl
 ##
-## output from quantify() in amplification.jl
+## output from mod_bl_q() in amplification.jl
 ##
 ## Author: Tom Price
 ## Date:   June 2019

@@ -102,7 +102,7 @@ function fit(
     coefs = map(getvalue, [fb, d0, k])
     obj_val = getobjectivevalue(jmp_model)
 
-    return MAK2Fitted(
+    return MAK2Fit(
         max_d_idx,
         coef_strs,
         coefs,
@@ -168,7 +168,7 @@ function fit(
     coefs = map(getvalue, [fb, bl_k, d0, k])
     obj_val = getobjectivevalue(jmp_model)
 
-    return MAK3Fitted(
+    return MAK3Fit(
         max_d_idx,
         fb_start,
         bl_k_start,

@@ -12,19 +12,19 @@ import Memento: debug, error
 
 ## function: perform deconvolution and adjust well-to-well variation in absolute fluorescence
 function calibrate(
-    raw_data                ::AbstractArray,        ## array of raw fluorescence by cycle, well, channel
-    dcv                     ::Bool,                 ## signal to perform multi-channel deconvolution
-    channel_nums            ::AbstractVector,       ## vector of channel numbers
+    raw_data                ::AbstractArray,            ## array of raw fluorescence by cycle, well, channel
+    dcv                     ::Bool,                     ## signal to perform multi-channel deconvolution
+    channel_nums            ::AbstractVector,           ## vector of channel numbers
     ## remove MySql dependency
     # db_conn ::MySQL.MySQLHandle, ## `db_conn_default` is defined in "__init__.jl"
     # calib_info ::Union{Integer,OrderedDict},
     # well_nums_found_in_fr ::AbstractVector,
     # well_nums_in_req ::AbstractVector=[],
-    calib_data              ::Associative,          ## calibration dataset
-    well_nums_found_in_fr   ::AbstractVector,       ## vector of well numbers
+    calibration_data        ::CalibrationData{<: Real}, ## calibration dataset
+    well_nums_found_in_fr   ::AbstractVector,           ## vector of well numbers
     dye_in                  ::Symbol = :FAM,
     dyes_to_be_filled       ::AbstractVector =[];
-    out_format              ::Symbol = :both        ## :array, :dict, :both
+    out_format              ::Symbol = :both            ## :array, :dict, :both
 )
     debug(logger, "at calibrate()")
 
@@ -33,11 +33,11 @@ function calibrate(
     # norm_data, norm_well_nums = prep_normalize(db_conn, calib_info, well_nums_in_req, dye_in, dyes_to_be_filled)
 
     ## assume without checking that we are using all the wells, all the time
-    const well_nums_in_req = calib_data |> num_wells |> from(0) |> collect
+    const well_nums_in_req = calibration_data |> num_wells |> from(0) |> collect
     #
-    ## prepare data to adjust well-to-well variation in absolute fluorescence values
+    ## prepare data for normalization
     const (norm_data, norm_well_nums) =
-        prep_normalize(calib_data, well_nums_in_req, dye_in, dyes_to_be_filled)
+        prep_normalize(calibration_data, well_nums_in_req, dye_in, dyes_to_be_filled)
     #
     ## overwrite the dummy well_nums
     norm_well_nums = well_nums_found_in_fr
@@ -60,7 +60,6 @@ function calibrate(
     debug(logger, repr(matched_well_idc))
 
     ## subtract background
-    ## mw = minus water
     const background_subtracted_data =
         cat(3,
             ## devectorized code avoids transposition
@@ -83,7 +82,7 @@ function calibrate(
                 1. * background_subtracted_data,
                 channel_nums,
                 matched_well_idc,
-                calib_data,
+                calibration_data,
                 well_nums_in_req;
                 out_format = :array)
         else ## !dcv

@@ -8,12 +8,12 @@ import DataStructures.OrderedDict
 
 
 function dispatch(
-        action          ::Symbol,
+    action_key      ::Symbol,
     request_body    ::AbstractString;
     verify          ::Bool =false
 )
-    const action_s = "\"" * replace(string(action), r"_", " ") * "\""
-    debug(logger, "at dispatch() with action $action_s")
+    const action_str = "\"" * replace(string(action_key), r"_", " ") * "\""
+    debug(logger, "at dispatch() with action $action_str")
     # debug(logger, "request body is:\n" * request_body)
 
     const result = try
@@ -29,26 +29,26 @@ function dispatch(
         ## Since the data structures are specific to each action,
         ## this should generally be done in the generic act() methods.
 
-        if !(action in keys(Action_DICT))
-            error(logger, "action $action_s is not recognized")
+        if !(action_key in keys(ACT))
+            error(logger, "action $action_str is not recognized")
         end
         ## else
-        const action_t = Val{Action_DICT[action]}()
+        const action = Val{ACT[action_key]}()
 
         const production_env = (get(ENV, "JULIA_ENV", nothing) == PRODUCTION_MODE)
         @static if !production_env
             ## this code is hidden from the parser on the BeagleBone
             if verify
                 const verify_input = try
-                    verify_request(action_t, req_parsed)
+                    verify_request(action, req_parsed)
                 catch
-                    warn(logger, "data supplied with $action_s request is in the wrong format")
+                    warn(logger, "data supplied with $action_str request is in the wrong format")
                 end ## try
             end ## if verify
         end ## if !production_env
 
         debug(logger, "dispatching to act() from dispatch()")
-        const response = act(action_t, req_parsed; out_format = :pre_json)
+        const response = act(action, req_parsed; out_format = :pre_json)
         println("response received")
         debug(logger, "response received from act() by dispatch()")
         debug(logger, repr(response))
@@ -58,9 +58,9 @@ function dispatch(
             ## this code is hidden from the parser on the BeagleBone
             if verify
                 const verify_output = try
-                    verify_response(action_t, JSON.parse(json_response, dicttype = OrderedDict))
+                    verify_response(action, JSON.parse(json_response, dicttype = OrderedDict))
                 catch
-                    warn(logger, "data returned from $action_s request is in the wrong format")
+                    warn(logger, "data returned from $action_str request is in the wrong format")
                 end ## try
             end ## if verify
         end ## if !production_env
@@ -171,6 +171,3 @@ end ## dispatch()
 # function test0()
 #     println(guids)
 # end
-
-
-#

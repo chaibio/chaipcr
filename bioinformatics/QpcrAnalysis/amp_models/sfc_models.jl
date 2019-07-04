@@ -1,9 +1,10 @@
-## sfc_models.jl
+## SFC_models.jl
 ##
-## models with same formula for each cycle (Sfc models)
+## models with same formula for each cycle (SFC models)
 
 import DataStructures.OrderedDict
 using JuMP
+
 
 ## function definitions
 
@@ -102,7 +103,7 @@ function add_func_fit!( ## vco = variable constraints objective
         "coef_strs = [\"$(join(md.coef_strs, "\", \""))\"]",
         "coefs = map(getvalue, [$(join(md.coef_strs, ", "))])",
         "obj_val = getobjectivevalue(jmp_model)",
-        "return SfcModelFit(coef_strs, coefs, status, obj_val, jmp_model, init_coefs); end"
+        "return SFCFit(coef_strs, coefs, status, obj_val, jmp_model, init_coefs); end"
     ], "; ")
     #
     ## add definition of func_fit

@@ -159,7 +159,7 @@ function fit(
     coefs = map(getvalue, [fb, eu0, d0, inh])
     obj_val = getobjectivevalue(jmp_model)
 
-    return MAKERGAUL3Fitted(
+    return MAKERGAUL3Fit(
         max_of_idx,
         coef_strs,
         coefs,
@@ -260,7 +260,7 @@ function fit(
     coefs = map(getvalue, [fb, bl_k, eu0, d0, inh])
     obj_val = getobjectivevalue(jmp_model)
 
-    return MAKERGAUL4Fitted(
+    return MAKERGAUL4Fit(
         max_of_idx,
         fb_start,
         bl_k_start,

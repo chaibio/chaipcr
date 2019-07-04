@@ -14,27 +14,6 @@ import DataStructures.OrderedDict
 
 abstract type AmpModelFit end
 
-struct SfcModelFit <: AmpModelFit
-    coef_strs   ::Vector{String}
-    coefs       ::Vector{Float_T}
-    status      ::Symbol
-    obj_val     ::AbstractFloat
-    jmp_model   ::JuMP.Model
-    init_coefs  ::OrderedDict{String,Float_T}
-end
-
-## Constructor method
-SfcModelFit(;
-    coef_strs   ::Vector{String}                =Vector{String}(),
-    coefs       ::Vector{Float_T}               =zeros(0),
-    status      ::Symbol                        = :not_fitted,
-    obj_val     ::AbstractFloat                 =0.0,
-    jmp_model   ::JuMP.Model                    =JuMP.Model(),
-    init_coefs  ::OrderedDict{String,Float_T}   =OrderedDict{String,Float_T}()
-) =
-    SfcModelFit(coef_strs, coefs, status, obj_val, jmp_model, init_coefs)
-
-
 struct MAK2Fit <: AmpModelFit
     max_d_idx   ::Int
     coef_strs   ::Vector{String}
@@ -131,10 +110,29 @@ MAKERGAUL4Fit(;
         coef_strs, coefs, status, obj_val, jmp_model)
 
 
+struct SFCFit <: AmpModelFit
+    coef_strs   ::Vector{String}
+    coefs       ::Vector{Float_T}
+    status      ::Symbol
+    obj_val     ::AbstractFloat
+    jmp_model   ::JuMP.Model
+    init_coefs  ::OrderedDict{String,Float_T}
+end
+
+## Constructor method
+SFCFit(;
+    coef_strs   ::Vector{String}                =Vector{String}(),
+    coefs       ::Vector{Float_T}               =zeros(0),
+    status      ::Symbol                        = :not_fitted,
+    obj_val     ::AbstractFloat                 =0.0,
+    jmp_model   ::JuMP.Model                    =JuMP.Model(),
+    init_coefs  ::OrderedDict{String,Float_T}   =OrderedDict{String,Float_T}()
+) =
+    SFCFit(coef_strs, coefs, status, obj_val, jmp_model, init_coefs)
+
+
 ## constants
 
 const ampmodelfits = subtypes(AmpModelFit)
-const AmpModelFit_DICT = OrderedDict(
-    zip(map(Symbol, ampmodels), ampmodelfits))
-
-## NB keys(AmpModelFit_DICT) = all the possible values of am_key in amp.jl
+const FIT = OrderedDict(
+    zip(ampmodels, ampmodelfits))

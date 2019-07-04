@@ -101,7 +101,7 @@ function act(
             return fail(logger, ArgumentError(
                 "no calibration information found")) |> out(out_format)
     end
-
+    const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
     ## we will assume that any relevant step/ramp information has already been passed along
     ## and is present in step_id / ramp_id
     const sr_key =
@@ -151,14 +151,13 @@ function act(
                 Dict{Symbol,Any}()
             end
         end
-    ## call
     const response = try
         process_amp(
             ## remove MySql dependency
             # db_conn, exp_id, asrp_vec, calib_info;
             # req_dict["experiment_id"],
             parse_raw_data()...,
-            req_dict[CALIBRATION_INFO_KEY],
+            calibration_data,
             asrp_vec;
             out_format  = out_format,
             kwdict_rc   = kwdict_rc,
@@ -193,7 +192,7 @@ function process_amp(
     num_fluo_wells          ::Integer,
     num_channels            ::Integer,
     raw_data                ::Array{<: Real,3},
-    calib_data              ::Associative,
+    calibration_data        ::CalibrationData{<: Real},
     ## we will assume that any relevant step/ramp information
     ## has already been passed along and is present in asrp_vec
     asrp_vec                ::Vector{AmpStepRampProperties};
@@ -202,19 +201,19 @@ function process_amp(
     baseline_cyc_bounds     ::AbstractVector =[],
     cq_method               ::Symbol = :Cy0,
     ct_fluos                ::AbstractVector =[],
-    max_cycle               ::Integer =1000, ## maximum temperature to analyze
+    max_cycle               ::Integer =1000, ## maximum number of cycles (argument not used)
     dcv                     ::Bool =true, ## if true, perform multi-channel deconvolution
     dye_in                  ::Symbol = :FAM,
     dyes_to_be_filled       ::AbstractVector =[],
     qt_prob_rc              ::Real =0.9, ## quantile probablity for fluo values per well
-    am_key                  ::Symbol = :SfcModel, ## :SfcModel, :MAKx, :MAKERGAULx
+    amp_model               ::AmpModel =SFC, ## SFC, MAKx, MAKERGAULx
     ipopt_print2file_prefix ::String ="", ## file prefix for Ipopt print for `mod_bl_q`
     kwdict_rc               ::Associative =Dict(), ## keyword arguments passed onto `report_cq!`,
     kwdict_mbq              ::Associative =Dict(), ## keyword arguments passed onto `mod_bl_q`
     ## allelic discrimination
-    ad_cycs                 ::Union{Integer,AbstractVector} =0, ## allelic discrimination: cycles of fluorescence to be used, 0 means the last cycle
+    ad_cycs                 ::Union{Integer,AbstractVector} =0, ## cycles of fluorescence to be used, 0 means the last cycle
     ctrl_well_dict          ::OrderedDict =CTRL_WELL_DICT,
-    cluster_method          ::ClusteringMethod = K_means_medoids, ## allelic discrimination: K_means(), K_medoids(), K_means_medoids()
+    cluster_method          ::ClusteringMethod =K_means_medoids, ## K_means, K_medoids, K_means_medoids
     norm_l                  ::Real =2, ## norm level for distance matrix, e.g. norm_l = 2 means l2-norm
     expected_ncg_raw        ::AbstractMatrix =DEFAULT_encgr, ## each column is a vector of binary genotype whose length is number of channels (0 => no signal, 1 => yes signal)
     categ_well_vec          ::AbstractVector =CATEG_WELL_VEC,
@@ -274,7 +273,7 @@ function process_amp(
                             baseline_cyc_bounds = _baseline_cyc_bounds[well_i, channel_i],
                             cq_method = :cp_dr1,
                             ct_fluo = NaN,
-                            am_key = am_key,
+                            amp_model = amp_model,
                             kwdict_mbq...)
                     end ## do well_i
                 mbq_array1 |>
@@ -297,7 +296,7 @@ function process_amp(
                         baseline_cyc_bounds = _baseline_cyc_bounds[well_i, channel_i],
                         cq_method = cq_method,
                         ct_fluo = _ct_fluos[channel_i],
-                        am_key = am_key,
+                        amp_model = amp_model,
                         kwdict_mbq...,
                         ipopt_print2file = ipopt_print2file)
                 end
@@ -322,7 +321,7 @@ function process_amp(
                     convert(typeof(getfield(full_amp_out, fn_mbq)), fv)) ## `setfield!` doesn't call `convert` on its own
             end ## next fn_mbq
             return nothing ## side effects only
-        end ## set_fn_mbq!
+        end ## set_fn_mbq!()
 
         function set_qt_fluos!()
             debug(logger, "at set_qt_fluos!()")
@@ -340,7 +339,8 @@ function process_amp(
             end
             return nothing ## side effects only
         end
-        ## end of function definitions nested within process_amp_1sr
+
+        ## << end of function definitions nested within process_amp_1sr
 
         debug(logger, "at process_amp_1sr()")
 
@@ -363,7 +363,7 @@ function process_amp(
                 # calib_info,
                 # fluo_well_nums,
                 # well_nums,
-                calib_data,
+                calibration_data,
                 fluo_well_nums,
                 dye_in,
                 dyes_to_be_filled;
@@ -371,7 +371,7 @@ function process_amp(
         #
         const _baseline_cyc_bounds = find_baseline_cyc_bounds()
         const NaN_array2 = amp_init(NaN)
-        const fitted_init = amp_init(AmpModelFit_DICT[am_key]())
+        const fitted_init = amp_init(FIT[amp_model]())
         const empty_vals_4cq = amp_init(OrderedDict{Symbol, AbstractFloat}())
         const ct_fluos_empty = fill(NaN, num_channels)
         const _ct_fluos = find_ct_fluos()
@@ -410,14 +410,13 @@ function process_amp(
             NaN_array2, ## qt_fluos
             Inf, ## max_qt_fluo
             NaN_array2, ## max_bsf
-            NaN_array2, ## scld_max_bsf
-            NaN_array2, ## scld_max_dr1
-            NaN_array2, ## scld_max_dr2
+            NaN_array2, ## scaled_max_bsf
+            NaN_array2, ## scaled_max_dr1
+            NaN_array2, ## scaled_max_dr2
             amp_init(""), ## why_NaN
             _ct_fluos, ## ct_fluos
             OrderedDict{Symbol, Vector{String}}(), ## assignments_adj_labels_dict
-            OrderedDict{Symbol, AssignGenosResult}() ## agr_dict
-        )
+            OrderedDict{Symbol, AssignGenosResult}()) ## agr_dict
         if num_cycs <= 2
             warn(logger, "number of cycles $num_cycs <= 2: baseline subtraction " *
                 "and Cq calculation will not be performed")
@@ -602,8 +601,8 @@ end ## process_amp()
 function mod_bl_q(
     fluos               ::AbstractVector;
     min_reliable_cyc    ::Real =5, ## >= 1
-    am_key              ::Symbol = :SfcModel, ## :SfcModel, :MAKx, :MAKERGAULx
-    sfc_model_defs      ::OrderedDict{Symbol, SFCModelDef} =MDs,
+    amp_model           ::AmpModel = SFC, ## SFC, MAKx, MAKERGAULx
+    SFC_model_defs      ::OrderedDict{Symbol, SFCModelDef} =MDs,
     bl_method           ::Symbol = :l4_enl,
     baseline_cyc_bounds ::AbstractVector =[],
     bl_fallback_func    ::Function =median,
@@ -612,24 +611,23 @@ function mod_bl_q(
     cq_method           ::Symbol = :Cy0,
     ct_fluo             ::Real =NaN,
     kwargs_jmp_model    ::OrderedDict =OrderedDict(
-        :solver => IpoptSolver(print_level=0, max_iter=35) ## `ReadOnlyMemoryError()` for v0.5.1
-        # :solver => IpoptSolver(print_level=0, max_iter=100) ## increase allowed number of iterations for MAK-based methods, due to possible numerical difficulties during search for fitting directions (step size becomes too small to be precisely represented by the precision allowed by the system's capacity)
-        # :solver => NLoptSolver(algorithm=:LN_COBYLA)
-    ),
+        :solver => IpoptSolver(print_level=0, max_iter=35)), ## `ReadOnlyMemoryError()` for v0.5.1
+        # :solver => IpoptSolver(print_level=0, max_iter=100)), ## increase allowed number of iterations for MAK-based methods, due to possible numerical difficulties during search for fitting directions (step size becomes too small to be precisely represented by the precision allowed by the system's capacity)
+        # :solver => NLoptSolver(algorithm=:LN_COBYLA)),
     ipopt_print2file ::String ="",
 )
-    function fit_dfc_model()
+    function fit_DFC_model()
         ## no fallback for baseline, because:
         ## (1) curve may fit well though :Error or :UserLimit
         ## (search step becomes very small but has not converge);
         ## (2) the guessed basedline (`start` of `fb`) is usually
         ## quite close to a sensible baseline.
-        const dfc_inst = Var{AmpModel_DICT[am_key]}()
+        const DFC_instance = FIT[amp_model]()
         const wts = ones(num_cycs)
-        const fitted_prebl = fit(dfc_inst, cycs, fluos, wts; kwargs_jmp_model...)
+        const fitted_prebl = fit(DFC_instance, cycs, fluos, wts; kwargs_jmp_model...)
         const baseline =
             fitted_prebl.coefs[1] +
-                am_key in [:MAK3, :MAKERGAUL4] ?
+                amp_model in [MAK3, MAKERGAUL4] ?
                     fitted_prebl.coefs[2] .* cycs : ## .+ ???
                     0.0
         const fitted_postbl = fitted_prebl
@@ -637,13 +635,13 @@ function mod_bl_q(
         const d0_i_vec = find(isequal(:d0), fitted_postbl.coef_syms)
         return MbqOutput(
             fitted_prebl,
-            [am_key], ## bl_notes,
+            [string(amp_model)], ## bl_notes,
             fluos .- baseline, ## blsub_fluos
             fitted_postbl,
             fitted_postbl.status,
             coefs_pob, ## coefs
             coefs_pob[d0_i_vec[1]], ## d0
-            pred_from_cycs(dfc_inst, cycs, coefs_pob...), ## blsub_fitted
+            pred_from_cycs(DFC_instance, cycs, coefs_pob...), ## blsub_fitted
             NaN, ## dr1_pred,
             NaN, ## dr2_pred,
             Inf, ## max_dr1
@@ -653,13 +651,12 @@ function mod_bl_q(
             NaN, ## cq_raw
             NaN, ## cq
             NaN, ## eff
-            NaN  ## cq_fluo
-        )
-    end ## fit_dfc_model()
+            NaN) ## cq_fluo
+    end ## fit_DFC_model()
 
-    function fit_sfc_model()
+    function fit_SFC_model()
 
-        function sfc_wts()
+        function SFC_wts()
             if bl_method in [:lin_1ft, :lin_2ft]
                 _wts = zeros(num_cycs)
                 _wts[colon(baseline_cyc_bounds...)] .= 1
@@ -673,10 +670,10 @@ function mod_bl_q(
                     return zeros(num_cycs)
                 end
             end
-        end
+        end ## SFC_wts()
 
         ## update bl_notes
-        function sfc_prebl_status(prebl_status ::Symbol)
+        function SFC_prebl_status(prebl_status ::Symbol)
             bl_notes = ["prebl_status $prebl_status", "model-derived baseline"]
             if prebl_status in [:Optimal, :UserLimit]
                 const (min_bfd, max_bfd) = extrema(blsub_fluos) ## `bfd` - blsub_fluos_draft
@@ -696,7 +693,7 @@ function mod_bl_q(
                 # error(logger, "Baseline estimation returned unrecognized termination status $prebl_status")
             end ## if prebl_status
             return bl_notes
-        end
+        end ## SFC_prebl_status()
 
         function bl_cycs()
             const len_bcb = length(baseline_cyc_bounds)
@@ -711,7 +708,7 @@ function mod_bl_q(
             end
             ## fallthrough
             throw(DomainError("too few cycles to estimate baseline"))
-        end
+        end ## bl_cycs()
 
         ## automatically choose baseline cycles as the flat part of the curve
         ## uses `fluos`, `last_cyc_wt0`; updates `bl_notes` using push!()
@@ -770,29 +767,30 @@ function mod_bl_q(
                     throw(ErrorException("unhandled error in func_pred_eff()"))
             end ## try
         end
-        ## end of function definitions nested within fit_sfc()
 
-        debug(logger, "at fit_sfc()")
+        ## << end of function definitions nested within fit_SFC()
+
+        debug(logger, "at fit_SFC()")
         const len_denser = denser_factor * (num_cycs - 1) + 1
         const cycs_denser = Array(range(1, 1/denser_factor, len_denser))
         const raw_cycs_index = colon(1, denser_factor, len_denser)
         ## to determine weights (`wts`) for sigmoid fitting per `min_reliable_cyc`
         const last_cyc_wt0 = floor(min_reliable_cyc) - 1
-        if bl_method in keys(sfc_model_defs)
+        if bl_method in keys(SFC_model_defs)
             ## fit model to find baseline
-            const wts = sfc_wts()
-            const fitted_prebl = sfc_model_defs[bl_method].func_fit(
+            const wts = SFC_wts()
+            const fitted_prebl = SFC_model_defs[bl_method].func_fit(
                 cycs, fluos, wts; kwargs_jmp_model...)
-            baseline = sfc_model_defs[bl_method].funcs_pred[:bl](cycs, fitted_prebl.coefs...) ## may be changed later
+            baseline = SFC_model_defs[bl_method].funcs_pred[:bl](cycs, fitted_prebl.coefs...) ## may be changed later
             blsub_fluos = fluos .- baseline
-            bl_notes = sfc_prebl_status(fitted_prebl.status)
+            bl_notes = SFC_prebl_status(fitted_prebl.status)
             if length(bl_notes) >= 2 && bl_notes[2] == "fallback"
                 const bl_func = bl_fallback_func
             end
         else
             ## do not fit model to find baseline
             const wts = ones(num_cycs)
-            const fitted_prebl = AF_EMPTY_DICT[am_key]
+            const fitted_prebl = FIT[amp_model]()
             bl_notes = ["no prebl_status", "no fallback"]
             if bl_method == :median
                 const bl_func = median
@@ -806,10 +804,10 @@ function mod_bl_q(
             baseline = bl_func(fluos[bl_cycs()]) ## change or new def
             blsub_fluos = fluos .- baseline
         end      
-        const fitted_postbl = sfc_model_defs[m_postbl].func_fit(
+        const fitted_postbl = SFC_model_defs[m_postbl].func_fit(
             cycs, blsub_fluos, wts; kwargs_jmp_model...)
         const coefs_pob = fitted_postbl.coefs
-        const funcs_pred = sfc_model_defs[m_postbl].funcs_pred
+        const funcs_pred = SFC_model_defs[m_postbl].funcs_pred
         const dr1_pred = funcs_pred[:dr1](cycs_denser, coefs_pob...)
         const (max_dr1, idx_max_dr1) = findmax(dr1_pred)
         const cyc_max_dr1 = cycs_denser[idx_max_dr1]
@@ -819,12 +817,12 @@ function mod_bl_q(
         const func_pred_f = funcs_pred[:f]
         const Cy0 = cyc_max_dr1 - func_pred_f(cyc_max_dr1, coefs_pob...) / max_dr1
         const ct = try
-                funcs_pred[:inv](ct_fluo, coefs_pob...)
-            catch err
-                isa(err, DomainError) ?
-                    Ct_VAL_DomainError :
-                    rethrow()
-            end ## try
+            funcs_pred[:inv](ct_fluo, coefs_pob...)
+        catch err
+            isa(err, DomainError) ?
+                Ct_VAL_DomainError :
+                rethrow()
+        end ## try
         const eff_pred = map(func_pred_eff, cycs_denser)
         const (eff_max, idx_max_eff) = findmax(eff_pred)
         const cyc_vals_4cq = OrderedDict(
@@ -859,8 +857,7 @@ function mod_bl_q(
             cq_raw,
             copy(cyc_vals_4cq[cq_method]), ## cq
             copy(eff_vals_4cq[cq_method]), ## eff
-            func_pred_f(cq_raw <= 0 ? NaN : cq_raw, coefs_pob...) ## cq_fluo
-        )
+            func_pred_f(cq_raw <= 0 ? NaN : cq_raw, coefs_pob...)) ## cq_fluo
     end
     ## end of function definitions nested within mod_bl_q
 
@@ -874,27 +871,27 @@ function mod_bl_q(
         push!(solver.options, (:output_file, ipopt_print2file))
     end
     ## fit model
-    if (am_key == :SfcModel)
-        fit_sfc_model()
-    elseif (am_key in (:MAK2, :MAK3, :MAKERGAUL3, :MAKERGAUL4))
-        fit_dfc_model()
+    if (amp_model == SFC)
+        fit_SFC_model()
+    elseif (amp_model in (MAK2, MAK3, MAKERGAUL3, MAKERGAUL4))
+        fit_DFC_model()
     else
-        throw(ArgumentError("`am_key` $am_key is not recognized"))
+        throw(ArgumentError("`amp_model` $amp_model is not recognized"))
     end ## if
 end ## mod_bl_q()
 
 
 function report_cq!(
-    full_amp_out    ::AmpStepRampOutput,
-    well_i          ::Integer,
-    channel_i       ::Integer;
-    before_128x     ::Bool =false,
+    full_amp_out        ::AmpStepRampOutput,
+    well_i              ::Integer,
+    channel_i           ::Integer;
+    before_128x         ::Bool =false,
     max_dr1_lb =472,
     max_dr2_lb =41,
     max_bsf_lb =4356,
-    scld_max_dr1_lb ::Real =0.0089, ## look like real amplification, scld_max_dr1 0.00894855, ip223, exp. 75, well A7, channel 2.
-    scld_max_dr2_lb ::Real =0.000689,
-    scld_max_bsf_lb ::Real =0.086
+    scaled_max_dr1_lb   ::Real =0.0089, ## look like real amplification, scaled_max_dr1 0.00894855, ip223, exp. 75, well A7, channel 2.
+    scaled_max_dr2_lb   ::Real =0.000689,
+    scaled_max_bsf_lb   ::Real =0.086
 )
     if before_128x
         max_dr1_lb, max_dr2_lb, max_bsf_lb = [max_dr1_lb, max_dr2_lb, max_bsf_lb] ./ 128
@@ -906,7 +903,7 @@ function report_cq!(
             [ :postbl_status, :cq_raw, :max_dr1, :max_dr2 ])
     const max_bsf = maximum(full_amp_out.blsub_fluos[:, well_i, channel_i])
     const b_ = full_amp_out.coefs[1, well_i, channel_i]
-    const (scld_max_dr1, scld_max_dr2, scld_max_bsf) =
+    const (scaled_max_dr1, scaled_max_dr2, scaled_max_bsf) =
         [max_dr1, max_dr2, max_bsf] ./ full_amp_out.max_qt_fluo
     const why_NaN =
         if postbl_status == :Error
@@ -923,23 +920,23 @@ function report_cq!(
             "max_dr2 $max_dr2 < max_dr2_lb $max_dr2_lb"
         elseif max_bsf < max_bsf_lb
             "max_bsf $max_bsf < max_bsf_lb $max_bsf_lb"
-        elseif scld_max_dr1 < scld_max_dr1_lb
-            "scld_max_dr1 $scld_max_dr1 < scld_max_dr1_lb $scld_max_dr1_lb"
-        elseif scld_max_dr2 < scld_max_dr2_lb
-            "scld_max_dr2 $scld_max_dr2 < scld_max_dr2_lb $scld_max_dr2_lb"
-        elseif scld_max_bsf < scld_max_bsf_lb
-            "scld_max_bsf $scld_max_bsf < scld_max_bsf_lb $scld_max_bsf_lb"
+        elseif scaled_max_dr1 < scaled_max_dr1_lb
+            "scaled_max_dr1 $scaled_max_dr1 < scaled_max_dr1_lb $scaled_max_dr1_lb"
+        elseif scaled_max_dr2 < scaled_max_dr2_lb
+            "scaled_max_dr2 $scaled_max_dr2 < scaled_max_dr2_lb $scaled_max_dr2_lb"
+        elseif scaled_max_bsf < scaled_max_bsf_lb
+            "scaled_max_bsf $scaled_max_bsf < scaled_max_bsf_lb $scaled_max_bsf_lb"
         else
             ""
         end ## why_NaN
     (why_NaN != "") && (full_amp_out.cq[well_i, channel_i] = NaN)
     #
     for tup in (
-        (:max_bsf,      max_bsf),
-        (:scld_max_dr1, scld_max_dr1),
-        (:scld_max_dr2, scld_max_dr2),
-        (:scld_max_bsf, scld_max_bsf),
-        (:why_NaN,      why_NaN))
+        (:max_bsf,        max_bsf),
+        (:scaled_max_dr1, scaled_max_dr1),
+        (:scaled_max_dr2, scaled_max_dr2),
+        (:scaled_max_bsf, scaled_max_bsf),
+        (:why_NaN,        why_NaN))
         getfield(full_amp_out, tup[1])[well_i, channel_i] = tup[2]
     end
     return nothing ## side effects only

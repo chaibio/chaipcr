@@ -52,27 +52,27 @@ end ## normalize
 
 ## function: check whether the data in optical calibration experiment is valid
 function prep_normalize(
-    calibration_data    ::Associative,
+    calibration_data    ::CalibrationData{C},
     well_nums           ::AbstractVector,
     dye_in              ::Symbol = :FAM,
     dyes_to_be_filled   ::AbstractVector =[]
-)
+) where {C <: Real}
     debug(logger, "at prep_normalize()")
     ## issue:
     ## using the current format for the request body there is no well_num information
     ## associated with the calibration data
-    signal_data_dict = OrderedDict{Int,Vector{Float_T}}() ## use type of calibration data
-    water_data_dict  = OrderedDict{Int,Vector{Float_T}}() ## use type of calibration data
+    signal_data_dict = OrderedDict{Int,Vector{C}}() ## | use type of calibration data
+    water_data_dict  = OrderedDict{Int,Vector{C}}() ## |
     stop_msgs  = Vector{String}()
-    for channel in 1:num_channels(calibration_data[WATER_KEY][FLUORESCENCE_VALUE_KEY])
-        key = CHANNEL_KEY * "_" * string(channel)
+    for channel in 1:calibration_data.num_channels
+        key = Symbol(CHANNEL_KEY, "_", string(channel))
         try
-            water_data_dict[channel]  = calibration_data[WATER_KEY][FLUORESCENCE_VALUE_KEY][channel]
+            water_data_dict[channel]  = calibration_data.water[channel]
         catch
             push!(stop_msgs, "Cannot access water calibration data for channel $channel")
         end ## try
         try
-            signal_data_dict[channel] = calibration_data[key][FLUORESCENCE_VALUE_KEY][channel]
+            signal_data_dict[channel] = getfield(calibration_data, key)[channel]
         catch
             push!(stop_msgs, "Cannot access signal calibration data for channel $channel")
         end ## try

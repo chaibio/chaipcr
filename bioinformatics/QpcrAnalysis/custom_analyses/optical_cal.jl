@@ -38,25 +38,23 @@ function act(
             return fail(logger, ArgumentError(
                 "no calibration information found")) |> out(out_format)
     end
-    const calib_info_dict = req_dict[CALIBRATION_INFO_KEY]
+    const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
     try
-        prep_normalize(calib_info_dict, well_nums, dye_in, dyes_to_be_filled)
+        prep_normalize(calibration_data, well_nums, dye_in, dyes_to_be_filled)
     catch err
         return fail(logger, err; bt=true) |> out(out_format)
     end
-    if (length(calib_info_dict) >= 3)
-        ## get_k
+    if (calibration_data.num_channels == 2)
         ## if there are 2 or more channels then
         ## the deconvolution matrix K is calculated
         ## otherwise deconvolution is not performed
         const result_k = try
-            get_k(calib_info_dict, well_nums)
+            get_k(calibration_data, well_nums)
         catch err
             return fail(logger, err; bt=true) |> out(out_format)
         end
         (length(result_k.inv_note) > 0) &&
             return fail(logger, result_k.inv_note) |> out(out_format)
     end ## if
-
     return OrderedDict(:valid => true) |> out(out_format)
 end ## act(::Val{optical_calibration})

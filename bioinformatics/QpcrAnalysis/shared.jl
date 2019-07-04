@@ -283,24 +283,11 @@ function dictvec2df(
     return df
 end
 
-## used in normalize.jl
-num_channels(fluos ::AbstractArray) =
-    (length(fluos) > 1) && thing(fluos[2]) ? 2 : 1
-
-num_channels(calib ::Associative) =
-    calib |> keys |>
-        mold(key -> num_channels(calib[key][FLUORESCENCE_VALUE_KEY])) |>
-        maximum
-
 ## used in calib.jl
+import Base.length
+length(::Void) = 0
 num_wells(fluos ::AbstractArray) =
-    fluos |> sift(thing) |> mold(length) |> maximum
-
-num_wells(calib ::Associative) =
-    calib |> keys |> collect |>
-        sift(key -> haskey(calib[key],FLUORESCENCE_VALUE_KEY)) |>
-        mold(key -> num_wells(calib[key][FLUORESCENCE_VALUE_KEY])) |>
-        maximum
+    fluos |> mold(length) |> maximum
 
 ## duplicated in MySQLforQpcrAnalysis.jl
 get_ordered_keys(dict ::Dict) =

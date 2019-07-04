@@ -4,9 +4,8 @@
 ## Date:   June 2019
 
 
-## rename `rbbs_3ary` as `calibrated` once juliaapi_new has been updated
+## issue: rename `rbbs_3ary` as `calibrated` once juliaapi_new has been updated
 struct AmpStepRampOutput2Bjson
-    # calibrated                  ::Array{Float_T,3} ## fluorescence after deconvolution and normalization
     rbbs_3ary                   ::Array{Float_T,3} ## fluorescence after deconvolution and normalization
     blsub_fluos                 ::Array{Float_T,3} ## fluorescence after baseline subtraction
     dr1_pred                    ::Array{Float_T,3} ## dF/dc (slope of fluorescence/cycle)

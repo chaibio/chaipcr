@@ -14,5 +14,5 @@ import DataStructures.OrderedDict
 @enum Action amplification meltcurve standard_curve load_script optical_calibration thermal_performance_diagnostic thermal_consistency optical_test_single_channel optical_test_dual_channel # your_own_analyze_functionality
 
 const actions = instances(Action)
-const Action_DICT = OrderedDict(
+const ACT = OrderedDict(
     zip(map(Symbol, actions), actions))

@@ -59,8 +59,7 @@ module QpcrAnalysis
     ## calibration
     include("structs/CalibrationData.jl")
     ## deconvolution
-    # include("structs/DeconvMatrices.jl")
-    include("structs/K4deconv.jl")
+    include("structs/K4Deconv.jl")
     include("structs/WellProc.jl")
     ## allelic discrimination
     include("structs/ClusteringMethod.jl")

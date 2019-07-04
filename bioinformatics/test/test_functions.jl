@@ -158,8 +158,8 @@ function generate_tests(;
         for channel_num in [:single_channel, :dual_channel]
             datafile = TEST_DATA[i, channel_num]
             if (datafile != "")
-                action = Symbol(TEST_DATA[i, :action])
-                action_t = Val{QpcrAnalysis.Action_DICT[action]}()
+                action_key = Symbol(TEST_DATA[i, :action])
+                # action = Val{QpcrAnalysis.ACT[action_key]}()
                 request = JSON.parsefile("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/$datafile.json",
                     dicttype=OrderedDict)
                 body = String(JSON.json(request))
@@ -168,15 +168,15 @@ function generate_tests(;
                     QpcrAnalysis.print_v(println, verbose, "Testing $testname")
                     @static BBB || FactCheck.clear_results()
                     if (debug) ## errors fail out
-                        # QpcrAnalysis.verify_request(action_t,request)
-                        response = QpcrAnalysis.act(action_t, request)
+                        # QpcrAnalysis.verify_request(action,request)
+                        response = QpcrAnalysis.act(action, request)
                         response_body = string(JSON.json(response))
                         response_parsed = JSON.parse(response_body, dicttype=OrderedDict)
-                        # QpcrAnalysis.verify_response(action_t,response_parsed)
+                        # QpcrAnalysis.verify_response(action,response_parsed)
                         ok = true
                     else ## continue tests after errors reported
                         (ok, response_body) = QpcrAnalysis.dispatch(
-                            action, body; verify=false)
+                            action_key, body; verify=false)
                         println("response_body:")
                         println(response_body)
                         response_parsed = JSON.parse(response_body, dicttype=OrderedDict)
