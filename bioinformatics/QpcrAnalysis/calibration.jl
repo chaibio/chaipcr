@@ -12,7 +12,7 @@ import Memento: debug, error
 
 ## function: perform deconvolution and adjust well-to-well variation in absolute fluorescence
 function calibrate(
-    raw_data                ::AbstractArray,            ## array of raw fluorescence by cycle, well, channel
+    raw_data                ::AbstractArray,            ## 3D array of raw fluorescence by cycle, well, channel
     dcv                     ::Bool,                     ## signal to perform multi-channel deconvolution
     channel_nums            ::AbstractVector,           ## vector of channel numbers
     ## remove MySql dependency

@@ -43,6 +43,13 @@ function act(
     end
     const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
 
+    ## parse melting curve data into DataFrame
+    # const mc_data = MeltCurveRawData(req_dict[RAW_DATA_KEY])
+    const mc_data = DataFrame()
+    foreach(keys(MC_RAW_FIELDS)) do key
+        mc_data[key] = mc_data[RAW_DATA_KEY][MC_RAW_FIELDS[key]]
+    end
+
     const kwdict_mc_tm_pw = OrderedDict{Symbol,Any}(
         map(keys(MC_TM_PW_KEYWORDS)) do key
             key => req_dict[MC_TM_PW_KEYWORDS[key]]
@@ -56,7 +63,7 @@ function act(
             # exp_id,
             # stage_id,
             # calib_info;
-            req_dict[RAW_DATA_KEY],
+            mc_data,
             calibration_data;
             well_nums = well_nums,
             auto_span_smooth = auto_span_smooth,

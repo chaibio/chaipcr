@@ -23,7 +23,7 @@ struct MAK2Fit <: AmpModelFit
     jmp_model   ::JuMP.Model
 end
 
-## Constructor method
+## constructor
 MAK2Fit(;
     max_d_idx   ::Int               =0,
     coef_strs   ::Vector{String}    =Vector{String}(),
@@ -47,7 +47,7 @@ struct MAK3Fit <: AmpModelFit
     jmp_model   ::JuMP.Model
 end
 
-## Constructor method
+## constructor
 MAK3Fit(;
     max_d_idx   ::Int               =0,
     fb_start    ::Float_T           =0.0,
@@ -71,7 +71,7 @@ struct MAKERGAUL3Fit <: AmpModelFit
     jmp_model   ::JuMP.Model
 end
 
-## Constructor method
+## constructor
 MAKERGAUL3Fit(;
     max_of_idx  ::Int               =0,
     coef_strs   ::Vector{String}    =Vector{String}(),
@@ -95,7 +95,7 @@ struct MAKERGAUL4Fit <: AmpModelFit
     jmp_model   ::JuMP.Model
 end
 
-## Constructor method
+## constructor
 MAKERGAUL4Fit(;
     max_of_idx  ::Int               =0,
     fb_start    ::Float_T           =0.0,
@@ -119,7 +119,7 @@ struct SFCFit <: AmpModelFit
     init_coefs  ::OrderedDict{String,Float_T}
 end
 
-## Constructor method
+## constructor
 SFCFit(;
     coef_strs   ::Vector{String}                =Vector{String}(),
     coefs       ::Vector{Float_T}               =zeros(0),
@@ -132,7 +132,6 @@ SFCFit(;
 
 
 ## constants
-
 const ampmodelfits = subtypes(AmpModelFit)
 const FIT = OrderedDict(
     zip(ampmodels, ampmodelfits))

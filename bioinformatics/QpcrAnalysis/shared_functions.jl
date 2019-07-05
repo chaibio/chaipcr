@@ -1,81 +1,71 @@
+## shared_functions.jl
+##
 ## functions used by multiple analytic methods
 
 import DataStructures.OrderedDict
 import Memento: debug, warn, error, Logger
 
 
-## simple macros
-# macro when(predicate, conditional)
-#     return :(if ($predicate)
-#         ($conditional)
-#     end)
-# end
-# macro unless(predicate, conditional)
-#     return :(if !($predicate)
-#         ($conditional)
-#     end)
-# end
-
-## used in amp.jl
-## used in shared.jl
+## used in amplification.jl
+## used in shared_functions.jl
 ## currying function
 curry(f) = x -> (y...) -> f(x, y...)
 
-## used in amp.jl
-## used in shared.jl
-## used in meltcrv.jl
+## used in amplification.jl
+## used in shared_functions.jl
+## used in melting_curve.jl
 ## used in optical_test_dual_channel.jl
 mold  = curry(map)       ## mold(f)  = x -> map(f, x)
 
-## used in amp.jl
-## used in shared.jl
-## used in meltcrv.jl
+## used in amplification.jl
+## used in shared_functions.jl
+## used in melting_curve.jl
 ## used in deconvolute.jl
 sift  = curry(filter)    ## sift(f)  = x -> filter(f, x)
 
-## used in meltcrv.jl
-## used in shared.jl
+## used in melting_curve.jl
+## used in shared_functions.jl
 cast  = curry(broadcast) ## cast(f)  = x -> broadcast(f, x)
 
-## used in calib.jl
-## used in shared.jl
+## used in calibration.jl
+## used in shared_functions.jl
 from  = curry(range)     ## from(b)  = e -> range(b, e)
 
-## used in shared.jl
+## used in shared_functions.jl
 ## flip function
 flip(f)  = y -> x -> f(x, y)
 
-## used in amp.jl
-## used in meltcrv.jl
+## used in amplification.jl
+## used in melting_curve.jl
 ## thermal_consistency.jl
 field = flip(getfield)  ## field(f) = x -> getfield(x, f)
 
-## used in amp.jl
-## used in meltcrv.jl
+## used in amplification.jl
+## used in melting_curve.jl
 index = flip(getindex)  ## index(i) = x -> getindex(x, i)
 
-## used in amp.jl
-## used in meltcrv.jl
+## used in amplification.jl
+## used in melting_curve.jl
 ## curried reporter function, flipped
 report(digits ::Integer, x) = round(x, digits)
 roundoff(digits ::Integer) = curry(report)(digits)
 const JSON_DIGITS = 6 ## number of decimal points for floats in JSON output
 
-## used in amp.jl
+## used in amplification.jl
 str2sym(x) = isa(x, String) ? Symbol(x) : x
 
 ## used in normalize.jl
-## used in meltcrv.jl
-## used in deconv.jl
+## used in melting_curve.jl
+## used in deconvolution.jl
 sweep(summary_func) = sweep_func -> x -> broadcast(sweep_func, x, summary_func(x))
 
-## used in meltcrv.jl
+## used in melting_curve.jl
 ## normalize values to a range from 0 to 1
 normalize_range(x ::AbstractArray) =
     sweep(minimum)(-)(x) |> sweep(maximum)(/)
 
-## used in meltcrv.jl
-## used in shared.jl
+## used in melting_curve.jl
+## used in shared_functions.jl
 # thing(x) = !(x == nothing)
 thing = (!isequal)(nothing)
 
@@ -83,42 +73,11 @@ thing = (!isequal)(nothing)
 ## transform `nothing` to NaN
 nothing2NaN(x) = thing(x) ? x : NaN
 
-## overloaded log format methods
-# function format(fmt ::DefaultFormatter, rec ::Record)
-#     notrace = getindex(rec, :levelnum) <= _log_levels["notice"]
-#     parts = map(fmt.tokens) do token
-#         content = token.first
-#         value = content
-#         if token.second
-#             tmp_val = rec[content]
-#             if content === :lookup && !notrace
-#                 name, file, line = if isa(tmp_val, StackFrame)
-#                     # lookup is a StackFrame
-#                     tmp_val.func, tmp_val.file, tmp_val.line
-#                 else
-#                     "<nothing>", "", -1
-#                 end
-#                 value = "$(name)@$(basename(string(file))):$(line)"
-#             elseif content === :stacktrace && !notrace
-#                 # stacktrace is a vector of StackFrames
-#                 str_frames = map(tmp_val) do frame
-#                     string(frame.func, "@", basename(string(frame.file)), ":", frame.line)
-#                 end
-#                 value = string(" stack:[", join(str_frames, ", "), "]")
-#             else
-#                 value = tmp_val
-#             end
-#         end
-#         return value
-#     end
-#     return string(parts...)
-# end
-
 out(out_format ::Symbol) =
     output -> (out_format == :json) ? JSON.json(output) : output
 
-## used in amp.jl
-## used in meltcrv.jl
+## used in amplification.jl
+## used in melting_curve.jl
 ## used in optical_cal.jl
 ## used in thermal_consistency.jl
 function fail(
@@ -152,8 +111,8 @@ function fail(
         :error => err_msg)
 end ## fail()
 
-## used in amp.jl
-## used in meltcrv.jl
+## used in amplification.jl
+## used in melting_curve.jl
 ## finite differencing function
 function finite_diff(
     X       ::AbstractVector,
@@ -200,14 +159,14 @@ function scinot(x ::Real, num_sig_digits ::Integer=3; log_base ::Integer=10)
     return (_mantissa, Int(_exponent))
 end
 
-## used in meltcrv.jl
+## used in melting_curve.jl
 is_increasing(x ::AbstractVector) = diff(x) .> zero(x)
 
-## used in meltcrv.jl
+## used in melting_curve.jl
 ## truncate elements to length of shortest element
 shorten(x) = map(y -> y[x |> mold(length) |> minimum |> from(1)], x)
 
-## used in meltcrv.jl
+## used in melting_curve.jl
 ## extend vector with NaN values to a specified length
 ## curried function
 extend_NaN(len ::Integer) =
@@ -222,7 +181,7 @@ extend_NaN(len ::Integer) =
 extend(x ::AbstractArray) =
     map(extend_NaN(y |> mold(length) |> maximum), x)
 
-## used in meltcrv.jl
+## used in melting_curve.jl
 ## used in pnmsmu.jl
 ## find nearby data points in vector
 ## `giis` - get indices in span
@@ -253,10 +212,10 @@ function find_mid_sumr_bysw(
         mold(v -> sumr_func(v) == v[half_width + 1]) |> find
 end
 
-## used in meltcrv.jl
+## used in melting_curve.jl
 ordered_tuple(x, y) = (x < y) ? (x, y) : (y, x)
 
-## used in meltcrv.jl
+## used in melting_curve.jl
 split_vector_and_return_larger_quantile(
     x                   ::AbstractVector,
     len                 ::Integer,          ## == length(x)
@@ -266,24 +225,7 @@ split_vector_and_return_larger_quantile(
         quantile(x[range], p)
     end |> maximum
 
-## functions
-## moved to MySQLforQpcrAnalysis.jl: get_mysql_data_well
-
-## construct DataFrame from dictionary key and value vectors
-## `dict_keys` need to be a vector of strings
-## to construct DataFrame column indices correctly
-function dictvec2df(
-    dict_keys           ::AbstractVector,
-    dict_values         ::AbstractVector
-)
-    df = DataFrame()
-    for dict_key in dict_keys
-        df[Symbol(dict_key)] = map(index(dict_key), dict_values)
-    end 
-    return df
-end
-
-## used in calib.jl
+## used in calibration.jl
 import Base.length
 length(::Void) = 0
 num_wells(fluos ::AbstractArray) =
@@ -441,3 +383,31 @@ end
 #     return (found_well_namedtuple, found_well_nums)
 # end
 
+## functions
+## moved to MySQLforQpcrAnalysis.jl: get_mysql_data_well
+
+## construct DataFrame from dictionary key and value vectors
+## `dict_keys` need to be a vector of strings
+## to construct DataFrame column indices correctly
+# function dictvec2df(
+#     dict_keys           ::AbstractVector,
+#     dict_values         ::AbstractVector
+# )
+#     df = DataFrame()
+#     for dict_key in dict_keys
+#         df[Symbol(dict_key)] = map(index(dict_key), dict_values)
+#     end 
+#     return df
+# end
+
+## simple macros
+# macro when(predicate, conditional)
+#     return :(if ($predicate)
+#         ($conditional)
+#     end)
+# end
+# macro unless(predicate, conditional)
+#     return :(if !($predicate)
+#         ($conditional)
+#     end)
+# end

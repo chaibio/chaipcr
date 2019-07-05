@@ -50,7 +50,7 @@ module QpcrAnalysis
     ## include each script, generally in the order of workflow
 
     ## shared functions
-    include("shared.jl")
+    include("shared_functions.jl")
 
     ## struct definitions for:
 

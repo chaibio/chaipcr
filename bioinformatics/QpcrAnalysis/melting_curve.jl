@@ -4,13 +4,18 @@
 
 import DataStructures.OrderedDict
 import DataArrays.DataArray
+import DataFrames.DataFrame
 import StatsBase: rle
 import Dierckx: Spline1D, derivative
 import Memento: debug, info, warn, error
 
 
 ## constants >>
-
+const MC_RAW_FIELDS = OrderedDict(
+    :temperature    => TEMPERATURE_KEY,
+    :fluorescence   => FLUORESCENCE_VALUE_KEY,
+    :well           => WELL_NUM_KEY,
+    :channel        => CHANNEL_KEY)
 const MC_TM_PW_KEYWORDS = Dict{Symbol,String}(
     :qt_prob_flTm   => "qt_prob",
     :normd_qtv_ub   => "max_normd_qtv",
@@ -39,6 +44,13 @@ function act(
     end
     const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
 
+    ## parse melting curve data into DataFrame
+    # const mc_data = MeltCurveRawData(req_dict[RAW_DATA_KEY])
+    const mc_data = DataFrame()
+    foreach(keys(MC_RAW_FIELDS)) do key
+        mc_data[key] = mc_data[RAW_DATA_KEY][MC_RAW_FIELDS[key]]
+    end
+
     # kwdict_pmc = OrderedDict{Symbol,Any}()
     # for key in ["channel_nums"]
     #     if key in keys_req_dict
@@ -54,7 +66,7 @@ function act(
     ## which will perform the analysis for the entire dataset
     const response = try
         process_mc(
-            req_dict[RAW_DATA_KEY],
+            mc_data,
             calibration_data;
             out_format = out_format,
             # kwdict_pmc...,
@@ -68,7 +80,7 @@ end ## act(::Val{meltcurve})
 
 ## analyse melting curve experiment
 function process_mc(
-    mc_data             ::Associative,
+    mc_data             ::DataFrame,
     calibration_data    ::CalibrationData{<: Real};
     well_nums           ::AbstractVector =[],
     auto_span_smooth    ::Bool =false,
@@ -81,17 +93,20 @@ function process_mc(
     out_format          ::Symbol = :pre_json, ## :full, :pre_json, :json
     kwdict_mc_tm_pw     ::Associative =OrderedDict() ## keyword arguments passed onto `mc_tm_pw`
 )
-    ## function: get raw melt curve data by channel and perform optical calibration
+    ## function: format fluorescence data for calibration
     ##
-    ## issue: this would be vastly simpler using DataFrames
+    ## issue:
+    ## this generates a lot of intermediate representations
+    ## and might be sped up by creating an appropriate container
+    ## and mutating it in place
     function get_mc_data(channel_num ::Integer)
 
         ## subset melting curve data by channel (curried)
         select_mcdata_by_channel(channel_num ::Integer) =
             mc_data ::Associative ->
                 Dict(
-                    map([TEMPERATURE_KEY, FLUORESCENCE_VALUE_KEY, WELL_NUM_KEY]) do key
-                        Symbol(key) => mc_data[key][mc_data[CHANNEL_KEY] .== channel_num]
+                    map([:temperature, :fluorescence, :well]) do f
+                        f => getfield(mc_data, f)[mc_data.channel .== channel_num]
                     end)
 
         ## split temperature and fluorescence data by well
@@ -105,20 +120,13 @@ function process_mc(
             end
 
         ## extend data vectors with NaN values where necessary to make them equal in length
+        ## this is performed to convert the fluorescence data to a 3D array
         ##
         ## issue:
-        ## this is performed to convert the fluorescence data to a 3D array
-        ## it is, however, completely unnecessary to convert the data to this format
-        ## because the 3D array is immediately sliced by channel
-        ## and all the NaN values that have been inserted by this function
-        ## must then be removed in normalize_tf()
+        ## although it is unlikely that the maximum vector length varies by channel
+        ## if it does the arrays (which are generated separately by channel)
+        ## will not be conformable and the algorithm will fail
         extend_tf_vecs(tf_dict_vec ::AbstractArray) =
-            # map(tf_dict_vec) do tf_dict
-            #     Dict(
-            #         map(TF_KEYS) do key
-            #             key => extend_NaN(map(x -> length(x[:temperature]), tf_dict_vec) |> maximum)(tf_dict[key])
-            #         end)
-            # end
             map(tf_dict_vec) do tf_dict
                 Dict(
                     map(TF_KEYS) do key
@@ -133,12 +141,12 @@ function process_mc(
         toMeltCurveTF(tf_nv_adj ::AbstractArray) =
             MeltCurveTF(
                 map(TF_KEYS) do key
-                    # mapreduce(tf_dict -> tf_dict[key], hcat, tf_nv_adj)
                     mapreduce(index(key), hcat, tf_nv_adj)
                 end...)
 
     ## << end of function definitions nested in get_mc_data()
 
+    ## calculate
         mc_data |>
         select_mcdata_by_channel(channel_num) |>
         split_tf_by_well |>
@@ -146,15 +154,6 @@ function process_mc(
         toMeltCurveTF
     end ## get_mc_data
 
-    # function normalize_tf(channel_i ::Integer, i ::Integer)
-    #     debug(logger, repr(mc_data_bych[channel_i].temperature[:, i]))
-    #     debug(logger, repr(calibrated_data[:, i, channel_i]))
-    #     throw("stop")
-    #     normalize_fluos(
-    #         remove_when_NaN_in_first(
-    #             mc_data_bych[channel_i].t_da[:, i],
-    #             calibrated_data[:, i, channel_i])...)
-    # end
     normalize_tf(c ::Integer, w ::Integer) =
         normalize_fluos(
             remove_when_temperature_NaN(
@@ -162,16 +161,17 @@ function process_mc(
                 calibrated_data[:, w, c])...)
 
     remove_when_temperature_NaN(x...) =
-        map(y -> y[broadcast(!isnan, first(x))], x)
-        # map(first(x) |> cast(!isnan) |> index, x)
+        # map(y -> y[broadcast(!isnan, first(x))], x)
+        map(first(x) |> cast(!isnan) |> index, x)
 
+    ## subtract lowest fluorescence value
+    ## NB if any value is NaN, the result will be all NaNs
     normalize_fluos(
         tmprtrs     ::DataArray{<: AbstractFloat},
         fluos_raw   ::AbstractVector{<: AbstractFloat}) =
             Dict(
                 :tmprtrs => tmprtrs,
-                # :fluos   => sweep(minimum)(-)(fluos_raw))
-                :fluos   => fluos_raw .- minimum(fluos_raw |> sift(!isnan)))
+                :fluos   => sweep(minimum)(-)(fluos_raw))
 
     ## << end of function definitions nested in process_mc()
 

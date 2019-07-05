@@ -18,7 +18,7 @@ struct CalibrationData{C <: Real} <: AbstractCalibrationData
     num_channels    ::Int
 end
 
-## constructor method
+## constructor
 function CalibrationData(calib ::Associative)
     const w  = calib[WATER_KEY][FLUORESCENCE_VALUE_KEY]
     const C  = typeof(w[1][1])
