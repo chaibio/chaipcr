@@ -6,7 +6,9 @@ import Dierckx: Spline1D, derivative
 import Memento: debug, warn, error
 
 
-## constants
+## constants 
+
+## preset values
 const MIN_FLUORESCENCE_VAL = 8e5
 const MIN_TM_VAL = 77
 const MAX_TM_VAL = 81
@@ -14,6 +16,8 @@ const MAX_DELTA_TM_VAL = 2
 
 
 ## called by dispatch()
+## NB default values supplied to process_mc()
+##    are the same as for melting curve experiments
 function act(
     ::Type{Val{thermal_consistency}},
     ## remove MySql dependency
@@ -23,14 +27,12 @@ function act(
     # calib_info ::Union{Integer,OrderedDict};
     req_dict            ::Associative;
     out_format          ::Symbol = :pre_json,
-    well_nums           ::AbstractVector =[],
-    auto_span_smooth    ::Bool =false,
-    span_smooth_default ::Real =0.015,
-    span_smooth_factor  ::Real =7.2,
-    dye_in              ::Symbol = :FAM,
-    dyes_to_be_filled   ::AbstractVector =[],
-    dcv                 ::Bool =true, ## if true, perform multi-channel deconvolution
-    max_temperature     ::Real =1000, ## maximum temperature to analyze
+    well_nums           ::AbstractVector = DEFAULT_MC_WELL_NUMS,
+    auto_span_smooth    ::Bool = DEFAULT_MC_AUTO_SPAN_SMOOTH,
+    span_smooth_default ::Real = DEFAULT_MC_SPAN_SMOOTH_DEFAULT,
+    span_smooth_factor  ::Real = DEFAULT_MC_SPAN_SMOOTH_FACTOR,
+    dcv                 ::Bool = DEFAULT_MC_DCV, ## if true, perform multi-channel deconvolution
+    max_temperature     ::Real = DEFAULT_MC_MAX_TEMPERATURE, ## maximum temperature to analyze
     reporting           =roundoff(JSON_DIGITS) ## reporting function
 )
     debug(logger, "at act(::Type{Val{thermal_consistency}})")
@@ -69,8 +71,6 @@ function act(
             auto_span_smooth = auto_span_smooth,
             span_smooth_default = span_smooth_default,
             span_smooth_factor = span_smooth_factor,
-            dye_in = dye_in,
-            dyes_to_be_filled = dyes_to_be_filled,
             dcv = dcv,
             max_temperature = max_temperature,
             out_format = :full,

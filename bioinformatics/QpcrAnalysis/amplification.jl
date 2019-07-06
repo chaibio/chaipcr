@@ -11,21 +11,50 @@ using Ipopt
 
 ## constants >>
 
+## default for asrp_vec
+const DEFAULT_AMP_CYC_NUMS          = Vector{Int}()
+
+## default for calibration
+const DEFAULT_AMP_DCV               = true
+
+## defaults for baseline model
+const DEFAULT_AMP_MODEL             = SFCModel
+const DEFAULT_AMP_MODEL_NAME        = :l4_enl
+const DEFAULT_AMP_MODEL_DEF         = SFC_MDs[DEFAULT_AMP_MODEL_NAME]
+
+## defaults for report_cq!()
+## note for default scaled_max_dr1_lb:
+## 'look like real amplification, scaled_max_dr1 0.00894855, ip223, exp. 75, well A7, channel 2`
+const DEFAULT_AMP_QT_PROB           = 0.9
+const DEFAULT_AMP_BEFORE_128X       = false
+const DEFAULT_AMP_MAX_DR1_LB        = 472
+const DEFAULT_AMP_MAX_DR2_LB        = 41
+const DEFAULT_AMP_MAX_BSF_LB        = 4356
+const DEFAULT_AMP_SCALED_MAX_DR1_LB = 0.0089
+const DEFAULT_AMP_SCALED_MAX_DR2_LB = 0.000689
+const DEFAULT_AMP_SCALED_MAX_BSF_LB = 0.086
+
+## defaults for process_ad()
+const DEFAULT_AMP_CYCS              = 0
+# const DEFAULT_AMP_CTRL_WELL_DICT    = CTRL_WELL_DICT
+const DEFAULT_AMP_CLUSTER_METHOD    = k_means_medoids
+const DEFAULT_AMP_NORM_L            = 2
+# const DEFAULT_AMP_DEFAULT_ENCGR     = DEFAULT_encgr
+# const DEFAULT_AMP_CATEG_WELL_VEC    = CATEG_WELL_VEC
+
+## other
 const CT_VAL_DOMAINERROR = -99 ## a value that cannot be obtained by normal calculation of Ct
-const CYC_NUMS_DEFAULT = Vector{Int}()
 const KWARGS_RC_KEYS = Dict(
     "min_fluomax"   => :max_bsf_lb,
     "min_D1max"     => :max_dr1_lb,
     "min_D2max"     => :max_dr2_lb)
-const KWARGS_PA1_KEYS =
+const KWARGS_FIT_KEYS =
     ["min_reliable_cyc", "baseline_cyc_bounds", "cq_method", "ctrl_well_dict"]
-## choose default model for amplification curve fitting
-const DEFAULT_AMP_MODEL_NAME = :l4_enl
 
 
 ## function definitions >>
 
-## called by dispatch
+## called by dispatch()
 function act(
     ::Type{Val{amplification}},
     req_dict        ::Associative;
@@ -89,9 +118,9 @@ function act(
     ## remove MySql dependency
     ## asrp_vec
     # if "step_id" in keys_req_dict
-    #     asrp_vec = [AmpStepRampProperties("step", req_dict["step_id"], CYC_NUMS_DEFAULT)]
+    #     asrp_vec = [AmpStepRampProperties("step", req_dict["step_id"], DEFAULT_AMP_CYC_NUMS)]
     # elseif "ramp_id" in keys_req_dict
-    #     asrp_vec = [AmpStepRampProperties("ramp", req_dict["ramp_id"], CYC_NUMS_DEFAULT)]
+    #     asrp_vec = [AmpStepRampProperties("ramp", req_dict["ramp_id"], DEFAULT_AMP_CYC_NUMS)]
     # else
     #     asrp_vec = Vector{AmpStepRampProperties}()
     # end
@@ -111,7 +140,7 @@ function act(
         elseif  req_key(RAMP_ID_KEY) RAMP_ID_KEY
         else throw(ArgumentError("no step/ramp information found"))
         end
-    const asrp_vec = [AmpStepRampProperties(:ramp, req_dict[sr_key], CYC_NUMS_DEFAULT)]
+    const asrp_vec = [AmpStepRampProperties(:ramp, req_dict[sr_key], DEFAULT_AMP_CYC_NUMS)]
     ## `report_cq!` arguments
     const kwargs_rc = Dict{Symbol,Any}(
         map(KWARGS_RC_KEYS   |> keys |> collect |> sift(req_key)) do key
@@ -161,7 +190,6 @@ function act(
             parse_raw_data()...,
             calibration_data,
             asrp_vec;
-            kwargs_cal      = Dict{Symbol,Any}(),
             kwargs_fit      = kwargs_fit,
             kwargs_rc       = kwargs_rc,
             kwargs_ad       = Dict{Symbol,Any}(),
@@ -201,36 +229,33 @@ function process_amp(
     ## has already been passed along and is present in asrp_vec
     asrp_vec                ::Vector{AmpStepRampProperties};
     ## calibration parameters
-    kwargs_cal              ::Associative = Dict{Symbol,Any}(
-        dcv                     => true, ## if true, perform multi-channel deconvolution
-        dye_in                  => :FAM,
-        dyes_to_be_filled       => []),
+    dcv                     ::Bool = DEFAULT_AMP_DCV, ## if true, perform multi-channel deconvolution
     ## arguments for fit_baseline_model()
-    amp_model               ::AmpModel =SFC,        ## SFC, MAKx, MAKERGAULx
-    ipopt_print2file_prefix ::String = "", ## file prefix for Ipopt print
+    amp_model               ::AmpModel = DEFAULT_AMP_MODEL, ## SFC, MAKx, MAKERGAULx
+    ipopt_print2file_prefix ::String = "",          ## file prefix for Ipopt print
     kwargs_fit              ::Associative =Dict{Symbol,Any}(), ## passed from request
     ## baseline model parameters
-    baseline_cyc_bounds     ::AbstractVector =[],   ## argument only used for SFC
-    min_reliable_cyc        ::Real =5,              ## argument only used for SFC
-    max_cycle               ::Integer =1000,        ## argument not used
+    baseline_cyc_bounds     ::AbstractVector = [],  ## argument only used for SFC
+    min_reliable_cyc        ::Real = 5,             ## argument only used for SFC
+    max_cycle               ::Integer = 1000,       ## argument not used
     ## quantification parameters
     cq_method               ::Symbol = :Cy0,        ## argument only used for SFC
-    ct_fluos                ::AbstractVector =[],   ## argument only used for SFC
+    ct_fluos                ::AbstractVector = [],  ## argument only used for SFC
     ## arguments for set_qt_fluos!()
-    qt_prob_rc              ::Real =0.9, ## quantile probablity for fluo values per well
+    qt_prob_rc              ::Real = 0.9,           ## quantile probablity for fluo values per well
     ## arguments for report_cq!()
-    kwargs_rc               ::Associative =Dict{Symbol,Any}(), ## passed from request
+    kwargs_rc               ::Associative = Dict{Symbol,Any}(), ## passed from request
     ## allelic discrimination parameters
     kwargs_ad                   ::Associative = Dict{Symbol,Any}(
-        cycs                        => 0, ## cycles of fluorescence to be used, 0 means the last cycle
-        ctrl_well_dict              => CTRL_WELL_DICT,
-        cluster_method              => k_means_medoids, ## k_means, k_medoids, k_means_medoids
-        norm_l                      => 2, ## norm level for distance matrix, e.g. norm_l = 2 means l2-norm
-        expected_ncg_raw            => DEFAULT_encgr, ## each column is a vector of binary genotype whose length is number of channels (0 => no signal, 1 => yes signal)
-        categ_well_vec              => CATEG_WELL_VEC),
+        cycs                        => DEFAULT_AMP_CYCS, ## cycles of fluorescence to be used, 0 means the last cycle
+        ctrl_well_dict              => DEFAULT_AMP_CTRL_WELL_DICT,
+        cluster_method              => DEFAULT_AMP_CLUSTER_METHOD, ## k_means, k_medoids, k_means_medoids
+        norm_l                      => DEFAULT_AMP_NORM_L, ## norm level for distance matrix, e.g. norm_l = 2 means L2-norm
+        expected_ncg_raw            => DEFAULT_AMP_DEFAULT_ENCGR, ## each column is a vector of binary genotype whose length is number of channels (0 => no signal, 1 => yes signal)
+        categ_well_vec              => DEFAULT_AMP_CATEG_WELL_VEC),
     ## output options
-    out_sr_dict             ::Bool = true, ## output an OrderedDict keyed by `sr_str`s
-    out_format              ::Symbol = :json, ## :full, :pre_json, :json
+    out_sr_dict             ::Bool = true,          ## output OrderedDict keyed by `sr`
+    out_format              ::Symbol = :json,       ## :full, :pre_json, :json
     reporting               ::Function = roundoff(JSON_DIGITS), ## reporting function
 )
     ## process amplification per step
@@ -242,6 +267,7 @@ function process_amp(
         # calib_info ::Union{Integer,OrderedDict},
         # fluo_well_nums ::AbstractVector,
         # well_nums ::AbstractVector,
+        kwargs_jmp_model        ::Associative,
         asrp                    ::AmpStepRampProperties,
         dcv                     ::Bool, ## logical, whether to perform multi-channel deconvolution
         out_format              ::Symbol ## :full, :pre_json, :json
@@ -266,14 +292,19 @@ function process_amp(
             map(1:num_channels) do channel_i
                 const fit_array1 =
                     map(1:num_fluo_wells) do well_i
+                        solver =
                         const fit =
                             fit_baseline_model(
-                                calibrated_data[:, well_i, channel_i];
-                                amp_model,
+                                Val{amp_model},
+                                calibrated_data[:, well_i, channel_i],
+                                kwargs_jmp_model;
+                                amp_model = amp_model,
+                                ipopt_print2file = ipopt_print2file,
                                 ## parameters that apply only when fitting SFC models
-                                baseline_cyc_bounds = checked_baseline_cyc_bounds[well_i, channel_i],
-                                min_reliable_cyc = min_reliable_cyc,
-                                kwargs_fit...) ## passed from request
+                                kwargs_bl = Dict(
+                                    baseline_cyc_bounds => checked_baseline_cyc_bounds[well_i, channel_i],
+                                    min_reliable_cyc => min_reliable_cyc,
+                                    kwargs_fit...)) ## passed from request
                                 # cq_method = :cp_dr1,
                                 # ct_fluo = NaN)
                     end ## do well_i
@@ -292,15 +323,18 @@ function process_amp(
                     ipopt_print2file = length(ipopt_print2file_prefix) == 0 ?
                         "" : "$(join([ipopt_print2file_prefix, channel_i, well_i], '_')).txt"
                     fit_baseline_model(
-                        calibrated_data[:, well_i, channel_i];
-                        amp_model,
+                        Val{amp_model},
+                        calibrated_data[:, well_i, channel_i],
+                        kwargs_jmp_model;
+                        amp_model = amp_model,
                         ipopt_print2file = ipopt_print2file,
                         ## parameters that apply only when fitting SFC models
-                        baseline_cyc_bounds = checked_baseline_cyc_bounds[well_i, channel_i],
-                        min_reliable_cyc = min_reliable_cyc,
+                        kwargs_bl = Dict(
+                            baseline_cyc_bounds => checked_baseline_cyc_bounds[well_i, channel_i],
+                            min_reliable_cyc => min_reliable_cyc,
+                            kwargs_fit...)) ## passed from request
                         # cq_method = cq_method,
-                        # ct_fluo = calculated_ct_fluos[channel_i])
-                        kwargs_fit...) ## passed from request
+                        # ct_fluo = calculated_ct_fluos[channel_i]),
                 end
                 for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
             ]
@@ -311,9 +345,10 @@ function process_amp(
             [
                 amp_model == SFC ?
                     quantify(
-                        fit_array2[well_i, channel_i],
-                        cq_method,
-                        ct_fluos,
+                        Val{amp_model},
+                        fit_array2[well_i, channel_i];
+                        cq_method = cq_method,
+                        ct_fluo = calculated_ct_fluos[channel_i],
                     ) :
                     AmpQuantOutput()
                 for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
@@ -352,17 +387,17 @@ function process_amp(
         const (background_subtracted_data, k4dcv, deconvoluted_data,
                 norm_data, norm_well_nums, calibrated_data) =
             calibrate(
-                raw_data,
-                calibration_data,
-                fluo_well_nums,
-                channel_nums;
                 ## remove MySql dependency
                 # db_conn,
                 # calib_info,
                 # fluo_well_nums,
                 # well_nums,
-                out_format = :array,
-                kwargs_cal...)
+                raw_data,
+                calibration_data,
+                fluo_well_nums,
+                channel_nums,
+                dcv,
+                :array)
         #
         ## initialize output
         full_amp_out = AmpStepRampOutput(
@@ -458,10 +493,10 @@ function process_amp(
     #
     #     asrp_vec = vcat(
     #         map(step_ids) do step_id
-    #             AmpStepRampProperties("step", step_id, CYC_NUMS_DEFAULT)
+    #             AmpStepRampProperties("step", step_id, DEFAULT_AMP_CYC_NUMS)
     #         end,
     #         map(ramp_ids) do ramp_id
-    #             AmpStepRampProperties("ramp", ramp_id, CYC_NUMS_DEFAULT)
+    #             AmpStepRampProperties("ramp", ramp_id, DEFAULT_AMP_CYC_NUMS)
     #         end
     #     )
     # end ## if length(sr_str_vec)
@@ -526,6 +561,11 @@ function process_amp(
     #
     # channel_nums = unique(fd_nt[:channel])
 
+    solver = IpoptSolver(print_level = 0, max_iter = 35) ## `ReadOnlyMemoryError()` for v0.5.1
+    # solver = IpoptSolver(print_level = 0, max_iter = 100) ## increase allowed number of iterations for MAK-based methods, due to possible numerical difficulties during search for fitting directions (step size becomes too small to be precisely represented by the precision allowed by the system's capacity)
+    # solver = NLoptSolver(algorithm = :LN_COBYLA)
+    kwargs_jmp_model = Dict(:solver => solver)
+
     ## issues:
     ## 1.
     ## the new code currently assumes only 1 step/ramp
@@ -543,6 +583,7 @@ function process_amp(
                         # db_conn, exp_id, asrp, calib_info,
                         # fluo_well_nums, well_nums,
                         asrp,
+                        kwargs_jmp_model,
                         dcv && num_channels > 1, ## `dcv`
                         (out_format == :json ? :pre_json : out_format)) ## out_format_1sr
             end) ## do asrp
@@ -560,7 +601,6 @@ function process_amp(
     final_out[:valid] = true
     return final_out
 end ## process_amp()
-
 
 
 ## used in calc_ct_fluos()
@@ -662,13 +702,13 @@ function report_cq!(
     full_amp_out        ::AmpStepRampOutput,
     well_i              ::Integer,
     channel_i           ::Integer;
-    before_128x         ::Bool = false,
-    max_dr1_lb          ::Integer = 472,
-    max_dr2_lb          ::Integer = 41,
-    max_bsf_lb          ::Integer = 4356,
-    scaled_max_dr1_lb   ::AbstractFloat = 0.0089, ## look like real amplification, scaled_max_dr1 0.00894855, ip223, exp. 75, well A7, channel 2.
-    scaled_max_dr2_lb   ::AbstractFloat = 0.000689,
-    scaled_max_bsf_lb   ::AbstractFloat = 0.086
+    before_128x         ::Bool = DEFAULT_RCQ_BEFORE_128X,
+    max_dr1_lb          ::Integer = DEFAULT_RCQ_MAX_DR1_LB,
+    max_dr2_lb          ::Integer = DEFAULT_RCQ_MAX_DR2_LB,
+    max_bsf_lb          ::Integer = DEFAULT_RCQ_MAX_BSF_LB,
+    scaled_max_dr1_lb   ::AbstractFloat = DEFAULT_RCQ_SCALED_MAX_DR1_LB, 
+    scaled_max_dr2_lb   ::AbstractFloat = DEFAULT_RCQ_SCALED_MAX_DR2_LB,
+    scaled_max_bsf_lb   ::AbstractFloat = DEFAULT_RCQ_SCALED_MAX_BSF_LB,
 )
     if before_128x
         max_dr1_lb, max_dr2_lb, max_bsf_lb = [max_dr1_lb, max_dr2_lb, max_bsf_lb] ./ 128

@@ -7,19 +7,21 @@ import JSON.json
 import Memento.debug
 
 
+## default value
+const DEFAULT_OC_WELL_NUMS      = []
+
+
 ## called by dispatch()
 function act(
     ::Type{Val{optical_calibration}},
     req_dict            ::Associative;
-    well_nums           ::AbstractVector =[],
+    well_nums           ::AbstractVector = DEFAULT_OC_WELL_NUMS,
     out_format          ::Symbol = :pre_json,
     ## remove MySql dependency  
     #
     # db_conn::MySQL.MySQLHandle,
     # exp_id::Integer, ## not used for computation
     # calib_info::Union{Integer,OrderedDict}; ## really used
-    dye_in              ::Symbol = :FAM, 
-    dyes_to_be_filled   ::Vector =[]
 )
     debug(logger, "at act(::Type{Val{optical_calibration}})")
  
@@ -40,7 +42,7 @@ function act(
     end
     const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
     try
-        prep_normalize(calibration_data, well_nums, dye_in, dyes_to_be_filled)
+        prep_normalize(calibration_data, well_nums)
     catch err
         return fail(logger, err; bt=true) |> out(out_format)
     end

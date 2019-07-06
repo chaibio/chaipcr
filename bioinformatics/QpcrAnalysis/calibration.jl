@@ -23,24 +23,19 @@ function calibrate(
     dyes_to_be_filled       ::AbstractVector =[],
     ## output parameter
     out_format              ::Symbol = :both,           ## :array, :dict, :both
-    ## remove MySql dependency
-    # db_conn ::MySQL.MySQLHandle, ## `db_conn_default` is defined in "__init__.jl"
-    # calib_info ::Union{Integer,OrderedDict},
-    # well_nums_found_in_raw ::AbstractVector,
-    # well_nums_in_req ::AbstractVector=[],
 )
     debug(logger, "at calibrate()")
 
     ## remove MySql dependency
     # calib_info = ensure_ci(db_conn, calib_info)
-    # norm_data, norm_well_nums = prep_normalize(db_conn, calib_info, well_nums_in_req, dye_in, dyes_to_be_filled)
+    # norm_data, norm_well_nums = prep_normalize(db_conn, calib_info, well_nums_in_req, dye_in, dyes_to_fill)
 
     ## assume without checking that we are using all the wells, all the time
     const well_nums_in_req = calibration_data |> num_wells |> from(0) |> collect
     #
     ## prepare data for normalization
     const (norm_data, norm_well_nums) =
-        prep_normalize(calibration_data, well_nums_in_req, dye_in, dyes_to_be_filled)
+        prep_normalize(calibration_data, well_nums_in_req)
     #
     ## overwrite the dummy well_nums
     norm_well_nums = well_nums_found_in_raw
@@ -130,7 +125,7 @@ end ## calibrate()
 #     # well_nums_1 ::AbstractVector=[],
 #     # well_nums_2 ::AbstractVector=[];
 #     dye_in      ::Symbol =:FAM,
-#     dyes_to_be_filled ::AbstractVector =[]
+#     dyes_to_fill ::AbstractVector =[]
 # )
 #     ## This function is expected to handle situations where `calib_info_1` and `calib_info_2`
 #     ## have different combinations of wells, but the number of wells should be the same.
@@ -164,7 +159,7 @@ end ## calibrate()
 #             channel_nums_1,
 #             true,
 #             dye_in,
-#             dyes_to_be_filled;
+#             dyes_to_fill;
 #             out_format = :array)
 #     return CalibCalibOutput(
 #         ary2dcv_1,

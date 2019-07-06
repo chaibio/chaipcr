@@ -14,10 +14,10 @@ function act(
     ::Type{Val{standard_curve}},
     req_vec     ::Vector{Any};
     out_format  ::Symbol = :pre_json,
-    json_digits ::Integer =JSON_DIGITS,
-    qty_base    ::Real =10,
-    empty_tre   ::TargetResultEle =EMPTY_TRE,
-    empty_gre   ::GroupResultEle  =EMPTY_GRE
+    json_digits ::Integer = JSON_DIGITS,
+    qty_base    ::Real = 10,
+    empty_tre   ::TargetResultEle = EMPTY_TRE,
+    empty_gre   ::GroupResultEle  = EMPTY_GRE
 )
     debug(logger, "at act(::Type{Val{standard_curve}})")
     #

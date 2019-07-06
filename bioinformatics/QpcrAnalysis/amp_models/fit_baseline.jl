@@ -6,14 +6,9 @@
 
 function fit_baseline(
     ## data
-    fluos               ::AbstractVector;
+    fluos               ::AbstractVector,
     ## solver parameters
-    kwargs_jmp_model    ::Associative = Dict{Symbol,Any}(
-        :solver => IpoptSolver(
-            print_level = 0,
-            max_iter    = 35)), ## `ReadOnlyMemoryError()` for v0.5.1
-        # :solver => IpoptSolver(print_level=0, max_iter=100)), ## increase allowed number of iterations for MAK-based methods, due to possible numerical difficulties during search for fitting directions (step size becomes too small to be precisely represented by the precision allowed by the system's capacity)
-        # :solver => NLoptSolver(algorithm=:LN_COBYLA)),
+    kwargs_jmp_model    ::Associative;
     ipopt_print2file    ::String = "",
     ## amplification model
     amp_model           ::AmpModel = SFC, ## SFC, MAKx, MAKERGAULx
@@ -22,11 +17,10 @@ function fit_baseline(
     debug(logger, "at fit_baseline()")
     ## set up solver
     solver = kwargs_jmp_model[:solver]
-    if isa(solver, Ipopt.IpoptSolver)
+    isa(solver, Ipopt.IpoptSolver) &&
         push!(solver.options, (:output_file, ipopt_print2file))
-    end
     ## fit model
-    fit_baseline_model(
+    const fit = fit_baseline_model(
     	Val{amp_model},
         fluos,
         kwargs_jmp_model;
@@ -40,6 +34,7 @@ function fit_baseline_model(
     fluos               ::AbstractVector,
     kwargs_jmp_model    ::Associative;
 ) 
+    debug(logger, "at fit_baseline_model() - DFC")
     ## no fallback for baseline, because:
     ## (1) curve may fit well though :Error or :UserLimit
     ## (search step becomes very small but has not converge);
@@ -60,23 +55,6 @@ function fit_baseline_model(
         [string(amp_model)], ## bl_notes
         fluos .- baseline) ## blsub_fluos
 end ## fit_baseline_model() ## DFC
-
-
-function fit_quant_model_DFC(
-    fluos               ::AbstractVector,
-    kwargs_jmp_model    ::Associative,
-    amp_model           ::AmpModel;
-    baseline_model_fit  ::AmpBaselineModelFitOutput
-) 
-    ## baseline model = quantification model
-    const fitted_postbl = baseline_model_fit.fitted_prebl
-    const coefs_pob = fitted_postbl.coefs
-    const d0_i_vec = find(isequal(:d0), fitted_postbl.coef_syms)
-        fitted_postbl,
-        fitted_postbl.status,
-        coefs_pob, ## coefs
-        coefs_pob[d0_i_vec[1]], ## d0
-        pred_from_cycs(Val{amp_model}, cycs, coefs_pob...)) ## blsub_fitted
 
 
 ## SFC
@@ -191,7 +169,7 @@ function fit_baseline_model(
 
     ## << end of function definitions nested within fit_baseline_model() ## SFC
 
-    debug(logger, "at fit_baseline_model_SFC()")
+    debug(logger, "at fit_baseline_model() - SFC")
     const num_cycs = length(fluos)
     const cycs = 1:num_cycs
     ## to determine weights (`wts`) for sigmoid fitting per `min_reliable_cyc`

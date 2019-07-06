@@ -11,6 +11,39 @@ import Memento: debug, info, warn, error
 
 
 ## constants >>
+
+## defaults for process_mc()
+const DEFAULT_MC_WELL_NUMS              = []
+const DEFAULT_MC_AUTO_SPAN_SMOOTH       = false
+const DEFAULT_MC_SPAN_SMOOTH_DEFAULT    = 0.015
+const DEFAULT_MC_SPAN_SMOOTH_FACTOR     = 7.2
+const DEFAULT_MC_DCV                    = true
+const DEFAULT_MC_MAX_TEMPERATURE        = 1000
+const DEFAULT_KWARGS_MC_TM_PW           = Dict()
+
+## defaults for mc_tm_pw()
+const DEFAULT_MC_NTI_FRAC               = 0.05
+const DEFAULT_MC_SPAN_CSS_TEMPERATURE   = 1.0
+const DEFAULT_MC_DENSER_FACTOR          = 10
+const DEFAULT_MC_SMOOTH_FLUO_SPLINE     = false
+const DEFAULT_MC_PEAK_SPAN_TEMPERATURE  = 2.0
+const DEFAULT_MC_QT_PROB_RANGE_LB       = 0.21
+const DEFAULT_MC_NCP_UB                 = 10
+const DEFAULT_MC_NOISY_FACTOR           = 0.2
+const DEFAULT_MC_QT_PROB_FLTM           = 0.64
+const DEFAULT_MC_NORMD_QTV_UB           = 0.8
+const DEFAULT_MC_TOP1_FROM_MAX_UB       = 1.0
+const DEFAULT_MC_TOP_N                  = 4
+const DEFAULT_MC_FRAC_REPORT_LB         = 0.1
+const DEFAULT_MC_FRAC2ADD               = 0.01
+
+## defaults for mc_tm_pw() overridden by process_mc()
+const OVERRIDDEN_DEFAULT_AUTO_SPAN_SMOOTH       = true
+const OVERRIDDEN_DEFAULT_MC_SPAN_SMOOTH_DEFAULT = 0.05
+const OVERRIDDEN_DEFAULT_MC_SPAN_SMOOTH_FACTOR  = 7.2
+
+
+## field names
 const MC_RAW_FIELDS = OrderedDict(
     :temperature    => TEMPERATURE_KEY,
     :fluorescence   => FLUORESCENCE_VALUE_KEY,
@@ -20,7 +53,7 @@ const MC_TM_PW_KEYWORDS = Dict{Symbol,String}(
     :qt_prob_flTm   => "qt_prob",
     :normd_qtv_ub   => "max_normd_qtv",
     :top_N          => "top_N")
-const TF_KEYS = [:temperature, :fluorescence_value]
+const MC_TF_KEYS = [:temperature, :fluorescence_value]
 const MC_OUT_FIELDS = OrderedDict(
     :mc      => :melt_curve_data,
     :Ta_fltd => :melt_curve_analysis)
@@ -82,16 +115,14 @@ end ## act(::Type{Val{meltcurve}})
 function process_mc(
     mc_data             ::DataFrame,
     calibration_data    ::CalibrationData{<: Real};
-    well_nums           ::AbstractVector =[],
-    auto_span_smooth    ::Bool =false,
-    span_smooth_default ::Real =0.015,
-    span_smooth_factor  ::Real =7.2,
-    dye_in              ::Symbol = :FAM,
-    dyes_to_be_filled   ::AbstractVector =[],
-    dcv                 ::Bool =true, ## logical, whether to perform multi-channel deconvolution
-	max_temperature     ::Real =1000, ## maximum temperature (argument not used)
+    well_nums           ::AbstractVector = DEFAULT_MC_WELL_NUMS,
+    auto_span_smooth    ::Bool = DEFAULT_MC_AUTO_SPAN_SMOOTH,
+    span_smooth_default ::Real = DEFAULT_MC_SPAN_SMOOTH_DEFAULT,
+    span_smooth_factor  ::Real = DEFAULT_MC_SPAN_SMOOTH_FACTOR,
+    dcv                 ::Bool = DEFAULT_MC_DCV, ## logical, whether to perform multi-channel deconvolution
+	max_temperature     ::Real = DEFAULT_MC_MAX_TEMPERATURE, ## maximum temperature (argument not used)
+    kwargs_mc_tm_pw     ::Associative = DEFAULT_KWARGS_MC_TM_PW, ## keyword arguments passed onto `mc_tm_pw`
     out_format          ::Symbol = :pre_json, ## :full, :pre_json, :json
-    kwargs_mc_tm_pw     ::Associative =OrderedDict() ## keyword arguments passed onto `mc_tm_pw`
 )
     ## function: format fluorescence data for calibration
     ##
@@ -114,7 +145,7 @@ function process_mc(
         split_tf_by_well(fluo_sel ::Associative) =
             map(fluo_well_nums) do well_num
                 Dict(
-                    map(TF_KEYS) do key
+                    map(MC_TF_KEYS) do key
                         key => fluo_sel[key][fluo_sel[:well_num] .== well_num]
                     end)
             end
@@ -129,7 +160,7 @@ function process_mc(
         extend_tf_vecs(tf_dict_vec ::AbstractArray) =
             map(tf_dict_vec) do tf_dict
                 Dict(
-                    map(TF_KEYS) do key
+                    map(MC_TF_KEYS) do key
                         key => extend_NaN(
                                     maximum(
                                         map(length ∘ index(:temperature),
@@ -140,7 +171,7 @@ function process_mc(
         ## convert to MeltCurveTF object
         toMeltCurveTF(tf_nv_adj ::AbstractArray) =
             MeltCurveTF(
-                map(TF_KEYS) do key
+                map(MC_TF_KEYS) do key
                     mapreduce(index(key), hcat, tf_nv_adj)
                 end...)
 
@@ -200,9 +231,7 @@ function process_mc(
             fluo_well_nums,
             channel_nums,
             num_channels == 1 ? false : dcv,
-            dye_in,
-            dyes_to_be_filled,
-            out_format = :array)
+            :array)
     #
     ## ignore dummy well_nums from calibrate()
     const norm_well_nums_alt = fluo_well_nums
@@ -259,37 +288,37 @@ function mc_tm_pw(
     #
     ## input data
     ## `tf` - temperature and fluorescence
-    tf_dict             ::Associative;
+    tf_dict                 ::Associative;
     #
     ## The maximum fraction of median temperature interval to be considered narrow
     ## `nti` - narrow temperature interval
-    nti_frac            ::AbstractFloat =0.05,
+    nti_frac                ::AbstractFloat = DEFAULT_MC_NTI_FRAC,
     #
     ## smoothing -df/dt curve and if `smooth_fluo`, fluorescence curve too
-    auto_span_smooth    ::Bool =true,
-    span_css_tmprtr     ::Real =1.0, ## css = choose `span_smooth`. fluorescence fluctuation with the temperature range of approximately `span_css_tmprtr * 2` is considered for choosing `span_smooth`
-    span_smooth_default ::AbstractFloat =0.05, ## unit: fraction of data points for smoothing
-    span_smooth_factor  ::Real =7.2,
+    auto_span_smooth        ::Bool = OVERRIDDEN_DEFAULT_AUTO_SPAN_SMOOTH,
+    span_css_temperature    ::AbstractFloat = DEFAULT_MC_SPAN_CSS_TEMPERATURE, ## css = choose `span_smooth`. fluorescence fluctuation with the temperature range of approximately `dyes_to_fill * 2` is considered for choosing `span_smooth`
+    span_smooth_default     ::AbstractFloat = OVERRIDDEN_DEFAULT_MC_SPAN_SMOOTH_DEFAULT, ## unit: fraction of data points for smoothing
+    span_smooth_factor      ::AbstractFloat = OVERRIDDEN_DEFAULT_MC_SPAN_SMOOTH_FACTOR,
     #
     ## get a denser temperature sequence to get fluorescence and -df/dt from it and fitted spline function
-    denser_factor       ::Integer =10,
-    smooth_fluo_spl     ::Bool =false,
+    denser_factor           ::Integer = DEFAULT_MC_DENSER_FACTOR,
+    smooth_fluo_spline      ::Bool = DEFAULT_MC_SMOOTH_FLUO_SPLINE,
     #
     ## identify Tm peaks and calculate peak area
-    peak_span_tmprtr    ::Real =2.0, ## Within the smoothed -df/dt sequence spanning the temperature range of approximately `peak_span_tmprtr`, if the maximum -df/dt value equals that at the middle point of the sequence, identify this middle point as a peak summit. Similar to `span.peaks` in qpcR code. Combined with `peak_shoulder` (similar to `Tm.border` in qpcR code).
+    peak_span_temperature   ::AbstractFloat = DEFAULT_MC_PEAK_SPAN_TEMPERATURE, ## Within the smoothed -df/dt sequence spanning the temperature range of approximately `peak_span_temperature`, if the maximum -df/dt value equals that at the middle point of the sequence, identify this middle point as a peak summit. Similar to `span.peaks` in qpcR code. Combined with `peak_shoulder` (similar to `Tm.border` in qpcR code).
     ## peak_shoulder ::Real =1, ## 1/2 width of peak in temperature when calculating peak area  # consider changing from 1 to 2, or automatically determined (max and min d2)?
     #
     ## filter Tm peaks
-    qt_prob_range_lb    ::AbstractFloat =0.21, ## quantile probability point for the lower bound of the range considered for number of crossing points
-    ncp_ub              ::Integer =10, ## upper bound of number of data points crossing the mid range value (line parallel to x-axis) of smoothed -df/dt (`ndrv_smu`)
-    noisy_factor        ::AbstractFloat =0.2, ## `num_cross_points` must also <= `noisy_factor * len_raw`
-    qt_prob_flTm        ::AbstractFloat =0.64, ## quantile probability point for normalized -df/dT (range 0-1)
-    normd_qtv_ub        ::AbstractFloat =0.8, ## upper bound of normalized -df/dt values (range 0-1) at the quantile probablity point
-    top1_from_max_ub    ::Real =1.0, ## upper bound of temperature difference between top-1 Tm peak and maximum -df/dt
-    top_N               ::Integer =4, ## top number of Tm peaks to report
-    frac_report_lb      ::AbstractFloat =0.1, ## lower bound of area fraction of the Tm peak to be reported in regards to the largest real Tm peak
+    qt_prob_range_lb        ::AbstractFloat = DEFAULT_MC_QT_PROB_RANGE_LB, ## quantile probability point for the lower bound of the range considered for number of crossing points
+    ncp_ub                  ::Integer = DEFAULT_MC_NCP_UB, ## upper bound of number of data points crossing the mid range value (line parallel to x-axis) of smoothed -df/dt (`ndrv_smu`)
+    noisy_factor            ::AbstractFloat = DEFAULT_MC_NOISY_FACTOR, ## `num_cross_points` must also <= `noisy_factor * len_raw`
+    qt_prob_flTm            ::AbstractFloat = DEFAULT_MC_QT_PROB_FLTM, ## quantile probability point for normalized -df/dT (range 0-1)
+    normd_qtv_ub            ::AbstractFloat = DEFAULT_MC_NORMD_QTV_UB, ## upper bound of normalized -df/dt values (range 0-1) at the quantile probablity point
+    top1_from_max_ub        ::AbstractFloat = DEFAULT_MC_TOP1_FROM_MAX_UB, ## upper bound of temperature difference between top-1 Tm peak and maximum -df/dt
+    top_N                   ::Integer = DEFAULT_MC_TOP_N, ## top number of Tm peaks to report
+    frac_report_lb          ::AbstractFloat = DEFAULT_MC_FRAC_REPORT_LB, ## lower bound of area fraction of the Tm peak to be reported in regards to the largest real Tm peak
     #
-    reporting           =roundoff(JSON_DIGITS), ## reporting function
+    reporting               =roundoff(JSON_DIGITS), ## reporting function
 )
     ## functions to parse input data
 
@@ -363,7 +392,7 @@ function mc_tm_pw(
     calc_fu_rle(css_idc ::AbstractVector{Int}) =
         rle(is_increasing(fluos[css_idc]))
 
-    ## find the region of length 2 * span_css_tmprtr
+    ## find the region of length 2 * span_css_temperature
     ## showing the steepest fluo decrease (`fluo_dcrs`) between start and end
     max_fluo_dcrs() =
         indmax(
@@ -374,7 +403,7 @@ function mc_tm_pw(
         fluos[sel_idc_int[1]] - fluos[sel_idc_int[end]]
 
     giis_tp(i ::Int) =
-        giis_uneven(tmprtrs, i, span_css_tmprtr)
+        giis_uneven(tmprtrs, i, span_css_temperature)
 
     ## smoothing functions
 
@@ -401,7 +430,7 @@ function mc_tm_pw(
         ## assumes constant baseline == minimum fluorescence value
         sweep(minimum)(-)(
             ## optionally, smooth the output of the spline function
-            smooth_fluo_spl ?
+            smooth_fluo_spline ?
                 supsmu(tp_denser, fluo_spl, span_smooth) :
                 fluo_spl)
 
@@ -421,9 +450,9 @@ function mc_tm_pw(
     ## peak finding functions
 
     ## `dp` - data point
-    # half_peak_span_tmprtr = (peak_span_tmprtr / 2.0)
+    # half_peak_span_temperature = (peak_span_temperature / 2.0)
     span_peaks_dp() =
-        (peak_span_tmprtr / 2.0) / (max_tp - min_tp) * len_denser |>
+        (peak_span_temperature / 2.0) / (max_tp - min_tp) * len_denser |>
             roundoff(0) |> Int
 
     ## find summit and nadir indices of Tm peaks in `ndrv_smu`
@@ -698,7 +727,7 @@ end ## mc_tm_pw()
 ## used to eliminate duplicate values in temperature data
 function mutate_dups(
     vec_2mut ::AbstractVector,
-    frac2add ::Real =0.01
+    frac2add ::Real = DEFAULT_MC_FRAC2ADD,
 )
     debug(logger, "at mutate_dups()")
     const vec_len       = vec_2mut |> length

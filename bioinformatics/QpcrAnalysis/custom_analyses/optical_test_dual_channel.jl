@@ -8,10 +8,12 @@ import Memento: debug, warn
 ## constants >>
 
 ## channel descriptors
-const CHANNELS = [1, 2]
-const CHANNEL_IS = 1:length(CHANNELS)
-const SYMBOLS_FAM_HEX = [:FAM, :HEX]
+const CHANNELS          = [1, 2]
+const CHANNEL_IS        = 1:length(CHANNELS)
+const SYMBOLS_FAM_HEX   = [:FAM, :HEX]
 const NEW_CALIB_SYMBOLS = [:baseline; :water; SYMBOLS_FAM_HEX]
+
+## preset values >>
 
 ## bounds of signal-to-noise ratio (SNR)
 const SNR_FAM_CH1_MIN = 0.75

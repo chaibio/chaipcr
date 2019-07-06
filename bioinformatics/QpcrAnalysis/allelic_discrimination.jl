@@ -34,8 +34,8 @@ const CTRL_WELL_DICT = OrderedDict{Vector{Int},Vector{Int}}() ## key is genotype
 ## old approach
 # const CTRL_WELL_DICT = DefaultOrderedDict(Vector{Int}, Vector{Int}, Vector{Int}())
 
-EMPTY_UCC_DICT = OrderedDict{Set{Vector{Float_T}},UniqCombinCenters}()
-EMPTY_BEST_GENO_COMBINS = Vector{Matrix{Int}}()
+const EMPTY_UCC_DICT = OrderedDict{Set{Vector{Float_T}},UniqCombinCenters}()
+const EMPTY_BEST_GENO_COMBINS = Vector{Matrix{Int}}()
 
 const CATEG_WELL_VEC = [
     (:rbbs_ary3,   Colon()),

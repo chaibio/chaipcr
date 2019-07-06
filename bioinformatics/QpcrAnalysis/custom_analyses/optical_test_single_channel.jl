@@ -5,10 +5,10 @@ import JSON.json
 import Memento.debug
 
 
-## default values
-const MIN_EXCITATION_FLUORESCENCE = 5120
-const MIN_EXCITATION_FLUORESCENCE_MULTIPLE = 3
-const MAX_EXCITATION = 384000
+## preset values
+const MIN_EXCITATION_FLUORESCENCE           = 5120
+const MAX_EXCITATION_FLUORESCENCE           = 384000
+# const MIN_EXCITATION_FLUORESCENCE_MULTIPLE  = 3
 
 
 ## called by dispatch()
@@ -55,11 +55,11 @@ function act(
             # valid =
             #    (excitation >= MIN_EXCITATION_FLUORESCENCE) &&
             #    (excitation / baseline >= MIN_EXCITATION_FLUORESCENCE_MULTIPLE) &&
-            #    (excitation <= MAX_EXCITATION) # old
+            #    (excitation <= MAX_EXCITATION_FLUORESCENCE) # old
             const valid =
                 (excitation .>= MIN_EXCITATION_FLUORESCENCE) &&
                 (baseline   .<  MIN_EXCITATION_FLUORESCENCE) &&
-                (excitation .<= MAX_EXCITATION) ## Josh, 2016-08-15
+                (excitation .<= MAX_EXCITATION_FLUORESCENCE) ## Josh, 2016-08-15
             all_valid &= valid
             OrderedDict(
                 :baseline   => baseline,

@@ -5,7 +5,13 @@ import DataStructures.OrderedDict
 import Memento: debug, error
 
 
+## default values
+const DEFAULT_DCV_BACKUP_K      = K4DCV
+const DEFAULT_DCV_WELL_PROC     = well_proc_vec
+
+## preset values
 const DECONVOLUTION_SCALING_FACTOR = [1.0, 4.2]    ## used: [1, oneof(1, 2, 3.5, 8, 7, 5.6, 4.2)]
+
 
 ## multi-channel deconvolution
 function deconvolute(
@@ -27,10 +33,10 @@ function deconvolute(
     # well_nums ::AbstractVector=[];
 
     calibration_data        ::CalibrationData{<: Real},
-    well_nums               ::AbstractVector =[];
+    well_nums               ::AbstractVector;
     ## keyword arguments
-    k4dcv_backup            ::K4Deconv =K4DCV, ## argument not used
-    scaling_factor_dcv_vec  ::AbstractVector =DECONVOLUTION_SCALING_FACTOR,
+    k4dcv_backup            ::K4Deconv = DEFAULT_DCV_BACKUP_K, ## argument not used
+    scaling_factor_dcv_vec  ::AbstractVector = DECONVOLUTION_SCALING_FACTOR,
     out_format              ::Symbol = :array ## :array, :dict, :both
 )
     debug(logger, "at deconvolute()")
@@ -84,9 +90,9 @@ function get_k(
     ## I'm not sure that this is a problem because the calibration data
     ## in the request body is already specific to a single step.
     calibration_data    ::CalibrationData{<: Real},
-    well_nums           ::AbstractVector =[];
+    well_nums           ::AbstractVector;
     ## keyword arguments
-    well_proc           ::WellProc =well_proc_vec, ## options: well_proc_mean, well_proc_vec
+    well_proc           ::WellProc = DEFAULT_DCV_WELL_PROC, ## options: well_proc_mean, well_proc_vec
     save_to             ::String ="" ## used: "k.jld"
 )
     debug(logger, "at get_k()")

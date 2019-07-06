@@ -6,8 +6,11 @@ import DataStructures.OrderedDict
 import Memento: debug, error
 
 
-## constants >>
+## constants
 const NORMALIZATION_SCALING_FACTOR  = 3.7           ## used: 9e5, 1e5, 1.2e6, 3.0
+const DEFAULT_NORM_MINUS_WATER      = false
+const DEFAULT_NORM_DYE_IN           = :FAM
+const DEFAULT_NORM_DYES_TO_FILL     = []
 
 ## function definitions >>
 
@@ -24,8 +27,8 @@ function normalize(
     norm_data                       ::Associative,
     matched_well_idc                ::AbstractVector,
     channel                         ::Integer;
-    minus_water                     ::Bool =false,
-    normalization_scaling_factor    ::Real =NORMALIZATION_SCALING_FACTOR
+    minus_water                     ::Bool = DEFAULT_NORM_MINUS_WATER,
+    normalization_scaling_factor    ::Real = NORMALIZATION_SCALING_FACTOR,
 )
     debug(logger, "at normalize()")
 
@@ -53,10 +56,10 @@ end ## normalize
 ## function: check whether the data in optical calibration experiment is valid
 function prep_normalize(
     calibration_data    ::CalibrationData{C},
-    well_nums           ::AbstractVector,
-    dye_in              ::Symbol = :FAM,
-    dyes_to_be_filled   ::AbstractVector =[]
-) where {C <: Real}
+    well_nums           ::AbstractVector;
+    dye_in              ::Symbol = DEFAULT_NORM_DYE_IN,
+    dyes_to_fill        ::AbstractVector = DEFAULT_NORM_DYES_TO_FILL,
+) where {C <: AbstractFloat}
     debug(logger, "at prep_normalize()")
     ## issue:
     ## using the current format for the request body there is no well_num information
@@ -103,13 +106,13 @@ function prep_normalize(
     ## removing MySql dependency in get_wva_data because
     ## using the current format for the request body
     ## we cannot subset the calibration data by step_id
-    # if length(dyes_to_be_filled) > 0 ## extrapolate well-to-well variation data for missing channels
+    # if length(dyes_to_fill) > 0 ## extrapolate well-to-well variation data for missing channels
     #     println("Preset well-to-well variation data is used to extrapolate calibration data for missing channels.")
     #     channels_missing = setdiff(channels_in_water, channels_in_signal)
-    #     dyes_dyes_to_be_filled_channels = map(dye -> DYE2CHST[dye]["channel"], dyes_to_be_filled) ## DYE2CHST is defined in module scope
+    #     dyes_dyes_to_fill_channels = map(dye -> DYE2CHST[dye]["channel"], dyes_to_fill) ## DYE2CHST is defined in module scope
     #     check_subset(
     #         Ccsc(channels_missing, "Channels missing well-to-well variation data"),
-    #         Ccsc(dyes_dyes_to_be_filled_channels, "channels corresponding to the dyes of which well-to-well variation data is needed")
+    #         Ccsc(dyes_dyes_to_fill_channels, "channels corresponding to the dyes of which well-to-well variation data is needed")
     #     )
     #     # process preset calibration data
     #     preset_step_ids = OrderedDict([
@@ -120,7 +123,7 @@ function prep_normalize(
     #     pivot_preset = preset_signal_data_dict[dye_in]
     #     pivot_in = signal_data_dict[DYE2CHST[dye_in]["channel"]]
     #     in2preset = pivot_in ./ pivot_preset
-    #     for dye in dyes_to_be_filled
+    #     for dye in dyes_to_fill
     #         signal_data_dict[DYE2CHST[dye]["channel"]] = preset_signal_data_dict[dye] .* in2preset
     #     end
     # end ## if
