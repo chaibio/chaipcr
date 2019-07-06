@@ -13,7 +13,7 @@ const MAX_EXCITATION = 384000
 
 ## called by dispatch()
 function act(
-    ::Val{optical_test_single_channel},
+    ::Type{Val{optical_test_single_channel}},
     ## remove MySql dependency
     #
     # db_conn ::MySQL.MySQLHandle,
@@ -24,7 +24,7 @@ function act(
     ot_dict         ::Associative;
     out_format      ::Symbol = :pre_json
 )
-    debug(logger, "at act(::Val{optical_test_single_channel})")
+    debug(logger, "at act(::Type{Val{optical_test_single_channel}})")
  
     ## remove MySql dependency
     #
@@ -71,4 +71,4 @@ function act(
         :optical_data => results,
         :valid        => all_valid)
     return output |> out(out_format)
-end ## act(::Val{optical_test_single_channel})
+end ## act(::Type{Val{optical_test_single_channel}})

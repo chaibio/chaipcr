@@ -15,3 +15,18 @@ struct AmpStepRampOutput2Bjson
     ct_fluos                    ::Vector{Float_T}  ## fluorescence thresholds (one value per channel) for Ct method
     assignments_adj_labels_dict ::OrderedDict{Symbol,Vector{String}} ## assigned genotypes from allelic discrimination, keyed by type of data (see `AD_DATA_CATEG` in "allelic_discrimination.jl")
 end
+
+## constructor
+AmpStepRampOutput2Bjson(
+	full_amp_out	::AmpStepRampOutput,
+    reporting       ::Function = roundoff(JSON_DIGITS) ## reporting function
+) =
+    AmpStepRampOutput2Bjson(
+    	map(fieldnames(AmpStepRampOutput2Bjson)) do fieldname
+	        const fieldvalue = getfield(full_amp_out, fieldname)
+	        try
+	            reporting(fieldvalue)
+	        catch
+	            fieldvalue ## non-numeric fields
+	        end ## try
+	    end...) ## do fieldname

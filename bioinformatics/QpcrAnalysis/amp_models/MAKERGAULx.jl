@@ -25,7 +25,7 @@ const inh_START             = 4e-6 ## used: eu0_inh_LB (Infeasible for flat line
 ## function definitions
 
 function pred_from_nm1(
-    ::Union{Val{:MAKERGAUL3}, Val{:MAKERGAUL4}},
+    ::Union{Type{Val{MAKERGAUL3}}, Type{Val{MAKERGAUL4}}},
     eu_nm1      ::Real,
     d_nm1       ::Real,
     inh         ::Real
@@ -37,7 +37,7 @@ end ## pred_from_nm1()
 
 
 function pred_from_cycs( ## 0.7to1.2e-5 sec for 40 cycles on PC
-    ::Val{:MAKERGAUL3},
+    ::Type{Val{MAKERGAUL3}},
     cycs2fit    ::AbstractVector,
     fb          ::Real,
     eu0         ::Real,
@@ -56,10 +56,10 @@ function pred_from_cycs( ## 0.7to1.2e-5 sec for 40 cycles on PC
     end
     fs_w0 = pred_ary_eu_d_w0[:, 2] + fb
     return fs_w0[2:end][map(Int, cycs)]
-end ## pred_from_cycs(::Val{:MAKERGAUL3})
+end ## pred_from_cycs(::Type{Val{MAKERGAUL3}})
 
 function pred_from_cycs(
-    ::Val{:MAKERGAUL4},
+    ::Type{Val{MAKERGAUL4}},
     cycs        ::AbstractVector,
     fb          ::Real,
     bl_k        ::Real,
@@ -78,10 +78,10 @@ function pred_from_cycs(
         i += 1
     end
     return fb + bl_k * cycs .+ pred_ary_eu_d_w0[:, 2][2:end][map(Int, cycs)]
-end ## pred_from_cycs(::MAKERGAUL4)
+end ## pred_from_cycs(:MAKERGAUL4)
 
 function fit(
-    ::Val{:MAKERGAUL3},
+    ::Type{Val{MAKERGAUL3}},
     cycs        ::AbstractVector, ## continous integers or not
     obs_fluos   ::AbstractVector,
     wts         ::AbstractVector =ones(length(obs_fluos));
@@ -168,10 +168,10 @@ function fit(
         jmp_model,
         # init_coefs
     )
-end ## fit(::Val{:MAKERGAUL3})
+end ## fit(::Type{Val{MAKERGAUL3}})
 
 function fit(
-    ::Val{:MAKERGAUL4},
+    ::Type{Val{MAKERGAUL4}},
     cycs        ::AbstractVector, ## continous integers or not
     obs_fluos   ::AbstractVector,
     wts         ::AbstractVector=ones(length(obs_fluos));
@@ -271,4 +271,4 @@ function fit(
         jmp_model,
         # init_coefs
     )
-end ## fit(::Val{:MAKERGAUL4})
+end ## fit(::Type{Val{MAKERGAUL4}})

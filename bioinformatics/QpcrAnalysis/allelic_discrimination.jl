@@ -94,7 +94,7 @@ end ## prep_data_4ad
 function do_cluster_analysis(
     raw_data        ::AbstractMatrix,
     init_centers    ::AbstractMatrix,
-    cluster_method  ::ClusteringMethod = K_means_medoids,
+    cluster_method  ::ClusteringMethod = k_means_medoids,
     norm_l          ::Real =2
 )
     ## get pair-wise distance (cost) matrix
@@ -111,7 +111,7 @@ function do_cluster_analysis(
     end
 
     ## cluster analysis methods
-    function clustering(::Val{K_means}, _init_centers)
+    function clustering(::Type{Val{k_means}}, _init_centers)
         ## ideally the element with the same index between
         ## `init_centers` and `cluster_result.centers` should be for the same genotype
         _cluster_result = kmeans!(raw_data, _init_centers)
@@ -119,18 +119,15 @@ function do_cluster_analysis(
     end
 
     ## Issue: how to use output from k-means clustering as input for k-medoids ???
-    clustering(::Val{K_means_medoids}, _init_centers) =
-        clustering(Val{K_medoids}(), clustering(Val{K_means}(), _init_centers)[2])
+    clustering(::Type{Val{k_means_medoids}}, _init_centers) =
+        clustering(Val{k_medoids}, clustering(Val{k_means}, _init_centers)[2])
 
-    function clustering(::Val{K_medoids}, _)
+    function clustering(::Type{Val{k_medoids}}, _)
         ## _init_centers is [2 x num_centers] matrix, kmedoids! requires vector
         ## use dummy values 1:num_centers for now
         _cluster_result = kmedoids!(dist_mtx, collect(1:num_centers)) ## dist_mtx not dist_mtx_winit
         return (_cluster_result, raw_data[:, _cluster_result.medoids]) ## raw_data not data_winit
     end
-
-    clustering(unknown_cluster_method, _) =
-        throw(ArgumentError, "clustering method \"$unknown_cluster_method\" not implemented")
 
     ## get cluster silhouettes
     get_silhouettes() =
@@ -239,7 +236,7 @@ function do_cluster_analysis(
     # const n_wells_winit = n_wells + num_centers
     # dist_mtx_winit = calc_dist_mtx_winit(init_centers)
     const (cluster_result, centers) =
-        clustering(Val{cluster_method}(), copy(init_centers))
+        clustering(Val{cluster_method}, copy(init_centers))
     const assignments_woinit = cluster_result.assignments[well_idc]
     const slhts = get_silhouettes()
     const slht_mean = mean(slhts)
@@ -271,7 +268,7 @@ function assign_genos(
     ntc_bool_vec        ::Vector{Bool},
     expected_ncg_raw    ::AbstractMatrix =DEFAULT_encgr,
     ctrl_well_dict      ::OrderedDict =CTRL_WELL_DICT,
-    cluster_method      ::ClusteringMethod = :K_means_medoids,
+    cluster_method      ::ClusteringMethod = k_means_medoids,
     norm_l              ::Real =2,
     ## below not specified by `process_ad` as of right now
     init_factors        ::AbstractVector =DEFAULT_init_FACTORS, # for `init_centers`
@@ -535,7 +532,7 @@ function assign_genos(
     const best_num_genos = length(best_ucc.uniq_combin_centers)
     const car = best_ucc.car
     # const init_centers, dist_mtx_winit, cluster_result, centers, slhts, slht_mean =
-    #     map(fn -> getfield(car, fn), fieldnames(car))
+    #     map(fieldname -> getfield(car, fieldname), fieldnames(car))
     ## can we call any of the genotypes?
     if (best_num_genos < max_num_genos - 1 ) ## cannot call genotypes
         # const all_unclassified = true
@@ -618,14 +615,13 @@ function process_ad(
     ## relevant if `categ == "fluo"`, last available cycle
     cycs                ::Union{Integer,AbstractVector},
 
-    ctrl_well_dict      ::OrderedDict,
+    ctrl_well_dict      ::Associative,
     cluster_method      ::ClusteringMethod, ## for `assign_genos`
     norm_l              ::Real, ## for `assign_genos`
 
     ## each column is a vector of binary geno whose length is number of channels
     ## (0 => no signal, 1 => yes signal)
     expected_ncg_raw    ::AbstractMatrix =DEFAULT_encgr,
-
     categ_well_vec      ::AbstractVector =CATEG_WELL_VEC,
 )
     debug(logger, "at process_ad()")

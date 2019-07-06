@@ -30,7 +30,7 @@ import JSON, DataStructures.OrderedDict
 # ********************************************************************************
 
 function verify_response(
-    ::Val{standard_curve},
+    ::Type{Val{standard_curve}},
     response ::Any
 )
     facts() do
@@ -81,7 +81,7 @@ end
 # ********************************************************************************
 
 function verify_response(
-    ::Val{amplification},
+    ::Type{Val{amplification}},
     response ::Any
 )
     facts() do
@@ -174,7 +174,7 @@ end
 # ********************************************************************************
 
 function verify_response(
-    ::Val{meltcurve},
+    ::Type{Val{meltcurve}},
     response ::Any
 )
     facts() do
@@ -228,7 +228,7 @@ end
 # ********************************************************************************
 
 function verify_response(
-    ::Val{load_script},
+    ::Type{Val{load_script}},
     response ::Any
 )
     facts() do
@@ -258,7 +258,7 @@ end
 # ********************************************************************************
 
 function verify_response(
-    ::Val{thermal_performance_diagnostic},
+    ::Type{Val{thermal_performance_diagnostic}},
     response ::Any
 )
     facts() do
@@ -336,7 +336,7 @@ end
 # ********************************************************************************
 
 function verify_response(
-    ::Val{thermal_consistency},
+    ::Type{Val{thermal_consistency}},
     response ::Any
 )
     facts() do
@@ -385,7 +385,7 @@ end
 # success response body (optical_cal):
 
 function verify_response(
-    ::Val{optical_calibration},
+    ::Type{Val{optical_calibration}},
     response ::Any
 )
     facts() do
@@ -413,7 +413,7 @@ end
 # ********************************************************************************
 
 function verify_response(
-    ::Val{optical_test_single_channel},
+    ::Type{Val{optical_test_single_channel}},
     response ::Any
 )
     facts() do
@@ -453,7 +453,7 @@ end
 # *******************************************************************************
 
 function verify_response(
-    ::Val{optical_test_dual_channel},
+    ::Type{Val{optical_test_dual_channel}},
     response ::Any
 )
     facts() do

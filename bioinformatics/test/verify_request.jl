@@ -36,7 +36,7 @@ FactCheck.setstyle(:default)
 # ********************************************************************************
 
 function verify_request(
-    ::Val{QpcrAnalysis.standard_curve},
+    ::Type{Val{QpcrAnalysis.standard_curve}},
     request ::AbstractArray
 )
     facts("Standard curve requested") do
@@ -172,7 +172,7 @@ function raw_test(raw ::Associative)
 end
 
 function verify_request(
-    ::Val{amplification},
+    ::Type{Val{amplification}},
     request ::Associative
 )
     facts("Amplification requested") do
@@ -273,7 +273,7 @@ end
 # ;
 
 function verify_request(
-    ::Val{QpcrAnalysis.meltcurve},
+    ::Type{Val{QpcrAnalysis.meltcurve}},
     request ::Any
 )
     facts("Melting curve requested") do
@@ -334,7 +334,7 @@ end
 # ;
 
 function verify_request(
-    ::Val{QpcrAnalysis.thermal_performance_diagnostic},
+    ::Type{Val{QpcrAnalysis.thermal_performance_diagnostic}},
     request ::Any
 )
     facts("Thermal performance diagnostic requested") do
@@ -377,7 +377,7 @@ end
 # ;
 
 function verify_request(
-    ::Val{QpcrAnalysis.thermal_consistency},
+    ::Type{Val{QpcrAnalysis.thermal_consistency}},
     request ::Any
 )
     facts("Thermal consistency requested") do
@@ -416,7 +416,7 @@ end
 # ********************************************************************************
 
 function verify_request(
-    ::Val{QpcrAnalysis.optical_calibration},
+    ::Type{Val{QpcrAnalysis.optical_calibration}},
     request ::Any
 )
     facts("Optical calibration requested") do
@@ -457,7 +457,7 @@ end
 # ;
 
 function verify_request(
-    ::Val{QpcrAnalysis.optical_test_single_channel},
+    ::Type{Val{QpcrAnalysis.optical_test_single_channel}},
     request ::Any
 )
     facts("Single channel optical test requested") do
@@ -502,7 +502,7 @@ end
 # ;
 
 function verify_request(
-    ::Val{QpcrAnalysis.optical_test_dual_channel},
+    ::Type{Val{QpcrAnalysis.optical_test_dual_channel}},
     request ::Any
 )
     facts("Dual channel optical test requested") do

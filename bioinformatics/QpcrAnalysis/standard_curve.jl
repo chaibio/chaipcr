@@ -11,7 +11,7 @@ import Memento: debug, warn, error
 ## called by dispatch()
 ## `/slope` for log (DNA copy#) is on the x-axis and Cq on the y-axis, otherwise `*slope`
 function act(
-    ::Val{standard_curve},
+    ::Type{Val{standard_curve}},
     req_vec     ::Vector{Any};
     out_format  ::Symbol = :pre_json,
     json_digits ::Integer =JSON_DIGITS,
@@ -19,7 +19,7 @@ function act(
     empty_tre   ::TargetResultEle =EMPTY_TRE,
     empty_gre   ::GroupResultEle  =EMPTY_GRE
 )
-    debug(logger, "at act(::Val{standard_curve})")
+    debug(logger, "at act(::Type{Val{standard_curve}})")
     #
     ## parse data
     const req_df = reqvec2df(req_vec)
@@ -156,7 +156,7 @@ function act(
         :groups  => Vector(),
         :valid   => true)
     return output |> out(out_format)
-end ## act(::Val{standard_curve})
+end ## act(::Type{Val{standard_curve}})
 
 
 ## dependencies of `standard_curve`

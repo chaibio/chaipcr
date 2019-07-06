@@ -161,7 +161,7 @@ function get_k(
     "This may be caused by using the same or a similar set of solutions " *
     "in the steps for different dyes."
     const (k_s, k_inv_vec, inv_note) =
-        calc_kinv(Val{well_proc}(), k4dcv_bydye, dyes, n_wells, water_well_nums)
+        calc_kinv(Val{well_proc}, k4dcv_bydye, dyes, n_wells, water_well_nums)
     const k4dcv = K4Deconv(k_s, k_inv_vec, (length(inv_note) > 0 ? inv_note * INV_NOTE_PT2 : ""))
     (length(save_to) > 0) && save(save_to, "k4dcv", k4dcv)
     return k4dcv
@@ -171,7 +171,7 @@ end ## get_k()
 ## dependencies of get_k() >>
 
 function calc_kinv(
-    ::Val{well_proc_mean},
+    ::Type{Val{well_proc_mean}},
     k4dcv_bydye     ::Associative,
     dyes            ::AbstractVector,
     n_wells         ::Integer,
@@ -197,7 +197,7 @@ function calc_kinv(
 end
 
 function calc_kinv(
-    ::Val{well_proc_vec},
+    ::Type{Val{well_proc_vec}},
     k4dcv_bydye     ::Associative,
     dyes            ::AbstractVector,
     n_wells         ::Integer,

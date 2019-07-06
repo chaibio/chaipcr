@@ -30,11 +30,11 @@ const MC_OUT_FIELDS = OrderedDict(
 
 ## called by dispatch()
 function act(
-    ::Val{meltcurve},
+    ::Type{Val{meltcurve}},
     req_dict    ::Associative;
     out_format  ::Symbol = :pre_json
 )
-    debug(logger, "at act(::Val{meltcurve})")
+    debug(logger, "at act(::Type{Val{meltcurve}})")
 
     ## calibration data is required    
     if !(haskey(req_dict,CALIBRATION_INFO_KEY) &&
@@ -51,13 +51,13 @@ function act(
         mc_data[key] = mc_data[RAW_DATA_KEY][MC_RAW_FIELDS[key]]
     end
 
-    # kwdict_pmc = OrderedDict{Symbol,Any}()
+    # kwargs_pmc = OrderedDict{Symbol,Any}()
     # for key in ["channel_nums"]
     #     if key in keys_req_dict
-    #         kwdict_pmc[parse(key)] = req_dict[key]
+    #         kwargs_pmc[parse(key)] = req_dict[key]
     #     end
     # end
-    const kwdict_mc_tm_pw = OrderedDict{Symbol,Any}(
+    const kwargs_mc_tm_pw = OrderedDict{Symbol,Any}(
         map(keys(MC_TM_PW_KEYWORDS)) do key
             key => req_dict[MC_TM_PW_KEYWORDS[key]]
         end) ## do key
@@ -69,13 +69,13 @@ function act(
             mc_data,
             calibration_data;
             out_format = out_format,
-            # kwdict_pmc...,
-            kwdict_mc_tm_pw = kwdict_mc_tm_pw)
+            # kwargs_pmc...,
+            kwargs_mc_tm_pw = kwargs_mc_tm_pw)
     catch err
         return fail(logger, err; bt=true) |> out(out_format)
     end ## try
     return response |> out(out_format)
-end ## act(::Val{meltcurve})
+end ## act(::Type{Val{meltcurve}})
 
 
 ## analyse melting curve experiment
@@ -91,7 +91,7 @@ function process_mc(
     dcv                 ::Bool =true, ## logical, whether to perform multi-channel deconvolution
 	max_temperature     ::Real =1000, ## maximum temperature (argument not used)
     out_format          ::Symbol = :pre_json, ## :full, :pre_json, :json
-    kwdict_mc_tm_pw     ::Associative =OrderedDict() ## keyword arguments passed onto `mc_tm_pw`
+    kwargs_mc_tm_pw     ::Associative =OrderedDict() ## keyword arguments passed onto `mc_tm_pw`
 )
     ## function: format fluorescence data for calibration
     ##
@@ -196,12 +196,12 @@ function process_mc(
             norm_data, norm_well_nums, calibrated_data) =
         calibrate(
             raw_data,
-            num_channels == 1 ? false : dcv,
-            channel_nums,
             calibration_data,
             fluo_well_nums,
+            channel_nums,
+            num_channels == 1 ? false : dcv,
             dye_in,
-            dyes_to_be_filled;
+            dyes_to_be_filled,
             out_format = :array)
     #
     ## ignore dummy well_nums from calibrate()
@@ -222,7 +222,7 @@ function process_mc(
                             auto_span_smooth = auto_span_smooth,
                             span_smooth_default = span_smooth_default,
                             span_smooth_factor = span_smooth_factor,
-                            kwdict_mc_tm_pw...)
+                            kwargs_mc_tm_pw...)
                     else
                         MeltCurveTa()
                     end ## if

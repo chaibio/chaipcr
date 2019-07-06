@@ -13,6 +13,6 @@ import DataStructures.OrderedDict
 ## NB in Julia v0.7 we can use the syntax @enum begin ... end
 @enum Action amplification meltcurve standard_curve load_script optical_calibration thermal_performance_diagnostic thermal_consistency optical_test_single_channel optical_test_dual_channel # your_own_analyze_functionality
 
-const actions = instances(Action)
+const ACTIONS = instances(Action)
 const ACT = OrderedDict(
-    zip(map(Symbol, actions), actions))
+    zip(map(Symbol, ACTIONS), ACTIONS))

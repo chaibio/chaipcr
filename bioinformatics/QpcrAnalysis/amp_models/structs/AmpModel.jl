@@ -3,6 +3,12 @@
 ## Author: Tom Price
 ## Date:   June 2019
 
-@enum AmpModel MAK2 MAK3 MAKERGAUL3 MAKERGAUL4 SFC
+abstract type AmpModel                  end
+abstract type SFCModel      <: AmpModel end
+abstract type DFCModel      <: AmpModel end
+abstract type MAK2          <: DFCModel end
+abstract type MAK3          <: DFCModel end
+abstract type MAKERGAUL3    <: DFCModel end
+abstract type MAKERGAUL4    <: DFCModel end
 
-const ampmodels = instances(AmpModel)
+const AMPMODELS = [subtypes(AmpModel)..., subtypes(DFCModel)...]

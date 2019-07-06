@@ -20,7 +20,7 @@ const MAX_TIME_TO_HEAT = 90e3       ## ms
 
 ## called by dispatch()
 function act(
-    ::Val{thermal_performance_diagnostic},
+    ::Type{Val{thermal_performance_diagnostic}},
     ## remove MySql dependency
     #
     # db_conn ::MySQL.MySQLHandle,
@@ -29,7 +29,7 @@ function act(
     temperatureData ::Associative;
     out_format      ::Symbol = :pre_json
 )
-    debug(logger, "at act(::Val{thermal_performance_diagnostic})")
+    debug(logger, "at act(::Type{Val{thermal_performance_diagnostic}})")
 
     ## remove MySql dependency
     #
@@ -120,4 +120,4 @@ function act(
             ),
             :valid => true)
     return output |> out(out_format)
-end ## act(::Val{thermal_performance_diagnostic})
+end ## act(::Type{Val{thermal_performance_diagnostic}})

@@ -12,19 +12,22 @@ import Memento: debug, error
 
 ## function: perform deconvolution and adjust well-to-well variation in absolute fluorescence
 function calibrate(
+    ## data
     raw_data                ::AbstractArray,            ## 3D array of raw fluorescence by cycle, well, channel
-    dcv                     ::Bool,                     ## signal to perform multi-channel deconvolution
-    channel_nums            ::AbstractVector,           ## vector of channel numbers
+    calibration_data        ::CalibrationData{<: Real}, ## calibration dataset
+    well_nums_found_in_raw  ::AbstractVector,           ## vector of well numbers
+    channel_nums            ::AbstractVector;           ## vector of channel numbers
+    ## calibration parameters
+    dcv                     ::Bool = true,              ## if true, perform multi-channel deconvolution
+    dye_in                  ::Symbol = :FAM,
+    dyes_to_be_filled       ::AbstractVector =[],
+    ## output parameter
+    out_format              ::Symbol = :both,           ## :array, :dict, :both
     ## remove MySql dependency
     # db_conn ::MySQL.MySQLHandle, ## `db_conn_default` is defined in "__init__.jl"
     # calib_info ::Union{Integer,OrderedDict},
-    # well_nums_found_in_fr ::AbstractVector,
+    # well_nums_found_in_raw ::AbstractVector,
     # well_nums_in_req ::AbstractVector=[],
-    calibration_data        ::CalibrationData{<: Real}, ## calibration dataset
-    well_nums_found_in_fr   ::AbstractVector,           ## vector of well numbers
-    dye_in                  ::Symbol = :FAM,
-    dyes_to_be_filled       ::AbstractVector =[];
-    out_format              ::Symbol = :both            ## :array, :dict, :both
 )
     debug(logger, "at calibrate()")
 
@@ -40,17 +43,17 @@ function calibrate(
         prep_normalize(calibration_data, well_nums_in_req, dye_in, dyes_to_be_filled)
     #
     ## overwrite the dummy well_nums
-    norm_well_nums = well_nums_found_in_fr
+    norm_well_nums = well_nums_found_in_raw
     #
     const num_channels = length(channel_nums)
-    # if length(well_nums_found_in_fr) == 0
-    #     well_nums_found_in_fr = norm_well_nums
+    # if length(well_nums_found_in_raw) == 0
+    #     well_nums_found_in_raw = norm_well_nums
     # end
 
     ## remove MySql dependency
     #
     # matched_well_idc = find(norm_well_nums) do norm_well_num
-    #     norm_well_num in well_nums_found_in_fr
+    #     norm_well_num in well_nums_found_in_raw
     # end ## do norm_well_num
 
     ## issue:
@@ -154,12 +157,12 @@ end ## calibrate()
 #     const (background_subtracted_data_1, k4dcv_2, deconvoluted_data_1, norm_data_2, norm_well_nums_2, calibrated_data_1) =
 #         calibrate(
 #             ary2dcv_1,
-#             true,
-#             channel_nums_1,
 #             db_conn_2,
 #             calib_info_2,
 #             well_nums_2,
 #             well_nums_2,
+#             channel_nums_1,
+#             true,
 #             dye_in,
 #             dyes_to_be_filled;
 #             out_format = :array)

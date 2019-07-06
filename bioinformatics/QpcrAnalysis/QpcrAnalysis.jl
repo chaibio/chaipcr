@@ -71,11 +71,11 @@ module QpcrAnalysis
     include("amp_models/structs/AmpModelFit.jl")
     include("amp_models/structs/SFCModelDef.jl")
     # include("structs/AmpRawData.jl")
+    include("structs/AmpBaselineModelFit.jl")
+    include("structs/AmpQuantOutput.jl")
     include("structs/AmpStepRampProperties.jl")
     include("structs/AmpStepRampOutput.jl")
     include("structs/AmpStepRampOutput2Bjson.jl")
-    # include("structs/AmpQuantification.jl")
-    include("structs/MbqOutput.jl")
     ## melting curve
     # include("structs/MeltCurveRawData.jl")
     include("structs/MeltCurveTF.jl")
@@ -111,12 +111,12 @@ module QpcrAnalysis
     include("deconvolution.jl")
 
     ## amplification
-    include("amplification.jl")
-    include("allelic_discrimination.jl")
     include("amp_models/MAKx.jl")
     include("amp_models/MAKERGAULx.jl")
     include("amp_models/sfc_model_bases.jl")
     include("amp_models/sfc_models.jl")
+    include("amplification.jl")
+    include("allelic_discrimination.jl")
     ## melting curve
     include("melting_curve.jl")
     include("supsmu.jl")

@@ -35,7 +35,7 @@ const WATER_MIN = [1000, -1000]
 
 ## called by dispatch()
 function act(
-    ::Val{optical_test_dual_channel},
+    ::Type{Val{optical_test_dual_channel}},
     ## remove MySqldependency
     #
     # db_conn ::MySQL.MySQLHandle,
@@ -54,7 +54,7 @@ function act(
         transpose(dscrmnts_snr[cl](transpose(snr_2chs)))
     end
 
-    debug(logger, "at act(::Val{optical_test_dual_channel})")
+    debug(logger, "at act(::Type{Val{optical_test_dual_channel}})")
 
     ## remove MySql dependency
     #
@@ -185,4 +185,4 @@ function act(
         :valid              => length(error_msgs) == 0,
         :error              => join(error_msgs, "; "))
     return output |> out(out_format)
-end ## act(::Val{optical_test_dual_channel})
+end ## act(::Type{Val{optical_test_dual_channel}})

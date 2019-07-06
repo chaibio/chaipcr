@@ -11,9 +11,6 @@
 import DataStructures.OrderedDict
 
 ## NB in Julia v0.7 we can use the syntax @enum begin ... end
-@enum ClusteringMethod K_means K_means_medoids K_medoids
+@enum ClusteringMethod k_means k_means_medoids k_medoids
 
-const clusteringmethods = instances(ClusteringMethod)
-const cm_DICT = OrderedDict(
-    zip(map(Symbol, clusteringmethods), 
-        clusteringmethods))
+const CLUSTERINGMETHODS = instances(ClusteringMethod)

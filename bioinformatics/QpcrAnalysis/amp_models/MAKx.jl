@@ -17,11 +17,11 @@ const k_START       = 10 ## used: 10 better, 2 good, 1e-10 bad, 1 bad
 
 ## function definitions
 
-pred_from_d_nm1(::Union{Val{:MAK2}, Val{:MAK3}}, d_nm1::Real, k::Real) =
+pred_from_d_nm1(::Union{Type{Val{MAK2}}, Type{Val{MAK3}}}, d_nm1::Real, k::Real) =
     d_nm1 + k * log(1 + d_nm1 / k)
 
 function pred_from_cycs( ## 0.7to1.2e-5 sec for 40 cycles on PC
-    ::Val{:MAK2},
+    ::Type{Val{MAK2}},
     cycs    ::AbstractVector,
     fb      ::Real,
     d0      ::Real,
@@ -35,10 +35,10 @@ function pred_from_cycs( ## 0.7to1.2e-5 sec for 40 cycles on PC
         i += 1
     end
     return fb + pred_ds[2:end][map(Int, cycs)]
-end ## pred_from_cycs(::Val{:MAK2})
+end ## pred_from_cycs(::Type{Val{MAK2}})
 
 function pred_from_cycs( ## sec for 40 cycles on PC
-    ::Val{:MAK3},
+    ::Type{Val{MAK3}},
     cycs    ::AbstractVector,
     fb      ::Real,
     bl_k    ::Real,
@@ -53,10 +53,10 @@ function pred_from_cycs( ## sec for 40 cycles on PC
         i += 1
     end
     return fb + bl_k * cycs .+ pred_ds[2:end][map(Int, cycs)]
-end ## pred_from_cycs(::Val{:MAK3})
+end ## pred_from_cycs(::Type{Val{MAK3}})
 
 function fit(
-    ::Val{:MAK2},
+    ::Type{Val{MAK2}},
     cycs        ::AbstractVector, ## continous integers or not
     obs_fluos   ::AbstractVector,
     wts         ::AbstractVector =ones(length(obs_fluos));
@@ -111,10 +111,10 @@ function fit(
         jmp_model,
         # init_coefs
     )
-end ## fit(::Val{:MAK2})
+end ## fit(::Type{Val{MAK2}})
 
 function fit(
-    ::Val{:MAK3},
+    ::Type{Val{MAK3}},
     cycs        ::AbstractVector, ## continous integers or not
     obs_fluos   ::AbstractVector,
     wts         ::AbstractVector =ones(length(obs_fluos));
@@ -179,7 +179,7 @@ function fit(
         jmp_model,
         # init_coefs
     )
-end ## fit(::Val{:MAK3})
+end ## fit(::Type{Val{MAK3}})
 
 
 ## need `@eval`, not used
@@ -237,10 +237,10 @@ end ## fit(::Val{:MAK3})
 ## for `@NLobjective(jmp_model, Min, @eval ...)` from `fit_mak2`
 # function get_mak2_rsq_str(
 #     obs_fluos::AbstractVector;
-#     kwdict_gmp::Associative=OrderedDict(), # keyword arguments passed onto `get_mak2_psf`
+#     kwargs_gmp::Associative=OrderedDict(), # keyword arguments passed onto `get_mak2_psf`
 #     )
 #     num_cycs = length(obs_fluos)
-#     pred_strs_fluo = get_mak2_psf(num_cycs; kwdict_gmp...)
+#     pred_strs_fluo = get_mak2_psf(num_cycs; kwargs_gmp...)
 #     rsq_str = join(map(1:num_cycs) do cyc_n
 #         "($(pred_strs_fluo[cyc_n]) - $(obs_fluos[cyc_n])) ^ 2"
 #     end, " + ") ## do cyc_n

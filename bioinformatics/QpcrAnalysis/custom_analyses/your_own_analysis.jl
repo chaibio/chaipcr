@@ -7,7 +7,7 @@
 ## see the lines that contain `YourOwnAnalysis`.
 
 # function act(
-#     ::Val{your_own_analysis},
+#     ::Type{Val{your_own_analysis}},
 #     req_dict ::Associative;
 #     # whatever keyword arguments you want to add
 #     )

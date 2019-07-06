@@ -33,7 +33,7 @@ function dispatch(
             error(logger, "action $action_str is not recognized")
         end
         ## else
-        const action = Val{ACT[action_key]}()
+        const action = Val{ACT[action_key]}
 
         const production_env = (get(ENV, "JULIA_ENV", nothing) == PRODUCTION_MODE)
         @static if !production_env

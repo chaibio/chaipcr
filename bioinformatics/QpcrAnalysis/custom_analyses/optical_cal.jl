@@ -9,7 +9,7 @@ import Memento.debug
 
 ## called by dispatch()
 function act(
-    ::Val{optical_calibration},
+    ::Type{Val{optical_calibration}},
     req_dict            ::Associative;
     well_nums           ::AbstractVector =[],
     out_format          ::Symbol = :pre_json,
@@ -21,7 +21,7 @@ function act(
     dye_in              ::Symbol = :FAM, 
     dyes_to_be_filled   ::Vector =[]
 )
-    debug(logger, "at act(::Val{optical_calibration})")
+    debug(logger, "at act(::Type{Val{optical_calibration}})")
  
     ## remove MySql dependency
     # calib_info_ori = calib_info
@@ -57,4 +57,4 @@ function act(
             return fail(logger, result_k.inv_note) |> out(out_format)
     end ## if
     return OrderedDict(:valid => true) |> out(out_format)
-end ## act(::Val{optical_calibration})
+end ## act(::Type{Val{optical_calibration}})

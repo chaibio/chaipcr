@@ -1,8 +1,5 @@
 ## AmpModelFit.jl
 ##
-## requires AmpModel.jl
-## for const ampmodels
-##
 ## Author: Tom Price
 ## Date:   June 2019
 
@@ -25,12 +22,12 @@ end
 
 ## constructor
 MAK2Fit(;
-    max_d_idx   ::Int               =0,
-    coef_strs   ::Vector{String}    =Vector{String}(),
-    coefs       ::Vector{Float_T}   =zeros(0),
+    max_d_idx   ::Int               = 0,
+    coef_strs   ::Vector{String}    = Vector{String}(),
+    coefs       ::Vector{Float_T}   = zeros(0),
     status      ::Symbol            = :not_fitted,
-    obj_val     ::Float_T           =0.0,
-    jmp_model   ::JuMP.Model        =JuMP.Model()
+    obj_val     ::Float_T           = 0.0,
+    jmp_model   ::JuMP.Model        = JuMP.Model()
 ) =
     MAK2Fit(max_d_idx, coef_strs, coefs,
         status, obj_val, jmp_model)
@@ -49,14 +46,14 @@ end
 
 ## constructor
 MAK3Fit(;
-    max_d_idx   ::Int               =0,
-    fb_start    ::Float_T           =0.0,
-    bl_k_start  ::Float_T           =0.0,
-    coef_strs   ::Vector{String}    =Vector{String}(),
-    coefs       ::Vector{Float_T}   =zeros(0),
+    max_d_idx   ::Int               = 0,
+    fb_start    ::Float_T           = 0.0,
+    bl_k_start  ::Float_T           = 0.0,
+    coef_strs   ::Vector{String}    = Vector{String}(),
+    coefs       ::Vector{Float_T}   = zeros(0),
     status      ::Symbol            = :not_fitted,
-    obj_val     ::Float_T           =0.0,
-    jmp_model   ::JuMP.Model        =JuMP.Model()
+    obj_val     ::Float_T           = 0.0,
+    jmp_model   ::JuMP.Model        = JuMP.Model()
 ) =
     MAK3Fit(max_d_idx, fb_start, bl_k_start,
         coef_strs, coefs, status, obj_val, jmp_model)
@@ -73,12 +70,12 @@ end
 
 ## constructor
 MAKERGAUL3Fit(;
-    max_of_idx  ::Int               =0,
-    coef_strs   ::Vector{String}    =Vector{String}(),
-    coefs       ::Vector{Float_T}   =zeros(0),
+    max_of_idx  ::Int               = 0,
+    coef_strs   ::Vector{String}    = Vector{String}(),
+    coefs       ::Vector{Float_T}   = zeros(0),
     status      ::Symbol            = :not_fitted,
-    obj_val     ::Float_T           =0.0,
-    jmp_model   ::JuMP.Model        =JuMP.Model()
+    obj_val     ::Float_T           = 0.0,
+    jmp_model   ::JuMP.Model        = JuMP.Model()
 ) =
     MAKERGAUL3Fit(max_of_idx, coef_strs, coefs,
         status, obj_val, jmp_model)
@@ -97,14 +94,14 @@ end
 
 ## constructor
 MAKERGAUL4Fit(;
-    max_of_idx  ::Int               =0,
-    fb_start    ::Float_T           =0.0,
-    bl_k_start  ::Float_T           =0.0,
-    coef_strs   ::Vector{String}    =Vector{String}(),
-    coefs       ::Vector{Float_T}   =zeros(0),
+    max_of_idx  ::Int               = 0,
+    fb_start    ::Float_T           = 0.0,
+    bl_k_start  ::Float_T           = 0.0,
+    coef_strs   ::Vector{String}    = Vector{String}(),
+    coefs       ::Vector{Float_T}   = zeros(0),
     status      ::Symbol            = :not_fitted,
-    obj_val     ::Float_T           =0.0,
-    jmp_model   ::JuMP.Model        =JuMP.Model()
+    obj_val     ::Float_T           = 0.0,
+    jmp_model   ::JuMP.Model        = JuMP.Model()
 ) =
     MAKERGAUL4Fit(max_of_idx, fb_start, bl_k_start,
         coef_strs, coefs, status, obj_val, jmp_model)
@@ -121,17 +118,11 @@ end
 
 ## constructor
 SFCFit(;
-    coef_strs   ::Vector{String}                =Vector{String}(),
-    coefs       ::Vector{Float_T}               =zeros(0),
+    coef_strs   ::Vector{String}                = Vector{String}(),
+    coefs       ::Vector{Float_T}               = zeros(0),
     status      ::Symbol                        = :not_fitted,
-    obj_val     ::AbstractFloat                 =0.0,
-    jmp_model   ::JuMP.Model                    =JuMP.Model(),
-    init_coefs  ::OrderedDict{String,Float_T}   =OrderedDict{String,Float_T}()
+    obj_val     ::AbstractFloat                 = 0.0,
+    jmp_model   ::JuMP.Model                    = JuMP.Model(),
+    init_coefs  ::OrderedDict{String,Float_T}   = OrderedDict{String,Float_T}()
 ) =
     SFCFit(coef_strs, coefs, status, obj_val, jmp_model, init_coefs)
-
-
-## constants
-const ampmodelfits = subtypes(AmpModelFit)
-const FIT = OrderedDict(
-    zip(ampmodels, ampmodelfits))

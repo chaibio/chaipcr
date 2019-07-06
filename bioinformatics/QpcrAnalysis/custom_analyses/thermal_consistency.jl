@@ -15,7 +15,7 @@ const MAX_DELTA_TM_VAL = 2
 
 ## called by dispatch()
 function act(
-    ::Val{thermal_consistency},
+    ::Type{Val{thermal_consistency}},
     ## remove MySql dependency
     # db_conn ::MySQL.MySQLHandle,
     # exp_id ::Integer,
@@ -33,7 +33,7 @@ function act(
     max_temperature     ::Real =1000, ## maximum temperature to analyze
     reporting           =roundoff(JSON_DIGITS) ## reporting function
 )
-    debug(logger, "at act(::Val{thermal_consistency})")
+    debug(logger, "at act(::Type{Val{thermal_consistency}})")
 
     ## calibration data is required
     if !(haskey(req_dict, CALIBRATION_INFO_KEY) &&
@@ -50,7 +50,7 @@ function act(
         mc_data[key] = mc_data[RAW_DATA_KEY][MC_RAW_FIELDS[key]]
     end
 
-    const kwdict_mc_tm_pw = OrderedDict{Symbol,Any}(
+    const kwargs_mc_tm_pw = OrderedDict{Symbol,Any}(
         map(keys(MC_TM_PW_KEYWORDS)) do key
             key => req_dict[MC_TM_PW_KEYWORDS[key]]
         end)
@@ -74,7 +74,7 @@ function act(
             dcv = dcv,
             max_temperature = max_temperature,
             out_format = :full,
-            kwdict_mc_tm_pw = kwdict_mc_tm_pw)
+            kwargs_mc_tm_pw = kwargs_mc_tm_pw)
     catch err
         return fail(logger, err; bt=true) |> out(out_format)
     end ## try
@@ -114,4 +114,4 @@ function act(
     (out_format == :full) && return full_out()
     ## else
     return pre_json_out() |> out(out_format)
-end ## act(::Val{thermal_consistency})
+end ## act(::Type{Val{thermal_consistency}})
