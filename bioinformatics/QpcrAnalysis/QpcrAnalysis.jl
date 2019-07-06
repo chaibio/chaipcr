@@ -68,14 +68,16 @@ module QpcrAnalysis
     include("structs/AssignGenosResult.jl")
     ## amplification
     include("amp_models/structs/AmpModel.jl")
+    include("amp_models/structs/Amp.jl")
     include("amp_models/structs/AmpModelFit.jl")
     include("amp_models/structs/SFCModelDef.jl")
     # include("structs/AmpRawData.jl")
     include("structs/AmpBaselineModelFit.jl")
+    # include("structs/AmpStepRampProperties.jl")
     include("structs/AmpStepRampOutput.jl")
     include("structs/AmpStepRampProperties.jl")
     include("structs/AmpStepRampOutput2Bjson.jl")
-    include("structs/AmpQuantOutput.jl")
+    # include("structs/AmpQuantOutput.jl")
     ## melting curve
     # include("structs/MeltCurveRawData.jl")
     include("structs/MeltCurveTF.jl")

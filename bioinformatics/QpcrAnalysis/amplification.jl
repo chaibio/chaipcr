@@ -1,6 +1,10 @@
 ## amplification.jl
 ##
 ## amplification analysis
+##
+## issue:
+## the code assumes only 1 step/ramp because the current data format
+## does not allow us to break the fluorescence data down by step_id/ramp_id
 
 import JSON: parse
 import DataStructures.OrderedDict
@@ -10,9 +14,6 @@ using Ipopt
 
 
 ## constants >>
-
-## default for asrp_vec
-const DEFAULT_AMP_CYC_NUMS          = Vector{Int}()
 
 ## default for calibration
 const DEFAULT_AMP_DCV               = true
@@ -42,6 +43,9 @@ const DEFAULT_AMP_NORM_L            = 2
 # const DEFAULT_AMP_DEFAULT_ENCGR     = DEFAULT_encgr
 # const DEFAULT_AMP_CATEG_WELL_VEC    = CATEG_WELL_VEC
 
+## default for asrp_vec
+# const DEFAULT_AMP_CYC_NUMS          = Vector{Int}()
+
 ## other
 const CT_VAL_DOMAINERROR = -99 ## a value that cannot be obtained by normal calculation of Ct
 const KWARGS_RC_KEYS = Dict(
@@ -60,61 +64,6 @@ function act(
     req_dict        ::Associative;
     out_format      ::Symbol = :pre_json
 )
-    ## issue:
-    ## the following assumes only 1 step/ramp because the current data format
-    ## does not allow us to break the fluorescence data down by step_id/ramp_id
-    function parse_raw_data()
-        const (cyc_nums, fluo_well_nums, channel_nums) =
-            map([CYCLE_NUM_KEY, WELL_NUM_KEY, CHANNEL_KEY]) do key
-                req_dict[RAW_DATA_KEY][key] |> unique             ## in order of appearance
-            end
-        const (num_cycs, num_fluo_wells, num_channels) =
-            map(length, (cyc_nums, fluo_well_nums, channel_nums))
-        try
-            assert(req_dict[RAW_DATA_KEY][CYCLE_NUM_KEY] ==
-                repeat(
-                    cyc_nums,
-                    outer = num_fluo_wells * num_channels))
-            assert(req_dict[RAW_DATA_KEY][WELL_NUM_KEY ] ==
-                repeat(
-                    fluo_well_nums,
-                    inner = num_cycs,
-                    outer = num_channels))
-            assert(req_dict[RAW_DATA_KEY][CHANNEL_KEY  ] ==
-                repeat(
-                    channel_nums,
-                    inner = num_cycs * num_fluo_wells))
-        catch
-            throw(AssertionError("The format of the fluorescence data does not " *
-                "lend itself to transformation into a 3-dimensional array. " *
-                "Please make sure that it is sorted by channel, well number, and cycle number."))
-        end ## try
-        ## this code assumes that the data in the request
-        ## is formatted appropriately for this transformation
-        ## we can check the cycle/well/channel data if necessary
-        const R = typeof(req_dict[RAW_DATA_KEY][FLUORESCENCE_VALUE_KEY][1][1])
-        const raw_data ::Array{R,3} =
-            reshape(
-                req_dict[RAW_DATA_KEY][FLUORESCENCE_VALUE_KEY],
-                num_cycs, num_fluo_wells, num_channels)
-        ## rearrange data in sort order of each index
-        const cyc_perm  = sortperm(cyc_nums)
-        const well_perm = sortperm(fluo_well_nums)
-        const chan_perm = sortperm(channel_nums)
-        return (
-            raw_data[cyc_perm,well_perm,chan_perm],
-            num_cycs,
-            num_fluo_wells,
-            num_channels,
-            cyc_nums[cyc_perm],
-            fluo_well_nums[well_perm],
-            map(channel_nums[chan_perm]) do c
-                Symbol(CHANNEL_KEY, "_", c)
-            end)
-    end ## parse_raw_data()
-
-    ## << end of function definition nested within amp()
-
     debug(logger, "at act(::Type{Val{amplification}})")
     ## calibration data is required
     req_key = curry(haskey)(req_dict)
@@ -124,23 +73,6 @@ function act(
                 "no calibration information found")) |> out(out_format)
     end
     const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
-    ## we will assume that any relevant step/ramp information has already been passed along
-    ## and is present in step_id / ramp_id
-    const sr_key =
-        if      req_key(STEP_ID_KEY) STEP_ID_KEY
-        elseif  req_key(RAMP_ID_KEY) RAMP_ID_KEY
-        else throw(ArgumentError("no step/ramp information found"))
-        end
-    ## remove MySql dependency
-    ## asrp_vec
-    # if "step_id" in keys_req_dict
-    #     asrp_vec = [AmpStepRampProperties("step", req_dict["step_id"], DEFAULT_AMP_CYC_NUMS)]
-    # elseif "ramp_id" in keys_req_dict
-    #     asrp_vec = [AmpStepRampProperties("ramp", req_dict["ramp_id"], DEFAULT_AMP_CYC_NUMS)]
-    # else
-    #     asrp_vec = Vector{AmpStepRampProperties}()
-    # end        
-    const asrp_vec = [AmpStepRampProperties(:ramp, req_dict[sr_key], DEFAULT_AMP_CYC_NUMS)]
     ## `report_cq!` arguments
     const kwargs_rc = Dict{Symbol,Any}(
         map(KWARGS_RC_KEYS   |> keys |> collect |> sift(req_key)) do key
@@ -202,26 +134,33 @@ function act(
         ## issues:
         ## 1.
         ## the new code currently assumes only 1 step/ramp
-        ## because as the request body is currrently structured
+        ## because as the request body is currently structured
         ## we cannot subset the fluorescence data by step_id/ramp_id
         ## 2.
         ## need to verify that the fluorescence data complies
         ## with the constraints imposed by max_cycle and well_constraint
-        const sr_dict = 
-            OrderedDict(
-                # map([ asrp_vec[1] ]) do asrp
-                #     join([asrp.step_or_ramp, asrp.id], "_") =>
-                        process_amp_1sr(
-                            ## remove MySql dependency
-                            # db_conn, exp_id, asrp, calib_info,
-                            # fluo_well_nums, well_nums,
-                            amp,
-                            asrp,
-                            out_format == :json ? :pre_json : out_format)) ## out_format_1sr
-                # end) ## do asrp
-        ## output
+        #
+        # const sr_key =
+        #     if      req_key(STEP_ID_KEY) STEP_ID_KEY
+        #     elseif  req_key(RAMP_ID_KEY) RAMP_ID_KEY
+        #     else throw(ArgumentError("no step/ramp information found"))
+        #     end
+        # const asrp_vec = [AmpStepRampProperties(:ramp, req_dict[sr_key], DEFAULT_cyc_nums)]
+        # const sr_dict = 
+        #     OrderedDict(
+        #         map([ asrp_vec[1] ]) do asrp
+        #             join([asrp.step_or_ramp, asrp.id], "_") =>
+        #                 process_amp_1sr(
+        #                     # remove MySql dependency
+        #                     # db_conn, exp_id, asrp, calib_info,
+        #                     # fluo_well_nums, well_nums,
+        #                     amp,
+        #                     asrp,
+        #                     out_format == :json ? :pre_json : out_format)) ## out_format_1sr
+        #         end) ## do asrp
+        # ## output
         # if (out_sr_dict)
-            final_out = sr_dict
+        #     final_out = sr_dict
         # else
         #     const first_sr_out = first(values(sr_dict))
         #     final_out =
@@ -230,6 +169,7 @@ function act(
         #                 key => getfield(first_sr_out, key)
         #             end)
         # end
+        final_out = process_amp_1sr(amp)
         final_out[:valid] = true
         final_out        
     catch err
@@ -241,10 +181,61 @@ end ## act(::Type{Val{amplification}})
 
 ## process amplification per step
 function process_amp_1sr(
-    amp                     ::Amp,
-    asrp                    ::AmpStepRampProperties,
-    out_format              ::Symbol ## :full, :pre_json, :json
+    amp                     ::Amp;
+    # asrp                    ::AmpStepRampProperties,
+    out_format              ::Symbol = :pre_json ## :full, :pre_json
 )
+    function parse_raw_data()
+        const (cyc_nums, fluo_well_nums, channel_nums) =
+            map([CYCLE_NUM_KEY, WELL_NUM_KEY, CHANNEL_KEY]) do key
+                req_dict[RAW_DATA_KEY][key] |> unique             ## in order of appearance
+            end
+        const (num_cycs, num_fluo_wells, num_channels) =
+            map(length, (cyc_nums, fluo_well_nums, channel_nums))
+        try
+            assert(req_dict[RAW_DATA_KEY][CYCLE_NUM_KEY] ==
+                repeat(
+                    cyc_nums,
+                    outer = num_fluo_wells * num_channels))
+            assert(req_dict[RAW_DATA_KEY][WELL_NUM_KEY ] ==
+                repeat(
+                    fluo_well_nums,
+                    inner = num_cycs,
+                    outer = num_channels))
+            assert(req_dict[RAW_DATA_KEY][CHANNEL_KEY  ] ==
+                repeat(
+                    channel_nums,
+                    inner = num_cycs * num_fluo_wells))
+        catch
+            throw(AssertionError("The format of the fluorescence data does not " *
+                "lend itself to transformation into a 3-dimensional array. " *
+                "Please make sure that it is sorted by channel, well number, and cycle number."))
+        end ## try
+        ## this code assumes that the data in the request
+        ## is formatted appropriately for this transformation
+        ## we can check the cycle/well/channel data if necessary
+        const R = typeof(req_dict[RAW_DATA_KEY][FLUORESCENCE_VALUE_KEY][1][1])
+        const raw_data ::Array{R,3} =
+            reshape(
+                req_dict[RAW_DATA_KEY][FLUORESCENCE_VALUE_KEY],
+                num_cycs, num_fluo_wells, num_channels)
+        ## rearrange data in sort order of each index
+        const cyc_perm  = sortperm(cyc_nums)
+        const well_perm = sortperm(fluo_well_nums)
+        const chan_perm = sortperm(channel_nums)
+        return (
+            raw_data[cyc_perm,well_perm,chan_perm],
+            num_cycs,
+            num_fluo_wells,
+            num_channels,
+            cyc_nums[cyc_perm],
+            fluo_well_nums[well_perm],
+            map(channel_nums[chan_perm]) do c
+                Symbol(CHANNEL_KEY, "_", c)
+            end)
+    end ## parse_raw_data()
+
+    ## << end of function definition nested within amp()
     function check_baseline_cyc_bounds()
         debug(logger, "at find_baseline_cyc_bounds()")
         const size_bcb = size(baseline_cyc_bounds)
