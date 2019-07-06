@@ -32,7 +32,7 @@ end ## fit_baseline()
 function fit_baseline_model(
 	::Type{Val{M}} where M <: DFCModel,
     fluos               ::AbstractVector,
-    kwargs_jmp_model    ::Associative;
+    solver              ::IpoptSolver;
 ) 
     debug(logger, "at fit_baseline_model() - DFC")
     ## no fallback for baseline, because:
@@ -44,7 +44,7 @@ function fit_baseline_model(
     const cycs = 1:num_cycs
     const wts = ones(num_cycs)
     const DFC_type = FIT[amp_model]() ## empty model fit
-    const fitted_prebl = fit(DFC_instance, cycs, fluos, wts; kwargs_jmp_model...)
+    const fitted_prebl = fit(DFC_instance, cycs, fluos, wts; solver = solver)
     const baseline =
         fitted_prebl.coefs[1] +
             amp_model in [MAK3, MAKERGAUL4] ?
@@ -61,12 +61,12 @@ end ## fit_baseline_model() ## DFC
 function fit_baseline_model(
 	::Type{Val{SFCModel}},
     fluos               ::AbstractVector,
-    kwargs_jmp_model    ::Associative;
-    SFC_model_defs      ::OrderedDict{Symbol, SFCModelDef} = MDs,
+    solver              ::IpoptSolver;
+    SFC_model_defs      ::OrderedDict{Symbol, SFCModelDef} = SFC_MDs,
     bl_method           ::Symbol = DEFAULT_AMP_MODEL_NAME,
-    bl_fallback_func    ::Function = median,
-    min_reliable_cyc    ::Real = 5, ## >= 1
-    baseline_cyc_bounds ::AbstractVector = [],
+    bl_fallback_func    ::Function = DEFAULT_AMP_FALLBACK_FUNC,
+    min_reliable_cyc    ::Real = DEFAULT_AMP_MIN_RELIABLE_CYC,
+    baseline_cyc_bounds ::AbstractVector = DEFAULT_AMP_BASELINE_CYC_BOUNDS,
 )
     function SFC_wts()
         if bl_method in [:lin_1ft, :lin_2ft]

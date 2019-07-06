@@ -37,8 +37,8 @@ function CalibrationData(calib ::Associative)
         n)
 end
 
-## Other function
-num_wells(calibration_data ::CalibrationData{<: Real}) =
+## other method
+num_wells(this ::CalibrationData{<: Real}) =
     [:water, Symbol(CHANNEL_KEY, "_", 1), Symbol(CHANNEL_KEY, "_", 2)] |>
-        mold(f -> num_wells(getfield(calibration_data, f))) |>
+        mold(f -> num_wells(getfield(this, f))) |>
         maximum
