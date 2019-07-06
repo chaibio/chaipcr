@@ -95,7 +95,7 @@ function do_cluster_analysis(
     raw_data        ::AbstractMatrix,
     init_centers    ::AbstractMatrix,
     cluster_method  ::ClusteringMethod = k_means_medoids,
-    norm_l          ::Real =2
+    norm_l          ::AbstractFloat = 2
 )
     ## get pair-wise distance (cost) matrix
     ## matrix is symmetric with zeros on major diagonal

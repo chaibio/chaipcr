@@ -102,29 +102,20 @@ function act(
         const well_perm = sortperm(fluo_well_nums)
         const chan_perm = sortperm(channel_nums)
         return (
-            cyc_nums[cyc_perm],
-            fluo_well_nums[well_perm],
-            map(i -> "channel_$(i)", channel_nums[chan_perm]),
+            raw_data[cyc_perm,well_perm,chan_perm],
             num_cycs,
             num_fluo_wells,
             num_channels,
-            raw_data[cyc_perm,well_perm,chan_perm])
+            cyc_nums[cyc_perm],
+            fluo_well_nums[well_perm],
+            map(channel_nums[chan_perm]) do c
+                Symbol(CHANNEL_KEY, "_", c)
+            end)
     end ## parse_raw_data()
 
     ## << end of function definition nested within amp()
 
     debug(logger, "at act(::Type{Val{amplification}})")
-
-    ## remove MySql dependency
-    ## asrp_vec
-    # if "step_id" in keys_req_dict
-    #     asrp_vec = [AmpStepRampProperties("step", req_dict["step_id"], DEFAULT_AMP_CYC_NUMS)]
-    # elseif "ramp_id" in keys_req_dict
-    #     asrp_vec = [AmpStepRampProperties("ramp", req_dict["ramp_id"], DEFAULT_AMP_CYC_NUMS)]
-    # else
-    #     asrp_vec = Vector{AmpStepRampProperties}()
-    # end
-
     ## calibration data is required
     req_key = curry(haskey)(req_dict)
     if !(req_key(CALIBRATION_INFO_KEY) &&
@@ -140,6 +131,15 @@ function act(
         elseif  req_key(RAMP_ID_KEY) RAMP_ID_KEY
         else throw(ArgumentError("no step/ramp information found"))
         end
+    ## remove MySql dependency
+    ## asrp_vec
+    # if "step_id" in keys_req_dict
+    #     asrp_vec = [AmpStepRampProperties("step", req_dict["step_id"], DEFAULT_AMP_CYC_NUMS)]
+    # elseif "ramp_id" in keys_req_dict
+    #     asrp_vec = [AmpStepRampProperties("ramp", req_dict["ramp_id"], DEFAULT_AMP_CYC_NUMS)]
+    # else
+    #     asrp_vec = Vector{AmpStepRampProperties}()
+    # end        
     const asrp_vec = [AmpStepRampProperties(:ramp, req_dict[sr_key], DEFAULT_AMP_CYC_NUMS)]
     ## `report_cq!` arguments
     const kwargs_rc = Dict{Symbol,Any}(
@@ -147,8 +147,8 @@ function act(
             KWARGS_RC_KEYS[key] => req_dict[key]
         end) ## map
     ## `process_amp_1sr` arguments
-    const kwargs_pa1 = Dict{Symbol,Any}(
-        map(KWARGS_PA1_KEYS |> keys |> collect |> sift(req_key)) do key
+    const kwargs_fit = Dict{Symbol,Any}(
+        map(KWARGS_FIT_KEYS |> keys |> collect |> sift(req_key)) do key
             if (key == CATEG_WELL_VEC_KEY)
                 :categ_well_vec =>
                     map(req_dict[CATEG_WELL_VEC_KEY]) do x
@@ -162,7 +162,7 @@ function act(
             end ## if
         end) ## map
     ## arguments for fit_baseline_model()
-    const kwargs_fit =
+    const kwargs_bl =
         begin
             const baseline_method =
                 req_key(BASELINE_METHOD_KEY) &&
@@ -182,425 +182,249 @@ function act(
                 Dict{Symbol,Any}()
             end
         end
-    const response = try
-        process_amp(
-            ## remove MySql dependency
-            # db_conn, exp_id, asrp_vec, calib_info;
-            # req_dict["experiment_id"],
-            parse_raw_data()...,
-            calibration_data,
-            asrp_vec;
-            kwargs_fit      = kwargs_fit,
-            kwargs_rc       = kwargs_rc,
-            kwargs_ad       = Dict{Symbol,Any}(),
-            out_format      = out_format,
-            out_sr_dict     = false,
-            kwargs_pa1...)
+    const parsed_raw_data = parse_raw_data()
+    ## create container for data and parameters
+    ## to pass to process_amp_1sr
+    const amp = Amp(
+        parsed_raw_data...,
+        calibration_data,
+        IpoptSolver(print_level = 0, max_iter = 35),
+        "",
+        DEFAULT_AMP_DCV && parsed_raw_data[4] > 1, ## dcv && num_channels > 1
+        DEFAULT_AMP_MODEL,
+        kwargs_bl,
+        kwargs_fit,
+        kwargs_rc,
+        # true,
+        out_format,
+        roundoff(JSON_DIGITS))
+    const process_amp = try
+        ## issues:
+        ## 1.
+        ## the new code currently assumes only 1 step/ramp
+        ## because as the request body is currrently structured
+        ## we cannot subset the fluorescence data by step_id/ramp_id
+        ## 2.
+        ## need to verify that the fluorescence data complies
+        ## with the constraints imposed by max_cycle and well_constraint
+        const sr_dict = 
+            OrderedDict(
+                # map([ asrp_vec[1] ]) do asrp
+                #     join([asrp.step_or_ramp, asrp.id], "_") =>
+                        process_amp_1sr(
+                            ## remove MySql dependency
+                            # db_conn, exp_id, asrp, calib_info,
+                            # fluo_well_nums, well_nums,
+                            amp,
+                            asrp,
+                            out_format == :json ? :pre_json : out_format)) ## out_format_1sr
+                # end) ## do asrp
+        ## output
+        # if (out_sr_dict)
+            final_out = sr_dict
+        # else
+        #     const first_sr_out = first(values(sr_dict))
+        #     final_out =
+        #         OrderedDict(
+        #             map(fieldnames(first_sr_out)) do key
+        #                 key => getfield(first_sr_out, key)
+        #             end)
+        # end
+        final_out[:valid] = true
+        final_out        
     catch err
         return fail(logger, err; bt=true) |> out(out_format)
     end ## try
-    return response |> out(out_format)
+    return process_amp |> out(out_format)
 end ## act(::Type{Val{amplification}})
 
 
-## currently this function does nothing
-## it just passes data through to process_amp_1sr()
-## the compiler might be able to eliminate it
-function process_amp(
-    ## remove MySql dependency
-    #
-    # db_conn ::MySQL.MySQLHandle,
-    # exp_id ::Integer,
-    # asrp_vec ::Vector{AmpStepRampProperties},
-    # calib_info ::Union{Integer,OrderedDict};
-    # exp_id                  ::Integer,
-    #
-    ## data
-    # well_nums ::AbstractVector =[],
-    cyc_nums                ::Vector{<: Integer},
-    fluo_well_nums          ::Vector{<: Integer},
-    channel_nums            ::Vector{String},
-    num_cycs                ::Integer,
-    num_fluo_wells          ::Integer,
-    num_channels            ::Integer,
-    raw_data                ::Array{<: Real,3},
-    calibration_data        ::CalibrationData{<: Real},
-    ## we will assume that any relevant step/ramp information
-    ## has already been passed along and is present in asrp_vec
-    asrp_vec                ::Vector{AmpStepRampProperties};
-    ## calibration parameters
-    dcv                     ::Bool = DEFAULT_AMP_DCV, ## if true, perform multi-channel deconvolution
-    ## arguments for fit_baseline_model()
-    amp_model               ::AmpModel = DEFAULT_AMP_MODEL, ## SFC, MAKx, MAKERGAULx
-    ipopt_print2file_prefix ::String = "",          ## file prefix for Ipopt print
-    kwargs_fit              ::Associative =Dict{Symbol,Any}(), ## passed from request
-    ## baseline model parameters
-    baseline_cyc_bounds     ::AbstractVector = [],  ## argument only used for SFC
-    min_reliable_cyc        ::Real = 5,             ## argument only used for SFC
-    max_cycle               ::Integer = 1000,       ## argument not used
-    ## quantification parameters
-    cq_method               ::Symbol = :Cy0,        ## argument only used for SFC
-    ct_fluos                ::AbstractVector = [],  ## argument only used for SFC
-    ## arguments for set_qt_fluos!()
-    qt_prob_rc              ::Real = 0.9,           ## quantile probablity for fluo values per well
-    ## arguments for report_cq!()
-    kwargs_rc               ::Associative = Dict{Symbol,Any}(), ## passed from request
-    ## allelic discrimination parameters
-    kwargs_ad                   ::Associative = Dict{Symbol,Any}(
-        cycs                        => DEFAULT_AMP_CYCS, ## cycles of fluorescence to be used, 0 means the last cycle
-        ctrl_well_dict              => DEFAULT_AMP_CTRL_WELL_DICT,
-        cluster_method              => DEFAULT_AMP_CLUSTER_METHOD, ## k_means, k_medoids, k_means_medoids
-        norm_l                      => DEFAULT_AMP_NORM_L, ## norm level for distance matrix, e.g. norm_l = 2 means L2-norm
-        expected_ncg_raw            => DEFAULT_AMP_DEFAULT_ENCGR, ## each column is a vector of binary genotype whose length is number of channels (0 => no signal, 1 => yes signal)
-        categ_well_vec              => DEFAULT_AMP_CATEG_WELL_VEC),
-    ## output options
-    out_sr_dict             ::Bool = true,          ## output OrderedDict keyed by `sr`
-    out_format              ::Symbol = :json,       ## :full, :pre_json, :json
-    reporting               ::Function = roundoff(JSON_DIGITS), ## reporting function
+## process amplification per step
+function process_amp_1sr(
+    amp                     ::Amp,
+    asrp                    ::AmpStepRampProperties,
+    out_format              ::Symbol ## :full, :pre_json, :json
 )
-    ## process amplification per step
-    function process_amp_1sr(
-        ## remove MySql dependency
-        # db_conn ::MySQL.MySQLHandle,
-        # exp_id ::Integer,
-        # asrp ::AmpStepRampProperties,
-        # calib_info ::Union{Integer,OrderedDict},
-        # fluo_well_nums ::AbstractVector,
-        # well_nums ::AbstractVector,
-        kwargs_jmp_model        ::Associative,
-        asrp                    ::AmpStepRampProperties,
-        dcv                     ::Bool, ## logical, whether to perform multi-channel deconvolution
-        out_format              ::Symbol ## :full, :pre_json, :json
-    )
-        function check_baseline_cyc_bounds()
-            debug(logger, "at find_baseline_cyc_bounds()")
-            const size_bcb = size(baseline_cyc_bounds)
-            if size_bcb == (0,) || (size_bcb == (2,) && size(baseline_cyc_bounds[1]) == ()) ## can't use `eltype(baseline_cyc_bounds) <: Integer` because `JSON.parse("[1,2]")` results in `Any[1,2]` instead of `Int[1,2]`
-                return amp_init(baseline_cyc_bounds)
-            elseif size_bcb == (num_fluo_wells, num_channels) && eltype(baseline_cyc_bounds) <: AbstractVector ## final format of `baseline_cyc_bounds`
-                return baseline_cyc_bounds
-            end
-            throw(ArgumentError("`baseline_cyc_bounds` is not in the right format"))
-        end ## check_baseline_cyc_bounds()
-
-        ## calculate ct_fluos when amp_model == SFC && cq_method == :ct
-        function calc_ct_fluos()
-            debug(logger, "at calc_ct_fluos()")
-            (length(ct_fluos) > 0) && return ct_fluos
-            (cq_method != :ct)     && return ct_fluos_empty
-            ## num_cycs > 2 && length(ct_fluos) == 0 && cq_method == :ct
-            map(1:num_channels) do channel_i
-                const fit_array1 =
-                    map(1:num_fluo_wells) do well_i
-                        solver =
-                        const fit =
-                            fit_baseline_model(
-                                Val{amp_model},
-                                calibrated_data[:, well_i, channel_i],
-                                kwargs_jmp_model;
-                                amp_model = amp_model,
-                                ipopt_print2file = ipopt_print2file,
-                                ## parameters that apply only when fitting SFC models
-                                kwargs_bl = Dict(
-                                    baseline_cyc_bounds => checked_baseline_cyc_bounds[well_i, channel_i],
-                                    min_reliable_cyc => min_reliable_cyc,
-                                    kwargs_fit...)) ## passed from request
-                                # cq_method = :cp_dr1,
-                                # ct_fluo = NaN)
-                    end ## do well_i
-                fit_array1 |>
-                    mold(index(:postbl_status)) |>
-                    find_idc_useful |>
-                    mold(fit_i -> fit_array1[fit_i][:cq_fluo]) |>
-                    median
-            end ## do channel_i
-        end ## calc_ct_fluos()
-
-        function calc_fit_array2()
-            debug(logger, "at calc_fit_array2()")
-            [
-                begin
-                    ipopt_print2file = length(ipopt_print2file_prefix) == 0 ?
-                        "" : "$(join([ipopt_print2file_prefix, channel_i, well_i], '_')).txt"
-                    fit_baseline_model(
-                        Val{amp_model},
-                        calibrated_data[:, well_i, channel_i],
-                        kwargs_jmp_model;
-                        amp_model = amp_model,
-                        ipopt_print2file = ipopt_print2file,
-                        ## parameters that apply only when fitting SFC models
-                        kwargs_bl = Dict(
-                            baseline_cyc_bounds => checked_baseline_cyc_bounds[well_i, channel_i],
-                            min_reliable_cyc => min_reliable_cyc,
-                            kwargs_fit...)) ## passed from request
-                        # cq_method = cq_method,
-                        # ct_fluo = calculated_ct_fluos[channel_i]),
-                end
-                for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
-            ]
-        end ## calc_fit_array2()
-
-        function calc_quant_array2(fit_array2 ::AbstractArray)
-            debug(logger, "at calc_quant_array2()")
-            [
-                amp_model == SFC ?
-                    quantify(
-                        Val{amp_model},
-                        fit_array2[well_i, channel_i];
-                        cq_method = cq_method,
-                        ct_fluo = calculated_ct_fluos[channel_i],
-                    ) :
-                    AmpQuantOutput()
-                for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
-            ]
-        end ## calc_quant_array2()
-
-        function set_qt_fluos!()
-            debug(logger, "at set_qt_fluos!()")
-            full_amp_out.qt_fluos =
-                [   quantile(full_amp_out.blsub_fluos[:, well_i, channel_i], qt_prob_rc)
-                    for well_i in 1:num_fluo_wells, channel_i in 1:num_channels             ]
-            full_amp_out.max_qt_fluo = maximum(full_amp_out.qt_fluos)
-            return nothing ## side effects only
+    function check_baseline_cyc_bounds()
+        debug(logger, "at find_baseline_cyc_bounds()")
+        const size_bcb = size(baseline_cyc_bounds)
+        if size_bcb == (0,) || (size_bcb == (2,) && size(baseline_cyc_bounds[1]) == ()) ## can't use `eltype(baseline_cyc_bounds) <: Integer` because `JSON.parse("[1,2]")` results in `Any[1,2]` instead of `Int[1,2]`
+            return amp_init(baseline_cyc_bounds)
+        elseif size_bcb == (num_fluo_wells, num_channels) && eltype(baseline_cyc_bounds) <: AbstractVector ## final format of `baseline_cyc_bounds`
+            return baseline_cyc_bounds
         end
+        throw(ArgumentError("`baseline_cyc_bounds` is not in the right format"))
+    end ## check_baseline_cyc_bounds()
 
-        function set_fieldname_rcq!()
-            debug(logger, "at set_fn_rcq!()")
+    ## calculate ct_fluos when amp_model == SFC && cq_method == :ct
+    function calc_ct_fluos()
+        debug(logger, "at calc_ct_fluos()")
+        (length(ct_fluos) > 0) && return ct_fluos
+        (cq_method != :ct)     && return ct_fluos_empty
+        ## num_cycs > 2 && length(ct_fluos) == 0 && cq_method == :ct
+        map(1:num_channels) do channel_i
+            const fit_array1 =
+                map(1:num_fluo_wells) do well_i
+                    solver =
+                    const fit =
+                        fit_baseline_model(
+                            Val{amp_model},
+                            calibrated_data[:, well_i, channel_i],
+                            kwargs_jmp_model;
+                            amp_model = amp_model,
+                            ipopt_print2file = ipopt_print2file,
+                            ## parameters that apply only when fitting SFC models
+                            kwargs_bl = Dict(
+                                baseline_cyc_bounds => checked_baseline_cyc_bounds[well_i, channel_i],
+                                min_reliable_cyc => min_reliable_cyc,
+                                kwargs_fit...)) ## passed from request
+                            # cq_method = :cp_dr1,
+                            # ct_fluo = NaN)
+                end ## do well_i
+            fit_array1 |>
+                mold(index(:postbl_status)) |>
+                find_idc_useful |>
+                mold(fit_i -> fit_array1[fit_i][:cq_fluo]) |>
+                median
+        end ## do channel_i
+    end ## calc_ct_fluos()
+
+    function calc_fit_array2()
+        debug(logger, "at calc_fit_array2()")
+        [
+            begin
+                ipopt_print2file = length(ipopt_print2file_prefix) == 0 ?
+                    "" : "$(join([ipopt_print2file_prefix, channel_i, well_i], '_')).txt"
+                fit_baseline_model(
+                    Val{amp_model},
+                    calibrated_data[:, well_i, channel_i],
+                    kwargs_jmp_model;
+                    amp_model = amp_model,
+                    ipopt_print2file = ipopt_print2file,
+                    ## parameters that apply only when fitting SFC models
+                    kwargs_bl = Dict(
+                        baseline_cyc_bounds => checked_baseline_cyc_bounds[well_i, channel_i],
+                        min_reliable_cyc => min_reliable_cyc,
+                        kwargs_fit...)) ## passed from request
+                    # cq_method = cq_method,
+                    # ct_fluo = calculated_ct_fluos[channel_i]),
+            end
             for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
-                report_cq!(full_amp_out, well_i, channel_i; kwargs_rc...)
-            end
-            return nothing ## side effects only
+        ]
+    end ## calc_fit_array2()
+
+    function calc_quant_array2(fit_array2 ::AbstractArray)
+        debug(logger, "at calc_quant_array2()")
+        [
+            amp_model == SFCModel ?
+                quantify(
+                    Val{amp_model},
+                    fit_array2[well_i, channel_i];
+                    cq_method = cq_method,
+                    ct_fluo = calculated_ct_fluos[channel_i],
+                ) :
+                AmpQuantOutput()
+            for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
+        ]
+    end ## calc_quant_array2()
+
+    function set_qt_fluos!()
+        debug(logger, "at set_qt_fluos!()")
+        full_amp_out.qt_fluos =
+            [   quantile(full_amp_out.blsub_fluos[:, well_i, channel_i], qt_prob_rc)
+                for well_i in 1:num_fluo_wells, channel_i in 1:num_channels             ]
+        full_amp_out.max_qt_fluo = maximum(full_amp_out.qt_fluos)
+        return nothing ## side effects only
+    end
+
+    function set_fieldname_rcq!()
+        debug(logger, "at set_fn_rcq!()")
+        for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
+            report_cq!(full_amp_out, well_i, channel_i; kwargs_rc...)
         end
+        return nothing ## side effects only
+    end
 
-        ## << end of function definitions nested within process_amp_1sr
+    ## << end of function definitions nested within process_amp_1sr
 
-        debug(logger, "at process_amp_1sr()")
-
-        ## remove MySql dependency
-        # raw_data = get_amp_data(
-        #     db_conn,
-        #     "fluorescence_value", # "fluorescence_value" or "baseline_value"
-        #     exp_id, asrp,
-        #     fluo_well_nums, channel_nums)
-
-        ## deconvolute and normalize
-        const (background_subtracted_data, k4dcv, deconvoluted_data,
-                norm_data, norm_well_nums, calibrated_data) =
-            calibrate(
-                ## remove MySql dependency
-                # db_conn,
-                # calib_info,
-                # fluo_well_nums,
-                # well_nums,
-                raw_data,
-                calibration_data,
-                fluo_well_nums,
-                channel_nums,
-                dcv,
-                :array)
-        #
-        ## initialize output
-        full_amp_out = AmpStepRampOutput(
-            raw_data,
-            background_subtracted_data,
-            k4dcv,
-            deconvoluted_data,
-            norm_data,
-            calibrated_data,
-            fluo_well_nums,
-            num_channels,
-            # cq_method,
-            ct_fluos)
-        #
-        if num_cycs <= 2
-            warn(logger, "number of cycles $num_cycs <= 2: baseline subtraction " *
-                "and Cq calculation will not be performed")
-        else ## num_cycs > 2
-            const ct_fluos_empty = fill(NaN, num_channels)
-            const (checked_baseline_cyc_bounds, calculated_ct_fluos) =
-                amp_model == SFC ?
-                    (check_baseline_cyc_bounds(), calc_ct_fluos()) :
-                    (baseline_cyc_bounds, ct_fluos_empty)
-            full_amp_out.ct_fluos = calculated_ct_fluos
-            ## baseline model fit
-            const fit_array2 = calc_fit_array2()
-            foreach(fieldnames(AmpModelFitOutput)) do fieldname
-                set_field_from_array!(full_amp_out, fieldname, fit_array2)
-            end ## do fieldname
-            ## quantification
-            const quant_array2 = calc_quant_array2(fit_array2)
-            foreach(fieldnames(AmpQuantOutput)) do fieldname
-                set_field_from_array!(full_amp_out, fieldname, quant_array2)
-            end ## do fieldname
-            ## qt_fluos
-            set_qt_fluos!()
-            ## report_cq
-            set_fieldname_rcq!()
-        end ## if
-        #
-        ## allelic discrimination
-        # if dcv
-        #     full_amp_out.assignments_adj_labels_dict, full_amp_out.agr_dict =
-        #         process_ad(
-        #             full_amp_out,
-        #             kwargs_ad...)
-        # end # if dcv
-        #
-        ## format output
-        return (out_format == :full) ?
-            full_amp_out :
-            AmpStepRampOutput2Bjson(full_amp_out, reporting)
-    end ## process_amp_1sr()
-
-    # << end of function definition nested within process_amp()
-
-    debug(logger, "at process_amp()")
-
-    # print_v(println, verbose,
-    #     "db_conn: ", db_conn, "\n",
-    #     "experiment_id: $exp_id\n",
-    #     "asrp_vec: $asrp_vec\n",
-    #     "calib_info: $calib_info\n",
-    #     "max_cycle: $max_cycle"
-    # )
+    debug(logger, "at process_amp_1sr()")
 
     ## remove MySql dependency
-    #
-    # calib_info = ensure_ci(db_conn, calib_info, exp_id)
-    #
-    ## find step_id/ramp_id information
-    # if length(asrp_vec) == 0
-    #     sr_qry = """SELECT
-    #             steps.id AS steps_id,
-    #             steps.collect_data AS steps_collect_data,
-    #             ramps.id AS ramps_id,
-    #             ramps.collect_data AS ramps_collect_data
-    #         FROM experiments
-    #         LEFT JOIN protocols ON experiments.experiment_definition_id = protocols.experiment_definition_id
-    #         LEFT JOIN stages ON protocols.id = stages.protocol_id
-    #         LEFT JOIN steps ON stages.id = steps.stage_id
-    #         LEFT JOIN ramps ON steps.id = ramps.next_step_id
-    #         WHERE
-    #             experiments.id = $exp_id AND
-    #             stages.stage_type <> \'meltcurve\'
-    #     """
-    #     ## (mapping no longer needed after using "AS" in query):
-    #     ## [1] steps.id, [2] steps.collect_data, [3] ramps.id, [4] ramps.collect_data
-    #     sr = MySQL.mysql_execute(db_conn, sr_qry)[1] # [index] fieldnames
-    #
-    #     step_ids = unique(sr[1][sr[2] .== 1])
-    #     ramp_ids = unique(sr[3][sr[4] .== 1])
-    #
-    #     asrp_vec = vcat(
-    #         map(step_ids) do step_id
-    #             AmpStepRampProperties("step", step_id, DEFAULT_AMP_CYC_NUMS)
-    #         end,
-    #         map(ramp_ids) do ramp_id
-    #             AmpStepRampProperties("ramp", ramp_id, DEFAULT_AMP_CYC_NUMS)
-    #         end
-    #     )
-    # end ## if length(sr_str_vec)
-    #
-    ### find the latest step or ramp
-    ## if out_sr_dict
-    ##     sr_ids = map(asrp -> asrp.id, asrp_vec)
-    ##     max_step_id = maximum(sr_ids)
-    ##     msi_idc = find(sr_id -> sr_id == max_step_id, sr_ids) # msi = max_step_id
-    ##     if length(msi_idc) == 1
-    ##         latest_idx = msi_idc[1]
-    ##     else # length(max_idc) == 2
-    ##         latest_idx = find(asrp_vec) do asrp
-    ##             asrp.step_or_ramp == "step" && aspr.id == max_step_id
-    ##         end[1] # do asrp
-    ##     end # if length(min_idc) == 1
-    ##     asrp_latest = asrp_vec[latest_idx]
-    ## else # implying `sr_vec` has only one element
-    ##     asrp_latest = asrp_vec[1]
-    ## end
-    #
-    ## print_v(println, verbose, asrp_latest)
-    #
-    ## find `asrp`
-    # for asrp in asrp_vec
-    #     fd_qry_2b = """
-    #         SELECT well_num, cycle_num
-    #             FROM fluorescence_data
-    #             WHERE
-    #                 experiment_id = $exp_id AND
-    #                 $(asrp.step_or_ramp)_id = $(asrp.id) AND
-    #                 cycle_num <= $max_cycle AND
-    #                 step_id is not NULL
-    #                 well_constraint
-    #             ORDER BY cycle_num
-    #     """
-    #     ## must "SELECT well_num" for `get_mysql_data_well`
-    #     fd_nt, fluo_well_nums = get_mysql_data_well(
-    #         well_nums, fd_qry_2b, db_conn, verbose
-    #     )
-    #     asrp.cyc_nums = unique(fd_nt[:cycle_num])
-    #  end # for asrp
-    #
-    ## find `fluo_well_nums` and `channel_nums`.
-    ## literal i.e. non-pointer variables created in a Julia for-loop is local,
-    ## i.e. not accessible outside of the for-loop.
-    #  asrp_1 = asrp_vec[1]
-    #  fd_qry_2b = """
-    #      SELECT well_num, channel
-    #          FROM fluorescence_data
-    #          WHERE
-    #              experiment_id = $exp_id AND
-    #              $(asrp_1.step_or_ramp)_id = $(asrp_1.id) AND
-    #              step_id is not NULL
-    #              well_constraint
-    #          ORDER BY well_num
-    #  """
-    #  # must "SELECT well_num" and "ORDER BY well_num" for `get_mysql_data_well`
-    #  fd_nt, fluo_well_nums = get_mysql_data_well(
-    #      well_nums, fd_qry_2b, db_conn, verbose
-    #  )
-    #
-    # channel_nums = unique(fd_nt[:channel])
+    # raw_data = get_amp_data(
+    #     db_conn,
+    #     "fluorescence_value", # "fluorescence_value" or "baseline_value"
+    #     exp_id, asrp,
+    #     fluo_well_nums, channel_nums)
 
-    solver = IpoptSolver(print_level = 0, max_iter = 35) ## `ReadOnlyMemoryError()` for v0.5.1
-    # solver = IpoptSolver(print_level = 0, max_iter = 100) ## increase allowed number of iterations for MAK-based methods, due to possible numerical difficulties during search for fitting directions (step size becomes too small to be precisely represented by the precision allowed by the system's capacity)
-    # solver = NLoptSolver(algorithm = :LN_COBYLA)
-    kwargs_jmp_model = Dict(:solver => solver)
-
-    ## issues:
-    ## 1.
-    ## the new code currently assumes only 1 step/ramp
-    ## because as the request body is currrently structured
-    ## we cannot subset the fluorescence data by step_id/ramp_id
-    ## 2.
-    ## need to verify that the fluorescence data complies
-    ## with the constraints imposed by max_cycle and well_constraint
-    const sr_dict = 
-        OrderedDict(
-            map([ asrp_vec[1] ]) do asrp
-                join([asrp.step_or_ramp, asrp.id], "_") =>
-                    process_amp_1sr(
-                        ## remove MySql dependency
-                        # db_conn, exp_id, asrp, calib_info,
-                        # fluo_well_nums, well_nums,
-                        asrp,
-                        kwargs_jmp_model,
-                        dcv && num_channels > 1, ## `dcv`
-                        (out_format == :json ? :pre_json : out_format)) ## out_format_1sr
-            end) ## do asrp
-    ## output
-    if (out_sr_dict)
-        const final_out = sr_dict
-    else
-        const first_sr_out = first(values(sr_dict))
-        const final_out =
-            OrderedDict(
-                map(fieldnames(first_sr_out)) do key
-                    key => getfield(first_sr_out, key)
-                end)
-    end
-    final_out[:valid] = true
-    return final_out
-end ## process_amp()
+    kwargs_jmp_model = Dict(:solver => amp.solver)
+    ## deconvolute and normalize
+    const (background_subtracted_data, k4dcv, deconvoluted_data,
+            norm_data, norm_well_nums, calibrated_data) =
+        calibrate(
+            ## remove MySql dependency
+            # db_conn,
+            # calib_info,
+            # fluo_well_nums,
+            # well_nums,
+            raw_data,
+            calibration_data,
+            fluo_well_nums,
+            channel_nums,
+            dcv,
+            :array)
+    #
+    ## initialize output
+    full_amp_out = AmpStepRampOutput(
+        raw_data,
+        background_subtracted_data,
+        k4dcv,
+        deconvoluted_data,
+        norm_data,
+        calibrated_data,
+        fluo_well_nums,
+        num_channels,
+        # cq_method,
+        ct_fluos)
+    #
+    if num_cycs <= 2
+        warn(logger, "number of cycles $num_cycs <= 2: baseline subtraction " *
+            "and Cq calculation will not be performed")
+    else ## num_cycs > 2
+        const ct_fluos_empty = fill(NaN, num_channels)
+        const (checked_baseline_cyc_bounds, calculated_ct_fluos) =
+            amp_model == SFC ?
+                (check_baseline_cyc_bounds(), calc_ct_fluos()) :
+                (baseline_cyc_bounds, ct_fluos_empty)
+        full_amp_out.ct_fluos = calculated_ct_fluos
+        ## baseline model fit
+        const fit_array2 = calc_fit_array2()
+        foreach(fieldnames(AmpModelFitOutput)) do fieldname
+            set_field_from_array!(full_amp_out, fieldname, fit_array2)
+        end ## do fieldname
+        ## quantification
+        const quant_array2 = calc_quant_array2(fit_array2)
+        foreach(fieldnames(AmpQuantOutput)) do fieldname
+            set_field_from_array!(full_amp_out, fieldname, quant_array2)
+        end ## do fieldname
+        ## qt_fluos
+        set_qt_fluos!()
+        ## report_cq
+        set_fieldname_rcq!()
+    end ## if
+    #
+    ## allelic discrimination
+    # if dcv
+    #     full_amp_out.assignments_adj_labels_dict, full_amp_out.agr_dict =
+    #         process_ad(
+    #             full_amp_out,
+    #             kwargs_ad...)
+    # end # if dcv
+    #
+    ## format output
+    return (out_format == :full) ?
+        full_amp_out :
+        AmpStepRampOutput2Bjson(full_amp_out, reporting)
+end ## process_amp_1sr()
 
 
 ## used in calc_ct_fluos()
