@@ -12,3 +12,5 @@ mutable struct UniqCombinCenters
     slht_mean           ::Float_T
     geno_combins        ::Vector{Matrix{Float_T}}
 end
+
+const EMPTY_UCC_DICT = OrderedDict{Set{Vector{Float_T}},UniqCombinCenters}()

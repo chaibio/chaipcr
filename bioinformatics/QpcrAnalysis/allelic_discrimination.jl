@@ -9,55 +9,20 @@ import StatsBase.counts
 import Memento: debug, info, error
 
 
-## constants >>
-
-## default values for processing preset calibration data with 4 groups
-const DEFAULT_encgr = Array{Int,2}(0, 0)
-## const DEFAULT_encgr = [0 1 0 1; 0 0 1 1] ## NTC, homo ch1, homo ch2, hetero
-const DEFAULT_init_FACTORS = [1, 1, 1, 1] ## sometimes "hetero" may not have very high end-point fluo
-const DEFAULT_apg_LABELS = ["ntc", "homo_1", "homo_2", "hetero", "unclassified"] ## [0 1 0 1; 0 0 1 1]
-## const DEFAULT_apg_LABELS = ["hetero", "homo_2", "homo_1", "ntc", "unclassified"] ## [1 0 1 0; 1 1 0 0]
-
-## 3 groups without NTC (non-template control)
-# const DEFAULT_egr = [1 0 1; 0 1 1] # homo ch1, homo ch2, hetero
-# const DEFAULT_init_FACTORS = [1, 1, 1] # sometimes "hetero" may not have very high end-point fluo
-# const DEFAULT_eg_LABELS = ["homo_a", "homo_b", "hetero", "unclassified"]
-
-const CTRL_WELL_DICT = OrderedDict{Vector{Int},Vector{Int}}() ## key is genotype (Vector{Int}), value is well numbers (Vector{Int})
-## example
-# const CTRL_WELL_DICT = OrderedDict(
-#     [0, 0] => [1, 2], # NTC, well 1 and 2
-#     [1, 0] => [3, 4], # homo ch1, well 3 and 4
-#     [0, 1] => [5, 6], # homo ch2, well 5 and 6
-#     [1, 1] => [7, 8]  # hetero, well 7 and 8
-# )
-## old approach
-# const CTRL_WELL_DICT = DefaultOrderedDict(Vector{Int}, Vector{Int}, Vector{Int}())
-
-const EMPTY_UCC_DICT = OrderedDict{Set{Vector{Float_T}},UniqCombinCenters}()
-const EMPTY_BEST_GENO_COMBINS = Vector{Matrix{Int}}()
-
-const CATEG_WELL_VEC = [
-    (:rbbs_ary3,   Colon()),
-    (:blsub_fluos, Colon()),
-    (:d0,          Colon()),
-    (:cq,          Colon())]
-
-
 ## function definitions >>
 
 ## nrn: whether to flip the binary genotype or not
-NRN_SELF = identity
-NRN_NOT  = x -> 1 .- x
+const NRN_SELF = identity
+const NRN_NOT  = x -> 1 .- x
 
 ## start with bottom-level function, goes step-wise
 function prep_input_4ad(
     ## one step/ramp of amplification output
-    full_amp_out    ::AmpStepRampOutput,
+    full_amp_out    ::AmpOutput,
     categ           ::Symbol = :fluo,
-    well_idc        ::Union{AbstractVector, Colon} =Colon(),
+    well_idc        ::Union{AbstractVector, Colon} = Colon(),
     ## relevant if `categ == :fluo`, last available cycle
-    cycs            ::Union{Integer, AbstractVector} =1
+    cycs            ::Union{Integer, AbstractVector} = 1
 )
     num_cycs, n_wells, num_channels = size(full_amp_out.fr_ary3)
     nrn = NRN_SELF
@@ -266,22 +231,22 @@ function assign_genos(
     data                ::AbstractMatrix,
     nrn                 ::Function,
     ntc_bool_vec        ::Vector{Bool},
-    expected_ncg_raw    ::AbstractMatrix =DEFAULT_encgr,
-    ctrl_well_dict      ::OrderedDict =CTRL_WELL_DICT,
+    expected_ncg_raw    ::AbstractMatrix = DEFAULT_encgr,
+    ctrl_well_dict      ::OrderedDict = CTRL_WELL_DICT,
     cluster_method      ::ClusteringMethod = k_means_medoids,
-    norm_l              ::Real =2,
+    norm_l              ::Real = 2,
     ## below not specified by `process_ad` as of right now
-    init_factors        ::AbstractVector =DEFAULT_init_FACTORS, # for `init_centers`
-    slht_lb             ::Real =0; # lower limit of silhouette
-    apg_labels          ::AbstractVector =DEFAULT_apg_LABELS
+    init_factors        ::AbstractVector = DEFAULT_init_FACTORS, # for `init_centers`
+    slht_lb             ::Real = 0; # lower limit of silhouette
+    apg_labels          ::AbstractVector = DEFAULT_apg_LABELS
     ## `apg` - all possible genotypes.
     ## Julia v0.6.0 on 2017-06-25:
-    ## `apg_labels ::Vector{AbstractString} =DEFAULT_eg_LABELS` resulted in
+    ## `apg_labels ::Vector{AbstractString} = DEFAULT_eg_LABELS` resulted in
     ## "ERROR: MethodError: no method matching #assign_genos#301( ::Array{AbstractString,1},
     ## ::QpcrAnalysis.#assign_genos, ::Array{Float64,2}, ::Array{Float64,2}, ::Float64)"
 )
     function calc_expected_genos_all()
-        f(c ::Int) = 
+        f(c ::Int) =
             reduce(
                 hcat,
                 fill(
@@ -610,7 +575,7 @@ end ## assign_genos()
 
 
 function process_ad(
-    full_amp_out        ::AmpStepRampOutput,
+    full_amp_out        ::AmpOutput,
 
     ## relevant if `categ == "fluo"`, last available cycle
     cycs                ::Union{Integer,AbstractVector},
@@ -621,8 +586,8 @@ function process_ad(
 
     ## each column is a vector of binary geno whose length is number of channels
     ## (0 => no signal, 1 => yes signal)
-    expected_ncg_raw    ::AbstractMatrix =DEFAULT_encgr,
-    categ_well_vec      ::AbstractVector =CATEG_WELL_VEC,
+    expected_ncg_raw    ::AbstractMatrix = DEFAULT_encgr,
+    categ_well_vec      ::AbstractVector = CATEG_WELL_VEC,
 )
     debug(logger, "at process_ad()")
     ## indicate a well as NTC (non-template control) if all the channels have NaN as Cq

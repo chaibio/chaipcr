@@ -33,7 +33,7 @@ function act(
 )
     debug(logger, "at act(::Type{Val{amplification}})")
     const parsed_raw_data = try
-        parse_raw_data()
+        amp_parse_raw_data(req_dict)
     catch err
         return fail(logger, err; bt=true) |> out(out_format)
     end ## try        
@@ -152,7 +152,7 @@ end ## act(::Type{Val{amplification}})
 
 ## extract dimensions of raw amplification data
 ## and format into a 3D array
-function parse_raw_data(req_dict ::Associative)
+function amp_parse_raw_data(req_dict ::Associative)
     const (cyc_nums, fluo_well_nums, channel_nums) =
         map([CYCLE_NUM_KEY, WELL_NUM_KEY, CHANNEL_KEY]) do key
             req_dict[RAW_DATA_KEY][key] |> unique             ## in order of appearance
@@ -178,10 +178,7 @@ function parse_raw_data(req_dict ::Associative)
             "lend itself to transformation into a 3-dimensional array. " *
             "Please make sure that it is sorted by channel, well number, and cycle number."))
     end ## try
-    ## this code assumes that the data in the request
-    ## is formatted appropriately for this transformation
-    ## we can check the cycle/well/channel data if necessary
-    const raw_data =
+    const raw_data = ## formerly `fr_ary3`
         reshape(
             req_dict[RAW_DATA_KEY][FLUORESCENCE_VALUE_KEY],
             num_cycs, num_fluo_wells, num_channels)
@@ -199,4 +196,4 @@ function parse_raw_data(req_dict ::Associative)
         map(channel_nums[chan_perm]) do c
             Symbol(CHANNEL_KEY, "_", c)
         end)
-end ## parse_raw_data()
+end ## amp_parse_raw_data()

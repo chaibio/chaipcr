@@ -1,72 +1,73 @@
-## fit_baseline.jl
+## AmpBaselineModelFit.jl
+##
+## output from fit_baseline_model()
 ##
 ## Author: Tom Price
 ## Date:   July 2019
 
+import DataStructures.OrderedDict
+import Ipopt: IpoptSolver #, NLoptSolver
 
-function fit_baseline(
-    ## data
-    fluos               ::AbstractVector,
-    ## solver parameters
-    kwargs_jmp_model    ::Associative;
-    ipopt_print2file    ::String = "",
-    ## amplification model
-    amp_model           ::AmpModel = SFC, ## SFC, MAKx, MAKERGAULx
-    kwargs_bl			::Associative = Dict{Symbol,Any}()
-)
-    debug(logger, "at fit_baseline()")
-    ## set up solver
-    solver = kwargs_jmp_model[:solver]
-    isa(solver, Ipopt.IpoptSolver) &&
-        push!(solver.options, (:output_file, ipopt_print2file))
-    ## fit model
-    const fit = fit_baseline_model(
-    	Val{amp_model},
-        fluos,
-        kwargs_jmp_model;
-        kwargs_bl...)
-end ## fit_baseline()
 
+struct AmpBaselineModelFit
+    fit_bl          ::AmpModelFit
+    bl_notes        ::Vector{String}
+    blsub_fluos     ::Vector{Float_T}
+end
+
+
+## defaults for baseline model
+const DEFAULT_AMP_MODEL                 = SFCModel
+const DEFAULT_AMP_BL_METHOD             = :l4_enl
+const DEFAULT_AMP_FALLBACK_FUNC         = median
+const DEFAULT_AMP_CT_FLUOS              = []
+const DEFAULT_AMP_MIN_RELIABLE_CYC      = 5 ## >= 1
+const DEFAULT_AMP_BASELINE_CYC_BOUNDS   = []
+
+
+## fit_baseline_model() definitions >>
 
 ## DFC
 function fit_baseline_model(
-	::Type{Val{M}} where M <: DFCModel,
+    ::Type{Val{M}} where M <: DFCModel,
+    o                   ::AmpOutput,
     fluos               ::AbstractVector,
     solver              ::IpoptSolver;
 ) 
-    debug(logger, "at fit_baseline_model() - DFC")
+    debug(logger, "at fit_baseline_model(Val{M}) where M <: DFCModel")
     ## no fallback for baseline, because:
     ## (1) curve may fit well though :Error or :UserLimit
     ## (search step becomes very small but has not converge);
     ## (2) the guessed basedline (`start` of `fb`) is usually
     ## quite close to a sensible baseline.
+    const amp_model = o.input.amp_model
     const num_cycs = length(fluos)
     const cycs = 1:num_cycs
     const wts = ones(num_cycs)
-    const DFC_type = FIT[amp_model]() ## empty model fit
-    const fitted_prebl = fit(DFC_instance, cycs, fluos, wts; solver = solver)
+    const fit_bl = fit(Val{amp_model}, cycs, fluos, wts; solver = solver)
     const baseline =
-        fitted_prebl.coefs[1] +
+        fit_bl.coefs[1] +
             amp_model in [MAK3, MAKERGAUL4] ?
-                fitted_prebl.coefs[2] .* cycs : ## .+ ???
+                fit_bl.coefs[2] .* cycs : ## .+ ???
                 0.0
-    return AmpBaselineModelFitOutput(
-        fitted_prebl,
+    return AmpBaselineModelFit(
+        fit_bl,
         [string(amp_model)], ## bl_notes
         fluos .- baseline) ## blsub_fluos
-end ## fit_baseline_model() ## DFC
+end ## fit_baseline_model(Val{M}) where M <: DFCModel
 
 
 ## SFC
 function fit_baseline_model(
-	::Type{Val{SFCModel}},
+    ::Type{Val{SFCModel}},
+    o                   ::AmpOutput,
     fluos               ::AbstractVector,
     solver              ::IpoptSolver;
     SFC_model_defs      ::OrderedDict{Symbol, SFCModelDef} = SFC_MDs,
     bl_method           ::Symbol = DEFAULT_AMP_MODEL_NAME,
     bl_fallback_func    ::Function = DEFAULT_AMP_FALLBACK_FUNC,
     min_reliable_cyc    ::Real = DEFAULT_AMP_MIN_RELIABLE_CYC,
-    baseline_cyc_bounds ::AbstractVector = DEFAULT_AMP_BASELINE_CYC_BOUNDS,
+    baseline_cyc_bounds ::AbstractVector = DEFAULT_AMP_BASELINE_CYC_BOUNDS
 )
     function SFC_wts()
         if bl_method in [:lin_1ft, :lin_2ft]
@@ -85,15 +86,15 @@ function fit_baseline_model(
     end ## SFC_wts()
 
     ## update bl_notes
-    function SFC_prebl_status(prebl_status ::Symbol)
-        bl_notes = ["prebl_status $prebl_status", "model-derived baseline"]
-        if prebl_status in [:Optimal, :UserLimit]
+    function SFC_bl_status(bl_status ::Symbol)
+        bl_notes = ["bl_status $bl_status", "model-derived baseline"]
+        if bl_status in [:Optimal, :UserLimit]
             const (min_bfd, max_bfd) = extrema(blsub_fluos) ## `bfd` - blsub_fluos_draft
             if max_bfd - min_bfd <= abs(min_bfd)
                 bl_notes[2] = "fallback"
                 push!(bl_notes, "max_bfd ($max_bfd) - min_bfd ($min_bfd) == $(max_bfd - min_bfd) <= abs(min_bfd)")
             end ## if max_bfd - min_bfd
-        elseif prebl_status == :Error
+        elseif bl_status == :Error
             bl_notes[2] = "fallback"
         else
             ## other status codes include
@@ -102,10 +103,10 @@ function fit_baseline_model(
             ## My suggestion is to treat the same as :Error (TP Jan 2019):
             bl_notes[2] = "fallback"
             ## Alternatively, an error could be raised:
-            # error(logger, "Baseline estimation returned unrecognized termination status $prebl_status")
-        end ## if prebl_status
+            # error(logger, "Baseline estimation returned unrecognized termination status $bl_status")
+        end ## if bl_status
         return bl_notes
-    end ## SFC_prebl_status()
+    end ## SFC_bl_status()
 
     function bl_cycs()
         const len_bcb = length(baseline_cyc_bounds)
@@ -169,7 +170,8 @@ function fit_baseline_model(
 
     ## << end of function definitions nested within fit_baseline_model() ## SFC
 
-    debug(logger, "at fit_baseline_model() - SFC")
+    debug(logger, "at fit_baseline_model(Val{SFCModel})")
+    const i = o.input
     const num_cycs = length(fluos)
     const cycs = 1:num_cycs
     ## to determine weights (`wts`) for sigmoid fitting per `min_reliable_cyc`
@@ -177,19 +179,19 @@ function fit_baseline_model(
     if bl_method in keys(SFC_model_defs)
         ## fit model to find baseline
         const wts = SFC_wts()
-        const fitted_prebl = SFC_model_defs[bl_method].func_fit(
-            cycs, fluos, wts; kwargs_jmp_model...)
-        baseline = SFC_model_defs[bl_method].funcs_pred[:bl](cycs, fitted_prebl.coefs...) ## may be changed later
+        const fit_bl = SFC_model_defs[bl_method].func_fit(
+            cycs, fluos, wts; solver = solver)
+        baseline = SFC_model_defs[bl_method].funcs_pred[:bl](cycs, fit_bl.coefs...) ## may be changed later
         blsub_fluos = fluos .- baseline
-        bl_notes = SFC_prebl_status(fitted_prebl.status)
+        bl_notes = SFC_bl_status(fit_bl.status)
         if length(bl_notes) >= 2 && bl_notes[2] == "fallback"
             const bl_func = bl_fallback_func
         end
     else
         ## do not fit model to find baseline
         const wts = ones(num_cycs)
-        const fitted_prebl = FIT[amp_model]() ## empty model fit
-        bl_notes = ["no prebl_status", "no fallback"]
+        const fit_bl = FIT[amp_model]() ## empty model fit
+        bl_notes = ["no bl_status", "no fallback"]
         if bl_method == :median
             const bl_func = median
         else
@@ -202,8 +204,8 @@ function fit_baseline_model(
         baseline = bl_func(fluos[bl_cycs()]) ## change or new def
         blsub_fluos = fluos .- baseline
     end      
-    return AmpBaselineModelFitOutput(
-        fitted_prebl,
+    return AmpBaselineModelFit(
+        fit_bl,
         bl_notes,
         blsub_fluos)
-end ## fit_baseline_model() ## SFC
+end ## fit_baseline_model(Val{SFCModel})
