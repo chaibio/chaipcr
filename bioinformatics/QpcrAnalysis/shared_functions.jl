@@ -48,7 +48,7 @@ index = flip(getindex)  ## index(i) = x -> getindex(x, i)
 ## used in melting_curve.jl
 ## curried reporter function, flipped
 report(digits ::Integer, x) = round(x, digits)
-roundoff(digits ::Integer) = curry(report)(digits)
+roundoff(digits ::Integer) = cast(curry(report))(digits)
 const JSON_DIGITS = 6 ## number of decimal points for floats in JSON output
 
 ## used in amplification.jl
@@ -73,8 +73,8 @@ thing = (!isequal)(nothing)
 ## transform `nothing` to NaN
 nothing2NaN(x) = thing(x) ? x : NaN
 
-out(out_format ::Symbol) =
-    output -> (out_format == :json) ? JSON.json(output) : output
+out(out_format ::OutputFormat) =
+    output -> (out_format == json) ? JSON.json(output) : output
 
 ## used in amplification.jl
 ## used in melting_curve.jl
@@ -83,7 +83,7 @@ out(out_format ::Symbol) =
 function fail(
     logger      ::Logger,
     err         ::Exception;
-    bt          ::Bool =false ## backtrace?
+    bt          ::Bool = false ## backtrace?
 )
     const err_msg = sprint(showerror, err)
     if bt
@@ -91,7 +91,7 @@ function fail(
     end
     try
         error(logger, err_msg)
-    catch ## just report the error
+    catch() ## just report the error
         if bt
             const stl = collect(enumerate(IndexStyle(st), st))
             try
@@ -102,7 +102,7 @@ function fail(
                             index, ptr = tup
                             " [$index] $ptr\n"
                         end))
-            catch
+            catch()
             end ## try
         end ## if bt
     end ## try
@@ -114,11 +114,12 @@ end ## fail()
 ## used in amplification.jl
 ## used in melting_curve.jl
 ## finite differencing function
+@enum FiniteDiffMethod central forward backward
 function finite_diff(
     X       ::AbstractVector,
     Y       ::AbstractVector; ## X and Y must be of same length
-    nu      ::Integer =1, ## order of derivative
-    method  ::Symbol = :central
+    nu      ::Integer = 1, ## order of derivative
+    method  ::FiniteDiffMethod = central
 )
     debug(logger, "at finite_diff()")
     const dlen = length(X)
@@ -128,9 +129,9 @@ function finite_diff(
     (dlen == 1) && return zeros(1)
     if (nu == 1)
         const (range1, range2) =
-            if      (method == :central)  tuple(3:dlen+2, 1:dlen)
-            elseif  (method == :forward)  tuple(3:dlen+2, 1:dlen+1)
-            elseif  (method == :backward) tuple(2:dlen+1, 1:dlen)
+            if      (method == central)  tuple(3:dlen+2, 1:dlen)
+            elseif  (method == forward)  tuple(3:dlen+2, 1:dlen+1)
+            elseif  (method == backward) tuple(2:dlen+1, 1:dlen)
             else
                 throw(ArgmentError, "method \"$method\" not recognized")
             end ## if
@@ -151,7 +152,11 @@ end ## finite_diff()
 
 ## used in standard_curve.jl
 ## transform a real number to scientific notation
-function scinot(x ::Real, num_sig_digits ::Integer=3; log_base ::Integer=10)
+function scinot(
+    x               ::Real,
+    num_sig_digits  ::Integer = 3;
+    log_base        ::Integer = 10
+)
     isnan(x) && return (NaN, NaN)
     (x == 0) && return (0, 0)
     _exponent = log(log_base, abs(x)) |> floor
@@ -202,7 +207,7 @@ giis_uneven(
 function find_mid_sumr_bysw(
     vals       ::AbstractVector,
     half_width ::Integer,
-    sumr_func  ::Function =maximum
+    sumr_func  ::Function = maximum
 )
     vals_iw(i ::Integer) = vals_padded[i : i + half_width * 2]
     #

@@ -9,8 +9,8 @@
 const BBB = match(r"beaglebone", readlines(`uname -a`)[1]) != nothing
 const RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE = false
 
-import DataFrames: DataFrame
-import DataStructures: OrderedDict
+import DataFrames.DataFrame
+import DataStructures.OrderedDict
 import JSON: json, parse, parsefile
 
 @static if !BBB

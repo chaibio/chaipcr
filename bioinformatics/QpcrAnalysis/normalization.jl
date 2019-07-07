@@ -59,7 +59,7 @@ function prep_normalize(
     well_nums           ::AbstractVector;
     dye_in              ::Symbol = DEFAULT_NORM_DYE_IN,
     dyes_to_fill        ::AbstractVector = DEFAULT_NORM_DYES_TO_FILL,
-) where {C <: AbstractFloat}
+) where {C <: Real}
     debug(logger, "at prep_normalize()")
     ## issue:
     ## using the current format for the request body there is no well_num information
@@ -71,12 +71,12 @@ function prep_normalize(
         key = Symbol(CHANNEL_KEY, "_", string(channel))
         try
             water_data_dict[channel]  = calibration_data.water[channel]
-        catch
+        catch()
             push!(stop_msgs, "Cannot access water calibration data for channel $channel")
         end ## try
         try
             signal_data_dict[channel] = getfield(calibration_data, key)[channel]
-        catch
+        catch()
             push!(stop_msgs, "Cannot access signal calibration data for channel $channel")
         end ## try
         if length(water_data_dict[channel]) != length(signal_data_dict[channel])

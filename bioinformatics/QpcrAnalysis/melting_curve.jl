@@ -65,7 +65,7 @@ const MC_OUT_FIELDS = OrderedDict(
 function act(
     ::Type{Val{meltcurve}},
     req_dict    ::Associative;
-    out_format  ::Symbol = :pre_json
+    out_format  ::OutputFormat = pre_json
 )
     debug(logger, "at act(::Type{Val{meltcurve}})")
 
@@ -81,7 +81,7 @@ function act(
     # const mc_data = MeltCurveRawData(req_dict[RAW_DATA_KEY])
     const mc_data = DataFrame()
     foreach(keys(MC_RAW_FIELDS)) do key
-        mc_data[key] = mc_data[RAW_DATA_KEY][MC_RAW_FIELDS[key]]
+        mc_data[key] = req_dict[RAW_DATA_KEY][MC_RAW_FIELDS[key]]
     end
 
     # kwargs_pmc = OrderedDict{Symbol,Any}()
@@ -105,7 +105,7 @@ function act(
             # kwargs_pmc...,
             kwargs_mc_tm_pw = kwargs_mc_tm_pw)
     catch err
-        return fail(logger, err; bt=true) |> out(out_format)
+        return fail(logger, err; bt = true) |> out(out_format)
     end ## try
     return response |> out(out_format)
 end ## act(::Type{Val{meltcurve}})
@@ -122,7 +122,7 @@ function process_mc(
     dcv                 ::Bool = DEFAULT_MC_DCV, ## logical, whether to perform multi-channel deconvolution
 	max_temperature     ::Real = DEFAULT_MC_MAX_TEMPERATURE, ## maximum temperature (argument not used)
     kwargs_mc_tm_pw     ::Associative = DEFAULT_KWARGS_MC_TM_PW, ## keyword arguments passed onto `mc_tm_pw`
-    out_format          ::Symbol = :pre_json, ## :full, :pre_json, :json
+    out_format          ::OutputFormat = pre_json, ## full, pre_json, json
 )
     ## function: format fluorescence data for calibration
     ##
@@ -208,9 +208,9 @@ function process_mc(
 
     debug(logger, "at process_mc()")
     const (channel_nums, fluo_well_nums) =
-        map((CHANNEL_KEY, WELL_NUM_KEY)) do key
-            mc_data[key] |> unique |> sort
-        end ## do key
+        map((CHANNEL_KEY, WELL_NUM_KEY)) do fieldname
+            mc_data[fieldname] |> unique |> sort
+        end ## do fieldname
     const num_channels   = length(channel_nums)
     const num_fluo_wells = length(fluo_well_nums)
     #
@@ -229,9 +229,9 @@ function process_mc(
             raw_data,
             calibration_data,
             fluo_well_nums,
-            channel_nums,
-            num_channels == 1 ? false : dcv,
-            :array)
+            channel_nums;
+            dcv = num_channels == 1 ? false : dcv,
+            data_format = array)
     #
     ## ignore dummy well_nums from calibrate()
     const norm_well_nums_alt = fluo_well_nums
@@ -259,7 +259,7 @@ function process_mc(
             hcat,
             1:num_channels)
     #
-    if (out_format == :full)
+    if (out_format == full)
         return MeltCurveOutput(
             mc_bychwl,
             channel_nums,
@@ -306,7 +306,7 @@ function mc_tm_pw(
     #
     ## identify Tm peaks and calculate peak area
     peak_span_temperature   ::AbstractFloat = DEFAULT_MC_PEAK_SPAN_TEMPERATURE, ## Within the smoothed -df/dt sequence spanning the temperature range of approximately `peak_span_temperature`, if the maximum -df/dt value equals that at the middle point of the sequence, identify this middle point as a peak summit. Similar to `span.peaks` in qpcR code. Combined with `peak_shoulder` (similar to `Tm.border` in qpcR code).
-    ## peak_shoulder ::Real =1, ## 1/2 width of peak in temperature when calculating peak area  # consider changing from 1 to 2, or automatically determined (max and min d2)?
+    ## peak_shoulder ::Real = 1, ## 1/2 width of peak in temperature when calculating peak area  # consider changing from 1 to 2, or automatically determined (max and min d2)?
     #
     ## filter Tm peaks
     qt_prob_range_lb        ::AbstractFloat = DEFAULT_MC_QT_PROB_RANGE_LB, ## quantile probability point for the lower bound of the range considered for number of crossing points
@@ -318,7 +318,7 @@ function mc_tm_pw(
     top_N                   ::Integer = DEFAULT_MC_TOP_N, ## top number of Tm peaks to report
     frac_report_lb          ::AbstractFloat = DEFAULT_MC_FRAC_REPORT_LB, ## lower bound of area fraction of the Tm peak to be reported in regards to the largest real Tm peak
     #
-    reporting               =roundoff(JSON_DIGITS), ## reporting function
+    reporting               = roundoff(JSON_DIGITS), ## reporting function
 )
     ## functions to parse input data
 
@@ -408,8 +408,8 @@ function mc_tm_pw(
     ## smoothing functions
 
     ## fit cubic spline to fluos ~ tmprtrs using Dierckx
-    ## default parameter s=0.0 interpolates without smoothing
-    spline_model(x) = Spline1D(shorten(x)...; k=3)
+    ## default parameter s = 0.0 interpolates without smoothing
+    spline_model(x) = Spline1D(shorten(x)...; k = 3)
 
     ## smooth raw fluo values
     smooth_raw_fluo() =
@@ -687,7 +687,7 @@ function mc_tm_pw(
     ## else
     ## peak indices sorted by area
     ## `idc_sb` - indices sorted by
-    const idc_sb_area = sortperm(map(field(:area), Ta_raw), rev=true)
+    const idc_sb_area = sortperm(map(field(:area), Ta_raw), rev = true)
     #
     ## keep only the biggest peak(s)
     ## passes functions instead of values for mc_slope & num_cross_points

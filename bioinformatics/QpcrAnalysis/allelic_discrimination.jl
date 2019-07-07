@@ -18,7 +18,7 @@ const NRN_NOT  = x -> 1 .- x
 ## start with bottom-level function, goes step-wise
 function prep_input_4ad(
     ## one step/ramp of amplification output
-    full_amp_out    ::AmpOutput,
+    full_amp_out    ::AmpFullOutput,
     categ           ::Symbol = :fluo,
     well_idc        ::Union{AbstractVector, Colon} = Colon(),
     ## relevant if `categ == :fluo`, last available cycle
@@ -575,7 +575,7 @@ end ## assign_genos()
 
 
 function process_ad(
-    full_amp_out        ::AmpOutput,
+    full_amp_out        ::AmpFullOutput,
 
     ## relevant if `categ == "fluo"`, last available cycle
     cycs                ::Union{Integer,AbstractVector},

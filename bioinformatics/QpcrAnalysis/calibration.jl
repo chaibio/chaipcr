@@ -13,7 +13,7 @@ import Memento: debug, error
 ## function: perform deconvolution and adjust well-to-well variation in absolute fluorescence
 function calibrate(
     ## data
-    raw_data                ::AbstractArray,            ## 3D array of raw fluorescence by cycle, well, channel
+    raw_data                ::AmpRawData{<: Real},      ## 3D array of raw fluorescence by cycle, well, channel
     calibration_data        ::CalibrationData{<: Real}, ## calibration dataset
     well_nums_found_in_raw  ::AbstractVector,           ## vector of well numbers
     channel_nums            ::AbstractVector;           ## vector of channel numbers
@@ -22,7 +22,7 @@ function calibrate(
     dye_in                  ::Symbol = :FAM,
     dyes_to_be_filled       ::AbstractVector =[],
     ## output parameter
-    out_format              ::Symbol = :both,           ## :array, :dict, :both
+    data_format             ::DataFormat = array       ## array, dict, both
 )
     debug(logger, "at calibrate()")
 
@@ -62,8 +62,8 @@ function calibrate(
         cat(3,
             ## devectorized code avoids transposition
             [
-                [   raw_data[u,w,c] - norm_data[:water][c][matched_well_idc][w]
-                    for u in 1:size(raw_data, 1),
+                [   raw_data.a[u,w,c] - norm_data[:water][c][matched_well_idc][w]
+                    for u in 1:size(raw_data.a, 1),
                         w in matched_well_idc     ]
                 for c in 1:num_channels                 ]...)
 
@@ -82,7 +82,7 @@ function calibrate(
                 matched_well_idc,
                 calibration_data,
                 well_nums_in_req;
-                out_format = :array)
+                data_format = array)
         else ## !dcv
             K4Deconv(), background_subtracted_data
         end
@@ -103,11 +103,11 @@ function calibrate(
     ## the following line of code needs the keys of calibrated_dict to be in sort order
     calibrated_array() = cat(3, values(calibrated_dict)...)
     const calibrated_data =
-        if      (out_format == :array)  tuple(calibrated_array())
-        elseif  (out_format == :dict)   tuple(calibrated_dict)
-        elseif  (out_format == :both)   tuple(calibrated_array(), calibrated_dict)
+        if      (data_format == array)  tuple(calibrated_array())
+        elseif  (data_format == dict)   tuple(calibrated_dict)
+        elseif  (data_format == both)   tuple(calibrated_array(), calibrated_dict)
         else                            throw(ArgumentException(
-                                            "`out_format` must be :array, :dict or :both"))
+                                            "`data_format` must be array, dict or both"))
         end ## if
     return (background_subtracted_data, k4dcv, deconvoluted_data,
             norm_data, norm_well_nums, calibrated_data...)
@@ -160,7 +160,7 @@ end ## calibrate()
 #             true,
 #             dye_in,
 #             dyes_to_fill;
-#             out_format = :array)
+#             data_format = array)
 #     return CalibCalibOutput(
 #         ary2dcv_1,
 #         background_subtracted_data_1,

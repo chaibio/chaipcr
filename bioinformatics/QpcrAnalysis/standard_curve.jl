@@ -1,6 +1,6 @@
 ## standard_curve.jl
 
-import JSON
+import JSON.json
 import DataFrames: DataFrame, by
 import Memento: debug, warn, error
 
@@ -13,7 +13,7 @@ import Memento: debug, warn, error
 function act(
     ::Type{Val{standard_curve}},
     req_vec     ::Vector{Any};
-    out_format  ::Symbol = :pre_json,
+    out_format  ::OutputFormat = pre_json,
     json_digits ::Integer = JSON_DIGITS,
     qty_base    ::Real = 10,
     empty_tre   ::TargetResultEle = EMPTY_TRE,
@@ -28,7 +28,7 @@ function act(
     if  size(req_df, 2) == 0 ||
         any(map(symbl -> all(isnan.(req_df[symbl])),[:target, :cq, :qty]))
             const output = OrderedDict(:targets => [], :groups => [], :valid => false)
-            return out_format == :json ? JSON.json(output) : output
+            return output |> out(out_format)
     end
     #
     ## target result set
@@ -91,9 +91,9 @@ function act(
     # end ## do chunk
 
     ## report results
-    (out_format == :full) && return target_result_df
+    (out_format == full) && return target_result_df
 
-    ## out_format != :full
+    ## out_format != full
     ## target result set
     tre_vec = target_result_df[.!isnan.(target_result_df[:target]), 2]
     target_vec = Vector{Any}()
@@ -175,7 +175,7 @@ function reqvec2df(req_vec ::AbstractVector)
     #
     num_channels = maximum(map(req_vec) do req_ele
         try length(req_ele[WELL_KEY])
-        catch
+        catch()
             0
         end ## try
     end) ## do req_ele
@@ -185,7 +185,7 @@ function reqvec2df(req_vec ::AbstractVector)
         for channel_i in range(1, num_channels)
             measrmt_dict =
                 try req_ele[WELL_KEY][channel_i]
-                catch
+                catch()
                     Dict{String,Any}()
                 end ## try
             if length(measrmt_dict) == 0
@@ -203,7 +203,7 @@ function reqvec2df(req_vec ::AbstractVector)
             push!(qty_vec, qty)
             push!(sample_vec,
                 try nothing2NaN(req_ele[SAMPLE_KEY])
-                catch
+                catch()
                     NaN
                 end) ## try
         end ## for channel_i
@@ -404,7 +404,7 @@ function generate_req_sc(;
             :sample => sample_vec[well_i])
     end ## do well_i
 
-    return (json(req_vec), req_vec)
+    return (JSON.json(req_vec), req_vec)
 end ## generate_req_sc
 
 
@@ -414,62 +414,62 @@ end ## generate_req_sc
 
 ## recursive functions to simplify output
 
-function simplify(x ::Number, out_format ::Symbol)
+function simplify(x ::Number, out_format ::OutputFormat)
 println("Number $x format $out_format")
     x
 end
 
-function simplify(tup ::Tuple, out_format ::Symbol)
+function simplify(tup ::Tuple, out_format ::OutputFormat)
 println("Tuple $tup format $out_format")
-    if out_format == :full
+    if out_format == full
         tup
     else
         Tuple([
-            simplify(tup[i],out_format) for i in range(1,length(tup))
+            simplify(tup[i], out_format) for i in 1:length(tup)
         ])
     end
 end
 
-function simplify(vec ::Vector, out_format ::Symbol)
+function simplify(vec ::Vector, out_format ::OutputFormat)
 println("Vector $vec format $out_format")
-    if out_format == :full
+    if out_format == full
         vec
     else
         Vector([
-            simplify(vec[i],out_format) for i in range(1,length(vec))
+            simplify(vec[i], out_format) for i in 1:length(vec)
         ])
     end
 end
 
-function simplify(dict ::Associative, out_format ::Symbol)
+function simplify(dict ::Associative, out_format ::OutputFormat)
 println("Dict $dict format $out_format")
-    if out_format == :full
+    if out_format == full
         dict
     else
         x = OrderedDict()
         for i in keys(dict)
-            x[i] = simplify(dict[i],out_format)
+            x[i] = simplify(dict[i], out_format)
         end
         x
     end
 end
 
-function simplify(df ::DataFrame, out_format ::Symbol)
+function simplify(df ::DataFrame, out_format ::OutputFormat)
 println("DataFrame $df format $out_format")
-    if out_format == :full
+    if out_format == full
         df
     else
         x = OrderedDict()
         for i in names(df)
-            x[i] = simplify(df[i],out_format)
+            x[i] = simplify(df[i], out_format)
         end
         x
     end
 end
 
-function simplify(r ::StandardCurveResult, out_format ::Symbol)
+function simplify(r ::StandardCurveResult, out_format ::OutputFormat)
 println("Result $r format $out_format")
-    if out_format == :full
+    if out_format == full
         r
     else
         x = OrderedDict()
@@ -478,7 +478,7 @@ println("Result $r format $out_format")
             return x
         end
         for i in fieldnames(r)
-            x[i] = simplify(getfield(r,i),out_format)
+            x[i] = simplify(getfield(r,i), out_format)
         end
         x
     end

@@ -1,7 +1,6 @@
 ## thermal_performance_diagnostic.jl
 
 import DataStructures.OrderedDict
-import JSON.json
 import Memento.debug
 
 
@@ -27,7 +26,7 @@ function act(
     # exp_id ::Integer, # really used
     # calib_info ::Union{Integer,OrderedDict} ## not used for computation
     temperatureData ::Associative;
-    out_format      ::Symbol = :pre_json
+    out_format      ::OutputFormat = pre_json
 )
     debug(logger, "at act(::Type{Val{thermal_performance_diagnostic}})")
 
@@ -60,12 +59,12 @@ function act(
     # const apprxRampDownEndTime, apprxRampUpStartTime = extrema(elapsed_times_low_temp)
     const apprxRampUpStartTime =
         try maximum(elapsed_times[hbzt_lower .& (elapsed_times .< apprxRampUpEndTime)])
-        catch
+        catch()
             -Inf
         end ## try maximum
     const apprxRampDownEndTime =
         try minimum(elapsed_times[hbzt_lower .& (elapsed_times .> apprxRampDownStartTime)])
-        catch
+        catch()
             Inf
         end ## try minimum
     #

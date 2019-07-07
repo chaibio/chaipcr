@@ -3,8 +3,8 @@
 ## Author: Tom Price
 ## Date:   June 2019
 
-import JuMP
 import DataStructures.OrderedDict
+using JuMP
 
 
 ## structs and constructors
@@ -27,7 +27,7 @@ MAK2Fit(;
     coefs       ::Vector{Float_T}   = zeros(0),
     status      ::Symbol            = :not_fitted,
     obj_val     ::Float_T           = 0.0,
-    jmp_model   ::JuMP.Model        = JuMP.Model()
+    jmp_model   ::JuMP.Model        = JuMP.Model(),
 ) =
     MAK2Fit(max_d_idx, coef_strs, coefs,
         status, obj_val, jmp_model)

@@ -1,4 +1,4 @@
-## AmpQuantModelFit.jl
+## AmpQuantOutput.jl
 ##
 ## output from fit_quant_model()
 ##
@@ -9,17 +9,12 @@ import DataStructures.OrderedDict
 import Ipopt: IpoptSolver #, NLoptSolver
 
 
-abstract type AmpQuantModelFit end
+abstract type AmpQuantOutput                            end
+abstract type AmpQuantLongOutput    <: AmpQuantOutput   end
+abstract type AmpQuantShortOutput   <: AmpQuantOutput   end
+abstract type AmpQuantCqOnlyOutput  <: AmpQuantOutput   end
 
-struct AmpDFCQuantModelFit <: AmpQuantModelFit
-    quant_fit       ::AmpModelFit
-    quant_status    ::Symbol
-    coefs           ::Vector{Float_T}
-    d0              ::Float_T
-    quant_fluos     ::Vector{Float_T}
-end
-
-struct AmpSFCQuantModelFit <: AmpQuantModelFit
+struct AmpSFCQuantLongOutput <: AmpQuantLongOutput
     quant_fit       ::AmpModelFit
     quant_status    ::Symbol
     coefs           ::Vector{Float_T}
@@ -37,13 +32,33 @@ struct AmpSFCQuantModelFit <: AmpQuantModelFit
     cq_fluo         ::Array{Float_T,2}
 end
 
+struct AmpDFCQuantLongOutput <: AmpQuantLongOutput
+    quant_fit       ::AmpModelFit
+    quant_status    ::Symbol
+    coefs           ::Vector{Float_T}
+    d0              ::Float_T
+    quant_fluos     ::Vector{Float_T}
+end
+
+struct AmpSFCQuantShortOutput <: AmpQuantShortOutput
+    cq              ::Array{Float_T,2} ## cq values, applicable to sigmoid models but not to MAK models
+end
+
+struct AmpDFCQuantShortOutput <: AmpQuantShortOutput
+    d0              ::Float_T
+end
+
+struct AmpCqOnlyQuantOutput <: AmpQuantCqOnlyOutput
+    cq_fluo         ::Array{Float_T,2}
+end
+
 
 ## constants >>
 
 ## defaults for quantification model
-const DEFAULT_AMP_QUANT_METHOD          = :l4_enl
+const DEFAULT_AMP_QUANT_METHOD          = l4_enl
 const DEFAULT_AMP_DENSER_FACTOR         = 3
-const DEFAULT_AMP_CQ_METHOD             = :Cy0
+const DEFAULT_AMP_CQ_METHOD             = Cy0
 const DEFAULT_AMP_CT_FLUO               = NaN
 const DEFAULT_AMP_CQ_ONLY               = false
 
@@ -56,7 +71,8 @@ const AMP_CT_VAL_DOMAINERROR = -99
 ## DFC
 function fit_quant_model(
     ::Type{Val{M}},
-    bl                  ::AmpBaselineModelFit;
+    bl                  ::AmpBaselineModelFit,
+    solver              ::IpoptSolver;
 ) where M <: DFCModel
     debug(logger, "at fit_quant_model(Val{M}) where M <: DFCModel")
     ## baseline model = quantification model
@@ -85,30 +101,30 @@ function fit_quant_model(
     cq_only             ::Bool = DEFAULT_AMP_CQ_ONLY,
 )
     function calc_cq_only()
-        (cq_method == :cp_dr1) && return begin
+        (cq_method == cp_dr1) && return begin
                 const dr1_pred = funcs_pred[:dr1](cycs_denser, quant_coefs...)
                 const idx_max_dr1= findmax(dr1_pred)[2]
                 cycs_denser[idx_max_dr1]
             end
-        (cq_method == :cp_dr2) && return begin
+        (cq_method == cp_dr2) && return begin
                 const dr2_pred = funcs_pred[:dr2](cycs_denser, quant_coefs...)
                 const idx_max_dr2 = findmax(dr2_pred)[2]
                 cycs_denser[idx_max_dr2]
             end
-        (cq_method == :Cy0) && return begin
+        (cq_method == Cy0) && return begin
                 const dr1_pred = funcs_pred[:dr1](cycs_denser, quant_coefs...)
                 const (max_dr1, idx_max_dr1) = findmax(dr1_pred)
                 const cyc_max_dr1 = cycs_denser[idx_max_dr1]
                 cyc_max_dr1 - funcs_pred[:f](cyc_max_dr1, quant_coefs...) / max_dr1
             end
-        (cq_method == :ct) && return try
+        (cq_method == ct) && return try
                 funcs_pred[:inv](ct_fluo, quant_coefs...)
             catch err
                 isa(err, DomainError) ?
                     AMP_CT_VAL_DOMAINERROR :
                     rethrow()
             end ## try
-        (cq_method == :max_eff) && return begin
+        (cq_method == max_eff) && return begin
                 const eff_pred = map(func_pred_eff, cycs_denser)
                 const idx_max_eff = findmax(eff_pred)[2]
                 cycs_denser[idx_max_eff]

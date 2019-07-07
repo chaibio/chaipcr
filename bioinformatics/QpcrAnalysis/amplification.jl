@@ -9,7 +9,7 @@
 import JSON: parse
 import DataStructures.OrderedDict
 import Ipopt: IpoptSolver #, NLoptSolver
-import Memento: debug, warn, Error
+import Memento: debug, warn, error
 using Ipopt
 
 
@@ -19,17 +19,18 @@ const KWARGS_RC_KEYS_DICT = Dict(
     "min_D1max"     => :max_dr1_lb,
     "min_D2max"     => :max_dr2_lb)
 const KWARGS_AMP_KEYS =
-    ["min_reliable_cyc", "baseline_cyc_bounds", "cq_method", "ctrl_well_dict"]
+    ["min_reliable_cyc", "baseline_cyc_bounds", "ctrl_well_dict",
+        CQ_METHOD_KEY, CATEG_WELL_VEC_KEY]
 
 
 ## function definitions >>
 
 ## function called by dispatch()
-## parses request body into Amp struct and calls amp_process_1sr()
+-## parses request body into Amp struct and calls amp_process_1sr()
 function act(
     ::Type{Val{amplification}},
     req_dict        ::Associative;
-    out_format      ::Symbol = :pre_json
+    out_format      ::OutputFormat = pre_json
 )
     debug(logger, "at act(::Type{Val{amplification}})")
     const parsed_raw_data = try
@@ -56,6 +57,14 @@ function act(
                             element :
                             Colon()
                     end ## do x
+            elseif (key == CQ_METHOD_KEY)
+                :cq_method => try
+                    CqMethod(req_dict[CQ_METHOD_KEY])
+                catch()
+                    return fail(logger, ArgumentError("Cq method \"" *
+                        req_dict[CQ_METHOD_KEY] * "\" not implemented");
+                        bt=true) |> out(out_format)
+                end ## try        
             else
                 Symbol(key) => str2sym.(req_dict[key])
             end ## if
@@ -68,11 +77,11 @@ function act(
                req_dict[BASELINE_METHOD_KEY] 
             if      (baseline_method == SIGMOID_KEY)
                         Dict{Symbol,Any}(
-                            :bl_method          =>  :l4_enl,
+                            :bl_method          =>  l4_enl,
                             :bl_fallback_func   =>  median)
             elseif  (baseline_method == LINEAR_KEY)
                         Dict{Symbol,Any}(
-                            :bl_method          =>  :lin_1ft,
+                            :bl_method          =>  lin_1ft,
                             :bl_fallback_func   =>  mean)
             elseif  (baseline_method == MEDIAN_KEY)
                         Dict{Symbol,Any}(
@@ -87,8 +96,8 @@ function act(
             KWARGS_RC_KEYS_DICT[key] => req_dict[key]
         end) ## map
     ## create container for data and parameters
-    ## to pass to process_amp_1sr
-    const amp = Amp(
+    ## to pass to amp_process_1sr
+    const amp = AmpInput(
         parsed_raw_data...,
         calibration_data,
         IpoptSolver(print_level = 0, max_iter = 35),
@@ -96,12 +105,12 @@ function act(
         DEFAULT_AMP_DCV && parsed_raw_data[4] > 1, ## dcv && num_channels > 1
         DEFAULT_AMP_MODEL,
         # true,
-        out_format,
+        AmpOutputOption(out_format),
         roundoff(JSON_DIGITS);
         kwargs_bl...,
         kwargs_amp...,
         kwargs_rc...,)
-    const process_amp = try
+    const result = try
         ## issues:
         ## 1.
         ## the new code currently assumes only 1 step/ramp
@@ -121,7 +130,7 @@ function act(
         #     OrderedDict(
         #         map([ asrp_vec[1] ]) do asrp
         #             join([asrp.step_or_ramp, asrp.id], "_") =>
-        #                 process_amp_1sr(
+        #                 amp_process_1sr(
         #                     # remove MySql dependency
         #                     # db_conn, exp_id, asrp, calib_info,
         #                     # fluo_well_nums, well_nums,
@@ -140,13 +149,13 @@ function act(
         #                 key => getfield(first_sr_out, key)
         #             end)
         # end
-        final_out = process_amp_1sr(amp)
+        final_out = amp_process_1sr(amp)
         final_out[:valid] = true
         final_out        
     catch err
         return fail(logger, err; bt=true) |> out(out_format)
     end ## try
-    return process_amp |> out(out_format)
+    return result |> out(out_format)
 end ## act(::Type{Val{amplification}})
 
 
@@ -173,11 +182,12 @@ function amp_parse_raw_data(req_dict ::Associative)
             repeat(
                 channel_nums,
                 inner = num_cycs * num_fluo_wells))
-    catch
+    catch()
         throw(AssertionError("The format of the fluorescence data does not " *
             "lend itself to transformation into a 3-dimensional array. " *
             "Please make sure that it is sorted by channel, well number, and cycle number."))
     end ## try
+    const F = typeof(req_dict[RAW_DATA_KEY][FLUORESCENCE_VALUE_KEY][1])
     const raw_data = ## formerly `fr_ary3`
         reshape(
             req_dict[RAW_DATA_KEY][FLUORESCENCE_VALUE_KEY],
@@ -187,13 +197,11 @@ function amp_parse_raw_data(req_dict ::Associative)
     const well_perm = sortperm(fluo_well_nums)
     const chan_perm = sortperm(channel_nums)
     return (
-        AmpRawData(raw_data[cyc_perm, well_perm, chan_perm]),
+        AmpRawData{F}(raw_data[cyc_perm, well_perm, chan_perm]),
         num_cycs,
         num_fluo_wells,
         num_channels,
         cyc_nums[cyc_perm],
         fluo_well_nums[well_perm],
-        map(channel_nums[chan_perm]) do c
-            Symbol(CHANNEL_KEY, "_", c)
-        end)
+        channel_nums[chan_perm])
 end ## amp_parse_raw_data()

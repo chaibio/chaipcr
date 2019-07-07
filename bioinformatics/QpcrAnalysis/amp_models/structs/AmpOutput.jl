@@ -12,28 +12,17 @@ import Ipopt: IpoptSolver #, NLoptSolver
 
 ## structs >>
 
-## issue: rename `rbbs_3ary` as `calibrated` once juliaapi_new has been updated
-struct AmpOutput2Bjson
-    rbbs_3ary                   ::Array{Float_T,3} ## fluorescence after deconvolution and normalization
-    blsub_fluos                 ::Array{Float_T,3} ## fluorescence after baseline subtraction
-    dr1_pred                    ::Array{Float_T,3} ## dF/dc (slope of fluorescence/cycle)
-    dr2_pred                    ::Array{Float_T,3} ## d2F/dc2
-    cq                          ::Array{Float_T,2} ## cq values, applicable to sigmoid models but not to MAK models
-    d0                          ::Array{Float_T,2} ## starting quantity from absolute quanitification
-    ct_fluos                    ::Vector{Float_T}  ## fluorescence thresholds (one value per channel) for Ct method
-    assignments_adj_labels_dict ::OrderedDict{Symbol,Vector{String}} ## assigned genotypes from allelic discrimination, keyed by type of data (see `AD_DATA_CATEG` in "allelic_discrimination.jl")
-end
-
+abstract type AmpOutput end
 
 ## issue: rename `rbbs_3ary` as `calibrated` once juliaapi_new has been updated
-mutable struct AmpOutput
-    input                       ::AmpInput
-    ## computed in process_amp_1sr()
+mutable struct AmpLongOutput <: AmpOutput
+    raw_data                    ::Array{<: Real,3}
+    ## computed in amp_process_1sr()
     background_subtracted_data  ::Array{<: Real,3} ## mw_ary3
     k4dcv                       ::K4Deconv
-    deconvoluted_data           ::Array{Float_T,3} ## dcvd_ary3
-    norm_data                   ::OrderedDict{Symbol,OrderedDict{Integer,Vector{Float_T}}} ## wva_data
-    rbbs_3ary                   ::Array{Float_T,3} ## calibrated_data
+    deconvoluted_data           ::Array{<: Real,3} ## dcvd_ary3
+    norm_data                   ::OrderedDict{Symbol,OrderedDict{Int,Vector{C}}} where {C <: Real} ## wva_data
+    rbbs_3ary                   ::Array{<: Real,3} ## calibrated_data
     # cq_method                   ::Symbol
     ## for ct method
     ct_fluos                    ::Vector{Float_T}
@@ -58,7 +47,7 @@ mutable struct AmpOutput
     cq                          ::Array{Float_T,2}
     eff                         ::Array{Float_T,2}
     cq_fluo                     ::Array{Float_T,2}
-    ## computed in process_amp_1sr()
+    ## computed in amp_process_1sr()
     qt_fluos                    ::Array{Float_T,2}
     max_qt_fluo                 ::Float_T
     ## computed by report_cq!()
@@ -70,6 +59,23 @@ mutable struct AmpOutput
     ## allelic discrimination output
     assignments_adj_labels_dict ::OrderedDict{Symbol,Vector{String}}
     agr_dict                    ::OrderedDict{Symbol,AssignGenosResult}
+end
+
+## issue: rename `rbbs_3ary` as `calibrated` once juliaapi_new has been updated
+mutable struct AmpShortOutput <: AmpOutput
+    rbbs_3ary                   ::Array{Float_T,3} ## fluorescence after deconvolution and normalization
+    blsub_fluos                 ::Array{Float_T,3} ## fluorescence after baseline subtraction
+    dr1_pred                    ::Array{Float_T,3} ## dF/dc (slope of fluorescence/cycle)
+    dr2_pred                    ::Array{Float_T,3} ## d2F/dc2
+    cq                          ::Array{Float_T,2} ## cq values, applicable to sigmoid models but not to MAK models
+    d0                          ::Array{Float_T,2} ## starting quantity for absolute quantification
+    ct_fluos                    ::Vector{Float_T}  ## fluorescence thresholds (one value per channel) for Ct method
+    assignments_adj_labels_dict ::OrderedDict{Symbol,Vector{String}} ## assigned genotypes from allelic discrimination, keyed by type of data (see `AD_DATA_CATEG` in "allelic_discrimination.jl")
+end
+
+
+mutable struct AmpCqOnlyOutput <: AmpOutput
+    cq_fluo                     ::Array{Float_T,2}
 end
 
 
@@ -90,35 +96,22 @@ const DEFAULT_AMP_SCALED_MAX_BSF_LB = 0.086
 
 ## constructors >>
 
-AmpOutput2Bjson(
-    o               ::AmpOutput;
-    reporting       ::Function = roundoff(JSON_DIGITS) ## reporting function
-) =
-    AmpOutput2Bjson(
-        map(fieldnames(AmpOutput2Bjson)) do fieldname
-            const fieldvalue = getfield(full_amp_out, fieldname)
-            try
-                reporting(fieldvalue)
-            catch
-                fieldvalue ## non-numeric fields
-            end ## try
-        end...) ## do fieldname
-
-
 function AmpOutput(
-    input,
-    background_subtracted_data,
-    k4dcv,
-    deconvoluted_data,
-    norm_data,
-    calibrated_data,
-    ct_fluos
+    ::Type{Val{long}},
+    raw_data                    ::AmpRawData{<: Real},
+    background_subtracted_data  ::Array{<: Real,3},
+    k4dcv                       ::K4Deconv,
+    deconvoluted_data           ::Array{<: Real,3},
+    norm_data                   ::OrderedDict{Symbol,OrderedDict{Int,Vector{C}}} where {C <: Real},
+    norm_well_nums              ::AbstractVector,
+    calibrated_data             ::Array{<: Real,3},
+    ct_fluos                    ::Vector{Float_T};
 )
-    const NaN_array2 = amp_init(NaN)
-    const fitted_init = amp_init(FIT[amp_model]())
-    const empty_vals_4cq = amp_init(OrderedDict{Symbol, AbstractFloat}())
-    AmpOutput(
-        input,
+    const NaN_array2        = amp_init(i, NaN)
+    const fitted_init       = amp_init(i, FIT[i, i.amp_model]())
+    const empty_vals_4cq    = amp_init(i, OrderedDict{Symbol, AbstractFloat}())
+    AmpLongOutput(
+        i.raw_data,
         background_subtracted_data, ## formerly mw_ary3
         k4dcv,
         deconvoluted_data, ## formerly dcvd_ary3
@@ -128,15 +121,15 @@ function AmpOutput(
         ## ct_fluos
         ct_fluos, ## ct_fluos
         ## baseline model fit
-        fitted_init, ## fitted_prebl,
-        amp_init(Vector{String}()), ## bl_notes
+        fitted_init, ## bl_fit,
+        amp_init(i, Vector{String}()), ## bl_notes
         calibrated_data, ## blsub_fluos
         ## quantification model fit
-        fitted_init, ## fitted_postbl,
-        amp_init(:not_fitted), ## postbl_status
-        amp_init(NaN, 1), ## coefs ## NB size = 1 for 1st dimension may not be correct for the chosen model
+        fitted_init, ## quant_fit,
+        amp_init(i, :not_fitted), ## quant_status
+        amp_init(i, NaN, 1), ## coefs ## NB size = 1 for 1st dimension may not be correct for the chosen model
         NaN_array2, ## d0
-        calibrated_data, ## blsub_fitted,
+        calibrated_data, ## quant_fluos,
         ## quantification
         zeros(0, 0, 0), ## dr1_pred
         zeros(0, 0, 0), ## dr2_pred
@@ -156,92 +149,50 @@ function AmpOutput(
         NaN_array2, ## scaled_max_bsf
         NaN_array2, ## scaled_max_dr1
         NaN_array2, ## scaled_max_dr2
-        amp_init(""), ## why_NaN
+        amp_init(i, ""), ## why_NaN
         ## allelic discrimination
         OrderedDict{Symbol, Vector{String}}(), ## assignments_adj_labels_dict
         OrderedDict{Symbol, AssignGenosResult}()) ## agr_dict
 end ## constructor
 
 
-## analyse amplification per step/ramp
-function amp_process_1sr(
-    i                       ::AmpInput;
-    # asrp                    ::AmpStepRampProperties,
-    out_format              ::Symbol = :pre_json ## :full, :pre_json
+function AmpOutput(
+    ::Type{Val{short}},
+    background_subtracted_data  ::Array{<: Real,3},
+    k4dcv                       ::K4Deconv,
+    deconvoluted_data           ::Array{<: Real,3},
+    norm_data                   ::OrderedDict{Symbol,OrderedDict{Int,Vector{C}}} where {C <: Real},
+    norm_well_nums              ::AbstractVector,
+    calibrated_data             ::Array{<: Real,3},
+    ct_fluos                    ::Vector{Float_T};
+    reporting                   ::Function = roundoff(JSON_DIGITS) ## reporting function
 )
-    debug(logger, "at amp_process_1sr()")
-    ## deconvolute and normalize
-    const (background_subtracted_data, k4dcv, deconvoluted_data,
-            norm_data, norm_well_nums, calibrated_data) =
-        calibrate(
-            i.raw_data,
-            i.calibration_data,
-            i.fluo_well_nums,
-            i.channel_nums,
-            i.dcv,
-            :array)
-    ## initialize output
-    o = AmpOutput(
-        i.raw_data,
-        background_subtracted_data,
-        k4dcv,
-        deconvoluted_data,
-        norm_data,
-        calibrated_data,
-        i.fluo_well_nums,
-        i.num_channels,
-        # cq_method,
-        DEFAULT_AMP_CT_FLUOS)
-    #
-    # kwargs_jmp_model = Dict(:solver => this.solver)
-    if num_cycs <= 2
-        warn(logger, "number of cycles $num_cycs <= 2: baseline subtraction " *
-            "and Cq calculation will not be performed")
-    else ## num_cycs > 2
-        ## calculate ct_fluos
-        const baseline_cyc_bounds =
-            check_baseline_cyc_bounds(i, DEFAULT_AMP_BASELINE_CYC_BOUNDS)
-        o.ct_fluos =
-            calc_ct_fluos(o, DEFAULT_AMP_CT_FLUOS, baseline_cyc_bounds)
-        ## baseline model fit
-        const fit_array2 = calc_fit_array2(o)
-        foreach(fieldnames(AmpModelFitOutput)) do fieldname
-            set_field_from_array!(o, fieldname, fit_array2)
-        end ## do fieldname
-        ## quantification
-        const quant_array2 = calc_quant_array2(o, fit_array2)
-        foreach(fieldnames(AmpQuantOutput)) do fieldname
-            set_field_from_array!(o, fieldname, quant_array2)
-        end ## do fieldname
-        ## qt_fluos
-        set_qt_fluos!(o)
-        ## report_cq
-        set_fieldname_rcq!(o)
-    end ## if
-    #
-    ## allelic discrimination
-    # if dcv
-    #     o.assignments_adj_labels_dict, o.agr_dict =
-    #         process_ad(
-    #             o,
-    #             kwargs_ad...)
-    # end # if dcv
-    #
-    ## format output
-    return (out_format == :full) ?
-        o :
-        AmpOutput2Bjson(o, reporting)
-end ## amp_process_1sr()
+    const NaN_array2 = amp_init(i, NaN)
+    const cd = reporting(calibrated_data)
+    AmpShortOutput(
+        cd, ## formerly rbbs_ary3
+        cd, ## blsub_fluos
+        zeros(0, 0, 0), ## dr1_pred
+        zeros(0, 0, 0), ## dr2_pred
+        NaN_array2, ## d0
+        NaN_array2, ## cq
+        ct_fluos, ## ct_fluos
+        OrderedDict{Symbol, AssignGenosResult}()) ## agr_dict
+end ## constructor
+
+
+AmpOutput(::Type{Val{cq_only}}, i ::AmpInput, args...) =
+    AmpCqOnlyOutput(amp_init(i, NaN))
 
 
 ## calculate ct_fluos
 function calc_ct_fluos(
     o                       ::AmpOutput,
+    i                       ::AmpInput,
     ct_fluos                ::AbstractVector,
-    baseline_cyc_bounds     ::AbstractVector,
+    baseline_cyc_bounds     ::AbstractArray,
 )
     debug(logger, "at calc_ct_fluos()")
-    const i = o.input
     const ct_fluos_empty = fill(NaN, i.num_channels)
     (i.num_cycs <= 2)       && return ct_fluos
     (length(ct_fluos) > 0)  && return ct_fluos
@@ -255,13 +206,13 @@ function calc_ct_fluos(
                     Dict{Symbol, Any}(
                         baseline_cyc_bounds => baseline_cyc_bounds[well_i, channel_i],
                         kwargs_bl(i)...)
-                const fluos = o.calibrated_data[:, well_i, channel_i] 
+                const fluos = o.rbbs_3ary[:, well_i, channel_i]
                 const fit_bl =
                     fit_baseline_model(
                         Val{SFC},
                         o,
-                        fluos,
-                        i.solver;
+                        i,
+                        fluos;
                         kw_bl...) ## parameters that apply only when fitting SFC models
                 const fit_q =
                     fit_quant_model(
@@ -291,40 +242,43 @@ function find_idc_useful(postbl_stata ::AbstractVector)
 end ## find_idc_useful()
 
 
-function calc_fit_array2(o ::AmpOutput)
+function calc_fit_array2(
+    i                       ::AmpInput,
+    o                       ::AmpOutput, 
+    bl_cyc_bounds           ::AbstractArray,
+)
     debug(logger, "at calc_fit_array2()")
-    const i = o.input
     solver = i.solver
+    const prefix = i.ipopt_print2file_prefix
     [
         begin
-            if isa(solver, Ipopt.IpoptSolver) && length(ipopt_print2file_prefix) > 0
-                const ipopt_print2file =
-                    string(join([ipopt_print2file_prefix, channel_i, well_i], '_')) * ".txt"
-                push!(solver.options, (:output_file, ipopt_print2file))
+            if isa(solver, Ipopt.IpoptSolver) && length(prefix) > 0
+                const ipopt_file = string(join([prefix, channel_i, well_i], '_')) * ".txt"
+                push!(solver.options, (:output_file, ipopt_file))
             end
             const kw_bl =
-                i.amp_model == SFC ?
+                i.amp_model == SFCModel ?
                     Dict{Symbol, Any}(
-                        baseline_cyc_bounds => baseline_cyc_bounds[well_i, channel_i],
+                        :baseline_cyc_bounds => bl_cyc_bounds[well_i, channel_i],
                         kwargs_bl(i)...) :
                     Dict{Symbol, Any}()
             const fit_bl =
                 fit_baseline_model(
                     Val{i.amp_model},
+                    i,
                     o,
-                    o.calibrated_data[:, well_i, channel_i],
-                    i.solver;
+                    o.rbbs_3ary[:, well_i, channel_i];
                     kw_bl...) ## parameters that apply only when fitting SFC models
             const fit_q =
                 fit_quant_model(
-                    Val{SFC},
+                    Val{SFCModel},
                     fit_bl;
                     solver = i.solver,
-                    ct_fluo = calculated_ct_fluos[channel_i],
+                    ct_fluo = o.ct_fluos[channel_i],
                     kwargs_quant(i)...)
 
 
-                # cq_method = cq_method,
+                # cq_method *= cq_method,
                 # ct_fluo = 
         end
         for well_i in 1:i.num_fluo_wells, channel_i in 1:i.num_channels
@@ -332,18 +286,23 @@ function calc_fit_array2(o ::AmpOutput)
 end ## calc_fit_array2()
 
 
-function calc_quant_array2(fit_array2 ::AbstractArray)
+function calc_quant_array2(
+    o                   ::AmpOutput,
+    fit_array2          ::AbstractArray
+)
     debug(logger, "at calc_quant_array2()")
+    const i = o.input
     [
-        amp_model == SFC ?
-            quantify(
-                Val{amp_model},
-                fit_array2[well_i, channel_i];
+        i.amp_model == SFCModel ?
+            fit_quant_model(
+                Val{SFCModel},
+                fit_array2[well_i, channel_i],
+                solver = i.solver,
                 cq_method = cq_method,
-                ct_fluo = calculated_ct_fluos[channel_i],
+                ct_fluo = o.ct_fluos[channel_i],
             ) :
-            AmpQuantOutput()
-        for well_i in 1:num_fluo_wells, channel_i in 1:num_channels
+            AmpQuantModelFit()
+        for well_i in 1:i.num_fluo_wells, channel_i in 1:i.num_channels
     ]
 end ## calc_quant_array2()
 
@@ -379,7 +338,7 @@ function set_qt_fluos!(o ::AmpOutput)
     i = o.input
     o.qt_fluos =
         [   quantile(o.blsub_fluos[:, well_i, channel_i], qt_prob_rc)
-            for well_i in 1:i.num_fluo_wells, channel_i in 1:i.num_channels             ]
+            for well_i in 1:i.num_fluo_wells, channel_i in 1:i.num_channels ]
     o.max_qt_fluo = maximum(o.qt_fluos)
     return nothing ## side effects only
 end ## set_qt_fluos!()
@@ -456,3 +415,18 @@ function report_cq!(
     end
     return nothing ## side effects only
 end ## report_cq!
+
+
+AmpJSONOutput(
+    o               ::AmpOutput;
+    reporting       ::Function = roundoff(JSON_DIGITS) ## reporting function
+) =
+    AmpJSONOutput(
+        map(fieldnames(AmpJSONOutput)) do fieldname
+            const fieldvalue = getfield(o, fieldname)
+            try 
+                reporting(fieldvalue)
+            catch()
+                fieldvalue ## non-numeric fields
+            end ## try
+        end...) ## do fieldname

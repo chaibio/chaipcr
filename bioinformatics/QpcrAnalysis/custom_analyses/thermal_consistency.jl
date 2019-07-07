@@ -26,7 +26,7 @@ function act(
     # stage_id ::Integer,
     # calib_info ::Union{Integer,OrderedDict};
     req_dict            ::Associative;
-    out_format          ::Symbol = :pre_json,
+    out_format          ::OutputFormat = pre_json,
     well_nums           ::AbstractVector = DEFAULT_MC_WELL_NUMS,
     auto_span_smooth    ::Bool = DEFAULT_MC_AUTO_SPAN_SMOOTH,
     span_smooth_default ::Real = DEFAULT_MC_SPAN_SMOOTH_DEFAULT,
@@ -49,7 +49,7 @@ function act(
     # const mc_data = MeltCurveRawData(req_dict[RAW_DATA_KEY])
     const mc_data = DataFrame()
     foreach(keys(MC_RAW_FIELDS)) do key
-        mc_data[key] = mc_data[RAW_DATA_KEY][MC_RAW_FIELDS[key]]
+        mc_data[key] = req_dict[RAW_DATA_KEY][MC_RAW_FIELDS[key]]
     end
 
     const kwargs_mc_tm_pw = OrderedDict{Symbol,Any}(
@@ -73,7 +73,7 @@ function act(
             span_smooth_factor = span_smooth_factor,
             dcv = dcv,
             max_temperature = max_temperature,
-            out_format = :full,
+            out_format = full,
             kwargs_mc_tm_pw = kwargs_mc_tm_pw)
     catch err
         return fail(logger, err; bt=true) |> out(out_format)
@@ -111,7 +111,7 @@ function act(
             :delta_Tm => (reporting(delta_Tm_val),
                             delta_Tm_val .<= MAX_DELTA_TM_VAL),
             :valid    => true)
-    (out_format == :full) && return full_out()
+    (out_format == full) && return full_out()
     ## else
     return pre_json_out() |> out(out_format)
 end ## act(::Type{Val{thermal_consistency}})

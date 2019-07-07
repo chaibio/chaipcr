@@ -9,5 +9,5 @@
 abstract type AbstractAmpRawData end
 
 struct AmpRawData{F <: Real} <: AbstractAmpRawData
-    raw_data ::Array{F,3}
+    a ::Array{F,3}
 end

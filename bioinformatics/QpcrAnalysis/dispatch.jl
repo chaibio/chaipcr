@@ -41,14 +41,14 @@ function dispatch(
             if verify
                 const verify_input = try
                     verify_request(action, req_parsed)
-                catch
+                catch()
                     warn(logger, "data supplied with $action_str request is in the wrong format")
                 end ## try
             end ## if verify
         end ## if !production_env
 
         debug(logger, "dispatching to act() from dispatch()")
-        const response = act(action, req_parsed; out_format = :pre_json)
+        const response = act(action, req_parsed; out_format = pre_json)
         println("response received")
         debug(logger, "response received from act() by dispatch()")
         debug(logger, repr(response))
@@ -59,7 +59,7 @@ function dispatch(
             if verify
                 const verify_output = try
                     verify_response(action, JSON.parse(json_response, dicttype = OrderedDict))
-                catch
+                catch()
                     warn(logger, "data returned from $action_str request is in the wrong format")
                 end ## try
             end ## if verify

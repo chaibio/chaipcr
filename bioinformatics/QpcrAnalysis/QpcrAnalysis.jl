@@ -49,10 +49,12 @@ module QpcrAnalysis
 
     ## include each script, generally in the order of workflow
 
+    ## format options
+    include("structs/OutputFormat.jl")
+    include("structs/DataFormat.jl")
+
     ## shared functions
     include("shared_functions.jl")
-
-    ## struct definitions for:
 
     ## dispatch
     include("structs/Action.jl")
@@ -60,23 +62,30 @@ module QpcrAnalysis
     include("structs/CalibrationData.jl")
     ## deconvolution
     include("structs/K4Deconv.jl")
-    include("structs/WellProc.jl")
     ## allelic discrimination
     include("structs/ClusteringMethod.jl")
     include("structs/ClusterAnalysisResult.jl")
     include("structs/UniqCombinCenters.jl")
     include("structs/AssignGenosResult.jl")
-    ## amplification
+    ## amplification models
     include("amp_models/structs/AmpModel.jl")
     # include("amp_models/structs/Amp.jl")
     include("amp_models/structs/AmpModelFit.jl")
     include("amp_models/structs/SFCModelDef.jl")
+
+    ## generate amplification model definitions
+    include("amp_models/SFC_model_definitions.jl")
+    include("amp_models/generate_SFC_models.jl")
+    include("amp_models/MAKx.jl")
+    include("amp_models/MAKERGAULx.jl")
+
+    ## amplification experiments
     include("amp_models/structs/AmpRawData.jl")
-    include("amp_models/structs/Amp.jl")
+    include("amp_models/structs/AmpInput.jl")
     include("amp_models/structs/AmpOutput.jl")
     include("amp_models/structs/AmpBaselineModelFit.jl")
     include("amp_models/structs/AmpQuantModelFit.jl")
-    ## melting curve
+    ## melting curve experiments
     # include("structs/MeltCurveRawData.jl")
     include("structs/MeltCurveTF.jl")
     include("structs/Peak.jl")
@@ -104,19 +113,12 @@ module QpcrAnalysis
 
     ## dispatch
     include("dispatch.jl")
-
     ## calibration
     include("calibration.jl")
     include("normalization.jl")
     include("deconvolution.jl")
-
     ## amplification
-    include("amp_models/MAKx.jl")
-    include("amp_models/MAKERGAULx.jl")
-    include("amp_models/sfc_model_bases.jl")
-    include("amp_models/sfc_models.jl")
     include("amplification.jl")
-    include("allelic_discrimination.jl")
     ## melting curve
     include("melting_curve.jl")
     include("supsmu.jl")
@@ -133,6 +135,7 @@ module QpcrAnalysis
     ## Create module level logger
     ## this can be precompiled
     using Memento
+    import FactCheck.clear_results
     logger = getlogger(current_module())
 
     ## This function contains stuff that needs to happen

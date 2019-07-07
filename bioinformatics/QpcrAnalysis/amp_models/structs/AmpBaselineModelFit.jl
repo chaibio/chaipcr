@@ -16,13 +16,13 @@ struct AmpBaselineModelFit
 end
 
 
-## defaults for baseline model
-const DEFAULT_AMP_MODEL                 = SFCModel
-const DEFAULT_AMP_BL_METHOD             = :l4_enl
-const DEFAULT_AMP_FALLBACK_FUNC         = median
-const DEFAULT_AMP_CT_FLUOS              = []
-const DEFAULT_AMP_MIN_RELIABLE_CYC      = 5 ## >= 1
-const DEFAULT_AMP_BASELINE_CYC_BOUNDS   = []
+## default values for baseline model
+const DEFAULT_AMP_MODEL             = SFCModel
+const DEFAULT_AMP_BL_METHOD         = l4_enl
+const DEFAULT_AMP_FALLBACK_FUNC     = median
+const DEFAULT_AMP_CT_FLUOS          = Vector{Float_T}()
+const DEFAULT_AMP_MIN_RELIABLE_CYC  = 5 ## >= 1
+const DEFAULT_AMP_BL_CYC_BOUNDS     = Vector{Int}()
 
 
 ## fit_baseline_model() definitions >>
@@ -30,9 +30,9 @@ const DEFAULT_AMP_BASELINE_CYC_BOUNDS   = []
 ## DFC
 function fit_baseline_model(
     ::Type{Val{M}} where M <: DFCModel,
+    i                   ::AmpInput,
     o                   ::AmpOutput,
-    fluos               ::AbstractVector,
-    solver              ::IpoptSolver;
+    fluos               ::AbstractVector;
 ) 
     debug(logger, "at fit_baseline_model(Val{M}) where M <: DFCModel")
     ## no fallback for baseline, because:
@@ -40,11 +40,11 @@ function fit_baseline_model(
     ## (search step becomes very small but has not converge);
     ## (2) the guessed basedline (`start` of `fb`) is usually
     ## quite close to a sensible baseline.
-    const amp_model = o.input.amp_model
+    const amp_model = i.amp_model
     const num_cycs = length(fluos)
     const cycs = 1:num_cycs
     const wts = ones(num_cycs)
-    const fit_bl = fit(Val{amp_model}, cycs, fluos, wts; solver = solver)
+    const fit_bl = fit(Val{amp_model}, cycs, fluos, wts; solver = i.solver)
     const baseline =
         fit_bl.coefs[1] +
             amp_model in [MAK3, MAKERGAUL4] ?
@@ -60,17 +60,17 @@ end ## fit_baseline_model(Val{M}) where M <: DFCModel
 ## SFC
 function fit_baseline_model(
     ::Type{Val{SFCModel}},
+    i                   ::AmpInput,
     o                   ::AmpOutput,
-    fluos               ::AbstractVector,
-    solver              ::IpoptSolver;
-    SFC_model_defs      ::OrderedDict{Symbol, SFCModelDef} = SFC_MDs,
-    bl_method           ::Symbol = DEFAULT_AMP_MODEL_NAME,
+    fluos               ::AbstractVector;
+    SFC_model_defs      ::OrderedDict{SFCModelName, SFCModelDef} = SFC_MDs,
+    bl_method           ::SFCModelName = DEFAULT_AMP_MODEL_NAME,
     bl_fallback_func    ::Function = DEFAULT_AMP_FALLBACK_FUNC,
     min_reliable_cyc    ::Real = DEFAULT_AMP_MIN_RELIABLE_CYC,
-    baseline_cyc_bounds ::AbstractVector = DEFAULT_AMP_BASELINE_CYC_BOUNDS
+    baseline_cyc_bounds ::AbstractArray = DEFAULT_AMP_BASELINE_CYC_BOUNDS
 )
     function SFC_wts()
-        if bl_method in [:lin_1ft, :lin_2ft]
+        if bl_method in [lin_1ft, lin_2ft]
             _wts = zeros(num_cycs)
             _wts[colon(baseline_cyc_bounds...)] .= 1
             return _wts
@@ -128,7 +128,7 @@ function fit_baseline_model(
     ## `last_cyc_wt0 == floor(min_reliable_cyc) - 1`
     function auto_choose_bl_cycs()
         const (min_fluo, min_fluo_cyc) = findmin(fluos)
-        const dr2_cfd = finite_diff(cycs, fluos; nu=2) ## `Dierckx.Spline1D` resulted in all `NaN` in some cases
+        const dr2_cfd = finite_diff(cycs, fluos; nu = 2) ## `Dierckx.Spline1D` resulted in all `NaN` in some cases
         const dr2_cfd_left = dr2_cfd[1:min_fluo_cyc]
         const dr2_cfd_right = dr2_cfd[min_fluo_cyc:end]
         const (max_dr2_left_cyc, max_dr2_right_cyc) =
@@ -171,7 +171,6 @@ function fit_baseline_model(
     ## << end of function definitions nested within fit_baseline_model() ## SFC
 
     debug(logger, "at fit_baseline_model(Val{SFCModel})")
-    const i = o.input
     const num_cycs = length(fluos)
     const cycs = 1:num_cycs
     ## to determine weights (`wts`) for sigmoid fitting per `min_reliable_cyc`
@@ -180,7 +179,7 @@ function fit_baseline_model(
         ## fit model to find baseline
         const wts = SFC_wts()
         const fit_bl = SFC_model_defs[bl_method].func_fit(
-            cycs, fluos, wts; solver = solver)
+            cycs, fluos, wts; solver = i.solver)
         baseline = SFC_model_defs[bl_method].funcs_pred[:bl](cycs, fit_bl.coefs...) ## may be changed later
         blsub_fluos = fluos .- baseline
         bl_notes = SFC_bl_status(fit_bl.status)

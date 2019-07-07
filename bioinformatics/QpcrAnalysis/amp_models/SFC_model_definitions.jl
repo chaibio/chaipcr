@@ -1,4 +1,4 @@
-## SFC_model_bases.jl
+## SFC_model_definitions.jl
 ##
 ## Author: Tom Price
 ## Date:   June 2019
@@ -11,7 +11,7 @@ const SFC_MODEL_BASES = [ ## vector of tuples
 ## generic
 
     (
-        :lin_1ft,
+        lin_1ft,
         true,
         ["_x"],
         ["X"],
@@ -30,7 +30,7 @@ const SFC_MODEL_BASES = [ ## vector of tuples
     ),
 
     (
-        :lin_2ft,
+        lin_2ft,
         true,
         ["_x1", "_x2"],
         ["X1", "X2"],
@@ -52,7 +52,7 @@ const SFC_MODEL_BASES = [ ## vector of tuples
 ## amplification curve
 
     (
-        :b4,
+        b4,
         false,
         ["_x"],
         ["X"],
@@ -86,7 +86,7 @@ const SFC_MODEL_BASES = [ ## vector of tuples
     ),
 
     (
-        :l4, ## name
+        l4, ## name
         false, ## linear
         ["_x"],
         ["X"],
@@ -119,7 +119,7 @@ const SFC_MODEL_BASES = [ ## vector of tuples
     ),
 
     (
-        :l4_hbl, ## hyperbolic baseline: increase before log-phase then minimal at plateau (most simple version is -1/x). baseline model `c + bl_k / (e_ - x)` model caused "Ipopt finished with status Restoration_Failed"
+        l4_hbl, ## hyperbolic baseline: increase before log-phase then minimal at plateau (most simple version is -1/x). baseline model `c + bl_k / (e_ - x)` model caused "Ipopt finished with status Restoration_Failed"
         false,
         ["_x"],
         ["X"],
@@ -159,7 +159,7 @@ const SFC_MODEL_BASES = [ ## vector of tuples
     ),
 
     (
-        :l4_lbl, ## linear baseline
+        l4_lbl, ## linear baseline
         false,
         ["_x"],
         ["X"],
@@ -198,7 +198,7 @@ const SFC_MODEL_BASES = [ ## vector of tuples
     ),
 
     (
-        :l4_qbl, ## quadratic baseline
+        l4_qbl, ## quadratic baseline
         false,
         ["_x"],
         ["X"],
@@ -238,7 +238,7 @@ const SFC_MODEL_BASES = [ ## vector of tuples
     ),
 
     (
-        :l4_enl, ## name
+        l4_enl, ## name
         false, ## linear
         ["_x"],
         ["X"],
@@ -279,7 +279,7 @@ const SFC_MODEL_BASES = [ ## vector of tuples
     ),
 
     (
-        :l4_enl_hbl, ## hyperbolic baseline: increase before log-phase then minimal at plateau (most simple version is -1/x). baseline model `c + bl_k / (e_ - x)` model caused "Ipopt finished with status Restoration_Failed"
+        l4_enl_hbl, ## hyperbolic baseline: increase before log-phase then minimal at plateau (most simple version is -1/x). baseline model `c + bl_k / (e_ - x)` model caused "Ipopt finished with status Restoration_Failed"
         false,
         ["_x"],
         ["X"],
@@ -319,7 +319,7 @@ const SFC_MODEL_BASES = [ ## vector of tuples
     ),
 
     (
-        :l4_enl_lbl, ## linear baseline
+        l4_enl_lbl, ## linear baseline
         false,
         ["_x"],
         ["X"],
@@ -358,7 +358,7 @@ const SFC_MODEL_BASES = [ ## vector of tuples
     ),
 
     (
-        :l4_enl_qbl, ## quadratic baseline
+        l4_enl_qbl, ## quadratic baseline
         false,
         ["_x"],
         ["X"],

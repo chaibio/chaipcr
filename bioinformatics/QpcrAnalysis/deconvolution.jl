@@ -5,6 +5,10 @@ import DataStructures.OrderedDict
 import Memento: debug, error
 
 
+## Enum type for K matrix calculation
+## used in deconvolution.jl
+@enum WellProc well_proc_mean well_proc_vec
+
 ## default values
 const DEFAULT_DCV_BACKUP_K      = K4DCV
 const DEFAULT_DCV_WELL_PROC     = well_proc_vec
@@ -37,7 +41,7 @@ function deconvolute(
     ## keyword arguments
     k4dcv_backup            ::K4Deconv = DEFAULT_DCV_BACKUP_K, ## argument not used
     scaling_factor_dcv_vec  ::AbstractVector = DECONVOLUTION_SCALING_FACTOR,
-    out_format              ::Symbol = :array ## :array, :dict, :both
+    data_format             ::DataFormat = array ## array, dict, both
 )
     debug(logger, "at deconvolute()")
 
@@ -63,11 +67,11 @@ function deconvolute(
         end) ## do channel_i
     ## format output
     const deconvoluted_data =
-        if      (out_format == :array)  tuple(deconvoluted_array)
-        elseif  (out_format == :dict)   tuple(deconvoluted_dict())
-        elseif  (out_format == :both)   tuple(deconvoluted_array, deconvoluted_dict())
+        if      (data_format == array)  tuple(deconvoluted_array)
+        elseif  (data_format == dict)   tuple(deconvoluted_dict())
+        elseif  (data_format == both)   tuple(deconvoluted_array, deconvoluted_dict())
         else
-            throw(ArgumentError("`out_format` must be :array, :dict or :both"))
+            throw(ArgumentError("`out_format` must be array, dict or both"))
         end ## if
     return (k4dcv, deconvoluted_data...)
 end ## deconvolute()
