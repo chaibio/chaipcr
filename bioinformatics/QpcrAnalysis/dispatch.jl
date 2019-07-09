@@ -1,6 +1,10 @@
-## dispatch.jl
-##
-## dispatches API GET requests to the appropriate act() method
+#===================================================================
+
+    dispatch.jl
+
+    dispatches API GET requests to the appropriate act() method
+    
+===================================================================#
 
 import JSON: parse, json
 import DataStructures.OrderedDict
@@ -48,8 +52,7 @@ function dispatch(
         end ## if !production_env
 
         debug(logger, "dispatching to act() from dispatch()")
-        const response = act(action, req_parsed; out_format = pre_json)
-        println("response received")
+        const response = act(action, req_parsed; out_format = pre_json_output)
         debug(logger, "response received from act() by dispatch()")
         debug(logger, repr(response))
         const json_response = JSON.json(response)

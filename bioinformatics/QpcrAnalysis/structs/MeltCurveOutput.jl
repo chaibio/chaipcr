@@ -1,8 +1,11 @@
-## MeltCurveOutput.jl
-##
-## Author: Tom Price
-## Date:   July 2019
+#=========================
 
+    MeltCurveOutput.jl
+
+    Author: Tom Price
+    Date:   July 2019
+
+==========================#
 
 struct MeltCurveOutput
     mc_array                ::Array{MeltCurveTa} # dim1 is well and dim2 is channel

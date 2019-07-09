@@ -1,10 +1,14 @@
-## PeakIndices.jl
-##
-## data type and methods for melting curve
-## and temperature consistency experiments
-##
-## Author: Tom Price
-## Date: June 2019
+#==============================================
+
+    PeakIndices.jl
+
+    data type and methods for melting curve
+    and temperature consistency experiments
+
+    Author: Tom Price
+    Date: June 2019
+
+==============================================#
 
 import Base: start, next, done, eltype, collect, iteratorsize, SizeUnknown
 

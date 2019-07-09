@@ -1,4 +1,8 @@
-## thermal_performance_diagnostic.jl
+#========================================
+
+    thermal_performance_diagnostic.jl
+
+========================================#
 
 import DataStructures.OrderedDict
 import Memento.debug
@@ -26,7 +30,7 @@ function act(
     # exp_id ::Integer, # really used
     # calib_info ::Union{Integer,OrderedDict} ## not used for computation
     temperatureData ::Associative;
-    out_format      ::OutputFormat = pre_json
+    out_format      ::OutputFormat = pre_json_output
 )
     debug(logger, "at act(::Type{Val{thermal_performance_diagnostic}})")
 

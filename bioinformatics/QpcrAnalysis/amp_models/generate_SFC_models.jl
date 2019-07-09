@@ -1,7 +1,11 @@
-## generate_SFC_models.jl
-##
-## generates definitions for models
-## with same formula for each cycle (SFC models)
+#====================================================
+
+    generate_SFC_models.jl
+
+    generates definitions for models
+    with same formula for each cycle (SFC models)
+
+====================================================#
 
 import DataStructures.OrderedDict
 using JuMP

@@ -1,10 +1,16 @@
-## SFC_model_definitions.jl
-##
-## Author: Tom Price
-## Date:   June 2019
+#===============================
+
+    SFC_model_definitions.jl
+
+    Author: Tom Price
+    Date:   June 2019
+
+================================#
 
 import DataStructures.OrderedDict
 
+
+@enum SFCModelName take_the_median lin_1ft lin_2ft b4 l4 l4_hbl l4_lbl l4_qbl l4_enl l4_enl_hbl l4_enl_lbl l4_enl_qbl
 
 const SFC_MODEL_BASES = [ ## vector of tuples
 
@@ -397,3 +403,7 @@ const SFC_MODEL_BASES = [ ## vector of tuples
         )
     )
 ]
+
+## check
+const SFC_MODEL_NAMES = map(index(1), SFC_MODEL_BASES)
+@assert all(SFC_MODEL_NAMES .== instances(SFCModelName)[2:end]) "incorrect enumeration of SFC model names"

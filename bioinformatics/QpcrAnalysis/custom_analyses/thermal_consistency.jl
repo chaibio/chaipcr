@@ -1,6 +1,10 @@
-## thermal_consistency.jl
-##
-## 72°C thermal consistency test
+#====================================
+
+    thermal_consistency.jl
+
+    72°C thermal consistency test
+
+====================================#
 
 import Dierckx: Spline1D, derivative
 import Memento: debug, warn, error
@@ -26,7 +30,7 @@ function act(
     # stage_id ::Integer,
     # calib_info ::Union{Integer,OrderedDict};
     req_dict            ::Associative;
-    out_format          ::OutputFormat = pre_json,
+    out_format          ::OutputFormat = pre_json_output,
     well_nums           ::AbstractVector = DEFAULT_MC_WELL_NUMS,
     auto_span_smooth    ::Bool = DEFAULT_MC_AUTO_SPAN_SMOOTH,
     span_smooth_default ::Real = DEFAULT_MC_SPAN_SMOOTH_DEFAULT,
@@ -73,7 +77,7 @@ function act(
             span_smooth_factor = span_smooth_factor,
             dcv = dcv,
             max_temperature = max_temperature,
-            out_format = full,
+            out_format = full_output,
             kwargs_mc_tm_pw = kwargs_mc_tm_pw)
     catch err
         return fail(logger, err; bt=true) |> out(out_format)
@@ -111,7 +115,7 @@ function act(
             :delta_Tm => (reporting(delta_Tm_val),
                             delta_Tm_val .<= MAX_DELTA_TM_VAL),
             :valid    => true)
-    (out_format == full) && return full_out()
+    (out_format == full_output) && return full_out()
     ## else
     return pre_json_out() |> out(out_format)
 end ## act(::Type{Val{thermal_consistency}})

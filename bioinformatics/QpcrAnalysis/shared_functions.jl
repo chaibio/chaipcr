@@ -1,6 +1,10 @@
-## shared_functions.jl
-##
-## functions used by multiple analytic methods
+#==================================================
+
+    shared_functions.jl
+
+    functions used by multiple analytic methods
+    
+==================================================#
 
 import DataStructures.OrderedDict
 import Memento: debug, warn, error, Logger
@@ -115,6 +119,7 @@ end ## fail()
 ## used in melting_curve.jl
 ## finite differencing function
 @enum FiniteDiffMethod central forward backward
+#
 function finite_diff(
     X       ::AbstractVector,
     Y       ::AbstractVector; ## X and Y must be of same length
@@ -329,7 +334,7 @@ end
 #     exp_id      ::Integer ##=calib_info_AIR
 # )
 #     if isa(calib_info, Integer)
-#    
+#
 #         if calib_info == calib_info_AIR
 #             calib_id = MySQL.mysql_execute(
 #                 db_conn,
@@ -338,24 +343,24 @@ end
 #         else
 #             calib_id = calib_info
 #         end
-#    
+#
 #         step_qry = "SELECT step_id FROM fluorescence_data WHERE experiment_id=$calib_id"
 #         step_ids = sort(unique(MySQL.mysql_execute(db_conn, step_qry)[1][:step_id]))
-#    
+#
 #         calib_info = OrderedDict(
 #             "water" => OrderedDict(
 #                 "calibration_id" => calib_id,
 #                 "step_id" => step_ids[1]))
-#    
+#
 #         for i in 2:(length(step_ids))
 #             calib_info["channel_$(i-1)"] = OrderedDict(
 #                 "calibration_id" => calib_id,
 #                 "step_id" => step_ids[i])
 #         end ## for
-#   
+#
 #         channel_qry = "SELECT channel FROM fluorescence_data WHERE experiment_id=$calib_id"
 #         channels = sort(unique(MySQL.mysql_execute(db_conn, channel_qry)[1][:channel]))
-#    
+#
 #         for channel in channels
 #             channel_key = "channel_$channel"
 #             if !(channel_key in keys(calib_info))
@@ -401,7 +406,7 @@ end
 #     df = DataFrame()
 #     for dict_key in dict_keys
 #         df[Symbol(dict_key)] = map(index(dict_key), dict_values)
-#     end 
+#     end
 #     return df
 # end
 

@@ -1,6 +1,10 @@
-## normalization.jl
-##
-## normalize variation between wells in absolute fluorescence values
+#========================================================================
+
+    normalization.jl
+
+    normalize variation between wells in absolute fluorescence values
+    
+========================================================================#
 
 import DataStructures.OrderedDict
 import Memento: debug, error

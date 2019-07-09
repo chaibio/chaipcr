@@ -1,7 +1,11 @@
-## MeltCurveTF.jl
-##
-## Author: Tom Price
-## Date:   July 2019
+#========================
+
+	MeltCurveTF.jl
+
+	Author: Tom Price
+	Date:   July 2019
+
+=========================#
 
 import DataArrays.DataArray
 

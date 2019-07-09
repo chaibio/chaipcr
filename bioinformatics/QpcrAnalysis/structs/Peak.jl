@@ -1,11 +1,14 @@
-## Peak.jl
-##
-## data type and methods for melting curve
-## and temperature consistency experiments
-##
-## Author: Tom Price
-## Date: June 2019
+#===============================================
 
+	Peak.jl
+
+	data type and methods for melting curve
+	and temperature consistency experiments
+
+	Author: Tom Price
+	Date: June 2019
+
+===============================================#
 
 struct Peak
     idx             ::Int

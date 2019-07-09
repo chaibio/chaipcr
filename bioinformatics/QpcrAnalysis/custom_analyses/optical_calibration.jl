@@ -1,6 +1,10 @@
-## optical_cal.jl
-##
-## uses prep_normalize() to check validity of calibration data
+#==================================================================
+
+    optical_calibration.jl
+
+    uses prep_normalize() to check validity of calibration data
+
+==================================================================#
 
 import DataStructures.OrderedDict
 import Memento.debug
@@ -15,7 +19,7 @@ function act(
     ::Type{Val{optical_calibration}},
     req_dict            ::Associative;
     well_nums           ::AbstractVector = DEFAULT_OC_WELL_NUMS,
-    out_format          ::OutputFormat = pre_json,
+    out_format          ::OutputFormat = pre_json_output,
     ## remove MySql dependency  
     #
     # db_conn::MySQL.MySQLHandle,

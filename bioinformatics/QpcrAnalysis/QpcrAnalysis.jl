@@ -1,20 +1,27 @@
-## Module QpcrAnalysis.jl
+#=============================
 
-## Notes on using MySQL 0.3.0 instead of current version
-## ----
-##                   0.3.0                      0.5.2
-## connect           mysql_connect(, some_db)   connect(; db=some_db)
-## query function    mysql_execute              query
-## query return      Array(DataFrame)           NamedTuple
-## data container    DataFrame                  NamedTuple
-## data access       [1]                        (direct)
-## ----
-## `connect` examples:
-## 0.3.0 `MySQL.mysql_connect(host, username, password, some_db)`
-## 0.5.2 `MySQL.connect(host, username, password; db=some_db)`
-## `query` examples:
-## 0.3.0 `MySQL.mysql_execute(some_query)[1][:some_header]`
-## 0.5.2 `MySQL.query(some_query)[:some_header]`
+    Module QpcrAnalysis.jl
+
+=============================#
+
+
+#=
+    Notes on using MySQL 0.3.0 instead of current version
+    ----
+                      0.3.0                      0.5.2
+    connect           mysql_connect(, some_db)   connect(; db=some_db)
+    query function    mysql_execute              query
+    query return      Array(DataFrame)           NamedTuple
+    data container    DataFrame                  NamedTuple
+    data access       [1]                        (direct)
+    ----
+    `connect` examples:
+    0.3.0 `MySQL.mysql_connect(host, username, password, some_db)`
+    0.5.2 `MySQL.connect(host, username, password; db=some_db)`
+    `query` examples:
+    0.3.0 `MySQL.mysql_execute(some_query)[1][:some_header]`
+    0.5.2 `MySQL.query(some_query)[:some_header]`
+=#
 
 __precompile__()
 
@@ -39,7 +46,8 @@ module QpcrAnalysis
         isfile("$path_/$MODULE_NAME.jl")
     end][1] ## slice by boolean vector returned a one-element vector. Assumption: LOAD_PATH is global
 
-    ## include key string constants
+    ## define constants
+    include("constants/enums.jl")
     include("constants/keystrings.jl")
 
     ## default data width in production mode:  32 bits (BBB)
@@ -49,16 +57,12 @@ module QpcrAnalysis
 
     ## include each script, generally in the order of workflow
 
-    ## format options
-    include("structs/OutputFormat.jl")
-    include("structs/DataFormat.jl")
-
     ## shared functions
     include("shared_functions.jl")
 
-    ## dispatch
-    include("structs/Action.jl")
+    ## struct definitions for:
     ## calibration
+    include("structs/RawData.jl")
     include("structs/CalibrationData.jl")
     ## deconvolution
     include("structs/K4Deconv.jl")
@@ -71,20 +75,18 @@ module QpcrAnalysis
     include("amp_models/structs/AmpModel.jl")
     # include("amp_models/structs/Amp.jl")
     include("amp_models/structs/AmpModelFit.jl")
+    include("amp_models/SFC_model_definitions.jl")
     include("amp_models/structs/SFCModelDef.jl")
 
     ## generate amplification model definitions
-    include("amp_models/SFC_model_definitions.jl")
     include("amp_models/generate_SFC_models.jl")
     include("amp_models/MAKx.jl")
     include("amp_models/MAKERGAULx.jl")
 
     ## amplification experiments
-    include("amp_models/structs/AmpRawData.jl")
+    include("amp_models/structs/AmpModelResults.jl")
     include("amp_models/structs/AmpInput.jl")
     include("amp_models/structs/AmpOutput.jl")
-    include("amp_models/structs/AmpBaselineModelFit.jl")
-    include("amp_models/structs/AmpQuantModelFit.jl")
     ## melting curve experiments
     # include("structs/MeltCurveRawData.jl")
     include("structs/MeltCurveTF.jl")
@@ -119,13 +121,14 @@ module QpcrAnalysis
     include("deconvolution.jl")
     ## amplification
     include("amplification.jl")
+    include("fit_amplification_model.jl")
     ## melting curve
     include("melting_curve.jl")
     include("supsmu.jl")
     ## standard curve
     include("standard_curve.jl")
     ## custom analyses
-    include("custom_analyses/optical_cal.jl")
+    include("custom_analyses/optical_calibration.jl")
     include("custom_analyses/optical_test_single_channel.jl")
     include("custom_analyses/optical_test_dual_channel.jl")
     include("custom_analyses/thermal_consistency.jl")
@@ -151,7 +154,7 @@ module QpcrAnalysis
         ## Register the module level logger at runtime
         ## so it is accessible via `get_logger(QpcrAnalysis)`
         Memento.register(logger)
-        #   
+        #
         ## clear Fact Checks
         !production_env && FactCheck.clear_results()
     end ## __init__()

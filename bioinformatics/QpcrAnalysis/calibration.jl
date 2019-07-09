@@ -1,8 +1,12 @@
-## calibration.jl
-##
-## calibration procedure:
-## 1. multichannel deconvolution
-## 2. adjust well-to-well variation in absolute fluorescence values
+#=====================================================================
+
+    calibration.jl
+
+    calibration procedure:
+    1. multichannel deconvolution
+    2. normalize variation between wells in absolute fluorescence
+    
+=====================================================================#
 
 import DataStructures.OrderedDict
 import Memento: debug, error
@@ -10,10 +14,10 @@ import Memento: debug, error
 
 ## function definitions >>
 
-## function: perform deconvolution and adjust well-to-well variation in absolute fluorescence
+## function: perform deconvolution between channels and normalize variation between wells
 function calibrate(
     ## data
-    raw_data                ::AmpRawData{<: Real},      ## 3D array of raw fluorescence by cycle, well, channel
+    raw_data                ::RawData{<: Real},      ## 3D array of raw fluorescence by cycle, well, channel
     calibration_data        ::CalibrationData{<: Real}, ## calibration dataset
     well_nums_found_in_raw  ::AbstractVector,           ## vector of well numbers
     channel_nums            ::AbstractVector;           ## vector of channel numbers
@@ -55,15 +59,14 @@ function calibrate(
     ## we can't match well numbers between calibration data and experimental data
     ## because we don't have that information for the calibration data
     const matched_well_idc = norm_well_nums |> length |> from(1) |> collect
-    debug(logger, repr(matched_well_idc))
 
     ## subtract background
     const background_subtracted_data =
         cat(3,
             ## devectorized code avoids transposition
             [
-                [   raw_data.a[u,w,c] - norm_data[:water][c][matched_well_idc][w]
-                    for u in 1:size(raw_data.a, 1),
+                [   raw_data.fluorescence[u,w,c] - norm_data[:water][c][matched_well_idc][w]
+                    for u in 1:size(raw_data.fluorescence, 1),
                         w in matched_well_idc     ]
                 for c in 1:num_channels                 ]...)
 

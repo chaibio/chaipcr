@@ -1,6 +1,10 @@
-## melting_curve.jl
-##
-## melting curve analysis
+#==============================
+
+    melting_curve.jl
+
+    melting curve analysis
+
+==============================#
 
 import DataStructures.OrderedDict
 import DataArrays.DataArray
@@ -53,7 +57,7 @@ const MC_TM_PW_KEYWORDS = Dict{Symbol,String}(
     :qt_prob_flTm   => "qt_prob",
     :normd_qtv_ub   => "max_normd_qtv",
     :top_N          => "top_N")
-const MC_TF_KEYS = [:temperature, :fluorescence_value]
+const MC_TF_KEYS = [:temperature, :fluorescence]
 const MC_OUT_FIELDS = OrderedDict(
     :mc      => :melt_curve_data,
     :Ta_fltd => :melt_curve_analysis)
@@ -122,7 +126,7 @@ function process_mc(
     dcv                 ::Bool = DEFAULT_MC_DCV, ## logical, whether to perform multi-channel deconvolution
 	max_temperature     ::Real = DEFAULT_MC_MAX_TEMPERATURE, ## maximum temperature (argument not used)
     kwargs_mc_tm_pw     ::Associative = DEFAULT_KWARGS_MC_TM_PW, ## keyword arguments passed onto `mc_tm_pw`
-    out_format          ::OutputFormat = pre_json, ## full, pre_json, json
+    out_format          ::OutputFormat = pre_json_output, ## full_output, pre_json_output, json_output
 )
     ## function: format fluorescence data for calibration
     ##
@@ -134,19 +138,19 @@ function process_mc(
 
         ## subset melting curve data by channel (curried)
         select_mcdata_by_channel(channel_num ::Integer) =
-            mc_data ::Associative ->
+            mc_data ::DataFrame ->
                 Dict(
                     map([:temperature, :fluorescence, :well]) do f
-                        f => getfield(mc_data, f)[mc_data.channel .== channel_num]
+                        f => mc_data[f][mc_data[:channel] .== channel_num]
                     end)
 
         ## split temperature and fluorescence data by well
         ## return vector of TF Dicts
         split_tf_by_well(fluo_sel ::Associative) =
-            map(fluo_well_nums) do well_num
+            map(fluo_well_nums) do well
                 Dict(
                     map(MC_TF_KEYS) do key
-                        key => fluo_sel[key][fluo_sel[:well_num] .== well_num]
+                        key => fluo_sel[key][fluo_sel[:well] .== well]
                     end)
             end
 
@@ -208,19 +212,20 @@ function process_mc(
 
     debug(logger, "at process_mc()")
     const (channel_nums, fluo_well_nums) =
-        map((CHANNEL_KEY, WELL_NUM_KEY)) do fieldname
+        map((:channel, :well)) do fieldname
             mc_data[fieldname] |> unique |> sort
         end ## do fieldname
-    const num_channels   = length(channel_nums)
-    const num_fluo_wells = length(fluo_well_nums)
+    const num_channels      = length(channel_nums)
+    const num_fluo_wells    = length(fluo_well_nums)
     #
     ## get data arrays by channel
     ## output is Vector{MeltCurveTF}
-    const mc_data_bych  = map(get_mc_data, channel_nums)
+    const mc_data_bych      = map(get_mc_data, channel_nums)
     #
     ## reshape raw fluorescence data to 3-dimensional array
     ## dimensions 1,2,3 = temperature,well,channel
-    const raw_data      = cat(3, map(field(:fluorescence), mc_data_bych)...)
+    const mc_data_array     = cat(3, map(field(:fluorescence), mc_data_bych)...)
+    const raw_data          = RawData(mc_data_array)
     #
     ## deconvolute and normalize
     const (background_subtracted_data, k4dcv, deconvoluted_data,
@@ -259,12 +264,12 @@ function process_mc(
             hcat,
             1:num_channels)
     #
-    if (out_format == full)
+    if (out_format == full_output)
         return MeltCurveOutput(
             mc_bychwl,
             channel_nums,
             fluo_well_nums,
-            raw_data,
+            raw_data.fluorescence,
             background_subtracted_data,
             k4dcv,
             deconvoluted_data,
@@ -653,7 +658,6 @@ function mc_tm_pw(
     #
     ## fit a cubic spline model in order to interpolate data points
     ## then smooth data and calculate slope at denser sequence of temperatures
-    debug(logger,repr(smooth_raw_fluo()))
     const spl           = spline_model(smooth_raw_fluo())
     const tp_denser     = interpolated_temperatures()
     const mc_denser     = smoothing_process()

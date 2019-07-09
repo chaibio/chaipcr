@@ -1,6 +1,10 @@
-## allelic_discrimination.jl
-##
-## clusters data to identify allele groups
+#===============================================
+
+    allelic_discrimination.jl
+
+    clusters data to identify allele groups
+    
+===============================================#
 
 import DataStructures.OrderedDict
 import Clustering: ClusteringResult, kmeans!, kmedoids!, silhouettes

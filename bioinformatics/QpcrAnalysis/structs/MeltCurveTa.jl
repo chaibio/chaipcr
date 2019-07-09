@@ -1,10 +1,13 @@
-## MeltCurveTa.jl
-##
-## melting curve analysis output struct
-##
-## Author: Tom Price
-## Date:   June 2019
+#===========================================
 
+    MeltCurveTa.jl
+
+    melting curve analysis output struct
+
+    Author: Tom Price
+    Date:   June 2019
+
+===========================================#
 
 struct MeltCurveTa ## `Tm and area` - Ta
     mc              ::Array{Float_T,2}

@@ -1,8 +1,11 @@
-## StandardCurveResult.jl
-##
-## Author: Tom Price
-## Date: Dec 2018
+#=============================
 
+    StandardCurveResult.jl
+
+    Author: Tom Price
+    Date: Dec 2018
+
+=============================#
 
 abstract type StandardCurveResult end
 

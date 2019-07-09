@@ -1,9 +1,14 @@
-## ClusterAnalysisResult.jl
-##
-## clustering analysis result from a possible combination of expected genotypes
-##
-## Author: Tom Price
-## Date:   July 2019
+#========================================================
+
+    ClusterAnalysisResult.jl
+
+    clustering analysis result
+    from a possible combination of expected genotypes
+
+    Author: Tom Price
+    Date:   July 2019
+    
+========================================================#
 
 import Clustering.ClusteringResult
 

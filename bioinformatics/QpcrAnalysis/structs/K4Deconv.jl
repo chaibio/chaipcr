@@ -1,10 +1,14 @@
-## K4Deconv.jl
-##
-## type for K matrix
-## used in deconv.jl
-##
-## Author: Tom Price
-## Date:   June 2019
+#========================
+
+    K4Deconv.jl
+
+    type for K matrix
+    used in deconv.jl
+
+    Author: Tom Price
+    Date:   June 2019
+
+=========================#
 
 import JLD
 

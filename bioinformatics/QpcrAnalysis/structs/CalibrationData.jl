@@ -1,10 +1,15 @@
-## CalibrationData.jl
-##
-## raw calibration data struct
-## this could be used to supply well numbers
-##
-## Author: Tom Price
-## Date:   June 2019
+#================================================
+
+    CalibrationData.jl
+
+    raw calibration data struct
+    this could be used to supply well numbers
+
+    Author: Tom Price
+    Date:   June 2019
+
+=================================================#
+
 
 import DataStructures.OrderedDict
 

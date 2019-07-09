@@ -1,6 +1,9 @@
-## MAKERGAULx.jl
-##
-## different formula for each cycle (dfc)
+#=============================================
+    MAKERGAULx.jl
+
+    different formula for each cycle (dfc)
+
+=============================================#
 
 ## write functions to fit MAKERGAUL model here, which will be called in `mod_bl_q` in "amp.jl"
 

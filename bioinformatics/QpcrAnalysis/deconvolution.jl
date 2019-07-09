@@ -1,5 +1,10 @@
-## deconv.jl
-## color compensation / multi-channel deconvolution
+#=======================================================
+
+    deconvolution.jl
+
+    color compensation / multi-channel deconvolution
+    
+=======================================================#
 
 import DataStructures.OrderedDict
 import Memento: debug, error

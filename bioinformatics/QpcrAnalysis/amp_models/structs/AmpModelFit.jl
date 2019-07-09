@@ -1,7 +1,14 @@
-## AmpModelFit.jl
-##
-## Author: Tom Price
-## Date:   June 2019
+#=====================================
+
+    AmpModelFit.jl
+
+    structs containing parameters
+    of fitted amplification models
+
+    Author: Tom Price
+    Date:   June 2019
+
+=====================================#
 
 import DataStructures.OrderedDict
 using JuMP
@@ -57,7 +64,7 @@ MAK3Fit(;
 ) =
     MAK3Fit(max_d_idx, fb_start, bl_k_start,
         coef_strs, coefs, status, obj_val, jmp_model)
-    
+
 
 struct MAKERGAUL3Fit <: AmpModelFit
     max_of_idx  ::Int

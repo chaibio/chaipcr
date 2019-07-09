@@ -1,9 +1,14 @@
-## MAKx.jl
-##
-## different formula for each cycle (dfc)
+#==============================================================
 
-## write functions to fit MAKx (MAK2 and MAK3) model here,
-## which will be called in `mod_bl_q` in "amp.jl"
+    MAKx.jl
+
+    different formula for each cycle (dfc)
+
+    write functions to fit MAKx (MAK2 and MAK3) model here,
+    which will be called in fit_amplification_model()
+    in amplification.jl
+
+===============================================================#
 
 import DataStructures.OrderedDict;
 import JuMP: Model, @variable, @constraint, @NLconstraint, @NLobjective,

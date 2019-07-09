@@ -1,6 +1,10 @@
-## supsmu.jl
-#
-## wrapper for Fortran subroutine `supsmu` (Friedman 1984)
+#==============================================================
+
+    supsmu.jl
+
+    wrapper for Fortran subroutine `supsmu` (Friedman 1984)
+    
+==============================================================#
 
 import Memento: debug, error
 

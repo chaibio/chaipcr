@@ -1,7 +1,11 @@
-## AssignGenosResult.jl
-##
-## Author: Tom Price
-## Date:   July 2019
+#===========================
+
+	AssignGenosResult.jl
+
+    Author: Tom Price
+	Date:   July 2019
+
+============================#
 
 import Clustering.ClusteringResult
 

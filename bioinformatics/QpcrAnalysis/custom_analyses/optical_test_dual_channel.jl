@@ -1,4 +1,8 @@
-## optical_test_dual_channel.jl
+#===================================
+
+    optical_test_dual_channel.jl
+
+===================================#
 
 import DataStructures.OrderedDict
 import Memento: debug, warn
@@ -46,7 +50,7 @@ function act(
     # start: arguments that might be passed by upstream code
     # well_nums ::AbstractVector =[],
     ot_dict         ::Associative; ## keys: "baseline", "water", "FAM", "HEX"
-    out_format      ::OutputFormat = pre_json
+    out_format      ::OutputFormat = pre_json_output
 )
     function SNR_test(w, cl)
         const (baseline_2chs, water_fluo_2chs, signal_fluo_2chs) =

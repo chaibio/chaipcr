@@ -1,4 +1,8 @@
-## standard_curve.jl
+#==========================
+
+     standard_curve.jl
+
+==========================#
 
 import JSON.json
 import DataFrames: DataFrame, by
@@ -13,7 +17,7 @@ import Memento: debug, warn, error
 function act(
     ::Type{Val{standard_curve}},
     req_vec     ::Vector{Any};
-    out_format  ::OutputFormat = pre_json,
+    out_format  ::OutputFormat = pre_json_output,
     json_digits ::Integer = JSON_DIGITS,
     qty_base    ::Real = 10,
     empty_tre   ::TargetResultEle = EMPTY_TRE,
@@ -91,9 +95,9 @@ function act(
     # end ## do chunk
 
     ## report results
-    (out_format == full) && return target_result_df
+    (out_format == full_output) && return target_result_df
 
-    ## out_format != full
+    ## out_format != full_output
     ## target result set
     tre_vec = target_result_df[.!isnan.(target_result_df[:target]), 2]
     target_vec = Vector{Any}()
@@ -421,7 +425,7 @@ end
 
 function simplify(tup ::Tuple, out_format ::OutputFormat)
 println("Tuple $tup format $out_format")
-    if out_format == full
+    if out_format == full_output
         tup
     else
         Tuple([
@@ -432,7 +436,7 @@ end
 
 function simplify(vec ::Vector, out_format ::OutputFormat)
 println("Vector $vec format $out_format")
-    if out_format == full
+    if out_format == full_output
         vec
     else
         Vector([
@@ -443,7 +447,7 @@ end
 
 function simplify(dict ::Associative, out_format ::OutputFormat)
 println("Dict $dict format $out_format")
-    if out_format == full
+    if out_format == full_output
         dict
     else
         x = OrderedDict()
@@ -456,7 +460,7 @@ end
 
 function simplify(df ::DataFrame, out_format ::OutputFormat)
 println("DataFrame $df format $out_format")
-    if out_format == full
+    if out_format == full_output
         df
     else
         x = OrderedDict()
@@ -469,7 +473,7 @@ end
 
 function simplify(r ::StandardCurveResult, out_format ::OutputFormat)
 println("Result $r format $out_format")
-    if out_format == full
+    if out_format == full_output
         r
     else
         x = OrderedDict()

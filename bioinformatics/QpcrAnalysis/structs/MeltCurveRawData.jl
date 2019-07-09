@@ -1,10 +1,14 @@
-## MeltCurveRawData.jl
-##
-## currently unused:
-## a DataFrame is preferred
-##
-## Author: Tom Price
-## Date:   July 2019
+#===============================
+
+	MeltCurveRawData.jl
+
+	currently unused:
+	a DataFrame is preferred
+
+	Author: Tom Price
+	Date:   July 2019
+
+================================#
 
 
 # struct MeltCurveRawData{F} where {F <: Real}

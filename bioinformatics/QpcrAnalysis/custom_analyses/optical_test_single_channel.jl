@@ -1,4 +1,8 @@
-## optical_test_single_channel.jl
+#=====================================
+
+    optical_test_single_channel.jl
+
+=====================================#
 
 import DataStructures.OrderedDict
 import Memento.debug
@@ -21,7 +25,7 @@ function act(
     # start: arguments that might be passed by upstream code
     # well_nums ::AbstractVector =[],
     ot_dict         ::Associative;
-    out_format      ::OutputFormat = pre_json
+    out_format      ::OutputFormat = pre_json_output
 )
     debug(logger, "at act(::Type{Val{optical_test_single_channel}})")
  
