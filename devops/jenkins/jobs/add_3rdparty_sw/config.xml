@@ -425,7 +425,12 @@ sync
 sleep 30
 
 echo installing headers...
-apt-get -y -q install linux-headers-`uname -r` || exit 1
+uname=`uname -r`
+echo uname=$uname
+uname_updated=$(echo &quot;$uname&quot; | sed &quot;s/chai-//&quot;)
+echo updated to $uname_updated
+
+apt-get -y -q install linux-headers-$uname_updated || exit 1
 apt-get install -y -q cmake || exit 1
 sync
 sleep 30
@@ -819,9 +824,10 @@ then
       echo Building a debug image
       exit 0
 fi
-
-rm -r /var/cache/apt /var/log/ /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/tests
-mkdir /var/log/ -p
+rm /var/log/* ||  true
+rm -r /var/cache/apt /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/tests ||  true
+mkdir /var/log/ -p ||  true
+#chmod 777 /var/log ||  true
 
 # remove part of .git folder to save more space. Keeping the .git/objects folder under the packages because Pkg.status() verify the package number from there. An extra chance to save space is available here by cherry pick the exact file needed by Pkg.status().
 
