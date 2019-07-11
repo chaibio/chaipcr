@@ -1,0 +1,261 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Building chaibio initial debian image. Reference: https://github.com/RobertCNelson/bb-kernel</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.28.0">
+      <projectUrl>https://github.com/chaibio/bb-linux-kernel.git/</projectUrl>
+      <displayName></displayName>
+    </com.coravy.hudson.plugins.github.GithubProjectProperty>
+    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.17.2">
+      <optOut>false</optOut>
+    </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>download_prefix</name>
+          <description>Jenkins server download postfix</description>
+          <defaultValue>10.0.1.20/download</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>echo install build tools
+sudo apt-get update
+sudo apt-get -y install lzma lzop bison flex pkg-config libmpc-dev u-boot-tools libncurses5-dev:amd64 libssl-dev:amd64
+sudo apt-get -y install mdadm
+sudo apt-get -y install xz-utils
+
+#sudo apt-get -y install git build-essential kernel-package fakeroot libncurses5-dev libssl-dev ccache bison flex
+
+
+
+</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>echo building kernel
+git clone https://github.com/chaibio/bb-linux-kernel.git
+cd bb-linux-kernel
+
+git checkout origin/chai-linux-4.9.y -b tmp
+echo building kernel
+
+cat &gt;&gt; build_kernel.sh &lt;&lt; EOF
+export kernel_version=&quot;\${KERNEL_UTS}&quot;
+echo &quot;setting kernel version to \$kernel_version&quot;
+echo  &quot;\$kernel_version&quot; &gt; ../kernel_version.info
+EOF
+mkdir -p /var/lib/jenkins/.config/git/ || true
+sudo chmod 777 /var/lib/jenkins/.config/git/
+sudo chmod 777 /var/lib/jenkins/*
+
+
+sudo chmod 777 /tmp
+sudo chmod 777 /tmp/*
+export AUTO_BUILD=1
+time ./build_kernel.sh
+</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>export image_filename=bone-debian-9.3-console-armhf-2017-12-10-1gb.img
+export image_filename_xz=$image_filename.xz
+rm $image_filename || true
+rm $image_filename_xz || true
+wget $download_prefix/$image_filename_xz || exit 1
+kernel_version=$(cat kernel_version.info)
+filename=debian-sdcard-$kernel_version.img
+rm $filename || true
+unxz $image_filename_xz
+ls -ahl $image_filename || exit 1
+mv $image_filename $filename
+
+</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>kernel_version=$(cat kernel_version.info)
+filename=debian-sdcard-$kernel_version.img
+output_device=$filename
+export PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/share/rvm/bin
+
+fileext=${filename##*.}
+sdcard_image_file=$output_device
+
+echo mounting sdcard image
+loopdev=$(/sbin/losetup -f)
+if [ $? -gt 0 ]
+then
+   	echo &quot;Error creating a block device for $sdcard_image_file! No free loop devices handle. Please restart PC.&quot;
+   	exit 1
+fi
+
+set +e
+loopdev_success=false
+pwd
+for i in `seq 1 100`
+do
+	echo creating the loop device $loopdev
+	if [ -e $loopdev ]
+	then
+		echo $loopdev is taken.
+       	loopdev=&quot;/dev/loop4$i&quot;
+		continue
+	fi
+    sync
+    sleep 2
+
+	echo &quot;sudo losetup $loopdev $sdcard_image_file&quot;
+    sudo losetup -v $loopdev $sdcard_image_file
+   	if [ $? -gt 0 ]
+    then
+        loopdev=&quot;/dev/loop5$i&quot;
+		echo error creating loop device.. trying another.
+    		continue
+		else
+			loopdev_success=true
+		break
+    fi
+done
+
+if ! $loopdev_success
+then
+	echo &quot;Error creating a block device for $sdcard_image_file!&quot;
+	exit 1
+fi
+sudo chmod 777 $loopdev
+sudo partprobe $loopdev || true
+set -e
+output_device=$loopdev
+echo $loopdev &gt; loopdevice.info
+
+
+export DISK=$output_device
+
+echo Mount Partition:
+echo On most systems these partitions may will be auto-mounted...
+
+sudo mkdir -p /media/rootfs/  || true
+sudo chmod 777 /media/rootfs/  || true
+umount /media/rootfs/  || true
+sudo mount ${DISK}p1 /media/rootfs/
+
+</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>echo Set uname_r in /boot/uEnv.txt
+kernel_version=$(cat kernel_version.info)
+sed -i &quot;s/uname_r/#old kernel uname_r/&quot; /media/rootfs/boot/uEnv.txt || true
+sudo sh -c &quot;echo &apos;uname_r=${kernel_version}&apos; &gt;&gt; /media/rootfs/boot/uEnv.txt&quot;
+
+echo Copy Kernel Image
+sudo cp -v ./bb-linux-kernel/deploy/${kernel_version}.zImage /media/rootfs/boot/vmlinuz-${kernel_version}
+sudo cp bb-linux-kernel/KERNEL/.config /media/rootfs/boot/config-$kernel_version
+
+echo Copy Kernel Device Tree Binaries
+sudo mkdir -p /media/rootfs/boot/dtbs/${kernel_version}/
+sudo tar xfv ./bb-linux-kernel/deploy/${kernel_version}-dtbs.tar.gz -C /media/rootfs/boot/dtbs/${kernel_version}/
+
+echo Copy Kernel Modules
+sudo tar xfv ./bb-linux-kernel/deploy/${kernel_version}-modules.tar.gz -C /media/rootfs/
+</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>kernel_version=$(cat kernel_version.info)
+loopdev=$(cat loopdevice.info)
+filename=debian-sdcard-$kernel_version.img
+output_device=$filename
+export DISK=$loopdev
+
+echo Remove microSD/SD card
+sync
+sudo umount /media/rootfs || true
+sync
+
+#rm -r  bb-linux-kernel gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf.tar.xz gcc-linaro-6.5.0-2018.12-x86_64_arm-linux-gnueabihf u-boot $output_device debian-9.8-minimal-armhf-2019-02-16*  || true
+if [ -e $DISK ]
+then
+#    umount $DISK || true
+	sync
+	sleep 2
+	fuser -m $DISK* --all -u -v -k  || true
+	mdadm --stop $DISK  || true
+fi
+
+if [ -e $DISK ]
+then
+	losetup -d $DISK  || true
+fi
+
+mkdir -p  /usr/share/nginx/html/download/ || true
+xz $filename
+cp -sf $filename.xz debian-sdcard-chai-latest.img.xz || true
+
+ls -ahl
+mv $filename* /usr/share/nginx/html/download/
+
+if [ -e $DISK ]
+then
+	rm $DISK  || true
+fi
+if [ -e $DISK ]
+then
+	rm $DISK  || true
+fi
+    
+    
+kernel_image_url=&quot;http://10.0.1.20/download/$filename.xz&quot;    
+    
+cat &lt;&lt; EOF &gt; build_report.xml
+&lt;section name=&quot;&quot; fontcolor=&quot;&quot;&gt;
+    // To display a field
+    &lt;field name=&quot;Kernel Image&quot; titlecolor=&quot;&quot; value=&quot;Download&quot; detailcolor=&quot;&quot; href=&quot;$kernel_image_url&quot;&gt; 
+    &lt;![CDATA[ 
+Kernel image (${kernel_image_url}) &lt;a href=&quot;$kernel_image_url&quot; download=&quot;$filename&quot;&gt;Download&lt;/a&gt;
+    ]]&gt; &lt;/field&gt;
+&lt;/section&gt;
+EOF
+
+echo All Done
+    
+    </command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>*.xml</artifacts>
+      <allowEmptyArchive>true</allowEmptyArchive>
+      <onlyIfSuccessful>true</onlyIfSuccessful>
+      <fingerprint>false</fingerprint>
+      <defaultExcludes>true</defaultExcludes>
+      <caseSensitive>true</caseSensitive>
+    </hudson.tasks.ArtifactArchiver>
+    <hudson.plugins.summary__report.ACIPluginPublisher plugin="summary_report@1.15">
+      <name>*.xml</name>
+      <shownOnProjectPage>true</shownOnProjectPage>
+    </hudson.plugins.summary__report.ACIPluginPublisher>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.34">
+      <deleteDirs>false</deleteDirs>
+      <cleanupParameter></cleanupParameter>
+      <externalDelete></externalDelete>
+    </hudson.plugins.ws__cleanup.PreBuildCleanup>
+    <hudson.plugins.build__timeout.BuildTimeoutWrapper plugin="build-timeout@1.18">
+      <strategy class="hudson.plugins.build_timeout.impl.NoActivityTimeOutStrategy">
+        <timeoutSecondsString>108000</timeoutSecondsString>
+      </strategy>
+      <operationList/>
+    </hudson.plugins.build__timeout.BuildTimeoutWrapper>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.8"/>
+  </buildWrappers>
+</project>
