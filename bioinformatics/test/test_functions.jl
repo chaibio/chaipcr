@@ -1,15 +1,10 @@
-#==============================================================================================
-
-    test_functions.jl
-
-    Author: Tom Price
-    Date: Dec 2018
-
-    automated test script for Julia API
-    this code should be run at startup in fresh julia REPL
-
-==============================================================================================#
-
+## test_functions.jl
+#
+## Author: Tom Price
+## Date: Dec 2018
+#
+## automated test script for Julia API
+## this code should be run at startup in fresh julia REPL
 
 const BBB = match(r"beaglebone", readlines(`uname -a`)[1]) != nothing
 const RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE = false
@@ -27,12 +22,6 @@ const td = readdlm("$LOAD_FROM_DIR/../test/data/test_data.csv", ',', header=true
 const TEST_DATA = DataFrame([
     slicedim(td[1], 2, i) for i in 1:size(td[1],2)],
     map(Symbol, td[2][:]))
-
-
-#==============================================================================================
-    interactive code (development environment) >>
-==============================================================================================#
-
 
 ## example code to generate, run, and save tests
 ## BSON preferred to JLD because it can save functions and closures
@@ -85,9 +74,56 @@ end
 # @timev for i in 1:100; test_functions["thermal consistency dual channel"](); end;
 
 
-#==============================================================================================
-    interactive code (BBB) >>
-==============================================================================================#
+## Meltcurve timings
+#
+# meltcrv commit  932b24a9be5bb148074830b0fd812618234ccfc1 (don't round mc_denser)
+#  10.571982 seconds (61.91 M allocations: 8.668 GiB, 11.33% gc time)
+# elapsed time (ns): 10571982383
+# gc time (ns):      1197314629
+# bytes allocated:   9307300800
+# pool allocs:       61839800
+# non-pool GC allocs:58000
+# malloc() calls:    10900
+# realloc() calls:   600
+# GC pauses:         405
+# full collections:  2
+
+# meltcrv commit  932b24a9be5bb148074830b0fd812618234ccfc1 (remove args from nested funcs)
+#  14.142563 seconds (63.41 M allocations: 8.969 GiB, 7.87% gc time)
+# elapsed time (ns): 14142562549
+# gc time (ns):      1113163232
+# bytes allocated:   9630603200
+# pool allocs:       63321800
+# non-pool GC allocs:79700
+# malloc() calls:    12500
+# realloc() calls:   600
+# GC pauses:         419
+# full collections:  2
+
+# meltcrv commit f12f5bda9485e307481be0012fc9ec4555aed0a6 (slowest)
+# 18.955378 seconds (49.29 M allocations: 8.766 GiB, 7.62% gc time)
+# elapsed time (ns): 18955377866
+# gc time (ns):      1443815331
+# bytes allocated:   9412268800
+# pool allocs:       49198400
+# non-pool GC allocs:80300
+# malloc() calls:    12500
+# realloc() calls:   600
+# GC pauses:         410
+# full collections:  3
+
+# master commit c39573826114c84d3a516d3ec447c83765871368
+# 9.707145 seconds (66.11 M allocations: 8.753 GiB, 12.19% gc time)
+# elapsed time (ns): 9707144763
+# gc time (ns):      1182875365
+# bytes allocated:   9398664064
+# pool allocs:       66009104
+# non-pool GC allocs:94900
+# malloc() calls:    9600
+# realloc() calls:   600
+# GC pauses:         410
+# full collections:  3
+
 
 
 ## timing tests on BBB
@@ -110,9 +146,6 @@ if (RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE & BBB)
 end
 
 
-#==============================================================================================
-    test functions >>
-==============================================================================================#
 
 
 function generate_tests(;
@@ -168,10 +201,6 @@ function generate_tests(;
     return test_functions
 end
 
-
-#=============================================================================================#
-
-
 ## generate script to call test functions
 ## to precompile julia routines for BBB
 function generate_test_script(outfile ::String)
@@ -194,10 +223,6 @@ function generate_test_script(outfile ::String)
         """)
     end ## close file
 end ## generate_test_script()
-
-
-#=============================================================================================#
-
 
 ## write dispatch calls for generate_test_script()
 function write_dispatch_calls(f)
@@ -228,10 +253,6 @@ function write_dispatch_calls(f)
     end ## next action (i)
 end ## write_dispatch_calls()
 
-
-#=============================================================================================#
-
-
 ## run test functions
 ## returns true for every test that runs without errors
 function test_dispatch(test_functions ::Associative)
@@ -250,65 +271,6 @@ function time_dispatch(test_functions ::Associative)
         testname => result[1] && result[2]["valid"]
     end)
 end
-
-
-#==============================================================================================
-    results >>
-==============================================================================================#
-
-
-## Meltcurve timings
-#
-# meltcrv commit  932b24a9be5bb148074830b0fd812618234ccfc1 (don't round mc_denser)
-#  10.571982 seconds (61.91 M allocations: 8.668 GiB, 11.33% gc time)
-# elapsed time (ns): 10571982383
-# gc time (ns):      1197314629
-# bytes allocated:   9307300800
-# pool allocs:       61839800
-# non-pool GC allocs:58000
-# malloc() calls:    10900
-# realloc() calls:   600
-# GC pauses:         405
-# full collections:  2
-
-# meltcrv commit  932b24a9be5bb148074830b0fd812618234ccfc1 (remove args from nested funcs)
-#  14.142563 seconds (63.41 M allocations: 8.969 GiB, 7.87% gc time)
-# elapsed time (ns): 14142562549
-# gc time (ns):      1113163232
-# bytes allocated:   9630603200
-# pool allocs:       63321800
-# non-pool GC allocs:79700
-# malloc() calls:    12500
-# realloc() calls:   600
-# GC pauses:         419
-# full collections:  2
-
-# meltcrv commit f12f5bda9485e307481be0012fc9ec4555aed0a6 (slowest)
-# 18.955378 seconds (49.29 M allocations: 8.766 GiB, 7.62% gc time)
-# elapsed time (ns): 18955377866
-# gc time (ns):      1443815331
-# bytes allocated:   9412268800
-# pool allocs:       49198400
-# non-pool GC allocs:80300
-# malloc() calls:    12500
-# realloc() calls:   600
-# GC pauses:         410
-# full collections:  3
-
-# master commit c39573826114c84d3a516d3ec447c83765871368
-# 9.707145 seconds (66.11 M allocations: 8.753 GiB, 12.19% gc time)
-# elapsed time (ns): 9707144763
-# gc time (ns):      1182875365
-# bytes allocated:   9398664064
-# pool allocs:       66009104
-# non-pool GC allocs:94900
-# malloc() calls:    9600
-# realloc() calls:   600
-# GC pauses:         410
-# full collections:  3
-
-
-#=============================================================================================#
 
 
 # BBB results 2019-01-07

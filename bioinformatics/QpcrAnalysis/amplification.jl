@@ -1,4 +1,4 @@
-#==============================================================================================
+#==============================================================================
 
     amplification.jl
 
@@ -8,7 +8,7 @@
     the code assumes only 1 step/ramp because the current data format
     does not allow us to break the fluorescence data down by step_id/ramp_id
 
-==============================================================================================#
+===============================================================================#
 
 import JSON: parse
 import DataStructures.OrderedDict
@@ -17,11 +17,7 @@ import Memento: debug, warn, error
 using Ipopt
 
 
-#==============================================================================================
-    field names >>
-==============================================================================================#
-
-
+## field names
 const KWARGS_AMP_KEYS =
     ["min_reliable_cyc", "baseline_cyc_bounds", "ctrl_well_dict",
         CQ_METHOD_KEY, CATEG_WELL_VEC_KEY]
@@ -31,13 +27,10 @@ const KWARGS_RCQ_KEYS_DICT = Dict(
     "min_D2max"     => :max_dr2_lb)
 
 
-#==============================================================================================
-    function definitions >>
-==============================================================================================#
-
+## function definitions >>
 
 ## function called by dispatch()
-## parses request body into AmpInput struct and calls amp_analysis()
+## parses request body into AmpInput struct and calls do_amplification()
 function act(
     ::Type{Val{amplification}},
     req_dict        ::Associative;
@@ -108,8 +101,8 @@ function act(
         end) ## map
     #
     ## create container for data and parameters
-    ## to pass to amp_analysis()
-    const interface = AmpInput(
+    ## to pass to do_amplification()
+    const amp = AmpInput(
         parsed_raw_data...,
         calibration_data,
         IpoptSolver(print_level = 0, max_iter = 35),
@@ -142,7 +135,7 @@ function act(
         #     OrderedDict(
         #         map([ asrp_vec[1] ]) do asrp
         #             join([asrp.step_or_ramp, asrp.id], "_") =>
-        #                 amp_analysis(
+        #                 do_amplification(
         #                     # remove MySql dependency
         #                     # db_conn, exp_id, asrp, calib_info,
         #                     # fluo_well_nums, well_nums,
@@ -161,7 +154,7 @@ function act(
         #                 key => getfield(first_sr_out, key)
         #             end)
         # end
-        const first_sr_out = amp_analysis(interface)
+        const first_sr_out = do_amplification(amp)
         OrderedDict([
             map(fieldnames(first_sr_out)) do key
                 key => getfield(first_sr_out, key)
@@ -215,7 +208,7 @@ function amp_parse_raw_data(req_dict ::Associative)
     const well_perm = sortperm(fluo_well_nums)
     const chan_perm = sortperm(channel_nums)
     return (
-        RawFluo{F}(raw_data[cyc_perm, well_perm, chan_perm]),
+        RawData{F}(raw_data[cyc_perm, well_perm, chan_perm]),
         num_cycs,
         num_fluo_wells,
         num_channels,
@@ -229,8 +222,8 @@ end ## amp_parse_raw_data()
 
 
 ## analyse amplification per step/ramp
-function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
-    debug(logger, "at amp_analysis()")
+function do_amplification(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
+    debug(logger, "at do_amplification()")
     ## deconvolute and normalize
     const calibration_results =
         calibrate(
@@ -263,18 +256,81 @@ function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
         ## qt_fluos
         set_qt_fluos!(i, o, i.qt_prob)
         ## report_cq
-        set_fieldname_rcq!(i, o)
+        set_fieldname_rcq!(i, o, kwargs_rcq(i))
     end ## if
     #
     ## allelic discrimination
     # if dcv
     #     o.assignments_adj_labels_dict, o.agr_dict =
-    #         process_ad(i, o)
+    #         process_ad(
+    #             o,
+    #             kwargs_ad...)
     # end # if dcv
     #
     ## format output
     return o
-end ## amp_analysis()
+end ## do_amplification()
+
+
+#=============================================================================================#
+
+
+## helper functions >>
+
+amp_init(i ::AmpInput, x...) = fill(x..., i.num_fluo_wells, i.num_channels)
+
+## baseline estimation parameters
+kwargs_bl(i ::AmpInput) =
+    Dict{Symbol,Any}(
+        :bl_method          => i.bl_method,
+        :bl_fallback_func   => i.bl_fallback_func,
+        :min_reliable_cyc   => i.min_reliable_cyc,
+    )
+
+## quantitation parameters
+kwargs_quant(i ::AmpInput) =
+    Dict{Symbol,Any}(
+        :cq_method          => i.cq_method,
+        :denser_factor      => i.denser_factor,
+    )
+
+## arguments for report_cq!()
+kwargs_rcq(i ::AmpInput) =
+    Dict{Symbol,Any}(
+        :before_128x        => i.before_128x,
+        :max_dr1_lb         => i.max_dr1_lb,
+        :max_dr2_lb         => i.max_dr2_lb,
+        :max_bsf_lb         => i.max_bsf_lb,
+        :scaled_max_dr1_lb  => i.scaled_max_dr1_lb,
+        :scaled_max_dr2_lb  => i.scaled_max_dr2_lb,
+        :scaled_max_bsf_lb  => i.scaled_max_bsf_lb,
+    )
+
+## arguments for process_ad()
+kwargs_ad(i ::AmpInput) =
+    Dict{Symbol,Any}(
+        :ctrl_well_dict     => i.ctrl_well_dict,
+        # :cluster_method     => i.cluster_method,
+        # :norm_l             => i.norm_l,
+        # :encgr              => i.encgr,
+        # :categ_well_vec     => i.categ_well_vec
+    )
+
+function check_bl_cyc_bounds(
+    i               ::AmpInput,
+    bl_cyc_bounds   ::Union{Vector{I},Array{Vector{I},2}} where {I <: Integer},
+)
+    debug(logger, "at check_bl_cyc_bounds()")
+    (i.num_cycs <= 2) && return bl_cyc_bounds
+    const size_bcb = size(bl_cyc_bounds)
+    if size_bcb == (0,) || size_bcb == (2,)
+        return amp_init(i, bl_cyc_bounds)
+    elseif size_bcb == (i.num_fluo_wells, i.num_channels) &&
+        eltype(bl_cyc_bounds) <: AbstractVector ## final format of `baseline_cyc_bounds`
+            return bl_cyc_bounds
+    end
+    throw(ArgumentError("`baseline_cyc_bounds` is not in the right format"))
+end ## check_bl_cyc_bounds()
 
 
 #=============================================================================================#
@@ -297,23 +353,19 @@ function calc_ct_fluos(
     map(1:i.num_channels) do channel_i
         const fits =
             map(1:i.num_fluo_wells) do well_i
-                # const kw_bl =
-                #     Dict{Symbol, Any}(
-                #         baseline_cyc_bounds => baseline_cyc_bounds[well_i, channel_i],
-                #         kwargs_bl(i)...)
+                const kw_bl =
+                    Dict{Symbol, Any}(
+                        baseline_cyc_bounds => baseline_cyc_bounds[well_i, channel_i],
+                        kwargs_bl(i)...)
                 const fluos = o.rbbs_3ary[:, well_i, channel_i]
                 fit_amplification_model(
                     Val{SFCModel},
                     AmpCqFluoModelResults,
                     i,
-                    # fluos;
-                    # kw_bl..., ## parameters that apply only when fitting SFC models
-                    # cq_method = cp_dr1,
-                    # ct_fluo = NaN)
-                    fluos,
-                    bl_cyc_bounds[well_i, channel_i],
-                    cp_dr1, ## cq_method
-                    NaN) ## i.ct_fluo
+                    fluos;
+                    kw_bl..., ## parameters that apply only when fitting SFC models
+                    cq_method = :cp_dr1,
+                    ct_fluo = NaN)
             end ## do well_i
         fits |>
             mold(field(:quant_status)) |>
@@ -331,7 +383,7 @@ function find_idc_useful(postbl_stata ::AbstractVector)
     (length(idc_useful) > 0) && return idc_useful
     idc_useful = find(postbl_stata .== :UserLimit)
     (length(idc_useful) > 0) && return idc_useful
-    return eachindex(postbl_stata)
+    return 1:length(postbl_stata)
 end ## find_idc_useful()
 
 
@@ -353,25 +405,21 @@ function calc_fit_array2(
                 const ipopt_file = string(join([prefix, channel_i, well_i], '_')) * ".txt"
                 push!(solver.options, (:output_file, ipopt_file))
             end
-            # const kw_bl =
-            #     i.amp_model == SFCModel ?
-            #         Dict{Symbol, Any}(
-            #             :baseline_cyc_bounds => bl_cyc_bounds[well_i, channel_i],
-            #             kwargs_bl(i)...) :
-            #         Dict{Symbol, Any}()
+            const kw_bl =
+                i.amp_model == SFCModel ?
+                    Dict{Symbol, Any}(
+                        :baseline_cyc_bounds => bl_cyc_bounds[well_i, channel_i],
+                        kwargs_bl(i)...) :
+                    Dict{Symbol, Any}()
             const fluos = o.rbbs_3ary[:, well_i, channel_i]
             fit_amplification_model(
                 Val{SFCModel},
                 i.amp_model_results,
                 i,
-                # fluos;
-                # kw_bl...,
-                # kwargs_quant(i)...,
-                # ct_fluo = o.ct_fluos[channel_i])
-                fluos,
-                bl_cyc_bounds[well_i, channel_i],
-                i.cq_method,
-                o.ct_fluos[channel_i])
+                fluos;
+                kw_bl...,
+                kwargs_quant(i)...,
+                ct_fluo = o.ct_fluos[channel_i])
         end
         for well_i in 1:i.num_fluo_wells, channel_i in 1:i.num_channels
     ]
@@ -438,10 +486,11 @@ set_qt_fluos!(
 function set_fieldname_rcq!(
     i                       ::AmpInput, 
     o                       ::AmpLongOutput, 
+    kwargs_rcq              ::Associative,
 )
     debug(logger, "at set_fieldname_rcq!()")
     for well_i in 1:i.num_fluo_wells, channel_i in 1:i.num_channels
-        report_cq!(i, o, well_i, channel_i)
+        report_cq!(o, well_i, channel_i; kwargs_rcq...)
     end
     return nothing ## side effects only
 end ## set_fieldname_rcq!()
@@ -450,20 +499,25 @@ end ## set_fieldname_rcq!()
 set_fieldname_rcq!(
     i                       ::AmpInput, 
     o                       ::AmpShortOutput,
+    kwargs_rcq              ::Associative,
 ) =
     nothing
 
 
 function report_cq!(
-    i                       ::AmpInput, 
     o                       ::AmpLongOutput,
     well_i                  ::Integer,
-    channel_i               ::Integer,
+    channel_i               ::Integer;
+    before_128x             ::Bool = DEFAULT_AMP_BEFORE_128X,
+    max_dr1_lb              ::Integer = DEFAULT_AMP_MAX_DR1_LB,
+    max_dr2_lb              ::Integer = DEFAULT_AMP_MAX_DR2_LB,
+    max_bsf_lb              ::Integer = DEFAULT_AMP_MAX_BSF_LB,
+    scaled_max_dr1_lb       ::AbstractFloat = DEFAULT_AMP_SCALED_MAX_DR1_LB,
+    scaled_max_dr2_lb       ::AbstractFloat = DEFAULT_AMP_SCALED_MAX_DR2_LB,
+    scaled_max_bsf_lb       ::AbstractFloat = DEFAULT_AMP_SCALED_MAX_BSF_LB,
 )
-    if i.before_128x
-        max_dr1_lb, max_dr2_lb, max_bsf_lb = [i.max_dr1_lb, i.max_dr2_lb, i.max_bsf_lb] ./ 128
-    else
-        max_dr1_lb, max_dr2_lb, max_bsf_lb = i.max_dr1_lb, i.max_dr2_lb, i.max_bsf_lb
+    if before_128x
+        max_dr1_lb, max_dr2_lb, max_bsf_lb = [max_dr1_lb, max_dr2_lb, max_bsf_lb] ./ 128
     end
     #
     const num_cycs = size(o.raw_data, 1)
@@ -474,15 +528,15 @@ function report_cq!(
     const max_bsf = maximum(o.blsub_fluos[:, well_i, channel_i])
     const b_ = full_amp_out.coefs[1, well_i, channel_i]
     const (scaled_max_dr1, scaled_max_dr2, scaled_max_bsf) =
-        [max_dr1, max_dr2, max_bsf] ./ o.max_qt_fluo
+        [max_dr1, max_dr2, max_bsf] ./ full_amp_out.max_qt_fluo
     const why_NaN =
         if postbl_status == :Error
             "postbl_status == :Error"
         elseif b_ > 0
             "b > 0"
-        elseif o.cq_method == ct && o.cq_raw == AMP_CT_VAL_DOMAINERROR
+        elseif o.cq_method == :ct && cq_raw == AMP_CT_VAL_DOMAINERROR
             "DomainError when calculating Ct"
-        elseif o.cq_raw <= 0.1 || o.cq_raw >= num_cycs
+        elseif cq_raw <= 0.1 || cq_raw >= num_cycs
             "cq_raw <= 0.1 || cq_raw >= num_cycs"
         elseif max_dr1 < max_dr1_lb
             "max_dr1 $max_dr1 < max_dr1_lb $max_dr1_lb"
@@ -490,12 +544,12 @@ function report_cq!(
             "max_dr2 $max_dr2 < max_dr2_lb $max_dr2_lb"
         elseif max_bsf < max_bsf_lb
             "max_bsf $max_bsf < max_bsf_lb $max_bsf_lb"
-        elseif scaled_max_dr1 < i.scaled_max_dr1_lb
-            "scaled_max_dr1 $scaled_max_dr1 < scaled_max_dr1_lb $(i.scaled_max_dr1_lb)"
-        elseif scaled_max_dr2 < i.scaled_max_dr2_lb
-            "scaled_max_dr2 $scaled_max_dr2 < scaled_max_dr2_lb $(i.scaled_max_dr2_lb)"
-        elseif scaled_max_bsf < i.scaled_max_bsf_lb
-            "scaled_max_bsf $scaled_max_bsf < scaled_max_bsf_lb $(i.scaled_max_bsf_lb)"
+        elseif scaled_max_dr1 < scaled_max_dr1_lb
+            "scaled_max_dr1 $scaled_max_dr1 < scaled_max_dr1_lb $scaled_max_dr1_lb"
+        elseif scaled_max_dr2 < scaled_max_dr2_lb
+            "scaled_max_dr2 $scaled_max_dr2 < scaled_max_dr2_lb $scaled_max_dr2_lb"
+        elseif scaled_max_bsf < scaled_max_bsf_lb
+            "scaled_max_bsf $scaled_max_bsf < scaled_max_bsf_lb $scaled_max_bsf_lb"
         else
             ""
         end ## why_NaN

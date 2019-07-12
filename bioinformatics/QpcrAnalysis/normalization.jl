@@ -92,7 +92,7 @@ function prep_normalize(
     const (channels_in_water, channels_in_signal) =
         map(get_ordered_keys, (water_data_dict, signal_data_dict))
     ## assume without checking that there are no missing wells anywhere
-    const signal_well_nums = collect(eachindex(signal_data_dict[1]))
+    const signal_well_nums = collect(1:length(signal_data_dict[1]))
     ## check whether signal fluorescence > water fluorescence
     for channel in channels_in_signal
         const norm_invalid_idc = find(signal_data_dict[channel] .<= water_data_dict[channel])

@@ -91,7 +91,7 @@ function add_func_fit!( ## vco = variable constraints objective
     end
     #
     residual_str = "($func_str_replaced - $Y_str[i])"
-    iter_str = "for i in eachindex($(X_strs[1]))" ## assuming X and Y have the same length
+    iter_str = "for i in 1:length($(X_strs[1]))" ## assuming X and Y have the same length
     #
     if obj_algrt == :RSS
         obj_expr_str = "sum(wts[i] * $residual_str^2 $iter_str)"

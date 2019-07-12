@@ -1,6 +1,6 @@
 #==============================================
 
-    RawFluo.jl
+    RawData.jl
 
     struct containing raw fluorescence data
     from amplification experiment
@@ -12,8 +12,8 @@
 
 import DataArrays.DataArray
 
-abstract type AbstractRawFluo end
+abstract type AbstractRawData end
 
-struct RawFluo{F <: Real} <: AbstractRawFluo
+struct RawData{F <: Real} <: AbstractRawData
     fluorescence ::DataArray{F,3}
 end
