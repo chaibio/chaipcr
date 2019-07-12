@@ -7,7 +7,7 @@
 ==============================================================================================#
 
 import DataStructures.OrderedDict
-import DataArrays.DataArray
+# import DataArrays.DataArray
 import DataFrames.DataFrame
 import StatsBase: rle
 import Dierckx: Spline1D, derivative
@@ -31,11 +31,13 @@ function mc_peak_analysis(
             for key in keys(tf_dict))
 
     ## temperature intervals
-    temperature_intervals(temperatures_orig ::DataArray{<: AbstractFloat,1}) =
+    # temperature_intervals(temperatures_orig ::DataArray{<: AbstractFloat,1}) =
+    temperature_intervals(temperatures_orig ::Array{<: AbstractFloat,1}) =
         vcat(diff(temperatures_orig), Inf)
 
     ## filter datapoints
-    not_too_close(temp_intervals ::DataArray{<: AbstractFloat,1}) =
+    # not_too_close(temp_intervals ::DataArray{<: AbstractFloat,1}) =
+    not_too_close(temp_intervals ::Array{<: AbstractFloat,1}) =
         temp_intervals .> i.temp_too_close_frac * median(temp_intervals)
 
     ## functions used to calculate `span_smooth` >>
@@ -296,7 +298,7 @@ function mc_peak_analysis(
         const areas_raw = map(field(:area), peaks_raw)
         const min_area = areas_raw[largest_peak] * i.min_normalized_area
         const largest_idc = area_order[range(1, min(i.max_num_peaks + 1, num_peaks))]
-        const filtered_idc = find(largest_idc) do idx
+        const filtered_idc = filter(largest_idc) do idx
             areas_raw[idx] >= min_area
         end
         return length(filtered_idc) > i.max_num_peaks ? [] : filtered_idc
@@ -312,7 +314,8 @@ function mc_peak_analysis(
     const (temperatures, fluos) =
         tf_dict |>
         filter_too_close |>
-        tf -> (mutate_dups(tf[:temperatures].data, i.jitter_constant), tf[:fluos])
+        # tf -> (mutate_dups(tf[:temperatures].data, i.jitter_constant), tf[:fluos])
+        tf -> (mutate_dups(tf[:temperatures], i.jitter_constant), tf[:fluos])
     const len_raw = length(temperatures)
     #
     ## negative derivative by central finite differencing (cfd)
@@ -355,7 +358,7 @@ function mc_peak_analysis(
     #
     ## return smoothed data if no peaks
     if num_peaks == 0
-        return output_type = Type{McPeakLongOutput} ?
+        return output_type == McPeakLongOutput ?
             McPeakOutput(
                 McPeakLongOutput;
                 observed_data       = i.reporting(observed_data),
@@ -370,18 +373,18 @@ function mc_peak_analysis(
     ## keep only the biggest peak(s)
     const area_order = sortperm(map(field(:area), peaks_raw), rev = true)
     const peaks_filtered = peaks_raw[peak_filter()]
-    return output_type == Type{McPeakLongOutput} ?
+    return output_type == McPeakLongOutput ?
         McPeakLongOutput(
-            observed_data,
-            peaks_filtered,
+            i.reporting(observed_data),
+            i.reporting(peaks_filtered),
             smoothed_data,
             negderiv_midrange,
             sn_dict,
-            peaks_raw[area_order],
+            i.reporting(peaks_raw[area_order]),
             length(peaks_filtered) > 0) :
         McPeakShortOutput(
-            observed_data,
-            peaks_filtered)
+            i.reporting(observed_data),
+            i.reporting(peaks_filtered))
 
 end ## mc_peak_analysis()
 
@@ -416,7 +419,7 @@ function mutate_dups(
     accumulator1 = 0
     accumulator2 = 0
     for i in eachindex(dups) 
-        multiway_tie  = i > 1 && dups[i] - dups[i-1] == 1
+        multiway_tie  = i > 1 && dups[i] - dups[i - 1] == 1
         accumulator1 += multiway_tie
         accumulator2  = multiway_tie ? accumulator2 : accumulator1
         rank = accumulator1 - accumulator2 + 1

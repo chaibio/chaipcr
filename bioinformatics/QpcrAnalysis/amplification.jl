@@ -109,6 +109,7 @@ function act(
     #
     ## create container for data and parameters
     ## to pass to amp_analysis()
+    const amp_output = AmpOutputOption(out_format)
     const interface = AmpInput(
         parsed_raw_data...,
         calibration_data,
@@ -117,7 +118,7 @@ function act(
         DEFAULT_AMP_DCV && parsed_raw_data[4] > 1, ## dcv && num_channels > 1
         DEFAULT_AMP_MODEL,
         # true,
-        AmpOutputOption(out_format),
+        amp_output,
         roundoff(JSON_DIGITS);
         kw_bl...,
         kw_amp...,
@@ -215,7 +216,7 @@ function amp_parse_raw_data(req_dict ::Associative)
     const well_perm = sortperm(fluo_well_nums)
     const chan_perm = sortperm(channel_nums)
     return (
-        RawFluo{F}(raw_data[cyc_perm, well_perm, chan_perm]),
+        RawData{F}(raw_data[cyc_perm, well_perm, chan_perm]),
         num_cycs,
         num_fluo_wells,
         num_channels,
@@ -472,7 +473,7 @@ function report_cq!(
             fieldname -> getfield(o, fieldname)[well_i, channel_i]
         end
     const max_bsf = maximum(o.blsub_fluos[:, well_i, channel_i])
-    const b_ = full_amp_out.coefs[1, well_i, channel_i]
+    const b_ = o.coefs[1, well_i, channel_i]
     const (scaled_max_dr1, scaled_max_dr2, scaled_max_bsf) =
         [max_dr1, max_dr2, max_bsf] ./ o.max_qt_fluo
     const why_NaN =

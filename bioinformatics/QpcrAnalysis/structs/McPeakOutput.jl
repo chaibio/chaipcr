@@ -31,18 +31,18 @@ abstract type McPeakOutput end
 
 struct McPeakLongOutput <: McPeakOutput
     observed_data       ::Array{Float_T,2} ## needs to be typed
-    peaks_filtered      ::Vector{Peak}
+    peaks_filtered      ::Array{Float_T,2} ## needs to be typed
     smoothed_data       ::Array{Float_T,2} ## needs to be typed
     negderiv_midrange   ::Float_T
     extrema             ::Dict{Symbol,Array{Float_T,2}}
-    peaks_raw           ::Vector{Peak}
+    peaks_raw           ::Array{Float_T,2} ## needs to be typed
     peaks_reported      ::Bool
 end
 
 
 struct McPeakShortOutput <: McPeakOutput
-    observed_data       ::Array{Float_T,2}
-    peaks_filtered      ::Vector{Peak}
+    observed_data       ::Array{Float_T,2} ## needs to be typed
+    peaks_filtered      ::Array{Float_T,2} ## needs to be typed
 end
 
 
@@ -54,11 +54,11 @@ end
 McPeakOutput(
     ::Type{McPeakLongOutput};
     observed_data       ::Array{Float_T,2}              = EMPTY_data,
-    peaks_filtered      ::Vector{Peak}                  = [],
+    peaks_filtered      ::Array{Float_T,2}              = EMPTY_peaks,
     smoothed_data       ::Array{Float_T,2}              = EMPTY_data,
     negderiv_midrange   ::Float_T                       = NaN,
     extremes            ::Dict{Symbol,Array{Float_T,2}} = EMPTY_sn,
-    peaks_raw           ::Vector{Peak}                  = [],
+    peaks_raw           ::Array{Float_T,2}              = EMPTY_peaks,
     peaks_reported      ::Bool                          = false,
 ) =
     McPeakFullOutput(
@@ -74,7 +74,7 @@ McPeakOutput(
 McPeakOutput(
     ::Type{McPeakShortOutput};
     observed_data       ::Array{Float_T,2}              = EMPTY_data,
-    peaks_filtered      ::Vector{Peak}                  = [],
+    peaks_filtered      ::Array{Float_T,2}              = EMPTY_peaks,
 ) =
     McPeakShortOutput(
         observed_data,

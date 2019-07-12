@@ -62,7 +62,7 @@ module QpcrAnalysis
 
     ## struct definitions for:
     ## calibration
-    include("structs/RawFluo.jl")
+    include("structs/RawData.jl")
     include("structs/CalibrationData.jl")
     ## deconvolution
     include("structs/K4Deconv.jl")
