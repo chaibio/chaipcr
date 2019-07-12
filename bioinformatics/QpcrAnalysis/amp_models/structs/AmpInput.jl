@@ -1,9 +1,9 @@
-#=============================================================
+#==============================================================================================
 
     AmpInput.jl
 
     struct of data and all analysis parameters
-    to be passed to do_amplification() in amplification.jl
+    to be passed to amp_analysis() in amplification.jl
 
     the constructor is intended as the only interface
     to the amplification analysis and the only place
@@ -12,13 +12,15 @@
     Author: Tom Price
     Date:   July 2019
 
-==============================================================#
+==============================================================================================#
 
 import DataStructures.OrderedDict
 import Ipopt: IpoptSolver #, NLoptSolver
 
 
-## enums >>
+#==============================================================================================
+    enums >>
+==============================================================================================#
 
 @enum CqMethod cp_dr1 cp_dr2 Cy0 ct max_eff
 CqMethod(m ::String) = CqMethod(findfirst(map(string, instances(CqMethod)), m) - 1)
@@ -28,8 +30,10 @@ AmpOutputOption(option ::OutputFormat) =
     option == full_output ? long : short
 
 
+#==============================================================================================
+    constants >>
+==============================================================================================#
 
-## constants >>
 
 ## default for calibration
 const DEFAULT_AMP_DCV               = true
@@ -71,11 +75,14 @@ const DEFAULT_AMP_DEFAULT_ENCGR     = DEFAULT_encgr
 const DEFAULT_AMP_CATEG_WELL_VEC    = CATEG_WELL_VEC
 
 
-## structs >>
+#==============================================================================================
+    struct >>
+==============================================================================================#
+
 
 struct AmpInput{F <: Real, C <: Real, M <: AmpModel}
     ## input data
-    raw_data                ::RawData{F}
+    raw_data                ::RawFluo{F}
     num_cycs                ::Int
     num_fluo_wells          ::Int
     num_channels            ::Int
@@ -97,12 +104,14 @@ struct AmpInput{F <: Real, C <: Real, M <: AmpModel}
     reporting               ::Function
     ## keyword arguments >>
     ## SFC model fitting parameters
-    min_reliable_cyc        ::Int
-    baseline_cyc_bounds     ::Union{Vector,Array{Vector,2}}
+    SFC_model_defs          ::OrderedDict{SFCModelName, SFCModelDef}
     bl_method               ::SFCModelName
     bl_fallback_func        ::Function
-    cq_method               ::CqMethod
+    min_reliable_cyc        ::Int
+    baseline_cyc_bounds     ::Union{Vector,Array{Vector,2}}
+    quant_method            ::SFCModelName
     denser_factor           ::Int
+    cq_method               ::CqMethod
     ## argument for set_qt_fluos!()
     qt_prob                 ::Float_T
     ## arguments for report_cq!()
@@ -113,18 +122,20 @@ struct AmpInput{F <: Real, C <: Real, M <: AmpModel}
     scaled_max_bsf_lb       ::Float_T
     scaled_max_dr1_lb       ::Float_T
     scaled_max_dr2_lb       ::Float_T
-    ## arguments for process_ad!()
+    ## arguments for process_ad()
     ctrl_well_dict          ::OrderedDict{Vector{Int},Vector{Int}}
     ## ...
 end
 
 
-## methods >>
+#==============================================================================================
+    method >>
+==============================================================================================#
 
-## constructor
 
+## constructor = interface to amp_analysis()
 AmpInput{F <: Real, C <: Real, M <: AmpModel}(
-    raw_data                ::RawData{F},
+    raw_data                ::RawFluo{F},
     num_cycs                ::Integer,
     num_fluo_wells          ::Integer,
     num_channels            ::Integer,
@@ -140,13 +151,16 @@ AmpInput{F <: Real, C <: Real, M <: AmpModel}(
     amp_output              ::AmpOutputOption,
     reporting               ::Function;
     ## SFC model fitting parameters    
+    SFC_model_defs          ::OrderedDict{SFCModelName, SFCModelDef}
+                                                = SFC_MDs,
+    bl_method               ::SFCModelName      = DEFAULT_AMP_BL_METHOD,
+    bl_fallback_func        ::Function          = DEFAULT_AMP_FALLBACK_FUNC,
     min_reliable_cyc        ::Integer           = DEFAULT_AMP_MIN_RELIABLE_CYC,
     baseline_cyc_bounds     ::Union{AbstractVector,AbstractArray}
                                                 = DEFAULT_AMP_BASELINE_CYC_BOUNDS,
-    bl_method               ::SFCModelName      = DEFAULT_AMP_BL_METHOD,
-    bl_fallback_func        ::Function          = DEFAULT_AMP_FALLBACK_FUNC,
-    cq_method               ::CqMethod          = DEFAULT_AMP_CQ_METHOD,
+    quant_method            ::SFCModelName      = DEFAULT_AMP_QUANT_METHOD,
     denser_factor           ::Int               = DEFAULT_AMP_DENSER_FACTOR,
+    cq_method               ::CqMethod          = DEFAULT_AMP_CQ_METHOD,
     ## argument for set_qt_fluos!()
     qt_prob                 ::AbstractFloat     = DEFAULT_AMP_QT_PROB,
     ## arguments for report_cq!()
@@ -178,10 +192,11 @@ AmpInput{F <: Real, C <: Real, M <: AmpModel}(
         amp_output,
         amp_output == long ? AmpLongModelResults : AmpShortModelResults,
         reporting,
-        min_reliable_cyc,
-        baseline_cyc_bounds,
+        SFC_model_defs,
         bl_method,
         bl_fallback_func,
+        min_reliable_cyc,
+        baseline_cyc_bounds,
         cq_method,
         denser_factor,
         qt_prob,
@@ -194,3 +209,52 @@ AmpInput{F <: Real, C <: Real, M <: AmpModel}(
         scaled_max_bsf_lb,
         ctrl_well_dict,
     )
+
+
+#==============================================================================================
+    helper functions >>
+==============================================================================================#
+
+
+amp_init(i ::AmpInput, x...) = fill(x..., i.num_fluo_wells, i.num_channels)
+
+## baseline estimation parameters
+# kwargs_bl(i ::AmpInput) =
+#     Dict{Symbol,Any}(
+#         :bl_method          => i.bl_method,
+#         :bl_fallback_func   => i.bl_fallback_func,
+#         :min_reliable_cyc   => i.min_reliable_cyc,
+#     )
+
+## quantitation parameters
+# kwargs_quant(i ::AmpInput) =
+#     Dict{Symbol,Any}(
+#         :cq_method          => i.cq_method,
+#         :denser_factor      => i.denser_factor,
+#     )
+
+## arguments for process_ad()
+kwargs_ad(i ::AmpInput) =
+    Dict{Symbol,Any}(
+        :ctrl_well_dict     => i.ctrl_well_dict,
+        # :cluster_method     => i.cluster_method,
+        # :norm_l             => i.norm_l,
+        # :encgr              => i.encgr,
+        # :categ_well_vec     => i.categ_well_vec
+    )
+
+function check_bl_cyc_bounds(
+    i               ::AmpInput,
+    bl_cyc_bounds   ::Union{Vector{I},Array{Vector{I},2}} where {I <: Integer},
+)
+    debug(logger, "at check_bl_cyc_bounds()")
+    (i.num_cycs <= 2) && return bl_cyc_bounds
+    const size_bcb = size(bl_cyc_bounds)
+    if size_bcb == (0,) || size_bcb == (2,)
+        return amp_init(i, bl_cyc_bounds)
+    elseif size_bcb == (i.num_fluo_wells, i.num_channels) &&
+        eltype(bl_cyc_bounds) <: AbstractVector ## final format of `baseline_cyc_bounds`
+            return bl_cyc_bounds
+    end
+    throw(ArgumentError("`baseline_cyc_bounds` is not in the right format"))
+end ## check_bl_cyc_bounds()

@@ -1,16 +1,19 @@
-#====================================
+#==============================================================================================
 
     thermal_consistency.jl
 
     72°C thermal consistency test
 
-====================================#
+==============================================================================================#
 
 import Dierckx: Spline1D, derivative
 import Memento: debug, warn, error
 
 
-## constants 
+#==============================================================================================
+    constants >>
+==============================================================================================#
+
 
 ## preset values
 const MIN_FLUORESCENCE_VAL = 8e5
@@ -19,9 +22,15 @@ const MAX_TM_VAL = 81
 const MAX_DELTA_TM_VAL = 2
 
 
+#==============================================================================================
+    function >>
+==============================================================================================#
+
+
 ## called by dispatch()
-## NB default values supplied to process_mc()
-##    are the same as for melting curve experiments
+##
+## NB default values supplied to mc_analysis()
+## are the same as for melting curve experiments
 function act(
     ::Type{Val{thermal_consistency}},
     ## remove MySql dependency
@@ -40,7 +49,7 @@ function act(
     reporting           =roundoff(JSON_DIGITS) ## reporting function
 )
     debug(logger, "at act(::Type{Val{thermal_consistency}})")
-
+    #
     ## calibration data is required
     if !(haskey(req_dict, CALIBRATION_INFO_KEY) &&
         typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative)
@@ -48,22 +57,22 @@ function act(
                 "no calibration information found")) |> out(out_format)
     end
     const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
-
+    #
     ## parse melting curve data into DataFrame
     # const mc_data = MeltCurveRawData(req_dict[RAW_DATA_KEY])
     const mc_data = DataFrame()
     foreach(keys(MC_RAW_FIELDS)) do key
         mc_data[key] = req_dict[RAW_DATA_KEY][MC_RAW_FIELDS[key]]
     end
-
-    const kwargs_mc_tm_pw = OrderedDict{Symbol,Any}(
-        map(keys(MC_TM_PW_KEYWORDS)) do key
-            key => req_dict[MC_TM_PW_KEYWORDS[key]]
+    #
+    const kw_pa = OrderedDict{Symbol,Any}(
+        map(keys(MC_PEAK_ANALYSIS_KEYWORDS)) do key
+            key => req_dict[MC_PEAK_ANALYSIS_KEYWORDS[key]]
         end)
-    
-    ## process data as melting curve
+    #
+    ## analyse data as melting curve
     const mc_w72c = try
-        process_mc(
+        do_mc(
             ## remove MySql dependency
             # db_conn,
             # exp_id,
@@ -78,10 +87,11 @@ function act(
             dcv = dcv,
             max_temperature = max_temperature,
             out_format = full_output,
-            kwargs_mc_tm_pw = kwargs_mc_tm_pw)
+            kwargs_pa = kw_pa)
     catch err
         return fail(logger, err; bt=true) |> out(out_format)
     end ## try
+    #
     ## process the data from only one channel
     const channel_proc = 1
     const channel_proc_i = find(channel_proc .== mc_w72c.channel_nums)[1]
@@ -102,6 +112,7 @@ function act(
                 Ta[1,2])
         end ## if size
     end ## do Ta
+    #
     ## return values
     const delta_Tm_val = max_Tm - min_Tm
     full_out() =

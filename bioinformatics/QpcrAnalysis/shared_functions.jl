@@ -1,10 +1,10 @@
-#==================================================
+#==============================================================================================
 
     shared_functions.jl
 
     functions used by multiple analytic methods
     
-==================================================#
+==============================================================================================#
 
 import DataStructures.OrderedDict
 import Memento: debug, warn, error, Logger
@@ -192,16 +192,14 @@ extend(x ::AbstractArray) =
     map(extend_NaN(y |> mold(length) |> maximum), x)
 
 ## used in melting_curve.jl
-## used in pnmsmu.jl
 ## find nearby data points in vector
-## `giis` - get indices in span
-giis_uneven(
-    X      ::AbstractVector,
-    i      ::Integer,
-    span_x ::Real
+find_in_span(
+    X           ::AbstractVector,
+    i           ::Integer,
+    half_span   ::Real
 ) =
     find(X) do x
-        X[i] - span_x <= x <= X[i] + span_x
+        X[i] - half_span <= x <= X[i] + half_span
     end
 
 ## find the indices in a vector
@@ -209,17 +207,17 @@ giis_uneven(
 ## value of the sliding window centering at the index
 ## (window width = number of data points in the whole window).
 ## can be used to find local summits and nadirs
-function find_mid_sumr_bysw(
-    vals       ::AbstractVector,
-    half_width ::Integer,
-    sumr_func  ::Function = maximum
+function find_local(
+    vals            ::AbstractVector,
+    half_width      ::Integer,
+    summary_func    ::Function = maximum
 )
-    vals_iw(i ::Integer) = vals_padded[i : i + half_width * 2]
+    vals_in_window(i ::Integer) = vals_padded[i : i + half_width * 2]
     #
-    const padding = fill(-sumr_func(-vals), half_width)
+    const padding = fill(-summary_func(-vals), half_width)
     const vals_padded = [padding; vals; padding]
-    vals |> length |> from(1) |> collect |> mold(vals_iw) |>
-        mold(v -> sumr_func(v) == v[half_width + 1]) |> find
+    vals |> length |> from(1) |> collect |> mold(vals_in_window) |>
+        mold(v -> summary_func(v) == v[half_width + 1]) |> find
 end
 
 ## used in melting_curve.jl
@@ -230,9 +228,9 @@ split_vector_and_return_larger_quantile(
     x                   ::AbstractVector,
     len                 ::Integer,          ## == length(x)
     idx                 ::Integer,          ## 1 <= idx <= len
-    p                   ::AbstractFloat     ## 0 <= p <= 1
+    q                   ::AbstractFloat     ## 0 <= p <= 1
 ) = map((1:idx, idx:len)) do range
-        quantile(x[range], p)
+        quantile(x[range], q)
     end |> maximum
 
 ## used in calibration.jl

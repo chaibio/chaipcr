@@ -1,8 +1,8 @@
-#==========================
+#==============================================================================================
 
      standard_curve.jl
 
-==========================#
+==============================================================================================#
 
 import JSON.json
 import DataFrames: DataFrame, by
@@ -10,6 +10,11 @@ import Memento: debug, warn, error
 
 ## if isnull(sample) well not considered
 ## what if isnull(cq)
+
+
+#==============================================================================================
+    functions >>
+==============================================================================================#
 
 
 ## called by dispatch()
@@ -161,6 +166,9 @@ function act(
         :valid   => true)
     return output |> out(out_format)
 end ## act(::Type{Val{standard_curve}})
+
+
+#=============================================================================================#
 
 
 ## dependencies of `standard_curve`
@@ -348,7 +356,7 @@ function generate_req_sc(;
                 generate_uniq_ints(num_uniq_targets_perchannel, available_targets, rng)
             available_targets = setdiff(available_targets, uniq_targets_thischannel)
             nna_target_vec = rand(rng, uniq_targets_thischannel, length(nna_target_idc))
-            for nna_idx_i in 1:length(nna_target_idc)
+            for nna_idx_i in eachindex(nna_target_idc)
                 target_vec[nna_target_idc[nna_idx_i]] = nna_target_vec[nna_idx_i]
             end
         end ## for channel_i
@@ -429,7 +437,7 @@ println("Tuple $tup format $out_format")
         tup
     else
         Tuple([
-            simplify(tup[i], out_format) for i in 1:length(tup)
+            simplify(tup[i], out_format) for i in eachindex(tup)
         ])
     end
 end
@@ -440,7 +448,7 @@ println("Vector $vec format $out_format")
         vec
     else
         Vector([
-            simplify(vec[i], out_format) for i in 1:length(vec)
+            simplify(vec[i], out_format) for i in eachindex(vec)
         ])
     end
 end

@@ -22,8 +22,12 @@ const AMP_CT_VAL_DOMAINERROR        = -99
 function fit_amplification_model(
     ::Type{Val{M}} where M <: DFCModel,
     ::Type{R},
-    i               ::AmpInput,
-    fluos           ::AbstractVector;
+    i                   ::AmpInput,
+    fluos               ::AbstractVector,
+    ## these parameters not used to fit DFC models
+    baseline_cyc_bounds ::AbstractArray,
+    cq_method           ::CqMethod,
+    ct_fluo             ::AbstractFloat,
 ) where R <: Union{AmpLongModelResults,AmpShortModelResults}
     debug(logger, "at fit_amplification_model(::Type{Val{M}} where M <: DFCModel)")
     ## no fallback for baseline, because:
@@ -86,19 +90,13 @@ function fit_amplification_model(
     ::Type{Val{SFCModel}},
     ::Type{R},
     i                   ::AmpInput,
-    fluos               ::AbstractVector;
-    SFC_model_defs      ::OrderedDict{SFCModelName, SFCModelDef} = SFC_MDs,
-    bl_method           ::SFCModelName = DEFAULT_AMP_BL_METHOD,
-    bl_fallback_func    ::Function = DEFAULT_AMP_FALLBACK_FUNC,
-    min_reliable_cyc    ::Real = DEFAULT_AMP_MIN_RELIABLE_CYC,
-    baseline_cyc_bounds ::AbstractArray = DEFAULT_AMP_BASELINE_CYC_BOUNDS,
-    quant_method        ::SFCModelName = DEFAULT_AMP_QUANT_METHOD,
-    cq_method           ::CqMethod = DEFAULT_AMP_CQ_METHOD,
-    ct_fluo             ::AbstractFloat = DEFAULT_AMP_CT_FLUO,
-    denser_factor       ::Int = DEFAULT_AMP_DENSER_FACTOR,
+    fluos               ::AbstractVector,
+    baseline_cyc_bounds ::AbstractArray,
+    cq_method           ::CqMethod,
+    ct_fluo             ::AbstractFloat,
 ) where R <: AmpModelResults
     function SFC_wts()
-        if bl_method in [lin_1ft, lin_2ft]
+        if i.bl_method in [lin_1ft, lin_2ft]
             _wts = zeros(num_cycs)
             _wts[colon(baseline_cyc_bounds...)] .= 1
             return _wts
@@ -144,9 +142,9 @@ function fit_amplification_model(
             throw(ArgumentError("length of `baseline_cyc_bounds` must be 0 or 2"))
         elseif len_bcb == 2
             push!(bl_notes, "user-defined")
-            # baseline = bl_fallback_func(fluos[colon(baseline_cyc_bounds...)])
+            # baseline = i.bl_fallback_func(fluos[colon(baseline_cyc_bounds...)])
             return colon(baseline_cyc_bounds...)
-        elseif len_bcb == 0 && last_cyc_wt0 > 1 && num_cycs >= min_reliable_cyc
+        elseif len_bcb == 0 && last_cyc_wt0 > 1 && num_cycs >= i.min_reliable_cyc
             return auto_choose_bl_cycs()
         end
         ## fallthrough
@@ -155,7 +153,7 @@ function fit_amplification_model(
 
     ## automatically choose baseline cycles as the flat part of the curve
     ## uses `fluos`, `last_cyc_wt0`; updates `bl_notes` using push!()
-    ## `last_cyc_wt0 == floor(min_reliable_cyc) - 1`
+    ## `last_cyc_wt0 == floor(i.min_reliable_cyc) - 1`
     function auto_choose_bl_cycs()
         const (min_fluo, min_fluo_cyc) = findmin(fluos)
         const dr2_cfd = finite_diff(cycs, fluos; nu = 2) ## `Dierckx.Spline1D` resulted in all `NaN` in some cases
@@ -262,21 +260,22 @@ function fit_amplification_model(
     # const cycs = range(1.0, num_cycs)
     const num_cycs = i.num_cycs
     const cycs = i.cyc_nums ## allows non-contiguous sequences of cycles
-    ## to determine weights (`wts`) for sigmoid fitting per `min_reliable_cyc`
-    const last_cyc_wt0 = floor(min_reliable_cyc) - 1
-    if bl_method in SFC_MODEL_NAMES
+    ## to determine weights (`wts`) for sigmoid fitting per `i.min_reliable_cyc`
+    const last_cyc_wt0 = floor(i.min_reliable_cyc) - 1
+    if i.bl_method in SFC_MODEL_NAMES
         ## fit model to find baseline
         const wts = SFC_wts()
-        const bl_fit = SFC_model_defs[bl_method].func_fit(
+        const bl_fit = i.SFC_model_defs[i.bl_method].func_fit(
             cycs, fluos, wts; solver = i.solver)
         const bl_status = bl_fit.status
         bl_notes = ["bl_status $bl_status"]
-        baseline = SFC_model_defs[bl_method].funcs_pred[:bl](cycs, bl_fit.coefs...)
+        baseline = i.SFC_model_defs[i.bl_method].funcs_pred[:bl](
+            cycs, bl_fit.coefs...)
         blsub_fluos = fluos .- baseline
         const have_good_results = good_status()
         if !have_good_results
             ## recalculate baseline
-            const bl_func = bl_fallback_func
+            const bl_func = i.bl_fallback_func
         end
     else ## bl_method == take_the_median
         ## do not fit model to find baseline
@@ -293,11 +292,11 @@ function fit_amplification_model(
     end
     #
     ## fit quantitation model
-    const qm = SFC_model_defs[quant_method]
+    const qm = i.SFC_model_defs[i.quant_method]
     const quant_fit = qm.func_fit(cycs, blsub_fluos, wts; solver = i.solver)
     const quant_coefs = quant_fit.coefs
-    const len_denser = denser_factor * (num_cycs - 1) + 1
-    const cycs_denser = Array(range(1.0, 1.0/denser_factor, len_denser))
+    const len_denser = i.denser_factor * (num_cycs - 1) + 1
+    const cycs_denser = Array(range(1.0, 1.0/i.denser_factor, len_denser))
     const funcs_pred = qm.funcs_pred
     #
     ## do quantitation
@@ -358,7 +357,7 @@ function fit_amplification_model(
                     eff_max :
                     func_pred_eff(cyc_vals_4cq[key])
             end)
-    const raw_cycs_index = colon(1, denser_factor, len_denser)
+    const raw_cycs_index = colon(1, i.denser_factor, len_denser)
     return AmpLongModelResults(
         fluos, ## rbbs_3ary,
         bl_fit,

@@ -486,7 +486,7 @@ function assign_genos(
     const channel_extrema = hcat(minimum(data, 2), maximum(data, 2))
     init_centers_all = calc_init_centers_all()
     ## update initial centers according to controls with known genotypes if present
-    for i in 1:length(ctrl_genos)
+    for i in eachindex(ctrl_genos)
         ctrl_well_idc = ctrl_well_dict[ctrl_genos[i]] .+ 1 ## transform 0-indexed well_nums to 1-indexed well_idc
         ctrl_well_data = data[:, ctrl_well_idc]
         init_centers_all[:, ctrl_geno_idc[i]] = mean(ctrl_well_data, 2)
@@ -562,7 +562,7 @@ function assign_genos(
         ## previously `assignments_agp_idc .* (relative_diff_closest_dists .> slht_lb)`
         const assignments_adj =
             map(i -> (car.slhts[i] < slht_lb) ? unclassified_assignment : assignments_agp_idc[i],
-                1:length(assignments_agp_idc))
+                eachindex(assignments_agp_idc))
     end ## if best_num_genos
     const assignments_adj_labels = map(a -> apg_labels[a], assignments_adj)
     return (
@@ -596,7 +596,7 @@ function process_ad(
     debug(logger, "at process_ad()")
     ## indicate a well as NTC (non-template control) if all the channels have NaN as Cq
     const ntc_bool_vec =
-        map(1:length(full_amp_out.fluo_well_nums)) do well_idx
+        map(eachindex(full_amp_out.fluo_well_nums)) do well_idx
             all(isnan.(full_amp_out.cq[well_idx,:]))
         end
     ## output
