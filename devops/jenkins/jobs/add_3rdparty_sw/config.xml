@@ -447,8 +447,7 @@ then
       touch /root/debug_image
       cd /sdcard/factory/
 fi
-
-wget &quot;http://netix.dl.sourceforge.net/project/soci/soci/soci-3.2.2/soci-3.2.2.tar.gz&quot;
+wget &quot;https://datapacket.dl.sourceforge.net/project/soci/soci/soci-3.2.2/soci-3.2.2.tar.gz&quot; || wget &quot;http://netix.dl.sourceforge.net/project/soci/soci/soci-3.2.2/soci-3.2.2.tar.gz&quot;
 tar xpvzf soci-3.2.2.tar.gz
 dpkg --configure -a
 cd soci-3.2.2
@@ -779,14 +778,14 @@ echo &quot;Setting up Julia: Updating rep&quot;
 echo precompiling mandatory packages.
 cat &lt;&lt;EOF &gt;&gt; chaibio_packages.jl
 
-	Pkg.build(&quot;DataArrays&quot;,&quot;DataStructures&quot;, &quot;SpecialFunctions&quot;, &quot;MathProgBase&quot;, &quot;HDF5&quot;, &quot;Clustering&quot;, &quot;Nullables&quot;,&quot;JSON&quot;, &quot;JLD&quot;, &quot;JuMP&quot;, &quot;HttpServer&quot;, &quot;Dierckx&quot;, &quot;Ipopt&quot;, &quot;DataFrames&quot;)
+	Pkg.build(&quot;DataArrays&quot;,&quot;DataStructures&quot;, &quot;SpecialFunctions&quot;, &quot;MathProgBase&quot;, &quot;HDF5&quot;, &quot;Clustering&quot;, &quot;Nullables&quot;,&quot;JSON&quot;, &quot;JLD&quot;, &quot;JuMP&quot;, &quot;HTTP&quot;, &quot;Dierckx&quot;, &quot;Ipopt&quot;, &quot;DataFrames&quot;)
 	println(&quot;Building: Done&quot;)
 
 	println(&quot;Pinning all done&quot;)
 	using DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering
         println(&quot;Used DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering&quot;)
-	using JSON, JLD, JuMP, HttpServer, DataArrays
-        println(&quot;Used JSON, JLD, JuMP, HttpServer, DataArrays&quot;)
+	using JSON, JLD, JuMP, HTTP, DataArrays
+        println(&quot;Used JSON, JLD, JuMP, HTTP, DataArrays&quot;)
 	using Dierckx, Ipopt, DataFrames
 	println(&quot;All packages used&quot;)
 
