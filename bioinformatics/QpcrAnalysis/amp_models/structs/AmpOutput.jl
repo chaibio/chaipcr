@@ -21,7 +21,7 @@ abstract type AmpOutput end
 ## issue: rename `rbbs_3ary` as `calibrated` once juliaapi_new has been updated
 mutable struct AmpLongOutput <: AmpOutput
     raw_data                    ::Array{<: Real,3}
-    ## computed in do_amplification()
+    ## computed in amp_analysis()
     background_subtracted_data  ::Array{<: Real,3} ## mw_ary3
     k4dcv                       ::K4Deconv
     deconvoluted_data           ::Array{<: Real,3} ## dcvd_ary3
@@ -49,7 +49,7 @@ mutable struct AmpLongOutput <: AmpOutput
     cq                          ::Array{Float_T,2}
     eff                         ::Array{Float_T,2}
     cq_fluo                     ::Array{Float_T,2}
-    ## computed in do_amplification()
+    ## computed in amp_analysis()
     qt_fluos                    ::Array{Float_T,2}
     max_qt_fluo                 ::Float_T
     ## computed by report_cq!()

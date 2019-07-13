@@ -1,4 +1,4 @@
-#===============================================
+#==============================================================================================
 
 	Peak.jl
 
@@ -8,11 +8,12 @@
 	Author: Tom Price
 	Date: June 2019
 
-===============================================#
+==============================================================================================#
+
 
 struct Peak
     idx             ::Int
-    Tm              ::Float_T
+    Tm              ::Float_T ## temperature at maximum of -dT/df
     area            ::Float_T
 end
 
@@ -24,7 +25,7 @@ report(digits ::Integer, p ::Peak) =
 
 report(digits ::Integer, peaks ::Vector{Peak}) =
     length(peaks) == 0 ?
-        EMPTY_Ta :
+        EMPTY_peaks :
         mapreduce(p -> round.([p.Tm p.area], digits),
             vcat,
             peaks)

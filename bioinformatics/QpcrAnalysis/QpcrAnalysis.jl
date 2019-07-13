@@ -62,7 +62,7 @@ module QpcrAnalysis
 
     ## struct definitions for:
     ## calibration
-    include("structs/RawData.jl")
+    include("structs/RawFluo.jl")
     include("structs/CalibrationData.jl")
     ## deconvolution
     include("structs/K4Deconv.jl")
@@ -90,10 +90,11 @@ module QpcrAnalysis
     ## melting curve experiments
     # include("structs/MeltCurveRawData.jl")
     include("structs/MeltCurveTF.jl")
-    include("structs/Peak.jl")
     include("structs/PeakIndices.jl")
-    include("structs/MeltCurveTa.jl")
-    include("structs/MeltCurveOutput.jl")
+    include("structs/Peak.jl")
+    include("structs/McPeakOutput.jl")
+    include("structs/McInput.jl")
+    include("structs/McOutput.jl")
     ## standard curve
     include("structs/StandardCurveResult.jl")
     ## thermal consistency
@@ -124,6 +125,7 @@ module QpcrAnalysis
     include("fit_amplification_model.jl")
     ## melting curve
     include("melting_curve.jl")
+    include("mc_peak_analysis.jl")
     include("supsmu.jl")
     ## standard curve
     include("standard_curve.jl")

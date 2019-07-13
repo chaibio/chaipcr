@@ -1,18 +1,21 @@
-#===================================
+#==============================================================================================
 
     optical_test_dual_channel.jl
 
-===================================#
+==============================================================================================#
 
 import DataStructures.OrderedDict
 import Memento: debug, warn
 
 
-## constants >>
+#==============================================================================================
+    constants >>
+==============================================================================================#
+
 
 ## channel descriptors
 const CHANNELS          = [1, 2]
-const CHANNEL_IS        = 1:length(CHANNELS)
+const CHANNEL_IS        = eachindex(CHANNELS)
 const SYMBOLS_FAM_HEX   = [:FAM, :HEX]
 const NEW_CALIB_SYMBOLS = [:baseline; :water; SYMBOLS_FAM_HEX]
 
@@ -36,7 +39,10 @@ const WATER_MAX = [32000, 5000]
 const WATER_MIN = [1000, -1000]
 
 
-## function definition >>
+#==============================================================================================
+    function definition >>
+==============================================================================================#
+
 
 ## called by dispatch()
 function act(
