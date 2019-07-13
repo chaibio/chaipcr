@@ -152,9 +152,22 @@ sudo mount ${DISK}p1 /media/rootfs/
 </command>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
-      <command>echo Set uname_r in /boot/uEnv.txt
+      <command>echo removing old kernel
+old_kernel_version=$(sudo cat /media/rootfs/boot/uEnv.txt | grep &quot;^uname_r&quot; | grep -v &apos;#&apos;  | awk -F&quot;=&quot; &apos;{print $2}&apos;)
+if [ -z $old_kernel_version ]
+then
+        echo &quot;Cann&apos;t find old kernel version&quot;
+else
+        echo old kernel $old_kernel_version
+        if [ -e  /media/rootfs/var/lib/initramfs-tools/$old_kernel_version ]
+        then
+			sudo rm -r /media/rootfs/var/lib/initramfs-tools/$old_kernel_version  /media/rootfs/boot/dtbs/$old_kernel_version /media/rootfs/lib/modules/$old_kernel_version || true
+        fi
+fi
+
+echo Set uname_r in /boot/uEnv.txt
 kernel_version=$(cat kernel_version.info)
-sed -i &quot;s/uname_r/#old kernel uname_r/&quot; /media/rootfs/boot/uEnv.txt || true
+sudo sed -i &quot;s/uname_r/#old kernel uname_r/&quot; /media/rootfs/boot/uEnv.txt || true
 sudo sh -c &quot;echo &apos;uname_r=${kernel_version}&apos; &gt;&gt; /media/rootfs/boot/uEnv.txt&quot;
 
 echo Copy Kernel Image
@@ -196,25 +209,7 @@ then
 	losetup -d $DISK  || true
 fi
 
-mkdir -p  /usr/share/nginx/html/download/ || true
-xz $filename
-cp -sf $filename.xz debian-sdcard-chai-latest.img.xz || true
-
-ls -ahl
-mv $filename* /usr/share/nginx/html/download/
-
-if [ -e $DISK ]
-then
-	rm $DISK  || true
-fi
-if [ -e $DISK ]
-then
-	rm $DISK  || true
-fi
-    
-    
 kernel_image_url=&quot;http://10.0.1.20/download/$filename.xz&quot;    
-    
 cat &lt;&lt; EOF &gt; build_report.xml
 &lt;section name=&quot;&quot; fontcolor=&quot;&quot;&gt;
     // To display a field
@@ -225,9 +220,27 @@ Kernel image (${kernel_image_url}) &lt;a href=&quot;$kernel_image_url&quot; down
 &lt;/section&gt;
 EOF
 
+mkdir -p  /usr/share/nginx/html/download/ || true
+
+xz $filename
+mv $filename.xz /usr/share/nginx/html/download/
+cd /usr/share/nginx/html/download/
+cp -sf $filename.xz debian-sdcard-chai-latest.img.xz || true
+
+ls -ahl
+
+if [ -e $DISK ]
+then
+	rm $DISK  || true
+fi
+if [ -e $DISK ]
+then
+	rm $DISK  || true
+fi
+
 echo All Done
     
-    </command>
+exit 0</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
