@@ -25,7 +25,6 @@ import DataFrames.DataFrame
 
 
 ## defaults for mc_analysis()
-# const DEFAULT_MC_WELL_NUMS                      = []
 const DEFAULT_MC_DCV                            = true
 const DEFAULT_MC_AUTO_SPAN_SMOOTH               = false
 const DEFAULT_MC_SPAN_SMOOTH_DEFAULT            = 0.015
@@ -62,14 +61,13 @@ const DEFAULT_MC_JITTER_CONSTANT                = 0.01
 
 
 struct McInput{C <: Real}
-    # raw_data                    ::McRawData{<: Real}
-    # temperature                 ::AbstractVector
-    # fluorescence                ::RawFluo{<: Real}
+    # temperature                 ::RawData{<: Float_T}
+    # fluorescence                ::RawData{<: Real}
     calibration_data            ::CalibrationData{C}
-    raw_df                   ::DataFrame
-    num_fluo_wells              ::Int
+    raw_df                      ::DataFrame
+    num_wells                   ::Int
     num_channels                ::Int
-    fluo_well_nums              ::Vector{Int}
+    well_nums                   ::Vector{Int}
     channel_nums                ::Vector{Int}
     dcv                         ::Bool
     max_temperature             ::Int
@@ -105,13 +103,12 @@ end
 McInput(
     ## input data
     calibration_data            ::CalibrationData{<: Real},
-    # raw_data                    ::McRawData{<: Real},
-    # temperature                 ::AbstractVector,
-    # fluorescence                ::RawFluo{<: Real},
+    # temperature                 ::RawData{<: Float_T}
+    # fluorescence                ::RawData{<: Real}
     raw_df                      ::DataFrame,
-    num_fluo_wells              ::Integer,
+    num_wells                   ::Integer,
     num_channels                ::Integer,
-    fluo_well_nums              ::AbstractVector,
+    well_nums                   ::AbstractVector,
     channel_nums                ::AbstractVector;
     ## calibration parameter: if true, perform multi-channel deconvolution
     dcv                         ::Bool              = DEFAULT_MC_DCV,
@@ -148,9 +145,9 @@ McInput(
     McInput(
         calibration_data,
         raw_df,
-        num_fluo_wells,
+        num_wells,
         num_channels,
-        fluo_well_nums,
+        well_nums,
         channel_nums,
         dcv,
         max_temperature,

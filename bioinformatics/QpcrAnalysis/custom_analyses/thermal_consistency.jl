@@ -16,7 +16,7 @@ import Memento: debug, warn, error
 
 
 ## preset values
-const MIN_FLUORESCENCE_VAL = 8e5
+# const MIN_FLUORESCENCE_VAL = 8e5 ## not used
 const MIN_TM_VAL = 77
 const MAX_TM_VAL = 81
 const MAX_DELTA_TM_VAL = 2
@@ -40,7 +40,6 @@ function act(
     # calib_info ::Union{Integer,OrderedDict};
     req_dict            ::Associative;
     out_format          ::OutputFormat = pre_json_output,
-    well_nums           ::AbstractVector = DEFAULT_MC_WELL_NUMS,
     auto_span_smooth    ::Bool = DEFAULT_MC_AUTO_SPAN_SMOOTH,
     span_smooth_default ::Real = DEFAULT_MC_SPAN_SMOOTH_DEFAULT,
     span_smooth_factor  ::Real = DEFAULT_MC_SPAN_SMOOTH_FACTOR,
@@ -59,45 +58,41 @@ function act(
     const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
     #
     ## parse melting curve data into DataFrame
-    # const mc_data = MeltCurveRawData(req_dict[RAW_DATA_KEY])
-    const mc_data = DataFrame()
-    foreach(keys(MC_RAW_FIELDS)) do key
-        mc_data[key] = req_dict[RAW_DATA_KEY][MC_RAW_FIELDS[key]]
-    end
+    const mc_parsed_raw_data = mc_parse_raw_data(req_dict[RAW_DATA_KEY])
     #
+    ## parse analysis parameters from request
     const kw_pa = OrderedDict{Symbol,Any}(
         map(keys(MC_PEAK_ANALYSIS_KEYWORDS)) do key
             key => req_dict[MC_PEAK_ANALYSIS_KEYWORDS[key]]
         end)
     #
-    ## analyse data as melting curve
-    const mc_w72c = try
-        do_mc(
-            ## remove MySql dependency
-            # db_conn,
-            # exp_id,
-            # stage_id,
-            # calib_info;
-            mc_data,
-            calibration_data;
-            well_nums = well_nums,
+    ## create container for data and parameter values
+    interface = McInput(
+            calibration_data,
+            mc_parsed_raw_data...;
+            dcv = DEFAULT_MC_DCV && mc_parsed_raw_data[3] > 1, ## num_channels > 1
             auto_span_smooth = auto_span_smooth,
             span_smooth_default = span_smooth_default,
             span_smooth_factor = span_smooth_factor,
-            dcv = dcv,
             max_temperature = max_temperature,
             out_format = full_output,
-            kwargs_pa = kw_pa)
+            kw_pa...)
+    #
+    ## analyse data as melting curve
+    const mc_w72c = try
+        mc_analysis(interface)
     catch err
         return fail(logger, err; bt=true) |> out(out_format)
     end ## try
     #
     ## process the data from only one channel
+    ## PROBLEM >> this does not seem appropriate for dual channel analysis
     const channel_proc = 1
-    const channel_proc_i = find(channel_proc .== mc_w72c.channel_nums)[1]
+    const channel_proc_i = find(channel_proc .== interface.channel_nums)[1]
     const mc_tm = map(
-        field(:Ta_fltd),
-        mc_w72c.mc_array[:, channel_proc_i]) ## mc_bychwl
+        field(:peaks_filtered),
+        mc_w72c.peak_output[:, channel_proc_i]) ## mc_bychannelwell
+    println(mc_tm)
     min_Tm = max_temperature + 1
     max_Tm = 0
     const tm_check_vec = map(mc_tm) do Ta

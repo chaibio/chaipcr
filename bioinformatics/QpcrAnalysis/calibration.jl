@@ -17,7 +17,7 @@ import Memento: debug, error
 ## function: perform deconvolution between channels and normalize variation between wells
 function calibrate(
     ## data
-    raw_data                ::RawFluo{<: Real},      ## 3D array of raw fluorescence by cycle, well, channel
+    raw                     ::RawData{<: Real},         ## 3D array of raw fluorescence by cycle/temp, well, channel
     calibration_data        ::CalibrationData{<: Real}, ## calibration dataset
     well_nums_found_in_raw  ::AbstractVector,           ## vector of well numbers
     channel_nums            ::AbstractVector;           ## vector of channel numbers
@@ -65,8 +65,8 @@ function calibrate(
         cat(3,
             ## devectorized code avoids transposition
             [
-                [   raw_data.fluorescence[u,w,c] - norm_data[:water][c][matched_well_idc][w]
-                    for u in 1:size(raw_data.fluorescence, 1),
+                [   raw.data[u,w,c] - norm_data[:water][c][matched_well_idc][w]
+                    for u in 1:size(raw.data, 1),
                         w in matched_well_idc     ]
                 for c in 1:num_channels                 ]...)
 

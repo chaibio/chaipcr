@@ -82,7 +82,7 @@ const DEFAULT_AMP_CATEG_WELL_VEC    = CATEG_WELL_VEC
 
 struct AmpInput{F <: Real, C <: Real, M <: AmpModel}
     ## input data
-    raw_data                ::RawFluo{F}
+    raw_data                ::RawData{F}
     num_cycs                ::Int
     num_fluo_wells          ::Int
     num_channels            ::Int
@@ -135,7 +135,7 @@ end
 
 ## constructor = interface to amp_analysis()
 AmpInput{F <: Real, C <: Real, M <: AmpModel}(
-    raw_data                ::RawFluo{F},
+    raw_data                ::RawData{F},
     num_cycs                ::Integer,
     num_fluo_wells          ::Integer,
     num_channels            ::Integer,
@@ -197,8 +197,9 @@ AmpInput{F <: Real, C <: Real, M <: AmpModel}(
         bl_fallback_func,
         min_reliable_cyc,
         baseline_cyc_bounds,
-        cq_method,
+        quant_method,
         denser_factor,
+        cq_method,
         qt_prob,
         before_128x,
         max_bsf_lb,
