@@ -45,32 +45,32 @@ then
 
     cd ${julia_pkgdir}/.julia/v0.6/BuildExecutable/src/
 
-    cat << 'EOF' >  add_catch.patch
+cat << 'EOF' >  add_catch.patch
 
---- src/BuildExecutable.jl  2018-05-29 22:08:45.271522602 +0000
-+++ src/BuildExecutable.jl  2018-05-29 20:48:13.108040252 +0000
+--- src/BuildExecutable.jl	2018-05-29 22:08:45.271522602 +0000
++++ src/BuildExecutable.jl	2018-05-29 20:48:13.108040252 +0000
 @@ -143,10 +143,13 @@
-         run(cmd)
-         println()
+     run(cmd)
+     println()
 
 +try
-         println("running: rm -rf $(tmpdir) $(sys.buildfile).o $(sys.inference).o $(sys.inference).ji $(sys.inference0).o $(sys.inference0).ji")
-         map(f-> rm(f, recursive=true), [tmpdir, sys.buildfile*".o", sys.inference*".o", sys.inference*".ji", sys.inference0*".o", sys.inference0*".ji"])
-         println()
+     println("running: rm -rf $(tmpdir) $(sys.buildfile).o $(sys.inference).o $(sys.inference).ji $(sys.inference0).o $(sys.inference0).ji")
+     map(f-> rm(f, recursive=true), [tmpdir, sys.buildfile*".o", sys.inference*".o", sys.inference*".ji", sys.inference0*".o", sys.inference0*".ji"])
+     println()
 +end
 
 +try
-         if targetdir != nothing
-                 # Move created files to target directory
-                 for file in [exe_file.buildfile, sys.buildfile * ".$(Libdl.dlext)", sys.buildfile * ".ji"]
+     if targetdir != nothing
+         # Move created files to target directory
+         for file in [exe_file.buildfile, sys.buildfile * ".$(Libdl.dlext)", sys.buildfile * ".ji"]
 @@ -194,7 +197,7 @@
-                         end
-                 end
+             end
          end
+     end
 -
 +end
-         println("$(exe_file.targetfile) successfully created.")
-         return 0
+     println("$(exe_file.targetfile) successfully created.")
+     return 0
  end
 
 
