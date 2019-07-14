@@ -13,7 +13,7 @@ import Memento: debug, warn, error, Logger
 ## used in amplification.jl
 ## used in shared_functions.jl
 ## currying function
-curry(f) = x -> (y...) -> f(x, y...)
+@inline curry(f) = x -> (y...) -> f(x, y...)
 
 ## used in amplification.jl
 ## used in shared_functions.jl
@@ -37,7 +37,7 @@ from  = curry(range)     ## from(b)  = e -> range(b, e)
 
 ## used in shared_functions.jl
 ## flip function
-flip(f)  = y -> x -> f(x, y)
+@inline flip(f)  = x -> (y...) -> f(y..., x)
 
 ## used in amplification.jl
 ## used in melting_curve.jl
@@ -55,30 +55,26 @@ report(digits ::Integer, x) = round(x, digits)
 roundoff(digits ::Integer) = cast(curry(report))(digits)
 const JSON_DIGITS = 6 ## number of decimal points for floats in JSON output
 
-## used in amplification.jl
-str2sym(x) = isa(x, String) ? Symbol(x) : x
+@inline out(out_format ::OutputFormat) =
+    output -> (out_format == json) ? JSON.json(output) : output
 
-## used in normalize.jl
+@inline get_ordered_keys(dict ::Dict) =
+    dict |> keys |> collect |> sort
+
+@inline get_ordered_keys(ordered_dict ::OrderedDict) =
+    ordered_dict |> keys |> collect
+
 ## used in melting_curve.jl
+## used in mc_peak_analysis.jl
 ## used in deconvolution.jl
+## used in optical_test_dual_channel.jl
 sweep(summary_func) = sweep_func -> x -> broadcast(sweep_func, x, summary_func(x))
-
-## used in melting_curve.jl
-## normalize values to a range from 0 to 1
-normalize_range(x ::AbstractArray) =
-    sweep(minimum)(-)(x) |> sweep(maximum)(/)
 
 ## used in melting_curve.jl
 ## used in shared_functions.jl
 # thing(x) = !(x == nothing)
+## NB cannot inline this because compiler does not recognize it as a function
 thing = (!isequal)(nothing)
-
-## used in standard_curve.jl
-## transform `nothing` to NaN
-nothing2NaN(x) = thing(x) ? x : NaN
-
-out(out_format ::OutputFormat) =
-    output -> (out_format == json) ? JSON.json(output) : output
 
 ## used in amplification.jl
 ## used in melting_curve.jl
@@ -170,13 +166,6 @@ function scinot(
 end
 
 ## used in melting_curve.jl
-is_increasing(x ::AbstractVector) = diff(x) .> zero(x)
-
-## used in melting_curve.jl
-## truncate elements to length of shortest element
-shorten(x) = map(y -> y[x |> mold(length) |> minimum |> from(1)], x)
-
-## used in melting_curve.jl
 ## extend vector with NaN values to a specified length
 ## curried function
 extend_NaN(len ::Integer) =
@@ -187,64 +176,11 @@ extend_NaN(len ::Integer) =
                     vcat(vec, fill(NaN, m)) :
                     error(logger, "vector is too long")
 
-## extend array elements with NaNs to length of longest element
-extend(x ::AbstractArray) =
-    map(extend_NaN(y |> mold(length) |> maximum), x)
-
-## used in melting_curve.jl
-## find nearby data points in vector
-find_in_span(
-    X           ::AbstractVector,
-    i           ::Integer,
-    half_span   ::Real
-) =
-    find(X) do x
-        X[i] - half_span <= x <= X[i] + half_span
-    end
-
-## find the indices in a vector
-## where the value at the index equals the summary
-## value of the sliding window centering at the index
-## (window width = number of data points in the whole window).
-## can be used to find local summits and nadirs
-function find_local(
-    vals            ::AbstractVector,
-    half_width      ::Integer,
-    summary_func    ::Function = maximum
-)
-    vals_in_window(i ::Integer) = vals_padded[i : i + half_width * 2]
-    #
-    const padding = fill(-summary_func(-vals), half_width)
-    const vals_padded = [padding; vals; padding]
-    vals |> length |> from(1) |> collect |> mold(vals_in_window) |>
-        mold(v -> summary_func(v) == v[half_width + 1]) |> find
-end
-
-## used in melting_curve.jl
-ordered_tuple(x, y) = (x < y) ? (x, y) : (y, x)
-
-## used in melting_curve.jl
-split_vector_and_return_larger_quantile(
-    x                   ::AbstractVector,
-    len                 ::Integer,          ## == length(x)
-    idx                 ::Integer,          ## 1 <= idx <= len
-    q                   ::AbstractFloat     ## 0 <= p <= 1
-) = map((1:idx, idx:len)) do range
-        quantile(x[range], q)
-    end |> maximum
-
 ## used in calibration.jl
 import Base.length
 length(::Void) = 0
-num_wells(fluos ::AbstractArray) =
+@inline num_wells(fluos ::AbstractArray) =
     fluos |> mold(length) |> maximum
-
-## duplicated in MySQLforQpcrAnalysis.jl
-get_ordered_keys(dict ::Dict) =
-    dict |> keys |> collect |> sort
-
-get_ordered_keys(ordered_dict ::OrderedDict) =
-    ordered_dict |> keys |> collect
 
 ## parse AbstractFloat on BBB
 function parse_af{T<:AbstractFloat}( ::Type{T}, strval ::String)

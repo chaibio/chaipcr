@@ -43,12 +43,15 @@ function act(
     req_dict        ::Associative;
     out_format      ::OutputFormat = pre_json_output
 )
+    @inline str2sym(x) = isa(x, String) ? Symbol(x) : x
+    #
     debug(logger, "at act(::Type{Val{amplification}})")
     const parsed_raw_data = try
         amp_parse_raw_data(req_dict)
     catch err
         return fail(logger, err; bt=true) |> out(out_format)
     end ## try
+    #
     ## calibration data is required
     req_key = curry(haskey)(req_dict)
     if !(req_key(CALIBRATION_INFO_KEY) &&
@@ -57,6 +60,7 @@ function act(
                 "no calibration information found")) |> out(out_format)
     end
     const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
+    #
     ## analysis parameters for model fitting
     const kw_amp = Dict{Symbol,Any}(
         map(KWARGS_AMP_KEYS |> sift(req_key)) do key
@@ -80,6 +84,7 @@ function act(
                 Symbol(key) => str2sym.(req_dict[key])
             end ## if
         end) ## map
+    #
     ## arguments for fit_baseline_model()
     const kw_bl =
         begin
@@ -101,6 +106,7 @@ function act(
                 Dict{Symbol,Any}()
             end
         end
+    #
     ## report_cq!() arguments
     const kw_rcq = Dict{Symbol,Any}(
         map(KWARGS_RCQ_KEYS_DICT |> keys |> collect |> sift(req_key)) do key
@@ -232,6 +238,7 @@ end ## amp_parse_raw_data()
 ## analyse amplification per step/ramp
 function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
     debug(logger, "at amp_analysis()")
+    #
     ## deconvolute and normalize
     const calibration_results =
         calibrate(
@@ -241,6 +248,7 @@ function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
             i.channel_nums;
             dcv = i.dcv,
             data_format = array)
+    #
     ## initialize output
     o = AmpOutput(
         Val{i.amp_output},
@@ -249,6 +257,8 @@ function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
         # cq_method,
         DEFAULT_AMP_CT_FLUOS)
     # kwargs_jmp_model = Dict(:solver => this.solver)
+    #
+    ## fit amplification models and report results
     if i.num_cycs <= 2
         warn(logger, "number of cycles $num_cycs <= 2: baseline subtraction " *
             "and Cq calculation will not be performed")
@@ -327,7 +337,7 @@ end ## calc_ct_fluos()
 
 
 ## used in calc_ct_fluos()
-function find_idc_useful(postbl_stata ::AbstractVector)
+@inline function find_idc_useful(postbl_stata ::AbstractVector)
     idc_useful = find(postbl_stata .== :Optimal)
     (length(idc_useful) > 0) && return idc_useful
     idc_useful = find(postbl_stata .== :UserLimit)

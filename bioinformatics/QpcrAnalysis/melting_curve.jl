@@ -142,7 +142,11 @@ function mc_analysis(i ::McInput)
     #                     key => fluo_sel[key][fluo_sel[:well] .== well]
     #                 end)
     #         end
-    #        
+    #
+    #     ## extend array elements with NaNs to length of longest element
+    #     @inline extend(x ::AbstractArray) =
+    #         map(extend_NaN(y |> mold(length) |> maximum), x)
+    #
     #     ## extend data vectors with NaN values where necessary to make them equal in length
     #     ## this is performed to convert the fluorescence data to a 3D array
     #     ##

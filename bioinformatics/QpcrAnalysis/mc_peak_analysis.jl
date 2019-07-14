@@ -53,17 +53,17 @@ function mc_peak_analysis(
         end ## if
 
     ## calculate the smoothing parameter
-    function calc_span_smooth(fu ::Tuple{Vector{Bool},Vector{<: Integer}})
+    @inline function calc_span_smooth(fu ::Tuple{Vector{Bool},Vector{<: Integer}})
 
         larger_span(span_smooth_product ::Real) =
-        if span_smooth_product > i.span_smooth_default
-            info(logger, "`span_smooth` was selected as $span_smooth")
-            return span_smooth_product(temperatures, fluos, fu)
-        else
-            info(logger, "`span_smooth_product` $span_smooth_product < `span_smooth_default`, " *
-                "use `span_smooth_default` $(i.span_smooth_default)")
-            return i.span_smooth_default
-        end ## if
+            if span_smooth_product > i.span_smooth_default
+                info(logger, "`span_smooth` was selected as $span_smooth")
+                return span_smooth_product(temperatures, fluos, fu)
+            else
+                info(logger, "`span_smooth_product` $span_smooth_product < `span_smooth_default`, " *
+                    "use `span_smooth_default` $(i.span_smooth_default)")
+                return i.span_smooth_default
+            end ## if
 
         ## `span_smooth_product` = the longest temperature span
         ## where fluorescence goes up as temperature increases
@@ -92,7 +92,11 @@ function mc_peak_analysis(
     ## `fu_rle` - fluorescence up run length encoding
     fu_rle() = calc_fu_rle(temps_in_span(max_fluo_decrease()))
 
-    calc_fu_rle(idc ::AbstractVector{Int}) = rle(is_increasing(fluos[idc]))
+    is_increasing(x ::AbstractVector) =
+        diff(x) .> zero(x)
+
+    calc_fu_rle(idc ::AbstractVector{Int}) =
+        rle(is_increasing(fluos[idc]))
 
     ## find the region of length 2 * i.temperature_bandwidth
     ## showing the steepest fluorescence decrease between start and end
@@ -104,14 +108,29 @@ function mc_peak_analysis(
     fluo_decrease(sel_idc_int ::AbstractVector{Int}) =
         fluos[sel_idc_int[1]] - fluos[sel_idc_int[end]]
 
+    ## find nearby data points in vector
+    find_in_span(
+        X           ::AbstractVector,
+        i           ::Integer,
+        half_span   ::Real
+    ) =
+        find(X) do x
+            X[i] - half_span <= x <= X[i] + half_span
+        end
+
     temps_in_span(i ::Int) =
         find_in_span(temperatures, i, i.temperature_bandwidth)
 
-    ## smoothing functions
+    ## smoothing functions >>
+
+    ## truncate elements to length of shortest element
+    shorten(x) =
+        x |> mold(index(x |> mold(length) |> minimum |> from(1)))
 
     ## fit cubic spline to fluos ~ temperatures using Dierckx
     ## default parameter s = 0.0 interpolates without smoothing
-    spline_model(x) = Spline1D(shorten(x)...; k = 3)
+    spline_model(x) =
+        Spline1D(shorten(x)...; k = 3)
 
     ## smooth raw fluo values
     smooth_raw_fluo() =
@@ -151,6 +170,24 @@ function mc_peak_analysis(
 
     ## peak finding functions
 
+    ## find the indices in a vector
+    ## where the value at the index equals the summary
+    ## value of the sliding window centering at the index
+    ## (window width = number of data points in the whole window).
+    ## can be used to find local summits and nadirs
+    function find_local(
+        summary_func    ::Function,
+        vals            ::AbstractVector,
+        half_width      ::Integer,
+    )
+        vals_in_window(i ::Integer) = vals_padded[i : i + half_width * 2]
+        #
+        const padding = fill(-summary_func(-vals), half_width)
+        const vals_padded = [padding; vals; padding]
+        vals |> length |> from(1) |> collect |> mold(vals_in_window) |>
+            mold(v -> summary_func(v) == v[half_width + 1]) |> find
+    end
+
     # half_peak_span_temperature = 0.5 * i.peak_span_temperature
     half_peak_window() =
         0.5 * (i.peak_span_temperature / temp_span) * len_denser |>
@@ -158,14 +195,12 @@ function mc_peak_analysis(
 
     ## find summit and nadir indices of Tm peaks in `negderiv_smu`
     find_summits_and_nadirs() =
-        map(x -> find_local(negderiv_smu, half_peak_window(), x),
-            [maximum, minimum])
+        [maximum, minimum] |> mold(f -> find_local(f, negderiv_smu, half_peak_window()))
 
     summits_and_nadirs(sn_idc...) =
         OrderedDict(
             zip([:summit, :nadir],
-                map(idc -> smoothed_data[idc, :],
-                    sn_idc)))
+                sn_idc |> mold(idc -> smoothed_data[idc, :])))
 
     ## peak constructors used in find_peaks()
     make_peak(::Void) = nothing
@@ -188,7 +223,7 @@ function mc_peak_analysis(
     end ## find_peaks()
 
     ## find shoulders of peak
-    function peak_bounds(element ::PeakIndicesElement)
+    @inline function peak_bounds(element ::PeakIndicesElement)
         left_nadir_idx, summit_idx, right_nadir_idx =
             element |> fieldnames |> mold(curry(getfield)(element))
         # nadir_vec = [left_nadir_idx, right_nadir_idx]
@@ -226,12 +261,15 @@ function mc_peak_analysis(
     ## peak area elevated from baseline ==
     ## integrated -df/dT peak area elevated from x-axis -
     ## trapezium-shaped baseline area elevated from x-axis
-    function calc_area(peak_bounds_idc ::Tuple{Integer, Integer})
+    @inline function calc_area(peak_bounds_idc ::Tuple{Integer, Integer})
         #
         area_func(temp_lo ::Real, temp_hi ::Real) =
             -sum(negderiv_smu[[peak_bounds_idc...]]) * 0.5 * (temp_hi - temp_lo) -
                 (spl(temp_hi) - spl(temp_lo)) ## 'baseline' of peak
-        ## end of function definition nested in peak_area()
+        #
+        ordered_tuple(x, y) = (x < y) ? (x, y) : (y, x)
+        #
+        ## << end of function definitions nested in peak_area()
 
         # temp_lo, temp_hi = map(
         #     func -> func(denser_temps[peak_bound_idc]),
@@ -240,7 +278,7 @@ function mc_peak_analysis(
     end ## calc_area()
 
     ## count cross points
-    function count_cross_points()
+    @inline function count_cross_points()
         ## vectorized version
         # num_cross_points = sum(map(1:(len_denser-1)) do i
         #     (negderiv_smu[i] - negderiv_midrange) * (negderiv_smu[i+1] - negderiv_midrange) <= 0
@@ -260,10 +298,21 @@ function mc_peak_analysis(
         end ## while
         return num_cross_points
     end ## count_cross_points()
-    #
+
+    split_vector_and_return_larger_quantile(
+        x                   ::AbstractVector,
+        len                 ::Integer,          ## == length(x)
+        idx                 ::Integer,          ## 1 <= idx <= len
+        q                   ::AbstractFloat     ## 0 <= p <= 1
+    ) = (1:idx, idx:len) |> mold(range -> quantile(x[range], q)) |> maximum
+
     ## filter out peaks due to random fluctuation
     ## note: largest_peak_idx calculated incorrectly in original code
     function peak_filter()
+        ## function: normalize values to a range from 0 to 1
+        normalize_range(x ::AbstractArray) =
+            sweep(minimum)(-)(x) |> sweep(maximum)(/)
+        #
         const largest_peak = first(area_order)
         if  (split_vector_and_return_larger_quantile(
                 normalize_range(negderiv_smu), ## originally normalize_range(negderiv), but why ???
@@ -295,12 +344,11 @@ function mc_peak_analysis(
         ## `areas_raw[area_order[i.max_num_peaks + 1]] >= area_lb`
         ## implying `length(filtered_idc_topNp1) > i.max_num_peaks`
         ## If `num_peaks >= i.max_num_peaks` there is no problem.
-        const areas_raw = map(field(:area), peaks_raw)
+        const areas_raw = peaks_raw |> mold(field(:area))
         const min_area = areas_raw[largest_peak] * i.min_normalized_area
-        const largest_idc = area_order[range(1, min(i.max_num_peaks + 1, num_peaks))]
-        const filtered_idc = filter(largest_idc) do idx
-            areas_raw[idx] >= min_area
-        end
+        const largest_idc = area_order[min(i.max_num_peaks + 1, num_peaks) |> from(1)]
+        const filtered_idc = largest_idc |>
+            sift(idx -> areas_raw[idx] >= min_area)
         return length(filtered_idc) > i.max_num_peaks ? [] : filtered_idc
     end ## peak_filter()
 
@@ -371,7 +419,7 @@ function mc_peak_analysis(
     end ## if no peaks
     #
     ## keep only the biggest peak(s)
-    const area_order = sortperm(map(field(:area), peaks_raw), rev = true)
+    const area_order = sortperm(peaks_raw |> mold(field(:area)), rev = true)
     const peaks_filtered = peaks_raw[peak_filter()]
     return output_type == McPeakLongOutput ?
         McPeakLongOutput(
@@ -401,7 +449,6 @@ function mutate_dups(
     vec_2mut        ::AbstractVector,
     jitter_constant ::AbstractFloat,
 )
-    local i
     debug(logger, "at mutate_dups()")
     const vec_len       = vec_2mut |> length
     const vec_uniq      = vec_2mut |> unique |> sort
@@ -418,7 +465,8 @@ function mutate_dups(
     ## break ties
     accumulator1 = 0
     accumulator2 = 0
-    for i in eachindex(dups) 
+    local i
+    for i in eachindex(dups)
         multiway_tie  = i > 1 && dups[i] - dups[i - 1] == 1
         accumulator1 += multiway_tie
         accumulator2  = multiway_tie ? accumulator2 : accumulator1

@@ -192,6 +192,7 @@ function reqvec2df(req_vec ::AbstractVector)
         end ## try
     end) ## do req_ele
     #
+    @inline nothing2NaN(x) = thing(x) ? x : NaN
     for well_i in range(1, length(req_vec))
         req_ele = req_vec[well_i]
         for channel_i in range(1, num_channels)

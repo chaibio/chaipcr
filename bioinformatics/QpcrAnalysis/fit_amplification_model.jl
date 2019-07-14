@@ -29,13 +29,18 @@ function fit_amplification_model(
     cq_method           ::CqMethod,
     ct_fluo             ::AbstractFloat,
 ) where R <: Union{AmpLongModelResults,AmpShortModelResults}
+    bl() = coefs[1] .+
+            i.amp_model in [MAK3, MAKERGAUL4] ?
+                coefs[2] .* cycs :
+                0.0
+    d0() = coefs[findfirst(bl.bl_fit.coef_syms .== :d0)]
+
     debug(logger, "at fit_amplification_model(::Type{Val{M}} where M <: DFCModel)")
     ## no fallback for baseline, because:
     ## (1) curve may fit well though :Error or :UserLimit
     ## (search step becomes very small but has not converge);
     ## (2) the guessed basedline (`start` of `fb`) is usually
     ## quite close to a sensible baseline.
-    const amp_model = i.amp_model
     # const num_cycs = length(fluos)
     # const cycs = range(1.0, num_cycs)
     const num_cycs = i.num_cycs
@@ -44,12 +49,7 @@ function fit_amplification_model(
     ## fit model
     const bl_fit = fit(Val{M}, cycs, fluos, wts; solver = i.solver)
     const coefs = bl_fit.coefs
-    const baseline = coefs[1] .+
-            amp_model in [MAK3, MAKERGAUL4] ?
-                coefs[2] .* cycs :
-                0.0
-    const blsub_fluos = fluos .- baseline
-    const d0 = coefs[find(isequal(:d0), bl.bl_fit.coef_syms)[1]]
+    const blsub_fluos = fluos .- bl()
     ## set output
     if R <: AmpShortModelResults
         return AmpShortModelResults(
@@ -58,7 +58,7 @@ function fit_amplification_model(
             NaN, ## dr1_pred
             NaN, ## dr2_pred
             NaN, ## cq
-            d0)
+            d0())
     else
         return AmpLongModelResults(
             fluos, ## rbbs_3ary,
@@ -68,7 +68,7 @@ function fit_amplification_model(
             bl_fit, ## quant_fit
             bl_fit.status, ## quant_status
             coefs, ## quant_coefs
-            d0,
+            d0(),
             pred_from_cycs(Val{M}, cycs, coefs...), ## quant_fluos
             NaN, ## dr1_pred,
             NaN, ## dr2_pred,
@@ -95,7 +95,7 @@ function fit_amplification_model(
     cq_method           ::CqMethod,
     ct_fluo             ::AbstractFloat,
 ) where R <: AmpModelResults
-    function SFC_wts()
+    @inline function SFC_wts()
         if i.bl_method in [lin_1ft, lin_2ft]
             _wts = zeros(num_cycs)
             _wts[colon(baseline_cyc_bounds...)] .= 1
@@ -111,7 +111,7 @@ function fit_amplification_model(
         end
     end ## SFC_wts()
 
-    function good_status()
+    @inline function good_status()
         if bl_status in [:Optimal, :UserLimit]
             const (min_bfd, max_bfd) = extrema(blsub_fluos) ## `bfd` - blsub_fluos_draft
             if !(max_bfd - min_bfd <= abs(min_bfd))
@@ -136,7 +136,7 @@ function fit_amplification_model(
         #     "unrecognized termination status $(bl_status)"))
     end ## good_status()
 
-    function bl_cycs()
+    @inline function bl_cycs()
         const len_bcb = length(baseline_cyc_bounds)
         if !(len_bcb in [0, 2])
             throw(ArgumentError("length of `baseline_cyc_bounds` must be 0 or 2"))
@@ -154,7 +154,7 @@ function fit_amplification_model(
     ## automatically choose baseline cycles as the flat part of the curve
     ## uses `fluos`, `last_cyc_wt0`; updates `bl_notes` using push!()
     ## `last_cyc_wt0 == floor(i.min_reliable_cyc) - 1`
-    function auto_choose_bl_cycs()
+    @inline function auto_choose_bl_cycs()
         const (min_fluo, min_fluo_cyc) = findmin(fluos)
         const dr2_cfd = finite_diff(cycs, fluos; nu = 2) ## `Dierckx.Spline1D` resulted in all `NaN` in some cases
         const dr2_cfd_left = dr2_cfd[1:min_fluo_cyc]
@@ -239,7 +239,7 @@ function fit_amplification_model(
     end
 
     ## function needed because `Cy0` may not be in `cycs_denser`
-    function func_pred_eff(cyc)
+    @inline function func_pred_eff(cyc)
         try
             -(map([0.5, -0.5]) do epsilon
                 log2(funcs_pred[:f](cyc + epsilon, quant_coefs...))
@@ -300,32 +300,33 @@ function fit_amplification_model(
     const funcs_pred = qm.funcs_pred
     #
     ## do quantitation
-    calc_cq(cq_raw ::Real) = try
-        funcs_pred[:f](cq_raw, quant_coefs...)
-        catch err
-    isa(err, DomainError) ?
-        NaN :
-        rethrow()
-    end ## try
+    # calc_cq_fluo(cq_raw ::Real) = try
+    #     funcs_pred[:f](cq_raw, quant_coefs...)
+    #     catch err
+    # isa(err, DomainError) ?
+    #     NaN :
+    #     rethrow()
+    # end ## try
+    @inline nonpos2NaN(x) = x <= zero(x) ? NaN : x
+    @inline calc_cq_fluo(cq_raw ::Real) = funcs_pred[:f](nonpos2NaN(cq_raw), quant_coefs...)
 
     if R <: AmpCqFluoModelResults
         const cq_raw = calc_cq_raw()
         return AmpCqFluoModelResults(
             quant_fit.status, ## quant_status
-            calc_cq(cq_raw <= 0 ? NaN : cq_raw)) ## cq_fluo
+            calc_cq_fluo(cq_raw)) ## cq_fluo
     end
     #
     const dr1_pred = funcs_pred[:dr1](cycs_denser, quant_coefs...)
     const dr2_pred = funcs_pred[:dr2](cycs_denser, quant_coefs...)
     if R <: AmpShortModelResults
         const cq_raw = calc_cq_raw(dr1_pred = dr1_pred, dr2_pred = dr2_pred)
-        const cq = calc_cq(cq_raw)
         return AmpShortModelResults(
             fluos, ## rbbs_3ary,
             blsub_fluos,
             dr1_pred,
             dr2_pred,
-            cq, ## cq
+            nonpos2NaN(cq_raw), ## cq
             NaN) ## d0
     end
     #
@@ -375,7 +376,7 @@ function fit_amplification_model(
         cyc_vals_4cq,
         eff_vals_4cq,
         cq_raw,
-        copy(cyc_vals_4cq[Symbol(cq_method)]), ## cq
+        nonpos2NaN(cq_raw), ## cq
         copy(eff_vals_4cq[Symbol(cq_method)]), ## eff
-        calc_cq(cq_raw <= 0 ? NaN : cq_raw)) ## cq_fluo
+        calc_cq_fluo(cq_raw)) ## cq_fluo
 end ## fit_amplification_model(Val{SFCModel})
