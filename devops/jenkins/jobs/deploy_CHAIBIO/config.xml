@@ -715,8 +715,8 @@ echo patching rc.local
 cd /etc
 if [ ! -e rc.local ]
 then
-    echo &quot;Cann&apos;t find rc.local. Creating it.&quot;
-    cat &gt;&gt; rc.local &lt;&lt; EOF
+    echo &quot;Overwriting rc.local.&quot;
+    cat &gt; rc.local &lt;&lt; EOF
 #!/bin/sh -e
 #
 # rc.local
@@ -737,7 +737,7 @@ chmod +x rc.local
 fi
 
 cd /etc        
-patch -i ~/chaipcr/deploy/device/rc.local.patch  || (echo error patching rc.local &amp;&amp; exit 1)
+patch -i ~/chaipcr/deploy/device/rc.local.patch  || (echo error patching rc.local)
 cd
 sync
 
