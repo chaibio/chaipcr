@@ -26,7 +26,14 @@ rm -r dtb-rebuilder-4.9-ti
 cd ..
 cd ilitek
 
-apt-get install -y make linux-headers-`uname -r` build-essential
+echo installing headers...
+uname=`uname -r`
+echo uname=$uname
+uname_updated=$(echo "$uname" | sed "s/chai-//")
+echo updated to $uname_updated
+
+apt-get -y -q install linux-headers-$uname_updated
+apt-get install -y make build-essential
 make mod
 
 if [ -e ilitek_aimv20.ko ]
