@@ -319,13 +319,14 @@ function fit_amplification_model(
     #
     const dr1_pred = funcs_pred[:dr1](cycs_denser, quant_coefs...)
     const dr2_pred = funcs_pred[:dr2](cycs_denser, quant_coefs...)
+    const raw_cycs_index = colon(1, i.denser_factor, len_denser)
     if R <: AmpShortModelResults
         const cq_raw = calc_cq_raw(dr1_pred = dr1_pred, dr2_pred = dr2_pred)
         return AmpShortModelResults(
             fluos, ## rbbs_3ary,
             blsub_fluos,
-            dr1_pred,
-            dr2_pred,
+            dr1_pred[raw_cycs_index],
+            dr2_pred[raw_cycs_index],
             nonpos2NaN(cq_raw), ## cq
             NaN) ## d0
     end
@@ -358,7 +359,6 @@ function fit_amplification_model(
                     eff_max :
                     func_pred_eff(cyc_vals_4cq[key])
             end)
-    const raw_cycs_index = colon(1, i.denser_factor, len_denser)
     return AmpLongModelResults(
         fluos, ## rbbs_3ary,
         bl_fit,
