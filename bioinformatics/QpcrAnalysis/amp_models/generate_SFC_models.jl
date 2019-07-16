@@ -13,6 +13,7 @@ using JuMP
 
 ## function definitions
 
+"Generate prediction function given SFC model definition."
 function add_funcs_pred!(
     md          ::SFCModelDef,
     verbose     ::Bool=false
@@ -39,6 +40,7 @@ function add_funcs_pred!(
 end
 
 
+"Generate fit function given SFC model definition."
 function add_func_fit!( ## vco = variable constraints objective
     md          ::SFCModelDef;
     Y_str       ::String = "Y",

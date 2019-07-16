@@ -1,38 +1,43 @@
-#==============================================================================================
+
+#===============================================================================
 
     dispatch.jl
 
     dispatches API GET requests to the appropriate act() method
     
-==============================================================================================#
+===============================================================================#
 
 import JSON: parse, json
 import DataStructures.OrderedDict
     import Memento: debug, warn, error
 
 
+"""
+Parse GET request, dispatch to the appropriate `act` method, and return a 2-Tuple of a 
+Boolean and a JSON string. Called by the Julia webserver in response to GET requests.
+NB The API is documented in docs/juliaapi_new.txt.
+"""
 function dispatch(
     action_key      ::Symbol,
     request_body    ::AbstractString;
-    verify          ::Bool =false
+    verify          ::Bool = false
 )
     const action_str = "\"" * replace(string(action_key), r"_", " ") * "\""
     debug(logger, "at dispatch() with action $action_str")
     # debug(logger, "request body is:\n" * request_body)
     #
     const result = try
-        ## NB. DefaultDict and DefaultOrderedDict constructors sometimes don't work on OrderedDict
-        ## (https://github.com/JuliaLang/DataStructures.jl/issues/205)
+        ## NB. DefaultDict and DefaultOrderedDict constructors sometimes don't work
+        ## on OrderedDict (https://github.com/JuliaLang/DataStructures.jl/issues/205)
         req_parsed = JSON.parse(request_body; dicttype=OrderedDict)
-        #
-        ## Performance issue:
-        ## By default the JSON parser uses type ::Any
-        ## This wastes time and memory downstream.
-        ## It is important to annotate the type of data structures
-        ## wherever it is known.
-        ## Since the data structures are specific to each action,
-        ## this should generally be done in the generic act() methods.
-        #
+        #=
+            Issue:
+            By default the JSON parser converts Arrays and Dicts to type ::Any.
+            It is important to annotate the type of data structures wherever
+            they are known to avoid wasting time and memory downstream.
+            Since the data structures are specific to each action,
+            this should generally be done in the generic act() methods.
+        =#
         if !(action_key in keys(ACT))
             error(logger, "action $action_str is not recognized")
         end
@@ -46,7 +51,8 @@ function dispatch(
                 const verify_input = try
                     verify_request(action, req_parsed)
                 catch()
-                    warn(logger, "data supplied with $action_str request is in the wrong format")
+                    warn(logger, "data supplied with " * action_str *
+                        " request is in the wrong format")
                 end ## try
             end ## if verify
         end ## if !production_env
@@ -61,9 +67,11 @@ function dispatch(
             ## this code is hidden from the parser on the BeagleBone
             if verify
                 const verify_output = try
-                    verify_response(action, JSON.parse(json_response, dicttype = OrderedDict))
+                    verify_response(action,
+                        JSON.parse(json_response, dicttype = OrderedDict))
                 catch()
-                    warn(logger, "data returned from $action_str request is in the wrong format")
+                    warn(logger, "data returned from " * action_str *
+                        " request is in the wrong format")
                 end ## try
             end ## if verify
         end ## if !production_env
@@ -88,6 +96,9 @@ function dispatch(
     debug(logger, "response body: " * response_body)
     return (success, response_body)
 end ## dispatch()
+
+
+#==============================================================================#
 
 
 ## unused function

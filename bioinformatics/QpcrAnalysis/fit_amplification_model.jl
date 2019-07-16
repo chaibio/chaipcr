@@ -1,4 +1,4 @@
-#==============================================================================================
+#===============================================================================
 
     fit_amplification_model.jl
 
@@ -9,17 +9,18 @@
     Author: Tom Price
     Date:   July 2019
 
-==============================================================================================#
+===============================================================================#
 
 ## constant:
 ## a value that cannot be obtained by normal calculation of Ct
 const AMP_CT_VAL_DOMAINERROR        = -99
 
 
-#=============================================================================================#
+#==============================================================================#
 
 
 ## fit_amplification_model() definition for DFC models
+"Model amplification data for a single well and channel."
 function fit_amplification_model(
     ::Type{Val{M}} where M <: DFCModel,
     ::Type{R},
@@ -85,7 +86,7 @@ function fit_amplification_model(
 end ## fit_amplification_model() where DFCModel
 
 
-#=============================================================================================#
+#==============================================================================#
 
 
 ## fit_amplification_model() definition for SFC models
@@ -98,6 +99,7 @@ function fit_amplification_model(
     cq_method           ::CqMethod,
     ct_fluo             ::AbstractFloat,
 ) where R <: AmpModelResults
+    "Calculates weights used to estimate the baseline by SFC model."
     @inline function SFC_wts()
         local wts
         if i.bl_method == lin_1ft || i.bl_method == lin_2ft ## linear models
@@ -115,6 +117,7 @@ function fit_amplification_model(
         end
     end ## SFC_wts()
 
+    "Check that the SFC model used to calculate the baseline terminated appropriately."
     @inline function good_status()
         if bl_status == :Optimal || bl_status == :UserLimit
             const (min_bfd, max_bfd) = extrema(blsub_fluos) ## `bfd` - blsub_fluos_draft
@@ -155,12 +158,14 @@ function fit_amplification_model(
         throw(DomainError("too few cycles to estimate baseline"))
     end ## bl_cycs()
 
-    ## automatically choose baseline cycles as the flat part of the curve
     ## uses `fluos`, `last_cyc_wt0`; updates `bl_notes` using push!()
     ## `last_cyc_wt0 == floor(i.min_reliable_cyc) - 1`
+    "Automatically choose baseline cycles as the flat part of the curve."
     @inline function auto_choose_bl_cycs()
         const (min_fluo, min_fluo_cyc) = findmin(fluos)
-        const dr2_cfd = finite_diff(cycs, fluos; nu = 2) ## `Dierckx.Spline1D` resulted in all `NaN` in some cases
+        ## finite diff is used to estimate derivative because
+        ## `Dierckx.Spline1D` resulted in all `NaN` in some cases
+        const dr2_cfd = finite_diff(cycs, fluos; nu = 2)
         const dr2_cfd_left  = dr2_cfd[1:min_fluo_cyc]
         const dr2_cfd_right = dr2_cfd[min_fluo_cyc:end]
         const (max_dr2_left_cyc, max_dr2_right_cyc) =
@@ -168,14 +173,19 @@ function fit_amplification_model(
         if max_dr2_right_cyc <= last_cyc_wt0
             ## fluo on fitted spline may not be close to raw fluo
             ## at `max_dr2_left_cyc` and `max_dr2_right_cyc`
-            # push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) <= last_cyc_wt0 ($last_cyc_wt0), bl_cycs = $(last_cyc_wt0+1):$num_cycs")
+            # push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) <= " *
+            #     "last_cyc_wt0 ($last_cyc_wt0), bl_cycs = $(last_cyc_wt0+1):$num_cycs")
             return colon(last_cyc_wt0 + 1, num_cycs)
         end
         ## max_dr2_right_cyc > last_cyc_wt0
         const bl_cyc_start = max(last_cyc_wt0 + 1, max_dr2_left_cyc)
-        # push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) > last_cyc_wt0 ($last_cyc_wt0), bl_cyc_start = $bl_cyc_start (max(last_cyc_wt0+1, max_dr2_left_cyc), i.e. max($(last_cyc_wt0+1), $max_dr2_left_cyc))")
+        # push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) > " *
+        #     "last_cyc_wt0 ($last_cyc_wt0), bl_cyc_start = $bl_cyc_start " *
+        #     "(max(last_cyc_wt0+1, max_dr2_left_cyc), i.e. " *
+        #     "max($(last_cyc_wt0+1), $max_dr2_left_cyc))")
         if max_dr2_right_cyc - bl_cyc_start <= 1
-            # push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) - bl_cyc_start ($bl_cyc_start) <= 1")
+            # push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) - " *
+            #     "bl_cyc_start ($bl_cyc_start) <= 1")
             if (max_dr2_right_cyc < num_cycs)
                 const (max_dr2_right_2, max_dr2_right_cyc_2_shifted) =
                     findmax(dr2_cfd[max_dr2_right_cyc + 1:end])
@@ -185,15 +195,18 @@ function fit_amplification_model(
             const max_dr2_right_cyc_2 = max_dr2_right_cyc_2_shifted + max_dr2_right_cyc
             if max_dr2_right_cyc_2 - max_dr2_right_cyc <= 1
                 const bl_cyc_end = num_cycs
-                # push!(bl_notes, "max_dr2_right_cyc_2 ($max_dr2_right_cyc_2) - max_dr2_right_cyc ($max_dr2_right_cyc) == 1")
+                # push!(bl_notes, "max_dr2_right_cyc_2 ($max_dr2_right_cyc_2) - " *
+                #     "max_dr2_right_cyc ($max_dr2_right_cyc) == 1")
             else 
                 ## max_dr2_right_cyc_2 - max_dr2_right_cyc > 1
-                # push!(bl_notes, "max_dr2_right_cyc_2 ($max_dr2_right_cyc_2) - max_dr2_right_cyc ($max_dr2_right_cyc) != 1")
+                # push!(bl_notes, "max_dr2_right_cyc_2 ($max_dr2_right_cyc_2) - " *
+                #     "max_dr2_right_cyc ($max_dr2_right_cyc) != 1")
                 const bl_cyc_end = max_dr2_right_cyc_2
             end ## if
         else
             ## max_dr2_right_cyc - bl_cyc_start > 1
-            # push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) - bl_cyc_start ($bl_cyc_start) > 1")
+            # push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) - " *
+            #     "bl_cyc_start ($bl_cyc_start) > 1")
             const bl_cyc_end = max_dr2_right_cyc
         end ## if
         # push!(bl_notes, "bl_cyc_end = $bl_cyc_end")
@@ -326,7 +339,9 @@ function fit_amplification_model(
     #
     ## results by R
     if R <: AmpCqFluoModelResults
-        const cq_raw = calc_cq_raw(dr1_pred_()) ## Efficient for DEFAULT_AMP_CQ_FLUO_METHOD = cp_dr1
+        ## the following method for calculating cq_raw
+        ## is efficient for DEFAULT_AMP_CQ_FLUO_METHOD = cp_dr1
+        const cq_raw = calc_cq_raw(dr1_pred_())
         return AmpCqFluoModelResults(
             quant_fit.status, ## quant_status
             calc_cq_fluo(cq_raw)) ## cq_fluo

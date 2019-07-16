@@ -1,12 +1,11 @@
-#==============================================================================================
-
+#===========================================================m====================
     calibration.jl
 
     calibration procedure:
     1. multichannel deconvolution
     2. normalize variation between wells in absolute fluorescence
     
-==============================================================================================#
+===============================================================================#
 
 import DataStructures.OrderedDict
 import StaticArrays: SArray
@@ -14,9 +13,9 @@ import Memento: debug, error
 
 
 
-#==============================================================================================
+#===============================================================================
     constants >>
-==============================================================================================#
+===============================================================================#
 
 ## default values
 const DEFAULT_CAL_DYE_IN            = :FAM
@@ -31,19 +30,19 @@ const DECONVOLUTION_SCALING_FACTOR  = [1.0, 4.2]    ## used: [1, oneof(1, 2, 3.5
 
 
 
-#==============================================================================================
+#===============================================================================
     function definitions >>
-==============================================================================================#
+===============================================================================#
 
-## function: perform deconvolution between channels and normalize variation between wells
+"Perform deconvolution between channels and normalize variation between wells."
 function calibrate(
     ## data
-    raw                     ::RawData{<: Real},         ## 3D array of raw fluorescence by cycle/temp, well, channel
+    raw                     ::RawData{<: Real},         ## 3D array of raw fluorescence
     calibration_data        ::CalibrationData{<: Real}, ## calibration dataset
     well_nums_found_in_raw  ::AbstractVector,           ## vector of well numbers
     channel_nums            ::AbstractVector;           ## vector of channel numbers
     ## calibration parameters
-    dcv                     ::Bool = true,              ## if true, perform multi-channel deconvolution
+    dcv                     ::Bool = true,              ## do multi-channel deconvolution
     dye_in                  ::Symbol = DEFAULT_CAL_DYE_IN,
     dyes_to_fill            ::AbstractVector = DEFAULT_CAL_DYES_TO_FILL,
     ## output parameter
@@ -53,7 +52,8 @@ function calibrate(
 
     ## remove MySql dependency
     # calib_info = ensure_ci(db_conn, calib_info)
-    # norm_data, norm_well_nums = prep_normalize(db_conn, calib_info, well_nums_in_req, dye_in, dyes_to_fill)
+    # norm_data, norm_well_nums = prep_normalize(db_conn,
+    #     calib_info, well_nums_in_req, dye_in, dyes_to_fill)
 
     ## assume without checking that we are using all the wells, all the time
     const well_nums_in_req = calibration_data |> num_wells |> from(0) |> collect
@@ -98,7 +98,9 @@ function calibrate(
 
             ## removing MySql dependency
             # k4dcv, deconvoluted_data = deconvolute(
-            #     1. * background_subtracted_data, channel_nums, matched_well_idc, db_conn, calib_info, well_nums_in_req;
+            #     1. * background_subtracted_data,
+            #     channel_nums, matched_well_idc,
+            #     db_conn, calib_info, well_nums_in_req;
             #     out_format="array")
             deconvolute(
                 1. * background_subtracted_data,
@@ -142,10 +144,10 @@ function calibrate(
 end ## calibrate()
 
 
-#=============================================================================================#
+#==============================================================================#
 
 
-## function: check whether the data in optical calibration experiment is valid
+"Check validity of optical calibration data."
 function prep_normalize(
     calibration_data    ::CalibrationData{C},
     well_nums           ::AbstractVector,
@@ -199,19 +201,23 @@ function prep_normalize(
     ## using the current format for the request body
     ## we cannot subset the calibration data by step_id
     # if length(dyes_to_fill) > 0 ## extrapolate well-to-well variation data for missing channels
-    #     println("Preset well-to-well variation data is used to extrapolate calibration data for missing channels.")
+    #     println("Preset well-to-well variation data is used to extrapolate " *
+    #         "calibration data for missing channels.")
     #     channels_missing = setdiff(channels_in_water, channels_in_signal)
-    #     dyes_dyes_to_fill_channels = map(dye -> DYE2CHST[dye]["channel"], dyes_to_fill) ## DYE2CHST is defined in module scope
+    #     dyes_dyes_to_fill_channels =
+    #         map(dye -> DYE2CHST[dye]["channel"], dyes_to_fill) ## DYE2CHST is defined in module scope
     #     check_subset(
     #         Ccsc(channels_missing, "Channels missing well-to-well variation data"),
-    #         Ccsc(dyes_dyes_to_fill_channels, "channels corresponding to the dyes of which well-to-well variation data is needed")
+    #         Ccsc(dyes_dyes_to_fill_channels, "channels corresponding to the dyes " *
+    #             "of which well-to-well variation data is needed")
     #     )
     #     # process preset calibration data
     #     preset_step_ids = OrderedDict([
     #         dye => DYE2CHST[dye]["step_id"]
     #         for dye in keys(DYE2CHST)
     #     ])
-    #     preset_signal_data_dict, dyes_in_preset = get_wva_data(PRESET_calib_ids["signal"], preset_step_ids, db_conn, "dye") ## `well_nums` is not passed on
+    #     preset_signal_data_dict, dyes_in_preset =
+    #         get_wva_data(PRESET_calib_ids["signal"], preset_step_ids, db_conn, "dye") ## `well_nums` is not passed on
     #     pivot_preset = preset_signal_data_dict[dye_in]
     #     pivot_in = signal_data_dict[DYE2CHST[dye_in]["channel"]]
     #     in2preset = pivot_in ./ pivot_preset
@@ -231,17 +237,19 @@ function prep_normalize(
 end ## prep_normalize
 
 
-#=============================================================================================#
+#==============================================================================#
 
+#=
+    normalize(): each dye only has data for its target channel;
+    calibration/calib/oc - used for `deconvolute` and `normalize`,
+    each dye has data for both target and non-target channels.
+    Input `fluo` and output: dim2 indexed by well and dim1 indexed by unit,
+    which can be cycle (amplification) or temperature point (melt curve).
+    Output does not include the automatically created column at index 1
+    from rownames of input array as R does
+=#
 
-## function: normalize variation between wells in absolute fluorescence values (normalize).
-## each dye only has data for its target channel;
-## calibration/calib/oc - used for `deconvolute` and `normalize`,
-## each dye has data for both target and non-target channels.
-## Input `fluo` and output: dim2 indexed by well and dim1 indexed by unit,
-## which can be cycle (amplification) or temperature point (melt curve).
-## Output does not include the automatically created column at index 1
-## from rownames of input array as R does
+"Normalize variation between wells in absolute fluorescence values."
 function normalize(
     fluorescence                    ::Array{<: Real,2},
     norm_data                       ::Associative,
@@ -273,10 +281,10 @@ function normalize(
 end ## normalize
 
 
-#=============================================================================================#
+#==============================================================================#
 
 
-## multi-channel deconvolution
+"Perform multi-channel deconvolution of fluorescence values."
 function deconvolute(
     ## ary2dcv dim1 is unit, which can be cycle (amplification), temperature point (melting curve),
     ## or step type (like "water", "channel_1", "channel_2" for calibration experiment);
@@ -333,10 +341,10 @@ function deconvolute(
 end ## deconvolute()
 
 
-#=============================================================================================#
+#==============================================================================#
 
 
-## function: get cross-over constant matrix `k`
+"Calculate the matrix `k` that describes crosstalk between channels."
 function get_k(
     ## remove MySql dependency
     # db_conn ::MySQL.MySQLHandle,
@@ -364,14 +372,15 @@ function get_k(
     # dcv_exp_info = ensure_ci(db_conn, dcv_exp_info)
     #
     # calib_key_vec = get_ordered_keys(dcv_exp_info)
-    # cd_key_vec = calib_key_vec[2:end] # cd = channel of dye. "water" is index 1 per original order.
+    # cd_key_vec = calib_key_vec[2:end] # cd = channel of dye, "water" is index 1
     #
     # dcv_data_dict = get_full_calib_data(db_conn, dcv_exp_info, well_nums)
     #
     # water_data, water_well_nums = dcv_data_dict["water"]
     # num_wells = length(water_well_nums)
     #
-    ## `dcv_well_nums` is not passed on because expected to be the same as `water_well_nums`,
+    ## `dcv_well_nums` is not passed on because it is
+    ## expected to be the same as `water_well_nums`,
     ## otherwise error will be raised by `get_full_calib_data`
     # k4dcv_bydye = OrderedDict(map(cd_key_vec) do cd_key
     #    k_data_1dye, dcv_well_nums = dcv_data_dict[cd_key]
@@ -406,21 +415,21 @@ function get_k(
     ## check that the water-subtracted signal in the target channel
     ## is greater than that in the non-target channel(s) for each well and each dye
     err_msgs = Vector{String}()
-    for target_channel_i in channel_nums
-        const target_signals = view(k4dcv_bydye[dyes[target_channel_i]], target_channel_i, :)
-        for non_target_channel_i in channel_nums
-            if (target_channel_i != non_target_channel_i)
-                non_target_signals = view(k4dcv_bydye[dyes[target_channel_i]], non_target_channel_i, :)
+    for target_ci in channel_nums
+        const target_signals = view(k4dcv_bydye[dyes[target_ci]], target_ci, :)
+        for non_target_ci in channel_nums
+            if (target_ci != non_target_ci)
+                non_target_signals = view(k4dcv_bydye[dyes[target_ci]], non_target_ci, :)
                 failed_idc = find(target_signals .<= non_target_signals)
                 if length(failed_idc) > 0
                     push!(err_msgs,
-                        "invalid deconvolution data for the dye targeting channel $target_channel_i: " *
-                        "fluorescence value of non-target channel $non_target_channel_i " *
-                        "is greater than or equal to that of target channel $target_channel_i " *
+                        "invalid deconvolution data for the dye targeting channel $target_ci: " *
+                        "fluorescence value of non-target channel $non_target_ci " *
+                        "is greater than or equal to that of target channel $target_ci " *
                         "in the following well(s) - " * join(water_well_nums[failed_idc], ", "))
                 end ## if
             end ## if
-        end ## for non_target_channel_i
+        end ## for non_target_ci
     end ## for channel_i
     (length(err_msgs) > 0) && throw(DomainError(join(err_msgs, "; ")))
     #
@@ -437,10 +446,10 @@ function get_k(
 end ## get_k()
 
 
-#=============================================================================================#
+#==============================================================================#
 
 
-## dependencies of get_k() >>
+## functions called by get_k() >>
 
 function calc_kinv(
     ::Type{Val{well_proc_mean}},
@@ -467,6 +476,7 @@ function calc_kinv(
     end ## try
     return k_s, fill(k_inv, n_wells), inv_note ? "" : "Well mean"
 end
+
 
 function calc_kinv(
     ::Type{Val{well_proc_vec}},
@@ -500,7 +510,7 @@ function calc_kinv(
 end
 
 
-#=============================================================================================#
+#==============================================================================#
 
 
 ## unused function
@@ -538,7 +548,8 @@ end
 #             map(values(calib_dict_1)) do value_1
 #                 reshape(transpose(fluo_data), 1, size(value_1[1])[2:-1:1]...)
 #             end...) ## do value_1
-#     const (background_subtracted_data_1, k4dcv_2, deconvoluted_data_1, norm_data_2, norm_well_nums_2, calibrated_data_1) =
+#     const (background_subtracted_data_1, k4dcv_2, deconvoluted_data_1,
+#         norm_data_2, norm_well_nums_2, calibrated_data_1) =
 #         calibrate(
 #             ary2dcv_1,
 #             db_conn_2,
@@ -562,7 +573,8 @@ end
 
 ## deprecated to remove MySql dependency
 #
-## get all the data from a calibration experiment, including data from all the channels for all the steps
+## get all the data from a calibration experiment,
+## including data from all the channels for all the steps
 # function get_full_calib_data(
 #    db_conn::MySQL.MySQLHandle,
 #    calib_info::OrderedDict,
@@ -596,11 +608,13 @@ end
 #            well_nums, k_qry_2b, db_conn, false
 #        )
 #        if length(well_nums) > 0 && Set(calib_well_nums) != Set(well_nums)
-#            error(logger, "experiment $exp_id, step $step_id: calibration data is not found for all the wells requested")
+#            error(logger, "experiment $exp_id, step $step_id: " *
+#                " calibration data is not found for all the wells requested")
 #        end ## if
 #        calib_data_1key_chwl = vcat(map(channel_nums) do channel
 #            transpose(calib_data_1key[:fluorescence_value][calib_data_1key[:channel] .== channel])
-#        end...) ## do channel. return an array where rows indexed by channels and columns indexed by wells
+#        end...) ## do channel
+#            return an array where rows indexed by channels and columns indexed by wells
 #
 #        return calib_key => (calib_data_1key_chwl, calib_well_nums)
 #    end)

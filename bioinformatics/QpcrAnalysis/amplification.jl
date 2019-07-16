@@ -1,4 +1,4 @@
-#==============================================================================================
+#===============================================================================
 
     amplification.jl
 
@@ -8,7 +8,7 @@
     the code assumes only 1 step/ramp because the current data format
     does not allow us to break the fluorescence data down by step_id/ramp_id
 
-==============================================================================================#
+===============================================================================#
 
 import JSON: parse
 import DataStructures.OrderedDict
@@ -18,9 +18,9 @@ using Ipopt
 
 
 
-#==============================================================================================
+#===============================================================================
     field names >>
-==============================================================================================#
+===============================================================================#
 
 const KWARGS_AMP_KEYS =
     ["min_reliable_cyc", "baseline_cyc_bounds", "ctrl_well_dict",
@@ -34,12 +34,13 @@ const AMP_VECTOR_OUTPUT_FIELDS =
 
 
 
-#==============================================================================================
+#===============================================================================
     function definitions >>
-==============================================================================================#
+===============================================================================#
 
 ## function called by dispatch()
 ## parses request body into AmpInput struct and calls amp_analysis()
+"Generic function called by `dispatch`."
 function act(
     ::Type{Val{amplification}},
     req_dict        ::Associative;
@@ -183,11 +184,11 @@ function act(
 end ## act(::Type{Val{amplification}})
 
 
-#=============================================================================================#
+#==============================================================================#
 
 
-## extract dimensions of raw amplification data
-## and format into a 3D array
+"Extract dimensions of raw amplification data, then format the raw data into a
+3D array as required by `calibrate`."
 function amp_parse_raw_data(req_dict ::Associative)
     const (cyc_nums, fluo_well_nums, channel_nums) =
         map([CYCLE_NUM_KEY, WELL_NUM_KEY, CHANNEL_KEY]) do key
@@ -239,10 +240,10 @@ function amp_parse_raw_data(req_dict ::Associative)
 end ## amp_parse_raw_data()
 
 
-#=============================================================================================#
+#==============================================================================#
 
 
-## analyse amplification per step/ramp
+"Analyse amplification data via calls to `calibrate` and `get_fit_results`."
 function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
     debug(logger, "at amp_analysis()")
     #
@@ -271,7 +272,7 @@ function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
     else ## num_cycs > 2
         const baseline_cyc_bounds = check_bl_cyc_bounds(i, DEFAULT_AMP_BL_CYC_BOUNDS)
         o.ct_fluos = calc_ct_fluos(i, o, DEFAULT_AMP_CT_FLUOS, baseline_cyc_bounds)
-        set_fit_results!(i, o, baseline_cyc_bounds)
+        set_output_fields!(i, o, get_fit_results(i, o, baseline_cyc_bounds))
         set_qt_fluos!(i, o)
         set_report_cq!(i, o)
     end ## if
@@ -286,10 +287,10 @@ function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
 end ## amp_analysis()
 
 
-#=============================================================================================#
+#==============================================================================#
 
 
-## calculate ct_fluos
+"Calculate the amplification output field `ct_fluos`."
 function calc_ct_fluos(
     i                       ::AmpInput,
     o                       ::AmpOutput,
@@ -336,11 +337,11 @@ end ## calc_ct_fluos()
 end ## find_idc_useful()
 
 
-#=============================================================================================#
+#==============================================================================#
 
 
-## fit amplification model for each well, channel
-function set_fit_results!(
+"Fit amplification model to data for each well and channel."
+function get_fit_results(
     i                       ::AmpInput,
     o                       ::AmpOutput,
     bl_cyc_bounds           ::AbstractArray,
@@ -371,13 +372,13 @@ function set_fit_results!(
         [
             fit_model(wi, ci)
             for wi in 1:i.num_fluo_wells, ci in 1:i.num_channels    ]
-    set_output_fields!(i, o, fit_results)
 end ## set_fit_results!()
 
 
-#=============================================================================================#
+#==============================================================================#
 
 
+"Format the results of the amplification analyses."
 @inline function set_output_fields!(
     i                       ::AmpInput,
     o                       ::AmpOutput,
@@ -400,10 +401,11 @@ end ## set_fit_results!()
 end ## set_output_fields!()
 
 
-#=============================================================================================#
+#==============================================================================#
 
 
-## calculate `qt_fluos` and `max_qt_fluo` and set output fields
+"Calculate the amplification analysis fields `qt_fluos` and `max_qt_fluo`, when
+the output format is `long`."
 function set_qt_fluos!(
     i                       ::AmpInput, 
     o                       ::AmpLongOutput, 
@@ -417,7 +419,7 @@ function set_qt_fluos!(
 end ## set_qt_fluos!()
 
 
-## function does nothing when the output format is `short`
+"Do nothing when the output format is `short`."
 set_qt_fluos!(
     i                       ::AmpInput, 
     o                       ::AmpShortOutput,
@@ -425,9 +427,10 @@ set_qt_fluos!(
     nothing
 
 
-#=============================================================================================#
+#==============================================================================#
 
 
+"Call `report_cq!` for each well and channel, when the output format is `long`."
 function set_report_cq!(
     i                       ::AmpInput, 
     o                       ::AmpLongOutput, 
@@ -439,7 +442,8 @@ function set_report_cq!(
     return nothing ## side effects only
 end ## set_report_cq!()
 
-## function does nothing when the output format is `short`
+
+"Do nothing when the output format is `short`."
 set_report_cq!(
     i                       ::AmpInput, 
     o                       ::AmpShortOutput,
@@ -447,6 +451,7 @@ set_report_cq!(
     nothing
 
 
+"Report amplification output fields relating to the calculation of `cq`. "
 function report_cq!(
     i                       ::AmpInput, 
     o                       ::AmpLongOutput,

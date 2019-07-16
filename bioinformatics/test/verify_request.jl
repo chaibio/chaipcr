@@ -1,39 +1,44 @@
-# verify_request.jl
-#
-# Author: Tom Price
-# Date: Dec 2018
-#
-# This Julia script tests the JSON data structures 
-# that are supplied in the body of GET requests
-# 
-# *     based on documentation of REST API from juliaapi_new.txt
-#
-# *     Julia listens on http://localhost:8081 via HttpServer.jl and dispatch.jl
-#       and sends responses to the Rails app on http://localhost:3000
-#
-# *     the relevant controller in the Rails app is
-#       chaipcr/web/app/controllers/experiments_controller.rb
-#
-# *     currently calls are POST-ed to
-#       http://127.0.0.1:8081/experiments/#{experiment.id}/standard_curve
-#       http://127.0.0.1:8081/experiments/#{experiment.id}/amplification
-#       http://127.0.0.1:8081/experiments/#{experiment.id}/meltcurve
-#       http://127.0.0.1:8081/experiments/#{experiment.id}/analyze
+#===============================================================================
+
+    verify_request.jl
+
+    Author: Tom Price
+    Date: Dec 2018
+
+    This Julia script tests the JSON data structures 
+    that are supplied in the body of GET requests
+
+    *     based on documentation of REST API from juliaapi_new.txt
+
+    *     Julia listens on http://localhost:8081 via HttpServer.jl and dispatch.jl
+          and sends responses to the Rails app on http://localhost:3000
+
+    *     the relevant controller in the Rails app is
+          chaipcr/web/app/controllers/experiments_controller.rb
+
+    *     currently calls are POST-ed to
+          http://127.0.0.1:8081/experiments/#{experiment.id}/standard_curve
+          http://127.0.0.1:8081/experiments/#{experiment.id}/amplification
+          http://127.0.0.1:8081/experiments/#{experiment.id}/meltcurve
+          http://127.0.0.1:8081/experiments/#{experiment.id}/analyze
+
+===============================================================================#
 
 import JSON, DataStructures.OrderedDict
 import FactCheck: facts, context, @fact, clear_results, exitstatus, less_than_or_equal
 
 FactCheck.setstyle(:default)
 
-# ================================================================================
-# Here are the REST APIs using HTTP GET
-# ================================================================================
 
-# ********************************************************************************
-#
-# call: experiments/:experiment_id/standard_curve
-#
-# ********************************************************************************
+#===============================================================================
+    Here are the REST APIs using HTTP GET
+===============================================================================#
+
+#===============================================================================
+
+    call: experiments/:experiment_id/standard_curve
+
+===============================================================================#
 
 function verify_request(
     ::Type{Val{QpcrAnalysis.standard_curve}},
@@ -78,11 +83,11 @@ end
 
 
 
-# ********************************************************************************
-#
-# call: experiments/:experiment_id/amplification
-#
-# ********************************************************************************
+#===============================================================================
+
+    call: experiments/:experiment_id/amplification
+
+===============================================================================#
 
 ## according to juliaapi_new.txt:
 #
@@ -244,17 +249,17 @@ end
 
 
 
-# ********************************************************************************
-#
-# call: experiments/:experiment_id/meltcurve
-#
-#
-# ********************************************************************************
+#===============================================================================
 
-# Notes: 
-# 
-# channel_nums = [1] for 1 channel, [1,2] for 2 channels, etc.
-# top_N = number of Tm peaks to report
+    call: experiments/:experiment_id/meltcurve
+
+===============================================================================#
+
+#=
+    Notes: 
+    channel_nums = [1] for 1 channel, [1,2] for 2 channels, etc.
+    top_N = number of Tm peaks to report
+=#
 
 # Calibration (water, channel_1, channel_2) data comes from the following SQL query: 
 # SELECT fluorescence_value, well_num, channel
@@ -320,11 +325,11 @@ end
 
 
 
-# ********************************************************************************
-#
-# call: experiments/:experiment_id/thermal_performance_diagnostic
-#
-# ********************************************************************************
+#===============================================================================
+
+    call: experiments/:experiment_id/thermal_performance_diagnostic
+
+===============================================================================#
 
 # SQL query: 
 # SELECT *
@@ -361,11 +366,11 @@ end
 
 
 
-# ********************************************************************************
-#
-# call: experiments/:experiment_id/thermal_consistency
-#
-# ********************************************************************************
+#===============================================================================
+
+    call: experiments/:experiment_id/thermal_consistency
+
+===============================================================================#
 
 # SQL query: 
 # SELECT fluorescence_value, temperature, well_num, channel
@@ -409,11 +414,11 @@ end
 
 
 
-# ********************************************************************************
-#
-# call: experiments/:experiment_id/optical_cal
-#
-# ********************************************************************************
+#===============================================================================
+
+    call: experiments/:experiment_id/optical_cal
+
+===============================================================================#
 
 function verify_request(
     ::Type{Val{QpcrAnalysis.optical_calibration}},
@@ -443,11 +448,11 @@ end
 
 
 
-# ********************************************************************************
-#
-# call: experiments/:experiment_id/optical_test_single_channel
-#
-# ********************************************************************************
+#===============================================================================
+
+    call: experiments/:experiment_id/optical_test_single_channel
+
+===============================================================================#
 
 ## SQL query: 
 # SELECT fluorescence_value, well_num, cycle_num
@@ -488,11 +493,11 @@ end
 
 
 
-# ********************************************************************************
-#
-# call: experiments/:experiment_id/optical_test_dual_channel
-#
-# ********************************************************************************
+#===============================================================================
+
+    call: experiments/:experiment_id/optical_test_dual_channel
+
+===============================================================================#
 
 ## SQL query: 
 # SELECT fluorescence_value, well_num, cycle_num

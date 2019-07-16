@@ -1,10 +1,10 @@
-#==============================================================================================
+#===============================================================================
 
     melting_curve.jl
 
     melting curve analysis
 
-==============================================================================================#
+===============================================================================#
 
 import DataStructures.OrderedDict
 import DataArrays.DataArray
@@ -13,9 +13,9 @@ import Memento: debug, error
 
 
 
-#==============================================================================================
+#===============================================================================
     field names >>
-==============================================================================================#
+===============================================================================#
 
 const MC_RAW_FIELDS = OrderedDict(
     :temperature            => TEMPERATURE_KEY,
@@ -32,9 +32,9 @@ const MC_OUTPUT_FIELDS = OrderedDict(
     :peaks_filtered         => :melt_curve_analysis)
 
 
-#==============================================================================================
+#===============================================================================
     function definitions >>
-==============================================================================================#
+===============================================================================#
 
 
 ## called by dispatch()
@@ -81,11 +81,10 @@ function act(
 end ## act(::Type{Val{meltcurve}})
 
 
-#=============================================================================================#
+#==============================================================================#
 
 
-## extract dimensions of raw melting curve data
-## and format as a DataFrame
+"Extract dimensions of raw melting curve data and format as a DataFrame."
 function mc_parse_raw_data(raw_dict ::Associative)
     const mc_raw_df = DataFrame()
     foreach(keys(MC_RAW_FIELDS)) do key
@@ -111,10 +110,10 @@ function mc_parse_raw_data(raw_dict ::Associative)
 end ## mc_parse_raw_data()
 
 
-#=============================================================================================#
+#==============================================================================#
 
 
-## analyse melting curve experiment
+"Analyse a melting curve experiment via calls to `calibrate` and `mc_peak_analysis`."
 function mc_analysis(i ::McInput)
 
     # ## function: format fluorescence data for calibration
@@ -182,7 +181,8 @@ function mc_analysis(i ::McInput)
     #             toMeltCurveTF
     # end ## get_mc_data
 
-    ## convert DataFrame to 3D array of fluorescences suitable for calibration
+    "Convert raw melting curve data from a DataFrame to 3D array of fluorescences
+    as required by `calibrate`."
     function transform_3d(df)
         ## split-apply-combine style
         # extended = copy(df)
@@ -223,7 +223,8 @@ function mc_analysis(i ::McInput)
             for wi in eachindex(i.well_nums)
                 # w = i.well_nums[wi]
                 location = selection[ci, wi]
-                let ## to future-proof access to ti outside the for-loop: scoping rules change after v0.6
+                let ## to future-proof access to `ti` outside the for-loop:
+                    ## scoping rules change after v0.6
                     ti = 0
                     for ti in eachindex(location)
                         t[ti, wi, ci] = df[location[ti], :temperature ]
@@ -245,13 +246,15 @@ function mc_analysis(i ::McInput)
                 # mc_data_bychannel[ci].temperature[:, wi],
                 raw_temps.data[ :, wi, ci],
                 calibrated_data[:, wi, ci])...)
-           
+    
+    "Take as input a vector of temperatures and a vector of fluorescences, and set
+    the fluorescence to NaN wherever the corresponding temperature value is NaN."
     remove_when_temperature_NaN(x...) =
         # map(y -> y[broadcast(!isnan, first(x))], x)
         x |> mold(first(x) |> cast(!isnan) |> index)
            
-    ## subtract lowest fluorescence value
-    ## NB if any value is NaN, the result will be all NaNs
+    "Normalize fluorescences values by subtracting the lowest value. Note that
+    if any value is NaN, the result will be a vector of NaNs."
     normalize_fluos(
         temperatures    ::AbstractVector{<: AbstractFloat},
         fluos_raw       ::AbstractVector{<: AbstractFloat}) =

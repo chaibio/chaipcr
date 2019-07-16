@@ -1,10 +1,10 @@
-#==============================================================================================
+#===============================================================================
 
     shared_functions.jl
 
     functions used by multiple analytic methods
     
-==============================================================================================#
+===============================================================================#
 
 import DataStructures.OrderedDict
 import Memento: debug, warn, error, Logger
@@ -12,70 +12,221 @@ import Memento: debug, warn, error, Logger
 
 ## used in amplification.jl
 ## used in shared_functions.jl
-## currying function
+"""
+
+    curry(f)(x...)
+
+Currying function.
+
+# Example:
+```julia-repl
+julia> (1,2,3) |> QpcrAnalysis.curry(map)(x -> 2x)
+(2, 4, 6)
+```
+"""
 @inline curry(f) = x -> (y...) -> f(x, y...)
 
-## used in amplificatcion.jl
+## used in amplification.jl
 ## used in shared_functions.jl
 ## used in melting_curve.jl
 ## used in optical_test_dual_channel.jl
+"""
+    mold(f)(x...)
+
+Curried `map` function.
+
+# Example:
+```julia-repl
+julia> (1,2,3) |> QpcrAnalysis.mold(x -> 2x)
+(2, 4, 6)
+```
+"""
 mold   = curry(map)         ## mold(f)   = x -> map(f, x)
 
 ## used in amplification.jl
 ## used in shared_functions.jl
 ## used in melting_curve.jl
 ## used in deconvolute.jl
+"""
+    sift(f)(x...)
+
+Curried `filter` function.
+
+# Example:
+```julia-repl
+julia> 1:10 |> QpcrAnalysis.sift(isodd) |> Tuple
+(1, 3, 5, 7, 9)
+```
+"""
 sift   = curry(filter)      ## sift(f)   = x -> filter(f, x)
 
 ## used in melting_curve.jl
 ## used in shared_functions.jl
+"""
+    cast(f)(x...)
+
+Curried `broadcast` function.
+
+# Example:
+```julia-repl
+julia> Dict(:a=>0:2,:b=>[0,4,8]) |> values |> QpcrAnalysis.cast(mean)
+3-element Array{Float64,1}:
+0.0
+2.5
+5.0
+```
+"""
 cast   = curry(broadcast)   ## cast(f)   = x -> broadcast(f, x)
 
 ## used in calibration.jl
 ## used in shared_functions.jl
+"""
+    from(x)(y...)
+
+Curried `range` function.
+
+# Example:
+```julia-repl
+julia> 10 |> QpcrAnalysis.from(1) |> collect |> Tuple
+(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+```
+"""
 from   = curry(range)       ## from(b)   = e -> range(b, e)
 
 ## used in amplification.jl
 ## used in allelic_discrimination.jl
+"""
+    gather(f)(xs...)
+
+Curried `reduce` function.
+
+# Example:
+```julia-repl
+julia> 1:5 |> QpcrAnalysis.gather(*)
+120
+```
+"""
 gather = curry(reduce)      ## gather(f) = x -> reduce(f, x)
 
 ## used in amplification.jl
+"""
+    bless(T)(xs...)
+
+Curried `convert` function.
+
+# Example:
+```julia-repl
+julia> -1 |> QpcrAnalysis.bless(Complex) |> sqrt
+0.0 + 1.0im
+```
+"""
 bless  = curry(convert)     ## bless(T)  = x -> convert(T, x)
 
 ## used in shared_functions.jl
-## flip function
-@inline flip(f)  = x -> (y...) -> f(y..., x)
+"""
+    tail(f)(x...)
+
+Tail-currying function.
+
+# Example:
+```julia-repl
+julia> -1 |> QpcrAnalysis.bless(Complex) |> sqrt
+0.0 + 1.0im
+```
+"""
+@inline tail(f)  = (x...) -> y -> f(y, x...)
 
 ## used in amplification.jl
 ## used in melting_curve.jl
 ## thermal_consistency.jl
-field = flip(getfield)  ## field(f) = x -> getfield(x, f)
+"""
+    field(name ::Symbol)(value)
+
+Tail-curried `getfield` function.
+
+# Example:
+```julia-repl
+julia> exp(1im * pi) |> QpcrAnalysis.field(:re)
+-1.0
+```
+"""
+field = tail(getfield)  ## field(f...) = x -> getfield(x, f...)
 
 ## used in amplification.jl
 ## used in melting_curve.jl
-index = flip(getindex)  ## index(i) = x -> getindex(x, i)
+"""
+    index(inds...)(A)
+
+Tail-curried `getindex` function."
+
+# Example:
+```julia-repl
+julia> [1:3 4:6] |> QpcrAnalysis.index(1,2)
+4
+```
+"""
+index = tail(getindex)  ## index(i...) = x -> getindex(x, i...)
 
 ## used in amplification.jl
-morph(d...) = x -> reshape(x, d...)
+"""
+    morph(dims...)(A)
+
+Tail-curried `reshape` function.
+
+# Example:
+```julia-repl
+julia> [1:3 4:6] |> QpcrAnalysis.reshape(2,3)
+2×3 Array{Int64,2}:
+ 1  3  5
+ 2  4  6
+```
+"""
+morph = tail(reshape)   ## morph(d...) = x -> reshape(x, d...)
 
 ## used in allelic_discrimination.jl
 ## used in mc_peak_analysis.jl
-furnish(d...) = x -> fill(x, d...)
+"""
+    furnish(dims...)(x)
+
+Tail-curried `fill` function.
+
+# Example:
+```julia-repl
+julia> NaN |> QpcrAnalysis.furnish(2,3)
+2×3 Array{Int64,2}:
+ NaN  NaN  NaN
+ NaN  NaN  NaN
+```
+"""
+furnish = tail(fill)    ## furnish(d...) = x -> fill(x, d...)
 
 ## used in amplification.jl
 ## used in allelic_discrimination.jl
 ## used in melting_curve.jl
-moose(f, g) = x -> mapreduce(f, g, x)
+"""
+    moose(f, op)(itr)
+
+Tail-curried `mapreduce` function.
+
+# Example:
+```julia-repl
+julia> [1:5;] |> QpcrAnalysis.moose(x -> x^2, hcat)
+1×5 Array{Int64,2}:
+ 1  4  9  16  25
+```
+"""
+moose = tail(mapreduce) ## moose(f, op) = itr -> mapreduce(f, op, itr)
+
+## reporter functions
+@inline out(out_format ::OutputFormat) =
+    output -> (out_format == json) ? JSON.json(output) : output
+report(digits ::Integer, x) = round(x, digits)
+const JSON_DIGITS = 6 ## number of decimal points for floats in JSON output
 
 ## used in amplification.jl
 ## used in melting_curve.jl
-## curried reporter function, flipped
-report(digits ::Integer, x) = round(x, digits)
+"Curried reporter function."
 roundoff(digits ::Integer) = cast(curry(report))(digits)
-const JSON_DIGITS = 6 ## number of decimal points for floats in JSON output
-
-@inline out(out_format ::OutputFormat) =
-    output -> (out_format == json) ? JSON.json(output) : output
 
 @inline get_ordered_keys(dict ::Dict) =
     dict |> keys |> collect |> sort
@@ -87,6 +238,20 @@ const JSON_DIGITS = 6 ## number of decimal points for floats in JSON output
 ## used in mc_peak_analysis.jl
 ## used in deconvolution.jl
 ## used in optical_test_dual_channel.jl
+"""
+    sweep(f)(op)(x)
+
+Sweep out a summary function from a data collection `x`.
+
+# Examples:
+```julia-repl
+julia> (85,100,115) |> QpcrAnalysis.sweep(minimum)(-) |> QpcrAnalysis.sweep(maximum)(/)
+(0.0, 0.5, 1.0)
+
+julia> (85,100,115) |> QpcrAnalysis.sweep(mean)(-) |> QpcrAnalysis.sweep(std)(/)
+(-1.0, 0.0, 1.0)
+```
+"""
 sweep(summary_func) = sweep_func -> x -> broadcast(sweep_func, x, summary_func(x))
 
 ## used in melting_curve.jl
@@ -99,6 +264,7 @@ thing = (!isequal)(nothing)
 ## used in melting_curve.jl
 ## used in optical_cal.jl
 ## used in thermal_consistency.jl
+"Handle exceptions by returning an `OrderedDict` containing the error message."
 function fail(
     logger      ::Logger,
     err         ::Exception;
@@ -132,7 +298,9 @@ end ## fail()
 
 ## used in amplification.jl
 ## used in melting_curve.jl
-## finite differencing function
+"Finite differencing function. Three methods are implemented: `forward`, `backward`,
+and `central`. The default central difference method provides the best approximation
+of the derivative for twice-differentiable functions."
 function finite_diff(
     X       ::AbstractVector,
     Y       ::AbstractVector; ## X and Y must be of same length
@@ -169,7 +337,7 @@ function finite_diff(
 end ## finite_diff()
 
 ## used in standard_curve.jl
-## transform a real number to scientific notation
+"Transform a real number to scientific notation."
 function scinot(
     x               ::Real,
     num_sig_digits  ::Integer = 3;
@@ -183,8 +351,7 @@ function scinot(
 end
 
 ## used in melting_curve.jl
-## extend vector with NaN values to a specified length
-## curried function
+"Curried function that extends a vector with NaN values to a specified length."
 extend_NaN(len ::Integer) =
     vec ::AbstractVector ->
         len - length(vec) |>
@@ -194,21 +361,15 @@ extend_NaN(len ::Integer) =
                     error(logger, "vector is too long")
 
 ## used in calibration.jl
-import Base.length
-length(::Void) = 0
+"Derive the number of wells from the length of data vectors supplied to the function."
 @inline num_wells(fluos ::AbstractArray) =
     fluos |> mold(length) |> maximum
+import Base.length
+length(::Void) = 0
 
-## parse AbstractFloat on BBB
-function parse_af{T<:AbstractFloat}( ::Type{T}, strval ::String)
-    str_parts = split(strval, '.')
-    float_parts = map(str_part -> Base.parse(Int32, str_part), str_parts)
-    return float_parts[1] + float_parts[2] / 10^length(str_parts[2])
-end
-
-## print with verbose control
 ## deprecated in favour of Memento.info()
 ## still used in test functions
+"Print function governed by Boolean output flag. Deprecated in favor of `Memento.info`."
 function print_v(
     print_func ::Function,
     verbose ::Bool,
@@ -222,21 +383,29 @@ function print_v(
 end
 
 ## unused function
+## parse AbstractFloat on BBB
+# function parse_af{T<:AbstractFloat}( ::Type{T}, strval ::String)
+#     str_parts = split(strval, '.')
+#     float_parts = map(str_part -> Base.parse(Int32, str_part), str_parts)
+#     return float_parts[1] + float_parts[2] / 10^length(str_parts[2])
+# end
+
+## unused function
 ## repeat n times: take the output of an function and use it as the input for the same function
-function redo(
-    func ::Function,
-    input,
-    times ::Integer,
-    extra_args...;
-    kwargs...
-)
-    output = input
-    while times > 0
-        output = func(output, extra_args...; kwargs...)
-        times -= 1
-    end
-    return output
-end
+# function redo(
+#     func ::Function,
+#     input,
+#     times ::Integer,
+#     extra_args...;
+#     kwargs...
+# )
+#     output = input
+#     while times > 0
+#         output = func(output, extra_args...; kwargs...)
+#         times -= 1
+#     end
+#     return output
+# end
 
 ## unused functions
 # inc_index(i ::Integer, len ::Integer) = (i >= len) ? len : i + 1

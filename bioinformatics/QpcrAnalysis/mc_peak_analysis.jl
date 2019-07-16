@@ -1,58 +1,61 @@
-#==============================================================================================
+#===============================================================================
 
     mc_peak_analysis.jl
 
     melting curve peak analysis
 
-==============================================================================================#
+===============================================================================#
 
 import DataStructures.OrderedDict
-# import DataArrays.DataArray
 import DataFrames.DataFrame
 import StatsBase: rle
 import Dierckx: Spline1D, derivative
 import Memento: debug, info, warn, error
 
 
-#=============================================================================================#
+#==============================================================================#
 
 
-## function: find peaks in melting curve data for each well
+"""
+Finds peak in the melting curve data, specifically the negative of the derivative
+of fluorescence with respect to temperature, for each well and channel.
+"""
 function mc_peak_analysis(
     i                           ::McInput,
     output_type                 ::Type{P},
     tf_dict                     ::Associative,
 ) where {P <: McPeakOutput}
+
     ## functions to parse input data >>
 
-    ## filter out data points separated by narrow temperature intervals
+    "Filter out data points that are separated by narrow temperature intervals."
     filter_too_close(tf_dict ::Associative) =
-        Dict(key => tf_dict[key][(tf_dict[:temperatures] |> temperature_intervals |> not_too_close)]
+        Dict(key => tf_dict[key][(
+                tf_dict[:temperatures] |> temperature_intervals |> not_too_close)]
             for key in keys(tf_dict))
 
-    ## temperature intervals
-    # temperature_intervals(temperatures_orig ::DataArray{<: AbstractFloat,1}) =
+    "Calculate temperature intervals."
     temperature_intervals(temperatures_orig ::Array{<: AbstractFloat,1}) =
         vcat(diff(temperatures_orig), Inf)
 
-    ## filter datapoints
-    # not_too_close(temp_intervals ::DataArray{<: AbstractFloat,1}) =
+    "Criterion for narrow temperature intervals."
     not_too_close(temp_intervals ::Array{<: AbstractFloat,1}) =
         temp_intervals .> i.temp_too_close_frac * median(temp_intervals)
 
     ## functions used to calculate `span_smooth` >>
 
-    ## choose the value for `span_smooth`
+    "Choose the value for the smoothing parameter `span_smooth`."
     choose_span_smooth() =
         if i.auto_span_smooth
             info(logger, "automatic selection of `span_smooth`...")
             calc_span_smooth(fu_rle())
         else
-            info(logger, "no automatic selection, use span_smooth_default $(i.span_smooth_default) as `span_smooth`")
+            info(logger, "no automatic selection, use span_smooth_default " *
+                string(i.span_smooth_default) * " as `span_smooth`")
             i.span_smooth_default
         end ## if
 
-    ## calculate the smoothing parameter
+    "Calculate the smoothing parameter `span_smooth`."
     @inline function calc_span_smooth(fu ::Tuple{Vector{Bool},Vector{<: Integer}})
 
         larger_span(span_smooth_product ::Real) =
@@ -60,13 +63,14 @@ function mc_peak_analysis(
                 info(logger, "`span_smooth` was selected as $span_smooth")
                 return span_smooth_product(temperatures, fluos, fu)
             else
-                info(logger, "`span_smooth_product` $span_smooth_product < `span_smooth_default`, " *
-                    "use `span_smooth_default` $(i.span_smooth_default)")
+                info(logger, "`span_smooth_product` $span_smooth_product < " *
+                    "`span_smooth_default`, use `span_smooth_default` " *
+                    string(i.span_smooth_default))
                 return i.span_smooth_default
             end ## if
 
-        ## `span_smooth_product` = the longest temperature span
-        ## where fluorescence goes up as temperature increases
+        "Calculate `span_smooth_product` as the longest temperature span
+        in which fluorescence rises with temperature."
         span_smooth_product() =
             i.span_smooth_factor * max_fu_temp_span(fu_idc()) / i.temp_span
 
@@ -87,9 +91,9 @@ function mc_peak_analysis(
         end ## if
     end ## calc_span_smooth()
 
-    ## find the region(s) where there is a positive gradient
-    ## such that fluorescence increases as the temperature increases
     ## `fu_rle` - fluorescence up run length encoding
+    "Find the region(s) where there is a positive gradient such that fluorescence
+    increases with temperature."
     fu_rle() = calc_fu_rle(temps_in_span(max_fluo_decrease()))
 
     is_increasing(x ::AbstractVector) =
@@ -98,8 +102,8 @@ function mc_peak_analysis(
     calc_fu_rle(idc ::AbstractVector{Int}) =
         rle(is_increasing(fluos[idc]))
 
-    ## find the region of length 2 * i.temperature_bandwidth
-    ## showing the steepest fluorescence decrease between start and end
+    "Find the region of length 2 * `temperature_bandwidth` showing the steepest
+    fluorescence decrease between start and end."
     max_fluo_decrease() =
         indmax(
             fluo_decrease(temps_in_span(i))
@@ -108,7 +112,7 @@ function mc_peak_analysis(
     fluo_decrease(sel_idc_int ::AbstractVector{Int}) =
         fluos[sel_idc_int[1]] - fluos[sel_idc_int[end]]
 
-    ## find nearby data points in vector
+    "Find nearby data points in a vector."
     find_in_span(
         X           ::AbstractVector,
         i           ::Integer,
@@ -123,30 +127,32 @@ function mc_peak_analysis(
 
     ## smoothing functions >>
 
-    ## truncate elements to length of shortest element
+    "Truncate elements in a vector to the length of the shortest element."
     shorten(x) =
         x |> mold(index(x |> mold(length) |> minimum |> from(1)))
 
-    ## fit cubic spline to fluos ~ temperatures using Dierckx
-    ## default parameter s = 0.0 interpolates without smoothing
+    "Model fluorescence as a cubic spline function of temperature using the Dierckx
+    Fortran library. The default parameter `s = 0.0` interpolates without smoothing."
     spline_model(x) =
         Spline1D(shorten(x)...; k = 3)
 
-    ## smooth raw fluo values
+    "Smooth raw fluorescence values."
     smooth_raw_fluo() =
         (temperatures, supsmu(temperatures, fluos, span_smooth / i.denser_factor))
 
-    ## fit cubic spline to fluos ~ temperatures, re-calculate fluorescence,
-    ## and calculate -df/dt using `denser_temps` (a denser sequence of temperatures)
+    "Model fluorescence as a cubic spline function of temperature, then recalculates
+    the fluorescence and its derivative with respect to temperature using a denser
+    sequence of interpolated temperatures."
     smoothed_data_matrix() =
         hcat(
-            ## collate processed, interpolated data into matrix
+            ## collates processed, interpolated data into matrix
             ## note: memory intensive
             denser_temps,
             fluo_spl_blsub(spl(denser_temps)),
             negderiv_smu(-derivative(spl, denser_temps)))
 
-    ## baseline-subtracted spline-smoothed fluorescence data
+    "Calculate baseline-subtracted spline-smoothed fluorescence data, and optionally
+    smooth the output of the spline function."
     fluo_spl_blsub(fluo_spl ::AbstractVector{<: AbstractFloat}) =
         ## assumes constant baseline == minimum fluorescence value
         sweep(minimum)(-)(
@@ -155,26 +161,24 @@ function mc_peak_analysis(
                 supsmu(denser_temps, fluo_spl, span_smooth) :
                 fluo_spl)
 
-    ## calculate negative derivative at interpolated temperatures
-    ## smooth output using `supsmu`
+    "Calculate the negative derivative at interpolated temperatures and smooth
+    the output using `supsmu`."
     negderiv_smu(negderiv ::AbstractVector{<: AbstractFloat}) =
         supsmu(denser_temps, negderiv, span_smooth)
 
-    ## create denser array of interpolated temperature values
     ## note: DataArray format doesn't work for `derivative` by "Dierckx"
+    "Create a dense sequence of interpolated temperature values."
     interpolated_temperatures() =
         Array(colon(
             min_temp,
             temp_span / (len_raw * i.denser_factor - 1),
             max_temp))
 
-    ## peak finding functions
+    ## peak finding functions >>
 
-    ## find the indices in a vector
-    ## where the value at the index equals the summary
-    ## value of the sliding window centering at the index
-    ## (window width = number of data points in the whole window).
-    ## can be used to find local summits and nadirs
+    "Find the indices in a vector where the value at the index equals the summary
+    value of a sliding window centered at the index. This can be used to find local
+    summits and nadirs (peaks and troughs) in a 1-dimensional data series."
     function find_local(
         summary_func    ::Function,
         vals            ::AbstractVector,
@@ -194,7 +198,7 @@ function mc_peak_analysis(
         0.5 * (i.peak_span_temperature / temp_span) * len_denser |>
             roundoff(0) |> Int
 
-    ## find summit and nadir indices of Tm peaks in `negderiv_smu`
+    "Find the indices of summits and nadirs the smoothed -df/dT data series."
     find_summits_and_nadirs() =
         [maximum, minimum] |> mold(f -> find_local(f, negderiv_smu, half_peak_window()))
 
@@ -211,6 +215,7 @@ function mc_peak_analysis(
             denser_temps[element.summit_idx],   ## temperature at peak
             peak_bounds(element) |> calc_area)  ## area
 
+    "Iterate over summits and nadirs to create a vector of `Peak`s."
     function find_peaks(
         summit_idc      ::AbstractVector,
         nadir_idc       ::AbstractVector
@@ -223,7 +228,7 @@ function mc_peak_analysis(
         Vector{Peak}(peak_finder |> collect |> mold(make_peak) |> sift(thing))
     end ## find_peaks()
 
-    ## find shoulders of peak
+    "Find the shoulders of a peak."
     @inline function peak_bounds(element ::PeakIndicesElement)
         left_nadir_idx, summit_idx, right_nadir_idx =
             element |> fieldnames |> mold(curry(getfield)(element))
@@ -259,9 +264,9 @@ function mc_peak_analysis(
         return (high_nadir_idx, about2cross_idx)
     end ## peak_bounds()
 
-    ## peak area elevated from baseline ==
-    ## integrated -df/dT peak area elevated from x-axis -
+    ## == integrated -df/dT peak area elevated from x-axis minus
     ## trapezium-shaped baseline area elevated from x-axis
+    "Calculate the area of the peak above its baseline."
     @inline function calc_area(peak_bounds_idc ::Tuple{Integer, Integer})
         #
         area_func(temp_lo ::Real, temp_hi ::Real) =
@@ -307,8 +312,8 @@ function mc_peak_analysis(
         q                   ::AbstractFloat     ## 0 <= p <= 1
     ) = (1:idx, idx:len) |> mold(range -> quantile(x[range], q)) |> maximum
 
-    ## filter out peaks due to random fluctuation
     ## note: largest_peak_idx calculated incorrectly in original code
+    "Filter out small or randomly-occurring peaks."
     function peak_filter()
         ## function: normalize values to a range from 0 to 1
         normalize_range(x ::AbstractArray) =
@@ -390,7 +395,8 @@ function mc_peak_analysis(
     const smoothed_data     = smoothed_data_matrix()
     const negderiv_smu      = smoothed_data[:,3]
     const max_negderiv_smu  = findmax(negderiv_smu)
-    const negderiv_midrange = mean([quantile(negderiv_smu, i.negderiv_range_low_quantile), max_negderiv_smu[1]])
+    const negderiv_midrange =
+        mean([quantile(negderiv_smu, i.negderiv_range_low_quantile), max_negderiv_smu[1]])
     #
     ## extract data at observed temperatures
     const len_denser        = length(denser_temps)
@@ -438,14 +444,12 @@ function mc_peak_analysis(
 end ## mc_peak_analysis()
 
 
-#=============================================================================================#
+#==============================================================================#
 
 
 ## function called by mc_peak_analysis() >>
 
-## jitter duplicated elements in a numeric vector
-## so that all the elements become unique
-## used to eliminate duplicate values in temperature data
+"Jitter duplicated temperature values so that all the elements become unique."
 function mutate_dups(
     vec_2mut        ::AbstractVector,
     jitter_constant ::AbstractFloat,

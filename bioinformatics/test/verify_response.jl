@@ -1,33 +1,37 @@
-# verify_response.jl
-#
-# Author: Tom Price
-# Date: Dec 2018
-#
-# This Julia script tests the JSON data structures 
-# that are returned in the body of responses to GET requests
-# 
-# *     based on documentation of REST API from juliaapi_new.txt
-#
-# *     Julia listens on http://localhost:8081 via HttpServer.jl and dispatch.jl
-#       and sends responses to the Rails app on http://localhost:3000
-#
-# *     the relevant controller in the Rails app is
-#       chaipcr/web/app/controllers/experiments_controller.rb
-#
-# *     currently calls are POST-ed to
-#       http://127.0.0.1:8081/experiments/#{experiment.id}/standard_curve
-#       http://127.0.0.1:8081/experiments/#{experiment.id}/amplification
-#       http://127.0.0.1:8081/experiments/#{experiment.id}/meltcurve
-#       http://127.0.0.1:8081/experiments/#{experiment.id}/analyze
+#===============================================================================
+
+    verify_response.jl
+
+    Author: Tom Price
+    Date: Dec 2018
+
+    This Julia script tests the JSON data structures 
+    that are returned in the body of responses to GET requests
+
+    *     based on documentation of REST API from juliaapi_new.txt
+
+    *     Julia listens on http://localhost:8081 via HttpServer.jl and dispatch.jl
+          and sends responses to the Rails app on http://localhost:3000
+
+    *     the relevant controller in the Rails app is
+          chaipcr/web/app/controllers/experiments_controller.rb
+
+    *     currently calls are POST-ed to
+          http://127.0.0.1:8081/experiments/#{experiment.id}/standard_curve
+          http://127.0.0.1:8081/experiments/#{experiment.id}/amplification
+          http://127.0.0.1:8081/experiments/#{experiment.id}/meltcurve
+          http://127.0.0.1:8081/experiments/#{experiment.id}/analyze
+
+===============================================================================#
 
 import JSON, DataStructures.OrderedDict
 
 
-# ********************************************************************************
-#
-# call: experiments/:experiment_id/standard_curve
-#
-# ********************************************************************************
+#===============================================================================
+
+    call: experiments/:experiment_id/standard_curve
+
+===============================================================================#
 
 function verify_response(
     ::Type{Val{standard_curve}},
@@ -74,11 +78,11 @@ end
 
 
 
-# ********************************************************************************
-#
-# call: experiments/:experiment_id/amplification
-#
-# ********************************************************************************
+#===============================================================================
+
+    call: experiments/:experiment_id/amplification
+
+===============================================================================#
 
 function verify_response(
     ::Type{Val{amplification}},
@@ -166,12 +170,11 @@ end
 
 
 
-# ********************************************************************************
-#
-# call: experiments/:experiment_id/meltcurve
-#
-#
-# ********************************************************************************
+#===============================================================================
+
+    call: experiments/:experiment_id/meltcurve
+
+===============================================================================#
 
 function verify_response(
     ::Type{Val{meltcurve}},
@@ -221,11 +224,11 @@ end
 
 
 
-# ********************************************************************************
-#
-# call: system/loadscript?script=path%2Fto%2Fanalyze.jl
-#
-# ********************************************************************************
+#===============================================================================
+
+    call: system/loadscript?script=path%2Fto%2Fanalyze.jl
+
+===============================================================================#
 
 function verify_response(
     ::Type{Val{load_script}},
@@ -251,11 +254,11 @@ end
 
 
 
-# ********************************************************************************
-#
-# call: experiments/:experiment_id/thermal_performance_diagnostic
-#
-# ********************************************************************************
+#===============================================================================
+
+    call: experiments/:experiment_id/thermal_performance_diagnostic
+
+===============================================================================#
 
 function verify_response(
     ::Type{Val{thermal_performance_diagnostic}},
@@ -329,11 +332,11 @@ end
 
 
 
-# ********************************************************************************
-#
-# call: experiments/:experiment_id/thermal_consistency
-#
-# ********************************************************************************
+#===============================================================================
+
+    call: experiments/:experiment_id/thermal_consistency
+
+===============================================================================#
 
 function verify_response(
     ::Type{Val{thermal_consistency}},
@@ -376,11 +379,11 @@ end
 
 
 
-# ********************************************************************************
-#
-# call: experiments/:experiment_id/optical_cal
-#
-# ********************************************************************************
+#===============================================================================
+
+    call: experiments/:experiment_id/optical_cal
+
+===============================================================================#
 
 # success response body (optical_cal):
 
@@ -406,11 +409,11 @@ end
 
 
 
-# ********************************************************************************
-#
-# call: experiments/:experiment_id/optical_test_single_channel
-#
-# ********************************************************************************
+#===============================================================================
+
+    call: experiments/:experiment_id/optical_test_single_channel
+
+===============================================================================#
 
 function verify_response(
     ::Type{Val{optical_test_single_channel}},
@@ -446,11 +449,11 @@ end
 
 
 
-# ********************************************************************************
-#
-# call: experiments/:experiment_id/optical_test_dual_channel
-#
-# *******************************************************************************
+#===============================================================================
+
+    call: experiments/:experiment_id/optical_test_dual_channel
+
+===============================================================================#
 
 function verify_response(
     ::Type{Val{optical_test_dual_channel}},
