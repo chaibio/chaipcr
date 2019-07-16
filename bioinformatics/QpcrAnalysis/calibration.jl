@@ -18,10 +18,6 @@ import Memento: debug, error
     constants >>
 ==============================================================================================#
 
-## Enum type for K matrix calculation
-## used in deconvolution.jl
-@enum WellProc well_proc_mean well_proc_vec
-
 ## default values
 const DEFAULT_CAL_DYE_IN            = :FAM
 const DEFAULT_CAL_DYES_TO_FILL      = []

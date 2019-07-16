@@ -1,6 +1,6 @@
-#=============================================
+#==============================================================================================
 
-    keystrings.jl
+    keystring_constants.jl
 
     Author: Tom Price
     Date: June 2019
@@ -8,10 +8,9 @@
     header file for QpcrAnalysis.jl module
     defines alphanumeric Dict keys
 
-=============================================#
+==============================================================================================#
 
-const DEVELOPMENT_MODE = "development"
-const PRODUCTION_MODE = "production"
+
 const WATER_KEY = "water"
 const FLUORESCENCE_VALUE_KEY = "fluorescence_value"
 const CYCLE_NUM_KEY = "cycle_num"

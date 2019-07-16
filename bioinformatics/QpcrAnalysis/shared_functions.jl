@@ -133,8 +133,6 @@ end ## fail()
 ## used in amplification.jl
 ## used in melting_curve.jl
 ## finite differencing function
-@enum FiniteDiffMethod central forward backward
-#
 function finite_diff(
     X       ::AbstractVector,
     Y       ::AbstractVector; ## X and Y must be of same length

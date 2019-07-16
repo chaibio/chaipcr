@@ -19,22 +19,6 @@ import Ipopt: IpoptSolver #, NLoptSolver
 
 
 #==============================================================================================
-    enums >>
-==============================================================================================#
-
-@enum CqMethod cp_dr1 cp_dr2 Cy0 ct max_eff
-CqMethod(m ::String) = CqMethod(findfirst(map(string, instances(CqMethod)), m) - 1)
-
-@enum AmpOutputOption long short cq_fluo
-AmpOutputOption(option ::OutputFormat) =
-    option == full_output ? long : short
-
-@enum ClusteringMethod k_means k_means_medoids k_medoids
-const CLUSTERINGMETHODS = instances(ClusteringMethod)
-
-
-
-#==============================================================================================
     constants >>
 ==============================================================================================#
 

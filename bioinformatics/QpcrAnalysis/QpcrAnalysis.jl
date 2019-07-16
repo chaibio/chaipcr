@@ -23,6 +23,11 @@
     0.5.2 `MySQL.query(some_query)[:some_header]`
 =#
 
+
+#==============================================================================================
+    start of module definition >>
+==============================================================================================#
+
 __precompile__()
 
 
@@ -46,56 +51,63 @@ module QpcrAnalysis
         isfile("$path_/$MODULE_NAME.jl")
     end][1] ## slice by boolean vector returned a one-element vector. Assumption: LOAD_PATH is global
 
-    ## define constants
-    include("constants/enums.jl")
-    include("constants/keystrings.jl")
-
     ## default data width in production mode:  32 bits (BBB)
     ## default data width in development mode: 64 bits
-    const production_env = (get(ENV, "JULIA_ENV", nothing) == PRODUCTION_MODE)
+    const DEVELOPMENT_MODE = "development"
+    const PRODUCTION_MODE  = "production"
+    const production_env   = (get(ENV, "JULIA_ENV", nothing) == PRODUCTION_MODE)
     const Float_T = production_env ? Float32 : Float64
 
-    ## include each script, generally in the order of workflow
+
+
+#==============================================================================================
+    include each script, generally in the order of workflow
+==============================================================================================#
+
+    ## define constants
+    include("defines/enums.jl")
+    include("defines/keystring_constants.jl")
 
     ## shared functions
     include("shared_functions.jl")
 
     ## struct definitions for:
     ## calibration
-    include("structs/RawData.jl")
-    include("structs/CalibrationData.jl")
+    include("defines/RawData.jl")
+    include("defines/CalibrationData.jl")
     ## deconvolution
-    include("structs/K4Deconv.jl")
+    include("defines/K4Deconv.jl")
     ## allelic discrimination
-    include("structs/ClusterAnalysisResult.jl")
-    include("structs/UniqCombinCenters.jl")
-    include("structs/AssignGenosResult.jl")
+    include("defines/ClusterAnalysisResult.jl")
+    include("defines/UniqCombinCenters.jl")
+    include("defines/AssignGenosResult.jl")
     ## amplification models
-    include("amp_models/structs/AmpModel.jl")
-    include("amp_models/structs/AmpModelFit.jl")
-    include("amp_models/SFC_model_definitions.jl")
-    include("amp_models/structs/SFCModelDef.jl")
+    include("amp_models/defines/AmpModel.jl")
+    include("amp_models/defines/AmpModelFit.jl")
+    include("amp_models/defines/SFC_model_definitions.jl")
+    include("amp_models/defines/SFCModelDef.jl")
 
     ## generate amplification model definitions
     include("amp_models/generate_SFC_models.jl")
     include("amp_models/MAKx.jl")
     include("amp_models/MAKERGAULx.jl")
 
-    ## amplification experiments
-    include("amp_models/structs/AmpModelResults.jl")
-    include("amp_models/structs/AmpInput.jl")
-    include("amp_models/structs/AmpOutput.jl")
-    ## melting curve experiments
-    include("structs/PeakIndices.jl")
-    include("structs/Peak.jl")
-    include("structs/McPeakOutput.jl")
-    include("structs/McInput.jl")
-    include("structs/McOutput.jl")
+    ## struct definitions for:
+    ## amplification analysis
+    include("amp_models/defines/AmpModelResults.jl")
+    include("amp_models/defines/AmpInput.jl")
+    include("amp_models/defines/AmpOutput.jl")
+    ## melting curve
+    include("defines/PeakIndices.jl")
+    include("defines/Peak.jl")
+    include("defines/McPeakOutput.jl")
+    include("defines/McInput.jl")
+    include("defines/McOutput.jl")
     ## standard curve
-    include("structs/StandardCurveResult.jl")
+    include("defines/StandardCurveResult.jl")
     ## thermal consistency
-    include("structs/TmCheck1w.jl")
-    include("structs/ThermalConsistencyOutput.jl")
+    include("defines/TmCheck1w.jl")
+    include("defines/ThermalConsistencyOutput.jl")
 
     ## this code is hidden from the parser on the BeagleBone
     @static if !production_env
@@ -109,7 +121,6 @@ module QpcrAnalysis
     end
 
     ## function definitions for:
-
     ## dispatch
     include("dispatch.jl")
     ## calibration
@@ -131,11 +142,23 @@ module QpcrAnalysis
     include("custom_analyses/thermal_performance_diagnostic.jl")
     # include("custom_analyses/your_own_analysis.jl")
 
-    ## Create module level logger
+
+
+#==============================================================================================
+    create logger >>
+==============================================================================================#
+
+    ## create module level logger
     ## this can be precompiled
     using Memento
     import FactCheck.clear_results
     logger = getlogger(current_module())
+
+
+
+#==============================================================================================
+    runtime initialization >>
+==============================================================================================#
 
     ## This function contains stuff that needs to happen
     ## at runtime when the module is loaded
@@ -154,4 +177,9 @@ module QpcrAnalysis
         ## clear Fact Checks
         !production_env && FactCheck.clear_results()
     end ## __init__()
+
 end ## module QpcrAnalysis
+
+#==============================================================================================
+    << end of module definition
+==============================================================================================#
