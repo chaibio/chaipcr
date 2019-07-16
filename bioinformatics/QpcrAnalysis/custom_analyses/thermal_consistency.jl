@@ -10,10 +10,10 @@ import Dierckx: Spline1D, derivative
 import Memento: debug, warn, error
 
 
+
 #==============================================================================================
     constants >>
 ==============================================================================================#
-
 
 ## preset values
 # const MIN_FLUORESCENCE_VAL = 8e5 ## not used
@@ -22,10 +22,10 @@ const MAX_TM_VAL = 81
 const MAX_DELTA_TM_VAL = 2
 
 
+
 #==============================================================================================
     function >>
 ==============================================================================================#
-
 
 ## called by dispatch()
 ##
@@ -45,7 +45,7 @@ function act(
     span_smooth_factor  ::Real = DEFAULT_MC_SPAN_SMOOTH_FACTOR,
     dcv                 ::Bool = DEFAULT_MC_DCV, ## if true, perform multi-channel deconvolution
     max_temperature     ::Real = DEFAULT_MC_MAX_TEMPERATURE, ## maximum temperature to analyze
-    reporting           =roundoff(JSON_DIGITS) ## reporting function
+    reporting           ::Function = roundoff(JSON_DIGITS) ## reporting function
 )
     debug(logger, "at act(::Type{Val{thermal_consistency}})")
     #
@@ -91,7 +91,7 @@ function act(
     const channel_proc_i = find(channel_proc .== interface.channel_nums)[1]
     const mc_tm = map(
         field(:peaks_filtered),
-        mc_w72c.peak_output[:, channel_proc_i]) ## mc_bychannelwell
+        mc_w72c.peak_output[:, channel_proc_i]) ## mc_matrix
     println(mc_tm)
     min_Tm = max_temperature + 1
     max_Tm = 0

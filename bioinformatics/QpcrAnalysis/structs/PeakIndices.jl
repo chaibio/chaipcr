@@ -66,7 +66,7 @@ Base.next(iter ::PeakIndices, state ::Void) = (nothing, nothing)
 
 function Base.next(iter ::PeakIndices, state ::PeakIndicesState)
     left_nadir_ii, summit_ii, right_nadir_ii =
-        state |> fieldnames |> mold(curry(getfield)(state))
+        map(f -> getfield(state, f), fieldnames(state))
     ## next summit
     while (summit_ii < iter.len_summit_idc)
         ## summit_ii < iter.len_summit_idc

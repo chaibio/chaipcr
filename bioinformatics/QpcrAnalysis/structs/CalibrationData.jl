@@ -1,4 +1,4 @@
-#================================================
+#==============================================================================================
 
     CalibrationData.jl
 
@@ -8,8 +8,7 @@
     Author: Tom Price
     Date:   June 2019
 
-=================================================#
-
+==============================================================================================#
 
 import DataStructures.OrderedDict
 
@@ -43,7 +42,7 @@ function CalibrationData(calib ::Associative)
 end
 
 ## other method
-num_wells(this ::CalibrationData{<: Real}) =
+num_wells(this ::CalibrationData) =
     [:water, Symbol(CHANNEL_KEY, "_", 1), Symbol(CHANNEL_KEY, "_", 2)] |>
         mold(f -> num_wells(getfield(this, f))) |>
         maximum

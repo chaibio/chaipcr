@@ -1,10 +1,10 @@
-#===================================================================
+#==============================================================================================
 
     dispatch.jl
 
     dispatches API GET requests to the appropriate act() method
     
-===================================================================#
+==============================================================================================#
 
 import JSON: parse, json
 import DataStructures.OrderedDict
@@ -19,12 +19,12 @@ function dispatch(
     const action_str = "\"" * replace(string(action_key), r"_", " ") * "\""
     debug(logger, "at dispatch() with action $action_str")
     # debug(logger, "request body is:\n" * request_body)
-
+    #
     const result = try
         ## NB. DefaultDict and DefaultOrderedDict constructors sometimes don't work on OrderedDict
         ## (https://github.com/JuliaLang/DataStructures.jl/issues/205)
         req_parsed = JSON.parse(request_body; dicttype=OrderedDict)
-
+        #
         ## Performance issue:
         ## By default the JSON parser uses type ::Any
         ## This wastes time and memory downstream.
@@ -32,13 +32,13 @@ function dispatch(
         ## wherever it is known.
         ## Since the data structures are specific to each action,
         ## this should generally be done in the generic act() methods.
-
+        #
         if !(action_key in keys(ACT))
             error(logger, "action $action_str is not recognized")
         end
         ## else
         const action = Val{ACT[action_key]}
-
+        #
         const production_env = (get(ENV, "JULIA_ENV", nothing) == PRODUCTION_MODE)
         @static if !production_env
             ## this code is hidden from the parser on the BeagleBone
@@ -50,13 +50,13 @@ function dispatch(
                 end ## try
             end ## if verify
         end ## if !production_env
-
+        #
         debug(logger, "dispatching to act() from dispatch()")
         const response = act(action, req_parsed; out_format = pre_json_output)
         debug(logger, "response received from act() by dispatch()")
         debug(logger, repr(response))
         const json_response = JSON.json(response)
-
+        #
         @static if !production_env
             ## this code is hidden from the parser on the BeagleBone
             if verify
@@ -67,14 +67,14 @@ function dispatch(
                 end ## try
             end ## if verify
         end ## if !production_env
-
+        #
         ## return value
         json_response
-
+        #
     catch err
         fail(logger, err; bt=true)
     end ## result = try
-
+    #
     const success = !isa(result, Exception)
     const response_body = if success
         string(result)

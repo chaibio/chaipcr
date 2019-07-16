@@ -8,10 +8,10 @@ import DataStructures.OrderedDict
 import Memento: debug, warn
 
 
+
 #==============================================================================================
     constants >>
 ==============================================================================================#
-
 
 ## channel descriptors
 const CHANNELS          = [1, 2]
@@ -39,10 +39,10 @@ const WATER_MAX = [32000, 5000]
 const WATER_MIN = [1000, -1000]
 
 
+
 #==============================================================================================
     function definition >>
 ==============================================================================================#
-
 
 ## called by dispatch()
 function act(
@@ -96,7 +96,7 @@ function act(
                         CHANNELS)
             end)
     const num_wells = size(fluo_dict[:baseline], 1)
-
+    #
     bool_dict = OrderedDict(:baseline => fill(true, num_wells, length(CHANNELS)))
     ## water test
     bool_dict[:water] =
@@ -113,9 +113,9 @@ function act(
             mapreduce(
                 well_i -> SNR_test(well_i, calib_label),
                 vcat,
-                range(1, num_wells))
+                1:num_wells)
     end
-
+    #
     ## organize "optical_data"
     const optical_data =
         map(range(1, num_wells)) do well_i
@@ -129,7 +129,7 @@ function act(
                             
                 end) ## do cl_i
         end ## do well_i
-
+    #
     ## FAM and HEX self-calibrated
     ## ((signal_of_dye_x_in_channel_k - water_in_channel_k) /
     ##     (signal_of_target_dye_in_channel_k - water_in_channel_k); x=FAM,HEX; k=1,2)
@@ -162,8 +162,8 @@ function act(
                 swd_dye[channel_i] ./ swd_normd[channel_i]
             end ## do channel_i
         end ## do swd_dye
-
-    ## call as invalid aonalysis if there are negative or zero values in the normalized data
+    #
+    ## call as invalid analysis if there are negative or zero values in the normalized data
     ## that will cause the channel1:channel2 ratio to be zero, infinite, or negative
     ## devectorized
     error_msgs = Vector{String}()

@@ -12,10 +12,10 @@ import DataFrames.DataFrame
 import Memento: debug, error
 
 
+
 #==============================================================================================
     field names >>
 ==============================================================================================#
-
 
 const MC_RAW_FIELDS = OrderedDict(
     :temperature            => TEMPERATURE_KEY,
@@ -236,7 +236,7 @@ function mc_analysis(i ::McInput)
                 end ## let
             end ## next wi
         end ## next ci
-        return RawData{Float_T}(t), RawData{Float_T}(f)
+        return RawData(t), RawData(f)
     end ## transform_3d()
            
     normalize_tf(ci ::Integer, wi ::Integer) =
@@ -248,7 +248,7 @@ function mc_analysis(i ::McInput)
            
     remove_when_temperature_NaN(x...) =
         # map(y -> y[broadcast(!isnan, first(x))], x)
-        map(first(x) |> cast(!isnan) |> index, x)
+        x |> mold(first(x) |> cast(!isnan) |> index)
            
     ## subtract lowest fluorescence value
     ## NB if any value is NaN, the result will be all NaNs
@@ -313,12 +313,12 @@ function mc_analysis(i ::McInput)
     ## ignore dummy well_nums from calibrate()
     const norm_well_nums = i.well_nums
     #
-    ## subset temperature/fluorescence data by channel then by well
+    ## subset temperature/fluorescence data by channel / well
     ## then smooth the fluorescence/temperature data and calculate Tm peak, area
-    ## bychwl = by channel then by well_nums
-    const mc_bychannelwell =
-    reshape(
-        mapreduce(
+    ## result is mc_matrix: dim1 = well, dim2 = channel
+    const mc_matrix =
+        eachindex(i.channel_nums) |> ## do for each channel
+        moose(
             ci ->
                 map(eachindex(i.well_nums)) do wi
                     if i.well_nums[wi] in norm_well_nums
@@ -329,10 +329,9 @@ function mc_analysis(i ::McInput)
                     else
                         McPeakOutput(peak_format)
                     end
-                end, ## do w
-            hcat,
-            eachindex(i.channel_nums)),
-                i.num_wells, i.num_channels) ## coerce to 2d array
+                end, ## do wi
+            hcat) |>
+        morph(i.num_wells, i.num_channels) ## coerce to 2d array
     #
     # if (i.out_format == full_output)
     if peak_format == McPeakLongOutput
@@ -346,13 +345,13 @@ function mc_analysis(i ::McInput)
             norm_data,
             i.well_nums,
             calibrated_data,
-            mc_bychannelwell)
+            mc_matrix)
     else
         ## json_output, pre_json_output
         ## McPeakShortOutput
         output_dict = OrderedDict{Symbol,Any}(map(keys(MC_OUTPUT_FIELDS)) do f
             MC_OUTPUT_FIELDS[f] =>
-                [   i.reporting(getfield(mc_bychannelwell[wi, ci], f))
+                [   i.reporting(getfield(mc_matrix[wi, ci], f))
                     for wi in 1:i.num_wells, ci in 1:i.num_channels ]
         end) ## do f
         output_dict[:valid] = true

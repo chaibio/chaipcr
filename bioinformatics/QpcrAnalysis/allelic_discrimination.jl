@@ -1,10 +1,10 @@
-#===============================================
+#==============================================================================================
 
     allelic_discrimination.jl
 
     clusters data to identify allele groups
     
-===============================================#
+==============================================================================================#
 
 import DataStructures.OrderedDict
 import Clustering: ClusteringResult, kmeans!, kmedoids!, silhouettes
@@ -13,11 +13,20 @@ import StatsBase.counts
 import Memento: debug, info, error
 
 
-## function definitions >>
+
+#==============================================================================================
+    constants >>
+==============================================================================================#
 
 ## nrn: whether to flip the binary genotype or not
 const NRN_SELF = identity
 const NRN_NOT  = x -> 1 .- x
+
+
+
+#==============================================================================================
+    function definitions >>
+==============================================================================================#
 
 ## start with bottom-level function, goes step-wise
 function prep_input_4ad(
@@ -58,6 +67,9 @@ function prep_input_4ad(
     data = transpose(data_t[well_idc, :])
     return (data, nrn)
 end ## prep_data_4ad
+
+
+#=============================================================================================#
 
 
 function do_cluster_analysis(
@@ -186,10 +198,11 @@ function do_cluster_analysis(
         end ## check_grp()
         ## end of function definition nested within check_groups()
 
-        mapreduce(
-            grp_i -> check_grp(assignments_woinit .== grp_i),
-            vcat,
-            1:num_centers)
+        # mapreduce(
+        #     grp_i -> check_grp(assignments_woinit .== grp_i),
+        #     vcat,
+        #     1:num_centers)
+        num_centers |> from(1) |> moose(grp_i -> check_grp(assignments_woinit .== grp_i), vcat)
     end ## check_groups()
     ## end of function definitions nested within do_cluster_analysis()
 
@@ -226,6 +239,9 @@ function do_cluster_analysis(
 end ## do_cluster_analysis()
 
 
+#=============================================================================================#
+
+
 ## steps to assign genotypes:
 ## 1. check whether expected genotypes are specified:
 ##    if yes use them,
@@ -251,19 +267,11 @@ function assign_genos(
 )
     function calc_expected_genos_all()
         f(c ::Int) =
-            reduce(
-                hcat,
-                fill(
-                    mapreduce(
-                        geno -> fill(geno, 1, 2^(c-1)),
-                        hcat,
-                        [0, 1]),
-                    2^(num_channels - c)))
-        mapreduce(
-            f,
-            vcat,
-            1:num_channels
-        ) |> nrn
+            [0, 1] |>
+            moose(furnish(1, 2^(c-1)), hcat) |>
+            furnish(2^(num_channels - c)) |>
+            gather(hcat)
+        num_channels |> from(1) |> moose(f, vcat) |> nrn
     end ## calc_expected_genos_all()
 
     ## for any channel, all the data points are the same
@@ -576,6 +584,9 @@ function assign_genos(
             expected_genos_all,
             ucc_dict))
 end ## assign_genos()
+
+
+#=============================================================================================#
 
 
 function process_ad(

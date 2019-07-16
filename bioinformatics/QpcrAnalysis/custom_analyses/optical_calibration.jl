@@ -14,10 +14,10 @@ import Memento.debug
 const DEFAULT_OC_WELL_NUMS      = []
 
 
+
 #==============================================================================================
     function definition >>
 ==============================================================================================#
-
 
 ## called by dispatch()
 function act(
@@ -50,7 +50,7 @@ function act(
     end
     const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
     try
-        prep_normalize(calibration_data, well_nums)
+        prep_normalize(calibration_data, well_nums, DEFAULT_CAL_DYE_IN, DEFAULT_CAL_DYES_TO_FILL)
     catch err
         return fail(logger, err; bt=true) |> out(out_format)
     end
@@ -59,7 +59,7 @@ function act(
         ## the deconvolution matrix K is calculated
         ## otherwise deconvolution is not performed
         const result_k = try
-            get_k(calibration_data, well_nums)
+            get_k(calibration_data, well_nums, DEFAULT_DCV_WELL_PROC)
         catch err
             return fail(logger, err; bt=true) |> out(out_format)
         end

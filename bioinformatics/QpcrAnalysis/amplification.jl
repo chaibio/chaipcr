@@ -17,10 +17,10 @@ import Memento: debug, warn, error
 using Ipopt
 
 
+
 #==============================================================================================
     field names >>
 ==============================================================================================#
-
 
 const KWARGS_AMP_KEYS =
     ["min_reliable_cyc", "baseline_cyc_bounds", "ctrl_well_dict",
@@ -29,12 +29,14 @@ const KWARGS_RCQ_KEYS_DICT = Dict(
     "min_fluomax"   => :max_bsf_lb,
     "min_D1max"     => :max_dr1_lb,
     "min_D2max"     => :max_dr2_lb)
+const AMP_VECTOR_OUTPUT_FIELDS =
+    [:rbbs_3ary, :blsub_fluos, :coefs, :blsub_fitted, :dr1_pred, :dr2_pred]
+
 
 
 #==============================================================================================
     function definitions >>
 ==============================================================================================#
-
 
 ## function called by dispatch()
 ## parses request body into AmpInput struct and calls amp_analysis()
@@ -193,6 +195,8 @@ function amp_parse_raw_data(req_dict ::Associative)
         end
     const (num_cycs, num_fluo_wells, num_channels) =
         map(length, (cyc_nums, fluo_well_nums, channel_nums))
+    #
+    ## check that data are conformable to 3D array
     try
         assert(req_dict[RAW_DATA_KEY][CYCLE_NUM_KEY] ==
             repeat(
@@ -212,11 +216,14 @@ function amp_parse_raw_data(req_dict ::Associative)
             "lend itself to transformation into a 3-dimensional array. " *
             "Please make sure that it is sorted by channel, well number, and cycle number."))
     end ## try
+    #
+    ## reshape to 3D array
     const F = typeof(req_dict[RAW_DATA_KEY][FLUORESCENCE_VALUE_KEY][1])
     const raw_data = ## formerly `fr_ary3`
         reshape(
             req_dict[RAW_DATA_KEY][FLUORESCENCE_VALUE_KEY],
             num_cycs, num_fluo_wells, num_channels)
+    #
     ## rearrange data in sort order of each index
     const cyc_perm  = sortperm(cyc_nums)
     const well_perm = sortperm(fluo_well_nums)
@@ -242,7 +249,7 @@ function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
     ## deconvolute and normalize
     const calibration_results =
         calibrate(
-            i.raw_data,
+            i.raw,
             i.calibration_data,
             i.fluo_well_nums,
             i.channel_nums;
@@ -256,7 +263,6 @@ function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
         calibration_results...,
         # cq_method,
         DEFAULT_AMP_CT_FLUOS)
-    # kwargs_jmp_model = Dict(:solver => this.solver)
     #
     ## fit amplification models and report results
     if i.num_cycs <= 2
@@ -264,17 +270,10 @@ function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
             "and Cq calculation will not be performed")
     else ## num_cycs > 2
         const baseline_cyc_bounds = check_bl_cyc_bounds(i, DEFAULT_AMP_BL_CYC_BOUNDS)
-        ## calculate ct_fluos
         o.ct_fluos = calc_ct_fluos(i, o, DEFAULT_AMP_CT_FLUOS, baseline_cyc_bounds)
-        ## baseline model fit
-        const fit_array2 = calc_fit_array2(i, o, baseline_cyc_bounds)
-        foreach(fieldnames(fit_array2[1,1])) do fieldname
-            set_field_from_array!(i, o, fieldname, fit_array2)
-        end ## do fieldname
-        ## qt_fluos
-        set_qt_fluos!(i, o, i.qt_prob)
-        ## report_cq
-        set_fieldname_rcq!(i, o)
+        set_fit_results!(i, o, baseline_cyc_bounds)
+        set_qt_fluos!(i, o)
+        set_report_cq!(i, o)
     end ## if
     #
     ## allelic discrimination
@@ -283,7 +282,6 @@ function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
     #         process_ad(i, o)
     # end # if dcv
     #
-    ## format output
     return o
 end ## amp_analysis()
 
@@ -308,22 +306,14 @@ function calc_ct_fluos(
     map(1:i.num_channels) do channel_i
         const fits =
             map(1:i.num_fluo_wells) do well_i
-                # const kw_bl =
-                #     Dict{Symbol, Any}(
-                #         baseline_cyc_bounds => baseline_cyc_bounds[well_i, channel_i],
-                #         kwargs_bl(i)...)
                 const fluos = o.rbbs_3ary[:, well_i, channel_i]
                 fit_amplification_model(
                     Val{SFCModel},
                     AmpCqFluoModelResults,
                     i,
-                    # fluos;
-                    # kw_bl..., ## parameters that apply only when fitting SFC models
-                    # cq_method = cp_dr1,
-                    # ct_fluo = NaN)
                     fluos,
                     bl_cyc_bounds[well_i, channel_i],
-                    cp_dr1, ## cq_method
+                    DEFAULT_AMP_CT_FLUO_METHOD, ## cq_method
                     NaN) ## i.ct_fluo
             end ## do well_i
         fits |>
@@ -350,73 +340,64 @@ end ## find_idc_useful()
 
 
 ## fit amplification model for each well, channel
-function calc_fit_array2(
+function set_fit_results!(
     i                       ::AmpInput,
     o                       ::AmpOutput,
     bl_cyc_bounds           ::AbstractArray,
 )
-    debug(logger, "at calc_fit_array2()")
+    function fit_model(wi ::Integer, ci ::Integer)
+        debug(logger, "at fit_model($wi, $ci)")
+        if isa(solver, Ipopt.IpoptSolver) && length(prefix) > 0
+            const ipopt_file = string(join([prefix, ci, wi], '_')) * ".txt"
+            push!(solver.options, (:output_file, ipopt_file))
+        end
+        const fluos = o.rbbs_3ary[:, wi, ci]
+        fit_amplification_model(
+            Val{i.amp_model},
+            i.amp_model_results,
+            i,
+            fluos,
+            bl_cyc_bounds[wi, ci],
+            i.cq_method,
+            o.ct_fluos[ci])
+    end ## fit model()
+
+    ## << end of function definition nested within set_fit_results!()
+        
+    debug(logger, "at set_fit_results!()")
     solver = i.solver
     const prefix = i.ipopt_print2file_prefix
-    [
-        begin
-            if isa(solver, Ipopt.IpoptSolver) && length(prefix) > 0
-                const ipopt_file = string(join([prefix, channel_i, well_i], '_')) * ".txt"
-                push!(solver.options, (:output_file, ipopt_file))
-            end
-            # const kw_bl =
-            #     i.amp_model == SFCModel ?
-            #         Dict{Symbol, Any}(
-            #             :baseline_cyc_bounds => bl_cyc_bounds[well_i, channel_i],
-            #             kwargs_bl(i)...) :
-            #         Dict{Symbol, Any}()
-            const fluos = o.rbbs_3ary[:, well_i, channel_i]
-            fit_amplification_model(
-                Val{SFCModel},
-                i.amp_model_results,
-                i,
-                # fluos;
-                # kw_bl...,
-                # kwargs_quant(i)...,
-                # ct_fluo = o.ct_fluos[channel_i])
-                fluos,
-                bl_cyc_bounds[well_i, channel_i],
-                i.cq_method,
-                o.ct_fluos[channel_i])
-        end
-        for well_i in 1:i.num_fluo_wells, channel_i in 1:i.num_channels
-    ]
-end ## calc_fit_array2()
+    const fit_results =
+        [
+            fit_model(wi, ci)
+            for wi in 1:i.num_fluo_wells, ci in 1:i.num_channels    ]
+    set_output_fields!(i, o, fit_results)
+end ## set_fit_results!()
 
 
 #=============================================================================================#
 
 
-## setter method for AmpOutput
-function set_field_from_array!(
+@inline function set_output_fields!(
     i                       ::AmpInput,
     o                       ::AmpOutput,
-    fieldname               ::Symbol,
-    data_array2             ::AbstractArray
+    results                 ::AbstractArray,
 )
-    debug(logger, "at set_field_from_array!()")
-    # (fieldname == :rbbs_3ary) && return
-    const val = [   getfield(data_array2[well_i, channel_i], fieldname)
-                    for well_i in 1:i.num_fluo_wells, channel_i in 1:i.num_channels ]
-    const reshaped_val =
-        fieldname in [:rbbs_3ary, :blsub_fluos, :coefs, :blsub_fitted, :dr1_pred, :dr2_pred] ?
-            ## reshape to 3D array
-            reshape(
-                cat(2, val...), ## 2D array of size (`num_cycs` or number of coefs, `num_wells * num_channels`)
-                length(val[1, 1]),
-                size(val)...) :
-            val
-    setfield!(
-        o,
-        fieldname,
-        convert(typeof(getfield(o, fieldname)), reshaped_val)) ## `setfield!` doesn't call `convert` on its own
+    debug(logger, "at set_output_fields!()")
+    foreach(fieldnames(first(results))) do fieldname
+        const T = eltype(getfield(o, fieldname))
+        if fieldname in AMP_VECTOR_OUTPUT_FIELDS
+            setfield!(o, fieldname,
+                results |>
+                moose(bless(Vector{T}) ∘ field(fieldname), hcat) |>
+                morph(:, i.num_fluo_wells, i.num_channels))
+        else
+            setfield!(o, fieldname,
+                results |> mold(bless(T) ∘ field(fieldname)))
+        end ## if
+    end ## next fieldname
     return nothing ## side effects only
-end ## set_field_from_array!()
+end ## set_output_fields!()
 
 
 #=============================================================================================#
@@ -426,7 +407,6 @@ end ## set_field_from_array!()
 function set_qt_fluos!(
     i                       ::AmpInput, 
     o                       ::AmpLongOutput, 
-    qt_prob                 ::AbstractFloat,
 )
     debug(logger, "at set_qt_fluos!()")
     o.qt_fluos =
@@ -441,24 +421,26 @@ end ## set_qt_fluos!()
 set_qt_fluos!(
     i                       ::AmpInput, 
     o                       ::AmpShortOutput,
-    qt_prob                 ::AbstractFloat,
 ) =
     nothing
 
 
-function set_fieldname_rcq!(
+#=============================================================================================#
+
+
+function set_report_cq!(
     i                       ::AmpInput, 
     o                       ::AmpLongOutput, 
 )
-    debug(logger, "at set_fieldname_rcq!()")
+    debug(logger, "at set_report_cq!()")
     for well_i in 1:i.num_fluo_wells, channel_i in 1:i.num_channels
         report_cq!(i, o, well_i, channel_i)
     end
     return nothing ## side effects only
-end ## set_fieldname_rcq!()
+end ## set_report_cq!()
 
 ## function does nothing when the output format is `short`
-set_fieldname_rcq!(
+set_report_cq!(
     i                       ::AmpInput, 
     o                       ::AmpShortOutput,
 ) =

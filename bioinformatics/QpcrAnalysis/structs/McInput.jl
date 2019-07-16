@@ -19,10 +19,10 @@ import DataArrays.DataArray
 import DataFrames.DataFrame
 
 
+
 #==============================================================================================
     constants >>
 ==============================================================================================#
-
 
 ## defaults for mc_analysis()
 const DEFAULT_MC_DCV                            = true
@@ -55,15 +55,13 @@ const DEFAULT_MC_JITTER_CONSTANT                = 0.01
 # const OVERRIDDEN_DEFAULT_MC_SPAN_SMOOTH_FACTOR  = 7.2
 
 
+
 #==============================================================================================
     struct >>
 ==============================================================================================#
 
-
-struct McInput{C <: Real}
-    # temperature                 ::RawData{<: Float_T}
-    # fluorescence                ::RawData{<: Real}
-    calibration_data            ::CalibrationData{C}
+struct McInput <: Input
+    calibration_data            ::CalibrationData{<: Real}
     raw_df                      ::DataFrame
     num_wells                   ::Int
     num_channels                ::Int
@@ -94,17 +92,15 @@ struct McInput{C <: Real}
 end
 
 
+
 #==============================================================================================
     method >>
 ==============================================================================================#
-
 
 ## constructor
 McInput(
     ## input data
     calibration_data            ::CalibrationData{<: Real},
-    # temperature                 ::RawData{<: Float_T}
-    # fluorescence                ::RawData{<: Real}
     raw_df                      ::DataFrame,
     num_wells                   ::Integer,
     num_channels                ::Integer,
@@ -172,10 +168,10 @@ McInput(
         reporting)
 
 
+
 #==============================================================================================
     helper function >>
 ==============================================================================================#
-
 
 ## parameters to be passed to mc_peak_analysis()
 # kwargs_pa(i ::McInput) =

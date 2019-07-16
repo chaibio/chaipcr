@@ -181,11 +181,12 @@ function mc_peak_analysis(
         half_width      ::Integer,
     )
         vals_in_window(i ::Integer) = vals_padded[i : i + half_width * 2]
+        match_summary_val(v ::AbstractVector) = summary_func(v) == v[half_width + 1]
         #
-        const padding = fill(-summary_func(-vals), half_width)
+        const padding = -summary_func(-vals) |> furnish(half_width)
         const vals_padded = [padding; vals; padding]
-        vals |> length |> from(1) |> collect |> mold(vals_in_window) |>
-            mold(v -> summary_func(v) == v[half_width + 1]) |> find
+        vals |> length |> from(1) |> collect |>
+            mold(match_summary_val ∘ vals_in_window) |> find
     end
 
     # half_peak_span_temperature = 0.5 * i.peak_span_temperature

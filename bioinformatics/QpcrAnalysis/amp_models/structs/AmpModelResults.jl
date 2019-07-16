@@ -1,16 +1,21 @@
-## AmpModelResults.jl
-##
-## output from fit_model!()
-##
-## Author: Tom Price
-## Date:   July 2019
+#==============================================================================================
+
+    AmpModelResults.jl
+
+    output from fit_model!()
+
+    Author: Tom Price
+    Date:   July 2019
+
+==============================================================================================#
 
 import DataStructures.OrderedDict
 import Ipopt: IpoptSolver #, NLoptSolver
 
 
-
-## structs >>
+#==============================================================================================
+    structs >>
+==============================================================================================#
 
 abstract type AmpModelResults end
 
@@ -39,7 +44,7 @@ end
 
 ## issue: rename `rbbs_3ary` as `calibrated` once juliaapi_new has been updated
 struct AmpShortModelResults <: AmpModelResults
-    rbbs_3ary       ::Vector{Float_T}   ## fluorescence after deconvolution and normalization
+    # rbbs_3ary       ::Vector{Float_T}   ## fluorescence after deconvolution and normalization
     blsub_fluos     ::Vector{Float_T}   ## fluorescence after baseline subtraction
     dr1_pred        ::Vector{Float_T}   ## dF/dc (slope of fluorescence/cycle)
     dr2_pred        ::Vector{Float_T}   ## d2F/dc2

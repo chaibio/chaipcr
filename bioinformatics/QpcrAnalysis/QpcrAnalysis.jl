@@ -1,8 +1,8 @@
-#=============================
+#==============================================================================================
 
     Module QpcrAnalysis.jl
 
-=============================#
+==============================================================================================#
 
 
 #=
@@ -67,13 +67,11 @@ module QpcrAnalysis
     ## deconvolution
     include("structs/K4Deconv.jl")
     ## allelic discrimination
-    include("structs/ClusteringMethod.jl")
     include("structs/ClusterAnalysisResult.jl")
     include("structs/UniqCombinCenters.jl")
     include("structs/AssignGenosResult.jl")
     ## amplification models
     include("amp_models/structs/AmpModel.jl")
-    # include("amp_models/structs/Amp.jl")
     include("amp_models/structs/AmpModelFit.jl")
     include("amp_models/SFC_model_definitions.jl")
     include("amp_models/structs/SFCModelDef.jl")
@@ -88,8 +86,6 @@ module QpcrAnalysis
     include("amp_models/structs/AmpInput.jl")
     include("amp_models/structs/AmpOutput.jl")
     ## melting curve experiments
-    # include("structs/MeltCurveRawData.jl")
-    include("structs/MeltCurveTF.jl")
     include("structs/PeakIndices.jl")
     include("structs/Peak.jl")
     include("structs/McPeakOutput.jl")
@@ -118,8 +114,6 @@ module QpcrAnalysis
     include("dispatch.jl")
     ## calibration
     include("calibration.jl")
-    include("normalization.jl")
-    include("deconvolution.jl")
     ## amplification
     include("amplification.jl")
     include("fit_amplification_model.jl")

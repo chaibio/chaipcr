@@ -61,7 +61,89 @@ end
 # run(`mv exec_testfns.jl ../build`)
 
 
-## Meltcurve test code
+
+## Amplification timings 12 July 2019
+
+# amp1 = test_functions["amplification single channel"]()
+# # open("/tmp/amp1-test.json","w") do f
+# #     JSON.print(f, amp1[2]["cq"])
+# # end
+# amp1_local = amp1[2]["cq"]
+# amp1_saved = JSON.parsefile("/tmp/amp1-test.json")
+# amp1_local == amp1_saved ## should be true
+# using Memento
+# setlevel!(QpcrAnalysis.logger, "error")
+# @timev for i in 1:100; test_functions["amplification single channel"](); end;
+# ## NB trailing semicolon suppresses output to REPL
+
+## tweaks
+# 27.564401 seconds (25.59 M allocations: 1.598 GiB, 1.62% gc time)
+# elapsed time (ns): 27564401000
+# gc time (ns):      446231000
+# bytes allocated:   1715774576
+# pool allocs:       25519126
+# non-pool GC allocs:61100
+# malloc() calls:    9600
+# realloc() calls:   900
+# GC pauses:         75
+
+# first attempt using static arrays
+# 35.524490 seconds (27.04 M allocations: 9.616 GiB, 3.94% gc time)
+# elapsed time (ns): 35524490000
+# gc time (ns):      1399246000
+# bytes allocated:   10325273296
+# pool allocs:       25401356
+# non-pool GC allocs:1629005
+# malloc() calls:    9700
+# realloc() calls:   1200
+# GC pauses:         450
+# full collections:  1
+
+# 27.231486 seconds (27.77 M allocations: 1.724 GiB, 1.75% gc time)
+# elapsed time (ns): 27231486000
+# gc time (ns):      476178000
+# bytes allocated:   1851260240
+# pool allocs:       27699785
+# non-pool GC allocs:62205
+# malloc() calls:    9600
+# realloc() calls:   1100
+# GC pauses:         80
+
+# commit 803d603cf6663601a97b22c1937d8b682110b4d2
+# 29.464264 seconds (27.88 M allocations: 1.674 GiB, 1.66% gc time)
+# elapsed time (ns): 29464264000
+# gc time (ns):      487881000
+# bytes allocated:   1797779888
+# pool allocs:       27815683
+# non-pool GC allocs:57505
+# malloc() calls:    9600
+# realloc() calls:   1100
+# GC pauses:         78
+
+# commit a01b3b50a6e753f3ce92d4a33c1cc9adbb6256b7:
+# 27.899778 seconds (27.90 M allocations: 1.675 GiB, 1.99% gc time)
+# elapsed time (ns): 27899778000
+# gc time (ns):      554854000
+# bytes allocated:   1798466880
+# pool allocs:       27832990
+# non-pool GC allocs:57504
+# malloc() calls:    9600
+# realloc() calls:   1100
+# GC pauses:         78
+
+# commit 24b9b1128a41d1c1b7cfd504f147a8f9713c5ce1:
+# 27.199742 seconds (30.54 M allocations: 1.727 GiB, 1.81% gc time)
+# elapsed time (ns): 27199742000
+# gc time (ns):      492167000
+# bytes allocated:   1854066288
+# pool allocs:       30471464
+# non-pool GC allocs:58100
+# malloc() calls:    9600
+# realloc() calls:   400
+# GC pauses:         80
+
+
+## Meltcurve timings 12 July 2019
 
 # mc3 = test_functions["meltcurve single channel"]()
 # # open("/tmp/mc3-test.json","w") do f
@@ -75,7 +157,7 @@ end
 # @timev for i in 1:100; test_functions["meltcurve single channel"](); end;
 # ## NB trailing semicolon suppresses output to REPL
 
-# commit c6344dee6622955ae376aef051062d92b22c7fe5 (mc):
+# commit a01b3b50a6e753f3ce92d4a33c1cc9adbb6256b7:
 # 12.023655 seconds (52.23 M allocations: 8.743 GiB, 11.55% gc time)
 # elapsed time (ns): 12023655000
 # gc time (ns):      1388750000
@@ -87,7 +169,7 @@ end
 # GC pauses:         410
 # full collections:  1
 
-# commit 73883fd51b000e8c01da05814b0e06b89b153653 (master):
+# commit 73883fd51b000e8c01da05814b0e06b89b153653:
 # 13.969750 seconds (52.23 M allocations: 8.743 GiB, 11.36% gc time)
 # elapsed time (ns): 13969750000
 # gc time (ns):      1586836000
@@ -99,7 +181,7 @@ end
 # GC pauses:         410
 # full collections:  1
 
-# commit 24b9b1128a41d1c1b7cfd504f147a8f9713c5ce1 (master):
+# commit 24b9b1128a41d1c1b7cfd504f147a8f9713c5ce1:
 # 15.593274 seconds (169.50 M allocations: 16.070 GiB, 15.57% gc time)
 # elapsed time (ns): 15593274000
 # gc time (ns):      2428248000

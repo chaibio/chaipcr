@@ -15,25 +15,32 @@ import Memento: debug, warn, error, Logger
 ## currying function
 @inline curry(f) = x -> (y...) -> f(x, y...)
 
-## used in amplification.jl
+## used in amplificatcion.jl
 ## used in shared_functions.jl
 ## used in melting_curve.jl
 ## used in optical_test_dual_channel.jl
-mold  = curry(map)       ## mold(f)  = x -> map(f, x)
+mold   = curry(map)         ## mold(f)   = x -> map(f, x)
 
 ## used in amplification.jl
 ## used in shared_functions.jl
 ## used in melting_curve.jl
 ## used in deconvolute.jl
-sift  = curry(filter)    ## sift(f)  = x -> filter(f, x)
+sift   = curry(filter)      ## sift(f)   = x -> filter(f, x)
 
 ## used in melting_curve.jl
 ## used in shared_functions.jl
-cast  = curry(broadcast) ## cast(f)  = x -> broadcast(f, x)
+cast   = curry(broadcast)   ## cast(f)   = x -> broadcast(f, x)
 
 ## used in calibration.jl
 ## used in shared_functions.jl
-from  = curry(range)     ## from(b)  = e -> range(b, e)
+from   = curry(range)       ## from(b)   = e -> range(b, e)
+
+## used in amplification.jl
+## used in allelic_discrimination.jl
+gather = curry(reduce)      ## gather(f) = x -> reduce(f, x)
+
+## used in amplification.jl
+bless  = curry(convert)     ## bless(T)  = x -> convert(T, x)
 
 ## used in shared_functions.jl
 ## flip function
@@ -47,6 +54,18 @@ field = flip(getfield)  ## field(f) = x -> getfield(x, f)
 ## used in amplification.jl
 ## used in melting_curve.jl
 index = flip(getindex)  ## index(i) = x -> getindex(x, i)
+
+## used in amplification.jl
+morph(d...) = x -> reshape(x, d...)
+
+## used in allelic_discrimination.jl
+## used in mc_peak_analysis.jl
+furnish(d...) = x -> fill(x, d...)
+
+## used in amplification.jl
+## used in allelic_discrimination.jl
+## used in melting_curve.jl
+moose(f, g) = x -> mapreduce(f, g, x)
 
 ## used in amplification.jl
 ## used in melting_curve.jl

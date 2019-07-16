@@ -29,11 +29,14 @@ CqMethod(m ::String) = CqMethod(findfirst(map(string, instances(CqMethod)), m) -
 AmpOutputOption(option ::OutputFormat) =
     option == full_output ? long : short
 
+@enum ClusteringMethod k_means k_means_medoids k_medoids
+const CLUSTERINGMETHODS = instances(ClusteringMethod)
+
+
 
 #==============================================================================================
     constants >>
 ==============================================================================================#
-
 
 ## default for calibration
 const DEFAULT_AMP_DCV               = true
@@ -44,6 +47,7 @@ const DEFAULT_AMP_BL_METHOD         = l4_enl
 const DEFAULT_AMP_FALLBACK_FUNC     = median
 const DEFAULT_AMP_MIN_RELIABLE_CYC  = 5 ## >= 1
 const DEFAULT_AMP_BL_CYC_BOUNDS     = Vector{Int}()
+const DEFAULT_AMP_CQ_FLUO_METHOD    = cp_dr1
 
 ## defaults for quantification model
 const DEFAULT_AMP_QUANT_METHOD      = l4_enl
@@ -75,14 +79,16 @@ const DEFAULT_AMP_DEFAULT_ENCGR     = DEFAULT_encgr
 const DEFAULT_AMP_CATEG_WELL_VEC    = CATEG_WELL_VEC
 
 
+
 #==============================================================================================
     struct >>
 ==============================================================================================#
 
+abstract type Input end
 
-struct AmpInput
+struct AmpInput <: Input
     ## input data
-    raw_data                ::RawData{<: Real}
+    raw                     ::RawData{<: Real}
     num_cycs                ::Int
     num_fluo_wells          ::Int
     num_channels            ::Int
@@ -128,14 +134,14 @@ struct AmpInput
 end
 
 
+
 #==============================================================================================
     method >>
 ==============================================================================================#
 
-
 ## constructor = interface to amp_analysis()
 AmpInput(
-    raw_data                ::RawData{<: Real},
+    raw                     ::RawData{<: Real},
     num_cycs                ::Integer,
     num_fluo_wells          ::Integer,
     num_channels            ::Integer,
@@ -159,7 +165,7 @@ AmpInput(
     baseline_cyc_bounds     ::Union{AbstractVector,AbstractArray}
                                                 = DEFAULT_AMP_BASELINE_CYC_BOUNDS,
     quant_method            ::SFCModelName      = DEFAULT_AMP_QUANT_METHOD,
-    denser_factor           ::Int               = DEFAULT_AMP_DENSER_FACTOR,
+    denser_factor           ::Integer           = DEFAULT_AMP_DENSER_FACTOR,
     cq_method               ::CqMethod          = DEFAULT_AMP_CQ_METHOD,
     ## argument for set_qt_fluos!()
     qt_prob                 ::AbstractFloat     = DEFAULT_AMP_QT_PROB,
@@ -176,7 +182,7 @@ AmpInput(
                                                 = DEFAULT_AMP_CTRL_WELL_DICT,
 ) =
     AmpInput(
-        raw_data,
+        raw,
         num_cycs,
         num_fluo_wells,
         num_channels,
@@ -212,27 +218,12 @@ AmpInput(
     )
 
 
+
 #==============================================================================================
     helper functions >>
 ==============================================================================================#
 
-
 amp_init(i ::AmpInput, x...) = fill(x..., i.num_fluo_wells, i.num_channels)
-
-## baseline estimation parameters
-# kwargs_bl(i ::AmpInput) =
-#     Dict{Symbol,Any}(
-#         :bl_method          => i.bl_method,
-#         :bl_fallback_func   => i.bl_fallback_func,
-#         :min_reliable_cyc   => i.min_reliable_cyc,
-#     )
-
-## quantitation parameters
-# kwargs_quant(i ::AmpInput) =
-#     Dict{Symbol,Any}(
-#         :cq_method          => i.cq_method,
-#         :denser_factor      => i.denser_factor,
-#     )
 
 ## arguments for process_ad()
 kwargs_ad(i ::AmpInput) =
@@ -259,3 +250,18 @@ function check_bl_cyc_bounds(
     end
     throw(ArgumentError("`baseline_cyc_bounds` is not in the right format"))
 end ## check_bl_cyc_bounds()
+
+## baseline estimation parameters
+# kwargs_bl(i ::AmpInput) =
+#     Dict{Symbol,Any}(
+#         :bl_method          => i.bl_method,
+#         :bl_fallback_func   => i.bl_fallback_func,
+#         :min_reliable_cyc   => i.min_reliable_cyc,
+#     )
+
+## quantitation parameters
+# kwargs_quant(i ::AmpInput) =
+#     Dict{Symbol,Any}(
+#         :cq_method          => i.cq_method,
+#         :denser_factor      => i.denser_factor,
+#     )

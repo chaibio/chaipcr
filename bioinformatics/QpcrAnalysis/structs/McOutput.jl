@@ -30,5 +30,5 @@ struct McLongOutput <: McOutput
 end
 
 ## this type not necessary because `output_dict` in mc_analysis()
-## can be constructed directly from `mc_bychannelwell`
+## can be constructed directly from `mc_matrix`:
 # abstract type McShortOutput <: McOutput end
