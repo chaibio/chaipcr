@@ -154,8 +154,8 @@ function AmpOutput(
     AmpShortOutput(
         cd, ## formerly rbbs_ary3
         cd, ## blsub_fluos
-        zeros(0, 0, 0), ## dr1_pred
-        zeros(0, 0, 0), ## dr2_pred
+        cd, ## dr1_pred
+        cd, ## dr2_pred
         NaN_array2, ## d0
         NaN_array2, ## cq
         ct_fluos, ## ct_fluos

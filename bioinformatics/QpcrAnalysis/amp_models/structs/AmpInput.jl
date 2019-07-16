@@ -80,23 +80,23 @@ const DEFAULT_AMP_CATEG_WELL_VEC    = CATEG_WELL_VEC
 ==============================================================================================#
 
 
-struct AmpInput{F <: Real, C <: Real, M <: AmpModel}
+struct AmpInput
     ## input data
-    raw_data                ::RawData{F}
+    raw_data                ::RawData{<: Real}
     num_cycs                ::Int
     num_fluo_wells          ::Int
     num_channels            ::Int
     cyc_nums                ::Vector{Int}
     fluo_well_nums          ::Vector{Int}
     channel_nums            ::Vector{Int}
-    calibration_data        ::CalibrationData{C}
+    calibration_data        ::CalibrationData{<: Real}
     ## solver
     solver                  ::IpoptSolver
     ipopt_print2file_prefix ::String
     ## calibration parameters
     dcv                     ::Bool
     ## amplification model
-    amp_model               ::Type{M}
+    amp_model               ::Type{<: AmpModel}
     ## output format parameters
     # out_sr_dict             ::Bool
     amp_output              ::AmpOutputOption
@@ -134,19 +134,19 @@ end
 
 
 ## constructor = interface to amp_analysis()
-AmpInput{F <: Real, C <: Real, M <: AmpModel}(
-    raw_data                ::RawData{F},
+AmpInput(
+    raw_data                ::RawData{<: Real},
     num_cycs                ::Integer,
     num_fluo_wells          ::Integer,
     num_channels            ::Integer,
     cyc_nums                ::Vector{Int},
     fluo_well_nums          ::Vector{Int},
     channel_nums            ::Vector{Int},
-    calibration_data        ::CalibrationData{C},
+    calibration_data        ::CalibrationData{<: Real},
     solver                  ::IpoptSolver,
     ipopt_print2file_prefix ::AbstractString,
     dcv                     ::Bool,
-    amp_model               ::Type{M},
+    amp_model               ::Type{<: AmpModel},
     # out_sr_dict             ::Bool,
     amp_output              ::AmpOutputOption,
     reporting               ::Function;
