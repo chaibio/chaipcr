@@ -12,6 +12,7 @@
 
 import JSON: parse
 import DataStructures.OrderedDict
+import StaticArrays: SVector, SMatrix
 import Ipopt: IpoptSolver #, NLoptSolver
 import Memento: debug, warn, error
 using Ipopt
@@ -58,7 +59,7 @@ function act(
     ## calibration data is required
     req_key = curry(haskey)(req_dict)
     if !(req_key(CALIBRATION_INFO_KEY) &&
-        typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative)
+        isa(req_dict[CALIBRATION_INFO_KEY], Associative))
             return fail(logger, ArgumentError(
                 "no calibration information found")) |> out(out_format)
     end
@@ -122,13 +123,12 @@ function act(
     const interface = AmpInput(
         parsed_raw_data...,
         calibration_data,
+        DEFAULT_AMP_MODEL,
+        amp_output,
         IpoptSolver(print_level = 0, max_iter = 35),
         "",
-        DEFAULT_AMP_DCV && parsed_raw_data[4] > 1, ## dcv && num_channels > 1
-        DEFAULT_AMP_MODEL,
-        # true,
-        amp_output,
-        roundoff(JSON_DIGITS);
+        roundoff(JSON_DIGITS),
+        DEFAULT_AMP_DCV && parsed_raw_data[4] > 1; ## dcv && num_channels > 1
         kw_bl...,
         kw_amp...,
         kw_rcq...,)
@@ -190,53 +190,56 @@ end ## act(::Type{Val{amplification}})
 "Extract dimensions of raw amplification data, then format the raw data into a
 3D array as required by `calibrate`."
 function amp_parse_raw_data(req_dict ::Associative)
-    const (cyc_nums, fluo_well_nums, channel_nums) =
+    const (cycs, wells, channels) =
         map([CYCLE_NUM_KEY, WELL_NUM_KEY, CHANNEL_KEY]) do key
             req_dict[RAW_DATA_KEY][key] |> unique             ## in order of appearance
         end
-    const (num_cycs, num_fluo_wells, num_channels) =
-        map(length, (cyc_nums, fluo_well_nums, channel_nums))
+    const (num_cycs, num_wells, num_channels) =
+        map(length, (cycs, wells, channels))
     #
     ## check that data are conformable to 3D array
     try
         assert(req_dict[RAW_DATA_KEY][CYCLE_NUM_KEY] ==
             repeat(
-                cyc_nums,
-                outer = num_fluo_wells * num_channels))
+                cycs,
+                outer = num_wells * num_channels))
         assert(req_dict[RAW_DATA_KEY][WELL_NUM_KEY ] ==
             repeat(
-                fluo_well_nums,
+                wells,
                 inner = num_cycs,
                 outer = num_channels))
         assert(req_dict[RAW_DATA_KEY][CHANNEL_KEY  ] ==
             repeat(
-                channel_nums,
-                inner = num_cycs * num_fluo_wells))
+                channels,
+                inner = num_cycs * num_wells))
     catch()
         throw(AssertionError("The format of the fluorescence data does not " *
             "lend itself to transformation into a 3-dimensional array. " *
-            "Please make sure that it is sorted by channel, well number, and cycle number."))
+            "Please make sure that it is sorted by channel, well, and cycle number."))
     end ## try
     #
     ## reshape to 3D array
-    const F = typeof(req_dict[RAW_DATA_KEY][FLUORESCENCE_VALUE_KEY][1])
+    const F = eltype(first(req_dict[RAW_DATA_KEY][FLUORESCENCE_VALUE_KEY]))
     const raw_data = ## formerly `fr_ary3`
         reshape(
             req_dict[RAW_DATA_KEY][FLUORESCENCE_VALUE_KEY],
-            num_cycs, num_fluo_wells, num_channels)
+            num_cycs, num_wells, num_channels)
     #
     ## rearrange data in sort order of each index
-    const cyc_perm  = sortperm(cyc_nums)
-    const well_perm = sortperm(fluo_well_nums)
-    const chan_perm = sortperm(channel_nums)
+    const cyc_perm  = sortperm(cycs)
+    const well_perm = sortperm(wells)
+    const chan_perm = sortperm(channels)
+    #
+    ## kludge to index well numbers starting at 0
+    const kludge = sweep(minimum)(-)(wells)
     return (
         RawData{F}(raw_data[cyc_perm, well_perm, chan_perm]),
         num_cycs,
-        num_fluo_wells,
+        num_wells,
         num_channels,
-        cyc_nums[cyc_perm],
-        fluo_well_nums[well_perm],
-        channel_nums[chan_perm])
+        cycs[cyc_perm] |> SVector{num_cycs},
+        kludge[well_perm] |> mold(Symbol ∘ Int) |> SVector{num_wells},
+        channels[chan_perm] |> SVector{num_channels})
 end ## amp_parse_raw_data()
 
 
@@ -248,14 +251,7 @@ function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
     debug(logger, "at amp_analysis()")
     #
     ## deconvolute and normalize
-    const calibration_results =
-        calibrate(
-            i.raw,
-            i.calibration_data,
-            i.fluo_well_nums,
-            i.channel_nums;
-            dcv = i.dcv,
-            data_format = array)
+    const calibration_results = calibrate(i, i.raw, array)
     #
     ## initialize output
     o = AmpOutput(
@@ -263,7 +259,7 @@ function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
         i,
         calibration_results...,
         # cq_method,
-        DEFAULT_AMP_CT_FLUOS)
+        default_ct_fluos(i))
     #
     ## fit amplification models and report results
     if i.num_cycs <= 2
@@ -271,10 +267,10 @@ function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
             "and Cq calculation will not be performed")
     else ## num_cycs > 2
         const baseline_cyc_bounds = check_bl_cyc_bounds(i, DEFAULT_AMP_BL_CYC_BOUNDS)
-        o.ct_fluos = calc_ct_fluos(i, o, DEFAULT_AMP_CT_FLUOS, baseline_cyc_bounds)
-        set_output_fields!(i, o, get_fit_results(i, o, baseline_cyc_bounds))
-        set_qt_fluos!(i, o)
-        set_report_cq!(i, o)
+        set_ct_fluos!(o, i, baseline_cyc_bounds)
+        set_output_fields!(o, i, get_fit_results(o, i, baseline_cyc_bounds))
+        set_qt_fluos!(o, i)
+        set_report_cq!(o, i)
     end ## if
     #
     ## allelic discrimination
@@ -290,44 +286,44 @@ end ## amp_analysis()
 #==============================================================================#
 
 
-"Calculate the amplification output field `ct_fluos`."
-function calc_ct_fluos(
-    i                       ::AmpInput,
+"Set the amplification output field `ct_fluos`."
+function set_ct_fluos!(
     o                       ::AmpOutput,
-    ct_fluos                ::AbstractVector,
+    i                       ::AmpInput,
     baseline_cyc_bounds     ::AbstractArray,
 )
     debug(logger, "at calc_ct_fluos()")
-    const ct_fluos_empty = fill(NaN, i.num_channels)
-    (i.num_cycs <= 2)       && return ct_fluos
-    (length(ct_fluos) > 0)  && return ct_fluos
-    (i.cq_method != :ct)    && return ct_fluos_empty
-    (i.amp_model != :SFC)   && return ct_fluos_empty
+    (length(o.ct_fluos) > 0) && return nothing
+    o.ct_fluos = default_ct_fluos(i)
+    (i.cq_method != :ct)     && return nothing
+    (i.amp_model != :SFC)    && return nothing
     ## else
-    map(1:i.num_channels) do channel_i
-        const fits =
-            map(1:i.num_fluo_wells) do well_i
-                const fluos = o.rbbs_3ary[:, well_i, channel_i]
-                fit_amplification_model(
-                    Val{SFCModel},
-                    AmpCqFluoModelResults,
-                    i,
-                    fluos,
-                    bl_cyc_bounds[well_i, channel_i],
-                    DEFAULT_AMP_CT_FLUO_METHOD, ## cq_method
-                    NaN) ## i.ct_fluo
-            end ## do well_i
-        fits |>
-            mold(field(:quant_status)) |>
-            find_idc_useful |>
-            curry(getindex)(fits) |>
-            mold(field(:cq_fluo)) |>
-            median
-    end ## do channel_i
+    o.ct_fluos =
+        map(1:i.num_channels) do channel_i
+            const fits =
+                map(1:i.num_wells) do well_i
+                    const fluos = o.rbbs_3ary[:, well_i, channel_i]
+                    fit_amplification_model(
+                        Val{SFCModel},
+                        AmpCqFluoModelResults,
+                        i,
+                        fluos,
+                        bl_cyc_bounds[well_i, channel_i],
+                        DEFAULT_AMP_CT_FLUO_METHOD, ## cq_method
+                        NaN) ## i.ct_fluo
+                end ## do well_i
+            fits |>
+                mold(field(:quant_status)) |>
+                find_idc_useful |>
+                curry(getindex)(fits) |>
+                mold(field(:cq_fluo)) |>
+                median
+        end ## do channel_i
+    return nothing ## side effects only
 end ## calc_ct_fluos()
 
+## called by calc_ct_fluos() >>
 
-## used in calc_ct_fluos()
 @inline function find_idc_useful(postbl_stata ::AbstractVector)
     idc_useful = find(postbl_stata .== :Optimal)
     (length(idc_useful) > 0) && return idc_useful
@@ -336,14 +332,17 @@ end ## calc_ct_fluos()
     return eachindex(postbl_stata)
 end ## find_idc_useful()
 
+default_ct_fluos(i ::AmpInput) =
+    SVector{i.num_channels, Float_T}(fill(NaN, i.num_channels))
+
 
 #==============================================================================#
 
 
 "Fit amplification model to data for each well and channel."
 function get_fit_results(
-    i                       ::AmpInput,
     o                       ::AmpOutput,
+    i                       ::AmpInput,
     bl_cyc_bounds           ::AbstractArray,
 )
     function fit_model(wi ::Integer, ci ::Integer)
@@ -364,14 +363,14 @@ function get_fit_results(
     end ## fit model()
 
     ## << end of function definition nested within set_fit_results!()
-        
+
     debug(logger, "at set_fit_results!()")
     solver = i.solver
     const prefix = i.ipopt_print2file_prefix
     const fit_results =
-        [
+        SMatrix{i.num_wells, i.num_channels, i.amp_model_results}([
             fit_model(wi, ci)
-            for wi in 1:i.num_fluo_wells, ci in 1:i.num_channels    ]
+            for wi in 1:i.num_wells, ci in 1:i.num_channels])
 end ## set_fit_results!()
 
 
@@ -380,8 +379,8 @@ end ## set_fit_results!()
 
 "Format the results of the amplification analyses."
 @inline function set_output_fields!(
-    i                       ::AmpInput,
     o                       ::AmpOutput,
+    i                       ::AmpInput,
     results                 ::AbstractArray,
 )
     debug(logger, "at set_output_fields!()")
@@ -391,10 +390,11 @@ end ## set_fit_results!()
             setfield!(o, fieldname,
                 results |>
                 moose(bless(Vector{T}) ∘ field(fieldname), hcat) |>
-                morph(:, i.num_fluo_wells, i.num_channels))
+                morph(:, i.num_wells, i.num_channels))
         else
             setfield!(o, fieldname,
-                results |> mold(bless(T) ∘ field(fieldname)))
+                results |> mold(bless(T) ∘ field(fieldname)) |>
+                bless(SMatrix{i.num_wells, i.num_channels, T}))
         end ## if
     end ## next fieldname
     return nothing ## side effects only
@@ -407,13 +407,13 @@ end ## set_output_fields!()
 "Calculate the amplification analysis fields `qt_fluos` and `max_qt_fluo`, when
 the output format is `long`."
 function set_qt_fluos!(
-    i                       ::AmpInput, 
-    o                       ::AmpLongOutput, 
+    o                       ::AmpLongOutput,
+    i                       ::AmpInput,
 )
     debug(logger, "at set_qt_fluos!()")
     o.qt_fluos =
         [   quantile(o.blsub_fluos[:, well_i, channel_i], i.qt_prob)
-            for well_i in 1:i.num_fluo_wells, channel_i in 1:i.num_channels ]
+            for well_i in 1:i.num_wells, channel_i in 1:i.num_channels ]
     o.max_qt_fluo = maximum(o.qt_fluos)
     return nothing ## side effects only
 end ## set_qt_fluos!()
@@ -421,8 +421,8 @@ end ## set_qt_fluos!()
 
 "Do nothing when the output format is `short`."
 set_qt_fluos!(
-    i                       ::AmpInput, 
     o                       ::AmpShortOutput,
+    i                       ::AmpInput,
 ) =
     nothing
 
@@ -432,11 +432,11 @@ set_qt_fluos!(
 
 "Call `report_cq!` for each well and channel, when the output format is `long`."
 function set_report_cq!(
-    i                       ::AmpInput, 
-    o                       ::AmpLongOutput, 
+    o                       ::AmpLongOutput,
+    i                       ::AmpInput,
 )
     debug(logger, "at set_report_cq!()")
-    for well_i in 1:i.num_fluo_wells, channel_i in 1:i.num_channels
+    for well_i in 1:i.num_wells, channel_i in 1:i.num_channels
         report_cq!(i, o, well_i, channel_i)
     end
     return nothing ## side effects only
@@ -445,16 +445,16 @@ end ## set_report_cq!()
 
 "Do nothing when the output format is `short`."
 set_report_cq!(
-    i                       ::AmpInput, 
     o                       ::AmpShortOutput,
+    i                       ::AmpInput,
 ) =
     nothing
 
 
-"Report amplification output fields relating to the calculation of `cq`. "
+"Report amplification output fields relating to the calculation of `cq`."
 function report_cq!(
-    i                       ::AmpInput, 
     o                       ::AmpLongOutput,
+    i                       ::AmpInput,
     well_i                  ::Integer,
     channel_i               ::Integer,
 )

@@ -15,7 +15,7 @@
 ===============================================================================#
 
 import DataStructures.OrderedDict
-import DataArrays.DataArray
+import StaticArrays: SVector
 import DataFrames.DataFrame
 
 
@@ -61,13 +61,19 @@ const DEFAULT_MC_JITTER_CONSTANT                = 0.01
 ===============================================================================#
 
 struct McInput <: Input
-    calibration_data            ::CalibrationData{<: Real}
+    ## raw data
     raw_df                      ::DataFrame
+    ## data dimensions
     num_wells                   ::Int
     num_channels                ::Int
-    well_nums                   ::Vector{Int}
-    channel_nums                ::Vector{Int}
-    dcv                         ::Bool
+    wells                       ::SVector{W,Symbol} where {W}
+    channels                    ::SVector{C,Int} where {C}
+    #
+    ## calibration data and parameters
+    calibration                 ::CalibrationData{<: NumberOfChannels, <: Real}
+    calibration_args            ::CalibrationParameters
+    #
+    ## melting curve analysis parameters
     max_temperature             ::Int
     temp_too_close_frac         ::Float_T
     temperature_bandwidth       ::Float_T
@@ -87,6 +93,8 @@ struct McInput <: Input
     max_num_peaks               ::Int
     min_normalized_area         ::Float_T
     jitter_constant             ::Float_T
+    #
+    ## output parameters
     out_format                  ::OutputFormat
     reporting                   ::Function
 end
@@ -99,15 +107,23 @@ end
 
 ## constructor
 McInput(
-    ## input data
-    calibration_data            ::CalibrationData{<: Real},
+    ## data
     raw_df                      ::DataFrame,
     num_wells                   ::Integer,
     num_channels                ::Integer,
-    well_nums                   ::AbstractVector,
-    channel_nums                ::AbstractVector;
-    ## calibration parameter: if true, perform multi-channel deconvolution
+    wells                       ::AbstractVector{Symbol},
+    channels                    ::AbstractVector{<: Integer},
+    #
+    ## calibration data
+    calibration_data            ::CalibrationData{<: NumberOfChannels, <: Real};
+    ## calibration parameters
     dcv                         ::Bool              = DEFAULT_MC_DCV,
+    dye_in                      ::Symbol            = DEFAULT_CAL_DYE_IN,
+    dyes_to_fill                ::AbstractVector    = DEFAULT_CAL_DYES_TO_FILL,
+    subtract_water              ::Bool              = DEFAULT_NORM_SUBTRACT_WATER,
+    k_method                    ::KMethod           = DEFAULT_DCV_K_METHOD,
+    #
+    ## melting curve analysis parameters
     ## unused parameter
     max_temperature             ::Real              = DEFAULT_MC_MAX_TEMPERATURE,
     ## fraction of median temperature interval below which datapoints are considered too close
@@ -134,18 +150,26 @@ McInput(
     min_normalized_area         ::AbstractFloat     = DEFAULT_MC_MIN_NORMALIZED_AREA, ## smallest reportable peak as proportion of the area of the largest peak
     ## argument for mutate_dups()
     jitter_constant             ::AbstractFloat     = DEFAULT_MC_JITTER_CONSTANT,
-    # output format
+    #
+    ## output format parameters
     out_format                  ::OutputFormat      = pre_json_output,
     reporting                   ::Function          = roundoff(JSON_DIGITS), ## reporting function
 ) =
     McInput(
-        calibration_data,
         raw_df,
         num_wells,
         num_channels,
-        well_nums,
-        channel_nums,
-        dcv,
+        wells,
+        channels,
+        #
+        calibration_data,
+        CalibrationParameters(
+            dcv,
+            dye_in,
+            dyes_to_fill,
+            subtract_water,
+            k_method),
+        #
         max_temperature,
         temp_too_close_frac,
         temperature_bandwidth,
@@ -155,6 +179,7 @@ McInput(
         denser_factor,
         smooth_fluo_spline,
         peak_span_temperature,
+        # peak_shoulder
         negderiv_range_low_quantile,
         max_num_cross_points,
         noise_factor,
@@ -164,6 +189,7 @@ McInput(
         max_num_peaks,
         min_normalized_area,
         jitter_constant,
+        #
         out_format,
         reporting)
 

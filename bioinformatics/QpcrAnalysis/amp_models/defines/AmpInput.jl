@@ -15,6 +15,7 @@
 ===============================================================================#
 
 import DataStructures.OrderedDict
+import StaticArrays: SMatrix, SVector
 import Ipopt: IpoptSolver #, NLoptSolver
 
 
@@ -37,8 +38,6 @@ const DEFAULT_AMP_CQ_FLUO_METHOD    = cp_dr1
 const DEFAULT_AMP_QUANT_METHOD      = l4_enl
 const DEFAULT_AMP_DENSER_FACTOR     = 3                 ## must be an integer
 const DEFAULT_AMP_CQ_METHOD         = Cy0
-const DEFAULT_AMP_CT_FLUOS          = Vector{Float_T}() ## \ NB these defaults
-const DEFAULT_AMP_CT_FLUO           = NaN               ## / cannot be overridden
 
 ## default for set_qt_fluos!()
 const DEFAULT_AMP_QT_PROB           = 0.9
@@ -71,28 +70,26 @@ const DEFAULT_AMP_CATEG_WELL_VEC    = CATEG_WELL_VEC
 abstract type Input end
 
 struct AmpInput <: Input
-    ## input data
+    ## raw data
     raw                     ::RawData{<: Real}
+    ## data dimensions
     num_cycs                ::Int
-    num_fluo_wells          ::Int
+    num_wells               ::Int
     num_channels            ::Int
-    cyc_nums                ::Vector{Int}
-    fluo_well_nums          ::Vector{Int}
-    channel_nums            ::Vector{Int}
-    calibration_data        ::CalibrationData{<: Real}
+    cycs                    ::SVector{N,Int} where {N}
+    wells                   ::SVector{W,Symbol} where {W}
+    channels                ::SVector{C,Int} where {C}
+
+    ## calibration data and parameters
+    calibration             ::CalibrationData{<: NumberOfChannels, <: Real}
+    calibration_args        ::CalibrationParameters
+
+    ## amplification analysis parameters
     ## solver
     solver                  ::IpoptSolver
     ipopt_print2file_prefix ::String
-    ## calibration parameters
-    dcv                     ::Bool
     ## amplification model
     amp_model               ::Type{<: AmpModel}
-    ## output format parameters
-    # out_sr_dict             ::Bool
-    amp_output              ::AmpOutputOption
-    amp_model_results       ::Type{<: AmpModelResults}  ## set by amp_output
-    reporting               ::Function
-    ## keyword arguments >>
     ## SFC model fitting parameters
     SFC_model_defs          ::OrderedDict{SFCModelName, SFCModelDef}
     bl_method               ::SFCModelName
@@ -112,34 +109,46 @@ struct AmpInput <: Input
     scaled_max_bsf_lb       ::Float_T
     scaled_max_dr1_lb       ::Float_T
     scaled_max_dr2_lb       ::Float_T
+
     ## arguments for process_ad()
     ctrl_well_dict          ::OrderedDict{Vector{Int},Vector{Int}}
     ## ...
+
+    ## output format parameters
+    # out_sr_dict             ::Bool
+    amp_output              ::AmpOutputOption
+    amp_model_results       ::Type{<: AmpModelResults}  ## set by amp_output
+    reporting               ::Function
 end
 
 
 
 #===============================================================================
-    method >>
+    constructors >>
 ===============================================================================#
 
 ## constructor = interface to amp_analysis()
 AmpInput(
     raw                     ::RawData{<: Real},
     num_cycs                ::Integer,
-    num_fluo_wells          ::Integer,
+    num_wells               ::Integer,
     num_channels            ::Integer,
-    cyc_nums                ::Vector{Int},
-    fluo_well_nums          ::Vector{Int},
-    channel_nums            ::Vector{Int},
-    calibration_data        ::CalibrationData{<: Real},
+    cycs                    ::AbstractVector{<: Integer},
+    wells                   ::AbstractVector{Symbol},
+    channels                ::AbstractVector{<: Integer},
+    calibration_data        ::CalibrationData{<: NumberOfChannels, <: Real},
+    amp_model               ::Type{<: AmpModel},
+    amp_output              ::AmpOutputOption,
     solver                  ::IpoptSolver,
     ipopt_print2file_prefix ::AbstractString,
-    dcv                     ::Bool,
-    amp_model               ::Type{<: AmpModel},
     # out_sr_dict             ::Bool,
-    amp_output              ::AmpOutputOption,
-    reporting               ::Function;
+    reporting               ::Function,
+    ## calibration parameters
+    dcv                     ::Bool;
+    dye_in                  ::Symbol            = DEFAULT_CAL_DYE_IN,
+    dyes_to_fill            ::AbstractVector    = DEFAULT_CAL_DYES_TO_FILL,
+    subtract_water          ::Bool              = DEFAULT_NORM_SUBTRACT_WATER,
+    k_method                ::KMethod           = DEFAULT_DCV_K_METHOD,
     ## SFC model fitting parameters    
     SFC_model_defs          ::OrderedDict{SFCModelName, SFCModelDef}
                                                 = SFC_MDs,
@@ -168,20 +177,22 @@ AmpInput(
     AmpInput(
         raw,
         num_cycs,
-        num_fluo_wells,
+        num_wells,
         num_channels,
-        cyc_nums,
-        fluo_well_nums,
-        channel_nums,
+        cycs,
+        wells,
+        channels,
         calibration_data,
+        CalibrationParameters(
+            dcv,
+            dye_in,
+            dyes_to_fill,
+            subtract_water,
+            k_method),
         solver,
         ipopt_print2file_prefix,
-        dcv,
         amp_model,
         # out_sr_dict,
-        amp_output,
-        amp_output == long ? AmpLongModelResults : AmpShortModelResults,
-        reporting,
         SFC_model_defs,
         bl_method,
         bl_fallback_func,
@@ -199,15 +210,33 @@ AmpInput(
         scaled_max_dr2_lb,
         scaled_max_bsf_lb,
         ctrl_well_dict,
+        amp_output,
+        amp_output == long ? AmpLongModelResults : AmpShortModelResults,
+        reporting,
     )
 
+
+## null constructor for DeconvolutionMatrices
+function DeconvolutionMatrices(i ::Input)
+    const s = size(i.calibration.data)
+    const w = s[1]
+    const c = s[2]
+    const v = i.calibration_args.k_method == well_proc_vec ? w : 1
+    const empty_matrix = SMatrix{c,c,Float_T}(fill(NaN,c,c))
+    DeconvolutionMatrices(
+        SVector{v}(fill(empty_matrix,v)),
+        SVector{w}(fill(empty_matrix,w)),
+        "")
+end
 
 
 #===============================================================================
     helper functions >>
 ===============================================================================#
 
-amp_init(i ::AmpInput, x...) = fill(x..., i.num_fluo_wells, i.num_channels)
+amp_init(i ::AmpInput, x) =
+    SMatrix{i.num_wells, i.num_channels, typeof(x)}(
+        fill(x, i.num_wells, i.num_channels))
 
 ## arguments for process_ad()
 kwargs_ad(i ::AmpInput) =
@@ -228,7 +257,7 @@ function check_bl_cyc_bounds(
     const size_bcb = size(bl_cyc_bounds)
     if size_bcb == (0,) || size_bcb == (2,)
         return amp_init(i, bl_cyc_bounds)
-    elseif size_bcb == (i.num_fluo_wells, i.num_channels) &&
+    elseif size_bcb == (i.num_wells, i.num_channels) &&
         eltype(bl_cyc_bounds) <: AbstractVector ## final format of `baseline_cyc_bounds`
             return bl_cyc_bounds
     end

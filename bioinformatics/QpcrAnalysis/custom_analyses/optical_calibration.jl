@@ -10,11 +10,6 @@ import DataStructures.OrderedDict
 import Memento.debug
 
 
-## default value
-const DEFAULT_OC_WELL_NUMS      = []
-
-
-
 #===============================================================================
     function definition >>
 ===============================================================================#
@@ -23,8 +18,8 @@ const DEFAULT_OC_WELL_NUMS      = []
 function act(
     ::Type{Val{optical_calibration}},
     req_dict            ::Associative;
-    well_nums           ::AbstractVector = DEFAULT_OC_WELL_NUMS,
     out_format          ::OutputFormat = pre_json_output,
+
     ## remove MySql dependency  
     #
     # db_conn::MySQL.MySQLHandle,
@@ -44,22 +39,29 @@ function act(
 
     ## calibration data is required
     if !(haskey(req_dict, CALIBRATION_INFO_KEY) &&
-        typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative)
+        isa(req_dict[CALIBRATION_INFO_KEY], Associative))
             return fail(logger, ArgumentError(
                 "no calibration information found")) |> out(out_format)
     end
-    const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
-    try
-        prep_normalize(calibration_data, well_nums, DEFAULT_CAL_DYE_IN, DEFAULT_CAL_DYES_TO_FILL)
+    const calibration = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
+    const wells = try
+        prep_normalize(
+            calibration,
+            DEFAULT_CAL_DYE_IN,
+            DEFAULT_CAL_DYES_TO_FILL)[2]
     catch err
         return fail(logger, err; bt=true) |> out(out_format)
     end
-    if (calibration_data.num_channels == 2)
+    if (size(calibration.data, 2) == 2)
         ## if there are 2 or more channels then
         ## the deconvolution matrix K is calculated
         ## otherwise deconvolution is not performed
         const result_k = try
-            get_k(calibration_data, well_nums, DEFAULT_DCV_WELL_PROC)
+            get_k(
+                calibration,
+                eachindex(wells),
+                wells,
+                DEFAULT_DCV_K_METHOD)
         catch err
             return fail(logger, err; bt=true) |> out(out_format)
         end

@@ -21,8 +21,8 @@ Finds peak in the melting curve data, specifically the negative of the derivativ
 of fluorescence with respect to temperature, for each well and channel.
 """
 function mc_peak_analysis(
-    i                           ::McInput,
     output_type                 ::Type{P},
+    i                           ::McInput,
     tf_dict                     ::Associative,
 ) where {P <: McPeakOutput}
 

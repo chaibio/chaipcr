@@ -14,7 +14,7 @@
 ===============================================================================#
 
 import DataStructures.OrderedDict
-
+import StaticArrays: SVector
 
 ## used in dispatch.jl
 @enum Action amplification meltcurve standard_curve load_script optical_calibration thermal_performance_diagnostic thermal_consistency optical_test_single_channel optical_test_dual_channel # your_own_analyze_functionality
@@ -31,7 +31,7 @@ const OUTPUTFORMATS = instances(OutputFormat)
 const DATAFORMATS = instances(DataFormat)
 
 ## used in get_k() in calibration.jl
-@enum WellProc well_proc_mean well_proc_vec
+@enum KMethod well_proc_mean well_proc_vec
 
 ## used in finite_diff() in shared_functions.jl
 @enum FiniteDiffMethod central forward backward
@@ -48,3 +48,14 @@ AmpOutputOption(option ::OutputFormat) =
 ## used in allelic_discrimination.jl
 @enum ClusteringMethod k_means k_means_medoids k_medoids
 const CLUSTERINGMETHODS = instances(ClusteringMethod)
+
+
+## overloaded index methods for enums
+import Base: to_index
+to_index(A, ind ::Enum) = to_index(A, Int(ind))
+# import Base.to_indices
+# enum2int(idx) = idx
+# enum2int(idx ::Enum) = Int(idx)
+# to_indices(A, inds...) = to_indices(A, map(enum2int, inds)...)
+# import Base.getindex
+# getindex(A, inds...) = getindex(A, map(enum2int, inds)...)

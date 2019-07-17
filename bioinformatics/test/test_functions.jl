@@ -73,8 +73,69 @@ end
 # amp1_local == amp1_saved ## should be true
 # using Memento
 # setlevel!(QpcrAnalysis.logger, "error")
-# @timev for i in 1:100; test_functions["amplification single channel"](); end;
-# ## NB trailing semicolon suppresses output to REPL
+# using BenchmarkTools
+# @benchmark test_functions["amplification single channel"]()
+
+## commit dce3b4a1265df1ca5582283b374b118f0c3d3195
+# BenchmarkTools.Trial:
+#   memory estimate:  16.00 MiB
+#   allocs estimate:  250888
+#   --------------
+#   minimum time:     262.566 ms (0.00% GC)
+#   median time:      279.580 ms (2.11% GC)
+#   mean time:        281.085 ms (1.59% GC)
+#   maximum time:     308.169 ms (2.30% GC)
+#   --------------
+#   samples:          18
+#   evals/sample:     1
+
+# BenchmarkTools.Trial:
+#   memory estimate:  16.34 MiB
+#   allocs estimate:  256084
+#   --------------
+#   minimum time:     260.359 ms (0.00% GC)
+#   median time:      273.739 ms (1.87% GC)
+#   mean time:        271.579 ms (1.50% GC)
+#   maximum time:     279.663 ms (1.99% GC)
+#   --------------
+#   samples:          19
+#   evals/sample:     1
+
+# BenchmarkTools.Trial:
+#   memory estimate:  16.34 MiB
+#   allocs estimate:  256062
+#   --------------
+#   minimum time:     260.107 ms (0.00% GC)
+#   median time:      273.675 ms (1.74% GC)
+#   mean time:        271.271 ms (1.40% GC)
+#   maximum time:     278.717 ms (2.53% GC)
+#   --------------
+#   samples:          19
+#   evals/sample:     1
+
+# BenchmarkTools.Trial:
+#   memory estimate:  16.33 MiB
+#   allocs estimate:  256004
+#   --------------
+#   minimum time:     260.770 ms (0.00% GC)
+#   median time:      275.252 ms (1.74% GC)
+#   mean time:        273.402 ms (1.39% GC)
+#   maximum time:     287.380 ms (1.63% GC)
+#   --------------
+#   samples:          19
+#   evals/sample:     1
+
+# BenchmarkTools.Trial:
+#   memory estimate:  16.31 MiB
+#   allocs estimate:  255684
+#   --------------
+#   minimum time:     258.748 ms (0.00% GC)
+#   median time:      276.412 ms (1.91% GC)
+#   mean time:        277.095 ms (1.55% GC)
+#   maximum time:     312.047 ms (2.52% GC)
+#   --------------
+#   samples:          19
+#   evals/sample:     1
 
 ## tweaks
 # 27.564401 seconds (25.59 M allocations: 1.598 GiB, 1.62% gc time)
@@ -154,8 +215,22 @@ end
 # mc3_local == mc3_saved ## should be true
 # using Memento
 # setlevel!(QpcrAnalysis.logger, "warn")
-# @timev for i in 1:100; test_functions["meltcurve single channel"](); end;
-# ## NB trailing semicolon suppresses output to REPL
+# # @timev for i in 1:100; test_functions["meltcurve single channel"](); end;
+# using BenchmarkTools
+# @benchmark test_functions["meltcurve single channel"]()
+
+# commit dce3b4a1265df1ca5582283b374b118f0c3d3195
+# BenchmarkTools.Trial:
+#   memory estimate:  88.80 MiB
+#   allocs estimate:  538375
+#   --------------
+#   minimum time:     122.706 ms (10.05% GC)
+#   median time:      126.369 ms (11.01% GC)
+#   mean time:        127.271 ms (11.23% GC)
+#   maximum time:     149.936 ms (8.78% GC)
+#   --------------
+#   samples:          40
+#   evals/sample:     1
 
 # commit a01b3b50a6e753f3ce92d4a33c1cc9adbb6256b7:
 # 12.023655 seconds (52.23 M allocations: 8.743 GiB, 11.55% gc time)
@@ -203,8 +278,22 @@ end
 # mc4_local == mc4_saved ## should be true
 # using Memento
 # setlevel!(QpcrAnalysis.logger, "warn")
-# @timev for i in 1:100; test_functions["meltcurve dual channel"](); end;
-# ## NB trailing semicolon suppresses output to REPL
+# # @timev for i in 1:100; test_functions["meltcurve dual channel"](); end;
+# using BenchmarkTools
+# @benchmark test_functions["meltcurve dual channel"]()
+
+## commit a01b3b50a6e753f3ce92d4a33c1cc9adbb6256b7:
+# BenchmarkTools.Trial:
+#   memory estimate:  163.67 MiB
+#   allocs estimate:  1073239
+#   --------------
+#   minimum time:     241.945 ms (9.06% GC)
+#   median time:      252.435 ms (11.32% GC)
+#   mean time:        253.406 ms (11.08% GC)
+#   maximum time:     287.109 ms (10.74% GC)
+#   --------------
+#   samples:          20
+#   evals/sample:     1
 
 # commit 30d20ce41a26d7ad304cf7db57a76e8974f6d055:
 # 25.629426 seconds (114.48 M allocations: 16.327 GiB, 11.84% gc time)

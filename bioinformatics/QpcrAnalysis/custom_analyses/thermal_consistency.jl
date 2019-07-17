@@ -51,7 +51,7 @@ function act(
     #
     ## calibration data is required
     if !(haskey(req_dict, CALIBRATION_INFO_KEY) &&
-        typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative)
+        isa(req_dict[CALIBRATION_INFO_KEY], Associative))
             return fail(logger, ArgumentError(
                 "no calibration information found")) |> out(out_format)
     end
@@ -68,8 +68,8 @@ function act(
     #
     ## create container for data and parameter values
     interface = McInput(
-            calibration_data,
-            mc_parsed_raw_data...;
+            mc_parsed_raw_data...,
+            calibration_data;
             dcv = DEFAULT_MC_DCV && mc_parsed_raw_data[3] > 1, ## num_channels > 1
             auto_span_smooth = auto_span_smooth,
             span_smooth_default = span_smooth_default,
@@ -88,7 +88,7 @@ function act(
     ## process the data from only one channel
     ## PROBLEM >> this does not seem appropriate for dual channel analysis
     const channel_proc = 1
-    const channel_proc_i = find(channel_proc .== interface.channel_nums)[1]
+    const channel_proc_i = find(channel_proc .== interface.channels)[1]
     const mc_tm = map(
         field(:peaks_filtered),
         mc_w72c.peak_output[:, channel_proc_i]) ## mc_matrix
@@ -96,7 +96,7 @@ function act(
     min_Tm = max_temperature + 1
     max_Tm = 0
     const tm_check_vec = map(mc_tm) do Ta
-        if size(Ta)[1] == 0
+        if size(Ta, 1) == 0
             TmCheck1w((NaN, false), NaN)
         else
             const top1_Tm = Ta[1,1]

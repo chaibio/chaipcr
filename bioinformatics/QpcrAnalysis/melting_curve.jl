@@ -17,7 +17,7 @@ import Memento: debug, error
     field names >>
 ===============================================================================#
 
-const MC_RAW_FIELDS = OrderedDict(
+const MC_RAW_FIELDS = Dict(
     :temperature            => TEMPERATURE_KEY,
     :fluorescence           => FLUORESCENCE_VALUE_KEY,
     :well                   => WELL_NUM_KEY,
@@ -45,9 +45,9 @@ function act(
 )
     debug(logger, "at act(::Type{Val{meltcurve}})")
     #
-    ## calibration data is required    
+    ## calibration data is required
     if !(haskey(req_dict,CALIBRATION_INFO_KEY) &&
-        typeof(req_dict[CALIBRATION_INFO_KEY]) <: Associative)
+        isa(req_dict[CALIBRATION_INFO_KEY], Associative))
             return fail(logger, ArgumentError(
                 "no calibration information found")) |> out(out_format)
     end
@@ -64,8 +64,8 @@ function act(
     #
     ## create container for data and parameter values
     interface = McInput(
-            calibration_data,
-            mc_parsed_raw_data...;
+            mc_parsed_raw_data...,
+            calibration_data;
             dcv = DEFAULT_MC_DCV && mc_parsed_raw_data[3] > 1, ## num_channels > 1
             out_format = out_format,
             kwargs_pa...)
@@ -90,23 +90,28 @@ function mc_parse_raw_data(raw_dict ::Associative)
     foreach(keys(MC_RAW_FIELDS)) do key
         try
             mc_raw_df[key] = raw_dict[MC_RAW_FIELDS[key]]
-        catch()
-            throw(DimensionMismatch("the format of the raw data is incorrect:" *
-                "each data field should have the same length"))
+        catch err
+            if isa(err, ArgumentError)
+                throw(ArgumentError("the format of the raw data is incorrect:" *
+                    "each data field should have the same length"))
+            else
+                rethrow()
+            end ## if
         end ## try
     end ## next key
-    const (well_nums, channel_nums) =
+    mc_raw_df[:well] = mc_raw_df[:well] |> mold(Symbol ∘ Int)
+    const (wells, channels) =
         map([WELL_NUM_KEY, CHANNEL_KEY]) do key
             raw_dict[key] |> unique |> sort
         end
     const (num_wells, num_channels) =
-        map(length, (well_nums, channel_nums))
+        map(length, (wells, channels))
     return (
         mc_raw_df,
         num_wells,
         num_channels,
-        well_nums,
-        channel_nums)
+        wells |> mold(Symbol ∘ Int) |> SVector{num_wells,Symbol},
+        channels |> SVector{num_channels,Int})
 end ## mc_parse_raw_data()
 
 
@@ -123,7 +128,7 @@ function mc_analysis(i ::McInput)
     # ## and might be sped up by creating an appropriate container
     # ## and mutating it in place
     # function get_mc_data(channel_num ::Integer)
-    #        
+    #
     #     ## subset melting curve data by channel (curried)
     #     select_mcdata_by_channel(channel_num ::Integer) =
     #         mc_data ::DataFrame ->
@@ -131,11 +136,11 @@ function mc_analysis(i ::McInput)
     #                 map([:temperature, :fluorescence, :well]) do f
     #                     f => mc_data[f][mc_data[:channel] .== channel_num]
     #                 end)
-    #        
+    #
     #     ## split temperature and fluorescence data by well
     #     ## return vector of TF Dicts
     #     split_tf_by_well(fluo_sel ::Associative) =
-    #         map(i.well_nums) do well
+    #         map(i.wells) do well
     #             Dict(
     #                 map(MC_TF_KEYS) do key
     #                     key => fluo_sel[key][fluo_sel[:well] .== well]
@@ -172,16 +177,16 @@ function mc_analysis(i ::McInput)
     #                                         tf_dict_vec)))(tf_dict[key])
     #                 end)
     #         end
-    #        
+    #
     #     ## convert to MeltCurveTF object
     #     toMeltCurveTF(tf_nv_adj ::AbstractArray) =
     #         MeltCurveTF(
     #             map(MC_TF_KEYS) do key
     #                 mapreduce(index(key), hcat, tf_nv_adj)
     #             end...)
-    #        
+    #
     # ## << end of function definitions nested in get_mc_data()
-    #        
+    #
     # ## calculate
     #     return i.raw_df |>
     #             select_mcdata_by_channel(channel_num) |>
@@ -192,7 +197,7 @@ function mc_analysis(i ::McInput)
 
     "Convert raw melting curve data from a DataFrame to 3D array of fluorescences
     as required by `calibrate`."
-    function transform_3d(df)
+    function transform_3d(df ::DataFrame)
         ## split-apply-combine style
         # extended = copy(df)
         # extended[:fluorescence] = Vector{Float_T}(extended[:fluorescence]) ## to allow NaN
@@ -214,23 +219,23 @@ function mc_analysis(i ::McInput)
         #     RawData{Float_T}
         #
         ## devectorized style
-        cs = [df[:channel] .== c for c in i.channel_nums]
-        ws = [df[:well   ] .== w for w in i.well_nums   ]
+        cs = [df[:channel] .== c for c in i.channels]
+        ws = [df[:well   ] .== w for w in i.wells   ]
         const selection =
-            [   find(cs[ci] .& ws[wi]) 
-                for ci in eachindex(i.channel_nums), wi in eachindex(i.well_nums)   ]
+            [   find(cs[ci] .& ws[wi])
+                for ci in eachindex(i.channels), wi in eachindex(i.wells)   ]
         # @inline selector(c ::Int, w ::Int) = (df[:channel] .== c) .& (df[:well] .== w)
         # const selection =
         #     [   find(selector(c, w))
-        #         for c in i.channel_nums, w in i.well_nums   ]
+        #         for c in i.channels, w in i.wells   ]
         const longest = selection |> mold(length) |> maximum
         const dims = (longest, i.num_wells, i.num_channels)
         t = Array{Float_T}(dims)
         f = Array{Float_T}(dims)
-        for ci in eachindex(i.channel_nums)
-            # c = i.channel_nums[ci]
-            for wi in eachindex(i.well_nums)
-                # w = i.well_nums[wi]
+        for ci in eachindex(i.channels)
+            # c = i.channels[ci]
+            for wi in eachindex(i.wells)
+                # w = i.wells[wi]
                 location = selection[ci, wi]
                 let ## to future-proof access to `ti` outside the for-loop:
                     ## scoping rules change after v0.6
@@ -248,20 +253,20 @@ function mc_analysis(i ::McInput)
         end ## next ci
         return RawData(t), RawData(f)
     end ## transform_3d()
-           
+
     normalize_tf(ci ::Integer, wi ::Integer) =
         normalize_fluos(
             remove_when_temperature_NaN(
                 # mc_data_bychannel[ci].temperature[:, wi],
                 raw_temps.data[ :, wi, ci],
                 calibrated_data[:, wi, ci])...)
-    
+
     "Take as input a vector of temperatures and a vector of fluorescences, and set
     the fluorescence to NaN wherever the corresponding temperature value is NaN."
     remove_when_temperature_NaN(x...) =
         # map(y -> y[broadcast(!isnan, first(x))], x)
         x |> mold(first(x) |> cast(!isnan) |> index)
-           
+
     "Normalize fluorescences values by subtracting the lowest value. Note that
     if any value is NaN, the result will be a vector of NaNs."
     normalize_fluos(
@@ -270,26 +275,26 @@ function mc_analysis(i ::McInput)
             Dict(
                 :temperatures   => temperatures,
                 :fluos          => sweep(minimum)(-)(fluos_raw))
-            
+
     # ## << end of function definitions nested in mc_analysis()
 
     debug(logger, "at mc_analysis()")
-    # const (channel_nums, well_nums) =
+    # const (channels, wells) =
     #     map((:channel, :well)) do fieldname
     #         i.raw_df[fieldname] |> unique |> sort
     #     end ## do fieldname
-    # const num_channels      = length(channel_nums)
-    # const num_wells         = length(well_nums)
+    # const num_channels      = length(channels)
+    # const num_wells         = length(wells)
     #
     ## get data arrays by channel
     ## output is Vector{MeltCurveTF}
-    # const mc_data_bychannel = map(get_mc_data, i.channel_nums)
+    # const mc_data_bychannel = map(get_mc_data, i.channels)
     #
     ## reshape raw fluorescence data to 3-dimensional array
     ## dimensions 1,2,3 = temperature,well,channel
     # const mc_data_array     = cat(3, map(field(:fluorescence), mc_data_bychannel)...)
     # const raw_fluos         = RawData(mc_data_array)
-    
+
     ## alternative method, manipulating DataFrame directly
     const (raw_temps, raw_fluos) = transform_3d(i.raw_df)
     #
@@ -300,62 +305,47 @@ function mc_analysis(i ::McInput)
             k4dcv,
             deconvoluted_data,
             norm_data,
-            _,                                  ## discard norm_well_nums
-            calibrated_data                 ) =
-            calibrate(
-                raw_fluos,
-                i.calibration_data,
-                i.well_nums,
-                i.channel_nums;
-                dcv = i.dcv,
-                data_format = array)
-        ## ignore dummy well_nums from calibrate()
+            norm_wells,
+            calibrated_data ) =
+                calibrate(i, raw_fluos, array)
     else
         ## McPeakShortOutput
-        const (_, _, _, _, _, calibrated_data) = ## discard other output fields
-            calibrate(
-                raw_fluos,
-                i.calibration_data,
-                i.well_nums,
-                i.channel_nums;
-                dcv = i.dcv,
-                data_format = array)
+        const (_, _, _, _, norm_wells, calibrated_data) = ## discard other output fields
+            calibrate(i, raw_fluos, array)
     end ## if peak_format
-    #
-    ## ignore dummy well_nums from calibrate()
-    const norm_well_nums = i.well_nums
     #
     ## subset temperature/fluorescence data by channel / well
     ## then smooth the fluorescence/temperature data and calculate Tm peak, area
     ## result is mc_matrix: dim1 = well, dim2 = channel
     const mc_matrix =
-        eachindex(i.channel_nums) |> ## do for each channel
+        eachindex(i.channels) |> ## do for each channel
         moose(
             ci ->
-                map(eachindex(i.well_nums)) do wi
-                    if i.well_nums[wi] in norm_well_nums
+                map(eachindex(i.wells)) do wi
+                    if i.wells[wi] in norm_wells
                         mc_peak_analysis(
-                            i,
                             peak_format,
+                            i,
                             normalize_tf(ci, wi))
                     else
                         McPeakOutput(peak_format)
                     end
                 end, ## do wi
             hcat) |>
-        morph(i.num_wells, i.num_channels) ## coerce to 2d array
+        morph(length(norm_wells), i.num_channels) ## coerce to 2d array
     #
     # if (i.out_format == full_output)
+    println("peak_format: $peak_format")
     if peak_format == McPeakLongOutput
         return McLongOutput(
-            i.channel_nums,
-            i.well_nums,
+            i.wells,
+            i.channels,
             raw_fluos.data,
             background_subtracted_data,
             k4dcv,
             deconvoluted_data,
             norm_data,
-            i.well_nums,
+            i.wells,
             calibrated_data,
             mc_matrix)
     else

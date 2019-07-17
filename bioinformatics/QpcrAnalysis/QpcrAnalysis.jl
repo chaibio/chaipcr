@@ -58,8 +58,10 @@ module QpcrAnalysis
 
     ## struct definitions for:
     ## calibration
+    include("defines/NumberOfChannels.jl")
     include("defines/RawData.jl")
     include("defines/CalibrationData.jl")
+    include("defines/CalibrationParameters.jl")
     ## deconvolution
     include("defines/K4Deconv.jl")
     ## allelic discrimination

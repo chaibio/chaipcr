@@ -46,14 +46,14 @@ function fit_amplification_model(
     # const num_cycs = length(fluos)
     # const cycs = range(1.0, num_cycs)
     const num_cycs = i.num_cycs
-    const cycs = i.cyc_nums ## allows non-contiguous sequences of cycles
+    const cycs = Vector(i.cycs) ## allows non-contiguous sequences of cycles
     const wts = ones(num_cycs)
     ## fit model
     const bl_fit = fit(Val{M}, cycs, fluos, wts; solver = i.solver)
     const coefs = bl_fit.coefs
     const blsub_fluos = fluos .- bl()
     ## set output
-    if R <: AmpShortModelResults
+    if isa(R, AmpShortModelResults)
         return AmpShortModelResults(
             fluos, ## rbbs_3ary,
             blsub_fluos,
@@ -197,7 +197,7 @@ function fit_amplification_model(
                 const bl_cyc_end = num_cycs
                 # push!(bl_notes, "max_dr2_right_cyc_2 ($max_dr2_right_cyc_2) - " *
                 #     "max_dr2_right_cyc ($max_dr2_right_cyc) == 1")
-            else 
+            else
                 ## max_dr2_right_cyc_2 - max_dr2_right_cyc > 1
                 # push!(bl_notes, "max_dr2_right_cyc_2 ($max_dr2_right_cyc_2) - " *
                 #     "max_dr2_right_cyc ($max_dr2_right_cyc) != 1")
@@ -221,9 +221,9 @@ function fit_amplification_model(
         range(1.0, 1.0/i.denser_factor, len_denser)
 
     ## functions used to calculate cq / cq_raw / cq_fluo >>
-    
+
     dr1_pred_() =
-        funcs_pred[:dr1](cycs_denser, quant_coefs...)   
+        funcs_pred[:dr1](cycs_denser, quant_coefs...)
     #
     dr2_pred_() =
         funcs_pred[:dr2](cycs_denser, quant_coefs...)
@@ -295,8 +295,10 @@ function fit_amplification_model(
     ## fit baseline model
     # const num_cycs = length(fluos)
     # const cycs = range(1.0, num_cycs)
+    ## the following allows non-contiguous sequences of cycles
+    ## NB. Ipopt solver hangs unless cycs converted from SVector to Vector
     const num_cycs = i.num_cycs
-    const cycs = i.cyc_nums ## allows non-contiguous sequences of cycles
+    const cycs = Vector(i.cycs)
     ## to determine weights (`wts`) for sigmoid fitting per `i.min_reliable_cyc`
     const last_cyc_wt0 = floor(i.min_reliable_cyc) - 1
     if i.bl_method in SFC_MODEL_NAMES
@@ -338,7 +340,7 @@ function fit_amplification_model(
     const funcs_pred = qm.funcs_pred
     #
     ## results by R
-    if R <: AmpCqFluoModelResults
+    if R == AmpCqFluoModelResults
         ## the following method for calculating cq_raw
         ## is efficient for DEFAULT_AMP_CQ_FLUO_METHOD = cp_dr1
         const cq_raw = calc_cq_raw(dr1_pred_())
@@ -350,7 +352,7 @@ function fit_amplification_model(
     const dr1_pred = dr1_pred_()
     const dr2_pred = dr2_pred_()
     const raw_cycs_index = colon(1, i.denser_factor, len_denser)
-    if R <: AmpShortModelResults
+    if R == AmpShortModelResults
         const cq_raw = calc_cq_raw(dr1_pred, dr2_pred)
         return AmpShortModelResults(
             # fluos, ## rbbs_3ary,
@@ -359,9 +361,9 @@ function fit_amplification_model(
             dr2_pred[raw_cycs_index],
             nonpos2NaN(cq_raw), ## cq
             NaN) ## d0
-    end
+    end ## R
     #
-    ## AmpLongModelResults
+    ## R == AmpLongModelResults
     const (max_dr1, idx_max_dr1) = findmax(dr1_pred)
     const cyc_max_dr1 = cycs_denser[idx_max_dr1]
     const (max_dr2, idx_max_dr2) = findmax(dr2_pred)

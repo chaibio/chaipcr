@@ -37,7 +37,7 @@ function prep_input_4ad(
     ## relevant if `categ == :fluo`, last available cycle
     cycs            ::Union{Integer, AbstractVector} = 1
 )
-    num_cycs, n_wells, num_channels = size(full_amp_out.fr_ary3)
+    const (num_cycs, n_wells, num_channels) = size(full_amp_out.fr_ary3)
     nrn = NRN_SELF
     #
     if categ in [:rbbs_ary3, :blsub_fluos]
@@ -211,9 +211,9 @@ function do_cluster_analysis(
     # new_data = vcat(raw_data, transpose(slope_vec) .* mean(raw_data[1:2,:], 1) ./ median(slope_vec))
     # init_centers = vcat(init_centers, ones(1, size(init_centers)[2]))
 
-    const n_wells = size(raw_data,2)
+    const n_wells = size(raw_data, 2)
     const well_idc = 1:n_wells
-    const num_centers = size(init_centers,2)
+    const num_centers = size(init_centers, 2)
     const dist_mtx = calc_dist_mtx()
     # const n_wells_winit = n_wells + num_centers
     # dist_mtx_winit = calc_dist_mtx_winit(init_centers)
@@ -365,10 +365,10 @@ function assign_genos(
     function encg_cluster_model()
         const expected_ncg = nrn(expected_ncg_raw)
         const non_ctrl_geno_idc =
-            map(1:size(expected_ncg,2)) do encg_idx
-                find(1:size(expected_genos_all,2) do geno_idx
+            map(1:size(expected_ncg, 2)) do encg_idx
+                find(1:size(expected_genos_all, 2) do geno_idx
                     expected_ncg[:, encg_idx] == expected_genos_all[:, geno_idx]
-                end)[1]
+                end)[1] ## inefficient
             end
         const (car, geno_combin, center_set) =
             cluster_geno(ctrl_geno_idc, non_ctrl_geno_idc)
@@ -386,7 +386,7 @@ function assign_genos(
     end
 
     function cluster_geno(idc...)
-        const _geno_idc = vcat(idc...)
+        const _geno_idc = idc |> gather(vcat)
         const _car = do_cluster_analysis(
             data,
             init_centers_all[:, _geno_idc], ## init_centers
@@ -450,7 +450,7 @@ function assign_genos(
             _new_center_idc[ntc_center_idc] =
                 find(geno_idc_all) do geno_idx
                     all(expected_genos_all[:, geno_idx] .== [1, 1])
-                end[1]
+                end[1] ## inefficient
         end ## if
     end ## ntc2hetero!()
 
@@ -472,13 +472,13 @@ function assign_genos(
         return channel_all_equal()
     end
     ## NTC (non-template controls)
-    const geno_idc_all = 1:size(expected_genos_all,2)
+    const geno_idc_all = 1:size(expected_genos_all, 2)
     const ntc_geno = fill(0, num_channels)
     const ntc_geno_idx =
         find(
             geno_idx -> all(expected_genos_all[:, geno_idx] .== ntc_geno),
             geno_idc_all
-        )[1]
+        )[1] ## inefficient
     const non_ntc_geno_idc = geno_idc_all[geno_idc_all .!= ntc_geno_idx]
     const non_ntc_geno_combin = expected_genos_all[:, non_ntc_geno_idc]
     ## control genotypes
@@ -543,7 +543,7 @@ function assign_genos(
 
         ## (!!!! needs testing) check whether the controls are assigned with the correct genos, if not, assign as unclassified
         # for ctrl_geno in keys(ctrl_well_dict)
-        #     for i in 1:size(expected_genos)[2]
+        #     for i in 1:size(expected_genos, 2)
         #         if expected_genos[:, i] == ctrl_geno
         #             expected_ctrl_assignment = i ## needs to use `centers`, `assignments_agp_idc`
         #             break
@@ -607,7 +607,7 @@ function process_ad(
     debug(logger, "at process_ad()")
     ## indicate a well as NTC (non-template control) if all the channels have NaN as Cq
     const ntc_bool_vec =
-        map(eachindex(full_amp_out.fluo_well_nums)) do well_idx
+        map(eachindex(full_amp_out.well_nums)) do well_idx
             all(isnan.(full_amp_out.cq[well_idx,:]))
         end
     ## output

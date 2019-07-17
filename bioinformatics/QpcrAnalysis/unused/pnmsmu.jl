@@ -73,7 +73,7 @@ end
 
 ## using native least square method. ~4 sec when using DataFrame, 2-3 sec when using Array
 function pnm_lsq(x_ary ::AbstractArray, Y ::AbstractVector)
-    x_w1 = hcat(ones(size(x_ary)[1]), x_ary)
+    x_w1 = hcat(ones(size(x_ary, 1)), x_ary)
     x_w1_T = transpose(x_w1)
     coefs = *(inv(x_w1_T * x_w1), x_w1_T, Y)
 end

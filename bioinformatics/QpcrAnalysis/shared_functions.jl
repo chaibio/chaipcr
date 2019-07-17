@@ -3,7 +3,7 @@
     shared_functions.jl
 
     functions used by multiple analytic methods
-    
+
 ===============================================================================#
 
 import DataStructures.OrderedDict
@@ -27,9 +27,9 @@ julia> (1,2,3) |> QpcrAnalysis.curry(map)(x -> 2x)
 @inline curry(f) = x -> (y...) -> f(x, y...)
 
 ## used in amplification.jl
-## used in shared_functions.jl
 ## used in melting_curve.jl
 ## used in optical_test_dual_channel.jl
+## used in shared_functions.jl
 """
     mold(f)(x...)
 
@@ -43,10 +43,10 @@ julia> (1,2,3) |> QpcrAnalysis.mold(x -> 2x)
 """
 mold   = curry(map)         ## mold(f)   = x -> map(f, x)
 
-## used in amplification.jl
-## used in shared_functions.jl
-## used in melting_curve.jl
 ## used in deconvolute.jl
+## used in amplification.jl
+## used in melting_curve.jl
+## used in shared_functions.jl
 """
     sift(f)(x...)
 
@@ -69,11 +69,8 @@ Curried `broadcast` function.
 
 # Example:
 ```julia-repl
-julia> Dict(:a=>0:2,:b=>[0,4,8]) |> values |> QpcrAnalysis.cast(mean)
-3-element Array{Float64,1}:
-0.0
-2.5
-5.0
+julia> Dict(:a=>0:2,:b=>[0,4,8]) |> values |> QpcrAnalysis.cast(mean) |> Tuple
+(0.0, 2.5, 5.0)
 ```
 """
 cast   = curry(broadcast)   ## cast(f)   = x -> broadcast(f, x)
@@ -121,6 +118,44 @@ julia> -1 |> QpcrAnalysis.bless(Complex) |> sqrt
 ```
 """
 bless  = curry(convert)     ## bless(T)  = x -> convert(T, x)
+
+## used in calibration.jl
+"""
+    splat(f)(x)
+
+Curried splatting function. Iterate over the collection in the second argument,
+passing the elements individually as arguments to the first.
+
+# Examples:
+```julia-repl
+julia> [3,4] |> splat(//)
+3//4
+
+julia> (1,2,3) |> splat(hcat)
+1×3 Array{Int64,2}:
+ 1, 2, 3
+```
+"""
+splat(f) = x -> f(x...)
+
+## used in calibration.jl
+"""
+    tie(n)(x...)
+
+Curried `cat` function.
+
+# Example:
+```julia-repl
+julia> reduce(tie(3),[zeros(1,3,1),ones(1,3,1)])
+1×3×2 Array{Float64,3}:
+[:, :, 1] =
+ 0.0  0.0  0.0
+
+[:, :, 2] =
+ 1.0  1.0  1.0
+```
+"""
+tie     = curry(cat)    ## cat(n)        = x -> cat(n, x...)
 
 ## used in shared_functions.jl
 """
@@ -212,24 +247,33 @@ Tail-curried `mapreduce` function.
 
 # Example:
 ```julia-repl
-julia> [1:5;] |> QpcrAnalysis.moose(x -> x^2, hcat)
-1×5 Array{Int64,2}:
- 1  4  9  16  25
+julia> [1:5;] |> QpcrAnalysis.moose(x -> x^2, hcat) |> Tuple
+(1, 4, 9, 16, 25)
 ```
 """
-moose(f ::Function, op ::Function) = itr -> mapreduce(f, op, itr)
+@inline moose(f ::Function, op ::Function) = itr -> mapreduce(f, op, itr)
 
 ## reporter functions
 @inline out(out_format ::OutputFormat) =
     output -> (out_format == json) ? JSON.json(output) : output
-report(digits ::Integer, x) = round(x, digits)
+@inline report(digits ::Integer, x) = round(x, digits)
 const JSON_DIGITS = 6 ## number of decimal points for floats in JSON output
 
 ## used in amplification.jl
 ## used in mc_peak_analysis.jl
 ## used in thermal_consistency.jl
-"Curried reporter function."
-roundoff(digits ::Integer) = cast(curry(report))(digits)
+"""
+    roundoff(digits ::Integer)(x)
+
+Curried reporter function."
+
+# Example:
+```julia-repl
+julia> pi |> QpcrAnalysis.roundoff(2)
+3.14
+```
+"""
+@inline roundoff(digits ::Integer) = cast(curry(report))(digits)
 
 @inline get_ordered_keys(dict ::Dict) =
     dict |> keys |> collect |> sort
@@ -237,9 +281,9 @@ roundoff(digits ::Integer) = cast(curry(report))(digits)
 @inline get_ordered_keys(ordered_dict ::OrderedDict) =
     ordered_dict |> keys |> collect
 
+## used in deconvolution.jl
 ## used in melting_curve.jl
 ## used in mc_peak_analysis.jl
-## used in deconvolution.jl
 ## used in optical_test_dual_channel.jl
 """
     sweep(f)(op)(x)
@@ -255,7 +299,8 @@ julia> (85,100,115) |> QpcrAnalysis.sweep(mean)(-) |> QpcrAnalysis.sweep(std)(/)
 (-1.0, 0.0, 1.0)
 ```
 """
-sweep(summary_func) = sweep_func -> x -> broadcast(sweep_func, x, summary_func(x))
+@inline sweep(summary_func) =
+    sweep_func -> x -> broadcast(sweep_func, x, summary_func(x))
 
 ## used in melting_curve.jl
 ## used in shared_functions.jl
@@ -353,10 +398,12 @@ function scinot(
 end
 
 ## used in calibration.jl
-## used in CurriedalibrationData.jl
-"Derive the number of wells from the length of data vectors supplied to the function."
-@inline num_wells(fluos ::AbstractArray) =
+## used in CalibrationData.jl
+"Derive the number of wells from the collection of data vectors supplied to the function."
+count_wells(fluos ::AbstractArray) =
     fluos |> mold(length) |> maximum
+count_wells(dict ::Associative) =
+    dict |> values |> mold(count_wells ∘ index(FLUORESCENCE_VALUE_KEY)) |> maximum
 import Base.length
 length(::Void) = 0
 
@@ -384,7 +431,8 @@ end
 # end
 
 ## unused function
-## repeat n times: take the output of an function and use it as the input for the same function
+## repeat n times: take the output of a function
+## and use it as the input for the same function
 # function redo(
 #     func ::Function,
 #     input,
@@ -416,7 +464,7 @@ end
 #     layered_vector ::AbstractVector,
 #     num_layers_left ::Integer=0
 # )
-#     md_array = copy(layered_vector) # safe in case `eltype(layered_vector) <: AbstractArray`
+#     md_array = copy(layered_vector) ## safe in case `eltype(layered_vector) <: AbstractArray`
 #     while redo(eltype, md_array, num_layers_left + 1) <: AbstractArray
 #         md_array = reshape(
 #             cat(2, md_array...),
@@ -429,9 +477,10 @@ end
 ## legacy function
 ## deprecated to remove MySql dependency
 #
-## function: check whether a value different from `calib_info_AIR` is passed onto `calib_info`
-## if not, use `exp_id` to find calibration experiment in MySQL database
-## and assumes water "step_id"=2, signal "step_id"=4, using FAM to calibrate all the channels.
+## function: check whether a value different from `calib_info_AIR`
+## is passed onto `calib_info`. if not, use `exp_id` to find calibration experiment
+## in MySQL database and assumes water "step_id"=2, signal "step_id"=4,
+## using FAM to calibrate all the channels.
 # function ensure_ci(
 #
 #     ## remove MySql dependency
@@ -524,6 +573,9 @@ end
 # end
 
 ## simple macros
+## deprecated in favour of:
+## `true  && (Expr)`
+## `false || (Expr)`
 # macro when(predicate, conditional)
 #     return :(if ($predicate)
 #         ($conditional)
