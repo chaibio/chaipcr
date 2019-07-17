@@ -234,8 +234,8 @@ function mc_peak_analysis(
             element |> fieldnames |> mold(curry(getfield)(element))
         # nadir_vec = [left_nadir_idx, right_nadir_idx]
         # low_nadir_idx, high_nadir_idx = map(
-        #     func -> nadir_vec[func(negderiv_smu[nadir_vec])[2]],
-        #     [findmin, findmax])
+        #     func -> nadir_vec[func(negderiv_smu[nadir_vec])],
+        #     [indmin, indmax])
         const (low_nadir_idx, high_nadir_idx) =
             (negderiv_smu[left_nadir_idx] < negderiv_smu[right_nadir_idx]) ?
                 (left_nadir_idx, right_nadir_idx) :

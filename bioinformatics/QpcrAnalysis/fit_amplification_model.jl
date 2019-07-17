@@ -169,7 +169,7 @@ function fit_amplification_model(
         const dr2_cfd_left  = dr2_cfd[1:min_fluo_cyc]
         const dr2_cfd_right = dr2_cfd[min_fluo_cyc:end]
         const (max_dr2_left_cyc, max_dr2_right_cyc) =
-            (dr2_cfd_left, dr2_cfd_right) |> mold(index(2) ∘ findmax)
+            (dr2_cfd_left, dr2_cfd_right) |> mold(indmax)
         if max_dr2_right_cyc <= last_cyc_wt0
             ## fluo on fitted spline may not be close to raw fluo
             ## at `max_dr2_left_cyc` and `max_dr2_right_cyc`
@@ -229,10 +229,10 @@ function fit_amplification_model(
         funcs_pred[:dr2](cycs_denser, quant_coefs...)
     #
     cyc_max_dr1_(dr1_pred ::AbstractVector) =
-        cycs_denser[findmax(dr1_pred)[2]]
+        cycs_denser[indmax(dr1_pred)]
     #
     cyc_max_dr2_(dr2_pred ::AbstractVector) =
-        cycs_denser[findmax(dr2_pred)[2]]
+        cycs_denser[indmax(dr2_pred)]
     #
     cy0_(max_dr1 ::Real, idx_max_dr1 ::Integer) =
         cy0_(max_dr1, idx_max_dr1, cycs_denser[idx_max_dr1])
@@ -247,7 +247,7 @@ function fit_amplification_model(
             rethrow()
     end ## ct_()
     #
-    max_eff() = cycs_denser[findmax(map(func_pred_eff, cycs_denser))[2]]
+    max_eff() = cycs_denser[indmax(map(func_pred_eff, cycs_denser))]
     #
     nonpos2NaN(x ::Real) =
         x <= zero(x) ? NaN : x

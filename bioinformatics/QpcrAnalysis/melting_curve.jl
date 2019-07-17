@@ -142,6 +142,15 @@ function mc_analysis(i ::McInput)
     #                 end)
     #         end
     #
+    # "Curried function that extends a vector with NaN values to a specified length."
+    # extend_NaN(len ::Integer) =
+    #     vec ::AbstractVector ->
+    #         len - length(vec) |>
+    #             m ->
+    #                 m >= 0 ?
+    #                     vcat(vec, fill(NaN, m)) :
+    #                     error(logger, "vector is too long")
+    #
     #     ## extend array elements with NaNs to length of longest element
     #     @inline extend(x ::AbstractArray) =
     #         map(extend_NaN(y |> mold(length) |> maximum), x)

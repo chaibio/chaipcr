@@ -130,8 +130,10 @@ Tail-currying function.
 
 # Example:
 ```julia-repl
-julia> -1 |> QpcrAnalysis.bless(Complex) |> sqrt
-0.0 + 1.0im
+julia> 1:10 |> QpcrAnalysis.tail(filter) |> QpcrAnalysis.tail(map)([iseven,isodd])
+2-element Array{Array{Int64,1},1}:
+ [2, 4, 6, 8, 10]
+ [1, 3, 5, 7, 9]
 ```
 """
 @inline tail(f)  = (x...) -> y -> f(y, x...)
@@ -215,7 +217,7 @@ julia> [1:5;] |> QpcrAnalysis.moose(x -> x^2, hcat)
  1  4  9  16  25
 ```
 """
-moose = tail(mapreduce) ## moose(f, op) = itr -> mapreduce(f, op, itr)
+moose(f ::Function, op ::Function) = itr -> mapreduce(f, op, itr)
 
 ## reporter functions
 @inline out(out_format ::OutputFormat) =
@@ -224,7 +226,8 @@ report(digits ::Integer, x) = round(x, digits)
 const JSON_DIGITS = 6 ## number of decimal points for floats in JSON output
 
 ## used in amplification.jl
-## used in melting_curve.jl
+## used in mc_peak_analysis.jl
+## used in thermal_consistency.jl
 "Curried reporter function."
 roundoff(digits ::Integer) = cast(curry(report))(digits)
 
@@ -257,7 +260,6 @@ sweep(summary_func) = sweep_func -> x -> broadcast(sweep_func, x, summary_func(x
 ## used in melting_curve.jl
 ## used in shared_functions.jl
 # thing(x) = !(x == nothing)
-## NB cannot inline this because compiler does not recognize it as a function
 thing = (!isequal)(nothing)
 
 ## used in amplification.jl
@@ -350,17 +352,8 @@ function scinot(
     return (_mantissa, Int(_exponent))
 end
 
-## used in melting_curve.jl
-"Curried function that extends a vector with NaN values to a specified length."
-extend_NaN(len ::Integer) =
-    vec ::AbstractVector ->
-        len - length(vec) |>
-            m ->
-                m >= 0 ?
-                    vcat(vec, fill(NaN, m)) :
-                    error(logger, "vector is too long")
-
 ## used in calibration.jl
+## used in CurriedalibrationData.jl
 "Derive the number of wells from the length of data vectors supplied to the function."
 @inline num_wells(fluos ::AbstractArray) =
     fluos |> mold(length) |> maximum

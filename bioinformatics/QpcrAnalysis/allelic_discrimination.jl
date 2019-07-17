@@ -351,9 +351,9 @@ function assign_genos(
         ## resulting in largest silhouette mean)
         const ucc_keys = _ucc_dict |> keys |> collect
         const _best_i =
-            findmax(
+            indmax(
                 collect(
-                    map(key -> getfield(_ucc_dict[key],:slht_mean), ucc_keys)))[2]
+                    map(key -> getfield(_ucc_dict[key],:slht_mean), ucc_keys)))
         const _best_ucc = _ucc_dict[ucc_keys[_best_i]]
         # expected_genos = expected_genos_vec[best_i]
         return (_best_i, _best_ucc, _ucc_dict)
@@ -416,9 +416,9 @@ function assign_genos(
         while any(_new_center_idc .== 0)
             for i in 1:best_num_genos
                 if _new_center_idc[i] == 0
-                    closest_j = findmin(dist_optm_init_centers[i, :])[2]
+                    closest_j = indmin(dist_optm_init_centers[i, :])
                     if !(closest_j in _new_center_idc)
-                        closest_i = findmin(dist_optm_init_centers[:, closest_j])[2]
+                        closest_i = indmin(dist_optm_init_centers[:, closest_j])
                         if closest_i == i
                             _new_center_idc[i] = closest_j
                             dist_optm_init_centers[i, :] = +Inf
