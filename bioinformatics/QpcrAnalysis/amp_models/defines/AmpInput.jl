@@ -73,10 +73,10 @@ struct AmpInput <: Input
     ## raw data
     raw                     ::RawData{<: Real}
     ## data dimensions
-    num_cycs                ::Int
+    num_cycles              ::Int
     num_wells               ::Int
     num_channels            ::Int
-    cycs                    ::SVector{N,Int} where {N}
+    cycles                  ::SVector{N,Int} where {N}
     wells                   ::SVector{W,Symbol} where {W}
     channels                ::SVector{C,Int} where {C}
 
@@ -130,10 +130,10 @@ end
 ## constructor = interface to amp_analysis()
 AmpInput(
     raw                     ::RawData{<: Real},
-    num_cycs                ::Integer,
+    num_cycles              ::Integer,
     num_wells               ::Integer,
     num_channels            ::Integer,
-    cycs                    ::AbstractVector{<: Integer},
+    cycles                  ::AbstractVector{<: Integer},
     wells                   ::AbstractVector{Symbol},
     channels                ::AbstractVector{<: Integer},
     calibration_data        ::CalibrationData{<: NumberOfChannels, <: Real},
@@ -176,10 +176,10 @@ AmpInput(
 ) =
     AmpInput(
         raw,
-        num_cycs,
+        num_cycles,
         num_wells,
         num_channels,
-        cycs,
+        cycles,
         wells,
         channels,
         calibration_data,
@@ -253,7 +253,7 @@ function check_bl_cyc_bounds(
     bl_cyc_bounds   ::Union{Vector{I},Array{Vector{I},2}} where {I <: Integer},
 )
     debug(logger, "at check_bl_cyc_bounds()")
-    (i.num_cycs <= 2) && return bl_cyc_bounds
+    (i.num_cycles <= 2) && return bl_cyc_bounds
     const size_bcb = size(bl_cyc_bounds)
     if size_bcb == (0,) || size_bcb == (2,)
         return amp_init(i, bl_cyc_bounds)

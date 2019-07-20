@@ -49,7 +49,7 @@ function act(
     #
     debug(logger, "at act(::Type{Val{amplification}})")
     const parsed_raw_data = try
-        amp_parse_raw_data(req_dict)
+        amp_parse_raw_data(req_dict[RAW_DATA_KEY])
     catch err
         return fail(logger, err; bt=true) |> out(out_format)
     end ## try
@@ -187,44 +187,45 @@ end ## act(::Type{Val{amplification}})
 
 "Extract dimensions of raw amplification data, then format the raw data into a
 3D array as required by `calibrate`."
-function amp_parse_raw_data(req_dict ::Associative)
-    const (cycs, wells, channels) =
+function amp_parse_raw_data(raw_dict ::Associative)
+    const (cycles, wells, channels) =
         map([CYCLE_NUM_KEY, WELL_NUM_KEY, CHANNEL_KEY]) do key
-            req_dict[RAW_DATA_KEY][key] |> unique             ## in order of appearance
+            raw_dict[key] |> unique ## in order of appearance
         end
-    const (num_cycs, num_wells, num_channels) =
-        map(length, (cycs, wells, channels))
+    const (num_cycles, num_wells, num_channels) =
+        map(length, (cycles, wells, channels))
     #
-    ## check that data are conformable to 3D array
+    ## check that data are sorted and conformable to 3D array
     try
-        assert(req_dict[RAW_DATA_KEY][CYCLE_NUM_KEY] ==
+        assert(raw_dict[CYCLE_NUM_KEY] ==
             repeat(
-                cycs,
+                cycles,
                 outer = num_wells * num_channels))
-        assert(req_dict[RAW_DATA_KEY][WELL_NUM_KEY ] ==
+        assert(raw_dict[WELL_NUM_KEY ] ==
             repeat(
                 wells,
-                inner = num_cycs,
+                inner = num_cycles,
                 outer = num_channels))
-        assert(req_dict[RAW_DATA_KEY][CHANNEL_KEY  ] ==
+        assert(raw_dict[CHANNEL_KEY  ] ==
             repeat(
                 channels,
-                inner = num_cycs * num_wells))
+                inner = num_cycles * num_wells))
     catch()
-        throw(AssertionError("The format of the fluorescence data does not " *
+        throw(ArgumentError("The format of the fluorescence data does not " *
             "lend itself to transformation into a 3-dimensional array. " *
-            "Please make sure that it is sorted by channel, well, and cycle number."))
+            "Please make sure that the data are sorted by " *
+            "channel, well, and cycle number."))
     end ## try
     #
     ## reshape to 3D array
-    const F = eltype(first(req_dict[RAW_DATA_KEY][FLUORESCENCE_VALUE_KEY]))
+    const F = eltype(first(raw_dict[FLUORESCENCE_VALUE_KEY]))
     const raw_data = ## formerly `fr_ary3`
         reshape(
-            req_dict[RAW_DATA_KEY][FLUORESCENCE_VALUE_KEY],
-            num_cycs, num_wells, num_channels)
+            raw_dict[FLUORESCENCE_VALUE_KEY],
+            num_cycles, num_wells, num_channels)
     #
     ## rearrange data in sort order of each index
-    const cyc_perm  = sortperm(cycs)
+    const cyc_perm  = sortperm(cycles)
     const well_perm = sortperm(wells)
     const chan_perm = sortperm(channels)
     #
@@ -232,10 +233,10 @@ function amp_parse_raw_data(req_dict ::Associative)
     const kludge = sweep(minimum)(-)(wells)
     return (
         RawData{F}(raw_data[cyc_perm, well_perm, chan_perm]),
-        num_cycs,
+        num_cycles,
         num_wells,
         num_channels,
-        cycs[cyc_perm] |> SVector{num_cycs},
+        cycles[cyc_perm] |> SVector{num_cycles},
         kludge[well_perm] |> mold(Symbol ∘ Int) |> SVector{num_wells},
         channels[chan_perm] |> SVector{num_channels})
 end ## amp_parse_raw_data()
@@ -260,10 +261,10 @@ function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
         default_ct_fluos(i))
     #
     ## fit amplification models and report results
-    if i.num_cycs <= 2
-        warn(logger, "number of cycles $num_cycs <= 2: baseline subtraction " *
+    if i.num_cycles <= 2
+        warn(logger, "number of cycles $num_cycles <= 2: baseline subtraction " *
             "and Cq calculation will not be performed")
-    else ## num_cycs > 2
+    else ## num_cycles > 2
         const baseline_cyc_bounds = check_bl_cyc_bounds(i, DEFAULT_AMP_BL_CYC_BOUNDS)
         set_ct_fluos!(o, i, baseline_cyc_bounds)
         set_output_fields!(o, i, get_fit_results(o, i, baseline_cyc_bounds))
@@ -464,7 +465,7 @@ function report_cq!(
         max_dr1_lb, max_dr2_lb, max_bsf_lb = i.max_dr1_lb, i.max_dr2_lb, i.max_bsf_lb
     end
     #
-    const num_cycs = size(o.raw_data, 1)
+    const num_cycles = size(o.raw_data, 1)
     const (postbl_status, cq_raw, max_dr1, max_dr2) =
         map([ :postbl_status, :cq_raw, :max_dr1, :max_dr2 ]) do fieldname
             fieldname -> getfield(o, fieldname)[well_i, channel_i]
@@ -480,8 +481,8 @@ function report_cq!(
             "b > 0"
         elseif o.cq_method == ct && o.cq_raw == AMP_CT_VAL_DOMAINERROR
             "DomainError when calculating Ct"
-        elseif o.cq_raw <= 0.1 || o.cq_raw >= num_cycs
-            "cq_raw <= 0.1 || cq_raw >= num_cycs"
+        elseif o.cq_raw <= 0.1 || o.cq_raw >= num_cycles
+            "cq_raw <= 0.1 || cq_raw >= num_cycles"
         elseif max_dr1 < max_dr1_lb
             "max_dr1 $max_dr1 < max_dr1_lb $max_dr1_lb"
         elseif max_dr2 < max_dr2_lb
