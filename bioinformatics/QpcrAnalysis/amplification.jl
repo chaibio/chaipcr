@@ -30,8 +30,6 @@ const KWARGS_RCQ_KEYS_DICT = Dict(
     "min_fluomax"   => :max_bsf_lb,
     "min_D1max"     => :max_dr1_lb,
     "min_D2max"     => :max_dr2_lb)
-const AMP_VECTOR_OUTPUT_FIELDS =
-    [:rbbs_3ary, :blsub_fluos, :coefs, :blsub_fitted, :dr1_pred, :dr2_pred]
 
 
 
@@ -385,8 +383,10 @@ end ## set_fit_results!()
 )
     debug(logger, "at set_output_fields!()")
     foreach(fieldnames(first(results))) do fieldname
-        const T = eltype(getfield(o, fieldname))
-        if fieldname in AMP_VECTOR_OUTPUT_FIELDS
+        const output_field = getfield(o, fieldname)
+        const T = output_field |> eltype
+        const vector_output_field = ndims(output_field) == 3
+        if vector_output_field
             setfield!(o, fieldname,
                 results |>
                 moose(bless(Vector{T}) ∘ field(fieldname), hcat) |>

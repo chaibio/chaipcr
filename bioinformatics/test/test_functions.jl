@@ -76,6 +76,19 @@ end
 # using BenchmarkTools
 # @benchmark test_functions["amplification single channel"]()
 
+## commit c964da0fe71de22009e5ea3881d1b0629b179e9c !!!
+# BenchmarkTools.Trial:
+#   memory estimate:  16.00 MiB
+#   allocs estimate:  250883
+#   --------------
+#   minimum time:     251.437 ms (0.00% GC)
+#   median time:      267.216 ms (2.19% GC)
+#   mean time:        263.837 ms (1.58% GC)
+#   maximum time:     275.962 ms (2.44% GC)
+#   --------------
+#   samples:          19
+#   evals/sample:     1
+
 ## commit dce3b4a1265df1ca5582283b374b118f0c3d3195
 # BenchmarkTools.Trial:
 #   memory estimate:  16.00 MiB
@@ -281,6 +294,19 @@ end
 # # @timev for i in 1:100; test_functions["meltcurve dual channel"](); end;
 # using BenchmarkTools
 # @benchmark test_functions["meltcurve dual channel"]()
+
+## commit c964da0fe71de22009e5ea3881d1b0629b179e9c !!!
+# BenchmarkTools.Trial:
+#   memory estimate:  163.67 MiB
+#   allocs estimate:  1073208
+#   --------------
+#   minimum time:     233.911 ms (9.25% GC)
+#   median time:      245.089 ms (11.52% GC)
+#   mean time:        244.477 ms (11.22% GC)
+#   maximum time:     252.217 ms (7.67% GC)
+#   --------------
+#   samples:          21
+#   evals/sample:     1
 
 ## commit a01b3b50a6e753f3ce92d4a33c1cc9adbb6256b7:
 # BenchmarkTools.Trial:
