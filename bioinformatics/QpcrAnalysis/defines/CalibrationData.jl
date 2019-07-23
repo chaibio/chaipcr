@@ -18,9 +18,7 @@ import DataStructures.OrderedDict
 import StaticArrays: SArray
 
 
-abstract type AbstractCalibrationData end
-
-struct CalibrationData{N <: NumberOfChannels, R <: Real} <: AbstractCalibrationData
+struct CalibrationData{N <: NumberOfChannels, R <: Real}
     array       ::SArray{S,R,3} where {S <: Tuple}
     ## inner constructors supply type parameters
     ## and enforce constraints on size of data array

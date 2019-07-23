@@ -26,8 +26,8 @@ function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
     debug(logger, "at amp_analysis()")
     #
     ## deconvolute and normalize
-    const calibration_input = CalibrationInput(i.calibration_data, i.calibration_args)
-    const calibration_results = calibrate(i, calibration_input, i.raw, array)
+    const calibration_results =
+        calibrate(i, i.calibration_data, i.calibration_args, i.raw, array)
     #
     ## initialize output
     o = AmpOutput(

@@ -199,7 +199,6 @@ function mc_analysis(i ::McInput)
     const (raw_temps, raw_fluos) = transform_3d(i.raw_df)
     #
     ## deconvolute and normalize
-    const calibration_input = CalibrationInput(i.calibration_data, i.calibration_args)
     const peak_format = peak_output_format(i.out_format)
     if peak_format == McPeakLongOutput
         (   background_subtracted_data,
@@ -208,11 +207,11 @@ function mc_analysis(i ::McInput)
             norm_data,
             norm_wells,
             calibrated_data ) =
-                calibrate(i, calibration_input, raw_fluos, array)
+                calibrate(i, i.calibration_data, i.calibration_args, raw_fluos, array)
     else
         ## McPeakShortOutput
         const (_, _, _, _, norm_wells, calibrated_data) = ## discard other output fields
-            calibrate(i, calibration_input, raw_fluos, array)
+            calibrate(i, i.calibration_data, i.calibration_args, raw_fluos, array)
     end ## if peak_format
     #
     ## subset temperature/fluorescence data by channel / well

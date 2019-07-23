@@ -65,7 +65,6 @@ module QpcrAnalysis
     include("defines/RawData.jl")
     include("defines/CalibrationData.jl")
     include("defines/CalibrationParameters.jl")
-    include("defines/CalibrationInput.jl")
     include("defines/DeconvolutionMatrices.jl")
     ## allelic discrimination
     include("defines/ClusterAnalysisResult.jl")
@@ -152,12 +151,16 @@ module QpcrAnalysis
     ## This function contains stuff that needs to happen
     ## at runtime when the module is loaded
     function __init__()
-        ## Changes to the default logger must happen at runtime
+        ## create log handler
+        ## NB changes to the default logger must happen at runtime
         ## otherwise segfaults are liable to occur
         push!(logger,
             DefaultHandler(
                 FileRoller("julia.log", production_env ? "/var/log" : "/tmp"), ## default max size ~5MB
                 DefaultFormatter("[ {date} | {level} ]: {msg}")))
+        ## debug-level logging in production environment (provisional setting)
+        production_env  && setlevel!(logger, "debug")
+        ## debug-level logging in development environment
         !production_env && setlevel!(logger, "debug")
         ## Register the module level logger at runtime
         ## so it is accessible via `get_logger(QpcrAnalysis)`

@@ -13,16 +13,6 @@
 
 
 #===============================================================================
-    constants >>
-===============================================================================#
-
-## channel descriptors
-# const CHANNELS = DYES = SVector(1,2)
-# const DYE_SYMBOLS = SVector(:FAM, :HEX)
-
-
-
-#===============================================================================
     defaults >>
 ===============================================================================#
 
@@ -57,3 +47,11 @@ SCHEMA = CAL_ARGS_FIELD_DEFS
 # println(@macroexpand @make_constructor_from_SCHEMA CalibrationParameters)
 @make_struct_from_SCHEMA CalibrationParameters
 @make_constructor_from_SCHEMA CalibrationParameters
+
+
+
+#===============================================================================
+    constant >>
+===============================================================================#
+
+const DEFAULT_CAL_ARGS = CalibrationParameters()

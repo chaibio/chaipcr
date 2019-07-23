@@ -27,14 +27,17 @@ end
 
 
 #===============================================================================
-    constructor requiring Input type >>
+    null constructor >>
 ===============================================================================#
 
-function DeconvolutionMatrices(calibration ::CalibrationInput)
-    const s = size(calibration.data.array)
+function DeconvolutionMatrices(
+    calibration_data    ::CalibrationData{<: NumberOfChannels, <: Real},
+    calibration_args    ::CalibrationParameters
+)
+    const s = size(calibration_data.array)
     const w = s[1]
     const c = s[2]
-    const v = calibration.args.k_method == well_proc_vec ? w : 1
+    const v = calibration_args.k_method == well_proc_vec ? w : 1
     const empty_matrix = SMatrix{c,c,Float_T}(fill(NaN,c,c))
     DeconvolutionMatrices(
         SVector{v}(fill(empty_matrix,v)),
