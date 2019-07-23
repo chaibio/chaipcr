@@ -45,4 +45,3 @@ no_default(f ::Field) = f.default === nothing
 
 subset_schema(schema ::AbstractArray{Field}, x ::AbstractArray{Symbol}) =
     schema[indexin(x, schema |> mold(field(:name)))]
-

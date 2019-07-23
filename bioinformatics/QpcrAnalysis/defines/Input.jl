@@ -28,14 +28,11 @@ abstract type Input end
 function parse_req_dict!(
 	action 		::Action,
 	kwargs 		::Associative,
-	req_dict 	::Associative
+	req_dict 	::Associative,
 )
 	for key in keys(req_dict)
-	    const parsed_field = try
-	        parse_req(Val{action}, Val{Symbol(key)}, key, req_dict[key])
-	    catch err
-	        return fail(logger, err; bt = true) |> out(out_format)
-	    end ## try
+	    const parsed_field =
+	        parse_req(Val{action}, Val{Symbol(key)}, key, req_dict)
 	    (parsed_field === nothing) &&
 	        info(logger, "ignored field \"$key\" in request data") 
 	    add_pairs!(kwargs, parsed_field)
@@ -52,11 +49,11 @@ parse_req(
             ::Union{Type{Val{amplification}},Type{Val{meltcurve}}},
             ::Type{Val{:calibration_info}},
     key     ::AbstractString,
-    value   ::Associative
+    req_dict::Associative,
 ) =
     :calibration_data =>
         try
-            CalibrationData(value)
+            CalibrationData(req_dict[key])
         catch()
             throw(ArgumentError("could not parse calibration data"))
         end ## try
@@ -65,41 +62,41 @@ parse_req(
             ::Union{Type{Val{amplification}},Type{Val{meltcurve}}},
             ::Type{Val{:experiment_id}},
     key     ::AbstractString,
-            ::Any
+    req_dict::Associative,
 ) = nothing
 
 parse_req(
             ::Union{Type{Val{amplification}},Type{Val{meltcurve}}},
             ::Type{Val{:stage_id}},
     key     ::AbstractString,
-            ::Any
+    req_dict::Associative,
 ) = nothing
 
 parse_req(
             ::Union{Type{Val{amplification}},Type{Val{meltcurve}}},
             ::Type{Val{:step_id}},
     key     ::AbstractString,
-            ::Any
+    req_dict::Associative,
 ) = nothing
 
 parse_req(
             ::Union{Type{Val{amplification}},Type{Val{meltcurve}}},
             ::Type{Val{:ramp_id}},
     key     ::AbstractString,
-            ::Any
+    req_dict::Associative,
 ) = nothing
 
 parse_req(
             ::Union{Type{Val{amplification}},Type{Val{meltcurve}}},
             ::Type{Val{:channel_nums}},
     key     ::AbstractString,
-            ::Any
+    req_dict::Associative,
 ) = nothing
 
 parse_req(
             ::Union{Type{Val{amplification}},Type{Val{meltcurve}}},
             ::Type{Any},
     key     ::AbstractString,
-            ::Any
+    req_dict::Associative,
 ) =
     throw(ArgumentError("field \"$key\" in request body not recognized"))

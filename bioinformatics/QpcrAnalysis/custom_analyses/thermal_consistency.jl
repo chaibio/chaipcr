@@ -59,25 +59,28 @@ function act(
             "no calibration data in request")) |> out(out_format)
     end
     #
-    ## parse data from request into Dict of keywords
-    tc_kwargs = Dict(
-        :calibration_args    => CalibrationParameters(dcv = dcv),
-        :auto_span_smooth    => auto_span_smooth,
-        :span_smooth_default => span_smooth_default,
-        :span_smooth_factor  => span_smooth_factor,
-        :max_temperature     => max_temperature,
-        :out_format          => full_output,
-        :reporting           => reporting)
-    parse_req_dict!(meltcurve, tc_kwargs, req_dict)
+    ## parse data from request
+    const mc_parsed_raw_data = mc_parse_raw_data(req_dict[RAW_DATA_KEY])
+    const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
+    #
+    ## parse analysis parameters from request
+    const kw_pa = OrderedDict{Symbol,Any}(
+        map(keys(MC_PEAK_ANALYSIS_KEYWORDS)) do key
+            key => req_dict[MC_PEAK_ANALYSIS_KEYWORDS[key]]
+        end)
     #
     ## create container for data and parameter values
-    parsed_raw_tc_data = tc_kwargs[:parsed_raw_mc_data]
-    calibration_data   = tc_kwargs[:calibration_data]
-    tc_kwargs = delete_all!(tc_kwargs, [:parsed_raw_mc_data, :calibration_data])
     interface = McInput(
-        parsed_raw_tc_data...,
-        calibration_data;
-        tc_kwargs...)
+            mc_parsed_raw_data...,
+            calibration_data;
+            calibration_args = CalibrationParameters(dcv = dcv),
+            auto_span_smooth = auto_span_smooth,
+            span_smooth_default = span_smooth_default,
+            span_smooth_factor = span_smooth_factor,
+            max_temperature = max_temperature,
+            out_format = full_output,
+            reporting = reporting,
+            kw_pa...)
     #
     ## analyse data as melting curve
     const mc_w72c = try

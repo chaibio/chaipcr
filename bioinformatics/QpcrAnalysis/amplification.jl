@@ -16,6 +16,20 @@ import Memento: debug
 
 
 #===============================================================================
+    field names >>
+===============================================================================#
+
+const KWARGS_AMP_KEYS =
+    ["min_reliable_cyc", "baseline_cyc_bounds", "ctrl_well_dict",
+        CQ_METHOD_KEY, CATEG_WELL_VEC_KEY]
+const KWARGS_RCQ_KEYS_DICT = Dict(
+    "min_fluomax"   => :max_bsf_lb,
+    "min_D1max"     => :max_dr1_lb,
+    "min_D2max"     => :max_dr2_lb)
+
+
+
+#===============================================================================
     function definitions >>
 ===============================================================================#
 
@@ -30,31 +44,82 @@ function act(
     debug(logger, "at act(::Type{Val{amplification}})")
     #
     ## required data
-    # req_key = curry(haskey)(req_dict)
+    req_key = curry(haskey)(req_dict)
     if !raw_data_in_req(req_dict)
         return fail(logger, ArgumentError(
             "no raw data for amplification analysis in request")) |> out(out_format)
-            end
+    end
     if !calibration_info_in_req(req_dict)
         return fail(logger, ArgumentError(
-            "no calibration data in request")) |> out(out_format)
+            "no calibration information in request")) |> out(out_format)
     end
     #
-    ## parse data from request into Dict of keywords
-    amp_kwargs = Dict{Symbol,Any}(
-        :out_format => out_format,
-        :amp_output => AmpOutputOption(out_format))
-    parse_req_dict!(amplification, amp_kwargs, req_dict)
+    ## parse data from request
+    const parsed_raw_data = amp_parse_raw_data(req_dict[RAW_DATA_KEY])
+    const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
+    #
+    ## analysis parameters for model fitting
+    const kw_amp = Dict{Symbol,Any}(
+        map(KWARGS_AMP_KEYS |> sift(req_key)) do key
+            if (key == CATEG_WELL_VEC_KEY)
+                :categ_well_vec =>
+                    map(req_dict[CATEG_WELL_VEC_KEY]) do x
+                        const element = str2sym.(x)
+                        (length(element[2]) == 0) ?
+                            element :
+                            Colon()
+                    end ## do x
+            elseif (key == CQ_METHOD_KEY)
+                :cq_method => try
+                    CqMethod(req_dict[CQ_METHOD_KEY])
+                catch()
+                    return fail(logger, ArgumentError("Cq method \"" *
+                        req_dict[CQ_METHOD_KEY] * "\" not implemented");
+                        bt = true) |> out(out_format)
+                end ## try
+            else
+                Symbol(key) => str2sym.(req_dict[key])
+            end ## if
+        end) ## map
+    #
+    ## arguments for fit_baseline_model()
+    const kw_bl =
+        begin
+            const baseline_method =
+                req_key(BASELINE_METHOD_KEY) &&
+               req_dict[BASELINE_METHOD_KEY]
+            if      (baseline_method == SIGMOID_KEY)
+                        Dict{Symbol,Any}(
+                            :bl_method          =>  l4_enl,
+                            :bl_fallback_func   =>  median)
+            elseif  (baseline_method == LINEAR_KEY)
+                        Dict{Symbol,Any}(
+                            :bl_method          =>  lin_1ft,
+                            :bl_fallback_func   =>  mean)
+            elseif  (baseline_method == MEDIAN_KEY)
+                        Dict{Symbol,Any}(
+                            :bl_method          =>  take_the_median)
+            else
+                Dict{Symbol,Any}()
+            end
+        end
+    #
+    ## report_cq!() arguments
+    const kw_rcq = Dict{Symbol,Any}(
+        map(KWARGS_RCQ_KEYS_DICT |> keys |> collect |> sift(req_key)) do key
+            KWARGS_RCQ_KEYS_DICT[key] => req_dict[key]
+        end) ## map
     #
     ## create container for data and parameters
     ## to pass to amp_analysis()
-    const parsed_raw_amp_data = amp_kwargs[:parsed_raw_amp_data]
-    const calibration_data    = amp_kwargs[:calibration_data   ]
-    amp_kwargs = delete_all!(amp_kwargs, [:parsed_raw_amp_data, :calibration_data])
     const interface = AmpInput(
-        parsed_raw_amp_data...,
+        parsed_raw_data...,
         calibration_data;
-        amp_kwargs...)
+        out_format = out_format,
+        amp_output = AmpOutputOption(out_format),
+        kw_bl...,
+        kw_amp...,
+        kw_rcq...,)
     const result = try
         ## issues:
         ## 1.
@@ -105,117 +170,6 @@ function act(
     end ## try
     return result |> out(out_format)
 end ## act(::Type{Val{amplification}})
-
-
-#==============================================================================#
-
-
-## methods for data acquisition from request:
-## add/remove/modify methods as appropriate if the API changes >>
-
-parse_req(
-            ::Type{Val{amplification}},
-            ::Type{Val{:raw_data}},
-    key     ::AbstractString,
-    value   ::Associative
-) =
-    :parsed_raw_amp_data =>
-        try
-            amp_parse_raw_data(value)
-        catch err
-            throw(ArgumentError("could not parse raw data for amplification analysis"))
-        end ## try
-
-parse_req(
-            ::Type{Val{amplification}},
-            ::Type{Val{:categ_well_vec}},
-    key     ::AbstractString,
-    value   ::AbstractVector
-) =
-    :categ_well_vec =>
-        map(value) do x
-            const element = str2sym.(x)
-            length(element[2]) == 0 ?
-                element :
-                Colon()
-        end ## do x
-
-parse_req(
-            ::Type{Val{amplification}},
-            ::Type{Val{:cq_method}},
-    key     ::AbstractString,
-    value   ::AbstractString
-) =
-    :cq_method =>
-        try
-            CqMethod(value)
-        catch()
-            throw(ArgumentError("Cq method \"$value\" not implemented"))
-        end ## try
-
-parse_req(
-            ::Type{Val{amplification}},
-            ::Type{Val{:min_reliable_cyc}},
-    key     ::AbstractString,
-    value   ::Int
-) =
-    :min_reliable_cyc => Int(value)
-
-parse_req(
-            ::Type{Val{amplification}},
-            ::Type{Val{:baseline_cyc_bounds}},
-    key     ::AbstractString,
-    value   ::AbstractArray
-) =
-    :baseline_cyc_bounds => value
-
-parse_req(
-            ::Type{Val{amplification}}, 
-            ::Type{Val{:ctrl_well_dict}},
-    key     ::AbstractString,
-    value   ::Associative
-) =
-    :ctrl_well_dict => str2sym.(value)
-
-parse_req(
-            ::Type{Val{amplification}},
-            ::Type{Val{:baseline_method}},
-    key     ::AbstractString,
-    value   ::AbstractString
-) =
-    if      (value == SIGMOID_KEY)
-                (   :bl_method          =>  l4_enl,
-                    :bl_fallback_func   =>  median  )
-    elseif  (value == LINEAR_KEY)
-                (   :bl_method          =>  lin_1ft,
-                    :bl_fallback_func   =>  mean    )
-    elseif  (value == MEDIAN_KEY)
-                    :bl_method          =>  take_the_median
-    end
-
-parse_req(
-            ::Type{Val{amplification}},
-            ::Type{Val{:min_fluomax}},
-    key     ::AbstractString,
-    value   ::Int
-) =
-    :max_bsf_lb => Int(value)
-
-parse_req(
-            ::Type{Val{amplification}},
-            ::Type{Val{:min_D1max}},
-    key     ::AbstractString,
-    value   ::Int
-) =
-    :max_dr1_lb => Int(value)
-
-parse_req(
-            ::Type{Val{amplification}},
-            ::Type{Val{:min_D2max}},
-    key     ::AbstractString,
-    value   ::Int
-) =
-    :max_dr2_lb => Int(value)
 
 
 ## called by parse_req >>

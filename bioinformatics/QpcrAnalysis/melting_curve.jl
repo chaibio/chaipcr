@@ -24,6 +24,10 @@ const MC_RAW_FIELDS = Dict(
     :fluorescence           => FLUORESCENCE_VALUE_KEY,
     :well                   => WELL_NUM_KEY,
     :channel                => CHANNEL_KEY)
+const MC_PEAK_ANALYSIS_KEYWORDS = Dict{Symbol,String}(
+    :norm_negderiv_quantile => "qt_prob",
+    :max_norm_negderiv      => "max_normd_qtv",
+    :max_num_peaks          => "top_N")
 const MC_TF_KEYS = [:temperature, :fluorescence]
 const MC_OUTPUT_FIELDS = OrderedDict(
     :observed_data          => :melt_curve_data,
@@ -53,18 +57,22 @@ function act(
             "no calibration data in request")) |> out(out_format)
     end
     #
-    ## parse data from request into Dict of keywords
-    mc_kwargs = Dict{Symbol,Any}(:out_format => out_format)
-    parse_req_dict!(meltcurve, mc_kwargs, req_dict)
+    ## parse data from request
+    const mc_parsed_raw_data = mc_parse_raw_data(req_dict[RAW_DATA_KEY])
+    const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
+    #
+    ## parse analysis parameters from request
+    const kwargs_pa = OrderedDict{Symbol,Any}(
+        map(keys(MC_PEAK_ANALYSIS_KEYWORDS)) do key
+            key => req_dict[MC_PEAK_ANALYSIS_KEYWORDS[key]]
+        end) ## do key
     #
     ## create container for data and parameter values
-    parsed_raw_mc_data = mc_kwargs[:parsed_raw_mc_data]
-    calibration_data   = mc_kwargs[:calibration_data]
-    mc_kwargs = delete_all!(mc_kwargs, [:parsed_raw_mc_data, :calibration_data])
     interface = McInput(
-            parsed_raw_mc_data...,
+            mc_parsed_raw_data...,
             calibration_data;
-            mc_kwargs...)
+            out_format = out_format,
+            kwargs_pa...)
     #
     ## pass data and parameter values to mc_analysis()
     ## which will perform the analysis for the entire dataset
@@ -75,50 +83,6 @@ function act(
     end ## try
     return response |> out(out_format)
 end ## act(::Type{Val{meltcurve}})
-
-
-#==============================================================================#
-
-
-## methods for data acquisition from request:
-## add/remove/modify methods as appropriate if the API changes >>
-
-parse_req(
-            ::Type{Val{meltcurve}},
-            ::Type{Val{:raw_data}},
-    key     ::AbstractString,
-    value   ::Associative
-) =
-    :parsed_raw_mc_data =>
-        try
-            mc_parse_raw_data(value)
-        catch err
-            throw(ArgumentError("could not parse raw data for melting curve analysis"))
-        end ## try
-
-parse_req(
-            ::Type{Val{meltcurve}},
-            ::Type{Val{:qt_prob}},
-    key     ::AbstractString,
-    value   ::Real
-) =
-    :norm_negderiv_quantile => Float_T(value)
-
-parse_req(
-            ::Type{Val{meltcurve}},
-            ::Type{Val{:max_normd_qtv}}, 
-    key     ::AbstractString,
-    value   ::Real
-) =
-    :max_norm_negderiv => Float_T(value)
-
-parse_req(
-            ::Type{Val{meltcurve}},
-            ::Type{Val{:top_N}},
-    key     ::AbstractString,
-    value   ::Int
-) =
-    :max_num_peaks => Int(value)
 
 
 #==============================================================================#

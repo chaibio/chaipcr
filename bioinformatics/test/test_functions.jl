@@ -74,20 +74,116 @@ end
 # using Memento
 # setlevel!(QpcrAnalysis.logger, "error")
 # using BenchmarkTools
+# # @timev for i in 1:100; test_functions["amplification single channel"](); end;
 # @benchmark test_functions["amplification single channel"]()
 
-## commit c964da0fe71de22009e5ea3881d1b0629b179e9c !!!
+## commit c4d3ac425fbfa1e65ae352f1e78b1483645754e5
+#  31.532593 seconds (25.08 M allocations: 1.562 GiB, 1.49% gc time)
+# elapsed time (ns): 31532593000
+# gc time (ns):      469400000
+# bytes allocated:   1676803712
+# pool allocs:       25010026
+# non-pool GC allocs:59900
+# malloc() calls:    9600
+# realloc() calls:   900
+# GC pauses:         74
+
+## commit 2e7344b877395abe088d59422b5708fd8165f43d (fixup)
+#  27.648082 seconds (25.36 M allocations: 1.572 GiB, 1.60% gc time)
+# elapsed time (ns): 27648082000
+# gc time (ns):      442063000
+# bytes allocated:   1688355424
+# pool allocs:       25288926
+# non-pool GC allocs:60400
+# malloc() calls:    9600
+# realloc() calls:   900
+# GC pauses:         74
+
+## commit 43161cad1e67aa8073efb63ec3be51bd5c21a3fd
+# BenchmarkTools.Trial:
+#   memory estimate:  15.99 MiB
+#   allocs estimate:  250801
+#   --------------
+#   minimum time:     269.112 ms (0.00% GC)
+#   median time:      285.939 ms (1.94% GC)
+#   mean time:        288.227 ms (1.55% GC)
+#   maximum time:     322.246 ms (2.45% GC)
+#   --------------
+#   samples:          18
+#   evals/sample:     1
+
+## commit 9e6b315e1f56b3310e0488590bde9d0e0725529b
+# BenchmarkTools.Trial:
+#   memory estimate:  15.99 MiB
+#   allocs estimate:  250801
+#   --------------
+#   minimum time:     306.455 ms (0.00% GC)
+#   median time:      324.136 ms (1.74% GC)
+#   mean time:        322.756 ms (1.27% GC)
+#   maximum time:     336.128 ms (1.79% GC)
+#   --------------
+#   samples:          16
+#   evals/sample:     1
+
+## commit 00f645a6adfdbb99ab2279b6358f0fc50a21e532
+# BenchmarkTools.Trial:
+#   memory estimate:  15.99 MiB
+#   allocs estimate:  250818
+#   --------------
+#   minimum time:     290.265 ms (1.82% GC)
+#   median time:      301.966 ms (1.76% GC)
+#   mean time:        303.233 ms (1.43% GC)
+#   maximum time:     316.700 ms (1.77% GC)
+#   --------------
+#   samples:          17
+#   evals/sample:     1
+
+## better
+#  29.574523 seconds (25.08 M allocations: 1.562 GiB, 1.54% gc time)
+# elapsed time (ns): 29574523000
+# gc time (ns):      456487000
+# bytes allocated:   1676802240
+# pool allocs:       25008593
+# non-pool GC allocs:59900
+# malloc() calls:    9600
+# realloc() calls:   900
+# GC pauses:         73
+
+## commit ff41db9d3fd782dd24fdcdfe7835c15faca380e9
+#   memory estimate:  16.00 MiB
+#   allocs estimate:  250872
+#   --------------
+#   minimum time:     269.513 ms (0.00% GC)
+#   median time:      286.489 ms (1.90% GC)
+#   mean time:        283.428 ms (1.46% GC)
+#   maximum time:     291.448 ms (2.13% GC)
+#   --------------
+#   samples:          18
+#   evals/sample:     1
+
+## commit cc325bb92525153a641c8083c977b2f202aed130
 # BenchmarkTools.Trial:
 #   memory estimate:  16.00 MiB
 #   allocs estimate:  250883
 #   --------------
-#   minimum time:     251.437 ms (0.00% GC)
-#   median time:      267.216 ms (2.19% GC)
-#   mean time:        263.837 ms (1.58% GC)
-#   maximum time:     275.962 ms (2.44% GC)
+#   minimum time:     257.397 ms (0.00% GC)
+#   median time:      272.069 ms (2.05% GC)
+#   mean time:        268.909 ms (1.49% GC)
+#   maximum time:     276.962 ms (2.02% GC)
 #   --------------
 #   samples:          19
 #   evals/sample:     1
+
+## commit c964da0fe71de22009e5ea3881d1b0629b179e9c on master
+#  30.972977 seconds (25.09 M allocations: 1.562 GiB, 1.51% gc time)
+# elapsed time (ns): 30972977000
+# gc time (ns):      468801000
+# bytes allocated:   1677302448
+# pool allocs:       25018510
+# non-pool GC allocs:59905
+# malloc() calls:    9600
+# realloc() calls:   900
+# GC pauses:         73
 
 ## commit dce3b4a1265df1ca5582283b374b118f0c3d3195
 # BenchmarkTools.Trial:
@@ -100,54 +196,6 @@ end
 #   maximum time:     308.169 ms (2.30% GC)
 #   --------------
 #   samples:          18
-#   evals/sample:     1
-
-# BenchmarkTools.Trial:
-#   memory estimate:  16.34 MiB
-#   allocs estimate:  256084
-#   --------------
-#   minimum time:     260.359 ms (0.00% GC)
-#   median time:      273.739 ms (1.87% GC)
-#   mean time:        271.579 ms (1.50% GC)
-#   maximum time:     279.663 ms (1.99% GC)
-#   --------------
-#   samples:          19
-#   evals/sample:     1
-
-# BenchmarkTools.Trial:
-#   memory estimate:  16.34 MiB
-#   allocs estimate:  256062
-#   --------------
-#   minimum time:     260.107 ms (0.00% GC)
-#   median time:      273.675 ms (1.74% GC)
-#   mean time:        271.271 ms (1.40% GC)
-#   maximum time:     278.717 ms (2.53% GC)
-#   --------------
-#   samples:          19
-#   evals/sample:     1
-
-# BenchmarkTools.Trial:
-#   memory estimate:  16.33 MiB
-#   allocs estimate:  256004
-#   --------------
-#   minimum time:     260.770 ms (0.00% GC)
-#   median time:      275.252 ms (1.74% GC)
-#   mean time:        273.402 ms (1.39% GC)
-#   maximum time:     287.380 ms (1.63% GC)
-#   --------------
-#   samples:          19
-#   evals/sample:     1
-
-# BenchmarkTools.Trial:
-#   memory estimate:  16.31 MiB
-#   allocs estimate:  255684
-#   --------------
-#   minimum time:     258.748 ms (0.00% GC)
-#   median time:      276.412 ms (1.91% GC)
-#   mean time:        277.095 ms (1.55% GC)
-#   maximum time:     312.047 ms (2.52% GC)
-#   --------------
-#   samples:          19
 #   evals/sample:     1
 
 ## tweaks
@@ -231,6 +279,58 @@ end
 # # @timev for i in 1:100; test_functions["meltcurve single channel"](); end;
 # using BenchmarkTools
 # @benchmark test_functions["meltcurve single channel"]()
+
+## commit c4d3ac425fbfa1e65ae352f1e78b1483645754e5
+# BenchmarkTools.Trial:
+#   memory estimate:  89.58 MiB
+#   allocs estimate:  544655
+#   --------------
+#   minimum time:     129.748 ms (8.59% GC)
+#   median time:      133.773 ms (9.97% GC)
+#   mean time:        134.578 ms (10.02% GC)
+#   maximum time:     156.465 ms (6.52% GC)
+#   --------------
+#   samples:          38
+#   evals/sample:     1
+
+## commit 43161cad1e67aa8073efb63ec3be51bd5c21a3fd
+# BenchmarkTools.Trial:
+#   memory estimate:  88.82 MiB
+#   allocs estimate:  539324
+#   --------------
+#   minimum time:     131.895 ms (9.63% GC)
+#   median time:      138.426 ms (10.46% GC)
+#   mean time:        139.572 ms (10.57% GC)
+#   maximum time:     163.011 ms (7.00% GC)
+#   --------------
+#   samples:          36
+#   evals/sample:     1
+
+## commit c4d3ac425fbfa1e65ae352f1e78b1483645754e5
+# BenchmarkTools.Trial:
+#   memory estimate:  88.83 MiB
+#   allocs estimate:  539341
+#   --------------
+#   minimum time:     243.293 ms (7.69% GC)
+#   median time:      268.042 ms (7.84% GC)
+#   mean time:        269.678 ms (7.85% GC)
+#   maximum time:     311.692 ms (4.76% GC)
+#   --------------
+#   samples:          19
+#   evals/sample:     1
+
+## commit 00f645a6adfdbb99ab2279b6358f0fc50a21e532
+# BenchmarkTools.Trial:
+#   memory estimate:  88.83 MiB
+#   allocs estimate:  539341
+#   --------------
+#   minimum time:     241.817 ms (8.47% GC)
+#   median time:      263.864 ms (8.24% GC)
+#   mean time:        263.688 ms (8.25% GC)
+#   maximum time:     301.315 ms (5.61% GC)
+#   --------------
+#   samples:          19
+#   evals/sample:     1
 
 # commit dce3b4a1265df1ca5582283b374b118f0c3d3195
 # BenchmarkTools.Trial:

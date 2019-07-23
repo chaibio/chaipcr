@@ -43,7 +43,7 @@ function act(
         return fail(logger, ArgumentError(
             "no calibration data in request")) |> out(out_format)
     end
-    const calibration_data = get_calibration_data(req_dict)
+    const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
     const calibration_args = CalibrationParameters()
     #
     ## check validity of data for normalization
@@ -53,11 +53,9 @@ function act(
         return fail(logger, err; bt = true) |> out(out_format)
     end
     #
+    ## if there are 2 or more channels then
     ## check validity of data for deconvolution
     if isa(calibration_data, CalibrationData{DualChannel,<: Real})
-        ## if there are 2 or more channels then
-        ## the deconvolution matrix K is calculated
-        ## otherwise deconvolution is not performed
         const result_k = try
             get_k(
                 calibration_data,
