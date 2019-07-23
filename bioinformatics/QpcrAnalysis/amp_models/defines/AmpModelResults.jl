@@ -65,14 +65,14 @@ SCHEMA = AMPLONGMODELRESULTS_FIELD_DEFS
 @make_struct_from_SCHEMA AmpLongModelResults AmpModelResults
 @make_constructor_from_SCHEMA AmpLongModelResults
 
-SCHEMA = subset_by_name(
-    AMPSHORTMODELRESULTS_FIELDNAMES,
-    AMPLONGMODELRESULTS_FIELD_DEFS)
+SCHEMA = subset_schema(
+    AMPLONGMODELRESULTS_FIELD_DEFS,
+    AMPSHORTMODELRESULTS_FIELDNAMES)
 @make_struct_from_SCHEMA AmpShortModelResults AmpModelResults
 @make_constructor_from_SCHEMA AmpShortModelResults
 
-SCHEMA = subset_by_name(
-    AMPCQFLUOMODELRESULTS_FIELDNAMES,
-    AMPLONGMODELRESULTS_FIELD_DEFS)
+SCHEMA = subset_schema(
+    AMPLONGMODELRESULTS_FIELD_DEFS,
+    AMPCQFLUOMODELRESULTS_FIELDNAMES)
 @make_struct_from_SCHEMA AmpCqFluoModelResults AmpModelResults
 @make_constructor_from_SCHEMA AmpCqFluoModelResults

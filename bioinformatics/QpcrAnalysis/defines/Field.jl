@@ -42,3 +42,7 @@ Field(name ::Symbol, typ ::Type{T} where {T}) =
     kw_arg(f ::Field) = Expr(:kw, var_arg(f), f.default)
 
 no_default(f ::Field) = f.default === nothing
+
+subset_schema(schema ::AbstractArray{Field}, x ::AbstractArray{Symbol}) =
+    schema[indexin(x, schema |> mold(field(:name)))]
+

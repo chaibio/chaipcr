@@ -156,7 +156,7 @@ julia> reduce(tie(3),[zeros(1,3,1),ones(1,3,1)])
  1.0  1.0  1.0
 ```
 """
-tie     = curry(cat)    ## cat(n)        = x -> cat(n, x...)
+tie    = curry(cat)         ## tie(n)    = x -> cat(n, x...)
 
 ## used in shared_functions.jl
 """
@@ -303,6 +303,7 @@ julia> (85,100,115) |> QpcrAnalysis.sweep(mean)(-) |> QpcrAnalysis.sweep(std)(/)
 @inline sweep(summary_func) =
     sweep_func -> x -> broadcast(sweep_func, x, summary_func(x))
 
+## used in amplification.jl
 ## used in melting_curve.jl
 ## used in shared_functions.jl
 # thing(x) = !(x === nothing)
@@ -312,17 +313,47 @@ thing = (!isequal)(nothing)
 ## used in melting_curve.jl
 ## used in optical_cal.jl
 ## used in thermal_consistency.jl
-has_calibration_info(req_dict) =
-    !(haskey(req_dict,CALIBRATION_INFO_KEY) &&
-        isa(req_dict[CALIBRATION_INFO_KEY], Associative))
+calibration_info_in_req(req_dict) =
+    haskey(req_dict,CALIBRATION_INFO_KEY) &&
+        isa(req_dict[CALIBRATION_INFO_KEY], Associative)
 
 ## used in amplification.jl
 ## used in melting_curve.jl
+## used in thermal_consistency
+raw_data_in_req(req_dict) =
+    haskey(req_dict,RAW_DATA_KEY) &&
+        isa(req_dict[RAW_DATA_KEY], Associative)
+
 ## used in optical_cal.jl
 ## used in thermal_consistency
 get_calibration_data(req_dict) =
     CalibrationData(req_dict[CALIBRATION_INFO_KEY])
-       
+
+## used in amplification.jl
+## used in melting_curve.jl
+## used in thermal_consistency
+function add_pairs!(dict ::Associative, pair ::Pair)
+    # const (key, value) = pair
+    # setindex!(dict, value, key)
+    setindex!(dict, pair[2], pair[1])
+end
+
+function add_pairs!(dict ::Associative, pairs ::Tuple)
+    for pair in pairs
+        add_pairs!(dict, pair)
+    end ## next pair
+end
+
+add_pairs!(dict ::Associative, ::Void) = nothing
+
+## used in amplification.jl
+## used in melting_curve.jl
+## used in thermal_consistency
+delete_all!(dict ::Associative, ks ::AbstractVector) =
+    length(ks) == 0 ?
+        dict :
+        delete_all!(delete!(dict, ks[end]), ks[1:end-1])
+
 ## used in amplification.jl
 ## used in melting_curve.jl
 ## used in optical_cal.jl

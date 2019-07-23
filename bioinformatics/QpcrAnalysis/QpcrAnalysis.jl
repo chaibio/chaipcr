@@ -49,23 +49,24 @@ module QpcrAnalysis
     include each script, generally in the order of workflow
 ===============================================================================#
 
-    ## define constants & macros
+    ## define constants & macros:
     include("defines/enums.jl")
     include("defines/macros.jl")
     include("defines/keystring_constants.jl")
 
-    ## shared functions
+    ## define shared functions:
     include("shared_functions.jl")
 
-    ## define structs
+    ## define structs and types:
     include("defines/Field.jl")
+    include("defines/Input.jl")
     ## calibration
     include("defines/NumberOfChannels.jl")
     include("defines/RawData.jl")
     include("defines/CalibrationData.jl")
     include("defines/CalibrationParameters.jl")
     include("defines/CalibrationInput.jl")
-    include("defines/K4Deconv.jl")
+    include("defines/DeconvolutionMatrices.jl")
     ## allelic discrimination
     include("defines/ClusterAnalysisResult.jl")
     include("defines/UniqCombinCenters.jl")
@@ -75,21 +76,16 @@ module QpcrAnalysis
     include("amp_models/defines/AmpModelFit.jl")
     include("amp_models/defines/SFC_model_definitions.jl")
     include("amp_models/defines/SFCModelDef.jl")
-
     ## generate amplification model definitions
     include("amp_models/generate_SFC_models.jl")
     include("amp_models/MAKx.jl")
     include("amp_models/MAKERGAULx.jl")
     include("amp_models/defines/AmpModelResults.jl")
-
-    ## generate input structs
-    include("defines/Input.jl")
+    ## amplification
     include("amp_models/defines/AmpInput.jl")
-    include("defines/McInput.jl")
-
-    ## define structs
     include("amp_models/defines/AmpOutput.jl")
     ## melting curve
+    include("defines/McInput.jl")
     include("defines/PeakIndices.jl")
     include("defines/Peak.jl")
     include("defines/McPeakOutput.jl")
@@ -111,16 +107,18 @@ module QpcrAnalysis
         include("../test/verify_response.jl")
     end
 
-    ## function definitions for:
+    ## define functions:
     ## dispatch
     include("dispatch.jl")
     ## calibration
     include("calibration.jl")
     ## amplification
     include("amplification.jl")
-    include("fit_amplification_model.jl")
+    include("amp_analysis.jl")
+    include("amp_fit_model.jl")
     ## melting curve
     include("melting_curve.jl")
+    include("mc_analysis.jl")
     include("mc_peak_analysis.jl")
     include("supsmu.jl")
     ## standard curve

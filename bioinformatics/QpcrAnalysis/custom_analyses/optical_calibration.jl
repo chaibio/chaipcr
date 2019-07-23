@@ -38,21 +38,19 @@ function act(
     #     "dict: ", calib_info_dict
     # )
 
-    ## calibration data is required
-    if has_calibration_info(req_dict)
-        return fail(logger, ArgumentError(
-            "no calibration information found")) |> out(out_format)
-    end
-    #
     ## make CalibrationInput struct with default analysis parameters
-    const calibration_data  = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
+    if !calibration_info_in_req(req_dict)
+        return fail(logger, ArgumentError(
+            "no calibration data in request")) |> out(out_format)
+    end
+    const calibration_data  = get_calibration_data(req_dict)
     const calibration_input = CalibrationInput(calibration_data)
     #
     ## check validity of data for normalization
     const wells = try
         prep_normalize(calibration_input)[2]
     catch err
-        return fail(logger, err; bt=true) |> out(out_format)
+        return fail(logger, err; bt = true) |> out(out_format)
     end
     #
     ## check validity of data for deconvolution
@@ -66,7 +64,7 @@ function act(
                 eachindex(wells),
                 wells)
         catch err
-            return fail(logger, err; bt=true) |> out(out_format)
+            return fail(logger, err; bt = true) |> out(out_format)
         end
         (length(result_k.inv_note) > 0) &&
             return fail(logger, result_k.inv_note) |> out(out_format)

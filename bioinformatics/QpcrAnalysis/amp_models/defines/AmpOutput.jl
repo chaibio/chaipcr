@@ -85,9 +85,9 @@ SCHEMA = AMPLONGOUTPUT_FIELD_DEFS
 @make_struct_from_SCHEMA AmpLongOutput AmpOutput true
 @make_constructor_from_SCHEMA AmpLongOutput
 
-SCHEMA = subset_by_name(
-    AMPSHORTOUTPUT_FIELDNAMES,
-    AMPLONGOUTPUT_FIELD_DEFS)
+SCHEMA = subset_schema(
+    AMPLONGOUTPUT_FIELD_DEFS,
+    AMPSHORTOUTPUT_FIELDNAMES)
 @make_struct_from_SCHEMA AmpShortOutput AmpOutput true
 @make_constructor_from_SCHEMA AmpShortOutput
 

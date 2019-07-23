@@ -41,6 +41,7 @@ macro make_constructor_from_SCHEMA(structname)
 end ## end of macro
 
 
+
 ## usage:
 # println(@expand @make_struct MyStruct (a, Int) (b, Float64) )
 # @makestruct MyStruct (a, Int) (b, Float64)

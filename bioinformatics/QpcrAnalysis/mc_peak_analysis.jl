@@ -10,16 +10,14 @@ import DataStructures.OrderedDict
 import DataFrames.DataFrame
 import StatsBase: rle
 import Dierckx: Spline1D, derivative
-import Memento: debug, info, warn, error
+import Memento: debug, info
 
 
 #==============================================================================#
 
 
-"""
-Finds peak in the melting curve data, specifically the negative of the derivative
-of fluorescence with respect to temperature, for each well and channel.
-"""
+"Finds peak in the melting curve data, specifically the negative of the derivative
+of fluorescence with respect to temperature, for each well and channel."
 function mc_peak_analysis(
     output_type                 ::Type{P},
     i                           ::McInput,

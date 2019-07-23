@@ -297,7 +297,7 @@ function deconvolute(
     matched_calib_well_idc  ::AbstractVector{Int},
     calibration             ::CalibrationInput,
     wells                   ::AbstractVector{Symbol},
-    k_deconv_backup         ::K4Deconv, ## argument not used
+    k_deconv_backup         ::DeconvolutionMatrices, ## argument not used
     scaling_factor_dcv_vec  ::AbstractVector,
     data_format             ::DataFormat, ## array, dict, both
 

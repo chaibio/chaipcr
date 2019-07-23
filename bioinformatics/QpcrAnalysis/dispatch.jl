@@ -80,7 +80,7 @@ function dispatch(
         json_response
         #
     catch err
-        fail(logger, err; bt=true)
+        fail(logger, err; bt = true)
     end ## result = try
     #
     const success = !isa(result, Exception)

@@ -65,9 +65,9 @@ const SFC_MODEL_BASES = [ ## vector of tuples
         ["b_", "c_", "d_", "e_"],
         [],
         function b4_func_init_coefs(
-            X::AbstractVector,
-            Y::AbstractVector,
-            epsilon::Real=0.001
+            X       ::AbstractVector,
+            Y       ::AbstractVector,
+            epsilon ::Real = 0.001
             )
             Y_min, Y_min_idx = findmin(Y)
             c_ = Y_min - epsilon
@@ -99,9 +99,9 @@ const SFC_MODEL_BASES = [ ## vector of tuples
         ["b_", "c_", "d_", "e_"], ## coef_strs
         ["e_ >= 1e-100"], ## removing bound did not improve Cq accuracy
         function l4_func_init_coefs(
-            X::AbstractVector,
-            Y::AbstractVector,
-            epsilon::Real=0.01
+            X       ::AbstractVector,
+            Y       ::AbstractVector,
+            epsilon ::Real = 0.01
         )
             Y_min, Y_min_idx = findmin(Y)
             c_ = Y_min - epsilon
@@ -132,9 +132,9 @@ const SFC_MODEL_BASES = [ ## vector of tuples
         ["b_", "c_", "d_", "e_", "bl_k", "bl_o"],
         ["e_ >= 1e-100"],
         function l4_hbl_func_init_coefs(
-            X::AbstractVector,
-            Y::AbstractVector,
-            epsilon::Real=0.01
+            X       ::AbstractVector,
+            Y       ::AbstractVector,
+            epsilon ::Real = 0.01
         )
             Y_min, Y_min_idx = findmin(Y)
             c_ = Y_min - epsilon
@@ -172,9 +172,9 @@ const SFC_MODEL_BASES = [ ## vector of tuples
         ["b_", "c_", "d_", "e_", "k1"],
         ["e_ >= 1e-100"],
         function l4_lbl_func_init_coefs(
-            X::AbstractVector,
-            Y::AbstractVector,
-            epsilon::Real=0.01
+            X       ::AbstractVector,
+            Y       ::AbstractVector,
+            epsilon ::Real = 0.01
         )
             Y_min, Y_min_idx = findmin(Y)
             c_ = Y_min - epsilon
@@ -211,9 +211,9 @@ const SFC_MODEL_BASES = [ ## vector of tuples
         ["b_", "c_", "d_", "e_", "k1", "k2"],
         ["e_ >= 1e-100"],
         function l4_qbl_func_init_coefs(
-            X::AbstractVector,
-            Y::AbstractVector,
-            epsilon::Real=0.01
+            X       ::AbstractVector,
+            Y       ::AbstractVector,
+            epsilon ::Real = 0.01
         )
             Y_min, Y_min_idx = findmin(Y)
             c_ = Y_min - epsilon
@@ -251,9 +251,9 @@ const SFC_MODEL_BASES = [ ## vector of tuples
         ["b_", "c_", "d_", "e_"], ## coef_strs
         [], ## coef_cnstrnts
         function l4_enl_func_init_coefs(
-            X::AbstractVector,
-            Y::AbstractVector,
-            epsilon::Real=0.01
+            X       ::AbstractVector,
+            Y       ::AbstractVector,
+            epsilon ::Real = 0.01
         )
             Y_min, Y_min_idx = findmin(Y)
             c_ = Y_min - epsilon
@@ -292,9 +292,9 @@ const SFC_MODEL_BASES = [ ## vector of tuples
         ["b_", "c_", "d_", "e_", "bl_k", "bl_o"],
         [],
         function l4_enl_hbl_func_init_coefs(
-            X::AbstractVector,
-            Y::AbstractVector,
-            epsilon::Real=0.01
+            X       ::AbstractVector,
+            Y       ::AbstractVector,
+            epsilon ::Real = 0.01
         )
             Y_min, Y_min_idx = findmin(Y)
             c_ = Y_min - epsilon
@@ -332,9 +332,9 @@ const SFC_MODEL_BASES = [ ## vector of tuples
         ["b_", "c_", "d_", "e_", "k1"],
         [],
         function l4_enl_lbl_func_init_coefs(
-            X::AbstractVector,
-            Y::AbstractVector,
-            epsilon::Real=0.01
+            X       ::AbstractVector,
+            Y       ::AbstractVector,
+            epsilon ::Real = 0.01
         )
             Y_min, Y_min_idx = findmin(Y)
             c_ = Y_min - epsilon
@@ -371,9 +371,9 @@ const SFC_MODEL_BASES = [ ## vector of tuples
         ["b_", "c_", "d_", "e_", "k1", "k2"],
         [],
         function l4_enl_qbl_func_init_coefs(
-            X::AbstractVector,
-            Y::AbstractVector,
-            epsilon::Real=0.01
+            X       ::AbstractVector,
+            Y       ::AbstractVector,
+            epsilon ::Real = 0.01
         )
             Y_min, Y_min_idx = findmin(Y)
             c_ = Y_min - epsilon

@@ -1,6 +1,6 @@
 #===============================================================================
 
-    fit_amplification_model.jl
+    amp_fit_model.jl
 
     function to fit amplification models
     this is a refactoring of the function
@@ -19,9 +19,9 @@ const AMP_CT_VAL_DOMAINERROR        = -99
 #==============================================================================#
 
 
-## fit_amplification_model() definition for DFC models
+## amp_fit_model() definition for DFC models
 "Model amplification data for a single well and channel."
-function fit_amplification_model(
+function amp_fit_model(
     ::Type{Val{M}} where M <: DFCModel,
     ::Type{R},
     i                   ::AmpInput,
@@ -90,7 +90,7 @@ end ## fit_amplification_model() where DFCModel
 
 
 ## fit_amplification_model() definition for SFC models
-function fit_amplification_model(
+function amp_fit_model(
     ::Type{Val{SFCModel}},
     ::Type{R},
     i                   ::AmpInput,
