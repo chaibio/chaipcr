@@ -2,7 +2,7 @@
 
     AmpInput.jl
 
-    struct of data and all analysis parameters
+    defines struct of data and all analysis parameters
     to be passed to amp_analysis() in amplification.jl
 
     the constructor is intended as the only interface
@@ -19,262 +19,118 @@ import StaticArrays: SMatrix, SVector
 import Ipopt: IpoptSolver #, NLoptSolver
 
 
+
 #===============================================================================
-    constants >>
+    defaults >>
 ===============================================================================#
 
-## default for calibration
-const DEFAULT_AMP_DCV               = true
+## defaults for solver
+DEFAULT_AMP_SOLVER                      = IpoptSolver(print_level = 0, max_iter = 35)
+const DEFAULT_AMP_SOLVER_PRINT_PREFIX   = ""
 
 ## default values for baseline model
-const DEFAULT_AMP_MODEL             = SFCModel
-const DEFAULT_AMP_BL_METHOD         = l4_enl
-const DEFAULT_AMP_FALLBACK_FUNC     = median
-const DEFAULT_AMP_MIN_RELIABLE_CYC  = 5 ## >= 1
-const DEFAULT_AMP_BL_CYC_BOUNDS     = Vector{Int}()
-const DEFAULT_AMP_CQ_FLUO_METHOD    = cp_dr1
+const DEFAULT_AMP_MODEL_DEFS            = SFC_MDs
+const DEFAULT_AMP_MODEL                 = SFCModel
+const DEFAULT_AMP_BL_METHOD             = l4_enl
+const DEFAULT_AMP_FALLBACK_FUNC         = median
+const DEFAULT_AMP_MIN_RELIABLE_CYC      = 5         ## >= 1
+const DEFAULT_AMP_BL_CYC_BOUNDS         = Vector{Int}()
+const DEFAULT_AMP_CQ_FLUO_METHOD        = cp_dr1
 
 ## defaults for quantification model
-const DEFAULT_AMP_QUANT_METHOD      = l4_enl
-const DEFAULT_AMP_DENSER_FACTOR     = 3                 ## must be an integer
-const DEFAULT_AMP_CQ_METHOD         = Cy0
+const DEFAULT_AMP_QUANT_METHOD          = l4_enl
+const DEFAULT_AMP_DENSER_FACTOR         = 3         ## must be an integer
+const DEFAULT_AMP_CQ_METHOD             = Cy0
 
 ## default for set_qt_fluos!()
-const DEFAULT_AMP_QT_PROB           = 0.9
+const DEFAULT_AMP_QT_PROB               = 0.9
 
 ## defaults for report_cq!()
 ## note for default scaled_max_dr1_lb:
 ## 'look like real amplification, scaled_max_dr1 0.00894855, ip223, exp. 75, well A7, channel 2`
-const DEFAULT_AMP_BEFORE_128X       = false
-const DEFAULT_AMP_MAX_BSF_LB        = 4356              ## \
-const DEFAULT_AMP_MAX_DR1_LB        = 472               ## | must be integers
-const DEFAULT_AMP_MAX_DR2_LB        = 41                ## /
-const DEFAULT_AMP_SCALED_MAX_BSF_LB = 0.086
-const DEFAULT_AMP_SCALED_MAX_DR1_LB = 0.0089
-const DEFAULT_AMP_SCALED_MAX_DR2_LB = 0.000689
+const DEFAULT_AMP_BEFORE_128X           = false
+const DEFAULT_AMP_MAX_BSF_LB            = 4356      ## ⎫
+const DEFAULT_AMP_MAX_DR1_LB            = 472       ## ⎬ must be integers
+const DEFAULT_AMP_MAX_DR2_LB            = 41        ## ⎭
+const DEFAULT_AMP_SCALED_MAX_BSF_LB     = 0.086
+const DEFAULT_AMP_SCALED_MAX_DR1_LB     = 0.0089
+const DEFAULT_AMP_SCALED_MAX_DR2_LB     = 0.000689
 
 ## defaults for process_ad()
-const DEFAULT_AMP_CYCS              = 0
-const DEFAULT_AMP_CTRL_WELL_DICT    = CTRL_WELL_DICT
-const DEFAULT_AMP_CLUSTER_METHOD    = k_means_medoids
-const DEFAULT_AMP_NORM_L            = 2
-const DEFAULT_AMP_DEFAULT_ENCGR     = DEFAULT_encgr
-const DEFAULT_AMP_CATEG_WELL_VEC    = CATEG_WELL_VEC
+const DEFAULT_AMP_CYCS                  = 0
+const DEFAULT_AMP_CTRL_WELL_DICT        = CTRL_WELL_DICT
+const DEFAULT_AMP_CLUSTER_METHOD        = k_means_medoids
+const DEFAULT_AMP_NORM_L                = 2
+const DEFAULT_AMP_DEFAULT_ENCGR         = DEFAULT_encgr
+const DEFAULT_AMP_CATEG_WELL_VEC        = CATEG_WELL_VEC
+
+## defaults for output
+const DEFAULT_AMP_OUTPUT_FORMAT         = pre_json_output
+const DEFAULT_AMP_OUTPUT_OPTION         = short
+const DEFAULT_AMP_MODEL_OUTPUT_STRUCT   = AmpShortModelResults
+DEFAULT_AMP_REPORTER                    = roundoff(JSON_DIGITS)
 
 
 
 #===============================================================================
-    struct >>
+    Field definitions >>
 ===============================================================================#
 
-abstract type Input end
+## name, DataType, default value
+const AMP_FIELD_DEFS = [
+    ## data
+    Field(:raw,                  RawData{<: Real}),
+    Field(:num_cycles,           Int),
+    Field(:num_wells,            Int),
+    Field(:num_channels,         Int),
+    Field(:cycles,               SVector{N,Int} where {N}),
+    Field(:wells,                SVector{W,Symbol} where {W}),
+    Field(:channels,             SVector{C,Int} where {C}),
+    Field(:calibration_data,     CalibrationData{<: NumberOfChannels, <: Real}),
 
-struct AmpInput <: Input
-    ## raw data
-    raw                     ::RawData{<: Real}
-    ## data dimensions
-    num_cycles              ::Int
-    num_wells               ::Int
-    num_channels            ::Int
-    cycles                  ::SVector{N,Int} where {N}
-    wells                   ::SVector{W,Symbol} where {W}
-    channels                ::SVector{C,Int} where {C}
-
-    ## calibration data and parameters
-    calibration             ::CalibrationData{<: NumberOfChannels, <: Real}
-    calibration_args        ::CalibrationParameters
-
-    ## amplification analysis parameters
-    ## solver
-    solver                  ::IpoptSolver
-    ipopt_print2file_prefix ::String
-    ## amplification model
-    amp_model               ::Type{<: AmpModel}
-    ## SFC model fitting parameters
-    SFC_model_defs          ::OrderedDict{SFCModelName, SFCModelDef}
-    bl_method               ::SFCModelName
-    bl_fallback_func        ::Function
-    min_reliable_cyc        ::Int
-    baseline_cyc_bounds     ::Union{Vector,Array{Vector,2}}
-    quant_method            ::SFCModelName
-    denser_factor           ::Int
-    cq_method               ::CqMethod
-    ## argument for set_qt_fluos!()
-    qt_prob                 ::Float_T
-    ## arguments for report_cq!()
-    before_128x             ::Bool
-    max_bsf_lb              ::Int
-    max_dr1_lb              ::Int
-    max_dr2_lb              ::Int
-    scaled_max_bsf_lb       ::Float_T
-    scaled_max_dr1_lb       ::Float_T
-    scaled_max_dr2_lb       ::Float_T
-
-    ## arguments for process_ad()
-    ctrl_well_dict          ::OrderedDict{Vector{Int},Vector{Int}}
-    ## ...
-
-    ## output format parameters
-    # out_sr_dict             ::Bool
-    amp_output              ::AmpOutputOption
-    amp_model_results       ::Type{<: AmpModelResults}  ## set by amp_output
-    reporting               ::Function
-end
-
-
-
-#===============================================================================
-    constructors >>
-===============================================================================#
-
-## constructor = interface to amp_analysis()
-AmpInput(
-    raw                     ::RawData{<: Real},
-    num_cycles              ::Integer,
-    num_wells               ::Integer,
-    num_channels            ::Integer,
-    cycles                  ::AbstractVector{<: Integer},
-    wells                   ::AbstractVector{Symbol},
-    channels                ::AbstractVector{<: Integer},
-    calibration_data        ::CalibrationData{<: NumberOfChannels, <: Real},
-    amp_model               ::Type{<: AmpModel},
-    amp_output              ::AmpOutputOption,
-    solver                  ::IpoptSolver,
-    ipopt_print2file_prefix ::AbstractString,
-    # out_sr_dict             ::Bool,
-    reporting               ::Function,
     ## calibration parameters
-    dcv                     ::Bool;
-    dye_in                  ::Symbol            = DEFAULT_CAL_DYE_IN,
-    dyes_to_fill            ::AbstractVector    = DEFAULT_CAL_DYES_TO_FILL,
-    subtract_water          ::Bool              = DEFAULT_NORM_SUBTRACT_WATER,
-    k_method                ::KMethod           = DEFAULT_DCV_K_METHOD,
-    ## SFC model fitting parameters    
-    SFC_model_defs          ::OrderedDict{SFCModelName, SFCModelDef}
-                                                = SFC_MDs,
-    bl_method               ::SFCModelName      = DEFAULT_AMP_BL_METHOD,
-    bl_fallback_func        ::Function          = DEFAULT_AMP_FALLBACK_FUNC,
-    min_reliable_cyc        ::Integer           = DEFAULT_AMP_MIN_RELIABLE_CYC,
-    baseline_cyc_bounds     ::Union{AbstractVector,AbstractArray}
-                                                = DEFAULT_AMP_BASELINE_CYC_BOUNDS,
-    quant_method            ::SFCModelName      = DEFAULT_AMP_QUANT_METHOD,
-    denser_factor           ::Integer           = DEFAULT_AMP_DENSER_FACTOR,
-    cq_method               ::CqMethod          = DEFAULT_AMP_CQ_METHOD,
-    ## argument for set_qt_fluos!()
-    qt_prob                 ::AbstractFloat     = DEFAULT_AMP_QT_PROB,
-    ## arguments for report_cq!()
-    before_128x             ::Bool              = DEFAULT_AMP_BEFORE_128X,
-    max_bsf_lb              ::Integer           = DEFAULT_AMP_MAX_BSF_LB,
-    max_dr1_lb              ::Integer           = DEFAULT_AMP_MAX_DR1_LB,
-    max_dr2_lb              ::Integer           = DEFAULT_AMP_MAX_DR2_LB,
-    scaled_max_bsf_lb       ::AbstractFloat     = DEFAULT_AMP_SCALED_MAX_BSF_LB,
-    scaled_max_dr1_lb       ::AbstractFloat     = DEFAULT_AMP_SCALED_MAX_DR1_LB,
-    scaled_max_dr2_lb       ::AbstractFloat     = DEFAULT_AMP_SCALED_MAX_DR2_LB,
-    ## arguments for process_ad()
-    ctrl_well_dict          ::OrderedDict{Vector{Int},Vector{Int}}
-                                                = DEFAULT_AMP_CTRL_WELL_DICT,
-) =
-    AmpInput(
-        raw,
-        num_cycles,
-        num_wells,
-        num_channels,
-        cycles,
-        wells,
-        channels,
-        calibration_data,
-        CalibrationParameters(
-            dcv,
-            dye_in,
-            dyes_to_fill,
-            subtract_water,
-            k_method),
-        solver,
-        ipopt_print2file_prefix,
-        amp_model,
-        # out_sr_dict,
-        SFC_model_defs,
-        bl_method,
-        bl_fallback_func,
-        min_reliable_cyc,
-        baseline_cyc_bounds,
-        quant_method,
-        denser_factor,
-        cq_method,
-        qt_prob,
-        before_128x,
-        max_bsf_lb,
-        max_dr1_lb,
-        max_dr2_lb,
-        scaled_max_dr1_lb,
-        scaled_max_dr2_lb,
-        scaled_max_bsf_lb,
-        ctrl_well_dict,
-        amp_output,
-        amp_output == long ? AmpLongModelResults : AmpShortModelResults,
-        reporting,
-    )
+    Field(:calibration_args,     CalibrationParameters,         DEFAULT_CAL_ARGS),
 
+    ## solver parameters
+    Field(:solver,               IpoptSolver,                   DEFAULT_AMP_SOLVER),
+    Field(:ipopt_print_prefix,   String,                        DEFAULT_AMP_SOLVER_PRINT_PREFIX),
 
-## null constructor for DeconvolutionMatrices
-function DeconvolutionMatrices(i ::Input)
-    const s = size(i.calibration.data)
-    const w = s[1]
-    const c = s[2]
-    const v = i.calibration_args.k_method == well_proc_vec ? w : 1
-    const empty_matrix = SMatrix{c,c,Float_T}(fill(NaN,c,c))
-    DeconvolutionMatrices(
-        SVector{v}(fill(empty_matrix,v)),
-        SVector{w}(fill(empty_matrix,w)),
-        "")
-end
+    ## amplification model parameters
+    Field(:amp_model,            Type{<: AmpModel},             DEFAULT_AMP_MODEL),
+    Field(:SFC_model_defs,       OrderedDict{SFCModelName, SFCModelDef},
+                                                                DEFAULT_AMP_MODEL_DEFS),
+    Field(:bl_method,            SFCModelName,                  DEFAULT_AMP_BL_METHOD),
+    Field(:bl_fallback_func,     Function,                      DEFAULT_AMP_FALLBACK_FUNC),
+    Field(:min_reliable_cyc,     Int,                           DEFAULT_AMP_MIN_RELIABLE_CYC),
+    Field(:baseline_cyc_bounds,  Union{Vector,Array{Vector,2}}, DEFAULT_AMP_BL_CYC_BOUNDS),
+    Field(:quant_method,         SFCModelName,                  DEFAULT_AMP_QUANT_METHOD),
+    Field(:denser_factor,        Int,                           DEFAULT_AMP_DENSER_FACTOR),
+    Field(:cq_method,            CqMethod,                      DEFAULT_AMP_CQ_METHOD),
+    Field(:qt_prob,              Float_T,                       DEFAULT_AMP_QT_PROB),
+    Field(:before_128x,          Bool,                          DEFAULT_AMP_BEFORE_128X),
+    Field(:max_bsf_lb,           Int,                           DEFAULT_AMP_MAX_BSF_LB),
+    Field(:max_dr1_lb,           Int,                           DEFAULT_AMP_MAX_DR1_LB),
+    Field(:max_dr2_lb,           Int,                           DEFAULT_AMP_MAX_DR2_LB),
+    Field(:scaled_max_bsf_lb,    Float_T,                       DEFAULT_AMP_SCALED_MAX_BSF_LB),
+    Field(:scaled_max_dr1_lb,    Float_T,                       DEFAULT_AMP_SCALED_MAX_DR1_LB),
+    Field(:scaled_max_dr2_lb,    Float_T,                       DEFAULT_AMP_SCALED_MAX_DR2_LB),
+
+    ## allelic discrimination parameters
+    Field(:ctrl_well_dict,       OrderedDict{Vector{Int},Vector{Int}},
+                                                                DEFAULT_AMP_CTRL_WELL_DICT),
+    ## output format parameters
+    Field(:out_format,           OutputFormat,                  DEFAULT_AMP_OUTPUT_FORMAT),
+    Field(:amp_output,           AmpOutputOption,               DEFAULT_AMP_OUTPUT_OPTION),
+    Field(:amp_model_results,    Type{<: AmpModelResults},      DEFAULT_AMP_MODEL_OUTPUT_STRUCT),
+    Field(:reporting,            Function,                      DEFAULT_AMP_REPORTER)]
+
 
 
 #===============================================================================
-    helper functions >>
+    macro calls >>
 ===============================================================================#
 
-amp_init(i ::AmpInput, x) =
-    SMatrix{i.num_wells, i.num_channels, typeof(x)}(
-        fill(x, i.num_wells, i.num_channels))
-
-## arguments for process_ad()
-kwargs_ad(i ::AmpInput) =
-    Dict{Symbol,Any}(
-        :ctrl_well_dict     => i.ctrl_well_dict,
-        # :cluster_method     => i.cluster_method,
-        # :norm_l             => i.norm_l,
-        # :encgr              => i.encgr,
-        # :categ_well_vec     => i.categ_well_vec
-    )
-
-function check_bl_cyc_bounds(
-    i               ::AmpInput,
-    bl_cyc_bounds   ::Union{Vector{I},Array{Vector{I},2}} where {I <: Integer},
-)
-    debug(logger, "at check_bl_cyc_bounds()")
-    (i.num_cycles <= 2) && return bl_cyc_bounds
-    const size_bcb = size(bl_cyc_bounds)
-    if size_bcb == (0,) || size_bcb == (2,)
-        return amp_init(i, bl_cyc_bounds)
-    elseif size_bcb == (i.num_wells, i.num_channels) &&
-        eltype(bl_cyc_bounds) <: AbstractVector ## final format of `baseline_cyc_bounds`
-            return bl_cyc_bounds
-    end
-    throw(ArgumentError("`baseline_cyc_bounds` is not in the right format"))
-end ## check_bl_cyc_bounds()
-
-## baseline estimation parameters
-# kwargs_bl(i ::AmpInput) =
-#     Dict{Symbol,Any}(
-#         :bl_method          => i.bl_method,
-#         :bl_fallback_func   => i.bl_fallback_func,
-#         :min_reliable_cyc   => i.min_reliable_cyc,
-#     )
-
-## quantitation parameters
-# kwargs_quant(i ::AmpInput) =
-#     Dict{Symbol,Any}(
-#         :cq_method          => i.cq_method,
-#         :denser_factor      => i.denser_factor,
-#     )
+## generate struct and constructor
+SCHEMA = AMP_FIELD_DEFS
+@make_struct_from_SCHEMA AmpInput Input
+@make_constructor_from_SCHEMA AmpInput

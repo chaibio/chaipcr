@@ -120,6 +120,7 @@ julia> -1 |> QpcrAnalysis.bless(Complex) |> sqrt
 bless  = curry(convert)     ## bless(T)  = x -> convert(T, x)
 
 ## used in calibration.jl
+## used in CalibrationInput.jl
 """
     splat(f)(x)
 
@@ -247,7 +248,7 @@ Tail-curried `mapreduce` function.
 
 # Example:
 ```julia-repl
-julia> [1:5;] |> QpcrAnalysis.moose(x -> x^2, hcat) |> Tuple
+julia> [1:5;] |> QpcrAnalysis.moose(hcat) do x; x^2 end |> Tuple
 (1, 4, 9, 16, 25)
 ```
 """
@@ -304,9 +305,24 @@ julia> (85,100,115) |> QpcrAnalysis.sweep(mean)(-) |> QpcrAnalysis.sweep(std)(/)
 
 ## used in melting_curve.jl
 ## used in shared_functions.jl
-# thing(x) = !(x == nothing)
+# thing(x) = !(x === nothing)
 thing = (!isequal)(nothing)
 
+## used in amplification.jl
+## used in melting_curve.jl
+## used in optical_cal.jl
+## used in thermal_consistency.jl
+has_calibration_info(req_dict) =
+    !(haskey(req_dict,CALIBRATION_INFO_KEY) &&
+        isa(req_dict[CALIBRATION_INFO_KEY], Associative))
+
+## used in amplification.jl
+## used in melting_curve.jl
+## used in optical_cal.jl
+## used in thermal_consistency
+get_calibration_data(req_dict) =
+    CalibrationData(req_dict[CALIBRATION_INFO_KEY])
+       
 ## used in amplification.jl
 ## used in melting_curve.jl
 ## used in optical_cal.jl

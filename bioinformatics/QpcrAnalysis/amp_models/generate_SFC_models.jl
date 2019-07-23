@@ -16,7 +16,7 @@ using JuMP
 "Generate prediction function given SFC model definition."
 function add_funcs_pred!(
     md          ::SFCModelDef,
-    verbose     ::Bool=false
+    verbose     ::Bool = false
 )
     _x_args_str = join(map(_x_str -> "$_x_str::Real", md._x_strs), ", ")
     coefs_str = join(map(str -> "$str::Real", md.coef_strs), ", ")

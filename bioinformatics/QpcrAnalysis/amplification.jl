@@ -43,7 +43,7 @@ const KWARGS_RCQ_KEYS_DICT = Dict(
 function act(
     ::Type{Val{amplification}},
     req_dict        ::Associative;
-    out_format      ::OutputFormat = pre_json_output
+    out_format      ::OutputFormat = DEFAULT_AMP_OUTPUT_FORMAT
 )
     @inline str2sym(x) = isa(x, String) ? Symbol(x) : x
     #
@@ -56,12 +56,11 @@ function act(
     #
     ## calibration data is required
     req_key = curry(haskey)(req_dict)
-    if !(req_key(CALIBRATION_INFO_KEY) &&
-        isa(req_dict[CALIBRATION_INFO_KEY], Associative))
-            return fail(logger, ArgumentError(
-                "no calibration information found")) |> out(out_format)
+    if has_calibration_info(req_dict)
+        return fail(logger, ArgumentError(
+            "no calibration information found")) |> out(out_format)
     end
-    const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
+    const calibration_data = get_calibration_data(req_dict)
     #
     ## analysis parameters for model fitting
     const kw_amp = Dict{Symbol,Any}(
@@ -120,13 +119,9 @@ function act(
     const amp_output = AmpOutputOption(out_format)
     const interface = AmpInput(
         parsed_raw_data...,
-        calibration_data,
-        DEFAULT_AMP_MODEL,
-        amp_output,
-        IpoptSolver(print_level = 0, max_iter = 35),
-        "",
-        roundoff(JSON_DIGITS),
-        DEFAULT_AMP_DCV && parsed_raw_data[4] > 1; ## dcv && num_channels > 1
+        calibration_data;
+        out_format = out_format,
+        amp_output = amp_output,
         kw_bl...,
         kw_amp...,
         kw_rcq...,)
@@ -250,7 +245,8 @@ function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
     debug(logger, "at amp_analysis()")
     #
     ## deconvolute and normalize
-    const calibration_results = calibrate(i, i.raw, array)
+    const calibration_input = CalibrationInput(i.calibration_data, i.calibration_args)
+    const calibration_results = calibrate(i, calibration_input, i.raw, array)
     #
     ## initialize output
     o = AmpOutput(
@@ -365,7 +361,7 @@ function get_fit_results(
 
     debug(logger, "at set_fit_results!()")
     solver = i.solver
-    const prefix = i.ipopt_print2file_prefix
+    const prefix = i.ipopt_print_prefix
     const fit_results =
         SMatrix{i.num_wells, i.num_channels, i.amp_model_results}([
             fit_model(wi, ci)
@@ -510,3 +506,54 @@ function report_cq!(
     end
     return nothing ## side effects only
 end ## report_cq!
+
+
+
+#===============================================================================
+    helper functions >>
+===============================================================================#
+
+amp_init(i ::AmpInput, x) =
+    SMatrix{i.num_wells, i.num_channels, typeof(x)}(
+        fill(x, i.num_wells, i.num_channels))
+
+## arguments for process_ad()
+kwargs_ad(i ::AmpInput) =
+    Dict{Symbol,Any}(
+        :ctrl_well_dict     => i.ctrl_well_dict,
+        # :cluster_method     => i.cluster_method,
+        # :norm_l             => i.norm_l,
+        # :encgr              => i.encgr,
+        # :categ_well_vec     => i.categ_well_vec
+    )
+
+function check_bl_cyc_bounds(
+    i               ::AmpInput,
+    bl_cyc_bounds   ::Union{Vector{I},Array{Vector{I},2}} where {I <: Integer},
+)
+    debug(logger, "at check_bl_cyc_bounds()")
+    (i.num_cycles <= 2) && return bl_cyc_bounds
+    const size_bcb = size(bl_cyc_bounds)
+    if size_bcb == (0,) || size_bcb == (2,)
+        return amp_init(i, bl_cyc_bounds)
+    elseif size_bcb == (i.num_wells, i.num_channels) &&
+        eltype(bl_cyc_bounds) <: AbstractVector ## final format of `baseline_cyc_bounds`
+            return bl_cyc_bounds
+    end
+    throw(ArgumentError("`baseline_cyc_bounds` is not in the right format"))
+end ## check_bl_cyc_bounds()
+
+## baseline estimation parameters
+# kwargs_bl(i ::AmpInput) =
+#     Dict{Symbol,Any}(
+#         :bl_method          => i.bl_method,
+#         :bl_fallback_func   => i.bl_fallback_func,
+#         :min_reliable_cyc   => i.min_reliable_cyc,
+#     )
+
+## quantitation parameters
+# kwargs_quant(i ::AmpInput) =
+#     Dict{Symbol,Any}(
+#         :cq_method          => i.cq_method,
+#         :denser_factor      => i.denser_factor,
+#     )

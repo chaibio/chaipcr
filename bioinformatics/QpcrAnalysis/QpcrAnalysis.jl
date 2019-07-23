@@ -49,20 +49,22 @@ module QpcrAnalysis
     include each script, generally in the order of workflow
 ===============================================================================#
 
-    ## define constants
+    ## define constants & macros
     include("defines/enums.jl")
+    include("defines/macros.jl")
     include("defines/keystring_constants.jl")
 
     ## shared functions
     include("shared_functions.jl")
 
-    ## struct definitions for:
+    ## define structs
+    include("defines/Field.jl")
     ## calibration
     include("defines/NumberOfChannels.jl")
     include("defines/RawData.jl")
     include("defines/CalibrationData.jl")
     include("defines/CalibrationParameters.jl")
-    ## deconvolution
+    include("defines/CalibrationInput.jl")
     include("defines/K4Deconv.jl")
     ## allelic discrimination
     include("defines/ClusterAnalysisResult.jl")
@@ -78,17 +80,19 @@ module QpcrAnalysis
     include("amp_models/generate_SFC_models.jl")
     include("amp_models/MAKx.jl")
     include("amp_models/MAKERGAULx.jl")
-
-    ## struct definitions for:
-    ## amplification analysis
     include("amp_models/defines/AmpModelResults.jl")
+
+    ## generate input structs
+    include("defines/Input.jl")
     include("amp_models/defines/AmpInput.jl")
+    include("defines/McInput.jl")
+
+    ## define structs
     include("amp_models/defines/AmpOutput.jl")
     ## melting curve
     include("defines/PeakIndices.jl")
     include("defines/Peak.jl")
     include("defines/McPeakOutput.jl")
-    include("defines/McInput.jl")
     include("defines/McOutput.jl")
     ## standard curve
     include("defines/StandardCurveResult.jl")

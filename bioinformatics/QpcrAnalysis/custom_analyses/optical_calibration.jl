@@ -2,7 +2,8 @@
 
     optical_calibration.jl
 
-    uses prep_normalize() to check validity of calibration data
+    uses prep_normalize() and get_k() with default parameters
+    to check validity of calibration data
 
 ===============================================================================#
 
@@ -38,35 +39,38 @@ function act(
     # )
 
     ## calibration data is required
-    if !(haskey(req_dict, CALIBRATION_INFO_KEY) &&
-        isa(req_dict[CALIBRATION_INFO_KEY], Associative))
-            return fail(logger, ArgumentError(
-                "no calibration information found")) |> out(out_format)
+    if has_calibration_info(req_dict)
+        return fail(logger, ArgumentError(
+            "no calibration information found")) |> out(out_format)
     end
-    const calibration = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
+    #
+    ## make CalibrationInput struct with default analysis parameters
+    const calibration_data  = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
+    const calibration_input = CalibrationInput(calibration_data)
+    #
+    ## check validity of data for normalization
     const wells = try
-        prep_normalize(
-            calibration,
-            DEFAULT_CAL_DYE_IN,
-            DEFAULT_CAL_DYES_TO_FILL)[2]
+        prep_normalize(calibration_input)[2]
     catch err
         return fail(logger, err; bt=true) |> out(out_format)
     end
-    if (size(calibration.data, 2) == 2)
+    #
+    ## check validity of data for deconvolution
+    if isa(calibration_data, CalibrationData{DualChannel,<: Real})
         ## if there are 2 or more channels then
         ## the deconvolution matrix K is calculated
         ## otherwise deconvolution is not performed
         const result_k = try
             get_k(
-                calibration,
+                calibration_input,
                 eachindex(wells),
-                wells,
-                DEFAULT_DCV_K_METHOD)
+                wells)
         catch err
             return fail(logger, err; bt=true) |> out(out_format)
         end
         (length(result_k.inv_note) > 0) &&
             return fail(logger, result_k.inv_note) |> out(out_format)
     end ## if
+    #
     return OrderedDict(:valid => true) |> out(out_format)
 end ## act(::Type{Val{optical_calibration}})

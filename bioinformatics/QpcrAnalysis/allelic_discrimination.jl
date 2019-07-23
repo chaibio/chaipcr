@@ -202,7 +202,10 @@ function do_cluster_analysis(
         #     grp_i -> check_grp(assignments_woinit .== grp_i),
         #     vcat,
         #     1:num_centers)
-        num_centers |> from(1) |> moose(grp_i -> check_grp(assignments_woinit .== grp_i), vcat)
+        num_centers |> from(1) |>
+            moose(vcat) do grp_i
+                check_grp(assignments_woinit .== grp_i)
+            end ## next grp_i
     end ## check_groups()
     ## end of function definitions nested within do_cluster_analysis()
 
@@ -266,12 +269,13 @@ function assign_genos(
     ## ::QpcrAnalysis.#assign_genos, ::Array{Float64,2}, ::Array{Float64,2}, ::Float64)"
 )
     function calc_expected_genos_all()
-        f(c ::Int) =
-            [0, 1] |>
-            moose(furnish(1, 2^(c-1)), hcat) |>
-            furnish(2^(num_channels - c)) |>
-            gather(hcat)
-        num_channels |> from(1) |> moose(f, vcat) |> nrn
+        num_channels |> from(1) |>
+            moose(vcat) do c
+                [0, 1] |>
+                moose(furnish(1, 2^(c-1)), hcat) |>
+                furnish(2^(num_channels - c)) |>
+                gather(hcat)
+            end #= next c =# |> nrn
     end ## calc_expected_genos_all()
 
     ## for any channel, all the data points are the same

@@ -21,7 +21,7 @@ import StaticArrays: SArray
 abstract type AbstractCalibrationData end
 
 struct CalibrationData{N <: NumberOfChannels, R <: Real} <: AbstractCalibrationData
-    data        ::SArray{S,R,3} where {S <: Tuple}
+    array       ::SArray{S,R,3} where {S <: Tuple}
     ## inner constructors supply type parameters
     ## and enforce constraints on size of data array
     CalibrationData(::Type{SingleChannel}, data ::AbstractArray{R}) where{R <: Real} =

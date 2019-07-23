@@ -61,7 +61,7 @@ Base.eltype(iter ::PeakIndices) = Type{PeakIndicesState}
 Base.collect(iter ::PeakIndices) =
     [peak for peak in iter if thing(peak)]
 
-## fail if state == nothing
+## fail if state === nothing
 Base.next(iter ::PeakIndices, state ::Void) = (nothing, nothing)
 
 function Base.next(iter ::PeakIndices, state ::PeakIndicesState)

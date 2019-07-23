@@ -46,12 +46,11 @@ function act(
     debug(logger, "at act(::Type{Val{meltcurve}})")
     #
     ## calibration data is required
-    if !(haskey(req_dict,CALIBRATION_INFO_KEY) &&
-        isa(req_dict[CALIBRATION_INFO_KEY], Associative))
-            return fail(logger, ArgumentError(
-                "no calibration information found")) |> out(out_format)
+    if has_calibration_info(req_dict)
+        return fail(logger, ArgumentError(
+            "no calibration information found")) |> out(out_format)
     end
-    const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
+    const calibration_data = get_calibration_data(req_dict)
     #
     ## parse melting curve data into DataFrame
     const mc_parsed_raw_data = mc_parse_raw_data(req_dict[RAW_DATA_KEY])
@@ -66,7 +65,6 @@ function act(
     interface = McInput(
             mc_parsed_raw_data...,
             calibration_data;
-            dcv = DEFAULT_MC_DCV && mc_parsed_raw_data[3] > 1, ## num_channels > 1
             out_format = out_format,
             kwargs_pa...)
     #
@@ -299,19 +297,20 @@ function mc_analysis(i ::McInput)
     const (raw_temps, raw_fluos) = transform_3d(i.raw_df)
     #
     ## deconvolute and normalize
+    const calibration_input = CalibrationInput(i.calibration_data, i.calibration_args)
     const peak_format = peak_output_format(i.out_format)
     if peak_format == McPeakLongOutput
         (   background_subtracted_data,
-            k4dcv,
+            k_deconv,
             deconvoluted_data,
             norm_data,
             norm_wells,
             calibrated_data ) =
-                calibrate(i, raw_fluos, array)
+                calibrate(i, calibration_input, raw_fluos, array)
     else
         ## McPeakShortOutput
         const (_, _, _, _, norm_wells, calibrated_data) = ## discard other output fields
-            calibrate(i, raw_fluos, array)
+            calibrate(i, calibration_input, raw_fluos, array)
     end ## if peak_format
     #
     ## subset temperature/fluorescence data by channel / well
@@ -319,19 +318,15 @@ function mc_analysis(i ::McInput)
     ## result is mc_matrix: dim1 = well, dim2 = channel
     const mc_matrix =
         eachindex(i.channels) |> ## do for each channel
-        moose(
-            ci ->
-                map(eachindex(i.wells)) do wi
-                    if i.wells[wi] in norm_wells
-                        mc_peak_analysis(
-                            peak_format,
-                            i,
-                            normalize_tf(ci, wi))
-                    else
-                        McPeakOutput(peak_format)
-                    end
-                end, ## do wi
-            hcat) |>
+        moose(hcat) do ci
+            map(eachindex(i.wells)) do wi
+                if i.wells[wi] in norm_wells
+                    mc_peak_analysis(peak_format, i, normalize_tf(ci, wi))
+                else
+                    McPeakOutput(peak_format)
+                end ## if
+            end ## do wi
+        end #= next ci =# |>
         morph(length(norm_wells), i.num_channels) ## coerce to 2d array
     #
     # if (i.out_format == full_output)
@@ -342,7 +337,7 @@ function mc_analysis(i ::McInput)
             i.channels,
             raw_fluos.data,
             background_subtracted_data,
-            k4dcv,
+            k_deconv,
             deconvoluted_data,
             norm_data,
             i.wells,

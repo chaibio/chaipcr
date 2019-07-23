@@ -26,11 +26,34 @@ type DeconvolutionMatrices
     inv_note        ::String
 end
 
-## constants
-const K4DCV = JLD.load("$LOAD_FROM_DIR/defines/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv"] ## sometimes crashes REPL
 
-## Null constructors
+#===============================================================================
+    constructor requiring Input type >>
+===============================================================================#
+
 function K4Deconv()
     const empty_vector = Vector{Matrix{Float_T}}(0)
     K4Deconv(empty_vector, empty_vector, "")
 end
+
+
+function DeconvolutionMatrices(calibration ::CalibrationInput)
+    const s = size(calibration.data.array)
+    const w = s[1]
+    const c = s[2]
+    const v = calibration.args.k_method == well_proc_vec ? w : 1
+    const empty_matrix = SMatrix{c,c,Float_T}(fill(NaN,c,c))
+    DeconvolutionMatrices(
+        SVector{v}(fill(empty_matrix,v)),
+        SVector{w}(fill(empty_matrix,w)),
+        "")
+end
+
+
+
+#===============================================================================
+    constant >>
+===============================================================================#
+
+## NB loading this sometimes crashes REPL
+const K4DCV = JLD.load("$LOAD_FROM_DIR/defines/k4dcv_ip84_calib79n80n81_vec.jld")["k4dcv"]

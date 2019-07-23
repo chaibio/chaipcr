@@ -39,23 +39,22 @@ function act(
     # stage_id ::Integer,
     # calib_info ::Union{Integer,OrderedDict};
     req_dict            ::Associative;
-    out_format          ::OutputFormat = pre_json_output,
+    dcv                 ::Bool = DEFAULT_CAL_DCV, ## if true, perform multi-channel deconvolution
     auto_span_smooth    ::Bool = DEFAULT_MC_AUTO_SPAN_SMOOTH,
     span_smooth_default ::Real = DEFAULT_MC_SPAN_SMOOTH_DEFAULT,
     span_smooth_factor  ::Real = DEFAULT_MC_SPAN_SMOOTH_FACTOR,
-    dcv                 ::Bool = DEFAULT_MC_DCV, ## if true, perform multi-channel deconvolution
     max_temperature     ::Real = DEFAULT_MC_MAX_TEMPERATURE, ## maximum temperature to analyze
+    out_format          ::OutputFormat = pre_json_output,
     reporting           ::Function = roundoff(JSON_DIGITS) ## reporting function
 )
     debug(logger, "at act(::Type{Val{thermal_consistency}})")
     #
     ## calibration data is required
-    if !(haskey(req_dict, CALIBRATION_INFO_KEY) &&
-        isa(req_dict[CALIBRATION_INFO_KEY], Associative))
-            return fail(logger, ArgumentError(
-                "no calibration information found")) |> out(out_format)
+    if has_calibration_info(req_dict)
+        return fail(logger, ArgumentError(
+            "no calibration information found")) |> out(out_format)
     end
-    const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
+    const get_calibration_data(req_dict)
     #
     ## parse melting curve data into DataFrame
     const mc_parsed_raw_data = mc_parse_raw_data(req_dict[RAW_DATA_KEY])
@@ -70,12 +69,13 @@ function act(
     interface = McInput(
             mc_parsed_raw_data...,
             calibration_data;
-            dcv = DEFAULT_MC_DCV && mc_parsed_raw_data[3] > 1, ## num_channels > 1
+            calibration_args = CalibrationParameters(dcv = dcv),
             auto_span_smooth = auto_span_smooth,
             span_smooth_default = span_smooth_default,
             span_smooth_factor = span_smooth_factor,
             max_temperature = max_temperature,
             out_format = full_output,
+            reporting = reporting,
             kw_pa...)
     #
     ## analyse data as melting curve
@@ -87,11 +87,9 @@ function act(
     #
     ## process the data from only one channel
     ## PROBLEM >> this does not seem appropriate for dual channel analysis
-    const channel_proc = 1
-    const channel_proc_i = find(channel_proc .== interface.channels)[1]
     const mc_tm = map(
         field(:peaks_filtered),
-        mc_w72c.peak_output[:, channel_proc_i]) ## mc_matrix
+        mc_w72c.peak_output[:, CHANNELS[1]]) ## mc_matrix
     println(mc_tm)
     min_Tm = max_temperature + 1
     max_Tm = 0
