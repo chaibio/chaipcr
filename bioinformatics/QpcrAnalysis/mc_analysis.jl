@@ -232,7 +232,6 @@ function mc_analysis(i ::McInput)
         morph(length(norm_wells), i.num_channels) ## coerce to 2d array
     #
     # if (i.out_format == full_output)
-    println("peak_format: $peak_format")
     if peak_format == McPeakLongOutput
         return McLongOutput(
             i.wells,

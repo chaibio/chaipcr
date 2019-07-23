@@ -91,7 +91,6 @@ function act(
     const mc_tm = map(
         field(:peaks_filtered),
         mc_w72c.peak_output[:, CHANNELS[1]]) ## mc_matrix
-    println(mc_tm)
     min_Tm = max_temperature + 1
     max_Tm = 0
     const tm_check_vec = map(mc_tm) do Ta
