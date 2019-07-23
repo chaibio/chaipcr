@@ -7,6 +7,8 @@
 
 ===============================================================================#
 
+
+
 abstract type StandardCurveResult end
 
 struct TargetResultEle <: StandardCurveResult
@@ -17,6 +19,7 @@ struct TargetResultEle <: StandardCurveResult
     r2          ::Float_T
 end
 const EMPTY_TRE = TargetResultEle(0, fill(NaN, 4)...)
+
 
 struct GroupResultEle <: StandardCurveResult
     well        ::Vector{Int}

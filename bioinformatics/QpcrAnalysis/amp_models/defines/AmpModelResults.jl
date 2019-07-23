@@ -14,45 +14,65 @@ import Ipopt: IpoptSolver #, NLoptSolver
 
 
 #===============================================================================
-    structs >>
+    Field definitions >>
+===============================================================================#
+
+## issue: rename `rbbs_3ary` as `calibrated` once juliaapi_new has been updated
+const AMPLONGMODELRESULTS_FIELD_DEFS = [
+    Field(:rbbs_3ary,        Vector{Float_T}),
+    Field(:bl_fit,           Union{AmpModelFit,Symbol}),
+    Field(:bl_notes,         Vector{String}),
+    Field(:blsub_fluos,      Vector{Float_T}),
+    Field(:quant_fit,        AmpModelFit),
+    Field(:quant_status,     Symbol),
+    Field(:coefs,            Vector{Float_T}),
+    Field(:d0,               Float_T),
+    Field(:quant_fluos,      Vector{Float_T}),
+    Field(:dr1_pred,         Vector{Float_T}),
+    Field(:dr2_pred,         Vector{Float_T}),
+    Field(:max_dr1,          Float_T),
+    Field(:max_dr2,          Float_T),
+    Field(:cyc_vals_4cq,     OrderedDict{Symbol,Float_T}),
+    Field(:eff_vals_4cq,     OrderedDict{Symbol,Float_T}),
+    Field(:cq_raw,           Float_T),
+    Field(:cq,               Float_T),
+    Field(:eff,              Float_T),
+    Field(:cq_fluo,          Float_T)]
+
+
+const AMPSHORTMODELRESULTS_FIELDNAMES = [
+    # rbbs_3ary,
+    :blsub_fluos,
+    :dr1_pred,
+    :dr2_pred,
+    :cq,
+    :d0]
+
+
+const AMPCQFLUOMODELRESULTS_FIELDNAMES = [
+    :quant_status,
+    :cq_fluo]
+
+
+
+#===============================================================================
+    struct and constructor generation >>
 ===============================================================================#
 
 abstract type AmpModelResults end
 
-## issue: rename `rbbs_3ary` as `calibrated` once juliaapi_new has been updated
-struct AmpLongModelResults <: AmpModelResults
-    rbbs_3ary       ::Vector{Float_T}
-    bl_fit          ::Union{AmpModelFit,Symbol}
-    bl_notes        ::Vector{String}
-    blsub_fluos     ::Vector{Float_T}
-    quant_fit       ::AmpModelFit
-    quant_status    ::Symbol
-    coefs           ::Vector{Float_T}
-    d0              ::Float_T
-    quant_fluos     ::Vector{Float_T}
-    dr1_pred        ::Vector{Float_T}
-    dr2_pred        ::Vector{Float_T}
-    max_dr1         ::Float_T
-    max_dr2         ::Float_T
-    cyc_vals_4cq    ::OrderedDict{Symbol,Float_T}
-    eff_vals_4cq    ::OrderedDict{Symbol,Float_T}
-    cq_raw          ::Float_T
-    cq              ::Float_T
-    eff             ::Float_T
-    cq_fluo         ::Float_T
-end
+SCHEMA = AMPLONGMODELRESULTS_FIELD_DEFS
+@make_struct_from_SCHEMA AmpLongModelResults AmpModelResults
+@make_constructor_from_SCHEMA AmpLongModelResults
 
-## issue: rename `rbbs_3ary` as `calibrated` once juliaapi_new has been updated
-struct AmpShortModelResults <: AmpModelResults
-    # rbbs_3ary       ::Vector{Float_T}   ## fluorescence after deconvolution and normalization
-    blsub_fluos     ::Vector{Float_T}   ## fluorescence after baseline subtraction
-    dr1_pred        ::Vector{Float_T}   ## dF/dc (slope of fluorescence/cycle)
-    dr2_pred        ::Vector{Float_T}   ## d2F/dc2
-    cq              ::Float_T           ## cq values, applicable to sigmoid models but not to MAK models
-    d0              ::Float_T           ## starting quantity for absolute quantification
-end
+SCHEMA = subset_by_name(
+    AMPSHORTMODELRESULTS_FIELDNAMES,
+    AMPLONGMODELRESULTS_FIELD_DEFS)
+@make_struct_from_SCHEMA AmpShortModelResults AmpModelResults
+@make_constructor_from_SCHEMA AmpShortModelResults
 
-struct AmpCqFluoModelResults <: AmpModelResults
-    quant_status    ::Symbol
-    cq_fluo         ::Float_T
-end
+SCHEMA = subset_by_name(
+    AMPCQFLUOMODELRESULTS_FIELDNAMES,
+    AMPLONGMODELRESULTS_FIELD_DEFS)
+@make_struct_from_SCHEMA AmpCqFluoModelResults AmpModelResults
+@make_constructor_from_SCHEMA AmpCqFluoModelResults

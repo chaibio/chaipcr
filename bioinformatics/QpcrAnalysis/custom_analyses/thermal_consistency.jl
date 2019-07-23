@@ -54,7 +54,7 @@ function act(
         return fail(logger, ArgumentError(
             "no calibration information found")) |> out(out_format)
     end
-    const get_calibration_data(req_dict)
+    const calibration_data = get_calibration_data(req_dict)
     #
     ## parse melting curve data into DataFrame
     const mc_parsed_raw_data = mc_parse_raw_data(req_dict[RAW_DATA_KEY])

@@ -16,67 +16,80 @@ import Ipopt: IpoptSolver #, NLoptSolver
 
 
 #===============================================================================
-    structs >>
+    Field definitions >>
+===============================================================================#
+
+const AMPLONGOUTPUT_FIELD_DEFS = [
+    Field(:raw_data,                     Array{<: Real,3}), ## fr_ary3
+    ## computed in amp_analysis()
+    Field(:background_subtracted_data,   Array{<: Real,3}), ## mw_ary3
+    Field(:norm_data,                    SArray{S,<: Real} where {S}), ## wva_data
+    Field(:k_deconv,                     DeconvolutionMatrices), ## k4dcv
+    Field(:deconvoluted_data,            Array{<: Real,3}), ## dcvd_ary3
+    Field(:rbbs_3ary,                    Array{Float_T,3}), ## calibrated_data
+    # cq_method,                           Symbol
+    ## for ct method
+    Field(:ct_fluos,                     SVector{C,Float_T} where {C}),
+    ## computed by fit_model!()
+    Field(:bl_fit,                       SMatrix{W,C,Union{AmpModelFit,Symbol}} where {W,C}),
+    Field(:bl_notes,                     SMatrix{W,C,Vector{String}} where {W,C}),
+    Field(:blsub_fluos,                  Array{Float_T,3}),
+    Field(:quant_fit,                    SMatrix{W,C,Union{AmpModelFit,Symbol}} where {W,C}),
+    Field(:quant_status,                 SMatrix{W,C,Symbol} where {W,C}),
+    Field(:coefs,                        Array{Float_T,3}),
+    Field(:d0,                           SMatrix{W,C,Float_T} where {W,C}),
+    Field(:quant_fluos,                  Array{Float_T,3}),
+    Field(:dr1_pred,                     Array{Float_T,3}),
+    Field(:dr2_pred,                     Array{Float_T,3}),
+    Field(:max_dr1,                      SMatrix{W,C,Float_T} where {W,C}),
+    Field(:max_dr2,                      SMatrix{W,C,Float_T} where {W,C}),
+    Field(:cyc_vals_4cq,                 SMatrix{W,C,OrderedDict{Symbol,Float_T}} where {W,C}),
+    Field(:eff_vals_4cq,                 SMatrix{W,C,OrderedDict{Symbol,Float_T}} where {W,C}),
+    Field(:cq_raw,                       SMatrix{W,C,Float_T} where {W,C}),
+    Field(:cq,                           SMatrix{W,C,Float_T} where {W,C}),
+    Field(:eff,                          SMatrix{W,C,Float_T} where {W,C}),
+    Field(:cq_fluo,                      SMatrix{W,C,Float_T} where {W,C}),
+    ## computed in amp_analysis()
+    Field(:qt_fluos,                     SMatrix{W,C,Float_T} where {W,C}),
+    Field(:max_qt_fluo,                  Float_T),
+    ## computed by report_cq!()
+    Field(:max_bsf,                      SMatrix{W,C,Float_T} where {W,C}),
+    Field(:scaled_max_bsf,               SMatrix{W,C,Float_T} where {W,C}),
+    Field(:scaled_max_dr1,               SMatrix{W,C,Float_T} where {W,C}),
+    Field(:scaled_max_dr2,               SMatrix{W,C,Float_T} where {W,C}),
+    Field(:why_NaN,                      SMatrix{W,C,String} where {W,C}),
+    ## allelic discrimination output
+    Field(:assignments_adj_labels_dict,  OrderedDict{Symbol,Vector{String}}),
+    Field(:agr_dict,                     OrderedDict{Symbol,AssignGenosResult})]
+
+
+const AMPSHORTOUTPUT_FIELDNAMES = [
+    :rbbs_3ary,
+    :blsub_fluos,
+    :dr1_pred,
+    :dr2_pred,
+    :cq,
+    :d0,
+    :ct_fluos,
+    :assignments_adj_labels_dict]
+
+
+
+#===============================================================================
+    struct generation >>
 ===============================================================================#
 
 abstract type AmpOutput end
 
-## issue: rename `rbbs_3ary` as `calibrated` once juliaapi_new has been updated
-mutable struct AmpLongOutput <: AmpOutput
-    raw_data                    ::Array{<: Real,3} ## fr_ary3
-    ## computed in amp_analysis()
-    background_subtracted_data  ::Array{<: Real,3} ## mw_ary3
-    norm_data                   ::SArray{S,<: Real} where {S} ## wva_data
-    k_deconv                    ::DeconvolutionMatrices ## k4dcv
-    deconvoluted_data           ::Array{<: Real,3} ## dcvd_ary3
-    rbbs_3ary                   ::Array{Float_T,3} ## calibrated_data
-    # cq_method                   ::Symbol
-    ## for ct method
-    ct_fluos                    ::SVector{C,Float_T} where {C}
-    ## computed by fit_model!()
-    bl_fit                      ::SMatrix{W,C,Union{AmpModelFit,Symbol}} where {W,C}
-    bl_notes                    ::SMatrix{W,C,Vector{String}} where {W,C}
-    blsub_fluos                 ::Array{Float_T,3}
-    quant_fit                   ::SMatrix{W,C,Union{AmpModelFit,Symbol}} where {W,C}
-    quant_status                ::SMatrix{W,C,Symbol} where {W,C}
-    coefs                       ::Array{Float_T,3}
-    d0                          ::SMatrix{W,C,Float_T} where {W,C}
-    quant_fluos                 ::Array{Float_T,3}
-    dr1_pred                    ::Array{Float_T,3}
-    dr2_pred                    ::Array{Float_T,3}
-    max_dr1                     ::SMatrix{W,C,Float_T} where {W,C}
-    max_dr2                     ::SMatrix{W,C,Float_T} where {W,C}
-    cyc_vals_4cq                ::SMatrix{W,C,OrderedDict{Symbol,Float_T}} where {W,C}
-    eff_vals_4cq                ::SMatrix{W,C,OrderedDict{Symbol,Float_T}} where {W,C}
-    cq_raw                      ::SMatrix{W,C,Float_T} where {W,C}
-    cq                          ::SMatrix{W,C,Float_T} where {W,C}
-    eff                         ::SMatrix{W,C,Float_T} where {W,C}
-    cq_fluo                     ::SMatrix{W,C,Float_T} where {W,C}
-    ## computed in amp_analysis()
-    qt_fluos                    ::SMatrix{W,C,Float_T} where {W,C}
-    max_qt_fluo                 ::Float_T
-    ## computed by report_cq!()
-    max_bsf                     ::SMatrix{W,C,Float_T} where {W,C}
-    scaled_max_bsf              ::SMatrix{W,C,Float_T} where {W,C}
-    scaled_max_dr1              ::SMatrix{W,C,Float_T} where {W,C}
-    scaled_max_dr2              ::SMatrix{W,C,Float_T} where {W,C}
-    why_NaN                     ::SMatrix{W,C,String} where {W,C}
-    ## allelic discrimination output
-    assignments_adj_labels_dict ::OrderedDict{Symbol,Vector{String}}
-    agr_dict                    ::OrderedDict{Symbol,AssignGenosResult}
-end
+SCHEMA = AMPLONGOUTPUT_FIELD_DEFS
+@make_struct_from_SCHEMA AmpLongOutput AmpOutput true
+@make_constructor_from_SCHEMA AmpLongOutput
 
-## issue: rename `rbbs_3ary` as `calibrated` once juliaapi_new has been updated
-mutable struct AmpShortOutput <: AmpOutput
-    rbbs_3ary                   ::Array{Float_T,3} ## fluorescence after deconvolution and normalization
-    blsub_fluos                 ::Array{Float_T,3} ## fluorescence after baseline subtraction
-    dr1_pred                    ::Array{Float_T,3} ## dF/dc (slope of fluorescence/cycle)
-    dr2_pred                    ::Array{Float_T,3} ## d2F/dc2
-    cq                          ::SMatrix{W,C,Float_T} where {W,C} ## cq values, applicable to sigmoid models but not to MAK models
-    d0                          ::SMatrix{W,C,Float_T} where {W,C} ## starting quantity for absolute quantification
-    ct_fluos                    ::SVector{C,Float_T} where {C} ## fluorescence thresholds (one value per channel) for Ct method
-    assignments_adj_labels_dict ::OrderedDict{Symbol,Vector{String}} ## assigned genotypes from allelic discrimination, keyed by type of data (see `AD_DATA_CATEG` in "allelic_discrimination.jl")
-end
+SCHEMA = subset_by_name(
+    AMPSHORTOUTPUT_FIELDNAMES,
+    AMPLONGOUTPUT_FIELD_DEFS)
+@make_struct_from_SCHEMA AmpShortOutput AmpOutput true
+@make_constructor_from_SCHEMA AmpShortOutput
 
 
 
@@ -163,6 +176,6 @@ function AmpOutput(
         cd, ## dr2_pred
         NaN_array2, ## d0
         NaN_array2, ## cq
-        SVector{i.num_channels, Float_T}(ct_fluos), ## ct_fluos
+        ct_fluos, ## ct_fluos
         OrderedDict{Symbol, AssignGenosResult}()) ## agr_dict
 end ## constructor
