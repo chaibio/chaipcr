@@ -303,27 +303,24 @@ julia> (85,100,115) |> QpcrAnalysis.sweep(mean)(-) |> QpcrAnalysis.sweep(std)(/)
 @inline sweep(summary_func) =
     sweep_func -> x -> broadcast(sweep_func, x, summary_func(x))
 
+"""
+    x |> fan(fs)
+
+Apply a collection of functions to a single argument.
+
+# Example:
+```julia-repl
+julia> [0:10;] |> QpcrAnalysis.fan([minimum, median, maximum]) |> Tuple
+(0, 5.0, 10)
+"""
+fan = fs -> x -> map(f -> f(x), fs)
+
 ## used in amplification.jl
 ## used in melting_curve.jl
 ## used in shared_functions.jl
 # thing(x) = !(x === nothing)
 thing = (!isequal)(nothing)
 
-## used in amplification.jl
-## used in melting_curve.jl
-## used in optical_cal.jl
-## used in thermal_consistency.jl
-calibration_info_in_req(req_dict) =
-    haskey(req_dict, CALIBRATION_INFO_KEY) &&
-        isa(req_dict[CALIBRATION_INFO_KEY], Associative)
-
-## used in amplification.jl
-## used in melting_curve.jl
-## used in thermal_consistency.jl
-raw_data_in_req(req_dict) =
-    haskey(req_dict, RAW_DATA_KEY) &&
-        isa(req_dict[RAW_DATA_KEY], Associative)
-       
 ## used in amplification.jl
 ## used in melting_curve.jl
 ## used in optical_cal.jl

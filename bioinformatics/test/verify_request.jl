@@ -278,7 +278,7 @@ end
 # ;
 
 function verify_request(
-    ::Type{Val{QpcrAnalysis.meltcurve}},
+    ::Type{Val{QpcrAnalysis.melting_curve}},
     request ::Any
 )
     facts("Melting curve requested") do

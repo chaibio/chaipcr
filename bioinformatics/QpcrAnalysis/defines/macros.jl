@@ -19,7 +19,7 @@ macro make_struct_from_SCHEMA(structname, super = Any, mutable = false)
             mutable,
             Expr(:(<:), structname, super),
             Expr(:block, fields...)))
-end ## end of macro
+end ## macro
 
 
 "Make a constructor method with default values from predefined collection of Fields"
@@ -38,9 +38,44 @@ macro make_constructor_from_SCHEMA(structname)
                 Expr(:block,
                     Expr(:call, structname, varnames...))))
     end
-end ## end of macro
+end ## macro
 
+"Parse raw data data from `req_dict`"
+macro parse_raw_data_from_req_dict(action)
+    esc( :(
+        begin
+            req_key(RAW_DATA_KEY) ||
+                return ArgumentError(
+                    "no raw data for " * string($action) * " analysis in request")
+            const parsed_raw_data = try
+                parse_raw_data(Val{$action}, req_dict[RAW_DATA_KEY])
+            catch()
+                ArgumentError(
+                    "cannot parse raw data for " * string($action) * " analysis")
+            end ## try
+            isa(parsed_raw_data, ArgumentError) &&
+                return fail(logger, parsed_raw_data)
+        end ) )
+end ## macro
 
+"Get calibration data from `req_dict`"
+macro get_calibration_data_from_req_dict(action)
+    esc( :(
+        begin
+            req_key = curry(haskey)(req_dict)
+            req_key(CALIBRATION_INFO_KEY) ||
+                return ArgumentError(
+                    "no calibration data for " * string($action) * " analysis in request")
+            const calibration_data = try
+                CalibrationData(req_dict[CALIBRATION_INFO_KEY])
+            catch()
+                ArgumentError(
+                    "cannot parse calibration data for " * string($action) * " analysis")
+            end ## try
+            isa(calibration_data, ArgumentError) &&
+                return fail(logger, calibration_data)
+        end ) )
+end ## macro
 
 ## usage:
 # println(@expand @make_struct MyStruct (a, Int) (b, Float64) )

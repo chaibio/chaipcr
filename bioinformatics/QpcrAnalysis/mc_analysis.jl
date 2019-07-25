@@ -14,6 +14,17 @@ import DataFrames.DataFrame
 import Memento: debug
 
 
+
+#===============================================================================
+    field names >>
+===============================================================================#
+
+const MC_TF_KEYS = [:temperature, :fluorescence]
+const MC_OUTPUT_FIELDS = OrderedDict(
+    :observed_data          => :melt_curve_data,
+    :peaks_filtered         => :melt_curve_analysis)
+
+
 #===============================================================================
     function definitions >>
 ===============================================================================#

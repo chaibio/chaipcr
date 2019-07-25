@@ -16,20 +16,6 @@ import Memento: debug
 
 
 #===============================================================================
-    field names >>
-===============================================================================#
-
-const KWARGS_AMP_KEYS =
-    ["min_reliable_cyc", "baseline_cyc_bounds", "ctrl_well_dict",
-        CQ_METHOD_KEY, CATEG_WELL_VEC_KEY]
-const KWARGS_RCQ_KEYS_DICT = Dict(
-    "min_fluomax"   => :max_bsf_lb,
-    "min_D1max"     => :max_dr1_lb,
-    "min_D2max"     => :max_dr2_lb)
-
-
-
-#===============================================================================
     function definitions >>
 ===============================================================================#
 
@@ -43,46 +29,37 @@ function act(
 )
     debug(logger, "at act(::Type{Val{amplification}})")
     #
-    ## required data
-    req_key = curry(haskey)(req_dict)
-    if !raw_data_in_req(req_dict)
-        return fail(logger, ArgumentError(
-            "no raw data for amplification analysis in request")) |> out(out_format)
-    end
-    if !calibration_info_in_req(req_dict)
-        return fail(logger, ArgumentError(
-            "no calibration information in request")) |> out(out_format)
-    end
+    ## required fields
+    @get_calibration_data_from_req_dict(amplification)
+    @parse_raw_data_from_req_dict(amplification)
     #
-    ## parse data from request
-    const parsed_raw_data = amp_parse_raw_data(req_dict[RAW_DATA_KEY])
-    const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
+    ## keyword arguments
+    const kwargs = AMP_FIELD_DEFS |>
+        sift(req_key ∘ field(:key)) |>
+        mold() do x
+            x.name => req_dict[x.key]
+        end
+    req_key(CQ_METHOD_KEY) &&
+        push!(kwargs,
+            :cq_method => try
+                CqMethod(req_dict[CQ_METHOD_KEY])
+            catch()
+                return fail(logger, ArgumentError("Unrecognized cq method");
+                    bt = true) |> out(out_format)
+            end) ## try
+    req_key(CATEG_WELL_VEC_KEY) &&
+        push!(kwargs,
+            :categ_well_vec =>
+                map(req_dict[CATEG_WELL_VEC_KEY]) do x
+                    const element = str2sym.(x)
+                    (length(element[2]) == 0) ?
+                        element :
+                        Colon()
+                end) ## do x
+    req_key(CTRL_WELL_DICT_KEY) &&
+        push!(kwargs, :ctrl_well_dict => str2sym.(req_dict[CTRL_WELL_DICT_KEY]))
     #
-    ## analysis parameters for model fitting
-    const kw_amp = Dict{Symbol,Any}(
-        map(KWARGS_AMP_KEYS |> sift(req_key)) do key
-            if (key == CATEG_WELL_VEC_KEY)
-                :categ_well_vec =>
-                    map(req_dict[CATEG_WELL_VEC_KEY]) do x
-                        const element = str2sym.(x)
-                        (length(element[2]) == 0) ?
-                            element :
-                            Colon()
-                    end ## do x
-            elseif (key == CQ_METHOD_KEY)
-                :cq_method => try
-                    CqMethod(req_dict[CQ_METHOD_KEY])
-                catch()
-                    return fail(logger, ArgumentError("Cq method \"" *
-                        req_dict[CQ_METHOD_KEY] * "\" not implemented");
-                        bt = true) |> out(out_format)
-                end ## try
-            else
-                Symbol(key) => str2sym.(req_dict[key])
-            end ## if
-        end) ## map
-    #
-    ## arguments for fit_baseline_model()
+    ## baseline model parameters
     const kw_bl =
         begin
             const baseline_method =
@@ -104,12 +81,6 @@ function act(
             end
         end
     #
-    ## report_cq!() arguments
-    const kw_rcq = Dict{Symbol,Any}(
-        map(KWARGS_RCQ_KEYS_DICT |> keys |> collect |> sift(req_key)) do key
-            KWARGS_RCQ_KEYS_DICT[key] => req_dict[key]
-        end) ## map
-    #
     ## create container for data and parameters
     ## to pass to amp_analysis()
     const interface = AmpInput(
@@ -118,8 +89,7 @@ function act(
         out_format = out_format,
         amp_output = AmpOutputOption(out_format),
         kw_bl...,
-        kw_amp...,
-        kw_rcq...,)
+        kwargs...,)
     const result = try
         ## issues:
         ## 1.
@@ -182,7 +152,7 @@ end ## act(::Type{Val{amplification}})
 
 "Extract dimensions of raw amplification data, then format the raw data into a
 3D array as required by `calibrate`."
-function amp_parse_raw_data(raw_dict ::Associative)
+function parse_raw_data(::Type{Val{amplification}}, raw_dict ::Associative)
     const (cycles, wells, channels) =
         map([CYCLE_NUM_KEY, WELL_NUM_KEY, CHANNEL_KEY]) do key
             raw_dict[key] |> unique ## in order of appearance
@@ -234,4 +204,4 @@ function amp_parse_raw_data(raw_dict ::Associative)
         cycles[cyc_perm] |> SVector{num_cycles,Int},
         kludge[well_perm] |> mold(Symbol ∘ Int) |> SVector{num_wells,Symbol},
         channels[chan_perm] |> SVector{num_channels,Int})
-end ## amp_parse_raw_data()
+end ## parse_raw_data(Type{Val{amplification}})

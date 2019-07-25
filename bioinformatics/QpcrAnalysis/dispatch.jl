@@ -22,7 +22,7 @@ function dispatch(
     request_body    ::AbstractString;
     verify          ::Bool = false
 )
-    const action_str = "\"" * replace(string(action_key), r"_", " ") * "\""
+    const action_str = "\"$action_key\""
     debug(logger, "at dispatch() with action $action_str")
     # debug(logger, "request body is:\n" * request_body)
     #
@@ -148,7 +148,7 @@ end ## dispatch()
 #         # else
 #         #     println("No step_id or ramp_id will be specified.")
 #         end
-#     elseif action == "meltcurve"
+#     elseif action == "melting_curve"
 #         reqb["experiment_id"] = exp_id
 #         reqb["stage_id"] = stage_id
 #     elseif action == "analyze"

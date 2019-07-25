@@ -149,12 +149,12 @@ const MD_EMPTY_vals = (
     EMPTY_fp...,    ## :func_pred_strs, :funcs_pred
     "",             ## func_fit_str
     empty_func)     ## func_fit
-const SFC_MDs = OrderedDict(map(SFC_MODEL_BASES) do SFC_model_base
+const SFC_MODEL_DEFS = OrderedDict(map(SFC_MODEL_BASES) do SFC_model_base
     SFC_model_base[1] => SFCModelDef(
         SFC_model_base...,
         deepcopy(MD_EMPTY_vals)...)
 end)
-for md_ in values(SFC_MDs)
+for md_ in values(SFC_MODEL_DEFS)
     add_funcs_pred!(md_)
     add_func_fit!(md_)
 end

@@ -304,11 +304,11 @@ function amp_fit_model(
     if i.bl_method in SFC_MODEL_NAMES
         ## fit model to find baseline
         const wts = SFC_wts()
-        const bl_fit = i.SFC_model_defs[i.bl_method].func_fit(
+        const bl_fit = i.SFC_model_def_func(i.bl_method).func_fit(
             cycles, fluos, wts; solver = i.solver)
         const bl_status = bl_fit.status
         bl_notes = ["bl_status $bl_status"]
-        baseline = i.SFC_model_defs[i.bl_method].funcs_pred[:bl](
+        baseline = i.SFC_model_def_func(i.bl_method).funcs_pred[:bl](
             cycles, bl_fit.coefs...)
         blsub_fluos = fluos .- baseline
         const have_good_results = good_status()
@@ -332,7 +332,7 @@ function amp_fit_model(
     end
     #
     ## fit quantitation model
-    const qm = i.SFC_model_defs[i.quant_method]
+    const qm = i.SFC_model_def_func(i.quant_method)
     const quant_fit = qm.func_fit(cycles, blsub_fluos, wts; solver = i.solver)
     const quant_coefs = quant_fit.coefs
     const len_denser = denser_len(i, num_cycles)

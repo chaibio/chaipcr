@@ -49,29 +49,18 @@ function act(
 )
     debug(logger, "at act(::Type{Val{thermal_consistency}})")
     #
-    ## required data
-    if !raw_data_in_req(req_dict)
-        return fail(logger, ArgumentError(
-            "no raw data for thermal consistency analysis in request")) |> out(out_format)
-    end
-    if !calibration_info_in_req(req_dict)
-        return fail(logger, ArgumentError(
-            "no calibration data in request")) |> out(out_format)
-    end
+    ## required fields
+    @get_calibration_data_from_req_dict(thermal_consistency)
+    @parse_raw_data_from_req_dict(thermal_consistency)
     #
-    ## parse data from request
-    const mc_parsed_raw_data = mc_parse_raw_data(req_dict[RAW_DATA_KEY])
-    const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
-    #
-    ## parse analysis parameters from request
-    const kw_pa = OrderedDict{Symbol,Any}(
-        map(keys(MC_PEAK_ANALYSIS_KEYWORDS)) do key
-            key => req_dict[MC_PEAK_ANALYSIS_KEYWORDS[key]]
-        end)
+    ## keyword arguments
+    const kwargs = MC_FIELD_DEFS |>
+        sift(x -> x.key in keys(req_dict)) |>
+        mold(x -> x.name => req_dict[x.key])
     #
     ## create container for data and parameter values
     interface = McInput(
-            mc_parsed_raw_data...,
+            parsed_raw_data...,
             calibration_data;
             calibration_args = CalibrationParameters(dcv = dcv),
             auto_span_smooth = auto_span_smooth,
@@ -80,9 +69,9 @@ function act(
             max_temperature = max_temperature,
             out_format = full_output,
             reporting = reporting,
-            kw_pa...)
+            kwargs...)
     #
-    ## analyse data as melting curve
+    ## analyse data analyses melting curve
     const mc_w72c = try
         mc_analysis(interface)
     catch err

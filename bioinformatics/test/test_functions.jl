@@ -73,9 +73,31 @@ end
 # amp1_local == amp1_saved ## should be true
 # using Memento
 # setlevel!(QpcrAnalysis.logger, "error")
-# using BenchmarkTools
-# # @timev for i in 1:100; test_functions["amplification single channel"](); end;
-# @benchmark test_functions["amplification single channel"]()
+# # using BenchmarkTools
+# # @benchmark test_functions["amplification single channel"]()
+# @timev for i in 1:100; test_functions["amplification single channel"](); end;
+
+## HEAD (with macros)
+#  27.280691 seconds (25.35 M allocations: 1.593 GiB, 1.59% gc time)
+# elapsed time (ns): 27280691000
+# gc time (ns):      433476000
+# bytes allocated:   1710370432
+# pool allocs:       25277963
+# non-pool GC allocs:60300
+# malloc() calls:    9600
+# realloc() calls:   900
+# GC pauses:         75
+
+## commit dfe7f96d9e00f03b939cc84c898a58156c05fd41
+#  26.820811 seconds (25.08 M allocations: 1.562 GiB, 1.66% gc time)
+# elapsed time (ns): 26820811000
+# gc time (ns):      445567000
+# bytes allocated:   1676798240
+# pool allocs:       25007527
+# non-pool GC allocs:59900
+# malloc() calls:    9600
+# realloc() calls:   900
+# GC pauses:         73
 
 ## commit c4d3ac425fbfa1e65ae352f1e78b1483645754e5
 #  31.532593 seconds (25.08 M allocations: 1.562 GiB, 1.49% gc time)

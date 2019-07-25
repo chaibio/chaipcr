@@ -39,11 +39,7 @@ function act(
     # )
 
     ## get calibration data and use default analysis parameters
-    if !calibration_info_in_req(req_dict)
-        return fail(logger, ArgumentError(
-            "no calibration data in request")) |> out(out_format)
-    end
-    const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
+    @get_calibration_data_from_req_dict(optical_calibration)
     const calibration_args = CalibrationParameters()
     #
     ## check validity of data for normalization

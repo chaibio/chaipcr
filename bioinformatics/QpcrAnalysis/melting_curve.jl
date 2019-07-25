@@ -24,55 +24,36 @@ const MC_RAW_FIELDS = Dict(
     :fluorescence           => FLUORESCENCE_VALUE_KEY,
     :well                   => WELL_NUM_KEY,
     :channel                => CHANNEL_KEY)
-const MC_PEAK_ANALYSIS_KEYWORDS = Dict{Symbol,String}(
-    :norm_negderiv_quantile => "qt_prob",
-    :max_norm_negderiv      => "max_normd_qtv",
-    :max_num_peaks          => "top_N")
-const MC_TF_KEYS = [:temperature, :fluorescence]
-const MC_OUTPUT_FIELDS = OrderedDict(
-    :observed_data          => :melt_curve_data,
-    :peaks_filtered         => :melt_curve_analysis)
+
 
 
 #===============================================================================
     function definitions >>
 ===============================================================================#
 
-
 ## called by dispatch()
 function act(
-    ::Type{Val{meltcurve}},
+    ::Type{Val{melting_curve}},
     req_dict    ::Associative;
     out_format  ::OutputFormat = pre_json
 )
-    debug(logger, "at act(::Type{Val{meltcurve}})")
+    debug(logger, "at act(::Type{Val{melting_curve}})")
     #
-    ## required data
-    if !raw_data_in_req(req_dict)
-        return fail(logger, ArgumentError(
-            "no raw data for melting curve analysis in request")) |> out(out_format)
-    end
-    if !calibration_info_in_req(req_dict)
-        return fail(logger, ArgumentError(
-            "no calibration data in request")) |> out(out_format)
-    end
+    ## required fields
+    @get_calibration_data_from_req_dict(melting_curve)
+    @parse_raw_data_from_req_dict(melting_curve)
     #
-    ## parse data from request
-    const mc_parsed_raw_data = mc_parse_raw_data(req_dict[RAW_DATA_KEY])
-    const calibration_data = CalibrationData(req_dict[CALIBRATION_INFO_KEY])
-    #
-    ## parse analysis parameters from request
-    const kwargs_pa = OrderedDict{Symbol,Any}(
-        map(keys(MC_PEAK_ANALYSIS_KEYWORDS)) do key
-            key => req_dict[MC_PEAK_ANALYSIS_KEYWORDS[key]]
-        end) ## do key
+    ## keyword arguments
+    const kwargs = MC_FIELD_DEFS |>
+        sift(x -> x.key in keys(req_dict)) |>
+        mold(x -> x.name => req_dict[x.key])
     #
     ## create container for data and parameter values
     interface = McInput(
-            mc_parsed_raw_data...,
+            parsed_raw_data...,
             calibration_data;
             out_format = out_format,
-            kwargs_pa...)
+            kwargs...)
     #
     ## pass data and parameter values to mc_analysis()
     ## which will perform the analysis for the entire dataset
@@ -82,14 +63,17 @@ function act(
         return fail(logger, err; bt = true) |> out(out_format)
     end ## try
     return response |> out(out_format)
-end ## act(::Type{Val{meltcurve}})
+end ## act(::Type{Val{melting_curve}})
 
 
 #==============================================================================#
 
 
 "Extract dimensions of raw melting curve data and format as a DataFrame."
-function mc_parse_raw_data(raw_dict ::Associative)
+function parse_raw_data(
+    ::Union{Type{Val{melting_curve}},Type{Val{thermal_consistency}}},
+    raw_dict ::Associative
+)
     const mc_raw_df = DataFrame()
     foreach(keys(MC_RAW_FIELDS)) do key
         try
@@ -116,4 +100,4 @@ function mc_parse_raw_data(raw_dict ::Associative)
         num_channels,
         wells |> mold(Symbol ∘ Int) |> SVector{num_wells,Symbol},
         channels |> SVector{num_channels,Int})
-end ## mc_parse_raw_data()
+end ## parse_raw_data(::Type{Val{melting_curve}})

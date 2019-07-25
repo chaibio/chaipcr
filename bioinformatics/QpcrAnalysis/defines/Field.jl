@@ -20,6 +20,7 @@ struct Field
     name        ::Symbol
     typ         ::Type{T} where {T}
     default     ::Any
+    key         ::String
 end
 
 
@@ -28,8 +29,18 @@ end
     constructor >>
 ===============================================================================#
 
-Field(name ::Symbol, typ ::Type{T} where {T}) =
-    Field(name, typ, nothing)
+Field(
+    name    ::Symbol,
+    typ     ::Type{T} where {T},
+) =
+    Field(name, typ, nothing, "")
+
+Field(
+    name    ::Symbol,
+    typ     ::Type{T} where {T},
+    default ::Any,
+) =
+    Field(name, typ, default, "")
 
 
 
