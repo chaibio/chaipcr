@@ -254,14 +254,14 @@ function assign_genos(
     data                ::AbstractMatrix,
     nrn                 ::Function,
     ntc_bool_vec        ::Vector{Bool},
-    expected_ncg_raw    ::AbstractMatrix = DEFAULT_encgr,
-    ctrl_well_dict      ::OrderedDict = CTRL_WELL_DICT,
-    cluster_method      ::ClusteringMethod = k_means_medoids,
-    norm_l              ::Real = 2,
+    expected_ncg_raw    ::AbstractMatrix    = DEFAULT_AMP_ENCGR,
+    ctrl_well_dict      ::OrderedDict       = DEFAULT_AMP_CTRL_WELL_DICT,
+    cluster_method      ::ClusteringMethod  = DEFAULT_AMP_CLUSTER_METHOD,
+    norm_l              ::Real              = DEFAULT_AMP_NORM_L,
     ## below not specified by `process_ad` as of right now
-    init_factors        ::AbstractVector = DEFAULT_init_FACTORS, # for `init_centers`
-    slht_lb             ::Real = 0; # lower limit of silhouette
-    apg_labels          ::AbstractVector = DEFAULT_apg_LABELS
+    init_factors        ::AbstractVector    = DEFAULT_AMP_INIT_FACTORS, # for `init_centers`
+    slht_lb             ::Real              = 0; # lower limit of silhouette
+    apg_labels          ::AbstractVector    = DEFAULT_AMP_APG_LABELS
     ## `apg` - all possible genotypes.
     ## Julia v0.6.0 on 2017-06-25:
     ## `apg_labels ::Vector{AbstractString} = DEFAULT_eg_LABELS` resulted in
@@ -605,8 +605,8 @@ function process_ad(
 
     ## each column is a vector of binary geno whose length is number of channels
     ## (0 => no signal, 1 => yes signal)
-    expected_ncg_raw    ::AbstractMatrix = DEFAULT_encgr,
-    categ_well_vec      ::AbstractVector = CATEG_WELL_VEC,
+    expected_ncg_raw    ::AbstractMatrix = DEFAULT_AMP_ENCGR,
+    categ_well_vec      ::AbstractVector = DEFAULT_AMP_CATEG_WELL_VEC,
 )
     debug(logger, "at process_ad()")
     ## indicate a well as NTC (non-template control) if all the channels have NaN as Cq

@@ -57,12 +57,7 @@ const DEFAULT_AMP_SCALED_MAX_DR1_LB     = 0.0089
 const DEFAULT_AMP_SCALED_MAX_DR2_LB     = 0.000689
 
 ## defaults for process_ad()
-const DEFAULT_AMP_CYCS                  = 0
-const DEFAULT_AMP_CTRL_WELL_DICT        = CTRL_WELL_DICT
-const DEFAULT_AMP_CLUSTER_METHOD        = k_means_medoids
-const DEFAULT_AMP_NORM_L                = 2
-const DEFAULT_AMP_DEFAULT_ENCGR         = DEFAULT_encgr
-const DEFAULT_AMP_CATEG_WELL_VEC        = CATEG_WELL_VEC
+## see AssignGenosResult.jl
 
 ## defaults for output
 const DEFAULT_AMP_OUTPUT_FORMAT         = pre_json_output
@@ -79,50 +74,51 @@ DEFAULT_AMP_REPORTER                    = roundoff(JSON_DIGITS)
 ## name, DataType, default value
 const AMP_FIELD_DEFS = [
     ## data
-    Field(:raw,                  RawData{<: Real}),
-    Field(:num_cycles,           Int),
-    Field(:num_wells,            Int),
-    Field(:num_channels,         Int),
-    Field(:cycles,               SVector{N,Int} where {N}),
-    Field(:wells,                SVector{W,Symbol} where {W}),
-    Field(:channels,             SVector{C,Int} where {C}),
-    Field(:calibration_data,     CalibrationData{<: NumberOfChannels, <: Real}),
+    Field(:raw,                 RawData{<: Real}),
+    Field(:num_cycles,          Int),
+    Field(:num_wells,           Int),
+    Field(:num_channels,        Int),
+    Field(:cycles,              SVector{N,Int} where {N}),
+    Field(:wells,               SVector{W,Symbol} where {W}),
+    Field(:channels,            SVector{C,Int} where {C}),
+    Field(:calibration_data,    CalibrationData{<: NumberOfChannels, <: Real}),
 
     ## calibration parameters
-    Field(:calibration_args,     CalibrationParameters,     DEFAULT_CAL_ARGS),
+    Field(:calibration_args,    CalibrationParameters,      DEFAULT_CAL_ARGS),
 
     ## solver parameters
-    Field(:solver,               IpoptSolver,               DEFAULT_AMP_SOLVER),
-    Field(:ipopt_print_prefix,   String,                    DEFAULT_AMP_SOLVER_PRINT_PREFIX),
+    Field(:solver,              IpoptSolver,                DEFAULT_AMP_SOLVER),
+    Field(:ipopt_print_prefix,  String,                     DEFAULT_AMP_SOLVER_PRINT_PREFIX),
 
     ## amplification model parameters
-    Field(:amp_model,            Type{<: AmpModel},         DEFAULT_AMP_MODEL),
-    Field(:SFC_model_def_func,   Function,                  DEFAULT_AMP_MODEL_DEF_FUNC),
-    Field(:bl_method,            SFCModelName,              DEFAULT_AMP_BL_METHOD),
-    Field(:bl_fallback_func,     Function,                  DEFAULT_AMP_FALLBACK_FUNC),
-    Field(:min_reliable_cyc,     Int,                       DEFAULT_AMP_MIN_RELIABLE_CYC,   "min_reliable_cyc"),
-    Field(:baseline_cyc_bounds,  Union{Vector,Array{Vector,2}},
+    Field(:amp_model,           Type{<: AmpModel},          DEFAULT_AMP_MODEL),
+    Field(:SFC_model_def_func,  Function,                   DEFAULT_AMP_MODEL_DEF_FUNC),
+    Field(:bl_method,           SFCModelName,               DEFAULT_AMP_BL_METHOD),
+    Field(:bl_fallback_func,    Function,                   DEFAULT_AMP_FALLBACK_FUNC),
+    Field(:min_reliable_cyc,    Int,                        DEFAULT_AMP_MIN_RELIABLE_CYC,   "min_reliable_cyc"),
+    Field(:baseline_cyc_bounds, Union{Vector,Array{Vector,2}},
                                                             DEFAULT_AMP_BL_CYC_BOUNDS,      "baseline_cyc_bounds"),
-    Field(:quant_method,         SFCModelName,              DEFAULT_AMP_QUANT_METHOD),
-    Field(:denser_factor,        Int,                       DEFAULT_AMP_DENSER_FACTOR),
-    Field(:cq_method,            CqMethod,                  DEFAULT_AMP_CQ_METHOD),
-    Field(:qt_prob,              Float_T,                   DEFAULT_AMP_QT_PROB),
-    Field(:before_128x,          Bool,                      DEFAULT_AMP_BEFORE_128X),
-    Field(:max_bsf_lb,           Int,                       DEFAULT_AMP_MAX_BSF_LB,         "min_fluomax"),
-    Field(:max_dr1_lb,           Int,                       DEFAULT_AMP_MAX_DR1_LB,         "min_D1max"),
-    Field(:max_dr2_lb,           Int,                       DEFAULT_AMP_MAX_DR2_LB,         "min_D2max"),
-    Field(:scaled_max_bsf_lb,    Float_T,                   DEFAULT_AMP_SCALED_MAX_BSF_LB),
-    Field(:scaled_max_dr1_lb,    Float_T,                   DEFAULT_AMP_SCALED_MAX_DR1_LB),
-    Field(:scaled_max_dr2_lb,    Float_T,                   DEFAULT_AMP_SCALED_MAX_DR2_LB),
+    Field(:quant_method,        SFCModelName,               DEFAULT_AMP_QUANT_METHOD),
+    Field(:denser_factor,       Int,                        DEFAULT_AMP_DENSER_FACTOR),
+    Field(:cq_method,           CqMethod,                   DEFAULT_AMP_CQ_METHOD),
+    Field(:qt_prob,             Float_T,                    DEFAULT_AMP_QT_PROB),
+    Field(:before_128x,         Bool,                       DEFAULT_AMP_BEFORE_128X),
+    Field(:max_bsf_lb,          Int,                        DEFAULT_AMP_MAX_BSF_LB,         "min_fluomax"),
+    Field(:max_dr1_lb,          Int,                        DEFAULT_AMP_MAX_DR1_LB,         "min_D1max"),
+    Field(:max_dr2_lb,          Int,                        DEFAULT_AMP_MAX_DR2_LB,         "min_D2max"),
+    Field(:scaled_max_bsf_lb,   Float_T,                    DEFAULT_AMP_SCALED_MAX_BSF_LB),
+    Field(:scaled_max_dr1_lb,   Float_T,                    DEFAULT_AMP_SCALED_MAX_DR1_LB),
+    Field(:scaled_max_dr2_lb,   Float_T,                    DEFAULT_AMP_SCALED_MAX_DR2_LB),
 
     ## allelic discrimination parameters
-    Field(:ctrl_well_dict,       OrderedDict{Vector{Int},Vector{Int}},
+    Field(:categ_well_vec,      Vector{Pair{Symbol,Any}},   DEFAULT_AMP_CATEG_WELL_VEC),
+    Field(:ctrl_well_dict,      OrderedDict{Vector{Int},Vector{Int}},
                                                             DEFAULT_AMP_CTRL_WELL_DICT),
     ## output format parameters
-    Field(:out_format,           OutputFormat,              DEFAULT_AMP_OUTPUT_FORMAT),
-    Field(:amp_output,           AmpOutputOption,           DEFAULT_AMP_OUTPUT_OPTION),
-    Field(:amp_model_results,    Type{<: AmpModelResults},  DEFAULT_AMP_MODEL_OUTPUT_STRUCT),
-    Field(:reporting,            Function,                  DEFAULT_AMP_REPORTER)]
+    Field(:out_format,          OutputFormat,               DEFAULT_AMP_OUTPUT_FORMAT),
+    Field(:amp_output,          AmpOutputOption,            DEFAULT_AMP_OUTPUT_OPTION),
+    Field(:amp_model_results,   Type{<: AmpModelResults},   DEFAULT_AMP_MODEL_OUTPUT_STRUCT),
+    Field(:reporting,           Function,                   DEFAULT_AMP_REPORTER)]
 
 
 

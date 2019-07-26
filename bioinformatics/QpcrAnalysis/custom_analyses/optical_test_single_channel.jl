@@ -22,6 +22,8 @@ const MAX_EXCITATION_FLUORESCENCE           = 384000
 ## called by dispatch()
 function act(
     ::Type{Val{optical_test_single_channel}},
+    req             ::Associative;
+    out_format      ::OutputFormat = pre_json_output
     ## remove MySql dependency
     #
     # db_conn ::MySQL.MySQLHandle,
@@ -29,15 +31,13 @@ function act(
     # calib_info ::Union{Integer,OrderedDict} =calib_info_AIR; ## not used for computation
     # start: arguments that might be passed by upstream code
     # well_nums ::AbstractVector =[],
-    ot_dict         ::Associative;
-    out_format      ::OutputFormat = pre_json_output
 )
     debug(logger, "at act(::Type{Val{optical_test_single_channel}})")
  
     ## remove MySql dependency
     #
     # step_ids = ["baseline_step_id", "excitation_step_id"]
-    # ot_dict = OrderedDict(map(step_ids) do step_id
+    # req = OrderedDict(map(step_ids) do step_id
     #     ot_qry_2b = "SELECT fluorescence_value, well_num
     #         FROM fluorescence_data
     #         WHERE
@@ -54,12 +54,12 @@ function act(
     #     step_id => ot_nt[:fluorescence_value]
     # end) # do step_id
 
-    ## assuming the 2 values of `ot_dict` are the same in length (number of wells)
+    ## assuming the 2 values of `req` are the same in length (number of wells)
     all_valid = true
     const results =
-        map(range(1, length(ot_dict[BASELINE_KEY][FLUORESCENCE_VALUE_KEY]))) do well_i
-            const baseline   = ot_dict[BASELINE_KEY][FLUORESCENCE_VALUE_KEY][well_i]
-            const excitation = ot_dict[EXCITATION_KEY][FLUORESCENCE_VALUE_KEY][well_i]
+        map(eachindex(req[BASELINE_KEY][FLUORESCENCE_VALUE_KEY])) do well_i
+            const baseline   = req[BASELINE_KEY][FLUORESCENCE_VALUE_KEY][well_i]
+            const excitation = req[EXCITATION_KEY][FLUORESCENCE_VALUE_KEY][well_i]
             # valid =
             #    (excitation >= MIN_EXCITATION_FLUORESCENCE) &&
             #    (excitation / baseline >= MIN_EXCITATION_FLUORESCENCE_MULTIPLE) &&

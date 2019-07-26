@@ -77,16 +77,16 @@ end
 # # @benchmark test_functions["amplification single channel"]()
 # @timev for i in 1:100; test_functions["amplification single channel"](); end;
 
-## HEAD (with macros)
-#  27.280691 seconds (25.35 M allocations: 1.593 GiB, 1.59% gc time)
-# elapsed time (ns): 27280691000
-# gc time (ns):      433476000
-# bytes allocated:   1710370432
-# pool allocs:       25277963
-# non-pool GC allocs:60300
+## commit 7d9864b27b7d8fcc777963fc2085ba800e41faa2
+#  26.419600 seconds (25.08 M allocations: 1.561 GiB, 1.56% gc time)
+# elapsed time (ns): 26419600000
+# gc time (ns):      411273000
+# bytes allocated:   1676623840
+# pool allocs:       25009327
+# non-pool GC allocs:59900
 # malloc() calls:    9600
 # realloc() calls:   900
-# GC pauses:         75
+# GC pauses:         73
 
 ## commit dfe7f96d9e00f03b939cc84c898a58156c05fd41
 #  26.820811 seconds (25.08 M allocations: 1.562 GiB, 1.66% gc time)

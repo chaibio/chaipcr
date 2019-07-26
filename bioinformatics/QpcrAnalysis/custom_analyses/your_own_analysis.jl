@@ -12,7 +12,7 @@
 
 # function act(
 #     ::Type{Val{your_own_analysis}},
-#     req_dict ::Associative;
+#     req ::Associative;
 #     # whatever keyword arguments you want to add
 #     )
 #     ## put your own code here

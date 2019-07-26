@@ -303,6 +303,7 @@ julia> (85,100,115) |> QpcrAnalysis.sweep(mean)(-) |> QpcrAnalysis.sweep(std)(/)
 @inline sweep(summary_func) =
     sweep_func -> x -> broadcast(sweep_func, x, summary_func(x))
 
+## used in enums.jl
 """
     x |> fan(fs)
 

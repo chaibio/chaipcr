@@ -18,7 +18,7 @@ import Memento.debug
 ## called by dispatch()
 function act(
     ::Type{Val{optical_calibration}},
-    req_dict            ::Associative;
+    req                 ::Associative;
     out_format          ::OutputFormat = pre_json_output,
 
     ## remove MySql dependency  
@@ -39,7 +39,7 @@ function act(
     # )
 
     ## get calibration data and use default analysis parameters
-    @get_calibration_data_from_req_dict(optical_calibration)
+    @get_calibration_data_from_req(optical_calibration)
     const calibration_args = CalibrationParameters()
     #
     ## check validity of data for normalization

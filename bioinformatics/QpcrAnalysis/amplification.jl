@@ -24,25 +24,25 @@ import Memento: debug
 "Generic function called by `dispatch`."
 function act(
     ::Type{Val{amplification}},
-    req_dict        ::Associative;
+    req             ::Associative;
     out_format      ::OutputFormat = DEFAULT_AMP_OUTPUT_FORMAT
 )
     debug(logger, "at act(::Type{Val{amplification}})")
     #
     ## required fields
-    @get_calibration_data_from_req_dict(amplification)
-    @parse_raw_data_from_req_dict(amplification)
+    @get_calibration_data_from_req(amplification)
+    @parse_raw_data_from_req(amplification)
     #
     ## keyword arguments
     const kwargs = AMP_FIELD_DEFS |>
         sift(req_key ∘ field(:key)) |>
         mold() do x
-            x.name => req_dict[x.key]
+            x.name => req[x.key]
         end
     req_key(CQ_METHOD_KEY) &&
         push!(kwargs,
             :cq_method => try
-                CqMethod(req_dict[CQ_METHOD_KEY])
+                CqMethod(req[CQ_METHOD_KEY])
             catch()
                 return fail(logger, ArgumentError("Unrecognized cq method");
                     bt = true) |> out(out_format)
@@ -50,21 +50,21 @@ function act(
     req_key(CATEG_WELL_VEC_KEY) &&
         push!(kwargs,
             :categ_well_vec =>
-                map(req_dict[CATEG_WELL_VEC_KEY]) do x
+                map(req[CATEG_WELL_VEC_KEY]) do x
                     const element = str2sym.(x)
                     (length(element[2]) == 0) ?
                         element :
                         Colon()
                 end) ## do x
     req_key(CTRL_WELL_DICT_KEY) &&
-        push!(kwargs, :ctrl_well_dict => str2sym.(req_dict[CTRL_WELL_DICT_KEY]))
+        push!(kwargs, :ctrl_well_dict => str2sym.(req[CTRL_WELL_DICT_KEY]))
     #
     ## baseline model parameters
     const kw_bl =
         begin
             const baseline_method =
                 req_key(BASELINE_METHOD_KEY) &&
-               req_dict[BASELINE_METHOD_KEY]
+               req[BASELINE_METHOD_KEY]
             if      (baseline_method == SIGMOID_KEY)
                         Dict{Symbol,Any}(
                             :bl_method          =>  l4_enl,
@@ -105,7 +105,7 @@ function act(
         #     elseif  req_key(RAMP_ID_KEY) RAMP_ID_KEY
         #     else throw(ArgumentError("no step/ramp information found"))
         #     end
-        # const asrp_vec = [AmpStepRampProperties(:ramp, req_dict[sr_key], DEFAULT_cyc_nums)]
+        # const asrp_vec = [AmpStepRampProperties(:ramp, req[sr_key], DEFAULT_cyc_nums)]
         # const sr_dict =
         #     OrderedDict(
         #         map([ asrp_vec[1] ]) do asrp

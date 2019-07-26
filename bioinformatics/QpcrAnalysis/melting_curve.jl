@@ -34,19 +34,21 @@ const MC_RAW_FIELDS = Dict(
 ## called by dispatch()
 function act(
     ::Type{Val{melting_curve}},
-    req_dict    ::Associative;
+    req         ::Associative;
     out_format  ::OutputFormat = pre_json
 )
     debug(logger, "at act(::Type{Val{melting_curve}})")
     #
     ## required fields
-    @get_calibration_data_from_req_dict(melting_curve)
-    @parse_raw_data_from_req_dict(melting_curve)
+    @get_calibration_data_from_req(melting_curve)
+    @parse_raw_data_from_req(melting_curve)
     #
     ## keyword arguments
     const kwargs = MC_FIELD_DEFS |>
-        sift(x -> x.key in keys(req_dict)) |>
-        mold(x -> x.name => req_dict[x.key])
+        sift(req_key ∘ field(:key)) |>
+        mold() do x
+            x.name => req[x.key]
+        end
     #
     ## create container for data and parameter values
     interface = McInput(

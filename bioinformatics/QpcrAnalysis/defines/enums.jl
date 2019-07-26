@@ -17,20 +17,19 @@ import DataStructures.OrderedDict
 import StaticArrays: SVector
 import Base.string
 
+
 ## used in dispatch.jl
 @enum Action amplification melting_curve standard_curve load_script optical_calibration thermal_performance_diagnostic thermal_consistency optical_test_single_channel optical_test_dual_channel # your_own_analyze_functionality
+# const ACT = instances(Action) |> mold(fan([Symbol, identity])) |> OrderedDict
 const ACTIONS = instances(Action)
-const ACT = OrderedDict(
-    zip(map(Symbol, ACTIONS), ACTIONS))
+const ACT = zip(map(Symbol, ACTIONS), ACTIONS) |> OrderedDict 
 string(action ::Action) = replace(string(action), r"_", " ")
 
 ## used in various functions
 @enum OutputFormat full_output json_output pre_json_output
-const OUTPUTFORMATS = instances(OutputFormat)
 
 ## used in calibration.jl
 @enum DataFormat array dict both
-const DATAFORMATS = instances(DataFormat)
 
 ## used in get_k() in calibration.jl
 @enum KMethod well_proc_mean well_proc_vec
@@ -40,7 +39,10 @@ const DATAFORMATS = instances(DataFormat)
 
 ## used in AmpInput.jl
 @enum CqMethod cp_dr1 cp_dr2 Cy0 ct max_eff
-CqMethod(m ::String) = CqMethod(findfirst(map(string, instances(CqMethod)), m) - 1)
+# const CQ = instances(CqMethod) |> mold(fan([Symbol, identity])) |> OrderedDict
+const CQ_METHODS = instances(CqMethod)
+const CQ = zip(map(Symbol, CQ_METHODS), CQ_METHODS) |> OrderedDict
+CqMethod(m ::String) = CQ[Symbol(m)]
 
 ## used in AmpInput.jl
 @enum AmpOutputOption long short cq_fluo
@@ -49,7 +51,6 @@ AmpOutputOption(option ::OutputFormat) =
 
 ## used in allelic_discrimination.jl
 @enum ClusteringMethod k_means k_means_medoids k_medoids
-const CLUSTERINGMETHODS = instances(ClusteringMethod)
 
 
 ## overloaded index methods for enums

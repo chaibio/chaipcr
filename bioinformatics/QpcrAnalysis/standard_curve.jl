@@ -21,7 +21,7 @@ import Memento: debug, warn, error
 ## `/slope` for log (DNA copy#) is on the x-axis and Cq on the y-axis, otherwise `*slope`
 function act(
     ::Type{Val{standard_curve}},
-    req_vec     ::Vector{Any};
+    req         ::Vector{Any};
     out_format  ::OutputFormat = pre_json_output,
     json_digits ::Integer = JSON_DIGITS,
     qty_base    ::Real = 10,
@@ -31,11 +31,11 @@ function act(
     debug(logger, "at act(::Type{Val{standard_curve}})")
     #
     ## parse data
-    const req_df = reqvec2df(req_vec)
+    const req_df = req2df(req)
     #
     ## empty dataset
     if  size(req_df, 2) == 0 ||
-        any(map(symbl -> all(isnan.(req_df[symbl])),[:target, :cq, :qty]))
+        [:target, :cq, :qty] |> mold(symbl -> all(isnan.(req_df[symbl]))) |> any
             const output = OrderedDict(:targets => [], :groups => [], :valid => false)
             return output |> out(out_format)
     end
@@ -46,25 +46,23 @@ function act(
         if isnan(target_id)
             empty_tre
         else
-            const nna_vec = map(range(1, size(chunk_target, 1))) do i
-                !isnan(chunk_target[i, :qty]) && !isnan(chunk_target[i, :cq])
-            end
-            const used_chunk_target = chunk_target[nna_vec, :]
+            const used = !isnan(chunk_target[:, :qty]) .& !isnan(chunk_target[:, :cq])
             ## better to use GLM.jl here
-            const x_vec = log.(qty_base, used_chunk_target[:qty])
-            const y_vec = used_chunk_target[:cq]
-            const b0, b1 = linreg(x_vec, y_vec)
+            const x = log.(qty_base, chunk_target[used, :qty])
+            const y = chunk_target[used, :cq]
+            const b0, b1 = linreg(x, y)
             const eff = exp(-log(e, qty_base) / b1) - 1
-            const y_mean = mean(y_vec)
-            const ss_res = sum(map(i -> (b0 + b1 * x_vec[i] - y_vec[i])^2, range(1, sum(nna_vec))))
-            const ss_tot = sum(map(y -> (y - y_mean)^2, y_vec))
+            const yhat = b0 + b1 .* x
+            const ybar = mean(y)
+            const ss_res = y .- yhat |> sumsq
+            const ss_tot = y .- ybar |> sumsq
             const r2_ = 1 - ss_res / ss_tot
             ## adjusted R2 ?
             TargetResultEle(
                 target_id,
                 round.([b1, b0, eff, r2_], json_digits)...)
         end ## if isnan
-    end ## do chunk_target
+    end ## by chunk_target
 
     ## group results calculation commented out
     ## as this calculation is duplicated in the front end
@@ -168,54 +166,60 @@ function act(
 end ## act(::Type{Val{standard_curve}})
 
 
+## called by act
+sumsq(y) = sum(y .^ 2)
+
+
 #==============================================================================#
 
 
 ## dependencies of `standard_curve`
 
-## parse req_vec into a dataframe
-function reqvec2df(req_vec ::AbstractVector)
+## parse req into a dataframe
+function req2df(req ::AbstractVector)
+    (length(req) == 0) && return DataFrame()
     #
-    (length(req_vec) == 0) && return DataFrame()
-    #
-    well_vec = Vector{Int}()
+    well_vec    = Vector{Int}()
     channel_vec = Vector{Int}()
-    target_vec = Vector{Real}()
-    cq_vec = Vector{AbstractFloat}()
-    qty_vec = Vector{AbstractFloat}()
-    sample_vec = Vector{Real}()
+    target_vec  = Vector{Real}()
+    cq_vec      = Vector{Float_T}()
+    qty_vec     = Vector{Float_T}()
+    sample_vec  = Vector{Real}()
     #
-    num_channels = maximum(map(req_vec) do req_ele
-        try length(req_ele[WELL_KEY])
-        catch()
-            0
-        end ## try
-    end) ## do req_ele
+    num_channels =
+        map(req) do req_ele
+            try
+                length(req_ele[WELL_KEY])
+            catch()
+                0
+            end ## try
+        end #= do req_ele =# |> maximum
     #
     @inline nothing2NaN(x) = thing(x) ? x : NaN
-    for well_i in range(1, length(req_vec))
-        req_ele = req_vec[well_i]
-        for channel_i in range(1, num_channels)
+    for well_i in eachindex(req)
+        req_ele = req[well_i]
+        for channel_i in 1:num_channels
             measrmt_dict =
-                try req_ele[WELL_KEY][channel_i]
+                try
+                    req_ele[WELL_KEY][channel_i]
                 catch()
                     Dict{String,Any}()
                 end ## try
             if length(measrmt_dict) == 0
                 target = cq = qty = NaN
             else
-                target = nothing2NaN(measrmt_dict[TARGET_KEY])
-                cq = nothing2NaN(measrmt_dict["cq"])
+                target   = nothing2NaN(measrmt_dict[TARGET_KEY])
+                cq       = nothing2NaN(measrmt_dict[CQ_KEY])
                 qty_dict = measrmt_dict[QUANTITY_KEY]
-                qty = nothing2NaN(qty_dict["m"]) * 10.0 ^ nothing2NaN(qty_dict["b"])
+                qty      = nothing2NaN(qty_dict["m"]) * 10.0 ^ nothing2NaN(qty_dict["b"])
             end ## if
-            push!(well_vec, well_i)
-            push!(channel_vec, channel_i)
-            push!(target_vec, target)
-            push!(cq_vec, cq)
-            push!(qty_vec, qty)
-            push!(sample_vec,
-                try nothing2NaN(req_ele[SAMPLE_KEY])
+            push!(well_vec,     well_i)
+            push!(channel_vec,  channel_i)
+            push!(target_vec,   target)
+            push!(cq_vec,       cq)
+            push!(qty_vec,      qty)
+            push!(sample_vec,   try
+                    nothing2NaN(req_ele[SAMPLE_KEY])
                 catch()
                     NaN
                 end) ## try
@@ -223,12 +227,12 @@ function reqvec2df(req_vec ::AbstractVector)
     end ## for well_i
     #
     return DataFrame(
-        well = well_vec,
+        well    = well_vec,
         channel = channel_vec,
-        target = target_vec,
-        cq = cq_vec,
-        qty = qty_vec,
-        sample = sample_vec)
+        target  = target_vec,
+        cq      = cq_vec,
+        qty     = qty_vec,
+        sample  = sample_vec)
 end
 
 ## end: dependencies of `standard_curve`
@@ -238,7 +242,7 @@ end
 ## not to be used in production
 
 ## generate unique integers
-function generate_uniq_ints(num_ints ::Integer, S, rng ::AbstractRNG =Base.GLOBAL_RNG)
+function generate_uniq_ints(num_ints ::Integer, S, rng ::AbstractRNG = Base.GLOBAL_RNG)
     if num_ints > length(S)
         error(logger, "num_ints > length(S), i.e. no enough values to choose from")
     end
@@ -256,8 +260,8 @@ function insert2ary(
     el2ins,
     num_ins             ::Integer,
     ary                 ::AbstractArray,
-    seek2ins_along_dim  ::Integer =1,
-    rng                 ::AbstractRNG =Base.GLOBAL_RNG
+    seek2ins_along_dim  ::Integer = 1,
+    rng                 ::AbstractRNG = Base.GLOBAL_RNG
 )
     const dim_len = size(ary)[seek2ins_along_dim]
     const idx_range = 1:(dim_len + num_ins)
@@ -272,7 +276,7 @@ function insert2ary(
     const ary_ut = Array{Union{eltype(ary),typeof(el2ins)},ary_ndims}(ary)
     select_all_idx_vec = Vector{Any}(fill(Colon(), ary_ndims)) ## make sure eltype is a supertype of Vector{Int}
     const ary_size = size(ary)
-    const ins_size = map(range(1, ary_ndims)) do i
+    const ins_size = map(1:ary_ndims) do i
         i == seek2ins_along_dim ? 1 : ary_size[i]
     end
     const ins_slice = fill(el2ins, ins_size...)
@@ -295,29 +299,29 @@ function generate_req_sc(;
     ## random unless individually specified
     ## NA not counted as a unique value for `num_uniq`
 
-    num_wells ::Integer =16,
-    num_channels ::Integer =2,
+    num_wells           ::Integer = 16,
+    num_channels        ::Integer = 2,
 
-    target_vec ::AbstractVector =[],
-    num_uniq_targets ::Integer =10,
-    lb_num_na_targets ::Integer =2,
+    target_vec          ::AbstractVector = [],
+    num_uniq_targets    ::Integer = 10,
+    lb_num_na_targets   ::Integer = 2,
 
-    cq_vec ::AbstractVector =[],
-    cq_bounds ::Tuple =(0.01, 40.0),
-    num_na_cqs ::Integer =3,
+    cq_vec              ::AbstractVector = [],
+    cq_bounds           ::Tuple = (0.01, 40.0),
+    num_na_cqs          ::Integer = 3,
 
-    qm_vec ::AbstractVector =[],
-    qm_bounds ::Tuple =(1, 10),
-    qb_vec ::AbstractVector =[],
-    qb_bounds ::Tuple{Int,Int} =(-20, 20),
-    num_na_qtys ::Integer =0,
+    qm_vec              ::AbstractVector = [],
+    qm_bounds           ::Tuple = (1, 10),
+    qb_vec              ::AbstractVector = [],
+    qb_bounds           ::Tuple{Int,Int} = (-20, 20),
+    num_na_qtys         ::Integer = 0,
 
-    sample_vec ::AbstractVector =[],
-    num_uniq_samples ::Integer =4,
-    num_na_samples ::Integer =2,
+    sample_vec          ::AbstractVector = [],
+    num_uniq_samples    ::Integer = 4,
+    num_na_samples      ::Integer = 2,
 
-    rng_type ::DataType =MersenneTwister,
-    seed ::Integer =1
+    rng_type            ::DataType = MersenneTwister,
+    seed                ::Integer = 1
 )
     rng = rng_type(seed)
 
@@ -344,13 +348,14 @@ function generate_req_sc(;
         println("randomly generating targets...") ## target values should not be the same across different channels for the same well
         num_nna_targets = num_measrmts - channelwide_num_na_targets - addi_num_na_targets
         target_vec = insert2ary(NaN, addi_num_na_targets, fill(0, num_nna_targets), 1, rng)
-        nna_channel_idc = find(1:num_channels) do channel_i
-            !(channel_i in na_channel_idc)
-        end
+        nna_channel_idc =
+            find(1:num_channels) do channel_i
+                !(channel_i in na_channel_idc)
+            end
         available_targets = 1:num_uniq_targets
         num_uniq_targets_perchannel = Int(floor(num_uniq_targets / num_channels))
         for channel_i in nna_channel_idc
-            target_idc_thischannel = ((1:num_wells) .-1) .* num_channels .+ channel_i
+            target_idc_thischannel = ((1:num_wells) .- 1) .* num_channels .+ channel_i
             nna_target_idc = target_idc_thischannel[
                 map(target_idx -> !isnan(target_vec[target_idx]), target_idc_thischannel)]
             uniq_targets_thischannel =
@@ -403,9 +408,10 @@ function generate_req_sc(;
         error(logger, "sample_vec not empty but length not same as num_wells")
     end
 
-    req_vec = map(1:num_wells) do well_i
+    req = map(1:num_wells) do well_i
         OrderedDict(
-            :well   => map(1:num_channels) do channel_i
+            :well => 
+                map(1:num_channels) do channel_i
                     measrmt_i = (well_i - 1) * num_channels + channel_i
                     OrderedDict(
                         :target     => target_vec[measrmt_i],
@@ -413,11 +419,11 @@ function generate_req_sc(;
                         :quantity   => OrderedDict(
                             :m          => qm_vec[measrmt_i],
                             :b          => qb_vec[measrmt_i]))
-                end,
+                end, ## next channel_i
             :sample => sample_vec[well_i])
-    end ## do well_i
+    end ## next well_i
 
-    return (JSON.json(req_vec), req_vec)
+    return (JSON.json(req), req)
 end ## generate_req_sc
 
 

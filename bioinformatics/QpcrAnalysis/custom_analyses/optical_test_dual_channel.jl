@@ -47,6 +47,8 @@ const WATER_MIN = [1000, -1000]
 ## called by dispatch()
 function act(
     ::Type{Val{optical_test_dual_channel}},
+    req             ::Associative; ## keys: "baseline", "water", "FAM", "HEX"
+    out_format      ::OutputFormat = pre_json_output
     ## remove MySqldependency
     #
     # db_conn ::MySQL.MySQLHandle,
@@ -55,8 +57,6 @@ function act(
     #
     # start: arguments that might be passed by upstream code
     # well_nums ::AbstractVector =[],
-    ot_dict         ::Associative; ## keys: "baseline", "water", "FAM", "HEX"
-    out_format      ::OutputFormat = pre_json_output
 )
     function SNR_test(w, label)
         const (baseline_2chs, water_fluo_2chs, signal_fluo_2chs) =
@@ -92,7 +92,7 @@ function act(
                         # fluo_data[:fluorescence_value][
                         #     (fluo_data[:step_id] .== calib_info[label]["step_id"]) .& (fluo_data[:channel] .== channel)
                         # ]
-                        channel -> ot_dict[string(label)][FLUORESCENCE_VALUE_KEY][channel],
+                        channel -> req[string(label)][FLUORESCENCE_VALUE_KEY][channel],
                         hcat,
                         CHANNELS)
             end)

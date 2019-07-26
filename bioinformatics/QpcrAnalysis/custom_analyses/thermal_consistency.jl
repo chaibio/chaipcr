@@ -38,7 +38,7 @@ function act(
     # exp_id ::Integer,
     # stage_id ::Integer,
     # calib_info ::Union{Integer,OrderedDict};
-    req_dict            ::Associative;
+    req                 ::Associative;
     dcv                 ::Bool          = DEFAULT_CAL_DCV, ## if true, perform multi-channel deconvolution
     auto_span_smooth    ::Bool          = DEFAULT_MC_AUTO_SPAN_SMOOTH,
     span_smooth_default ::Real          = DEFAULT_MC_SPAN_SMOOTH_DEFAULT,
@@ -50,13 +50,13 @@ function act(
     debug(logger, "at act(::Type{Val{thermal_consistency}})")
     #
     ## required fields
-    @get_calibration_data_from_req_dict(thermal_consistency)
-    @parse_raw_data_from_req_dict(thermal_consistency)
+    @get_calibration_data_from_req(thermal_consistency)
+    @parse_raw_data_from_req(thermal_consistency)
     #
     ## keyword arguments
     const kwargs = MC_FIELD_DEFS |>
-        sift(x -> x.key in keys(req_dict)) |>
-        mold(x -> x.name => req_dict[x.key])
+        sift(x -> x.key in keys(req)) |>
+        mold(x -> x.name => req[x.key])
     #
     ## create container for data and parameter values
     interface = McInput(

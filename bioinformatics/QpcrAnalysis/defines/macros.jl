@@ -40,15 +40,15 @@ macro make_constructor_from_SCHEMA(structname)
     end
 end ## macro
 
-"Parse raw data data from `req_dict`"
-macro parse_raw_data_from_req_dict(action)
+"Parse raw data data from request."
+macro parse_raw_data_from_req(action)
     esc( :(
         begin
             req_key(RAW_DATA_KEY) ||
                 return ArgumentError(
                     "no raw data for " * string($action) * " analysis in request")
             const parsed_raw_data = try
-                parse_raw_data(Val{$action}, req_dict[RAW_DATA_KEY])
+                parse_raw_data(Val{$action}, req[RAW_DATA_KEY])
             catch()
                 ArgumentError(
                     "cannot parse raw data for " * string($action) * " analysis")
@@ -58,16 +58,16 @@ macro parse_raw_data_from_req_dict(action)
         end ) )
 end ## macro
 
-"Get calibration data from `req_dict`"
-macro get_calibration_data_from_req_dict(action)
+"Get calibration data from request."
+macro get_calibration_data_from_req(action)
     esc( :(
         begin
-            req_key = curry(haskey)(req_dict)
+            req_key = curry(haskey)(req)
             req_key(CALIBRATION_INFO_KEY) ||
                 return ArgumentError(
                     "no calibration data for " * string($action) * " analysis in request")
             const calibration_data = try
-                CalibrationData(req_dict[CALIBRATION_INFO_KEY])
+                CalibrationData(req[CALIBRATION_INFO_KEY])
             catch()
                 ArgumentError(
                     "cannot parse calibration data for " * string($action) * " analysis")

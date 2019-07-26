@@ -33,13 +33,13 @@ const MAX_TIME_TO_HEAT  = 90e3      ## ms
 ## called by dispatch()
 function act(
     ::Type{Val{thermal_performance_diagnostic}},
+    req             ::Associative;
+    out_format      ::OutputFormat = pre_json_output
     ## remove MySql dependency
     #
     # db_conn ::MySQL.MySQLHandle,
     # exp_id ::Integer, # really used
     # calib_info ::Union{Integer,OrderedDict} ## not used for computation
-    temperatureData ::Associative;
-    out_format      ::OutputFormat = pre_json_output
 )
     debug(logger, "at act(::Type{Val{thermal_performance_diagnostic}})")
 
@@ -49,7 +49,7 @@ function act(
     # temperatureData = MySQL.mysql_execute(db_conn, queryTemperatureData)[1]
     # num_dp = length(temperatureData[1]) ## dp = data points
 
-    const elapsed_times = temperatureData[ELAPSED_TIME_KEY]
+    const elapsed_times = req[ELAPSED_TIME_KEY]
     const num_dp = length(elapsed_times)
     #
     ## add a new column (not row) that is the average of the two heat block zones
@@ -57,7 +57,7 @@ function act(
         map(range(1, num_dp)) do i
             mean(
                 map([HEAT_BLOCK_ZONE_1_TEMP_KEY, HEAT_BLOCK_ZONE_2_TEMP_KEY]) do zone
-                    temperatureData[zone][i]
+                    req[zone][i]
                 end) ## do zone                
         end ## do i
     #
@@ -100,17 +100,17 @@ function act(
             round(
                 maximum(
                     abs.(
-                        temperatureData[HEAT_BLOCK_ZONE_1_TEMP_KEY][elapsed_time_idc] .-
-                            temperatureData[HEAT_BLOCK_ZONE_2_TEMP_KEY][elapsed_time_idc])),
+                        req[HEAT_BLOCK_ZONE_1_TEMP_KEY][elapsed_time_idc] .-
+                            req[HEAT_BLOCK_ZONE_2_TEMP_KEY][elapsed_time_idc])),
                 JSON_DIGITS)
         end ## do time_vec
     ## calculate the average ramp rate of the lid heater in degrees °C per second
     const lidHeaterStartRampTime =
         minimum(elapsed_times[
-            temperatureData[LID_TEMP_KEY] .> LOW_TEMP_pDELTA])
+            req[LID_TEMP_KEY] .> LOW_TEMP_pDELTA])
     const lidHeaterStopRampTime =
         maximum(elapsed_times[
-            temperatureData[LID_TEMP_KEY] .< HIGH_TEMP_mDELTA])
+            req[LID_TEMP_KEY] .< HIGH_TEMP_mDELTA])
     const Lid_TotalTime = lidHeaterStopRampTime - lidHeaterStartRampTime
     const Lid_HeatingRate = round(temp_range_adj / Lid_TotalTime, JSON_DIGITS)
     #

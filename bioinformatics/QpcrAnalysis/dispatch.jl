@@ -1,4 +1,3 @@
-
 #===============================================================================
 
     dispatch.jl
@@ -22,24 +21,22 @@ function dispatch(
     request_body    ::AbstractString;
     verify          ::Bool = false
 )
-    const action_str = "\"$action_key\""
-    debug(logger, "at dispatch() with action $action_str")
+    debug(logger, "at dispatch() with action \"$action_key\"")
     # debug(logger, "request body is:\n" * request_body)
-    #
     const result = try
         ## NB. DefaultDict and DefaultOrderedDict constructors sometimes don't work
         ## on OrderedDict (https://github.com/JuliaLang/DataStructures.jl/issues/205)
-        req_parsed = JSON.parse(request_body; dicttype=OrderedDict)
+        req_parsed = JSON.parse(request_body; dicttype = OrderedDict)
         #=
             Issue:
             By default the JSON parser converts Arrays and Dicts to type ::Any.
             It is important to annotate the type of data structures wherever
-            they are known to avoid wasting time and memory downstream.
+            they are known to avoid wasting time and mem`ory downstream.
             Since the data structures are specific to each action,
             this should generally be done in the generic act() methods.
         =#
         if !(action_key in keys(ACT))
-            error(logger, "action $action_str is not recognized")
+            error(logger, "action \"$action_key\" is not recognized")
         end
         ## else
         const action = Val{ACT[action_key]}
@@ -51,8 +48,8 @@ function dispatch(
                 const verify_input = try
                     verify_request(action, req_parsed)
                 catch()
-                    warn(logger, "data supplied with " * action_str *
-                        " request is in the wrong format")
+                    warn(logger, "data supplied with \"$action_key\"" *
+                        "request is in the wrong format")
                 end ## try
             end ## if verify
         end ## if !production_env
@@ -70,7 +67,7 @@ function dispatch(
                     verify_response(action,
                         JSON.parse(json_response, dicttype = OrderedDict))
                 catch()
-                    warn(logger, "data returned from " * action_str *
+                    warn(logger, "data returned from \"$action_key\"" *
                         " request is in the wrong format")
                 end ## try
             end ## if verify
@@ -78,19 +75,19 @@ function dispatch(
         #
         ## return value
         json_response
-        #
     catch err
         fail(logger, err; bt = true)
-    end ## result = try
+    end ## try
     #
     const success = !isa(result, Exception)
-    const response_body = if success
-        string(result)
-    else
-        JSON.json(Dict(
-            :valid => false,
-            :error => sprint(showerror, result)))
-    end ## if success
+    const response_body =
+        if success
+            string(result)
+        else
+            JSON.json(Dict(
+                :valid => false,
+                :error => sprint(showerror, result)))
+        end ## if
     debug(logger, "returning from dispatch()")
     debug(logger, "success: $success")
     debug(logger, "response body: " * response_body)
@@ -103,11 +100,11 @@ end ## dispatch()
 
 ## unused function
 ## get keyword arguments from request
-# function get_kw_from_req(key_vec ::AbstractVector, req_dict ::Associative)
+# function get_kw_from_req(key_vec ::AbstractVector, req ::Associative)
 #     pair_vec = Vector{Pair}()
 #     for key in key_vec
-#         if haskey(req_dict, key)
-#             push!(pair_vec, Symbol(key) => req_dict[key])
+#         if haskey(req, key)
+#             push!(pair_vec, Symbol(key) => req[key])
 #         end ## if
 #     end ## for
 #     return OrderedDict(pair_vec)
