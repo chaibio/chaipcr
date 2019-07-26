@@ -28,7 +28,7 @@ macro make_constructor_from_SCHEMA(structname)
     if !no_constructor
         kw_args  = SCHEMA |> sift(!no_default) |> mold(kw_arg)
         var_args = SCHEMA |> sift( no_default) |> mold(var_arg)
-        varnames = SCHEMA |> mold(field(:name))
+        varnames = SCHEMA |> their(:name)
         esc(
             Expr(:(=),
                 Expr(:call,
@@ -40,23 +40,6 @@ macro make_constructor_from_SCHEMA(structname)
     end
 end ## macro
 
-"Parse raw data data from request."
-macro parse_raw_data_from_req(action)
-    esc( :(
-        begin
-            req_key(RAW_DATA_KEY) ||
-                return ArgumentError(
-                    "no raw data for " * string($action) * " analysis in request")
-            const parsed_raw_data = try
-                parse_raw_data(Val{$action}, req[RAW_DATA_KEY])
-            catch()
-                ArgumentError(
-                    "cannot parse raw data for " * string($action) * " analysis")
-            end ## try
-            isa(parsed_raw_data, ArgumentError) &&
-                return fail(logger, parsed_raw_data)
-        end ) )
-end ## macro
 
 "Get calibration data from request."
 macro get_calibration_data_from_req(action)
@@ -74,6 +57,25 @@ macro get_calibration_data_from_req(action)
             end ## try
             isa(calibration_data, ArgumentError) &&
                 return fail(logger, calibration_data)
+        end ) )
+end ## macro
+
+
+"Parse raw data data from request."
+macro parse_raw_data_from_req(action)
+    esc( :(
+        begin
+            req_key(RAW_DATA_KEY) ||
+                return ArgumentError(
+                    "no raw data for " * string($action) * " analysis in request")
+            const parsed_raw_data = try
+                parse_raw_data(Val{$action}, req[RAW_DATA_KEY])
+            catch()
+                ArgumentError(
+                    "cannot parse raw data for " * string($action) * " analysis")
+            end ## try
+            isa(parsed_raw_data, ArgumentError) &&
+                return fail(logger, parsed_raw_data)
         end ) )
 end ## macro
 

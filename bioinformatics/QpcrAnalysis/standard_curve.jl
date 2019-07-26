@@ -31,7 +31,13 @@ function act(
     debug(logger, "at act(::Type{Val{standard_curve}})")
     #
     ## parse data
-    const req_df = req2df(req)
+    const req_df =
+        try
+            parse_raw_data(Val{standard_curve}, req)
+        catch()
+            fail(logger, ArgumentError(
+                "cannot parse raw data for standard curve analysis"))
+        end ## try
     #
     ## empty dataset
     if  size(req_df, 2) == 0 ||
@@ -46,7 +52,7 @@ function act(
         if isnan(target_id)
             empty_tre
         else
-            const used = !isnan(chunk_target[:, :qty]) .& !isnan(chunk_target[:, :cq])
+            const used = .!isnan.(chunk_target[:, :qty]) .& .!isnan.(chunk_target[:, :cq])
             ## better to use GLM.jl here
             const x = log.(qty_base, chunk_target[used, :qty])
             const y = chunk_target[used, :cq]
@@ -109,7 +115,7 @@ function act(
             const err_msg = "less 2 valid data points of cq and/or qty available for fitting standard curve"
             warn(logger, err_msg)
             target_result = OrderedDict(
-                :target_id => getfield(tre, :target_id),
+                :target_id => tre.target_id,
                 :error     => err_msg)
         else
             target_result = tre
@@ -176,7 +182,7 @@ sumsq(y) = sum(y .^ 2)
 ## dependencies of `standard_curve`
 
 ## parse req into a dataframe
-function req2df(req ::AbstractVector)
+function parse_raw_data(::Type{Val{standard_curve}}, req ::AbstractVector)
     (length(req) == 0) && return DataFrame()
     #
     well_vec    = Vector{Int}()
@@ -333,20 +339,21 @@ function generate_req_sc(;
         channelwide_num_na_targets = num_na_channels * num_wells
         na_channel_idc = generate_uniq_ints(num_na_channels, 1:num_channels, rng)
         addi_num_na_targets = max(0, lb_num_na_targets - channelwide_num_na_targets)
-        println("num_uniq_targets < num_channels. targets will all be na for channel(s) ", join(na_channel_idc, ","))
+        println("num_uniq_targets < num_channels. targets will all be na for channel(s) ",
+            join(na_channel_idc, ","))
     else
         channelwide_num_na_targets = 0
         na_channel_idc = Vector{Int}()
         addi_num_na_targets = lb_num_na_targets
     end
 
-    num_measrmts = num_wells * num_channels
-    println("num_wells and num_channels mandate num_measrmts to be $num_measrmts (including na)")
+    num_measurements = num_wells * num_channels
+    println("num_wells and num_channels mandate num_measurements to be $num_measurements (including na)")
 
     num_targets = length(target_vec)
     if num_targets == 0
         println("randomly generating targets...") ## target values should not be the same across different channels for the same well
-        num_nna_targets = num_measrmts - channelwide_num_na_targets - addi_num_na_targets
+        num_nna_targets = num_measurements - channelwide_num_na_targets - addi_num_na_targets
         target_vec = insert2ary(NaN, addi_num_na_targets, fill(0, num_nna_targets), 1, rng)
         nna_channel_idc =
             find(1:num_channels) do channel_i
@@ -367,25 +374,25 @@ function generate_req_sc(;
             end
         end ## for channel_i
 
-    elseif num_targets != num_measrmts
-        error(logger, "target_vec not empty but length not same as num_measrmts")
+    elseif num_targets != num_measurements
+        error(logger, "target_vec not empty but length not same as num_measurements")
     end ## if num_targets
 
     num_cqs = length(cq_vec)
     if num_cqs == 0
         println("randomly generating cq values...")
-        num_nna_cqs = num_measrmts - num_na_cqs
+        num_nna_cqs = num_measurements - num_na_cqs
         nna_cq_vec = rand(rng, num_nna_cqs) .* -(cq_bounds...) .+ cq_bounds[2] # upperbound - (0,1)seq * scaling_factor
         cq_vec = insert2ary(NaN, num_na_cqs, nna_cq_vec, 1, rng)
-    elseif num_cqs != num_measrmts
-        error(logger, "cq_vec not empty but length not same as num_measrmts")
+    elseif num_cqs != num_measurements
+        error(logger, "cq_vec not empty but length not same as num_measurements")
     end
 
     num_qm = length(qm_vec)
     num_qb = length(qb_vec)
     if num_qm == num_qb == 0
         println("randomly generating quantity values...")
-        num_nna_qtys = num_measrmts - num_na_qtys
+        num_nna_qtys = num_measurements - num_na_qtys
         nna_qm_vec = rand(rng, num_nna_qtys) .* -(qm_bounds...) .+ qm_bounds[2]
         nna_qb_vec = rand(rng, qb_bounds[1]:qb_bounds[2], num_nna_qtys)
         nna_qty_mtx = hcat(nna_qm_vec, nna_qb_vec)
@@ -394,8 +401,8 @@ function generate_req_sc(;
         qb_vec = qty_mtx[:, 2] # not convert to integer due to NaN
     elseif num_qm != num_qb
         error(logger, "lengths of qm_vec and qb_vec not equal")
-    elseif num_qm != num_measrmts
-        error(logger, "qm_vec and qb_vec with equal non-0 length but not same as num_measrmts")
+    elseif num_qm != num_measurements
+        error(logger, "qm_vec and qb_vec with equal non-0 length but not same as num_measurements")
     end
 
     num_samples = length(sample_vec)

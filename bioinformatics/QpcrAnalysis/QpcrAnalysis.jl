@@ -50,9 +50,9 @@ module QpcrAnalysis
 ===============================================================================#
 
     ## define constants & macros:
+    include("defines/keystring_constants.jl")
     include("defines/enums.jl")
     include("defines/macros.jl")
-    include("defines/keystring_constants.jl")
 
     ## define shared functions:
     include("shared_functions.jl")

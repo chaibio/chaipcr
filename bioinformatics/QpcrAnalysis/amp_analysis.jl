@@ -89,10 +89,10 @@ function set_ct_fluos!(
                         NaN) ## i.ct_fluo
                 end ## do well_i
             fits |>
-                mold(field(:quant_status)) |>
+                their(:quant_status) |>
                 find_idc_useful |>
                 curry(getindex)(fits) |>
-                mold(field(:cq_fluo)) |>
+                their(:cq_fluo) |>
                 median
         end ## do channel_i
     return nothing ## side effects only

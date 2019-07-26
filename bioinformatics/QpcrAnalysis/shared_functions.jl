@@ -191,7 +191,9 @@ julia> exp(1im * pi) |> QpcrAnalysis.field(:re)
 field = tail(getfield)  ## field(f...) = x -> getfield(x, f...)
 
 ## used in amplification.jl
-## used in melting_curve.jl
+## used in mc_analysis.jl
+## used in mc_peak_analysis.jl
+## used in shared_functions.jl
 """
     index(inds...)(A)
 
@@ -205,7 +207,9 @@ julia> [1:3 4:6] |> QpcrAnalysis.index(1,2)
 """
 index = tail(getindex)  ## index(i...) = x -> getindex(x, i...)
 
-## used in amplification.jl
+## used in CalibrationData.jl
+## used in amp_analysis.jl
+## used in mc_analysis.jl
 """
     morph(dims...)(A)
 
@@ -315,6 +319,12 @@ julia> [0:10;] |> QpcrAnalysis.fan([minimum, median, maximum]) |> Tuple
 (0, 5.0, 10)
 """
 fan = fs -> x -> map(f -> f(x), fs)
+
+## used in macros.jl
+## used in Field.jl
+## used in amp_analysis.jl
+## used in mc_peak_analysis.jl
+their(f) = x -> map(field(f), x) ## = mold(field(f))
 
 ## used in amplification.jl
 ## used in melting_curve.jl

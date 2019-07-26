@@ -348,11 +348,9 @@ function mc_peak_analysis(
         ## `areas_raw[area_order[i.max_num_peaks + 1]] >= area_lb`
         ## implying `length(filtered_idc_topNp1) > i.max_num_peaks`
         ## If `num_peaks >= i.max_num_peaks` there is no problem.
-        const areas_raw = peaks_raw |> mold(field(:area))
         const min_area = areas_raw[largest_peak] * i.min_normalized_area
         const largest_idc = area_order[min(i.max_num_peaks + 1, num_peaks) |> from(1)]
-        const filtered_idc = largest_idc |>
-            sift(idx -> areas_raw[idx] >= min_area)
+        const filtered_idc = largest_idc |> sift(idx -> areas_raw[idx] >= min_area)
         return length(filtered_idc) > i.max_num_peaks ? [] : filtered_idc
     end ## peak_filter()
 
@@ -424,7 +422,8 @@ function mc_peak_analysis(
     end ## if no peaks
     #
     ## keep only the biggest peak(s)
-    const area_order = sortperm(peaks_raw |> mold(field(:area)), rev = true)
+    const areas_raw = peaks_raw |> their(:area)
+    const area_order = sortperm(areas_raw, rev = true)
     const peaks_filtered = peaks_raw[peak_filter()]
     return output_type == McPeakLongOutput ?
         McPeakLongOutput(
