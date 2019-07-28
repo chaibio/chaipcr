@@ -47,22 +47,32 @@ function act(
     end
     #
     ## target result set
-    const target_result_df = by(req_df, :target) do chunk_target
+    const use = .!isnan.(req_df[:, :qty]) .& .!isnan.(req_df[:, :cq])
+    const target_result_df = by(req_df[use, :], :target) do chunk_target
         const target_id = chunk_target[1, :target]
         if isnan(target_id)
             empty_tre
         else
-            const used = .!isnan.(chunk_target[:, :qty]) .& .!isnan.(chunk_target[:, :cq])
             ## better to use GLM.jl here
-            const x = log.(qty_base, chunk_target[used, :qty])
-            const y = chunk_target[used, :cq]
+            const x =
+                if qty_base == 10
+                    log10.(chunk_target[:, :qty])
+                else
+                    log.(qty_base, chunk_target[:, :qty])
+                end
+            const y = chunk_target[:, :cq]
             const b0, b1 = linreg(x, y)
-            const eff = exp(-log(e, qty_base) / b1) - 1
+            const eff =
+                if qty_base == 10
+                    exp10(-1.0 / b1) - 1.0
+                else
+                    exp(-log(e, qty_base) / b1) - 1.0
+                end
             const yhat = b0 + b1 .* x
             const ybar = mean(y)
             const ss_res = y .- yhat |> sumsq
             const ss_tot = y .- ybar |> sumsq
-            const r2_ = 1 - ss_res / ss_tot
+            const r2_ = 1.0 - ss_res / ss_tot
             ## adjusted R2 ?
             TargetResultEle(
                 target_id,

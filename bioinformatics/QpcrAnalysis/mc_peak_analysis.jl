@@ -21,24 +21,25 @@ of fluorescence with respect to temperature, for each well and channel."
 function mc_peak_analysis(
     output_type                 ::Type{P},
     i                           ::McInput,
-    tf_dict                     ::Associative,
+    df                          ::DataFrame,
 ) where {P <: McPeakOutput}
 
     ## functions to parse input data >>
 
     "Filter out data points that are separated by narrow temperature intervals."
-    filter_too_close(tf_dict ::Associative) =
-        Dict(key => tf_dict[key][(
-                tf_dict[:temperatures] |> temperature_intervals |> not_too_close)]
-            for key in keys(tf_dict))
+    filter_too_close(df ::DataFrame) =
+        df[df[:temperature] |> temperature_intervals |> not_too_close, :]
 
     "Calculate temperature intervals."
-    temperature_intervals(temperatures_orig ::Array{<: AbstractFloat,1}) =
-        vcat(diff(temperatures_orig), Inf)
+    temperature_intervals(temps_orig ::Vector{<: AbstractFloat}) =
+        vcat(diff(temps_orig), Inf)
 
     "Criterion for narrow temperature intervals."
-    not_too_close(temp_intervals ::Array{<: AbstractFloat,1}) =
+    not_too_close(temp_intervals ::Vector{<: AbstractFloat}) =
         temp_intervals .> i.temp_too_close_frac * median(temp_intervals)
+
+    jitter_temps!(df ::DataFrame) =
+        (mutate_dups(df[:temperature], i.jitter_constant), df[:fluorescence])
 
     ## functions used to calculate `span_smooth` >>
 
@@ -58,8 +59,8 @@ function mc_peak_analysis(
 
         larger_span(span_smooth_product ::Real) =
             if span_smooth_product > i.span_smooth_default
-                info(logger, "`span_smooth` was selected as $span_smooth")
-                return span_smooth_product(temperatures, fluos, fu)
+                info(logger, "`span_smooth` was selected as $span_smooth_product")
+                return span_smooth_product
             else
                 info(logger, "`span_smooth_product` $span_smooth_product < " *
                     "`span_smooth_default`, use `span_smooth_default` " *
@@ -73,7 +74,7 @@ function mc_peak_analysis(
             i.span_smooth_factor * max_fu_temp_span(fu_idc()) / i.temp_span
 
         max_fu_temp_span(fu ::AbstractVector{Int}) =
-            maximum(temperatures[fu_idc[2:2:end]] .- temperatures[fu[1:2:end]])
+            maximum(temps[fu_idc[2:2:end]] .- temps[fu[1:2:end]])
 
         fu_idc() = (cumsum(fu[1][1] ? vcat(0,fu[2]) : fu[2]) .+ 1)[1:2*sum(fu[1])]
 
@@ -103,9 +104,7 @@ function mc_peak_analysis(
     "Find the region of length 2 * `temperature_bandwidth` showing the steepest
     fluorescence decrease between start and end."
     max_fluo_decrease() =
-        indmax(
-            fluo_decrease(temps_in_span(i))
-            for i in 1:len_raw)
+        indmax(fluo_decrease(temps_in_span(i)) for i in 1:len_raw)
 
     fluo_decrease(sel_idc_int ::AbstractVector{Int}) =
         fluos[sel_idc_int[1]] - fluos[sel_idc_int[end]]
@@ -121,7 +120,7 @@ function mc_peak_analysis(
         end
 
     temps_in_span(i ::Int) =
-        find_in_span(temperatures, i, i.temperature_bandwidth)
+        find_in_span(temps, i, i.temperature_bandwidth)
 
     ## smoothing functions >>
 
@@ -136,7 +135,7 @@ function mc_peak_analysis(
 
     "Smooth raw fluorescence values."
     smooth_raw_fluo() =
-        (temperatures, supsmu(temperatures, fluos, span_smooth / i.denser_factor))
+        (temps, supsmu(temps, fluos, span_smooth / i.denser_factor))
 
     "Model fluorescence as a cubic spline function of temperature, then recalculates
     the fluorescence and its derivative with respect to temperature using a denser
@@ -200,7 +199,7 @@ function mc_peak_analysis(
     find_summits_and_nadirs() =
         [maximum, minimum] |> mold(f -> find_local(f, negderiv_smu, half_peak_window()))
 
-    summits_and_nadirs(sn_idc...) =
+    summits_and_nadirs(sn_idc) =
         OrderedDict(
             zip([:summit, :nadir],
                 sn_idc |> mold(idc -> smoothed_data[idc, :])))
@@ -325,7 +324,7 @@ function mc_peak_analysis(
                 i.norm_negderiv_quantile) ## larger_normd_qtv_of_two_sides
                     > i.max_norm_negderiv) ||
             (count_cross_points() > min(i.max_num_cross_points, len_raw * i.noise_factor)) ||
-            (linreg(temperatures, fluos)[2] >= 0.0) ## slope
+            (linreg(temps, fluos)[2] >= 0.0) ## slope
             return []
         end ## if
         ## else
@@ -360,25 +359,20 @@ function mc_peak_analysis(
     #
     ## filter out data points separated by narrow temperature intervals
     ## return temperatures as array, assuming no missing values
-    # debug(logger, repr(tf_dict))
-    const (temperatures, fluos) =
-        tf_dict |>
-        filter_too_close |>
-        # tf -> (mutate_dups(tf[:temperatures].data, i.jitter_constant), tf[:fluos])
-        tf -> (mutate_dups(tf[:temperatures], i.jitter_constant), tf[:fluos])
-    const len_raw = length(temperatures)
+    const (temps, fluos)    = df |> filter_too_close |> jitter_temps!
+    const len_raw           = length(temps)
     #
     ## negative derivative by central finite differencing (cfd)
     ## only used if the data array is too short to find peaks
     if (len_raw <= 3)
-        const slope = finite_diff(temperatures, fluos; nu = 1)
+        const slope = finite_diff(temps, fluos; nu = 1)
         return McPeakOutput(output_type;
-            observed_data = i.reporting(hcat(temperatures, fluos, -slope)))
+            observed_data = i.reporting(hcat(temps, fluos, -slope)))
     end ## if
     #
     ## else
-    const min_temp          = minimum(temperatures)
-    const max_temp          = maximum(temperatures)
+    const min_temp          = minimum(temps)
+    const max_temp          = maximum(temps)
     const temp_span         = max_temp - min_temp
     #
     ## choose smoothing parameter
@@ -389,7 +383,7 @@ function mc_peak_analysis(
     const spl               = spline_model(smooth_raw_fluo())
     const denser_temps      = interpolated_temperatures()
     const smoothed_data     = smoothed_data_matrix()
-    const negderiv_smu      = smoothed_data[:,3]
+    const negderiv_smu      = smoothed_data[:, 3]
     const max_negderiv_smu  = findmax(negderiv_smu)
     const negderiv_midrange =
         mean([quantile(negderiv_smu, i.negderiv_range_low_quantile), max_negderiv_smu[1]])
@@ -401,7 +395,7 @@ function mc_peak_analysis(
     ## find peak and trough locations
     ## `sn` - summits and nadirs
     const sn_idc            = find_summits_and_nadirs()
-    const sn_dict           = summits_and_nadirs(sn_idc...)
+    const sn_dict           = summits_and_nadirs(sn_idc)
     #
     ## estimate area of peaks above baseline
     const peaks_raw         = find_peaks(sn_idc...)

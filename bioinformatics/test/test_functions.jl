@@ -289,7 +289,7 @@ end
 
 ## Meltcurve timings 12 July 2019
 
-# mc3 = test_functions["meltcurve single channel"]()
+# mc3 = test_functions["melting curve single channel"]()
 # # open("/tmp/mc3-test.json","w") do f
 # #     JSON.print(f, mc3[2]["melt_curve_analysis"])
 # # end
@@ -298,63 +298,23 @@ end
 # mc3_local == mc3_saved ## should be true
 # using Memento
 # setlevel!(QpcrAnalysis.logger, "warn")
-# # @timev for i in 1:100; test_functions["meltcurve single channel"](); end;
-# using BenchmarkTools
-# @benchmark test_functions["meltcurve single channel"]()
+# # using BenchmarkTools
+# # @benchmark test_functions["melting curve single channel"]()
+# @timev for i in 1:100; test_functions["melting curve single channel"](); end;
 
-## commit c4d3ac425fbfa1e65ae352f1e78b1483645754e5
-# BenchmarkTools.Trial:
-#   memory estimate:  89.58 MiB
-#   allocs estimate:  544655
-#   --------------
-#   minimum time:     129.748 ms (8.59% GC)
-#   median time:      133.773 ms (9.97% GC)
-#   mean time:        134.578 ms (10.02% GC)
-#   maximum time:     156.465 ms (6.52% GC)
-#   --------------
-#   samples:          38
-#   evals/sample:     1
+## commit "fixed error in selection of smoothing parameter for melting curve analysis"
+#  11.660345 seconds (53.87 M allocations: 8.660 GiB, 11.45% gc time)
+# elapsed time (ns): 11660345000
+# gc time (ns):      1335187000
+# bytes allocated:   9298158176
+# pool allocs:       53788340
+# non-pool GC allocs:67900
+# malloc() calls:    8700
+# realloc() calls:   1200
+# GC pauses:         406
+# full collections:  1
 
-## commit 43161cad1e67aa8073efb63ec3be51bd5c21a3fd
-# BenchmarkTools.Trial:
-#   memory estimate:  88.82 MiB
-#   allocs estimate:  539324
-#   --------------
-#   minimum time:     131.895 ms (9.63% GC)
-#   median time:      138.426 ms (10.46% GC)
-#   mean time:        139.572 ms (10.57% GC)
-#   maximum time:     163.011 ms (7.00% GC)
-#   --------------
-#   samples:          36
-#   evals/sample:     1
-
-## commit c4d3ac425fbfa1e65ae352f1e78b1483645754e5
-# BenchmarkTools.Trial:
-#   memory estimate:  88.83 MiB
-#   allocs estimate:  539341
-#   --------------
-#   minimum time:     243.293 ms (7.69% GC)
-#   median time:      268.042 ms (7.84% GC)
-#   mean time:        269.678 ms (7.85% GC)
-#   maximum time:     311.692 ms (4.76% GC)
-#   --------------
-#   samples:          19
-#   evals/sample:     1
-
-## commit 00f645a6adfdbb99ab2279b6358f0fc50a21e532
-# BenchmarkTools.Trial:
-#   memory estimate:  88.83 MiB
-#   allocs estimate:  539341
-#   --------------
-#   minimum time:     241.817 ms (8.47% GC)
-#   median time:      263.864 ms (8.24% GC)
-#   mean time:        263.688 ms (8.25% GC)
-#   maximum time:     301.315 ms (5.61% GC)
-#   --------------
-#   samples:          19
-#   evals/sample:     1
-
-# commit dce3b4a1265df1ca5582283b374b118f0c3d3195
+## commit dce3b4a1265df1ca5582283b374b118f0c3d3195
 # BenchmarkTools.Trial:
 #   memory estimate:  88.80 MiB
 #   allocs estimate:  538375
@@ -367,7 +327,7 @@ end
 #   samples:          40
 #   evals/sample:     1
 
-# commit a01b3b50a6e753f3ce92d4a33c1cc9adbb6256b7:
+## commit a01b3b50a6e753f3ce92d4a33c1cc9adbb6256b7:
 # 12.023655 seconds (52.23 M allocations: 8.743 GiB, 11.55% gc time)
 # elapsed time (ns): 12023655000
 # gc time (ns):      1388750000
@@ -404,7 +364,7 @@ end
 # full collections:  3
 
 
-# mc4 = test_functions["meltcurve dual channel"]()
+# mc4 = test_functions["melting curve dual channel"]()
 # # open("/tmp/mc4-test.json","w") do f
 # #     JSON.print(f, mc4[2]["melt_curve_analysis"])
 # # end
@@ -413,11 +373,23 @@ end
 # mc4_local == mc4_saved ## should be true
 # using Memento
 # setlevel!(QpcrAnalysis.logger, "warn")
-# # @timev for i in 1:100; test_functions["meltcurve dual channel"](); end;
-# using BenchmarkTools
-# @benchmark test_functions["meltcurve dual channel"]()
+# # using BenchmarkTools
+# # @benchmark test_functions["meltcurve dual channel"]()
+# @timev for i in 1:100; test_functions["melting curve dual channel"](); end;
 
-## commit c964da0fe71de22009e5ea3881d1b0629b179e9c !!!
+## commit "fixed error in selection of smoothing parameter for melting curve analysis"
+#  22.297143 seconds (107.45 M allocations: 15.962 GiB, 10.65% gc time)
+# elapsed time (ns): 22297143000
+# gc time (ns):      2373774000
+# bytes allocated:   17138929472
+# pool allocs:       107307234
+# non-pool GC allocs:125503
+# malloc() calls:    17100
+# realloc() calls:   1400
+# GC pauses:         747
+# full collections:  2
+
+## commit c964da0fe71de22009e5ea3881d1b0629b179e9c
 # BenchmarkTools.Trial:
 #   memory estimate:  163.67 MiB
 #   allocs estimate:  1073208
@@ -468,9 +440,6 @@ end
 # full collections:  5
 
 
-# mc4 = test_functions["meltcurve dual channel"]()
-# @timev for i in 1:100; test_functions["meltcurve dual channel"](); end;
-#
 # mc11 = test_functions["thermal consistency dual channel"]()
 # # open("/tmp/mc11-master.json","w") do f
 # #     JSON.print(f, mc11[2])
@@ -478,6 +447,12 @@ end
 # master11 = JSON.parsefile("/tmp/mc11-master.json")
 # mc11[2] == master11 ## should be true
 # @timev for i in 1:100; test_functions["thermal consistency dual channel"](); end;
+
+
+# standard curve results
+# response_body:
+# {"targets":[{"target_id":1,"slope":9.119527,"offset":35.45153,"efficiency":-0.223136,"r2":0.075808},{"target_id":2,"slope":-2.499102,"offset":12.596607,"efficiency":1.512718,"r2":0.298742}],"groups":[],"valid":true}
+# (true, DataStructures.OrderedDict{String,Any}("targets"=>Any[DataStructures.OrderedDict{String,Any}("target_id"=>1,"slope"=>9.11953,"offset"=>35.4515,"efficiency"=>-0.223136,"r2"=>0.075808), DataStructures.OrderedDict{String,Any}("target_id"=>2,"slope"=>-2.4991,"offset"=>12.5966,"efficiency"=>1.51272,"r2"=>0.298742)],"groups"=>Any[],"valid"=>true))
 
 
 #===============================================================================

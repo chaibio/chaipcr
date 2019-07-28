@@ -19,7 +19,7 @@ import Memento: debug
     field names >>
 ===============================================================================#
 
-const MC_TF_KEYS = [:temperature, :fluorescence]
+# const MC_TF_KEYS = [:temperature, :fluorescence]
 const MC_OUTPUT_FIELDS = OrderedDict(
     :observed_data          => :melt_curve_data,
     :peaks_filtered         => :melt_curve_analysis)
@@ -166,28 +166,25 @@ function mc_analysis(i ::McInput)
     end ## transform_3d()
 
     normalize_tf(ci ::Integer, wi ::Integer) =
-        normalize_fluos(
+        normalize_fluos!(
             remove_when_temperature_NaN(
-                # mc_data_bychannel[ci].temperature[:, wi],
-                raw_temps.data[ :, wi, ci],
-                calibrated_data[:, wi, ci])...)
+                DataFrame(
+                    :temperature    => raw_temps.data[ :, wi, ci],
+                    :fluorescence   => calibrated_data[:, wi, ci])))
 
     "Take as input a vector of temperatures and a vector of fluorescences, and set
     the fluorescence to NaN wherever the corresponding temperature value is NaN."
-    remove_when_temperature_NaN(x...) =
-        # map(y -> y[broadcast(!isnan, first(x))], x)
-        x |> mold(first(x) |> cast(!isnan) |> index)
+    remove_when_temperature_NaN(df ::DataFrame) =
+        df[.!isnan.(df[:temperature]), :]
 
     "Normalize fluorescences values by subtracting the lowest value. Note that
     if any value is NaN, the result will be a vector of NaNs."
-    normalize_fluos(
-        temperatures    ::AbstractVector{<: AbstractFloat},
-        fluos_raw       ::AbstractVector{<: AbstractFloat}) =
-            Dict(
-                :temperatures   => temperatures,
-                :fluos          => sweep(minimum)(-)(fluos_raw))
+    function normalize_fluos!(df ::DataFrame)
+        df[:fluorescence] = sweep(minimum)(-)(df[:fluorescence])
+        return df
+    end
 
-    # ## << end of function definitions nested in mc_analysis()
+    ## << end of function definitions nested in mc_analysis()
 
     debug(logger, "at mc_analysis()")
     # const (channels, wells) =
@@ -228,7 +225,7 @@ function mc_analysis(i ::McInput)
     ## subset temperature/fluorescence data by channel / well
     ## then smooth the fluorescence/temperature data and calculate Tm peak, area
     ## result is mc_matrix: dim1 = well, dim2 = channel
-    const mc_matrix =
+    const mcpa_matrix =
         eachindex(i.channels) |> ## do for each channel
         moose(hcat) do ci
             map(eachindex(i.wells)) do wi
@@ -237,8 +234,8 @@ function mc_analysis(i ::McInput)
                 else
                     McPeakOutput(peak_format)
                 end ## if
-            end ## do wi
-        end #= do ci =# |>
+            end ## next wi
+        end #= next ci =# |>
         morph(length(norm_wells), i.num_channels) ## coerce to 2d array
     #
     # if (i.out_format == full_output)
@@ -253,15 +250,16 @@ function mc_analysis(i ::McInput)
             norm_data,
             i.wells,
             calibrated_data,
-            mc_matrix)
+            mcpa_matrix)
     else
         ## json_output, pre_json_output
         ## McPeakShortOutput
-        output_dict = OrderedDict{Symbol,Any}(map(keys(MC_OUTPUT_FIELDS)) do f
-            MC_OUTPUT_FIELDS[f] =>
-                [   i.reporting(getfield(mc_matrix[wi, ci], f))
-                    for wi in 1:i.num_wells, ci in 1:i.num_channels ]
-        end) ## do f
+        output_dict = OrderedDict{Symbol,Any}(
+            map(keys(MC_OUTPUT_FIELDS)) do f
+                MC_OUTPUT_FIELDS[f] =>
+                    [   i.reporting(getfield(mcpa_matrix[wi, ci], f))
+                        for wi in 1:i.num_wells, ci in 1:i.num_channels ]
+            end) ## do f
         output_dict[:valid] = true
         return output_dict
     end ## if out_format
