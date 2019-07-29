@@ -713,8 +713,8 @@ cd ~/chaipcr/deploy/
 
 echo patching rc.local
 cd /etc
-if [ ! -e rc.local ]
-then
+#if [ ! -e rc.local ]
+#then
     echo &quot;Overwriting rc.local.&quot;
     cat &gt; rc.local &lt;&lt; EOF
 #!/bin/sh -e
@@ -734,7 +734,7 @@ exit 0
 
 EOF
 chmod +x rc.local
-fi
+#fi
 
 cd /etc        
 patch -i ~/chaipcr/deploy/device/rc.local.patch  || (echo error patching rc.local)

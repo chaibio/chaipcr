@@ -244,8 +244,11 @@ do
      free -m
 done
 
-umount /dev/mmcblk0p*
-umount /sdcard/*
+umount /dev/mmcblk0p1 || true
+umount /dev/mmcblk0p2 || true
+umount /dev/mmcblk0p2 || true
+
+umount /sdcard/* || true
 
 lsblk
 if mount | grep mmcblk0
