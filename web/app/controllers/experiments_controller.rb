@@ -1209,7 +1209,7 @@ class ExperimentsController < ApplicationController
     background("standardcurve", experiment.id) do
       begin
         start_time = Time.now
-        response = HTTParty.post("http://127.0.0.1:8081/experiments/#{@experiment.id}/standard_curve", body: body.to_json)
+        response = HTTParty.get("http://127.0.0.1:8081/experiments/#{@experiment.id}/standard_curve", body: body.to_json)
         logger.info("Julia code time #{Time.now-start_time}")
         if response.code != 200
           raise_julia_error(response)
@@ -1276,7 +1276,7 @@ class ExperimentsController < ApplicationController
       body = body.merge(amplification_option.to_hash)
       body = body.merge("#{sub_type}_id"=>sub_id)
       logger.info("body=#{body.to_json}")
-      response = HTTParty.post("http://127.0.0.1:8081/experiments/#{experiment.id}/amplification", body: body.to_json, timeout: 180)
+      response = HTTParty.get("http://127.0.0.1:8081/experiments/#{experiment.id}/amplification", body: body.to_json, timeout: 180)
       if response.code != 200
         raise_julia_error(response)
       else
@@ -1389,7 +1389,7 @@ class ExperimentsController < ApplicationController
       body = {calibration_info: calibrate_hash(calibration_id), experiment_id: experiment.id, stage_id: stage_id, raw_data: MeltCurveDatum.julia_hash(experiment.id, stage_id)}
       body = body.merge({qt_prob: 0.1, max_normd_qtv:0.9}) if experiment.experiment_definition.guid == "thermal_consistency"
       logger.info("body=#{body.to_json}")
-      response = HTTParty.post("http://127.0.0.1:8081/experiments/#{experiment.id}/meltcurve", body: body.to_json)
+      response = HTTParty.get("http://127.0.0.1:8081/experiments/#{experiment.id}/meltcurve", body: body.to_json)
       if response.code != 200
         raise_julia_error(response)
       else
@@ -1469,11 +1469,11 @@ class ExperimentsController < ApplicationController
         if experiment.experiment_definition.guid == "optical_cal" || experiment.experiment_definition.guid == "dual_channel_optical_cal_v2"
           body = optical_cal(experiment)
           logger.info("body=#{body.to_json}")
-          response = HTTParty.post("http://127.0.0.1:8081/experiments/#{experiment.id}/optical_cal", body: body.to_json)
+          response = HTTParty.get("http://127.0.0.1:8081/experiments/#{experiment.id}/optical_cal", body: body.to_json)
         elsif self.class.method_defined?(experiment.experiment_definition.guid)
           body = send(experiment.experiment_definition.guid, experiment)
           logger.info("body=#{body.to_json}")
-          response = HTTParty.post("http://127.0.0.1:8081/experiments/#{experiment.id}/#{experiment.experiment_definition.guid}", body: body.to_json)
+          response = HTTParty.get("http://127.0.0.1:8081/experiments/#{experiment.id}/#{experiment.experiment_definition.guid}", body: body.to_json)
         else
           raise "**#{experiment.experiment_definition.guid}** not implemented"
         end
