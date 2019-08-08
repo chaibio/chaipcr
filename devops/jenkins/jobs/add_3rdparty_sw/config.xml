@@ -352,8 +352,8 @@ LC_ALL=C /sbin/sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
 __EOF__
 
 /sbin/partprobe /dev/mmcblk0
-/sbin/mkfs.ext4 /dev/mmcblk0p1 -F
-/sbin/mkfs.ext4 /dev/mmcblk0p2 -F -N 300000
+/sbin/mkfs.ext4 -O ^metadata_csum,^64bit  /dev/mmcblk0p1 -F
+/sbin/mkfs.ext4 -O ^metadata_csum,^64bit  /dev/mmcblk0p2 -F -N 300000
 mkdir -p /sdcard/factory || true
 mkdir -p /sdcard/upgrade || true
 if mount /dev/mmcblk0p1 /sdcard/factory/

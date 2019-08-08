@@ -346,8 +346,8 @@ LC_ALL=C /sbin/sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
 __EOF__
 
 /sbin/partprobe /dev/mmcblk0
-/sbin/mkfs.ext4 /dev/mmcblk0p1 -F
-/sbin/mkfs.ext4 /dev/mmcblk0p2 -F
+/sbin/mkfs.ext4 -O ^metadata_csum,^64bit /dev/mmcblk0p1 -F
+/sbin/mkfs.ext4 -O ^metadata_csum,^64bit /dev/mmcblk0p2 -F
 
 fi
 
@@ -816,7 +816,10 @@ systemctl enable qpcrbrowser.service </command>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo Build/install LCD drivers
+      <command>echo install wifi firmware
+apt-get -y install firmware-realtek
+
+echo Build/install LCD drivers
 # this needs some optimization.. it takes 90MB
 apt-get  -y -q install device-tree-compiler
 cd ~/chaipcr/modules/LCDtouch_V3/49
@@ -1147,7 +1150,7 @@ umount /dev/mmcblk0p*
 rm -r /sdcard/upgrade
 mkdir -p /sdcard/upgrade/
 
-mkfs.ext4 /dev/mmcblk0p1 -F
+mkfs.ext4 -O ^metadata_csum,^64bit /dev/mmcblk0p1 -F
 
 sync
 sync

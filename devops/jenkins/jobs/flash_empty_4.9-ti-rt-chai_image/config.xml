@@ -700,7 +700,7 @@ echo basic image zeroing done!
 sync
 mkdir /data /perm || true
 echo reformatting /data partition
-mkfs.ext4 -F /dev/mmcblk1p2 -L data
+mkfs.ext4 -O ^metadata_csum,^64bit -F /dev/mmcblk1p2 -L data
 sync
 echo restarting!
 

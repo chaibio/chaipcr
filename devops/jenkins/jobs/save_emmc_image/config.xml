@@ -296,8 +296,8 @@ __EOF__
         blockdev --rereadpt /dev/mmcblk0
         hdparm -z /dev/mmcblk0
 
-        mkfs.ext4 /dev/mmcblk0p1
-        mkfs.ext4 /dev/mmcblk0p2
+        mkfs.ext4 -O ^metadata_csum,^64bit  /dev/mmcblk0p1
+        mkfs.ext4 -O ^metadata_csum,^64bit /dev/mmcblk0p2
         
 if LC_ALL=C /sbin/sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
 ,10485760,0x83,*
@@ -529,6 +529,10 @@ eMMC image ($emmc_image_latest_compressed) &lt;a href=&quot;$full_emmc_url&quot;
       &lt;![CDATA[ 
 SDCard image ($sdcard_filename) &lt;a href=&quot;$sdcard_url&quot; download=&quot;sdcard.img&quot;&gt;Download&lt;/a&gt;
     ]]&gt; &lt;/field&gt;
+    &lt;field name=&quot;zSDCard&quot; titlecolor=&quot;&quot; value=&quot;Download&quot; detailcolor=&quot;&quot; href=&quot;$sdcard_url.tgz&quot;&gt; 
+      &lt;![CDATA[ 
+SDCard image tgz ($sdcard_filename) &lt;a href=&quot;$sdcard_url.tgz&quot; download=&quot;sdcard.img&quot;&gt;Download Compressed&lt;/a&gt;
+    ]]&gt; &lt;/field&gt;
 &lt;/section&gt;
 EOF
 
@@ -540,8 +544,8 @@ partition_sdcard() {
 __EOF__
 
      /sbin/partprobe /dev/mmcblk0  || true
-     /sbin/mkfs.ext4 /dev/mmcblk0p1 -F  || true
-     /sbin/mkfs.ext4 /dev/mmcblk0p2 -F  || true
+     /sbin/mkfs.ext4 -O ^metadata_csum,^64bit /dev/mmcblk0p1 -F  || true
+     /sbin/mkfs.ext4 -O ^metadata_csum,^64bit /dev/mmcblk0p2 -F  || true
 }
 
 partition_sdcard &amp;

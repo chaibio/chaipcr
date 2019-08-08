@@ -214,7 +214,7 @@ else
  LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
 ,,0xe,*
 __EOF__
-        mkfs.ext4 /dev/mmcblk0p1
+        mkfs.ext4 -O ^metadata_csum,^64bit /dev/mmcblk0p1
         blockdev --flushbufs /dev/mmcblk0
         partprobe /dev/mmcblk0
         sfdisk -R /dev/mmcblk0
