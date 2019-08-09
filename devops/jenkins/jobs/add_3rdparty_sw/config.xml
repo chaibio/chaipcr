@@ -432,6 +432,10 @@ uname_updated=$(echo &quot;$uname&quot; | sed &quot;s/chai-//&quot;)
 echo updated to $uname_updated
 
 apt-get -y -q install linux-headers-$uname_updated || exit 1
+mv /usr/src/linux-headers-$uname_updated /usr/src/linux-headers-`uname -r`
+ln -nfs /usr/src/linux-headers-`uname -r` /lib/modules/`uname -r`/build 
+ln -nfs /usr/src/linux-headers-`uname -r` /lib/modules/`uname -r`/source
+
 apt-get install -y -q cmake || exit 1
 sync
 sleep 30

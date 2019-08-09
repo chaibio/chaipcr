@@ -576,6 +576,9 @@ uname_updated=$(echo &quot;$uname&quot; | sed &quot;s/chai-//&quot;)
 echo updated to $uname_updated
 
 apt-get -y -q install linux-headers-$uname_updated || exit 1
+mv /usr/src/linux-headers-$uname_updated /usr/src/linux-headers-`uname -r`
+ln -nfs /usr/src/linux-headers-`uname -r` /lib/modules/`uname -r`/build 
+ln -nfs /usr/src/linux-headers-`uname -r` /lib/modules/`uname -r`/source
 
 apt-get install -y git make build-essential cmake curl pkg-config python sshpass unzip
 
@@ -1008,6 +1011,7 @@ echo uname=$uname
 uname_updated=$(echo &quot;$uname&quot; | sed &quot;s/chai-//&quot;)
 echo updated to $uname_updated
 apt-get  -y -q --purge autoremove linux-headers-$uname_updated || exit 1
+rm -r /usr/src/linux-headers-`uname -r`
 
 apt-get  -y -q --purge autoremove g++-4.7 g++-4.8 gcc-4.8 g++-4.8 gcc-4.8 g++-4.8 
 apt-get  -y -q --purge autoremove libblas3gf libblas3gf
