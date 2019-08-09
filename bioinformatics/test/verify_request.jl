@@ -16,7 +16,7 @@
     *     the relevant controller in the Rails app is
           chaipcr/web/app/controllers/experiments_controller.rb
 
-    *     currently calls are POST-ed to
+    *     currently calls are GET-ed to
           http://127.0.0.1:8081/experiments/#{experiment.id}/standard_curve
           http://127.0.0.1:8081/experiments/#{experiment.id}/amplification
           http://127.0.0.1:8081/experiments/#{experiment.id}/meltcurve
@@ -278,7 +278,7 @@ end
 # ;
 
 function verify_request(
-    ::Type{Val{QpcrAnalysis.melting_curve}},
+    ::Type{Val{QpcrAnalysis.meltcurve}},
     request ::Any
 )
     facts("Melting curve requested") do
@@ -421,7 +421,7 @@ end
 ===============================================================================#
 
 function verify_request(
-    ::Type{Val{QpcrAnalysis.optical_calibration}},
+    ::Type{Val{QpcrAnalysis.optical_cal}},
     request ::Any
 )
     facts("Optical calibration requested") do

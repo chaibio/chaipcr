@@ -16,7 +16,7 @@
     *     the relevant controller in the Rails app is
           chaipcr/web/app/controllers/experiments_controller.rb
 
-    *     currently calls are POST-ed to
+    *     currently calls are GET-ed to
           http://127.0.0.1:8081/experiments/#{experiment.id}/standard_curve
           http://127.0.0.1:8081/experiments/#{experiment.id}/amplification
           http://127.0.0.1:8081/experiments/#{experiment.id}/meltcurve
@@ -177,7 +177,7 @@ end
 ===============================================================================#
 
 function verify_response(
-    ::Type{Val{melting_curve}},
+    ::Type{Val{meltcurve}},
     response ::Any
 )
     facts() do
@@ -231,7 +231,7 @@ end
 ===============================================================================#
 
 function verify_response(
-    ::Type{Val{load_script}},
+    ::Type{Val{loadscript}},
     response ::Any
 )
     facts() do
@@ -388,7 +388,7 @@ end
 # success response body (optical_cal):
 
 function verify_response(
-    ::Type{Val{optical_calibration}},
+    ::Type{Val{optical_cal}},
     response ::Any
 )
     facts() do

@@ -495,7 +495,7 @@ function generate_tests(;
         for channel_num in [:single_channel, :dual_channel]
             datafile = TEST_DATA[i, channel_num]
             if (datafile != "")
-                action_key = Symbol(TEST_DATA[i, :action])
+                action_key = TEST_DATA[i, :action]
                 # action = Val{QpcrAnalysis.ACT[action_key]}()
                 request = JSON.parsefile("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/$datafile.json",
                     dicttype=OrderedDict)

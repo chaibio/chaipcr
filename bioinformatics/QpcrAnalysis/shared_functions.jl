@@ -334,7 +334,7 @@ thing = (!isequal)(nothing)
 
 ## used in amplification.jl
 ## used in melting_curve.jl
-## used in optical_cal.jl
+## used in optical_calibration.jl
 ## used in thermal_consistency.jl
 "Handle exceptions by returning an `OrderedDict` containing the error message."
 function fail(

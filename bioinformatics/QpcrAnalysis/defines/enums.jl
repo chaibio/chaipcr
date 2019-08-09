@@ -19,10 +19,9 @@ import Base.string
 
 
 ## used in dispatch.jl
-@enum Action amplification melting_curve standard_curve load_script optical_calibration thermal_performance_diagnostic thermal_consistency optical_test_single_channel optical_test_dual_channel # your_own_analyze_functionality
-# const ACT = instances(Action) |> mold(fan([Symbol, identity])) |> OrderedDict
+@enum Action amplification meltcurve standard_curve loadscript optical_cal thermal_performance_diagnostic thermal_consistency optical_test_single_channel optical_test_dual_channel # your_own_analyze_functionality
 const ACTIONS = instances(Action)
-const ACT = zip(map(Symbol, ACTIONS), ACTIONS) |> OrderedDict 
+const ACT = zip(map(String ∘ Symbol, ACTIONS), ACTIONS) |> OrderedDict
 string(action ::Action) = replace(string(action), r"_", " ")
 
 ## used in various functions

@@ -33,15 +33,15 @@ const MC_RAW_FIELDS = Dict(
 
 ## called by dispatch()
 function act(
-    ::Type{Val{melting_curve}},
+    ::Type{Val{meltcurve}},
     req         ::Associative;
     out_format  ::OutputFormat = pre_json
 )
-    debug(logger, "at act(::Type{Val{melting_curve}})")
+    debug(logger, "at act(::Type{Val{meltcurve}})")
     #
     ## required fields
-    @get_calibration_data_from_req(melting_curve)
-    @parse_raw_data_from_req(melting_curve)
+    @get_calibration_data_from_req(meltcurve)
+    @parse_raw_data_from_req(meltcurve)
     #
     ## keyword arguments
     const kwargs = MC_FIELD_DEFS |>
@@ -65,7 +65,7 @@ function act(
         return fail(logger, err; bt = true) |> out(out_format)
     end ## try
     return response |> out(out_format)
-end ## act(::Type{Val{melting_curve}})
+end ## act(::Type{Val{meltcurve}})
 
 
 #==============================================================================#
@@ -73,7 +73,7 @@ end ## act(::Type{Val{melting_curve}})
 
 "Extract dimensions of raw melting curve data and format as a DataFrame."
 function parse_raw_data(
-    ::Union{Type{Val{melting_curve}},Type{Val{thermal_consistency}}},
+    ::Union{Type{Val{meltcurve}},Type{Val{thermal_consistency}}},
     raw_dict ::Associative
 )
     const mc_raw_df = DataFrame()
@@ -102,4 +102,4 @@ function parse_raw_data(
         num_channels,
         wells |> mold(Symbol ∘ Int) |> SVector{num_wells,Symbol},
         channels |> SVector{num_channels,Int})
-end ## parse_raw_data(::Type{Val{melting_curve}})
+end ## parse_raw_data(::Type{Val{meltcurve}})

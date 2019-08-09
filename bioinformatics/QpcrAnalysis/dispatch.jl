@@ -17,7 +17,7 @@ Boolean and a JSON string. Called by the Julia webserver in response to GET requ
 NB The API is documented in docs/juliaapi_new.txt.
 """
 function dispatch(
-    action_key      ::Symbol,
+    action_key      ::AbstractString,
     request_body    ::AbstractString;
     verify          ::Bool = false
 )
@@ -145,7 +145,7 @@ end ## dispatch()
 #         # else
 #         #     println("No step_id or ramp_id will be specified.")
 #         end
-#     elseif action == "melting_curve"
+#     elseif action == "meltcurve"
 #         reqb["experiment_id"] = exp_id
 #         reqb["stage_id"] = stage_id
 #     elseif action == "analyze"
