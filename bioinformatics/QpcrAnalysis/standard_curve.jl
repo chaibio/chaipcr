@@ -440,7 +440,7 @@ function generate_req_sc(;
             :sample => sample_vec[well_i])
     end ## next well_i
 
-    return (JSON.json(req), req)
+    return (json(req), req)
 end ## generate_req_sc
 
 
