@@ -500,7 +500,7 @@ apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hic
       cd /root/chaipcr/bioinformatics/build/ || exit 1
       chmod +x precompilescript.sh || exit 1
 
-      time ./precompilescript.sh $julia_pkgdir || exit 1
+      time ./precompilescript.sh $julia_pkgdir || echo &quot;Error executing QpcrAnalysis.dispatch()&quot; &amp;&amp; exit 1
 
      if [ -e /root/chaipcr/bioinformatics/qpcranalysis.so ]
      then
