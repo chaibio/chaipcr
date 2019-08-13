@@ -1,4 +1,4 @@
-echo "precompile julia packages if needed"
+gecho "precompile julia packages if needed"
 julia_pkgdir=/root
 if [ -d $1 ] && ! [ -z $1 ]
 then
@@ -97,11 +97,14 @@ println("Done Using!")
 
 if isfile("/root/chaipcr/bioinformatics/build/exec_testfns.jl")
     println("Function test script found.. executing by precompile script!")
-try
-    include("/root/chaipcr/bioinformatics/build/exec_testfns.jl")
-end
+    try
+	include("/root/chaipcr/bioinformatics/build/exec_testfns.jl")
+    catch
+	exit(5)
+    end
 else
     println("Function test script not found!")
+    exit(4)
 end
 
 function main()
@@ -114,7 +117,7 @@ function main()
 end
 
 println("Done with precompilescript!")
-
+exit(0)
 
 EOF
 
@@ -137,7 +140,7 @@ EOF
 
     rm -r /usr/lib/lib/root/
     #mkdir -p /root/julia/julia6RBinaries/lib/lib/root/
-    mkdir -p /usr/lib/lib/root/
+    mkdi2r -p /usr/lib/lib/root/
 
     rm /usr/lib/lib/root/qpcranalysis.ji
     rm /usr/lib/lib/root/qpcranalysis.so
@@ -145,7 +148,7 @@ EOF
 
     echo "creating the image"
     cd /root/chaipcr/bioinformatics/build/
-    time JULIA_ENV=production $JULIA /tmp/mkexec.jl
+    time JULIA_ENV=production $JULIA /tmp/mkexec.jl || echo "Error executing QpcrAnalysis.dispatch().. error code $?" && exit 1
 
     mkdir -p /root/lib/root/
     cp /usr/lib/lib/root/qpcranalysis.so /root/lib/root/qpcranalysis.so

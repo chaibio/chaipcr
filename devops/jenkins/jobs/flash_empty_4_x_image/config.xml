@@ -568,6 +568,20 @@ exit 1</command>
       <command>echo device is restarted.. 
 ping google.com -c 10
 
+cat /etc/issue
+cat /etc/debian_version
+cat /etc/os-release
+
+apt-key update
+apt-get update
+
+apt-get -q -y upgrade
+apt-get -q -y dist-upgrade
+
+cat /etc/issue
+cat /etc/debian_version
+cat /etc/os-release
+
 apt-key update
 apt-get update
 
@@ -575,6 +589,11 @@ apt-get -q -y upgrade
 apt-get -q -y dist-upgrade
 
 update-initramfs -u
+
+cat /etc/issue
+cat /etc/debian_version
+cat /etc/os-release
+
 touch /forcefsck
 
 lsblk
