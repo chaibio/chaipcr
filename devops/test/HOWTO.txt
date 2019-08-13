@@ -2,7 +2,7 @@ Test Experiments
 ================
 
 1) Continuous upgrade:
-To test reailablity of the upgrade procedure for any new upgrade image.
+To test realiablity of the upgrade procedure for any new upgrade image.
 Experiment setup: copy autorun.sh to the root of the factory settings sdcard. And initiate an upgrade by calling /sdcard/upgrade/scripts/perform_upgrade.sh. The script should conduct 50 upgrades continously with 10 minutes in between.
 
 Optionally, each experiment reports 3 events to the experiment database:
@@ -13,7 +13,7 @@ Optionally, each experiment reports 3 events to the experiment database:
 To receive those events a web application should be published as follows:
 database: to be created by importing experiment.sql. New database server information should be updated in database.php.inc.
 wepapp: copy report_exp.php and database.php.inc to the web shared folder. Typically apache with mysql database support. beaglebone.info should be updated with the new URL to the updated web server inside autorun.sh.
-Currently the webapp and database are temprary hosted at: 
+Currently the webapp and database are temporarily hosted at: 
 	Username: experiment1
 	Password: eLance1!
 	phpMyAdmin: https://p3nlmysqladm002.secureserver.net/grid55/121/index.php?uniqueDnsEntry=

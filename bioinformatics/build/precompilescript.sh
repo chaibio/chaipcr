@@ -15,7 +15,7 @@ then
     pkill -9 julia
     ps -aux
 
-    echo "compil0ing _supsmu.so"
+    echo "compiling _supsmu.so"
     cd /root/chaipcr/bioinformatics/QpcrAnalysis
     rm _supsmu.so
     #gfortran -Wall -Wextra -o _supsmu.so -c _supsmu.f
