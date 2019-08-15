@@ -19,6 +19,6 @@
 
 abstract type AbstractRaw end
 
-struct RawData{F <: Real} <: AbstractRaw
+struct RawData{F <: Union{Int,Float_T}} <: AbstractRaw
     data ::Array{F,3}
 end

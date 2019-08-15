@@ -18,13 +18,15 @@ import DataStructures.OrderedDict
 import StaticArrays: SArray
 
 
-struct CalibrationData{N <: NumberOfChannels, R <: Real}
-    array       ::SArray{S,R,3} where {S <: Tuple}
+struct CalibrationData{N <: NumberOfChannels, R <: Union{Int,Float_T}}
+    array ::SArray{S,R,3} where {S <: Tuple}
     ## inner constructors supply type parameters
     ## and enforce constraints on size of data array
-    CalibrationData(::Type{SingleChannel}, data ::AbstractArray{R}) where{R <: Real} =
+    CalibrationData(::Type{SingleChannel}, data ::AbstractArray{R})
+    where{R <: Union{Int,Float_T}} =
         new{SingleChannel,R}(SArray{Tuple{size(data,1),1,2},R}(data))
-    CalibrationData(::Type{DualChannel}, data ::AbstractArray{R}) where{R <: Real} =
+    CalibrationData(::Type{DualChannel}, data ::AbstractArray{R})
+    where{R <: Union{Int,Float_T}} =
         new{DualChannel,R}(SArray{Tuple{size(data,1),2,3},R}(data))
 end
 

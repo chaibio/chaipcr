@@ -494,9 +494,9 @@ function do_curl(
     verbose         ::Bool = true,
 )
     ## create text buffer in the form of a closure
-    buffer_contents::String = ""
-    buffer_readptr::Csize_t = 1
-    buffer_length::Csize_t = 0
+    buffer_contents::String
+    buffer_readptr::Csize_t
+    buffer_length::Csize_t
     #
     function reset_buffer()
         buffer_contents = ""
@@ -602,14 +602,14 @@ function do_curl(
     ## callback function to receive response data
     ## after v0.6: use Ptr{Cvoid} instead of Ptr{Void}
     function curl_write_cb(source::Ptr{Void}, s::Csize_t, n::Csize_t, buf_thunk::Ptr{Void})
-        const chunk_size = s * n
+        const chunk_size::Csize_t = s * n
         dest = Array{UInt8}(chunk_size)
         ccall(:memcpy, Ptr{Void}, (Ptr{Void}, Ptr{Void}, UInt64), dest, source, chunk_size)
         const chunk = dest |> pointer |> Cstring |> unsafe_string
         # QpcrAnalysis.print_v(println, verbose, "received: " * chunk)
         buf = unsafe_pointer_to_objref(buf_thunk)::Function
         buf(:append, chunk_size, chunk)
-        return chunk_size::Csize_t
+        return chunk_size
     end
     #
     ## use C compatible callback function
