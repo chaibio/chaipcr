@@ -494,9 +494,9 @@ function do_curl(
     verbose         ::Bool = true,
 )
     ## create text buffer in the form of a closure
-    buffer_contents::String
-    buffer_readptr::Csize_t
-    buffer_length::Csize_t
+    local buffer_contents::String
+    local buffer_readptr::Csize_t
+    local buffer_length::Csize_t
     #
     function reset_buffer()
         buffer_contents = ""
@@ -772,7 +772,7 @@ end ## write_dispatch_calls()
 ## returns true for every test that runs without errors
 function test_dispatch(test_functions ::Associative)
     OrderedDict(map(keys(test_functions)) do testname
-        println("Making dispatch call: $testname")
+        println("\nMaking dispatch call: $testname")
         result = test_functions[testname]()
         testname => result[1] && result[2]["valid"]
     end)
@@ -781,7 +781,7 @@ end
 ## time performance
 function time_dispatch(test_functions ::Associative)
     OrderedDict(map(keys(test_functions)) do testname
-        println("Making dispatch call: $testname")  
+        println("\nMaking dispatch call: $testname")
         @timev result = test_functions[testname]()
         testname => result[1] && result[2]["valid"]
     end)

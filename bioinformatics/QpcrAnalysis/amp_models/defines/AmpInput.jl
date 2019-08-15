@@ -128,7 +128,5 @@ const AMP_FIELD_DEFS = [
 
 ## generate struct and constructor
 SCHEMA = AMP_FIELD_DEFS
-println(@macroexpand @make_struct_from_SCHEMA AmpInput)
 @make_struct_from_SCHEMA AmpInput Input
-println(@macroexpand @make_constructor_from_SCHEMA AmpInput)
 @make_constructor_from_SCHEMA AmpInput
