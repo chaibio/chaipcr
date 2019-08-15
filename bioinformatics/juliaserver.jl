@@ -22,7 +22,7 @@ function get_response(req ::HTTP.Request)
     info(logger, "Julia webserver has received $(req.method) request to http://127.0.0.1:8081$(req.target)")
     debug(logger, "at get_response() with target $(req.target)")
     const code =
-        if req.method == "GET"
+        if req.method == "GET" ## per HTTP RFC, this is actually a POST request because it contains body data
             const nodes = HTTP.URIs.splitpath(req.target)
             if length(nodes) >= 3
                 const experiment_id = nodes[2]
@@ -70,11 +70,11 @@ const RESPONSE_HEADERS = HTTP.mkheaders([
 
 ## set up REST endpoints to dispatch to service functions
 HTTP.serve(
-    host    =ip"127.0.0.1",
-    port    =8081,
-    handler =HandlerFunction(get_response),
-    logger  =logIO,
-    verbose =true) ## logs server activity
+    host    = ip"127.0.0.1",
+    port    = 8081,
+    handler = HandlerFunction(get_response),
+    logger  = logIO,
+    verbose = true) ## logs server activity
 info(logger, "Webserver listening on: http://127.0.0.1:8081")
 
 

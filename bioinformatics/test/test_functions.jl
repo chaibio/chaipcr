@@ -17,6 +17,7 @@ const RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE = false
 import DataFrames.DataFrame
 import DataStructures.OrderedDict
 import JSON: json, parse, parsefile
+using LibCURL
 
 @static if !BBB
     import FactCheck: clear_results
@@ -36,12 +37,14 @@ const TEST_DATA = DataFrame([
 
 ## example code to generate, run, and save tests
 ## BSON preferred to JLD because it can save functions and closures
-if (RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE & !BBB)
-    cd("/home/vagrant/chaipcr/bioinformatics/QpcrAnalysis")
-    push!(LOAD_PATH, pwd())
-    using QpcrAnalysis
-
-    test_functions = QpcrAnalysis.generate_tests(debug=false)
+    if (RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE & !BBB)
+        # cd("/home/vagrant/chaipcr/bioinformatics/QpcrAnalysi  s")
+        dir = pwd()
+        push!(LOAD_PATH, dir)
+        using QpcrAnalysis
+        test_functions = QpcrAnalysis.generate_tests()
+    # JULIA_ENV=development julia -e 'push!(LOAD_PATH,"."); include("../juliaserver.jl")' &
+    # open(`julia -e 'push!(LOAD_PATH, $dir); include("$dir/../juliaserver.jl")'`)
     check = QpcrAnalysis.test_dispatch(test_functions)
 
     if all(values(check))
@@ -485,9 +488,135 @@ end
 ===============================================================================#
 
 
+function do_curl(
+    action          ::AbstractString,
+    request_body    ::AbstractString;
+    verify          ::Bool = false,
+    verbose         ::Bool = true,
+)
+    ## create text buffer in the form of a closure
+    buffer_contents = ""
+    function buffer(action::Symbol = :get, data::String = "")
+        if action == :reset
+            buffer_contents = ""
+            return nothing
+        elseif action == :append
+            buffer_contents = buffer_contents * data
+            return nothing
+        else ## action == :get
+            return buffer_contents
+        end
+    end
+    #
+    ## init a curl handle
+    const curl = curl_easy_init()
+    #
+    ## First set the URL that is about to receive our POST
+    const exp_id = verify ? "0" : "1"
+    const url = "http://127.0.0.1:8081/experiments/" * exp_id * "/" * action
+    curl_easy_setopt(curl, CURLOPT_URL, url)
+    #
+    ## Now specify we want to POST data
+    curl_easy_setopt(curl, CURLOPT_POST, 1)
+    #
+    ## Now specify GET method
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET")
+    #
+    ## create custom header to read request
+    req_headers = Ptr{Void}(0)
+    req_headers = curl_slist_append(req_headers, "Content-Type: application/json")
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, req_headers)
+    #
+    ## copy request data into buffer
+    const req_text = Array{UInt8}(request_body)
+    QpcrAnalysis.print_v(println, verbose, "request_body:", request_body)
+    #
+    ## this fails for large sz (> 10,000): must chunk
+    ## after v0.6: use Ptr{Cvoid} instead of Ptr{Void}
+    function curl_read_req(dest::Ptr{Void}, s::Csize_t, n::Csize_t, source::Ptr{Void})
+        const sz = s * n
+        (s == 0 || n == 0 || sz < 1) && return Csize_t(0) ## EOF
+        const bytes = source |> Ptr{UInt8} |> unsafe_string |> length |> Csize_t
+        if (bytes > 0)
+            ccall(:memcpy, Ptr{Void}, (Ptr{Void}, Ptr{Void}, Csize_t), dest, source, bytes)
+            return bytes
+        end
+        return Csize_t(0) ## EOF
+    end
+    #
+    ## after v0.6: use @cfunction instead of cfunction
+    const c_curl_read_req =
+        cfunction(curl_read_req, Csize_t, (Ptr{Void}, Csize_t, Csize_t, Ptr{Void}))
+    #
+    ## we want to use our own read function
+    curl_easy_setopt(curl, CURLOPT_READFUNCTION, c_curl_read_req)
+    #
+    ## pointer to pass to our read functions
+    curl_easy_setopt(curl, CURLOPT_READDATA, req_text)
+    #
+    ## get verbose debug output please
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1)
+    #
+    ## set request length
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, Clong(length(request_body)))
+    #
+    ## setup the callback function to receive response data
+    ## after v0.6: use Ptr{Cvoid} instead of Ptr{Void}
+    function curl_write_cb(source::Ptr{Void}, s::Csize_t, n::Csize_t, buf_thunk::Ptr{Void})
+        const sz = s * n
+        dest = Array{UInt8}(sz)
+        ccall(:memcpy, Ptr{Void}, (Ptr{Void}, Ptr{Void}, UInt64), dest, source, sz)
+        const chunk = dest |> pointer |> Cstring |> unsafe_string
+        QpcrAnalysis.print_v(println, verbose, "received: " * chunk)
+        buf = unsafe_pointer_to_objref(buf_thunk)::Function
+        buf(:append, chunk)
+        sz::Csize_t
+    end
+    #
+    ## after v0.6: use @cfunction instead of cfunction
+    c_curl_write_cb = cfunction(curl_write_cb, Csize_t, (Ptr{Void}, Csize_t, Csize_t, Ptr{Void}))
+    #
+    ## we want to use our own write function
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, c_curl_write_cb)
+    #
+    ## use buffer to copy response body
+    buffer(:reset)
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, pointer_from_objref(buffer))
+    #
+    ## execute the query
+    const res = curl_easy_perform(curl)
+    QpcrAnalysis.print_v(println, verbose, "curl response: $res")
+    #
+    ## get response body
+    response_text = buffer()
+    QpcrAnalysis.print_v(println, verbose, "response body: " * response_text)
+    #
+    ## retrieve HTTP code
+    const http_code = Array{Clong}(1)
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, http_code)
+    QpcrAnalysis.print_v(println, verbose, "http code: ", http_code[1])
+    #
+    ## retrieve elapsed time
+    const elapsed = Array{Cdouble}(1)
+    curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, elapsed)
+    QpcrAnalysis.print_v(println, verbose, "elapsed time: ", elapsed[1])
+    #
+    ## free headers
+    curl_slist_free_all(req_headers)
+    #
+    ## release handle
+    curl_easy_cleanup(curl)
+    #
+    return(true, response_text)
+end
+
+
+#==============================================================================#
+
+
 function generate_tests(;
-    debug     ::Bool =false,
-    verbose   ::Bool =false
+    test_API    ::Bool = true,
+    verbose     ::Bool = false
 )
     test_functions = OrderedDict()
     strip = [" single"," dual"," channel"]
@@ -497,28 +626,24 @@ function generate_tests(;
             if (datafile != "")
                 action_key = TEST_DATA[i, :action]
                 # action = Val{QpcrAnalysis.ACT[action_key]}()
-                request = JSON.parsefile("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/$datafile.json",
+                request = JSON.parsefile(
+                    "$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/$datafile.json",
                     dicttype=OrderedDict)
                 body = String(JSON.json(request))
 
                 function test_function()
                     QpcrAnalysis.print_v(println, verbose, "Testing $testname")
                     @static BBB || FactCheck.clear_results()
-                    if (debug) ## errors fail out
-                        # QpcrAnalysis.verify_request(action,request)
-                        response = QpcrAnalysis.act(action, request)
-                        response_body = string(JSON.json(response))
-                        response_parsed = JSON.parse(response_body, dicttype=OrderedDict)
-                        # QpcrAnalysis.verify_response(action,response_parsed)
-                        ok = true
-                    else ## continue tests after errors reported
+                    if test_API
+                        (ok, response_body) = QpcrAnalysis.do_curl(
+                            action_key, body; verify=false)
+                    else
                         (ok, response_body) = QpcrAnalysis.dispatch(
                             action_key, body; verify=false)
-                        println("response_body:")
-                        println(response_body)
-                        response_parsed = JSON.parse(response_body, dicttype=OrderedDict)
-                    end ## if debug
-                    if (ok && response_parsed["valid"] )
+                    end
+                    println("#" * response_body * "#")
+                    response_parsed = JSON.parse(response_body, dicttype=OrderedDict)
+                    if (ok && response_parsed["valid"])
                         QpcrAnalysis.print_v(println, verbose, "Passed $testname\n")
                     else
                         QpcrAnalysis.print_v(println, verbose, "Failed $testname\n")
