@@ -140,7 +140,7 @@ EOF
 
     rm -r /usr/lib/lib/root/
     #mkdir -p /root/julia/julia6RBinaries/lib/lib/root/
-    mkdi2r -p /usr/lib/lib/root/
+    mkdir -p /usr/lib/lib/root/
 
     rm /usr/lib/lib/root/qpcranalysis.ji
     rm /usr/lib/lib/root/qpcranalysis.so
