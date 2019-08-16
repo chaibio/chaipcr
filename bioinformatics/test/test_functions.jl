@@ -17,6 +17,7 @@ const RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE = false
 import DataFrames.DataFrame
 import DataStructures.OrderedDict
 import JSON: json, parse, parsefile
+using LibCURL
 
 @static if !BBB
     import FactCheck: clear_results
@@ -37,11 +38,12 @@ const TEST_DATA = DataFrame([
 ## example code to generate, run, and save tests
 ## BSON preferred to JLD because it can save functions and closures
 if (RUN_THIS_CODE_INTERACTIVELY_NOT_ON_INCLUDE & !BBB)
-    cd("/home/vagrant/chaipcr/bioinformatics/QpcrAnalysis")
-    push!(LOAD_PATH, pwd())
+    # cd("/home/vagrant/chaipcr/bioinformatics/QpcrAnalysis")
+    # JULIA_ENV=development julia -e 'push!(LOAD_PATH,"."); include("../juliaserver.jl")' &
+    dir = pwd()
+    push!(LOAD_PATH, dir)
     using QpcrAnalysis
-
-    test_functions = QpcrAnalysis.generate_tests(debug=false)
+    test_functions = QpcrAnalysis.generate_tests()
     check = QpcrAnalysis.test_dispatch(test_functions)
 
     if all(values(check))
@@ -485,9 +487,178 @@ end
 ===============================================================================#
 
 
+function do_curl(
+    action          ::AbstractString,
+    request_body    ::AbstractString;
+    verify          ::Bool = false,
+    verbose         ::Bool = true,
+)
+    ## create text buffer in the form of a closure
+    local buffer_contents::String
+    local buffer_readptr::Csize_t
+    local buffer_length::Csize_t
+    #
+    function reset_buffer()
+        buffer_contents = ""
+        buffer_readptr = 1
+        buffer_length = 0
+    end
+    #
+    function buffer(
+        action      ::Symbol = :get,
+        chunk_size  ::Csize_t = Csize_t(0),
+        chunk       ::String = ""
+    )
+        if action == :reset
+            reset_buffer()
+            return nothing
+        elseif action == :length
+            return buffer_length
+        elseif action == :append
+            buffer_contents = buffer_contents * chunk
+            buffer_length += chunk_size
+            return nothing
+        elseif action == :read
+            const read_length = min(chunk_size, buffer_length - buffer_readptr + 1)
+            const read_range = range(buffer_readptr, read_length)
+            buffer_readptr += read_length
+            if buffer_readptr > buffer_length
+                const return_chunk = buffer_contents[read_range]
+                reset_buffer()
+                return return_chunk
+            else
+                return buffer_contents[read_range]
+            end
+        else ## action == :get
+            return buffer_contents
+        end
+    end
+    #
+    ## init a curl handle
+    const curl = curl_easy_init()
+    #
+    ## First set the URL that is about to receive our POST
+    const exp_id = verify ? "0" : "1"
+    const url = "http://127.0.0.1:8081/experiments/" * exp_id * "/" * action
+    curl_easy_setopt(curl, CURLOPT_URL, url)
+    #
+    ## Now specify we want to POST data
+    curl_easy_setopt(curl, CURLOPT_POST, 1)
+    #
+    ## Now specify GET method
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET")
+    #
+    ## create custom header to read request
+    req_headers = Ptr{Void}(0)
+    req_headers = curl_slist_append(req_headers, "Content-Type: application/json")
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, req_headers)
+    #
+    ## copy request data into buffer
+    const req_text = Array{UInt8}(request_body)
+    QpcrAnalysis.print_v(println, verbose, "request_body:", request_body)
+    #
+    ## callback function to read request
+    ## after v0.6: use Ptr{Cvoid} instead of Ptr{Void}
+    function curl_read_req(dest::Ptr{Void}, s::Csize_t, n::Csize_t, buf_thunk::Ptr{Void})
+        const chunk_size::Csize_t = s * n
+        buf = unsafe_pointer_to_objref(buf_thunk)::Function
+        eof = (s == 0 || n == 0 || chunk_size < 1)
+        if !eof
+            const buf_size = buf(:length)
+            eof |= iszero(buf_size)
+        end
+        if eof
+            buf(:reset) ## buffer must be emptied before writing the response body into it
+            return Csize_t(0)
+        end
+        ## else
+        ## read a chunk of text from buffer
+        const source = Array{UInt8}(buf(:read, chunk_size))
+        const source_length::Csize_t = length(source)
+        ## copy chunk to dest
+        ccall(:memcpy, Ptr{Void}, (Ptr{Void}, Ptr{Void}, Csize_t), dest, source, source_length)
+        return source_length
+    end
+    #
+    ## use C compatible callback function
+    ## after v0.6: use @cfunction instead of cfunction
+    const c_curl_read_req =
+        cfunction(curl_read_req, Csize_t, (Ptr{Void}, Csize_t, Csize_t, Ptr{Void}))
+    curl_easy_setopt(curl, CURLOPT_READFUNCTION, c_curl_read_req)
+    #
+    ## load request body into buffer
+    buffer(:reset)
+    buffer(:append, request_body |> length |> Csize_t, request_body)
+    #
+    ## buffer thunk to our read function
+    curl_easy_setopt(curl, CURLOPT_READDATA, pointer_from_objref(buffer))
+    #
+    ## verbose debug output option
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, verbose ? 1 : 0)
+    #
+    ## set request length
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, Clong(length(request_body)))
+    #
+    ## callback function to receive response data
+    ## after v0.6: use Ptr{Cvoid} instead of Ptr{Void}
+    function curl_write_cb(source::Ptr{Void}, s::Csize_t, n::Csize_t, buf_thunk::Ptr{Void})
+        const chunk_size::Csize_t = s * n
+        dest = Array{UInt8}(chunk_size)
+        ccall(:memcpy, Ptr{Void}, (Ptr{Void}, Ptr{Void}, UInt64), dest, source, chunk_size)
+        const chunk = dest |> pointer |> Cstring |> unsafe_string
+        # QpcrAnalysis.print_v(println, verbose, "received: " * chunk)
+        buf = unsafe_pointer_to_objref(buf_thunk)::Function
+        buf(:append, chunk_size, chunk)
+        return chunk_size
+    end
+    #
+    ## use C compatible callback function
+    ## after v0.6: use @cfunction instead of cfunction
+    c_curl_write_cb =
+        cfunction(curl_write_cb, Csize_t, (Ptr{Void}, Csize_t, Csize_t, Ptr{Void}))
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, c_curl_write_cb)
+    #
+    ## thunk to pass to write function
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, pointer_from_objref(buffer))
+    #
+    ## execute the query
+    const res = curl_easy_perform(curl)
+    QpcrAnalysis.print_v(println, verbose, "curl response: $res")
+    #
+    ## get response body
+    response_text = buffer()
+    QpcrAnalysis.print_v(println, verbose, "response body: " * response_text)
+    #
+    ## retrieve HTTP code
+    if verbose
+        const http_code = Array{Clong}(1)
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, http_code)
+        QpcrAnalysis.print_v(println, verbose, "http code: ", http_code[1])
+    end
+    #
+    ## retrieve elapsed time
+    if verbose
+        const elapsed = Array{Cdouble}(1)
+        curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, elapsed)
+        QpcrAnalysis.print_v(println, verbose, "elapsed time: ", elapsed[1])
+    end
+    #
+    ## free headers
+    curl_slist_free_all(req_headers)
+    #
+    ## release handle
+    curl_easy_cleanup(curl)
+    #
+    return(true, response_text)
+end
+
+
+#==============================================================================#
+
+
 function generate_tests(;
-    debug     ::Bool =false,
-    verbose   ::Bool =false
+    test_API    ::Bool = true,
+    verbose     ::Bool = false
 )
     test_functions = OrderedDict()
     strip = [" single"," dual"," channel"]
@@ -497,28 +668,23 @@ function generate_tests(;
             if (datafile != "")
                 action_key = TEST_DATA[i, :action]
                 # action = Val{QpcrAnalysis.ACT[action_key]}()
-                request = JSON.parsefile("$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/$datafile.json",
+                request = JSON.parsefile(
+                    "$(QpcrAnalysis.LOAD_FROM_DIR)/../test/data/$datafile.json",
                     dicttype=OrderedDict)
                 body = String(JSON.json(request))
 
                 function test_function()
                     QpcrAnalysis.print_v(println, verbose, "Testing $testname")
                     @static BBB || FactCheck.clear_results()
-                    if (debug) ## errors fail out
-                        # QpcrAnalysis.verify_request(action,request)
-                        response = QpcrAnalysis.act(action, request)
-                        response_body = string(JSON.json(response))
-                        response_parsed = JSON.parse(response_body, dicttype=OrderedDict)
-                        # QpcrAnalysis.verify_response(action,response_parsed)
-                        ok = true
-                    else ## continue tests after errors reported
+                    if test_API
+                        (ok, response_body) = QpcrAnalysis.do_curl(
+                            action_key, body; verbose=verbose, verify=false)
+                    else
                         (ok, response_body) = QpcrAnalysis.dispatch(
                             action_key, body; verify=false)
-                        println("response_body:")
-                        println(response_body)
-                        response_parsed = JSON.parse(response_body, dicttype=OrderedDict)
-                    end ## if debug
-                    if (ok && response_parsed["valid"] )
+                    end
+                    response_parsed = JSON.parse(response_body, dicttype=OrderedDict)
+                    if (ok && response_parsed["valid"])
                         QpcrAnalysis.print_v(println, verbose, "Passed $testname\n")
                     else
                         QpcrAnalysis.print_v(println, verbose, "Failed $testname\n")
@@ -606,7 +772,7 @@ end ## write_dispatch_calls()
 ## returns true for every test that runs without errors
 function test_dispatch(test_functions ::Associative)
     OrderedDict(map(keys(test_functions)) do testname
-        println("Making dispatch call: $testname")
+        println("\nMaking dispatch call: $testname")
         result = test_functions[testname]()
         testname => result[1] && result[2]["valid"]
     end)
@@ -615,7 +781,7 @@ end
 ## time performance
 function time_dispatch(test_functions ::Associative)
     OrderedDict(map(keys(test_functions)) do testname
-        println("Making dispatch call: $testname")  
+        println("\nMaking dispatch call: $testname")
         @timev result = test_functions[testname]()
         testname => result[1] && result[2]["valid"]
     end)

@@ -22,7 +22,7 @@ function dispatch(
     verify          ::Bool = false
 )
     debug(logger, "at dispatch() with action \"$action_key\"")
-    # debug(logger, "request body is:\n" * request_body)
+    debug(logger, "request body: " * request_body)
     const result = try
         ## NB. DefaultDict and DefaultOrderedDict constructors sometimes don't work
         ## on OrderedDict (https://github.com/JuliaLang/DataStructures.jl/issues/205)

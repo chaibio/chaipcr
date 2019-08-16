@@ -80,7 +80,7 @@ macro parse_raw_data_from_req(action)
 end ## macro
 
 ## usage:
-# println(@expand @make_struct MyStruct (a, Int) (b, Float64) )
+# println(@macroexpand @make_struct MyStruct (a, Int) (b, Float64) )
 # @makestruct MyStruct (a, Int) (b, Float64)
 # macro make_struct(name, schema...)
 #     fields = [  :( $(entry.args[1])::$(entry.args[2]) )

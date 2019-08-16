@@ -74,14 +74,14 @@ DEFAULT_AMP_REPORTER                    = roundoff(JSON_DIGITS)
 ## name, DataType, default value
 const AMP_FIELD_DEFS = [
     ## data
-    Field(:raw,                 RawData{<: Real}),
+    Field(:raw,                 RawData{<: Union{Int,Float_T}}),
     Field(:num_cycles,          Int),
     Field(:num_wells,           Int),
     Field(:num_channels,        Int),
     Field(:cycles,              SVector{N,Int} where {N}),
     Field(:wells,               SVector{W,Symbol} where {W}),
     Field(:channels,            SVector{C,Int} where {C}),
-    Field(:calibration_data,    CalibrationData{<: NumberOfChannels, <: Real}),
+    Field(:calibration_data,    CalibrationData{<: NumberOfChannels, <: Union{Int,Float_T}}),
 
     ## calibration parameters
     Field(:calibration_args,    CalibrationParameters,      DEFAULT_CAL_ARGS),
