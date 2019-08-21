@@ -684,7 +684,7 @@ function generate_tests(;
                             action_key, body; verify=false)
                     end
                     response_parsed = JSON.parse(response_body, dicttype=OrderedDict)
-                    if (ok && response_parsed["valid"])
+                    if (ok && haskey(response_parsed, "valid") && response_parsed["valid"])
                         QpcrAnalysis.print_v(println, verbose, "Passed $testname\n")
                     else
                         QpcrAnalysis.print_v(println, verbose, "Failed $testname\n")
