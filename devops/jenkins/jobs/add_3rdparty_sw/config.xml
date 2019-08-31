@@ -863,7 +863,7 @@ apt-get update
 apt-get install -y -q libfontconfig1-dev libfreetype6-dev
 
 echo downloading compiled QT v4.8.6
-cd /sdcard/factory/
+cd /sdcard/upgrade/
 #wget $download_prefix/qt-everywhere-compiled-4.8.6.tgz
 wget $download_prefix/qt-everywhere-slim-4.8.6.tgz
 tar xfv qt-everywhere-slim-4.8.6.tgz
@@ -887,7 +887,7 @@ if $is_dev
 then
       echo Building a debug image
 else
-    cd /sdcard/factory/
+    cd /sdcard/upgrade/
     rm -r qt-everywhere-opensource-src-4.8.6
     rm qt-everywhere-compiled-4.8.6.tgz
     rm qt-everywhere-slim-4.8.6.tgz

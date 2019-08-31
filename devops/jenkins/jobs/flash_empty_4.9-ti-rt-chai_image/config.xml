@@ -673,6 +673,17 @@ touch /forcefsck
 lsblk
 df -h
 
+echo installing headers...
+uname=`uname -r`
+echo uname=$uname
+uname_updated=$(echo &quot;$uname&quot; | sed &quot;s/chai-//&quot;)
+echo updated to $uname_updated
+
+apt-get -y -q install linux-headers-$uname_updated || exit 1
+mv /usr/src/linux-headers-$uname_updated /usr/src/linux-headers-`uname -r`
+ln -nfs /usr/src/linux-headers-`uname -r` /lib/modules/`uname -r`/build 
+ln -nfs /usr/src/linux-headers-`uname -r` /lib/modules/`uname -r`/source
+
 echo image creation done.
 
 exit 0</command>
