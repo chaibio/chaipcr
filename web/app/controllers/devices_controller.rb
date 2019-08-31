@@ -534,7 +534,7 @@ class DevicesController < ApplicationController
     t = Tempfile.new("tmpexportdb.zip")
     logfiles = ["/var/log/realtime.log", "/var/log/realtime.log.1", "/var/log/syslog", "/var/log/syslog.1", "/var/log/daemon.log", "/var/log/daemon.log.1",
                 "/var/log/dmesg", "/var/log/dmesg.0", "/var/log/life_age.log", "/var/log/rails.log", "/var/log/rails.log.1", "/var/log/unicorn.log", "/var/log/unicorn.log.1",
-                "/sdcard/factory/booting.log", "/sdcard/upgrade/booting.log", "/var/log/upgrade.log"]
+                "/sdcard/factory/booting.log", "/sdcard/upgrade/booting.log", "/var/log/upgrade.log", "/var/log/julia.log"]
     configfiles = ["/root/configuration.json", "/perm/device.json"]
     begin
       Zip::OutputStream.open(t) { |zos| }
