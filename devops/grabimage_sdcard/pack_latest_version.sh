@@ -43,6 +43,8 @@ fi
 
 #check_running_system
 echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+echo 36000 > /proc/sys/kernel/hung_task_timeout_secs
+
 sdcard="/tmp/sdcard"
 
 image_filename_upgrade1="${sdcard}/eMMC_part1.img"

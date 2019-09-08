@@ -229,18 +229,17 @@ swapoff -a
 umount /dev/mmcblk0p*
 blockdev --flushbufs /dev/mmcblk0
 partprobe /dev/mmcblk0
-sfdisk -R /dev/mmcblk0
+#sfdisk -R /dev/mmcblk0
 udevadm trigger --subsystem-match=block; udevadm settle
 blockdev --rereadpt /dev/mmcblk0
-hdparm -z /dev/mmcblk0
+#hdparm -z /dev/mmcblk0
 sync
 sleep 60
 sync
 lsof
 umount /dev/mmcblk0p* -v
 sleep 60
-umount /dev/mmcblk0p1 -f -v
-umount /dev/mmcblk0p2 -f -v
+umount /dev/mmcblk0* -f -v || true
 umount /sdcard/* -f -v
 
 lsblk
@@ -257,67 +256,56 @@ apt-get install -y -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force
 
 blockdev --flushbufs /dev/mmcblk0
 partprobe /dev/mmcblk0
-sfdisk -R /dev/mmcblk0
+#sfdisk -R /dev/mmcblk0
 udevadm trigger --subsystem-match=block; udevadm settle
 blockdev --rereadpt /dev/mmcblk0
-hdparm -z /dev/mmcblk0
+#hdparm -z /dev/mmcblk0
 
 if LC_ALL=C /sbin/sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
-,10485760,0x83,*
-,,0x83,*
+,,0xe,*
 __EOF__
 then
-	echo SDCard formated!
+	echo SDCard partitioned!
 else
 	echo error formatting SDCard. retrying..
         blockdev --flushbufs /dev/mmcblk0
         partprobe /dev/mmcblk0
-        sfdisk -R /dev/mmcblk0
+#        sfdisk -R /dev/mmcblk0
         udevadm trigger --subsystem-match=block; udevadm settle
         blockdev --rereadpt /dev/mmcblk0
-        hdparm -z /dev/mmcblk0
+        #hdparm -z /dev/mmcblk0
         dd if=/dev/zero of=/dev/mmcblk0 bs=51200 count=1000
         sync
         blockdev --flushbufs /dev/mmcblk0
         partprobe /dev/mmcblk0
-        sfdisk -R /dev/mmcblk0
+#        sfdisk -R /dev/mmcblk0
         udevadm trigger --subsystem-match=block; udevadm settle
         blockdev --rereadpt /dev/mmcblk0
-        hdparm -z /dev/mmcblk0
+        #hdparm -z /dev/mmcblk0
 
 LC_ALL=C /sbin/sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
-,10485760,0x83,*
-,,0x83,*
+,,0xe,*
 __EOF__
+
         blockdev --flushbufs /dev/mmcblk0
         partprobe /dev/mmcblk0
-        sfdisk -R /dev/mmcblk0
+#        sfdisk -R /dev/mmcblk0
         udevadm trigger --subsystem-match=block; udevadm settle
         blockdev --rereadpt /dev/mmcblk0
-        hdparm -z /dev/mmcblk0
+        #hdparm -z /dev/mmcblk0
 
-        mkfs.ext4 -O ^metadata_csum,^64bit  /dev/mmcblk0p1
-        mkfs.ext4 -O ^metadata_csum,^64bit /dev/mmcblk0p2
-        
-if LC_ALL=C /sbin/sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
-,10485760,0x83,*
-,,0x83,*
-__EOF__
-        then
-	       echo SDCard formated!
-        else
- 	       echo error formatting SDCard.
-#	       exit 1
-       fi
+      mkfs.vfat /dev/mmcblk0p1 -n CHAIBIO || true
+      mkfs.fat /dev/mmcblk0p1 -n CHAIBIO || true
 fi
+
 blockdev --flushbufs /dev/mmcblk0
 partprobe /dev/mmcblk0
-sfdisk -R /dev/mmcblk0
+#sfdisk -R /dev/mmcblk0
 udevadm trigger --subsystem-match=block; udevadm settle
 blockdev --rereadpt /dev/mmcblk0
-hdparm -z /dev/mmcblk0
+#hdparm -z /dev/mmcblk0
 
-if command mkfs.fat
+if command -v mkfs.fat 
 then
       mkfs.fat /dev/mmcblk0p1 -n CHAIBIO
 else
@@ -368,9 +356,9 @@ shutdown -r 1
       <command>#!/bin/bash
 echo waiting for a restart
 sleep 620
-for i in {0..1200..60}
+for i in {0..36000..60}
 do
-	echo &quot;Waiting for the build device to become ready! $i&quot;
+	echo &quot;Waiting for the build device to become ready! $i seconds waiting ..&quot;
 	sleep 60
     if ping $build_machine -c 3
     then
