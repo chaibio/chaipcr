@@ -23,6 +23,7 @@ function dispatch(
 )
     debug(logger, "at dispatch() with action \"$action_key\"")
     debug(logger, "request body: " * request_body)
+	success = false
     const result = try
         ## NB. DefaultDict and DefaultOrderedDict constructors sometimes don't work
         ## on OrderedDict (https://github.com/JuliaLang/DataStructures.jl/issues/205)
@@ -74,23 +75,17 @@ function dispatch(
         end ## if !production_env
         #
         ## return value
+		success = true
         json_response
     catch err
-        fail(logger, err; bt = true)
+		JSON.json(fail(logger, err; bt = true) |> out(pre_json_output))
     end ## try
-    #
-    const success = !isa(result, Exception)
-    const response_body =
-        if success
-            string(result)
-        else
-            JSON.json(Dict(
-                :valid => false,
-                :error => sprint(showerror, result)))
-        end ## if
+    
+    const response_body = string(result)
+
     debug(logger, "returning from dispatch()")
     debug(logger, "success: $success")
-    debug(logger, "response body: " * response_body)
+
     return (success, response_body)
 end ## dispatch()
 

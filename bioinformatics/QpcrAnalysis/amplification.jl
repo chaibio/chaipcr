@@ -90,7 +90,7 @@ function act(
         amp_output = AmpOutputOption(out_format),
         kw_bl...,
         kwargs...,)
-    const result = try
+    const result =
         ## issues:
         ## 1.
         ## the new code currently assumes only 1 step/ramp
@@ -135,9 +135,6 @@ function act(
                 key => getfield(first_sr_out, key)
             end...,
             :valid => true])
-    catch err
-        return fail(logger, err; bt = true) |> out(out_format)
-    end ## try
     return result |> out(out_format)
 end ## act(::Type{Val{amplification}})
 

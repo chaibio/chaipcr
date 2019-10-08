@@ -59,11 +59,9 @@ function act(
     #
     ## pass data and parameter values to mc_analysis()
     ## which will perform the analysis for the entire dataset
-    const response = try
+    const response =
         mc_analysis(interface)
-    catch err
-        return fail(logger, err; bt = true) |> out(out_format)
-    end ## try
+
     return response |> out(out_format)
 end ## act(::Type{Val{meltcurve}})
 

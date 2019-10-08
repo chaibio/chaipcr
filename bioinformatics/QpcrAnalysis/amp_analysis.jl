@@ -78,7 +78,7 @@ function set_ct_fluos!(
         map(1:i.num_channels) do channel_i
             const fits =
                 map(1:i.num_wells) do well_i
-                    const fluos = o.rbbs_3ary[:, well_i, channel_i]
+                    const fluos = o.rbbs_ary3[:, well_i, channel_i]
                     amp_fit_model(
                         Val{SFCModel},
                         AmpCqFluoModelResults,
@@ -127,7 +127,7 @@ function get_fit_results(
             const ipopt_file = string(join([prefix, ci, wi], '_')) * ".txt"
             push!(solver.options, (:output_file, ipopt_file))
         end
-        const fluos = o.rbbs_3ary[:, wi, ci]
+        const fluos = o.rbbs_ary3[:, wi, ci]
         amp_fit_model(
             Val{i.amp_model},
             i.amp_model_results,
