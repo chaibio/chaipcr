@@ -26,7 +26,7 @@ const AMPLONGOUTPUT_FIELD_DEFS = [
     Field(:norm_data,                    SArray{S,<: Real} where {S}), ## wva_data
     Field(:k_deconv,                     DeconvolutionMatrices), ## k4dcv
     Field(:deconvoluted_data,            Array{<: Real,3}), ## dcvd_ary3
-    Field(:rbbs_3ary,                    Array{Float_T,3}), ## calibrated_data
+    Field(:rbbs_ary3,                    Array{Float_T,3}), ## calibrated_data
     # cq_method,                           Symbol
     ## for ct method
     Field(:ct_fluos,                     SVector{C,Float_T} where {C}),
@@ -64,7 +64,7 @@ const AMPLONGOUTPUT_FIELD_DEFS = [
 
 
 const AMPSHORTOUTPUT_FIELDNAMES = [
-    :rbbs_3ary,
+    :rbbs_ary3,
     :blsub_fluos,
     :dr1_pred,
     :dr2_pred,

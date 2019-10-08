@@ -35,7 +35,7 @@ function act(
         try
             parse_raw_data(Val{standard_curve}, req)
         catch()
-            fail(logger, ArgumentError(
+            throw(ArgumentError(
                 "cannot parse raw data for standard curve analysis"))
         end ## try
     #

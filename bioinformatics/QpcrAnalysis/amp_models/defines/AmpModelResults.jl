@@ -17,9 +17,9 @@ import Ipopt: IpoptSolver #, NLoptSolver
     Field definitions >>
 ===============================================================================#
 
-## issue: rename `rbbs_3ary` as `calibrated` once juliaapi_new has been updated
+## issue: rename `rbbs_ary3` as `calibrated` once juliaapi_new has been updated
 const AMPLONGMODELRESULTS_FIELD_DEFS = [
-    Field(:rbbs_3ary,        Vector{Float_T}),
+    Field(:rbbs_ary3,        Vector{Float_T}),
     Field(:bl_fit,           Union{AmpModelFit,Symbol}),
     Field(:bl_notes,         Vector{String}),
     Field(:blsub_fluos,      Vector{Float_T}),
@@ -41,7 +41,7 @@ const AMPLONGMODELRESULTS_FIELD_DEFS = [
 
 
 const AMPSHORTMODELRESULTS_FIELDNAMES = [
-    # rbbs_3ary,
+    # rbbs_ary3,
     :blsub_fluos,
     :dr1_pred,
     :dr2_pred,

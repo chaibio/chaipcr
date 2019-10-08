@@ -40,8 +40,7 @@ function get_response(req ::HTTP.Request)
                 const success, response_body =
                     QpcrAnalysis.dispatch(action, request_body; kwargs...)
                 debug(logger, "at get_response() receiving results from QpcrAnalysis.dispatch()")
-                ## code =
-                (success) ? 200 : 500
+                code = (success) ? 200 : 500
             else ## length(nodes) < 3
                 404
             end

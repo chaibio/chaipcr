@@ -55,7 +55,7 @@ function amp_fit_model(
     ## set output
     if isa(R, AmpShortModelResults)
         return AmpShortModelResults(
-            fluos, ## rbbs_3ary,
+            fluos, ## rbbs_ary3,
             blsub_fluos,
             NaN, ## dr1_pred
             NaN, ## dr2_pred
@@ -63,7 +63,7 @@ function amp_fit_model(
             d0())
     else
         return AmpLongModelResults(
-            fluos, ## rbbs_3ary,
+            fluos, ## rbbs_ary3,
             bl_fit,
             [string(amp_model)], ## bl_notes
             blsub_fluos,
@@ -355,7 +355,7 @@ function amp_fit_model(
     if R == AmpShortModelResults
         const cq_raw = calc_cq_raw(dr1_pred, dr2_pred)
         return AmpShortModelResults(
-            # fluos, ## rbbs_3ary,
+            # fluos, ## rbbs_ary3,
             blsub_fluos,
             dr1_pred[raw_cycs_index],
             dr2_pred[raw_cycs_index],
@@ -385,7 +385,7 @@ function amp_fit_model(
                     func_pred_eff(cyc_vals_4cq[key])
             end)
     return AmpLongModelResults(
-        fluos, ## rbbs_3ary
+        fluos, ## rbbs_ary3
         bl_fit,
         bl_notes,
         blsub_fluos,
