@@ -156,7 +156,7 @@ module QpcrAnalysis
         ## otherwise segfaults are liable to occur
         push!(logger,
             DefaultHandler(
-                FileRoller("julia.log", production_env ? "/var/log" : "/tmp"), ## default max size ~5MB
+                production_env ? "/var/log/julia.log" : "/tmp/julia.log",
                 DefaultFormatter("[ {date} | {level} ]: {msg}")))
         ## debug-level logging in production environment (provisional setting)
         production_env  && setlevel!(logger, "debug")

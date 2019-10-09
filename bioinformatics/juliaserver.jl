@@ -58,7 +58,7 @@ end ## get_response
 ## set up logging
 logger = getlogger("QpcrAnalysis")
 logIO = (@p gethandlers logger|values|collect|getindex _ 1|getfield _ :io)
-debug(logger, "logfile " * getfield(logIO, :filepath))
+debug(logger, "logfile " * getfield(logIO, :name))
 
 ## headers
 const RESPONSE_HEADERS = HTTP.mkheaders([
