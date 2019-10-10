@@ -59,6 +59,11 @@ function dispatch(
         const response = act(action, req_parsed; out_format = pre_json_output)
         debug(logger, "response received from act() by dispatch()")
         debug(logger, repr(response))
+
+        if isa(response, ArgumentError)
+           throw(response)
+        end ## if isa
+
         const json_response = JSON.json(response)
         #
         @static if !production_env

@@ -37,7 +37,7 @@ function CalibrationData(calib ::Associative)
     local water, dye1, dye2 ## not enum
     const num_wells = count_wells(calib)
     const water     = calib[WATER_KEY][FLUORESCENCE_VALUE_KEY]
-    const R         = water |> first |> first |> typeof
+    const R         = Int #water |> first |> first |> typeof
     const dye1      = calib[CHANNEL_KEY * "_1"][FLUORESCENCE_VALUE_KEY]
     if length(dye1) > 1 && thing(dye1[2]) && haskey(calib, CHANNEL_KEY * "_2")
         const dye2  = calib[CHANNEL_KEY * "_2"][FLUORESCENCE_VALUE_KEY]
@@ -45,7 +45,7 @@ function CalibrationData(calib ::Associative)
             [water, dye1, dye2] |> gather(vcat) |> gather(hcat) |>
                 morph(num_wells,2,3) |> mold(bless(R))
         catch()
-            warn(logger, "calibration data are in the wrong format")
+            warn(logger, "dual channel calibration data are in the wrong format")
             rethrow()
         end ## try
         return CalibrationData(DualChannel, data)
@@ -54,7 +54,7 @@ function CalibrationData(calib ::Associative)
     const data  = try
         [water, dye1] |> moose(first, hcat) |> morph(num_wells,1,2) |> mold(bless(R))
     catch()
-        warn(logger, "calibration data are in the wrong format")
+        warn(logger, "single channel calibration data are in the wrong format")
         rethrow()
     end ## try
     return CalibrationData(SingleChannel, data)

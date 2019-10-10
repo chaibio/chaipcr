@@ -44,8 +44,7 @@ function act(
             :cq_method => try
                 CqMethod(req[CQ_METHOD_KEY])
             catch()
-                return fail(logger, ArgumentError("Unrecognized cq method");
-                    bt = true) |> out(out_format)
+                return ArgumentError("Unrecognized cq method")
             end) ## try
     req_key(CATEG_WELL_VEC_KEY) &&
         push!(kwargs,
