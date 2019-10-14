@@ -57,9 +57,9 @@ function amp_fit_model(
         return AmpShortModelResults(
             fluos, ## rbbs_ary3,
             blsub_fluos,
-            NaN, ## dr1_pred
-            NaN, ## dr2_pred
-            NaN, ## cq
+            NaN_T, ## dr1_pred
+            NaN_T, ## dr2_pred
+            NaN_T, ## cq
             d0())
     else
         return AmpLongModelResults(
@@ -72,16 +72,16 @@ function amp_fit_model(
             coefs, ## quant_coefs
             d0(),
             pred_from_cycs(Val{M}, cycles, coefs...), ## quant_fluos
-            NaN, ## dr1_pred,
-            NaN, ## dr2_pred,
-            Inf, ## max_dr1
-            Inf, ## max_dr2
+            NaN_T, ## dr1_pred,
+            NaN_T, ## dr2_pred,
+            Inf_T, ## max_dr1
+            Inf_T, ## max_dr2
             OrderedDict(), ## cyc_vals_4cq
             OrderedDict(), ## eff_vals_4cq
-            NaN, ## cq_raw
-            NaN, ## cq
-            NaN, ## eff
-            NaN) ## cq_fluo
+            NaN_T, ## cq_raw
+            NaN_T, ## cq
+            NaN_T, ## eff
+            NaN_T) ## cq_fluo
     end ## if Q
 end ## fit_amplification_model() where DFCModel
 
@@ -250,7 +250,7 @@ function amp_fit_model(
     max_eff() = cycles_denser[indmax(map(func_pred_eff, cycles_denser))]
     #
     nonpos2NaN(x ::Real) =
-        x <= zero(x) ? NaN : x
+        x <= zero(x) ? NaN_T : x
     #
     calc_cq_fluo(cq_raw ::Real) =
         funcs_pred[:f](nonpos2NaN(cq_raw), quant_coefs...)
@@ -283,7 +283,7 @@ function amp_fit_model(
             end...)
         catch err
             isa(err, DomainError) ?
-                NaN :
+                NaN_T :
                 rethrow()
         end ## try
     end ## func_pred_eff()
@@ -360,7 +360,7 @@ function amp_fit_model(
             dr1_pred[raw_cycs_index],
             dr2_pred[raw_cycs_index],
             nonpos2NaN(cq_raw), ## cq
-            NaN) ## d0
+            NaN_T) ## d0
     end ## R
     #
     ## R == AmpLongModelResults
@@ -392,7 +392,7 @@ function amp_fit_model(
         quant_fit,
         quant_fit.status, ## quant_status
         quant_coefs,
-        NaN, ## d0
+        NaN_T, ## d0
         funcs_pred[:f](cycles, quant_coefs...), ## blsub_fitted
         dr1_pred[raw_cycs_index],
         dr2_pred[raw_cycs_index],

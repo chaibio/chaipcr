@@ -18,7 +18,7 @@ struct TargetResultEle <: StandardCurveResult
     efficiency  ::Float_T
     r2          ::Float_T
 end
-const EMPTY_TRE = TargetResultEle(0, fill(NaN, 4)...)
+const EMPTY_TRE = TargetResultEle(0, fill(NaN_T, 4)...)
 
 
 struct GroupResultEle <: StandardCurveResult
@@ -29,4 +29,4 @@ struct GroupResultEle <: StandardCurveResult
     qty_mean    ::Float_T
     qty_sd      ::Float_T
 end
-const EMPTY_GRE = GroupResultEle([], 0, fill(NaN, 4)...)
+const EMPTY_GRE = GroupResultEle([], 0, fill(NaN_T, 4)...)

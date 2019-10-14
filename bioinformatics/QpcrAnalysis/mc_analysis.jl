@@ -64,7 +64,7 @@ function mc_analysis(i ::McInput)
     #         len - length(vec) |>
     #             m ->
     #                 m >= 0 ?
-    #                     vcat(vec, fill(NaN, m)) :
+    #                     vcat(vec, fill(NaN_T, m)) :
     #                     error(logger, "vector is too long")
     #
     #     ## extend array elements with NaNs to length of longest element
@@ -118,8 +118,8 @@ function mc_analysis(i ::McInput)
         # for j in 1:size(lengths, 1),
         #     k in range(1, longest - lengths[:len][j])
         #     push!(extended, Dict(
-        #         :temperature    => NaN,
-        #         :fluorescence   => NaN,
+        #         :temperature    => NaN_T,
+        #         :fluorescence   => NaN_T,
         #         :channel        => lengths[:channel][j],
         #         :well           => lengths[:well][k]))
         # end ## next j, k
@@ -156,8 +156,8 @@ function mc_analysis(i ::McInput)
                         f[ti, wi, ci] = df[location[ti], :fluorescence]
                     end ## next ti
                     for ti in (ti + 1):longest
-                        t[ti, wi, ci] = NaN
-                        f[ti, wi, ci] = NaN
+                        t[ti, wi, ci] = NaN_T
+                        f[ti, wi, ci] = NaN_T
                     end ## next ti
                 end ## let
             end ## next wi

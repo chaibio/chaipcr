@@ -73,12 +73,12 @@ function act(
     const apprxRampUpStartTime =
         try maximum(elapsed_times[hbzt_lower .& (elapsed_times .< apprxRampUpEndTime)])
         catch()
-            -Inf
+            -Inf_T
         end ## try maximum
     const apprxRampDownEndTime =
         try minimum(elapsed_times[hbzt_lower .& (elapsed_times .> apprxRampDownStartTime)])
         catch()
-            Inf
+            Inf_T
         end ## try minimum
     #
     const temp_range_adj = (HIGH_TEMP_mDELTA - LOW_TEMP_pDELTA) * 1000

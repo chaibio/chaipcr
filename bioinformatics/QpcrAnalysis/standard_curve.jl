@@ -211,7 +211,7 @@ function parse_raw_data(::Type{Val{standard_curve}}, req ::AbstractVector)
             end ## try
         end #= do req_ele =# |> maximum
     #
-    @inline nothing2NaN(x) = thing(x) ? x : NaN
+    @inline nothing2NaN(x) = thing(x) ? x : NaN_T
     for well_i in eachindex(req)
         req_ele = req[well_i]
         for channel_i in 1:num_channels
@@ -222,7 +222,7 @@ function parse_raw_data(::Type{Val{standard_curve}}, req ::AbstractVector)
                     Dict{String,Any}()
                 end ## try
             if length(measrmt_dict) == 0
-                target = cq = qty = NaN
+                target = cq = qty = NaN_T
             else
                 target   = nothing2NaN(measrmt_dict[TARGET_KEY])
                 cq       = nothing2NaN(measrmt_dict[CQ_KEY])
@@ -237,7 +237,7 @@ function parse_raw_data(::Type{Val{standard_curve}}, req ::AbstractVector)
             push!(sample_vec,   try
                     nothing2NaN(req_ele[SAMPLE_KEY])
                 catch()
-                    NaN
+                    NaN_T
                 end) ## try
         end ## for channel_i
     end ## for well_i
@@ -364,7 +364,7 @@ function generate_req_sc(;
     if num_targets == 0
         println("randomly generating targets...") ## target values should not be the same across different channels for the same well
         num_nna_targets = num_measurements - channelwide_num_na_targets - addi_num_na_targets
-        target_vec = insert2ary(NaN, addi_num_na_targets, fill(0, num_nna_targets), 1, rng)
+        target_vec = insert2ary(NaN_T, addi_num_na_targets, fill(0, num_nna_targets), 1, rng)
         nna_channel_idc =
             find(1:num_channels) do channel_i
                 !(channel_i in na_channel_idc)
@@ -393,7 +393,7 @@ function generate_req_sc(;
         println("randomly generating cq values...")
         num_nna_cqs = num_measurements - num_na_cqs
         nna_cq_vec = rand(rng, num_nna_cqs) .* -(cq_bounds...) .+ cq_bounds[2] # upperbound - (0,1)seq * scaling_factor
-        cq_vec = insert2ary(NaN, num_na_cqs, nna_cq_vec, 1, rng)
+        cq_vec = insert2ary(NaN_T, num_na_cqs, nna_cq_vec, 1, rng)
     elseif num_cqs != num_measurements
         error(logger, "cq_vec not empty but length not same as num_measurements")
     end
@@ -406,7 +406,7 @@ function generate_req_sc(;
         nna_qm_vec = rand(rng, num_nna_qtys) .* -(qm_bounds...) .+ qm_bounds[2]
         nna_qb_vec = rand(rng, qb_bounds[1]:qb_bounds[2], num_nna_qtys)
         nna_qty_mtx = hcat(nna_qm_vec, nna_qb_vec)
-        qty_mtx = insert2ary(NaN, num_na_qtys, nna_qty_mtx, 1, rng)
+        qty_mtx = insert2ary(NaN_T, num_na_qtys, nna_qty_mtx, 1, rng)
         qm_vec = qty_mtx[:, 1]
         qb_vec = qty_mtx[:, 2] # not convert to integer due to NaN
     elseif num_qm != num_qb
@@ -420,7 +420,7 @@ function generate_req_sc(;
         println("randomly generating samples...")
         num_nna_samples = num_wells - num_na_samples
         nna_sample_vec = rand(rng, 1:num_uniq_samples, num_nna_samples)
-        sample_vec = insert2ary(NaN, num_na_samples, nna_sample_vec, 1, rng)
+        sample_vec = insert2ary(NaN_T, num_na_samples, nna_sample_vec, 1, rng)
     elseif num_samples != num_wells
         error(logger, "sample_vec not empty but length not same as num_wells")
     end

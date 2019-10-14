@@ -86,7 +86,7 @@ function set_ct_fluos!(
                         fluos,
                         bl_cyc_bounds[well_i, channel_i],
                         DEFAULT_AMP_CT_FLUO_METHOD, ## cq_method
-                        NaN) ## i.ct_fluo
+                        NaN_T) ## i.ct_fluo
                 end ## do well_i
             fits |>
                 their(:quant_status) |>
@@ -109,7 +109,7 @@ end ## calc_ct_fluos()
 end ## find_idc_useful()
 
 default_ct_fluos(i ::AmpInput) =
-    SVector{i.num_channels, Float_T}(fill(NaN, i.num_channels))
+    SVector{i.num_channels, Float_T}(fill(NaN_T, i.num_channels))
 
 
 #==============================================================================#
@@ -273,7 +273,7 @@ function report_cq!(
         else
             ""
         end ## why_NaN
-    (why_NaN != "") && (o.cq[well_i, channel_i] = NaN)
+    (why_NaN != "") && (o.cq[well_i, channel_i] = NaN_T)
     #
     for tup in (
         (:max_bsf,        max_bsf),

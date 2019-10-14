@@ -425,8 +425,8 @@ function assign_genos(
                         closest_i = indmin(dist_optm_init_centers[:, closest_j])
                         if closest_i == i
                             _new_center_idc[i] = closest_j
-                            dist_optm_init_centers[i, :] = +Inf
-                            dist_optm_init_centers[:, closest_j] = +Inf
+                            dist_optm_init_centers[i, :] = +Inf_T
+                            dist_optm_init_centers[:, closest_j] = +Inf_T
                         end ## if closest_i
                     end ## if !
                 end ## if _new_center_idc

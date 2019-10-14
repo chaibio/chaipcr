@@ -416,7 +416,7 @@ function scinot(
     num_sig_digits  ::Integer = 3;
     log_base        ::Integer = 10
 )
-    isnan(x) && return (NaN, NaN)
+    isnan(x) && return (NaN_T, NaN_T)
     (x == 0) && return (0, 0)
     _exponent = log(log_base, abs(x)) |> floor
     _mantissa = round(x / log_base ^ _exponent, num_sig_digits)

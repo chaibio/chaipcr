@@ -87,7 +87,7 @@ function act(
     max_Tm = 0
     const tm_check_vec = map(mc_tm) do Ta
         if size(Ta, 1) == 0
-            TmCheck1w((NaN, false), NaN)
+            TmCheck1w((NaN_T, false), NaN_T)
         else
             const top1_Tm = Ta[1,1]
             (top1_Tm < min_Tm) && (min_Tm = top1_Tm)

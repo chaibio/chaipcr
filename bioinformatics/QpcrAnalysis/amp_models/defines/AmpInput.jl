@@ -43,7 +43,7 @@ const DEFAULT_AMP_DENSER_FACTOR         = Int_T(3)         ## must be an integer
 const DEFAULT_AMP_CQ_METHOD             = Cy0
 
 ## default for set_qt_fluos!()
-const DEFAULT_AMP_QT_PROB               = 0.9
+const DEFAULT_AMP_QT_PROB               = Float_T(0.9)
 
 ## defaults for report_cq!()
 ## note for default scaled_max_dr1_lb:
@@ -52,9 +52,9 @@ const DEFAULT_AMP_BEFORE_128X           = false
 const DEFAULT_AMP_MAX_BSF_LB            = Int_T(4356)      ## ⎫
 const DEFAULT_AMP_MAX_DR1_LB            = Int_T(472)       ## ⎬ must be integers
 const DEFAULT_AMP_MAX_DR2_LB            = Int_T(41)        ## ⎭
-const DEFAULT_AMP_SCALED_MAX_BSF_LB     = 0.086
-const DEFAULT_AMP_SCALED_MAX_DR1_LB     = 0.0089
-const DEFAULT_AMP_SCALED_MAX_DR2_LB     = 0.000689
+const DEFAULT_AMP_SCALED_MAX_BSF_LB     = Float_T(0.086)
+const DEFAULT_AMP_SCALED_MAX_DR1_LB     = Float_T(0.0089)
+const DEFAULT_AMP_SCALED_MAX_DR2_LB     = Float_T(0.000689)
 
 ## defaults for process_ad()
 ## see AssignGenosResult.jl

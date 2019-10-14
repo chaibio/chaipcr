@@ -38,7 +38,7 @@ function DeconvolutionMatrices(
     const w = s[1]
     const c = s[2]
     const v = calibration_args.k_method == well_proc_vec ? w : 1
-    const empty_matrix = SMatrix{c,c,Float_T}(fill(NaN,c,c))
+    const empty_matrix = SMatrix{c,c,Float_T}(fill(NaN_T,c,c))
     DeconvolutionMatrices(
         SVector{v}(fill(empty_matrix,v)),
         SVector{w}(fill(empty_matrix,w)),

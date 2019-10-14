@@ -14,7 +14,7 @@ import JuMP: Model, @variable, @constraint, @NLconstraint, @NLobjective,
 ## bounds
 const fb_B_MULTIPLE     = 1.9
 const d0_LB             = 1e-14
-const d0_UB             = Inf ## used: 0.1 (Bultmann 2013)
+const d0_UB             = Inf_T ## used: 0.1 (Bultmann 2013)
 const eu0_inh_LB        = 0.0001
 const eu0_UB_MULTIPLE   = 10
 const inh_UB_MULTIPLE   = 10

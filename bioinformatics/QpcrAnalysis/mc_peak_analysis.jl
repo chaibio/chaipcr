@@ -32,7 +32,7 @@ function mc_peak_analysis(
 
     "Calculate temperature intervals."
     temperature_intervals(temps_orig ::Vector{<: AbstractFloat}) =
-        vcat(diff(temps_orig), Inf)
+        vcat(diff(temps_orig), Inf_T)
 
     "Criterion for narrow temperature intervals."
     not_too_close(temp_intervals ::Vector{<: AbstractFloat}) =

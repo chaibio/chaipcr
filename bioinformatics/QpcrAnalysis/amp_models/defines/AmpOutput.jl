@@ -108,7 +108,7 @@ function AmpOutput(
     calibrated_data             ::Array{<: Real,3},
     ct_fluos                    ::AbstractVector;
 )
-    const NaN_array2        = amp_init(i, NaN)
+    const NaN_array2        = amp_init(i, NaN_T)
     const fitted_init       = amp_init(i, FIT[i.amp_model]())
     const empty_vals_4cq    = amp_init(i, OrderedDict{Symbol, Float_T}())
     AmpLongOutput(
@@ -127,7 +127,7 @@ function AmpOutput(
         calibrated_data, ## blsub_fluos
         fitted_init, ## quant_fit,
         amp_init(i, :not_fitted), ## quant_status
-        fill(NaN, 1, i.num_wells, i.num_channels), ## coefs ## NB size = 1 for 1st dimension may not be correct for the chosen model
+        fill(NaN_T, 1, i.num_wells, i.num_channels), ## coefs ## NB size = 1 for 1st dimension may not be correct for the chosen model
         NaN_array2, ## d0
         calibrated_data, ## quant_fluos,
         calibrated_data, ## dr1_pred
@@ -167,7 +167,7 @@ function AmpOutput(
     ct_fluos                    ::AbstractVector;
     reporting                   ::Function = roundoff(JSON_DIGITS) ## reporting function
 )
-    const NaN_array2 = amp_init(i, NaN)
+    const NaN_array2 = amp_init(i, NaN_T)
     const cd = reporting.(calibrated_data)
     AmpShortOutput(
         cd, ## formerly rbbs_ary3

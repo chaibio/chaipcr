@@ -265,10 +265,10 @@ const SFC_MODEL_BASES = [ ## vector of tuples
             b_ = lin1_coefs[2]
             # e_ = -lin1_coefs[1] / b_
             if isnan(b_) || b_ == 0.0
-                b_ = NaN
-                e_ = NaN
-                c_ = NaN
-                d_ = NaN
+                b_ = NaN_T
+                e_ = NaN_T
+                c_ = NaN_T
+                d_ = NaN_T
             else
                 e_ = -lin1_coefs[1] / b_
             end
