@@ -195,8 +195,8 @@ sumsq(y) = sum(y .^ 2)
 function parse_raw_data(::Type{Val{standard_curve}}, req ::AbstractVector)
     (length(req) == 0) && return DataFrame()
     #
-    well_vec    = Vector{Int}()
-    channel_vec = Vector{Int}()
+    well_vec    = Vector{Int_T}()
+    channel_vec = Vector{Int_T}()
     target_vec  = Vector{Real}()
     cq_vec      = Vector{Float_T}()
     qty_vec     = Vector{Float_T}()
@@ -329,7 +329,7 @@ function generate_req_sc(;
     qm_vec              ::AbstractVector = [],
     qm_bounds           ::Tuple = (1, 10),
     qb_vec              ::AbstractVector = [],
-    qb_bounds           ::Tuple{Int,Int} = (-20, 20),
+    qb_bounds           ::Tuple{Int_T,Int_T} = (-20, 20),
     num_na_qtys         ::Integer = 0,
 
     sample_vec          ::AbstractVector = [],
@@ -353,7 +353,7 @@ function generate_req_sc(;
             join(na_channel_idc, ","))
     else
         channelwide_num_na_targets = 0
-        na_channel_idc = Vector{Int}()
+        na_channel_idc = Vector{Int_T}()
         addi_num_na_targets = lb_num_na_targets
     end
 
@@ -370,7 +370,7 @@ function generate_req_sc(;
                 !(channel_i in na_channel_idc)
             end
         available_targets = 1:num_uniq_targets
-        num_uniq_targets_perchannel = Int(floor(num_uniq_targets / num_channels))
+        num_uniq_targets_perchannel = Int_T(floor(num_uniq_targets / num_channels))
         for channel_i in nna_channel_idc
             target_idc_thischannel = ((1:num_wells) .- 1) .* num_channels .+ channel_i
             nna_target_idc = target_idc_thischannel[

@@ -73,7 +73,7 @@ function mc_peak_analysis(
         span_smooth_product() =
             i.span_smooth_factor * max_fu_temp_span(fu_idc()) / i.temp_span
 
-        max_fu_temp_span(fu ::AbstractVector{Int}) =
+        max_fu_temp_span(fu ::AbstractVector{Int_T}) =
             maximum(temps[fu_idc[2:2:end]] .- temps[fu[1:2:end]])
 
         fu_idc() = (cumsum(fu[1][1] ? vcat(0,fu[2]) : fu[2]) .+ 1)[1:2*sum(fu[1])]
@@ -98,7 +98,7 @@ function mc_peak_analysis(
     is_increasing(x ::AbstractVector) =
         diff(x) .> zero(x)
 
-    calc_fu_rle(idc ::AbstractVector{Int}) =
+    calc_fu_rle(idc ::AbstractVector{Int_T}) =
         rle(is_increasing(fluos[idc]))
 
     "Find the region of length 2 * `temperature_bandwidth` showing the steepest
@@ -106,7 +106,7 @@ function mc_peak_analysis(
     max_fluo_decrease() =
         indmax(fluo_decrease(temps_in_span(i)) for i in 1:len_raw)
 
-    fluo_decrease(sel_idc_int ::AbstractVector{Int}) =
+    fluo_decrease(sel_idc_int ::AbstractVector{Int_T}) =
         fluos[sel_idc_int[1]] - fluos[sel_idc_int[end]]
 
     "Find nearby data points in a vector."
@@ -119,7 +119,7 @@ function mc_peak_analysis(
             X[i] - half_span <= x <= X[i] + half_span
         end
 
-    temps_in_span(i ::Int) =
+    temps_in_span(i ::Int_T) =
         find_in_span(temps, i, i.temperature_bandwidth)
 
     ## smoothing functions >>
@@ -193,7 +193,7 @@ function mc_peak_analysis(
     # half_peak_span_temperature = 0.5 * i.peak_span_temperature
     half_peak_window() =
         0.5 * (i.peak_span_temperature / temp_span) * len_denser |>
-            roundoff(0) |> Int
+            roundoff(0) |> Int_T
 
     "Find the indices of summits and nadirs the smoothed -df/dT data series."
     find_summits_and_nadirs() =

@@ -12,19 +12,19 @@ import Clustering.ClusteringResult
 
 struct AssignGenosResult
     cluster_result      ::ClusteringResult
-    best_i              ::Int
-    best_genos_combins  ::Vector{Matrix{Int}}
-    expected_genos_all  ::Matrix{Int}
+    best_i              ::Int_T
+    best_genos_combins  ::Vector{Matrix{Int_T}}
+    expected_genos_all  ::Matrix{Int_T}
     ucc_dict            ::OrderedDict{Set{Vector{Float_T}},UniqCombinCenters}
 end
 
 
 ## constants >>
 
-const EMPTY_BEST_GENO_COMBINS = Vector{Matrix{Int}}()
+const EMPTY_BEST_GENO_COMBINS = Vector{Matrix{Int_T}}()
 
 ## default values for processing preset calibration data with 4 groups
-const DEFAULT_AMP_ENCGR = Array{Int,2}(0, 0)
+const DEFAULT_AMP_ENCGR = Array{Int_T,2}(0, 0)
 ## const DEFAULT_AMP_ENCGR = [0 1 0 1; 0 0 1 1] ## NTC, homo ch1, homo ch2, hetero
 const DEFAULT_AMP_INIT_FACTORS = [1, 1, 1, 1] ## sometimes "hetero" may not have very high end-point fluo
 const DEFAULT_AMP_APG_LABELS = ["ntc", "homo_1", "homo_2", "hetero", "unclassified"] ## [0 1 0 1; 0 0 1 1]
@@ -35,8 +35,8 @@ const DEFAULT_AMP_APG_LABELS = ["ntc", "homo_1", "homo_2", "hetero", "unclassifi
 # const DEFAULT_AMP_INIT_FACTORS = [1, 1, 1] # sometimes "hetero" may not have very high end-point fluo
 # const DEFAULT_AMP_EG_LABELS = ["homo_a", "homo_b", "hetero", "unclassified"]
 
-const DEFAULT_AMP_CTRL_WELL_DICT = OrderedDict{Vector{Int},Vector{Int}}()
-## key is genotype (Vector{Int}), value is well numbers (Vector{Int})
+const DEFAULT_AMP_CTRL_WELL_DICT = OrderedDict{Vector{Int_T},Vector{Int_T}}()
+## key is genotype (Vector{Int}), value is well numbers (Vector{Int_T})
 ## example
 # const DEFAULT_AMP_CTRL_WELL_DICT = OrderedDict(
 #     [0, 0] => [1, 2], # NTC, well 1 and 2
@@ -45,7 +45,7 @@ const DEFAULT_AMP_CTRL_WELL_DICT = OrderedDict{Vector{Int},Vector{Int}}()
 #     [1, 1] => [7, 8]  # hetero, well 7 and 8
 # )
 ## old approach
-# const DEFAULT_AMP_CTRL_WELL_DICT = DefaultOrderedDict(Vector{Int}, Vector{Int}, Vector{Int}())
+# const DEFAULT_AMP_CTRL_WELL_DICT = DefaultOrderedDict(Vector{Int_T}, Vector{Int_T}, Vector{Int_T}())
 
 const DEFAULT_AMP_CATEG_WELL_VEC = Vector{Pair{Symbol,Any}}([
     :rbbs_ary3      => Colon(),     ## calibrated_data

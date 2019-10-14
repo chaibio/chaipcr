@@ -12,7 +12,7 @@
 
 
 struct Peak
-    idx             ::Int
+    idx             ::Int_T
     Tm              ::Float_T ## temperature at maximum of -dT/df
     area            ::Float_T
 end

@@ -37,7 +37,11 @@ function act(
     const kwargs = AMP_FIELD_DEFS |>
         sift(req_key ∘ field(:key)) |>
         mold() do x
-            x.name => req[x.key]
+			if isa(req[x.key], Int64) && Int_T != Int64
+				x.name => Int_T(req[x.key])
+			else
+				x.name => req[x.key]
+			end
         end
     req_key(CQ_METHOD_KEY) &&
         push!(kwargs,
@@ -171,7 +175,8 @@ function parse_raw_data(::Type{Val{amplification}}, raw_dict ::Associative)
             repeat(
                 channels,
                 inner = num_cycles * num_wells))
-    catch()
+    catch err
+		error(logger, "raw dict exception: " * sprint(showerror, err))
         throw(ArgumentError("The format of the fluorescence data does not " *
             "lend itself to transformation into a 3-dimensional array. " *
             "Please make sure that the data are sorted by " *
@@ -179,7 +184,10 @@ function parse_raw_data(::Type{Val{amplification}}, raw_dict ::Associative)
     end ## try
     #
     ## reshape to 3D array
-    const F = eltype(first(raw_dict[FLUORESCENCE_VALUE_KEY]))
+    F = eltype(first(raw_dict[FLUORESCENCE_VALUE_KEY]))
+	if (F == Int64 && Int_T != Int64)
+		F = Int_T
+	end
     const raw_data = ## formerly `fr_ary3`
         reshape(
             raw_dict[FLUORESCENCE_VALUE_KEY],
@@ -194,10 +202,10 @@ function parse_raw_data(::Type{Val{amplification}}, raw_dict ::Associative)
     const kludge = sweep(minimum)(-)(wells)
     return (
         RawData{F}(raw_data[cyc_perm, well_perm, chan_perm]),
-        num_cycles,
-        num_wells,
-        num_channels,
-        cycles[cyc_perm] |> SVector{num_cycles,Int},
-        kludge[well_perm] |> mold(Symbol ∘ Int) |> SVector{num_wells,Symbol},
-        channels[chan_perm] |> SVector{num_channels,Int})
+        Int_T(num_cycles),
+        Int_T(num_wells),
+        Int_T(num_channels),
+        cycles[cyc_perm] |> SVector{num_cycles,Int_T},
+        kludge[well_perm] |> mold(Symbol ∘ Int_T) |> SVector{num_wells,Symbol},
+        channels[chan_perm] |> SVector{num_channels,Int_T})
 end ## parse_raw_data(Type{Val{amplification}})

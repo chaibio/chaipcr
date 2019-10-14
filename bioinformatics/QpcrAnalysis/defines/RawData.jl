@@ -6,7 +6,7 @@
     parameterized on unit type
 
     Dimensions:
-    1. Unit: `cycle` for amplification data (type Int)
+    1. Unit: `cycle` for amplification data (type Int_T)
        `temperature` for melting curve data (type Float_T).
     2. Well: enumerated type, maximum 16.
     3. Channel: 1 or 2.
@@ -19,6 +19,6 @@
 
 abstract type AbstractRaw end
 
-struct RawData{F <: Union{Int,Float_T}} <: AbstractRaw
+struct RawData{F <: Union{Int_T,Float_T}} <: AbstractRaw
     data ::Array{F,3}
 end

@@ -20,23 +20,23 @@ import Base: start, next, done, eltype, collect, iteratorsize, SizeUnknown
 
 struct PeakIndices
     summit_heights  ::Vector{Float_T}
-    summit_idc      ::Vector{Int}
-    nadir_idc       ::Vector{Int}
-    len_summit_idc  ::Int
-    len_nadir_idc   ::Int
+    summit_idc      ::Vector{Int_T}
+    nadir_idc       ::Vector{Int_T}
+    len_summit_idc  ::Int_T
+    len_nadir_idc   ::Int_T
     PeakIndices(h,s,n) = new(vcat(h,0.0), vcat(s,0), vcat(n,0), length(s), length(n))
 end
 
 struct PeakIndicesState
-    left_nadir_ii   ::Int
-    summit_ii       ::Int
-    right_nadir_ii  ::Int
+    left_nadir_ii   ::Int_T
+    summit_ii       ::Int_T
+    right_nadir_ii  ::Int_T
 end 
 
 struct PeakIndicesElement
-    left_nadir_idx  ::Int
-    summit_idx      ::Int
-    right_nadir_idx ::Int
+    left_nadir_idx  ::Int_T
+    summit_idx      ::Int_T
+    right_nadir_idx ::Int_T
 end
 
 

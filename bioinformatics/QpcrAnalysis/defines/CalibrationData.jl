@@ -18,17 +18,17 @@ import DataStructures.OrderedDict
 import StaticArrays: SArray
 
 
-struct CalibrationData{N <: NumberOfChannels, R <: Union{Int,Float_T}}
+struct CalibrationData{N <: NumberOfChannels, R <: Union{Int_T,Float_T}}
     array       ::SArray{S,R,3} where {S <: Tuple}
     ## inner constructors supply type parameters
     ## and enforce constraints on size of data array
     CalibrationData(
         ::Type{SingleChannel},
-        data ::AbstractArray{R}) where{R <: Union{Int,Float_T}} =
+        data ::AbstractArray{R}) where{R <: Union{Int_T,Float_T}} =
             new{SingleChannel,R}(SArray{Tuple{size(data,1),1,2},R}(data))
     CalibrationData(
         ::Type{DualChannel},
-        data ::AbstractArray{R}) where{R <: Union{Int,Float_T}} =
+        data ::AbstractArray{R}) where{R <: Union{Int_T,Float_T}} =
             new{DualChannel,R}(SArray{Tuple{size(data,1),2,3},R}(data))
 end
 
@@ -37,7 +37,11 @@ function CalibrationData(calib ::Associative)
     local water, dye1, dye2 ## not enum
     const num_wells = count_wells(calib)
     const water     = calib[WATER_KEY][FLUORESCENCE_VALUE_KEY]
-    const R         = Int #water |> first |> first |> typeof
+    R         = water |> first |> first |> typeof
+	if (R == Int64 && Int_T != Int64)
+		R = Int_T
+	end
+	
     const dye1      = calib[CHANNEL_KEY * "_1"][FLUORESCENCE_VALUE_KEY]
     if length(dye1) > 1 && thing(dye1[2]) && haskey(calib, CHANNEL_KEY * "_2")
         const dye2  = calib[CHANNEL_KEY * "_2"][FLUORESCENCE_VALUE_KEY]

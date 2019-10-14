@@ -12,7 +12,7 @@
 abstract type StandardCurveResult end
 
 struct TargetResultEle <: StandardCurveResult
-    target_id   ::Int
+    target_id   ::Int_T
     slope       ::Float_T
     offset      ::Float_T
     efficiency  ::Float_T
@@ -22,8 +22,8 @@ const EMPTY_TRE = TargetResultEle(0, fill(NaN, 4)...)
 
 
 struct GroupResultEle <: StandardCurveResult
-    well        ::Vector{Int}
-    target_id   ::Int
+    well        ::Vector{Int_T}
+    target_id   ::Int_T
     cq_mean     ::Float_T
     cq_sd       ::Float_T
     qty_mean    ::Float_T

@@ -21,7 +21,7 @@ using JuMP
 abstract type AmpModelFit end
 
 struct MAK2Fit <: AmpModelFit
-    max_d_idx   ::Int
+    max_d_idx   ::Int_T
     coef_strs   ::Vector{String}
     coefs       ::Vector{Float_T}
     status      ::Symbol
@@ -31,7 +31,7 @@ end
 
 ## constructor
 MAK2Fit(;
-    max_d_idx   ::Int               = 0,
+    max_d_idx   ::Int_T             = 0,
     coef_strs   ::Vector{String}    = Vector{String}(),
     coefs       ::Vector{Float_T}   = zeros(0),
     status      ::Symbol            = :not_fitted,
@@ -43,7 +43,7 @@ MAK2Fit(;
 
 
 struct MAK3Fit <: AmpModelFit
-    max_d_idx   ::Int
+    max_d_idx   ::Int_T
     fb_start    ::Float_T
     bl_k_start  ::Float_T
     coef_strs   ::Vector{String}
@@ -55,7 +55,7 @@ end
 
 ## constructor
 MAK3Fit(;
-    max_d_idx   ::Int               = 0,
+    max_d_idx   ::Int_T             = 0,
     fb_start    ::Float_T           = 0.0,
     bl_k_start  ::Float_T           = 0.0,
     coef_strs   ::Vector{String}    = Vector{String}(),
@@ -69,7 +69,7 @@ MAK3Fit(;
 
 
 struct MAKERGAUL3Fit <: AmpModelFit
-    max_of_idx  ::Int
+    max_of_idx  ::Int_T
     coef_strs   ::Vector{String}
     coefs       ::Vector{Float_T}
     status      ::Symbol
@@ -79,7 +79,7 @@ end
 
 ## constructor
 MAKERGAUL3Fit(;
-    max_of_idx  ::Int               = 0,
+    max_of_idx  ::Int_T             = 0,
     coef_strs   ::Vector{String}    = Vector{String}(),
     coefs       ::Vector{Float_T}   = zeros(0),
     status      ::Symbol            = :not_fitted,
@@ -91,7 +91,7 @@ MAKERGAUL3Fit(;
 
 
 struct MAKERGAUL4Fit <: AmpModelFit
-    max_of_idx  ::Int
+    max_of_idx  ::Int_T
     fb_start    ::Float_T
     bl_k_start  ::Float_T
     coef_strs   ::Vector{String}
@@ -103,7 +103,7 @@ end
 
 ## constructor
 MAKERGAUL4Fit(;
-    max_of_idx  ::Int               = 0,
+    max_of_idx  ::Int_T             = 0,
     fb_start    ::Float_T           = 0.0,
     bl_k_start  ::Float_T           = 0.0,
     coef_strs   ::Vector{String}    = Vector{String}(),

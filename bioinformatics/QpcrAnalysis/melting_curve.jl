@@ -87,7 +87,7 @@ function parse_raw_data(
             end ## if
         end ## try
     end ## next key
-    mc_raw_df[:well] = mc_raw_df[:well] |> mold(Symbol ∘ Int)
+    mc_raw_df[:well] = mc_raw_df[:well] |> mold(Symbol ∘ Int_T)
     const (wells, channels) =
         map([WELL_NUM_KEY, CHANNEL_KEY]) do key
             raw_dict[key] |> unique |> sort
@@ -98,6 +98,6 @@ function parse_raw_data(
         mc_raw_df,
         num_wells,
         num_channels,
-        wells |> mold(Symbol ∘ Int) |> SVector{num_wells,Symbol},
-        channels |> SVector{num_channels,Int})
+        wells |> mold(Symbol ∘ Int_T) |> SVector{num_wells,Symbol},
+        channels |> SVector{num_channels,Int_T})
 end ## parse_raw_data(::Type{Val{meltcurve}})

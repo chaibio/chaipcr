@@ -16,7 +16,7 @@ abstract type McOutput end
 
 struct McLongOutput <: McOutput
     wells                       ::SVector{W,Symbol} where {W}
-    channels                    ::SVector{C,Int} where {C}
+    channels                    ::SVector{C,Int_T} where {C}
     raw_data                    ::Array{<: Real,3}
     background_subtracted_data  ::Array{<: Real,3}
     k_deconv                    ::DeconvolutionMatrices
@@ -25,7 +25,7 @@ struct McLongOutput <: McOutput
     norm_wells                  ::SVector{V,Symbol} where {V}
     calibrated_data             ::Array{Float_T,3}
     peak_output                 ::Array{McPeakLongOutput,2} ## dim1 is well and dim2 is channel
-    # tf_bychwl                   ::OrderedDict{Int,Vector{OrderedDict{String,Vector{Float_T}}}}
+    # tf_bychwl                   ::OrderedDict{Int_T,Vector{OrderedDict{String,Vector{Float_T}}}}
 end
 
 ## the following type not necessary because `output_dict` in mc_analysis()

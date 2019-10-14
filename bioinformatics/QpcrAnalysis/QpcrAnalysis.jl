@@ -42,6 +42,7 @@ module QpcrAnalysis
     const PRODUCTION_MODE  = "production"
     const production_env   = (get(ENV, "JULIA_ENV", nothing) == PRODUCTION_MODE)
     const Float_T = production_env ? Float32 : Float64
+	const Int_T = production_env ? Int32 : Int64
 
 
 

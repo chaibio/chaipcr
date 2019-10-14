@@ -33,7 +33,7 @@ function pnmsmu(
 
     # sel_idc = selected indices
     if x_evenly_spaced ## faster
-        span_dp = round(Int, span_frac * dlen) ## dp = data points
+        span_dp = round(Int_T, span_frac * dlen) ## dp = data points
         sel_idc_vec = map(i -> giis_even(dlen, i, span_dp), 1:dlen)
     else
         span_x = span_frac * (maximum(X) - minimum(X))

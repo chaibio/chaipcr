@@ -54,10 +54,10 @@ AmpOutputOption(option ::OutputFormat) =
 
 ## overloaded index methods for enums
 import Base: to_index
-to_index(A, ind ::Enum) = to_index(A, Int(ind))
+to_index(A, ind ::Enum) = to_index(A, Int_T(ind))
 # import Base.to_indices
 # enum2int(idx) = idx
-# enum2int(idx ::Enum) = Int(idx)
+# enum2int(idx ::Enum) = Int_T(idx)
 # to_indices(A, inds...) = to_indices(A, map(enum2int, inds)...)
 # import Base.getindex
 # getindex(A, inds...) = getindex(A, map(enum2int, inds)...)

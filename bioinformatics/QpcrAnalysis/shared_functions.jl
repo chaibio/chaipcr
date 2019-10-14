@@ -420,7 +420,7 @@ function scinot(
     (x == 0) && return (0, 0)
     _exponent = log(log_base, abs(x)) |> floor
     _mantissa = round(x / log_base ^ _exponent, num_sig_digits)
-    return (_mantissa, Int(_exponent))
+    return (_mantissa, Int_T(_exponent))
 end
 
 ## used in calibration.jl

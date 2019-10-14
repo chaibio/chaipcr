@@ -58,7 +58,7 @@ function pred_from_cycs( ## 0.7to1.2e-5 sec for 40 cycles on PC
         i += 1
     end
     fs_w0 = pred_ary_eu_d_w0[:, 2] + fb
-    return fs_w0[2:end][map(Int, cycs)]
+    return fs_w0[2:end][map(Int_T, cycs)]
 end ## pred_from_cycs(::Type{Val{MAKERGAUL3}})
 
 function pred_from_cycs(
@@ -80,7 +80,7 @@ function pred_from_cycs(
         )
         i += 1
     end
-    return fb + bl_k * cycs .+ pred_ary_eu_d_w0[:, 2][2:end][map(Int, cycs)]
+    return fb + bl_k * cycs .+ pred_ary_eu_d_w0[:, 2][2:end][map(Int_T, cycs)]
 end ## pred_from_cycs(:MAKERGAUL4)
 
 function fit(

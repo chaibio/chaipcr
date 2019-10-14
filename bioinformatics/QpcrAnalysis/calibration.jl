@@ -502,7 +502,7 @@ get_k(
 function calc_kinv(
     ::Type{Val{well_proc_mean}},
     smw             ::AbstractArray{<: AbstractFloat},
-    dyes            ::SVector{L,Int},
+    dyes            ::SVector{L,Int_T},
     wells           ::SVector{L,Symbol}
 ) where {L}
     inv_note = false
@@ -532,7 +532,7 @@ end
 function calc_kinv(
     ::Type{Val{well_proc_vec}},
     smw             ::AbstractArray{<: AbstractFloat},
-    dyes            ::SVector{L,Int},
+    dyes            ::SVector{L,Int_T},
     wells           ::SVector{M,Symbol} where {M}
 ) where {L}
     singular_wells = Vector{Symbol}()
@@ -594,7 +594,7 @@ end
 #     # calib_key_vec_1 = get_ordered_keys(calib_info_1)
 #     # cd_key_vec_1 = calib_key_vec_1[2:end] ## cd = channel of dye. "water" is index 1 per original order.
 #     # channel_nums_1 = map(cd_key_vec_1) do cd_key
-#     #     parse(Int, split(cd_key, "_")[2])
+#     #     parse(Int_T, split(cd_key, "_")[2])
 #     # end
 #
 #     const ary2dcv_1 =
@@ -640,7 +640,7 @@ end
 #    calib_key_vec = get_ordered_keys(calib_info)
 #    cd_key_vec = calib_key_vec[2:end] ## cd = channel of dye. "water" is index 1 per original order.
 #    channel_nums = map(cd_key_vec) do cd_key
-#        parse(Int, split(cd_key, "_")[2])
+#        parse(Int_T, split(cd_key, "_")[2])
 #    end
 #    num_channels = length(channel_nums)
 #

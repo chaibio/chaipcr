@@ -40,7 +40,6 @@ macro make_constructor_from_SCHEMA(structname)
     end
 end ## macro
 
-
 "Get calibration data from request."
 macro get_calibration_data_from_req(action)
     esc( :(
@@ -52,7 +51,7 @@ macro get_calibration_data_from_req(action)
             const calibration_data = try
                 CalibrationData(req[CALIBRATION_INFO_KEY])
             catch err
-                error(logger, "calibration data exception: " * err)
+                error(logger, "calibration data exception: " * sprint(showerror, err))
                 return ArgumentError(
                     "cannot parse calibration data for " * string($action) * " analysis")
             end ## try
@@ -70,7 +69,7 @@ macro parse_raw_data_from_req(action)
             const parsed_raw_data = try
                 parse_raw_data(Val{$action}, req[RAW_DATA_KEY])
             catch err
-                error(logger, "parse_raw_data exception: " * err)
+                error(logger, "parse_raw_data exception: " * sprint(showerror, err))
                 return ArgumentError(
                     "cannot parse raw data for " * string($action) * " analysis")
             end ## try
@@ -78,8 +77,8 @@ macro parse_raw_data_from_req(action)
 end ## macro
 
 ## usage:
-# println(@macroexpand @make_struct MyStruct (a, Int) (b, Float64) )
-# @makestruct MyStruct (a, Int) (b, Float64)
+# println(@macroexpand @make_struct MyStruct (a, Int_T) (b, Float64) )
+# @makestruct MyStruct (a, Int_T) (b, Float64)
 # macro make_struct(name, schema...)
 #     fields = [  :( $(entry.args[1])::$(entry.args[2]) )
 #                 for entry in schema ]

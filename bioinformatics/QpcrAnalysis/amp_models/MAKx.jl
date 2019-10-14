@@ -39,7 +39,7 @@ function pred_from_cycs( ## 0.7to1.2e-5 sec for 40 cycles on PC
         push!(pred_ds, pred_from_d_nm1(MAK2(), pred_ds[i], k))
         i += 1
     end
-    return fb + pred_ds[2:end][map(Int, cycs)]
+    return fb + pred_ds[2:end][map(Int_T, cycs)]
 end ## pred_from_cycs(::Type{Val{MAK2}})
 
 function pred_from_cycs( ## sec for 40 cycles on PC
@@ -57,7 +57,7 @@ function pred_from_cycs( ## sec for 40 cycles on PC
         push!(pred_ds, pred_from_d_nm1(MAK2(), pred_ds[i], k))
         i += 1
     end
-    return fb + bl_k * cycs .+ pred_ds[2:end][map(Int, cycs)]
+    return fb + bl_k * cycs .+ pred_ds[2:end][map(Int_T, cycs)]
 end ## pred_from_cycs(::Type{Val{MAK3}})
 
 function fit(
