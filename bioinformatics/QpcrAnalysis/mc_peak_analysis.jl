@@ -55,7 +55,7 @@ function mc_peak_analysis(
         end ## if
 
     "Calculate the smoothing parameter `span_smooth`."
-    @inline function calc_span_smooth(fu ::Tuple{Vector{Bool},Vector{<: Integer}})
+    @inline function calc_span_smooth(fu ::Tuple{Vector{Bool},Vector{<: Int_T}})
 
         larger_span(span_smooth_product ::Real) =
             if span_smooth_product > i.span_smooth_default
@@ -264,7 +264,7 @@ function mc_peak_analysis(
     ## == integrated -df/dT peak area elevated from x-axis minus
     ## trapezium-shaped baseline area elevated from x-axis
     "Calculate the area of the peak above its baseline."
-    @inline function calc_area(peak_bounds_idc ::Tuple{Integer, Integer})
+    @inline function calc_area(peak_bounds_idc ::Tuple{Int_T, Int_T})
         #
         area_func(temp_lo ::Real, temp_hi ::Real) =
             -sum(negderiv_smu[[peak_bounds_idc...]]) * 0.5 * (temp_hi - temp_lo) -
@@ -304,9 +304,9 @@ function mc_peak_analysis(
 
     split_vector_and_return_larger_quantile(
         x                   ::AbstractVector,
-        len                 ::Integer,          ## == length(x)
-        idx                 ::Integer,          ## 1 <= idx <= len
-        q                   ::AbstractFloat     ## 0 <= p <= 1
+        len                 ::Int_T,      ## == length(x)
+        idx                 ::Int_T,      ## 1 <= idx <= len
+        q                   ::Float_T     ## 0 <= p <= 1
     ) = (1:idx, idx:len) |> mold(range -> quantile(x[range], q)) |> maximum
 
     ## note: largest_peak_idx calculated incorrectly in original code
@@ -402,7 +402,7 @@ function mc_peak_analysis(
     const num_peaks         = length(peaks_raw)
     #
     ## return smoothed data if no peaks
-    
+
     if num_peaks == 0
         return output_type == McPeakLongOutput ?
 			McPeakLongOutput(
@@ -442,7 +442,7 @@ end ## mc_peak_analysis()
 "Jitter duplicated temperature values so that all the elements become unique."
 function mutate_dups(
     vec_2mut        ::AbstractVector,
-    jitter_constant ::AbstractFloat,
+    jitter_constant ::Float_T,
 )
     debug(logger, "at mutate_dups()")
     const vec_len       = vec_2mut |> length
