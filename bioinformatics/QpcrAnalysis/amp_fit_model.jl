@@ -29,7 +29,7 @@ function amp_fit_model(
     ## these parameters not used to fit DFC models
     baseline_cyc_bounds ::AbstractArray,
     cq_method           ::CqMethod,
-    ct_fluo             ::AbstractFloat,
+    ct_fluo             ::Float_T,
 ) where R <: Union{AmpLongModelResults,AmpShortModelResults}
     bl() = coefs[1] .+
             i.amp_model in [MAK3, MAKERGAUL4] ?
@@ -97,7 +97,7 @@ function amp_fit_model(
     fluos               ::AbstractVector,
     baseline_cyc_bounds ::AbstractArray,
     cq_method           ::CqMethod,
-    ct_fluo             ::AbstractFloat,
+    ct_fluo             ::Float_T,
 ) where R <: AmpModelResults
     "Calculates weights used to estimate the baseline by SFC model."
     @inline function SFC_wts()
@@ -214,7 +214,7 @@ function amp_fit_model(
         return bl_cyc_start:bl_cyc_end
     end ## auto_choose_bl_cycs()
 
-    denser_len(i ::Input, n :: Integer) =
+    denser_len(i ::Input, n :: Int_T) =
         i.denser_factor * (n - 1) + 1
     #
     interpolated_cycles() =

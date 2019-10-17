@@ -501,7 +501,7 @@ get_k(
 "Calculate a single deconvolution matrix K, averaging across all wells"
 function calc_kinv(
     ::Type{Val{well_proc_mean}},
-    smw             ::AbstractArray{<: AbstractFloat},
+    smw             ::AbstractArray{<: Float_T},
     dyes            ::SVector{L,Int_T},
     wells           ::SVector{L,Symbol}
 ) where {L}
@@ -531,7 +531,7 @@ end
 "Calculate deconvolution matrix K for each well"
 function calc_kinv(
     ::Type{Val{well_proc_vec}},
-    smw             ::AbstractArray{<: AbstractFloat},
+    smw             ::AbstractArray{<: Float_T},
     dyes            ::SVector{L,Int_T},
     wells           ::SVector{M,Symbol} where {M}
 ) where {L}

@@ -121,7 +121,7 @@ function get_fit_results(
     i                       ::AmpInput,
     bl_cyc_bounds           ::AbstractArray,
 )
-    function do_model_fit(wi ::Integer, ci ::Integer)
+    function do_model_fit(wi ::Int_T, ci ::Int_T)
         debug(logger, "at do_model_fit($wi, $ci)")
         if isa(solver, Ipopt.IpoptSolver) && length(prefix) > 0
             const ipopt_file = string(join([prefix, ci, wi], '_')) * ".txt"
@@ -231,8 +231,8 @@ set_report_cq!(
 function report_cq!(
     o                       ::AmpLongOutput,
     i                       ::AmpInput,
-    well_i                  ::Integer,
-    channel_i               ::Integer,
+    well_i                  ::Int_T,
+    channel_i               ::Int_T,
 )
     if i.before_128x
         max_dr1_lb, max_dr2_lb, max_bsf_lb = [i.max_dr1_lb, i.max_dr2_lb, i.max_bsf_lb] ./ 128
@@ -299,7 +299,7 @@ amp_init(i ::AmpInput, x) =
 
 function check_bl_cyc_bounds(
     i               ::AmpInput,
-    bl_cyc_bounds   ::Union{Vector{I},Array{Vector{I},2}} where {I <: Integer},
+    bl_cyc_bounds   ::Union{Vector{I},Array{Vector{I},2}} where {I <: Int_T},
 )
     debug(logger, "at check_bl_cyc_bounds()")
     (i.num_cycles <= 2) && return bl_cyc_bounds

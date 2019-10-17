@@ -165,7 +165,7 @@ function mc_analysis(i ::McInput)
         return RawData(t), RawData(f)
     end ## transform_3d()
 
-    normalize_tf(ci ::Integer, wi ::Integer) =
+    normalize_tf(ci ::Int_T, wi ::Int_T) =
         normalize_fluos!(
             remove_when_temperature_NaN(
                 DataFrame(

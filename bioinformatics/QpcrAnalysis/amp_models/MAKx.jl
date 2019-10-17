@@ -33,7 +33,7 @@ function pred_from_cycs( ## 0.7to1.2e-5 sec for 40 cycles on PC
     k       ::Real
 )
     max_cyc = maximum(cycs)
-    pred_ds = [AbstractFloat(d0)]
+    pred_ds = [Float_T(d0)]
     i = 1
     while i <= max_cyc
         push!(pred_ds, pred_from_d_nm1(MAK2(), pred_ds[i], k))
@@ -51,7 +51,7 @@ function pred_from_cycs( ## sec for 40 cycles on PC
     k       ::Real
 )
     max_cyc = maximum(cycs)
-    pred_ds = [AbstractFloat(d0)]
+    pred_ds = [Float_T(d0)]
     i = 1
     while i <= max_cyc
         push!(pred_ds, pred_from_d_nm1(MAK2(), pred_ds[i], k))

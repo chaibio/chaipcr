@@ -65,7 +65,7 @@ const MC_FIELD_DEFS = [
     Field(:num_wells,                   Int_T),
     Field(:num_channels,                Int_T),
     Field(:wells,                       AbstractVector{Symbol}),
-    Field(:channels,                    AbstractVector{<: Integer}),
+    Field(:channels,                    AbstractVector{<: Int_T}),
     Field(:calibration_data,            CalibrationData{<: NumberOfChannels, <: Union{Int_T,Float_T}}),
     Field(:calibration_args,            CalibrationParameters, DEFAULT_CAL_ARGS),
     Field(:max_temperature,             Union{Int_T,Float_T},    DEFAULT_MC_MAX_TEMPERATURE),
