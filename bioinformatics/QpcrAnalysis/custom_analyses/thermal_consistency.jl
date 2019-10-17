@@ -72,11 +72,8 @@ function act(
             kwargs...)
     #
     ## analyse data analyses melting curve
-    const mc_w72c = try
+    const mc_w72c =
         mc_analysis(interface)
-    catch err
-        return fail(logger, err; bt = true) |> out(out_format)
-    end ## try
     #
     ## process the data from only one channel
     ## PROBLEM >> this does not seem appropriate for dual channel analysis

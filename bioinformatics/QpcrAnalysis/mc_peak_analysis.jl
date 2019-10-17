@@ -404,14 +404,12 @@ function mc_peak_analysis(
     ## return smoothed data if no peaks
     if num_peaks == 0
         return output_type == McPeakLongOutput ?
-            McPeakOutput(
-                McPeakLongOutput;
+			McPeakLongOutput(
                 observed_data       = i.reporting(observed_data),
                 smoothed_data       = smoothed_data,
                 negderiv_midrange   = negderiv_midrange,
-                extrema             = sn_dict) :
-            McPeakOutput(
-                McPeakShortOutput;
+                extremes            = sn_dict) :
+            McPeakShortOutput(
                 observed_data       = i.reporting(observed_data))
     end ## if no peaks
     #

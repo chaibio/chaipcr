@@ -24,7 +24,7 @@ struct McLongOutput <: McOutput
     norm_data                   ::SArray{S,<: Real,3} where {S}
     norm_wells                  ::SVector{V,Symbol} where {V}
     calibrated_data             ::Array{Float_T,3}
-    peak_output                 ::Array{McPeakLongOutput,2} ## dim1 is well and dim2 is channel
+    peak_output                 ::Array{McPeakOutput,2} ## dim1 is well and dim2 is channel
     # tf_bychwl                   ::OrderedDict{Int_T,Vector{OrderedDict{String,Vector{Float_T}}}}
 end
 

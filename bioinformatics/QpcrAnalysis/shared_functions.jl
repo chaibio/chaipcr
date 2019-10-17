@@ -262,7 +262,7 @@ julia> [1:5;] |> QpcrAnalysis.moose(hcat) do x; x^2 end |> Tuple
 ## reporter functions
 @inline out(out_format ::OutputFormat) =
     output -> (out_format == json) ? json(output) : output
-@inline report(digits ::Integer, x) = round(x, digits)
+@inline report(digits ::Integer, x) = round.(x, digits)
 const JSON_DIGITS = 6 ## number of decimal points for floats in JSON output
 
 ## used in amplification.jl

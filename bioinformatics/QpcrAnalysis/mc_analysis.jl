@@ -232,7 +232,7 @@ function mc_analysis(i ::McInput)
                 if i.wells[wi] in norm_wells
                     mc_peak_analysis(peak_format, i, normalize_tf(ci, wi))
                 else
-                    McPeakOutput(peak_format)
+                    McPeakShortOutput()
                 end ## if
             end ## next wi
         end #= next ci =# |>

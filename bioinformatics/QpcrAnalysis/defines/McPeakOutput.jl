@@ -30,7 +30,7 @@ const PEAKOUTPUT_FIELD_DEFS = [
     Field(:peaks_filtered,        Array{Float_T,2},               EMPTY_peaks),
     Field(:smoothed_data,         Array{Float_T,2},               EMPTY_data),
     Field(:negderiv_midrange,     Float_T,                        NaN_T),
-    Field(:extremes,              Dict{Symbol,Array{Float_T,2}},  EMPTY_sn),
+    Field(:extremes,              OrderedDict{Symbol,Array{Float_T,2}},  EMPTY_sn),
     Field(:peaks_raw,             Array{Float_T,2},               EMPTY_peaks),
     Field(:peaks_reported,        Bool,                           false)]
 
