@@ -28,18 +28,18 @@ function mc_peak_analysis(
 
     "Filter out data points that are separated by narrow temperature intervals."
     filter_too_close(df ::DataFrame) =
-        df[df[:temperature] |> temperature_intervals |> not_too_close, :]
+        df[df[:temperature] |> mold(Float_T) |> temperature_intervals |> not_too_close, :]
 
     "Calculate temperature intervals."
-    temperature_intervals(temps_orig ::Vector{<: AbstractFloat}) =
+    temperature_intervals(temps_orig ::Vector{<: Float_T}) =
         vcat(diff(temps_orig), Inf_T)
 
     "Criterion for narrow temperature intervals."
-    not_too_close(temp_intervals ::Vector{<: AbstractFloat}) =
+    not_too_close(temp_intervals ::Vector{<: Float_T}) =
         temp_intervals .> i.temp_too_close_frac * median(temp_intervals)
 
     jitter_temps!(df ::DataFrame) =
-        (mutate_dups(df[:temperature], i.jitter_constant), df[:fluorescence])
+        (mutate_dups(df[:temperature], i.jitter_constant), df[:fluorescence] |> mold(Float_T))
 
     ## functions used to calculate `span_smooth` >>
 
@@ -112,7 +112,7 @@ function mc_peak_analysis(
     "Find nearby data points in a vector."
     find_in_span(
         X           ::AbstractVector,
-        i           ::Integer,
+        i           ::Int_T,
         half_span   ::Real
     ) =
         find(X) do x
@@ -150,7 +150,7 @@ function mc_peak_analysis(
 
     "Calculate baseline-subtracted spline-smoothed fluorescence data, and optionally
     smooth the output of the spline function."
-    fluo_spl_blsub(fluo_spl ::AbstractVector{<: AbstractFloat}) =
+    fluo_spl_blsub(fluo_spl ::AbstractVector{<: Float_T}) =
         ## assumes constant baseline == minimum fluorescence value
         sweep(minimum)(-)(
             ## optionally, smooth the output of the spline function
@@ -160,7 +160,7 @@ function mc_peak_analysis(
 
     "Calculate the negative derivative at interpolated temperatures and smooth
     the output using `supsmu`."
-    negderiv_smu(negderiv ::AbstractVector{<: AbstractFloat}) =
+    negderiv_smu(negderiv ::AbstractVector{<: Float_T}) =
         supsmu(denser_temps, negderiv, span_smooth)
 
     ## note: DataArray format doesn't work for `derivative` by "Dierckx"
@@ -179,9 +179,9 @@ function mc_peak_analysis(
     function find_local(
         summary_func    ::Function,
         vals            ::AbstractVector,
-        half_width      ::Integer,
+        half_width      ::Int_T,
     )
-        vals_in_window(i ::Integer) = vals_padded[i : i + half_width * 2]
+        vals_in_window(i ::Int_T) = vals_padded[i : i + half_width * 2]
         match_summary_val(v ::AbstractVector) = summary_func(v) == v[half_width + 1]
         #
         const padding = -summary_func(-vals) |> furnish(half_width)
@@ -402,6 +402,7 @@ function mc_peak_analysis(
     const num_peaks         = length(peaks_raw)
     #
     ## return smoothed data if no peaks
+    
     if num_peaks == 0
         return output_type == McPeakLongOutput ?
 			McPeakLongOutput(

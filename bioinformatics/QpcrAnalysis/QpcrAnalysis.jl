@@ -43,10 +43,10 @@ module QpcrAnalysis
     const production_env   = (get(ENV, "JULIA_ENV", nothing) == PRODUCTION_MODE)
     ##const production_env = true
 	
-    const Float_T = (Sys.WORD_SIZE == 32) ? Float32 : Float64
+    const Float_T = Float64
 	const Int_T = (Sys.WORD_SIZE == 32) ? Int32 : Int64
-    const NaN_T = (Sys.WORD_SIZE == 32) ? NaN32 : NaN64
-    const Inf_T = (Sys.WORD_SIZE == 32) ? Inf32 : Inf64
+    const NaN_T = NaN64
+    const Inf_T = Inf64
 
 #===============================================================================
     include each script, generally in the order of workflow
