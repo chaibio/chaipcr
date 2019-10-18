@@ -23,7 +23,7 @@ function act(
     ::Type{Val{standard_curve}},
     req         ::Vector{Any};
     out_format  ::OutputFormat = pre_json_output,
-    json_digits ::Integer = JSON_DIGITS,
+    json_digits ::Int_T = JSON_DIGITS,
     qty_base    ::Real = 10,
     empty_tre   ::TargetResultEle = EMPTY_TRE,
     empty_gre   ::GroupResultEle  = EMPTY_GRE

@@ -263,13 +263,13 @@ julia> [1:5;] |> QpcrAnalysis.moose(hcat) do x; x^2 end |> Tuple
 @inline out(out_format ::OutputFormat) =
     output -> (out_format == json) ? json(output) : output
 @inline report(digits ::Integer, x) = round.(x, digits)
-const JSON_DIGITS = 6 ## number of decimal points for floats in JSON output
+const JSON_DIGITS = Int_T(6) ## number of decimal points for floats in JSON output
 
 ## used in amplification.jl
 ## used in mc_peak_analysis.jl
 ## used in thermal_consistency.jl
 """
-    roundoff(digits ::Integer)(x)
+    roundoff(digits ::Int_T)(x)
 
 Curried reporter function."
 
@@ -279,7 +279,7 @@ julia> pi |> QpcrAnalysis.roundoff(2)
 3.14
 ```
 """
-@inline roundoff(digits ::Integer) = cast(curry(report))(digits)
+@inline roundoff(digits ::Int_T) = cast(curry(report))(digits)
 
 @inline get_ordered_keys(dict ::Dict) =
     dict |> keys |> collect |> sort
@@ -426,7 +426,7 @@ end
 ## used in calibration.jl
 ## used in CalibrationData.jl
 "Derive the number of wells from the collection of data vectors supplied to the function."
-count_wells(fluos ::AbstractArray) =
+count_wells(fluos ::Array) =
     fluos |> mold(length) |> maximum
 count_wells(dict ::Associative) =
     dict |> values |> mold(count_wells ∘ index(FLUORESCENCE_VALUE_KEY)) |> maximum
