@@ -50,21 +50,29 @@ cat << 'EOF' >  add_catch.patch
 
 --- src/BuildExecutable.jl	2018-05-29 22:08:45.271522602 +0000
 +++ src/BuildExecutable.jl	2018-05-29 20:48:13.108040252 +0000
-@@ -143,10 +143,13 @@
+@@ -137,16 +137,20 @@
      run(cmd)
      println()
-
+ 
+-
++try
+     println("running: $gcc -g $win_arg $(join(incs, " ")) $(cfile) -o $(exe_file.buildfile) -Wl,-rpath,$(sys.buildpath) -L$(sys.buildpath) $(exe_file.libjulia) -l$(exename)")
+     cmd = setenv(`$gcc -g $win_arg $(incs) $(cfile) -o $(exe_file.buildfile) -Wl,-rpath,$(sys.buildpath) -Wl,-rpath,$(sys.buildpath*"/julia") -L$(sys.buildpath) $(exe_file.libjulia) -l$(exename)`, ENV2)
+     run(cmd)
+     println()
++end
+ 
 +try
      println("running: rm -rf $(tmpdir) $(sys.buildfile).o $(sys.inference).o $(sys.inference).ji $(sys.inference0).o $(sys.inference0).ji")
      map(f-> rm(f, recursive=true), [tmpdir, sys.buildfile*".o", sys.inference*".o", sys.inference*".ji", sys.inference0*".o", sys.inference0*".ji"])
      println()
 +end
-
+ 
 +try
      if targetdir != nothing
          # Move created files to target directory
          for file in [exe_file.buildfile, sys.buildfile * ".$(Libdl.dlext)", sys.buildfile * ".ji"]
-@@ -194,7 +197,7 @@
+@@ -194,7 +198,7 @@
              end
          end
      end
@@ -73,11 +81,10 @@ cat << 'EOF' >  add_catch.patch
      println("$(exe_file.targetfile) successfully created.")
      return 0
  end
-
-
 EOF
 
     echo "Patching..."
+exit 0
     patch -i add_catch.patch || (echo error patching ExecBuilder package && exit 1)
     echo "done installation... creating executable:"
     rm add_catch.patch
