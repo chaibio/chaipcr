@@ -84,7 +84,6 @@ cat << 'EOF' >  add_catch.patch
 EOF
 
     echo "Patching..."
-exit 0
     patch -i add_catch.patch || (echo error patching ExecBuilder package && exit 1)
     echo "done installation... creating executable:"
     rm add_catch.patch
