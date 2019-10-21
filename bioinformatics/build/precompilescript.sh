@@ -41,6 +41,7 @@ then
     fi
 
     echo "Creating executable"
+#    julia -e 'Pkg.add("BuildExecutable");Pkg.add("Suppressor");Pkg.checkout("BuildExecutable")'
     julia -e 'Pkg.add("BuildExecutable");Pkg.checkout("BuildExecutable")'
 
     cd ${julia_pkgdir}/.julia/v0.6/BuildExecutable/src/
@@ -77,7 +78,6 @@ cat << 'EOF' >  add_catch.patch
 EOF
 
     echo "Patching..."
-
     patch -i add_catch.patch || (echo error patching ExecBuilder package && exit 1)
     echo "done installation... creating executable:"
     rm add_catch.patch
@@ -92,14 +92,15 @@ push!(LOAD_PATH, "/root/chaipcr/bioinformatics/QpcrAnalysis/")
 
 println("Using time: ")
 @time using QpcrAnalysis
+#using Suppressor
 println("Done Using!")
-
 
 if isfile("/root/chaipcr/bioinformatics/build/exec_testfns.jl")
     println("Function test script found.. executing by precompile script!")
-try
-    include("/root/chaipcr/bioinformatics/build/exec_testfns.jl")
-end
+    #@suppress try
+    try
+	include("/root/chaipcr/bioinformatics/build/exec_testfns.jl")
+    end
 else
     println("Function test script not found!")
 end
@@ -132,7 +133,9 @@ println("Executable creation finished")
 EOF
 
     rm -r /tmp/output/
+    ls /lib/lib/root && rm -r /lib/lib/root
     mkdir -p /tmp/output/
+    ls /lib/lib/root || mkdir -p /lib/lib/root
     ls /root/qpcranalysis && rm /root/qpcranalysis
 
     rm -r /usr/lib/lib/root/
@@ -148,6 +151,7 @@ EOF
     time JULIA_ENV=production $JULIA /tmp/mkexec.jl
 
     mkdir -p /root/lib/root/
+    ls  /root/lib/root/qpcranalysis.so && cp /lib/lib/root/qpcranalysis.so  /root/lib/root/qpcranalysis.so
     cp /usr/lib/lib/root/qpcranalysis.so /root/lib/root/qpcranalysis.so
 
 fi
@@ -163,12 +167,19 @@ test_julia_server()
         cp /tmp/output/qpcranalysis  /root/chaipcr/bioinformatics/
         cp /tmp/output/qpcranalysis.so /root/chaipcr/bioinformatics/
         rm -r /tmp/output
-
+    elif [ -e /lib/lib/root/qpcranalysis.so ]
+    then
+        echo "moving qpcranalysis.so"
+        date
+        cp /lib/lib/root/qpcranalysis.so  /root/chaipcr/bioinformatics/
+    fi
+    if [ -e /root/chaipcr/bioinformatics/qpcranalysis.so ]
+    then
         echo "running with qpcranalysis.so"
         JULIA_ENV=production julia  -J /root/chaipcr/bioinformatics/qpcranalysis.so -e 'push!(LOAD_PATH, "/root/chaipcr/bioinformatics/QpcrAnalysis/"); include("/root/chaipcr/bioinformatics/juliaserver.jl")'
         echo "exit running with qpcranalysis.so"
         date
-        else
+    else
         echo "running without qpcranalysis.so"
         JULIA_ENV=production julia  -e 'push!(LOAD_PATH, "/root/chaipcr/bioinformatics/QpcrAnalysis/"); include("/root/chaipcr/bioinformatics/juliaserver.jl")'
         echo "exit running without qpcranalysis.so"
