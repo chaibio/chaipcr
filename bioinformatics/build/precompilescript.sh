@@ -208,3 +208,5 @@ sleep 100
 
 ps -aux | grep julia
 df -h
+
+exit 0
