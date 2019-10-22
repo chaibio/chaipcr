@@ -55,7 +55,7 @@ function mc_peak_analysis(
         end ## if
 
     "Calculate the smoothing parameter `span_smooth`."
-    @inline function calc_span_smooth(fu ::Tuple{Vector{Bool},Vector{<: Int_T}})
+    @inline function calc_span_smooth(fu ::Tuple{Vector{Bool},Vector{<: Integer}})
 
         larger_span(span_smooth_product ::Real) =
             if span_smooth_product > i.span_smooth_default
@@ -264,7 +264,7 @@ function mc_peak_analysis(
     ## == integrated -df/dT peak area elevated from x-axis minus
     ## trapezium-shaped baseline area elevated from x-axis
     "Calculate the area of the peak above its baseline."
-    @inline function calc_area(peak_bounds_idc ::Tuple{Int_T, Int_T})
+    @inline function calc_area(peak_bounds_idc ::Tuple{Integer, Integer})
         #
         area_func(temp_lo ::Real, temp_hi ::Real) =
             -sum(negderiv_smu[[peak_bounds_idc...]]) * 0.5 * (temp_hi - temp_lo) -
@@ -304,8 +304,8 @@ function mc_peak_analysis(
 
     split_vector_and_return_larger_quantile(
         x                   ::AbstractVector,
-        len                 ::Int_T,      ## == length(x)
-        idx                 ::Int_T,      ## 1 <= idx <= len
+        len                 ::Integer,      ## == length(x)
+        idx                 ::Integer,      ## 1 <= idx <= len
         q                   ::Float_T     ## 0 <= p <= 1
     ) = (1:idx, idx:len) |> mold(range -> quantile(x[range], q)) |> maximum
 
