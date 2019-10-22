@@ -106,7 +106,7 @@ function add_func_fit!( ## vco = variable constraints objective
     #
     ## return
     return_str = join([
-        "status = solve(jmp_model)",
+        "status = solve(jmp_model; suppress_warnings=true)",
         "coef_strs = [\"$(join(md.coef_strs, "\", \""))\"]",
         "coefs = map(getvalue, [$(join(md.coef_strs, ", "))])",
         "obj_val = getobjectivevalue(jmp_model)",

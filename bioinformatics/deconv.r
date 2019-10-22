@@ -39,7 +39,7 @@ get_k <- function(
             k_data_1dye / sum(k_data_1dye)
         })))
         colnames(k) <- dye_names
-        k_inv <- tryCatch(solve(k), error=err_e)
+        k_inv <- tryCatch(solve(k; suppress_warnings=true, error=err_e)
         if ('error' %in% class(k_inv)) {
             k_singular <- c('Well mean K matrix is singular. ')
         } else {
@@ -57,7 +57,7 @@ get_k <- function(
                 k_data_1dye / sum(k_data_1dye)
             })))
             k[,,well_num] <- k_mtx
-            k_inv <- tryCatch(solve(k_mtx), error=err_e)
+            k_inv <- tryCatch(solve(k_mtx; suppress_warnings=true), error=err_e)
             if ('error' %in% class(k_inv)) {
                 k_singular_vec <- c(k_singular_vec, well_num)
             } else {

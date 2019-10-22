@@ -157,7 +157,7 @@ function fit(
     #     @eval $(parse(get_mak2_rsq_str(obs_fluos[1:max_d2_idx]))) ## `OutOfMemoryError()`
     # )
 
-    status = solve(jmp_model)
+    status = solve(jmp_model; suppress_warnings=true)
     coef_strs = ["fb", "eu0", "d0", "inh"]
     coefs = map(getvalue, [fb, eu0, d0, inh])
     obj_val = getobjectivevalue(jmp_model)
@@ -258,7 +258,7 @@ function fit(
     #     @eval $(parse(get_mak2_rsq_str(obs_fluos[1:max_d2_idx]))) ## `OutOfMemoryError()`
     # )
 
-    status = solve(jmp_model)
+    status = solve(jmp_model; suppress_warnings=true)
     coef_strs = ["fb", "bl_k", "eu0", "d0", "inh"]
     coefs = map(getvalue, [fb, bl_k, eu0, d0, inh])
     obj_val = getobjectivevalue(jmp_model)
