@@ -56,7 +56,13 @@ function act(
     ## keyword arguments
     const kwargs = MC_FIELD_DEFS |>
         sift(x -> x.key in keys(req)) |>
-        mold(x -> x.name => req[x.key])
+        mold() do x
+			if isa(req[x.key], Int64) && Int_T != Int64
+				x.name => Int_T(req[x.key])
+			else
+				x.name => req[x.key]
+			end
+        end
     #
     ## create container for data and parameter values
     interface = McInput(
