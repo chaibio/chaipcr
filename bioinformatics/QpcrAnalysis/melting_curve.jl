@@ -47,7 +47,11 @@ function act(
     const kwargs = MC_FIELD_DEFS |>
         sift(req_key ∘ field(:key)) |>
         mold() do x
-            x.name => req[x.key]
+			if isa(req[x.key], Int64) && Int_T != Int64
+				x.name => Int_T(req[x.key])
+			else
+				x.name => req[x.key]
+			end
         end
     #
     ## create container for data and parameter values
