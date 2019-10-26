@@ -479,7 +479,7 @@ exit 0
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo arranging to build julia and different libs
+      <command>echo install 3rd party packages
 sync
 
 df -h
@@ -673,10 +673,16 @@ cd /sdcard/factory/julia-compile
 
 mkdir downloadjulia
 cd downloadjulia
-wget https://julialang-s3.julialang.org/bin/linux/armv7l/0.6/julia-0.6.3-linux-armv7l.tar.gz
+wget $download_prefix/julia-v0.6.4-linux-armv7l.tar.gz
+#julia-0.6.3-test.tar.gz
+#julia-v0.6.4-linux-armv7l.tar.gz
+#wget https://julialang-s3.julialang.org/bin/linux/armv7l/0.6/julia-0.6.3-linux-armv7l.tar.gz
 #wget https://julialang-s3.julialang.org/bin/linux/armv7l/0.6/julia-0.6.2-linux-armv7l.tar.gz
 #tar xfvz julia-0.6.2-linux-armv7l.tar.gz
-tar xfvz julia-0.6.3-linux-armv7l.tar.gz
+#tar xfvz julia-0.6.3-linux-armv7l.tar.gz
+tar xfvz julia-v0.6.4-linux-armv7l.tar.gz
+#xfvz julia-v0.6.4-linux-armv7l.tar.gz
+
 cp -r julia-*/* /usr/
 
 cd ..
@@ -863,7 +869,7 @@ apt-get update
 apt-get install -y -q libfontconfig1-dev libfreetype6-dev
 
 echo downloading compiled QT v4.8.6
-cd /sdcard/factory/
+cd /sdcard/upgrade/
 #wget $download_prefix/qt-everywhere-compiled-4.8.6.tgz
 wget $download_prefix/qt-everywhere-slim-4.8.6.tgz
 tar xfv qt-everywhere-slim-4.8.6.tgz
@@ -887,7 +893,7 @@ if $is_dev
 then
       echo Building a debug image
 else
-    cd /sdcard/factory/
+    cd /sdcard/upgrade/
     rm -r qt-everywhere-opensource-src-4.8.6
     rm qt-everywhere-compiled-4.8.6.tgz
     rm qt-everywhere-slim-4.8.6.tgz

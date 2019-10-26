@@ -16,7 +16,7 @@
         <hudson.model.StringParameterDefinition>
           <name>download_prefix</name>
           <description>Jenkins server download postfix</description>
-          <defaultValue>10.0.1.20/download</defaultValue>
+          <defaultValue>http://10.0.1.20/download</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
