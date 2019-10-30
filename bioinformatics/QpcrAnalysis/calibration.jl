@@ -18,7 +18,7 @@ import Memento: debug, error
 ===============================================================================#
 
 ## default values
-const DEFAULT_CAL_FIRST_WELL        = 0
+const DEFAULT_CAL_FIRST_WELL        = 1
 
 ## preset values
 const NORMALIZATION_SCALING_FACTOR  = 3.7           ## used: 9e5, 1e5, 1.2e6, 3.0
@@ -68,6 +68,7 @@ function calibrate(
     const matched_exp_well_idc = find(matched_wells)
     const matched_calib_well_idc = SVector{length(matched_exp_well_idc)}(
         matched_wells[matched_exp_well_idc])
+
     #
     ## subtract background
     const background_subtracted_data =
@@ -76,6 +77,7 @@ function calibrate(
             norm_data[:,:,WATER],
             matched_wells,
             matched_exp_well_idc)
+
     #
     const (k_deconv, deconvoluted_data) =
         if  calibration_args.dcv &&

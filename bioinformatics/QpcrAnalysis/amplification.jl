@@ -193,19 +193,14 @@ function parse_raw_data(::Type{Val{amplification}}, raw_dict ::Associative)
             raw_dict[FLUORESCENCE_VALUE_KEY],
             num_cycles, num_wells, num_channels)
     #
-    ## rearrange data in sort order of each index
-    const cyc_perm  = sortperm(cycles)
-    const well_perm = sortperm(wells)
-    const chan_perm = sortperm(channels)
     #
     ## kludge to index well numbers starting at 0
-    const kludge = sweep(minimum)(-)(wells)
     return (
-        RawData{F}(raw_data[cyc_perm, well_perm, chan_perm]),
+        RawData{F}(raw_data[cycles, wells, channels]),
         Int_T(num_cycles),
         Int_T(num_wells),
         Int_T(num_channels),
-        cycles[cyc_perm] |> SVector{num_cycles,Int_T},
-        kludge[well_perm] |> mold(Symbol ∘ Int_T) |> SVector{num_wells,Symbol},
-        channels[chan_perm] |> SVector{num_channels,Int_T})
+        cycles[cycles] |> SVector{num_cycles,Int_T},
+        wells |> mold(Symbol ∘ Int_T) |> SVector{num_wells,Symbol},
+        channels[channels] |> SVector{num_channels,Int_T})
 end ## parse_raw_data(Type{Val{amplification}})
