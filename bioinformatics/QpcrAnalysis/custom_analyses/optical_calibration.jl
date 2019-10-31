@@ -40,10 +40,10 @@ function act(
 
     ## get calibration data and use default analysis parameters
     @get_calibration_data_from_req(optical_cal)
-    const calibration_args = CalibrationParameters()
+    calibration_args = CalibrationParameters()
     #
     ## check validity of data for normalization
-    const wells = try
+    wells = try
         prep_normalize(calibration_data)[2]
     catch err
         return fail(logger, err; bt = true) |> out(out_format)
@@ -52,7 +52,7 @@ function act(
     ## if there are 2 or more channels then
     ## check validity of data for deconvolution
     if isa(calibration_data, CalibrationData{DualChannel,<: Real})
-        const result_k = try
+        result_k = try
             get_k(
                 calibration_data,
                 calibration_args,

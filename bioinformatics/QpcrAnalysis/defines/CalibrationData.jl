@@ -35,29 +35,29 @@ end
 ## parser / outer constructor
 function CalibrationData(calib ::Associative)
     local water, dye1, dye2 ## not enum
-    const num_wells = count_wells(calib)
-    const water     = calib[WATER_KEY][FLUORESCENCE_VALUE_KEY]
+    num_wells = count_wells(calib)
+    water     = calib[WATER_KEY][FLUORESCENCE_VALUE_KEY]
     R         = water |> first |> first |> typeof
 	if (R == Int64 && Int_T != Int64)
 		R = Int_T
 	end
 	
-    const dye1      = calib[CHANNEL_KEY * "_1"][FLUORESCENCE_VALUE_KEY]
+    dye1      = calib[CHANNEL_KEY * "_1"][FLUORESCENCE_VALUE_KEY]
     if length(dye1) > 1 && thing(dye1[2]) && haskey(calib, CHANNEL_KEY * "_2")
-        const dye2  = calib[CHANNEL_KEY * "_2"][FLUORESCENCE_VALUE_KEY]
-        const data  = try
+        dye2  = calib[CHANNEL_KEY * "_2"][FLUORESCENCE_VALUE_KEY]
+        data  = try
             [water, dye1, dye2] |> gather(vcat) |> gather(hcat) |>
                 morph(num_wells,2,3) |> mold(bless(R))
-        catch()
+        catch
             warn(logger, "dual channel calibration data are in the wrong format")
             rethrow()
         end ## try
         return CalibrationData(DualChannel, data)
     end ## if
     ## else single channel
-    const data  = try
+    data  = try
         [water, dye1] |> moose(first, hcat) |> morph(num_wells,1,2) |> mold(bless(R))
-    catch()
+    catch
         warn(logger, "single channel calibration data are in the wrong format")
         rethrow()
     end ## try

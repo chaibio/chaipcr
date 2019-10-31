@@ -17,7 +17,7 @@
 
 const EMPTY_data    = zeros(Float_T, 1,3)[1:0,:]
 const EMPTY_peaks   = zeros(Float_T, 1,2)[1:0,:]
-const EMPTY_sn      = Dict(:summit => EMPTY_peaks, :nadir => EMPTY_peaks)
+const EMPTY_sn      = OrderedDict(:summit => EMPTY_peaks, :nadir => EMPTY_peaks)
 
 
 

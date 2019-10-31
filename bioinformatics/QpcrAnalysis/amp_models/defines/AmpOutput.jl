@@ -108,9 +108,9 @@ function AmpOutput(
     calibrated_data             ::Array{<: Real,3},
     ct_fluos                    ::AbstractVector;
 )
-    const NaN_array2        = amp_init(i, NaN_T)
-    const fitted_init       = amp_init(i, FIT[i.amp_model]())
-    const empty_vals_4cq    = amp_init(i, OrderedDict{Symbol, Float_T}())
+    NaN_array2        = amp_init(i, NaN_T)
+    fitted_init       = amp_init(i, FIT[i.amp_model]())
+    empty_vals_4cq    = amp_init(i, OrderedDict{Symbol, Float_T}())
     AmpLongOutput(
         i.raw_data, ## formerly fr_ary3
         background_subtracted_data, ## formerly mw_ary3
@@ -167,8 +167,8 @@ function AmpOutput(
     ct_fluos                    ::AbstractVector;
     reporting                   ::Function = roundoff(JSON_DIGITS) ## reporting function
 )
-    const NaN_array2 = amp_init(i, NaN_T)
-    const cd = reporting.(calibrated_data)
+    NaN_array2 = amp_init(i, NaN_T)
+    cd = reporting.(calibrated_data)
     AmpShortOutput(
         cd, ## formerly rbbs_ary3
         cd, ## blsub_fluos

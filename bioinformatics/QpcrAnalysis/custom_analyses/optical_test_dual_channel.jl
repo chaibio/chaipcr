@@ -59,9 +59,9 @@ function act(
     # well_nums ::AbstractVector =[],
 )
     function SNR_test(w, label)
-        const (baseline_2chs, water_fluo_2chs, signal_fluo_2chs) =
+        (baseline_2chs, water_fluo_2chs, signal_fluo_2chs) =
             map(key -> fluo_dict[key][w, :], [:baseline, :water, label])
-        const snr_2chs =
+        snr_2chs =
             (signal_fluo_2chs .- water_fluo_2chs) ./ (signal_fluo_2chs .- baseline_2chs)
         transpose(dscrmnts_snr[label](transpose(snr_2chs)))
     end
@@ -83,7 +83,7 @@ function act(
     # num_wells = length(fluo_well_nums)
 
     # fluo_dict = OrderedDict(map(old_labels) do label ## old
-    const fluo_dict =
+    fluo_dict =
         OrderedDict(
             map(OPTICAL_TEST_SYMBOLS) do label
                 label =>
@@ -96,7 +96,7 @@ function act(
                         hcat,
                         CHANNELS)
             end)
-    const num_wells = size(fluo_dict[:baseline], 1)
+    num_wells = size(fluo_dict[:baseline], 1)
     #
     bool_dict = OrderedDict(:baseline => fill(true, num_wells, length(CHANNELS)))
     ## water test
@@ -118,7 +118,7 @@ function act(
     end
     #
     ## organize "optical_data"
-    const optical_data =
+    optical_data =
         map(1:num_wells) do well
             OrderedDict(
                 map(OPTICAL_TEST_SYMBOLS) do label
@@ -145,19 +145,19 @@ function act(
     ## reporting negative or infinite values
     #
     ## substract water values from signal values
-    const swd_vec =
+    swd_vec =
         map(DYE_SYMBOLS) do label
             map(CHANNELS) do channel
                 fluo_dict[label][:, channel] .- fluo_dict[:water][:, channel]
             end ## do channel
         end ## do label
     ## calculate normalization values from data in target channels
-    const swd_normd =
+    swd_normd =
         map(CHANNELS) do target
             sweep(mean)(/)(swd_vec[target][target]) ## dye == channel
         end
     ## normalize signal data
-    const self_calib_vec =
+    self_calib_vec =
         map(swd_vec) do swd_dye
             map(CHANNELS) do channel
                 swd_dye[channel] ./ swd_normd[channel]
@@ -178,7 +178,7 @@ function act(
     end ## for dye, channel, value
     #
     ## calculate channel1:channel2 ratios
-    const ch12_ratios =
+    ch12_ratios =
         OrderedDict(
             map(DYES) do dye
                 sc_dye = self_calib_vec[dye]
@@ -191,7 +191,7 @@ function act(
     end
 
     ## return values
-    const output = OrderedDict(
+    output = OrderedDict(
         :optical_data       => optical_data,
         Symbol("Ch1:Ch2")   => ch12_ratios,
         :valid              => length(error_msgs) == 0,

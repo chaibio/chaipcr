@@ -44,7 +44,7 @@ function act(
     @parse_raw_data_from_req(meltcurve)
     #
     ## keyword arguments
-    const kwargs = MC_FIELD_DEFS |>
+    kwargs = MC_FIELD_DEFS |>
         sift(req_key ∘ field(:key)) |>
         mold() do x
 			if isa(req[x.key], Int64) && Int_T != Int64
@@ -63,7 +63,7 @@ function act(
     #
     ## pass data and parameter values to mc_analysis()
     ## which will perform the analysis for the entire dataset
-    const response =
+    response =
         mc_analysis(interface)
 
     return response |> out(out_format)
@@ -78,7 +78,7 @@ function parse_raw_data(
     ::Union{Type{Val{meltcurve}},Type{Val{thermal_consistency}}},
     raw_dict ::Associative
 )
-    const mc_raw_df = DataFrame()
+    mc_raw_df = DataFrame()
     foreach(keys(MC_RAW_FIELDS)) do key
         try
             mc_raw_df[key] = raw_dict[MC_RAW_FIELDS[key]]
@@ -92,11 +92,11 @@ function parse_raw_data(
         end ## try
     end ## next key
     mc_raw_df[:well] = mc_raw_df[:well] |> mold(Symbol ∘ Int_T)
-    const (wells, channels) =
+    (wells, channels) =
         map([WELL_NUM_KEY, CHANNEL_KEY]) do key
             raw_dict[key] |> unique |> sort
         end
-    const (num_wells, num_channels) =
+    (num_wells, num_channels) =
         map(length, (wells, channels))
     return (
         mc_raw_df,

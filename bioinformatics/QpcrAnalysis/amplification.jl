@@ -34,7 +34,7 @@ function act(
     @parse_raw_data_from_req(amplification)
     #
     ## keyword arguments
-    const kwargs = AMP_FIELD_DEFS |>
+    kwargs = AMP_FIELD_DEFS |>
         sift(req_key ∘ field(:key)) |>
         mold() do x
 			if isa(req[x.key], Int64) && Int_T != Int64
@@ -54,7 +54,7 @@ function act(
         push!(kwargs,
             :categ_well_vec =>
                 map(req[CATEG_WELL_VEC_KEY]) do x
-                    const element = str2sym.(x)
+                    element = str2sym.(x)
                     (length(element[2]) == 0) ?
                         element :
                         Colon()
@@ -63,9 +63,9 @@ function act(
         push!(kwargs, :ctrl_well_dict => str2sym.(req[CTRL_WELL_DICT_KEY]))
     #
     ## baseline model parameters
-    const kw_bl =
+    kw_bl =
         begin
-            const baseline_method =
+            baseline_method =
                 req_key(BASELINE_METHOD_KEY) &&
                req[BASELINE_METHOD_KEY]
             if      (baseline_method == SIGMOID_KEY)
@@ -86,14 +86,14 @@ function act(
     #
     ## create container for data and parameters
     ## to pass to amp_analysis()
-    const interface = AmpInput(
+    interface = AmpInput(
         parsed_raw_data...,
         calibration_data;
         out_format = out_format,
         amp_output = AmpOutputOption(out_format),
         kw_bl...,
         kwargs...,)
-    const result =
+    result =
         ## issues:
         ## 1.
         ## the new code currently assumes only 1 step/ramp
@@ -132,7 +132,7 @@ function act(
         #                 key => getfield(first_sr_out, key)
         #             end)
         # end
-        const first_sr_out = amp_analysis(interface)
+        first_sr_out = amp_analysis(interface)
         OrderedDict([
             map(fieldnames(first_sr_out)) do key
                 key => getfield(first_sr_out, key)
@@ -153,11 +153,11 @@ end ## act(::Type{Val{amplification}})
 "Extract dimensions of raw amplification data, then format the raw data into a
 3D array as required by `calibrate`."
 function parse_raw_data(::Type{Val{amplification}}, raw_dict ::Associative)
-    const (cycles, wells, channels) =
+    (cycles, wells, channels) =
         map([CYCLE_NUM_KEY, WELL_NUM_KEY, CHANNEL_KEY]) do key
             raw_dict[key] |> unique ## in order of appearance
         end
-    const (num_cycles, num_wells, num_channels) =
+    (num_cycles, num_wells, num_channels) =
         map(length, (cycles, wells, channels))
     #
     ## check that data are sorted and conformable to 3D array
@@ -188,7 +188,7 @@ function parse_raw_data(::Type{Val{amplification}}, raw_dict ::Associative)
 	if (F == Int64 && Int_T != Int64)
 		F = Int_T
 	end
-    const raw_data = ## formerly `fr_ary3`
+    raw_data = ## formerly `fr_ary3`
         reshape(
             raw_dict[FLUORESCENCE_VALUE_KEY],
             num_cycles, num_wells, num_channels)

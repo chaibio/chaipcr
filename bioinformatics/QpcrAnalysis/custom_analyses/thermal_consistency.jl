@@ -54,7 +54,7 @@ function act(
     @parse_raw_data_from_req(thermal_consistency)
     #
     ## keyword arguments
-    const kwargs = MC_FIELD_DEFS |>
+    kwargs = MC_FIELD_DEFS |>
         sift(x -> x.key in keys(req)) |>
         mold() do x
 			if isa(req[x.key], Int64) && Int_T != Int64
@@ -78,21 +78,21 @@ function act(
             kwargs...)
     #
     ## analyse data analyses melting curve
-    const mc_w72c =
+    mc_w72c =
         mc_analysis(interface)
     #
     ## process the data from only one channel
     ## PROBLEM >> this does not seem appropriate for dual channel analysis
-    const mc_tm = map(
+    mc_tm = map(
         field(:peaks_filtered),
         mc_w72c.peak_output[:, CHANNELS[1]]) ## mc_matrix
     min_Tm = max_temperature + 1
     max_Tm = 0
-    const tm_check_vec = map(mc_tm) do Ta
+    tm_check_vec = map(mc_tm) do Ta
         if size(Ta, 1) == 0
             TmCheck1w((NaN_T, false), NaN_T)
         else
-            const top1_Tm = Ta[1,1]
+            top1_Tm = Ta[1,1]
             (top1_Tm < min_Tm) && (min_Tm = top1_Tm)
             (top1_Tm > max_Tm) && (max_Tm = top1_Tm)
             TmCheck1w(
@@ -102,7 +102,7 @@ function act(
     end ## do Ta
     #
     ## return values
-    const delta_Tm_val = max_Tm - min_Tm
+    delta_Tm_val = max_Tm - min_Tm
     full_out() =
         ThermalConsistencyOutput(
             tm_check_vec,

@@ -48,7 +48,7 @@ macro get_calibration_data_from_req(action)
             req_key(CALIBRATION_INFO_KEY) ||
                 return ArgumentError(
                     "no calibration data for " * string($action) * " analysis in request")
-            const calibration_data = try
+            calibration_data = try
                 CalibrationData(req[CALIBRATION_INFO_KEY])
             catch err
                 error(logger, "calibration data exception: " * sprint(showerror, err))
@@ -66,7 +66,7 @@ macro parse_raw_data_from_req(action)
             req_key(RAW_DATA_KEY) ||
                 return ArgumentError(
                     "no raw data for " * string($action) * " analysis in request")
-            const parsed_raw_data = try
+            parsed_raw_data = try
                 parse_raw_data(Val{$action}, req[RAW_DATA_KEY])
             catch err
                 error(logger, "parse_raw_data exception: " * sprint(showerror, err))

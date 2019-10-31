@@ -26,7 +26,7 @@ function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
     debug(logger, "at amp_analysis()")
     #
     ## deconvolute and normalize
-    const calibration_results =
+    calibration_results =
         calibrate(i, i.calibration_data, i.calibration_args, i.raw, array)
     #
     ## initialize output
@@ -43,7 +43,7 @@ function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
         warn(logger, "number of cycles $num_cycles <= 2: baseline subtraction " *
             "and Cq calculation will not be performed")
     else ## num_cycles > 2
-        const baseline_cyc_bounds = check_bl_cyc_bounds(i, DEFAULT_AMP_BL_CYC_BOUNDS)
+        baseline_cyc_bounds = check_bl_cyc_bounds(i, DEFAULT_AMP_BL_CYC_BOUNDS)
         set_ct_fluos!(o, i, baseline_cyc_bounds)
         set_output_fields!(o, i, get_fit_results(o, i, baseline_cyc_bounds))
         set_qt_fluos!(o, i)
@@ -77,9 +77,9 @@ function set_ct_fluos!(
     ## else
     o.ct_fluos =
         map(1:i.num_channels) do channel_i
-            const fits =
+            fits =
                 map(1:i.num_wells) do well_i
-                    const fluos = o.rbbs_ary3[:, well_i, channel_i]
+                    fluos = o.rbbs_ary3[:, well_i, channel_i]
                     amp_fit_model(
                         Val{SFCModel},
                         AmpCqFluoModelResults,
@@ -125,10 +125,10 @@ function get_fit_results(
     function do_model_fit(wi ::Int_T, ci ::Int_T)
         debug(logger, "at do_model_fit($wi, $ci)")
         if isa(solver, Ipopt.IpoptSolver) && length(prefix) > 0
-            const ipopt_file = string(join([prefix, ci, wi], '_')) * ".txt"
+            ipopt_file = string(join([prefix, ci, wi], '_')) * ".txt"
             push!(solver.options, (:output_file, ipopt_file))
         end
-        const fluos = o.rbbs_ary3[:, wi, ci]
+        fluos = o.rbbs_ary3[:, wi, ci]
         amp_fit_model(
             Val{i.amp_model},
             i.amp_model_results,
@@ -143,8 +143,8 @@ function get_fit_results(
 
     debug(logger, "at set_fit_results!()")
     solver = i.solver
-    const prefix = i.ipopt_print_prefix
-    const fit_results =
+    prefix = i.ipopt_print_prefix
+    fit_results =
         SMatrix{i.num_wells, i.num_channels, i.amp_model_results}([
             do_model_fit(wi, ci)
             for wi in 1:i.num_wells, ci in 1:i.num_channels])
@@ -162,9 +162,9 @@ end ## set_fit_results!()
 )
     debug(logger, "at set_output_fields!()")
     foreach(fieldnames(first(results))) do fieldname
-        const output_field = getfield(o, fieldname)
-        const T = output_field |> eltype
-        const vector_output_field = ndims(output_field) == 3
+        output_field = getfield(o, fieldname)
+        T = output_field |> eltype
+        vector_output_field = ndims(output_field) == 3
         if vector_output_field
             setfield!(o, fieldname,
                 results |>
@@ -241,16 +241,16 @@ function report_cq!(
         max_dr1_lb, max_dr2_lb, max_bsf_lb = i.max_dr1_lb, i.max_dr2_lb, i.max_bsf_lb
     end
     #
-    const num_cycles = size(o.raw_data, 1)
-    const (postbl_status, cq_raw, max_dr1, max_dr2) =
+    num_cycles = size(o.raw_data, 1)
+    (postbl_status, cq_raw, max_dr1, max_dr2) =
         map([ :postbl_status, :cq_raw, :max_dr1, :max_dr2 ]) do fieldname
             fieldname -> getfield(o, fieldname)[well_i, channel_i]
         end
-    const max_bsf = maximum(o.blsub_fluos[:, well_i, channel_i])
-    const b_ = o.coefs[1, well_i, channel_i]
-    const (scaled_max_dr1, scaled_max_dr2, scaled_max_bsf) =
+    max_bsf = maximum(o.blsub_fluos[:, well_i, channel_i])
+    b_ = o.coefs[1, well_i, channel_i]
+    (scaled_max_dr1, scaled_max_dr2, scaled_max_bsf) =
         [max_dr1, max_dr2, max_bsf] ./ o.max_qt_fluo
-    const why_NaN =
+    why_NaN =
         if postbl_status == :Error
             "postbl_status == :Error"
         elseif b_ > 0
@@ -304,7 +304,7 @@ function check_bl_cyc_bounds(
 )
     debug(logger, "at check_bl_cyc_bounds()")
     (i.num_cycles <= 2) && return bl_cyc_bounds
-    const size_bcb = size(bl_cyc_bounds)
+    size_bcb = size(bl_cyc_bounds)
     if size_bcb == (0,) || size_bcb == (2,)
         return amp_init(i, bl_cyc_bounds)
     elseif size_bcb == (i.num_wells, i.num_channels) &&

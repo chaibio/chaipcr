@@ -105,8 +105,8 @@ function Base.next(iter ::PeakIndices, state ::PeakIndicesState)
         summit_ii = (iis -> iis[indmax(iter.summit_heights[iis])])(summit_ii:right_summit_ii)
     end
     ## return value
-    const newstate = PeakIndicesState(left_nadir_ii, summit_ii, right_nadir_ii)
-    const element  = PeakIndicesElement(iter, newstate)
+    newstate = PeakIndicesState(left_nadir_ii, summit_ii, right_nadir_ii)
+    element  = PeakIndicesElement(iter, newstate)
     return (element, newstate)
 end ## next()
 

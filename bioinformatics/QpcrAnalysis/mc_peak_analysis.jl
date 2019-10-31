@@ -184,8 +184,8 @@ function mc_peak_analysis(
         vals_in_window(i ::Int_T) = vals_padded[i : i + half_width * 2]
         match_summary_val(v ::AbstractVector) = summary_func(v) == v[half_width + 1]
         #
-        const padding = -summary_func(-vals) |> furnish(half_width)
-        const vals_padded = [padding; vals; padding]
+        padding = -summary_func(-vals) |> furnish(half_width)
+        vals_padded = [padding; vals; padding]
         vals |> length |> from(1) |> collect |>
             mold(match_summary_val ∘ vals_in_window) |> find
     end
@@ -217,7 +217,7 @@ function mc_peak_analysis(
         summit_idc      ::AbstractVector,
         nadir_idc       ::AbstractVector
     )
-        const peak_finder =
+        peak_finder =
             PeakIndices(
                 negderiv_smu[summit_idc],
                 summit_idc,
@@ -233,11 +233,11 @@ function mc_peak_analysis(
         # low_nadir_idx, high_nadir_idx = map(
         #     func -> nadir_vec[func(negderiv_smu[nadir_vec])],
         #     [indmin, indmax])
-        const (low_nadir_idx, high_nadir_idx) =
+        (low_nadir_idx, high_nadir_idx) =
             (negderiv_smu[left_nadir_idx] < negderiv_smu[right_nadir_idx]) ?
                 (left_nadir_idx, right_nadir_idx) :
                 (right_nadir_idx, left_nadir_idx)
-        const hn_ns = negderiv_smu[high_nadir_idx]
+        hn_ns = negderiv_smu[high_nadir_idx]
         #
         ## find the nearest location to `summit_idx`
         ## on the `low_nadir_idx` side of the peak
@@ -316,7 +316,7 @@ function mc_peak_analysis(
         normalize_range(x ::AbstractArray) =
             sweep(minimum)(-)(x) |> sweep(maximum)(/)
         #
-        const largest_peak = first(area_order)
+        largest_peak = first(area_order)
         if  (split_vector_and_return_larger_quantile(
                 normalize_range(negderiv_smu), ## originally normalize_range(negderiv), but why ???
                 len_denser,
@@ -347,9 +347,9 @@ function mc_peak_analysis(
         ## `areas_raw[area_order[i.max_num_peaks + 1]] >= area_lb`
         ## implying `length(filtered_idc_topNp1) > i.max_num_peaks`
         ## If `num_peaks >= i.max_num_peaks` there is no problem.
-        const min_area = areas_raw[largest_peak] * i.min_normalized_area
-        const largest_idc = area_order[min(i.max_num_peaks + 1, num_peaks) |> from(1)]
-        const filtered_idc = largest_idc |> sift(idx -> areas_raw[idx] >= min_area)
+        min_area = areas_raw[largest_peak] * i.min_normalized_area
+        largest_idc = area_order[min(i.max_num_peaks + 1, num_peaks) |> from(1)]
+        filtered_idc = largest_idc |> sift(idx -> areas_raw[idx] >= min_area)
         return length(filtered_idc) > i.max_num_peaks ? [] : filtered_idc
     end ## peak_filter()
 
@@ -359,8 +359,8 @@ function mc_peak_analysis(
     #
     ## filter out data points separated by narrow temperature intervals
     ## return temperatures as array, assuming no missing values
-    const (temps, fluos)    = df |> filter_too_close |> jitter_temps!
-    const len_raw           = length(temps)
+    (temps, fluos)    = df |> filter_too_close |> jitter_temps!
+    len_raw           = length(temps)
     #
     ## negative derivative by central finite differencing (cfd)
     ## only used if the data array is too short to find peaks
@@ -381,35 +381,35 @@ function mc_peak_analysis(
     end ## if
     #
     ## else
-    const min_temp          = minimum(temps)
-    const max_temp          = maximum(temps)
-    const temp_span         = max_temp - min_temp
+    min_temp          = minimum(temps)
+    max_temp          = maximum(temps)
+    temp_span         = max_temp - min_temp
     #
     ## choose smoothing parameter
-    const span_smooth       = choose_span_smooth()
+    span_smooth       = choose_span_smooth()
     #
     ## fit a cubic spline model in order to interpolate data points
     ## then smooth data and calculate slope at denser sequence of temperatures
-    const spl               = spline_model(smooth_raw_fluo())
-    const denser_temps      = interpolated_temperatures()
-    const smoothed_data     = smoothed_data_matrix()
-    const negderiv_smu      = smoothed_data[:, 3]
-    const max_negderiv_smu  = findmax(negderiv_smu)
-    const negderiv_midrange =
+    spl               = spline_model(smooth_raw_fluo())
+    denser_temps      = interpolated_temperatures()
+    smoothed_data     = smoothed_data_matrix()
+    negderiv_smu      = smoothed_data[:, 3]
+    max_negderiv_smu  = findmax(negderiv_smu)
+    negderiv_midrange =
         mean([quantile(negderiv_smu, i.negderiv_range_low_quantile), max_negderiv_smu[1]])
     #
     ## extract data at observed temperatures
-    const len_denser        = length(denser_temps)
-    const observed_data     = smoothed_data[1:i.denser_factor:len_denser, :]
+    len_denser        = length(denser_temps)
+    observed_data     = smoothed_data[1:i.denser_factor:len_denser, :]
     #
     ## find peak and trough locations
     ## `sn` - summits and nadirs
-    const sn_idc            = find_summits_and_nadirs()
-    const sn_dict           = summits_and_nadirs(sn_idc)
+    sn_idc            = find_summits_and_nadirs()
+    sn_dict           = summits_and_nadirs(sn_idc)
     #
     ## estimate area of peaks above baseline
-    const peaks_raw         = find_peaks(sn_idc...)
-    const num_peaks         = length(peaks_raw)
+    peaks_raw         = find_peaks(sn_idc...)
+    num_peaks         = length(peaks_raw)
     #
     ## return smoothed data if no peaks
 
@@ -425,9 +425,9 @@ function mc_peak_analysis(
     end ## if no peaks
     #
     ## keep only the biggest peak(s)
-    const areas_raw = peaks_raw |> their(:area)
-    const area_order = sortperm(areas_raw, rev = true)
-    const peaks_filtered = peaks_raw[peak_filter()]
+    areas_raw = peaks_raw |> their(:area)
+    area_order = sortperm(areas_raw, rev = true)
+    peaks_filtered = peaks_raw[peak_filter()]
     return output_type == McPeakLongOutput ?
         McPeakLongOutput(
             i.reporting(observed_data),
@@ -455,18 +455,18 @@ function mutate_dups(
     jitter_constant ::Float_T,
 )
     debug(logger, "at mutate_dups()")
-    const vec_len       = vec_2mut |> length
-    const vec_uniq      = vec_2mut |> unique |> sort
-    const vec_uniq_len  = vec_uniq |> length
+    vec_len       = vec_2mut |> length
+    vec_uniq      = vec_2mut |> unique |> sort
+    vec_uniq_len  = vec_uniq |> length
     ## return if no ties
     (vec_len == vec_uniq_len) && return vec_2mut
     ## find ties
-    const order_to   = sortperm(vec_2mut)
-    const order_back = sortperm(order_to)
+    order_to   = sortperm(vec_2mut)
+    order_back = sortperm(order_to)
     vec_sorted = (vec_2mut + 0.0)[order_to]
-    const dups = find(diff(vec_sorted) .== 0.0) .+ 1
+    dups = find(diff(vec_sorted) .== 0.0) .+ 1
     ## calculate value of jitter
-    const add1 = jitter * median(diff(vec_uniq))
+    add1 = jitter * median(diff(vec_uniq))
     ## break ties
     accumulator1 = 0
     accumulator2 = 0

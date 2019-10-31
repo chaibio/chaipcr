@@ -24,7 +24,7 @@ function dispatch(
     debug(logger, "at dispatch() with action \"$action_key\"")
     debug(logger, "request body: " * request_body)
 	success = false
-    const result = try
+    result = try
         ## NB. DefaultDict and DefaultOrderedDict constructors sometimes don't work
         ## on OrderedDict (https://github.com/JuliaLang/DataStructures.jl/issues/205)
         req_parsed = JSON.parse(request_body; dicttype = OrderedDict)
@@ -40,15 +40,15 @@ function dispatch(
             error(logger, "action \"$action_key\" is not recognized")
         end
         ## else
-        const action = Val{ACT[action_key]}
+        action = Val{ACT[action_key]}
         #
-        const production_env = (get(ENV, "JULIA_ENV", nothing) == PRODUCTION_MODE)
+        production_env = (get(ENV, "JULIA_ENV", nothing) == PRODUCTION_MODE)
         @static if !production_env
             ## this code is hidden from the parser on the BeagleBone
             if verify
-                const verify_input = try
+                verify_input = try
                     verify_request(action, req_parsed)
-                catch()
+                catch
                     warn(logger, "data supplied with \"$action_key\"" *
                         "request is in the wrong format")
                 end ## try
@@ -56,7 +56,7 @@ function dispatch(
         end ## if !production_env
         #
         debug(logger, "dispatching to act() from dispatch()")
-        const response = act(action, req_parsed; out_format = pre_json_output)
+        response = act(action, req_parsed; out_format = pre_json_output)
         debug(logger, "response received from act() by dispatch()")
         debug(logger, repr(response))
 
@@ -64,15 +64,15 @@ function dispatch(
            throw(response)
         end ## if isa
 
-        const json_response = JSON.json(response)
+        json_response = JSON.json(response)
         #
         @static if !production_env
             ## this code is hidden from the parser on the BeagleBone
             if verify
-                const verify_output = try
+                verify_output = try
                     verify_response(action,
                         JSON.parse(json_response, dicttype = OrderedDict))
-                catch()
+                catch
                     warn(logger, "data returned from \"$action_key\"" *
                         " request is in the wrong format")
                 end ## try
@@ -86,7 +86,7 @@ function dispatch(
 		JSON.json(fail(logger, err; bt = true) |> out(pre_json_output))
     end ## try
     
-    const response_body = string(result)
+    response_body = string(result)
 
     debug(logger, "returning from dispatch()")
     debug(logger, "success: $success")
