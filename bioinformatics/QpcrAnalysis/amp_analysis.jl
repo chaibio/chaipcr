@@ -39,6 +39,7 @@ function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
     #
     ## fit amplification models and report results
     if i.num_cycles <= 2
+		num_cycles = i.num_cycles
         warn(logger, "number of cycles $num_cycles <= 2: baseline subtraction " *
             "and Cq calculation will not be performed")
     else ## num_cycles > 2

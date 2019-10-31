@@ -364,10 +364,20 @@ function mc_peak_analysis(
     #
     ## negative derivative by central finite differencing (cfd)
     ## only used if the data array is too short to find peaks
+	if (len_raw == 0)
+        return output_type == McPeakLongOutput ?
+			McPeakLongOutput() :
+            McPeakShortOutput()
+	end
+	
     if (len_raw <= 3)
-        const slope = finite_diff(temps, fluos; nu = 1)
-        return McPeakOutput(output_type;
-            observed_data = i.reporting(hcat(temps, fluos, -slope)))
+        slope = finite_diff(temps, fluos; nu = 1)
+	
+        return output_type == McPeakLongOutput ?
+			McPeakLongOutput(
+                observed_data       = i.reporting(hcat(temps, fluos, -slope))) :
+            McPeakShortOutput(
+                observed_data       = i.reporting(hcat(temps, fluos, -slope)))
     end ## if
     #
     ## else
