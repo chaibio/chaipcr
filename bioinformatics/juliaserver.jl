@@ -14,51 +14,11 @@
 import HTTP: serve, Request, Response, HandlerFunction, mkheaders, URI, URIs.splitpath
 import JSON.json
 import Memento: getlogger, gethandlers, debug, info, error
-import FunctionalData.@p
 import QpcrAnalysis
-
-
-function get_response(req ::HTTP.Request)
-    info(logger, "Julia webserver has received $(req.method) request to http://127.0.0.1:8081$(req.target)")
-    debug(logger, "at get_response() with target $(req.target)")
-    const code =
-        if req.method == "GET" ## per HTTP RFC, this is actually a POST request because it contains body data
-            const nodes = HTTP.URIs.splitpath(req.target)
-            if length(nodes) >= 3
-                const experiment_id = nodes[2]
-                const action        = nodes[3]
-                const request_body  = String(req.body)
-                debug(logger, "request body: " * request_body)
-
-                ## calls to http://localhost/experiments/0/
-                ## will activate a slow test mode
-                const kwargs = Dict{Symbol,Bool}(
-                    (experiment_id == "0") ? :verify => true : ())
-
-                ## dispatch request to Julia engine
-                debug(logger, "calling QpcrAnalysis.dispatch() from get_response()")
-                const success, response_body =
-                    QpcrAnalysis.dispatch(action, request_body; kwargs...)
-                debug(logger, "at get_response() receiving results from QpcrAnalysis.dispatch()")
-                code = (success) ? 200 : 500
-            else ## length(nodes) < 3
-                404
-            end
-        else ## not GET
-            404
-        end
-    (code == 404) && (const response_body = JSON.json(Dict(:error => "not found")))
-    #
-    debug(logger, "returning from get_response()")
-    debug(logger, "status: $code")
-    debug(logger, "response body: $response_body")
-    return HTTP.Response(code, RESPONSE_HEADERS; body=response_body)
-end ## get_response
 
 ## set up logging
 logger = getlogger("QpcrAnalysis")
-logIO = (@p gethandlers logger|values|collect|getindex _ 1|getfield _ :io)
-debug(logger, "logfile " * getfield(logIO, :name))
+debug(logger, "******************** Julia Server is started ********************")
 
 ## headers
 const RESPONSE_HEADERS = HTTP.mkheaders([
@@ -67,13 +27,58 @@ const RESPONSE_HEADERS = HTTP.mkheaders([
     "Content-Language" => "en",
     "Date"             => Dates.format(now(Dates.UTC), Dates.RFC1123Format)])
 
+
+global julia_running = false
+
 ## set up REST endpoints to dispatch to service functions
-HTTP.serve(
-    host    = ip"127.0.0.1",
-    port    = 8081,
-    handler = HandlerFunction(get_response),
-    logger  = logIO,
-    verbose = true) ## logs server activity
+HTTP.listen() do req::HTTP.Request
+	global julia_running
+
+	if julia_running == true
+		# Julia can process only one request at a time
+		warn(logger, "Julia is still processing an existing request, reject new request with 503")
+		return HTTP.Response(503, RESPONSE_HEADERS; body=JSON.json(Dict(:error => "Julia is busy")))
+	end
+
+	julia_running = true
+
+    info(logger, "Julia webserver has received $(req.method) request to http://127.0.0.1:8081$(req.target)")
+
+    code =
+        if req.method == "GET" ## per HTTP RFC, this is actually a POST request because it contains body data
+            const nodes = HTTP.URIs.splitpath(req.target)
+            if length(nodes) >= 3
+                experiment_id = nodes[2]
+                action        = nodes[3]
+                request_body  = String(req.body)
+
+                ## calls to http://localhost/experiments/0/
+                ## will activate a slow test mode
+                kwargs = Dict{Symbol,Bool}(
+                    (experiment_id == "0") ? :verify => true : ())
+
+                ## dispatch request to Julia engine
+                debug(logger, "Calling QpcrAnalysis.dispatch()")
+                success, response_body =
+                    QpcrAnalysis.dispatch(action, request_body; kwargs...)
+                debug(logger, "Returning from QpcrAnalysis.dispatch(): success=$success")
+                code = (success) ? 200 : 500
+            else ## length(nodes) < 3
+                404
+            end
+        else ## not GET
+            404
+        end
+    (code == 404) && (response_body = JSON.json(Dict(:error => "not found")))
+
+    debug(logger, "Julia finish processing: status: $code, response body: $response_body")
+
+	julia_running = false
+
+    return HTTP.Response(code, RESPONSE_HEADERS; body=response_body)
+
+end ## HTTP.serve
+
 info(logger, "Webserver listening on: http://127.0.0.1:8081")
 
 
