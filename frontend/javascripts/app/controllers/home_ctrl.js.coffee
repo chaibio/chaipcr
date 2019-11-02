@@ -110,6 +110,14 @@ window.ChaiBioTech.ngApp
     #   return exp_name if exp_name.length <= NAME_LENGTH
     #   return exp_name.substring(0, NAME_LENGTH-2)+'...'
 
+    $scope.machine_state = 'idle' #by default
+    $scope.current_experiment_id = 0
+    $scope.$on 'status:data:updated', (e, data, oldData) ->
+      return if !data
+      return if !data.experiment_controller
+      $scope.machine_state = data.experiment_controller.machine.state
+      $scope.current_experiment_id = parseInt(data.experiment_controller.experiment?.id)
+
     @openExperiment = (exp) ->
       if not $scope.deleteMode
         state = Status.getData();
