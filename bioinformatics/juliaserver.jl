@@ -29,10 +29,44 @@ const RESPONSE_HEADERS = HTTP.mkheaders([
 
 
 global julia_running = false
+global exit_server=false
 
 ## set up REST endpoints to dispatch to service functions
-HTTP.listen() do req::HTTP.Request
+@async HTTP.listen() do req::HTTP.Request
 	global julia_running
+	global exit_server
+
+    	info(logger, "Julia webserver has received $(req.method) request to http://127.0.0.1:8081$(req.target)")
+
+	## Server control
+	if contains(req.target, "exit")
+		# Exit server for debug puposes.
+		exit(0)
+		# should never come here
+		return HTTP.Response(200, RESPONSE_HEADERS; body=JSON.json(Dict(:error => "Julia is exiting.. cya.."))) 
+	elseif contains(req.target, "/farewell")
+		# Exit server with no spawn.
+		exit(101)
+	elseif contains(req.target, "/end")
+		# Polite way to exit listener. No agressive thread kill.
+		exit_server=true
+		return HTTP.Response(200, RESPONSE_HEADERS; body=JSON.json(Dict(:error => "Julia is exiting."))) 
+	elseif contains(req.target, "/logerror")
+		# setting logging level to errors only
+		setlevel!(logger, "error")
+		return HTTP.Response(200, RESPONSE_HEADERS; body=JSON.json(Dict(:error => "Julia logging level set to error."))) 
+	elseif contains(req.target, "/logwarn")
+		# setting logging level to warn
+		setlevel!(logger, "warn")
+		return HTTP.Response(200, RESPONSE_HEADERS; body=JSON.json(Dict(:error => "Julia logging level set to warn."))) 
+	elseif contains(req.target, "/logdebug")
+		# setting logging level to debug
+		setlevel!(logger, "debug")
+		return HTTP.Response(200, RESPONSE_HEADERS; body=JSON.json(Dict(:error => "Julia logging level set to debug."))) 
+	elseif contains(req.target, "/isbusy")
+		# check julia sever status
+		return HTTP.Response(200, RESPONSE_HEADERS; body=JSON.json(Dict(:error => (julia_running?"Juliaserver is busy":"Juliaserver is ready")))) 
+	end
 
 	if julia_running == true
 		# Julia can process only one request at a time
@@ -41,8 +75,6 @@ HTTP.listen() do req::HTTP.Request
 	end
 
 	julia_running = true
-
-    info(logger, "Julia webserver has received $(req.method) request to http://127.0.0.1:8081$(req.target)")
 
     code =
         if req.method == "GET" ## per HTTP RFC, this is actually a POST request because it contains body data
@@ -56,7 +88,7 @@ HTTP.listen() do req::HTTP.Request
                 ## will activate a slow test mode
                 kwargs = Dict{Symbol,Bool}(
                     (experiment_id == "0") ? :verify => true : ())
-
+		
                 ## dispatch request to Julia engine
                 debug(logger, "Calling QpcrAnalysis.dispatch()")
                 success, response_body =
@@ -73,13 +105,17 @@ HTTP.listen() do req::HTTP.Request
 
     debug(logger, "Julia finish processing: status: $code, response body: $response_body")
 
-	julia_running = false
+    julia_running = false
 
     return HTTP.Response(code, RESPONSE_HEADERS; body=response_body)
 
 end ## HTTP.serve
 
-info(logger, "Webserver listening on: http://127.0.0.1:8081")
+info(logger, "Starting webserver listener on: http://127.0.0.1:8081")
+while !exit_server
+        sleep(1)
+end
+info(logger, "Server module quitting...")
 
 
 #

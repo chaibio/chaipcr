@@ -5,7 +5,7 @@ then
     julia_pkgdir=$1
     echo "setting julia dir to $1"
 fi
-
+rm /root/chaipcr/bioinformatics/qpcranalysis.so
 if [ -e /root/chaipcr/bioinformatics/juliaserver.jl ]
 then
     julia -v
@@ -87,8 +87,6 @@ EOF
     patch -i add_catch.patch || (echo error patching ExecBuilder package && exit 1)
     echo "done installation... creating executable:"
     rm add_catch.patch
-    #exit 0
-
     JULIA=julia
 
     cat > /tmp/precompile_QpcrAnalysis.jl << EOF
@@ -98,17 +96,29 @@ push!(LOAD_PATH, "/root/chaipcr/bioinformatics/QpcrAnalysis/")
 
 println("Using time: ")
 @time using QpcrAnalysis
-#using Suppressor
 println("Done Using!")
 
 if isfile("/root/chaipcr/bioinformatics/build/exec_testfns.jl")
-    println("Function test script found.. executing by precompile script!")
-    #@suppress try
+    println("Function testing script found.. executing by precompile script!")
     try
 	include("/root/chaipcr/bioinformatics/build/exec_testfns.jl")
     end
 else
-    println("Function test script not found!")
+    println("Function testing script not found!")
+end
+
+println("Done Dispatch training.. starting curl training..")
+
+if isfile("/root/chaipcr/bioinformatics/build/juliaserver.jl")
+    println("Function testing script found.. executing by precompile script!")
+    try
+	cmd=\`/root/chaipcr/bioinformatics/build/exec_testcurl.sh\`
+	@async run(cmd)
+	include("/root/chaipcr/bioinformatics/build/juliaserver.jl")
+	println("Done with curl training..")
+    end
+else
+    println("Function testing script not found!")
 end
 
 function main()
@@ -116,7 +126,7 @@ function main()
     println("Main is executed!")
     #reload("QpcrAnalysis")
     println("dispatch time no JIT:")
-    include("/root/chaipcr/bioinformatics/juliaserver.jl")
+    include("/root/chaipcr/bioinformatics/build/juliaserver.jl")
     println("Server Exit")
 end
 
@@ -153,19 +163,38 @@ EOF
     rm /usr/share/julia/base/userimg.jl
 
     echo "creating the image"
+    if [ -e /usr/local/lib/lib ]
+    then
+	rm -r /usr/local/lib/lib
+    fi
+
+    mkdir -p /usr/local/lib/lib/root/
+   
     cd /root/chaipcr/bioinformatics/build/
+    cp ../juliaserver.jl .
     time JULIA_ENV=production $JULIA /tmp/mkexec.jl
+    rm juliaserver.jl
+    echo "template execution done"
 
     mkdir -p /root/lib/root/
     ls  /root/lib/root/qpcranalysis.so && cp /lib/lib/root/qpcranalysis.so  /root/lib/root/qpcranalysis.so
     cp /usr/lib/lib/root/qpcranalysis.so /root/lib/root/qpcranalysis.so
+    if [ -e /usr/local/lib/lib/root/qpcranalysis.so ]
+    then
+	cp /usr/local/lib/lib/root/qpcranalysis.so /root/lib/root/qpcranalysis.so
+    fi
 
 fi
 
 echo "testing juliaserver script to make sure nothing left to precompile as we are removing the compilation tools later to free up space."
+if [ -e /run/precompilejuliadone.flag ]
+then
+	rm /run/precompilejuliadone.flag
+fi
 
 test_julia_server()
 {
+
     if [ -e /tmp/output/qpcranalysis.so ]
     then
         echo "moving qpcranalysis.so"
@@ -178,7 +207,12 @@ test_julia_server()
         echo "moving qpcranalysis.so"
         date
         cp /lib/lib/root/qpcranalysis.so  /root/chaipcr/bioinformatics/
+    elif [ -e /usr/local/lib/lib/root/qpcranalysis.so ]
+    then
+	cp /usr/local/lib/lib/root/qpcranalysis.so /root/chaipcr/bioinformatics/
     fi
+
+    ./exec_testcurl.sh &
     if [ -e /root/chaipcr/bioinformatics/qpcranalysis.so ]
     then
         echo "running with qpcranalysis.so"
@@ -191,12 +225,30 @@ test_julia_server()
         echo "exit running without qpcranalysis.so"
         date
     fi
+    echo "Juliaserver exit.. done with testing juliaserver."
+    touch /run/precompilejuliadone.flag
+    exit 0
 }
 
 test_julia_server &
+counter=0
 echo "starting julia server on a different thread"
-sleep 1800
-echo "julia server testing period due. Cleaning up."
+while true
+do
+        if [ -e /run/precompilejuliadone.flag ]
+        then
+                echo Juliaserver finished testing.
+                break
+        fi
+        if [ $counter -gt 30 ]
+        then
+                echo "julia server testing period due. Cleaning up."
+                break
+        fi
+        counter=$((counter+1))
+        sleep 60
+done
+
 rm -r /root/lib/root/
 
 pkill -9 julia
@@ -208,3 +260,11 @@ sleep 100
 
 ps -aux | grep julia
 df -h
+if [ -e /run/precompilejuliadone.flag ]
+then
+	echo Juliaserver finished testing.
+else
+	echo Juliaserver failed testing.
+fi
+
+exit 0
