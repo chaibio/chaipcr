@@ -31,15 +31,32 @@ const RESPONSE_HEADERS = HTTP.mkheaders([
 global julia_running = false
 global exit_server=false
 
+info(logger, "Starting webserver listener on: http://127.0.0.1:8081")
+global TCPREF = Ref{Base.TCPServer}()
+
+@async while true
+	if !exit_server
+	        sleep(1)
+	else
+		info(logger, "Ending webserver")
+		close(TCPREF.x)
+		break
+	end
+	
+end
+
 ## set up REST endpoints to dispatch to service functions
-@async HTTP.listen() do req::HTTP.Request
+HTTP.listen( tcpref = TCPREF) do req::HTTP.Request
 	global julia_running
 	global exit_server
 
     	info(logger, "Julia webserver has received $(req.method) request to http://127.0.0.1:8081$(req.target)")
-
+	
 	## Server control
-	if contains(req.target, "exit")
+	if exit_server
+		info(logger, "Server is about to exit.. no more calls are processed.")
+		return nothing
+	elseif contains(req.target, "exit")
 		# Exit server for debug puposes.
 		exit(0)
 		# should never come here
@@ -111,10 +128,7 @@ global exit_server=false
 
 end ## HTTP.serve
 
-info(logger, "Starting webserver listener on: http://127.0.0.1:8081")
-while !exit_server
-        sleep(1)
-end
+
 info(logger, "Server module quitting...")
 
 
