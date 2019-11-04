@@ -293,7 +293,29 @@ start_julia () {
 			else
 				JULIA_ENV=production julia -e 'push!(LOAD_PATH, "/root/chaipcr/bioinformatics/QpcrAnalysis/"); include("/root/chaipcr/bioinformatics/juliaserver.jl")' || true
 			fi
-			echo julia exit
+			
+			exitcode=$?
+			timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
+			msg="Julia exit($exitcode) on $timestamp"
+			cd /var/log
+			echo $msg>julia.log
+			if ! [ -e crashjulia ]
+			then
+			        echo creating crashjulia
+			        mkdir crashjulia
+			fi
+			echo $msg
+			echo $msg >> julia.log
+			mv julia.log crashjulia/julia-$timestamp.log
+			cd crashjulia
+			tar czf julia-$timestamp.log.tgz julia-$timestamp.log --remove-files &
+
+			if [ $exitcode -eq 101 ]
+			then
+			        echo Disabling Julia watchdog
+			        return
+			fi
+
 			check_for_exit
 			sleep 10
 		done
