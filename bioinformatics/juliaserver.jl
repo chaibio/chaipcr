@@ -29,60 +29,47 @@ const RESPONSE_HEADERS = HTTP.mkheaders([
 
 
 global julia_running = false
-global exit_server=false
 
 info(logger, "Starting webserver listener on: http://127.0.0.1:8081")
 global TCPREF = Ref{Base.TCPServer}()
 
-@async while true
-	if !exit_server
-	        sleep(1)
-	else
-		info(logger, "Ending webserver")
-		close(TCPREF.x)
-		break
-	end
-	
-end
-
 ## set up REST endpoints to dispatch to service functions
 HTTP.listen( tcpref = TCPREF) do req::HTTP.Request
 	global julia_running
-	global exit_server
 
-    	info(logger, "Julia webserver has received $(req.method) request to http://127.0.0.1:8081$(req.target)")
+    info(logger, "Julia webserver has received $(req.method) request to http://127.0.0.1:8081$(req.target)")
 	
 	## Server control
-	if exit_server
-		info(logger, "Server is about to exit.. no more calls are processed.")
-		return nothing
-	elseif contains(req.target, "exit")
+	if req.target == "/exit"
+		close(TCPREF.x)
 		# Exit server for debug puposes.
 		exit(0)
 		# should never come here
-		return HTTP.Response(200, RESPONSE_HEADERS; body=JSON.json(Dict(:error => "Julia is exiting.. cya.."))) 
-	elseif contains(req.target, "/farewell")
+		return HTTP.Response(200, RESPONSE_HEADERS; body=JSON.json(Dict(:info => "Julia is exiting.. cya.."))) 
+	elseif req.target == "/farewell"
 		# Exit server with no spawn.
 		exit(101)
-	elseif contains(req.target, "/end")
+		return HTTP.Response(200, RESPONSE_HEADERS; body=JSON.json(Dict(:info => "Julia is exiting.. cya.."))) 
+	elseif req.target == "/end"
 		# Polite way to exit listener. No agressive thread kill.
-		exit_server=true
-		return HTTP.Response(200, RESPONSE_HEADERS; body=JSON.json(Dict(:error => "Julia is exiting."))) 
-	elseif contains(req.target, "/logerror")
+		info(logger, "Ending Julia webserver")
+		close(TCPREF.x)
+		return HTTP.Response(200, RESPONSE_HEADERS; body=JSON.json(Dict(:info => "Julia is exiting."))) 
+	elseif req.target == "/logerror"
 		# setting logging level to errors only
-		setlevel!(logger, "error")
-		return HTTP.Response(200, RESPONSE_HEADERS; body=JSON.json(Dict(:error => "Julia logging level set to error."))) 
-	elseif contains(req.target, "/logwarn")
+		Memento.setlevel!(logger, "error")
+		return HTTP.Response(200, RESPONSE_HEADERS; body=JSON.json(Dict(:info => "Julia logging level set to error."))) 
+	elseif req.target == "/logwarn"
 		# setting logging level to warn
-		setlevel!(logger, "warn")
-		return HTTP.Response(200, RESPONSE_HEADERS; body=JSON.json(Dict(:error => "Julia logging level set to warn."))) 
-	elseif contains(req.target, "/logdebug")
+		Memento.setlevel!(logger, "warn")
+		return HTTP.Response(200, RESPONSE_HEADERS; body=JSON.json(Dict(:info => "Julia logging level set to warn."))) 
+	elseif req.target == "/logdebug"
 		# setting logging level to debug
-		setlevel!(logger, "debug")
-		return HTTP.Response(200, RESPONSE_HEADERS; body=JSON.json(Dict(:error => "Julia logging level set to debug."))) 
-	elseif contains(req.target, "/isbusy")
+		Memento.setlevel!(logger, "debug")
+		return HTTP.Response(200, RESPONSE_HEADERS; body=JSON.json(Dict(:info => "Julia logging level set to debug."))) 
+	elseif req.target == "/isbusy"
 		# check julia sever status
-		return HTTP.Response(200, RESPONSE_HEADERS; body=JSON.json(Dict(:error => (julia_running?"Juliaserver is busy":"Juliaserver is ready")))) 
+		return HTTP.Response(200, RESPONSE_HEADERS; body=JSON.json(Dict(:info => (julia_running?"Juliaserver is busy":"Juliaserver is ready")))) 
 	end
 
 	if julia_running == true
