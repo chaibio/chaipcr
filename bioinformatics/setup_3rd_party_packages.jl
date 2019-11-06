@@ -111,6 +111,7 @@ Pkg.build(
 	"Clustering",
 	"Nullables",
 	"JSON",
+	"HTTP",
 	"JLD",
 	"JuMP",
 	"Dierckx",
