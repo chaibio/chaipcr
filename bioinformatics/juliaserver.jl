@@ -44,22 +44,22 @@ HTTP.listen() do req::HTTP.Request
 
     info(logger, "Julia webserver has received $(req.method) request to http://127.0.0.1:8081$(req.target)")
 
-    code =
+    const code =
         if req.method == "GET" ## per HTTP RFC, this is actually a POST request because it contains body data
             const nodes = HTTP.URIs.splitpath(req.target)
             if length(nodes) >= 3
-                experiment_id = nodes[2]
-                action        = nodes[3]
-                request_body  = String(req.body)
+                const experiment_id = nodes[2]
+                const action        = nodes[3]
+                const request_body  = String(req.body)
 
                 ## calls to http://localhost/experiments/0/
                 ## will activate a slow test mode
-                kwargs = Dict{Symbol,Bool}(
+                const kwargs = Dict{Symbol,Bool}(
                     (experiment_id == "0") ? :verify => true : ())
 
                 ## dispatch request to Julia engine
                 debug(logger, "Calling QpcrAnalysis.dispatch()")
-                success, response_body =
+                const success, response_body =
                     QpcrAnalysis.dispatch(action, request_body; kwargs...)
                 debug(logger, "Returning from QpcrAnalysis.dispatch(): success=$success")
                 code = (success) ? 200 : 500
