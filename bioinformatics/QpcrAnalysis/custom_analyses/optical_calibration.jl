@@ -56,7 +56,7 @@ function act(
             get_k(
                 calibration_data,
                 calibration_args,
-                eachindex(wells),
+				SVector{length(wells)}(eachindex(wells)),
                 wells)
         catch err
             return fail(logger, err; bt = true) |> out(out_format)

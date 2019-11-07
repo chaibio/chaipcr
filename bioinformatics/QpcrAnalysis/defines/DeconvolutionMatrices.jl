@@ -31,7 +31,7 @@ end
 ===============================================================================#
 
 function DeconvolutionMatrices(
-    calibration_data    ::CalibrationData{<: NumberOfChannels, <: Real},
+    calibration_data    ::CalibrationData{<: NumberOfChannels, <: Union{Int_T,Float_T}},
     calibration_args    ::CalibrationParameters
 )
     s = size(calibration_data.array)

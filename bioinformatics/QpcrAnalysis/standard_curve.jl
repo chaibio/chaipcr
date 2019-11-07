@@ -192,7 +192,7 @@ sumsq(y) = sum(y .^ 2)
 ## dependencies of `standard_curve`
 
 ## parse req into a dataframe
-function parse_raw_data(::Type{Val{standard_curve}}, req ::AbstractVector)
+function parse_raw_data(::Type{Val{standard_curve}}, req ::Vector{Any})
     (length(req) == 0) && return DataFrame()
     #
     well_vec    = Vector{Int_T}()
