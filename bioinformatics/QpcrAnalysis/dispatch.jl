@@ -25,9 +25,14 @@ function dispatch(
     debug(logger, "request body: " * request_body)
 	success = false
     result = try
+        if !(action_key in keys(ACT))
+            errmsg = "dispatch: $action_key action is not recognized"
+            warn(logger, errmsg)
+            throw(ErrorException(errmsg))
+        end
+
         ## NB. DefaultDict and DefaultOrderedDict constructors sometimes don't work
         ## on OrderedDict (https://github.com/JuliaLang/DataStructures.jl/issues/205)
-        req_parsed = JSON.parse(request_body; dicttype = OrderedDict)
         #=
             Issue:
             By default the JSON parser converts Arrays and Dicts to type ::Any.
@@ -36,9 +41,8 @@ function dispatch(
             Since the data structures are specific to each action,
             this should generally be done in the generic act() methods.
         =#
-        if !(action_key in keys(ACT))
-            error(logger, "action \"$action_key\" is not recognized")
-        end
+		req_parsed = JSON.parse(request_body; dicttype = OrderedDict)
+				
         ## else
         action = Val{ACT[action_key]}
         #
@@ -88,8 +92,7 @@ function dispatch(
     
     response_body = string(result)
 
-    debug(logger, "returning from dispatch()")
-    debug(logger, "success: $success")
+    debug(logger, "returning from dispatch(): success=$success")
 
     return (success, response_body)
 end ## dispatch()

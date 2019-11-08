@@ -51,7 +51,7 @@ macro get_calibration_data_from_req(action)
             calibration_data = try
                 CalibrationData(req[CALIBRATION_INFO_KEY])
             catch err
-                error(logger, "calibration data exception: " * sprint(showerror, err))
+                warn(logger, "calibration data exception: " * sprint(showerror, err))
                 return ArgumentError(
                     "cannot parse calibration data for " * string($action) * " analysis")
             end ## try
@@ -69,7 +69,7 @@ macro parse_raw_data_from_req(action)
             parsed_raw_data = try
                 parse_raw_data(Val{$action}, req[RAW_DATA_KEY])
             catch err
-                error(logger, "parse_raw_data exception: " * sprint(showerror, err))
+                warn(logger, "parse_raw_data exception: " * sprint(showerror, err))
                 return ArgumentError(
                     "cannot parse raw data for " * string($action) * " analysis")
             end ## try

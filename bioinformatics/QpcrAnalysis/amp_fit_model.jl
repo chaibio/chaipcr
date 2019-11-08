@@ -37,7 +37,7 @@ function amp_fit_model(
                 0.0
     d0() = coefs[findfirst(bl.bl_fit.coef_syms .== :d0)]
 
-    debug(logger, "at fit_amplification_model(::Type{Val{M}} where M <: DFCModel)")
+    debug(logger, "at amp_fit_model(::Type{Val{M}} where M <: DFCModel)")
     ## no fallback for baseline, because:
     ## (1) curve may fit well though :Error or :UserLimit
     ## (search step becomes very small but has not converge);
@@ -155,7 +155,7 @@ function amp_fit_model(
             return auto_choose_bl_cycs()
         end
         ## fallthrough
-        throw(DomainError("too few cycles to estimate baseline"))
+        throw(ErrorException("too few cycles to estimate baseline"))
     end ## bl_cycs()
 
     ## uses `fluos`, `last_cyc_wt0`; updates `bl_notes` using push!()
@@ -290,7 +290,7 @@ function amp_fit_model(
 
     ## << end of function definitions nested within fit_baseline_model() ## SFC
 
-    debug(logger, "at fit_amplification_model(Val{SFCModel})")
+    debug(logger, "at amp_fit_model(Val{SFCModel})")
     #
     ## fit baseline model
     # const num_cycles = length(fluos)
@@ -312,6 +312,7 @@ function amp_fit_model(
             cycles, bl_fit.coefs...)
         blsub_fluos = fluos .- baseline
         have_good_results = good_status()
+        debug(logger, "bl notes: $bl_notes, good_results: $have_good_results")
         if !have_good_results
             ## recalculate baseline
             bl_func = i.bl_fallback_func

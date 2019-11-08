@@ -47,7 +47,7 @@ function act(
         push!(kwargs,
             :cq_method => try
                 CqMethod(req[CQ_METHOD_KEY])
-            catch()
+            catch
                 return ArgumentError("Unrecognized cq method")
             end) ## try
     req_key(CATEG_WELL_VEC_KEY) &&
@@ -176,7 +176,7 @@ function parse_raw_data(::Type{Val{amplification}}, raw_dict ::Associative)
                 channels,
                 inner = num_cycles * num_wells))
     catch err
-		error(logger, "raw dict exception: " * sprint(showerror, err))
+		warn(logger, "raw dict exception: " * sprint(showerror, err))
         throw(ArgumentError("The format of the fluorescence data does not " *
             "lend itself to transformation into a 3-dimensional array. " *
             "Please make sure that the data are sorted by " *

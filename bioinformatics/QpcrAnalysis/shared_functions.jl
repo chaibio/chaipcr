@@ -344,25 +344,23 @@ function fail(
     bt          ::Bool = false ## backtrace?
 )
     err_msg = sprint(showerror, err)
-    if bt
-        st = stacktrace(catch_backtrace())
-    end
-    try
-        error(logger, err_msg)
-    catch ## just report the error
+	try
+        if bt
+            st = stacktrace(catch_backtrace())
+        end
+        warn(logger, err_msg)
         if bt
             stl = collect(enumerate(IndexStyle(st), st))
-            try
-                error(logger, "error thrown in " *
-                    string(st[1]) * "\nStacktrace:\n" *
+            warn(logger, "error thrown in " *
+                 string(st[1]) * "\nStacktrace:\n" *
                     join(
                         map(stl[1:end]) do tup
                             index, ptr = tup
                             " [$index] $ptr\n"
                         end))
-            catch
-            end ## try
         end ## if bt
+    catch e
+		warn(logger, "fail catch error: " * sprint(showerror, e))
     end ## try
     OrderedDict(
         :valid => false,
