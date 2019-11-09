@@ -106,7 +106,6 @@ HTTP.listen( tcpref = TCPREF) do req::HTTP.Request
             404
         end
     (code == 404) && (response_body = JSON.json(Dict(:error => "not found")))
-
     debug(logger, "Julia finish processing: status: $code, response body: $response_body")
 
     julia_running = false
@@ -115,8 +114,6 @@ HTTP.listen( tcpref = TCPREF) do req::HTTP.Request
 
 end ## HTTP.serve
 
-
 info(logger, "Server module quitting...")
-
 
 #

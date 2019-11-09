@@ -479,7 +479,7 @@ apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hic
 	echo &apos;debconf debconf/frontend select Noninteractive&apos; | debconf-set-selections
 	DEBIAN_FRONTEND=noninteractive apt-get -q -y  install patchelf
 	DEBIAN_FRONTEND=noninteractive apt-get -q -y  install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp ntpdate build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3
-
+         apt install -q -y libcholmod3 libblas-dev  libblas-common || true
 	DEBIAN_FRONTEND=noninteractive apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3  || exit 1
 
       pkill -9 julia
@@ -1014,8 +1014,7 @@ apt-get  -y -q --purge autoremove linux-headers-$uname_updated || exit 1
 rm -r /usr/src/linux-headers-`uname -r`
 
 apt-get  -y -q --purge autoremove g++-4.7 g++-4.8 gcc-4.8 g++-4.8 gcc-4.8 g++-4.8 
-apt-get  -y -q --purge autoremove libblas3gf libblas3gf
-apt-get  -y -q --purge autoremove parted automake build-essential cmake curl device-tree-compiler g++ gfortran git i2c-tools libarpack2 libblas-common libblas-dev libblas3 libedit-dev libfftw3-dev libfftw3-double3 libfftw3-single3 libfontconfig1-dev libfreetype6-dev libgfortran3 libgfortran3 libgmp3-dev liblapack3 liblapack3gf libllvm3.8 libmetis5 libmpfr-dev libopenblas-base libopenblas-dev libqt4-webkit libssl-dev libtool libunwind8 libxcursor-dev libxext-dev libxfixes-dev libxft-dev libxi-dev libxml2-dev libxrandr-dev libxrender-dev libxslt-dev lsb-release m4 nodejs pkg-config python unzip
+apt-get  -y -q --purge autoremove parted automake build-essential cmake device-tree-compiler g++ gfortran git i2c-tools libarpack2 libedit-dev libfftw3-dev libfftw3-double3 libfftw3-single3 libfontconfig1-dev libfreetype6-dev libgfortran3 libgfortran3 libgmp3-dev liblapack3 liblapack3gf libllvm3.8 libmetis5 libmpfr-dev libopenblas-base libopenblas-dev libqt4-webkit libssl-dev libtool libunwind8 libxcursor-dev libxext-dev libxfixes-dev libxft-dev libxi-dev libxml2-dev libxrandr-dev libxrender-dev libxslt-dev lsb-release m4 nodejs pkg-config python unzip
 export DEBIAN_FRONTEND=noninteractive
 apt-get install -y -q liblapack-dev 
 apt-get  install -y -q -o DPkg::Options::=&quot;--force-confnew&quot; libts-bin
@@ -1043,7 +1042,6 @@ df -h
 done
 
 DEBIAN_FRONTEND=noninteractive apt-get -q -y install gettext
-#DEBIAN_FRONTEND=noninteractive apt-get -q -y install libgtk-3-0
 apt-get -y -q install libpango1.0-0 libglib2.0-0 libcairo2
 apt-get -q -y install libboost-chrono-dev libboost-system-dev
 if [ -e /etc/bypassjulia.flag ]
@@ -1051,6 +1049,7 @@ then
     echo Julia is not installed
 else
     apt-get -q -y install hdf5-tools
+    apt-get install -q -y libcholmod3 libblas-dev  libblas-common || true
 fi
 
 df -h
