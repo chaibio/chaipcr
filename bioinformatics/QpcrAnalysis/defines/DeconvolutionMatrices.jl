@@ -18,7 +18,7 @@ import StaticArrays: SVector, SMatrix
     struct >>
 ===============================================================================#
 
-type DeconvolutionMatrices
+mutable struct DeconvolutionMatrices
     k_s             ::Vector{SMatrix{C,C,Float_T} where {C}}
     k_inv_vec       ::Vector{SMatrix{C,C,Float_T} where {C}}
     inv_note        ::String
@@ -31,14 +31,14 @@ end
 ===============================================================================#
 
 function DeconvolutionMatrices(
-    calibration_data    ::CalibrationData{<: NumberOfChannels, <: Real},
+    calibration_data    ::CalibrationData{<: NumberOfChannels, <: Union{Int_T,Float_T}},
     calibration_args    ::CalibrationParameters
 )
-    const s = size(calibration_data.array)
-    const w = s[1]
-    const c = s[2]
-    const v = calibration_args.k_method == well_proc_vec ? w : 1
-    const empty_matrix = SMatrix{c,c,Float_T}(fill(NaN_T,c,c))
+    s = size(calibration_data.array)
+    w = s[1]
+    c = s[2]
+    v = calibration_args.k_method == well_proc_vec ? w : 1
+    empty_matrix = SMatrix{c,c,Float_T}(fill(NaN_T,c,c))
     DeconvolutionMatrices(
         SVector{v}(fill(empty_matrix,v)),
         SVector{w}(fill(empty_matrix,w)),

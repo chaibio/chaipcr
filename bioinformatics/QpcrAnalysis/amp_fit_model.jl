@@ -25,7 +25,7 @@ function amp_fit_model(
     ::Type{Val{M}} where M <: DFCModel,
     ::Type{R},
     i                   ::AmpInput,
-    fluos               ::AbstractVector,
+    fluos               ::Vector{Float_T},
     ## these parameters not used to fit DFC models
     baseline_cyc_bounds ::AbstractArray,
     cq_method           ::CqMethod,
@@ -37,7 +37,7 @@ function amp_fit_model(
                 0.0
     d0() = coefs[findfirst(bl.bl_fit.coef_syms .== :d0)]
 
-    debug(logger, "at fit_amplification_model(::Type{Val{M}} where M <: DFCModel)")
+    debug(logger, "at amp_fit_model(::Type{Val{M}} where M <: DFCModel)")
     ## no fallback for baseline, because:
     ## (1) curve may fit well though :Error or :UserLimit
     ## (search step becomes very small but has not converge);
@@ -45,13 +45,13 @@ function amp_fit_model(
     ## quite close to a sensible baseline.
     # const num_cycles = length(fluos)
     # const cycles = range(1.0, num_cycles)
-    const num_cycles = i.num_cycles
-    const cycles = Vector(i.cycles) ## allows non-contiguous sequences of cycles
-    const wts = ones(num_cycles)
+    num_cycles = i.num_cycles
+    cycles = Vector(i.cycles) ## allows non-contiguous sequences of cycles
+    wts = ones(num_cycles)
     ## fit model
-    const bl_fit = fit(Val{M}, cycles, fluos, wts; solver = i.solver)
-    const coefs = bl_fit.coefs
-    const blsub_fluos = fluos .- bl()
+    bl_fit = fit(Val{M}, cycles, fluos, wts; solver = i.solver)
+    coefs = bl_fit.coefs
+    blsub_fluos = fluos .- bl()
     ## set output
     if isa(R, AmpShortModelResults)
         return AmpShortModelResults(
@@ -94,7 +94,7 @@ function amp_fit_model(
     ::Type{Val{SFCModel}},
     ::Type{R},
     i                   ::AmpInput,
-    fluos               ::AbstractVector,
+    fluos               ::Vector{Float_T},
     baseline_cyc_bounds ::AbstractArray,
     cq_method           ::CqMethod,
     ct_fluo             ::Float_T,
@@ -120,7 +120,7 @@ function amp_fit_model(
     "Check that the SFC model used to calculate the baseline terminated appropriately."
     @inline function good_status()
         if bl_status == :Optimal || bl_status == :UserLimit
-            const (min_bfd, max_bfd) = extrema(blsub_fluos) ## `bfd` - blsub_fluos_draft
+            (min_bfd, max_bfd) = extrema(blsub_fluos) ## `bfd` - blsub_fluos_draft
             if !(max_bfd - min_bfd <= abs(min_bfd))
                 push!(bl_notes, "model-derived baseline")
                 return true
@@ -144,7 +144,7 @@ function amp_fit_model(
     end ## good_status()
 
     @inline function bl_cycs()
-        const len_bcb = length(baseline_cyc_bounds)
+        len_bcb = length(baseline_cyc_bounds)
         if !(len_bcb in [0, 2])
             throw(ArgumentError("length of `baseline_cyc_bounds` must be 0 or 2"))
         elseif len_bcb == 2
@@ -155,20 +155,20 @@ function amp_fit_model(
             return auto_choose_bl_cycs()
         end
         ## fallthrough
-        throw(DomainError("too few cycles to estimate baseline"))
+        throw(ErrorException("too few cycles to estimate baseline"))
     end ## bl_cycs()
 
     ## uses `fluos`, `last_cyc_wt0`; updates `bl_notes` using push!()
     ## `last_cyc_wt0 == floor(i.min_reliable_cyc) - 1`
     "Automatically choose baseline cycles as the flat part of the curve."
     @inline function auto_choose_bl_cycs()
-        const (min_fluo, min_fluo_cyc) = findmin(fluos)
+        (min_fluo, min_fluo_cyc) = findmin(fluos)
         ## finite diff is used to estimate derivative because
         ## `Dierckx.Spline1D` resulted in all `NaN` in some cases
-        const dr2_cfd = finite_diff(cycles, fluos; nu = 2)
-        const dr2_cfd_left  = dr2_cfd[1:min_fluo_cyc]
-        const dr2_cfd_right = dr2_cfd[min_fluo_cyc:end]
-        const (max_dr2_left_cyc, max_dr2_right_cyc) =
+        dr2_cfd = finite_diff(cycles, fluos; nu = 2)
+        dr2_cfd_left  = dr2_cfd[1:min_fluo_cyc]
+        dr2_cfd_right = dr2_cfd[min_fluo_cyc:end]
+        (max_dr2_left_cyc, max_dr2_right_cyc) =
             (dr2_cfd_left, dr2_cfd_right) |> mold(indmax)
         if max_dr2_right_cyc <= last_cyc_wt0
             ## fluo on fitted spline may not be close to raw fluo
@@ -178,7 +178,7 @@ function amp_fit_model(
             return colon(last_cyc_wt0 + 1, num_cycles)
         end
         ## max_dr2_right_cyc > last_cyc_wt0
-        const bl_cyc_start = max(last_cyc_wt0 + 1, max_dr2_left_cyc)
+        bl_cyc_start = max(last_cyc_wt0 + 1, max_dr2_left_cyc)
         # push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) > " *
         #     "last_cyc_wt0 ($last_cyc_wt0), bl_cyc_start = $bl_cyc_start " *
         #     "(max(last_cyc_wt0+1, max_dr2_left_cyc), i.e. " *
@@ -187,27 +187,27 @@ function amp_fit_model(
             # push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) - " *
             #     "bl_cyc_start ($bl_cyc_start) <= 1")
             if (max_dr2_right_cyc < num_cycles)
-                const (max_dr2_right_2, max_dr2_right_cyc_2_shifted) =
+                (max_dr2_right_2, max_dr2_right_cyc_2_shifted) =
                     findmax(dr2_cfd[max_dr2_right_cyc + 1:end])
             else
                 max_dr2_right_cyc_2_shifted = 0
             end
-            const max_dr2_right_cyc_2 = max_dr2_right_cyc_2_shifted + max_dr2_right_cyc
+            max_dr2_right_cyc_2 = max_dr2_right_cyc_2_shifted + max_dr2_right_cyc
             if max_dr2_right_cyc_2 - max_dr2_right_cyc <= 1
-                const bl_cyc_end = num_cycles
+                bl_cyc_end = num_cycles
                 # push!(bl_notes, "max_dr2_right_cyc_2 ($max_dr2_right_cyc_2) - " *
                 #     "max_dr2_right_cyc ($max_dr2_right_cyc) == 1")
             else
                 ## max_dr2_right_cyc_2 - max_dr2_right_cyc > 1
                 # push!(bl_notes, "max_dr2_right_cyc_2 ($max_dr2_right_cyc_2) - " *
                 #     "max_dr2_right_cyc ($max_dr2_right_cyc) != 1")
-                const bl_cyc_end = max_dr2_right_cyc_2
+                bl_cyc_end = max_dr2_right_cyc_2
             end ## if
         else
             ## max_dr2_right_cyc - bl_cyc_start > 1
             # push!(bl_notes, "max_dr2_right_cyc ($max_dr2_right_cyc) - " *
             #     "bl_cyc_start ($bl_cyc_start) > 1")
-            const bl_cyc_end = max_dr2_right_cyc
+            bl_cyc_end = max_dr2_right_cyc
         end ## if
         # push!(bl_notes, "bl_cyc_end = $bl_cyc_end")
         # push!(bl_notes, "bl_cycles = $bl_cyc_start:$bl_cyc_end")
@@ -228,15 +228,15 @@ function amp_fit_model(
     dr2_pred_() =
         funcs_pred[:dr2](cycles_denser, quant_coefs...)
     #
-    cyc_max_dr1_(dr1_pred ::AbstractVector) =
+    cyc_max_dr1_(dr1_pred ::Vector{Float_T}) =
         cycles_denser[indmax(dr1_pred)]
     #
-    cyc_max_dr2_(dr2_pred ::AbstractVector) =
+    cyc_max_dr2_(dr2_pred ::Vector{Float_T}) =
         cycles_denser[indmax(dr2_pred)]
     #
-    cy0_(max_dr1 ::Real, idx_max_dr1 ::Integer) =
+    cy0_(max_dr1 ::Float_T, idx_max_dr1 ::Int_T) =
         cy0_(max_dr1, idx_max_dr1, cycles_denser[idx_max_dr1])
-    cy0_(max_dr1 ::Real, idx_max_dr1 ::Integer, cyc_max_dr1 ::Real) =
+    cy0_(max_dr1 ::Float_T, idx_max_dr1 ::Int_T, cyc_max_dr1 ::Float_T) =
         cyc_max_dr1 - funcs_pred[:f](cyc_max_dr1, quant_coefs...) / max_dr1
     #
     ct_() = try
@@ -249,10 +249,10 @@ function amp_fit_model(
     #
     max_eff() = cycles_denser[indmax(map(func_pred_eff, cycles_denser))]
     #
-    nonpos2NaN(x ::Real) =
+    nonpos2NaN(x ::Float_T) =
         x <= zero(x) ? NaN_T : x
     #
-    calc_cq_fluo(cq_raw ::Real) =
+    calc_cq_fluo(cq_raw ::Float_T) =
         funcs_pred[:f](nonpos2NaN(cq_raw), quant_coefs...)
     #
     @inline function calc_cq_raw()
@@ -260,12 +260,12 @@ function amp_fit_model(
         (cq_method == max_eff) && return max_eff_()
         calc_cq_raw(dr1_pred_())
     end
-    @inline function calc_cq_raw(dr1_pred ::AbstractVector)
+    @inline function calc_cq_raw(dr1_pred ::Vector{Float_T})
         (cq_method == cp_dr1)  && return cyc_max_dr1_(dr1_pred)
         (cq_method == Cy0)     && return cy0_(findmax(dr1_pred)...)
         calc_cq_raw(dr1_pred, dr2_pred_())
     end
-    @inline function calc_cq_raw(dr1_pred ::AbstractVector, dr2_pred ::AbstractVector)
+    @inline function calc_cq_raw(dr1_pred ::Vector{Float_T}, dr2_pred ::Vector{Float_T})
         (cq_method == cp_dr2)  && return cyc_max_dr2_(dr2_pred)
         (cq_method == cp_dr1)  && return cyc_max_dr1_(dr1_pred)
         (cq_method == Cy0)     && return cy0_(findmax(dr1_pred)...)
@@ -290,41 +290,42 @@ function amp_fit_model(
 
     ## << end of function definitions nested within fit_baseline_model() ## SFC
 
-    debug(logger, "at fit_amplification_model(Val{SFCModel})")
+    debug(logger, "at amp_fit_model(Val{SFCModel})")
     #
     ## fit baseline model
     # const num_cycles = length(fluos)
     # const cycles = range(1.0, num_cycles)
     ## the following allows non-contiguous sequences of cycles
     ## NB. Ipopt solver hangs unless cycles converted from SVector to Vector
-    const num_cycles = i.num_cycles
-    const cycles = Vector(i.cycles)
+    num_cycles = i.num_cycles
+    cycles = Vector(i.cycles)
     ## to determine weights (`wts`) for sigmoid fitting per `i.min_reliable_cyc`
-    const last_cyc_wt0 = floor(i.min_reliable_cyc) - 1
+    last_cyc_wt0 = floor(i.min_reliable_cyc) - 1
     if i.bl_method in SFC_MODEL_NAMES
         ## fit model to find baseline
-        const wts = SFC_wts()
-        const bl_fit = i.SFC_model_def_func(i.bl_method).func_fit(
+        wts = SFC_wts()
+        bl_fit = i.SFC_model_def_func(i.bl_method).func_fit(
             cycles, fluos, wts; solver = i.solver)
-        const bl_status = bl_fit.status
+        bl_status = bl_fit.status
         bl_notes = ["bl_status $bl_status"]
         baseline = i.SFC_model_def_func(i.bl_method).funcs_pred[:bl](
             cycles, bl_fit.coefs...)
         blsub_fluos = fluos .- baseline
-        const have_good_results = good_status()
+        have_good_results = good_status()
+        debug(logger, "bl notes: $bl_notes, good_results: $have_good_results")
         if !have_good_results
             ## recalculate baseline
-            const bl_func = i.bl_fallback_func
+            bl_func = i.bl_fallback_func
         end
     else
         ## bl_method == take_the_median
         ## do not fit model to find baseline
-        const wts = ones(num_cycles)
-        const bl_fit = FIT[amp_model]() ## empty model fit
-        const have_good_results = false
+        wts = ones(num_cycles)
+        bl_fit = FIT[amp_model]() ## empty model fit
+        have_good_results = false
         bl_notes = ["no bl_status", "no fallback"]
-        const bl_status = ""
-        const bl_func = median
+        bl_status = ""
+        bl_func = median
     end ## if bl_method
     if !have_good_results
         baseline = bl_func(fluos[bl_cycs()])
@@ -332,28 +333,28 @@ function amp_fit_model(
     end
     #
     ## fit quantitation model
-    const qm = i.SFC_model_def_func(i.quant_method)
-    const quant_fit = qm.func_fit(cycles, blsub_fluos, wts; solver = i.solver)
-    const quant_coefs = quant_fit.coefs
-    const len_denser = denser_len(i, num_cycles)
-    const cycles_denser = interpolated_cycles()
-    const funcs_pred = qm.funcs_pred
+    qm = i.SFC_model_def_func(i.quant_method)
+    quant_fit = qm.func_fit(cycles, blsub_fluos, wts; solver = i.solver)
+    quant_coefs = quant_fit.coefs
+    len_denser = denser_len(i, num_cycles)
+    cycles_denser = interpolated_cycles()
+    funcs_pred = qm.funcs_pred
     #
     ## results by R
     if R == AmpCqFluoModelResults
         ## the following method for calculating cq_raw
         ## is efficient for DEFAULT_AMP_CQ_FLUO_METHOD = cp_dr1
-        const cq_raw = calc_cq_raw(dr1_pred_())
+        cq_raw = calc_cq_raw(dr1_pred_())
         return AmpCqFluoModelResults(
             quant_fit.status, ## quant_status
             calc_cq_fluo(cq_raw)) ## cq_fluo
     end ## if
     #
-    const dr1_pred = dr1_pred_()
-    const dr2_pred = dr2_pred_()
-    const raw_cycs_index = colon(1, i.denser_factor, len_denser)
+    dr1_pred = dr1_pred_()
+    dr2_pred = dr2_pred_()
+    raw_cycs_index = colon(1, i.denser_factor, len_denser)
     if R == AmpShortModelResults
-        const cq_raw = calc_cq_raw(dr1_pred, dr2_pred)
+        cq_raw = calc_cq_raw(dr1_pred, dr2_pred)
         return AmpShortModelResults(
             # fluos, ## rbbs_ary3,
             blsub_fluos,
@@ -364,20 +365,20 @@ function amp_fit_model(
     end ## R
     #
     ## R == AmpLongModelResults
-    const (max_dr1, idx_max_dr1) = findmax(dr1_pred)
-    const cyc_max_dr1 = cycles_denser[idx_max_dr1]
-    const (max_dr2, idx_max_dr2) = findmax(dr2_pred)
-    const cyc_max_dr2 = cycles_denser[idx_max_dr2]
-    const eff_pred = map(func_pred_eff, cycles_denser)
-    const (eff_max, idx_max_eff) = findmax(eff_pred)
-    const cyc_vals_4cq = OrderedDict(
+    (max_dr1, idx_max_dr1) = findmax(dr1_pred)
+    cyc_max_dr1 = cycles_denser[idx_max_dr1]
+    (max_dr2, idx_max_dr2) = findmax(dr2_pred)
+    cyc_max_dr2 = cycles_denser[idx_max_dr2]
+    eff_pred = map(func_pred_eff, cycles_denser)
+    (eff_max, idx_max_eff) = findmax(eff_pred)
+    cyc_vals_4cq = OrderedDict(
         :cp_dr1  => cyc_max_dr1,
         :cp_dr2  => cyc_max_dr2,
         :Cy0     => cy0_(max_dr1, idx_max_dr1, cyc_max_dr1),
         :ct      => ct_(),
         :max_eff => cycles_denser[idx_max_eff])
-    const cq_raw = cyc_vals_4cq[Symbol(cq_method)]
-    const eff_vals_4cq =
+    cq_raw = cyc_vals_4cq[Symbol(cq_method)]
+    eff_vals_4cq =
         OrderedDict(
             map(keys(cyc_vals_4cq)) do key
                 key => (key == :max_eff) ?

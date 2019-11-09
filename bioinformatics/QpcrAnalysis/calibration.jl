@@ -37,9 +37,9 @@ const SIGNAL = 2
 "Perform deconvolution between channels and normalize variation between wells."
 function calibrate(
     i                       ::Input,
-    calibration_data        ::CalibrationData{<: NumberOfChannels, <: Real},
+    calibration_data        ::CalibrationData{<: NumberOfChannels, <: Union{Int_T,Float_T}},
     calibration_args        ::CalibrationParameters,
-    raw                     ::RawData{<: Real},         ## 3D array of raw fluorescence
+    raw                     ::RawData{<: Union{Int_T,Float_T}},         ## 3D array of raw fluorescence
     data_format             ::DataFormat,               ## array, dict, both
 )
     debug(logger, "at calibrate()")
@@ -50,7 +50,7 @@ function calibrate(
     #     calib_info, well_nums_in_req, dye_in, dyes_to_fill)
 
     ## prepare data for normalization
-    const (norm_data, norm_wells) = prep_normalize(calibration_data)
+    (norm_data, norm_wells) = prep_normalize(calibration_data)
 
     # if length(well_nums_found_in_req) == 0
     #     well_nums_found_in_req = norm_wells
@@ -64,14 +64,14 @@ function calibrate(
 
     ## match (explicit) well numbers in the experimental data
     ## with (presumed complete) set of well numbers in calibration data
-    const matched_wells = indexin(i.wells, norm_wells)
-    const matched_exp_well_idc = find(matched_wells)
-    const matched_calib_well_idc = SVector{length(matched_exp_well_idc)}(
+    matched_wells = indexin(i.wells, norm_wells)
+    matched_exp_well_idc = find(matched_wells)
+    matched_calib_well_idc = SVector{length(matched_exp_well_idc)}(
         matched_wells[matched_exp_well_idc])
 
     #
     ## subtract background
-    const background_subtracted_data =
+    background_subtracted_data =
         subtract_background(
             raw.data,
             norm_data[:,:,WATER],
@@ -79,9 +79,9 @@ function calibrate(
             matched_exp_well_idc)
 
     #
-    const (k_deconv, deconvoluted_data) =
+    (k_deconv, deconvoluted_data) =
         if  calibration_args.dcv &&
-            isa(calibration_data, CalibrationData{DualChannel,<: Real})
+            isa(calibration_data, CalibrationData{DualChannel,<: Union{Int_T,Float_T}})
             ## addition with flexible ratio instead of deconvolution (commented out)
             # k_inv_vec = fill(reshape(DataArray([1, 0, 1, 0]), 2, 2), 16)
 
@@ -105,9 +105,9 @@ function calibrate(
                 background_subtracted_data
         end
     #
-    const calibrated_array =
+    calibrated_array =
         map(1:i.num_channels) do channel
-            normalize(
+            perform_normalize(
                 deconvoluted_data[:, :, channel],
                 norm_data,
                 matched_exp_well_idc,
@@ -125,7 +125,7 @@ function calibrate(
             map(1:i.num_channels) do channel
                 channel => calibrated_array[:, :, channel]
             end)
-    const calibrated_data =
+    calibrated_data =
         if      (data_format == array)  tuple(calibrated_array)
         elseif  (data_format == dict)   tuple(calibrated_dict())
         elseif  (data_format == both)   tuple(calibrated_array, calibrated_dict())
@@ -144,10 +144,10 @@ end ## calibrate()
 
 ## called by calibrate()
 function subtract_background(
-    raw_data                ::Array{<: Real, 3},
-    water_data              ::SArray{S,<: Real,2} where {S},
-    matched_wells           ::AbstractArray{Int},
-    matched_exp_wells_idc   ::AbstractArray{Int},
+    raw_data                ::Array{<: Union{Int_T,Float_T}, 3},
+    water_data              ::SArray{S,<: Union{Int_T,Float_T},2} where {S},
+    matched_wells           ::Array{Int_T},
+    matched_exp_wells_idc   ::Array{Int_T},
 )
     ## vectorized
     # raw_data[:,matched_exp_wells_idc,:] .-
@@ -164,25 +164,25 @@ end
 
 
 "Check validity of optical calibration data."
-function prep_normalize(calibration_data ::CalibrationData{DualChannel, <: Real})
+function prep_normalize(calibration_data ::CalibrationData{DualChannel, <: Union{Int_T,Float_T}})
     debug(logger, "at prep_normalize()")
     norm_data = get_norm_data(calibration_data)
     ## index wells in calibration data starting at `DEFAULT_CAL_FIRST_WELL` = 0
     ## issue:
     ## using the current format for the request body there is no well_num information
     ## associated with the calibration data
-    const num_wells = size(calibration_data.array, 1)
-    const num_channels = 2
-    const signal_wells = num_wells |> from(DEFAULT_CAL_FIRST_WELL) |>
+    num_wells = size(calibration_data.array, 1)
+    num_channels = 2
+    signal_wells = num_wells |> from(DEFAULT_CAL_FIRST_WELL) |>
         mold(Symbol) |> SVector{num_wells}
     ## check whether signal fluorescence > water fluorescence
-    const failed = norm_data[:, :, SIGNAL] .<= norm_data[:, :, WATER]
+    failed = norm_data[:, :, SIGNAL] .<= norm_data[:, :, WATER]
     if any(failed)
         err_msgs = Vector{String}()
         for channel in 1:num_channels
-            const invalid = find(failed[:, channel])
+            invalid = find(failed[:, channel])
             if length(invalid) > 0
-                const failed_wells = join(signal_wells[invalid], ", ")
+                failed_wells = join(signal_wells[invalid], ", ")
                 push!(err_msgs, "invalid calibration data in channel $channel: " *
                     "fluorescence value of water is greater than or equal to that of dye " *
                     "in the following well(s) - " * failed_wells)
@@ -226,16 +226,16 @@ function prep_normalize(calibration_data ::CalibrationData{DualChannel, <: Real}
 end ## prep_normalize()
 
 
-function prep_normalize(calibration_data ::CalibrationData{SingleChannel, <: Real})
+function prep_normalize(calibration_data ::CalibrationData{SingleChannel, <: Union{Int_T,Float_T}})
     debug(logger, "at prep_normalize()")
     norm_data = calibration_data.array
-    const num_wells = size(calibration_data.array, 1)
-    const signal_wells = num_wells |> from(DEFAULT_CAL_FIRST_WELL) |>
+    num_wells = size(calibration_data.array, 1)
+    signal_wells = num_wells |> from(DEFAULT_CAL_FIRST_WELL) |>
         mold(Symbol) |> SVector{num_wells}
     ## check whether signal fluorescence > water fluorescence
-    const failed = norm_data[:, 1, SIGNAL] .<= norm_data[:, 1, WATER]
+    failed = norm_data[:, 1, SIGNAL] .<= norm_data[:, 1, WATER]
     if any(failed)
-        const err_msg = "invalid calibration data in channel 1: " *
+        err_msg = "invalid calibration data in channel 1: " *
             "fluorescence value of water is greater than or equal to that of dye " *
             "in the following well(s) - " * join(signal_wells[find(failed)], ", ")
         throw(ArgumentError(err_msg))
@@ -246,10 +246,10 @@ end ## prep_normalize()
 
 ## called by prep_normalize() >>
 
-get_norm_data(data ::CalibrationData{SingleChannel, <: Real}) =
+get_norm_data(data ::CalibrationData{SingleChannel, <: Union{Int_T,Float_T}}) =
     data.array
 
-function get_norm_data(data ::CalibrationData{DualChannel,R}) where {R <: Real}
+function get_norm_data(data ::CalibrationData{DualChannel,R}) where {R <: Union{Int_T,Float_T}}
     local (water, dye1, dye2) = 1:3
     SArray{Tuple{size(data.array,1),2,2},R}( ## hcat converts from SArray to Array
         hcat(
@@ -261,7 +261,7 @@ end
 #==============================================================================#
 
 #=
-    normalize(): each dye only has data for its target channel;
+    perform_normalize(): each dye only has data for its target channel;
     calibration/calib/oc - used for `deconvolute` and `normalize`,
     each dye has data for both target and non-target channels.
     Input `fluo` and output: dim2 indexed by well and dim1 indexed by unit,
@@ -272,20 +272,20 @@ end
 
 ## called from calibrate()
 "Normalize variation between wells in absolute fluorescence values."
-function normalize(
-    fluorescence                    ::AbstractArray{<: Real,2},
-    norm_data                       ::SArray{S,<: Real,3} where {S},
-    matched_exp_well_idc            ::AbstractArray{Int},
-    matched_calib_well_idc          ::SArray{L,Int,1} where {L},
-    channel                         ::Int,
+function perform_normalize(
+    fluorescence                    ::Array{<: Union{Int_T,Float_T},2},
+    norm_data                       ::SArray{S,<: Union{Int_T,Float_T},3} where {S},
+    matched_exp_well_idc            ::Array{Int_T},
+    matched_calib_well_idc          ::SVector{L,Int_T} where {L},
+    channel                         ::Int_T,
     subtract_water                  ::Bool,
-    normalization_scaling_factor    ::Real,
+    normalization_scaling_factor    ::Float_T,
 )
-    debug(logger, "at normalize()")
+    debug(logger, "at perform_normalize()")
     #
     ## devectorized code avoids transposing data matrix
     if subtract_water == false
-        const smw = norm_data[matched_calib_well_idc, channel, SIGNAL]
+        smw = norm_data[matched_calib_well_idc, channel, SIGNAL]
         return ([
             normalization_scaling_factor * mean(smw) *
                 fluorescence[u, matched_exp_well_idc[wi]] / smw[wi]
@@ -294,14 +294,14 @@ function normalize(
     end
     #
     ## subtract_water == true
-    const norm_water = norm_data[matched_calib_well_idc, channel, WATER]
-    const smw = norm_data[matched_calib_well_idc, channel, SIGNAL] .- norm_water
+    norm_water = norm_data[matched_calib_well_idc, channel, WATER]
+    smw = norm_data[matched_calib_well_idc, channel, SIGNAL] .- norm_water
     return ([
         normalization_scaling_factor * mean(smw) *
             (fluorescence[u, matched_exp_well_idc[wi]] - norm_water[wi]) / smw[wi]
                 for u  in 1:size(fluorescence, 1),
                     wi in eachindex(matched_exp_well_idc)])
-end ## normalize
+end ## perform_normalize
 
 
 #==============================================================================#
@@ -313,13 +313,13 @@ function deconvolute(
     ## ary2dcv dim1 is unit, which can be cycle (amplification), temperature point (melting curve),
     ## or step type (like "water", "channel_1", "channel_2" for calibration experiment);
     ## ary2dcv dim2 must be well, ary2dcv dim3 must be channel
-    calibration_data        ::CalibrationData{DualChannel, <: Real},
+    calibration_data        ::CalibrationData{DualChannel, <: Union{Int_T,Float_T}},
     calibration_args        ::CalibrationParameters,
     ary2dcv                 ::Array{Float_T,3},
-    matched_calib_well_idc  ::AbstractVector{Int},
-    wells                   ::AbstractVector{Symbol},
+    matched_calib_well_idc  ::SVector{L,Int_T} where {L},
+    wells                   ::SVector{L,Symbol} where {L},
     k_deconv_backup         ::DeconvolutionMatrices, ## argument not used
-    scaling_factor_dcv_vec  ::AbstractVector,
+    scaling_factor_dcv_vec  ::Vector{Float_T},
     data_format             ::DataFormat, ## array, dict, both
 
     ## remove MySql dependency
@@ -339,13 +339,13 @@ function deconvolute(
     #     length_step_ids <= 2 || length(unique(step_ids)) < length_step_ids
     # end) ? k_deconv_backup : get_k(db_conn, calib_info, well_nums) ## use default `well_proc` value
 
-    const k_deconv = get_k(
+    k_deconv = get_k(
         calibration_data,
         calibration_args,
         matched_calib_well_idc,
         wells)
-    const (num_units, num_channels) = size(ary2dcv,1,3)
-    const scaled_k_inv_vecs =
+    (num_units, num_channels) = size(ary2dcv,1,3)
+    scaled_k_inv_vecs =
         map(eachindex(matched_calib_well_idc)) do wi
             k_deconv.k_inv_vec[wi] .* scaling_factor_dcv_vec
         end
@@ -359,7 +359,7 @@ function deconvolute(
             channel => deconvoluted_array[:, :, channel]
             for channel in 1:num_channels)
     ## format output
-    const deconvoluted_data =
+    deconvoluted_data =
         if      (data_format == array)  tuple(deconvoluted_array)
         elseif  (data_format == dict)   tuple(deconvoluted_dict())
         elseif  (data_format == both)   tuple(deconvoluted_array, deconvoluted_dict())
@@ -371,13 +371,13 @@ end ## deconvolute()
 
 
 deconvolute(
-    calibration_data        ::CalibrationData{SingleChannel, <: Real},
+    calibration_data        ::CalibrationData{SingleChannel, <: Union{Int_T,Float_T}},
     calibration_args        ::CalibrationParameters,
     ary2dcv                 ::Array{Float_T,3},
-    matched_calib_well_idc  ::AbstractVector{Int},
-    wells                   ::AbstractVector{Symbol},
+    matched_calib_well_idc  ::SVector{L,Int_T} where {L},
+    wells                   ::SVector{L,Symbol} where {L},
     k_deconv_backup         ::DeconvolutionMatrices, ## argument not used
-    scaling_factor_dcv_vec  ::AbstractVector,
+    scaling_factor_dcv_vec  ::Vector{Float_T},
     data_format             ::DataFormat, ## array, dict, both
 ) =
     throw(ArgumentError("cannot perform multi-channel deconvolution " *
@@ -389,10 +389,10 @@ deconvolute(
 
 "Calculate the matrix `k` that describes crosstalk between channels."
 function get_k(
-    calibration_data        ::CalibrationData{DualChannel, <: Real},
+    calibration_data        ::CalibrationData{DualChannel, <: Union{Int_T,Float_T}},
     calibration_args        ::CalibrationParameters,
-    matched_calib_well_idc  ::AbstractVector{Int},
-    wells                   ::AbstractVector{Symbol};
+    matched_calib_well_idc  ::SVector{L,Int_T} where {L},
+    wells                   ::SVector{L,Symbol} where {L};
     save_to                 ::String = "" ## used: "k.jld"
 
     ## remove MySql dependency
@@ -433,7 +433,7 @@ function get_k(
     # end)
 
     ## water-subtracted calibration data
-    const smw = SArray{Tuple{2,2,length(matched_calib_well_idc)},Float_T}([
+    smw = SArray{Tuple{2,2,length(matched_calib_well_idc)},Float_T}([
         calibration_data.array[well, channel, dye] - calibration_data.array[well, channel, WATER]
         for channel in 1:2,
             dye     in 2:3,
@@ -442,21 +442,21 @@ function get_k(
     #
     ## check that the water-subtracted signal in the target channel
     ## is greater than that in the non-target channel(s) for each well and each dye
-    const failed =
+    failed =
         map(DYES) do dye
-            const target     = dye
-            const non_target = 3 - target
+            target     = dye
+            non_target = 3 - target
             smw[target, dye, :] .<= smw[non_target, dye, :]
         end #= next channel =# |>
         gather(hcat)
     if any(failed)
         err_msgs = Vector{String}()
         for dye in DYES
-            const invalid = find(failed[:, dye])
+            invalid = find(failed[:, dye])
             if length(invalid) > 0
-                const target     = dye
-                const non_target = 3 - target
-                const wells_invalid = join(wells[invalid], ", ")
+                target     = dye
+                non_target = 3 - target
+                wells_invalid = join(wells[invalid], ", ")
                 push!(err_msgs,
                     "invalid deconvolution data for the dye targeting channel $target: " *
                     "fluorescence value of non-target channel $non_target " *
@@ -468,13 +468,13 @@ function get_k(
     end ## if any(failed)
     #
     ## compute inverses and return
-    const INV_NOTE_PT2 = ": K matrix is singular, using `pinv` instead of `inv` " *
+    INV_NOTE_PT2 = ": K matrix is singular, using `pinv` instead of `inv` " *
     "to compute inverse matrix of K. Deconvolution result may not be accurate. " *
     "This may be caused by using the same or a similar set of solutions " *
     "in the steps for different dyes."
-    const (k_s, k_inv_vec, inv_note) =
+    (k_s, k_inv_vec, inv_note) =
         calc_kinv(Val{calibration_args.k_method}, smw, DYES, wells)
-    const k_deconv =
+    k_deconv =
         DeconvolutionMatrices(
             k_s,
             k_inv_vec,
@@ -485,10 +485,10 @@ end ## get_k()
 
 
 get_k(
-    calibration_data        ::CalibrationData{SingleChannel, <: Real},
+    calibration_data        ::CalibrationData{SingleChannel, <: Union{Int_T,Float_T}},
     calibration_args        ::CalibrationParameters,
-    matched_calib_well_idc  ::AbstractVector{Int},
-    wells                   ::AbstractVector{Symbol};
+    matched_calib_well_idc  ::SVector{L,Int_T} where {L},
+    wells                   ::SVector{L,Symbol} where {L};
     save_to                 ::String = "" ## used: "k.jld"
 ) =
     throw(ArgumentError("cannot calculate deconvolution matrices " *
@@ -503,17 +503,17 @@ get_k(
 "Calculate a single deconvolution matrix K, averaging across all wells"
 function calc_kinv(
     ::Type{Val{well_proc_mean}},
-    smw             ::AbstractArray{<: Float_T},
+    smw             ::SArray{S,<: Float_T,3} where {S},
     dyes            ::SVector{L,Int_T},
     wells           ::SVector{L,Symbol}
 ) where {L}
     inv_note = false
-    const k_s =
+    k_s =
         map(eachindex(dyes)) do dye
             SVector{L,Float_T}(sweep(sum)(/)(mean(smw[:,dye,:], 2)))
         end #= next dye =# |>
         gather(hcat)
-    const k_inv = try
+    k_inv = try
         inv(k_s)
     catch err
         if isa(err, Base.LinAlg.SingularException)
@@ -533,19 +533,19 @@ end
 "Calculate deconvolution matrix K for each well"
 function calc_kinv(
     ::Type{Val{well_proc_vec}},
-    smw             ::AbstractArray{<: Float_T},
+    smw             ::SArray{S,<: Float_T,3} where {S},
     dyes            ::SVector{L,Int_T},
     wells           ::SVector{M,Symbol} where {M}
 ) where {L}
     singular_wells = Vector{Symbol}()
-    const k_s =
+    k_s =
         map(eachindex(wells)) do wi
             map(eachindex(dyes)) do dye
                 sweep(sum)(/)(smw[:, dye, wi])
             end #= next dye =# |>
             gather(hcat)
         end ## next wi
-    const k_inv_vec =
+    k_inv_vec =
         map(eachindex(wells)) do wi
             try
                 ## `inv()` is supposedly faster with StaticArray
@@ -560,7 +560,7 @@ function calc_kinv(
                 end ## if isa(err
             end ## try
         end ## next wi
-    const inv_note = (length(singular_wells) > 0) ?
+    inv_note = (length(singular_wells) > 0) ?
         "Well(s) " * string(join(singular_wells, ", ")) : ""
     return k_s, k_inv_vec, inv_note
 end

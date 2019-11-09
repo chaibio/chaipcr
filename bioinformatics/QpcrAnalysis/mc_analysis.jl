@@ -132,15 +132,15 @@ function mc_analysis(i ::McInput)
         ## devectorized style
         cs = [df[:channel] .== c for c in i.channels]
         ws = [df[:well   ] .== w for w in i.wells   ]
-        const selection =
+        selection =
             [   find(cs[ci] .& ws[wi])
                 for ci in eachindex(i.channels), wi in eachindex(i.wells)   ]
         # @inline selector(c ::Int, w ::Int) = (df[:channel] .== c) .& (df[:well] .== w)
         # const selection =
         #     [   find(selector(c, w))
         #         for c in i.channels, w in i.wells   ]
-        const longest = selection |> mold(length) |> maximum
-        const dims = (longest, i.num_wells, i.num_channels)
+        longest = selection |> mold(length) |> maximum
+        dims = (longest, i.num_wells, i.num_channels)
         t = Array{Float_T}(dims)
         f = Array{Float_T}(dims)
         for ci in eachindex(i.channels)
@@ -204,10 +204,10 @@ function mc_analysis(i ::McInput)
     # const raw_fluos         = RawData(mc_data_array)
 
     ## alternative method, manipulating DataFrame directly
-    const (raw_temps, raw_fluos) = transform_3d(i.raw_df)
+    (raw_temps, raw_fluos) = transform_3d(i.raw_df)
     #
     ## deconvolute and normalize
-    const peak_format = peak_output_format(i.out_format)
+    peak_format = peak_output_format(i.out_format)
     if peak_format == McPeakLongOutput
         (   background_subtracted_data,
             k_deconv,
@@ -218,14 +218,14 @@ function mc_analysis(i ::McInput)
                 calibrate(i, i.calibration_data, i.calibration_args, raw_fluos, array)
     else
         ## McPeakShortOutput
-        const (_, _, _, _, norm_wells, calibrated_data) = ## discard other output fields
+        (_, _, _, _, norm_wells, calibrated_data) = ## discard other output fields
             calibrate(i, i.calibration_data, i.calibration_args, raw_fluos, array)
     end ## if peak_format
     #
     ## subset temperature/fluorescence data by channel / well
     ## then smooth the fluorescence/temperature data and calculate Tm peak, area
     ## result is mc_matrix: dim1 = well, dim2 = channel
-    const mcpa_matrix =
+    mcpa_matrix =
         eachindex(i.channels) |> ## do for each channel
         moose(hcat) do ci
             map(eachindex(i.wells)) do wi

@@ -31,10 +31,10 @@ function act(
     debug(logger, "at act(::Type{Val{standard_curve}})")
     #
     ## parse data
-    const req_df =
+    req_df =
         try
             parse_raw_data(Val{standard_curve}, req)
-        catch()
+        catch
             throw(ArgumentError(
                 "cannot parse raw data for standard curve analysis"))
         end ## try
@@ -42,37 +42,37 @@ function act(
     ## empty dataset
     if  size(req_df, 2) == 0 ||
         [:target, :cq, :qty] |> mold(symbl -> all(isnan.(req_df[symbl]))) |> any
-            const output = OrderedDict(:targets => [], :groups => [], :valid => false)
+            output = OrderedDict(:targets => [], :groups => [], :valid => false)
             return output |> out(out_format)
     end
     #
     ## target result set
-    const use = .!isnan.(req_df[:, :qty]) .& .!isnan.(req_df[:, :cq])
-    const target_result_df = by(req_df[use, :], :target) do chunk_target
-        const target_id = chunk_target[1, :target]
+    use = .!isnan.(req_df[:, :qty]) .& .!isnan.(req_df[:, :cq])
+    target_result_df = by(req_df[use, :], :target) do chunk_target
+        target_id = chunk_target[1, :target]
         if isnan(target_id)
             empty_tre
         else
             ## better to use GLM.jl here
-            const x =
+            x =
                 if qty_base == 10
                     log10.(chunk_target[:, :qty])
                 else
                     log.(qty_base, chunk_target[:, :qty])
                 end
-            const y = chunk_target[:, :cq]
-            const b0, b1 = linreg(x, y)
-            const eff =
+            y = chunk_target[:, :cq]
+            b0, b1 = linreg(x, y)
+            eff =
                 if qty_base == 10
                     exp10(-1.0 / b1) - 1.0
                 else
                     exp(-log(e, qty_base) / b1) - 1.0
                 end
-            const yhat = b0 + b1 .* x
-            const ybar = mean(y)
-            const ss_res = y .- yhat |> sumsq
-            const ss_tot = y .- ybar |> sumsq
-            const r2_ = 1.0 - ss_res / ss_tot
+            yhat = b0 + b1 .* x
+            ybar = mean(y)
+            ss_res = y .- yhat |> sumsq
+            ss_tot = y .- ybar |> sumsq
+            r2_ = 1.0 - ss_res / ss_tot
             ## adjusted R2 ?
             TargetResultEle(
                 target_id,
@@ -122,7 +122,7 @@ function act(
     target_vec = Vector{Any}()
     for tre in tre_vec
         if isnan(tre.slope) && isnan(tre.offset)
-            const err_msg = "less 2 valid data points of cq and/or qty available for fitting standard curve"
+            err_msg = "less 2 valid data points of cq and/or qty available for fitting standard curve"
             warn(logger, err_msg)
             target_result = OrderedDict(
                 :target_id => tre.target_id,
@@ -192,7 +192,7 @@ sumsq(y) = sum(y .^ 2)
 ## dependencies of `standard_curve`
 
 ## parse req into a dataframe
-function parse_raw_data(::Type{Val{standard_curve}}, req ::AbstractVector)
+function parse_raw_data(::Type{Val{standard_curve}}, req ::Vector{Any})
     (length(req) == 0) && return DataFrame()
     #
     well_vec    = Vector{Int_T}()
@@ -206,7 +206,7 @@ function parse_raw_data(::Type{Val{standard_curve}}, req ::AbstractVector)
         map(req) do req_ele
             try
                 length(req_ele[WELL_KEY])
-            catch()
+            catch
                 0
             end ## try
         end #= do req_ele =# |> maximum
@@ -218,7 +218,7 @@ function parse_raw_data(::Type{Val{standard_curve}}, req ::AbstractVector)
             measrmt_dict =
                 try
                     req_ele[WELL_KEY][channel_i]
-                catch()
+                catch
                     Dict{String,Any}()
                 end ## try
             if length(measrmt_dict) == 0
@@ -236,7 +236,7 @@ function parse_raw_data(::Type{Val{standard_curve}}, req ::AbstractVector)
             push!(qty_vec,      qty)
             push!(sample_vec,   try
                     nothing2NaN(req_ele[SAMPLE_KEY])
-                catch()
+                catch
                     NaN_T
                 end) ## try
         end ## for channel_i
@@ -260,7 +260,7 @@ end
 ## generate unique integers
 function generate_uniq_ints(num_ints ::Integer, S, rng ::AbstractRNG = Base.GLOBAL_RNG)
     if num_ints > length(S)
-        error(logger, "num_ints > length(S), i.e. no enough values to choose from")
+        warn(logger, "num_ints($num_ints) > length(S), i.e. no enough values to choose from")
     end
     uniq_ints = unique(rand(rng, S, num_ints))
     while length(uniq_ints) < num_ints
@@ -279,25 +279,25 @@ function insert2ary(
     seek2ins_along_dim  ::Integer = 1,
     rng                 ::AbstractRNG = Base.GLOBAL_RNG
 )
-    const dim_len = size(ary)[seek2ins_along_dim]
-    const idx_range = 1:(dim_len + num_ins)
-    const ins_idc = generate_uniq_ints(num_ins, idx_range, rng)
-    const ins_vec = sort(ins_idc) .- (1:num_ins) .+ 1
-    const ins_mtx =
+    dim_len = size(ary)[seek2ins_along_dim]
+    idx_range = 1:(dim_len + num_ins)
+    ins_idc = generate_uniq_ints(num_ins, idx_range, rng)
+    ins_vec = sort(ins_idc) .- (1:num_ins) .+ 1
+    ins_mtx =
         hcat(
             vcat(1, ins_vec),
             vcat(ins_vec .- 1, dim_len))
 
-    const ary_ndims = ndims(ary)
-    const ary_ut = Array{Union{eltype(ary),typeof(el2ins)},ary_ndims}(ary)
+    ary_ndims = ndims(ary)
+    ary_ut = Array{Union{eltype(ary),typeof(el2ins)},ary_ndims}(ary)
     select_all_idx_vec = Vector{Any}(fill(Colon(), ary_ndims)) ## make sure eltype is a supertype of Vector{Int}
-    const ary_size = size(ary)
-    const ins_size = map(1:ary_ndims) do i
+    ary_size = size(ary)
+    ins_size = map(1:ary_ndims) do i
         i == seek2ins_along_dim ? 1 : ary_size[i]
     end
-    const ins_slice = fill(el2ins, ins_size...)
+    ins_slice = fill(el2ins, ins_size...)
 
-    const ary_wins =
+    ary_wins =
         getindex(
             cat(seek2ins_along_dim,
                 map(range(1, num_ins + 1)) do i
@@ -341,8 +341,7 @@ function generate_req_sc(;
 )
     rng = rng_type(seed)
 
-    println("num_wells: ", num_wells)
-    println("num_channels: ", num_channels)
+    debug(logger, "at generate_req_sc: num_wells=$num_wells, num_channels=$num_channels")
 
     if num_uniq_targets < num_channels
         num_na_channels = num_channels - num_uniq_targets
@@ -385,7 +384,9 @@ function generate_req_sc(;
         end ## for channel_i
 
     elseif num_targets != num_measurements
-        error(logger, "target_vec not empty but length not same as num_measurements")
+        errmsg = "target_vec not empty but length($num_targets) not same as num_measurements($num_measurements)"
+        warn(logger, errmsg)
+        throw(ErrorException(errmsg))
     end ## if num_targets
 
     num_cqs = length(cq_vec)
@@ -395,7 +396,9 @@ function generate_req_sc(;
         nna_cq_vec = rand(rng, num_nna_cqs) .* -(cq_bounds...) .+ cq_bounds[2] # upperbound - (0,1)seq * scaling_factor
         cq_vec = insert2ary(NaN_T, num_na_cqs, nna_cq_vec, 1, rng)
     elseif num_cqs != num_measurements
-        error(logger, "cq_vec not empty but length not same as num_measurements")
+        errmsg = "cq_vec not empty but length($num_cqs) not same as num_measurements($num_measurements)"
+        warn(logger, errmsg)
+        throw(ErrorException(errmsg))
     end
 
     num_qm = length(qm_vec)
@@ -410,9 +413,13 @@ function generate_req_sc(;
         qm_vec = qty_mtx[:, 1]
         qb_vec = qty_mtx[:, 2] # not convert to integer due to NaN
     elseif num_qm != num_qb
-        error(logger, "lengths of qm_vec and qb_vec not equal")
+        errmsg = "lengths of qm_vec($num_qm) and qb_vec($num_qb) not equal"
+        warn(logger, errmsg)
+        throw(ErrorException(errmsg))
     elseif num_qm != num_measurements
-        error(logger, "qm_vec and qb_vec with equal non-0 length but not same as num_measurements")
+        errmsg = "qm_vec and qb_vec with equal non-0 length($num_qm) but not same as num_measurements($num_measurements)"
+        warn(logger, errmsg)
+        throw(ErrorException(errmsg))
     end
 
     num_samples = length(sample_vec)
@@ -422,7 +429,9 @@ function generate_req_sc(;
         nna_sample_vec = rand(rng, 1:num_uniq_samples, num_nna_samples)
         sample_vec = insert2ary(NaN_T, num_na_samples, nna_sample_vec, 1, rng)
     elseif num_samples != num_wells
-        error(logger, "sample_vec not empty but length not same as num_wells")
+        errmsg = "sample_vec not empty but length($num_samples) not same as num_wells($num_wells)"
+        warn(logger, errmsg)
+        throw(ErrorException(errmsg))
     end
 
     req = map(1:num_wells) do well_i

@@ -465,7 +465,7 @@ function assign_genos(
     const max_num_genos = 2 ^ num_channels ## 2 comes from the binary possible values, i.e. presence/absence of signal for each channel
     const unclassified_assignment = max_num_genos + 1
     if length(apg_labels) != unclassified_assignment
-        error(logger, "the number of labels does not equal the number of all possible genotypes")
+        warn(logger, "the number of labels does not equal the number of all possible genotypes")
     end
     ## `expected_genos_all` - each column is a vector of binary geno
     ## whose length is number of channels (0 => channel min, 1 => channel max)

@@ -343,26 +343,24 @@ function fail(
     err         ::Exception;
     bt          ::Bool = false ## backtrace?
 )
-    const err_msg = sprint(showerror, err)
-    if bt
-        const st = stacktrace(catch_backtrace())
-    end
-    try
-        error(logger, err_msg)
-    catch() ## just report the error
+    err_msg = sprint(showerror, err)
+	try
         if bt
-            const stl = collect(enumerate(IndexStyle(st), st))
-            try
-                error(logger, "error thrown in " *
-                    string(st[1]) * "\nStacktrace:\n" *
+            st = stacktrace(catch_backtrace())
+        end
+        warn(logger, err_msg)
+        if bt
+            stl = collect(enumerate(IndexStyle(st), st))
+            warn(logger, "error thrown in " *
+                 string(st[1]) * "\nStacktrace:\n" *
                     join(
                         map(stl[1:end]) do tup
                             index, ptr = tup
                             " [$index] $ptr\n"
                         end))
-            catch()
-            end ## try
         end ## if bt
+    catch e
+		warn(logger, "fail catch error: " * sprint(showerror, e))
     end ## try
     OrderedDict(
         :valid => false,
@@ -381,20 +379,20 @@ function finite_diff(
     method  ::FiniteDiffMethod = central
 )
     debug(logger, "at finite_diff()")
-    const dlen = length(X)
+    dlen = length(X)
     if dlen != length(Y)
         throw(DimensionError, "X and Y must be of same length")
     end ## if
     (dlen == 1) && return zeros(1)
     if (nu == 1)
-        const (range1, range2) =
+        (range1, range2) =
             if      (method == central)  tuple(3:dlen+2, 1:dlen)
             elseif  (method == forward)  tuple(3:dlen+2, 1:dlen+1)
             elseif  (method == backward) tuple(2:dlen+1, 1:dlen)
             else
                 throw(ArgmentError, "method \"$method\" not recognized")
             end ## if
-        const (X_p2, Y_p2) = map((X, Y)) do ori
+        (X_p2, Y_p2) = map((X, Y)) do ori
             vcat(
                 ori[2] * 2 - ori[1],
                 ori,

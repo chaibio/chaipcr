@@ -56,15 +56,15 @@ function act(
 
     ## assuming the 2 values of `req` are the same in length (number of wells)
     all_valid = true
-    const results =
+    results =
         map(eachindex(req[BASELINE_KEY][FLUORESCENCE_VALUE_KEY])) do well_i
-            const baseline   = req[BASELINE_KEY][FLUORESCENCE_VALUE_KEY][well_i]
-            const excitation = req[EXCITATION_KEY][FLUORESCENCE_VALUE_KEY][well_i]
+            baseline   = req[BASELINE_KEY][FLUORESCENCE_VALUE_KEY][well_i]
+            excitation = req[EXCITATION_KEY][FLUORESCENCE_VALUE_KEY][well_i]
             # valid =
             #    (excitation >= MIN_EXCITATION_FLUORESCENCE) &&
             #    (excitation / baseline >= MIN_EXCITATION_FLUORESCENCE_MULTIPLE) &&
             #    (excitation <= MAX_EXCITATION_FLUORESCENCE) # old
-            const valid =
+            valid =
                 (excitation .>= MIN_EXCITATION_FLUORESCENCE) &&
                 (baseline   .<  MIN_EXCITATION_FLUORESCENCE) &&
                 (excitation .<= MAX_EXCITATION_FLUORESCENCE) ## Josh, 2016-08-15
