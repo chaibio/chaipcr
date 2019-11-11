@@ -44,8 +44,16 @@ function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
             "and Cq calculation will not be performed")
     else ## num_cycles > 2
         baseline_cyc_bounds = check_bl_cyc_bounds(i, DEFAULT_AMP_BL_CYC_BOUNDS)
-        set_ct_fluos!(o, i, baseline_cyc_bounds)
-        set_output_fields!(o, i, get_fit_results(o, i, baseline_cyc_bounds))
+        try
+            set_ct_fluos!(o, i, baseline_cyc_bounds)
+        catch e
+            warn(logger, "set_ct_fluos catch error: " * sprint(showerror, e))
+        end
+        try
+            set_output_fields!(o, i, get_fit_results(o, i, baseline_cyc_bounds))
+        catch e
+            warn(logger, "get_fit_results catch error: " * sprint(showerror, e))
+        end
         set_qt_fluos!(o, i)
         set_report_cq!(o, i)
     end ## if
