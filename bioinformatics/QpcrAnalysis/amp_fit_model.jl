@@ -25,7 +25,7 @@ function amp_fit_model(
     ::Type{Val{M}} where M <: DFCModel,
     ::Type{R},
     i                   ::AmpInput,
-    fluos               ::AbstractVector,
+    fluos               ::Vector{Float_T},
     ## these parameters not used to fit DFC models
     baseline_cyc_bounds ::AbstractArray,
     cq_method           ::CqMethod,
@@ -37,7 +37,7 @@ function amp_fit_model(
                 0.0
     d0() = coefs[findfirst(bl.bl_fit.coef_syms .== :d0)]
 
-    debug(logger, "at fit_amplification_model(::Type{Val{M}} where M <: DFCModel)")
+    debug(logger, "at amp_fit_model(::Type{Val{M}} where M <: DFCModel)")
     ## no fallback for baseline, because:
     ## (1) curve may fit well though :Error or :UserLimit
     ## (search step becomes very small but has not converge);
@@ -94,7 +94,7 @@ function amp_fit_model(
     ::Type{Val{SFCModel}},
     ::Type{R},
     i                   ::AmpInput,
-    fluos               ::AbstractVector,
+    fluos               ::Vector{Float_T},
     baseline_cyc_bounds ::AbstractArray,
     cq_method           ::CqMethod,
     ct_fluo             ::Float_T,
@@ -155,7 +155,7 @@ function amp_fit_model(
             return auto_choose_bl_cycs()
         end
         ## fallthrough
-        throw(DomainError("too few cycles to estimate baseline"))
+        throw(ErrorException("too few cycles to estimate baseline"))
     end ## bl_cycs()
 
     ## uses `fluos`, `last_cyc_wt0`; updates `bl_notes` using push!()
@@ -228,15 +228,15 @@ function amp_fit_model(
     dr2_pred_() =
         funcs_pred[:dr2](cycles_denser, quant_coefs...)
     #
-    cyc_max_dr1_(dr1_pred ::AbstractVector) =
+    cyc_max_dr1_(dr1_pred ::Vector{Float_T}) =
         cycles_denser[indmax(dr1_pred)]
     #
-    cyc_max_dr2_(dr2_pred ::AbstractVector) =
+    cyc_max_dr2_(dr2_pred ::Vector{Float_T}) =
         cycles_denser[indmax(dr2_pred)]
     #
-    cy0_(max_dr1 ::Real, idx_max_dr1 ::Integer) =
+    cy0_(max_dr1 ::Float_T, idx_max_dr1 ::Int_T) =
         cy0_(max_dr1, idx_max_dr1, cycles_denser[idx_max_dr1])
-    cy0_(max_dr1 ::Real, idx_max_dr1 ::Integer, cyc_max_dr1 ::Real) =
+    cy0_(max_dr1 ::Float_T, idx_max_dr1 ::Int_T, cyc_max_dr1 ::Float_T) =
         cyc_max_dr1 - funcs_pred[:f](cyc_max_dr1, quant_coefs...) / max_dr1
     #
     ct_() = try
@@ -249,10 +249,10 @@ function amp_fit_model(
     #
     max_eff() = cycles_denser[indmax(map(func_pred_eff, cycles_denser))]
     #
-    nonpos2NaN(x ::Real) =
+    nonpos2NaN(x ::Float_T) =
         x <= zero(x) ? NaN_T : x
     #
-    calc_cq_fluo(cq_raw ::Real) =
+    calc_cq_fluo(cq_raw ::Float_T) =
         funcs_pred[:f](nonpos2NaN(cq_raw), quant_coefs...)
     #
     @inline function calc_cq_raw()
@@ -260,12 +260,12 @@ function amp_fit_model(
         (cq_method == max_eff) && return max_eff_()
         calc_cq_raw(dr1_pred_())
     end
-    @inline function calc_cq_raw(dr1_pred ::AbstractVector)
+    @inline function calc_cq_raw(dr1_pred ::Vector{Float_T})
         (cq_method == cp_dr1)  && return cyc_max_dr1_(dr1_pred)
         (cq_method == Cy0)     && return cy0_(findmax(dr1_pred)...)
         calc_cq_raw(dr1_pred, dr2_pred_())
     end
-    @inline function calc_cq_raw(dr1_pred ::AbstractVector, dr2_pred ::AbstractVector)
+    @inline function calc_cq_raw(dr1_pred ::Vector{Float_T}, dr2_pred ::Vector{Float_T})
         (cq_method == cp_dr2)  && return cyc_max_dr2_(dr2_pred)
         (cq_method == cp_dr1)  && return cyc_max_dr1_(dr1_pred)
         (cq_method == Cy0)     && return cy0_(findmax(dr1_pred)...)
@@ -290,7 +290,7 @@ function amp_fit_model(
 
     ## << end of function definitions nested within fit_baseline_model() ## SFC
 
-    debug(logger, "at fit_amplification_model(Val{SFCModel})")
+    debug(logger, "at amp_fit_model(Val{SFCModel})")
     #
     ## fit baseline model
     # const num_cycles = length(fluos)
@@ -312,6 +312,7 @@ function amp_fit_model(
             cycles, bl_fit.coefs...)
         blsub_fluos = fluos .- baseline
         have_good_results = good_status()
+        debug(logger, "bl notes: $bl_notes, good_results: $have_good_results")
         if !have_good_results
             ## recalculate baseline
             bl_func = i.bl_fallback_func

@@ -34,7 +34,7 @@ function act(
     req_df =
         try
             parse_raw_data(Val{standard_curve}, req)
-        catch()
+        catch
             throw(ArgumentError(
                 "cannot parse raw data for standard curve analysis"))
         end ## try
@@ -192,7 +192,7 @@ sumsq(y) = sum(y .^ 2)
 ## dependencies of `standard_curve`
 
 ## parse req into a dataframe
-function parse_raw_data(::Type{Val{standard_curve}}, req ::AbstractVector)
+function parse_raw_data(::Type{Val{standard_curve}}, req ::Vector{Any})
     (length(req) == 0) && return DataFrame()
     #
     well_vec    = Vector{Int_T}()
@@ -206,7 +206,7 @@ function parse_raw_data(::Type{Val{standard_curve}}, req ::AbstractVector)
         map(req) do req_ele
             try
                 length(req_ele[WELL_KEY])
-            catch()
+            catch
                 0
             end ## try
         end #= do req_ele =# |> maximum
@@ -218,7 +218,7 @@ function parse_raw_data(::Type{Val{standard_curve}}, req ::AbstractVector)
             measrmt_dict =
                 try
                     req_ele[WELL_KEY][channel_i]
-                catch()
+                catch
                     Dict{String,Any}()
                 end ## try
             if length(measrmt_dict) == 0
@@ -236,7 +236,7 @@ function parse_raw_data(::Type{Val{standard_curve}}, req ::AbstractVector)
             push!(qty_vec,      qty)
             push!(sample_vec,   try
                     nothing2NaN(req_ele[SAMPLE_KEY])
-                catch()
+                catch
                     NaN_T
                 end) ## try
         end ## for channel_i
@@ -260,7 +260,7 @@ end
 ## generate unique integers
 function generate_uniq_ints(num_ints ::Integer, S, rng ::AbstractRNG = Base.GLOBAL_RNG)
     if num_ints > length(S)
-        error(logger, "num_ints > length(S), i.e. no enough values to choose from")
+        warn(logger, "num_ints($num_ints) > length(S), i.e. no enough values to choose from")
     end
     uniq_ints = unique(rand(rng, S, num_ints))
     while length(uniq_ints) < num_ints
@@ -341,8 +341,7 @@ function generate_req_sc(;
 )
     rng = rng_type(seed)
 
-    println("num_wells: ", num_wells)
-    println("num_channels: ", num_channels)
+    debug(logger, "at generate_req_sc: num_wells=$num_wells, num_channels=$num_channels")
 
     if num_uniq_targets < num_channels
         num_na_channels = num_channels - num_uniq_targets
@@ -385,7 +384,9 @@ function generate_req_sc(;
         end ## for channel_i
 
     elseif num_targets != num_measurements
-        error(logger, "target_vec not empty but length not same as num_measurements")
+        errmsg = "target_vec not empty but length($num_targets) not same as num_measurements($num_measurements)"
+        warn(logger, errmsg)
+        throw(ErrorException(errmsg))
     end ## if num_targets
 
     num_cqs = length(cq_vec)
@@ -395,7 +396,9 @@ function generate_req_sc(;
         nna_cq_vec = rand(rng, num_nna_cqs) .* -(cq_bounds...) .+ cq_bounds[2] # upperbound - (0,1)seq * scaling_factor
         cq_vec = insert2ary(NaN_T, num_na_cqs, nna_cq_vec, 1, rng)
     elseif num_cqs != num_measurements
-        error(logger, "cq_vec not empty but length not same as num_measurements")
+        errmsg = "cq_vec not empty but length($num_cqs) not same as num_measurements($num_measurements)"
+        warn(logger, errmsg)
+        throw(ErrorException(errmsg))
     end
 
     num_qm = length(qm_vec)
@@ -410,9 +413,13 @@ function generate_req_sc(;
         qm_vec = qty_mtx[:, 1]
         qb_vec = qty_mtx[:, 2] # not convert to integer due to NaN
     elseif num_qm != num_qb
-        error(logger, "lengths of qm_vec and qb_vec not equal")
+        errmsg = "lengths of qm_vec($num_qm) and qb_vec($num_qb) not equal"
+        warn(logger, errmsg)
+        throw(ErrorException(errmsg))
     elseif num_qm != num_measurements
-        error(logger, "qm_vec and qb_vec with equal non-0 length but not same as num_measurements")
+        errmsg = "qm_vec and qb_vec with equal non-0 length($num_qm) but not same as num_measurements($num_measurements)"
+        warn(logger, errmsg)
+        throw(ErrorException(errmsg))
     end
 
     num_samples = length(sample_vec)
@@ -422,7 +429,9 @@ function generate_req_sc(;
         nna_sample_vec = rand(rng, 1:num_uniq_samples, num_nna_samples)
         sample_vec = insert2ary(NaN_T, num_na_samples, nna_sample_vec, 1, rng)
     elseif num_samples != num_wells
-        error(logger, "sample_vec not empty but length not same as num_wells")
+        errmsg = "sample_vec not empty but length($num_samples) not same as num_wells($num_wells)"
+        warn(logger, errmsg)
+        throw(ErrorException(errmsg))
     end
 
     req = map(1:num_wells) do well_i

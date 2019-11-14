@@ -178,3 +178,9 @@ end ## module QpcrAnalysis
 #===============================================================================
     << end of module definition
 ===============================================================================#
+
+# for precompiling
+using HTTP, JSON, Memento
+using Clustering, Combinatorics, DataArrays, DataFrames
+using DataStructures, Dierckx, HDF5, Ipopt, JLD, JSON, JuMP
+using MathProgBase, Nullables, SpecialFunctions, FactCheck, FunctionalData, Match, Syslogs, Memento, HttpCommon, HttpParser, IniFile
