@@ -305,8 +305,8 @@ start_julia () {
 			        mkdir crashjulia
 			fi
 			echo $msg
-			echo $msg >> julia.log
 			mv julia.log crashjulia/julia-$timestamp.log
+                        echo $msg >> julia.log
 			cd crashjulia
 			tar czf julia-$timestamp.log.tgz julia-$timestamp.log --remove-files &
 
