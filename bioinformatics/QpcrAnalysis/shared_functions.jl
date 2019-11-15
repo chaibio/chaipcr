@@ -343,13 +343,17 @@ function fail(
     err         ::Exception;
     bt          ::Bool = false ## backtrace?
 )
+	debug(logger, "at fail()")
+	
+	if (get(ENV, "JULIA_ENV", nothing) == PRODUCTION_MODE)
+		bt = false
+	end
+	
     err_msg = sprint(showerror, err)
 	try
-        if bt
-            st = stacktrace(catch_backtrace())
-        end
         warn(logger, err_msg)
         if bt
+			st = stacktrace(catch_backtrace())
             stl = collect(enumerate(IndexStyle(st), st))
             warn(logger, "error thrown in " *
                  string(st[1]) * "\nStacktrace:\n" *
