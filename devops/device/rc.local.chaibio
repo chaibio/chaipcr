@@ -298,7 +298,7 @@ start_julia () {
 			timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
 			msg="Julia exit($exitcode) on $timestamp"
 			cd /var/log
-			echo $msg>julia.log
+			echo $msg>>julia.log
 			if ! [ -e crashjulia ]
 			then
 			        echo creating crashjulia
