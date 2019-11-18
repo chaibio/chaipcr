@@ -189,7 +189,9 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
         , 1000
 
       fetchFluorescenceData = ->
-        
+        if !($scope.experiment.completion_status && $scope.experiment.completed_at)
+          return
+
         gofetch = true
         gofetch = false if $scope.fetching
         gofetch = false if $scope.$parent.chart isnt 'standard-curve'

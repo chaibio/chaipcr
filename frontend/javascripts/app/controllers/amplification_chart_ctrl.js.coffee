@@ -343,6 +343,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         , 1000
 
       fetchFluorescenceData = ->
+        if !($scope.experiment.completion_status && $scope.experiment.completed_at)
+          return
+
         gofetch = true
         gofetch = false if $scope.fetching
         gofetch = false if $scope.$parent.chart isnt 'amplification'
@@ -701,7 +704,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                 $scope.updateSamplesSet()
                 $scope.updateTargetsSet()
                 updateSeries()
-
+                
                 fetchFluorescenceData()
 
               $timeout ->
