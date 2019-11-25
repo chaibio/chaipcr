@@ -189,8 +189,6 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
         , 1000
 
       fetchFluorescenceData = ->
-        if !($scope.experiment.completion_status && $scope.experiment.completed_at)
-          return
 
         gofetch = true
         gofetch = false if $scope.fetching
@@ -212,7 +210,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
               $scope.standardcurve_data = helper.paddData()
             if resp.status is 200 and !resp.data.partial
               $rootScope.$broadcast 'complete'
-            if (resp.data.steps?[0].amplification_data and resp.data.steps?[0].amplification_data?.length > 1 and $scope.enterState) or (resp.data.steps?[0].amplification_data and resp.data.steps?[0].amplification_data?.length > 1 and !resp.data.partial)
+            if (resp.data.steps?[0].amplification_data and resp.data.steps?[0].amplification_data?.length > 1)
               
               # $scope.chartConfig.axes.x.min = 0
               $scope.hasData = true
@@ -261,6 +259,8 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
               updateButtonCts()
               updateSeries()
 
+              if !(($scope.experiment?.completion_status && $scope.experiment?.completed_at) or $scope.enterState)
+                $scope.retrying = true
 
             if ((resp.data?.partial is true) or (resp.status is 202)) and !$scope.retrying
               retry()

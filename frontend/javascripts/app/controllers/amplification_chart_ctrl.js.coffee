@@ -343,9 +343,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         , 1000
 
       fetchFluorescenceData = ->
-        if !($scope.experiment.completion_status && $scope.experiment.completed_at)
-          return
-
         gofetch = true
         gofetch = false if $scope.fetching
         gofetch = false if $scope.$parent.chart isnt 'amplification'
@@ -358,7 +355,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           # alert('h6')
 
           Experiment.getAmplificationData($stateParams.id)
-          .then (resp) ->
+          .then (resp) ->            
             $scope.has_init = true
             $scope.fetching = false
             $scope.error = null
@@ -370,7 +367,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               $scope.hasData = false
             if resp.status is 200 and !resp.data.partial
               $rootScope.$broadcast 'complete'
-            if (resp.data.steps?[0].amplification_data and resp.data.steps?[0].amplification_data?.length > 1 and $scope.enterState) or (resp.data.steps?[0].amplification_data and resp.data.steps?[0].amplification_data?.length > 1 and !resp.data.partial)
+            if (resp.data.steps?[0].amplification_data and resp.data.steps?[0].amplification_data?.length > 1)
               $scope.chartConfig.axes.x.min = 1
               $scope.hasData = true
               data = resp.data.steps[0]
@@ -391,6 +388,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               $scope.updateTargetsSet()
               updateButtonCts()
               updateSeries()
+              if !(($scope.experiment?.completion_status && $scope.experiment?.completed_at) or $scope.enterState)
+                $scope.retrying = true
 
               # retry()
             if ((resp.data?.partial is true) or (resp.status is 202) or (resp.status is 304)) and !$scope.retrying
