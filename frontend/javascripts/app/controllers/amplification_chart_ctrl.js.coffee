@@ -290,13 +290,20 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         updateSeries()
       
       $scope.updateTargetsSet = ->
-        $scope.targetsSet = []
+        # $scope.targetsSet = []
         for i in [0...$scope.targets.length]
           if $scope.targets[i].id
             target = _.filter $scope.targetsSet, (target) ->
               target.id is $scope.targets[i].id
             if !target.length
               $scope.targetsSet.push($scope.targets[i])
+
+        for i in [0...$scope.targetsSet.length]
+          if $scope.targetsSet[i].id
+            target = _.filter $scope.targets, (target) ->
+              target.id is $scope.targetsSet[i].id
+            if !target.length
+              delete $scope.targetsSet[i]
 
       $scope.updateSamplesSet = ->
         $scope.samplesSet = []
@@ -376,7 +383,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               $scope.targets = helper.normalizeWellTargetData($scope.well_data, $scope.targets, $scope.is_dual_channel)
 
               for i in [0..$scope.targets.length - 1] by 1
-                $scope.targetsSetHided[$scope.targets[i]?.id] = true
+                $scope.targetsSetHided[$scope.targets[i]?.id] = true if $scope.targetsSetHided[$scope.targets[i]?.id] is undefined
 
               data.amplification_data?.shift()
               data.cq?.shift()
@@ -698,7 +705,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                 $scope.well_data = helper.blankWellData($scope.is_dual_channel, $scope.well_targets)
                 $scope.targets = helper.blankWellTargetData($scope.well_data)
                 for i in [0..$scope.targets.length - 1] by 1
-                  $scope.targetsSetHided[$scope.targets[i]?.id] = true
+                  $scope.targetsSetHided[$scope.targets[i]?.id] = true  if $scope.targetsSetHided[$scope.targets[i]?.id] is undefined
 
                 $scope.updateSamplesSet()
                 $scope.updateTargetsSet()
