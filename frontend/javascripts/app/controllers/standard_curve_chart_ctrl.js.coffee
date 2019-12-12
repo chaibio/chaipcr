@@ -142,13 +142,20 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
           fetchFluorescenceData()
 
       $scope.updateTargetsSet = ->
-        $scope.targetsSet = []
+        # $scope.targetsSet = []
         for i in [0...$scope.targets.length]
           if $scope.targets[i].id
             target = _.filter $scope.targetsSet, (target) ->
               target.id is $scope.targets[i].id
             if !target.length
               $scope.targetsSet.push($scope.targets[i])
+
+        for i in [0...$scope.targetsSet.length]
+          if $scope.targetsSet[i].id
+            target = _.filter $scope.targets, (target) ->
+              target.id is $scope.targetsSet[i].id
+            if !target.length
+              delete $scope.targetsSet[i]
 
       $scope.$watchCollection 'targetsSetHided', ->        
         updateSeries() if $scope.hasData
