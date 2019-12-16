@@ -151,7 +151,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
               $scope.targetsSet.push($scope.targets[i])
 
         for i in [0...$scope.targetsSet.length]
-          if $scope.targetsSet[i].id
+          if $scope.targetsSet[i]?.id
             target = _.filter $scope.targets, (target) ->
               target.id is $scope.targetsSet[i].id
             if !target.length
