@@ -144,7 +144,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
       $scope.updateTargetsSet = ->
         # $scope.targetsSet = []
         for i in [0...$scope.targets.length]
-          if $scope.targets[i].id
+          if $scope.targets[i]?.id
             target = _.filter $scope.targetsSet, (target) ->
               target.id is $scope.targets[i].id
             if !target.length
@@ -233,7 +233,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
 
               if !$scope.re_init_chart_data
                 for i in [0..$scope.targets.length - 1] by 1
-                  $scope.targetsSetHided[$scope.targets[i]?.id] = true
+                  $scope.targetsSetHided[$scope.targets[i]?.id] = true  if $scope.targetsSetHided[$scope.targets[i]?.id] is undefined
 
               AMPLI_DATA_CACHE = angular.copy data
 
@@ -564,7 +564,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
                 $scope.well_data = helper.blankWellData($scope.is_dual_channel, $scope.well_targets)
                 $scope.targets = helper.blankWellTargetData($scope.well_data)
                 for i in [0..$scope.targets.length - 1] by 1
-                  $scope.targetsSetHided[$scope.targets[i]?.id] = true
+                  $scope.targetsSetHided[$scope.targets[i]?.id] = true  if $scope.targetsSetHided[$scope.targets[i]?.id] is undefined
 
                 $scope.omittedIndexes = []
                 for well, i in $scope.well_data by 1

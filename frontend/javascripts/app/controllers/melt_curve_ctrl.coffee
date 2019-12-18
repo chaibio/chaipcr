@@ -181,9 +181,8 @@ App.controller 'MeltCurveChartCtrl', [
         $scope.well_data = MeltCurveService.normalizeSummaryData(data.ramps[0].melt_curve_data, data.targets, $scope.well_targets)
         $scope.targets = MeltCurveService.normalizeWellTargetData($scope.well_data, $scope.is_dual_channel)        
 
-        $scope.targetsSetHided = []
         for i in [0..$scope.targets.length - 1] by 1
-          $scope.targetsSetHided[$scope.targets[i]?.id] = true
+          $scope.targetsSetHided[$scope.targets[i]?.id] = true if $scope.targetsSetHided[$scope.targets[i]?.id] is undefined
 
         for well_data, well_i in $scope.well_data by 1
           if $scope.wellButtons["well_#{well_data.well_num - 1}"].ct == undefined
@@ -329,9 +328,8 @@ App.controller 'MeltCurveChartCtrl', [
                         $scope.well_targets[i].color = if $scope.well_targets[i] then $scope.lookupTargets[$scope.well_targets[i].id] else 'transparent'
                   
                   $scope.targets = $scope.well_targets
-                  $scope.targetsSetHided = []
                   for i in [0..$scope.targets.length - 1] by 1
-                    $scope.targetsSetHided[$scope.targets[i]?.id] = true
+                    $scope.targetsSetHided[$scope.targets[i]?.id] = true if $scope.targetsSetHided[$scope.targets[i]?.id] is undefined
 
                   getMeltCurveData(getMeltCurveDataCallBack)
                   $scope.enterState = false
