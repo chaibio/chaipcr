@@ -408,14 +408,8 @@ function mc_peak_analysis(
     sn_dict           = summits_and_nadirs(sn_idc)
     #
     ## estimate area of peaks above baseline
-	if size(sn_idc[1])[1]==1
-	    peak_finder_collect=[PeakIndicesElement(sn_idc[2][1],sn_idc[1][1],sn_idc[2][2])]
-		peaks_raw=Vector{Peak}(peak_finder_collect |> mold(make_peak) |> sift(thing))
-		num_peaks=1
-	else
-		peaks_raw         = find_peaks(sn_idc...)
-		num_peaks         = length(peaks_raw)
-	end
+    peaks_raw         = find_peaks(sn_idc...)
+    num_peaks         = length(peaks_raw)
     #
     ## return smoothed data if no peaks
 
