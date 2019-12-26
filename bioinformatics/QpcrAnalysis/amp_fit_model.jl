@@ -291,6 +291,25 @@ function amp_fit_model(
     ## << end of function definitions nested within fit_baseline_model() ## SFC
 
     debug(logger, "at amp_fit_model(Val{SFCModel})")
+	criteria_1=abs(abs(mean(fluos[end-3:end]))-abs(mean(fluos[1:4])))
+	if criteria_1<10000
+		num_cycles = i.num_cycles
+		cycles = Vector(i.cycles)
+		last_cyc_wt0 = floor(i.min_reliable_cyc) - 1	
+		len_denser = denser_len(i, num_cycles)
+		cycles_denser = interpolated_cycles()
+		raw_cycs_index = colon(1, i.denser_factor, len_denser)
+		bl_func = median
+        baseline = bl_func(fluos[bl_cycs()])
+        blsub_fluos = fluos .- baseline
+        return AmpShortModelResults(
+            # fluos, ## rbbs_ary3,
+            blsub_fluos,
+            zeros(raw_cycs_index),
+            zeros(raw_cycs_index),
+            nonpos2NaN(-1.0), ## cq
+            NaN_T) ## d0
+	end
     #
     ## fit baseline model
     # const num_cycles = length(fluos)
