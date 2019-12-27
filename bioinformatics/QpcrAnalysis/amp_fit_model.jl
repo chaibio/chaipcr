@@ -291,7 +291,7 @@ function amp_fit_model(
     ## << end of function definitions nested within fit_baseline_model() ## SFC
 
     debug(logger, "at amp_fit_model(Val{SFCModel})")
-	criteria_1=abs(abs(mean(fluos[end-3:end]))-abs(mean(fluos[1:4])))
+	criteria_1=mean(fluos[end-3:end])-mean(fluos[1:4])
 	if criteria_1<10000
 		num_cycles = i.num_cycles
 		cycles = Vector(i.cycles)
