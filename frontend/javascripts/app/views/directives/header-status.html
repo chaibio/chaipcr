@@ -134,16 +134,16 @@
         <div class="pull-right controls SHR text-right">
           <div class="message">
             <span ng-show="experiment.completion_status === 'success'">completed</span>
-            <span ng-show="experiment.completion_status !== 'success'">
-            <span class="failed">failed</span>
-            <span ng-show="experiment.completion_status === 'aborted'">
-              user cancelled
-              <strong ng-show="experiment.time_valid" >{{experiment.completed_at|date:'MMM. dd yyyy, hh:mm:ss'}}</strong>
-            </span>
-            <span ng-show="experiment.completion_status !== 'aborted'">
-              AN ERROR OCCURED
-              <strong style="cursor: pointer" ng-click="viewError()">VIEW DETAILS</strong>
-            </span>
+            <span ng-show="experiment.completion_status !== 'success'>
+              <span class="failed">failed</span>
+              <span ng-show="experiment.completion_status === 'aborted'">
+                user cancelled
+                <strong ng-show="experiment.time_valid" >{{experiment.completed_at|date:'MMM. dd yyyy, hh:mm:ss'}}</strong>
+              </span>
+              <span ng-show="experiment.completion_status !== 'aborted'">
+                AN ERROR OCCURED
+                <strong style="cursor: pointer" ng-click="viewError()">VIEW DETAILS</strong>
+              </span>
             </span>
           </div>
           <button class="button-header" duplicate-experiment experiment-id="experiment.id">
@@ -158,13 +158,13 @@
         <div class="pull-left exp-name H3" title="{{experiment.name|uppercase}}">
           <div ng-show="experiment.id && experiment.name">{{expName(20)}}</div>
         </div>
-        <div class="pull-right controls SHR text-right">
+        <div class="pull-right controls SHR text-right" ng-show="!dataAnalysis || !isStarted">
           <div class="message">
             <span class="failed">failed</span>
             <span ng-show="experiment.completion_status === 'aborted'">
             User cancelled
           </span>
-            <span ng-show="experiment.completion_status !== 'aborted'">
+            <span ng-show="experiment.completion_status !== 'aborted'">              
             AN ERROR OCCURED
           </span>
           </div>

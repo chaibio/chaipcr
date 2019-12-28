@@ -48,6 +48,7 @@ window.App.directive 'headerStatus', [
       $scope.loading = true
       $scope.start_confirm_show = false
       $scope.dataAnalysis = false
+      $scope.isStarted = false
       counter = 0
       stringUrl = "run-experiment"
       if ($location.path().indexOf(stringUrl) == -1)
@@ -87,6 +88,9 @@ window.App.directive 'headerStatus', [
         $scope.oldState = oldData?.experiment_controller?.machine?.state || 'NONE'
         $scope.isCurrentExp = parseInt(data.experiment_controller.experiment?.id) is parseInt(experiment_id)
         if $scope.isCurrentExp is true
+          if !$scope.isStarted and data.experiment_controller.machine.state != 'idle'
+            $scope.isStarted = true
+            
           $scope.enterState = $scope.isCurrentExp
         #console.log $scope.enterState
 
@@ -163,9 +167,8 @@ window.App.directive 'headerStatus', [
         $scope.experiment?.name = expName.name
 
       $scope.$on 'complete', ->
-        $scope.dataAnalysis = true
-        console.log $scope.dataAnalysis
         getExperiment (exp) ->
+          $scope.dataAnalysis = true
           $scope.experiment = exp
 
       $scope.$watch 'experimentId', (id) ->
