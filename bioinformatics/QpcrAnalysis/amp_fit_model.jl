@@ -291,25 +291,6 @@ function amp_fit_model(
     ## << end of function definitions nested within fit_baseline_model() ## SFC
 
     debug(logger, "at amp_fit_model(Val{SFCModel})")
-	criteria_1=mean(fluos[end-3:end])-mean(fluos[1:4])
-	if criteria_1<10000
-		num_cycles = i.num_cycles
-		cycles = Vector(i.cycles)
-		last_cyc_wt0 = floor(i.min_reliable_cyc) - 1	
-		len_denser = denser_len(i, num_cycles)
-		cycles_denser = interpolated_cycles()
-		raw_cycs_index = colon(1, i.denser_factor, len_denser)
-		bl_func = median
-        baseline = bl_func(fluos[bl_cycs()])
-        blsub_fluos = fluos .- baseline
-        return AmpShortModelResults(
-            # fluos, ## rbbs_ary3,
-            blsub_fluos,
-            zeros(raw_cycs_index),
-            zeros(raw_cycs_index),
-            nonpos2NaN(-1.0), ## cq
-            NaN_T) ## d0
-	end
     #
     ## fit baseline model
     # const num_cycles = length(fluos)
@@ -358,6 +339,12 @@ function amp_fit_model(
     len_denser = denser_len(i, num_cycles)
     cycles_denser = interpolated_cycles()
     funcs_pred = qm.funcs_pred
+	#if quant_fit.status==Symbol("Optimal")
+	
+
+
+
+	#end
     #
     ## results by R
     if R == AmpCqFluoModelResults
@@ -372,8 +359,30 @@ function amp_fit_model(
     dr1_pred = dr1_pred_()
     dr2_pred = dr2_pred_()
     raw_cycs_index = colon(1, i.denser_factor, len_denser)
+
+
+	pred_values=[funcs_pred[:f](i,quant_coefs...) for i in 1:length(blsub_fluos)]
+	error=[abs(ff[1]-ff[2]) for ff in zip(pred_values,blsub_fluos)]
+	delta=abs(maximum(vcat(pred_values,blsub_fluos)))+abs(minimum(vcat(pred_values,blsub_fluos)))
+	criteria_norm_err=sum(error)/(delta*length(blsub_fluos))<0.025
+
+
+	dr1_values=[funcs_pred[:dr1](i,quant_coefs...) for i in 1:i.num_cycles]
+	criteria_dr1=maximum(dr1_values)>i.max_dr1_lb
+	dr2_values=[funcs_pred[:dr2](i,quant_coefs...) for i in 1:i.num_cycles]
+	criteria_dr2=maximum(dr2_values)>i.max_dr2_lb
+
+	cq_raw_temp=calc_cq_raw(dr1_pred, dr2_pred)
+
+	criteria_cq=cq_raw_temp>0 && cq_raw_temp<i.num_cycles
+
     if R == AmpShortModelResults
-        cq_raw = calc_cq_raw(dr1_pred, dr2_pred)
+		if criteria_norm_err && criteria_dr1 && criteria_dr2 && criteria_cq
+			cq_raw = cq_raw_temp
+		else
+			cq_raw=-1.0
+        end
+		
         return AmpShortModelResults(
             # fluos, ## rbbs_ary3,
             blsub_fluos,
