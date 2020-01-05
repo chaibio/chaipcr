@@ -408,8 +408,48 @@ function mc_peak_analysis(
     sn_dict           = summits_and_nadirs(sn_idc)
     #
     ## estimate area of peaks above baseline
-    peaks_raw         = find_peaks(sn_idc...)
-    num_peaks         = length(peaks_raw)
+    # half_peak_span_temperature = 0.5 * i.peak_span_temperature
+	half_peak_window_n(coef ::Float_T) =
+        coef * (i.peak_span_temperature / temp_span) * len_denser |>
+            roundoff(0) |> Int_T
+
+    find_summits_and_nadirs_n(coef ::Float_T) =
+        [maximum, minimum] |> mold(f -> find_local(f, negderiv_smu, half_peak_window_n(coef)))
+
+    if size(sn_idc[1])[1]==1
+        if size(sn_idc[2])[1]==1
+            sn_idc_summit=sn_idc[1][1]
+            window_coef=0.5
+            sn_idc_n=sn_idc
+            left_nadd=0
+            right_nadd=0
+            sn_idc_summit>sn_idc[2][1] ? left_nadd=sn_idc[2][1]:right_nadd=sn_idc[2][1]
+            flag=true
+            while window_coef>0.01 && flag
+                window_coef*=0.6
+                sn_idc_n=find_summits_and_nadirs_n(window_coef)
+                if size(sn_idc_n[2])[1]>1
+                    left_nadd==0 && sn_idc_n[2][1]<sn_idc_summit ? flag=false:flag=true
+                    right_nadd==0 && sn_idc_n[2][end]>sn_idc_summit ? flag=false:flag=true
+                end
+            end
+            if left_nadd==0
+                left_nadd=sn_idc_n[2][1]
+            else
+                right_nadd=sn_idc_n[2][end]
+            end
+            peak_finder_collect=[PeakIndicesElement(left_nadd,sn_idc_summit,right_nadd)]
+            peaks_raw=Vector{Peak}(peak_finder_collect |> mold(make_peak) |> sift(thing))
+            num_peaks=1
+        else
+            peak_finder_collect=[PeakIndicesElement(sn_idc[2][1],sn_idc[1][1],sn_idc[2][2])]
+            peaks_raw=Vector{Peak}(peak_finder_collect |> mold(make_peak) |> sift(thing))
+            num_peaks=1
+        end
+    else
+        peaks_raw         = find_peaks(sn_idc...)
+        num_peaks         = length(peaks_raw)
+    end
     #
     ## return smoothed data if no peaks
 
