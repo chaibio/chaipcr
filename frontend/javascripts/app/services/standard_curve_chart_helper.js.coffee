@@ -123,13 +123,13 @@ window.ChaiBioTech.ngApp.service 'StandardCurveChartHelper', [
           if datum[0]
             pt = cycle_num: datum[0][2]
             for y_item, i in datum by 1
-              pt["well_#{i}_background"] = y_item[3]
-              pt["well_#{i}_baseline"] =  y_item[4]
-              pt["well_#{i}_background_log"] = if y_item[3] > 0 then y_item[3] else 10
-              pt["well_#{i}_baseline_log"] =  if y_item[4] > 0 then y_item[4] else 10
+              pt["well_#{y_item[1]-1}_background"] = y_item[3]
+              pt["well_#{y_item[1]-1}_baseline"] =  y_item[4]
+              pt["well_#{y_item[1]-1}_background_log"] = if y_item[3] > 0 then y_item[3] else 10
+              pt["well_#{y_item[1]-1}_baseline_log"] =  if y_item[4] > 0 then y_item[4] else 10
 
-              pt["well_#{i}_dr1_pred"] = y_item[5]
-              pt["well_#{i}_dr2_pred"] = y_item[6]
+              pt["well_#{y_item[1]-1}_dr1_pred"] = y_item[5]
+              pt["well_#{y_item[1]-1}_dr2_pred"] = y_item[6]
             return pt
           else
             {}
