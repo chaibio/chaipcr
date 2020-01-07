@@ -36,6 +36,7 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
     $scope.errorExport = false
     $scope.exporting = false
     $scope.isIdle = false
+    $scope.runningExpId = 0
 
     $scope.deleteExperiment = ->
       #exp = new Experiment id: $stateParams.id
@@ -103,7 +104,7 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
           $scope.status = 'NOT_STARTED'
           $scope.runStatus = 'Not run yet.'
         if data.experiment.started_at and !data.experiment.completed_at
-          if data.experiment.completion_status
+          if !$scope.isIdle and (parseInt($scope.runningExpId) is parseInt($scope.exp.id))
             $scope.status = 'RUNNING'
             $scope.runStatus = 'Currently running.'
           else
@@ -136,8 +137,9 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
       $scope.lidOpen = if data?.optics?.lid_open == "true" then true else false
       state = data?.experiment_controller?.machine?.state
       oldState = oldData?.experiment_controller?.machine?.state
-      $scope.getExperiment() if state isnt oldState
       return if !data
       return if !data.experiment_controller
       $scope.isIdle = if data.experiment_controller.machine.state == 'idle' then true else false
+      $scope.runningExpId = data.experiment_controller.experiment?.id
+      $scope.getExperiment() if (state isnt oldState) or (!$scope.isIdle and $scope.status isnt 'RUNNING')
 ])
