@@ -1479,12 +1479,14 @@ class ExperimentsController < ApplicationController
           raise "**#{experiment.experiment_definition.guid}** not implemented"
         end
       
+        logger.info("code=#{response.code} response=#{response}")
+        
         if response.code != 200
           raise_julia_error(response)
         else
           new_data = CachedAnalyzeDatum.new(:experiment_id=>experiment.id, :analyze_result=>response.body)
           #update analyze status
-          if experiment.diagnostic?
+          if experiment.diagnostic? || experiment.calibration?
             analysis_results = JSON.parse(response.body)
             experiment.update_attributes(:analyze_status=>(analysis_results["valid"] != true)? "failed" : "success")
           end

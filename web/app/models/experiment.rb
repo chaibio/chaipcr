@@ -204,6 +204,10 @@ class Experiment < ActiveRecord::Base
   def diagnostic?
     experiment_definition.experiment_type == ExperimentDefinition::TYPE_DIAGNOSTIC
   end
+  
+  def calibration?
+    experiment_definition.experiment_type == ExperimentDefinition::TYPE_CALIBRATION
+  end
 
   def diagnostic_passed?
     diagnostic? && completion_status == "success" && analyze_status == "success"
