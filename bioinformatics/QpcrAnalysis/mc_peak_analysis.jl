@@ -415,7 +415,7 @@ function mc_peak_analysis(
 
     find_summits_and_nadirs_n(coef ::Float_T) =
         [maximum, minimum] |> mold(f -> find_local(f, negderiv_smu, half_peak_window_n(coef)))
-
+    sn_idc[1][1]==1?[deleteat!(sn_idc[1],1),sn_idc[2]]:nothing
     if size(sn_idc[1])[1]==1
         if size(sn_idc[2])[1]==1
             sn_idc_summit=sn_idc[1][1]
@@ -442,7 +442,7 @@ function mc_peak_analysis(
             peaks_raw=Vector{Peak}(peak_finder_collect |> mold(make_peak) |> sift(thing))
             num_peaks=1
         else
-            peak_finder_collect=[PeakIndicesElement(sn_idc[2][1],sn_idc[1][1],sn_idc[2][2])]
+            peak_finder_collect=[PeakIndicesElement(sn_idc[2][1],sn_idc[1][1],sn_idc[2][end])]
             peaks_raw=Vector{Peak}(peak_finder_collect |> mold(make_peak) |> sift(thing))
             num_peaks=1
         end
