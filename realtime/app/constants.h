@@ -28,6 +28,11 @@ const double kUSSensorJThermistorC1Coefficient = 0.000235057162160341;
 const double kUSSensorJThermistorC3Coefficient = 0.0000000785661432368816;
 const double kUSSensorJThermistorC5Coefficient = 0.0000000000395309964792414;
 
+//Steinhart-Hart coefficients (new equation)
+const double kUSSensorJThermistorACoefficient = 0.001129138;
+const double kUSSensorJThermistorBCoefficient = 0.000234126;
+const double kUSSensorJThermistorCCoefficient = 0.0000000876656;
+
 const double kQTICurveZThermistorC0Coefficient = 0.001116401465500;
 const double kQTICurveZThermistorC1Coefficient = 0.000237982973213;
 const double kQTICurveZThermistorC2Coefficient = -0.000000372283234;

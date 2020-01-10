@@ -71,18 +71,24 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(ADCController::ConsumersLis
 
     settings.name = "heat block 1";
     settings.pidController = new PIDController(heatBlockPIDSchedule, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax, SinglePoleRecursiveFilter(cutoffFrequency));
-    settings.thermistor.reset(new SteinhartHartThermistorC0135(kHeatBlockThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
+    /*settings.thermistor.reset(new SteinhartHartThermistorC0135(kHeatBlockThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
                                                           kUSSensorJThermistorC0Coefficient, kUSSensorJThermistorC1Coefficient,
-                                                          kUSSensorJThermistorC3Coefficient, kUSSensorJThermistorC5Coefficient));
+                                                          kUSSensorJThermistorC3Coefficient, kUSSensorJThermistorC5Coefficient));*/
+    settings.thermistor.reset(new SteinhartHartThermistorC0135_V2(kHeatBlockThermistorVoltageDividerResistanceOhms, kADCBits,
+                                                          kUSSensorJThermistorACoefficient, kUSSensorJThermistorBCoefficient,
+                                                          kUSSensorJThermistorCCoefficient));
 
     HeatBlockZoneController *zone1 = new HeatBlockZoneController(settings, kHeatBlockZone1PWMPath, kHeatBlockZone1PWMPeriodNs, kHeadBlockZone1HeatPin, kHeadBlockZone1CoolPin);
     consumers[ADCController::EReadZone1Singular] = settings.thermistor;
 
     settings.name = "heat block 2";
     settings.pidController = new PIDController(heatBlockPIDSchedule, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax, SinglePoleRecursiveFilter(cutoffFrequency));
-    settings.thermistor.reset(new SteinhartHartThermistorC0135(kHeatBlockThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
+    /*settings.thermistor.reset(new SteinhartHartThermistorC0135(kHeatBlockThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
                                                           kUSSensorJThermistorC0Coefficient, kUSSensorJThermistorC1Coefficient,
-                                                          kUSSensorJThermistorC3Coefficient, kUSSensorJThermistorC5Coefficient));
+                                                          kUSSensorJThermistorC3Coefficient, kUSSensorJThermistorC5Coefficient));*/
+    settings.thermistor.reset(new SteinhartHartThermistorC0135_V2(kHeatBlockThermistorVoltageDividerResistanceOhms, kADCBits,
+                                                          kUSSensorJThermistorACoefficient, kUSSensorJThermistorBCoefficient,
+                                                          kUSSensorJThermistorCCoefficient));
 
     HeatBlockZoneController *zone2 = new HeatBlockZoneController(settings, kHeatBlockZone2PWMPath, kHeatBlockZone2PWMPeriodNs, kHeadBlockZone2HeatPin, kHeadBlockZone2CoolPin);
     consumers[ADCController::EReadZone2Singular] = settings.thermistor;

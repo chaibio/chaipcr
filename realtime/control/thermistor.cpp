@@ -92,6 +92,24 @@ double SteinhartHartThermistorC0135::temperatureForResistance(double resistanceO
     return degreesK - 273.15;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Class SteinhartHartThermistor for C0135 (V2)
+SteinhartHartThermistorC0135_V2::SteinhartHartThermistorC0135_V2(unsigned int voltageDividerResistance, unsigned int adcBits,
+        double a, double b, double c):
+    Thermistor(voltageDividerResistance, adcBits),
+    _a {a},
+    _b {b},
+    _c {c} {
+}
+
+double SteinhartHartThermistorC0135_V2::temperatureForResistance(double resistanceOhms) {
+    double lnRes = log(resistanceOhms);
+    double lnRes3 = pow(lnRes, 3);
+
+    //steinhart-hart equation
+    double degreesK = 1.0 / (_a + (_b * lnRes) + (_c * lnRes3));
+    return degreesK - 273.15;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class BetaThermistor
