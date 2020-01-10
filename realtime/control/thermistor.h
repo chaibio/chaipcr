@@ -76,6 +76,17 @@ private:
     const double _c0, _c1, _c3, _c5; //steinhart-hart coefficients
 };
 
+class SteinhartHartThermistorC0135_V2: public Thermistor {
+public:
+    SteinhartHartThermistorC0135_V2(unsigned int voltageDividerResistance, unsigned int adcBits,
+        double a, double b, double c);
+
+    double temperatureForResistance(double resistanceOhms) override;
+
+private:
+    const double _a, _b, _c; //steinhart-hart coefficients
+};
+
 class BetaThermistor: public Thermistor {
 public:
     BetaThermistor(unsigned int voltageDividerResistance, unsigned int adcBits,
