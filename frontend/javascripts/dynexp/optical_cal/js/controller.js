@@ -19,6 +19,7 @@
 
       var ERROR_TYPES = ['OFFLINE', 'CANT_CREATE_EXPERIMENT', 'CANT_START_EXPERIMENT', 'LID_OPEN', 'UNKNOWN_ERROR', 'ANOTHER_EXPERIMENT_RUNNING'];
       var checkMachineStatusInterval = null;
+      $scope.analyze_failed = false;
 
       $scope.$on('$destroy', function() {
         if (checkMachineStatusInterval) {
@@ -151,14 +152,9 @@
             if (resp.status == 200) {
               $state.go('optical_cal.step-6');
               $scope.result = resp.data;
-              $scope.valid = true;
-              for (var i = resp.data.valid.length - 1; i >= 0; i--) {
-                if (resp.data.valid[i] === false) {
-                  $scope.valid = false;
-                  break;
-                }
-              }
+              $scope.valid = resp.data.valid;
               if ($scope.valid) $http.put(host + '/settings', { settings: { "calibration_id": $scope.experiment.id } });
+              $scope.analyze_failed = false;
             }
             if (resp.status == 202) {
               $timeout($scope.analyzeExperiment, 1000);
@@ -169,7 +165,8 @@
               $timeout($scope.analyzeExperiment, 1000);
             } else if (resp.status == 500) {
               $scope.valid = false;
-              $scope.custom_error = resp.data.errors || "An error occured while trying to analyze the experiment results.";
+              $scope.result = resp.data;
+              $scope.analyze_failed = true;
             }
           });
       };

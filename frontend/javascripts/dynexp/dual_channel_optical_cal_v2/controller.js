@@ -180,13 +180,7 @@
             } else {
               $state.go('2_channel_optical_cal.analyze', params);
               $scope.result = resp.data;
-              $scope.valid = true;
-              for (var i = resp.data.valid.length - 1; i >= 0; i--) {
-                if (resp.data.valid[i] === false) {
-                  $scope.valid = false;
-                  break;
-                }
-              }
+              $scope.valid = resp.data.valid;
               if ($scope.valid)
                 $http.put(host + '/settings', { settings: { "calibration_id": $scope.experiment.id } });
             }

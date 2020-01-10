@@ -29,16 +29,12 @@
       {{experiment.completion_message}}
     </p>
 
-    <p class="heating" ng-show="!experiment.completed_at">
+    <p class="heating" ng-show="!experiment.completed_at || analyze_failed">
       Experiment was aborted due to an unknown error.
     </p>
 
-    <p class="heating" ng-show="custom_error">
-      {{custom_error}}
-    </p>
-
-    <p class="heating" ng-repeat="err_msg in result.error_message">
-      {{err_msg}}
+    <p class="heating">
+      {{result.error}}
     </p>
 
     <a ui-sref="settings.root" class="button">OKAY</a>
