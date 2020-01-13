@@ -74,7 +74,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(ADCController::ConsumersLis
     /*settings.thermistor.reset(new SteinhartHartThermistorC0135(kHeatBlockThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
                                                           kUSSensorJThermistorC0Coefficient, kUSSensorJThermistorC1Coefficient,
                                                           kUSSensorJThermistorC3Coefficient, kUSSensorJThermistorC5Coefficient));*/
-    settings.thermistor.reset(new SteinhartHartThermistorC0135_V2(kHeatBlockThermistorVoltageDividerResistanceOhms, kADCBits,
+    settings.thermistor.reset(new SteinhartHartThermistorC0135_V2(kHeatBlockThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
                                                           kUSSensorJThermistorACoefficient, kUSSensorJThermistorBCoefficient,
                                                           kUSSensorJThermistorCCoefficient));
 
@@ -86,7 +86,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(ADCController::ConsumersLis
     /*settings.thermistor.reset(new SteinhartHartThermistorC0135(kHeatBlockThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
                                                           kUSSensorJThermistorC0Coefficient, kUSSensorJThermistorC1Coefficient,
                                                           kUSSensorJThermistorC3Coefficient, kUSSensorJThermistorC5Coefficient));*/
-    settings.thermistor.reset(new SteinhartHartThermistorC0135_V2(kHeatBlockThermistorVoltageDividerResistanceOhms, kADCBits,
+    settings.thermistor.reset(new SteinhartHartThermistorC0135_V2(kHeatBlockThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
                                                           kUSSensorJThermistorACoefficient, kUSSensorJThermistorBCoefficient,
                                                           kUSSensorJThermistorCCoefficient));
 
