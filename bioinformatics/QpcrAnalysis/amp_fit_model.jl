@@ -381,6 +381,9 @@ function amp_fit_model(
 			cq_raw = cq_raw_temp
 		else
 			cq_raw=-1.0
+			bl_func = median
+			baseline = bl_func(fluos[bl_cycs()])
+			blsub_fluos = fluos .- baseline
         end
 		
         return AmpShortModelResults(
