@@ -89,7 +89,7 @@ function Base.next(iter ::PeakIndices, state ::PeakIndicesState)
         ## otherwise try the next summit
     end
     ## fail if no more summits or no flanking nadirs
-    if  (summit_ii >= iter.len_summit_idc) ||
+    if  (summit_ii > iter.len_summit_idc) ||
        !(iter.nadir_idc[left_nadir_ii] < iter.summit_idc[summit_ii] < iter.nadir_idc[right_nadir_ii])
             return (nothing, nothing)
     end
@@ -106,8 +106,11 @@ function Base.next(iter ::PeakIndices, state ::PeakIndicesState)
     end
     ## return value
     newstate = PeakIndicesState(left_nadir_ii, summit_ii, right_nadir_ii)
-    element  = PeakIndicesElement(iter, newstate)
-    return (element, newstate)
+    element  = PeakIndicesElement(iter, PeakIndicesState(left_nadir_ii, summit_ii, right_nadir_ii))
+    if newstate==state
+        return (nothing, nothing)
+    end
+    return (element, PeakIndicesState(left_nadir_ii, right_summit_ii, right_nadir_ii))
 end ## next()
 
 ## constructor
