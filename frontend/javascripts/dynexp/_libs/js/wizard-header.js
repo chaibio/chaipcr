@@ -20,6 +20,7 @@
           if (!oldData) return;
           if (!data) return;
           $scope.status = data.experiment_controller.machine.state;
+          $scope.experimentId = (data.experiment_controller.experiment) ? data.experiment_controller.experiment.id : 0;
           if (($scope.status !== oldData.experiment_controller.machine.state || !$scope.experiment) && $scope.experimentId) {
             getExperiment();
           }
@@ -28,8 +29,6 @@
         $scope.doCancel = function() {
           $scope.onCancel();
         };
-
-
       }
 
       return {
@@ -44,7 +43,6 @@
         templateUrl: 'dynexp/_libs/views/wizard-header.html',
         link: linkFunc
       };
-
     }
   ]);
 

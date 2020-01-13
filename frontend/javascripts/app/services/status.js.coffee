@@ -74,6 +74,8 @@ window.ChaiBioTech.ngApp
 
         .error (resp) ->
           #isUp = if resp is null then false else true
+          $rootScope.$broadcast 'status:data:error', resp
+
           for def in ques by 1
             def.reject(resp)
 

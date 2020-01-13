@@ -16,12 +16,21 @@
     function OpticalCalibrationCtrl($scope, $window, Experiment, $state, Status, GlobalService,
       host, $http, DeviceInfo, $interval, $uibModal, $rootScope, $timeout) {
 
-
       var ERROR_TYPES = ['OFFLINE', 'CANT_CREATE_EXPERIMENT', 'CANT_START_EXPERIMENT', 'LID_OPEN', 'UNKNOWN_ERROR', 'ANOTHER_EXPERIMENT_RUNNING'];
       var checkMachineStatusInterval = null;
       $scope.analyze_failed = false;
+      var pages = [
+        'optical_cal.intro',
+        'optical_cal.step-1',
+        'optical_cal.step-2',
+        'optical_cal.step-3',
+        'optical_cal.step-3-reading',
+        'optical_cal.step-4',
+        'optical_cal.step-5',
+        'optical_cal.step-6'
+      ];
 
-      $scope.$on('$destroy', function() {
+      $scope.$on('$destroy', function() {        
         if (checkMachineStatusInterval) {
           $timeout.cancel(checkMachineStatusInterval);
         }
@@ -31,10 +40,7 @@
       $scope.cancel = false;
       $scope.errors = {};
 
-      function checkMachineStatus() {
-        Status
-          .fetch()
-          .then(function(deviceStatus) {
+      function checkMachineStatus(deviceStatus) {        
             // In case connected
 
             if (errorModal) {
@@ -61,34 +67,34 @@
             } else {
               delete $scope.errors.LID_OPEN;
             }
-          })
-          .catch(function(err) {
-            // Error
-            $scope.errors.OFFLINE = "Can't connect to the machine.";
-
-            if (err.status === 500) {
-
-              if (!errorModal) {
-                var scope = $rootScope.$new();
-                scope.message = {
-                  title: "Cant connect to machine.",
-                  body: err.data.errors || "Error"
-                };
-
-                errorModal = $uibModal.open({
-                  templateUrl: 'dynexp/optical_cal/views/modal-error.html',
-                  scope: scope
-                });
-              }
-            }
-          });
       }
 
-      checkMachineStatusInterval = $interval(checkMachineStatus, 1000);
+      $scope.$on('status:data:error', function(e, data, oldData) {
+        var err = data;
+        // Error
+        $scope.errors.OFFLINE = "Can't connect to the machine.";
 
-      $scope.$watch(function() {
-        return Status.getData();
-      }, function(data, oldData) {
+        if (err.status === 500) {
+
+          if (!errorModal) {
+            var scope = $rootScope.$new();
+            scope.message = {
+              title: "Cant connect to machine.",
+              body: err.data.errors || "Error"
+            };
+
+            errorModal = $uibModal.open({
+              templateUrl: 'dynexp/optical_cal/views/modal-error.html',
+              scope: scope
+            });
+          }
+        }
+      });
+
+      // checkMachineStatusInterval = $interval(checkMachineStatus, 1000);
+
+      $scope.$on('status:data:updated', function(e, data, oldData) {
+        checkMachineStatus(data);
         if (!data) return;
         if (!data.experiment_controller) return;
         if (!oldData) return;
@@ -124,13 +130,12 @@
           // experiment is complete
           checkExperimentStatus();
         }
-        if ($state.current.name === 'optical_cal.step-3' || $state.current.name === 'optical_cal.step-3-reading') {
-          console.log($scope.timeRemaining);
+        if ($state.current.name === 'optical_cal.step-3' || $state.current.name === 'optical_cal.step-3-reading') {          
           if ($scope.timeRemaining >= $scope.finalStepHoldTime()) {
             $scope.timeRemaining = ($scope.timeRemaining - $scope.finalStepHoldTime());
           }
         }
-      }, true);
+      });
 
       function checkExperimentStatus() {
         Experiment.get($scope.experiment.id).then(function(resp) {
@@ -142,7 +147,9 @@
             }
             $scope.analyzeExperiment();
           } else {
-            $timeout(checkExperimentStatus, 1000);
+            if (pages.indexOf($state.current.name) > -1) {
+              $timeout(checkExperimentStatus, 1000);
+            }
           }
         });
       }
@@ -237,8 +244,7 @@
         if (!$scope.data.experiment_controller.experiment) return 0;
 
         var step_id = parseInt($scope.data.experiment_controller.experiment.step.id);
-        var steps = $scope.experiment.protocol.stages[0].stage.steps;
-        console.log(steps[steps.length - 1].step.hold_time);
+        var steps = $scope.experiment.protocol.stages[0].stage.steps;        
         return steps[steps.length - 1].step.hold_time;
 
       };

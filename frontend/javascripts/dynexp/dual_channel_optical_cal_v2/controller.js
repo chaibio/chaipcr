@@ -15,11 +15,11 @@
     '$timeout',
     function OpticalCalibrationCtrl($scope, $window, Experiment, $state, Status, GlobalService, Constants,
       host, $http, $interval, $uibModal, $rootScope, $timeout) {
-
+      
       var checkMachineStatusInterval = null;
       $scope.analyze_failed = false;
 
-      $scope.$on('$destroy', function() {
+      $scope.$on('$destroy', function() {        
         if (checkMachineStatusInterval) {
           $timeout.cancel(checkMachineStatusInterval);
         }
@@ -42,9 +42,31 @@
       $scope.errors = {};
       $scope.Constants = Constants;
       $scope.created = false;
-      var params;
+      var params;      
+
+      $scope.$on('status:data:error', function(e, data, oldData) {
+        var err = data;
+        $scope.errors.OFFLINE = "Can't connect to the machine.";
+
+        if (err.status === 500) {
+
+          if (!errorModal) {
+            var scope = $rootScope.$new();
+            scope.message = {
+              title: "Cant connect to machine.",
+              body: err.data.errors || "Error"
+            };
+
+            errorModal = $uibModal.open({
+              templateUrl: 'dynexp/dual_channel_optical_cal_v2/views/modal-error.html',
+              scope: scope
+            });
+          }
+        }        
+      });
 
       $scope.$on('status:data:updated', function(e, data, oldData) {
+        checkMachineStatus(data);
         if (!data) return;
         if (!data.experiment_controller) return;
         if (!oldData) return;
@@ -70,7 +92,6 @@
         if (data.experiment_controller.experiment &&
           !$scope.experiment &&
           data.experiment_controller.experiment.name === 'Dual Channel Optical Calibration') {
-
           Experiment.get(data.experiment_controller.experiment.id).then(function(resp) {
             $scope.experiment = resp.data.experiment;
           });
@@ -82,11 +103,10 @@
         if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle') && is_current_exp) {
           // experiment is complete
           checkExperimentStatus();
-
         }
       });
 
-      function checkExperimentStatus() {
+      function checkExperimentStatus() {        
         Experiment.get($scope.experiment.id).then(function(resp) {
           $scope.experiment = resp.data.experiment;
           if ($scope.experiment.completed_at) {
@@ -97,15 +117,14 @@
               $scope.analyzeExperiment();
             }
           } else {
-            $timeout(checkExperimentStatus, 1000);
+            if (pages.indexOf($state.current.name) > -1) {
+              $timeout(checkExperimentStatus, 1000);
+            }
           }
         });
       }
 
-      function checkMachineStatus() {
-        Status
-          .fetch()
-          .then(function(deviceStatus) {
+      function checkMachineStatus(deviceStatus) {
             // In case connected
 
             if (errorModal) {
@@ -132,34 +151,13 @@
             } else {
               delete $scope.errors.LID_OPEN;
             }
-          })
-          .catch(function(err) {
-            // Error
-            $scope.errors.OFFLINE = "Can't connect to the machine.";
-
-            if (err.status === 500) {
-
-              if (!errorModal) {
-                var scope = $rootScope.$new();
-                scope.message = {
-                  title: "Cant connect to machine.",
-                  body: err.data.errors || "Error"
-                };
-
-                errorModal = $uibModal.open({
-                  templateUrl: 'dynexp/dual_channel_optical_cal_v2/views/modal-error.html',
-                  scope: scope
-                });
-              }
-            }
-          });
       }
 
-      checkMachineStatusInterval = $interval(checkMachineStatus, 1000);
+      // checkMachineStatusInterval = $interval(checkMachineStatus, 1000);
 
       // getExperimentForAnalyze();
       function getExperimentForAnalyze(){
-        if($state.current.name == '2_channel_optical_cal.analyze' && !$scope.experiment && $state.params.id){
+        if($state.current.name == '2_channel_optical_cal.analyze' && !$scope.experiment && $state.params.id){          
           Experiment.get($state.params.id).then(function(resp) {
             $scope.experiment = resp.data.experiment;
             if ($scope.experiment.completed_at) {
@@ -234,7 +232,7 @@
 
       $scope.createExperiment = function() {
         if (!$scope.created) {
-          Experiment.create({ guid: 'dual_channel_optical_cal_v2', name: 'dual_channel_optical_cal_v2' })
+          Experiment.create({ guid: 'dual_channel_optical_cal_v2', name: 'Dual Channel Optical Calibration' })
             .then(function(resp) {
               Experiment.startExperiment(resp.data.experiment.id)
                 .then(function() {

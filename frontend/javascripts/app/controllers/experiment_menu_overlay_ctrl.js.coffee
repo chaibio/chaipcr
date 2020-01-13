@@ -141,5 +141,5 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
       return if !data.experiment_controller
       $scope.isIdle = if data.experiment_controller.machine.state == 'idle' then true else false
       $scope.runningExpId = data.experiment_controller.experiment?.id
-      $scope.getExperiment() if (state isnt oldState) or (!$scope.isIdle and $scope.status isnt 'RUNNING')
+      $scope.getExperiment() if (state isnt oldState) or (!$scope.isIdle and $scope.status isnt 'RUNNING' and $scope.runningExpId is $stateParams.id)
 ])
