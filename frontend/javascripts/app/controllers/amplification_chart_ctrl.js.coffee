@@ -62,7 +62,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       
       $scope.cy0 = {name:'Cy0', desciption:'A C<sub>q</sub> calling method based on the max first derivative of the curve (recommended).'}
       $scope.cpd2 = {name:'cpD2', desciption:'A C<sub>q</sub> calling method based on the max second derivative of the curve.'}
-      $scope.minFl = {name: 'Min Flouresence', desciption:'The minimum fluorescence threshold for C<sub>q</sub> calling. C<sub>q</sub> values will not be called when the fluorescence is below this threshold.', value:null}
+      $scope.minFl = {name: 'Min Fluorescence', desciption:'The minimum fluorescence threshold for C<sub>q</sub> calling. C<sub>q</sub> values will not be called when the fluorescence is below this threshold.', value:null}
       $scope.minCq = {name: 'Min Cycle', desciption:'The earliest cycle to use in C<sub>q</sub> calling & baseline subtraction. Data for earlier cycles will be ignored.', value:null}
       $scope.minDf = {name: 'Min dF/dc', desciption:'The threshold which the first derivative of the curve must exceed for a C<sub>q</sub> to be called.', value:null}
       $scope.minD2f = {name: 'Min d<sup>2</sup>F/dc', desciption:'The threshold which the second derivative of the curve must exceed for a C<sub>q</sub> to be called.', value:null}
@@ -75,7 +75,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       $scope.cyclesFrom = null
       $scope.cyclesTo = null
-      $scope.hoverName = 'Min. Flouresence'
+      $scope.hoverName = 'Min. Fluorescence'
       $scope.hoverDescription = 'This is a test description'
       $scope.samples = []
       $scope.types = []
@@ -152,7 +152,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.errorCheck = false
         if !$scope.minFl.value
           $scope.hoverName = 'Error'
-          $scope.hoverDescription = 'Min Flourescence cannot be left empty'
+          $scope.hoverDescription = 'Min Fluorescence cannot be left empty'
           $scope.hoverOn = true
           $scope.errorCheck = true
           $scope.errorFl = true

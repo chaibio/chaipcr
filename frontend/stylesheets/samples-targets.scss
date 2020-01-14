@@ -72,6 +72,30 @@ table.sample-target-table{
                 line-height: 24px;
             }
         }
+
+        tbody tr:first-child{
+            .icon-wrapper{
+                .assigned-description{
+                    top: 27px;
+                    box-shadow: 0px 1px 2px #888;
+
+                    &::after{
+                        top: -9px;
+                        border-color: transparent;
+                        border-bottom-color: #fff;
+                        bottom: auto;
+                        border-width: .5rem .3rem;
+                    }
+                    &::before{
+                        top: -11px;
+                        bottom: auto;
+                        border-color: transparent;
+                        border-bottom-color: rgba(0, 0, 0, 0.25);
+                        border-width: .5rem .3rem;
+                    }
+                }
+            }
+        }
     }
     padding-left: 50px !important;
     padding-right: 50px !important;
@@ -141,7 +165,7 @@ table.sample-target-table{
             color: #777;
             font-weight: 300;
             position: absolute;
-            top: -30px;
+            top: -32px;
             left: -56px;
             background: #fff;
             z-index: 99;

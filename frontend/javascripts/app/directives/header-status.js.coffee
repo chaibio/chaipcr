@@ -45,7 +45,8 @@ window.App.directive 'headerStatus', [
     link: ($scope, elem, attrs, controller) ->
 
       experiment_id = null
-      $scope.loading = true
+      $scope.expLoading = true
+      $scope.statusLoading = 3
       $scope.start_confirm_show = false
       $scope.dataAnalysis = false
       $scope.isStarted = false
@@ -54,14 +55,16 @@ window.App.directive 'headerStatus', [
       if ($location.path().indexOf(stringUrl) == -1)
         $scope.dataAnalysis = true
 
+      $scope.isLoading = () ->
+        $scope.expLoading || $scope.statusLoading
+
       $scope.show = ->
         if attrs.experimentId then (experiment_id and $scope.status) else $scope.status
 
       getExperiment = (cb) ->
         return if !experiment_id
-        #$scope.loading = true
-        Experiment.get(id: experiment_id).then (resp) ->
-          $scope.loading = false
+        Experiment.get(id: experiment_id).then (resp) ->          
+          $scope.expLoading = false
           cb resp.experiment if cb
 
       $scope.is_holding = false
@@ -90,6 +93,8 @@ window.App.directive 'headerStatus', [
         if $scope.isCurrentExp is true
           if !$scope.isStarted and data.experiment_controller.machine.state != 'idle'
             $scope.isStarted = true
+          else if $scope.isStarted and data.experiment_controller.machine.state == 'idle'
+            $scope.isStarted = false
             
           $scope.enterState = $scope.isCurrentExp
         #console.log $scope.enterState
@@ -109,6 +114,8 @@ window.App.directive 'headerStatus', [
 
         $scope.timeRemaining = TestInProgressHelper.timeRemaining(data)
         $scope.timePercentage = TestInProgressHelper.timePercentage(data)
+        if $scope.statusLoading > 0 
+          $scope.statusLoading--
 
         #in progress
         if $scope.state isnt 'idle' and $scope.state isnt 'complete' and $scope.isCurrentExp
@@ -130,9 +137,11 @@ window.App.directive 'headerStatus', [
         Experiment.getExperimentDuration($scope.experiment)
 
       $scope.startExperiment = ->
+        $scope.isStarted = true
         Experiment.startExperiment(experiment_id).then ->
           $scope.experiment.started_at = true
-          $scope.loading = true
+          $scope.expLoading = true
+          $scope.statusLoading = 3
           getExperiment (exp) ->
             $scope.experiment = exp
             $rootScope.$broadcast 'experiment:started', experiment_id

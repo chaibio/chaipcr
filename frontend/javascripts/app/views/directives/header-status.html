@@ -18,7 +18,7 @@
 -->
 <div click-check>
   <!-- loading -->
-  <div class="header-status" ng-if="loading">
+  <div class="header-status" ng-if="isLoading()">
     <div class="full-width" full-width use-max="true" min="900">
       <div class="clearfix state">
         <div class="pull-left menu" ng-transclude>
@@ -29,7 +29,7 @@
       </div>
     </div>
   </div>
-  <div ng-if="!loading" class="header-status" ng-class="{'in-progress': state && state !== 'idle' && isCurrentExp, 'complete': experiment && ((experiment.completed_at && !(state !== 'idle' && isCurrentExp)) || (experiment.started_at && state==='idle') )}" ng-style="backgroundStyle">
+  <div ng-if="!isLoading()" class="header-status" ng-class="{'in-progress': state && state !== 'idle' && isCurrentExp, 'complete': experiment && ((experiment.completed_at && !(state !== 'idle' && isCurrentExp)) || (experiment.started_at && !(state !== 'idle' && isCurrentExp)))}" ng-style="backgroundStyle">
     <div class="full-width" full-width use-max="true" min="900">
       <!-- begin is valid -->
       <div class="clearfix state" ng-show="experiment.id && !experiment.started_at && !experiment.completed_at && !(statusData.optics.lid_open==='true')&& state==='idle'">
@@ -152,13 +152,15 @@
         </div>
       </div>
       <!-- experiment has been started and not completed -->
-      <div class="clearfix state" ng-show="experiment && experiment.started_at && !experiment.completed_at && state==='idle' && (dataAnalysis || !enterState)">
+      <div class="clearfix state" 
+        ng-show="experiment && experiment.started_at && !experiment.completed_at && 
+            !isStarted && !(state !== 'idle' && isCurrentExp) && (dataAnalysis || !enterState)">
         <div class="pull-left menu" ng-transclude>
         </div>
         <div class="pull-left exp-name H3" title="{{experiment.name|uppercase}}">
           <div ng-show="experiment.id && experiment.name">{{expName(20)}}</div>
         </div>
-        <div class="pull-right controls SHR text-right" ng-show="!dataAnalysis || !isStarted">
+        <div class="pull-right controls SHR text-right">
           <div class="message">
             <span class="failed">failed</span>
             <span ng-show="experiment.completion_status === 'aborted'">
