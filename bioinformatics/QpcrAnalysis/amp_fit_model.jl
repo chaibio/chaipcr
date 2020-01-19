@@ -374,23 +374,58 @@ function amp_fit_model(
 
 	cq_raw_temp=calc_cq_raw(dr1_pred, dr2_pred)
 
-	criteria_cq=cq_raw_temp>0 && cq_raw_temp<i.num_cycles
+    criteria_cq=cq_raw_temp>0 && cq_raw_temp<i.num_cycles
+    
+    function discrete_dr1_dr2(fluos)
+        len=length(fluos)
+        dr1_val=zeros(len)
+        dr2_val=zeros(len)
+        dr2_val_v2=zeros(len)
+        for el=1:len
+            if el == 1
+                dr1_val[el]=(fluos[el+1]-fluos[el])
+            elseif el == len
+                dr1_val[el]=(fluos[el]-fluos[el-1])
+            else
+                dr1_val[el]=(fluos[el+1]-fluos[el-1])/2
+            end
+        end
+
+        for el=1:len
+            if el == 1
+                dr2_val[el]=(dr1_val[el+1]-dr1_val[el])
+                dr2_val_v2[el]=dr2_val[el]
+            elseif el == len
+                dr2_val[el]=(dr1_val[el]-dr1_val[el-1])
+                dr2_val_v2[el]=dr2_val[el]
+            else
+                dr2_val[el]=(fluos[el+1]+fluos[el-1]-2*fluos[el])
+                dr2_val_v2[el]=(dr1_val[el+1]-dr1_val[el-1])/2
+            end
+        end
+        return (dr1_val,dr2_val,dr2_val_v2)
+    end
 
     if R == AmpShortModelResults
 		if criteria_norm_err && criteria_dr1 && criteria_dr2 && criteria_cq
-			cq_raw = cq_raw_temp
+            cq_raw = cq_raw_temp
+            dr1_values=dr1_pred[raw_cycs_index]
+            dr2_values=dr2_pred[raw_cycs_index]
 		else
 			cq_raw=-1.0
 			bl_func = median
 			baseline = bl_func(fluos[bl_cycs()])
-			blsub_fluos = fluos .- baseline
+            blsub_fluos = fluos .- baseline
+            dr1_values1,dr2_values1,dr2_values1_v2=discrete_dr1_dr2(fluos)
+            dr1_values=dr1_values1
+            dr2_values=dr2_values1_v2
         end
 		
         return AmpShortModelResults(
             # fluos, ## rbbs_ary3,
             blsub_fluos,
-            dr1_pred[raw_cycs_index],
-            dr2_pred[raw_cycs_index],
+            dr1_values,
+            dr2_values,
             nonpos2NaN(cq_raw), ## cq
             NaN_T) ## d0
     end ## R
