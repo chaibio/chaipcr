@@ -468,6 +468,7 @@ function mc_peak_analysis(
     areas_raw = peaks_raw |> their(:area)
     area_order = sortperm(areas_raw, rev = true)
     peaks_filtered = peaks_raw[peak_filter()]
+    sort!(peaks_filtered,by=x->negderiv_smu[x.idx],rev=true)
     return output_type == McPeakLongOutput ?
         McPeakLongOutput(
             i.reporting(observed_data),
