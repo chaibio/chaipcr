@@ -1463,11 +1463,10 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 					sampleId =  (!sampleId && $scope.wellInf[z].sampleid) ? $scope.wellInf[z].sampleid : sampleId;
 				}
 			}
-			unlinkElem(target1Id, unLink, "Target1");
+
+			targetId = (target1Id) ? target1Id : target2Id;
+			unlinkElem(targetId, unLink, "TargetAll");
 			unlinkElem(sampleId, unLink, "Sample");
-			if($scope.is_dual_channel){
-				unlinkElem(target2Id, unLink, "Target2");
-			}
 		};
 
 		$scope.clearWellsByType = function (clearType) {
@@ -1504,6 +1503,44 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 		};		
 
 		function unlinkElem (itemId, unlinkWells, clearType){
+			if (itemId && (clearType == "TargetAll")) {
+				Experiment.unlinkTarget($stateParams.id, itemId, { wells: unlinkWells, channel: 0 }).then(function (response) {
+					for (var i = 0; i < response.config.data.wells.length; i++) {
+						$scope.wellInf[response.config.data.wells[i] - 1].target1id = 0;
+						$scope.wellInf[response.config.data.wells[i] - 1].target1 = "Not set";
+						$scope.wellInf[response.config.data.wells[i] - 1].target1type = "";
+						$scope.wellInf[response.config.data.wells[i] - 1].target1quantity = "";
+						$scope.wellInf[response.config.data.wells[i] - 1].target1color = "";
+						$scope.wellInf[response.config.data.wells[i] - 1].target1quantityTotal = "";
+						$scope.wellInf[response.config.data.wells[i] - 1].target1quantityM = "";
+						$scope.wellInf[response.config.data.wells[i] - 1].target1quantityB = "";
+
+						$scope.wellInf[response.config.data.wells[i] - 1].target2id = 0;
+						$scope.wellInf[response.config.data.wells[i] - 1].target2 = "Not set";
+						$scope.wellInf[response.config.data.wells[i] - 1].target2type = "";
+						$scope.wellInf[response.config.data.wells[i] - 1].target2quantity = "";
+						$scope.wellInf[response.config.data.wells[i] - 1].target2color = "";
+						$scope.wellInf[response.config.data.wells[i] - 1].target2quantityTotal = "";
+						$scope.wellInf[response.config.data.wells[i] - 1].target2quantityM = "";
+						$scope.wellInf[response.config.data.wells[i] - 1].target2quantityB = "";
+					}
+					$scope.enableTarget1Type = false;
+					$scope.enableTarget1Qty = false;
+					$scope.target1Selected = "Choose";
+					$scope.target1SelectedId = 0;
+					$scope.target1SelectedColor = "white";
+					$scope.selectedTarget1Type = "";
+					$scope.target1Quantity.value = null;
+
+					$scope.enableTarget2Type = false;
+					$scope.enableTarget2Qty = false;
+					$scope.target2Selected = "Choose";
+					$scope.target2SelectedId = 0;
+					$scope.target2SelectedColor = "white";
+					$scope.selectedTarget2Type = "";
+					$scope.target2Quantity.value = null;
+				});
+			}
 			if (itemId && (clearType == "Target1")) {
 				Experiment.unlinkTarget($stateParams.id, itemId, { wells: unlinkWells, channel: 1 }).then(function (response) {
 					for (var i = 0; i < response.config.data.wells.length; i++) {
