@@ -52,7 +52,7 @@ Base.start(iter ::PeakIndices) = PeakIndicesState(0, 0, 0)
 
 Base.done(iter ::PeakIndices, state ::Void) = true
 Base.done(iter ::PeakIndices, state ::PeakIndicesState) =
-    state.left_nadir_ii > iter.len_summit_idc
+    state.left_nadir_ii > iter.len_nadir_idc
 
 Base.iteratorsize(::PeakIndices) = SizeUnknown()
 
