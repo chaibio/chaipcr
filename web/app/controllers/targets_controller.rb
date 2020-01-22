@@ -340,9 +340,7 @@ class TargetsController < ApplicationController
   end
   
   def unlinks
-    params[:wells].each do |well_num|
-      unlink_well(well_num)
-    end
+    unlink_well(params[:wells], params[:channel])
     CachedStandardCurveDatum.invalidate(@experiment.well_layout.id) if @target.errors.empty?
     respond_to do |format|
       format.json { render "show", :status => (@target.errors.empty?)? :ok : :unprocessable_entity}
@@ -369,17 +367,24 @@ class TargetsController < ApplicationController
     end
   end
   
-  def unlink_well(well_num)
-    target_well = TargetsWell.where(:target_id=>@target.id, :well_layout_id=>@experiment.well_layout.id, :well_num=>well_num).first
-    if target_well
-      ret = target_well.destroy
-      if !ret
-        target_well.errors.full_messages.each do |message|
-          @target.errors.add(:targets_wells, message)
+  def unlink_well(wells, channel)
+    targets = Target.includes(:targets_wells).where(["targets.well_layout_id=? or targets.well_layout_id=?", @experiment.well_layout.id, @experiment.targets_well_layout_id]).order("targets.well_layout_id, targets.id")
+    if channel > 0
+      targets = targets.where(["channel=?", channel])      
+    end
+    targets_ids = targets.map {|target| target.id}
+    targets_wells = TargetsWell.where(["well_layout_id=? AND target_id IN (?) AND well_num IN (?)", @experiment.well_layout.id, targets_ids, wells]).order("FIELD(target_id,#{targets_ids.join(',')})")
+    targets_wells.each do |target_well|
+      if target_well
+        ret = target_well.destroy
+        if !ret
+          target_well.errors.full_messages.each do |message|
+            @target.errors.add(:targets_wells, message)
+          end
         end
+      else
+        @target.errors.add(:targets_wells, "well num #{well_num} is not associated with this target")
       end
-    else
-      @target.errors.add(:targets_wells, "well num #{well_num} is not associated with this target")
     end
   end
   

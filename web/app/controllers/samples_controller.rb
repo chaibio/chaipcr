@@ -300,9 +300,7 @@ class SamplesController < ApplicationController
   end
   
   def unlinks
-    params[:wells].each do |well_num|
-      unlink_well(well_num)
-    end
+    unlink_well(params[:wells])
     CachedStandardCurveDatum.invalidate(@experiment.well_layout.id) if @sample.errors.empty?
     respond_to do |format|
       format.json { render "show", :status => (@sample.errors.empty?)? :ok : :unprocessable_entity}
@@ -321,17 +319,19 @@ class SamplesController < ApplicationController
     end
   end
   
-  def unlink_well(well_num)
-    sample_well = SamplesWell.where(:sample_id=>@sample.id, :well_layout_id=>@experiment.well_layout.id, :well_num=>well_num).first
-    if sample_well
-      ret = sample_well.destroy
-      if !ret
-        sample_well.errors.full_messages.each do |message|
-          @sample.errors.add(:samples_wells, message)
+  def unlink_well(wells)
+    samples_wells = SamplesWell.where(["well_layout_id=? AND well_num IN (?)", @experiment.well_layout.id, wells])
+    samples_wells.each do |sample_well|
+      if sample_well
+        ret = sample_well.destroy
+        if !ret
+          sample_well.errors.full_messages.each do |message|
+            @sample.errors.add(:samples_wells, message)
+          end
         end
+      else
+        @sample.errors.add(:samples_wells, "well num #{well_num} is not associated with this sample")
       end
-    else
-      @sample.errors.add(:samples_wells, "well num #{well_num} is not associated with this sample")
     end
   end
   

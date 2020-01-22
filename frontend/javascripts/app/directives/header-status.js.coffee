@@ -44,9 +44,10 @@ window.App.directive 'headerStatus', [
     templateUrl: 'app/views/directives/header-status.html'
     link: ($scope, elem, attrs, controller) ->
 
+      INIT_LOADING = 2
       experiment_id = null
       $scope.expLoading = true
-      $scope.statusLoading = 3
+      $scope.statusLoading = INIT_LOADING
       $scope.start_confirm_show = false
       $scope.dataAnalysis = false
       $scope.isStarted = false
@@ -141,7 +142,7 @@ window.App.directive 'headerStatus', [
         Experiment.startExperiment(experiment_id).then ->
           $scope.experiment.started_at = true
           $scope.expLoading = true
-          $scope.statusLoading = 3
+          $scope.statusLoading = INIT_LOADING
           getExperiment (exp) ->
             $scope.experiment = exp
             $rootScope.$broadcast 'experiment:started', experiment_id
