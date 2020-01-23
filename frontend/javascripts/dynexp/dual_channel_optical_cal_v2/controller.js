@@ -18,6 +18,8 @@
       
       var checkMachineStatusInterval = null;
       $scope.analyze_failed = false;
+      var current_exp_id = 0;
+      var cal_exp_id = 0;
 
       $scope.$on('$destroy', function() {        
         if (checkMachineStatusInterval) {
@@ -97,9 +99,10 @@
           });
         }
 
-        var this_exp_id = $scope.experiment ? $scope.experiment.id : null;
+        current_exp_id = $scope.experiment ? $scope.experiment.id : null;
+        cal_exp_id = (!cal_exp_id) ? current_exp_id : cal_exp_id;
         var running_exp_id = oldData.experiment_controller.experiment ? oldData.experiment_controller.experiment.id : null;
-        var is_current_exp = parseInt(this_exp_id) === parseInt(running_exp_id) && !!running_exp_id;
+        var is_current_exp = parseInt(current_exp_id) === parseInt(running_exp_id) && !!running_exp_id;
         if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle') && is_current_exp) {
           // experiment is complete
           checkExperimentStatus();
@@ -107,10 +110,10 @@
       });
 
       function checkExperimentStatus() {        
-        Experiment.get($scope.experiment.id).then(function(resp) {
+        Experiment.get(cal_exp_id).then(function(resp) {
           $scope.experiment = resp.data.experiment;
           if ($scope.experiment.completed_at) {
-            params = { id: $scope.experiment.id };
+            params = { id: cal_exp_id };
             if ($scope.experiment.completion_status !== 'success') {
               $state.go('2_channel_optical_cal.analyze', params);
             } else {
@@ -132,9 +135,10 @@
               errorModal = null;
             }
 
-            var this_exp_id = $scope.experiment ? $scope.experiment.id : null;
+            current_exp_id = $scope.experiment ? $scope.experiment.id : null;
+            cal_exp_id = (!cal_exp_id) ? current_exp_id : cal_exp_id;
             var running_exp_id = deviceStatus.experiment_controller.experiment ? deviceStatus.experiment_controller.experiment.id : null;
-            var is_current_exp = (running_exp_id !== null) && parseInt(this_exp_id) === parseInt(running_exp_id);
+            var is_current_exp = (running_exp_id !== null) && parseInt(current_exp_id) === parseInt(running_exp_id);
 
             if (deviceStatus.experiment_controller.machine.state !== 'idle' && !is_current_exp) {
               $scope.errors.ANOTHER_EXPERIMENT_RUNNING = "Another experiment is running.";
@@ -171,7 +175,7 @@
       }
 
       $scope.analyzeExperiment = function() {
-        Experiment.analyze($scope.experiment.id)
+        Experiment.analyze(cal_exp_id)
           .then(function(resp) {
             if (resp.status == 202) {
               $timeout($scope.analyzeExperiment, 1000);
@@ -180,7 +184,7 @@
               $scope.result = resp.data;
               $scope.valid = resp.data.valid;
               if ($scope.valid)
-                $http.put(host + '/settings', { settings: { "calibration_id": $scope.experiment.id } });
+                $http.put(host + '/settings', { settings: { "calibration_id": cal_exp_id } });
             }
             $scope.analyze_failed = false;
           })
