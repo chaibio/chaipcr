@@ -374,7 +374,7 @@ function amp_fit_model(
 
 	cq_raw_temp=calc_cq_raw(dr1_pred, dr2_pred)
 
-    criteria_cq=cq_raw_temp>0 && cq_raw_temp<i.num_cycles
+    criteria_cq=cq_raw_temp>0 && cq_raw_temp<i.num_cycles && cq_raw_temp>i.min_reliable_cyc 
     
     function discrete_dr1_dr2(fluos)
         len=length(fluos)
