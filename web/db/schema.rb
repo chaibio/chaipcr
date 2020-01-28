@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180925064008) do
+ActiveRecord::Schema.define(version: 20181211202118) do
 
   create_table "amplification_curves", force: :cascade do |t|
     t.integer "experiment_id", limit: 4
@@ -48,6 +48,7 @@ ActiveRecord::Schema.define(version: 20180925064008) do
     t.integer "min_d2",                   limit: 4
     t.integer "baseline_cycle_min",       limit: 4
     t.integer "baseline_cycle_max",       limit: 4
+    t.string  "baseline_method",          limit: 255
   end
 
   create_table "cached_analyze_data", force: :cascade do |t|
@@ -281,12 +282,13 @@ ActiveRecord::Schema.define(version: 20180925064008) do
   add_index "user_tokens", ["access_token"], name: "index_user_tokens_on_access_token", unique: true, using: :btree
 
   create_table "users", force: :cascade do |t|
-    t.string   "email",           limit: 255, null: false
-    t.string   "password_digest", limit: 255, null: false
-    t.string   "role",            limit: 255, null: false
+    t.string   "email",           limit: 255,                null: false
+    t.string   "password_digest", limit: 255,                null: false
+    t.string   "role",            limit: 255,                null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "name",            limit: 255, null: false
+    t.string   "name",            limit: 255,                null: false
+    t.boolean  "show_banner",                 default: true
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
