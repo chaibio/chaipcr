@@ -89,6 +89,19 @@ window.ChaiBioTech.ngApp.service 'StandardCurveChartHelper', [
         '#14A451'
       ]
 
+    mathPow = (dec, pow) ->
+      res = 1
+      i = 0
+      if pow == 0 then return 1
+      else if pow < 0
+        for i in [0...Math.abs(pow)]
+          res = res / dec
+        return res;
+      else 
+        for i in [0...Math.abs(pow)]
+          res = res * dec;
+        return res;
+
     @neutralizeData = (amplification_data, targets, is_dual_channel=false) ->
       amplification_data = angular.copy amplification_data
       targets = angular.copy targets
@@ -161,7 +174,7 @@ window.ChaiBioTech.ngApp.service 'StandardCurveChartHelper', [
           datasets["well_#{summary_data[i][1] - 1}_#{channel}"] = []
           datasets["well_#{summary_data[i][1] - 1}_#{channel}"].push
             cq: summary_data[i][3]
-            log_quantity: Math.log10(summary_data[i][4] * Math.pow(10, summary_data[i][5]))
+            log_quantity: Math.log10(summary_data[i][4] * mathPow(10, summary_data[i][5]))
 
       return datasets
 
@@ -237,8 +250,8 @@ window.ChaiBioTech.ngApp.service 'StandardCurveChartHelper', [
 
         item['active'] = false
 
-        item['mean_quantity'] = item['mean_quantity_m'] * Math.pow(10, item['mean_quantity_b'])
-        item['quantity'] = item['quantity_m'] * Math.pow(10, item['quantity_b'])
+        item['mean_quantity'] = item['mean_quantity_m'] * mathPow(10, item['mean_quantity_b'])
+        item['quantity'] = item['quantity_m'] * mathPow(10, item['quantity_b'])
 
         well_data.push item
 
@@ -252,7 +265,7 @@ window.ChaiBioTech.ngApp.service 'StandardCurveChartHelper', [
         item['replic_group'] = null
         item['quantity_m'] = elem.quantity?.m
         item['quantity_b'] = elem.quantity?.b
-        item['quantity'] = item['quantity_m'] * Math.pow(10, item['quantity_b'])
+        item['quantity'] = item['quantity_m'] * mathPow(10, item['quantity_b'])
         item['mean_quantity_m'] = null
         item['mean_quantity_b'] = null
         item['mean_quantity'] = 0

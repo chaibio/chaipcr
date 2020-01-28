@@ -84,6 +84,19 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         '#14A451'
       ]
 
+    mathPow = (dec, pow) ->
+      res = 1
+      i = 0
+      if pow == 0 then return 1
+      else if pow < 0
+        for i in [0...Math.abs(pow)]
+          res = res / dec
+        return res;
+      else 
+        for i in [0...Math.abs(pow)]
+          res = res * dec;
+        return res;
+
     @neutralizeData = (amplification_data, targets, is_dual_channel=false) ->
       amplification_data = angular.copy amplification_data
       targets = angular.copy targets
@@ -206,8 +219,8 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
         item['active'] = false
 
-        item['mean_quantity'] = item['mean_quantity_m'] * Math.pow(10, item['mean_quantity_b'])
-        item['quantity'] = item['quantity_m'] * Math.pow(10, item['quantity_b'])
+        item['mean_quantity'] = item['mean_quantity_m'] * mathPow(10, item['mean_quantity_b'])
+        item['quantity'] = item['quantity_m'] * mathPow(10, item['quantity_b'])
 
         well_data.push item
 
