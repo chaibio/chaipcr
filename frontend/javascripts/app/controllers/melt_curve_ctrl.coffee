@@ -355,7 +355,13 @@ App.controller 'MeltCurveChartCtrl', [
         updateSeries()
 
       isDefaultSwitchDisable = (target)->
-        return $scope.expTargets.length == 0 && target && target.name == 'Ch 2'
+        if $scope.expTargets.length
+          target_item = _.filter $scope.expTargets, (elem) ->
+            elem.id is target.id
+          return (target_item.length && target_item[0].channel == 2) || (!target_item.length && target.name == 'Ch 2')
+        else
+          return ($scope.expTargets.length == 0 && target.name == 'Ch 2')
+        true
 
       $scope.onZoom = (transform, w, h, scale_extent) ->
         $scope.mc_scroll = {
