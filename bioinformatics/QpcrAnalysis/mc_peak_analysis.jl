@@ -350,7 +350,7 @@ function mc_peak_analysis(
         min_area = areas_raw[largest_peak] * i.min_normalized_area
         largest_idc = area_order[min(i.max_num_peaks + 1, num_peaks) |> from(1)]
         filtered_idc = largest_idc |> sift(idx -> areas_raw[idx] >= min_area)
-        return length(filtered_idc) > i.max_num_peaks ? [] : filtered_idc
+        return filtered_idc
     end ## peak_filter()
 
     ## << end of function definitions nested in mc_peak_analysis()
@@ -469,6 +469,7 @@ function mc_peak_analysis(
     area_order = sortperm(areas_raw, rev = true)
     peaks_filtered = peaks_raw[peak_filter()]
     sort!(peaks_filtered,by=x->negderiv_smu[x.idx],rev=true)
+    length(peaks_filtered)>i.max_num_peaks ? peaks_filtered=peaks_filtered[1:i.max_num_peaks] : nothing
     return output_type == McPeakLongOutput ?
         McPeakLongOutput(
             i.reporting(observed_data),
