@@ -54,7 +54,6 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 		$scope.colors = AmplificationChartHelper.SAMPLE_TARGET_COLORS;
 		$scope.enableTarget1Type = false;
 		$scope.clearSelected = "Choose";
-		//console.log($scope.colors);
 
 		$scope.enableTarget1Qty = false;
 		$scope.enableTarget2Qty = false;
@@ -444,78 +443,6 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 			});
 		};
 
-		$scope.$watch('target1Quantity.value', function(val, oldVal) {
-			if($scope.dragging) return;
-
-			var m1 = '', b1 = '';
-			if($scope.target1Quantity.value){
-				var stn = Number($scope.target1Quantity.value);
-				var data = stn.toExponential().toString().split(/[eE]/);
-				m1 = Number(data[0]);
-				b1 = Number(data[1]);
-				if($scope.target1Quantity.value == '1E'){
-					m1 = 1;
-					b1 = 1;
-				}
-			}
-			$scope.target1Quantity.quantityM = (m1) ? m1.toFixed(2) : '';
-			$scope.target1Quantity.quantityB = b1;
-
-			if(!validateTarget1Quantity()){
-				$scope.error_target1Qty = 'Must be greater than zero';
-				for (i = 0; i < 16; i++) {
-					if ($scope.wells["well_" + i].selected) {
-						$scope.wellInf[i].target1quantityM = '';
-						$scope.wellInf[i].target1quantityB = '';
-					}
-				}
-			} else {
-				$scope.error_target1Qty = '';
-
-				for (i = 0; i < 16; i++) {
-					if ($scope.wells["well_" + i].selected) {
-						$scope.wellInf[i].target1quantityM = (!m1 || isNaN(m1)) ? '' : m1.toFixed(2);
-						$scope.wellInf[i].target1quantityB = (!b1 || isNaN(b1)) ? 0 : b1;
-					}
-				}
-			}
-		});
-
-		$scope.$watch('target2Quantity.value', function(val, oldVal) {
-			if($scope.dragging) return;
-			var m1 = '', b1 = '';
-			if($scope.target2Quantity.value){
-				var stn = Number($scope.target2Quantity.value);
-				var data = stn.toExponential().toString().split(/[eE]/);
-				m1 = Number(data[0]);
-				b1 = Number(data[1]);				
-				if($scope.target2Quantity.value == '1E'){
-					m1 = 1;
-					b1 = 1;
-				}
-			}
-			$scope.target2Quantity.quantityM = (m1) ? m1.toFixed(2) : '';
-			$scope.target2Quantity.quantityB = b1;
-
-			if(!validateTarget2Quantity()){
-				$scope.error_target2Qty = 'Must be greater than zero';
-				for (i = 0; i < 16; i++) {
-					if ($scope.wells["well_" + i].selected) {
-						$scope.wellInf[i].target2quantityM = '';
-						$scope.wellInf[i].target2quantityB = '';
-					}
-				}
-			} else {
-				$scope.error_target2Qty = '';
-				for (i = 0; i < 16; i++) {
-					if ($scope.wells["well_" + i].selected) {
-						$scope.wellInf[i].target2quantityM = (!m1 || isNaN(m1)) ? '' : m1.toFixed(2);
-						$scope.wellInf[i].target2quantityB = (!b1 || isNaN(b1)) ? 0 : b1;
-					}
-				}
-			}
-		});
-
 		function validateTarget1Quantity(){
 			var stn;
 
@@ -536,14 +463,6 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 			}
 
 			return true;
-		}
-
-		var string = "1eee10";
-		var re = new RegExp("^[0-9]*.?[0-9]*[e]?[-|+]?[0-9]*$");
-		if (re.test(string)) {
-			console.log("Valid");
-		} else {
-			console.log("Invalid");
 		}
 
 		Device.isDualChannel().then(function (is_dual_channel) {
@@ -894,16 +813,6 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 
 		};
 
-		/*		$(window).load(function() {
-			console.log($('.samples-div').height());
-				var heightDiv;
-				//$('.samples-div').css({'top': '-'+heightDiv+'px'});
-				$( ".options-div" ).each(function( index ) {
-					heightDiv = $(this).height() - 34;
-		  $(this).css({'top': '-'+heightDiv+'px'});
-		});
-		});*/
-
 		$scope.testing = function () {
 			//console.log($('.samples-div').height());
 			//var heightDiv;
@@ -990,7 +899,6 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 		}
 		//ngModel.$setViewValue(wells);
 		$scope.wells = wells;
-		//console.log($scope.wells);
 		$scope.row_header_width = 30;
 		$scope.columns = [];
 		$scope.rows = [];
@@ -1266,7 +1174,6 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 				if ($scope.wells["well_" + i].selected) {
 					linkSampleWell[k] = i + 1;
 					k++;
-					//console.log($scope.wells["well_" + i]);
 				}
 			}
 
@@ -1628,15 +1535,10 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 
 				stn = Number($scope.target1Quantity.value);
 
-				console.log(stn.toExponential());
-				console.log(stn.toExponential().toString().split(/[eE]/));
-
 				var data = stn.toExponential().toString().split(/[eE]/);
 				var m1 = Number(data[0]);
 				var b1 = Number(data[1]);
 
-				console.log(m1);
-				console.log(b1);
 				k = 0;
 				var linkTargetQuantity = [];
 				for (i = 0; i < 16; i++) {
@@ -1660,10 +1562,33 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 					// $scope.getWellLayout();
 				});
 
+
+				$scope.target1Quantity.quantityM = (m1) ? m1.toFixed(2) : '';
+				$scope.target1Quantity.quantityB = b1;
+
+				if(!validateTarget1Quantity()){
+					$scope.error_target1Qty = 'Must be greater than zero';
+					for (i = 0; i < 16; i++) {
+						if ($scope.wells["well_" + i].selected) {
+							$scope.wellInf[i].target1quantityM = '';
+							$scope.wellInf[i].target1quantityB = '';
+						}
+					}
+
+				} else {
+					$scope.error_target1Qty = '';
+
+					for (i = 0; i < 16; i++) {
+						if ($scope.wells["well_" + i].selected) {
+							$scope.wellInf[i].target1quantityM = (!m1 || isNaN(m1)) ? '' : m1.toFixed(2);
+							$scope.wellInf[i].target1quantityB = (!b1 || isNaN(b1)) ? 0 : b1;
+						}
+					}
+				}
+
 			}
 			else {
 				$scope.target1Quantity.value = '';
-				console.log("error");
 			}
 
 		};
@@ -1683,15 +1608,10 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 
 				stn = Number($scope.target2Quantity.value);
 
-				console.log(stn.toExponential());
-				console.log(stn.toExponential().toString().split(/[eE]/));
-
 				var data = stn.toExponential().toString().split(/[eE]/);
 				var m1 = Number(data[0]);
 				var b1 = Number(data[1]);
 
-				console.log(m1);
-				console.log(b1);
 				k = 0;
 				var linkTargetQuantity = [];
 				for (i = 0; i < 16; i++) {
@@ -1714,11 +1634,32 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 					updateTargetWell(response);
 					// $scope.getWellLayout();
 				});
+
+				$scope.target2Quantity.quantityM = (m1) ? m1.toFixed(2) : '';
+				$scope.target2Quantity.quantityB = b1;
+
+				if(!validateTarget2Quantity()){
+					$scope.error_target2Qty = 'Must be greater than zero';
+					for (i = 0; i < 16; i++) {
+						if ($scope.wells["well_" + i].selected) {
+							$scope.wellInf[i].target2quantityM = '';
+							$scope.wellInf[i].target2quantityB = '';
+						}
+					}
+				} else {
+					$scope.error_target2Qty = '';
+					for (i = 0; i < 16; i++) {
+						if ($scope.wells["well_" + i].selected) {
+							$scope.wellInf[i].target2quantityM = (!m1 || isNaN(m1)) ? '' : m1.toFixed(2);
+							$scope.wellInf[i].target2quantityB = (!b1 || isNaN(b1)) ? 0 : b1;
+						}
+					}
+				}
+
 			}
 
 			else {
 				$scope.target2Quantity.value = '';
-				console.log("error");
 			}
 		};
 

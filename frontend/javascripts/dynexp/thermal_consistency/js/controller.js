@@ -31,6 +31,9 @@
         $scope.isFinite = isFinite;
         $('.content').addClass('analyze');
 
+        var current_exp_id = 0;
+        var cal_exp_id = 0;
+
         GlobalService.isDualChannel(function(it_is) {
           $scope.is_dual_channel = it_is;
         });
@@ -47,6 +50,7 @@
         }
 
         $scope.$on('status:data:updated', function(e, data, oldData) {
+          $scope.checkMachineStatus(data);
           if (!data) return;
           if (!data.experiment_controller) return;
           if (!oldData) return;
@@ -56,6 +60,11 @@
           $scope.state = data.experiment_controller.machine.state;
           $scope.old_state = oldData.experiment_controller.machine.state;
           $scope.timeRemaining = GlobalService.timeRemaining(data);
+
+          current_exp_id = $scope.experiment ? $scope.experiment.id : null;
+          cal_exp_id = (!cal_exp_id) ? current_exp_id : cal_exp_id;
+          var running_exp_id = oldData.experiment_controller.experiment ? oldData.experiment_controller.experiment.id : null;
+          var is_current_exp = (parseInt(current_exp_id) === parseInt(running_exp_id)) && (running_exp_id !== null);
 
           if (data.experiment_controller.experiment && !$scope.experiment) {
             getExperiment(data.experiment_controller.experiment.id);
@@ -79,21 +88,46 @@
 
         }, true);
 
+        $scope.$on('status:data:error', function(e, data, oldData) {
+          var err = data;
+          // Error
+          $scope.error = true;
+          $scope.lidMessage = "Cant connect to machine.";
+
+          if (err.status === 500) {
+
+            if (!$scope.modal) {
+              var scope = $rootScope.$new();
+              scope.message = {
+                title: "Cant connect to machine.",
+                body: err.data.errors || "Error"
+              };
+
+              $scope.modal = $uibModal.open({
+                templateUrl: 'dynexp/thermal_consistency/views/modal-error.html',
+                scope: scope
+              });
+            }
+          }
+        });
+
         function checkExperimentStatus() {
-          Experiment.get($scope.experiment.id).then(function(resp) {
+          Experiment.get(cal_exp_id).then(function(resp) {
             $scope.experiment = resp.data.experiment;
             if ($scope.experiment.completed_at) {
-              $state.go('thermal_consistency.analyze', { id: $scope.experiment.id });
+              $state.go('thermal_consistency.analyze', { id: cal_exp_id });
             } else {
               $timeout(checkExperimentStatus, 1000);
             }
           });
         }
 
-        $scope.checkMachineStatus = function() {
-          Status
-            .fetch()
-            .then(function(deviceStatus) {
+        $scope.checkMachineStatus = function(deviceStatus) {
+            current_exp_id = $scope.experiment ? $scope.experiment.id : null;
+            cal_exp_id = (!cal_exp_id) ? current_exp_id : cal_exp_id;
+            var running_exp_id = deviceStatus.experiment_controller.experiment ? deviceStatus.experiment_controller.experiment.id : null;
+            var is_current_exp = (running_exp_id !== null) && parseInt(current_exp_id) === parseInt(running_exp_id);
+
             // Incase connected
             if ($scope.modal) {
               $scope.modal.close();
@@ -106,39 +140,15 @@
             } else {
               $scope.error = false;
             }
-          }, function(err) {
-            // Error
-            $scope.error = true;
-            $scope.lidMessage = "Cant connect to machine.";
-
-            if (err.status === 500) {
-
-              if (!$scope.modal) {
-                var scope = $rootScope.$new();
-                scope.message = {
-                  title: "Cant connect to machine.",
-                  body: err.data.errors || "Error"
-                };
-
-                $scope.modal = $uibModal.open({
-                  templateUrl: 'dynexp/thermal_consistency/views/modal-error.html',
-                  scope: scope
-                });
-              }
-            }
-          });
-
-          $scope.timeout = $timeout($scope.checkMachineStatus, 1000);
         };
-
-        $scope.checkMachineStatus();
 
         $scope.analyzeExperiment = function() {
           $scope.analyzing = true;
+          cal_exp_id = $stateParams.id;
           if (!$scope.analyzedExp) {
-            getExperiment($stateParams.id, function(exp) {
+            getExperiment(cal_exp_id, function(exp) {
               if (exp.completion_status === 'success') {
-                Experiment.analyze($stateParams.id)
+                Experiment.analyze(cal_exp_id)
                   .then(function(resp) {
                     console.log(resp);
                     if (resp.status == 200) {

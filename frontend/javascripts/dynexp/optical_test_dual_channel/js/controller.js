@@ -42,7 +42,11 @@
         $scope.created = false;
         $scope.CONSTANTS = Constants;
 
+        var current_exp_id = 0;
+        var cal_exp_id = 0;
+
         $scope.$on('status:data:updated', function(e, data, oldData) {
+          checkMachineStatus(data);
           if (!data) return;
           if (!data.experiment_controller) return;
           if (!oldData) return;
@@ -63,73 +67,80 @@
             }
           }
 
+          current_exp_id = $scope.experiment ? $scope.experiment.id : null;
+          cal_exp_id = (!cal_exp_id) ? current_exp_id : cal_exp_id;
+          var running_exp_id = oldData.experiment_controller.experiment ? oldData.experiment_controller.experiment.id : null;
+          var is_current_exp = (parseInt(current_exp_id) === parseInt(running_exp_id)) && (running_exp_id !== null);
+
           if (data.experiment_controller.experiment && !$scope.experiment) {
             Experiment.get(data.experiment_controller.experiment.id).then(function(resp) {
               $scope.experiment = resp.data.experiment;
             });
           }
 
-          if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle')) {
+          if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle') && is_current_exp) {
             // experiment is complete
             checkExperimentStatus();
           }
         });
 
+        $scope.$on('status:data:error', function(e, data, oldData) {
+          var err = data;
+          // Error
+          $scope.errors.OFFLINE = "Can't connect to the machine.";
+
+          if (err.status === 500) {
+
+            if (!errorModal) {
+              var scope = $rootScope.$new();
+              scope.message = {
+                title: "Cant connect to machine.",
+                body: err.data.errors || "Error"
+              };
+
+              errorModal = $uibModal.open({
+                templateUrl: 'dynexp/optical_test_dual_channel/views/modal-error.html',
+                scope: scope
+              });
+            }
+          }
+        });
+
         function checkExperimentStatus() {
-          Experiment.get($scope.experiment.id).then(function(resp) {
+          Experiment.get(cal_exp_id).then(function(resp) {
             $scope.experiment = resp.data.experiment;
             if ($scope.experiment.completed_at) {
-              $state.go('optical_test_2ch.page-9', { id: $scope.experiment.id });
+              $state.go('optical_test_2ch.page-9', { id: cal_exp_id });
             } else {
               $timeout(checkExperimentStatus, 1000);
             }
           });
         }
 
-        function checkMachineStatus() {
-          Status
-            .fetch()
-            .then(function(deviceStatus) {
-              // In case connected
+        function checkMachineStatus(deviceStatus) {
+          // In case connected
+          current_exp_id = $scope.experiment ? $scope.experiment.id : null;
+          cal_exp_id = (!cal_exp_id) ? current_exp_id : cal_exp_id;
+          var running_exp_id = deviceStatus.experiment_controller.experiment ? deviceStatus.experiment_controller.experiment.id : null;
+          var is_current_exp = (running_exp_id !== null) && parseInt(current_exp_id) === parseInt(running_exp_id);
 
-              if (errorModal) {
-                errorModal.close();
-                errorModal = null;
-              }
+          if (errorModal) {
+            errorModal.close();
+            errorModal = null;
+          }
 
-              if ($scope.errors.OFFLINE) {
-                delete $scope.errors.OFFLINE;
-              }
+          if ($scope.errors.OFFLINE) {
+            delete $scope.errors.OFFLINE;
+          }
 
-              if (deviceStatus.optics.lid_open === "true" || deviceStatus.optics.lid_open === true) { // lid is open
-                $scope.errors.LID_OPEN = "Close lid to begin.";
-              } else {
-                delete $scope.errors.LID_OPEN;
-              }
-            })
-            .catch(function(err) {
-              // Error
-              $scope.errors.OFFLINE = "Can't connect to the machine.";
-
-              if (err.status === 500) {
-
-                if (!errorModal) {
-                  var scope = $rootScope.$new();
-                  scope.message = {
-                    title: "Cant connect to machine.",
-                    body: err.data.errors || "Error"
-                  };
-
-                  errorModal = $uibModal.open({
-                    templateUrl: 'dynexp/optical_test_dual_channel/views/modal-error.html',
-                    scope: scope
-                  });
-                }
-              }
-            });
+          if (deviceStatus.optics.lid_open === "true" || deviceStatus.optics.lid_open === true) { // lid is open
+            $scope.errors.LID_OPEN = "Close lid to begin.";
+          } else {
+            delete $scope.errors.LID_OPEN;
+          }
         }
 
-        checkMachineStatusInterval = $interval(checkMachineStatus, 1000);
+        // checkMachineStatusInterval = $interval(checkMachineStatus, 1000);
 
         $scope.lidHeatPercentage = function() {
           if (!$scope.experiment) return 0;

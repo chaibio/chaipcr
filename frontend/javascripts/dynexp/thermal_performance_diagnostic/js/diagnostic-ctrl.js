@@ -38,12 +38,14 @@
         var temperatureLogs = [];
         var tempPoll = null;
         var animation;
+        var current_exp_id = 0;
+        var cal_exp_id = $params.id;
 
         function fetchTempLogs() {
           if (!fetchingTemps) {
             fetchingTemps = true;
             var last_elapsed_time = temperatureLogs[temperatureLogs.length - 1] ? temperatureLogs[temperatureLogs.length - 1].temperature_log.elapsed_time : -1;
-            Experiment.getTemperatureData($scope.experiment.id, { starttime: last_elapsed_time * 1 + 1 })
+            Experiment.getTemperatureData(cal_exp_id, { starttime: last_elapsed_time * 1 + 1 })
               .then(function(resp) {
                 if (resp.data.length === 0) return;
                 var data = resp.data;
@@ -119,7 +121,7 @@
 
         function analyzeExperiment() {
           if (!$scope.analyzedExp) {
-            Experiment.analyze($params.id).then(function(resp) {
+            Experiment.analyze(cal_exp_id).then(function(resp) {
                 if (resp.status == 200) {
                   $scope.analyzedExp = resp.data;
                   console.log($scope.analyzedExp);
@@ -140,9 +142,7 @@
           }
         }
 
-        $scope.$watch(function() {
-          return Status.getData();
-        }, function(data, oldData) {
+        $scope.$on('status:data:updated', function(e, data, oldData) {
           var exp, newState, oldState, ref, ref1;
           if (!data) {
             return;
@@ -156,10 +156,14 @@
           newState = data.experiment_controller.machine.state;
           oldState = oldData !== null ? (ref = oldData.experiment_controller) !== null ? (ref1 = ref.machine) !== null ? ref1.state : void 0 : void 0 : void 0;
           $scope.status = newState === 'running' ? data.experiment_controller.machine.thermal_state : newState;
-          $timeout(function() {
-            $scope.heat_block_temp = data.heat_block.temperature;
-            $scope.lid_temp = data.lid.temperature;
-          }, 2500);
+
+          // $timeout(function() {
+          //   $scope.heat_block_temp = data.heat_block.temperature;
+          //   $scope.lid_temp = data.lid.temperature;
+          // }, 2500);
+
+          $scope.heat_block_temp = data.heat_block.temperature;
+          $scope.lid_temp = data.lid.temperature;
           if (data.experiment_controller.experiment) $scope.elapsedTime = data.experiment_controller.experiment.run_duration;
 
           if (!$scope.experiment) {
@@ -190,10 +194,10 @@
               }
             });
           }
-        });
+        }, true);
 
         function checkExperimentStatus() {
-          Experiment.get($scope.experiment.id).then(function(resp) {
+          Experiment.get(cal_exp_id).then(function(resp) {
             $scope.experiment = resp.data.experiment;
             if ($scope.experiment.completed_at) {
               if ($scope.experiment.completion_status === 'success') {
@@ -207,7 +211,7 @@
 
         $scope.stopExperiment = function() {
           Experiment.stopExperiment({
-            id: $scope.experiment.id
+            id: cal_exp_id
           }).then(function() {
             $state.go('settings.root');
           });
@@ -215,7 +219,6 @@
 
         getExperiment(function(resp) {
           $scope.experiment = resp.experiment;
-          console.log($scope.experiment);
         });
 
         $scope.$on('$destroy', function() {
