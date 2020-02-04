@@ -17,7 +17,7 @@
           <div class="info-title">Avg. Ramp Rate:</div>
           <div class="info-details"><b>{{ analyzedExp.Heating.AvgRampRate[0] | round:2 }}</b> &deg;C/s</div>
           <div class="img-button">
-            <img ng-src="{{ analyzedExp.Heating.AvgRampRate[1] ? '/images/dynexp/diagnostic-wizard-check-button.png': '/images/dynexp/diagnostic-wizard-x-button.png' }}">
+            <img ng-src="{{ analyzedExp.Heating.AvgRampRate[1] ? '/images/dynexp/diagnostic-wizard-check-button.png': ((analyzedExp.Heating.AvgRampRate[1] == undefined) ? '' : '/images/dynexp/diagnostic-wizard-x-button.png') }}">
           </div>
         </div>
         <div class="block-text">
@@ -29,7 +29,7 @@
           <div class="info-title">Total Time:</div>
           <div class="info-details"><b>{{analyzedExp.Heating.TotalTime[0]/1000 | secondsDisplay:'display2'}}</b> s</div>
           <div class="img-button">
-            <img ng-src="{{ analyzedExp.Heating.TotalTime[1] ? '/images/dynexp/diagnostic-wizard-check-button.png' : '/images/dynexp/diagnostic-wizard-x-button.png' }}">
+            <img ng-src="{{ analyzedExp.Heating.TotalTime[1] ? '/images/dynexp/diagnostic-wizard-check-button.png' : ((analyzedExp.Heating.TotalTime[1] == undefined) ? '' : '/images/dynexp/diagnostic-wizard-x-button.png') }}">
           </div>
         </div>
         <div class="block-text">
@@ -42,7 +42,7 @@
           <div class="info-title">Max. Block &Delta;T:</div>
           <div class="info-details"><b>{{analyzedExp.Heating.MaxBlockDeltaT[0] | round:2}}</b> &deg;C</div>
           <div class="img-button">
-            <img ng-src="{{ analyzedExp.Heating.MaxBlockDeltaT[1] ? '/images/dynexp/diagnostic-wizard-check-button.png' : '/images/dynexp/diagnostic-wizard-x-button.png' }}">
+            <img ng-src="{{ analyzedExp.Heating.MaxBlockDeltaT[1] ? '/images/dynexp/diagnostic-wizard-check-button.png' : ((analyzedExp.Heating.MaxBlockDeltaT[1] == undefined) ? '' : '/images/dynexp/diagnostic-wizard-x-button.png') }}">
           </div>
         </div>
         <div class="block-text">
@@ -60,7 +60,7 @@
           <div class="info-title">Avg. Ramp Rate:</div>
           <div class="info-details"><b>{{ analyzedExp.Cooling.AvgRampRate[0] | round:2 }}</b> &deg;C/s</div>
           <div class="img-button">
-            <img ng-src="{{ analyzedExp.Cooling.AvgRampRate[1] ? '/images/dynexp/diagnostic-wizard-check-button.png': '/images/dynexp/diagnostic-wizard-x-button.png' }}">
+            <img ng-src="{{ analyzedExp.Cooling.AvgRampRate[1] ? '/images/dynexp/diagnostic-wizard-check-button.png': ((analyzedExp.Cooling.AvgRampRate[1] == undefined) ? '' : '/images/dynexp/diagnostic-wizard-x-button.png') }}">
           </div>
         </div>
         <div class="block-text">
@@ -72,7 +72,7 @@
           <div class="info-title">Total Time:</div>
           <div class="info-details"><b>{{analyzedExp.Cooling.TotalTime[0]/1000 | secondsDisplay:'display2'}}</b> s</div>
           <div class="img-button">
-            <img ng-src="{{ analyzedExp.Cooling.TotalTime[1] ? '/images/dynexp/diagnostic-wizard-check-button.png' : '/images/dynexp/diagnostic-wizard-x-button.png' }}">
+            <img ng-src="{{ analyzedExp.Cooling.TotalTime[1] ? '/images/dynexp/diagnostic-wizard-check-button.png' : ((analyzedExp.Cooling.TotalTime[1] == undefined) ? '' : '/images/dynexp/diagnostic-wizard-x-button.png') }}">
           </div>
         </div>
         <div class="block-text">
@@ -85,7 +85,7 @@
           <div class="info-title">Max. Block &Delta;T:</div>
           <div class="info-details"><b>{{analyzedExp.Cooling.MaxBlockDeltaT[0] | round:2 }}</b> &deg;C</div>
           <div class="img-button">
-            <img ng-src="{{ analyzedExp.Cooling.MaxBlockDeltaT[1] ? '/images/dynexp/diagnostic-wizard-check-button.png' : '/images/dynexp/diagnostic-wizard-x-button.png' }}">
+            <img ng-src="{{ analyzedExp.Cooling.MaxBlockDeltaT[1] ? '/images/dynexp/diagnostic-wizard-check-button.png' : ((analyzedExp.Cooling.MaxBlockDeltaT[1] == undefined) ? '' : '/images/dynexp/diagnostic-wizard-x-button.png') }}">
           </div>
         </div>
         <div class="block-text">
@@ -103,7 +103,7 @@
           <div class="info-title">Heating Rate:</div>
           <div class="info-details"><b>{{ analyzedExp.Lid.HeatingRate[0] | round:2}}</b> &deg;C/s</div>
           <div class="img-button">
-            <img ng-src="{{ analyzedExp.Lid.HeatingRate[1] ? '/images/dynexp/diagnostic-wizard-check-button.png': '/images/dynexp/diagnostic-wizard-x-button.png' }}">
+            <img ng-src="{{ analyzedExp.Lid.HeatingRate[1] ? '/images/dynexp/diagnostic-wizard-check-button.png': ((analyzedExp.Lid.HeatingRate[1] == undefined) ? '' : '/images/dynexp/diagnostic-wizard-x-button.png') }}">
           </div>
         </div>
         <div class="block-text">
@@ -115,7 +115,7 @@
           <div class="info-title">Time to Heat:</div>
           <div class="info-details"><b>{{analyzedExp.Lid.TotalTime[0]/1000 | secondsDisplay:'display2'}}</b> s</div>
           <div class="img-button">
-            <img ng-src="{{ analyzedExp.Lid.TotalTime[1] ? '/images/dynexp/diagnostic-wizard-check-button.png' : '/images/dynexp/diagnostic-wizard-x-button.png' }}">
+            <img ng-src="{{ analyzedExp.Lid.TotalTime[1] ? '/images/dynexp/diagnostic-wizard-check-button.png' : ((analyzedExp.Lid.TotalTime[1] == undefined) ? '' : '/images/dynexp/diagnostic-wizard-x-button.png') }}">
           </div>
         </div>
         <div class="block-text">

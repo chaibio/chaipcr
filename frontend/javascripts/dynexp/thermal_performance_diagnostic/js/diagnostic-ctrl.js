@@ -38,7 +38,7 @@
         var temperatureLogs = [];
         var tempPoll = null;
         var animation;
-        var current_exp_id = 0;
+        var current_exp_id = $params.id;
         var cal_exp_id = $params.id;
 
         function fetchTempLogs() {
@@ -124,7 +124,6 @@
             Experiment.analyze(cal_exp_id).then(function(resp) {
                 if (resp.status == 200) {
                   $scope.analyzedExp = resp.data;
-                  console.log($scope.analyzedExp);
                 } else if (resp.status == 202) {
                   $timeout(analyzeExperiment, 1000);
                 }
@@ -174,23 +173,20 @@
               }
               if (resp.experiment.started_at && resp.experiment.completed_at) {
                 fetchTempLogs();
-                if (resp.experiment.completion_status === 'success') analyzeExperiment();
-                Status.stopSync();
+                if (resp.experiment.completion_status === 'success') analyzeExperiment();                
               }
             });
           }
           if (newState === 'idle' && oldState !== 'idle' && $params.id) {
-            stopPolling();
-            Status.stopSync();
+            stopPolling();            
             checkExperimentStatus();
           }
 
-          if (newState === 'idle' && oldState == 'idle' && $params.id) {
+          if (newState === 'idle' && oldState == 'idle' && $params.id && tempPoll) {
             getExperiment(function(resp) {
               $scope.experiment = resp.experiment;
               if ($scope.experiment.completion_status === 'failure') {
-                stopPolling();
-                Status.stopSync();
+                stopPolling();                
               }
             });
           }
@@ -217,9 +213,9 @@
           });
         };
 
-        getExperiment(function(resp) {
-          $scope.experiment = resp.experiment;
-        });
+        // getExperiment(function(resp) {
+        //   $scope.experiment = resp.experiment;
+        // });
 
         $scope.$on('$destroy', function() {
           stopPolling();

@@ -72,10 +72,11 @@
             $scope.experiment = resp.data.experiment;
 
             var startPromise = Experiment.startExperiment(resp.data.experiment.id);
+            var newExpId = resp.data.experiment.id;
 
             startPromise.then(function() {
               $state.go('thermal_performance_diagnostic.diagnostic', {
-                id: resp.data.experiment.id
+                id: newExpId
               });
             });
 

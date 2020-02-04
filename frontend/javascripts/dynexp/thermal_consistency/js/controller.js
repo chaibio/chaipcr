@@ -84,8 +84,6 @@
             });
           }
 
-          if ($state.current.name === 'analyze') Status.stopSync();
-
         }, true);
 
         $scope.$on('status:data:error', function(e, data, oldData) {
