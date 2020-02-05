@@ -364,7 +364,7 @@ function amp_fit_model(
 	pred_values=[funcs_pred[:f](i,quant_coefs...) for i in 1:length(blsub_fluos)]
 	error=[abs(ff[1]-ff[2]) for ff in zip(pred_values,blsub_fluos)]
 	delta=abs(maximum(vcat(pred_values,blsub_fluos)))+abs(minimum(vcat(pred_values,blsub_fluos)))
-	criteria_norm_err=sum(error)/(delta*length(blsub_fluos))<0.025
+	criteria_norm_err=sum(error)/(delta*length(blsub_fluos))<0.03
 
 
 	dr1_values=[funcs_pred[:dr1](i,quant_coefs...) for i in 1:i.num_cycles]
