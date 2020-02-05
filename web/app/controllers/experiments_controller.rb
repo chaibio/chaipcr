@@ -991,7 +991,7 @@ class ExperimentsController < ApplicationController
   api :GET, "/experiments/:id/export", "zip temperature, amplification and meltcurv csv files"
   def export
     t = Tempfile.new("tmpexport_#{request.remote_ip}")
-    experiment_dir = "qpcr_experiment_#{(@experiment)? @experiment.name : "null"}"
+    experiment_dir = "qpcr_experiment_#{(@experiment)? @experiment.name.sub('/', '-') : "null"}"
     begin
       Zip::OutputStream.open(t.path) do |out|
         if request.method != "HEAD"
