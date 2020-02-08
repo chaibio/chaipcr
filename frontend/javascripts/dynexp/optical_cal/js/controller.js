@@ -116,6 +116,7 @@
 
         current_exp_id = $scope.experiment ? $scope.experiment.id : null;
         cal_exp_id = (!cal_exp_id) ? current_exp_id : cal_exp_id;
+        $scope.experiment_id = cal_exp_id;
         var running_exp_id = oldData.experiment_controller.experiment ? oldData.experiment_controller.experiment.id : null;
         var is_current_exp = (parseInt(current_exp_id) === parseInt(running_exp_id)) && (running_exp_id !== null);
 

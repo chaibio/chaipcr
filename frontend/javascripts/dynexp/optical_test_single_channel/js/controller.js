@@ -24,6 +24,7 @@
         $('.content').addClass('analyze');
         var current_exp_id = 0;
         var cal_exp_id = 0;
+        $scope.experiment_id = 0;
 
 
         $scope.$on('$destroy', function () {
@@ -58,6 +59,7 @@
 
           current_exp_id = $scope.experiment ? $scope.experiment.id : null;
           cal_exp_id = (!cal_exp_id) ? current_exp_id : cal_exp_id;
+          $scope.experiment_id = cal_exp_id;
           var running_exp_id = oldData.experiment_controller.experiment ? oldData.experiment_controller.experiment.id : null;
           var is_current_exp = (parseInt(current_exp_id) === parseInt(running_exp_id)) && (running_exp_id !== null);
 
@@ -148,6 +150,7 @@
                     if (resp.status == 200) {
                       $scope.analyzedExp = resp.data.optical_data;
                       //$scope.tm_values = GlobalService.getTmValues(resp.data);
+                      $scope.experiment_id = cal_exp_id;
                       $scope.analyzing = false;
                     } else if (resp.status == 202) {
                       $timeout($scope.analyzeExperiment, 1000);
