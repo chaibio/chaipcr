@@ -61,7 +61,9 @@ void Lid::processOutput()
     }
     else if (ExperimentController::getInstance()->machineState() == ExperimentController::CompleteMachineState)
     {
-        if (ExperimentController::getInstance()->experiment().protocol()->currentStep()->temperature() <= _completionTurnOffTemp)
+        Experiment experiment = ExperimentController::getInstance()->experiment();
+
+        if (experiment.protocol() && experiment.protocol()->currentStep() && experiment.protocol()->currentStep()->temperature() <= _completionTurnOffTemp)
             setEnableMode(false);
     }
 }
