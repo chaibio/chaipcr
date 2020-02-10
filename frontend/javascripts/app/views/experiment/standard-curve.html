@@ -203,12 +203,10 @@ limitations under the License.
               <th class="B2-M-Amplification" style="text-align: center; width: 50px;">Type</th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; width: 20%;">Target</th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; min-width: 40px;" ng-class="{'channel-1': color_by === 'channel'}">
-                <span ng-if="is_dual_channel">C<sub>q</sub></span>
-                <span ng-if="!is_dual_channel">C<sub>q</sub></span>
+                <span>C<sub>q</sub></span>
               </th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; min-width: 45px;" ng-class="{'channel-2': color_by === 'channel'}">
-                <span ng-if="is_dual_channel" >C<sub>q</sub> M</span>
-                <span ng-if="!is_dual_channel" >C<sub>q</sub> M</span>
+                <span>C<sub>q</sub> M</span>
               </th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; min-width: 40px;">Qty</th>
               <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; min-width: 55px;">Qty M</th>
@@ -283,16 +281,13 @@ limitations under the License.
                 </span>
               </td>
               <td class="B2-Amplification" style="text-align: left" ng-click="onSelectRow(well_item, $index)">
-                <span class="B2-Amplification width1" ng-if="is_dual_channel">
+                <span class="B2-Amplification width1">
                   <span class="B2-Amplification" ng-show="well_item.mean_cq > 0">
                     {{well_item.mean_cq | round:2}}
                   </span>
                   <span class="B2-Amplification" ng-show="well_item.mean_cq <= 0">
                     <span class="B2-Amplification dummy-placeholder">&nbsp;</span>
                   </span>
-                </span>
-                <span class="B2-Amplification width1" ng-if="!is_dual_channel">
-                  <span class="B2-Amplification dummy-placeholder"></span>
                 </span>
               </td>
               <td class="B2-Amplification" style="text-align: left" ng-click="onSelectRow(well_item, $index)">
