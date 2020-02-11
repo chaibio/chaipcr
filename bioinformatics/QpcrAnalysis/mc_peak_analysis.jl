@@ -48,6 +48,7 @@ function mc_peak_analysis(
         if i.auto_span_smooth
             info(logger, "automatic selection of `span_smooth`...")
             calc_span_smooth(fu_rle())
+
         else
             info(logger, "no automatic selection, use span_smooth_default " *
                 string(i.span_smooth_default) * " as `span_smooth`")
@@ -127,6 +128,7 @@ function mc_peak_analysis(
     "Truncate elements in a vector to the length of the shortest element."
     shorten(x) =
         x |> mold(index(x |> mold(length) |> minimum |> from(1)))
+
 
     "Model fluorescence as a cubic spline function of temperature using the Dierckx
     Fortran library. The default parameter `s = 0.0` interpolates without smoothing."
@@ -265,6 +267,7 @@ function mc_peak_analysis(
     ## trapezium-shaped baseline area elevated from x-axis
     "Calculate the area of the peak above its baseline."
     @inline function calc_area(peak_bounds_idc ::Tuple{Int_T, Int_T})
+
         #
         area_func(temp_lo ::Real, temp_hi ::Real) =
             -sum(negderiv_smu[[peak_bounds_idc...]]) * 0.5 * (temp_hi - temp_lo) -
@@ -433,6 +436,7 @@ function mc_peak_analysis(
                     right_nadd==0 && sn_idc_n[2][end]>sn_idc_summit ? flag=false:flag=true
                 end
             end
+
             if left_nadd==0
                 left_nadd=sn_idc_n[2][1]
             else
