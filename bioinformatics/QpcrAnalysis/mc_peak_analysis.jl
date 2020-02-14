@@ -48,7 +48,6 @@ function mc_peak_analysis(
         if i.auto_span_smooth
             info(logger, "automatic selection of `span_smooth`...")
             calc_span_smooth(fu_rle())
-
         else
             info(logger, "no automatic selection, use span_smooth_default " *
                 string(i.span_smooth_default) * " as `span_smooth`")
@@ -129,7 +128,6 @@ function mc_peak_analysis(
     shorten(x) =
         x |> mold(index(x |> mold(length) |> minimum |> from(1)))
 
-
     "Model fluorescence as a cubic spline function of temperature using the Dierckx
     Fortran library. The default parameter `s = 0.0` interpolates without smoothing."
     spline_model(x) =
@@ -194,7 +192,7 @@ function mc_peak_analysis(
 
     # half_peak_span_temperature = 0.5 * i.peak_span_temperature
     half_peak_window() =
-        0.5 * (i.peak_span_temperature / temp_span) * len_denser |>
+        0.3 * (i.peak_span_temperature / temp_span) * len_denser |>
             roundoff(0) |> Int_T
 
     "Find the indices of summits and nadirs the smoothed -df/dT data series."
@@ -208,12 +206,30 @@ function mc_peak_analysis(
 
     ## peak constructors used in find_peaks()
     make_peak(::Void) = nothing
-    make_peak(element ::PeakIndicesElement) =
-        Peak(
+    function make_peak(element ::PeakIndicesElement)
+        normalize_range(x ::AbstractArray) =
+            sweep(minimum)(-)(x) |> sweep(maximum)(/)
+        
+        nd_s=normalize_range(negderiv_smu)[element.summit_idx]
+        nd_rn=normalize_range(negderiv_smu)[element.right_nadir_idx]
+        nd_ln=normalize_range(negderiv_smu)[element.left_nadir_idx]
+        t_s=normalize_range(denser_temps)[element.summit_idx]
+        t_rn=normalize_range(denser_temps)[element.right_nadir_idx]
+        t_ln=normalize_range(denser_temps)[element.left_nadir_idx]
+        
+        equal_dist=minimum([element.summit_idx-element.left_nadir_idx,element.right_nadir_idx-element.summit_idx])
+        equal_dist<0?equal_dist=5:nothing
+        nd_rn_=normalize_range(negderiv_smu)[element.summit_idx+equal_dist]
+        nd_ln_=normalize_range(negderiv_smu)[element.summit_idx-equal_dist]
+        t_rn_=normalize_range(denser_temps)[element.summit_idx+equal_dist]
+        t_ln_=normalize_range(denser_temps)[element.summit_idx-equal_dist]
+
+        a_=[(nd_s-nd_ln_)/(t_s-t_ln_),(nd_s-nd_rn_)/(t_rn_-t_s)]
+        return Peak(
             element.summit_idx,                 ## summit_idx
             denser_temps[element.summit_idx],   ## temperature at peak
-            peak_bounds(element) |> calc_area)  ## area
-
+            minimum([nd_s-nd_rn,nd_s-nd_ln])>0.1 && maximum(a_)/minimum(a_)<1.9 ? peak_bounds(element) |> calc_area : 0)  ## area
+    end
     "Iterate over summits and nadirs to create a vector of `Peak`s."
     function find_peaks(
         summit_idc      ::AbstractVector,
@@ -267,7 +283,6 @@ function mc_peak_analysis(
     ## trapezium-shaped baseline area elevated from x-axis
     "Calculate the area of the peak above its baseline."
     @inline function calc_area(peak_bounds_idc ::Tuple{Int_T, Int_T})
-
         #
         area_func(temp_lo ::Real, temp_hi ::Real) =
             -sum(negderiv_smu[[peak_bounds_idc...]]) * 0.5 * (temp_hi - temp_lo) -
@@ -305,6 +320,29 @@ function mc_peak_analysis(
         return num_cross_points
     end ## count_cross_points()
 
+    @inline function count_cross_points_dist()
+        normalize_range(x ::AbstractArray) =
+            sweep(minimum)(-)(x) |> sweep(maximum)(/)
+        num_cross_points = 0
+        cross_loc=zeros(0)
+        negderiv_smu_centred1 = sign(negderiv_smu[1] - negderiv_midrange)
+        local ii = 0
+        while (ii < len_denser)
+            ii += 1
+            negderiv_smu_centred0 = negderiv_smu_centred1
+            negderiv_smu_centred1 = sign(negderiv_smu[ii] - negderiv_midrange)
+            if negderiv_smu_centred0 != negderiv_smu_centred1
+                num_cross_points += 1
+                push!(cross_loc,ii/len_denser)
+            end
+        end ## while
+        if num_cross_points>min(i.max_num_cross_points, len_raw * i.noise_factor) && mean(cross_loc)>0.4 && mean(cross_loc)<0.6
+            println(cross_loc)
+            return true 
+        else
+            return false
+        end
+    end ## count_cross_points()
     split_vector_and_return_larger_quantile(
         x                   ::AbstractVector,
         len                 ::Int_T,      ## == length(x)
@@ -326,8 +364,10 @@ function mc_peak_analysis(
                 peaks_raw[largest_peak].idx, ## index of peak with largest area
                 i.norm_negderiv_quantile) ## larger_normd_qtv_of_two_sides
                     > i.max_norm_negderiv) ||
-            (count_cross_points() > min(i.max_num_cross_points, len_raw * i.noise_factor)) ||
-            (linreg(temps, fluos)[2] >= 0.0) ## slope
+            (count_cross_points() > min(i.max_num_cross_points, len_raw * i.noise_factor)*1.9) ||
+            linreg(temps, fluos)[2] >= 0.0 || normalize_range(negderiv_smu)[1]>0.6 || count_cross_points_dist() || 
+            abs(maximum(negderiv_smu)-minimum(negderiv_smu))<3500
+
             return []
         end ## if
         ## else
@@ -353,6 +393,7 @@ function mc_peak_analysis(
         min_area = areas_raw[largest_peak] * i.min_normalized_area
         largest_idc = area_order[min(i.max_num_peaks + 1, num_peaks) |> from(1)]
         filtered_idc = largest_idc |> sift(idx -> areas_raw[idx] >= min_area)
+        filtered_idc = filtered_idc |> sift(idx_ -> normalize_range(negderiv_smu)[peaks_raw[idx_].idx] > 0.3)
         return filtered_idc
     end ## peak_filter()
 
@@ -436,7 +477,6 @@ function mc_peak_analysis(
                     right_nadd==0 && sn_idc_n[2][end]>sn_idc_summit ? flag=false:flag=true
                 end
             end
-
             if left_nadd==0
                 left_nadd=sn_idc_n[2][1]
             else
@@ -473,7 +513,7 @@ function mc_peak_analysis(
     area_order = sortperm(areas_raw, rev = true)
     peaks_filtered = peaks_raw[peak_filter()]
     sort!(peaks_filtered,by=x->negderiv_smu[x.idx],rev=true)
-    length(peaks_filtered)>i.max_num_peaks ? peaks_filtered=peaks_filtered[1:i.max_num_peaks] : nothing
+    length(peaks_filtered)>i.max_num_peaks?peaks_filtered=peaks_filtered[1:i.max_num_peaks]:nothing
     return output_type == McPeakLongOutput ?
         McPeakLongOutput(
             i.reporting(observed_data),
