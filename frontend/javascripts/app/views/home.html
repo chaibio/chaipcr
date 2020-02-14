@@ -61,18 +61,22 @@
         <div class="exp-list-container" full-height force="true" doc="true" offset="(64 + 37)">
           <div ng-repeat="exp in experiments " class="ovtrunc home-page-exp-tile">
             <div ng-mouseenter="mouseOver = true" class="home-page-tile-text ovtrunc" ng-mouseleave="mouseOver = false" ng-class="{'home-page-tile-text': true, 'home-page-tile-text-hover': mouseOver && !deleteMode}" ng-click="HomeCtrl.openExperiment(exp.experiment)">
-              <!--<a ng-if="!exp.experiment.started_at" href="/#/experiments/{{exp.experiment.id}}/run-experiment?chart=amplification">-->
-              <div class="experiment-links">
-                <div class="home-page-exp-name B1B">
-                  {{exp.experiment.name}}
+              <a class="experiment-link" href="{{
+                (state.experiment_controller.machine.state == 'running' && exp.experiment.id == state.experiment_controller.experiment.id) ?   (    exp.experiment.type != 'test_kit' ?       '/#/experiments/' + exp.experiment.id + '/run-experiment?chart=amplification' :       '/#/dynexp/pika-test/exp-running/' + exp.experiment.id  ) :   (    exp.experiment.type != 'test_kit' ?       (        exp.experiment.started_at ?           '/#/experiments/' + exp.experiment.id + '/run-experiment?chart=amplification' :           '/#/edit-protocol/' + exp.experiment.id      ) :       (        !exp.experiment.started_at ?           '/#/dynexp/pika-test/setWellsA/' + exp.experiment.id :           (            !exp.experiment.started_at && !exp.experiment.completed_at ?               '/#/dynexp/pika-test/results/' + exp.experiment.id :               '/#/dynexp/pika-test/exp-running/' + exp.experiment.id          )      )  )
+
+              }}">
+                <div class="experiment-links">
+                  <div class="home-page-exp-name B1B">
+                    {{exp.experiment.name}}
+                  </div>
+                  <span class="home-page-exp-created-at B2" ng-show="!exp.experiment.started_at && exp.experiment.time_valid">Created {{exp.experiment.created_at}}, #{{exp.experiment.id}}</span>
+                  <span class="home-page-exp-created-at B2" ng-show="!exp.experiment.started_at && !exp.experiment.time_valid">Created, #{{exp.experiment.id}}</span>
+                  <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at && exp.experiment.time_valid">Run {{exp.experiment.started_at}}, #{{exp.experiment.id}}</span>
+                  <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at && !exp.experiment.time_valid">Run previously, #{{exp.experiment.id}}</span>
+                  <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && !exp.experiment.completed_at && (exp.experiment.id!=current_experiment_id || machine_state == 'idle')">Run {{exp.experiment.started_at}}, #{{exp.experiment.id}}</span>
+                  <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && !exp.experiment.completed_at && exp.experiment.id==current_experiment_id && machine_state != 'idle'">IN PROGRESS&nbsp;<ellipsis-animated></ellipsis-animated></span>
                 </div>
-                <span class="home-page-exp-created-at B2" ng-show="!exp.experiment.started_at && exp.experiment.time_valid">Created {{exp.experiment.created_at}}, #{{exp.experiment.id}}</span>
-                <span class="home-page-exp-created-at B2" ng-show="!exp.experiment.started_at && !exp.experiment.time_valid">Created, #{{exp.experiment.id}}</span>
-                <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at && exp.experiment.time_valid">Run {{exp.experiment.started_at}}, #{{exp.experiment.id}}</span>
-                <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at && !exp.experiment.time_valid">Run previously, #{{exp.experiment.id}}</span>
-                <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && !exp.experiment.completed_at && (exp.experiment.id!=current_experiment_id || machine_state == 'idle')">Run {{exp.experiment.started_at}}, #{{exp.experiment.id}}</span>
-                <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && !exp.experiment.completed_at && exp.experiment.id==current_experiment_id && machine_state != 'idle'">IN PROGRESS&nbsp;<ellipsis-animated><ellipsis-animated/></span>                
-              </div>
+              </a>
 <!--               <a class="experiment-links" ng-if="!exp.experiment.started_at && exp.experiment.type === 'test_kit'" ui-sref="pika_test.setWellsA({id: exp.experiment.id})">
                 <div class="home-page-exp-name B1B">
                   {{exp.experiment.name}}

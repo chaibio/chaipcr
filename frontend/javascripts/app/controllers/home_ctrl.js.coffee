@@ -36,7 +36,7 @@ window.ChaiBioTech.ngApp
     $scope.experiments = null
     $scope.deleteMode = false
     $scope.enterHome = true
-
+    $scope.state = ''
 
     User.getCurrent().then (resp) ->
       $scope.user = resp.data.user
@@ -45,28 +45,14 @@ window.ChaiBioTech.ngApp
       if !$scope.enterHome
         @fetchExperiments()
 
-    # $scope.$on '.home-page-exp-tile', =>
-    #   alert($(".home-page-exp-tile").width());
-
-    # getWidth = ->
-    #   if($(".home-page-exp-tile").width())
-    #     alert($(".home-page-exp-tile").width())
-    #     width = $(".home-page-exp-tile").width()
-    #     $(".home-page-del").css({
-    #       'left': width - 72+'px',
-    #       'transition': 'left .3s'
-    #     })
-
-    #   else
-    #     $timeout ->
-    #       getWidth()
-    #     , 2000
-
-    #getWidth()
-
     @fetchExperiments = ->
       Experiment.query (experiments) ->
         $scope.experiments = experiments
+        $timeout ->
+          $('a.experiment-link').unbind 'click'
+          $('a.experiment-link').on 'click', (e)->
+            e.preventDefault()
+        , 500
 
     if $scope.enterHome
       @fetchExperiments()
@@ -104,12 +90,6 @@ window.ChaiBioTech.ngApp
         $window.alert resp.data.experiment?.errors?.base || 'Unable to delete experiment.'
         data.del = false
 
-    # @expName = (exp_name, truncate_length) ->
-    #   NAME_LENGTH = parseInt(truncate_length)
-    #   return if !exp_name
-    #   return exp_name if exp_name.length <= NAME_LENGTH
-    #   return exp_name.substring(0, NAME_LENGTH-2)+'...'
-
     $scope.machine_state = 'idle' #by default
     $scope.current_experiment_id = 0
     $scope.$on 'status:data:updated', (e, data, oldData) ->
@@ -120,18 +100,14 @@ window.ChaiBioTech.ngApp
 
     @openExperiment = (exp) ->
       if not $scope.deleteMode
-        state = Status.getData();
-        if state.experiment_controller.machine.state == 'running' and exp.id == state.experiment_controller.experiment.id
+        $scope.state = Status.getData()
+        if $scope.state.experiment_controller.machine.state == 'running' and exp.id == $scope.state.experiment_controller.experiment.id
           if exp.type isnt 'test_kit'
             $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
           else
             $state.go 'pika_test.exp-running', id: exp.id
 
         else
-          if exp.started_at
-            $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
-          else
-            $state.go 'edit-protocol', {id: exp.id}
           if exp.type isnt 'test_kit'
             if exp.started_at
               $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
@@ -144,8 +120,5 @@ window.ChaiBioTech.ngApp
               $state.go('pika_test.results', id: exp.id)
             else
               $state.go 'pika_test.exp-running', id: exp.id
-
-
     return
-
 ]

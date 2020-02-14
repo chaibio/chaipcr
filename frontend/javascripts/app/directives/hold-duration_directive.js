@@ -70,6 +70,17 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
           }
         });
 
+        scope.$watch("shown", function(val, oldVal) {
+          if(oldVal){
+            var oldTimeVal = TimeService.convertToSeconds(oldVal);
+            if(!isNaN(oldTimeVal) && Number(oldTimeVal)) {
+              editValue = oldTimeVal;
+            }
+          } else{
+            editValue = (val) ? TimeService.convertToSeconds(val) : 0;
+          }
+        });
+
         scope.ifLastStep = function() {
 
           var myCircle = scope.$parent.fabricStep.circle;          
@@ -79,16 +90,12 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
         scope.editAndFocus = function(className) {
 
           scope.edit = true;
-          editValue = TimeService.convertToSeconds(scope.shown);
         };
 
         scope.save = function() {
 
           scope.edit = false;
           var newHoldTime = TimeService.convertToSeconds(scope.shown);
-
-          //console.log(newHoldTime, editValue);
-          /*if((newHoldTime || newHoldTime === 0) && editValue != newHoldTime) {*/
           
           if(!isNaN(newHoldTime) && scope.reading != newHoldTime) {
 
@@ -103,8 +110,8 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
                   });
                 });
               } else {
-                scope.reading = newHoldTime;
                 alerts.showMessage(alerts.holdDurationZeroWarning, scope);
+                scope.reading = editValue;
               }
             } else {
               $timeout(function() {
@@ -116,8 +123,6 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
                 });
               });
             }
-
-            editValue = newHoldTime;
           }
           scope.shown = TimeService.newTimeFormatting(scope.reading);
         };

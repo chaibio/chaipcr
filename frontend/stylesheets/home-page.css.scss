@@ -180,6 +180,7 @@
         //width: 200px;
         //height: 20px;
         overflow: hidden;
+        color: #333;
       }
       .text-scroll {
         position: absolute;
@@ -222,6 +223,9 @@
         //text-overflow: ellipsis;
         padding-right: 15px;
         word-wrap: break-word;
+        a{
+          text-decoration: none;
+        }
       }
       .t {
         white-space: nowrap;
