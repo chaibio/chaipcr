@@ -293,17 +293,17 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         # $scope.targetsSet = []
         for i in [0...$scope.targets.length]
           if $scope.targets[i].id
-            target = _.filter $scope.targetsSet, (target) ->
-              target.id is $scope.targets[i].id
-            if !target.length
+            target = _.filter $scope.targetsSet, (item) ->
+              item.id is $scope.targets[i].id
+            if !target.length              
               $scope.targetsSet.push($scope.targets[i])
 
-        for i in [0...$scope.targetsSet.length]
+        for i in [$scope.targetsSet.length-1..0]
           if $scope.targetsSet[i].id
-            target = _.filter $scope.targets, (target) ->
-              target.id is $scope.targetsSet[i].id
+            target = _.filter $scope.targets, (item) ->
+              item.id is $scope.targetsSet[i].id
             if !target.length
-              delete $scope.targetsSet[i]
+              $scope.targetsSet.splice(i, 1)
 
       $scope.updateSamplesSet = ->
         $scope.samplesSet = []

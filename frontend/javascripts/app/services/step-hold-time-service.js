@@ -15,6 +15,10 @@ angular.module("canvasApp").service('stepHoldTimeService', [
             return step.parentStage.nextStage === null && step.nextStep === null;
         };
 
+        this.isCyclingStage = function(step) {
+            return step.parentStage.model.stage_type == 'cycling';
+        };
+
         // Defrag this method.. 
         this.postEdit = function($scope, parent, textObject) {
 
@@ -43,7 +47,7 @@ angular.module("canvasApp").service('stepHoldTimeService', [
 
         this.manageZeroHoldTime = function($scope, parent, newHoldTime, previousHoldTime) {
 
-            if(this.ifLastStep(parent.parent) && ! $scope.step.collect_data) {
+            if(this.ifLastStep(parent.parent) && !this.isCyclingStage(parent.parent) && ! $scope.step.collect_data) {
                 $scope.step.hold_time = newHoldTime;
                 parent.doThingsForLast(newHoldTime, previousHoldTime);
                 this.saveHoldTime($scope);

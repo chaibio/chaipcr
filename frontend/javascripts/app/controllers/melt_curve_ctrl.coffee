@@ -355,6 +355,7 @@ App.controller 'MeltCurveChartCtrl', [
         updateSeries()
 
       isDefaultSwitchDisable = (target)->
+        return true if !target
         if $scope.expTargets.length
           target_item = _.filter $scope.expTargets, (elem) ->
             elem.id is target.id

@@ -82,9 +82,12 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
         });
 
         scope.ifLastStep = function() {
-
           var myCircle = scope.$parent.fabricStep.circle;          
           return myCircle.next === null;
+        };
+
+        scope.isCyclingStage = function() {
+          return scope.$parent.fabricStep.parentStage.model.stage_type == 'cycling';
         };
 
         scope.editAndFocus = function(className) {
@@ -102,7 +105,7 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
             if(Number(newHoldTime) < 0) {
               alerts.showMessage(alerts.noNegativeHold, scope);
             } else if(Number(newHoldTime) === 0 ) {
-              if(scope.ifLastStep() && ! scope.$parent.step.collect_data) {
+              if(scope.ifLastStep() && !scope.isCyclingStage() && !scope.$parent.step.collect_data) {
                 scope.reading = newHoldTime;
                 $timeout(function() {
                   ExperimentLoader.changeHoldDuration(scope.$parent).then(function(data) {
