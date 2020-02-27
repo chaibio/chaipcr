@@ -150,12 +150,12 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
             if !target.length
               $scope.targetsSet.push($scope.targets[i])
 
-        for i in [0...$scope.targetsSet.length]
-          if $scope.targetsSet[i]?.id
-            target = _.filter $scope.targets, (target) ->
-              target.id is $scope.targetsSet[i].id
+        for i in [$scope.targetsSet.length-1..0] by -1
+          if $scope.targetsSet[i].id
+            target = _.filter $scope.targets, (item) ->
+              item.id is $scope.targetsSet[i].id
             if !target.length
-              delete $scope.targetsSet[i]
+              $scope.targetsSet.splice(i, 1)
 
       $scope.$watchCollection 'targetsSetHided', ->        
         updateSeries() if $scope.hasData

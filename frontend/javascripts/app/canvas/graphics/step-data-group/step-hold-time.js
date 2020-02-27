@@ -26,11 +26,22 @@ angular.module("canvasApp").factory('stepHoldTime', [
       this.model = model;
       var that = this;
 
+      this.ifLastStep = function(step) {
+          return step.parentStage.nextStage === null && step.nextStep === null;
+      };
+
+      this.isCyclingStage = function(step) {
+          return step.parentStage.model.stage_type == 'cycling';
+      };
+
       this.render = function() {
 
         this.holdTime = this.model.hold_time;
-
-        this.text = new fabric.IText(stepHoldTimeService.formatHoldTime(this.model.hold_time), {
+        var circleText = stepHoldTimeService.formatHoldTime(this.model.hold_time);
+        if(this.ifLastStep(parent.parent) && !this.isCyclingStage(parent.parent) && !$scope.step.collect_data) {
+          circleText = "∞";
+        }
+        this.text = new fabric.IText(circleText, {
           fill: 'black',
           fontSize: 20,
           top : 0,
