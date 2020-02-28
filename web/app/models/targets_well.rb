@@ -46,7 +46,9 @@ class TargetsWell < ActiveRecord::Base
   
   TYPE_STANDARD = "standard"
   TYPE_UNKNOWN = "unknown"
-
+  TYPE_POSITIVE_CONTROL = "positive_control"
+  TYPE_NEGATIVE_CONTROL = "negative_control"
+  
   scope :for_experiment, lambda {|experiment| where(:well_layout_id=>experiment.well_layout.id)}
 
   scope :with_data, lambda {|experiment, stage|
@@ -68,7 +70,7 @@ class TargetsWell < ActiveRecord::Base
   
   validates_presence_of :well_num
   validates :well_num, :inclusion => {:in=>1..16, :message => "%{value} is not between 1 and 16"}
-  validates :well_type, inclusion: { in: ["positive_control", "negative_control", TYPE_STANDARD, TYPE_UNKNOWN, nil],
+  validates :well_type, inclusion: { in: [TYPE_POSITIVE_CONTROL, TYPE_NEGATIVE_CONTROL, TYPE_STANDARD, TYPE_UNKNOWN, nil],
      message: "'%{value}' is not a valid type" }
 
   validate :validate
@@ -119,7 +121,7 @@ class TargetsWell < ActiveRecord::Base
           end
         end
       end
-      #logger.info("last_target=#{(lasttarget)? lasttarget.id : "nil"}, target=#{(target)? target.id : "nil"} sample=#{(target)? target.sample_id : "nil"} well_type=#{(target)? target.well_type : "nil"} quantity=#{(target)? target.quantity_b : "nil"} replic=#{replic}")
+      #logger.info("last_target=#{(lasttarget)? lasttarget.id : "nil"}, target=#{(target)? target.id : "nil"} sample=#{(target)? target.sample_id : "nil"} well_type=#{(target)? target.well_type : "nil"} quantity=#{(target)? target.quantity_b : "nil"} cq=#{(target)? target.cq : "nil"} replic=#{replic}")
       if replic == true
         if replic_group.empty?
           lasttarget.replic = replic_group_num
@@ -236,7 +238,7 @@ class TargetsWell < ActiveRecord::Base
     if @quantity == nil
       if well_type == TYPE_STANDARD
         @quantity = [quantity_m.to_f, quantity_b.to_i]
-      elsif well_type == TYPE_UNKNOWN
+      elsif well_type == TYPE_UNKNOWN || well_type == TYPE_POSITIVE_CONTROL || well_type == TYPE_NEGATIVE_CONTROL
         if target_equation != nil && target_equation["offset"] != nil && target_equation["slope"] != nil && cq != nil
           quantity_log10 = (cq-target_equation["offset"])/target_equation["slope"]
           quantity_value = 10**quantity_log10
