@@ -38,7 +38,7 @@ angular.module("canvasApp").factory('stepHoldTime', [
 
         this.holdTime = this.model.hold_time;
         var circleText = stepHoldTimeService.formatHoldTime(this.model.hold_time);
-        if(this.ifLastStep(parent.parent) && !this.isCyclingStage(parent.parent) && !$scope.step.collect_data) {
+        if(this.ifLastStep(parent.parent) && !this.isCyclingStage(parent.parent) && !$scope.step.collect_data && this.holdTime == 0) {
           circleText = "∞";
         }
         this.text = new fabric.IText(circleText, {
