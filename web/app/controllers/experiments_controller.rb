@@ -1184,7 +1184,7 @@ class ExperimentsController < ApplicationController
   end
 
   def generate_etag(partial, tag1, tag2=nil)
-    return "partial:#{partial} tag:#{tag1} #{(tag2)? "tag2:"+tag2.to_s : ""}"
+    return "partial:#{partial} tag:#{tag1} #{(!tag2.nil?)? "tag2:"+tag2.to_s : ""}"
   end
   
   def background_standard_curve_data(experiment)
