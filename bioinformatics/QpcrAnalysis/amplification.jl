@@ -71,7 +71,7 @@ function act(
             if      (baseline_method == SIGMOID_KEY)
                         Dict{Symbol,Any}(
                             :bl_method          =>  l4_enl,
-                            :bl_fallback_func   =>  median)
+                            :bl_fallback_func   =>  mean)
             elseif  (baseline_method == LINEAR_KEY)
                         Dict{Symbol,Any}(
                             :bl_method          =>  lin_1ft,

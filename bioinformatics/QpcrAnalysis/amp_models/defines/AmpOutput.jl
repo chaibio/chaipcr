@@ -34,6 +34,7 @@ const AMPLONGOUTPUT_FIELD_DEFS = [
     Field(:bl_fit,                       SMatrix{W,C,Union{AmpModelFit,Symbol}} where {W,C}),
     Field(:bl_notes,                     SMatrix{W,C,Vector{String}} where {W,C}),
     Field(:blsub_fluos,                  Array{Float_T,3}),
+    Field(:blsub_fluos_flb,                  Array{Float_T,3}),
     Field(:quant_fit,                    SMatrix{W,C,Union{AmpModelFit,Symbol}} where {W,C}),
     Field(:quant_status,                 SMatrix{W,C,Symbol} where {W,C}),
     Field(:coefs,                        Array{Float_T,3}),
@@ -41,6 +42,8 @@ const AMPLONGOUTPUT_FIELD_DEFS = [
     Field(:quant_fluos,                  Array{Float_T,3}),
     Field(:dr1_pred,                     Array{Float_T,3}),
     Field(:dr2_pred,                     Array{Float_T,3}),
+    Field(:dr1_pred1,                     Array{Float_T,3}),
+    Field(:dr2_pred1,                     Array{Float_T,3}),
     Field(:max_dr1,                      SMatrix{W,C,Float_T} where {W,C}),
     Field(:max_dr2,                      SMatrix{W,C,Float_T} where {W,C}),
     Field(:cyc_vals_4cq,                 SMatrix{W,C,OrderedDict{Symbol,Float_T}} where {W,C}),
@@ -66,8 +69,13 @@ const AMPLONGOUTPUT_FIELD_DEFS = [
 const AMPSHORTOUTPUT_FIELDNAMES = [
     :rbbs_ary3,
     :blsub_fluos,
+    :blsub_fluos_flb,
     :dr1_pred,
     :dr2_pred,
+    :dr1_pred1,
+    :dr2_pred1,
+    :quant_status,
+    :coefs,
     :cq,
     :d0,
     :ct_fluos,
@@ -80,6 +88,7 @@ const AMPSHORTOUTPUT_FIELDNAMES = [
 ===============================================================================#
 
 abstract type AmpOutput end
+
 
 SCHEMA = AMPLONGOUTPUT_FIELD_DEFS
 @make_struct_from_SCHEMA AmpLongOutput AmpOutput true
@@ -109,7 +118,7 @@ function AmpOutput(
     ct_fluos                    ::AbstractVector;
 )
     NaN_array2        = amp_init(i, NaN_T)
-    fitted_init       = amp_init(i, FIT[i.amp_model]())
+    # fitted_init       = amp_init(i, FIT[i.amp_model]())
     empty_vals_4cq    = amp_init(i, OrderedDict{Symbol, Float_T}())
     AmpLongOutput(
         i.raw_data, ## formerly fr_ary3
@@ -125,11 +134,14 @@ function AmpOutput(
         fitted_init, ## bl_fit,
         amp_init(i, Vector{String}()), ## bl_notes
         calibrated_data, ## blsub_fluos
+        calibrated_data,
         fitted_init, ## quant_fit,
         amp_init(i, :not_fitted), ## quant_status
         fill(NaN_T, 1, i.num_wells, i.num_channels), ## coefs ## NB size = 1 for 1st dimension may not be correct for the chosen model
         NaN_array2, ## d0
         calibrated_data, ## quant_fluos,
+        calibrated_data, ## dr1_pred
+        calibrated_data, ## dr2_pred
         calibrated_data, ## dr1_pred
         calibrated_data, ## dr2_pred
         NaN_array2, ## max_dr1
@@ -172,8 +184,13 @@ function AmpOutput(
     AmpShortOutput(
         cd, ## formerly rbbs_ary3
         cd, ## blsub_fluos
+        cd,
         cd, ## dr1_pred
         cd, ## dr2_pred
+        cd, ## dr1_pred
+        cd, ## dr2_pred
+        amp_init(i, :not_fitted), ## quant_status
+        fill(NaN_T, 1, i.num_wells, i.num_channels),
         NaN_array2, ## d0
         NaN_array2, ## cq
         ct_fluos, ## ct_fluos

@@ -29,7 +29,7 @@ const SFC_MODEL_BASES = [ ## vector of tuples
         OrderedDict(
             :f   => "c0 + c1 * _x",
             :inv => "(_x - c0) / c1",
-            :bl  => "0",
+            :bl  => "c0",
             :dr1 => "c1",
             :dr2 => "0"
         )

@@ -102,9 +102,10 @@ function amp_fit_model(
     "Calculates weights used to estimate the baseline by SFC model."
     @inline function SFC_wts()
         local wts
+        debug(logger, "at SFC_wts")
         if i.bl_method == lin_1ft || i.bl_method == lin_2ft ## linear models
             wts = zeros(num_cycles)
-            wts[colon(baseline_cyc_bounds...)] .= 1
+            wts[bl_cycs()] .= 1
             return wts
         else
             ## some kind of sigmoid model is used to estimate amplification curve
@@ -145,13 +146,13 @@ function amp_fit_model(
 
     @inline function bl_cycs()
         len_bcb = length(baseline_cyc_bounds)
+        debug(logger, "at bl_cycs")
         if !(len_bcb in [0, 2])
             throw(ArgumentError("length of `baseline_cyc_bounds` must be 0 or 2"))
         elseif len_bcb == 2
             push!(bl_notes, "user-defined")
-            # baseline = i.bl_fallback_func(fluos[colon(baseline_cyc_bounds...)])
             return colon(baseline_cyc_bounds...)
-        elseif len_bcb == 0 && last_cyc_wt0 > 1 && num_cycles >= i.min_reliable_cyc
+        elseif len_bcb == 0 
             return auto_choose_bl_cycs()
         end
         ## fallthrough
@@ -162,6 +163,7 @@ function amp_fit_model(
     ## `last_cyc_wt0 == floor(i.min_reliable_cyc) - 1`
     "Automatically choose baseline cycles as the flat part of the curve."
     @inline function auto_choose_bl_cycs()
+        debug(logger, "at auto_choose_bl_cycs")
         (min_fluo, min_fluo_cyc) = findmin(fluos)
         ## finite diff is used to estimate derivative because
         ## `Dierckx.Spline1D` resulted in all `NaN` in some cases
@@ -214,7 +216,7 @@ function amp_fit_model(
         return bl_cyc_start:bl_cyc_end
     end ## auto_choose_bl_cycs()
 
-    denser_len(i ::Input, n :: Int_T) =
+    denser_len(i , n :: Int_T) =
         i.denser_factor * (n - 1) + 1
     #
     interpolated_cycles() =
@@ -312,24 +314,23 @@ function amp_fit_model(
             cycles, bl_fit.coefs...)
         blsub_fluos = fluos .- baseline
         have_good_results = good_status()
+        blsub_fluos_flb = fluos .- i.bl_fallback_func(fluos[bl_cycs()])
         debug(logger, "bl notes: $bl_notes, good_results: $have_good_results")
-        if !have_good_results
-            ## recalculate baseline
-            bl_func = i.bl_fallback_func
-        end
     else
         ## bl_method == take_the_median
         ## do not fit model to find baseline
         wts = ones(num_cycles)
-        bl_fit = FIT[amp_model]() ## empty model fit
+        # bl_fit = FIT[amp_model]() ## empty model fit
         have_good_results = false
         bl_notes = ["no bl_status", "no fallback"]
         bl_status = ""
         bl_func = median
+        baseline = bl_func(fluos[bl_cycs()])
+        blsub_fluos= fluos .- baseline
+        blsub_fluos_flb=blsub_fluos
     end ## if bl_method
     if !have_good_results
-        baseline = bl_func(fluos[bl_cycs()])
-        blsub_fluos = fluos .- baseline
+        blsub_fluos = blsub_fluos_flb
     end
     #
     ## fit quantitation model
@@ -341,7 +342,8 @@ function amp_fit_model(
     funcs_pred = qm.funcs_pred
 	#if quant_fit.status==Symbol("Optimal")
 	
-
+    dr1_pred = dr1_pred_()
+    dr2_pred = dr2_pred_()
 
 
 	#end
@@ -356,26 +358,7 @@ function amp_fit_model(
             calc_cq_fluo(cq_raw)) ## cq_fluo
     end ## if
     #
-    dr1_pred = dr1_pred_()
-    dr2_pred = dr2_pred_()
-    raw_cycs_index = colon(1, i.denser_factor, len_denser)
 
-
-	pred_values=[funcs_pred[:f](i,quant_coefs...) for i in 1:length(blsub_fluos)]
-	error=[abs(ff[1]-ff[2]) for ff in zip(pred_values,blsub_fluos)]
-	delta=abs(maximum(vcat(pred_values,blsub_fluos)))+abs(minimum(vcat(pred_values,blsub_fluos)))
-	criteria_norm_err=sum(error)/(delta*length(blsub_fluos))<0.03
-
-
-	dr1_values=[funcs_pred[:dr1](i,quant_coefs...) for i in 1:i.num_cycles]
-	criteria_dr1=maximum(dr1_values)>i.max_dr1_lb
-	dr2_values=[funcs_pred[:dr2](i,quant_coefs...) for i in 1:i.num_cycles]
-	criteria_dr2=maximum(dr2_values)>i.max_dr2_lb
-
-	cq_raw_temp=calc_cq_raw(dr1_pred, dr2_pred)
-
-    criteria_cq=cq_raw_temp>0 && cq_raw_temp<i.num_cycles && cq_raw_temp>i.min_reliable_cyc 
-    
     function discrete_dr1_dr2(fluos)
         len=length(fluos)
         dr1_val=zeros(len)
@@ -390,7 +373,6 @@ function amp_fit_model(
                 dr1_val[el]=(fluos[el+1]-fluos[el-1])/2
             end
         end
-
         for el=1:len
             if el == 1
                 dr2_val[el]=(dr1_val[el+1]-dr1_val[el])
@@ -405,28 +387,22 @@ function amp_fit_model(
         end
         return (dr1_val,dr2_val,dr2_val_v2)
     end
+    #criteria_norm_err
 
     if R == AmpShortModelResults
-		if criteria_norm_err && criteria_dr1 && criteria_dr2 && criteria_cq
-            cq_raw = cq_raw_temp
-            dr1_values=dr1_pred[raw_cycs_index]
-            dr2_values=dr2_pred[raw_cycs_index]
-		else
-			cq_raw=-1.0
-			bl_func = median
-			baseline = bl_func(fluos[bl_cycs()])
-            blsub_fluos = fluos .- baseline
-            dr1_values1,dr2_values1,dr2_values1_v2=discrete_dr1_dr2(fluos)
-            dr1_values=dr1_values1
-            dr2_values=dr2_values1_v2
-        end
-		
+        raw_cycs_index = colon(1, i.denser_factor, len_denser)
+        dr1_values1,dr2_values1,dr2_values1_v2=discrete_dr1_dr2(fluos)
         return AmpShortModelResults(
             # fluos, ## rbbs_ary3,
             blsub_fluos,
-            dr1_values,
-            dr2_values,
-            nonpos2NaN(cq_raw), ## cq
+            blsub_fluos_flb,
+            dr1_pred[raw_cycs_index],
+            dr2_pred[raw_cycs_index],
+            dr1_values1,
+            dr2_values1_v2,
+            quant_fit.status,
+            quant_coefs,
+            nonpos2NaN(calc_cq_raw(dr1_pred, dr2_pred)), ## cq
             NaN_T) ## d0
     end ## R
     #
@@ -456,6 +432,7 @@ function amp_fit_model(
         bl_fit,
         bl_notes,
         blsub_fluos,
+        blsub_fluos_flb,
         quant_fit,
         quant_fit.status, ## quant_status
         quant_coefs,
@@ -463,6 +440,8 @@ function amp_fit_model(
         funcs_pred[:f](cycles, quant_coefs...), ## blsub_fitted
         dr1_pred[raw_cycs_index],
         dr2_pred[raw_cycs_index],
+        dr1_values1,
+        dr2_values1_v2,
         max_dr1,
         max_dr2,
         cyc_vals_4cq,

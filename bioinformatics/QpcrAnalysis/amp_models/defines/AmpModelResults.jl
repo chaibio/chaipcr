@@ -23,6 +23,7 @@ const AMPLONGMODELRESULTS_FIELD_DEFS = [
     Field(:bl_fit,           Union{AmpModelFit,Symbol}),
     Field(:bl_notes,         Vector{String}),
     Field(:blsub_fluos,      Vector{Float_T}),
+    Field(:blsub_fluos_flb,  Vector{Float_T}),
     Field(:quant_fit,        AmpModelFit),
     Field(:quant_status,     Symbol),
     Field(:coefs,            Vector{Float_T}),
@@ -30,6 +31,8 @@ const AMPLONGMODELRESULTS_FIELD_DEFS = [
     Field(:quant_fluos,      Vector{Float_T}),
     Field(:dr1_pred,         Vector{Float_T}),
     Field(:dr2_pred,         Vector{Float_T}),
+    Field(:dr1_pred1,        Vector{Float_T}),
+    Field(:dr2_pred1,        Vector{Float_T}),
     Field(:max_dr1,          Float_T),
     Field(:max_dr2,          Float_T),
     Field(:cyc_vals_4cq,     OrderedDict{Symbol,Float_T}),
@@ -43,8 +46,13 @@ const AMPLONGMODELRESULTS_FIELD_DEFS = [
 const AMPSHORTMODELRESULTS_FIELDNAMES = [
     # rbbs_ary3,
     :blsub_fluos,
+    :blsub_fluos_flb,
     :dr1_pred,
     :dr2_pred,
+    :dr1_pred1,
+    :dr2_pred1,
+    :quant_status,
+    :coefs,
     :cq,
     :d0]
 
