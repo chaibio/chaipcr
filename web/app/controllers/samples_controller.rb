@@ -321,17 +321,17 @@ class SamplesController < ApplicationController
   
   def unlink_well(wells)
     samples_wells = SamplesWell.where(["well_layout_id=? AND well_num IN (?)", @experiment.well_layout.id, wells])
-    samples_wells.each do |sample_well|
-      if sample_well
+    if !samples_wells.blank?
+      samples_wells.each do |sample_well|
         ret = sample_well.destroy
         if !ret
           sample_well.errors.full_messages.each do |message|
             @sample.errors.add(:samples_wells, message)
           end
         end
-      else
-        @sample.errors.add(:samples_wells, "well num #{well_num} is not associated with this sample")
       end
+    else
+      @sample.errors.add(:samples_wells, "wells #{wells} is not associated with this sample")
     end
   end
   

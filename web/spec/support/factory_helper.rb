@@ -136,4 +136,22 @@ module FactoryHelper
     [first_stage_collect_data, step]
   end
   
+  def create_sample_for_wells(experiment, sample_name, wells)
+    post "/experiments/#{experiment.id}/samples", {name: sample_name}.to_json, http_headers
+    expect(response).to be_success  
+    json = JSON.parse(response.body)
+    post "/experiments/#{experiment.id}/samples/#{json["sample"]["id"]}/links", {wells: wells}.to_json, http_headers
+    expect(response).to be_success
+  end
+  
+  def create_target_for_wells(experiment, target_name, channel, csv_file)
+    post "/experiments/#{experiment.id}/targets", {name: target_name, channel: channel}.to_json, http_headers
+    expect(response).to be_success  
+    json = JSON.parse(response.body)
+
+    CSV.foreach(csv_file) do |row|
+      TargetsWell.create(:well_layout_id=>experiment.well_layout.id, :well_num=>row[0], :target_id=>json["target"]["id"], :well_type=>row[1], :quantity_m=>row[2], :quantity_b=>row[3], :omit=>row[4])
+    end
+  end
+  
 end

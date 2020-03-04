@@ -1,0 +1,16 @@
+well_num,well_type,quantity_m,quantity_b,omit
+1,standard,1.00000000,0,0
+2,standard,1.00000000,-1,0
+3,standard,1.00000000,-2,0
+4,standard,1.00000000,-3,0
+5,standard,1.00000000,-4,0
+6,standard,1.00000000,0,0
+7,standard,1.00000000,-2,0
+8,standard,1.00000000,-4,0
+9,standard,1.00000000,0,0
+10,standard,1.00000000,-1,0
+11,standard,1.00000000,-2,0
+12,standard,1.00000000,-3,0
+13,standard,1.00000000,-4,0
+14,standard,1.00000000,-1,0
+15,standard,1.00000000,-3,0

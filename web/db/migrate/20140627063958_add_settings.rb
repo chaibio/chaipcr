@@ -3,7 +3,5 @@ class AddSettings < ActiveRecord::Migration
     create_table :settings, id: false do |t|
       t.boolean :debug, :default => false
     end
-    
-    Setting.create
   end
 end

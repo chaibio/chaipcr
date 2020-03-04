@@ -369,7 +369,7 @@ class TargetsController < ApplicationController
   
   def unlink_well(wells, channel)
     targets = Target.includes(:targets_wells).where(["targets.well_layout_id=? or targets.well_layout_id=?", @experiment.well_layout.id, @experiment.targets_well_layout_id]).order("targets.well_layout_id, targets.id")
-    if channel > 0
+    if !channel.nil? and channel > 0
       targets = targets.where(["channel=?", channel])      
     end
     targets_ids = targets.map {|target| target.id}

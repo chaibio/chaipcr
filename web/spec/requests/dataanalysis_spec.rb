@@ -206,6 +206,48 @@ describe "DataAnalysis API", type: :request do
     response.response_code.should == 200
   end  
   
+  it "summary data for replic group" do
+    create_sample_for_wells(@experiment, "Sample 1", [1,6,9])
+    create_sample_for_wells(@experiment, "Sample 2", [2,10,14])
+    create_sample_for_wells(@experiment, "Sample 3", [3,7,11])
+    create_sample_for_wells(@experiment, "Sample 4", [4,12,15])
+    create_sample_for_wells(@experiment, "Sample 5", [5,8,13])
+    
+    create_target_for_wells(@experiment, "Target 1", 1, "spec/fixtures/targets_wells.csv")
+    
+    create_fluorescence_data(@experiment, 0, 20)
+    stage, step = create_amplification_and_cq_data(@experiment, 0, 20)  
+    
+    get "/experiments/#{@experiment.id}/amplification_data", { :format => 'json' }
+    response.response_code.should == 200
+    json = JSON.parse(response.body)
+    expected_response=[[1,1,nil,1.0,0,0,1.0,0],
+              [6,1,nil,1.0,0,0,1.0,0],
+              [9,1,nil,1.0,0,0,1.0,0],
+              [2,2,nil,1.0,-1,0,1.0,-1],
+              [10,2,nil,1.0,-1,0,1.0,-1],
+              [14,2,nil,1.0,-1,0,1.0,-1],
+              [3,3,nil,1.0,-2,0,1.0,-2],
+              [7,3,nil,1.0,-2,0,1.0,-2],
+              [11,3,nil,1.0,-2,0,1.0,-2],
+              [4,4,nil,1.0,-3,0,1.0,-3],
+              [12,4,nil,1.0,-3,0,1.0,-3],
+              [15,4,nil,1.0,-3,0,1.0,-3],
+              [5,5,nil,1.0,-4,0,1.0,-4],
+              [8,5,nil,1.0,-4,0,1.0,-4],
+              [13,5,nil,1.0,-4,0,1.0,-4]]
+              
+    summary_data = json["steps"][0]["summary_data"]
+    summary_data.shift
+    summary_data.each_with_index do |row, index|
+      row.shift
+      row.each_with_index do |val, valindex|
+        val.should == expected_response[index][valindex]
+      end
+    end
+    
+  end
+  
 =begin    
   it "export" do
     experiment = create_experiment("test1")
