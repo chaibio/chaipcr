@@ -99,6 +99,10 @@ class WellLayout < ActiveRecord::Base
     parent_type == Experiment.name
   end
   
+  def timestamp
+    updated_at.to_time.to_i
+  end
+  
   def layout
     wellsamples = Sample.joins(:samples_wells).where(["samples_wells.well_layout_id=?", id]).order("well_num").select("samples.*, well_num")
     welltargets = Target.joins(:targets_wells).where(["targets_wells.well_layout_id=?", id]).order("well_num, channel").select("targets.*, well_num, well_type, omit, quantity_m, quantity_b")

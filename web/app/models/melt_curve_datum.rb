@@ -69,7 +69,7 @@ class MeltCurveDatum < ActiveRecord::Base
 				end
 				property :targets do
 					key :type, :array
-          key :description, "[{'target_id':1,'target_name':'Ch 1'},{'target_id':2,'target_name':'Ch 2'}]"
+          key :description, "[{'target_id':1,'target_name':'Ch 1','channel':1},{'target_id':2,'target_name':'Ch 2','channel':2}]"
 					items do
 						property :target_id do
 							key :type, :integer
@@ -79,6 +79,10 @@ class MeltCurveDatum < ActiveRecord::Base
 							key :type, :string
 							key :description, 'Target name'
               key :default, "Ch 1 or Ch 2"
+            end
+						property :channel do
+							key :type, :integer
+							key :description, 'Channel'
             end
           end
         end

@@ -24,7 +24,7 @@ class SamplesWell < ActiveRecord::Base
     extend SwaggerHelper::PropertyWellnum
   end
   
-  belongs_to :well_layout
+  belongs_to :well_layout, touch: true
   belongs_to :sample
     
   attr_accessor :validate_samples_in_well

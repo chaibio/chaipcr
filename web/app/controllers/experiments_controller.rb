@@ -550,7 +550,7 @@ class ExperimentsController < ApplicationController
   example "{'partial':false, 'total_cycles':40, 'steps':['step_id':2,
             'amplification_data':[['target_id', 'well_num', 'cycle_num', 'background_subtracted_value', 'baseline_subtracted_value', 'dr1_pred', 'dr2_pred' 'fluorescence_value'], [1, 1, 1, 25488, -2003, 34543, 453344, 86], [1, 1, 2, 53984, -409, 56345, 848583, 85]],
             'summary_data':[['target_id','well_num','replic_group','cq','quantity_m','quantity_b','mean_cq','mean_quantity_m','mean_quantity_b'], [1,1,null,null,null,null,null,null,null], [2,12,1,7.314787,4.0,2,6.9858934999999995,4.0,2], [2,14,1,6.657,4.0,2,6.9858934999999995,4.0,2], [2,3,null,6.2,5.7952962,14,null,null,null]],
-            'targets':[['id','name','equation'],[1,'target1',null],[2,'target2',{'slope':-0.064624,'offset':7.154049,'efficiency':2979647189313701.5,'r2':0.221279}]]
+            'targets':[['id','name','channel','equation'],[1,'target1',1,null],[2,'target2',2,{'slope':-0.064624,'offset':7.154049,'efficiency':2979647189313701.5,'r2':0.221279}]]
           ]}"
   def amplification_data
     params[:raw] = params[:raw].to_bool if !params[:raw].nil?
@@ -608,7 +608,7 @@ class ExperimentsController < ApplicationController
               @partial = FluorescenceDatum.new_data_generated?(@experiment.id, @first_stage_collect_data.id)
             end
 
-            if !stale?(etag: generate_etag(@partial, AmplificationDatum.maxid(@experiment.id, @first_stage_collect_data.id), standard_curve_pending))
+            if !stale?(etag: generate_etag(@partial, AmplificationDatum.maxid(@experiment.id, @first_stage_collect_data.id), @experiment.well_layout.timestamp, standard_curve_pending))
               #render 304 Not Modified
               return
             end
@@ -620,12 +620,12 @@ class ExperimentsController < ApplicationController
               return
             elsif !@amplification_data.blank?
               #set etag
-              fresh_when(:etag => generate_etag(@partial, AmplificationDatum.maxid(@experiment.id, @first_stage_collect_data.id), standard_curve_pending))
+              fresh_when(:etag => generate_etag(@partial, AmplificationDatum.maxid(@experiment.id, @first_stage_collect_data.id), @experiment.well_layout.timestamp, standard_curve_pending))
             end
           end
 
           if params[:raw] == true
-            if !analyze_required && !stale?(etag: generate_etag(@partial, last_cycle, standard_curve_pending))
+            if !analyze_required && !stale?(etag: generate_etag(@partial, last_cycle, @experiment.well_layout.timestamp, standard_curve_pending))
               #render 304 Not Modified
               return
             end
@@ -656,7 +656,7 @@ class ExperimentsController < ApplicationController
             fluorescence_data = fluorescence_data.filtered_by_targets(@experiment.well_layout.id, fake_targets).order_by_target(fake_targets).to_a
             if !analyze_required && !fluorescence_data.blank?
               #set etag
-              fresh_when(:etag => generate_etag(@partial, fluorescence_data.last.cycle_num, standard_curve_pending))
+              fresh_when(:etag => generate_etag(@partial, fluorescence_data.last.cycle_num, @experiment.well_layout.timestamp, standard_curve_pending))
             end
           end
         end
@@ -849,7 +849,7 @@ class ExperimentsController < ApplicationController
               @partial = MeltCurveDatum.new_data_generated?(@experiment, @first_stage_meltcurve_data.id) != nil
             end
 
-            if !@experiment.cached_temperature.nil? && !stale?(etag: generate_etag(@partial, @experiment.cached_temperature))
+            if !@experiment.cached_temperature.nil? && !stale?(etag: generate_etag(@partial, @experiment.cached_temperature, @experiment.well_layout.timestamp))
               #render 304 Not Modified
               return
             end
@@ -863,12 +863,12 @@ class ExperimentsController < ApplicationController
               return
             elsif !@experiment.cached_temperature.nil?
               #set etag
-              fresh_when(:etag => generate_etag(@partial, @experiment.cached_temperature))
+              fresh_when(:etag => generate_etag(@partial, @experiment.cached_temperature, @experiment.well_layout.timestamp))
             end
           end
 
           if params[:raw] == true
-            if !analyze_required && !stale?(etag: generate_etag(@partial, MeltCurveDatum.maxid(@experiment.id, @first_stage_meltcurve_data.id)))
+            if !analyze_required && !stale?(etag: generate_etag(@partial, MeltCurveDatum.maxid(@experiment.id, @first_stage_meltcurve_data.id), @experiment.well_layout.timestamp))
               #render 304 Not Modified
               return
             end
@@ -901,7 +901,7 @@ class ExperimentsController < ApplicationController
               #set etag
               max_id = raw_data.max_by(&:id).id
               #logger.info("**************max_id=#{max_id}")
-              fresh_when(:etag => generate_etag(@partial, max_id))
+              fresh_when(:etag => generate_etag(@partial, max_id, @experiment.well_layout.timestamp))
             end
           end
         end
@@ -1183,8 +1183,8 @@ class ExperimentsController < ApplicationController
     @experiment = Experiment.find_by_id(params[:id]) if @experiment.nil?
   end
 
-  def generate_etag(partial, tag1, tag2=nil)
-    return "partial:#{partial} tag:#{tag1} #{(!tag2.nil?)? "tag2:"+tag2.to_s : ""}"
+  def generate_etag(partial, tag1, tag2, tag3=nil)
+    return "partial:#{partial} tag:#{tag1} tag2:#{tag2} #{(!tag3.nil?)? "tag3:"+tag3.to_s : ""}"
   end
   
   def background_standard_curve_data(experiment)
@@ -1643,7 +1643,7 @@ class ExperimentsController < ApplicationController
                              [data.target_id,data.well_num,data.replic,data.cq,data.quantity[0],data.quantity[1],data.mean_cq,data.mean_quantity[0],data.mean_quantity[1]]}
       end
       if !targets.blank?
-        elem.targets = [["id", "name", "equation"]] + targets.map {|target| [target.target_id, target.target_name, target.target_equation]}
+        elem.targets = [["id", "name", "channel", "equation"]] + targets.map {|target| [target.target_id, target.target_name, target.channel, target.target_equation]}
       end
       group << elem
     end

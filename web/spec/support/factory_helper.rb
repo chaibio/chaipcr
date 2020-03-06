@@ -144,7 +144,16 @@ module FactoryHelper
     expect(response).to be_success
   end
   
-  def create_target_for_wells(experiment, target_name, channel, csv_file)
+  def create_target_for_wells(experiment, target_name, channel, wells)
+    post "/experiments/#{experiment.id}/targets", {name: target_name, channel: channel}.to_json, http_headers
+    expect(response).to be_success  
+    json = JSON.parse(response.body)
+    
+    post "/experiments/#{experiment.id}/targets/#{json["target"]["id"]}/links", {wells: wells}.to_json, http_headers
+    expect(response).to be_success
+  end
+  
+  def create_target_for_wells_csv(experiment, target_name, channel, csv_file)
     post "/experiments/#{experiment.id}/targets", {name: target_name, channel: channel}.to_json, http_headers
     expect(response).to be_success  
     json = JSON.parse(response.body)

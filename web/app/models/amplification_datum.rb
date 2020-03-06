@@ -129,7 +129,7 @@ class AmplificationDatum < ActiveRecord::Base
 			end
 		end
 		property :targets do
-			key :description, "Two dimensional array like [['id','name','equation'],[1,'target1',null],[2,'target2',{'slope':-0.064624,'offset':7.154049,'efficiency':2979647189313701.5,'r2':0.221279}]]"
+			key :description, "Two dimensional array like [['id','name','channel','equation'],[1,'target1',1,null],[2,'target2',2,{'slope':-0.064624,'offset':7.154049,'efficiency':2979647189313701.5,'r2':0.221279}]]"
 			key :type, :array
 			items do
 				key :type, :array

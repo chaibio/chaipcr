@@ -62,7 +62,7 @@ class TargetsWell < ActiveRecord::Base
 
   scope :with_samples, -> { joins("left join samples on samples.id = samples_wells.sample_id").select("samples.name as sample_name") }
 
-  belongs_to :well_layout
+  belongs_to :well_layout, touch: true
   belongs_to :target
   
   attr_accessor :validate_targets_in_well
@@ -170,8 +170,8 @@ class TargetsWell < ActiveRecord::Base
 
   def self.fake_targets
     targets = []
-    targets << OpenStruct.new(:target_id => 1, :target_name=>TargetsHelper::FAKE_TARGET_1, :target_equation=>nil)
-    targets << OpenStruct.new(:target_id => 2, :target_name=>TargetsHelper::FAKE_TARGET_2, :target_equation=>nil) if Device.dual_channel?
+    targets << OpenStruct.new(:target_id => 1, :target_name=>TargetsHelper::FAKE_TARGET_1, :channel=>1, :target_equation=>nil)
+    targets << OpenStruct.new(:target_id => 2, :target_name=>TargetsHelper::FAKE_TARGET_2, :channel=>2, :target_equation=>nil) if Device.dual_channel?
     targets
   end
   

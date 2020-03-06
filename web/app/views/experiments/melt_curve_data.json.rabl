@@ -15,5 +15,5 @@ child(@melt_curve_data_group, :root=>"ramps", :object_root=>false) do
 end
 
 child(@targets, :root=>"targets", :object_root=>false) do
-	attributes :target_id, :target_name
+	attributes :target_id, :target_name, :channel
 end

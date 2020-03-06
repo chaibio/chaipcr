@@ -213,7 +213,7 @@ describe "DataAnalysis API", type: :request do
     create_sample_for_wells(@experiment, "Sample 4", [4,12,15])
     create_sample_for_wells(@experiment, "Sample 5", [5,8,13])
     
-    create_target_for_wells(@experiment, "Target 1", 1, "spec/fixtures/targets_wells.csv")
+    create_target_for_wells_csv(@experiment, "Target 1", 1, "spec/fixtures/targets_wells.csv")
     
     create_fluorescence_data(@experiment, 0, 20)
     stage, step = create_amplification_and_cq_data(@experiment, 0, 20)  
@@ -245,7 +245,22 @@ describe "DataAnalysis API", type: :request do
         val.should == expected_response[index][valindex]
       end
     end
+  end
+  
+  it "add target will trigger amplification_data reload" do
+    create_fluorescence_data(@experiment, 0, 20)
+    stage, step = create_amplification_and_cq_data(@experiment, 0, 20)  
     
+    get "/experiments/#{@experiment.id}/amplification_data", { :format => 'json' }
+    response.response_code.should == 200
+    get "/experiments/#{@experiment.id}/amplification_data", { :format => 'json' }, { "If-None-Match" => response.etag }
+    response.response_code.should == 304
+    
+    create_target_for_wells(@experiment, "Target 1", 1, [6])
+    get "/experiments/#{@experiment.id}/amplification_data", { :format => 'json' }, { "If-None-Match" => response.etag }
+    response.response_code.should == 200
+    get "/experiments/#{@experiment.id}/amplification_data", { :format => 'json' }, { "If-None-Match" => response.etag }
+    response.response_code.should == 304
   end
   
 =begin    

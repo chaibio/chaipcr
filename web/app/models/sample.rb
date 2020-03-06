@@ -52,7 +52,7 @@ class Sample < ActiveRecord::Base
     end
   end
   
-  belongs_to :well_layout
+  belongs_to :well_layout, touch: true
   has_many :samples_wells, dependent: :destroy
   
   attr_accessor :force_destroy

@@ -58,7 +58,7 @@ class Target < ActiveRecord::Base
     end
   end
   
-  belongs_to :well_layout
+  belongs_to :well_layout, touch: true
   has_many :targets_wells, dependent: :destroy
   
   attr_accessor :imported, :force_destroy
