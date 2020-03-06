@@ -332,7 +332,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
                 else
                   well_color = '#8FC742'
 
-                continue if Math.abs($scope.standardcurve_data["well_#{i}_#{ch_i}"][0]['log_quantity']) is Number.POSITIVE_INFINITY
+                continue if $scope.standardcurve_data["well_#{i}_#{ch_i}"][0] is undefined or Math.abs($scope.standardcurve_data["well_#{i}_#{ch_i}"][0]['log_quantity']) is Number.POSITIVE_INFINITY
                 if $scope.color_by is 'sample'
                   if well_color is $scope.init_sample_color
                     $scope.chartConfig.series.push
