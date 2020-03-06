@@ -87,7 +87,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
       }
       
       $scope.toggleOmitIndex = (omit_index, well_item) ->
-        return if !$scope.hasData
+        return if $scope.re_init_chart_data
         if $scope.omittedIndexes.indexOf(omit_index) != -1
           $scope.omittedIndexes.splice $scope.omittedIndexes.indexOf(omit_index), 1
         else
@@ -211,7 +211,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
           .then (resp) ->
             $scope.fetching = false
             $scope.error = null
-            
+
             if (resp.status is 200 and resp.data?.partial and $scope.enterState) or (resp.status is 200 and !resp.data.partial)
               $scope.hasData = true
               $scope.standardcurve_data = helper.paddData()
@@ -271,6 +271,8 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
 
             if ((resp.data?.partial is true) or (resp.status is 202)) and !$scope.retrying
               retry()
+            else
+              $scope.re_init_chart_data = false              
 
           .catch (resp) ->
             if resp.status is 500
