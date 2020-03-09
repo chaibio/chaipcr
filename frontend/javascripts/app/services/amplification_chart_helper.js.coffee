@@ -213,8 +213,8 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           target = _.filter target_data, (target) ->
             target[0] is item.target_id
           item['target_name'] = target[0][1] if target[0]
-          item['channel'] = if item['target_name'] == 'Ch 1' then 1 else 2
-          item['color'] = if item['target_name'] == 'Ch 1' then @SAMPLE_TARGET_COLORS[0] else @SAMPLE_TARGET_COLORS[1]
+          item['channel'] = target[0][2]
+          item['color'] = @SAMPLE_TARGET_COLORS[target[0][2] - 1]
           item['well_type'] = ''
 
         item['active'] = false

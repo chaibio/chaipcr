@@ -185,12 +185,12 @@ window.ChaiBioTech.ngApp.service 'StandardCurveChartHelper', [
         target_line: []
 
       for i in [1.. target_data.length - 1] by 1
-        if target_data[i][2]
+        if target_data[i][3]
           datasets["target_line"].push
-            efficiency: target_data[i][2].efficiency
-            offset: target_data[i][2].offset
-            r2: target_data[i][2].r2
-            slope: target_data[i][2].slope
+            efficiency: target_data[i][3].efficiency
+            offset: target_data[i][3].offset
+            r2: target_data[i][3].r2
+            slope: target_data[i][3].slope
             id: target_data[i][0]
 
       return datasets
@@ -243,8 +243,8 @@ window.ChaiBioTech.ngApp.service 'StandardCurveChartHelper', [
           target = _.filter target_data, (target) ->
             target[0] is item.target_id
           item['target_name'] = target[0][1] if target[0]
-          item['channel'] = if item['target_name'] == 'Ch 1' then 1 else 2
-          item['color'] = if item['target_name'] == 'Ch 1' then @SAMPLE_TARGET_COLORS[0] else @SAMPLE_TARGET_COLORS[1]
+          item['channel'] = target[0][2]
+          item['color'] = @SAMPLE_TARGET_COLORS[target[0][2] - 1]
           item['well_type'] = ''
           item['omit'] = 0
 
