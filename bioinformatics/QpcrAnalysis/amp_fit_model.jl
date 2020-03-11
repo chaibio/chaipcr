@@ -302,7 +302,8 @@ function amp_fit_model(
     num_cycles = i.num_cycles
     cycles = Vector(i.cycles)
     ## to determine weights (`wts`) for sigmoid fitting per `i.min_reliable_cyc`
-    last_cyc_wt0 = floor(i.min_reliable_cyc) - 1
+    #last_cyc_wt0 = floor(i.min_reliable_cyc) - 1
+    last_cyc_wt0 = 4
     if i.bl_method in SFC_MODEL_NAMES
         ## fit model to find baseline
         wts = SFC_wts()

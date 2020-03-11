@@ -248,8 +248,8 @@ function set_report_cq!(
     for well_i in 1:i.num_wells, channel_i in 1:i.num_channels
         b_ = o.coefs[1, well_i, channel_i]
         postbl_status =o.quant_status[well_i, channel_i]
-        max_dr1=maximum(o.dr1_pred)
-        max_dr2=maximum(o.dr2_pred)
+        max_dr1=maximum(o.dr1_pred[:,well_i,channel_i])
+        max_dr2=maximum(o.dr2_pred[:,well_i,channel_i])
         max_bsf = maximum(o.blsub_fluos_flb[:, well_i, channel_i])
         max_bsf_ = maximum(o.blsub_fluos[(end-Int(floor((size(o.blsub_fluos)[1])/4))):end, well_i, channel_i])
         (scaled_max_dr1, scaled_max_dr2, scaled_max_bsf) =
