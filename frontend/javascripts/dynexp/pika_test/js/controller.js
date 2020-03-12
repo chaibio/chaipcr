@@ -55,7 +55,6 @@
         $scope.twoKits = false;
         $scope.notes = [];
         //$scope.notes_B = [];
-        $scope.indexA = "fdsfsfdsfdsf";
         $scope.editNotes = false;
         $scope.state = '';
         $scope.old_state = '';
@@ -74,9 +73,9 @@
             $scope.experimentId = $stateParams.id;
             getExperiment($scope.experimentId);
             Experiment.getWellLayout($stateParams.id).then(function (resp) {
-              $scope.target = resp.data[0].targets[0];
-              $scope.target2 = resp.data[8].targets[0];
-              if ($scope.target.id != $scope.target2.id) {
+              $scope.target = (resp.data[0].targets) ? resp.data[0].targets[0] : {id: 0, name: ''};
+              $scope.target2 = (resp.data[8].targets) ? resp.data[8].targets[0] : {id: 0, name: ''};
+              if ($scope.target.id != $scope.target2.id && $scope.target2.id && $scope.target.id) {
                 $scope.twoKits = true;
               }
               var j = 0,
@@ -475,19 +474,25 @@
           $scope.analyzing = true;
           $scope.experimentComplete = true;
           Experiment.getFluorescenceData($scope.experimentId).then(function(resp) {
-            console.log(resp);
             if (resp.status == 200 && !resp.data.partial) {
               $scope.testFl = true;
               $scope.analyzing = false;
-              $scope.cq = resp.data.steps[0].cq;
-              //$scope.cq = [["channel","well_num","cq"],[1,1,"20.76"],[1,2,42.13],[1,3,40.89],[1,4,9.47],[1,5,20],[1,6,"26.33"],[1,7,"33.89"],[1,8,"5"],[1,9,"34.5"],[1,10,"19"],[1,11,"12"],[1,12,"6"],[1,13,"24"],[1,14,"39"],[1,15,"32"],[1,16,"18"],[2,1,"11"],[2,2,"25.15"],[2,3,36],[2,4,"8"],[2,5,"34"],[2,6,"10"],[2,7,"15"],[2,8,"25"],[2,9,"35"],[2,10,"28"],[2,11,"2"],[2,12,"7"],[2,13,"0"],[2,14,"35"],[2,15,"28"],[2,16,"17"]];
-              for (i = 1; i < 17; i++) {
-                $scope.famCq[i - 1] = parseFloat($scope.cq[i][2]);
+              $scope.summary_data = resp.data.steps[0].summary_data;
+              var targets = resp.data.steps[0].targets;
+              // $scope.summary_data = [["channel","well_num","cq"],[1,1,"20.76"],[1,2,42.13],[1,3,40.89],[1,4,9.47],[1,5,20],[1,6,"26.33"],[1,7,"33.89"],[1,8,"5"],[1,9,"34.5"],[1,10,"19"],[1,11,"12"],[1,12,"6"],[1,13,"24"],[1,14,"39"],[1,15,"32"],[1,16,"18"],[2,1,"11"],[2,2,"25.15"],[2,3,36],[2,4,"8"],[2,5,"34"],[2,6,"10"],[2,7,"15"],[2,8,"25"],[2,9,"35"],[2,10,"28"],[2,11,"2"],[2,12,"7"],[2,13,"0"],[2,14,"35"],[2,15,"28"],[2,16,"17"]];
+              $scope.famCq = [];
+              $scope.hexCq = [];
+              if($scope.summary_data){
+                for (i = 1; i < 17; i++) {
+                  var cqValue = filterSummaryByTarget(targets[1][0], i);
+                  $scope.famCq.push(parseFloat((cqValue.length) ? cqValue[3] : 0));
+                }
+                for (i = 17; i < 33; i++) {
+                  var cqValue = filterSummaryByTarget(targets[2][0], i - 16);
+                  $scope.hexCq.push(parseFloat((cqValue.length) ? cqValue[3] : 0));
+                }
+                getResultArray();                
               }
-              for (i = 17; i < 33; i++) {
-                $scope.hexCq[i - 17] = parseFloat($scope.cq[i][2]);
-              }
-              getResultArray();
             } else if (resp.data.partial || resp.status == 202) {
                 $timeout($scope.getResults, 1000);
               }
@@ -505,15 +510,24 @@
               }
             });
             /*  for (var i = 1; i < 17; i++) {
-            $scope.famCq[i-1] = parseFloat($scope.cq[i][2]);
+            $scope.famCq[i-1] = parseFloat($scope.summary_data[i][2]);
           }
           for (var i = 17; i < 33; i++) {
-          $scope.hexCq[i-17] = parseFloat($scope.cq[i][2]);
+          $scope.hexCq[i-17] = parseFloat($scope.summary_data[i][2]);
         }
 
         getResultArray(); */
 
       };
+
+      function filterSummaryByTarget(target_id, well_num){
+        for (var i = 0; i < $scope.summary_data.length; i++) {
+          if($scope.summary_data[i][0] == target_id && $scope.summary_data[i][1] == well_num){
+            return $scope.summary_data[i];
+          }
+        }
+        return '';
+      }
 
       function getExperiment(exp_id, cb) {
         Experiment.get(exp_id).then(function(resp) {
@@ -525,7 +539,6 @@
 
 
       $scope.$on('status:data:updated', function(e, data, oldData) {
-        console.log("called");
         if (!data) return;
         if (!data.experiment_controller) return;
         if (!oldData) return;
