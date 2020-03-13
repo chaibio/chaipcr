@@ -483,12 +483,13 @@
               $scope.famCq = [];
               $scope.hexCq = [];
               if($scope.summary_data){
+                var cqValue = '';
                 for (i = 1; i < 17; i++) {
                   var cqValue = filterSummaryByTarget(targets[1][0], i);
                   $scope.famCq.push(parseFloat((cqValue.length) ? cqValue[3] : 0));
                 }
                 for (i = 17; i < 33; i++) {
-                  var cqValue = filterSummaryByTarget(targets[2][0], i - 16);
+                  cqValue = filterSummaryByTarget(targets[2][0], i - 16);
                   $scope.hexCq.push(parseFloat((cqValue.length) ? cqValue[3] : 0));
                 }
                 getResultArray();                
