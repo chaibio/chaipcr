@@ -303,19 +303,26 @@ function amp_fit_model(
     cycles = Vector(i.cycles)
     ## to determine weights (`wts`) for sigmoid fitting per `i.min_reliable_cyc`
     #last_cyc_wt0 = floor(i.min_reliable_cyc) - 1
-    last_cyc_wt0 = 4
+    last_cyc_wt0 = 0
     if i.bl_method in SFC_MODEL_NAMES
         ## fit model to find baseline
         wts = SFC_wts()
         bl_fit = i.SFC_model_def_func(i.bl_method).func_fit(
-            cycles, fluos, wts; solver = i.solver)
+            cycles, fluos, wts; solver = Ipopt.IpoptSolver([(:print_level,0)]) )
         bl_status = bl_fit.status
         bl_notes = ["bl_status $bl_status"]
         baseline = i.SFC_model_def_func(i.bl_method).funcs_pred[:bl](
             cycles, bl_fit.coefs...)
         blsub_fluos = fluos .- baseline
         have_good_results = good_status()
-        blsub_fluos_flb = fluos .- i.bl_fallback_func(fluos[bl_cycs()])
+        have_good_results = false
+        middle_ind=Int(floor((i.num_cycles/2)))
+        if mean(fluos[1:3])>mean(fluos[middle_ind-1:middle_ind+1])>mean(fluos[end-2:end])
+            have_good_results = false
+            blsub_fluos_flb = fluos .- mean(fluos[1:5])
+        else
+            blsub_fluos_flb = fluos .- mean(fluos[bl_cycs()])
+        end  
         debug(logger, "bl notes: $bl_notes, good_results: $have_good_results")
     else
         ## bl_method == take_the_median
@@ -336,7 +343,7 @@ function amp_fit_model(
     #
     ## fit quantitation model
     qm = i.SFC_model_def_func(i.quant_method)
-    quant_fit = qm.func_fit(cycles, blsub_fluos, wts; solver = i.solver)
+    quant_fit = qm.func_fit(cycles, blsub_fluos, wts; solver = Ipopt.IpoptSolver([(:print_level,0)]))
     quant_coefs = quant_fit.coefs
     len_denser = denser_len(i, num_cycles)
     cycles_denser = interpolated_cycles()
