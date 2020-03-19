@@ -168,6 +168,7 @@ function amp_fit_model(
         ## finite diff is used to estimate derivative because
         ## `Dierckx.Spline1D` resulted in all `NaN` in some cases
         dr2_cfd = finite_diff(cycles, fluos; nu = 2)
+
         dr2_cfd_left  = dr2_cfd[1:min_fluo_cyc]
         dr2_cfd_right = dr2_cfd[min_fluo_cyc:end]
         (max_dr2_left_cyc, max_dr2_right_cyc) =
@@ -302,34 +303,43 @@ function amp_fit_model(
     num_cycles = i.num_cycles
     cycles = Vector(i.cycles)
     ## to determine weights (`wts`) for sigmoid fitting per `i.min_reliable_cyc`
-    #last_cyc_wt0 = floor(i.min_reliable_cyc) - 1
     last_cyc_wt0 = 0
     if i.bl_method in SFC_MODEL_NAMES
         ## fit model to find baseline
         wts = SFC_wts()
+        len_denser = denser_len(i, num_cycles)
+        cycles_denser = interpolated_cycles()
         bl_fit = i.SFC_model_def_func(i.bl_method).func_fit(
-            cycles, fluos, wts; solver = Ipopt.IpoptSolver([(:print_level,0)]) )
+            cycles, fluos, wts; solver = i.solver)
         bl_status = bl_fit.status
-        bl_notes = ["bl_status $bl_status"]
-        baseline = i.SFC_model_def_func(i.bl_method).funcs_pred[:bl](
-            cycles, bl_fit.coefs...)
-        blsub_fluos = fluos .- baseline
-        have_good_results = good_status()
-        have_good_results = false
-        middle_ind=Int(floor((i.num_cycles/2)))
-        if mean(fluos[1:3])>mean(fluos[middle_ind-1:middle_ind+1])>mean(fluos[end-2:end])
-            have_good_results = false
-            blsub_fluos_flb = fluos .- mean(fluos[1:5])
+        
+        if (bl_status == :Optimal || bl_status == :UserLimit) && (abs(maximum(fluos)-minimum(fluos))>5000)
+            dr2_pred_tm=i.SFC_model_def_func(i.bl_method).funcs_pred[:dr2](
+                cycles_denser, bl_fit.coefs...)
+            cyc_idx_=Int(floor(cycles_denser[findmax(dr2_pred_tm)[2]]))-1
+            if cyc_idx_ <= i.min_reliable_cyc
+                auto_cycs=1:cyc_idx_
+            else
+                auto_cycs=i.min_reliable_cyc:cyc_idx_
+            end
+            if cyc_idx_==0
+                auto_cycs=bl_cycs()
+            end
         else
-            blsub_fluos_flb = fluos .- mean(fluos[bl_cycs()])
-        end  
-        debug(logger, "bl notes: $bl_notes, good_results: $have_good_results")
+            auto_cycs=bl_cycs()
+        end
+        
+        baseline = median(fluos[auto_cycs])
+        blsub_fluos= fluos .- baseline
+        blsub_fluos_flb=blsub_fluos
+
+        # debug(logger, "bl notes: $bl_notes, good_results: $have_good_results")
     else
         ## bl_method == take_the_median
         ## do not fit model to find baseline
         wts = ones(num_cycles)
         # bl_fit = FIT[amp_model]() ## empty model fit
-        have_good_results = false
+        # have_good_results = false
         bl_notes = ["no bl_status", "no fallback"]
         bl_status = ""
         bl_func = median
@@ -337,13 +347,13 @@ function amp_fit_model(
         blsub_fluos= fluos .- baseline
         blsub_fluos_flb=blsub_fluos
     end ## if bl_method
-    if !have_good_results
-        blsub_fluos = blsub_fluos_flb
-    end
+    # if !have_good_results
+    #     blsub_fluos = blsub_fluos_flb
+    # end
     #
     ## fit quantitation model
     qm = i.SFC_model_def_func(i.quant_method)
-    quant_fit = qm.func_fit(cycles, blsub_fluos, wts; solver = Ipopt.IpoptSolver([(:print_level,0)]))
+    quant_fit = qm.func_fit(cycles[auto_cycs[1]:end], blsub_fluos[auto_cycs[1]:end], wts; solver = i.solver)
     quant_coefs = quant_fit.coefs
     len_denser = denser_len(i, num_cycles)
     cycles_denser = interpolated_cycles()
@@ -459,3 +469,4 @@ function amp_fit_model(
         copy(eff_vals_4cq[Symbol(cq_method)]), ## eff
         calc_cq_fluo(cq_raw)) ## cq_fluo
 end ## fit_amplification_model(Val{SFCModel})
+
