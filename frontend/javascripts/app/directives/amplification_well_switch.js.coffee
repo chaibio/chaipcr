@@ -45,6 +45,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
       wells = {}
       $scope.dragging = false
       $scope.shiftStartIndex = -1
+      $scope.initTargetSelect = false
 
       $scope.$on 'keypressed:command', ->
         is_cmd_key_held = true
@@ -73,7 +74,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
           color: well_color
 
       ngModel.$setViewValue wells
-      $scope.wells = wells
+      $scope.wells = wells      
 
       $scope.row_header_width = 20
       $scope.columns = []
@@ -103,7 +104,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
         return actives
       , (actives) ->
         for a, i in actives by 1
-          $scope.wells["well_#{i}"].active = a if $scope.wells["well_#{i}"]
+          $scope.wells["well_#{i}"].active = a if $scope.wells["well_#{i}"]        
 
       $scope.$watch 'colorBy', (color_by) ->
         for i in [0..15] by 1
@@ -130,16 +131,20 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
           # $scope.wells["well_#{i}"].selected = selected
           $scope.wells["well_#{i}"].color = well_color
 
-        ngModel.$setViewValue angular.copy($scope.wells)
+        ngModel.$setViewValue angular.copy($scope.wells)        
 
 
       $scope.$watch 'targets', (target) ->
-        for i in [0..15] by 1
-          selected = true
-          if $scope.targets and (($scope.isDual and (!$scope.targets[i*2] or !$scope.targets[i*2].id) and (!$scope.targets[i*2+1] or !$scope.targets[i*2+1].id)) or (!$scope.isDual and (!$scope.targets[i] or !$scope.targets[i].id)))
-            selected = false
-          $scope.wells["well_#{i}"].selected = selected
-        ngModel.$setViewValue angular.copy($scope.wells)
+        if !$scope.initTargetSelect and $scope.targets and $scope.targets.length
+          for i in [0..15] by 1
+            selected = true
+            if $scope.targets and (($scope.isDual and (!$scope.targets[i*2] or !$scope.targets[i*2].id) and (!$scope.targets[i*2+1] or !$scope.targets[i*2+1].id)) or (!$scope.isDual and (!$scope.targets[i] or !$scope.targets[i].id)))
+              selected = false
+            $scope.wells["well_#{i}"].selected = selected        
+          ngModel.$setViewValue angular.copy($scope.wells)
+          targets = _.filter $scope.targets, (item) ->
+            item.id
+          $scope.initTargetSelect = true if targets and targets.length
 
       $scope.getStyleForWellBar = (row, col, config, i) ->
         'background-color': config.color
@@ -164,7 +169,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
 
         ngModel.$setViewValue(angular.copy($scope.wells))
 
-        $rootScope.$broadcast 'event:switch-chart-well', {active: well?.active, index: index}
+        $rootScope.$broadcast 'event:switch-chart-well', {active: well?.active, index: 0}
 
       $scope.dragStart = (evt, type, index) ->
         # type can be 'column', 'row', 'well' or 'corner'
