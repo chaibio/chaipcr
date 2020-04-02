@@ -1,4 +1,4 @@
-<div ng-show="!experimentComplete" class="text-center exp-running col-lg-6 col-md-6 col-sm-6 col-xs-6">
+<div ng-show="!experimentComplete && initial_done" class="text-center exp-running col-lg-6 col-md-6 col-sm-6 col-xs-6">
 	<h4>Your experiment is running. Please do not open the</h4>
 	<h4>hardware unless instructed to here.</h4>
 
@@ -19,7 +19,7 @@
 
 </div>
 
-<div ng-show="experimentComplete" class="text-center col-lg-6 col-md-6 col-sm-6 col-xs-6">
+<div ng-show="experimentComplete && initial_done" class="text-center col-lg-6 col-md-6 col-sm-6 col-xs-6">
 	<p>Your experiment is complete.</p>
 
 		<h3>Time Remaining:</h3>

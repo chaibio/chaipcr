@@ -35,7 +35,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
       $scope.chartConfig = helper.chartConfig()
       $scope.chartConfig.channels = if is_dual_channel then 2 else 1
       # $scope.chartConfig.axes.x.max = 1
-      $scope.standardcurve_data = helper.paddData()
+      $scope.standardcurve_data = helper.paddData($scope.is_dual_channel)
       $scope.well_data = []
       $scope.line_data = {target_line: []}
 
@@ -212,15 +212,16 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
             $scope.fetching = false
             $scope.error = null
 
-            if (resp.status is 200 and resp.data?.partial and $scope.enterState) or (resp.status is 200 and !resp.data.partial)
+            if (resp.status is 200 and !resp.data.partial)
               $scope.hasData = true
-              $scope.standardcurve_data = helper.paddData()
+              $scope.standardcurve_data = helper.paddData($scope.is_dual_channel)
+            if (resp.status is 200 and resp.data?.partial and $scope.enterState)
+              $scope.hasData = false
             if resp.status is 200 and !resp.data.partial
               $rootScope.$broadcast 'complete'
-            if (resp.data.steps?[0].amplification_data and resp.data.steps?[0].amplification_data?.length > 1)
+            if $scope.hasData and (resp.data.steps?[0].amplification_data and resp.data.steps?[0].amplification_data?.length > 1)
               
               # $scope.chartConfig.axes.x.min = 0
-              $scope.hasData = true
               data = resp.data.steps[0]
 
               $scope.well_data = helper.normalizeSummaryData(data.summary_data, data.targets, $scope.well_targets)

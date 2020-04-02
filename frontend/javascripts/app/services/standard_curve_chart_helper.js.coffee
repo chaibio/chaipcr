@@ -344,10 +344,15 @@ window.ChaiBioTech.ngApp.service 'StandardCurveChartHelper', [
 
       return targets
 
-    @paddData = (cycle_num = 1) ->
+    @paddData = (is_dual_channel) ->
       datasets = {}
-      for i in [0..15] by 1
-        datasets["well_#{i}_1"] = []
+      if is_dual_channel
+        for ch in [1..2] by 1
+          for i in [0..15] by 1
+            datasets["well_#{i}_#{ch}"] = []
+      else
+        for i in [0..15] by 1
+          datasets["well_#{i}_1"] = []
 
       datasets
 
