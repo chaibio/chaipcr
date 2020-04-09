@@ -317,9 +317,6 @@ function amp_fit_model(
             if (bl_status == :Optimal || bl_status == :UserLimit) #&& (abs(maximum(fluos)-minimum(fluos))>20000)
                 dr2_pred_tm=i.SFC_model_def_func(i.bl_method).funcs_pred[:dr2](
                     cycles_denser, bl_fit.coefs...)
-                
-                # println(dr2_pred_tm)
-                # println(fluos)
                 min_fluo_cyc_=findmin(fluos)[2]
                 if (min_fluo_cyc_<i.min_reliable_cyc)
                     fluos_muted=vcat(fill(findmax(fluos)[1],i.min_reliable_cyc-1),fluos[i.min_reliable_cyc:end])
@@ -369,9 +366,7 @@ function amp_fit_model(
             auto_cycs=i.baseline_cyc_bounds[1]:i.baseline_cyc_bounds[2]
             baseline = median(fluos[auto_cycs])
         end
-        println(auto_cycs)
-        println(baseline)
-        
+
         blsub_fluos= fluos .-baseline
         blsub_fluos_flb=blsub_fluos
 

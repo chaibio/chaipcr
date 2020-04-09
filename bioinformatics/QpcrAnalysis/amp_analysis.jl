@@ -56,17 +56,6 @@ function amp_analysis(i ::AmpInput) # ; asrp ::AmpStepRampProperties)
         set_qt_fluos!(o, i)
         set_report_cq!(o, i)
     end ## if
-    #
-    ## allelic discrimination
-    # if dcv
-    #     o.assignments_adj_labels_dict, o.agr_dict =
-    #         process_ad(i, o)
-    # end # if dcv
-    #
-    # serialize('/home/ali/ali/cq/output',o=o)
-    # file_=open("/home/ali/ali/cq/output", "w")
-    # serialize(file_, o)
-    # close(file_)
     return o
 end ## amp_analysis()
 
