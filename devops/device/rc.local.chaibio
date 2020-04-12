@@ -130,7 +130,7 @@ change_root_password_on_factorysettings () {
 			rm ${sdcard}/upgrade/change_root_password.flag || :
         		echo "Change root password flag down.."
 		else
-			echo password changed failed
+			echo password changing failed
 		fi
 	else
 		echo "No change root password flag found!"
@@ -673,7 +673,7 @@ check_upgrade_autorun () {
                 update_wireless_network
                 update_ethernet_network
 		change_root_password_on_factorysettings
-                retain_previous_user_credentials_on_upgrade
+#               retain_previous_user_credentials_on_upgrade
 		run_migrate_on_upgrade_logged
 		return 0
 	fi
