@@ -18,7 +18,7 @@
 				<td style="width:200px">Amount</td>
 				<td style="width:200px">Notes</td>
 			</tr>
-			<tr ng-show="x" class="td-description" ng-repeat="x in samples track by $index">
+			<tr ng-show="x && (x.name != '' && x.name != 'empty')" class="td-description" ng-repeat="x in samples track by $index">
 				<td ng-if="$index < 2">
 					A{{$index + 1}}. {{x.name}}
 					<img ng-show="result[$index] == 'Valid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_valid.svg">
@@ -39,7 +39,7 @@
 				<td ng-show="x.id && !x.notes" ng-click="openNotes($index, x)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
 				<td ng-show="!x.id" class="notes-cursor"><img style="width:20px; opacity: .5;" src="/images/dynexp/pika-test/comment_off.svg"></td>
 			</tr>
-			<tr ng-show="y" class="td-description" ng-repeat="y in samples_B track by $index">
+			<tr ng-show="y && (y.name != '' && y.name != 'empty')" class="td-description" ng-repeat="y in samples_B track by $index">
 				<td>
 					<span>B{{$index+1}}. {{y.name}}</span>
 					<img ng-show="result[$index+8] == 'Positive'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_pos.svg">
@@ -67,7 +67,7 @@
 				<td style="width:200px">Amount</td>
 				<td style="width:200px">Notes</td>
 			</tr>
-			<tr ng-show="x" class="td-description" ng-repeat="x in samples track by $index">
+			<tr ng-show="x && (x.name != '' && x.name != 'empty')" class="td-description" ng-repeat="x in samples track by $index">
 				<td ng-if="$index < 2">
 					A{{$index + 1}}. {{x.name}}
 					<img ng-show="result[$index] == 'Valid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_valid.svg">
@@ -100,7 +100,7 @@
 				<td style="width:200px">Amount</td>
 				<td style="width:200px">Notes</td>
 			</tr>
-			<tr ng-show="y" class="td-description" ng-repeat="y in samples_B track by $index">
+			<tr ng-show="y && (y.name != '' && y.name != 'empty')" class="td-description" ng-repeat="y in samples_B track by $index">
 				<td ng-if="$index < 2">
 					B{{$index + 1}}. {{y.name}}
 					<img ng-show="result[$index+8] == 'Valid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_valid.svg">
