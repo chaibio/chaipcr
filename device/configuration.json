@@ -1,8 +1,8 @@
 {
 	"software": {
-		"version": "1.1.1",
+		"version": "1.1.0.BUILD_NUMBER",
 		"platform": "S0100",
-		"data_partition_free_soft_limit": 40,	
+		"data_partition_free_soft_limit": 40,
 		"data_partition_free_hard_limit": 30
 	},
 	"thermal": {
@@ -19,7 +19,7 @@
 		"baseline": {
 			"method": "auto_median"
 		},
-		
+
 		"cq_calling": {
 			"method": "Cy0",
 			"min_cq": 5,
@@ -27,7 +27,7 @@
 			"df_dc_threshold": 1280,
 			"d2f_dc2_threshold": 160
 		},
-		
+
 		"melt": {
 			"span_smooth_default": 0.05,
 			"span_smooth_factor": 7.2
