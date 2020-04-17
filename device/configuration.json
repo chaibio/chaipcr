@@ -1,6 +1,6 @@
 {
 	"software": {
-		"version": "1.1.0",
+		"version": "1.1.0.BUILD_NUMBER",
 		"platform": "S0100",
 		"data_partition_free_soft_limit": 40,	
 		"data_partition_free_hard_limit": 30
