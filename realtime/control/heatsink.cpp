@@ -93,7 +93,7 @@ void HeatSink::processOutput()
         {
             if (currentDrive == 0.0)
                 _fanTransitionSteps.emplace_back(2 * 1000 * 1000, -1.0);
-            else if (currentDrive == 0.3)
+            else if (currentDrive == 0.2)
                 _fanTransitionSteps.emplace_back(1 * 1000 * 1000, -1.0);
             else //0.5
             {
