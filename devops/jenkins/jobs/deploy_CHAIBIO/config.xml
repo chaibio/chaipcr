@@ -290,10 +290,11 @@ ENDSSH
         cd ..
         echo done gulp deploy
         
+        echo Build number is $build_number
 		rm -rf ./web/log
 		sed -i &apos;s/&quot;version&quot;: &quot;1.0.0&quot;,/&quot;version&quot;: &quot;&apos;${image_version}&apos;&quot;,/g&apos; ./device/configuration.json || true
 		sed -i &apos;s/&quot;version&quot;: &quot;1.1.1&quot;,/&quot;version&quot;: &quot;&apos;${image_version}&apos;&quot;,/g&apos; ./device/configuration.json || true
-        sed -i &apos;s/BUILD_NUMBER/${build_number}/g&apos; ./device/configuration.json  || true
+        sed -i &apos;s/BUILD_NUMBER/&apos;${build_number}&apos;/g&apos; ./device/configuration.json  || true
 
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./web &quot;$build_machine:/root/chaipcr/&quot; || (echo error copying files to device &amp;&amp; exit 1)
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./browser &quot;$build_machine:/root/chaipcr/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
