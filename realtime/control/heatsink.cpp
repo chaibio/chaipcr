@@ -85,7 +85,7 @@ void HeatSink::processOutput()
         if (targetTemp < 30.0)
             nextDrive = 0.5;
         else
-            nextDrive = 0.2; //qpcrApp.settings().device.fanChange ? 0.2 : 0.3;
+            nextDrive = qpcrApp.settings().device.fanChange ? 0.2 : 0.3;
 
         double currentDrive = fanDrive();
 
@@ -93,7 +93,7 @@ void HeatSink::processOutput()
         {
             if (currentDrive == 0.0)
                 _fanTransitionSteps.emplace_back(2 * 1000 * 1000, -1.0);
-            else if (currentDrive == 0.2)
+            else if (currentDrive == 0.3)
                 _fanTransitionSteps.emplace_back(1 * 1000 * 1000, -1.0);
             else //0.5
             {
