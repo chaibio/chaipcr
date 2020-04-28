@@ -618,8 +618,8 @@ class DevicesController < ApplicationController
   end
 
   def retrieve_mac
-    str = `ifconfig eth0 | grep HWaddr`
-  #  str = "eth0      Link encap:Ethernet  HWaddr 54:4a:16:c0:7e:38 "
+    str = `ifconfig eth0 | grep ether`
+    #str = "ether 54:4a:16:c0:70:9a txqueuelen 1000 (Ethernet) "
     re = %r/([A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2}/
     return re.match(str).to_s.strip
   end
