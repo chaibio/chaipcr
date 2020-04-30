@@ -244,13 +244,14 @@ function set_report_cq!(
         (scaled_max_dr1, scaled_max_dr2, scaled_max_bsf) =
         [max_dr1, max_dr2, max_bsf] ./ max_qt_fluo_
 
+        min_reliable_cyc_=length(i.baseline_cyc_bounds)==2?i.baseline_cyc_bounds[1]:i.min_reliable_cyc
 
         if (max_bsf < i.max_bsf_lb || scaled_max_bsf < i.scaled_max_bsf_lb ||
             max_dr2 < max_dr2_lb || max_dr1 < max_dr1_lb  || 
             scaled_max_dr2 < i.scaled_max_dr2_lb || 
             scaled_max_dr1 < i.scaled_max_dr1_lb || o.cq[well_i, channel_i]>i.num_cycles || 
-            o.cq[well_i, channel_i]<i.min_reliable_cyc || postbl_status == :Error ||
-            b_ > 0 || max_bsf_ < i.max_bsf_lb)
+            o.cq[well_i, channel_i]<min_reliable_cyc_ || postbl_status == :Error ||
+            b_ > 0)
             
             o.blsub_fluos[:,well_i, channel_i]=o.blsub_fluos_flb[:,well_i, channel_i]
             o.dr1_pred[:,well_i, channel_i]=o.dr1_pred1[:,well_i, channel_i]
