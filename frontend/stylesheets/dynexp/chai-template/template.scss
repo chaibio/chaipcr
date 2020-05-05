@@ -1,0 +1,35 @@
+@import "./variables.scss";
+
+.chai-mode{
+  .mr-10{
+    margin-right: 10px;
+  }
+
+  .ml-10{
+    margin-left: 10px;
+  }
+
+  .mt-10{
+    margin-top: 10px;
+  }
+
+  .mb-10{
+    margin-bottom: 10px;
+  }
+
+  .mt-20{
+    margin-top: 20px;
+  }
+
+  .d-flex{
+    display: flex;
+  }
+
+  .align-items-center{
+    align-items: center;
+  }
+
+  .cursor-pointer{
+    cursor: pointer;
+  }
+}

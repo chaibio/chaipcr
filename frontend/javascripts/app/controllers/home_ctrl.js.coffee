@@ -115,7 +115,7 @@ window.ChaiBioTech.ngApp
               $state.go 'edit-protocol', {id: exp.id}
           else
             if not exp.started_at
-              $state.go('pika_test.setWellsA', id: exp.id)
+              $state.go('pika_test.set-wells', id: exp.id)
             else if exp.started_at isnt null && exp.completed_at isnt null
               $state.go('pika_test.results', id: exp.id)
             else

@@ -259,13 +259,13 @@
         };
 
         $scope.goBackToA = function() {
-          $state.go('pika_test.setWellsA', { id: $scope.experimentId });
+          $state.go('pika_test.set-wells', { id: $scope.experimentId });
           $scope.setProgress(0);
           $scope.assignB = false;
         };
 
         $scope.goBackToB = function() {
-          $state.go('pika_test.setWellsB', {id: $scope.experimentId});
+          $state.go('pika_test.set-wells', {id: $scope.experimentId});
           $scope.setProgress(70);
           $scope.assignB = true;
           $scope.assignReview = false;

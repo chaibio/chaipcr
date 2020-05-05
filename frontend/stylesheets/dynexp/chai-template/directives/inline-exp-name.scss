@@ -1,0 +1,39 @@
+@import "../variables.scss";
+
+  // Inline Exp Name Editor Style
+.chai-mode{
+  .inline-exp-name {
+    .exp-name-field{
+      display: inline-block;
+      &::after{
+        content:attr(data-error);
+        color: $link-text-color;
+        display: block;
+        position: absolute;
+        font-family: 'DINOT--Regular', Arial, sans-serif;
+        font-size: 12px;
+        line-height: 15px;
+      }
+      input{
+        padding: 0;
+        border-bottom: 1px solid $cell-border-color;
+        caret-color: $text-cursor-color;
+      }
+    }
+
+    a{
+      color: $link-text-color;
+      outline: none;
+      cursor: pointer;
+      &:hover, &:focus{
+        background: transparent;
+        text-decoration: none; 
+      }
+    }
+
+    .hide-elem{
+      position: absolute;
+      top: -1000px;
+    }
+  }
+}
