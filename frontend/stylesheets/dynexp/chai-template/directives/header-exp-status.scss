@@ -1,0 +1,70 @@
+@import "../variables.scss";
+
+  // Header Exp Status Style
+.chai-mode{
+  .header-exp-status{
+    .header-bar{
+      background: $black;
+      height: 60px;
+      width: 100%;
+
+      display: flex;
+      justify-content: space-between;
+      padding: 0 40px;
+      color: $white;
+
+      .left-content{
+        display: flex;
+        height: 60px;
+        justify-content: flex-start;
+        align-items: center;
+      }
+
+      .right-content{
+        display: flex;
+        height: 60px;
+        justify-content: flex-start;
+        align-items: center;
+      }
+
+      .failed{
+        background-color: $link-text-color;
+        color: $white;
+        margin-right: 10px;
+        padding: 2px 5px;
+      }
+
+      &.in-progress {
+        background: -moz-linear-gradient(left, #64b027 0%, #c6e35f 46%, #5d8329 46%, #5d8329 100%);
+        /* FF3.6-15 */
+        background: -webkit-linear-gradient(left, #64b027 0%, #c6e35f 46%, #5d8329 46%, #5d8329 100%);
+        /* Chrome10-25,Safari5.1-6 */
+        background: linear-gradient(to right, #64b027 0%, #c6e35f 46%, #5d8329 46%, #5d8329 100%);
+        /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+      }
+      &.complete {
+        background-image: url('/images/header-complete.png');
+        background-size: auto 100%;
+      }      
+    }
+
+    .home-link{
+      height: 30px;
+      border: 1px solid $white;
+      border-radius: 2px;
+      color: $white;
+      margin-right: 20px;
+      line-height: 26px;
+      padding: 0 10px 0 5px;
+      cursor: pointer;
+
+      img{
+        height: 24px;
+        width: 30px;
+        display: inline-block;
+        vertical-align: middle;
+        margin-bottom: 2px;
+      }
+    }
+  }
+}
