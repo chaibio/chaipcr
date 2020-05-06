@@ -18,6 +18,11 @@
 				templateUrl: 'dynexp/pika_test/views/v2/set-wells.html'
 			})
 
+			.state('pika_test.experiment-running', {
+				url: '/experiment-running/:id',
+				templateUrl: 'dynexp/pika_test/views/v2/exp-running.html'
+			})
+
 			.state('pika_test.introduction', {
 				url: '/introduction',
 				templateUrl: 'dynexp/pika_test/views/intro.html'

@@ -25,6 +25,12 @@
         $window.$('body').removeClass('pika-set-well-active');
       });
 
+      angular.element('body').click(function(evt) {
+        if(evt.target.id !== 'start-experiment-button' && $scope.start_confirm_show === true) {
+          $scope.start_confirm_show = false;
+        }
+      });
+
       $scope.samples = ['', '', '', '', '', ''];
       $scope.samples_B = ['', '', '', '', '', '', '', ''];
       $scope.initial_done = false;
@@ -264,80 +270,17 @@
           if($scope.samples[omit_sample_index].name != omit_sample_name){      
             Experiment.createSample($scope.experimentId, {name: omit_sample_name}).then(function(resp) {
               var new_sample = resp.data.sample;
-              if($scope.samples[omit_sample_index].id){
-                var is_assign = false;
-                for(var i = 0; i < 8; i++){
-                  if(!$scope.samples[i].id){
-                    $scope.samples[i] = $scope.samples[omit_sample_index];
-                    Experiment.linkSample($scope.experimentId, $scope.samples[i].id, { wells: [i+1] }).then(function (response) {
-                    });
-                    is_assign = true;
-                    break;
-                  }
-                }
-
-                if(!is_assign && !$scope.is_two_kit){
-                  for(i = 0; i < 8; i++){
-                    if(!$scope.samples_B[i].id){
-                      $scope.samples_B[i] = $scope.samples[omit_sample_index];
-                      Experiment.linkSample($scope.experimentId, $scope.samples_B[i].id, { wells: [i+8+1] }).then(function (response) {
-                      });
-                      is_assign = true;
-                      break;
-                    }
-                  }
-                }
-
-                if(!is_assign){
-                  Experiment.deleteLinkedSample($scope.experimentId, $scope.samples[omit_sample_index].id).then(function(resp) {
-                    $scope.samples[omit_sample_index] = new_sample;
-                    Experiment.linkSample($scope.experimentId, new_sample.id, { wells: [omit_sample_index + 1] }).then(function (response) {
-                    });
-                  });
-                } else {
-                  $scope.samples[omit_sample_index] = new_sample;
-                  Experiment.linkSample($scope.experimentId, new_sample.id, { wells: [omit_sample_index + 1] }).then(function (response) {
-                  });                
-                }
-              } else {
-                $scope.samples[omit_sample_index] = new_sample;
-                Experiment.linkSample($scope.experimentId, new_sample.id, { wells: [omit_sample_index + 1] }).then(function (response) {
-                });
-              }
+              $scope.samples[omit_sample_index] = new_sample;
+              Experiment.linkSample($scope.experimentId, new_sample.id, { wells: [omit_sample_index + 1] }).then(function (response) {});
             });
           }
 
           if($scope.is_two_kit && $scope.samples_B[omit_sample_index].name != omit_sample_name){            
             Experiment.createSample($scope.experimentId, {name: omit_sample_name}).then(function(resp) {
               var new_sample = resp.data.sample;
-              if($scope.samples_B[omit_sample_index].id){
-                var is_assign = false;
-                for(var i = 0; i < 8; i++){
-                  if(!$scope.samples_B[i].id){
-                    $scope.samples_B[i] = $scope.samples_B[omit_sample_index];
-                    Experiment.linkSample($scope.experimentId, $scope.samples_B[i].id, { wells: [i+1] }).then(function (response) {
-                    });
-                    is_assign = true;
-                    break;
-                  }
-                }
-
-                if(!is_assign){
-                  Experiment.deleteLinkedSample($scope.experimentId, $scope.samples_B[omit_sample_index].id).then(function(resp) {
-                    $scope.samples_B[omit_sample_index] = new_sample;
-                    Experiment.linkSample($scope.experimentId, new_sample.id, { wells: [omit_sample_index + 9] }).then(function (response) {
-                    });
-                  });
-                } else {
-                  $scope.samples_B[omit_sample_index] = new_sample;
-                  Experiment.linkSample($scope.experimentId, new_sample.id, { wells: [omit_sample_index + 9] }).then(function (response) {
-                  });                
-                }
-              } else {
-                $scope.samples_B[omit_sample_index] = new_sample;
-                Experiment.linkSample($scope.experimentId, new_sample.id, { wells: [omit_sample_index + 9] }).then(function (response) {
-                });
-              }
+              $scope.samples_B[omit_sample_index] = new_sample;
+              Experiment.linkSample($scope.experimentId, new_sample.id, { wells: [omit_sample_index + 9] }).then(function (response) {
+              });
             });
           }
 

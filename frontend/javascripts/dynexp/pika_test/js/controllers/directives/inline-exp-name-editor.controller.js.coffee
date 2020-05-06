@@ -41,12 +41,12 @@ angular.module('dynexp.pika_test').controller 'InlineExpNameEditorCtrl', [
 
     $scope.adjustTextWidth = () ->
       $timeout (() ->
-        field_width = Math.max(document.getElementById('exp_name_plat').offsetWidth + 5, 250)
+        field_width = Math.max(document.getElementById('exp_name_plat').offsetWidth + 20, 150)
         angular.element(document.getElementById('exp_name_field')).css('width', (field_width) + 'px')
       ), 10
 
     $scope.focusExpName = ->
-      field_width = Math.max(document.getElementById('exp_name_plat').offsetWidth + 5, 250)
+      field_width = Math.max(document.getElementById('exp_name_plat').offsetWidth + 20, 150)
       angular.element(document.getElementById('exp_name_field')).css('width', (field_width) + 'px')
       
       $scope.ori_experiment_name = $scope.experiment.name

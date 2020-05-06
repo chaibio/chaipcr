@@ -14,8 +14,8 @@
       <section class="well-container">
         <div class="well-panel">
           <div class="d-flex">
-            <h1 class="CH1">{{ is_two_kit ? 'Test Kit1' : 'Test Kit'}}</h1>
-            <h1 class="CH1" ng-if="is_two_kit">Test Kit2</h1>
+            <h1 class="CH1">{{ is_two_kit ? 'Test Kit 1' : 'Test Kit'}}</h1>
+            <h1 class="CH1" ng-if="is_two_kit">Test Kit 2</h1>
           </div>
           <div class="d-flex mt-20">
             <div class="well-table">
@@ -124,8 +124,8 @@
             </div>
           </div>
         </div>
-        <button class="button-start-exp CB1-M" ng-if="!start_confirm_show" ng-click="startConfirm()">Start Experiment</button>
-        <button class="button-confirm-exp CB1-M" ng-if="start_confirm_show" ng-click="startExperiment()">Confirm Start</button>
+        <button class="button-start-exp CB1-M" id="start-experiment-button" ng-if="!start_confirm_show" ng-click="startConfirm()">Start Experiment</button>
+        <button class="button-confirm-exp CB1-M" id="start-experiment-button" ng-if="start_confirm_show" ng-click="startExperiment()">Confirm Start</button>
       </section>
     </div>
   </div>
