@@ -94,7 +94,7 @@ describe("It should test amplificationChart", function() {
       expect(_$scope.cpd2.name).toEqual('cpD2');
       expect(_$scope.cpd2.desciption).toEqual('A Cq calling method based on the max second derivative of the curve.');
 
-      expect(_$scope.minFl.name).toEqual('Min Flouresence');
+      expect(_$scope.minFl.name).toEqual('Min Fluorescence');
       expect(_$scope.minFl.desciption).toEqual('The minimum fluorescence threshold for Cq calling. Cq values will not be called when the fluorescence is below this threshold.');
       expect(_$scope.minFl.value).toEqual(null);
 
@@ -120,13 +120,13 @@ describe("It should test amplificationChart", function() {
 
       expect(_$scope.cyclesFrom).toEqual(null);
       expect(_$scope.cyclesTo).toEqual(null);
-      expect(_$scope.hoverName).toEqual("Min. Flouresence");
+      expect(_$scope.hoverName).toEqual("Min. Fluorescence");
       expect(_$scope.hoverDescription).toEqual("This is a test description");
       expect(_$scope.samples).toEqual(jasmine.any(Array));
       expect(_$scope.editExpNameMode).toEqual(jasmine.any(Array));
     });
 
-    it("It should test expName:Updated chnage", function() {
+    it("It should test expName:Updated change", function() {
 
       _expName.name = "chai1";
       
@@ -148,7 +148,7 @@ describe("It should test amplificationChart", function() {
       _$scope.check();
       expect(_$scope.errorCheck).toEqual(true);
       expect(_$scope.hoverName).toEqual("Error");
-      //expect(_$scope.hoverDescription).toEqual('Min Flourescence cannot be left empty');
+      //expect(_$scope.hoverDescription).toEqual('Min Fluurescence cannot be left empty');
       expect(_$scope.hoverOn).toEqual(true);
       expect(_$scope.errorCheck).toEqual(true);
       expect(_$scope.errorFl).toEqual(true);
