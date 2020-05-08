@@ -135,7 +135,8 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
 
                             for (i = 2; i < 16; i++) {
                                 linkTargetName[i] = {
-                                    well_num: i + 1
+                                    well_num: i + 1,
+                                    well_type: 'unknown'
                                 };
                             }                            
                             Experiment.linkTarget(new_experiment_id, $scope.target_1.id, { wells: linkTargetName }).then(function (response) {                                
@@ -259,7 +260,8 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
                             };
                             for (i = 2; i < 8; i++) {
                                 linkTargetName[i] = {
-                                    well_num: i + 1
+                                    well_num: i + 1,
+                                    well_type: 'unknown'
                                 };
                             }                            
                             Experiment.linkTarget(new_experiment_id, $scope.target_1.id, { wells: linkTargetName }).then(function (response) {                                
@@ -287,7 +289,8 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
                             };
                             for (i = 10; i < 16; i++) {
                                 linkTargetName[i] = {
-                                    well_num: i + 1
+                                    well_num: i + 1,
+                                    well_type: 'unknown'
                                 };
                             }                            
                             Experiment.linkTarget(new_experiment_id, $scope.target_2.id, { wells: linkTargetName }).then(function (response) {                                
@@ -308,9 +311,26 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
                             var linkTargetName = [];
                             for (i = 0; i < 16; i++) {
                                 linkTargetName[i] = {
-                                    well_num: i + 1
+                                    well_num: i + 1,
+                                    well_type: 'unknown'
                                 };
                             }                            
+                            linkTargetName[0] = {
+                                well_num: 1,
+                                well_type: 'positive_control'
+                            };
+                            linkTargetName[1] = {
+                                well_num: 2,
+                                well_type: 'negative_control'
+                            };
+                            linkTargetName[8] = {
+                                well_num: 9,
+                                well_type: 'positive_control'
+                            };
+                            linkTargetName[9] = {
+                                well_num: 10,
+                                well_type: 'negative_control'
+                            };
                             Experiment.linkTarget(new_experiment_id, $scope.target_ipc.id, { wells: linkTargetName }).then(function (response) {                                
                                 cb(null, response);
                             }).catch(function(err) {

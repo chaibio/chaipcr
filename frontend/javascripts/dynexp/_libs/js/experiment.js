@@ -95,6 +95,10 @@ angular.module('dynexp.libs')
       return $http.get("/experiments/" + id + "/well_layout");
     };
 
+    self.getTargets = function(id) {
+      return $http.get("/experiments/" + id + "/targets");
+    };
+
     self.createSample = function(expId, data) {
       return $http.post("/experiments/" + expId + "/samples", data);
     };
