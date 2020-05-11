@@ -229,6 +229,9 @@
 
 
       $scope.startExperiment = function(){
+        // Experiment.startExperiment($scope.experimentId).then(function(resp) {
+          $state.go('pika_test.experiment-running', { id: $scope.experimentId });
+        // });
       };
 
       $scope.omitPositive = function(){

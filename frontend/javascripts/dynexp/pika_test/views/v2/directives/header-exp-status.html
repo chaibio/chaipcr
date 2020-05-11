@@ -15,54 +15,54 @@
     </div>
 
     <!-- begin is invalid LID IS OPEN -->
-    <div class="right-content CB3-L" ng-if="!experiment.started_at && !experiment.completed_at && (statusData.optics.lid_open==='true')">LID IS OPEN</div>
+    <div class="right-content CB1-M" ng-if="!experiment.started_at && !experiment.completed_at && (statusData.optics.lid_open==='true')">LID IS OPEN</div>
 
     <!-- begin is invalid ANOTHER EXP RUNNING -->
-    <div class="right-content CB3-L" ng-if="!experiment.started_at && !experiment.completed_at && (state !== 'idle')">
+    <div class="right-content CB1-M" ng-if="!experiment.started_at && !experiment.completed_at && (state !== 'idle')">
       ANOTHER EXPERIMENT IS RUNNING
-      <span class="CB3-M ml-10 cursor-pointer" ui-sref="run-experiment({id: statusData.experiment_controller.experiment.id, chart: 'amplification'})">VIEW NOW</span>
+      <span class="CB1-M ml-10 cursor-pointer" ui-sref="run-experiment({id: statusData.experiment_controller.experiment.id, chart: 'amplification'})">VIEW NOW</span>
     </div>
 
     <!-- experiment in progress -->
-    <div class="right-content CB3-L" ng-if="!experiment.completed_at && state !== 'idle' && isCurrentExp">
-      IN PROGRESS...
-      <span class="CB3-M ml-10" ng-if="state !== 'lid_heating'">{{timeRemaining | secondsDisplay: 'display2'}} remaining</span>
-      <span class="CB3-M ml-10" ng-if="state === 'lid_heating'">estimating time remaining</span>
+    <div class="right-content CB1-M" ng-if="!experiment.completed_at && state !== 'idle' && isCurrentExp">
+      In PROGRESS...
+      <span class="CB1-M ml-10" ng-if="state !== 'lid_heating'">{{timeRemaining | secondsDisplay: 'display2'}} Remaining</span>
+      <span class="CB1-M ml-10" ng-if="state === 'lid_heating'">estimating time remaining</span>
     </div>
 
     <!-- experiment complete - final holding state -->
-    <div class="right-content CB3-M" ng-if="experiment.completed_at && state !== 'idle' && isCurrentExp && !dataAnalysis">
+    <div class="right-content CB1-M" ng-if="experiment.completed_at && state !== 'idle' && isCurrentExp && !dataAnalysis">
       Analyzing<ellipsis-animated></ellipsis-animated>  &nbsp;Holding Temperature of {{status.heat_block.temperature | round: 1}} &deg;C
     </div>
-    <div class="right-content CB3-M" ng-if="experiment.completed_at && state !== 'idle' && isCurrentExp && dataAnalysis">
+    <div class="right-content CB1-M" ng-if="experiment.completed_at && state !== 'idle' && isCurrentExp && dataAnalysis">
       Experiment Complete, Holding Temperature of {{status.heat_block.temperature | round: 1}}&deg;C
     </div>
 
     <!-- experiment complete - data analyzing -->
-    <div class="right-content CB3-M" ng-if="experiment.completed_at && !(state !== 'idle' && isCurrentExp) && !dataAnalysis && enterState">
+    <div class="right-content CB1-M" ng-if="experiment.completed_at && !(state !== 'idle' && isCurrentExp) && !dataAnalysis && enterState">
       Run Complete, Analyzing<ellipsis-animated></ellipsis-animated>
     </div>
 
     <!-- experiment completed successfully -->
-    <div class="right-content CB3-L" ng-if="experiment.completed_at && !(state !== 'idle' && isCurrentExp) && (dataAnalysis || !enterState)">
+    <div class="right-content CB1-M" ng-if="experiment.completed_at && !(state !== 'idle' && isCurrentExp) && (dataAnalysis || !enterState)">
       <span ng-if="experiment.completion_status === 'success'">COMPLETED</span>
       <span ng-if="experiment.completion_status !== 'success'">
-        <span class="failed CB3-M mr-10">FAILED</span>
+        <span class="failed CB1-M mr-10">FAILED</span>
         <span ng-if="experiment.completion_status === 'aborted'">
           USER CANCELLED
           <span ng-if="experiment.time_valid" >{{experiment.completed_at|date:'MMM. dd yyyy, hh:mm:ss'}}</span>
         </span>
         <span ng-if="experiment.completion_status !== 'aborted'">
           AN ERROR OCCURED
-          <span class="CB3-M cursor-pointer" ng-click="viewError()">VIEW DETAILS</span>
+          <span class="CB1-M cursor-pointer" ng-click="viewError()">VIEW DETAILS</span>
         </span>
       </span>
     </div>
 
     <!-- experiment has been started and not completed -->
-    <div class="right-content CB3-L" ng-if="experiment && experiment.started_at && !experiment.completed_at && 
+    <div class="right-content CB1-M" ng-if="experiment && experiment.started_at && !experiment.completed_at && 
             !isStarted && !(state !== 'idle' && isCurrentExp) && (dataAnalysis || !enterState)">
-      <span class="failed CB3-M">FAILED</span>
+      <span class="failed CB1-M">FAILED</span>
       <span ng-if="experiment.completion_status === 'aborted'">USER CANCELLED</span>
       <span ng-if="experiment.completion_status !== 'aborted'">AN ERROR OCCURED</span>
     </div>

@@ -1,0 +1,87 @@
+<div id="sidemenu-content">
+  <div class="side-menu-header-container">
+    <div class="home-link CB1-M" ui-sref="home()">
+      <img src='/images/dynexp/pika-test/menu-back-white-only.svg'/>
+      Back to Home
+    </div>
+    <div class="close-container"><span class="close-side-menu" toggle-sidemenu>
+      <img src="/images/x_k_white.svg">
+    </span></div>
+  </div>
+
+  <div class="side-menu-content-container">
+    <div class="side-menu-name-container">
+      <exp-name-editor status="status"></exp-name-editor>
+    </div>
+    <div class="side-menu-menu-container run-exp" style="padding: 0">
+      <div class="side-menu-button-container" ng-if="status == 'COMPLETED'">
+        <button ng-show="!exporting" class="side-menu-button CB1-M" ng-click="exportExperiment()" experiment-id="params.id" style="margin-right: 10px;">Export</button>
+        <button ng-show="exporting" class="side-menu-button CB1-M" style="margin-right: 10px;">Exporting<ellipsis-animated><ellipsis-animated/></button>
+        <button class="side-menu-button CB1-M second-button" ng-click="isConfirmDelete = !isConfirmDelete" ng-show="!isConfirmDelete">Delete</button>
+        <button class="side-menu-button CB1-M second-button confirm-delete" ng-click="deleteExperiment(params.id)" ng-show="isConfirmDelete">Confirm Delete</button>
+        <span class="text-danger" ng-show="errorExport">Error exporting data. Please try again.</span>
+      </div>
+      <hr/>
+    </div>
+
+    <div class="side-menu-menu-container property-menu">
+      <label class="section-name CB2-M">Setup</label>
+      <hr/>
+      <div class="side-menu-menu-item">
+        <div class="CH1-M" ui-sref="pika_test.set-wells({id: params.id})"  style="margin: 0">
+          <span>Assign Wells</span>
+        </div>
+      </div>
+      <div class="side-menu-menu-box" ng-if="status == 'RUNNING'">
+        <div class="CB2-M">
+          <span>Experiment In Progress</span>
+        </div>
+        <button class="side-menu-button CB2-M" ng-click="cancelExperiment(params.id)">Cancel</button>
+      </div>
+    </div>
+    <div class="side-menu-menu-container analyze-menu">
+      <label class="section-name CB2-M">{{ (status == 'RUNNING') ? 'Analyzing Results..' : 'Results'}}</label>
+      <hr/>
+      <div class="side-menu-menu-item" ng-class="{'disabled-link': status == 'NOT_STARTED' || !hasAmplification()}">
+        <div class="CH1-M" ui-sref="run-experiment({id: params.id, chart: 'amplification'})" toggle-sidemenu ng-if="status != 'NOT_STARTED' && hasAmplification()">
+          <span>Test Result</span>
+        </div>
+        <div class="CH1-M" ng-if="status == 'NOT_STARTED' || !hasAmplification()">
+          <span>Test Result</span>
+        </div>
+      </div>
+      <div class="side-menu-menu-item" ng-class="{'disabled-link': status == 'NOT_STARTED' || !hasAmplification()}">
+        <div class="CH1-M" ui-sref="run-experiment({id: params.id, chart: 'amplification'})" toggle-sidemenu ng-if="status != 'NOT_STARTED' && hasAmplification()">
+          <span>Amplification Curve</span>
+        </div>
+        <div class="CH1-M" ng-if="status == 'NOT_STARTED' || !hasAmplification()">
+          <span>Amplification Curve</span>
+        </div>
+      </div>
+      <div class="side-menu-menu-item" ng-class="{'disabled-link': status == 'NOT_STARTED' || !hasStandardCurve()}">
+        <div class="CH1-M" ui-sref="run-experiment({id: params.id, chart: 'standard-curve'})" toggle-sidemenu ng-if="status != 'NOT_STARTED' && hasStandardCurve()">
+          <span>Standard Curve</span>
+        </div>
+        <div class="CH1-M" ng-if="status == 'NOT_STARTED' || !hasStandardCurve()">
+          <span>Standard Curve</span>
+        </div>
+      </div>
+      <div class="side-menu-menu-item" ng-class="{'disabled-link': status == 'NOT_STARTED' || !hasMeltCurve()}">
+        <div class="CH1-M" ui-sref="run-experiment({id: params.id, chart: 'melt-curve'})" toggle-sidemenu ng-if="status != 'NOT_STARTED' && hasMeltCurve()">
+          <span>Melt Curve</span>
+        </div>
+        <div class="CH1-M" ng-if="status == 'NOT_STARTED' || !hasMeltCurve()">
+          <span>Melt Curve</span>
+        </div>        
+      </div>
+      <div class="side-menu-menu-item" ng-class="{'disabled-link': status == 'NOT_STARTED'}">
+        <div class="CH1-M" ui-sref="run-experiment({id: params.id, chart: 'temperature-logs'})" toggle-sidemenu ng-if="status != 'NOT_STARTED'">
+          <span>Thermal Profile</span>
+        </div>
+        <div class="CH1-M" ng-if="status == 'NOT_STARTED'">
+          <span>Thermal Profile</span>
+        </div>        
+      </div>
+    </div>
+  </div>
+</div>

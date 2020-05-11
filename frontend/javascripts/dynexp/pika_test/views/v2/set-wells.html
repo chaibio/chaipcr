@@ -14,8 +14,8 @@
       <section class="well-container">
         <div class="well-panel">
           <div class="d-flex">
-            <h1 class="CH1">{{ is_two_kit ? 'Test Kit 1' : 'Test Kit'}}</h1>
-            <h1 class="CH1" ng-if="is_two_kit">Test Kit 2</h1>
+            <h1 class="CH1">{{ target.name }}</h1>
+            <h1 class="CH1" ng-if="is_two_kit">{{ target2.name ? target2.name : ''}}</h1>
           </div>
           <div class="d-flex mt-20">
             <div class="well-table">
@@ -38,12 +38,12 @@
                   ng-focus="focusWell('A', $index, x.name)"
                   ng-if="!isControlWell(x, $index, 'A')"
                   >
-                <label class="CG1 type" ng-class="{'positive': x.name == 'Positive Control', 'negative': x.name == 'Negative Control', 'available': x.id}">
+                <label class="CG1 type" ng-class="{'positive': x.name == 'Positive Control', 'negative': x.name == 'Negative Control', 'available': x.name}">
                   {{(x.name == 'Positive Control') ? '+' : ( (x.name == 'Negative Control') ? '-' : 'S' )}}
                 </label>
-                <img src="/images/dynexp/pika-test/note-disable.svg" class="note" ng-if="!x.id"/>
+                <img src="/images/dynexp/pika-test/note-disable.svg" class="note" ng-if="!x.name"/>
                 <img src="/images/dynexp/pika-test/note-on.svg" class="note cursor-pointer note-{{'A'+$index}}" ng-if="x.id && x.notes" ng-click="openNotes($index, x, 'A')"/>
-                <img src="/images/dynexp/pika-test/note-off.svg" class="note cursor-pointer note-{{'A'+$index}}" ng-if="x.id && !x.notes" ng-click="openNotes($index, x, 'A')"/>
+                <img src="/images/dynexp/pika-test/note-off.svg" class="note cursor-pointer note-{{'A'+$index}}" ng-if="x.name && !x.notes" ng-click="openNotes($index, x, 'A')"/>
               </div>
             </div>
             <div class="well-table">
@@ -66,12 +66,12 @@
                   ng-focus="focusWell('B', $index, x.name)"
                   ng-if="!isControlWell(x, $index, 'B')"
                   >
-                <label class="CG1 type" ng-class="{'positive': x.name == 'Positive Control', 'negative': x.name == 'Negative Control', 'available': x.id}">
+                <label class="CG1 type" ng-class="{'positive': x.name == 'Positive Control', 'negative': x.name == 'Negative Control', 'available': x.name}">
                   {{(x.name == 'Positive Control') ? '+' : ( (x.name == 'Negative Control') ? '-' : 'S' )}}
                 </label>
-                <img src="/images/dynexp/pika-test/note-disable.svg" class="note" ng-if="!x.id"/>
+                <img src="/images/dynexp/pika-test/note-disable.svg" class="note" ng-if="!x.name"/>
                 <img src="/images/dynexp/pika-test/note-on.svg" class="note cursor-pointer note-{{'B'+$index}}" ng-if="x.id && x.notes" ng-click="openNotes($index, x, 'B')"/>
-                <img src="/images/dynexp/pika-test/note-off.svg" class="note cursor-pointer note-{{'B'+$index}}" ng-if="x.id && !x.notes" ng-click="openNotes($index, x, 'B')"/>
+                <img src="/images/dynexp/pika-test/note-off.svg" class="note cursor-pointer note-{{'B'+$index}}" ng-if="x.name && !x.notes" ng-click="openNotes($index, x, 'B')"/>
               </div>
             </div>
           </div>
@@ -87,7 +87,7 @@
             <tr>
               <td class="map-row-header CG1">A</td>
               <td class="CG2" ng-repeat="x in samples track by $index">
-                <label class="CG1 type" ng-class="{'positive': x.name == 'Positive Control', 'negative': x.name == 'Negative Control', 'available': x.id, 'active': (current_well_index == $index && current_well_row == 'A')}">
+                <label class="CG1 type" ng-class="{'positive': x.name == 'Positive Control', 'negative': x.name == 'Negative Control', 'available': x.name, 'active': (current_well_index == $index && current_well_row == 'A')}">
                   {{(x.name == 'Positive Control') ? '+' : ( (x.name == 'Negative Control') ? '-' : 'S' )}}
                 </label>
               </td>
@@ -95,7 +95,7 @@
             <tr>
               <td class="map-row-header CG1">B</td>
               <td class="CG2" ng-repeat="x in samples_B track by $index">
-                <label class="CG1 type" ng-class="{'positive': x.name == 'Positive Control', 'negative': x.name == 'Negative Control', 'available': x.id, 'active': (current_well_index == $index && current_well_row == 'B')}">
+                <label class="CG1 type" ng-class="{'positive': x.name == 'Positive Control', 'negative': x.name == 'Negative Control', 'available': x.name, 'active': (current_well_index == $index && current_well_row == 'B')}">
                   {{(x.name == 'Positive Control') ? '+' : ( (x.name == 'Negative Control') ? '-' : 'S' )}}
                 </label>
               </td>
