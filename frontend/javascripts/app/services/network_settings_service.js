@@ -44,9 +44,11 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
 
       var delay = $q.defer();
       $http.get(host + ':8000/network/wlan/scan').then(function(scanOutput) {
-        scanOutput.data.scan_result.forEach(function(network) {
-          that.listofAllWifi[network.ssid] = network;
-        });
+        if(scanOutput.data.scan_result){          
+          scanOutput.data.scan_result.forEach(function(network) {
+            that.listofAllWifi[network.ssid] = network;
+          });
+        }
         delay.resolve(scanOutput);
       }, function(err) {
         delay.reject(err);
