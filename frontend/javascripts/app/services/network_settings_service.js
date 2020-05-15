@@ -59,12 +59,14 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       this.userSettings = $.jStorage.get('userNetworkSettings');
       this.accessLanLookup();
 
-      this.intervalKey = $interval(that.accessLanLookup, interval);
+      if(!this.intervalKey){
+        this.intervalKey = $interval(that.accessLanLookup, interval);
+      }
     };
 
     this.accessLanLookup = function() {
+      that.lanLookup();
       if(that.userSettings.wifiSwitchOn /*&& that.wirelessError === false*/) {
-        that.lanLookup();
       }
     };
 
@@ -242,7 +244,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     $rootScope.$on("$stateChangeStart", function(event, toState) {
       // If we are not in the network settings part, we dont have to query /network anymore
       if(toState.name !== "settings.networkmanagement" && toState.name !== "settings.networkmanagement.wifi") {
-        that.stopInterval();
+        // that.stopInterval();
       }
     });
   }
