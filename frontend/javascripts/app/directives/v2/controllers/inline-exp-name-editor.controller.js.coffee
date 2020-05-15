@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ###
-angular.module('dynexp.pika_test').controller 'InlineExpNameEditorCtrl', [
+window.ChaiBioTech.ngApp.controller 'InlineExpNameEditorCtrl', [
   '$scope'
   'focus'
   'Experiment'

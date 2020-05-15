@@ -7,19 +7,23 @@
         </div>
       </div>
     </header-exp-status>
-    <div class="pika-content">
+    <div class="pika-content" full-height offset="100">
       <p class="description CX2">
         Your experiment is running. Please do not open the hardware unless instructed to here.
       </p>
-      <p class="time-status CX3-M">
+      <p class="time-status CX3-M" ng-if="state === 'running'">
         Time Remaining:
       </p>
-      <p class="digit-time CX1-L">
-        1:13:13
+      <p class="time-status CX3-M" ng-if="state === 'lid_heating'">
+        This will take about one minute
       </p>
-      <p class="CX4">
-        Expected complete at roughly 3:42
+      <p class="digit-time CX1-L" ng-show="state === 'running'">
+        {{ timeRemaining | secondsDisplay: 'display2'}}
+      </p>
+      <p class="CX4" ng-show="state === 'lid_heating'">
+        The lid is heating to <b>{{experiment.protocol.lid_temperature | round: 1}} &deg;</b>C <br>
       </p>
     </div>
+    <status-bar></status-bar>
   </div>
 </div>

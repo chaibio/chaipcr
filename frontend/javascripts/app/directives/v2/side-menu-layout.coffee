@@ -1,4 +1,4 @@
-window.App.directive 'sideMenuLayout', [
+window.ChaiBioTech.ngApp.directive 'sideMenuLayout', [
   '$rootScope'
   '$templateCache'
   '$compile'
@@ -9,11 +9,11 @@ window.App.directive 'sideMenuLayout', [
     transclude: true
     #replace: true
     scope:
-      sidemenuTemplate: '@'
+      isOpen: '=?'
 
-    templateUrl: 'dynexp/pika_test/views/v2/directives/side-menu-layout.html'
+    templateUrl: 'app/views/directives/v2/side-menu-layout.html'
     link: ($scope, elem) ->
-      $scope.sideMenuOpen = true
+      $scope.sideMenuOpen = ($scope.isOpen == undefined) ? true : $scope.isOpen
 
       $rootScope.$on 'sidemenu:toggle', ->
         $scope.sideMenuOpen = !$scope.sideMenuOpen

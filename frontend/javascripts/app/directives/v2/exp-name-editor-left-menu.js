@@ -1,4 +1,4 @@
-window.App.directive('expNameEditor', [
+window.ChaiBioTech.ngApp.directive('expNameEditor', [
 
   function() {
 
@@ -8,7 +8,7 @@ window.App.directive('expNameEditor', [
         scope: {
           status: "="
         },
-        templateUrl: "dynexp/pika_test/views/v2/directives/exp-name-editor-left-menu.html",
+        templateUrl: "app/views/directives/v2/exp-name-editor-left-menu.html",
         controller: 'ExpNameEditorCtrl',
 
         link: function($scope, elem) {

@@ -17,7 +17,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ###
 
-window.App.directive 'headerExpStatus', [
+window.ChaiBioTech.ngApp.directive 'headerExpStatus', [
   'Experiment'
   '$state'
   'TestInProgressHelper'
@@ -34,7 +34,7 @@ window.App.directive 'headerExpStatus', [
     transclude: true
     scope:
       experimentId: '=?'
-    templateUrl: 'dynexp/pika_test/views/v2/directives/header-exp-status.html'
+    templateUrl: 'app/views/directives/v2/header-exp-status.html'
     link: ($scope, elem, attrs, controller) ->
 
       INIT_LOADING = 2

@@ -4,6 +4,15 @@
 $sidemenu_width_open: 360px;
 $sidemenu_width_close: 0;
 .chai-mode{
+  &.run-experiment-state-active{
+    .side-menu-layout{
+      &.sidemenu-open{
+        .page-wrapper{
+          margin-right: -360px;
+        }
+      }
+    }
+  }
   .side-menu-layout{
     width: 100%;
     -webkit-transition: margin 0.3s; /* Safari */
@@ -76,7 +85,6 @@ $sidemenu_width_close: 0;
 
       .side-menu-content-container {
         width: 100%;
-        height: 718px;
         padding-left: 40px;
         padding-right: 40px;
 
@@ -460,11 +468,13 @@ $sidemenu_width_close: 0;
       .sidemenu{
         width: $sidemenu_width_open;
         flex: 0 0 $sidemenu_width_open;
+        z-index: 10;
         box-shadow: 1px 0px 1px rgba(0, 0, 0, 0.3);        
       }
     }
     .page-wrapper{
       width: 100%;
+      transition: all 0.3s;
     }
   }
 }

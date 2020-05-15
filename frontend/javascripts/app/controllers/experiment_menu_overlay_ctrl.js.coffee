@@ -126,6 +126,9 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
 
     $scope.hasStandardCurve = ->
       return if $scope.exp then Experiment.hasStandardCurve($scope.exp) else false
+    $scope.cancelExperiment = ->
+      Experiment.stopExperiment($stateParams.id).then (data) ->
+        $state.go 'home'
 
     $rootScope.$on 'sidemenu:toggle', ->
       $scope.errorExport = false

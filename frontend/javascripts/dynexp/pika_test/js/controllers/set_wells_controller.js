@@ -18,10 +18,8 @@
     function PikaSetWellsCtrl($scope, $window, Experiment, $state, $stateParams, Status, GlobalService,
       host, $http, CONSTANTS, $timeout, $rootScope, $uibModal, focus) {
 
-      $window.$('body').addClass('chai-mode');
       $window.$('body').addClass('pika-set-well-active');
       $scope.$on('$destroy', function() {
-        $window.$('body').removeClass('chai-mode');
         $window.$('body').removeClass('pika-set-well-active');
       });
 
@@ -229,9 +227,9 @@
 
 
       $scope.startExperiment = function(){
-        // Experiment.startExperiment($scope.experimentId).then(function(resp) {
+        Experiment.startExperiment($scope.experimentId).then(function(resp) {
           $state.go('pika_test.experiment-running', { id: $scope.experimentId });
-        // });
+        });
       };
 
       $scope.omitPositive = function(){

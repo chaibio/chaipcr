@@ -1,4 +1,4 @@
-window.App.directive('leftSideMenu', [
+window.ChaiBioTech.ngApp.directive('leftSideMenu', [
   '$rootScope',
   function($rootScope) {
     return {
@@ -7,7 +7,7 @@ window.App.directive('leftSideMenu', [
       bindToController: true,
       //replace: true,
 
-      templateUrl: 'dynexp/pika_test/views/v2/directives/side-left-menu.html',
+      templateUrl: 'app/views/directives/v2/side-left-menu.html',
       controller: 'ExperimentMenuOverlayCtrl',
 
       link: function($scope, elem) {

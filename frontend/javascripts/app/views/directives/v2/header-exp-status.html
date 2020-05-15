@@ -15,19 +15,19 @@
     </div>
 
     <!-- begin is invalid LID IS OPEN -->
-    <div class="right-content CB1-M" ng-if="!experiment.started_at && !experiment.completed_at && (statusData.optics.lid_open==='true')">LID IS OPEN</div>
+    <div class="right-content CB1-M" ng-if="!experiment.started_at && !experiment.completed_at && (statusData.optics.lid_open==='true')">Lid is open</div>
 
     <!-- begin is invalid ANOTHER EXP RUNNING -->
     <div class="right-content CB1-M" ng-if="!experiment.started_at && !experiment.completed_at && (state !== 'idle')">
-      ANOTHER EXPERIMENT IS RUNNING
-      <span class="CB1-M ml-10 cursor-pointer" ui-sref="run-experiment({id: statusData.experiment_controller.experiment.id, chart: 'amplification'})">VIEW NOW</span>
+      Another experiment is running
+      <span class="CB1-B ml-10 cursor-pointer" ui-sref="run-experiment({id: statusData.experiment_controller.experiment.id, chart: 'amplification'})">View Now</span>
     </div>
 
     <!-- experiment in progress -->
     <div class="right-content CB1-M" ng-if="!experiment.completed_at && state !== 'idle' && isCurrentExp">
-      In PROGRESS...
+      In Progress...
       <span class="CB1-M ml-10" ng-if="state !== 'lid_heating'">{{timeRemaining | secondsDisplay: 'display2'}} Remaining</span>
-      <span class="CB1-M ml-10" ng-if="state === 'lid_heating'">estimating time remaining</span>
+      <span class="CB1-M ml-10" ng-if="state === 'lid_heating'">Estimating time remaining</span>
     </div>
 
     <!-- experiment complete - final holding state -->
@@ -54,7 +54,7 @@
         </span>
         <span ng-if="experiment.completion_status !== 'aborted'">
           AN ERROR OCCURED
-          <span class="CB1-M cursor-pointer" ng-click="viewError()">VIEW DETAILS</span>
+          <span class="CB1-M cursor-pointer" ng-click="viewError()">View Details</span>
         </span>
       </span>
     </div>

@@ -17,7 +17,7 @@
   limitations under the License.
   -->
 <div>
-  <div class="home-page-wrapper row" full-height offset="37">
+  <div class="home-page-wrapper row" full-height offset="40">
     <!-- Left side of the home page -->
     <div class="home-page-left-wing col-xs-6">
       <div class="home-page-new-logo"></div>
@@ -62,7 +62,7 @@
           <div ng-repeat="exp in experiments " class="ovtrunc home-page-exp-tile">
             <div ng-mouseenter="mouseOver = true" class="home-page-tile-text ovtrunc" ng-mouseleave="mouseOver = false" ng-class="{'home-page-tile-text': true, 'home-page-tile-text-hover': mouseOver && !deleteMode}" ng-click="HomeCtrl.openExperiment(exp.experiment)">
               <a class="experiment-link" href="{{
-                (state.experiment_controller.machine.state == 'running' && exp.experiment.id == state.experiment_controller.experiment.id) ?   (    exp.experiment.type != 'test_kit' ?       '/#/experiments/' + exp.experiment.id + '/run-experiment?chart=amplification' :       '/#/dynexp/pika-test/exp-running/' + exp.experiment.id  ) :   (    exp.experiment.type != 'test_kit' ?       (        exp.experiment.started_at ?           '/#/experiments/' + exp.experiment.id + '/run-experiment?chart=amplification' :           '/#/edit-protocol/' + exp.experiment.id      ) :       (        !exp.experiment.started_at ?           '/#/dynexp/pika-test/set-wells/' + exp.experiment.id :           (            exp.experiment.completed_at ?               '/#/dynexp/pika-test/results/' + exp.experiment.id :               '/#/dynexp/pika-test/exp-running/' + exp.experiment.id          )      )  )
+                (state.experiment_controller.machine.state == 'running' && exp.experiment.id == state.experiment_controller.experiment.id) ?   (    exp.experiment.type != 'test_kit' ?       '/#/experiments/' + exp.experiment.id + '/run-experiment?chart=amplification' :       '/#/dynexp/pika-test/experiment-running/' + exp.experiment.id  ) :   (    exp.experiment.type != 'test_kit' ?       (        exp.experiment.started_at ?           '/#/experiments/' + exp.experiment.id + '/run-experiment?chart=amplification' :           '/#/edit-protocol/' + exp.experiment.id      ) :       (        !exp.experiment.started_at ?           '/#/dynexp/pika-test/set-wells/' + exp.experiment.id :           (            exp.experiment.completed_at ?               '/#/dynexp/pika-test/results/' + exp.experiment.id :               '/#/dynexp/pika-test/experiment-running/' + exp.experiment.id          )      )  )
 
               }}">
                 <div class="experiment-links">
@@ -107,7 +107,7 @@
                 <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at && !exp.experiment.time_valid">Run previously, #{{exp.experiment.id}}</span>
                 <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && !exp.experiment.completed_at">IN PROGRESS&nbsp;<ellipsis-animated><ellipsis-animated/></span>
               </a>
-              <a class="experiment-links" ng-if="exp.experiment.started_at && !exp.experiment.completed_at && exp.experiment.type === 'test_kit'" ui-sref="pika_test.exp-running({id: exp.experiment.id})">
+              <a class="experiment-links" ng-if="exp.experiment.started_at && !exp.experiment.completed_at && exp.experiment.type === 'test_kit'" ui-sref="pika_test.experiment-running({id: exp.experiment.id})">
                 <div class="home-page-exp-name B1B">
                   {{exp.experiment.name}}
                 </div>

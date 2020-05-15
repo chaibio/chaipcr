@@ -1,4 +1,4 @@
-angular.module('dynexp.pika_test').controller 'ExpNameEditorCtrl', [
+window.ChaiBioTech.ngApp.controller 'ExpNameEditorCtrl', [
   '$scope'
   'focus'
   'Experiment'

@@ -10,7 +10,7 @@
       <span class="CB2-M sub-caption">Assign wells for experiment:</span>
       <inline-exp-name-editor></inline-exp-name-editor>
     </header>
-    <div class="pika-content">
+    <div class="pika-content" full-height offset="220">
       <section class="well-container">
         <div class="well-panel">
           <div class="d-flex">
@@ -124,9 +124,12 @@
             </div>
           </div>
         </div>
-        <button class="button-start-exp CB1-M" id="start-experiment-button" ng-if="!start_confirm_show" ng-click="startConfirm()">Start Experiment</button>
-        <button class="button-confirm-exp CB1-M" id="start-experiment-button" ng-if="start_confirm_show" ng-click="startExperiment()">Confirm Start</button>
+        <div ng-if="!experiment.started_at">
+          <button class="button-start-exp CB1-M" id="start-experiment-button" ng-if="!start_confirm_show" ng-click="startConfirm()">Start Experiment</button>
+          <button class="button-confirm-exp CB1-M" id="start-experiment-button" ng-if="start_confirm_show" ng-click="startExperiment()">Confirm Start</button>
+        </div>
       </section>
     </div>
+    <status-bar></status-bar>
   </div>
 </div>

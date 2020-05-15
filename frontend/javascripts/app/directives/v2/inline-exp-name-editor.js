@@ -17,14 +17,14 @@
  * limitations under the License.
  */
 
-window.App.directive('inlineExpNameEditor', [
+window.ChaiBioTech.ngApp.directive('inlineExpNameEditor', [
 
   function() {
 
       return {
         restric: "E",
         bindToController: true,
-        templateUrl: "dynexp/pika_test/views/v2/directives/inline-exp-name-editor.html",
+        templateUrl: "app/views/directives/v2/inline-exp-name-editor.html",
         controller: 'InlineExpNameEditorCtrl',
         link: function($scope, elem) {
         }

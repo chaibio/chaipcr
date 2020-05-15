@@ -42,11 +42,11 @@
     <div class="side-menu-menu-container analyze-menu">
       <label class="section-name CB2-M">{{ (status == 'RUNNING') ? 'Analyzing Results..' : 'Results'}}</label>
       <hr/>
-      <div class="side-menu-menu-item" ng-class="{'disabled-link': status == 'NOT_STARTED' || !hasAmplification()}">
-        <div class="CH1-M" ui-sref="run-experiment({id: params.id, chart: 'amplification'})" toggle-sidemenu ng-if="status != 'NOT_STARTED' && hasAmplification()">
+      <div class="side-menu-menu-item" ng-class="{'disabled-link': status != 'COMPLETED'}">
+        <div class="CH1-M" ui-sref="run-experiment({id: params.id, chart: 'amplification'})" toggle-sidemenu ng-if="status == 'COMPLETED'">
           <span>Test Result</span>
         </div>
-        <div class="CH1-M" ng-if="status == 'NOT_STARTED' || !hasAmplification()">
+        <div class="CH1-M" ng-if="status != 'COMPLETED'">
           <span>Test Result</span>
         </div>
       </div>
@@ -58,19 +58,19 @@
           <span>Amplification Curve</span>
         </div>
       </div>
-      <div class="side-menu-menu-item" ng-class="{'disabled-link': status == 'NOT_STARTED' || !hasStandardCurve()}">
-        <div class="CH1-M" ui-sref="run-experiment({id: params.id, chart: 'standard-curve'})" toggle-sidemenu ng-if="status != 'NOT_STARTED' && hasStandardCurve()">
+      <div class="side-menu-menu-item" ng-class="{'disabled-link': status != 'COMPLETED' || !hasStandardCurve()}">
+        <div class="CH1-M" ui-sref="run-experiment({id: params.id, chart: 'standard-curve'})" toggle-sidemenu ng-if="status == 'COMPLETED' && hasStandardCurve()">
           <span>Standard Curve</span>
         </div>
-        <div class="CH1-M" ng-if="status == 'NOT_STARTED' || !hasStandardCurve()">
+        <div class="CH1-M" ng-if="status != 'COMPLETED' || !hasStandardCurve()">
           <span>Standard Curve</span>
         </div>
       </div>
-      <div class="side-menu-menu-item" ng-class="{'disabled-link': status == 'NOT_STARTED' || !hasMeltCurve()}">
-        <div class="CH1-M" ui-sref="run-experiment({id: params.id, chart: 'melt-curve'})" toggle-sidemenu ng-if="status != 'NOT_STARTED' && hasMeltCurve()">
+      <div class="side-menu-menu-item" ng-class="{'disabled-link': status != 'COMPLETED' || !hasMeltCurve()}">
+        <div class="CH1-M" ui-sref="run-experiment({id: params.id, chart: 'melt-curve'})" toggle-sidemenu ng-if="status == 'COMPLETED' && hasMeltCurve()">
           <span>Melt Curve</span>
         </div>
-        <div class="CH1-M" ng-if="status == 'NOT_STARTED' || !hasMeltCurve()">
+        <div class="CH1-M" ng-if="status != 'COMPLETED' || !hasMeltCurve()">
           <span>Melt Curve</span>
         </div>        
       </div>
