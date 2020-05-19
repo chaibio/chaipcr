@@ -42,7 +42,7 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
           if(stat) {
             scope.configureSwitch(stat);
             scope.inProgress = false; // We explicitly say it here because we dont have to look for inprogress for the very first time.
-            unregisterWatch();
+            // unregisterWatch();
           }
         });
 

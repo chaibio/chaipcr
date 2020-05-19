@@ -48,6 +48,8 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
           scanOutput.data.scan_result.forEach(function(network) {
             that.listofAllWifi[network.ssid] = network;
           });
+        } else {
+          that.listofAllWifi = {};
         }
         delay.resolve(scanOutput);
       }, function(err) {
@@ -112,7 +114,6 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     };
 
     this.processOnError = function(err) {
-
       previousSsid = this.previousConnectionStatus = null;
       this.connectedWifiNetwork = {};
       this.wirelessError = true;

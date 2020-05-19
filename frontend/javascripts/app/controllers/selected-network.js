@@ -45,7 +45,7 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
         $scope.buttonValue = "SAVE CHANGES";
       }
 
-      if(val === "auto" && $scope.currentNetwork.settings.type === "static"){
+      if(val === "auto" && $scope.currentNetwork.settings && $scope.currentNetwork.settings.type === "static"){
         $scope.changeToAutomatic();
       }
 
