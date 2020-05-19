@@ -41,7 +41,8 @@ public:
         {
             NoEncryption,
             WepEncryption,
-            Wpa1Ecryption,
+            Wpa1PSKEcryption,
+            Wpa18021xEcryption,
             Wpa2PSKEcryption,
             Wpa28021xEcryption
         };
