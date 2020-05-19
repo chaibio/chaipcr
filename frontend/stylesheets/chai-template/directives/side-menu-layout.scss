@@ -4,7 +4,11 @@
 $sidemenu_width_open: 360px;
 $sidemenu_width_close: 0;
 .chai-mode{
-  &.run-experiment-state-active{
+  &.run-experiment-state-active,
+  &.plate-layout-state-active,
+  &.samples-targets-state-active,
+  &.edit-protocol-state-active,
+  &.pika-set-well-active{
     .side-menu-layout{
       &.sidemenu-open{
         .page-wrapper{
@@ -100,11 +104,6 @@ $sidemenu_width_close: 0;
             }
             &:hover{
               border-left: 3px solid $link-text-color;
-              svg{
-                & > g{
-                  fill: #fff;
-                }
-              }
             }
           }
 
@@ -188,7 +187,7 @@ $sidemenu_width_close: 0;
           }
           .side-menu-exp-status {
             color: #999;
-            padding: 5px 0;
+            margin-bottom: 15px;
             &.run-on-status{
               color: $black;
             }
@@ -262,7 +261,7 @@ $sidemenu_width_close: 0;
                 label.exp-message{
                   width: 100%;
                   text-align: center;
-                  padding: 17px 0;
+                  padding: 6px 0;
                   background: #df1924;
                   border: 1px solid #df1924;
                   color: #fff;
@@ -271,6 +270,9 @@ $sidemenu_width_close: 0;
                   cursor: pointer;
                   position: relative;
                   left: 0;
+                  font-weight: normal;
+                  height: auto;
+                  top: 0;
 
                   &.lid-open{
                     background: #fff;
@@ -356,19 +358,17 @@ $sidemenu_width_close: 0;
         .side-menu-button-container {
           width: 100%;
           height: auto;
-          padding-top: 20px;
           padding-bottom: 20px;
           border: none;
           .second-button {
             margin-left: -5px;
           }
           .side-menu-button {
-            width: calc(50% - 5px);
-            height: 40px;
             background-color: white;
             border: 1px solid black;
             outline: none;
             border-radius: 3px;
+            padding: 6px 20px;
             &:hover{
               background: #df1924;
               color: #fff;
@@ -391,9 +391,8 @@ $sidemenu_width_close: 0;
           }
 
           span{
-            font-size: 12px;
-            font-family: 'dinot-medium';
-            font-weight: 300;        
+            width: 100%;
+            display: block;
           }
         }
 

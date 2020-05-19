@@ -1,10 +1,15 @@
 <div ng-controller="PikaSetWellsCtrl">
-  <div class="pika-wrapper">
+  <div class="pika-wrapper" side-menu-layout is-open="false">
     <header-exp-status experiment-id="experiment.id">
-      <div class="home-link CB1-M" ui-sref="home()">
+      <div class="home-link CB1-M" ui-sref="home()" ng-if="!experiment.started_at">
         <img src='/images/dynexp/pika-test/menu-back-white-only.svg'/>
         Back to Home
       </div>
+      <div class="stripes-and-name" toggle-sidemenu ng-if="experiment.started_at">
+        <div class="stripes">
+          <img src='/images/menu-white.svg'/>
+        </div>
+      </div>      
     </header-exp-status>
     <header class="exp-header">
       <span class="CB2-M sub-caption">Assign wells for experiment:</span>

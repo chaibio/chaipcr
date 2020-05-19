@@ -16,38 +16,15 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<menu-overlay>
-  <div class="edit-stage-step-container" ng-controller="StageStepCtrl">
-    <div full-height offset="40">
+<div class="edit-stage-step-container" ng-controller="StageStepCtrl">
+  <div class="pika-wrapper" side-menu-layout is-open="false">
+    <div style="display: flex; flex-direction: column; height: calc(100% - 40px);">
+      <header-status experiment-id="protocol.id">
+        <div class="stripes" toggle-sidemenu>
+          <img src='/images/menu-white.svg'/>
+        </div>
+      </header-status>
       <div class="top-half noselect">
-        <!-- Top part -->
-        <header-status experiment-id="protocol.id">
-          <div class="stripes" toggle-sidemenu>
-            <img src='/images/menu-white.svg'/>
-          </div>
-        </header-status>
-        <!-- <div class="name-on-top">
-        <div class="stripe-container">
-          <div class="stripes">
-            <a toggle-sidemenu>
-              <div class="stripe"></div>
-              <div class="stripe"></div>
-              <div class="stripe"></div>
-            </a>
-          </div>
-        </div>
-        <div class="top-exp-name">
-          {{protocol.name}}
-        </div>
-        <div class="where-m-I">
-          <scroll-on-top ng-if="showScrollbar" width="{{scrollWidth}}" left="{{scrollLeft}}"></scroll-on-top>
-        </div>
-        <div ng-if="false" class="undo-container SH">
-          <button id="undo-action">UNDO</button>
-        </div>
-      </div> -->
-        <!-- Top part End-->
-        <!-- Canvas Part -->
         <div class="canvas-containing">
           <canvas class="canvasClass" id="canvas"></canvas>
           <div class="canvas-loading">LOADING
@@ -61,8 +38,6 @@
           </div>
         </div>
       </div>
-      <!-- Canvas Part End-->
-      <!-- bottom-half-->
       <div protocol-screen-center-bottom-half class="bottom-half noselect">
         <arrow class="previous" action="previous" ng-click="arrowClicked()"></arrow>
         <div class="middle-ground">
@@ -119,9 +94,8 @@
         </div>
         <arrow class="next" action="next" ng-click="arrowClicked()"></arrow>
       </div>
+
     </div>
-    <div class="exp-info-bar" sticky-footer>
-      <status-bar experiment-id="protocol.id"></status-bar>
-    </div>
+    <status-bar experiment-id="protocol.id"></status-bar>
   </div>
-</menu-overlay>
+</div>

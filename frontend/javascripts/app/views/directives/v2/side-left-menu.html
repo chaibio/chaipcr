@@ -12,24 +12,60 @@
   <div class="side-menu-content-container">
     <div class="side-menu-name-container">
       <exp-name-editor status="status"></exp-name-editor>
+      <div ng-show="exp.time_valid && status == 'COMPLETED'" class="side-menu-exp-status CB2 run-on-status">
+        {{runStatus}} {{exp.started_at}}
+        <label class="side-menu-exp-status-text success CB2" ng-show="exp.completion_status === 'success'">Completed</label>
+        <label class="side-menu-exp-status-text failed CB2" ng-show="exp.completion_status !== 'success'">Failed</label>
+      </div>
+      <div ng-show="!exp.time_valid && status == 'COMPLETED'" class="side-menu-exp-status CB2 run-on-status">
+        Run previously
+        <label class="side-menu-exp-status-text success" ng-show="exp.completion_status === 'success'">Completed</label>
+        <label class="side-menu-exp-status-text failed" ng-show="exp.completion_status !== 'success'">Failed</label>
+      </div>
+      <div ng-if="status != 'COMPLETED'" class="side-menu-exp-status CB2">{{runStatus}}</div>
     </div>
     <div class="side-menu-menu-container run-exp" style="padding: 0">
+      <div class="side-menu-menu-item" ng-if="exp.type != 'test_kit'">
+        <experiment-item show-prop="showProperties" exp="exp" state-val="{{status}}" lid-open="lidOpen" is-idle="isIdle" max-cycle="maxCycle"></experiment-item>
+      </div>
+
       <div class="side-menu-button-container" ng-if="status == 'COMPLETED'">
         <button ng-show="!exporting" class="side-menu-button CB1-M" ng-click="exportExperiment()" experiment-id="params.id" style="margin-right: 10px;">Export</button>
         <button ng-show="exporting" class="side-menu-button CB1-M" style="margin-right: 10px;">Exporting<ellipsis-animated><ellipsis-animated/></button>
-        <button class="side-menu-button CB1-M second-button" ng-click="isConfirmDelete = !isConfirmDelete" ng-show="!isConfirmDelete">Delete</button>
-        <button class="side-menu-button CB1-M second-button confirm-delete" ng-click="deleteExperiment(params.id)" ng-show="isConfirmDelete">Confirm Delete</button>
-        <span class="text-danger" ng-show="errorExport">Error exporting data. Please try again.</span>
+        <button class="side-menu-button CB1-M second-button" ng-click="setConfirmDelete(true)" ng-show="!getConfirmDelete()">Delete</button>
+        <button class="side-menu-button CB1-M second-button confirm-delete" ng-click="deleteExperiment(params.id)" ng-show="getConfirmDelete()">Confirm Delete</button>
+        <span class="text-danger CB3-M" ng-show="errorExport">Error exporting data. Please try again.</span>
       </div>
       <hr/>
     </div>
-
     <div class="side-menu-menu-container property-menu">
       <label class="section-name CB2-M">Setup</label>
       <hr/>
-      <div class="side-menu-menu-item">
+      <div class="side-menu-menu-item" ng-if="exp.type == 'test_kit'">
         <div class="CH1-M" ui-sref="pika_test.set-wells({id: params.id})"  style="margin: 0">
           <span>Assign Wells</span>
+        </div>
+      </div>
+      <div ng-if="exp.type != 'test_kit'">
+        <div class="side-menu-menu-item">
+          <div class="CH1-M" ng-click="openProperties(true)">Experiment Properties &nbsp;
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 9"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><polygon points="8 4.5 0 0 0 9 8 4.5"/></g></g></svg>          
+          </div>
+        </div>
+        <div class="side-menu-menu-item">
+          <div class="CH1-M" ui-sref="edit-protocol({id: params.id})">
+            <protocol-item state="{{status}}"></protocol-item>
+          </div>
+        </div>
+        <div class="side-menu-menu-item">
+          <div class="CH1-M" ui-sref="samples-targets({id: params.id})">
+            <span>Samples + Targets</span>
+          </div>
+        </div>
+        <div class="side-menu-menu-item">
+          <div class="CH1-M" ui-sref="plate-layout({id: params.id})">
+            <span>Well Layout</span>
+          </div>
         </div>
       </div>
       <div class="side-menu-menu-box" ng-if="status == 'RUNNING'">
@@ -40,9 +76,9 @@
       </div>
     </div>
     <div class="side-menu-menu-container analyze-menu">
-      <label class="section-name CB2-M">{{ (status == 'RUNNING') ? 'Analyzing Results..' : 'Results'}}</label>
+      <label class="section-name CB2-M">{{ (status == 'RUNNING') ? 'Analyzing Results...' : 'Results'}}</label>
       <hr/>
-      <div class="side-menu-menu-item" ng-class="{'disabled-link': status != 'COMPLETED'}">
+      <div class="side-menu-menu-item" ng-class="{'disabled-link': status != 'COMPLETED'}" ng-if="exp.type == 'test_kit'">
         <div class="CH1-M" ui-sref="run-experiment({id: params.id, chart: 'amplification'})" toggle-sidemenu ng-if="status == 'COMPLETED'">
           <span>Test Result</span>
         </div>
@@ -82,6 +118,18 @@
           <span>Thermal Profile</span>
         </div>        
       </div>
+    </div>
+  </div>
+
+  <div class="side-sub-menu-content-container" ng-show="showProperties">
+    <div class="side-menu-header-container" style="padding: 0">
+      <span>&nbsp;</span>
+      <div class="close-container" style="padding-right: 0"><span class="close-side-menu" ng-click="openProperties(false)">
+        <img src="/images/x_k.svg">
+      </span></div>
+    </div>
+    <div class="side-menu-menu-container">
+      <edit-lid-temp></edit-lid-temp>
     </div>
   </div>
 </div>

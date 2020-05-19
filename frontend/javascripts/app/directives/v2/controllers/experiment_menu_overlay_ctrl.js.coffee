@@ -38,6 +38,25 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
     $scope.isIdle = false
     $scope.runningExpId = 0
 
+    $scope.confirmStatus = false
+    $scope.isConfirmDelete = false
+
+    $scope.$on 'runReady:true', ->
+      $scope.confirmStatus = true
+
+    angular.element('body').click (e) ->
+      if $scope.confirmStatus == true and e.target.innerHTML != 'Run Experiment'
+        $rootScope.$broadcast 'runReady:false'
+        $scope.confirmStatus = false
+      if $scope.isConfirmDelete == true and e.target.innerHTML != 'Delete'
+        $scope.isConfirmDelete = false
+
+    $scope.setConfirmDelete = (isConfirm) ->
+      $scope.isConfirmDelete = isConfirm
+
+    $scope.getConfirmDelete = () ->
+      $scope.isConfirmDelete
+
     $scope.deleteExperiment = ->
       #exp = new Experiment id: $stateParams.id
       Experiment.delete($stateParams.id)
@@ -129,6 +148,9 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
     $scope.cancelExperiment = ->
       Experiment.stopExperiment($stateParams.id).then (data) ->
         $state.go 'home'
+
+    $scope.openProperties = (prop) ->
+      $scope.showProperties = prop
 
     $rootScope.$on 'sidemenu:toggle', ->
       $scope.errorExport = false

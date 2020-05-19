@@ -18,7 +18,7 @@
     <div class="right-content CB1-M" ng-if="!experiment.started_at && !experiment.completed_at && (statusData.optics.lid_open==='true')">Lid is open</div>
 
     <!-- begin is invalid ANOTHER EXP RUNNING -->
-    <div class="right-content CB1-M" ng-if="!experiment.started_at && !experiment.completed_at && (state !== 'idle')">
+    <div class="right-content CB1-M" ng-if="!experiment.started_at && !experiment.completed_at && (state !== 'idle') && !isCurrentExp">
       Another experiment is running
       <span class="CB1-B ml-10 cursor-pointer" ui-sref="run-experiment({id: statusData.experiment_controller.experiment.id, chart: 'amplification'})">View Now</span>
     </div>

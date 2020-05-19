@@ -17,8 +17,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <div ng-controller="PlateLayoutCtrl">
-    <div menu-overlay>
-        <div full-height offset="37" class="plate-layout-wrapper" style="display: flex; flex-direction: column;">
+    <div class="pika-wrapper" side-menu-layout is-open="false">
+        <div style="display: flex; flex-direction: column; height: calc(100% - 40px);">
             <header-status experiment-id="experiment.id">
                 <div class="stripes-and-name" toggle-sidemenu>
                       <div class="stripes">
@@ -27,7 +27,7 @@ limitations under the License.
                 </div>
             </header-status>
 
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 header-plate-layout">
+            <div class="col-lg-12 header-plate-layout">
                 <h4 class="XB1B" style="display:inline-block; line-height: 50px; margin: 0;">Well Layout</h4>
                 <span class="experiment-info XB1" ng-show="standard_experiment">Using standards from <b>{{standard_experiment.name}}</b></span>
                 <div class="XB1 tip-banner">

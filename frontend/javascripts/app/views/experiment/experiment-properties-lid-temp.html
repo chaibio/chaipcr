@@ -18,59 +18,59 @@
 -->
 <div class="experiment-properties-subtoption">
   <form name="expForm" ng-show="experiment">
-      <div class="heading B1M">
+      <div class="heading CB1-M">
         Lid Temperature :
       </div>
 
       <div class="exp-name-container">
-        <span class="exp-name B1M truncate" ng-click="focusLidTemp()" ng-show="!editLidTempMode">
+        <span class="exp-name CB1-M truncate" ng-click="focusLidTemp()" ng-show="!editLidTempMode">
           {{ (experiment.protocol.lid_temperature) | degreeCelcius }}
         </span>
 
-        <input required type="text" name="lidTemp" ng-pattern="/^[0-9]+((\.[0-9]+)?)$/" class="exp-name B1M" ng-model="experiment.protocol.lid_temperature"
+        <input required type="text" name="lidTemp" ng-pattern="/^[0-9]+((\.[0-9]+)?)$/" class="exp-name CB1-M" ng-model="experiment.protocol.lid_temperature"
           ng-show="editLidTempMode" ng-blur="updateProtocol(experiment.protocol, expForm)" on-key-enter="updateProtocol(experiment.protocol, expForm)"
           focus-on="editLidTempMode">
-        <span class="help-block B2M" ng-show="expForm.lidTemp.$error.pattern">
+        <span class="help-block CB3-M" ng-show="expForm.lidTemp.$error.pattern">
           <span class="text-danger">Must be a valid number.</span>
         </span>
 
-        <span class="help-block B2M" ng-show="expForm.lidTemp.$error.required">
+        <span class="help-block CB3-M" ng-show="expForm.lidTemp.$error.required">
           <span class="text-danger">Must not be null</span>
         </span>
 
       </div>
 
-      <div class="text-center message-container B2M">
+      <div class="text-center message-container CB3-M">
         <span  ng-show="successLid" class="help-block">
           <span class="text-success">{{successLid}}</span>
         </span>
       </div>
 
       <div ng-show="errors">
-        <span class="help-block B2M">
+        <span class="help-block CB3-M">
           <span class="text-danger">{{errors}}</span>
         </span>
       </div>
 
   </form>
 
-  <div ng-show="!experiment" class="B2M">
+  <div ng-show="!experiment" class="CB3-M">
     <img src="/images/loading.gif"> Loading ...
   </div>
 
 </div>
 <div class="experiment-note-option">
-  <label class="section-name B1M">Notes</label>
-  <p class="notes-text B1" ng-click="focusNote()" ng-show="!editNoteMode">{{experiment.notes}}</p>  
-  <textarea class="B1" ng-model="experiment.notes" ng-show="editNoteMode" ng-blur="updateNote()" focus-on="editNoteMode" rows="5"></textarea>
-  <div class="text-center message-container B2M">
+  <label class="section-name CB1-M">Notes</label>
+  <p class="notes-text CB1" ng-click="focusNote()" ng-show="!editNoteMode">{{experiment.notes}}</p>  
+  <textarea class="CB1" ng-model="experiment.notes" ng-show="editNoteMode" ng-blur="updateNote()" focus-on="editNoteMode" rows="5"></textarea>
+  <div class="text-center message-container CB3-M">
     <span  ng-show="successNote" class="help-block">
       <span class="text-success">{{successNote}}</span>
     </span>
   </div>
 
   <div ng-show="errors">
-    <span class="help-block B2M">
+    <span class="help-block CB3-M">
       <span class="text-danger">{{errors}}</span>
     </span>
   </div>
