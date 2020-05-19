@@ -184,11 +184,28 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
             'type': "dhcp"
           };
           $scope.updateConnectedWifi('wpa-ssid');
+        } else if($scope.selectedWifiNow.encryption === 'wpa1 psk') {
+          $scope.wifiNetworkType = 'wpa1 psk';
+          $scope.credentials = {
+            'wpa-ssid': $scope.name,
+            'wpa-psk': "",
+            'type': "dhcp"
+          };
+          $scope.updateConnectedWifi('wpa-ssid');
         } else if($scope.selectedWifiNow.encryption === 'wpa2 802.1x') {
           $scope.wifiNetworkType = 'wpa2 802.1x';
           $scope.credentials = {
             'wpa-ssid': $scope.name,
-						'wpa-identity': "",
+            'wpa-identity': "",
+            'wpa-password': "",
+            'type': "dhcp"
+          };
+          $scope.updateConnectedWifi('wpa-ssid');
+        } else if($scope.selectedWifiNow.encryption === 'wpa1 802.1x') {
+          $scope.wifiNetworkType = 'wpa1 802.1x';
+          $scope.credentials = {
+            'wpa-ssid': $scope.name,
+            'wpa-identity': "",
             'wpa-password': "",
             'type': "dhcp"
           };
@@ -202,11 +219,11 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
           };
           $scope.updateConnectedWifi('wireless_essid');
         }
-				else if($scope.selectedWifiNow.encryption === 'none') {
+        else if($scope.selectedWifiNow.encryption === 'none') {
           $scope.wifiNetworkType = 'none';
           $scope.credentials = {
             'wireless_essid': $scope.name,
-						'type': "dhcp"
+            'type': "dhcp"
           };
           $scope.updateConnectedWifi('wireless_essid');
         }
