@@ -18,122 +18,123 @@ limitations under the License.
 -->
 <div ng-controller="SampleTargetCtrl">
   <div class="pika-wrapper" side-menu-layout is-open="false">
-    <div style="display: flex; flex-direction: column; height: calc(100% - 40px);">
-      <header-status experiment-id="experiment.id">
-        <div class="stripes-and-name" toggle-sidemenu>
-          <div class="stripes">
-            <img src='/images/menu-white.svg'/>
+    <header-status experiment-id="experiment.id">
+      <div class="stripes-and-name" toggle-sidemenu>
+        <div class="stripes">
+          <img src='/images/menu-grey.svg'/>
+        </div>
+      </div>
+    </header-status>
+    <div class="inner-wrapper">
+      <div class="inner-container">
+        <div class="home-page-wrapper row">
+          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 header-samples-targets">
+              <h4 style="display:inline-block">Manage Samples + Targets</h4>
+              <!-- <span ng-click="openImportStandards()" class="import-button">Import Standards</span> -->
           </div>
-        </div>
-      </header-status>
 
-      <div class="home-page-wrapper row">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 header-samples-targets">
-            <h4 style="display:inline-block">Manage Samples + Targets</h4>
-            <!-- <span ng-click="openImportStandards()" class="import-button">Import Standards</span> -->
-        </div>
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 samples" style="padding-left: 70px !important;">
+            <p>Samples</p>
 
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 samples" full-height force="true" offset="160" style="padding-left: 70px !important;">
-          <p>Samples</p>
+            <table fixed-header class="sample-target-table sample-table">
+                <thead>
+                    <tr>
+                        <th width="70%">Name</th>
+                        <th class="text-right" width="10%" style="padding: 0 2px; min-width: 50px;"></th>
+                        <th class="text-center" width="20%" style="padding: 0 2px; min-width: 50px;">Color</th>
+                        <th class="text-center" width="50px" style="padding: 0 2px; min-width: 50px;"></th>
+                    </tr>
+                </thead>
+              <tbody>
+                <tr ng-repeat="rowContent in rows track by $index">
+                    <td style="border-bottom:1px solid #bbb;">
+                        <input style="border:0px;padding:0px;outline: none;width:100%;" type="text" ng-blur="updateSample(rowContent, $index)" ng-focus="focusSample(rowContent, $index)" placeholder="" class="" ng-model="rowContent.name">
+                    </td>
+                    <td style="border-bottom:1px solid #bbb; min-width: 50px;" class="text-center">
+                        <label class="icon-wrapper">
+                            <img class="assigned-icon" src="/images/assigned.svg" alt="" ng-show="rowContent.assigned">
+                            <div class="assigned-description">
+                                <span>Assigned to wells</span>
+                            </div>                      
+                        </label>
+                    </td>
+                    <td style="border-bottom:1px solid #bbb; min-width: 50px;" class="text-center">
+                        <span class="color" ng-attr-style="background-color:{{colors[$index % 16]}};display:inline-block;width:20px;height:20px;border-radius:3px;"></span>
+                    </td>
+                    <td style="text-align:center; padding: 0; min-width: 50px;" class="text-center" >
+                        <span ng-show="!rowContent.confirmDelete" ng-click="confirmDeleteSample(rowContent)"><img class="delete" src="/images/trash_initial.svg" alt=""></span>
+                        <span ng-show="rowContent.confirmDelete" ng-click="deleteSample(rowContent, $index)"><img class="delete-confirm" src="/images/confirm_trash.svg" alt=""></span>
+                    </td>
+                </tr>
+              </tbody>
+            </table>
 
-          <table fixed-header class="sample-target-table sample-table">
-              <thead>
-                  <tr>
-                      <th width="70%">Name</th>
-                      <th class="text-right" width="10%" style="padding: 0 2px; min-width: 50px;"></th>
-                      <th class="text-center" width="20%" style="padding: 0 2px; min-width: 50px;">Color</th>
-                      <th class="text-center" width="50px" style="padding: 0 2px; min-width: 50px;"></th>
-                  </tr>
-              </thead>
-            <tbody>
-              <tr ng-repeat="rowContent in rows track by $index">
-                  <td style="border-bottom:1px solid #bbb;">
-                      <input style="border:0px;padding:0px;outline: none;width:100%;" type="text" ng-blur="updateSample(rowContent, $index)" ng-focus="focusSample(rowContent, $index)" placeholder="" class="" ng-model="rowContent.name">
-                  </td>
-                  <td style="border-bottom:1px solid #bbb; min-width: 50px;" class="text-center">
-                      <label class="icon-wrapper">
-                          <img class="assigned-icon" src="/images/assigned.svg" alt="" ng-show="rowContent.assigned">
-                          <div class="assigned-description">
-                              <span>Assigned to wells</span>
-                          </div>                      
-                      </label>
-                  </td>
-                  <td style="border-bottom:1px solid #bbb; min-width: 50px;" class="text-center">
-                      <span class="color" ng-attr-style="background-color:{{colors[$index % 16]}};display:inline-block;width:20px;height:20px;border-radius:3px;"></span>
-                  </td>
-                  <td style="text-align:center; padding: 0; min-width: 50px;" class="text-center" >
-                      <span ng-show="!rowContent.confirmDelete" ng-click="confirmDeleteSample(rowContent)"><img class="delete" src="/images/trash_initial.svg" alt=""></span>
-                      <span ng-show="rowContent.confirmDelete" ng-click="deleteSample(rowContent, $index)"><img class="delete-confirm" src="/images/confirm_trash.svg" alt=""></span>
-                  </td>
-              </tr>
-            </tbody>
-          </table>
+            <span class="add-span" ng-click="create()"><img class="add-plus" src="/images/Add.svg" alt=""> Add Sample</span>
 
-          <span class="add-span" ng-click="create()"><img class="add-plus" src="/images/Add.svg" alt=""> Add Sample</span>
+          </div>
 
-        </div>
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 targets">
+            <p>Targets</p>
 
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 targets" full-height force="true" offset="160">
-          <p>Targets</p>
+            <table fixed-header class="sample-target-table target-table">
+                <thead>
+                    <tr>
+                        <th width="50%">Name</th>
+                        <th class="text-center" width="20%" style="padding: 0 2px; min-width: 60px;">Ch.</th>
+                        <th class="text-center" width="10%" style="padding: 0 2px; min-width: 50px;"></th>
+                        <th class="text-center" width="20%" style="padding: 0 2px; min-width: 50px;">Color</th>
+                        <th width="50px" style="padding: 0 2px; min-width: 50px;"></th>
+                    </tr>
+                </thead>
+              <tbody>
+                <tr ng-repeat="targetContent in targets track by $index">
+                    <td style="border-bottom:1px solid #bbb;">
+                        <input style="border:0px;padding:0px;width:100%;outline: none;" type="text" ng-blur="updateTargetName(targetContent,$index)" ng-focus="focusTarget(targetContent,$index)" placeholder=""  class="" ng-model="targetContent.name">
+                    </td>
+                    <td style="border-bottom:1px solid #bbb; padding: 0 2px; min-width: 60px;" class="text-center">
+                        <div ng-show="targetContent.selectChannel"  class="channel-selector" ng-if="is_dual_channel">
+                            <span ng-click="updateTargetChannel(targetContent.id,1, $index)" ng-class="{'select-channel-border':targetContent.channel == 1}">1</span>                        
+                            <span ng-click="updateTargetChannel(targetContent.id,2, $index)" ng-class="{'select-channel-border':targetContent.channel == 2}">2</span>
+                        </div>
+                        <div ng-show="!targetContent.selectChannel"  class="cursor-channel">
+                            <span ng-click="targetContent.selectChannel = !targetContent.selectChannel" 
+                                style="text-decoration: underline; display: block;" 
+                                ng-if="is_dual_channel">
+                                {{targetContent.channel}}
+                            </span>
+                            <span 
+                                style="display: block;" 
+                                ng-if="!is_dual_channel">
+                                {{targetContent.channel}}
+                            </span>
+                        </div>
+                    </td>
+                    <td style="border-bottom:1px solid #bbb; padding: 0 2px; min-width: 50px;" class="text-right">
+                        <label class="icon-wrapper">
+                            <img class="assigned-icon" src="/images/assigned.svg" alt="" ng-show="targetContent.assigned">
+                            <div class="assigned-description">
+                                <span>Assigned to wells</span>
+                            </div>                      
+                        </label>
+                        <img class="lock-icon" src="/images/lock.svg" alt="" ng-show="targetContent.imported">
+                    </td>
+                    <td style="border-bottom:1px solid #bbb; padding: 0 2px; min-width: 50px;" class="text-center">
+                        <span class="color" ng-attr-style="background-color:{{colors[$index % 16]}};display:inline-block;width:20px;height:20px;border-radius:3px;"></span>
+                    </td>
+                    <td style="text-align:center;padding: 0; padding: 0 2px; min-width: 50px;" class="text-center">
+                        <span ng-show="!targetContent.confirmDelete" ng-click="confirmDeleteTarget(targetContent)"><img class="delete" src="/images/trash_initial.svg" alt=""></span>
+                        <span ng-show="targetContent.confirmDelete" ng-click="deleteTarget(targetContent, $index)"><img class="delete-confirm" src="/images/confirm_trash.svg" alt=""></span>
+                    </td>
+                </tr>
+              </tbody>
+            </table>
 
-          <table fixed-header class="sample-target-table target-table">
-              <thead>
-                  <tr>
-                      <th width="50%">Name</th>
-                      <th class="text-center" width="20%" style="padding: 0 2px; min-width: 60px;">Ch.</th>
-                      <th class="text-center" width="10%" style="padding: 0 2px; min-width: 50px;"></th>
-                      <th class="text-center" width="20%" style="padding: 0 2px; min-width: 50px;">Color</th>
-                      <th width="50px" style="padding: 0 2px; min-width: 50px;"></th>
-                  </tr>
-              </thead>
-            <tbody>
-              <tr ng-repeat="targetContent in targets track by $index">
-                  <td style="border-bottom:1px solid #bbb;">
-                      <input style="border:0px;padding:0px;width:100%;outline: none;" type="text" ng-blur="updateTargetName(targetContent,$index)" ng-focus="focusTarget(targetContent,$index)" placeholder=""  class="" ng-model="targetContent.name">
-                  </td>
-                  <td style="border-bottom:1px solid #bbb; padding: 0 2px; min-width: 60px;" class="text-center">
-                      <div ng-show="targetContent.selectChannel"  class="channel-selector" ng-if="is_dual_channel">
-                          <span ng-click="updateTargetChannel(targetContent.id,1, $index)" ng-class="{'select-channel-border':targetContent.channel == 1}">1</span>                        
-                          <span ng-click="updateTargetChannel(targetContent.id,2, $index)" ng-class="{'select-channel-border':targetContent.channel == 2}">2</span>
-                      </div>
-                      <div ng-show="!targetContent.selectChannel"  class="cursor-channel">
-                          <span ng-click="targetContent.selectChannel = !targetContent.selectChannel" 
-                              style="text-decoration: underline; display: block;" 
-                              ng-if="is_dual_channel">
-                              {{targetContent.channel}}
-                          </span>
-                          <span 
-                              style="display: block;" 
-                              ng-if="!is_dual_channel">
-                              {{targetContent.channel}}
-                          </span>
-                      </div>
-                  </td>
-                  <td style="border-bottom:1px solid #bbb; padding: 0 2px; min-width: 50px;" class="text-right">
-                      <label class="icon-wrapper">
-                          <img class="assigned-icon" src="/images/assigned.svg" alt="" ng-show="targetContent.assigned">
-                          <div class="assigned-description">
-                              <span>Assigned to wells</span>
-                          </div>                      
-                      </label>
-                      <img class="lock-icon" src="/images/lock.svg" alt="" ng-show="targetContent.imported">
-                  </td>
-                  <td style="border-bottom:1px solid #bbb; padding: 0 2px; min-width: 50px;" class="text-center">
-                      <span class="color" ng-attr-style="background-color:{{colors[$index % 16]}};display:inline-block;width:20px;height:20px;border-radius:3px;"></span>
-                  </td>
-                  <td style="text-align:center;padding: 0; padding: 0 2px; min-width: 50px;" class="text-center">
-                      <span ng-show="!targetContent.confirmDelete" ng-click="confirmDeleteTarget(targetContent)"><img class="delete" src="/images/trash_initial.svg" alt=""></span>
-                      <span ng-show="targetContent.confirmDelete" ng-click="deleteTarget(targetContent, $index)"><img class="delete-confirm" src="/images/confirm_trash.svg" alt=""></span>
-                  </td>
-              </tr>
-            </tbody>
-          </table>
+            <span class="add-span" ng-click="createTarget()"><img class="add-plus" src="/images/Add.svg" alt=""> Add Target</span>
 
-          <span class="add-span" ng-click="createTarget()"><img class="add-plus" src="/images/Add.svg" alt=""> Add Target</span>
-
+          </div>
         </div>
       </div>
     </div>
-    <status-bar experiment-id="experiment.id"></status-bar>
   </div>
+  <status-bar experiment-id="experiment.id"></status-bar>
 </div>

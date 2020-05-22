@@ -1,9 +1,9 @@
 
 window.ChaiBioTech.ngApp.directive('fixedHeader', fixedHeader);
 
-fixedHeader.$inject = ['$timeout', '$window'];
+fixedHeader.$inject = ['$timeout', '$window', '$rootScope'];
 
-function fixedHeader($timeout, $window) {
+function fixedHeader($timeout, $window, $rootScope) {
     return {
         restrict: 'A',
         link: link
@@ -11,6 +11,7 @@ function fixedHeader($timeout, $window) {
 
     function link($scope, $elem, $attrs, $ctrl) {
         var elem = $elem[0];
+        var timeout = null;
 
         // wait for data to load and then transform the table
         $scope.$watch(tableDataLoaded, function(isTableDataLoaded) {
@@ -26,6 +27,17 @@ function fixedHeader($timeout, $window) {
         });
 
         angular.element($window).on('resize', onResizeWindow);
+
+        $rootScope.$on('sidemenu:toggle', function(){
+            if (timeout) {
+              $timeout.cancel(timeout);
+              timeout = null;
+            }
+            timeout = $timeout(function() {
+              onResizeWindow();
+              timeout = null;
+            }, 300);
+        });
 
         function tableScrollRender() {
             var tbodyElems = elem.querySelector('tbody');

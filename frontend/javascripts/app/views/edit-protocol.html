@@ -18,84 +18,85 @@
 -->
 <div class="edit-stage-step-container" ng-controller="StageStepCtrl">
   <div class="pika-wrapper" side-menu-layout is-open="false">
-    <div style="display: flex; flex-direction: column; height: calc(100% - 40px);">
-      <header-status experiment-id="protocol.id">
-        <div class="stripes" toggle-sidemenu>
-          <img src='/images/menu-white.svg'/>
-        </div>
-      </header-status>
-      <div class="top-half noselect">
-        <div class="canvas-containing">
-          <canvas class="canvasClass" id="canvas"></canvas>
-          <div class="canvas-loading">LOADING
-            <ellipsis-animated></ellipsis-animated>
-          </div>
-          <!--<div class="exp_completed_overlay" ng-show="exp_completed"></div> -->
-          <div class="canvas-in-progress">
-            <div class="canvas-message"> IN PROGRESS
+    <header-status experiment-id="protocol.id">
+      <div class="stripes" toggle-sidemenu>
+        <img src='/images/menu-grey.svg'/>
+      </div>
+    </header-status>
+    <div class="inner-wrapper">
+      <div class="inner-container">
+        <div class="top-half noselect">
+          <div class="canvas-containing">
+            <canvas class="canvasClass" id="canvas"></canvas>
+            <div class="canvas-loading">LOADING
               <ellipsis-animated></ellipsis-animated>
             </div>
-          </div>
-        </div>
-      </div>
-      <div protocol-screen-center-bottom-half class="bottom-half noselect">
-        <arrow class="previous" action="previous" ng-click="arrowClicked()"></arrow>
-        <div class="middle-ground">
-          <div class="first-data-row">
-            <general></general>
-            <summary-mode></summary-mode>
-          </div>
-          <div class="data-boxes-container">
-            <div class="data-box-container-summary">
-              <!--First two data boxes -->
-              <div class="data-box-container-summary-scroll">
-                <div class="data-boxes temperature-change">
-                  <div class="name-board SH">TEMPERATURE DETAILS</div>
-                  <temperature caption="Temperature" help-text="[4-100     ºC]" unit="ºC" reading="step.temperature" action="WOWaction(edit)"></temperature>
-                  <ramp-speed caption="Ramp Speed" help-text="[0-5&nbsp;&nbsp;ºC/s]" unit="ºC/s" reading="step.ramp.rate"></ramp-speed>
-                  <hold-duration caption="Hold Duration" help-text="[0:00-5:00]" reading="step.hold_time" pause="! step.pause"></hold-duration>
-                </div>
-                <div class="data-boxes auto-delta">
-                  <div class="name-board">
-                    <div class="toggle-container">
-                      <auto-delta-toggle data="stage.auto_delta" type="{{stage.stage_type}}" call="changeDelta"></auto-delta-toggle>
-                    </div>
-                    <auto-delta-caption type="{{stage.stage_type}}"></auto-delta-caption>
-                  </div>
-                  <start-on-cycle caption="Start On Cycle" delta="stage.auto_delta" reading="stage.auto_delta_start_cycle"></start-on-cycle>
-                  <temp caption="Δ Temp" unit="ºC" delta="stage.auto_delta" reading="step.delta_temperature">
-                    <capsule func="changeDeltaTemperature" delta="{{stage.auto_delta}}" data="step.delta_temperature"></capsule>
-                  </temp>
-                  <time caption="Δ Time" delta="stage.auto_delta" reading="step.delta_duration_s">
-                    <capsule func="changeDeltaTime" delta="{{stage.auto_delta}}" data="step.delta_duration_s"></capsule>
-                  </time>
-                </div>
-                <div class="data-boxes exp-overview">
-                  <div class="name-board SH">EXPERIMENT OVERVIEW</div>
-                  <summary-mode-item caption="Stages" reading="{{fabricStep.parentStage.parent.allStageViews.length}}"></summary-mode-item>
-                  <summary-mode-item caption="Steps" reading="{{fabricStep.parentStage.parent.allStepViews.length}}"></summary-mode-item>
-                  <summary-mode-item caption="Est. Time to Complete" reading="{{protocol.protocol.estimate_duration | toHour}}"></summary-mode-item>
-                </div>
-                <div class="data-boxes exp-metadata">
-                  <div class="name-board SH">EXPERIMENT META DATA</div>
-                  <summary-mode-item caption="Created on" reading="{{protocol.created_at | amDateFormat: 'MMM D, YYYY hh:mm A'}}"></summary-mode-item>
-                  <summary-mode-item ng-if="protocol.started_at" caption="Run on" reading="{{protocol.started_at | amDateFormat: 'MMM D, YYYY hh:mm A'}}"></summary-mode-item>
-                </div>
+            <!--<div class="exp_completed_overlay" ng-show="exp_completed"></div> -->
+            <div class="canvas-in-progress">
+              <div class="canvas-message"> IN PROGRESS
+                <ellipsis-animated></ellipsis-animated>
               </div>
             </div>
-            <!--First two data boxes -->
-            <div class="data-boxes edit-stage-step">
-              <div class="name-board SH">EDIT STEPS + STAGES</div>
-              <actions></actions>
-            </div>
           </div>
-          <stage-type-popup ng-show="actionPopup && !infiniteHoldStage"></stage-type-popup>
-          <div class="exp_completed_overlay" ng-show="exp_completed"></div>
         </div>
-        <arrow class="next" action="next" ng-click="arrowClicked()"></arrow>
+        <div protocol-screen-center-bottom-half class="bottom-half noselect">
+          <arrow class="previous" action="previous" ng-click="arrowClicked()"></arrow>
+          <div class="middle-ground">
+            <div class="first-data-row">
+              <general></general>
+              <summary-mode></summary-mode>
+            </div>
+            <div class="data-boxes-container">
+              <div class="data-box-container-summary">
+                <!--First two data boxes -->
+                <div class="data-box-container-summary-scroll">
+                  <div class="data-boxes temperature-change">
+                    <div class="name-board SH">TEMPERATURE DETAILS</div>
+                    <temperature caption="Temperature" help-text="[4-100     ºC]" unit="ºC" reading="step.temperature" action="WOWaction(edit)"></temperature>
+                    <ramp-speed caption="Ramp Speed" help-text="[0-5&nbsp;&nbsp;ºC/s]" unit="ºC/s" reading="step.ramp.rate"></ramp-speed>
+                    <hold-duration caption="Hold Duration" help-text="[0:00-5:00]" reading="step.hold_time" pause="! step.pause"></hold-duration>
+                  </div>
+                  <div class="data-boxes auto-delta">
+                    <div class="name-board">
+                      <div class="toggle-container">
+                        <auto-delta-toggle data="stage.auto_delta" type="{{stage.stage_type}}" call="changeDelta"></auto-delta-toggle>
+                      </div>
+                      <auto-delta-caption type="{{stage.stage_type}}"></auto-delta-caption>
+                    </div>
+                    <start-on-cycle caption="Start On Cycle" delta="stage.auto_delta" reading="stage.auto_delta_start_cycle"></start-on-cycle>
+                    <temp caption="Δ Temp" unit="ºC" delta="stage.auto_delta" reading="step.delta_temperature">
+                      <capsule func="changeDeltaTemperature" delta="{{stage.auto_delta}}" data="step.delta_temperature"></capsule>
+                    </temp>
+                    <time caption="Δ Time" delta="stage.auto_delta" reading="step.delta_duration_s">
+                      <capsule func="changeDeltaTime" delta="{{stage.auto_delta}}" data="step.delta_duration_s"></capsule>
+                    </time>
+                  </div>
+                  <div class="data-boxes exp-overview">
+                    <div class="name-board SH">EXPERIMENT OVERVIEW</div>
+                    <summary-mode-item caption="Stages" reading="{{fabricStep.parentStage.parent.allStageViews.length}}"></summary-mode-item>
+                    <summary-mode-item caption="Steps" reading="{{fabricStep.parentStage.parent.allStepViews.length}}"></summary-mode-item>
+                    <summary-mode-item caption="Est. Time to Complete" reading="{{protocol.protocol.estimate_duration | toHour}}"></summary-mode-item>
+                  </div>
+                  <div class="data-boxes exp-metadata">
+                    <div class="name-board SH">EXPERIMENT META DATA</div>
+                    <summary-mode-item caption="Created on" reading="{{protocol.created_at | amDateFormat: 'MMM D, YYYY hh:mm A'}}"></summary-mode-item>
+                    <summary-mode-item ng-if="protocol.started_at" caption="Run on" reading="{{protocol.started_at | amDateFormat: 'MMM D, YYYY hh:mm A'}}"></summary-mode-item>
+                  </div>
+                </div>
+              </div>
+              <!--First two data boxes -->
+              <div class="data-boxes edit-stage-step">
+                <div class="name-board SH">EDIT STEPS + STAGES</div>
+                <actions></actions>
+              </div>
+            </div>
+            <stage-type-popup ng-show="actionPopup && !infiniteHoldStage"></stage-type-popup>
+            <div class="exp_completed_overlay" ng-show="exp_completed"></div>
+          </div>
+          <arrow class="next" action="next" ng-click="arrowClicked()"></arrow>
+        </div>
       </div>
-
     </div>
-    <status-bar experiment-id="protocol.id"></status-bar>
   </div>
+  <status-bar experiment-id="protocol.id"></status-bar>
 </div>

@@ -40,6 +40,7 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
 
     $scope.confirmStatus = false
     $scope.isConfirmDelete = false
+    $scope.isConfirmCancel = false
 
     $scope.$on 'runReady:true', ->
       $scope.confirmStatus = true
@@ -50,12 +51,20 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
         $scope.confirmStatus = false
       if $scope.isConfirmDelete == true and e.target.innerHTML != 'Delete'
         $scope.isConfirmDelete = false
+      if $scope.isConfirmCancel == true and e.target.innerHTML != 'Cancel'
+        $scope.isConfirmCancel = false
 
     $scope.setConfirmDelete = (isConfirm) ->
       $scope.isConfirmDelete = isConfirm
 
     $scope.getConfirmDelete = () ->
       $scope.isConfirmDelete
+
+    $scope.setConfirmCancel = (isConfirm) ->
+      $scope.isConfirmCancel = isConfirm
+
+    $scope.getConfirmCancel = () ->
+      $scope.isConfirmCancel
 
     $scope.deleteExperiment = ->
       #exp = new Experiment id: $stateParams.id
@@ -125,7 +134,7 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
         if data.experiment.started_at and !data.experiment.completed_at
           if !$scope.isIdle and (parseInt($scope.runningExpId) is parseInt($scope.exp.id))
             $scope.status = 'RUNNING'
-            $scope.runStatus = 'Currently running.'
+            $scope.runStatus = ''
           else
             $scope.status = 'COMPLETED'
             $scope.runStatus = 'Run on:'

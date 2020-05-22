@@ -5,7 +5,8 @@
     '$window',
     '$timeout',
     'WindowWrapper',
-    function($window, $timeout, WindowWrapper) {
+    '$rootScope',
+    function($window, $timeout, WindowWrapper, $rootScope) {
       return {
         restrict: 'AE',
         link: function($scope, elem, attrs) {
@@ -32,7 +33,7 @@
             var numVisibleDataBoxes = 3;
             var prevWidth = prev.width();
             var nextWidth = next.width();
-            var mainWidth = WindowWrapper.width() > minWidth ? WindowWrapper.width() : minWidth;
+            var mainWidth = $('.inner-container').width() > minWidth ? $('.inner-container').width() : minWidth;
             var middleGroundWidth = mainWidth - (prevWidth + nextWidth);
 
             elem.css({ width: mainWidth });
@@ -87,6 +88,16 @@
             }, 100);
           });
 
+          $rootScope.$on('sidemenu:toggle', function(){
+            if (timeout) {
+              $timeout.cancel(timeout);
+              timeout = null;
+            }
+            timeout = $timeout(function() {
+              $scope.adjust();
+              timeout = null;
+            }, 300);
+          });
         }
       };
     }

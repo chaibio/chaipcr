@@ -12,17 +12,17 @@
   <div class="side-menu-content-container">
     <div class="side-menu-name-container">
       <exp-name-editor status="status"></exp-name-editor>
-      <div ng-show="exp.time_valid && status == 'COMPLETED'" class="side-menu-exp-status CB2 run-on-status">
+      <div ng-if="exp.time_valid && status == 'COMPLETED'" class="side-menu-exp-status CB2 run-on-status">
         {{runStatus}} {{exp.started_at}}
-        <label class="side-menu-exp-status-text success CB2" ng-show="exp.completion_status === 'success'">Completed</label>
-        <label class="side-menu-exp-status-text failed CB2" ng-show="exp.completion_status !== 'success'">Failed</label>
+        <label class="side-menu-exp-status-text success CB2" ng-if="exp.completion_status === 'success'">Completed</label>
+        <label class="side-menu-exp-status-text failed CB2" ng-if="exp.completion_status !== 'success'">Failed</label>
       </div>
-      <div ng-show="!exp.time_valid && status == 'COMPLETED'" class="side-menu-exp-status CB2 run-on-status">
+      <div ng-if="!exp.time_valid && status == 'COMPLETED'" class="side-menu-exp-status CB2 run-on-status">
         Run previously
-        <label class="side-menu-exp-status-text success" ng-show="exp.completion_status === 'success'">Completed</label>
-        <label class="side-menu-exp-status-text failed" ng-show="exp.completion_status !== 'success'">Failed</label>
+        <label class="side-menu-exp-status-text success" ng-if="exp.completion_status === 'success'">Completed</label>
+        <label class="side-menu-exp-status-text failed" ng-if="exp.completion_status !== 'success'">Failed</label>
       </div>
-      <div ng-if="status != 'COMPLETED'" class="side-menu-exp-status CB2">{{runStatus}}</div>
+      <div ng-if="status != 'COMPLETED' && runStatus" class="side-menu-exp-status CB2">{{runStatus}}</div>
     </div>
     <div class="side-menu-menu-container run-exp" style="padding: 0">
       <div class="side-menu-menu-item" ng-if="exp.type != 'test_kit'">
@@ -30,11 +30,11 @@
       </div>
 
       <div class="side-menu-button-container" ng-if="status == 'COMPLETED'">
-        <button ng-show="!exporting" class="side-menu-button CB1-M" ng-click="exportExperiment()" experiment-id="params.id" style="margin-right: 10px;">Export</button>
-        <button ng-show="exporting" class="side-menu-button CB1-M" style="margin-right: 10px;">Exporting<ellipsis-animated><ellipsis-animated/></button>
-        <button class="side-menu-button CB1-M second-button" ng-click="setConfirmDelete(true)" ng-show="!getConfirmDelete()">Delete</button>
-        <button class="side-menu-button CB1-M second-button confirm-delete" ng-click="deleteExperiment(params.id)" ng-show="getConfirmDelete()">Confirm Delete</button>
-        <span class="text-danger CB3-M" ng-show="errorExport">Error exporting data. Please try again.</span>
+        <button ng-if="!exporting" class="side-menu-button CB1-M" ng-click="exportExperiment()" experiment-id="params.id" style="margin-right: 10px;">Export</button>
+        <button ng-if="exporting" class="side-menu-button CB1-M" style="margin-right: 10px;">Exporting<ellipsis-animated><ellipsis-animated/></button>
+        <button class="side-menu-button CB1-M second-button" ng-click="setConfirmDelete(true)" ng-if="!getConfirmDelete()">Delete</button>
+        <button class="side-menu-button CB1-M second-button confirm-delete" ng-click="deleteExperiment(params.id)" ng-if="getConfirmDelete()">Confirm Delete</button>
+        <span class="text-danger CB3-M" ng-if="errorExport">Error exporting data. Please try again.</span>
       </div>
       <hr/>
     </div>
@@ -70,9 +70,10 @@
       </div>
       <div class="side-menu-menu-box" ng-if="status == 'RUNNING'">
         <div class="CB2-M">
-          <span>Experiment In Progress</span>
+          <span ui-sref="pika_test.experiment-running({id: params.id})">Experiment In Progress</span>
         </div>
-        <button class="side-menu-button CB2-M" ng-click="cancelExperiment(params.id)">Cancel</button>
+        <button class="side-menu-button CB2-M" ng-click="setConfirmCancel(true)" ng-if="!getConfirmCancel()">Cancel</button>
+        <button class="side-menu-button CB2-M confirm-cancel" ng-click="cancelExperiment(params.id)" ng-if="getConfirmCancel()">Confirm Cancel</button>
       </div>
     </div>
     <div class="side-menu-menu-container analyze-menu">

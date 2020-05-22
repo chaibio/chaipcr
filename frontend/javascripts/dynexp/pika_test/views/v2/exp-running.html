@@ -3,11 +3,11 @@
     <header-exp-status experiment-id="experiment.id">
       <div class="stripes-and-name" toggle-sidemenu>
         <div class="stripes">
-          <img src='/images/menu-white.svg'/>
+          <img src='/images/menu-grey.svg'/>
         </div>
       </div>
     </header-exp-status>
-    <div class="pika-content" full-height offset="100">
+    <div class="pika-content">
       <p class="description CX2">
         Your experiment is running. Please do not open the hardware unless instructed to here.
       </p>
@@ -24,6 +24,6 @@
         The lid is heating to <b>{{experiment.protocol.lid_temperature | round: 1}} &deg;</b>C <br>
       </p>
     </div>
-    <status-bar></status-bar>
   </div>
+  <status-bar></status-bar>
 </div>

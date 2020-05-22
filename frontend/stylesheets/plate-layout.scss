@@ -493,6 +493,8 @@ li {
     background: #fff;
     padding: 0 15px;
     overflow: hidden;
+    position: relative;
+    z-index: 1;
 
     &::after{
         content: ' ';
@@ -595,9 +597,11 @@ li {
 
 .plate-layout-pane{
   background: #eee;
-  overflow: hidden;
+  &.inner-container{
+    min-width: 1200px !important;
+  }
   .plate-layout-box{
-    overflow: auto;
+    height: calc(100vh - 170px);
     .plate-layout-details{
       width: 100%;
       height: 100%;
@@ -610,5 +614,11 @@ li {
         position: relative;
       }
     }
+  }
+}
+
+.plate-layout-state-active{
+  .inner-wrapper{
+    background: #eee;
   }
 }

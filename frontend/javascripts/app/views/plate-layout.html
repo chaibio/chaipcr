@@ -18,471 +18,471 @@ limitations under the License.
 -->
 <div ng-controller="PlateLayoutCtrl">
     <div class="pika-wrapper" side-menu-layout is-open="false">
-        <div class="plate-layout-pane" style="display: flex; flex-direction: column; height: calc(100% - 40px);">
-            <header-status experiment-id="experiment.id">
-                <div class="stripes-and-name" toggle-sidemenu>
-                      <div class="stripes">
-                        <img src='/images/menu-white.svg'/>
-                      </div>
-                </div>
-            </header-status>
-
-            <div class="col-lg-12 header-plate-layout">
-                <h4 class="XB1B" style="display:inline-block; line-height: 50px; margin: 0;">Well Layout</h4>
-                <span class="experiment-info XB1" ng-show="standard_experiment">Using standards from <b>{{standard_experiment.name}}</b></span>
-                <div class="XB1 tip-banner">
-                    <span>Select wells from the grid below to begin.</span>
-                    <button ng-click="setNoShowBanner()">Don't show again</button>
-                    <label ng-click="closeBanner()"><img src="/images/x_k_white.svg"></label>
-                </div>
+        <header-status experiment-id="experiment.id">
+            <div class="stripes-and-name" toggle-sidemenu>
+                  <div class="stripes">
+                    <img src='/images/menu-grey.svg'/>
+                  </div>
             </div>
+        </header-status>
+        <div class="inner-wrapper">
+            <div class="inner-container plate-layout-pane">
+                <div class="header-plate-layout">
+                    <h4 class="XB1B" style="display:inline-block; line-height: 50px; margin: 0;">Well Layout</h4>
+                    <span class="experiment-info XB1" ng-show="standard_experiment">Using standards from <b>{{standard_experiment.name}}</b></span>
+                    <div class="XB1 tip-banner">
+                        <span>Select wells from the grid below to begin.</span>
+                        <button ng-click="setNoShowBanner()">Don't show again</button>
+                        <label ng-click="closeBanner()"><img src="/images/x_k_white.svg"></label>
+                    </div>
+                </div>
 
-            <div class="plate-layout-box" full-height  offset="150">
-                <div class="plate-layout-details">
-                    <div class="plate-layout-frame">
-                        <div class="plate-layout-wells">
-                            <table style="width:100%">
-                                <tbody>
-                                    <tr style="background: #eee;">
-                                        <th ng-click="selectAllWells()" ng-style="{width: row_header_width + 'px'}" class="col-header" style="cursor: pointer;"></th>
-                                        <th 
-                                            ng-mousedown="dragStart($event, 'column', col.index)" 
-                                            ng-mouseup="dragStop($event, 'column', col.index)" 
-                                            ng-mousemove="dragged($event, 'column', col.index)" 
-                                            ng-repeat="col in columns" 
-                                            ng-style="{width: getCellWidth() + 'px'}" 
-                                            class="col-header XG1" 
-                                            ng-class="{dragged: col.selected}">
-                                            {{col.index + 1}}
-                                        </th>
-                                    </tr>
-                                    <tr ng-repeat="row in rows">
-                                        <td class="row-header" 
-                                            style="background: #eee;"
-                                            ng-mousedown="dragStart($event, 'row', row.index)" 
-                                            ng-mousemove="dragged($event, 'row', row.index)" 
-                                            ng-mouseup="dragStop($event, 'row', row.index)" 
-                                            ng-class="{dragged: row.selected}"
-                                        >
-                                            <label style="width: 20px;" class="XG1">                                                
-                                                {{ rowCharacters[row.index] }}
-                                            </label>
-                                        </td>
-                                        <td 
-                                            class="well-switch"
-                                            ng-repeat="col in columns" 
-                                            ng-init="i = (row.index * columns.length) + col.index; well = wells['well_' + i];" 
-                                            ng-mousedown="dragStart($event, 'well', i)" 
-                                            ng-mousemove="dragged($event, 'well', i)" 
-                                            ng-mouseup="dragStop($event, 'well', i)" 
-                                            ng-class="{selected: well.selected, active: well.active}" 
-                                            ng-style="getWellStyle(row, col, well, i)">
-                                            <div class="well-switch-container" ng-style="getWellContainerStyle(row, col, well, i)">
-                                                <div class="ct-cq-container" ng-if="row.index == 0">
-                                                    <div class="sample-name XB1B" ng-class="{'no-sample-set': wellInf[col.index].sample == 'Choose'}"> 
-                                                        <span ng-if="wellInf[col.index].sample == 'Choose'">&nbsp;</span>
-                                                        <span ng-if="wellInf[col.index].sample != 'Choose'">{{wellInf[col.index].sample}}</span>
-                                                    </div>
-                                                    <hr class="sample-underline">
-                                                    <div ng-class="{'hiding-div': wellInf[col.index].target1 == 'Not set'}">
-                                                        <div 
-                                                            class="targetRect"                                                             
-                                                            ng-style="{'background-color': wellInf[col.index].target1color}"
-                                                            ng-class="{'no-targetBorder': wellInf[col.index].target1 == 'Not set'}">
-                                                            <span ng-if="wellInf[col.index].target1type == 'positive_control'" class="wellCircle" style="line-height: 12px;">+</span>
-                                                            <span ng-if="wellInf[col.index].target1type == 'negative_control'" class="wellCircle" style="line-height: 12px;">-</span>
-                                                            <span ng-if="wellInf[col.index].target1type == 'standard'" class="wellCircle">S</span>
-                                                            <span ng-if="wellInf[col.index].target1type == 'unknown'" class="wellCircle">U</span>
-                                                            <span ng-if="wellInf[col.index].target1type == ''" class="wellCircle" ng-class="{'wellCircle-empty': wellInf[col.index].target1 == 'Not set'}"></span>
+                <div class="plate-layout-box">
+                    <div class="plate-layout-details">
+                        <div class="plate-layout-frame">
+                            <div class="plate-layout-wells">
+                                <table style="width:100%">
+                                    <tbody>
+                                        <tr style="background: #eee;">
+                                            <th ng-click="selectAllWells()" ng-style="{width: row_header_width + 'px'}" class="col-header" style="cursor: pointer;"></th>
+                                            <th 
+                                                ng-mousedown="dragStart($event, 'column', col.index)" 
+                                                ng-mouseup="dragStop($event, 'column', col.index)" 
+                                                ng-mousemove="dragged($event, 'column', col.index)" 
+                                                ng-repeat="col in columns" 
+                                                ng-style="{width: getCellWidth() + 'px'}" 
+                                                class="col-header XG1" 
+                                                ng-class="{dragged: col.selected}">
+                                                {{col.index + 1}}
+                                            </th>
+                                        </tr>
+                                        <tr ng-repeat="row in rows">
+                                            <td class="row-header" 
+                                                style="background: #eee;"
+                                                ng-mousedown="dragStart($event, 'row', row.index)" 
+                                                ng-mousemove="dragged($event, 'row', row.index)" 
+                                                ng-mouseup="dragStop($event, 'row', row.index)" 
+                                                ng-class="{dragged: row.selected}"
+                                            >
+                                                <label style="width: 20px;" class="XG1">                                                
+                                                    {{ rowCharacters[row.index] }}
+                                                </label>
+                                            </td>
+                                            <td 
+                                                class="well-switch"
+                                                ng-repeat="col in columns" 
+                                                ng-init="i = (row.index * columns.length) + col.index; well = wells['well_' + i];" 
+                                                ng-mousedown="dragStart($event, 'well', i)" 
+                                                ng-mousemove="dragged($event, 'well', i)" 
+                                                ng-mouseup="dragStop($event, 'well', i)" 
+                                                ng-class="{selected: well.selected, active: well.active}" 
+                                                ng-style="getWellStyle(row, col, well, i)">
+                                                <div class="well-switch-container" ng-style="getWellContainerStyle(row, col, well, i)">
+                                                    <div class="ct-cq-container" ng-if="row.index == 0">
+                                                        <div class="sample-name XB1B" ng-class="{'no-sample-set': wellInf[col.index].sample == 'Choose'}"> 
+                                                            <span ng-if="wellInf[col.index].sample == 'Choose'">&nbsp;</span>
+                                                            <span ng-if="wellInf[col.index].sample != 'Choose'">{{wellInf[col.index].sample}}</span>
                                                         </div>
-                                                        <div class="targetInfo" style="display:inline-block;padding-left:5px;">
-                                                            <span class="target-name XB1B" ng-class="{'no-sample-set': wellInf[col.index].target1 == 'Not set'}">{{(wellInf[col.index].target1 == 'Not set') ? 'No Target' : wellInf[col.index].target1}} </span>
-                                                            <br>
-                                                            <span 
-                                                                class="target-name XB1" 
-                                                                ng-class="{'hiding-div':wellInf[col.index].target1quantityM == '' }" 
-                                                                ng-if="wellInf[col.index].target1type != 'positive_control' && wellInf[col.index].target1type != 'negative_control'"
-                                                                style="color: #333;">{{wellInf[col.index].target1quantityM}} x 10<sup>{{wellInf[col.index].target1quantityB}}</sup> 
-                                                            </span>
-                                                            <span
-                                                                class="target-name XB1" 
-                                                                ng-if="wellInf[col.index].target1type == 'positive_control'"
-                                                                style="color: #333;"
-                                                            >Positive Ctrl</span>
-                                                            <span
-                                                                class="target-name XB1" 
-                                                                ng-if="wellInf[col.index].target1type == 'negative_control'"
-                                                                style="color: #333;"
-                                                            >Negative Ctrl</span>
-                                                            <!-- <span class="target-name XB1" ng-class="{'hiding-div':wellInf[col.index].target1quantityM == '' }" style="color: #333;">{{wellInf[col.index].target1quantityM}}E<span ng-show="wellInf[col.index].target1quantityB >= 0" style="line-height: 12px;">+</span>{{wellInf[col.index].target1quantityB}} </span> -->
-                                                        </div>
+                                                        <hr class="sample-underline">
+                                                        <div ng-class="{'hiding-div': wellInf[col.index].target1 == 'Not set'}">
+                                                            <div 
+                                                                class="targetRect"                                                             
+                                                                ng-style="{'background-color': wellInf[col.index].target1color}"
+                                                                ng-class="{'no-targetBorder': wellInf[col.index].target1 == 'Not set'}">
+                                                                <span ng-if="wellInf[col.index].target1type == 'positive_control'" class="wellCircle" style="line-height: 12px;">+</span>
+                                                                <span ng-if="wellInf[col.index].target1type == 'negative_control'" class="wellCircle" style="line-height: 12px;">-</span>
+                                                                <span ng-if="wellInf[col.index].target1type == 'standard'" class="wellCircle">S</span>
+                                                                <span ng-if="wellInf[col.index].target1type == 'unknown'" class="wellCircle">U</span>
+                                                                <span ng-if="wellInf[col.index].target1type == ''" class="wellCircle" ng-class="{'wellCircle-empty': wellInf[col.index].target1 == 'Not set'}"></span>
+                                                            </div>
+                                                            <div class="targetInfo" style="display:inline-block;padding-left:5px;">
+                                                                <span class="target-name XB1B" ng-class="{'no-sample-set': wellInf[col.index].target1 == 'Not set'}">{{(wellInf[col.index].target1 == 'Not set') ? 'No Target' : wellInf[col.index].target1}} </span>
+                                                                <br>
+                                                                <span 
+                                                                    class="target-name XB1" 
+                                                                    ng-class="{'hiding-div':wellInf[col.index].target1quantityM == '' }" 
+                                                                    ng-if="wellInf[col.index].target1type != 'positive_control' && wellInf[col.index].target1type != 'negative_control'"
+                                                                    style="color: #333;">{{wellInf[col.index].target1quantityM}} x 10<sup>{{wellInf[col.index].target1quantityB}}</sup> 
+                                                                </span>
+                                                                <span
+                                                                    class="target-name XB1" 
+                                                                    ng-if="wellInf[col.index].target1type == 'positive_control'"
+                                                                    style="color: #333;"
+                                                                >Positive Ctrl</span>
+                                                                <span
+                                                                    class="target-name XB1" 
+                                                                    ng-if="wellInf[col.index].target1type == 'negative_control'"
+                                                                    style="color: #333;"
+                                                                >Negative Ctrl</span>
+                                                                <!-- <span class="target-name XB1" ng-class="{'hiding-div':wellInf[col.index].target1quantityM == '' }" style="color: #333;">{{wellInf[col.index].target1quantityM}}E<span ng-show="wellInf[col.index].target1quantityB >= 0" style="line-height: 12px;">+</span>{{wellInf[col.index].target1quantityB}} </span> -->
+                                                            </div>
 
+                                                        </div>
+                                                        <hr ng-class="{'hiding-div': !is_dual_channel}">
+                                                        <div ng-class="{'hiding-div': !is_dual_channel}">
+                                                            <div 
+                                                                ng-class="{'hiding-div':wellInf[col.index].target2 == 'Not set'}" 
+                                                                class="targetRect" 
+                                                                ng-style="{'background-color': wellInf[col.index].target2color}">
+                                                                <span ng-if="wellInf[col.index].target2type == 'positive_control'" class="wellCircle" style="line-height: 12px;">+</span>
+                                                                <span ng-if="wellInf[col.index].target2type == 'negative_control'" class="wellCircle" style="line-height: 12px;">-</span>
+                                                                <span ng-if="wellInf[col.index].target2type == 'standard'" class="wellCircle">S</span>
+                                                                <span ng-if="wellInf[col.index].target2type == 'unknown'" class="wellCircle">U</span>
+                                                                <span ng-if="wellInf[col.index].target2type == ''" class="wellCircle"></span>
+                                                            </div>
+
+                                                            <div class="targetInfo" ng-class="{'hiding-div':wellInf[col.index].target2 == 'Not set'}" style="display:inline-block;padding-left:5px;">
+                                                                <span class="target-name XB1B">{{(wellInf[col.index].target2 == 'Not set') ? 'No Target' : wellInf[col.index].target2}} </span>
+                                                                <br>
+                                                                <span 
+                                                                    class="target-name XB1" 
+                                                                    ng-class="{'hiding-div':wellInf[col.index].target2quantityM == '' }" 
+                                                                    ng-if="wellInf[col.index].target2type != 'positive_control' && wellInf[col.index].target2type != 'negative_control'"
+                                                                    style="color: #333;">{{wellInf[col.index].target2quantityM}} x 10<sup>{{wellInf[col.index].target2quantityB}}</sup> 
+                                                                </span>
+                                                                <span
+                                                                    class="target-name XB1" 
+                                                                    ng-if="wellInf[col.index].target2type == 'positive_control'"
+                                                                    style="color: #333;"
+                                                                >Positive Ctrl</span>
+                                                                <span
+                                                                    class="target-name XB1" 
+                                                                    ng-if="wellInf[col.index].target2type == 'negative_control'"
+                                                                    style="color: #333;"
+                                                                >Negative Ctrl</span>
+
+                                                                <!-- <span class="target-name XB1" ng-class="{'hiding-div':wellInf[col.index].target2quantityM == '' }" style="color: #333;">{{wellInf[col.index].target2quantityM}}E<span ng-show="wellInf[col.index].target2quantityB >= 0" style="line-height: 12px;">+</span>{{wellInf[col.index].target2quantityB}} </span> -->
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <hr ng-class="{'hiding-div': !is_dual_channel}">
-                                                    <div ng-class="{'hiding-div': !is_dual_channel}">
-                                                        <div 
-                                                            ng-class="{'hiding-div':wellInf[col.index].target2 == 'Not set'}" 
+                                                    <div class="ct-cq-container" ng-if="row.index == 1">
+                                                        <div class="sample-name XB1B" ng-class="{'no-sample-set': wellInf[col.index+8].sample == 'Choose'}"> 
+                                                            <span ng-if="wellInf[col.index+8].sample == 'Choose'">&nbsp;</span>
+                                                            <span ng-if="wellInf[col.index+8].sample != 'Choose'">{{wellInf[col.index+8].sample}}</span>
+                                                        </div>
+                                                        <hr class="sample-underline">
+                                                        <div ng-class="{'hiding-div': wellInf[col.index+8].target1 == 'Not set'}">
+                                                            <div 
                                                             class="targetRect" 
-                                                            ng-style="{'background-color': wellInf[col.index].target2color}">
-                                                            <span ng-if="wellInf[col.index].target2type == 'positive_control'" class="wellCircle" style="line-height: 12px;">+</span>
-                                                            <span ng-if="wellInf[col.index].target2type == 'negative_control'" class="wellCircle" style="line-height: 12px;">-</span>
-                                                            <span ng-if="wellInf[col.index].target2type == 'standard'" class="wellCircle">S</span>
-                                                            <span ng-if="wellInf[col.index].target2type == 'unknown'" class="wellCircle">U</span>
-                                                            <span ng-if="wellInf[col.index].target2type == ''" class="wellCircle"></span>
-                                                        </div>
+                                                            ng-style="{'background-color': wellInf[col.index+8].target1color}"                  
+                                                            ng-class="{'no-targetBorder': wellInf[col.index+8].target1 == 'Not set'}">
+                                                                <span ng-if="wellInf[col.index+8].target1type == 'positive_control'" class="wellCircle" style="line-height: 12px;">+</span>
+                                                                <span ng-if="wellInf[col.index+8].target1type == 'negative_control'" class="wellCircle" style="line-height: 12px;">-</span>
+                                                                <span ng-if="wellInf[col.index+8].target1type == 'standard'" class="wellCircle">S</span>
+                                                                <span ng-if="wellInf[col.index+8].target1type == 'unknown'" class="wellCircle">U</span>
+                                                                <span ng-if="wellInf[col.index+8].target1type == ''" class="wellCircle" ng-class="{'wellCircle-empty': wellInf[col.index+8].target1 == 'Not set'}"></span>
+                                                            </div>
 
-                                                        <div class="targetInfo" ng-class="{'hiding-div':wellInf[col.index].target2 == 'Not set'}" style="display:inline-block;padding-left:5px;">
-                                                            <span class="target-name XB1B">{{(wellInf[col.index].target2 == 'Not set') ? 'No Target' : wellInf[col.index].target2}} </span>
-                                                            <br>
-                                                            <span 
-                                                                class="target-name XB1" 
-                                                                ng-class="{'hiding-div':wellInf[col.index].target2quantityM == '' }" 
-                                                                ng-if="wellInf[col.index].target2type != 'positive_control' && wellInf[col.index].target2type != 'negative_control'"
-                                                                style="color: #333;">{{wellInf[col.index].target2quantityM}} x 10<sup>{{wellInf[col.index].target2quantityB}}</sup> 
-                                                            </span>
-                                                            <span
-                                                                class="target-name XB1" 
-                                                                ng-if="wellInf[col.index].target2type == 'positive_control'"
-                                                                style="color: #333;"
-                                                            >Positive Ctrl</span>
-                                                            <span
-                                                                class="target-name XB1" 
-                                                                ng-if="wellInf[col.index].target2type == 'negative_control'"
-                                                                style="color: #333;"
-                                                            >Negative Ctrl</span>
+                                                            <div class="targetInfo" style="display:inline-block;padding-left:5px;">
+                                                                <span class="target-name XB1B" ng-class="{'no-sample-set': wellInf[col.index+8].target1 == 'Not set'}">{{(wellInf[col.index+8].target1 == 'Not set') ? 'No Target' : wellInf[col.index+8].target1}} </span>
+                                                                <br>
+                                                                <span 
+                                                                    class="target-name XB1" 
+                                                                    ng-class="{'hiding-div':wellInf[col.index+8].target1quantityM == '' }" 
+                                                                    ng-if="wellInf[col.index+8].target1type != 'positive_control' && wellInf[col.index+8].target1type != 'negative_control'"
+                                                                    style="color: #333;">{{wellInf[col.index+8].target1quantityM}} x 10<sup>{{wellInf[col.index+8].target1quantityB}}</sup></span>
+                                                                <span
+                                                                    class="target-name XB1" 
+                                                                    ng-if="wellInf[col.index+8].target1type == 'positive_control'"
+                                                                    style="color: #333;"
+                                                                >Positive Ctrl</span>
+                                                                <span
+                                                                    class="target-name XB1" 
+                                                                    ng-if="wellInf[col.index+8].target1type == 'negative_control'"
+                                                                    style="color: #333;"
+                                                                >Negative Ctrl</span>                                                           
+                                                                <!-- <span class="target-name XB1" ng-class="{'hiding-div':wellInf[col.index+8].target1quantityM == '' }" style="color: #333;">{{wellInf[col.index+8].target1quantityM}}E<span ng-show="wellInf[col.index+8].target1quantityB >= 0" style="line-height: 12px;">+</span>{{wellInf[col.index+8].target1quantityB}} </span> -->
+                                                            </div>
+                                                        </div>
+                                                        <hr ng-class="{'hiding-div': !is_dual_channel}">
+                                                        <div ng-class="{'hiding-div': !is_dual_channel}">
+                                                            <div 
+                                                                ng-class="{'hiding-div':wellInf[col.index+8].target2 == 'Not set'}" 
+                                                                class="targetRect" 
+                                                                ng-style="{'background-color': wellInf[col.index+8].target2color}">
+                                                                <span ng-if="wellInf[col.index+8].target2type == 'positive_control'" class="wellCircle" style="line-height: 12px;">+</span>
+                                                                <span ng-if="wellInf[col.index+8].target2type == 'negative_control'" class="wellCircle" style="line-height: 12px;">-</span>
+                                                                <span ng-if="wellInf[col.index+8].target2type == 'standard'" class="wellCircle">S</span>
+                                                                <span ng-if="wellInf[col.index+8].target2type == 'unknown'" class="wellCircle">U</span>
+                                                                <span ng-if="wellInf[col.index+8].target2type == ''" class="wellCircle">&nbsp;</span>
+                                                            </div>
 
-                                                            <!-- <span class="target-name XB1" ng-class="{'hiding-div':wellInf[col.index].target2quantityM == '' }" style="color: #333;">{{wellInf[col.index].target2quantityM}}E<span ng-show="wellInf[col.index].target2quantityB >= 0" style="line-height: 12px;">+</span>{{wellInf[col.index].target2quantityB}} </span> -->
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="ct-cq-container" ng-if="row.index == 1">
-                                                    <div class="sample-name XB1B" ng-class="{'no-sample-set': wellInf[col.index+8].sample == 'Choose'}"> 
-                                                        <span ng-if="wellInf[col.index+8].sample == 'Choose'">&nbsp;</span>
-                                                        <span ng-if="wellInf[col.index+8].sample != 'Choose'">{{wellInf[col.index+8].sample}}</span>
-                                                    </div>
-                                                    <hr class="sample-underline">
-                                                    <div ng-class="{'hiding-div': wellInf[col.index+8].target1 == 'Not set'}">
-                                                        <div 
-                                                        class="targetRect" 
-                                                        ng-style="{'background-color': wellInf[col.index+8].target1color}"                  
-                                                        ng-class="{'no-targetBorder': wellInf[col.index+8].target1 == 'Not set'}">
-                                                            <span ng-if="wellInf[col.index+8].target1type == 'positive_control'" class="wellCircle" style="line-height: 12px;">+</span>
-                                                            <span ng-if="wellInf[col.index+8].target1type == 'negative_control'" class="wellCircle" style="line-height: 12px;">-</span>
-                                                            <span ng-if="wellInf[col.index+8].target1type == 'standard'" class="wellCircle">S</span>
-                                                            <span ng-if="wellInf[col.index+8].target1type == 'unknown'" class="wellCircle">U</span>
-                                                            <span ng-if="wellInf[col.index+8].target1type == ''" class="wellCircle" ng-class="{'wellCircle-empty': wellInf[col.index+8].target1 == 'Not set'}"></span>
-                                                        </div>
-
-                                                        <div class="targetInfo" style="display:inline-block;padding-left:5px;">
-                                                            <span class="target-name XB1B" ng-class="{'no-sample-set': wellInf[col.index+8].target1 == 'Not set'}">{{(wellInf[col.index+8].target1 == 'Not set') ? 'No Target' : wellInf[col.index+8].target1}} </span>
-                                                            <br>
-                                                            <span 
-                                                                class="target-name XB1" 
-                                                                ng-class="{'hiding-div':wellInf[col.index+8].target1quantityM == '' }" 
-                                                                ng-if="wellInf[col.index+8].target1type != 'positive_control' && wellInf[col.index+8].target1type != 'negative_control'"
-                                                                style="color: #333;">{{wellInf[col.index+8].target1quantityM}} x 10<sup>{{wellInf[col.index+8].target1quantityB}}</sup></span>
-                                                            <span
-                                                                class="target-name XB1" 
-                                                                ng-if="wellInf[col.index+8].target1type == 'positive_control'"
-                                                                style="color: #333;"
-                                                            >Positive Ctrl</span>
-                                                            <span
-                                                                class="target-name XB1" 
-                                                                ng-if="wellInf[col.index+8].target1type == 'negative_control'"
-                                                                style="color: #333;"
-                                                            >Negative Ctrl</span>                                                           
-                                                            <!-- <span class="target-name XB1" ng-class="{'hiding-div':wellInf[col.index+8].target1quantityM == '' }" style="color: #333;">{{wellInf[col.index+8].target1quantityM}}E<span ng-show="wellInf[col.index+8].target1quantityB >= 0" style="line-height: 12px;">+</span>{{wellInf[col.index+8].target1quantityB}} </span> -->
-                                                        </div>
-                                                    </div>
-                                                    <hr ng-class="{'hiding-div': !is_dual_channel}">
-                                                    <div ng-class="{'hiding-div': !is_dual_channel}">
-                                                        <div 
-                                                            ng-class="{'hiding-div':wellInf[col.index+8].target2 == 'Not set'}" 
-                                                            class="targetRect" 
-                                                            ng-style="{'background-color': wellInf[col.index+8].target2color}">
-                                                            <span ng-if="wellInf[col.index+8].target2type == 'positive_control'" class="wellCircle" style="line-height: 12px;">+</span>
-                                                            <span ng-if="wellInf[col.index+8].target2type == 'negative_control'" class="wellCircle" style="line-height: 12px;">-</span>
-                                                            <span ng-if="wellInf[col.index+8].target2type == 'standard'" class="wellCircle">S</span>
-                                                            <span ng-if="wellInf[col.index+8].target2type == 'unknown'" class="wellCircle">U</span>
-                                                            <span ng-if="wellInf[col.index+8].target2type == ''" class="wellCircle">&nbsp;</span>
-                                                        </div>
-
-                                                        <div class="targetInfo" ng-class="{'hiding-div':wellInf[col.index+8].target2 == 'Not set'}" style="display:inline-block;padding-left:5px;">
-                                                            <span class="target-name XB1B">{{(wellInf[col.index+8].target2 == 'Not set') ? 'No Target' : wellInf[col.index+8].target2}} </span>
-                                                            <br>
-                                                            <span 
-                                                                class="target-name XB1" 
-                                                                ng-class="{'hiding-div':wellInf[col.index+8].target2quantityM == '' }" 
-                                                                ng-if="wellInf[col.index+8].target2type != 'positive_control' && wellInf[col.index+8].target2type != 'negative_control'"
-                                                                style="color: #333;">{{wellInf[col.index+8].target2quantityM}} x 10<sup>{{wellInf[col.index+8].target2quantityB}}</sup></span>
-                                                            <span
-                                                                class="target-name XB1" 
-                                                                ng-if="wellInf[col.index+8].target2type == 'positive_control'"
-                                                                style="color: #333;"
-                                                            >Positive Ctrl</span>
-                                                            <span
-                                                                class="target-name XB1" 
-                                                                ng-if="wellInf[col.index+8].target2type == 'negative_control'"
-                                                                style="color: #333;"
-                                                            >Negative Ctrl</span>   
-                                                            <!-- <span class="target-name XB1" ng-class="{'hiding-div':wellInf[col.index+8].target2quantityM == '' }" style="color: #333;">{{wellInf[col.index+8].target2quantityM}}E<span ng-show="wellInf[col.index+8].target2quantityB >= 0" style="line-height: 12px;">+</span>{{wellInf[col.index+8].target2quantityB}} </span> -->
+                                                            <div class="targetInfo" ng-class="{'hiding-div':wellInf[col.index+8].target2 == 'Not set'}" style="display:inline-block;padding-left:5px;">
+                                                                <span class="target-name XB1B">{{(wellInf[col.index+8].target2 == 'Not set') ? 'No Target' : wellInf[col.index+8].target2}} </span>
+                                                                <br>
+                                                                <span 
+                                                                    class="target-name XB1" 
+                                                                    ng-class="{'hiding-div':wellInf[col.index+8].target2quantityM == '' }" 
+                                                                    ng-if="wellInf[col.index+8].target2type != 'positive_control' && wellInf[col.index+8].target2type != 'negative_control'"
+                                                                    style="color: #333;">{{wellInf[col.index+8].target2quantityM}} x 10<sup>{{wellInf[col.index+8].target2quantityB}}</sup></span>
+                                                                <span
+                                                                    class="target-name XB1" 
+                                                                    ng-if="wellInf[col.index+8].target2type == 'positive_control'"
+                                                                    style="color: #333;"
+                                                                >Positive Ctrl</span>
+                                                                <span
+                                                                    class="target-name XB1" 
+                                                                    ng-if="wellInf[col.index+8].target2type == 'negative_control'"
+                                                                    style="color: #333;"
+                                                                >Negative Ctrl</span>   
+                                                                <!-- <span class="target-name XB1" ng-class="{'hiding-div':wellInf[col.index+8].target2quantityM == '' }" style="color: #333;">{{wellInf[col.index+8].target2quantityM}}E<span ng-show="wellInf[col.index+8].target2quantityB >= 0" style="line-height: 12px;">+</span>{{wellInf[col.index+8].target2quantityB}} </span> -->
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="selection-section">
-                            <div class="sample-target-section">
-                                <div class="inline-block" 
-                                    style="width: 25%; padding-right: 20px;border-right: 1px solid #eee;">
-                                    <div class="section-title">                                        
-                                        <h4 class="XB1B">Sample</h4>
-                                        <span ng-click="clearWellsByType('Sample')" class="XB1M clear-link" ng-show="selectionMade && selectedCountByType('Sample')">Clear</span>
-                                    </div>
-                                    <hr>
-                                    <div class="select-style" ng-class="{opacityLess: !selectionMade}">
-
-                                    <!--<select name="repeatSelect" ng-disabled="!selectionMade" ng-model="sampleSelected" ng-change="assignSamples(sampleSelected)" >
-                                            <option value=0>Select a sample</option>
-                                            <option ng-repeat="option in samples" value="{{option.id}}">{{option.name}}</option>
-                                        </select> -->
-
-                                        <p class="testing-clicking XB1" ng-click="openSampleOptions()"
-                                            style="background-position: 165px 15px;" 
-                                        >{{sampleSelected}}</p>
-                                    </div>
-                                    <div ng-class="{'hiding-div':!showSampleOptions }" class="options-div samples-div"
-                                        style="display: none;">
-                                        <label class="button-arrow up-arrow" 
-                                            ng-show="is_scroll_list"
-                                            ng-class="{disabled: menu_scroll_top <= 0}"
-                                            ng-click="scrollUpByType('Sample')"
-                                        ></label>
-                                        <div class="dropdown-container">
-                                            <ul>
-                                                <li ng-class="{active: sampleSelectedId == 0}" class="XB1" ng-if="sampleSelectedId == 0">
-                                                    Choose
-                                                </li>
-                                                <li ng-class="{active: sampleSelectedId == option.id}" class="XB1" ng-repeat="option in samples" ng-click="assignSamples(option.id,option.name)" >{{option.name}}</li>
-                                            </ul>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="selection-section">
+                                <div class="sample-target-section">
+                                    <div class="inline-block" 
+                                        style="width: 25%; padding-right: 20px;border-right: 1px solid #eee;">
+                                        <div class="section-title">                                        
+                                            <h4 class="XB1B">Sample</h4>
+                                            <span ng-click="clearWellsByType('Sample')" class="XB1M clear-link" ng-show="selectionMade && selectedCountByType('Sample')">Clear</span>
                                         </div>
-                                        <label 
-                                            class="button-arrow down-arrow" 
-                                            ng-show="is_scroll_list"
-                                            ng-class="{disabled: dropdown_list_height <= menu_scroll_top + dropdown_inner_height}"
-                                            ng-click="scrollDownByType('Sample')"
-                                        ></label>
-<!--                                         <ul class="ul-height" ng-if = "samples.length > 8">
-                                            <li class="li-height XB1" ng-repeat="option in samples" ng-click="assignSamples(option.id,option.name)" >{{option.name}}</li>
-                                        </ul> -->
-                                    </div>
-                                </div>
+                                        <hr>
+                                        <div class="select-style" ng-class="{opacityLess: !selectionMade}">
 
-                                <div class="inline-block" style="width: 75%;">
-                                    <div>
-                                        <div class="inline-block"
-                                            style="width: 42%;padding: 0 20px;">
-                                            <div class="section-title">                                        
-                                                <h4 class="XB1B" ng-if="is_dual_channel">Ch 1 Target</h4>
-                                                <h4 class="XB1B" ng-if="!is_dual_channel">Target</h4>
-                                                <span ng-click="clearWellsByType('Target1')" class="XB1M clear-link" ng-show="selectionMade && selectedCountByType('Target1')">Clear</span>
-                                            </div>                                            
-                                            <hr>
-                                            <div class="select-style" ng-class="{opacityLess: !selectionMade}" >
+                                        <!--<select name="repeatSelect" ng-disabled="!selectionMade" ng-model="sampleSelected" ng-change="assignSamples(sampleSelected)" >
+                                                <option value=0>Select a sample</option>
+                                                <option ng-repeat="option in samples" value="{{option.id}}">{{option.name}}</option>
+                                            </select> -->
 
-                                            <!--    <select name="repeatSelect" ng-disabled="!selectionMade" ng-model="target1Selected" ng-change="assignTarget(target1Selected, '1')" >
-                                                    <option value=0>Select a target</option>
-                                                    <option ng-repeat="option in targets1" value="{{option.id}}">{{option.name}}</option>
-                                                </select> -->
-
-                                                <p class="testing-clicking XB1" ng-click="openTarget1Options()"
-                                                    style="background-position: 199px 15px;" 
-                                                >
-                                                    <span class="span-target-color" ng-style="{'background-color': target1SelectedColor}"></span>{{target1Selected}}                                                    
-                                                </p>
-
+                                            <p class="testing-clicking XB1" ng-click="openSampleOptions()"
+                                                style="background-position: 165px 15px;" 
+                                            >{{sampleSelected}}</p>
+                                        </div>
+                                        <div ng-class="{'hiding-div':!showSampleOptions }" class="options-div samples-div"
+                                            style="display: none;">
+                                            <label class="button-arrow up-arrow" 
+                                                ng-show="is_scroll_list"
+                                                ng-class="{disabled: menu_scroll_top <= 0}"
+                                                ng-click="scrollUpByType('Sample')"
+                                            ></label>
+                                            <div class="dropdown-container">
+                                                <ul>
+                                                    <li ng-class="{active: sampleSelectedId == 0}" class="XB1" ng-if="sampleSelectedId == 0">
+                                                        Choose
+                                                    </li>
+                                                    <li ng-class="{active: sampleSelectedId == option.id}" class="XB1" ng-repeat="option in samples" ng-click="assignSamples(option.id,option.name)" >{{option.name}}</li>
+                                                </ul>
                                             </div>
-                                            <div ng-class="{'hiding-div':!showTarget1Options }" class="options-div targets1-div" 
-                                                style="display: none;">
-                                                <label class="button-arrow up-arrow" 
-                                                    ng-show="is_scroll_list"
-                                                    ng-class="{disabled: menu_scroll_top <= 0}"
-                                                    ng-click="scrollUpByType('Target1')"
-                                                ></label>
-                                                <div class="dropdown-container">
-                                                    <ul>
-                                                        <li 
-                                                            ng-class="{active: target1SelectedId == 0}" 
-                                                            class="XB1" 
-                                                            ng-if="target1SelectedId == 0">
-                                                            <span class="span-target-color" style="background-color: #fff"></span>
-                                                            <span class="target-text">Choose</span>
-                                                        </li>
-                                                        <li ng-class="{active: target1SelectedId == option.id}" class="XB1" ng-repeat="option in targets1" ng-click="assignTarget(option.id, '1', option.name)" >
-                                                            <span class="span-target-color" ng-style="{'background-color': option.color}"></span>
-                                                            <span class="target-text">{{option.name}}</span>
-                                                        </li>
-                                                    </ul>
+                                            <label 
+                                                class="button-arrow down-arrow" 
+                                                ng-show="is_scroll_list"
+                                                ng-class="{disabled: dropdown_list_height <= menu_scroll_top + dropdown_inner_height}"
+                                                ng-click="scrollDownByType('Sample')"
+                                            ></label>
+    <!--                                         <ul class="ul-height" ng-if = "samples.length > 8">
+                                                <li class="li-height XB1" ng-repeat="option in samples" ng-click="assignSamples(option.id,option.name)" >{{option.name}}</li>
+                                            </ul> -->
+                                        </div>
+                                    </div>
+
+                                    <div class="inline-block" style="width: 75%;">
+                                        <div>
+                                            <div class="inline-block"
+                                                style="width: 42%;padding: 0 20px;">
+                                                <div class="section-title">                                        
+                                                    <h4 class="XB1B" ng-if="is_dual_channel">Ch 1 Target</h4>
+                                                    <h4 class="XB1B" ng-if="!is_dual_channel">Target</h4>
+                                                    <span ng-click="clearWellsByType('Target1')" class="XB1M clear-link" ng-show="selectionMade && selectedCountByType('Target1')">Clear</span>
+                                                </div>                                            
+                                                <hr>
+                                                <div class="select-style" ng-class="{opacityLess: !selectionMade}" >
+
+                                                <!--    <select name="repeatSelect" ng-disabled="!selectionMade" ng-model="target1Selected" ng-change="assignTarget(target1Selected, '1')" >
+                                                        <option value=0>Select a target</option>
+                                                        <option ng-repeat="option in targets1" value="{{option.id}}">{{option.name}}</option>
+                                                    </select> -->
+
+                                                    <p class="testing-clicking XB1" ng-click="openTarget1Options()"
+                                                        style="background-position: 199px 15px;" 
+                                                    >
+                                                        <span class="span-target-color" ng-style="{'background-color': target1SelectedColor}"></span>{{target1Selected}}                                                    
+                                                    </p>
+
                                                 </div>
-                                                <label 
-                                                    class="button-arrow down-arrow" 
-                                                    ng-show="is_scroll_list"
-                                                    ng-class="{disabled: dropdown_list_height <= menu_scroll_top + dropdown_inner_height}"
-                                                    ng-click="scrollDownByType('Target1')"
-                                                ></label>
+                                                <div ng-class="{'hiding-div':!showTarget1Options }" class="options-div targets1-div" 
+                                                    style="display: none;">
+                                                    <label class="button-arrow up-arrow" 
+                                                        ng-show="is_scroll_list"
+                                                        ng-class="{disabled: menu_scroll_top <= 0}"
+                                                        ng-click="scrollUpByType('Target1')"
+                                                    ></label>
+                                                    <div class="dropdown-container">
+                                                        <ul>
+                                                            <li 
+                                                                ng-class="{active: target1SelectedId == 0}" 
+                                                                class="XB1" 
+                                                                ng-if="target1SelectedId == 0">
+                                                                <span class="span-target-color" style="background-color: #fff"></span>
+                                                                <span class="target-text">Choose</span>
+                                                            </li>
+                                                            <li ng-class="{active: target1SelectedId == option.id}" class="XB1" ng-repeat="option in targets1" ng-click="assignTarget(option.id, '1', option.name)" >
+                                                                <span class="span-target-color" ng-style="{'background-color': option.color}"></span>
+                                                                <span class="target-text">{{option.name}}</span>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <label 
+                                                        class="button-arrow down-arrow" 
+                                                        ng-show="is_scroll_list"
+                                                        ng-class="{disabled: dropdown_list_height <= menu_scroll_top + dropdown_inner_height}"
+                                                        ng-click="scrollDownByType('Target1')"
+                                                    ></label>
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        <div class="inline-block" style="width: 33%;padding: 0 20px;">
-                                            <div class="section-title">                                        
-                                                <h4 class="XB1B">Type</h4>
-                                                <span ng-click="clearTargetWellsByType('Target1')" class="XB1M clear-link" ng-show="selectionMade && selectedCountByTargetType('Target1')">Clear</span>
+                                            <div class="inline-block" style="width: 33%;padding: 0 20px;">
+                                                <div class="section-title">                                        
+                                                    <h4 class="XB1B">Type</h4>
+                                                    <span ng-click="clearTargetWellsByType('Target1')" class="XB1M clear-link" ng-show="selectionMade && selectedCountByTargetType('Target1')">Clear</span>
+                                                </div>
+                                                <hr>
+                                                <span ng-click="assignTargetType('standard')" class="numberCircle" ng-class="{'target-selected':selectedTarget1Type == 'standard', 'disabled-clicking':!enableTarget1Type}">
+                                                    <img src="/images/ring_s.svg">
+                                                </span>
+                                                <span ng-click="assignTargetType('unknown')" class="numberCircle" ng-class="{'target-selected':selectedTarget1Type == 'unknown', 'disabled-clicking':!enableTarget1Type}">
+                                                    <img src="/images/ring_u.svg">
+                                                </span>
+                                                <span ng-click="assignTargetType('positive_control')" class="numberCircle" ng-class="{'target-selected':selectedTarget1Type == 'positive_control', 'disabled-clicking':!enableTarget1Type}">
+                                                    <img src="/images/ring_plus.svg">
+                                                </span>
+                                                <span ng-click="assignTargetType('negative_control')" class="numberCircle" ng-class="{'target-selected':selectedTarget1Type == 'negative_control', 'disabled-clicking':!enableTarget1Type}">
+                                                    <img src="/images/ring_neg.svg">
+                                                </span>
+
                                             </div>
-                                            <hr>
-                                            <span ng-click="assignTargetType('standard')" class="numberCircle" ng-class="{'target-selected':selectedTarget1Type == 'standard', 'disabled-clicking':!enableTarget1Type}">
-                                                <img src="/images/ring_s.svg">
-                                            </span>
-                                            <span ng-click="assignTargetType('unknown')" class="numberCircle" ng-class="{'target-selected':selectedTarget1Type == 'unknown', 'disabled-clicking':!enableTarget1Type}">
-                                                <img src="/images/ring_u.svg">
-                                            </span>
-                                            <span ng-click="assignTargetType('positive_control')" class="numberCircle" ng-class="{'target-selected':selectedTarget1Type == 'positive_control', 'disabled-clicking':!enableTarget1Type}">
-                                                <img src="/images/ring_plus.svg">
-                                            </span>
-                                            <span ng-click="assignTargetType('negative_control')" class="numberCircle" ng-class="{'target-selected':selectedTarget1Type == 'negative_control', 'disabled-clicking':!enableTarget1Type}">
-                                                <img src="/images/ring_neg.svg">
-                                            </span>
 
+                                            <div class="inline-block" style="width: 25%; padding: 0 0 0 20px;">
+                                                <h4 class="XB1B">Quantity</h4>
+                                                <hr>
+                                                <input class="quantity-input XB1" 
+                                                    type="text" ng-model="target1Quantity.value" 
+                                                    ng-blur="assignTargetQuantity()"
+                                                    ng-keydown="keydownTargetQuantity($event)"
+                                                    ng-readonly="!enableTarget1Qty"
+                                                    ng-class="{ error: error_target1Qty, 
+                                                                blank: (!target1Quantity.value.toString().length),
+                                                                'opacityLess':!enableTarget1Qty}"
+                                                    format-number
+                                                    placeholder="Set"
+                                                     />
+                                                <img class="error-field-icon" src="/images/alert.svg" ng-show="error_target1Qty">
+                                                <span class="error-field">{{error_target1Qty}}</span>
+                                                <span class="quantity-helper" ng-show="target1Quantity.value && !error_target1Qty">
+                                                    {{target1Quantity.quantityM}} x 10<sup>{{target1Quantity.quantityB}}</sup>
+                                                </span>
+                                            </div>                                        
                                         </div>
+                                        <div ng-if="is_dual_channel">
+                                            <div class="inline-block"
+                                                style="width: 42%;padding: 0 20px;">
+                                                <div class="section-title">                                        
+                                                    <h4 class="XB1B">Ch 2 Target</h4>
+                                                    <span ng-click="clearWellsByType('Target2')" class="XB1M clear-link" ng-show="selectionMade && selectedCountByType('Target2')">Clear</span>
+                                                </div>
+                                                <hr>
+                                                <div ng-click="openTarget2Options()" class="select-style"  ng-class="{opacityLess: !selectionMade}">
 
-                                        <div class="inline-block" style="width: 25%; padding: 0 0 0 20px;">
-                                            <h4 class="XB1B">Quantity</h4>
-                                            <hr>
-                                            <input class="quantity-input XB1" 
-                                                type="text" ng-model="target1Quantity.value" 
-                                                ng-blur="assignTargetQuantity()"
-                                                ng-keydown="keydownTargetQuantity($event)"
-                                                ng-readonly="!enableTarget1Qty"
-                                                ng-class="{ error: error_target1Qty, 
-                                                            blank: (!target1Quantity.value.toString().length),
-                                                            'opacityLess':!enableTarget1Qty}"
+                                                    <!--<select name="repeatSelect" ng-disabled="!selectionMade" ng-model="target2Selected" ng-change="assignTarget(target2Selected, '2')" >
+                                                        <option value=0>Select a target</option>
+                                                        <option ng-repeat="option in targets2" value="{{option.id}}">{{option.name}}</option>
+                                                    </select> -->
+                                                    <p class="testing-clicking XB1" style="background-position: 199px 15px;"><span class="span-target-color" ng-style="{'background-color': target2SelectedColor}"></span>{{target2Selected}}</p>
+
+                                                </div>
+                                                <div ng-class="{'hiding-div':!showTarget2Options }" class="options-div targets2-div"
+                                                    style="display: none;">
+                                                    <label class="button-arrow up-arrow" 
+                                                        ng-show="is_scroll_list"
+                                                        ng-class="{disabled: menu_scroll_top <= 0}"
+                                                        ng-click="scrollUpByType('Target2')"
+                                                    ></label>
+                                                    <div class="dropdown-container">
+                                                        <ul>
+                                                            <li ng-class="{active: target2SelectedId == 0}" class="XB1" ng-if="target2SelectedId == 0">
+                                                                <span class="span-target-color" style="background-color: #fff"></span>
+                                                                <span class="target-text">Choose</span>
+                                                            </li>
+                                                            <li ng-class="{active: target2SelectedId == option.id}" ng-repeat="option in targets2" ng-click="assignTarget(option.id, '2', option.name)"  class="XB1">
+                                                                <span class="span-target-color" ng-style="{'background-color': option.color}"></span>
+                                                                <span class="target-text">{{option.name}}</span>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <label 
+                                                        class="button-arrow down-arrow" 
+                                                        ng-show="is_scroll_list"
+                                                        ng-class="{disabled: dropdown_list_height <= menu_scroll_top + dropdown_inner_height}"
+                                                        ng-click="scrollDownByType('Target2')"
+                                                    ></label>                                                
+                                                </div>
+
+                                            </div>
+
+                                            <div class="inline-block"
+                                                style="width: 33%;padding: 0 20px;">
+                                                <div class="section-title">                                        
+                                                    <h4 class="XB1B">Type</h4>
+                                                    <span ng-click="clearTargetWellsByType('Target2')" class="XB1M clear-link" ng-show="selectionMade && selectedCountByTargetType('Target2')">Clear</span>
+                                                </div>                                            
+                                                <hr>
+                                                <span ng-click="assignTarget2Type('standard')" class="numberCircle" ng-class="{'target-selected':selectedTarget2Type == 'standard', 'disabled-clicking':!enableTarget2Type}">
+                                                    <img src="/images/ring_s.svg">
+                                                </span>
+                                                <span ng-click="assignTarget2Type('unknown')" class="numberCircle" ng-class="{'target-selected':selectedTarget2Type == 'unknown', 'disabled-clicking':!enableTarget2Type}">
+                                                    <img src="/images/ring_u.svg">
+                                                </span>
+                                                <span ng-click="assignTarget2Type('positive_control')" class="numberCircle" ng-class="{'target-selected':selectedTarget2Type == 'positive_control', 'disabled-clicking':!enableTarget2Type}">
+                                                    <img src="/images/ring_plus.svg">
+                                                </span>
+                                                <span ng-click="assignTarget2Type('negative_control')" class="numberCircle" ng-class="{'target-selected':selectedTarget2Type == 'negative_control', 'disabled-clicking':!enableTarget2Type}">
+                                                    <img src="/images/ring_neg.svg">
+                                                </span>
+
+                                            </div>
+
+                                            <div class="inline-block"
+                                                style="width: 25%;padding: 0 0 0 20px;">
+                                                <h4 class="XB1B">Quantity</h4>
+                                                <hr>
+                                                <input class="quantity-input XB1" type="text" ng-model="target2Quantity.value" 
+                                                ng-blur="assignTarget2Quantity()" 
+                                                ng-keydown="keydownTarget2Quantity($event)"
+                                                ng-readonly="!enableTarget2Qty"
+                                                ng-class="{ error: error_target2Qty, 
+                                                            blank: (!target2Quantity.value.toString().length), 'opacityLess':!enableTarget2Qty}"
                                                 format-number
                                                 placeholder="Set"
                                                  />
-                                            <img class="error-field-icon" src="/images/alert.svg" ng-show="error_target1Qty">
-                                            <span class="error-field">{{error_target1Qty}}</span>
-                                            <span class="quantity-helper" ng-show="target1Quantity.value && !error_target1Qty">
-                                                {{target1Quantity.quantityM}} x 10<sup>{{target1Quantity.quantityB}}</sup>
-                                            </span>
-                                        </div>                                        
-                                    </div>
-                                    <div ng-if="is_dual_channel">
-                                        <div class="inline-block"
-                                            style="width: 42%;padding: 0 20px;">
-                                            <div class="section-title">                                        
-                                                <h4 class="XB1B">Ch 2 Target</h4>
-                                                <span ng-click="clearWellsByType('Target2')" class="XB1M clear-link" ng-show="selectionMade && selectedCountByType('Target2')">Clear</span>
+                                                <img class="error-field-icon" src="/images/alert.svg" ng-show="error_target2Qty">
+                                                <span class="error-field">{{error_target2Qty}}</span>
+                                                <span class="quantity-helper" ng-show="target2Quantity.value && !error_target2Qty">
+                                                    {{target2Quantity.quantityM}} x 10<sup>{{target2Quantity.quantityB}}</sup>
+                                                </span>                                            
                                             </div>
-                                            <hr>
-                                            <div ng-click="openTarget2Options()" class="select-style"  ng-class="{opacityLess: !selectionMade}">
-
-                                                <!--<select name="repeatSelect" ng-disabled="!selectionMade" ng-model="target2Selected" ng-change="assignTarget(target2Selected, '2')" >
-                                                    <option value=0>Select a target</option>
-                                                    <option ng-repeat="option in targets2" value="{{option.id}}">{{option.name}}</option>
-                                                </select> -->
-                                                <p class="testing-clicking XB1" style="background-position: 199px 15px;"><span class="span-target-color" ng-style="{'background-color': target2SelectedColor}"></span>{{target2Selected}}</p>
-
-                                            </div>
-                                            <div ng-class="{'hiding-div':!showTarget2Options }" class="options-div targets2-div"
-                                                style="display: none;">
-                                                <label class="button-arrow up-arrow" 
-                                                    ng-show="is_scroll_list"
-                                                    ng-class="{disabled: menu_scroll_top <= 0}"
-                                                    ng-click="scrollUpByType('Target2')"
-                                                ></label>
-                                                <div class="dropdown-container">
-                                                    <ul>
-                                                        <li ng-class="{active: target2SelectedId == 0}" class="XB1" ng-if="target2SelectedId == 0">
-                                                            <span class="span-target-color" style="background-color: #fff"></span>
-                                                            <span class="target-text">Choose</span>
-                                                        </li>
-                                                        <li ng-class="{active: target2SelectedId == option.id}" ng-repeat="option in targets2" ng-click="assignTarget(option.id, '2', option.name)"  class="XB1">
-                                                            <span class="span-target-color" ng-style="{'background-color': option.color}"></span>
-                                                            <span class="target-text">{{option.name}}</span>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <label 
-                                                    class="button-arrow down-arrow" 
-                                                    ng-show="is_scroll_list"
-                                                    ng-class="{disabled: dropdown_list_height <= menu_scroll_top + dropdown_inner_height}"
-                                                    ng-click="scrollDownByType('Target2')"
-                                                ></label>                                                
-                                            </div>
-
-                                        </div>
-
-                                        <div class="inline-block"
-                                            style="width: 33%;padding: 0 20px;">
-                                            <div class="section-title">                                        
-                                                <h4 class="XB1B">Type</h4>
-                                                <span ng-click="clearTargetWellsByType('Target2')" class="XB1M clear-link" ng-show="selectionMade && selectedCountByTargetType('Target2')">Clear</span>
-                                            </div>                                            
-                                            <hr>
-                                            <span ng-click="assignTarget2Type('standard')" class="numberCircle" ng-class="{'target-selected':selectedTarget2Type == 'standard', 'disabled-clicking':!enableTarget2Type}">
-                                                <img src="/images/ring_s.svg">
-                                            </span>
-                                            <span ng-click="assignTarget2Type('unknown')" class="numberCircle" ng-class="{'target-selected':selectedTarget2Type == 'unknown', 'disabled-clicking':!enableTarget2Type}">
-                                                <img src="/images/ring_u.svg">
-                                            </span>
-                                            <span ng-click="assignTarget2Type('positive_control')" class="numberCircle" ng-class="{'target-selected':selectedTarget2Type == 'positive_control', 'disabled-clicking':!enableTarget2Type}">
-                                                <img src="/images/ring_plus.svg">
-                                            </span>
-                                            <span ng-click="assignTarget2Type('negative_control')" class="numberCircle" ng-class="{'target-selected':selectedTarget2Type == 'negative_control', 'disabled-clicking':!enableTarget2Type}">
-                                                <img src="/images/ring_neg.svg">
-                                            </span>
-
-                                        </div>
-
-                                        <div class="inline-block"
-                                            style="width: 25%;padding: 0 0 0 20px;">
-                                            <h4 class="XB1B">Quantity</h4>
-                                            <hr>
-                                            <input class="quantity-input XB1" type="text" ng-model="target2Quantity.value" 
-                                            ng-blur="assignTarget2Quantity()" 
-                                            ng-keydown="keydownTarget2Quantity($event)"
-                                            ng-readonly="!enableTarget2Qty"
-                                            ng-class="{ error: error_target2Qty, 
-                                                        blank: (!target2Quantity.value.toString().length), 'opacityLess':!enableTarget2Qty}"
-                                            format-number
-                                            placeholder="Set"
-                                             />
-                                            <img class="error-field-icon" src="/images/alert.svg" ng-show="error_target2Qty">
-                                            <span class="error-field">{{error_target2Qty}}</span>
-                                            <span class="quantity-helper" ng-show="target2Quantity.value && !error_target2Qty">
-                                                {{target2Quantity.quantityM}} x 10<sup>{{target2Quantity.quantityB}}</sup>
-                                            </span>                                            
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="clear-selection-section">
-                                <h4 class="XB1B">Current Selection</h4>
-                                <hr>
-                                <div class="clear-button XB1M" ng-click="clearWells()" ng-class="{opacityLess: !selectionMade || !isClearAll()}">
-                                    Clear Selection
+                                <div class="clear-selection-section">
+                                    <h4 class="XB1B">Current Selection</h4>
+                                    <hr>
+                                    <div class="clear-button XB1M" ng-click="clearWells()" ng-class="{opacityLess: !selectionMade || !isClearAll()}">
+                                        Clear Selection
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
-        <status-bar experiment-id="experiment.id"></status-bar>
     </div>
+    <status-bar experiment-id="experiment.id"></status-bar>
 </div>

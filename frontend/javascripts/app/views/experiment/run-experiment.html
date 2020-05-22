@@ -18,25 +18,27 @@
 -->
 <div ng-controller="RunExperimentCtrl">
   <div class="pika-wrapper" side-menu-layout is-open="false">
-    <div style="display: flex; flex-direction: column; height: calc(100% - 40px);">
-      <header-status experiment-id="experiment.id">
-        <div class="stripes-and-name" toggle-sidemenu>
-          <div class="stripes">
-            <img src='/images/menu-white.svg'/>
+    <header-status experiment-id="experiment.id">
+      <div class="stripes-and-name" toggle-sidemenu>
+        <div class="stripes">
+          <img src='/images/menu-grey.svg'/>
+        </div>
+      </div>
+    </header-status>
+    <div class="inner-wrapper">
+      <div class="inner-container" style="min-width: 0">
+        <div class="chart-screens-container">
+          <div ng-if="chart === 'amplification'" style="position:absolute; width: 100%; height: 100%; min-width: 1368px; min-height: 668px;" ng-include src="'app/views/experiment/amplification-chart.html'">
           </div>
-        </div>
-      </header-status>
-      <div class="chart-screens-container">
-        <div ng-if="chart === 'amplification'" style="position:absolute; width: 100%; height: 100%; min-width: 1368px; min-height: 668px;" ng-include src="'app/views/experiment/amplification-chart.html'">
-        </div>
-        <div ng-if="chart === 'standard-curve'" style="position:absolute; width: 100%; height: 100%; min-width: 1368px; min-height: 668px;" ng-include src="'app/views/experiment/standard-curve.html'">
-        </div>
-        <div ng-if="chart === 'temperature-logs'" style="position:absolute; width: 100%; height: 100%; min-height: 668px;" ng-include src="'app/views/experiment/temperature-logs.html'">
-        </div>
-        <div ng-if="chart === 'melt-curve'" style="position:absolute; width: 100%; height: 100%; min-width: 1368px; min-height: 668px;" ng-include src="'app/views/experiment/melt-curve.html'">
+          <div ng-if="chart === 'standard-curve'" style="position:absolute; width: 100%; height: 100%; min-width: 1368px; min-height: 668px;" ng-include src="'app/views/experiment/standard-curve.html'">
+          </div>
+          <div ng-if="chart === 'temperature-logs'" style="position:absolute; width: 100%; height: 100%; min-height: 668px;" ng-include src="'app/views/experiment/temperature-logs.html'">
+          </div>
+          <div ng-if="chart === 'melt-curve'" style="position:absolute; width: 100%; height: 100%; min-width: 1368px; min-height: 668px;" ng-include src="'app/views/experiment/melt-curve.html'">
+          </div>
         </div>
       </div>
     </div>
-    <status-bar experiment-id="experiment.id"></status-bar>
   </div>
+  <status-bar experiment-id="experiment.id"></status-bar>
 </div>

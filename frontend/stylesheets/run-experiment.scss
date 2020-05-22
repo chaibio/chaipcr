@@ -1,11 +1,10 @@
 .run-experiment-state-active {
-  min-width: 1205px;
   overflow-y: hidden;
   .chart-screens-container {
     flex-grow: 1; 
     position: relative; 
     overflow:auto;    
-    // min-height: 400px;
+    height: calc(100vh - 100px);
     .chart-error {
       position: absolute;
       left: 0;

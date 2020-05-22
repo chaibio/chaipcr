@@ -12,7 +12,7 @@ $sidemenu_width_close: 0;
     .side-menu-layout{
       &.sidemenu-open{
         .page-wrapper{
-          margin-right: -360px;
+          width: calc(100% - 360px);
         }
       }
     }
@@ -26,6 +26,15 @@ $sidemenu_width_close: 0;
     align-items: stretch;
     color: $black;
 
+    .inner-wrapper{
+      overflow: auto;
+      width: 100%;
+      height: calc(100% - 60px);
+      .inner-container{
+        min-width: 1024px;
+      }
+    }
+
     .sidemenu{
       background-color: white;
       height: auto;
@@ -38,7 +47,7 @@ $sidemenu_width_close: 0;
       box-shadow: none;
 
       #sidemenu-content {
-        height: 100vh;
+        height: calc(100vh - 40px);
         width: $sidemenu_width_open;
         overflow-y: auto;
       }
@@ -112,7 +121,7 @@ $sidemenu_width_close: 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 10px 10px 13px;
+            padding: 10px;
             border-radius: 2px;
             margin-top: 20px;
 
@@ -121,6 +130,21 @@ $sidemenu_width_close: 0;
               border: 1px solid $link-text-color;
               padding: 6px 15px;
               border-radius: 2px;
+
+              &.confirm-cancel, &:hover{
+                background: $link-text-color;
+                color: $white;
+              }
+              &.confirm-cancel{
+                padding: 6px 4px;                
+              }
+            }
+
+            span{
+              &:hover{
+                color: $link-text-color;
+                cursor: pointer;
+              }
             }
           }
 
@@ -399,7 +423,8 @@ $sidemenu_width_close: 0;
         hr{
           margin-top: 10px;
           margin-bottom: 15px;
-          border: 1px solid $cell-border-color;
+          border: none;
+          border-bottom: 1px solid $cell-border-color;
         }
       }
 

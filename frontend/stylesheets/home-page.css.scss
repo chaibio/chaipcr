@@ -2,7 +2,7 @@
 @import "./colors.css.scss";
 .home-page-wrapper {
   height: 100%;
-  min-height: 760px;
+  min-height: 360px;
   position: relative;
   margin: 0 !important;
   padding: 0 !important;
@@ -454,6 +454,10 @@
       animation-duration: 0.5s;
       left: -72px;
     }
+  }
+
+  .samples, .targets{
+    height: calc(100vh - 180px);
   }
 }
 
