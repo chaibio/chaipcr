@@ -71,6 +71,7 @@
 
         var famTargets = [];
         var hexTargets = [];
+        $scope.target_ipc = null;
 
         function getId() {
           if ($stateParams.id) {
@@ -85,18 +86,20 @@
               for(var i = 0; i < targets.length; i++){
                 if(targets[i].target.name.trim() == 'IPC'){
                   hexTargets.push(targets[i].target.id);
+                  $scope.target_ipc = targets[i].target;
                 } else {
                   famTargets.push(targets[i].target.id);
                 }
               }
+              $scope.twoKits = (targets.length == 3) ? true : false;
             });
 
             Experiment.getWellLayout($stateParams.id).then(function (resp) {
               $scope.target = (resp.data[0].targets) ? resp.data[0].targets[0] : {id: 0, name: ''};
               $scope.target2 = (resp.data[8].targets) ? resp.data[8].targets[0] : {id: 0, name: ''};
-              if ($scope.target.id != $scope.target2.id && $scope.target2.id && $scope.target.id) {
-                $scope.twoKits = true;
-              }
+              // if ($scope.target.id != $scope.target2.id && $scope.target2.id && $scope.target.id) {
+              //   $scope.twoKits = true;
+              // }
               var j = 0,
               k, i;
               for (i = 0; i < 8; i++) {
@@ -172,7 +175,10 @@
               Experiment.deleteLinkedSample($scope.experimentId, x.id).then(function(resp) {                
                 $scope.editExpNameMode[index] = false;
                 $scope.samples[index] = {id: 0, name: ''};
-              });              
+              });
+
+              Experiment.unlinkTarget($scope.experimentId, $scope.target.id, { wells: [index + 1], channel: 0 }).then(function (response) {                                
+              });
             }
           } else {
             if(x.name){
@@ -181,7 +187,13 @@
                 Experiment.linkSample($scope.experimentId, resp.data.sample.id, { wells: [index+1] }).then(function (response) {                                
                     $scope.editExpNameMode[index] = false;
                 });              
-              });              
+              });
+              Experiment.linkTarget($scope.experimentId, $scope.target.id, { wells: [{ well_num: index + 1, well_type: 'unknown' }] }).then(function (response) {                                
+              });
+              if($scope.target_ipc){
+                Experiment.linkTarget($scope.experimentId, $scope.target_ipc.id, { wells: [{ well_num: index + 1, well_type: 'unknown' }] }).then(function (response) {                                
+                });
+              }
             }
           }
           // Experiment.updateWell($scope.experimentId, index, { 'sample_name': x }).then(function(resp) {});
@@ -216,6 +228,8 @@
                 $scope.editExpNameMode[index] = false;
                 $scope.samples_B[index] = {id: 0, name: ''};
               });              
+              Experiment.unlinkTarget($scope.experimentId, $scope.target.id, { wells: [index + 9], channel: 0 }).then(function (response) {                                
+              });
             }
           } else {
             if(x.name){
@@ -224,7 +238,20 @@
                 Experiment.linkSample($scope.experimentId, resp.data.sample.id, { wells: [index + 9] }).then(function (response) {                                
                     $scope.editExpNameMode[index] = false;
                 });              
-              });              
+              });
+
+              if($scope.twoKits){                
+                Experiment.linkTarget($scope.experimentId, $scope.target2.id, { wells: [{ well_num: index + 9, well_type: 'unknown' }] }).then(function (response) {
+                });
+              } else {
+                Experiment.linkTarget($scope.experimentId, $scope.target.id, { wells: [{ well_num: index + 9, well_type: 'unknown' }] }).then(function (response) {                                
+                });                
+              }
+              if($scope.target_ipc){
+                Experiment.linkTarget($scope.experimentId, $scope.target_ipc.id, { wells: [{ well_num: index + 9, well_type: 'unknown' }] }).then(function (response) {                                
+                });
+              }
+
             }
           }
         };

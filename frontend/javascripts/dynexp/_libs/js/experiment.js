@@ -115,6 +115,14 @@ angular.module('dynexp.libs')
       return $http.delete("/experiments/" + expId + "/samples/"+sampleId+"?force=true");
     };
 
+    self.linkTarget = function(expId, targetId, data) {
+      return $http.post("/experiments/" + expId + "/targets/" + targetId + "/links", data);
+    };
+
+    self.unlinkTarget = function(expId, targetId, data) {
+      return $http.post("/experiments/" + expId + "/targets/" + targetId + "/unlinks", data);
+    };
+
     self.updateExperimentName = function(id, name) {
       return $http.put("/experiments/" + id, {
         experiment: name

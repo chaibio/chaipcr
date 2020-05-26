@@ -55,7 +55,6 @@
         <span class="text-danger" ng-show="errorExport">Error exporting data. Please try again.</span>
       </div>
     </div>
-
     <div class="side-menu-menu-container property-menu">
       <label class="section-name XB1">Setup</label>
       <div class="side-menu-menu-item">
@@ -68,12 +67,12 @@
           <protocol-item state="{{status}}"></protocol-item>
         </div>
       </div>
-      <div class="side-menu-menu-item">
+      <div class="side-menu-menu-item" ng-if="exp.type != 'test_kit'">
         <div class="XH3M" ui-sref="samples-targets({id: params.id})" toggle-sidemenu>
           <span>Samples + Targets</span>
         </div>
       </div>
-      <div class="side-menu-menu-item">
+      <div class="side-menu-menu-item" ng-if="exp.type != 'test_kit'">
         <div class="XH3M" ui-sref="plate-layout({id: params.id})" toggle-sidemenu>
           <span>Well Layout</span>
         </div>

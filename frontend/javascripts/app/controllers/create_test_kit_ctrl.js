@@ -154,7 +154,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
                             };
                             linkTargetName[1] = {
                                 well_num: 2,
-                                well_type: 'positive_control'
+                                well_type: 'negative_control'
                             };
                             Experiment.linkTarget(new_experiment_id, $scope.target_ipc.id, { wells: linkTargetName }).then(function (response) {                                
                                 cb(null, response);
@@ -322,7 +322,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
                             };
                             linkTargetName[1] = {
                                 well_num: 2,
-                                well_type: 'positive_control'
+                                well_type: 'negative_control'
                             };
                             linkTargetName[2] = {
                                 well_num: 9,
@@ -330,7 +330,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
                             };
                             linkTargetName[3] = {
                                 well_num: 10,
-                                well_type: 'positive_control'
+                                well_type: 'negative_control'
                             };
                             Experiment.linkTarget(new_experiment_id, $scope.target_ipc.id, { wells: linkTargetName }).then(function (response) {                                
                                 cb(null, response);
