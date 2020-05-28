@@ -10,36 +10,32 @@
     <div class="inner-wrapper">
       <div class="inner-container">
         <div class="pika-content">
-          <h3 class="CH1">{{}} Results</h3>
-          <table>
-            <tr class="td-heading">
-              <td style="width:300px">Well</td>
-              <td style="width:100px">Cq</td>
-              <td style="width:200px">Results</td>
-            <!--  <td style="width:100px">Hex Cq</td> -->
-              <td style="width:200px">Amount</td>
-              <td style="width:200px">Notes</td>
-            </tr>
+          <h3 class="CH1">{{experiment.name}} Results</h3>
+          <table class="CB2">
             <tr ng-if="x && (x.name != '' && x.name != 'empty')" ng-repeat="x in samples track by $index">
-              <td ng-if="$index < 2">
-                A{{$index + 1}}. {{x.name}}
-                <img ng-show="result[$index] == 'Valid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_valid.svg">
-                <img ng-show="result[$index] == 'Invalid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_invalid.svg">
+              <td style="width:35px" ng-if="$index < 8">A{{$index + 1}}</td>
+              <td style="width:35px" ng-if="$index >= 8">B{{$index - 7}}</td>
+              <td class="CB2-M">{{x.name}}</td>
+
+              <td ng-if="$index < 2" class="text-center">
+                <img ng-show="result[$index] == 'Valid'" style="width:20px"  src="/images/dynexp/pika-test/res_valid.svg">
+                <img ng-show="result[$index] == 'Invalid'" style="width:20px"  src="/images/dynexp/pika-test/res_invalid.svg">
               </td>
-              <td ng-if="$index >= 2">
-                <span>A{{$index + 1}}. {{x.name}}</span>
-                <img ng-show="result[$index] == 'Positive'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_pos.svg">
-                <img ng-show="result[$index] == 'Negative'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_neg.svg">
-                <img ng-show="result[$index] == 'Inhibited'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_inhib.svg">
-                <img ng-show="result[$index] == 'Unknown'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_inhib.svg">
+              <td ng-if="$index >= 2" class="text-center">
+                <img ng-show="result[$index] == 'Positive'" style="width:20px"  src="/images/dynexp/pika-test/res_pos.svg">
+                <img ng-show="result[$index] == 'Negative'" style="width:20px"  src="/images/dynexp/pika-test/res_neg.svg">
+                <img ng-show="result[$index] == 'Inhibited'" style="width:20px"  src="/images/dynexp/pika-test/res_inhib.svg">
+                <img ng-show="result[$index] == 'Unknown'" style="width:20px"  src="/images/dynexp/pika-test/res_inhib.svg">
               </td>
               <td><span ng-show="famCq[$index]">{{famCq[$index] | round:2}}</span></td>
               <td>{{result[$index]}}</td>
-            <!--  <td>{{hexCq[$index]}}</td> -->
               <td>{{amount[$index]}}</td>
-              <td ng-show="x.id && x.notes" ng-click="openNotes($index, x)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
-              <td ng-show="x.id && !x.notes" ng-click="openNotes($index, x)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
-              <td ng-show="!x.id" class="notes-cursor"><img style="width:20px; opacity: .5;" src="/images/dynexp/pika-test/comment_off.svg"></td>
+              <td ng-if="x.id && x.notes" ng-click="openNotes($index, x)" class="notes-cursor text-right" style="width:50px">
+                <img style="width:20px" src="/images/dynexp/pika-test/note-on.svg" class="cursor-pointer note-{{$index}}">
+              </td>
+              <td ng-if="x.id && !x.notes" ng-click="openNotes($index, x)" class="notes-cursor text-right" style="width:50px">
+                <img style="width:20px" src="/images/dynexp/pika-test/note-off.svg" class="cursor-pointer note-{{$index}}">
+              </td>
             </tr>
           </table>
         </div>

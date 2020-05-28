@@ -3,7 +3,7 @@
   .controller('PikaExpResultCtrl', [
     '$scope',
     '$window',
-    'dynexpExperimentService',
+    'Experiment',
     '$state',
     '$stateParams',
     'Status',
@@ -37,58 +37,12 @@
       $scope.hexCq = [];
       $scope.amount = [];
       $scope.result = [];
-
-      function getExperiment(exp_id, cb) {
-        Experiment.get(exp_id).then(function(resp) {
-          $scope.experiment = resp.data.experiment;
-          if (cb) cb(resp.data.experiment);
-        });
-      }
-
-      function getId() {
-        if ($stateParams.id) {
-          $scope.experimentId = $stateParams.id;
-          getExperiment($scope.experimentId, function(exp){
-            $scope.initial_done = true;
-          });
-
-          Experiment.getTargets($stateParams.id).then(function (resp) {
-            var targets = resp.data;
-            for(var i = 0; i < targets.length; i++){
-              if(targets[i].target.name.trim() == 'IPC'){
-                hexTargets.push(targets[i].target.id);
-                $scope.target_ipc = targets[i].target;
-              } else {
-                famTargets.push(targets[i].target.id);
-              }
-            }
-            $scope.twoKits = (famTargets.length == 2) ? true : false;
-          });
-
-          Experiment.getWellLayout($stateParams.id).then(function (resp) {
-            $scope.target = (resp.data[0].targets) ? resp.data[0].targets[0] : {id: 0, name: ''};
-            $scope.target2 = (resp.data[8].targets) ? resp.data[8].targets[0] : {id: 0, name: ''};
-            var j = 0,
-            k, i;
-            for (i = 0; i < 8; i++) {
-              $scope.samples[i] = (resp.data[i].samples) ? resp.data[i].samples[0] : {id: 0, name: ''};
-            }
-
-            for (k = 8; k < 16; k++) {
-              $scope.samples_B[k - 8] = (resp.data[k].samples) ? resp.data[k].samples[0] : {id: 0, name: ''};
-            }
-            for (i = 0; i < 16; i++) {
-              $scope.notes[i] = '';
-            }
-          });
-        
-        } else {
-          $timeout(function() {
-            getId();
-          }, 500);
-        }
-      }
-      getId();
+      $scope.notes = [];
+      $scope.amount[0] = "\u2014";
+      $scope.amount[1] = "\u2014";
+      $scope.samples = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
+      $scope.target = null;
+      $scope.target2 = null;
 
       $scope.$on('status:data:updated', function(e, data, oldData) {
         if (!data) return;
@@ -289,10 +243,10 @@
         getAmountArray();
       }
 
-      $scope.getResults = function() {
+      function getResults() {
         $scope.analyzing = true;
         $scope.experimentComplete = true;
-        Experiment.getFluorescenceData($scope.experimentId).then(function(resp) {
+        Experiment.getAmplificationData($stateParams.id).then(function(resp) {
           if (resp.status == 200 && !resp.data.partial) {
             $scope.testFl = true;
             $scope.analyzing = false;
@@ -321,7 +275,7 @@
               $timeout($scope.getResults, 1000);
             }
           });
-      };
+      }
 
       function filterSummaryByFam(well_num){
         for (var i = 0; i < $scope.summary_data.length; i++) {
@@ -340,6 +294,94 @@
         }
         return 0;
       }
+
+      function getExperiment(exp_id, cb) {
+        Experiment.get({id: exp_id}).then(function(resp) {
+          $scope.experiment = resp.experiment;
+          if (cb) cb(resp.experiment);
+        });
+      }
+
+      function getId() {
+        if ($stateParams.id) {
+          $scope.experimentId = $stateParams.id;
+          getExperiment($scope.experimentId, function(exp){
+            $scope.initial_done = true;
+          });
+
+          Experiment.getTargets($stateParams.id).then(function (resp) {
+            var targets = resp.data;
+            for(var i = 0; i < targets.length; i++){
+              if(targets[i].target.name.trim() == 'IPC'){
+                hexTargets.push(targets[i].target.id);
+                $scope.target_ipc = targets[i].target;
+              } else {
+                famTargets.push(targets[i].target.id);
+              }
+            }
+            $scope.twoKits = (famTargets.length == 2) ? true : false;
+
+            Experiment.getWellLayout($stateParams.id).then(function (resp) {
+              var k, i;
+              for (i = 0; i < 16; i++) {
+                $scope.samples[i] = (resp.data[i].samples) ? resp.data[i].samples[0] : {id: 0, name: ''};
+              }
+
+              for (i = 0; i < 16; i++) {
+                $scope.notes[i] = '';
+              }
+
+              getResults();
+            });
+          });        
+        } else {
+          $timeout(function() {
+            getId();
+          }, 500);
+        }
+      }
+      getId();
+
+      $scope.openNotes = function(index, sample, well_row) {
+        $scope.selectedSample = sample;
+        $scope.selectedWellIndex = (index < 8) ? index + 1 : index - 7;
+        $scope.selectedWellRow = (index < 8) ? 'A' : 'B';
+        $scope.oriSampleNotes = sample.notes;
+
+        $scope.modalInstance = $uibModal.open({
+          scope: $scope,
+          templateUrl: 'dynexp/pika_test/note-modal.html',
+          backdrop: true
+        });
+
+        $scope.modalInstance.rendered.then(function(){
+          var note_pos = document.querySelector(".note-" + index).getBoundingClientRect();
+          var body_pos = document.body.getBoundingClientRect();
+
+          var modal_width = document.querySelector('.pika-exp-result-active .modal-dialog').offsetWidth;
+          var modal_height = document.querySelector('.pika-exp-result-active .modal-dialog').offsetHeight;
+          var modal_top = note_pos.top - modal_height - 10 > 10 ? note_pos.top - modal_height - 10 : note_pos.top + 35;
+          var modal_left = (note_pos.left + modal_width > body_pos.width) ? body_pos.width - modal_width - 30 : note_pos.left - modal_width / 2 + 15;
+
+          angular.element(document.querySelector('.pika-exp-result-active .modal-dialog')).css('left', (modal_left) + 'px');
+          angular.element(document.querySelector('.pika-exp-result-active .modal-dialog')).css('top', (modal_top) + 'px');
+        });
+
+        setTimeout(function(){
+          focus('editNotes');
+        }, 500);
+      };
+
+      $scope.updateNotes = function() {
+        Experiment.updateSample($scope.experimentId, $scope.selectedSample.id, {notes: $scope.selectedSample.notes}).then(function(resp) {          
+          $scope.modalInstance.close();
+        });
+      };
+
+      $scope.cancel = function() {
+        $scope.selectedSample.notes = $scope.oriSampleNotes;
+        $scope.modalInstance.close();
+      };
 
     }
   ]);

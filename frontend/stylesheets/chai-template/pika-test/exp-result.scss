@@ -2,12 +2,26 @@
 
 .chai-mode.pika-exp-result-active{
   .pika-wrapper{
+    .inner-container{
+      min-width: 768px !important;
+    }
+
     .pika-content{
-      padding: 20px 60px;
+      padding: 20px 80px;
       h3{
         margin: 0;
         margin-bottom: 15px;
         padding-left: 40px;
+      }
+
+      table{
+        width: 100%;
+        tr{
+          td{
+            padding: 10px 5px;
+            border-bottom: 1px solid #bfbfbf;
+          }
+        }
       }
     }
   }
