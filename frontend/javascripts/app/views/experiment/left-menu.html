@@ -67,13 +67,16 @@
           <protocol-item state="{{status}}"></protocol-item>
         </div>
       </div>
-      <div class="side-menu-menu-item" ng-if="exp.type != 'test_kit'">
+      <div class="side-menu-menu-item">
         <div class="XH3M" ui-sref="samples-targets({id: params.id})" toggle-sidemenu>
           <span>Samples + Targets</span>
         </div>
       </div>
-      <div class="side-menu-menu-item" ng-if="exp.type != 'test_kit'">
-        <div class="XH3M" ui-sref="plate-layout({id: params.id})" toggle-sidemenu>
+      <div class="side-menu-menu-item">
+        <div class="XH3M" ui-sref="plate-layout({id: params.id})" toggle-sidemenu ng-if="exp.type != 'test_kit'">
+          <span>Well Layout</span>
+        </div>
+        <div class="XH3M" ui-sref="pika_test.setWellsA({id: params.id})" toggle-sidemenu ng-if="exp.type == 'test_kit'">
           <span>Well Layout</span>
         </div>
       </div>
