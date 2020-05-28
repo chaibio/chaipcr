@@ -52,7 +52,7 @@
         if ($stateParams.id) {
           $scope.experimentId = $stateParams.id;
           getExperiment($scope.experimentId, function(exp){
-            if(exp.completion_status) $scope.viewResults();
+            // if(exp.completion_status) $scope.viewResults();
             $scope.initial_done = true;
           });
           Experiment.getWellLayout($stateParams.id).then(function (resp) {
@@ -93,7 +93,7 @@
 
       $scope.viewResults = function() {
         $scope.showSidebar = false;
-        $state.go('pika_test.results', { id: $scope.experimentId });
+        $state.go('pika_test.experiment-result', { id: $scope.experimentId });
       };
 
       $scope.updateWellA = function(index, x) {
@@ -107,7 +107,7 @@
             } else {
               Experiment.deleteLinkedSample($scope.experimentId, x.id).then(function(resp) {
                 $scope.samples[index] = {id: 0, name: ''};
-              });              
+              });
             }
           } else {
             if(x.name){

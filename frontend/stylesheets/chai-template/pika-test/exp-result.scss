@@ -1,0 +1,14 @@
+@import "../variables.scss";
+
+.chai-mode.pika-exp-result-active{
+  .pika-wrapper{
+    .pika-content{
+      padding: 20px 60px;
+      h3{
+        margin: 0;
+        margin-bottom: 15px;
+        padding-left: 40px;
+      }
+    }
+  }
+}

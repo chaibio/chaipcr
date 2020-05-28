@@ -1,6 +1,6 @@
 (function() {
   angular.module('dynexp.pika_test')
-  .controller('PikaExpRunningCtrl', [
+  .controller('PikaExpResultCtrl', [
     '$scope',
     '$window',
     'dynexpExperimentService',
@@ -15,12 +15,12 @@
     '$rootScope',
     '$uibModal',
     'focus',
-    function PikaExpRunningCtrl($scope, $window, Experiment, $state, $stateParams, Status, GlobalService,
+    function PikaExpResultCtrl($scope, $window, Experiment, $state, $stateParams, Status, GlobalService,
       host, $http, CONSTANTS, $timeout, $rootScope, $uibModal, focus) {
 
-      $window.$('body').addClass('pika-exp-running-active');
+      $window.$('body').addClass('pika-exp-result-active');
       $scope.$on('$destroy', function() {
-        $window.$('body').removeClass('pika-exp-running-active');
+        $window.$('body').removeClass('pika-exp-result-active');
       });
 
       $scope.state = '';
@@ -38,7 +38,6 @@
         if ($stateParams.id) {
           $scope.experimentId = $stateParams.id;
           getExperiment($scope.experimentId, function(exp){
-            if(exp.completion_status) $scope.viewResults();
             $scope.initial_done = true;
           });
         } else {

@@ -117,7 +117,7 @@ window.ChaiBioTech.ngApp
             if not exp.started_at
               $state.go('pika_test.set-wells', id: exp.id)
             else if exp.started_at isnt null && exp.completed_at isnt null
-              $state.go('pika_test.results', id: exp.id)
+              $state.go('pika_test.experiment-result', id: exp.id)
             else
               $state.go 'pika_test.experiment-running', id: exp.id
     return

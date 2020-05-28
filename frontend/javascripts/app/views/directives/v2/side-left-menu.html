@@ -80,7 +80,7 @@
       <label class="section-name CB2-M">{{ (status == 'RUNNING') ? 'Analyzing Results...' : 'Results'}}</label>
       <hr/>
       <div class="side-menu-menu-item" ng-class="{'disabled-link': status != 'COMPLETED'}" ng-if="exp.type == 'test_kit'">
-        <div class="CH1-M" ui-sref="run-experiment({id: params.id, chart: 'amplification'})" toggle-sidemenu ng-if="status == 'COMPLETED'">
+        <div class="CH1-M" ui-sref="pika_test.experiment-result({id: params.id})" toggle-sidemenu ng-if="status == 'COMPLETED'">
           <span>Test Result</span>
         </div>
         <div class="CH1-M" ng-if="status != 'COMPLETED'">

@@ -1,0 +1,50 @@
+<div ng-controller="PikaExpResultCtrl">
+  <div class="pika-wrapper" side-menu-layout>
+    <header-exp-status experiment-id="experiment.id">
+      <div class="stripes-and-name" toggle-sidemenu>
+        <div class="stripes">
+          <img src='/images/menu-grey.svg'/>
+        </div>
+      </div>
+    </header-exp-status>
+    <div class="inner-wrapper">
+      <div class="inner-container">
+        <div class="pika-content">
+          <h3 class="CH1">{{}} Results</h3>
+          <table>
+            <tr class="td-heading">
+              <td style="width:300px">Well</td>
+              <td style="width:100px">Cq</td>
+              <td style="width:200px">Results</td>
+            <!--  <td style="width:100px">Hex Cq</td> -->
+              <td style="width:200px">Amount</td>
+              <td style="width:200px">Notes</td>
+            </tr>
+            <tr ng-if="x && (x.name != '' && x.name != 'empty')" ng-repeat="x in samples track by $index">
+              <td ng-if="$index < 2">
+                A{{$index + 1}}. {{x.name}}
+                <img ng-show="result[$index] == 'Valid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_valid.svg">
+                <img ng-show="result[$index] == 'Invalid'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_invalid.svg">
+              </td>
+              <td ng-if="$index >= 2">
+                <span>A{{$index + 1}}. {{x.name}}</span>
+                <img ng-show="result[$index] == 'Positive'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_pos.svg">
+                <img ng-show="result[$index] == 'Negative'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_neg.svg">
+                <img ng-show="result[$index] == 'Inhibited'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_inhib.svg">
+                <img ng-show="result[$index] == 'Unknown'" style="width:20px;float:right"  src="/images/dynexp/pika-test/res_inhib.svg">
+              </td>
+              <td><span ng-show="famCq[$index]">{{famCq[$index] | round:2}}</span></td>
+              <td>{{result[$index]}}</td>
+            <!--  <td>{{hexCq[$index]}}</td> -->
+              <td>{{amount[$index]}}</td>
+              <td ng-show="x.id && x.notes" ng-click="openNotes($index, x)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_on.svg"></td>
+              <td ng-show="x.id && !x.notes" ng-click="openNotes($index, x)" class="notes-cursor"><img style="width:20px" src="/images/dynexp/pika-test/comment_off.svg"></td>
+              <td ng-show="!x.id" class="notes-cursor"><img style="width:20px; opacity: .5;" src="/images/dynexp/pika-test/comment_off.svg"></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <status-bar></status-bar>
+</div>
