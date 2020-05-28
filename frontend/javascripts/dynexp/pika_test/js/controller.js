@@ -91,7 +91,7 @@
                   famTargets.push(targets[i].target.id);
                 }
               }
-              $scope.twoKits = (targets.length == 3) ? true : false;
+              $scope.twoKits = (famTargets.length == 2) ? true : false;
             });
 
             Experiment.getWellLayout($stateParams.id).then(function (resp) {
