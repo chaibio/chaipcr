@@ -77,7 +77,7 @@
           if ($stateParams.id) {
             $scope.experimentId = $stateParams.id;
             getExperiment($scope.experimentId, function(exp){
-              if(exp.completion_status) $scope.viewResults();
+              if($state.current.name === 'pika_test.exp-running' && exp.completion_status) $scope.viewResults();
               $scope.initial_done = true;
             });
 
