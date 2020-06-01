@@ -130,11 +130,18 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       $http.get(host + ':8000/network/wlan')
       .then(function(result) {
         console.log(result.data, "bing");
-        if(! result.data.state) {
+        if(!result.data.state) {
           return null;
         }
         if(result.data.state.status) {
           that.macAddress = result.data.state.macAddress;
+          if(result.data.state.status == 'connected'){
+            that.userSettings.wifiSwitchOn = true;
+            $.jStorage.set('userNetworkSettings', that.userSettings);            
+          } else {
+            that.userSettings.wifiSwitchOn = false;
+            $.jStorage.set('userNetworkSettings', that.userSettings);            
+          }
         }
       }, function(err) {
         that.processOnError(err); // in case error ,May be no wireless interface
