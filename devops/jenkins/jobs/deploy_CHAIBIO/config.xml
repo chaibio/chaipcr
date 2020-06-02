@@ -43,7 +43,7 @@
     </userRemoteConfigs>
     <branches>
       <hudson.plugins.git.BranchSpec>
-        <name>*/master</name>
+        <name>**</name>
       </hudson.plugins.git.BranchSpec>
     </branches>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
@@ -825,18 +825,18 @@ systemctl enable qpcrbrowser.service </command>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo install wifi firmware
-apt-get -y install firmware-realtek
-
+apt-get -y install firmware-realtek || exit 1
+ 
 echo Build/install LCD drivers
 # this needs some optimization.. it takes 90MB
-apt-get  -y -q install device-tree-compiler
+apt-get  -y -q install device-tree-compiler || exit 1
 cd ~/chaipcr/modules/LCDtouch_V3/49
 chmod 775 install_debian.sh
 
 mkdir -p /boot/dts/
 mkdir -p /lib/firmware/
 
-./install_debian.sh
+./install_debian.sh || exit 1
 if $is_dev
 then
       echo Building a debug image
