@@ -44,6 +44,8 @@ std::string getMacAddress(const std::string &interface);
 std::string getInterfaceGateway(const std::string &interface);
 std::vector<std::string> readDnsServers();
 
+#define IS_PLUGGALBE(iface) (iface.find("wlan") != std::string::npos || iface.find("wlx")  != std::string::npos)
+
 namespace NetworkInterfaces
 {
 
@@ -52,7 +54,12 @@ std::string InterfaceSettings::toString() const
     std::stringstream stream;
 
     if (autoConnect)
-        stream << "auto " << interface << '\n';
+    {
+	if(IS_PLUGGALBE(interface))
+	        stream << "allow-hotplug " << interface << '\n';
+	else
+	        stream << "auto " << interface << '\n';
+    }
 
     stream << "iface " << interface << " inet " << type << '\n';
 
@@ -129,7 +136,7 @@ InterfaceSettings readInterfaceSettings(const std::string &filePath, const std::
             pos = line.find(' ', pos + 1) + 1;
             interface.type = line.substr(pos);
         }
-        else if (line == "auto " + interfaceName)
+        else if (line == "auto " + interfaceName || (line == "allow-hotplug " + interfaceName && IS_PLUGGALBE(interfaceName)))
             interface.autoConnect = true;
         else if (!interface.interface.empty() && (line.substr(0, 4) == std::string("    ") || line.at(0) == '\t'))
         {
@@ -187,7 +194,7 @@ void writeInterfaceSettings(const std::string &filePath, const InterfaceSettings
             else
                 skip = false;
         }
-        else if (line == "auto " + interface.interface)
+        else if (line == "auto " + interface.interface || (line == "allow-hotplug " + interface.interface && IS_PLUGGALBE(interface.interface)))
             continue;
         else if (skip && !line.empty() && (line.substr(0, 4) == std::string("    ") || line.at(0) == '\t'))
             continue;
