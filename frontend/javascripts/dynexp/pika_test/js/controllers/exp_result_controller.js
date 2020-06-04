@@ -41,8 +41,7 @@
       $scope.amount[0] = "\u2014";
       $scope.amount[1] = "\u2014";
       $scope.samples = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
-      $scope.target = null;
-      $scope.target2 = null;
+      $scope.targets = [];
 
       $scope.$on('status:data:updated', function(e, data, oldData) {
         if (!data) return;
@@ -261,7 +260,8 @@
                 $scope.famCq.push(filterSummaryByFam(i));
                 $scope.hexCq.push(filterSummaryByHex(i));
               }
-              getResultArray();                
+              getResultArray();
+              console.log('--$scope.result--', $scope.result);
             }
           } else if (resp.data.partial || resp.status == 202) {
               $timeout($scope.getResults, 1000);
@@ -317,6 +317,7 @@
                 $scope.target_ipc = targets[i].target;
               } else {
                 famTargets.push(targets[i].target.id);
+                $scope.targets.push(resp.data[i].target);
               }
             }
             $scope.twoKits = (famTargets.length == 2) ? true : false;

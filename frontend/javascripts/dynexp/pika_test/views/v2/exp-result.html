@@ -10,9 +10,40 @@
     <div class="inner-wrapper">
       <div class="inner-container">
         <div class="pika-content">
-          <h3 class="CH1">{{experiment.name}} Results</h3>
+          <h3 class="CH1">{{targets[0].name}}</h3>
           <table class="CB2">
-            <tr ng-if="x && (x.name != '' && x.name != 'empty')" ng-repeat="x in samples track by $index">
+            <tr ng-if="x && (x.name != '' && x.name != 'empty') && ((twoKits && $index < 8) || (!twoKits && $index >= 8))" 
+              ng-repeat="x in samples track by $index">
+              <td style="width:35px" ng-if="$index < 8">A{{$index + 1}}</td>
+              <td style="width:35px" ng-if="$index >= 8">B{{$index - 7}}</td>
+              <td class="CB2-M">{{x.name}}</td>
+
+              <td ng-if="$index < 2" class="text-center">
+                <img ng-show="result[$index] == 'Valid'" style="width:20px"  src="/images/dynexp/pika-test/res_valid.svg">
+                <img ng-show="result[$index] == 'Invalid'" style="width:20px"  src="/images/dynexp/pika-test/res_invalid.svg">
+              </td>
+              <td ng-if="$index >= 2" class="text-center">
+                <img ng-show="result[$index] == 'Positive'" style="width:20px"  src="/images/dynexp/pika-test/res_pos.svg">
+                <img ng-show="result[$index] == 'Negative'" style="width:20px"  src="/images/dynexp/pika-test/res_neg.svg">
+                <img ng-show="result[$index] == 'Inhibited'" style="width:20px"  src="/images/dynexp/pika-test/res_inhib.svg">
+                <img ng-show="result[$index] == 'Unknown'" style="width:20px"  src="/images/dynexp/pika-test/res_inhib.svg">
+              </td>
+              <td><span ng-show="famCq[$index]">{{famCq[$index] | round:2}}</span></td>
+              <td>{{result[$index]}}</td>
+              <td>{{amount[$index]}}</td>
+              <td ng-if="x.id && x.notes" ng-click="openNotes($index, x)" class="notes-cursor text-right" style="width:50px">
+                <img style="width:20px" src="/images/dynexp/pika-test/note-on.svg" class="cursor-pointer note-{{$index}}">
+              </td>
+              <td ng-if="x.id && !x.notes" ng-click="openNotes($index, x)" class="notes-cursor text-right" style="width:50px">
+                <img style="width:20px" src="/images/dynexp/pika-test/note-off.svg" class="cursor-pointer note-{{$index}}">
+              </td>
+            </tr>
+          </table>
+
+          <h3 class="CH1" ng-if="twoKits" style="margin-top: 30px;">{{targets[1].name}}</h3>
+          <table class="CB2" ng-if="twoKits">
+            <tr ng-if="x && (x.name != '' && x.name != 'empty') && ($index >= 8)" 
+              ng-repeat="x in samples track by $index">
               <td style="width:35px" ng-if="$index < 8">A{{$index + 1}}</td>
               <td style="width:35px" ng-if="$index >= 8">B{{$index - 7}}</td>
               <td class="CB2-M">{{x.name}}</td>

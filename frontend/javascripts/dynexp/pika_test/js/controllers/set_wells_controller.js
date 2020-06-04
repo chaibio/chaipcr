@@ -3,7 +3,7 @@
   .controller('PikaSetWellsCtrl', [
     '$scope',
     '$window',
-    'dynexpExperimentService',
+    'Experiment',
     '$state',
     '$stateParams',
     'Status',
@@ -40,12 +40,25 @@
       $scope.current_well_index = -1;
       $scope.original_sample_name = '';
       $scope.is_two_kit = false;
+      $scope.targets = [];
+      $scope.target_ipc = null;
+      $scope.well_types = [];
+      $scope.exp_samples = [];
 
       function getExperiment(exp_id, cb) {
-        Experiment.get(exp_id).then(function(resp) {
-          $scope.experiment = resp.data.experiment;
-          if (cb) cb(resp.data.experiment);
+        Experiment.get({id: exp_id}).then(function(resp) {
+          $scope.experiment = resp.experiment;
+          if (cb) cb(resp.experiment);
         });
+      }
+
+      function findSampleByName(sample_name){
+        for(var i = 0; i < $scope.exp_samples.length; i++){
+          if($scope.exp_samples[i].name == sample_name){
+            return $scope.exp_samples[i];
+          }
+        }
+        return false;
       }
 
       function getId() {
@@ -55,33 +68,45 @@
             // if(exp.completion_status) $scope.viewResults();
             $scope.initial_done = true;
           });
-          Experiment.getWellLayout($stateParams.id).then(function (resp) {
-            $scope.target = (resp.data[0].targets) ? resp.data[0].targets[0] : {id: 0, name: ''};
-            $scope.target2 = (resp.data[8].targets) ? resp.data[8].targets[0] : {id: 0, name: ''};
-            if ($scope.target.id != $scope.target2.id && $scope.target2.id && $scope.target.id) {
-              $scope.is_two_kit = true;
-            }
-            var j = 0,
-            k, i;
-            for (i = 0; i < 8; i++) {
-              $scope.samples[i] = (resp.data[i].samples) ? resp.data[i].samples[0] : {id: 0, name: ''};
-            }
 
-            for (k = 8; k < 16; k++) {
-              $scope.samples_B[k - 8] = (resp.data[k].samples) ? resp.data[k].samples[0] : {id: 0, name: ''};
+          Experiment.getSamples($stateParams.id).then(function (resp) {
+            for(var i = 0; i < resp.data.length; i++){
+              $scope.exp_samples.push(resp.data[i].sample);
+            }            
+          });
+
+          Experiment.getTargets($stateParams.id).then(function (resp) {
+            for(var i = 0; i < resp.data.length; i++){
+              if(resp.data[i].target.name.trim() != 'IPC'){
+                $scope.targets.push(resp.data[i].target);
+              } else {
+                $scope.target_ipc = resp.data[i].target;
+              }
             }
-            
-            if($scope.is_two_kit){
-              $scope.omit_positive = (($scope.samples[0].id && $scope.samples[0].name == 'Positive Control') || 
-                                      ($scope.samples_B[0].id && $scope.samples_B[0].name == 'Positive Control')) ? false : true;
-              $scope.omit_negative = (($scope.samples[1].id  && $scope.samples[1].name == 'Negative Control') ||
-                                      ($scope.samples_B[1].id && $scope.samples_B[1].name == 'Negative Control')) ? false : true;
-            } else {              
-              $scope.omit_positive = ($scope.samples[0].id && $scope.samples[0].name == 'Positive Control') ? false : true;
-              $scope.omit_negative = ($scope.samples[1].id  && $scope.samples[1].name == 'Negative Control') ? false : true;
-            }
+            $scope.is_two_kit = ($scope.targets.length == 2) ? true : false;
+
+            Experiment.getWellLayout($stateParams.id).then(function (resp) {
+              $scope.well_types = [];
+              for(var i = 0; i < resp.data.length; i++){
+                var well_type = (resp.data[i].targets && resp.data[i].targets[0].well_type) ? resp.data[i].targets[0].well_type : '';
+                $scope.well_types.push(well_type);
+              }
+
+              var j = 0, k;
+              for (i = 0; i < 8; i++) {
+                $scope.samples[i] = (resp.data[i].samples) ? resp.data[i].samples[0] : {id: 0, name: ''};
+              }
+
+              for (k = 8; k < 16; k++) {
+                $scope.samples_B[k - 8] = (resp.data[k].samples) ? resp.data[k].samples[0] : {id: 0, name: ''};
+              }
+
+              $scope.omit_positive = (resp.data[0].targets && resp.data[0].targets[0].well_type == 'positive_control') ? false : true;
+              $scope.omit_negative = (resp.data[1].targets && resp.data[1].targets[0].well_type == 'negative_control') ? false : true;
+            });
 
           });
+
         } else {
           $timeout(function() {
             getId();
@@ -108,6 +133,9 @@
               Experiment.deleteLinkedSample($scope.experimentId, x.id).then(function(resp) {
                 $scope.samples[index] = {id: 0, name: ''};
               });
+              Experiment.unlinkTarget($scope.experimentId, $scope.targets[0].id, { wells: [index + 1], channel: 0 }).then(function (response) {
+                $scope.well_types[index] = '';
+              });
             }
           } else {
             if(x.name){
@@ -115,20 +143,29 @@
                 $scope.samples[index] = resp.data.sample;              
                 Experiment.linkSample($scope.experimentId, resp.data.sample.id, { wells: [index+1] }).then(function (response) {
                 });
-              });              
+              });
+
+              var well_type = 'unknown';
+              if(!$scope.omit_positive){
+                if(index == 0){
+                  well_type = 'positive_control';
+                }
+              }
+
+              if(!$scope.omit_negative){
+                if(index == 1){
+                  well_type = 'negative_control';
+                }
+              }
+
+              Experiment.linkTarget($scope.experimentId, $scope.targets[0].id, { wells: [{ well_num: index + 1, well_type: well_type }] }).then(function (response) {
+                $scope.well_types[index] = well_type;
+              });
+              if($scope.target_ipc){
+                Experiment.linkTarget($scope.experimentId, $scope.target_ipc.id, { wells: [{ well_num: index + 1, well_type: well_type }] }).then(function (response) {
+                });
+              }
             }
-          }
-
-          if($scope.is_two_kit){
-
-          } else {
-            if(x.name == 'Positive Control' && index == 0){
-              $scope.omit_positive = false;
-            }
-
-            if(x.name == 'Negative Control' && index == 1){
-              $scope.omit_negative = false;
-            }            
           }
         }
         $scope.current_well_row = '';
@@ -148,6 +185,9 @@
               Experiment.deleteLinkedSample($scope.experimentId, x.id).then(function(resp) {
                 $scope.samples_B[index] = {id: 0, name: ''};
               });              
+              Experiment.unlinkTarget($scope.experimentId, ($scope.is_two_kit) ? $scope.targets[1].id : $scope.targets[0].id, { wells: [index + 9], channel: 0 }).then(function (response) {
+                $scope.well_types[index] = '';
+              });
             }
           } else {
             if(x.name){
@@ -156,17 +196,37 @@
                 Experiment.linkSample($scope.experimentId, resp.data.sample.id, { wells: [index + 9] }).then(function (response) {
                 });
               });
-            }
-          }
 
-          if($scope.is_two_kit){
-            if(x.name == 'Positive Control' && index == 0){
-              $scope.omit_positive = false;
-            }
+              if($scope.is_two_kit){
+                var well_type = 'unknown';
+                if(!$scope.omit_positive){
+                  if(index == 0){
+                    well_type = 'positive_control';
+                  }
+                }
 
-            if(x.name == 'Negative Control' && index == 1){
-              $scope.omit_negative = false;
-            }            
+                if(!$scope.omit_negative){
+                  if(index == 1){
+                    well_type = 'negative_control';
+                  }
+                }
+                Experiment.linkTarget($scope.experimentId, $scope.targets[1].id, { wells: [{ well_num: index + 9, well_type: well_type }] }).then(function (response) {
+                  $scope.well_types[index + 8] = well_type;
+                });
+                if($scope.target_ipc){
+                  Experiment.linkTarget($scope.experimentId, $scope.target_ipc.id, { wells: [{ well_num: index + 9, well_type: well_type }] }).then(function (response) {
+                  });
+                }
+              } else {
+                Experiment.linkTarget($scope.experimentId, $scope.targets[0].id, { wells: [{ well_num: index + 9, well_type: 'unknown' }] }).then(function (response) {                                
+                  $scope.well_types[index + 8] = 'unknown';
+                });
+                if($scope.target_ipc){
+                  Experiment.linkTarget($scope.experimentId, $scope.target_ipc.id, { wells: [{ well_num: index + 9, well_type: 'unknown' }] }).then(function (response) {
+                  });
+                }
+              }
+            }
           }
         }
         $scope.current_well_row = '';
@@ -244,27 +304,36 @@
         var omit_control = false;
         var omit_sample_index = 0;
         var omit_sample_name = 'Positive Control';
+        var omit_well_type = 'positive_control';
         if(is_positive){
           $scope.omit_positive = !$scope.omit_positive;
           omit_control = $scope.omit_positive;
           omit_sample_index = 0;
           omit_sample_name = 'Positive Control';
+          omit_well_type = 'positive_control';
         } else {
           $scope.omit_negative = !$scope.omit_negative;
           omit_control = $scope.omit_negative;
           omit_sample_index = 1;
           omit_sample_name = 'Negative Control';
+          omit_well_type = 'negative_control';
         }
 
         if(omit_control){
-          if($scope.samples[omit_sample_index].name == omit_sample_name){
+          if($scope.samples[omit_sample_index].id){
             Experiment.deleteLinkedSample($scope.experimentId, $scope.samples[omit_sample_index].id).then(function(resp) {
               $scope.samples[omit_sample_index] = {id: 0, name: ''};
             });
+            Experiment.unlinkTarget($scope.experimentId, $scope.targets[0].id, { wells: [omit_sample_index + 1], channel: 0 }).then(function (response) {
+              $scope.well_types[omit_sample_index] = '';
+            });
           }
-          if($scope.is_two_kit && $scope.samples_B[omit_sample_index].name == omit_sample_name){
+          if($scope.is_two_kit && $scope.samples_B[omit_sample_index].id){
             Experiment.deleteLinkedSample($scope.experimentId, $scope.samples_B[omit_sample_index].id).then(function(resp) {
               $scope.samples_B[omit_sample_index] = {id: 0, name: ''};
+            });
+            Experiment.unlinkTarget($scope.experimentId, $scope.targets[1].id, { wells: [omit_sample_index + 9], channel: 0 }).then(function (response) {
+              $scope.well_types[omit_sample_index + 8] = '';
             });
           }
         } else {
@@ -276,6 +345,15 @@
             });
           }
 
+          Experiment.linkTarget($scope.experimentId, $scope.targets[0].id, { wells: [{ well_num: omit_sample_index + 1, well_type: omit_well_type }] }).then(function (response) {
+            $scope.well_types[omit_sample_index] = omit_well_type;
+          });
+
+          if($scope.target_ipc){
+            Experiment.linkTarget($scope.experimentId, $scope.target_ipc.id, { wells: [{ well_num: omit_sample_index + 1, well_type: omit_well_type }] }).then(function (response) {
+            });
+          }         
+
           if($scope.is_two_kit && $scope.samples_B[omit_sample_index].name != omit_sample_name){            
             Experiment.createSample($scope.experimentId, {name: omit_sample_name}).then(function(resp) {
               var new_sample = resp.data.sample;
@@ -283,15 +361,21 @@
               Experiment.linkSample($scope.experimentId, new_sample.id, { wells: [omit_sample_index + 9] }).then(function (response) {
               });
             });
-          }
 
+            Experiment.linkTarget($scope.experimentId, $scope.targets[1].id, { wells: [{ well_num: omit_sample_index + 9, well_type: omit_well_type }] }).then(function (response) {
+              $scope.well_types[omit_sample_index + 8] = omit_well_type;
+            });
+
+            if($scope.target_ipc){
+              Experiment.linkTarget($scope.experimentId, $scope.target_ipc.id, { wells: [{ well_num: omit_sample_index + 9, well_type: omit_well_type }] }).then(function (response) {
+              });
+            }            
+          }
         }
       }
 
       $scope.isControlWell = function(sample, index, well_row){
-        return (sample.name == 'Positive Control' || sample.name == 'Negative Control') && 
-                sample.id && index < 2 && ($scope.is_two_kit || well_row == 'A') &&
-                ($scope.original_sample_name == 'Positive Control' || $scope.original_sample_name == 'Negative Control');
+        return ($scope.well_types[index] == 'positive_control' || $scope.well_types[index] == 'negative_control');
       };
     }
   ]);
