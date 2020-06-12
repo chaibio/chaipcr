@@ -112,7 +112,7 @@ $sidemenu_width_close: 0;
             svg{
               width: 10px;
             }
-            &:hover{
+            &:hover, &.active{
               border-left: 3px solid $link-text-color;
             }
           }
@@ -431,7 +431,7 @@ $sidemenu_width_close: 0;
 
       .side-sub-menu-content-container{
         width: 360px;
-        height: 100%;
+        height: calc(100% - 100px);
         padding-left: 25px;
         padding-right: 25px;
         position: fixed;

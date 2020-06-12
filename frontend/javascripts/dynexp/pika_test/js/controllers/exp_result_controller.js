@@ -261,20 +261,19 @@
                 $scope.hexCq.push(filterSummaryByHex(i));
               }
               getResultArray();
-              console.log('--$scope.result--', $scope.result);
             }
           } else if (resp.data.partial || resp.status == 202) {
-              $timeout($scope.getResults, 1000);
-            }
-          })
-          .catch(function(resp) {
-            if (resp.status == 500) {
-              $scope.custom_error = resp.data.errors || "An error occured while trying to analyze the experiment results.";
-              $scope.analyzing = false;
-            } else if (resp.status == 503) {
-              $timeout($scope.getResults, 1000);
-            }
-          });
+            $timeout(getResults, 1000);
+          }
+        })
+        .catch(function(resp) {
+          $scope.analyzing = false;
+          if (resp.status == 500) {
+            $scope.custom_error = (resp.data && resp.data.errors) || "An error occured while trying to analyze the experiment results.";
+          } else if (resp.status == 503) {
+            $timeout(getResults, 1000);
+          }
+        });
       }
 
       function filterSummaryByFam(well_num){
@@ -309,32 +308,38 @@
             $scope.initial_done = true;
           });
 
-          Experiment.getTargets($stateParams.id).then(function (resp) {
-            var targets = resp.data;
-            for(var i = 0; i < targets.length; i++){
-              if(targets[i].target.name.trim() == 'IPC'){
-                hexTargets.push(targets[i].target.id);
-                $scope.target_ipc = targets[i].target;
-              } else {
-                famTargets.push(targets[i].target.id);
-                $scope.targets.push(resp.data[i].target);
-              }
+          Experiment.getWellLayout($stateParams.id).then(function (well_resp) {
+            // if(
+            //   !(well_resp.data[0].targets[0] && well_resp.data[0].targets[0].well_type == 'positive_control' && 
+            //   well_resp.data[1].targets[1] && well_resp.data[1].targets[1].well_type == 'negative_control')
+            // ){
+            //   $state.go('run-experiment', {id: $stateParams.id, chart: 'amplification'});
+            // }
+
+            var k, i;
+            for (i = 0; i < 16; i++) {
+              $scope.samples[i] = (well_resp.data[i].samples) ? well_resp.data[i].samples[0] : {id: 0, name: ''};
             }
-            $scope.twoKits = (famTargets.length == 2) ? true : false;
 
-            Experiment.getWellLayout($stateParams.id).then(function (resp) {
-              var k, i;
-              for (i = 0; i < 16; i++) {
-                $scope.samples[i] = (resp.data[i].samples) ? resp.data[i].samples[0] : {id: 0, name: ''};
+            for (i = 0; i < 16; i++) {
+              $scope.notes[i] = '';
+            }
+
+            Experiment.getTargets($stateParams.id).then(function (resp) {
+              var targets = resp.data;
+              for(var i = 0; i < targets.length; i++){
+                if(targets[i].target.name.trim() == 'IPC'){
+                  hexTargets.push(targets[i].target.id);
+                  $scope.target_ipc = targets[i].target;
+                } else {
+                  famTargets.push(targets[i].target.id);
+                  $scope.targets.push(resp.data[i].target);
+                }
               }
-
-              for (i = 0; i < 16; i++) {
-                $scope.notes[i] = '';
-              }
-
+              $scope.twoKits = (famTargets.length == 2) ? true : false;
               getResults();
             });
-          });        
+          });
         } else {
           $timeout(function() {
             getId();

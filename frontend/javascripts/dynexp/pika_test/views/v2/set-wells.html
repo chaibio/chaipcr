@@ -141,7 +141,7 @@
                 </div>
               </div>
             </div>
-            <div ng-if="!experiment.started_at">
+            <div ng-if="experiment && !experiment.started_at">
               <button class="button-start-exp CB1-M" id="start-experiment-button" ng-if="!start_confirm_show" ng-click="startConfirm()">Start Experiment</button>
               <button class="button-confirm-exp CB1-M" id="start-experiment-button" ng-if="start_confirm_show" ng-click="startExperiment()">Confirm Start</button>
             </div>

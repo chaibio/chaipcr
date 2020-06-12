@@ -17,6 +17,17 @@
       table{
         width: 100%;
         tr{
+          &.target-name{
+            td{
+              padding: 0 5px;
+              border-bottom: none;
+
+              h3{
+                margin-top: 30px;
+                padding: 0;
+              }
+            }
+          }
           td{
             padding: 10px 5px;
             border-bottom: 1px solid #bfbfbf;

@@ -9,10 +9,13 @@
     </header-exp-status>
     <div class="inner-wrapper">
       <div class="inner-container">
-        <div class="pika-content">
+        <div class="pika-content" ng-if="analyzing">
+          <h3 class="CH1">Analyzing...</h3>          
+        </div>
+        <div class="pika-content" ng-if="!analyzing">
           <h3 class="CH1">{{targets[0].name}}</h3>
           <table class="CB2">
-            <tr ng-if="x && (x.name != '' && x.name != 'empty') && ((twoKits && $index < 8) || (!twoKits && $index >= 8))" 
+            <tr ng-if="x && (x.name != '' && x.name != 'empty') && ((twoKits && $index < 8) || !twoKits)" 
               ng-repeat="x in samples track by $index">
               <td style="width:35px" ng-if="$index < 8">A{{$index + 1}}</td>
               <td style="width:35px" ng-if="$index >= 8">B{{$index - 7}}</td>
@@ -38,21 +41,22 @@
                 <img style="width:20px" src="/images/dynexp/pika-test/note-off.svg" class="cursor-pointer note-{{$index}}">
               </td>
             </tr>
-          </table>
-
-          <h3 class="CH1" ng-if="twoKits" style="margin-top: 30px;">{{targets[1].name}}</h3>
-          <table class="CB2" ng-if="twoKits">
-            <tr ng-if="x && (x.name != '' && x.name != 'empty') && ($index >= 8)" 
+            <tr ng-if="twoKits" class="target-name">
+              <td>&nbsp;</td>
+              <td colspan="6">
+                <h3 class="CH1">{{targets[1].name}}</h3>
+              </td>
+            </tr>
+            <tr ng-if="x && (x.name != '' && x.name != 'empty') && (twoKits && $index >= 8)" 
               ng-repeat="x in samples track by $index">
-              <td style="width:35px" ng-if="$index < 8">A{{$index + 1}}</td>
               <td style="width:35px" ng-if="$index >= 8">B{{$index - 7}}</td>
               <td class="CB2-M">{{x.name}}</td>
 
-              <td ng-if="$index < 2" class="text-center">
+              <td ng-if="$index < 10" class="text-center">
                 <img ng-show="result[$index] == 'Valid'" style="width:20px"  src="/images/dynexp/pika-test/res_valid.svg">
                 <img ng-show="result[$index] == 'Invalid'" style="width:20px"  src="/images/dynexp/pika-test/res_invalid.svg">
               </td>
-              <td ng-if="$index >= 2" class="text-center">
+              <td ng-if="$index >= 10" class="text-center">
                 <img ng-show="result[$index] == 'Positive'" style="width:20px"  src="/images/dynexp/pika-test/res_pos.svg">
                 <img ng-show="result[$index] == 'Negative'" style="width:20px"  src="/images/dynexp/pika-test/res_neg.svg">
                 <img ng-show="result[$index] == 'Inhibited'" style="width:20px"  src="/images/dynexp/pika-test/res_inhib.svg">
@@ -68,7 +72,7 @@
                 <img style="width:20px" src="/images/dynexp/pika-test/note-off.svg" class="cursor-pointer note-{{$index}}">
               </td>
             </tr>
-          </table>
+          </table>          
         </div>
       </div>
     </div>
