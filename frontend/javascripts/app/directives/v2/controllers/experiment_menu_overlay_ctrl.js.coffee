@@ -38,11 +38,13 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
     $scope.errorExport = false
     $scope.exporting = false
     $scope.isIdle = false
-    $scope.runningExpId = -1
+    $scope.runningExpId = 0
 
     $scope.confirmStatus = false
     $scope.isConfirmDelete = false
     $scope.isConfirmCancel = false
+
+    isInit = true
 
     $scope.$on 'runReady:true', ->
       $scope.confirmStatus = true
@@ -76,9 +78,6 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
 
     callAtTimeout = ->
       $scope.exportExperiment()
-
-    callExpTimeout = ->
-      $scope.getExperiment()
 
     $scope.exportExperiment = ->
       $scope.exporting = true
@@ -129,7 +128,7 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
 
     $scope.$on 'cycle:number:updated', (e, num) ->
       $scope.maxCycle = num
-    
+
     $scope.getExperiment = ->
       Experiment.get(id: $stateParams.id).then (data) ->
         $scope.exp = data.experiment
@@ -141,10 +140,9 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
           if !$scope.isIdle and (parseInt($scope.runningExpId) is parseInt($scope.exp.id))
             $scope.status = 'RUNNING'
             $scope.runStatus = ''
-          else if $scope.runningExpId == -1
-            $scope.status = null
-            $scope.runStatus = ''
-            $timeout callExpTimeout, 500
+          else if isInit
+            $scope.status = ''
+            $scope.runStatus = ''            
           else
             $scope.status = 'COMPLETED'
             $scope.runStatus = 'Run on:'
@@ -181,10 +179,14 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
       $scope.lidOpen = if data?.optics?.lid_open == "true" then true else false
       state = data?.experiment_controller?.machine?.state
       oldState = oldData?.experiment_controller?.machine?.state
-      $scope.runningExpId = 0
       return if !data
       return if !data.experiment_controller
       $scope.isIdle = if data.experiment_controller.machine.state == 'idle' then true else false
       $scope.runningExpId = data.experiment_controller.experiment?.id
-      $scope.getExperiment() if (state isnt oldState) or (!$scope.isIdle and $scope.status isnt 'RUNNING' and $scope.runningExpId is $stateParams.id)
+
+      if isInit
+        $scope.getExperiment()
+        isInit = false
+      else
+        $scope.getExperiment() if (state isnt oldState) or (!$scope.isIdle and $scope.status isnt 'RUNNING' and $scope.runningExpId is $stateParams.id)
 ])

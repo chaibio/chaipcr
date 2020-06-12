@@ -26,6 +26,8 @@
       $scope.state = '';
       $scope.old_state = '';
       var enterState = false;
+      var INIT_LOADING = 2;
+      $scope.statusLoading = INIT_LOADING;
 
       function getExperiment(exp_id, cb) {
         Experiment.get(exp_id).then(function(resp) {
@@ -75,12 +77,17 @@
         $scope.stateName = $state.current.name;
 
         if ($scope.state === 'idle' && $scope.old_state === 'idle' && $state.current.name === 'pika_test.experiment-running') {
-          getExperiment($scope.experimentId);
-          if ($scope.experiment.completion_status) {
-            $state.go('pika_test.experiment-result', { id: $scope.experiment.id });
-          } else {
-            $state.go('pika_test.set-wells', { id: $scope.experiment.id });
-          }
+          getExperiment($scope.experimentId, function(exp){
+            if ( $scope.statusLoading > 0 ){
+              $scope.statusLoading--;
+            } else {
+              if ($scope.experiment.completion_status) {
+                $state.go('pika_test.experiment-result', { id: $scope.experiment.id });
+              } else {
+                $state.go('pika_test.set-wells', { id: $scope.experiment.id });
+              }
+            }
+          });
         }
       });
     }
