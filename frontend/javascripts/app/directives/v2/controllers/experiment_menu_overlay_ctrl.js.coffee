@@ -29,14 +29,46 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
   '$window'
   ($scope, $stateParams, Experiment, $state, AmplificationChartHelper, Status, $timeout, $rootScope, $http, $window) ->
     $scope.params = $stateParams
+    $scope.stateInfo = $state.current
     $scope.lidOpen = false
     $scope.showProperties = false
     $scope.status = null
     $scope.exp = null
+    $scope.exp_type = ''
     $scope.errorExport = false
     $scope.exporting = false
     $scope.isIdle = false
     $scope.runningExpId = 0
+
+    $scope.confirmStatus = false
+    $scope.isConfirmDelete = false
+    $scope.isConfirmCancel = false
+
+    isInit = true
+
+    $scope.$on 'runReady:true', ->
+      $scope.confirmStatus = true
+
+    angular.element('body').click (e) ->
+      if $scope.confirmStatus == true and e.target.innerHTML != 'Run Experiment'
+        $rootScope.$broadcast 'runReady:false'
+        $scope.confirmStatus = false
+      if $scope.isConfirmDelete == true and e.target.innerHTML != 'Delete'
+        $scope.isConfirmDelete = false
+      if $scope.isConfirmCancel == true and e.target.innerHTML != 'Cancel'
+        $scope.isConfirmCancel = false
+
+    $scope.setConfirmDelete = (isConfirm) ->
+      $scope.isConfirmDelete = isConfirm
+
+    $scope.getConfirmDelete = () ->
+      $scope.isConfirmDelete
+
+    $scope.setConfirmCancel = (isConfirm) ->
+      $scope.isConfirmCancel = isConfirm
+
+    $scope.getConfirmCancel = () ->
+      $scope.isConfirmCancel
 
     $scope.deleteExperiment = ->
       #exp = new Experiment id: $stateParams.id
@@ -96,17 +128,21 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
 
     $scope.$on 'cycle:number:updated', (e, num) ->
       $scope.maxCycle = num
-    
+
     $scope.getExperiment = ->
       Experiment.get(id: $stateParams.id).then (data) ->
         $scope.exp = data.experiment
+        $scope.exp_type = $scope.exp.type
         if !data.experiment.started_at and !data.experiment.completed_at
           $scope.status = 'NOT_STARTED'
           $scope.runStatus = 'Not run yet.'
         if data.experiment.started_at and !data.experiment.completed_at
           if !$scope.isIdle and (parseInt($scope.runningExpId) is parseInt($scope.exp.id))
             $scope.status = 'RUNNING'
-            $scope.runStatus = 'Currently running.'
+            $scope.runStatus = ''
+          else if isInit
+            $scope.status = ''
+            $scope.runStatus = ''            
           else
             $scope.status = 'COMPLETED'
             $scope.runStatus = 'Run on:'
@@ -126,6 +162,12 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
 
     $scope.hasStandardCurve = ->
       return if $scope.exp then Experiment.hasStandardCurve($scope.exp) else false
+    $scope.cancelExperiment = ->
+      Experiment.stopExperiment($stateParams.id).then (data) ->
+        $state.go 'home'
+
+    $scope.openProperties = (prop) ->
+      $scope.showProperties = prop
 
     $rootScope.$on 'sidemenu:toggle', ->
       $scope.errorExport = false
@@ -141,5 +183,10 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
       return if !data.experiment_controller
       $scope.isIdle = if data.experiment_controller.machine.state == 'idle' then true else false
       $scope.runningExpId = data.experiment_controller.experiment?.id
-      $scope.getExperiment() if (state isnt oldState) or (!$scope.isIdle and $scope.status isnt 'RUNNING' and $scope.runningExpId is $stateParams.id)
+
+      if isInit
+        $scope.getExperiment()
+        isInit = false
+      else
+        $scope.getExperiment() if (state isnt oldState) or (!$scope.isIdle and $scope.status isnt 'RUNNING' and $scope.runningExpId is $stateParams.id)
 ])

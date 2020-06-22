@@ -43,7 +43,7 @@
     </userRemoteConfigs>
     <branches>
       <hudson.plugins.git.BranchSpec>
-        <name>*/master</name>
+        <name>**</name>
       </hudson.plugins.git.BranchSpec>
     </branches>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
@@ -62,6 +62,8 @@
 echo checking Jenkins server
 echo &quot;Bash version ${BASH_VERSION}...&quot;
 echo Image build version $image_version
+echo Release build number $release_build_number
+
 uname -a
 ls -ahl
 lsblk
@@ -290,8 +292,11 @@ ENDSSH
         cd ..
         echo done gulp deploy
         
+        echo Release build number is $release_build_number
 		rm -rf ./web/log
-		sed -i &apos;s/&quot;version&quot;: &quot;1.0.0&quot;,/&quot;version&quot;: &quot;&apos;${image_version}&apos;&quot;,/g&apos; ./device/configuration.json
+		sed -i &apos;s/&quot;version&quot;: &quot;1.0.0&quot;,/&quot;version&quot;: &quot;&apos;${image_version}&apos;&quot;,/g&apos; ./device/configuration.json || true
+		sed -i &apos;s/&quot;version&quot;: &quot;1.1.1&quot;,/&quot;version&quot;: &quot;&apos;${image_version}&apos;&quot;,/g&apos; ./device/configuration.json || true
+        sed -i &apos;s/BUILD_NUMBER/&apos;${release_build_number}&apos;/g&apos; ./device/configuration.json  || true
 
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./web &quot;$build_machine:/root/chaipcr/&quot; || (echo error copying files to device &amp;&amp; exit 1)
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./browser &quot;$build_machine:/root/chaipcr/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
@@ -820,18 +825,18 @@ systemctl enable qpcrbrowser.service </command>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
       <siteName>root@$build_machine:22</siteName>
       <command>echo install wifi firmware
-apt-get -y install firmware-realtek
-
+apt-get -y install firmware-realtek || exit 1
+ 
 echo Build/install LCD drivers
 # this needs some optimization.. it takes 90MB
-apt-get  -y -q install device-tree-compiler
+apt-get  -y -q install device-tree-compiler || exit 1
 cd ~/chaipcr/modules/LCDtouch_V3/49
 chmod 775 install_debian.sh
 
 mkdir -p /boot/dts/
 mkdir -p /lib/firmware/
 
-./install_debian.sh
+./install_debian.sh || exit 1
 if $is_dev
 then
       echo Building a debug image

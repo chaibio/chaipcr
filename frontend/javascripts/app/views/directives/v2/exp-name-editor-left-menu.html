@@ -1,0 +1,21 @@
+<div class="side-menu-exp-name CH1">
+  <div class="side-top-header CB2-M">    
+    <label>Experiment Name</label>  
+    <span class="edit-experiment-name" ng-click="focusExpName()" ng-show="!editExpNameMode">Edit</span>
+    <span class="edit-experiment-name CB2-B" ng-click="saveExperiment(experiment)" ng-show="editExpNameMode">Save</span>
+    <span class="edit-experiment-name" ng-click="cancelExpName()" ng-show="editExpNameMode" style="margin-right: 10px;">Cancel</span>
+  </div>
+  <form name="expForm">
+    <div class="exp-name-container">
+      <p class="exp-name CH1" ng-class="{'hide-elem': editExpNameMode}" id="exp_name_plat">{{experiment.name}}</p>
+      <textarea class="exp-name CH1" required ng-model="experiment.name" ng-show="editExpNameMode"
+        focus-on="editExpNameMode" id="exp_name_field" rows="3" ng-change="adjustTextHeight()"></textarea>
+    </div>
+    <div ng-show="errors">
+      <span class="help-block CB2-M">
+        <span class="text-danger">{{errors}}</span>
+      </span>
+    </div>
+
+  </form>
+</div>

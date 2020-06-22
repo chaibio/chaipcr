@@ -314,54 +314,57 @@ function amp_fit_model(
         bl_status = bl_fit.status
         len_bcb = length(i.baseline_cyc_bounds)
         if len_bcb==0
-            if (bl_status == :Optimal || bl_status == :UserLimit) #&& (abs(maximum(fluos)-minimum(fluos))>20000)
-                dr2_pred_tm=i.SFC_model_def_func(i.bl_method).funcs_pred[:dr2](
-                    cycles_denser, bl_fit.coefs...)
-                min_fluo_cyc_=findmin(fluos)[2]
-                if (min_fluo_cyc_<i.min_reliable_cyc)
-                    fluos_muted=vcat(fill(findmax(fluos)[1],i.min_reliable_cyc-1),fluos[i.min_reliable_cyc:end])
-                    min_fluo_cyc_=findmin(fluos_muted)[2]
-                end
-                approx_min_dr2=findmin(abs.(cycles_denser-min_fluo_cyc_))[2]
-                basecyc_1st=i.min_reliable_cyc
-                if !(min_fluo_cyc_==i.min_reliable_cyc)
-                    dr2_left2mf=dr2_pred_tm[1:approx_min_dr2-1]
-                    if !(all(dr2_left2mf.<dr2_pred_tm[approx_min_dr2]))
-                        basecyc_1st=Int(floor(cycles_denser[findmax(dr2_left2mf)[2]]))
-                        basecyc_1st=i.min_reliable_cyc<=basecyc_1st?basecyc_1st:i.min_reliable_cyc
-                    end
-                end
-
-                if (min_fluo_cyc_==i.num_cycles || length(cycles_denser)==approx_min_dr2)
-                    basecyc_last=i.num_cycles
-                else
-                    cycmax_dr2=findmax(dr2_pred_tm)[2]
-                    if (cycmax_dr2 == approx_min_dr2)
-                        basecyc_last=Int(floor(cycles_denser[cycmax_dr2]))
-                    else
-                        dr2_right2mf=dr2_pred_tm[approx_min_dr2+1:end]
-                        basecyc_last=Int(floor(cycles_denser[findmax(dr2_right2mf)[2]+approx_min_dr2]))
-                        basecyc_last=i.min_reliable_cyc==basecyc_last?i.num_cycles:basecyc_last
-                    end
-                end
-                auto_cycs=basecyc_1st:basecyc_last
-                baseline = median(fluos[auto_cycs])
-
-                # my method, also worked:)
-                # cyc_idx_=Int(floor(cycles_denser[findmax(dr2_pred_tm)[2]]))-1
-                # println(cyc_idx_)
-                # if cyc_idx_ <= i.min_reliable_cyc
-                #     auto_cycs=cyc_idx_==0?bl_cycs():(1:cyc_idx_)
-                #     baseline = i.SFC_model_def_func(i.bl_method).funcs_pred[:bl](
-                #                          cycles_denser, bl_fit.coefs...)[1]
-                # else
-                #     auto_cycs=i.min_reliable_cyc:cyc_idx_
-                #     baseline = median(fluos[auto_cycs])
-                # end
+            if num_cycles<=i.min_reliable_cyc
+                auto_cycs=1:num_cycles
             else
-                auto_cycs=i.min_reliable_cyc:i.num_cycles
-                baseline = median(fluos[auto_cycs])
+                if (bl_status == :Optimal || bl_status == :UserLimit) #&& (abs(maximum(fluos)-minimum(fluos))>20000)
+                    dr2_pred_tm=i.SFC_model_def_func(i.bl_method).funcs_pred[:dr2](
+                        cycles_denser, bl_fit.coefs...)
+                    min_fluo_cyc_=findmin(fluos)[2]
+                    if (min_fluo_cyc_<i.min_reliable_cyc)
+                        fluos_muted=vcat(fill(findmax(fluos)[1],i.min_reliable_cyc-1),fluos[i.min_reliable_cyc:end])
+                        min_fluo_cyc_=findmin(fluos_muted)[2]
+                    end
+                    approx_min_dr2=findmin(abs.(cycles_denser-min_fluo_cyc_))[2]
+                    basecyc_1st=i.min_reliable_cyc
+                    if !(min_fluo_cyc_==i.min_reliable_cyc)
+                        dr2_left2mf=dr2_pred_tm[1:approx_min_dr2-1]
+                        if !(all(dr2_left2mf.<dr2_pred_tm[approx_min_dr2]))
+                            basecyc_1st=Int(floor(cycles_denser[findmax(dr2_left2mf)[2]]))
+                            basecyc_1st=i.min_reliable_cyc<=basecyc_1st?basecyc_1st:i.min_reliable_cyc
+                        end
+                    end
+
+                    if (min_fluo_cyc_==i.num_cycles || length(cycles_denser)==approx_min_dr2)
+                        basecyc_last=i.num_cycles
+                    else
+                        cycmax_dr2=findmax(dr2_pred_tm)[2]
+                        if (cycmax_dr2 == approx_min_dr2)
+                            basecyc_last=Int(floor(cycles_denser[cycmax_dr2]))
+                        else
+                            dr2_right2mf=dr2_pred_tm[approx_min_dr2+1:end]
+                            basecyc_last=Int(floor(cycles_denser[findmax(dr2_right2mf)[2]+approx_min_dr2]))
+                            basecyc_last=i.min_reliable_cyc==basecyc_last?i.num_cycles:basecyc_last
+                        end
+                    end
+                    auto_cycs=basecyc_1st:basecyc_last
+
+                    # my method, also worked:)
+                    # cyc_idx_=Int(floor(cycles_denser[findmax(dr2_pred_tm)[2]]))-1
+                    # println(cyc_idx_)
+                    # if cyc_idx_ <= i.min_reliable_cyc
+                    #     auto_cycs=cyc_idx_==0?bl_cycs():(1:cyc_idx_)
+                    #     baseline = i.SFC_model_def_func(i.bl_method).funcs_pred[:bl](
+                    #                          cycles_denser, bl_fit.coefs...)[1]
+                    # else
+                    #     auto_cycs=i.min_reliable_cyc:cyc_idx_
+                    #     baseline = median(fluos[auto_cycs])
+                    # end
+                else
+                    auto_cycs=i.min_reliable_cyc:i.num_cycles
+                end
             end
+            baseline = median(fluos[auto_cycs])
         else
             auto_cycs=i.baseline_cyc_bounds[1]:i.baseline_cyc_bounds[2]
             baseline = median(fluos[auto_cycs])

@@ -52,8 +52,7 @@ window.App.directive 'statusBar', [
       $scope.is_holding = false
 
       $scope.goToTestKit = ->
-        $state.go('pika_test.exp-running', {id: $scope.footer_experiment.id})
-        # $window.location.href = "/dynexp/pika_test/index.html#/exp-running/" + $scope.footer_experiment.id
+        $state.go('pika_test.experiment-running', {id: $scope.footer_experiment.id})
 
       $scope.$on 'status:data:updated', (e, data, oldData) ->
         return if !data

@@ -46,16 +46,6 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
         if !data.experiment.started_at and !data.experiment.completed_at
           $scope.status = 'NOT_STARTED'
           $scope.runStatus = 'Not run yet.'
-        if data.experiment.started_at and !data.experiment.completed_at
-          if data.experiment.completion_status
-            $scope.status = 'RUNNING'
-            $scope.runStatus = 'Currently running.'
-          else
-            $scope.status = 'COMPLETED'
-            $scope.runStatus = 'Run on:'
-        if data.experiment.started_at and data.experiment.completed_at
-          $scope.status = 'COMPLETED'
-          $scope.runStatus = 'Run on:'
 
     getData()
 

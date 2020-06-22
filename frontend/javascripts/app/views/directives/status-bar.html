@@ -16,70 +16,43 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<div>
-  <!-- <div class="status-bar" ng-show="!show()"></div> -->
-  <div class="status-bar B2" ng-show="show()">
-    <!-- <span class="experiment-result" ng-show="footer_experiment.completed_at && !is_holding" ng-class="footer_experiment.completion_status === 'success' ? 'success' : 'failed'">
-      <span ng-show="footer_experiment.completion_status === 'success'">EXPERIMENT COMPLETE</span>
-    <span ng-show="footer_experiment.completion_status !== 'success'">EXPERIMENT FAILED</span>
+<div class="status-bar CB2-M" ng-show="show()">
+  <span class="idle-state" ng-show="state === 'idle'">No Experiment Running</span>
+  <span class="running-info" ng-show="state !== 'idle'">
+    Experiment in Progress:
+    <span ng-show="footer_experiment.type !== 'test_kit'" class="experiment-name CB2-B" ui-sref="run-experiment({id: footer_experiment.id, chart: 'amplification'})">
+      {{truncate(footer_experiment.name, 50)}}
     </span>
-    <span class="completion-message" ng-show="footer_experiment.completed_at && !is_holding">
-      <span ng-show="footer_experiment.completion_status === 'success'">COMPLETED SUCCESSFULLY</span>
-    <span ng-show="footer_experiment.completion_message">{{footer_experiment.completion_message}}</span>
-    <span ng-show="!footer_experiment.completion_message">
-        <span ng-show="footer_experiment.completion_status === 'aborted' ">ABORTED BY THE USER</span>
-    <span ng-show="footer_experiment.completion_status !== 'aborted' && footer_experiment.completion_status !== 'success' ">{{footer_experiment.completion_status}}</span>
+    <span ng-show="footer_experiment.type === 'test_kit'" class="experiment-name CB2-B" ng-click="goToTestKit()">
+      {{truncate(footer_experiment.name, 50)}}
     </span>
-    <span class="normal">ran {{ footer_experiment.completed_at | amCalendar }}</span>
-    </span> -->
-    <span class="idle-state" ng-show="state === 'idle'">
-      NO EXPERIMENT RUNNING
-    <!-- <span ng-show="footer_experiment.id && !footer_experiment.started_at">{{footer_experiment.name}}
-      <span class="normal">is valid and ready to run</span>
-    </span> -->
+    <span class="time-remaining" ng-show="state === 'running' || is_holding">
+        Time Remaining:
+        <span ng-show="!is_holding" class="CB2-B">{{timeRemaining | secondsDisplay: 'display2'}}</span>
+    <span class="holding" ng-show="is_holding">Holding</span>
     </span>
-    <span class="running-info" ng-show="state !== 'idle'">
-      in progress:
-      <span ng-show="footer_experiment.type !== 'test_kit'" class="experiment-name" ui-sref="run-experiment({id: footer_experiment.id, chart: 'amplification'})">{{truncate(footer_experiment.name, 50)}}</span>
-			<span ng-show="footer_experiment.type === 'test_kit'" class="experiment-name" ng-click="goToTestKit()">{{truncate(footer_experiment.name, 50)}}</span>
-
-<!--       <span class="machine-state">
-        <span class="holding">
-          <span ng-show="state === 'lid_heating'">heating lid</span>
-          <span ng-show="state === 'paused'">paused</span>
-          <span ng-show="state === 'running'">{{thermal_state}}</span>
-        </span>
-      </span> -->
-      <span class="time-remaining" ng-show="state === 'running' || is_holding">
-          TIME REMAINING:
-          <span ng-show="!is_holding">{{timeRemaining | secondsDisplay: 'display2'}}</span>
-      <span class="holding" ng-show="is_holding">HOLDING</span>
+    <span class="temp-info" ng-show="state !== 'lid_heating'">
+        Block: <span class="CB2-B">{{status.heat_block.temperature | round: 1}} &deg;C</span>
       </span>
-      <span class="temp-info" ng-show="state !== 'lid_heating'">
-          BLOCK: {{status.heat_block.temperature | round: 1}} &deg;C
-        </span>
-      <span class="temp-info">
-          LID: {{status.lid.temperature | round: 1}} &deg;C
-      </span>
+    <span class="temp-info">
+        Lid: <span class="CB2-B">{{status.lid.temperature | round: 1}} &deg;C</span>
     </span>
-    <span class="controls-container">
-        <!-- <span class="control" ng-show="state === 'idle' && experiment" experiment-id="footer_experiment.id" duplicate-experiment>DUPLICATE EXPERIMENT</span>
-      <span class="control" ng-show="!footer_experiment.started_at && footer_experiment.id && state === 'idle'" ng-class="{'disabled': footer_experiment.started_at}" ng-click="startExperiment()">BEGIN EXPERIMENT</span> -->
-      <span class="control" ng-show="state === 'paused'" ng-click="resumeExperiment()">
-        <img src="/images/status-resume-btn.png">
-        RESUME
-      </span>
-      <div class="control" ng-show="(footer_experiment.started_at) && (!footer_experiment.completed_at || is_holding) && state !== 'idle' && !stop_confirm_show" ng-click="stopConfirm()">
-        <img src="/images/status-bar-stop-btn.png">
-        <span ng-show="!is_holding">STOP EXPERIMENT</span>
-        <span ng-show="is_holding">END HOLD</span>
-      </div>
-      <div ng-click="stopExperiment()" class="control stop-confirm" ng-show="(footer_experiment.started_at) && (!footer_experiment.completed_at || is_holding) && state !== 'idle' && stop_confirm_show">
-        <input type="text" id="focus-listner-placeholder" ng-blur="inputBlur()">
-        <img src="/images/status-bar-stop-confirm-btn.png">
-        <span ng-show="!is_holding">CONFIRM STOP</span>
-        <span ng-show="is_holding">CONFIRM END HOLD</span>
-      </div>
+  </span>
+  <span class="controls-container">
+    <span class="control" ng-show="state === 'paused'" ng-click="resumeExperiment()">
+      <img src="/images/status-resume-btn.png">
+      Resume
     </span>
-  </div>
+    <div class="control" ng-show="(footer_experiment.started_at) && (!footer_experiment.completed_at || is_holding) && state !== 'idle' && !stop_confirm_show" ng-click="stopConfirm()">
+      <img src="/images/status-bar-stop-btn.png">
+      <span ng-show="!is_holding">Stop Experiment</span>
+      <span ng-show="is_holding">End Hold</span>
+    </div>
+    <div ng-click="stopExperiment()" class="control stop-confirm" ng-show="(footer_experiment.started_at) && (!footer_experiment.completed_at || is_holding) && state !== 'idle' && stop_confirm_show">
+      <input type="text" id="focus-listner-placeholder" ng-blur="inputBlur()">
+      <img src="/images/status-bar-stop-confirm-btn.png">
+      <span ng-show="!is_holding">Confirm Stop</span>
+      <span ng-show="is_holding">Confirm End Hold</span>
+    </div>
+  </span>
 </div>

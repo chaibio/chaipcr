@@ -1,0 +1,23 @@
+@import "../variables.scss";
+
+.chai-mode.pika-exp-running-active{
+  .pika-wrapper{
+    .pika-content{
+      text-align: center;
+      padding: 30px;
+
+      p.description{
+        max-width: 480px;
+        margin: auto;
+      }
+
+      p.time-status{
+        padding-top: 90px;
+      }
+
+      p.digit-time{
+        padding-bottom: 20px;
+      }
+    }
+  }
+}

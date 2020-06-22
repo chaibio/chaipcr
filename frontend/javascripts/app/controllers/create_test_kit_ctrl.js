@@ -171,7 +171,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
                             $scope.creating = false;
                             $scope.error = response.data.errors || "An error occured while trying to create the experiment.";
                         } else {
-                            $state.go('pika_test.setWellsA', {id: new_experiment_id});
+                            $state.go('pika_test.set-wells', {id: new_experiment_id});
                             $scope.$close();
                         }
                     });
@@ -347,7 +347,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
                             $scope.creating = false;
                             $scope.error = response.data.errors || "An error occured while trying to create the experiment.";
                         } else {
-                            $state.go('pika_test.setWellsA', {id: new_experiment_id});
+                            $state.go('pika_test.set-wells', {id: new_experiment_id});
                             $scope.$close();
                         }
                     });

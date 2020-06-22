@@ -84,18 +84,27 @@ App.directive 'aspectRatio', [
 
       resizeTimeout = null
       
-      $scope.$watch (->
-        angular.element(elem).parent().parent().parent().height()        
-      ), (isResize) ->
-        if isResize
-          runAspectRatio()
-          $timeout ->
-            $rootScope.$broadcast 'event:resize-draw-chart'
-          , 100
+      # $scope.$watch (->
+      #   angular.element(elem).parent().parent().parent().height()        
+      # ), (isResize) ->
+      #   if isResize
+      #     runAspectRatio()
+      #     $timeout ->
+      #       $rootScope.$broadcast 'event:resize-draw-chart'
+      #     , 100
 
       $scope.$on 'window:resize', ->
         # console.log('window:resize')
         runAspectRatio()
+        $timeout ->
+          $rootScope.$broadcast 'event:resize-draw-chart'
+        , 100
+
+      $rootScope.$on 'sidemenu:toggle', ->
+        runAspectRatio()
+        $timeout ->
+          $rootScope.$broadcast 'event:resize-draw-chart'
+        , 300
 
       runAspectRatio = (send_event = false) ->
         resizeAspectRatio()

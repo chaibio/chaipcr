@@ -1,0 +1,39 @@
+@import "../variables.scss";
+
+.chai-mode.pika-exp-result-active{
+  .pika-wrapper{
+    .inner-container{
+      min-width: 768px !important;
+    }
+
+    .pika-content{
+      padding: 20px 80px;
+      h3{
+        margin: 0;
+        margin-bottom: 15px;
+        padding-left: 40px;
+      }
+
+      table{
+        width: 100%;
+        tr{
+          &.target-name{
+            td{
+              padding: 0 5px;
+              border-bottom: none;
+
+              h3{
+                margin-top: 30px;
+                padding: 0;
+              }
+            }
+          }
+          td{
+            padding: 10px 5px;
+            border-bottom: 1px solid #bfbfbf;
+          }
+        }
+      }
+    }
+  }
+}

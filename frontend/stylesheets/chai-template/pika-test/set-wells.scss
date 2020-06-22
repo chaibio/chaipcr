@@ -1,0 +1,359 @@
+@import "../variables.scss";
+
+.chai-mode{
+  .pika-wrapper{
+    height: calc(100vh - 40px);
+    position: relative;
+    margin: 0 !important;
+    padding: 0 !important;
+
+    header.exp-header{
+      height: 80px;
+      width: 100%;
+      box-shadow: 1px 1px 1px $section-border-color;
+      padding: 10px 40px;
+      color: $black;
+
+      .sub-caption{
+        display: block;
+        margin-bottom: 5px;
+      }
+    }
+
+    .pika-content{
+      color: $black;
+
+      .well-container{
+        padding: 20px 40px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        height: calc(100vh - 350px);
+        box-shadow: 1px 1px 1px $section-border-color;
+
+        h1{
+          margin: 0 165px 0 40px;
+          border-bottom: 2px solid $black;
+          padding-bottom: 5px;
+          width: 100%;
+        }
+
+        .well-table{
+          width: 100%;
+          .well-row{
+            padding-bottom: 20px;
+            .number{
+              width: 40px;
+              display: inline-block;
+              color: $well-number-color;
+              padding-bottom: 5px;
+            }
+            .name{
+              width: calc(100% - 210px);
+              border-bottom: 1px solid $well-number-color;
+              padding-bottom: 5px;
+              caret-color: $text-cursor-color;
+            }
+            .type{
+              color: transparent;
+              width: 30px;
+              height: 30px;
+              line-height: 28px;
+              background: transparent;
+              border-radius: 50%;
+              text-align: center;
+              margin: 0 25px 0 30px;
+              border: 1px solid $well-type-color;
+              box-sizing: border-box;
+
+              &.positive{
+                &.available{
+                  border: 1px solid $red;
+                  color: $white;
+                  visibility: visible;
+                  background: $red;
+                  font-size: 24px;
+                  line-height: 24px;
+                }
+
+              }
+
+              &.negative{
+                &.available{
+                  border: 1px solid $black;
+                  color: $white;
+                  visibility: visible;
+                  background: $black;
+                  font-size: 24px;
+                  line-height: 24px;
+                }
+              }
+
+              &.available{
+                background: $well-type-color;
+                color: $white;
+              }
+            }
+            .note{
+              width: 30px;
+              height: 25px;
+              margin-right: 45px;
+            }
+          }
+        }
+      }
+      .well-command{
+        padding: 30px 80px;
+        height: 150px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .mini-map{
+          display: flex;
+          align-items: center;
+          table{
+            text-align: center;
+            color: $minimap-color;
+            margin-right: 60px;
+            tr{
+              td{
+                padding: 7px 2px;
+
+                &.map-row-header{
+                  padding-right: 8px;
+                }
+              }
+
+              &.map-col-header{
+                td{
+                  padding: 0;
+                }
+              }
+            }
+          }
+
+          .control-check{
+            position: relative;
+            margin-right: 30px;
+            .well-check{
+              color: $black;
+              position: relative;
+              label{
+                width: 20px;
+                height: 20px;
+                margin: 0;
+                margin-right: 15px;
+                border: 1px solid $cell-border-color;
+                background: $white;
+                border-radius: 2px;
+                padding: 2px;
+                vertical-align: middle;
+                display: inline-block;
+                cursor: pointer;
+                img{
+                  display: block;
+                }
+              }
+            }
+            a{
+              color: $link-text-color;
+              cursor: pointer;
+              margin-left: 35px;
+              display: block;
+              &:hover{
+                text-decoration: none;
+                background: transparent;
+              }
+            }
+
+            span{
+              display: block;
+              color: $black;
+              margin-left: 35px;
+            }
+
+            .omit-tooltip{
+              padding: 20px 40px 20px 20px;
+              position: absolute;
+              width: 440px;              
+              border-radius: 2px;
+              box-shadow: 0 1px 2px $section-border-color;
+              border: 1px solid $well-number-color;
+              top: -220px;
+              background: #fff;
+              a{
+                width: 10px;
+                height: 10px;
+                display: block;
+                position: absolute;
+                right: 20px;
+                top: 20px;
+                margin: 0;
+                img{
+                  display: block;
+                }
+              }
+            }
+          }
+        }
+
+        .type{
+          color: transparent;
+          width: 24px;
+          height: 24px;
+          line-height: 22px;
+          background: transparent;
+          border-radius: 50%;
+          text-align: center;
+          margin: 0;
+          border: 1px solid $well-type-color;
+          box-sizing: border-box;
+          transition: all 0.2s;
+
+          &.active{
+            transform: scale(1.15);
+          }
+
+          &.positive{
+            background: $white;
+            &.available{
+              border: 1px solid $red;
+              color: $white;
+              background: $red;
+              font-size: 20px;
+              line-height: 18px;
+            }
+
+          }
+
+          &.negative{
+            background: $white;
+            &.available{
+              border: 1px solid $black;
+              color: $white;
+              visibility: visible;
+              background: $black;
+              font-size: 20px;
+              line-height: 18px;
+            }
+          }
+
+          &.available{
+            background: $well-type-color;
+            color: $white;
+          }
+        }
+
+        button.button-start-exp{
+          background: #fff;
+          border: 1px solid $black;
+          height: 50px;
+          line-height: 30px;
+          color: $black;
+          width: 200px;
+          border-radius: 2px;
+          padding: 0;
+
+          &:hover{
+            background: $black;
+            color: $white;
+          }
+        }
+
+        button.button-confirm-exp{
+          background: $link-text-color;
+          border: 1px solid $link-text-color;
+          height: 50px;
+          line-height: 30px;
+          color: $white;
+          width: 200px;
+          border-radius: 2px;
+          padding: 0;
+        }
+      }
+    }
+  }
+}
+
+.pika-set-well-active, 
+.pika-exp-result-active{
+  .modal-backdrop{
+    background: transparent !important;
+  }
+
+  input{
+    border: none;
+    outline: none;
+  }
+
+  .modal-dialog{
+    width: 280px;
+    position: absolute;
+    margin: 0;
+    .modal-content{
+      border-radius: 2px;
+      box-shadow: 0 1px 2px $section-border-color;
+      border-color: $well-number-color;      
+
+      .notes-box{
+        padding: 10px 10px 15px 10px;
+        .notes-textarea{
+          margin-bottom: 15px;
+          text-align: left;
+          border: none;
+          border-bottom: 1px solid $well-number-color;
+          outline: none;
+          border-radius: 0;
+          width: 100%;
+          color: $black;
+        }
+
+        .notes-buttons{
+          position: relative;
+          text-align: center;
+          .notes-commit, .notes-cancel{
+            border-radius: 2px;
+            height: 25px;
+            border: 1px solid $black;
+            line-height: 20px;
+            width: 80px;
+          }
+
+          .notes-commit{
+            background: $black;
+            color: $white;
+            margin-right: 5px;
+            &:hover{
+              background: $white;
+              color: $black;
+            }
+          }
+
+          .notes-cancel{
+            background: $white;
+            color: $black;
+            &:hover{
+              background: $black;
+              color: $white;
+            }
+          }
+        }
+
+        .well-number{
+          width: 25px;
+          height: 25px;
+          border: 1px solid #000;
+          background: #ffffff;
+          position: absolute;
+          color: #000;
+          left: 0;
+          top: 0;
+          margin: 0;
+          border-radius: 50%;
+          line-height: 23px;
+        }
+
+      }
+    }
+  }
+}

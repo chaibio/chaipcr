@@ -1,0 +1,163 @@
+
+@font-face {
+  font-family: "DINOT--Light";
+  font-weight: normal;
+  font-style: normal;
+  src: url("/fonts/dinot/DINOT-Light.eot");
+  src: url("/fonts/dinot/DINOT-Light.eot?#iefix") format("eot"),
+  url("/fonts/dinot/DINOT-Light.woff") format("woff"),
+  url("/fonts/dinot/DINOT-Light.otf") format("otf");
+}
+
+@font-face {
+  font-family: "DINOT--Medium";
+  font-weight: normal;
+  font-style: normal;
+  src: url("/fonts/dinot/DINOT-Medium.eot");
+  src: url("/fonts/dinot/DINOT-Medium.eot?#iefix") format("eot"),
+  url("/fonts/dinot/DINOT-Medium.woff") format("woff"),
+  url("/fonts/dinot/DINOT-Medium.otf") format("otf");
+}
+
+@font-face {
+  font-family: "DINOT--Regular";
+  font-weight: normal;
+  font-style: normal;
+  src: url("/fonts/dinot/DINOT-Regular.eot");
+  src: url("/fonts/dinot/DINOT-Regular.eot?#iefix") format("eot"),
+  url("/fonts/dinot/DINOT-Regular.woff") format("woff"),
+  url("/fonts/dinot/DINOT-Regular.otf") format("otf");
+}
+
+@font-face {
+  font-family: "DINOT--Bold";
+  src: url("/fonts/dinot/DINOT-Bold.eot");
+  src: url("/fonts/dinot/DINOT-Bold.eot?#iefix") format("eot"),
+  url("/fonts/dinot/DINOT-Bold.woff") format("woff"),
+  url("/fonts/dinot/DINOT-Bold.otf") format("otf");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@import "./variables.scss";
+.chai-mode{
+  .CH1{
+    font-family: 'DINOT--Bold', Arial, sans-serif;
+    font-size: 18px;
+    line-height: 26px;
+  }
+
+  .CH1-M{
+    font-family: 'DINOT--Medium', Arial, sans-serif;
+    font-size: 18px;
+    line-height: 26px;
+  }
+
+  .CB1{
+    font-family: 'DINOT--Regular', Arial, sans-serif;
+    font-size: 16px;
+    line-height: 21px;
+  }
+
+  .CB1-M{
+    font-family: 'DINOT--Medium', Arial, sans-serif;
+    font-size: 16px;
+    line-height: 21px;
+  }
+
+  .CB1-B{
+    font-family: 'DINOT--Bold', Arial, sans-serif;
+    font-size: 16px;
+    line-height: 21px;
+  }
+
+  .CB2{
+    font-family: 'DINOT--Regular', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .CB2-M{
+    font-family: 'DINOT--Medium', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .CB2-B{
+    font-family: 'DINOT--Bold', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .CB2-L{
+    font-family: 'DINOT--Light', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .CB3{
+    font-family: 'DINOT--Regular', Arial, sans-serif;
+    font-size: 12px;
+    line-height: 15px;
+  }
+
+  .CB3-M{
+    font-family: 'DINOT--Medium', Arial, sans-serif;
+    font-size: 12px;
+    line-height: 15px;
+  }
+
+  .CB3-L{
+    font-family: 'DINOT--Light', Arial, sans-serif;
+    font-size: 12px;
+    line-height: 15px;
+  }
+
+  .CL1{
+    font-family: 'DINOT--Medium', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .CL2{
+    font-family: 'DINOT--Medium', Arial, sans-serif;
+    font-size: 12px;
+    line-height: 15px;
+  }
+
+  .CG1{
+    font-family: 'DINOT--Regular', Arial, sans-serif;
+    font-size: 10px;
+    line-height: 12px;
+  }
+
+  .CG2{
+    font-family: 'DINOT--Regular', Arial, sans-serif;
+    font-size: 9px;
+    line-height: 11px;    
+  }
+
+  .CX1-L{
+    font-family: 'DINOT--Light', Arial, sans-serif;
+    font-size: 140px;
+    line-height: 160px;
+  }
+
+  .CX2{
+    font-family: 'DINOT--Regular', Arial, sans-serif;
+    font-size: 22px;
+    line-height: 28px;
+  }
+
+  .CX3-M{
+    font-family: 'DINOT--Medium', Arial, sans-serif;
+    font-size: 20px;
+    line-height: 24px;
+  }
+
+  .CX4{
+    font-family: 'DINOT--Regular', Arial, sans-serif;
+    font-size: 18px;
+    line-height: 20px;
+  }
+}

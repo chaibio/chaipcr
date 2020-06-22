@@ -13,6 +13,19 @@
 				url: '/dynexp/pika-test',
 				templateUrl: 'dynexp/pika_test/index.html'
 			})
+			.state('pika_test.set-wells', {
+				url: '/set-wells/:id',
+				templateUrl: 'dynexp/pika_test/views/v2/set-wells.html'
+			})
+			.state('pika_test.experiment-running', {
+				url: '/experiment-running/:id',
+				templateUrl: 'dynexp/pika_test/views/v2/exp-running.html'
+			})
+			.state('pika_test.experiment-result', {
+				url: '/experiment-result/:id',
+				templateUrl: 'dynexp/pika_test/views/v2/exp-result.html'
+			})
+
 			.state('pika_test.introduction', {
 				url: '/introduction',
 				templateUrl: 'dynexp/pika_test/views/intro.html'
