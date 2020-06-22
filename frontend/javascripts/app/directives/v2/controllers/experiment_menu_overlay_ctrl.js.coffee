@@ -34,6 +34,7 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
     $scope.showProperties = false
     $scope.status = null
     $scope.exp = null
+    $scope.well_layout = null
     $scope.exp_type = ''
     $scope.errorExport = false
     $scope.exporting = false
@@ -152,7 +153,22 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
 
         $scope.maxCycle = AmplificationChartHelper.getMaxExperimentCycle data.experiment
 
+    $scope.getWellLayout = ->
+      Experiment.getWellLayout($stateParams.id).then (data) ->
+        $scope.well_layout = data.data
+
+    $scope.hasStandardTarget = ->
+      if $scope.well_layout        
+        std_wells = _.filter $scope.well_layout, (item) ->
+          if item.targets
+            std_targets = _.filter item.targets, (target) ->
+              target.well_type == 'standard'
+            return std_targets.length > 0
+        return std_wells.length > 0
+      return false
+
     $scope.getExperiment()
+    $scope.getWellLayout()
 
     $scope.hasMeltCurve = ->
       return if $scope.exp then Experiment.hasMeltCurve($scope.exp) else false
@@ -161,7 +177,8 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
       return if $scope.exp then Experiment.hasAmplificationCurve($scope.exp) else false
 
     $scope.hasStandardCurve = ->
-      return if $scope.exp then Experiment.hasStandardCurve($scope.exp) else false
+      return if $scope.exp then Experiment.hasStandardCurve($scope.exp) and $scope.hasStandardTarget() else false
+
     $scope.cancelExperiment = ->
       Experiment.stopExperiment($stateParams.id).then (data) ->
         $state.go 'home'
