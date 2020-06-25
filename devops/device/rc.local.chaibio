@@ -225,7 +225,6 @@ run_migrate_on_upgrade () {
 			mount -o remount,ro ${sdcard}/factory/ || :
 		fi
 
-
 		rm ${sdcard}/upgrade/upgrade_autorun.flag || :
         	echo "Upgrade autorun flag down.."
 
@@ -633,6 +632,35 @@ create_swapfile () {
         free -m
 }
 
+function replace_in_file () {
+	filename=$1
+	if [ -e $filename ]
+	then
+		echo Replacing strings in $filename
+		if [ -e $filename.org ]
+		then
+			echo file processed before
+		else
+			cp $filename $filename.org
+		fi
+		full_string=$(cat $filename)
+                search_string=$2
+                replace_string=$3
+		updated_file=${full_string/$search_string/$replace_string}
+		echo "$updated_file">${filename}
+	else
+		echo File not found: $filename
+	fi
+}
+
+function upgrade_interfaces () {
+	if [ -e ${sdcard}/factory/upgrade_autorun.flag ] || [ -e ${sdcard}/upgrade/upgrade_autorun.flag ]
+	then
+		echo upgrading /etc/network/interfaces
+		replace_in_file /etc/network/interfaces "auto wl" "allow-hotplug wl"
+	fi
+}
+
 check_upgrade_autorun () {
 	sdcard_dev=""
 	if [ -e /dev/mmcblk0p3 ]
@@ -670,6 +698,7 @@ check_upgrade_autorun () {
 		fi
 
 		create_swapfile &
+		upgrade_interfaces
                 update_wireless_network
                 update_ethernet_network
 		change_root_password_on_factorysettings
