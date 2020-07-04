@@ -646,6 +646,7 @@ perform_upgrade () {
 	reset_update_uenv_with_verification 2
        	remove_upgrade_flags
 	reset_uenv
+ 	sh ${sdcard_p1}/scripts/setup_touchcontroller.sh || true	
         alldone
         exit 0
 }
@@ -1001,6 +1002,7 @@ reset_update_uenv_with_verification 1
 remove_upgrade_flags
 reset_uenv
 reset_s2
+sh ${sdcard_p1}/scripts/setup_touchcontroller.sh || true
 echo "eMMC Flasher: all done!"
 sync
 

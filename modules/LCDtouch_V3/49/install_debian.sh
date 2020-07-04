@@ -44,5 +44,19 @@ else
 	exit 1
 fi
 
+cd ../ft5x0x
+make
+if [ -e ft5x0x_ts.ko ]
+then
+	cp ft5x0x_ts.ko /lib/modules/$(shell uname -r)/kernel/drivers/input/touchscreen
+	depmod -a
+else
+	echo Error compiling ft5x0x touch driver
+	exit 1
+fi
+
+echo ilitek_aimv20 > /etc/modules-load.d/chaibio_touch_controller.conf
+
 sync
+
 exit 0

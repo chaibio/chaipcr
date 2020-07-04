@@ -305,9 +305,11 @@ start_julia () {
 			fi
 			echo $msg
 			mv julia.log crashjulia/julia-$timestamp.log
+			msg="Spawning from a Julia exit($exitcode) on $timestamp"
                         echo $msg >> julia.log
 			cd crashjulia
 			tar czf julia-$timestamp.log.tgz julia-$timestamp.log --remove-files &
+			find /var/log/crashjulia/ -mtime +10 -type f -delete
 
 			if [ $exitcode -eq 101 ]
 			then
@@ -704,6 +706,10 @@ check_upgrade_autorun () {
 		change_root_password_on_factorysettings
 #               retain_previous_user_credentials_on_upgrade
 		run_migrate_on_upgrade_logged
+		if [ -e /sdcard/upgrade/scripts/setup_touchcontroller.sh ]
+		then
+			/sdcard/upgrade/scripts/setup_touchcontroller.sh
+		fi
 		return 0
 	fi
 

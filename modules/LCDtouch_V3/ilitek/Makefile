@@ -13,8 +13,6 @@ install:
 	cp CHAI-LCDtouch5-00A0.dtbo /lib/firmware/CHAI-LCDtouch5-00A0.dtbo
 	cp ilitek_aimv20.ko /lib/modules/$(shell uname -r)/kernel/drivers/input/touchscreen
 	depmod -a
-	echo ilitek_aimv20 > /etc/modules-load.d/ilitek_aimv20.conf
-	rm -rf /etc/modules-load.d/ft5x0x_ts.conf
 	sync
 
 install_mod:
