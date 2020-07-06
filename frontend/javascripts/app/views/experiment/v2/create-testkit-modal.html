@@ -1,0 +1,93 @@
+<div class="choose-testkit-box">
+	<div class="dialog-header">
+		<label class="CX3-B title">{{modal_title}}</label>
+		<label class="dialog-close" ng-click="$dismiss()">
+			<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 5"><rect x="2.25" y="-0.79" width="0.5" height="6.57" transform="translate(-1.04 2.5) rotate(-45)"/><rect x="-0.79" y="2.25" width="6.57" height="0.5" transform="translate(-1.04 2.5) rotate(-45)"/></svg>
+		</label>
+	</div>
+	<div class="dialog-content" ng-class="{'no-padding': current_step == 'multi_kit', 'single-kit': current_step == 'signle_kit'}">
+		<div class="manufacture-selector" ng-if="current_step == 'brand'">
+			<ul>
+				<li 
+					ng-repeat="item in brands" 
+					ng-click="selectBrand(item)" 
+					ng-class="{selected: selected_brand.name == item.name}">
+					<img ng-src="{{item.logo}}">
+				</li>
+			</ul>
+		</div>
+		<div class="signle-kit" ng-if="current_step == 'signle_kit'">
+			<table>
+				<tr class="header"><td class="CX5">Kit Name</td></tr>
+				<tr ng-repeat="item in test_kits">
+					<td>
+						<label class="CX5"
+							ng-class="{active: item.name == selected_kit_1.name}" 
+							ng-click="onSelectKit1(item)">{{item.name}}</label>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="multi-kit" ng-if="current_step == 'multi_kit'">
+			<div class="kit-header">
+				<div class="kit-selector">
+					<label class="CX5-M" ng-click="onSelectKitType('one')" ng-class="{active: current_kit_type == 'one'}">One Kit</label>
+					<label class="CX5-M" ng-click="onSelectKitType('two')" ng-class="{active: current_kit_type == 'two'}">Two Kits</label>
+				</div>
+			</div>
+			<div class="kit-list">
+				<table>
+					<tr class="header">
+						<td class="CX5">1</td>
+						<td class="CX5" ng-if="current_kit_type == 'two'">2</td>
+						<td class="CX5">Kit Name</td>
+						<td></td>
+					</tr>
+					<tr><td></td><td ng-if="current_kit_type == 'two'"></td><td class="CX5-M">Bacteria 4e Kits</td></tr>
+					<tr ng-repeat="item in test_kits" ng-if="item.category == 'Bacteria 4e Kits'">
+						<td>
+							<div class="checkbox-wrapper CX5" ng-click="onSelectKit1(item)" ng-class="{ 'selected': item.name == selected_kit_1.name}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+						</td>
+						<td ng-if="current_kit_type == 'two'">
+							<div class="checkbox-wrapper CX5" ng-click="onSelectKit2(item)" ng-class="{ 'selected': item.name == selected_kit_2.name}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+						</td>
+						<td>
+							<label class="CX5"
+								ng-class="{active: item.name == selected_kit_1.name}">{{item.name}}</label>
+						</td>
+						<td class="CX5">{{item.kit_id}}</td>
+					</tr>
+					<tr><td></td><td ng-if="current_kit_type == 'two'"></td><td class="CX5-M">Yeast 4e Kits</td></tr>
+					<tr ng-repeat="item in test_kits" ng-if="item.category == 'Yeast 4e Kits'">
+						<td>
+							<div class="checkbox-wrapper CX5" ng-click="onSelectKit1(item)" ng-class="{ 'selected': item.name == selected_kit_1.name}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+						</td>
+						<td ng-if="current_kit_type == 'two'">
+							<div class="checkbox-wrapper CX5" ng-click="onSelectKit2(item)" ng-class="{ 'selected': item.name == selected_kit_2.name}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
+						</td>
+						<td>
+							<label class="CX5"
+								ng-class="{active: item.name == selected_kit_1.name}" 
+								ng-click="onSelectKit1(item)">{{item.name}}</label>
+						</td>
+						<td class="CX5">{{item.kit_id}}</td>
+					</tr>
+				</table>	
+			</div>
+		</div>
+	</div>
+	<div class="dialog-footer">
+		<a href="" ng-click="onBackStep()" class="button-continue CX5">{{back_button_name}}</a>
+		<a href="" ng-click="onNextStep()" class="button-continue CX5" 
+			ng-class="{
+				active: (current_step=='brand' && selected_brand) || 
+						(current_step=='signle_kit' && selected_kit_1) || 
+						(current_step=='multi_kit' && current_kit_type=='one' && selected_kit_1) ||
+						(current_step=='multi_kit' && current_kit_type=='two' && selected_kit_2 && selected_kit_1),
+				disabled: (current_step=='brand' && !selected_brand)  || 
+						(current_step=='signle_kit' && !selected_kit_1) ||
+						(current_step=='multi_kit' && current_kit_type=='one' && !selected_kit_1) ||
+						(current_step=='multi_kit' && current_kit_type=='two' && (!selected_kit_2 || !selected_kit_1)),
+			}">{{action_button_name}}<ellipsis-animated ng-if="creating"></ellipsis-animated></a>
+	</div>
+</div>

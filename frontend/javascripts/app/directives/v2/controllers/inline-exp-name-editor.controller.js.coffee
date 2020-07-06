@@ -42,18 +42,19 @@ window.ChaiBioTech.ngApp.controller 'InlineExpNameEditorCtrl', [
     $scope.adjustTextWidth = () ->
       $timeout (() ->
         field_width = Math.max(document.getElementById('exp_name_plat').offsetWidth + 20, 150)
-        angular.element(document.getElementById('exp_name_field')).css('width', (field_width) + 'px')
+        angular.element(document.getElementById('inline_exp_name_field')).css('width', (field_width) + 'px')
       ), 10
 
     $scope.focusExpName = ->
       field_width = Math.max(document.getElementById('exp_name_plat').offsetWidth + 20, 150)
-      angular.element(document.getElementById('exp_name_field')).css('width', (field_width) + 'px')
+      console.log(field_width)
+      angular.element(document.getElementById('inline_exp_name_field')).css('width', (field_width) + 'px')
       
       $scope.ori_experiment_name = $scope.experiment.name
       $scope.removeMessages()
       $scope.editExpNameMode = true
       focus('editExpNameMode')
-      document.getElementById('exp_name_field').select()
+      document.getElementById('inline_exp_name_field').select()
 
     $scope.cancelExpName = ->      
       $scope.editModeOff()
