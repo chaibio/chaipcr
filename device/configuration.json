@@ -3,7 +3,8 @@
 		"version": "1.1.1.BUILD_NUMBER",
 		"platform": "S0100",
 		"data_partition_free_soft_limit": 40,
-		"data_partition_free_hard_limit": 30
+		"data_partition_free_hard_limit": 30,
+		"touch_controller": "ft5x0x_ts"
 	},
 	"thermal": {
 		"lid": {

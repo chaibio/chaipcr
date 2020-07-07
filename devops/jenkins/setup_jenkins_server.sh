@@ -5,8 +5,14 @@ wget -q -O - http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key | sudo apt-key 
 sh -c 'echo deb http://pkg.jenkins-ci.org/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
 apt update
 apt install openjdk-8-jdk-headless openjdk-8-jre-headless curl
-apt install jenkins git nginx
+apt install jenkins git nginx sshpass hdparm
 ufw app list
+
+echo HostKey /etc/ssh/ssh_host_rsa_key >> /etc/ssh/sshd_config
+echo HostKey /etc/ssh/ssh_host_dsa_key >> /etc/ssh/sshd_config
+echo HostKey /etc/ssh/ssh_host_ecdsa_key >> /etc/ssh/sshd_config
+echo HostKey /etc/ssh/ssh_host_ed25519_key >> /etc/ssh/sshd_config
+service sshd restart
 
 mkdir -p /usr/share/nginx/html/download/support_files/
 chmod 777 /usr/share/nginx/html/download/*
