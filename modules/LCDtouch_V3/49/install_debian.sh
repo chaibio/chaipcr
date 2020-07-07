@@ -48,7 +48,7 @@ cd ../ft5x0x
 make
 if [ -e ft5x0x_ts.ko ]
 then
-	cp ft5x0x_ts.ko /lib/modules/$(shell uname -r)/kernel/drivers/input/touchscreen
+	cp ft5x0x_ts.ko /lib/modules/$(uname -r)/kernel/drivers/input/touchscreen
 	depmod -a
 else
 	echo Error compiling ft5x0x touch driver
