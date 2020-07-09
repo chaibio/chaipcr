@@ -40,14 +40,14 @@ window.ChaiBioTech.ngApp.controller 'InlineExpNameEditorCtrl', [
     $scope.ori_experiment_name = ''
 
     $scope.adjustTextWidth = () ->
-      $timeout (() ->
-        field_width = Math.max(document.getElementById('exp_name_plat').offsetWidth + 20, 150)
-        angular.element(document.getElementById('inline_exp_name_field')).css('width', (field_width) + 'px')
-      ), 10
+      # $timeout (() ->
+      #   field_width = Math.max(document.getElementById('inline_exp_name_plat').offsetWidth + 20, 150)
+      #   angular.element(document.getElementById('inline_exp_name_field')).css('width', (field_width) + 'px')
+      # ), 10
+      return
 
     $scope.focusExpName = ->
-      field_width = Math.max(document.getElementById('exp_name_plat').offsetWidth + 20, 150)
-      console.log(field_width)
+      field_width = Math.max(document.getElementById('inline_exp_name_plat').offsetWidth + 20, 150)
       angular.element(document.getElementById('inline_exp_name_field')).css('width', (field_width) + 'px')
       
       $scope.ori_experiment_name = $scope.experiment.name
@@ -65,7 +65,7 @@ window.ChaiBioTech.ngApp.controller 'InlineExpNameEditorCtrl', [
       $scope.errors = null
 
     $scope.editModeOff = ->
-      angular.element(document.getElementById('exp_name_plat')).css('width', 'auto')
+      angular.element(document.getElementById('inline_exp_name_plat')).css('width', 'auto')
       $scope.editExpNameMode = false
 
     $scope.saveExperiment = (exp)->
