@@ -21,8 +21,8 @@
               <td>Sample</td>
               <td style="width:35px"></td>
               <td style="width:100px; white-space: nowrap;">Result</td>
-              <td style="width:100px">{{targets[0].name}} C<sub>q</sub></td>
-              <td style="width:100px">{{target_ipc.name}} C<sub>q</sub></td>
+              <td style="width:100px" class="text-center">{{targets[0].name}} C<sub>q</sub></td>
+              <td style="width:100px" class="text-center">{{target_ipc.name}} C<sub>q</sub></td>
               <td style="width:50px"></td>
             </tr>
             <tr ng-if="x && (x.name != '' && x.name != 'empty')" 
@@ -31,10 +31,10 @@
               <td ng-if="$index >= 8">B{{$index - 7}}</td>
               <td class="CB2-M">{{x.name}}</td>
               <td>
-                <img ng-if="result[$index] == 'Valid'" style="width:20px"  src="/images/dynexp/pika-test/res_valid.svg">
-                <img ng-if="result[$index] == 'Invalid' || result[$index] == 'Invalid - NTC Control Failed' || result[$index] == 'Invalid - Positive Control Failed'" style="width:20px"  src="/images/dynexp/pika-test/res_invalid.svg">
-                <img ng-if="result[$index] == 'Positive'" style="width:20px"  src="/images/dynexp/pika-test/res_pos.svg">
-                <img ng-if="result[$index] == 'Inhibited'" style="width:20px"  src="/images/dynexp/pika-test/res_inhib.svg">
+                <img ng-if="result[$index] == 'Valid'" style="width:20px"  src="/images/Valid.svg">
+                <img ng-if="result[$index] == 'Invalid' || result[$index] == 'Invalid - NTC Control Failed' || result[$index] == 'Invalid - Positive Control Failed'" style="width:20px"  src="/images/Invalid.svg">
+                <img ng-if="result[$index] == 'Positive'" style="width:20px"  src="/images/Positive.svg">
+                <img ng-if="result[$index] == 'Inhibited'" style="width:20px"  src="/images/Inhibited.svg">
               </td>
               <td style="white-space: nowrap;">{{result[$index]}}</td>
               <td class="text-center"><span ng-show="famCq[$index]">{{famCq[$index] | round:2}}</span></td>
@@ -57,14 +57,14 @@
               <td class="CB2-M">{{x.name}}</td>
 
               <td ng-if="$index < 2" class="text-center" style="width:35px">
-                <img ng-show="result[$index] == 'Valid'" style="width:20px"  src="/images/dynexp/pika-test/res_valid.svg">
-                <img ng-show="result[$index] == 'Invalid'" style="width:20px"  src="/images/dynexp/pika-test/res_invalid.svg">
+                <img ng-show="result[$index] == 'Valid'" style="width:20px"  src="/images/Valid.svg">
+                <img ng-show="result[$index] == 'Invalid'" style="width:20px"  src="/images/Invalid.svg">
               </td>
               <td ng-if="$index >= 2" class="text-center" style="width:35px">
-                <img ng-show="result[$index] == 'Positive'" style="width:20px"  src="/images/dynexp/pika-test/res_pos.svg">
-                <img ng-show="result[$index] == 'Negative'" style="width:20px"  src="/images/dynexp/pika-test/res_neg.svg">
-                <img ng-show="result[$index] == 'Inhibited'" style="width:20px"  src="/images/dynexp/pika-test/res_inhib.svg">
-                <img ng-show="result[$index] == 'Unknown'" style="width:20px"  src="/images/dynexp/pika-test/res_inhib.svg">
+                <img ng-show="result[$index] == 'Positive'" style="width:20px"  src="/images/Positive.svg">
+                <img ng-show="result[$index] == 'Negative'" style="width:20px"  src="/images/Negative.svg">
+                <img ng-show="result[$index] == 'Inhibited'" style="width:20px"  src="/images/Inhibited.svg">
+                <img ng-show="result[$index] == 'Unknown'" style="width:20px"  src="/images/Inhibited.svg">
               </td>
               <td style="width:80px"><span ng-show="famCq[$index]">{{famCq[$index] | round:2}}</span></td>
               <td style="width:80px">{{result[$index]}}</td>
@@ -88,14 +88,14 @@
               <td class="CB2-M">{{x.name}}</td>
 
               <td ng-if="$index < 10" class="text-center">
-                <img ng-show="result[$index] == 'Valid'" style="width:20px"  src="/images/dynexp/pika-test/res_valid.svg">
-                <img ng-show="result[$index] == 'Invalid'" style="width:20px"  src="/images/dynexp/pika-test/res_invalid.svg">
+                <img ng-show="result[$index] == 'Valid'" style="width:20px"  src="/images/Valid.svg">
+                <img ng-show="result[$index] == 'Invalid'" style="width:20px"  src="/images/Invalid.svg">
               </td>
               <td ng-if="$index >= 10" class="text-center">
-                <img ng-show="result[$index] == 'Positive'" style="width:20px"  src="/images/dynexp/pika-test/res_pos.svg">
-                <img ng-show="result[$index] == 'Negative'" style="width:20px"  src="/images/dynexp/pika-test/res_neg.svg">
-                <img ng-show="result[$index] == 'Inhibited'" style="width:20px"  src="/images/dynexp/pika-test/res_inhib.svg">
-                <img ng-show="result[$index] == 'Unknown'" style="width:20px"  src="/images/dynexp/pika-test/res_inhib.svg">
+                <img ng-show="result[$index] == 'Positive'" style="width:20px"  src="/images/Positive.svg">
+                <img ng-show="result[$index] == 'Negative'" style="width:20px"  src="/images/Negative.svg">
+                <img ng-show="result[$index] == 'Inhibited'" style="width:20px"  src="/images/Inhibited.svg">
+                <img ng-show="result[$index] == 'Unknown'" style="width:20px"  src="/images/Inhibited.svg">
               </td>
               <td><span ng-show="famCq[$index]">{{famCq[$index] | round:2}}</span></td>
               <td>{{result[$index]}}</td>
