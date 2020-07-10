@@ -70,7 +70,8 @@
       </div>
       <div class="side-menu-menu-box" ng-if="status == 'RUNNING'">
         <div class="CB2-M">
-          <span ui-sref="pika_test.experiment-running({id: params.id})">Experiment In Progress</span>
+          <span ui-sref="pika_test.experiment-running({id: params.id})" ng-if="exp_type && exp_type == 'test_kit'">Experiment In Progress</span>
+          <span ng-if="exp_type && exp_type != 'test_kit'">Experiment In Progress</span>
         </div>
         <button class="side-menu-button CB2-M" ng-click="setConfirmCancel(true)" ng-if="!getConfirmCancel()">Cancel</button>
         <button class="side-menu-button CB2-M confirm-cancel" ng-click="cancelExperiment(params.id)" ng-if="getConfirmCancel()">Confirm Cancel</button>
