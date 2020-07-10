@@ -400,6 +400,14 @@
         var type_index = (well_row == 'A') ? index : index + 8;
         return ($scope.well_types[type_index] == 'positive_control' || $scope.well_types[type_index] == 'negative_control');
       };
+
+      $scope.learnMoreClick = function(is_positive){
+        if(is_positive){
+          $scope.omit_negative_help = false; $scope.omit_positive_help = !$scope.omit_positive_help;
+        } else {
+          $scope.omit_positive_help = false; $scope.omit_negative_help = !$scope.omit_negative_help;
+        }
+      };
     }
   ]);
 })();
