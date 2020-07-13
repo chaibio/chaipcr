@@ -1,0 +1,9 @@
+/var/log/julia.log {	
+    rotate 10
+    daily	
+    missingok	
+    notifempty	
+    delaycompress	
+    compress	
+    copytruncate	
+}	

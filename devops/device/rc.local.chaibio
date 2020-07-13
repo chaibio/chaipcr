@@ -297,18 +297,8 @@ start_julia () {
 			timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
 			msg="Julia exit($exitcode) on $timestamp"
 			cd /var/log
-			echo $msg>>julia.log
-			if ! [ -e crashjulia ]
-			then
-			        echo creating crashjulia
-			        mkdir crashjulia
-			fi
 			echo $msg
-			mv julia.log crashjulia/julia-$timestamp.log
-                        echo $msg >> julia.log
-			cd crashjulia
-			tar czf julia-$timestamp.log.tgz julia-$timestamp.log --remove-files &
-
+			/usr/sbin/logrotate -vf /etc/logrotate.d/julia
 			if [ $exitcode -eq 101 ]
 			then
 			        echo Disabling Julia watchdog
