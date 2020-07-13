@@ -298,7 +298,7 @@ start_julia () {
 			msg="Julia exit($exitcode) on $timestamp"
 			cd /var/log
 			echo $msg
-			/usr/sbin/logrotate -vf /etc/logrotate.d/julia
+			/usr/sbin/logrotate -vf /etc/logrotate.d/julia || true
 			if [ $exitcode -eq 101 ]
 			then
 			        echo Disabling Julia watchdog
