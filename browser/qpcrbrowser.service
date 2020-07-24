@@ -3,7 +3,7 @@ Description=QPCRBrowser
 
 [Service]
 WorkingDirectory=/root/tmp/
-#ExecStartPre=/bin/sh -c 'echo LCDtouch5 > /sys/devices/bone_capemgr.9/slots'
+ExecStartPre=/bin/sh -c '/root/chaipcr/deploy/device/check_touch_controller.sh'
 #ExecStart=/bin/sh -c '/root/tmp/qpcrbrowser -qws -display VNC:0' #It will start browser with VNC server. Usually on 5900 port
 ExecStart=/bin/sh -c '/root/tmp/qpcrbrowser -qws' #It will start browser for LCD display
 SyslogIdentifier=QPCRBrowser

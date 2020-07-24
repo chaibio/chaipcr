@@ -5,6 +5,7 @@ reboot_needed=1
 set_touch_driver () {
 	lib=$1
 	reboot_needed=1
+	echo "Setting $lib touch controller"
 	if [ -e /lib/modules/$(uname -r)/kernel/drivers/input/touchscreen/$lib.ko ]
 	then
 		if grep $lib /etc/modules-load.d/chaibio_touch_controller.conf
@@ -21,17 +22,7 @@ set_touch_driver () {
 }
 
 setup_touch_controller_by_i2c() {
-	if [ -d /sys/class/i2c-dev/i2c-2/device/2-0041 ]
-	then
-		set_touch_driver ilitek_aimv20
-		exit $reboot_needed
-	elif [ -d /sys/class/i2c-dev/i2c-2/device/2-0038 ]
-	then
-	        set_touch_driver ft5x0x_ts
-		exit $reboot_needed
-	else
-		echo No i2c representation.
-	fi
+
 	if [ -e /perm/device.json ]
 	then
 		echo device.json found
@@ -55,7 +46,18 @@ setup_touch_controller_by_i2c() {
         	        echo "Touch driver directive not found in device.json"
 		fi
 	else
-		echo "Cannot find the right touch driver"
+		echo "Cannot find /perm/device.json"
+		if [ -d /sys/class/i2c-dev/i2c-2/device/2-0041 ]
+		then
+			set_touch_driver ilitek_aimv20
+			exit $reboot_needed
+		elif [ -d /sys/class/i2c-dev/i2c-2/device/2-0038 ]
+		then
+	        	set_touch_driver ft5x0x_ts
+			exit $reboot_needed
+		else
+			echo No i2c representation.
+		fi
 	fi
 
 	if [ $reboot_needed -eq 0 ]
