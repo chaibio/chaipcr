@@ -752,7 +752,7 @@ fi
 echo "packaging factory scripts in upgrade image."
 cp -r ${output_dir}/p1/* $temp/$factory_scripts
 
-if tar cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs $image_filename_perm $image_filename_format_data $checksums_filename $upgrade_scripts $config_filenames $factory_scripts --exclude=factory_settings.img.tar
+if tar cvf --exclude=factory_settings.img.tar $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs $image_filename_perm $image_filename_format_data $checksums_filename $upgrade_scripts $config_filenames $factory_scripts
 then
 	echo $image_filename_upgrade_temp generatted.
 else
