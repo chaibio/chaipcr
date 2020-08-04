@@ -297,18 +297,8 @@ start_julia () {
 			timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
 			msg="Julia exit($exitcode) on $timestamp"
 			cd /var/log
-			echo $msg>>julia.log
-			if ! [ -e crashjulia ]
-			then
-			        echo creating crashjulia
-			        mkdir crashjulia
-			fi
 			echo $msg
-			mv julia.log crashjulia/julia-$timestamp.log
-                        echo $msg >> julia.log
-			cd crashjulia
-			tar czf julia-$timestamp.log.tgz julia-$timestamp.log --remove-files &
-
+			/usr/sbin/logrotate -vf /etc/logrotate.d/julia || true
 			if [ $exitcode -eq 101 ]
 			then
 			        echo Disabling Julia watchdog
@@ -636,7 +626,7 @@ upgrade_interfaces () {
 	if [ -e ${sdcard}/factory/upgrade_autorun.flag ] || [ -e ${sdcard}/upgrade/upgrade_autorun.flag ]
 	then
 		echo upgrading /etc/network/interfaces
-		/bin/sed -i "s#auto wl#allow-hotplug wl#g" /etc/network/interfaces || true
+               /bin/sed -i "s#auto wl#allow-hotplug wl#g" /etc/network/interfaces || true
 	fi
 }
 
@@ -677,9 +667,9 @@ check_upgrade_autorun () {
 		fi
 
 		create_swapfile &
-		update_wireless_network
-		upgrade_interfaces
-		update_ethernet_network
+                update_wireless_network
+                upgrade_interfaces
+                update_ethernet_network
 		change_root_password_on_factorysettings
 #               retain_previous_user_credentials_on_upgrade
 		run_migrate_on_upgrade_logged
