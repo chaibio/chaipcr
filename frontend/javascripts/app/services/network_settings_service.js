@@ -44,9 +44,13 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
 
       var delay = $q.defer();
       $http.get(host + ':8000/network/wlan/scan').then(function(scanOutput) {
-        scanOutput.data.scan_result.forEach(function(network) {
-          that.listofAllWifi[network.ssid] = network;
-        });
+        if(scanOutput.data.scan_result){          
+          scanOutput.data.scan_result.forEach(function(network) {
+            that.listofAllWifi[network.ssid] = network;
+          });
+        } else {
+          that.listofAllWifi = {};
+        }
         delay.resolve(scanOutput);
       }, function(err) {
         delay.reject(err);
@@ -59,12 +63,14 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       this.userSettings = $.jStorage.get('userNetworkSettings');
       this.accessLanLookup();
 
-      this.intervalKey = $interval(that.accessLanLookup, interval);
+      if(!this.intervalKey){
+        this.intervalKey = $interval(that.accessLanLookup, interval);
+      }
     };
 
     this.accessLanLookup = function() {
+      that.lanLookup();
       if(that.userSettings.wifiSwitchOn /*&& that.wirelessError === false*/) {
-        that.lanLookup();
       }
     };
 
@@ -108,7 +114,6 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     };
 
     this.processOnError = function(err) {
-
       previousSsid = this.previousConnectionStatus = null;
       this.connectedWifiNetwork = {};
       this.wirelessError = true;
@@ -125,11 +130,18 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       $http.get(host + ':8000/network/wlan')
       .then(function(result) {
         console.log(result.data, "bing");
-        if(! result.data.state) {
+        if(!result.data.state) {
           return null;
         }
         if(result.data.state.status) {
           that.macAddress = result.data.state.macAddress;
+          if(result.data.state.status == 'connected'){
+            that.userSettings.wifiSwitchOn = true;
+            $.jStorage.set('userNetworkSettings', that.userSettings);            
+          } else {
+            that.userSettings.wifiSwitchOn = false;
+            $.jStorage.set('userNetworkSettings', that.userSettings);            
+          }
         }
       }, function(err) {
         that.processOnError(err); // in case error ,May be no wireless interface
@@ -242,7 +254,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     $rootScope.$on("$stateChangeStart", function(event, toState) {
       // If we are not in the network settings part, we dont have to query /network anymore
       if(toState.name !== "settings.networkmanagement" && toState.name !== "settings.networkmanagement.wifi") {
-        that.stopInterval();
+        // that.stopInterval();
       }
     });
   }

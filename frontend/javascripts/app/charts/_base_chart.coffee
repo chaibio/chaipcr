@@ -1344,7 +1344,7 @@ class BaseChart
       line = @xAxisLeftExtremeValue.line
       text = @xAxisLeftExtremeValue.text
       rect = @xAxisLeftExtremeValue.rect
-      minX = if @hasData() then Math.round(xScale.invert(0) * 10) / 10 else @DEFAULT_MIN_X
+      minX = Math.round(xScale.invert(0) * 10) / 10
       text.text(@xAxisTickFormat(minX))
       textWidth = text.node().getBBox().width
       text.attr('x', @MARGIN.left + @EXTREME_PADDING)
@@ -1358,7 +1358,7 @@ class BaseChart
         .attr('y2', @height + @MARGIN.top + @xAxisLeftExtremeValue.config.offsetTop + @xAxisLeftExtremeValue.config.conHeight - @xAxisLeftExtremeValue.config.underlineStroke)
 
     if @xAxisRightExtremeValue.text
-      maxX = if @hasData() then Math.round(xScale.invert(@width) * 10) / 10 else @DEFAULT_MAX_X
+      maxX = Math.round(xScale.invert(@width) * 10) / 10      
       @xAxisRightExtremeValue.text.text(@xAxisTickFormat(maxX))
       textWidth = @xAxisRightExtremeValue.text.node().getBBox().width
       @xAxisRightExtremeValue.text.attr('x', @width + @MARGIN.left - (textWidth / 2))
@@ -1377,7 +1377,7 @@ class BaseChart
     if @yAxisUpperExtremeValue.text
       text = @yAxisUpperExtremeValue.text
       rect = @yAxisUpperExtremeValue.rect
-      maxY = if @hasData() then Math.round(yScale.invert(0) * 10) / 10 else @DEFAULT_MAX_Y
+      maxY = Math.round(yScale.invert(0) * 10) / 10
       text.text(@yAxisTickFormat(maxY))
       textWidth = text.node().getBBox().width
       text.attr('x', @MARGIN.left - (@yAxisUpperExtremeValue.config.offsetRight + textWidth))
@@ -1396,7 +1396,7 @@ class BaseChart
       line = @yAxisLowerExtremeValue.line
       rect = @yAxisLowerExtremeValue.rect
       text = @yAxisLowerExtremeValue.text
-      minY = if @hasData() then Math.round(yScale.invert(@height) * 10) / 10 else @DEFAULT_MIN_Y
+      minY = Math.round(yScale.invert(@height) * 10) / 10
       text.text(@yAxisTickFormat(minY))
       textWidth = text.node().getBBox().width
       text.attr('x', @MARGIN.left - (@yAxisLowerExtremeValue.config.offsetRight + textWidth))

@@ -176,7 +176,7 @@ class TargetsWell < ActiveRecord::Base
   end
   
   def self.fake_targets?(experiment)
-    !TargetsWell.for_experiment(experiment).exists?
+    !TargetsWell.for_experiment(experiment).filtered.exists?
   end
 
   def initialize(data)

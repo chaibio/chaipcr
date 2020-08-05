@@ -33,12 +33,12 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     $scope.wirelessError = false;  // Incase no wifi adapter is present in the machine
     $scope.macAddress = NetworkSettingsService.macAddress || null;
     $scope.userSettings = $.jStorage.get('userNetworkSettings');
-    $scope.wifiNetworkStatus = $scope.userSettings.wifiSwitchOn; // If network is on/off
+    $scope.wifiNetworkStatus = ($scope.userSettings.wifiSwitchOn === undefined) ? false : $scope.userSettings.wifiSwitchOn; // If network is on/off
     NetworkSettingsService.intervalScanKey = null;
     $scope.currentInterval = 1000;
 
     // Initiate wifi network service;
-    if ($scope.userSettings.wifiSwitchOn) {
+    if($scope.userSettings.wifiSwitchOn) {
       NetworkSettingsService.getSettings(5000);
     }
 
@@ -47,9 +47,8 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
       server.
     */
     $scope.$on('new_wifi_result', function() {
-
       $scope.wirelessError = false;
-      $scope.wifiNetworkStatus = $scope.userSettings.wifiSwitchOn;
+      $scope.wifiNetworkStatus = NetworkSettingsService.userSettings.wifiSwitchOn;
       $scope.currentWifiSettings = NetworkSettingsService.connectedWifiNetwork;
     });
     /**
@@ -75,7 +74,6 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
         if(switchStatus === true && $scope.userSettings.wifiSwitchOn === false) {
           $scope.turnOnWifi();
         } else if(switchStatus === false && $scope.userSettings.wifiSwitchOn === true) {
-          NetworkSettingsService.stopInterval();
           $scope.turnOffWifi();
         }
       } else {
@@ -127,8 +125,8 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
       $scope.wifiNetworkStatus = false;
       $scope.wirelessErrorData = NetworkSettingsService.wirelessErrorData;
       $scope.wifiNetworks = $scope.currentWifiSettings = {};
-      $scope.userSettings.wifiSwitchOn = false;
-      $.jStorage.set('userNetworkSettings', $scope.userSettings);
+      // $scope.userSettings.wifiSwitchOn = false;
+      // $.jStorage.set('userNetworkSettings', $scope.userSettings);
     };
 
     /**
@@ -204,6 +202,9 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     $scope.init = function() {
       console.log("Initing");
       NetworkSettingsService.getEthernetStatus();
+      if(NetworkSettingsService.intervalKey === null) {
+        NetworkSettingsService.getSettings(5000);
+      }
 
       if(NetworkSettingsService.wirelessError) {
         $scope.whenNoWifiAdapter();
@@ -211,10 +212,6 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
       }
 
       if($scope.userSettings.wifiSwitchOn) {
-        if(NetworkSettingsService.intervalKey === null) {
-          NetworkSettingsService.getSettings(5000);
-        }
-
         $scope.currentWifiSettings = NetworkSettingsService.connectedWifiNetwork;
         NetworkSettingsService.intervalScanKey = $interval($scope.findWifiNetworks, $scope.currentInterval);
         // If we refresh right on this page, mac address may take some time to load in service , so we wait to load here.
@@ -231,5 +228,13 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     };
 
     $scope.init();
+
+    $scope.$on('$destroy', function(network) {
+      $scope.stopInterval();
+      if(NetworkSettingsService.intervalKey) {
+        NetworkSettingsService.stopInterval();
+      }      
+    });
+
   }
 ]);

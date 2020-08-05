@@ -69,19 +69,37 @@
         //  $scope.cq = [["channel","well_num","cq"],[1,1,"39"],[1,2,2],[1,3,40],[1,4,9],[1,5,20],[1,6,"26"],[1,7,"33"],[1,8,"5"],[1,9,"34.5"],[1,10,"19"],[1,11,"12"],[1,12,"6"],[1,13,"24"],[1,14,"39"],[1,15,"32"],[1,16,"18"],[2,1,"11"],[2,2,"25.15"],[2,3,36],[2,4,"8"],[2,5,"34"],[2,6,"10"],[2,7,"15"],[2,8,"25"],[2,9,"35"],[2,10,"28"],[2,11,"2"],[2,12,"7"],[2,13,"0"],[2,14,"35"],[2,15,"28"],[2,16,"17"]];
         this.getResultArray = getResultArray;
 
+        var famTargets = [];
+        var hexTargets = [];
+        $scope.target_ipc = null;
+
         function getId() {
           if ($stateParams.id) {
             $scope.experimentId = $stateParams.id;
             getExperiment($scope.experimentId, function(exp){
-              if(exp.completion_status) $scope.viewResults();
+              if($state.current.name === 'pika_test.exp-running' && exp.completion_status) $scope.viewResults();
               $scope.initial_done = true;
             });
+
+            Experiment.getTargets($stateParams.id).then(function (resp) {
+              var targets = resp.data;
+              for(var i = 0; i < targets.length; i++){
+                if(targets[i].target.name.trim() == 'IPC'){
+                  hexTargets.push(targets[i].target.id);
+                  $scope.target_ipc = targets[i].target;
+                } else {
+                  famTargets.push(targets[i].target.id);
+                }
+              }
+              $scope.twoKits = (famTargets.length == 2) ? true : false;
+            });
+
             Experiment.getWellLayout($stateParams.id).then(function (resp) {
               $scope.target = (resp.data[0].targets) ? resp.data[0].targets[0] : {id: 0, name: ''};
               $scope.target2 = (resp.data[8].targets) ? resp.data[8].targets[0] : {id: 0, name: ''};
-              if ($scope.target.id != $scope.target2.id && $scope.target2.id && $scope.target.id) {
-                $scope.twoKits = true;
-              }
+              // if ($scope.target.id != $scope.target2.id && $scope.target2.id && $scope.target.id) {
+              //   $scope.twoKits = true;
+              // }
               var j = 0,
               k, i;
               for (i = 0; i < 8; i++) {
@@ -157,7 +175,10 @@
               Experiment.deleteLinkedSample($scope.experimentId, x.id).then(function(resp) {                
                 $scope.editExpNameMode[index] = false;
                 $scope.samples[index] = {id: 0, name: ''};
-              });              
+              });
+
+              Experiment.unlinkTarget($scope.experimentId, $scope.target.id, { wells: [index + 1], channel: 0 }).then(function (response) {                                
+              });
             }
           } else {
             if(x.name){
@@ -166,7 +187,13 @@
                 Experiment.linkSample($scope.experimentId, resp.data.sample.id, { wells: [index+1] }).then(function (response) {                                
                     $scope.editExpNameMode[index] = false;
                 });              
-              });              
+              });
+              Experiment.linkTarget($scope.experimentId, $scope.target.id, { wells: [{ well_num: index + 1, well_type: 'unknown' }] }).then(function (response) {                                
+              });
+              if($scope.target_ipc){
+                Experiment.linkTarget($scope.experimentId, $scope.target_ipc.id, { wells: [{ well_num: index + 1, well_type: 'unknown' }] }).then(function (response) {                                
+                });
+              }
             }
           }
           // Experiment.updateWell($scope.experimentId, index, { 'sample_name': x }).then(function(resp) {});
@@ -201,6 +228,8 @@
                 $scope.editExpNameMode[index] = false;
                 $scope.samples_B[index] = {id: 0, name: ''};
               });              
+              Experiment.unlinkTarget($scope.experimentId, $scope.target.id, { wells: [index + 9], channel: 0 }).then(function (response) {                                
+              });
             }
           } else {
             if(x.name){
@@ -209,7 +238,20 @@
                 Experiment.linkSample($scope.experimentId, resp.data.sample.id, { wells: [index + 9] }).then(function (response) {                                
                     $scope.editExpNameMode[index] = false;
                 });              
-              });              
+              });
+
+              if($scope.twoKits){                
+                Experiment.linkTarget($scope.experimentId, $scope.target2.id, { wells: [{ well_num: index + 9, well_type: 'unknown' }] }).then(function (response) {
+                });
+              } else {
+                Experiment.linkTarget($scope.experimentId, $scope.target.id, { wells: [{ well_num: index + 9, well_type: 'unknown' }] }).then(function (response) {                                
+                });                
+              }
+              if($scope.target_ipc){
+                Experiment.linkTarget($scope.experimentId, $scope.target_ipc.id, { wells: [{ well_num: index + 9, well_type: 'unknown' }] }).then(function (response) {                                
+                });
+              }
+
             }
           }
         };
@@ -489,12 +531,8 @@
               if($scope.summary_data){
                 var cqValue = '';
                 for (i = 1; i < 17; i++) {
-                  cqValue = filterSummaryByTarget(targets[1][0], i);
-                  $scope.famCq.push(parseFloat((cqValue.length) ? cqValue[3] : 0));
-                }
-                for (i = 17; i < 33; i++) {
-                  cqValue = filterSummaryByTarget(targets[2][0], i - 16);
-                  $scope.hexCq.push(parseFloat((cqValue.length) ? cqValue[3] : 0));
+                  $scope.famCq.push(filterSummaryByFam(i));
+                  $scope.hexCq.push(filterSummaryByHex(i));
                 }
                 getResultArray();                
               }
@@ -503,7 +541,6 @@
               }
             })
             .catch(function(resp) {
-              console.log(resp);
               if (resp.status == 500) {
                 $scope.custom_error = resp.data.errors || "An error occured while trying to analyze the experiment results.";
                 $scope.analyzing = false;
@@ -525,13 +562,22 @@
 
       };
 
-      function filterSummaryByTarget(target_id, well_num){
+      function filterSummaryByFam(well_num){
         for (var i = 0; i < $scope.summary_data.length; i++) {
-          if($scope.summary_data[i][0] == target_id && $scope.summary_data[i][1] == well_num){
-            return $scope.summary_data[i];
+          if(famTargets.includes($scope.summary_data[i][0]) && $scope.summary_data[i][1] == well_num){
+            return parseFloat(($scope.summary_data[i].length && $scope.summary_data[i][3]) ? $scope.summary_data[i][3] : 0);
           }
         }
-        return '';
+        return 0;
+      }
+
+      function filterSummaryByHex(well_num){
+        for (var i = 0; i < $scope.summary_data.length; i++) {
+          if(hexTargets.includes($scope.summary_data[i][0]) && $scope.summary_data[i][1] == well_num){
+            return parseFloat(($scope.summary_data[i].length && $scope.summary_data[i][3]) ? $scope.summary_data[i][3] : 0);
+          }
+        }
+        return 0;
       }
 
       function getExperiment(exp_id, cb) {
@@ -571,7 +617,6 @@
         }
 
         if ($scope.state === 'idle' && $scope.old_state !== 'idle') {
-          console.log($scope.state);
           $scope.checkExperimentStatus();
         }
 

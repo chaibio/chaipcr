@@ -44,6 +44,11 @@
       $scope.target_ipc = null;
       $scope.well_types = [];
       $scope.exp_samples = [];
+      $scope.target1_name = '';
+
+      $scope.is_omittable = false;
+
+      var target2_name = 'IPC';
 
       function getExperiment(exp_id, cb) {
         Experiment.get({id: exp_id}).then(function(resp) {
@@ -67,44 +72,55 @@
           getExperiment($scope.experimentId, function(exp){
             // if(exp.completion_status) $scope.viewResults();
             $scope.initial_done = true;
+            switch($scope.experiment.guid){
+              case 'chai_coronavirus_env_kit':
+                $scope.target1_name = 'Coronavirus Environmental Surface';
+                target2_name = 'IAC';
+                $scope.is_omittable = false;
+                break;
+              case 'pika_4e_kit':
+                target2_name = 'IPC';
+                $scope.is_omittable = true;
+                break;
+            }
+
+            Experiment.getTargets($stateParams.id).then(function (resp) {
+              for(var i = 0; i < resp.data.length; i++){
+                if(resp.data[i].target.name.trim() != target2_name){
+                  $scope.targets.push(resp.data[i].target);
+                } else {
+                  $scope.target_ipc = resp.data[i].target;
+                }
+              }
+              $scope.is_two_kit = ($scope.targets.length == 2) ? true : false;
+
+              Experiment.getWellLayout($stateParams.id).then(function (resp) {
+                $scope.well_types = [];
+                for(var i = 0; i < resp.data.length; i++){
+                  var well_type = (resp.data[i].targets && resp.data[i].targets[0].well_type) ? resp.data[i].targets[0].well_type : '';
+                  $scope.well_types.push(well_type);
+                }
+
+                var j = 0, k;
+                for (i = 0; i < 8; i++) {
+                  $scope.samples[i] = (resp.data[i].samples) ? resp.data[i].samples[0] : {id: 0, name: ''};
+                }
+
+                for (k = 8; k < 16; k++) {
+                  $scope.samples_B[k - 8] = (resp.data[k].samples) ? resp.data[k].samples[0] : {id: 0, name: ''};
+                }
+
+                $scope.omit_positive = (resp.data[0].targets && resp.data[0].targets[0].well_type == 'positive_control') ? false : true;
+                $scope.omit_negative = (resp.data[1].targets && resp.data[1].targets[0].well_type == 'negative_control') ? false : true;
+              });
+            });
+
           });
 
           Experiment.getSamples($stateParams.id).then(function (resp) {
             for(var i = 0; i < resp.data.length; i++){
               $scope.exp_samples.push(resp.data[i].sample);
             }            
-          });
-
-          Experiment.getTargets($stateParams.id).then(function (resp) {
-            for(var i = 0; i < resp.data.length; i++){
-              if(resp.data[i].target.name.trim() != 'IPC'){
-                $scope.targets.push(resp.data[i].target);
-              } else {
-                $scope.target_ipc = resp.data[i].target;
-              }
-            }
-            $scope.is_two_kit = ($scope.targets.length == 2) ? true : false;
-
-            Experiment.getWellLayout($stateParams.id).then(function (resp) {
-              $scope.well_types = [];
-              for(var i = 0; i < resp.data.length; i++){
-                var well_type = (resp.data[i].targets && resp.data[i].targets[0].well_type) ? resp.data[i].targets[0].well_type : '';
-                $scope.well_types.push(well_type);
-              }
-
-              var j = 0, k;
-              for (i = 0; i < 8; i++) {
-                $scope.samples[i] = (resp.data[i].samples) ? resp.data[i].samples[0] : {id: 0, name: ''};
-              }
-
-              for (k = 8; k < 16; k++) {
-                $scope.samples_B[k - 8] = (resp.data[k].samples) ? resp.data[k].samples[0] : {id: 0, name: ''};
-              }
-
-              $scope.omit_positive = (resp.data[0].targets && resp.data[0].targets[0].well_type == 'positive_control') ? false : true;
-              $scope.omit_negative = (resp.data[1].targets && resp.data[1].targets[0].well_type == 'negative_control') ? false : true;
-            });
-
           });
 
         } else {
@@ -265,6 +281,12 @@
       };
 
       $scope.updateNotes = function() {
+        var well_row = $scope.selectedWellIndex - 1;
+        var notes = $scope.selectedSample.notes;
+
+        $scope.selectedSample = ($scope.selectedSample && $scope.selectedSample.id) ? $scope.selectedSample : ($scope.selectedWellRow == 'A' ? $scope.samples[well_row] : $scope.samples_B[well_row]);
+        $scope.selectedSample.notes = notes;
+
         Experiment.updateSample($scope.experimentId, $scope.selectedSample.id, {notes: $scope.selectedSample.notes}).then(function(resp) {          
           $scope.modalInstance.close();
         });
@@ -375,7 +397,16 @@
       }
 
       $scope.isControlWell = function(sample, index, well_row){
-        return ($scope.well_types[index] == 'positive_control' || $scope.well_types[index] == 'negative_control');
+        var type_index = (well_row == 'A') ? index : index + 8;
+        return ($scope.well_types[type_index] == 'positive_control' || $scope.well_types[type_index] == 'negative_control');
+      };
+
+      $scope.learnMoreClick = function(is_positive){
+        if(is_positive){
+          $scope.omit_negative_help = false; $scope.omit_positive_help = !$scope.omit_positive_help;
+        } else {
+          $scope.omit_positive_help = false; $scope.omit_negative_help = !$scope.omit_negative_help;
+        }
       };
     }
   ]);

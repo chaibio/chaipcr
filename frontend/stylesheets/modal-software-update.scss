@@ -1,8 +1,11 @@
 @import "colors.css.scss";
 
-.modal-software-update-open {
+.modal-software-update-open,
+.modal-software-update-open.pika-set-well-active {
 
   .modal-dialog {
+    margin: 30px auto;
+    position: relative;
     width: 500px;
     margin-top: 100px;
 

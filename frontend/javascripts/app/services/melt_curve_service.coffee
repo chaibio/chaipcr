@@ -228,11 +228,11 @@ App.service 'MeltCurveService', [
           for temp, ii in data[i].temperature by 1
 
             total_temp = 0
-            for t in [0..15] by 1
-              total_temp += data[t].temperature[ii]
+            for t in [0...data.length] by 1
+              total_temp += if data[t] then data[t].temperature[ii] else 0
 
             datasets["well_#{data[i].well_num - 1}_#{data[i].channel}"].push
-              temperature: Math.round((total_temp / 16) * 100) / 100
+              temperature: Math.round((total_temp / data.length) * 100) / 100
               derivative: Math.round(data[i].derivative_data[ii] * 100) / 100
               normalized: Math.round(data[i].normalized_data[ii] * 100) / 100
 

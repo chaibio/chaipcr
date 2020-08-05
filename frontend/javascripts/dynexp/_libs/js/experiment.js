@@ -95,6 +95,10 @@ angular.module('dynexp.libs')
       return $http.get("/experiments/" + id + "/well_layout");
     };
 
+    self.getTargets = function(id) {
+      return $http.get("/experiments/" + id + "/targets");
+    };
+
     self.createSample = function(expId, data) {
       return $http.post("/experiments/" + expId + "/samples", data);
     };
@@ -109,6 +113,14 @@ angular.module('dynexp.libs')
 
     self.deleteLinkedSample = function(expId, sampleId){
       return $http.delete("/experiments/" + expId + "/samples/"+sampleId+"?force=true");
+    };
+
+    self.linkTarget = function(expId, targetId, data) {
+      return $http.post("/experiments/" + expId + "/targets/" + targetId + "/links", data);
+    };
+
+    self.unlinkTarget = function(expId, targetId, data) {
+      return $http.post("/experiments/" + expId + "/targets/" + targetId + "/unlinks", data);
     };
 
     self.updateExperimentName = function(id, name) {

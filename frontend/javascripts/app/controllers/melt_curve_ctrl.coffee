@@ -105,7 +105,7 @@ App.controller 'MeltCurveChartCtrl', [
         for i in [$scope.targetsSet.length-1..0] by -1
           if $scope.targetsSet[i]?.id
             target = _.filter $scope.targets, (item) ->
-              item.id is $scope.targetsSet[i].id
+              item and item.id is $scope.targetsSet[i].id
             if !target.length
               $scope.targetsSet.splice(i, 1)
 

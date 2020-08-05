@@ -143,7 +143,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
             $scope.wells["well_#{i}"].selected = selected        
           ngModel.$setViewValue angular.copy($scope.wells)
           targets = _.filter $scope.targets, (item) ->
-            item.id
+            item and item.id
           $scope.initTargetSelect = true if targets and targets.length
 
       $scope.getStyleForWellBar = (row, col, config, i) ->
