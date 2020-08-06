@@ -14,6 +14,10 @@ set_touch_driver () {
 		else
                         reboot_needed=0
 		fi
+		if [ -e /etc/modules-load.d/ilitek_aimv20.conf ]
+		then
+			rm /etc/modules-load.d/ilitek_aimv20.conf
+		fi
 		echo $lib>/etc/modules-load.d/chaibio_touch_controller.conf
 	else
 		echo Touch driver not found $lib
