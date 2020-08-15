@@ -35,7 +35,18 @@ if [ -e /dev/mmcblk0p3 ] ; then
 	eMMC="/dev/mmcblk0"
 fi
 
-if [ ! -e "${eMMC}p3" ]
+if [ -z $eMMC ]
+then
+	if mountpoint / -d | grep -qs "0:1" 
+	then
+		sdcard_dev="/dev/mmcblk0"
+        	eMMC="/dev/mmcblk1"
+	fi
+
+fi
+
+
+if [ ! -e "${eMMC}p3" ] && ! [ $restore ]
 then
         echo "Proper eMMC partitionining not found!"
 	exit 1
