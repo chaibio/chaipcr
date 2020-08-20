@@ -27,7 +27,8 @@ window.ChaiBioTech.ngApp
   '$state'
   'User'
   'Status'
-  ($scope, Experiment, $window, $uibModal, $timeout, $state, User, Status) ->
+  '$rootScope'
+  ($scope, Experiment, $window, $uibModal, $timeout, $state, User, Status, $rootScope) ->
 
     angular.element('body').addClass 'modal-form'
     $scope.$on '$destroy', ->
@@ -76,6 +77,13 @@ window.ChaiBioTech.ngApp
       modalInstance.result.then (exp) ->
         $state.go 'edit-protocol', id: exp.id
 
+    @onSetting = ->
+      modalInstance = $uibModal.open
+        templateUrl: 'app/views/settings/v2/setting-modal.html'
+        controller: 'SettingsModalCtrl'
+        openedClass: 'settings-modal'
+        backdrop: false
+
     @confirmDelete = (exp) ->
       if $scope.deleteMode
         exp.del = true
@@ -120,5 +128,18 @@ window.ChaiBioTech.ngApp
               $state.go('pika_test.experiment-result', id: exp.id)
             else
               $state.go 'pika_test.experiment-running', id: exp.id
+
+    @initActivity = ->
+      activity = localStorage.getItem('init_activity')
+      localStorage.removeItem('init_activity')
+      if activity == 'diagnostic'
+        @onSetting()
+        $timeout ->
+          $rootScope.$broadcast 'modal:maintenance'
+        , 100        
+        return
+
+    @initActivity()
+
     return
 ]

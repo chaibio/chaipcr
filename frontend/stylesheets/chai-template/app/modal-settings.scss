@@ -1,0 +1,686 @@
+@import "../variables.scss";
+.settings-modal{
+  .modal{
+    overflow: hidden;
+  }
+
+  .modal-dialog{
+    max-height: 700px;
+    width: 1040px;
+
+    background: #fff;
+    .modal-content{
+      box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
+      border: none;
+      height: 100%;
+      border-radius: 2px;
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    @media (min-width: 1200px){
+      margin: 100px auto;
+    }
+  }
+
+  &.modal-software-update-open{
+    .modal-backdrop.in{
+      & + .modal{
+        .modal-dialog{
+          width: 500px;
+        }
+      }
+    }
+  }  
+
+  label{
+    font-weight: initial;
+    margin-bottom: 0;
+  }
+
+  .settings-box{
+    height: 100%;
+    .dialog-header{
+      height: 60px;
+      position: relative;
+      padding: 15px 20px 15px 40px;
+      background: $black;
+      border-top-left-radius: 2px;
+      border-top-right-radius: 2px;
+
+      .title{
+        display: inline-block;
+        color: $white;
+      }
+
+      .dialog-close{
+        cursor: pointer;
+        vertical-align: middle;
+        position: absolute;
+        right: 20px;
+        top: 15px;
+        svg{
+          border: 2px solid #fff;
+          border-radius: 3px;
+          padding: 5px;
+          width: 30px;
+          rect{
+            fill: #fff;
+          }
+        }
+
+        &:hover{
+          svg{
+            background: #000;
+            rect{
+              fill: #fff;
+            }
+          }
+        }       
+      }
+    }
+    .dialog-content{
+      min-height: 560px;
+      padding: 20px 40px;
+      display: flex;
+      color: #000;
+      .sidenav-bar{
+        min-width: 180px;
+        padding: 15px 10px 15px 0;
+        label{
+          font-weight: initial;
+          color: #000;
+          margin-bottom: 0;
+        }
+        ul{
+          li{
+            margin-bottom: 15px;
+            span{            
+              padding: 3px 10px;
+              border: 1px solid transparent;
+              border-radius: 2px;
+              display: inline-block;
+              cursor: pointer;
+            }
+
+            &.active{
+              span{
+                color: #BFBFBF;
+                border-color: #BFBFBF;
+                cursor: initial;
+              }
+            }
+          }
+        }
+      }
+      .setting-content{
+        width: 100%;
+        height: 520px;
+        display: flex;
+        align-items: center;        
+
+        .frame-header, .frame-content{ display: none; }
+        &.box-frame{
+          display: block;
+          border-radius: 2px;
+          box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+          background: #fff;
+          .frame-header{
+            height: 50px;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 2px;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+
+            .frame-close{
+              width: 15px;
+              height: 15px;
+              margin: 0;
+              cursor: pointer;
+            }
+          }
+
+          .frame-content{
+            width: 100%;
+            height: 470px;
+            display: block;
+          }
+        }
+
+        .sub-title{
+          border-bottom: 1px solid #000;
+          padding-bottom: 10px;
+          margin: 0;
+        }
+      }
+
+      .ci-btn-light{
+        background: #fff;
+        border-radius: 2px;
+        border: 1px solid #000000;
+        padding: 5px 12px;
+        outline: none;
+        text-decoration: none;
+        color: $black;
+        cursor: pointer;
+        display: inline-block;
+        &:hover, &:active{
+          background: #DF2025;
+          border-color: #DF2025;
+          color: #fff;
+        }
+
+        &.ci-btn-icon{
+          display: flex;
+          align-items: center;
+          img{
+            width: 15px;
+            height: 15px;
+            margin-right: 7px;
+          }
+        }
+
+        &.disabled{
+          color: $black;
+          border-color: $black;
+          cursor: initial;
+          opacity: 0.5;
+          &:hover, &:active{
+            background: #fff;
+            border-color: $black;
+            color: $black;
+          }
+        }
+
+        &.red-button{
+          background: #DF2025;
+          border-color: #DF2025;
+          color: #fff;
+          &:hover, &:active{
+            background: #fff;
+            border-color: #000;
+            color: #000;
+          }                    
+        }
+      }
+
+      span.error{
+        color: #E02127;
+        display: block;
+        margin-top: 5px;
+      }
+
+      // System Update Information
+      .system-update{
+        text-align: center;
+        width: 560px;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 40px;
+
+        .update-info{
+          height: 240px;
+          border-radius: 3px;
+          border: 2px solid rgba(0, 0, 0, 0.4);
+          padding: 30px 40px;
+          display: flex;
+          align-items: center;
+          margin-bottom: 30px;
+
+          .machine-info{
+            padding-left: 40px;
+            width: 100%;
+            .connect-badge{
+              width: 140px;
+              height: 40px;
+              border-radius: 3px;
+              border: 2px solid rgba(0, 0, 0, 0.4);
+              line-height: 35px;
+              margin-left: auto;
+              margin-right: auto;
+            }
+          }
+
+          img{
+            width: 200px;
+          }
+
+          label{
+            color: rgba(0, 0, 0, 0.6);
+            font-weight: initial;
+            margin: 0;
+            display: block;
+
+            &.CX3, &.CX3-B{
+              color: rgba(0, 0, 0, 0.6);
+            }
+          }
+        }
+      }
+
+      // User Information
+      .manage-user{
+        width: 100%;
+        height: 100%;
+        padding: 15px 10px;
+        display: flex;
+
+        .two-col{
+          width: 100%;
+          padding: 0 30px;
+        }
+
+        ul{
+          max-height: 325px;
+          overflow: auto;
+          margin-left: -5px;
+          li{
+            margin-bottom: 20px;
+            span{            
+              padding: 3px 0;
+              border-radius: 2px;
+              display: inline-block;
+              cursor: pointer;
+              margin-left: 5px;
+
+              &.active, &:hover{
+                color: #fff;
+                background: #00BAFF;
+                margin-left: 0;
+                padding: 3px 5px;
+              }
+            }
+          }
+          b{
+            font-weight: initial;
+          }
+        }
+      }
+
+      // Network Connection
+      .network-connection{
+        width: 100%;
+        height: 100%;
+        padding: 15px 20px;
+        display: flex;
+
+        label{
+          color: #000;
+
+          &.error{
+            color: #DF2025;
+          }
+        }
+
+        .two-col{
+          width: 370px;
+          padding: 0 20px;
+
+          &:first-child{
+            padding-left: 0;
+          }
+        }
+
+        .setting-switch{
+          label{
+            margin-left: 2px
+          }
+        }
+
+        .connection-list{
+          .wifi-switch{
+            display: inline-block;
+            width: 40px;
+          }
+
+          .lan-switch{
+            .check-symbol{
+              margin-left: 22px;
+              margin-right: 2px;              
+            }
+
+            .ci-btn-light{
+              vertical-align: middle;
+              margin-left: 15px;
+              padding: 4px 10px;              
+            }
+          }
+
+          h5{
+            display: inline-block;
+            width: calc(100% - 40px);
+          }
+        }
+
+        .lock{
+          left: 0;
+          top: 11px;
+          width: 10px;
+          height: 15px;
+        }
+        .lock-rect{
+          width: 10px;
+          height: 8px;
+        }
+        .lock-latch{
+          width: 8px;
+          height: 8px;
+          top: -5px;
+          left: 1px;
+        }
+
+        .wifi{
+          height: 20px;
+          width: 20px;
+          top: 5px;
+          left: 0;
+          margin-right: 5px;
+          .arc4{
+            width: 2px;
+            height: 2px;
+            top: 0;
+            left: 0;
+          }
+          .arc3{
+            width: 8px;
+            height: 8px;
+          }
+          .arc2{
+            width: 14px;
+            height: 14px;
+          }
+          .arc1{
+            width: 20px;
+            height: 20px;
+          }
+          .show{
+            border-width: 1px;
+          }
+        }
+
+        ul{
+          max-height: 360px;
+          overflow: auto;
+          li{
+            display: flex;
+            width: calc(100% - 17px);
+            margin-left: auto;
+            padding: 3px 10px 3px 5px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            justify-content: space-between;
+
+            span{
+              width: calc(100% - 60px);
+            }
+
+            .check-symbol{
+              margin-right: 5px;
+              top: 5px;
+            }
+
+            &.selected, &:hover{
+              background: #00BAFF;
+              border-radius: 2px;
+              color: #fff;
+              .check-symbol{
+                background: transparent;
+                border-color: transparent;
+                &:after{
+                  border-color: transparent;
+                }
+              }
+
+              .check-symbol.active{
+                background: transparent;
+                border-color: #fff;
+                &:after{
+                  border-color: #fff;
+                }
+              }
+
+              .lock-rect{
+                background: #fff;
+                .lock-latch{
+                  border-color: #fff;
+                }
+              }
+
+              .wifi{
+                .show.signal-ready{
+                  border-top-color: #fff;
+                }
+                .arc4.signal-ready{
+                  background-color: #fff;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Maintenance
+      .maintenance, .system{
+        padding: 20px;
+        width: 100%;
+        height: 100%;
+        h5{
+          margin: 0;
+        }
+
+        .box-frame{
+          padding: 20px;
+          border: 1px solid #BFBFBF;
+          border-radius: 3px;
+          margin-bottom: 20px;
+        }
+
+        .row{
+          margin-top: 0;
+          margin-bottom: 0;
+          margin-left: -10px;
+          margin-right: -10px;
+
+          .col-sm-6{
+            padding-left: 10px;
+            padding-right: 10px;
+          }
+        }
+
+        .performance{
+          max-width: 740px;
+          text-align: center;
+          img{
+            margin-top: 10px;
+            width: 600px;
+          }
+
+          label{
+            color: $black;
+            max-width: 340px;
+            display: block;
+            margin: auto;
+          }
+        }
+      }
+
+      .system{
+        span.export-text{
+          display: inline-block;
+          width: 150px;
+          vertical-align: middle;
+          padding-left: 20px;
+          margin-bottom: 5px;
+        }
+
+        .ci-btn-light.green{
+          color: #fff;
+          background: #68BD43;
+          border-color: #68BD43;
+           &:hover, &:active{
+            background: $white;
+            border-color: $black;
+            color: $black;
+          }
+        }
+      }
+    }
+  }
+
+  .setting-switch {
+    .switch {
+      height: 8px;
+      margin-top: -2px;
+      width: 18px;
+      vertical-align: middle;
+      small {
+        width: 8px;
+        height: 8px;
+        border-width: 0;
+        background: #fff;
+      }
+      &.checked {
+        small {
+          left: 10px;          
+        }
+      }
+
+      &.disabled{
+        background: #d7d7d7;
+        cursor: initial;
+        small{
+          background: #eee;
+        }
+      }
+    }
+    &.auto {
+      .switch {
+        background: #BBB;
+        border-color: #BBB;
+      }
+      small {
+        background: #bbb;
+      }
+      .set-auto {
+        color: $black;
+      }
+    }
+    label {
+      color: $black;
+      display: inline-block;
+      margin-left: 10px;
+      margin-bottom: 0;
+    }
+    span.set-auto {
+      color: $blue;
+      cursor: pointer;
+      margin-left: 15px;
+    }
+  }
+
+  .modal-input-field{
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    flex-wrap: wrap;
+    label{
+      border-bottom: 1px solid #aaa;
+      width: 100px;
+      color: $gray;
+
+      &.point{
+        width: 10px;
+        text-align: center;
+      }
+    }
+    input{
+      outline: none;
+      border: none;
+      border-bottom: 1px solid $black;
+      width: calc(100% - 100px);
+      padding: 1px 0;
+      color: $black;
+      font-feature-settings: "salt";
+      background: $white;
+      margin: 0;
+
+      &.ip-field{
+        width: 30px;
+      }
+    }
+
+    &.lg-label{
+      label{
+        width: 120px;
+      }
+
+      input{
+        width: calc(100% - 120px);
+      }
+    }
+
+    &.sm-label{
+      label{
+        width: 60px;
+      }
+
+      input{
+        width: calc(100% - 60px);
+      }
+    }
+
+    span{
+      display: none;
+      position: relative;
+      color: #e02127;
+      margin-top: 5px;
+    }
+
+    &.error{
+      span{
+        display: block;
+      }
+
+      input{
+        border-color: #E02127;
+      }
+    }
+  }
+
+  .check-symbol{
+    width: 13px;
+    height: 13px;
+    display: inline-block;
+    background: transparent;
+    border-radius: 50%;
+    vertical-align: text-top;
+    position: relative;
+    border: 1px solid transparent;
+
+    &.active{      
+      background: #8DC63F;
+      border-color: #8DC63F;
+    }
+
+
+    &:after{
+      content: "";
+      display: block;
+      position: absolute;
+      top: 3px;
+      left: 2px;
+      border: 1px solid #fff;
+      border-right: none;
+      border-top: none;
+      width: 7px;
+      height: 4px;
+      transform: rotate(-45deg);
+    }
+
+    &.disabled{
+      background: transparent;
+      border: 1px solid transparent;
+    }
+  }
+}

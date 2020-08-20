@@ -1,0 +1,43 @@
+<div class="manage-user">
+  <div class="two-col">
+    <h5 class="CX5-M sub-title mb-10">Current Users</h5>
+    <ul class="CX5">
+      <li ng-repeat="user in users">
+        <span ng-class="{active: current_user.id == user.user.id}" ng-click="onSelectUser(user.user)">{{user.user.name}}<b class="CG1" ng-if="user.user.role=='admin'"> Admin</b></span>
+      </li>
+    </ul>
+    <button class="ci-btn-light ci-btn-icon CX5" ng-click="onAddUser()">
+      <img src="/images/Add.svg" alt="">
+      Add User
+    </button>
+  </div>
+  <div class="two-col">
+    <h5 class="CX5-M sub-title mb-10">User Details</h5>
+    <span class="CX5" ng-if="!current_user">Please select a user</span>
+    <form ng-if="current_user">
+      <div class="setting-switch mb-15">
+        <switch class="switch" ng-model="current_user.is_admin"></switch>
+        <label class="CX5-M">Admin Access</label>
+      </div>
+      <modal-input-field caption="Name" class="mb-20 sm-label" field="Name">
+        <input type="text" class="CX5-M" ng-model="current_user.name" placeholder="User Name" error="errors.name" autocomplete="username">
+      </modal-input-field>
+      <modal-input-field caption="E-Mail" value="current_user.email" class="mb-20 sm-label" error="errors.email" field="Email">
+          <input type="text" class="CX5-M" ng-model="current_user.email" placeholder="User E-Mail" autocomplete="email">
+      </modal-input-field>
+      <button ng-if="!is_reset_password" class="ci-btn-light CX5 mb-20" ng-click="onResetPassword()">Reset Password</button>
+
+      <modal-input-field caption="New Password" class="mb-20 lg-label" ng-if="is_reset_password" error="errors.password">
+        <input type="password" class="CX5-M" ng-model="password.new_pwd" placeholder="New Password" ng-blur="onUserFieldChanged()" autocomplete="new-password">
+      </modal-input-field>
+      <modal-input-field caption="Confirm" class="mb-20 lg-label" ng-if="is_reset_password" error="errors.confirm_password">
+        <input type="password" class="CX5-M" ng-model="password.confirm_pwd" placeholder="Confirm Password" ng-blur="onUserFieldChanged()" autocomplete="confirm-password">
+      </modal-input-field>
+      <div class="button-group">
+        <button class="ci-btn-light CX5 mr-20" ng-class="{disabled: !has_changes}" ng-click="onSaveChanges()">Save Changes</button>
+        <button class="ci-btn-light CX5" ng-click="onUserCancel()">Cancel</button>
+      </div>
+      <span class="error CG1-M">{{errors.message}}</span>
+    </form>
+  </div>
+</div>

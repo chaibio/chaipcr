@@ -1,0 +1,72 @@
+<div class="settings-box">
+  <div class="dialog-header">
+    <label class="CX3-B title">Settings</label>
+    <label class="dialog-close" ng-click="$dismiss()">
+      <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 5"><rect x="2.25" y="-0.79" width="0.5" height="6.57" transform="translate(-1.04 2.5) rotate(-45)"/><rect x="-0.79" y="2.25" width="6.57" height="0.5" transform="translate(-1.04 2.5) rotate(-45)"/></svg>
+    </label>
+  </div>
+  <div class="dialog-content">
+    <div class="sidenav-bar">
+      <div class="user-section mb-30">
+        <label class="CX5 d-block">Active User</label>
+        <label class="CX3-B mr-10 mb-10">{{user.name}}</label><span class="CG1" ng-if="user.role === 'admin'">Admin</span>
+        <div class="button-group">
+          <button class="ci-btn-light CX5 mr-10" logout>Logout</button>
+          <button class="ci-btn-light CX5" ng-click="onEditClick()">Edit</button>
+        </div>
+      </div>
+      <ul class="CX5-M">
+        <li ng-class="{active: page == 'users'}" ng-click="onChangePage('users')"><span>Manage Users</span></li>
+        <li ng-class="{active: page == 'network'}" ng-click="onChangePage('network')"><span>Network Settings</span></li>
+        <li ng-class="{active: page == 'maintenance'}" ng-click="onChangePage('maintenance')"><span>Maintenance</span></li>
+        <li ng-class="{active: page == 'system'}" ng-click="onChangePage('system')"><span>System</span></li>
+      </ul>
+    </div>
+    <div class="setting-content" ng-class="{'box-frame': page != 'system-update'}">
+      <div class="system-update" ng-if="page == 'system-update'">
+        <div class="update-info">
+          <img src="/images/Open qpCR Outline Grey Settings.svg">
+          <div class="machine-info">
+            <label class="CX3-M mb-20 connect-badge">Connected</label>
+            <label class="CG1 sm-text">Model Number:</label>
+            <label class="CG1 sm-text mb-10">{{version_data.model_number}}</label>
+            <label class="CG1 sm-text">Serial Number:</label>
+            <label class="CG1 sm-text mb-10">{{version_data.serial_number}}</label>
+            <label class="CG1 sm-text">Software Version:</label>
+            <label class="CG1 sm-text mb-10">{{ version_data.software.version + (update_available === 'unavailable' ? ' (Latest)' : '') }}</label>
+          </div>
+        </div>
+        <button class="ci-btn-light CX5-M" ng-if="update_available === 'unavailable' && !checkedUpdate && !checking_update" ng-click="checkForUpdates()">Check For Updates</button>
+
+        <button class="ci-btn-light CX5-M disabled" ng-if="update_available === 'unavailable' && checkedUpdate && !checking_update">
+          Software Up To Date
+        </button>
+        <button class="ci-btn-light CX5-M" ng-if="update_available === 'available' && !checking_update" ng-click="openUpdateModal()">
+          Software Update Available
+        </button>
+        <button class="ci-btn-light CX5-M disabled" ng-if="update_available === 'downloading' && !checking_update">
+          Downloading Software Update
+          <ellipsis-animated>
+          <ellipsis-animated/>
+        </button>
+        <button class="ci-btn-light CX5-M disabled" ng-if="checking_update">
+          Checking For Available Updates
+          <ellipsis-animated>
+          <ellipsis-animated/>
+        </button>
+      </div>
+      <div class="frame-header" ng-if="page != 'system-update'">
+        <span class="CX5-M">{{page_title}}</span>
+        <label class="frame-close" ng-click="onPageClose()">
+          <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 5"><rect x="2.25" y="-0.79" width="0.5" height="6.57" transform="translate(-1.04 2.5) rotate(-45)"/><rect x="-0.79" y="2.25" width="6.57" height="0.5" transform="translate(-1.04 2.5) rotate(-45)"/></svg>
+        </label>        
+      </div>
+      <div class="frame-content" ng-if="page != 'system-update'">
+        <manage-user-panel ng-if="page == 'users'"></manage-user-panel>
+        <network-panel ng-if="page == 'network'"></network-panel>
+        <maintenance-panel ng-if="page == 'maintenance'"></maintenance-panel>
+        <update-panel ng-if="page == 'system'"></update-panel>
+      </div>
+    </div>
+  </div>
+</div>

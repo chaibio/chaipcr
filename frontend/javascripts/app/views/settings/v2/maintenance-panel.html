@@ -1,0 +1,80 @@
+<div class="maintenance">
+  <div class="row" ng-show="!performance_screen">
+    <div class="col-sm-6">
+      <div class="box-frame">
+        <h5 class="CX5-M mb-15">Thermal Performance</h5>
+        <p class="CX5 mb-20">Tests block heating & cooling performance; lid heating</p>
+        <button
+          class="ci-btn-light CX5" 
+          ng-class="{ 'disabled': anotherExperimentInProgress}" 
+          ng-click="onPerformanceClick()">
+          Run Now
+        </button>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="box-frame">
+        <h5 class="CX5-M mb-15">Optical</h5>
+        <p class="CX5 mb-20">Tests functionality of fluorescence detection optics</p>
+        <button 
+          class="ci-btn-light CX5" 
+          ng-if="!is_dual_channel" 
+          ng-class="{ 'disabled': anotherExperimentInProgress || !checked}" 
+          ng-click="onOpticalClick(false)">
+          Run Now
+        </button>
+        <button 
+          class="ci-btn-light CX5" 
+          ng-if="is_dual_channel" 
+          ng-class="{ 'disabled' : anotherExperimentInProgress || !checked}" 
+          ng-click="onOpticalClick(true)">
+          Run Now
+        </button>
+      </div>
+    </div>
+    <div class="col-sm-6" ng-if="!has_serial_number">
+      <div class="box-frame">
+        <h5 class="CX5-M mb-15">Thermal Uniformity</h5>
+        <p class="CX5 mb-20">Tests well-to-well variances in temperature</p>
+        <button 
+          class="ci-btn-light CX5" 
+          ng-class="{ 'disabled': anotherExperimentInProgress}" 
+          ng-click="onUniformityClick()">
+          Run Now
+        </button>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="box-frame">
+        <h5 class="CX5-M mb-15">Optical Calibration</h5>
+        <p class="CX5 mb-10">Compensates for well-to-well variations in optical performance.</p>
+        <p class="CX5 mb-20">Run whenever lid height is adjusted or tube type is changed.</p>
+        <button 
+          class="ci-btn-light CX5" 
+          ng-class="{ 'disabled': anotherExperimentInProgress || !checked}" 
+          ng-if="!is_dual_channel" 
+          ng-click="onCalibOpticalClick(false)">
+          Run Now
+        </button>
+        <button 
+          class="ci-btn-light CX5" 
+          ng-class="{ 'disabled': anotherExperimentInProgress || !checked}" 
+          ng-if="is_dual_channel" 
+          ng-click="onCalibOpticalClick(true)">
+          Run Now
+        </button>        
+      </div>
+    </div>
+  </div>
+  <div class="performance" ng-show="performance_screen">
+    <img src="/images/dynexp/machine.png" class="mb-30">
+    <label class="CX5 mb-20">This diagnostic will test the heating and cooling performance of your Open qPCR's heat block, as well as its lid heater.</label>
+    <label class="CX5-M mb-40">Before continuing, remove all tubes from your Open qPCR, and ensure the lid is closed.</label>
+    <div class="button-group">
+      <button class="ci-btn-light CX5 mr-20 red-button">
+        Begin Diagnostic
+      </button>
+      <button class="ci-btn-light CX5" ng-click="performance_screen=false">Cancel</button>
+    </div>
+  </div>
+</div>
