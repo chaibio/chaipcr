@@ -10,13 +10,13 @@
 
   <div ng-show="experiment.completion_status !== 'success' && !analyzing">
     <div class="alert alert-danger">
-      <strong>Experiment Failed!</strong> {{ experiment.completion_message }}
+      <strong>Failure: </strong> {{ experiment.completion_message }}
     </div>
   </div>
 
   <div ng-show="custom_error">
     <div class="alert alert-danger">
-      <strong>Experiment Failed!</strong> {{ custom_error }}
+      <strong>Failure: </strong> {{ custom_error }}
     </div>
   </div>
 
