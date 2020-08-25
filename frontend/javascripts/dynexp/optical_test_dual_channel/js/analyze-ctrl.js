@@ -9,6 +9,7 @@ angular.module('dynexp.optical_test_dual_channel').controller('OpticalTestDualCh
 
     $scope.loop = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
     $scope.analyzing = true;
+    $scope.valid = false;
 
     $scope.isPassed = function() {
       $scope.data = $scope.data || [];
@@ -27,7 +28,7 @@ angular.module('dynexp.optical_test_dual_channel').controller('OpticalTestDualCh
         }
       }
 
-      return valid;
+      return valid && $scope.valid;
     };
 
     $scope.analyzeExperiment = function() {
@@ -38,6 +39,8 @@ angular.module('dynexp.optical_test_dual_channel').controller('OpticalTestDualCh
             .then(function(resp) {
               if (resp.status == 200) {
                 $scope.data = resp.data.optical_data;
+                $scope.custom_error = resp.data.error;
+                $scope.valid = resp.data.valid;
                 $scope.analyzing = false;
               } else if (resp.status == 202) {
                 $timeout($scope.analyzeExperiment, 1000);

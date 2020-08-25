@@ -151,6 +151,7 @@
                       $scope.analyzedExp = resp.data.optical_data;
                       //$scope.tm_values = GlobalService.getTmValues(resp.data);
                       $scope.experiment_id = cal_exp_id;
+                      $scope.custom_error = resp.data.error;
                       $scope.analyzing = false;
                     } else if (resp.status == 202) {
                       $timeout($scope.analyzeExperiment, 1000);
