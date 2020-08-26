@@ -241,6 +241,7 @@
             .then(function(resp) {
               Experiment.startExperiment(resp.data.experiment.id)
                 .then(function() {
+                  localStorage.setItem('init_activity', 'maintenance');
                   $scope.experiment = resp.data.experiment;
                   $scope.created = true;
                   $scope.errors = {};
@@ -264,7 +265,7 @@
 
       $scope.cancelExperiment = function() {
         Experiment.stopExperiment($scope.experiment_id).then(function() {
-          $state.go('settings.root');
+          $state.go('home');
         });
       };
 

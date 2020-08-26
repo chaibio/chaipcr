@@ -404,7 +404,7 @@
           overflow: auto;
           li{
             display: flex;
-            width: calc(100% - 17px);
+            width: calc(100% - 35px);
             margin-left: auto;
             padding: 3px 10px 3px 5px;
             margin-bottom: 10px;
@@ -418,6 +418,10 @@
             .check-symbol{
               margin-right: 5px;
               top: 5px;
+            }
+
+            &.active{
+              width: calc(100% - 17px);
             }
 
             &.selected, &:hover{
@@ -657,10 +661,12 @@
     vertical-align: text-top;
     position: relative;
     border: 1px solid transparent;
+    display: none;
 
     &.active{      
       background: #8DC63F;
       border-color: #8DC63F;
+      display: inline-block;
     }
 
 

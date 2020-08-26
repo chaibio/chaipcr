@@ -200,6 +200,7 @@
           Experiment.create({ guid: 'thermal_consistency', name: 'thermal_consistency' }).then(function(resp) {
             $timeout.cancel($scope.timeout);
             Experiment.startExperiment(resp.data.experiment.id).then(function() {
+              localStorage.setItem('init_activity', 'maintenance');
               $scope.experiment = resp.data.experiment;
               $state.go('thermal_consistency.exp-running');
             });
@@ -208,7 +209,7 @@
 
         $scope.cancelExperiment = function() {
           Experiment.stopExperiment($scope.experiment_id).then(function() {
-            $state.go('settings.root');
+            $state.go('home');
           });
         };
 

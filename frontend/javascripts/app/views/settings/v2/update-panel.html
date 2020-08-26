@@ -8,7 +8,7 @@
           ng-disabled="checkedUpdate"
           ng-class="{disabled: checkedUpdate}"
           ng-if="update_available === 'unavailable'" ng-click="checkUpdate()">
-          Check For Update
+          Check for Update
         </button>
         <button class="ci-btn-light CX5 mb-10" 
           ng-if="(update_available === 'available' || update_available === 'downloading')" 
@@ -25,7 +25,7 @@
           Downloading software<ellipsis-animated><ellipsis-animated/>
         </span>
         <span class="CB3 ml-10" ng-if="checking_update">
-          Checking for available updates<ellipsis-animated><ellipsis-animated/>
+          Checking for available updates
         </span>
         <button class="ci-btn-light CX5" ng-click="openUploadModal()">Upload Software Image</button>
       </div>

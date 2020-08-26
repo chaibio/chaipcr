@@ -132,7 +132,7 @@ window.ChaiBioTech.ngApp
     @initActivity = ->
       activity = localStorage.getItem('init_activity')
       localStorage.removeItem('init_activity')
-      if activity == 'diagnostic'
+      if activity == 'maintenance'
         @onSetting()
         $timeout ->
           $rootScope.$broadcast 'modal:maintenance'

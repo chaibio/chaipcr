@@ -75,7 +75,7 @@
             var newExpId = resp.data.experiment.id;
 
             startPromise.then(function() {
-              localStorage.setItem('init_activity', 'diagnostic');
+              localStorage.setItem('init_activity', 'maintenance');
               $state.go('thermal_performance_diagnostic.diagnostic', {
                 id: newExpId
               });

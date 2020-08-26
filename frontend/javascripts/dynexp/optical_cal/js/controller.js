@@ -207,6 +207,7 @@
       $scope.createExperiment = function() {
         Experiment.create({ guid: 'optical_cal', name: 'optical_cal' }).then(function(resp) {
           Experiment.startExperiment(resp.data.experiment.id).then(function() {
+            localStorage.setItem('init_activity', 'maintenance');
             $scope.experiment = resp.data.experiment;
             $state.go('optical_cal.step-3');
           });
@@ -221,7 +222,7 @@
 
       $scope.cancelExperiment = function() {
         Experiment.stopExperiment($scope.experiment_id).then(function() {
-          $state.go('settings.root');
+          $state.go('home');
         });
       };
 

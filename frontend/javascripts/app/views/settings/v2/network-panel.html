@@ -15,7 +15,7 @@
       <ellipsis-animated><ellipsis-animated/>
     </div>
     <ul class="CX5-M">
-      <li ng-repeat="wifiNetwork in wifiNetworks" ng-click="onSelectNetwork(wifiNetwork.ssid)" ng-class="{selected: selectedWifiNow.ssid == wifiNetwork.ssid}">
+      <li ng-repeat="wifiNetwork in wifiNetworks" ng-click="onSelectNetwork(wifiNetwork.ssid)" ng-class="{selected: selectedWifiNow.ssid == wifiNetwork.ssid, active: isConnectedNetwork(wifiNetwork.ssid)}">
         <wifi-check-symbol current-network="currentWifiSettings" ssid="{{wifiNetwork.ssid}}"></wifi-check-symbol>
         <span>{{wifiNetwork.ssid | truncate:20}}</span>
         <wifi-lock encryption="{{wifiNetwork.encryption}}" ssid="{{wifiNetwork.ssid | spaceToUnderscore}}"></wifi-lock>

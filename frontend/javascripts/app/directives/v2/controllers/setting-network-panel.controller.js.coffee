@@ -199,6 +199,7 @@ window.App.controller 'SettingNetworkPanelCtrl', [
       if $scope.userSettings.wifiSwitchOn
         $scope.currentWifiSettings = NetworkSettingsService.connectedWifiNetwork
         NetworkSettingsService.intervalScanKey = $interval($scope.findWifiNetworks, $scope.currentInterval)
+
         # If we refresh right on this page, mac address may take some time to load in service , so we wait to load here.
         if $scope.macAddress == null and NetworkSettingsService.wirelessError == true
           waitForMac = $interval((->
@@ -452,5 +453,14 @@ window.App.controller 'SettingNetworkPanelCtrl', [
     $scope.onCancel = () ->
       $scope.name = ''
       $scope.selectedWifiNow = null
+
+    $scope.isConnectedNetwork = (ssid) ->
+      if $scope.currentWifiSettings.state && $scope.currentWifiSettings.state.status == "connected"
+        _ssid = $scope.currentWifiSettings.settings["wpa-ssid"] || $scope.currentWifiSettings.settings.wireless_essid
+        connectedNetworkSsid = _ssid.replace(new RegExp('"', 'g'), "")
+        return connectedNetworkSsid == ssid
+      return false
+
+
 
 ]

@@ -200,6 +200,7 @@
         $scope.createExperiment = function() {
           Experiment.create({ guid: 'optical_test_single_channel', name: 'optical_test_single_channel' }).then(function(resp) {
             Experiment.startExperiment(resp.data.experiment.id).then(function() {
+              localStorage.setItem('init_activity', 'maintenance');
               $scope.experiment = resp.data.experiment;
               $state.go('optical_test_1ch.exp-running');
             });
@@ -208,7 +209,7 @@
 
         $scope.cancelExperiment = function() {
           Experiment.stopExperiment($scope.experiment_id).then(function() {
-            $state.go('settings.root');
+            $state.go('home');
           });
         };
 
