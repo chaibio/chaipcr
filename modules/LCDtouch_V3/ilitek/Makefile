@@ -18,7 +18,7 @@ install:
 install_mod:
 	cp ilitek_aimv20.ko /lib/modules/$(shell uname -r)/kernel/drivers/input/touchscreen
 	depmod -a
-	echo ilitek_aimv20 > /etc/modules-load.d/ilitek_aimv20.conf
+	echo ilitek_aimv20 > /etc/modules-load.d/chaibio_touch_controller.conf
 	sync
 
 clean:
