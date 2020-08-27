@@ -25,7 +25,22 @@ set_touch_driver () {
 	return $reboot_needed
 }
 
-setup_touch_controller_by_i2c() {
+setup_touch_controller_by_i2c () {
+		if [ -d /sys/class/i2c-dev/i2c-2/device/2-0041 ]
+		then
+			set_touch_driver ilitek_aimv20
+			exit $reboot_needed
+		elif [ -d /sys/class/i2c-dev/i2c-2/device/2-0038 ]
+		then
+	        	set_touch_driver ft5x0x_ts
+			exit $reboot_needed
+		else
+			echo No i2c representation.
+		fi
+}
+
+
+setup_touch_controller_by_device_json () {
 
 	if [ -e /perm/device.json ]
 	then
@@ -51,17 +66,7 @@ setup_touch_controller_by_i2c() {
 		fi
 	else
 		echo "Cannot find /perm/device.json"
-		if [ -d /sys/class/i2c-dev/i2c-2/device/2-0041 ]
-		then
-			set_touch_driver ilitek_aimv20
-			exit $reboot_needed
-		elif [ -d /sys/class/i2c-dev/i2c-2/device/2-0038 ]
-		then
-	        	set_touch_driver ft5x0x_ts
-			exit $reboot_needed
-		else
-			echo No i2c representation.
-		fi
+		setup_touch_controller_by_i2c
 	fi
 
 	if [ $reboot_needed -eq 0 ]
@@ -72,6 +77,12 @@ setup_touch_controller_by_i2c() {
 	exit $reboot_needed
 }
 
-setup_touch_controller_by_i2c
+if [ -z $1 ]
+then
+	setup_touch_controller_by_device_json
+else
+	echo Setting touch driver to $1
+	set_touch_driver $1
+fi
 
 exit $reboot_needed
