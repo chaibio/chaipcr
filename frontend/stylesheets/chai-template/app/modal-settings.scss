@@ -355,7 +355,7 @@
 
         .lock{
           left: 0;
-          top: 11px;
+          top: 7px;
           width: 10px;
           height: 15px;
         }
@@ -373,7 +373,7 @@
         .wifi{
           height: 20px;
           width: 20px;
-          top: 5px;
+          top: 4px;
           left: 0;
           margin-right: 5px;
           .arc4{
@@ -412,7 +412,14 @@
             justify-content: space-between;
 
             span{
-              width: calc(100% - 60px);
+              width: calc(100% - 40px);
+            }
+
+            .wifi-props{
+              width: 35px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
             }
 
             .check-symbol{
