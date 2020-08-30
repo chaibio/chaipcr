@@ -109,11 +109,11 @@
                   <td class="CG2" ng-repeat="x in samples_B track by $index">
                     <label class="CG1 type" 
                       ng-class="{
-                        'positive': well_types[$index] == 'positive_control', 
-                        'negative': well_types[$index] == 'negative_control', 
+                        'positive': well_types[$index + 8] == 'positive_control', 
+                        'negative': well_types[$index + 8] == 'negative_control', 
                         'available': x.name,
                         'active': (current_well_index == $index && current_well_row == 'B')}">
-                      {{(well_types[$index] == 'positive_control') ? '+' : ( (well_types[$index] == 'negative_control') ? '-' : 'S' )}}
+                      {{(well_types[$index + 8] == 'positive_control') ? '+' : ( (well_types[$index + 8] == 'negative_control') ? '-' : 'S' )}}
                     </label>
                   </td>
                 </tr>
