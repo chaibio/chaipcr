@@ -15,12 +15,14 @@
       <ellipsis-animated><ellipsis-animated/>
     </div>
     <ul class="CX5-M">
-      <li ng-repeat="wifiNetwork in wifiNetworks" ng-click="onSelectNetwork(wifiNetwork.ssid)" ng-class="{selected: selectedWifiNow.ssid == wifiNetwork.ssid, active: isConnectedNetwork(wifiNetwork.ssid)}">
+      <li ng-repeat="wifiNetwork in wifiNetworks" ng-click="onSelectNetwork(wifiNetwork.ssid)" ng-class="{selected: selectedWifiNow.ssid == wifiNetwork.ssid}">
         <wifi-check-symbol current-network="currentWifiSettings" ssid="{{wifiNetwork.ssid}}"></wifi-check-symbol>
-        <span>{{wifiNetwork.ssid | truncate:20}}</span>
-        <div class="wifi-props">
-          <wifi-signal ssid="{{wifiNetwork.ssid | spaceToUnderscore}}" quality="{{wifiNetwork.quality}}"></wifi-signal>          
-          <wifi-lock encryption="{{wifiNetwork.encryption}}" ssid="{{wifiNetwork.ssid | spaceToUnderscore}}"></wifi-lock>
+        <div class="wifi-info">
+          <span>{{wifiNetwork.ssid | truncate:20}}</span>
+          <div class="wifi-props">
+            <wifi-signal ssid="{{wifiNetwork.ssid | spaceToUnderscore}}" quality="{{wifiNetwork.quality}}"></wifi-signal>          
+            <wifi-lock encryption="{{wifiNetwork.encryption}}" ssid="{{wifiNetwork.ssid | spaceToUnderscore}}"></wifi-lock>
+          </div>
         </div>
       </li>
     </ul>
