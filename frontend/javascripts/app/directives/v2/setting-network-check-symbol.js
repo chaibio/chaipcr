@@ -25,7 +25,7 @@ angular.module('ChaiBioTech').directive("wifiCheckSymbol", [
     return {
       restrict: "E",
       replace: true,
-      template: '<label class="check-symbol"></label>',
+      template: '<div class="check-symbol"><img src="/images/WhiteCheckGreenRing.svg"></div>',
       scope: {
         currentNetwork: "=currentNetwork",
         ssid: "@ssid"

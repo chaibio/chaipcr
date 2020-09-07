@@ -1,13 +1,17 @@
 <div class="network-connection">
   <div class="two-col connection-list">
     <div class="setting-switch lan-switch mb-15">
-      <label class="check-symbol" ng-class="{'active': ethernetSettings.settings}"></label>
+      <div class="check-symbol" ng-class="{'active': ethernetSettings.settings}">
+        <img src="/images/WhiteCheckGreenRing.svg">
+      </div>
       <label class="CX5-M" style="cursor: pointer;">Ethernet</label>
       <button class="ci-btn-light CG1" ng-click="onSelectNetwork('ethernet')">Edit Settings</button>
     </div>
     <div class="setting-switch wifi-switch">
       <switch ng-model="wifiNetworkStatus" disabled="wirelessError"></switch>
-      <label class="check-symbol" ng-class="{'active': currentWifiSettings.state && currentWifiSettings.state.status == 'connected'}"></label>
+      <div class="check-symbol" ng-class="{'active': currentWifiSettings.state && currentWifiSettings.state.status == 'connected'}">
+        <img src="/images/WhiteCheckGreenRing.svg">
+      </div>
     </div>
     <h5 class="CX5-M sub-title mb-10">WiFi</h5>
     <span class="CX5 ml-40" ng-if="wirelessError">No wifi adapter</span>
