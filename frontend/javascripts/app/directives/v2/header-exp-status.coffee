@@ -55,6 +55,14 @@ window.ChaiBioTech.ngApp.directive 'headerExpStatus', [
       $scope.show = ->
         if attrs.experimentId then (experiment_id and $scope.status) else $scope.status
 
+      onResize = ->
+        $timeout ()->
+          elem.find('.left-content').css('width', '40%')
+          right_width = elem.find('.right-content').width() + 10
+          elem.find('.left-content').css('width', 'calc(100% - ' + right_width + 'px)')
+          elem.find('.right-content').css('opacity', '1')
+        , 10
+
       getExperiment = (cb) ->
         return if !experiment_id
         Experiment.get(id: experiment_id).then (resp) ->          
@@ -69,6 +77,7 @@ window.ChaiBioTech.ngApp.directive 'headerExpStatus', [
       checkStatus = () ->
         getExperiment (exp) ->
           $scope.experiment = exp
+          onResize()
           # if !$scope.experiment.completed_at
           #   $timeout checkStatus, 1000
 
@@ -124,6 +133,8 @@ window.ChaiBioTech.ngApp.directive 'headerExpStatus', [
         else
           $scope.backgroundStyle = {}
 
+        onResize()
+
       $scope.getDuration = ->
         return 0 if !$scope?.experiment?.completed_at
         Experiment.getExperimentDuration($scope.experiment)
@@ -177,5 +188,8 @@ window.ChaiBioTech.ngApp.directive 'headerExpStatus', [
         experiment_id = id
         getExperiment (exp) ->
           $scope.experiment = exp
+
+      $scope.$on 'window:resize', ->
+        onResize()
 
 ]

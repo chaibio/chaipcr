@@ -62,9 +62,17 @@ window.App.directive 'headerStatus', [
       $scope.show = ->
         if attrs.experimentId then (experiment_id and $scope.status) else $scope.status
 
+      onResize = ->
+        $timeout ()->
+          elem.find('.left-content').css('width', '40%')
+          right_width = elem.find('.right-content').width() + 10
+          elem.find('.left-content').css('width', 'calc(100% - ' + right_width + 'px)')
+          elem.find('.right-content').css('opacity', '1')
+        , 10
+
       getExperiment = (cb) ->
         return if !experiment_id
-        Experiment.get(id: experiment_id).then (resp) ->          
+        Experiment.get(id: experiment_id).then (resp) ->
           $scope.expLoading = false
           cb resp.experiment if cb
 
@@ -76,6 +84,7 @@ window.App.directive 'headerStatus', [
       checkStatus = () ->
         getExperiment (exp) ->
           $scope.experiment = exp
+          onResize()
           # if !$scope.experiment.completed_at
           #   $timeout checkStatus, 1000
 
@@ -131,7 +140,7 @@ window.App.directive 'headerStatus', [
         else
           $scope.backgroundStyle = {}
 
-
+        onResize()
 
       $scope.getDuration = ->
         return 0 if !$scope?.experiment?.completed_at
@@ -187,4 +196,6 @@ window.App.directive 'headerStatus', [
         getExperiment (exp) ->
           $scope.experiment = exp
 
+      $scope.$on 'window:resize', ->
+        onResize()
 ]

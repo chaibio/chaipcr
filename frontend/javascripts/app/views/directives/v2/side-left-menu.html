@@ -14,13 +14,13 @@
       <exp-name-editor status="status"></exp-name-editor>
       <div ng-if="exp && exp.time_valid && status == 'COMPLETED'" class="side-menu-exp-status CB2 run-on-status">
         {{runStatus}} {{exp.started_at}}
-        <label class="side-menu-exp-status-text success CB2" ng-if="exp.completion_status === 'success'">Completed</label>
-        <label class="side-menu-exp-status-text failed CB2" ng-if="exp.completion_status !== 'success'">Failed</label>
+        <label class="side-menu-exp-status-text success CX5-M" ng-if="exp.completion_status === 'success'">Completed</label>
+        <label class="side-menu-exp-status-text failed CX5-M" ng-if="exp.completion_status !== 'success'">Failed</label>
       </div>
       <div ng-if="exp && !exp.time_valid && status == 'COMPLETED'" class="side-menu-exp-status CB2 run-on-status">
         Run previously
-        <label class="side-menu-exp-status-text success" ng-if="exp.completion_status === 'success'">Completed</label>
-        <label class="side-menu-exp-status-text failed" ng-if="exp.completion_status !== 'success'">Failed</label>
+        <label class="side-menu-exp-status-text success CX5-M" ng-if="exp.completion_status === 'success'">Completed</label>
+        <label class="side-menu-exp-status-text failed CX5-M" ng-if="exp.completion_status !== 'success'">Failed</label>
       </div>
       <div ng-if="status != 'COMPLETED' && runStatus" class="side-menu-exp-status CB2">{{runStatus}}</div>
     </div>

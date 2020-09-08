@@ -223,12 +223,13 @@ $sidemenu_width_close: 0;
               float: right;
               margin: 0;
               font-weight: 300;
-              padding: 5px 10px;
+              padding: 1px 6px 3px;
               border-radius: 3px;
               position: relative;
-              top: -5px;
+              top: -2px;
               &.success{
-                padding: 5px 0;
+                background: #8fc742;
+                color: #fff;
               }
               &.failed{
                 background: #df1924;

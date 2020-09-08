@@ -34,7 +34,7 @@
         height: 60px;
         justify-content: flex-start;
         align-items: center;
-        max-width: 55%;
+        max-width: 100%;
 
         .exp-name{
           white-space: nowrap;
@@ -48,6 +48,7 @@
         height: 60px;
         justify-content: flex-start;
         align-items: center;
+        opacity: 0;
 
         .button-header{
           background: $dark-gray;

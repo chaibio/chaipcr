@@ -40,14 +40,16 @@ window.ChaiBioTech.ngApp.controller 'InlineExpNameEditorCtrl', [
     $scope.ori_experiment_name = ''
 
     $scope.adjustTextWidth = () ->
-      # $timeout (() ->
-      #   field_width = Math.max(document.getElementById('inline_exp_name_plat').offsetWidth + 20, 150)
-      #   angular.element(document.getElementById('inline_exp_name_field')).css('width', (field_width) + 'px')
-      # ), 10
+      $timeout (() ->
+        field_width = Math.max(document.getElementById('inline_exp_name_plat').offsetWidth + 20, 150)
+        field_width = Math.min(document.getElementsByClassName('inline-exp-name')[0].offsetWidth - 110, field_width)
+        angular.element(document.getElementById('inline_exp_name_field')).css('width', (field_width) + 'px')
+      ), 10
       return
 
     $scope.focusExpName = ->
       field_width = Math.max(document.getElementById('inline_exp_name_plat').offsetWidth + 20, 150)
+      field_width = Math.min(document.getElementsByClassName('inline-exp-name')[0].offsetWidth - 110, field_width)
       angular.element(document.getElementById('inline_exp_name_field')).css('width', (field_width) + 'px')
       
       $scope.ori_experiment_name = $scope.experiment.name
@@ -87,4 +89,8 @@ window.ChaiBioTech.ngApp.controller 'InlineExpNameEditorCtrl', [
       promise.finally ->
         if !$scope.errors
           $scope.editModeOff()
+
+    $scope.$on 'window:resize', ->
+      $scope.adjustTextWidth()
+
 ]

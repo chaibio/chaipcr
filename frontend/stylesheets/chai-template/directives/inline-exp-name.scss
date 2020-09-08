@@ -25,6 +25,8 @@
       color: $link-text-color;
       outline: none;
       cursor: pointer;
+      display: inline-block;
+      vertical-align: middle;
       &:hover, &:focus{
         background: transparent;
         text-decoration: none; 
@@ -34,6 +36,15 @@
     .hide-elem{
       position: absolute;
       top: -1000px;
+    }
+
+    span{
+      display: inline-block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: calc(100% - 80px);
+      vertical-align: middle;      
     }
   }
 }
