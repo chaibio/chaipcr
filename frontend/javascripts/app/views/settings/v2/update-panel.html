@@ -1,0 +1,52 @@
+<div class="system" export-click>
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="box-frame">
+        <h5 class="CX5-M mb-15">Software Update Status</h5>
+        <p class="CX5 mb-20">v{{ data.software.version + " installed"}}</p>
+        <button class="ci-btn-light CX5 mb-10" 
+          ng-disabled="checkedUpdate"
+          ng-class="{disabled: checkedUpdate}"
+          ng-if="update_available === 'unavailable'" ng-click="checkUpdate()">
+          Check for Update
+        </button>
+        <button class="ci-btn-light CX5 mb-10" 
+          ng-if="(update_available === 'available' || update_available === 'downloading')" 
+          ng-disabled="checking_update"
+          ng-class="{disabled: checking_update}"
+          ng-click="openUpdateModal()">
+          Update Available
+        </button>
+
+        <span class="CB3 ml-10" ng-if="update_available === 'unavailable' && checkedUpdate && !checking_update">
+          Latest version installed
+        </span>
+        <span class="CB3 ml-10" ng-if="update_available === 'downloading' && !checking_update">
+          Downloading software<ellipsis-animated><ellipsis-animated/>
+        </span>
+        <span class="CB3 ml-10" ng-if="checking_update">
+          Checking for available updates
+        </span>
+        <button class="ci-btn-light CX5" ng-click="openUploadModal()">Upload Software Image</button>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="box-frame">
+        <h5 class="CX5-M mb-15">Export Database</h5>
+        <p class="CX5 mb-20">Export system database to share with support staff. This usually takes a few minutes.</p>
+        <div class="button-group">          
+          <button 
+            class="ci-btn-light CX5" 
+            style="margin-bottom: 22px;" 
+            ng-click="export()" 
+            ng-class="{disabled: export_status == 'progress', green: export_status == 'done'}">
+            {{export_status == 'ready' ? 'Begin Export' : (export_status == 'progress' ? 'Exporting' : 'Export Complete')}}
+            <ellipsis-animated ng-if="export_status == 'progress'"><ellipsis-animated/>
+          </button>
+          <span class="CB3 export-text" ng-if="export_status == 'progress'">Please wait, preparing database export.</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

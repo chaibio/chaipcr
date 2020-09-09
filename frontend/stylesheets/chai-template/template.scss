@@ -2,27 +2,63 @@
 
 .chai-mode{
   .mr-10{
-    margin-right: 10px;
+    margin-right: 10px !important;
+  }
+
+  .mr-20{
+    margin-right: 20px !important;
   }
 
   .ml-10{
-    margin-left: 10px;
+    margin-left: 10px !important;
+  }
+
+  .ml-40{
+    margin-left: 40px !important;
   }
 
   .mt-10{
-    margin-top: 10px;
+    margin-top: 10px !important;
+  }
+
+  .mb-0{
+    margin-bottom: 0 !important;
   }
 
   .mb-10{
-    margin-bottom: 10px;
+    margin-bottom: 10px !important;
+  }
+
+  .mb-15{
+    margin-bottom: 15px !important;
+  }
+
+  .mb-20{
+    margin-bottom: 20px !important;
+  }
+
+  .mb-30{
+    margin-bottom: 30px !important;
+  }
+
+  .mb-40{
+    margin-bottom: 40px !important;
   }
 
   .mt-20{
-    margin-top: 20px;
+    margin-top: 20px !important;
+  }
+
+  .d-inline{
+    display: inline-block !important;
+  }
+
+  .d-block{
+    display: block !important;
   }
 
   .d-flex{
-    display: flex;
+    display: flex !important;
   }
 
   .align-items-center{

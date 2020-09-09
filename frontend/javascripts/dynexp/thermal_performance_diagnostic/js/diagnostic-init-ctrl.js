@@ -22,7 +22,7 @@
         });
 
         $scope.stopExperiment = function() {
-          $state.go('settings.root');
+          $state.go('home');
         };
 
         $scope.checkMachineStatus = function() {
@@ -75,6 +75,7 @@
             var newExpId = resp.data.experiment.id;
 
             startPromise.then(function() {
+              localStorage.setItem('init_activity', 'maintenance');
               $state.go('thermal_performance_diagnostic.diagnostic', {
                 id: newExpId
               });

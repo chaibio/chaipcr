@@ -209,7 +209,7 @@
           Experiment.stopExperiment({
             id: cal_exp_id
           }).then(function() {
-            $state.go('settings.root');
+            $state.go('home');
           });
         };
 

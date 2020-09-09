@@ -1,0 +1,11 @@
+<div class="modal-input-field" ng-class="{error: error}">
+  <label class="CX5">{{caption}}</label>  
+  <input ip-number class="ip-field first CX5-M" type="text" min="0" max="255" required="true" ng-model="splittedIP[0]">
+  <label class="CX5 point">.</label>  
+  <input ip-number class="ip-field second CX5-M" type="text" min="0" max="255" required="true" ng-model="splittedIP[1]">
+  <label class="CX5 point">.</label>  
+  <input ip-number class="ip-field third CX5-M" type="text" min="0" max="255" required="true" ng-model="splittedIP[2]">
+  <label class="CX5 point">.</label>  
+  <input ip-number class="ip-field fourth CX5-M" type="text" min="0" max="255" required="true" ng-model="splittedIP[3]">
+  <span class="CG1-M">{{error ? (field ? field + ' ' + error : error) : ''}}</span>
+</div>

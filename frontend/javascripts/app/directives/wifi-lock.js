@@ -51,7 +51,7 @@ angular.module('ChaiBioTech').directive('wifiLock', [
 
         scope.$watch("encryption", function(val) {
           if(scope.encryption === "" || scope.encryption === "none" ) {
-            angular.element(element).hide();
+            angular.element(element).css('opacity', '0');
           }
         });
         }
