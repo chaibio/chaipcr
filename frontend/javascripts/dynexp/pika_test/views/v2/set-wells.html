@@ -125,7 +125,7 @@
                 <span class="CB3">Will decrease certainty in negative results</span>
                 <a class="CB3-M" ng-click="learnMoreClick(true)">Learn More</a>
                 <div class="omit-tooltip" ng-if="omit_positive_help" style="top: -140px;">
-                  <a><img src="/images/x_k.svg" ng-click="omit_positive_help = !omit_positive_help"></a>
+                  <a ng-click="learnMoreClick(true)"><img src="/images/x_k.svg"></a>
                   <p class="CB2">It is recommended to run positive controls with each run to validate performance of the system. Positive controls should be omitted only by users with complete confidence in their sample preparation.</p>
                 </div>
               </div>
@@ -136,7 +136,7 @@
                 <span class="CB3">Positive samples may not be called</span>
                 <a class="CB3-M" ng-click="learnMoreClick(false)">Learn More</a>
                 <div class="omit-tooltip" ng-if="omit_negative_help">
-                  <a><img src="/images/x_k.svg" ng-click="omit_negative_help = !omit_negative_help"></a>
+                  <a ng-click="learnMoreClick(false)"><img src="/images/x_k.svg"></a>
                   <p class="CB2">In order to call a positive sample, it is necessary for one well to return a valid negative result. Without this, it cannot be concluded that positive results and not due to PCR contamination. <br/><br/>The negative control should only be omitted if you expect at least one negative result, i.e. you are running a high number of samples and expect most will be negative.</p>
                 </div>
               </div>

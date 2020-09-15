@@ -26,7 +26,9 @@
         id="inline_exp_name_field"
         ng-change="adjustTextWidth()"
         ng-model="experiment.name"         
-        focus-on="editExpNameMode">
+        focus-on="editExpNameMode"
+        maxlength="255"
+        >
     </div>
     <a class="edit-exp-name CB2-M" ng-click="focusExpName()" ng-show="!editExpNameMode">Edit</a>
     <a class="edit-exp-name CB2-B mr-10" ng-click="saveExperiment(experiment)" ng-show="editExpNameMode">Save</a>

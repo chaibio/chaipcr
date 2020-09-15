@@ -68,4 +68,9 @@
   .cursor-pointer{
     cursor: pointer;
   }
+
+  .modal-backdrop.in{
+    filter: alpha(opacity=0);
+    opacity: 0;    
+  }
 }
