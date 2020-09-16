@@ -4,7 +4,10 @@
   <description>Build basic debian image with kernel version 4.x</description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.17.2">
+    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@1.27.0">
+      <doNotScan>false</doNotScan>
+    </com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty>
+    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.18">
       <optOut>false</optOut>
     </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
     <hudson.model.ParametersDefinitionProperty>
@@ -47,8 +50,10 @@ lsblk
 df -h
 echo user: $(whoami)
 ping google.com -c 10
+sudo apt-get update
 echo Checking for nessasery packages:
 sudo apt-get -y -q install sshpass parted mdadm --allow-unauthenticated
+sudo apt-get -y -q install dirmngr --install-recommends
 
 sudo chmod 777      /var/lib/jenkins/.ssh/known_hosts
 ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
@@ -81,7 +86,6 @@ echo patching sshd_config
 #EOF
 sudo cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
 KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
-Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 EOF
 
 ssh-keygen -A || true
@@ -104,7 +108,6 @@ else
 	cat &lt;&lt;EOF &gt;&gt; /var/lib/jenkins/.ssh/config
 Host $build_machine
 		KexAlgorithms +diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
-		Ciphers +3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 #		KexAlgorithms +diffie-hellman-group1-sha1
 #        KexAlgorithms +curve25519-sha256@libssh.org
 #        KexAlgorithms +ecdh-sha2-nistp256
@@ -143,7 +146,6 @@ else
     
 	cat &lt;&lt;EOF&gt;&gt; /etc/ssh/sshd_config
 		KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
-		Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 EOF
 	ssh-keygen -A || true
 
@@ -170,7 +172,6 @@ else
     
 	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
 KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
-Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 
 EOF
 	ssh-keygen -A || true
@@ -217,7 +218,7 @@ done
 echo done connection check.
 sleep 20</command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo &quot;Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}&quot;
 echo &quot;Slave Beaglebone at ${build_machine}&quot;
@@ -258,8 +259,9 @@ then
 fi
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command># download flasher image
 
@@ -289,7 +291,10 @@ wget $download_prefix/$image_filename || exit 1
 #	exit 1
 #fi
 
+sudo apt-get update
 echo installing missing packages.
+DEBIAN_FRONTEND=noninteractive apt-get -y -q install dirmngr --install-recommends
+sudo apt-get -y -q install dirmngr --install-recommends
 
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 9D6D8F6BC857C906
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7638D0442B90D010
@@ -337,13 +342,15 @@ fi
 echo done flashing sdcard
 sync
 
-#apt-get install -y -q parted
-blockdev --flushbufs /dev/mmcblk0
-partprobe /dev/mmcblk0
-sfdisk -R /dev/mmcblk0
+apt-get install -y -q parted || true
+apt-get install -y -q hdparm || true
+
+blockdev --flushbufs /dev/mmcblk0 || true
+partprobe /dev/mmcblk0 || true
+sfdisk -R /dev/mmcblk0 || true
 udevadm trigger --subsystem-match=block; udevadm settle
-blockdev --rereadpt /dev/mmcblk0
-hdparm -z /dev/mmcblk0
+blockdev --rereadpt /dev/mmcblk0 || true
+hdparm -z /dev/mmcblk0 || true
 
 echo patching sdcard
 mount /dev/mmcblk0p1 /mnt  || exit 1
@@ -352,17 +359,16 @@ cd /mnt/opt/scripts/tools/eMMC/
 echo first patching sshd_config
 cat &lt;&lt;EOF &gt;&gt; /mnt/etc/ssh/sshd_config
 KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
-Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 EOF
 
-if [ -e functions-201712.sh.patch ]
+if [ -e functions-20200808.sh.patch ]
 then
    echo sdcard got patched before
 else
 
-wget $download_prefix/functions-201712.sh.patch
-patch -i functions-201712.sh.patch
-rm functions-201712.sh.patch
+wget $download_prefix/functions-20200808.sh.patch
+patch -i functions-20200808.sh.patch
+#rm functions-20200808.sh.patch
 
 if $check_badblocks
 then
@@ -434,10 +440,12 @@ lazy_flash()
 	if mount | grep &quot;/dev/mmcblk1&quot; | grep -w &quot;/&quot;
 	then
 		echo &quot;==&gt; Booting from eMMC&quot;
-		if [ /opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh ]
+		if [ -e /opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh ]
 		then
 			mv /opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh /opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh.org
+                        echo Flasher is now disabled
 		fi	
+                echo Flasher is disabled
 		exit 0
 	else
 		echo &quot;==&gt; Flasher is booting from SDCard&quot;
@@ -445,8 +453,13 @@ lazy_flash()
 	if [ -e /opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh ]
 	then
 		echo starting flasher
-		bash /opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh
-		#mv /opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh  /opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh.done
+		cp /opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh /opt/scripts/tools/eMMC/init-eMMC-flasher-v3-chaibio.sh
+		mv /opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh /opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh.org
+
+		/bin/bash /opt/scripts/tools/eMMC/init-eMMC-flasher-v3-chaibio.sh
+                #it never come here (Reboots earlier)
+                echo Flasher is all done
+		mv /opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh  /opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh.done
 		echo Done flashing
 	else
 		echo &quot;==&gt; Flasher was done before&quot;
@@ -460,8 +473,8 @@ exit 0
 
 EOF
 cd
-touch /forcefsck
-touch /mnt/forcefsck
+#touch /forcefsck
+#touch /mnt/forcefsck
 sync
 
 cd
@@ -486,6 +499,7 @@ echo &quot;Restart scheduled after a min&quot;
 
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -533,9 +547,15 @@ done
 echo &quot;timeout waiting for the device to become ready!&quot;
 exit 1</command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Updating kernel on $build_machine
+
+sudo apt-get update
+#sudo apt-get upgrade -y -q
+echo installing missing packages.
+DEBIAN_FRONTEND=noninteractive apt-get -y -q install dirmngr --install-recommends
+
 #
 #cat &lt;&lt;EOF &gt;&gt; /etc/apt/sources.list
 #deb [arch=armhf] http://repos.rcn-ee.com/debian/ jessie main
@@ -560,10 +580,10 @@ apt-get update
 apt-get autoremove
 apt-get install -y -q -f
 
-apt-get install -y -q git ntpdate  || exit 1
+DEBIAN_FRONTEND=noninteractive apt-get install -y -q git ntpdate  || exit 1
 apt-get install -y -q -f
 
-apt-get install -y -q unzip parted  || exit 1
+DEBIAN_FRONTEND=noninteractive apt-get install -y -q unzip parted  || exit 1
 apt-get install -y -q -f
 
 apt-get install -y -q autoremove
@@ -585,7 +605,7 @@ ntpdate -b -s -u pool.ntp.org
 
 #     ./update_kernel.sh --ti-channel --lts-4_9
 
-touch /forcefsck
+#touch /forcefsck
 sync 
 shutdown -r 1
 
@@ -595,6 +615,7 @@ echo restart scheduled after a min-2
 #exit 0
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -637,16 +658,18 @@ done
 echo timeout waiting for the device to become ready!
 exit 1</command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo device is restarted.. 
+
 ping google.com -c 10
 
 apt-key update
 apt-get update
 
-apt-get -q -y upgrade
-apt-get -q -y dist-upgrade
+apt-mark hold bb-cape-overlays
+DEBIAN_FRONTEND=noninteractive apt-get -q -y upgrade
+#DEBIAN_FRONTEND=noninteractive apt-get -q -y dist-upgrade
 
 update-initramfs -u
 touch /forcefsck
@@ -658,10 +681,12 @@ echo image creation done.
 
 exit 0</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo zeroing
+
 echo 1500 &gt; /proc/sys/kernel/hung_task_timeout_secs
 
 dd if=/dev/zero of=/zeros.bigfile bs=16M
@@ -709,6 +734,7 @@ shutdown -r 1
 exit 0
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -733,6 +759,6 @@ exit 1</command>
   </builders>
   <publishers/>
   <buildWrappers>
-    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.8"/>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.11.3"/>
   </buildWrappers>
 </project>
