@@ -98,7 +98,7 @@ class TargetsWell < ActiveRecord::Base
     replic_group = []
     replic_group_num = 1
     cq_sum = 0
-    quantity_sum = nil
+    quantity_sum = 0
     targets = []
     targets_wells << nil
     targets_wells.each do |target|
@@ -136,7 +136,7 @@ class TargetsWell < ActiveRecord::Base
       else
         if !replic_group.blank?
           mean_cq = cq_sum/replic_group.length
-          if !quantity_sum.nil?
+          if quantity_sum != 0
             mean_quantity = quantity_sum/replic_group.length
             mean_quantity_nodes = decimal_to_scientific_notation(mean_quantity)
           else
@@ -151,7 +151,7 @@ class TargetsWell < ActiveRecord::Base
         end
         replic_group = []
         cq_sum = 0
-        quantity_sum = nil
+        quantity_sum = 0
       end
 
       #create targets list with unique target
