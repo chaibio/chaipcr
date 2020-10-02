@@ -4,7 +4,10 @@
   <description>Build basic debian image with kernel version 4.x</description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.17.2">
+    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@1.27.0">
+      <doNotScan>false</doNotScan>
+    </com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty>
+    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.18">
       <optOut>false</optOut>
     </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
     <hudson.model.ParametersDefinitionProperty>
@@ -81,7 +84,7 @@ echo patching sshd_config
 #EOF
 sudo cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
 KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
-Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+#Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 EOF
 
 ssh-keygen -A || true
@@ -104,7 +107,7 @@ else
 	cat &lt;&lt;EOF &gt;&gt; /var/lib/jenkins/.ssh/config
 Host $build_machine
 		KexAlgorithms +diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
-		Ciphers +3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+#		Ciphers +3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 #		KexAlgorithms +diffie-hellman-group1-sha1
 #        KexAlgorithms +curve25519-sha256@libssh.org
 #        KexAlgorithms +ecdh-sha2-nistp256
@@ -143,7 +146,7 @@ else
     
 	cat &lt;&lt;EOF&gt;&gt; /etc/ssh/sshd_config
 		KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
-		Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+#		Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 EOF
 	ssh-keygen -A || true
 
@@ -170,7 +173,7 @@ else
     
 	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
 KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
-Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+#Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 
 EOF
 	ssh-keygen -A || true
@@ -217,7 +220,7 @@ done
 echo done connection check.
 sleep 20</command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo &quot;Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}&quot;
 echo &quot;Slave Beaglebone at ${build_machine}&quot;
@@ -255,8 +258,9 @@ then
 fi
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command># download flasher image
 
@@ -345,7 +349,7 @@ cd /mnt/opt/scripts/tools/eMMC/
 echo first patching sshd_config
 cat &lt;&lt;EOF &gt;&gt; /mnt/etc/ssh/sshd_config
 KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
-Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+# Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 EOF
 
 if [ -e functions-201712.sh.patch ]
@@ -412,6 +416,7 @@ echo &quot;Restart scheduled after a min&quot;
 
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -459,7 +464,7 @@ done
 echo &quot;timeout waiting for the device to become ready!&quot;
 exit 1</command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Updating kernel on $build_machine
 #
@@ -521,6 +526,7 @@ echo restart scheduled after a min-2
 #exit 0
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -563,7 +569,7 @@ done
 echo timeout waiting for the device to become ready!
 exit 1</command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo device is restarted.. 
 ping google.com -c 10
@@ -572,7 +578,7 @@ apt-key update
 apt-get update
 
 apt-get -q -y upgrade
-apt-get -q -y dist-upgrade
+#apt-get -q -y dist-upgrade
 
 update-initramfs -u
 touch /forcefsck
@@ -584,8 +590,9 @@ echo image creation done.
 
 exit 0</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo zeroing
 echo 1500 &gt; /proc/sys/kernel/hung_task_timeout_secs
@@ -635,6 +642,7 @@ shutdown -r 1
 exit 0
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -659,6 +667,6 @@ exit 1</command>
   </builders>
   <publishers/>
   <buildWrappers>
-    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.8"/>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.11.3"/>
   </buildWrappers>
 </project>
