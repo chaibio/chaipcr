@@ -4,11 +4,14 @@
   <description>Build Chaibio shoftware</description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.28.0">
+    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@1.27.0">
+      <doNotScan>false</doNotScan>
+    </com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty>
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.30.0">
       <projectUrl>https://github.com/chaibio/chaipcr.git/</projectUrl>
       <displayName></displayName>
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
-    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.17.2">
+    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.18">
       <optOut>false</optOut>
     </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
     <hudson.model.ParametersDefinitionProperty>
@@ -139,7 +142,7 @@ done
 echo done connection check.
 </command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo &quot;Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}&quot;
 echo &quot;Slave Beaglebone at ${build_machine}&quot;
@@ -165,8 +168,9 @@ dpkg --configure -a
 
 exit 0</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>#	echo update sources# if not updated?
 echo kernel is updated	
@@ -212,6 +216,7 @@ shutdown -r 1
 echo a reboot is scheduled after a minute.
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -232,7 +237,7 @@ done
 echo timeout waiting for the device to become ready!
 exit 1</command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>#!/bin/bash
 apt-get update
@@ -339,8 +344,9 @@ service mysql start
 
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo unmounting any sdcard folders and creating swap file
 umount /sdcard/*
@@ -385,8 +391,9 @@ sudo swapon -s
 
 free -m</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Update Software
 apt-key update
@@ -476,8 +483,9 @@ exit 0
 
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo install 3rd party packages
 sync
@@ -508,14 +516,20 @@ fsck /dev/mmcblk1p1 -y -f
 df -h
 exit 0</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo installing POCO
 if $is_dev
 then
       echo Building a debug image
       cd /sdcard/factory/
+else
+      if [ -e poco-1.6.1.tar.gz ]
+      then
+             rm -r poco-*
+      fi
 fi
 
 wget &quot;http://pocoproject.org/releases/poco-1.6.1/poco-1.6.1.tar.gz&quot;  || exit 1
@@ -537,6 +551,69 @@ else
       rm -rf poco-1.6.1* poco-1.6.1.tar.gz
 fi
 
+echo install wifi firmware
+apt-get -y install firmware-realtek || exit 1
+ 
+apt install -y dkms
+
+echo installing 3rd party Edimax driver
+
+mkdir -p /sdcard/factory/wifi/edimax
+cd /sdcard/factory/wifi/edimax
+git clone https://github.com/pvaret/rtl8192cu-fixes.git
+cd rtl8192cu-fixes
+
+sed -i &apos;s/CONFIG_PLATFORM_I386_PC = y/CONFIG_PLATFORM_I386_PC = n/&apos; Makefile
+sed -i &apos;s/CONFIG_PLATFORM_ARM_GENERIC = n/CONFIG_PLATFORM_ARM_GENERIC = y/&apos; Makefile
+
+cd ..
+
+dkms add ./rtl8192cu-fixes
+dkms install 8192cu/1.11
+depmod -a
+cp ./rtl8192cu-fixes/blacklist-native-rtl8192.conf /etc/modprobe.d/
+
+ls -ahl /lib/modules/4.9.78-ti-chai-r94/updates/dkms/8192cu.ko || echo &quot;Error: failed adding edimax 3rd party driver&quot;
+
+rmmod /lib/modules/4.9.78-ti-chai-r94/kernel/drivers/net/wireless/realtek/rtlwifi/rtl8192cu/rtl8192cu.ko || true
+
+mv /lib/modules/4.9.78-ti-chai-r94/kernel/drivers/net/wireless/realtek/rtlwifi/rtl8192cu/rtl8192cu.ko   /lib/modules/4.9.78-ti-chai-r94/kernel/drivers/net/wireless/realtek/rtlwifi/rtl8192cu/rtl8192cu.ko.disabled || true
+
+echo installing cudy driver
+apt install -y usb-modeswitch
+
+mkdir -p /sdcard/factory/wifi/cudy
+cd /sdcard/factory/wifi/cudy
+git clone https://github.com/brektrou/rtl8821CU.git
+cd rtl8821CU
+
+echo fixing MakeFile
+sudo cp /lib/modules/$(uname -r)/build/arch/arm/Makefile /lib/modules/$(uname -r)/build/arch/arm/Makefile.$(date +%Y%m%d%H%M)
+sudo sed -i &apos;s/-msoft-float//&apos; /lib/modules/$(uname -r)/build/arch/arm/Makefile
+sudo ln -s /lib/modules/$(uname -r)/build/arch/arm /lib/modules/$(uname -r)/build/arch/armv7l
+sudo sed -i &apos;s/CONFIG_PLATFORM_I386_PC = y/CONFIG_PLATFORM_I386_PC = n/&apos; Makefile
+sudo sed -i &apos;s/CONFIG_PLATFORM_ARM_RPI = n/CONFIG_PLATFORM_ARM_RPI = y/&apos; Makefile
+
+
+echo Building..
+chmod +x dkms-install.sh
+time ./dkms-install.sh
+ls -ahl /lib/modules/4.9.78-ti-chai-r94/updates/dkms/8821cu.ko
+modprobe 8821cu
+
+echo editing usb_modeswitch rules..
+sed  -i &apos;/LABEL=&quot;modeswitch_rules_end&quot;/i # &apos; /lib/udev/rules.d/40-usb_modeswitch.rules
+sed  -i &apos;/LABEL=&quot;modeswitch_rules_end&quot;/i # Realtek 8211CU Wifi AC USB&apos; /lib/udev/rules.d/40-usb_modeswitch.rules
+sed  -i &apos;/LABEL=&quot;modeswitch_rules_end&quot;/i ATTR{idVendor}==&quot;0bda&quot;, ATTR{idProduct}==&quot;1a2b&quot;, RUN+=&quot;/usr/sbin/usb_modeswitch -K -v 0bda -p 1a2b&quot;&apos; /lib/udev/rules.d/40-usb_modeswitch.rules
+sed  -i &apos;/LABEL=&quot;modeswitch_rules_end&quot;/i # &apos; /lib/udev/rules.d/40-usb_modeswitch.rules
+
+if $is_dev
+then
+      echo Building a debug image
+else
+      echo cleaning up wifi drivers build folder
+      rm -r /sdcard/factory/wifi
+fi
 
 sync
 fsck /dev/mmcblk1p1 -y -f
@@ -545,20 +622,26 @@ df -h
 exit 0
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo cleanup without envs
 
 apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential || true
+echo done installing essentials.. 
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get install -q -y gfortran ntpdate || exit 1
+
+echo syncing time.. 
 ntpdate -b -s -u pool.ntp.org
 sync
+sleep 100
 
-apt-get autoremove -q -y --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data libx11* libxcb* || exit 1
+echo removing unneeded packages
+apt-get autoremove -q -y --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data libx11* libxcb*
 
 echo cleanup with envs
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get autoremove -q -y --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data libx11* libxcb* || exit 1
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_FRONTEND=noninteractive apt-get autoremove -q -y --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data libx11* libxcb*
 
 apt-get clean
 apt-get autoclean
@@ -644,8 +727,9 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_
 df -h
 exit 0</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo downloading and installing Julia
 sync
@@ -859,8 +943,9 @@ ls -ahl
 exit 0
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo installing QT
 dpkg --configure -a
@@ -904,13 +989,15 @@ fi
 sync
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command></command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>if $bypass_julia
 then
@@ -929,8 +1016,9 @@ exit 0
 
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Disable Services
 systemctl disable cloud9.service
@@ -963,8 +1051,9 @@ fsck /dev/mmcblk0p1 -y -f
 df -h
 exit 0</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Install Ruby Packages
 gem install bundle
@@ -972,8 +1061,9 @@ gem install bundle
 #gem install nodejs
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Build gems with native extensions
 bundle config build.atomic --use-system-libraries || exit 1
@@ -983,8 +1073,9 @@ bundle config build.nokogiri --use-system-libraries || exit 1
 
 df -h</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Remote Support Access
 sync
@@ -1008,16 +1099,18 @@ rm ngrok
 df -h
 exit 0</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo removing service user password
 #Edit /etc/shadow, remove password for service by setting pw to *
 passwd service -d
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo installing boost
 sync
@@ -1028,8 +1121,9 @@ apt-get -q -y install libboost-chrono-dev libboost-system-dev || exit 1
 df -h
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo zeroing
 
@@ -1058,6 +1152,7 @@ fi
 df -h
 echo basic beaglebone setup done!</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>echo all 3rd party software done for $build_machine, you can call call deploy_chibio job to add chibio software now.
@@ -1067,6 +1162,6 @@ exit 0</command>
   </builders>
   <publishers/>
   <buildWrappers>
-    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.8"/>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.11.3"/>
   </buildWrappers>
 </project>
