@@ -48,7 +48,7 @@
 
       $scope.is_omittable = false;
 
-      var target2_name = 'IPC';
+      var target2_name = ['IPC'];
 
       function getExperiment(exp_id, cb) {
         Experiment.get({id: exp_id}).then(function(resp) {
@@ -74,22 +74,32 @@
             $scope.initial_done = true;
             switch($scope.experiment.guid){
               case 'chai_coronavirus_env_kit':
-                $scope.target1_name = 'Coronavirus Environmental Surface';
-                target2_name = 'IAC';
+                target2_name = ['IAC', 'RPLP0'];
                 $scope.is_omittable = false;
                 break;
               case 'pika_4e_kit':
-                target2_name = 'IPC';
+                target2_name = ['IPC'];
                 $scope.is_omittable = true;
                 break;
             }
 
             Experiment.getTargets($stateParams.id).then(function (resp) {
               for(var i = 0; i < resp.data.length; i++){
-                if(resp.data[i].target.name.trim() != target2_name){
+                if(!target2_name.includes(resp.data[i].target.name.trim())){
                   $scope.targets.push(resp.data[i].target);
                 } else {
                   $scope.target_ipc = resp.data[i].target;
+                  if ($scope.experiment.guid == 'chai_coronavirus_env_kit'){
+                    switch($scope.target_ipc.name){
+                      case 'IAC':
+                        $scope.target1_name = 'Coronavirus Environmental Surface';
+                        break;
+                      case 'RPLP0':
+                        $scope.target1_name = 'COVID-19 Surveillance';
+                        break;
+                    }
+                  }
+
                 }
               }
               $scope.is_two_kit = ($scope.targets.length == 2) ? true : false;

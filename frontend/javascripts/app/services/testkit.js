@@ -38,7 +38,7 @@ window.ChaiBioTech.ngApp.service('Testkit', [
       });
     };
 
-    self.getAmountArray = function(twoKits){
+    self.getAmountArray = function(famCq, twoKits){
       var i = 0;
       this.amount  = [];
       this.amount[0] = (this.result[0] == "Invalid") ? "Repeat - Refer to user manual" : "";
@@ -135,6 +135,7 @@ window.ChaiBioTech.ngApp.service('Testkit', [
         this.result[i]="Invalid";
         if(this.result[1] == "Invalid"){
           this.result[i]="Invalid";
+          continue;
         } else if(this.result[0] == "Valid" && this.result[1] == "Valid") {
           if(famCq[i]>=10 && famCq[i]<=38){
             this.result[i]="Positive";
@@ -143,9 +144,8 @@ window.ChaiBioTech.ngApp.service('Testkit', [
           } else if (famCq[i] > 38 && (hexCq[i]>=20 && hexCq[i]<=36)){
             this.result[i]="Negative";
           }
-        } 
-
-        if (this.result[1] == "Valid"){
+          continue;
+        } else if (this.result[1] == "Valid"){
           if((!famCq[i]) && (!hexCq[i])){
             this.result[i]="Inhibited";
           } else if(!(famCq[i]) && hexCq[i] > 36) {
@@ -154,7 +154,7 @@ window.ChaiBioTech.ngApp.service('Testkit', [
             this.result[i]="Inhibited";
           } else if(famCq[i] > 38 && hexCq[i] > 36){
             this.result[i]="Inhibited";
-          }
+          }          
         }
       }
       if(!twoKits){
@@ -162,6 +162,7 @@ window.ChaiBioTech.ngApp.service('Testkit', [
           this.result[i]="Invalid";
           if(this.result[1] == "Invalid"){
             this.result[i]="Invalid";
+            continue;
           } else if(this.result[0] == "Valid" && this.result[1] == "Valid") {
             if(famCq[i]>=10 && famCq[i]<=38){
               this.result[i]="Positive";
@@ -170,9 +171,8 @@ window.ChaiBioTech.ngApp.service('Testkit', [
             } else if (famCq[i] > 38 && (hexCq[i]>=20 && hexCq[i]<=36)){
               this.result[i]="Negative";
             }
-          } 
-
-          if (this.result[1] == "Valid"){
+            continue;
+          } else if (this.result[1] == "Valid"){
             if((!famCq[i]) && (!hexCq[i])){
               this.result[i]="Inhibited";
             } else if(!(famCq[i]) && hexCq[i] > 36) {
@@ -204,6 +204,7 @@ window.ChaiBioTech.ngApp.service('Testkit', [
           this.result[i]="Invalid";
           if(this.result[9] == "Invalid"){
             this.result[i]="Invalid";
+            continue;
           } else if(this.result[8] == "Valid" && this.result[9] == "Valid") {
             if(famCq[i]>=10 && famCq[i]<=38){
               this.result[i]="Positive";
@@ -212,9 +213,8 @@ window.ChaiBioTech.ngApp.service('Testkit', [
             } else if (famCq[i] > 38 && (hexCq[i]>=20 && hexCq[i]<=36)){
               this.result[i]="Negative";
             }
-          } 
-
-          if (this.result[9] == "Valid"){
+            continue;
+          } else if (this.result[9] == "Valid"){
             if((!famCq[i]) && (!hexCq[i])){
               this.result[i]="Inhibited";
             } else if(!(famCq[i]) && hexCq[i] > 36) {
@@ -241,6 +241,38 @@ window.ChaiBioTech.ngApp.service('Testkit', [
       }
 
       if((!famCq[1] || famCq[1] == 0) && (hexCq[1]>0)){
+        this.result[1]="Valid";
+      } else{
+        this.result[1]="Invalid";
+      }
+
+      for (i = 2; i < 16; i++) {
+        this.result[i]="Invalid";
+        if(this.result[1] == "Valid" && famCq[i]>0){
+          this.result[i]="Positive";
+        } else if(this.result[1] == "Invalid" && famCq[i]>0){
+          this.result[i]="Invalid - NTC Control Failed";
+        } else if(this.result[0] == "Valid" && hexCq[i]>0 && (!famCq[i] || famCq[i] == 0)){
+          this.result[i]="Not Detected";
+        } else if(this.result[0] == "Invalid" && hexCq[i]>0 && (!famCq[i] || famCq[i] == 0)){
+          this.result[i]="Invalid - Positive Control Failed";
+        } else if((!famCq[i] || famCq[i] == 0) && (!hexCq[i] || hexCq[i] == 0)){
+          this.result[i]="Inhibited";
+        }
+      }
+      return this.result;
+    };
+
+    self.getCovid19SurResultArray = function(famCq, hexCq){
+      var i = 0;
+      this.result = [];
+      if(famCq[0]>0 && hexCq[0]>0){
+        this.result[0]="Valid";
+      } else {
+        this.result[0]="Invalid";
+      }
+
+      if((!famCq[1] || famCq[1] == 0) && (!hexCq[1] || hexCq[1] == 0)){
         this.result[1]="Valid";
       } else{
         this.result[1]="Invalid";

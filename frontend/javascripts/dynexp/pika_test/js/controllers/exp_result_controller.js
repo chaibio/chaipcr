@@ -43,7 +43,7 @@
       $scope.amount[1] = "\u2014";
       $scope.samples = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
       $scope.targets = [];
-      var target2_name = 'IPC';
+      var target2_name = ['IPC'];
 
       $scope.$on('status:data:updated', function(e, data, oldData) {
         if (!data) return;
@@ -77,11 +77,15 @@
 
               switch($scope.experiment.guid){
                 case 'chai_coronavirus_env_kit':
-                  $scope.result = Testkit.getCoronaResultArray($scope.famCq, $scope.hexCq);
+                  if($scope.target_ipc.name == 'IAC'){
+                    $scope.result = Testkit.getCoronaResultArray($scope.famCq, $scope.hexCq);
+                  } else if($scope.target_ipc.name == 'RPLP0'){
+                    $scope.result = Testkit.getCovid19SurResultArray($scope.famCq, $scope.hexCq);
+                  }
                   break;
                 case 'pika_4e_kit':
                   $scope.result = Testkit.getResultArray($scope.famCq, $scope.hexCq, $scope.twoKits);
-                  $scope.amount = Testkit.getAmountArray($scope.twoKits);
+                  $scope.amount = Testkit.getAmountArray($scope.famCq, $scope.twoKits);
                   break;
               }
               
@@ -132,10 +136,10 @@
             $scope.initial_done = true;
             switch($scope.experiment.guid){
               case 'chai_coronavirus_env_kit':
-                target2_name = 'IAC';
+                target2_name = ['IAC', 'RPLP0'];
                 break;
               case 'pika_4e_kit':
-                target2_name = 'IPC';
+                target2_name = ['IPC'];
                 break;
             }
             Experiment.getWellLayout($stateParams.id).then(function (well_resp) {
@@ -151,7 +155,7 @@
               Experiment.getTargets($stateParams.id).then(function (resp) {
                 var targets = resp.data;
                 for(var i = 0; i < targets.length; i++){
-                  if(targets[i].target.name.trim() == target2_name){
+                  if(target2_name.includes(targets[i].target.name.trim())){
                     hexTargets.push(targets[i].target.id);
                     $scope.target_ipc = targets[i].target;
                   } else {
