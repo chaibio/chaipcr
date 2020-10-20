@@ -45,9 +45,7 @@
                       ng-focus="focusWell('A', $index, x.name)"
                       ng-if="!isControlWell(x, $index, 'A')"
                       >
-                    <label class="CG1 type" ng-class="{'positive': well_types[$index] == 'positive_control', 'negative': well_types[$index] == 'negative_control', 'available': x.name}">
-                      {{(well_types[$index] == 'positive_control') ? '+' : ( (well_types[$index] == 'negative_control') ? '-' : 'S' )}}
-                    </label>
+                    <label class="CG1 type" ng-class="{'positive': well_types[$index] == 'positive_control', 'negative': well_types[$index] == 'negative_control', 'available': x.name}"></label>
                     <img src="/images/dynexp/pika-test/note-disable.svg" class="note" ng-if="!x.name"/>
                     <img src="/images/dynexp/pika-test/note-on.svg" class="note cursor-pointer note-{{'A'+$index}}" ng-if="x.name && x.notes" ng-click="openNotes($index, x, 'A')"/>
                     <img src="/images/dynexp/pika-test/note-off.svg" class="note cursor-pointer note-{{'A'+$index}}" ng-if="x.name && !x.notes" ng-click="openNotes($index, x, 'A')"/>
@@ -73,9 +71,7 @@
                       ng-focus="focusWell('B', $index, x.name)"
                       ng-if="!isControlWell(x, $index, 'B')"
                       >
-                    <label class="CG1 type" ng-class="{'positive': well_types[$index + 8] == 'positive_control', 'negative': well_types[$index + 8] == 'negative_control', 'available': x.name}">
-                      {{(well_types[$index + 8] == 'positive_control') ? '+' : ( (well_types[$index + 8] == 'negative_control') ? '-' : 'S' )}}
-                    </label>
+                    <label class="CG1 type" ng-class="{'positive': well_types[$index + 8] == 'positive_control', 'negative': well_types[$index + 8] == 'negative_control', 'available': x.name}"></label>
                     <img src="/images/dynexp/pika-test/note-disable.svg" class="note" ng-if="!x.name"/>
                     <img src="/images/dynexp/pika-test/note-on.svg" class="note cursor-pointer note-{{'B'+$index}}" ng-if="x.name && x.notes" ng-click="openNotes($index, x, 'B')"/>
                     <img src="/images/dynexp/pika-test/note-off.svg" class="note cursor-pointer note-{{'B'+$index}}" ng-if="x.name && !x.notes" ng-click="openNotes($index, x, 'B')"/>
@@ -99,9 +95,7 @@
                         'positive': well_types[$index] == 'positive_control', 
                         'negative': well_types[$index] == 'negative_control', 
                         'available': x.name,
-                        'active': (current_well_index == $index && current_well_row == 'A')}">
-                      {{(well_types[$index] == 'positive_control') ? '+' : ( (well_types[$index] == 'negative_control') ? '-' : 'S' )}}
-                    </label>
+                        'active': (current_well_index == $index && current_well_row == 'A')}"></label>
                   </td>
                 </tr>
                 <tr>
@@ -112,9 +106,7 @@
                         'positive': well_types[$index + 8] == 'positive_control', 
                         'negative': well_types[$index + 8] == 'negative_control', 
                         'available': x.name,
-                        'active': (current_well_index == $index && current_well_row == 'B')}">
-                      {{(well_types[$index + 8] == 'positive_control') ? '+' : ( (well_types[$index + 8] == 'negative_control') ? '-' : 'S' )}}
-                    </label>
+                        'active': (current_well_index == $index && current_well_row == 'B')}"></label>
                   </td>
                 </tr>
               </table>

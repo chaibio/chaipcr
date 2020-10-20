@@ -68,11 +68,11 @@
               &.positive{
                 &.available{
                   border: 1px solid $red;
-                  color: $white;
                   visibility: visible;
-                  background: $red;
-                  font-size: 24px;
-                  line-height: 24px;
+                  background: url("/images/dynexp/pika-test/TPos.svg") $red;
+                  background-repeat: no-repeat;
+                  background-size: contain;
+                  background-position: center;
                 }
 
               }
@@ -80,17 +80,19 @@
               &.negative{
                 &.available{
                   border: 1px solid $black;
-                  color: $white;
                   visibility: visible;
-                  background: $black;
-                  font-size: 24px;
-                  line-height: 24px;
+                  background: url("/images/dynexp/pika-test/TNeg.svg") $black;
+                  background-repeat: no-repeat;
+                  background-size: contain;
+                  background-position: center;
                 }
               }
 
               &.available{
-                background: $well-type-color;
-                color: $white;
+                background: url("/images/dynexp/pika-test/TSamp.svg") $well-type-color;
+                background-repeat: no-repeat;
+                background-size: contain;
+                background-position: center;
               }
             }
             .note{
@@ -218,10 +220,10 @@
             background: $white;
             &.available{
               border: 1px solid $red;
-              color: $white;
-              background: $red;
-              font-size: 20px;
-              line-height: 18px;
+              background: url("/images/dynexp/pika-test/TPos.svg") $red;
+              background-repeat: no-repeat;
+              background-size: contain;
+              background-position: center;
             }
 
           }
@@ -230,17 +232,19 @@
             background: $white;
             &.available{
               border: 1px solid $black;
-              color: $white;
               visibility: visible;
-              background: $black;
-              font-size: 20px;
-              line-height: 18px;
+              background: url("/images/dynexp/pika-test/TNeg.svg") $black;
+              background-repeat: no-repeat;
+              background-size: contain;
+              background-position: center;
             }
           }
 
           &.available{
-            background: $well-type-color;
-            color: $white;
+            background: url("/images/dynexp/pika-test/TSamp.svg") $well-type-color;
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-position: center;
           }
         }
 

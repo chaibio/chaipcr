@@ -34,6 +34,10 @@
       $scope.target_ipc = null;
       $scope.twoKits = false;
 
+      $scope.omit_positive = false;
+      $scope.omit_negative = false;
+      $scope.neg_exist = false;
+
       $scope.famCq = [];
       $scope.hexCq = [];
       $scope.amount = [];
@@ -84,7 +88,7 @@
                   }
                   break;
                 case 'pika_4e_kit':
-                  $scope.result = Testkit.getResultArray($scope.famCq, $scope.hexCq, $scope.twoKits);
+                  $scope.result = Testkit.getResultArray($scope.famCq, $scope.hexCq, $scope.twoKits, $scope.omit_positive, $scope.omit_negative, $scope.neg_exist);
                   $scope.amount = Testkit.getAmountArray($scope.famCq, $scope.twoKits);
                   break;
               }
@@ -146,11 +150,21 @@
               var k, i;
               for (i = 0; i < 16; i++) {
                 $scope.samples[i] = (well_resp.data[i].samples) ? well_resp.data[i].samples[0] : {id: 0, name: ''};
+                if($scope.samples[i].name == 'Negative' && well_resp.data[i].targets){
+                  for(k = 0; k < well_resp.data[i].targets.length; k++){
+                    if(well_resp.data[i].targets[k].name == 'IPC'){
+                      $scope.neg_exist = true;
+                    }
+                  }
+                }
               }
 
               for (i = 0; i < 16; i++) {
                 $scope.notes[i] = '';
               }
+
+              $scope.omit_positive = (well_resp.data[0].targets && well_resp.data[0].targets[0].well_type == 'positive_control') ? false : true;
+              $scope.omit_negative = (well_resp.data[1].targets && well_resp.data[1].targets[0].well_type == 'negative_control') ? false : true;
 
               Experiment.getTargets($stateParams.id).then(function (resp) {
                 var targets = resp.data;
