@@ -2,7 +2,28 @@
   <div class="row" ng-show="!performance_screen">
     <div class="col-sm-6">
       <div class="box-frame">
-        <h5 class="CX5-M mb-15">Thermal Performance</h5>
+        <h5 class="CX5-M mb-15">Optical Calibration</h5>
+        <p class="CX5 mb-10">Compensates for well-to-well variations in optical performance.</p>
+        <p class="CX5 mb-20">Run whenever lid height is adjusted or tube type is changed.</p>
+        <button 
+          class="ci-btn-light CX5" 
+          ng-class="{ 'disabled': anotherExperimentInProgress || !checked}" 
+          ng-if="!is_dual_channel" 
+          ng-click="onCalibOpticalClick(false)">
+          Run Now
+        </button>
+        <button 
+          class="ci-btn-light CX5" 
+          ng-class="{ 'disabled': anotherExperimentInProgress || !checked}" 
+          ng-if="is_dual_channel" 
+          ng-click="onCalibOpticalClick(true)">
+          Run Now
+        </button>        
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="box-frame">
+        <h5 class="CX5-M mb-15">Thermal Performance Test</h5>
         <p class="CX5 mb-20">Tests block heating & cooling performance; lid heating</p>
         <button
           class="ci-btn-light CX5" 
@@ -14,7 +35,7 @@
     </div>
     <div class="col-sm-6">
       <div class="box-frame">
-        <h5 class="CX5-M mb-15">Optical</h5>
+        <h5 class="CX5-M mb-15">Optical Test</h5>
         <p class="CX5 mb-20">Tests functionality of fluorescence detection optics</p>
         <button 
           class="ci-btn-light CX5" 
@@ -42,27 +63,6 @@
           ng-click="onUniformityClick()">
           Run Now
         </button>
-      </div>
-    </div>
-    <div class="col-sm-6">
-      <div class="box-frame">
-        <h5 class="CX5-M mb-15">Optical Calibration</h5>
-        <p class="CX5 mb-10">Compensates for well-to-well variations in optical performance.</p>
-        <p class="CX5 mb-20">Run whenever lid height is adjusted or tube type is changed.</p>
-        <button 
-          class="ci-btn-light CX5" 
-          ng-class="{ 'disabled': anotherExperimentInProgress || !checked}" 
-          ng-if="!is_dual_channel" 
-          ng-click="onCalibOpticalClick(false)">
-          Run Now
-        </button>
-        <button 
-          class="ci-btn-light CX5" 
-          ng-class="{ 'disabled': anotherExperimentInProgress || !checked}" 
-          ng-if="is_dual_channel" 
-          ng-click="onCalibOpticalClick(true)">
-          Run Now
-        </button>        
       </div>
     </div>
   </div>
