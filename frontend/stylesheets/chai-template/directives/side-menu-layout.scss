@@ -419,6 +419,13 @@ $sidemenu_width_close: 0;
           span{
             width: 100%;
             display: block;
+
+            &.ellipsis_animated-inner{
+              display: inline;
+              span{
+                display: inline;
+              }
+            }
           }
         }
 
