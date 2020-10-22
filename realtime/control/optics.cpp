@@ -188,7 +188,7 @@ void Optics::stopCollectData()
     }
 }
 
-void Optics::toggleCollectData(bool waitStop)
+void Optics::toggleCollectData(bool cancelCollect)
 {
     std::lock_guard<std::recursive_mutex> lock(_collectDataMutex);
 
@@ -201,11 +201,14 @@ void Optics::toggleCollectData(bool waitStop)
     {
         CollectionDataType type = _collectDataType.exchange(NoCollectionDataType);
 
-        _adcState = false;
-        _adcCondition.notify_all();
-        _collectDataTimer->cancel(waitStop);
-        _ledController->disableLEDs();
+        if (cancelCollect)
+        {
+            _adcState = false;
+            _adcCondition.notify_all();
+            _collectDataTimer->cancel(true);
+        }
 
+        _ledController->disableLEDs();
         _collectDataType = type;
     }
 }

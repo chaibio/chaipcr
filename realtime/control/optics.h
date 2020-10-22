@@ -112,7 +112,7 @@ public:
     boost::signals2::lockfree_signal<void()> fluorescenceDataCollected;
 
 private:
-    void toggleCollectData(bool waitStop = true);
+    void toggleCollectData(bool cancelCollect = true);
     void collectDataCallback(Poco::Util::TimerTask &task);
 	
 private:
