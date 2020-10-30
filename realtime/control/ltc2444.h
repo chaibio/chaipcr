@@ -42,10 +42,10 @@ public:
         kOversamplingRatio32768 = 15
     } OversamplingRatio;
 
-    int32_t readSingleEndedChannel(uint8_t channel, OversamplingRatio oversamplingRate);
-    int32_t readDifferentialChannels(uint8_t lowerChannel, bool lowerChannelPositive, OversamplingRatio oversamplingRate);
+    int32_t readSingleEndedChannel(uint8_t channel, OversamplingRatio oversamplingRate, bool &readyFlag);
+    int32_t readDifferentialChannels(uint8_t lowerChannel, bool lowerChannelPositive, OversamplingRatio oversamplingRate, bool &readyFlag);
 
-    int32_t readADC(uint8_t ch, bool SGL, bool lowerChannelPositive, OversamplingRatio oversamplingRate);
+    int32_t readADC(uint8_t ch, bool SGL, bool lowerChannelPositive, OversamplingRatio oversamplingRate, bool &readyFlag);
 
     bool waitBusy();
     void stopWaitinigBusy();

@@ -68,7 +68,10 @@ void ADCController::process() {
     setThreadName("ADCController");
     setMaxRealtimePriority();
 
-    _ltc2444->readSingleEndedChannel(0, kThermistorOversamplingRate); //start first read
+    {
+        bool readyFlag = false;
+        _ltc2444->readSingleEndedChannel(0, kThermistorOversamplingRate, readyFlag); //start first read
+    }
 
     static const boost::chrono::nanoseconds repeatFrequencyInterval((boost::chrono::nanoseconds::rep)round(1.0 / kADCRepeatFrequency * 1000 * 1000 * 1000));
     boost::chrono::steady_clock::time_point repeatFrequencyLastTime = boost::chrono::steady_clock::now();
@@ -79,11 +82,12 @@ void ADCController::process() {
         while (_workState) {
             checkin();
 
-            if (_ltc2444->waitBusy())
-                continue;
+            bool wait = _ltc2444->waitBusy();
 
             if (!_workState)
                 break;
+            else if (wait)
+                continue;
 
             if (ExperimentController::getInstance()->machineState() == ExperimentController::IdleMachineState && _debugLogger->workState() != BaseADCDebugLogger::WorkingState) {
                 timespec time;
@@ -127,37 +131,41 @@ void ADCController::process() {
 
             //schedule conversion for next state, retrieve previous conversion value
             int32_t value = 0;
+            bool readyFlag = false;
+
             switch (nextState) {
             case EReadZone1Singular:
-                value = _ltc2444->readSingleEndedChannel(0, kThermistorOversamplingRate);
-                _debugLogger->store(_currentConversionState, value, _currentChannel);
+                value = _ltc2444->readSingleEndedChannel(0, kThermistorOversamplingRate, readyFlag);
                 break;
 
             case EReadZone2Singular:
-                value = _ltc2444->readSingleEndedChannel(1, kThermistorOversamplingRate);
-                _debugLogger->store(_currentConversionState, value, _currentChannel);
+                value = _ltc2444->readSingleEndedChannel(1, kThermistorOversamplingRate, readyFlag);
                 break;
 
             case EReadLIA:
                 if (_currentConversionState == EReadZone2Singular && nextState == EReadLIA && !_ignoreReading)
                     //sample unused ADC input before the optical channels
-                    value = _ltc2444->readSingleEndedChannel(3, kLIAOversamplingRate);
+                    value = _ltc2444->readSingleEndedChannel(3, kLIAOversamplingRate, readyFlag);
                 else
-                    value = _ltc2444->readSingleEndedChannel(kADCOpticsChannels.at(channel), kLIAOversamplingRate);
-
-                if (!_ignoreReading)
-                    _debugLogger->store(_currentConversionState, value, _currentChannel);
+                    value = _ltc2444->readSingleEndedChannel(kADCOpticsChannels.at(channel), kLIAOversamplingRate, readyFlag);
 
                 break;
 
             case EReadLid:
-                value = _ltc2444->readSingleEndedChannel(7, kThermistorOversamplingRate);
-                _debugLogger->store(_currentConversionState, value, _currentChannel);
+                value = _ltc2444->readSingleEndedChannel(7, kThermistorOversamplingRate, readyFlag);
                 break;
 
             default:
                 throw std::logic_error("Unexpected error: ADCController::process - unknown adc state");
             }
+
+            if (!readyFlag)
+            {
+                logStream << "ADCController::process - 31 bit is set, skipping this read" << std::endl;
+                continue;
+            }
+            else if (!_ignoreReading)
+                _debugLogger->store(_currentConversionState, value, _currentChannel);
 
             try {
                 if (!_ignoreReading) {

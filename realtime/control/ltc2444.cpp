@@ -34,15 +34,17 @@ LTC2444::LTC2444(unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPin
 LTC2444::~LTC2444() {
 }
 
-int32_t LTC2444::readSingleEndedChannel(uint8_t channel, OversamplingRatio oversamplingRate) {
-    return readADC(channel, true, false, oversamplingRate);
+int32_t LTC2444::readSingleEndedChannel(uint8_t channel, OversamplingRatio oversamplingRate, bool &readyFlag) {
+    return readADC(channel, true, false, oversamplingRate, readyFlag);
 }
 
-int32_t LTC2444::readDifferentialChannels(uint8_t lowerChannel, bool lowerChannelPositive, OversamplingRatio oversamplingRate) {
-    return readADC(lowerChannel / 2, false, lowerChannelPositive, oversamplingRate);
+int32_t LTC2444::readDifferentialChannels(uint8_t lowerChannel, bool lowerChannelPositive, OversamplingRatio oversamplingRate, bool &readyFlag) {
+    return readADC(lowerChannel / 2, false, lowerChannelPositive, oversamplingRate, readyFlag);
 }
 
-int32_t LTC2444::readADC(uint8_t ch, bool SGL, bool lowerChannelPositive, OversamplingRatio oversamplingRate) {
+int32_t LTC2444::readADC(uint8_t ch, bool SGL, bool lowerChannelPositive, OversamplingRatio oversamplingRate, bool &readyFlag) {
+    readyFlag = true;
+
     uint32_t modeBits = (uint32_t)oversamplingRate << 1; //OSR3_OSR2_OSR1_OSR0_TWOX; TWOX = 0
 
 	//0xA000000 the first 3 bits here represents 101, based on the datasheet.
@@ -70,7 +72,10 @@ int32_t LTC2444::readADC(uint8_t ch, bool SGL, bool lowerChannelPositive, Oversa
 
     spiPort_.readBytes(dataIn, dataOut, 4, kADCSPIFrequencyHz);
 
-    if ((dataIn[0] >> 5) & (dataIn[0] >> 4) & 1) {
+    if (dataIn[0] >> 7) {
+        readyFlag = false;
+    }
+    else if ((dataIn[0] >> 5) & (dataIn[0] >> 4) & 1) {
         //APP_LOGGER << "LTC2444::readADC - overvoltage occured" << std::endl;
 
         conversion = std::numeric_limits<int32_t>::max();
@@ -105,7 +110,7 @@ bool LTC2444::waitBusy() {
         APP_LOGGER << "LTC2444::waitBusy - exception: " << ex.what() << std::endl;
     }
 
-    return false;
+    return true;
 }
 
 void LTC2444::stopWaitinigBusy() {
