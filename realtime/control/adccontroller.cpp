@@ -145,7 +145,7 @@ void ADCController::process() {
             case EReadLIA:
                 if (_currentConversionState == EReadZone2Singular && nextState == EReadLIA && !_ignoreReading)
                     //sample unused ADC input before the optical channels
-                    value = _ltc2444->readSingleEndedChannel(3, kLIAOversamplingRate, readyFlag);
+                    value = _ltc2444->readSingleEndedChannel(kADCOpticsChannels.at(0), kLIAOversamplingRate, readyFlag);
                 else
                     value = _ltc2444->readSingleEndedChannel(kADCOpticsChannels.at(channel), kLIAOversamplingRate, readyFlag);
 
