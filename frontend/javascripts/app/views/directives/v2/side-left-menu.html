@@ -103,7 +103,7 @@
           <span>Amplification Curve</span>
         </div>
       </div>
-      <div class="side-menu-menu-item" 
+      <div ng-if="exp_type != 'test_kit'" class="side-menu-menu-item" 
         ng-class="{
           'disabled-link': status != 'COMPLETED' || !hasStandardCurve(), 
           'active': stateInfo.name == 'run-experiment' && params.chart == 'standard-curve'}">
@@ -114,7 +114,7 @@
           <span>Standard Curve</span>
         </div>
       </div>
-      <div class="side-menu-menu-item" 
+      <div ng-if="exp_type != 'test_kit'" class="side-menu-menu-item" 
         ng-class="{
           'disabled-link': status != 'COMPLETED' || !hasMeltCurve(), 
           'active': stateInfo.name == 'run-experiment' && params.chart == 'melt-curve'}">
