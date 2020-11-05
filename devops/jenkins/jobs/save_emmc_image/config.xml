@@ -474,7 +474,7 @@ full_emmc_url=${download_prefix}/${emmc_image_latest_compressed}
 
 if [ -e configuration.json ]
 then
-    device_image_number=$(jq &quot;.software.version&quot; configuration.json)
+    device_image_number=$(jq -r &quot;.software.version&quot; configuration.json)
     echo device configuration version $device_image_number
     if ! [ -z $device_image_number ]
     then
@@ -581,7 +581,7 @@ echo Report filename is $build_report_filename
 cat &lt;&lt; EOF &gt; $build_report_filename
 &lt;section name=&quot;&quot; fontcolor=&quot;&quot;&gt;
     // To display a field
-    &lt;field name=&quot;Relative Build Number&quot; titlecolor=&quot;&quot; value=&quot;$image_version&quot; detailcolor=&quot;&quot;&gt; 
+    &lt;field name=&quot;Build Number&quot; titlecolor=&quot;&quot; value=&quot;$image_version&quot; detailcolor=&quot;&quot;&gt; 
     &lt;![CDATA[ 
 Release version and build number are $image_version
     ]]&gt; &lt;/field&gt;
