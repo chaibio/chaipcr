@@ -4,11 +4,14 @@
   <description>Building chaibio initial debian image. Reference: https://github.com/RobertCNelson/bb-kernel</description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.28.0">
+    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@1.27.0">
+      <doNotScan>false</doNotScan>
+    </com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty>
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.30.0">
       <projectUrl>https://github.com/chaibio/bb-linux-kernel.git/</projectUrl>
       <displayName></displayName>
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
-    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.17.2">
+    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.18">
       <optOut>false</optOut>
     </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
     <hudson.model.ParametersDefinitionProperty>
@@ -60,12 +63,24 @@ mkdir -p /var/lib/jenkins/.config/git/ || true
 sudo chmod 777 /var/lib/jenkins/.config/git/
 sudo chmod 777 /var/lib/jenkins/*
 
-
+sed -i &quot;s/wheezy|jessie|stretch|buster/focal|wheezy|jessie|stretch|buster/&quot; tools/host_det.sh
+sed -i &quot;s/#image=/image=/&quot; build_kernel.sh
+sed -i &quot;s/#address=/address=/&quot; build_kernel.sh
+ 
 sudo chmod 777 /tmp
 sudo chmod 777 /tmp/*
+
 export AUTO_BUILD=1
+export ZRELADDR=0x80008000
+export image=&quot;uImage&quot;
+
+defconfig_url=&quot;$download_prefix/defconfig_chai-kernel-4.9.y&quot;
+wget $defconfig_url -O patches/defconfig
+cat patches/defconfig
+
 time ./build_kernel.sh
-</command>
+
+exit 1</command>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
       <command>export image_filename=bone-debian-9.3-console-armhf-2017-12-10-1gb.img
@@ -148,7 +163,6 @@ sudo mkdir -p /media/rootfs/  || true
 sudo chmod 777 /media/rootfs/  || true
 umount /media/rootfs/  || true
 sudo mount ${DISK}p1 /media/rootfs/
-
 </command>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
@@ -209,7 +223,7 @@ then
 	losetup -d $DISK  || true
 fi
 
-kernel_image_url=&quot;http://10.0.1.20/download/$filename.xz&quot;    
+kernel_image_url=&quot;$download_prefix/$filename.xz&quot;    
 cat &lt;&lt; EOF &gt; build_report.xml
 &lt;section name=&quot;&quot; fontcolor=&quot;&quot;&gt;
     // To display a field
@@ -251,6 +265,7 @@ exit 0</command>
       <fingerprint>false</fingerprint>
       <defaultExcludes>true</defaultExcludes>
       <caseSensitive>true</caseSensitive>
+      <followSymlinks>true</followSymlinks>
     </hudson.tasks.ArtifactArchiver>
     <hudson.plugins.summary__report.ACIPluginPublisher plugin="summary_report@1.15">
       <name>*.xml</name>
@@ -258,17 +273,12 @@ exit 0</command>
     </hudson.plugins.summary__report.ACIPluginPublisher>
   </publishers>
   <buildWrappers>
-    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.34">
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.38">
       <deleteDirs>false</deleteDirs>
       <cleanupParameter></cleanupParameter>
       <externalDelete></externalDelete>
+      <disableDeferredWipeout>false</disableDeferredWipeout>
     </hudson.plugins.ws__cleanup.PreBuildCleanup>
-    <hudson.plugins.build__timeout.BuildTimeoutWrapper plugin="build-timeout@1.18">
-      <strategy class="hudson.plugins.build_timeout.impl.NoActivityTimeOutStrategy">
-        <timeoutSecondsString>108000</timeoutSecondsString>
-      </strategy>
-      <operationList/>
-    </hudson.plugins.build__timeout.BuildTimeoutWrapper>
-    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.8"/>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.11.3"/>
   </buildWrappers>
 </project>
