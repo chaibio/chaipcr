@@ -11,7 +11,10 @@
 </description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.17.2">
+    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@1.27.1">
+      <doNotScan>false</doNotScan>
+    </com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty>
+    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.18.1">
       <optOut>false</optOut>
     </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
     <hudson.model.ParametersDefinitionProperty>
@@ -101,7 +104,7 @@ echo Environmental variables:
 env
 
 echo Checking for nessasery packages:
-sudo apt-get -y -q install sshpass parted mdadm
+sudo apt-get -y -q install sshpass parted mdadm jq
 
 if grep $build_machine ~/.ssh/config
 then
@@ -185,28 +188,47 @@ echo done connection check.
 ls
 echo now at $(pwd)
 rm build_report.xml
-branch_param=
-rm -r tmp || true
-echo build_branch is $build_branch
-if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; -eq &quot;trunk&quot; ]
-then
- 	echo No build branch chosen
-else
-   	branch_param=&quot;-b $(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
-    echo Cloning branch $branch_param
-fi
 
-sudo rm -r tmp || true
-mkdir tmp || true
-cd tmp
-git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
-cd chaipcr || exit 1
+        echo Branch param $build_branch
+        clean_build_branch=$build_branch
+        clean_build_branch=${clean_build_branch#&quot;branches/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;refs/heads/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;tags/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;trunk&quot;}
+        clean_build_branch=${clean_build_branch#&quot;master&quot;}
+        echo Cleaned branch param $clean_build_branch
+
+        branch_param=
+        branch_name=
+
+        if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
+        then
+                echo No build branch chosen
+        else
+                branch_name=$clean_build_branch
+                branch_param=&quot;-b $branch_name&quot;
+                echo Cloning branch and param $branch_name and $branch_param
+        fi
+
+        sudo rm -r tmp || true
+
+		git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
+        cd chaipcr || exit 1
+
+        if [ -z $branch_name ]
+        then
+                echo No build branch chosen
+        else
+                git checkout $branch_name
+        fi
+
+
 echo now at $(pwd)
 ls
 
 </command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo &quot;Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}&quot;
 echo &quot;Slave Beaglebone at ${build_machine}&quot;
@@ -248,6 +270,29 @@ then
   echo &quot;Error: can&apos;t unmount sdcard!&quot;
   exit 1
 fi
+
+echo kill unused cpu consuming processes
+pids=$( pidof sh )
+
+for pp in $pids
+do
+#       echo &quot;Process $pp&quot;
+        if ps aux | grep chaibio | grep $pp
+        then
+                echo Killing $pp
+                kill -9 $pp
+        fi
+done
+
+pkill ruby2.3 
+pkill mysqld
+pkill julia
+pkill julia
+pkill mysqld
+pkill ruby2.3
+pkill ruby2.3
+pkill nginx
+pkill nginx
 
 echo installing missing packages.
 dpkg --configure -a --force-confdef --force-confnew
@@ -323,6 +368,7 @@ fi
 
 lsblk</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>echo now at $(pwd)
@@ -334,7 +380,7 @@ sshpass -p chaipcr scp -r devops/grabimage_sdcard/* root@$build_machine:/tmp/gre
 sshpass -p chaipcr scp -r devops/grabimage_sdcard/uEnv.sdcard.txt root@$build_machine:/tmp/grep_sdcard/uEnv.txt
 </command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo patching grep sdcard to boot only once
 sed &quot;s/reboot/rm \/mnt\/uEnv.txt ; reboot/&quot; -i /tmp/grep_sdcard/autorun.sh
@@ -349,8 +395,11 @@ umount /tmp/grep_sdcard
 
 echo scheduling a restart in a min
 shutdown -r 1
+exit 0
+
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -371,17 +420,33 @@ done
 echo timeout waiting for the device to become ready!
 exit 1</command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo mounting result grep sdcard
 
 umount /dev/mmcblk0p1
 umount /sdcard/*
 
+echo killing unused cpu consuming processes
+for pp in $pids
+do
+        echo &quot;Checking process $pp&quot;
+        if ps aux | grep chaibio | grep $pp
+        then
+                echo Killing $pp
+                kill -9 $pp
+        fi
+done
+
+pkill ruby2.3 
+pkill mysqld
+pkill julia
+
 mkdir -p /tmp/grep_sdcard
 mount /dev/mmcblk0p1 /tmp/grep_sdcard
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>echo fetching eMMC image.
@@ -396,6 +461,7 @@ echo fetching image files from beaglebone.
 
 #sshpass -p chaipcr scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r root@$build_machine:/tmp/grep_sdcard/* &quot;${grep_sdcard_dir}&quot;
 sshpass -p chaipcr scp -oStrictHostKeyChecking=no -r root@$build_machine:/tmp/grep_sdcard/* &quot;${grep_sdcard_dir}&quot;
+sshpass -p chaipcr scp -oStrictHostKeyChecking=no -r root@$build_machine:/root/configuration.json .
 sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;umount /tmp/grep_sdcard &amp;&amp; exit 0&quot;
 
 ls -ahl &quot;${grep_sdcard_dir}&quot;
@@ -405,6 +471,16 @@ emmc_image_latest_compressed_full_local_path=${local_download_folder}/${emmc_ima
 
 tar zfvc $emmc_image_latest_compressed_full_local_path ${grep_sdcard_dir}/eMMC_part*.img
 full_emmc_url=${download_prefix}/${emmc_image_latest_compressed}
+
+if [ -e configuration.json ]
+then
+    device_image_number=$(jq &quot;.software.version&quot; configuration.json)
+    echo device configuration version $device_image_number
+    if ! [ -z $device_image_number ]
+    then
+    	export image_version=$device_image_number
+    fi
+fi
 
 if $no_factorysettings_sdcard
 then
@@ -505,6 +581,11 @@ echo Report filename is $build_report_filename
 cat &lt;&lt; EOF &gt; $build_report_filename
 &lt;section name=&quot;&quot; fontcolor=&quot;&quot;&gt;
     // To display a field
+    &lt;field name=&quot;Relative Build Number&quot; titlecolor=&quot;&quot; value=&quot;$image_version&quot; detailcolor=&quot;&quot;&gt; 
+    &lt;![CDATA[ 
+Release version and build number are $image_version
+    ]]&gt; &lt;/field&gt;
+    
     &lt;field name=&quot;Upgrade Image&quot; titlecolor=&quot;&quot; value=&quot;Download&quot; detailcolor=&quot;&quot; href=&quot;$upgrade_image_url&quot;&gt; 
     &lt;![CDATA[ 
 Upgrade image (${output_image_prefix}_upgrade.img.tar) &lt;a href=&quot;$upgrade_image_url&quot; download=&quot;upgrade.img.tar&quot;&gt;Download&lt;/a&gt;
@@ -551,11 +632,14 @@ exit 0</command>
       <fingerprint>false</fingerprint>
       <defaultExcludes>true</defaultExcludes>
       <caseSensitive>true</caseSensitive>
+      <followSymlinks>true</followSymlinks>
     </hudson.tasks.ArtifactArchiver>
     <hudson.plugins.summary__report.ACIPluginPublisher plugin="summary_report@1.15">
       <name>*.xml</name>
       <shownOnProjectPage>true</shownOnProjectPage>
     </hudson.plugins.summary__report.ACIPluginPublisher>
   </publishers>
-  <buildWrappers/>
+  <buildWrappers>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.11.5"/>
+  </buildWrappers>
 </project>
