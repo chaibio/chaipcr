@@ -4,7 +4,10 @@
   <description>Build Chaibio shoftware</description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.17.2">
+    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@1.27.1">
+      <doNotScan>false</doNotScan>
+    </com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty>
+    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.18.1">
       <optOut>false</optOut>
     </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
     <hudson.model.ParametersDefinitionProperty>
@@ -15,17 +18,20 @@
           <defaultValue>10.0.100.240</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
-        <hudson.scm.listtagsparameter.ListSubversionTagsParameterDefinition plugin="subversion@2.9">
+        <com.syhuang.hudson.plugins.listgitbranchesparameter.ListGitBranchesParameterDefinition plugin="list-git-branches-parameter@0.0.9">
           <name>build_branch</name>
-          <description>Select a Subversion entry</description>
-          <tagsDir>https://github.com/chaibio/chaipcr</tagsDir>
+          <uuid>0fa4bb4b-0b18-4eaa-98cd-5b7b8cafb3b0</uuid>
+          <remoteURL>https://github.com/chaibio/chaipcr</remoteURL>
           <credentialsId></credentialsId>
-          <tagsFilter></tagsFilter>
-          <reverseByDate>true</reverseByDate>
-          <reverseByName>false</reverseByName>
           <defaultValue></defaultValue>
-          <maxTags></maxTags>
-        </hudson.scm.listtagsparameter.ListSubversionTagsParameterDefinition>
+          <type>PT_BRANCH_TAG</type>
+          <tagFilter>*</tagFilter>
+          <branchFilter>.*</branchFilter>
+          <sortMode>NONE</sortMode>
+          <selectedValue>NONE</selectedValue>
+          <quickFilterEnabled>false</quickFilterEnabled>
+          <listSize>5</listSize>
+        </com.syhuang.hudson.plugins.listgitbranchesparameter.ListGitBranchesParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>is_dev</name>
           <description>Build a development image.</description>
@@ -34,7 +40,7 @@
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.5.1">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@4.4.2">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
@@ -79,25 +85,20 @@ sudo apt-get -y -q install mdadm npm
 sudo apt-get -y -q install nodejs ruby-dev 
 sudo apt-get -y -q install libxslt-dev 
 sudo apt-get -y -q install libxml2-dev
-sudo apt-get -q -y install npm
+sudo apt-get -q -y install npm jq
+
+node -v
+sudo npm install -g n
+#sudo n 8.15.0
+sudo n 8.11.3
+node -v
 
 if grep $build_machine /var/lib/jenkins/.ssh/config
 then
 	echo /var/lib/jenkins/.ssh/config was patched already
 else
 	echo patching /var/lib/jenkins/.ssh/config
-	cat &lt;&lt;EOF &gt;&gt; /var/lib/jenkins/.ssh/config
-Host $build_machine
-		KexAlgorithms +diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
-		Ciphers +3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
-#		KexAlgorithms +diffie-hellman-group1-sha1
-#        KexAlgorithms +curve25519-sha256@libssh.org
-#        KexAlgorithms +ecdh-sha2-nistp256
-#        KexAlgorithms +ecdh-sha2-nistp384
-#        KexAlgorithms +ecdh-sha2-nistp521
-#        KexAlgorithms +diffie-hellman-group-exchange-sha256
-#        KexAlgorithms +diffie-hellman-group14-sha1
-EOF
+
 fi
 
 #if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
@@ -118,7 +119,7 @@ echo deleting root password in case of chaipcr
 sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;passwd -d -u root&quot;
 
 ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
-ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
+ssh -t -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
 
 if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
 then
@@ -145,7 +146,7 @@ ENDSSH
 
 echo returned to host. connection check:
 counter=0
-until ssh -t root@$build_machine &apos;exit 0&apos;
+until ssh -t -t root@$build_machine &apos;exit 0&apos;
 do
 	counter=$(( $counter + 1 ))
     if [ $counter -gt 10 ]
@@ -161,7 +162,7 @@ done
 echo done connection check.
 </command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo &quot;Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}&quot;
 echo &quot;Slave Beaglebone at ${build_machine}&quot;
@@ -171,6 +172,7 @@ uname -a
 ls -ahl
 lsblk
 df -h
+echo &quot;Shell used: $0&quot;
 
 swapoff -a
 
@@ -183,11 +185,28 @@ then
   echo &quot;Error: can&apos;t unmount sdcard!&quot;
   exit 1
 fi
-dpkg --configure -a</command>
+dpkg --configure -a
+
+monitor_cpu_memory_main () {
+        while true
+        do
+                date
+                echo &quot;CPU Usage&quot;
+                ps aux | sort -nrk 3,3 | head -n 5
+                echo &quot;Memory Usage:&quot;
+                ps aux | sort -nrk 4,4 | head -n 5
+                sleep 60
+        done
+}
+
+monitor_cpu_memory_main&gt;/var/log/monitor_cpu_main.log &amp;
+</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
+
 # waiting 20min for the bulding device to become connectable
 echo &quot;Waiting for the build device ($build_machine) to become ready!&quot;
 #sleep 1500
@@ -226,32 +245,46 @@ ENDSSH
 		echo ssh is connectable.
         sleep 10
 
+		echo &quot;Shell used: $0&quot;
+
 		echo now at $(pwd)
-		branch_param=
+
+        echo Branch param $build_branch
+        clean_build_branch=$build_branch
+        clean_build_branch=${clean_build_branch#&quot;branches/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;refs/heads/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;tags/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;trunk&quot;}
+        clean_build_branch=${clean_build_branch#&quot;master&quot;}
+        echo Cleaned branch param $clean_build_branch
+
+        branch_param=
         branch_name=
 
-	    if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
-		then
-   			echo No build branch chosen
-		else
-     		branch_param=&quot;-b $(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
-            branch_name=&quot;$(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
-		    echo Cloning branch $branch_param
-		fi
+        if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
+        then
+                echo No build branch chosen
+        else
+                branch_name=$clean_build_branch
+                branch_param=&quot;-b $branch_name&quot;
+                echo Cloning branch and param $branch_name and $branch_param
+        fi
 
-		sudo rm -r tmp || true
-	 	mkdir tmp || true
+        sudo rm -r tmp || true
+        mkdir tmp || true
         cd tmp
-		git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
-        cd chaipcr || exit 1   
-        if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]] 
-		then
-   			echo No build branch chosen
-		else
-     		git checkout $branch_name
-		fi
+        git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
+        cd chaipcr || exit 1
 
-        cd web
+        if [ -z $branch_name ]
+        then
+                echo No build branch chosen
+        else
+                git checkout $branch_name
+        fi
+
+		cd web
+        chaibio_web=$(pwd)
         echo now at $(pwd)
         
         gem env
@@ -264,46 +297,171 @@ ENDSSH
             gem sources --add http://rubygems.org/
         fi
   		
+        sudo apt-get update
+        sudo apt-get -y -q install -y libncurses5-dev || true
         sudo apt-get -y -q install ca-certificates software-properties-common 
 
         sudo apt-add-repository -y ppa:rael-gc/rvm
         sudo apt-get update
-        sudo apt-get -y -q install rvm nodejs nodejs-legacy
-        sudo chmod 0777 /usr/share/rvm/tmp
-        sudo chmod 0777 /usr/share/rvm/tmp/*
-        sudo chmod 0777 /usr/share/rvm/*
-
-		sudo rvm install ruby-2.2.9
-        sudo /usr/share/rvm/bin/rvm install ruby-2.2.9
-
-        source /etc/profile.d/rvm.sh
-        sudo rvm install ruby-2.2.9
-        sudo /usr/share/rvm/bin/rvm install ruby-2.2.9
-
-		echo installing nodejs v4.5.0
- 		sudo bash -ic &apos;curl https://raw.githubusercontent.com/creationix/nvm/v0.32.0/install.sh | bash; export NVM_DIR=&quot;/var/lib/jenkins/.nvm&quot;; echo &quot;dir2: $NVM_DIR&quot;; [ -s &quot;$NVM_DIR/nvm.sh&quot; ] &amp;&amp; . &quot;$NVM_DIR/nvm.sh&quot; ; nvm install 4.5.0;nvm use 4.5.0&apos;
-		
-
-        sudo npm install --global gulp
-        sudo npm install --global gulp-cli
-        sudo npm install
         
-        sudo gulp deploy || exit 1
+        sudo apt-get -y -q install nodejs-legacy || true
+        sudo apt-get -y -q install nodejs
+        sudo apt-get -y -q install rvm
+        
+		sudo apt-get -y -q install build-essential
+		sudo apt-get -y -q install curl
+		sudo apt-get -y -q install gpg
+
+		sudo gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 || true
+		cd /tmp 
+		curl -sSL https://get.rvm.io -o rvm.sh || true
+		less /tmp/rvm.sh || true
+ 		sudo gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 || true
+        
+        sudo cat /tmp/rvm.sh | bash -s stable --rails || true
+		if [ -e ~/.rvm/scripts/rvm ]
+        then
+        	. ~/.rvm/scripts/rvm || true
+        fi
+
+		rvm list || true
+     
+        sudo chmod 0777 /usr/share/rvm/tmp 
+        sudo chmod 0777 /usr/share/rvm/tmp/* || true
+        sudo chmod 0777 /usr/share/rvm/* 
+
+		if sudo apt-get install -y libssl1.0-dev
+        then
+        	echo libssl1.0-dev installed ok
+        else
+         	echo installing libssl1.0-dev from jessie repo
+        	sudo chmod 777 /etc/apt/sources.list.d/
+			sudo rm /etc/apt/sources.list.d/libssl10.list || true
+			sudo echo &quot;deb http://security.ubuntu.com/ubuntu bionic-security main&quot;&gt; /etc/apt/sources.list.d/libssl10.list
+			sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 9D6D8F6BC857C906	
+        	sudo apt-get update -y 
+			sudo apt-get install -y --no-install-recommends libssl1.0-dev
+			sudo rm /etc/apt/sources.list.d/libssl10.list
+			sudo apt-get update -y 
+        fi
+
+		echo adding nvm envs
+        . /etc/profile.d/rvm.sh || true
+
+		echo installing ruby
+		sudo /usr/share/rvm/bin/rvm install ruby-2.2.9 || true
+
+		
+     	echo gloabal install gulp
+		sudo npm install gulp -g
+
+		echo gitting
+		#git clone https://github.com/chaibio/chaipcr.git
+		cd &quot;$chaibio_web&quot;
+
+		echo gloabal install gulp locally
+		npm install gulp
+
+		sudo npm install --global gulp-cli
+		npm install gulp-cli
+
+		echo installing all
+		npm install
+
+		echo stating gulp deploy
+		gulp deploy || exit 1
+	  
+     
+     
+     
+     
+     
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        #echo npm install global glub
+	    #sudo npm install --global gulp
+        
+		#echo npm install glub
+	    #npm install gulp
+
+		#echo npm install glub-cli
+        #sudo npm install --global gulp-cli || true
+        
+        #echo stating install
+        #sudo npm install
+        
+        #echo stating gulp deploy
+        #sudo gulp deploy || exit 1
         cd ..
         echo done gulp deploy
         
         echo Release build number is $release_build_number
 		rm -rf ./web/log
-		sed -i &apos;s/&quot;version&quot;: &quot;1.0.0&quot;,/&quot;version&quot;: &quot;&apos;${image_version}&apos;&quot;,/g&apos; ./device/configuration.json || true
-		sed -i &apos;s/&quot;version&quot;: &quot;1.1.1&quot;,/&quot;version&quot;: &quot;&apos;${image_version}&apos;&quot;,/g&apos; ./device/configuration.json || true
-        sed -i &apos;s/BUILD_NUMBER/&apos;${release_build_number}&apos;/g&apos; ./device/configuration.json  || true
+        
+        version_number=$(jq &quot;.software.version&quot; ./device/configuration.json)
+		if ! [ -z $version_number ]
+		then
+        	prefix=&quot;\&quot;&quot;
+        	suffix=&quot;.RELATIVE_BUILDNUMBER\&quot;&quot;
+        	version_number=${version_number%&quot;$RELATIVE_BUILDNUMBER&quot;}
+        	version_number_trimmed=$(echo $version_number | sed -e &quot;s/^$prefix//&quot; -e &quot;s/$suffix$//&quot;)
+        	if ! [ -z $version_number_trimmed ]
+        	then
+                echo &quot;Version: $version_number_trimmed&quot;
+                relative_build_number_filename=&quot;$HUDSON_HOME/userContent/lastbuildnumber/$version_number_trimmed&quot;
+                if ! [ -d &quot;$HUDSON_HOME/userContent/lastbuildnumber/&quot; ]
+                then
+                        mkdir -p &quot;$HUDSON_HOME/userContent/lastbuildnumber/&quot;
+                        echo 1&gt;$relative_build_number_filename
+                fi
+                if ! [ -e &quot;$relative_build_number_filename&quot; ]
+                then
+                        echo 1&gt;$relative_build_number_filename
+                fi
 
+                relative_build_number=$(cat $relative_build_number_filename)
+                relative_build_number=$((relative_build_number+1))
+                echo $relative_build_number&gt;$relative_build_number_filename
+                echo setting relative version number to $relative_build_number
+                sed -i &apos;s/RELATIVE_BUILDNUMBER/&apos;${relative_build_number}&apos;/g&apos; ./device/configuration.json  || true
+        	fi
+		fi
+
+		sed -i &apos;s/&quot;version&quot;: &quot;1.0.0&quot;,/&quot;version&quot;: &quot;&apos;${image_version}&apos;&quot;,/g&apos; ./device/configuration.json || true
+#		sed -i &apos;s/&quot;version&quot;: &quot;1.1.1&quot;,/&quot;version&quot;: &quot;&apos;${image_version}&apos;&quot;,/g&apos; ./device/configuration.json || true
+        sed -i &apos;s/BUILD_NUMBER/&apos;${release_build_number}&apos;/g&apos; ./device/configuration.json  || true
+		echo -e &quot;Jenkins release number# $release_build_number\n&quot;&gt;changes.log
+        echo &quot;Changes (last 4 weeks)&quot;&gt;&gt;changes.log
+        git log --pretty=format:&quot;%h - %an, %ar : %s&quot; --since=4.weeks&gt;&gt;changes.log
+
+		echo $release_build_number&gt;build_number.ini
+        
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./web &quot;$build_machine:/root/chaipcr/&quot; || (echo error copying files to device &amp;&amp; exit 1)
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./browser &quot;$build_machine:/root/chaipcr/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./bioinformatics &quot;$build_machine:/root/chaipcr/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./device/configuration.json &quot;$build_machine:/root/chaipcr/deploy/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./device/configuration.json &quot;$build_machine:/root/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
+        rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a changes.log &quot;$build_machine:/root/chaipcr/deploy/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./devops/factory_settings_sdcard/scripts/replace_uEnv.txt.sh &quot;$build_machine:/root/chaipcr/deploy/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
+        rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./devops/factory_settings_sdcard/scripts/setup_touchcontroller.sh &quot;$build_machine:/root/chaipcr/deploy/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./devops/device &quot;$build_machine:/root/chaipcr/deploy/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
 		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./modules &quot;$build_machine:/root/chaipcr/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
 		
@@ -316,7 +474,7 @@ exit 1
 
 </command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Setup MySQL
 mkdir /data /perm || true
@@ -366,7 +524,7 @@ else
 fi
 
 # creating a temporary swap file on sdcard
-if fallocate -l 2G /sdcard/factory/swapfile #or dd if=/dev/zero of=/sdcard/factory/swapfile bs=10M count=300
+if fallocate -l 4G /sdcard/factory/swapfile #or dd if=/dev/zero of=/sdcard/factory/swapfile bs=10M count=300
 then
     echo &quot;swap file created successfully&quot;
 else
@@ -385,22 +543,35 @@ free -m
 apt autoremove -y -q
 du -h --max-depth=1 /
 df -h
+echo removing wifi drivers sources
+rm -r /usr/src/linux-headers-4.4.62-ti-xenomai-r99 || true
+rm -r /usr/src/rtl8821CU-5.4.1/ || true
+rm -r /usr/src/8192cu-1.11/ || true
+df -h
+
 exit 0</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Maintenance
 df -h
 export RAILS_ENV=production
 export DEBIAN_FRONTEND=noninteractive
-apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data
-apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data
+apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data || true
+apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data || true
 
+echo &quot;processing website&quot;
 cd /root/chaipcr/web
 bundle install
+
+echo &quot;processing website..&quot;
 gem install bcrypt -v &apos;3.1.11&apos;
+
+echo &quot;processing website...&quot;
 systemctl enable r.service
+
 echo Setup Rails app
 mkdir -p ~/chaipcr/web/config/
 cat &lt;&lt;EOF &gt;&gt; ~/chaipcr/web/config/database.yml
@@ -442,43 +613,77 @@ df -h
 
 exit 0</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo precompile julia packages if needed
-if [ -e /etc/bypassjulia.flag ]
-then
-    echo  Bypass julia build
-    exit 0
-fi
+      if [ -e /etc/bypassjulia.flag ]
+      then
+          echo  Bypass julia build
+          exit 0
+      fi
 
-if [ -e /root/chaipcr/bioinformatics/juliaserver.jl ]
-then
-      julia -v
-      echo about to start using QpcrAnalysis
-else
-      echo building with no julia
-      exit 0
-fi
+      if [ -e /root/chaipcr/bioinformatics/juliaserver.jl ]
+      then
+            julia -v
+            echo about to start using QpcrAnalysis
+      else
+            echo building with no julia
+            exit 0
+      fi
 
+     if [ -e /root/chaipcr/bioinformatics/qpcranalysis.so ]
+     then
+          echo julia binaries was generated successfully on a previous precompile.. expecting resuming build.
+          exit 0
+     fi
+
+monitor_cpu_memory () {
+        while true
+        do
+                date
+                echo &quot;CPU Usage&quot;
+                ps aux | sort -nrk 3,3 | head -n 5
+                echo &quot;Memory Usage:&quot;
+                ps aux | sort -nrk 4,4 | head -n 5
+                sleep 60
+        done
+}
+
+monitor_cpu_memory&gt;/var/log/monitor_cpu.log &amp;
+
+      if [ -e /root/.julia ]
+      then
+           echo freeing up .julia
+           umount /root/.julia || true
+           rm -r /root/.julia || true
+      fi
+
+      echo mounting dot julia
       mkdir -p /root/.julia || exit 1
       chmod 777 /root/.julia || exit 1
+
+      echo mounting julia dir 
       mount /dev/mmcblk0p2 /root/.julia || exit 1
+
       cd
       if $is_dev
       then
              echo Building a debug image
       else
+            echo Extracting julia files
             tar xfz /data/dot_julia_complete.tgz || exit 1
             rm dot_julia.tgz
       fi
 
       df -h
       free -m
+      echo removing unneeded packages
       export DEBIAN_FRONTEND=noninteractive
-apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data
-apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data
-
+apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data || true
+apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data || true
+echo Installing required packages
 	export PATH=$PATH:/sbin:/usr/sbin
 	export TERM=linux
 	echo &apos;debconf debconf/frontend select Noninteractive&apos; | debconf-set-selections
@@ -544,8 +749,9 @@ du -h --max-depth=1 .
 exit 0
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>if $is_dev
 then
@@ -566,10 +772,18 @@ apt update
 exit 0
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo browser compile
+      <command>#!/bin/bash
+
+echo browser compile
+if [ -e /root/tmp ]
+then
+     rm -r /root/tmp
+fi
+
 cd /sdcard/factory/
 rm -r compile-browser || true
 mkdir compile-browser
@@ -586,26 +800,39 @@ ln -nfs /usr/src/linux-headers-`uname -r` /lib/modules/`uname -r`/build
 ln -nfs /usr/src/linux-headers-`uname -r` /lib/modules/`uname -r`/source
 
 apt-get install -y git make build-essential cmake curl pkg-config python sshpass unzip
+echo &quot;Shell used: $0&quot;
 
-branch_param=
-branch_name=
-if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
-then
-   echo No build branch chosen
-else
-     branch_param=&quot;-b $(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
-     branch_name=&quot;$(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
-     echo Cloning branch $branch_param
-fi
+        echo Branch param $build_branch
+        clean_build_branch=$build_branch
+        clean_build_branch=${clean_build_branch#&quot;branches/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;refs/heads/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;tags/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;trunk&quot;}
+        clean_build_branch=${clean_build_branch#&quot;master&quot;}
+        echo Cleaned branch param $clean_build_branch
 
-git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
-cd chaipcr
-if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
-then
-       echo No build branch chosen
-else
-     	git checkout $branch_name
-fi
+        branch_param=
+        branch_name=
+
+        if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
+        then
+                echo No build branch chosen
+        else
+                branch_name=$clean_build_branch
+                branch_param=&quot;-b $branch_name&quot;
+                echo Cloning branch and param $branch_name and $branch_param
+        fi
+
+        git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
+        cd chaipcr || exit 1
+
+        if [ -z $branch_name ]
+        then
+                echo No build branch chosen
+        else
+                git checkout $branch_name
+        fi
+
 
 cd /sdcard/factory/compile-browser/chaipcr/browser/ || exit 1
 
@@ -632,10 +859,13 @@ fi
 echo done compiling browser
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo compiling realtime
+      <command>#!/bin/bash
+
+echo compiling realtime
 
 cd /sdcard/factory/ || exit 1
 free -m
@@ -645,26 +875,37 @@ rm -r /sdcard/factory/realtime-compile || true
 mkdir -p /sdcard/factory/realtime-compile || exit 1
 cd /sdcard/factory/realtime-compile || exit 1
 
-branch_param=
-branch_name=
+        echo Branch param $build_branch
+        clean_build_branch=$build_branch
+        clean_build_branch=${clean_build_branch#&quot;branches/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;refs/heads/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;tags/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;trunk&quot;}
+        clean_build_branch=${clean_build_branch#&quot;master&quot;}
+        echo Cleaned branch param $clean_build_branch
 
-if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
-then
-        echo No build branch chosen
-else
-         branch_param=&quot;-b $(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
-         branch_name=&quot;$(echo $build_branch | cut -d&apos;/&apos; -f 2)&quot;
-	echo Cloning branch $branch_param
-fi
+        branch_param=
+        branch_name=
 
-git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
-cd chaipcr
-if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
-then
-        echo No build branch chosen
-else
-     	git checkout $branch_name
-fi
+        if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
+        then
+                echo No build branch chosen
+        else
+                branch_name=$clean_build_branch
+                branch_param=&quot;-b $branch_name&quot;
+                echo Cloning branch and param $branch_name and $branch_param
+        fi
+
+        git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
+        cd chaipcr || exit 1
+
+        if [ -z $branch_name ]
+        then
+                echo No build branch chosen
+        else
+                git checkout $branch_name
+        fi
+
 
 cd /sdcard/factory/realtime-compile/chaipcr/realtime || exit 1
 
@@ -700,8 +941,9 @@ systemctl enable realtime.service
 sync
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo checking deployed web files
 ls -ahl
@@ -805,8 +1047,9 @@ rm temp.patch
 
 exit 0</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Configure Logrotate
 cp ~/chaipcr/deploy/device/logrotate/logrotate.conf /etc || exit 1
@@ -821,8 +1064,9 @@ cp -r ~/chaipcr/browser/resources ~/tmp/ || exit 1
 cp ~/chaipcr/browser/qpcrbrowser.service /lib/systemd/system/ || exit 1
 systemctl enable qpcrbrowser.service </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo install wifi firmware
 apt-get -y install firmware-realtek || exit 1
@@ -837,14 +1081,21 @@ mkdir -p /boot/dts/
 mkdir -p /lib/firmware/
 
 ./install_debian.sh || exit 1
+if [ -e /root/chaipcr/deploy/setup_touchcontroller.sh ]
+then
+     echo &quot;Setting up touch driver&quot;
+     /root/chaipcr/deploy/setup_touchcontroller.sh
+fi
+
 if $is_dev
 then
       echo Building a debug image
 else
       apt-get  -y -q --purge autoremove device-tree-compiler
-      rm -r /root/chaipcr/modules
-      rm -r /root/chaipcr/deploy/overlay
+      rm -r /root/chaipcr/modules  2&gt; /dev/null
+      rm -r /root/chaipcr/deploy/overlay  2&gt; /dev/null
 fi
+
 modprobe -i tilcdc || exit 1
 echo done installing LCD driver.
 
@@ -855,8 +1106,9 @@ fsck /dev/mmcblk0p1 -y -f
 
 exit 0</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Checking locale.
 if grep &quot;&quot; /etc/default/locale
@@ -941,8 +1193,9 @@ EOF
 update-rc.d -f nginx defaults
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Unicorn
 mkdir ~/shared || exit 1
@@ -954,8 +1207,9 @@ mkdir /etc/unicorn || exit 1
 cp ~/chaipcr/web/config/etc/unicorn/chaipcr.conf /etc/unicorn/ || exit 1
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo closing swap file
 sync
@@ -993,8 +1247,9 @@ apt update
 
 exit 0</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo cleanup to free up some space
 df -h
@@ -1070,10 +1325,21 @@ uenvcmd=echo Shutting down USB powered devices.;run shutdown_usb_power
 
 EOF
 
+echo removing build monitoring logs
+if [ -e /var/log/monitor_cpu.log ]
+then
+       rm /var/log/monitor_cpu.log
+fi
+if [ -e /var/log/monitor_cpu_main.log ]
+then
+       rm /var/log/monitor_cpu_main.log
+fi
+
 exit 0</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo zeroing 2
 
@@ -1102,8 +1368,9 @@ fi
 
 echo basic beaglebone setup done!</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo changing root password to chaipcr and disabling login prompt on console
 sudo systemctl disable getty@tty1.service
@@ -1119,6 +1386,7 @@ echo rebooting
 shutdown -r 1
 echo a reboot is scheduled after a minute</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -1140,7 +1408,7 @@ echo timeout waiting for the device to become ready!
 exit 1
 </command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo device is still connectable!
 
@@ -1171,6 +1439,7 @@ df -h
 
 exit 0</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>echo all done for $build_machine, you can call create_factory_settings_sdcard job to create a factory settings image. root password is chaipcr
@@ -1180,6 +1449,6 @@ exit 0</command>
   </builders>
   <publishers/>
   <buildWrappers>
-    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.8"/>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.11.5"/>
   </buildWrappers>
 </project>
