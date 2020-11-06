@@ -44,11 +44,13 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                     {
                         kit_id: 'coronavirus-env-surface',
                         name: 'Coronavirus Environmental Surface',
+                        guid: 'chai_coronavirus_env_kit',
                         target_name: 'SARS-CoV-2'
                     },
                     {
                         kit_id: 'covid-19-surveillance',
                         name: 'COVID-19 Surveillance',
+                        guid: 'chai_covid19_surv_kit',
                         target_name: 'SARS-CoV-2'
                     },
                 ],
@@ -198,6 +200,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
             var target2_name = '';
             var sample2_name = '';
             if ($scope.selected_brand.name == 'chai'){
+                $scope.selected_brand.guid = $scope.kit1.guid;
                 switch($scope.kit1.kit_id){
                     case 'coronavirus-env-surface':
                         target2_name = 'IAC';
