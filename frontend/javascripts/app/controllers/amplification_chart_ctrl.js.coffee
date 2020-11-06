@@ -69,9 +69,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.baseline_auto = {name:'Auto', desciption:'Automatically detect the baseline cycles.'}
       $scope.baseline_manual = {name:'Manual', desciption:'Manually specify the baseline cycles.'}
 
-      $scope.sigmoid = {name:'Sigmoid', desciption:'Hover description'}
-      $scope.linear = {name:'Linear', desciption:'Hover desciption'}
-      $scope.median = {name:'Median', desciption:'Hover desciption'}
+      $scope.sigmoid = {name:'Sigmoid', desciption:'Calculate baseline by fitting a sigmoid curve to amplification data. Falls back to median method if sigmoid curve fitting fails.'}
+      $scope.linear = {name:'Linear', desciption:'Calculate baseline by fitting a linear line to baseline cycles.'}
+      $scope.median = {name:'Median', desciption:'Calculate baseline by taking the median value from baseline cycles.'}
 
       $scope.cyclesFrom = null
       $scope.cyclesTo = null

@@ -74,7 +74,11 @@
             $scope.initial_done = true;
             switch($scope.experiment.guid){
               case 'chai_coronavirus_env_kit':
-                target2_name = ['IAC', 'RPLP0'];
+                target2_name = ['IAC'];
+                $scope.is_omittable = false;
+                break;
+              case 'chai_covid19_surv_kit':
+                target2_name = ['RPLP0'];
                 $scope.is_omittable = false;
                 break;
               case 'pika_4e_kit':
@@ -89,17 +93,14 @@
                   $scope.targets.push(resp.data[i].target);
                 } else {
                   $scope.target_ipc = resp.data[i].target;
-                  if ($scope.experiment.guid == 'chai_coronavirus_env_kit'){
-                    switch($scope.target_ipc.name){
-                      case 'IAC':
-                        $scope.target1_name = 'Coronavirus Environmental Surface';
-                        break;
-                      case 'RPLP0':
-                        $scope.target1_name = 'COVID-19 Surveillance';
-                        break;
-                    }
+                  switch($scope.target_ipc.name){
+                    case 'IAC':
+                      $scope.target1_name = 'Coronavirus Environmental Surface';
+                      break;
+                    case 'RPLP0':
+                      $scope.target1_name = 'COVID-19 Surveillance';
+                      break;
                   }
-
                 }
               }
               $scope.is_two_kit = ($scope.targets.length == 2) ? true : false;
