@@ -202,10 +202,21 @@ class Step < ActiveRecord::Base
       if (temperature < temperature_min || temperature > temperature_max)
         errors.add(:temperature, "between #{temperature_min} to #{temperature_max}")
       end
+      if temperature < 20
+        if !hold_time.nil?
+          if hold_time >= 7200 #2 hours
+            errors.add(:temperature, "Holding steps < 20 ºC must not exceed 2 hours")
+          elsif infinite_hold?
+            errors.add(:temperature, "Holding steps < 20 ºC must not do infinite hold")
+          end
+        end
+      end
     end
 
-    if !hold_time.nil? && hold_time < 0
-      errors.add(:hold_time, "Cannot be negative")
+    if !hold_time.nil?
+      if hold_time < 0
+        errors.add(:hold_time, "Cannot be negative")
+      end
     end
 
     if collect_data && (infinite_hold? || pause)
