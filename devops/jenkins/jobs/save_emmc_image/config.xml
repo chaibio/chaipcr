@@ -210,7 +210,9 @@ rm build_report.xml
                 echo Cloning branch and param $branch_name and $branch_param
         fi
 
-        sudo rm -r tmp || true
+		sudo rm -r tmp || true
+		mkdir tmp || true
+		cd tmp
 
 		git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
         cd chaipcr || exit 1
