@@ -474,6 +474,8 @@ emmc_image_latest_compressed_full_local_path=${local_download_folder}/${emmc_ima
 tar zfvc $emmc_image_latest_compressed_full_local_path ${grep_sdcard_dir}/eMMC_part*.img
 full_emmc_url=${download_prefix}/${emmc_image_latest_compressed}
 
+export upgrade_image_postfix=$output_image_prefix
+
 if [ -e configuration.json ]
 then
     device_image_number=$(jq -r &quot;.software.version&quot; configuration.json)
@@ -481,6 +483,7 @@ then
     if ! [ -z $device_image_number ]
     then
     	export image_version=$device_image_number
+        export upgrade_image_postfix=$device_image_number
     fi
 fi
 
@@ -534,8 +537,8 @@ then
     echo sdcard filename is $sdcard_filename
     
     upgrade_image_filename=$tmp_sdcard_dir/p2/upgrade.img.tar
-    upgrade_image_url_local_filename=${local_download_folder}/${output_image_prefix}_upgrade.img.tar
-    upgrade_image_url=${download_prefix}/${output_image_prefix}_upgrade.img.tar
+    upgrade_image_url_local_filename=${local_download_folder}/upgrade_${upgrade_image_postfix}.img.tar
+    upgrade_image_url=${download_prefix}/upgrade_${upgrade_image_postfix}.img.tar
     echo upgrade image path $upgrade_image_filename, copying to $upgrade_image_url_local_filename
     cp $upgrade_image_filename $upgrade_image_url_local_filename
     echo Upgrade image URL is $upgrade_image_url
@@ -590,7 +593,7 @@ Release version and build number are $image_version
     
     &lt;field name=&quot;Upgrade Image&quot; titlecolor=&quot;&quot; value=&quot;Download&quot; detailcolor=&quot;&quot; href=&quot;$upgrade_image_url&quot;&gt; 
     &lt;![CDATA[ 
-Upgrade image (${output_image_prefix}_upgrade.img.tar) &lt;a href=&quot;$upgrade_image_url&quot; download=&quot;upgrade.img.tar&quot;&gt;Download&lt;/a&gt;
+Upgrade image (upgrade_${upgrade_image_postfix}.img.tar) &lt;a href=&quot;$upgrade_image_url&quot;&gt;Download&lt;/a&gt;
     ]]&gt; &lt;/field&gt;
      &lt;field name=&quot;eMMC&quot; titlecolor=&quot;&quot; value=&quot;Download&quot; detailcolor=&quot;&quot; href=&quot;$full_emmc_url&quot;&gt; 
       &lt;![CDATA[ 
