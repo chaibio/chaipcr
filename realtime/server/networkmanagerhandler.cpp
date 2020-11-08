@@ -223,5 +223,7 @@ void NetworkManagerHandler::wifiConnect()
 
 void NetworkManagerHandler::wifiDisconnect()
 {
+    NetworkInterfaces::removeInterfaceSettings(kNetworkInterfacesFile, qpcrApp.wirelessManager()->interfaceName());
+
     qpcrApp.wirelessManager()->shutdown();
 }

@@ -67,8 +67,8 @@ namespace NetworkInterfaces
     std::vector<std::string> getAllInterfaces();
 
     InterfaceSettings readInterfaceSettings(const std::string &filePath, const std::string &interfaceName);
-
     void writeInterfaceSettings(const std::string &filePath, const InterfaceSettings &interface);
+    void removeInterfaceSettings(const std::string &filePath, const std::string &interface);
 
     void ifup(const std::string &interfaceName);
     void ifdown(const std::string &interfaceName);

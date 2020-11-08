@@ -44,7 +44,7 @@ std::string getMacAddress(const std::string &interface);
 std::string getInterfaceGateway(const std::string &interface);
 std::vector<std::string> readDnsServers();
 
-#define IS_PLUGGALBE(iface) (iface.find("wlan") != std::string::npos || iface.find("wlx")  != std::string::npos)
+#define IS_PLUGGALBE(iface) (iface.find("wlan") != std::string::npos || iface.find("wlx") != std::string::npos)
 
 namespace NetworkInterfaces
 {
@@ -55,10 +55,10 @@ std::string InterfaceSettings::toString() const
 
     if (autoConnect)
     {
-	if(IS_PLUGGALBE(interface))
-	        stream << "allow-hotplug " << interface << '\n';
-	else
-	        stream << "auto " << interface << '\n';
+        if (IS_PLUGGALBE(interface))
+            stream << "allow-hotplug " << interface << '\n';
+        else
+            stream << "auto " << interface << '\n';
     }
 
     stream << "iface " << interface << " inet " << type << '\n';
@@ -203,6 +203,50 @@ void writeInterfaceSettings(const std::string &filePath, const InterfaceSettings
     }
 
     content += '\n' + interface.toString();
+
+    while (content.find("\n\n\n") != std::string::npos)
+        content.replace(content.find("\n\n\n"), 3, "\n\n");
+
+    file.close();
+    file.open(filePath, std::fstream::out | std::fstream::trunc);
+    file << content;
+}
+
+void removeInterfaceSettings(const std::string &filePath, const std::string &interface)
+{
+    if (interface.empty())
+        return;
+
+    std::fstream file(filePath);
+
+    if (!file.is_open())
+        throw std::system_error(errno, std::generic_category(), "Network error: unable to write file " + filePath + " -");
+
+    std::string content;
+    std::string line;
+    bool skip = false;
+
+    while (file.good())
+    {
+        std::getline(file, line);
+
+        if (line.find("iface") == 0)
+        {
+            if (interface == line.substr(6, line.find(' ', 6) - 6))
+            {
+                skip = true;
+                continue;
+            }
+            else
+                skip = false;
+        }
+        else if (line == "auto " + interface || (line == "allow-hotplug " + interface && IS_PLUGGALBE(interface)))
+            continue;
+        else if (skip && !line.empty() && (line.substr(0, 4) == std::string("    ") || line.at(0) == '\t'))
+            continue;
+
+        content += line + '\n';
+    }
 
     while (content.find("\n\n\n") != std::string::npos)
         content.replace(content.find("\n\n\n"), 3, "\n\n");
