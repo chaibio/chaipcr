@@ -179,6 +179,8 @@ const int kUpdateDownloadError = 10002;
 
 //Network settings
 const std::string kNetworkInterfacesFile = "/etc/network/interfaces";
+static const std::string kNetworkDriverName = "8192cu";
+static const std::string kNetworkDriverPath = "/lib/modules/4.9.78-ti-chai-r94/updates/dkms/" + kNetworkDriverName + ".ko";
 
 //Time checker
 const std::string kSavedTimePath = "/data/chaipcr_saved_time";

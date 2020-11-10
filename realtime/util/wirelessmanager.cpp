@@ -195,14 +195,25 @@ void WirelessManager::_connect()
 
 void WirelessManager::ifup()
 {
-    std::string interface = interfaceName();
-    LoggerStreams streams;
-
+    LoggerStreams logStreams;
     std::stringstream stream;
-    stream << "ifup " << interface;
 
-    if (!Util::watchProcess(stream.str(), _connectionEventFd, [&streams](const char *buffer, std::size_t size){ streams.stream("WirelessManager::ifup - ifup (stdout)").write(buffer, size); },
-                                                             [&streams](const char *buffer, std::size_t size){ streams.stream("WirelessManager::ifup - ifup (stderr)").write(buffer, size); }))
+    stream << "rmmod " << kNetworkDriverName;
+
+    if (!Util::watchProcess(stream.str(), _connectionEventFd,
+                            [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - rmmod (stdout)").write(buffer, size); },
+                            [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - rmmod (stderr)").write(buffer, size); }))
+    {
+        _connectionStatus = NotConnected;
+        return;
+    }
+
+    stream.str("");
+    stream << "insmod " << kNetworkDriverPath;
+
+    if (!Util::watchProcess(stream.str(), _connectionEventFd,
+                            [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - insmod (stdout)").write(buffer, size); },
+                            [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - insmod (stderr)").write(buffer, size); }))
     {
         _connectionStatus = NotConnected;
     }
