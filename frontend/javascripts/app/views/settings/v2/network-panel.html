@@ -45,24 +45,24 @@
       </modal-input-field>
 
       <modal-input-field caption="Password" class="mb-20" ng-show="wifiNetworkType=='wpa2 802.1x' || wifiNetworkType=='wpa1 802.1x'" error="errors.wifi_password">
-        <input type="password" class="CX5-M" placeholder="{{name}} Password" ng-model="credentials['wpa-password']" autocomplete="password">
+        <input type="password" class="CX5-M" placeholder="{{name}} Password" ng-model="credentials['wpa-password']" autocomplete="password" ng-readonly="buttonValue=='Connecting'">
       </modal-input-field>
 
       <modal-input-field caption="Password" class="mb-20" ng-show="wifiNetworkType=='wpa2 psk' || wifiNetworkType=='wpa1 psk'" error="errors.wifi_password">
-        <input type="password" class="CX5-M" placeholder="{{name}} Password" ng-model="credentials['wpa-psk']" autocomplete="password">
+        <input type="password" class="CX5-M" placeholder="{{name}} Password" ng-model="credentials['wpa-psk']" autocomplete="password" ng-readonly="buttonValue=='Connecting'">
       </modal-input-field>
 
       <modal-input-field caption="Password" class="mb-20" ng-show="wifiNetworkType=='wep'" error="errors.wifi_password">
-        <input type="password" class="CX5-M" placeholder="{{name}} Password" ng-model="credentials['wireless_key']" autocomplete="password">
+        <input type="password" class="CX5-M" placeholder="{{name}} Password" ng-model="credentials['wireless_key']" autocomplete="password" ng-readonly="buttonValue=='Connecting'">
       </modal-input-field>
 
       <label class="CX5 mb-15 error" ng-if="statusMessage">{{statusMessage}}</label>
 
       <div class="button-group">
-        <button class="ci-btn-light CX5 mr-20" ng-if="wifiNetworkType" ng-click="connectWifi()">
+        <button class="ci-btn-light CX5 mr-20" ng-if="wifiNetworkType" ng-click="connectWifi()" ng-class="{'disabled': buttonValue=='Connecting'}">
           {{buttonValue}}<ellipsis-animated ng-if="buttonValue=='Connecting'"></ellipsis-animated>
         </button>
-        <button class="ci-btn-light CX5" ng-click="onCancel()">Cancel</button>
+        <button class="ci-btn-light CX5" ng-click="onCancel()" ng-show="buttonValue!='Connecting'">Cancel</button>
       </div>
     </form>
 
@@ -96,7 +96,7 @@
       <modal-ip-address value="editEthernetData['dns-nameservers']" caption="DNS Server" class="mb-20" ng-show="!autoSetting"></modal-ip-address>
 
       <div class="button-group">
-        <button class="ci-btn-light CX5 mr-20" ng-if="!autoSetting" ng-click="connectEthernet()">
+        <button class="ci-btn-light CX5 mr-20" ng-if="!autoSetting" ng-click="connectEthernet()" ng-class="{'disabled': buttonValue=='Connecting'}">
           {{buttonValue}}
           <ellipsis-animated ng-if="buttonValue=='Connecting'"></ellipsis-animated>
         </button>

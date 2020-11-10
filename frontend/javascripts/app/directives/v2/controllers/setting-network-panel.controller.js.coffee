@@ -263,7 +263,7 @@ window.App.controller 'SettingNetworkPanelCtrl', [
     $scope.connectWifi = ->
       console.log $scope.credentials
       # for checking later in 200.
-      if !verifyWifiCredentials()
+      if $scope.buttonValue == 'Connecting' || !verifyWifiCredentials()
         return
 
       NetworkSettingsService.connectWifi($scope.credentials).then ((data) ->
@@ -276,18 +276,22 @@ window.App.controller 'SettingNetworkPanelCtrl', [
       return
 
     $scope.configureAsStatus = (status) ->
-      switch status
-        when 'not_connected'
+      if $scope.selectedWifiNow?.ssid == NetworkSettingsService.connectedWifiNetwork.settings?['wpa-ssid']
+        switch status
+          when 'not_connected'
+            $scope.buttonValue = 'Connect'
+            $scope.statusMessage = ''
+          when 'connecting'
+            $scope.buttonValue = 'Connecting'
+          when 'connection_error'
+            $scope.buttonValue = 'Connect'
+            $scope.statusMessage = 'Unable to connect'
+          when 'authentication_error'
+            $scope.buttonValue = 'Connect'
+            $scope.statusMessage = 'Authentication error'
+      else
           $scope.buttonValue = 'Connect'
           $scope.statusMessage = ''
-        when 'connecting'
-          $scope.buttonValue = 'Connecting'
-        when 'connection_error'
-          $scope.buttonValue = 'Connect'
-          $scope.statusMessage = 'Unable to connect'
-        when 'authentication_error'
-          $scope.buttonValue = 'Connect'
-          $scope.statusMessage = 'Authentication error'
       return
 
     $scope.connectEthernet = ->
@@ -448,6 +452,7 @@ window.App.controller 'SettingNetworkPanelCtrl', [
       $scope.name = network
       $scope.selectedWifiNow = NetworkSettingsService.listofAllWifi[$scope.name] or null
       $scope.initNetwork()
+      $scope.errors.wifi_password = ''
       return
 
     $scope.onCancel = () ->
