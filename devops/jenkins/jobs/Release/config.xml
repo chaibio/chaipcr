@@ -1,10 +1,13 @@
 <?xml version='1.1' encoding='UTF-8'?>
-<com.tikal.jenkins.plugins.multijob.MultiJobProject plugin="jenkins-multijob-plugin@1.27">
+<com.tikal.jenkins.plugins.multijob.MultiJobProject plugin="jenkins-multijob-plugin@1.33">
   <actions/>
   <description>Flash the BB with the latest fresh kernel image. And deploy our software and create a factory settings sdcard.</description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.17.2">
+    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@1.27.1">
+      <doNotScan>false</doNotScan>
+    </com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty>
+    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.18.1">
       <optOut>false</optOut>
     </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
     <hudson.model.ParametersDefinitionProperty>
@@ -21,17 +24,20 @@
           <defaultValue>http://10.0.1.20/download</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
-        <hudson.scm.listtagsparameter.ListSubversionTagsParameterDefinition plugin="subversion@2.9">
+        <com.syhuang.hudson.plugins.listgitbranchesparameter.ListGitBranchesParameterDefinition plugin="list-git-branches-parameter@0.0.9">
           <name>build_branch</name>
-          <description>Select a Subversion entry</description>
-          <tagsDir>https://github.com/chaibio/chaipcr.git</tagsDir>
+          <uuid>7b76aa40-f971-42b9-811f-71c391d63f71</uuid>
+          <remoteURL>https://github.com/chaibio/chaipcr.git</remoteURL>
           <credentialsId></credentialsId>
-          <tagsFilter></tagsFilter>
-          <reverseByDate>true</reverseByDate>
-          <reverseByName>false</reverseByName>
-          <defaultValue></defaultValue>
-          <maxTags></maxTags>
-        </hudson.scm.listtagsparameter.ListSubversionTagsParameterDefinition>
+          <defaultValue>trunk</defaultValue>
+          <type>PT_BRANCH_TAG</type>
+          <tagFilter>*</tagFilter>
+          <branchFilter>.*</branchFilter>
+          <sortMode>NONE</sortMode>
+          <selectedValue>NONE</selectedValue>
+          <quickFilterEnabled>false</quickFilterEnabled>
+          <listSize>5</listSize>
+        </com.syhuang.hudson.plugins.listgitbranchesparameter.ListGitBranchesParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>input_image_prefix</name>
           <description>Image prefix to start with.</description>
@@ -66,7 +72,9 @@
       <phaseJobs>
         <com.tikal.jenkins.plugins.multijob.PhaseJobsConfig>
           <jobName>restore_emmc_image</jobName>
+          <jobAlias></jobAlias>
           <currParams>true</currParams>
+          <aggregatedTestResults>false</aggregatedTestResults>
           <exposedSCM>false</exposedSCM>
           <disableJob>false</disableJob>
           <parsingRulesPath></parsingRulesPath>
@@ -83,13 +91,16 @@
       </phaseJobs>
       <continuationCondition>SUCCESSFUL</continuationCondition>
       <executionType>PARALLEL</executionType>
+      <quietPeriodGroovy>index &lt; 5 ? 0 : 2 * 60</quietPeriodGroovy>
     </com.tikal.jenkins.plugins.multijob.MultiJobBuilder>
     <com.tikal.jenkins.plugins.multijob.MultiJobBuilder>
       <phaseName>Our SW Deployment</phaseName>
       <phaseJobs>
         <com.tikal.jenkins.plugins.multijob.PhaseJobsConfig>
           <jobName>deploy_CHAIBIO</jobName>
+          <jobAlias></jobAlias>
           <currParams>true</currParams>
+          <aggregatedTestResults>false</aggregatedTestResults>
           <exposedSCM>false</exposedSCM>
           <disableJob>false</disableJob>
           <parsingRulesPath></parsingRulesPath>
@@ -99,9 +110,10 @@
           <abortAllJob>true</abortAllJob>
           <condition></condition>
           <configs>
-            <hudson.plugins.parameterizedtrigger.PredefinedBuildParameters plugin="parameterized-trigger@2.35.1">
+            <hudson.plugins.parameterizedtrigger.PredefinedBuildParameters plugin="parameterized-trigger@2.38">
               <properties>image_version=1.1.0.$BUILD_NUMBER
 release_build_number=$BUILD_NUMBER</properties>
+              <textParamValueOnNewLine>false</textParamValueOnNewLine>
             </hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
           </configs>
           <killPhaseOnJobResultCondition>FAILURE</killPhaseOnJobResultCondition>
@@ -111,13 +123,16 @@ release_build_number=$BUILD_NUMBER</properties>
       </phaseJobs>
       <continuationCondition>SUCCESSFUL</continuationCondition>
       <executionType>PARALLEL</executionType>
+      <quietPeriodGroovy>index &lt; 5 ? 0 : 2 * 60</quietPeriodGroovy>
     </com.tikal.jenkins.plugins.multijob.MultiJobBuilder>
     <com.tikal.jenkins.plugins.multijob.MultiJobBuilder>
       <phaseName>Factory Settings SDCard creation</phaseName>
       <phaseJobs>
         <com.tikal.jenkins.plugins.multijob.PhaseJobsConfig>
           <jobName>save_emmc_image</jobName>
+          <jobAlias></jobAlias>
           <currParams>true</currParams>
+          <aggregatedTestResults>false</aggregatedTestResults>
           <exposedSCM>false</exposedSCM>
           <disableJob>false</disableJob>
           <parsingRulesPath></parsingRulesPath>
@@ -127,7 +142,7 @@ release_build_number=$BUILD_NUMBER</properties>
           <abortAllJob>true</abortAllJob>
           <condition></condition>
           <configs>
-            <hudson.plugins.parameterizedtrigger.BooleanParameters plugin="parameterized-trigger@2.35.1">
+            <hudson.plugins.parameterizedtrigger.BooleanParameters plugin="parameterized-trigger@2.38">
               <configs>
                 <hudson.plugins.parameterizedtrigger.BooleanParameterConfig>
                   <name>no_factorysettings_sdcard</name>
@@ -135,11 +150,12 @@ release_build_number=$BUILD_NUMBER</properties>
                 </hudson.plugins.parameterizedtrigger.BooleanParameterConfig>
               </configs>
             </hudson.plugins.parameterizedtrigger.BooleanParameters>
-            <hudson.plugins.parameterizedtrigger.PredefinedBuildParameters plugin="parameterized-trigger@2.35.1">
+            <hudson.plugins.parameterizedtrigger.PredefinedBuildParameters plugin="parameterized-trigger@2.38">
               <properties>release_build_number=$BUILD_NUMBER
 image_version=1.1.0.$BUILD_NUMBER
 sdcard_filename=sdcard_release_$BUILD_NUMBER.img
 </properties>
+              <textParamValueOnNewLine>false</textParamValueOnNewLine>
             </hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
           </configs>
           <killPhaseOnJobResultCondition>FAILURE</killPhaseOnJobResultCondition>
@@ -149,6 +165,7 @@ sdcard_filename=sdcard_release_$BUILD_NUMBER.img
       </phaseJobs>
       <continuationCondition>SUCCESSFUL</continuationCondition>
       <executionType>SEQUENTIALLY</executionType>
+      <quietPeriodGroovy>index &lt; 5 ? 0 : 2 * 60</quietPeriodGroovy>
     </com.tikal.jenkins.plugins.multijob.MultiJobBuilder>
     <hudson.tasks.Shell>
       <command>#echo save_emmc build number $SAVE_EMMC_IMAGE_BUILD_NUMBER .. This one is $BUILD_NUMBER
@@ -166,11 +183,13 @@ exit 0</command>
     </hudson.plugins.summary__report.ACIPluginPublisher>
   </publishers>
   <buildWrappers>
-    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.34">
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.38">
       <deleteDirs>false</deleteDirs>
       <cleanupParameter></cleanupParameter>
       <externalDelete></externalDelete>
+      <disableDeferredWipeout>false</disableDeferredWipeout>
     </hudson.plugins.ws__cleanup.PreBuildCleanup>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.11.5"/>
   </buildWrappers>
   <pollSubjobs>false</pollSubjobs>
 </com.tikal.jenkins.plugins.multijob.MultiJobProject>

@@ -10,7 +10,10 @@
 </description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.17.2">
+    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@1.27.0">
+      <doNotScan>false</doNotScan>
+    </com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty>
+    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.18">
       <optOut>false</optOut>
     </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
     <hudson.model.ParametersDefinitionProperty>
@@ -37,7 +40,22 @@
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
-  <scm class="hudson.scm.NullSCM"/>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@4.3.0">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>https://github.com/chaibio/chaipcr.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions/>
+  </scm>
   <canRoam>true</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
@@ -49,29 +67,70 @@
       <command>#!/bin/bash
 echo checking Jenkins server
 echo &quot;Bash version ${BASH_VERSION}...&quot;
-
-
+uname -a
 ls -ahl
 lsblk
 df -h
 echo user: $(whoami)
-
-echo Restoring image to device at $build_machine
-echo Environmental variables:
-env
-
+ping google.com -c 10
+sudo apt-get update
 echo Checking for nessasery packages:
-sudo apt-get -y -q install sshpass parted mdadm
+sudo apt-get -y -q install sshpass parted mdadm --allow-unauthenticated
+sudo apt-get -y -q install dirmngr --install-recommends
 
-if grep $build_machine ~/.ssh/config
+sudo chmod 777      /var/lib/jenkins/.ssh/known_hosts
+ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
+#ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
+
+sshpass -p temppwd ssh -t -oStrictHostKeyChecking=no debian@$build_machine &lt;&lt;&apos;ENDSSH&apos;
+echo enable root access with no password
+echo temppwd | sudo -S su
+echo temppwd | sudo -S sed -i -e &apos;s:PermitEmptyPasswords no:PermitEmptyPasswords yes:g&apos; /etc/ssh/sshd_config
+sudo sed -i -e &apos;s:#PermitEmptyPasswords:PermitEmptyPasswords:g&apos; /etc/ssh/sshd_config
+sudo sed -i -e &apos;s:UsePAM yes:UsePAM no:g&apos; /etc/ssh/sshd_config
+sudo sed -i -e &apos;s:PermitRootLogin without-password:PermitRootLogin yes:g&apos; /etc/ssh/sshd_config
+sudo sed -i -e &apos;s:PermitRootLogin prohibit-password:PermitRootLogin yes:g&apos; /etc/ssh/sshd_config
+sudo sed -i -e &apos;s:#PermitRootLogin:PermitRootLogin:g&apos; /etc/ssh/sshd_config
+
+
+sudo passwd -d -u root
+sudo su
+
+echo patching sshd_config
+    
+#sudo cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
+#KexAlgorithms diffie-hellman-group1-sha1
+#KexAlgorithms ecdh-sha2-nistp256
+#KexAlgorithms ecdh-sha2-nistp384
+#KexAlgorithms ecdh-sha2-nistp521
+#KexAlgorithms diffie-hellman-group-exchange-sha256
+#KexAlgorithms diffie-hellman-group14-sha1
+#Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+#EOF
+sudo cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
+KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+EOF
+
+ssh-keygen -A || true
+sudo /etc/init.d/ssh restart
+service ssh restart
+
+echo ssh daemon is restarted
+
+
+ENDSSH
+
+echo root access patching returned
+
+
+if grep $build_machine /var/lib/jenkins/.ssh/config
 then
-	echo ~/.ssh/config was patched already
+	echo /var/lib/jenkins/.ssh/config was patched already
 else
-	echo patching ~/.ssh/config
-	cat &lt;&lt;EOF &gt;&gt; ~/.ssh/config
+	echo patching /var/lib/jenkins/.ssh/config
+	cat &lt;&lt;EOF &gt;&gt; /var/lib/jenkins/.ssh/config
 Host $build_machine
 		KexAlgorithms +diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
-		Ciphers +3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 #		KexAlgorithms +diffie-hellman-group1-sha1
 #        KexAlgorithms +curve25519-sha256@libssh.org
 #        KexAlgorithms +ecdh-sha2-nistp256
@@ -94,39 +153,78 @@ fi
 #	sudo service sshd restart
 #fi
 
-ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
 
-#echo deleting root password in case of chaipcr
-#sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;passwd -d -u root&quot;
+echo deleting root password in case of chaipcr
+sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;passwd -d -u root&quot;
+#echo done deleting root password
 
-ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
-sshpass -p chaipcr ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt; ENDSSH
+
+if ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
 
 if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
 then
-	echo sshd_config on $build_machine was patched already
+	echo sshd_config was patched already
 else
 	echo patching sshd_config
     
-	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
+	cat &lt;&lt;EOF&gt;&gt; /etc/ssh/sshd_config
 		KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
-		Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
-	EOF
+EOF
 	ssh-keygen -A || true
 
 	sudo service sshd restart
     sudo service ssh restart
     /etc/init.d/ssh restart
-	echo $build_machine patched
+	echo device is patched
+    ifconfig
+fi
+
+exit 0
+ENDSSH
+then
+   echo &quot;-t worked&quot;
+else
+echo &quot; trying -tt&quot;
+ssh -tt -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
+
+if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
+then
+	echo sshd_config was patched already
+else
+	echo patching sshd_config
+    
+	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
+KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+EOF
+	ssh-keygen -A || true
+
+	
+	sudo service sshd restart
+    sudo service ssh restart
+    /etc/init.d/ssh restart
+	echo device is patched
     ifconfig
 fi
 
 exit 0
 ENDSSH
 
-echo returned to host. connection check:
+fi
+
+echo Returned to host. connection check:
+ssh -oStrictHostKeyChecking=no -t root@$build_machine &apos;exit 0&apos;
+
+if ssh -oStrictHostKeyChecking=no -tt root@$build_machine &apos;exit 0&apos;
+then
+    echo key is added ok
+else
+    echo error adding key to known hosts.. retrying..
+    chmod 777 /var/lib/jenkins/.ssh/known_hosts
+	ssh -oStrictHostKeyChecking=no -t root@$build_machine &apos;exit 0&apos;
+fi
+
 counter=0
-until sshpass -p chaipcr ssh -t root@$build_machine &apos;exit 0&apos;
+until ssh -tt root@$build_machine &apos;exit 0&apos;
 do
 	counter=$(( $counter + 1 ))
     if [ $counter -gt 10 ]
@@ -134,15 +232,15 @@ do
     	echo Beaglebone is not available.
     	exit 1
     fi
-	echo waiting for beaglebone to become connectable.
-	sleep 10
     
+	echo waiting for beaglebone to become connectable.
+	sleep 20
 done
 
 echo done connection check.
-</command>
+sleep 20</command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo &quot;Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}&quot;
 echo &quot;Slave Beaglebone at ${build_machine}&quot;
@@ -263,6 +361,7 @@ lsblk
 df -h
 exit 0</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>ls
@@ -294,7 +393,7 @@ rm $emmc_image_latest_tmp_compressed || true
 
 </command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo patching grep sdcard to boot only once
 #cp /tmp/grep_sdcard/autorun.sh /tmp/grep_sdcard/autorun.sh.org
@@ -319,6 +418,7 @@ shutdown -r 1
 
 exit 0</command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -326,8 +426,8 @@ exit 0</command>
 rm -r /tmp/${BUILD_NUMBER} || true
 
 echo waiting for a restart
-sleep 120
-for i in {0..1200..60}
+sleep 1200
+for i in {0..2400..60}
 do
 	echo &quot;Waiting for the build device to become ready! $i&quot;
 	sleep 60
@@ -342,7 +442,7 @@ done
 echo timeout waiting for the device to become ready!
 exit 1</command>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo All done.
 # debug markers 
@@ -351,10 +451,11 @@ exit 1</command>
 exit 0
 </command>
       <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
   </builders>
   <publishers/>
   <buildWrappers>
-    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.8"/>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.11.3"/>
   </buildWrappers>
 </project>

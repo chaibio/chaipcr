@@ -81,11 +81,10 @@
 
               switch($scope.experiment.guid){
                 case 'chai_coronavirus_env_kit':
-                  if($scope.target_ipc.name == 'IAC'){
-                    $scope.result = Testkit.getCoronaResultArray($scope.famCq, $scope.hexCq);
-                  } else if($scope.target_ipc.name == 'RPLP0'){
-                    $scope.result = Testkit.getCovid19SurResultArray($scope.famCq, $scope.hexCq);
-                  }
+                  $scope.result = Testkit.getCoronaResultArray($scope.famCq, $scope.hexCq);
+                  break;
+                case 'chai_covid19_surv_kit':
+                  $scope.result = Testkit.getCovid19SurResultArray($scope.famCq, $scope.hexCq);
                   break;
                 case 'pika_4e_kit':
                   $scope.result = Testkit.getResultArray($scope.famCq, $scope.hexCq, $scope.twoKits, $scope.omit_positive, $scope.omit_negative, $scope.neg_exist);
@@ -140,7 +139,10 @@
             $scope.initial_done = true;
             switch($scope.experiment.guid){
               case 'chai_coronavirus_env_kit':
-                target2_name = ['IAC', 'RPLP0'];
+                target2_name = ['IAC'];
+                break;
+              case 'chai_covid19_surv_kit':
+                target2_name = ['RPLP0'];
                 break;
               case 'pika_4e_kit':
                 target2_name = ['IPC'];

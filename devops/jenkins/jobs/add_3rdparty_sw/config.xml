@@ -615,6 +615,8 @@ else
       rm -r /sdcard/factory/wifi
 fi
 
+apt autoremove -q -y dkms firmware-realtek tzdata linux-headers-4.4.62-ti-xenomai-r99
+
 sync
 fsck /dev/mmcblk1p1 -y -f
 df -h
