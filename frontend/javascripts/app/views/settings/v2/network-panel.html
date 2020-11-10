@@ -62,7 +62,6 @@
         <button class="ci-btn-light CX5 mr-20" ng-if="wifiNetworkType" ng-click="connectWifi()" ng-class="{'disabled': buttonValue=='Connecting'}">
           {{buttonValue}}<ellipsis-animated ng-if="buttonValue=='Connecting'"></ellipsis-animated>
         </button>
-        <button class="ci-btn-light CX5" ng-click="onCancel()" ng-show="buttonValue!='Connecting'">Cancel</button>
       </div>
     </form>
 
@@ -100,7 +99,6 @@
           {{buttonValue}}
           <ellipsis-animated ng-if="buttonValue=='Connecting'"></ellipsis-animated>
         </button>
-        <button class="ci-btn-light CX5" ng-click="onCancel()">Cancel</button>
       </div>
     </form>
 
