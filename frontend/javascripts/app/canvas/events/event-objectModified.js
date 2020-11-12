@@ -18,8 +18,8 @@
  */
 
 angular.module("canvasApp").factory('objectModified', [
-  'ExperimentLoader',
-  function(ExperimentLoader) {
+  'ExperimentLoader', 'alerts',
+  function(ExperimentLoader, alerts) {
 
     this.init = function(C, $scope, that) {
 
@@ -32,11 +32,19 @@ angular.module("canvasApp").factory('objectModified', [
         switch(evt.target.name) {
 
           case "controlCircleGroup":
+            if($scope.step.hold_time >= 7200 && Number($scope.step.temperature) < 20){
+              alerts.showMessage(alerts.holdLess20DurationWarning, $scope);
+              $scope.step.temperature = $scope.old_step_temp;
+            } else if($scope.step.hold_time == 0 && Number($scope.step.temperature) < 20){
+              alerts.showMessage(alerts.holdLess20DurationZeroWarning, $scope);
+              $scope.step.temperature = $scope.old_step_temp;
+            } else {
+              ExperimentLoader.changeTemperature($scope)
+                .then(function(data) {
+                  console.log(data);
+              });
+            }
 
-            ExperimentLoader.changeTemperature($scope)
-              .then(function(data) {
-                console.log(data);
-            });
           break;
 
           /*case "moveStep":

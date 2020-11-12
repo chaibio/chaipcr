@@ -105,7 +105,10 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
             if(Number(newHoldTime) < 0) {
               alerts.showMessage(alerts.noNegativeHold, scope);
             } else if(Number(newHoldTime) === 0 ) {
-              if(scope.ifLastStep() && !scope.isCyclingStage() && !scope.$parent.step.collect_data) {
+              if(scope.$parent.step.temperature < 20){
+                alerts.showMessage(alerts.holdLess20DurationZeroWarning, scope);
+                scope.reading = editValue;
+              } else if(scope.ifLastStep() && !scope.isCyclingStage() && !scope.$parent.step.collect_data) {
                 scope.reading = newHoldTime;
                 $timeout(function() {
                   ExperimentLoader.changeHoldDuration(scope.$parent).then(function(data) {
@@ -116,6 +119,9 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
                 alerts.showMessage(alerts.holdDurationZeroWarning, scope);
                 scope.reading = editValue;
               }
+            } else if(Number(newHoldTime) >= 7200 && scope.$parent.step.temperature < 20) {
+                alerts.showMessage(alerts.holdLess20DurationWarning, scope);
+                scope.reading = editValue;
             } else {
               $timeout(function() {
                 scope.reading = newHoldTime;

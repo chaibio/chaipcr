@@ -20,7 +20,8 @@
 window.ChaiBioTech.ngApp.directive('temperature', [
   'ExperimentLoader',
   '$timeout',
-  function(ExperimentLoader, $timeout) {
+  'alerts',
+  function(ExperimentLoader, $timeout, alerts) {
     return {
       restric: 'EA',
       replace: true,
@@ -73,9 +74,13 @@ window.ChaiBioTech.ngApp.directive('temperature', [
 
         scope.save = function() {
           scope.edit = false;
-
-          if(! isNaN(scope.shown) && editValue != Number(scope.shown)) {
-
+          if(scope.$parent.step.hold_time >= 7200 && Number(scope.shown) < 20){
+            alerts.showMessage(alerts.holdLess20DurationWarning, scope);
+            scope.shown = Number(scope.reading).toFixed(1);
+          } else if (scope.$parent.step.hold_time == 0 && Number(scope.shown) < 20) {
+            alerts.showMessage(alerts.holdLess20DurationZeroWarning, scope);
+            scope.shown = Number(scope.reading).toFixed(1);
+          } else if(! isNaN(scope.shown) && editValue != Number(scope.shown)) {
             scope.reading = Number(scope.shown).toFixed(1);
             $timeout(function() {
               ExperimentLoader.changeTemperature(scope.$parent).then(function(data) {

@@ -32,6 +32,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
     $scope.stage = {};
     $scope.step = {};
     $scope.exp_completed = false;
+    $scope.old_step_temp = 0;
 
     $scope.$on("expName:Updated", function() {
       $scope.protocol.name = expName.name;
@@ -86,15 +87,16 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
         $scope.step = circle.parent.model;
         $scope.stage = circle.parent.parentStage.model;
         $scope.fabricStep = circle.parent;
+        $scope.old_step_temp = $scope.step.temperature;
       });
 
     };
 
     $scope.applyValues = function(circle) {
-
       $scope.step = circle.parent.model;
       $scope.stage = circle.parent.parentStage.model;
       $scope.fabricStep = circle.parent;
+      $scope.old_step_temp = $scope.step.temperature;
     };
   }
 ]);

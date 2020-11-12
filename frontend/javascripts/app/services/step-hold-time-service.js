@@ -33,6 +33,9 @@ angular.module("canvasApp").service('stepHoldTimeService', [
                     alerts.showMessage(alerts.noNegativeHold, $scope);
                 } else if(newHoldTime === 0) {
                     this.manageZeroHoldTime($scope, parent, newHoldTime, previousHoldTime);
+                } else if(newHoldTime >= 7200 && $scope.step.temperature < 20) {
+                    alerts.showMessage(alerts.holdLess20DurationWarning, $scope);
+                    $scope.step.hold_time = previousHoldTime;
                 } else {
                     $scope.step.hold_time = newHoldTime;
                     this.saveHoldTime($scope);
@@ -46,8 +49,10 @@ angular.module("canvasApp").service('stepHoldTimeService', [
         };
 
         this.manageZeroHoldTime = function($scope, parent, newHoldTime, previousHoldTime) {
-
-            if(this.ifLastStep(parent.parent) && !this.isCyclingStage(parent.parent) && ! $scope.step.collect_data) {
+            if($scope.step.temperature < 20){
+                alerts.showMessage(alerts.holdLess20DurationZeroWarning, $scope);
+                $scope.step.hold_time = previousHoldTime;
+            } else if(this.ifLastStep(parent.parent) && !this.isCyclingStage(parent.parent) && ! $scope.step.collect_data) {
                 $scope.step.hold_time = newHoldTime;
                 parent.doThingsForLast(newHoldTime, previousHoldTime);
                 this.saveHoldTime($scope);
