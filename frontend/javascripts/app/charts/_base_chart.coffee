@@ -14,8 +14,8 @@ class BaseChart
   DEFAULT_MIN_X: 0
   zoomTransform: {x: 0, y: 0, k: 1}
   isZooming: false
-  INPUT_PADDING: 5
-  EXTREME_PADDING: 10
+  INPUT_PADDING: 3
+  EXTREME_PADDING: 2
 
   MARGIN:
     left: 0
@@ -1252,7 +1252,7 @@ class BaseChart
       .attr('class', 'g-axis-limit-text')
       .attr('fill', '#000')
       .attr('x', @MARGIN.left - (offsetRight + conWidth))
-      .attr('y', @height + @MARGIN.top - @EXTREME_PADDING - conHeight)
+      .attr('y', @height + @MARGIN.top - @EXTREME_PADDING - conHeight + 5)
       .attr('dy', '0.71em')
       # .attr('font-size', "#{@AXES_TICKS_FONT_SIZE}px")
       # .attr('font-family', 'dinot-regular')
@@ -1267,7 +1267,7 @@ class BaseChart
       .attr('width', conWidth)
       .attr('x', @MARGIN.left - (conWidth + offsetRight))
       .attr('height', conHeight - offsetTop)
-      .attr('y', @height + @MARGIN.top - conHeight - @EXTREME_PADDING)
+      .attr('y', @height + @MARGIN.top - conHeight - @EXTREME_PADDING + 3)
       .on 'click', => @onClickLowerYAxisInput()
 
     form = inputContainer.append('xhtml:form')
@@ -1396,17 +1396,19 @@ class BaseChart
       line = @yAxisLowerExtremeValue.line
       rect = @yAxisLowerExtremeValue.rect
       text = @yAxisLowerExtremeValue.text
+
       minY = Math.round(yScale.invert(@height) * 10) / 10
       text.text(@yAxisTickFormat(minY))
       textWidth = text.node().getBBox().width
-      text.attr('x', @MARGIN.left - (@yAxisLowerExtremeValue.config.offsetRight + textWidth))
+      text.attr('x', @MARGIN.left - (@yAxisLowerExtremeValue.config.offsetRight + textWidth))        
+
       rect.attr('x', @MARGIN.left - (@yAxisLowerExtremeValue.config.offsetRight + textWidth))
         .attr('width', textWidth)
 
       line.attr('x1', @MARGIN.left - (textWidth + @yAxisLowerExtremeValue.config.offsetRight))
-        .attr('y1', @height + @MARGIN.top - @EXTREME_PADDING * 1.5)
+        .attr('y1', @height + @MARGIN.top - @EXTREME_PADDING)
         .attr('x2', @MARGIN.left - (textWidth + @yAxisLowerExtremeValue.config.offsetRight) + textWidth)
-        .attr('y2', @height + @MARGIN.top - @EXTREME_PADDING * 1.5)
+        .attr('y2', @height + @MARGIN.top - @EXTREME_PADDING)
         .attr('opacity', 1)
 
     @hideLastAxesTicks()
@@ -1427,7 +1429,7 @@ class BaseChart
 
   hideLastAxesTicks: ->
     spacingX = 20
-    spacingY = 1
+    spacingY = 5
     xAxisLeftExtremeValueText = @xAxisLeftExtremeValue.text
     xAxisRightExtremeValueText = @xAxisRightExtremeValue.text
     yAxisLowerExtremeValueText = @yAxisLowerExtremeValue.text
@@ -1455,7 +1457,7 @@ class BaseChart
     ticks.each (d, i) ->
       y = this.transform.baseVal.consolidate().matrix.f
       textHeight = yAxisLowerExtremeValueText.node().getBBox().height
-      if y >  height - textHeight - spacingY - 20 or y < textHeight + spacingY
+      if y >  height - textHeight - spacingY - 15 or y < textHeight + spacingY
         d3.select(this).attr('opacity', 0)
       d3.select(this).select('line').attr('opacity', 0)
 
