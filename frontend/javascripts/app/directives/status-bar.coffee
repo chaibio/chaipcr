@@ -52,7 +52,13 @@ window.App.directive 'statusBar', [
       $scope.is_holding = false
 
       $scope.goToTestKit = ->
-        $state.go('pika_test.experiment-running', {id: $scope.footer_experiment.id})
+        switch $scope.footer_experiment.guid
+          when "chai_coronavirus_env_kit"
+            $state.go('coronavirus-env.experiment-running', {id: $scope.footer_experiment.id})
+          when "chai_covid19_surv_kit"
+            $state.go('covid19-surv.experiment-running', {id: $scope.footer_experiment.id})
+          when "pika_4e_kit"
+            $state.go('pika_test.experiment-running', {id: $scope.footer_experiment.id})
 
       $scope.$on 'status:data:updated', (e, data, oldData) ->
         return if !data

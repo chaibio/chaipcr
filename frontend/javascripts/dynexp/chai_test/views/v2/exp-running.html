@@ -1,0 +1,29 @@
+<div ng-controller="ChaiTestExpRunningCtrl">
+  <div class="pika-wrapper" side-menu-layout>
+    <header-exp-status experiment-id="experiment.id">
+      <div class="stripes-and-name" toggle-sidemenu>
+        <div class="stripes">
+          <img src='/images/menu-grey.svg'/>
+        </div>
+      </div>
+    </header-exp-status>
+    <div class="pika-content">
+      <p class="description CX2">
+        Your experiment is running. Please do not open the hardware unless instructed to here.
+      </p>
+      <p class="time-status CX3-M" ng-if="state === 'running'">
+        Time Remaining:
+      </p>
+      <p class="time-status CX3-M" ng-if="state === 'lid_heating'">
+        This will take about one minute
+      </p>
+      <p class="digit-time CX1-L" ng-show="state === 'running'">
+        {{ timeRemaining | secondsDisplay: 'display2'}}
+      </p>
+      <p class="CX4" ng-show="state === 'lid_heating'">
+        The lid is heating to <b>{{experiment.protocol.lid_temperature | round: 1}} &deg;</b>C <br>
+      </p>
+    </div>
+  </div>
+  <status-bar></status-bar>
+</div>

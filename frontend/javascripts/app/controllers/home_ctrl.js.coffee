@@ -113,8 +113,13 @@ window.ChaiBioTech.ngApp
           if exp.type isnt 'test_kit'
             $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
           else
-            $state.go 'pika_test.experiment-running', id: exp.id
-
+            switch exp.guid
+              when "chai_coronavirus_env_kit"
+                $state.go 'coronavirus-env.experiment-running', id: exp.id
+              when "chai_covid19_surv_kit"
+                $state.go 'covid19-surv.experiment-running', id: exp.id
+              when "pika_4e_kit"
+                $state.go 'pika_test.experiment-running', id: exp.id
         else
           if exp.type isnt 'test_kit'
             if exp.started_at
@@ -122,12 +127,30 @@ window.ChaiBioTech.ngApp
             else
               $state.go 'edit-protocol', {id: exp.id}
           else
-            if not exp.started_at
-              $state.go('pika_test.set-wells', id: exp.id)
-            else if exp.started_at isnt null && exp.completed_at isnt null
-              $state.go('pika_test.experiment-result', id: exp.id)
-            else
-              $state.go 'pika_test.experiment-running', id: exp.id
+            switch exp.guid
+              when "chai_coronavirus_env_kit"
+                if not exp.started_at
+                  $state.go('coronavirus-env.set-wells', id: exp.id)
+                else if exp.started_at isnt null && exp.completed_at isnt null
+                  $state.go('coronavirus-env.experiment-result', id: exp.id)
+                else
+                  $state.go 'coronavirus-env.experiment-running', id: exp.id
+
+              when "chai_covid19_surv_kit"
+                if not exp.started_at
+                  $state.go('covid19-surv.set-wells', id: exp.id)
+                else if exp.started_at isnt null && exp.completed_at isnt null
+                  $state.go('covid19-surv.experiment-result', id: exp.id)
+                else
+                  $state.go 'covid19-surv.experiment-running', id: exp.id
+
+              when "pika_4e_kit"
+                if not exp.started_at
+                  $state.go('pika_test.set-wells', id: exp.id)
+                else if exp.started_at isnt null && exp.completed_at isnt null
+                  $state.go('pika_test.experiment-result', id: exp.id)
+                else
+                  $state.go 'pika_test.experiment-running', id: exp.id
 
     @initActivity = ->
       activity = localStorage.getItem('init_activity')

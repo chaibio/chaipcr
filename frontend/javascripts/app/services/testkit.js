@@ -41,15 +41,15 @@ window.ChaiBioTech.ngApp.service('Testkit', [
     self.getAmountArray = function(famCq, twoKits){
       var i = 0;
       this.amount  = [];
-      this.amount[0] = (this.result[0] == "Invalid") ? "Repeat - Refer to user manual" : "";
-      this.amount[1] = (this.result[1] == "Invalid") ? "Repeat - Refer to user manual" : "";
+      this.amount[0] = (this.result[0] == "Invalid") ? "" : "";
+      this.amount[1] = (this.result[1] == "Invalid") ? "" : "";
 
       for (i = 2; i < 8; i++) {
         if(this.result[i] == "Inhibited"){
-          this.amount[i] = "Repeat - Refer to user manual";
+          this.amount[i] = "";
         }
         else if(this.result[i] == "Invalid"){
-          this.amount[i] = "Repeat - Refer to user manual";
+          this.amount[i] = "";
         }
         else if (famCq[i]>=10 && famCq[i]<= 24) {
           this.amount[i] = "High";
@@ -70,7 +70,7 @@ window.ChaiBioTech.ngApp.service('Testkit', [
             this.amount[i] = "Invalid";
           }
           else if(this.result[i] == "Invalid"){
-            this.amount[i] = "Repeat - Refer to user manual";
+            this.amount[i] = "";
           }
           else if (famCq[i]>=10 && famCq[i]<= 24) {
             this.amount[i] = "High";
@@ -91,10 +91,10 @@ window.ChaiBioTech.ngApp.service('Testkit', [
         this.amount[9]="\u2014";
         for (i = 10; i < 16; i++) {
           if(this.result[i] == "Inhibited"){
-            this.amount[i] = "Repeat - Refer to user manual";
+            this.amount[i] = "";
           }
           else if(this.result[i] == "Invalid"){
-            this.amount[i] = "Repeat - Refer to user manual";
+            this.amount[i] = "";
           }
           else if (famCq[i]>=10 && famCq[i]<= 24) {
             this.amount[i] = "High";

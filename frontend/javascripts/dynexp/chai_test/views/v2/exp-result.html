@@ -1,0 +1,56 @@
+<div ng-controller="ChaiTestExpResultCtrl">
+  <div class="pika-wrapper" side-menu-layout>
+    <header-exp-status experiment-id="experiment.id">
+      <div class="stripes-and-name" toggle-sidemenu>
+        <div class="stripes">
+          <img src='/images/menu-grey.svg'/>
+        </div>
+      </div>
+    </header-exp-status>
+    <div class="inner-wrapper">
+      <div class="inner-container">
+        <div class="pika-content" ng-if="analyzing">
+          <h3 class="CH1">Analyzing...</h3>          
+        </div>
+        <div class="pika-content" ng-if="!analyzing">
+          <h3 class="CH1">{{targets[0].name}}</h3>
+          <!-- Corona virus environmental surface -->
+          <table class="CB2">
+            <tr class="CX5-M tr-header">
+              <td style="width:35px">Well</td>
+              <td>Sample</td>
+              <td style="width:35px"></td>
+              <td style="width:150px; white-space: nowrap;">Result</td>
+              <td style="width:100px" class="text-center">{{targets[0].name}} C<sub>q</sub></td>
+              <td style="width:100px; font-style: italic;" class="text-center">{{target_ipc.name}} C<sub>q</sub></td>
+              <td style="width:50px"></td>
+            </tr>
+            <tr ng-if="x && (x.name != '' && x.name != 'empty')" 
+              ng-repeat="x in samples track by $index">
+              <td ng-if="$index < 8">A{{$index + 1}}</td>
+              <td ng-if="$index >= 8">B{{$index - 7}}</td>
+              <td class="CB2-M">{{x.name}}</td>
+              <td>
+                <img ng-if="result[$index] == 'Valid'" style="width:20px"  src="/images/Valid.svg">
+                <img ng-if="result[$index] == 'Invalid' || result[$index] == 'Invalid - NTC Control Failed' || result[$index] == 'Invalid - Positive Control Failed'" style="width:20px"  src="/images/Invalid.svg">
+                <img ng-if="result[$index] == 'Not Detected'" style="width:20px"  src="/images/Negative.svg">
+                <img ng-if="result[$index] == 'Positive'" style="width:20px"  src="/images/Positive.svg">
+                <img ng-if="result[$index] == 'Inhibited'" style="width:20px"  src="/images/Inhibited.svg">
+              </td>
+              <td style="white-space: nowrap;">{{result[$index]}}</td>
+              <td class="text-center"><span ng-show="famCq[$index]">{{famCq[$index] | round:2}}</span></td>
+              <td class="text-center"><span ng-show="hexCq[$index]">{{hexCq[$index] | round:2}}</span></td>
+              <td ng-if="x.id && x.notes" ng-click="openNotes($index, x)" class="notes-cursor text-right" style="width:50px">
+                <img style="width:20px" src="/images/dynexp/pika-test/note-on.svg" class="cursor-pointer note-{{$index}}">
+              </td>
+              <td ng-if="x.id && !x.notes" ng-click="openNotes($index, x)" class="notes-cursor text-right" style="width:50px">
+                <img style="width:20px" src="/images/dynexp/pika-test/note-off.svg" class="cursor-pointer note-{{$index}}">
+              </td>              
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <status-bar></status-bar>
+</div>

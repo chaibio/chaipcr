@@ -41,8 +41,13 @@
     <div class="side-menu-menu-container property-menu">
       <label class="section-name CB2-M">Setup</label>
       <hr/>
-      <div class="side-menu-menu-item" ng-if="exp_type == 'test_kit'" ng-class="{'active': stateInfo.name == 'pika_test.set-wells'}">
-        <div class="CH1-M" ui-sref="pika_test.set-wells({id: params.id})"  style="margin: 0">
+      <div 
+        ng-if="exp_type == 'test_kit'"
+        class="side-menu-menu-item" 
+        ng-class="{
+          'active': stateInfo.name == 'pika_test.set-wells' || stateInfo.name == 'coronavirus-env.set-wells' || stateInfo.name == 'covid19-surv.set-wells'
+        }">
+        <div class="CH1-M" ng-click="goTestKit('set-wells')" style="margin: 0">
           <span>Assign Wells</span>
         </div>
       </div>
@@ -70,8 +75,7 @@
       </div>
       <div class="side-menu-menu-box" ng-if="status == 'RUNNING'">
         <div class="CB2-M">
-          <span ui-sref="pika_test.experiment-running({id: params.id})" ng-if="exp_type && exp_type == 'test_kit'">Experiment In Progress</span>
-          <span ng-if="exp_type && exp_type != 'test_kit'">Experiment In Progress</span>
+          <span ng-click="goTestKit('experiment-running')">Experiment In Progress</span>
         </div>
         <button class="side-menu-button CB2-M" ng-click="setConfirmCancel(true)" ng-if="!getConfirmCancel()">Cancel</button>
         <button class="side-menu-button CB2-M confirm-cancel" ng-click="cancelExperiment(params.id)" ng-if="getConfirmCancel()">Confirm Cancel</button>
@@ -83,8 +87,8 @@
       <div class="side-menu-menu-item" ng-if="exp_type == 'test_kit'"
         ng-class="{
           'disabled-link': status != 'COMPLETED',
-          'active': stateInfo.name == 'pika_test.experiment-result'}">
-        <div class="CH1-M" ui-sref="pika_test.experiment-result({id: params.id})" toggle-sidemenu ng-if="status == 'COMPLETED'">
+          'active': stateInfo.name == 'pika_test.experiment-result' || stateInfo.name == 'coronavirus-env.experiment-result' || stateInfo.name == 'covid19-surv.experiment-result'}">
+        <div class="CH1-M" ng-click="goTestKit('experiment-result')" toggle-sidemenu ng-if="status == 'COMPLETED'">
           <span>Test Result</span>
         </div>
         <div class="CH1-M" ng-if="status != 'COMPLETED'">

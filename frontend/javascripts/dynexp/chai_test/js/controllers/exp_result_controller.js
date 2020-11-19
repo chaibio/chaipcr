@@ -1,6 +1,6 @@
 (function() {
-  angular.module('dynexp.pika_test')
-  .controller('PikaExpResultCtrl', [
+  angular.module('dynexp.chai-test')
+  .controller('ChaiTestExpResultCtrl', [
     '$scope',
     '$window',
     'Experiment',
@@ -10,14 +10,13 @@
     'dynexpGlobalService',
     'host',
     '$http',
-    'PikaTestConstants',
     '$timeout',
     '$rootScope',
     '$uibModal',
     'focus',
     'Testkit',
-    function PikaExpResultCtrl($scope, $window, Experiment, $state, $stateParams, Status, GlobalService,
-      host, $http, CONSTANTS, $timeout, $rootScope, $uibModal, focus, Testkit) {
+    function ChaiTestExpResultCtrl($scope, $window, Experiment, $state, $stateParams, Status, GlobalService,
+      host, $http, $timeout, $rootScope, $uibModal, focus, Testkit) {
 
       $window.$('body').addClass('pika-exp-result-active');
       $scope.$on('$destroy', function() {
@@ -79,8 +78,15 @@
                 $scope.hexCq.push(filterSummaryByHex(i));
               }
 
-              $scope.result = Testkit.getResultArray($scope.famCq, $scope.hexCq, $scope.twoKits, $scope.omit_positive, $scope.omit_negative, $scope.neg_exist);
-              $scope.amount = Testkit.getAmountArray($scope.famCq, $scope.twoKits);              
+              switch($scope.experiment.guid){
+                case 'chai_coronavirus_env_kit':
+                  $scope.result = Testkit.getCoronaResultArray($scope.famCq, $scope.hexCq);
+                  break;
+                case 'chai_covid19_surv_kit':
+                  $scope.result = Testkit.getCovid19SurResultArray($scope.famCq, $scope.hexCq);
+                  break;
+              }
+              
             }
           } else if (resp.data.partial || resp.status == 202) {
             $timeout(getResults, 1000);
@@ -126,7 +132,14 @@
           $scope.experimentId = $stateParams.id;
           getExperiment($scope.experimentId, function(exp){
             $scope.initial_done = true;
-            target2_name = ['IPC'];
+            switch($scope.experiment.guid){
+              case 'chai_coronavirus_env_kit':
+                target2_name = ['IAC'];
+                break;
+              case 'chai_covid19_surv_kit':
+                target2_name = ['RPLP0'];
+                break;
+            }
             Experiment.getWellLayout($stateParams.id).then(function (well_resp) {
               var k, i;
               for (i = 0; i < 16; i++) {
@@ -180,7 +193,7 @@
 
         $scope.modalInstance = $uibModal.open({
           scope: $scope,
-          templateUrl: 'dynexp/pika_test/note-modal.html',
+          templateUrl: 'dynexp/chai_test/note-modal.html',
           backdrop: true
         });
 

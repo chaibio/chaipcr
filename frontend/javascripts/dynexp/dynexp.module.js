@@ -7,4 +7,5 @@ angular.module('dynexp', [
   'dynexp.thermal_consistency',
   'dynexp.thermal_performance_diagnostic',
   'dynexp.pika_test',
+  'dynexp.chai-test',
 ]);
