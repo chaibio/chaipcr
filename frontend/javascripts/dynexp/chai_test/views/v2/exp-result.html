@@ -22,7 +22,9 @@
               <td style="width:35px"></td>
               <td style="width:150px; white-space: nowrap;">Result</td>
               <td style="width:100px" class="text-center">{{targets[0].name}} C<sub>q</sub></td>
-              <td style="width:100px; font-style: italic;" class="text-center">{{target_ipc.name}} C<sub>q</sub></td>
+              <td style="width:100px;" class="text-center">
+                <span ng-style="{'font-style': target_ipc && target_ipc.name == 'RPLP0' ? 'italic' : 'initial'}">{{target_ipc.name}}</span> C<sub>q</sub>
+              </td>
               <td style="width:50px"></td>
             </tr>
             <tr ng-if="x && (x.name != '' && x.name != 'empty')" 

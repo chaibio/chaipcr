@@ -144,6 +144,16 @@ window.ChaiBioTech.ngApp.service('Testkit', [
             this.result[i]="Negative";
           } else if (famCq[i] > 38 && (hexCq[i]>=20 && hexCq[i]<=36)){
             this.result[i]="Negative";
+          } else {
+            if((!famCq[i]) && (!hexCq[i])){
+              this.result[i]="Inhibited";
+            } else if(!(famCq[i]) && hexCq[i] > 36) {
+              this.result[i]="Inhibited";
+            } else if(famCq[i] > 38 && (!hexCq[i])){
+              this.result[i]="Inhibited";
+            } else if(famCq[i] > 38 && hexCq[i] > 36){
+              this.result[i]="Inhibited";
+            }
           }
         } else if(this.result[0] == "Valid" && this.result[1] == "Omitted" && negExist) {
           if(famCq[i]>=10 && famCq[i]<=38){
@@ -158,7 +168,7 @@ window.ChaiBioTech.ngApp.service('Testkit', [
             this.result[i]="Inhibited";
           } else if(famCq[i] > 38 && hexCq[i] > 36){
             this.result[i]="Inhibited";
-          }          
+          }
         }
       }
       if(!twoKits){
@@ -173,6 +183,16 @@ window.ChaiBioTech.ngApp.service('Testkit', [
               this.result[i]="Negative";
             } else if (famCq[i] > 38 && (hexCq[i]>=20 && hexCq[i]<=36)){
               this.result[i]="Negative";
+            } else {
+              if((!famCq[i]) && (!hexCq[i])){
+                this.result[i]="Inhibited";
+              } else if(!(famCq[i]) && hexCq[i] > 36) {
+                this.result[i]="Inhibited";
+              } else if(famCq[i] > 38 && (!hexCq[i])){
+                this.result[i]="Inhibited";
+              } else if(famCq[i] > 38 && hexCq[i] > 36){
+                this.result[i]="Inhibited";
+              }
             }
           } else if(this.result[0] == "Valid" && this.result[1] == "Omitted" && negExist) {
             if(famCq[i]>=10 && famCq[i]<=38){
@@ -219,6 +239,16 @@ window.ChaiBioTech.ngApp.service('Testkit', [
               this.result[i]="Negative";
             } else if (famCq[i] > 38 && (hexCq[i]>=20 && hexCq[i]<=36)){
               this.result[i]="Negative";
+            } else {
+              if((!famCq[i]) && (!hexCq[i])){
+                this.result[i]="Inhibited";
+              } else if(!(famCq[i]) && hexCq[i] > 36) {
+                this.result[i]="Inhibited";
+              } else if(famCq[i] > 38 && (!hexCq[i])){
+                this.result[i]="Inhibited";
+              } else if(famCq[i] > 38 && hexCq[i] > 36){
+                this.result[i]="Inhibited";
+              }
             }
           } else if(this.result[8] == "Valid" && this.result[9] == "Omitted" && negExist) {
             if(famCq[i]>=10 && famCq[i]<=38){
