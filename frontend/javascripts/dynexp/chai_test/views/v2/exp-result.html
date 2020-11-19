@@ -33,8 +33,8 @@
               <td>
                 <img ng-if="result[$index] == 'Valid'" style="width:20px"  src="/images/Valid.svg">
                 <img ng-if="result[$index] == 'Invalid' || result[$index] == 'Invalid - NTC Control Failed' || result[$index] == 'Invalid - Positive Control Failed'" style="width:20px"  src="/images/Invalid.svg">
-                <img ng-if="result[$index] == 'Not Detected'" style="width:20px"  src="/images/Negative.svg">
-                <img ng-if="result[$index] == 'Positive'" style="width:20px"  src="/images/Positive.svg">
+                <img ng-if="result[$index] == 'Not Detected'" style="width:20px"  src="/images/Negative.svg?v=1">
+                <img ng-if="result[$index] == 'Positive'" style="width:20px"  src="/images/Positive.svg?v=1">
                 <img ng-if="result[$index] == 'Inhibited'" style="width:20px"  src="/images/Inhibited.svg">
               </td>
               <td style="white-space: nowrap;">{{result[$index]}}</td>

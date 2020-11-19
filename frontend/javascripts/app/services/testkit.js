@@ -87,8 +87,8 @@ window.ChaiBioTech.ngApp.service('Testkit', [
         }
       }
       else{
-        this.amount[8]="\u2014";
-        this.amount[9]="\u2014";
+        this.amount[8]="";
+        this.amount[9]="";
         for (i = 10; i < 16; i++) {
           if(this.result[i] == "Inhibited"){
             this.amount[i] = "";
