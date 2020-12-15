@@ -41,6 +41,7 @@
       margin-left: 10px;
       border-radius: 2px;
       white-space: nowrap;
+      cursor: pointer;
 
       &.disabled {
         color: $light-gray;
