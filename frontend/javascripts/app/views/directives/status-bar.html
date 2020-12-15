@@ -16,29 +16,31 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<div class="status-bar CB2-M" ng-show="show()">
-  <span class="idle-state" ng-show="state === 'idle'">No Experiment Running</span>
-  <span class="running-info" ng-show="state !== 'idle'">
-    Experiment in Progress:
-    <span ng-show="footer_experiment.type !== 'test_kit'" class="experiment-name CB2-B" ui-sref="run-experiment({id: footer_experiment.id, chart: 'amplification'})">
-      {{truncate(footer_experiment.name, 50)}}
+<div class="footer-status-bar CB2-M" ng-show="show()">
+  <div class="left-content" ng-show="state === 'idle'">
+    <span class="idle-state">Machine is idle</span>
+  </div>
+  <div class="left-content" ng-show="state !== 'idle'">
+    <span>Experiment in Progress:&nbsp;</span>
+    <span ng-show="footer_experiment.type !== 'test_kit'" class="experiment-name CB2-B mr-20" ui-sref="run-experiment({id: footer_experiment.id, chart: 'amplification'})">
+      {{footer_experiment.name}}
     </span>
-    <span ng-show="footer_experiment.type === 'test_kit'" class="experiment-name CB2-B" ng-click="goToTestKit()">
-      {{truncate(footer_experiment.name, 50)}}
+    <span ng-show="footer_experiment.type === 'test_kit'" class="experiment-name CB2-B mr-20" ng-click="goToTestKit()">
+      {{footer_experiment.name}}
     </span>
-    <span class="time-remaining" ng-show="state === 'running' || is_holding">
+    <span class="time-remaining mr-20" ng-show="state === 'running' || is_holding">
         Time Remaining:
         <span ng-show="!is_holding" class="CB2-B">{{timeRemaining | secondsDisplay: 'display2'}}</span>
-    <span class="holding" ng-show="is_holding">Holding</span>
+    <span class="holding mr-20" ng-show="is_holding">Holding</span>
     </span>
-    <span class="temp-info" ng-show="state !== 'lid_heating'">
+    <span class="temp-info mr-20" ng-show="state !== 'lid_heating'">
         Block: <span class="CB2-B">{{status.heat_block.temperature | round: 1}} &deg;C</span>
       </span>
     <span class="temp-info">
         Lid: <span class="CB2-B">{{status.lid.temperature | round: 1}} &deg;C</span>
     </span>
-  </span>
-  <span class="controls-container">
+  </div>
+  <div class="right-content">
     <span class="control" ng-show="state === 'paused'" ng-click="resumeExperiment()">
       <img src="/images/status-resume-btn.png">
       Resume
@@ -53,6 +55,6 @@
       <img src="/images/status-bar-stop-confirm-btn.png">
       <span ng-show="!is_holding">Confirm Stop</span>
       <span ng-show="is_holding">Confirm End Hold</span>
-    </div>
-  </span>
+    </div>    
+  </div>
 </div>

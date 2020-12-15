@@ -29,12 +29,20 @@ window.App.directive 'statusBar', [
     templateUrl: 'app/views/directives/status-bar.html'
     link: ($scope, elem, attrs) ->
 
-
       experiment_id = null
       $document = angular.element(document)
       inputFocus = elem.find('input')
       stopping = false
       $scope.truncate = Experiment.truncateName
+
+      onResize = ->
+        elem.find('.left-content').css('opacity', '0')
+        $timeout ()->
+          elem.find('.left-content').css('width', '40%')
+          right_width = elem.find('.right-content').width() + 10
+          elem.find('.left-content').css('width', 'calc(100% - ' + right_width + 'px)')
+          elem.find('.left-content').css('opacity', '1')
+        , 1000
 
       $scope.show = ->
         if $scope.state isnt 'idle' then (!!$scope.status and !!$scope.footer_experiment) else !!$scope.status
@@ -44,10 +52,11 @@ window.App.directive 'statusBar', [
         Experiment.get(id: experiment_id).then (data) ->
           cb data.experiment
 
-      $scope.$watch 'experimentId', (id) ->
+      $scope.$watch 'experiment_id', (id) ->
         return if !id
         getExperiment (exp) ->
           $scope.footer_experiment = exp
+          onResize()
 
       $scope.is_holding = false
 
@@ -66,6 +75,7 @@ window.App.directive 'statusBar', [
             $scope.footer_experiment = exp
             $scope.status = data
             $scope.is_holding = TestInProgressHelper.set_holding(data, exp)
+            onResize()
         else
           $scope.status = data
           $scope.is_holding = TestInProgressHelper.set_holding(data, $scope.footer_experiment)
@@ -76,6 +86,7 @@ window.App.directive 'statusBar', [
           experiment_id = data.experiment_controller.experiment.id
           getExperiment (exp) ->
             $scope.footer_experiment = exp
+            onResize()
 
         if $scope.state is 'idle' and $scope.oldState isnt 'idle'
           $scope.footer_experiment = null

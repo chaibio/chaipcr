@@ -1,0 +1,69 @@
+@import "../variables.scss";
+.chai-mode .footer-status-bar{
+  background: $dark-gray;
+  color: #fff;
+  height: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  width: 100%;
+  overflow: hidden;
+
+  .left-content{
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+    .experiment-name {
+      cursor: pointer;
+      border-bottom: 1px solid #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-shadow: 0px 2px 1px rgba(51, 51, 51, 0.67);
+      line-height: 30px;
+      margin-right: 20px;
+    }
+
+    > span{
+      display: block;
+      white-space: nowrap;
+    }
+  }
+
+  .right-content{
+    display: flex;
+    align-items: center;
+    .control {
+      color: #fff;
+      padding: 6px 10px;
+      margin-left: 10px;
+      border-radius: 2px;
+      white-space: nowrap;
+
+      &.disabled {
+        color: $light-gray;
+      }
+
+      &.stop-confirm {
+        background-color: $chai-red;
+      }
+
+      input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        position: absolute;
+      }
+
+      img {
+        width: 15px;
+        height: 15px;
+        vertical-align: middle;
+        margin-top: -3px;
+        margin-right: 7px;
+      }
+    }
+  }
+}
