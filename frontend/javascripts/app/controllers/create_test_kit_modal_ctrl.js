@@ -320,7 +320,17 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                         $scope.creating = false;
                         $scope.error = response.data.errors || "An error occured while trying to create the experiment.";
                     } else {
-                        $state.go('pika_test.set-wells', {id: new_experiment_id});
+                        switch($scope.selected_brand.guid){
+                            case 'chai_coronavirus_env_kit':
+                                $state.go('coronavirus-env.set-wells', {id: new_experiment_id});
+                                break;
+                            case 'chai_covid19_surv_kit':
+                                $state.go('covid19-surv.set-wells', {id: new_experiment_id});
+                                break;
+                            case 'pika_4e_kit':
+                                $state.go('pika_test.set-wells', {id: new_experiment_id});
+                                break;
+                        }
                         $scope.$close();
                     }
                 });
@@ -441,7 +451,17 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                             $scope.creating = false;
                             $scope.error = response.data.errors || "An error occured while trying to create the experiment.";
                         } else {
-                            $state.go('pika_test.set-wells', {id: new_experiment_id});
+                            switch($scope.selected_brand.guid){
+                                case 'chai_coronavirus_env_kit':
+                                    $state.go('coronavirus-env.set-wells', {id: new_experiment_id});
+                                    break;
+                                case 'chai_covid19_surv_kit':
+                                    $state.go('covid19-surv.set-wells', {id: new_experiment_id});
+                                    break;
+                                case 'pika_4e_kit':
+                                    $state.go('pika_test.set-wells', {id: new_experiment_id});
+                                    break;
+                            }
                             $scope.$close();
                         }
                     });
@@ -618,7 +638,17 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                             $scope.creating = false;
                             $scope.error = response.data.errors || "An error occured while trying to create the experiment.";
                         } else {
-                            $state.go('pika_test.set-wells', {id: new_experiment_id});
+                            switch($scope.selected_brand.guid){
+                                case 'chai_coronavirus_env_kit':
+                                    $state.go('coronavirus-env.set-wells', {id: new_experiment_id});
+                                    break;
+                                case 'chai_covid19_surv_kit':
+                                    $state.go('covid19-surv.set-wells', {id: new_experiment_id});
+                                    break;
+                                case 'pika_4e_kit':
+                                    $state.go('pika_test.set-wells', {id: new_experiment_id});
+                                    break;
+                            }
                             $scope.$close();
                         }
                     });

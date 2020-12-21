@@ -1,0 +1,15 @@
+<div class="notes-box">
+  <textarea 
+    type="text" 
+    focus-on="editNotes" 
+    placeholder="Add note to well {{selectedWellRow + selectedWellIndex}}" 
+    class="CB2 notes-textarea" 
+    ng-model="selectedSample.notes" 
+    rows="4">
+  </textarea>
+  <div class="text-center notes-buttons">
+    <label class="CB3 well-number">{{selectedWellRow + selectedWellIndex}}</label>
+    <button class="notes-commit CB3" ng-click="updateNotes()">Commit</button>
+    <button class="notes-cancel CB3" ng-click="cancel()">Cancel</button>
+  </div>
+</div>
