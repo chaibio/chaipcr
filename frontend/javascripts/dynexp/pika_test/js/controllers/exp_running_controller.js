@@ -32,6 +32,7 @@
       function getExperiment(exp_id, cb) {
         Experiment.get(exp_id).then(function(resp) {
           $scope.experiment = resp.data.experiment;
+          $rootScope.pageTitle = resp.experiment.name + " | Open qPCR";
           if (cb) cb(resp.data.experiment);
         });
       }

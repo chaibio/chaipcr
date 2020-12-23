@@ -38,6 +38,7 @@ window.ChaiBioTech.ngApp
     $scope.deleteMode = false
     $scope.enterHome = true
     $scope.state = ''
+    $rootScope.pageTitle = ''
 
     User.getCurrent().then (resp) ->
       $scope.user = resp.data.user

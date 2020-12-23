@@ -31,10 +31,25 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 	'$stateParams',
 	'AmplificationChartHelper',
 	'User',
-	function ($scope, Status, $http, Device, $window, $timeout, $location, $state, Experiment, $stateParams, AmplificationChartHelper, User) {
+	'$rootScope',
+	function (
+		$scope, 
+		Status, 
+		$http, 
+		Device, 
+		$window, 
+		$timeout, 
+		$location, 
+		$state, 
+		Experiment, 
+		$stateParams, 
+		AmplificationChartHelper, 
+		User,
+		$rootScope) {
 
 		Experiment.get({ id: $stateParams.id }).then(function (response) {
 			$scope.experiment = response.experiment;
+			$rootScope.pageTitle = response.experiment.name + " | Open qPCR";
 			if($scope.experiment.standard_experiment_id){
 				Experiment.get({ id: $scope.experiment.standard_experiment_id }).then(function (resp) {
 					$scope.standard_experiment = resp.experiment;

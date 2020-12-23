@@ -29,7 +29,8 @@
       '$stateParams',
       '$state',
       'ThermalPerformanceDiagnosticConstants',
-      function($scope, Experiment, Status, $interval, $timeout, DiagnosticWizardService, $params, $state, CONSTANTS) {
+      '$rootScope',
+      function($scope, Experiment, Status, $interval, $timeout, DiagnosticWizardService, $params, $state, CONSTANTS, $rootScope) {
 
         $scope.CONSTANTS = CONSTANTS;
         $scope.lidTemps = null;
@@ -40,6 +41,7 @@
         var animation;
         var current_exp_id = $params.id;
         var cal_exp_id = $params.id;
+        $rootScope.pageTitle = "Thermal Diagnostic Wizard | Open qPCR";
 
         function fetchTempLogs() {
           if (!fetchingTemps) {

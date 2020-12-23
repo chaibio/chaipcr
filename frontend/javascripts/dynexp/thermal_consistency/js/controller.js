@@ -33,6 +33,7 @@
 
         var current_exp_id = 0;
         var cal_exp_id = 0;
+        $rootScope.pageTitle = "Thermal Uniformity Diagnostic | Open qPCR";
 
         GlobalService.isDualChannel(function(it_is) {
           $scope.is_dual_channel = it_is;

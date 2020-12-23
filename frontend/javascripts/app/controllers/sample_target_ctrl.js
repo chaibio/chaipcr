@@ -31,10 +31,26 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
     '$stateParams',
     'AmplificationChartHelper',
     'SampleTargetDelete',
-    function($scope, Status, $http, Device, $window, $timeout, $location, $state, Experiment, $uibModal, $stateParams, AmplificationChartHelper, SampleTargetDelete) {
+    '$rootScope',
+    function(
+        $scope, 
+        Status, 
+        $http, 
+        Device, 
+        $window, 
+        $timeout, 
+        $location, 
+        $state, 
+        Experiment, 
+        $uibModal, 
+        $stateParams, 
+        AmplificationChartHelper, 
+        SampleTargetDelete, 
+        $rootScope) {
 
         Experiment.get({id: $stateParams.id}).then(function(response){
             $scope.experiment = response.experiment;
+            $rootScope.pageTitle = response.experiment.name + " | Open qPCR";
         });
 
         Device.isDualChannel().then(function(is_dual_channel){

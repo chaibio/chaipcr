@@ -13,7 +13,7 @@ App.controller 'LoginCtrl', [
   '$rootScope'
   ($scope, $http, $window, $rootScope) ->
 
-    $rootScope.pageTitle = "ChaiPCR | Login"
+    $rootScope.pageTitle = "Open qPCR | Chai"
     #$scope.software_version = "1.0"
 
     angular.element('body').addClass('login-state-active')

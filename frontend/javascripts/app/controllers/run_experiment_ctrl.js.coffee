@@ -22,7 +22,8 @@ window.ChaiBioTech.ngApp.controller 'RunExperimentCtrl', [
   '$state'
   'Experiment'
   'ChoosenChartService'
-  ($scope, $stateParams, $state, Experiment, ChoosenChartService) ->
+  '$rootScope'
+  ($scope, $stateParams, $state, Experiment, ChoosenChartService, $rootScope) ->
     $scope.chart = $stateParams.chart
 
     changeChart = (chart) ->
@@ -47,6 +48,7 @@ window.ChaiBioTech.ngApp.controller 'RunExperimentCtrl', [
 
     Experiment.get(id: $stateParams.id).then (data) ->
       $scope.experiment = data.experiment
+      $rootScope.pageTitle = data.experiment.name + " | Open qPCR"
 
       if !hasChart($scope.chart)
         chart = null

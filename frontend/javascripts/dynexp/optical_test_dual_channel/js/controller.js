@@ -44,6 +44,7 @@
 
         var current_exp_id = 0;
         var cal_exp_id = 0;
+        $rootScope.pageTitle = "Optical Diagnostic | Open qPCR";
 
         $scope.$on('status:data:updated', function(e, data, oldData) {
           checkMachineStatus(data);

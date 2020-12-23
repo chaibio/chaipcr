@@ -44,7 +44,8 @@
       $scope.errors = {};
       $scope.Constants = Constants;
       $scope.created = false;
-      var params;      
+      var params;
+      $rootScope.pageTitle = "Optical Calibration | Open qPCR";
 
       $scope.$on('status:data:error', function(e, data, oldData) {
         var err = data;

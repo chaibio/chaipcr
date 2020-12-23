@@ -12,7 +12,7 @@ App.controller 'WelcomeCtrl', [
   '$rootScope'
   ($scope, $http, $window, $rootScope) ->
 
-    $rootScope.pageTitle = "ChaiPCR | Login"
+    $rootScope.pageTitle = "Open qPCR | Chai"
 
     $scope.user =
       role: 'admin'

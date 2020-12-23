@@ -60,6 +60,8 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
       ExperimentLoader.getExperiment()
         .then(function(data) {
           //data.experiment.completed_at = data.experiment.completion_status = true;
+          $rootScope.pageTitle = data.experiment.name + " | Open qPCR";
+          
           $scope.protocol = data.experiment;
           $scope.stage = ExperimentLoader.loadFirstStages();
           $scope.step = ExperimentLoader.loadFirstStep();

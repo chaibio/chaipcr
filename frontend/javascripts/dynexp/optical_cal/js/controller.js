@@ -41,6 +41,7 @@
       var cal_exp_id = 0;
       $scope.cancel = false;
       $scope.errors = {};
+      $rootScope.pageTitle = "Optical Calibration | Open qPCR";
 
       function checkMachineStatus(deviceStatus) {        
             // In case connected

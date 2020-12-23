@@ -14,6 +14,7 @@
         $scope.error = true;
         $scope.modal = null;
         $scope.timeout = null;
+        $rootScope.pageTitle = "Thermal Diagnostic Wizard | Open qPCR";
 
         $scope.$on('$destroy', function() {
           if ($scope.timeout) {

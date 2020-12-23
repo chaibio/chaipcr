@@ -24,6 +24,7 @@ window.ChaiBioTech.ngApp.service('expName', [
     this.name = '';
     this.updateName = function(name) {
       this.name = name;
+      $rootScope.pageTitle = name + " | Open qPCR";
       $rootScope.$broadcast("expName:Updated");
     };
   }
