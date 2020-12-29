@@ -53,15 +53,23 @@
         ng-if="experiment.completion_status !== 'success' && experiment.completion_status !== 'aborted'">
         Failed
       </span>
-      <span 
-        ng-if="experiment.completion_status !== 'success' && experiment.completion_status !== 'aborted'"
-        class="button-header-o" 
-        ng-click="viewError()">
-        View Details
-      </span>
 
+      <div class="detail mr-10">
+        <span
+          ng-if="experiment.completion_status !== 'success' && experiment.completion_status !== 'aborted'"
+          class="button-header-o "
+          ng-class="{'active' : isOpenedError}"
+          ng-click="viewError()">
+          View Details
+        </span>
+        <div class="error-box CB2" ng-class="{'opened' : isOpenedError}">
+          <div class="close-button" ng-click="closeError()"><img src="/images/x_k_white.svg"></div>
+          {{experiment && experiment.completion_message}}
+        </div>
+      </div>
 
-<!--       <span ng-if="experiment.completion_status !== 'success'">
+      <!--       
+      <span ng-if="experiment.completion_status !== 'success'">
         <span class="failed CB2-B mr-10">Failed</span>
         <span ng-if="experiment.completion_status === 'aborted'">
           User cancelled
@@ -72,7 +80,7 @@
         </span>
         <button class="CB2-B button-header ml-10" ng-click="viewError()">View Details</button>
       </span>
- -->
+      -->
     </div>
 
     <!-- experiment has been started and not completed -->

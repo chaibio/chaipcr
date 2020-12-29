@@ -14,7 +14,7 @@
     display: flex;
     align-items: center;
     width: 100%;
-    max-width: 750px;
+    max-width: calc(50% + 200px);
 
     .experiment-name {
       cursor: pointer;

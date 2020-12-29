@@ -44,6 +44,8 @@ window.ChaiBioTech.ngApp.directive 'headerExpStatus', [
       $scope.start_confirm_show = false
       $scope.dataAnalysis = false
       $scope.isStarted = false
+      $scope.isOpenedError = false
+      
       counter = 0
       stringUrl = "run-experiment"
       if ($location.path().indexOf(stringUrl) == -1)
@@ -170,10 +172,10 @@ window.ChaiBioTech.ngApp.directive 'headerExpStatus', [
         return Experiment.truncateName($scope.experiment.name, truncate_length)
 
       $scope.viewError = ->
-        err =
-          message: $scope.experiment.completion_message
-          date: $scope.experiment.completed_at
-        ModalError.open err
+        $scope.isOpenedError = true
+
+      $scope.closeError = ->
+        $scope.isOpenedError = false
 
       $scope.$on 'expName:Updated', ->
         $scope.experiment?.name = expName.name

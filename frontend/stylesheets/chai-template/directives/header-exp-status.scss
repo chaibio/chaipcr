@@ -34,6 +34,9 @@
   }
 
   .header-exp-status{
+    position: relative;
+    z-index: 10;
+
     &.standard-exp{
       .header-bar{
         background: $dark-gray;
@@ -54,6 +57,7 @@
       background: $black;
       height: 60px;
       width: 100%;
+      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
 
       display: flex;
       justify-content: space-between;
@@ -102,7 +106,9 @@
           text-align: center;
           cursor: pointer;
           outline: none;
-          &:hover, &:active{
+          position: relative;
+          display: block;
+          &:hover, &:active, &.active{
             color: $black;
             background: $white;
           }
@@ -127,6 +133,42 @@
         margin-right: 10px;
         padding: 3px 10px 5px;
         border-radius: 2px;
+      }
+
+      .detail{
+        position: relative;
+
+        .error-box{
+          position: absolute;
+          right: 0;
+          padding: 20px 15px 15px;
+          background: #222;
+          width: 250px;
+          z-index: -1;
+          border-radius: 2px;
+          text-align: center;
+          opacity: 0;
+          top: 0;
+
+          &.opened{
+            opacity: 1;
+            top: 44px;
+            transition: all 0.2s ease-in;
+          }          
+
+          .close-button{
+            float: right;
+            margin-right: -3px;
+            margin-top: -8px;
+            width: 10px;
+            height: 10px;
+            display: block;
+            cursor: pointer;
+            img{
+              display: block;
+            }
+          }
+        }
       }
 
       .completed{
