@@ -271,6 +271,8 @@ App.controller 'MeltCurveChartCtrl', [
         $scope.label_dF_dT = dF_dt
 
       getMeltCurveDataCallBack = (data) ->
+        $scope.config.axes.x.min = null
+        $scope.config.axes.x.max = null
         updateButtonTms(data)
 
         chart_data = MeltCurveService.normalizeChartData(data.ramps[0].melt_curve_data, data.targets, $scope.well_targets)
@@ -286,6 +288,27 @@ App.controller 'MeltCurveChartCtrl', [
       $scope.showColorByList = ->
         document.getElementById("colorByList_ampli").classList.toggle("show")
 
+      updateXAxisRange = () ->
+        minX = 9999
+        maxX = -9999
+
+        for i in [0..$scope.experiment.protocol.stages.length - 1] by 1
+          stage = $scope.experiment.protocol.stages[i].stage
+          if stage.stage_type != 'meltcurve'
+            continue
+          for j in [0..$scope.experiment.protocol.stages[i].stage.steps.length - 1] by 1
+            step = $scope.experiment.protocol.stages[i].stage.steps[j].step
+            if step.ramp.collect_data
+              continue
+            if parseFloat(step.temperature) > maxX 
+              maxX = parseFloat(step.temperature)
+
+            if parseFloat(step.temperature) < minX 
+              minX = parseFloat(step.temperature)
+
+        $scope.config.axes.x.min = if minX == 9999 then null else minX
+        $scope.config.axes.x.max = if maxX == -9999 then null else maxX
+
       $scope.$watch ->
         $scope.$parent.chart
       , (chart) ->
@@ -293,52 +316,55 @@ App.controller 'MeltCurveChartCtrl', [
           if !$scope.hasData
             $scope.expTargets = []
             $scope.lookupTargets = []
-            Experiment.getTargets($stateParams.id).then (resp_target) ->
-              for i in [0...resp_target.data.length]
-                $scope.expTargets[i] = resp_target.data[i].target
-                $scope.lookupTargets[resp_target.data[i].target.id] = $scope.COLORS[i % $scope.COLORS.length]
+            Experiment.get(id: $stateParams.id).then (resp_exp) ->
+              $scope.experiment = resp_exp.experiment
+              updateXAxisRange()              
+              Experiment.getTargets($stateParams.id).then (resp_target) ->
+                for i in [0...resp_target.data.length]
+                  $scope.expTargets[i] = resp_target.data[i].target
+                  $scope.lookupTargets[resp_target.data[i].target.id] = $scope.COLORS[i % $scope.COLORS.length]
 
-              $scope.expSamples = []
-              Experiment.getSamples($stateParams.id).then (response) ->
-                for i in [0...response.data.length]
-                  $scope.expSamples[i] = response.data[i].sample
+                $scope.expSamples = []
+                Experiment.getSamples($stateParams.id).then (response) ->
+                  for i in [0...response.data.length]
+                    $scope.expSamples[i] = response.data[i].sample
 
-                $scope.well_targets = []
-                Experiment.getWellLayout($stateParams.id).then (resp) ->
-                  for i in [0...resp.data.length]
-                    $scope.samples[i] = if resp.data[i].samples then resp.data[i].samples[0] else null
-                    if $scope.samples[i]
-                      for j in [0...$scope.expSamples.length]
-                        if $scope.samples[i].id == $scope.expSamples[j].id
-                          $scope.samples[i].color = $scope.COLORS[j % $scope.COLORS.length]
-                          break
-                        else
-                          $scope.samples[i].color = $scope.init_sample_color
-                    if $scope.is_dual_channel
-                      $scope.well_targets[2*i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0]  else null
-                      $scope.well_targets[2*i+1] = if resp.data[i].targets && resp.data[i].targets[1] then resp.data[i].targets[1] else null
+                  $scope.well_targets = []
+                  Experiment.getWellLayout($stateParams.id).then (resp) ->
+                    for i in [0...resp.data.length]
+                      $scope.samples[i] = if resp.data[i].samples then resp.data[i].samples[0] else null
+                      if $scope.samples[i]
+                        for j in [0...$scope.expSamples.length]
+                          if $scope.samples[i].id == $scope.expSamples[j].id
+                            $scope.samples[i].color = $scope.COLORS[j % $scope.COLORS.length]
+                            break
+                          else
+                            $scope.samples[i].color = $scope.init_sample_color
+                      if $scope.is_dual_channel
+                        $scope.well_targets[2*i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0]  else null
+                        $scope.well_targets[2*i+1] = if resp.data[i].targets && resp.data[i].targets[1] then resp.data[i].targets[1] else null
 
-                      if $scope.well_targets[2*i]
-                        $scope.well_targets[2*i].color = if $scope.well_targets[2*i] then $scope.lookupTargets[$scope.well_targets[2*i].id] else 'transparent'
-                      if $scope.well_targets[2*i+1]
-                        $scope.well_targets[2*i+1].color = if $scope.well_targets[2*i+1] then $scope.lookupTargets[$scope.well_targets[2*i+1].id] else 'transparent'
-                    else
-                      $scope.well_targets[i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0]  else null
-                      if $scope.well_targets[i]
-                        $scope.well_targets[i].color = if $scope.well_targets[i] then $scope.lookupTargets[$scope.well_targets[i].id] else 'transparent'
-                  
-                  $scope.targets = $scope.well_targets
-                  for i in [0..$scope.targets.length - 1] by 1
-                    $scope.targetsSetHided[$scope.targets[i]?.id] = true if $scope.targetsSetHided[$scope.targets[i]?.id] is undefined and !isDefaultSwitchDisable($scope.targets[i])
+                        if $scope.well_targets[2*i]
+                          $scope.well_targets[2*i].color = if $scope.well_targets[2*i] then $scope.lookupTargets[$scope.well_targets[2*i].id] else 'transparent'
+                        if $scope.well_targets[2*i+1]
+                          $scope.well_targets[2*i+1].color = if $scope.well_targets[2*i+1] then $scope.lookupTargets[$scope.well_targets[2*i+1].id] else 'transparent'
+                      else
+                        $scope.well_targets[i] = if resp.data[i].targets && resp.data[i].targets[0] then resp.data[i].targets[0]  else null
+                        if $scope.well_targets[i]
+                          $scope.well_targets[i].color = if $scope.well_targets[i] then $scope.lookupTargets[$scope.well_targets[i].id] else 'transparent'
+                    
+                    $scope.targets = $scope.well_targets
+                    for i in [0..$scope.targets.length - 1] by 1
+                      $scope.targetsSetHided[$scope.targets[i]?.id] = true if $scope.targetsSetHided[$scope.targets[i]?.id] is undefined and !isDefaultSwitchDisable($scope.targets[i])
 
-                  getMeltCurveData(getMeltCurveDataCallBack)
-                  $scope.enterState = false
-                  $scope.data = MeltCurveService.defaultData($scope.is_dual_channel)
-                  $scope.well_data = MeltCurveService.blankWellData($scope.is_dual_channel, $scope.well_targets)
-                  $scope.has_data = false
+                    getMeltCurveData(getMeltCurveDataCallBack)
+                    $scope.enterState = false
+                    $scope.data = MeltCurveService.defaultData($scope.is_dual_channel)
+                    $scope.well_data = MeltCurveService.blankWellData($scope.is_dual_channel, $scope.well_targets)
+                    $scope.has_data = false
 
-                  $scope.updateSamplesSet()
-                  $scope.updateTargetsSet()
+                    $scope.updateSamplesSet()
+                    $scope.updateTargetsSet()
 
             $timeout ->
               $rootScope.$broadcast 'event:start-resize-aspect-ratio'
