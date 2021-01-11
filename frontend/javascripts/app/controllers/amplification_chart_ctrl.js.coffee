@@ -724,6 +724,14 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.$on '$destroy', ->
         $interval.cancel(retryInterval) if retryInterval
 
+        # store well buttons
+        wellSelections = {}
+        for well_i in [0..15] by 1
+          wellSelections["well_#{well_i}"] = $scope.wellButtons["well_#{well_i}"].selected
+
+        $.jStorage.set('selectedWells', wellSelections)
+        $.jStorage.set('selectedExpId', $stateParams.id)
+
       $scope.showPlotTypeList = ->
         document.getElementById("plotTypeList").classList.toggle("show")
 

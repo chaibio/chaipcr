@@ -271,8 +271,6 @@ App.controller 'MeltCurveChartCtrl', [
         $scope.label_dF_dT = dF_dt
 
       getMeltCurveDataCallBack = (data) ->
-        $scope.config.axes.x.min = null
-        $scope.config.axes.x.max = null
         updateButtonTms(data)
 
         chart_data = MeltCurveService.normalizeChartData(data.ramps[0].melt_curve_data, data.targets, $scope.well_targets)
@@ -298,8 +296,6 @@ App.controller 'MeltCurveChartCtrl', [
             continue
           for j in [0..$scope.experiment.protocol.stages[i].stage.steps.length - 1] by 1
             step = $scope.experiment.protocol.stages[i].stage.steps[j].step
-            if step.ramp.collect_data
-              continue
             if parseFloat(step.temperature) > maxX 
               maxX = parseFloat(step.temperature)
 
@@ -524,6 +520,14 @@ App.controller 'MeltCurveChartCtrl', [
 
       $scope.$on '$destroy', ->
         $interval.cancel(retryInterval) if retryInterval
+
+        # store well buttons
+        wellSelections = {}
+        for well_i in [0..15] by 1
+          wellSelections["well_#{well_i}"] = $scope.wellButtons["well_#{well_i}"].selected
+
+        $.jStorage.set('selectedWells', wellSelections)
+        $.jStorage.set('selectedExpId', $stateParams.id)
 
     $scope.onChangeSlotType = (type) ->
       $scope.curve_type = type

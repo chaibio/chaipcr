@@ -1,0 +1,77 @@
+<div ng-controller="PikaSetSampleCtrl">
+  <div class="pika-wrapper" side-menu-layout is-open="false">
+    <header-exp-status experiment-id="experiment.id">
+      <div class="home-link CB1-M" ui-sref="home()" ng-if="!experiment.started_at">
+        <img src='/images/dynexp/pika-test/menu-back-white-only.svg'/>
+        Back to Home
+      </div>
+    </header-exp-status>
+    <div class="inner-wrapper">
+      <div class="inner-sidemenu">
+        <div class="side-menu-content-container">
+          <div class="side-menu-name-container">
+            <exp-name-editor status="status"></exp-name-editor>
+            <hr/>
+          </div>
+          <div class="side-menu-menu-container property-menu">
+            <label class="section-name CB2-M">Setup</label>
+            <hr/>
+            <span class="CB2 section-sub-name">LP Real Beer Spoiler identification</span>
+            <div class="side-menu-menu-item active">
+              <div class="CH1-M">
+                <span>Place 8-tube strip in Row A,<br/>and 6-tube strip in Row B</span>
+              </div>
+            </div>
+            <div class="side-menu-menu-item">
+              <div class="CH1-M">
+                <span>Start Experiment</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mini-map">
+          <table>
+            <tr class="map-col-header">
+              <td></td>
+              <td class="CB3" ng-repeat="x in samples track by $index">{{$index + 1}}</td>
+            </tr>
+            <tr>
+              <td class="map-row-header CB3">A</td>
+              <td class="CB3" ng-repeat="x in samples track by $index">
+                <label class="CB3 type" 
+                  ng-class="{
+                    'positive': well_types[$index] == 'positive_control', 
+                    'negative': well_types[$index] == 'negative_control', 
+                    'available': x.name,
+                    'active': (current_well_index == $index && current_well_row == 'A')}"></label>
+              </td>
+            </tr>
+            <tr>
+              <td class="map-row-header CB3">B</td>
+              <td class="CB3" ng-repeat="x in samples_B track by $index">
+                <label class="CB3 type" 
+                  ng-class="{
+                    'positive': well_types[$index + 8] == 'positive_control', 
+                    'negative': well_types[$index + 8] == 'negative_control', 
+                    'available': x.name,
+                    'active': (current_well_index == $index && current_well_row == 'B')}"></label>
+              </td>
+            </tr>
+          </table>          
+        </div>
+      </div>
+      <div class="inner-container">
+        <h2 class="CX2">Place 8-tube strip in Row A, and 6-tube strip in Row B</h2>
+        <div class="sample-name-box">
+          <input type="text" class="CX4-M" placeholder="Enter Sample Name" />
+          <textarea placeholder="Notes" class="CB2" rows="5"></textarea>
+          <div class="button-group">
+            <button class="button-back CB1-M" ng-click="onBack()">Back</button>
+            <button class="button-continue CB1-M" ng-click="onContinue()">Continue</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <status-bar></status-bar>
+</div>

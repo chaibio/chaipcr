@@ -26,6 +26,11 @@
 				templateUrl: 'dynexp/pika_test/views/v2/exp-result.html'
 			})
 
+			.state('pika_test.set-sample', {
+				url: '/set-sample/:id',
+				templateUrl: 'dynexp/pika_test/views/v2/set-sample.html'
+			})
+
 			.state('pika_test.introduction', {
 				url: '/introduction',
 				templateUrl: 'dynexp/pika_test/views/intro.html'

@@ -81,6 +81,12 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                         category: 'Bacteria 4e Kits'
                     },
                     {
+                        name: 'LP Real Beer Spoiler Identification',
+                        kit_id: '(2401-37)',
+                        category: 'Bacteria 4e Kits',
+                        guid: 'pika_4e_kit_rbsi'
+                    },
+                    {
                         name: 'LP Real Beer Spoiler screening',
                         kit_id: '(2401-38)',
                         category: 'Bacteria 4e Kits'

@@ -22,7 +22,8 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
   '$timeout',
   '$state',
   '$rootScope',
-  (AmplificationChartHelper, $timeout, $state, $rootScope) ->
+  '$stateParams',
+  (AmplificationChartHelper, $timeout, $state, $rootScope, $stateParams) ->
     restrict: 'EA',
     require: 'ngModel',
     scope:
@@ -136,11 +137,23 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
 
       $scope.$watch 'targets', (target) ->
         if !$scope.initTargetSelect and $scope.targets and $scope.targets.length
-          for i in [0..15] by 1
-            selected = true
-            if $scope.targets and (($scope.isDual and (!$scope.targets[i*2] or !$scope.targets[i*2].id) and (!$scope.targets[i*2+1] or !$scope.targets[i*2+1].id)) or (!$scope.isDual and (!$scope.targets[i] or !$scope.targets[i].id)))
-              selected = false
-            $scope.wells["well_#{i}"].selected = selected        
+          if $.jStorage.get('selectedExpId') != $stateParams.id
+            for i in [0..15] by 1
+              selected = true
+              if $scope.targets and (($scope.isDual and (!$scope.targets[i*2] or !$scope.targets[i*2].id) and (!$scope.targets[i*2+1] or !$scope.targets[i*2+1].id)) or (!$scope.isDual and (!$scope.targets[i] or !$scope.targets[i].id)))
+                selected = false
+              $scope.wells["well_#{i}"].selected = selected
+          else
+            selectedWells = $.jStorage.get('selectedWells')
+            for i in [0..15] by 1
+              if selectedWells
+                $scope.wells["well_#{i}"].selected = selectedWells["well_#{i}"]
+              else
+                selected = true
+                if $scope.targets and (($scope.isDual and (!$scope.targets[i*2] or !$scope.targets[i*2].id) and (!$scope.targets[i*2+1] or !$scope.targets[i*2+1].id)) or (!$scope.isDual and (!$scope.targets[i] or !$scope.targets[i].id)))
+                  selected = false
+                $scope.wells["well_#{i}"].selected = selected
+
           ngModel.$setViewValue angular.copy($scope.wells)
           targets = _.filter $scope.targets, (item) ->
             item and item.id

@@ -154,8 +154,11 @@ window.ChaiBioTech.ngApp
                   $state.go 'pika_test.experiment-running', id: exp.id
 
     @initActivity = ->
+      $.jStorage.set('selectedExpId', 0)
+      $.jStorage.set('selectedWells', null)
+
       activity = localStorage.getItem('init_activity')
-      localStorage.removeItem('init_activity')
+      localStorage.removeItem('init_activity')     
       if activity == 'maintenance'
         @onSetting()
         $timeout ->
