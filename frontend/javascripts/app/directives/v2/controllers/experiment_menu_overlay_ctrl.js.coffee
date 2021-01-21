@@ -177,7 +177,7 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
             $state.go('coronavirus-env.' + route, id: $scope.exp.id)
           when "chai_covid19_surv_kit"
             $state.go('covid19-surv.' + route, id: $scope.exp.id)
-          when "pika_4e_kit"
+          when "pika_4e_kit", "pika_4e_lp_identification_kit"
             $state.go('pika_test.' + route, id: $scope.exp.id)
 
     $scope.hasMeltCurve = ->

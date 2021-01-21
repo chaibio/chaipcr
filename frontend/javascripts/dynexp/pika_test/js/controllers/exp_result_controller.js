@@ -47,6 +47,8 @@
       $scope.amount[1] = "\u2014";
       $scope.samples = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
       $scope.targets = [];
+      $scope.result_header="Sample";
+      $scope.pika_sample="";
       var target2_name = ['IPC'];
 
       $scope.$on('status:data:updated', function(e, data, oldData) {
@@ -128,16 +130,37 @@
           getExperiment($scope.experimentId, function(exp){
             $scope.initial_done = true;
             target2_name = ['IPC'];
+            switch($scope.experiment.guid){
+              case 'pika_4e_lp_identification_kit':
+                $scope.result_header="Target";
+                break;
+              default:
+                break;
+            }
+
             Experiment.getWellLayout($stateParams.id).then(function (well_resp) {
               var k, i;
               for (i = 0; i < 16; i++) {
-                $scope.samples[i] = (well_resp.data[i].samples) ? well_resp.data[i].samples[0] : {id: 0, name: ''};
-                if($scope.samples[i].name == 'Negative' && well_resp.data[i].targets){
-                  for(k = 0; k < well_resp.data[i].targets.length; k++){
-                    if(well_resp.data[i].targets[k].name == 'IPC'){
-                      $scope.neg_exist = true;
+                switch($scope.experiment.guid){
+                  case 'pika_4e_lp_identification_kit':
+                    if(well_resp.data[i].targets){
+                      $scope.samples[i] = well_resp.data[i].targets[0].channel == 1 ? well_resp.data[i].targets[0] : well_resp.data[i].targets[1];
+                    } else {
+                      $scope.samples[i] = {id: 0, name: ''};
                     }
-                  }
+                    $scope.samples[i].sample_data = (well_resp.data[i].samples) ? well_resp.data[i].samples[0] : {id: 0, name: ''};
+                    $scope.pika_sample = (well_resp.data[2] && well_resp.data[2].samples[0]) ? well_resp.data[2].samples[0].name : '';
+                    break;
+                  default:
+                    $scope.samples[i] = (well_resp.data[i].samples) ? well_resp.data[i].samples[0] : {id: 0, name: ''};
+                    if($scope.samples[i].name == 'Negative' && well_resp.data[i].targets){
+                      for(k = 0; k < well_resp.data[i].targets.length; k++){
+                        if(well_resp.data[i].targets[k].name == 'IPC'){
+                          $scope.neg_exist = true;
+                        }
+                      }
+                    }
+                    break;
                 }
               }
 
@@ -174,10 +197,19 @@
       getId();
 
       $scope.openNotes = function(index, sample, well_row) {
-        $scope.selectedSample = sample;
+        switch($scope.experiment.guid){
+          case 'pika_4e_lp_identification_kit':
+            $scope.selectedSample = sample.sample_data;
+            $scope.oriSampleNotes = sample.sample_data.notes;
+            break;
+          default:
+            $scope.selectedSample = sample;
+            $scope.oriSampleNotes = sample.notes;
+            break;
+        }
+
         $scope.selectedWellIndex = (index < 8) ? index + 1 : index - 7;
         $scope.selectedWellRow = (index < 8) ? 'A' : 'B';
-        $scope.oriSampleNotes = sample.notes;
 
         $scope.modalInstance = $uibModal.open({
           scope: $scope,

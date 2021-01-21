@@ -119,7 +119,7 @@ window.ChaiBioTech.ngApp
                 $state.go 'coronavirus-env.experiment-running', id: exp.id
               when "chai_covid19_surv_kit"
                 $state.go 'covid19-surv.experiment-running', id: exp.id
-              when "pika_4e_kit"
+              when "pika_4e_kit", "pika_4e_lp_identification_kit"
                 $state.go 'pika_test.experiment-running', id: exp.id
         else
           if exp.type isnt 'test_kit'
@@ -145,9 +145,12 @@ window.ChaiBioTech.ngApp
                 else
                   $state.go 'covid19-surv.experiment-running', id: exp.id
 
-              when "pika_4e_kit"
+              when "pika_4e_kit", "pika_4e_lp_identification_kit"
                 if not exp.started_at
-                  $state.go('pika_test.set-wells', id: exp.id)
+                  if exp.guid == "pika_4e_lp_identification_kit"
+                    $state.go('pika_test.set-sample', id: exp.id)
+                  else
+                    $state.go('pika_test.set-wells', id: exp.id)
                 else if exp.started_at isnt null && exp.completed_at isnt null
                   $state.go('pika_test.experiment-result', id: exp.id)
                 else

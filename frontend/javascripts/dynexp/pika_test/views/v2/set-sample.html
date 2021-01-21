@@ -63,11 +63,25 @@
       <div class="inner-container">
         <h2 class="CX2">Place 8-tube strip in Row A, and 6-tube strip in Row B</h2>
         <div class="sample-name-box">
-          <input type="text" class="CX4-M" placeholder="Enter Sample Name" />
-          <textarea placeholder="Notes" class="CB2" rows="5"></textarea>
+          <input type="text" class="CX4-M" placeholder="Enter Sample Name" ng-model="input_sample.name"/>
+          <textarea placeholder="Notes" class="CB2" rows="5"  ng-model="input_sample.notes"></textarea>
           <div class="button-group">
             <button class="button-back CB1-M" ng-click="onBack()">Back</button>
-            <button class="button-continue CB1-M" ng-click="onContinue()">Continue</button>
+            <button 
+              class="button-continue CB1-M" 
+              id="start-experiment-button" 
+              ng-if="!experiment.started_at && !start_confirm_show" 
+              ng-click="startConfirm()">Start Experiment</button>
+            
+            <button 
+              class="button-confirm-exp CB1-M" 
+              id="start-experiment-button" 
+              ng-if="!experiment.started_at && start_confirm_show" 
+              ng-click="onContinue()">Confirm Start<ellipsis-animated ng-if="creating"></ellipsis-animated></button>
+              
+            <button class="button-continue CB1-M" ng-click="onContinue()" ng-if="experiment.started_at">
+              Continue<ellipsis-animated ng-if="creating"></ellipsis-animated>
+            </button>
           </div>
         </div>
       </div>

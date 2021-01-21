@@ -44,7 +44,7 @@
 						<td></td>
 					</tr>
 					<tr><td></td><td ng-if="current_kit_type == 'two'"></td><td class="CX5-M">Bacteria 4e Kits</td></tr>
-					<tr ng-repeat="item in test_kits" ng-if="item.category == 'Bacteria 4e Kits'">
+					<tr ng-repeat="item in test_kits" ng-if="item.category == 'Bacteria 4e Kits' && !(current_kit_type == 'two' && item.guid)">
 						<td>
 							<div class="checkbox-wrapper CX5" ng-click="onSelectKit1(item)" ng-class="{ 'selected': item.name == selected_kit_1.name}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
 						</td>
@@ -55,7 +55,7 @@
 							<label class="CX5"
 								ng-class="{active: item.name == selected_kit_1.name}">{{item.name}}</label>
 						</td>
-						<td class="CX5">{{item.kit_id}}</td>
+						<td class="CX5">({{item.kit_id}})</td>
 					</tr>
 					<tr><td></td><td ng-if="current_kit_type == 'two'"></td><td class="CX5-M">Yeast 4e Kits</td></tr>
 					<tr ng-repeat="item in test_kits" ng-if="item.category == 'Yeast 4e Kits'">
@@ -70,7 +70,7 @@
 								ng-class="{active: item.name == selected_kit_1.name}" 
 								ng-click="onSelectKit1(item)">{{item.name}}</label>
 						</td>
-						<td class="CX5">{{item.kit_id}}</td>
+						<td class="CX5">({{item.kit_id}})</td>
 					</tr>
 				</table>	
 			</div>
@@ -80,14 +80,8 @@
 		<a href="" ng-click="onBackStep()" class="button-continue CX5">{{back_button_name}}</a>
 		<a href="" ng-click="onNextStep()" class="button-continue CX5" 
 			ng-class="{
-				active: (current_step=='brand' && selected_brand) || 
-						(current_step=='signle_kit' && selected_kit_1) || 
-						(current_step=='multi_kit' && current_kit_type=='one' && selected_kit_1) ||
-						(current_step=='multi_kit' && current_kit_type=='two' && selected_kit_2 && selected_kit_1),
-				disabled: (current_step=='brand' && !selected_brand)  || 
-						(current_step=='signle_kit' && !selected_kit_1) ||
-						(current_step=='multi_kit' && current_kit_type=='one' && !selected_kit_1) ||
-						(current_step=='multi_kit' && current_kit_type=='two' && (!selected_kit_2 || !selected_kit_1)),
+				active: isActiveNextButton(),
+				disabled: !isActiveNextButton(),
 			}">{{action_button_name}}<ellipsis-animated ng-if="creating"></ellipsis-animated></a>
 	</div>
 </div>

@@ -13,12 +13,17 @@
           <h3 class="CH1">Analyzing...</h3>          
         </div>
         <div class="pika-content" ng-if="!analyzing">
-          <h3 class="CH1">{{targets[0].name}}</h3>
+          <h3 class="CH1" ng-if="experiment.guid != 'pika_4e_lp_identification_kit'">{{targets[0].name}}</h3>
+          <div class="pika-title" ng-if="experiment.guid == 'pika_4e_lp_identification_kit'">
+            <h3 class="CH1">LP Real Beer Spoiler Identification</h3>
+            <h3 class="CB1 ml-40">Sample Name: <span class="CB1-M">{{pika_sample}}</span></h3>
+          </div>
+
           <!-- PIKA and others -->
           <table class="CB2">
             <tr class="CX5-M tr-header">
               <td style="width:35px">Well</td>
-              <td>Sample</td>
+              <td>{{result_header}}</td>
               <td style="width:35px"></td>
               <td style="width:150px; white-space: nowrap;">Result</td>
               <td class="text-center" style="width:100px">C<sub>q</sub></td>
@@ -46,10 +51,10 @@
               <td style="white-space: nowrap;">{{result[$index]}}</td>
               <td class="text-center"><span ng-show="famCq[$index]">{{famCq[$index] | round:2}}</span></td>
               <td class="text-center" style="white-space: nowrap;">{{amount[$index]}}</td>
-              <td ng-if="x.id && x.notes" ng-click="openNotes($index, x)" class="notes-cursor text-right" style="width:50px">
+              <td ng-if="(x.id && x.notes) || (x.sample_data && x.sample_data.id && x.sample_data.notes)" ng-click="openNotes($index, x)" class="notes-cursor text-right" style="width:50px">
                 <img style="width:20px" src="/images/dynexp/pika-test/note-on.svg" class="cursor-pointer note-{{$index}}">
               </td>
-              <td ng-if="x.id && !x.notes" ng-click="openNotes($index, x)" class="notes-cursor text-right" style="width:50px">
+              <td ng-if="(!x.sample_data && x.id && !x.notes) || (x.sample_data && x.sample_data.id && !x.sample_data.notes)" ng-click="openNotes($index, x)" class="notes-cursor text-right" style="width:50px">
                 <img style="width:20px" src="/images/dynexp/pika-test/note-off.svg" class="cursor-pointer note-{{$index}}">
               </td>
             </tr>
@@ -86,10 +91,10 @@
               <td style="white-space: nowrap;">{{result[$index]}}</td>
               <td class="text-center"><span ng-show="famCq[$index]">{{famCq[$index] | round:2}}</span></td>
               <td class="text-center" style="white-space: nowrap;">{{amount[$index]}}</td>
-              <td ng-if="x.id && x.notes" ng-click="openNotes($index, x)" class="notes-cursor text-right" style="width:50px">
+              <td ng-if="(x.id && x.notes) || (x.sample_data && x.sample_data.id && x.sample_data.notes)" ng-click="openNotes($index, x)" class="notes-cursor text-right" style="width:50px">
                 <img style="width:20px" src="/images/dynexp/pika-test/note-on.svg" class="cursor-pointer note-{{$index}}">
               </td>
-              <td ng-if="x.id && !x.notes" ng-click="openNotes($index, x)" class="notes-cursor text-right" style="width:50px">
+              <td ng-if="(!x.sample_data && x.id && !x.notes) || (x.sample_data && x.sample_data.id && !x.sample_data.notes)" ng-click="openNotes($index, x)" class="notes-cursor text-right" style="width:50px">
                 <img style="width:20px" src="/images/dynexp/pika-test/note-off.svg" class="cursor-pointer note-{{$index}}">
               </td>
             </tr>

@@ -54,7 +54,15 @@
         Experiment.get({id: exp_id}).then(function(resp) {
           $scope.experiment = resp.experiment;
           $rootScope.pageTitle = resp.experiment.name + " | Open qPCR";
-          if (cb) cb(resp.experiment);
+
+          switch($scope.experiment.guid){
+            case "pika_4e_lp_identification_kit":
+              $state.go('pika_test.set-sample', { id: exp_id });
+              break;
+            default:
+              if (cb) cb(resp.experiment);
+              break;
+          }
         });
       }
 

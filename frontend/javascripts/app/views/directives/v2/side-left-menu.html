@@ -42,14 +42,32 @@
       <label class="section-name CB2-M">Setup</label>
       <hr/>
       <div 
-        ng-if="exp_type == 'test_kit'"
+        ng-if="exp_type == 'test_kit' && exp.guid != 'pika_4e_lp_identification_kit'"
         class="side-menu-menu-item" 
         ng-class="{
           'active': stateInfo.name == 'pika_test.set-wells' || stateInfo.name == 'coronavirus-env.set-wells' || stateInfo.name == 'covid19-surv.set-wells'
         }">
         <div class="CH1-M" ng-click="goTestKit('set-wells')" style="margin: 0">
           <span>Assign Wells</span>
+        </div>        
+      </div>
+      <div ng-if="exp_type == 'test_kit' && exp.guid == 'pika_4e_lp_identification_kit'">
+        <span class="CB2 section-sub-name">LP Real Beer Spoiler identification</span>
+        <div class="side-menu-menu-item">
+          <div class="CH1-M" ng-click="goTestKit('set-sample')">
+            <span>Place 8-tube strip in Row A,<br/>and 6-tube strip in Row B</span>
+          </div>
         </div>
+        <div 
+          class="side-menu-menu-item"
+          ng-class="{
+            'active': stateInfo.name == 'pika_test.experiment-running'
+          }"          
+        >
+          <div class="CH1-M">
+            <span ng-click="goTestKit('experiment-running')">Start Experiment</span>
+          </div>
+        </div>        
       </div>
       <div ng-if="exp_type && exp_type != 'test_kit'">
         <div class="side-menu-menu-item">

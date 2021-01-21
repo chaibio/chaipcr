@@ -274,6 +274,12 @@
                 }
               }
 
+              &.button-confirm-exp{
+                background: $link-text-color;
+                color: #fff;
+                border: 1px solid $link-text-color;
+              }
+
             }
           }
         }
