@@ -226,6 +226,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
 
               $scope.well_data = helper.normalizeSummaryData(data.summary_data, data.targets, $scope.well_targets)
               $scope.targets = helper.normalizeWellTargetData($scope.well_data, $scope.targets, $scope.is_dual_channel)
+              data.summary_data = helper.initialSummaryData(data.summary_data, data.targets)
 
               $scope.omittedIndexes = []
               for well, i in $scope.well_data by 1

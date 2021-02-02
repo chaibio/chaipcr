@@ -380,7 +380,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               data = resp.data.steps[0]
 
               $scope.well_data = helper.normalizeSummaryData(data.summary_data, data.targets, $scope.well_targets)
-              $scope.targets = helper.normalizeWellTargetData($scope.well_data, $scope.targets, $scope.is_dual_channel)
+              $scope.targets = helper.normalizeWellTargetData($scope.well_data, $scope.targets, $scope.is_dual_channel)              
 
               for i in [0..$scope.targets.length - 1] by 1
                 $scope.targetsSetHided[$scope.targets[i]?.id] = true if $scope.targetsSetHided[$scope.targets[i]?.id] is undefined
@@ -388,6 +388,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               data.amplification_data?.shift()
               data.cq?.shift()
               data.amplification_data = helper.neutralizeData(data.amplification_data, $scope.targets, $scope.is_dual_channel)
+              data.summary_data = helper.initialSummaryData(data.summary_data, data.targets)
 
               AMPLI_DATA_CACHE = angular.copy data
               $scope.amplification_data = data.amplification_data

@@ -189,6 +189,18 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
       return targets
 
+    @initialSummaryData = (summary_data, target_data) ->
+      summary_data = angular.copy summary_data
+      target_data = angular.copy target_data
+      summary_data[0].push "channel"
+      for i in [1.. summary_data.length - 1] by 1
+        target = _.filter target_data, (elem) ->
+          elem[0] is summary_data[i][0]
+
+        summary_data[i].push target[0][2]
+      return _.sortBy summary_data, (elem) ->
+        elem[elem.length - 1]
+
     @normalizeSummaryData = (summary_data, target_data, well_targets) ->
       summary_data = angular.copy summary_data
       target_data = angular.copy target_data
