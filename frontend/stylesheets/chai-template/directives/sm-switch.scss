@@ -1,0 +1,52 @@
+@import "../variables.scss";
+.sm-switch {
+  .switch {
+    height: 8px;
+    margin-top: -2px;
+    width: 18px;
+    vertical-align: middle;
+    small {
+      width: 8px;
+      height: 8px;
+      border-width: 0;
+      background: #fff;
+    }
+    &.checked {
+      small {
+        left: 10px;          
+      }
+    }
+
+    &.disabled{
+      background: #d7d7d7;
+      cursor: initial;
+      small{
+        background: #eee;
+      }
+    }
+  }
+  &.auto {
+    .switch {
+      background: #BBB;
+      border-color: #BBB;
+    }
+    small {
+      background: #bbb;
+    }
+    .set-auto {
+      color: $black;
+    }
+  }
+  label {
+    color: $black;
+    display: inline-block;
+    margin-left: 10px;
+    margin-bottom: 0;
+    vertical-align: baseline;
+  }
+  span.set-auto {
+    color: $blue;
+    cursor: pointer;
+    margin-left: 15px;
+  }
+}

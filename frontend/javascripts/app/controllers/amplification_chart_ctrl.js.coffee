@@ -38,6 +38,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.chartConfig.axes.x.max = $stateParams.max_cycle || 1
       $scope.amplification_data = helper.paddData()
       $scope.well_data = []
+      $scope.simple_well_data = []
 
       $scope.COLORS = helper.SAMPLE_TARGET_COLORS
       $scope.WELL_COLORS = helper.COLORS      
@@ -102,6 +103,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       $scope.has_init = false
       $scope.init_sample_color = '#ccc'
+      $scope.isSampleMode = true
 
       $scope.bgcolor_target = {
         'background-color':'#666666'
@@ -380,7 +382,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               data = resp.data.steps[0]
 
               $scope.well_data = helper.normalizeSummaryData(data.summary_data, data.targets, $scope.well_targets)
-              $scope.targets = helper.normalizeWellTargetData($scope.well_data, $scope.targets, $scope.is_dual_channel)              
+              $scope.targets = helper.normalizeWellTargetData($scope.well_data, $scope.targets, $scope.is_dual_channel)
 
               for i in [0..$scope.targets.length - 1] by 1
                 $scope.targetsSetHided[$scope.targets[i]?.id] = true if $scope.targetsSetHided[$scope.targets[i]?.id] is undefined
@@ -396,6 +398,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               $scope.updateTargetsSet()
               updateButtonCts()
               updateSeries()
+
+              $scope.simple_well_data = helper.normalizeSimpleSummaryData($scope.well_data, $scope.targetsSet)
+
               if !(($scope.experiment?.completion_status && $scope.experiment?.completed_at) or $scope.enterState)
                 $scope.retrying = true
 
@@ -579,6 +584,13 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           else
             $rootScope.$broadcast 'event:amp-unselect-row', {well: well_item.well_num, channel: well_item.channel}
 
+      $scope.onSelectSimpleRow = (well_item, index) ->
+        if !$scope.has_init or (($scope.wellButtons['well_' + (well_item.well_num - 1)].selected) and ($scope.omittedIndexes.indexOf(index) == -1) and ($scope.targetsSetHided[$scope.targets[index].id]))
+          if !well_item.active
+            $rootScope.$broadcast 'event:amp-select-row', {well: well_item.well_num}
+          else
+            $rootScope.$broadcast 'event:amp-unselect-row', {well: well_item.well_num}
+
       $scope.onSelectLine = (config) ->
         $scope.bgcolor_target = { 'background-color':'black' }
         # $scope.bgcolor_wellSample = { 'background-color':'black' }
@@ -588,6 +600,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
         for well_i in [0..$scope.well_data.length - 1]
           $scope.well_data[well_i].active = ($scope.well_data[well_i].well_num - 1 == config.config.well and $scope.well_data[well_i].channel == config.config.channel)
+
+        for well_i in [0..$scope.simple_well_data.length - 1]
+          $scope.simple_well_data[well_i].active = ($scope.simple_well_data[well_i].well_num - 1 == config.config.well)
 
         for i in [0..15] by 1
           $scope.wellButtons["well_#{i}"].active = (i == config.config.well)
@@ -626,6 +641,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.onUnselectLine = ->
         for well_i in [0..$scope.well_data.length - 1]
           $scope.well_data[well_i].active = false
+
+        for well_i in [0..$scope.simple_well_data.length - 1]
+          $scope.simple_well_data[well_i].active = false
+
 
         for i in [0..15] by 1
           $scope.wellButtons["well_#{i}"].active = false
@@ -743,5 +762,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       #   document.getElementById("curve-plot").clientHeight + 30
       $scope.targetGridTop = ->
         Math.max(document.getElementById("curve-plot").clientHeight + 30, 412 + 30)
+
+      $scope.onChangeViewMode = ->
+        $scope.isSampleMode = !$scope.isSampleMode
+        $rootScope.$broadcast 'event:switch-view-mode'
 
 ]

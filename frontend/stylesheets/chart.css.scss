@@ -22,137 +22,6 @@
   /* Black w/ opacity */
 }
 
-
-/* Modal Content */
-
-/*
-.modal-content-amplification {
-  background-color: #fefefe;
-  margin: auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 750px;
-  height: 550px;
-  text-align: center;
-  font-family: 'dinot-Regular';
-  color: black !important;
-  .h3-baseline {
-    font-family: 'dinot-Bold';
-    color: black;
-    font-size: 20px;
-  }
-  .baseline-cycles {
-    border-top: 1px solid black;
-    padding-top: 10px;
-  }
-  .hover-desc {
-    visibility: hidden;
-  }
-  .error-color {
-    color: red !important;
-  }
-  .h3-cq {
-    color: black;
-    font-size: 20px;
-    margin-top: 10px;
-    font-weight: 300;
-    font-family: 'dinot';
-  }
-  .button {
-    border: 2px solid #787878;
-    background: #fff;
-    color: #333;
-    display: inline-block;
-    border-radius: 0;
-    font-weight: bold;
-    min-width: 150px;
-    margin-right: 15px;
-    margin-top: 10px;
-    padding: 6px 0;
-    //position: absolute;
-    top: 530px;
-  }
-  .button-cancel {
-    left: 650px;
-  }
-  .button-apply {
-    left: 850px;
-  }
-  .button:hover {
-    background: #8FC742;
-    color: white;
-    border: none;
-    height: 34px;
-  }
-  input {
-    border: 0;
-    outline: 0;
-    background: transparent;
-    width: 50px;
-  }
-  input[type="radio"] {
-    width: 20px;
-  }
-  input[type=number]::-webkit-inner-spin-button,
-  input[type=number]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  label.radio-pcr {
-    content: "";
-    display: inline-block;
-    width: 11px;
-    height: 11px;
-    border-radius: 12px;
-    margin-right: 10px;
-    left: 0;
-    border: 2px solid white;
-    bottom: 1px;
-    box-shadow: 0 0 0 0.07em #000;
-  }
-  input[type='radio']:checked + label.radio-pcr {
-    background: #8FC742;
-    box-shadow: 0 0 0 0.07em #000;
-  }
-  label {
-    padding-top: 5px;
-    color: black;
-    font-size: 15px;
-  }
-  .div-style {
-    text-align: left;
-    height: 275px;
-  }
-  .ct-label {
-    border-bottom: 1px solid #ccc;
-    margin-left: 25px;
-  }
-  .params-label {
-    border-bottom: 1px solid #ccc;
-    width: 180px;
-    text-align: left;
-    span {
-      width: 125px;
-      display: inline-block;
-    }
-  }
-  .by-label {
-    border-bottom: 1px solid #ccc;
-    margin-left: 5px;
-  }
-  .col-md-6 {
-    text-align: left;
-    border-top: 1px solid black;
-    padding-left: 0;
-  }
-  .cq-method {
-    text-align: left;
-    border-top: 1px solid black;
-    padding-left: 0;
-  }
-}
-*/
-
 /* The Close Button */
 
 .close {
@@ -172,11 +41,9 @@
 .dot {
   border-radius: 100px;
   display: inline-block;
-  height: 10px;
-  margin-right: 10px;
-  margin-left: 10px;
   vertical-align: middle;
-  width: 10px;
+  height: 12px;
+  width: 12px;
 }
 
 .chart-section {
@@ -568,11 +435,17 @@
 
 .experiment-chart-state-active {
   font-family: 'dinot';
-  .header {
-    .name-container {
-      width: 80%;
-    }
+  height: 100%; 
+  margin-left: 0px;  
+  margin-right: 0px;
+
+  .content{
+    padding-top:0px; 
+    height: 100%; 
+    display: flex;
   }
+
+
   .amplification-options {
     cursor: pointer;
     color: #00b3ed !important;
@@ -889,16 +762,25 @@
           td {
             font-family: "Dinot";
             font-size: 13px;
-            // line-height: 20px;
+            padding: 5px 0;
+            color: #000;
             .target-name{
-              width: 90px;
+              width: 100px;
               white-space: nowrap;
               overflow: hidden;
-              text-overflow: ellipsis;              
+              text-overflow: ellipsis;
             }
+            .dot{
+              display: block;
+              margin: 0 5px 0 0;
+              display: block;
+              width: 8px;
+              height: 8px;
+            }
+
           }
           .td-tik {
-            min-width: 30px;
+            min-width: 20px;
             text-align: right;
             cursor: pointer;
             span {
@@ -937,9 +819,47 @@
     padding-right: 0; 
     padding-left: 0; 
     margin-top:0px; 
-    overflow: auto; 
+    overflow-y: auto;
+    overflow-x: auto;
     background: #fff;
-    
+
+    .view-mode-panel{
+      display: flex;
+      padding: 10px 20px;
+      height: 60px;
+      align-items: center;
+      background: #FCFCFC;
+
+      span{
+        margin-right: 20px;
+      }
+
+      .view-mode-switch{
+        width: 240px;
+        background: #E3E3E3;
+        border-radius: 2px;
+        padding: 3px;
+        display: flex;
+        height: 40px;
+
+        .switch-item{
+          width: 100%;
+          border-radius: 2px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: 0.1s all ease-in;
+
+          &.active{
+            box-shadow: 0px 1px 1px rgba(0,0,0,0.4);
+            background: #fff;
+            font-family: 'DINOT--Medium', Arial, sans-serif;
+          }
+        }
+      }
+    }
+
     .type-td{
       text-align: center;
       vertical-align: middle;
@@ -954,43 +874,56 @@
       }
     }
 
-    // .target-span{
-    //  font-family: 'dinot-Regular';
-    //   font-size: 16px;
-    // }
-
     input {
       outline: none;
       border: none;
-      // font-family: 'dinot-Regular';
-      // font-size: 12px;
-      //width: 140px;
     }
+
+    .item-center{
+      justify-content: center;
+    }
+
     table {
       width: 100%;
       background: white;
+      height: fit-content; 
+
+      thead{
+        background: #595959;
+        &::-webkit-scrollbar{          
+          background: #595959;  /* optional: just make scrollbar invisible */
+        }
+      }
+
       // box-shadow: -1px 0px 1px $lightgray;
       th {
         background-color: lighten($gray, 15%);
-        // border-left: 1px solid lighten($lightgray, 15%);
-        // border-bottom: 1px solid lighten($lightgray, 15%);
         color: #fff;
-        padding: 10px 15px;
-        &.channel-1 {
-          background-color: $blue;
-        }
-        &.channel-2 {
-          background-color: $green;
+        padding: 10px 0;
+        font-weight: initial;
+        display: flex;
+        align-items: center;
+
+        &.target-header{
+          padding: 5px 10px;
+          span{
+            display: block;
+            height: 100%;
+            padding: 5px 6px;
+            border-radius: 2px;            
+          }
         }
       }
       tr {
-        // border-bottom: 1px solid #eee;
+        display: flex;
         td {
           // border-left: 1px solid lighten($lightgray, 15%);
           // border-bottom: 1px solid lighten($lightgray, 15%);
           color: $lightgray;
-          padding: 7px 3px;
-          text-align: center;
+          padding: 7px 3px;          
+          display: none;
+          align-items: center;
+
           &:first-of-type {
             color: $gray;
             font-weight: bold;
@@ -999,13 +932,12 @@
             // border-right: 1px solid lighten($lightgray, 15%);
             border-right: none;
           }
+
           .text {
             display: inline-block;
             vertical-align: middle;
           }
-          .width1 {
-            padding: 5px 0px 5px 0px;
-          }
+
           .dummy-placeholder {
             padding-right: 3px;
             padding-left: 3px;
@@ -1016,14 +948,62 @@
           cursor: pointer;
           td {
             color: #000;
+            display: flex;
+          }
+
+          &.omitted {
+            cursor: pointer;
+            td {
+              color: $lightgray;
+              display: flex;
+
+              .dot{
+                background: #fff !important;
+                border:1px solid #D1D1D1;
+              }
+
+              svg .icon-path{
+                fill: #D1D1D1 !important;
+                stroke: #d1d1d1;
+              }
+            }          
           }
         }
+
 
         &.active{
           td{
             background: #09b0ef;
             color: #fff;
+            display: flex;
           }
+        }
+      }
+
+      &.simple-mode-table{
+        tr{
+          td.target-cell{
+            padding: 5px 3px;
+            & > span{
+              padding: 2px 7px;
+              border-radius: 2px;
+              border: 0px solid transparent;
+            }
+          }
+
+          &.active{
+            td{
+              background: #D6F5FF;
+              color: #000;
+              &.target-cell{
+                padding: 4px 3px;
+                & > span{
+                  background: #fff;
+                  border: 1px solid transparent;
+                }
+              }
+            }
+          }          
         }
       }
     }
@@ -1036,7 +1016,8 @@
 
   .one-line-span{
     white-space: nowrap;
-    text-overflow: ellipsis;    
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 
   .checkbox-wrapper{
@@ -1048,7 +1029,7 @@
       height: 16px;
       overflow: hidden;
       border-radius: 2px;
-      border: 1px solid #2f2f2f;
+      border: 1px solid #707070;
       vertical-align: middle;
       margin: 0;
       cursor: pointer;
@@ -1059,7 +1040,7 @@
     &.selected{
       label.outer-line{
         background: url(/images/omit_check.svg) no-repeat center center #fff;
-        background-size: 10px 10px;
+        background-size: 8px 8px;
       }
     }
   }

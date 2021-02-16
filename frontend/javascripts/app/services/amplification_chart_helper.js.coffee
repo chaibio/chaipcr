@@ -240,6 +240,46 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
       return well_data
 
+    @normalizeSimpleSummaryData = (well_data, targetsSet) ->
+      well_data = angular.copy well_data
+      targetsSet = angular.copy targetsSet
+
+      simple_well_data = []
+
+      for i in [0.. 15] by 1
+        item = {}
+        targets = []
+        well_line_items = _.filter well_data, (line_item) ->
+          line_item.well_num == i+1
+
+        if well_line_items.length
+          for j in [0.. targetsSet.length - 1] by 1
+            target_item = {}
+            well_item = _.filter well_line_items, (line_item) ->
+              line_item.target_id == targetsSet[j].id
+
+            target_item['target_id'] = targetsSet[j].id
+            target_item['color'] = targetsSet[j].color
+            target_item['channel'] = targetsSet[j].channel
+            if well_item.length
+              target_item['cq'] = well_item[0].cq 
+            else 
+              target_item['cq'] = 0
+
+            targets.push target_item
+
+          item['well_num'] = well_line_items[0].well_num
+          item['color'] = well_line_items[0].color
+          item['active'] = false
+          item['targets'] = targets
+
+          simple_well_data.push item
+
+      simple_well_data = _.orderBy(simple_well_data,['well_num'],['asc']);      
+
+      return simple_well_data
+
+
     @blankWellData = (is_dual_channel, well_targets) ->
       well_targets = angular.copy well_targets
       well_data = []

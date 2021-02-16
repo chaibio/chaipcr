@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<div class="experiment-chart-state-active results-charts" style="height: 100%; margin-left: 0px;  margin-right: 0px;">
+<div class="experiment-chart-state-active results-charts">
   <div class="page-layout" ng-controller="StandardCurveChartCtrl" ng-show="experiment" style="height: 100%;">
     <div class="content" style="padding-top:0px; height: 100%; display: flex;">
       <div class="chart-section" offset="0" force="true" style="height:100%; padding-left: 0px; padding-right: 0px; background: #eeeeee">
@@ -192,57 +192,54 @@ limitations under the License.
           </chart-well-switch>
         </div>
       </div>
-      <div class="table-container" force="true" style="width: 100%; height: 100%; padding-right: 0; padding-left: 0; margin-top:0px; overflow: auto; background: #fff;">
-        <table style="height: fit-content; min-width: 540px; backface-visibility: white">
-          <tbody>
+
+      <div class="table-container" force="true">
+        <table fixed-result-header offset="0" min-width="620">
+          <thead>
             <tr>
-              <th class="B2-M-Amplification" style="text-align: center; border-left:none; padding: 10px 5px; width: 45px;">Clr</th>
-              <th class="B2-M-Amplification" style="text-align: center; padding: 10px 5px; width: 50px;">Omit</th>
-              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; width: 45px;" >Well</th>
-              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; width: 20%;" >Sample</th>
-              <th class="B2-M-Amplification" style="text-align: center; width: 50px;">Type</th>
-              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; width: 20%;">Target</th>
-              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; min-width: 40px;" ng-class="{'channel-1': color_by === 'channel'}">
-                <span>C<sub>q</sub></span>
-              </th>
-              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; min-width: 45px;" ng-class="{'channel-2': color_by === 'channel'}">
-                <span>C<sub>q</sub> M</span>
-              </th>
-              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; min-width: 40px;">Qty</th>
-              <th class="B2-M-Amplification" style="text-align: left; padding-left:0px; min-width: 55px;">Qty M</th>
+              <th class="CB4-M item-center" width="35px">Clr</th>
+              <th class="CB4-M item-center" width="40px">Omit</th>
+              <th class="CB4-M item-center" width="45px" >Well</th>
+              <th class="CB4-M " width="25%" >Sample</th>
+              <th class="CB4-M item-center" width="50px">Type</th>
+              <th class="CB4-M " width="25%">Target</th>
+              <th class="CB4-M item-center" width="10%"><span>C<sub>q</sub></span></th>
+              <th class="CB4-M item-center" width="10%"><span>C<sub>q</sub> M</span></th>
+              <th class="CB4-M item-center" width="15%">Qty</th>
+              <th class="CB4-M item-center" width="15%">Qty M</th>
             </tr>
+          </thead>
+          <tbody>
             <tr ng-repeat="well_item in well_data" 
               ng-class="{
-                selected: (!has_init && !re_init_chart_data) || (
-                  (wellButtons['well_' + (well_item.well_num - 1)].selected) && 
-                  (well_item.omit == 0) && 
+                selected: !has_init || (
+                  (wellButtons['well_' + (well_item.well_num - 1)].selected) &&                 
                   (targetsSetHided[targets[chartConfig.channels * (well_item.well_num - 1) + well_item.channel - 1].id])),
-                active: well_item.active
+                active: well_item.active,
+                omitted: (omittedIndexes.indexOf($index) != -1)
               }"
               ng-if="well_item.target_id"
             >
-              <td class="B2-Amplification" ng-class="{'text-center': color_by==='channel'}" style="vertical-align: middle; line-height: 10px;background: #fff;"
-                ng-click="onSelectRow(well_item, $index)"
-              >
-                <span ng-if="color_by==='well'" class="B2-Amplification dot" ng-attr-style="background-color: {{wellButtons['well_'+(well_item.well_num - 1)].color}}"></span>
+              <td class="CB4 item-center" ng-click="onSelectRow(well_item, $index)" style="background: #fff">
+                <span ng-if="color_by==='well'" class="CB4 dot" ng-attr-style="background-color: {{wellButtons['well_'+(well_item.well_num - 1)].color}}"></span>
                 <span 
                   ng-if="color_by==='sample'" 
-                  class="B2-Amplification dot" 
+                  class="CB4 dot" 
                   ng-attr-style="background-color: {{(samples[well_item.well_num - 1]) ? samples[well_item.well_num - 1].color : init_sample_color}}"></span>
                 <span 
                   ng-if="color_by==='target'" 
-                  class="B2-Amplification dot" 
+                  class="CB4 dot" 
                   ng-attr-style="background-color: {{targets[chartConfig.channels * (well_item.well_num - 1) + well_item.channel - 1].color}}"></span>
               </td>
-              <td class="B2-Amplification" style="border-top-left-radius: 3px;border-bottom-left-radius: 3px;">
+              <td class="CB4 item-center" style="border-top-left-radius: 3px;border-bottom-left-radius: 3px;">
                 <div 
-                    class="checkbox-wrapper B1B" ng-click="toggleOmitIndex($index, well_item)" 
-                    ng-class="{ 'selected': well_item.omit == 1}">
+                    class="checkbox-wrapper B1B" ng-click="toggleOmitIndex($index)" 
+                    ng-class="{ 'selected': omittedIndexes.indexOf($index) != -1}">
                   <label class="outer-line"></label>
                 </div>                 
               </td>
-              <td class="B2-Amplification" ng-class="{'text-center': color_by==='channel'}" style="text-align: left" ng-click="onSelectRow(well_item, $index)">
-                <span class="B2-Amplification text">
+              <td class="CB4 item-center" ng-click="onSelectRow(well_item, $index)">
+                <span class="CB4 text">
                   <span ng-show="well_item.well_num < 9">
                     A{{well_item.well_num}}
                   </span>
@@ -251,64 +248,62 @@ limitations under the License.
                   </span>
                 </span>
               </td>
-              <td class="B2-Amplification" style="text-align: left;" ng-click="onSelectRow(well_item, $index)">
-                <span class="B2-Amplification one-line-span">
-                  {{samples[well_item.well_num - 1].name | truncate:20}}
+              <td class="CB4" ng-click="onSelectRow(well_item, $index)">
+                <span class="one-line-span">{{samples[well_item.well_num - 1].name | truncate:30}}</span>
+              </td>
+              <td class="CB4 type-td item-center" ng-click="onSelectRow(well_item, $index)">
+                <span class="CB4 type-span" style="width: 20px; height: 20px;" ng-if="well_item.well_type">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" ng-if="well_item.well_type == 'standard'"><g id="Layer_2" data-name="Layer 2"><g id="Symbol_Editing_Mode" data-name="Symbol Editing Mode"><g id="New_Symbol_8" data-name="New Symbol 8"><circle class="cls-1" cx="25" cy="25" r="23"/><path class="icon-path" d="M25,4A21,21,0,1,1,4,25,21,21,0,0,1,25,4m0-4A25,25,0,1,0,50,25,25,25,0,0,0,25,0Z"/><path class="icon-path" d="M24.59,32.32c-2.7,0-4.75-.58-6.5-2.35l2.25-2.25a5.84,5.84,0,0,0,4.3,1.5c2.05,0,3.15-.78,3.15-2.2a2,2,0,0,0-.55-1.5,2.65,2.65,0,0,0-1.58-.63l-2.15-.3a6,6,0,0,1-3.45-1.47,4.7,4.7,0,0,1-1.27-3.5c0-3.17,2.35-5.4,6.2-5.4a7.62,7.62,0,0,1,5.75,2.08l-2.2,2.17a5,5,0,0,0-3.65-1.22c-1.85,0-2.75,1-2.75,2.24a1.74,1.74,0,0,0,.52,1.28,3.12,3.12,0,0,0,1.65.7l2.1.3a5.84,5.84,0,0,1,3.4,1.37,5,5,0,0,1,1.37,3.78C31.18,30.37,28.31,32.32,24.59,32.32Z"/></g></g></g></svg>
+
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" ng-if="well_item.well_type == 'positive_control'"><defs><style>.cls-1{fill:#fff;}.cls-2{stroke:#000;stroke-miterlimit:10;}</style></defs><title>ring_plus</title><g id="Layer_2" data-name="Layer 2"><g id="Symbol_Editing_Mode" data-name="Symbol Editing Mode"><g id="New_Symbol_7" data-name="New Symbol 7"><circle class="cls-1" cx="25" cy="25" r="23"/><path class="icon-path" d="M25,4A21,21,0,1,1,4,25,21,21,0,0,1,25,4m0-4A25,25,0,1,0,50,25,25,25,0,0,0,25,0Z"/><path class="cls-2 icon-path" d="M26.33,26.32V31H23.67v-4.7H19V23.66h4.7V19h2.66v4.68H31v2.66Z"/></g></g></g></svg>
+
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" ng-if="well_item.well_type == 'negative_control'"><defs><style>.cls-1{fill:#fff;}.cls-2{stroke:#000;stroke-miterlimit:10;}</style></defs><title>ring_neg</title><g id="Layer_2" data-name="Layer 2"><g id="Symbol_Editing_Mode" data-name="Symbol Editing Mode"><g id="New_Symbol_6" data-name="New Symbol 6"><circle class="cls-1" cx="25" cy="25" r="23"/><path class="icon-path" d="M25,4A21,21,0,1,1,4,25,21,21,0,0,1,25,4m0-4A25,25,0,1,0,50,25,25,25,0,0,0,25,0Z"/><path class="cls-2 icon-path" d="M19,26.33V23.67H31v2.66Z"/></g></g></g></svg>
+
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" ng-if="well_item.well_type == 'unknown'"><defs><style>.cls-1{fill:#fff;}</style></defs><title>ring_u</title><g id="Layer_2" data-name="Layer 2"><g id="Symbol_Editing_Mode" data-name="Symbol Editing Mode"><g id="New_Symbol_5" data-name="New Symbol 5"><circle class="cls-1" cx="25" cy="25" r="23"/><path class="icon-path" d="M25,4A21,21,0,1,1,4,25,21,21,0,0,1,25,4m0-4A25,25,0,1,0,50,25,25,25,0,0,0,25,0Z"/><path class="icon-path" d="M25,32.29a5,5,0,0,1-5.24-5V17.92h2.78v9.27a2.47,2.47,0,1,0,4.94,0V17.92h2.76v9.37A5,5,0,0,1,25,32.29Z"/></g></g></g></svg>
                 </span>
               </td>
-              <td class="B2-Amplification type-td" ng-click="onSelectRow(well_item, $index)">
-                <span class="B2-Amplification type-span" style="width: 20px; height: 20px;" ng-if="well_item.well_type">
-                  <img src="/images/ring_s.svg" ng-if="well_item.well_type == 'standard'">
-                  <img src="/images/ring_plus.svg" ng-if="well_item.well_type == 'positive_control'">
-                  <img src="/images/ring_neg.svg" ng-if="well_item.well_type == 'negative_control'">
-                  <img src="/images/ring_u.svg" ng-if="well_item.well_type == 'unknown'">
-                </span>
+              <td class="CB4" ng-click="onSelectRow(well_item, $index)">
+                <span class="one-line-span">{{well_item.target_name | truncate:30}}</span>              
               </td>
-              <td class="B2-Amplification" style="text-align: left;" ng-click="onSelectRow(well_item, $index)">
-                <span class="B2-Amplification one-line-span">
-                  {{well_item.target_name | truncate:20}}
-                  <!-- {{targets[$index].name | truncate:20}} -->
-                </span>
-              </td>
-              <td class="B2-Amplification" style="text-align: left" ng-click="onSelectRow(well_item, $index)">
-                <span class="B2-Amplification width1" >
-                  <span class="B2-Amplification" ng-show="well_item.cq > 0">
+              <td class="CB4 item-center" ng-click="onSelectRow(well_item, $index)">
+                <span class="CB4" >
+                  <span class="CB4" ng-show="well_item.cq > 0">
                     {{well_item.cq | round:2}}
                   </span>
-                  <span class="B2-Amplification" ng-show="well_item.cq <= 0">
-                    <span class="B2-Amplification dummy-placeholder">&nbsp;</span>
+                  <span class="CB4" ng-show="well_item.cq <= 0">
+                    <span class="CB4 dummy-placeholder">&nbsp;</span>
                   </span>
                 </span>
               </td>
-              <td class="B2-Amplification" style="text-align: left" ng-click="onSelectRow(well_item, $index)">
-                <span class="B2-Amplification width1">
-                  <span class="B2-Amplification" ng-show="well_item.mean_cq > 0">
+              <td class="CB4 item-center" ng-click="onSelectRow(well_item, $index)">
+                <span class="CB4">
+                  <span class="CB4" ng-show="well_item.mean_cq > 0">
                     {{well_item.mean_cq | round:2}}
                   </span>
-                  <span class="B2-Amplification" ng-show="well_item.mean_cq <= 0">
-                    <span class="B2-Amplification dummy-placeholder">&nbsp;</span>
+                  <span class="CB4" ng-show="well_item.mean_cq <= 0">
+                    <span class="CB4 dummy-placeholder">&nbsp;</span>
                   </span>
                 </span>
               </td>
-              <td class="B2-Amplification" style="text-align: left" ng-click="onSelectRow(well_item, $index)">
-                <span class="B2-Amplification width1" ng-show="well_item.quantity > 0">
+              <td class="CB4 item-center" ng-click="onSelectRow(well_item, $index)">
+                <span class="CB4" ng-show="well_item.quantity > 0">
                   {{well_item.quantity | fixedDigit:6}}
                 </span>
-                <span class="B2-Amplification" ng-show="well_item.quantity <= 0">
-                  <span class="B2-Amplification dummy-placeholder">&nbsp;</span>
+                <span class="CB4" ng-show="well_item.quantity <= 0">
+                  <span class="CB4 dummy-placeholder">&nbsp;</span>
                 </span>
               </td>
-              <td class="B2-Amplification" style="text-align: left; border-top-right-radius: 3px;border-bottom-right-radius: 3px;" ng-click="onSelectRow(well_item, $index)">
-                <span class="B2-Amplification width1" ng-show="well_item.mean_quantity > 0">
+              <td class="CB4 item-center" style="border-top-right-radius: 3px;border-bottom-right-radius: 3px;" ng-click="onSelectRow(well_item, $index)">
+                <span class="CB4" ng-show="well_item.mean_quantity > 0">
                   {{well_item.mean_quantity | fixedDigit:6}}
                 </span>
-                <span class="B2-Amplification" ng-show="well_item.mean_quantity <= 0">
-                  <span class="B2-Amplification dummy-placeholder">&nbsp;</span>
+                <span class="CB4" ng-show="well_item.mean_quantity <= 0">
+                  <span class="CB4 dummy-placeholder">&nbsp;</span>
                 </span>
               </td>
             </tr>
           </tbody>
-        </table>
+        </table>        
       </div>
     </div>
   </div>

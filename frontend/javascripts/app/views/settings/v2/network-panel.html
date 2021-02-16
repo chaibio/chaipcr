@@ -1,13 +1,13 @@
 <div class="network-connection">
   <div class="two-col connection-list">
-    <div class="setting-switch lan-switch mb-15">
+    <div class="sm-switch lan-switch mb-15">
       <div class="check-symbol" ng-class="{'active': ethernetSettings.settings}">
         <img src="/images/WhiteCheckGreenRing.svg">
       </div>
       <label class="CX5-M" style="cursor: pointer;">Ethernet</label>
       <button class="ci-btn-light CG1" ng-click="onSelectNetwork('ethernet')">Edit Settings</button>
     </div>
-    <div class="setting-switch wifi-switch">
+    <div class="sm-switch wifi-switch">
       <switch ng-model="wifiNetworkStatus" disabled="wirelessError"></switch>
       <div class="check-symbol" ng-class="{'active': currentWifiSettings.state && currentWifiSettings.state.status == 'connected'}">
         <img src="/images/WhiteCheckGreenRing.svg">
@@ -66,7 +66,7 @@
     </form>
 
     <form ng-if="IamConnected && name=='ethernet'" style="width: 250px;">
-      <div class="setting-switch mb-15">
+      <div class="sm-switch mb-15">
         <switch ng-model="autoSetting"></switch>
         <label class="CX5-M ml-10">Set Automatically</label>
       </div>

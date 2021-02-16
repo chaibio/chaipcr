@@ -254,13 +254,22 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
 
   activeLine: (well_data) ->
     path = null
-    for line, i in @lines by 1
-      if @config.series[i].well == well_data.well - 1 and @config.series[i].channel == well_data.channel
-        path = line
-        break
+    if well_data.channel
+      for line, i in @lines by 1      
+        if @config.series[i].well == well_data.well - 1 and @config.series[i].channel == well_data.channel
+          path = line
+          break
 
-    if path._groups[0]?[0]?.__data__.length
-      @setActivePath(path)
+      if path._groups[0]?[0]?.__data__.length
+        @setActivePath(path)
+    else
+      for line, i in @lines by 1      
+        if @config.series[i].well == well_data.well - 1
+          path = line
+          break
+      if path._groups[0]?[0]?.__data__.length
+        @setActivePath(path)
+
 
   setBoxRFYAndCycleTexts: (x) ->
     line_config = @activePathConfig.config

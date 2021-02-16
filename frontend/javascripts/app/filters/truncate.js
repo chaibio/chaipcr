@@ -19,7 +19,7 @@
 
 window.ChaiBioTech.ngApp.filter('truncate', [
   function() {
-    return function(value, length) {
+    return function(value, length, ellipsis) {
 
       var MAX_VALUE = length || 32;
 
@@ -35,7 +35,7 @@ window.ChaiBioTech.ngApp.filter('truncate', [
         return value;
       }
 
-      return value.substring(0, MAX_VALUE - 2) + ' ...';
+      return ellipsis ? value.substring(0, MAX_VALUE) : value.substring(0, MAX_VALUE - 2) + ' ...';
     };
   }
 ]);
