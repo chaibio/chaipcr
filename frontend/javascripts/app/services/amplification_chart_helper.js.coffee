@@ -263,8 +263,10 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
             target_item['channel'] = targetsSet[j].channel
             if well_item.length
               target_item['cq'] = well_item[0].cq 
+              target_item['assigned'] = true
             else 
               target_item['cq'] = 0
+              target_item['assigned'] = false
 
             targets.push target_item
 

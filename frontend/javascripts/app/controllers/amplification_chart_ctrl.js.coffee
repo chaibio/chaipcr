@@ -116,8 +116,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       modal = document.getElementById('myModal')
       span = document.getElementsByClassName("close")[0]
 
-      $scope.toggleOmitIndex = (omit_index) ->
-      
+      $scope.toggleOmitIndex = (well_item) ->
+        omit_index = well_item.well_num.toString() + '_' + well_item.channel.toString()
         if $scope.omittedIndexes.indexOf(omit_index) != -1
           $scope.omittedIndexes.splice $scope.omittedIndexes.indexOf(omit_index), 1
         else
@@ -505,10 +505,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             $scope.chartConfig.series.push(nonGreySeries[i])
 
       getWellDataIndex = (well_num, channel) ->
-        for i in [0..$scope.well_data.length - 1] by 1
-          if $scope.well_data[i].well_num is well_num and $scope.well_data[i].channel is channel
-            return i
-        return -1
+        return well_num.toString() + '_' + channel
 
       $scope.onUpdateProperties = (cycle, rfu, dF_dC, d2_dc2) ->
         $scope.label_cycle = cycle
@@ -536,8 +533,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         config.config.channel = well_item.channel
 
         dual_value = if $scope.is_dual_channel then 2 else 1
+        omit_index = well_item.well_num.toString() + '_' + well_item.channel.toString()
 
-        if $scope.wellButtons['well_' + (well_item.well_num - 1)].selected and $scope.omittedIndexes.indexOf(index) == -1 and $scope.targetsSetHided[$scope.targets[index].id]
+        if $scope.wellButtons['well_' + (well_item.well_num - 1)].selected and $scope.omittedIndexes.indexOf(omit_index) == -1 and $scope.targetsSetHided[$scope.targets[index].id]
           for well_i in [0..$scope.well_data.length - 1]
             $scope.well_data[well_i].active = ($scope.well_data[well_i].well_num - 1 == config.config.well and $scope.well_data[well_i].channel == config.config.channel)
 
@@ -578,18 +576,21 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $scope.bgcolor_target = { 'background-color':'#666' }
 
       $scope.onSelectRow = (well_item, index) ->
-        if !$scope.has_init or (($scope.wellButtons['well_' + (well_item.well_num - 1)].selected) and ($scope.omittedIndexes.indexOf(index) == -1) and ($scope.targetsSetHided[$scope.targets[index].id]))
+        omit_index = well_item.well_num.toString() + '_' + well_item.channel.toString()
+        if !$scope.has_init or (($scope.wellButtons['well_' + (well_item.well_num - 1)].selected) and ($scope.omittedIndexes.indexOf(omit_index) == -1) and ($scope.targetsSetHided[$scope.targets[index].id]))
           if !well_item.active
             $rootScope.$broadcast 'event:amp-select-row', {well: well_item.well_num, channel: well_item.channel}
           else
             $rootScope.$broadcast 'event:amp-unselect-row', {well: well_item.well_num, channel: well_item.channel}
 
-      $scope.onSelectSimpleRow = (well_item, index) ->
-        if !$scope.has_init or (($scope.wellButtons['well_' + (well_item.well_num - 1)].selected) and ($scope.omittedIndexes.indexOf(index) == -1) and ($scope.targetsSetHided[$scope.targets[index].id]))
-          if !well_item.active
-            $rootScope.$broadcast 'event:amp-select-row', {well: well_item.well_num}
+      $scope.onSelectSimpleRow = (well_item, well_target) ->
+        omit_index = well_item.well_num.toString() + '_' + well_target.channel.toString()
+        if well_target.assigned and $scope.omittedIndexes.indexOf(omit_index) == -1          
+          if !well_item.active or $scope.active_cell != omit_index
+            $scope.active_cell = omit_index
+            $rootScope.$broadcast 'event:amp-select-row', {well: well_item.well_num, channel: well_target.channel}
           else
-            $rootScope.$broadcast 'event:amp-unselect-row', {well: well_item.well_num}
+            $rootScope.$broadcast 'event:amp-unselect-row', {well: well_item.well_num, channel: well_target.channel}
 
       $scope.onSelectLine = (config) ->
         $scope.bgcolor_target = { 'background-color':'black' }

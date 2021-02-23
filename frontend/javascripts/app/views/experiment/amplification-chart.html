@@ -221,7 +221,7 @@ limitations under the License.
                 (wellButtons['well_' + (well_item.well_num - 1)].selected) &&                 
                 (targetsSetHided[targets[chartConfig.channels * (well_item.well_num - 1) + well_item.channel - 1].id])),
               active: well_item.active,
-              omitted: (omittedIndexes.indexOf($index) != -1)
+              omitted: (omittedIndexes.indexOf(well_item.well_num.toString() + '_' + well_item.channel.toString()) != -1)
             }"
             ng-if="well_item.target_id"
           >
@@ -238,8 +238,8 @@ limitations under the License.
             </td>
             <td class="CB4 item-center" style="border-top-left-radius: 3px;border-bottom-left-radius: 3px;">
               <div 
-                  class="checkbox-wrapper B1B" ng-click="toggleOmitIndex($index)" 
-                  ng-class="{ 'selected': omittedIndexes.indexOf($index) != -1}">
+                  class="checkbox-wrapper B1B" ng-click="toggleOmitIndex(well_item)" 
+                  ng-class="{ 'selected': omittedIndexes.indexOf(well_item.well_num.toString() + '_' + well_item.channel.toString()) != -1}">
                 <label class="outer-line"></label>
               </div>                 
             </td>
@@ -329,10 +329,9 @@ limitations under the License.
             ng-class="{
               selected: !has_init || (wellButtons['well_' + (well_item.well_num - 1)].selected),
               active: well_item.active,
-              omitted: (omittedIndexes.indexOf($index) != -1)
             }"
           >
-            <td class="CB4 item-center" style="background: #fff" ng-click="onSelectSimpleRow(well_item, $index)">
+            <td class="CB4 item-center" style="background: #fff">
               <span ng-if="color_by==='well'" class="CB4 dot" ng-attr-style="background-color: {{wellButtons['well_'+(well_item.well_num - 1)].color}}"></span>
               <span 
                 ng-if="color_by==='sample'" 
@@ -343,7 +342,7 @@ limitations under the License.
                 class="CB4 dot" 
                 style="background-color: #D1D1D1;"></span>
             </td>
-            <td class="CB4 item-center" style="border-top-left-radius: 3px;border-bottom-left-radius: 3px;" ng-click="onSelectSimpleRow(well_item, $index)">
+            <td class="CB4 item-center" style="border-top-left-radius: 3px;border-bottom-left-radius: 3px;">
               <span class="CB4 text">
                 <span ng-show="well_item.well_num < 9">
                   A{{well_item.well_num}}
@@ -353,16 +352,23 @@ limitations under the License.
                 </span>
               </span>
             </td>
-            <td class="CB4" ng-click="onSelectSimpleRow(well_item, $index)">
+            <td class="CB4">
               <span class="one-line-span">{{samples[well_item.well_num - 1].name}}</span>
             </td>
             <td 
               class="CB4 item-center target-cell" 
+              ng-class="{
+                assigned: well_target.assigned, 
+                omitted: (well_target.assigned && omittedIndexes.indexOf(well_item.well_num.toString() + '_' + well_target.channel.toString()) != -1)                
+              }"
               ng-repeat="well_target in well_item.targets" 
               ng-if="targetsSetHided[well_target.target_id]"
-              ng-click="onSelectSimpleRow(well_item, $index)"
+              ng-click="onSelectSimpleRow(well_item, well_target)"
             >
-              <span class="CB4" ng-attr-style="border-color: {{well_target.color}}">
+              <span 
+                class="CB4"                
+                ng-attr-style="border-color: {{well_target.color}}"
+              >
                 <span class="CB4" ng-show="well_target.cq > 0">
                   {{well_target.cq | round:2}}
                 </span>
