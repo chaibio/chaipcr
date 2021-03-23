@@ -102,7 +102,21 @@ limitations under the License.
                   <h2 class="H2-Amplification">Loading Data <ellipsis-animated></ellipsis-animated></h2>
                   <p class="XB1">May take a minute</p>
                 </div>
-                <amplification-chart data="amplification_data" config="chartConfig" zoom="ampli_zoom" on-zoom="onZoom" on-select-line="onSelectLine" on-unselect-line="onUnselectLine" on-update-properties="onUpdateProperties" scroll="ampli_scroll.value" show="showAmpliChart"></amplification-chart>
+                <amplification-chart 
+                  data="amplification_data" 
+                  config="chartConfig" 
+                  zoom="ampli_zoom" 
+                  on-zoom="onZoom" 
+                  on-select-line="onSelectLine" 
+                  on-unselect-line="onUnselectLine"
+                  on-update-properties="onUpdateProperties" 
+
+                  on-highlight-lines="onHighlightLines" 
+                  on-un-highlight-lines="onUnHighlightLines"
+
+                  scroll="ampli_scroll.value" 
+                  show="showAmpliChart"
+                ></amplification-chart>
               </div>  
               <div class="zoom-box">
                 <div class="zoom-button-divider">
@@ -199,7 +213,7 @@ limitations under the License.
           <div class="switch-item CB4" ng-class="{'active': !isSampleMode}">Detailed</div>
         </div>
       </div>
-      <table fixed-result-header offset="60" min-width="620" ng-show="!isSampleMode">
+      <table fixed-result-header offset="60" min-width="620" ng-show="!isSampleMode" class="detail-mode-table">
         <thead>
           <tr>
             <th class="CB4-M item-center" width="35px">Clr</th>
@@ -221,9 +235,12 @@ limitations under the License.
                 (wellButtons['well_' + (well_item.well_num - 1)].selected) &&                 
                 (targetsSetHided[targets[chartConfig.channels * (well_item.well_num - 1) + well_item.channel - 1].id])),
               active: well_item.active,
+              highlight: well_item.highlight,
               omitted: (omittedIndexes.indexOf(well_item.well_num.toString() + '_' + well_item.channel.toString()) != -1)
             }"
             ng-if="well_item.target_id"
+            ng-mousemove="onHoverRow($event, well_item, $index)"
+            class="well-item-row"
           >
             <td class="CB4 item-center" ng-click="onSelectRow(well_item, $index)" style="background: #fff">
               <span ng-if="color_by==='well'" class="CB4 dot" ng-attr-style="background-color: {{wellButtons['well_'+(well_item.well_num - 1)].color}}"></span>
@@ -320,7 +337,7 @@ limitations under the License.
                 ng-repeat="target in targetsSet"
                 ng-if="targetsSetHided[target.id]"
             >
-              <span class="one-line-span" ng-attr-style="background-color: {{target.color}};">{{target.name | truncate:5:1}}. C<sub>q</sub></span>
+              <span class="one-line-span" ng-attr-style="background-color: {{color_by == 'target' ? target.color : 'transparent'}};">{{target.name | truncate:5:1}}. C<sub>q</sub></span>
             </th>
           </tr>
         </thead>
@@ -328,8 +345,11 @@ limitations under the License.
           <tr ng-repeat="well_item in simple_well_data" 
             ng-class="{
               selected: !has_init || (wellButtons['well_' + (well_item.well_num - 1)].selected),
-              active: well_item.active,
-            }"
+              active: well_item.active || isTargetHover(well_item),
+              highlight: well_item.highlight,
+            }"            
+            class="well-item-row"
+            ng-mousemove="onHoverSimpleRow($event, well_item)"
           >
             <td class="CB4 item-center" style="background: #fff">
               <span ng-if="color_by==='well'" class="CB4 dot" ng-attr-style="background-color: {{wellButtons['well_'+(well_item.well_num - 1)].color}}"></span>
@@ -338,7 +358,7 @@ limitations under the License.
                 class="CB4 dot" 
                 ng-attr-style="background-color: {{(samples[well_item.well_num - 1]) ? samples[well_item.well_num - 1].color : init_sample_color}}"></span>
               <span 
-                ng-if="color_by==='target'" 
+                ng-if="color_by==='target'"
                 class="CB4 dot" 
                 style="background-color: #D1D1D1;"></span>
             </td>
@@ -359,14 +379,16 @@ limitations under the License.
               class="CB4 item-center target-cell" 
               ng-class="{
                 assigned: well_target.assigned, 
+                selected: well_target.selected, 
                 omitted: (well_target.assigned && omittedIndexes.indexOf(well_item.well_num.toString() + '_' + well_target.channel.toString()) != -1)                
               }"
               ng-repeat="well_target in well_item.targets" 
               ng-if="targetsSetHided[well_target.target_id]"
-              ng-click="onSelectSimpleRow(well_item, well_target)"
+              ng-click="onSelectSimpleRow($event, well_item, well_target)"
+              data-channel="{{well_target.channel}}"
             >
               <span 
-                class="CB4"                
+                class="CB4"
                 ng-attr-style="border-color: {{well_target.color}}"
               >
                 <span class="CB4" ng-show="well_target.cq > 0">

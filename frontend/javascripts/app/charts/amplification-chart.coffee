@@ -13,6 +13,7 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
     # left: 80
     # right: 10
     # bottom: 20
+
   inK: ->
     @getMaxY() - @getMinY() > 20000
 
@@ -254,21 +255,67 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
 
   activeLine: (well_data) ->
     path = null
-    if well_data.channel
-      for line, i in @lines by 1      
-        if @config.series[i].well == well_data.well - 1 and @config.series[i].channel == well_data.channel
-          path = line
-          break
+    
+    for line, i in @lines by 1      
+      if @config.series[i].well == well_data.well - 1 and @config.series[i].channel == well_data.channel
+        path = line
+        if path._groups[0]?[0]?.__data__.length
+          @setActivePath(path)
+        break
 
-      if path._groups[0]?[0]?.__data__.length
-        @setActivePath(path)
-    else
-      for line, i in @lines by 1      
-        if @config.series[i].well == well_data.well - 1
+  highlightLine: (well_info) ->
+    path_list = []
+    for well_data, wi in well_info.well_datas by 1
+      for line, i in @lines by 1
+        if @config.series[i].well == well_data.well - 1 and (well_data.channel == 0 or @config.series[i].channel == well_data.channel)
           path = line
-          break
-      if path._groups[0]?[0]?.__data__.length
-        @setActivePath(path)
+          if path._groups[0]?[0]?.__data__.length
+            path_list.push(path)
+
+    @setMultipleHighlightPath(path_list, well_info.well_index)
+
+  makeHighlightWhiteBorderLine: (line_config) ->
+    xScale = @getXScale()
+    yScale = @getYScale()
+    line = d3.line()
+
+    line.curve(@getLineCurve())
+    line.x (d) -> xScale(d[line_config.x])
+    line.y (d) -> yScale(d[line_config.y])
+    if (@config.axes.y.scale is 'log') then line.defined (d) -> d[line_config.y] > 10
+    newBorderLine = @viewSVG.append("path")
+        .datum(@data[line_config.dataset])
+        .attr("class", "white-border-line")
+        .attr("stroke", "#fff")
+        .attr('fill', 'none')
+        .attr("d", line)
+        .attr('stroke-width', @HOVERED_PATH_STROKE_WIDTH *2.5)
+    @highlightBorderPaths.push(newBorderLine)
+
+  setMultipleHighlightPath: (paths, well_index) ->
+    if @highlightPaths.length
+      for line, i in @highlightPaths by 1
+        line.attr('stroke-width', @NORMAL_PATH_STROKE_WIDTH)
+        @highlightBorderPaths[i].remove()
+
+      @highlightPaths = []
+      @highlightBorderPaths = []
+      @highlightPathConfigs = []
+
+    for line, i in paths by 1
+      pathConfig = @getPathConfig(line)
+      if pathConfig.config
+        lineConfig = pathConfig.config
+        lineIndex = pathConfig.index
+        @makeHighlightWhiteBorderLine(lineConfig)
+        newLine = @makeColoredLine(lineConfig).attr('stroke-width', @HOVERED_PATH_STROKE_WIDTH)
+        @lines[lineIndex] = newLine
+        @highlightPaths.push(newLine)
+        @highlightPathConfigs.push(pathConfig)
+        line.remove()
+
+    if typeof @onHighlightLines is 'function'
+      @onHighlightLines(@highlightPathConfigs, well_index)
 
 
   setBoxRFYAndCycleTexts: (x) ->

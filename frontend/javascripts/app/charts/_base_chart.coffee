@@ -4,7 +4,7 @@ class BaseChart
 
   NORMAL_PATH_STROKE_WIDTH: 2
   HOVERED_PATH_STROKE_WIDTH: 3
-  ACTIVE_PATH_STROKE_WIDTH: 5
+  ACTIVE_PATH_STROKE_WIDTH: 4
   CIRCLE_STROKE_WIDTH: 2
   CIRCLE_RADIUS: 7
   
@@ -22,6 +22,10 @@ class BaseChart
     top: 0
     right: 0
     bottom: 0
+
+  highlightPaths: []
+  highlightBorderPaths: []
+  highlightPathConfigs: []
 
   constructor: (@elem, @data, @config) ->
     # console.log('@data')
@@ -159,6 +163,18 @@ class BaseChart
     @activePath = null
     @box.container.remove() if @box
     @onUnselectLine() if @onUnselectLine
+
+  unsetHighlightPaths: ->
+    return if not @highlightPaths.length
+
+    for line, i in @highlightPaths by 1
+      line.attr('stroke-width', @NORMAL_PATH_STROKE_WIDTH)
+      @highlightBorderPaths[i].remove()
+
+    @highlightPaths = []
+    @highlightBorderPaths = []
+    @highlightPathConfigs = []
+    @onUnHighlightLines() if @onUnHighlightLines
 
   drawBox: (line_config) ->
     @box.container.remove() if @box
@@ -371,7 +387,7 @@ class BaseChart
         .attr("stroke", "#fff")
         .attr('fill', 'none')
         .attr("d", line)
-        .attr('stroke-width', @ACTIVE_PATH_STROKE_WIDTH + 3)
+        .attr('stroke-width', @ACTIVE_PATH_STROKE_WIDTH * 3)
 
   drawLines: ->
     
@@ -1631,6 +1647,12 @@ class BaseChart
 
   onUnselectLine: (fn) ->
     @onUnselectLine = fn
+
+  onHighlightLines: (fn) ->
+    @onHighlightLines = fn
+
+  onUnHighlightLines: (fn) ->
+    @onUnHighlightLines = fn
 
   onUpdateProperties: (fn) ->
     @onUpdateProperties = fn

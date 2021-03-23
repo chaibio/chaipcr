@@ -39,11 +39,11 @@
           class="well-switch" 
           ng-init="i = (row.index * columns.length) + col.index; well = wells['well_' + i];" 
           ng-mousedown="dragStart($event, 'well', i)" 
-          ng-mousemove="dragged($event, 'well', i)" 
+          ng-mousemove="wellHover($event, 'well', i)"
           ng-mouseup="dragStop($event, 'well', i)" 
           ng-class="{selected: well.selected, active: well.active && well.selected}" 
           ng-style="getWellStyle(row, col, well, i)">
-          <div class="well-switch-container B1-Amplification" style="height: 100%; background: inherit;" ng-style="getWellContainerStyle(row, col, well, i)">
+          <div class="well-switch-container" ng-style="getWellContainerStyle(row, col, well, i)">
             <div class="well-switch-bar-container">
               <div class="well-switch-bar" ng-style="getStyleForWellBar(row, col, well, i)" ng-if="colorBy!='target'"></div>
               <div class="well-switch-bar" ng-style="getStyleForWellBar(row, col, well, i)" ng-if="colorBy=='target' && !isDual"></div>
@@ -53,11 +53,25 @@
                 <div class="well-hr-bar"></div>
               </div>
             </div>
-            <div class="ct-cq-container">
-              <div ng-if="chartType == 'amplification'"> C<sub>q</sub> <strong class="value">{{ displayCt(well.ct[0]) }}</strong> </div>
-              <div ng-if="chartType == 'amplification' && isDual"> C<sub>q</sub> <strong class="value">{{ displayCt(well.ct[1]) }}</strong> </div>
-              <div ng-if="chartType == 'melt-curve'"> T<sub>m</sub> 1: <strong class="value">{{ displayCt(well.ct[0]) }}</strong> </div>
-              <div ng-if="chartType == 'melt-curve' && isDual"> T<sub>m</sub> 1: <strong class="value">{{ displayCt(well.ct[1]) }}</strong> </div>
+            <div class="detail-container">
+              <label class="sample-name CB3-M">{{samples[i] ? samples[i].name : ''}}</label>
+              <div class="well-type-box">
+                <img 
+                  ng-src="{{wellTypeIcons[well.well_type[0]]}}" 
+                  ng-if="well.well_type[0]" 
+                  class="target-icon"
+                  data-channel="1"
+                >
+                <label ng-if="!well.well_type[0]"></label>
+                <div class="well-delimiter"></div>
+                <img 
+                  ng-src="{{wellTypeIcons[well.well_type[1]]}}" 
+                  ng-if="well.well_type[1]" 
+                  class="target-icon"
+                  data-channel="2"
+                >
+                <label ng-if="!well.well_type[1]"></label>
+              </div>
             </div>
           </div>
         </td>

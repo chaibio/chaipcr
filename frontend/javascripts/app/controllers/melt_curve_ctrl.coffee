@@ -79,6 +79,26 @@ App.controller 'MeltCurveChartCtrl', [
         'background-color':'#666666'
       }
 
+      last_well_number = 0
+      last_target_channel = 0
+      last_target_assigned = 0
+
+      $scope.registerOutsideHover = false;
+      unhighlight_event = ''
+
+      if !$scope.registerOutsideHover
+        $scope.registerOutsideHover = angular.element(window).on 'mousemove', (e)->
+          if !angular.element(e.target).parents('.well-switch').length and !angular.element(e.target).parents('.well-item-row').length 
+            console.log('--unhighlight_event--', unhighlight_event)
+            if unhighlight_event
+              $rootScope.$broadcast unhighlight_event, {}
+              unhighlight_event = ''
+              last_well_number = 0
+              last_target_channel = 0
+              last_target_assigned = 0
+
+          $scope.$apply()
+
       $scope.toggleOmitIndex = (omit_index) ->
       
         if $scope.omittedIndexes.indexOf(omit_index) != -1
@@ -458,6 +478,7 @@ App.controller 'MeltCurveChartCtrl', [
 
         for well_i in [0..$scope.well_data.length - 1]
           $scope.well_data[well_i].active = ($scope.well_data[well_i].well_num - 1 == config.config.well and $scope.well_data[well_i].channel == config.config.channel)
+          $scope.well_data[well_i].highlight = false
 
         for i in [0..15] by 1
           $scope.wellButtons["well_#{i}"].active = (i == config.config.well)
@@ -488,12 +509,13 @@ App.controller 'MeltCurveChartCtrl', [
             wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8']
             $scope.label_well = wells[i]
 
-        wellScrollTop = (config.config.well * dual_value + config.config.channel - 1 + dual_value) * 36 - document.querySelector('.table-container').offsetHeight
-        angular.element(document.querySelector('.table-container')).animate { scrollTop: wellScrollTop }, 'fast'
+        wellScrollTop = (config.config.well * dual_value + config.config.channel - 1 + dual_value) * 36 - document.querySelector('.detail-mode-table tbody').offsetHeight
+        angular.element('.detail-mode-table tbody').animate { scrollTop: wellScrollTop }, 'fast'
           
       $scope.onUnselectLine = ->
         for well_i in [0..$scope.well_data.length - 1]
           $scope.well_data[well_i].active = false
+          $scope.well_data[well_i].highlight = false
 
         for i in [0..15] by 1
           $scope.wellButtons["well_#{i}"].active = false
@@ -513,6 +535,50 @@ App.controller 'MeltCurveChartCtrl', [
         $scope.bgcolor_wellSample = {
           'background-color':'#666666'
         }
+
+      $scope.onHoverRow = (event, well_item, index) ->
+        is_active_line = false
+        for well_i in [0..$scope.well_data.length - 1]
+          if $scope.well_data[well_i].active
+            is_active_line = true
+            break
+
+        if is_active_line or (last_well_number == well_item.well_num and last_target_channel == well_item.channel)
+          return
+
+        last_well_number = well_item.well_num
+        last_target_channel = well_item.channel
+
+        omit_index = well_item.well_num.toString() + '_' + well_item.channel.toString()
+        if !$scope.has_init or (($scope.wellButtons['well_' + (well_item.well_num - 1)].selected) and ($scope.omittedIndexes.indexOf(omit_index) == -1) and ($scope.targetsSetHided[$scope.targets[index].id]))
+          if !well_item.active
+            $rootScope.$broadcast 'event:melt-highlight-row', { well_datas: [{well: well_item.well_num, channel: well_item.channel}], well_index: well_item.well_num - 1 }
+            unhighlight_event = 'event:melt-unhighlight-row'
+
+      $scope.onHighlightLines = (configs, well_index) ->
+        for well_i in [0..$scope.well_data.length - 1]
+          $scope.well_data[well_i].active = false
+          $scope.well_data[well_i].highlight = false
+        
+        for well_i in [0..$scope.well_data.length - 1]
+          for config, i in configs by 1
+            if ($scope.well_data[well_i].well_num - 1 == config.config.well and $scope.well_data[well_i].channel == config.config.channel)
+              $scope.well_data[well_i].highlight = true
+        
+        for i in [0..15] by 1
+          $scope.wellButtons["well_#{i}"].active = (i == well_index)
+
+        dual_value = if $scope.is_dual_channel then 2 else 1
+        config = configs[0]
+        wellScrollTop = (config.config.well * dual_value + config.config.channel - 1 + dual_value) * 36 - document.querySelector('.detail-mode-table tbody').offsetHeight
+        angular.element('.detail-mode-table tbody').animate { scrollTop: wellScrollTop }, 'fast'
+
+        return
+
+      $scope.onUnHighlightLines = (configs) ->
+        $scope.onUnselectLine()
+        return
+
 
       $scope.$watchCollection 'wellButtons', (buttons) ->
         return if !buttons

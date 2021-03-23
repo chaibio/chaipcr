@@ -16,6 +16,8 @@ window.App.directive 'meltCurveChart', [
         onUpdateProperties: '&'
         onSelectLine: '&'
         onUnselectLine: '&'
+        onHighlightLines: '&'
+        onUnHighlightLines: '&'        
         show: '='
       link: ($scope, elem, attrs) ->
 
@@ -38,16 +40,30 @@ window.App.directive 'meltCurveChart', [
           chart.onSelectLine($scope.onSelectLine())
           chart.onUnselectLine($scope.onUnselectLine())
           chart.onUpdateProperties($scope.onUpdateProperties())
+          chart.onHighlightLines($scope.onHighlightLines())
+          chart.onUnHighlightLines($scope.onUnHighlightLines())
 
           d = chart.getDimensions()
 
           # $scope.onZoom()(chart.getTransform(), d.width, d.height, chart.getScaleExtent())
 
         $scope.$on 'event:melt-select-row', (e, data, oldData) ->
-          chart.activeLine(data, true)
+          if chart
+            chart.unsetHighlightPaths()
+            chart.activeLine(data, true)
         
         $scope.$on 'event:melt-unselect-row', (e, data, oldData) ->
-          chart.unsetActivePath()
+          if chart
+            chart.unsetActivePath(data)
+
+        $scope.$on 'event:melt-highlight-row', (e, data, oldData) ->
+          if chart
+            chart.unsetActivePath()
+            chart.highlightLine(data, true)
+        
+        $scope.$on 'event:melt-unhighlight-row', (e, data, oldData) ->
+          if chart
+            chart.unsetHighlightPaths()
 
         $scope.$on 'window:resize', ->
           if chart and $scope.show

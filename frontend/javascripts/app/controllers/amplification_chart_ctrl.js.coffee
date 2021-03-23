@@ -116,6 +116,25 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       modal = document.getElementById('myModal')
       span = document.getElementsByClassName("close")[0]
 
+      last_well_number = 0
+      last_target_channel = 0
+      last_target_assigned = 0
+
+      $scope.registerOutsideHover = false;
+      unhighlight_event = ''
+
+      if !$scope.registerOutsideHover
+        $scope.registerOutsideHover = angular.element(window).on 'mousemove', (e)->
+          if !angular.element(e.target).parents('.well-switch').length and !angular.element(e.target).parents('.well-item-row').length 
+            if unhighlight_event
+              $rootScope.$broadcast unhighlight_event, {}
+              unhighlight_event = ''
+              last_well_number = 0
+              last_target_channel = 0
+              last_target_assigned = 0
+
+          $scope.$apply()
+
       $scope.toggleOmitIndex = (well_item) ->
         omit_index = well_item.well_num.toString() + '_' + well_item.channel.toString()
         if $scope.omittedIndexes.indexOf(omit_index) != -1
@@ -419,15 +438,22 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       updateButtonCts = ->
         for well_i in [0..15] by 1
+          channel_1_well = _.find $scope.well_data, (item) ->
+            item.well_num is well_i+1 and item.channel is 1
+
+          channel_2_well = _.find $scope.well_data, (item) ->
+            item.well_num is well_i+1 and item.channel is 2
+
+          $scope.wellButtons["well_#{well_i}"].well_type = []
+          $scope.wellButtons["well_#{well_i}"].well_type.push(if channel_1_well then channel_1_well.well_type else '')
+          $scope.wellButtons["well_#{well_i}"].well_type.push(if channel_2_well then channel_2_well.well_type else '')
+
           cts = _.filter AMPLI_DATA_CACHE.summary_data, (ct) ->
             ct[1] is well_i+1
 
           $scope.wellButtons["well_#{well_i}"].ct = []
           for ct_i in [0..cts.length - 1] by 1
             $scope.wellButtons["well_#{well_i}"].ct.push(cts[ct_i][3])
-
-          # $scope.wellButtons["well_#{well_i}"].ct.push( cts[0][4] * Math.pow(10, cts[0][5]) )
-          # $scope.wellButtons["well_#{well_i}"].ct.push( if (cts[1]) then cts[1][4] * Math.pow(10, cts[1][5]) else null)
 
         return
         # for well_i in [0..15] by 1
@@ -576,6 +602,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $scope.bgcolor_target = { 'background-color':'#666' }
 
       $scope.onSelectRow = (well_item, index) ->
+        for well_i in [0..$scope.well_data.length - 1]
+          $scope.well_data[well_i].highlight = false
+
         omit_index = well_item.well_num.toString() + '_' + well_item.channel.toString()
         if !$scope.has_init or (($scope.wellButtons['well_' + (well_item.well_num - 1)].selected) and ($scope.omittedIndexes.indexOf(omit_index) == -1) and ($scope.targetsSetHided[$scope.targets[index].id]))
           if !well_item.active
@@ -583,14 +612,119 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           else
             $rootScope.$broadcast 'event:amp-unselect-row', {well: well_item.well_num, channel: well_item.channel}
 
-      $scope.onSelectSimpleRow = (well_item, well_target) ->
-        omit_index = well_item.well_num.toString() + '_' + well_target.channel.toString()
-        if well_target.assigned and $scope.omittedIndexes.indexOf(omit_index) == -1          
-          if !well_item.active or $scope.active_cell != omit_index
-            $scope.active_cell = omit_index
-            $rootScope.$broadcast 'event:amp-select-row', {well: well_item.well_num, channel: well_target.channel}
+      $scope.onSelectSimpleRow = (event, well_item, well_target) ->
+        isTargetCell = angular.element(event.target).parents('td').hasClass('target-cell')
+        if isTargetCell and well_target
+          omit_index = well_item.well_num.toString() + '_' + well_target.channel.toString()
+          if well_target.assigned and $scope.omittedIndexes.indexOf(omit_index) == -1          
+            if !well_item.active or $scope.active_cell != omit_index
+              $scope.active_cell = omit_index
+              $rootScope.$broadcast 'event:amp-select-row', {well: well_item.well_num, channel: well_target.channel}
+            else
+              $rootScope.$broadcast 'event:amp-unselect-row', {well: well_item.well_num, channel: well_target.channel}
+
+      $scope.isTargetHover = (well_item) ->
+        for target_index in [0..well_item.targets.length - 1]
+          if well_item.targets[target_index].selected
+            return true
+        return false
+
+      $scope.onHoverRow = (event, well_item, index) ->
+        is_active_line = false
+        for well_i in [0..$scope.well_data.length - 1]
+          if $scope.well_data[well_i].active
+            is_active_line = true
+            break
+
+        if is_active_line or (last_well_number == well_item.well_num and last_target_channel == well_item.channel)
+          return
+
+        last_well_number = well_item.well_num
+        last_target_channel = well_item.channel
+
+        omit_index = well_item.well_num.toString() + '_' + well_item.channel.toString()
+        if !$scope.has_init or (($scope.wellButtons['well_' + (well_item.well_num - 1)].selected) and ($scope.omittedIndexes.indexOf(omit_index) == -1) and ($scope.targetsSetHided[$scope.targets[index].id]))
+          if !well_item.active
+            $rootScope.$broadcast 'event:amp-highlight-row', { well_datas: [{well: well_item.well_num, channel: well_item.channel}], well_index: well_item.well_num - 1 }
+            unhighlight_event = 'event:amp-unhighlight-row'
+
+      $scope.onHoverSimpleRow = (event, well_item) ->
+        is_active_line = false
+        for well_i in [0..$scope.simple_well_data.length - 1]
+          if $scope.simple_well_data[well_i].active
+            is_active_line = true
+            break
+
+        tdElem = if angular.element(event.target).hasClass('target-cell') then angular.element(event.target) else angular.element(event.target).parents('td.target-cell')
+        target_channel = angular.element(tdElem).data('channel')
+        target_assigned = angular.element(tdElem).hasClass('assigned')
+
+        if is_active_line or (last_well_number is well_item.well_num and last_target_channel is target_channel and last_target_assigned is target_assigned)
+          return
+
+        last_well_number = well_item.well_num
+        last_target_channel = target_channel
+        last_target_assigned = target_assigned
+
+        if !(target_channel and target_assigned)
+          if !well_item.active
+            $rootScope.$broadcast 'event:amp-highlight-row', { well_datas: [{well: well_item.well_num, channel: 0}], well_index: well_item.well_num - 1 }
+            unhighlight_event = 'event:amp-unhighlight-row'
+        else
+          omit_index = well_item.well_num.toString() + '_' + target_channel.toString()
+          if last_target_assigned and $scope.omittedIndexes.indexOf(omit_index) == -1          
+            if !well_item.active or $scope.active_cell != omit_index
+              $scope.active_cell = omit_index              
+              $rootScope.$broadcast 'event:amp-highlight-row', { well_datas: [{well: well_item.well_num, channel: target_channel}], well_index: well_item.well_num - 1 }
+              unhighlight_event = 'event:amp-unhighlight-row'
+
+      $scope.onHighlightLines = (configs, well_index) ->
+        for well_i in [0..$scope.well_data.length - 1]
+          $scope.well_data[well_i].active = false
+          $scope.well_data[well_i].highlight = false
+        
+        for well_i in [0..$scope.well_data.length - 1]
+          for config, i in configs by 1
+            if ($scope.well_data[well_i].well_num - 1 == config.config.well and $scope.well_data[well_i].channel == config.config.channel)
+              $scope.well_data[well_i].highlight = true
+        
+        for well_i in [0..$scope.simple_well_data.length - 1]
+          $scope.simple_well_data[well_i].active = false
+          $scope.simple_well_data[well_i].highlight = false
+          for target_index in [0..$scope.simple_well_data[well_i].targets.length - 1]
+            $scope.simple_well_data[well_i].targets[target_index].selected = false
+
+        for well_i in [0..$scope.simple_well_data.length - 1]
+          if configs.length == 1
+            config = configs[0]
+            if ($scope.simple_well_data[well_i].well_num - 1 == config.config.well)
+              $scope.simple_well_data[well_i].highlight = true
+              for target_index in [0..$scope.simple_well_data[well_i].targets.length - 1]
+                if $scope.simple_well_data[well_i].targets[target_index].assigned and $scope.simple_well_data[well_i].targets[target_index].channel == config.config.channel
+                  $scope.simple_well_data[well_i].targets[target_index].selected = true
           else
-            $rootScope.$broadcast 'event:amp-unselect-row', {well: well_item.well_num, channel: well_target.channel}
+            if ($scope.simple_well_data[well_i].well_num - 1 == config.config.well)
+              $scope.simple_well_data[well_i].highlight = true
+              for target_index in [0..$scope.simple_well_data[well_i].targets.length - 1]
+                $scope.simple_well_data[well_i].targets[target_index].selected = false
+
+        for i in [0..15] by 1
+          $scope.wellButtons["well_#{i}"].active = (i == well_index)
+
+        dual_value = if $scope.is_dual_channel then 2 else 1
+        config = configs[0]
+        if !$scope.isSampleMode
+          wellScrollTop = (config.config.well * dual_value + config.config.channel - 1 + dual_value) * 36 - document.querySelector('.detail-mode-table tbody').offsetHeight
+          angular.element('.detail-mode-table tbody').animate { scrollTop: wellScrollTop }, 'fast'
+        else
+          wellScrollTop = (config.config.well + config.config.channel - 1 + dual_value) * 36 - document.querySelector('.simple-mode-table tbody').offsetHeight
+          angular.element('.simple-mode-table tbody').animate { scrollTop: wellScrollTop }, 'fast'
+
+        return
+
+      $scope.onUnHighlightLines = (configs) ->
+        $scope.onUnselectLine()
+        return
 
       $scope.onSelectLine = (config) ->
         $scope.bgcolor_target = { 'background-color':'black' }
@@ -603,7 +737,17 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $scope.well_data[well_i].active = ($scope.well_data[well_i].well_num - 1 == config.config.well and $scope.well_data[well_i].channel == config.config.channel)
 
         for well_i in [0..$scope.simple_well_data.length - 1]
-          $scope.simple_well_data[well_i].active = ($scope.simple_well_data[well_i].well_num - 1 == config.config.well)
+          $scope.simple_well_data[well_i].active = false
+          $scope.simple_well_data[well_i].highlight = false
+          for target_index in [0..$scope.simple_well_data[well_i].targets.length - 1]
+            $scope.simple_well_data[well_i].targets[target_index].selected = false
+
+        for well_i in [0..$scope.simple_well_data.length - 1]
+          if ($scope.simple_well_data[well_i].well_num - 1 == config.config.well)
+            $scope.simple_well_data[well_i].active = ($scope.simple_well_data[well_i].well_num - 1 == config.config.well)
+            for target_index in [0..$scope.simple_well_data[well_i].targets.length - 1]
+              if $scope.simple_well_data[well_i].targets[target_index].assigned and $scope.simple_well_data[well_i].targets[target_index].channel == config.config.channel
+                $scope.simple_well_data[well_i].targets[target_index].selected = true
 
         for i in [0..15] by 1
           $scope.wellButtons["well_#{i}"].active = (i == config.config.well)
@@ -636,15 +780,23 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8']
             $scope.label_well = wells[i]
 
-        wellScrollTop = (config.config.well * dual_value + config.config.channel - 1 + dual_value) * 36 - document.querySelector('.table-container').offsetHeight
-        angular.element(document.querySelector('.table-container')).animate { scrollTop: wellScrollTop }, 'fast'
+        if !$scope.isSampleMode
+          wellScrollTop = (config.config.well * dual_value + config.config.channel - 1 + dual_value) * 36 - document.querySelector('.detail-mode-table tbody').offsetHeight
+          angular.element('.detail-mode-table tbody').animate { scrollTop: wellScrollTop }, 'fast'
+        else
+          wellScrollTop = (config.config.well + config.config.channel - 1 + dual_value) * 36 - document.querySelector('.simple-mode-table tbody').offsetHeight
+          angular.element('.simple-mode-table tbody').animate { scrollTop: wellScrollTop }, 'fast'
           
       $scope.onUnselectLine = ->
         for well_i in [0..$scope.well_data.length - 1]
           $scope.well_data[well_i].active = false
+          $scope.well_data[well_i].highlight = false
 
         for well_i in [0..$scope.simple_well_data.length - 1]
           $scope.simple_well_data[well_i].active = false
+          $scope.simple_well_data[well_i].highlight = false
+          for target_index in [0..$scope.simple_well_data[well_i].targets.length - 1]
+            $scope.simple_well_data[well_i].targets[target_index].selected = false
 
 
         for i in [0..15] by 1
@@ -767,5 +919,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.onChangeViewMode = ->
         $scope.isSampleMode = !$scope.isSampleMode
         $rootScope.$broadcast 'event:switch-view-mode'
+        last_well_number = 0
+        last_target_channel = 0
+        last_target_assigned = 0
 
 ]

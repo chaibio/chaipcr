@@ -16,6 +16,8 @@ window.App.directive 'amplificationChart', [
         onUpdateProperties: '&'
         onSelectLine: '&'
         onUnselectLine: '&'
+        onHighlightLines: '&'
+        onUnHighlightLines: '&'
         show: '='
       link: ($scope, elem, attrs) ->
 
@@ -38,6 +40,8 @@ window.App.directive 'amplificationChart', [
           chart.onZoomAndPan($scope.onZoom())
           chart.onSelectLine($scope.onSelectLine())
           chart.onUnselectLine($scope.onUnselectLine())
+          chart.onHighlightLines($scope.onHighlightLines())
+          chart.onUnHighlightLines($scope.onUnHighlightLines())
 
           chart.onUpdateProperties($scope.onUpdateProperties())
 
@@ -47,10 +51,22 @@ window.App.directive 'amplificationChart', [
           # $scope.onUpdateProperties()($scope.label_cycle, $scope.label_RFU, $scope.label_dF_dC, $scope.label_D2_dc2)
         
         $scope.$on 'event:amp-select-row', (e, data, oldData) ->
-          chart.activeLine(data, true)
-        
+          if chart
+            chart.unsetHighlightPaths()
+            chart.activeLine(data, true)
+          
         $scope.$on 'event:amp-unselect-row', (e, data, oldData) ->
-          chart.unsetActivePath()
+          if chart
+            chart.unsetActivePath(data)
+
+        $scope.$on 'event:amp-highlight-row', (e, data, oldData) ->
+          if chart
+            chart.unsetActivePath()
+            chart.highlightLine(data, true)
+        
+        $scope.$on 'event:amp-unhighlight-row', (e, data, oldData) ->
+          if chart
+            chart.unsetHighlightPaths()
 
         $scope.$on 'window:resize', ->
           if chart and $scope.show

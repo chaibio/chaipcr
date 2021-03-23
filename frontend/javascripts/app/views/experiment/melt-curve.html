@@ -87,7 +87,19 @@ limitations under the License.
                     <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
                     <p class="B2">May take a minute</p>
                   </div>
-                  <melt-curve-chart data="data" config="config" zoom="mc_zoom" on-zoom="onZoom" on-select-line="onSelectLine" on-unselect-line="onUnselectLine" on-update-properties="onUpdateProperties" scroll="mc_scroll.value" show="showMeltCurveChart"></melt-curve-chart>
+                  <melt-curve-chart 
+                    data="data" 
+                    config="config" 
+                    zoom="mc_zoom" 
+                    on-zoom="onZoom" 
+                    on-select-line="onSelectLine" 
+                    on-unselect-line="onUnselectLine" 
+                    on-update-properties="onUpdateProperties" 
+                    on-highlight-lines="onHighlightLines" 
+                    on-un-highlight-lines="onUnHighlightLines"
+                    scroll="mc_scroll.value" 
+                    show="showMeltCurveChart"
+                  ></melt-curve-chart>
                 </div>
                 <div class="zoom-box">
                   <div class="zoom-button-divider">
@@ -171,7 +183,7 @@ limitations under the License.
         </div>
       </div>
       <div class="table-container" force="true">
-        <table fixed-result-header offset="0" min-width="620">
+        <table fixed-result-header offset="0" min-width="620" class="detail-mode-table">
           <thead>
             <tr>
               <th class="CB4-M item-center" width="35px">Clr</th>
@@ -193,9 +205,12 @@ limitations under the License.
                   (wellButtons['well_' + (well_item.well_num - 1)].selected) &&                 
                   (targetsSetHided[targets[config.channels * (well_item.well_num - 1) + well_item.channel - 1].id])),
                 active: well_item.active,
+                highlight: well_item.highlight,
                 omitted: (omittedIndexes.indexOf($index) != -1)
               }"
               ng-if="well_item.target_id"
+              ng-mousemove="onHoverRow($event, well_item, $index)"
+              class="well-item-row"              
             >
               <td class="CB4 item-center" ng-click="onSelectRow(well_item, $index)" style="background: #fff">
                 <span ng-if="color_by==='well'" class="CB4 dot" ng-attr-style="background-color: {{wellButtons['well_'+(well_item.well_num - 1)].color}}"></span>

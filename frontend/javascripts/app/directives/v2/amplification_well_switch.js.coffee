@@ -36,7 +36,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
       labelUnit: '=?'
       chartType: '@'
 
-    templateUrl: 'app/views/directives/chart-well-switch.html',
+    templateUrl: 'app/views/directives/v2/chart-well-switch.html',
     link: ($scope, elem, attrs, ngModel) ->
 
       COLORS = AmplificationChartHelper.SAMPLE_TARGET_COLORS
@@ -47,6 +47,24 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
       $scope.dragging = false
       $scope.shiftStartIndex = -1
       $scope.initTargetSelect = false
+      $scope.wellTypeIcons = 
+        positive_control: '/images/ring_plus.svg'
+        negative_control: '/images/ring_neg.svg'
+        standard: '/images/ring_s.svg'
+        unknown: '/images/ring_u.svg'
+
+
+      $scope.registerOutsideHover = false;
+      unhighlight_event = ''
+
+      if !$scope.registerOutsideHover
+        $scope.registerOutsideHover = angular.element(window).on 'mousemove', (e)->
+          if !angular.element(e.target).parents('.well-switch').length and !angular.element(e.target).parents('.well-item-row').length
+            if unhighlight_event
+              $rootScope.$broadcast unhighlight_event, {}
+              unhighlight_event = ''
+
+          $scope.$apply()
 
       $scope.$on 'keypressed:command', ->
         is_cmd_key_held = true
@@ -73,9 +91,10 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
           selected: true
           active: false
           color: well_color
+          well_type: ['', '']
 
       ngModel.$setViewValue wells
-      $scope.wells = wells      
+      $scope.wells = wells
 
       $scope.row_header_width = 20
       $scope.columns = []
@@ -106,6 +125,15 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
       , (actives) ->
         for a, i in actives by 1
           $scope.wells["well_#{i}"].active = a if $scope.wells["well_#{i}"]        
+
+      $scope.$watchCollection ->
+        well_types = []
+        for i in [0..15] by 1
+          well_types.push ngModel.$modelValue["well_#{i}"].well_type
+        return well_types
+      , (well_types) ->
+        for a, i in well_types by 1
+          $scope.wells["well_#{i}"].well_type = a if $scope.wells["well_#{i}"]        
 
       $scope.$watch 'colorBy', (color_by) ->
         for i in [0..15] by 1
@@ -183,6 +211,31 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
         ngModel.$setViewValue(angular.copy($scope.wells))
 
         $rootScope.$broadcast 'event:switch-chart-well', {active: well?.active, index: 0}
+
+      hoverTarget = null
+      $scope.wellHover = (evt, type, index) ->
+        selectedWell = $scope.wells['well_' + index]
+        wellData = []
+        currentTarget = null
+
+        if selectedWell.selected and !$scope.dragging and (!selectedWell.active or hoverTarget)
+          hoverTarget = null
+          if $scope.chartType == 'amplification'
+            $rootScope.$broadcast 'event:amp-highlight-row', { well_datas: [{well: index + 1, channel: 0}], well_index: index }
+            unhighlight_event = 'event:amp-unhighlight-row'
+          else if $scope.chartType == 'melt-curve'
+            $rootScope.$broadcast 'event:melt-highlight-row', { well_datas: [{well: index + 1, channel: 0}], well_index: index }
+            unhighlight_event = 'event:melt-unhighlight-row'
+
+        else
+          if !selectedWell.selected and !$scope.dragging
+            if $scope.chartType == 'amplification'
+              $rootScope.$broadcast 'event:amp-unhighlight-row', {well: index + 1, channel: 0}
+            else
+              $rootScope.$broadcast 'event:melt-unhighlight-row', {well: index + 1, channel: 0}
+            unhighlight_event = ''
+
+          $scope.dragged(evt, type, index)
 
       $scope.dragStart = (evt, type, index) ->
         # type can be 'column', 'row', 'well' or 'corner'
@@ -269,6 +322,7 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
 
 
       $scope.dragStop = (evt, type, index) ->
+        return if !$scope.dragging
 
         $scope.dragging = false
 
@@ -342,8 +396,14 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
 
       $scope.getWellContainerStyle = (row, col, well, i) ->
         style = {}
+        style.height = "100%"
+        style.background = 'inherit'
+
         if well.active && well.selected
           style.width = "#{Math.round(@getCellWidth() + ACTIVE_BORDER_WIDTH * 4)}px"
+        else
+          style.width = "#{Math.round(@getCellWidth()) - 2}px"
+
         return style
 
       $scope.displayCt = (ct) ->
