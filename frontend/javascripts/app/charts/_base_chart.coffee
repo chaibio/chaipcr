@@ -4,7 +4,7 @@ class BaseChart
 
   NORMAL_PATH_STROKE_WIDTH: 2
   HOVERED_PATH_STROKE_WIDTH: 3
-  ACTIVE_PATH_STROKE_WIDTH: 4
+  ACTIVE_PATH_STROKE_WIDTH: 5
   CIRCLE_STROKE_WIDTH: 2
   CIRCLE_RADIUS: 7
   
@@ -124,6 +124,44 @@ class BaseChart
 
   showMouseIndicators: ->
     @circle.attr('opacity', 1) if (@circle and @activePath)
+
+
+  raiseActivePath: () ->
+    if @activePath
+      @whiteBorderLine.raise()
+      @activePath.raise()
+      @circle.raise()
+
+  setHoveredPathPack: () ->
+    @raiseActivePath()
+    return if not @hoveredLine
+    @hoveredPathConfig = @getPathConfig(@hoveredLine)
+    return if !@hoveredPathConfig.config
+    lineConfig = @hoveredPathConfig.config
+    lineIndex = @hoveredPathConfig.index
+    @makeHoveredWhiteBorderLine(lineConfig)
+    @hoveredLine.raise()
+
+  makeHoveredWhiteBorderLine: (line_config) ->
+    xScale = @getXScale()
+    yScale = @getYScale()
+    line = d3.line()
+    if @hoveredWhiteBorderLine then @hoveredWhiteBorderLine.remove()
+    line.curve(@getLineCurve())
+    line.x (d) -> xScale(d[line_config.x])
+    line.y (d) -> yScale(d[line_config.y])
+    if (@config.axes.y.scale is 'log') then line.defined (d) -> d[line_config.y] > 10
+    @hoveredWhiteBorderLine = @viewSVG.append("path")
+        .datum(@data[line_config.dataset])
+        .attr("class", "white-border-line")
+        .attr("stroke", "#fff")
+        .attr('fill', 'none')
+        .attr("d", line)
+        .attr('stroke-width', @HOVERED_PATH_STROKE_WIDTH * 2)
+
+  unsetHoveredWhiteBorderLine: () ->
+    if @hoveredWhiteBorderLine then @hoveredWhiteBorderLine.remove()
+    @hoveredWhiteBorderLine = null
 
   setActivePath: (path, mouse) ->
     if (@activePath)
@@ -363,12 +401,14 @@ class BaseChart
           if (_path isnt @activePath)
             _path.attr('stroke-width', @HOVERED_PATH_STROKE_WIDTH)
             @hoveredLine = _path
+            @setHoveredPathPack()
             @hovering = true
           @mouseMoveCb()
         )
         .on('mouseout', (e, a, path) =>
           if (_path isnt @activePath)
             _path.attr('stroke-width', @NORMAL_PATH_STROKE_WIDTH)
+            @unsetHoveredWhiteBorderLine()
             @hovering = false
         )
 
@@ -387,7 +427,7 @@ class BaseChart
         .attr("stroke", "#fff")
         .attr('fill', 'none')
         .attr("d", line)
-        .attr('stroke-width', @ACTIVE_PATH_STROKE_WIDTH * 3)
+        .attr('stroke-width', @ACTIVE_PATH_STROKE_WIDTH + 4)
 
   drawLines: ->
     
@@ -450,7 +490,7 @@ class BaseChart
           @unsetActivePath()
           if @hoveredLine
             mouse = @getMousePosition(@mouseOverlay.node())
-            @setActivePath(@hoveredLine, mouse)          
+            @setActivePath(@hoveredLine, mouse)
         )
 
     if @activePathConfig
@@ -1565,6 +1605,8 @@ class BaseChart
         if @hoveredLine
           @hoveredLine.attr('stroke-width', @NORMAL_PATH_STROKE_WIDTH)
           @hoveredLine = null
+          @unsetHoveredWhiteBorderLine()
+          @raiseActivePath()
 
       if !@activePath
         @hideMouseIndicators()
@@ -1611,17 +1653,23 @@ class BaseChart
       if distances[closestLineIndex] > maxDistance
         closestLineIndex = undefined
         @hoveredLine = null
+        @raiseActivePath()
+
       if @prevClosestLineIndex isnt closestLineIndex
         if @prevClosestLineIndex isnt undefined and @lines[@prevClosestLineIndex]
           @lines.forEach (line) =>
             if line isnt @activePath and line isnt @hoveredLine and !@hovering
               line.attr('stroke-width', @NORMAL_PATH_STROKE_WIDTH)
+              @unsetHoveredWhiteBorderLine()
           if !@hovering and @hoveredLine
             @hoveredLine.attr('stroke-width', @NORMAL_PATH_STROKE_WIDTH)
             @hoveredLine = null
+            @unsetHoveredWhiteBorderLine()
+            @raiseActivePath()            
         if (closestLineIndex isnt undefined) and !@hovering and (@lines[closestLineIndex] isnt @activePath)
           @lines[closestLineIndex].attr('stroke-width', @HOVERED_PATH_STROKE_WIDTH)
           @hoveredLine = @lines[closestLineIndex]
+          @setHoveredPathPack()
         @prevClosestLineIndex = closestLineIndex
 
   _getTransformXFromScroll: (scroll) ->

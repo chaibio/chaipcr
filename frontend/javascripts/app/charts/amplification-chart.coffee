@@ -289,7 +289,7 @@ class AmplificationChart extends window.ChaiBioCharts.BaseChart
         .attr("stroke", "#fff")
         .attr('fill', 'none')
         .attr("d", line)
-        .attr('stroke-width', @HOVERED_PATH_STROKE_WIDTH *2.5)
+        .attr('stroke-width', @HOVERED_PATH_STROKE_WIDTH *2)
     @highlightBorderPaths.push(newBorderLine)
 
   setMultipleHighlightPath: (paths, well_index) ->

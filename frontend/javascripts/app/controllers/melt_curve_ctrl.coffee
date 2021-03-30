@@ -89,7 +89,6 @@ App.controller 'MeltCurveChartCtrl', [
       if !$scope.registerOutsideHover
         $scope.registerOutsideHover = angular.element(window).on 'mousemove', (e)->
           if !angular.element(e.target).parents('.well-switch').length and !angular.element(e.target).parents('.well-item-row').length 
-            console.log('--unhighlight_event--', unhighlight_event)
             if unhighlight_event
               $rootScope.$broadcast unhighlight_event, {}
               unhighlight_event = ''
@@ -208,6 +207,16 @@ App.controller 'MeltCurveChartCtrl', [
           if $scope.wellButtons["well_#{well_data.well_num - 1}"].ct == undefined
             $scope.wellButtons["well_#{well_data.well_num - 1}"].ct = ['', '']
           $scope.wellButtons["well_#{well_data.well_num - 1}"].ct[well_data.channel - 1] = MeltCurveService.averagedTm(well_data.tm)
+
+          channel_1_well = _.find $scope.well_data, (item) ->
+            item.well_num is well_i+1 and item.channel is 1
+
+          channel_2_well = _.find $scope.well_data, (item) ->
+            item.well_num is well_i+1 and item.channel is 2
+
+          $scope.wellButtons["well_#{well_i}"].well_type = []
+          $scope.wellButtons["well_#{well_i}"].well_type.push(if channel_1_well then channel_1_well.well_type else '')
+          $scope.wellButtons["well_#{well_i}"].well_type.push(if channel_2_well then channel_2_well.well_type else '')
 
         $scope.updateTargetsSet()
         updateSeries()
@@ -508,9 +517,10 @@ App.controller 'MeltCurveChartCtrl', [
 
             wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8']
             $scope.label_well = wells[i]
-
-        wellScrollTop = (config.config.well * dual_value + config.config.channel - 1 + dual_value) * 36 - document.querySelector('.detail-mode-table tbody').offsetHeight
-        angular.element('.detail-mode-table tbody').animate { scrollTop: wellScrollTop }, 'fast'
+  
+        if !unhighlight_event
+          wellScrollTop = (config.config.well * dual_value + config.config.channel - 1 + dual_value) * 36 - document.querySelector('.detail-mode-table tbody').offsetHeight
+          angular.element('.detail-mode-table tbody').animate { scrollTop: wellScrollTop }, 'fast'
           
       $scope.onUnselectLine = ->
         for well_i in [0..$scope.well_data.length - 1]
@@ -570,8 +580,10 @@ App.controller 'MeltCurveChartCtrl', [
 
         dual_value = if $scope.is_dual_channel then 2 else 1
         config = configs[0]
-        wellScrollTop = (config.config.well * dual_value + config.config.channel - 1 + dual_value) * 36 - document.querySelector('.detail-mode-table tbody').offsetHeight
-        angular.element('.detail-mode-table tbody').animate { scrollTop: wellScrollTop }, 'fast'
+
+        if !unhighlight_event && config
+          wellScrollTop = (config.config.well * dual_value + config.config.channel - 1 + dual_value) * 36 - document.querySelector('.detail-mode-table tbody').offsetHeight
+          angular.element('.detail-mode-table tbody').animate { scrollTop: wellScrollTop }, 'fast'
 
         return
 

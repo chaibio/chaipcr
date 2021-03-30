@@ -713,12 +713,14 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
         dual_value = if $scope.is_dual_channel then 2 else 1
         config = configs[0]
-        if !$scope.isSampleMode
-          wellScrollTop = (config.config.well * dual_value + config.config.channel - 1 + dual_value) * 36 - document.querySelector('.detail-mode-table tbody').offsetHeight
-          angular.element('.detail-mode-table tbody').animate { scrollTop: wellScrollTop }, 'fast'
-        else
-          wellScrollTop = (config.config.well + config.config.channel - 1 + dual_value) * 36 - document.querySelector('.simple-mode-table tbody').offsetHeight
-          angular.element('.simple-mode-table tbody').animate { scrollTop: wellScrollTop }, 'fast'
+
+        if !unhighlight_event && config
+          if !$scope.isSampleMode
+            wellScrollTop = (config.config.well * dual_value + config.config.channel - 1 + dual_value) * 36 - document.querySelector('.detail-mode-table tbody').offsetHeight
+            angular.element('.detail-mode-table tbody').animate { scrollTop: wellScrollTop }, 'fast'
+          else
+            wellScrollTop = (config.config.well + config.config.channel - 1 + dual_value) * 36 - document.querySelector('.simple-mode-table tbody').offsetHeight
+            angular.element('.simple-mode-table tbody').animate { scrollTop: wellScrollTop }, 'fast'
 
         return
 
@@ -780,12 +782,13 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8']
             $scope.label_well = wells[i]
 
-        if !$scope.isSampleMode
-          wellScrollTop = (config.config.well * dual_value + config.config.channel - 1 + dual_value) * 36 - document.querySelector('.detail-mode-table tbody').offsetHeight
-          angular.element('.detail-mode-table tbody').animate { scrollTop: wellScrollTop }, 'fast'
-        else
-          wellScrollTop = (config.config.well + config.config.channel - 1 + dual_value) * 36 - document.querySelector('.simple-mode-table tbody').offsetHeight
-          angular.element('.simple-mode-table tbody').animate { scrollTop: wellScrollTop }, 'fast'
+        if !unhighlight_event          
+          if !$scope.isSampleMode
+            wellScrollTop = (config.config.well * dual_value + config.config.channel - 1 + dual_value) * 36 - document.querySelector('.detail-mode-table tbody').offsetHeight
+            angular.element('.detail-mode-table tbody').animate { scrollTop: wellScrollTop }, 'fast'
+          else
+            wellScrollTop = (config.config.well + config.config.channel - 1 + dual_value) * 36 - document.querySelector('.simple-mode-table tbody').offsetHeight
+            angular.element('.simple-mode-table tbody').animate { scrollTop: wellScrollTop }, 'fast'
           
       $scope.onUnselectLine = ->
         for well_i in [0..$scope.well_data.length - 1]

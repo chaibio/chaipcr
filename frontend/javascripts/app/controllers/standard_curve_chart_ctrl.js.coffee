@@ -287,6 +287,16 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
 
       updateButtonCts = ->
         for well_i in [0..15] by 1
+          channel_1_well = _.find $scope.well_data, (item) ->
+            item.well_num is well_i+1 and item.channel is 1
+
+          channel_2_well = _.find $scope.well_data, (item) ->
+            item.well_num is well_i+1 and item.channel is 2
+
+          $scope.wellButtons["well_#{well_i}"].well_type = []
+          $scope.wellButtons["well_#{well_i}"].well_type.push(if channel_1_well then channel_1_well.well_type else '')
+          $scope.wellButtons["well_#{well_i}"].well_type.push(if channel_2_well then channel_2_well.well_type else '')
+
           cts = _.filter AMPLI_DATA_CACHE.summary_data, (ct) ->
             ct[1] is well_i+1
 
