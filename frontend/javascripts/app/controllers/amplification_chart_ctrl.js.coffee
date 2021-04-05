@@ -702,7 +702,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               for target_index in [0..$scope.simple_well_data[well_i].targets.length - 1]
                 if $scope.simple_well_data[well_i].targets[target_index].assigned and $scope.simple_well_data[well_i].targets[target_index].channel == config.config.channel
                   $scope.simple_well_data[well_i].targets[target_index].selected = true
-          else
+          else if configs.length > 1
             if ($scope.simple_well_data[well_i].well_num - 1 == config.config.well)
               $scope.simple_well_data[well_i].highlight = true
               for target_index in [0..$scope.simple_well_data[well_i].targets.length - 1]

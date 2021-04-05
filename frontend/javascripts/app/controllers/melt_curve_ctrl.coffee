@@ -98,8 +98,8 @@ App.controller 'MeltCurveChartCtrl', [
 
           $scope.$apply()
 
-      $scope.toggleOmitIndex = (omit_index) ->
-      
+      $scope.toggleOmitIndex = (well_item) ->
+        omit_index = well_item.well_num.toString() + '_' + well_item.channel.toString()
         if $scope.omittedIndexes.indexOf(omit_index) != -1
           $scope.omittedIndexes.splice $scope.omittedIndexes.indexOf(omit_index), 1
         else
@@ -289,10 +289,7 @@ App.controller 'MeltCurveChartCtrl', [
             $scope.config.series.push(nonGreySeries[i])
 
       getWellDataIndex = (well_num, channel) ->
-        for i in [0..$scope.well_data.length - 1] by 1
-          if $scope.well_data[i].well_num is well_num and $scope.well_data[i].channel is channel
-            return i
-        return -1
+        return well_num.toString() + '_' + channel
 
       $scope.onUpdateProperties = (temp, norm, dF_dt) ->
         $scope.label_Temp = temp
@@ -435,8 +432,9 @@ App.controller 'MeltCurveChartCtrl', [
         config.config.channel = well_item.channel
 
         dual_value = if $scope.is_dual_channel then 2 else 1
+        omit_index = well_item.well_num.toString() + '_' + well_item.channel.toString()
 
-        if $scope.wellButtons['well_' + (well_item.well_num - 1)].selected and $scope.omittedIndexes.indexOf(index) == -1 and $scope.targetsSetHided[$scope.targets[index].id]
+        if $scope.wellButtons['well_' + (well_item.well_num - 1)].selected and $scope.omittedIndexes.indexOf(omit_index) == -1 and $scope.targetsSetHided[$scope.targets[index].id]
           for well_i in [0..$scope.well_data.length - 1]
             $scope.well_data[well_i].active = ($scope.well_data[well_i].well_num - 1 == config.config.well and $scope.well_data[well_i].channel == config.config.channel)
 
@@ -475,7 +473,8 @@ App.controller 'MeltCurveChartCtrl', [
           $scope.bgcolor_target = { 'background-color':'#666' }
 
       $scope.onSelectRow = (well_item, index) ->
-        if !$scope.has_init or (($scope.wellButtons['well_' + (well_item.well_num - 1)].selected) and ($scope.omittedIndexes.indexOf(index) == -1) and ($scope.targetsSetHided[$scope.targets[index].id]))
+        omit_index = well_item.well_num.toString() + '_' + well_item.channel.toString()
+        if !$scope.has_init or (($scope.wellButtons['well_' + (well_item.well_num - 1)].selected) and ($scope.omittedIndexes.indexOf(omit_index) == -1) and ($scope.targetsSetHided[$scope.targets[index].id]))
           if !well_item.active
             $rootScope.$broadcast 'event:melt-select-row', {well: well_item.well_num, channel: well_item.channel}
           else

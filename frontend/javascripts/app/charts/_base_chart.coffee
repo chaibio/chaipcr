@@ -4,7 +4,7 @@ class BaseChart
 
   NORMAL_PATH_STROKE_WIDTH: 2
   HOVERED_PATH_STROKE_WIDTH: 3
-  ACTIVE_PATH_STROKE_WIDTH: 5
+  ACTIVE_PATH_STROKE_WIDTH: 3
   CIRCLE_STROKE_WIDTH: 2
   CIRCLE_RADIUS: 7
   
@@ -133,7 +133,6 @@ class BaseChart
       @circle.raise()
 
   setHoveredPathPack: () ->
-    @raiseActivePath()
     return if not @hoveredLine
     @hoveredPathConfig = @getPathConfig(@hoveredLine)
     return if !@hoveredPathConfig.config
@@ -141,6 +140,7 @@ class BaseChart
     lineIndex = @hoveredPathConfig.index
     @makeHoveredWhiteBorderLine(lineConfig)
     @hoveredLine.raise()
+    @raiseActivePath()
 
   makeHoveredWhiteBorderLine: (line_config) ->
     xScale = @getXScale()
@@ -157,7 +157,7 @@ class BaseChart
         .attr("stroke", "#fff")
         .attr('fill', 'none')
         .attr("d", line)
-        .attr('stroke-width', @HOVERED_PATH_STROKE_WIDTH * 2)
+        .attr('stroke-width', @HOVERED_PATH_STROKE_WIDTH * 3)
 
   unsetHoveredWhiteBorderLine: () ->
     if @hoveredWhiteBorderLine then @hoveredWhiteBorderLine.remove()
@@ -427,7 +427,7 @@ class BaseChart
         .attr("stroke", "#fff")
         .attr('fill', 'none')
         .attr("d", line)
-        .attr('stroke-width', @ACTIVE_PATH_STROKE_WIDTH + 4)
+        .attr('stroke-width', @ACTIVE_PATH_STROKE_WIDTH *3)
 
   drawLines: ->
     

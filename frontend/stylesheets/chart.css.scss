@@ -688,6 +688,17 @@
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
+          position: relative;
+
+          .data-point{
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: absolute;
+            left: 10px;
+            right: 10px;
+            top: 8px;            
+          }
 
           .target-name{
             max-width: 90px;

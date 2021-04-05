@@ -85,9 +85,29 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
       $scope.plot_bgcolor_target = {
         'background-color':'#666666'
       }
+
+      last_well_number = 0
+      last_target_channel = 0
+      last_target_assigned = 0
+
+      $scope.registerOutsideHover = false;
+      unhighlight_event = ''
+
+      if !$scope.registerOutsideHover
+        $scope.registerOutsideHover = angular.element(window).on 'mousemove', (e)->
+          if !angular.element(e.target).parents('.well-switch').length and !angular.element(e.target).parents('.well-item-row').length 
+            if unhighlight_event
+              $rootScope.$broadcast unhighlight_event, {}
+              unhighlight_event = ''
+              last_well_number = 0
+              last_target_channel = 0
+              last_target_assigned = 0
+
+          $scope.$apply()
       
-      $scope.toggleOmitIndex = (omit_index, well_item) ->
+      $scope.toggleOmitIndex = (well_item) ->
         return if $scope.re_init_chart_data
+        omit_index = well_item.well_num.toString() + '_' + well_item.channel.toString()
         if $scope.omittedIndexes.indexOf(omit_index) != -1
           $scope.omittedIndexes.splice $scope.omittedIndexes.indexOf(omit_index), 1
         else
@@ -102,6 +122,9 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
 
         Experiment.linkTarget($stateParams.id, well_item.target_id, { wells: omitTargetLink }).then (data) ->
           reInitChartData()
+
+      getWellDataIndex = (well_num, channel) ->
+        return well_num.toString() + '_' + channel
 
       reInitChartData = ->
         $scope.chartConfig.line_series = []
@@ -231,7 +254,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
               $scope.omittedIndexes = []
               for well, i in $scope.well_data by 1
                 if well.omit
-                  $scope.omittedIndexes.push i
+                  $scope.omittedIndexes.push(getWellDataIndex(well.well_num, well.channel))
 
               if !$scope.re_init_chart_data
                 for i in [0..$scope.targets.length - 1] by 1
@@ -410,7 +433,34 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
         for i in [0..15] by 1
           $scope.wellButtons["well_#{i}"].active = false
 
-      $scope.onHoverPlot = (plot_config) ->
+      $scope.onHighlightPlots = (configs, well_index) ->
+
+        for well_i in [0..$scope.well_data.length - 1]
+          $scope.well_data[well_i].active = false
+          $scope.well_data[well_i].highlight = false
+
+        for well_i in [0..$scope.well_data.length - 1]
+          omit_index = $scope.well_data[well_i].well_num.toString() + '_' + $scope.well_data[well_i].channel.toString()
+          for config, i in configs by 1
+            if ($scope.well_data[well_i].well_num - 1 == config.config.well and $scope.well_data[well_i].channel == config.config.channel) and ($scope.omittedIndexes.indexOf(omit_index) == -1)
+              $scope.well_data[well_i].highlight = true
+
+        dual_value = if $scope.is_dual_channel then 2 else 1
+
+        for i in [0..15] by 1
+          $scope.wellButtons["well_#{i}"].active = (i == well_index)
+
+        config = configs[0].config
+        wellScrollTop = (well_index * dual_value + config.channel - 1 + dual_value) * 36 - document.querySelector('.table-container').offsetHeight
+        angular.element(document.querySelector('.table-container')).animate { scrollTop: wellScrollTop }, 'fast'
+
+        return
+
+      $scope.onUnHighlightPlots = () ->
+        $scope.onUnselectPlot()
+        return
+
+      $scope.onHoverPlot = (plot_config, well_index) ->
         $scope.onUnselectPlot()
         $scope.label_plot = plot_config
         if $scope.label_plot
@@ -418,6 +468,42 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
             $scope.label_plot.well_label = 'A' + ($scope.label_plot.well + 1) 
           else 
             $scope.label_plot.well_label = 'B' + ($scope.label_plot.well - 7) 
+
+          for well_i in [0..$scope.well_data.length - 1]
+            $scope.well_data[well_i].active = false
+            $scope.well_data[well_i].highlight = false
+
+            omit_index = $scope.well_data[well_i].well_num.toString() + '_' + $scope.well_data[well_i].channel.toString()
+            if ($scope.well_data[well_i].well_num - 1 == plot_config.well and $scope.well_data[well_i].channel == plot_config.channel) and ($scope.omittedIndexes.indexOf(omit_index) == -1)
+              $scope.well_data[well_i].highlight = true
+
+          for i in [0..15] by 1
+            $scope.wellButtons["well_#{i}"].active = (i == plot_config.well)
+        else
+          for well_i in [0..$scope.well_data.length - 1]
+            $scope.well_data[well_i].active = false
+            $scope.well_data[well_i].highlight = false
+          for i in [0..15] by 1
+            $scope.wellButtons["well_#{i}"].active = false
+
+      $scope.onHoverRow = (event, well_item, index) ->
+        is_active_plot = false
+        for well_i in [0..$scope.well_data.length - 1]
+          if $scope.well_data[well_i].active
+            is_active_plot = true
+            break
+
+        if is_active_plot or (last_well_number == well_item.well_num and last_target_channel == well_item.channel)
+          return
+
+        last_well_number = well_item.well_num
+        last_target_channel = well_item.channel
+
+        omit_index = well_item.well_num.toString() + '_' + well_item.channel.toString()
+        if !$scope.has_init or (($scope.wellButtons['well_' + (well_item.well_num - 1)].selected) and ($scope.omittedIndexes.indexOf(omit_index) == -1) and ($scope.targetsSetHided[$scope.targets[index].id]))
+          if !well_item.active
+            $rootScope.$broadcast 'event:std-highlight-row', { well_datas: [{well: well_item.well_num, channel: well_item.channel}], well_index: well_item.well_num - 1 }
+            unhighlight_event = 'event:std-unhighlight-row'
 
       $scope.onZoom = (transform, w, h, scale_extent) ->
         $scope.std_scroll = {
@@ -441,7 +527,8 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
 
         dual_value = if $scope.is_dual_channel then 2 else 1
 
-        if $scope.wellButtons['well_' + (well_item.well_num - 1)].selected and $scope.omittedIndexes.indexOf(index) == -1 and $scope.targetsSetHided[$scope.targets[index].id]
+        omit_index = well_item.well_num.toString() + '_' + well_item.channel.toString()
+        if $scope.wellButtons['well_' + (well_item.well_num - 1)].selected and $scope.omittedIndexes.indexOf(omit_index) == -1 and $scope.targetsSetHided[$scope.targets[index].id]
           for well_i in [0..$scope.well_data.length - 1]
             $scope.well_data[well_i].active = ($scope.well_data[well_i].well_num - 1 == config.config.well and $scope.well_data[well_i].channel == config.config.channel)
 
@@ -481,7 +568,11 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
           $scope.line_bgcolor_target = { 'background-color':'#666' }
 
       $scope.onSelectRow = (well_item, index) ->
-        if !$scope.has_init or (($scope.wellButtons['well_' + (well_item.well_num - 1)].selected) and ($scope.omittedIndexes.indexOf(index) == -1) and ($scope.targetsSetHided[$scope.targets[index].id]))
+        for well_i in [0..$scope.well_data.length - 1]
+          $scope.well_data[well_i].highlight = false
+
+        omit_index = well_item.well_num.toString() + '_' + well_item.channel.toString()
+        if !$scope.has_init or (($scope.wellButtons['well_' + (well_item.well_num - 1)].selected) and ($scope.omittedIndexes.indexOf(omit_index) == -1) and ($scope.targetsSetHided[$scope.targets[index].id]))
           if !well_item.active
             $rootScope.$broadcast 'event:standard-select-row', {well: well_item.well_num, channel: well_item.channel, well_type: well_item.well_type}
           else
@@ -522,6 +613,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
       $scope.onUnselectPlot = ->
         for well_i in [0..$scope.well_data.length - 1]
           $scope.well_data[well_i]?.active = false
+          $scope.well_data[well_i]?.highlight = false
 
         for i in [0..15] by 1
           $scope.wellButtons["well_#{i}"]?.active = false
@@ -583,7 +675,7 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
                 $scope.omittedIndexes = []
                 for well, i in $scope.well_data by 1
                   if well.omit
-                    $scope.omittedIndexes.push i
+                    $scope.omittedIndexes.push(getWellDataIndex(well.well_num, well.channel))
 
                 $scope.updateTargetsSet()
                 updateSeries()

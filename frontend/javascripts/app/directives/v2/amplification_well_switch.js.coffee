@@ -226,11 +226,16 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
           else if $scope.chartType == 'melt-curve'
             $rootScope.$broadcast 'event:melt-highlight-row', { well_datas: [{well: index + 1, channel: 0}], well_index: index }
             unhighlight_event = 'event:melt-unhighlight-row'
+          else if $scope.chartType == 'standard-curve'
+            $rootScope.$broadcast 'event:std-highlight-row', { well_datas: [{well: index + 1, channel: 0}], well_index: index }
+            unhighlight_event = 'event:std-unhighlight-row'
 
         else
           if !selectedWell.selected and !$scope.dragging
             if $scope.chartType == 'amplification'
               $rootScope.$broadcast 'event:amp-unhighlight-row', {well: index + 1, channel: 0}
+            else if $scope.chartType == 'standard-curve'
+              $rootScope.$broadcast 'event:std-unhighlight-row', {well: index + 1, channel: 0}
             else
               $rootScope.$broadcast 'event:melt-unhighlight-row', {well: index + 1, channel: 0}
             unhighlight_event = ''

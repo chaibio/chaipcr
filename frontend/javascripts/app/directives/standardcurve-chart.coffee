@@ -20,6 +20,8 @@ window.App.directive 'standardCurveChart', [
         onSelectPlot: '&'
         onUnselectPlot: '&'
         onHoverPlot: '&'
+        onHighlightPlots: '&'
+        onUnHighlightPlots: '&'
         show: '='
       link: ($scope, elem, attrs) ->
 
@@ -45,6 +47,9 @@ window.App.directive 'standardCurveChart', [
           chart.onUnselectPlot($scope.onUnselectPlot())
           chart.onHoverPlot($scope.onHoverPlot())
           chart.onUpdateProperties($scope.onUpdateProperties())
+
+          chart.onHighlightPlots($scope.onHighlightPlots())
+          chart.onUnHighlightPlots($scope.onUnHighlightPlots())
           chart.activeDefaultLine()
 
           d = chart.getDimensions()
@@ -55,6 +60,15 @@ window.App.directive 'standardCurveChart', [
         $scope.$on 'event:standard-unselect-row', (e, data, oldData) ->
           chart.unselectPlot()
         
+        $scope.$on 'event:std-highlight-row', (e, data, oldData) ->
+          if chart
+            chart.unselectPlot()
+            chart.highlightPlot(data)
+        
+        $scope.$on 'event:std-unhighlight-row', (e, data, oldData) ->
+          if chart
+            chart.unsethighlightPlot()
+
         $scope.$on 'window:resize', ->
           if chart and $scope.show
             $timeout ->
