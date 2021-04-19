@@ -398,11 +398,11 @@ class StandardCurveChart extends window.ChaiBioCharts.BaseChart
 
   highlightPlot: (well_info) ->
     plot_item_list = []
-    for well_data, wi in well_info.well_datas by 1
-      for p, i in @plots by 1
-        if p.well == well_data.well - 1 and (well_data.channel == 0 or p.channel == well_data.channel)
-          plot_item_list.push(p)
-          break
+    if @plots
+      for well_data, wi in well_info.well_datas by 1
+        for p, i in @plots by 1
+          if p.well == well_data.well - 1 and (well_data.channel == 0 or p.channel == well_data.channel)
+            plot_item_list.push(p)
 
     @setMultipleHighlightPlot(plot_item_list, well_info.well_index)
 

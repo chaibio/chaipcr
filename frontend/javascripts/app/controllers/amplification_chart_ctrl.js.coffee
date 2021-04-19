@@ -679,12 +679,15 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               unhighlight_event = 'event:amp-unhighlight-row'
 
       $scope.onHighlightLines = (configs, well_index) ->
+        if well_index == -1
+          well_index = configs[0].config.well
+          
         for well_i in [0..$scope.well_data.length - 1]
           $scope.well_data[well_i].active = false
           $scope.well_data[well_i].highlight = false
         
         for well_i in [0..$scope.well_data.length - 1]
-          for config, i in configs by 1
+          for config, i in configs by 1            
             if ($scope.well_data[well_i].well_num - 1 == config.config.well and $scope.well_data[well_i].channel == config.config.channel)
               $scope.well_data[well_i].highlight = true
         

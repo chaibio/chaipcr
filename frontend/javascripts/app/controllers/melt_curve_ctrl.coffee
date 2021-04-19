@@ -565,6 +565,9 @@ App.controller 'MeltCurveChartCtrl', [
             unhighlight_event = 'event:melt-unhighlight-row'
 
       $scope.onHighlightLines = (configs, well_index) ->
+        if well_index == -1
+          well_index = configs[0].config.well
+
         for well_i in [0..$scope.well_data.length - 1]
           $scope.well_data[well_i].active = false
           $scope.well_data[well_i].highlight = false

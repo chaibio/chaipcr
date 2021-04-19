@@ -141,6 +141,10 @@ class BaseChart
     @makeHoveredWhiteBorderLine(lineConfig)
     @hoveredLine.raise()
     @raiseActivePath()
+    if typeof @onHighlightLines is 'function' and !@activePathConfig
+      @onHighlightLines([{config: lineConfig, index: lineIndex}], -1)
+
+
 
   makeHoveredWhiteBorderLine: (line_config) ->
     xScale = @getXScale()
@@ -162,6 +166,8 @@ class BaseChart
   unsetHoveredWhiteBorderLine: () ->
     if @hoveredWhiteBorderLine then @hoveredWhiteBorderLine.remove()
     @hoveredWhiteBorderLine = null
+    if typeof @onUnHighlightLines is 'function' and !@activePathConfig
+      @onUnHighlightLines()
 
   setActivePath: (path, mouse) ->
     if (@activePath)
@@ -212,7 +218,8 @@ class BaseChart
     @highlightPaths = []
     @highlightBorderPaths = []
     @highlightPathConfigs = []
-    @onUnHighlightLines() if @onUnHighlightLines
+    if typeof @onUnHighlightLines is 'function'
+      @onUnHighlightLines()
 
   drawBox: (line_config) ->
     @box.container.remove() if @box

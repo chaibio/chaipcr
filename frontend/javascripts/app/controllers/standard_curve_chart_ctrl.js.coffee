@@ -450,9 +450,10 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
         for i in [0..15] by 1
           $scope.wellButtons["well_#{i}"].active = (i == well_index)
 
-        config = configs[0].config
-        wellScrollTop = (well_index * dual_value + config.channel - 1 + dual_value) * 36 - document.querySelector('.table-container').offsetHeight
-        angular.element(document.querySelector('.table-container')).animate { scrollTop: wellScrollTop }, 'fast'
+        if configs[0]
+          config = configs[0].config
+          wellScrollTop = (config.well * dual_value + config.channel - 1 + dual_value) * 36 - document.querySelector('.detail-mode-table tbody').offsetHeight
+          angular.element('.detail-mode-table tbody').animate { scrollTop: wellScrollTop }, 'fast'
 
         return
 
