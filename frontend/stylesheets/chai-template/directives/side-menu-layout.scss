@@ -32,7 +32,7 @@ $sidemenu_width_close: 0;
     .inner-wrapper{
       overflow: auto;
       width: 100%;
-      height: calc(100% - 60px);
+      height: calc(100vh - 100px);
       .inner-container{
         min-width: 1024px;
       }
