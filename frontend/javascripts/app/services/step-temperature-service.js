@@ -30,7 +30,7 @@ angular.module("canvasApp").service('stepTemperatureService', [
             parent.model.temperature = $scope.step.temperature;
             parent.circleGroup.top = parent.getTop().top;
             parent.createNewStepDataGroup();
-            moveRampLineService.manageDrag(parent.circleGroup);
+            moveRampLineService.manageDrag(parent.circleGroup, true);
             parent.circleGroup.setCoords();
             parent.canvas.renderAll();
         };

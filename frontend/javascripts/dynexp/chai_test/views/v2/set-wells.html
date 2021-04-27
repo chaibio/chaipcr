@@ -25,7 +25,7 @@
                 <h1 class="CH1" ng-if="is_two_kit">{{ targets[1].name ? targets[1].name : ''}}</h1>
               </div>
               <div class="d-flex mt-20">
-                <div class="well-table">
+                <div class="well-table" ng-show="!is_loading">
                   <div class="well-row d-flex align-items-center" ng-repeat="x in samples track by $index">
                     <span class="CB2 number">A{{$index+1}}.</span>
                     <input
@@ -51,7 +51,7 @@
                     <img src="/images/dynexp/pika-test/note-off.svg" class="note cursor-pointer note-{{'A'+$index}}" ng-if="x.name && !x.notes" ng-click="openNotes($index, x, 'A')"/>
                   </div>
                 </div>
-                <div class="well-table">
+                <div class="well-table" ng-show="!is_loading">
                   <div class="well-row d-flex align-items-center" ng-repeat="x in samples_B track by $index">
                     <span class="CB2 number">B{{$index+1}}.</span>
                     <input

@@ -326,7 +326,7 @@ angular.module("canvasApp").factory('circle', [
         }
       };
 
-      this.temperatureDisplay = function(targetCircleGroup) {
+      this.temperatureDisplay = function(targetCircleGroup, isManual) {
 
         var dynamicTemp;
         if(targetCircleGroup.top >= this.middlePoint) {
@@ -335,7 +335,11 @@ angular.module("canvasApp").factory('circle', [
           dynamicTemp = 100 - ((targetCircleGroup.top - this.scrollTop) / this.scrollRatio2);
         }
 
-        dynamicTemp = (Math.abs(dynamicTemp) >= 100) ?  100 : Math.abs(dynamicTemp).toFixed(1);
+        if(Math.abs(dynamicTemp) >= 100){
+          dynamicTemp = 100;
+        } else {
+          dynamicTemp = (isManual) ? Math.abs(dynamicTemp).toFixed(1) : Math.abs(dynamicTemp).toFixed(0) + '.0';
+        }
         this.temperature.text = String(dynamicTemp + "º");
         this.model.temperature = String(dynamicTemp);
       };

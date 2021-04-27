@@ -27,6 +27,8 @@ class BaseChart
   highlightBorderPaths: []
   highlightPathConfigs: []
 
+  maxDataX: 0
+
   constructor: (@elem, @data, @config) ->
     # console.log('@data')
     # console.log(@data)
@@ -564,6 +566,12 @@ class BaseChart
     max = d3.max @config.series, (s) =>
       d3.max @data[s.dataset], (d) => d[s.x]
     return max || 0
+
+  getMaxDataX: ->    
+    return @maxDataX if @maxDataX == @getMaxX()
+    @maxDataX = d3.max @config.series, (s) =>
+      d3.max @data[s.dataset], (d) => d[s.x]
+    return @maxDataX || 0
 
   getMinY: ->
     return @config.axes.y.min if @config.axes.y.min
@@ -1620,14 +1628,14 @@ class BaseChart
         return
       x = @getMousePosition(@mouseOverlay.node())[0]
       pos = @getPathPositionByX(@guidingLines[@activePathConfig.index], x)
-      max_x = ((@getMaxX() - @getMinX()) / (@config.axes.x.max - @getMinX())) * @width
+      # max_x = ((@getMaxX() - @getMinX()) / (@config.axes.x.max - @getMinX())) * @width
+      max_x = ((@getMaxDataX() - @getMinX()) / (@config.axes.x.max - @getMinX())) * @width      
 
       if x > max_x
         @hideMouseIndicators()
       else
         if window.isFinite(x)
-          @circle
-            .attr("cx", x)
+          @circle.attr("cx", x)
         else
           @hideMouseIndicators()
         @circle

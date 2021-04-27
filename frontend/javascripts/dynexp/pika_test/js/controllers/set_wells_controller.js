@@ -46,6 +46,7 @@
       $scope.exp_samples = [];
       $scope.target1_name = '';
 
+      $scope.is_loading = true;
       $scope.is_omittable = false;
 
       var target2_name = ['IPC'];
@@ -132,6 +133,7 @@
 
                 $scope.omit_positive = (resp.data[0].targets && resp.data[0].targets[0].well_type == 'positive_control') ? false : true;
                 $scope.omit_negative = (resp.data[1].targets && resp.data[1].targets[0].well_type == 'negative_control') ? false : true;
+                $scope.is_loading = false;
               });
             });
 

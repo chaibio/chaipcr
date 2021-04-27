@@ -56,7 +56,7 @@ angular.module("canvasApp").service('stepEvents',[
         
         var circle = _$scope.fabricStep.circle;
         circle.circleGroup.top = circle.getTop().top;
-        moveRampLineService.manageDrag(circle.circleGroup);
+        moveRampLineService.manageDrag(circle.circleGroup, true);
         circle.circleGroup.setCoords();
         _canvas.renderAll();
     };

@@ -320,7 +320,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                         }).catch(function(err) {
                             cb(null, null);
                         });
-                    }).catch(function(err) {                            
+                    }).catch(function(err) {
                         cb(null, null);
                     });
                 });
@@ -588,8 +588,8 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
 
                     // Target 1
                     tasks.push(function(cb) {
-                        Experiment.createTarget(new_experiment_id,{name: target1_kit1_name, channel: 1}).then(function(resp) {
-                            $scope.target_1 = resp.data.target;
+                        Experiment.createTarget(new_experiment_id,{name: target1_kit1_name, channel: 1}).then(function(target1Resp) {
+                            $scope.target_1 = target1Resp.data.target;
                             var linkTargetName = [];
                             linkTargetName[0] = {
                                 well_num: 1,
@@ -600,64 +600,59 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                                 well_type: 'negative_control'
                             };
 
-                            Experiment.linkTarget(new_experiment_id, $scope.target_1.id, { wells: linkTargetName }).then(function (response) {                                
-                                cb(null, response);
-                            }).catch(function(err) {
-                                cb(null, null);
-                            });
-                        }).catch(function(err) {                            
-                            cb(null, null);
-                        });
-                    });
+                            Experiment.linkTarget(new_experiment_id, $scope.target_1.id, { wells: linkTargetName }).then(function (target1LinkResp) {
 
-                    // Target 2
-                    tasks.push(function(cb) {
-                        Experiment.createTarget(new_experiment_id,{name: target1_kit2_name, channel: 1}).then(function(resp) {
-                            $scope.target_2 = resp.data.target;
-                            var linkTargetName = [];
-                            linkTargetName[0] = {
-                                well_num: 9,
-                                well_type: 'positive_control'
-                            };
-                            linkTargetName[1] = {
-                                well_num: 10,
-                                well_type: 'negative_control'
-                            };
+                                // Target 2
+                                Experiment.createTarget(new_experiment_id,{name: target1_kit2_name, channel: 1}).then(function(target2Resp) {
+                                    $scope.target_2 = target2Resp.data.target;
+                                    var linkTargetName = [];
+                                    linkTargetName[0] = {
+                                        well_num: 9,
+                                        well_type: 'positive_control'
+                                    };
+                                    linkTargetName[1] = {
+                                        well_num: 10,
+                                        well_type: 'negative_control'
+                                    };
 
-                            Experiment.linkTarget(new_experiment_id, $scope.target_2.id, { wells: linkTargetName }).then(function (response) {                                
-                                cb(null, response);
-                            }).catch(function(err) {
-                                cb(null, null);
-                            });
-                        }).catch(function(err) {                            
-                            cb(null, null);
-                        });
-                    });
+                                    Experiment.linkTarget(new_experiment_id, $scope.target_2.id, { wells: linkTargetName }).then(function (target2LinkResp) {
 
+                                        // Target - IPC
+                                        Experiment.createTarget(new_experiment_id,{name: target2_name, channel: 2}).then(function(targetIPCResp) {
+                                            $scope.target_ipc = targetIPCResp.data.target;
+                                            var linkTargetName = [];
+                                            linkTargetName[0] = {
+                                                well_num: 1,
+                                                well_type: 'positive_control'
+                                            };
+                                            linkTargetName[1] = {
+                                                well_num: 2,
+                                                well_type: 'negative_control'
+                                            };
+                                            linkTargetName[2] = {
+                                                well_num: 9,
+                                                well_type: 'positive_control'
+                                            };
+                                            linkTargetName[3] = {
+                                                well_num: 10,
+                                                well_type: 'negative_control'
+                                            };
+                                            Experiment.linkTarget(new_experiment_id, $scope.target_ipc.id, { wells: linkTargetName }).then(function (response) {
+                                                cb(null, response);
+                                            }).catch(function(err) {
+                                                cb(null, null);
+                                            });
+                                        }).catch(function(err) {
+                                            cb(null, null);
+                                        });
 
-                    // Target - IPC
-                    tasks.push(function(cb) {
-                        Experiment.createTarget(new_experiment_id,{name: target2_name, channel: 2}).then(function(resp) {
-                            $scope.target_ipc = resp.data.target;
-                            var linkTargetName = [];
-                            linkTargetName[0] = {
-                                well_num: 1,
-                                well_type: 'positive_control'
-                            };
-                            linkTargetName[1] = {
-                                well_num: 2,
-                                well_type: 'negative_control'
-                            };
-                            linkTargetName[2] = {
-                                well_num: 9,
-                                well_type: 'positive_control'
-                            };
-                            linkTargetName[3] = {
-                                well_num: 10,
-                                well_type: 'negative_control'
-                            };
-                            Experiment.linkTarget(new_experiment_id, $scope.target_ipc.id, { wells: linkTargetName }).then(function (response) {                                
-                                cb(null, response);
+                                    }).catch(function(err) {
+                                        cb(null, null);
+                                    });
+                                }).catch(function(err) {
+                                    cb(null, null);
+                                });
+
                             }).catch(function(err) {
                                 cb(null, null);
                             });
