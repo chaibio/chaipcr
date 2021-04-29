@@ -227,41 +227,55 @@ function set_report_cq!(
     i                       ::AmpInput,
 ) 
     debug(logger, "at set_report_cq!() SHORT FORMAT")
-    temp_cq=fill(NaN_T,size(o.cq)[1],size(o.cq)[2])
+    temp_cq=fill(NaN_T,size(o.cq)[1], size(o.cq)[2])
     
     max_dr1_lb, max_dr2_lb, max_bsf_lb = i.max_dr1_lb, i.max_dr2_lb, i.max_bsf_lb
     qt_fluos_ =
         [   quantile(o.blsub_fluos_flb[:, well_i, channel_i], i.qt_prob)
-            for well_i in 1:i.num_wells, channel_i in 1:i.num_channels ]
+            for well_i in 1: i.num_wells, channel_i in 1: i.num_channels ]
     max_qt_fluo_ = maximum(qt_fluos_)
-    for well_i in 1:i.num_wells, channel_i in 1:i.num_channels
+    for well_i in 1: i.num_wells, channel_i in 1: i.num_channels
         b_ = o.coefs[1, well_i, channel_i]
-        postbl_status =o.quant_status[well_i, channel_i]
-        max_dr1=maximum(o.dr1_pred[:,well_i,channel_i])
-        max_dr2=maximum(o.dr2_pred[:,well_i,channel_i])
+        postbl_status = o.quant_status[well_i, channel_i]
+        max_dr1= maximum(o.dr1_pred[:, well_i, channel_i])
+        max_dr2= maximum(o.dr2_pred[:, well_i, channel_i])
         max_bsf = maximum(o.blsub_fluos_flb[:, well_i, channel_i])
-        max_bsf_ = maximum(o.blsub_fluos[(end-Int(floor((size(o.blsub_fluos)[1])/4))):end, well_i, channel_i])
+		max_bsf_ = maximum(o.blsub_fluos[(end - Int(floor((size(o.blsub_fluos)[1]) / 4))): end, well_i, channel_i])
         (scaled_max_dr1, scaled_max_dr2, scaled_max_bsf) =
         [max_dr1, max_dr2, max_bsf] ./ max_qt_fluo_
 
-        min_reliable_cyc_=length(i.baseline_cyc_bounds)==2?i.baseline_cyc_bounds[1]:i.min_reliable_cyc
+        min_reliable_cyc_ = length(i.baseline_cyc_bounds) == 2 ? i.baseline_cyc_bounds[1]: i.min_reliable_cyc
 
         if (max_bsf < i.max_bsf_lb || scaled_max_bsf < i.scaled_max_bsf_lb ||
             max_dr2 < max_dr2_lb || max_dr1 < max_dr1_lb  || 
             scaled_max_dr2 < i.scaled_max_dr2_lb || 
-            scaled_max_dr1 < i.scaled_max_dr1_lb || o.cq[well_i, channel_i]>i.num_cycles || 
-            o.cq[well_i, channel_i]<min_reliable_cyc_ || postbl_status == :Error ||
+            scaled_max_dr1 < i.scaled_max_dr1_lb || o.cq[well_i, channel_i] > i.num_cycles || 
+            o.cq[well_i, channel_i] < min_reliable_cyc_ || postbl_status == :Error ||
             b_ > 0)
-            
+			
+			why_cq_failed = "Cq for W:$well_i, C:$channel_i failed due to: "
+			why_cq_failed *= max_bsf < i.max_bsf_lb ? "max_bsf($max_bsf) < i.max_bsf_lb($(i.max_bsf_lb)) |" : ""
+			why_cq_failed *= scaled_max_bsf < i.scaled_max_bsf_lb ? "scaled_max_bsf($scaled_max_bsf) < i.scaled_max_bsf_lb($(i.scaled_max_bsf_lb)) |" : ""
+			why_cq_failed *= max_dr2 < max_dr2_lb ? "max_dr2($max_dr2) < max_dr2_lb($max_dr2_lb) |" : ""
+			why_cq_failed *= max_dr1 < max_dr1_lb ? "max_dr1 < max_dr1_lb : " * "$max_dr1 < $max_dr1_lb |" : ""
+			why_cq_failed *= scaled_max_dr2 < i.scaled_max_dr2_lb ? "scaled_max_dr2($scaled_max_dr2) < i.scaled_max_dr2_lb($(i.scaled_max_dr2_lb)) |" : ""
+			why_cq_failed *= scaled_max_dr1 < i.scaled_max_dr1_lb ? "scaled_max_dr1($scaled_max_dr1) < i.scaled_max_dr1_lb($(i.scaled_max_dr1_lb)) |" : ""
+			why_cq_failed *= o.cq[well_i, channel_i] > i.num_cycles ? "o.cq[well_i, channel_i]($(o.cq[well_i, channel_i])) > i.num_cycles($(i.num_cycles)) |" : ""
+			why_cq_failed *= o.cq[well_i, channel_i] < min_reliable_cyc_ ? "o.cq[well_i, channel_i]($(o.cq[well_i, channel_i])) < min_reliable_cyc_($(min_reliable_cyc_)) |" : ""
+			why_cq_failed *= postbl_status == :Error ? "postbl_status == :Error |" : ""
+			why_cq_failed *= b_ > 0 ? "b_($b_) > 0 |" : "" 
+			debug(logger, why_cq_failed)
+			
             o.blsub_fluos[:,well_i, channel_i]=o.blsub_fluos_flb[:,well_i, channel_i]
             o.dr1_pred[:,well_i, channel_i]=o.dr1_pred1[:,well_i, channel_i]
             o.dr2_pred[:,well_i, channel_i]=o.dr2_pred1[:,well_i, channel_i]
             
         else
             temp_cq[well_i, channel_i] = o.cq[well_i, channel_i]
+			debug(logger, "Cq for W:$well_i, C:$channel_i >> $(o.cq[well_i, channel_i])")
         end
     end
-    o.cq=convert(typeof(o.cq),temp_cq)
+    o.cq=convert(typeof(o.cq), temp_cq)
     return nothing
 end
 
