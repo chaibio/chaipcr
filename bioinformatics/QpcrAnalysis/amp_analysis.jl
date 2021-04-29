@@ -253,18 +253,18 @@ function set_report_cq!(
             o.cq[well_i, channel_i] < min_reliable_cyc_ || postbl_status == :Error ||
             b_ > 0)
 			
-			why_cq_failed = "Cq for W:$well_i, C:$channel_i failed due to: "
-			why_cq_failed *= max_bsf < i.max_bsf_lb ? "max_bsf($max_bsf) < i.max_bsf_lb($(i.max_bsf_lb)) |" : ""
-			why_cq_failed *= scaled_max_bsf < i.scaled_max_bsf_lb ? "scaled_max_bsf($scaled_max_bsf) < i.scaled_max_bsf_lb($(i.scaled_max_bsf_lb)) |" : ""
-			why_cq_failed *= max_dr2 < max_dr2_lb ? "max_dr2($max_dr2) < max_dr2_lb($max_dr2_lb) |" : ""
-			why_cq_failed *= max_dr1 < max_dr1_lb ? "max_dr1 < max_dr1_lb : " * "$max_dr1 < $max_dr1_lb |" : ""
-			why_cq_failed *= scaled_max_dr2 < i.scaled_max_dr2_lb ? "scaled_max_dr2($scaled_max_dr2) < i.scaled_max_dr2_lb($(i.scaled_max_dr2_lb)) |" : ""
-			why_cq_failed *= scaled_max_dr1 < i.scaled_max_dr1_lb ? "scaled_max_dr1($scaled_max_dr1) < i.scaled_max_dr1_lb($(i.scaled_max_dr1_lb)) |" : ""
-			why_cq_failed *= o.cq[well_i, channel_i] > i.num_cycles ? "o.cq[well_i, channel_i]($(o.cq[well_i, channel_i])) > i.num_cycles($(i.num_cycles)) |" : ""
-			why_cq_failed *= o.cq[well_i, channel_i] < min_reliable_cyc_ ? "o.cq[well_i, channel_i]($(o.cq[well_i, channel_i])) < min_reliable_cyc_($(min_reliable_cyc_)) |" : ""
-			why_cq_failed *= postbl_status == :Error ? "postbl_status == :Error |" : ""
-			why_cq_failed *= b_ > 0 ? "b_($b_) > 0 |" : "" 
-			debug(logger, why_cq_failed)
+            why_cq_failed = "Cq for W:$well_i, C:$channel_i failed due to: "
+            why_cq_failed *= max_bsf < i.max_bsf_lb ? "max_bsf($max_bsf) < i.max_bsf_lb($(i.max_bsf_lb)) |" : ""
+            why_cq_failed *= scaled_max_bsf < i.scaled_max_bsf_lb ? "scaled_max_bsf($scaled_max_bsf) < i.scaled_max_bsf_lb($(i.scaled_max_bsf_lb)) |" : ""
+            why_cq_failed *= max_dr2 < max_dr2_lb ? "max_dr2($max_dr2) < max_dr2_lb($max_dr2_lb) |" : ""
+            why_cq_failed *= max_dr1 < max_dr1_lb ? "max_dr1 < max_dr1_lb : " * "$max_dr1 < $max_dr1_lb |" : ""
+            why_cq_failed *= scaled_max_dr2 < i.scaled_max_dr2_lb ? "scaled_max_dr2($scaled_max_dr2) < i.scaled_max_dr2_lb($(i.scaled_max_dr2_lb)) |" : ""
+            why_cq_failed *= scaled_max_dr1 < i.scaled_max_dr1_lb ? "scaled_max_dr1($scaled_max_dr1) < i.scaled_max_dr1_lb($(i.scaled_max_dr1_lb)) |" : ""
+            why_cq_failed *= o.cq[well_i, channel_i] > i.num_cycles ? "o.cq[well_i, channel_i]($(o.cq[well_i, channel_i])) > i.num_cycles($(i.num_cycles)) |" : ""
+            why_cq_failed *= o.cq[well_i, channel_i] < min_reliable_cyc_ ? "o.cq[well_i, channel_i]($(o.cq[well_i, channel_i])) < min_reliable_cyc_($(min_reliable_cyc_)) |" : ""
+            why_cq_failed *= postbl_status == :Error ? "postbl_status == :Error |" : ""
+            why_cq_failed *= b_ > 0 ? "b_($b_) > 0 |" : "" 
+            debug(logger, why_cq_failed)
 			
             o.blsub_fluos[:,well_i, channel_i]=o.blsub_fluos_flb[:,well_i, channel_i]
             o.dr1_pred[:,well_i, channel_i]=o.dr1_pred1[:,well_i, channel_i]
@@ -272,7 +272,7 @@ function set_report_cq!(
             
         else
             temp_cq[well_i, channel_i] = o.cq[well_i, channel_i]
-			debug(logger, "Cq for W:$well_i, C:$channel_i >> $(o.cq[well_i, channel_i])")
+            debug(logger, "Cq for W:$well_i, C:$channel_i >> $(o.cq[well_i, channel_i])")
         end
     end
     o.cq=convert(typeof(o.cq), temp_cq)
