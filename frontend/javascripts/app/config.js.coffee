@@ -56,7 +56,10 @@ window.ChaiBioTech.ngApp
       $window.document.cookie = 'authentication_token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
       $.jStorage.deleteKey 'authToken'
       if !Status.isUpdating()
-        $window.location.assign '/'
+        if $window.location.hash
+          $window.location.assign '/login' + $window.location.hash
+        else
+          $window.location.assign '/'
 ]
 
 .config [

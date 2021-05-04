@@ -438,6 +438,7 @@ class BaseChart
         .attr("d", line)
         .attr('stroke-width', @ACTIVE_PATH_STROKE_WIDTH *3)
 
+
   drawLines: ->
     
     series = @config.series
@@ -1584,6 +1585,7 @@ class BaseChart
         )
         .on 'click', =>
           @unsetActivePath()
+          @unsetHighlightPaths()
           if @hoveredLine
             mouse = @getMousePosition(@mouseOverlay.node())
             @setActivePath(@hoveredLine, mouse)
@@ -1647,6 +1649,99 @@ class BaseChart
 
       @prevMousePosition = [pos.x, pos.y]
 
+  drawCoverLines: ->
+    #Check for setHoverLine function
+    if loc is 'y:max'
+      max = @computedMaxY()
+      maxY = if angular.isNumber(val) and !window.isNaN(val) then val else max
+      y = @yScale
+      lastYScale = @lastYScale || y
+      minY = lastYScale.invert(@height)
+
+      if minY >= maxY
+        return false
+
+      maxY = if maxY > max then max else maxY
+      k = @height / (y(minY) - y(maxY))
+
+      @editingYAxis = true
+      lastK = @getTransform().k
+      @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)))
+      @editingYAxis = false
+      @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(lastK))
+
+    if loc is 'y:min'
+      y = @yScale
+      lastYScale = @lastYScale || y
+      min = @computedMinY()
+
+      minY = if angular.isNumber(val) and !window.isNaN(val) then val else min
+      maxY = lastYScale.invert(0)
+      if (minY >= maxY)
+        return false
+
+      minY = if minY < min then min else minY
+
+      k = @height / (y(minY) - y(maxY))
+      lastK = @getTransform().k
+      @editingYAxis = true
+      @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)))
+      @editingYAxis = false
+      @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(lastK))
+
+    if loc is 'x:min'
+      extent = @getScaleExtent() - @getMinX()
+      x = @xScale
+      lastXScale = @lastXScale || x
+      minX = val * 1
+      maxX = lastXScale.invert(@width)
+      if (minX >= maxX)
+        return false
+      if (val is '' || minX < @getMinX())
+        minX = @getMinX()
+      k = @width / (x(maxX) - x(minX))
+      width_percent = 1 / k
+      w = extent - (width_percent * extent)
+      @chartSVG.call(@zooomBehavior.scaleTo, k)
+      @scroll((minX - @getMinX()) / w)
+
+    if loc is 'x:max'
+      extent = @getScaleExtent() - @getMinX()
+      x = @xScale
+      lastXScale = @lastXScale || x
+      minX = lastXScale.invert(0)
+      maxX = val * 1
+      if (minX >= maxX)
+        return false
+      if val is ''
+        maxX = @getMaxX()
+      if (maxX > @getScaleExtent())
+        maxX = @getScaleExtent()
+      k = @width / (x(maxX) - x(minX))
+      width_percent = 1 / k
+      w = extent - (width_percent * extent)
+      @chartSVG.call(@zooomBehavior.scaleTo, k)
+      @scroll((minX - @getMinX()) / w)
+
+    # update input state
+    extremeValue = null
+    
+    if loc is 'x:min'
+      extremeValue =  @xAxisLeftExtremeValue
+    else if loc is 'x:max'
+      extremeValue =  @xAxisRightExtremeValue
+    else if loc is 'y:min'
+      extremeValue = @yAxisLowerExtremeValue
+    else
+      extremeValue = @yAxisUpperExtremeValue
+
+    @onClickAxisInput(loc, extremeValue)
+    setTimeout =>
+      input.blur()
+    , 100
+
+
+
   setHoveredLine: ->
     mouse = @getMousePosition(@mouseOverlay.node())
     mouseX = mouse[0]
@@ -1665,7 +1760,7 @@ class BaseChart
         closestLineIndex = lineIndex
       if distance < distances[closestLineIndex]
         closestLineIndex = lineIndex
-      if distances[closestLineIndex] > maxDistance
+      if distances[closestLineIndex] > maxDistance or distance == distances[closestLineIndex]
         closestLineIndex = undefined
         @hoveredLine = null
         @raiseActivePath()

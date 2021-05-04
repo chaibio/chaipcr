@@ -899,6 +899,16 @@
       background: white;
       height: fit-content; 
 
+      &.detail-mode-table{
+        tr.active.selected.highlight{
+          td{
+            background: #09b0ef;
+            color: #fff;
+            display: flex;
+          }          
+        }
+      }
+
       thead{
         background: #595959;
         &::-webkit-scrollbar{          
@@ -1042,7 +1052,7 @@
               background: #b5edfe;
               color: #000;
               &.target-cell.assigned{
-                padding: 4px 3px;
+                padding: 5px 3px;
                 & > span{
                   background: #fff;
                   border: 1px solid transparent;
@@ -1067,7 +1077,7 @@
               background: #D6F5FF;
               color: #000;
               &.target-cell.assigned{
-                padding: 4px 3px;
+                padding: 5px 3px;
                 & > span{
                   background: #fff;
                   border: 1px solid transparent;
