@@ -1630,11 +1630,13 @@ class BaseChart
         return
       x = @getMousePosition(@mouseOverlay.node())[0]
       pos = @getPathPositionByX(@guidingLines[@activePathConfig.index], x)
-      # max_x = ((@getMaxX() - @getMinX()) / (@config.axes.x.max - @getMinX())) * @width
       max_x = ((@getMaxDataX() - @getMinX()) / (@config.axes.x.max - @getMinX())) * @width      
 
       if x > max_x
-        @hideMouseIndicators()
+        @circle.attr("cx", max_x)
+        @circle
+          .attr("cy", pos.y)
+          .attr('transform', 'translate(0,0) scale(1)')
       else
         if window.isFinite(x)
           @circle.attr("cx", x)
@@ -1684,8 +1686,6 @@ class BaseChart
 
       k = @height / (y(minY) - y(maxY))
       lastK = @getTransform().k
-      @editingYAxis = true
-      @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(k).translate(0, -y(maxY)))
       @editingYAxis = false
       @chartSVG.call(@zooomBehavior.transform, d3.zoomIdentity.scale(lastK))
 
@@ -1702,8 +1702,11 @@ class BaseChart
       k = @width / (x(maxX) - x(minX))
       width_percent = 1 / k
       w = extent - (width_percent * extent)
-      @chartSVG.call(@zooomBehavior.scaleTo, k)
-      @scroll((minX - @getMinX()) / w)
+
+    @zooomBehavior = d3.zoom()
+      .on 'start', => @isZooming = true
+      .on 'end', => @isZooming = false
+      .on 'zoom', => @zoomed()
 
     if loc is 'x:max'
       extent = @getScaleExtent() - @getMinX()
@@ -1722,6 +1725,13 @@ class BaseChart
       w = extent - (width_percent * extent)
       @chartSVG.call(@zooomBehavior.scaleTo, k)
       @scroll((minX - @getMinX()) / w)
+
+      if !@activePath
+        @hideMouseIndicators()
+        return
+      x = @getMousePosition(@mouseOverlay.node())[0]
+      pos = @getPathPositionByX(@guidingLines[@activePathConfig.index], x)
+      max_x = ((@getMaxDataX() - @getMinX()) / (@config.axes.x.max - @getMinX())) * @width      
 
     # update input state
     extremeValue = null
