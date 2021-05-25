@@ -1,5 +1,6 @@
 <div class="modal-input-field" ng-class="{error: error}">
   <label class="CX5">{{caption}}</label>
   <p></p>
-  <span class="CG1-M">{{error ? (field ? field + ' ' + error : error) : ''}}</span>
+  <span class="CG1-M" ng-if="!label">{{error ? (field ? field + ' ' + error : error) : ''}}</span>
+  <span class="CG1-M" ng-if="label">{{label}}</span>
 </div>

@@ -5,33 +5,65 @@
         <img src="/images/WhiteCheckGreenRing.svg">
       </div>
       <label class="CX5-M" style="cursor: pointer;">Ethernet</label>
-      <button class="ci-btn-light CG1" ng-click="onSelectNetwork('ethernet')">Edit Settings</button>
+      <button class="ci-btn-light CG1" ng-click="onSelectNetwork('ethernet')" ng-class="{'active' : name == 'ethernet'}">Edit Settings</button>
     </div>
-    <div class="sm-switch wifi-switch">
-      <switch ng-model="wifiNetworkStatus" disabled="wirelessError"></switch>
-      <div class="check-symbol" ng-class="{'active': currentWifiSettings.state && currentWifiSettings.state.status == 'connected'}">
-        <img src="/images/WhiteCheckGreenRing.svg">
+    <div class="wan-options">
+      <div class="sm-switch wifi-switch">
+        <switch ng-model="wifiNetworkStatus" disabled="wirelessError"></switch>
+        <div class="check-symbol" ng-class="{'active': currentWifiSettings.state && currentWifiSettings.state.status == 'connected'}">
+          <img src="/images/WhiteCheckGreenRing.svg">
+        </div>
+      </div>
+      <div class="view-mode-switch" ng-click="onChangeWanOption()">
+        <div class="switch-item CX5" ng-class="{'active': wanOption=='wifi'}">Connect to WiFi</div>
+        <div class="switch-item CX5" ng-class="{'active': wanOption=='hotspot'}">Activate Hotspot</div>
       </div>
     </div>
-    <h5 class="CX5-M sub-title mb-10">WiFi</h5>
-    <span class="CX5 ml-40" ng-if="wirelessError">No wifi adapter</span>
-    <div class="ml-40" ng-if="!wifiNetworks[0] && wifiNetworkStatus===true">
-      <ellipsis-animated><ellipsis-animated/>
-    </div>
-    <ul class="CX5-M">
-      <li ng-repeat="wifiNetwork in wifiNetworks" ng-click="onSelectNetwork(wifiNetwork.ssid)" ng-class="{selected: selectedWifiNow.ssid == wifiNetwork.ssid}">
-        <wifi-check-symbol current-network="currentWifiSettings" ssid="{{wifiNetwork.ssid}}"></wifi-check-symbol>
-        <div class="wifi-info">
-          <span>{{wifiNetwork.ssid | truncate:20}}</span>
-          <div class="wifi-props">
-            <wifi-signal ssid="{{wifiNetwork.ssid | spaceToUnderscore}}" quality="{{wifiNetwork.quality}}"></wifi-signal>          
-            <wifi-lock encryption="{{wifiNetwork.encryption}}" ssid="{{wifiNetwork.ssid | spaceToUnderscore}}"></wifi-lock>
+    <div class="wifi-section" ng-show="wanOption=='wifi'">
+      <span class="CX5 ml-40" ng-if="wirelessError">No wifi adapter</span>
+      <div class="ml-40" ng-if="!wifiNetworks[0] && wifiNetworkStatus===true">
+        <ellipsis-animated><ellipsis-animated/>
+      </div>
+      <ul class="CX5-M">
+        <li ng-repeat="wifiNetwork in wifiNetworks" ng-click="onSelectNetwork(wifiNetwork.ssid)" ng-class="{selected: selectedWifiNow.ssid == wifiNetwork.ssid}">
+          <wifi-check-symbol current-network="currentWifiSettings" ssid="{{wifiNetwork.ssid}}"></wifi-check-symbol>
+          <div class="wifi-info">
+            <span>{{wifiNetwork.ssid | truncate:20}}</span>
+            <div class="wifi-props">
+              <wifi-signal ssid="{{wifiNetwork.ssid | spaceToUnderscore}}" quality="{{wifiNetwork.quality}}"></wifi-signal>          
+              <wifi-lock encryption="{{wifiNetwork.encryption}}" ssid="{{wifiNetwork.ssid | spaceToUnderscore}}"></wifi-lock>
+            </div>
           </div>
+        </li>
+      </ul>
+      <div class="wan-backdrop" ng-if="IamConnected && name=='ethernet'"></div>
+    </div>
+    <div class="hotspot-section" ng-show="wanOption=='hotspot'">
+      <div class="hotspot-form">
+        <label class="CX5 mb-15">
+          {{isHotspotActive ? 'Deactivate hotspot to edit details' : 'Set hotspot details'}}
+        </label>
+        <modal-input-field caption="Network Name" class="mb-20" error="hotspotErrors.network_name">
+          <input type="text" class="CX5-M" ng-model="hotspotInfo.network_name" placeholder="Network Name" autocomplete="network name">
+        </modal-input-field>
+        <modal-input-field caption="Password" class="mb-20" error="hotspotErrors.password" label="Must be at least 8 characters">
+          <input type="password" class="CX5-M" ng-model="hotspotInfo.password" placeholder="Password" autocomplete="password">
+        </modal-input-field>
+        <div class="hotspot-status" ng-show="isHotspotActive">
+          <span class="CX5">Hotspot status:</span>
+          <label class="status-icon"></label>
+          <span class="CX5-M">Active</span>
         </div>
-      </li>
-    </ul>
+        <div class="button-group">
+          <button class="ci-btn-light CX5 mr-20" ng-click="onHotspotClick()">
+            {{isHotspotActive ? 'Deactivate Hotspot' : 'Activate Hotspot'}}
+          </button>
+        </div>
+      </div>
+      <div class="wan-backdrop" ng-if="IamConnected && name=='ethernet'"></div>
+    </div>
   </div>
-  <div class="two-col">
+  <div class="two-col" ng-show="wanOption == 'wifi' || name=='ethernet'">
     <h5 class="CX5-M sub-title mb-10">{{name=='ethernet' ? 'Ethernet ' : name + ' '}}Network Details</h5>
     <span class="CX5" ng-if="!name">Please select a network</span>
     <form ng-if="!IamConnected && name">
@@ -77,28 +109,29 @@
       <modal-input-field caption="IP Address" class="mb-20" ng-show="autoSetting">
         <input type="text" class="CX5-M" ng-model="editEthernetData.address" placeholder="IP Address" autocomplete="ip-address" readonly>
       </modal-input-field>
-      <modal-ip-address value="editEthernetData.address" caption="IP Address" class="mb-20" ng-show="!autoSetting"></modal-ip-address>
+      <modal-ip-address value="editEthernetData.address" caption="IP Address" class="mb-20" ng-show="!autoSetting" on-change="onIPFieldChange($event)"></modal-ip-address>
 
       <modal-input-field caption="Subnet Mask" class="mb-20" ng-show="autoSetting">
         <input type="text" class="CX5-M" ng-model="editEthernetData.maskAddress" placeholder="Subnet Mask" autocomplete="mask-address" readonly>
       </modal-input-field>
-      <modal-ip-address value="editEthernetData.maskAddress" caption="Subnet Mask" class="mb-20" ng-show="!autoSetting"></modal-ip-address>
+      <modal-ip-address value="editEthernetData.maskAddress" caption="Subnet Mask" class="mb-20" ng-show="!autoSetting" on-change="onIPFieldChange($event)"></modal-ip-address>
 
       <modal-input-field caption="Gateway IP" class="mb-20" ng-show="autoSetting">
         <input type="text" class="CX5-M" ng-model="editEthernetData.gateway" placeholder="Gateway IP" autocomplete="gateway-address" readonly>
       </modal-input-field>
-      <modal-ip-address value="editEthernetData.gateway" caption="Gateway IP" class="mb-20" ng-show="!autoSetting"></modal-ip-address>
+      <modal-ip-address value="editEthernetData.gateway" caption="Gateway IP" class="mb-20" ng-show="!autoSetting" on-change="onIPFieldChange($event)"></modal-ip-address>
 
       <modal-input-field caption="DNS Server" class="mb-20" ng-show="autoSetting">
         <input type="text" class="CX5-M" ng-model="editEthernetData['dns-nameservers']" placeholder="DNS Server" autocomplete="dns-server" readonly>
       </modal-input-field>
-      <modal-ip-address value="editEthernetData['dns-nameservers']" caption="DNS Server" class="mb-20" ng-show="!autoSetting"></modal-ip-address>
+      <modal-ip-address value="editEthernetData['dns-nameservers']" caption="DNS Server" class="mb-20" ng-show="!autoSetting" on-change="onIPFieldChange($event)"></modal-ip-address>
 
       <div class="button-group">
-        <button class="ci-btn-light CX5 mr-20" ng-if="!autoSetting" ng-click="connectEthernet()" ng-class="{'disabled': buttonValue=='Connecting'}">
+        <button class="ci-btn-light CX5 mr-10" ng-if="!autoSetting" ng-click="connectEthernet()" ng-disabled="!buttonEnabled">
           {{buttonValue}}
           <ellipsis-animated ng-if="buttonValue=='Connecting'"></ellipsis-animated>
         </button>
+        <button class="ci-btn-light CX5 mr-10" ng-click="onCancel()">Cancel</button>        
       </div>
     </form>
 

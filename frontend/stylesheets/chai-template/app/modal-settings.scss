@@ -181,7 +181,7 @@
           }
         }
 
-        &.disabled{
+        &.disabled, &[disabled]{
           color: $black;
           border-color: $black;
           cursor: initial;
@@ -326,16 +326,20 @@
           label{
             margin-left: 2px
           }
+          .switch{
+            margin-top: 0;
+          }
         }
 
         .connection-list{
           .wifi-switch{
-            display: inline-block;
+            display: flex;
             width: 40px;
-            vertical-align: middle;
+            align-items: center;
 
             .check-symbol{
-              margin-left: 2px;
+              margin-left: 3px;
+              margin-top: 0;
             }
           }
 
@@ -348,7 +352,12 @@
             .ci-btn-light{
               vertical-align: middle;
               margin-left: 15px;
-              padding: 4px 10px;              
+              padding: 4px 10px;
+              &.active, &:hover{
+                background: #000;
+                color: #fff;
+                border-color: #000;
+              }
             }
           }
 
@@ -405,8 +414,9 @@
         }
 
         ul{
-          max-height: 360px;
+          max-height: 352px;
           overflow: auto;
+          margin-top: 12px;
           li{
             display: flex;
             width: calc(100% - 17px);
@@ -464,6 +474,92 @@
                   background-color: #fff;
                 }
               }
+            }
+          }
+        }
+
+        .view-mode-switch{
+          width: calc(100% - 40px);
+          background: #E3E3E3;
+          border-radius: 2px;
+          padding: 3px;
+          display: flex;
+          height: 40px;
+
+          .switch-item{
+            width: 100%;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.1s all ease-in;
+            color: #777;
+
+            &.active{
+              box-shadow: 0px 1px 1px rgba(0,0,0,0.4);
+              background: #fff;
+              color: #000;
+              font-family: 'DINOT--Medium', Arial, sans-serif;
+            }
+          }
+        }
+        .wan-options{
+          display: flex;
+          align-items: center;
+        }
+
+        .wan-backdrop{
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 0;
+          bottom: 0;
+          background: #fffa;
+        }
+
+        .wifi-section{
+          position: relative;
+        }
+
+        .hotspot-section{
+          position: relative;
+          margin-left: 40px;
+          margin-top: 16px;
+
+          .modal-input-field{
+            label{
+              width: 120px;
+              color: #777777;
+            }
+            input{
+              width: calc(100% - 120px);
+            }
+            span{
+              display: block;
+              color: #000;
+            }
+
+            &.error{
+              span{
+                display: block;
+                color: #e02127;
+              }
+            }
+          }
+
+          .hotspot-status{
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            label.status-icon{
+              margin: 0 6px 0 10px;
+              display: block;
+              width: 6px;
+              height: 6px;
+              background: #8DC63F;
+              border: 1px solid #6CAC15;
+              border-radius: 50%;
             }
           }
         }

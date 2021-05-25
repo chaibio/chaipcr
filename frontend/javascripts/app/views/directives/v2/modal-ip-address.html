@@ -1,11 +1,31 @@
 <div class="modal-input-field" ng-class="{error: error}">
   <label class="CX5">{{caption}}</label>  
-  <input ip-number class="ip-field first CX5-M" type="text" min="0" max="255" required="true" ng-model="splittedIP[0]">
+  <input 
+  	ip-number 
+  	class="ip-field first CX5-M" 
+  	type="text" min="0" max="255" required="true" 
+  	ng-model="splittedIP[0]" ng-change="change(splittedIP[0])"
+  >
   <label class="CX5 point">.</label>  
-  <input ip-number class="ip-field second CX5-M" type="text" min="0" max="255" required="true" ng-model="splittedIP[1]">
+  <input 
+  	ip-number 
+  	class="ip-field second CX5-M" 
+  	type="text" min="0" max="255" required="true" 
+  	ng-model="splittedIP[1]" ng-change="change(splittedIP[1])"
+  >
   <label class="CX5 point">.</label>  
-  <input ip-number class="ip-field third CX5-M" type="text" min="0" max="255" required="true" ng-model="splittedIP[2]">
+  <input 
+  	ip-number 
+  	class="ip-field third CX5-M" 
+  	type="text" min="0" max="255" required="true" 
+  	ng-model="splittedIP[2]" ng-change="change(splittedIP[2])"
+  >
   <label class="CX5 point">.</label>  
-  <input ip-number class="ip-field fourth CX5-M" type="text" min="0" max="255" required="true" ng-model="splittedIP[3]">
+  <input 
+  	ip-number 
+  	class="ip-field fourth CX5-M" 
+  	type="text" min="0" max="255" required="true" 
+  	ng-model="splittedIP[3]" ng-change="change(splittedIP[3])"
+  >
   <span class="CG1-M">{{error ? (field ? field + ' ' + error : error) : ''}}</span>
 </div>

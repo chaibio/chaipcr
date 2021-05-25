@@ -29,6 +29,7 @@ window.App.controller 'SettingNetworkPanelCtrl', [
     #Select Network    
     $scope.autoSetting = true
     $scope.buttonValue = 'Connect'
+    $scope.buttonEnabled = false
     $scope.IamConnected = false
     $scope.statusMessage = ''
     $scope.currentNetwork = {}
@@ -40,6 +41,16 @@ window.App.controller 'SettingNetworkPanelCtrl', [
     $scope.errors = 
       wifi_password: ''
       wifi_ssid: ''
+
+    $scope.wanOption = 'wifi'
+    $scope.hotspotErrors = 
+      network_name: ''
+      password: ''
+
+    $scope.hotspotInfo = 
+      network_name: ''
+      password: ''
+    $scope.isHotspotActive = false
 
     ###*
       'new_wifi_result' this event is fired up when new wifi status is sent from the
@@ -245,15 +256,15 @@ window.App.controller 'SettingNetworkPanelCtrl', [
 
     verifyWifiCredentials = ->
       if $scope.wifiNetworkType == 'wpa2 802.1x' || $scope.wifiNetworkType == 'wpa1 802.1x'
-        $scope.errors.wifi_ssid = if $scope.credentials['wpa-identity'] then '' else 'Cannot left blank.'
-        $scope.errors.wifi_password = if $scope.credentials['wpa-password'] then '' else 'Cannot left blank.'
+        $scope.errors.wifi_ssid = if $scope.credentials['wpa-identity'] then '' else 'Cannot be blank.'
+        $scope.errors.wifi_password = if $scope.credentials['wpa-password'] then '' else 'Cannot be blank.'
 
       else if $scope.wifiNetworkType=='wpa2 psk' || $scope.wifiNetworkType=='wpa1 psk'
         $scope.errors.wifi_ssid = ''
-        $scope.errors.wifi_password = if $scope.credentials['wpa-psk'] then '' else 'Cannot left blank.'
+        $scope.errors.wifi_password = if $scope.credentials['wpa-psk'] then '' else 'Cannot be blank.'
       else if $scope.wifiNetworkType=='wep'
         $scope.errors.wifi_ssid = ''
-        $scope.errors.wifi_password = if $scope.credentials['wireless_key'] then '' else 'Cannot left blank.'
+        $scope.errors.wifi_password = if $scope.credentials['wireless_key'] then '' else 'Cannot be blank.'
       else
         $scope.errors.wifi_ssid = ''
         $scope.errors.wifi_password = ''
@@ -297,14 +308,13 @@ window.App.controller 'SettingNetworkPanelCtrl', [
     $scope.connectEthernet = ->
       $scope.statusMessage = ''
       $scope.buttonValue = 'Connecting'
+      $scope.buttonEnabled = false
       NetworkSettingsService.connectToEthernet($scope.editEthernetData).then ((result) ->
-        console.log result
         NetworkSettingsService.getEthernetStatus()
         # Get the new ip details as soon as we connect to new ethernet.
         $scope.autoSetting = true
         return
       ), (err) ->
-        console.log err
         return
       $timeout $scope.goToNewIp, 5000
       return
@@ -443,19 +453,24 @@ window.App.controller 'SettingNetworkPanelCtrl', [
       return
 
     $scope.onSelectNetwork = (network) ->
-      # Select Network
-      if network == 'ethernet'
-        $scope.buttonValue = 'Save Changes'
-      else
-        $scope.buttonValue = 'Connect'
-
       $scope.name = network
       $scope.selectedWifiNow = NetworkSettingsService.listofAllWifi[$scope.name] or null
       $scope.initNetwork()
       $scope.errors.wifi_password = ''
+
+      # Select Network
+      if network == 'ethernet'
+        $scope.buttonValue = 'Save Changes'
+        $scope.buttonEnabled = false
+        $scope.oriEditEthernetData = angular.copy $scope.editEthernetData
+      else
+        $scope.buttonValue = 'Connect'
       return
 
     $scope.onCancel = () ->
+      if $scope.name == 'ethernet'
+        NetworkSettingsService.connectedEthernet.state = angular.copy $scope.oriEditEthernetData
+
       $scope.name = ''
       $scope.selectedWifiNow = null
 
@@ -466,6 +481,27 @@ window.App.controller 'SettingNetworkPanelCtrl', [
         return connectedNetworkSsid == ssid
       return false
 
+    ## Wan Options
+    $scope.onChangeWanOption = () ->
+      $scope.wanOption = if $scope.wanOption == 'wifi' then 'hotspot' else 'wifi'
+      if !$scope.wifiNetworkStatus
+        $scope.wifiNetworkStatus = true
 
+    verifyHotspotCredentials = ->
+      $scope.hotspotErrors.network_name = if $scope.hotspotInfo.network_name then '' else 'Cannot be blank.'
+      $scope.hotspotErrors.password = if $scope.hotspotInfo.password.length < 8 then 'Must be at least 8 characters' else ''
+      return if $scope.hotspotErrors.network_name == '' and $scope.hotspotErrors.password == '' then true else false
 
+    $scope.onHotspotClick = () ->
+      if !verifyHotspotCredentials()
+        return
+      $scope.isHotspotActive = !$scope.isHotspotActive
+      if !$scope.isHotspotActive
+        $scope.hotspotInfo = 
+          network_name: ''
+          password: ''
+
+    $scope.onIPFieldChange = (e) ->
+      if $scope.buttonValue != 'Connecting'
+        $scope.buttonEnabled = true
 ]

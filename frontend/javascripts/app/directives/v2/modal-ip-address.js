@@ -8,13 +8,14 @@
          ip: '=value',
          caption: '@',
          error: '=',
-         field: '@'
+         field: '@',
+         change: '&onChange',
        },
        link: function($scope, elem, attr) {
          if($scope.ip) {
            $scope.splittedIP = $scope.ip.split('.');
            angular.element('.ip-field').blur(function(evt) {
-             $scope.ip = $scope.splittedIP.join('.');
+              $scope.ip = $scope.splittedIP.join('.');
            });
          }
        }

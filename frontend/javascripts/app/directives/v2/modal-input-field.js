@@ -10,6 +10,7 @@
           error: '=',
           caption: '@',
           field: '@',
+          label: '@',
         },
         link: function(scope,element,attrs,ctrl, transclude){
           element.find('p').replaceWith(transclude());
