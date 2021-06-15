@@ -31,7 +31,7 @@
       function getExperiment(exp_id, cb) {
         Experiment.get(exp_id).then(function(resp) {
           $scope.experiment = resp.data.experiment;
-          $rootScope.pageTitle = resp.experiment.name + " | Open qPCR";
+          $rootScope.pageTitle = $scope.experiment.name + " | Open qPCR";
           if (cb) cb(resp.data.experiment);
         });
       }
@@ -40,7 +40,6 @@
         if ($stateParams.id) {
           $scope.experimentId = $stateParams.id;
           getExperiment($scope.experimentId, function(exp){
-            if(exp.completion_status) $scope.viewResults();
             $scope.initial_done = true;
           });
         } else {
@@ -53,7 +52,7 @@
       
       $scope.checkExperimentStatus = function() {
         Experiment.get($scope.experimentId).then(function(resp) {
-          $scope.experiment = resp.data.experiment;
+          $scope.experiment = resp.experiment;
           if ($scope.experiment.completed_at) {
             if ($scope.experiment.completion_status === 'success') {
               $scope.goToResults();
