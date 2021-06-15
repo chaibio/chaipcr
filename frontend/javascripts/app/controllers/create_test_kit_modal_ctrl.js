@@ -234,7 +234,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
             var sample2_name = '';
             if ($scope.selected_brand.name == 'chai'){
                 $scope.selected_brand.guid = $scope.kit1.guid;
-                switch($scope.kit1.guid){
+                switch($scope.kit1.kit_id){
                     case 'coronavirus-env-surface':
                         target2_name = 'IAC';
                         break;
