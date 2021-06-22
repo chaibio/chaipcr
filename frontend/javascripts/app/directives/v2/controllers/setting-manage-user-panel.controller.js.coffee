@@ -7,6 +7,8 @@ window.App.controller 'SettingManageUserPanelCtrl', [
     $scope.users = []
     $scope.errors = {}
     selected_user = {}
+    $scope.login_user = {}
+    $scope.open_confirm = false
 
     init = () ->
       $scope.current_user = null
@@ -26,6 +28,9 @@ window.App.controller 'SettingManageUserPanelCtrl', [
       if selected_user.id
         $scope.onSelectUser(selected_user)
         selected_user = {}
+
+    User.getCurrent().then (resp) ->
+      $scope.login_user = resp.data.user
 
     $scope.onSelectUser = (user) ->
       $scope.current_user = angular.copy(user)
@@ -123,6 +128,27 @@ window.App.controller 'SettingManageUserPanelCtrl', [
           $scope.errors.email = data.user.errors.email?[0]
           $scope.errors.name = data.user.errors.name?[0]
           $scope.errors.password = data.user.errors.password?[0]
+
+    $scope.onConfirmDeleteUser = () ->
+      $scope.open_confirm = true
+      $scope.delete_error = ''
+
+    $scope.onConfirmCancel = () ->
+      $scope.open_confirm = false
+      $scope.delete_error = ''
+
+    $scope.onDeleteUser = () ->
+      $scope.delete_error = ''
+      User.remove($scope.current_user.id)
+      .then (resp) ->
+        for index in [0...$scope.users.length]
+          if $scope.users[index].user.id == $scope.current_user.id
+            $scope.users.splice(index, 1)
+            break
+        $scope.current_user = null
+        $scope.open_confirm = false
+      .catch (error) ->
+        $scope.delete_error = error.errors.base?[0]
 
     $scope.$on 'modal:edit-user', (e, data, oldData) ->
       if $scope.users.length

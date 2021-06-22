@@ -205,6 +205,13 @@
         }
       }
 
+      .ci-link{
+        color: #E02127;
+        cursor: pointer;
+        outline: none;
+        text-decoration: none;
+      }
+
       span.error{
         color: #E02127;
         display: block;
@@ -269,6 +276,7 @@
         .two-col{
           width: 100%;
           padding: 0 30px;
+          position: relative;
         }
 
         ul{
@@ -294,6 +302,28 @@
           }
           b{
             font-weight: initial;
+          }
+        }
+
+        .usertype-box{
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .confirm-wapper{
+          position: absolute;
+          top: 0;
+          background: #fffc;
+          height: 100%;
+          width: 100%;
+          padding: 30px;
+
+          .confirm-box{
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0px 1px 2px #777;
+            border-radius: 2px;            
           }
         }
       }

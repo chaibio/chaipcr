@@ -14,10 +14,13 @@
   <div class="two-col">
     <h5 class="CX5-M sub-title mb-10">User Details</h5>
     <span class="CX5" ng-if="!current_user">Please select a user</span>
-    <form ng-if="current_user">
-      <div class="sm-switch mb-15">
-        <switch class="switch" ng-model="current_user.is_admin"></switch>
-        <label class="CX5-M">Admin Access</label>
+    <form ng-if="current_user" style="position: relative;">
+      <div class="usertype-box mb-15">
+        <div class="sm-switch">
+          <switch class="switch" ng-model="current_user.is_admin"></switch>
+          <label class="CX5-M">Admin Access</label>
+        </div>
+        <a class="ci-link CB4-M" ng-click="onConfirmDeleteUser()" ng-show="login_user.role == 'admin' && !is_add_user && current_user.role != 'admin'">Delete User</button>
       </div>
       <modal-input-field caption="Name" class="mb-20 sm-label" field="Name">
         <input type="text" class="CX5-M" ng-model="current_user.name" placeholder="User Name" error="errors.name" autocomplete="username">
@@ -38,6 +41,18 @@
         <button class="ci-btn-light CX5" ng-click="onUserCancel()">Cancel</button>
       </div>
       <span class="error CG1-M">{{errors.message}}</span>
+
+      <!-- confirm box -->
+      <div class="confirm-wapper" ng-show="open_confirm">
+        <div class="confirm-box">
+          <p class="CB4 mb-20">Are you sure you want to delete <span class="CB4-M">{{current_user.name}}</span>’s profile?</p>
+          <div class="button-group">
+            <button class="ci-btn-light CX5 mr-10" ng-click="onDeleteUser()">Yes, Delete</button>
+            <button class="ci-btn-light CX5" ng-click="onConfirmCancel()">Cancel</button>
+          </div>
+          <span class="error CG1-M mt-10">{{delete_error}}</span>
+        </div>
+      </div>
     </form>
   </div>
 </div>

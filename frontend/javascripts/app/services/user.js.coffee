@@ -73,6 +73,8 @@ window.ChaiBioTech.ngApp.service 'User', [
       deferred = $q.defer()
       $http.delete("/users/#{id}").then (resp) ->
         deferred.resolve resp.data
+      .catch (resp) ->
+        deferred.reject resp.data.user
 
       deferred.promise;
 
