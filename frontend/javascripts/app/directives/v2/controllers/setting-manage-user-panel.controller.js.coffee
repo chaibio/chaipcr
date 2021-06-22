@@ -42,6 +42,12 @@ window.App.controller 'SettingManageUserPanelCtrl', [
         new_pwd: '',
         confirm_pwd: ''
 
+      $scope.errors = 
+        email: '',
+        name: '',
+        password: '',
+        confirm_password: ''
+
     $scope.onResetPassword = () ->
       $scope.is_reset_password = true
       $scope.has_changes = false
@@ -83,14 +89,19 @@ window.App.controller 'SettingManageUserPanelCtrl', [
       $scope.password = 
         new_pwd: '',
         confirm_pwd: ''
-      $scope.errors.password = ''
-      $scope.errors.confirm_password = ''
+
       $scope.current_user = 
         email: '',
         role: '',
         name: '',
         is_admin: false,
         show_banner: true
+
+      $scope.errors = 
+        email: '',
+        name: '',
+        password: '',
+        confirm_password: ''
 
     $scope.onUserFieldChanged = () ->
       $scope.errors.password = validatorForNewPasswd()
@@ -106,7 +117,6 @@ window.App.controller 'SettingManageUserPanelCtrl', [
         $scope.current_user.password_confirmation = $scope.password.confirm_pwd
 
       $scope.current_user.role = if $scope.current_user.is_admin then 'admin' else 'default'
-
       if $scope.current_user.id
         User.updateUser($scope.current_user.id, user: $scope.current_user)
         .then (user) ->
