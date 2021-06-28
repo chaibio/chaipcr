@@ -226,7 +226,12 @@ class UsersController < ApplicationController
   example "[{'user':{'id':1,'name':'test','email':'test@test.com','role':'user', 'show_banner':false}}]"
   def update
     @user = User.find_by_id(params[:id])
-    ret  = @user.update_attributes(user_params)
+    if @user != current_user && current_user.role != 'admin'
+      ret = false
+      @user.errors.add(:base, "You don't have permission to update")
+    else
+      ret  = @user.update_attributes(user_params)
+    end
     respond_to do |format|
       format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
     end
@@ -262,7 +267,10 @@ class UsersController < ApplicationController
     @user = User.find_by_id(params[:id])
     if @user == current_user
       ret = false
-      @user.errors.add(:base, "cannot destroy yourself")
+      @user.errors.add(:base, "Cannot delete yourself")
+    elsif current_user.role != 'admin'
+      ret = false
+      @user.errors.add(:base, "You don't have permission to delete")
     else
       ret = @user.destroy
     end

@@ -23,14 +23,15 @@ window.App.controller 'SettingManageUserPanelCtrl', [
       $scope.has_changes = false
 
     init()
+
+    User.getCurrent().then (resp) ->
+      $scope.login_user = resp.data.user
+
     User.fetch().then (users) ->
       $scope.users = users
       if selected_user.id
         $scope.onSelectUser(selected_user)
         selected_user = {}
-
-    User.getCurrent().then (resp) ->
-      $scope.login_user = resp.data.user
 
     $scope.onSelectUser = (user) ->
       $scope.current_user = angular.copy(user)
@@ -126,9 +127,10 @@ window.App.controller 'SettingManageUserPanelCtrl', [
               break
           $scope.current_user = null
         .catch (data) ->
-          $scope.errors.email = data.user.errors.email?[0]
-          $scope.errors.name = data.user.errors.name?[0]
-          $scope.errors.password = data.user.errors.password?[0]
+          $scope.errors.email = data.errors.email?[0]
+          $scope.errors.name = data.errors.name?[0]
+          $scope.errors.password = data.errors.password?[0]
+          $scope.errors.message = data.errors.base?[0]          
       else
         User.save($scope.current_user)
         .then (user) ->

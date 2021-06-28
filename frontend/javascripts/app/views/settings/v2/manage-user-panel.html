@@ -6,7 +6,7 @@
         <span ng-class="{active: current_user.id == user.user.id}" ng-click="onSelectUser(user.user)">{{user.user.name}}<b class="CG1" ng-if="user.user.role=='admin'"> Admin</b></span>
       </li>
     </ul>
-    <button class="ci-btn-light ci-btn-icon CX5" ng-click="onAddUser()">
+    <button class="ci-btn-light ci-btn-icon CX5" ng-click="onAddUser()" ng-if="login_user.role == 'admin'">
       <img src="/images/Add.svg" alt="">
       Add User
     </button>
@@ -15,20 +15,26 @@
     <h5 class="CX5-M sub-title mb-10">User Details</h5>
     <span class="CX5" ng-if="!current_user">Please select a user</span>
     <form ng-if="current_user" style="position: relative;">
-      <div class="usertype-box mb-15">
+      <div class="usertype-box" ng-if="login_user.role == 'admin'">
         <div class="sm-switch">
           <switch class="switch" ng-model="current_user.is_admin"></switch>
           <label class="CX5-M">Admin Access</label>
         </div>
-        <a class="ci-link CB4-M" ng-click="onConfirmDeleteUser()" ng-show="login_user.role == 'admin' && !is_add_user && current_user.role != 'admin'">Delete User</button>
+        <a class="ci-link CB4-M" ng-click="onConfirmDeleteUser()" ng-show="login_user.role == 'admin' && !is_add_user && current_user.id != login_user.id">Delete User</button>
       </div>
-      <modal-input-field caption="Name" class="mb-20 sm-label" field="Name">
+      <modal-input-field caption="Name" class="mt-20 mb-20 sm-label" field="Name">
         <input type="text" class="CX5-M" ng-model="current_user.name" placeholder="User Name" error="errors.name" autocomplete="username">
       </modal-input-field>
       <modal-input-field caption="E-Mail" value="current_user.email" class="mb-20 sm-label" error="errors.email" field="Email">
           <input type="text" class="CX5-M" ng-model="current_user.email" placeholder="User E-Mail" autocomplete="email">
       </modal-input-field>
-      <button ng-if="!is_reset_password" class="ci-btn-light CX5 mb-20" ng-click="onResetPassword()">Reset Password</button>
+      <button 
+        ng-if="!is_reset_password && (login_user.role == 'admin' || login_user.id == current_user.id)"
+        class="ci-btn-light CX5 mb-20" 
+        ng-click="onResetPassword()"
+      >
+        Reset Password
+      </button>
 
       <modal-input-field caption="New Password" class="mb-20 lg-label" ng-if="is_reset_password" error="errors.password">
         <input type="password" class="CX5-M" ng-model="password.new_pwd" placeholder="New Password" ng-blur="onUserFieldChanged()" autocomplete="new-password">
@@ -37,7 +43,14 @@
         <input type="password" class="CX5-M" ng-model="password.confirm_pwd" placeholder="Confirm Password" ng-blur="onUserFieldChanged()" autocomplete="confirm-password">
       </modal-input-field>
       <div class="button-group">
-        <button class="ci-btn-light CX5 mr-20" ng-class="{disabled: !has_changes}" ng-click="onSaveChanges()">Save Changes</button>
+        <button 
+          class="ci-btn-light CX5 mr-20" 
+          ng-class="{disabled: !has_changes}" 
+          ng-click="onSaveChanges()" 
+          ng-if="login_user.role == 'admin' || login_user.id == current_user.id"
+        >
+          Save Changes
+        </button>
         <button class="ci-btn-light CX5" ng-click="onUserCancel()">Cancel</button>
       </div>
       <span class="error CG1-M">{{errors.message}}</span>
@@ -45,12 +58,12 @@
       <!-- confirm box -->
       <div class="confirm-wapper" ng-show="open_confirm">
         <div class="confirm-box">
-          <p class="CB4 mb-20">Are you sure you want to delete <span class="CB4-M">{{current_user.name}}</span>’s profile?</p>
+          <p class="CB4 mb-20">Are you sure you want to delete <span class="CB4-M">{{current_user.name}}’s</span> profile?</p>
           <div class="button-group">
             <button class="ci-btn-light CX5 mr-10" ng-click="onDeleteUser()">Yes, Delete</button>
             <button class="ci-btn-light CX5" ng-click="onConfirmCancel()">Cancel</button>
           </div>
-          <span class="error CG1-M mt-10">{{delete_error}}</span>
+          <span class="error CB3-M mt-10">{{delete_error}}</span>
         </div>
       </div>
     </form>
