@@ -30,7 +30,7 @@
       </modal-input-field>
       <button 
         ng-if="!is_reset_password && (login_user.role == 'admin' || login_user.id == current_user.id)"
-        class="ci-btn-light CX5 mb-20" 
+        class="ci-btn-light CX5 mb-15" 
         ng-click="onResetPassword()"
       >
         Reset Password
@@ -44,9 +44,9 @@
       </modal-input-field>
       <div class="button-group">
         <button 
-          class="ci-btn-light CX5 mr-20" 
+          class="ci-btn-light CX5 mr-10" 
           ng-class="{disabled: !has_changes}" 
-          ng-click="onSaveChanges()" 
+          ng-click="onSaveChanges()"
           ng-if="login_user.role == 'admin' || login_user.id == current_user.id"
         >
           Save Changes
