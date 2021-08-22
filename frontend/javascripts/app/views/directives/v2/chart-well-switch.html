@@ -38,9 +38,16 @@
           ng-repeat="col in columns" 
           class="well-switch" 
           ng-init="i = (row.index * columns.length) + col.index; well = wells['well_' + i];" 
+
           ng-mousedown="dragStart($event, 'well', i)" 
           ng-mousemove="wellHover($event, 'well', i)"
           ng-mouseup="dragStop($event, 'well', i)" 
+
+          ng-touchstart="touchStart($event, 'well', i)" 
+          ng-touchmove="touched($event, 'well', i)" 
+          ng-touchend="touchEnd($event, 'well', i)"
+
+          data-well-index="{{i}}"
           ng-class="{selected: well.selected, active: well.active && well.selected}" 
           ng-style="getWellStyle(row, col, well, i)">
           <div class="well-switch-container" ng-style="getWellContainerStyle(row, col, well, i)">

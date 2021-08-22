@@ -53,6 +53,8 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
         standard: '/images/ring_s.svg'
         unknown: '/images/ring_u.svg'
 
+      $scope.touch_desc = 'touch test'
+
 
       $scope.registerOutsideHover = false;
       unhighlight_event = ''
@@ -245,6 +247,10 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
       $scope.dragStart = (evt, type, index) ->
         # type can be 'column', 'row', 'well' or 'corner'
         # index is index of the type
+
+        $scope.touch_desc = $scope.touch_desc + '** touchStart **' + evt + ' ' + type + ' ' + index
+
+
         $scope.dragging = true
         $scope.dragStartingPoint =
           type: type
@@ -417,4 +423,149 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
         else
           ''
 
+      $scope.touchStart = (evt, type, index) ->
+        $scope.dragging = true
+        $scope.dragStartingPoint =
+          type: type
+          index: index
+
+        if $scope.dragStartingPoint.type is 'column'
+          if type is 'well'
+            index = if index >= $scope.columns.length then index - $scope.columns.length else index
+
+          max = Math.max.apply(Math, [index, $scope.dragStartingPoint.index])
+          min = if max is index then $scope.dragStartingPoint.index else index
+          $scope.columns.forEach (col) ->
+            col.selected = col.index >= min and col.index <= max
+            $scope.rows.forEach (row) ->
+              well = $scope.wells["well_#{row.index * $scope.columns.length + col.index}"]
+              if not (isCtrlKeyHeld(evt) and well.selected)
+                well.selected = col.selected
+
+        if $scope.dragStartingPoint.type is 'row'
+          if type is 'well'
+            index = if index >= 8 then 1 else 0
+          max = Math.max.apply(Math, [index, $scope.dragStartingPoint.index])
+          min = if max is index then $scope.dragStartingPoint.index else index
+          $scope.rows.forEach (row) ->
+            row.selected = row.index >= min and row.index <= max
+            $scope.columns.forEach (col) ->
+              well = $scope.wells["well_#{row.index * $scope.columns.length + col.index}"]
+              # ctrl or command key held
+              if not (isCtrlKeyHeld(evt) and well.selected)
+                well.selected = row.selected
+
+      $scope.touched = (evt, type) ->
+        selectedElement = document.elementFromPoint(evt.originalEvent.changedTouches[0].clientX, evt.originalEvent.changedTouches[0].clientY)
+        index = 0
+        if !selectedElement then return
+
+        while selectedElement.parentNode
+          element = angular.element(selectedElement)
+          if element.hasClass('well-switch')
+            index = element.data('well-index')
+            break
+          selectedElement = selectedElement.parentNode
+
+        return if !$scope.dragging
+        return if type is $scope.dragStartingPoint.type and index is $scope.dragStartingPoint.index
+
+        if $scope.dragStartingPoint.type is 'column'
+          if type is 'well'
+            index = if index >= $scope.columns.length then index - $scope.columns.length else index
+
+          max = Math.max.apply(Math, [index, $scope.dragStartingPoint.index])
+          min = if max is index then $scope.dragStartingPoint.index else index
+          $scope.columns.forEach (col) ->
+            col.selected = col.index >= min and col.index <= max
+            $scope.rows.forEach (row) ->
+              well = $scope.wells["well_#{row.index * $scope.columns.length + col.index}"]
+              if not (isCtrlKeyHeld(evt) and well.selected)
+                well.selected = col.selected
+
+        if $scope.dragStartingPoint.type is 'row'
+          if type is 'well'
+            index = if index >= 8 then 1 else 0
+          max = Math.max.apply(Math, [index, $scope.dragStartingPoint.index])
+          min = if max is index then $scope.dragStartingPoint.index else index
+          $scope.rows.forEach (row) ->
+            row.selected = row.index >= min and row.index <= max
+            $scope.columns.forEach (col) ->
+              well = $scope.wells["well_#{row.index * $scope.columns.length + col.index}"]
+              # ctrl or command key held
+              if not (isCtrlKeyHeld(evt) and well.selected)
+                well.selected = row.selected
+
+        if $scope.dragStartingPoint.type is 'well'
+          if type is 'well'
+            row1 = Math.floor($scope.dragStartingPoint.index / $scope.columns.length)
+            col1 = $scope.dragStartingPoint.index - row1 * $scope.columns.length
+            row2 = Math.floor(index / $scope.columns.length)
+            col2 = index - row2 * $scope.columns.length
+            max_row = Math.max.apply(Math, [row1, row2])
+            min_row = if max_row is row1 then row2 else row1
+            max_col = Math.max.apply(Math, [col1, col2])
+            min_col = if max_col is col1 then col2 else col1
+            $scope.rows.forEach (row) ->
+              $scope.columns.forEach (col) ->
+                selected = (row.index >= min_row and row.index <= max_row) and (col.index >= min_col and col.index <= max_col)
+                well = $scope.wells["well_#{row.index * $scope.columns.length + col.index}"]
+                if not (isCtrlKeyHeld(evt) and well.selected)
+                  well.selected = selected
+
+      $scope.touchEnd = (evt, type) ->
+        selectedElement = document.elementFromPoint(evt.originalEvent.changedTouches[0].clientX, evt.originalEvent.changedTouches[0].clientY)
+        if !selectedElement then return
+        index = 0
+        while selectedElement.parentNode
+          element = angular.element(selectedElement)
+          if element.hasClass('well-switch')
+            index = element.data('well-index')
+            break
+          selectedElement = selectedElement.parentNode
+
+        return if !$scope.dragging
+
+        $scope.dragging = false
+
+        # remove selected from columns and row headers
+        $scope.columns.forEach (col) ->
+          col.selected = false
+        $scope.rows.forEach (row) ->
+          row.selected = false
+
+        if type is 'well' and index is $scope.dragStartingPoint.index
+          # deselect all other wells if ctrl/cmd key is not held
+          if !isCtrlKeyHeld(evt)
+            $scope.rows.forEach (r) ->
+              $scope.columns.forEach (c) ->
+                $scope.wells["well_#{r.index * $scope.columns.length + c.index}"].selected = false
+
+          # toggle selected state
+          well = $scope.wells["well_#{index}"]
+          well.selected = if isCtrlKeyHeld(evt) then !well.selected else true
+
+
+        if $scope.dragStartingPoint.type is 'well' and $scope.shiftStartIndex >= 0
+          if type is 'well'
+            row1 = Math.floor($scope.shiftStartIndex / $scope.columns.length)
+            col1 = $scope.shiftStartIndex - row1 * $scope.columns.length
+            row2 = Math.floor(index / $scope.columns.length)
+            col2 = index - row2 * $scope.columns.length
+            max_row = Math.max.apply(Math, [row1, row2])
+            min_row = if max_row is row1 then row2 else row1
+            max_col = Math.max.apply(Math, [col1, col2])
+            min_col = if max_col is col1 then col2 else col1
+            $scope.rows.forEach (row) ->
+              $scope.columns.forEach (col) ->
+                selected = (row.index >= min_row && row.index <= max_row) && (col.index >= min_col && col.index <= max_col)
+                well = $scope.wells["well_" + (row.index * $scope.columns.length + col.index)]
+                if evt.shiftKey 
+                  well.selected = selected
+
+        if not evt.shiftKey then $scope.shiftStartIndex = index
+
+        ngModel.$setViewValue(angular.copy($scope.wells))
+
+        $rootScope.$broadcast 'event:switch-chart-well', {active: well?.active, index: index}
   ]

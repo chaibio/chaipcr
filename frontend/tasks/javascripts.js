@@ -51,6 +51,7 @@ var vendorFiles = [
   'libs/ng-file-upload.js',
   'libs/ng-webworker.js',
   'libs/async.js',
+  'libs/ng-touch.min.js',
   // 'libs/angular-sanitize.js',
 ];
 var appFiles = [
