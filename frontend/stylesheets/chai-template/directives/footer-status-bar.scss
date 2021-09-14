@@ -11,6 +11,7 @@
   overflow: hidden;
   position: fixed;
   bottom: 0;
+  z-index: 1000;
 
   .left-content{
     display: flex;

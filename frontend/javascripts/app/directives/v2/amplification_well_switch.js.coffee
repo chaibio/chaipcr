@@ -53,9 +53,6 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
         standard: '/images/ring_s.svg'
         unknown: '/images/ring_u.svg'
 
-      $scope.touch_desc = 'touch test'
-
-
       $scope.registerOutsideHover = false;
       unhighlight_event = ''
 
@@ -98,13 +95,16 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
       ngModel.$setViewValue wells
       $scope.wells = wells
 
-      $scope.row_header_width = 20
+      $scope.row_header_width = if window.innerWidth <= 1366 and window.innerWidth > 1112 then 30 else 20
       $scope.columns = []
       $scope.rows = []
       for i in [0...8]
         $scope.columns.push index: i, selected: false
       for i in [0...2]
         $scope.rows.push index: i, selected: false
+
+      $scope.$on 'window:resize', ->
+        $scope.row_header_width = if window.innerWidth <= 1366 and window.innerWidth > 1112 then 30 else 20
 
       $scope.getWidth = -> elem[0].parentElement.offsetWidth
       $scope.getCellWidth = ->
@@ -247,9 +247,6 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
       $scope.dragStart = (evt, type, index) ->
         # type can be 'column', 'row', 'well' or 'corner'
         # index is index of the type
-
-        $scope.touch_desc = $scope.touch_desc + '** touchStart **' + evt + ' ' + type + ' ' + index
-
 
         $scope.dragging = true
         $scope.dragStartingPoint =
@@ -536,14 +533,19 @@ window.ChaiBioTech.ngApp.directive 'chartWellSwitch', [
 
         if type is 'well' and index is $scope.dragStartingPoint.index
           # deselect all other wells if ctrl/cmd key is not held
-          if !isCtrlKeyHeld(evt)
+          # toggle selected state
+          selected_count = 0
+          for i in [0..15] by 1
+            if $scope.wells["well_#{i}"].selected
+              selected_count = selected_count + 1
+
+          if selected_count == 1
             $scope.rows.forEach (r) ->
               $scope.columns.forEach (c) ->
                 $scope.wells["well_#{r.index * $scope.columns.length + c.index}"].selected = false
 
-          # toggle selected state
           well = $scope.wells["well_#{index}"]
-          well.selected = if isCtrlKeyHeld(evt) then !well.selected else true
+          well.selected = if selected_count > 1 then !well.selected else true
 
 
         if $scope.dragStartingPoint.type is 'well' and $scope.shiftStartIndex >= 0

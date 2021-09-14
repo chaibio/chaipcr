@@ -23,6 +23,7 @@
 
   .col-header {
     text-align: center;
+    height: 20px;
 
     &.dragged {
       background: #7DC2E6;
@@ -148,6 +149,65 @@
           width: 2px;
           background: #c5c5c5;
         }
+      }
+    }
+  }
+}
+
+.small{
+  .chart-well-switch {
+    .well-switch {
+      .detail-container {
+        .sample-name {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1366px) {
+  .chart-well-switch {
+    .col-header {
+      height: 30px;
+    }
+
+    .well-switch {
+      min-height: 45px;
+      .detail-container {
+        min-height: 30px;
+      }
+    }
+  }
+}
+
+@media (max-width: 1112px) {
+  .chart-well-switch {
+    .col-header {
+      height: 20px;
+    }
+
+    .well-switch {
+      min-height: 45px;
+      .detail-container {
+        min-height: 30px;
+        padding: 5px;
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .chart-well-switch {
+    .col-header {
+      height: 20px;
+    }
+
+    .well-switch {
+      min-height: 45px;
+      .detail-container {
+        min-height: 30px;
+        padding: 2px 5px;
       }
     }
   }

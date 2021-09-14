@@ -13,10 +13,15 @@
     .curve-title {
       display: inline-block; //width: 70%;
       cursor: pointer;
+      padding-left: 15px;
       img {
         display: inline-block;
         margin-top: -5px;
         width: 20px;
+      }
+
+      &.short-name {
+        display: none;
       }
     }
     .plot-type-checkboxes {
@@ -163,6 +168,26 @@
         .scrollbar {
           border-radius: 10px;
         }
+      }
+    }
+  }
+}
+
+
+///////////////////// Responsive  ///////////////////////////////
+@media (max-width: 1024px){
+  .results-charts {
+    .curve-header {
+      .curve-title.short-name {
+        display: block;
+        // width: 150px;
+        // white-space: nowrap;
+        // text-overflow: ellipsis;
+        // overflow: hidden;        
+      }
+
+      .curve-title.long-name {
+        display: none;
       }
     }
   }

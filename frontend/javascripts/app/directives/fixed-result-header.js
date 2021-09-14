@@ -130,6 +130,7 @@ function fixedResultHeader($timeout, $window, $rootScope) {
                 });
 
                 var validWidth = (tableMinWidth > parentWidth ? tableMinWidth : parentWidth - 3) - scrollWidth - fixedWidth;
+                var innerWidth = window.innerWidth;
 
                 angular.forEach(elem.querySelectorAll('tr:first-child th'), function (thElem, i) {
                     var tdElems = elem.querySelectorAll('tbody tr td:nth-child(' + (i + 1) + ')');
@@ -138,7 +139,15 @@ function fixedResultHeader($timeout, $window, $rootScope) {
 
                     angular.forEach(tdElems, function(tdElem, i){
                         if(thElem.attributes.width.value.indexOf('%') != -1){
-                            tdElem.style.width = (widthPercent * validWidth / 100) + 'px';
+                            if(innerWidth > 1368){
+                                tdElem.style.width = (widthPercent * validWidth / 100) + 'px';
+                            } else {
+                                if(widthPercent == '100'){
+                                    tdElem.style.width = '120px';
+                                } else {
+                                    tdElem.style.width = (widthPercent * validWidth / 100) + 'px';
+                                }
+                            }
                             // tdElem.style.width = widthPercent + '%';
                         } else {
                             tdElem.style.width = thElem.attributes.width.value;
@@ -147,8 +156,15 @@ function fixedResultHeader($timeout, $window, $rootScope) {
 
                     if (thElem) {
                         if(thElem.attributes.width.value.indexOf('%') != -1){
-                            // thElem.style.width = widthPercent + '%';
-                            thElem.style.width = (widthPercent * validWidth / 100) + 'px';
+                            if(innerWidth > 1368){
+                                thElem.style.width = (widthPercent * validWidth / 100) + 'px';
+                            } else {
+                                if(widthPercent == '100'){
+                                    thElem.style.width = '120px';
+                                } else {
+                                    thElem.style.width = (widthPercent * validWidth / 100) + 'px';
+                                }
+                            }
                         } else {
                             thElem.style.width = thElem.attributes.width.value;
                         }

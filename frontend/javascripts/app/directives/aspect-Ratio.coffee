@@ -18,9 +18,10 @@ App.directive 'aspectRatio', [
       offsetTop: '=?'
     link: ($scope, elem) ->
 
-      elem.addClass 'aspect-Ratio'
+      elem.addClass 'aspect-Ratio'      
 
       getWidth = ->
+
         # console.log('parent_getWidth')
         # console.log(elem.parent().width())
         width = elem.parent().width() - $scope.offsetX
@@ -45,12 +46,9 @@ App.directive 'aspectRatio', [
         # if height > elem.parent().height()  then height = elem.parent().height()
         height
 
-      resizeAspectRatio = -> 
-
+      resizeDesktopAspectRatio = -> 
         width = getWidth()
         height = getHeight()
-
-        # console.log('resizeAspectRatio')
 
         if width > $scope.maxWidth and height > $scope.maxHeight
           width = $scope.maxWidth
@@ -69,7 +67,10 @@ App.directive 'aspectRatio', [
         elem.css('min-Width': width)
         elem.css('width': width)
         elem.css('min-height': height)
-        elem.css('height': height)        
+        elem.css('height': height)    
+        angular.element('.choose-chart').removeClass('small')
+        angular.element('.chart-screen-wapper').css('min-width': 1368)
+
         elem.parent().children().last().get(0).style.height = height + "px"
         angular.element(elem.parent().children().last().get(0)).children().last().get(0).style.height = height - $scope.offsetTop + "px"
 
@@ -81,6 +82,62 @@ App.directive 'aspectRatio', [
           element.getElementsByClassName('target-box')[0].style.padding = "5px 20px 5px 10px"
         else if offsetHeight == scrollHeight
           element.getElementsByClassName('target-box')[0].style.padding = "5px 10px"
+        return
+
+      resizeTabletAspectRatio = ->
+        innerHeight = window.innerHeight
+        innerWidth = window.innerWidth
+
+
+        minHeight = if innerWidth > 1024 then 780 else 640
+        maxHeight = if innerWidth > 768 then 1024 else 720
+        paddingHeight = 60
+
+        if innerWidth > 1112
+          minHeight = 960
+          maxHeight = 1024
+          wellTableHeight = 175
+        else if innerWidth > 1024
+          minHeight = 720
+          maxHeight = 1024
+          wellTableHeight = 130
+          paddingHeight = 40
+        else if innerWidth > 992
+          minHeight = 640
+          maxHeight = 1024
+          wellTableHeight = 110
+          paddingHeight = 40
+        else
+          minHeight = 840
+          maxHeight = 1024
+          wellTableHeight = 110
+          paddingHeight = 40
+       
+        height = Math.min(Math.max(innerHeight, minHeight), maxHeight) - 100 - 100 - 60  - paddingHeight - wellTableHeight
+        width = height * 1.7
+
+        elem.css('min-Width': width)
+        elem.css('width': width)
+        elem.css('min-height': height)
+        elem.css('height': height)
+
+        if wellTableHeight == 175
+          angular.element('.choose-chart').removeClass('small')
+        else
+          angular.element('.choose-chart').addClass('small')
+
+        angular.element('.chart-screen-wapper').css('min-width': width + 40 + 620)
+
+        return
+
+      resizeAspectRatio = -> 
+        innerWidth = window.innerWidth
+        if innerWidth > 1366
+          resizeDesktopAspectRatio()
+        else
+          resizeTabletAspectRatio()
+
+
 
       resizeTimeout = null
       

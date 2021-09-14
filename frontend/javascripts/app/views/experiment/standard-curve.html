@@ -21,15 +21,12 @@ limitations under the License.
     <div class="content" style="padding-top:0px; height: 100%; display: flex;">
       <div class="chart-section" offset="0" force="true" style="height:100%; padding-left: 0px; padding-right: 0px; background: #eeeeee">
         <div>
-          <div class="curve-header">
+          <div class="curve-header" ng-click="onChangeScrollView('left')">
             <div class="curve-name">
               <!-- <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()"> -->
-              <chart-chooser class="curve-title H1" experiment="experiment" current-chart="$parent.chart" style="padding-left: 15px;">
-                Standard Curve
-                <img class="arrow-down" src="/images/arrow-down_black.png">
-              </chart-chooser>
+              <div class="curve-title H1">Standard Curve</div>
             </div>
-            <div class="plot-options">
+            <div class="plot-options color-by">
               <p class="B1-Amplification">Color by</p>
               <form role="form" class="form-horizontal B1-Amplification" name="colorBy" novalidate>
                 <div class="form-group" style="margin: 0;">
@@ -49,7 +46,7 @@ limitations under the License.
                 </div>
               </form>
             </div>
-            <div class="plot-options" style="padding-right: 40px;">
+            <div class="plot-options plot-type">
               <ul class="data-point-type">
                 <li>
                   <label class="XB1M">Standard</label>
@@ -63,9 +60,20 @@ limitations under the License.
             </div>
           </div>          
           <div class="curve-body amplification-chart" style="height:100%; display: flex; flex-direction: row; justify-content: space-between;">
-            <div class="curve-plot" aspect-ratio offset-x='160 + 10 + 20' offset-y='100 + 160 + 20 + 10' min-width='680' max-width='1020' min-height='400' max-height='600' offset-top='250' id="curve-plot" style="display: block;padding: 0;">
+            <div 
+              class="curve-plot" 
+              aspect-ratio 
+              offset-x='160 + 10 + 20' 
+              offset-y='100 + 160 + 20 + 10' 
+              min-width='320' 
+              max-width='1020' 
+              min-height='320' 
+              max-height='600' 
+              offset-top='250' 
+              id="curve-plot" style="display: block;padding: 0;"
+            >            
               <div class="chart-wrapper">
-                <div class="chart-container" style="height:100%; min-width: 660px; min-height: 340px;">
+                <div class="chart-container" style="height:100%; min-width: 480px; min-height: 320px;">
                   <div class="chart-error B1" ng-show="retrying && !fetching && error">
                     <strong class="text-black">Unable to load chart data</strong>
                     <p ng-bind="error"></p>
@@ -181,7 +189,50 @@ limitations under the License.
             </div>            
           </div>
         </div>
-        <div class="choose-chart" style="position: relative;margin: 0 10px; height: 160px;">
+
+        <div class="additional-info-mobile two-column">
+          <div class="info-wrapper parameters">
+            <div class="header CB4-M">{{label_well}}</div>
+            <div class="target-container">
+              <table class="parameters-table">
+                <tr>
+                  <td class="B1v-Amplification">Effic:</td>
+                  <td class="B1Mv-Amplification">{{label_effic * 100 | fixed_number: 1}}{{(label_effic !='') ? '%' : ''}}</td>
+                  <td class="B1v-Amplification">Slope:</td>
+                  <td class="B1Mv-Amplification">{{label_slope | fixed_number: 3}}</td>
+                </tr>
+                <tr>
+                  <td class="B1v-Amplification">R<sup>2</sup>:</td>
+                  <td class="B1Mv-Amplification">{{label_r2 | fixed_number: 3}}</td>
+                  <td class="B1v-Amplification">Y-Int:</td>
+                  <td class="B1Mv-Amplification">{{label_yint | fixed_number: 2}}</td>
+                  <td class="B1v-Amplification" style="color: #888;">Channel:</td>
+                  <td class="B1Mv-Amplification" style="color: #888;">{{label_channel}}</td>
+                </tr>
+              </table>              
+            </div>
+          </div>
+
+          <div class="info-wrapper">
+            <div class="header CB4-M">Targets</div>
+            <div class="target-container">
+              <div class="target-list">
+                <div class="target-line" ng-repeat="target in targetsSet">
+                  <div class="target-name">
+                    <label class="dot" ng-attr-style="background-color: {{target.color}};"></label>
+                    {{target.name}}
+                  </div>
+                    <div class="sm-switch">
+                      <switch class="switch" ng-model="targetsSetHided[target.id]"></switch>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="choose-chart">
           <chart-well-switch 
             style="position: absolute; height: 100%;" 
             ng-model="wellButtons" 
@@ -197,7 +248,7 @@ limitations under the License.
 
       <div class="table-container" force="true">
         <table fixed-result-header offset="0" min-width="620" class="detail-mode-table">
-          <thead>
+          <thead ng-click="onChangeScrollView('right')">
             <tr>
               <th class="CB4-M item-center" width="35px">Clr</th>
               <th class="CB4-M item-center" width="40px">Omit</th>

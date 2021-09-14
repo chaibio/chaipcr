@@ -717,4 +717,12 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
       $scope.targetGridTop = ->
         Math.max(document.getElementById("curve-plot").clientHeight + 30, 412 + 30)
 
+      $scope.onChangeScrollView = (direction) ->
+        if document.querySelector('.chart-screens-container').scrollLeft < 100
+          if direction == '' or direction == 'right'
+            angular.element(document.querySelector('.chart-screens-container')).animate { scrollLeft: 2500 }, 'fast'
+        else
+          angular.element(document.querySelector('.chart-screens-container')).animate { scrollLeft: 0 }, 'fast'
+        return
+
 ]

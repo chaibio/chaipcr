@@ -528,3 +528,19 @@ $sidemenu_width_close: 0;
     }
   }
 }
+
+
+@media (max-width: 1366px){
+  .chai-mode{
+    .side-menu-layout{
+      .sidemenu{
+        #sidemenu-content {
+          height: auto;
+        }
+      }
+      .inner-wrapper{
+        height: 100%;
+      }
+    }
+  }
+}

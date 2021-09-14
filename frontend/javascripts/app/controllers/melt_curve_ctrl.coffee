@@ -614,4 +614,12 @@ App.controller 'MeltCurveChartCtrl', [
       $scope.label_Temp = ''
       $scope.label_Norm = ''
       $scope.label_dF_dT = ''
+
+    $scope.onChangeScrollView = (direction) ->
+      if document.querySelector('.chart-screens-container').scrollLeft < 100
+        if direction == '' or direction == 'right'
+          angular.element(document.querySelector('.chart-screens-container')).animate { scrollLeft: 2500 }, 'fast'
+      else
+        angular.element(document.querySelector('.chart-screens-container')).animate { scrollLeft: 0 }, 'fast'
+      return
 ]

@@ -929,4 +929,15 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         last_target_channel = 0
         last_target_assigned = 0
 
+      $scope.onChangeScrollView = (direction, event) ->
+        if event and (angular.element(event.target).hasClass('switch-item') or angular.element(event.target).hasClass('view-mode-switch'))
+          return
+
+        if document.querySelector('.chart-screens-container').scrollLeft < 100
+          if direction == '' or direction == 'right'
+            angular.element(document.querySelector('.chart-screens-container')).animate { scrollLeft: 2500 }, 'fast'
+        else
+          angular.element(document.querySelector('.chart-screens-container')).animate { scrollLeft: 0 }, 'fast'
+        return
+
 ]
