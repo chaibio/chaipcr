@@ -215,11 +215,11 @@ limitations under the License.
           <thead ng-click="onChangeScrollView('right')">
             <tr>
               <th class="CB4-M item-center" width="35px">Clr</th>
-              <th class="CB4-M item-center" width="40px">Omit</th>
+              <th class="CB4-M item-center melt-omit" width="40px">Omit</th>
               <th class="CB4-M item-center" width="45px" >Well</th>
-              <th class="CB4-M " width="25%" >Sample</th>
+              <th class="CB4-M melt-sample" width="25%" >Sample</th>
               <th class="CB4-M item-center" width="50px">Type</th>
-              <th class="CB4-M " width="25%">Target</th>
+              <th class="CB4-M melt-target" width="25%">Target</th>
               <th class="CB4-M item-center" width="12.5%"><span>T<sub>m</sub> 1</span></th>
               <th class="CB4-M item-center" width="12.5%"><span>T<sub>m</sub> 2</span></th>
               <th class="CB4-M item-center" width="12.5%"><span>T<sub>m</sub> 3</span></th>
@@ -251,7 +251,7 @@ limitations under the License.
                   class="CB4 dot" 
                   ng-attr-style="background-color: {{targets[config.channels * (well_item.well_num - 1) + well_item.channel - 1].color}}"></span>
               </td>
-              <td class="CB4 item-center" style="border-top-left-radius: 3px;border-bottom-left-radius: 3px;">
+              <td class="CB4 item-center melt-omit" style="border-top-left-radius: 3px;border-bottom-left-radius: 3px;">
                 <div 
                     class="checkbox-wrapper B1B" ng-click="toggleOmitIndex(well_item)" 
                     ng-class="{ 'selected': omittedIndexes.indexOf(well_item.well_num.toString() + '_' + well_item.channel.toString()) != -1}">
@@ -268,7 +268,7 @@ limitations under the License.
                   </span>
                 </span>
               </td>
-              <td class="CB4" ng-click="onSelectRow(well_item, $index)">
+              <td class="CB4 melt-sample" ng-click="onSelectRow(well_item, $index)">
                 <span class="one-line-span">{{samples[well_item.well_num - 1].name | truncate:30}}</span>
               </td>
               <td class="CB4 type-td item-center" ng-click="onSelectRow(well_item, $index)">
@@ -282,7 +282,7 @@ limitations under the License.
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" ng-if="well_item.well_type == 'unknown'"><defs><style>.cls-1{fill:#fff;}</style></defs><title>ring_u</title><g id="Layer_2" data-name="Layer 2"><g id="Symbol_Editing_Mode" data-name="Symbol Editing Mode"><g id="New_Symbol_5" data-name="New Symbol 5"><circle class="cls-1" cx="25" cy="25" r="23"/><path class="icon-path" d="M25,4A21,21,0,1,1,4,25,21,21,0,0,1,25,4m0-4A25,25,0,1,0,50,25,25,25,0,0,0,25,0Z"/><path class="icon-path" d="M25,32.29a5,5,0,0,1-5.24-5V17.92h2.78v9.27a2.47,2.47,0,1,0,4.94,0V17.92h2.76v9.37A5,5,0,0,1,25,32.29Z"/></g></g></g></svg>
                 </span>
               </td>
-              <td class="CB4" ng-click="onSelectRow(well_item, $index)">
+              <td class="CB4 melt-target" ng-click="onSelectRow(well_item, $index)">
                 <span class="one-line-span">{{well_item.target_name | truncate:30}}</span>              
               </td>
               <td class="CB4 item-center" ng-click="onSelectRow(well_item, $index)">
