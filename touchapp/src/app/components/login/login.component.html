@@ -1,0 +1,30 @@
+<div class="login-container">
+  <form class="login-wrapper" #loginForm="ngForm" (ngSubmit)="doSubmit()">
+    <div class="login-box">
+      <div class="login-inner-container">
+        <div class="logo-version-section">
+          <img class="logo" src="assets/images/login_logo.png">
+          <span class="version-data">Version {{deviceInfo.software.version}}</span>
+        </div>
+        <div class="input-section">
+          <span class="login-input-label">Username</span>
+          <input type="email" class="login-input-field" placeholder="Email Address" autofocus required [(ngModel)]="credentials.email" name="email">
+        </div>
+        <div class="input-section password">
+          <span class="login-input-label">Password</span>
+          <input type="password" placeholder="Enter Password" class="login-input-field" [(ngModel)]="credentials.password" name="password">
+        </div>
+        <div class="message-section text-center">
+          <span class="text-danger" *ngIf="loginError">{{loginError}}</span>
+        </div>
+        <div class="submit-section text-center">
+          <button type="submit" class="login-button" [disabled]="!loginForm.form.valid">Sign In</button>
+        </div>
+      </div>
+    </div>
+    <div class="serial-section">
+      <span class="serial-data">Serial#:&nbsp;{{deviceInfo.serial_number}}</span>
+    </div>
+  </form>
+</div>
+

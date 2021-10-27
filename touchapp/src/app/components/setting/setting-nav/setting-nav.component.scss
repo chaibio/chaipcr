@@ -1,0 +1,13 @@
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .ch-button {
+    padding: 8px;
+    img {
+      width: 14px;
+      display: block;
+    }
+  }
+}

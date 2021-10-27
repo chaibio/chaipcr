@@ -1,0 +1,25 @@
+.chart-well-switch {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  table {
+    border: none;
+  }
+
+  th, td {
+    border: none;
+  }
+
+  .well-switch {
+    text-align: center;
+    vertical-align: middle;
+    line-height: 90px;
+  }
+
+  .well-switch-container {
+    border: 2px solid #fff;
+    border-radius: 100%;
+  }
+}

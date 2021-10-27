@@ -1,0 +1,16 @@
+.setting-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .nav-container{
+    padding: 15px 15px 15px 20px;
+    box-shadow: 0px 1px 1px #00000029;
+    z-index: 1;
+  }
+
+  .content{
+    height: calc(100% - 64px);
+    overflow: auto;
+  }
+}

@@ -1,0 +1,26 @@
+<div class="experiments-list">
+  <div class="experiment-list-container" *ngIf="experiments&& experiments.length > 0">
+    <ul>
+      <li *ngFor="let item of experiments; let i = index" class="exp-list-item" [ngClass]="{'confirm-delete': item.confirmDelete, 'deleting': item.deleting}">
+        <div class="exp-texts-container">
+          <span class="exp-name CX3-M mb-10">{{item.model.name}}</span>
+          <span class="exp-info CB4">Created Today at 12:22 AM, #3</span>
+        </div>
+        <div (blur)="focusOut(item)" class="exp-options-container">
+          <div class="delete-icon" (click)="confirmDelete(item, i)">
+            <span class="H2" [hidden]="!item.confirmDelete">?</span>
+          </div>
+          <button (blur)="focusOut(item)" class="delete-button" (click)="deleteExperiment(item)">
+            <div class="loader"></div>
+          </button>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div class="exp-list-loading-container" *ngIf="!experiments">
+    <p class="CX3-M">Loading experiments...</p>
+  </div>
+  <div class="exp-list-empty-container" *ngIf="experiments? experiments.length === 0 : false">
+    <p class="CX3-M">No experiments yet.</p>
+  </div>
+</div>

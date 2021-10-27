@@ -1,0 +1,238 @@
+.experiments-list {
+
+  .experiments-heading {
+    height: 64px;
+    background-color: #333;
+
+    .experiments-heading-text {
+      width: 60%;
+      height: 100%;
+      float: left;
+      text-transform: uppercase;
+      color: #fff;
+      line-height: 3;
+    }
+    .experiments-heading-button {
+      width: 40%;
+      float: right;
+      .button {
+        display: inline-block;
+        width: 80px;
+        height: 30px;
+        color: #fff;
+        text-transform: uppercase;
+        background-color: #000;
+        border: 2px solid grey;
+        margin: 16px 32px 0 0;
+        text-align: center;
+        line-height: 26px;
+
+        &:hover {
+          cursor: pointer;
+          text-decoration: none;
+        }
+
+        &.editing {
+          color: #000;
+          border-color: #fff;
+          background-color: #fff;
+        }
+      }
+    }
+  }
+
+  .experiment-list-container {
+
+    height: 100%;
+
+    ul {
+      padding: 0;
+      margin: 0;
+      li {
+        padding: 0;
+        margin: 0;
+        display: block;
+        border-bottom: 1px solid #e6e6e6;
+        position: relative;
+        left: 0;
+        overflow: hidden;
+        cursor: pointer;
+        input {
+          display: block;
+          width: 0;
+          height: 0;
+          opacity: 0;
+        }
+
+        .exp-texts-container {
+          height: 100%;
+          padding-top: 10px;
+          padding-bottom: 10px;
+          span{
+            display: block;
+          }
+        }
+
+        .exp-options-container {
+          top: 0;
+          position: absolute;
+          width: 72px * 2;
+          height: 100%;
+          background-color: red;
+          left: 100%;
+          transition: left 0.5s;
+
+          .delete-icon {
+            width: 72px;
+            height: 100%;
+            background-color: #df2227;
+            cursor: pointer;
+            color: #df2227;
+            background-image: url(/assets/images/trash.svg);
+            background-position: center;
+            background-size: 24px 26px;
+            background-repeat: no-repeat;
+            float: left;
+            text-align: center;
+            &::before {
+              content: '\200B';
+              display: inline-block;
+              height: 100%;
+              vertical-align: middle;
+            }
+            span {
+              color: white;
+              padding-left: 40px;
+              -webkit-user-select: none;
+              user-select: none;
+              display: none;
+              vertical-align: middle;
+            }
+          }
+
+          .delete-button {
+            border: 0;
+            padding: 0;
+            width: 72px;
+            height: 100%;
+            cursor: pointer;
+            background-color: #c30506;
+            background-position: center;
+            background-image: url(/assets/images/ok.svg);
+            background-size: 26px 28px;
+            background-repeat: no-repeat;
+            display: block;
+            float: left;
+
+            .loader {
+              display: none;
+            }
+          }
+
+          .deletting-icon {
+            width: 72px;
+            height: 100%;
+            cursor: pointer;
+            text-align: center;
+            vertical-align: middle;
+            background-color: #c30506;
+            float: left;
+          }
+        }
+      }
+    }
+
+    &.editing {
+      ul {
+        li {
+          cursor: auto;
+
+          .exp-options-container {
+            left: calc(100% - 72px);
+          }
+
+          &.confirm-delete {
+            .exp-options-container {
+              left: calc(100% - 144px);
+
+              .delete-icon {
+                span {
+                  display: inline-block;
+                }
+              }
+            }
+          }
+
+          &.deleting {
+            .exp-options-container {
+              left: calc(100% - 144px);
+
+              .delete-button {
+                text-align: center;
+                vertical-align: middle;
+                background-color: #c30506;
+                background-image: none;
+
+                &::before {
+                  content: '\200B';
+                  display: inline-block;
+                  height: 100%;
+                  vertical-align: middle;
+                }
+                .loader,
+                .loader:before,
+                .loader:after {
+                  background: #ffffff; //-webkit-animation: load1 1s infinite ease-in-out;
+                  animation: load1 1s infinite ease-in-out;
+                  width: 3px;
+                  height: 12px;
+                }
+                .loader:before,
+                .loader:after {
+                  position: absolute;
+                  top: 0;
+                  content: '';
+                }
+                .loader:before {
+                  left: -5px;
+                  -webkit-animation-delay: -0.32s;
+                  animation-delay: -0.32s;
+                }
+                .loader {
+                  color: #ffffff;
+                  display: inline-block;
+                  font-size: 5px;
+                  transform: translateZ(0);
+                  animation-delay: -0.16s;
+                }
+                .loader:after {
+                  left: 5px;
+                }
+                @keyframes load1 {
+                  0%,
+                  80%,
+                  100% {
+                    box-shadow: 0 0;
+                    height: 12px;
+                  }
+                  40% {
+                    box-shadow: 0 -6px;
+                    height: 18px;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .exp-list-loading-container,
+  .exp-list-empty-container {
+    p {
+      text-align: center;
+      padding-top: 10px;
+    }
+  }
+}

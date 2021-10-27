@@ -1,0 +1,28 @@
+.homepage-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .button-panel{
+    padding: 40px 20px;
+    height: 40px;
+    box-shadow: 0px 1px 1px #00000029;
+    z-index: 1;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo{
+    height: 100%;
+  }
+
+  .experiments{
+    height: calc(100% - 120px);
+    background-color: #F2F2F2;
+    overflow: auto;
+    padding: 0 20px;
+  }
+
+}

@@ -1,0 +1,22 @@
+.new-user {
+  display: block;
+  margin: 0;
+  padding: 20px 80px;
+  height: 100%;
+
+  h2{
+    margin: 0;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #000;
+    font-weight: normal;    
+  }
+
+  .form-line{
+    display: flex;
+    flex-direction: column;
+  }
+
+  .control-label{
+    display: block;
+  }
+}

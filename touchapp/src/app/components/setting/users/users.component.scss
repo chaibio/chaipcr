@@ -1,0 +1,62 @@
+.manage-users {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+
+  .user-box{
+    padding: 20px 40px;
+    flex: 0 0 340px;
+    overflow: auto;
+
+    h2{
+      margin: 0;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #000;
+      font-weight: normal;
+    }
+
+    ul.user-list{
+      margin: 0;
+      padding: 0;
+      list-style: none;
+
+      li{
+        display: flex;
+        margin-top: 20px;
+        span{
+          display: block;
+        }
+        label.admin-badge{
+          color: #00BAFF;
+          border: 1px solid #00BAFF;
+          border-radius: 2px;
+          padding: 4px 8px;
+        }
+      }
+    }    
+  }
+
+  .menu-box{
+    padding: 20px;
+    background: #F2F2F2;
+    box-shadow: inset 1px 0px 2px #00000040;
+    flex: 1;
+
+    .ch-button{
+      width: 100%;
+
+      &.xl{
+        padding: 24px;
+        text-align: center;
+      }
+
+      .plus-icon{
+        width: 60px;
+        height: 60px;
+        display: block;
+        margin: 0 auto 20px auto;
+      }
+    }
+  }
+}

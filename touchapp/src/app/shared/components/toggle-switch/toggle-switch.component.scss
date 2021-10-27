@@ -1,0 +1,82 @@
+.toggle-switch {
+    width: 36px;
+    height: 20px;
+    position: relative;
+    display: inline-block;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    -webkit-border-radius: 9999px;
+    -moz-border-radius: 9999px;
+    border-radius: 9999px;
+    cursor: pointer;
+    background: #BFBFBF;
+}
+.toggle-switch .toggle-handler {
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    border-radius: 20px;
+    top: 2px;
+    -webkit-transition: all .2s ease-out;
+    -moz-transition: all .2s ease-out;
+    -o-transition: all .2s ease-out;
+    transition: all .2s ease-out;
+}
+.toggle-switch .toggle-bg-on {
+    width: 36px;
+    height: 20px;
+    background-color: #8DC63F;
+    -webkit-border-radius: 9999px;
+    -moz-border-radius: 9999px;
+    border-radius: 9999px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    -webkit-transition: all .2s ease-out;
+    -moz-transition: all .2s ease-out;
+    -o-transition: all .2s ease-out;
+    transition: all .2s ease-out;
+    transform-origin: 0 50%
+}
+.toggle-switch.toggle-off .toggle-handler {
+    background-color: #fff;
+    -webkit-transform: translateX(0);
+    -moz-transform: translateX(0);
+    -ms-transform: translateX(0);
+    -o-transform: translateX(0);
+    transform: translateX(0);
+    left: 2px;
+}
+.toggle-switch.toggle-off .toggle-bg-on {
+    visibility: hidden;
+    opacity: .4;
+    -webkit-transform: scale(.8);
+    -moz-transform: scale(.8);
+    -ms-transform: scale(.8);
+    -o-transform: scale(.8);
+    transform: scale(.8);
+    width: 50%
+}
+.toggle-switch.toggle-on .toggle-handler {
+    background-color: #fff;
+    -webkit-transform: translateX(18px);
+    -moz-transform: translateX(18px);
+    -ms-transform: translateX(18px);
+    -o-transform: translateX(18px);
+    transform: translateX(18px);
+}
+.toggle-switch.toggle-on .toggle-bg-on {
+    visibility: visible;
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+    opacity: 1;
+    width: 100%
+}

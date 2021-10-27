@@ -1,0 +1,54 @@
+.header-status {
+
+  box-shadow: 0px 3px 5px #999;
+
+  .menu-dropdown {
+    float: left;
+    background: #fff;
+    width: 70px;
+    height: 70px;
+    padding: 20px;
+
+    .menu-bar {
+      width: 30px;
+      height: 3px;
+      background: grey;
+      margin-top: 5px;
+      border-radius: 3px;
+    }
+  }
+
+  .header-right-container {
+    float: left;
+    line-height: 70px;
+    color: #fff;
+    background: #333;
+
+    .bg-placeholder {
+      width: 100%;
+
+      &.completed {
+        background-image: url('/assets/images/header-complete.png');
+        background-size: auto 100%;
+      }
+    }
+
+    .exp-name {
+      float: left;
+      width: 50%;
+      padding-left: 15px;
+      font-size: 16px;
+    }
+
+    .status-indicator {
+      float: left;
+      width: 50%;
+
+      .failed {
+        background-color: #e02127;
+        padding: 2px 5px;
+      }
+    }
+  }
+
+}

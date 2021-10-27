@@ -1,0 +1,18 @@
+<div class="chart-well-switch">
+  <table cellspacing="0" cellpadding="0">
+    <tbody>
+      <tr *ngFor="let row of rows">
+        <td *ngFor="let col of cols" class="well-switch" (mousedown)="dragStart($event, 'well', getWellIndex(row, col))" (mousemove)="dragged($event, 'well', getWellIndex(row, col))" (mouseup)="dragStop($event, 'well', getWellIndex(row, col))" (ngClass)="{selected: well.selected, active: well.active}">
+
+          <div class="well-switch-container" [ngStyle]="getWellContainerStyle(row, col, getWell(row, col), getWellIndex(row, col))">
+
+            {{getWellName(row, col)}}
+
+          </div>
+
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+

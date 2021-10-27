@@ -1,0 +1,86 @@
+<div class="header-status clearfix">
+  <div class="menu-dropdown">
+    <div class="menu-bar"></div>
+    <div class="menu-bar"></div>
+    <div class="menu-bar"></div>
+  </div>
+  <div class="header-right-container clearfix" chai-full-width offset="70">
+    <div class="bg-placeholder clearfix" [attr.style]="getBackgroundStyle()" [ngClass]="{completed: experiment && ((!(state !=='idle' && isCurrentExperiment()) && experiment.completed_at) || experiment.started_at && state === 'idle') && analyzed}">
+      <div class="exp-name x">
+        {{ experiment? experiment.name : 'Loading...' }}
+      </div>
+      <!--experiment valid, lid is close-->
+      <div class="status-indicator" *ngIf="!!state && !!experiment && !experiment.started_at && !experiment.completed_at && state==='idle' && !statusData.optics.lid_open">
+        <div class="message">
+          <span class="message-text"></span>
+        </div>
+        <!--{{ state }}-->
+        <a class="button" *ngIf="!confirmStart" (click)="confirmStart = true">START EXPERIMENT</a>
+        <a class="button" *ngIf="confirmStart" (click)="startExperiment()">CONFIRM START</a>
+      </div>
+
+      <!--experiment invalid, lid is open-->
+      <div class="status-indicator" *ngIf="!!state && !!experiment && !experiment.started_at && !experiment.completed_at && state==='idle' && statusData.optics.lid_open">
+        <div class="message">
+          <span class="message-text">LID IS OPEN</span>
+        </div>
+        <a class="button disabled">BEGIN EXPERIMENT</a>
+      </div>
+      <!--experiment completed successfully-->
+      <div class="status-indicator" *ngIf="!!state && !!experiment && !!experiment.completed_at && experiment.completion_status==='success' && !(state !== 'idle' && isCurrentExperiment()) && analyzed">
+        <div class="message">
+          COMPLETED
+        </div>
+      </div>
+      <!--experiment failed-->
+      <div class="status-indicator" *ngIf="!!state && !!experiment && (!!experiment.started_at && experiment.completion_status !=='success' && !(state !== 'idle' && isCurrentExperiment())) && analyzed">
+        <div class="message">
+          <span class="failed SHR">FAILED</span>
+          <span class="message-text" *ngIf="experiment.completion_status === 'aborted'">
+            USER CANCELLED
+          </span>
+          <span class="message-text" *ngIf="experiment.completion_status !== 'aborted'">
+            AN ERROR OCCURED
+          </span>
+        </div>
+      </div>
+      <!--holding stage-->
+      <div class="status-indicator" *ngIf="!!state && !!experiment && (!!experiment.started_at && !!experiment.completed_at)">
+        <div class="message">
+          <span class="message-text" *ngIf="!analyzed">
+            RUN COMPLETE, ANALYZING...
+          </span>
+        </div>
+      </div>
+      <!--another experiment is running -->
+      <div class="status-indicator" *ngIf="!!state && !!experiment && (!experiment.started_at && !experiment.completed_at && state !== 'idle' && !isCurrentExperiment())">
+        <div class="message">
+          <span class="message-text" *ngIf="!analyzed">
+            ANOTHER EXPERIMENT IS RUNNING
+          </span>
+          <a class="button">
+            VIEW NOW
+          </a>
+        </div>
+      </div>
+      <!--experiment is lid heating-->
+      <div class="status-indicator" *ngIf="!!state && !!experiment && (!!experiment.started_at && !experiment.completed_at && state === 'lid_heating' && isCurrentExperiment())">
+        <div class="message">
+          <div class="message-text">
+            <span>IN PROGRESS...</span>
+            <strong>ESTIMATING TIME REMAINING</strong>
+          </div>
+        </div>
+      </div>
+      <!--experiment is running-->
+      <div class="status-indicator" *ngIf="!!state && !!experiment && (!!experiment.started_at && !experiment.completed_at && state === 'running' && isCurrentExperiment())">
+        <div class="message">
+          <div class="message-text">
+            <span>IN PROGRESS...</span>
+            <strong>{{ remainingTime | hrMinSec  }} Remaining</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
