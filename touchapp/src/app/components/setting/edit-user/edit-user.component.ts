@@ -5,10 +5,10 @@ import Keyboard from "simple-keyboard";
 import { UserModel } from '../users/user.model';
 
 @Component({
-    templateUrl: './new-user.component.html',
-    styleUrls: ['./new-user.component.scss']
+    templateUrl: './edit-user.component.html',
+    styleUrls: ['./edit-user.component.scss']
 })
-export class NewUserComponent implements OnInit {
+export class EditUserComponent implements OnInit {
 
     public selectedField = "";
     public selectedTarget: any;
@@ -71,14 +71,14 @@ export class NewUserComponent implements OnInit {
         this.breadCrumbs.emit(new EmitPathEvent(BreadPaths.settingPath, [
             { name: 'Settings', current: false, path: '/setting' },
             { name: 'Manage Users', current: false, path: '/setting/users' },
-            { name: 'New User', current: true, path: '/setting/users/new' },
+            { name: 'Andrey', current: true, path: '/setting/users/1' },
         ]));
 
         this.userData = {
-            id: 0,
-            is_admin: false,
-            name: '',
-            email: '',
+            id: null,
+            is_admin: true,
+            name: 'Andrey',
+            email: 'andrey@test.com',
             password: '',
             confirm_password: ''
         };
@@ -104,7 +104,7 @@ export class NewUserComponent implements OnInit {
             return;
         }
 
-        if(targetElement.classList.contains('new-user') || targetElement.classList.contains('nav-container') || targetElement.tagName.toLowerCase() == 'label'){
+        if(targetElement.classList.contains('edit-user') || targetElement.classList.contains('nav-container') || targetElement.tagName.toLowerCase() == 'label'){
             this.openKeyboard = false;
             if(this.selectedTarget && this.selectedTarget.classList.contains("focus")){
                 this.selectedTarget.classList.remove("focus");
@@ -121,11 +121,15 @@ export class NewUserComponent implements OnInit {
     };
 
     onKeyPress = (button: string) => {
+        console.log("Button pressed", button);
         this.openKeyboard = true;
+        /**
+         * If you want to handle the shift and caps lock buttons
+         */
         if (button.includes("{") && button.includes("}")) {
             this.handleLayoutChange(button);
-        }
-    }
+        }         
+    };
 
     handleLayoutChange(button) {
         let currentLayout = this.keyboard.options.layoutName;

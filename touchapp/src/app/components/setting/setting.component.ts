@@ -13,12 +13,7 @@ export class SettingComponent implements OnDestroy, OnInit {
         // statusService.startSync();
     }
 
-    ngOnInit(){
-        this.crumbItems = [
-            { name: 'Settings', current: false },
-            { name: 'Manage Users', current: true },
-        ]
-    }
+    ngOnInit(){}
 
     ngOnDestroy() {
         // this.statusService.stopSync()

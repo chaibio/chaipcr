@@ -16,6 +16,7 @@ import { AmplificationConfigService } from './services/chart-config/amplificatio
 import { StatusService } from './services/status/status.service';
 import { ExperimentService } from './services/experiment/experiment.service';
 import { WindowRef } from './services/windowref/windowref.service';
+import { BreadCrumbsService } from './services/breadcrumbs.service';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,8 @@ import { WindowRef } from './services/windowref/windowref.service';
     AuthHttp,
     SessionService,
     ChartConfigService,
-    AmplificationConfigService
+    AmplificationConfigService,
+    BreadCrumbsService
   ],
   exports: [
     DashboardModule,

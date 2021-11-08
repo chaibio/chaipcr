@@ -11,11 +11,11 @@ import { StatusService } from '../../services/status/status.service'
 export class DashboardComponent implements OnDestroy{
 
   constructor(private statusService: StatusService) {
-    statusService.startSync();
+    // statusService.startSync();
   }
 
   ngOnDestroy() {
-    this.statusService.stopSync()
+    // this.statusService.stopSync()
   }
 
 }

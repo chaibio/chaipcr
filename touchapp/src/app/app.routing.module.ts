@@ -13,6 +13,7 @@ import { AmplificationComponent } from './components/dashboard/charts/amplificat
 import { SettingHomeComponent } from './components/setting/home/home.component';
 import { ManageUsersComponent } from './components/setting/users/users.component';
 import { NewUserComponent } from './components/setting/new-user/new-user.component';
+import { EditUserComponent } from './components/setting/edit-user/edit-user.component';
 
 const appRoutes: Routes = [
   {
@@ -55,13 +56,17 @@ const appRoutes: Routes = [
         path: 'users/new',
         component: NewUserComponent,
       },
+      {
+        path: 'users/:user_id',
+        component: EditUserComponent,
+      },
     ]
   },
-  {
-    path: 'login',
-    component: LoginComponent,
-    canActivate: [LoginRouteGuard]
-  }
+  // {
+  //   path: 'login',
+  //   component: LoginComponent,
+  //   canActivate: [LoginRouteGuard]
+  // }
 ];
 
 

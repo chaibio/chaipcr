@@ -21,14 +21,16 @@
     <h2 class="CX6-M">Current Users</h2>
     <ul class="user-list">
       <li *ngFor="let user of users">
-        <span class="CX6-M mr-10">{{user.name}}</span>
-        <label class="admin-badge CX5-M" *ngIf="user.admin">Admin</label>
+        <a routerLink="/setting/users/1">          
+          <span class="CX6-M mr-10">{{user.name}}</span>
+          <label class="admin-badge CX5-M" *ngIf="user.admin">Admin</label>
+        </a>
       </li>
     </ul>
   </div>
   <div class="menu-box">
     <button class="ch-button xl CX3-M mb-20" (click)="onNewUser()">
-      <img src="/assets/images/dynexp/pika-test/res_pos.svg" class="plus-icon" />
+      <img src="/assets/images/touch/add-plus.svg" class="plus-icon" />
       Add User
     </button>
     <button class="ch-button CX3-M" (click)="onGoHome()">Back to Home</button>    

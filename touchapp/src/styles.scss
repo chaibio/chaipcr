@@ -1,4 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
+@import 'simple-keyboard/build/css/index.css';
+
 html, body{
   display: block;
   margin: 0;
@@ -11,3 +13,5 @@ html, body{
 @import "assets/stylesheets/fonts";
 @import "assets/stylesheets/chart-section";
 @import "assets/stylesheets/common";
+@import "assets/stylesheets/keyboard";
+

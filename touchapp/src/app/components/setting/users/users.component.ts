@@ -1,15 +1,16 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { BreadCrumbsService, EmitPathEvent, BreadPaths } from '../../../services/breadcrumbs.service';
 
 @Component({
     templateUrl: './users.component.html',
     styleUrls: ['./users.component.scss']
 })
-export class ManageUsersComponent {
+export class ManageUsersComponent implements OnInit {
 
     public users: Array<any>;
 
-    constructor(private router: Router) {
+    constructor(private router: Router, private breadCrumbs: BreadCrumbsService) {
         this.users = [
             {name: "Andre", admin: true},
             {name: "Draymond", admin: false},
@@ -20,6 +21,13 @@ export class ManageUsersComponent {
             {name: "Jonathan", admin: false},
             {name: "Kevin", admin: true},
         ]
+    }
+
+    ngOnInit() {
+        this.breadCrumbs.emit(new EmitPathEvent(BreadPaths.settingPath, [
+            { name: 'Settings', current: false, path: '/setting' },
+            { name: 'Manage Users', current: true },
+        ]));
     }
 
     onGoHome(){

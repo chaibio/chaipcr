@@ -19,9 +19,9 @@ export class LoginRouteGuard implements CanActivate {
   }
 
   private loggedIn (): boolean {
-
-    let token = localStorage.getItem('token');
-    return !!token;
+    return true;
+    // let token = localStorage.getItem('token');
+    // return !!token;
 
   }
 

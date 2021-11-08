@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'ch-toggle-switch',
@@ -7,12 +7,24 @@ import { Component, Input } from '@angular/core';
 })
 export class ToggleSwitchComponent {
 
-  @Input() checked: boolean = false
+  private checkedValue = false;
+  get checked(): boolean {
+    return this.checkedValue;
+  }
+
+  @Input()
+  set checked(val: boolean) {
+    this.checkedValue = val;
+    this.checkedChange.emit(val);
+  }
+  @Output() checkedChange = new EventEmitter<boolean>();
+  @Output() click = new EventEmitter<any>();
 
   constructor() {
   }
 
   changeAction(){
   	this.checked = !this.checked
+  	this.click.emit();
   }
 }

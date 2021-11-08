@@ -23,5 +23,10 @@ ul.breadcrumbs {
     &.active{
       color: #000;
     }
+
+    a{
+      text-decoration: none;
+      color: #1470CC;
+    }
   }
 }

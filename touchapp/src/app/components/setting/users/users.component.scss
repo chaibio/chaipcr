@@ -24,6 +24,12 @@
       li{
         display: flex;
         margin-top: 20px;
+        a{
+          display: flex;
+          align-items: center;
+          text-decoration: none;
+          color: #000;
+        }
         span{
           display: block;
         }

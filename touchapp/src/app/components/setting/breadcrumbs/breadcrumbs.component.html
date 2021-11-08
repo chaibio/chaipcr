@@ -18,6 +18,7 @@
   -->
 <ul class="breadcrumbs">
   <li *ngFor="let item of items" [ngClass]="{'active': item.current }" class="CX3-M">
-    {{item.name}}
+    <span *ngIf="item.current">{{item.name}}</span>
+    <a *ngIf="!item.current" routerLink="{{item.path}}">{{item.name}}</a>
   </li>
 </ul>

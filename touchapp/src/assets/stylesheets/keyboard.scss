@@ -1,0 +1,92 @@
+
+/**
+ * hg-theme-default theme
+ */
+.simple-keyboard.hg-theme-ios {
+  width: 100%;
+  margin: auto;
+  .hg-row {
+    display: flex;
+    &:not(:last-child) {
+      margin-bottom: 5px;
+    }
+    .hg-button {
+      &:not(:last-child) {
+        margin-right: 5px;
+      }
+    }
+    &:nth-child(2) {
+      margin-left: 18px;
+    }
+  }
+}
+
+.simple-keyboard.hg-theme-ios.hg-theme-default {
+  background-color: #eaeaea !important;
+  .hg-row {
+    .hg-button {
+      flex-grow: 1;
+      cursor: pointer;
+      max-width: initial;
+    }
+  }
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 5px;
+  border-radius: 5px;
+  .hg-button {
+    border-radius: 5px;
+    box-sizing: border-box;
+    padding: 0;
+    background: white;
+    border-bottom: 1px solid #b5b5b5;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: none;
+    font-weight: 400;
+    font-size: 18px;
+    max-width: 48px;
+    min-width: 48px;
+    height: 48px;
+    min-height: 48px;
+    &:active {
+      background: #e4e4e4;
+    }
+    &:focus {
+      background: #e4e4e4;
+    }
+  }
+  .hg-button.hg-functionBtn {
+    background-color: #d7dde1;
+  }
+  .hg-button.hg-button-space {
+    background-color: #ffffff;
+  }
+  .hg-button.hg-button-shift {
+    background-color: #ffffff;
+  }
+  .hg-button.hg-button-shiftactivated {
+    background-color: #ffffff;
+  }
+  .hg-button-space {
+    max-width: 360px;
+    min-width: 360px;
+  }
+  .hg-button-enter {
+    max-width: 110px;
+    min-width: 110px;
+  }
+  .hg-button-altright {
+    min-width: 80px;
+    max-width: 80px;
+  }
+  .hg-button-back {
+    min-width: 80px;
+    max-width: 80px;
+  }
+}
+.simple-keyboard.hg-theme-ios.hg-theme-default.hg-layout-custom {
+  background-color: #e5e5e5;
+  padding: 5px;
+}

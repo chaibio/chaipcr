@@ -27,7 +27,7 @@
 		padding: 10px;
 		outline: none;
 
-		&:focus, &:active{
+		&:focus, &:active, &.focus, &.active{
 			border-color: #00BAFF;
 		}
 	}

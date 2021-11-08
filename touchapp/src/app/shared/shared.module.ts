@@ -11,24 +11,30 @@ import {
 import { LogoutDirective } from './directives/logout/logout.directive';
 import { FullHeightDirective } from './directives/full-height/full-height.directive';
 import { FullWidthDirective } from './directives/full-width/full-width.directive';
+import { ClickOutsideDirective } from './directives/click-outside/click-outside.directive';
+
 import { HeaderStatusComponent } from './directives/header-status/header-status.component';
 import { HrMinSecPipe } from './pipes/hr-min-secs/hr-min-secs.pipe';
 import { BaseChartDirective } from './directives/charts/base-chart/base-chart.directive'
 import { AmplificationChartDirective } from './directives/charts/amplification-chart/amplification-chart.directive'
 import { WellButtonsComponent } from './components/well-buttons/well-buttons.component';
 import { ToggleSwitchComponent } from './components/toggle-switch/toggle-switch.component';
+import { PasswordEditorComponent } from './components/password-editor/password-editor.component';
 
 @NgModule({
   declarations: [
     LogoutDirective,
     FullHeightDirective,
     FullWidthDirective,
+    ClickOutsideDirective,
+
     BaseChartDirective,
     AmplificationChartDirective,
     WellButtonsComponent,
     ToggleSwitchComponent,
     HeaderStatusComponent,
-    HrMinSecPipe
+    HrMinSecPipe,
+    PasswordEditorComponent,
   ],
   imports: [
     FormsModule,
@@ -43,12 +49,15 @@ import { ToggleSwitchComponent } from './components/toggle-switch/toggle-switch.
     LogoutDirective,
     FullHeightDirective,
     FullWidthDirective,
+    ClickOutsideDirective,
+
     HeaderStatusComponent,
     BaseChartDirective,
     AmplificationChartDirective,
     WellButtonsComponent,
     ToggleSwitchComponent,
-    HrMinSecPipe
+    HrMinSecPipe,
+    PasswordEditorComponent,
   ],
   providers: [
     Title,

@@ -8,6 +8,7 @@ import { SettingBreadcrumbsComponent } from './breadcrumbs/breadcrumbs.component
 import { SettingHomeComponent } from './home/home.component'
 import { ManageUsersComponent } from './users/users.component'
 import { NewUserComponent } from './new-user/new-user.component'
+import { EditUserComponent } from './edit-user/edit-user.component'
 
 const components = [
   SettingComponent,
@@ -16,6 +17,7 @@ const components = [
   SettingHomeComponent,
   ManageUsersComponent,
   NewUserComponent,
+  EditUserComponent,
 ]
 
 @NgModule({
