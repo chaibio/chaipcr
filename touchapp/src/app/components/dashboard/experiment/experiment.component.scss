@@ -1,0 +1,106 @@
+.experiment-running {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #1A0405;
+  flex-direction: column;
+  color: #fff;
+
+  &.confirm-stop{
+    background: #0D0D0D;
+
+    .status-box{
+      .warning-message{
+        background: transparent linear-gradient(180deg, #1C1C1C 0%, #1A1A1A 100%) 0% 0% no-repeat padding-box;
+      }
+    }
+
+    .exp-details{
+      .button-box{
+        background: #1F010380 0% 0% no-repeat padding-box;
+        box-shadow: inset 0px 3px 7px #000000CC;
+        border: 1px solid #3E0003;
+        button{
+          background: transparent linear-gradient(180deg, #D90B15 0%, #CC0A14 100%) 0% 0% no-repeat padding-box;
+          color: #fff;
+        }
+      }
+    }
+  }
+
+  .status-box{
+    margin-bottom: 35px;
+    padding: 20px 20px 0 20px;
+    display: flex;
+    justify-content: space-between;
+
+    .warning-message{
+      display: flex;
+      align-items: center;
+      width: 300px;
+      background: transparent linear-gradient(180deg, #BF0A13 0%, #B30911 100%) 0% 0% no-repeat padding-box;
+      box-shadow: 0px 1px 1px #00000066;
+      border-radius: 2px;
+      padding: 10px 30px 10px 30px;
+
+      p{
+        margin: 0;
+        margin-left: 25px;
+      }
+
+      .warning-icon{
+        width: 50px;
+      }
+    }
+
+    .temperature-container{
+      display: flex;
+      width: 220px;
+      border: 1px solid #404040;
+      border-radius: 2px;
+      padding: 10px 0 10px 0;
+      p{
+        margin: 0;
+      }
+
+      .temp-stat{
+        flex: 1;
+        margin-left: 20px;
+        &:first-child{
+          border-right: 1px solid #404040;
+        }
+      }
+    }
+  }
+
+  .exp-details{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .exp-title{
+      margin: 0;
+      margin-bottom: 10px;
+      width: 560px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: normal;
+      text-align: center;
+    }
+
+    .button-box{
+      background: #1F010380 0% 0% no-repeat padding-box;
+      box-shadow: inset 0px 3px 7px #000000CC;
+      border: 1px solid #2E2E2E;
+      border-radius: 4px;
+      padding: 10px;
+
+      button{
+        width: 205px;
+      }
+    }
+  }
+}

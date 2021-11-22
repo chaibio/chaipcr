@@ -1,0 +1,93 @@
+@import "./variables.scss";
+
+.chai-mode{
+	.fade{
+		opacity: 0;
+		transition: opacity .15s linear;
+		&.show{
+			opacity: 1;
+		}
+	}
+
+	.modal-backdrop{
+		position: fixed;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 1040;
+		background-color: #fff;
+
+		&.fade{
+			opacity: 0;
+		}
+
+		&.show{
+			opacity: 0.8;
+		}
+
+	}
+
+	.modal{
+		position: fixed;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 1050;
+		display: none;
+		overflow: hidden;
+		outline: 0;
+
+		&.fade{
+			.modal-dialog{
+				transition: -webkit-transform .3s ease-out;
+				transition: transform .3s ease-out;
+				transition: transform .3s ease-out,-webkit-transform .3s ease-out;
+				-webkit-transform: translate(0,-25%);
+				transform: translate(0,-25%);
+			}
+		}
+
+		&.show{
+			.modal-dialog{
+				-webkit-transform: translate(0,0);
+				transform: translate(0,0);
+			}
+		}
+	}
+
+	&.modal-open{
+		.modal{
+			overflow-x: hidden;
+			overflow-y: auto;
+		}
+	}
+
+	.modal-dialog{
+		position: relative;
+		width: auto;
+		margin: 40px;
+		pointer-events: none;		
+	}
+
+	.modal-content{
+		position: relative;
+		display: -webkit-box;
+		display: -ms-flexbox;
+		display: flex;
+		-webkit-box-orient: vertical;
+		-webkit-box-direction: normal;
+		-ms-flex-direction: column;
+		flex-direction: column;
+		width: auto;
+		padding: 30px;
+		pointer-events: auto;
+		background-color: #fff;
+		background-clip: padding-box;
+		border: 2px solid #A8A8A8;
+		border-radius: 3px;
+		outline: 0;
+	}
+
+}

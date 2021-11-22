@@ -1,0 +1,24 @@
+
+.confirm-modal{
+	width: 440px;
+	margin: auto;
+
+	.modal-dialog{
+		margin: 80px 40px !important;
+		.modal-content{
+			padding: 20px 30px 30px 30px;
+		}
+	}
+
+	.modal-body{
+		text-align: center;
+		margin-bottom: 20px;
+	}
+
+	.modal-footer{
+		display: flex;
+		.ch-button{
+			flex: 1;
+		}
+	}
+}

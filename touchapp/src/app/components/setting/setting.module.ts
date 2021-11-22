@@ -9,6 +9,8 @@ import { SettingHomeComponent } from './home/home.component'
 import { ManageUsersComponent } from './users/users.component'
 import { NewUserComponent } from './new-user/new-user.component'
 import { EditUserComponent } from './edit-user/edit-user.component'
+import { EditUserGuard } from './edit-user/edit-user.guard'
+import { NewUserGuard } from './new-user/new-user.guard'
 
 const components = [
   SettingComponent,
@@ -28,7 +30,11 @@ const components = [
   declarations: components,
   exports: [
     ...components
-  ]
+  ],
+  providers: [
+    EditUserGuard,
+    NewUserGuard,
+  ]  
 })
 
 export class SettingModule {}

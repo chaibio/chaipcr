@@ -16,6 +16,7 @@ import { map, catchError } from 'rxjs/operators'
 
 import { BaseHttp } from '../base_http/base_http.service';
 import { WindowRef } from '../windowref/windowref.service';
+import { CookiesService } from '../cookie.service'
 
 @Injectable()
 export class AuthHttp extends BaseHttp {
@@ -23,12 +24,13 @@ export class AuthHttp extends BaseHttp {
   token_name = 'token';
   authState: BehaviorSubject<boolean> = new BehaviorSubject(true);
 
-  constructor(backend: XHRBackend, options: RequestOptions, windowRef: WindowRef) {
+  constructor(backend: XHRBackend, options: RequestOptions, windowRef: WindowRef, private cookiesService: CookiesService) {
     super(backend, options, windowRef);
   }
 
   request(url: string | Request, options?: RequestOptionsArgs): Observable<Response> {
-    let token = localStorage.getItem(this.token_name);
+    // let token = localStorage.getItem(this.token_name);
+    const token = this.cookiesService.getCookie('authentication_token');    
     if (typeof url === 'string') { // meaning we have to add the token to the options, not in url
       if (!options) {
         // let's make option object
@@ -53,7 +55,8 @@ export class AuthHttp extends BaseHttp {
   }
 
   protected appendTokenToUrl(url: string): string {
-    let token = localStorage.getItem(this.token_name);
+    // let token = localStorage.getItem(this.token_name);
+    const token = this.cookiesService.getCookie('authentication_token');    
     if (url.indexOf('8000') >= 0) {
       let separator = url.indexOf('?') >= 0 ? '&' : '?'
       url = `${url}${separator}access_token=${token}`

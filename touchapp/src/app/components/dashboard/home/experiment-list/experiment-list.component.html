@@ -4,7 +4,7 @@
       <li *ngFor="let item of experiments; let i = index" class="exp-list-item" [ngClass]="{'confirm-delete': item.confirmDelete, 'deleting': item.deleting}">
         <div class="exp-texts-container">
           <span class="exp-name CX3-M mb-10">{{item.model.name}}</span>
-          <span class="exp-info CB4">Created {{item.model.created_at}}, #{{item.model.id}}</span>
+          <span class="exp-info CB4">{{getExperimentLineItem(item.model)}}</span>
         </div>
         <div (blur)="focusOut(item)" class="exp-options-container">
           <div class="delete-icon" (click)="confirmDelete(item, i)">

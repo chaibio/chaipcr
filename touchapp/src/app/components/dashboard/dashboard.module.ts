@@ -6,6 +6,7 @@ import { DashboardAuthGuard } from './dashboard.auth-guard';
 import { DashboardComponent } from './dashboard.component';
 import { HomeModule } from './home/home.module'
 import { ChartsModule } from './charts/charts.module';
+import { ExperimentModule } from './experiment/experiment.module'
 
 @NgModule({
   imports: [
@@ -13,6 +14,7 @@ import { ChartsModule } from './charts/charts.module';
     SharedModule,
     HomeModule,
     ChartsModule,
+    ExperimentModule,
   ],
   declarations: [
     DashboardComponent,

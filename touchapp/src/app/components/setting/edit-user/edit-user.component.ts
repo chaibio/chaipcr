@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { BreadCrumbsService, EmitPathEvent, BreadPaths } from '../../../services/breadcrumbs.service';
 import Keyboard from "simple-keyboard";
 import { UserModel } from '../users/user.model';
+import { ConfirmModalService } from '../../../shared/modals/confirm-modal/confirm-modal.service';
 
 @Component({
     templateUrl: './edit-user.component.html',
@@ -22,10 +23,16 @@ export class EditUserComponent implements OnInit {
     public confirmPasswordError: string = ''
     public passwordFocus: boolean = false
     public confirmPasswordFocus: boolean = false
+    public hasChanges = false
 
     @ViewChild('container') container: ElementRef;
 
-    constructor(private router: Router, private breadCrumbs: BreadCrumbsService, private changeDetector : ChangeDetectorRef) {}
+    constructor(
+        private router: Router,
+        private breadCrumbs: BreadCrumbsService,
+        private changeDetector : ChangeDetectorRef,
+        private confirmModalService: ConfirmModalService
+    ) {}
 
     ngAfterViewInit() {
         this.keyboard = new Keyboard({
@@ -55,7 +62,7 @@ export class EditUserComponent implements OnInit {
           display: {
             "{alt}": ".?123",
             "{shift}": "⇧",
-            "{shiftactivated}": "⇧",
+            "{shiftactivated}": "🡅",
             "{enter}": "return",
             "{bksp}": "⌫",
             "{altright}": ".?123",
@@ -85,11 +92,11 @@ export class EditUserComponent implements OnInit {
 
         this.inputPos = {
             is_admin: 0,
-            name: 105,
-            email: 210,
-            password: 320,
-            confirm_password: 425,
-            save: 500
+            name: 94,
+            email: 200,
+            password: 306,
+            confirm_password: 412,
+            save: 518
         };
 
         this.fieldKeys = ['is_admin', 'name', 'email', 'password', 'confirm_password', 'save']
@@ -118,10 +125,10 @@ export class EditUserComponent implements OnInit {
 
     onChange = (input: string) => {
         this.userData[this.selectedField] = input;
+        this.hasChanges = true
     };
 
     onKeyPress = (button: string) => {
-        console.log("Button pressed", button);
         this.openKeyboard = true;
         /**
          * If you want to handle the shift and caps lock buttons
@@ -201,6 +208,7 @@ export class EditUserComponent implements OnInit {
         if(this.selectedTarget && this.selectedTarget.classList.contains("focus")){
             this.selectedTarget.classList.remove("focus");
         }
+        this.hasChanges = true
     }
 
     onSelectControl(direction){
@@ -230,6 +238,7 @@ export class EditUserComponent implements OnInit {
     }
 
     onSaveChange() {
+        this.hasChanges = false
         this.router.navigate(['/setting/users']);
     }
 
@@ -249,6 +258,10 @@ export class EditUserComponent implements OnInit {
         } else {
             this.confirmPasswordError = ''
         }
+    }
+
+    async confirmSaveData(){
+        return await this.confirmModalService.confirm('Exit without saving?', 'Yes, Exit');
     }
 
 }

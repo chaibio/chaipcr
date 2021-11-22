@@ -7,6 +7,7 @@ import {
 
 import { ExperimentService } from '../../../../services/experiment/experiment.service'
 import { ExperimentList } from '../../../../shared/models/experiment-list.model'
+import { StatusService } from '../../../../services/status/status.service'
 
 const ESCAPE_KEYCODE = 27;
 
@@ -19,8 +20,14 @@ export class ExperimentListComponent implements OnInit {
 
   experiments: ExperimentListItem[]
   editing: boolean
+  machine_state: string = ''
+  current_experiment_id: number = 0;
 
-  constructor(private expService: ExperimentService, private el: ElementRef) {
+  constructor(
+    private expService: ExperimentService,
+    private el: ElementRef,
+    private statusService: StatusService
+  ) {
 
   }
 
@@ -44,6 +51,11 @@ export class ExperimentListComponent implements OnInit {
         }
       })
     })
+
+    this.statusService.$data.subscribe(data => {
+      this.machine_state = data.experiment_controller.machine.state;
+      this.current_experiment_id = (data.experiment_controller.experiment) ? data.experiment_controller.experiment.id : 0;
+    })    
   }
 
   toggleEditing() {
@@ -74,6 +86,28 @@ export class ExperimentListComponent implements OnInit {
       })
       this.experiments = newExpList
     })
+  }
+
+  getExperimentLineItem(experiment){
+    if(!experiment.started_at && experiment.time_valid){
+      return `Created ${experiment.created_at}, #${experiment.id}`
+    }
+
+    if(!experiment.started_at && !experiment.time_valid){
+      return `Created, #${experiment.id}`
+    }
+
+    if(experiment.started_at && experiment.completed_at && experiment.time_valid){
+      return `Run ${experiment.started_at}, #${experiment.id}`
+    }
+
+    if(experiment.started_at && !experiment.completed_at && (experiment.id!=this.current_experiment_id || this.machine_state == 'idle')){
+      return `Run ${experiment.started_at}, #${experiment.id}`
+    }
+
+    if(experiment.started_at && !experiment.completed_at && (experiment.id!=this.current_experiment_id || this.machine_state !== 'idle')){
+      return `IN PROGRESS...`
+    }
   }
 
 }

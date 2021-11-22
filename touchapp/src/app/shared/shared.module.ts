@@ -21,6 +21,9 @@ import { WellButtonsComponent } from './components/well-buttons/well-buttons.com
 import { ToggleSwitchComponent } from './components/toggle-switch/toggle-switch.component';
 import { PasswordEditorComponent } from './components/password-editor/password-editor.component';
 
+import { ConfirmModalComponent } from './modals/confirm-modal/confirm-modal.component';
+import { ConfirmModalService } from './modals/confirm-modal/confirm-modal.service';
+
 @NgModule({
   declarations: [
     LogoutDirective,
@@ -35,6 +38,8 @@ import { PasswordEditorComponent } from './components/password-editor/password-e
     HeaderStatusComponent,
     HrMinSecPipe,
     PasswordEditorComponent,
+
+    ConfirmModalComponent,
   ],
   imports: [
     FormsModule,
@@ -62,7 +67,11 @@ import { PasswordEditorComponent } from './components/password-editor/password-e
   providers: [
     Title,
     { provide: APP_BASE_HREF, useValue: '/' },
-  ]
+    ConfirmModalService,
+  ],
+  entryComponents: [
+    ConfirmModalComponent
+  ],
 })
 
 export class SharedModule { }

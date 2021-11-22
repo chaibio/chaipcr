@@ -53,7 +53,12 @@ export class ExperimentService {
 
   startExperiment(id: number) {
     let loc = this.wref.nativeWindow().location;
-    return this.http.post(`${loc.protocol}//${loc.hostname}:8000/control/start`, {experiment_id: id})
+    return this.http.post(`/device/start`, {experiment_id: id})
+  }
+
+  stopExperiment(id: number) {
+    let loc = this.wref.nativeWindow().location;
+    return this.http.post(`/device/stop`, {experiment_id: id})
   }
 
   private extractExperiment(res): Experiment {

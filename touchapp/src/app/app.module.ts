@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { SharedModule } from './shared/shared.module';
 import { AppRoutesModule } from './app.routing.module';
@@ -17,6 +18,7 @@ import { StatusService } from './services/status/status.service';
 import { ExperimentService } from './services/experiment/experiment.service';
 import { WindowRef } from './services/windowref/windowref.service';
 import { BreadCrumbsService } from './services/breadcrumbs.service';
+import { CookiesService } from './services/cookie.service';
 
 @NgModule({
   declarations: [
@@ -24,6 +26,7 @@ import { BreadCrumbsService } from './services/breadcrumbs.service';
   ],
   imports: [
     BrowserModule,
+    NgbModule.forRoot(),
     SharedModule,
     AppRoutesModule,
     DashboardModule,
@@ -39,7 +42,8 @@ import { BreadCrumbsService } from './services/breadcrumbs.service';
     SessionService,
     ChartConfigService,
     AmplificationConfigService,
-    BreadCrumbsService
+    BreadCrumbsService,
+    CookiesService,
   ],
   exports: [
     DashboardModule,
