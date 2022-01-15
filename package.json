@@ -44,7 +44,7 @@
     "karma-phantomjs-launcher": "^1.0.4",
     "karma-spec-reporter": "0.0.24",
     "require-dir": "^0.3.0",
-    "shelljs": "^0.5.3"
+    "shelljs": "^0.8.5"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
