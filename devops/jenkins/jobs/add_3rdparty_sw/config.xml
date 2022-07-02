@@ -1,19 +1,12 @@
-<?xml version='1.1' encoding='UTF-8'?>
-<project>
+<?xml version="1.1" encoding="UTF-8" standalone="no"?><project>
   <actions/>
   <description>Build Chaibio shoftware</description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@1.27.0">
-      <doNotScan>false</doNotScan>
-    </com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty>
-    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.30.0">
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.32.0">
       <projectUrl>https://github.com/chaibio/chaipcr.git/</projectUrl>
-      <displayName></displayName>
+      <displayName/>
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
-    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.18">
-      <optOut>false</optOut>
-    </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
@@ -40,6 +33,7 @@
         </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
+    
   </properties>
   <scm class="hudson.scm.NullSCM"/>
   <canRoam>true</canRoam>
@@ -52,7 +46,7 @@
     <hudson.tasks.Shell>
       <command>#!/bin/bash
 echo checking Jenkins server
-echo &quot;Bash version ${BASH_VERSION}...&quot;
+echo "Bash version ${BASH_VERSION}..."
 uname -a
 ls -ahl
 lsblk
@@ -93,13 +87,13 @@ fi
 #	sudo service sshd restart
 #fi
 
-ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
+ssh-keygen -f "/var/lib/jenkins/.ssh/known_hosts" -R $build_machine
 
 echo deleting root password in case of chaipcr
-sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;passwd -d -u root&quot;
+sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine "passwd -d -u root"
 
-ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
-ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
+ssh-keygen -f "/var/lib/jenkins/.ssh/known_hosts" -R $build_machine
+ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;'ENDSSH'
 
 if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
 then
@@ -126,7 +120,7 @@ ENDSSH
 
 echo returned to host. connection check:
 counter=0
-until ssh -t root@$build_machine &apos;exit 0&apos;
+until ssh -t root@$build_machine 'exit 0'
 do
 	counter=$(( $counter + 1 ))
     if [ $counter -gt 10 ]
@@ -141,13 +135,14 @@ done
 
 echo done connection check.
 </command>
+      <configuredLocalRules/>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo &quot;Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}&quot;
-echo &quot;Slave Beaglebone at ${build_machine}&quot;
+      <command>echo "Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}"
+echo "Slave Beaglebone at ${build_machine}"
 echo checking build device 
-echo &quot;Bash version ${BASH_VERSION}...&quot;
+echo "Bash version ${BASH_VERSION}..."
 uname -a
 ls -ahl
 lsblk
@@ -161,7 +156,7 @@ umount /sdcard/*
 lsblk
 if mount | grep mmcblk0
 then
-  echo &quot;Error: can&apos;t unmount sdcard!&quot;
+  echo "Error: can't unmount sdcard!"
   exit 1
 fi
 dpkg --configure -a
@@ -195,7 +190,10 @@ apt-get -y autoclean
 
 dpkg --configure -a
 
-apt-get upgrade -y -q
+DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -q upgrade
+dpkg --configure -a --force-confdef --force-confold
+
+
 dpkg --configure -a
 df -h
 
@@ -224,7 +222,7 @@ echo waiting for a restart
 sleep 60
 for i in {0..300..60}
 do
-	echo &quot;Waiting for the build device to become ready! $i&quot;
+	echo "Waiting for the build device to become ready! $i"
 	sleep 60
     if ping $build_machine -c 1
     then
@@ -236,6 +234,7 @@ done
 
 echo timeout waiting for the device to become ready!
 exit 1</command>
+      <configuredLocalRules/>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
@@ -246,7 +245,7 @@ apt-get -q -y install unzip parted || exit 1
 sync
 
 echo installing basic packages.
-apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential || exit 1
+apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential tzdata || exit 1
 dpkg --configure -a
 sync
 sleep 30
@@ -255,8 +254,9 @@ if  g++ --version | grep 4.6
 then
 apt-key update
 apt-get update
-apt-get -y upgrade
-dpkg --configure -a
+DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -q upgrade
+dpkg --configure -a --force-confdef --force-confold
+
 apt-get -y install g++-4.7
 apt-get clean
 apt-get autoclean
@@ -282,11 +282,11 @@ else
     service mysql start
 fi
 
-sudo debconf-set-selections &lt;&lt;&lt; &quot;mysql-server-5.5 mysql-server/root_password password chaipcr&quot;
-sudo debconf-set-selections &lt;&lt;&lt; &quot;mysql-server-5.5 mysql-server/root_password_again password chaipcr&quot;
+sudo debconf-set-selections &lt;&lt;&lt; "mysql-server-5.5 mysql-server/root_password password chaipcr"
+sudo debconf-set-selections &lt;&lt;&lt; "mysql-server-5.5 mysql-server/root_password_again password chaipcr"
 
-sudo debconf-set-selections &lt;&lt;&lt; &quot;mysql-server mysql-server/root_password password chaipcr&quot;
-sudo debconf-set-selections &lt;&lt;&lt; &quot;mysql-server mysql-server/root_password_again password chaipcr&quot;
+sudo debconf-set-selections &lt;&lt;&lt; "mysql-server mysql-server/root_password password chaipcr"
+sudo debconf-set-selections &lt;&lt;&lt; "mysql-server mysql-server/root_password_again password chaipcr"
 
 echo Installing mysql server package
 export DEBIAN_FRONTEND=noninteractive
@@ -310,7 +310,7 @@ echo done installing mysql
 service mysqld start
 echo resetting mysql password
 cat &gt;&gt; mysql_password_flush.sql &lt;&lt; EOF
-    UPDATE user SET password=PASSWORD(&apos;&apos;) WHERE user=&apos;root&apos;;
+    UPDATE user SET password=PASSWORD('') WHERE user='root';
     FLUSH PRIVILEGES;
     exit
 EOF
@@ -332,14 +332,14 @@ echo done resetting mysql password
 # boxing transactions queue.
 echo boxing transactions queue.
 MYSQL_USER=root
-MYSQL_CONN=&quot;-u${MYSQL_USER} --password=&quot;
-SQL=&quot;SET GLOBAL innodb_fast_shutdown = 0&quot;
-mysql ${MYSQL_CONN} -ANe&quot;${SQL}&quot;
+MYSQL_CONN="-u${MYSQL_USER} --password="
+SQL="SET GLOBAL innodb_fast_shutdown = 0"
+mysql ${MYSQL_CONN} -ANe"${SQL}"
 mysqladmin ${MYSQL_CONN} shutdown
 cd /var/lib/mysql
 rm -f ib_logfile*
-echo &quot;[mysqld]&quot;&gt;/etc/mysql/conf.d/chaibio.cnf
-echo &quot;innodb_log_file_size = 5M&quot;&gt;&gt;/etc/mysql/conf.d/chaibio.cnf
+echo "[mysqld]"&gt;/etc/mysql/conf.d/chaibio.cnf
+echo "innodb_log_file_size = 5M"&gt;&gt;/etc/mysql/conf.d/chaibio.cnf
 service mysql start
 
 </command>
@@ -364,9 +364,9 @@ mkdir -p /sdcard/factory || true
 mkdir -p /sdcard/upgrade || true
 if mount /dev/mmcblk0p1 /sdcard/factory/
 then
-    echo &quot;temp sdcard folder mounted&quot;
+    echo "temp sdcard folder mounted"
 else
-   echo &quot;Error mounting temp sdcard folder&quot;
+   echo "Error mounting temp sdcard folder"
    exit 1
 fi
 
@@ -376,9 +376,9 @@ fi
 # creating a temporary swap file on sdcard
 if fallocate -l 2G /sdcard/factory/swapfile #or dd if=/dev/zero of=/sdcard/factory/swapfile bs=10M count=300
 then
-    echo &quot;swap file created successfully&quot;
+    echo "swap file created successfully"
 else
-   echo &quot;failed creating swap file&quot;
+   echo "failed creating swap file"
    exit 1
 fi
 
@@ -413,8 +413,8 @@ apt-get -q -y install unzip || exit 1
 
 dpkg --configure -a
 
-echo &quot;FSCKFIX=yes&quot; &gt;&gt; /etc/default/rcS
-apt-key list  | grep &quot;expired: &quot; | sed -ne &apos;s|pub .*/\([^ ]*\) .*|\1|gp&apos; | xargs -n1 sudo apt-key adv --keyserver keys.gnupg.net --recv-keys 
+echo "FSCKFIX=yes" &gt;&gt; /etc/default/rcS
+apt-key list  | grep "expired: " | sed -ne 's|pub .*/\([^ ]*\) .*|\1|gp' | xargs -n1 sudo apt-key adv --keyserver keys.gnupg.net --recv-keys 
 apt-get -q -y update
 
 apt-get --force-yes -y -q install nodejs ruby ruby-dev  || exit 1
@@ -435,7 +435,7 @@ sleep 30
 echo installing headers...
 uname=`uname -r`
 echo uname=$uname
-uname_updated=$(echo &quot;$uname&quot; | sed &quot;s/chai-//&quot;)
+uname_updated=$(echo "$uname" | sed "s/chai-//")
 echo updated to $uname_updated
 
 apt-get -y -q install linux-headers-$uname_updated || exit 1
@@ -448,22 +448,22 @@ sync
 sleep 30
 dpkg --configure -a
 
-echo &quot;Build SOCI (or get its libs from repo)&quot;
+echo "Build SOCI (or get its libs from repo)"
 cd ~
 
 #http://downloads.sourceforge.net/project/soci/soci/soci-3.2.2/soci-3.2.2.tar.gz?r=&amp;ts=1481630635&amp;use_mirror=netix
-#wget &quot;http://downloads.sourceforge.net/project/soci/soci/soci-3.2.2/soci-3.2.2.tar.gz&quot;
+#wget "http://downloads.sourceforge.net/project/soci/soci/soci-3.2.2/soci-3.2.2.tar.gz"
 if $is_dev
 then
       echo Building a debug image
       touch /root/debug_image
       cd /sdcard/factory/
 fi
-wget &quot;https://datapacket.dl.sourceforge.net/project/soci/soci/soci-3.2.2/soci-3.2.2.tar.gz&quot; || wget &quot;http://netix.dl.sourceforge.net/project/soci/soci/soci-3.2.2/soci-3.2.2.tar.gz&quot;
+wget "https://datapacket.dl.sourceforge.net/project/soci/soci/soci-3.2.2/soci-3.2.2.tar.gz" || wget "http://netix.dl.sourceforge.net/project/soci/soci/soci-3.2.2/soci-3.2.2.tar.gz"
 tar xpvzf soci-3.2.2.tar.gz
 dpkg --configure -a
 cd soci-3.2.2
-cmake -DCMAKE_BUILD_TYPE=Release -DSOCI_STATIC=OFF -DSOCI_TESTS=OFF -DWITH_SQLITE3=OFF -DSOCI_EMPTY=OFF -DWITH_MYSQL=ON -G &quot;Unix Makefiles&quot; || exit 1
+cmake -DCMAKE_BUILD_TYPE=Release -DSOCI_STATIC=OFF -DSOCI_TESTS=OFF -DWITH_SQLITE3=OFF -DSOCI_EMPTY=OFF -DWITH_MYSQL=ON -G "Unix Makefiles" || exit 1
 make || exit 1
 make install || exit 1
 cd ..
@@ -532,7 +532,7 @@ else
       fi
 fi
 
-wget &quot;http://pocoproject.org/releases/poco-1.6.1/poco-1.6.1.tar.gz&quot;  || exit 1
+wget "http://pocoproject.org/releases/poco-1.6.1/poco-1.6.1.tar.gz"  || exit 1
 tar xpvzf poco-1.6.1.tar.gz  || exit 1
 cd poco-1.6.1
 ./configure || exit 1
@@ -552,7 +552,7 @@ else
 fi
 
 echo install wifi firmware
-apt-get -y install firmware-realtek || exit 1
+sudo apt-get -q -y install firmware-realtek || exit 1
  
 apt install -y dkms
 
@@ -563,8 +563,8 @@ cd /sdcard/factory/wifi/edimax
 git clone https://github.com/pvaret/rtl8192cu-fixes.git
 cd rtl8192cu-fixes
 
-sed -i &apos;s/CONFIG_PLATFORM_I386_PC = y/CONFIG_PLATFORM_I386_PC = n/&apos; Makefile
-sed -i &apos;s/CONFIG_PLATFORM_ARM_GENERIC = n/CONFIG_PLATFORM_ARM_GENERIC = y/&apos; Makefile
+sed -i 's/CONFIG_PLATFORM_I386_PC = y/CONFIG_PLATFORM_I386_PC = n/' Makefile
+sed -i 's/CONFIG_PLATFORM_ARM_GENERIC = n/CONFIG_PLATFORM_ARM_GENERIC = y/' Makefile
 
 cd ..
 
@@ -573,39 +573,66 @@ dkms install 8192cu/1.11
 depmod -a
 cp ./rtl8192cu-fixes/blacklist-native-rtl8192.conf /etc/modprobe.d/
 
-ls -ahl /lib/modules/4.9.78-ti-chai-r94/updates/dkms/8192cu.ko || echo &quot;Error: failed adding edimax 3rd party driver&quot;
+ls -ahl /lib/modules/4.9.78-ti-chai-r94/updates/dkms/8192cu.ko || echo "Error: failed adding edimax 3rd party driver"
 
 rmmod /lib/modules/4.9.78-ti-chai-r94/kernel/drivers/net/wireless/realtek/rtlwifi/rtl8192cu/rtl8192cu.ko || true
 
 mv /lib/modules/4.9.78-ti-chai-r94/kernel/drivers/net/wireless/realtek/rtlwifi/rtl8192cu/rtl8192cu.ko   /lib/modules/4.9.78-ti-chai-r94/kernel/drivers/net/wireless/realtek/rtlwifi/rtl8192cu/rtl8192cu.ko.disabled || true
 
-echo installing cudy driver
-apt install -y usb-modeswitch
+echo Installing cudy wifi adapter driver
+DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -q install usb-modeswitch
 
 mkdir -p /sdcard/factory/wifi/cudy
 cd /sdcard/factory/wifi/cudy
-git clone https://github.com/brektrou/rtl8821CU.git
-cd rtl8821CU
+
+#wget https://www.cudytech.com/filedownload/407543
+wget $download_prefix/build/407543
+
+unzip 407543
+
+cd rtl88x2bu_linux/
 
 echo fixing MakeFile
 sudo cp /lib/modules/$(uname -r)/build/arch/arm/Makefile /lib/modules/$(uname -r)/build/arch/arm/Makefile.$(date +%Y%m%d%H%M)
-sudo sed -i &apos;s/-msoft-float//&apos; /lib/modules/$(uname -r)/build/arch/arm/Makefile
+sudo sed -i 's/-msoft-float//' /lib/modules/$(uname -r)/build/arch/arm/Makefile
 sudo ln -s /lib/modules/$(uname -r)/build/arch/arm /lib/modules/$(uname -r)/build/arch/armv7l
-sudo sed -i &apos;s/CONFIG_PLATFORM_I386_PC = y/CONFIG_PLATFORM_I386_PC = n/&apos; Makefile
-sudo sed -i &apos;s/CONFIG_PLATFORM_ARM_RPI = n/CONFIG_PLATFORM_ARM_RPI = y/&apos; Makefile
 
+sudo sed -i 's/hard-float/float-abi=hard/' Makefile
+
+sudo make
+sudo make install
+sudo modprobe -r 88x2bu
+sudo modprobe 88x2bu rtw_switch_usb_mode=2
+echo "options 88x2bu rtw_switch_usb_mode=2" &gt; /etc/modprobe.d/88x2bu.conf
+
+echo Building the driver for AC600
+
+cd /sdcard/factory/wifi/cudy
+#wget https://www.cudytech.com/filedownload/269982
+wget $download_prefix/build/269982
+
+tar xfvz 269982
+cd rtl8821CU_rtl8731AU_WiFi_linux_v5.8.1.7_37266.20200929_COEX20200616-4141/
+
+echo fixing MakeFile
+sudo sed -i 's/hard-float/float-abi=hard/' Makefile
+#sudo sed -i 's/CONFIG_PLATFORM_I386_PC = y/CONFIG_PLATFORM_I386_PC = n/' Makefile
+#sudo sed -i 's/CONFIG_PLATFORM_ARM_RPI = n/CONFIG_PLATFORM_ARM_RPI = y/' Makefile
 
 echo Building..
-chmod +x dkms-install.sh
-time ./dkms-install.sh
-ls -ahl /lib/modules/4.9.78-ti-chai-r94/updates/dkms/8821cu.ko
-modprobe 8821cu
+
+time make
+make install
+sudo modprobe -r 8821cu || true
+sudo modprobe 8821cu rtw_switch_usb_mode=2
+echo "options 8821cu rtw_switch_usb_mode=2" &gt; /etc/modprobe.d/8821cu.conf
 
 echo editing usb_modeswitch rules..
-sed  -i &apos;/LABEL=&quot;modeswitch_rules_end&quot;/i # &apos; /lib/udev/rules.d/40-usb_modeswitch.rules
-sed  -i &apos;/LABEL=&quot;modeswitch_rules_end&quot;/i # Realtek 8211CU Wifi AC USB&apos; /lib/udev/rules.d/40-usb_modeswitch.rules
-sed  -i &apos;/LABEL=&quot;modeswitch_rules_end&quot;/i ATTR{idVendor}==&quot;0bda&quot;, ATTR{idProduct}==&quot;1a2b&quot;, RUN+=&quot;/usr/sbin/usb_modeswitch -K -v 0bda -p 1a2b&quot;&apos; /lib/udev/rules.d/40-usb_modeswitch.rules
-sed  -i &apos;/LABEL=&quot;modeswitch_rules_end&quot;/i # &apos; /lib/udev/rules.d/40-usb_modeswitch.rules
+sed  -i '/LABEL="modeswitch_rules_end"/i # Cudy AC600 0bda 1a2b Realtek Semiconductor Corp' /lib/udev/rules.d/40-usb_modeswitch.rules
+sed  -i '/LABEL="modeswitch_rules_end"/i ATTR{idVendor}=="0bda", ATTR{idProduct}=="1a2b", RUN+="/usr/sbin/usb_modeswitch -K -v 0bda -p 1a2b"' /lib/udev/rules.d/40-usb_modeswitch.rules
+sed  -i '/LABEL="modeswitch_rules_end"/i # ' /lib/udev/rules.d/40-usb_modeswitch.rules
+
+echo  8821cu &gt;&gt; /etc/modules
 
 if $is_dev
 then
@@ -615,7 +642,7 @@ else
       rm -r /sdcard/factory/wifi
 fi
 
-apt autoremove -q -y dkms firmware-realtek tzdata linux-headers-4.4.62-ti-xenomai-r99
+apt autoremove -q -y firmware-realtek tzdata linux-headers-4.4.62-ti-xenomai-r99
 
 sync
 fsck /dev/mmcblk1p1 -y -f
@@ -660,7 +687,8 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:%PATH% DEBIAN_
 echo with no envs
 apt-get -y -q install i2c-tools evtest git automake libtool  || exit 1
 
-git clone git://github.com/kergoth/tslib.git
+#git clone git://github.com/kergoth/tslib.git
+git clone https://github.com/libts/tslib.git
 cd tslib
 cat &gt;&gt; /usr/include/linux/input.h &lt;&lt; __EOF__
 #undef ABS_MAX
@@ -707,7 +735,7 @@ cp /usr/local/etc/ts.conf /etc/
 # maybe we can perform calibration on first use
 
 #Edit /etc/ts.conf to uncomment the second line:
-sed -i &apos;s/#module_raw input/module_raw input/&apos; /etc/ts.conf
+sed -i 's/#module_raw input/module_raw input/' /etc/ts.conf
 
 #Run ts_configure and press crosshairs on LCD.. maybe on first run
 
@@ -715,12 +743,13 @@ echo check ldconfig
 which ldconfig
 
 echo patching /etc/ld.so.conf
-echo &quot;/usr/local/lib&quot; &gt;&gt; /etc/ld.so.conf
+echo "/usr/local/lib" &gt;&gt; /etc/ld.so.conf
 ldconfig
 
 apt-key update
 apt-get update
-apt-get -y -q upgrade
+DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -q upgrade
+dpkg --configure -a --force-confdef --force-confold
 
 apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential || true
 
@@ -778,17 +807,17 @@ sync
 #if $is_dev
 #then
 #      echo Building a debug image
-#      echo &quot;export JULIA_PKGDIR=/sdcard/factory/.julia&quot;&gt;&gt;~/.profile
+#      echo "export JULIA_PKGDIR=/sdcard/factory/.julia"&gt;&gt;~/.profile
 #      export JULIA_PKGDIR=/sdcard/factory/.julia
 #else
 #      echo Formatting disk!  
-#      echo &quot;export JULIA_PKGDIR=/root/.julia&quot;&gt;&gt;~/.profile
+#      echo "export JULIA_PKGDIR=/root/.julia"&gt;&gt;~/.profile
 #      export JULIA_PKGDIR=/root/.julia
       rm -r /root/.julia
       mkdir -p /root/.julia
       chmod 0777 /root/.julia
       mount /dev/mmcblk0p2 /root/.julia || exit 1
-#      echo &quot;export JULIA_PKGDIR=/root/.julia&quot;&gt;&gt;~/.profile
+#      echo "export JULIA_PKGDIR=/root/.julia"&gt;&gt;~/.profile
 #      export JULIA_PKGDIR=/root/.julia
 #fi
 # source ~/.profile
@@ -808,8 +837,8 @@ sync
       apt install -y -q liblapack-dev libblas-dev
       apt install -y -q libmysqlclient-dev
 
-#      sed -i &apos;1i using DataArrays&apos; /root/chaipcr/bioinformatics/juliaserver.jl
-#      sed -i &apos;1i push!(LOAD_PATH, &quot;/root/chaipcr/bioinformatics/QpcrAnalysis/&quot;)&apos; /root/chaipcr/bioinformatics/juliaserver.jl
+#      sed -i '1i using DataArrays' /root/chaipcr/bioinformatics/juliaserver.jl
+#      sed -i '1i push!(LOAD_PATH, "/root/chaipcr/bioinformatics/QpcrAnalysis/")' /root/chaipcr/bioinformatics/juliaserver.jl
 
       echo Build time- adding pre-requesits
       free -m
@@ -830,14 +859,14 @@ DEBIAN_FRONTEND=noninteractive apt-get -q -y install gettext
 echo $(date) Performing precompilling julia packages
 if [ -e /tmp/mysql.sock ]
 then
-	echo &quot;MySQL sockets file found&quot;
+	echo "MySQL sockets file found"
 else
 	if [ -e /run/mysqld/mysqld.sock ]
 	then
-		echo &quot;Clonning MySQL sockets file&quot;
+		echo "Clonning MySQL sockets file"
 		ln -s /run/mysqld/mysqld.sock /tmp/mysql.sock
 	else
-		echo &quot;MySQL sockets file not found.&quot; 
+		echo "MySQL sockets file not found." 
 		exit 1
 	fi
 fi
@@ -857,39 +886,39 @@ sync
 
 sleep 60
 
-echo &quot;Setting up Julia: Initializing rep&quot;
+echo "Setting up Julia: Initializing rep"
 cd /tmp
 wget https://github.com/chaibio/chaipcr/raw/master/bioinformatics/setup_3rd_party_packages.jl
 
 rm -r ~/.julia/*
 
-julia -e &apos;include(&quot;/tmp/setup_3rd_party_packages.jl&quot;)&apos;
+julia -e 'include("/tmp/setup_3rd_party_packages.jl")'
 
 apt-get -y -q install libglib2.0-0
 apt --fix-broken install -y -q
 
 sync
 
-echo &quot;Setting up Julia: Updating rep&quot;
+echo "Setting up Julia: Updating rep"
 
 echo precompiling mandatory packages.
 cat &lt;&lt;EOF &gt;&gt; chaibio_packages.jl
 
-	Pkg.build(&quot;DataArrays&quot;,&quot;DataStructures&quot;, &quot;SpecialFunctions&quot;, &quot;MathProgBase&quot;, &quot;HDF5&quot;, &quot;Clustering&quot;, &quot;Nullables&quot;,&quot;JSON&quot;, &quot;JLD&quot;, &quot;JuMP&quot;, &quot;HTTP&quot;, &quot;Dierckx&quot;, &quot;Ipopt&quot;, &quot;DataFrames&quot;)
-	println(&quot;Building: Done&quot;)
+	Pkg.build("DataArrays","DataStructures", "SpecialFunctions", "MathProgBase", "HDF5", "Clustering", "Nullables","JSON", "JLD", "JuMP", "HTTP", "Dierckx", "Ipopt", "DataFrames")
+	println("Building: Done")
 
-	println(&quot;Pinning all done&quot;)
+	println("Pinning all done")
 	using DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering
-        println(&quot;Used DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering&quot;)
+        println("Used DataStructures, SpecialFunctions, MathProgBase, HDF5, Clustering")
 	using JSON, JLD, JuMP, HTTP, DataArrays
-        println(&quot;Used JSON, JLD, JuMP, HTTP, DataArrays&quot;)
+        println("Used JSON, JLD, JuMP, HTTP, DataArrays")
 	using Dierckx, Ipopt, DataFrames
-	println(&quot;All packages used&quot;)
+	println("All packages used")
 
 	Pkg.status()
-	println(&quot;Using: Done&quot;)
+	println("Using: Done")
 
-println(&quot;Setting up Julia: done testing.. quitting..&quot;)
+println("Setting up Julia: done testing.. quitting..")
 quit()
 EOF
 sync
@@ -931,8 +960,8 @@ cd
 #mount /dev/mmcblk1p2 /data || true
 tar czf /data/dot_julia_complete.tgz .julia 
 
-#find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;/logs/
-#find /root/.julia/.cache/ -name objects | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
+#find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I '{}' rm -r '{}'/logs/
+#find /root/.julia/.cache/ -name objects | grep -v METADATA | xargs -I '{}' rm -r '{}'
 
 #tar czf dot_julia.tgz .julia 
 
@@ -995,7 +1024,7 @@ sync
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
-      <command></command>
+      <command/>
       <execEachLine>false</execEachLine>
       <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
@@ -1030,11 +1059,11 @@ systemctl disable bonescript-autorun.service
 rm /etc/systemd/system/sockets.target.wants/cloud9.socket
 
 echo ifup script fix
-echo &quot;Due to a bug (https://bugs.launchpad.net/ubuntu/+source/ntp/+bug/1206164) a script from ifup has to be fixed&quot;
-sed -i &apos;s/) \&amp;/) &lt;\/dev\/null &gt;\/dev\/null 2&gt;\&amp;1 \&amp;/g&apos; /etc/network/if-up.d/ntpdate
+echo "Due to a bug (https://bugs.launchpad.net/ubuntu/+source/ntp/+bug/1206164) a script from ifup has to be fixed"
+sed -i 's/) \&amp;/) &lt;\/dev\/null &gt;\/dev\/null 2&gt;\&amp;1 \&amp;/g' /etc/network/if-up.d/ntpdate
 
 #echo Calling timezone setter on ifup
-#echo &quot;/root/chaipcr/deploy/device/set_timezone.sh &amp;&quot; &gt;&gt; /etc/network/if-up.d/ntpdate
+#echo "/root/chaipcr/deploy/device/set_timezone.sh &amp;" &gt;&gt; /etc/network/if-up.d/ntpdate
 
 apt-get clean
 apt-get autoclean
@@ -1081,7 +1110,7 @@ df -h</command>
       <siteName>root@$build_machine:22</siteName>
       <command>echo Remote Support Access
 sync
-echo &quot;temp\ntemp\nAny name\n\n\n\n\n\n&quot; | adduser service # any pw will do, will delete it below
+echo "temp\ntemp\nAny name\n\n\n\n\n\n" | adduser service # any pw will do, will delete it below
 
 echo setting up service user
 adduser service sudo
@@ -1160,10 +1189,11 @@ echo basic beaglebone setup done!</command>
       <command>echo all 3rd party software done for $build_machine, you can call call deploy_chibio job to add chibio software now.
 
 exit 0</command>
+      <configuredLocalRules/>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
   <buildWrappers>
-    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.11.3"/>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.11.6"/>
   </buildWrappers>
 </project>
