@@ -182,6 +182,32 @@ const std::string kNetworkInterfacesFile = "/etc/network/interfaces";
 static const std::string kNetworkDriverName = "8192cu";
 static const std::string kNetworkDriverPath = "/lib/modules/4.9.78-ti-chai-r94/updates/dkms/" + kNetworkDriverName + ".ko";
 
+struct WifiDriver
+{
+    const char* pszNetworkDriverName;
+    const char* pszNetworkDriverPath;
+    const bool bSupportsIfup;
+    const char* pszUSBID[];
+};
+
+static const WifiDriver wifiDrivers[] = {
+
+    // Edimax ew-7811Un
+    // Bus 001 Device 003: ID 0bda:8176 Realtek Semiconductor Corp. RTL8188CUS 802.11n WLAN Adapter
+    { kNetworkDriverName.c_str(), kNetworkDriverPath.c_str(), true, {"0bda:8176", nullptr} },        // this may drop compatibles
+    
+    // Cudy AC600 https://www.cudytech.com/wu600_software_download
+    // Bus 001 Device 002: ID 0bda:1a2b Realtek Semiconductor Corp. << Mas storage
+    // Bus 001 Device 003: ID 0bda:c811 Realtek Semiconductor Corp. << switching to this one
+    { "8821cu", "/lib/modules/4.9.78-ti-chai-r94/kernel/drivers/net/wireless/8821cu.ko", false, {"0bda:c811", nullptr} },
+
+    // Cudy AC1300 https://www.cudytech.com/wu1300_software_download
+    // Bus 001 Device 003: ID 0bda:b812 Realtek Semiconductor Corp. 
+    { "88x2bu", "/lib/modules/4.9.78-ti-chai-r94/kernel/drivers/net/wireless/88x2bu.ko", false, {"0bda:b812", "2357:012d", "2001:331c", nullptr} },
+
+    { nullptr, nullptr, false, { nullptr} }
+};
+
 //Time checker
 const std::string kSavedTimePath = "/data/chaipcr_saved_time";
 

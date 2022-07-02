@@ -196,9 +196,37 @@ void WirelessManager::_connect()
 void WirelessManager::ifup()
 {
     LoggerStreams logStreams;
-    std::stringstream stream;
+    std::stringstream stream, lsusbstream;
+    int found_adapter=-1;
+/*
+    stream << "lsusb ";
+    if (Util::watchProcess(stream.str(), _connectionEventFd,
+                            [&logStreams,&lsusbstream](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - lsusb (stdout)").write(buffer, size); lsusbstream.write(buffer, size); },
+                            [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - lsusb (stderr)").write(buffer, size); }))
+    {
+        APP_LOGGER << "ifup: lsusb returns " << lsusbstream.str() << std::endl;
+    }
 
-    stream << "rmmod " << kNetworkDriverName;
+    for(int adapter=0; found_adapter==-1 && wifiDrivers[adapter].pszNetworkDriverName!=nullptr; adapter++)
+        for(int device=0; wifiDrivers[adapter].pszUSBID[device]!=nullptr; device++)
+        {
+            if( lsusbstream.str().find(wifiDrivers[adapter].pszUSBID[device]) != std::string::npos )
+            {
+                found_adapter = adapter;
+                APP_LOGGER << "ifup: found the wifi adapter " << wifiDrivers[adapter].pszUSBID[device] << std::endl;
+                break;
+            }
+            APP_LOGGER << "ifup: failed checking " << wifiDrivers[adapter].pszUSBID[device] << std::endl;
+        }
+*/
+    if(found_adapter==-1)
+    {
+        APP_LOGGER << "ifup: failed finding a wifi adapter" << std::endl;
+        found_adapter = 0;
+    }
+
+    stream.str("");
+    stream << "rmmod " << wifiDrivers[found_adapter].pszNetworkDriverName;
 
     if (!Util::watchProcess(stream.str(), _connectionEventFd,
                             [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - rmmod (stdout)").write(buffer, size); },
@@ -209,7 +237,7 @@ void WirelessManager::ifup()
     }
 
     stream.str("");
-    stream << "insmod " << kNetworkDriverPath;
+    stream << "insmod " << wifiDrivers[found_adapter].pszNetworkDriverPath;
 
     if (!Util::watchProcess(stream.str(), _connectionEventFd,
                             [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - insmod (stdout)").write(buffer, size); },

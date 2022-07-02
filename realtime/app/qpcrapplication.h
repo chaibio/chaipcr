@@ -107,6 +107,7 @@ private:
     void waitFlag();
     void readDeviceFile();
     void readConfigurationFile();
+    void setWatchdog(bool bEnableWatchdog) {m_bEnableWatchdog=bEnableWatchdog;};
 
     void initSignals();
     bool waitSignal() const;
@@ -127,6 +128,7 @@ private:
     std::shared_ptr<UpdateManager> _updateManager;
 
     std::exception_ptr _exception;
+    bool m_bEnableWatchdog;
 };
 
 #define qpcrApp QPCRApplication::getInstance()
