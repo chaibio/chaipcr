@@ -99,7 +99,7 @@ void WirelessManager::shutdown()
 
         stopCommands();
 
-        _shutdownThread = std::thread(&WirelessManager::ifdown, this);
+        /*_shutdownThread = std::thread(&*/WirelessManager::ifdown()/*, this)*/;
     }
 }
 
@@ -198,13 +198,17 @@ void WirelessManager::ifup()
     LoggerStreams logStreams;
     std::stringstream stream, lsusbstream;
     int found_adapter=-1;
-/*
-    stream << "lsusb ";
+
+    stream << "/usr/bin/lsusb";
     if (Util::watchProcess(stream.str(), _connectionEventFd,
                             [&logStreams,&lsusbstream](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - lsusb (stdout)").write(buffer, size); lsusbstream.write(buffer, size); },
                             [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - lsusb (stderr)").write(buffer, size); }))
     {
         APP_LOGGER << "ifup: lsusb returns " << lsusbstream.str() << std::endl;
+    }
+    else
+    {
+        APP_LOGGER << "ifup: error calling lsusb" << std::endl;
     }
 
     for(int adapter=0; found_adapter==-1 && wifiDrivers[adapter].pszNetworkDriverName!=nullptr; adapter++)
@@ -213,15 +217,16 @@ void WirelessManager::ifup()
             if( lsusbstream.str().find(wifiDrivers[adapter].pszUSBID[device]) != std::string::npos )
             {
                 found_adapter = adapter;
-                APP_LOGGER << "ifup: found the wifi adapter " << wifiDrivers[adapter].pszUSBID[device] << std::endl;
+                APP_LOGGER << "ifup: found the wifi adapter " << wifiDrivers[adapter].pszNetworkDriverName;
+                APP_LOGGER << ", USBID " << wifiDrivers[adapter].pszUSBID[device] << std::endl;
                 break;
             }
-            APP_LOGGER << "ifup: failed checking " << wifiDrivers[adapter].pszUSBID[device] << std::endl;
+            //APP_LOGGER << "ifup: failed checking " << wifiDrivers[adapter].pszUSBID[device] << std::endl;
         }
-*/
+
     if(found_adapter==-1)
     {
-        APP_LOGGER << "ifup: failed finding a wifi adapter" << std::endl;
+        APP_LOGGER << "ifup: failed detecting a wifi adapter" << std::endl;
         found_adapter = 0;
     }
 

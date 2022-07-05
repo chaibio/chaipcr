@@ -187,14 +187,15 @@ struct WifiDriver
     const char* pszNetworkDriverName;
     const char* pszNetworkDriverPath;
     const bool bSupportsIfup;
-    const char* pszUSBID[];
+    const char* pszUSBID[5];
 };
 
 static const WifiDriver wifiDrivers[] = {
 
     // Edimax ew-7811Un
     // Bus 001 Device 003: ID 0bda:8176 Realtek Semiconductor Corp. RTL8188CUS 802.11n WLAN Adapter
-    { "8192cu", "/lib/modules/4.9.78-ti-chai-r94/updates/dkms/8192cu.ko", true, {"0bda:8176", nullptr} },        // this may drop compatibles
+    // Bus 001 Device 002: ID 7392:7811 Edimax Technology Co., Ltd EW-7811Un 802.11n Wireless Adapter [Realtek RTL8188CUS]
+    { "8192cu", "/lib/modules/4.9.78-ti-chai-r94/updates/dkms/8192cu.ko", true, {"0bda:8176", "7392:7811", "RTL8188CUS", nullptr} },        // this may drop compatibles
     
     // Cudy AC600 https://www.cudytech.com/wu600_software_download
     // Bus 001 Device 002: ID 0bda:1a2b Realtek Semiconductor Corp. << Mas storage
