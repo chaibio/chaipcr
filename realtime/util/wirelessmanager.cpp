@@ -37,6 +37,7 @@
 #include <ifaddrs.h>
 #include <net/if.h>
 #include <sys/eventfd.h>
+#include <Poco/File.h>
 
 #define CONNECTION_TIMEOUT_INTERVAL 10
 #define SCAN_CACHE_INTERVAL 60
@@ -196,7 +197,7 @@ void WirelessManager::_connect()
 void WirelessManager::ifup()
 {
     LoggerStreams logStreams;
-    std::stringstream stream, lsusbstream;
+    std::stringstream stream, lsusbstream, lsmodstream;
     int found_adapter=-1;
 
     stream << "/usr/bin/lsusb";
@@ -230,17 +231,43 @@ void WirelessManager::ifup()
         found_adapter = 0;
     }
 
-    stream.str("");
-    stream << "rmmod " << wifiDrivers[found_adapter].pszNetworkDriverName;
-
-    if (!Util::watchProcess(stream.str(), _connectionEventFd,
-                            [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - rmmod (stdout)").write(buffer, size); },
-                            [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - rmmod (stderr)").write(buffer, size); }))
+    stream.str("/sbin/lsmod");
+    if (Util::watchProcess(stream.str(), _connectionEventFd,
+                            [&logStreams,&lsmodstream](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - lsmod (stdout)").write(buffer, size); lsmodstream.write(buffer, size); },
+                            [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - lsmod (stderr)").write(buffer, size); }))
     {
-        _connectionStatus = NotConnected;
-        return;
+        APP_LOGGER << "ifup: lsmod returns " << lsmodstream.str() << std::endl;
+    }
+    else
+    {
+        APP_LOGGER << "ifup: error calling lsmod" << std::endl;
     }
 
+    if( lsmodstream.str().find( wifiDrivers[found_adapter].pszNetworkDriverName ) != std::string::npos )
+    {
+        APP_LOGGER << "ifup: rmmod unloadding the wifi driver " << wifiDrivers[found_adapter].pszNetworkDriverName << std::endl;
+
+        stream.str("");
+        stream << "rmmod " << wifiDrivers[found_adapter].pszNetworkDriverName;
+
+        if (!Util::watchProcess(stream.str(), _connectionEventFd,
+                                [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - rmmod (stdout)").write(buffer, size); },
+                                [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - rmmod (stderr)").write(buffer, size); }))
+        {
+            _connectionStatus = NotConnected;
+            return;
+        }
+    }
+    else
+    {
+        APP_LOGGER << "ifup: rmmod driver is not loaded " << wifiDrivers[found_adapter].pszNetworkDriverName << std::endl;
+    }
+
+    if(!Poco::File(wifiDrivers[found_adapter].pszNetworkDriverPath).exists())
+    {
+        APP_LOGGER << "ifup: insmod driver is not installed " << wifiDrivers[found_adapter].pszNetworkDriverPath << std::endl;
+        return;
+    }
     stream.str("");
     stream << "insmod " << wifiDrivers[found_adapter].pszNetworkDriverPath;
 
