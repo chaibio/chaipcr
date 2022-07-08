@@ -22,6 +22,7 @@
 #include "wirelessmanager.h"
 #include "qpcrapplication.h"
 #include "constants.h"
+#include "logger.h"
 
 NetworkManagerHandler::NetworkManagerHandler(const std::string &interfaceName, OperationType type)
 {
@@ -141,8 +142,11 @@ void NetworkManagerHandler::getStat(boost::property_tree::ptree &responsePt)
 
 void NetworkManagerHandler::setSettings(const boost::property_tree::ptree &requestPt)
 {
+    APP_LOGGER << "NetworkManagerHandler::setSettings" << std::endl;
     if (requestPt.find("type") != requestPt.not_found())
     {
+        APP_LOGGER << "NetworkManagerHandler::setSettings found type" << std::endl;
+
         NetworkInterfaces::InterfaceSettings settings;
         settings.interface = _interfaceName;
         settings.type = requestPt.get<std::string>("type");
@@ -154,10 +158,14 @@ void NetworkManagerHandler::setSettings(const boost::property_tree::ptree &reque
                 settings.arguments[it->first] = it->second.get_value<std::string>();
         }
 
+        APP_LOGGER << "NetworkManagerHandler::setSettings adding settings" << std::endl;
         NetworkInterfaces::writeInterfaceSettings(kNetworkInterfacesFile, settings);
 
+        APP_LOGGER << "NetworkManagerHandler::setSettings adding settings " << _interfaceName  << std::endl;
+        APP_LOGGER << "NetworkManagerHandler::setSettings adding settings " << qpcrApp.wirelessManager()->interfaceName()  << std::endl;
         if (_interfaceName != qpcrApp.wirelessManager()->interfaceName())
         {
+        APP_LOGGER << "NetworkManagerHandler::setSettings about to ifdownup " << _interfaceName  << std::endl;
             NetworkInterfaces::ifdown(_interfaceName);
             NetworkInterfaces::ifup(_interfaceName);
         }
@@ -166,6 +174,8 @@ void NetworkManagerHandler::setSettings(const boost::property_tree::ptree &reque
     }
     else
     {
+        APP_LOGGER << "NetworkManagerHandler::setSettings no type set " << std::endl;
+
         setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
         setErrorString("type must be set");
     }
@@ -218,12 +228,18 @@ void NetworkManagerHandler::wifiScan(boost::property_tree::ptree &responsePt)
 
 void NetworkManagerHandler::wifiConnect()
 {
+    APP_LOGGER << "NetworkManagerHandler::wifiConnect " << std::endl;
+
     qpcrApp.wirelessManager()->connect();
 }
 
 void NetworkManagerHandler::wifiDisconnect()
 {
-    NetworkInterfaces::removeInterfaceSettings(kNetworkInterfacesFile, qpcrApp.wirelessManager()->interfaceName());
-
+    //APP_LOGGER << "wifiDisconnect" << std::endl;
+    std::string interface = qpcrApp.wirelessManager()->interfaceName();
     qpcrApp.wirelessManager()->shutdown();
+    //APP_LOGGER << "done shutdown" << std::endl;
+    NetworkInterfaces::removeInterfaceSettings(kNetworkInterfacesFile, interface);
+    //APP_LOGGER << "interface removed" << std::endl;
+
 }
