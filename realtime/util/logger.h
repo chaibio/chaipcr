@@ -55,6 +55,6 @@ private:
     std::map<std::string, std::stringstream> _streams;
 };
 
-#define APP_LOGGER Poco::LogStream(Logger::get())
+#define APP_LOGGER Poco::LogStream(::Logger::get())
 
 #endif // LOGGER_H

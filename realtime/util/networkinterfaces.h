@@ -38,6 +38,8 @@ namespace NetworkInterfaces
     public:
         std::string interface;
         std::string type;
+        std::string hotspot_ssid;
+        std::string hotspot_key;
         bool autoConnect;
 
         std::map<std::string, std::string> arguments;

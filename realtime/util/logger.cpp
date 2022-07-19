@@ -25,7 +25,7 @@
 #include <Poco/FormattingChannel.h>
 #include <Poco/PatternFormatter.h>
 
-Poco::Logger* Logger::_logger = nullptr;
+Poco::Logger* ::Logger::_logger = nullptr;
 
 void Logger::setup(const std::string &name)
 {
@@ -49,7 +49,7 @@ void Logger::setup(Poco::Channel *channel, const std::string &name)
 
 LoggerStreams::~LoggerStreams()
 {
-    Poco::LogStream logStream(Logger::get());
+    Poco::LogStream logStream(::Logger::get());
 
     for (std::pair<const std::string, std::stringstream> &stream: _streams)
     {

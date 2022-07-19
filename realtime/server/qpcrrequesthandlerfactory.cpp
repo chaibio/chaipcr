@@ -37,6 +37,7 @@
 
 #include "qpcrrequesthandlerfactory.h"
 #include "qpcrapplication.h"
+#include "logger.h"
 
 using namespace std;
 using namespace Poco;
@@ -48,15 +49,23 @@ const boost::chrono::hours USER_CACHE_DURATION(1);
 // Class QPCRRequestHandlerFactory
 HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPServerRequest &request)
 {
+    std::cout << "createRequestHandler " << std::endl;
+
     try
     {
         vector<string> requestPath;
         URI uri(request.getURI());
 
         uri.getPathSegments(requestPath);
+        APP_LOGGER << "createRequestHandler " << request.getURI() << std::endl;
 
         if (!requestPath.empty())
         {
+            APP_LOGGER << "createRequestHandler " << request.getMethod() << ": " << requestPath.size() << " ";
+            for(auto a:requestPath)
+                APP_LOGGER << a << "|";
+            APP_LOGGER << std::endl;
+            
             if (request.getMethod() == "GET")
             {
                 if (requestPath.size() >= 2 && requestPath.at(0) == "network")
@@ -78,6 +87,14 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
                     return new NetworkManagerHandler(requestPath.at(1), NetworkManagerHandler::WifiConnect);
                 else if (requestPath.at(2) == "disconnect")
                     return new NetworkManagerHandler(requestPath.at(1), NetworkManagerHandler::WifiDisconnect);
+                else if (requestPath.at(2) == "hotspotselect")
+                    return new NetworkManagerHandler(requestPath.at(1), NetworkManagerHandler::HotspotSelect);
+                else if (requestPath.at(2) == "wifiselect")
+                    return new NetworkManagerHandler(requestPath.at(1), NetworkManagerHandler::WifiSelect);
+                else if (requestPath.at(2) == "hotspotactivate" || requestPath.at(2) == "create_hotspot")
+                    return new NetworkManagerHandler(requestPath.at(1), NetworkManagerHandler::HotspotActivate);
+                else if (requestPath.at(2) == "hotspotdeactivate")
+                    return new NetworkManagerHandler(requestPath.at(1), NetworkManagerHandler::HotspotDeactivate);
             }
             else if (request.getMethod() == "OPTIONS")
                 return new HTTPCodeHandler(HTTPResponse::HTTP_OK);

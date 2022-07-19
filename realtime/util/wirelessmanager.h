@@ -28,6 +28,7 @@
 #include <boost/noncopyable.hpp>
 
 #include <Poco/RWLock.h>
+#include "networkinterfaces.h"
 
 struct iw_range;
 
@@ -63,7 +64,8 @@ public:
         Connecting,
         ConnectionError,
         AuthenticationError,
-        Connected
+        Connected,
+        HotspotActive
     };
 
     WirelessManager();
@@ -71,11 +73,18 @@ public:
 
     std::string interfaceName() const;
 
+    // wifi
     void connect();
     void shutdown();
 
-    std::string getCurrentSsid() const;
+    // hotspot
+    void hotspotSelect();
+    void wifiSelect();
+    void hotspotActivate();
+    void hotspotDeactivate();
+    NetworkInterfaces::InterfaceSettings& hotspotSettings() {return hotspot_settings;};
 
+    std::string getCurrentSsid() const;
     std::vector<ScanResult> scanResult();
 
     inline ConnectionStatus connectionStatus() const noexcept { return _connectionStatus; }
@@ -86,6 +95,11 @@ private:
     void stopCommands();
 
     void _connect();
+    void _hotspotSelect();
+    void _wifiSelect();
+    void _hotspotActivate();
+    void _hotspotDeactivate();
+
 
     void ifup();
     void ifdown();
@@ -107,9 +121,11 @@ private:
 
     std::recursive_mutex _commandsMutex;
 
-    std::thread _connectionThread;
+    std::thread _connectionThread, _selectionThread, _hotspotThread;
     std::atomic<OperationState> _connectionThreadState;
     int _connectionEventFd;
+    
+    NetworkInterfaces::InterfaceSettings hotspot_settings;
 
     std::thread _shutdownThread;
 

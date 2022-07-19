@@ -68,10 +68,30 @@ void NetworkManagerHandler::processData(const boost::property_tree::ptree &reque
         break;
 
     case WifiDisconnect:
+        hotspotDeactivate();
         wifiDisconnect();
         JsonHandler::processData(requestPt, responsePt);
         break;
 
+    // Hotspot
+    case HotspotSelect:
+        hotspotSelect();
+        JsonHandler::processData(requestPt, responsePt);
+        break;
+    case WifiSelect:
+        wifiSelect();
+        JsonHandler::processData(requestPt, responsePt);
+        break;
+    case HotspotActivate:
+        setHotspotSettings(requestPt);
+        hotspotActivate();
+        JsonHandler::processData(requestPt, responsePt);
+        break;
+    case HotspotDeactivate:
+        hotspotDeactivate();
+        JsonHandler::processData(requestPt, responsePt);
+        break;
+ 
     default:
         setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
         setErrorString("Unknown opeation type");
@@ -117,6 +137,10 @@ void NetworkManagerHandler::getStat(boost::property_tree::ptree &responsePt)
 
         switch (status)
         {
+        case WirelessManager::HotspotActive:
+            responsePt.put("state.status", "hotspot_active");
+            break;
+
         case WirelessManager::Connecting:
             responsePt.put("state.status", "connecting");
             break;
@@ -137,6 +161,38 @@ void NetworkManagerHandler::getStat(boost::property_tree::ptree &responsePt)
             responsePt.put("state.status", "not_connected");
             break;
         }
+    }
+}
+
+NetworkInterfaces::InterfaceSettings& NetworkManagerHandler::hotspotSettings()
+{
+    return qpcrApp.wirelessManager()->hotspotSettings();
+}
+
+void NetworkManagerHandler::setHotspotSettings(const boost::property_tree::ptree &requestPt)
+{
+    APP_LOGGER << "NetworkManagerHandler::setHotspotSettings" << std::endl;
+    if (requestPt.find("hotspot_key") != requestPt.not_found() && requestPt.find("hotspot_ssid") != requestPt.not_found() )
+    {
+        APP_LOGGER << "NetworkManagerHandler::setHotspotSettings found type" << std::endl;
+
+        hotspotSettings().arguments.clear();
+        hotspotSettings().interface = _interfaceName;
+        hotspotSettings().hotspot_ssid = requestPt.get<std::string>("hotspot_ssid");
+        hotspotSettings().hotspot_key = requestPt.get<bool>("hotspot_key", true);
+
+        for (boost::property_tree::ptree::const_iterator it = requestPt.begin(); it != requestPt.end(); ++it)
+        {
+            if ( it->first != "hotspot_ssid" && it->first != "hotspot_key" )
+                hotspotSettings().arguments[it->first] = it->second.get_value<std::string>();
+        }
+    }
+    else
+    {
+        APP_LOGGER << "NetworkManagerHandler::setSettings no type set " << std::endl;
+
+        setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+        setErrorString("hotspot_ssid and hotspot_key must be set");
     }
 }
 
@@ -161,11 +217,11 @@ void NetworkManagerHandler::setSettings(const boost::property_tree::ptree &reque
         APP_LOGGER << "NetworkManagerHandler::setSettings adding settings" << std::endl;
         NetworkInterfaces::writeInterfaceSettings(kNetworkInterfacesFile, settings);
 
-        APP_LOGGER << "NetworkManagerHandler::setSettings adding settings " << _interfaceName  << std::endl;
+        APP_LOGGER << "NetworkManagerHandler::setSettings adding settings " << _interfaceName << std::endl;
         APP_LOGGER << "NetworkManagerHandler::setSettings adding settings " << qpcrApp.wirelessManager()->interfaceName()  << std::endl;
         if (_interfaceName != qpcrApp.wirelessManager()->interfaceName())
         {
-        APP_LOGGER << "NetworkManagerHandler::setSettings about to ifdownup " << _interfaceName  << std::endl;
+            APP_LOGGER << "NetworkManagerHandler::setSettings about to ifdownup " << _interfaceName  << std::endl;
             NetworkInterfaces::ifdown(_interfaceName);
             NetworkInterfaces::ifup(_interfaceName);
         }
@@ -229,17 +285,40 @@ void NetworkManagerHandler::wifiScan(boost::property_tree::ptree &responsePt)
 void NetworkManagerHandler::wifiConnect()
 {
     APP_LOGGER << "NetworkManagerHandler::wifiConnect " << std::endl;
-
     qpcrApp.wirelessManager()->connect();
+}
+
+void NetworkManagerHandler::hotspotSelect()
+{
+    // put back latest settings interfaces if hotspotted.. otherwise it will disconnect wifi only
+    APP_LOGGER << "NetworkManagerHandler::hotspotSelect " << std::endl;
+    qpcrApp.wirelessManager()->hotspotSelect();
+}
+
+void NetworkManagerHandler::wifiSelect()
+{
+    // returns back latest interfaces settings
+    APP_LOGGER << "NetworkManagerHandler::wifiSelect " << std::endl;
+    qpcrApp.wirelessManager()->wifiSelect();
+}
+
+void NetworkManagerHandler::hotspotActivate()
+{
+    // set hotspot settings and turn it on
+    APP_LOGGER << "NetworkManagerHandler::hotspotActivate create_hotspot" << std::endl;
+    qpcrApp.wirelessManager()->hotspotActivate();
+}
+
+void NetworkManagerHandler::hotspotDeactivate()
+{
+    // disconnects hotspot 
+    APP_LOGGER << "NetworkManagerHandler::hotspotDeactivate " << std::endl;
+    qpcrApp.wirelessManager()->hotspotDeactivate();
 }
 
 void NetworkManagerHandler::wifiDisconnect()
 {
-    //APP_LOGGER << "wifiDisconnect" << std::endl;
     std::string interface = qpcrApp.wirelessManager()->interfaceName();
     qpcrApp.wirelessManager()->shutdown();
-    //APP_LOGGER << "done shutdown" << std::endl;
     NetworkInterfaces::removeInterfaceSettings(kNetworkInterfacesFile, interface);
-    //APP_LOGGER << "interface removed" << std::endl;
-
 }
