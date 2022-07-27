@@ -49,7 +49,7 @@ const boost::chrono::hours USER_CACHE_DURATION(1);
 // Class QPCRRequestHandlerFactory
 HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPServerRequest &request)
 {
-    std::cout << "createRequestHandler " << std::endl;
+//    std::cout << "createRequestHandler " << std::endl;
 
     try
     {

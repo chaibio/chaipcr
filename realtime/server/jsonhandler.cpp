@@ -37,6 +37,7 @@ JsonHandler::JsonHandler(Poco::Net::HTTPResponse::HTTPStatus status, const std::
 
 void JsonHandler::processRequest(Poco::Net::HTTPServerRequest &request)
 {
+    APP_LOGGER << "void JsonHandler::processRequest " << std::endl;
     boost::property_tree::ptree requestPt;
 
     if (getStatus() != Poco::Net::HTTPResponse::HTTP_OK)
@@ -90,6 +91,8 @@ void JsonHandler::processResponse(Poco::Net::HTTPServerResponse &response)
 
 void JsonHandler::processData(const boost::property_tree::ptree &/*requestPt*/, boost::property_tree::ptree &responsePt)
 {
+    APP_LOGGER << "JsonHandler::processData " << std::endl;
+
     if (getStatus() == Poco::Net::HTTPResponse::HTTP_OK)
         responsePt.put("status.status", true);
     else

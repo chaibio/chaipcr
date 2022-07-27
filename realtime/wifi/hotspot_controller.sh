@@ -14,7 +14,6 @@ then
 		/sbin/ifdown $1
 		/sbin/ifup $1
 	fi
-	echo "OK"
 	exit 0
 fi
 
@@ -33,7 +32,7 @@ then
 
         /sbin/ifdown $1
         /sbin/ifup $1
-        echo "OK"
+
         exit 0
 fi
 
@@ -52,7 +51,6 @@ then
         /sbin/ifdown $1
         /sbin/ifup $1
 
-        echo "OK"
         exit 0
 fi
 
@@ -71,7 +69,6 @@ then
         /sbin/ifdown $1
         /sbin/ifup $1
 
-        echo "OK"
         exit 0
 fi
 
@@ -83,7 +80,6 @@ then
 	echo "Usage: hotspot_controller.sh <Interface> <Hotspot SSID> <Hotspot key>"
         echo "Example: hotspot_controller.sh wlan0 Chaibio password"
 	echo " "
-        echo "KO"
 	exit 1
 else
 	interface=$1
@@ -132,8 +128,6 @@ systemctl enable hostapd
 /sbin/ifup $interface
 
 cp /etc/network/interfaces /sdcard/upgrade/interfaces.latest_hotspot_settings
-
-echo "OK"
 
 exit 0
 

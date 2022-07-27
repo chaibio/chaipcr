@@ -239,6 +239,8 @@ void NetworkManagerHandler::setSettings(const boost::property_tree::ptree &reque
 
 void NetworkManagerHandler::wifiScan(boost::property_tree::ptree &responsePt)
 {
+    APP_LOGGER << "NetworkManagerHandler::wifiScan " << std::endl;
+
     std::vector<WirelessManager::ScanResult> scanResult = qpcrApp.wirelessManager()->scanResult();
     boost::property_tree::ptree array;
 

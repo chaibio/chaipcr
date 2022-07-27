@@ -82,6 +82,7 @@ public:
     void wifiSelect();
     void hotspotActivate();
     void hotspotDeactivate();
+
     NetworkInterfaces::InterfaceSettings& hotspotSettings() {return hotspot_settings;};
 
     std::string getCurrentSsid() const;
@@ -91,6 +92,7 @@ public:
 
 private:
     void setInterfaceName(const std::string &name);
+    void loadWifiDriver();
 
     void stopCommands();
 

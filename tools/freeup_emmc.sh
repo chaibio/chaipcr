@@ -24,7 +24,10 @@ sudo swapon /sdcard/upgrade/swapfile
 
 #verifying swap file is successfully added
 sudo swapon -s
-
+sync
+swapoff -v /tmp/swapfile
+sync
+rm /tmp/swapfile
 free -m
 
 

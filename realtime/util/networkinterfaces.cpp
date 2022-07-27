@@ -172,6 +172,7 @@ InterfaceSettings readInterfaceSettings(const std::string &filePath, const std::
 
 void writeInterfaceSettings(const std::string &filePath, const InterfaceSettings &interface)
 {
+    APP_LOGGER << "removeInterfaceSettings " << std::endl;
     std::fstream file(filePath);
 
     if (!file.is_open())
@@ -264,7 +265,7 @@ void removeInterfaceSettings(const std::string &filePath, const std::string &int
 void ifup(const std::string &interfaceName)
 {
     std::stringstream stream;
-    stream << "ifup " << interfaceName;
+    stream << "/root/chaipcr/deploy/wifi/ifup.sh " << interfaceName;
 
     LoggerStreams streams;
 
@@ -275,7 +276,7 @@ void ifup(const std::string &interfaceName)
 void ifdown(const std::string &interfaceName)
 {
     std::stringstream stream;
-    stream << "ifdown " << interfaceName;
+    stream << "/root/chaipcr/deploy/wifi/ifdown.sh " << interfaceName;
 
     LoggerStreams streams;
 
