@@ -40,7 +40,7 @@ DataHandler::DataHandler(Poco::Net::HTTPResponse::HTTPStatus status)
 
 void DataHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
-    APP_LOGGER << "DataHandler::handleRequest " << std::endl;
+    APP_DEBUGGER << "DataHandler::handleRequest " << std::endl;
 
     try
     {
@@ -76,7 +76,7 @@ void DataHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
 
 void DataHandler::processResponse(Poco::Net::HTTPServerResponse &response)
 {
-    APP_LOGGER << "DataHandler::processResponse " << std::endl;
+    APP_DEBUGGER << "DataHandler::processResponse " << std::endl;
 
     response.send().flush();
 }

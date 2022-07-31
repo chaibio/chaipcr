@@ -57,14 +57,14 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
         URI uri(request.getURI());
 
         uri.getPathSegments(requestPath);
-        APP_LOGGER << "createRequestHandler " << request.getURI() << std::endl;
+        APP_DEBUGGER << "createRequestHandler " << request.getURI() << std::endl;
 
         if (!requestPath.empty())
         {
-            APP_LOGGER << "createRequestHandler " << request.getMethod() << ": " << requestPath.size() << " ";
+            APP_DEBUGGER << "createRequestHandler " << request.getMethod() << ": " << requestPath.size() << " ";
             for(auto a:requestPath)
-                APP_LOGGER << a << "|";
-            APP_LOGGER << std::endl;
+                APP_DEBUGGER << a << "|";
+            APP_DEBUGGER << std::endl;
             
             if (request.getMethod() == "GET")
             {

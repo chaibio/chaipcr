@@ -83,31 +83,31 @@ std::string WirelessManager::interfaceName() const
 
 void WirelessManager::hotspotSelect()
 {
-    APP_LOGGER << "WirelessManager::hotspotSelect " << std::endl;
+    APP_DEBUGGER << "WirelessManager::hotspotSelect " << std::endl;
     _selectionThread = std::thread(&WirelessManager::_hotspotSelect, this);
 }
 
 void WirelessManager::wifiSelect()
 {
-    APP_LOGGER << "WirelessManager::wifiSelect " << std::endl;
+    APP_DEBUGGER << "WirelessManager::wifiSelect " << std::endl;
     _selectionThread = std::thread(&WirelessManager::_wifiSelect, this);
 }
 
 void WirelessManager::hotspotActivate()
 {
-    APP_LOGGER << "WirelessManager::hotspotActivate " << std::endl;
+    APP_DEBUGGER << "WirelessManager::hotspotActivate " << std::endl;
     _hotspotThread = std::thread(&WirelessManager::_hotspotActivate, this);
 }
 
 void WirelessManager::hotspotDeactivate()
 {
-    APP_LOGGER << "WirelessManager::hotspotDeactivate " << std::endl;
+    APP_DEBUGGER << "WirelessManager::hotspotDeactivate " << std::endl;
     _hotspotThread = std::thread(&WirelessManager::_hotspotDeactivate, this);
 }
 
 void WirelessManager::_hotspotDeactivate()
 {
-    APP_LOGGER << "WirelessManager::_hotspotDeactivate " << std::endl;
+    APP_DEBUGGER << "WirelessManager::_hotspotDeactivate " << std::endl;
     if (interfaceName().empty())
     {
         APP_LOGGER << "WirelessManager::_hotspotDeactivate Error no interface name" << std::endl;
@@ -116,12 +116,16 @@ void WirelessManager::_hotspotDeactivate()
     
     std::stringstream stream;
     stream << "/root/chaipcr/deploy/wifi/hotspot_controller.sh " << interfaceName() << " hotspotdeactivate";
-    command_run( "WirelessManager::_hotspotDeactivate", stream.str() );
+    if(command_run( "WirelessManager::_hotspotDeactivate", stream.str() ))
+    {
+        if ( _connectionStatus == HotspotActive )
+            _connectionStatus = NotConnected;
+    }
 }
 
 void WirelessManager::_hotspotSelect()
 {
-    APP_LOGGER << "WirelessManager::_hotspotSelect " << std::endl;
+    APP_DEBUGGER << "WirelessManager::_hotspotSelect " << std::endl;
     if (interfaceName().empty())
     {
         APP_LOGGER << "WirelessManager::_hotspotSelect Error no interface name" << std::endl;
@@ -147,7 +151,7 @@ bool command_run(std::string tag, std::string cmd)
                             [&logStreams,tag,&output](const char *buffer, std::size_t size){ logStreams.stream( tag + " (stdout)").write(buffer, size); output.write(buffer, size);},
                             [&logStreams,tag](const char *buffer, std::size_t size){ logStreams.stream( tag + " (stderr)").write(buffer, size); }))
     {
-        APP_LOGGER << tag << ": error calling " << cmd << std::endl;
+        APP_DEBUGGER << tag << ": error calling " << cmd << std::endl;
         return false;
     }
 
@@ -156,7 +160,7 @@ bool command_run(std::string tag, std::string cmd)
 
 void WirelessManager::_wifiSelect()
 {
-    APP_LOGGER << "WirelessManager::_wifiSelect " << std::endl;
+    APP_DEBUGGER << "WirelessManager::_wifiSelect " << std::endl;
 
     if (interfaceName().empty())
     {
@@ -171,7 +175,7 @@ void WirelessManager::_wifiSelect()
 
 void WirelessManager::_hotspotActivate()
 {
-    APP_LOGGER << "WirelessManager::_hotspotActivate " << std::endl;
+    APP_DEBUGGER << "WirelessManager::_hotspotActivate " << std::endl;
     _connectionStatus = ConnectionError;
 
     if (interfaceName().empty())
@@ -205,13 +209,13 @@ void WirelessManager::_hotspotActivate()
 
 void WirelessManager::connect()
 {
-    APP_LOGGER << "WirelessManager::connect " << interfaceName() << std::endl;
+    APP_DEBUGGER << "WirelessManager::connect " << interfaceName() << std::endl;
 
     if (!interfaceName().empty())
     {
         std::lock_guard<std::recursive_mutex> lock(_commandsMutex);
 
-        APP_LOGGER << "WirelessManager::connect stopping " << interfaceName() << std::endl;
+        APP_DEBUGGER << "WirelessManager::connect stopping " << interfaceName() << std::endl;
         stopCommands();
 
         _connectionStatus = Connecting;
@@ -222,13 +226,17 @@ void WirelessManager::connect()
 
 void WirelessManager::shutdown()
 {
-    APP_LOGGER << "WirelessManager::shutdown" << std::endl;
+    APP_DEBUGGER << "WirelessManager::shutdown, _connectionStatus =" << _connectionStatus << std::endl;
     if (!interfaceName().empty())
     {
         std::lock_guard<std::recursive_mutex> lock(_commandsMutex);
+        bool bDectivateHotspot = ( _connectionStatus != HotspotActive );
 
         stopCommands();
 
+        if(bDectivateHotspot)
+            hotspotDeactivate();
+        else
         /*_shutdownThread = std::thread(&*/WirelessManager::ifdown()/*, this)*/;
     }
 }
@@ -246,13 +254,13 @@ std::string WirelessManager::getCurrentSsid() const
 
 std::vector<WirelessManager::ScanResult> WirelessManager::scanResult()
 {
-    APP_LOGGER << "WirelessManager::scanResult" << std::endl;
+    APP_DEBUGGER << "WirelessManager::scanResult" << std::endl;
 
     Poco::RWLock::ScopedReadLock lock(_scanResultMutex);
 
     if (_scanTime + SCAN_CACHE_INTERVAL < std::time(nullptr))
     {
-        APP_LOGGER << "clearning scan resutls" << std::endl;
+        APP_DEBUGGER << "clearning scan resutls" << std::endl;
         _scanResult.clear();
     }
 
@@ -269,7 +277,7 @@ void WirelessManager::setInterfaceName(const std::string &name)
 
 void WirelessManager::stopCommands()
 {
-        APP_LOGGER << "WirelessManager::stopCommands" << std::endl;
+        APP_DEBUGGER << "WirelessManager::stopCommands" << std::endl;
 
     std::lock_guard<std::recursive_mutex> lock(_commandsMutex);
 
@@ -302,7 +310,7 @@ void WirelessManager::stopCommands()
 
 void WirelessManager::_connect()
 {
-    APP_LOGGER << "WirelessManager::_connect " << std::endl;
+    APP_DEBUGGER << "WirelessManager::_connect " << std::endl;
 
     try
     {
@@ -325,23 +333,23 @@ void WirelessManager::_connect()
             return;
         }
 
-        APP_LOGGER << "about to NetworkInterfaces::removeLeases " << std::endl;
+        APP_DEBUGGER << "about to NetworkInterfaces::removeLeases " << std::endl;
         NetworkInterfaces::removeLeases(interface);
 
         _connectionStatus = Connecting;
 
-        APP_LOGGER << "about to ifup " << std::endl;
+        APP_DEBUGGER << "about to ifup " << std::endl;
         ifup();
-        APP_LOGGER << "done ifup " << std::endl;
-        APP_LOGGER << "done NetworkInterfaces::dhcpTimeout() " << NetworkInterfaces::dhcpTimeout() << std::endl;
-        APP_LOGGER << "done CONNECTION_TIMEOUT_INTERVAL " << CONNECTION_TIMEOUT_INTERVAL << std::endl;
+        APP_DEBUGGER << "done ifup " << std::endl;
+        APP_DEBUGGER << "done NetworkInterfaces::dhcpTimeout() " << NetworkInterfaces::dhcpTimeout() << std::endl;
+        APP_DEBUGGER << "done CONNECTION_TIMEOUT_INTERVAL " << CONNECTION_TIMEOUT_INTERVAL << std::endl;
 
         _connectionTimeout = std::time(nullptr) + NetworkInterfaces::dhcpTimeout() + CONNECTION_TIMEOUT_INTERVAL;
         _connectionThreadState = Idle;
     }
     catch (const std::exception &ex)
     {
-        APP_LOGGER << "WirelessManager::_connect - exception occured:" << ex.what() << std::endl;
+        APP_DEBUGGER << "WirelessManager::_connect - exception occured:" << ex.what() << std::endl;
 
         _connectionStatus = ConnectionError;
     }
@@ -357,10 +365,10 @@ void WirelessManager::loadWifiDriver()
 
     stream << "/usr/bin/lsusb";
     if (!Util::watchProcess(stream.str(), _connectionEventFd,
-                            [&logStreams,&lsusbstream](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - lsusb (stdout)").write(buffer, size); lsusbstream.write(buffer, size); APP_LOGGER << "1" << std::endl; },
-                            [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - lsusb (stderr)").write(buffer, size); APP_LOGGER << "2" << std::endl;}))
+                            [&logStreams,&lsusbstream](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - lsusb (stdout)").write(buffer, size); lsusbstream.write(buffer, size); },
+                            [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - lsusb (stderr)").write(buffer, size); }))
     {
-        APP_LOGGER << "ifup: error calling lsusb" << std::endl;
+        APP_DEBUGGER << "loadWifiDriver: error calling lsusb" << std::endl;
     }
 
     for(int adapter=0; found_adapter==-1 && wifiDrivers[adapter].pszNetworkDriverName!=nullptr; adapter++)
@@ -370,24 +378,24 @@ void WirelessManager::loadWifiDriver()
             {
                 found_adapter = adapter;
                 bRmmodInsmod = wifiDrivers[adapter].bRmmodInsmod;
-                APP_LOGGER << "ifup: found the wifi adapter " << wifiDrivers[adapter].pszNetworkDriverName;
-                APP_LOGGER << ", USBID " << wifiDrivers[adapter].pszUSBID[device] << std::endl;
+                APP_DEBUGGER << "loadWifiDriver: found the wifi adapter " << wifiDrivers[adapter].pszNetworkDriverName;
+                APP_DEBUGGER << ", USBID " << wifiDrivers[adapter].pszUSBID[device] << std::endl;
                 break;
             }
         }
 
     if(found_adapter==-1)
     {
-        APP_LOGGER << "ifup: failed detecting a wifi adapter" << std::endl;
+        APP_DEBUGGER << "loadWifiDriver: failed detecting a wifi adapter" << std::endl;
         found_adapter = 0;
     }
 
     stream.str("/sbin/lsmod");
     if (!Util::watchProcess(stream.str(), _connectionEventFd,
-                            [&logStreams,&lsmodstream](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - lsmod (stdout)").write(buffer, size); lsmodstream.write(buffer, size);APP_LOGGER << "7" << std::endl; },
-                            [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - lsmod (stderr)").write(buffer, size); APP_LOGGER << "8" << std::endl;}))
+                            [&logStreams,&lsmodstream](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - lsmod (stdout)").write(buffer, size); lsmodstream.write(buffer, size); },
+                            [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - lsmod (stderr)").write(buffer, size); }))
     {
-        APP_LOGGER << "ifup: error calling lsmod" << std::endl;
+        APP_LOGGER << "loadWifiDriver: error calling lsmod" << std::endl;
     }
 
     if( lsmodstream.str().find( wifiDrivers[found_adapter].pszNetworkDriverName ) == std::string::npos )
@@ -403,10 +411,10 @@ void WirelessManager::loadWifiDriver()
             stream << "rmmod " << wifiDrivers[found_adapter].pszNetworkDriverName;
 
             if (!Util::watchProcess(stream.str(), _connectionEventFd,
-                                    [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - rmmod (stdout)").write(buffer, size); APP_LOGGER << "12" << std::endl;},
-                                    [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - rmmod (stderr)").write(buffer, size); APP_LOGGER << "13" << std::endl;}))
+                                    [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::loadWifiDriver - rmmod (stdout)").write(buffer, size); },
+                                    [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::loadWifiDriver - rmmod (stderr)").write(buffer, size); }))
             {
-                APP_LOGGER << "ifup: rmmod driver failed " << wifiDrivers[found_adapter].pszNetworkDriverPath << std::endl;
+                APP_DEBUGGER << "loadWifiDriver: rmmod driver failed " << wifiDrivers[found_adapter].pszNetworkDriverPath << std::endl;
             }
         }
 
@@ -417,17 +425,17 @@ void WirelessManager::loadWifiDriver()
     {
         if(!Poco::File(wifiDrivers[found_adapter].pszNetworkDriverPath).exists())
         {
-            APP_LOGGER << "ifup: insmod driver is not installed " << wifiDrivers[found_adapter].pszNetworkDriverPath << std::endl;
+            APP_DEBUGGER << "loadWifiDriver: insmod driver is not installed " << wifiDrivers[found_adapter].pszNetworkDriverPath << std::endl;
             return;
         }
 
         stream.str("");
         stream << "insmod " << wifiDrivers[found_adapter].pszNetworkDriverPath;
         if (!Util::watchProcess(stream.str(), _connectionEventFd,
-                                [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - insmod (stdout)").write(buffer, size); },
-                                [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - insmod (stderr)").write(buffer, size); }))
+                                [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::loadWifiDriver - insmod (stdout)").write(buffer, size); },
+                                [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::loadWifiDriver - insmod (stderr)").write(buffer, size); }))
         {
-            APP_LOGGER << "ifup: insmod error " << stream.str() << std::endl;
+            APP_LOGGER << "loadWifiDriver: insmod error " << stream.str() << std::endl;
         }
     }
 }
@@ -441,7 +449,7 @@ void WirelessManager::ifup()
 
     if(interfaceName().empty())
     {
-        APP_LOGGER << "unknown interface.. expecting " << NetworkInterfaces::findWifiInterface() << std::endl;
+        APP_DEBUGGER << "ifup: unknown interface.. expecting " << NetworkInterfaces::findWifiInterface() << std::endl;
     }
 
     if(!interfaceName().empty())
@@ -453,7 +461,7 @@ void WirelessManager::ifup()
                                 [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - ifup (stdout)").write(buffer, size); },
                                 [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - ifup (stderr)").write(buffer, size); }))
         {
-            APP_LOGGER << "ifup: ifconfig up error " << std::endl;
+            APP_LOGGER << "ifup: ifup error " << std::endl;
             _connectionStatus = NotConnected;
             return;
         }
@@ -462,34 +470,33 @@ void WirelessManager::ifup()
 
 void WirelessManager::ifdown()
 {
-    APP_LOGGER << "WirelessManager::ifdown " << interfaceName() << std::endl;
+    APP_DEBUGGER << "WirelessManager::ifdown " << interfaceName() << std::endl;
 
     NetworkInterfaces::ifdown(interfaceName());
 
     _connectionStatus = NotConnected;
-    APP_LOGGER << "WirelessManager::ifdown done " << std::endl;
+    APP_DEBUGGER << "WirelessManager::ifdown done " << std::endl;
 }
 
 void WirelessManager::checkInterfaceStatus()
 {
-    APP_LOGGER << "WirelessManager::checkInterfaceStatus " << std::endl;
+    APP_DEBUGGER << "WirelessManager::checkInterfaceStatus " << std::endl;
 
     while (_interfaceStatusThreadStatus == Working)
     {
         std::string interface = interfaceName();
-        APP_LOGGER << "WirelessManager::checkInterfaceStatus interface " << interface << std::endl;
+        APP_DEBUGGER << "WirelessManager::checkInterfaceStatus interface " << interface << std::endl;
 
         if (interface.empty() || if_nametoindex(interface.c_str()) == 0)
         {
             setInterfaceName("");
 
             interface = NetworkInterfaces::findWifiInterface();
-            APP_LOGGER << "WirelessManager::checkInterfaceStatus interface is now " << interface << std::endl;
+            APP_DEBUGGER << "WirelessManager::checkInterfaceStatus interface is now " << interface << std::endl;
 
             if (!interface.empty())
                 setInterfaceName(interface);
         }
-
 
         if (!interface.empty())
         {
@@ -502,13 +509,13 @@ void WirelessManager::checkInterfaceStatus()
         sleep(!interface.empty() ? 3 : 10);
     }
 
-    APP_LOGGER << "WirelessManager::checkInterfaceStatus exit" <<  std::endl;
+    APP_DEBUGGER << "WirelessManager::checkInterfaceStatus exit" <<  std::endl;
     _interfaceStatusThreadStatus = Idle;
 }
 
 void WirelessManager::scan(const std::string &interface)
 {
-    APP_LOGGER << "WirelessManager::scan " << interface << std::endl;
+    APP_DEBUGGER << "WirelessManager::scan " << interface << std::endl;
 
     std::stringstream stream;
 
@@ -522,7 +529,7 @@ void WirelessManager::scan(const std::string &interface)
         std::string line;
         std::getline(stream, line);
 
-        //APP_LOGGER << "WirelessManager::scan line " << line << std::endl;
+        //APP_DEBUGGER << "WirelessManager::scan line " << line << std::endl;
 
         if (line.find("Cell ") != std::string::npos)
         {
@@ -608,10 +615,10 @@ void WirelessManager::scan(const std::string &interface)
 
 void WirelessManager::checkConnection(const std::string &interface)
 {
-    APP_LOGGER << "WirelessManager::checkConnection " << interface << std::endl;
+    APP_DEBUGGER << "WirelessManager::checkConnection " << interface << std::endl;
     if (_connectionThreadState == HotspotActive )
     {
-        APP_LOGGER << "Hotspot active" << std::endl;
+        APP_DEBUGGER << "Hotspot active" << std::endl;
         return;
     }
 
@@ -619,19 +626,19 @@ void WirelessManager::checkConnection(const std::string &interface)
 
     if (!state.isEmpty())
     {
-        APP_LOGGER << "WirelessManager::checkConnection not empty " << state.flags << std::endl;
-        APP_LOGGER << "WirelessManager::checkConnection not empty IFF_UP " << (int)(state.flags & IFF_UP) << std::endl;
-        APP_LOGGER << "WirelessManager::checkConnection not empty state.addressState " << state.addressState<< std::endl;
+        APP_DEBUGGER << "WirelessManager::checkConnection not empty " << state.flags << std::endl;
+        APP_DEBUGGER << "WirelessManager::checkConnection not empty IFF_UP " << (int)(state.flags & IFF_UP) << std::endl;
+        APP_DEBUGGER << "WirelessManager::checkConnection not empty state.addressState " << state.addressState<< std::endl;
 
         if (state.flags & IFF_UP && state.addressState)
         {
             _connectionStatus = Connected;
             _connectionTimeout = 0;
-                APP_LOGGER << "WirelessManager::checkConnection connected" << std::endl;
+            APP_DEBUGGER << "WirelessManager::checkConnection connected" << std::endl;
         }
-        else if (_connectionThreadState != Working && _connectionThreadState != NotConnected && std::time(nullptr) > _connectionTimeout) // should check for hotspot as well//
+        else if (_connectionThreadState != Working && _connectionStatus != NotConnected && _connectionStatus != HotspotActive && std::time(nullptr) > _connectionTimeout) // should check for hotspot as well//
         {
-            APP_LOGGER << "WirelessManager::checkConnection timeout" << std::endl;
+            APP_DEBUGGER << "WirelessManager::checkConnection timeout" << std::endl;
 
             if (state.flags & IFF_UP)
                 _connectionStatus = AuthenticationError;

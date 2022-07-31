@@ -92,7 +92,7 @@ std::vector<std::string> getAllInterfaces()
         {
             if (address->ifa_addr && address->ifa_addr->sa_family == AF_PACKET)
                 interfaces.emplace_back(address->ifa_name);
-            APP_LOGGER << "Interface " << address->ifa_name << std::endl;
+            APP_DEBUGGER << "Interface " << address->ifa_name << std::endl;
         }
 
         freeifaddrs(addresses);
@@ -172,7 +172,7 @@ InterfaceSettings readInterfaceSettings(const std::string &filePath, const std::
 
 void writeInterfaceSettings(const std::string &filePath, const InterfaceSettings &interface)
 {
-    APP_LOGGER << "removeInterfaceSettings " << std::endl;
+    APP_DEBUGGER << "removeInterfaceSettings " << std::endl;
     std::fstream file(filePath);
 
     if (!file.is_open())
@@ -216,7 +216,7 @@ void writeInterfaceSettings(const std::string &filePath, const InterfaceSettings
 
 void removeInterfaceSettings(const std::string &filePath, const std::string &interface)
 {
-    APP_LOGGER << "removeInterfaceSettings " << interface << std::endl;
+    APP_DEBUGGER << "removeInterfaceSettings " << interface << std::endl;
 
     if (interface.empty())
         return;
@@ -259,7 +259,7 @@ void removeInterfaceSettings(const std::string &filePath, const std::string &int
     file.open(filePath, std::fstream::out | std::fstream::trunc);
     file << content;
 
-    APP_LOGGER << "removeInterfaceSettings removed" << std::endl;
+    APP_DEBUGGER << "removeInterfaceSettings removed" << std::endl;
 }
 
 void ifup(const std::string &interfaceName)
@@ -371,7 +371,7 @@ std::string findWifiInterface()
 {
     for (const std::string &interface: NetworkInterfaces::getAllInterfaces())
     {
-        APP_LOGGER << "Testing Interface " << interface << std::endl;
+        APP_DEBUGGER << "Testing Interface " << interface << std::endl;
 
         std::stringstream command, output;
         command << "iwconfig " << interface;
@@ -386,7 +386,7 @@ std::string findWifiInterface()
         }
 
         std::string str = output.str();
-        APP_LOGGER << "Testing Interface res: " <<  str << std::endl;
+        APP_DEBUGGER << "Testing Interface res: " <<  str << std::endl;
 
         if (!str.empty() && str.find("no wireless extensions") == std::string::npos)
             return interface;

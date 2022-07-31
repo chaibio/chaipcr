@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# to disable this script please uncomment next two lines
+echo $@ >> /tmp/hotspot_controller.log
+#echo OK
+#exit 0
+
 interface=wlan0
 hotspotssid=Chaibio
 hotspotkey=password
@@ -32,24 +37,24 @@ then
 
         /sbin/ifdown $1
         /sbin/ifup $1
+	retval=$?
 
-        exit 0
+	echo "OK"
+        exit $retval
 fi
 
 if [[ "$2" == "hotspotdeactivate" ]] && [ -n "$1" ]
 then
+	echo Removing wifi settings, and return to empty interfaecs.
         echo selecting to go wifi on interface $1
         systemctl disable hostapd
 
-        if [ -e /sdcard/upgrade/interfaces.latest_hotspot_settings ]
-        then
-                cp /sdcard/upgrade/interfaces.latest_hotspot_settings /etc/network/interfaces
-        else
-                cp /root/chaipcr/deploy/wifi/interfaces.empty.template /etc/network/interfaces
-        fi
+        cp /root/chaipcr/deploy/wifi/interfaces.empty.template /etc/network/interfaces
 
         /sbin/ifdown $1
-        /sbin/ifup $1
+ #       /sbin/ifup $1
+
+	echo OK
 
         exit 0
 fi

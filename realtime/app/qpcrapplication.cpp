@@ -78,7 +78,8 @@ int QPCRApplication::getUserId(const std::string &token) const
 void QPCRApplication::defineOptions(OptionSet &options)
 {
     options.addOption(Option("enable_log_file", "flog", "enables log files", false, "path", true));
-    options.addOption(Option("disable_watchdog", "dwd", "disable watchdog", false, "watchdogstate", false));
+    options.addOption(Option("disable_watchdog", "w", "disable watchdog", false, "watchdogstate", false));
+    options.addOption(Option("debug_messages", "d", "show debug messages", false, "debug", false));
 
     ServerApplication::defineOptions(options);
 }
@@ -86,7 +87,7 @@ void QPCRApplication::defineOptions(OptionSet &options)
 void QPCRApplication::handleOption(const string &name, const string &value)
 {
     ServerApplication::handleOption(name, value);
-
+    
     if (name == "enable_log_file")
     {
         Logger::setup(kAppLogName, value);
@@ -96,6 +97,10 @@ void QPCRApplication::handleOption(const string &name, const string &value)
     if (name == "disable_watchdog")
     {
         setWatchdog(false);
+    }
+    if (name == "debug_messages")
+    {
+        ::Logger::setDebug();
     }
 }
 
