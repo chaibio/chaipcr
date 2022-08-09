@@ -40,6 +40,19 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     this.wifiRestartingInProgress = false;
     this.macAddress = null;
 
+    this.createHotspot = function(params) {
+
+      var delay = $q.defer();
+      $http.post(host + ':8000/network/wlan/create_hotspot', params)
+      .then(function(result) {
+        delay.resolve(result);
+      }, function(err) {
+        delay.reject(err);
+      });
+
+      return delay.promise;
+    };
+
     this.getWifiNetworks = function() {
 
       var delay = $q.defer();
