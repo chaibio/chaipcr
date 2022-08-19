@@ -137,8 +137,23 @@ void NetworkManagerHandler::getStat(boost::property_tree::ptree &responsePt)
         switch (status)
         {
         case WirelessManager::HotspotActive:
+        {
             responsePt.put("state.status", "hotspot_active");
-            break;
+            std:: string interfacename, hotspot_ssid, hotspot_key;
+            
+            bool success = WirelessManager::hotspotRetrieveInfo( interfacename, hotspot_ssid, hotspot_key );
+            if(success)
+            {
+                responsePt.put("state.hotspot_ssid", hotspot_ssid);
+                responsePt.put("state.hotspot_key", hotspot_key);
+                responsePt.put("state.interfacename", interfacename);
+            }
+
+            responsePt.put("state.hotspot_ssid_buffered", hotspotSettings().hotspot_ssid);
+            responsePt.put("state.hotspot_key_buffered",  hotspotSettings().hotspot_key);
+            responsePt.put("state.interfacename_buffered", hotspotSettings().interface);
+        }
+        break;
 
         case WirelessManager::Connecting:
             responsePt.put("state.status", "connecting");
@@ -188,7 +203,7 @@ void NetworkManagerHandler::setHotspotSettings(const boost::property_tree::ptree
     }
     else
     {
-        APP_DEBUGGER << "NetworkManagerHandler::setSettings no type set " << std::endl;
+        APP_DEBUGGER << "NetworkManagerHandler::setHotspotSettings no hotspot_ssid and hotspot_key set " << std::endl;
 
         setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
         setErrorString("hotspot_ssid and hotspot_key must be set");
@@ -323,6 +338,10 @@ void NetworkManagerHandler::hotspotDeactivate()
     // disconnects hotspot 
     APP_DEBUGGER << "NetworkManagerHandler::hotspotDeactivate " << std::endl;
     qpcrApp.wirelessManager()->hotspotDeactivate();
+
+    hotspotSettings().hotspot_ssid.clear();
+    hotspotSettings().hotspot_key.clear();
+    hotspotSettings().interface.clear();
 }
 
 void NetworkManagerHandler::wifiDisconnect()
