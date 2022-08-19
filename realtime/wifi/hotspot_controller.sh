@@ -74,22 +74,30 @@ then
         /sbin/ifdown $1
         /sbin/ifup $1
 
+	echo OK
+
         exit 0
 fi
 
 
-if [ -z $3 ] || [ -z $1 ] || [ -z $2 ]
+if [ -z $3 ] || [ -z $1 ] || [ -z $2 ] || [ -z $4 ] 
 then
 	echo ""
 	echo "Usage error"
-	echo "Usage: hotspot_controller.sh <Interface> <Hotspot SSID> <Hotspot key>"
+	echo "Usage: hotspot_controller.sh <Interface> hotspotActivate <Hotspot SSID> <Hotspot key>"
         echo "Example: hotspot_controller.sh wlan0 Chaibio password"
 	echo " "
 	exit 1
-else
+fi
+
+if [[ "$2" == "hotspotActivate" ]] && [ -n "$1" ] && [ -n "$4" ] &&[ -n "$2" ] &&[ -n "$3" ]
+then
 	interface=$1
-	hotspotssid=$2
-	hotspotkey=$3
+	hotspotssid=$3
+	hotspotkey=$4
+else
+        echo "Usage error"
+	exit 1
 fi
 
 echo Setting up wifi hotspot using the following settings
@@ -133,6 +141,8 @@ systemctl enable hostapd
 /sbin/ifup $interface
 
 cp /etc/network/interfaces /sdcard/upgrade/interfaces.latest_hotspot_settings
+
+echo OK
 
 exit 0
 

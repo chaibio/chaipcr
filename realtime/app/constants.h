@@ -178,7 +178,8 @@ const int kUpdateSdcardError = 10001;
 const int kUpdateDownloadError = 10002;
 
 //Network settings
-const std::string kNetworkInterfacesFile = "/etc/network/interfaces";
+const std::string kNetworkInterfacesFile    = "/etc/network/interfaces";
+const std::string kHostapdConf              = "/etc/hostapd/hostapd.conf";
 static const std::string kNetworkDriverName = "8192cu";
 static const std::string kNetworkDriverPath = "/lib/modules/4.9.78-ti-chai-r94/updates/dkms/" + kNetworkDriverName + ".ko";
 

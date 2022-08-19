@@ -29,9 +29,12 @@
 
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <stdexcept>
 #include <system_error>
 #include <map>
+
+#include <Poco/File.h>
 
 #include <unistd.h>
 #include <ifaddrs.h>
@@ -173,6 +176,63 @@ void WirelessManager::_wifiSelect()
     command_run( "WirelessManager::_wifiSelect", stream.str() );
 }
 
+bool WirelessManager::hotspotRetrieveInfo(std::string& interfacename, std::string& hotspot_ssid, std::string& hotspot_key )
+{
+    interfacename.clear();
+    hotspot_ssid.clear();
+    hotspot_key.clear();
+
+    if(!Poco::File(kHostapdConf).exists())
+    {
+        APP_DEBUGGER << "hotspotRetrieveInfo" << std::endl;
+        return false;
+    }
+
+    std::fstream file(kHostapdConf);
+
+    if (!file.is_open())
+    {
+        APP_DEBUGGER << "Network error: unable to read file " + kHostapdConf << std::endl;
+        return false;
+    }
+
+    while (file.good())
+    {
+        std::string line;
+        std::getline(file, line);
+
+        if (line.empty() || line.at(0) == '#')
+            continue;
+
+        if (line.find("interface=") == 0)
+        {
+            if (!interfacename.empty())
+                return false;
+
+            interfacename = line.substr(10);
+            continue;
+        }
+        if (line.find("ssid=") == 0)
+        {
+            if (!hotspot_ssid.empty())
+                return false;
+
+            hotspot_ssid = line.substr(5);
+            continue;
+        }
+        if (line.find("wpa_passphrase=") == 0)
+        {
+            if (!hotspot_key.empty())
+                return false;
+
+            hotspot_key = line.substr(15);
+            continue;
+        }
+    }
+
+    return !hotspot_key.empty() &&  !hotspot_ssid.empty() && !interfacename.empty();
+}
+
 void WirelessManager::_hotspotActivate()
 {
     APP_DEBUGGER << "WirelessManager::_hotspotActivate " << std::endl;
@@ -199,11 +259,15 @@ void WirelessManager::_hotspotActivate()
     std::string hotspot_ssid = hotspot_settings.hotspot_ssid;
     std::string hotspot_key  = hotspot_settings.hotspot_key;
     std::stringstream stream;
-    stream << "/root/chaipcr/deploy/wifi/hotspot_controller.sh " << interfaceName() << " \"" << hotspot_ssid << "\" \"" << hotspot_key << "\"";
+    stream << "/root/chaipcr/deploy/wifi/hotspot_controller.sh " << interfaceName() << " hotspotActivate \"" << hotspot_ssid << "\" \"" << hotspot_key << "\"";
     if(command_run( "WirelessManager::_wifiSelect", stream.str() ))
     {
         _connectionStatus = HotspotActive;
         APP_LOGGER << "WirelessManager::_hotspotActivate hotspot activated OK" << std::endl;
+    }
+    else
+    {
+        APP_LOGGER << "WirelessManager::_hotspotActivate hotspot activated KO" << std::endl;
     }
 }
 
@@ -230,7 +294,7 @@ void WirelessManager::shutdown()
     if (!interfaceName().empty())
     {
         std::lock_guard<std::recursive_mutex> lock(_commandsMutex);
-        bool bDectivateHotspot = ( _connectionStatus != HotspotActive );
+        bool bDectivateHotspot = ( _connectionStatus == HotspotActive );
 
         stopCommands();
 
@@ -616,7 +680,7 @@ void WirelessManager::scan(const std::string &interface)
 void WirelessManager::checkConnection(const std::string &interface)
 {
     APP_DEBUGGER << "WirelessManager::checkConnection " << interface << std::endl;
-    if (_connectionThreadState == HotspotActive )
+    if (_connectionStatus == HotspotActive )
     {
         APP_DEBUGGER << "Hotspot active" << std::endl;
         return;

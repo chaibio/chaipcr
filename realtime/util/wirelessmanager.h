@@ -102,13 +102,15 @@ private:
     void _hotspotActivate();
     void _hotspotDeactivate();
 
-
     void ifup();
     void ifdown();
 
     void checkInterfaceStatus();
     void scan(const std::string &interface);
     void checkConnection(const std::string &interface);
+
+public:
+    static bool hotspotRetrieveInfo(std::string& interfacename, std::string& hotspot_ssid, std::string& hotspot_key );
 
 private:
     enum OperationState

@@ -119,6 +119,8 @@ void QPCRApplication::initialize(Application&) {
 
         waitFlag();
 
+        APP_LOGGER << "--------------------------The startup flag has been set--------------------------" << std::endl;
+
         readDeviceFile();
         readConfigurationFile();
 
