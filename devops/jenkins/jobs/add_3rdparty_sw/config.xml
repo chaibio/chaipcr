@@ -161,6 +161,8 @@ then
 fi
 dpkg --configure -a
 
+
+
 exit 0</command>
       <execEachLine>false</execEachLine>
       <hideCommand>false</hideCommand>
@@ -243,6 +245,33 @@ apt-get update
 apt-get -q -y install unzip parted || exit 1
 
 sync
+
+
+sudo cp --backup=numbered /usr/bin/wget /usr/bin/wget.org
+cat &lt;&lt;EOT &gt; /usr/bin/wget
+#!/bin/bash
+
+echo \$@&gt;&gt;/tmp/wget.log
+/usr/bin/wget.org \$@
+res=\$?
+if [ \$res -eq 0 ]
+then
+        exit \$res
+else
+        FILE=\$@
+        filename=\${FILE##*/} 
+        echo filename is \$filename
+        url=http://10.0.1.20/download/packages/\$filename
+        echo new URL is \$url
+        echo new URL is \$url &gt;&gt;/tmp/wget.log
+        /usr/bin/wget.org \$url
+        exit \$?
+fi
+
+exit 1
+EOT
+
+chmod +x /usr/bin/wget
 
 echo installing basic packages.
 apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential tzdata || exit 1
@@ -573,14 +602,15 @@ dkms install 8192cu/1.11
 depmod -a
 cp ./rtl8192cu-fixes/blacklist-native-rtl8192.conf /etc/modprobe.d/
 
+echo "8192cu" &gt; /etc/modules-load.d/8192cu.conf
+
 ls -ahl /lib/modules/4.9.78-ti-chai-r94/updates/dkms/8192cu.ko || echo "Error: failed adding edimax 3rd party driver"
 
 rmmod /lib/modules/4.9.78-ti-chai-r94/kernel/drivers/net/wireless/realtek/rtlwifi/rtl8192cu/rtl8192cu.ko || true
 
 mv /lib/modules/4.9.78-ti-chai-r94/kernel/drivers/net/wireless/realtek/rtlwifi/rtl8192cu/rtl8192cu.ko   /lib/modules/4.9.78-ti-chai-r94/kernel/drivers/net/wireless/realtek/rtlwifi/rtl8192cu/rtl8192cu.ko.disabled || true
 
-echo Installing cudy wifi adapter driver
-DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -q install usb-modeswitch
+echo Installing cudy wifi adapter driver AC1300
 
 mkdir -p /sdcard/factory/wifi/cudy
 cd /sdcard/factory/wifi/cudy
@@ -604,35 +634,6 @@ sudo make install
 sudo modprobe -r 88x2bu
 sudo modprobe 88x2bu rtw_switch_usb_mode=2
 echo "options 88x2bu rtw_switch_usb_mode=2" &gt; /etc/modprobe.d/88x2bu.conf
-
-echo Building the driver for AC600
-
-cd /sdcard/factory/wifi/cudy
-#wget https://www.cudytech.com/filedownload/269982
-wget $download_prefix/build/269982
-
-tar xfvz 269982
-cd rtl8821CU_rtl8731AU_WiFi_linux_v5.8.1.7_37266.20200929_COEX20200616-4141/
-
-echo fixing MakeFile
-sudo sed -i 's/hard-float/float-abi=hard/' Makefile
-#sudo sed -i 's/CONFIG_PLATFORM_I386_PC = y/CONFIG_PLATFORM_I386_PC = n/' Makefile
-#sudo sed -i 's/CONFIG_PLATFORM_ARM_RPI = n/CONFIG_PLATFORM_ARM_RPI = y/' Makefile
-
-echo Building..
-
-time make
-make install
-sudo modprobe -r 8821cu || true
-sudo modprobe 8821cu rtw_switch_usb_mode=2
-echo "options 8821cu rtw_switch_usb_mode=2" &gt; /etc/modprobe.d/8821cu.conf
-
-echo editing usb_modeswitch rules..
-sed  -i '/LABEL="modeswitch_rules_end"/i # Cudy AC600 0bda 1a2b Realtek Semiconductor Corp' /lib/udev/rules.d/40-usb_modeswitch.rules
-sed  -i '/LABEL="modeswitch_rules_end"/i ATTR{idVendor}=="0bda", ATTR{idProduct}=="1a2b", RUN+="/usr/sbin/usb_modeswitch -K -v 0bda -p 1a2b"' /lib/udev/rules.d/40-usb_modeswitch.rules
-sed  -i '/LABEL="modeswitch_rules_end"/i # ' /lib/udev/rules.d/40-usb_modeswitch.rules
-
-echo  8821cu &gt;&gt; /etc/modules
 
 if $is_dev
 then
@@ -715,6 +716,7 @@ sync
 
 echo Set environment variables 
 cat &gt; ~/.profile &lt;&lt; EOL
+    export LC_ALL=C
     export SLOTS=/sys/devices/platform/bone_capemgr/slots
     export PINS=/sys/kernel/debug/pinctrl/44e10800.pinmux/pins
     export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
@@ -1150,6 +1152,9 @@ sync
 apt-get -q -y install libboost-chrono-dev libboost-system-dev || exit 1
 
 df -h
+
+#sudo cp /usr/bin/wget.org /usr/bin/wget
+sudo cp /tmp/wget.log ~
 </command>
       <execEachLine>false</execEachLine>
       <hideCommand>false</hideCommand>
