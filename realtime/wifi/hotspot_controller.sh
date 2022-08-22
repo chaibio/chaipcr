@@ -16,6 +16,7 @@ then
 	then
 		cp /sdcard/upgrade/interfaces.latest_wifi_settings /etc/network/interfaces
 		systemctl disable hostapd
+		service hostapd stop
 		/sbin/ifdown $1
 		/sbin/ifup $1
 	fi
@@ -27,6 +28,7 @@ if [[ "$2" == "wifiselect" ]] && [ -n "$1" ]
 then
         echo selecting to go wifi on interface $1
         systemctl disable hostapd
+        service hostapd stop
 
         if [ -e /sdcard/upgrade/interfaces.latest_wifi_settings ]
         then
@@ -48,6 +50,7 @@ then
 	echo Removing wifi settings, and return to empty interfaecs.
         echo selecting to go wifi on interface $1
         systemctl disable hostapd
+	service hostapd stop
 
         cp /root/chaipcr/deploy/wifi/interfaces.empty.template /etc/network/interfaces
 
@@ -70,6 +73,7 @@ then
                 cp /root/chaipcr/deploy/wifi/interfaces.empty.template /etc/network/interfaces
         fi
         systemctl enable hostapd
+        service hostapd start
 
         /sbin/ifdown $1
         /sbin/ifup $1
@@ -117,6 +121,9 @@ then
 fi
 
 # Settingup hotspot
+systemctl disable hostapd
+service hostapd stop
+
 cp /root/chaipcr/deploy/wifi/hostapd.conf.template /etc/hostapd/hostapd.conf
 cp /root/chaipcr/deploy/wifi/interfaces.hotspot.template /etc/network/interfaces
 
@@ -124,7 +131,6 @@ sed -i "s/NAMEOFNETWORK/${hotspotssid}/g" /etc/hostapd/hostapd.conf || true
 sed -i "s/WIRELESSKEY/${hotspotkey}/g" /etc/hostapd/hostapd.conf || true
 sed -i "s/INTERFACE/${interface}/g" /etc/hostapd/hostapd.conf || true
 sed -i "s/INTERFACE/${interface}/g" /etc/network/interfaces || true
-
 
 update_test=$(grep "CHAIBIO" /etc/dnsmasq.conf)
 if [ -z "$update_test" ]
@@ -136,6 +142,7 @@ then
 fi
 
 systemctl enable hostapd
+service hostapd start
 
 /sbin/ifdown $interface
 /sbin/ifup $interface

@@ -32,6 +32,7 @@ NetworkManagerHandler::NetworkManagerHandler(const std::string &interfaceName, O
 
 void NetworkManagerHandler::processData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt)
 {
+    APP_DEBUGGER << "Start processing data" << std::endl;
     if (_interfaceName == "wlan")
     {
         if (qpcrApp.wirelessManager()->interfaceName().empty())
@@ -40,11 +41,16 @@ void NetworkManagerHandler::processData(const boost::property_tree::ptree &reque
             setErrorString("No WIFI interface is present");
 
             JsonHandler::processData(requestPt, responsePt);
+            APP_DEBUGGER << "No WIFI interface is present" << std::endl;
 
             return;
         }
 
         _interfaceName = qpcrApp.wirelessManager()->interfaceName();
+    }
+    else
+    {
+        APP_DEBUGGER << "_interfaceName " << _interfaceName << " _type: " << _type << std::endl;
     }
 
     switch (_type)
@@ -83,7 +89,12 @@ void NetworkManagerHandler::processData(const boost::property_tree::ptree &reque
         break;
     case HotspotActivate:
         setHotspotSettings(requestPt);
-        hotspotActivate();
+        if(!hotspotActivate())
+        {
+           setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+           setErrorString("Invalid hotspot settings");
+        }
+
         JsonHandler::processData(requestPt, responsePt);
         break;
     case HotspotDeactivate:
@@ -186,28 +197,45 @@ NetworkInterfaces::InterfaceSettings& NetworkManagerHandler::hotspotSettings()
 void NetworkManagerHandler::setHotspotSettings(const boost::property_tree::ptree &requestPt)
 {
     APP_DEBUGGER << "NetworkManagerHandler::setHotspotSettings" << std::endl;
-    if (requestPt.find("hotspot_key") != requestPt.not_found() && requestPt.find("hotspot_ssid") != requestPt.not_found() )
+/*    if (requestPt.find("password") == requestPt.not_found() && requestPt.find("ssid") == requestPt.not_found() )
     {
-        APP_DEBUGGER << "NetworkManagerHandler::setHotspotSettings found type" << std::endl;
+        APP_DEBUGGER << "NetworkManagerHandler::setHotspotSettings setting defaults" << std::endl;
 
         hotspotSettings().arguments.clear();
         hotspotSettings().interface = _interfaceName;
-        hotspotSettings().hotspot_ssid = requestPt.get<std::string>("hotspot_ssid");
-        hotspotSettings().hotspot_key = requestPt.get<bool>("hotspot_key", true);
+        hotspotSettings().hotspot_ssid = "chaihotspot";
+        hotspotSettings().hotspot_key  = "password";
 
         for (boost::property_tree::ptree::const_iterator it = requestPt.begin(); it != requestPt.end(); ++it)
         {
-            if ( it->first != "hotspot_ssid" && it->first != "hotspot_key" )
+            if ( it->first != "ssid" && it->first != "password" )
+                hotspotSettings().arguments[it->first] = it->second.get_value<std::string>();
+        }
+    }
+    else */if (requestPt.find("password") != requestPt.not_found() && requestPt.find("ssid") != requestPt.not_found() )
+    {
+        APP_DEBUGGER << "NetworkManagerHandler::setHotspotSettings found ssid and password" << std::endl;
+
+        hotspotSettings().arguments.clear();
+        hotspotSettings().interface = _interfaceName;
+        hotspotSettings().hotspot_ssid = requestPt.get<std::string>("ssid");
+        hotspotSettings().hotspot_key  = requestPt.get<std::string>("password");
+
+        for (boost::property_tree::ptree::const_iterator it = requestPt.begin(); it != requestPt.end(); ++it)
+        {
+            if ( it->first != "ssid" && it->first != "password" )
                 hotspotSettings().arguments[it->first] = it->second.get_value<std::string>();
         }
     }
     else
     {
-        APP_DEBUGGER << "NetworkManagerHandler::setHotspotSettings no hotspot_ssid and hotspot_key set " << std::endl;
+        APP_DEBUGGER << "NetworkManagerHandler::setHotspotSettings Both ssid and password must be set" << std::endl;
 
         setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
-        setErrorString("hotspot_ssid and hotspot_key must be set");
+        setErrorString("Both ssid and password must be set!");
     }
+    APP_DEBUGGER << "NetworkManagerHandler::setHotspotSettings done" << std::endl;
+
 }
 
 void NetworkManagerHandler::setSettings(const boost::property_tree::ptree &requestPt)
@@ -315,7 +343,7 @@ void NetworkManagerHandler::wifiConnect()
 void NetworkManagerHandler::hotspotSelect()
 {
     // put back latest settings interfaces if hotspotted.. otherwise it will disconnect wifi only
-    APP_DEBUGGER << "NetworkManagerHandler::hotspotSelect " << std::endl;
+    APP_DEBUGGER << "NetworkManagerHandler::hotspotSelect" << std::endl;
     qpcrApp.wirelessManager()->hotspotSelect();
 }
 
@@ -326,11 +354,12 @@ void NetworkManagerHandler::wifiSelect()
     qpcrApp.wirelessManager()->wifiSelect();
 }
 
-void NetworkManagerHandler::hotspotActivate()
+bool NetworkManagerHandler::hotspotActivate()
 {
     // set hotspot settings and turn it on
     APP_DEBUGGER << "NetworkManagerHandler::hotspotActivate create_hotspot" << std::endl;
-    qpcrApp.wirelessManager()->hotspotActivate();
+    return qpcrApp.wirelessManager()->hotspotActivate();
+
 }
 
 void NetworkManagerHandler::hotspotDeactivate()

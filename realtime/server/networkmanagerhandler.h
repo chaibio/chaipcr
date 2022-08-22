@@ -61,7 +61,7 @@ private:
 
     void hotspotSelect();
     void wifiSelect();
-    void hotspotActivate();
+    bool hotspotActivate();
     void hotspotDeactivate();
 
 

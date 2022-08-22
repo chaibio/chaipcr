@@ -87,24 +87,50 @@ std::string WirelessManager::interfaceName() const
 void WirelessManager::hotspotSelect()
 {
     APP_DEBUGGER << "WirelessManager::hotspotSelect " << std::endl;
+    stopCommands();
+
     _selectionThread = std::thread(&WirelessManager::_hotspotSelect, this);
 }
 
 void WirelessManager::wifiSelect()
 {
     APP_DEBUGGER << "WirelessManager::wifiSelect " << std::endl;
+    stopCommands();
+
     _selectionThread = std::thread(&WirelessManager::_wifiSelect, this);
 }
 
-void WirelessManager::hotspotActivate()
+bool WirelessManager::hotspotActivate()
 {
     APP_DEBUGGER << "WirelessManager::hotspotActivate " << std::endl;
+    stopCommands();
+
+    if (interfaceName().empty())
+    {
+        APP_LOGGER << "WirelessManager::_hotspotActivate Error no interface name" << std::endl;
+        return false;
+    }
+
+    if (hotspot_settings.hotspot_ssid.empty())
+    {
+        APP_LOGGER << "Error no hotspot ssid" << std::endl;
+        return false;
+    }
+
+    if (hotspot_settings.hotspot_key.length()<8)
+    {
+        APP_LOGGER << "Invalid hotspot key." << std::endl;
+        return false;
+    }
+
     _hotspotThread = std::thread(&WirelessManager::_hotspotActivate, this);
+    return true;
 }
 
 void WirelessManager::hotspotDeactivate()
 {
     APP_DEBUGGER << "WirelessManager::hotspotDeactivate " << std::endl;
+    stopCommands();
     _hotspotThread = std::thread(&WirelessManager::_hotspotDeactivate, this);
 }
 
@@ -252,7 +278,7 @@ void WirelessManager::_hotspotActivate()
 
     if (hotspot_settings.hotspot_key.length()<8)
     {
-        APP_LOGGER << "WirelessManager::_hotspotActivate Error no or invalid hotspot key" << std::endl;
+        APP_LOGGER << "WirelessManager::_hotspotActivate Invalid hotspot key." << std::endl;
         return;
     }
 

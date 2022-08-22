@@ -80,7 +80,7 @@ public:
     // hotspot
     void hotspotSelect();
     void wifiSelect();
-    void hotspotActivate();
+    bool hotspotActivate();
     void hotspotDeactivate();
 
     NetworkInterfaces::InterfaceSettings& hotspotSettings() {return hotspot_settings;};

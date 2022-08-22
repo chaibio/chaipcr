@@ -58,9 +58,12 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
 
         uri.getPathSegments(requestPath);
         APP_DEBUGGER << "createRequestHandler " << request.getURI() << std::endl;
-
+//        APP_DEBUGGER << "createRequestHandler " << request.getMethod() << std::endl;
+//      APP_DEBUGGER << "createRequestHandler " << requestPath.size() << std::endl;
+        
         if (!requestPath.empty())
         {
+            APP_DEBUGGER << "createRequestHandler !requestPath.empty() " << endl;
             APP_DEBUGGER << "createRequestHandler " << request.getMethod() << ": " << requestPath.size() << " ";
             for(auto a:requestPath)
                 APP_DEBUGGER << a << "|";
@@ -83,6 +86,7 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
             }
             else if (request.getMethod() == "POST" && requestPath.size() == 3)
             {
+//                APP_DEBUGGER << "POST of size 3: " << requestPath.at(2) << endl;
                 if (requestPath.at(2) == "connect")
                     return new NetworkManagerHandler(requestPath.at(1), NetworkManagerHandler::WifiConnect);
                 else if (requestPath.at(2) == "disconnect")
@@ -159,6 +163,10 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
             }
             else
                 return new JsonHandler(HTTPResponse::HTTP_UNAUTHORIZED, "You must be logged in");
+        }
+        else
+        {
+            APP_DEBUGGER << "createRequestHandler requestPath.empty() " << endl;
         }
 
         return new HTTPCodeHandler(HTTPResponse::HTTP_NOT_FOUND);
