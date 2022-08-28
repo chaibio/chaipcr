@@ -13,7 +13,7 @@
         </hudson.model.StringParameterDefinition>
         <com.syhuang.hudson.plugins.listgitbranchesparameter.ListGitBranchesParameterDefinition plugin="list-git-branches-parameter@0.0.9">
           <name>build_branch</name>
-          <uuid>880b4044-2a14-4f98-a069-9b20d73d8c06</uuid>
+          <uuid>bafb714b-6670-457c-9b4d-b75e4ba8280e</uuid>
           <remoteURL>https://github.com/chaibio/chaipcr</remoteURL>
           <credentialsId/>
           <defaultValue/>
@@ -465,7 +465,8 @@ ENDSSH
 		rsync --delete --rsh="sshpass ssh -oStrictHostKeyChecking=no -l root" -a ./bioinformatics "$build_machine:/root/chaipcr/"  || (echo error copying files to device &amp;&amp; exit 1)
 		rsync --delete --rsh="sshpass ssh -oStrictHostKeyChecking=no -l root" -a ./device/configuration.json "$build_machine:/root/chaipcr/deploy/"  || (echo error copying files to device &amp;&amp; exit 1)
 		rsync --delete --rsh="sshpass ssh -oStrictHostKeyChecking=no -l root" -a ./device/configuration.json "$build_machine:/root/"  || (echo error copying files to device &amp;&amp; exit 1)
-        rsync --delete --rsh="sshpass ssh -oStrictHostKeyChecking=no -l root" -a changes.log "$build_machine:/root/chaipcr/deploy/"  || (echo error copying files to device &amp;&amp; exit 1)
+        rsync --delete --rsh="sshpass ssh -oStrictHostKeyChecking=no -l root" -a changes.log "$build_machine:/root/chaipcr/deploy/"  || true # (echo error copying files to device &amp;&amp; exit 1)
+        rsync --delete --rsh="sshpass ssh -oStrictHostKeyChecking=no -l root" -a ./realtime/wifi "$build_machine:/root/chaipcr/deploy/"  || (echo error copying files to device &amp;&amp; exit 1)
 		rsync --delete --rsh="sshpass ssh -oStrictHostKeyChecking=no -l root" -a ./devops/factory_settings_sdcard/scripts/replace_uEnv.txt.sh "$build_machine:/root/chaipcr/deploy/"  || (echo error copying files to device &amp;&amp; exit 1)
         rsync --delete --rsh="sshpass ssh -oStrictHostKeyChecking=no -l root" -a ./devops/factory_settings_sdcard/scripts/setup_touchcontroller.sh "$build_machine:/root/chaipcr/deploy/"  || (echo error copying files to device &amp;&amp; exit 1)
 		rsync --delete --rsh="sshpass ssh -oStrictHostKeyChecking=no -l root" -a ./devops/device "$build_machine:/root/chaipcr/deploy/"  || (echo error copying files to device &amp;&amp; exit 1)
@@ -498,7 +499,7 @@ sync
 cd
 
 echo unmounting any sdcard folders
-DEBIAN_FRONTEND=noninteractive apt-get -q -y  install parted
+DEBIAN_FRONTEND=noninteractive apt-get -q -y  install parted hostapd
 
 swapoff -a
 umount /sdcard/*
@@ -892,6 +893,7 @@ echo done compiling browser
       <command>#!/bin/bash
 
 echo compiling realtime
+echo "export LC_ALL=C" &gt;&gt; ~/.profile
 
 cd /sdcard/factory/ || exit 1
 free -m
@@ -1101,7 +1103,7 @@ systemctl enable qpcrbrowser.service </command>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo install wifi firmware
-apt-get -y install firmware-realtek || exit 1
+apt-get -y install firmware-realtek || sleep 200 &amp;&amp; apt-get -y install firmware-realtek || exit 1
  
 echo Build/install LCD drivers
 # this needs some optimization.. it takes 90MB
