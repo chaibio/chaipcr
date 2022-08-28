@@ -50,6 +50,7 @@ window.App.controller 'SettingNetworkPanelCtrl', [
     $scope.hotspotInfo = 
       ssid: ''
       password: ''
+    $scope.hotspotShowPassword =  false
     $scope.isHotspotActive = false
 
     ###*
@@ -339,6 +340,9 @@ window.App.controller 'SettingNetworkPanelCtrl', [
       return
 
     $scope.initNetwork = ->
+      if NetworkSettingsService.connectedWifiNetwork?.state?.status == 'hotspot_active'
+        $scope.hotspotInfo.ssid = NetworkSettingsService.connectedWifiNetwork.state.hotspot_ssid
+        $scope.hotspotInfo.password = NetworkSettingsService.connectedWifiNetwork.state.hotspot_key
 
       if $scope.selectedWifiNow
         # if our selection is a wifi network.
@@ -511,6 +515,7 @@ window.App.controller 'SettingNetworkPanelCtrl', [
         return
 
       if !$scope.isHotspotActive
+        $scope.isHotspotActive = true
         NetworkSettingsService.createHotspot($scope.hotspotInfo).then ((data) ->
           $scope.isHotspotActive = true
           return

@@ -744,6 +744,16 @@
         border-color: #E02127;
       }
     }
+
+    .show-icon{
+      width: 16px;
+      position: absolute;
+      right: 0;
+      top: 4px;
+      img{
+        width: 100%;
+      }
+    }
   }
 
   .check-symbol{
