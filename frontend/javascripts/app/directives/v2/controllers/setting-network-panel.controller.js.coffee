@@ -343,6 +343,7 @@ window.App.controller 'SettingNetworkPanelCtrl', [
       if NetworkSettingsService.connectedWifiNetwork?.state?.status == 'hotspot_active'
         $scope.hotspotInfo.ssid = NetworkSettingsService.connectedWifiNetwork.state.hotspot_ssid
         $scope.hotspotInfo.password = NetworkSettingsService.connectedWifiNetwork.state.hotspot_key
+        $scope.isHotspotActive = true
 
       if $scope.selectedWifiNow
         # if our selection is a wifi network.
