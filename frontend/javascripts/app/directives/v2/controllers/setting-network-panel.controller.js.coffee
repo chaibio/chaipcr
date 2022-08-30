@@ -524,6 +524,7 @@ window.App.controller 'SettingNetworkPanelCtrl', [
           return
       else
         $scope.isHotspotActive = false
+        $scope.turnOffWifi()
         $scope.hotspotInfo = 
           ssid: ''
           password: ''
