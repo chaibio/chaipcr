@@ -44,12 +44,13 @@ window.App.controller 'SettingNetworkPanelCtrl', [
 
     $scope.wanOption = 'wifi'
     $scope.hotspotErrors = 
-      network_name: ''
+      ssid: ''
       password: ''
 
     $scope.hotspotInfo = 
-      network_name: ''
+      ssid: ''
       password: ''
+    $scope.hotspotShowPassword =  false
     $scope.isHotspotActive = false
 
     ###*
@@ -339,6 +340,10 @@ window.App.controller 'SettingNetworkPanelCtrl', [
       return
 
     $scope.initNetwork = ->
+      if NetworkSettingsService.connectedWifiNetwork?.state?.status == 'hotspot_active'
+        $scope.hotspotInfo.ssid = NetworkSettingsService.connectedWifiNetwork.state.hotspot_ssid
+        $scope.hotspotInfo.password = NetworkSettingsService.connectedWifiNetwork.state.hotspot_key
+        $scope.isHotspotActive = true
 
       if $scope.selectedWifiNow
         # if our selection is a wifi network.
@@ -481,24 +486,48 @@ window.App.controller 'SettingNetworkPanelCtrl', [
         return connectedNetworkSsid == ssid
       return false
 
+    $scope.restartWifi = ->
+      stopped = NetworkSettingsService.stop()
+      $scope.wifiNetworks = $scope.currentWifiSettings = {}
+      stopped.then ((result) ->
+        $scope.userSettings = $.jStorage.get('userNetworkSettings')
+        $scope.turnOnWifi()
+        return
+      ), (err) ->
+        console.log 'Could not disconnect wifi', err
+        return
+      return
+
     ## Wan Options
     $scope.onChangeWanOption = () ->
       $scope.wanOption = if $scope.wanOption == 'wifi' then 'hotspot' else 'wifi'
       if !$scope.wifiNetworkStatus
         $scope.wifiNetworkStatus = true
+      if $scope.isHotspotActive
+        $scope.restartWifi()
 
     verifyHotspotCredentials = ->
-      $scope.hotspotErrors.network_name = if $scope.hotspotInfo.network_name then '' else 'Cannot be blank.'
+      $scope.hotspotErrors.ssid = if $scope.hotspotInfo.ssid then '' else 'Cannot be blank.'
       $scope.hotspotErrors.password = if $scope.hotspotInfo.password.length < 8 then 'Must be at least 8 characters' else ''
-      return if $scope.hotspotErrors.network_name == '' and $scope.hotspotErrors.password == '' then true else false
+      return if $scope.hotspotErrors.ssid == '' and $scope.hotspotErrors.password == '' then true else false
 
     $scope.onHotspotClick = () ->
       if !verifyHotspotCredentials()
         return
-      $scope.isHotspotActive = !$scope.isHotspotActive
+
       if !$scope.isHotspotActive
+        $scope.isHotspotActive = true
+        NetworkSettingsService.createHotspot($scope.hotspotInfo).then ((data) ->
+          $scope.isHotspotActive = true
+          return
+        ), (err) ->
+          console.log err
+          return
+      else
+        $scope.isHotspotActive = false
+        $scope.turnOffWifi()
         $scope.hotspotInfo = 
-          network_name: ''
+          ssid: ''
           password: ''
 
     $scope.onIPFieldChange = (e) ->

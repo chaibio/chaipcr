@@ -3,4 +3,8 @@
   <p></p>
   <span class="CG1-M" ng-if="!label">{{error ? (field ? field + ' ' + error : error) : ''}}</span>
   <span class="CG1-M" ng-if="label">{{label}}</span>
+  <a ng-click="changeShow()" ng-if="type == 'password'" class="show-icon">
+  	<img src="/images/PWHide.svg" ng-if="!isShow"/>
+  	<img src="/images/PWShow.svg" ng-if="isShow"/>
+  </a>
 </div>

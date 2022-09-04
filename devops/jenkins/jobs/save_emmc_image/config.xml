@@ -1,27 +1,20 @@
-<?xml version='1.1' encoding='UTF-8'?>
-<project>
+<?xml version="1.1" encoding="UTF-8" standalone="no"?><project>
   <actions/>
-  <description>Creates a factory settings image from for connected BBB.&#xd;
-- create a grep sdcard&#xd;
-- start BBB on grep mode&#xd;
-- restart BBB on normal more&#xd;
-- backup grepped image&#xd;
-- apply process_raw_image.sh and create_sdcard.sh scripts&#xd;
-- exports the sdcard as an image file&#xd;
+  <description>Creates a factory settings image from for connected BBB.&#13;
+- create a grep sdcard&#13;
+- start BBB on grep mode&#13;
+- restart BBB on normal more&#13;
+- backup grepped image&#13;
+- apply process_raw_image.sh and create_sdcard.sh scripts&#13;
+- exports the sdcard as an image file&#13;
 </description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@1.27.1">
-      <doNotScan>false</doNotScan>
-    </com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty>
-    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.18.1">
-      <optOut>false</optOut>
-    </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
           <name>build_machine</name>
-          <description></description>
+          <description/>
           <defaultValue>10.0.100.240</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
@@ -44,7 +37,7 @@ Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
         <hudson.model.StringParameterDefinition>
           <name>sdcard_filename</name>
           <description>sdcard default filename</description>
-          <defaultValue></defaultValue>
+          <defaultValue/>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
@@ -73,6 +66,7 @@ Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
+    
   </properties>
   <scm class="hudson.scm.NullSCM"/>
   <canRoam>true</canRoam>
@@ -85,7 +79,7 @@ Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
     <hudson.tasks.Shell>
       <command>#!/bin/bash
 echo checking Jenkins server
-echo &quot;Bash version ${BASH_VERSION}...&quot;
+echo "Bash version ${BASH_VERSION}..."
 uname -a
 ls -ahl
 lsblk
@@ -137,13 +131,13 @@ fi
 #	sudo service sshd restart
 #fi
 
-ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
+ssh-keygen -f "/var/lib/jenkins/.ssh/known_hosts" -R $build_machine
 
 #echo deleting root password in case of chaipcr
-#sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;passwd -d -u root&quot;
+#sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine "passwd -d -u root"
 
-ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
-sshpass -p chaipcr ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
+ssh-keygen -f "/var/lib/jenkins/.ssh/known_hosts" -R $build_machine
+sshpass -p chaipcr ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;'ENDSSH'
 
 if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
 then
@@ -169,7 +163,7 @@ ENDSSH
 
 echo returned to host. connection check:
 counter=0
-until sshpass -p chaipcr ssh -t root@$build_machine &apos;exit 0&apos;
+until sshpass -p chaipcr ssh -t root@$build_machine 'exit 0'
 do
 	counter=$(( $counter + 1 ))
     if [ $counter -gt 10 ]
@@ -191,23 +185,28 @@ rm build_report.xml
 
         echo Branch param $build_branch
         clean_build_branch=$build_branch
-        clean_build_branch=${clean_build_branch#&quot;branches/&quot;}
-        clean_build_branch=${clean_build_branch#&quot;refs/heads/&quot;}
-        clean_build_branch=${clean_build_branch#&quot;tags/&quot;}
-        clean_build_branch=${clean_build_branch#&quot;trunk&quot;}
-        clean_build_branch=${clean_build_branch#&quot;master&quot;}
+        clean_build_branch=${clean_build_branch#"branches/"}
+        clean_build_branch=${clean_build_branch#"refs/heads/"}
+        clean_build_branch=${clean_build_branch#"tags/"}
+        clean_build_branch=${clean_build_branch#"trunk"}
+        clean_build_branch=${clean_build_branch#"master"}
         echo Cleaned branch param $clean_build_branch
 
         branch_param=
         branch_name=
 
-        if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
+        if [ -z $build_branch ] || ! [[ "$build_branch" == *\/* ]]  || [ "$build_branch" = "trunk" ]
         then
                 echo No build branch chosen
         else
                 branch_name=$clean_build_branch
-                branch_param=&quot;-b $branch_name&quot;
-                echo Cloning branch and param $branch_name and $branch_param
+                if [ -z $branch_name ]
+                then
+                        echo Master branch chosen..
+                else
+					branch_param="-b $branch_name"
+    	            echo Cloning branch and param $branch_name and $branch_param
+                fi
         fi
 
 		sudo rm -r tmp || true
@@ -229,13 +228,14 @@ echo now at $(pwd)
 ls
 
 </command>
+      <configuredLocalRules/>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo &quot;Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}&quot;
-echo &quot;Slave Beaglebone at ${build_machine}&quot;
+      <command>echo "Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}"
+echo "Slave Beaglebone at ${build_machine}"
 echo checking build device 
-echo &quot;Bash version ${BASH_VERSION}...&quot;
+echo "Bash version ${BASH_VERSION}..."
 uname -a
 ls -ahl
 lsblk
@@ -243,7 +243,7 @@ df -h
 
 if [ -e /root/debug_image ]
 then
-     echo &quot;Cann&apos;t save a debug image&quot;
+     echo "Cann't save a debug image"
      exit 1
 fi
 
@@ -269,7 +269,7 @@ umount /sdcard/* -f -v
 lsblk
 if mount | grep mmcblk0
 then
-  echo &quot;Error: can&apos;t unmount sdcard!&quot;
+  echo "Error: can't unmount sdcard!"
   exit 1
 fi
 
@@ -278,7 +278,7 @@ pids=$( pidof sh )
 
 for pp in $pids
 do
-#       echo &quot;Process $pp&quot;
+#       echo "Process $pp"
         if ps aux | grep chaibio | grep $pp
         then
                 echo Killing $pp
@@ -381,15 +381,16 @@ ls
 sshpass -p chaipcr scp -r devops/grabimage_sdcard/* root@$build_machine:/tmp/grep_sdcard/
 sshpass -p chaipcr scp -r devops/grabimage_sdcard/uEnv.sdcard.txt root@$build_machine:/tmp/grep_sdcard/uEnv.txt
 </command>
+      <configuredLocalRules/>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo patching grep sdcard to boot only once
-sed &quot;s/reboot/rm \/mnt\/uEnv.txt ; reboot/&quot; -i /tmp/grep_sdcard/autorun.sh
-sed &quot;s/halt/rm \/mnt\/uEnv.txt ; reboot # /&quot; -i /tmp/grep_sdcard/autorun.sh
+sed "s/reboot/rm \/mnt\/uEnv.txt ; reboot/" -i /tmp/grep_sdcard/autorun.sh
+sed "s/halt/rm \/mnt\/uEnv.txt ; reboot # /" -i /tmp/grep_sdcard/autorun.sh
 
-sed &quot;s/reboot/rm \/mnt\/uEnv.txt ; reboot/&quot; -i /tmp/grep_sdcard/pack_latest_version.sh
-sed &quot;s/halt/rm \/mnt\/uEnv.txt ; reboot # /&quot; -i /tmp/grep_sdcard/pack_latest_version.sh
+sed "s/reboot/rm \/mnt\/uEnv.txt ; reboot/" -i /tmp/grep_sdcard/pack_latest_version.sh
+sed "s/halt/rm \/mnt\/uEnv.txt ; reboot # /" -i /tmp/grep_sdcard/pack_latest_version.sh
 
 sync
 ls /tmp/grep_sdcard -ahl
@@ -409,7 +410,7 @@ echo waiting for a restart
 sleep 620
 for i in {0..36000..60}
 do
-	echo &quot;Waiting for the build device to become ready! $i seconds waiting ..&quot;
+	echo "Waiting for the build device to become ready! $i seconds waiting .."
 	sleep 60
     if ping $build_machine -c 3
     then
@@ -421,6 +422,7 @@ done
 
 echo timeout waiting for the device to become ready!
 exit 1</command>
+      <configuredLocalRules/>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
@@ -432,7 +434,7 @@ umount /sdcard/*
 echo killing unused cpu consuming processes
 for pp in $pids
 do
-        echo &quot;Checking process $pp&quot;
+        echo "Checking process $pp"
         if ps aux | grep chaibio | grep $pp
         then
                 echo Killing $pp
@@ -452,21 +454,21 @@ mount /dev/mmcblk0p1 /tmp/grep_sdcard
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>echo fetching eMMC image.
-stamp=$(date &apos;+%Y%M%d%H%m%S&apos;)
-grep_sdcard_dir=&quot;/tmp/${BUILD_NUMBER}/emmc_inbox_${stamp}&quot;
-tmp_sdcard_dir=&quot;/tmp/${BUILD_NUMBER}/sdcard_${stamp}&quot;
+stamp=$(date '+%Y%M%d%H%m%S')
+grep_sdcard_dir="/tmp/${BUILD_NUMBER}/emmc_inbox_${stamp}"
+tmp_sdcard_dir="/tmp/${BUILD_NUMBER}/sdcard_${stamp}"
 
 echo grep sdcard folder [input]: $grep_sdcard_dir
-mkdir -p &quot;${grep_sdcard_dir}&quot;
+mkdir -p "${grep_sdcard_dir}"
 
 echo fetching image files from beaglebone.
 
-#sshpass -p chaipcr scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r root@$build_machine:/tmp/grep_sdcard/* &quot;${grep_sdcard_dir}&quot;
-sshpass -p chaipcr scp -oStrictHostKeyChecking=no -r root@$build_machine:/tmp/grep_sdcard/* &quot;${grep_sdcard_dir}&quot;
-sshpass -p chaipcr scp -oStrictHostKeyChecking=no -r root@$build_machine:/root/configuration.json .
-sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;umount /tmp/grep_sdcard &amp;&amp; exit 0&quot;
+#sshpass -p chaipcr scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r root@$build_machine:/tmp/grep_sdcard/* "${grep_sdcard_dir}"
+sshpass -p chaipcr scp -oStrictHostKeyChecking=no -r root@$build_machine:/tmp/grep_sdcard/* "${grep_sdcard_dir}"
+sshpass -p chaipcr scp -oStrictHostKeyChecking=no -r root@$build_machine:/root/configuration.json . || true
+sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine "umount /tmp/grep_sdcard &amp;&amp; exit 0" || true
 
-ls -ahl &quot;${grep_sdcard_dir}&quot;
+ls -ahl "${grep_sdcard_dir}"
 
 emmc_image_latest_compressed=${output_image_prefix}_emmc.img.tgz
 emmc_image_latest_compressed_full_local_path=${local_download_folder}/${emmc_image_latest_compressed}
@@ -478,7 +480,7 @@ export upgrade_image_postfix=$output_image_prefix
 
 if [ -e configuration.json ]
 then
-    device_image_number=$(jq -r &quot;.software.version&quot; configuration.json)
+    device_image_number=$(jq -r ".software.version" configuration.json)
     echo device configuration version $device_image_number
     if ! [ -z $device_image_number ]
     then
@@ -496,11 +498,11 @@ build_report_filename=build_report.xml
 #_$BUILD_NUMBER.xml
 echo Report filename is $build_report_filename
 cat &lt;&lt; EOF &gt; $build_report_filename
-&lt;section name=&quot;&quot; fontcolor=&quot;&quot;&gt;
+&lt;section name="" fontcolor=""&gt;
     // To display a field
-     &lt;field name=&quot;eMMC&quot; titlecolor=&quot;&quot; value=&quot;Download&quot; detailcolor=&quot;&quot; href=&quot;$full_emmc_url&quot;&gt; 
+     &lt;field name="eMMC" titlecolor="" value="Download" detailcolor="" href="$full_emmc_url"&gt; 
       &lt;![CDATA[ 
-eMMC image ($emmc_image_latest_compressed) &lt;a href=&quot;$full_emmc_url&quot; download=&quot;eMMC.img.tgz&quot;&gt;Download&lt;/a&gt;
+eMMC image ($emmc_image_latest_compressed) &lt;a href="$full_emmc_url" download="eMMC.img.tgz"&gt;Download&lt;/a&gt;
     ]]&gt; &lt;/field&gt;
 &lt;/section&gt;
 EOF
@@ -509,10 +511,10 @@ fi
 
 cd tmp/chaipcr
 cd devops
-echo &apos;performing ./process_raw_image.sh &quot;${grep_sdcard_dir}&quot; &quot;${tmp_sdcard_dir}&quot;&apos;
+echo 'performing ./process_raw_image.sh "${grep_sdcard_dir}" "${tmp_sdcard_dir}"'
 echo fs version $(cat factory_settings_sdcard/fs_version.inf)
 
-if sudo ./process_raw_image.sh &quot;${grep_sdcard_dir}&quot; &quot;${tmp_sdcard_dir}&quot;
+if sudo ./process_raw_image.sh "${grep_sdcard_dir}" "${tmp_sdcard_dir}"
 then
    echo raw image processed
 else
@@ -520,13 +522,13 @@ else
    exit 1
 fi
 
-if [ -e &quot;${tmp_sdcard_dir}&quot; ]
+if [ -e "${tmp_sdcard_dir}" ]
 then
     if [ -z $sdcard_filename ]
     then
 	    sdcard_filename=sdcard_$BUILD_NUMBER.img
     fi
-    if [ &quot;$image_version&quot; = &quot;0.0.0.0&quot; ]
+    if [ "$image_version" = "0.0.0.0" ]
     then
         echo Release number not provided.
     else
@@ -552,12 +554,12 @@ then
 
 #	cp $full_emmc_image $emmc_image_latest_compressed_full_local_path
 
-	echo &quot;performing create_sdcard.sh $tmp_sdcard_dir $tmp_output_sdcard&quot;
-	if sudo ./create_sdcard.sh &quot;$tmp_sdcard_dir&quot; &quot;$tmp_output_sdcard&quot;
+	echo "performing create_sdcard.sh $tmp_sdcard_dir $tmp_output_sdcard"
+	if sudo ./create_sdcard.sh "$tmp_sdcard_dir" "$tmp_output_sdcard"
 	then
-   		echo SDCard image is created at &quot;$tmp_output_sdcard&quot;
+   		echo SDCard image is created at "$tmp_output_sdcard"
         echo please use it to flash an 8M SDCard.
-        echo &quot;ex: dd if=$tmp_output_sdcard of=/dev/sdX bs=16M&quot;
+        echo "ex: dd if=$tmp_output_sdcard of=/dev/sdX bs=16M"
         cp $tmp_output_sdcard $fullpath_sdcard_image
         echo copying compressed sdcard image
         cp ${tmp_output_sdcard}.tgz ${fullpath_sdcard_image}.tgz
@@ -584,28 +586,28 @@ build_report_filename=build_report.xml
 #_$BUILD_NUMBER.xml
 echo Report filename is $build_report_filename
 cat &lt;&lt; EOF &gt; $build_report_filename
-&lt;section name=&quot;&quot; fontcolor=&quot;&quot;&gt;
+&lt;section name="" fontcolor=""&gt;
     // To display a field
-    &lt;field name=&quot;Build Number&quot; titlecolor=&quot;&quot; value=&quot;$image_version&quot; detailcolor=&quot;&quot;&gt; 
+    &lt;field name="Build Number" titlecolor="" value="$image_version" detailcolor=""&gt; 
     &lt;![CDATA[ 
 Release version and build number are $image_version
     ]]&gt; &lt;/field&gt;
     
-    &lt;field name=&quot;Upgrade Image&quot; titlecolor=&quot;&quot; value=&quot;Download&quot; detailcolor=&quot;&quot; href=&quot;$upgrade_image_url&quot;&gt; 
+    &lt;field name="Upgrade Image" titlecolor="" value="Download" detailcolor="" href="$upgrade_image_url"&gt; 
     &lt;![CDATA[ 
-Upgrade image (upgrade_${upgrade_image_postfix}.img.tar) &lt;a href=&quot;$upgrade_image_url&quot;&gt;Download&lt;/a&gt;
+Upgrade image (upgrade_${upgrade_image_postfix}.img.tar) &lt;a href="$upgrade_image_url"&gt;Download&lt;/a&gt;
     ]]&gt; &lt;/field&gt;
-     &lt;field name=&quot;eMMC&quot; titlecolor=&quot;&quot; value=&quot;Download&quot; detailcolor=&quot;&quot; href=&quot;$full_emmc_url&quot;&gt; 
+     &lt;field name="eMMC" titlecolor="" value="Download" detailcolor="" href="$full_emmc_url"&gt; 
       &lt;![CDATA[ 
-eMMC image ($emmc_image_latest_compressed) &lt;a href=&quot;$full_emmc_url&quot; download=&quot;eMMC.img.tgz&quot;&gt;Download&lt;/a&gt;
+eMMC image ($emmc_image_latest_compressed) &lt;a href="$full_emmc_url" download="eMMC.img.tgz"&gt;Download&lt;/a&gt;
     ]]&gt; &lt;/field&gt;
-    &lt;field name=&quot;SDCard&quot; titlecolor=&quot;&quot; value=&quot;Download&quot; detailcolor=&quot;&quot; href=&quot;$sdcard_url&quot;&gt; 
+    &lt;field name="SDCard" titlecolor="" value="Download" detailcolor="" href="$sdcard_url"&gt; 
       &lt;![CDATA[ 
-SDCard image ($sdcard_filename) &lt;a href=&quot;$sdcard_url&quot; download=&quot;sdcard.img&quot;&gt;Download&lt;/a&gt;
+SDCard image ($sdcard_filename) &lt;a href="$sdcard_url" download="sdcard.img"&gt;Download&lt;/a&gt;
     ]]&gt; &lt;/field&gt;
-    &lt;field name=&quot;zSDCard&quot; titlecolor=&quot;&quot; value=&quot;Download&quot; detailcolor=&quot;&quot; href=&quot;$sdcard_url.tgz&quot;&gt; 
+    &lt;field name="zSDCard" titlecolor="" value="Download" detailcolor="" href="$sdcard_url.tgz"&gt; 
       &lt;![CDATA[ 
-SDCard image tgz ($sdcard_filename) &lt;a href=&quot;$sdcard_url.tgz&quot; download=&quot;sdcard.img&quot;&gt;Download Compressed&lt;/a&gt;
+SDCard image tgz ($sdcard_filename) &lt;a href="$sdcard_url.tgz" download="sdcard.img"&gt;Download Compressed&lt;/a&gt;
     ]]&gt; &lt;/field&gt;
 &lt;/section&gt;
 EOF
@@ -627,6 +629,7 @@ partition_sdcard &amp;
 echo All Done!
 
 exit 0</command>
+      <configuredLocalRules/>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
@@ -645,6 +648,6 @@ exit 0</command>
     </hudson.plugins.summary__report.ACIPluginPublisher>
   </publishers>
   <buildWrappers>
-    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.11.5"/>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.11.6"/>
   </buildWrappers>
 </project>

@@ -11,9 +11,15 @@
           caption: '@',
           field: '@',
           label: '@',
+          type: '@',
+          isShow: '=',
         },
         link: function(scope,element,attrs,ctrl, transclude){
           element.find('p').replaceWith(transclude());
+          scope.changeShow = function() {
+            scope.isShow = !scope.isShow;
+            scope.$apply();
+          };
         }
      };
    }

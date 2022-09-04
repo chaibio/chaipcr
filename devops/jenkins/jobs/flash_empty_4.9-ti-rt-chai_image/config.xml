@@ -1,15 +1,8 @@
-<?xml version='1.1' encoding='UTF-8'?>
-<project>
+<?xml version="1.1" encoding="UTF-8" standalone="no"?><project>
   <actions/>
   <description>Build basic debian image with kernel version 4.x</description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@1.27.0">
-      <doNotScan>false</doNotScan>
-    </com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty>
-    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.18">
-      <optOut>false</optOut>
-    </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
@@ -31,6 +24,7 @@
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
+    
   </properties>
   <scm class="hudson.scm.NullSCM"/>
   <canRoam>true</canRoam>
@@ -43,7 +37,7 @@
     <hudson.tasks.Shell>
       <command>#!/bin/bash
 echo checking Jenkins server
-echo &quot;Bash version ${BASH_VERSION}...&quot;
+echo "Bash version ${BASH_VERSION}..."
 uname -a
 ls -ahl
 lsblk
@@ -56,18 +50,18 @@ sudo apt-get -y -q install sshpass parted mdadm --allow-unauthenticated
 sudo apt-get -y -q install dirmngr --install-recommends
 
 sudo chmod 777      /var/lib/jenkins/.ssh/known_hosts
-ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
-#ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
+ssh-keygen -f "/var/lib/jenkins/.ssh/known_hosts" -R $build_machine
+#ssh-keygen -f "/var/lib/jenkins/.ssh/known_hosts" -R $build_machine
 
-sshpass -p temppwd ssh -t -oStrictHostKeyChecking=no debian@$build_machine &lt;&lt;&apos;ENDSSH&apos;
+sshpass -p temppwd ssh -t -oStrictHostKeyChecking=no debian@$build_machine &lt;&lt;'ENDSSH'
 echo enable root access with no password
 echo temppwd | sudo -S su
-echo temppwd | sudo -S sed -i -e &apos;s:PermitEmptyPasswords no:PermitEmptyPasswords yes:g&apos; /etc/ssh/sshd_config
-sudo sed -i -e &apos;s:#PermitEmptyPasswords:PermitEmptyPasswords:g&apos; /etc/ssh/sshd_config
-sudo sed -i -e &apos;s:UsePAM yes:UsePAM no:g&apos; /etc/ssh/sshd_config
-sudo sed -i -e &apos;s:PermitRootLogin without-password:PermitRootLogin yes:g&apos; /etc/ssh/sshd_config
-sudo sed -i -e &apos;s:PermitRootLogin prohibit-password:PermitRootLogin yes:g&apos; /etc/ssh/sshd_config
-sudo sed -i -e &apos;s:#PermitRootLogin:PermitRootLogin:g&apos; /etc/ssh/sshd_config
+echo temppwd | sudo -S sed -i -e 's:PermitEmptyPasswords no:PermitEmptyPasswords yes:g' /etc/ssh/sshd_config
+sudo sed -i -e 's:#PermitEmptyPasswords:PermitEmptyPasswords:g' /etc/ssh/sshd_config
+sudo sed -i -e 's:UsePAM yes:UsePAM no:g' /etc/ssh/sshd_config
+sudo sed -i -e 's:PermitRootLogin without-password:PermitRootLogin yes:g' /etc/ssh/sshd_config
+sudo sed -i -e 's:PermitRootLogin prohibit-password:PermitRootLogin yes:g' /etc/ssh/sshd_config
+sudo sed -i -e 's:#PermitRootLogin:PermitRootLogin:g' /etc/ssh/sshd_config
 
 
 sudo passwd -d -u root
@@ -132,11 +126,11 @@ fi
 
 
 echo deleting root password in case of chaipcr
-sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;passwd -d -u root&quot;
+sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine "passwd -d -u root"
 #echo done deleting root password
 
 
-if ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
+if ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;'ENDSSH'
 
 if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
 then
@@ -159,10 +153,10 @@ fi
 exit 0
 ENDSSH
 then
-   echo &quot;-t worked&quot;
+   echo "-t worked"
 else
-echo &quot; trying -tt&quot;
-ssh -tt -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
+echo " trying -tt"
+ssh -tt -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;'ENDSSH'
 
 if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
 then
@@ -190,19 +184,19 @@ ENDSSH
 fi
 
 echo Returned to host. connection check:
-ssh -oStrictHostKeyChecking=no -t root@$build_machine &apos;exit 0&apos;
+ssh -oStrictHostKeyChecking=no -t root@$build_machine 'exit 0'
 
-if ssh -oStrictHostKeyChecking=no -tt root@$build_machine &apos;exit 0&apos;
+if ssh -oStrictHostKeyChecking=no -tt root@$build_machine 'exit 0'
 then
     echo key is added ok
 else
     echo error adding key to known hosts.. retrying..
     chmod 777 /var/lib/jenkins/.ssh/known_hosts
-	ssh -oStrictHostKeyChecking=no -t root@$build_machine &apos;exit 0&apos;
+	ssh -oStrictHostKeyChecking=no -t root@$build_machine 'exit 0'
 fi
 
 counter=0
-until ssh -tt root@$build_machine &apos;exit 0&apos;
+until ssh -tt root@$build_machine 'exit 0'
 do
 	counter=$(( $counter + 1 ))
     if [ $counter -gt 10 ]
@@ -217,20 +211,21 @@ done
 
 echo done connection check.
 sleep 20</command>
+      <configuredLocalRules/>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo &quot;Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}&quot;
-echo &quot;Slave Beaglebone at ${build_machine}&quot;
+      <command>echo "Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}"
+echo "Slave Beaglebone at ${build_machine}"
 echo checking build device 
-echo &quot;Bash version ${BASH_VERSION}...&quot;
+echo "Bash version ${BASH_VERSION}..."
 uname -a
 ls -ahl
 lsblk
 df -h
 
 rm /var/lib/dpkg/lock
-echo -e &quot;\n&quot; | dpkg --configure -a
+echo -e "\n" | dpkg --configure -a
 
 mkdir -p /run/chaipcr/
 touch /run/chaipcr/exit_all.flag
@@ -254,7 +249,7 @@ umount /sdcard/* || true
 lsblk
 if mount | grep mmcblk0
 then
-  echo &quot;Error: can&apos;t unmount sdcard!&quot;
+  echo "Error: can't unmount sdcard!"
   exit 1
 fi
 </command>
@@ -319,15 +314,15 @@ echo flashing SDCard
 echo Image filename: $image_filename
 if [ -e /dev/mmcblk0 ] &amp;&amp; [ -e /dev/mmcblk1 ] 
 then
-   echo &quot;eMMC and SDCard found&quot;
+   echo "eMMC and SDCard found"
 else
-   echo &quot;SDCard is not found&quot;
+   echo "SDCard is not found"
    exit 1
 fi
 
 if mount | grep /dev/mmcblk0
 then
-      echo &quot;SDCard is still mounted, or it was inserted after booting. Please reboot&quot;
+      echo "SDCard is still mounted, or it was inserted after booting. Please reboot"
       exit 1
 fi
 echo Burning $image_filename to /dev/mmcblk0
@@ -375,24 +370,24 @@ then
   echo badblocks check is active
 else
   echo disable badblocks check
-  sed &quot;s/badblocks/#badblocks/&quot; -i functions.sh
+  sed "s/badblocks/#badblocks/" -i functions.sh
 fi
 
 echo removing root password
-root_password=$(cat /mnt/etc/shadow | grep root | awk -F &apos;:&apos; &apos;{print $2}&apos;)
-sed -i -e &apos;s:&apos;$root_password&apos;::g&apos; /mnt/etc/shadow
+root_password=$(cat /mnt/etc/shadow | grep root | awk -F ':' '{print $2}')
+sed -i -e 's:'$root_password'::g' /mnt/etc/shadow
 
 echo patching sshd_config
-sed -i -e &apos;s:PermitEmptyPasswords no:PermitEmptyPasswords yes:g&apos; /mnt/etc/ssh/sshd_config
-sed -i -e &apos;s:UsePAM yes:UsePAM no:g&apos; /mnt/etc/ssh/sshd_config
-sed -i -e &apos;s:PermitRootLogin without-password:PermitRootLogin yes:g&apos; /mnt/etc/ssh/sshd_config
+sed -i -e 's:PermitEmptyPasswords no:PermitEmptyPasswords yes:g' /mnt/etc/ssh/sshd_config
+sed -i -e 's:UsePAM yes:UsePAM no:g' /mnt/etc/ssh/sshd_config
+sed -i -e 's:PermitRootLogin without-password:PermitRootLogin yes:g' /mnt/etc/ssh/sshd_config
 
-sed -i -e &apos;s:PermitEmptyPasswords no:PermitEmptyPasswords yes:g&apos; /mnt/etc/ssh/sshd_config
-sudo sed -i -e &apos;s:#PermitEmptyPasswords:PermitEmptyPasswords:g&apos; /mnt/etc/ssh/sshd_config
-sudo sed -i -e &apos;s:UsePAM yes:UsePAM no:g&apos; /etc/ssh/sshd_config
-sudo sed -i -e &apos;s:PermitRootLogin without-password:PermitRootLogin yes:g&apos; /mnt/etc/ssh/sshd_config
-sudo sed -i -e &apos;s:PermitRootLogin prohibit-password:PermitRootLogin yes:g&apos; /mnt/etc/ssh/sshd_config
-sudo sed -i -e &apos;s:#PermitRootLogin:PermitRootLogin:g&apos; /mnt/etc/ssh/sshd_config
+sed -i -e 's:PermitEmptyPasswords no:PermitEmptyPasswords yes:g' /mnt/etc/ssh/sshd_config
+sudo sed -i -e 's:#PermitEmptyPasswords:PermitEmptyPasswords:g' /mnt/etc/ssh/sshd_config
+sudo sed -i -e 's:UsePAM yes:UsePAM no:g' /etc/ssh/sshd_config
+sudo sed -i -e 's:PermitRootLogin without-password:PermitRootLogin yes:g' /mnt/etc/ssh/sshd_config
+sudo sed -i -e 's:PermitRootLogin prohibit-password:PermitRootLogin yes:g' /mnt/etc/ssh/sshd_config
+sudo sed -i -e 's:#PermitRootLogin:PermitRootLogin:g' /mnt/etc/ssh/sshd_config
 
 echo done patching sshd_config
 
@@ -406,20 +401,20 @@ if [ -e rc.local ]
 then
 	echo truncating rc.local
 	cp rc.local rc.local.orig
-	echo &quot; &quot;&gt;rc.local 
+	echo " "&gt;rc.local 
 else
 	echo creating rc.local
 	touch rc.local
 	chmod +x rc.local
 fi
-    echo &quot;Overwriting rc.local.&quot;
+    echo "Overwriting rc.local."
     cat &gt; rc.local &lt;&lt; EOF
 #!/bin/sh -e
 #
 # rc.local
 #
 # This script is executed at the end of each multiuser runlevel.
-# Make sure that the script will &quot;exit 0&quot; on success or any other
+# Make sure that the script will "exit 0" on success or any other
 # value on error.
 #
 # In order to enable or disable this script just change the execution
@@ -437,9 +432,9 @@ lazy_flash()
 {
 	echo lazy flasher starting in 15s
 	sleep 15
-	if mount | grep &quot;/dev/mmcblk1&quot; | grep -w &quot;/&quot;
+	if mount | grep "/dev/mmcblk1" | grep -w "/"
 	then
-		echo &quot;==&gt; Booting from eMMC&quot;
+		echo "==&gt; Booting from eMMC"
 		if [ -e /opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh ]
 		then
 			mv /opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh /opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh.org
@@ -448,7 +443,7 @@ lazy_flash()
                 echo Flasher is disabled
 		exit 0
 	else
-		echo &quot;==&gt; Flasher is booting from SDCard&quot;
+		echo "==&gt; Flasher is booting from SDCard"
 	fi
 	if [ -e /opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh ]
 	then
@@ -462,7 +457,7 @@ lazy_flash()
 		mv /opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh  /opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh.done
 		echo Done flashing
 	else
-		echo &quot;==&gt; Flasher was done before&quot;
+		echo "==&gt; Flasher was done before"
 	fi
 	exit 0
 }
@@ -493,7 +488,7 @@ sync
 
 echo Restarting build device..
 shutdown -r 1
-echo &quot;Restart scheduled after a min&quot;
+echo "Restart scheduled after a min"
 
 #exit 0
 
@@ -504,12 +499,12 @@ echo &quot;Restart scheduled after a min&quot;
     <hudson.tasks.Shell>
       <command>#!/bin/bash
 # waiting 20min for the bulding device to flash
-echo &quot;Waiting for the build device ($build_machine) to flash and become ready!&quot;
+echo "Waiting for the build device ($build_machine) to flash and become ready!"
 sleep 500
 
 for i in {0..1200..60}
 do
-	echo &quot;Waiting for the build device ($build_machine) to become ready! $i&quot;
+	echo "Waiting for the build device ($build_machine) to become ready! $i"
 	sleep 60
 
 	if ping $build_machine -c 2
@@ -517,8 +512,8 @@ do
     	echo device is finally up !!
         sleep 60
         
-		ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
-		ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
+		ssh-keygen -f "/var/lib/jenkins/.ssh/known_hosts" -R $build_machine
+		ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;'ENDSSH'
 		echo $build_machine device is connectable.. 
 		lsblk
 		exit 0
@@ -527,7 +522,7 @@ ENDSSH
 		sleep 10
 		echo returned to host. connection check:
 		counter=0
-		until ssh -t root@$build_machine &apos;exit 0&apos;
+		until ssh -t root@$build_machine 'exit 0'
 		do
 			counter=$(( $counter + 1 ))
     		if [ $counter -gt 20 ]
@@ -535,7 +530,7 @@ ENDSSH
     			echo Beaglebone is not available.
     			exit 1
 		    fi
-			echo &quot;waiting for ssh on beaglebone to become connectable.&quot;
+			echo "waiting for ssh on beaglebone to become connectable."
 			sleep 10
 		done
 		echo ssh is connectable.
@@ -544,15 +539,16 @@ ENDSSH
     fi
 done
 
-echo &quot;timeout waiting for the device to become ready!&quot;
+echo "timeout waiting for the device to become ready!"
 exit 1</command>
+      <configuredLocalRules/>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Updating kernel on $build_machine
 
 sudo apt-get update
-#sudo apt-get upgrade -y -q
+
 echo installing missing packages.
 DEBIAN_FRONTEND=noninteractive apt-get -y -q install dirmngr --install-recommends
 
@@ -619,10 +615,10 @@ echo restart scheduled after a min-2
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
-echo &quot;waitting for a restart&quot;
+echo "waitting for a restart"
 for i in {0..300..60}
 do
-	echo &quot;Waiting for the build device to become ready! $i&quot;
+	echo "Waiting for the build device to become ready! $i"
 	sleep 60
     if ping $build_machine -c 1
     then
@@ -631,7 +627,7 @@ do
     	
         
         counter=0
-		until ssh -tt root@$build_machine &apos;exit 0&apos;
+		until ssh -tt root@$build_machine 'exit 0'
 		do
 			counter=$(( $counter + 1 ))
     		if [ $counter -gt 10 ]
@@ -657,6 +653,7 @@ done
 
 echo timeout waiting for the device to become ready!
 exit 1</command>
+      <configuredLocalRules/>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
@@ -668,7 +665,9 @@ apt-key update
 apt-get update
 
 apt-mark hold bb-cape-overlays
-DEBIAN_FRONTEND=noninteractive apt-get -q -y upgrade
+DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -q upgrade
+dpkg --configure -a --force-confdef --force-confold
+
 #DEBIAN_FRONTEND=noninteractive apt-get -q -y dist-upgrade
 
 update-initramfs -u
@@ -738,12 +737,12 @@ exit 0
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
-echo &quot;waitting for a restart&quot;
+echo "waitting for a restart"
 sleep 90
 
 for i in {0..1500..60}
 do
-	echo &quot;Waiting for the build device to become ready! $i&quot;
+	echo "Waiting for the build device to become ready! $i"
 	sleep 60
     if ping $build_machine -c 1
     then
@@ -755,10 +754,11 @@ done
 
 echo timeout waiting for the device to become ready!
 exit 1</command>
+      <configuredLocalRules/>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
   <buildWrappers>
-    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.11.3"/>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.11.6"/>
   </buildWrappers>
 </project>

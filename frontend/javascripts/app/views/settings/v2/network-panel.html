@@ -43,11 +43,12 @@
         <label class="CX5 mb-15">
           {{isHotspotActive ? 'Deactivate hotspot to edit details' : 'Set hotspot details'}}
         </label>
-        <modal-input-field caption="Network Name" class="mb-20" error="hotspotErrors.network_name">
-          <input type="text" class="CX5-M" ng-model="hotspotInfo.network_name" placeholder="Network Name" autocomplete="network name">
+        <modal-input-field caption="Network Name" class="mb-20" error="hotspotErrors.ssid">
+          <input type="text" class="CX5-M" ng-model="hotspotInfo.ssid" placeholder="Network Name" autocomplete="network name" ng-readonly="isHotspotActive">
         </modal-input-field>
-        <modal-input-field caption="Password" class="mb-20" error="hotspotErrors.password" label="Must be at least 8 characters">
-          <input type="password" class="CX5-M" ng-model="hotspotInfo.password" placeholder="Password" autocomplete="password">
+        <modal-input-field caption="Password" class="mb-20" error="hotspotErrors.password" label="Must be at least 8 characters" type="password" is-show="hotspotShowPassword">
+          <input type="password" class="CX5-M" ng-model="hotspotInfo.password" placeholder="Password" autocomplete="password" ng-readonly="isHotspotActive" ng-if="!hotspotShowPassword">
+          <input type="text" class="CX5-M" ng-model="hotspotInfo.password" placeholder="Password" autocomplete="password" ng-readonly="isHotspotActive" ng-if="hotspotShowPassword">
         </modal-input-field>
         <div class="hotspot-status" ng-show="isHotspotActive">
           <span class="CX5">Hotspot status:</span>
