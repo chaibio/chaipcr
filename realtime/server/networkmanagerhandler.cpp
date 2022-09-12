@@ -32,7 +32,7 @@ NetworkManagerHandler::NetworkManagerHandler(const std::string &interfaceName, O
 
 void NetworkManagerHandler::processData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt)
 {
-    APP_DEBUGGER << "Start processing data" << std::endl;
+    //APP_DEBUGGER << "Start processing data" << std::endl;
     if (_interfaceName == "wlan")
     {
         if (qpcrApp.wirelessManager()->interfaceName().empty())

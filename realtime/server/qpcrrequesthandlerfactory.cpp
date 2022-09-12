@@ -63,11 +63,11 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
         
         if (!requestPath.empty())
         {
-            APP_DEBUGGER << "createRequestHandler !requestPath.empty() " << endl;
-            APP_DEBUGGER << "createRequestHandler " << request.getMethod() << ": " << requestPath.size() << " ";
-            for(auto a:requestPath)
-                APP_DEBUGGER << a << "|";
-            APP_DEBUGGER << std::endl;
+//            APP_DEBUGGER << "createRequestHandler !requestPath.empty() " << endl;
+//            APP_DEBUGGER << "createRequestHandler " << request.getMethod() << ": " << requestPath.size() << " ";
+//            for(auto a:requestPath)
+  //              APP_DEBUGGER << a << "|";
+    //        APP_DEBUGGER << std::endl;
             
             if (request.getMethod() == "GET")
             {
