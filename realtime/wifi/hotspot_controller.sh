@@ -9,17 +9,44 @@ interface=wlan0
 hotspotssid=Chaibio
 hotspotkey=password
 #echo 2 is $2
+
+if [[ "$2" == "checkhotspot" ]] && [ -n "$1" ]
+then
+        echo checking hotspot status
+	check_wifi_settings=$(grep "hostapd" /etc/network/interfaces)
+	if [ -n "$check_wifi_settings" ]
+	then
+        	echo checking hotspot service status
+	        check_wifi_settings=$(service hostapd status | grep Active)
+		if [ -n "$check_wifi_settings" ]
+        	then
+			echo "OK: Hotspot active"
+			exit 0
+		else
+                        echo "KO: Hotspot service inactive"
+			exit 0
+		fi
+	else
+                echo "KO: Missing hotspot settings"
+		exit 0
+	fi
+
+	echo "KO"
+	exit 0
+fi
+
 if [[ "$2" == "stop" ]] && [ -n "$1" ]
 then
 	echo disabling hotspot on interface $1
 	if [ -e /sdcard/upgrade/interfaces.latest_wifi_settings ]
 	then
 		cp /sdcard/upgrade/interfaces.latest_wifi_settings /etc/network/interfaces
-		systemctl disable hostapd
+		systemctl stop hostapd
 		service hostapd stop
 		/sbin/ifdown $1
 		/sbin/ifup $1
 	fi
+        echo "OK"
 	exit 0
 fi
 
@@ -27,7 +54,7 @@ fi
 if [[ "$2" == "wifiselect" ]] && [ -n "$1" ]
 then
         echo selecting to go wifi on interface $1
-        systemctl disable hostapd
+        systemctl stop hostapd
         service hostapd stop
 
         if [ -e /sdcard/upgrade/interfaces.latest_wifi_settings ]
@@ -49,7 +76,7 @@ if [[ "$2" == "hotspotdeactivate" ]] && [ -n "$1" ]
 then
 	echo Removing wifi settings, and return to empty interfaecs.
         echo selecting to go wifi on interface $1
-        systemctl disable hostapd
+        systemctl stop hostapd
 	service hostapd stop
 
         cp /root/chaipcr/deploy/wifi/interfaces.empty.template /etc/network/interfaces
@@ -72,7 +99,7 @@ then
         else
                 cp /root/chaipcr/deploy/wifi/interfaces.empty.template /etc/network/interfaces
         fi
-        systemctl enable hostapd
+        systemctl start hostapd
         service hostapd start
 
         /sbin/ifdown $1
@@ -121,8 +148,9 @@ then
 fi
 
 # Settingup hotspot
-systemctl disable hostapd
+systemctl stop hostapd
 service hostapd stop
+ifconfig $interface down
 
 cp /root/chaipcr/deploy/wifi/hostapd.conf.template /etc/hostapd/hostapd.conf
 cp /root/chaipcr/deploy/wifi/interfaces.hotspot.template /etc/network/interfaces
@@ -141,11 +169,28 @@ then
 	echo "dhcp-range=10.0.0.2,10.0.0.20,255.255.255.0,24h">>/etc/dnsmasq.conf
 fi
 
-systemctl enable hostapd
+pid=$(cat /run/hostapd.wlan0.pid)
+kill -9 $pid
+sleep 1
+
+/usr/sbin/hostapd -B -P /run/hostapd.wlan0.pid /etc/hostapd/hostapd.conf
+if [ $? -ne 0 ]
+then
+	sleep 1
+	/usr/sbin/hostapd -B -P /run/hostapd.wlan0.pid /etc/hostapd/hostapd.conf
+	if [ $? -ne 0 ]
+	then
+	        sleep 1
+        	/usr/sbin/hostapd -B -P /run/hostapd.wlan0.pid /etc/hostapd/hostapd.conf
+	fi
+fi
+
+ifconfig $interface up
+systemctl start hostapd
 service hostapd start
 
-/sbin/ifdown $interface
-/sbin/ifup $interface
+#/sbin/ifdown $interface
+#/sbin/ifup $interface
 
 cp /etc/network/interfaces /sdcard/upgrade/interfaces.latest_hotspot_settings
 

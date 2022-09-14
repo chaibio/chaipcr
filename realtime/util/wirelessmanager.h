@@ -111,6 +111,8 @@ private:
 
 public:
     static bool hotspotRetrieveInfo(std::string& interfacename, std::string& hotspot_ssid, std::string& hotspot_key );
+    bool isHotspotActive();
+
 
 private:
     enum OperationState

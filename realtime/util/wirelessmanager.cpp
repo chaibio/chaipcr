@@ -202,6 +202,13 @@ void WirelessManager::_wifiSelect()
     command_run( "WirelessManager::_wifiSelect", stream.str() );
 }
 
+bool WirelessManager::isHotspotActive()
+{
+    std::stringstream stream;
+    stream << "/root/chaipcr/deploy/wifi/hotspot_controller.sh " << interfaceName() << " checkhotspot";
+    return command_run( "WirelessManager::isHotspotActive", stream.str() );
+}
+
 bool WirelessManager::hotspotRetrieveInfo(std::string& interfacename, std::string& hotspot_ssid, std::string& hotspot_key )
 {
     interfacename.clear();
@@ -708,7 +715,7 @@ void WirelessManager::checkConnection(const std::string &interface)
     APP_DEBUGGER << "WirelessManager::checkConnection " << interface << std::endl;
     if (_connectionStatus == HotspotActive )
     {
-        APP_DEBUGGER << "Hotspot active" << std::endl;
+        APP_DEBUGGER << "Connection status: Hotspot is active" << std::endl;
         return;
     }
 
@@ -716,15 +723,16 @@ void WirelessManager::checkConnection(const std::string &interface)
 
     if (!state.isEmpty())
     {
-        APP_DEBUGGER << "WirelessManager::checkConnection not empty " << state.flags << std::endl;
-        APP_DEBUGGER << "WirelessManager::checkConnection not empty IFF_UP " << (int)(state.flags & IFF_UP) << std::endl;
-        APP_DEBUGGER << "WirelessManager::checkConnection not empty state.addressState " << state.addressState<< std::endl;
+        //APP_DEBUGGER << "WirelessManager::checkConnection not empty " << state.flags << " IFF_UP " << (int)(state.flags & IFF_UP) << " state.addressState " << state.addressState<< std::endl;
 
         if (state.flags & IFF_UP && state.addressState)
         {
-            _connectionStatus = Connected;
+            if(isHotspotActive())
+                _connectionStatus = HotspotActive;
+            else
+                _connectionStatus = Connected;
             _connectionTimeout = 0;
-            APP_DEBUGGER << "WirelessManager::checkConnection connected" << std::endl;
+            APP_DEBUGGER << "WirelessManager::checkConnection connected " << _connectionStatus << std::endl;
         }
         else if (_connectionThreadState != Working && _connectionStatus != NotConnected && _connectionStatus != HotspotActive && std::time(nullptr) > _connectionTimeout) // should check for hotspot as well//
         {
