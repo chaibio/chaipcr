@@ -203,11 +203,7 @@ App.controller 'MeltCurveChartCtrl', [
         for i in [0..$scope.targets.length - 1] by 1
           $scope.targetsSetHided[$scope.targets[i]?.id] = true if $scope.targetsSetHided[$scope.targets[i]?.id] is undefined and !isDefaultSwitchDisable($scope.targets[i])
 
-        for well_data, well_i in $scope.well_data by 1
-          if $scope.wellButtons["well_#{well_data.well_num - 1}"].ct == undefined
-            $scope.wellButtons["well_#{well_data.well_num - 1}"].ct = ['', '']
-          $scope.wellButtons["well_#{well_data.well_num - 1}"].ct[well_data.channel - 1] = MeltCurveService.averagedTm(well_data.tm)
-
+        for well_i in [0..15] by 1
           channel_1_well = _.find $scope.well_data, (item) ->
             item.well_num is well_i+1 and item.channel is 1
 
@@ -217,6 +213,11 @@ App.controller 'MeltCurveChartCtrl', [
           $scope.wellButtons["well_#{well_i}"].well_type = []
           $scope.wellButtons["well_#{well_i}"].well_type.push(if channel_1_well then channel_1_well.well_type else '')
           $scope.wellButtons["well_#{well_i}"].well_type.push(if channel_2_well then channel_2_well.well_type else '')
+
+        for well_data, well_i in $scope.well_data by 1         
+          if $scope.wellButtons["well_#{well_data.well_num - 1}"].ct == undefined
+            $scope.wellButtons["well_#{well_data.well_num - 1}"].ct = ['', '']
+          $scope.wellButtons["well_#{well_data.well_num - 1}"].ct[well_data.channel - 1] = MeltCurveService.averagedTm(well_data.tm)
 
         $scope.updateTargetsSet()
         updateSeries()
