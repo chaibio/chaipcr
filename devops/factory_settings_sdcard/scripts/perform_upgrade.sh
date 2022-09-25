@@ -270,7 +270,15 @@ cp /var/lib/dhcp/dhclient.*.leases /data/.tmp/
 echo "Preserve the existing network configuration file before the upgrade"
 if [ -e /etc/network/interfaces ]
 then
-   cp /etc/network/interfaces /sdcard/upgrade
+   cp /etc/network/interfaces /sdcard/upgrade/
+fi
+if [ -e /etc/dnsmasq.conf ]
+then
+   cp /etc/dnsmasq.conf /sdcard/upgrade/
+fi
+if [ -e /etc/hostapd/hostapd.conf ]
+then
+   cp /etc/hostapd/hostapd.conf /sdcard/upgrade/
 fi
 
 echo "Preserve the existing network persistent rules file before the upgrade"

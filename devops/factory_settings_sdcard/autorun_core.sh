@@ -437,6 +437,51 @@ update_uenv () {
         sleep 5                                                                                  
 }
 
+backup_network () {
+
+	echo Backing up network files.
+
+	if [ ! -e /tmp/rootfs ] 
+	then
+		mkdir -p /tmp/rootfs || true
+	fi
+        
+	mount | grep ${eMMC_root}
+	if [ $? -eq 0 ]
+	then
+		echo ${eMMC_root} is mounted already
+	else
+		if mount ${eMMC_root} /tmp/rootfs
+		then
+			echo Error in mounting rootfs. Failed to backup network files.
+			return 1
+		fi
+	fi
+	
+	if [ -e /tmp/rootfs/etc/network/interfaces ]
+	then
+	   cp /tmp/rootfs/etc/network/interfaces ${sdcard_p2}/
+	fi
+	if [ -e /tmp/rootfs/etc/dnsmasq.conf ]
+	then
+	   cp /tmp/rootfs/etc/dnsmasq.conf ${sdcard_p2}/
+	fi
+	if [ -e /tmp/rootfs/etc/hostapd/hostapd.conf ]
+	then
+	   cp /tmp/rootfs/etc/hostapd/hostapd.conf ${sdcard_p2}/
+	fi
+	if [ -e /tmp/rootfs/etc/network/interfaces ]
+	then
+	   cp /tmp/rootfs/etc/network/interfaces.last_upgrade ${sdcard_p2}/
+	fi
+	
+	sync                                                                                     
+        sleep 5 	                                                                                 
+	umount /tmp/rootfs || true
+        sync                                                                                     
+        sleep 5                                                                                  
+}
+
 reset_uenv () {
 	echo "resetting uEnv!"
         if [ -z $emmc_boot_files ]
@@ -997,7 +1042,7 @@ fi
 
 perform_data_restore
 reset_update_uenv_with_verification 1
-
+backup_network
 remove_upgrade_flags
 reset_uenv
 reset_s2

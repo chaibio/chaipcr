@@ -169,11 +169,22 @@ then
 	echo "dhcp-range=10.0.0.2,10.0.0.20,255.255.255.0,24h">>/etc/dnsmasq.conf
 fi
 
-pid=$(cat /run/hostapd.wlan0.pid)
-kill -9 $pid
-sleep 1
+if [ -e /run/hostapd.wlan0.pid ]
+then
+	pid=$(cat /run/hostapd.wlan0.pid)
+	if [ -n $pid ]
+	then
+		if [ -e "/proc/$pid" ]
+		then
+			echo terminating current hostapd
+			kill -9 $pid
+			sleep 1
+		fi
+	fi
+fi
 
 /usr/sbin/hostapd -B -P /run/hostapd.wlan0.pid /etc/hostapd/hostapd.conf
+
 if [ $? -ne 0 ]
 then
 	sleep 1
