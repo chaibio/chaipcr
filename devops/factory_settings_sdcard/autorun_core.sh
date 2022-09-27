@@ -461,18 +461,17 @@ backup_network () {
 	if [ -e /tmp/rootfs/etc/network/interfaces ]
 	then
 	   cp /tmp/rootfs/etc/network/interfaces ${sdcard_p2}/
+	   cp /tmp/rootfs/etc/network/interfaces ${sdcard_p2}/interfaces.last_upgrade
 	fi
 	if [ -e /tmp/rootfs/etc/dnsmasq.conf ]
 	then
 	   cp /tmp/rootfs/etc/dnsmasq.conf ${sdcard_p2}/
+           cp /tmp/rootfs/etc/dnsmasq.conf ${sdcard_p2}/dnsmasq.conf.last_upgrade
 	fi
 	if [ -e /tmp/rootfs/etc/hostapd/hostapd.conf ]
 	then
 	   cp /tmp/rootfs/etc/hostapd/hostapd.conf ${sdcard_p2}/
-	fi
-	if [ -e /tmp/rootfs/etc/network/interfaces ]
-	then
-	   cp /tmp/rootfs/etc/network/interfaces.last_upgrade ${sdcard_p2}/
+           cp /tmp/rootfs/etc/hostapd/hostapd.conf ${sdcard_p2}/hostapd.conf.last_upgrade
 	fi
 	
 	sync                                                                                     
