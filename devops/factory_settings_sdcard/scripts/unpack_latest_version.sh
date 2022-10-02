@@ -123,7 +123,7 @@ backup_network () {
         then
                 mkdir -p /tmp/rootfs || true
         fi
-        
+ 
         mount | grep ${eMMC_root}
         if [ $? -eq 0 ]
         then
@@ -131,11 +131,13 @@ backup_network () {
         else
                 if mount ${eMMC_root} /tmp/rootfs
                 then
+			echo eMMC rootfs mounted successfully.
+		else
                         echo Error in mounting rootfs. Failed to backup network files.
                         return 1
                 fi
         fi
-        
+
         if [ -e /tmp/rootfs/etc/network/interfaces ]
         then
            echo /etc/network/interfaces found.
@@ -154,12 +156,12 @@ backup_network () {
            cp /tmp/rootfs/etc/hostapd/hostapd.conf ${sdcard_p2}/
            cp /tmp/rootfs/etc/hostapd/hostapd.conf ${sdcard_p2}/hostapd.conf.last_upgrade
         fi
-        
-        sync                                                                                     
-        sleep 5                                                                                          
+
+        sync
+        sleep 5
         umount /tmp/rootfs || true
-        sync                                                                                     
-        sleep 5                                                                                  
+        sync
+        sleep 5
 }
 
 setLedTimer

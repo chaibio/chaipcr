@@ -399,19 +399,19 @@ update_uenv () {
 			fi
 		fi
 		echo running factory settings version of replace_uEnv.txt.sh
-#       	        sh /sdcard/p1/scripts/replace_uEnv.txt.sh $emmc_boot_files || true        
-		echo resetting to boot switch dependant uEnv                       
-	        cp $emmc_boot_files/uEnv.72check.txt $emmc_boot_files/uEnv.txt || true                            
-        	sync                                                                                     
-	        sleep 5 	                                                                                 
+#       	        sh /sdcard/p1/scripts/replace_uEnv.txt.sh $emmc_boot_files || true
+		echo resetting to boot switch dependant uEnv
+	        cp $emmc_boot_files/uEnv.72check.txt $emmc_boot_files/uEnv.txt || true
+        	sync
+	        sleep 5
         	umount /tmp/rootfs || true
 	else
 		echo Dealing with four partitions system.
-	        echo copying coupling uEng.txt                                                           
-	        mount ${eMMC_boot} $emmc_boot_files -t vfat || true                            
+	        echo copying coupling uEng.txt
+		mount ${eMMC_boot} $emmc_boot_files -t vfat || true
 
-        	if [ $1 -eq 2 ]                                             
-	        then                                                                                     
+        	if [ $1 -eq 2 ]
+	        then
         	        if [ -e /sdcard/p2/scripts/replace_uEnv.txt.sh ]
 	                then
 				echo running upgrade version of replace_uEnv.txt.sh
@@ -419,13 +419,13 @@ update_uenv () {
 	                else
 				echo running factory settings version of replace_uEnv.txt.sh while performing upgrade.
                 	        sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
-        	        fi                                                                     
-	        else                                                                           
+        	        fi
+	        else
 			echo running factory settings version of replace_uEnv.txt.sh
-        	        sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true        
-	        fi                                                                             
-	        sync                                                                                     
-        	sleep 5                                                                                  
+        	        sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+	        fi
+	        sync
+        	sleep 5
 		if mount | grep $emmc_boot_files
 		then
 	        	umount $emmc_boot_files || true
@@ -433,19 +433,19 @@ update_uenv () {
 		fi
         fi
 
-        sync                                                                                     
-        sleep 5                                                                                  
+        sync
+        sleep 5
 }
 
 backup_network () {
 
 	echo Backing up network files.
 
-	if [ ! -e /tmp/rootfs ] 
+	if [ ! -e /tmp/rootfs ]
 	then
 		mkdir -p /tmp/rootfs || true
 	fi
-        
+
 	mount | grep ${eMMC_root}
 	if [ $? -eq 0 ]
 	then
@@ -453,11 +453,13 @@ backup_network () {
 	else
 		if mount ${eMMC_root} /tmp/rootfs
 		then
+			echo "eMMC rootfs mounted successfully."
+		else
 			echo Error in mounting rootfs. Failed to backup network files.
 			return 1
 		fi
 	fi
-	
+
 	if [ -e /tmp/rootfs/etc/network/interfaces ]
 	then
 	   cp /tmp/rootfs/etc/network/interfaces ${sdcard_p2}/
@@ -473,12 +475,12 @@ backup_network () {
 	   cp /tmp/rootfs/etc/hostapd/hostapd.conf ${sdcard_p2}/
            cp /tmp/rootfs/etc/hostapd/hostapd.conf ${sdcard_p2}/hostapd.conf.last_upgrade
 	fi
-	
-	sync                                                                                     
-        sleep 5 	                                                                                 
+
+	sync
+        sleep 5
 	umount /tmp/rootfs || true
-        sync                                                                                     
-        sleep 5                                                                                  
+        sync
+        sleep 5
 }
 
 reset_uenv () {
