@@ -17,7 +17,8 @@ then
 	if [ -n "$check_wifi_settings" ]
 	then
         	echo checking hotspot service status
-	        check_wifi_settings=$(service hostapd status | grep Active)
+#	        check_wifi_settings=$(service hostapd status | grep Active)
+		check_wifi_settings=$(ps aux | grep hostapd | grep -v grep)
 		if [ -n "$check_wifi_settings" ]
         	then
 			echo "OK: Hotspot active"
@@ -99,8 +100,8 @@ then
         else
                 cp /root/chaipcr/deploy/wifi/interfaces.empty.template /etc/network/interfaces
         fi
-        systemctl start hostapd
-        service hostapd start
+#        systemctl start hostapd
+#        service hostapd start
 
         /sbin/ifdown $1
         /sbin/ifup $1
@@ -166,42 +167,33 @@ then
         echo "# ">>/etc/dnsmasq.conf
 	echo "# CHAIBIO Hotspot settings">>/etc/dnsmasq.conf
 	echo "interface=$interface">>/etc/dnsmasq.conf
+	echo "listen-address=10.0.0.1">>/etc/dnsmasq.conf
 	echo "dhcp-range=10.0.0.2,10.0.0.20,255.255.255.0,24h">>/etc/dnsmasq.conf
 fi
 
-if [ -e /run/hostapd.wlan0.pid ]
-then
-	pid=$(cat /run/hostapd.wlan0.pid)
-	if [ -n $pid ]
-	then
-		if [ -e "/proc/$pid" ]
-		then
-			echo terminating current hostapd
-			kill -9 $pid
-			sleep 1
-		fi
-	fi
-fi
-
-/usr/sbin/hostapd -B -P /run/hostapd.wlan0.pid /etc/hostapd/hostapd.conf
-
-if [ $? -ne 0 ]
-then
-	sleep 1
-	/usr/sbin/hostapd -B -P /run/hostapd.wlan0.pid /etc/hostapd/hostapd.conf
-	if [ $? -ne 0 ]
-	then
-	        sleep 1
-        	/usr/sbin/hostapd -B -P /run/hostapd.wlan0.pid /etc/hostapd/hostapd.conf
-	fi
-fi
-
 ifconfig $interface up
-systemctl start hostapd
-service hostapd start
 
-#/sbin/ifdown $interface
-#/sbin/ifup $interface
+if grep /etc/hostapd/hostapd.conf /etc/default/hostapd
+then
+	echo /etc/default/hostapd is already patched
+else
+	echo DAEMON_CONF=\"/etc/hostapd/hostapd.conf\" >> /etc/default/hostapd
+fi
+
+service dnsmasq restart
+#ifconfig wlan0 1.0.0.1
+restart_interface () {
+	echo Executing /sbin/ifdown up $1
+	/sbin/ifdown $1
+	/bin/ip addr flush dev $1
+	/sbin/ifup $1
+	echo "Done flashing"
+}
+
+restart_interface $interface
+restart_interface $interface
+# &>>/tmp/dbg.log
+
 
 cp /etc/network/interfaces /sdcard/upgrade/interfaces.latest_hotspot_settings
 
