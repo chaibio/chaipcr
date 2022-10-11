@@ -121,9 +121,12 @@ backup_network () {
 
         if [ ! -e /tmp/rootfs ] 
         then
+        	echo creating /tmp/rootfs
                 mkdir -p /tmp/rootfs || true
         fi
  
+ 	ls -ahl /tmp/rootfs || true # debug
+ 	mount # debug
         mount | grep ${eMMC_root}
         if [ $? -eq 0 ]
         then
@@ -138,6 +141,8 @@ backup_network () {
                 fi
         fi
 
+	ls -ahl /tmp/rootfs/etc || true #debug
+	ls -ahl /tmp/rootfs/etc/network/ || true #debug
         if [ -e /tmp/rootfs/etc/network/interfaces ]
         then
            echo /etc/network/interfaces found.
@@ -297,7 +302,9 @@ then
         increment_stage_counter
 fi
 
+backup_network
 write_pt_image
+
 if [ $stage -le 2 ]
 then
         echo Partition table wrote.
@@ -396,7 +403,6 @@ else
 fi
 
 increment_stage_counter
-backup_network
 
 if [ "$1" = "factorysettings" ]
 then
@@ -481,4 +487,5 @@ then
         umount /tmp/data || true
 fi
 
+echo All done....
 exit 0
