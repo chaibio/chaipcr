@@ -13,7 +13,7 @@
         </hudson.model.StringParameterDefinition>
         <com.syhuang.hudson.plugins.listgitbranchesparameter.ListGitBranchesParameterDefinition plugin="list-git-branches-parameter@0.0.9">
           <name>build_branch</name>
-          <uuid>bafb714b-6670-457c-9b4d-b75e4ba8280e</uuid>
+          <uuid>8dd2b54a-f154-4df3-91e0-664d6c832249</uuid>
           <remoteURL>https://github.com/chaibio/chaipcr</remoteURL>
           <credentialsId/>
           <defaultValue/>
@@ -55,7 +55,7 @@
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers/>
-  <concurrentBuild>false</concurrentBuild>
+  <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -69,6 +69,8 @@ ls -ahl
 lsblk
 df -h
 echo user: $(whoami)
+
+echo The following part cannot run concurrently. Try to run deploy_CHAIBIO jobs atleast 20m minutes apart.
 
 echo Checking for nessasery packages:
 sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -q update
@@ -500,6 +502,10 @@ cd
 
 echo unmounting any sdcard folders
 DEBIAN_FRONTEND=noninteractive apt-get -q -y  install parted hostapd
+echo DAEMON_CONF=\"/etc/hostapd/hostapd.conf\" &gt;&gt; /etc/default/hostapd
+service hostapd stop
+systemctl disable hostapd.service
+
 
 swapoff -a
 umount /sdcard/*
@@ -754,14 +760,16 @@ echo Installing required packages
             cd
 
             echo moving julia to eMMC
-            tar czf /data/dot_julia_precompiled.tgz .julia || exit 1
+            tar czf /sdcard/factory/dot_julia_precompiled.tgz .julia || exit 1
+            killall julia || true
             pkill -9 julia
             pkill -9 julia
             umount .julia || exit 1
             echo cleaning up old julia folder
             rm -r .julia
+           # better move this upper
             rm /data/dot_julia_complete.tgz 
-            tar xzf /data/dot_julia_precompiled.tgz || exit 1
+            tar xzf /sdcard/factory/dot_julia_precompiled.tgz || exit 1
             echo returned Julia folder
      fi
 

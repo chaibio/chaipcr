@@ -628,6 +628,17 @@ sudo sed -i 's/-msoft-float//' /lib/modules/$(uname -r)/build/arch/arm/Makefile
 sudo ln -s /lib/modules/$(uname -r)/build/arch/arm /lib/modules/$(uname -r)/build/arch/armv7l
 
 sudo sed -i 's/hard-float/float-abi=hard/' Makefile
+sudo sed -i 's/CONFIG_POWER_SAVING = y/CONFIG_POWER_SAVING = n/' Makefile
+sudo sed -i 's/CONFIG_RTW_LOG_LEVEL = 3/CONFIG_RTW_LOG_LEVEL = 0/' Makefile
+
+# po2
+sudo sed -i 's/CONFIG_TXPWR_BY_RATE_EN = y/CONFIG_TXPWR_BY_RATE_EN = n/' Makefile
+
+# po3
+sudo sed -i 's/CONFIG_PROC_DEBUG = y/CONFIG_PROC_DEBUG = n/' Makefile
+sudo sed -i 's/CONFIG_RTW_DEBUG = y/CONFIG_RTW_DEBUG = n/' Makefile
+
+cp Makefile /opt/Makefile.88x2bu
 
 sudo make
 sudo make install
