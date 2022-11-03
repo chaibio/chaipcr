@@ -607,7 +607,7 @@ SDCard image ($sdcard_filename) &lt;a href="$sdcard_url" download="sdcard.img"&g
     ]]&gt; &lt;/field&gt;
     &lt;field name="zSDCard" titlecolor="" value="Download" detailcolor="" href="$sdcard_url.tgz"&gt; 
       &lt;![CDATA[ 
-SDCard image tgz ($sdcard_filename) &lt;a href="$sdcard_url.tgz" download="sdcard.img"&gt;Download Compressed&lt;/a&gt;
+SDCard image tgz ($sdcard_filename.tgz) &lt;a href="$sdcard_url.tgz" download="sdcard.img.tgz"&gt;Download Compressed&lt;/a&gt;
     ]]&gt; &lt;/field&gt;
 &lt;/section&gt;
 EOF
