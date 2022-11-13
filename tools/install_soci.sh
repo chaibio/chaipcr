@@ -1,5 +1,6 @@
 #!/bin/bash
 
+is_dev=true
 
 echo Update Software
 apt-key update
@@ -92,3 +93,5 @@ else
 fi
 
 df -h
+
+exit 0
