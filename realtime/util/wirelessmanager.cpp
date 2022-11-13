@@ -169,20 +169,11 @@ void WirelessManager::_hotspotSelect()
 bool command_run(std::string tag, std::string cmd)
 { 
     LoggerStreams logStreams;
-    int _cmdEventFd = eventfd(0, EFD_NONBLOCK);
-
-    if (_cmdEventFd == -1)
-        throw std::system_error(errno, std::generic_category(), "Wireless manager: unable to create event command fd -");
 
     std::stringstream output;
 
-    if (!Util::watchProcess(cmd, _cmdEventFd,
-                            [&logStreams,tag,&output](const char *buffer, std::size_t size){ logStreams.stream( tag + " (stdout)").write(buffer, size); output.write(buffer, size);},
-                            [&logStreams,tag](const char *buffer, std::size_t size){ logStreams.stream( tag + " (stderr)").write(buffer, size); }))
-    {
-        APP_DEBUGGER << tag << ": error calling " << cmd << std::endl;
-        return false;
-    }
+    Util::watchProcess(cmd, [&logStreams,tag,&output](const char *buffer, std::size_t size){ logStreams.stream( tag + " (stdout)").write(buffer, size); output.write(buffer, size);},
+                            [&logStreams,tag](const char *buffer, std::size_t size){ logStreams.stream( tag + " (stderr)").write(buffer, size); }, true);
 
     return output.str().find("OK") != std::string::npos;
 }
@@ -732,7 +723,7 @@ void WirelessManager::checkConnection(const std::string &interface)
             else
                 _connectionStatus = Connected;
             _connectionTimeout = 0;
-            APP_DEBUGGER << "WirelessManager::checkConnection connected " << _connectionStatus << std::endl;
+            APP_DEBUGGER << "WirelessManager::checkConnection connected " << _connectionStatus << ", flags "  << state.flags << " IFF_UP " << (int)(state.flags & IFF_UP) << " state.addressState " << state.addressState << std::endl;
         }
         else if (_connectionThreadState != Working && _connectionStatus != NotConnected && _connectionStatus != HotspotActive && std::time(nullptr) > _connectionTimeout) // should check for hotspot as well//
         {
