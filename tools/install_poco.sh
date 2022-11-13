@@ -14,7 +14,7 @@ else
       fi
 fi
 
-wget "http://pocoproject.org/releases/poco-1.6.1/poco-1.6.1.tar.gz"  || exit 1
+wget --no-check-certificate "http://pocoproject.org/releases/poco-1.6.1/poco-1.6.1.tar.gz"  || exit 1
 tar xpvzf poco-1.6.1.tar.gz  || exit 1
 cd poco-1.6.1
 ./configure || exit 1
