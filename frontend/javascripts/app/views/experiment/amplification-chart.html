@@ -241,19 +241,19 @@ limitations under the License.
           <div class="switch-item CB4" ng-class="{'active': !isSampleMode}">Detailed</div>
         </div>
       </div>
-      <table fixed-result-header offset="60" min-width="400" ng-show="!isSampleMode" class="detail-mode-table">
+      <table fixed-result-header rz-table offset="60" min-width="400" ng-show="!isSampleMode" rz-busy="isSampleMode" class="detail-mode-table" id="detail_mode_table">
         <thead>
           <tr>
             <th class="CB4-M item-center" width="35px">Clr</th>
             <th class="CB4-M item-center" width="40px">Omit</th>
             <th class="CB4-M item-center" width="45px" >Well</th>
-            <th class="CB4-M " width="25%" >Sample</th>
-            <th class="CB4-M item-center" width="50px">Type</th>
-            <th class="CB4-M " width="25%">Target</th>
-            <th class="CB4-M item-center" width="10%"><span>C<sub>q</sub></span></th>
-            <th class="CB4-M item-center" width="10%"><span>C<sub>q</sub> M</span></th>
-            <th class="CB4-M item-center" width="15%">Qty</th>
-            <th class="CB4-M item-center" width="15%">Qty M</th>
+            <th class="CB4-M resizable" width="25%" >Sample</th>
+            <th class="CB4-M item-center resizable" width="50px">Type</th>
+            <th class="CB4-M resizable" width="25%">Target</th>
+            <th class="CB4-M item-center resizable" width="10%"><span>C<sub>q</sub></span></th>
+            <th class="CB4-M item-center resizable" width="10%"><span>C<sub>q</sub> M</span></th>
+            <th class="CB4-M item-center resizable" width="15%">Qty</th>
+            <th class="CB4-M item-center resizable" width="15%">Qty M</th>
           </tr>
         </thead>
         <tbody>
@@ -354,13 +354,13 @@ limitations under the License.
           </tr>
         </tbody>
       </table>
-      <table fixed-result-header offset="60" min-width="400" ng-show="isSampleMode" class="simple-mode-table">
+      <table fixed-result-header rz-table offset="60" min-width="400" ng-show="isSampleMode" rz-busy="!isSampleMode" class="simple-mode-table" id="simple_mode_table">
         <thead>
           <tr>
             <th class="CB4-M item-center" width="50px">Clr</th>
             <th class="CB4-M item-center" width="50px" >Well</th>
-            <th class="CB4-M" width="100%" >Sample</th>
-            <th class="CB4-M item-center target-header" 
+            <th class="CB4-M resizable" width="100%" >Sample</th>
+            <th class="CB4-M item-center target-header resizable" 
                 width="105px" 
                 ng-repeat="target in targetsSet"
                 ng-if="targetsSetHided[target.id]"

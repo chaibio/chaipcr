@@ -1,0 +1,28 @@
+table.rz-table {
+  table-layout: fixed;
+  border-collapse: collapse;
+  th {
+    position: relative;
+    min-width: 25px;
+    .rz-handle {
+      width: 10px;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      right: 0;
+      cursor: ew-resize !important;
+      &:after{
+        content: '\2807';
+        font-size: 14px;
+        position: absolute;
+        top: 30%;
+        right: 0;
+        width: 7px;
+        color: #333;
+      }
+      &.rz-handle-active {
+        border-right: 1px dotted #000;
+      }
+    }
+  }
+}

@@ -40,5 +40,6 @@ window.App = window.ChaiBioTech.ngApp = angular.module 'ChaiBioTech', [
   'canvasApp'
   'ngWebworker'
   'dynexp'
+  'rzTable'
 ]
 #Please make sure to add module files in karma-files.js, so that tests work.

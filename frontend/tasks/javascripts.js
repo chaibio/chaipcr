@@ -52,6 +52,7 @@ var vendorFiles = [
   'libs/ng-webworker.js',
   'libs/async.js',
   'libs/ng-touch.min.js',
+  'libs/angular-table-resize.js',
   // 'libs/angular-sanitize.js',
 ];
 var appFiles = [
