@@ -453,8 +453,8 @@ void WirelessManager::loadWifiDriver()
 
     stream << "/usr/bin/lsusb";
     if (!Util::watchProcess(stream.str(), _connectionEventFd,
-                            [&logStreams,&lsusbstream](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - lsusb (stdout)").write(buffer, size); lsusbstream.write(buffer, size); },
-                            [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - lsusb (stderr)").write(buffer, size); }))
+                            [&logStreams,&lsusbstream](const char *buffer, std::size_t size){ logStreams.stream("loadWifiDriver - lsusb (stdout)").write(buffer, size); lsusbstream.write(buffer, size); },
+                            [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("loadWifiDriver - lsusb (stderr)").write(buffer, size); }))
     {
         APP_DEBUGGER << "loadWifiDriver: error calling lsusb" << std::endl;
     }
@@ -480,8 +480,8 @@ void WirelessManager::loadWifiDriver()
 
     stream.str("/sbin/lsmod");
     if (!Util::watchProcess(stream.str(), _connectionEventFd,
-                            [&logStreams,&lsmodstream](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - lsmod (stdout)").write(buffer, size); lsmodstream.write(buffer, size); },
-                            [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::ifup - lsmod (stderr)").write(buffer, size); }))
+                            [&logStreams,&lsmodstream](const char *buffer, std::size_t size){ logStreams.stream("loadWifiDriver - lsmod (stdout)").write(buffer, size); lsmodstream.write(buffer, size); },
+                            [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("loadWifiDriver - lsmod (stderr)").write(buffer, size); }))
     {
         APP_LOGGER << "loadWifiDriver: error calling lsmod" << std::endl;
     }
@@ -496,13 +496,13 @@ void WirelessManager::loadWifiDriver()
         if( lsmodstream.str().find( wifiDrivers[found_adapter].pszNetworkDriverName ) != std::string::npos )
         {
             stream.str("");
-            stream << "rmmod " << wifiDrivers[found_adapter].pszNetworkDriverName;
+            stream << "/sbin/modprobe -vr " << wifiDrivers[found_adapter].pszNetworkDriverName;
 
             if (!Util::watchProcess(stream.str(), _connectionEventFd,
-                                    [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::loadWifiDriver - rmmod (stdout)").write(buffer, size); },
-                                    [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::loadWifiDriver - rmmod (stderr)").write(buffer, size); }))
+                                    [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::loadWifiDriver - modprobe -vr (stdout)").write(buffer, size); },
+                                    [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::loadWifiDriver - modprobe -vr (stderr)").write(buffer, size); }))
             {
-                APP_DEBUGGER << "loadWifiDriver: rmmod driver failed " << wifiDrivers[found_adapter].pszNetworkDriverPath << std::endl;
+                APP_DEBUGGER << "loadWifiDriver: modprobe -vr driver failed " << wifiDrivers[found_adapter].pszNetworkDriverPath << std::endl;
             }
         }
 
@@ -513,23 +513,25 @@ void WirelessManager::loadWifiDriver()
     {
         if(!Poco::File(wifiDrivers[found_adapter].pszNetworkDriverPath).exists())
         {
-            APP_DEBUGGER << "loadWifiDriver: insmod driver is not installed " << wifiDrivers[found_adapter].pszNetworkDriverPath << std::endl;
+            APP_DEBUGGER << "loadWifiDriver: modprobe -v driver is not installed " << wifiDrivers[found_adapter].pszNetworkDriverPath << std::endl;
             return;
         }
 
         stream.str("");
-        stream << "insmod " << wifiDrivers[found_adapter].pszNetworkDriverPath;
+        stream << "/sbin/modprobe -v " << wifiDrivers[found_adapter].pszNetworkDriverName;
         if (!Util::watchProcess(stream.str(), _connectionEventFd,
-                                [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::loadWifiDriver - insmod (stdout)").write(buffer, size); },
-                                [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::loadWifiDriver - insmod (stderr)").write(buffer, size); }))
+                                [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::loadWifiDriver - modprobe (stdout)").write(buffer, size); },
+                                [&logStreams](const char *buffer, std::size_t size){ logStreams.stream("WirelessManager::loadWifiDriver - modprobe (stderr)").write(buffer, size); }))
         {
-            APP_LOGGER << "loadWifiDriver: insmod error " << stream.str() << std::endl;
+            APP_LOGGER << "loadWifiDriver: modprobe error " << stream.str() << std::endl;
         }
     }
 }
 
 void WirelessManager::ifup()
 {
+    APP_DEBUGGER << "ifup" << std::endl;
+
     loadWifiDriver();
     
     LoggerStreams logStreams;
