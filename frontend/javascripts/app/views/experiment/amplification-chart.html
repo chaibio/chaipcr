@@ -299,7 +299,7 @@ limitations under the License.
               </span>
             </td>
             <td class="CB4" ng-click="onSelectRow(well_item, $index)">
-              <span class="one-line-span">{{samples[well_item.well_num - 1].name | truncate:30}}</span>
+              <span class="one-line-span" uib-tooltip="{{samples[well_item.well_num - 1].name}}">{{samples[well_item.well_num - 1].name}}</span>
             </td>
             <td class="CB4 type-td item-center" ng-click="onSelectRow(well_item, $index)">
               <span class="CB4 type-span" style="width: 20px; height: 20px;" ng-if="well_item.well_type">
@@ -401,7 +401,7 @@ limitations under the License.
               </span>
             </td>
             <td class="CB4">
-              <span class="one-line-span">{{samples[well_item.well_num - 1].name}}</span>
+              <span class="one-line-span" uib-tooltip="{{samples[well_item.well_num - 1].name}}">{{samples[well_item.well_num - 1].name}}</span>
             </td>
             <td 
               class="CB4 item-center target-cell" 
