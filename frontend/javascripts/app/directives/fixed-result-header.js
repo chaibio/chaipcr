@@ -20,24 +20,6 @@ function fixedResultHeader($timeout, $window, $rootScope) {
             }
         });
 
-        $scope.$watch(tableScrollRender, function(isTableScrollRender) {            
-            if(isTableScrollRender){
-                transformTableOnResize();
-            }
-        });
-
-        $scope.$watch(parentWidthChanged, function(isParentWidthChanged) {            
-            if(isParentWidthChanged){
-                transformTableOnResize();
-            }
-        });
-
-        $scope.$watch(tableColumnChanged, function(isTableColumnChanged) {            
-            if(isTableColumnChanged){
-                transformTableOnResize();
-            }
-        });
-
         angular.element($window).on('resize', onResizeWindow);
 
         $rootScope.$on('sidemenu:toggle', function(){
@@ -99,6 +81,8 @@ function fixedResultHeader($timeout, $window, $rootScope) {
             // reset display styles so column widths are correct when measured below
             var tableOffsetHeight = elem.attributes.offset ? parseInt(elem.attributes.offset.value) : 0;
             var tableMinWidth = elem.attributes['min-width'] ? parseInt(elem.attributes['min-width'].value) : 0;
+            $(elem).css({minWidth: (tableMinWidth - 2) + 'px'});
+            $(elem).css({width: '100%'});
             var parentWidth = angular.element(elem).parent()[0].offsetWidth;
 
             var tbodyElems = elem.querySelector('tbody');
@@ -183,11 +167,12 @@ function fixedResultHeader($timeout, $window, $rootScope) {
                 // set css styles on thead and tbody
                 angular.element(elem.querySelectorAll('thead, tfoot')).css('display', 'block');
                 angular.element(elem.querySelectorAll('thead, tfoot')).css('overflow-y', overflow_style);
+                angular.element(elem.querySelectorAll('thead, tfoot')).css('overflow-x', 'hidden');
 
                 angular.element(elem.querySelectorAll('tbody')).css({
                     'display': 'block',
                     'height' : tbodyHeight + 'px',
-                    'overflow-y': 'auto'
+                    'overflow-y': 'auto',                    
                 });
 
                 var lastColumn = elem.querySelector('thead tr:first-child th:last-child');
