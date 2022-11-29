@@ -229,9 +229,21 @@ angular.module("rzTable").directive('rzTable', ['resizeStorage', '$injector', '$
             scope.options.onResizeInProgress && scope.options.onResizeInProgress(column, newWidth, diffX)
 
             // Set size
-            $(column).css({width: newWidth + 'px'});
+            $(column).css({width: newWidth + 'px'});           
             var colIndex = $(column).index() + 1;
             $(column).closest(".rz-table").find("td:nth-child("+colIndex+")").css({width: newWidth + 'px' });
+
+            // Update Table Size
+            var newTableWidth = 0;
+            $(column).parent().find("th").each(function(index, elem){
+                newTableWidth += parseInt($(elem).attr('style').replace('width: ', '').replace('px', '').trim());
+            });
+
+            $(column).parents('.rz-table').css({width: newTableWidth + 'px' });
+            var chartContainerWidth = $(column).parents('.content').children('.chart-section').width();
+            var newContentWidth = chartContainerWidth + newTableWidth + 2;
+            $(column).parents('.chart-screen-wapper').css({minWidth: newContentWidth + 'px'});
+
         }
     }
 
@@ -242,7 +254,7 @@ angular.module("rzTable").directive('rzTable', ['resizeStorage', '$injector', '$
 
     function getResizer(scope, attr) {
         try {
-            var mode = attr.rzMode ? scope.mode : 'BasicResizer';
+            var mode = attr.rzMode ? scope.mode : 'OverflowResizer';
             var Resizer = $injector.get(mode)
             return Resizer;
         } catch (e) {
@@ -627,14 +639,15 @@ angular.module("rzTable").factory("OverflowResizer", ["ResizerModel", function(R
 
     OverflowResizer.prototype.setup = function() {
         // Allow overflow in this mode
-        $(this.container).css({
-            overflow: 'auto'
-        });
+        // $(this.container).css({
+        //     overflow: 'auto'
+        // });
     };
 
     OverflowResizer.prototype.onTableReady = function() {
         // For mode overflow, make table as small as possible
-        $(this.table).width(1);
+        var containerWidth = $(this.table).parent().width();
+        $(this.table).width(containerWidth);
     };
 
     // Return constructor

@@ -21,7 +21,9 @@ table.rz-table {
         color: #333;
       }
       &.rz-handle-active {
-        border-right: 1px dotted #000;
+        &:after{
+          color: #32CCFF;
+        }
       }
     }
   }
