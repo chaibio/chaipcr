@@ -561,7 +561,8 @@ else
       fi
 fi
 
-wget "http://pocoproject.org/releases/poco-1.6.1/poco-1.6.1.tar.gz"  || exit 1
+#wget --no-check-certificate "http://pocoproject.org/releases/poco-1.6.1/poco-1.6.1.tar.gz"  || exit 1
+wget $download_prefix/build/poco-1.6.1.tar.gz  || exit 1
 tar xpvzf poco-1.6.1.tar.gz  || exit 1
 cd poco-1.6.1
 ./configure || exit 1
@@ -600,7 +601,9 @@ cd ..
 dkms add ./rtl8192cu-fixes
 dkms install 8192cu/1.11
 depmod -a
+
 cp ./rtl8192cu-fixes/blacklist-native-rtl8192.conf /etc/modprobe.d/
+cp ./rtl8192cu-fixes/8192cu-disable-power-management.conf /etc/modprobe.d/
 
 echo "8192cu" &gt; /etc/modules-load.d/8192cu.conf
 
@@ -616,7 +619,7 @@ mkdir -p /sdcard/factory/wifi/cudy
 cd /sdcard/factory/wifi/cudy
 
 #wget https://www.cudytech.com/filedownload/407543
-wget $download_prefix/build/407543
+wget --no-check-certificate $download_prefix/build/407543
 
 unzip 407543
 
@@ -1164,7 +1167,7 @@ apt-get -q -y install libboost-chrono-dev libboost-system-dev || exit 1
 
 df -h
 
-#sudo cp /usr/bin/wget.org /usr/bin/wget
+sudo cp /usr/bin/wget.org /usr/bin/wget
 sudo cp /tmp/wget.log ~
 </command>
       <execEachLine>false</execEachLine>

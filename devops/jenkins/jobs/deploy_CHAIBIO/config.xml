@@ -13,7 +13,7 @@
         </hudson.model.StringParameterDefinition>
         <com.syhuang.hudson.plugins.listgitbranchesparameter.ListGitBranchesParameterDefinition plugin="list-git-branches-parameter@0.0.9">
           <name>build_branch</name>
-          <uuid>8dd2b54a-f154-4df3-91e0-664d6c832249</uuid>
+          <uuid>6de8d9f2-e848-47f9-b900-d361224bf03f</uuid>
           <remoteURL>https://github.com/chaibio/chaipcr</remoteURL>
           <credentialsId/>
           <defaultValue/>
@@ -318,13 +318,13 @@ ENDSSH
         
 		sudo apt-get -y -q install build-essential
 		sudo apt-get -y -q install curl
-		sudo apt-get -y -q install gpg
+		#sudo apt-get -y -q install gpg
 
-		sudo gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 || true
+		sudo gpg --keyserver keyserver.ubuntu.com --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 || true
 		cd /tmp 
 		curl -sSL https://get.rvm.io -o rvm.sh || true
 		less /tmp/rvm.sh || true
- 		sudo gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 || true
+ 		sudo gpg --keyserver keyserver.ubuntu.com --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 || true
         
         sudo cat /tmp/rvm.sh | bash -s stable --rails || true
 		if [ -e ~/.rvm/scripts/rvm ]
@@ -1479,6 +1479,12 @@ fsck /dev/mmcblk1p1 -y -f
 
 mount /dev/mmcblk0p1 /sdcard/factory/ || true
 mount /dev/mmcblk0p2 /sdcard/upgrade/ || true
+
+if [ -e /usr/bin/wget.org ]
+then
+    sudo mv /usr/bin/wget.org /usr/bin/wget
+fi
+
 
 df -h
 
