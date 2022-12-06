@@ -930,6 +930,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         last_target_assigned = 0
 
       $scope.onChangeScrollView = (direction, event) ->
+        $('.right-table-box').css({minWidth: '600px'})
         if event and (angular.element(event.target).hasClass('switch-item') or angular.element(event.target).hasClass('view-mode-switch'))
           return
 

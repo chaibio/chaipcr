@@ -81,7 +81,7 @@ function fixedResultHeader($timeout, $window, $rootScope) {
             // reset display styles so column widths are correct when measured below
             var tableOffsetHeight = elem.attributes.offset ? parseInt(elem.attributes.offset.value) : 0;
             var tableMinWidth = elem.attributes['min-width'] ? parseInt(elem.attributes['min-width'].value) : 0;
-            $(elem).css({minWidth: (tableMinWidth - 2) + 'px'});
+            $(elem).css({minWidth: '100%'});
             $(elem).css({width: '100%'});
             var parentWidth = angular.element(elem).parent()[0].offsetWidth;
 
@@ -101,7 +101,7 @@ function fixedResultHeader($timeout, $window, $rootScope) {
             var scrollHeight = Math.abs(angular.element(elem).parent()[0].offsetHeight - angular.element(elem).parent()[0].scrollHeight);
 
             var tableHeight = trHeight * trCount + thHeight;
-            var tbodyHeight = (parentHeight > tableHeight + scrollHeight) ? tableHeight - thHeight : parentHeight - thHeight - scrollHeight;
+            var tbodyHeight = (parentHeight > tableHeight + scrollHeight) ? tableHeight - thHeight : parentHeight - thHeight;
 
             $timeout(function () {
                 // set widths of columns
@@ -182,7 +182,7 @@ function fixedResultHeader($timeout, $window, $rootScope) {
                 if(lastColumn){
                     lastColumn.style.width = lastColumnWidth + 'px';
                 }
-            });
+            }, 100);
 
         }
     }
