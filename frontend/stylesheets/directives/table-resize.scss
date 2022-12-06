@@ -5,11 +5,11 @@ table.rz-table {
     position: relative;
     min-width: 25px;
     .rz-handle {
-      width: 10px;
+      width: 8px;
       height: 100%;
       position: absolute;
       top: 0;
-      right: 0;
+      right: -3px;
       cursor: ew-resize !important;
       &:after{
         content: '\2807';

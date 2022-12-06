@@ -975,6 +975,14 @@
       justify-content: center;
     }
 
+    .item-right{
+      justify-content: flex-end;
+    }
+
+    .item-blank{
+      min-width: 0px !important;
+    }
+
     table {
       width: 100%;
       background: white;
@@ -1007,7 +1015,7 @@
         align-items: center;
 
         &.target-header{
-          padding: 5px 10px;
+          padding: 5px;
           span{
             display: block;
             height: 100%;

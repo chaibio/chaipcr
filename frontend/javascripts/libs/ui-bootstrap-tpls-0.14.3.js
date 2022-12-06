@@ -5099,6 +5099,10 @@ angular.module('ui.bootstrap.tooltip', ['ui.bootstrap.position', 'ui.bootstrap.s
               cancelShow();
               cancelHide();
 
+              if($(element)[0].scrollWidth <= $(element).innerWidth()){
+                return angular.noop;
+              }
+
               // Don't show empty tooltips.
               if (!ttScope.content) {
                 return angular.noop;

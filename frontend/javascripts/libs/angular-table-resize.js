@@ -241,8 +241,9 @@ angular.module("rzTable").directive('rzTable', ['resizeStorage', '$injector', '$
 
             $(column).parents('.rz-table').css({width: newTableWidth + 'px' });
             var chartContainerWidth = $(column).parents('.content').children('.chart-section').width();
-            var newContentWidth = chartContainerWidth + newTableWidth + 2;
-            $(column).parents('.chart-screen-wapper').css({minWidth: newContentWidth + 'px'});
+            var newContentWidth = newTableWidth + 2;
+
+            $(column).parents('.right-table-box').css({minWidth: newContentWidth + 'px'});
 
         }
     }

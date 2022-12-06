@@ -69,7 +69,8 @@ App.directive 'aspectRatio', [
         elem.css('min-height': height)
         elem.css('height': height)    
         angular.element('.choose-chart').removeClass('small')
-        angular.element('.chart-screen-wapper').css('min-width': 1368)
+        # angular.element('.chart-screen-wapper').css('min-width': 1368)
+        angular.element('.chart-screen-wapper').css('min-width': 0)
 
         elem.parent().children().last().get(0).style.height = height + "px"
         angular.element(elem.parent().children().last().get(0)).children().last().get(0).style.height = height - $scope.offsetTop + "px"
@@ -126,7 +127,8 @@ App.directive 'aspectRatio', [
         else
           angular.element('.choose-chart').addClass('small')
 
-        angular.element('.chart-screen-wapper').css('min-width': width + 40 + 620)
+        # angular.element('.chart-screen-wapper').css('min-width': width + 40 + 620)
+        angular.element('.chart-screen-wapper').css('min-width': 0)
 
         return
 
