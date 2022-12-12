@@ -234,207 +234,209 @@ limitations under the License.
       </div>
     </div>
     <div class="table-container" force="true">
-      <div class="right-table-box" style="height: 100%; min-width: 600px;">
-        <div class="view-mode-panel" ng-click="onChangeScrollView('right', $event)">
-          <span class="CB4">Table View</span>
-          <div class="view-mode-switch" ng-click="onChangeViewMode()">
-            <div class="switch-item CB4" ng-class="{'active': isSampleMode}">Simple</div>
-            <div class="switch-item CB4" ng-class="{'active': !isSampleMode}">Detailed</div>
-          </div>
+      <div class="view-mode-panel" ng-click="onChangeScrollView('right', $event)">
+        <span class="CB4">Table View</span>
+        <div class="view-mode-switch" ng-click="onChangeViewMode()">
+          <div class="switch-item CB4" ng-class="{'active': isSampleMode}">Simple</div>
+          <div class="switch-item CB4" ng-class="{'active': !isSampleMode}">Detailed</div>
         </div>
-        <table fixed-result-header rz-table offset="60" min-width="540" ng-show="!isSampleMode" rz-busy="isSampleMode" class="detail-mode-table" id="detail_mode_table">
-          <thead>
-            <tr>
-              <th class="CB4-M item-center" width="35px">Clr</th>
-              <th class="CB4-M item-center" width="40px">Omit</th>
-              <th class="CB4-M item-center" width="45px" >Well</th>
-              <th class="CB4-M resizable" width="20%" >Sample</th>
-              <th class="CB4-M item-center" width="50px">Type</th>
-              <th class="CB4-M resizable" width="20%">Target</th>
-              <th class="CB4-M item-right resizable target-header" width="15%"><span>C<sub>q</sub></span></th>
-              <th class="CB4-M item-right resizable target-header" width="15%"><span>C<sub>q</sub> M</span></th>
-              <th class="CB4-M item-right resizable target-header" width="15%"><span>Qty</span></th>
-              <th class="CB4-M item-right resizable target-header" width="15%"><span>Qty M</span></th>
-              <th class="CB4-M item-blank" width="0px" ></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr ng-repeat="well_item in well_data" 
-              ng-class="{
-                selected: !has_init || (
-                  (wellButtons['well_' + (well_item.well_num - 1)].selected) &&                 
-                  (targetsSetHided[targets[chartConfig.channels * (well_item.well_num - 1) + well_item.channel - 1].id])),
-                active: well_item.active,
-                highlight: well_item.highlight,
-                omitted: (omittedIndexes.indexOf(well_item.well_num.toString() + '_' + well_item.channel.toString()) != -1)
-              }"
-              ng-if="well_item.target_id"
-              ng-mousemove="onHoverRow($event, well_item, $index)"
-              class="well-item-row"
-            >
-              <td class="CB4 item-center" ng-click="onSelectRow(well_item, $index)" style="background: #fff">
-                <span ng-if="color_by==='well'" class="CB4 dot" ng-attr-style="background-color: {{wellButtons['well_'+(well_item.well_num - 1)].color}}"></span>
-                <span 
-                  ng-if="color_by==='sample'" 
-                  class="CB4 dot" 
-                  ng-attr-style="background-color: {{(samples[well_item.well_num - 1]) ? samples[well_item.well_num - 1].color : init_sample_color}}"></span>
-                <span 
-                  ng-if="color_by==='target'" 
-                  class="CB4 dot" 
-                  ng-attr-style="background-color: {{targets[chartConfig.channels * (well_item.well_num - 1) + well_item.channel - 1].color}}"></span>
-              </td>
-              <td class="CB4 item-center" style="border-top-left-radius: 3px;border-bottom-left-radius: 3px;">
-                <div 
-                    class="checkbox-wrapper B1B" ng-click="toggleOmitIndex(well_item)" 
-                    ng-class="{ 'selected': omittedIndexes.indexOf(well_item.well_num.toString() + '_' + well_item.channel.toString()) != -1}">
-                  <label class="outer-line"></label>
-                </div>                 
-              </td>
-              <td class="CB4 item-center" ng-click="onSelectRow(well_item, $index)">
-                <span class="CB4 text">
-                  <span ng-show="well_item.well_num < 9">
-                    A{{well_item.well_num}}
-                  </span>
-                  <span ng-show="well_item.well_num > 8">
-                    B{{well_item.well_num-8}}
-                  </span>
-                </span>
-              </td>
-              <td class="CB4" ng-click="onSelectRow(well_item, $index)">
-                <span class="one-line-span" uib-tooltip="{{samples[well_item.well_num - 1].name}}">{{samples[well_item.well_num - 1].name}}</span>
-              </td>
-              <td class="CB4 type-td item-center" ng-click="onSelectRow(well_item, $index)">
-                <span class="CB4 type-span" style="width: 20px; height: 20px;" ng-if="well_item.well_type">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" ng-if="well_item.well_type == 'standard'"><defs><style>.cls-1{fill:#fff;}.cls-2{stroke:#000;stroke-miterlimit:10;}</style></defs><g id="Layer_2" data-name="Layer 2"><g id="Symbol_Editing_Mode" data-name="Symbol Editing Mode"><g id="New_Symbol_8" data-name="New Symbol 8"><circle class="cls-1" cx="25" cy="25" r="23"/><path class="icon-path" d="M25,4A21,21,0,1,1,4,25,21,21,0,0,1,25,4m0-4A25,25,0,1,0,50,25,25,25,0,0,0,25,0Z"/><path class="icon-path" d="M24.59,32.32c-2.7,0-4.75-.58-6.5-2.35l2.25-2.25a5.84,5.84,0,0,0,4.3,1.5c2.05,0,3.15-.78,3.15-2.2a2,2,0,0,0-.55-1.5,2.65,2.65,0,0,0-1.58-.63l-2.15-.3a6,6,0,0,1-3.45-1.47,4.7,4.7,0,0,1-1.27-3.5c0-3.17,2.35-5.4,6.2-5.4a7.62,7.62,0,0,1,5.75,2.08l-2.2,2.17a5,5,0,0,0-3.65-1.22c-1.85,0-2.75,1-2.75,2.24a1.74,1.74,0,0,0,.52,1.28,3.12,3.12,0,0,0,1.65.7l2.1.3a5.84,5.84,0,0,1,3.4,1.37,5,5,0,0,1,1.37,3.78C31.18,30.37,28.31,32.32,24.59,32.32Z"/></g></g></g></svg>
-
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" ng-if="well_item.well_type == 'positive_control'"><defs><style>.cls-1{fill:#fff;}.cls-2{stroke:#000;stroke-miterlimit:10;}</style></defs><title>ring_plus</title><g id="Layer_2" data-name="Layer 2"><g id="Symbol_Editing_Mode" data-name="Symbol Editing Mode"><g id="New_Symbol_7" data-name="New Symbol 7"><circle class="cls-1" cx="25" cy="25" r="23"/><path class="icon-path" d="M25,4A21,21,0,1,1,4,25,21,21,0,0,1,25,4m0-4A25,25,0,1,0,50,25,25,25,0,0,0,25,0Z"/><path class="cls-2 icon-path" d="M26.33,26.32V31H23.67v-4.7H19V23.66h4.7V19h2.66v4.68H31v2.66Z"/></g></g></g></svg>
-
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" ng-if="well_item.well_type == 'negative_control'"><defs><style>.cls-1{fill:#fff;}.cls-2{stroke:#000;stroke-miterlimit:10;}</style></defs><title>ring_neg</title><g id="Layer_2" data-name="Layer 2"><g id="Symbol_Editing_Mode" data-name="Symbol Editing Mode"><g id="New_Symbol_6" data-name="New Symbol 6"><circle class="cls-1" cx="25" cy="25" r="23"/><path class="icon-path" d="M25,4A21,21,0,1,1,4,25,21,21,0,0,1,25,4m0-4A25,25,0,1,0,50,25,25,25,0,0,0,25,0Z"/><path class="cls-2 icon-path" d="M19,26.33V23.67H31v2.66Z"/></g></g></g></svg>
-
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" ng-if="well_item.well_type == 'unknown'"><defs><style>.cls-1{fill:#fff;}</style></defs><title>ring_u</title><g id="Layer_2" data-name="Layer 2"><g id="Symbol_Editing_Mode" data-name="Symbol Editing Mode"><g id="New_Symbol_5" data-name="New Symbol 5"><circle class="cls-1" cx="25" cy="25" r="23"/><path class="icon-path" d="M25,4A21,21,0,1,1,4,25,21,21,0,0,1,25,4m0-4A25,25,0,1,0,50,25,25,25,0,0,0,25,0Z"/><path class="icon-path" d="M25,32.29a5,5,0,0,1-5.24-5V17.92h2.78v9.27a2.47,2.47,0,1,0,4.94,0V17.92h2.76v9.37A5,5,0,0,1,25,32.29Z"/></g></g></g></svg>
-                </span>
-              </td>
-              <td class="CB4" ng-click="onSelectRow(well_item, $index)">
-                <span class="one-line-span">{{well_item.target_name | truncate:30}}</span>              
-              </td>
-              <td class="CB4 item-right" ng-click="onSelectRow(well_item, $index)">
-                <span class="CB4" >
-                  <span class="CB4" ng-show="well_item.cq > 0">
-                    {{well_item.cq | round:2}}
-                  </span>
-                  <span class="CB4" ng-show="well_item.cq <= 0">
-                    <span class="CB4 dummy-placeholder">&nbsp;</span>
-                  </span>
-                </span>
-              </td>
-              <td class="CB4 item-right" ng-click="onSelectRow(well_item, $index)">
-                <span class="CB4">
-                  <span class="CB4" ng-show="well_item.mean_cq > 0">
-                    {{well_item.mean_cq | round:2}}
-                  </span>
-                  <span class="CB4" ng-show="well_item.mean_cq <= 0">
-                    <span class="CB4 dummy-placeholder">&nbsp;</span>
-                  </span>
-                </span>
-              </td>
-              <td class="CB4 item-right" ng-click="onSelectRow(well_item, $index)">
-                <span class="CB4" ng-show="well_item.quantity > 0">
-                  {{well_item.quantity | fixedDigit:6}}
-                </span>
-                <span class="CB4" ng-show="well_item.quantity <= 0">
-                  <span class="CB4 dummy-placeholder">&nbsp;</span>
-                </span>
-              </td>
-              <td class="CB4 item-right" style="border-top-right-radius: 3px;border-bottom-right-radius: 3px;" ng-click="onSelectRow(well_item, $index)">
-                <span class="CB4" ng-show="well_item.mean_quantity > 0">
-                  {{well_item.mean_quantity | fixedDigit:6}}
-                </span>
-                <span class="CB4" ng-show="well_item.mean_quantity <= 0">
-                  <span class="CB4 dummy-placeholder">&nbsp;</span>
-                </span>
-              </td>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
-        <table fixed-result-header rz-table offset="60" min-width="400" ng-show="isSampleMode" rz-busy="!isSampleMode" class="simple-mode-table" id="simple_mode_table">
-          <thead>
-            <tr>
-              <th class="CB4-M item-center" width="50px">Clr</th>
-              <th class="CB4-M item-center" width="50px" >Well</th>
-              <th class="CB4-M resizable" width="240px" >Sample</th>
-              <th class="CB4-M item-right target-header resizable" 
-                  width="105px" 
-                  ng-repeat="target in targetsSet"
-                  ng-if="targetsSetHided[target.id]"
-              >
-                <span class="one-line-span" ng-attr-style="background-color: {{color_by == 'target' ? target.color : 'transparent'}};">{{target.name | truncate:5:1}}. C<sub>q</sub></span>
-              </th>
-              <th class="CB4-M item-blank" width="0px" ></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr ng-repeat="well_item in simple_well_data" 
-              ng-class="{
-                selected: !has_init || (wellButtons['well_' + (well_item.well_num - 1)].selected),
-                active: well_item.active || isTargetHover(well_item),
-                highlight: well_item.highlight,
-              }"            
-              class="well-item-row"
-              ng-mousemove="onHoverSimpleRow($event, well_item)"
-            >
-              <td class="CB4 item-center" style="background: #fff">
-                <span ng-if="color_by==='well'" class="CB4 dot" ng-attr-style="background-color: {{wellButtons['well_'+(well_item.well_num - 1)].color}}"></span>
-                <span 
-                  ng-if="color_by==='sample'" 
-                  class="CB4 dot" 
-                  ng-attr-style="background-color: {{(samples[well_item.well_num - 1]) ? samples[well_item.well_num - 1].color : init_sample_color}}"></span>
-                <span 
-                  ng-if="color_by==='target'"
-                  class="CB4 dot" 
-                  style="background-color: #D1D1D1;"></span>
-              </td>
-              <td class="CB4 item-center" style="border-top-left-radius: 3px;border-bottom-left-radius: 3px;">
-                <span class="CB4 text">
-                  <span ng-show="well_item.well_num < 9">
-                    A{{well_item.well_num}}
-                  </span>
-                  <span ng-show="well_item.well_num > 8">
-                    B{{well_item.well_num-8}}
-                  </span>
-                </span>
-              </td>
-              <td class="CB4">
-                <span class="one-line-span" uib-tooltip="{{samples[well_item.well_num - 1].name}}">{{samples[well_item.well_num - 1].name}}</span>
-              </td>
-              <td 
-                class="CB4 item-right target-cell" 
+      </div>
+      <div class="table-box" style="height: calc(100% - 60px);">
+        <div class="right-table-box" style="height: 100%; min-width: 600px;">
+          <table fixed-result-header rz-table offset="0" min-width="540" ng-show="!isSampleMode" rz-busy="isSampleMode" class="detail-mode-table" id="detail_mode_table">
+            <thead>
+              <tr>
+                <th class="CB4-M item-center" width="35px">Clr</th>
+                <th class="CB4-M item-center" width="40px">Omit</th>
+                <th class="CB4-M item-center" width="45px" >Well</th>
+                <th class="CB4-M resizable" width="20%" ><span class="one-line-span">Sample</span></th>
+                <th class="CB4-M item-center" width="50px">Type</th>
+                <th class="CB4-M resizable" width="20%"><span class="one-line-span">Target</span></th>
+                <th class="CB4-M item-right resizable target-header" width="15%"><span class="one-line-span">C<sub>q</sub></span></th>
+                <th class="CB4-M item-right resizable target-header" width="15%"><span class="one-line-span">C<sub>q</sub> M</span></th>
+                <th class="CB4-M item-right resizable target-header" width="15%"><span class="one-line-span">Qty</span></th>
+                <th class="CB4-M item-right resizable target-header" width="15%"><span class="one-line-span">Qty M</span></th>
+                <th class="CB4-M item-blank" width="0px" ></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="well_item in well_data" 
                 ng-class="{
-                  assigned: well_target.assigned, 
-                  selected: well_target.selected, 
-                  omitted: (well_target.assigned && omittedIndexes.indexOf(well_item.well_num.toString() + '_' + well_target.channel.toString()) != -1)                
+                  selected: !has_init || (
+                    (wellButtons['well_' + (well_item.well_num - 1)].selected) &&                 
+                    (targetsSetHided[targets[chartConfig.channels * (well_item.well_num - 1) + well_item.channel - 1].id])),
+                  active: well_item.active,
+                  highlight: well_item.highlight,
+                  omitted: (omittedIndexes.indexOf(well_item.well_num.toString() + '_' + well_item.channel.toString()) != -1)
                 }"
-                ng-repeat="well_target in well_item.targets" 
-                ng-if="targetsSetHided[well_target.target_id]"
-                ng-click="onSelectSimpleRow($event, well_item, well_target)"
-                data-channel="{{well_target.channel}}"
+                ng-if="well_item.target_id"
+                ng-mousemove="onHoverRow($event, well_item, $index)"
+                class="well-item-row"
               >
-                <span 
-                  class="CB4"
-                  ng-attr-style="border-color: {{well_target.color}}"
-                >
-                  <span class="CB4" ng-show="well_target.cq > 0">
-                    {{well_target.cq | round:2}}
+                <td class="CB4 item-center" ng-click="onSelectRow(well_item, $index)" style="background: #fff">
+                  <span ng-if="color_by==='well'" class="CB4 dot" ng-attr-style="background-color: {{wellButtons['well_'+(well_item.well_num - 1)].color}}"></span>
+                  <span 
+                    ng-if="color_by==='sample'" 
+                    class="CB4 dot" 
+                    ng-attr-style="background-color: {{(samples[well_item.well_num - 1]) ? samples[well_item.well_num - 1].color : init_sample_color}}"></span>
+                  <span 
+                    ng-if="color_by==='target'" 
+                    class="CB4 dot" 
+                    ng-attr-style="background-color: {{targets[chartConfig.channels * (well_item.well_num - 1) + well_item.channel - 1].color}}"></span>
+                </td>
+                <td class="CB4 item-center" style="border-top-left-radius: 3px;border-bottom-left-radius: 3px;">
+                  <div 
+                      class="checkbox-wrapper B1B" ng-click="toggleOmitIndex(well_item)" 
+                      ng-class="{ 'selected': omittedIndexes.indexOf(well_item.well_num.toString() + '_' + well_item.channel.toString()) != -1}">
+                    <label class="outer-line"></label>
+                  </div>                 
+                </td>
+                <td class="CB4 item-center" ng-click="onSelectRow(well_item, $index)">
+                  <span class="CB4 text">
+                    <span ng-show="well_item.well_num < 9">
+                      A{{well_item.well_num}}
+                    </span>
+                    <span ng-show="well_item.well_num > 8">
+                      B{{well_item.well_num-8}}
+                    </span>
                   </span>
-                  <span class="CB4" ng-show="well_target.cq <= 0">
+                </td>
+                <td class="CB4" ng-click="onSelectRow(well_item, $index)">
+                  <span class="one-line-span" uib-tooltip="{{samples[well_item.well_num - 1].name}}">{{samples[well_item.well_num - 1].name}}</span>
+                </td>
+                <td class="CB4 type-td item-center" ng-click="onSelectRow(well_item, $index)">
+                  <span class="CB4 type-span" style="width: 20px; height: 20px;" ng-if="well_item.well_type">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" ng-if="well_item.well_type == 'standard'"><defs><style>.cls-1{fill:#fff;}.cls-2{stroke:#000;stroke-miterlimit:10;}</style></defs><g id="Layer_2" data-name="Layer 2"><g id="Symbol_Editing_Mode" data-name="Symbol Editing Mode"><g id="New_Symbol_8" data-name="New Symbol 8"><circle class="cls-1" cx="25" cy="25" r="23"/><path class="icon-path" d="M25,4A21,21,0,1,1,4,25,21,21,0,0,1,25,4m0-4A25,25,0,1,0,50,25,25,25,0,0,0,25,0Z"/><path class="icon-path" d="M24.59,32.32c-2.7,0-4.75-.58-6.5-2.35l2.25-2.25a5.84,5.84,0,0,0,4.3,1.5c2.05,0,3.15-.78,3.15-2.2a2,2,0,0,0-.55-1.5,2.65,2.65,0,0,0-1.58-.63l-2.15-.3a6,6,0,0,1-3.45-1.47,4.7,4.7,0,0,1-1.27-3.5c0-3.17,2.35-5.4,6.2-5.4a7.62,7.62,0,0,1,5.75,2.08l-2.2,2.17a5,5,0,0,0-3.65-1.22c-1.85,0-2.75,1-2.75,2.24a1.74,1.74,0,0,0,.52,1.28,3.12,3.12,0,0,0,1.65.7l2.1.3a5.84,5.84,0,0,1,3.4,1.37,5,5,0,0,1,1.37,3.78C31.18,30.37,28.31,32.32,24.59,32.32Z"/></g></g></g></svg>
+
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" ng-if="well_item.well_type == 'positive_control'"><defs><style>.cls-1{fill:#fff;}.cls-2{stroke:#000;stroke-miterlimit:10;}</style></defs><title>ring_plus</title><g id="Layer_2" data-name="Layer 2"><g id="Symbol_Editing_Mode" data-name="Symbol Editing Mode"><g id="New_Symbol_7" data-name="New Symbol 7"><circle class="cls-1" cx="25" cy="25" r="23"/><path class="icon-path" d="M25,4A21,21,0,1,1,4,25,21,21,0,0,1,25,4m0-4A25,25,0,1,0,50,25,25,25,0,0,0,25,0Z"/><path class="cls-2 icon-path" d="M26.33,26.32V31H23.67v-4.7H19V23.66h4.7V19h2.66v4.68H31v2.66Z"/></g></g></g></svg>
+
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" ng-if="well_item.well_type == 'negative_control'"><defs><style>.cls-1{fill:#fff;}.cls-2{stroke:#000;stroke-miterlimit:10;}</style></defs><title>ring_neg</title><g id="Layer_2" data-name="Layer 2"><g id="Symbol_Editing_Mode" data-name="Symbol Editing Mode"><g id="New_Symbol_6" data-name="New Symbol 6"><circle class="cls-1" cx="25" cy="25" r="23"/><path class="icon-path" d="M25,4A21,21,0,1,1,4,25,21,21,0,0,1,25,4m0-4A25,25,0,1,0,50,25,25,25,0,0,0,25,0Z"/><path class="cls-2 icon-path" d="M19,26.33V23.67H31v2.66Z"/></g></g></g></svg>
+
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" ng-if="well_item.well_type == 'unknown'"><defs><style>.cls-1{fill:#fff;}</style></defs><title>ring_u</title><g id="Layer_2" data-name="Layer 2"><g id="Symbol_Editing_Mode" data-name="Symbol Editing Mode"><g id="New_Symbol_5" data-name="New Symbol 5"><circle class="cls-1" cx="25" cy="25" r="23"/><path class="icon-path" d="M25,4A21,21,0,1,1,4,25,21,21,0,0,1,25,4m0-4A25,25,0,1,0,50,25,25,25,0,0,0,25,0Z"/><path class="icon-path" d="M25,32.29a5,5,0,0,1-5.24-5V17.92h2.78v9.27a2.47,2.47,0,1,0,4.94,0V17.92h2.76v9.37A5,5,0,0,1,25,32.29Z"/></g></g></g></svg>
+                  </span>
+                </td>
+                <td class="CB4" ng-click="onSelectRow(well_item, $index)">
+                  <span class="one-line-span">{{well_item.target_name}}</span>              
+                </td>
+                <td class="CB4 item-right" ng-click="onSelectRow(well_item, $index)">
+                  <span class="CB4 one-line-span" >
+                    <span class="CB4" ng-show="well_item.cq > 0">
+                      {{well_item.cq | round:2}}
+                    </span>
+                    <span class="CB4" ng-show="well_item.cq <= 0">
+                      <span class="CB4 dummy-placeholder">&nbsp;</span>
+                    </span>
+                  </span>
+                </td>
+                <td class="CB4 item-right" ng-click="onSelectRow(well_item, $index)">
+                  <span class="CB4 one-line-span">
+                    <span class="CB4" ng-show="well_item.mean_cq > 0">
+                      {{well_item.mean_cq | round:2}}
+                    </span>
+                    <span class="CB4" ng-show="well_item.mean_cq <= 0">
+                      <span class="CB4 dummy-placeholder">&nbsp;</span>
+                    </span>
+                  </span>
+                </td>
+                <td class="CB4 item-right" ng-click="onSelectRow(well_item, $index)">
+                  <span class="CB4 one-line-span" ng-show="well_item.quantity > 0">
+                    {{well_item.quantity | fixedDigit:6}}
+                  </span>
+                  <span class="CB4" ng-show="well_item.quantity <= 0">
                     <span class="CB4 dummy-placeholder">&nbsp;</span>
                   </span>
-                </span>
-              </td>
-              <td>
-            </tr>
-          </tbody>
-        </table>
+                </td>
+                <td class="CB4 item-right" ng-click="onSelectRow(well_item, $index)">
+                  <span class="CB4 one-line-span" ng-show="well_item.mean_quantity > 0">
+                    {{well_item.mean_quantity | fixedDigit:6}}
+                  </span>
+                  <span class="CB4" ng-show="well_item.mean_quantity <= 0">
+                    <span class="CB4 dummy-placeholder">&nbsp;</span>
+                  </span>
+                </td>
+                <td style="border-top-right-radius: 3px;border-bottom-right-radius: 3px;"></td>
+              </tr>
+            </tbody>
+          </table>
+          <table fixed-result-header rz-table offset="0" min-width="400" ng-show="isSampleMode" rz-busy="!isSampleMode" class="simple-mode-table" id="simple_mode_table">
+            <thead>
+              <tr>
+                <th class="CB4-M item-center" width="50px">Clr</th>
+                <th class="CB4-M item-center" width="50px" >Well</th>
+                <th class="CB4-M resizable" width="240px" ><span class="one-line-span">Sample</span></th>
+                <th class="CB4-M item-right target-header resizable" 
+                    width="105px" 
+                    ng-repeat="target in targetsSet"
+                    ng-if="targetsSetHided[target.id]"
+                >
+                  <span class="one-line-span" ng-attr-style="background-color: {{color_by == 'target' ? target.color : 'transparent'}};">{{target.name | truncate:5:1}} C<sub>q</sub></span>
+                </th>
+                <th class="CB4-M item-blank" width="0px" ></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="well_item in simple_well_data" 
+                ng-class="{
+                  selected: !has_init || (wellButtons['well_' + (well_item.well_num - 1)].selected),
+                  active: well_item.active || isTargetHover(well_item),
+                  highlight: well_item.highlight,
+                }"            
+                class="well-item-row"
+                ng-mousemove="onHoverSimpleRow($event, well_item)"
+              >
+                <td class="CB4 item-center" style="background: #fff">
+                  <span ng-if="color_by==='well'" class="CB4 dot" ng-attr-style="background-color: {{wellButtons['well_'+(well_item.well_num - 1)].color}}"></span>
+                  <span 
+                    ng-if="color_by==='sample'" 
+                    class="CB4 dot" 
+                    ng-attr-style="background-color: {{(samples[well_item.well_num - 1]) ? samples[well_item.well_num - 1].color : init_sample_color}}"></span>
+                  <span 
+                    ng-if="color_by==='target'"
+                    class="CB4 dot" 
+                    style="background-color: #D1D1D1;"></span>
+                </td>
+                <td class="CB4 item-center" style="border-top-left-radius: 3px;border-bottom-left-radius: 3px;">
+                  <span class="CB4 text">
+                    <span ng-show="well_item.well_num < 9">
+                      A{{well_item.well_num}}
+                    </span>
+                    <span ng-show="well_item.well_num > 8">
+                      B{{well_item.well_num-8}}
+                    </span>
+                  </span>
+                </td>
+                <td class="CB4">
+                  <span class="one-line-span" uib-tooltip="{{samples[well_item.well_num - 1].name}}">{{samples[well_item.well_num - 1].name}}</span>
+                </td>
+                <td 
+                  class="CB4 item-right target-cell" 
+                  ng-class="{
+                    assigned: well_target.assigned, 
+                    selected: well_target.selected, 
+                    omitted: (well_target.assigned && omittedIndexes.indexOf(well_item.well_num.toString() + '_' + well_target.channel.toString()) != -1)                
+                  }"
+                  ng-repeat="well_target in well_item.targets" 
+                  ng-if="targetsSetHided[well_target.target_id]"
+                  ng-click="onSelectSimpleRow($event, well_item, well_target)"
+                  data-channel="{{well_target.channel}}"
+                >
+                  <span 
+                    class="CB4 one-line-span"
+                    ng-attr-style="border-color: {{well_target.color}}"
+                  >
+                    <span class="CB4" ng-show="well_target.cq > 0">
+                      {{well_target.cq | round:2}}
+                    </span>
+                    <span class="CB4" ng-show="well_target.cq <= 0">
+                      <span class="CB4 dummy-placeholder">&nbsp;</span>
+                    </span>
+                  </span>
+                </td>
+                <td style="border-top-right-radius: 3px;border-bottom-right-radius: 3px;"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>

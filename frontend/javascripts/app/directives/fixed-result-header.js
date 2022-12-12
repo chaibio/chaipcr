@@ -20,6 +20,11 @@ function fixedResultHeader($timeout, $window, $rootScope) {
             }
         });
 
+        $scope.$watch(parentHeightChanged, function() {
+            console.log('--parentHeightChanged--');
+            transformTableOnResizeHeight();
+        });
+
         angular.element($window).on('resize', onResizeWindow);
 
         $rootScope.$on('sidemenu:toggle', function(){
@@ -53,7 +58,7 @@ function fixedResultHeader($timeout, $window, $rootScope) {
             if(overflow_style != head_flow){
                 transformTableOnResize();
             }
-            return angular.element(elem).parent().height();
+            return $(elem).parents(".table-box").height();
         }
 
 
@@ -65,8 +70,9 @@ function fixedResultHeader($timeout, $window, $rootScope) {
             return selected_count + omitted_count;
         }
 
-        function parentWidthChanged(){
-            return angular.element(elem).parent()[0].offsetWidth;
+        function parentHeightChanged(){
+
+            return $(elem).parent()[0].offsetHeight;
         }
 
         function tableColumnChanged(){
@@ -77,14 +83,13 @@ function fixedResultHeader($timeout, $window, $rootScope) {
             transformTableOnResize();
         }
 
-        function transformTableOnResize(){
-            // reset display styles so column widths are correct when measured below
+        function transformTableOnResizeHeight(){
             var tableOffsetHeight = elem.attributes.offset ? parseInt(elem.attributes.offset.value) : 0;
             var tableMinWidth = elem.attributes['min-width'] ? parseInt(elem.attributes['min-width'].value) : 0;
             $(elem).css({minWidth: '100%'});
             $(elem).css({width: '100%'});
-            var parentWidth = angular.element(elem).parent()[0].offsetWidth;
-
+            
+            var parentWidth = $(elem).parents(".table-box")[0].offsetWidth;
             var tbodyElems = elem.querySelector('tbody');
             var scrollWidth = Math.abs(tbodyElems.offsetWidth - tbodyElems.scrollWidth);
             var lastColumnWidth = elem.querySelector('thead tr:first-child th:last-child').attributes.width.value;
@@ -97,13 +102,51 @@ function fixedResultHeader($timeout, $window, $rootScope) {
             var thHeight = (elem.querySelector('thead tr:first-child th:last-child')) ? elem.querySelector('thead tr:first-child th:last-child').offsetHeight : 0;
             var trCount = (elem.querySelectorAll('tbody tr').length) ? elem.querySelectorAll('tbody tr').length : 0;
 
-            var parentHeight = angular.element(elem).parent()[0].offsetHeight - tableOffsetHeight;
-            var scrollHeight = Math.abs(angular.element(elem).parent()[0].offsetHeight - angular.element(elem).parent()[0].scrollHeight);
-
-            var tableHeight = trHeight * trCount + thHeight;
-            var tbodyHeight = (parentHeight > tableHeight + scrollHeight) ? tableHeight - thHeight : parentHeight - thHeight;
 
             $timeout(function () {
+                var parentHeight = $(elem).parents(".table-box")[0].offsetHeight - tableOffsetHeight;
+                var scrollHeight = Math.abs($(elem).parent()[0].offsetHeight - $(elem).parents(".table-box")[0].offsetHeight);
+
+                var tableHeight = trHeight * trCount + thHeight;
+                var tbodyHeight = (parentHeight > tableHeight + scrollHeight) ? tableHeight - thHeight - scrollHeight : parentHeight - thHeight - scrollHeight;
+
+                angular.element(elem.querySelectorAll('tbody')).css({
+                    'display': 'block',
+                    'height' : tbodyHeight + 'px',
+                    'overflow-y': 'auto',                    
+                });
+
+            }, 100);
+        }
+
+        function transformTableOnResize(){
+            // reset display styles so column widths are correct when measured below
+            var tableOffsetHeight = elem.attributes.offset ? parseInt(elem.attributes.offset.value) : 0;
+            var tableMinWidth = elem.attributes['min-width'] ? parseInt(elem.attributes['min-width'].value) : 0;
+            $(elem).css({minWidth: '100%'});
+            $(elem).css({width: '100%'});
+
+            var parentWidth = $(elem).parents(".table-box")[0].offsetWidth;
+            var tbodyElems = elem.querySelector('tbody');
+            var scrollWidth = Math.abs(tbodyElems.offsetWidth - tbodyElems.scrollWidth);
+            var lastColumnWidth = elem.querySelector('thead tr:first-child th:last-child').attributes.width.value;
+            lastColumnWidth = lastColumnWidth.replace('px', '');
+            var isScrollExist = tbodyElems.scrollHeight - tbodyElems.offsetHeight;
+
+            var trHeight = (elem.querySelector('tbody tr.selected td:last-child')) ? elem.querySelector('tbody tr.selected td:last-child').offsetHeight : 0;
+            trHeight = (trHeight == 0 && elem.querySelector('tbody tr.omitted td:last-child')) ? elem.querySelector('tbody tr.omitted td:last-child').offsetHeight : trHeight;
+
+            var thHeight = (elem.querySelector('thead tr:first-child th:last-child')) ? elem.querySelector('thead tr:first-child th:last-child').offsetHeight : 0;
+            var trCount = (elem.querySelectorAll('tbody tr').length) ? elem.querySelectorAll('tbody tr').length : 0;
+
+
+            $timeout(function () {
+                var parentHeight = $(elem).parents(".table-box")[0].offsetHeight - tableOffsetHeight;
+                var scrollHeight = Math.abs($(elem).parent()[0].offsetHeight - $(elem).parents(".table-box")[0].offsetHeight);
+
+                var tableHeight = trHeight * trCount + thHeight;
+                var tbodyHeight = (parentHeight > tableHeight + scrollHeight) ? tableHeight - thHeight - scrollHeight : parentHeight - thHeight - scrollHeight;
+
                 // set widths of columns
                 var fixedWidth = 0;
                 var parentBorder = 3;

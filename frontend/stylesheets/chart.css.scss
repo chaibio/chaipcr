@@ -915,6 +915,13 @@
     overflow-x: auto;
     background: #fff;
 
+    .table-box{
+      width: 100%;
+      height: 100%;
+      overflow-y: hidden;
+      overflow-x: auto;
+    }
+
     .view-mode-panel{
       display: flex;
       padding: 10px 20px;
@@ -990,6 +997,13 @@
 
       &.detail-mode-table{
         tr.active.selected.highlight{
+          &.tooltip-row{
+            td{
+              background: #ecfaff;
+              color: #000;
+              transition: all 0.3s ease-in;
+            }
+          }
           td{
             background: #09b0ef;
             color: #fff;
@@ -1062,6 +1076,12 @@
           }
 
           &.highlight{
+            &.tooltip-row{
+              td{
+                background: #ecfaff;
+                transition: all 0.3s ease-in;
+              }
+            }            
             td{
               background: #D6F5FF;
               display: flex;
@@ -1089,6 +1109,13 @@
         }
 
         &.active{
+          &.tooltip-row{
+            td{
+              background: #ecfaff;
+              transition: all 0.3s ease-in;
+              color: #000;
+            }
+          }
           td{
             background: #09b0ef;
             color: #fff;
@@ -1137,6 +1164,13 @@
           }
 
           &.highlight{
+            &.tooltip-row{
+              td{
+                background: #ecfaff;
+                transition: all 0.3s ease-in;
+              }
+            }
+
             td{
               background: #b5edfe;
               color: #000;

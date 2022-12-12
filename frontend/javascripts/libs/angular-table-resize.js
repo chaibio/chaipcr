@@ -250,6 +250,8 @@ angular.module("rzTable").directive('rzTable', ['resizeStorage', '$injector', '$
 
     function getMinWidth(column) {
         // "25px" -> 25
+        if($(column).hasClass('item-right')) return 55; // numeric field => 55px;
+
         return parseInt($(column).css('min-width')) || 0;
     }
 
