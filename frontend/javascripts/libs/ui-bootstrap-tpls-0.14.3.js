@@ -5094,6 +5094,14 @@ angular.module('ui.bootstrap.tooltip', ['ui.bootstrap.position', 'ui.bootstrap.s
               }
             }
 
+            function adjustParent(isOpen) {
+              if(isOpen){
+                $(element).parents(".well-item-row").addClass('tooltip-row');
+              } else {
+                $(element).parents(".well-item-row").removeClass('tooltip-row');
+              }
+            }
+
             // Show the tooltip popup element.
             function show() {
               cancelShow();
@@ -5109,6 +5117,8 @@ angular.module('ui.bootstrap.tooltip', ['ui.bootstrap.position', 'ui.bootstrap.s
               }
 
               createTooltip();
+
+              adjustParent(true);
 
               // And show the tooltip.
               ttScope.$evalAsync(function() {
@@ -5138,6 +5148,8 @@ angular.module('ui.bootstrap.tooltip', ['ui.bootstrap.position', 'ui.bootstrap.s
               if (!ttScope) {
                 return;
               }
+
+              adjustParent(false);
 
               // First things first: we don't show it anymore.
               ttScope.$evalAsync(function() {

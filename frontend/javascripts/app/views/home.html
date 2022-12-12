@@ -17,9 +17,9 @@
   limitations under the License.
   -->
 <div>
-  <div class="home-page-wrapper row" full-height offset="40">
+  <div class="home-page-wrapper">
     <!-- Left side of the home page -->
-    <div class="home-page-left-wing col-xs-6">
+    <div class="home-page-left-wing">
       <div class="home-page-new-logo"></div>
       <div class="home-page-welcome HBIG">Welcome, {{user.name}}</div>
       <div class="home-page-new-exp-container">
@@ -45,21 +45,23 @@
     </div>
     <!-- End of Left side of the home page -->
     <!-- Right side of the home page -->
-    <div class="home-page-right-wing  col-xs-6">
+    <div class="home-page-right-wing">
       <div class="home-page-exp-header-container">
         <div class="home-page-recent-exp H2">EXPERIMENTS</div>
         <div class="home-page-edit-exp-container">
           <button ng-click="deleteMode = !deleteMode" ng-class="{'home-page-edit-button': !deleteMode, 'home-page-edit-button-active': deleteMode, 'BL': 'true', 'space-edit-button': 'true'}">EDIT</button>
         </div>
-      </div>
-      <div class="loading home-page-exp-messages B1B" ng-show="experiments === null">Loading&nbsp;
-        <ellipsis-animated>
-          <ellipsis-animated/>
-      </div>
-      <p class="home-page-exp-messages B1B" ng-show="experiments !== null && experiments.length === 0">No experiments yet.</p>
-      <div class="home-page-exp-container" ng-if="experiments !== null && experiments.length !== 0">
-        <div class="exp-list-container" full-height force="true" doc="true" offset="(64 + 37)">
-          <div ng-repeat="exp in experiments " class="ovtrunc home-page-exp-tile">
+      </div>      
+      <div class="home-page-exp-container">
+        <div class="exp-list-container">
+          <div class="loading home-page-exp-messages" ng-if="experiments === null">
+            <div class="loading-animation">
+              <div class="dot-windmill"></div>
+            </div>
+            <p class="B1B">Loading</p>
+          </div>
+          <p class="home-page-exp-messages B1B" ng-if="experiments !== null && experiments.length === 0">No experiments yet.</p>
+          <div ng-repeat="exp in experiments " class="ovtrunc home-page-exp-tile" ng-if="experiments !== null && experiments.length !== 0">
             <div ng-mouseenter="mouseOver = true" class="home-page-tile-text ovtrunc" ng-mouseleave="mouseOver = false" ng-class="{'home-page-tile-text': true, 'home-page-tile-text-hover': mouseOver && !deleteMode}" ng-click="HomeCtrl.openExperiment(exp.experiment)">
               <a class="experiment-link" href="{{
                 (state.experiment_controller.machine.state == 'running' && exp.experiment.id == state.experiment_controller.experiment.id) ?   (    exp.experiment.type != 'test_kit' ?       '/#/experiments/' + exp.experiment.id + '/run-experiment?chart=amplification' :       '/#/dynexp/pika-test/experiment-running/' + exp.experiment.id  ) :   (    exp.experiment.type != 'test_kit' ?       (        exp.experiment.started_at ?           '/#/experiments/' + exp.experiment.id + '/run-experiment?chart=amplification' :           '/#/edit-protocol/' + exp.experiment.id      ) :       (        !exp.experiment.started_at ?           '/#/dynexp/pika-test/set-wells/' + exp.experiment.id :           (            exp.experiment.completed_at ?               '/#/dynexp/pika-test/experiment-result/' + exp.experiment.id :               '/#/dynexp/pika-test/experiment-running/' + exp.experiment.id          )      )  )
