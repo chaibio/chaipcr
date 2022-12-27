@@ -21,7 +21,6 @@ function fixedResultHeader($timeout, $window, $rootScope) {
         });
 
         $scope.$watch(parentHeightChanged, function() {
-            console.log('--parentHeightChanged--');
             transformTableOnResizeHeight();
         });
 
@@ -110,6 +109,7 @@ function fixedResultHeader($timeout, $window, $rootScope) {
                 var tableHeight = trHeight * trCount + thHeight;
                 var tbodyHeight = (parentHeight > tableHeight + scrollHeight) ? tableHeight - thHeight - scrollHeight : parentHeight - thHeight - scrollHeight;
 
+                console.log('--tableHeight--', tableHeight, tbodyHeight, parentHeight, scrollHeight);
                 angular.element(elem.querySelectorAll('tbody')).css({
                     'display': 'block',
                     'height' : tbodyHeight + 'px',
@@ -145,7 +145,7 @@ function fixedResultHeader($timeout, $window, $rootScope) {
                 var scrollHeight = Math.abs($(elem).parent()[0].offsetHeight - $(elem).parents(".table-box")[0].offsetHeight);
 
                 var tableHeight = trHeight * trCount + thHeight;
-                var tbodyHeight = (parentHeight > tableHeight + scrollHeight) ? tableHeight - thHeight - scrollHeight : parentHeight - thHeight - scrollHeight;
+                var tbodyHeight = (parentHeight > tableHeight + scrollHeight) ? tableHeight - thHeight : parentHeight - thHeight - scrollHeight;
 
                 // set widths of columns
                 var fixedWidth = 0;
