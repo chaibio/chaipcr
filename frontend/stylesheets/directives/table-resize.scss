@@ -5,19 +5,26 @@ table.rz-table {
     position: relative;
     min-width: 25px;
     .rz-handle {
-      width: 8px;
+      width: 15px;
       height: 100%;
       position: absolute;
       top: 0;
-      right: -3px;
+      right: -5px;
       cursor: ew-resize !important;
       &:after{
-        content: '\2807';
+        font-family: 'icomoon';
+        speak: none;
+        font-style: normal;
+        font-weight: normal;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1;
+
+        content: "\e900";
         font-size: 14px;
         position: absolute;
         top: 30%;
-        right: 0;
-        width: 7px;
+        right: 0;        
         color: #333;
       }
       &.rz-handle-active {
