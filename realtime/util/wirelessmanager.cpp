@@ -60,7 +60,6 @@ WirelessManager::WirelessManager()
     _scanTime = 0;
     _scanScheduleState = false;
 
-    loadWifiDriver();
     _interfaceStatusThreadStatus = Working;
     _interfaceStatusThread = std::thread(&WirelessManager::checkInterfaceStatus, this);
 }

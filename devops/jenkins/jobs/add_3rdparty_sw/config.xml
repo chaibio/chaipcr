@@ -583,13 +583,15 @@ fi
 
 echo install wifi firmware
 sudo apt-get -q -y install firmware-realtek || exit 1
- 
+
 apt install -y dkms
 
 echo installing 3rd party Edimax driver
 
 mkdir -p /sdcard/factory/wifi/edimax
 cd /sdcard/factory/wifi/edimax
+
+
 git clone https://github.com/pvaret/rtl8192cu-fixes.git
 cd rtl8192cu-fixes
 
@@ -604,8 +606,6 @@ depmod -a
 
 cp ./rtl8192cu-fixes/blacklist-native-rtl8192.conf /etc/modprobe.d/
 cp ./rtl8192cu-fixes/8192cu-disable-power-management.conf /etc/modprobe.d/
-
-echo "8192cu" &gt; /etc/modules-load.d/8192cu.conf
 
 ls -ahl /lib/modules/4.9.78-ti-chai-r94/updates/dkms/8192cu.ko || echo "Error: failed adding edimax 3rd party driver"
 
@@ -1103,7 +1103,8 @@ exit 0</command>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Install Ruby Packages
-gem install bundle
+#gem install bundle
+gem install bundler -v "~&gt;1.8.0, &lt;2.0.0" || true
 #apt-get -q -y install nodejs 
 #gem install nodejs
 </command>

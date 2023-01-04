@@ -1043,8 +1043,9 @@ echo Update Networking
 sed -i 's/#auto eth0/auto eth0/' /etc/network/interfaces
 sed -i 's/#iface eth0/iface eth0/' /etc/network/interfaces
 
-sed -i 's/#timeout 60/timeout 20/' /etc/dhcp/dhclient.conf
-sed -i 's/#retry 60/retry 20/' /etc/dhcp/dhclient.conf
+cp /etc/dhcp/dhclient.conf /etc/dhcp/dhclient.conf.bak
+#sed -i 's/#timeout 60/timeout 20/' /etc/dhcp/dhclient.conf
+#sed -i 's/#retry 60/retry 20/' /etc/dhcp/dhclient.conf
 sed -i 's/#reboot/reboot/' /etc/dhcp/dhclient.conf
 
 echo Disabling usb1
