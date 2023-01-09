@@ -605,7 +605,7 @@ dkms install 8192cu/1.11
 depmod -a
 
 cp ./rtl8192cu-fixes/blacklist-native-rtl8192.conf /etc/modprobe.d/
-cp ./rtl8192cu-fixes/8192cu-disable-power-management.conf /etc/modprobe.d/
+#cp ./rtl8192cu-fixes/8192cu-disable-power-management.conf /etc/modprobe.d/
 
 ls -ahl /lib/modules/4.9.78-ti-chai-r94/updates/dkms/8192cu.ko || echo "Error: failed adding edimax 3rd party driver"
 

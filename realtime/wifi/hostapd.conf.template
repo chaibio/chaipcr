@@ -1,5 +1,4 @@
 interface=INTERFACE
-driver=nl80211
 ssid=NAMEOFNETWORK
 hw_mode=g
 channel=7

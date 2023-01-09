@@ -714,7 +714,15 @@ network_watchdog_interface() {
 			sleep 60
 	                continue
 	        fi
-
+                if echo "$iface" | grep -q "wlan"
+                then
+                        if grep hostapd /etc/network/interfaces -q
+                        then
+                                echo Temprary ignoring the interface  $iface
+                                sleep 60
+                                continue
+                        fi
+                fi
                 ip_address=$(ifconfig $iface | grep 'inet addr:') || :
                 if [ -z "$ip_address" ]
                 then
