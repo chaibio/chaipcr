@@ -265,12 +265,15 @@ window.ChaiBioTech.ngApp.controller 'StandardCurveChartCtrl', [
               $scope.standardcurve_data = helper.neutralizeChartData(data.summary_data, data.targets, $scope.targets, $scope.is_dual_channel)
               $scope.line_data = helper.neutralizeLineData(data.targets)
 
-              minQt = if $scope.well_data[0] then $scope.well_data[0].quantity else 0
+              minQt = if $scope.well_data[0] then $scope.well_data[0].quantity else 1
               maxQt = 0
               minCq = if $scope.well_data[0] then $scope.well_data[0].cq else 0
               maxCq = 0
 
               for well_item in $scope.well_data by 1
+                maxQt = if isNaN(maxQt) then 1 else maxQt
+                minQt = if isNaN(minQt) then 1 else minQt
+
                 if well_item.quantity <= minQt and well_item.quantity then minQt = well_item.quantity
                 if well_item.quantity >= maxQt and well_item.quantity then maxQt = well_item.quantity
                 if well_item.cq <= minCq and well_item.cq then minCq = well_item.cq
