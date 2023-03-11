@@ -13,7 +13,7 @@
         </hudson.model.StringParameterDefinition>
         <com.syhuang.hudson.plugins.listgitbranchesparameter.ListGitBranchesParameterDefinition plugin="list-git-branches-parameter@0.0.9">
           <name>build_branch</name>
-          <uuid>6de8d9f2-e848-47f9-b900-d361224bf03f</uuid>
+          <uuid>8dd2b54a-f154-4df3-91e0-664d6c832249</uuid>
           <remoteURL>https://github.com/chaibio/chaipcr</remoteURL>
           <credentialsId/>
           <defaultValue/>
