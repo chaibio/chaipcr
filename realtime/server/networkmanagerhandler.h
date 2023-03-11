@@ -20,6 +20,8 @@
 #define NETWORKMANAGERHANDLER_H
 
 #include "jsonhandler.h"
+#include "networkinterfaces.h"
+
 
 class NetworkManagerHandler : public JsonHandler
 {
@@ -33,10 +35,17 @@ public:
         //Wifi
         WifiScan,
         WifiConnect,
-        WifiDisconnect
+        WifiDisconnect,
+
+        // Hotspot
+        HotspotSelect, 
+        WifiSelect, 
+        HotspotActivate, 
+        HotspotDeactivate
     };
 
     NetworkManagerHandler(const std::string &interfaceName, OperationType type);
+    NetworkInterfaces::InterfaceSettings& hotspotSettings();
 
 protected:
     void processData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt);
@@ -44,10 +53,17 @@ protected:
 private:
     void getStat(boost::property_tree::ptree &responsePt);
     void setSettings(const boost::property_tree::ptree &requestPt);
-
+    void setHotspotSettings(const boost::property_tree::ptree &requestPt);
+    
     void wifiScan(boost::property_tree::ptree &responsePt);
     void wifiConnect();
     void wifiDisconnect();
+
+    void hotspotSelect();
+    void wifiSelect();
+    bool hotspotActivate();
+    void hotspotDeactivate();
+
 
 private:
     std::string _interfaceName;

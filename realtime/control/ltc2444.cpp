@@ -63,7 +63,7 @@ int32_t LTC2444::readADC(uint8_t ch, bool SGL, bool lowerChannelPositive, Oversa
     data |= modeBits << 19;
 	
 	//read conversion value and write the settings for the nex conversion via SPI.
-    int32_t conversion;
+    int32_t conversion = 0;
 	//convert data to big endian
 	dataOut[0] = (data>>24);
 	dataOut[1] = (data>>16);

@@ -445,6 +445,18 @@ update_wireless_network () {
        rm /sdcard/upgrade/interfaces
     fi
 
+    if [ -e /sdcard/upgrade/hostapd.conf ]
+    then
+       cp /sdcard/upgrade/hostapd.conf /etc/hostapd/hostapd.conf
+       rm /sdcard/upgrade/hostapd.conf
+    fi
+
+    if [ -e /sdcard/upgrade/dnsmasq.conf ]
+    then
+       cp /sdcard/upgrade/dnsmasq.conf /etc/dnsmasq.conf
+       rm /sdcard/upgrade/dnsmasq.conf
+    fi
+
     if [ -e /etc/udev/rules.d/80-net-setup-link.rules ]
     then
        echo "Symbolic link already exists for overriding predictable names for WIFI interface - wlanX"
@@ -702,7 +714,15 @@ network_watchdog_interface() {
 			sleep 60
 	                continue
 	        fi
-
+                if echo "$iface" | grep -q "wlan"
+                then
+                        if grep hostapd /etc/network/interfaces -q
+                        then
+                                echo Temprary ignoring the interface  $iface
+                                sleep 60
+                                continue
+                        fi
+                fi
                 ip_address=$(ifconfig $iface | grep 'inet addr:') || :
                 if [ -z "$ip_address" ]
                 then

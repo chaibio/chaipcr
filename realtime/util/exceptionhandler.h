@@ -37,8 +37,12 @@ extern "C" {
 
 typedef void (*ThrowHandler)(void*,void*,void(*)(void*));
 
+bool g_bIgnoreExceptions = true;
+
 bool ignore_exception(void *exception, void *info)
 {
+    if(g_bIgnoreExceptions)
+        return true;
     if (reinterpret_cast<std::type_info*>(info)->before(typeid(std::exception)))
     {
         std::string message = reinterpret_cast<std::exception*>(exception)->what();

@@ -1,0 +1,43 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+auto eth0
+iface eth0 inet dhcp
+# Example to keep MAC address between reboots
+#hwaddress ether DE:AD:BE:EF:CA:FE
+
+##connman: ethX static config
+#connmanctl services
+#Using the appropriate ethernet service, tell connman to setup a static IP address for that service:
+#sudo connmanctl config <service> --ipv4 manual <ip_addr> <netmask> <gateway> --nameservers <dns_server>
+
+##connman: WiFi
+#
+#connmanctl
+#connmanctl> tether wifi off
+#connmanctl> enable wifi
+#connmanctl> scan wifi
+#connmanctl> services
+#connmanctl> agent on
+#connmanctl> connect wifi_*_managed_psk
+#connmanctl> quit
+
+# Ethernet/RNDIS gadget (g_ether)
+# Used by: /opt/scripts/boot/autoconfigure_usb0.sh
+iface usb0 inet static
+    address 192.168.7.2
+    netmask 255.255.255.252
+    network 192.168.7.0
+    gateway 192.168.7.1
+
+# Hotspot settings
+allow-hotplug INTERFACE
+iface INTERFACE inet static
+    hostapd /etc/hostapd/hostapd.conf
+    address 10.0.0.1
+    netmask 255.255.255.0

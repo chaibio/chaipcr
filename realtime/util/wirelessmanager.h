@@ -28,6 +28,7 @@
 #include <boost/noncopyable.hpp>
 
 #include <Poco/RWLock.h>
+#include "networkinterfaces.h"
 
 struct iw_range;
 
@@ -63,7 +64,8 @@ public:
         Connecting,
         ConnectionError,
         AuthenticationError,
-        Connected
+        Connected,
+        HotspotActive
     };
 
     WirelessManager();
@@ -71,21 +73,34 @@ public:
 
     std::string interfaceName() const;
 
+    // wifi
     void connect();
     void shutdown();
 
-    std::string getCurrentSsid() const;
+    // hotspot
+    void hotspotSelect();
+    void wifiSelect();
+    bool hotspotActivate();
+    void hotspotDeactivate();
 
+    NetworkInterfaces::InterfaceSettings& hotspotSettings() {return hotspot_settings;};
+
+    std::string getCurrentSsid() const;
     std::vector<ScanResult> scanResult();
 
     inline ConnectionStatus connectionStatus() const noexcept { return _connectionStatus; }
 
 private:
     void setInterfaceName(const std::string &name);
+    void loadWifiDriver();
 
     void stopCommands();
 
     void _connect();
+    void _hotspotSelect();
+    void _wifiSelect();
+    void _hotspotActivate();
+    void _hotspotDeactivate();
 
     void ifup();
     void ifdown();
@@ -93,6 +108,11 @@ private:
     void checkInterfaceStatus();
     void scan(const std::string &interface);
     void checkConnection(const std::string &interface);
+
+public:
+    static bool hotspotRetrieveInfo(std::string& interfacename, std::string& hotspot_ssid, std::string& hotspot_key );
+    bool isHotspotActive();
+
 
 private:
     enum OperationState
@@ -107,9 +127,11 @@ private:
 
     std::recursive_mutex _commandsMutex;
 
-    std::thread _connectionThread;
+    std::thread _connectionThread, _selectionThread, _hotspotThread;
     std::atomic<OperationState> _connectionThreadState;
     int _connectionEventFd;
+    
+    NetworkInterfaces::InterfaceSettings hotspot_settings;
 
     std::thread _shutdownThread;
 

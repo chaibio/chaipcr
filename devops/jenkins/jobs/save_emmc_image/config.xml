@@ -247,6 +247,12 @@ then
      exit 1
 fi
 
+
+if [ -e /usr/bin/wget.org ]
+then
+    sudo mv /usr/bin/wget.org /usr/bin/wget
+fi
+
 dpkg --configure -a
 sync
 swapoff -a

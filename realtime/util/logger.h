@@ -36,25 +36,41 @@ public:
 
     static Poco::Logger& get() { return *_logger; }
     static bool isSetup() { return _logger; }
-
+    static bool isDebug() { return _debug; }
+    static void setDebug() { _debug = true; }
+    
 private:
     static void setup(Poco::Channel *channel, const std::string &name);
 
 private:
     static Poco::Logger *_logger;
+    static bool _debug;
 };
 
 class LoggerStreams
 {
 public:
+    LoggerStreams()
+    {
+        _verbose = ::Logger::isDebug();
+    }
+    LoggerStreams(bool verbose)
+    {
+        _verbose = verbose;
+    }
     ~LoggerStreams();
 
     inline std::stringstream& stream(const std::string &key) { return _streams[key]; }
 
 private:
     std::map<std::string, std::stringstream> _streams;
+    bool _verbose;
 };
 
-#define APP_LOGGER Poco::LogStream(Logger::get())
+#define APP_LOGGER Poco::LogStream(::Logger::get())
+
+#define APP_DEBUGGER \
+    if (!::Logger::isDebug()) {} \
+    else APP_LOGGER 
 
 #endif // LOGGER_H
